@@ -482,15 +482,12 @@ struct binary_op_helper
         typename storage_traits<Expr2>::type
       > maker;
     typedef typename maker::type type;
-    typedef typename mp::find_evaluation<Op, type, true>::type::return_t Expr;
+    typedef mp::find_evaluation<Op, type, true> ev_t;
+    typedef typename ev_t::type::return_t Expr;
     typedef typename Expr::template make_helper<Op, type> make_helper;
     typedef typename make_helper::type return_t;
 
-    typedef mp::enable_if<mp::or_<
-            traits::is_expression<Expr1>,
-            traits::is_expression<Expr2> >,
-        return_t
-      > enable;
+    typedef mp::enable_if<traits::is_implemented<ev_t>, return_t> enable;
 
     static return_t make(const Expr1& left, const Expr2& right)
     {
@@ -502,10 +499,12 @@ template<class Op, class Expr>
 struct unary_op_helper
 {
     typedef tuple<typename storage_traits<Expr>::type, empty_tuple> type;
-    typedef typename Expr::template make_helper<Op, type> make_helper;
+    typedef mp::find_evaluation<Op, type, true> ev_t;
+    typedef typename ev_t::type::return_t Rexpr;
+    typedef typename Rexpr::template make_helper<Op, type> make_helper;
     typedef typename make_helper::type return_t;
 
-    typedef mp::enable_if<traits::is_expression<Expr>, return_t> enable;
+    typedef mp::enable_if<traits::is_implemented<ev_t>, return_t> enable;
 
     static return_t make(const Expr& e)
     {
@@ -892,14 +891,15 @@ struct evaluation<
 
 // Automatically invoke unary_expression
 template<bool result_is_temporary, class Op, class Data>
-struct evaluation<Op, tuple<const Data&, empty_tuple>, result_is_temporary, 0,
+struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
     typename mp::enable_if<
-        traits::is_implemented<unary_expression<Op, Data> > >::type>
+        traits::is_implemented<
+            unary_expression<Op, typename traits::basetype<Data>::type> > >::type>
 {
-    typedef unary_expression<Op, Data> wrapped_t;
+    typedef unary_expression<Op, typename traits::basetype<Data>::type> wrapped_t;
     typedef typename wrapped_t::return_t return_t;
     typedef empty_tuple temporaries_t;
-    typedef typename mp::make_tuple<const Data&>::type data_t;
+    typedef typename mp::make_tuple<Data>::type data_t;
     static void doit(const data_t& input, temporaries_t temps, return_t* output)
     {
         wrapped_t::doit(*output, input.head);
@@ -1056,6 +1056,17 @@ struct unary_expression<operations::name, type> \
 { \
     typedef type return_t; \
     static void doit(type& to, const type& from) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_UNARY_EXPR_COND(name, ret_type, cond, eval) \
+template<class T> \
+struct unary_expression<typename mp::enable_if<cond, operations::name>::type, T> \
+{ \
+    typedef ret_type return_t; \
+    static void doit(ret_type& to, const T& from) \
     { \
         eval; \
     } \

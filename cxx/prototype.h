@@ -253,22 +253,36 @@ divisible(const T1& t1, const T2& t2)
     return fmpz_divisible_si(t1.evaluate()._data(), t2);
 }
 
-// TODO should this be lazy?
-inline mpz fac(ulong n)
-{
-    mpz ret;
-    fmpz_fac_ui(ret._data(), n);
-    return ret;
-}
-
 // These functions are evaluated lazily
+
+FLINT_DEFINE_UNOP(fac)
 FLINT_DEFINE_BINOP(rfac)
+FLINT_DEFINE_BINOP(bin)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND(rfac, mpz, traits::is_unsigned_integer<T>,
         fmpz_rfac_ui(to._data(), e1._data(), e2))
+FLINT_DEFINE_UNARY_EXPR_COND(fac, mpz, traits::is_unsigned_integer<T>,
+        fmpz_fac_ui(to._data(), from))
+
+template<class T1, class T2>
+struct binary_expression<
+    T1,
+    typename mp::enable_if<
+        mp::and_<
+            traits::is_unsigned_integer<T1>,
+            traits::is_unsigned_integer<T2> >,
+        operations::bin>::type,
+    T2>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const T1& t1, const T2& t2)
+    {
+        fmpz_bin_uiui(to._data(), t1, t2);
+    }
+};
+} // rules
 
 // TODO many more functions
-} // rules
 
 } // flint
 

@@ -164,6 +164,8 @@ test_functions()
     tassert(sqrt(b) == 4);
     tassert(sqrt(a) == 1);
     tassert(rfac(a, 3u) == 2*3*4);
+    tassert(a + fac(4u) == 2 + 4*3*2);
+    tassert(bin(4u, 2u) == 6);
 
     // check namespace std
     tassert(std::pow(a, 4u) == 16);
@@ -177,7 +179,6 @@ test_functions()
     tassert(divisible(b, a + a + 2u) == false);
     tassert(divisible(a + a, (unsigned short)2));
     tassert(divisible(-a + b, 3) == false);
-    tassert(fac(4u) == 4*3*2);
 }
 
 template<class T>
