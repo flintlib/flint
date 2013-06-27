@@ -37,7 +37,6 @@ int n_is_prime(mp_limb_t n)
 #if !FLINT64
     return n_is_probabprime(n);
 #else
-    int isprime;
     if (n < 10000000000000000UL)
         return n_is_probabprime(n);
     else 
