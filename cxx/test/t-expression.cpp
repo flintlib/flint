@@ -405,6 +405,9 @@ test_initialization()
 
     myint d('a');
     tassert(d._data().payload == 'a' && d._data().extra == 3);
+
+    myint e(c + c);
+    tassert(e._data().payload == 16);
 }
 
 void

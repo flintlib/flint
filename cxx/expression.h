@@ -344,6 +344,7 @@ public:
                 rules::initialization<derived_t, T> > >::type* = 0,
             typename mp::enable_if<traits::is_expression<T> >::type* = 0)
     {
+        rules::empty_initialization<derived_t>::doit(downcast());
         T::ev_traits_t::evaluate_into_fresh(downcast(), t);
     }
 
