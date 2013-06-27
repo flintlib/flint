@@ -727,24 +727,25 @@ struct evaluation<
     typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
     typedef typename binop_helper::return_t::evaluated_t return_t;
 
-    typedef mp::merge_tuple<temporaries1_t, temporaries2_t> merger1;
-    typedef mp::merge_tuple<
-        typename mp::make_tuple<return2_t*>::type,
-        typename merger1::type> merger2;
-    typedef tuple<return1_t*, typename merger2::type> temporaries_t;
+    typedef mp::merge_tuple<typename mp::make_tuple<return2_t*>::type,
+                 temporaries2_t> merger2;
+    typedef mp::merge_tuple<tuple<return1_t*, typename merger2::type>,
+                 temporaries1_t> merger1;
+    typedef typename merger1::type temporaries_t;
 
     typedef typename mp::make_tuple<Data1, Data2>::type data_t;
 
     static void doit(const data_t& input, temporaries_t temps, return_t* output)
     {
-        temporaries1_t temps1 =
-            merger1::get_first(merger2::get_second(temps.tail));
+        temporaries1_t temps1 = merger1::get_second(temps);
         temporaries2_t temps2 =
-            merger1::get_second(merger2::get_second(temps.tail));
-        ev1_t::doit(input.first()._data(), temps1, temps.first());
-        ev2_t::doit(input.second()._data(), temps2,
-            merger2::get_first(temps.tail).head);
-        *output = binop_helper::make(*temps.first(), *temps.second());
+            merger2::get_second(merger1::get_first(temps).tail);
+        return1_t* ret1 = merger1::get_first(temps).head;
+        return2_t* ret2 =
+            merger2::get_first(merger1::get_first(temps).tail).head;
+        ev1_t::doit(input.first()._data(), temps1, ret1);
+        ev2_t::doit(input.second()._data(), temps2, ret2);
+        *output = binop_helper::make(*ret1, *ret2);
     }
 };
 
