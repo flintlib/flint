@@ -28,7 +28,7 @@
 
 void
 fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-                                  const fmpz_mod_poly_t poly, slong **degs)
+                                  const fmpz_mod_poly_t poly, slong * const *degs)
 {
     fmpz_mod_poly_t f, g, s, v, tmp;
     fmpz_mod_poly_t *h, *H, *I;

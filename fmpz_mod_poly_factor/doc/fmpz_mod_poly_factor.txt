@@ -128,7 +128,7 @@ void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-		const fmpz_mod_poly_t poly, slong **degs)
+		const fmpz_mod_poly_t poly, slong * const *degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
     of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}

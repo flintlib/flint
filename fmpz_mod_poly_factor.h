@@ -93,7 +93,7 @@ fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
                                const fmpz_mod_poly_t pol, slong d);
 
 void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-                                       const fmpz_mod_poly_t poly, slong **degs);
+                                       const fmpz_mod_poly_t poly, slong * const *degs);
 
 void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
