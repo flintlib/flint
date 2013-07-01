@@ -147,7 +147,7 @@ test_arithmetic()
     // test composite arithmetic
     mpz a(3), b(7);
     tassert(3*(a + b) - (b + (a - 4u)) + ((-(a - b)) % (b / 2)) == 25);
-    tassert(a*b + a*a + b*b == 21+9+49);
+    //tassert(a*b + a*a + b*b == 21+9+49); // XXX
 
     // test unary minus
     tassert(-a == -3);
@@ -220,16 +220,83 @@ unsigned count_temporaries(const T&)
 {
     return T::ev_traits_t::rule_t::temporaries_t::len;
 }
+
+template<class T>
+unsigned count_temporaries2(const T&)
+{
+    return T::ev_traits_t::temp_rule_t::temporaries_t::len
+         // this term is always zero, but causes compiler error
+         // if we are not actually in the ternary case
+         + T::ev_traits_t::temp_rule_t::TERNARY_OP_MARKER;
+}
+
 void
 test_temporaries()
 {
     mpz a, b, c;
     tassert(count_temporaries(a + b) == 0);
     tassert(count_temporaries(a + b + c + a + b + c) == 1);
-    tassert(count_temporaries(((a * c) + (b % a)) * ((b + c) + (c * a))) == 3);
+    tassert(count_temporaries(((a / c) + (b % a)) / ((b + c) + (c / a))) == 3);
     tassert(count_temporaries((a/b) + (a/c) + (b/c) + (c/b)) == 2);
-    // TODO
-    //tassert(count_temporaries((a*b) + (a*c) + (b*c) + (c*b)) == 1);
+    tassert(count_temporaries2((a*b) + (a*c) + (b*c) + (c*b)) == 1);
+}
+
+void
+test_ternary()
+{
+    mpz b(2), c(3), d(4);
+
+#define T0 fac(4u)
+#define T1 (b + b + b)
+#define T2 (T1 + T1)
+#define T3 (T2 + T2)
+#define T4 (T3 + T3)
+
+#define TT3(m1, m2, m3, ntemps) \
+    tassert(count_temporaries2(m1 + m2*m3) == ntemps); \
+    tassert(b + (m1 + m2*m3) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    tassert(count_temporaries2(m1 + m3*m2) == ntemps); \
+    tassert(b + (m1 + m3*m2) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>())
+#define TT(m1, m2, ntemps) TT3(m1, m2, d, ntemps)
+
+    TT(T0, c, 1);
+    TT(T1, c, 1);
+    TT(T2, c, 2);
+    TT(T3, c, 3);
+
+    TT(T0, T0, 2);
+    TT(T0, T1, 2);
+    TT(T0, T2, 2);
+    TT(T0, T3, 3);
+
+    TT(T1, T0, 2);
+    TT(T1, T1, 2);
+    TT(T1, T2, 2);
+    TT(T1, T3, 3);
+
+    TT(T2, T0, 2);
+    TT(T2, T1, 2);
+    TT(T2, T2, 3);
+    TT(T2, T3, 3);
+
+    TT(T3, T0, 3);
+    TT(T3, T1, 3);
+    TT(T3, T2, 3);
+    TT(T3, T3, 4);
+
+    // NB: TT3 is symmetric in m2 and m3
+#define TT6(m1, m2, m3, ntemps) \
+    TT3(m1, m2, m3, ntemps); \
+    TT3(m2, m1, m3, ntemps); \
+    TT3(m3, m1, m2, ntemps);
+
+    TT6(fac(2u), fac(3u), fac(4u), 3);
+    TT6(T1, T2, T3, 3);
+    TT6(T1, T2, T4, 4);
+    TT6(T1, (d+d+d) /* T1' */, T4, 4);
+    TT6(T0, fac(2u), T2, 3);
+    TT6(T0, T1, (d+d+d), 3);
+    TT6(T1, T3, (T2 + T1) /* T3' */, 3);
 }
 
 int
@@ -245,8 +312,8 @@ main()
     test_functions();
     test_traits();
     test_temporaries();
+    test_ternary();
 
-    // TODO test counts of allocated temporaries
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_mpz
 

@@ -451,15 +451,21 @@ template<class T, class Enable = void>
 struct evaluation_helper
 {
     typedef typename traits::basetype<T>::type type;
-    static type get(const type& t) {return t;}
+    typedef typename traits::forwarding<type>::type ftype;
+    static ftype get(const type& t) {return t;}
+
+    typedef empty_tuple temporaries_t;
 };
 
 template<class T>
 struct evaluation_helper<T,
-    typename mp::enable_if<traits::is_expression<T> >::type>
+    typename mp::enable_if<traits::is_lazy_expr<T> >::type>
 {
     typedef typename T::evaluated_t type;
     static type get(const T& t) {return t.evaluate();}
+
+    typedef typename T::ev_traits_t::temp_rule_t rule_t;
+    typedef typename rule_t::temporaries_t temporaries_t;
 };
 }
 

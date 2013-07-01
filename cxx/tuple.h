@@ -116,7 +116,7 @@ struct make_tuple<T1, void, void>
 // That is to say, given a tuple like <A*, B*, C*, D*>,
 // compute a backing tuple type <A, B, C, D>.
 // 
-// If Tuple::head_t is the same as Return*, do not back the head
+// If one of the types in the tuple is Return*, do not back it
 // and instead feed it in separately. I.e. if Return is A*, then type
 // will be just <B*, C*, D*>.
 //
@@ -130,10 +130,10 @@ struct back_tuple;
 template<class Head, class Tail, class Return>
 struct back_tuple<tuple<Head*, Tail>, Return>
 {
-    typedef tuple<Head, typename back_tuple<Tail, void>::type> type;
-    static void init(tuple<Head*, Tail>& to, type& from, Return* ret /* unused */)
+    typedef tuple<Head, typename back_tuple<Tail, Return>::type> type;
+    static void init(tuple<Head*, Tail>& to, type& from, Return* ret)
     {
-        back_tuple<Tail, void>::init(to.tail, from.tail, ret);
+        back_tuple<Tail, Return>::init(to.tail, from.tail, ret);
         to.head = &from.head;
     }
 };
@@ -142,11 +142,11 @@ struct back_tuple<tuple<Head*, Tail>, Return>
 template<class Head, class Tail>
 struct back_tuple<tuple<Head*, Tail>, Head>
 {
-    typedef typename back_tuple<Tail, void>::type type;
+    typedef typename back_tuple<Tail, void /* no more merging */>::type type;
     static void init(tuple<Head*, Tail>& to, type& from, Head* ret)
     {
         to.head = ret;
-        back_tuple<Tail, void>::init(to.tail, from, ret /* unused */ );
+        back_tuple<Tail, void>::init(to.tail, from, 0 /* unused */ );
     }
 };
 
@@ -402,7 +402,107 @@ struct merge_tuple<empty_tuple, empty_tuple>
     static empty_tuple get_first(const type& input) {return empty_tuple();}
     static empty_tuple get_second(const type& input) {return empty_tuple();}
 };
+
+
+// Creation and manipulation of homogeneous tuples
+template<class T, unsigned n>
+struct make_homogeneous_tuple
+{
+    typedef tuple<T, typename make_homogeneous_tuple<T, n-1>::type> type;
+};
+template<class T>
+struct make_homogeneous_tuple<T, 0>
+{
+    typedef empty_tuple type;
+};
+
+namespace htuples {
+namespace hdetail {
+template<unsigned n, class Tuple>
+struct extract_helper
+{
+    typedef typename Tuple::head_t T;
+    typedef typename Tuple::tail_t tail_t;
+    typedef typename make_homogeneous_tuple<T, n>::type ht;
+#if 0
+    static ht get(const Tuple& tuple, T skip)
+    {
+        if(tuple.head == skip)
+            return extract_helper<n, tail_t>::get_noskip(tuple.tail);
+        return ht(tuple.head,
+                extract_helper<n-1, tail_t>::get(
+                    tuple.tail, skip));
+    }
+#endif
+    static ht get_noskip(const Tuple& tuple)
+    {
+        return ht(tuple.head,
+                extract_helper<n-1, tail_t>::get_noskip(
+                    tuple.tail));
+    }
+};
+template<class Tuple>
+struct extract_helper<0, Tuple>
+{
+    //template<class T>
+    //static empty_tuple get(const Tuple&, T) {return empty_tuple();}
+    static empty_tuple get_noskip(const Tuple&) {return empty_tuple();}
+};
+
+template<class Tuple>
+struct remove_helper
+{
+    static const unsigned n = Tuple::len;
+    typedef typename Tuple::tail_t tail_t;
+    typedef typename Tuple::head_t T;
+    static tail_t get(const Tuple& tuple, T res)
+    {
+        if(tuple.head == res)
+            return tuple.tail;
+        return tail_t(tuple.head, remove_helper<tail_t>::get(tuple.tail, res));
+    }
+};
+template<class T>
+struct remove_helper<tuple<T, empty_tuple> >
+{
+    static empty_tuple get(const tuple<T, empty_tuple>&, T)
+    {
+        return empty_tuple();
+    }
+};
+} // hdetail
+#if 0
+template<unsigned n, class Tuple>
+typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
+        const Tuple& tuple, typename Tuple::head_t skip)
+{
+    return hdetail::extract_helper<n, Tuple>::get(tuple, skip);
+}
+#endif
+template<unsigned n, class Tuple>
+typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
+        const Tuple& tuple)
+{
+    return hdetail::extract_helper<n, Tuple>::get_noskip(tuple);
+}
+
+template<class Tuple>
+typename Tuple::tail_t removeres(const Tuple& tuple, typename Tuple::head_t res)
+{
+    return hdetail::remove_helper<Tuple>::get(tuple, res);
+}
+} // htuples
 } // mp
+
+namespace traits {
+// Compute if "Tuple" is of the form (U, U, .. U), or empty.
+template<class Tuple, class U>
+struct is_homogeneous_tuple : mp::and_<
+    is_homogeneous_tuple<typename Tuple::tail_t, U>,
+    mp::equal_types<typename Tuple::head_t, U> > { };
+template<class U>
+struct is_homogeneous_tuple<empty_tuple, U> : true_ { };
+}
 } // flint
 
 #endif

@@ -31,6 +31,7 @@
 
 using namespace flint;
 using namespace mp;
+using namespace traits;
 
 void
 test_make()
@@ -100,15 +101,18 @@ test_back()
 
     typedef make_tuple<A, B, C> make3;
     typedef make_tuple<A*, B*, C*> make3p;
-    typedef make_tuple<B, C> make2;
+    typedef make_tuple<B, C> make2A;
+    typedef make_tuple<A, C> make2B;
 
     typedef back_tuple<make3p::type, void> backvoid;
     typedef back_tuple<make3p::type, D> backD;
     typedef back_tuple<make3p::type, A> backA;
+    typedef back_tuple<make3p::type, B> backB;
 
     tassert((equal_types<backvoid::type, make3::type>::val));
     tassert((equal_types<backD::type, make3::type>::val));
-    tassert((equal_types<backA::type, make2::type>::val));
+    tassert((equal_types<backA::type, make2A::type>::val));
+    tassert((equal_types<backB::type, make2B::type>::val));
 
     make3::type backing = make3::make(1, 2, 3);
     make3p::type pointers;
@@ -118,7 +122,7 @@ test_back()
     tassert(pointers.second()->payload == 4);
 
     A ret = 4;
-    make2::type backing2 = make2::make(1, 2);
+    make2A::type backing2 = make2A::make(1, 2);
     backA::init(pointers, backing2, &ret);
     tassert(pointers.first()->payload == 4);
     tassert(pointers.second()->payload == 1);
@@ -131,9 +135,6 @@ test_back()
     tassert((equal_types<back_tuple<empty_tuple>::type, empty_tuple>::val));
     typedef tuple<int*, empty_tuple> tup1_t;
     tassert((equal_types<back_tuple<tup1_t, int>::type, empty_tuple>::val));
-
-    typedef back_tuple<make3p::type, B> backB;
-    backB::init(pointers, backing, 0);
 }
 
 void
@@ -308,6 +309,15 @@ test_merge()
     tassert(anothermerge::type::len == 2);
 }
 
+void
+test_traits()
+{
+    tassert((is_homogeneous_tuple<make_tuple<int, int, int>::type, int>::val
+                == true));
+    tassert((is_homogeneous_tuple<make_tuple<int, char, int>::type, int>::val
+                == false));
+}
+
 int
 main()
 {
@@ -317,6 +327,7 @@ main()
     test_back();
     test_concat();
     test_merge();
+    test_traits();
 
     std::cout << "PASS" << std::endl;
     return 0;

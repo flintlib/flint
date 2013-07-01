@@ -287,6 +287,25 @@ DEFINE_FUNC(test_mpz_asymadd_3,
 {
     out = a + b + c + a + b + c + d;
 }
+
+DEFINE_FUNC(test_mpz_ternary_1,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out = a + ((a+b) + c*d);
+}
+
+DEFINE_FUNC(test_mpz_ternary_2,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_t tmp;
+    fmpz_init(tmp);
+
+    fmpz_add(tmp, a._data(), b._data());
+    fmpz_addmul(tmp, c._data(), d._data());
+    fmpz_add(out._data(), a._data(), tmp);
+
+    fmpz_clear(tmp);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -334,6 +353,12 @@ test_mpz()
     //  and addresses.)
     tassert(count(ass1, "\n") == count(ass2, "\n"));
     tassert(count(ass3, "\n") == count(ass2, "\n"));
+
+    ass1 = disass(program, "test_mpz_ternary_1");
+    ass2 = disass(program, "test_mpz_ternary_2");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    tassert(count(ass1, "mov") == count(ass2, "mov"));
+    tassert(count(ass1, "\n") == count(ass2, "\n")); // XXX
 }
 
 int

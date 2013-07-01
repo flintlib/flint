@@ -56,8 +56,12 @@ template<class T>
 struct not_ : value_of<!T::val> { };
 
 // Compute logical and of the input values.
+template<class T1, class T2, class T3 = void,
+    class T4 = void, class T5 = void, class T6 = void>
+struct and_ : and_<T1, and_<T2, T3, T4, T5> > { };
+
 template<class T, class U>
-struct and_ : value_of<T::val && U::val> { };
+struct and_<T, U, void, void, void, void> : value_of<T::val && U::val> { };
 
 template<class T, bool u>
 struct and_v : and_<T, value_of<u> > { };
@@ -125,5 +129,12 @@ template<class T, class U = void>
 struct disable_if : public enable_if<not_<T>, U> { };
 } // mp
 } // flint
+
+#ifndef MAX
+#define MAX(A, B) ((A) > (B) ? (A) : (B))
+#endif
+#ifndef MIN
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#endif
 
 #endif

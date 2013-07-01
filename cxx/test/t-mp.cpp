@@ -53,6 +53,11 @@ test_logic()
     tassert((or_<true_, true_>::val == true));
     tassert((or_<false_, true_>::val == true));
     tassert((or_<false_, false_>::val == false));
+
+    tassert((and_<true_, true_, true_, true_, true_>::val == true));
+    tassert((and_<true_, true_, true_, false_, true_>::val == false));
+    tassert((and_<true_, false_, true_, false_, true_>::val == false));
+    tassert((and_<true_, false_, true_>::val == false));
 }
 
 template<class T>
