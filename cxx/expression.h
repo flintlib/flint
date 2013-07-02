@@ -705,7 +705,6 @@ namespace rules {
 // Hence to evaluate expressions like a + (b + c), it suffices to write
 // rules for composition of two immediates.
 
-// TODO use result_is_temporary
 template<bool result_is_temporary, class Op, class Data1, class Data2>
 struct evaluation<
     Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
@@ -718,12 +717,12 @@ struct evaluation<
     typedef typename mp::find_evaluation<
         typename Data1::operation_t,
         typename Data1::data_t,
-        true // TODO
+        true
       >::type ev1_t;
     typedef typename mp::find_evaluation<
         typename Data2::operation_t,
         typename Data2::data_t,
-        true // TODO
+        true
       >::type ev2_t;
     typedef typename ev1_t::return_t return1_t;
     typedef typename ev1_t::temporaries_t temporaries1_t;
@@ -733,6 +732,7 @@ struct evaluation<
     typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
     typedef typename binop_helper::return_t::evaluated_t return_t;
 
+    // TODO sometimes the other way round uses fewer temporaries
     typedef mp::merge_tuple<typename mp::make_tuple<return2_t*>::type,
                  temporaries2_t> merger2;
     typedef mp::merge_tuple<tuple<return1_t*, typename merger2::type>,
@@ -767,7 +767,7 @@ struct evaluation<
     typedef typename mp::find_evaluation<
         typename Data2::operation_t,
         typename Data2::data_t,
-        true // TODO
+        true
       >::type ev2_t;
     typedef typename ev2_t::return_t return2_t;
     typedef typename ev2_t::temporaries_t temporaries2_t;
@@ -803,7 +803,7 @@ struct evaluation<
     typedef typename mp::find_evaluation<
         typename Data1::operation_t,
         typename Data1::data_t,
-        true // TODO
+        true
       >::type ev1_t;
     typedef typename ev1_t::return_t return1_t;
     typedef typename ev1_t::temporaries_t temporaries1_t;
@@ -833,7 +833,7 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
 {
     typedef typename mp::find_evaluation<
         typename Data::operation_t, typename Data::data_t,
-        true // TODO
+        true
       >::type ev_t;
     typedef typename ev_t::return_t interm_t;
     typedef typename ev_t::temporaries_t interm_temps_t;

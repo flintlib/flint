@@ -314,6 +314,28 @@ test_ternary()
     TT6(T1, T3, (T2 + T1) /* T3' */, 3);
 }
 
+void
+test_ternary_assigments()
+{
+    mpz a(2), b(3), c(4);
+    tassert((a += b*c) == 14);
+    tassert(a == 14);
+    tassert((a -= b*c) == 2);
+    tassert(a == 2);
+
+    tassert((a += (b+b)*c) == 26);
+    tassert((a -= (b+b)*c) == 2);
+    tassert((a += c*(b+b)) == 26);
+    tassert((a -= c*(b+b)) == 2);
+
+    tassert((a += (b+b)*(c+c)) == 50);
+    tassert((a -= (b+b)*(c+c)) == 2);
+
+    // Make sure that the general rule kicks
+    tassert((a += 3*c) == 14);
+    tassert((a -= 3*c) == 2);
+}
+
 int
 main()
 {
@@ -328,6 +350,7 @@ main()
     test_traits();
     test_temporaries();
     test_ternary();
+    test_ternary_assigments();
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_mpz

@@ -597,6 +597,136 @@ struct evaluation<operations::plus,
 };
 } // rules
 
+// Assignment-arithmetic using ternaries.
+namespace detail {
+// XXX this basically reproduces the binary expression rule logic
+template<class Right1, class Right2, class Enable = void>
+struct ternary_assign_helper { };
+
+// both immediate
+template<class Right1, class Right2>
+struct ternary_assign_helper<const Right1&, const Right2&,
+    typename mp::enable_if<mp::and_<
+        traits::is_immediate_expr<Right1>,
+        traits::is_immediate_expr<Right2> > >::type>
+{
+    typedef mp::enable_if<mp::and_<
+        traits::is_mpz<Right1>, traits::is_mpz<Right2> >, mpz&> enable;
+
+    const mpz& right1;
+    const mpz& right2;
+
+    ternary_assign_helper(const Right1& r1, const Right2& r2)
+        : right1(r1), right2(r2) {};
+    const mpz& getleft() {return right1;}
+    const mpz& getright() {return right2;}
+};
+
+// left immediate
+template<class Right1, class Right2>
+struct ternary_assign_helper<const Right1&, Right2,
+    typename mp::enable_if<mp::and_<
+        traits::is_immediate_expr<Right1>,
+        traits::is_lazy_expr<Right2> > >::type>
+{
+    typedef mp::and_<traits::is_mpz<Right1>, traits::is_mpz<Right2> > cond;
+    typedef mp::enable_if<cond, mpz&> enable;
+    
+    const mpz& right1;
+    mpz right2;
+    ternary_assign_helper(const Right1& r1, const Right2& r2)
+        : right1(r1)
+    {
+        Right2::ev_traits_t::evaluate_into_fresh(right2, r2);
+    }
+    const mpz& getleft() {return right1;}
+    const mpz& getright() {return right2;}
+};
+
+// right immediate
+template<class Right1, class Right2>
+struct ternary_assign_helper<Right1, const Right2&,
+    typename mp::enable_if<mp::and_<
+        traits::is_immediate_expr<Right2>,
+        traits::is_lazy_expr<Right1> > >::type>
+{
+    typedef ternary_assign_helper<const Right2&, Right1> tah_t;
+    typedef mp::enable_if<typename tah_t::cond, mpz&> enable;
+    tah_t tah;
+    ternary_assign_helper(const Right1& r1, const Right2& r2)
+        : tah(r2, r1) {}
+    const mpz& getleft() {return tah.getright();}
+    const mpz& getright() {return tah.getleft();}
+};
+
+template<class Right1, class Right2>
+struct ternary_assign_helper<Right1, Right2,
+    typename mp::enable_if<mp::and_<
+        traits::is_lazy_expr<Right2>,
+        traits::is_lazy_expr<Right1> > >::type>
+{
+    // TODO this is literally copied from the binary expression rule
+    typedef mp::enable_if<mp::and_<
+        traits::is_mpz<Right1>, traits::is_mpz<Right2> >, mpz&> enable;
+
+    typedef typename Right1::ev_traits_t::temp_rule_t ev1_t;
+    typedef typename Right2::ev_traits_t::temp_rule_t ev2_t;
+    typedef typename ev1_t::temporaries_t temporaries1_t;
+    typedef typename ev2_t::temporaries_t temporaries2_t;
+    typedef mp::merge_tuple<mp::make_tuple<mpz*>::type, temporaries2_t> merger2;
+    typedef mp::merge_tuple<tuple<mpz*, typename merger2::type>,
+                 temporaries1_t> merger1;
+    typedef typename merger1::type temporaries_t;
+    typedef mp::back_tuple<temporaries_t> back_t;
+
+    typename back_t::type backing;
+    temporaries_t temps;
+    mpz* ret1;
+    mpz* ret2;
+
+    ternary_assign_helper(const Right1& r1, const Right2& r2)
+    {
+        back_t::init(temps, backing, 0);
+        temporaries1_t temps1 = merger1::get_second(temps);
+        temporaries2_t temps2 =
+            merger2::get_second(merger1::get_first(temps).tail);
+        ret1 = merger1::get_first(temps).head;
+        ret2 = merger2::get_first(merger1::get_first(temps).tail).head;
+        ev1_t::doit(r1._data(), temps1, ret1);
+        ev2_t::doit(r2._data(), temps2, ret2);
+    }
+
+    const mpz& getright() {return *ret2;}
+    const mpz& getleft() {return *ret1;}
+};
+} // detail
+
+// a += b*c
+template<class Right1, class Right2>
+inline typename detail::ternary_assign_helper<Right1, Right2>::enable::type
+operator+=(mpz& left, const mpz_expression<operations::times,
+        tuple<Right1, tuple<Right2, empty_tuple> > >& other)
+{
+    detail::ternary_assign_helper<Right1, Right2> tah(
+            other._data().first(), other._data().second());
+    fmpz_addmul(left._data(), tah.getleft()._data(),
+            tah.getright()._data());
+    return left;
+}
+
+// a -= b*c
+template<class Right1, class Right2>
+inline typename detail::ternary_assign_helper<Right1, Right2>::enable::type
+operator-=(mpz& left, const mpz_expression<operations::times,
+        tuple<Right1, tuple<Right2, empty_tuple> > >& other)
+{
+    detail::ternary_assign_helper<Right1, Right2> tah(
+            other._data().first(), other._data().second());
+    fmpz_submul(left._data(), tah.getleft()._data(),
+            tah.getright()._data());
+    return left;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 // FUNCTIONS

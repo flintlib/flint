@@ -360,6 +360,49 @@ DEFINE_FUNC(test_mpz_ternary_4,
 
     fmpz_clear(tmp1);fmpz_clear(tmp2);
 }
+
+DEFINE_FUNC(test_mpz_ternary_5,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out += a*b;
+}
+
+DEFINE_FUNC(test_mpz_ternary_6,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_addmul(out._data(), a._data(), b._data());
+}
+
+DEFINE_FUNC(test_mpz_ternary_7,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out += a*(b+c);
+}
+
+DEFINE_FUNC(test_mpz_ternary_8,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_t tmp; fmpz_init(tmp);
+    fmpz_add(tmp, b._data(), c._data());
+    fmpz_addmul(out._data(), a._data(), tmp);
+    fmpz_clear(tmp);
+}
+
+DEFINE_FUNC(test_mpz_ternary_9,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out += (a+d)*(b+c);
+}
+
+DEFINE_FUNC(test_mpz_ternary_10,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_t tmp1, tmp2; fmpz_init(tmp1); fmpz_init(tmp2);
+    fmpz_add(tmp1, b._data(), c._data());
+    fmpz_add(tmp2, a._data(), d._data());
+    fmpz_addmul(out._data(), tmp1, tmp2);
+    fmpz_clear(tmp1); fmpz_clear(tmp2);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -432,6 +475,22 @@ test_mpz()
     tassert(count(ass1, "jmp") == count(ass2, "jmp"));
     tassert(fuzzy_equals(count(ass1, "mov") + count(ass1, "lea"),
                          count(ass2, "mov") + count(ass2, "lea"), 0.1));
+    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
+
+    ass1 = disass(program, "test_mpz_ternary_6");
+    ass2 = disass(program, "test_mpz_ternary_5");
+    tassert(count(ass1, "\n") == count(ass2, "\n")); // XXX
+
+    ass1 = disass(program, "test_mpz_ternary_7");
+    ass2 = disass(program, "test_mpz_ternary_8");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    // NB: ass1 is actually shorter?!?
+    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
+
+    ass1 = disass(program, "test_mpz_ternary_9");
+    ass2 = disass(program, "test_mpz_ternary_10");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    // NB: ass1 is actually shorter?!?
     tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
 }
 
