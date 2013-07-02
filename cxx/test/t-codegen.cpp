@@ -232,6 +232,38 @@ DEFINE_FUNC(test_tuple_back_2,
     out.tail.tail.head = i3;
 }
 
+DEFINE_FUNC(test_tuple_extract_1,
+        (make_homogeneous_tuple<int, 4>::type& out,
+         const make_homogeneous_tuple<int, 7>::type& in))
+{
+    out = htuples::extract<4>(in);
+}
+
+DEFINE_FUNC(test_tuple_extract_2,
+        (make_homogeneous_tuple<int, 4>::type& out,
+         const make_homogeneous_tuple<int, 7>::type& in))
+{
+    out.head = in.head;
+    out.tail.head = in.tail.head;
+    out.tail.tail.head = in.tail.tail.head;
+    out.tail.tail.tail.head = in.tail.tail.tail.head;
+}
+
+DEFINE_FUNC(test_tuple_removeres_1,
+        (make_homogeneous_tuple<int, 2>::type& out, int in1, int in2))
+{
+    make_homogeneous_tuple<int, 3>::type tmp =
+        make_tuple<int, int, int>::make(1, in1, in2);
+    out = htuples::removeres(tmp, 1);
+}
+
+DEFINE_FUNC(test_tuple_removeres_2,
+        (make_homogeneous_tuple<int, 2>::type& out, int in1, int in2))
+{
+    out.head = in1;
+    out.tail.head = in2;
+}
+
 
 DEFINE_FUNC(test_mpz_symadd_1,
         (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
@@ -306,6 +338,28 @@ DEFINE_FUNC(test_mpz_ternary_2,
 
     fmpz_clear(tmp);
 }
+
+DEFINE_FUNC(test_mpz_ternary_3,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out = a + ((a+b) + ((c+a) + (a+d))*d);
+}
+
+DEFINE_FUNC(test_mpz_ternary_4,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_t tmp1, tmp2;
+    fmpz_init(tmp1);fmpz_init(tmp2);
+
+    fmpz_add(tmp1, c._data(), a._data());
+    fmpz_add(tmp2, a._data(), d._data());
+    fmpz_add(tmp1, tmp1, tmp2);
+    fmpz_add(tmp2, a._data(), b._data());
+    fmpz_addmul(tmp2, tmp1, d._data());
+    fmpz_add(out._data(), a._data(), tmp2);
+
+    fmpz_clear(tmp1);fmpz_clear(tmp2);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -327,6 +381,17 @@ test_tuple()
 
     ass1 = disass(program, "test_tuple_back_1");
     ass2 = disass(program, "test_tuple_back_2");
+    // XXX is this deterministic?
+    tassert(stripaddr(ass1) == stripaddr(ass2));
+
+    ass1 = disass(program, "test_tuple_extract_1");
+    ass2 = disass(program, "test_tuple_extract_2");
+    tassert(count(ass1, "\n") == count(ass2, "\n"));
+    tassert(count(ass1, "mov") == count(ass2, "mov"));
+    tassert(count(ass1, "call") == count(ass2, "call")); // 0
+
+    ass1 = disass(program, "test_tuple_removeres_1");
+    ass2 = disass(program, "test_tuple_removeres_2");
     // XXX is this deterministic?
     tassert(stripaddr(ass1) == stripaddr(ass2));
 }
@@ -359,6 +424,15 @@ test_mpz()
     tassert(count(ass1, "call") == count(ass2, "call"));
     tassert(count(ass1, "mov") == count(ass2, "mov"));
     tassert(count(ass1, "\n") == count(ass2, "\n")); // XXX
+
+    ass1 = disass(program, "test_mpz_ternary_3");
+    ass2 = disass(program, "test_mpz_ternary_4");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    tassert(count(ass1, "je") == count(ass2, "je"));
+    tassert(count(ass1, "jmp") == count(ass2, "jmp"));
+    tassert(fuzzy_equals(count(ass1, "mov") + count(ass1, "lea"),
+                         count(ass2, "mov") + count(ass2, "lea"), 0.1));
+    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
 }
 
 int

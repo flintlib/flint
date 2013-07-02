@@ -318,6 +318,26 @@ test_traits()
                 == false));
 }
 
+void
+test_htuples()
+{
+    tassert((equal_types<make_tuple<int, int, int>::type,
+                         make_homogeneous_tuple<int, 3>::type>::val));
+
+    typedef make_tuple<int, int, int> maker;
+    maker::type tpl = maker::make(1, 2, 3);
+
+    tassert(htuples::extract<1>(tpl) == make_tuple<int>::make(1));
+    tassert((htuples::extract<2>(tpl) == make_tuple<int, int>::make(1, 2)));
+    tassert((htuples::extract<3>(tpl) == make_tuple<int, int, int>::make(1, 2, 3)));
+
+    typedef make_tuple<int, int> make2;
+    tassert(htuples::removeres(tpl, 1) == make2::make(2, 3));
+    tassert(htuples::removeres(tpl, 2) == make2::make(1, 3));
+    tassert(htuples::removeres(tpl, 3) == make2::make(1, 2));
+    tassert(htuples::removeres(tpl, 4) == make2::make(1, 2));
+}
+
 int
 main()
 {
@@ -328,6 +348,7 @@ main()
     test_concat();
     test_merge();
     test_traits();
+    test_htuples();
 
     std::cout << "PASS" << std::endl;
     return 0;

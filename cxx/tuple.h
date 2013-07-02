@@ -63,6 +63,11 @@ struct tuple
         : head(h), tail(t)
     {
     }
+
+    bool operator==(const tuple& other)
+    {
+        return head == other.head && tail == other.tail;
+    }
 };
 
 struct empty_tuple
@@ -73,6 +78,8 @@ struct empty_tuple
     empty head;
     empty tail;
     static const unsigned len = 0;
+
+    bool operator==(const empty_tuple&) {return true;}
 };
 
 namespace mp {
@@ -405,6 +412,8 @@ struct merge_tuple<empty_tuple, empty_tuple>
 
 
 // Creation and manipulation of homogeneous tuples
+
+// Build a tuple type of "n" repetitions of "T".
 template<class T, unsigned n>
 struct make_homogeneous_tuple
 {
@@ -424,16 +433,7 @@ struct extract_helper
     typedef typename Tuple::head_t T;
     typedef typename Tuple::tail_t tail_t;
     typedef typename make_homogeneous_tuple<T, n>::type ht;
-#if 0
-    static ht get(const Tuple& tuple, T skip)
-    {
-        if(tuple.head == skip)
-            return extract_helper<n, tail_t>::get_noskip(tuple.tail);
-        return ht(tuple.head,
-                extract_helper<n-1, tail_t>::get(
-                    tuple.tail, skip));
-    }
-#endif
+
     static ht get_noskip(const Tuple& tuple)
     {
         return ht(tuple.head,
@@ -444,8 +444,6 @@ struct extract_helper
 template<class Tuple>
 struct extract_helper<0, Tuple>
 {
-    //template<class T>
-    //static empty_tuple get(const Tuple&, T) {return empty_tuple();}
     static empty_tuple get_noskip(const Tuple&) {return empty_tuple();}
 };
 
@@ -471,14 +469,8 @@ struct remove_helper<tuple<T, empty_tuple> >
     }
 };
 } // hdetail
-#if 0
-template<unsigned n, class Tuple>
-typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
-        const Tuple& tuple, typename Tuple::head_t skip)
-{
-    return hdetail::extract_helper<n, Tuple>::get(tuple, skip);
-}
-#endif
+
+// Extract the first "n" values from the *homogeneous* tuple "tuple".
 template<unsigned n, class Tuple>
 typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
         const Tuple& tuple)
@@ -486,6 +478,15 @@ typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
     return hdetail::extract_helper<n, Tuple>::get_noskip(tuple);
 }
 
+// Remove one element from the *homogeneous* tuple "tuple", if possible "res".
+// Example:
+//   t1 = (1, 2, 3, 4)
+//   t2 = (1, 1, 1, 1)
+//   t3 = (2, 3, 4, 5)
+//
+//   removeres(t1, 1) -> (2, 3, 4)
+//   removeres(t2, 1) -> (1, 1, 1)
+//   removeres(t3, 1) -> (2, 3, 4) or any other three element subset
 template<class Tuple>
 typename Tuple::tail_t removeres(const Tuple& tuple, typename Tuple::head_t res)
 {

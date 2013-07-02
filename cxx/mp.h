@@ -130,11 +130,4 @@ struct disable_if : public enable_if<not_<T>, U> { };
 } // mp
 } // flint
 
-#ifndef MAX
-#define MAX(A, B) ((A) > (B) ? (A) : (B))
-#endif
-#ifndef MIN
-#define MIN(A, B) ((A) < (B) ? (A) : (B))
-#endif
-
 #endif

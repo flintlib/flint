@@ -36,6 +36,7 @@
 #include "cxx/stdmath.h"
 
 #include "fmpz.h"
+// also gets us FLINT_MIN and FLINT_MAX
 
 namespace flint {
 // "concrete" expression classes
@@ -254,7 +255,7 @@ struct ternary_hhelper<Left, right1_t, right2_t, true, true>
 {
     typedef typename Left::ev_traits_t::temp_rule_t evl;
     static const unsigned norig = evl::temporaries_t::len;
-    static const unsigned ntemps = MAX(norig, 1);
+    static const unsigned ntemps = FLINT_MAX(norig, 1);
     typedef typename mp::make_homogeneous_tuple<mpz*, ntemps>::type
         temporaries_t;
 
@@ -331,7 +332,7 @@ struct ternary_hhelper<Left, right1_t, right2_t, false, true>
     typedef mp::evaluation_helper<right1_t> evhr1;
     static const unsigned t1 = evl::temporaries_t::len;
     static const unsigned t2 = evhr1::temporaries_t::len;
-    static const unsigned ntemps = MAX(2, MAX(t1, t2) + (t1 == t2));
+    static const unsigned ntemps = FLINT_MAX(2, FLINT_MAX(t1, t2) + (t1 == t2));
 
     typedef ternary_hhelper_1imm<Left, right1_t, right1_t, t1 >= t2> thh1;
     typedef typename mp::make_homogeneous_tuple<mpz*, ntemps>::type
@@ -373,16 +374,16 @@ struct ternary_hhelper<Left, right1_t, right2_t, false, false>
     static const unsigned t3 = evr2::temporaries_t::len;
 
     // m1, m2, m3 is t1, t2, t3 reordered s.t. m1 >= m2 >= m3
-    static const unsigned m1 = MAX(t1, MAX(t2, t3));
-    static const unsigned m3 = MIN(t1, MIN(t2, t3));
+    static const unsigned m1 = FLINT_MAX(t1, FLINT_MAX(t2, t3));
+    static const unsigned m3 = FLINT_MIN(t1, FLINT_MIN(t2, t3));
     static const unsigned m2 = t1 + t2 + t3 - m1 - m3;
 
     // The following is obtained by case analysis
     static const unsigned ntemps =
-        (t1 == t2 && t2 == t3) ? MAX(3, t1+2) : // all equal
-        ((m1 > m2 && m2 > m3)  ? MAX(3, m1) :   // all distinct
-         (m1 == m2 ? MAX(m1+1, 3)               // first two equal
-                   : MAX(m1, MAX(m2+2, 3))));   // second two equal
+        (t1 == t2 && t2 == t3) ? FLINT_MAX(3, t1+2) : // all equal
+        ((m1 > m2 && m2 > m3)  ? FLINT_MAX(3, m1) :   // all distinct
+         (m1 == m2 ? FLINT_MAX(m1+1, 3)               // first two equal
+                   : FLINT_MAX(m1, FLINT_MAX(m2+2, 3))));   // second two equal
     typedef typename mp::make_homogeneous_tuple<mpz*, ntemps>::type
         temporaries_t;
 
