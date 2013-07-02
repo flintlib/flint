@@ -483,10 +483,11 @@ struct ternary_hhelper<Left, right1_t, right2_t, false, false>
     }
 };
 
-template<class Left, class Right1, class Right2, class Enable = void>
+template<class Left, class Right1, class Right2,
+    class disable_op = void, class Enable = void>
 struct ternary_helper { };
-template<class Left, class Right1, class Right2>
-struct ternary_helper<Left, Right1, Right2,
+template<class Left, class Right1, class Right2, class disable_op>
+struct ternary_helper<Left, Right1, Right2, disable_op,
     typename mp::enable_if<mp::and_<
         traits::is_lazy_expr<Left>,
         traits::is_expression<typename traits::basetype<Right1>::type>,
@@ -506,7 +507,8 @@ struct ternary_helper<Left, Right1, Right2,
             typename mp::make_tuple<
                 typename evl::return_t,
                 typename evhr1::type,
-                typename evhr2::type>::type, mpz>
+                typename evhr2::type>::type, mpz>,
+        mp::not_<mp::equal_types<typename Left::operation_t, disable_op> >
       > > enable;
 
     typedef ternary_hhelper<Left, right1_t, right2_t,
@@ -525,12 +527,18 @@ struct ternary_helper<Left, Right1, Right2,
 };
 } // rdetail
 
-template<class Left, class Right1, class Right2>
-struct evaluation<operations::plus,
+// a +- b*c
+template<class Op, class Left, class Right1, class Right2>
+struct evaluation<Op,
     tuple<Left, tuple<
         mpz_expression<operations::times,
             tuple<Right1, tuple<Right2, empty_tuple> > >,
-        empty_tuple> >,
+        // NB: there is no particular reason to have the enable_if here,
+        //     many other similar places would do
+        typename mp::enable_if<mp::or_<
+                mp::equal_types<Op, operations::plus>,
+                mp::equal_types<Op, operations::minus> >,
+            empty_tuple>::type> >,
     true, 1,
     typename rdetail::ternary_helper<Left, Right1, Right2>::enable::type>
 {
@@ -543,6 +551,7 @@ struct evaluation<operations::plus,
         mpz_expression<operations::times,
             tuple<Right1, tuple<Right2, empty_tuple> > >,
         empty_tuple> > data_t;
+    static const bool is_add = mp::equal_types<Op, operations::plus>::val;
 
     static void doit(const data_t& input, temporaries_t temps, return_t* res)
     {
@@ -550,6 +559,38 @@ struct evaluation<operations::plus,
         const mpz* right = 0;
         th::doit(input.first(), input.second()._data().first(),
                 input.second()._data().second(), temps, res, right, left);
+        if(is_add)
+            fmpz_addmul(res->_data(), left->_data(), right->_data());
+        else
+            fmpz_submul(res->_data(), left->_data(), right->_data());
+    }
+};
+
+// b*c + a
+template<class Right, class Left1, class Left2>
+struct evaluation<operations::plus,
+    tuple<mpz_expression<operations::times,
+            tuple<Left1, tuple<Left2, empty_tuple> > >,
+        tuple<Right, empty_tuple> >,
+    true, 1,
+    typename rdetail::ternary_helper<
+        Right, Left1, Left2, operations::times>::enable::type>
+{
+    static const unsigned TERNARY_OP_MARKER = 0;
+
+    typedef mpz return_t;
+    typedef rdetail::ternary_helper<Right, Left1, Left2> th;
+    typedef typename th::temporaries_t temporaries_t;
+    typedef tuple<mpz_expression<operations::times,
+            tuple<Left1, tuple<Left2, empty_tuple> > >,
+        tuple<Right, empty_tuple> > data_t;
+
+    static void doit(const data_t& input, temporaries_t temps, return_t* res)
+    {
+        const mpz* left = 0;
+        const mpz* right = 0;
+        th::doit(input.second(), input.first()._data().first(),
+                input.first()._data().second(), temps, res, right, left);
         fmpz_addmul(res->_data(), left->_data(), right->_data());
     }
 };

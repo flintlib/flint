@@ -252,11 +252,26 @@ test_ternary()
 #define T3 (T2 + T2)
 #define T4 (T3 + T3)
 
+    // The inner struct is a trickery to get gcc to free some of its data
+    // structures. It reduces the resident set by 50%, and compile time by 75%.
 #define TT3(m1, m2, m3, ntemps) \
+    do{ struct inner { static void doit() { \
+    mpz b(2), c(3), d(4); \
     tassert(count_temporaries2(m1 + m2*m3) == ntemps); \
     tassert(b + (m1 + m2*m3) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
     tassert(count_temporaries2(m1 + m3*m2) == ntemps); \
-    tassert(b + (m1 + m3*m2) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>())
+    tassert(b + (m1 + m3*m2) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    \
+    tassert(count_temporaries2(m2*m3 + m1) == ntemps); \
+    tassert(b + (m2*m3 + m1) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    tassert(count_temporaries2(m1 + m3*m2) == ntemps); \
+    tassert(b + (m3*m2 + m1) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    \
+    tassert(count_temporaries2(m1 - m2*m3) == ntemps); \
+    tassert(b + (m1 - m2*m3) == 2 + m1.to<long>() - m2.to<long>()*m3.to<long>()); \
+    tassert(count_temporaries2(m1 - m3*m2) == ntemps); \
+    tassert(b + (m1 - m3*m2) == 2 + m1.to<long>() - m2.to<long>()*m3.to<long>()); \
+    } }; inner::doit();} while(0)
 #define TT(m1, m2, ntemps) TT3(m1, m2, d, ntemps)
 
     TT(T0, c, 1);
