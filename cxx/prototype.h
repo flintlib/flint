@@ -38,7 +38,6 @@
 #include "cxx/stdmath.h"
 
 #include "fmpz.h"
-// also gets us FLINT_MIN and FLINT_MAX
 
 namespace flint {
 // "concrete" expression classes
@@ -234,296 +233,6 @@ FLINT_DEFINE_BINARY_EXPR_COND(root, mpz, traits::fits_into_slong<T>,
         fmpz_root(to._data(), e1._data(), e2))
 FLINT_DEFINE_UNARY_EXPR(sqrt, mpz, fmpz_sqrt(to._data(), from._data()))
 
-namespace rdetail {
-// Evaluation using ternary operators is actually surprisingly hard.
-// Consider e.g. a + b*c. The number of temporaries needed for this depends
-// on whether or not b, c are immediates, and on the numbers of temporaries
-// needed for each non-immediate expression.
-
-// This struct deals with the difficulties in whether b or c might be
-// immediate.
-template<class Left, class rigth1_t, class right2_t,
-    bool bimm, bool cimm>
-struct ternary_hhelper;
-
-// Case where both are immediate.
-template<class Left, class right1_t, class right2_t>
-struct ternary_hhelper<Left, right1_t, right2_t, true, true>
-{
-    typedef typename Left::ev_traits_t::temp_rule_t evl;
-    static const unsigned norig = evl::temporaries_t::len;
-    static const unsigned ntemps = FLINT_MAX(norig, 1);
-    typedef typename mp::make_homogeneous_tuple<mpz*, ntemps>::type
-        temporaries_t;
-
-    static void doit(const Left& left, const right1_t& right1,
-            const right2_t& right2, temporaries_t temps, mpz* res,
-            const mpz*& toright1, const mpz*& toright2)
-    {
-        evl::doit(left._data(), mp::htuples::extract<norig>(temps), res);
-        toright1 = &right1;
-        toright2 = &right2;
-    }
-};
-
-// If c is immediate but b is not, there are still two subcases.
-// Let t1 be the number of temporaries needed to evaluate a, and
-// t2 the number for b. If t1 >= t2, then we need to evaluate a first.
-// Otherwise b.
-// In any case, the number of temporaries is at least two (for the two return
-// values), and generically equal to the maximum of t1 and t2. If however
-// t1 == t2, then we need an additional temporary.
-template<class Left, class right1_t, class right2_t, bool t1_ge_t2>
-struct ternary_hhelper_1imm;
-// Case where t1 >= t2
-template<class Left, class right1_t, class right2_t>
-struct ternary_hhelper_1imm<Left, right1_t, right2_t, true>
-{
-    typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef typename right1_t::ev_traits_t::temp_rule_t evr;
-    static const unsigned t1 = evl::temporaries_t::len;
-    static const unsigned t2 = evr::temporaries_t::len;
-    // t1 >= t2
-
-    template<class Temps>
-    static void doit(const Left& left, const right1_t& right1,
-            Temps temps, mpz* res,
-            const mpz*& toright1)
-    {
-        evl::doit(left._data(), mp::htuples::extract<t1>(temps), res);
-        typename Temps::tail_t nores = mp::htuples::removeres(temps, res);
-        evr::doit(right1._data(),
-                mp::htuples::extract<t2>(nores), nores.head);
-        toright1 = nores.head;
-    }
-};
-// Case where t1 < t2
-template<class Left, class right1_t, class right2_t>
-struct ternary_hhelper_1imm<Left, right1_t, right2_t, false>
-{
-    typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef typename right1_t::ev_traits_t::temp_rule_t evr;
-    static const unsigned t1 = evl::temporaries_t::len;
-    static const unsigned t2 = evr::temporaries_t::len;
-    // t1 < t2
-
-    template<class Temps>
-    static void doit(const Left& left, const right1_t& right1,
-            Temps temps, mpz* res,
-            const mpz*& toright1)
-    {
-        typedef typename Temps::tail_t tail_t;
-        tail_t nores = mp::htuples::removeres(temps, res);
-        evr::doit(right1._data(),
-                mp::htuples::extract<t2>(temps), nores.head);
-        toright1 = nores.head;
-        evl::doit(left._data(),
-                mp::htuples::extract<t1>(tail_t(res, nores.tail)), res);
-    }
-};
-// Case where c is immediate.
-template<class Left, class right1_t, class right2_t>
-struct ternary_hhelper<Left, right1_t, right2_t, false, true>
-{
-    typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef tools::evaluation_helper<right1_t> evhr1;
-    static const unsigned t1 = evl::temporaries_t::len;
-    static const unsigned t2 = evhr1::temporaries_t::len;
-    static const unsigned ntemps = FLINT_MAX(2, FLINT_MAX(t1, t2) + (t1 == t2));
-
-    typedef ternary_hhelper_1imm<Left, right1_t, right1_t, t1 >= t2> thh1;
-    typedef typename mp::make_homogeneous_tuple<mpz*, ntemps>::type
-        temporaries_t;
-
-    static void doit(const Left& left, const right1_t& right1,
-            const right2_t& right2, temporaries_t temps, mpz* res,
-            const mpz*& toright1, const mpz*& toright2)
-    {
-        toright2 = &right2;
-        thh1::doit(left, right1, temps, res, toright1);
-    }
-};
-
-// Case where b is immediate.
-template<class Left, class right1_t, class right2_t>
-struct ternary_hhelper<Left, right1_t, right2_t, true, false>
-{
-    typedef ternary_hhelper<Left, right2_t, right1_t, false, true> thh;
-    typedef typename thh::temporaries_t temporaries_t;
-
-    static void doit(const Left& left, const right1_t& right1,
-            const right2_t& right2, temporaries_t temps, mpz* res,
-            const mpz*& toright1, const mpz*& toright2)
-    {
-        thh::doit(left, right2, right1, temps, res, toright2, toright1);
-    }
-};
-
-// Case where neither is immediate.
-template<class Left, class right1_t, class right2_t>
-struct ternary_hhelper<Left, right1_t, right2_t, false, false>
-{
-    typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef typename right1_t::ev_traits_t::temp_rule_t evr1;
-    typedef typename right2_t::ev_traits_t::temp_rule_t evr2;
-    static const unsigned t1 = evl::temporaries_t::len;
-    static const unsigned t2 = evr1::temporaries_t::len;
-    static const unsigned t3 = evr2::temporaries_t::len;
-
-    // m1, m2, m3 is t1, t2, t3 reordered s.t. m1 >= m2 >= m3
-    static const unsigned m1 = FLINT_MAX(t1, FLINT_MAX(t2, t3));
-    static const unsigned m3 = FLINT_MIN(t1, FLINT_MIN(t2, t3));
-    static const unsigned m2 = t1 + t2 + t3 - m1 - m3;
-
-    // The following is obtained by case analysis
-    static const unsigned ntemps =
-        (t1 == t2 && t2 == t3) ? FLINT_MAX(3, t1+2) : // all equal
-        ((m1 > m2 && m2 > m3)  ? FLINT_MAX(3, m1) :   // all distinct
-         (m1 == m2 ? FLINT_MAX(m1+1, 3)               // first two equal
-                   : FLINT_MAX(m1, FLINT_MAX(m2+2, 3))));   // second two equal
-    typedef typename mp::make_homogeneous_tuple<mpz*, ntemps>::type
-        temporaries_t;
-
-    struct resaccess
-    {
-        mpz* res;
-        resaccess(mpz* r) : res(r) {};
-
-        template<class Eval, class Temps, class Data>
-        typename Temps::tail_t doit(const Data& d, Temps temps)
-        {
-            Eval::doit(d,
-                    mp::htuples::extract<Eval::temporaries_t::len>(temps),
-                    res);
-            return mp::htuples::extract<Temps::len-1>(temps);
-        }
-    };
-    struct toaccess
-    {
-        const mpz*& right;
-        toaccess(const mpz*& r) : right(r) {};
-
-        template<class Eval, class Temps, class Data>
-        typename Temps::tail_t doit(const Data& d, Temps temps)
-        {
-            Eval::doit(d,
-                    mp::htuples::extract<Eval::temporaries_t::len>(temps),
-                    temps.head);
-            right = temps.head;
-            return temps.tail;
-        }
-    };
-
-    struct doit_really
-    {
-        template<class E1, class E2, class E3, class A1, class A2, class A3>
-        static void doit(const E1& e1, const E2& e2,
-                const E3& e3, temporaries_t temps,
-                A1 a1, A2 a2, A3 a3)
-        {
-            typedef typename E1::ev_traits_t::temp_rule_t ev1;
-            typedef typename E2::ev_traits_t::temp_rule_t ev2;
-            typedef typename E3::ev_traits_t::temp_rule_t ev3;
-            a3.template doit<ev3>(e3._data(), 
-                    a2.template doit<ev2>(e2._data(),
-                        a1.template doit<ev1>(e1._data(), temps)));
-        }
-    };
-    struct dont_doit
-    {
-        template<class E1, class E2, class E3, class A1, class A2, class A3>
-        static void doit(const E1& e1, const E2& e2,
-                const E3& e3, temporaries_t temps,
-                A1 a1, A2 a2, A3 a3)
-        {
-        }
-    };
-
-    template<class E1, class E2, class E3, class A1, class A2, class A3>
-    static void doit_sort(const E1& e1, const E2& e2,
-            const E3& e3, temporaries_t temps,
-            A1 a1, A2 a2, A3 a3)
-    {
-        typedef typename E1::ev_traits_t::temp_rule_t ev1;
-        typedef typename E2::ev_traits_t::temp_rule_t ev2;
-        typedef typename E3::ev_traits_t::temp_rule_t ev3;
-        static const unsigned u1 = ev1::temporaries_t::len;
-        static const unsigned u2 = ev2::temporaries_t::len;
-        static const unsigned u3 = ev3::temporaries_t::len;
-
-        if(u1 < u2)
-            return doit_sort(e2, e1, e3, temps, a2, a1, a3);
-        if(u2 < u3)
-            return doit_sort(e1, e3, e2, temps, a1, a3, a2);
-
-        // If we reach this point, u1 >= u2 >= u3.
-        // However, even if this is not the case, the following line (and
-        // everything it instantiates) still has to compile.
-        mp::if_v<(u1 >= u2 && u2 >= u3), doit_really, dont_doit>::type::doit(
-                e1, e2, e3, temps, a1, a2, a3);
-    }
-
-    static void doit(const Left& left, const right1_t& right1,
-            const right2_t& right2, temporaries_t temps, mpz* res,
-            const mpz*& toright1, const mpz*& toright2)
-    {
-        // We re-order the temporaries in such a way that res is at the
-        // very end. When evaluating things in the correct order, it is then
-        // always correct to take temporaries from the front, and drop them
-        // from the front.
-        temporaries_t temps_reordered = mp::concat_tuple<
-            typename temporaries_t::tail_t,
-            mp::make_tuple<mpz*>::type>::doit(
-                    mp::htuples::removeres(temps, res),
-                    mp::make_tuple<mpz*>::make(res));
-        doit_sort(left, right1, right2, temps_reordered,
-                resaccess(res), toaccess(toright1), toaccess(toright2));
-    }
-};
-
-template<class Left, class Right1, class Right2,
-    class disable_op = void, class Enable = void>
-struct ternary_helper { };
-template<class Left, class Right1, class Right2, class disable_op>
-struct ternary_helper<Left, Right1, Right2, disable_op,
-    typename mp::enable_if<mp::and_<
-        traits::is_lazy_expr<Left>,
-        traits::is_expression<typename traits::basetype<Right1>::type>,
-        traits::is_expression<typename traits::basetype<Right1>::type> > >::type>
-{
-    typedef typename traits::basetype<Right1>::type right1_t;
-    typedef typename traits::basetype<Right2>::type right2_t;
-
-    typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef tools::evaluation_helper<right1_t> evhr1;
-    typedef tools::evaluation_helper<right2_t> evhr2;
-    typedef mp::enable_if<mp::and_<
-        traits::is_homogeneous_tuple<typename evl::temporaries_t, mpz*>,
-        traits::is_homogeneous_tuple<typename evhr1::temporaries_t, mpz*>,
-        traits::is_homogeneous_tuple<typename evhr2::temporaries_t, mpz*>,
-        traits::is_homogeneous_tuple<
-            typename mp::make_tuple<
-                typename evl::return_t,
-                typename evhr1::type,
-                typename evhr2::type>::type, mpz>,
-        mp::not_<mp::equal_types<typename Left::operation_t, disable_op> >
-      > > enable;
-
-    typedef ternary_hhelper<Left, right1_t, right2_t,
-            traits::is_immediate<right1_t>::val,
-            traits::is_immediate<right2_t>::val> inner;
-    typedef typename inner::temporaries_t temporaries_t;
-
-    // evaluate left into res, rigth1 and right2 to arbitrary location,
-    // set toright1, toright2 to these locations
-    static void doit(const Left& left, const right1_t& right1,
-            const right2_t& right2, temporaries_t temps, mpz* res,
-            const mpz*& toright1, const mpz*& toright2)
-    {
-        inner::doit(left, right1, right2, temps, res, toright1, toright2);
-    }
-};
-} // rdetail
 
 // a +- b*c
 template<class Op, class Left, class Right1, class Right2>
@@ -538,12 +247,12 @@ struct evaluation<Op,
                 mp::equal_types<Op, operations::minus> >,
             empty_tuple>::type> >,
     true, 1,
-    typename rdetail::ternary_helper<Left, Right1, Right2>::enable::type>
+    typename tools::ternary_helper<mpz, Left, Right1, Right2>::enable::type>
 {
     static const unsigned TERNARY_OP_MARKER = 0;
 
     typedef mpz return_t;
-    typedef rdetail::ternary_helper<Left, Right1, Right2> th;
+    typedef tools::ternary_helper<mpz, Left, Right1, Right2> th;
     typedef typename th::temporaries_t temporaries_t;
     typedef tuple<Left, tuple<
         mpz_expression<operations::times,
@@ -571,13 +280,13 @@ struct evaluation<operations::plus,
             tuple<Left1, tuple<Left2, empty_tuple> > >,
         tuple<Right, empty_tuple> >,
     true, 1,
-    typename rdetail::ternary_helper<
+    typename tools::ternary_helper<mpz, 
         Right, Left1, Left2, operations::times>::enable::type>
 {
     static const unsigned TERNARY_OP_MARKER = 0;
 
     typedef mpz return_t;
-    typedef rdetail::ternary_helper<Right, Left1, Left2> th;
+    typedef tools::ternary_helper<mpz, Right, Left1, Left2> th;
     typedef typename th::temporaries_t temporaries_t;
     typedef tuple<mpz_expression<operations::times,
             tuple<Left1, tuple<Left2, empty_tuple> > >,
