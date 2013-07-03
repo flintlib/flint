@@ -316,6 +316,11 @@ test_traits()
                 == true));
     tassert((is_homogeneous_tuple<make_tuple<int, char, int>::type, int>::val
                 == false));
+
+    tassert(is_tuple<empty_tuple>::val == true);
+    tassert(is_tuple<make_tuple<int>::type>::val == true);
+    tassert((is_tuple<make_tuple<int, long>::type>::val == true));
+    tassert(is_tuple<int>::val == false);
 }
 
 void

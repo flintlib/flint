@@ -468,6 +468,8 @@ test_traits()
     tassert(is_lazy_expr<immediate_expression>::val == false);
     tassert(is_lazy_expr<immediate_nonexpression>::val == false);
     tassert(is_lazy_expr<lazy_expression>::val == true);
+    //tassert(is_lazy_expr<lazy_expression&>::val == false);
+    tassert(is_lazy_expr<const immediate_expression&>::val == false);
 }
 
 void

@@ -32,7 +32,9 @@
 // * non-explicit ctos
 // * contexts
 
+#include "cxx/evaluation_tools.h"
 #include "cxx/expression.h"
+#include "cxx/expression_traits.h"
 #include "cxx/stdmath.h"
 
 #include "fmpz.h"
@@ -69,12 +71,7 @@ typedef mpz_expression<operations::immediate, fmpz_t> mpz;
 // HELPERS
 ///////////////////////////////////////////////////////////////////
 namespace traits {
-template<class T, class Enable = void>
-struct is_mpz
-    : mp::equal_types<typename T::evaluated_t, mpz> { };
-template<class T>
-struct is_mpz<T, typename mp::disable_if<traits::is_expression<T> >::type>
-    : false_ { };
+template<class T> struct is_mpz : is_T_expr<T, mpz> { };
 } // traits
 namespace mp {
 template<class Out, class T1, class T2 = void>
@@ -329,7 +326,7 @@ template<class Left, class right1_t, class right2_t>
 struct ternary_hhelper<Left, right1_t, right2_t, false, true>
 {
     typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef mp::evaluation_helper<right1_t> evhr1;
+    typedef tools::evaluation_helper<right1_t> evhr1;
     static const unsigned t1 = evl::temporaries_t::len;
     static const unsigned t2 = evhr1::temporaries_t::len;
     static const unsigned ntemps = FLINT_MAX(2, FLINT_MAX(t1, t2) + (t1 == t2));
@@ -498,8 +495,8 @@ struct ternary_helper<Left, Right1, Right2, disable_op,
     typedef typename traits::basetype<Right2>::type right2_t;
 
     typedef typename Left::ev_traits_t::temp_rule_t evl;
-    typedef mp::evaluation_helper<right1_t> evhr1;
-    typedef mp::evaluation_helper<right2_t> evhr2;
+    typedef tools::evaluation_helper<right1_t> evhr1;
+    typedef tools::evaluation_helper<right2_t> evhr2;
     typedef mp::enable_if<mp::and_<
         traits::is_homogeneous_tuple<typename evl::temporaries_t, mpz*>,
         traits::is_homogeneous_tuple<typename evhr1::temporaries_t, mpz*>,
@@ -599,111 +596,39 @@ struct evaluation<operations::plus,
 
 // Assignment-arithmetic using ternaries.
 namespace detail {
-// XXX this basically reproduces the binary expression rule logic
-template<class Right1, class Right2, class Enable = void>
-struct ternary_assign_helper { };
-
-// both immediate
 template<class Right1, class Right2>
-struct ternary_assign_helper<const Right1&, const Right2&,
-    typename mp::enable_if<mp::and_<
-        traits::is_immediate_expr<Right1>,
-        traits::is_immediate_expr<Right2> > >::type>
+struct ternary_assign_helper
 {
-    typedef mp::enable_if<mp::and_<
-        traits::is_mpz<Right1>, traits::is_mpz<Right2> >, mpz&> enable;
-
-    const mpz& right1;
-    const mpz& right2;
-
-    ternary_assign_helper(const Right1& r1, const Right2& r2)
-        : right1(r1), right2(r2) {};
-    const mpz& getleft() {return right1;}
-    const mpz& getright() {return right2;}
-};
-
-// left immediate
-template<class Right1, class Right2>
-struct ternary_assign_helper<const Right1&, Right2,
-    typename mp::enable_if<mp::and_<
-        traits::is_immediate_expr<Right1>,
-        traits::is_lazy_expr<Right2> > >::type>
-{
-    typedef mp::and_<traits::is_mpz<Right1>, traits::is_mpz<Right2> > cond;
-    typedef mp::enable_if<cond, mpz&> enable;
-    
-    const mpz& right1;
-    mpz right2;
-    ternary_assign_helper(const Right1& r1, const Right2& r2)
-        : right1(r1)
-    {
-        Right2::ev_traits_t::evaluate_into_fresh(right2, r2);
-    }
-    const mpz& getleft() {return right1;}
-    const mpz& getright() {return right2;}
-};
-
-// right immediate
-template<class Right1, class Right2>
-struct ternary_assign_helper<Right1, const Right2&,
-    typename mp::enable_if<mp::and_<
-        traits::is_immediate_expr<Right2>,
-        traits::is_lazy_expr<Right1> > >::type>
-{
-    typedef ternary_assign_helper<const Right2&, Right1> tah_t;
-    typedef mp::enable_if<typename tah_t::cond, mpz&> enable;
-    tah_t tah;
-    ternary_assign_helper(const Right1& r1, const Right2& r2)
-        : tah(r2, r1) {}
-    const mpz& getleft() {return tah.getright();}
-    const mpz& getright() {return tah.getleft();}
-};
-
-template<class Right1, class Right2>
-struct ternary_assign_helper<Right1, Right2,
-    typename mp::enable_if<mp::and_<
-        traits::is_lazy_expr<Right2>,
-        traits::is_lazy_expr<Right1> > >::type>
-{
-    // TODO this is literally copied from the binary expression rule
-    typedef mp::enable_if<mp::and_<
-        traits::is_mpz<Right1>, traits::is_mpz<Right2> >, mpz&> enable;
-
-    typedef typename Right1::ev_traits_t::temp_rule_t ev1_t;
-    typedef typename Right2::ev_traits_t::temp_rule_t ev2_t;
-    typedef typename ev1_t::temporaries_t temporaries1_t;
-    typedef typename ev2_t::temporaries_t temporaries2_t;
-    typedef mp::merge_tuple<mp::make_tuple<mpz*>::type, temporaries2_t> merger2;
-    typedef mp::merge_tuple<tuple<mpz*, typename merger2::type>,
-                 temporaries1_t> merger1;
-    typedef typename merger1::type temporaries_t;
+    typedef tools::evaluate_2<Right1, Right2> ev2_t;
+    typedef typename ev2_t::temporaries_t temporaries_t;
     typedef mp::back_tuple<temporaries_t> back_t;
 
     typename back_t::type backing;
-    temporaries_t temps;
-    mpz* ret1;
-    mpz* ret2;
+    ev2_t ev2;
 
-    ternary_assign_helper(const Right1& r1, const Right2& r2)
+    static temporaries_t backtemps(typename back_t::type& backing)
     {
-        back_t::init(temps, backing, 0);
-        temporaries1_t temps1 = merger1::get_second(temps);
-        temporaries2_t temps2 =
-            merger2::get_second(merger1::get_first(temps).tail);
-        ret1 = merger1::get_first(temps).head;
-        ret2 = merger2::get_first(merger1::get_first(temps).tail).head;
-        ev1_t::doit(r1._data(), temps1, ret1);
-        ev2_t::doit(r2._data(), temps2, ret2);
+        temporaries_t temps;
+        back_t::init(temps, backing);
+        return temps;
     }
 
-    const mpz& getright() {return *ret2;}
-    const mpz& getleft() {return *ret1;}
+    ternary_assign_helper(typename ev2_t::arg1_t r1, typename ev2_t::arg2_t r2)
+        : ev2(backtemps(backing), r1, r2) {}
+    const mpz& getleft() {return ev2.get1();}
+    const mpz& getright() {return ev2.get2();}
 };
+
+template<class Right1, class Right2>
+struct enable_ternary_assign
+    : mp::enable_all_mpz<mpz&,
+        typename traits::basetype<Right1>::type,
+        typename traits::basetype<Right2>::type> { };
 } // detail
 
 // a += b*c
 template<class Right1, class Right2>
-inline typename detail::ternary_assign_helper<Right1, Right2>::enable::type
+inline typename detail::enable_ternary_assign<Right1, Right2>::type
 operator+=(mpz& left, const mpz_expression<operations::times,
         tuple<Right1, tuple<Right2, empty_tuple> > >& other)
 {
@@ -716,7 +641,7 @@ operator+=(mpz& left, const mpz_expression<operations::times,
 
 // a -= b*c
 template<class Right1, class Right2>
-inline typename detail::ternary_assign_helper<Right1, Right2>::enable::type
+inline typename detail::enable_ternary_assign<Right1, Right2>::type
 operator-=(mpz& left, const mpz_expression<operations::times,
         tuple<Right1, tuple<Right2, empty_tuple> > >& other)
 {

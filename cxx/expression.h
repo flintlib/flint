@@ -32,170 +32,14 @@
 #include <iosfwd>
 #include <string>
 
+#include "cxx/evaluation_tools.h"
+#include "cxx/expression_traits.h"
 #include "cxx/mp.h"
+#include "cxx/rules.h"
 #include "cxx/traits.h"
 #include "cxx/tuple.h"
 
 namespace flint {
-
-namespace operations {
-// TODO document these
-// unary operations
-struct immediate { };
-struct negate { };
-
-// binary operations
-struct plus { };
-struct minus { };
-struct times { };
-struct divided_by { };
-struct modulo { };
-} // operations
-
-namespace rules {
-// TODO document these
-struct no_op
-{
-    template<class U>
-    static void doit(const U&) {}
-};
-
-struct UNIMPLEMENTED
-{
-    static const bool unimplemented_marker = true;
-};
-
-template<class T, class From, class Enable = void>
-struct initialization : UNIMPLEMENTED { };
-
-template<class T, class Enable = void>
-struct print : UNIMPLEMENTED { };
-
-template<class T, class Enable = void>
-struct to_string : UNIMPLEMENTED { };
-// static std::string get(const T&, int base)
-
-template<class T, class Enable = void>
-struct destruction : no_op { };
-
-template<class T, class Enable = void>
-struct empty_initialization : UNIMPLEMENTED { };
-
-template<class T, class U, class Enable = void>
-struct assignment : UNIMPLEMENTED { };
-
-// C-style cmp.
-template<class T, class U, class Enable = void>
-struct cmp : UNIMPLEMENTED { };
-
-// For internal use
-template<class T, class U>
-struct _symmetric_cmp;
-
-// Rule for equals. Implemented in terms of cmp by default.
-template<class T, class U, class Enable = void>
-struct equals : UNIMPLEMENTED { };
-
-template<class To, class From, class Enable = void>
-struct conversion
-{
-    static To get(const From& from)
-    {
-        return To(from);
-    }
-};
-
-// If result_is_temporary is true, then the result coincides with the
-// first temporary (provided these have the same type)
-// Priorities 2, 1, 0 can be used to resolve conflicts.
-template<
-    class Op, class Data,
-    bool result_is_temporary,
-    unsigned priority,
-    class Enable = void>
-struct evaluation : UNIMPLEMENTED { };
-//{
-//    typedef X return_t;
-//    typedef Y temporaries_t; // a tuple of *pointers*
-//    static void doit(const T& input, temporaries_t temps, return_t* output);
-//};
-
-// Convenience helpers, instantiate by evaluation if necessary
-template<class T, class Op, class U>
-struct binary_expression : UNIMPLEMENTED { };
-// typedef X return_t;
-// static void doit(return_t& to, const T&, const U&);
-template<class T, class Op, class U>
-struct commutative_binary_expression : UNIMPLEMENTED { };
-// similarly
-
-template<class Op, class T>
-struct unary_expression : UNIMPLEMENTED { };
-} // rules
-
-namespace traits {
-template<class T>
-struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
-} // traits
-
-namespace mp {
-template<class Op, class Data,
-    bool result_is_temporary, unsigned min_prio = 0>
-struct find_evaluation
-{
-private:
-    typedef rules::evaluation<Op, Data, result_is_temporary, 2> r2;
-    typedef rules::evaluation<Op, Data, result_is_temporary, 1> r1;
-    typedef rules::evaluation<Op, Data, result_is_temporary, 0> r0;
-
-    typedef traits::is_implemented<r2> i2;
-    typedef traits::is_implemented<r1> i1;
-    typedef traits::is_implemented<r0> i0;
-
-public:
-    typedef typename mp::select<rules::UNIMPLEMENTED, // TODO
-        mp::and_v<i2, min_prio <= 2>, r2,
-        mp::and_v<i1, min_prio <= 1>, r1,
-        mp::and_v<i0, min_prio <= 0>, r0
-      >::type type;
-};
-} // mp
-
-namespace detail {
-struct EXPRESSION { };
-}
-
-namespace traits {
-template<class T>
-struct is_expression : _is_convertible<detail::EXPRESSION, T> { };
-
-template<class T>
-struct _is_immediate_expr
-    : _is_convertible<
-          typename basetype<T>::type::operation_t,
-          operations::immediate
-        >
-{ };
-
-// Compute if T is an expression, with operation "immediate"
-template<class T, class Enable = void>
-struct is_immediate_expr : _is_immediate_expr<T> { };
-template<class T>
-struct is_immediate_expr<T,
-  typename mp::enable_if<mp::not_<is_expression<T> > >::type>
-    : mp::false_ { };
-
-// Compute if T is an immediate expression, *or not an expression at all*
-template<class T>
-struct is_immediate
-    : mp::or_<mp::not_<is_expression<T> >, is_immediate_expr<T> > { };
-
-// Compute if T is a non-immediate expression
-template<class T>
-struct is_lazy_expr
-    : mp::and_<is_expression<T>, mp::not_<is_immediate_expr<T> > > { };
-} // traits
-
 namespace detail {
 template<class Operation, class Expr, class Data>
 struct evaluation_traits
@@ -277,14 +121,9 @@ struct copy_initialization_helper
     }
 };
 
-template<class T>
-struct should_enable : mp::false_ { };
-template<class Head, class Tail>
-struct should_enable<tuple<Head, Tail> > : mp::true_ { };
-
 template<class Data>
 struct copy_initialization_helper<Data,
-    typename mp::enable_if<should_enable<Data> >::type>
+    typename mp::enable_if<traits::is_tuple<Data> >::type>
 {
     Data data;
 
@@ -446,29 +285,6 @@ struct derived_wrapper
     };
 };
 
-namespace mp {
-template<class T, class Enable = void>
-struct evaluation_helper
-{
-    typedef typename traits::basetype<T>::type type;
-    typedef typename traits::forwarding<type>::type ftype;
-    static ftype get(const type& t) {return t;}
-
-    typedef empty_tuple temporaries_t;
-};
-
-template<class T>
-struct evaluation_helper<T,
-    typename mp::enable_if<traits::is_lazy_expr<T> >::type>
-{
-    typedef typename T::evaluated_t type;
-    static type get(const T& t) {return t.evaluate();}
-
-    typedef typename T::ev_traits_t::temp_rule_t rule_t;
-    typedef typename rule_t::temporaries_t temporaries_t;
-};
-}
-
 
 // operators
 
@@ -522,9 +338,9 @@ struct unary_op_helper
 template<class Expr1, class Expr2>
 struct order_op_helper
 {
-    typedef typename mp::evaluation_helper<Expr1>::type ev1_t;
-    typedef typename mp::evaluation_helper<Expr2>::type ev2_t;
-    typedef rules::_symmetric_cmp<ev1_t, ev2_t> scmp;
+    typedef typename tools::evaluation_helper<Expr1>::type ev1_t;
+    typedef typename tools::evaluation_helper<Expr2>::type ev2_t;
+    typedef tools::symmetric_cmp<ev1_t, ev2_t> scmp;
 
     typedef mp::enable_if<
           mp::and_<
@@ -538,8 +354,8 @@ struct order_op_helper
 
     static int get(const Expr1& e1, const Expr2& e2)
     {
-        return scmp::get(mp::evaluation_helper<Expr1>::get(e1),
-            mp::evaluation_helper<Expr2>::get(e2));
+        return scmp::get(tools::evaluation_helper<Expr1>::get(e1),
+            tools::evaluation_helper<Expr2>::get(e2));
     }
 };
 }
@@ -693,318 +509,10 @@ operator%=(Expr1& e1, const Expr2& e2)
     e1.set(e1 % e2);
     return e1;
 }
-
-// default rules
-
-namespace rules {
-// Composite binary operators
-// These rules implement binary operators by implementing both arguments
-// separately, then performing the operation on the evaluated types by
-// instantiating the appropriate rule again.
-//
-// Hence to evaluate expressions like a + (b + c), it suffices to write
-// rules for composition of two immediates.
-
-template<bool result_is_temporary, class Op, class Data1, class Data2>
-struct evaluation<
-    Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
-    typename mp::enable_if<
-        mp::and_<
-            traits::is_lazy_expr<Data1>,
-            traits::is_lazy_expr<Data2> > >::type
-  >
-{
-    typedef typename mp::find_evaluation<
-        typename Data1::operation_t,
-        typename Data1::data_t,
-        true
-      >::type ev1_t;
-    typedef typename mp::find_evaluation<
-        typename Data2::operation_t,
-        typename Data2::data_t,
-        true
-      >::type ev2_t;
-    typedef typename ev1_t::return_t return1_t;
-    typedef typename ev1_t::temporaries_t temporaries1_t;
-    typedef typename ev2_t::return_t return2_t;
-    typedef typename ev2_t::temporaries_t temporaries2_t;
-
-    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
-    typedef typename binop_helper::return_t::evaluated_t return_t;
-
-    // TODO sometimes the other way round uses fewer temporaries
-    typedef mp::merge_tuple<typename mp::make_tuple<return2_t*>::type,
-                 temporaries2_t> merger2;
-    typedef mp::merge_tuple<tuple<return1_t*, typename merger2::type>,
-                 temporaries1_t> merger1;
-    typedef typename merger1::type temporaries_t;
-
-    typedef typename mp::make_tuple<Data1, Data2>::type data_t;
-
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
-    {
-        temporaries1_t temps1 = merger1::get_second(temps);
-        temporaries2_t temps2 =
-            merger2::get_second(merger1::get_first(temps).tail);
-        return1_t* ret1 = merger1::get_first(temps).head;
-        return2_t* ret2 =
-            merger2::get_first(merger1::get_first(temps).tail).head;
-        ev1_t::doit(input.first()._data(), temps1, ret1);
-        ev2_t::doit(input.second()._data(), temps2, ret2);
-        *output = binop_helper::make(*ret1, *ret2);
-    }
-};
-
-template<bool result_is_temporary, class Op, class Data1, class Data2>
-struct evaluation<
-    Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
-    typename mp::enable_if<
-        mp::and_<
-            traits::is_immediate<typename traits::basetype<Data1>::type>,
-            traits::is_lazy_expr<Data2> > >::type
-  >
-{
-    typedef typename mp::find_evaluation<
-        typename Data2::operation_t,
-        typename Data2::data_t,
-        true
-      >::type ev2_t;
-    typedef typename ev2_t::return_t return2_t;
-    typedef typename ev2_t::temporaries_t temporaries2_t;
-    typedef typename traits::basetype<Data1>::type return1_t;
-
-    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
-    typedef typename binop_helper::return_t::evaluated_t return_t;
-
-    typedef mp::merge_tuple<
-        typename mp::make_tuple<return2_t*>::type,
-        temporaries2_t> merger;
-    typedef typename merger::type temporaries_t;
-
-    typedef typename mp::make_tuple<Data1, Data2>::type data_t;
-
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
-    {
-        return2_t* ret2 = merger::get_first(temps).head;;
-        ev2_t::doit(input.second()._data(), merger::get_second(temps), ret2);
-        *output = binop_helper::make(input.first(), *ret2);
-    }
-};
-
-template<bool result_is_temporary, class Op, class Data1, class Data2>
-struct evaluation<
-    Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
-    typename mp::enable_if<
-        mp::and_<
-            traits::is_immediate<typename traits::basetype<Data2>::type>,
-            traits::is_lazy_expr<Data1> > >::type
-  >
-{
-    typedef typename mp::find_evaluation<
-        typename Data1::operation_t,
-        typename Data1::data_t,
-        true
-      >::type ev1_t;
-    typedef typename ev1_t::return_t return1_t;
-    typedef typename ev1_t::temporaries_t temporaries1_t;
-    typedef typename traits::basetype<Data2>::type return2_t;
-
-    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
-    typedef typename binop_helper::return_t::evaluated_t return_t;
-
-    typedef mp::merge_tuple<
-        typename mp::make_tuple<return1_t*>::type,
-        temporaries1_t> merger;
-    typedef typename merger::type temporaries_t;
-
-    typedef typename mp::make_tuple<Data1, Data2>::type data_t;
-
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
-    {
-        return1_t* ret1 = merger::get_first(temps).head;
-        ev1_t::doit(input.first()._data(), merger::get_second(temps), ret1);
-        *output = binop_helper::make(*ret1, input.second());
-    }
-};
-
-template<class Op, class Data, bool result_is_temporary>
-struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
-    typename mp::enable_if<traits::is_lazy_expr<Data> >::type>
-{
-    typedef typename mp::find_evaluation<
-        typename Data::operation_t, typename Data::data_t,
-        true
-      >::type ev_t;
-    typedef typename ev_t::return_t interm_t;
-    typedef typename ev_t::temporaries_t interm_temps_t;
-
-    typedef detail::unary_op_helper<Op, interm_t> unop_helper;
-    typedef typename unop_helper::return_t::evaluated_t return_t;
-    typedef mp::merge_tuple<
-        typename mp::make_tuple<interm_t*>::type,
-        interm_temps_t> merger;
-    typedef typename merger::type temporaries_t;
-
-    typedef typename mp::make_tuple<Data>::type data_t;
-
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
-    {
-        interm_t* interm = merger::get_first(temps).head;
-        ev_t::doit(input.head._data(), merger::get_second(temps), interm);
-        *output = unop_helper::make(*interm);
-    }
-};
-
-// Automatically invoke binary_expression or commutative_binary_expression
-namespace rdetail {
-template<class Expr1, class Op, class Expr2>
-struct inverted_binary_expression
-{
-  typedef commutative_binary_expression<Expr2, Op, Expr1> wrapped_t;
-  typedef typename wrapped_t::return_t return_t;
-  static void doit(return_t& to, const Expr1& e1, const Expr2& e2)
-  {
-    return wrapped_t::doit(to, e2, e1);
-  }
-};
-
-template<template<class E1, class O, class E2> class BE,
-    class Data1, class Op, class Data2>
-struct binary_expr_helper
-{
-    typedef typename traits::basetype<Data1>::type data1_t;
-    typedef typename traits::basetype<Data2>::type data2_t;
-    typedef BE<data1_t, Op, data2_t> wrapped_t;
-    typedef typename wrapped_t::return_t return_t;
-    typedef empty_tuple temporaries_t;
-    typedef typename mp::make_tuple<Data1, Data2>::type data_t;
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
-    {
-        wrapped_t::doit(*output, input.first(), input.second());
-    }
-};
-} // rdetail
-
-template<bool result_is_temporary, class Op, class Data1, class Data2>
-struct evaluation<
-    Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
-    typename mp::enable_if<
-        mp::and_<
-            traits::is_immediate<typename traits::basetype<Data1>::type>,
-            mp::and_<
-                traits::is_immediate<typename traits::basetype<Data2>::type>,
-                mp::or_<
-                    traits::is_implemented<binary_expression<
-                        typename traits::basetype<Data1>::type,
-                        Op,
-                        typename traits::basetype<Data2>::type
-                      > >,
-                    mp::or_<
-                        traits::is_implemented<commutative_binary_expression<
-                            typename traits::basetype<Data1>::type,
-                            Op,
-                            typename traits::basetype<Data2>::type
-                          > >,
-                        traits::is_implemented<commutative_binary_expression<
-                            typename traits::basetype<Data2>::type,
-                            Op,
-                            typename traits::basetype<Data1>::type
-                          > >
-                      >
-                  >
-              >
-          >
-      >::type>
-    : mp::if_<
-            traits::is_implemented<binary_expression<
-                typename traits::basetype<Data1>::type,
-                Op,
-                typename traits::basetype<Data2>::type
-              > >,
-            rdetail::binary_expr_helper<binary_expression, Data1, Op, Data2>,
-            typename mp::if_<
-                traits::is_implemented<commutative_binary_expression<
-                    typename traits::basetype<Data1>::type,
-                    Op,
-                    typename traits::basetype<Data2>::type
-                  > >,
-                rdetail::binary_expr_helper<
-                    commutative_binary_expression, Data1, Op, Data2>,
-                rdetail::binary_expr_helper<
-                    rdetail::inverted_binary_expression, Data1, Op, Data2>
-              >::type
-          >::type
-{ };
-
-
-// Automatically invoke unary_expression
-template<bool result_is_temporary, class Op, class Data>
-struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
-    typename mp::enable_if<
-        traits::is_implemented<
-            unary_expression<Op, typename traits::basetype<Data>::type> > >::type>
-{
-    typedef unary_expression<Op, typename traits::basetype<Data>::type> wrapped_t;
-    typedef typename wrapped_t::return_t return_t;
-    typedef empty_tuple temporaries_t;
-    typedef typename mp::make_tuple<Data>::type data_t;
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
-    {
-        wrapped_t::doit(*output, input.head);
-    }
-};
-
-
-// Automatic printing if to_string is implemented
-template<class T>
-struct print<T,
-    typename mp::enable_if<traits::is_implemented<to_string<T> > >::type>
-{
-    static void doit(const T& v, std::ostream& o)
-    {
-        int base = 10;
-        std::ios_base::fmtflags ff = o.flags();
-        if(ff & o.hex)
-            base = 16;
-        if(ff & o.oct)
-            base = 8;
-        o << v.to_string(base);
-    }
-};
-
-// Automatic equality testing if cmp is implemented
-namespace rdetail {
-template<class T, class U>
-struct cmp_invert
-{
-    static int get(const T& t, const U& u)
-    {
-        return -cmp<U, T>::get(u, t);
-    }
-};
 }
-template<class T, class U>
-struct _symmetric_cmp
-    : mp::if_<traits::is_implemented<cmp<T, U> >,
-          cmp<T, U>,
-          typename mp::if_<traits::is_implemented<cmp<U, T> >,
-              rdetail::cmp_invert<T, U>,
-              UNIMPLEMENTED
-            >::type
-        >::type { };
 
-template<class T, class U>
-struct equals<T, U,
-    typename mp::enable_if<
-        traits::is_implemented<_symmetric_cmp<T, U> > >::type>
-{
-    static bool get(const T& t, const U& u)
-    {
-        return _symmetric_cmp<T, U>::get(t, u) == 0;
-    }
-};
-} // rules
-} // flint
+// TODO remove this?
+#include "cxx/default_rules.h"
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1059,105 +567,5 @@ name(const T1& t1) \
 { \
   return ::flint::detail::unary_op_helper< ::flint::operations::name, T1>::make(t1); \
 }
-
-// These macros should be called in namespace flint::rules
-
-// Specialise a getter called "name". The getter has one argument called "from"
-// of type "fromtype", and "eval" which should yield "totype". 
-#define FLINT_DEFINE_GET(name, totype, fromtype, eval) \
-template<> \
-struct name<totype, fromtype> \
-{ \
-    static totype get(const fromtype& from) \
-    { \
-        return eval; \
-    } \
-};
-
-// Specialise a doit rule called "name"
-#define FLINT_DEFINE_DOIT(name, totype, fromtype, eval) \
-template<> \
-struct name<totype, fromtype> \
-{ \
-    static void doit(totype& to, const fromtype& from) \
-    { \
-        eval; \
-    } \
-};
-
-// Specialise a doit rule called "name" which yields totype. It will
-// accept any type "T" which satisfies "cond".
-#define FLINT_DEFINE_DOIT_COND(name, totype, cond, eval) \
-template<class T> \
-struct name<totype, T, typename mp::enable_if<cond >::type> \
-{ \
-    static void doit(totype& to, const T& from) \
-    { \
-        eval; \
-    } \
-};
-
-// Specialise the unary expression rule type->type.
-#define FLINT_DEFINE_UNARY_EXPR(name, type, eval) \
-template<> \
-struct unary_expression<operations::name, type> \
-{ \
-    typedef type return_t; \
-    static void doit(type& to, const type& from) \
-    { \
-        eval; \
-    } \
-};
-
-#define FLINT_DEFINE_UNARY_EXPR_COND(name, ret_type, cond, eval) \
-template<class T> \
-struct unary_expression<typename mp::enable_if<cond, operations::name>::type, T> \
-{ \
-    typedef ret_type return_t; \
-    static void doit(ret_type& to, const T& from) \
-    { \
-        eval; \
-    } \
-};
-
-// Specialise the binary expression rule (type, type) -> type
-#define FLINT_DEFINE_BINARY_EXPR(name, type, eval) \
-template<> \
-struct binary_expression<type, operations::name, type> \
-{ \
-    typedef type return_t; \
-    static void doit(type& to, const type& e1, const type& e2) \
-    { \
-        eval; \
-    } \
-};
-
-// Specialise the commutative binary expression rule (Type, T) -> Type,
-// where T must satisfy "cond".
-#define FLINT_DEFINE_CBINARY_EXPR_COND(name, Type, cond, eval) \
-template<class T> \
-struct commutative_binary_expression<Type, \
-    typename mp::enable_if<cond, operations::name>::type, T> \
-{ \
-    typedef Type return_t; \
-    static void doit(Type& to, const Type& e1, const T& e2) \
-    { \
-        eval; \
-    } \
-};
-
-// Specialise the (non-commutative) binary expression rule (Type, T) -> Type,
-// where T must satisfy "cond".
-#define FLINT_DEFINE_BINARY_EXPR_COND(name, Type, cond, eval) \
-template<class T> \
-struct binary_expression<Type, \
-    typename mp::enable_if<cond, operations::name>::type, T> \
-{ \
-    typedef Type return_t; \
-    static void doit(Type& to, const Type& e1, const T& e2) \
-    { \
-        eval; \
-    } \
-};
 
 #endif

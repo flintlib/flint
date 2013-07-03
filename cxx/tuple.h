@@ -138,7 +138,7 @@ template<class Head, class Tail, class Return>
 struct back_tuple<tuple<Head*, Tail>, Return>
 {
     typedef tuple<Head, typename back_tuple<Tail, Return>::type> type;
-    static void init(tuple<Head*, Tail>& to, type& from, Return* ret)
+    static void init(tuple<Head*, Tail>& to, type& from, Return* ret = 0)
     {
         back_tuple<Tail, Return>::init(to.tail, from.tail, ret);
         to.head = &from.head;
@@ -150,7 +150,7 @@ template<class Head, class Tail>
 struct back_tuple<tuple<Head*, Tail>, Head>
 {
     typedef typename back_tuple<Tail, void /* no more merging */>::type type;
-    static void init(tuple<Head*, Tail>& to, type& from, Head* ret)
+    static void init(tuple<Head*, Tail>& to, type& from, Head* ret = 0)
     {
         to.head = ret;
         back_tuple<Tail, void>::init(to.tail, from, 0 /* unused */ );
@@ -162,7 +162,7 @@ template<class Return>
 struct back_tuple<empty_tuple, Return>
 {
     typedef empty_tuple type;
-    static void init(empty_tuple& to, type& from, Return* ret)
+    static void init(empty_tuple& to, type& from, Return* ret = 0)
     {
     }
 };
@@ -503,6 +503,14 @@ struct is_homogeneous_tuple : mp::and_<
     mp::equal_types<typename Tuple::head_t, U> > { };
 template<class U>
 struct is_homogeneous_tuple<empty_tuple, U> : true_ { };
+
+// Compute if T is a tuple
+template<class T>
+struct is_tuple : false_ { };
+template<class Head, class Tail>
+struct is_tuple<tuple<Head, Tail> > : true_ { };
+template<>
+struct is_tuple<empty_tuple> : true_ { };
 }
 } // flint
 
