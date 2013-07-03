@@ -226,14 +226,8 @@ FLINT_DEFINE_BINARY_EXPR_COND(modulo, mpz, traits::is_unsigned_integer<T>,
 
 FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._data(), from._data()))
 
-// standard math functions (c/f stdmath.h)
-FLINT_DEFINE_BINARY_EXPR_COND(pow, mpz, traits::is_unsigned_integer<T>,
-        fmpz_pow_ui(to._data(), e1._data(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND(root, mpz, traits::fits_into_slong<T>,
-        fmpz_root(to._data(), e1._data(), e2))
-FLINT_DEFINE_UNARY_EXPR(sqrt, mpz, fmpz_sqrt(to._data(), from._data()))
 
-
+// Optimized evaluation rules using ternary arithmetic (addmul, submul)
 // a +- b*c
 template<class Op, class Left, class Right1, class Right2>
 struct evaluation<Op,
@@ -249,6 +243,7 @@ struct evaluation<Op,
     true, 1,
     typename tools::ternary_helper<mpz, Left, Right1, Right2>::enable::type>
 {
+    // Helpful for testing.
     static const unsigned TERNARY_OP_MARKER = 0;
 
     typedef mpz return_t;
@@ -283,6 +278,7 @@ struct evaluation<operations::plus,
     typename tools::ternary_helper<mpz, 
         Right, Left1, Left2, operations::times>::enable::type>
 {
+    // Helpful for testing.
     static const unsigned TERNARY_OP_MARKER = 0;
 
     typedef mpz return_t;
@@ -409,6 +405,13 @@ struct binary_expression<
         fmpz_bin_uiui(to._data(), t1, t2);
     }
 };
+
+// standard math functions (c/f stdmath.h)
+FLINT_DEFINE_BINARY_EXPR_COND(pow, mpz, traits::is_unsigned_integer<T>,
+        fmpz_pow_ui(to._data(), e1._data(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND(root, mpz, traits::fits_into_slong<T>,
+        fmpz_root(to._data(), e1._data(), e2))
+FLINT_DEFINE_UNARY_EXPR(sqrt, mpz, fmpz_sqrt(to._data(), from._data()))
 } // rules
 
 // TODO many more functions
