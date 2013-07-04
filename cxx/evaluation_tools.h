@@ -303,6 +303,12 @@ struct ternary_hhelper;
 // (E.g. one needs rules for both a + b*c and b*c + a, but then which of these
 // applies to b*c + a*d?) To do this, pass the operation you want to exclude in
 // "disable_op".
+//
+// NOTE: in the current implementation, ternary_helper only works with
+// *homogeneous* expressions. These are defined to be expressions evaluating to
+// type T, which only need temporaries of type T.
+// This condition is included in the checks done by the enable member type.
+//
 template<class T, class Left, class Right1, class Right2,
     class disable_op = void, class Enable = void>
 struct ternary_helper { };
