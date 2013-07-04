@@ -54,7 +54,8 @@ struct evaluation_traits
 
     static evaluation_return_t evaluate(const derived_t& from)
     {
-        evaluation_return_t res;
+        evaluated_t res = 
+            rules::instantiate_temporaries<derived_t, evaluated_t>::get(from);
         evaluate_into_fresh(res, from);
         return res;
     }
@@ -62,7 +63,9 @@ struct evaluation_traits
     static void evaluate_into(evaluation_return_t& to, const derived_t& from)
     {
         typedef mp::back_tuple<typename rule_t::temporaries_t> back_t;
-        typename back_t::type temps_backing;
+        typename back_t::type temps_backing =
+            mp::htuples::fill<typename back_t::type>(
+                tools::temporaries_filler(from));
         typename rule_t::temporaries_t temps;
         back_t::init(temps, temps_backing, 0);
         rule_t::doit(from._data(), temps, &to);
@@ -74,7 +77,9 @@ struct evaluation_traits
             typename temp_rule_t::temporaries_t,
             evaluation_return_t
           > back_t;
-        typename back_t::type temps_backing;
+        typename back_t::type temps_backing =
+            mp::htuples::fill<typename back_t::type>(
+                tools::temporaries_filler(from));
         typename temp_rule_t::temporaries_t temps;
         back_t::init(temps, temps_backing, &to);
         temp_rule_t::doit(from._data(), temps, &to);
@@ -101,53 +106,16 @@ struct evaluation_traits<operations::immediate, Expr, Data>
         evaluate_into(to, from);
     }
 };
-
-// See copy constructor of expression for explanation
-template<class Data, class Enable = void>
-struct copy_initialization_helper
-{
-    Data data;
-
-    copy_initialization_helper(const Data& d) : data(d) {}
-    copy_initialization_helper() {}
-
-    // This does nothing, by design!
-    copy_initialization_helper(const copy_initialization_helper& o) {}
-
-    template<class T, class U>
-    void doit(T& to, const U& from)
-    {
-        rules::initialization<T, U>::doit(to, from);
-    }
-};
-
-template<class Data>
-struct copy_initialization_helper<Data,
-    typename mp::enable_if<traits::is_tuple<Data> >::type>
-{
-    Data data;
-
-    copy_initialization_helper(const Data& d)
-        : data(d) {}
-
-    copy_initialization_helper(const copy_initialization_helper& o)
-        : data(o.data)
-    {
-    }
-
-    template<class T, class U>
-    void doit(T& to, const U& from)
-    {
-    }
-};
 } // detail
 
+// Note that, wihle Data does not have to be default constructible,
+// it *does* need to be copy-constructible, and have a working destructor.
 template<class Derived, class Operation, class Data>
 class expression
     : public detail::EXPRESSION
 {
 private:
-    detail::copy_initialization_helper<Data> data;
+    Data data;
 
 protected:
     explicit expression(const Data& d) : data(d) {}
@@ -167,45 +135,44 @@ private:
         return *static_cast<const derived_t*>(this);
     }
 
+    // Some helpers for initialization, since it is not possible to
+    // conditionally enable constructors in C++98
+    template<class T>
+    static data_t get_data(const T& t,
+        typename mp::disable_if<traits::is_lazy_expr<T> >::type* = 0)
+    {
+        return data_t(t);
+    }
+    template<class T>
+    static data_t get_data(const T& t,
+        typename mp::enable_if<traits::is_lazy_expr<T> >::type* = 0,
+        typename mp::disable_if<
+            mp::equal_types<typename T::evaluated_t, derived_t> >::type* = 0)
+    {
+        return data_t(t.evaluate());
+    }
+    template<class T>
+    static data_t get_data(const T& t,
+        typename mp::enable_if<traits::is_lazy_expr<T> >::type* = 0,
+        typename mp::enable_if<
+            mp::equal_types<typename T::evaluated_t, derived_t> >::type* = 0)
+    {
+        return data_t(t.evaluate()._data());
+    }
+    // Having the empty constructor here delays its instantiation, and allows
+    // compiling even if data is *not* default constructible.
+    static data_t get_data() {return data_t();}
+
 public:
-    // TODO strip qualifiers?
     template<class T>
-    explicit expression(const T& t,
-            typename mp::enable_if<traits::is_implemented<
-                rules::initialization<derived_t, T> > >::type* = 0)
-    {
-        rules::initialization<derived_t, T>::doit(downcast(), t);
-    }
+    explicit expression(const T& t)
+        : data(get_data(t)) {}
 
-    template<class T>
-    explicit expression(const T& t,
-            typename mp::disable_if<traits::is_implemented<
-                rules::initialization<derived_t, T> > >::type* = 0,
-            typename mp::enable_if<traits::is_expression<T> >::type* = 0)
-    {
-        rules::empty_initialization<derived_t>::doit(downcast());
-        T::ev_traits_t::evaluate_into_fresh(downcast(), t);
-    }
+    template<class T, class U>
+    expression(const T& t, const U& u)
+        : data(t, u) {}
 
-    // We pay here for using the same class for actual data wrappers,
-    // and expression templates. The problem is that Data may not be
-    // default-initialisable (contains reference types), but it may also not
-    // be copy-initialisable (arrays...).
-    // The solution here is to wrap Data into copy_initialization_helper.
-    // If Data is a reference or a tuple (the expression template case),
-    // then data.doit is no-op the copy constructor of data does the work.
-    // If Data is not a reference or tuple, then the copy constructor is no-op,
-    // and doit defrers to rules.
-    expression(const expression& e)
-        : data(e.data)
-    {
-        data.doit(downcast(), e.downcast());
-    }
-
-    // NB: the compiler is not allowed to eagerly instantiate!
-    expression() {rules::empty_initialization<derived_t>::doit(downcast());}
-
-    ~expression() {rules::destruction<derived_t>::doit(downcast());}
+    expression() : data(get_data()) {}
 
     expression& operator=(const expression& o)
     {
@@ -213,8 +180,14 @@ public:
         return *this;
     }
 
-    Data& _data() {return data.data;}
-    const Data& _data() const {return data.data;}
+    // See rules::instantiate_temporaries for explanation.
+    derived_t create_temporary() const
+    {
+        return derived_t();
+    }
+
+    Data& _data() {return data;}
+    const Data& _data() const {return data;}
 
     void print(std::ostream& o) const
     {

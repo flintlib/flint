@@ -66,13 +66,21 @@ struct data
     int payload;
     bool* destroyed;
     int extra;
-    bool initialized;
 
-    data() : payload(-1), destroyed(0), extra(0), initialized(false) {}
+    data() : payload(-1), destroyed(0), extra(42) {}
 
+    ~data()
+    {
+        if(destroyed)
+            *destroyed = true;
+    }
 
-private:
-    data(const data& d);
+    data(const data& d)
+        : payload(d.payload), destroyed(0), extra(1) {}
+    data(int i)
+        : payload(i), destroyed(0), extra(2) {}
+    data(char i)
+        : payload(i), destroyed(0), extra(3) {}
 };
 
 typedef my_expression<operations::immediate, data> myint;
@@ -82,7 +90,8 @@ class my_expression2
     : public expression<derived_wrapper<my_expression2>, Operation, Data>
 {
 public:
-    my_expression2() {};
+    // cannot have a default constructor
+
     template<class T>
     explicit my_expression2(const T& t)
         : expression<derived_wrapper< ::my_expression2>,
@@ -95,6 +104,11 @@ public:
         return *this;
     }
 
+    my_expression2 create_temporary() const
+    {
+        return my_expression2(0l);
+    }
+
 protected:
     explicit my_expression2(const Data& d)
         : expression<derived_wrapper< ::my_expression2>,
@@ -103,68 +117,17 @@ protected:
     template<class D, class O, class Da>
     friend class flint::expression;
 };
-struct long_data {long payload;};
+struct long_data
+{
+    long payload;
+    // no default constructor
+    long_data(long d) : payload(d) {}
+    long_data(const myint& m) : payload(m._data().payload) {}
+};
 typedef my_expression2<operations::immediate, long_data> mylong;
 
 namespace flint {
 namespace rules {
-template<>
-struct destruction<myint>
-{
-    static void doit(myint& to)
-    {
-        tassert(to._data().initialized == true);
-        if(to._data().destroyed)
-            *to._data().destroyed = true;
-    }
-};
-
-template<>
-struct empty_initialization<myint>
-{
-    static void doit(myint& v)
-    {
-        v._data().extra = 42;
-        tassert(v._data().initialized == false);
-        v._data().initialized = true;
-    }
-};
-
-template<>
-struct initialization<myint, myint>
-{
-    static void doit(myint& to, const myint& from)
-    {
-        tassert(to._data().initialized == false);
-        to._data().payload = from._data().payload;
-        to._data().extra = 1;
-        to._data().initialized = true;
-    }
-};
-
-template<>
-struct initialization<myint, int>
-{
-    static void doit(myint& to, int i)
-    {
-        to._data().payload = i;
-        to._data().extra = 2;
-        tassert(to._data().initialized == false);
-        to._data().initialized = true;
-    }
-};
-
-template<>
-struct initialization<myint, char>
-{
-    static void doit(myint& to, char i)
-    {
-        to._data().payload = i;
-        to._data().extra = 3;
-        tassert(to._data().initialized == false);
-        to._data().initialized = true;
-    }
-};
 
 template<>
 struct print<myint>
@@ -298,41 +261,6 @@ struct unary_expression<operations::negate, myint>
 /////////////////////////////////////////////////////////////////////////////
 // Minimal rules for mylong
 /////////////////////////////////////////////////////////////////////////////
-
-template<>
-struct empty_initialization<mylong>
-{
-    static void doit(mylong&)
-    {
-    }
-};
-
-template<>
-struct initialization<mylong, long>
-{
-    static void doit(mylong& to, long from)
-    {
-        to._data().payload = from;
-    }
-};
-
-template<>
-struct initialization<mylong, mylong>
-{
-    static void doit(mylong& to, const mylong& from)
-    {
-        to._data().payload = from._data().payload;
-    }
-};
-
-template<>
-struct initialization<mylong, myint>
-{
-    static void doit(mylong& to, const myint& from)
-    {
-        to._data().payload = from._data().payload;
-    }
-};
 
 template<>
 struct equals<mylong, mylong>
@@ -600,6 +528,24 @@ test_assignment_arith()
     tassert(a == 10);
 }
 
+template<class T, class Expr>
+bool is_subexpr(const Expr& e)
+{
+    return tools::is_super_sub_expr<Expr, T>::val;
+}
+void
+test_tools()
+{
+    myint a(1);
+    mylong b(2l);
+    tassert(tools::find_subexpr<myint>(a) == 1);
+    tassert(tools::find_subexpr<myint>(a + b) == 1);
+    tassert(tools::find_subexpr<mylong>(a + b) == 2l);
+    tassert(tools::find_subexpr<myint>(b + (a + 2) + b) == 1);
+    tassert(is_subexpr<myint>(a+b));
+    tassert(!is_subexpr<mylong>(a+a));
+}
+
 int
 main()
 {
@@ -614,6 +560,7 @@ main()
     test_arithmetic();
     test_conversion();
     test_assignment_arith();
+    test_tools();
 
     std::cout << "PASS" << std::endl;
 

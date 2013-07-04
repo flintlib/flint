@@ -74,7 +74,7 @@ struct cmp_invert
 }
 
 // A version of the cmp rule which tries both argument orders
-template<class T, class U>
+template<class T, class U, class Enable = void>
 struct symmetric_cmp
     : mp::if_<traits::is_implemented<rules::cmp<T, U> >,
           rules::cmp<T, U>,
@@ -83,6 +83,90 @@ struct symmetric_cmp
               rules::UNIMPLEMENTED
             >::type
         >::type { };
+
+
+// Finding a subexpression of precsribed type
+namespace tdetail {
+template<class T, class Data, class Enable = void>
+struct find_subexpr_helper2;
+
+template<class T, class Expr, class Enable = void>
+struct find_subexpr_helper
+{
+    typedef find_subexpr_helper2<T, typename Expr::data_t> fsh;
+    static const bool val = fsh::val;
+    static const T& get(const Expr& e) {return fsh::get(e._data());}
+};
+
+template<class T>
+struct find_subexpr_helper<T, T>
+{
+    static const bool val = true;
+    static const T& get(const T& t) {return t;}
+};
+
+template<class T, class Expr>
+struct find_subexpr_helper<T, Expr,
+    typename mp::enable_if<mp::and_<traits::is_immediate<Expr>,
+        mp::not_<mp::equal_types<T, Expr> > > >::type>
+{
+    static const bool val = false;
+};
+
+template<class T, class Data, class Enable>
+struct find_subexpr_helper2
+{
+    typedef find_subexpr_helper2<T, typename Data::tail_t> fsh;
+    static const bool val = fsh::val;
+    static const T& get(const Data& d) {return fsh::get(d.tail);}
+};
+
+template<class T, class Head, class Tail>
+struct find_subexpr_helper2<T, tuple<Head, Tail>,
+    typename mp::enable_if<find_subexpr_helper<T,
+        typename traits::basetype<Head>::type> >::type>
+{
+    static const bool val = true;
+    typedef typename traits::basetype<Head>::type head_t;
+    typedef find_subexpr_helper<T, head_t> fsh;
+    static const T& get(const tuple<Head, Tail>& d) {return fsh::get(d.head);}
+};
+
+template<class T>
+struct find_subexpr_helper2<T, empty_tuple>
+{
+    static const bool val = false;
+};
+} // tdetail
+
+template<class T, class Expr>
+inline const T& find_subexpr(const Expr& e)
+{
+    return tdetail::find_subexpr_helper<T, Expr>::get(e);
+}
+
+template<class Expr, class T>
+struct is_super_sub_expr : tdetail::find_subexpr_helper<T, Expr> { };
+
+
+// A helper to invoke htuples::fill with instantiate_temporaries
+namespace tdetail {
+template<class Expr>
+struct fill_tmps_helper
+{
+    const Expr& expr;
+    fill_tmps_helper(const Expr& e) : expr(e) {};
+
+    template<class T>
+    T create() const {return rules::instantiate_temporaries<Expr, T>::get(expr);}
+};
+} // tdetail
+template <class Expr>
+tdetail::fill_tmps_helper<Expr> temporaries_filler(const Expr& e)
+{
+    return tdetail::fill_tmps_helper<Expr>(e);
+}
+
 
 // A helper to "evaluate" a single term, independend of whether or not it is
 // actually an expression template

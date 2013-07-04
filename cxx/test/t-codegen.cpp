@@ -311,13 +311,13 @@ DEFINE_FUNC(test_mpz_symadd_2,
     fmpz_init(tmp2);
     fmpz_init(tmp3);
 
-    fmpz_add(tmp1, a._data(), b._data());
-    fmpz_add(tmp2, c._data(), d._data());
+    fmpz_add(tmp1, a._fmpz(), b._fmpz());
+    fmpz_add(tmp2, c._fmpz(), d._fmpz());
     fmpz_add(tmp3, tmp1, tmp2);
-    fmpz_add(tmp1, a._data(), c._data());
-    fmpz_add(tmp2, b._data(), d._data());
+    fmpz_add(tmp1, a._fmpz(), c._fmpz());
+    fmpz_add(tmp2, b._fmpz(), d._fmpz());
     fmpz_add(tmp1, tmp1, tmp2);
-    fmpz_add(out._data(), tmp1, tmp3);
+    fmpz_add(out._fmpz(), tmp1, tmp3);
 
     fmpz_clear(tmp1);
     fmpz_clear(tmp2);
@@ -336,12 +336,12 @@ DEFINE_FUNC(test_mpz_asymadd_2,
     fmpz_t tmp;
     fmpz_init(tmp);
 
-    fmpz_add(tmp, a._data(), b._data());
-    fmpz_add(tmp, c._data(), tmp);
-    fmpz_add(tmp, b._data(), tmp);
-    fmpz_add(tmp, tmp, c._data());
-    fmpz_add(tmp, tmp, d._data());
-    fmpz_add(out._data(), a._data(), tmp);
+    fmpz_add(tmp, a._fmpz(), b._fmpz());
+    fmpz_add(tmp, c._fmpz(), tmp);
+    fmpz_add(tmp, b._fmpz(), tmp);
+    fmpz_add(tmp, tmp, c._fmpz());
+    fmpz_add(tmp, tmp, d._fmpz());
+    fmpz_add(out._fmpz(), a._fmpz(), tmp);
 
     fmpz_clear(tmp);
 }
@@ -364,9 +364,9 @@ DEFINE_FUNC(test_mpz_ternary_2,
     fmpz_t tmp;
     fmpz_init(tmp);
 
-    fmpz_add(tmp, a._data(), b._data());
-    fmpz_addmul(tmp, c._data(), d._data());
-    fmpz_add(out._data(), a._data(), tmp);
+    fmpz_add(tmp, a._fmpz(), b._fmpz());
+    fmpz_addmul(tmp, c._fmpz(), d._fmpz());
+    fmpz_add(out._fmpz(), a._fmpz(), tmp);
 
     fmpz_clear(tmp);
 }
@@ -383,12 +383,12 @@ DEFINE_FUNC(test_mpz_ternary_4,
     fmpz_t tmp1, tmp2;
     fmpz_init(tmp1);fmpz_init(tmp2);
 
-    fmpz_add(tmp1, c._data(), a._data());
-    fmpz_add(tmp2, a._data(), d._data());
+    fmpz_add(tmp1, c._fmpz(), a._fmpz());
+    fmpz_add(tmp2, a._fmpz(), d._fmpz());
     fmpz_add(tmp1, tmp1, tmp2);
-    fmpz_add(tmp2, a._data(), b._data());
-    fmpz_addmul(tmp2, tmp1, d._data());
-    fmpz_add(out._data(), a._data(), tmp2);
+    fmpz_add(tmp2, a._fmpz(), b._fmpz());
+    fmpz_addmul(tmp2, tmp1, d._fmpz());
+    fmpz_add(out._fmpz(), a._fmpz(), tmp2);
 
     fmpz_clear(tmp1);fmpz_clear(tmp2);
 }
@@ -402,7 +402,7 @@ DEFINE_FUNC(test_mpz_ternary_5,
 DEFINE_FUNC(test_mpz_ternary_6,
         (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
 {
-    fmpz_addmul(out._data(), a._data(), b._data());
+    fmpz_addmul(out._fmpz(), a._fmpz(), b._fmpz());
 }
 
 DEFINE_FUNC(test_mpz_ternary_7,
@@ -415,8 +415,8 @@ DEFINE_FUNC(test_mpz_ternary_8,
         (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
 {
     fmpz_t tmp; fmpz_init(tmp);
-    fmpz_add(tmp, b._data(), c._data());
-    fmpz_addmul(out._data(), a._data(), tmp);
+    fmpz_add(tmp, b._fmpz(), c._fmpz());
+    fmpz_addmul(out._fmpz(), a._fmpz(), tmp);
     fmpz_clear(tmp);
 }
 
@@ -430,9 +430,9 @@ DEFINE_FUNC(test_mpz_ternary_10,
         (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
 {
     fmpz_t tmp1, tmp2; fmpz_init(tmp1); fmpz_init(tmp2);
-    fmpz_add(tmp1, b._data(), c._data());
-    fmpz_add(tmp2, a._data(), d._data());
-    fmpz_addmul(out._data(), tmp1, tmp2);
+    fmpz_add(tmp1, b._fmpz(), c._fmpz());
+    fmpz_add(tmp2, a._fmpz(), d._fmpz());
+    fmpz_addmul(out._fmpz(), tmp1, tmp2);
     fmpz_clear(tmp1); fmpz_clear(tmp2);
 }
 } // extern "C"

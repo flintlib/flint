@@ -472,7 +472,7 @@ struct remove_helper<tuple<T, empty_tuple> >
 
 // Extract the first "n" values from the *homogeneous* tuple "tuple".
 template<unsigned n, class Tuple>
-typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
+inline typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
         const Tuple& tuple)
 {
     return hdetail::extract_helper<n, Tuple>::get_noskip(tuple);
@@ -488,9 +488,38 @@ typename make_homogeneous_tuple<typename Tuple::head_t, n>::type extract(
 //   removeres(t2, 1) -> (1, 1, 1)
 //   removeres(t3, 1) -> (2, 3, 4) or any other three element subset
 template<class Tuple>
-typename Tuple::tail_t removeres(const Tuple& tuple, typename Tuple::head_t res)
+inline typename Tuple::tail_t
+removeres(const Tuple& tuple, typename Tuple::head_t res)
 {
     return hdetail::remove_helper<Tuple>::get(tuple, res);
+}
+
+
+
+// Filling of tuples
+namespace htdetail {
+template<class Filler, class Tuple>
+struct fill_helper
+{
+    static Tuple get(const Filler& f)
+    {
+        typedef typename Tuple::head_t head_t;
+        typedef typename Tuple::tail_t tail_t;
+        return Tuple(f.template create<head_t>(),
+                fill_helper<Filler, tail_t>::get(f));
+    }
+};
+
+template<class Filler>
+struct fill_helper<Filler, empty_tuple>
+{
+    static empty_tuple get(const Filler&) {return empty_tuple();}
+};
+} // htdetail
+template<class Tuple, class Filler>
+Tuple fill(const Filler& f)
+{
+    return htdetail::fill_helper<Filler, Tuple>::get(f);
 }
 } // htuples
 } // mp

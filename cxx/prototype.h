@@ -60,6 +60,9 @@ public:
         return *this;
     }
 
+    fmpz_t& _fmpz() {return this->_data().f;}
+    const fmpz_t& _fmpz() const {return this->_data().f;}
+
 protected:
     explicit mpz_expression(const Data& d)
         : expression<derived_wrapper< ::flint::mpz_expression>,
@@ -68,7 +71,43 @@ protected:
     template<class D, class O, class Da>
     friend class expression;
 };
-typedef mpz_expression<operations::immediate, fmpz_t> mpz;
+
+namespace detail {
+struct fmpz_data
+{
+    fmpz_t f;
+
+    fmpz_data() {fmpz_init(f);}
+    ~fmpz_data() {fmpz_clear(f);}
+    fmpz_data(const fmpz_data& o) {fmpz_init_set(f, o.f);}
+
+    fmpz_data(const char* str)
+    {
+        fmpz_init(f);
+        fmpz_set_str(f, str, 10);
+    }
+
+    template<class T>
+    fmpz_data(const T& t)
+    {
+        init(t);
+    }
+
+    template<class T>
+    typename mp::enable_if<traits::is_unsigned_integer<T> >::type init(T t)
+    {
+        fmpz_init_set_ui(f, t);
+    }
+    template<class T>
+    typename mp::enable_if<traits::is_signed_integer<T> >::type init(T t)
+    {
+        fmpz_init(f);
+        fmpz_set_si(f, t);
+    }
+};
+} // detail
+
+typedef mpz_expression<operations::immediate, detail::fmpz_data> mpz;
 
 ///////////////////////////////////////////////////////////////////
 // HELPERS
@@ -89,60 +128,21 @@ struct enable_all_mpz<Out, T, void>
 // RULES
 ///////////////////////////////////////////////////////////////////
 namespace rules {
-template<>
-struct empty_initialization<mpz>
-{
-    static void doit(mpz& v)
-    {
-        fmpz_init(v._data());
-    }
-};
 
-template<>
-struct destruction<mpz>
-{
-    static void doit(mpz& v)
-    {
-        fmpz_clear(v._data());
-    }
-};
-
-FLINT_DEFINE_DOIT(initialization, mpz, mpz,
-        fmpz_init_set(to._data(), from._data()))
-
-FLINT_DEFINE_DOIT_COND(initialization, mpz, traits::is_unsigned_integer<T>,
-        fmpz_init_set_ui(to._data(), from))
-
-FLINT_DEFINE_DOIT_COND(initialization, mpz, traits::is_signed_integer<T>,
-        fmpz_init(to._data());fmpz_set_si(to._data(), from))
-
-// TODO should expression automatically deduce this from the assignment
-// implementation (or the other way round)?
-template<int n>
-struct initialization<mpz, char[n]>
-{
-    static void doit(mpz& target, const char* source)
-    {
-        fmpz_init(target._data());
-        // TODO what about different bases
-        fmpz_set_str(target._data(), source, 10);
-    }
-};
-
-FLINT_DEFINE_DOIT(assignment, mpz, mpz, fmpz_set(to._data(), from._data()))
+FLINT_DEFINE_DOIT(assignment, mpz, mpz, fmpz_set(to._fmpz(), from._fmpz()))
 
 FLINT_DEFINE_DOIT_COND(assignment, mpz, traits::is_unsigned_integer<T>,
-        fmpz_set_ui(to._data(), from))
+        fmpz_set_ui(to._fmpz(), from))
 
 FLINT_DEFINE_DOIT_COND(assignment, mpz, traits::is_signed_integer<T>,
-        fmpz_set_si(to._data(), from))
+        fmpz_set_si(to._fmpz(), from))
 
 template<int n>
 struct assignment<mpz, char[n]>
 {
     static void doit(mpz& target, const char* source)
     {
-        fmpz_set_str(target._data(), const_cast<char*>(source), 10);
+        fmpz_set_str(target._fmpz(), const_cast<char*>(source), 10);
     }
 };
 
@@ -151,7 +151,7 @@ struct cmp<mpz, mpz>
 {
     static int get(const mpz& l, const mpz& r)
     {
-        return fmpz_cmp(l._data(), r._data());
+        return fmpz_cmp(l._fmpz(), r._fmpz());
     }
 };
 
@@ -161,7 +161,7 @@ struct cmp<mpz, T,
 {
     static int get(const mpz& v, const T& t)
     {
-        return fmpz_cmp_si(v._data(), t);
+        return fmpz_cmp_si(v._fmpz(), t);
     }
 };
 
@@ -171,7 +171,7 @@ struct cmp<mpz, T,
 {
     static int get(const mpz& v, const T& t)
     {
-        return fmpz_cmp_ui(v._data(), t);
+        return fmpz_cmp_ui(v._fmpz(), t);
     }
 };
 
@@ -180,55 +180,55 @@ struct to_string<mpz>
 {
     static std::string get(const mpz& v, int base)
     {
-        char* str = fmpz_get_str(0, base, v._data());
+        char* str = fmpz_get_str(0, base, v._fmpz());
         std::string res(str);
         std::free(str);
         return res;
     }
 };
 
-FLINT_DEFINE_GET(conversion, slong, mpz, fmpz_get_si(from._data()))
-FLINT_DEFINE_GET(conversion, ulong, mpz, fmpz_get_ui(from._data()))
-FLINT_DEFINE_GET(conversion, double, mpz, fmpz_get_d(from._data()))
+FLINT_DEFINE_GET(conversion, slong, mpz, fmpz_get_si(from._fmpz()))
+FLINT_DEFINE_GET(conversion, ulong, mpz, fmpz_get_ui(from._fmpz()))
+FLINT_DEFINE_GET(conversion, double, mpz, fmpz_get_d(from._fmpz()))
 
 FLINT_DEFINE_BINARY_EXPR(plus, mpz,
-        fmpz_add(to._data(), e1._data(), e2._data()))
+        fmpz_add(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 FLINT_DEFINE_CBINARY_EXPR_COND(plus, mpz, traits::is_unsigned_integer<T>,
-        fmpz_add_ui(to._data(), e1._data(), e2))
+        fmpz_add_ui(to._fmpz(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR(times, mpz,
-        fmpz_mul(to._data(), e1._data(), e2._data()))
+        fmpz_mul(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 FLINT_DEFINE_CBINARY_EXPR_COND(times, mpz, traits::is_unsigned_integer<T>,
-        fmpz_mul_ui(to._data(), e1._data(), e2))
+        fmpz_mul_ui(to._fmpz(), e1._fmpz(), e2))
 
 FLINT_DEFINE_CBINARY_EXPR_COND(times, mpz, traits::is_signed_integer<T>,
-        fmpz_mul_si(to._data(), e1._data(), e2))
+        fmpz_mul_si(to._fmpz(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR(minus, mpz,
-        fmpz_sub(to._data(), e1._data(), e2._data()))
+        fmpz_sub(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 FLINT_DEFINE_BINARY_EXPR_COND(minus, mpz, traits::is_unsigned_integer<T>,
-        fmpz_sub_ui(to._data(), e1._data(), e2))
+        fmpz_sub_ui(to._fmpz(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR(divided_by, mpz,
-        fmpz_fdiv_q(to._data(), e1._data(), e2._data()))
+        fmpz_fdiv_q(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 FLINT_DEFINE_BINARY_EXPR_COND(divided_by, mpz, traits::is_unsigned_integer<T>,
-        fmpz_fdiv_q_ui(to._data(), e1._data(), e2))
+        fmpz_fdiv_q_ui(to._fmpz(), e1._fmpz(), e2))
 
 FLINT_DEFINE_BINARY_EXPR_COND(divided_by, mpz, traits::is_signed_integer<T>,
-        fmpz_fdiv_q_si(to._data(), e1._data(), e2))
+        fmpz_fdiv_q_si(to._fmpz(), e1._fmpz(), e2))
 
 // TODO this interpretation of mod is not the same as for builtin types!
 FLINT_DEFINE_BINARY_EXPR(modulo, mpz,
-        fmpz_mod(to._data(), e1._data(), e2._data()))
+        fmpz_mod(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 FLINT_DEFINE_BINARY_EXPR_COND(modulo, mpz, traits::is_unsigned_integer<T>,
-        fmpz_mod_ui(to._data(), e1._data(), e2))
+        fmpz_mod_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._data(), from._data()))
+FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._fmpz(), from._fmpz()))
 
 
 // Optimized evaluation rules using ternary arithmetic (addmul, submul)
@@ -266,9 +266,9 @@ struct evaluation<Op,
         th::doit(input.first(), input.second()._data().first(),
                 input.second()._data().second(), temps, res, right, left);
         if(is_add)
-            fmpz_addmul(res->_data(), left->_data(), right->_data());
+            fmpz_addmul(res->_fmpz(), left->_fmpz(), right->_fmpz());
         else
-            fmpz_submul(res->_data(), left->_data(), right->_data());
+            fmpz_submul(res->_fmpz(), left->_fmpz(), right->_fmpz());
     }
 };
 
@@ -298,7 +298,7 @@ struct evaluation<operations::plus,
         const mpz* right = 0;
         th::doit(input.second(), input.first()._data().first(),
                 input.first()._data().second(), temps, res, right, left);
-        fmpz_addmul(res->_data(), left->_data(), right->_data());
+        fmpz_addmul(res->_fmpz(), left->_fmpz(), right->_fmpz());
     }
 };
 } // rules
@@ -323,7 +323,9 @@ struct ternary_assign_helper
     }
 
     ternary_assign_helper(typename ev2_t::arg1_t r1, typename ev2_t::arg2_t r2)
-        : ev2(backtemps(backing), r1, r2) {}
+        : backing(mp::htuples::fill<typename back_t::type>(
+                    tools::temporaries_filler(r1+r2 /* XXX */))),
+          ev2(backtemps(backing), r1, r2) {}
     const mpz& getleft() {return ev2.get1();}
     const mpz& getright() {return ev2.get2();}
 };
@@ -343,8 +345,8 @@ operator+=(mpz& left, const mpz_expression<operations::times,
 {
     detail::ternary_assign_helper<Right1, Right2> tah(
             other._data().first(), other._data().second());
-    fmpz_addmul(left._data(), tah.getleft()._data(),
-            tah.getright()._data());
+    fmpz_addmul(left._fmpz(), tah.getleft()._fmpz(),
+            tah.getright()._fmpz());
     return left;
 }
 
@@ -356,8 +358,8 @@ operator-=(mpz& left, const mpz_expression<operations::times,
 {
     detail::ternary_assign_helper<Right1, Right2> tah(
             other._data().first(), other._data().second());
-    fmpz_submul(left._data(), tah.getleft()._data(),
-            tah.getright()._data());
+    fmpz_submul(left._fmpz(), tah.getleft()._fmpz(),
+            tah.getright()._fmpz());
     return left;
 }
 
@@ -372,14 +374,14 @@ template<class T1, class T2>
 inline typename mp::enable_all_mpz<bool, T1, T2>::type
 divisible(const T1& t1, const T2& t2)
 {
-    return fmpz_divisible(t1.evaluate()._data(), t2.evaluate()._data());
+    return fmpz_divisible(t1.evaluate()._fmpz(), t2.evaluate()._fmpz());
 }
 template<class T1, class T2>
 inline typename mp::enable_if<mp::and_<
     traits::is_mpz<T1>, traits::fits_into_slong<T2> >, bool>::type
 divisible(const T1& t1, const T2& t2)
 {
-    return fmpz_divisible_si(t1.evaluate()._data(), t2);
+    return fmpz_divisible_si(t1.evaluate()._fmpz(), t2);
 }
 
 // These functions are evaluated lazily
@@ -389,9 +391,9 @@ FLINT_DEFINE_BINOP(rfac)
 FLINT_DEFINE_BINOP(bin)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND(rfac_op, mpz, traits::is_unsigned_integer<T>,
-        fmpz_rfac_ui(to._data(), e1._data(), e2))
+        fmpz_rfac_ui(to._fmpz(), e1._fmpz(), e2))
 FLINT_DEFINE_UNARY_EXPR_COND(fac_op, mpz, traits::is_unsigned_integer<T>,
-        fmpz_fac_ui(to._data(), from))
+        fmpz_fac_ui(to._fmpz(), from))
 
 template<class T1, class T2>
 struct binary_expression<
@@ -406,16 +408,16 @@ struct binary_expression<
     typedef mpz return_t;
     static void doit(mpz& to, const T1& t1, const T2& t2)
     {
-        fmpz_bin_uiui(to._data(), t1, t2);
+        fmpz_bin_uiui(to._fmpz(), t1, t2);
     }
 };
 
 // standard math functions (c/f stdmath.h)
 FLINT_DEFINE_BINARY_EXPR_COND(pow_op, mpz, traits::is_unsigned_integer<T>,
-        fmpz_pow_ui(to._data(), e1._data(), e2))
+        fmpz_pow_ui(to._fmpz(), e1._fmpz(), e2))
 FLINT_DEFINE_BINARY_EXPR_COND(root_op, mpz, traits::fits_into_slong<T>,
-        fmpz_root(to._data(), e1._data(), e2))
-FLINT_DEFINE_UNARY_EXPR(sqrt_op, mpz, fmpz_sqrt(to._data(), from._data()))
+        fmpz_root(to._fmpz(), e1._fmpz(), e2))
+FLINT_DEFINE_UNARY_EXPR(sqrt_op, mpz, fmpz_sqrt(to._fmpz(), from._fmpz()))
 } // rules
 
 // TODO many more functions

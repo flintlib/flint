@@ -117,13 +117,13 @@ test_initialisation_assignment()
     // test deep copying of (f)mpz with more than one digit
     a = "100000000000000000000";
     b = a;
-    tassert(a._data()[0] != b._data()[0]);
+    tassert(a._fmpz()[0] != b._fmpz()[0]);
     mpz j(a);
-    tassert(a._data()[0] != j._data()[0]);
+    tassert(a._fmpz()[0] != j._fmpz()[0]);
     tassert(a == b && a == j);
 
     // just here to test our assumptions on data format
-    tassert(c._data()[0] == d._data()[0]);
+    tassert(c._fmpz()[0] == d._fmpz()[0]);
 }
 
 void

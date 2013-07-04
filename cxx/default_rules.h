@@ -225,6 +225,28 @@ struct equals<T, U,
         return tools::symmetric_cmp<T, U>::get(t, u) == 0;
     }
 };
+
+// Instantiating temporaries
+
+template<class Expr, class T, class Enable>
+struct instantiate_temporaries
+{
+    static T get(const Expr& e)
+    {
+        return T();
+    }
+};
+
+template<class Expr, class T>
+struct instantiate_temporaries<Expr, T,
+    typename mp::enable_if<tools::is_super_sub_expr<Expr, T> >::type>
+{
+    static T get(const Expr& e)
+    {
+        return tools::find_subexpr<T>(e).create_temporary();
+    }
+};
+
 } // rules
 } // flint
 

@@ -47,21 +47,12 @@ struct UNIMPLEMENTED
     static const bool unimplemented_marker = true;
 };
 
-template<class T, class From, class Enable = void>
-struct initialization : UNIMPLEMENTED { };
-
 template<class T, class Enable = void>
 struct print : UNIMPLEMENTED { };
 
 template<class T, class Enable = void>
 struct to_string : UNIMPLEMENTED { };
 // static std::string get(const T&, int base)
-
-template<class T, class Enable = void>
-struct destruction : no_op { };
-
-template<class T, class Enable = void>
-struct empty_initialization : UNIMPLEMENTED { };
 
 template<class T, class U, class Enable = void>
 struct assignment : UNIMPLEMENTED { };
@@ -97,6 +88,20 @@ struct evaluation : UNIMPLEMENTED { };
 //    typedef X return_t;
 //    typedef Y temporaries_t; // a tuple of *pointers*
 //    static void doit(const T& input, temporaries_t temps, return_t* output);
+//};
+
+// Instantiate temporaries for evaluation. The default implementation does the
+// following:
+// - find a subexpression t of e of type T
+// -- return t.create_temporary()
+// - if no such subexpression, return T()
+// Additionally, the expression class implements a version of create_temporary
+// which just returns T(), so if your class is default constructible,
+// everything works automatically.
+template<class Expr, class T, class Enable = void>
+struct instantiate_temporaries;
+//{
+//    static T get(const Expr& e);
 //};
 
 // Convenience helpers, instantiate by evaluation if necessary
