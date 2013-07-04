@@ -546,6 +546,18 @@ test_tools()
     tassert(!is_subexpr<mylong>(a+a));
 }
 
+void
+test_temporaries()
+{
+    myint a(1);
+#define T2 ((a + a) + (a + a))
+#define T3 (T2 + T2)
+    tassert(count_temporaries(T2) == 2);
+    tassert(count_temporaries(T3) == 3);
+    tassert(count_temporaries(T3 + T2) == 3);
+    tassert(count_temporaries(T2 + T3) == 3);
+}
+
 int
 main()
 {
@@ -561,6 +573,7 @@ main()
     test_conversion();
     test_assignment_arith();
     test_tools();
+    test_temporaries();
 
     std::cout << "PASS" << std::endl;
 

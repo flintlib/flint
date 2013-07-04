@@ -58,4 +58,11 @@
 #endif
 #endif
 
+// Count the number of temporaries needed to evaluate an expression of type T
+template<class T>
+unsigned count_temporaries(const T&)
+{
+    return T::ev_traits_t::rule_t::temporaries_t::len;
+}
+
 #endif

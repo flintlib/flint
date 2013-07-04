@@ -220,12 +220,6 @@ test_traits()
 }
 
 template<class T>
-unsigned count_temporaries(const T&)
-{
-    return T::ev_traits_t::rule_t::temporaries_t::len;
-}
-
-template<class T>
 unsigned count_temporaries2(const T&)
 {
     return T::ev_traits_t::temp_rule_t::temporaries_t::len
@@ -243,6 +237,10 @@ test_temporaries()
     tassert(count_temporaries(((a / c) + (b % a)) / ((b + c) + (c / a))) == 3);
     tassert(count_temporaries((a/b) + (a/c) + (b/c) + (c/b)) == 2);
     tassert(count_temporaries2((a*b) + (a*c) + (b*c) + (c*b)) == 1);
+
+    // test a bug in evaluate_2 (if addmul is used on the right, this can
+    // be done with two temporaries, else need three)
+    tassert(count_temporaries(((a+b)+(a+c)) + (((a+c) + a*c))) == 2);
 }
 
 void

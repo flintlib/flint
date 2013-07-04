@@ -304,8 +304,8 @@ struct evaluate_2<Expr1, Expr2,
         traits::is_lazy_expr<Expr2> > >::type>
 {
 private:
-    typedef typename Expr1::ev_traits_t::rule_t rule1_t;
-    typedef typename Expr2::ev_traits_t::rule_t rule2_t;
+    typedef typename Expr1::ev_traits_t::temp_rule_t rule1_t;
+    typedef typename Expr2::ev_traits_t::temp_rule_t rule2_t;
 
 public:
     typedef typename rule1_t::return_t return1_t;
@@ -319,28 +319,61 @@ private:
     typedef typename rule1_t::temporaries_t temporaries1_t;
     typedef typename rule2_t::temporaries_t temporaries2_t;
 
-    // TODO sometimes the other way round uses fewer temporaries
-    typedef mp::merge_tuple<typename mp::make_tuple<return2_t*>::type,
-                 temporaries2_t> merger2;
-    typedef mp::merge_tuple<tuple<return1_t*, typename merger2::type>,
-                 temporaries1_t> merger1;
+    template<class E1, class E2, class Enable>
+    friend struct evaluate_2;
+
+    // We can either evaluate the Expr1 first and then Expr2, or the other
+    // way round. We would like to choose the most efficient strategy.
+    // Since we have no access to other metrics, we compare the number of
+    // temporaries required (see typedef of doit below).
+
+    struct doit_1
+    {
+        typedef mp::merge_tuple<typename mp::make_tuple<return2_t*>::type,
+                     temporaries2_t> merger2;
+        typedef mp::merge_tuple<tuple<return1_t*, typename merger2::type>,
+                     temporaries1_t> merger1;
+        typedef typename merger1::type temporaries_t;
+
+        static void init(temporaries_t temps, const Expr1& e1, const Expr2& e2,
+                return1_t*& ret1, return2_t*& ret2)
+        {
+            temporaries1_t temps1 = merger1::get_second(temps);
+            temporaries2_t temps2 =
+                merger2::get_second(merger1::get_first(temps).tail);
+            ret1 = merger1::get_first(temps).head;
+            ret2 =
+                merger2::get_first(merger1::get_first(temps).tail).head;
+            rule1_t::doit(e1._data(), temps1, ret1);
+            rule2_t::doit(e2._data(), temps2, ret2);
+        }
+    };
+
+    struct doit_2
+    {
+        typedef typename evaluate_2<Expr2, Expr1>::doit_1 doit_other;
+        typedef typename doit_other::temporaries_t temporaries_t;
+
+        static void init(temporaries_t temps, const Expr1& e1, const Expr2& e2,
+                return1_t*& ret1, return2_t*& ret2)
+        {
+            doit_other::init(temps, e2, e1, ret2, ret1);
+        }
+    };
+
+    typedef typename mp::if_v<
+        (doit_1::temporaries_t::len <= doit_2::temporaries_t::len),
+        doit_1, doit_2>::type doit;
 
     return1_t* ret1;
     return2_t* ret2;
 
 public:
-    typedef typename merger1::type temporaries_t;
+    typedef typename doit::temporaries_t temporaries_t;
 
     evaluate_2(temporaries_t temps, const Expr1& e1, const Expr2& e2)
     {
-        temporaries1_t temps1 = merger1::get_second(temps);
-        temporaries2_t temps2 =
-            merger2::get_second(merger1::get_first(temps).tail);
-        ret1 = merger1::get_first(temps).head;
-        ret2 =
-            merger2::get_first(merger1::get_first(temps).tail).head;
-        rule1_t::doit(e1._data(), temps1, ret1);
-        rule2_t::doit(e2._data(), temps2, ret2);
+        doit::init(temps, e1, e2, ret1, ret2);
     }
 
     ref1_t get1() {return *ret1;}
