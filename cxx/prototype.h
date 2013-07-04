@@ -49,7 +49,9 @@ class mpz_expression
 public:
     mpz_expression() {}
     template<class T>
-    explicit mpz_expression(const T& t) : mpz_expression::expression(t) {}
+    explicit mpz_expression(const T& t)
+        : expression<derived_wrapper< ::flint::mpz_expression>,
+              Operation, Data>(t) {}
 
     template<class T>
     mpz_expression& operator=(const T& t)
@@ -59,7 +61,9 @@ public:
     }
 
 protected:
-    explicit mpz_expression(const Data& d) : mpz_expression::expression(d) {}
+    explicit mpz_expression(const Data& d)
+        : expression<derived_wrapper< ::flint::mpz_expression>,
+              Operation, Data>(d) {}
 
     template<class D, class O, class Da>
     friend class expression;
@@ -384,9 +388,9 @@ FLINT_DEFINE_UNOP(fac)
 FLINT_DEFINE_BINOP(rfac)
 FLINT_DEFINE_BINOP(bin)
 namespace rules {
-FLINT_DEFINE_BINARY_EXPR_COND(rfac, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(rfac_op, mpz, traits::is_unsigned_integer<T>,
         fmpz_rfac_ui(to._data(), e1._data(), e2))
-FLINT_DEFINE_UNARY_EXPR_COND(fac, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_UNARY_EXPR_COND(fac_op, mpz, traits::is_unsigned_integer<T>,
         fmpz_fac_ui(to._data(), from))
 
 template<class T1, class T2>
@@ -396,7 +400,7 @@ struct binary_expression<
         mp::and_<
             traits::is_unsigned_integer<T1>,
             traits::is_unsigned_integer<T2> >,
-        operations::bin>::type,
+        operations::bin_op>::type,
     T2>
 {
     typedef mpz return_t;
@@ -407,11 +411,11 @@ struct binary_expression<
 };
 
 // standard math functions (c/f stdmath.h)
-FLINT_DEFINE_BINARY_EXPR_COND(pow, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(pow_op, mpz, traits::is_unsigned_integer<T>,
         fmpz_pow_ui(to._data(), e1._data(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND(root, mpz, traits::fits_into_slong<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(root_op, mpz, traits::fits_into_slong<T>,
         fmpz_root(to._data(), e1._data(), e2))
-FLINT_DEFINE_UNARY_EXPR(sqrt, mpz, fmpz_sqrt(to._data(), from._data()))
+FLINT_DEFINE_UNARY_EXPR(sqrt_op, mpz, fmpz_sqrt(to._data(), from._data()))
 } // rules
 
 // TODO many more functions

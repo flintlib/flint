@@ -28,13 +28,34 @@
 #include <iostream>
 #include <cstdlib>
 
+#ifndef EXIT_STATEMENT
+#define EXIT_STATEMENT std::exit(1)
+#endif
+
 #define tassert(expr) do \
 { \
     if (!(expr)) \
     { \
         std::cout << "FAIL\n" __FILE__ ":" << __LINE__ << ": assertion " #expr " failed\n"; \
-        std::exit(1); \
+        EXIT_STATEMENT; \
     } \
 } while (0)
+
+// Whether or not the compiler is good enough to compile all of t-mpz.cpp
+// in reasonable time and space.
+#ifndef HAVE_FAST_COMPILER
+#ifdef __clang__
+// clang 3.4 works; let's suppose all work until someone complains
+#define HAVE_FAST_COMPILER 1
+#elif defined(__GNUC__)
+// gcc 4.7.3 is good enough, supposedly all higher ones are too
+#define HAVE_FAST_COMPILER \
+    (__GNUC__ >= 4 && \
+         ((__GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ >= 3) \
+          || (__GNUC_MINOR__ > 7)))
+#else
+#define HAVE_FAST_COMPILER 0
+#endif
+#endif
 
 #endif

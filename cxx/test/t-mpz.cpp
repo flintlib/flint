@@ -31,6 +31,10 @@
 #include "cxx.h"
 #include "cxx/test/helpers.h"
 
+#if !HAVE_FAST_COMPILER
+#warning "Some tests are disabled because your compiler is slow."
+#endif
+
 using namespace flint;
 
 void
@@ -284,6 +288,7 @@ test_ternary()
     TT(T0, T2, 2);
     TT(T0, T3, 3);
 
+#if HAVE_FAST_COMPILER
     TT(T1, T0, 2);
     TT(T1, T1, 2);
     TT(T1, T2, 2);
@@ -312,6 +317,7 @@ test_ternary()
     TT6(T0, fac(2u), T2, 3);
     TT6(T0, T1, (d+d+d), 3);
     TT6(T1, T3, (T2 + T1) /* T3' */, 3);
+#endif
 }
 
 void

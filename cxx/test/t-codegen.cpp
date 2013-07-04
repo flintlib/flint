@@ -30,10 +30,37 @@
 #include <sstream>
 #include <vector>
 
+
+// whether or not the compiler suppors __attribute__(__optimize__(..))
+#ifndef HAVE_OPTIMIZE_ATTRIBUTE
+#ifdef __GNUC__
+#define HAVE_OPTIMIZE_ATTRIBUTE (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
+#else
+#define HAVE_OPTIMIZE_ATTRIBUTE 0
+#endif
+#endif
+
+#ifndef DO_CODEGEN_CHECKS
+#if !HAVE_OPTIMIZE_ATTRIBUTE
+#define DO_CODEGEN_CHECKS 0
+#elif defined(__GNUC__)
+// TODO this will need tweaking
+#define DO_CODEGEN_CHECKS \
+    (__GNUC__ == 4 && __GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ == 3)
+#else
+#define DO_CODEGEN_CHECKS 0
+#endif
+#endif
+
+#if !DO_CODEGEN_CHECKS
+#define EXIT_STATEMENT throw skippable_exception("did not expect pass anyway")
+#endif
+
 #include "cxx/test/helpers.h"
 #include "cxx/tuple.h"
 
 #include "cxx/prototype.h"
+
 
 // Exception class to indicate that this test cannot proceed, e.g. because
 // binutils is not installed or because we cannot interpret the disassembled
@@ -162,9 +189,14 @@ using namespace flint;
 using namespace mp;
 
 extern "C" {
+#if HAVE_OPTIMIZE_ATTRIBUTE
 #define DEFINE_FUNC(name, args) \
 void name args __attribute__((__optimize__("no-exceptions"))); \
 void name args 
+#else
+#define DEFINE_FUNC(name, args) \
+void name args 
+#endif
 
 DEFINE_FUNC(test_tuple_merge_1,
         (int& o1, int& o2, int& o3, int i1, long i2, char i3, int i4))

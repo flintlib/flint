@@ -522,27 +522,29 @@ operator%=(Expr1& e1, const Expr2& e2)
 // This set of macros should be called in namespace flint.
 
 // Introduce a new binary operation called "name"
+// NB: because of ADL bugs in g++ <= 4.4, the operation tag is called "name_op",
+// whereas the function corresponding to it is just called "name"
 #define FLINT_DEFINE_BINOP(name) \
 namespace operations { \
-struct name { }; \
+struct name##_op { }; \
 } \
 template<class T1, class T2> \
-inline typename detail::binary_op_helper<T1, operations::name, T2>::enable::type \
+inline typename detail::binary_op_helper<T1, operations::name##_op, T2>::enable::type \
 name(const T1& t1, const T2& t2) \
 { \
-    return detail::binary_op_helper<T1, operations::name, T2>::make(t1, t2); \
+    return detail::binary_op_helper<T1, operations::name##_op, T2>::make(t1, t2); \
 }
 
 // Introduce a new unary operation called "name"
 #define FLINT_DEFINE_UNOP(name) \
 namespace operations { \
-struct name { }; \
+struct name##_op { }; \
 } \
 template<class T1> \
-inline typename detail::unary_op_helper<operations::name, T1>::enable::type \
+inline typename detail::unary_op_helper<operations::name##_op, T1>::enable::type \
 name(const T1& t1) \
 { \
-    return detail::unary_op_helper<operations::name, T1>::make(t1); \
+    return detail::unary_op_helper<operations::name##_op, T1>::make(t1); \
 }
 
 // To be called in any namespace
@@ -551,21 +553,21 @@ name(const T1& t1) \
 #define FLINT_DEFINE_BINOP_HERE(name) \
 template<class T1, class T2> \
 inline typename ::flint::detail::binary_op_helper<\
-    T1, ::flint::operations::name, T2>::enable::type \
+    T1, ::flint::operations::name##_op, T2>::enable::type \
 name(const T1& t1, const T2& t2) \
 { \
   return ::flint::detail::binary_op_helper< \
-      T1, ::flint::operations::name, T2>::make(t1, t2); \
+      T1, ::flint::operations::name##_op, T2>::make(t1, t2); \
 }
 
 // Make the unary operation "name" available in current namespace
 #define FLINT_DEFINE_UNOP_HERE(name) \
 template<class T1> \
 inline typename ::flint::detail::unary_op_helper<\
-    ::flint::operations::name, T1>::enable::type \
+    ::flint::operations::name##_op, T1>::enable::type \
 name(const T1& t1) \
 { \
-  return ::flint::detail::unary_op_helper< ::flint::operations::name, T1>::make(t1); \
+  return ::flint::detail::unary_op_helper< ::flint::operations::name##_op, T1>::make(t1); \
 }
 
 #endif

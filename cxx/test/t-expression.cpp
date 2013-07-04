@@ -41,7 +41,9 @@ class my_expression
 public:
     my_expression() {};
     template<class T>
-    explicit my_expression(const T& t) : my_expression::expression(t) {}
+    explicit my_expression(const T& t)
+        : expression<derived_wrapper< ::my_expression>,
+              Operation, Data>(t) {}
 
     template<class T>
     my_expression& operator=(const T& t)
@@ -52,7 +54,8 @@ public:
 
 protected:
     explicit my_expression(const Data& d)
-        : my_expression::expression(d) {}
+        : expression<derived_wrapper< ::my_expression>,
+              Operation, Data>(d) {}
 
     template<class D, class O, class Da>
     friend class flint::expression;
@@ -81,7 +84,9 @@ class my_expression2
 public:
     my_expression2() {};
     template<class T>
-    explicit my_expression2(const T& t) : my_expression2::expression(t) {}
+    explicit my_expression2(const T& t)
+        : expression<derived_wrapper< ::my_expression2>,
+              Operation, Data>(t) {}
 
     template<class T>
     my_expression2& operator=(const T& t)
@@ -92,7 +97,8 @@ public:
 
 protected:
     explicit my_expression2(const Data& d)
-        : my_expression2::expression(d) {}
+        : expression<derived_wrapper< ::my_expression2>,
+              Operation, Data>(d) {}
 
     template<class D, class O, class Da>
     friend class flint::expression;
