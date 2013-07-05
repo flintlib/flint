@@ -191,7 +191,7 @@ public:
 
     void print(std::ostream& o) const
     {
-        rules::print<evaluated_t>::doit(evaluate(), o);
+        tools::print_using_str<evaluated_t>::doit(evaluate(), o);
     }
 
     std::string to_string(int base = 10) const
@@ -234,7 +234,7 @@ public:
     bool equals(const T& t,
             typename mp::disable_if<traits::is_lazy_expr<T> >::type* = 0) const
     {
-        return rules::equals<evaluated_t, T>::get(evaluate(), t);
+        return tools::equals_using_cmp<evaluated_t, T>::get(evaluate(), t);
     }
 
     template<class Op, class NData>

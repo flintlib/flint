@@ -195,37 +195,6 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
     }
 };
 
-
-// Automatic printing if to_string is implemented
-template<class T>
-struct print<T,
-    typename mp::enable_if<traits::is_implemented<to_string<T> > >::type>
-{
-    static void doit(const T& v, std::ostream& o)
-    {
-        int base = 10;
-        std::ios_base::fmtflags ff = o.flags();
-        if(ff & o.hex)
-            base = 16;
-        if(ff & o.oct)
-            base = 8;
-        o << v.to_string(base);
-    }
-};
-
-// Automatic equality testing if cmp is implemented
-
-template<class T, class U>
-struct equals<T, U,
-    typename mp::enable_if<
-        traits::is_implemented<tools::symmetric_cmp<T, U> > >::type>
-{
-    static bool get(const T& t, const U& u)
-    {
-        return tools::symmetric_cmp<T, U>::get(t, u) == 0;
-    }
-};
-
 // Instantiating temporaries
 
 template<class Expr, class T, class Enable>

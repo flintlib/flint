@@ -105,6 +105,12 @@ struct fmpz_data
         fmpz_set_si(f, t);
     }
 };
+
+struct fmpz_view_data
+{
+    fmpz_t f;
+    fmpz_view_data(const fmpz_t& ft) {f[0] = ft[0];}
+};
 } // detail
 
 typedef fmpzxx_expression<operations::immediate, detail::fmpz_data> fmpzxx;

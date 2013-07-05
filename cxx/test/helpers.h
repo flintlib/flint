@@ -65,4 +65,16 @@ unsigned count_temporaries(const T&)
     return T::ev_traits_t::rule_t::temporaries_t::len;
 }
 
+template<class T, class U>
+bool typed_equals(const T&, const U&)
+{
+    return false;
+}
+
+template<class T>
+bool typed_equals(const T& a, const T& b)
+{
+    return a == b;
+}
+
 #endif

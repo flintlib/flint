@@ -28,6 +28,8 @@
 #ifndef CXX_EVALUATION_TOOLS_H
 #define CXX_EVALUATION_TOOLS_H
 
+#include <iosfwd>
+
 #include "flint.h" // FLINT_MAX and FLINT_MIN
 
 #include "cxx/expression_traits.h"
@@ -74,7 +76,7 @@ struct cmp_invert
 }
 
 // A version of the cmp rule which tries both argument orders
-template<class T, class U, class Enable = void>
+template<class T, class U>
 struct symmetric_cmp
     : mp::if_<traits::is_implemented<rules::cmp<T, U> >,
           rules::cmp<T, U>,
@@ -84,6 +86,50 @@ struct symmetric_cmp
             >::type
         >::type { };
 
+// A version of equals which uses cmp if possible
+namespace tdetail {
+template<class T, class U, class Enable = void>
+struct equals_using_cmp_ : rules::UNIMPLEMENTED { };
+template<class T, class U>
+struct equals_using_cmp_<T, U,
+    typename mp::enable_if<
+        traits::is_implemented<symmetric_cmp<T, U> > >::type>
+{
+    static bool get(const T& t, const U& u)
+    {
+        return tools::symmetric_cmp<T, U>::get(t, u) == 0;
+    }
+};
+} // tdetail
+template<class T, class U>
+struct equals_using_cmp
+    : mp::if_<traits::is_implemented<rules::equals<T, U> >,
+        rules::equals<T, U>, tdetail::equals_using_cmp_<T, U> >::type { };
+
+// Automatic printing if to_string is implemented
+namespace tdetail {
+template<class T, class Enable = void>
+struct print_using_str_ : rules::UNIMPLEMENTED { };
+template<class T>
+struct print_using_str_<T,
+    typename mp::enable_if<traits::is_implemented<rules::to_string<T> > >::type>
+{
+    static void doit(const T& v, std::ostream& o)
+    {
+        int base = 10;
+        std::ios_base::fmtflags ff = o.flags();
+        if(ff & o.hex)
+            base = 16;
+        if(ff & o.oct)
+            base = 8;
+        o << v.to_string(base);
+    }
+};
+} // tdetail
+template<class T>
+struct print_using_str
+    : mp::if_<traits::is_implemented<rules::print<T> >,
+        rules::print<T>, tdetail::print_using_str_<T> >::type { };
 
 // Finding a subexpression of precsribed type
 namespace tdetail {
