@@ -26,6 +26,6 @@
 #ifndef CXX_H
 #define CXX_H
 
-#include "cxx/prototype.h"
+// nothing here yet
 
 #endif

@@ -59,7 +59,7 @@
 #include "cxx/test/helpers.h"
 #include "cxx/tuple.h"
 
-#include "cxx/prototype.h"
+#include "cxx/fmpzxx.h"
 
 
 // Exception class to indicate that this test cannot proceed, e.g. because
@@ -297,14 +297,14 @@ DEFINE_FUNC(test_tuple_removeres_2,
 }
 
 
-DEFINE_FUNC(test_mpz_symadd_1,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_symadd_1,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out = ((a + b) + (c + d)) + ((a + c) + (b + d));
 }
 
-DEFINE_FUNC(test_mpz_symadd_2,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_symadd_2,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_t tmp1, tmp2, tmp3;
     fmpz_init(tmp1);
@@ -324,14 +324,14 @@ DEFINE_FUNC(test_mpz_symadd_2,
     fmpz_clear(tmp3);
 }
 
-DEFINE_FUNC(test_mpz_asymadd_1,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_asymadd_1,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out = (a + (((b + (c + (a + b))) + c) + d));
 }
 
-DEFINE_FUNC(test_mpz_asymadd_2,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_asymadd_2,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_t tmp;
     fmpz_init(tmp);
@@ -346,20 +346,20 @@ DEFINE_FUNC(test_mpz_asymadd_2,
     fmpz_clear(tmp);
 }
 
-DEFINE_FUNC(test_mpz_asymadd_3,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_asymadd_3,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out = a + b + c + a + b + c + d;
 }
 
-DEFINE_FUNC(test_mpz_ternary_1,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_1,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out = a + ((a+b) + c*d);
 }
 
-DEFINE_FUNC(test_mpz_ternary_2,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_2,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_t tmp;
     fmpz_init(tmp);
@@ -371,14 +371,14 @@ DEFINE_FUNC(test_mpz_ternary_2,
     fmpz_clear(tmp);
 }
 
-DEFINE_FUNC(test_mpz_ternary_3,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_3,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out = a + ((a+b) + ((c+a) + (a+d))*d);
 }
 
-DEFINE_FUNC(test_mpz_ternary_4,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_4,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_t tmp1, tmp2;
     fmpz_init(tmp1);fmpz_init(tmp2);
@@ -393,26 +393,26 @@ DEFINE_FUNC(test_mpz_ternary_4,
     fmpz_clear(tmp1);fmpz_clear(tmp2);
 }
 
-DEFINE_FUNC(test_mpz_ternary_5,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_5,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out += a*b;
 }
 
-DEFINE_FUNC(test_mpz_ternary_6,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_6,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_addmul(out._fmpz(), a._fmpz(), b._fmpz());
 }
 
-DEFINE_FUNC(test_mpz_ternary_7,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_7,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out += a*(b+c);
 }
 
-DEFINE_FUNC(test_mpz_ternary_8,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_8,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_t tmp; fmpz_init(tmp);
     fmpz_add(tmp, b._fmpz(), c._fmpz());
@@ -420,14 +420,14 @@ DEFINE_FUNC(test_mpz_ternary_8,
     fmpz_clear(tmp);
 }
 
-DEFINE_FUNC(test_mpz_ternary_9,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_9,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     out += (a+d)*(b+c);
 }
 
-DEFINE_FUNC(test_mpz_ternary_10,
-        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+DEFINE_FUNC(test_fmpzxx_ternary_10,
+        (fmpzxx& out, const fmpzxx& a, const fmpzxx& b, const fmpzxx& c, const fmpzxx& d))
 {
     fmpz_t tmp1, tmp2; fmpz_init(tmp1); fmpz_init(tmp2);
     fmpz_add(tmp1, b._fmpz(), c._fmpz());
@@ -472,17 +472,17 @@ test_tuple()
 }
 
 void
-test_mpz()
+test_fmpzxx()
 {
-    std::string ass1 = disass(program, "test_mpz_symadd_1");
-    std::string ass2 = disass(program, "test_mpz_symadd_2");
+    std::string ass1 = disass(program, "test_fmpzxx_symadd_1");
+    std::string ass2 = disass(program, "test_fmpzxx_symadd_2");
     tassert(count(ass1, "call") == count(ass2, "call"));
     tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
                 count(stripnop(ass2), "\n"), 0.1));
 
-    ass1 = disass(program, "test_mpz_asymadd_1");
-    ass2 = disass(program, "test_mpz_asymadd_2");
-    std::string ass3 = disass(program, "test_mpz_asymadd_3");
+    ass1 = disass(program, "test_fmpzxx_asymadd_1");
+    ass2 = disass(program, "test_fmpzxx_asymadd_2");
+    std::string ass3 = disass(program, "test_fmpzxx_asymadd_3");
     tassert(count(ass1, "call") == count(ass2, "call"));
     tassert(count(ass1, "mov") == count(ass2, "mov"));
     tassert(count(ass3, "call") == count(ass2, "call"));
@@ -494,14 +494,14 @@ test_mpz()
     tassert(count(ass1, "\n") == count(ass2, "\n"));
     tassert(count(ass3, "\n") == count(ass2, "\n"));
 
-    ass1 = disass(program, "test_mpz_ternary_1");
-    ass2 = disass(program, "test_mpz_ternary_2");
+    ass1 = disass(program, "test_fmpzxx_ternary_1");
+    ass2 = disass(program, "test_fmpzxx_ternary_2");
     tassert(count(ass1, "call") == count(ass2, "call"));
     tassert(count(ass1, "mov") == count(ass2, "mov"));
     tassert(count(ass1, "\n") == count(ass2, "\n")); // XXX
 
-    ass1 = disass(program, "test_mpz_ternary_3");
-    ass2 = disass(program, "test_mpz_ternary_4");
+    ass1 = disass(program, "test_fmpzxx_ternary_3");
+    ass2 = disass(program, "test_fmpzxx_ternary_4");
     tassert(count(ass1, "call") == count(ass2, "call"));
     tassert(count(ass1, "je") == count(ass2, "je"));
     tassert(count(ass1, "jmp") == count(ass2, "jmp"));
@@ -509,18 +509,18 @@ test_mpz()
                          count(ass2, "mov") + count(ass2, "lea"), 0.1));
     tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
 
-    ass1 = disass(program, "test_mpz_ternary_6");
-    ass2 = disass(program, "test_mpz_ternary_5");
+    ass1 = disass(program, "test_fmpzxx_ternary_6");
+    ass2 = disass(program, "test_fmpzxx_ternary_5");
     tassert(count(ass1, "\n") == count(ass2, "\n")); // XXX
 
-    ass1 = disass(program, "test_mpz_ternary_7");
-    ass2 = disass(program, "test_mpz_ternary_8");
+    ass1 = disass(program, "test_fmpzxx_ternary_7");
+    ass2 = disass(program, "test_fmpzxx_ternary_8");
     tassert(count(ass1, "call") == count(ass2, "call"));
     // NB: ass1 is actually shorter?!?
     tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
 
-    ass1 = disass(program, "test_mpz_ternary_9");
-    ass2 = disass(program, "test_mpz_ternary_10");
+    ass1 = disass(program, "test_fmpzxx_ternary_9");
+    ass2 = disass(program, "test_fmpzxx_ternary_10");
     tassert(count(ass1, "call") == count(ass2, "call"));
     // NB: ass1 is actually shorter?!?
     tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
@@ -534,7 +534,7 @@ main(int argc, char** argv)
     try
     {
         test_tuple();
-        test_mpz();
+        test_fmpzxx();
     }
     catch(skippable_exception e)
     {

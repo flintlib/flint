@@ -28,7 +28,7 @@
 #include <stdexcept>
 #include <stdio.h>
 
-#include "cxx.h"
+#include "cxx/fmpzxx.h"
 #include "cxx/test/helpers.h"
 
 #if !HAVE_FAST_COMPILER
@@ -40,7 +40,7 @@ using namespace flint;
 void
 test_printing()
 {
-    mpz a(31);
+    fmpzxx a(31);
 
     tassert(a.to_string() == "31");
     tassert(a.to_string(2) == "11111");
@@ -50,17 +50,17 @@ test_printing()
         << std::hex << a << '\n' << std::dec << a;
     tassert(oss.str() == "31\n37\n1f\n31");
 
-    mpz b(-15);
+    fmpzxx b(-15);
     tassert((a + b).to_string() == "16");
 }
 
 void
 test_order()
 {
-    mpz a(0);
-    mpz b(1);
-    mpz c(0);
-    mpz d(-1);
+    fmpzxx a(0);
+    fmpzxx b(1);
+    fmpzxx c(0);
+    fmpzxx d(-1);
 
 #define TO(xzero, zero, one, mone) \
     tassert(xzero == zero); \
@@ -94,7 +94,7 @@ test_order()
 void
 test_conversion()
 {
-    mpz a(4);
+    fmpzxx a(4);
     tassert(a.to<slong>() == 4);
     tassert(a.to<ulong>() == 4);
     tassert(a.to<double>() == 4.0);
@@ -104,9 +104,9 @@ test_conversion()
 void
 test_initialisation_assignment()
 {
-    mpz a(4), b(4l), c(4u), d("4");
-    mpz e(a);
-    mpz f, g, h, i;
+    fmpzxx a(4), b(4l), c(4u), d("4");
+    fmpzxx e(a);
+    fmpzxx f, g, h, i;
     f = 4;
     g = 4l;
     h = 4u;
@@ -114,11 +114,11 @@ test_initialisation_assignment()
     tassert(a == b && a == c&& a == d && a == e && a == f && a == g && a == h
             && a == i);
 
-    // test deep copying of (f)mpz with more than one digit
+    // test deep copying of (f)fmpzxx with more than one digit
     a = "100000000000000000000";
     b = a;
     tassert(a._fmpz()[0] != b._fmpz()[0]);
-    mpz j(a);
+    fmpzxx j(a);
     tassert(a._fmpz()[0] != j._fmpz()[0]);
     tassert(a == b && a == j);
 
@@ -139,17 +139,17 @@ test_arithmetic()
     tassert(seven / three == 2); \
     tassert(seven % three == 1)
 
-    TA(mpz(7), mpz(3));
-    TA(mpz(7), 3u);
-    TAC(7ul, mpz(3));
+    TA(fmpzxx(7), fmpzxx(3));
+    TA(fmpzxx(7), 3u);
+    TAC(7ul, fmpzxx(3));
 
     // test signed builtins (only div and mul)
-    tassert(-7 * mpz(3) == -21);
-    tassert(mpz(7) * (-3l) == -21);
-    tassert(mpz(21) / -3 == -7);
+    tassert(-7 * fmpzxx(3) == -21);
+    tassert(fmpzxx(7) * (-3l) == -21);
+    tassert(fmpzxx(21) / -3 == -7);
 
     // test composite arithmetic
-    mpz a(3), b(7);
+    fmpzxx a(3), b(7);
     tassert(3*(a + b) - (b + (a - 4u)) + ((-(a - b)) % (b / 2)) == 25);
     //tassert(a*b + a*a + b*b == 21+9+49); // XXX
 
@@ -159,8 +159,8 @@ test_arithmetic()
     // test assignment arithmetic
 #define TAA(op, res) \
     { \
-        mpz tmp1(10), tmp2(10), tmp3(10); \
-        mpz three(3); \
+        fmpzxx tmp1(10), tmp2(10), tmp3(10); \
+        fmpzxx three(3); \
         tmp1 op three; \
         tmp2 op 3u; \
         tmp3 op three*1; \
@@ -177,8 +177,8 @@ test_arithmetic()
 void
 test_functions()
 {
-    mpz a(2);
-    mpz b(16);
+    fmpzxx a(2);
+    fmpzxx b(16);
 
     tassert(pow(a, 4u) == 16);
     tassert(root(b, 4) == 2);
@@ -204,18 +204,18 @@ test_functions()
 }
 
 template<class T>
-void assert_is_mpz(const T&)
+void assert_is_fmpzxx(const T&)
 {
-    tassert(traits::is_mpz<T>::val);
+    tassert(traits::is_fmpzxx<T>::val);
 }
 struct newtype { };
 void
 test_traits()
 {
-    tassert(traits::is_mpz<mpz>::val == true);
-    tassert(traits::is_mpz<int>::val == false);
-    assert_is_mpz(mpz(1) + mpz(2));
-    tassert((traits::is_mpz<mpz_expression<
+    tassert(traits::is_fmpzxx<fmpzxx>::val == true);
+    tassert(traits::is_fmpzxx<int>::val == false);
+    assert_is_fmpzxx(fmpzxx(1) + fmpzxx(2));
+    tassert((traits::is_fmpzxx<fmpzxx_expression<
                 operations::immediate, newtype> >::val == false));
 }
 
@@ -231,7 +231,7 @@ unsigned count_temporaries2(const T&)
 void
 test_temporaries()
 {
-    mpz a, b, c;
+    fmpzxx a, b, c;
     tassert(count_temporaries(a + b) == 0);
     tassert(count_temporaries(a + b + c + a + b + c) == 1);
     tassert(count_temporaries(((a / c) + (b % a)) / ((b + c) + (c / a))) == 3);
@@ -246,7 +246,7 @@ test_temporaries()
 void
 test_ternary()
 {
-    mpz b(2), c(3), d(4);
+    fmpzxx b(2), c(3), d(4);
 
 #define T0 fac(4u)
 #define T1 (b + b + b)
@@ -258,7 +258,7 @@ test_ternary()
     // structures. It reduces the resident set by 50%, and compile time by 75%.
 #define TT3(m1, m2, m3, ntemps) \
     do{ struct inner { static void doit() { \
-    mpz b(2), c(3), d(4); \
+    fmpzxx b(2), c(3), d(4); \
     tassert(count_temporaries2(m1 + m2*m3) == ntemps); \
     tassert(b + (m1 + m2*m3) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
     tassert(count_temporaries2(m1 + m3*m2) == ntemps); \
@@ -321,7 +321,7 @@ test_ternary()
 void
 test_ternary_assigments()
 {
-    mpz a(2), b(3), c(4);
+    fmpzxx a(2), b(3), c(4);
     tassert((a += b*c) == 14);
     tassert(a == 14);
     tassert((a -= b*c) == 2);
@@ -343,7 +343,7 @@ test_ternary_assigments()
 int
 main()
 {
-    std::cout << "mpz....";
+    std::cout << "fmpzxx....";
 
     test_printing();
     test_order();
@@ -357,7 +357,7 @@ main()
     test_ternary_assigments();
 
     // TODO test that certain things *don't* compile?
-    // TODO test enable_all_mpz
+    // TODO test enable_all_fmpzxx
 
     std::cout << "PASS" << std::endl;
 }

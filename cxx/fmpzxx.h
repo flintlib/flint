@@ -23,8 +23,8 @@
 
 ******************************************************************************/
 
-#ifndef CXX_PROTOTYPE_H
-#define CXX_PROTOTYPE_H
+#ifndef CXX_FMPZXX_H
+#define CXX_FMPZXX_H
 
 #include <cstdlib>
 
@@ -43,18 +43,18 @@ namespace flint {
 // "concrete" expression classes
 
 template<class Operation, class Data>
-class mpz_expression
-    : public expression<derived_wrapper<mpz_expression>, Operation, Data>
+class fmpzxx_expression
+    : public expression<derived_wrapper<fmpzxx_expression>, Operation, Data>
 {
 public:
-    mpz_expression() {}
+    fmpzxx_expression() {}
     template<class T>
-    explicit mpz_expression(const T& t)
-        : expression<derived_wrapper< ::flint::mpz_expression>,
+    explicit fmpzxx_expression(const T& t)
+        : expression<derived_wrapper< ::flint::fmpzxx_expression>,
               Operation, Data>(t) {}
 
     template<class T>
-    mpz_expression& operator=(const T& t)
+    fmpzxx_expression& operator=(const T& t)
     {
         this->set(t);
         return *this;
@@ -64,8 +64,8 @@ public:
     const fmpz_t& _fmpz() const {return this->_data().f;}
 
 protected:
-    explicit mpz_expression(const Data& d)
-        : expression<derived_wrapper< ::flint::mpz_expression>,
+    explicit fmpzxx_expression(const Data& d)
+        : expression<derived_wrapper< ::flint::fmpzxx_expression>,
               Operation, Data>(d) {}
 
     template<class D, class O, class Da>
@@ -107,21 +107,21 @@ struct fmpz_data
 };
 } // detail
 
-typedef mpz_expression<operations::immediate, detail::fmpz_data> mpz;
+typedef fmpzxx_expression<operations::immediate, detail::fmpz_data> fmpzxx;
 
 ///////////////////////////////////////////////////////////////////
 // HELPERS
 ///////////////////////////////////////////////////////////////////
 namespace traits {
-template<class T> struct is_mpz : is_T_expr<T, mpz> { };
+template<class T> struct is_fmpzxx : is_T_expr<T, fmpzxx> { };
 } // traits
 namespace mp {
 template<class Out, class T1, class T2 = void>
-struct enable_all_mpz
-    : mp::enable_if<mp::and_<traits::is_mpz<T1>, traits::is_mpz<T2> >, Out> { };
+struct enable_all_fmpzxx
+    : mp::enable_if<mp::and_<traits::is_fmpzxx<T1>, traits::is_fmpzxx<T2> >, Out> { };
 template<class Out, class T>
-struct enable_all_mpz<Out, T, void>
-    : mp::enable_if<traits::is_mpz<T>, Out> { };
+struct enable_all_fmpzxx<Out, T, void>
+    : mp::enable_if<traits::is_fmpzxx<T>, Out> { };
 } // mp
 
 ///////////////////////////////////////////////////////////////////
@@ -129,56 +129,56 @@ struct enable_all_mpz<Out, T, void>
 ///////////////////////////////////////////////////////////////////
 namespace rules {
 
-FLINT_DEFINE_DOIT(assignment, mpz, mpz, fmpz_set(to._fmpz(), from._fmpz()))
+FLINT_DEFINE_DOIT(assignment, fmpzxx, fmpzxx, fmpz_set(to._fmpz(), from._fmpz()))
 
-FLINT_DEFINE_DOIT_COND(assignment, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_DOIT_COND(assignment, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_set_ui(to._fmpz(), from))
 
-FLINT_DEFINE_DOIT_COND(assignment, mpz, traits::is_signed_integer<T>,
+FLINT_DEFINE_DOIT_COND(assignment, fmpzxx, traits::is_signed_integer<T>,
         fmpz_set_si(to._fmpz(), from))
 
 template<int n>
-struct assignment<mpz, char[n]>
+struct assignment<fmpzxx, char[n]>
 {
-    static void doit(mpz& target, const char* source)
+    static void doit(fmpzxx& target, const char* source)
     {
         fmpz_set_str(target._fmpz(), const_cast<char*>(source), 10);
     }
 };
 
 template<>
-struct cmp<mpz, mpz>
+struct cmp<fmpzxx, fmpzxx>
 {
-    static int get(const mpz& l, const mpz& r)
+    static int get(const fmpzxx& l, const fmpzxx& r)
     {
         return fmpz_cmp(l._fmpz(), r._fmpz());
     }
 };
 
 template<class T>
-struct cmp<mpz, T,
+struct cmp<fmpzxx, T,
     typename mp::enable_if<traits::is_signed_integer<T> >::type>
 {
-    static int get(const mpz& v, const T& t)
+    static int get(const fmpzxx& v, const T& t)
     {
         return fmpz_cmp_si(v._fmpz(), t);
     }
 };
 
 template<class T>
-struct cmp<mpz, T,
+struct cmp<fmpzxx, T,
     typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
 {
-    static int get(const mpz& v, const T& t)
+    static int get(const fmpzxx& v, const T& t)
     {
         return fmpz_cmp_ui(v._fmpz(), t);
     }
 };
 
 template<>
-struct to_string<mpz>
+struct to_string<fmpzxx>
 {
-    static std::string get(const mpz& v, int base)
+    static std::string get(const fmpzxx& v, int base)
     {
         char* str = fmpz_get_str(0, base, v._fmpz());
         std::string res(str);
@@ -187,48 +187,48 @@ struct to_string<mpz>
     }
 };
 
-FLINT_DEFINE_GET(conversion, slong, mpz, fmpz_get_si(from._fmpz()))
-FLINT_DEFINE_GET(conversion, ulong, mpz, fmpz_get_ui(from._fmpz()))
-FLINT_DEFINE_GET(conversion, double, mpz, fmpz_get_d(from._fmpz()))
+FLINT_DEFINE_GET(conversion, slong, fmpzxx, fmpz_get_si(from._fmpz()))
+FLINT_DEFINE_GET(conversion, ulong, fmpzxx, fmpz_get_ui(from._fmpz()))
+FLINT_DEFINE_GET(conversion, double, fmpzxx, fmpz_get_d(from._fmpz()))
 
-FLINT_DEFINE_BINARY_EXPR(plus, mpz,
+FLINT_DEFINE_BINARY_EXPR(plus, fmpzxx,
         fmpz_add(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
-FLINT_DEFINE_CBINARY_EXPR_COND(plus, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_CBINARY_EXPR_COND(plus, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_add_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_BINARY_EXPR(times, mpz,
+FLINT_DEFINE_BINARY_EXPR(times, fmpzxx,
         fmpz_mul(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
-FLINT_DEFINE_CBINARY_EXPR_COND(times, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_CBINARY_EXPR_COND(times, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_mul_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_CBINARY_EXPR_COND(times, mpz, traits::is_signed_integer<T>,
+FLINT_DEFINE_CBINARY_EXPR_COND(times, fmpzxx, traits::is_signed_integer<T>,
         fmpz_mul_si(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_BINARY_EXPR(minus, mpz,
+FLINT_DEFINE_BINARY_EXPR(minus, fmpzxx,
         fmpz_sub(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
-FLINT_DEFINE_BINARY_EXPR_COND(minus, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(minus, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_sub_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_BINARY_EXPR(divided_by, mpz,
+FLINT_DEFINE_BINARY_EXPR(divided_by, fmpzxx,
         fmpz_fdiv_q(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
-FLINT_DEFINE_BINARY_EXPR_COND(divided_by, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(divided_by, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_fdiv_q_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_BINARY_EXPR_COND(divided_by, mpz, traits::is_signed_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(divided_by, fmpzxx, traits::is_signed_integer<T>,
         fmpz_fdiv_q_si(to._fmpz(), e1._fmpz(), e2))
 
 // TODO this interpretation of mod is not the same as for builtin types!
-FLINT_DEFINE_BINARY_EXPR(modulo, mpz,
+FLINT_DEFINE_BINARY_EXPR(modulo, fmpzxx,
         fmpz_mod(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
-FLINT_DEFINE_BINARY_EXPR_COND(modulo, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(modulo, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_mod_ui(to._fmpz(), e1._fmpz(), e2))
 
-FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._fmpz(), from._fmpz()))
+FLINT_DEFINE_UNARY_EXPR(negate, fmpzxx, fmpz_neg(to._fmpz(), from._fmpz()))
 
 
 // Optimized evaluation rules using ternary arithmetic (addmul, submul)
@@ -236,7 +236,7 @@ FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._fmpz(), from._fmpz()))
 template<class Op, class Left, class Right1, class Right2>
 struct evaluation<Op,
     tuple<Left, tuple<
-        mpz_expression<operations::times,
+        fmpzxx_expression<operations::times,
             tuple<Right1, tuple<Right2, empty_tuple> > >,
         // NB: there is no particular reason to have the enable_if here,
         //     many other similar places would do
@@ -245,24 +245,24 @@ struct evaluation<Op,
                 mp::equal_types<Op, operations::minus> >,
             empty_tuple>::type> >,
     true, 1,
-    typename tools::ternary_helper<mpz, Left, Right1, Right2>::enable::type>
+    typename tools::ternary_helper<fmpzxx, Left, Right1, Right2>::enable::type>
 {
     // Helpful for testing.
     static const unsigned TERNARY_OP_MARKER = 0;
 
-    typedef mpz return_t;
-    typedef tools::ternary_helper<mpz, Left, Right1, Right2> th;
+    typedef fmpzxx return_t;
+    typedef tools::ternary_helper<fmpzxx, Left, Right1, Right2> th;
     typedef typename th::temporaries_t temporaries_t;
     typedef tuple<Left, tuple<
-        mpz_expression<operations::times,
+        fmpzxx_expression<operations::times,
             tuple<Right1, tuple<Right2, empty_tuple> > >,
         empty_tuple> > data_t;
     static const bool is_add = mp::equal_types<Op, operations::plus>::val;
 
     static void doit(const data_t& input, temporaries_t temps, return_t* res)
     {
-        const mpz* left = 0;
-        const mpz* right = 0;
+        const fmpzxx* left = 0;
+        const fmpzxx* right = 0;
         th::doit(input.first(), input.second()._data().first(),
                 input.second()._data().second(), temps, res, right, left);
         if(is_add)
@@ -275,27 +275,27 @@ struct evaluation<Op,
 // b*c + a
 template<class Right, class Left1, class Left2>
 struct evaluation<operations::plus,
-    tuple<mpz_expression<operations::times,
+    tuple<fmpzxx_expression<operations::times,
             tuple<Left1, tuple<Left2, empty_tuple> > >,
         tuple<Right, empty_tuple> >,
     true, 1,
-    typename tools::ternary_helper<mpz, 
+    typename tools::ternary_helper<fmpzxx, 
         Right, Left1, Left2, operations::times>::enable::type>
 {
     // Helpful for testing.
     static const unsigned TERNARY_OP_MARKER = 0;
 
-    typedef mpz return_t;
-    typedef tools::ternary_helper<mpz, Right, Left1, Left2> th;
+    typedef fmpzxx return_t;
+    typedef tools::ternary_helper<fmpzxx, Right, Left1, Left2> th;
     typedef typename th::temporaries_t temporaries_t;
-    typedef tuple<mpz_expression<operations::times,
+    typedef tuple<fmpzxx_expression<operations::times,
             tuple<Left1, tuple<Left2, empty_tuple> > >,
         tuple<Right, empty_tuple> > data_t;
 
     static void doit(const data_t& input, temporaries_t temps, return_t* res)
     {
-        const mpz* left = 0;
-        const mpz* right = 0;
+        const fmpzxx* left = 0;
+        const fmpzxx* right = 0;
         th::doit(input.second(), input.first()._data().first(),
                 input.first()._data().second(), temps, res, right, left);
         fmpz_addmul(res->_fmpz(), left->_fmpz(), right->_fmpz());
@@ -326,13 +326,13 @@ struct ternary_assign_helper
         : backing(mp::htuples::fill<typename back_t::type>(
                     tools::temporaries_filler(r1+r2 /* XXX */))),
           ev2(backtemps(backing), r1, r2) {}
-    const mpz& getleft() {return ev2.get1();}
-    const mpz& getright() {return ev2.get2();}
+    const fmpzxx& getleft() {return ev2.get1();}
+    const fmpzxx& getright() {return ev2.get2();}
 };
 
 template<class Right1, class Right2>
 struct enable_ternary_assign
-    : mp::enable_all_mpz<mpz&,
+    : mp::enable_all_fmpzxx<fmpzxx&,
         typename traits::basetype<Right1>::type,
         typename traits::basetype<Right2>::type> { };
 } // detail
@@ -340,7 +340,7 @@ struct enable_ternary_assign
 // a += b*c
 template<class Right1, class Right2>
 inline typename detail::enable_ternary_assign<Right1, Right2>::type
-operator+=(mpz& left, const mpz_expression<operations::times,
+operator+=(fmpzxx& left, const fmpzxx_expression<operations::times,
         tuple<Right1, tuple<Right2, empty_tuple> > >& other)
 {
     detail::ternary_assign_helper<Right1, Right2> tah(
@@ -353,7 +353,7 @@ operator+=(mpz& left, const mpz_expression<operations::times,
 // a -= b*c
 template<class Right1, class Right2>
 inline typename detail::enable_ternary_assign<Right1, Right2>::type
-operator-=(mpz& left, const mpz_expression<operations::times,
+operator-=(fmpzxx& left, const fmpzxx_expression<operations::times,
         tuple<Right1, tuple<Right2, empty_tuple> > >& other)
 {
     detail::ternary_assign_helper<Right1, Right2> tah(
@@ -368,17 +368,17 @@ operator-=(mpz& left, const mpz_expression<operations::times,
 // FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////
 
-// These functions evaluate immediately and do not yield mpzs
+// These functions evaluate immediately and do not yield fmpzxxs
 
 template<class T1, class T2>
-inline typename mp::enable_all_mpz<bool, T1, T2>::type
+inline typename mp::enable_all_fmpzxx<bool, T1, T2>::type
 divisible(const T1& t1, const T2& t2)
 {
     return fmpz_divisible(t1.evaluate()._fmpz(), t2.evaluate()._fmpz());
 }
 template<class T1, class T2>
 inline typename mp::enable_if<mp::and_<
-    traits::is_mpz<T1>, traits::fits_into_slong<T2> >, bool>::type
+    traits::is_fmpzxx<T1>, traits::fits_into_slong<T2> >, bool>::type
 divisible(const T1& t1, const T2& t2)
 {
     return fmpz_divisible_si(t1.evaluate()._fmpz(), t2);
@@ -390,9 +390,9 @@ FLINT_DEFINE_UNOP(fac)
 FLINT_DEFINE_BINOP(rfac)
 FLINT_DEFINE_BINOP(bin)
 namespace rules {
-FLINT_DEFINE_BINARY_EXPR_COND(rfac_op, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(rfac_op, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_rfac_ui(to._fmpz(), e1._fmpz(), e2))
-FLINT_DEFINE_UNARY_EXPR_COND(fac_op, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_UNARY_EXPR_COND(fac_op, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_fac_ui(to._fmpz(), from))
 
 template<class T1, class T2>
@@ -405,19 +405,19 @@ struct binary_expression<
         operations::bin_op>::type,
     T2>
 {
-    typedef mpz return_t;
-    static void doit(mpz& to, const T1& t1, const T2& t2)
+    typedef fmpzxx return_t;
+    static void doit(fmpzxx& to, const T1& t1, const T2& t2)
     {
         fmpz_bin_uiui(to._fmpz(), t1, t2);
     }
 };
 
 // standard math functions (c/f stdmath.h)
-FLINT_DEFINE_BINARY_EXPR_COND(pow_op, mpz, traits::is_unsigned_integer<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(pow_op, fmpzxx, traits::is_unsigned_integer<T>,
         fmpz_pow_ui(to._fmpz(), e1._fmpz(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND(root_op, mpz, traits::fits_into_slong<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(root_op, fmpzxx, traits::fits_into_slong<T>,
         fmpz_root(to._fmpz(), e1._fmpz(), e2))
-FLINT_DEFINE_UNARY_EXPR(sqrt_op, mpz, fmpz_sqrt(to._fmpz(), from._fmpz()))
+FLINT_DEFINE_UNARY_EXPR(sqrt_op, fmpzxx, fmpz_sqrt(to._fmpz(), from._fmpz()))
 } // rules
 
 // TODO many more functions
