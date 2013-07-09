@@ -61,7 +61,8 @@ struct evaluation<
     typedef typename binop_helper::return_t::evaluated_t return_t;
     typedef typename mp::make_tuple<Data1, Data2>::type data_t;
 
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
     {
         ev2_t ev2(temps, input.first(), input.second());
         *output = binop_helper::make(ev2.get1(), ev2.get2());
@@ -88,7 +89,8 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
 
     typedef typename mp::make_tuple<Data>::type data_t;
 
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
     {
         interm_t* interm = merger::get_first(temps).head;
         ev_t::doit(input.head._data(), merger::get_second(temps), interm);
@@ -103,7 +105,8 @@ struct inverted_binary_expression
 {
   typedef commutative_binary_expression<Expr2, Op, Expr1> wrapped_t;
   typedef typename wrapped_t::return_t return_t;
-  static void doit(return_t& to, const Expr1& e1, const Expr2& e2)
+  template<class Return>
+  static void doit(Return& to, const Expr1& e1, const Expr2& e2)
   {
     return wrapped_t::doit(to, e2, e1);
   }
@@ -119,7 +122,8 @@ struct binary_expr_helper
     typedef typename wrapped_t::return_t return_t;
     typedef empty_tuple temporaries_t;
     typedef typename mp::make_tuple<Data1, Data2>::type data_t;
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
     {
         wrapped_t::doit(*output, input.first(), input.second());
     }
@@ -189,13 +193,23 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
     typedef typename wrapped_t::return_t return_t;
     typedef empty_tuple temporaries_t;
     typedef typename mp::make_tuple<Data>::type data_t;
-    static void doit(const data_t& input, temporaries_t temps, return_t* output)
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
     {
         wrapped_t::doit(*output, input.head);
     }
 };
 
 // Instantiating temporaries
+
+namespace rdetail {
+template<class T>
+struct evaluated_type_pred
+{
+    template<class Expr>
+    struct type : mp::equal_types<typename Expr::evaluated_t, T> { };
+};
+}
 
 template<class Expr, class T, class Enable>
 struct instantiate_temporaries
@@ -207,12 +221,13 @@ struct instantiate_temporaries
 };
 
 template<class Expr, class T>
-struct instantiate_temporaries<Expr, T,
-    typename mp::enable_if<tools::is_super_sub_expr<Expr, T> >::type>
+struct instantiate_temporaries<Expr, T, typename mp::enable_if<
+    tools::has_subexpr<rdetail::evaluated_type_pred<T>, Expr> >::type>
 {
     static T get(const Expr& e)
     {
-        return tools::find_subexpr<T>(e).create_temporary();
+        return tools::find_subexpr<rdetail::evaluated_type_pred<T> >(e)
+            .create_temporary();
     }
 };
 

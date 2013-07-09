@@ -92,9 +92,9 @@ struct evaluation : UNIMPLEMENTED { };
 
 // Instantiate temporaries for evaluation. The default implementation does the
 // following:
-// - find a subexpression t of e of type T
+// - find a subexpression t of e which evaluates to type T
 // -- return t.create_temporary()
-// - if no such subexpression, return T()
+// - if no such subexpression can be found, return T()
 // Additionally, the expression class implements a version of create_temporary
 // which just returns T(), so if your class is default constructible,
 // everything works automatically.

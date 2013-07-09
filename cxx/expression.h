@@ -60,7 +60,8 @@ struct evaluation_traits
         return res;
     }
 
-    static void evaluate_into(evaluation_return_t& to, const derived_t& from)
+    template<class T>
+    static void evaluate_into(T& to, const derived_t& from)
     {
         typedef mp::back_tuple<typename rule_t::temporaries_t> back_t;
         typename back_t::type temps_backing =
@@ -96,9 +97,10 @@ struct evaluation_traits<operations::immediate, Expr, Data>
     static evaluated_t& evaluate(derived_t& d) {return d;}
     static const evaluated_t& evaluate(const derived_t& d) {return d;}
 
-    static void evaluate_into(derived_t& to, const derived_t& from)
+    template<class T>
+    static void evaluate_into(T& to, const derived_t& from)
     {
-        rules::assignment<derived_t, derived_t>::doit(to, from);
+        rules::assignment<T, derived_t>::doit(to, from);
     }
 
     static void evaluate_into_fresh(derived_t& to, const derived_t& from)
@@ -144,6 +146,12 @@ private:
         return data_t(t);
     }
     template<class T>
+    static data_t get_data(T& t,
+        typename mp::disable_if<traits::is_lazy_expr<T> >::type* = 0)
+    {
+        return data_t(t);
+    }
+    template<class T>
     static data_t get_data(const T& t,
         typename mp::enable_if<traits::is_lazy_expr<T> >::type* = 0,
         typename mp::disable_if<
@@ -168,6 +176,10 @@ public:
     explicit expression(const T& t)
         : data(get_data(t)) {}
 
+    template<class T>
+    explicit expression(T& t)
+        : data(get_data(t)) {}
+
     template<class T, class U>
     expression(const T& t, const U& u)
         : data(t, u) {}
@@ -181,9 +193,9 @@ public:
     }
 
     // See rules::instantiate_temporaries for explanation.
-    derived_t create_temporary() const
+    evaluated_t create_temporary() const
     {
-        return derived_t();
+        return evaluated_t();
     }
 
     Data& _data() {return data;}

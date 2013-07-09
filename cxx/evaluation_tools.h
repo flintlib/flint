@@ -133,66 +133,75 @@ struct print_using_str
 
 // Finding a subexpression of precsribed type
 namespace tdetail {
-template<class T, class Data, class Enable = void>
+template<class Pred, class Data, class Enable = void>
 struct find_subexpr_helper2;
 
-template<class T, class Expr, class Enable = void>
+template<class Pred, class Expr, class Enable = void>
 struct find_subexpr_helper
 {
-    typedef find_subexpr_helper2<T, typename Expr::data_t> fsh;
+    typedef find_subexpr_helper2<Pred, typename Expr::data_t> fsh;
+    typedef typename fsh::rtype rtype;
     static const bool val = fsh::val;
-    static const T& get(const Expr& e) {return fsh::get(e._data());}
+    static rtype get(const Expr& e) {return fsh::get(e._data());}
 };
 
-template<class T>
-struct find_subexpr_helper<T, T>
+template<class Pred, class Expr>
+struct find_subexpr_helper<Pred, Expr,
+    typename mp::enable_if<typename Pred::template type<Expr> >::type>
 {
     static const bool val = true;
-    static const T& get(const T& t) {return t;}
+    typedef const Expr& rtype;
+    static rtype get(rtype t) {return t;}
 };
 
-template<class T, class Expr>
-struct find_subexpr_helper<T, Expr,
+template<class Pred, class Expr>
+struct find_subexpr_helper<Pred, Expr,
     typename mp::enable_if<mp::and_<traits::is_immediate<Expr>,
-        mp::not_<mp::equal_types<T, Expr> > > >::type>
+        mp::not_<typename Pred::template type<Expr> > > >::type>
 {
     static const bool val = false;
+    typedef void rtype;
 };
 
-template<class T, class Data, class Enable>
+template<class Pred, class Data, class Enable>
 struct find_subexpr_helper2
 {
-    typedef find_subexpr_helper2<T, typename Data::tail_t> fsh;
+    typedef find_subexpr_helper2<Pred, typename Data::tail_t> fsh;
+    typedef typename fsh::rtype rtype;
     static const bool val = fsh::val;
-    static const T& get(const Data& d) {return fsh::get(d.tail);}
+    static rtype get(const Data& d) {return fsh::get(d.tail);}
 };
 
-template<class T, class Head, class Tail>
-struct find_subexpr_helper2<T, tuple<Head, Tail>,
-    typename mp::enable_if<find_subexpr_helper<T,
+template<class Pred, class Head, class Tail>
+struct find_subexpr_helper2<Pred, tuple<Head, Tail>,
+    typename mp::enable_if<find_subexpr_helper<Pred,
         typename traits::basetype<Head>::type> >::type>
 {
     static const bool val = true;
     typedef typename traits::basetype<Head>::type head_t;
-    typedef find_subexpr_helper<T, head_t> fsh;
-    static const T& get(const tuple<Head, Tail>& d) {return fsh::get(d.head);}
+    typedef find_subexpr_helper<Pred, head_t> fsh;
+    typedef typename fsh::rtype rtype;
+    static rtype get(const tuple<Head, Tail>& d) {return fsh::get(d.head);}
 };
 
-template<class T>
-struct find_subexpr_helper2<T, empty_tuple>
+template<class Pred>
+struct find_subexpr_helper2<Pred, empty_tuple>
 {
     static const bool val = false;
+    typedef void rtype;
 };
 } // tdetail
 
-template<class T, class Expr>
-inline const T& find_subexpr(const Expr& e)
+template<class Pred, class Expr>
+inline typename tdetail::find_subexpr_helper<Pred, Expr>::rtype
+find_subexpr(const Expr& e)
 {
-    return tdetail::find_subexpr_helper<T, Expr>::get(e);
+    return tdetail::find_subexpr_helper<Pred, Expr>::get(e);
 }
 
-template<class Expr, class T>
-struct is_super_sub_expr : tdetail::find_subexpr_helper<T, Expr> { };
+template<class Pred, class Expr>
+struct has_subexpr
+    : tdetail::find_subexpr_helper<Pred, Expr> { };
 
 
 // A helper to invoke htuples::fill with instantiate_temporaries

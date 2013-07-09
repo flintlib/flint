@@ -87,10 +87,17 @@ class my_expression2
 public:
     // cannot have a default constructor
 
+    typedef expression<derived_wrapper< ::flint::my_expression2>,
+              Operation, Data> base_t;
+    typedef typename base_t::evaluated_t evaluated_t;
+
     template<class T>
     explicit my_expression2(const T& t)
-        : expression<derived_wrapper< ::flint::my_expression2>,
-              Operation, Data>(t) {}
+        : base_t(t) {}
+
+    template<class T>
+    explicit my_expression2(T& t)
+        : base_t(t) {}
 
     template<class T>
     my_expression2& operator=(const T& t)
@@ -99,27 +106,65 @@ public:
         return *this;
     }
 
-    my_expression2 create_temporary() const
+    evaluated_t create_temporary() const
     {
-        return my_expression2(0l);
+        return evaluated_t(0l);
     }
 
 protected:
     explicit my_expression2(const Data& d)
-        : expression<derived_wrapper< ::flint::my_expression2>,
-              Operation, Data>(d) {}
+        : base_t(d) {}
 
     template<class D, class O, class Da>
     friend class flint::expression;
 };
+
+struct longref_data;
+struct longcref_data;
+struct long_data;
+typedef my_expression2<operations::immediate, long_data> mylong;
+typedef my_expression2<operations::immediate, longref_data> mylong_ref;
+typedef my_expression2<operations::immediate, longcref_data> mylong_cref;
+
 struct long_data
 {
     long payload;
     // no default constructor
     long_data(long d) : payload(d) {}
     long_data(const myint& m) : payload(m._data().payload) {}
+
+    long_data(const mylong_ref&);
+    long_data(const mylong_cref&);
 };
-typedef my_expression2<operations::immediate, long_data> mylong;
+
+struct longref_data
+{
+    long& payload;
+
+    longref_data(mylong& l) : payload(l._data().payload) {}
+};
+
+struct longcref_data
+{
+    const long& payload;
+
+    longcref_data(const mylong& l) : payload(l._data().payload) {}
+    longcref_data(mylong_ref lr) : payload(lr._data().payload) {}
+};
+
+inline long_data::long_data(const mylong_ref& mlr) : payload(mlr._data().payload) {}
+inline long_data::long_data(const mylong_cref& mlr) : payload(mlr._data().payload) {}
+
+namespace mylong_traits {
+template<class T> struct is_source : mp::false_ { };
+template<class T> struct is_target : mp::false_ { };
+
+template<> struct is_source<mylong> : mp::true_ { };
+template<> struct is_source<mylong_ref> : mp::true_ { };
+template<> struct is_source<mylong_cref> : mp::true_ { };
+template<> struct is_target<mylong> : mp::true_ { };
+template<> struct is_target<mylong_ref> : mp::true_ { };
+}
 
 namespace rules {
 
@@ -256,19 +301,21 @@ struct unary_expression<operations::negate, myint>
 // Minimal rules for mylong
 /////////////////////////////////////////////////////////////////////////////
 
-template<>
-struct equals<mylong, mylong>
+template<class T, class U>
+struct equals<T, U, typename mp::enable_if<mp::and_<
+    mylong_traits::is_source<T>, mylong_traits::is_source<U> > >::type>
 {
-    static bool get(const mylong& i1, const mylong& i2)
+    static bool get(const T& i1, const U& i2)
     {
         return i1._data().payload == i2._data().payload;
     }
 };
 
-template<>
-struct equals<mylong, long>
+template<class T>
+struct equals<T, long,
+    typename mp::enable_if<mylong_traits::is_source<T> >::type>
 {
-    static bool get(const mylong& i1, long i2)
+    static bool get(const T& i1, long i2)
     {
         return i1._data().payload == i2;
     }
@@ -296,23 +343,51 @@ struct evaluation<
 };
 #endif
 
-template<>
-struct commutative_binary_expression<mylong, operations::plus, mylong>
+template<class T, class U>
+struct commutative_binary_expression<T, typename mp::enable_if<mp::and_<
+        mylong_traits::is_source<T>,
+        mylong_traits::is_source<U> >,
+    operations::plus>::type, U>
 {
     typedef mylong return_t;
-    static void doit(mylong& to, const mylong& a1, const mylong& a2)
+
+    template<class V>
+    static void doit(V& to, const T& a1, const U& a2)
     {
         to._data().payload = a1._data().payload + a2._data().payload;
     }
 };
 
-template<>
-struct commutative_binary_expression<myint, operations::plus, mylong>
+template<class U>
+struct commutative_binary_expression<typename mp::enable_if<
+    mylong_traits::is_source<U>, myint>::type, operations::plus, U>
 {
     typedef mylong return_t;
-    static void doit(mylong& to, const myint& a1, const mylong& a2)
+
+    template<class V>
+    static void doit(V& to, const myint& a1, const U& a2)
     {
         to._data().payload = a1._data().payload + a2._data().payload;
+    }
+};
+
+template<class T, class U>
+struct assignment<T, U, typename mp::enable_if<mp::and_<
+    mylong_traits::is_target<T>, mylong_traits::is_source<U> > >::type>
+{
+    static void doit(T& to, const U& from)
+    {
+        to._data().payload = from._data().payload;
+    }
+};
+
+template<class T>
+struct assignment<T, long,
+    typename mp::enable_if<mylong_traits::is_target<T> >::type>
+{
+    static void doit(T& to, long from)
+    {
+        to._data().payload = from;
     }
 };
 } // rules
