@@ -192,11 +192,23 @@ struct find_subexpr_helper2<Pred, empty_tuple>
 };
 } // tdetail
 
+template<class T>
+struct equal_types_pred
+{
+    template<class U> struct type : mp::equal_types<T, U> { };
+};
+
 template<class Pred, class Expr>
 inline typename tdetail::find_subexpr_helper<Pred, Expr>::rtype
 find_subexpr(const Expr& e)
 {
     return tdetail::find_subexpr_helper<Pred, Expr>::get(e);
+}
+
+template<class T, class Expr>
+inline const T& find_subexpr_T(const Expr& e)
+{
+    return find_subexpr<equal_types_pred<T> >(e);
 }
 
 template<class Pred, class Expr>

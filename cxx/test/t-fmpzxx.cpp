@@ -25,8 +25,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <stdexcept>
-#include <stdio.h>
 
 #include "cxx/fmpzxx.h"
 #include "cxx/test/helpers.h"
@@ -381,6 +379,12 @@ test_references()
     tassert((!traits::_is_convertible<fmpzxx, fmpzxx_ref>::val));
     tassert((!traits::_is_convertible<fmpzxx, fmpzxx_cref>::val));
     tassert((!traits::_is_convertible<fmpzxx_ref, fmpzxx_cref>::val));
+
+    // test creation from C types
+    fmpzxx_ref ar2 = fmpzxx_ref::make(a._fmpz());
+    fmpzxx_cref acr2 = fmpzxx_cref::make(acr._fmpz());
+    a = 7;
+    tassert(ar2 == 7 && acr2 == 7);
 }
 
 int

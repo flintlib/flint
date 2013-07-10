@@ -95,6 +95,18 @@ public:
     typename wrapped_traits::mutable_t _fmpz() {return this->_data().f;}
     typename wrapped_traits::const_t _fmpz() const {return this->_data().f;}
 
+    // These only make sense with fmpzxx_ref and fmpzxx_cref
+    template<class T>
+    static fmpzxx_expression make(T& f)
+    {
+        return fmpzxx_expression(Data::make(f));
+    }
+    template<class T>
+    static fmpzxx_expression make(const T& f)
+    {
+        return fmpzxx_expression(Data::make(f));
+    }
+
 protected:
     explicit fmpzxx_expression(const Data& d) : base_t(d) {}
 
@@ -167,6 +179,11 @@ struct fmpzref_data
     fmpz* f;
 
     fmpzref_data(fmpzxx& o) : f(o._fmpz()) {}
+
+    static fmpzref_data make(fmpz* f) {return fmpzref_data(f);}
+
+private:
+    fmpzref_data(fmpz* fp) : f(fp) {}
 };
 
 struct fmpzcref_data
@@ -175,6 +192,11 @@ struct fmpzcref_data
 
     fmpzcref_data(const fmpzxx& o) : f(o._fmpz()) {}
     fmpzcref_data(fmpzxx_ref o) : f(o._fmpz()) {}
+
+    static fmpzcref_data make(const fmpz* f) {return fmpzcref_data(f);}
+
+private:
+    fmpzcref_data(const fmpz* fp) : f(fp) {}
 };
 
 inline void fmpz_data::init(const fmpzxx_cref& r)

@@ -231,6 +231,19 @@ struct binary_expression<type, operations::name, type> \
     } \
 };
 
+// Specialise the commutative binary expression rule (type, type) -> type
+#define FLINT_DEFINE_CBINARY_EXPR(name, type, eval) \
+template<> \
+struct commutative_binary_expression<type, operations::name, type> \
+{ \
+    typedef type return_t; \
+    template<class V> \
+    static void doit(V& to, const type& e1, const type& e2) \
+    { \
+        eval; \
+    } \
+};
+
 // Specialise the commutative binary expression rule (Type, T) -> Type,
 // where T must satisfy "cond".
 #define FLINT_DEFINE_CBINARY_EXPR_COND(name, Type, cond, eval) \

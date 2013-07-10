@@ -227,27 +227,20 @@ test_assignment_arith()
     tassert(a == 10);
 }
 
-template<class T>
-struct equal_types_pred
-{
-    template<class U> struct type : mp::equal_types<T, U> { };
-};
-
 template<class T, class Expr>
 bool is_subexpr(const Expr& e)
 {
-    return tools::has_subexpr<equal_types_pred<T>, Expr>::val;
+    return tools::has_subexpr<tools::equal_types_pred<T>, Expr>::val;
 }
 void
 test_tools()
 {
-    typedef equal_types_pred<myint> intpred;
-    typedef equal_types_pred<mylong> longpred;
+    typedef tools::equal_types_pred<myint> intpred;
     myint a(1);
     mylong b(2l);
     tassert(tools::find_subexpr<intpred>(a) == 1);
     tassert(tools::find_subexpr<intpred>(a + b) == 1);
-    tassert(tools::find_subexpr<longpred>(a + b) == 2l);
+    tassert(tools::find_subexpr_T<mylong>(a + b) == 2l);
     tassert(tools::find_subexpr<intpred>(b + (a + 2) + b) == 1);
     tassert(is_subexpr<myint>(a+b));
     tassert(!is_subexpr<mylong>(a+a));
