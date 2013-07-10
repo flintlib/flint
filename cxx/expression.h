@@ -167,6 +167,17 @@ private:
     {
         return data_t(t.evaluate()._data());
     }
+
+    // Invoke the data copy constructor when appropriate
+    static data_t get_data(const derived_t& o)
+    {
+        return data_t(o._data());
+    }
+    static data_t get_data(derived_t& o)
+    {
+        return data_t(o._data());
+    }
+
     // Having the empty constructor here delays its instantiation, and allows
     // compiling even if data is *not* default constructible.
     static data_t get_data() {return data_t();}

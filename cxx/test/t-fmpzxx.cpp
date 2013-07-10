@@ -340,6 +340,49 @@ test_ternary_assigments()
     tassert((a -= 3*c) == 2);
 }
 
+bool
+try_implicit_conversion(fmpzxx_ref, const fmpzxx_ref&,
+        fmpzxx_cref, const fmpzxx_cref&, fmpzxx_cref, const fmpzxx_cref&)
+{
+    return true;
+}
+void
+test_references()
+{
+    fmpzxx a(2), b(3);
+    fmpzxx_ref ar(a);
+    fmpzxx_cref acr(a), bcr(b);
+
+    tassert(ar == 2 && bcr == 3 && ar == acr && ar ==  a);
+
+    // test assignments
+    fmpzxx d(ar);
+    a = 4;
+    tassert(ar == 4 && acr == 4 && d == 2);
+    ar = 2;
+    tassert(a == 2);
+
+    // test some arithmetic
+    tassert(a + bcr == 5);
+    tassert(acr + bcr == 5);
+    tassert(ar + 3u == 5);
+    tassert(a < bcr && ar < b && acr < bcr);
+    tassert(rfac(acr, 1u) == 2);
+
+    ar = bin(4u, 2u); tassert(acr == 6);
+    tassert(acr.to<long>() == 6l);
+    tassert(ar.to_string() == "6");
+    ar += b;
+    ar += bcr;
+    tassert(a == 12);
+
+    // test conversion of reference types
+    tassert(try_implicit_conversion(a, a, a, a, ar, ar));
+    tassert((!traits::_is_convertible<fmpzxx, fmpzxx_ref>::val));
+    tassert((!traits::_is_convertible<fmpzxx, fmpzxx_cref>::val));
+    tassert((!traits::_is_convertible<fmpzxx_ref, fmpzxx_cref>::val));
+}
+
 int
 main()
 {
@@ -355,6 +398,7 @@ main()
     test_temporaries();
     test_ternary();
     test_ternary_assigments();
+    test_references();
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_fmpzxx

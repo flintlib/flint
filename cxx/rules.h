@@ -150,6 +150,16 @@ struct name<totype, fromtype> \
     } \
 };
 
+#define FLINT_DEFINE_GET_COND(name, totype, cond, eval) \
+template<class T> \
+struct name<totype, T, typename mp::enable_if< cond >::type> \
+{ \
+    static totype get(const T& from) \
+    { \
+        return eval; \
+    } \
+};
+
 // Specialise a doit rule called "name"
 #define FLINT_DEFINE_DOIT(name, totype, fromtype, eval) \
 template<> \
@@ -165,9 +175,19 @@ struct name<totype, fromtype> \
 // accept any type "T" which satisfies "cond".
 #define FLINT_DEFINE_DOIT_COND(name, totype, cond, eval) \
 template<class T> \
-struct name<totype, T, typename mp::enable_if<cond >::type> \
+struct name<totype, T, typename mp::enable_if< cond >::type> \
 { \
     static void doit(totype& to, const T& from) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_DOIT_COND2(name, cond, eval) \
+template<class T, class U> \
+struct name<T, U, typename mp::enable_if< cond >::type> \
+{ \
+    static void doit(T& to, const U& from) \
     { \
         eval; \
     } \
@@ -179,7 +199,8 @@ template<> \
 struct unary_expression<operations::name, type> \
 { \
     typedef type return_t; \
-    static void doit(type& to, const type& from) \
+    template<class V> \
+    static void doit(V& to, const type& from) \
     { \
         eval; \
     } \
@@ -190,7 +211,8 @@ template<class T> \
 struct unary_expression<typename mp::enable_if<cond, operations::name>::type, T> \
 { \
     typedef ret_type return_t; \
-    static void doit(ret_type& to, const T& from) \
+    template<class V> \
+    static void doit(V& to, const T& from) \
     { \
         eval; \
     } \
@@ -202,7 +224,8 @@ template<> \
 struct binary_expression<type, operations::name, type> \
 { \
     typedef type return_t; \
-    static void doit(type& to, const type& e1, const type& e2) \
+    template<class V> \
+    static void doit(V& to, const type& e1, const type& e2) \
     { \
         eval; \
     } \
@@ -216,7 +239,21 @@ struct commutative_binary_expression<Type, \
     typename mp::enable_if<cond, operations::name>::type, T> \
 { \
     typedef Type return_t; \
-    static void doit(Type& to, const Type& e1, const T& e2) \
+    template<class V> \
+    static void doit(V& to, const Type& e1, const T& e2) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_CBINARY_EXPR_COND2(name, rettype, cond, eval) \
+template<class T, class U> \
+struct commutative_binary_expression<T, \
+    typename mp::enable_if< cond, operations::name>::type, U> \
+{ \
+    typedef rettype return_t; \
+    template<class V> \
+    static void doit(V& to, const T& e1, const U& e2) \
     { \
         eval; \
     } \
@@ -230,7 +267,21 @@ struct binary_expression<Type, \
     typename mp::enable_if<cond, operations::name>::type, T> \
 { \
     typedef Type return_t; \
-    static void doit(Type& to, const Type& e1, const T& e2) \
+    template<class V> \
+    static void doit(V& to, const Type& e1, const T& e2) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_BINARY_EXPR_COND2(name, rettype, cond, eval) \
+template<class T, class U> \
+struct binary_expression<T, \
+    typename mp::enable_if< cond, operations::name>::type, U> \
+{ \
+    typedef rettype return_t; \
+    template<class V> \
+    static void doit(V& to, const T& e1, const U& e2) \
     { \
         eval; \
     } \
