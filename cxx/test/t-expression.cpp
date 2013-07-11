@@ -202,6 +202,9 @@ test_arithmetic()
     tassert(c + (al + b)  == 14l);
     tassert((a + bl) + (cl + d) == 15l);
     tassert((a + bl) + (c + d) == 15l);
+
+    tassert((a << 2) == 12);
+    tassert(((a << 2) >> 2) == a);
 }
 
 void
@@ -301,6 +304,22 @@ test_references()
     tassert(a == 40l);
 }
 
+struct S { };
+S operator+(const S& s, const S&) {return s;}
+S operator-(const S&s) {return s;}
+template<class T>
+S operator*(const S& s, const T&) {return s;}
+void
+test_unrelated_overload()
+{
+    // Test a bug in our operator overloading logic which used to not allow
+    // this to compile.
+    S s;
+    s = s + s;
+    s = -s;
+    s = s * (myint(5) + myint(5));
+}
+
 int
 main()
 {
@@ -318,6 +337,8 @@ main()
     test_tools();
     test_temporaries();
     test_references();
+
+    test_unrelated_overload();
 
     std::cout << "PASS" << std::endl;
 

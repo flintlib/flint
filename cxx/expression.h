@@ -293,6 +293,18 @@ struct storage_traits
           Expr
         > { };
 
+template<class ev_t, class Op, class type>
+struct binary_op_helper_step2
+{
+    typedef typename ev_t::return_t Expr;
+    typedef typename Expr::template make_helper<Op, type> make_helper;
+    typedef typename make_helper::type return_t;
+};
+template<class Op, class type>
+struct binary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
+{
+    typedef int return_t;
+};
 template<class Expr1, class Op, class Expr2>
 struct binary_op_helper
 {
@@ -301,33 +313,44 @@ struct binary_op_helper
         typename storage_traits<Expr2>::type
       > maker;
     typedef typename maker::type type;
-    typedef mp::find_evaluation<Op, type, true> ev_t;
-    typedef typename ev_t::type::return_t Expr;
-    typedef typename Expr::template make_helper<Op, type> make_helper;
-    typedef typename make_helper::type return_t;
+    typedef typename mp::find_evaluation<Op, type, true>::type ev_t;
+    typedef binary_op_helper_step2<ev_t, Op, type> bohs2;
+    typedef typename bohs2::return_t return_t;
 
-    typedef mp::enable_if<traits::is_implemented<ev_t>, return_t> enable;
+    typedef traits::is_implemented<ev_t> cond;
+    typedef mp::enable_if<cond, return_t> enable;
 
     static return_t make(const Expr1& left, const Expr2& right)
     {
-        return make_helper::make(maker::make(left, right));
+        return bohs2::make_helper::make(maker::make(left, right));
     }
 };
 
+template<class ev_t, class Op, class type>
+struct unary_op_helper_step2
+{
+    typedef typename ev_t::return_t Rexpr;
+    typedef typename Rexpr::template make_helper<Op, type> make_helper;
+    typedef typename make_helper::type return_t;
+};
+template<class Op, class type>
+struct unary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
+{
+    typedef int return_t;
+};
 template<class Op, class Expr>
 struct unary_op_helper
 {
     typedef tuple<typename storage_traits<Expr>::type, empty_tuple> type;
-    typedef mp::find_evaluation<Op, type, true> ev_t;
-    typedef typename ev_t::type::return_t Rexpr;
-    typedef typename Rexpr::template make_helper<Op, type> make_helper;
-    typedef typename make_helper::type return_t;
+    typedef typename mp::find_evaluation<Op, type, true>::type ev_t;
+    typedef unary_op_helper_step2<ev_t, Op, type> uohs2;
+    typedef typename uohs2::return_t return_t;
 
     typedef mp::enable_if<traits::is_implemented<ev_t>, return_t> enable;
 
     static return_t make(const Expr& e)
     {
-        return make_helper::make(type(e, empty_tuple()));
+        return uohs2::make_helper::make(type(e, empty_tuple()));
     }
 };
 
@@ -457,6 +480,22 @@ inline typename detail::binary_op_helper<
 operator%(const Expr1& e1, const Expr2& e2)
 {
     return detail::binary_op_helper<Expr1, operations::modulo, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::shift, Expr2>::enable::type
+operator<<(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::shift, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::shift, Expr2>::enable::type
+operator>>(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::shift, Expr2>::make(e1, -e2);
 }
 
 template<class Expr>

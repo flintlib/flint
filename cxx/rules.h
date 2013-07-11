@@ -140,16 +140,6 @@ struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
 
 // Specialise a getter called "name". The getter has one argument called "from"
 // of type "fromtype", and "eval" which should yield "totype". 
-#define FLINT_DEFINE_GET(name, totype, fromtype, eval) \
-template<> \
-struct name<totype, fromtype> \
-{ \
-    static totype get(const fromtype& from) \
-    { \
-        return eval; \
-    } \
-};
-
 #define FLINT_DEFINE_GET2(name, totype, fromtype1, fromtype2, eval) \
 template<> \
 struct name<fromtype1, fromtype2> \
@@ -159,6 +149,9 @@ struct name<fromtype1, fromtype2> \
         return eval; \
     } \
 };
+
+#define FLINT_DEFINE_GET(name, totype, fromtype, eval) \
+    FLINT_DEFINE_GET2(name, totype, fromtype, fromtype, eval)
 
 #define FLINT_DEFINE_GET_COND(name, totype, cond, eval) \
 template<class T> \
@@ -229,17 +222,20 @@ struct unary_expression<typename mp::enable_if<cond, operations::name>::type, T>
 };
 
 // Specialise the binary expression rule (type, type) -> type
-#define FLINT_DEFINE_BINARY_EXPR(name, type, eval) \
+#define FLINT_DEFINE_BINARY_EXPR2(name, rtype, type1, type2, eval) \
 template<> \
-struct binary_expression<type, operations::name, type> \
+struct binary_expression<type1, operations::name, type2> \
 { \
-    typedef type return_t; \
+    typedef rtype return_t; \
     template<class V> \
-    static void doit(V& to, const type& e1, const type& e2) \
+    static void doit(V& to, const type1& e1, const type2& e2) \
     { \
         eval; \
     } \
 };
+
+#define FLINT_DEFINE_BINARY_EXPR(name, type, eval) \
+    FLINT_DEFINE_BINARY_EXPR2(name, type, type, type, eval)
 
 // Specialise the commutative binary expression rule (type, type) -> type
 #define FLINT_DEFINE_CBINARY_EXPR(name, type, eval) \

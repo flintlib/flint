@@ -43,14 +43,29 @@ namespace rules {
 // Hence to evaluate expressions like a + (b + c), it suffices to write
 // rules for composition of two immediates.
 
+namespace rdetail {
+template<class Op, class Data1, class Data2, class Enable = void>
+struct binary_should_enable { };
+
+template<class Op, class Data1, class Data2>
+struct binary_should_enable<Op, Data1, Data2,
+    typename mp::enable_if<mp::or_<
+        traits::is_lazy_expr<Data1>,
+        traits::is_lazy_expr<Data2>
+      > >::type>
+{
+    typedef tools::evaluate_2<Data1, Data2> ev2_t;
+    typedef typename ev2_t::return1_t return1_t;
+    typedef typename ev2_t::return2_t return2_t;
+    typedef typename detail::binary_op_helper<return1_t, Op, return2_t>::cond cond;
+    typedef mp::enable_if<cond> enable;
+};
+}
+
 template<bool result_is_temporary, class Op, class Data1, class Data2>
 struct evaluation<
     Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
-    typename mp::enable_if<
-        mp::or_<
-            traits::is_lazy_expr<Data1>,
-            traits::is_lazy_expr<Data2> > >::type
-  >
+    typename rdetail::binary_should_enable<Op, Data1, Data2>::enable::type>
 {
     typedef tools::evaluate_2<Data1, Data2> ev2_t;
     typedef typename ev2_t::return1_t return1_t;

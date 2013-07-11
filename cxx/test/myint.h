@@ -287,6 +287,19 @@ struct binary_expression<myint, operations::modulo, myint>
 };
 
 template<>
+struct binary_expression<myint, operations::shift, int>
+{
+    typedef myint return_t;
+    static void doit(myint& to, const myint& a1, int a2)
+    {
+        if (a2 >= 0)
+            to._data().payload = a1._data().payload << a2;
+        else
+            to._data().payload = a1._data().payload >> (-a2);
+    }
+};
+
+template<>
 struct unary_expression<operations::negate, myint>
 {
     typedef myint return_t;

@@ -46,6 +46,7 @@ struct minus { };
 struct times { };
 struct divided_by { };
 struct modulo { };
+struct shift { }; // left
 } // operations
 
 namespace detail {
