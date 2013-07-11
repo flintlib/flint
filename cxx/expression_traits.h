@@ -91,6 +91,13 @@ template<class Expr, class T>
 struct is_T_expr<Expr, T,
     typename mp::disable_if<traits::is_expression<Expr> >::type>
     : false_ { };
+
+// Decide if an expressing yielding From can be directly evaluated into To.
+// To be further specialised!
+template<class To, class From>
+struct can_evaluate_into : mp::false_ { };
+template<class T>
+struct can_evaluate_into<T, T> : mp::true_ { };
 } // traits
 } // flint
 

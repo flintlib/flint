@@ -435,6 +435,18 @@ DEFINE_FUNC(test_fmpzxx_ternary_10,
     fmpz_addmul(out._fmpz(), tmp1, tmp2);
     fmpz_clear(tmp1); fmpz_clear(tmp2);
 }
+
+DEFINE_FUNC(test_fmpzxx_ref_1,
+        (fmpzxx_ref out, fmpzxx_cref in1, fmpzxx_cref in2))
+{
+    out = in1 + in2;
+}
+
+DEFINE_FUNC(test_fmpzxx_ref_2,
+        (fmpzxx_ref out, fmpzxx_cref in1, fmpzxx_cref in2))
+{
+    fmpz_add(out._fmpz(), in1._fmpz(), in2._fmpz());
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -524,6 +536,10 @@ test_fmpzxx()
     tassert(count(ass1, "call") == count(ass2, "call"));
     // NB: ass1 is actually shorter?!?
     tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
+
+    ass1 = disass(program, "test_fmpzxx_ref_1");
+    ass2 = disass(program, "test_fmpzxx_ref_2");
+    tassert(count(ass1, "\n") == count(ass2, "\n"));
 }
 
 int

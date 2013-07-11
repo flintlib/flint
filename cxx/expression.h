@@ -236,9 +236,20 @@ public:
 
     template<class T>
     void set(const T& t,
-            typename mp::enable_if<traits::is_expression<T> >::type* = 0)
+            typename mp::enable_if<traits::is_expression<T> >::type* = 0,
+            typename mp::enable_if<traits::can_evaluate_into<
+                derived_t, typename T::evaluated_t> >::type* = 0)
     {
         T::ev_traits_t::evaluate_into(downcast(), t);
+    }
+    template<class T>
+    void set(const T& t,
+            typename mp::enable_if<traits::is_expression<T> >::type* = 0,
+            typename mp::disable_if<traits::can_evaluate_into<
+                derived_t, typename T::evaluated_t> >::type* = 0)
+    {
+        rules::assignment<derived_t, typename T::evaluated_t>::doit(
+            downcast(), t.evaluate());
     }
     template<class T>
     void set(const T& t,

@@ -123,6 +123,10 @@ typedef fmpzxx_expression<operations::immediate, detail::fmpz_data> fmpzxx;
 typedef fmpzxx_expression<operations::immediate, detail::fmpzref_data> fmpzxx_ref;
 typedef fmpzxx_expression<operations::immediate, detail::fmpzcref_data> fmpzxx_cref;
 
+namespace traits {
+template<> struct can_evaluate_into<fmpzxx_ref, fmpzxx> : mp::true_ { };
+}
+
 namespace detail {
 template<> struct fmpzxx_enableimplicit<fmpzxx_cref, fmpzxx_ref> : mp::true_ { };
 template<> struct fmpzxx_enableimplicit<fmpzxx_cref, fmpzxx> : mp::true_ { };

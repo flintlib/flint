@@ -86,6 +86,10 @@ test_assignment()
 
     a = 44l;
     tassert(a._data().payload == 44 && a._data().extra == 5);
+
+    mylong c(0);
+    c = a + b;
+    tassert(c == 87l);
 }
 
 void

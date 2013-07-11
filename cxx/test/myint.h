@@ -126,6 +126,10 @@ typedef my_expression2<operations::immediate, long_data> mylong;
 typedef my_expression2<operations::immediate, longref_data> mylong_ref;
 typedef my_expression2<operations::immediate, longcref_data> mylong_cref;
 
+namespace traits {
+template<> struct can_evaluate_into<mylong_ref, mylong> : mp::true_ { };
+}
+
 struct long_data
 {
     long payload;
@@ -401,6 +405,16 @@ struct assignment<T, long,
     static void doit(T& to, long from)
     {
         to._data().payload = from;
+    }
+};
+
+template<class T>
+struct assignment<T, myint,
+    typename mp::enable_if<mylong_traits::is_target<T> >::type>
+{
+    static void doit(T& to, const myint& from)
+    {
+        to._data().payload = from._data().payload;
     }
 };
 } // rules
