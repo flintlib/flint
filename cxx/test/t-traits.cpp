@@ -67,6 +67,9 @@ test_integrality()
     tassert(fits_into_slong<signed int>::val == true);
     tassert(fits_into_slong<signed long>::val == true);
     tassert(fits_into_slong<newtype>::val == false);
+
+    typedef void function_type(int, int);
+    tassert(fits_into_slong<function_type>::val == false);
 }
 
 void

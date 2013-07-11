@@ -65,9 +65,15 @@ template<> struct is_unsigned_integer<unsigned short> : true_ { };
 template<> struct is_unsigned_integer<unsigned int> : true_ { };
 template<> struct is_unsigned_integer<unsigned long> : true_ { };
 
+// Compute if T belongs to the signed or unsigned integer types
+template<class T> struct is_integer
+    : mp::or_<is_unsigned_integer<T>, is_signed_integer<T> > { };
+
 // Compute if T can always losslessly be converted into signed long
 // TODO should we use slong here instead of long?
-template<class T> struct fits_into_slong
+template<class T, class Enable = void> struct fits_into_slong : mp::false_ { };
+template<class T>
+struct fits_into_slong<T, typename mp::enable_if<traits::is_integer<T> >::type>
     : mp::or_<
           is_signed_integer<T>,
           mp::and_v<
@@ -75,10 +81,6 @@ template<class T> struct fits_into_slong
               sizeof(T) < sizeof(long)
             >
         > { };
-
-// Compute if T belongs to the signed or unsigned integer types
-template<class T> struct is_integer
-    : mp::or_<is_unsigned_integer<T>, is_signed_integer<T> > { };
 
 // Compute a type appropriate for forwarding T. This is just the appropriate
 // constant reference type (but avoids things like const (int&)&, which cause
