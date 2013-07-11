@@ -63,7 +63,7 @@ test_assignment()
 {
     padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
     padicxx a(ctx, 20), b(ctx, 20);
-    fmpzxx c(17);
+    fmpzxx c(17); fmpqxx d(17, 1u);
 
     a = 17; tassert(a != b);
     b = 17; tassert(a == b);
@@ -72,7 +72,7 @@ test_assignment()
     b = 0; b = c; tassert(a == b);
     b = 0; b = fmpzxx_ref(c); tassert(a == b);
     b = 0; b = fmpzxx_cref(c); tassert(a == b);
-    // TODO fmpq
+    b = 0; b = d; tassert(a == b);
 }
 
 void
@@ -87,15 +87,65 @@ test_conversion()
     tassert(b.to_string() == "3*5");
 
     tassert(a.to<fmpzxx>() == 15);
-    // TODO fmpq
+    tassert(a.to<fmpqxx>() == fmpqxx(15, 1u));
 
-    // TODO printing
+    std::ostringstream oss;
+    oss << a << ' ' << b;
+    tassert(oss.str() == "15 3*5");
 }
 
+template<class T>
+padicxx make_padic(const T& t, long prec = PADIC_DEFAULT_PREC)
+{
+    static padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
+    padicxx p(ctx);
+    p = t;
+    return p;
+}
+template<class T, class U>
+bool fuzzy_equals(const T& t, const U& u)
+{
+    long prec = std::min(t.prec(), u.prec()) - 5;
+    padicxx a(t.estimate_ctx(), prec); a = t;
+    padicxx b(t.estimate_ctx(), prec); b = u;
+    return a == b;
+}
 void
 test_arithmetic()
 {
-    // TODO
+    fmpqxx af(17, 25u), bf(5, 27u);
+    padicxx a(make_padic(af));
+    padicxx b(make_padic(bf));
+
+    tassert(fuzzy_equals(a + b, make_padic(af + bf)));
+    tassert(fuzzy_equals(a * b, make_padic(af * bf)));
+    tassert(fuzzy_equals(a / b, make_padic(af / bf)));
+    tassert(fuzzy_equals(a - b, make_padic(af - bf)));
+    tassert(fuzzy_equals(a << 2, make_padic(af * fmpzxx(25))));
+    tassert(fuzzy_equals(a >> 2, make_padic(af / fmpzxx(25))));
+    tassert(-a == make_padic(-af));
+}
+
+void
+test_functions()
+{
+    padicxx a(make_padic(fmpqxx(14, 25u)));
+    tassert(fuzzy_equals(a, pow(sqrt(a), 2)));
+
+    bool exception_occured = false;
+    try
+    {
+        sqrt(make_padic(fmpqxx(2, 1u))).evaluate();
+    }
+    catch(const padicxx_exception&)
+    {
+        exception_occured = true;
+    }
+    tassert(exception_occured);
+
+    fmpqxx cf(14*5, 1u);
+    padicxx c = make_padic(fmpqxx(14*5, 1u));
+    tassert(fuzzy_equals(log(exp(c)), c));
 }
 
 int
@@ -107,6 +157,7 @@ main()
     test_assignment();
     test_conversion();
     test_arithmetic();
+    test_functions();
 
     std::cout << "PASS" << std::endl;
     return 0;

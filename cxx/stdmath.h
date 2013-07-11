@@ -32,11 +32,15 @@ namespace flint {
 FLINT_DEFINE_BINOP(pow)
 FLINT_DEFINE_UNOP(sqrt)
 FLINT_DEFINE_BINOP(root)
+FLINT_DEFINE_UNOP(exp)
+FLINT_DEFINE_UNOP(log)
 } // flint
 
 namespace std {
 FLINT_DEFINE_BINOP_HERE(pow)
 FLINT_DEFINE_UNOP_HERE(sqrt)
+FLINT_DEFINE_UNOP_HERE(exp)
+FLINT_DEFINE_UNOP_HERE(log)
 }
 
 #endif

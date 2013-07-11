@@ -101,7 +101,7 @@ test_arithmetic()
     tassert(a - b == fmpqxx(3*7 - 5*2, 35u));
     tassert(a / b == fmpqxx(3*7, 10u));
 
-    tassert(a * c == fmpqxx(6, 5u));
+    tassert((a+a) * (c+c) == fmpqxx(24, 5u));
     tassert(c * a == fmpqxx(6, 5u));
     tassert(a / c == fmpqxx(3, 10u));
 

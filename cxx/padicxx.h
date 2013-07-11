@@ -28,16 +28,28 @@
 
 #include <algorithm> // std::max
 #include <cstdlib>
+#include <stdexcept>
+#include <string>
 
 #include "padic.h"
 
 #include "cxx/expression.h"
+#include "cxx/stdmath.h"
 #include "cxx/traits.h"
 #include "cxx/tuple.h"
 
 #include "fmpzxx.h"
+#include "fmpqxx.h"
 
 namespace flint {
+class padicxx_exception
+    : public std::domain_error
+{
+public:
+    padicxx_exception(const std::string& what)
+        : std::domain_error("padic computation failed: " + what) {}
+};
+
 namespace detail {
 template<class T>
 struct padicxx_max_prec
@@ -45,6 +57,12 @@ struct padicxx_max_prec
     // XXX is this a good idea?
     static slong get(const T&) {return 0;}
 };
+
+void padic_check(bool worked, const std::string& where)
+{
+    if(!worked)
+        throw padicxx_exception(where);
+}
 } // detail
 
 class padicxx_ctx
@@ -217,7 +235,8 @@ FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_unsigned_integer<T>,
         padic_set_ui(to._padic(), from, to._ctx()))
 FLINT_DEFINE_DOIT_COND(assignment, padicxx, fmpzxx_traits::is_source<T>, 
         padic_set_fmpz(to._padic(), from._fmpz(), to._ctx()))
-// TODO fmpq
+FLINT_DEFINE_DOIT(assignment, padicxx, fmpqxx,
+        padic_set_fmpq(to._padic(), from._fmpq(), to._ctx()))
 
 template<>
 struct conversion<fmpzxx, padicxx>
@@ -229,7 +248,17 @@ struct conversion<fmpzxx, padicxx>
         return res;
     }
 };
-// TODO fmpq
+
+template<>
+struct conversion<fmpqxx, padicxx>
+{
+    static fmpqxx get(const padicxx& from)
+    {
+        fmpqxx res;
+        padic_get_fmpq(res._fmpq(), from._padic(), from._ctx());
+        return res;
+    }
+};
 
 template<>
 struct to_string<padicxx>
@@ -260,8 +289,28 @@ FLINT_DEFINE_CBINARY_EXPR(times, padicxx,
         padic_mul(to._padic(), e1._padic(), e2._padic(), to._ctx()))
 FLINT_DEFINE_BINARY_EXPR(divided_by, padicxx,
         padic_div(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-// TODO neg, shift
+FLINT_DEFINE_BINARY_EXPR_COND(shift, padicxx,
+        traits::fits_into_slong<T>,
+        padic_shift(to._padic(), e1._padic(), e2, to._ctx()))
+
+FLINT_DEFINE_UNARY_EXPR(negate, padicxx,
+        padic_neg(to._padic(), from._padic(), to._ctx()))
+
+// lazy functions
+FLINT_DEFINE_UNARY_EXPR(sqrt_op, padicxx,
+        detail::padic_check(
+            padic_sqrt(to._padic(), from._padic(), to._ctx()), "sqrt"))
+FLINT_DEFINE_BINARY_EXPR_COND(pow_op, padicxx, traits::fits_into_slong<T>,
+        padic_pow_si(to._padic(), e1._padic(), e2, to._ctx()))
+FLINT_DEFINE_UNARY_EXPR(exp_op, padicxx,
+        detail::padic_check(
+            padic_exp(to._padic(), from._padic(), to._ctx()), "exp"))
+FLINT_DEFINE_UNARY_EXPR(log_op, padicxx,
+        detail::padic_check(
+            padic_log(to._padic(), from._padic(), to._ctx()), "log"))
+// TODO some more
 } // rules
+// TODO non-lazy functions
 } // flint
 
 #endif
