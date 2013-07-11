@@ -150,6 +150,16 @@ struct name<totype, fromtype> \
     } \
 };
 
+#define FLINT_DEFINE_GET2(name, totype, fromtype1, fromtype2, eval) \
+template<> \
+struct name<fromtype1, fromtype2> \
+{ \
+    static totype get(const fromtype1& e1, const fromtype2& e2) \
+    { \
+        return eval; \
+    } \
+};
+
 #define FLINT_DEFINE_GET_COND(name, totype, cond, eval) \
 template<class T> \
 struct name<totype, T, typename mp::enable_if< cond >::type> \

@@ -254,11 +254,11 @@ struct equals<padicxx, padicxx>
 
 FLINT_DEFINE_CBINARY_EXPR(plus, padicxx,
         padic_add(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-FLINT_DEFINE_CBINARY_EXPR(minus, padicxx,
+FLINT_DEFINE_BINARY_EXPR(minus, padicxx,
         padic_sub(to._padic(), e1._padic(), e2._padic(), to._ctx()))
 FLINT_DEFINE_CBINARY_EXPR(times, padicxx,
         padic_mul(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-FLINT_DEFINE_CBINARY_EXPR(divided_by, padicxx,
+FLINT_DEFINE_BINARY_EXPR(divided_by, padicxx,
         padic_div(to._padic(), e1._padic(), e2._padic(), to._ctx()))
 // TODO neg, shift
 } // rules

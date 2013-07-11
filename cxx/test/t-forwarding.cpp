@@ -148,7 +148,7 @@ test_evaluation()
 int
 main()
 {
-    std::cout << "t-forwarding....";
+    std::cout << "forwarding....";
 
     test_print();
     test_assignment();
