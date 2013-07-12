@@ -49,13 +49,11 @@ struct modulo { };
 struct shift { }; // left
 } // operations
 
-namespace detail {
-struct EXPRESSION { };
-}
-
 namespace traits {
+template<class T, class Enable = void>
+struct is_expression : mp::false_ { };
 template<class T>
-struct is_expression : _is_convertible<detail::EXPRESSION, T> { };
+struct is_expression<T, typename T::IS_EXPRESSION_MARKER> : mp::true_ { };
 
 template<class T>
 struct _is_immediate_expr

@@ -114,7 +114,6 @@ struct evaluation_traits<operations::immediate, Expr, Data>
 // it *does* need to be copy-constructible, and have a working destructor.
 template<class Derived, class Operation, class Data>
 class expression
-    : public detail::EXPRESSION
 {
 private:
     Data data;
@@ -123,6 +122,9 @@ protected:
     explicit expression(const Data& d) : data(d) {}
 
 public:
+    // internal -- see is_expression implementation.
+    typedef void IS_EXPRESSION_MARKER;
+
     typedef detail::evaluation_traits<Operation, expression, Data> ev_traits_t;
     typedef typename Derived::template type<Operation, Data>::result derived_t;
     typedef typename ev_traits_t::evaluated_t evaluated_t;
