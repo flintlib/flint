@@ -60,6 +60,7 @@
 #include "cxx/tuple.h"
 
 #include "cxx/fmpzxx.h"
+#include "cxx/vector.h"
 
 
 // Exception class to indicate that this test cannot proceed, e.g. because
@@ -129,8 +130,8 @@ std::vector<std::string> lines(const std::string& input)
 //
 // -->
 //
-//  45 0f be c9             movsbl %r9b,%r9d
-//  44 89 07                mov    %r8d,(%rdi)
+//  movsbl %r9b,%r9d
+//  mov    %r8d,(%rdi)
 // 
 std::string stripaddr(const std::string& input)
 {
@@ -144,7 +145,13 @@ std::string stripaddr(const std::string& input)
         if(pos == std::string::npos)
             result += ls[i];
         else
-            result += ls[i].substr(pos+2);
+        {
+            std::string tmp = ls[i].substr(pos+2);
+            pos = tmp.find("\t");
+            if(pos == std::string::npos)
+                result += tmp;
+            result += tmp.substr(pos+1);
+        }
         result += '\n';
     }
     return result;
@@ -187,6 +194,8 @@ bool fuzzy_equals(T v1, T v2, double perc)
 
 using namespace flint;
 using namespace mp;
+
+typedef make_vector_n<fmpzxx, 10>::type fmpzxx_vector;
 
 extern "C" {
 #if HAVE_OPTIMIZE_ATTRIBUTE
@@ -447,6 +456,27 @@ DEFINE_FUNC(test_fmpzxx_ref_2,
 {
     fmpz_add(out._fmpz(), in1._fmpz(), in2._fmpz());
 }
+
+DEFINE_FUNC(test_fmpzxx_vec_1,
+        (fmpzxx_vector& out, const fmpzxx_vector& in1, const fmpzxx_vector& in2))
+{
+    out = in1 + in2;
+}
+
+DEFINE_FUNC(test_fmpzxx_vec_2,
+        (fmpz* out, const fmpz* in1, const fmpz* in2))
+{
+    fmpz_add(out + 0, in1 + 0, in2 + 0);
+    fmpz_add(out + 1, in1 + 1, in2 + 1);
+    fmpz_add(out + 2, in1 + 2, in2 + 2);
+    fmpz_add(out + 3, in1 + 3, in2 + 3);
+    fmpz_add(out + 4, in1 + 4, in2 + 4);
+    fmpz_add(out + 5, in1 + 5, in2 + 5);
+    fmpz_add(out + 6, in1 + 6, in2 + 6);
+    fmpz_add(out + 7, in1 + 7, in2 + 7);
+    fmpz_add(out + 8, in1 + 8, in2 + 8);
+    fmpz_add(out + 9, in1 + 9, in2 + 9);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -542,6 +572,14 @@ test_fmpzxx()
     tassert(count(ass1, "\n") == count(ass2, "\n"));
 }
 
+void
+test_vector()
+{
+    std::string ass1 = disass(program, "test_fmpzxx_vec_1");
+    std::string ass2 = disass(program, "test_fmpzxx_vec_2");
+    tassert(stripaddr(ass1) == stripaddr(ass2));
+}
+
 int
 main(int argc, char** argv)
 {
@@ -551,6 +589,7 @@ main(int argc, char** argv)
     {
         test_tuple();
         test_fmpzxx();
+        test_vector();
     }
     catch(skippable_exception e)
     {

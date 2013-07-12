@@ -26,6 +26,9 @@
 #ifndef CXX_TEST_MYINT_H
 #define CXX_TEST_MYINT_H CXX_TEST_MYINT_H
 
+#include <sstream>
+#include <string>
+
 #include "cxx/expression.h"
 
 namespace flint {
@@ -198,6 +201,17 @@ struct assignment<myint, long>
     {
         to._data().payload = from;
         to._data().extra = 5;
+    }
+};
+
+template<>
+struct to_string<myint>
+{
+    static std::string get(const myint& i, int base /* ignored */)
+    {
+        std::ostringstream oss;
+        oss << i;
+        return oss.str();
     }
 };
 
