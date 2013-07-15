@@ -158,8 +158,10 @@ install: library
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
-	cp *.h $(DESTDIR)$(PREFIX)/include/flint
-	cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint
+	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/flint
+	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
+		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint; \
+	fi
 	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
 	cp qadic/CPimport.txt $(DESTDIR)$(FLINT_CPIMPORT_DIR)
 
