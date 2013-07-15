@@ -150,6 +150,8 @@ done
 
 #find dependencies
 
+LIBS="m"
+
 if [ -d "${GMP_DIR}/lib" ]; then
    GMP_LIB_DIR="${GMP_DIR}/lib"
    GMP_INC_DIR="${GMP_DIR}/include"
@@ -165,7 +167,7 @@ else
 fi
 LIB_DIRS="${LIB_DIRS} ${GMP_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${GMP_INC_DIR}"
-LIBS="-lgmp"
+LIBS="gmp ${LIBS}"
 
 if [ -d "${MPFR_DIR}/lib" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib"
@@ -185,6 +187,7 @@ else
 fi
 LIB_DIRS="${LIB_DIRS} ${MPFR_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${MPFR_INC_DIR}"
+LIBS="mpfr ${LIBS}"
 
 #configure extra libraries
 
@@ -201,7 +204,7 @@ if [ "$WANT_NTL" = "1" ]; then
    fi
    EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${NTL_INC_DIR}"
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${NTL_LIB_DIR}"
-   EXTRA_LIBS="${EXTRA_LIBS} -lntl"
+   EXTRA_LIBS="ntl ${EXTRA_LIBS}"
 fi
 
 if [ "$WANT_BLAS" = "1" ]; then
@@ -214,7 +217,7 @@ if [ "$WANT_BLAS" = "1" ]; then
    fi
    EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${BLAS_INC_DIR}"
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${BLAS_LIB_DIR}"
-   EXTRA_LIBS="${EXTRA_LIBS} -lopenblas"
+   EXTRA_LIBS="openblas ${EXTRA_LIBS}"
 fi
 CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
 
@@ -442,6 +445,10 @@ fi
 
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
+if [ "$PTHREAD" = "1" ]; then
+   LIBS="${LIBS} pthread"
+fi
+
 #pocess external modules
 
 EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${EXTENSIONS}"
@@ -462,13 +469,12 @@ done
 
 #linker params
 
-LIBS2="-lmpfr -lgmp -lm"
-if [ "$PTHREAD" = "1" ]; then
-   LIBS2="${LIBS2} -lpthread"
-fi
-LIBS="-lflint $LIBS2"
-LIBS2="$LLIBS $LIBS2"
-LIBS="$LLIBS $LIBS"
+for LIB in ${EXTRA_LIBS} ${LIBS}; do
+   lLIBS2="-l${LIB} ${lLIBS2}"
+done
+lLIBS="-lflint $lLIBS2"
+LIBS2="$LLIBS $lLIBS2"
+LIBS="$LLIBS $lLIBS"
 
 #paths for dynamic linker
 
