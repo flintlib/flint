@@ -304,11 +304,16 @@ struct translate_data<empty_tuple>
     static type make(empty_tuple, Idx) {return empty_tuple();}
 };
 
+template<class Data, class Enable = void>
+struct enable_evaluation : mp::false_ {typedef void vector_t;};
+
 template<class Data>
-struct enable_evaluation
-    : enable_vector_rules<typename traits::basetype<Data>::type>
+struct enable_evaluation<Data,
+    typename mp::enable_if<traits::is_expression<
+        typename traits::basetype<Data>::type> >::type>
+    : enable_vector_rules<typename traits::basetype<Data>::type::evaluated_t>
 {
-    typedef typename traits::basetype<Data>::type vector_t;
+    typedef typename traits::basetype<Data>::type::evaluated_t vector_t;
 };
 template<class Head, class Tail>
 struct enable_evaluation<tuple<Head, Tail> >
