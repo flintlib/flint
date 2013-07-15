@@ -67,8 +67,12 @@ template<class T, bool u>
 struct and_v : and_<T, value_of<u> > { };
 
 // Compute logical or of the input values.
+template<class T1, class T2, class T3 = void,
+    class T4 = void, class T5 = void, class T6 = void>
+struct or_ : or_<T1, or_<T2, T3, T4, T5> > { };
+
 template<class T, class U>
-struct or_ : value_of<T::val || U::val> { };
+struct or_<T, U, void, void, void, void> : value_of<T::val || U::val> { };
 
 // Compute V1 or V2, depending on C
 template<bool C, class V1, class V2>

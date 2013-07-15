@@ -446,13 +446,13 @@ DEFINE_FUNC(test_fmpzxx_ternary_10,
 }
 
 DEFINE_FUNC(test_fmpzxx_ref_1,
-        (fmpzxx_ref out, fmpzxx_cref in1, fmpzxx_cref in2))
+        (fmpzxx_ref out, fmpzxx_srcref in1, fmpzxx_srcref in2))
 {
     out = in1 + in2;
 }
 
 DEFINE_FUNC(test_fmpzxx_ref_2,
-        (fmpzxx_ref out, fmpzxx_cref in1, fmpzxx_cref in2))
+        (fmpzxx_ref out, fmpzxx_srcref in1, fmpzxx_srcref in2))
 {
     fmpz_add(out._fmpz(), in1._fmpz(), in2._fmpz());
 }

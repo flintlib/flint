@@ -77,10 +77,10 @@ public:
 
     // XXX these two are not actually exposed in the C api ...
     fmpzxx_ref get_p() {return fmpzxx_ref::make(ctx[0].p);}
-    fmpzxx_cref get_p() const {return fmpzxx_cref::make(ctx[0].p);}
+    fmpzxx_srcref get_p() const {return fmpzxx_srcref::make(ctx[0].p);}
 
     // TODO more constructors? Should we wrap padic_print_mode?
-    padicxx_ctx(fmpzxx_cref p, long min, long max, padic_print_mode mode)
+    padicxx_ctx(fmpzxx_srcref p, long min, long max, padic_print_mode mode)
     {
         padic_ctx_init(ctx, p._fmpz(), min, max, mode);
     }
@@ -117,7 +117,7 @@ public:
     const padic_t& _padic() const {return this->_data().p;}
     const padicxx_ctx& get_ctx() const {return this->_data().ctx;}
     fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
-    fmpzxx_cref unit() const {return fmpzxx_cref::make(padic_unit(_padic()));}
+    fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
     slong val() const {return padic_val(_padic());}
     slong _prec() const {return padic_prec(_padic());}
     padic_ctx_t& _ctx() const {return get_ctx()._ctx();}
@@ -229,11 +229,11 @@ struct padicxx_max_prec<padicxx_expression<Op, Data> >
 namespace rules {
 FLINT_DEFINE_DOIT(assignment, padicxx, padicxx,
         padic_set(to._padic(), from._padic(), to._ctx()))
-FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_signed_integer<T>, 
+FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_signed_integer, 
         padic_set_si(to._padic(), from, to._ctx()))
-FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_unsigned_integer<T>, 
+FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_unsigned_integer, 
         padic_set_ui(to._padic(), from, to._ctx()))
-FLINT_DEFINE_DOIT_COND(assignment, padicxx, fmpzxx_traits::is_source<T>, 
+FLINT_DEFINE_DOIT_COND(assignment, padicxx, FMPZXX_COND_S,
         padic_set_fmpz(to._padic(), from._fmpz(), to._ctx()))
 FLINT_DEFINE_DOIT(assignment, padicxx, fmpqxx,
         padic_set_fmpq(to._padic(), from._fmpq(), to._ctx()))
@@ -290,7 +290,7 @@ FLINT_DEFINE_CBINARY_EXPR(times, padicxx,
 FLINT_DEFINE_BINARY_EXPR(divided_by, padicxx,
         padic_div(to._padic(), e1._padic(), e2._padic(), to._ctx()))
 FLINT_DEFINE_BINARY_EXPR_COND(shift, padicxx,
-        traits::fits_into_slong<T>,
+        traits::fits_into_slong,
         padic_shift(to._padic(), e1._padic(), e2, to._ctx()))
 
 FLINT_DEFINE_UNARY_EXPR(negate, padicxx,
@@ -300,7 +300,7 @@ FLINT_DEFINE_UNARY_EXPR(negate, padicxx,
 FLINT_DEFINE_UNARY_EXPR(sqrt_op, padicxx,
         detail::padic_check(
             padic_sqrt(to._padic(), from._padic(), to._ctx()), "sqrt"))
-FLINT_DEFINE_BINARY_EXPR_COND(pow_op, padicxx, traits::fits_into_slong<T>,
+FLINT_DEFINE_BINARY_EXPR_COND(pow_op, padicxx, traits::fits_into_slong,
         padic_pow_si(to._padic(), e1._padic(), e2, to._ctx()))
 FLINT_DEFINE_UNARY_EXPR(exp_op, padicxx,
         detail::padic_check(

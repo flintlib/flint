@@ -206,7 +206,7 @@ void assert_is_fmpzxx(const T&)
 {
     tassert(traits::is_fmpzxx<T>::val);
 }
-struct newtype { };
+struct newtype {typedef void data_ref_t; typedef void data_srcref_t;};
 void
 test_traits()
 {
@@ -340,7 +340,7 @@ test_ternary_assigments()
 
 bool
 try_implicit_conversion(fmpzxx_ref, const fmpzxx_ref&,
-        fmpzxx_cref, const fmpzxx_cref&, fmpzxx_cref, const fmpzxx_cref&)
+        fmpzxx_srcref, const fmpzxx_srcref&, fmpzxx_srcref, const fmpzxx_srcref&)
 {
     return true;
 }
@@ -349,7 +349,7 @@ test_references()
 {
     fmpzxx a(2), b(3);
     fmpzxx_ref ar(a);
-    fmpzxx_cref acr(a), bcr(b);
+    fmpzxx_srcref acr(a), bcr(b);
 
     tassert(ar == 2 && bcr == 3 && ar == acr && ar ==  a);
 
@@ -377,14 +377,37 @@ test_references()
     // test conversion of reference types
     tassert(try_implicit_conversion(a, a, a, a, ar, ar));
     tassert((!traits::_is_convertible<fmpzxx, fmpzxx_ref>::val));
-    tassert((!traits::_is_convertible<fmpzxx, fmpzxx_cref>::val));
-    tassert((!traits::_is_convertible<fmpzxx_ref, fmpzxx_cref>::val));
+    tassert((!traits::_is_convertible<fmpzxx, fmpzxx_srcref>::val));
+    tassert((!traits::_is_convertible<fmpzxx_ref, fmpzxx_srcref>::val));
 
     // test creation from C types
     fmpzxx_ref ar2 = fmpzxx_ref::make(a._fmpz());
-    fmpzxx_cref acr2 = fmpzxx_cref::make(acr._fmpz());
+    fmpzxx_srcref acr2 = fmpzxx_srcref::make(acr._fmpz());
     a = 7;
     tassert(ar2 == 7 && acr2 == 7);
+}
+
+// TODO move
+void
+test_flint_classes()
+{
+    using namespace flint_classes;
+    tassert((mp::equal_types<to_nonref<fmpzxx>::type, fmpzxx>::val));
+    tassert((mp::equal_types<to_nonref<fmpzxx_ref>::type, fmpzxx>::val));
+    tassert((mp::equal_types<to_nonref<fmpzxx_srcref>::type, fmpzxx>::val));
+    tassert((mp::equal_types<to_ref<fmpzxx>::type, fmpzxx_ref>::val));
+    tassert((mp::equal_types<to_srcref<fmpzxx>::type, fmpzxx_srcref>::val));
+    tassert((mp::equal_types<to_ref<fmpzxx_ref>::type, fmpzxx_ref>::val));
+    tassert((is_ref<fmpzxx, fmpzxx_ref>::val));
+    tassert((is_ref<fmpzxx_ref, fmpzxx_ref>::val));
+    tassert((!is_ref<fmpzxx, fmpzxx>::val));
+    tassert((!is_ref<fmpzxx, fmpzxx_srcref>::val));
+    tassert((is_srcref<fmpzxx, fmpzxx_srcref>::val));
+    tassert((!is_srcref<fmpzxx, fmpzxx>::val));
+    tassert((!is_srcref<fmpzxx, fmpzxx_ref>::val));
+    tassert(is_nonref<fmpzxx>::val);
+    tassert(!is_nonref<fmpzxx_srcref>::val);
+    tassert(!is_nonref<fmpzxx_ref>::val);
 }
 
 int
@@ -403,6 +426,7 @@ main()
     test_ternary();
     test_ternary_assigments();
     test_references();
+    test_flint_classes();
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_fmpzxx

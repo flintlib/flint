@@ -31,6 +31,7 @@
 #include "fmpq.h"
 
 #include "cxx/expression.h"
+#include "cxx/flint_classes.h"
 #include "cxx/fmpzxx.h"
 
 // TODO exhibit this as a specialisation of a generic fraction<fmpzxx>
@@ -44,58 +45,55 @@ public:
     typedef expression<derived_wrapper< ::flint::fmpqxx_expression>,
               Operation, Data> base_t;
 
-    fmpqxx_expression() {}
-
-    template<class T>
-    explicit fmpqxx_expression(const T& t)
-        : base_t(t) {}
-
-    template<class T, class U>
-    fmpqxx_expression(const T& t, const U& u)
-        : base_t(t, u) {}
-
-    template<class T>
-    fmpqxx_expression& operator=(const T& t)
-    {
-        this->set(t);
-        return *this;
-    }
+    FLINTXX_DEFINE_BASICS(fmpqxx_expression)
+    FLINTXX_DEFINE_CTORS(fmpqxx_expression)
+    FLINTXX_DEFINE_C_REF(fmpqxx_expression, fmpq, _fmpq)
 
     // These only make sense with immediates
-    fmpq_t& _fmpq() {return this->_data().f;}
-    const fmpq_t& _fmpq() const {return this->_data().f;}
     fmpzxx_ref num() {return fmpzxx_ref::make(fmpq_numref(_fmpq()));}
-    fmpzxx_cref num() const {return fmpzxx_cref::make(fmpq_numref(_fmpq()));}
+    fmpzxx_srcref num() const {return fmpzxx_srcref::make(fmpq_numref(_fmpq()));}
     fmpzxx_ref den() {return fmpzxx_ref::make(fmpq_denref(_fmpq()));}
-    fmpzxx_cref den() const {return fmpzxx_cref::make(fmpq_denref(_fmpq()));}
+    fmpzxx_srcref den() const {return fmpzxx_srcref::make(fmpq_denref(_fmpq()));}
     void canonicalise() {fmpq_canonicalise(_fmpq());}
     bool is_canonical() const {return fmpq_is_canonical(_fmpq());}
-
-protected:
-    explicit fmpqxx_expression(const Data& d) : base_t(d) {}
-
-    template<class D, class O, class Da>
-    friend class expression;
 };
+
+namespace detail {
+struct fmpq_data;
+}
+
+typedef fmpqxx_expression<operations::immediate, detail::fmpq_data> fmpqxx;
+typedef fmpqxx_expression<operations::immediate,
+            flint_classes::ref_data<fmpqxx, fmpq> > fmpqxx_ref;
+typedef fmpqxx_expression<operations::immediate,
+            flint_classes::srcref_data<fmpqxx, fmpqxx_ref, fmpq> > fmpqxx_srcref;
 
 namespace detail {
 struct fmpq_data
 {
-    fmpq_t f;
+    fmpq_t inner;
+    typedef fmpq_t& data_ref_t;
+    typedef const fmpq_t& data_srcref_t;
 
-    fmpq_data() {fmpq_init(f);}
-    ~fmpq_data() {fmpq_clear(f);}
+    fmpq_data() {fmpq_init(inner);}
+    ~fmpq_data() {fmpq_clear(inner);}
 
     fmpq_data(const fmpq_data& o)
     {
-        fmpq_init(f);
-        fmpq_set(f, o.f);
+        fmpq_init(inner);
+        fmpq_set(inner, o.inner);
     }
 
-    fmpq_data(fmpzxx_cref num, fmpzxx_cref den)
+    fmpq_data(fmpzxx_srcref num, fmpzxx_srcref den)
     {
-        fmpq_init(f);
-        fmpq_set_fmpz_frac(f, num._fmpz(), den._fmpz());
+        fmpq_init(inner);
+        fmpq_set_fmpz_frac(inner, num._fmpz(), den._fmpz());
+    }
+
+    fmpq_data(fmpqxx_srcref r)
+    {
+        fmpq_init(inner);
+        fmpq_set(inner, r._fmpq());
     }
 
     template<class T, class U>
@@ -103,49 +101,40 @@ struct fmpq_data
             typename mp::enable_if<traits::fits_into_slong<T> >::type* = 0,
             typename mp::enable_if<traits::is_unsigned_integer<U> >::type* = 0)
     {
-        fmpq_init(f);
-        fmpq_set_si(f, num, den);
+        fmpq_init(inner);
+        fmpq_set_si(inner, num, den);
     }
 };
 } // detail
 
-typedef fmpqxx_expression<operations::immediate, detail::fmpq_data> fmpqxx;
-
 namespace rules {
-FLINT_DEFINE_DOIT(assignment, fmpqxx, fmpqxx,
+#define FMPQXX_COND_S FLINTXX_COND_S(fmpqxx)
+#define FMPQXX_COND_T FLINTXX_COND_T(fmpqxx)
+
+FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, FMPQXX_COND_S,
         fmpq_set(to._fmpq(), from._fmpq()))
-FLINT_DEFINE_DOIT_COND(assignment, fmpqxx, traits::fits_into_slong<T>, 
+FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, traits::fits_into_slong, 
         fmpq_set_si(to._fmpq(), from, 1))
 // TODO mpq, mpfr?
 
-template<>
-struct to_string<fmpqxx>
-{
-    static std::string get(const fmpqxx& p, int base)
-    {
-        char* str = fmpq_get_str(0, base, p._fmpq());
-        std::string res(str);
-        std::free(str);
-        return res;
-    }
-};
+FLINTXX_DEFINE_TO_STR(fmpqxx, fmpq_get_str(0,  base, from._fmpq()))
+FLINTXX_DEFINE_CMP(fmpqxx, fmpq_cmp(e1._fmpq(), e2._fmpq()))
 
-FLINT_DEFINE_GET2(cmp, int, fmpqxx, fmpqxx, fmpq_cmp(e1._fmpq(), e2._fmpq()))
-
-FLINT_DEFINE_CBINARY_EXPR(plus, fmpqxx,
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_add(to._fmpq(), e1._fmpq(), e2._fmpq()))
-FLINT_DEFINE_CBINARY_EXPR(minus, fmpqxx,
+FLINT_DEFINE_CBINARY_EXPR_COND2(minus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_sub(to._fmpq(), e1._fmpq(), e2._fmpq()))
-FLINT_DEFINE_CBINARY_EXPR(times, fmpqxx,
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_mul(to._fmpq(), e1._fmpq(), e2._fmpq()))
-FLINT_DEFINE_CBINARY_EXPR(divided_by, fmpqxx,
-        fmpq_div(to._fmpq(), e1._fmpq(), e2._fmpq()))
-FLINT_DEFINE_CBINARY_EXPR_COND(times, fmpqxx, fmpzxx_traits::is_source<T>,
+FLINT_DEFINE_CBINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S,
+        FMPQXX_COND_S, fmpq_div(to._fmpq(), e1._fmpq(), e2._fmpq()))
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
         fmpq_mul_fmpz(to._fmpq(), e1._fmpq(), e2._fmpz()))
-FLINT_DEFINE_BINARY_EXPR_COND(divided_by, fmpqxx, fmpzxx_traits::is_source<T>,
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
         fmpq_div_fmpz(to._fmpq(), e1._fmpq(), e2._fmpz()))
 
-FLINT_DEFINE_UNARY_EXPR(negate, fmpqxx, fmpq_neg(to._fmpq(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpqxx, FMPQXX_COND_S,
+        fmpq_neg(to._fmpq(), from._fmpq()))
 
 // TODO addmul
 

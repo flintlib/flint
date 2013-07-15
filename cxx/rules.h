@@ -155,7 +155,7 @@ struct name<fromtype1, fromtype2> \
 
 #define FLINT_DEFINE_GET_COND(name, totype, cond, eval) \
 template<class T> \
-struct name<totype, T, typename mp::enable_if< cond >::type> \
+struct name<totype, T, typename mp::enable_if< cond<T> >::type> \
 { \
     static totype get(const T& from) \
     { \
@@ -178,7 +178,7 @@ struct name<totype, fromtype> \
 // accept any type "T" which satisfies "cond".
 #define FLINT_DEFINE_DOIT_COND(name, totype, cond, eval) \
 template<class T> \
-struct name<totype, T, typename mp::enable_if< cond >::type> \
+struct name<totype, T, typename mp::enable_if< cond<T> >::type> \
 { \
     static void doit(totype& to, const T& from) \
     { \
@@ -186,9 +186,9 @@ struct name<totype, T, typename mp::enable_if< cond >::type> \
     } \
 };
 
-#define FLINT_DEFINE_DOIT_COND2(name, cond, eval) \
+#define FLINT_DEFINE_DOIT_COND2(name, cond1, cond2, eval) \
 template<class T, class U> \
-struct name<T, U, typename mp::enable_if< cond >::type> \
+struct name<T, U, typename mp::enable_if<mp::and_< cond1 <T>, cond2 <U> > >::type> \
 { \
     static void doit(T& to, const U& from) \
     { \
@@ -211,7 +211,7 @@ struct unary_expression<operations::name, type> \
 
 #define FLINT_DEFINE_UNARY_EXPR_COND(name, ret_type, cond, eval) \
 template<class T> \
-struct unary_expression<typename mp::enable_if<cond, operations::name>::type, T> \
+struct unary_expression<typename mp::enable_if<cond<T>, operations::name>::type, T> \
 { \
     typedef ret_type return_t; \
     template<class V> \
@@ -255,7 +255,7 @@ struct commutative_binary_expression<type, operations::name, type> \
 #define FLINT_DEFINE_CBINARY_EXPR_COND(name, Type, cond, eval) \
 template<class T> \
 struct commutative_binary_expression<Type, \
-    typename mp::enable_if<cond, operations::name>::type, T> \
+    typename mp::enable_if<cond<T>, operations::name>::type, T> \
 { \
     typedef Type return_t; \
     template<class V> \
@@ -265,10 +265,10 @@ struct commutative_binary_expression<Type, \
     } \
 };
 
-#define FLINT_DEFINE_CBINARY_EXPR_COND2(name, rettype, cond, eval) \
+#define FLINT_DEFINE_CBINARY_EXPR_COND2(name, rettype, cond1, cond2, eval) \
 template<class T, class U> \
 struct commutative_binary_expression<T, \
-    typename mp::enable_if< cond, operations::name>::type, U> \
+    typename mp::enable_if<mp::and_< cond1 <T>, cond2 <U> >, operations::name>::type, U> \
 { \
     typedef rettype return_t; \
     template<class V> \
@@ -283,7 +283,7 @@ struct commutative_binary_expression<T, \
 #define FLINT_DEFINE_BINARY_EXPR_COND(name, Type, cond, eval) \
 template<class T> \
 struct binary_expression<Type, \
-    typename mp::enable_if<cond, operations::name>::type, T> \
+    typename mp::enable_if<cond<T>, operations::name>::type, T> \
 { \
     typedef Type return_t; \
     template<class V> \
@@ -293,10 +293,10 @@ struct binary_expression<Type, \
     } \
 };
 
-#define FLINT_DEFINE_BINARY_EXPR_COND2(name, rettype, cond, eval) \
+#define FLINT_DEFINE_BINARY_EXPR_COND2(name, rettype, cond1, cond2, eval) \
 template<class T, class U> \
 struct binary_expression<T, \
-    typename mp::enable_if< cond, operations::name>::type, U> \
+    typename mp::enable_if< mp::and_< cond1 <T>, cond2 <U> >, operations::name>::type, U> \
 { \
     typedef rettype return_t; \
     template<class V> \

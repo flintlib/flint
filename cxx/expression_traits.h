@@ -92,7 +92,7 @@ struct is_T_expr<Expr, T,
 
 // Decide if an expressing yielding From can be directly evaluated into To.
 // To be further specialised!
-template<class To, class From>
+template<class To, class From, class Enable = void>
 struct can_evaluate_into : mp::false_ { };
 template<class T>
 struct can_evaluate_into<T, T> : mp::true_ { };

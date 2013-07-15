@@ -71,7 +71,7 @@ test_assignment()
     b = 17ul; tassert(a == b);
     b = 0; b = c; tassert(a == b);
     b = 0; b = fmpzxx_ref(c); tassert(a == b);
-    b = 0; b = fmpzxx_cref(c); tassert(a == b);
+    b = 0; b = fmpzxx_srcref(c); tassert(a == b);
     b = 0; b = d; tassert(a == b);
 }
 

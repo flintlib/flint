@@ -378,12 +378,12 @@ struct fmpz_vector_data
     }
 
     fmpzxx_ref at(long i) {return fmpzxx_ref::make(array + i);}
-    fmpzxx_cref at(long i) const {return fmpzxx_cref::make(array + i);}
+    fmpzxx_srcref at(long i) const {return fmpzxx_srcref::make(array + i);}
 };
 } // detail
 
 typedef vector_expression<
-    detail::wrapped_vector_traits<fmpzxx, long, fmpzxx_ref, fmpzxx_cref>,
+    detail::wrapped_vector_traits<fmpzxx, long, fmpzxx_ref, fmpzxx_srcref>,
     operations::immediate,
     detail::fmpz_vector_data> fmpz_vecxx;
 
