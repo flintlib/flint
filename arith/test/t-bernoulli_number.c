@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -41,7 +41,7 @@ int main()
     fmpz * den1;
     fmpz_t num2;
     fmpz_t den2;
-    long n, N;
+    slong n, N;
 
     printf("bernoulli_number....");
     fflush(stdout);
@@ -79,7 +79,7 @@ int main()
     /* Check non underscore versions */
     do
     {
-        long N = 100;
+        slong N = 100;
         fmpq * x;
         fmpq_t t;
 

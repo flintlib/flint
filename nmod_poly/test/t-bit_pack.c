@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -89,7 +89,7 @@ main(void)
     {
         fmpz_t f;
         nmod_poly_t A, B;
-        long b;
+        slong b;
         mp_limb_t n;
 
         do

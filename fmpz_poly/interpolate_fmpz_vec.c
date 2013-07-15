@@ -23,17 +23,17 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 
 static void
-_fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, long n)
+_fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, slong n)
 {
     fmpz_t p, q, t;
-    long i, j;
+    slong i, j;
 
     fmpz_init(p);
     fmpz_init(q);
@@ -59,7 +59,7 @@ _fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, long n)
 
 void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
-                                    const fmpz * xs, const fmpz * ys, long n)
+                                    const fmpz * xs, const fmpz * ys, slong n)
 {
     if (n == 0)
     {

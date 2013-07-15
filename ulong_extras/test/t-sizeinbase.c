@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -34,7 +34,7 @@ int main(void)
 {
     mp_limb_t n;
     int base, size1, size2;
-    long rep;
+    slong rep;
     mpz_t t;
     char * str;
 

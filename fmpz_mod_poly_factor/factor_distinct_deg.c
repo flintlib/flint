@@ -28,11 +28,11 @@
 
 void
 fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-                                  const fmpz_mod_poly_t poly, long **degs)
+                                  const fmpz_mod_poly_t poly, slong * const *degs)
 {
     fmpz_mod_poly_t f, g, s, v, tmp;
     fmpz_mod_poly_t *h, *H, *I;
-    long i, j, l, m, n, index;
+    slong i, j, l, m, n, index;
     fmpz_t p;
     double beta;
 

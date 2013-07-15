@@ -26,15 +26,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 char *
-_fmpz_poly_get_str(const fmpz * poly, long len)
+_fmpz_poly_get_str(const fmpz * poly, slong len)
 {
-    long i, bound;
+    slong i, bound;
     char *str, *strbase;
 
     if (len == 0)
@@ -45,7 +45,7 @@ _fmpz_poly_get_str(const fmpz * poly, long len)
         return str;
     }
 
-    bound = (long) (ceil(log10((double) (len + 1))));
+    bound = (slong) (ceil(log10((double) (len + 1))));
     for (i = 0; i < len; i++)
         bound += fmpz_sizeinbase(poly + i, 10) + 1;
     bound += len + 2;

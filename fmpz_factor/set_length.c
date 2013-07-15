@@ -24,23 +24,20 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_set_length(fmpz_factor_t factor, long newlen)
+_fmpz_factor_set_length(fmpz_factor_t factor, slong newlen)
 {
     if (factor->num > newlen)
     {
-        long i;
+        slong i;
         for (i = newlen; i < factor->num; i++)
-        {
             _fmpz_demote(factor->p + i); 
-            _fmpz_demote(factor->exp + i); 
-        }
     }
     factor->num = newlen;
 }

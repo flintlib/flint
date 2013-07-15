@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_mat.h"
@@ -44,9 +44,9 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         mpfr_mat_t a;
-        long j, k;
-        long rows = n_randint(state, 100);
-        long cols = n_randint(state, 100);
+        slong j, k;
+        slong rows = n_randint(state, 100);
+        slong cols = n_randint(state, 100);
         mp_prec_t prec = n_randint(state, 200) + MPFR_PREC_MIN;
 
         mpfr_mat_init(a, rows, cols, prec);

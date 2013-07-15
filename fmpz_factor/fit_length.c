@@ -24,14 +24,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_fit_length(fmpz_factor_t factor, long len)
+_fmpz_factor_fit_length(fmpz_factor_t factor, slong len)
 {
     if (len > factor->alloc)
     {
@@ -39,7 +39,7 @@ _fmpz_factor_fit_length(fmpz_factor_t factor, long len)
             len = 2 * factor->alloc;
 
         factor->p = (fmpz *) flint_realloc(factor->p, len * sizeof(fmpz));
-        factor->exp = (fmpz *) flint_realloc(factor->exp, len * sizeof(fmpz));
+        factor->exp = flint_realloc(factor->exp, len * sizeof(slong));
 
         if (len > factor->alloc)
         {

@@ -24,20 +24,20 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(long len)
+fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len)
 {
     fmpz_poly_struct ** tree = NULL;
 
     if (len)
     {
-        long i, j, height = FLINT_CLOG2(len);
+        slong i, j, height = FLINT_CLOG2(len);
 
         tree = flint_malloc(sizeof(fmpz_poly_struct *) * (height + 1));
         for (i = 0; i <= height; i++, len = (len + 1)/2)
@@ -52,11 +52,11 @@ fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(long len)
     return tree;
 }
 
-void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, long len)
+void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len)
 {
     if (len)
     {
-        long i, j, height = FLINT_CLOG2(len);
+        slong i, j, height = FLINT_CLOG2(len);
 
         for (i = 0; i <= height; i++, len = (len + 1)/2)
         {
@@ -70,9 +70,9 @@ void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, long len)
 }
 
 void
-_fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, long len, const fmpz_t mod)
+_fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_t mod)
 {
-    long height, pow, left, i;
+    slong height, pow, left, i;
     fmpz_poly_struct * pa, * pb;
 
     if (len == 0)

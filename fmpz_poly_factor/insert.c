@@ -28,14 +28,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly_factor.h"
 
 void
-fmpz_poly_factor_insert(fmpz_poly_factor_t fac, const fmpz_poly_t p, long exp)
+fmpz_poly_factor_insert(fmpz_poly_factor_t fac, const fmpz_poly_t p, slong exp)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
     {

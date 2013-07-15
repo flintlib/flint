@@ -25,18 +25,20 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 #include "ulong_extras.h"
+
+#pragma GCC diagnostic ignored "-Woverlength-strings"
 
 int
 main(void)
 {
     int i, result;
     flint_rand_t state;
-    
+
     printf("resultant....");
     fflush(stdout);
 
@@ -77,7 +79,7 @@ main(void)
         fmpq_clear(x);
         fmpq_clear(y);
     }
-    
+
     /* Check res(f h, g) == res(f, g) res(h, g) */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -112,7 +114,7 @@ main(void)
             printf("y = "), fmpq_print(y), printf("\n\n");
             abort();
         }
-        
+
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
         fmpq_poly_clear(h);
@@ -154,7 +156,7 @@ main(void)
            " 229355/219902324736 0 161/219902324736 887299/219902324736"
            " -427/7582838784 -611667/18325193728 -7/5114007552 833/54975581184"
            " -7/109951162368 -5402264413/219902324736 7/5114007552 35/9162596864"
-           " 1133545/219902324736 -151319/73300774912 0 7/219902324736" 
+           " 1133545/219902324736 -151319/73300774912 0 7/219902324736"
            " 7/54975581184 0 -10367/109951162368 7/54975581184 -161/109951162368");
 
         fmpq_poly_resultant(x, f, g);
@@ -183,3 +185,4 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+

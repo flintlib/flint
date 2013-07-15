@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -33,10 +33,10 @@
 /* Assumes poly1 and poly2 are not length 0. */
 void
 _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
-                             long len1, mp_srcptr poly2, long len2, long start,
+                             slong len1, mp_srcptr poly2, slong len2, slong start,
                              nmod_t mod)
 {
-    long m, n;
+    slong m, n;
 
     _nmod_vec_zero(res, start);
 
@@ -47,9 +47,9 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
     }
     else                        /* Ordinary case */
     {
-        long i;
-        long bits = FLINT_BITS - (long) mod.norm;
-        long log_len = FLINT_BIT_COUNT(len2);
+        slong i;
+        slong bits = FLINT_BITS - (slong) mod.norm;
+        slong log_len = FLINT_BIT_COUNT(len2);
 
         if (2 * bits + log_len <= FLINT_BITS)
         {
@@ -107,9 +107,9 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
 void
 nmod_poly_mulhigh_classical(nmod_poly_t res,
                             const nmod_poly_t poly1, const nmod_poly_t poly2,
-                            long start)
+                            slong start)
 {
-    long len_out = poly1->length + poly2->length - 1;
+    slong len_out = poly1->length + poly2->length - 1;
 
     if (poly1->length == 0 || poly2->length == 0 || start >= len_out)
     {

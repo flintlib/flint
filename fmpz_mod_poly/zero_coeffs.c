@@ -23,12 +23,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, long i, long j)
+void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 {
     if (i < 0)
         i = 0;

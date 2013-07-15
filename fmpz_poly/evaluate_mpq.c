@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, const fmpz * f, long len, 
+_fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, const fmpz * f, slong len, 
                         const fmpz_t anum, const fmpz_t aden)
 {
     _fmpz_poly_evaluate_horner_mpq(rnum, rden, f, len, anum, aden);

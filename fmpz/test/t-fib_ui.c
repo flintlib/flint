@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long i, n;
+    slong i, n;
     fmpz_t x, y, z, w;
 
     printf("fib_ui....");

@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p)
+void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
         fmpz_mod(res + i, vec + i, p);

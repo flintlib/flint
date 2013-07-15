@@ -23,11 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 /*
@@ -65,9 +60,9 @@ do {                             \
 int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
 {
     int z;
-    long i, j;
-    long r = mat->r;
-    long c = mat->c;
+    slong i, j;
+    slong r = mat->r;
+    slong c = mat->c;
 
     xxx_printf();
     for (i = 0; (i < r); i++)
@@ -88,9 +83,9 @@ int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
 int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 {
     int z;
-    long i, j;
-    long r = mat->r;
-    long c = mat->c;
+    slong i, j;
+    slong r = mat->r;
+    slong c = mat->c;
 
     xxx_putc('[');
     for (i = 0; i < r; i++)

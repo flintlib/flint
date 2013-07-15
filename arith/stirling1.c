@@ -22,20 +22,13 @@
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
-#include "arith.h"
-#include "ulong_extras.h"
 
+#include "arith.h"
 
 static void
-_rising_factorial(fmpz * res, long a, long b, long trunc)
+_rising_factorial(fmpz * res, slong a, slong b, slong trunc)
 {
-    const long span = b - a;
+    const slong span = b - a;
 
     switch (span)
     {
@@ -74,10 +67,10 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
         break;
     default:
         {
-            const long mid    = (a + b) / 2;
+            const slong mid    = (a + b) / 2;
             const int  chk    = (b - a + 1 < trunc);  /* i.e. nprod < trunc */
-            const long nleft  = chk ? mid - a + 1 : trunc;
-            const long nright = chk ? b - mid + 1 : trunc;
+            const slong nleft  = chk ? mid - a + 1 : trunc;
+            const slong nright = chk ? b - mid + 1 : trunc;
 
             fmpz *left  = _fmpz_vec_init(nleft);
             fmpz *right = _fmpz_vec_init(nright);
@@ -97,7 +90,7 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
 }
 
 void
-arith_stirling_number_1u(fmpz_t s, long n, long k)
+arith_stirling_number_1u(fmpz_t s, slong n, slong k)
 {
     /* Various special cases
        TODO: factorials, binomial coefficients, harmonic numbers ... */
@@ -119,7 +112,7 @@ arith_stirling_number_1u(fmpz_t s, long n, long k)
 }
 
 void
-arith_stirling_number_1(fmpz_t s, long n, long k)
+arith_stirling_number_1(fmpz_t s, slong n, slong k)
 {
     arith_stirling_number_1u(s, n, k);
     if ((n + k) % 2)
@@ -127,16 +120,16 @@ arith_stirling_number_1(fmpz_t s, long n, long k)
 }
 
 void
-arith_stirling_number_1u_vec(fmpz * row, long n, long klen)
+arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen)
 {
     if (klen > 0)
         _rising_factorial(row, 0, n, klen);
 }
 
 void
-arith_stirling_number_1_vec(fmpz * row, long n, long klen)
+arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
 {
-    long k;
+    slong k;
 
     arith_stirling_number_1u_vec(row, n, klen);
 

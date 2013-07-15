@@ -23,15 +23,11 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    long j;
+    slong j;
 
     if (mat1->r != mat2->r || mat1->c != mat2->c)
     {

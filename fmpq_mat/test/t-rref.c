@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long m, n, r, rank, b, d;
+        slong m, n, r, rank, b, d;
         fmpq_mat_t A, B, C;
         fmpz_mat_t M;
         fmpz_t den;
@@ -111,8 +111,8 @@ main(void)
     }
 
     flint_randclear(state);
-
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

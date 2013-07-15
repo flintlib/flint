@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -46,7 +46,7 @@ main(void)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
-        long N = n_randint(state, 50);
+        slong N = n_randint(state, 50);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -77,7 +77,7 @@ main(void)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
-        long N = n_randint(state, 50);
+        slong N = n_randint(state, 50);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -108,7 +108,7 @@ main(void)
     {
         nmod_poly_t a, b, r1, r2;
         mp_limb_t n = n_randtest_not_zero(state);
-        long N = n_randint(state, 50);
+        slong N = n_randint(state, 50);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

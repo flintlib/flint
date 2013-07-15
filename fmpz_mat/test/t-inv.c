@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -39,7 +39,7 @@ main(void)
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
     flint_rand_t state;
-    long i, j, m, r;
+    slong i, j, m, r;
 
     printf("inv....");
     fflush(stdout);

@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -78,7 +78,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
         var     - variable name
         buf     - buffer of size N, at write position i, with c == buf[i-1]
         z_coeff - mpz_t for the coefficient, f_coeff is the fmpz_t version
-        z_exp   - mpz_t for the exponent, exp is the long version
+        z_exp   - mpz_t for the exponent, exp is the slong version
         r       - return value
      */
 
@@ -89,7 +89,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     fmpz_t f_coeff;
     mpz_t z_coeff, z_exp;
-    long exp;
+    slong exp;
 
     int r = 0;
 

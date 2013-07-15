@@ -25,15 +25,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
+int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
 {
     int alloc, r;
-    long i;
+    slong i;
     mpz_t t;
 
     alloc = (*vec == NULL);
@@ -49,7 +49,7 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("Exception (_fmpz_vec_fread). Length does not fit into a long.\n");
+        printf("Exception (_fmpz_vec_fread). Length does not fit into a slong.\n");
         abort();
     }
     if (alloc)

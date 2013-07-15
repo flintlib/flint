@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "qsieve.h"
@@ -31,7 +31,7 @@
 
 void qsieve_ll_clear(qs_t qs_inf)
 {
-    long i;
+    slong i;
     
     fmpz_clear(qs_inf->kn);
     fmpz_clear(qs_inf->C);

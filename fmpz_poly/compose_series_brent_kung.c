@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -31,12 +31,12 @@
 #include "ulong_extras.h"
 
 void
-_fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1, 
-                                      const fmpz * poly2, long len2, long n)
+_fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, slong len1, 
+                                      const fmpz * poly2, slong len2, slong n)
 {
     fmpz_mat_t A, B, C;
     fmpz *t, *h;
-    long i, m;
+    slong i, m;
 
     if (n == 1)
     {
@@ -86,11 +86,11 @@ _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1,
 
 void
 fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long lenr;
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong lenr;
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {

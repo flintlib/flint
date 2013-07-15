@@ -31,10 +31,10 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
 {
     nmod_poly_t v;
     nmod_poly_factor_t sq_free, dist_deg;
-    long i, j, k, l, res_num, dist_deg_num;
-    long *degs;
+    slong i, j, k, l, res_num, dist_deg_num;
+    slong *degs;
 
-    if (!(degs = flint_malloc(nmod_poly_degree(poly) * sizeof(long))))
+    if (!(degs = flint_malloc(nmod_poly_degree(poly) * sizeof(slong))))
     {
         printf("Exception (nmod_poly_factor_kaltofen_shoup): \n");
         printf("Not enough memory.\n");

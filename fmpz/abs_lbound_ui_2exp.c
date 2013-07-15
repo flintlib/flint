@@ -23,16 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 mp_limb_t
-fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits)
+fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 {
     mp_limb_t m;
-    long shift, e, size;
+    slong shift, e, size;
     fmpz c = *x;
 
     if (!COEFF_IS_MPZ(c))

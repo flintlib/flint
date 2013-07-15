@@ -23,20 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
 #include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
-
-void arith_ramanujan_tau_series(fmpz_poly_t res, long n)
+void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 {
-    long j, k, jv, kv;
+    slong j, k, jv, kv;
     fmpz_t tmp;
     fmpz_poly_fit_length(res, n);
     _fmpz_vec_zero(res->coeffs, n);
@@ -63,7 +55,7 @@ void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
 {
     fmpz_poly_t poly;
     fmpz_t tau_p, p_11, next, this, prev;
-    long k, r;
+    slong k, r;
     ulong max_prime;
 
     max_prime = 1UL;
@@ -93,7 +85,7 @@ void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
         fmpz_one(prev);
         fmpz_set(this, tau_p);
 
-        for (r = 1; r < fmpz_get_ui(factors->exp + k); r++)
+        for (r = 1; r < factors->exp[k]; r++)
         {
             fmpz_mul(next, tau_p, this);
             fmpz_submul(next, p_11, prev);

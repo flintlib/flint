@@ -22,17 +22,11 @@
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
-#include "arith.h"
-#include "ulong_extras.h"
 
-void _arith_stirling_next_row(fmpz * new, fmpz * prev, long n, 
-                                               long klen, int kind);
+#include "arith.h"
+
+void _arith_stirling_next_row(fmpz * new, fmpz * prev, slong n, 
+                                               slong klen, int kind);
 
 static __inline__ void
 _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
@@ -44,11 +38,11 @@ _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
 }
 
 static void
-_fmpz_stirling2_powsum(fmpz_t s, long n, long k)
+_fmpz_stirling2_powsum(fmpz_t s, slong n, slong k)
 {
     fmpz_t t, u;
     fmpz * bc;
-    long j, m, max_bc;
+    slong j, m, max_bc;
 
     fmpz_init(t);
     fmpz_init(u);
@@ -91,7 +85,7 @@ _fmpz_stirling2_powsum(fmpz_t s, long n, long k)
 }
 
 void
-arith_stirling_number_2(fmpz_t s, long n, long k)
+arith_stirling_number_2(fmpz_t s, slong n, slong k)
 {
     if (n < 0 || k < 0 || k > n)
     {
@@ -133,9 +127,9 @@ arith_stirling_number_2(fmpz_t s, long n, long k)
 }
 
 void
-arith_stirling_number_2_vec(fmpz * row, long n, long klen)
+arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 {
-    long m;
+    slong m;
 
     klen = FLINT_MIN(klen, n+1);
 

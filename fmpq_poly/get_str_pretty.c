@@ -27,15 +27,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len, 
+char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len, 
                                  const char *var)
 {
-    long i;
+    slong i;
     size_t j;
     size_t size;     /* Upper bound on the length          */
     size_t densize;  /* Size of the denominator in base 10 */

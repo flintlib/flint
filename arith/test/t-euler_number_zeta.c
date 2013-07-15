@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -39,7 +39,7 @@ int main()
 {
     fmpz * ress;
     fmpz_t res;
-    long n, N;
+    slong n, N;
 
     printf("euler_number_zeta....");
     fflush(stdout);

@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, long n, ulong x)
+void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
 {
     fmpz_mod_poly_fit_length(poly, n + 1);
 

@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -31,8 +31,8 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, long len1, 
-                    const fmpz * poly2, const fmpz_t den2, long len2)
+                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
 {
     fmpz_t gcd1;  /* GCD( poly1, den2 ) */
     fmpz_t gcd2;  /* GCD( poly2, den1 ) */
@@ -79,7 +79,7 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long len;
+    slong len;
     
     if (poly1->length == 0 || poly2->length == 0)
     {

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "ulong_extras.h"
@@ -43,7 +43,7 @@ main(void)
     /* Check (a + b*c) == a + (b*c) */
     for (i = 0; i < 10000; i++)
     {
-        long len = n_randint(state, 100) + 1;
+        slong len = n_randint(state, 100) + 1;
         mp_limb_t n = n_randtest_not_zero(state);
         mp_limb_t c = n_randint(state, n);
         nmod_t mod;

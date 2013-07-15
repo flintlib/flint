@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -39,7 +39,7 @@ void fmpq_poly_init(fmpq_poly_t poly)
     poly->length = 0;
 }
 
-void fmpq_poly_init2(fmpq_poly_t poly, long alloc)
+void fmpq_poly_init2(fmpq_poly_t poly, slong alloc)
 {
     /* Allocate space for alloc small coeffs */
     poly->coeffs = (alloc ? (fmpz *) flint_calloc(alloc, sizeof(fmpz)) : NULL);

@@ -25,20 +25,20 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, long len)
+_fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, slong len)
 {
-    const long in_len = len;
+    const slong in_len = len;
     int neg;
-    long bits, limbs, loglen;
+    slong bits, limbs, loglen;
     mp_limb_t *arr, *arr3;
-    long sign = 0;
+    slong sign = 0;
 
     FMPZ_VEC_NORM(op, len);
 
@@ -84,7 +84,7 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, long len)
 
 void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op)
 {
-    long len;
+    slong len;
 
     if (op->length == 0)
     {

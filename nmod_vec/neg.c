@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
+void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, slong len, nmod_t mod)
 {
-    long i;
+    slong i;
     for (i = 0 ; i < len; i++)
         res[i] = nmod_neg(vec[i], mod);
 }

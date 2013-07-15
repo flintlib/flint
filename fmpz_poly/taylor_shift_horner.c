@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, long n)
+_fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
 {
-    long i, j;
+    slong i, j;
 
     if (*c == 1L)
     {

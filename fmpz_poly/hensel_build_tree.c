@@ -25,18 +25,18 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_hensel_build_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w, 
+void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, 
                                  const nmod_poly_factor_t fac)
 {
-    const long r = fac->num;
+    const slong r = fac->num;
     const nmod_t mod = (fac->p + 0)->mod;
 
-    long i, j;
+    slong i, j;
 
     nmod_poly_t d;
     nmod_poly_t *V = flint_malloc((2*r - 2)*sizeof(nmod_poly_t));
@@ -58,9 +58,9 @@ void fmpz_poly_hensel_build_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w,
 
     for (i = r, j = 0; j < 2*r - 4; i++, j += 2)
     {
-        long s;
-        long minp, mind;
-        long tmp;
+        slong s;
+        slong minp, mind;
+        slong tmp;
 
         minp = j;
         mind = nmod_poly_degree(V[j]);

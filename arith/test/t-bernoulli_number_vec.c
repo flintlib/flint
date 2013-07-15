@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -43,7 +43,7 @@ int main()
     fmpz * den1;
     fmpz * den2;
     fmpz * den3;
-    long i, n, N;
+    slong i, n, N;
 
     printf("bernoulli_number_vec....");
     fflush(stdout);

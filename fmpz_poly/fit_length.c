@@ -23,13 +23,13 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_fit_length(fmpz_poly_t poly, long len)
+fmpz_poly_fit_length(fmpz_poly_t poly, slong len)
 {
     if (len > poly->alloc)
     {

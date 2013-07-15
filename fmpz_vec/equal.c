@@ -23,15 +23,15 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 int
-_fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, long len)
+_fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len)
 {
-    long i;
+    slong i;
     if (vec1 == vec2)
         return 1;
 

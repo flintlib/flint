@@ -28,11 +28,11 @@
 #include "fmpz_mod_poly.h"
 
 int _fmpz_mod_poly_invmod(fmpz *A, 
-                          const fmpz *B, long lenB, 
-                          const fmpz *P, long lenP, const fmpz_t p)
+                          const fmpz *B, slong lenB, 
+                          const fmpz *P, slong lenP, const fmpz_t p)
 {
     fmpz *G;
-    long lenG;
+    slong lenG;
 
     FMPZ_VEC_NORM(B, lenB);
 
@@ -58,7 +58,7 @@ int _fmpz_mod_poly_invmod(fmpz *A,
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, 
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
 {
-    const long lenB = B->length, lenP = P->length;
+    const slong lenB = B->length, lenP = P->length;
     fmpz *t;
     int ans;
 

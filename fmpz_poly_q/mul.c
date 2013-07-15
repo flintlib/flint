@@ -61,8 +61,8 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
     /* Polynomials? */
     if (fmpz_poly_length(op1->den) == 1 && fmpz_poly_length(op2->den) == 1)
     {
-        const long len1 = fmpz_poly_length(op1->num);
-        const long len2 = fmpz_poly_length(op2->num);
+        const slong len1 = fmpz_poly_length(op1->num);
+        const slong len2 = fmpz_poly_length(op2->num);
 
         fmpz_poly_fit_length(rop->num, len1 + len2 - 1);
         if (len1 >= len2)

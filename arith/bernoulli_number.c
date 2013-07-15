@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include <mpfr.h>
-#include "flint.h"
 #include "arith.h"
-#include "fmpq.h"
 
 void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 {

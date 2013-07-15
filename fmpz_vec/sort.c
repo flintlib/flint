@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -33,7 +33,7 @@
 typedef int (*__compar_fn_t) (__const void *, __const void *);
 #endif
 
-void _fmpz_vec_sort(fmpz * vec, long len)
+void _fmpz_vec_sort(fmpz * vec, slong len)
 {
     qsort(vec, len, sizeof(fmpz), (__compar_fn_t) fmpz_cmp);
 }

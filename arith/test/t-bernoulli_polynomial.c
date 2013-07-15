@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -40,7 +40,7 @@ int main()
     fmpq_poly_t P, Q;
     mpz_t t;
 
-    long k, n;
+    slong k, n;
 
     printf("bernoulli_polynomial....");
     fflush(stdout);

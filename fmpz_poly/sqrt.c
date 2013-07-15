@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 int
-_fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len)
+_fmpz_poly_sqrt(fmpz * res, const fmpz * poly, slong len)
 {
     return _fmpz_poly_sqrt_classical(res, poly, len);
 }
@@ -37,7 +37,7 @@ _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len)
 int
 fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
 {
-    long blen, len = a->length;
+    slong blen, len = a->length;
     int result;
 
     if (len % 2 == 0)

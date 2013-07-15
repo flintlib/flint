@@ -23,17 +23,17 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 
 void
-_fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c)
+_fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 {
     fmpz_t r, t;
-    long i;
+    slong i;
 
     if (len < 2)
         return;
@@ -58,7 +58,7 @@ _fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c)
 void
 fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 {
-    long len = A->length;
+    slong len = A->length;
 
     if (len <= 1)
     {

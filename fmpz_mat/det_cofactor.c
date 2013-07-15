@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-
 
 void
 _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x)
@@ -125,7 +120,7 @@ _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x)
 void
 fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 {
-    long dim = A->r;
+    slong dim = A->r;
 
     switch (dim)
     {

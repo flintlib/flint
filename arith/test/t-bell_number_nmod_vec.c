@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "nmod_vec.h"
@@ -35,9 +35,9 @@ int main(void)
 {
     flint_rand_t state;
     mp_ptr b1, b2;
-    long n;
+    slong n;
 
-    const long maxn = 3000;
+    const slong maxn = 3000;
 
     printf("bell_number_nmod_vec....");
     fflush(stdout);

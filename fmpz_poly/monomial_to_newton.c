@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n)
+_fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, slong n)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < n - 1; i++)
         for (j = n - 2; j >= i; j--)

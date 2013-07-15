@@ -29,6 +29,7 @@
 
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 #include "ulong_extras.h"
 
 int

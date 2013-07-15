@@ -23,10 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 const mp_limb_t bell_number_tab[] = 
 {
@@ -48,7 +45,7 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
 {
     mp_limb_t s, t, u;
     mp_ptr facs, pows;
-    long i, j;
+    slong i, j;
 
     if (n < BELL_NUMBER_TAB_SIZE)
         return n_mod2_preinv(bell_number_tab[n], mod.n, mod.ninv);

@@ -24,15 +24,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
+_fmpz_poly_shift_left(fmpz * res, const fmpz * poly, slong len, slong n)
 {
-    long i;
+    slong i;
 
     /* Copy in reverse to avoid writing over unshifted coefficients */
     if (res != poly)
@@ -51,7 +51,7 @@ _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
 }
 
 void
-fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 {
     if (n == 0)
     {

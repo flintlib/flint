@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_hensel_lift_tree_recursive(long *link, 
-    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, long j, long inv, 
+void fmpz_poly_hensel_lift_tree_recursive(slong *link, 
+    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, slong j, slong inv, 
     const fmpz_t p0, const fmpz_t p1)
 {
     if (j >= 0)

@@ -25,15 +25,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 
-void perm(nmod_mat_t A, long * P)
+void perm(nmod_mat_t A, slong * P)
 {
-    long i;
+    slong i;
     mp_ptr * tmp;
 
     if (A->c == 0 || A->r == 0)
@@ -47,10 +47,10 @@ void perm(nmod_mat_t A, long * P)
     flint_free(tmp);
 }
 
-void check(long * P, nmod_mat_t LU, const nmod_mat_t A, long rank)
+void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
 {
     nmod_mat_t B, L, U;
-    long m, n, i, j;
+    slong m, n, i, j;
 
     m = A->r;
     n = A->c;
@@ -108,7 +108,7 @@ void check(long * P, nmod_mat_t LU, const nmod_mat_t A, long rank)
 int
 main(void)
 {
-    long i;
+    slong i;
 
     flint_rand_t state;
     flint_randinit(state);
@@ -120,8 +120,8 @@ main(void)
     {
         nmod_mat_t A, LU;
         mp_limb_t mod;
-        long m, n, r, d, rank;
-        long * P;
+        slong m, n, r, d, rank;
+        slong * P;
 
         m = n_randint(state, 30);
         n = n_randint(state, 30);
@@ -139,7 +139,7 @@ main(void)
             }
 
             nmod_mat_init_set(LU, A);
-            P = flint_malloc(sizeof(long) * m);
+            P = flint_malloc(sizeof(slong) * m);
 
             rank = nmod_mat_lu_recursive(P, LU, 0);
 

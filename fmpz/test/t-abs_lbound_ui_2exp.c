@@ -25,16 +25,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 static mp_limb_t
-refimpl(long * exp, const fmpz_t x, int bits)
+refimpl(slong * exp, const fmpz_t x, int bits)
 {
     fmpz_t t;
-    long xbits;
+    slong xbits;
     mp_limb_t m;
 
     xbits = fmpz_bits(x);
@@ -58,7 +58,7 @@ refimpl(long * exp, const fmpz_t x, int bits)
 int
 main(void)
 {
-    long iter;
+    slong iter;
     flint_rand_t state;
 
     printf("abs_lbound_ui_2exp....");
@@ -69,8 +69,8 @@ main(void)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_t x;
-        long bits;
-        long exp, yexp;
+        slong bits;
+        slong exp, yexp;
         mp_limb_t yman, man;
 
         fmpz_init(x);

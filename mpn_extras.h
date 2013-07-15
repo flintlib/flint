@@ -26,7 +26,7 @@
 #ifndef MPN_EXTRAS_H
 #define MPN_EXTRAS_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -53,7 +53,7 @@
         (bn) = __tn;           \
     } while (0)
 
-/* Not defined in mpir.h
+/* Not defined in gmp.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
 #define mpn_modexact_1_odd __gmpn_modexact_1_odd
@@ -75,7 +75,7 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 static __inline__
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 {
-    long i;
+    slong i;
     for (i = 0; i < xsize; i++)
     {
         if (x[i])
@@ -100,7 +100,7 @@ mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
 mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                      mp_ptr p, mp_size_t psize, ulong *exp);
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop);
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop);
 
 int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
@@ -182,7 +182,7 @@ do {                                                         \
 void
 flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
-                          long a, long b, long n, int d);
+                          slong a, slong b, slong n, int d);
 
 mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
@@ -207,6 +207,29 @@ void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_srcptr dinv, ulong norm);
+
+int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
+    mp_bitcnt_t b, mp_ptr tp);
+
+static __inline__
+void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+{
+  __mpz_struct str;
+  str._mp_d = rp;
+  str._mp_alloc = n;
+  str._mp_size =n;
+  mpz_rrandomb(&str,state,FLINT_BITS*n);
+}
+
+static __inline__
+void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_bitcnt_t n)
+{
+  __mpz_struct str;
+  str._mp_d = rp;
+  str._mp_alloc = (n + FLINT_BITS - 1)/FLINT_BITS;
+  str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
+  mpz_rrandomb(&str,state,n);
+}
 
 #ifdef __cplusplus
 }

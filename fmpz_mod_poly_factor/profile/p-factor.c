@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz_mod_poly_factor.h"
@@ -54,7 +54,7 @@ int main(void)
     int i, j, k, n, num;
     double t, T1, T2, T3;
 
-    const long degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
+    const slong degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
     const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
 
     flint_randinit(state);

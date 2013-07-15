@@ -23,18 +23,18 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
+void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, slong len, slong k)
 {
     flint_mpn_copyd(res + k, poly, len);
     flint_mpn_zero(res, k);
 }
 
-void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
+void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)
 {
     nmod_poly_fit_length(res, poly->length + k);
    

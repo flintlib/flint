@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -48,8 +48,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100);
-        long n = z_randtest(state);
+        slong len = n_randint(state, 100);
+        slong n = z_randtest(state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -75,7 +75,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len, n;
+        slong len, n;
         fmpz_t x;
 
         len = n_randint(state, 100);

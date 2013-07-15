@@ -26,16 +26,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
 _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
-                   long len, mp_bitcnt_t bits)
+                   slong len, mp_bitcnt_t bits)
 {
-    long i, sparseness;
+    slong i, sparseness;
 
     if (n_randint(state, 2))
     {
@@ -58,9 +58,9 @@ _fmpz_vec_randtest(fmpz * f, flint_rand_t state,
 
 void
 _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
-                            long len, mp_bitcnt_t bits)
+                            slong len, mp_bitcnt_t bits)
 {
-    long i, sparseness;
+    slong i, sparseness;
 
     if (n_randint(state, 2))
     {

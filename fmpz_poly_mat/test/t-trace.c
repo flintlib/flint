@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    long i;
+    slong i;
     flint_rand_t state;
 
     printf("trace....");
@@ -48,7 +48,7 @@ main(void)
     {
         fmpz_poly_mat_t A, B, AB, BA;
         fmpz_poly_t trab, trba;
-        long m, n;
+        slong m, n;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);

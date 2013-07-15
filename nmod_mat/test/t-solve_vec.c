@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
@@ -36,7 +36,7 @@ int
 main(void)
 {
     nmod_mat_t A, x, b, Ax;
-    long i, m, r;
+    slong i, m, r;
     int solved;
     mp_limb_t mod;
     flint_rand_t state;

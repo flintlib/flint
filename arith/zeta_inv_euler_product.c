@@ -23,19 +23,14 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
-#include <mpir.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
-
 
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {
     mpz_t z, x, y, r;
     mp_limb_t p;
-    long prec, powprec, yexp, shift;
+    slong prec, powprec, yexp, shift;
 
     mpz_init(x);
     mpz_init(y);
@@ -58,7 +53,7 @@ void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 
     while (1)
     {
-        long i;
+        slong i;
         powprec = prec - s*log(p)*1.4426950408889634 + 1;
 
         /* printf("prime %lu, powprec %ld\n", p, powprec); */

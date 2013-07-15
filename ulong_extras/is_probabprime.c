@@ -23,10 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
+/*
+    This function is used by n_is_prime up to 2^64 and *must* therefore
+    act as a primality proof up to that limit. 
+
+    Currently it acts as such all the way up to 2^64.
+*/
 int n_is_probabprime(mp_limb_t n)
 {
     mp_limb_t d;
@@ -57,8 +63,7 @@ int n_is_probabprime(mp_limb_t n)
         if (n < FLINT_ODDPRIME_SMALL_CUTOFF)
             return n_is_oddprime_small(n);
 
-        n_compute_primes(74000);
-        if (n < flint_primes_cutoff)
+        if (n < FLINT_PRIMES_TAB_DEFAULT_CUTOFF)
             return n_is_oddprime_binary(n);
       
         npre = n_precompute_inverse(n);

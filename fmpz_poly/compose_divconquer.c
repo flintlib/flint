@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -89,11 +89,11 @@
  */
 
 void
-_fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
-                                          const fmpz * poly2, long len2)
+_fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1, 
+                                          const fmpz * poly2, slong len2)
 {
-    long i, j, k, n;
-    long *hlen, alloc, powlen;
+    slong i, j, k, n;
+    slong *hlen, alloc, powlen;
     fmpz *v, **h, *pow, *temp;
 
     if (len1 <= 2 || len2 <= 1)
@@ -109,14 +109,14 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
 
     /* Initialisation */
     
-    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (slong *) flint_malloc(((len1 + 1) / 2) * sizeof(slong));
     
     k = FLINT_CLOG2(len1) - 1;
     
     hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
     {
-        long hi = (len1 + (1 << i) - 1) / (1 << i);
+        slong hi = (len1 + (1 << i) - 1) / (1 << i);
         for (n = (hi + 1) / 2; n < hi; n++)
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
@@ -170,7 +170,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     {
         if (hlen[1] > 0)
         {
-            long templen = powlen + hlen[1] - 1;
+            slong templen = powlen + hlen[1] - 1;
             _fmpz_poly_mul(temp, pow, powlen, h[1], hlen[1]);
             _fmpz_poly_add(h[0], temp, templen, h[0], hlen[0]);
             hlen[0] = FLINT_MAX(hlen[0], templen);
@@ -214,9 +214,9 @@ void
 fmpz_poly_compose_divconquer(fmpz_poly_t res, 
                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    long lenr;
+    const slong len1 = poly1->length;
+    const slong len2 = poly2->length;
+    slong lenr;
     
     if (len1 == 0)
     {

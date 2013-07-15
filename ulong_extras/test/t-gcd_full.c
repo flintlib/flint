@@ -23,10 +23,49 @@
 
 ******************************************************************************/
 
-#include <limits.h>
-#include <mpir.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 
+int main(void)
+{
+   int i, result;
+   flint_rand_t state;
+   
+   printf("gcd_full....");
+   fflush(stdout);
+   
+   flint_randinit(state);
 
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) 
+   {
+      mp_limb_t a, b, c, bits1, bits2, bits3;
+      
+      bits1 = n_randint(state, FLINT_BITS-1) + 1;
+      bits2 = n_randint(state, bits1) + 1;
+      bits3 = n_randint(state, FLINT_BITS - bits1) + 1;
+
+      do
+      {
+         a = n_randtest_bits(state, bits1);
+         b = n_randtest_bits(state, bits2);
+      } while ((n_gcd_full(a, b) != 1UL));
+
+      c = n_randtest_bits(state, bits3);
+
+      result = (n_gcd_full(a*c, b*c) == c);
+      if (!result)
+      {
+         printf("FAIL:\n");
+         printf("a = %lu, b = %lu, c = %lu\n", a, b, c); 
+         abort();
+      }
+   }
+
+   flint_randclear(state);
+
+   printf("PASS\n");
+   return 0;
+}

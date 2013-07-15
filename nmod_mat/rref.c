@@ -24,18 +24,18 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "perm.h"
 
-long
+slong
 nmod_mat_rref(nmod_mat_t A)
 {
-    long i, j, k, n, rank;
-    long * pivots;
-    long * nonpivots;
-    long * P;
+    slong i, j, k, n, rank;
+    slong * pivots;
+    slong * nonpivots;
+    slong * P;
 
     nmod_mat_t U, V;
 
@@ -63,8 +63,8 @@ nmod_mat_rref(nmod_mat_t A)
     nmod_mat_init(U, rank, rank, A->mod.n);
     nmod_mat_init(V, rank, n - rank, A->mod.n);
 
-    pivots = flint_malloc(sizeof(long) * rank);
-    nonpivots = flint_malloc(sizeof(long) * (n - rank));
+    pivots = flint_malloc(sizeof(slong) * rank);
+    nonpivots = flint_malloc(sizeof(slong) * (n - rank));
 
     for (i = j = k = 0; i < rank; i++)
     {

@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdio.h>
 #include "flint.h"
 #include "fmpz_mod_poly.h"
@@ -32,9 +32,9 @@
 
 int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly)
 {
-    long i, length;
+    slong i, length;
     fmpz_t coeff;
-    unsigned long res;
+    ulong res;
 
     fmpz_init(coeff);
     if (fscanf(f, "%ld", &length) != 1) {

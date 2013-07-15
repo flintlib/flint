@@ -27,7 +27,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -46,7 +46,7 @@ main(void)
 
     for (i = 0; i < 100000; i++)
     {
-        long a;
+        slong a;
         mpz_t b;
         int base;
         size_t r1, r2;

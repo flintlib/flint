@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
@@ -46,9 +46,9 @@ main(void)
     {
         nmod_poly_mat_t a;
         mp_limb_t mod;
-        long j, k;
-        long rows = n_randint(state, 100);
-        long cols = n_randint(state, 100);
+        slong j, k;
+        slong rows = n_randint(state, 100);
+        slong cols = n_randint(state, 100);
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_mat_init(a, rows, cols, mod);

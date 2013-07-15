@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "nmod_poly.h"
 
 void
-_fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long len)
+_fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
 {
     fmpz d[2];
 

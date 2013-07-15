@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 void
-fmpz_mul_si(fmpz_t f, const fmpz_t g, long x)
+fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 {
     fmpz c2 = *g;
 
@@ -46,20 +46,10 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, long x)
 
         /* unsigned limb by limb multiply (assembly for most CPU's) */
         umul_ppmm(prod[1], prod[0], uc2, ux);
-        if (!prod[1])           /* result fits in one limb */
-        {
-            fmpz_set_ui(f, prod[0]);
-            if ((c2 ^ x) < 0L)
-                fmpz_neg(f, f);
-        }
-        else                    /* result takes two limbs */
-        {
-            __mpz_struct *mpz_ptr = _fmpz_promote(f);
-            /* two limbs, least significant first, native endian, no nails, stored in prod */
-            mpz_import(mpz_ptr, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
-            if ((c2 ^ x) < 0L)
-                mpz_neg(mpz_ptr, mpz_ptr);
-        }
+        if ((c2 ^ x) < 0L)
+            fmpz_neg_uiui(f, prod[1], prod[0]);
+        else
+            fmpz_set_uiui(f, prod[1], prod[0]);
     }
     else                        /* c2 is large */
     {

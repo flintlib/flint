@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long i;
+    slong i;
     flint_rand_t state;
 
     printf("trace....");
@@ -46,7 +46,7 @@ main(void)
     {
         nmod_mat_t A, B, AB, BA;
         mp_limb_t mod, trab, trba;
-        long m, n;
+        slong m, n;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 10);

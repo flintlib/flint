@@ -23,15 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
-#include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
+#include "fmpz_factor.h"
 
 #define FLINT_NUM_TINY_DIVISORS FLINT_BITS
 
@@ -63,11 +56,11 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 
 
 void
-_arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
+_arith_divisors(fmpz *res, slong size, fmpz_factor_t factors)
 {
-    long i;
-    long *exp = flint_malloc(sizeof(long) * factors->num);
-    long *exp_max = flint_malloc(sizeof(long) * factors->num);
+    slong i;
+    slong *exp = flint_malloc(sizeof(slong) * factors->num);
+    slong *exp_max = flint_malloc(sizeof(slong) * factors->num);
     fmpz *powers = _fmpz_vec_init(factors->num);
     fmpz_t d;
 
@@ -75,7 +68,7 @@ _arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
     {
         exp[i] = 0;
         fmpz_set(powers + i, factors->p + i);
-        exp_max[i] = fmpz_get_ui(factors->exp + i);
+        exp_max[i] = factors->exp[i];
         fmpz_pow_ui(powers + i, powers + i, exp_max[i]);
     }
 
@@ -118,10 +111,10 @@ _arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
 
 
 void
-_arith_divisors_tiny(fmpz_poly_t res, long n)
+_arith_divisors_tiny(fmpz_poly_t res, slong n)
 {
-    long size;
-    long i, k;
+    slong size;
+    slong i, k;
 
     size = FLINT_TINY_DIVISORS_SIZE[n];
 
@@ -142,7 +135,7 @@ _arith_divisors_tiny(fmpz_poly_t res, long n)
 void
 arith_divisors(fmpz_poly_t res, const fmpz_t n)
 {
-    long i, size, m;
+    slong i, size, m;
     fmpz_factor_t factors;
 
     if (!COEFF_IS_MPZ(*n))
@@ -161,7 +154,7 @@ arith_divisors(fmpz_poly_t res, const fmpz_t n)
     /* TODO: check for overflow for huge n */
     size = 1;
     for (i = 0; i < factors->num; i++)
-        size *= fmpz_get_ui(factors->exp + i) + 1;
+        size *= factors->exp[i] + 1;
 
     fmpz_poly_fit_length(res, size);
     _arith_divisors(res->coeffs, size, factors);

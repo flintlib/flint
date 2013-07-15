@@ -23,7 +23,7 @@
  
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "padic.h"
@@ -41,7 +41,7 @@
 
     Under the additional condition that $N < 2^{f-2}$ one can 
     show that the code branch for primes that fit into a 
-    \code{signed long} does not cause overflow.  Moreover, 
+    \code{slong} does not cause overflow.  Moreover, 
     independently of this, it follows that the above value $b$ 
     is less than $2^{f-1}$.
 
@@ -58,7 +58,7 @@
     Then $ord_p(x^i/i) \geq N$ provided that $i v \geq N$.
  */
 
-long _padic_log_bound(long v, long N, const fmpz_t prime)
+slong _padic_log_bound(slong v, slong N, const fmpz_t prime)
 {
     if (N >= (1L << (FLINT_BITS - 2)))
     {
@@ -68,14 +68,14 @@ long _padic_log_bound(long v, long N, const fmpz_t prime)
 
     if (fmpz_fits_si(prime))
     {
-        long b, c, p = fmpz_get_si(prime);
+        slong b, c, p = fmpz_get_si(prime);
 
         c = N - n_flog(v, p);
         b = ((c + n_clog(c, p) + 1) + (v - 1)) / v;
 
         while (--b >= 2)
         {
-            long t = b * v - n_clog(b, p);
+            slong t = b * v - n_clog(b, p);
 
             if (t < N)
                 return b + 1;
@@ -89,9 +89,9 @@ long _padic_log_bound(long v, long N, const fmpz_t prime)
     }
 }
 
-void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+void _padic_log(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 {
-    if (N < (1L << 9) / (long) fmpz_bits(p))
+    if (N < (1L << 9) / (slong) fmpz_bits(p))
     {
         _padic_log_rectangular(z, y, v, p, N);
     }
@@ -104,7 +104,7 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     const fmpz *p = ctx->p;
-    const long N  = padic_prec(rop);
+    const slong N  = padic_prec(rop);
 
     if (padic_val(op) < 0)
     {
@@ -129,7 +129,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         else
         {
             fmpz_t t;
-            long v;
+            slong v;
 
             fmpz_init(t);
             v = fmpz_remove(t, x, p);

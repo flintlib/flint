@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -79,7 +79,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
-        long b, c;
+        slong b, c;
 
         b = z_randtest(state);
 

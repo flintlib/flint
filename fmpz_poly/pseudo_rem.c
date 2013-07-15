@@ -24,14 +24,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, long lenA, 
-                                                const fmpz * B, long lenB)
+void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, 
+                                                const fmpz * B, slong lenB)
 {
     fmpz * Q = _fmpz_vec_init(lenA + lenB - 1);
     _fmpz_poly_pseudo_divrem(Q, R, d, A, lenA, B, lenB);
@@ -41,7 +41,7 @@ void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, long lenA,
 void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, 
                                                     const fmpz_poly_t B)
 {
-    long lenr;
+    slong lenr;
     fmpz * r;
 
     if (B->length == 0)

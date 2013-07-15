@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
 
 /* Enable to exercise corner cases */
 #define DEBUG_USE_SMALL_PRIMES 0
@@ -57,7 +51,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     fmpz_t bound, prod, stable_prod, x, xnew;
     mp_limb_t p, xmod;
     nmod_mat_t Amod;
-    long n = A->r;
+    slong n = A->r;
 
     if (n == 0)
     {

@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -43,7 +43,7 @@ fmpz_set_d(fmpz_t f, double c)
     {
         _fmpz_demote(f);
         /* guaranteed to fit, since c gets truncated */
-        *f = (long) c;
+        *f = (slong) c;
     }
     else
     {

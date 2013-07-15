@@ -27,14 +27,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
 char * fmpq_poly_get_str(const fmpq_poly_t poly)
 {
-    long i;
+    slong i;
     size_t j;
     size_t len;     /* Upper bound on the length          */
     size_t denlen;  /* Size of the denominator in base 10 */

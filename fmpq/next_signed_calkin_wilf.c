@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void
 _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
@@ -49,5 +44,6 @@ _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
 void
 fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
 {
-    _fmpq_next_signed_calkin_wilf(&res->num, &res->den, &x->num, &x->den);
+    _fmpq_next_signed_calkin_wilf(fmpq_numref(res), fmpq_denref(res),
+        fmpq_numref(x), fmpq_denref(x));
 }

@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 #define ROT(u,v,t)   \
     do { fmpz _t = *u; *u = *v; *v = *t; *t = _t; } while (0);

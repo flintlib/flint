@@ -24,20 +24,20 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
-    long k, low, rlen;
+    slong k, low, rlen;
     fmpz_t d, t;
     fmpz * P;
     
-    rlen = (long) e * (len - 1L) + 1L;
+    rlen = (slong) e * (len - 1L) + 1L;
     _fmpz_vec_zero(res, rlen);
     
     for (low = 0L; poly[low] == 0L; low++) ;
@@ -49,8 +49,8 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e)
     {
         P = (fmpz *) poly + low;
         len  -= low;
-        res  += (long) e * low;
-        rlen -= (long) e * low;
+        res  += (slong) e * low;
+        rlen -= (slong) e * low;
     }
     
     fmpz_init(d);
@@ -60,11 +60,11 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e)
     
     for (k = 1; k < rlen; k++)
     {
-        long i, u = -k;
+        slong i, u = -k;
         for (i = 1; i <= FLINT_MIN(k, len - 1); i++)
         {
             fmpz_mul(t, P + i, res + (k - i));
-            u += (long) e + 1;
+            u += (slong) e + 1;
             if (u >= 0)
                 fmpz_addmul_ui(res + k, t, (ulong) u);
             else
@@ -81,8 +81,8 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e)
 void
 fmpz_poly_pow_multinomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const long len = poly->length;
-    long rlen;
+    const slong len = poly->length;
+    slong rlen;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -103,7 +103,7 @@ fmpz_poly_pow_multinomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         return;
     }
     
-    rlen = (long) e * (len - 1) + 1;
+    rlen = (slong) e * (len - 1) + 1;
 
     if (res != poly)
     {

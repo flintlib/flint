@@ -29,7 +29,7 @@
 
 *******************************************************************************
 
-size_t z_sizeinbase(long n, int b)
+size_t z_sizeinbase(slong n, int b)
 
     Returns the number of digits in the base $b$ representation 
     of the absolute value of the integer $n$.

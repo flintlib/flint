@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -38,7 +38,7 @@ int main()
 {
     fmpz * r;
     fmpz_t s, t;
-    long k, n;
+    slong k, n;
 
     printf("euler_number_vec....");
     fflush(stdout);

@@ -23,15 +23,12 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void
 fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat)
 {
-    long i, n = fmpq_mat_nrows(mat);
+    slong i, n = fmpq_mat_nrows(mat);
 
     if (n == 0)
         fmpq_zero(trace);

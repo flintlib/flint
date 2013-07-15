@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
@@ -45,7 +45,7 @@ main(void)
     {
         fmpq_mat_t A, B, C;
 
-        long m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
@@ -85,7 +85,7 @@ main(void)
     {
         fmpq_mat_t A, B, C;
 
-        long m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
@@ -125,7 +125,7 @@ main(void)
     {
         fmpq_mat_t A, B, C, D;
 
-        long m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
@@ -165,8 +165,8 @@ main(void)
     }
 
     flint_randclear(state);
-
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return EXIT_SUCCESS;
 }

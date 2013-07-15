@@ -25,14 +25,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
-                                  mp_srcptr B, long lenB, nmod_t mod)
+_nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, 
+                                  mp_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenB < 15)
     {
@@ -52,7 +52,7 @@ nmod_poly_div(nmod_poly_t Q,
 {
     nmod_poly_t tQ;
     mp_ptr q;
-    long A_len, B_len;
+    slong A_len, B_len;
 
     B_len = B->length;
     

@@ -25,14 +25,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
 int main(void)
 {
     flint_rand_t state;
-    long n;
+    slong n;
 
     printf("primes....");
     fflush(stdout);
@@ -43,7 +43,7 @@ int main(void)
     /* compare with n_nextprime */
     {
         n_primes_t iter;
-        long i;
+        slong i;
         mp_limb_t p, q;
 
         n_primes_init(iter);

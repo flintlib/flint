@@ -23,18 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void
 fmpq_mat_get_fmpz_mat_entrywise(fmpz_mat_t num, fmpz_mat_t den,
                                             const fmpq_mat_t mat)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {

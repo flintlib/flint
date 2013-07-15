@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, long x)
+fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
 {
-    long i;
+    slong i;
 
     /* Either scalar or input poly is zero */
     if ((x == 0L) || (poly2->length == 0))

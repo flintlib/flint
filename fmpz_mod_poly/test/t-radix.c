@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
@@ -35,11 +35,11 @@
 static int _check(fmpz_mod_poly_struct **B, 
                   const fmpz_mod_poly_t F, const fmpz_mod_poly_t R)
 {
-    const long lenF = F->length;
-    const long lenR = R->length;
-    const long N = (lenF - 1) / (lenR - 1);
+    const slong lenF = F->length;
+    const slong lenR = R->length;
+    const slong N = (lenF - 1) / (lenR - 1);
 
-    long i;
+    slong i;
     int result;
 
     fmpz_mod_poly_t S;
@@ -72,7 +72,7 @@ int main(void)
         fmpz_mod_poly_t f, r;
         fmpz_mod_poly_struct **b;
         fmpz_mod_poly_radix_t D;
-        long j, N;
+        slong j, N;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);

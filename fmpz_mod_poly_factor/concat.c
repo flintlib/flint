@@ -27,7 +27,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
@@ -36,7 +36,7 @@ void
 fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
                             const fmpz_mod_poly_factor_t fac)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
         fmpz_mod_poly_factor_insert(res, fac->poly + i, fac->exp[i]);

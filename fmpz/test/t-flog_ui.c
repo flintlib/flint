@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, x, y;
-        long k;
+        slong k;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
-        long k, l;
+        slong k, l;
 
         fmpz_init(a);
         fmpz_init(b);

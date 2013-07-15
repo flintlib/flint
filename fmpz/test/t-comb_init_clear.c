@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -34,9 +34,9 @@
 
 int main()
 {
-    long i, j;
+    slong i, j;
     mp_limb_t n;
-    long num_primes;
+    slong num_primes;
     mp_limb_t * primes;
     mp_limb_t p;
     fmpz_comb_t comb;

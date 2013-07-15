@@ -23,14 +23,10 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
-                  const fmpz_t opnum, const fmpz_t opden, long e)
+                  const fmpz_t opnum, const fmpz_t opden, slong e)
 {
     if (e >= 0)
     {
@@ -64,7 +60,7 @@ void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden,
     }
 }
 
-void fmpq_pow_si(fmpq_t rop, const fmpq_t op, long e)
+void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e)
 {
     _fmpq_pow_si(fmpq_numref(rop), fmpq_denref(rop), 
                  fmpq_numref(op), fmpq_denref(op), e);

@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
+nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
 {
     nmod_poly_fit_length(poly, len);
     _nmod_vec_randtest(poly->coeffs, state, len, poly->mod);
@@ -39,7 +39,7 @@ nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 }
 
 void
-nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
+nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 {
     do {
         nmod_poly_randtest(poly, state, len);

@@ -24,14 +24,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
 void
-nmod_poly_fit_length(nmod_poly_t poly, long alloc)
+nmod_poly_fit_length(nmod_poly_t poly, slong alloc)
 {
     if (alloc > poly->alloc)
     {

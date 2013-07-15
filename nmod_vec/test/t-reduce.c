@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "ulong_extras.h"
@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        long j, len = n_randint(state, 100) + 1;
+        slong j, len = n_randint(state, 100) + 1;
         mp_ptr vec = _nmod_vec_init(len);
         mp_ptr vec2 = _nmod_vec_init(len);
 

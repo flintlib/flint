@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -33,7 +33,7 @@
 
 
 void
-_nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+_nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 {
     mp_ptr t = _nmod_vec_init(n);
     _nmod_poly_invsqrt_series(t, h, n, mod);
@@ -42,12 +42,11 @@ _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 }
 
 void
-nmod_poly_sqrt_series(nmod_poly_t g, 
-                                 const nmod_poly_t h, long n)
+nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
     mp_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
-    long hlen;
+    slong hlen;
     
     hlen = h->length;
 

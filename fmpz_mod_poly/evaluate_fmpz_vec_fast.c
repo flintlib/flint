@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -33,10 +33,10 @@
 
 void
 _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
-    long plen, fmpz_poly_struct ** tree, long len, const fmpz_t mod)
+    slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_t mod)
 {
-    long height, i, j, pow, left;
-    long tree_height;
+    slong height, i, j, pow, left;
+    slong tree_height;
     fmpz_t temp, inv;
     fmpz * t, * u, * pb, * pc, * swap;
     fmpz_poly_struct * pa;
@@ -131,8 +131,8 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
     _fmpz_vec_clear(u, 2*len);
 }
 
-void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, long plen,
-    const fmpz * xs, long n, const fmpz_t mod)
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, slong plen,
+    const fmpz * xs, slong n, const fmpz_t mod)
 {
     fmpz_poly_struct ** tree;
 
@@ -144,7 +144,7 @@ void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, long pl
 
 void
 fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
-        const fmpz_mod_poly_t poly, const fmpz * xs, long n)
+        const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec_fast(ys, poly->coeffs,
                                         poly->length, xs, n, &(poly->p));

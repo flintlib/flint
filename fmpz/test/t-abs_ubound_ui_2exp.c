@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long iter;
+    slong iter;
     int result;
     flint_rand_t state;
 
@@ -45,8 +45,8 @@ main(void)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_t x, y;
-        long bits, yexp;
-        long exp;
+        slong bits, yexp;
+        slong exp;
         mp_limb_t man;
 
         fmpz_init(x);

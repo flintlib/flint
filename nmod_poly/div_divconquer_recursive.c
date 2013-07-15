@@ -25,14 +25,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
 _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
-                          mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+                          mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenB <= NMOD_DIV_DIVCONQUER_CUTOFF)
     {
@@ -40,8 +40,8 @@ _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
     }
     else
     {
-        const long n2 = lenB / 2;
-        const long n1 = lenB - n2;
+        const slong n2 = lenB / 2;
+        const slong n1 = lenB - n2;
 
         mp_ptr W1 = W;
         mp_ptr W2 = W + n2;

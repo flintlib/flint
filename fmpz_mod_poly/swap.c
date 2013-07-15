@@ -24,7 +24,7 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
@@ -33,7 +33,7 @@ void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1, fmpz_mod_poly_t poly2)
 {
     if (poly1 != poly2)
     {
-        long t;
+        slong t;
         fmpz *c;
 
         t             = poly1->length;

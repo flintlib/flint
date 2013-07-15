@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -31,7 +31,7 @@
 void
 _fmpz_poly_normalise(fmpz_poly_t poly)
 {
-    long i;
+    slong i;
     for (i = poly->length - 1; (i >= 0) && !poly->coeffs[i]; i--) ;
     poly->length = i + 1;
 }

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "long_extras.h"
@@ -45,8 +45,8 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a;
-        long coeff, len;
-        long n1, n2;
+        slong coeff, len;
+        slong n1, n2;
 
         fmpz_poly_init(a);
         len = n_randint(state, 100) + 1;

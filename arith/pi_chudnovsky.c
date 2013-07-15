@@ -32,7 +32,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "arith.h"
 
@@ -49,27 +49,27 @@
 #define max(x,y) ((x)>(y)?(x):(y))
 
 typedef struct {
-    unsigned long max_facs;
-    unsigned long num_facs;
-    unsigned long *fac;
-    unsigned long *pow;
+    ulong max_facs;
+    ulong num_facs;
+    ulong *fac;
+    ulong *pow;
 } fac_t[1];
 
 typedef struct {
-    long int fac;
-    long int pow;
-    long int nxt;
+    slong fac;
+    slong pow;
+    slong nxt;
 } sieve_t;
 
 typedef struct 
 {
     sieve_t *sieve;
-    long int sieve_size;
+    slong sieve_size;
     fac_t ftmp, fmul;
     mpz_t gcd;
     mpz_t *pstack, *qstack, *gstack;
     fac_t *fpstack, *fgstack;
-    long int top;
+    slong top;
 }
 pi_state_struct;
 
@@ -91,9 +91,9 @@ typedef pi_state_struct pi_state[1];
 
 /* r = sqrt(x) */
 void
-my_sqrt_ui(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, unsigned long x)
+my_sqrt_ui(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, ulong x)
 {
-    unsigned long prec, bits, prec0;
+    ulong prec, bits, prec0;
 
     prec0 = mpf_get_prec(r);
 
@@ -152,7 +152,7 @@ my_sqrt_ui(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, unsigned long x)
 void
 my_div(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, mpf_t y, mpf_t x)
 {
-    unsigned long prec, bits, prec0;
+    ulong prec, bits, prec0;
 
     prec0 = mpf_get_prec(r);
 
@@ -215,12 +215,12 @@ fac_reset(fac_t f)
 }
 
 static __inline__ void
-fac_init_size(fac_t f, long int s)
+fac_init_size(fac_t f, slong s)
 {
     if (s < INIT_FACS)
         s = INIT_FACS;
 
-    f[0].fac  = flint_malloc(s*sizeof(unsigned long)*2);
+    f[0].fac  = flint_malloc(s*sizeof(ulong)*2);
     f[0].pow  = f[0].fac + s;
     f[0].max_facs = s;
 
@@ -240,7 +240,7 @@ fac_clear(fac_t f)
 }
 
 static __inline__ void
-fac_resize(fac_t f, long int s)
+fac_resize(fac_t f, slong s)
 {
     if (f[0].max_facs < s)
     {
@@ -251,9 +251,9 @@ fac_resize(fac_t f, long int s)
 
 /* f = base^pow */
 static __inline__ void
-fac_set_bp(pi_state state, fac_t f, unsigned long base, long int pow)
+fac_set_bp(pi_state state, fac_t f, ulong base, slong pow)
 {
-    long int i;
+    slong i;
     assert(base<state->sieve_size);
     for (i=0, base/=2; base>0; i++, base = state->sieve[base].nxt)
     {
@@ -268,7 +268,7 @@ fac_set_bp(pi_state state, fac_t f, unsigned long base, long int pow)
 static __inline__ void
 fac_mul2(pi_state state, fac_t r, fac_t f, fac_t g)
 {
-    long int i, j, k;
+    slong i, j, k;
 
     for (i=j=k=0; i<f[0].num_facs && j<g[0].num_facs; k++)
     {
@@ -322,7 +322,7 @@ fac_mul(pi_state state, fac_t f, fac_t g)
 
 /* f *= base^pow */
 static __inline__ void
-fac_mul_bp(pi_state state, fac_t f, unsigned long base, unsigned long pow)
+fac_mul_bp(pi_state state, fac_t f, ulong base, ulong pow)
 {
     fac_set_bp(state, state->ftmp, base, pow);
     fac_mul(state, f, state->ftmp);
@@ -332,7 +332,7 @@ fac_mul_bp(pi_state state, fac_t f, unsigned long base, unsigned long pow)
 static __inline__ void
 fac_compact(fac_t f)
 {
-    long int i, j;
+    slong i, j;
     for (i=0, j=0; i<f[0].num_facs; i++)
     {
         if (f[0].pow[i]>0)
@@ -350,9 +350,9 @@ fac_compact(fac_t f)
 
 /* convert factorized form to number */
 void
-bs_mul(pi_state state, mpz_t r, long int a, long int b)
+bs_mul(pi_state state, mpz_t r, slong a, slong b)
 {
-    long int i, j;
+    slong i, j;
     if (b-a<=32)
     {
         mpz_set_ui(r, 1);
@@ -376,7 +376,7 @@ bs_mul(pi_state state, mpz_t r, long int a, long int b)
 void
 fac_remove_gcd(pi_state state, mpz_t p, fac_t fp, mpz_t g, fac_t fg)
 {
-    long int i, j, k, c;
+    slong i, j, k, c;
 
     fac_resize(state->fmul, min(fp->num_facs, fg->num_facs));
 
@@ -424,10 +424,10 @@ fac_remove_gcd(pi_state state, mpz_t p, fac_t fp, mpz_t g, fac_t fg)
 
 /* binary splitting */
 void
-bs(pi_state state, unsigned long a, unsigned long b,
-    unsigned gflag, long int level)
+bs(pi_state state, ulong a, ulong b,
+    unsigned gflag, slong level)
 {
-    unsigned long i, mid;
+    ulong i, mid;
 
     if (b - a == 1)
     {
@@ -498,12 +498,12 @@ bs(pi_state state, unsigned long a, unsigned long b,
 }
 
 void
-build_sieve(pi_state state, long int n, sieve_t *s)
+build_sieve(pi_state state, slong n, sieve_t *s)
 {
-    long int m, i, j, k;
+    slong m, i, j, k;
 
     state->sieve_size = n;
-    m = (long int)sqrt(n);
+    m = (slong)sqrt(n);
     memset(s, 0, sizeof(sieve_t)*n/2);
 
     s[1/2].fac = 1;
@@ -544,7 +544,7 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
 {
     mpf_t  pi, qi, t1, t2;
     mpfr_prec_t prec;
-    long int i, depth=1, terms;
+    slong i, depth=1, terms;
     pi_state state;
 
     prec = mpfr_get_prec(res) + 64;

@@ -24,14 +24,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
 void _nmod_poly_rem_q1(mp_ptr R, 
-                       mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                       mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
                        nmod_t mod)
 {
     const mp_limb_t invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);

@@ -23,7 +23,7 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -31,7 +31,7 @@
 int
 fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    long i;
+    slong i;
 
     if (poly1 == poly2)
         return 1;               /* same polynomial */

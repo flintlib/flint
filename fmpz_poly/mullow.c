@@ -25,15 +25,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1, 
-                                const fmpz * poly2, long len2, long n)
+_fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1, 
+                                const fmpz * poly2, slong len2, slong n)
 {
     mp_size_t limbs1, limbs2;
 
@@ -93,10 +93,10 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1,
 void
 fmpz_poly_mullow(fmpz_poly_t res,
                    const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                   long n)
+                   slong n)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const slong len1 = poly1->length;
+    const slong len2 = poly2->length;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {

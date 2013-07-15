@@ -29,9 +29,9 @@
 
 #undef ulong /* interferes with system includes */
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "nmod_mat.h"
@@ -44,8 +44,8 @@
 typedef struct
 {
     fmpz * entries;
-    long r;
-    long c;
+    slong r;
+    slong c;
     fmpz ** rows;
 } fmpz_mat_struct;
 
@@ -57,7 +57,7 @@ typedef fmpz_mat_struct fmpz_mat_t[1];
 #define fmpz_mat_nrows(mat) ((mat)->r)
 #define fmpz_mat_ncols(mat) ((mat)->c)
 
-void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
+void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
 void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
 void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
@@ -118,14 +118,14 @@ void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits,
 void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
 void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
 void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha);
-void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank, mp_bitcnt_t bits);
+void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, mp_bitcnt_t bits);
 void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det);
-void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count);
-int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, long n);
+void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count);
+int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, slong n);
 
 /* Norms */
 
-long fmpz_mat_max_bits(const fmpz_mat_t mat);
+slong fmpz_mat_max_bits(const fmpz_mat_t mat);
 
 /* Transpose */
 
@@ -139,22 +139,22 @@ void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A);
 
 /* Scalar operations */
 void fmpz_mat_scalar_mul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_mul_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_mul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_mul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_addmul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_submul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_submul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_addmul_nmod_mat_fmpz(fmpz_mat_t B, const nmod_mat_t A, const fmpz_t c);
 void fmpz_mat_scalar_addmul_nmod_mat_ui(fmpz_mat_t B, const nmod_mat_t A, ulong c);
 
 void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);
@@ -170,7 +170,7 @@ void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B, long bits);
+    const fmpz_mat_t B, mp_bitcnt_t bits);
 
 void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
@@ -182,12 +182,12 @@ void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 /* Permutations */
 
 static __inline__ void
-fmpz_mat_swap_rows(fmpz_mat_t mat, long * perm, long r, long s)
+fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
         fmpz * u;
-        long t;
+        slong t;
 
         if (perm)
         {
@@ -204,18 +204,18 @@ fmpz_mat_swap_rows(fmpz_mat_t mat, long * perm, long r, long s)
 
 /* Gaussian elimination *****************************************************/
 
-long fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
-                                    long start_row, long end_row, long c);
+slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
+                                    slong start_row, slong end_row, slong c);
 
-long fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
+slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check);
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 
 /* Modular gaussian elimination *********************************************/
 
-long
-fmpz_mat_rref_mod(long * perm, fmpz_mat_t A, const fmpz_t p);
+slong
+fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
 
 /* Trace ********************************************************************/
 
@@ -250,7 +250,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat);
 
 /* Rank *********************************************************************/
 
-long fmpz_mat_rank(const fmpz_mat_t A);
+slong fmpz_mat_rank(const fmpz_mat_t A);
 
 /* Nonsingular solving ******************************************************/
 
@@ -266,7 +266,7 @@ int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
 int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
         const fmpz_mat_t A, const fmpz_mat_t B);
 
-void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const long * perm,
+void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm,
         const fmpz_mat_t FFLU, const fmpz_mat_t B);
 
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
@@ -274,7 +274,7 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
 /* Nullspace ****************************************************************/
 
-long fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
+slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
 
 /* Inverse ******************************************************************/
 
@@ -292,19 +292,19 @@ void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
 void
-fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres, 
+fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
     const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
 void
-fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres, const fmpz_mat_t mat);
+fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
 
 void
 fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
-    nmod_mat_t * const residues, long nres,
+    nmod_mat_t * const residues, slong nres,
     fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
-    long nres, int sign);
+    slong nres, int sign);
 
 #ifdef __cplusplus
 }

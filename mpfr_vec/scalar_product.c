@@ -24,16 +24,16 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_vec.h"
 
 void
 _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1,
-                         __mpfr_struct * vec2, long length)
+                         __mpfr_struct * vec2, slong length)
 {
-    long i;
+    slong i;
     mpfr_t tmp;
     mpfr_init(tmp);
 

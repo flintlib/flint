@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpq_poly.h"
 #include "ulong_extras.h"
@@ -50,10 +50,10 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
-        long coeff, len;
+        slong coeff, len;
 
         fmpq_poly_init(a);
-        len = (long) (n_randint(state, 100) + 1);
+        len = (slong) (n_randint(state, 100) + 1);
         fmpq_poly_randtest(a, state, len, 100);
 
         for (j = 0; j < 1000; j++)

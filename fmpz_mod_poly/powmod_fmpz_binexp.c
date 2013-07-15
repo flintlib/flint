@@ -27,7 +27,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
@@ -35,12 +35,12 @@
 void
 _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
                                   const fmpz_t e, const fmpz * f,
-                                  long lenf, const fmpz_t p)
+                                  slong lenf, const fmpz_t p)
 {
     fmpz * T, * Q;
     fmpz_t invf;
-    long lenT, lenQ;
-    long i;
+    slong lenT, lenQ;
+    slong i;
 
     if (lenf == 2)
     {
@@ -82,9 +82,9 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
                            const fmpz_mod_poly_t f)
 {
     fmpz * q;
-    long len = poly->length;
-    long lenf = f->length;
-    long trunc = lenf - 1;
+    slong len = poly->length;
+    slong lenf = f->length;
+    slong trunc = lenf - 1;
     int qcopy = 0;
 
     if (lenf == 0)

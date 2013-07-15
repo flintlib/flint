@@ -30,12 +30,12 @@
 #define E(j,k) nmod_poly_mat_entry(B,j,k)
 
 static __inline__ void
-nmod_poly_mat_swap_rows(nmod_poly_mat_t mat, long * perm, long r, long s)
+nmod_poly_mat_swap_rows(nmod_poly_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
         nmod_poly_struct * u;
-        long t;
+        slong t;
 
         if (perm)
         {
@@ -50,12 +50,12 @@ nmod_poly_mat_swap_rows(nmod_poly_mat_t mat, long * perm, long r, long s)
     }
 }
 
-long
-nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
+slong
+nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
     const nmod_poly_mat_t A, int rank_check)
 {
     nmod_poly_t t;
-    long m, n, j, k, rank, r, pivot_row, pivot_col;
+    slong m, n, j, k, rank, r, pivot_row, pivot_col;
 
     if (nmod_poly_mat_is_empty(A))
     {

@@ -23,17 +23,17 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
+_fmpz_poly_reverse(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     if (res == poly)
     {
-        long i;
+        slong i;
 
         for (i = 0; i < n / 2; i++)
         {
@@ -47,7 +47,7 @@ _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
     }
     else
     {
-        long i;
+        slong i;
 
         for (i = 0; i < n - len; i++)
             fmpz_zero(res + i);
@@ -58,9 +58,9 @@ _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 }
 
 void
-fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 {
-    long len = FLINT_MIN(n, poly->length);
+    slong len = FLINT_MIN(n, poly->length);
     if (len == 0)
     {
         fmpz_poly_zero(res);

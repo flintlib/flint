@@ -23,19 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
-    nmod_mat_t * const residues, long nres,
+    nmod_mat_t * const residues, slong nres,
     fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 {
-    long i, j, k;
+    slong i, j, k;
     mp_ptr r;
 
     r = _nmod_vec_init(nres);
@@ -55,12 +50,12 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 
 void
 fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
-    long nres, int sign)
+    slong nres, int sign)
 {
     fmpz_comb_t comb;
     fmpz_comb_temp_t temp;
     mp_ptr primes;
-    long i;
+    slong i;
 
     primes = _nmod_vec_init(nres);
     for (i = 0; i < nres; i++)

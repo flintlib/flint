@@ -24,13 +24,13 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 fmpz *
-_fmpz_vec_init(long len)
+_fmpz_vec_init(slong len)
 {
     return (fmpz *) flint_calloc(len, sizeof(fmpz));
 }

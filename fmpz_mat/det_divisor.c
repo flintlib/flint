@@ -23,23 +23,15 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void
 fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 {
     fmpz_mat_t X, B;
     fmpz_t t, u, v, mod;
-    long i, n;
+    slong i, n;
     int success;
 
     n = A->r;

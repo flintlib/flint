@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
@@ -35,9 +35,9 @@ int main(void)
 {
     fmpz * b1;
     fmpz * b2;
-    long n;
+    slong n;
 
-    const long maxn = 1000;
+    const slong maxn = 1000;
 
     printf("bell_number_vec....");
     fflush(stdout);

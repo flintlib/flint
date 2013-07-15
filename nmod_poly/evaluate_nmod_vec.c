@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
-    mp_srcptr xs, long n, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, slong len,
+    mp_srcptr xs, slong n, nmod_t mod)
 {
     if (len < 32)
         _nmod_poly_evaluate_nmod_vec_iter(ys, coeffs, len, xs, n, mod);
@@ -40,7 +40,7 @@ _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
 
 void
 nmod_poly_evaluate_nmod_vec(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, long n)
+        const nmod_poly_t poly, mp_srcptr xs, slong n)
 {
     _nmod_poly_evaluate_nmod_vec(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);

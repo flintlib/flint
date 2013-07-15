@@ -32,16 +32,16 @@
 
 static __inline__ void
 fmpz_poly_addlow(fmpz_poly_t c, const fmpz_poly_t a,
-    const fmpz_poly_t b, long len)
+    const fmpz_poly_t b, slong len)
 {
     fmpz_poly_add(c, a, b);
     fmpz_poly_truncate(c, len);
 }
 
 void
-fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, long len)
+fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, slong len)
 {
-    long n = A->r;
+    slong n = A->r;
 
     if (n == 0)
         return;

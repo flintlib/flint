@@ -23,17 +23,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, 
                               const fmpq_mat_t op, const fmpz_t x)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < op->r; i++)
         for (j = 0; j < op->c; j++)

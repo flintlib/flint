@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -33,13 +33,12 @@ int main(void)
 {
    int i, result;
    flint_rand_t state;
+   slong cutoff = 100000;
    
    printf("is_oddprime_binary....");
    fflush(stdout);
    
    flint_randinit(state);
-
-   n_compute_primes(10000);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -50,12 +49,12 @@ int main(void)
 
       do
       {
-         d = n_randint(state, flint_primes_cutoff) | 1;
+         d = n_randint(state, cutoff) | 1;
          if (d == 1UL) d += 2;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
-      } while (d > flint_primes_cutoff);
+      } while (d > cutoff);
 
       result = n_is_oddprime_binary(d);
       
@@ -78,9 +77,9 @@ int main(void)
 
       do
       {
-         d = n_randint(state, flint_primes_cutoff) | 1;
+         d = n_randint(state, cutoff) | 1;
          mpz_set_ui(d_m, d);
-      } while ((mpz_probab_prime_p(d_m, 12)) || (d > flint_primes_cutoff));
+      } while ((mpz_probab_prime_p(d_m, 12)) || (d > cutoff));
 
       result = !n_is_oddprime_binary(d);
 

@@ -24,10 +24,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
@@ -35,7 +31,7 @@ fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
     if (mat1 != mat2)
     {
-        long i;
+        slong i;
 
         if (mat2->r && mat2->c)
             for (i = 0; i < mat2->r; i++)

@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -32,7 +32,7 @@
 void
 nmod_mat_zero(nmod_mat_t mat)
 {
-    long i, m, n;
+    slong i, m, n;
 
     m = mat->r;
     n = mat->c;

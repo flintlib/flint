@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fft.h"
@@ -49,9 +49,9 @@ main(void)
     {
         fmpz * a, * b;
         mp_bitcnt_t bits;
-        long len, limbs;
+        slong len, limbs;
         mp_limb_t ** ii, * ptr;
-        long i, bt;
+        slong i, bt;
 
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;
@@ -90,9 +90,9 @@ main(void)
     {
         fmpz * a, * b;
         mp_bitcnt_t bits;
-        long len, limbs;
+        slong len, limbs;
         mp_limb_t ** ii, * ptr;
-        long i, bt;
+        slong i, bt;
 
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;

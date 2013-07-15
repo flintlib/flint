@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_set_si(fmpz_poly_t poly, long c)
+fmpz_poly_set_si(fmpz_poly_t poly, slong c)
 {
     if (c == 0)
         fmpz_poly_zero(poly);

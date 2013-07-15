@@ -23,12 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "mpn_extras.h"
 #include "arith.h"
-
 
 #if FLINT64
 #define FLINT_HARMONIC_MAX_TINY 46
@@ -70,13 +66,13 @@ const mp_limb_t FLINT_HARMONIC_TINY_Q[] =
 };
 
 static void
-_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
+_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, slong n)
 {
     mpz_t p, q;
 
     mp_ptr t, v;
     mp_size_t ts, vs;
-    long size;
+    slong size;
 
     if (n <= 0)
     {
@@ -107,7 +103,7 @@ _mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
     _fmpq_canonicalise(num, den);
 }
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
+void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
 {
     n = FLINT_MAX(n, 0);
 
@@ -122,7 +118,7 @@ void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
     }
 }
 
-void arith_harmonic_number(fmpq_t x, long n)
+void arith_harmonic_number(fmpq_t x, slong n)
 {
     _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
 }

@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow_small(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
     switch (e)
     {
@@ -45,7 +45,7 @@ _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
             break;
         case 3:
         {
-            long alloc = 2 * len - 1;
+            slong alloc = 2 * len - 1;
             fmpz *t = _fmpz_vec_init(alloc);
             _fmpz_poly_sqr(t, poly, len);
             _fmpz_poly_mul(res, t, alloc, poly, len);
@@ -54,7 +54,7 @@ _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
         }
         case 4:
         {
-            long alloc = 2 * len - 1;
+            slong alloc = 2 * len - 1;
             fmpz *t = _fmpz_vec_init(alloc);
             _fmpz_poly_sqr(t, poly, len);
             _fmpz_poly_sqr(res, t, alloc);

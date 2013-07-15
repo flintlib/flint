@@ -28,14 +28,14 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod_poly_factor.h"
 
 void
 fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
     {

@@ -23,16 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 mp_limb_t
-_nmod_poly_div_root(mp_ptr Q, mp_srcptr A, long len, mp_limb_t c, nmod_t mod)
+_nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len, mp_limb_t c, nmod_t mod)
 {
     mp_limb_t r, t;
-    long i;
+    slong i;
 
     if (len < 2)
         return 0UL;
@@ -57,7 +57,7 @@ nmod_poly_div_root(nmod_poly_t Q,
 {
     mp_limb_t rem;
 
-    long len = A->length;
+    slong len = A->length;
 
     if (len == 0)
     {

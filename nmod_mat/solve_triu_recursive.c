@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -35,7 +35,7 @@ nmod_mat_solve_triu_recursive(nmod_mat_t X,
                                                                     int unit)
 {
     nmod_mat_t UA, UB, UD, XX, XY, BX, BY;
-    long r, n, m;
+    slong r, n, m;
 
     n = U->r;
     m = B->c;

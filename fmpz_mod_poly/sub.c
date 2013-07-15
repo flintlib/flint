@@ -24,16 +24,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, long len1, 
-                                   const fmpz *poly2, long len2, const fmpz_t p)
+void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1, 
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
 {
-    long i, len = FLINT_MAX(len1, len2);
+    slong i, len = FLINT_MAX(len1, len2);
 
     _fmpz_poly_sub(res, poly1, len1, poly2, len2);
 
@@ -47,7 +47,7 @@ void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, long len1,
 void fmpz_mod_poly_sub(fmpz_mod_poly_t res, 
                        const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
 {
-    long max = FLINT_MAX(poly1->length, poly2->length);
+    slong max = FLINT_MAX(poly1->length, poly2->length);
 
     fmpz_mod_poly_fit_length(res, max);
 

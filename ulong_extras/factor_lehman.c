@@ -25,8 +25,8 @@
 
 #undef ulong /* prevent clash with standard library */
 #include <math.h>
-#define ulong unsigned long
-#include <mpir.h>
+#define ulong mp_limb_t
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -35,7 +35,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
     double limit;
     mp_limb_t cuberoot, k;
     n_factor_t factors;
-    long bound;
+    slong bound;
 
 #if FLINT64 /* cannot compute enough primes */
     if (n > 10000000000000000UL) return n;

@@ -47,8 +47,6 @@ ulong_extras
 * in is_prime_pocklington allow the cofactor to be a perfect power not just
   prime
 
-* make n_gcd take arguments in either order and use throughout flint2
-
 * factor out some common code between n_is_perfect_power235 and
   n_factor_power235
 

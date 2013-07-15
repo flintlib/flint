@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -32,7 +32,7 @@
 
 void
 _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
-                                  mp_srcptr Q, long n, nmod_t mod)
+                                  mp_srcptr Q, slong n, nmod_t mod)
 {
     mp_ptr X2n, Qrev;
 
@@ -54,11 +54,11 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv,
 
 void
 nmod_poly_inv_series_basecase(nmod_poly_t Qinv, 
-                                 const nmod_poly_t Q, long n)
+                                 const nmod_poly_t Q, slong n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
     nmod_poly_t t1;
-    long Qlen;
+    slong Qlen;
     
     Qlen = Q->length;
 

@@ -25,7 +25,7 @@ Copyright (C) 2009 William Hart
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_t a;
         ulong n1, n2;
-        long coeff, len;
+        slong coeff, len;
 
         fmpz_poly_init(a);
         len = n_randint(state, 100) + 1;

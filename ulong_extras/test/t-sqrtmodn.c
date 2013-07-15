@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -42,7 +42,7 @@ int main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod n */
     {
         mp_limb_t a, b, n, ninv;
-        long num, i;
+        slong num, i;
         mp_bitcnt_t bits;
         mp_limb_t * sqrt;
         int btest;

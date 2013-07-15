@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m)
 {
-    long i, j;
+    slong i, j;
     fmpz_t t;
     fmpz_init(t);
 

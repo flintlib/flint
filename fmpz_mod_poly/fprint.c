@@ -24,16 +24,16 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, long len, 
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p)
 {
     int r;
-    long i;
+    slong i;
 
     r = fprintf(file, "%ld ", len);
     if (r <= 0)

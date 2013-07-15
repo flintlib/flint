@@ -40,19 +40,57 @@ or implied, of William Hart.
 #undef ulong /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
-#include "mpir.h"
+#include "gmp.h"
 #include "flint.h"
+#include "mpn_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
 
+#if defined(__MPIR_VERSION)
+
 #if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
 #define mpn_sumdiff_n __MPN(sumdiff_n)
 extern
 mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+
+#else
+
+static __inline__ mp_limb_t
+mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    mp_limb_t ret;
+    mp_ptr t;
+
+    if (n == 0)
+        return 0;
+
+    if ((s == x && d == y) || (s == y && d == x))
+    {
+        t = flint_malloc(n * sizeof(mp_limb_t));
+        ret = mpn_sub_n(t, x, y, n);
+        ret += 2 * mpn_add_n(s, x, y, n);
+        flint_mpn_copyi(d, t, n);
+        flint_free(t);
+        return ret;
+    }
+
+    if (s == x || s == y)
+    {
+        ret = mpn_sub_n(d, x, y, n);
+        ret += 2 * mpn_add_n(s, x, y, n);
+        return ret;
+    }
+
+    ret = 2 * mpn_add_n(s, x, y, n);
+    ret += mpn_sub_n(d, x, y, n);
+    return ret;
+}
+
 #endif
 
 #define fft_sumdiff(t, u, r, s, n) \
@@ -74,9 +112,9 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
          nn[limbs] = 1; \
       } else { \
          if (n_randint(state, 2) == 0) \
-            mpn_rrandom(nn, state->gmp_state, limbs); \
+            flint_mpn_rrandom(nn, state->gmp_state, limbs); \
          else \
-            mpn_urandomb(nn, state->gmp_state, limbs*FLINT_BITS); \
+            flint_mpn_urandomb(nn, state->gmp_state, limbs*FLINT_BITS); \
          nn[limbs] = n_randint(state, 1024); \
       } \
       if (n_randint(state, 2)) \
@@ -98,10 +136,10 @@ void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
    }
 }
 
-void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, 
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs);
 
-void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, 
                  mp_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs);
 
 mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs, 
@@ -229,7 +267,7 @@ void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii,
 void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
                              mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w);
 
-long fft_adjust_limbs(mp_size_t limbs);
+slong fft_adjust_limbs(mp_size_t limbs);
 
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt);
@@ -237,8 +275,8 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                                                     mp_limb_t * i2, mp_size_t n2);
 
-void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
-                                 long limbs, long trunc, mp_limb_t ** t1, 
+void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
+                                 slong limbs, slong trunc, mp_limb_t ** t1, 
                                 mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt);
 
 #ifdef __cplusplus

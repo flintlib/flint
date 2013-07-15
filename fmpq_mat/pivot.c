@@ -23,18 +23,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int
-fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c)
+fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c)
 {
-    long t, j;
+    slong t, j;
     fmpq * u;
 
     if (!fmpq_is_zero(fmpq_mat_entry(mat, r, c)))

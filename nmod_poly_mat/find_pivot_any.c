@@ -27,11 +27,11 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-long
+slong
 nmod_poly_mat_find_pivot_any(const nmod_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+                                    slong start_row, slong end_row, slong c)
 {
-    long r;
+    slong r;
 
     for (r = start_row; r < end_row; r++)
     {

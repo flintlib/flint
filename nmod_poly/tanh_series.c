@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
+_nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
 {
     mp_ptr t, u;
 
@@ -49,10 +49,10 @@ _nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
 }
 
 void
-nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
     mp_ptr h_coeffs;
-    long h_len = h->length;
+    slong h_len = h->length;
 
     if (h_len > 0 && h->coeffs[0] != 0UL)
     {

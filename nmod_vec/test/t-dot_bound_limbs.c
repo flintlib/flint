@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "ulong_extras.h"
@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 1000000; i++)
     {
-        long len;
+        slong len;
         nmod_t mod;
         mp_limb_t m;
         int limbs1, limbs2;

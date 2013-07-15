@@ -26,7 +26,7 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "longlong.h"
 #include "config.h"
@@ -46,7 +46,10 @@
 
 extern char version[];
 
-#define ulong unsigned long
+typedef mp_size_t slong;
+
+#define ulong mp_limb_t
+#define slong mp_limb_signed_t
 
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);
@@ -62,7 +65,13 @@ void flint_free(void * ptr);
     #define FLINT_D_BITS 31
 #endif
 
-#define mp_bitcnt_t unsigned long
+#define mp_bitcnt_t ulong
+
+#if HAVE_TLS
+#define FLINT_TLS_PREFIX __thread
+#else
+#define FLINT_TLS_PREFIX
+#endif
 
 int flint_test_multiplier(void);
 
@@ -115,7 +124,7 @@ typedef __mpfr_struct mpfr;
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
-#define FLINT_ABS(x) ((long)(x) < 0 ? (-(x)) : (x))
+#define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
 
 #define MP_PTR_SWAP(x, y) \
     do { \
@@ -150,21 +159,21 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define flint_mpn_zero(xxx, nnn) \
     do \
     { \
-        long ixxx; \
+        slong ixxx; \
         for (ixxx = 0; ixxx < (nnn); ixxx++) \
             (xxx)[ixxx] = 0UL; \
     } while (0)
 
 #define flint_mpn_copyi(xxx, yyy, nnn) \
    do { \
-      long ixxx; \
+      slong ixxx; \
       for (ixxx = 0; ixxx < (nnn); ixxx++) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
 
 #define flint_mpn_copyd(xxx, yyy, nnn) \
    do { \
-      long ixxx; \
+      slong ixxx; \
       for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
@@ -172,10 +181,32 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define flint_mpn_store(xxx, nnn, yyy) \
    do \
    { \
-      long ixxx; \
+      slong ixxx; \
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)
+
+/* compatibility between gmp and mpir */
+#ifndef mpn_com_n
+#define mpn_com_n mpn_com
+#endif
+
+#ifndef mpn_neg_n
+#define mpn_neg_n mpn_neg
+#endif
+
+#ifndef mpn_tdiv_q
+/* substitute for mpir's mpn_tdiv_q */
+static __inline__
+void mpn_tdiv_q(mp_ptr qp,
+	   mp_srcptr np, mp_size_t nn,
+	   mp_srcptr dp, mp_size_t dn)
+    {
+    mp_ptr _scratch = flint_malloc(dn * sizeof(mp_limb_t));
+    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    flint_free(_scratch);
+    }
+#endif
 
 #ifdef __cplusplus
 }

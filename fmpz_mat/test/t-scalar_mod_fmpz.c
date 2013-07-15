@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -48,7 +48,7 @@ main(void)
         fmpz_mat_t A, Amod;
         fmpz_t mod;
 
-        long rows, cols;
+        slong rows, cols;
 
         rows = n_randint(state, 20);
         cols = n_randint(state, 20);

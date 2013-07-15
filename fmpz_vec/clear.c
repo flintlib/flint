@@ -24,15 +24,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_clear(fmpz * vec, long len)
+_fmpz_vec_clear(fmpz * vec, slong len)
 {
-    long i;
+    slong i;
     for (i = 0; i < len; i++)
         fmpz_clear(vec + i);
     flint_free(vec);

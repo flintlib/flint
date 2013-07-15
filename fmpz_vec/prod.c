@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len)
+_fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len)
 {
     if (len <= 1)
     {
@@ -40,7 +40,7 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len)
     }
     else if (len <= 3)
     {
-        long i;
+        slong i;
 
         fmpz_mul(res, vec, vec + 1);
         for (i = 2; i < len; i++)
@@ -48,7 +48,7 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len)
     }
     else
     {
-        long m = len / 2;
+        slong m = len / 2;
         fmpz_t tmp;
         fmpz_init(tmp);
         _fmpz_vec_prod(res, vec, m);

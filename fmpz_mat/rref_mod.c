@@ -24,17 +24,15 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 #define E(j,k) fmpz_mat_entry(A,j,k)
 
-long
-fmpz_mat_rref_mod(long *perm, fmpz_mat_t A, const fmpz_t p)
+slong
+fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
 {
     fmpz_t t, inv;
-    long m, n, j, k, rank, r, pivot_row, pivot_col;
+    slong m, n, j, k, rank, r, pivot_row, pivot_col;
 
     if (fmpz_mat_is_empty(A))
     {

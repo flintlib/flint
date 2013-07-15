@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
 
 void

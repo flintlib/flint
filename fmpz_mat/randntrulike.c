@@ -25,19 +25,14 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q)
 {
-    const long c = mat->c, r = mat->r, d = r / 2;
+    const slong c = mat->c, r = mat->r, d = r / 2;
 
-    long i, j, k;
+    slong i, j, k;
     fmpz *h;
 
     if ((c != r) || (c != 2 * d))

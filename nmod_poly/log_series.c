@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod)
+_nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong n, nmod_t mod)
 {
     mp_ptr f_diff;
     mp_ptr f_inv;
@@ -48,11 +48,11 @@ _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod)
 }
 
 void
-nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
+nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
 {
     mp_ptr f_coeffs;
-    long k;
-    long flen = f->length;
+    slong k;
+    slong flen = f->length;
 
     if (flen < 1 || f->coeffs[0] != 1UL)
     {

@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
@@ -41,9 +41,9 @@ int main(void)
     fmpz * row;
     fmpz_t s;
 
-    long n, k, mm, nn;
+    slong n, k, mm, nn;
 
-    const long maxn = 40;
+    const slong maxn = 40;
 
     printf("stirling....");
     fflush(stdout);

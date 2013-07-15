@@ -25,16 +25,16 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
-            mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod)
+_nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
+            mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod)
 {
-    long limbs1, limbs2;
+    slong limbs1, limbs2;
     mp_ptr mpn1, mpn2, res;
 
     if (bits == 0)
@@ -76,9 +76,9 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
 void
 nmod_poly_mullow_KS(nmod_poly_t res,
                  const nmod_poly_t poly1, const nmod_poly_t poly2,
-                 mp_bitcnt_t bits, long n)
+                 mp_bitcnt_t bits, slong n)
 {
-    long len_out;
+    slong len_out;
 
     if ((poly1->length == 0) || (poly2->length == 0))
     {

@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -49,7 +49,7 @@ main(void)
     {
         nmod_poly_t f, g;
         mp_limb_t m;
-        long n;
+        slong n;
 
         m = n_randtest_prime(state, 0);
         nmod_poly_init(f, m);
@@ -83,7 +83,7 @@ main(void)
     {
         nmod_poly_t f, g, h;
         mp_limb_t m;
-        long n;
+        slong n;
 
         m = n_randtest_prime(state, 0);
         nmod_poly_init(f, m);

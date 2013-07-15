@@ -26,14 +26,14 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-int _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
+int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len)
 {
     return _fmpz_vec_fprint(file, poly, len);
 }

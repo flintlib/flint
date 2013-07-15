@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -33,7 +33,7 @@ void
 nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B)
 {
-    long m, k, n;
+    slong m, k, n;
 
     m = A->r;
     k = A->c;

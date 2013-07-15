@@ -26,14 +26,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_gmprand(fmpz_poly_t rop, gmp_randstate_t state, long len, long bits)
+void fmpz_poly_gmprand(fmpz_poly_t rop, gmp_randstate_t state, slong len, slong bits)
 {
-    long i;
+    slong i;
     mpz_t c;
     fmpz_t d;
     mpz_init(c);
@@ -91,7 +91,7 @@ main(void)
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
         {
             int c, n, reps = 0;
-            long s = 0L;
+            slong s = 0L;
             
             for (n = 0; n < ncases; n++)
             {

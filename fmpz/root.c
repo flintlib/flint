@@ -25,15 +25,15 @@
 
 #undef ulong /* avoid conflict with standard library */
 #include <stdlib.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 void
-fmpz_root(fmpz_t r, fmpz_t f, long n)
+fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 {
     fmpz c = *f;
     

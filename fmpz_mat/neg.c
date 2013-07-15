@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
 
 void
 fmpz_mat_neg(fmpz_mat_t res, const fmpz_mat_t mat)
 {
-    long i;
+    slong i;
 
     if (res->c < 1)
         return;

@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_content(fmpq_t res, const fmpz * poly, 
-                        const fmpz_t den, long len)
+                        const fmpz_t den, slong len)
 {
     _fmpz_poly_content(fmpq_numref(res), poly, len);
     fmpz_set(fmpq_denref(res), den);

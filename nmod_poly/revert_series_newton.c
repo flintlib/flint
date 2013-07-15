@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -33,9 +33,9 @@
 #define FLINT_REVERSE_NEWTON_CUTOFF 15
 
 void
-_nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
 {
-    long *a, i, k;
+    slong *a, i, k;
     mp_ptr T, U, V;
 
     if (n >= 1) Qinv[0] = 0UL;
@@ -49,7 +49,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 
     k = n;
     for (i = 1; (1L << i) < k; i++);
-    a = (long *) flint_malloc(i * sizeof(long));
+    a = (slong *) flint_malloc(i * sizeof(slong));
     a[i = 0] = k;
     while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
         a[++i] = (k = (k + 1) / 2);
@@ -77,11 +77,11 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 
 void
 nmod_poly_revert_series_newton(nmod_poly_t Qinv, 
-                                 const nmod_poly_t Q, long n)
+                                 const nmod_poly_t Q, slong n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
     nmod_poly_t t1;
-    long Qlen;
+    slong Qlen;
     
     Qlen = Q->length;
 

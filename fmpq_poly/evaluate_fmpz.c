@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -31,7 +31,7 @@
 
 void 
 _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
-                         const fmpz_t den, long len, const fmpz_t a)
+                         const fmpz_t den, slong len, const fmpz_t a)
 {
     fmpz_t d;
     

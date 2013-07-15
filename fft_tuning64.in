@@ -3,7 +3,7 @@
 #ifndef FFT_TUNING_H
 #define FFT_TUNING_H
 
-#include "mpir.h"
+#include "gmp.h"
 
 #define FFT_TAB \
    { { 4, 4 }, { 4, 3 }, { 3, 2 }, { 2, 1 }, { 2, 1 } }

@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long
-_fmpz_vec_max_bits(const fmpz * vec, long len)
+slong
+_fmpz_vec_max_bits(const fmpz * vec, slong len)
 {
-    long i, sign, max_limbs;
+    slong i, sign, max_limbs;
     mp_limb_t max_limb;
     mp_size_t limbs;
 

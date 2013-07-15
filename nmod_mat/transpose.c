@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -35,7 +35,7 @@ nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 {
     mp_limb_t tmp;
 
-    long i, j;
+    slong i, j;
 
     if (B->r != A->c || B->c != A->r)
     {

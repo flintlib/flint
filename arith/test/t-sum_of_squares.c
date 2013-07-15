@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
@@ -49,7 +49,7 @@ int main(void)
 {
     fmpz * r;
     fmpz_t t;
-    long i, j;
+    slong i, j;
 
     printf("sum_of_squares....");
     fflush(stdout);

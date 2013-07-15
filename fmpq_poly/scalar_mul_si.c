@@ -24,15 +24,15 @@
 ******************************************************************************/
 
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, long len, 
-                              long c)
+                              const fmpz * poly, const fmpz_t den, slong len, 
+                              slong c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
 
@@ -55,7 +55,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     {
         if (c > LONG_MIN || fmpz_cmp_ui(gcd, - (ulong) LONG_MIN))
         {
-            long g = fmpz_get_si(gcd);
+            slong g = fmpz_get_si(gcd);
 
             _fmpz_vec_scalar_mul_si(rpoly, poly, len, c / g);
             fmpz_divexact_si(rden, den, g);
@@ -69,7 +69,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     fmpz_clear(gcd);
 }
 
-void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
+void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
 {
     if (c == 0 || fmpq_poly_is_zero(op))
     {

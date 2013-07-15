@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -55,11 +55,17 @@ main(void)
         mpz_init(q);
 
         mpz_rrandomb(q, state->gmp_state, n_randint(state, 200) + 1);
+#ifdef mpz_next_likely_prime
         mpz_next_likely_prime(q, q, state->gmp_state);
+#else
+        mpz_nextprime(q, q);
+#endif
         fmpz_set_mpz(p, q);
 
         mpz_rrandomb(b, state->gmp_state, n_randint(state, 200) + 1);
         mpz_mod(b, b, q);
+        if (n_randint(state, 2))
+            mpz_neg(b, b);
         fmpz_set_mpz(a, b);
 
         r1 = fmpz_jacobi(a, p);

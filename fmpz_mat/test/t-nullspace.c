@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -38,7 +38,7 @@ main(void)
 {
     fmpz_mat_t A, B, ker;
     flint_rand_t state;
-    long i, m, n, b, d, r, nullity, nulrank;
+    slong i, m, n, b, d, r, nullity, nulrank;
 
     printf("nullspace....");
     fflush(stdout);

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
-        long trunc;
+        slong trunc;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
@@ -47,7 +47,7 @@ main(void)
         fmpq *ab, *pq;
         fmpq_t s1, s2, t, pqp;
         fmpq_bsplit_t sum;
-        long k, n;
+        slong k, n;
 
         n = n_randint(state, 40);
 

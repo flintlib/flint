@@ -24,17 +24,17 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
 
-void _fmpz_vec_set_fft(fmpz * coeffs_m, long length,
-                          mp_limb_t ** coeffs_f, long limbs, long sign)
+void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
+                          const mp_ptr * coeffs_f, slong limbs, slong sign)
 {
-   long i, size;
+   slong i, size;
    mp_limb_t * data;
    __mpz_struct * mpz_ptr;
 

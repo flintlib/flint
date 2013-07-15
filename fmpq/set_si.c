@@ -23,13 +23,9 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
 {
     if (q == 1 || p == 0)
     {
@@ -38,19 +34,21 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
     }
     else
     {
-        ulong r = FLINT_ABS(p);
+        ulong r = n_gcd_full(p < 0 ? (-(ulong) p) : (ulong) p, q);
 
-        if (r >= q)
-            r = n_gcd(r, q);
+        if (p < 0)
+        {
+            fmpz_set_ui(rnum, (-(ulong) p) / r);
+            fmpz_neg(rnum, rnum);
+        }
         else
-            r = n_gcd(q, r);
+            fmpz_set_si(rnum, p / r);
 
-        fmpz_set_si(rnum, p / r);
         fmpz_set_ui(rden, q / r);
     }
 }
 
-void fmpq_set_si(fmpq_t res, long p, ulong q)
+void fmpq_set_si(fmpq_t res, slong p, ulong q)
 {
-    _fmpq_set_si(&res->num, &res->den, p, q);
+    _fmpq_set_si(fmpq_numref(res), fmpq_denref(res), p, q);
 }

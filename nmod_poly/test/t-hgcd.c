@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -67,8 +67,8 @@ main(void)
         nmod_poly_t a, b, c, d, c1, d1, s, t;
 
         mp_ptr M[4];
-        long lenM[4];
-        long sgnM;
+        slong lenM[4];
+        slong sgnM;
 
         mp_limb_t n = n_randprime(state, FLINT_BITS, 0);
 

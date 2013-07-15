@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -32,11 +32,11 @@
 
 
 void
-__fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
+__fmpz_multi_CRT_ui_sign(fmpz_t output, const fmpz_t input,
     const fmpz_comb_t comb, fmpz_t temp)
 {
-    long n = comb->n;
-    long p;
+    slong n = comb->n;
+    slong p;
 
     if (n == 0L)
     {
@@ -49,7 +49,7 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
         /* XXX: overflow possible? */
         p = comb->primes[0];
         if ((p - (*input)) < (*input))
-            fmpz_set_si(output, (long) ((*input) - p));
+            fmpz_set_si(output, (slong) ((*input) - p));
         else
             fmpz_set_ui(output, (*input));
         return;
@@ -65,14 +65,14 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
     return;
 }
 
-void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
 {
-    long i, j;
-    long n = comb->n;
-    long num;
-    long log_res;
-    long num_primes = comb->num_primes;
+    slong i, j;
+    slong n = comb->n;
+    slong num;
+    slong log_res;
+    slong num_primes = comb->num_primes;
 
     fmpz ** comb_temp = ctemp->comb_temp;
     fmpz * temp = ctemp->temp;

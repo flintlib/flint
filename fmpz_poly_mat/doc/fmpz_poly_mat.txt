@@ -30,7 +30,7 @@
 
 *******************************************************************************
 
-void fmpz_poly_mat_init(fmpz_poly_mat_t mat, long rows, long cols)
+void fmpz_poly_mat_init(fmpz_poly_mat_t mat, slong rows, slong cols)
 
     Initialises a matrix with the given number of rows and columns for use.
 
@@ -50,11 +50,11 @@ void fmpz_poly_mat_clear(fmpz_poly_mat_t mat)
 
 *******************************************************************************
 
-long fmpz_poly_mat_nrows(const fmpz_poly_mat_t mat)
+slong fmpz_poly_mat_nrows(const fmpz_poly_mat_t mat)
 
     Returns the number of rows in \code{mat}.
 
-long fmpz_poly_mat_ncols(const fmpz_poly_mat_t mat)
+slong fmpz_poly_mat_ncols(const fmpz_poly_mat_t mat)
 
     Returns the number of columns in \code{mat}.
 
@@ -99,13 +99,19 @@ void fmpz_poly_mat_print(const fmpz_poly_mat_t mat, const char * x)
 *******************************************************************************
 
 void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state,
-        long len, mp_bitcnt_t bits)
+        slong len, mp_bitcnt_t bits)
 
     This is equivalent to applying \code{fmpz_poly_randtest} to all entries
     in the matrix.
 
+void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t state,
+        slong len, mp_bitcnt_t bits)
+
+    This is equivalent to applying \code{fmpz_poly_randtest_unsigned} to
+    all entries in the matrix.
+
 void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state,
-        long len, mp_bitcnt_t bits, float density)
+        slong len, mp_bitcnt_t bits, float density)
 
     Creates a random matrix with the amount of nonzero entries given
     approximately by the \code{density} variable, which should be a fraction
@@ -169,13 +175,13 @@ int fmpz_poly_mat_is_square(const fmpz_poly_mat_t mat)
 
 *******************************************************************************
 
-long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A)
+slong fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A)
 
     Returns the maximum number of bits among the coefficients of the
     entries in \code{A}, or the negative of that value if any
     coefficient is negative.
 
-long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A)
+slong fmpz_poly_mat_max_length(const fmpz_poly_mat_t A)
 
     Returns the maximum polynomial length among all the entries in \code{A}.
 
@@ -259,7 +265,7 @@ void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 void fmpz_poly_mat_mullow(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
-    const fmpz_poly_mat_t B, long len)
+    const fmpz_poly_mat_t B, slong len)
 
     Sets \code{C} to the matrix product of \code{A} and \code{B},
     truncating each entry in the result to length \code{len}.
@@ -283,7 +289,7 @@ void fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
     Sets \code{B} to the square of \code{A}, which must be a square matrix.
     Aliasing is allowed. This function uses Kronecker segmentation.
 
-void fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, long len)
+void fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, slong len)
 
     Sets \code{B} to the square of \code{A}, which must be a square matrix,
     truncating all entries to length \code{len}.
@@ -297,14 +303,14 @@ void fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp)
 
 void
 fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
-        long len)
+        slong len)
 
     Sets \code{B} to \code{A} raised to the power \code{exp}, truncating
     all entries to length \code{len}, where \code{A} is a square matrix.
     Uses exponentiation by squaring. Aliasing is allowed.
 
 void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
-                            fmpz_poly_mat_t * const factors, long n)
+                            fmpz_poly_mat_t * const factors, slong n)
 
     Sets \code{res} to the product of the \code{n} matrices given in
     the vector \code{factors}, all of which must be square and of the
@@ -316,8 +322,8 @@ void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
 
 *******************************************************************************
 
-long fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+slong fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
+                                    slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
     Returns a row index $r$ between \code{start_row} (inclusive) and
@@ -329,8 +335,8 @@ long fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
 
-long fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+slong fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
+                                    slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
     Returns a row index $r$ between \code{start_row} (inclusive) and
@@ -343,7 +349,7 @@ long fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
     the smallest coefficient bit bound. This heuristic typically reduces
     coefficient growth when the matrix entries vary in size.
 
-long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+slong fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, slong * perm,
                             const fmpz_poly_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
@@ -362,7 +368,7 @@ long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
     the sign is decided by the parity of the permutation. Note that the
     determinant is not generally the minimal denominator.
 
-long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
+slong fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
                             const fmpz_poly_mat_t A)
 
     Sets (\code{B}, \code{den}) to the reduced row echelon form of
@@ -408,7 +414,7 @@ void fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A)
     evaluating the matrix at $n$ distinct points, computing the determinant
     of each integer matrix, and forming the interpolating polynomial.
 
-long fmpz_poly_mat_rank(const fmpz_poly_mat_t A)
+slong fmpz_poly_mat_rank(const fmpz_poly_mat_t A)
 
     Returns the rank of \code{A}. Performs fraction-free LU decomposition
     on a copy of \code{A}.
@@ -441,7 +447,7 @@ int fmpz_poly_mat_inv(fmpz_poly_mat_t Ainv, fmpz_poly_t den,
 
 *******************************************************************************
 
-long fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
+slong fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
 
     Computes the right rational nullspace of the matrix \code{mat} and
     returns the nullity.
@@ -485,7 +491,7 @@ int fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den,
     forward and back substitution.
 
 void fmpz_poly_mat_solve_fflu_precomp(fmpz_poly_mat_t X,
-                    const long * perm,
+                    const slong * perm,
                     const fmpz_poly_mat_t FFLU, const fmpz_poly_mat_t B);
 
     Performs fraction-free forward and back substitution given a precomputed

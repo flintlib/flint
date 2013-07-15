@@ -23,14 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-
 
 static mp_limb_t
 find_good_prime_and_invert(nmod_mat_t Ainv,
@@ -64,17 +57,17 @@ find_good_prime_and_invert(nmod_mat_t Ainv,
 
 /* We need to perform several matrix-vector products Ay, and speed them
    up by using modular multiplication (this is only faster if we
-   precompute the modular matrices. Note: we assume that all
+   precompute the modular matrices). Note: we assume that all
    primes are >= p. This allows reusing y_mod as the right-hand
    side without reducing it. */
 
 #define USE_SLOW_MULTIPLICATION 0
 
-mp_limb_t * get_crt_primes(long * num_primes, const fmpz_mat_t A, mp_limb_t p)
+mp_limb_t * get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
 {
     fmpz_t bound, prod;
     mp_limb_t * primes;
-    long i, j;
+    slong i, j;
 
     fmpz_init(bound);
     fmpz_init(prod);
@@ -120,7 +113,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     mp_limb_t * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
-    long i, n, cols, num_primes;
+    slong i, n, cols, num_primes;
 
     n = A->r;
     cols = B->c;

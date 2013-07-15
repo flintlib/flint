@@ -17,32 +17,38 @@ Primitive types
 Depending on the main interpretation of the value of a variable, where 
 possible the following primitive datatype should be used:
 
-    | bit counts up to a single limb         | unsigned long       |
-    | bit counts, multiprecision             | mp_bitcnt_t         |
-    | limb counts in multiprecision integers | mp_size_t           |
-    | limbs                                  | mp_limb_t           |
-    | mp_limb_t arrays                       | mp_ptr/ mp_srcptr   |
-    | ui/ si function constants              | unsigned long/ long |
-    | polynomial lengths                     | long                |
-    | number of indeterminates               | long                |
-    | row/ column indices                    | long                |
-    | precision for mpfr types               | mpfr_prec_t         |
+    | bit counts up to a single limb         | ulong                       |
+    | bit counts, multiprecision             | mp_bitcnt_t                 |
+    | byte counts (strings)                  | size_t                      |
+    | limb counts in multiprecision integers | mp_size_t                   |
+    | limbs (unsigned/signed)                | mp_limb_t/ mp_limb_signed_t |
+    | mp_limb_t arrays                       | mp_ptr/ mp_srcptr           |
+    | ui/ si function constants              | ulong/ slong                |
+    | exponents (unsigned/signed)            | ulong/ slong                |
+    | polynomial lengths                     | slong                       |
+    | number of indeterminates               | slong                       |
+    | row/ column indices                    | slong                       |
+    | precision for mpfr types               | mpfr_prec_t                 |
 
 The typical definitions of these in terms of primitive types are:
 
-    | mp_bitcnt_t   | unsigned long, or unsigned long long               |
-    | mp_size_t     | int, long, or long long                            |
-    | mp_limb_t     | unsigned int, unsigned long, or unsigned long long |
-    | mp_ptr        | mp_limb_t *                                        |
-    | mp_srcptr     | const mp_limb_t *                                  |
+    | mp_bitcnt_t   | ulong, or ulong long                                 |
+    | mp_size_t     | long, or long long                                   |
+    | mp_limb_t     | ulong, or ulong long                                 |
+    | mp_ptr        | mp_limb_t *                                          |
+    | mp_srcptr     | const mp_limb_t *                                    |
+    | slong         | long or long long                                    |
+    | ulong         | ulong or ulong long                                  |
 
-Type definitions
-----------------
+Use of const
+------------
 
-Aside from the more mathematical FLINT types, we also use the following 
-definitions:
+Input parameters to functions should be marked const in the following cases:
 
-   | ulong | unsigned long |
+* complex types that are passed by reference, e.g. fmpz_poly_t
+
+They should not be used on output parameters or for simple types or simple
+structs which are passed by value and not reference, e.g. nmod_t.
 
 Random functions
 ----------------

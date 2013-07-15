@@ -24,15 +24,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
 void
-_nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1, 
-                            mp_srcptr poly2, long len2, long n, nmod_t mod)
+_nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1, 
+                            mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     if (n == 1)
     {
@@ -40,8 +40,8 @@ _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1,
     }
     else
     {
-        long i = len1 - 1;
-        long lenr;
+        slong i = len1 - 1;
+        slong lenr;
 
         mp_ptr t = _nmod_vec_init(n);
 
@@ -73,11 +73,11 @@ _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1,
 
 void
 nmod_poly_compose_series_horner(nmod_poly_t res, 
-                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long lenr;
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong lenr;
 
     if (len2 != 0 && poly2->coeffs[0] != 0)
     {

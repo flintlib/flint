@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -43,7 +43,7 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (!COEFF_IS_MPZ(c1))  /* g is small */
     {
-        fmpz_set_si(f, c1 / (long) h);
+        fmpz_set_si(f, c1 / (slong) h);
     }
     else  /* g is large */
     {

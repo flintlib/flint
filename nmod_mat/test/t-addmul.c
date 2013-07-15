@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long i;
+    slong i;
     flint_rand_t state;
     flint_randinit(state);
 
@@ -46,7 +46,7 @@ main(void)
         nmod_mat_t A, B, C, D, T, E;
         mp_limb_t mod = n_randtest_not_zero(state);
 
-        long m, k, n;
+        slong m, k, n;
 
         m = n_randint(state, 100);
         k = n_randint(state, 100);

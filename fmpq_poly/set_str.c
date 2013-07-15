@@ -27,17 +27,17 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-int 
+int
 _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
 {
     char * w;
-    long i, len;
+    slong i, len;
     mpq_t * a;
 
     len = atol(str);
@@ -51,15 +51,16 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
 
     a = (mpq_t *) flint_malloc(len * sizeof(mpq_t));
 
-    while (*str++ != ' ') ;
+    while (*str++ != ' ')
+        ;
 
     /* Find maximal gap between spaces and allocate w */
     {
         const char * s = str;
-        long max;
+        slong max;
         for (max = 0; *s != '\0';)
         {
-            long cur;
+            slong cur;
             for (s++, cur = 1; *s != ' ' && *s != '\0'; s++, cur++) ;
             if (max < cur)
                 max = cur;
@@ -72,13 +73,13 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
     {
         char * v;
         int ans;
-        
+
         for (str++, v = w; *str != ' ' && *str != '\0';)
             *v++ = *str++;
         *v = '\0';
         mpq_init(a[i]);
         ans = mpq_set_str(a[i], w, 10);
-        
+
         /* If the format is not correct, clear up and return -1 */
         if (ans)
         {
@@ -90,7 +91,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
             return -1;
         }
     }
-    
+
     _fmpq_poly_set_array_mpq(poly, den, (const mpq_t *) a, len);
 
     for (i = 0; i < len; i++)
@@ -105,7 +106,7 @@ int
 fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
 {
     int ans;
-    long len;
+    slong len;
 
     len = atol(str);
     if (len < 0)

@@ -30,10 +30,10 @@
 
 void
 fmpz_poly_mat_mullow(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
-    const fmpz_poly_mat_t B, long len)
+    const fmpz_poly_mat_t B, slong len)
 {
-    long ar, bc, br;
-    long i, j, k;
+    slong ar, bc, br;
+    slong i, j, k;
     fmpz_poly_t t;
 
     ar = A->r;

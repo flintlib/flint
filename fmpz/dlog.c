@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
@@ -39,7 +39,7 @@ fmpz_dlog(const fmpz_t x)
     else
     {
         double s;
-        long e;
+        slong e;
 
         s = mpz_get_d_2exp(&e, COEFF_TO_PTR(*x));
         return log(s) + e * 0.69314718055994530942;

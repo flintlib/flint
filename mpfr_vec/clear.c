@@ -24,15 +24,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_clear(__mpfr_struct * vec, long length)
+_mpfr_vec_clear(__mpfr_struct * vec, slong length)
 {
-    long i;
+    slong i;
     for (i = 0; i < length; i++)
         mpfr_clear(vec + i);
     flint_free(vec);

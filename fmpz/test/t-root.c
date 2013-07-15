@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -47,7 +47,7 @@ main(void)
     {
         fmpz_t f, g;
         mpz_t mf, mf2, mg;
-        long n;
+        slong n;
 
         fmpz_init(f);
         fmpz_init(g);
@@ -89,7 +89,7 @@ main(void)
     {
         fmpz_t f;
         mpz_t mf, mf2;
-        long n;
+        slong n;
 
         fmpz_init(f);
 

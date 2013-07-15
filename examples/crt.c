@@ -36,7 +36,7 @@
 
 int main(int argc, char* argv[])
 {
-    long i, bit_bound;
+    slong i, bit_bound;
     mp_limb_t prime, res;
     fmpz_t x, y, prod;
 

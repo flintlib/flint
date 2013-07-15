@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -39,10 +39,10 @@ int main()
     mpz_t num1;
     mp_limb_t * output, * output2;
     double primes_per_limb;
-    long i, j, k;
-    long bits;
+    slong i, j, k;
+    slong bits;
 
-    long num_primes;
+    slong num_primes;
     mp_limb_t * primes;
     mp_limb_t prime;
 

@@ -23,12 +23,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int
@@ -36,7 +30,7 @@ fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X,
                                     const fmpz_mat_t Xmod, const fmpz_t mod)
 {
     fmpz_t num, den, t, u, d;
-    long i, j;
+    slong i, j;
 
     int success = 1;
 

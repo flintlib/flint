@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -31,7 +31,7 @@
 
 void
 _nmod_poly_compose_mod(mp_ptr res,
-    mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod)
+    mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
 {
     if (lenh < 8 || lenf >= lenh)
         _nmod_poly_compose_mod_horner(res, f, lenf, g, h, lenh, mod);
@@ -44,10 +44,10 @@ nmod_poly_compose_mod(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len3 = poly3->length;
-    long len = len3 - 1;
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len3 = poly3->length;
+    slong len = len3 - 1;
 
     mp_ptr ptr2;
 

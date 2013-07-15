@@ -30,10 +30,12 @@ or implied, of William Hart.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fft.h"
+
 
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
@@ -58,6 +60,7 @@ void ref_adjust_sqrt2(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t limbs, 
 int
 main(void)
 {
+  /*
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1, * temp;
@@ -131,5 +134,6 @@ main(void)
     flint_randclear(state);
     
     printf("PASS\n");
+  */
     return 0;
 }

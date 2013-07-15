@@ -39,11 +39,11 @@ void
 prof_repeat(double *min, double *max, profile_target_t target, void *arg)
 {
     /* Number of timings that were at least DURATION_THRESHOLD microseconds */
-    unsigned long good_count = 0;
+    ulong good_count = 0;
     double max_time = DBL_MIN, min_time = DBL_MAX;
 
     /* First try one loop */
-    unsigned long num_trials = 4;
+    ulong num_trials = 4;
     double last_time;
     init_clock(0);
     target(arg, num_trials);
@@ -88,7 +88,7 @@ prof_repeat(double *min, double *max, profile_target_t target, void *arg)
                 adjust_ratio = 1.25;
             if (adjust_ratio < 0.75)
                 adjust_ratio = 0.75;
-            num_trials = (unsigned long) ceil(adjust_ratio * num_trials);
+            num_trials = (ulong) ceil(adjust_ratio * num_trials);
             /* Just to be safe */
             if (num_trials == 0)
                 num_trials = 1;

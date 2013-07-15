@@ -24,10 +24,10 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #undef ulong /* prevent clash with standard library */
 #include <stdlib.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -54,7 +54,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     {
         for (i = 0; i < factors.num; i++)
         {
-            if (factors.p[i] > flint_primes[FLINT_FACTOR_TRIAL_PRIMES - 1])
+            if (factors.p[i] > FLINT_FACTOR_TRIAL_PRIMES_PRIME)
             {
                 while (cofactor >= factors.p[i] && (cofactor % factors.p[i]) == 0)
                 {

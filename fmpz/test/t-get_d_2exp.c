@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
 
     double output;
-    long exp;
+    slong exp;
 
     printf("get_d_2exp....");
     fflush(stdout);

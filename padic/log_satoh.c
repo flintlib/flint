@@ -23,13 +23,13 @@
  
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "padic.h"
 #include "ulong_extras.h"
 
-void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 {
     if (N < 16)
     {
@@ -37,7 +37,7 @@ void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
     }
     else
     {
-        const long k = n_sqrt(N);
+        const slong k = n_sqrt(N);
 
         fmpz_t t, pk, pNk;
 
@@ -67,7 +67,7 @@ void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     const fmpz *p = ctx->p;
-    const long N  = padic_prec(rop);
+    const slong N  = padic_prec(rop);
 
     if (padic_val(op) < 0)
     {
@@ -92,7 +92,7 @@ int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         else
         {
             fmpz_t t;
-            long v;
+            slong v;
 
             fmpz_init(t);
             v = fmpz_remove(t, y, ctx->p);

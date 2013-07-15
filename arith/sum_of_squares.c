@@ -23,20 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_factor.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "arith.h"
 
 static void
 sum_of_two_squares(fmpz_t r, const fmpz_t n)
 {
     fmpz_factor_t fac;
-    long i;
+    slong i;
 
     fmpz_factor_init(fac);
     fmpz_factor(fac, n);
@@ -48,12 +42,12 @@ sum_of_two_squares(fmpz_t r, const fmpz_t n)
 
         if (res == 1)
         {
-            fmpz_add_ui(fac->exp + i, fac->exp + i, 1);
-            fmpz_mul(r, r, fac->exp + i);
+            fac->exp[i]++;
+            fmpz_mul_ui(r, r, fac->exp[i]);
         }
         else if (res == 3)
         {
-            if (fmpz_is_odd(fac->exp + i))
+            if (fac->exp[i] % 2)
             {
                 fmpz_zero(r);
                 break;
@@ -84,10 +78,10 @@ sum_of_four_squares(fmpz_t r, const fmpz_t n)
 }
 
 static void
-sum_of_squares_recursive(fmpz_t r, long k, ulong n)
+sum_of_squares_recursive(fmpz_t r, slong k, ulong n)
 {
     fmpz_t t, u;
-    long i, j;
+    slong i, j;
 
     fmpz_init(t);
     fmpz_init(u);
@@ -110,7 +104,7 @@ sum_of_squares_recursive(fmpz_t r, long k, ulong n)
 }
 
 static void
-sum_of_squares_series(fmpz_t r, ulong k, long n)
+sum_of_squares_series(fmpz_t r, ulong k, slong n)
 {
     fmpz * t;
 

@@ -32,9 +32,9 @@
 
 
 static __inline__ int
-nmod_mat_pivot(nmod_mat_t A, long * P, long start_row, long col)
+nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
 {
-    long j, t;
+    slong j, t;
     mp_ptr u;
 
     if (nmod_mat_entry(A, start_row, col) != 0)
@@ -59,12 +59,12 @@ nmod_mat_pivot(nmod_mat_t A, long * P, long start_row, long col)
 }
 
 
-long 
-nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check)
+slong 
+nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
 {
     mp_limb_t d, e, **a;
     nmod_t mod;
-    long i, m, n, rank, length, row, col;
+    slong i, m, n, rank, length, row, col;
 
     m = A->r;
     n = A->c;

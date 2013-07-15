@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -31,7 +31,7 @@
 void
 fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 {
-    long i;
+    slong i;
 
     /* Either scalar or input poly is zero */
     if ((x == 0) || (poly2->length == 0))

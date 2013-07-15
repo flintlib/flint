@@ -23,16 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
-long
-fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
+slong
+fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
 {
     fmpz_t p, q;
-    long i;
+    slong i;
 
     fmpz_init(p);
     fmpz_init(q);

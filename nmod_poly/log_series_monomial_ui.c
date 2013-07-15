@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
@@ -31,9 +31,9 @@
 
 void
 _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
-                                        long n, nmod_t mod)
+                                        slong n, nmod_t mod)
 {
-    long j, k, rlen;
+    slong j, k, rlen;
     mp_limb_t a;
 
     _nmod_vec_zero(res, n);
@@ -84,7 +84,7 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
 
 void
 nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
-                                    ulong power, long n)
+                                    ulong power, slong n)
 {
     if (power == 0)
     {

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, qinv, prod;
-        long m;
+        slong m;
 
         mp_limb_t n;
         do n = n_randtest_not_zero(state);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, qinv;
-        long m;
+        slong m;
 
         mp_limb_t n;
         do n = n_randtest(state);

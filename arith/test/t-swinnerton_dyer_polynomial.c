@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "profiler.h"
@@ -52,7 +52,7 @@ int main()
 {
     fmpz_poly_t S;
     mp_limb_t r;
-    long n;
+    slong n;
 
     printf("swinnerton_dyer_polynomial....");
     fflush(stdout);

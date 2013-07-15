@@ -23,11 +23,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "ulong_extras.h"
 #include "arith.h"
 
 void

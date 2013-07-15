@@ -25,17 +25,17 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod)
+_nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod)
 {
     ulong bit = ~((~0UL) >> 1);
-    long rlen;
-    long alloc = (long) e * (len - 1) + 1;
+    slong rlen;
+    slong alloc = (slong) e * (len - 1) + 1;
     mp_ptr v = _nmod_vec_init(alloc);
     mp_ptr R, S, T;
 
@@ -114,8 +114,8 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod)
 void
 nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
 {
-    const long len = poly->length;
-    long rlen;
+    const slong len = poly->length;
+    slong rlen;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -143,7 +143,7 @@ nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (long) e * (len - 1) + 1;
+    rlen = (slong) e * (len - 1) + 1;
 
     if (res != poly)
     {

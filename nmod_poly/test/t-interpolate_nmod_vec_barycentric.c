@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -48,7 +48,7 @@ main(void)
         nmod_poly_t P, Q;
         mp_ptr x, y;
         mp_limb_t mod;
-        long j, n, npoints;
+        slong j, n, npoints;
 
         mod = n_randtest_prime(state, 0);
         npoints = n_randint(state, FLINT_MIN(100, mod));

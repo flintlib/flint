@@ -28,10 +28,11 @@ or implied, of William Hart.
 
 */
 
-#include "mpir.h"
+#include "gmp.h"
 #include "flint.h"
 #include "fft.h"
-      
+#include "mpn_extras.h"
+
 void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                         mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 {
@@ -93,7 +94,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
       mpn_normmod_2expp1(ii[j], limbs);
       if (i1 != i2) mpn_normmod_2expp1(jj[j], limbs);
       c = 2*ii[j][limbs] + jj[j][limbs];
-      ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
+      ii[j][limbs] = flint_mpn_mulmod_2expp1_basecase(ii[j], ii[j], jj[j], c, n*w, tt);
    }
 
    ifft_truncate_sqrt2(ii, n, w, &t1, &t2, &s1, trunc);

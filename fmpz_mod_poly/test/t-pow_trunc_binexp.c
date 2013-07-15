@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_mod_poly_t a, b, c;
         fmpz_t p;
-        long e, trunc;
+        slong e, trunc;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
@@ -88,7 +88,7 @@ main(void)
     {
         fmpz_mod_poly_t a, b, c;
         fmpz_t p;
-        long e, trunc;
+        slong e, trunc;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);

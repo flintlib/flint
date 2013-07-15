@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -38,7 +38,7 @@ void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p)
     fmpz_set(&(poly->p), p);
 }
 
-void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, long alloc)
+void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, slong alloc)
 {
     if (alloc)                  /* allocate space for alloc small coeffs */
         poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));

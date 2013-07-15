@@ -24,17 +24,17 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_rem(fmpz * R, fmpz_t r, 
-                    const fmpz * A, const fmpz_t a, long lenA, 
-                    const fmpz * B, const fmpz_t b, long lenB)
+                    const fmpz * A, const fmpz_t a, slong lenA, 
+                    const fmpz * B, const fmpz_t b, slong lenB)
 {
-    long lenR;
+    slong lenR;
     ulong d;
     const fmpz * lead = B + (lenB - 1);
     
@@ -90,7 +90,7 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
 void fmpq_poly_rem(fmpq_poly_t R, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long lenA, lenB, lenR;
+    slong lenA, lenB, lenR;
 
     if (fmpq_poly_is_zero(poly2))
     {

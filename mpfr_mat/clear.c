@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_mat.h"
@@ -34,7 +34,7 @@ mpfr_mat_clear(mpfr_mat_t mat)
 {
     if (mat->entries)
     {
-        long i;
+        slong i;
         for (i = 0; i < mat->r * mat->c; i++)
             mpfr_clear(mat->entries + i);   /* Clear all coefficients */
         flint_free(mat->entries);     /* Clean up array of entries */

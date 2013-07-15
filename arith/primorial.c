@@ -24,12 +24,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 #if FLINT64
 #define LARGEST_ULONG_PRIMORIAL 52
@@ -127,11 +122,12 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
     return len;
 }
 
-void arith_primorial(fmpz_t res, long n)
+void arith_primorial(fmpz_t res, slong n)
 {
     mp_size_t len, pi;
     ulong bits;
     __mpz_struct * mpz_ptr;
+    const mp_limb_t * primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
     {
@@ -143,13 +139,13 @@ void arith_primorial(fmpz_t res, long n)
     }
 
     pi = n_prime_pi(n);
-    
-    n_compute_primes(pi);
-    bits = FLINT_BIT_COUNT(flint_primes[pi - 1]);
+
+    primes = n_primes_arr_readonly(pi);
+    bits = FLINT_BIT_COUNT(primes[pi - 1]);
     
     mpz_ptr = _fmpz_promote(res);
     mpz_realloc2(mpz_ptr, pi*bits);
     
-    len = mpn_prod_limbs(mpz_ptr->_mp_d, flint_primes, pi, bits);
+    len = mpn_prod_limbs(mpz_ptr->_mp_d, primes, pi, bits);
     mpz_ptr->_mp_size = len;
 }

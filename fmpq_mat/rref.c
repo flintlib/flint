@@ -23,15 +23,9 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
-long
+slong
 fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 {
     if (A->r <= 2 || A->c <= 2)

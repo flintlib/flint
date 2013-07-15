@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly, const fmpz_t den, long len, ulong e)
+                    const fmpz * poly, const fmpz_t den, slong len, ulong e)
 {
     _fmpz_poly_pow(rpoly, poly, len, e);
     fmpz_pow_ui(rden, den, e);
@@ -38,7 +38,7 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 {
-    long len = poly->length, rlen;
+    slong len = poly->length, rlen;
 
     if (e == 0)
     {
@@ -51,7 +51,7 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (long) e * (len - 1L) + 1L;
+    rlen = (slong) e * (len - 1L) + 1L;
 
     if (res != poly)
     {

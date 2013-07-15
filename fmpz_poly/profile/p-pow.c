@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <float.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -81,14 +81,14 @@ main(void)
             
                 timeit_t t[2];
                 int l, loops = 1, r = 0;
-                long s[2] = {0L, 0L};
+                slong s[2] = {0L, 0L};
                 double T[2];
             
                 /*
                    Construct random polynomial f of length len
                  */
                 {
-                    long ell;
+                    slong ell;
                     for (ell = 0; ell < len; ell++)
                         fmpz_randbits(f->coeffs + ell, state, bits);
                     if ((f->coeffs)[len - 1] == 0L)

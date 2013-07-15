@@ -23,17 +23,11 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 {
-    long n = A->r;
+    slong n = A->r;
 
     if (n == 0)
     {
@@ -90,7 +84,7 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
     {
         fmpz_mat_t Aclear, Bclear, I;
         fmpz * den;
-        long i;
+        slong i;
         int success;
 
         fmpz_mat_init(Aclear, n, n);

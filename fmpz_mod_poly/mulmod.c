@@ -26,18 +26,18 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, long len1,
-                           const fmpz * poly2, long len2, const fmpz * f,
-                           long lenf, const fmpz_t p)
+void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1,
+                           const fmpz * poly2, slong len2, const fmpz * f,
+                           slong lenf, const fmpz_t p)
 {
     fmpz * T, * Q;
     fmpz_t invf;
-    long lenT, lenQ;
+    slong lenT, lenQ;
 
     lenT = len1 + len2 - 1;
     lenQ = lenT - lenf + 1;
@@ -63,7 +63,7 @@ void
 fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f)
 {
-    long len1, len2, lenf;
+    slong len1, len2, lenf;
     fmpz * fcoeffs;
 
     lenf = f->length;

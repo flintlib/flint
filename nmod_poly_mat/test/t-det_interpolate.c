@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    slong i;
 
     printf("det_interpolate....");
     fflush(stdout);
@@ -45,7 +45,7 @@ main(void)
     {
         nmod_poly_mat_t A;
         nmod_poly_t a, b;
-        long n, deg;
+        slong n, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);

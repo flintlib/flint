@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-long
-fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
+slong
+fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)
 {
     return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : 0L;
 }

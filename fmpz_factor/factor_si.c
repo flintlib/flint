@@ -24,14 +24,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
 
 void
-fmpz_factor_si(fmpz_factor_t factor, long n)
+fmpz_factor_si(fmpz_factor_t factor, slong n)
 {
     _fmpz_factor_set_length(factor, 0);
 

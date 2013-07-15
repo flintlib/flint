@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long m, n, i, j, rep;
+    slong m, n, i, j, rep;
     flint_rand_t state;
 
     printf("zero....");

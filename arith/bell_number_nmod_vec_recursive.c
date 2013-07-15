@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 
 void
-arith_bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
+arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
 {
-    long i, k;
+    slong i, k;
     mp_ptr t;
 
     if (n < BELL_NUMBER_TAB_SIZE)

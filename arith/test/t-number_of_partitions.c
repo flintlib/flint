@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -111,7 +111,7 @@ int main(void)
     fmpz_t p;
     fmpz * v;
 
-    long i;
+    slong i;
 
     printf("number_of_partitions....");
     fflush(stdout);

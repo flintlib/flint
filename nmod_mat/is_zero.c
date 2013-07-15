@@ -32,7 +32,7 @@
 int
 nmod_mat_is_zero(const nmod_mat_t mat)
 {
-    long j;
+    slong j;
 
     if (mat->r == 0 || mat->c == 0)
         return 1;

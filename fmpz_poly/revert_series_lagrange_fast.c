@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -35,9 +35,9 @@
 #define Ri(ii) (R + (n-1)*((ii)-1))
 
 void
-_fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, long n)
+_fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong n)
 {
-    long i, j, k, m;
+    slong i, j, k, m;
     fmpz *R, *S, *T, *tmp;
     fmpz_t t;
 
@@ -92,11 +92,11 @@ _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, long n)
 
 void
 fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
-                                        const fmpz_poly_t Q, long n)
+                                        const fmpz_poly_t Q, slong n)
 {
     fmpz *Qcopy;
     int Qalloc;
-    long Qlen = Q->length;
+    slong Qlen = Q->length;
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
@@ -112,7 +112,7 @@ fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
     }
     else
     {
-        long i;
+        slong i;
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Qlen; i++)
             Qcopy[i] = Q->coeffs[i];

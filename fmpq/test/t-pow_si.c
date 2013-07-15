@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "long_extras.h"
 #include "ulong_extras.h"
@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 100000; i++)
     {
         fmpq_t a, b, c;
-        long e;
+        slong e;
 
         fmpq_init(a);
         fmpq_init(b);
@@ -81,7 +81,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_t a, b, c;
-        long j, e;
+        slong j, e;
 
         fmpq_init(a);
         fmpq_init(b);

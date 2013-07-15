@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
-               const fmpz * poly2, long len2)
+_fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1,
+               const fmpz * poly2, slong len2)
 {
 
     if (len1 < 6)
@@ -40,7 +40,7 @@ _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
     }
     else
     {
-        long b1, b2;
+        slong b1, b2;
 
         b1 = _fmpz_vec_max_bits(poly1, len1);
         b2 = _fmpz_vec_max_bits(poly2, len2);
@@ -67,8 +67,8 @@ fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
     }
     else /* len1 >= len2 >= 0 */
     {
-        const long len1 = poly1->length;
-        const long len2 = poly2->length;
+        const slong len1 = poly1->length;
+        const slong len2 = poly2->length;
         
         if (len1 == 0) /* len1 = len2 = 0 */
         {

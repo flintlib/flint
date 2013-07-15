@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1, 
-                               const fmpz * poly2, long len2)
+_fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1, 
+                               const fmpz * poly2, slong len2)
 {
     if (len1 == 1)
         fmpz_set(res, poly1);
@@ -47,9 +47,9 @@ void
 fmpz_poly_compose(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    long lenr;
+    const slong len1 = poly1->length;
+    const slong len2 = poly2->length;
+    slong lenr;
     
     if (len1 == 0)
     {

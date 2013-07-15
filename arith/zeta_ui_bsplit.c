@@ -1,8 +1,28 @@
-#include <mpir.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
 #include "arith.h"
 
 typedef struct
@@ -46,7 +66,7 @@ zeta_bsplit_clear(zeta_bsplit_state * S)
 
 
 static __inline__ void
-zeta_coeff_k(zeta_bsplit_state * S, long k, long n, long s)
+zeta_coeff_k(zeta_bsplit_state * S, slong k, slong n, slong s)
 {
     if (k + 1 < 0)
     {
@@ -90,7 +110,7 @@ zeta_coeff_k(zeta_bsplit_state * S, long k, long n, long s)
 }
 
 void
-zeta_bsplit(zeta_bsplit_state * L, long a, long b, long n, long s, int resumable)
+zeta_bsplit(zeta_bsplit_state * L, slong a, slong b, slong n, slong s, int resumable)
 {
     if (a + 1 == b)
     {
@@ -101,7 +121,7 @@ zeta_bsplit(zeta_bsplit_state * L, long a, long b, long n, long s, int resumable
         zeta_bsplit_state Rs;
         zeta_bsplit_state * R = &Rs;
 
-        long m = (a + b) / 2;
+        slong m = (a + b) / 2;
 
         zeta_bsplit(L, m, b, n, s, 1);
 
@@ -169,10 +189,10 @@ mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd)
 {
     zeta_bsplit_state sm;
     zeta_bsplit_state * sum = &sm;
-    long prec, wp, n;
+    slong prec, wp, n;
     mpfr_t t, u;
     mpz_t w;
-    long i;
+    slong i;
 
     if (s < 2)
     {

@@ -24,15 +24,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1, 
-                                        const fmpz * poly2, long len2)
+_fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1, 
+                                        const fmpz * poly2, slong len2)
 {
     if (len2 == 1)
     {
@@ -46,7 +46,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1,
     {
         fmpz_t a, b, d, g, h;
         fmpz *A, *B, *W;
-        long lenA, lenB;
+        slong lenA, lenB;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -70,7 +70,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1,
 
         while (1)
         {
-            const long delta = lenA - lenB;
+            const slong delta = lenA - lenB;
 
             _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
 
@@ -81,7 +81,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1,
 
             {                       /* Swap A and B */
                 fmpz *T;
-                long len;
+                slong len;
                 T = A, A = B, B = T, len = lenA, lenA = lenB, lenB = len;
             }
 
@@ -140,8 +140,8 @@ fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
     }
     else /* len1 >= len2 >= 0 */
     {
-        const long len1 = poly1->length;
-        const long len2 = poly2->length;
+        const slong len1 = poly1->length;
+        const slong len2 = poly2->length;
         
         if (len1 == 0) /* len1 = len2 = 0 */
         {

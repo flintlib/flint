@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -127,7 +127,7 @@ main(void)
     {
         fmpz_poly_t a, b, c;
         fmpz_t t;
-        long j;
+        slong j;
         int square;
 
         fmpz_poly_init(a);

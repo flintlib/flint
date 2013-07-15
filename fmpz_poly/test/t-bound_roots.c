@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long iter;
+    slong iter;
     flint_rand_t state;
 
     printf("bound_roots....");
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t f, g;
         fmpz_t t, p, q, bound, nbound;
-        long i, num_roots;
+        slong i, num_roots;
 
         fmpz_init(t);
         fmpz_init(p);

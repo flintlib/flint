@@ -24,17 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
-void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols)
+void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 {
     if ((rows) && (cols))
     {
-        long i;
+        slong i;
         mat->entries = (fmpq *) flint_calloc(rows * cols, sizeof(fmpq));
         mat->rows = (fmpq **) flint_malloc(rows * sizeof(fmpq *));
 

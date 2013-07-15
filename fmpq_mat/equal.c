@@ -23,18 +23,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 int
 fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 {
-    long i, j;
+    slong i, j;
 
     if (mat1->r != mat2->r || mat1->c != mat2->c)
         return 0;

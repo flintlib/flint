@@ -24,15 +24,9 @@
 ******************************************************************************/
 
 #include <math.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
-#include "ulong_extras.h"
-#include "longlong.h"
 
-
-void arith_landau_function_vec(fmpz * res, long len)
+void arith_landau_function_vec(fmpz * res, slong len)
 {
     mp_limb_t p, pmax;
     mp_limb_t pk, pkhi;

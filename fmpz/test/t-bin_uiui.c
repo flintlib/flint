@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long i;
+    slong i;
     ulong n, k;
     fmpz_t x, y;
     mpz_t z;

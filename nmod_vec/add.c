@@ -24,15 +24,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
 void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
-				   mp_srcptr vec2, long len, nmod_t mod)
+				   mp_srcptr vec2, slong len, nmod_t mod)
 {
-   long i;
+   slong i;
 
    if (mod.norm)
    {

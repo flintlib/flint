@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, long len2)
+_fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len2)
 {
-    long i;
+    slong i;
     for (i = 0; i < len2; i++)
         fmpz_add(res + i, vec1 + i, vec2 + i);
 }

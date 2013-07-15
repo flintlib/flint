@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -48,7 +48,7 @@ main(void)
     {
         fmpz_t a, c, d;
         fmpz *f;
-        long len = n_randint(state, 100);
+        slong len = n_randint(state, 100);
 
         fmpz_init(a);
         fmpz_init(c);

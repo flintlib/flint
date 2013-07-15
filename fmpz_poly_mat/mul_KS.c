@@ -33,10 +33,10 @@ void
 fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     const fmpz_poly_mat_t B)
 {
-    long i, j;
-    long A_len, B_len;
+    slong i, j;
+    slong A_len, B_len;
     int signs;
-    mp_bitcnt_t A_bits, B_bits, bit_size;
+    slong A_bits, B_bits, bit_size;
 
     fmpz_mat_t AA, BB, CC;
 
@@ -83,10 +83,10 @@ fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     for (i = 0; i < C->r; i++)
         for (j = 0; j < C->c; j++)
             if (signs)
-                fmpz_poly_bit_unpack_unsigned(fmpz_poly_mat_entry(C, i, j),
+                fmpz_poly_bit_unpack(fmpz_poly_mat_entry(C, i, j),
                     fmpz_mat_entry(CC, i, j), bit_size);
             else
-                fmpz_poly_bit_unpack(fmpz_poly_mat_entry(C, i, j),
+                fmpz_poly_bit_unpack_unsigned(fmpz_poly_mat_entry(C, i, j),
                     fmpz_mat_entry(CC, i, j), bit_size);
 
     fmpz_mat_clear(AA);

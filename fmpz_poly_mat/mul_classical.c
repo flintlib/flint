@@ -32,8 +32,8 @@ void
 fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     const fmpz_poly_mat_t B)
 {
-    long ar, bc, br;
-    long i, j, k;
+    slong ar, bc, br;
+    slong i, j, k;
     fmpz_poly_t t;
 
     ar = A->r;

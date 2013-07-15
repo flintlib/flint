@@ -24,12 +24,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c)
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)
 {
     if (c >= poly->mod.n)
         NMOD_RED(c, c, poly->mod);

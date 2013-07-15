@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 int
-_fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len)
+_fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len)
 {
-    long i, m;
+    slong i, m;
     int result;
 
     /* the degree must be even */
@@ -64,7 +64,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len)
     fmpz_sqrt(res + m - 1, poly + len - 1);
     result = 1;
 
-    /* do long divison style 'square root with remainder' from top to bottom */
+    /* do slong divison style 'square root with remainder' from top to bottom */
     if (len > 1)
     {
         fmpz_t t, u;
@@ -105,7 +105,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len)
 int
 fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
 {
-    long blen, len = a->length;
+    slong blen, len = a->length;
     int result;
 
     if (len % 2 == 0)

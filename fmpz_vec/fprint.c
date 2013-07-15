@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -44,10 +44,10 @@
     On failure, a negative number is returned.''
  */
 
-int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len)
 {
     int r;
-    long i;
+    slong i;
 
     r = fprintf(file, "%li", len);
     if ((len > 0) && (r > 0))

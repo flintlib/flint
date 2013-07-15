@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -51,7 +51,7 @@ main(void)
             A_out, B_out, G_out, H_out, Prod_1, Prod_2;
         nmod_poly_t a, b, d, g, h, prod;
         fmpz_t p, p1, big_P, p1_2, big_P_2;
-        long bits, length, nbits, n, exp, part_exp;
+        slong bits, length, nbits, n, exp, part_exp;
 
         bits = n_randint(state, 200) + 1;
         nbits = n_randint(state, FLINT_BITS - 6) + 6;

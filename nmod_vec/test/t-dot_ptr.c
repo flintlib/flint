@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "ulong_extras.h"
@@ -42,13 +42,13 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        long len;
+        slong len;
         nmod_t mod;
         mp_limb_t m, res, res2;
         mp_ptr x, y;
         mp_ptr * z;
         int limbs1;
-        long j, offset;
+        slong j, offset;
 
         len = n_randint(state, 1000) + 1;
         m = n_randtest_not_zero(state);

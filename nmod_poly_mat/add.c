@@ -31,7 +31,7 @@ void
 nmod_poly_mat_add(nmod_poly_mat_t C,
                         const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

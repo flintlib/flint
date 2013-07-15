@@ -23,15 +23,12 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_zero(fmpz_mat_t mat)
 {
-    long i;
+    slong i;
 
     if (mat->c < 1)
         return;

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -46,7 +46,7 @@ main(void)
         nmod_poly_t poly, poly2, poly3;
         nmod_poly_factor_t factors;
         mp_limb_t modulus;
-        long length, length2;
+        slong length, length2;
         int result = 1;
 
         modulus = n_randtest_prime(state, 0);

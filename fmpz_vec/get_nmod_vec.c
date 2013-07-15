@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -31,9 +31,9 @@
 #include "nmod_poly.h"
 
 void
-_fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, long len, nmod_t mod)
+_fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, slong len, nmod_t mod)
 {
-    long i;
+    slong i;
         
     for (i = 0; i < len; i++)
        res[i] = fmpz_fdiv_ui(poly + i, mod.n);

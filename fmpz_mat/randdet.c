@@ -23,19 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
 #include "fmpz_factor.h"
-#include "ulong_extras.h"
-
 
 void
 fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 {
-    long i, j, k, n;
+    slong i, j, k, n;
     int parity;
     fmpz * diag;
     fmpz_factor_t factor;
@@ -66,7 +60,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     /* Form diagonal entries that multiply to the determinant */
     for (i = 0; i < factor->num; i++)
     {
-        for (j = 0; j < fmpz_get_ui(&factor->exp[i]); j++)
+        for (j = 0; j < factor->exp[i]; j++)
         {
             k = n_randint(state, n);
             fmpz_mul(&diag[k], &diag[k], &factor->p[i]);

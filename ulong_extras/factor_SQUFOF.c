@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -93,7 +93,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
         if (r == 1UL) return 0UL;
    }
    
-    if (i == max_iters) return 0UL;  /* taken too long, give up */
+    if (i == max_iters) return 0UL;  /* taken too much time, give up */
 
     qlast = r;
     p = p + r*((sqroot - p)/r);
@@ -123,7 +123,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
         p = pnext;
     }
 
-    if (j == max_iters) return 0UL;  /* taken too long, give up */
+    if (j == max_iters) return 0UL;  /* taken too much time, give up */
 
     if ((q & 1UL) == 0UL) q /= 2UL;
 

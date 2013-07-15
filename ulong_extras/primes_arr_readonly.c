@@ -19,13 +19,26 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <stdlib.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 
+const mp_limb_t * n_primes_arr_readonly(ulong num_primes)
+{
+    int m;
+
+    if (num_primes < 1)
+        return NULL;
+
+    m = FLINT_CLOG2(num_primes);
+    if (m >= _flint_primes_used)
+        n_compute_primes(num_primes);
+
+    return _flint_primes[m];
+}
 

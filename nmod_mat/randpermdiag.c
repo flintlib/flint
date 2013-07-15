@@ -31,12 +31,12 @@
 
 int
 nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
-                            mp_srcptr diag, long n)
+                            mp_srcptr diag, slong n)
 {
     int parity;
-    long i;
-    long * rows;
-    long * cols;
+    slong i;
+    slong * rows;
+    slong * cols;
 
     rows = _perm_init(mat->r);
     cols = _perm_init(mat->c);

@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -33,8 +33,8 @@
 
 void
 _fmpq_poly_compose_series(fmpz * res, fmpz_t den, const fmpz * poly1,
-        const fmpz_t den1, long len1, const fmpz * poly2,
-        const fmpz_t den2, long len2, long n)
+        const fmpz_t den1, slong len1, const fmpz * poly2,
+        const fmpz_t den2, slong len2, slong n)
 {
     if (len1 <= 20)
         _fmpq_poly_compose_series_horner(res, den, poly1, den1, len1,
@@ -46,11 +46,11 @@ _fmpq_poly_compose_series(fmpz * res, fmpz_t den, const fmpz * poly1,
 
 void
 fmpq_poly_compose_series(fmpq_poly_t res, 
-                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n)
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long lenr;
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong lenr;
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {

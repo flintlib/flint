@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -32,8 +32,8 @@
 
 /* Assumes poly1 and poly2 are not length 0 and 0 < trunc <= len1 + len2 - 1 */
 void
-_nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
-                            mp_srcptr poly2, long len2, long trunc, nmod_t mod)
+_nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1,
+                            mp_srcptr poly2, slong len2, slong trunc, nmod_t mod)
 {
     if (len1 == 1 || trunc == 1)    /* Special case if the length of output is 1 */
     {
@@ -41,10 +41,10 @@ _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
     }
     else                        /* Ordinary case */
     {
-        long i;
+        slong i;
 
-        long bits = FLINT_BITS - (long) mod.norm;
-        long log_len = FLINT_BIT_COUNT(len2);
+        slong bits = FLINT_BITS - (slong) mod.norm;
+        slong log_len = FLINT_BIT_COUNT(len2);
 
         if (2 * bits + log_len <= FLINT_BITS)
         {
@@ -92,9 +92,9 @@ _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
 void
 nmod_poly_mullow_classical(nmod_poly_t res,
                            const nmod_poly_t poly1, const nmod_poly_t poly2,
-                           long trunc)
+                           slong trunc)
 {
-    long len_out;
+    slong len_out;
 
     if (poly1->length == 0 || poly2->length == 0 || trunc == 0)
     {

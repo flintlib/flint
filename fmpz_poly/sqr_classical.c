@@ -24,14 +24,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 /* Assumes len > 0. */
-void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, long len)
+void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, slong len)
 {
     if (len == 1)  /* Special case */
     {
@@ -39,7 +39,7 @@ void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, long len)
     }
     else   /* Ordinary case */
     {
-        long i;
+        slong i;
 
         _fmpz_vec_scalar_mul_fmpz(rop, op, len, op);
 
@@ -58,7 +58,7 @@ void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, long len)
 
 void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op)
 {
-    long len;
+    slong len;
 
     if (op->length == 0)
     {

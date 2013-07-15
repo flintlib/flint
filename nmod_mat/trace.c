@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -33,7 +33,7 @@ mp_limb_t
 nmod_mat_trace(const nmod_mat_t mat)
 {
     mp_limb_t t;
-    long i, n = nmod_mat_nrows(mat);
+    slong i, n = nmod_mat_nrows(mat);
 
     if (n == 0)
         return 0;

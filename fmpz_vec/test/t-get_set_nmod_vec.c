@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -50,10 +50,10 @@ main(void)
         fmpz *a, *b;
         mp_ptr c;
         nmod_t mod;
-        long i;
+        slong i;
         mp_limb_t t;
 
-        long len = n_randint(state, 100);
+        slong len = n_randint(state, 100);
         mp_limb_t n = n_randtest_not_zero(state);
 
         a = _fmpz_vec_init(len);

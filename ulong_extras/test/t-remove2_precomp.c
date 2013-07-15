@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -33,11 +33,14 @@ int main(void)
 {
    int i, result;
    flint_rand_t state;
-   
+   const mp_limb_t * primes;
+   const double * inverses;
+
    printf("remove2_precomp....");
    fflush(stdout);
  
-   n_compute_primes(10000UL);
+   primes = n_primes_arr_readonly(10000);
+   inverses = n_prime_inverses_arr_readonly(10000);
 
    flint_randinit(state);
 
@@ -59,7 +62,7 @@ int main(void)
       {
          mpz_set_ui(d_n1, n1);
          mpz_set_ui(d_p, flint_primes_small[j]);
-         exp1 = n_remove2_precomp(&n1, flint_primes[j], flint_prime_inverses[j]);
+         exp1 = n_remove2_precomp(&n1, primes[j], inverses[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
          n2 = mpz_get_ui(d_n2);
 
@@ -99,7 +102,7 @@ int main(void)
       {
          mpz_set_ui(d_n1, n1);
          mpz_set_ui(d_p, flint_primes_small[j]);
-         exp1 = n_remove2_precomp(&n1, flint_primes[j], flint_prime_inverses[j]);
+         exp1 = n_remove2_precomp(&n1, primes[j], inverses[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
          n2 = mpz_get_ui(d_n2);
 

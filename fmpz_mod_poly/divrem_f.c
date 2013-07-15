@@ -28,8 +28,8 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
-                             const fmpz *A, long lenA, 
-                             const fmpz *B, long lenB, const fmpz_t p)
+                             const fmpz *A, slong lenA, 
+                             const fmpz *B, slong lenB, const fmpz_t p)
 {
     fmpz_t invB;
 
@@ -47,9 +47,9 @@ void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R,
 void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length;
-    const long lenB = B->length;
-    const long lenQ = lenA - lenB + 1;
+    const slong lenA = A->length;
+    const slong lenB = B->length;
+    const slong lenQ = lenA - lenB + 1;
 
     fmpz *q, *r;
     fmpz_t invB;

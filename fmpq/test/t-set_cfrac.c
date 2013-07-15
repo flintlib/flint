@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
@@ -46,7 +46,7 @@ main(void)
     {
         fmpq_t x, y, r;
         fmpz * c;
-        long n, bound;
+        slong n, bound;
 
         fmpq_init(x);
         fmpq_init(y);

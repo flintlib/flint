@@ -27,15 +27,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 
 void
 nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
-    long r1, long c1, long r2, long c2)
+    slong r1, slong c1, slong r2, slong c2)
 {
-    long i;
+    slong i;
     window->entries = NULL;
 
     window->rows = flint_malloc((r2 - r1) * sizeof(mp_limb_t *));

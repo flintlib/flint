@@ -25,16 +25,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly_mat.h"
 #include "perm.h"
 #include "ulong_extras.h"
 
 /* checks that the rref has the right form */
-int check_rref(const nmod_poly_mat_t A, const nmod_poly_t den, long rank)
+int check_rref(const nmod_poly_mat_t A, const nmod_poly_t den, slong rank)
 {
-    long i, j, k, prev_pivot;
+    slong i, j, k, prev_pivot;
 
     /* bottom should be zero */
     for (i = rank; i < A->r; i++)
@@ -75,7 +75,7 @@ int check_rref(const nmod_poly_mat_t A, const nmod_poly_t den, long rank)
 int
 main(void)
 {
-    long iter;
+    slong iter;
     flint_rand_t state;
 
     printf("rref....");
@@ -87,8 +87,8 @@ main(void)
     {
         nmod_poly_mat_t A, R, B, R2;
         nmod_poly_t den, c, den2;
-        long j, k, m, n, deg, rank1, rank2;
-        long *perm;
+        slong j, k, m, n, deg, rank1, rank2;
+        slong *perm;
         float density;
         int equal;
         mp_limb_t p;

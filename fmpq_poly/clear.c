@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -34,7 +34,7 @@ void fmpq_poly_clear(fmpq_poly_t poly)
 {
     if (poly->coeffs)
     {
-        long i;
+        slong i;
         for (i = 0; i < poly->alloc; i++)
             _fmpz_demote(poly->coeffs + i);
         flint_free(poly->coeffs);

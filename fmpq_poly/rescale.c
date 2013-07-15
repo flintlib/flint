@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -32,7 +32,7 @@
 
 void
 _fmpq_poly_rescale(fmpz * res, fmpz_t denr, 
-                   const fmpz * poly, const fmpz_t den, long len, 
+                   const fmpz * poly, const fmpz_t den, slong len, 
                    const fmpz_t xnum, const fmpz_t xden)
 {
     if (len < 2L)
@@ -45,7 +45,7 @@ _fmpq_poly_rescale(fmpz * res, fmpz_t denr,
     }
     else
     {
-        long i;
+        slong i;
         fmpz_t t;
         
         fmpz_init(t);

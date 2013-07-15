@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
 int
-_nmod_vec_dot_bound_limbs(long len, nmod_t mod)
+_nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
 {
     mp_limb_t t2, t1, t0, u1, u0;
 

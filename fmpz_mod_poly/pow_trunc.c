@@ -25,23 +25,23 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
-                         ulong e, long trunc, const fmpz_t p)
+_fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
+                         ulong e, slong trunc, const fmpz_t p)
 {
     _fmpz_mod_poly_pow_trunc_binexp(res, poly, e, trunc, p);
 }
 
 void
 fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
-                  const fmpz_mod_poly_t poly, ulong e, long trunc)
+                  const fmpz_mod_poly_t poly, ulong e, slong trunc)
 {
-    const long len = poly->length;
+    const slong len = poly->length;
     fmpz * q;
     int qcopy = 0;
 

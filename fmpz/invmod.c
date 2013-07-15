@@ -25,13 +25,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 ulong
-z_gcdinv(ulong * inv, long a, ulong b)
+z_gcdinv(ulong * inv, slong a, ulong b)
 {
     ulong g, ua = FLINT_ABS(a);
 

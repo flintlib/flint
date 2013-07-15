@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

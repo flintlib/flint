@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -60,15 +60,15 @@ do {                                                                  \
 } while (0)
 
 void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H, 
-    const fmpz *f, long lenF, 
-    const fmpz *g, long lenG, const fmpz *h, long lenH, 
-    const fmpz *a, long lenA, const fmpz *b, long lenB, 
+    const fmpz *f, slong lenF, 
+    const fmpz *g, slong lenG, const fmpz *h, slong lenH, 
+    const fmpz *a, slong lenA, const fmpz *b, slong lenB, 
     const fmpz_t p, const fmpz_t p1)
 {
     const fmpz one[1] = {1l};
-    const long lenM = FLINT_MAX(lenG, lenH);
-    const long lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
-    const long lenD = FLINT_MAX(lenE, lenF);
+    const slong lenM = FLINT_MAX(lenG, lenH);
+    const slong lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
+    const slong lenD = FLINT_MAX(lenE, lenF);
     fmpz *C, *D, *E, *M;
 
     C = _fmpz_vec_init(lenF + lenD + lenE + lenM);

@@ -26,7 +26,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -34,10 +34,10 @@
 
 void
 _nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly, 
-                                ulong e, mp_srcptr f, long lenf, nmod_t mod)
+                                ulong e, mp_srcptr f, slong lenf, nmod_t mod)
 {
     mp_ptr T, Q;
-    long lenT, lenQ;
+    slong lenT, lenQ;
     int i;
 
     if (lenf == 2)
@@ -76,9 +76,9 @@ nmod_poly_powmod_ui_binexp(nmod_poly_t res,
                            const nmod_poly_t f)
 {
     mp_ptr p;
-    long len = poly->length;
-    long lenf = f->length;
-    long trunc = lenf - 1;
+    slong len = poly->length;
+    slong lenf = f->length;
+    slong trunc = lenf - 1;
     int pcopy = 0;
 
     if (lenf == 0)

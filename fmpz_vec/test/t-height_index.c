@@ -26,16 +26,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-static long
-refimpl(const fmpz * v, long len)
+static slong
+refimpl(const fmpz * v, slong len)
 {
-    long i, max = 0;
+    slong i, max = 0;
 
     for (i = 1; i < len; i++)
         if (fmpz_cmpabs(v + i, v + max) > 0)
@@ -58,7 +58,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;
-        long len, bits, p1, p2;
+        slong len, bits, p1, p2;
 
         len = 1 + n_randint(state, 100);
 

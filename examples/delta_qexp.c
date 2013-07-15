@@ -30,7 +30,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -39,7 +39,7 @@
 int main(int argc, char* argv[])
 {
     fmpz_t c, n;
-    long N = 0;
+    slong N = 0;
 
     if (argc == 2)
         N = atol(argv[1]);

@@ -23,15 +23,12 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_one(fmpz_mat_t mat)
 {
-    long i, n;
+    slong i, n;
 
     fmpz_mat_zero(mat);
     n = FLINT_MIN(mat->r, mat->c);

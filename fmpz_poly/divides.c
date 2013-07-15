@@ -23,14 +23,14 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
-                       long len1, const fmpz * b, long len2)
+                       slong len1, const fmpz * b, slong len2)
 {
     fmpz * r = _fmpz_vec_init(len1);
 
@@ -61,7 +61,7 @@ int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b)
     }
 
     {
-        const long lenQ = a->length - b->length + 1;
+        const slong lenQ = a->length - b->length + 1;
         int res;
 
         if (q == a || q == b)

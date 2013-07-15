@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_vec.h"
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         __mpfr_struct *a;
-        long j, length = n_randint(state, 100);
+        slong j, length = n_randint(state, 100);
         mp_prec_t prec = n_randint(state, 200) + MPFR_PREC_MIN;
 
         a = _mpfr_vec_init(length, prec);

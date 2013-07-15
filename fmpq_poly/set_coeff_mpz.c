@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, long n, const mpz_t x)
+void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, slong n, const mpz_t x)
 {
     fmpz_t f;
 

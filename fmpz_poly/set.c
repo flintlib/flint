@@ -23,7 +23,7 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -33,7 +33,7 @@ fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
     if (poly1 != poly2)         /* Aliasing is trivial */
     {
-        long i, len = poly2->length;
+        slong i, len = poly2->length;
 
         fmpz_poly_fit_length(poly1, len);
 

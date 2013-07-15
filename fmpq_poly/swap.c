@@ -24,14 +24,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 {
-    long t;
+    slong t;
     fmpz * tptr;
     
     t             = poly1->length;

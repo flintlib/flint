@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_t A;
         fmpz_t a;
-        long n = n_randint(state, 100);
+        slong n = n_randint(state, 100);
 
         fmpz_poly_init(A);
         fmpz_poly_randtest(A, state, n_randint(state, 100), 100);

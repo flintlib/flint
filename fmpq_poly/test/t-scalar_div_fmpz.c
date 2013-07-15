@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
@@ -84,7 +84,7 @@ main(void)
     {
         fmpq_poly_t a, b, c;
         fmpz_t n1;
-        long n;
+        slong n;
 
         n = z_randtest_not_zero(state);
         fmpz_init(n1);

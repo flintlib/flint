@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				             long len, mp_limb_t c, nmod_t mod)
+				             slong len, mp_limb_t c, nmod_t mod)
 {
     if (mod.norm >= FLINT_BITS/2) /* addmul will fit in a limb */
     {
@@ -39,7 +39,7 @@ void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
     }
     else /* products may take two limbs */
     {
-        long i;
+        slong i;
         for (i = 0; i < len; i++)
             NMOD_ADDMUL(res[i], vec[i], c, mod); /* hi already reduced mod n */
    }

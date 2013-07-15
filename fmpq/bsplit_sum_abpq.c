@@ -23,14 +23,11 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 void
 _fmpq_bsplit_sum_abpq(fmpz_t P, fmpz_t Q, fmpz_t B, fmpz_t T,
-                        const fmpq * ab, const fmpq * pq, long n1, long n2)
+                        const fmpq * ab, const fmpq * pq, slong n1, slong n2)
 {
     if (n2 - n1 <= 0)
     {
@@ -46,7 +43,7 @@ _fmpq_bsplit_sum_abpq(fmpz_t P, fmpz_t Q, fmpz_t B, fmpz_t T,
     }
     else
     {
-        long m = (n1 + n2) / 2;
+        slong m = (n1 + n2) / 2;
 
         fmpz_t P2, Q2, B2, T2;
 
@@ -82,7 +79,7 @@ _fmpq_bsplit_sum_abpq(fmpz_t P, fmpz_t Q, fmpz_t B, fmpz_t T,
 
 void
 fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
-                        const fmpq * ab, const fmpq * pq, long n1, long n2)
+                        const fmpq * ab, const fmpq * pq, slong n1, slong n2)
 {
     _fmpq_bsplit_sum_abpq(s->P, s->Q, s->B, s->T, ab, pq, n1, n2);
 }

@@ -24,16 +24,11 @@
 ******************************************************************************/
 
 #include <math.h>
-#include <mpir.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
 
 
-static long
-_bell_series_cutoff(long n)
+static slong
+_bell_series_cutoff(slong n)
 {
     double N, log_N, log_pow, log_fac;
 
@@ -52,12 +47,12 @@ _bell_series_cutoff(long n)
 }
 
 static void
-_mpz_bell_bsplit(mpz_t P, mpz_t Q, long a, long b, long n, long bmax)
+_mpz_bell_bsplit(mpz_t P, mpz_t Q, slong a, slong b, slong n, slong bmax)
 {
     if (b - a < 20)
     {
         mpz_t u;
-        long k;
+        slong k;
         mpz_init(u);
         mpz_set_ui(P, 0UL);
         mpz_set_ui(Q, 0UL);
@@ -74,7 +69,7 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, long a, long b, long n, long bmax)
     }
     else
     {
-        long m;
+        slong m;
         mpz_t P1, Q2;
         m = (a + b) / 2;
         mpz_init(P1);
@@ -91,7 +86,8 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, long a, long b, long n, long bmax)
 void
 arith_bell_number_bsplit(fmpz_t b, ulong n)
 {
-    long N, prec;
+    slong N;
+    mp_bitcnt_t prec;
     mpz_t P, Q;
     mpfr_t Pf, Qf, E, one;
 

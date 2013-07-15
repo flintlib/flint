@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -42,10 +42,7 @@ fmpz_is_probabprime(const fmpz_t p)
     {
        int ret;
        
-       gmp_randstate_t state;
-       gmp_randinit_default(state);
-       ret = mpz_likely_prime_p(COEFF_TO_PTR(c), state, 0);
-       gmp_randclear(state);
+       ret = (mpz_probab_prime_p(COEFF_TO_PTR(c), 25) != 0);
        return ret;
     }
 }

@@ -23,15 +23,9 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
-#include "fmpq.h"
 
-void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)
 {
     if (n < 700)
         _arith_bernoulli_number_vec_recursive(num, den, n);
@@ -41,10 +35,10 @@ void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, long n)
         _arith_bernoulli_number_vec_multi_mod(num, den, n);
 }
 
-void arith_bernoulli_number_vec(fmpq * x, long n)
+void arith_bernoulli_number_vec(fmpq * x, slong n)
 {
     fmpz * num, * den;
-    long i;
+    slong i;
 
     if (n <= 0)
         return;

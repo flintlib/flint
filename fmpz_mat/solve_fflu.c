@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "perm.h"
 
@@ -34,7 +31,7 @@ fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
                     const fmpz_mat_t A, const fmpz_mat_t B)
 {
     fmpz_mat_t LU;
-    long dim, *perm;
+    slong dim, *perm;
     int result;
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))

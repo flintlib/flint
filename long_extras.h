@@ -26,7 +26,7 @@
 #ifndef LONG_EXTRAS_H
 #define LONG_EXTRAS_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus
@@ -35,7 +35,7 @@
 
 /* Properties ****************************************************************/
 
-size_t z_sizeinbase(long n, int b);
+size_t z_sizeinbase(slong n, int b);
 
 /* Randomisation  ************************************************************/
 

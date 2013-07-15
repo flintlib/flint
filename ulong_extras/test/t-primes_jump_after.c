@@ -25,14 +25,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
 int main(void)
 {
     flint_rand_t state;
-    long j, k, l;
+    slong j, k, l;
 
     printf("primes_jump_after....");
     fflush(stdout);

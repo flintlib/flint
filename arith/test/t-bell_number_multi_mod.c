@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -35,7 +35,7 @@
 int main(void)
 {
     flint_rand_t state;
-    long i;
+    slong i;
 
     printf("bell_number_multi_mod....");
     fflush(stdout);
@@ -44,7 +44,7 @@ int main(void)
 
     for (i = 0; i < 100; i++)
     {
-        long n;
+        slong n;
         fmpz_t b1, b2;
 
         fmpz_init(b1);

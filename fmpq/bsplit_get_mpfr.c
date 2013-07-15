@@ -23,10 +23,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 /* TODO: combine helper functions with partition function code */

@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void
 _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,

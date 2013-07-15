@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len)
+_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len)
 {
     if (len <= 1)
     {
@@ -40,7 +40,7 @@ _fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len)
     }
     else
     {
-        long i;
+        slong i;
 
         fmpz_add(res, vec, vec + 1);
 

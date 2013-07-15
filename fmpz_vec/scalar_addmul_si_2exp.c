@@ -23,16 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, const fmpz * vec2, long len2,
-                                long c, ulong exp)
+_fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, const fmpz * vec2, slong len2,
+                                slong c, ulong exp)
 {
-    long i;
+    slong i;
     fmpz_t temp;
 
     if (c == 0)

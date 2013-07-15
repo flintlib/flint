@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_t a, b;
         mpz_t d, e, f;
-        long x;
+        slong x;
         ulong exp;
 
         fmpz_init(a);
@@ -90,7 +90,7 @@ main(void)
     {
         fmpz_t a;
         mpz_t d, e, f;
-        long x;
+        slong x;
         ulong exp;
 
         fmpz_init(a);

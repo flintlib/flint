@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpq.h"
 
 char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)

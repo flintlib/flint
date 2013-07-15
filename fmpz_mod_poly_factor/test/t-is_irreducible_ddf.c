@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly_factor.h"
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_mod_poly_t poly1, poly2;
         fmpz_t modulus;
-        long length;
+        slong length;
         int i, num;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));

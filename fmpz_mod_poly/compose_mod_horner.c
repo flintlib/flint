@@ -24,17 +24,17 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 void
-_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
-                                              const fmpz * h, long lenh, const fmpz_t p)
+_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
+                                              const fmpz * h, slong lenh, const fmpz_t p)
 {
-    long i, len;
+    slong i, len;
     fmpz * t;
 
     if (lenh == 1)
@@ -79,11 +79,11 @@ fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly
                          const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3)
 {
     fmpz_t inv3;
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len3 = poly3->length;
-    long len = len3 - 1;
-    long vec_len = FLINT_MAX(len3 - 1, len2);
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len3 = poly3->length;
+    slong len = len3 - 1;
+    slong vec_len = FLINT_MAX(len3 - 1, len2);
 
     fmpz * ptr2;
 

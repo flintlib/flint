@@ -24,12 +24,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, long len)
+void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len)
 {
     if (len > poly->alloc)
     {

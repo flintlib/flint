@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -31,7 +31,7 @@
 
 void
 _fmpq_poly_asin_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, long n)
+                           const fmpz * h, const fmpz_t hden, slong n)
 {
     fmpz * t;
     fmpz * u;
@@ -60,10 +60,10 @@ _fmpq_poly_asin_series(fmpz * g, fmpz_t gden,
 
 
 void
-fmpq_poly_asin_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
+fmpq_poly_asin_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 {
     fmpz * f_coeffs;
-    long flen = f->length;
+    slong flen = f->length;
 
     if (flen && !fmpz_is_zero(f->coeffs))
     {

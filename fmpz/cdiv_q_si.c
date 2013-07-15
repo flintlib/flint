@@ -25,15 +25,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 
 void
-fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 {
     fmpz c1 = *g;
-    long c2 = h;
+    slong c2 = h;
 
     if (h == 0)
     {

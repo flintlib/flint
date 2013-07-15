@@ -29,10 +29,10 @@
 #include "fmpz_poly.h"
 
 int _fmpz_poly_fprint_pretty(FILE * file, 
-                             const fmpz * poly, long len, const char * x)
+                             const fmpz * poly, slong len, const char * x)
 {
     int r;
-    long i;
+    slong i;
 
     FMPZ_VEC_NORM(poly, len);
 

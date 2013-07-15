@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -32,10 +32,10 @@
 
 void
 _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
-                               long lenA, const fmpz * B, long lenB)
+                               slong lenA, const fmpz * B, slong lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long e, lenQ;
+    slong e, lenQ;
     fmpz_t pow;
     
     if (lenB == 1)
@@ -91,7 +91,7 @@ void
 fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
                               const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenq, lenr;
+    slong lenq, lenr;
     fmpz *q, *r;
     
     if (B->length == 0)

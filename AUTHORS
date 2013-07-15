@@ -13,7 +13,7 @@ Gonzalo Tornaria : Theta function module, Montgomery multiplication and modular
 David Howden : Computing Bernoulli numbers mod many primes, fast polynomial
                multiplication over Z/pZ
 Burcin Erocal : Primary FLINT wrapper in Sage
-Tom Boothby : Improved factoring of unsigned longs and detection of perfect 
+Tom Boothby : Improved factoring of ulongs and detection of perfect 
               powers
 Daniel Woodhouse : Multivariate multiplication over Z/nZ, Z and 
                    getPeriodSequence 
@@ -29,16 +29,17 @@ Jean-Pierre Flori: Many build system patches and Sage integration.
 Frithjof Schulze: Some fmpz functions and various patches.
 Curtis Bright: Numerous patches including 32 bit support
 Jan Tuitman : contributed to the design of the padics module.
+Martin Lee: Improvements to factorisation for polynomials over F_p.
 
 Additional research was contributed by Daniel Scott and Daniel Ellam.
 
 Further patches and bug reports have been made by Michael Abshoff, Didier 
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
 Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan 
-Grayson, Martin Lee, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
+Grayson, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
 Puydt and many others.
 
-Ralph Hemmecke made available an autotools build for FLINT.
+Ralf Hemmecke made available an autotools build for FLINT.
 
 Numerous people have contributed to wrapping FLINT in Sage and debugging, 
 including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,

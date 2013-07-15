@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -31,7 +31,7 @@
 
 void
 fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                             long x)
+                             slong x)
 {
     if (x == 0)
     {

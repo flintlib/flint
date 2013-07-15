@@ -34,7 +34,7 @@ int main(void)
 {
    fmpz_t n, p;
    ulong c;
-   ulong B0;
+   ulong B1;
    
    fmpz_init(n);
    fmpz_init(p);
@@ -51,8 +51,8 @@ int main(void)
          abort();
       }
    
-      printf("Enter B0: "); fflush(stdout);
-      if (!scanf("%lu", &B0))
+      printf("Enter B1: "); fflush(stdout);
+      if (!scanf("%lu", &B1))
       {
          printf("Read failed\n");
          abort();
@@ -63,7 +63,7 @@ int main(void)
          c = n_randlimb(state);
       } while (c <= 2UL);
 
-      if (fmpz_factor_pp1(p, n, B0, c))
+      if (fmpz_factor_pp1(p, n, B1, B1/100, c))
       {
          printf("Factor: ");
          fmpz_print(p);

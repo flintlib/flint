@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <mpir.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 static const int mod4_tab[8] = { 2, 1, 3, 0, 0, 3, 1, 2 };
 

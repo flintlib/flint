@@ -23,18 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
-
 
 void
-fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank,
+fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank,
                   mp_bitcnt_t bits)
 {
-    long i;
+    slong i;
     fmpz * diag;
 
     if (rank < 0 || rank > mat->r || rank > mat->c)

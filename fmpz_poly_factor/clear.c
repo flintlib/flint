@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -33,7 +33,7 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
 {
     if (fac->alloc)
     {
-        long i;
+        slong i;
 
         for (i = 0; i < fac->alloc; i++)
         {

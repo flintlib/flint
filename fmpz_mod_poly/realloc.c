@@ -25,7 +25,7 @@
 
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, long alloc)
+void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {

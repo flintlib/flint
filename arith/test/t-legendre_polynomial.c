@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "profiler.h"
@@ -38,7 +38,7 @@ int main()
 {
     fmpq_poly_t Pn, Pn1, Pn2, R;
 
-    long n;
+    slong n;
 
     printf("legendre_polynomial....");
     fflush(stdout);

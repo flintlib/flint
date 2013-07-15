@@ -24,14 +24,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 
 void
 nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {

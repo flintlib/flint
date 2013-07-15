@@ -24,15 +24,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_set(mpfr * vec1, mpfr * vec2, long length)
+_mpfr_vec_set(mpfr * vec1, mpfr * vec2, slong length)
 {
-    long i;
+    slong i;
     for (i = 0; i < length; i++)
         mpfr_set(vec1 + i, vec2 + i, GMP_RNDN);
 }

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -47,7 +47,7 @@ int main(void)
 
       count_leading_zeros(count, n);
 
-      result = ((n == 0UL) || (((long)(n << count) < 0L) && (r_shift(n, FLINT_BITS-count) == 0UL)));
+      result = ((n == 0UL) || (((slong)(n << count) < 0L) && (r_shift(n, FLINT_BITS-count) == 0UL)));
       if (!result)
       {
          printf("FAIL:\n");

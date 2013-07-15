@@ -24,14 +24,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_div(fmpz * Q, const fmpz * A, long lenA, const fmpz * B, long lenB)
+_fmpz_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
 {
     _fmpz_poly_div_divconquer(Q, A, lenA, B, lenB);
 }

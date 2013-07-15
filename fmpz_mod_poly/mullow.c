@@ -24,25 +24,25 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1, 
-                                      const fmpz *poly2, long len2, 
-                                      const fmpz_t p, long n)
+void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, 
+                                      const fmpz *poly2, slong len2, 
+                                      const fmpz_t p, slong n)
 {
     _fmpz_poly_mullow(res, poly1, len1, poly2, len2, n);
     _fmpz_vec_scalar_mod_fmpz(res, res, n, p);
 }
 
 void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 
-    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, long n)
+    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const slong len1 = poly1->length;
+    const slong len2 = poly2->length;
 
     if ((len1 == 0) || (len2 == 0) || (n == 0))
     {

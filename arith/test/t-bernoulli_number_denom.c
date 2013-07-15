@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz.h"
@@ -34,7 +34,7 @@
 int main()
 {
     fmpz_t s, t;
-    long n;
+    slong n;
 
     printf("bernoulli_number_denom....");
     fflush(stdout);

@@ -23,18 +23,11 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
 {
-    long n = mat->r;
+    slong n = mat->r;
 
     if (n == 0)
     {
@@ -60,7 +53,7 @@ void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
     {
         fmpz_mat_t num;
         fmpz * den;
-        long i;
+        slong i;
 
         fmpz_mat_init(num, mat->r, mat->c);
         den = _fmpz_vec_init(mat->r);

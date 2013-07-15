@@ -25,10 +25,11 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include "flint.h"
 
-size_t z_sizeinbase(long n, int b)
+size_t z_sizeinbase(slong n, int b)
 {
-    long c = 0;
+    slong c = 0;
 
     if (n == 0)
     {

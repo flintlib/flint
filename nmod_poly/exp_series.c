@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
@@ -36,10 +36,10 @@
                   g = exp(-x) only to length (n+1)/2 */
 static void
 _nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
-    mp_srcptr h, long n, nmod_t mod, int inverse)
+    mp_srcptr h, slong n, nmod_t mod, int inverse)
 {
-    long a[FLINT_BITS];
-    long i, m, m2, l;
+    slong a[FLINT_BITS];
+    slong i, m, m2, l;
     mp_ptr T, U, hprime;
 
     T = _nmod_vec_init(n);
@@ -100,7 +100,7 @@ _nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
 }
 
 void 
-_nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+_nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 {
     if (n < NMOD_POLY_NEWTON_EXP_CUTOFF)
     {
@@ -114,7 +114,7 @@ _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, long n, nmod_t mod
 }
 
 void 
-_nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
+_nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
 {
     if (n < NMOD_POLY_NEWTON_EXP_CUTOFF)
     {
@@ -129,11 +129,11 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
 }
 
 void
-nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
+nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n)
 {
     mp_ptr f_coeffs, h_coeffs;
     nmod_poly_t t1;
-    long hlen, k;
+    slong hlen, k;
 
     nmod_poly_fit_length(f, n);
     hlen = h->length;

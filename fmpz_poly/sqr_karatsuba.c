@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -36,17 +36,17 @@
     For documentation, see fmpz_poly/mul_karatsuba.c
  */
 
-extern void revbin1(fmpz * out, const fmpz * in, long len, long bits);
+extern void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
 
-extern void revbin2(fmpz * out, const fmpz * in, long len, long bits);
+extern void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
 
-extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, long bits);
+extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
 
 void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
-                                   fmpz * temp, long bits)
+                                   fmpz * temp, slong bits)
 {
-    long len = (1L << bits);
-    long m = len / 2;
+    slong len = (1L << bits);
+    slong m = len / 2;
 
     if (len == 1)
     {
@@ -69,10 +69,10 @@ void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
     _fmpz_vec_add_rev(out, temp, bits);
 }
 
-void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, long len)
+void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, slong len)
 {
     fmpz *rev, *out, *temp;
-    long length, loglen = 0;
+    slong length, loglen = 0;
 
     if (len == 1)
     {
@@ -101,7 +101,7 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, long len)
 
 void fmpz_poly_sqr_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-    long len;
+    slong len;
 
     if (poly->length == 0)
     {

@@ -24,11 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 {

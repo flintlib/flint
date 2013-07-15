@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -35,7 +35,7 @@
 int main(void)
 {
     fmpz_mat_t A, B, C, D;
-    long i;
+    slong i;
     flint_rand_t state;
 
     printf("mul_classical....");
@@ -45,7 +45,7 @@ int main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long m, n, k;
+        slong m, n, k;
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);

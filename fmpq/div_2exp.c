@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
 {

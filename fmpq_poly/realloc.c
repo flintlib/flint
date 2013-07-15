@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
+void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
 {
     if (alloc == 0)  /* Clear up, reinitialise */
     {
@@ -43,7 +43,7 @@ void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
     {
         if (poly->length > alloc)  /* Reduce the size */
         {
-            long i;
+            slong i;
             for (i = alloc; i < poly->length; i++)
                 _fmpz_demote(poly->coeffs + i);
             poly->length = alloc;

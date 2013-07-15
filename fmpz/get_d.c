@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -36,7 +36,7 @@
 #define DOUBLE_MIN COEFF_MIN
 #endif
 
-extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
+extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, slong);
 
 double
 fmpz_get_d(const fmpz_t f)

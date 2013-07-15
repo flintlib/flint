@@ -289,8 +289,9 @@ Johansson, Andy Novocin and David Harvey (no longer active).
 FLINT 2 and following should compile on any machine with GCC and a standard 
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
 machines. There is also limited optimisation for ARM and ia64 machines. As 
-of version 2.0, FLINT required GCC version 2.96 or later, MPIR 2.6.0 or 
-later and MPFR 3.0.0 or later. It is also required that the platform 
+of version 2.0, FLINT required GCC version 2.96 or later, either MPIR
+(2.6.0 or later) or GMP (5.1.1 or later), and MPFR 3.0.0 or later.
+It is also required that the platform 
 provide a \code{uint64_t} type if a native 64 bit type is not available. 
 Full C99 compliance is \textbf{not} required.
 
@@ -307,12 +308,15 @@ file \code{fmpz_poly/test/t-add.c}.
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
 
-FLINT requires MPIR version 2.6.0 or later and MPFR 3.0.0 or later and
-a pthread implementation. Some of the input/output tests require 
+FLINT requires either MPIR (version 2.6.0 or later) or GMP
+(version 5.1.1 or later). If MPIR is used, MPIR must be built with
+the \code{--enable-gmpcompat} option. FLINT also requires
+MPFR 3.0.0 or later and a pthread implementation.
+Some of the input/output tests require 
 \code{fork} and \code{pipe}, however these are disabled on MinGW which
 does not provide a posix implementation.
 
-To configure FLINT you must specify where MPIR and MPFR are on
+To configure FLINT you must specify where GMP/MPIR and MPFR are on
 your system. FLINT can work with the libraries installed as usual,
 e.g. in \code{/usr/local} or it can work with the libraries built
 from source in their standard source trees. 
@@ -387,7 +391,7 @@ make install
 
 Now to use FLINT, simply include the appropriate header files for 
 the FLINT modules you wish to use in your C program.  Then compile 
-your program, linking against the FLINT library, MPIR, MPFR and
+your program, linking against the FLINT library, GMP/MPIR, MPFR and
 pthreads with the options \code{-lflint -lmpfr -lgmp -lpthread}.
 
 Note that you may have to set \code{LD_LIBRARY_PATH} or equivalent
@@ -401,7 +405,7 @@ your machine, you can do the following in your code:
 #undef ulong
 #include <stdio.h>
 // other system headers
-#define ulong unsigned long
+#define ulong mp_limb_t
 \end{lstlisting}
 
 This prevents FLINT's definition of \code{ulong} interfering with
@@ -454,12 +458,12 @@ email with your bug report to \url{hart_wb@yahoo.com} or report them on the
 FLINT devel list \url{https://groups.google.com/group/flint-devel?hl=en}.
 
 If possible please include details of your system, the version of GCC, 
-the versions of MPIR and MPFR as well as precise details of how to 
+the versions of GMP/MPIR and MPFR as well as precise details of how to 
 replicate the bug.
 
-Note that FLINT needs to be linked against version 2.6.0 or later of MPIR,
-version 3.0.0 or later of MPFR and must be compiled with gcc version 2.96 
-or later.  
+Note that FLINT needs to be linked against version 2.6.0 or later of MPIR
+(or version 5.1.1 or later of GMP), version 3.0.0 or later of MPFR and
+must be compiled with gcc version 2.96 or later.  
 
 \chapter{Contributors}
 
@@ -486,7 +490,7 @@ Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan
 Grayson, Martin Lee, Bob Smith, Antony Vennard, Frédéric Chyzak, Julien
 Puydt and many others.
 
-Ralph Hemmecke made available an autotools build for FLINT.
+Ralf Hemmecke made available an autotools build for FLINT.
 
 Numerous people have contributed to wrapping FLINT in Sage and debugging, 
 including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
@@ -596,7 +600,7 @@ Similar to the previous macro, \code{FLINT_MAX(x, y)} returns the
 maximum of \code{x} and \code{y}.
 
 The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits 
-required to represent an \code{unsigned long x}.  If \code{x} is zero, 
+required to represent an \code{ulong x}.  If \code{x} is zero, 
 returns~$0$.
 
 Derived from this there are the two macros \code{FLINT_FLOG2(x)} and 
@@ -622,7 +626,7 @@ In all respects, \code{fmpz_t}'s act precisely like GMP/ MPIR's
 \code{mpz_t}'s, with automatic memory management, however, in the first 
 place only one limb is used to implement them.  Once an \code{fmpz_t} 
 overflows a limb then a multiprecision integer is automatically allocated 
-and instead of storing the actual integer data the \code{long} which 
+and instead of storing the actual integer data the \code{slong} which 
 implements the type becomes an index into a FLINT wide array of 
 \code{mpz_t}'s.
 
@@ -978,7 +982,7 @@ between their output arguments.
 On the other hand, there are versions of these functions whose names are 
 prefixed with a single underscore.  These typically operate on polynomials 
 given in the form of a triple of object of types \code{fmpz *}, 
-\code{fmpz_t}, and \code{long}, containing the numerator, denominator and 
+\code{fmpz_t}, and \code{slong}, containing the numerator, denominator and 
 length, respectively.  In general, these functions expect their input to 
 be normalised, i.e.\ they do not allow zero padding, and to be in lowest 
 terms, and they do not allow their input and output arguments to be aliased.
@@ -1162,7 +1166,7 @@ nmod_poly_t x, y;
 nmod_poly_init(x, 7);
 nmod_poly_init(y, 7);
 nmod_poly_set_coeff_ui(x, 3, 5);
-nmod_poly_set_coeff_si(x, 0, 6);
+nmod_poly_set_coeff_ui(x, 0, 6);
 nmod_poly_mul(y, x, x);
 nmod_poly_print(x); printf("\n");
 nmod_poly_print(y); printf("\n");

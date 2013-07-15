@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -32,7 +32,7 @@
 int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 {
     int r;
-    long i, len;
+    slong i, len;
     mpz_t t;
 
     mpz_init(t);
@@ -44,7 +44,7 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("Exception (fmpz_poly_fread). Length does not fit into a long.\n");
+        printf("Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
         abort();
     }
     len = mpz_get_si(t);

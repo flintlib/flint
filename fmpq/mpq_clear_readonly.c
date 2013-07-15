@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 void flint_mpq_clear_readonly(mpq_t z)

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz.h"
@@ -35,7 +35,7 @@
 void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 {
     fmpz_poly_t t;
-    long d;
+    slong d;
 
     fmpz_poly_init(t);
 
@@ -74,7 +74,7 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 int main()
 {
     fmpz_poly_t A, B;
-    long n;
+    slong n;
 
     printf("cyclotomic_polynomial....");
     fflush(stdout);

@@ -24,23 +24,23 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 
-long
+slong
 nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 {
-    long i, j, k, m, n, rank, nullity;
-    long * p;
-    long * pivots;
-    long * nonpivots;
+    slong i, j, k, m, n, rank, nullity;
+    slong * p;
+    slong * pivots;
+    slong * nonpivots;
     nmod_mat_t tmp;
 
     m = A->r;
     n = A->c;
 
-    p = flint_malloc(sizeof(long) * FLINT_MAX(m, n));
+    p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
 
     nmod_mat_init_set(tmp, A);
     rank = nmod_mat_rref(tmp);

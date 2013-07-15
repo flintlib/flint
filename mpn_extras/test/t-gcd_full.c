@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
@@ -36,7 +36,7 @@ int main(void)
     mpz_t a, b, c, g;
     gmp_randstate_t st;
     flint_rand_t state;
-    long s1, s2;
+    slong s1, s2;
     
     printf("gcd_full....");
     fflush(stdout);

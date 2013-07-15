@@ -84,7 +84,7 @@ mp_limb_t n_randtest_not_zero(flint_rand_t state)
     As for \code{n_randtest()}, but does not return $0$.
     This function is intended for use in test code. 
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
+mp_limb_t n_randprime(flint_rand_t state, unsigned slong bits, int proved)
 
     Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with \code{bits} bits, where \code{bits} must be at least 2 and
@@ -131,7 +131,7 @@ mp_limb_t n_clog(mp_limb_t n, mp_limb_t b)
 ulong n_revbin(ulong in, ulong bits)
 
     Returns the binary reverse of \code{in}, assuming it is the given 
-    number of bits long, e.g.\ \code{n_revbin(10110, 6)} will return
+    number of bits in length, e.g.\ \code{n_revbin(10110, 6)} will return
     \code{110100}.
 
 int n_sizeinbase(mp_limb_t n, int base)
@@ -298,7 +298,7 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
     The value \code{norm} is provided for convenience. As $n$ is required
     to be normalised, it may be that $a$ and $b$ have been shifted to the
     left by \code{norm} bits before calling the function. Their product
-    then has an extra factor of $2^\mbox{norm}$. Specifying a nonzero
+    then has an extra factor of $2^\text{norm}$. Specifying a nonzero
     \code{norm} will shift the product right by this many bits before
     reducing it.
 
@@ -332,6 +332,11 @@ mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
     know the quotient is $2$. In the remaining cases, the quotient must 
     be $3$. When the quotient is $4$ or above, we use division. However this 
     happens rarely for generic inputs.
+
+mp_limb_t n_gcd_full(mp_limb_t x, mp_limb_t y)
+
+    Returns the greatest common divisor $g$ of $x$ and $y$.
+    No assumptions are made about $x$ and $y$.
 
 mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
 
@@ -482,7 +487,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
     Returns 0 if $a$ is a quadratic non-residue modulo $p$.
 
-long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
+slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -493,7 +498,7 @@ long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
+slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -504,7 +509,7 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     Computes all the square roots of \code{a} modulo \code{m} given the 
     factorisation of \code{m} in \code{fac}. The roots are stored in an array 
@@ -558,9 +563,30 @@ void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
 
 void n_compute_primes(ulong num_primes)
 
-    Precomputes \code{num_primes} primes and their \code{double} 
-    precomputed inverses and stores them in \code{flint_primes} 
-    and \code{flint_prime_inverse}, respectively.
+    Precomputes at least \code{num_primes} primes and their \code{double} 
+    precomputed inverses and stores them in an internal cache.
+    Assuming that FLINT has been built with support for thread-local storage,
+    each thread has its own cache.
+
+const mp_limb_t * n_primes_arr_readonly(ulong num_primes)
+
+    Returns a pointer to a read-only array of the first \code{num_primes}
+    prime numbers. The computed primes are cached for repeated calls.
+    The pointer is valid until the user calls \code{n_cleanup_primes}
+    in the same thread.
+
+const double * n_prime_inverses_arr_readonly(ulong n)
+
+    Returns a pointer to a read-only array of inverses of the first
+    \code{num_primes} prime numbers. The computed primes are cached for
+    repeated calls. The pointer is valid until the user calls
+    \code{n_cleanup_primes} in the same thread.
+
+void n_cleanup_primes()
+
+    Frees the internal cache of prime numbers used by the current thread.
+    This will invalidate any pointers returned by
+    \code{n_primes_arr_readonly} or \code{n_prime_inverses_arr_readonly}.
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
@@ -572,11 +598,9 @@ ulong n_prime_pi(mp_limb_t n)
 
     Returns the value of the prime counting function $\pi(n)$, i.e.\ the
     number of primes less than or equal to $n$. The invariant
-    \code{n_prime_pi(n_nth_prime(n)) == n} holds, or
-    \code{n_prime_pi(flint_primes[n-1]) == n}, where \code{flint_primes} is
-    indexed from zero.
+    \code{n_prime_pi(n_nth_prime(n)) == n}.
 
-    Currently, this function simply extends \code{flint_primes} up to
+    Currently, this function simply extends the table of cached primes up to
     an upper limit and then performs a binary search.
 
 void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
@@ -598,8 +622,8 @@ mp_limb_t n_nth_prime(ulong n)
     Returns the $n$th prime number $p_n$, using the mathematical indexing
     convention $p_1 = 2, p_2 = 3, \dotsc$.
 
-    This function simply ensures that \code{flint_primes} is large enough
-    and then looks up \code{flint_primes[n-1]}.
+    This function simply ensures that the table of cached primes is large
+    enough and then looks up the entry.
 
 void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
 
@@ -648,7 +672,7 @@ int n_is_oddprime_small(mp_limb_t n)
 int n_is_oddprime_binary(mp_limb_t n) 
 
     This function performs a simple binary search through 
-    \code{flint_primes} for $n$. If it exists in the array it returns
+    the table of cached primes for $n$. If it exists in the array it returns
     $1$, otherwise $0$. For the algorithm to operate correctly 
     $n$ should be odd and at least $17$. 
 
@@ -782,7 +806,7 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
 int n_is_probabprime_BPSW(mp_limb_t n)
 
-    Implements the Bailey--Pomerance--Selfridge--Wagstaff probable primality
+    Implements the Baillie--Pomerance--Selfridge--Wagstaff probable primality
     test. There are no known counterexamples to this being a primality test.
     For further details, see~\citep{CraPom2005}.
 
@@ -824,7 +848,7 @@ mp_limb_t n_sqrt(mp_limb_t a)
     will be down. Thus the square root may be one too large in some 
     instances. We also have to be careful when the square of this too large 
     value causes an overflow. The same assumptions hold for a single 
-    precision float so long as the square root itself can be represented 
+    precision float provided the square root itself can be represented 
     in a single float, i.e.\ for $a < 281474976710656 = 2^{46}$.
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
@@ -836,7 +860,7 @@ mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
     will be down. Thus the square root may be one too large in some 
     instances. We also have to be careful when the square of this too 
     large value causes an overflow. The same assumptions hold for a 
-    single precision float so long as the square root itself can be 
+    single precision float provided the square root itself can be 
     represented in a single float, i.e. for \
     $a < 281474976710656 = 2^{46}$. The remainder is computed by 
     subtracting the square of the computed square root from $a$.
@@ -915,7 +939,7 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors,
                   mp_limb_t n, ulong start, ulong num_primes)
 
     Trial factor $n$ with the first \code{num_primes} primes, but
-    starting at the prime in \code{flint_primes} with index start. 
+    starting at the prime with index start (counting from zero).
 
     One requires an initialised \code{n_factor_t} structure, but factors
     will be added by default to an already used \code{n_factor_t}. Use 
@@ -1082,10 +1106,10 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
     The factors are proved prime if \code{proved} is $1$, otherwise
     they are merely probably prime.
 
-mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
 
     Factors $n$ using Williams' $p + 1$ factoring algorithm, with prime
-    limit set to $B0$. We require $c$ to be set to a random value. Each
+    limit set to $B1$. We require $c$ to be set to a random value. Each
     trial of the algorithm with a different value of $c$ gives another
     chance to factor $n$, with roughly exponentially decreasing chance
     of finding a missing factor. If $p + 1$ (or $p - 1$) is not smooth

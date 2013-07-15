@@ -25,18 +25,18 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
-                           const fmpz * B, long lenB)
+_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
+                           const fmpz * B, slong lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long iQ, iR;
+    slong iQ, iR;
 
     if (R != A)
         _fmpz_vec_set(R, A, lenA);
@@ -57,7 +57,7 @@ void
 fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
                           const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenq, lenr;
+    slong lenq, lenr;
     fmpz *q, *r;
     
     if (B->length == 0)

@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -32,11 +32,11 @@
 
 
 void
-_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
-               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1,
+               const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2,
                 mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < FLINT_MIN(len1, len2); i++)
     {
@@ -64,8 +64,8 @@ _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
 }
 
 void
-_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
-               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, slong len1,
+               const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2,
                 mp_limb_t m2inv, int sign)
 {
     mp_limb_t c;
@@ -93,9 +93,9 @@ void
 fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
                         const fmpz_t m1, const nmod_poly_t poly2, int sign)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len = FLINT_MAX(len1, len2);
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len = FLINT_MAX(len1, len2);
 
     if (len == 0)
     {

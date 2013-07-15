@@ -23,20 +23,20 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_get_slice(fmpq_poly_t rop, const fmpq_poly_t op, long i, long j)
+void fmpq_poly_get_slice(fmpq_poly_t rop, const fmpq_poly_t op, slong i, slong j)
 {
     i = FLINT_MAX(i, 0);
     j = FLINT_MIN(j, op->length);
 
     if (i < j)
     {
-        long k;
+        slong k;
 
         if (rop == op)
         {

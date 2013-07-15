@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -31,7 +31,7 @@
 
 void fmpz_mod_poly_clear(fmpz_mod_poly_t poly)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < poly->alloc; i++)  /* Clean up any mpz_t's */
         _fmpz_demote(poly->coeffs + i);

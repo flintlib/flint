@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -33,14 +33,14 @@
 
 char * nmod_poly_get_str(const nmod_poly_t poly)
 {
-    long i;
+    slong i;
     char * buf, * ptr;
 
     /* estimate for the length, n and three spaces */
 #if FLINT64
-    long size = 21*2 + 1;
+    slong size = 21*2 + 1;
 #else
-    long size = 11*2 + 1;
+    slong size = 11*2 + 1;
 #endif
 
     for (i = 0; i < poly->length; i++)

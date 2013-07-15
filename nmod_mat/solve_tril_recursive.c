@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -37,7 +37,7 @@ nmod_mat_solve_tril_recursive(nmod_mat_t X,
                                                                     int unit)
 {
     nmod_mat_t LA, LC, LD, XX, XY, BX, BY;
-    long r, n, m;
+    slong r, n, m;
 
     n = L->r;
     m = B->c;

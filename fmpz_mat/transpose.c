@@ -23,16 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 {
     fmpz tmp;
-    long i, j;
+    slong i, j;
 
     if (B->r != A->c || B->c != A->r)
     {

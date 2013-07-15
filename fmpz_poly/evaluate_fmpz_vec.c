@@ -23,16 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
 fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
-                                const fmpz * a, long n)
+                                const fmpz * a, slong n)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < n; i++)
         fmpz_poly_evaluate_fmpz(res + i, f, a + i);

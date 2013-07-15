@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -34,7 +34,7 @@
 void
 _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
 {
-    long i, len;
+    slong i, len;
     n_factor_t nfac;
 
     if (n == 0)
@@ -55,6 +55,6 @@ _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
     for (i = 0; i < nfac.num; i++)
     {
         fmpz_set_ui(factor->p + len + i, nfac.p[i]);
-        fmpz_set_ui(factor->exp + len + i, nfac.exp[i]);
+        factor->exp[len + i] = nfac.exp[i];
     }
 }

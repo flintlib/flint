@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -31,7 +31,7 @@
 
 int fmpq_poly_debug(const fmpq_poly_t poly)
 {
-    long i;
+    slong i;
 
     printf("{alloc: %ld, length: %ld, coeffs:", poly->alloc, poly->length);
     for (i = 0; i < poly->alloc; i++)

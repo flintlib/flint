@@ -24,16 +24,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
 void
-_nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
 {
-    long i;
+    slong i;
     mp_ptr R, S, T, tmp;
 
     if (n >= 1) Qinv[0] = 0UL;
@@ -62,11 +62,11 @@ _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 
 void
 nmod_poly_revert_series_lagrange(nmod_poly_t Qinv, 
-                                 const nmod_poly_t Q, long n)
+                                 const nmod_poly_t Q, slong n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
     nmod_poly_t t1;
-    long Qlen;
+    slong Qlen;
     
     Qlen = Q->length;
 

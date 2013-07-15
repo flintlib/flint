@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
@@ -32,7 +32,7 @@
 void
 nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
 {
-    long i;
+    slong i;
 
     if (B == A || A->c == 0)
         return;

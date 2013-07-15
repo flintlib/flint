@@ -30,9 +30,9 @@
 
 #undef ulong /* interferes with system includes */
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -45,18 +45,18 @@
 
 void fmpz_poly_factor_init(fmpz_poly_factor_t fac);
 
-void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc);
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, slong alloc);
 
-void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc);
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, slong alloc);
 
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, slong len);
 
 void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
-                             const fmpz_poly_t p, long exp);
+                             const fmpz_poly_t p, slong exp);
 
 void fmpz_poly_factor_concat(fmpz_poly_factor_t res, 
                              const fmpz_poly_factor_t fac);
@@ -65,12 +65,12 @@ void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
 	const fmpz_poly_factor_t lifted_fac, 
-    const fmpz_poly_t F, const fmpz_t P, long exp);
+    const fmpz_poly_t F, const fmpz_t P, slong exp);
     
 void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F);
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
-								  long exp, const fmpz_poly_t f, long cutoff);
+								  slong exp, const fmpz_poly_t f, slong cutoff);
 
 void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G);
 

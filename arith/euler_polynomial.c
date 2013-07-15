@@ -23,18 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
 #include "arith.h"
 
 void arith_euler_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
-    long k;
+    slong k;
 
     if (n == 0)
     {

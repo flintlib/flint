@@ -23,12 +23,12 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-long 
+slong 
 fmpz_get_si(const fmpz_t f)
 {
     return (!COEFF_IS_MPZ(*f) ? *f : mpz_get_si(COEFF_TO_PTR(*f)));

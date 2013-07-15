@@ -27,7 +27,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
@@ -35,7 +35,7 @@
 void
 fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < fac->alloc; i++)
         fmpz_mod_poly_clear(fac->poly + i);

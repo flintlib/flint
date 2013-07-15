@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <float.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -36,7 +36,7 @@
 int
 main(void)
 {
-    long len, iter, i;
+    slong len, iter, i;
     fmpz_mod_poly_t f;
     fmpz * roots;
     fmpz_poly_struct ** tree;
@@ -74,7 +74,7 @@ main(void)
 
     timeit_stop(t);
 
-    printf("len = %ld, time = %ldms\n", len, ((long) t->cpu)/10);
+    printf("len = %ld, time = %ldms\n", len, ((slong) t->cpu)/10);
         
     fmpz_mod_poly_clear(f);
     

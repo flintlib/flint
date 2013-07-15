@@ -32,7 +32,7 @@
 
 int main(void)
 {
-    long k;
+    slong k;
 
     printf("pi_chudnovsky....");
     fflush(stdout);

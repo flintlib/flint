@@ -24,15 +24,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_vec.h"
 
 __mpfr_struct *
-_mpfr_vec_init(long length, mp_bitcnt_t prec)
+_mpfr_vec_init(slong length, mp_bitcnt_t prec)
 {
-    long i;
+    slong i;
 
     __mpfr_struct *vec =
         (__mpfr_struct *) flint_malloc(length * sizeof(__mpfr_struct));

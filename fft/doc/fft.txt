@@ -60,7 +60,7 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_limb_t * limbs,
     is returned by the function and any coefficients beyond this point are 
     not touched. 
 
-void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, 
          mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 
     Evaluate the polynomial \code{poly} of the given \code{length} at 
@@ -73,7 +73,7 @@ void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length,
     If the integer is initially zero the result will just be the evaluation 
     of the polynomial.
 
-void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, 
               mp_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 
     Evaluate the polynomial \code{poly} of the given \code{length} at
@@ -585,7 +585,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
     require that \code{depth} and \code{w} have been selected as per the 
     wrapper \code{fft_mulmod_2expp1} below.
 
-long fft_adjust_limbs(mp_size_t limbs)
+slong fft_adjust_limbs(mp_size_t limbs)
 
     Given a number of limbs, returns a new number of limbs (no more than 
     the next power of 2) which will work with the Nussbaumer code. It is only 
@@ -645,8 +645,8 @@ void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
 
 *******************************************************************************
 
-void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
-                              long limbs, long trunc, mp_limb_t ** t1, 
+void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
+                              slong limbs, slong trunc, mp_limb_t ** t1, 
                              mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt)
 
     Perform an FFT convolution of \code{ii} with \code{jj}, both of length 

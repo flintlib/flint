@@ -29,7 +29,7 @@
 #undef ulong /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include "flint.h"
 
@@ -39,11 +39,11 @@
 
 /* Memory management *********************************************************/
 
-static __inline__ long * _perm_init(long n)
+static __inline__ slong * _perm_init(slong n)
 {
-    long i, *vec;
+    slong i, *vec;
 
-    vec = (long *) flint_malloc(n * sizeof(long));
+    vec = (slong *) flint_malloc(n * sizeof(slong));
 
     if (!vec)
     {
@@ -57,16 +57,16 @@ static __inline__ long * _perm_init(long n)
     return vec;
 }
 
-static __inline__ void _perm_clear(long * vec)
+static __inline__ void _perm_clear(slong * vec)
 {
     flint_free(vec);
 }
 
 /* Assignment ****************************************************************/
 
-static __inline__ long _perm_equal(const long *vec1, const long *vec2, long n)
+static __inline__ slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < n; i++)
         if (vec1[i] != vec2[i])
@@ -75,30 +75,30 @@ static __inline__ long _perm_equal(const long *vec1, const long *vec2, long n)
     return 1;
 }
 
-static __inline__ void _perm_set(long *res, const long *vec, long n)
+static __inline__ void _perm_set(slong *res, const slong *vec, slong n)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < n; i++)
         res[i] = vec[i];
 }
 
-static __inline__ void _perm_set_one(long *vec, long n)
+static __inline__ void _perm_set_one(slong *vec, slong n)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < n; i++)
         vec[i] = i;
 }
 
 static __inline__ void
- _perm_inv(long *res, const long *vec, long n)
+ _perm_inv(slong *res, const slong *vec, slong n)
 {
-    long i;
+    slong i;
 
     if (res == vec)
     {
-        long *t = (long *) flint_malloc(n * sizeof(long));
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
 
         if (!t)
         {
@@ -123,13 +123,13 @@ static __inline__ void
 /* Composition ***************************************************************/
 
 static __inline__ void
-_perm_compose(long *res, const long *vec1, const long *vec2, long n)
+_perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 {
-    long i;
+    slong i;
 
     if (res == vec1)
     {
-        long *t = (long *) flint_malloc(n * sizeof(long));
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
 
         for (i = 0; i < n; i++)
             t[i] = vec1[i];
@@ -147,17 +147,17 @@ _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 
 /* Randomisation *************************************************************/
 
-int _perm_randtest(long * vec, long n, flint_rand_t state);
+int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 
 /* Parity ********************************************************************/
 
-int _perm_parity(const long * vec, long n);
+int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 
-static __inline__  int _long_vec_print(const long * vec, long len)
+static __inline__  int _long_vec_print(const slong * vec, slong len)
 {
-    long i;
+    slong i;
 
     printf("%ld", len);
     if (len > 0)
@@ -170,9 +170,9 @@ static __inline__  int _long_vec_print(const long * vec, long len)
     return 1;
 }
 
-static __inline__ int _perm_print(const long * vec, long n)
+static __inline__ int _perm_print(const slong * vec, slong n)
 {
-    long i;
+    slong i;
 
     printf("%ld", n);
     if (n > 0)

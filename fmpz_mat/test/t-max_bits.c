@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    long m, n, rep, res1, res2;
+    slong m, n, rep, res1, res2;
     flint_rand_t state;
 
     printf("max_bits....");

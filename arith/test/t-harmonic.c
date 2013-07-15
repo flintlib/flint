@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz.h"
@@ -35,7 +35,7 @@
 #include "profiler.h"
 
 
-void numerical_test(fmpq_t res, long n, double ans)
+void numerical_test(fmpq_t res, slong n, double ans)
 {
     const double tol = 1e-13;
     double err;
@@ -58,9 +58,9 @@ void numerical_test(fmpq_t res, long n, double ans)
 }
 
 void
-mpq_harmonic_balanced(mpq_t res, long a, long b)
+mpq_harmonic_balanced(mpq_t res, slong a, slong b)
 {
-    long k;
+    slong k;
     mpq_t t;
 
     mpq_init(t);
@@ -87,7 +87,7 @@ mpq_harmonic_balanced(mpq_t res, long a, long b)
 
 int main(void)
 {
-    long i;
+    slong i;
     mpq_t x, y;
     fmpq_t t;
 

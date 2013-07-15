@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
+_fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong n)
 {
     ulong bit = ~((~0UL) >> 1);
     fmpz *v = _fmpz_vec_init(n);
@@ -104,11 +104,11 @@ _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
 }
 
 void
-fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n)
+fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong n)
 {
     fmpz * copy;
     int clear;
-    long i, len;
+    slong i, len;
 
     if (n == 0)
     {

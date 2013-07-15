@@ -23,17 +23,11 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-
 
 #define AA(i,j) fmpz_mat_entry(A, i, j)
 #define BB(i,j) fmpz_mat_entry(B, i, j)
 #define XX(i,j) fmpz_mat_entry(X, i, j)
-
 
 int
 _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,
@@ -64,7 +58,7 @@ _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,
     if (success)
     {
         fmpz_t t12, t13, t14, x0, x1, x2;
-        long i, n = fmpz_mat_ncols(B);
+        slong i, n = fmpz_mat_ncols(B);
 
         fmpz_init(t12);
         fmpz_init(t13);
@@ -120,7 +114,7 @@ int
 fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
                             const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long i, dim = fmpz_mat_nrows(A);
+    slong i, dim = fmpz_mat_nrows(A);
 
     if (dim == 0 || fmpz_mat_ncols(B) == 0)
     {

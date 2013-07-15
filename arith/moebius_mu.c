@@ -23,19 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
-
 
 int arith_moebius_mu(const fmpz_t n)
 {
     fmpz_factor_t factors;
-    long i;
+    slong i;
     int mu;
 
     if (fmpz_abs_fits_ui(n))
@@ -47,7 +41,7 @@ int arith_moebius_mu(const fmpz_t n)
     mu = 1;
     for (i = 0; i < factors->num; i++)
     {
-        if (fmpz_get_ui(factors->exp + i) != 1UL)
+        if (factors->exp[i] != 1UL)
         {
             mu = 0;
             break;

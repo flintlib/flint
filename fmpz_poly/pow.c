@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
     if (e < 5UL)
         _fmpz_poly_pow_small(res, poly, len, e);
@@ -50,8 +50,8 @@ _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
 void
 fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const long len = poly->length;
-    long rlen;
+    const slong len = poly->length;
+    slong rlen;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -72,7 +72,7 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (long) e * (len - 1) + 1;
+    rlen = (slong) e * (len - 1) + 1;
 
     if (res != poly)
     {

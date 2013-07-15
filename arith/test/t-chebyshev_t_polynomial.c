@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz.h"
@@ -35,7 +35,7 @@
 int main()
 {
     fmpz_poly_t T0, T1, T2, t;
-    long n;
+    slong n;
 
     printf("chebyshev_t_polynomial....");
     fflush(stdout);

@@ -24,18 +24,18 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
     ulong bit = ~((~0UL) >> 1);
-    long rlen;
-    long alloc = (long) e * (len - 1) + 1;
+    slong rlen;
+    slong alloc = (slong) e * (len - 1) + 1;
     fmpz *v = _fmpz_vec_init(alloc);
     fmpz *R, *S, *T;
 
@@ -114,8 +114,8 @@ _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 void
 fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const long len = poly->length;
-    long rlen;
+    const slong len = poly->length;
+    slong rlen;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -136,7 +136,7 @@ fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (long) e * (len - 1) + 1;
+    rlen = (slong) e * (len - 1) + 1;
 
     if (res != poly)
     {

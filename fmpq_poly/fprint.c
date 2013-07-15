@@ -25,7 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -46,10 +46,10 @@
  */
 
 int 
-_fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, long len)
+_fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
 {
     int r;
-    long i;
+    slong i;
     fmpz_t n, d, g;
 
     fmpz_init(n);

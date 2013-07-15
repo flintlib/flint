@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "padic.h"
@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        slong N;
         padic_ctx_t ctx;
 
         padic_t a, b;

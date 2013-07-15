@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -37,7 +37,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    slong i;
     int result;
 
     printf("det_divisor....");
@@ -49,7 +49,7 @@ main(void)
     {
         fmpz_mat_t A;
         fmpz_t det, d, q, r;
-        long m, bits;
+        slong m, bits;
 
         m = n_randint(state, 15);
         bits = 1 + n_randint(state, 50);
@@ -102,6 +102,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

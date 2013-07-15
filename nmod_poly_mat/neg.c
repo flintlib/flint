@@ -30,7 +30,7 @@
 void
 nmod_poly_mat_neg(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

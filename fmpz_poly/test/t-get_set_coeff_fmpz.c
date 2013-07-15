@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t a;
         fmpz_t x1, x2;
-        long coeff, len;
+        slong coeff, len;
 
         fmpz_poly_init(a);
         fmpz_init(x1);

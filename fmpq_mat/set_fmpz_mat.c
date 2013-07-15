@@ -23,16 +23,11 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < src->r; i++)
     {

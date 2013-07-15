@@ -25,15 +25,15 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA,
-                                  const fmpz * B, long lenB)
+_fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, slong lenA,
+                                  const fmpz * B, slong lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
     fmpz_t q;
@@ -59,7 +59,7 @@ void
 fmpz_poly_rem_basecase(fmpz_poly_t R,
                        const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenr;
+    slong lenr;
     fmpz *r;
     
     if (B->length == 0)

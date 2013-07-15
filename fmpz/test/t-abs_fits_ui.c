@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -44,7 +44,7 @@ static void check(fmpz_t x, int expected)
 int
 main(void)
 {
-    long i;
+    slong i;
     fmpz_t x;
 
     printf("abs_fits_ui....");

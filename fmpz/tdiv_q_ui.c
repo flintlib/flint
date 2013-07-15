@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -53,7 +53,7 @@ fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
         {
             ulong q = ((ulong) -c1) / c2;
 
-            fmpz_set_si(f, - (long) q);
+            fmpz_set_si(f, - (slong) q);
         }
     }
     else                        /* g is large */

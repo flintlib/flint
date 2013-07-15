@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
@@ -40,7 +40,7 @@ static const mp_limb_t known[] = {
 int main(void)
 {
     fmpz * res;
-    long k, n;
+    slong k, n;
 
     printf("landau_function_vec....");
     fflush(stdout);

@@ -25,8 +25,8 @@
 
 #undef ulong /* prevent clash with stdlib */
 #include <stdlib.h>
-#define ulong unsigned long
-#include <mpir.h>
+#define ulong mp_limb_t
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -42,7 +42,7 @@ void __free_fmpz(fmpz * f)
    free(f);
 }   
 
-void __fmpz_set_si(fmpz_t f, long val)
+void __fmpz_set_si(fmpz_t f, slong val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {

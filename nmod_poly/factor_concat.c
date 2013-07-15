@@ -26,14 +26,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 
 void
 nmod_poly_factor_concat(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
         nmod_poly_factor_insert(res, fac->p + i, fac->exp[i]);

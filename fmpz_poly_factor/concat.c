@@ -27,14 +27,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly_factor.h"
 
 void
 fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
 {
-    long i;
+    slong i;
 
     fmpz_mul(&(res->c), &(res->c), &(fac->c));
 

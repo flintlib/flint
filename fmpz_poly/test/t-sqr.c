@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -103,7 +103,7 @@ main(void)
     /* Check _fmpz_poly_sqr directly */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         fmpz_poly_t a, out1, out2;
 
         len = n_randint(state, 100) + 1;

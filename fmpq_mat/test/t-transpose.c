@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
@@ -45,7 +45,7 @@ main(void)
     {
         fmpq_mat_t A, B, C;
 
-        long m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = m;
@@ -85,7 +85,7 @@ main(void)
     {
         fmpq_mat_t A, B;
 
-        long m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = m;

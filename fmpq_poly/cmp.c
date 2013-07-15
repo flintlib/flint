@@ -23,17 +23,17 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
-                   const fmpz * rpoly, const fmpz_t rden, long len)
+                   const fmpz * rpoly, const fmpz_t rden, slong len)
 {
     int ans;
-    long i = len - 1;
+    slong i = len - 1;
     fmpz_t lcoeff, rcoeff;
     
     if (fmpz_equal(lden, rden))
@@ -81,7 +81,7 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden,
 
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 {
-    long len1, len2;
+    slong len1, len2;
     
     if (left == right)
         return 0;

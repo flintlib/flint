@@ -28,10 +28,10 @@
 #include "nmod_poly.h"
 #include "mpn_extras.h"
 
-long _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+slong _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+                     mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const long cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
     if (lenA < cutoff)
@@ -50,7 +50,7 @@ nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     }
     else  /* lenA >= lenB >= 0 */
     {
-        const long lenA = A->length, lenB = B->length;
+        const slong lenA = A->length, lenB = B->length;
         mp_limb_t inv;
 
         if (lenA == 0)  /* lenA = lenB = 0 */
@@ -78,7 +78,7 @@ nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         else  /* lenA >= lenB >= 2 */
         {
             mp_ptr g, s, t;
-            long lenG;
+            slong lenG;
 
             if (G == A || G == B)
             {

@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    slong i;
 
     printf("sqr_KS....");
     fflush(stdout);
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B, C;
-        long n, deg;
+        slong n, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);
@@ -85,7 +85,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B;
-        long m, deg;
+        slong m, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);

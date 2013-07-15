@@ -23,9 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "fmpz_mat.h"
-#include "fmpz_poly.h"
 
 /*
     Assumes that \code{mat} is an $n \times n$ matrix and sets \code{(cp,n+1)} 
@@ -36,7 +34,7 @@
 
 void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
 {
-    const long n = mat->r;
+    const slong n = mat->r;
 
     if (n == 0)
     {
@@ -49,7 +47,7 @@ void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
     }
     else
     {
-        long i, j, k, t;
+        slong i, j, k, t;
         fmpz *a, *A, *s;
 
         a = _fmpz_vec_init(n * n);

@@ -27,18 +27,18 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-long
+slong
 nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+                                    slong start_row, slong end_row, slong c)
 {
-    long best_row, best_length, i;
+    slong best_row, best_length, i;
 
     best_row = start_row;
     best_length = nmod_poly_length(nmod_poly_mat_entry(mat, start_row, c));
 
     for (i = start_row + 1; i < end_row; i++)
     {
-        long l;
+        slong l;
 
         l = nmod_poly_length(nmod_poly_mat_entry(mat, i, c));
 

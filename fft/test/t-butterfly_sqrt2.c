@@ -30,9 +30,10 @@ or implied, of William Hart.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fft.h"
 
 /* set p = 2^wn + 1 */

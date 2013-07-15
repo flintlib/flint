@@ -25,14 +25,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 static void
-__nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
-                             mp_srcptr B, long lenB, nmod_t mod)
+__nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA, 
+                             mp_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -40,8 +40,8 @@ __nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
            Convert unbalanced division into a 2 n1 - 1 by n1 division
          */
 
-        const long n1 = lenA - lenB + 1;
-        const long n2 = lenB - n1;
+        const slong n1 = lenA - lenB + 1;
+        const slong n2 = lenB - n1;
 
         mp_srcptr p1 = A + n2;
         mp_srcptr d1 = B + n2;
@@ -67,17 +67,17 @@ __nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
 
 /* needed due to partial overlap */
 static void
-_nmod_vec_sub_dec(mp_ptr a, mp_srcptr b, mp_srcptr c, long n, nmod_t mod)
+_nmod_vec_sub_dec(mp_ptr a, mp_srcptr b, mp_srcptr c, slong n, nmod_t mod)
 {
-    long i;
+    slong i;
 
     for (i = n - 1; i >= 0; i--)
         a[i] = n_submod(b[i], c[i], mod.n);
 }
 
 void
-_nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
-                             mp_srcptr B, long lenB, nmod_t mod)
+_nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA,
+                             mp_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA <= 2 * lenB - 1)
     {
@@ -86,7 +86,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
     else  /* lenA > 2 * lenB - 1 */
     {
         mp_ptr S, T, V, R;
-        long shift, next, n = 2 * lenB - 1;
+        slong shift, next, n = 2 * lenB - 1;
 
         S = _nmod_vec_init(2 * n + (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod));
         T = S + n;
@@ -120,7 +120,7 @@ nmod_poly_div_divconquer(nmod_poly_t Q,
 {
     nmod_poly_t tQ;
     mp_ptr q;
-    long Alen, Blen;
+    slong Alen, Blen;
 
     Blen = B->length;
 

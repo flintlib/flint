@@ -24,14 +24,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void 
-_fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n)
+_fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, slong n)
 {
     if (n == 1)
     {
@@ -49,7 +49,7 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n)
 }
 
 void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
-                                         const fmpz_poly_t B, long n)
+                                         const fmpz_poly_t B, slong n)
 {
     fmpz *a, *b;
     ulong flags = 0UL;  /* 2^0 for a, 2^1 for b */
@@ -72,7 +72,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     }
     else
     {
-        long i;
+        slong i;
         a = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < A->length; i++)
             a[i] = A->coeffs[i];
@@ -86,7 +86,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     }
     else
     {
-        long i;
+        slong i;
         b = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < B->length; i++)
             b[i] = B->coeffs[i];

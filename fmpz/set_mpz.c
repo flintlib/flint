@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -31,7 +31,7 @@
 void
 fmpz_set_mpz(fmpz_t f, const mpz_t x)
 {
-    long size = (long) x->_mp_size;
+    slong size = (slong) x->_mp_size;
 
     if (size == 0L)             /* x is zero */
     {

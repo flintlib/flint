@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -34,7 +34,7 @@
 
 void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 {
-    long n, i, j;
+    slong n, i, j;
 
     n = temp->n;
     j = (1L << (n - 1));
@@ -54,7 +54,7 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 void
 fmpz_comb_clear(fmpz_comb_t comb)
 {
-    long i, j, n;
+    slong i, j, n;
 
     n = comb->n;
 

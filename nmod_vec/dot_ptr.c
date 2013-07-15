@@ -23,18 +23,18 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
 mp_limb_t
-_nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset,
-                            long len, nmod_t mod, int nlimbs)
+_nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
+                            slong len, nmod_t mod, int nlimbs)
 {
     mp_limb_t res;
-    long i;
+    slong i;
     NMOD_VEC_DOT(res, i, len, vec1[i], vec2[i][offset], mod, nlimbs);
     return res;
 }

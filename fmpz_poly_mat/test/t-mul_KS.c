@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    slong i;
 
     printf("mul_KS....");
     fflush(stdout);
@@ -44,9 +44,8 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C, D;
-        long m, n, k, bits, deg;
+        slong m, n, k, bits, deg;
 
-        /* TODO: add separate unsigned tests */
         m = n_randint(state, 15);
         n = n_randint(state, 15);
         k = n_randint(state, 15);
@@ -58,8 +57,16 @@ main(void)
         fmpz_poly_mat_init(C, m, k);
         fmpz_poly_mat_init(D, m, k);
 
-        fmpz_poly_mat_randtest(A, state, deg, bits);
-        fmpz_poly_mat_randtest(B, state, deg, bits);
+        if (n_randint(state, 2))
+            fmpz_poly_mat_randtest(A, state, deg, bits);
+        else
+            fmpz_poly_mat_randtest_unsigned(A, state, deg, bits);
+
+        if (n_randint(state, 2))
+            fmpz_poly_mat_randtest(B, state, deg, bits);
+        else
+            fmpz_poly_mat_randtest_unsigned(B, state, deg, bits);
+
         fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
 
         fmpz_poly_mat_mul_classical(C, A, B);
@@ -91,7 +98,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        long m, n, bits, deg;
+        slong m, n, bits, deg;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -131,7 +138,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        long m, n, bits, deg;
+        slong m, n, bits, deg;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

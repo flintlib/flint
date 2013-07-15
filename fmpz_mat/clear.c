@@ -23,10 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
@@ -34,7 +30,7 @@ fmpz_mat_clear(fmpz_mat_t mat)
 {
     if (mat->entries)
     {
-        long i;
+        slong i;
         for (i = 0; i < mat->r * mat->c; i++)
             fmpz_clear(mat->entries + i);   /* Clear all coefficients */
         flint_free(mat->entries);     /* Clean up array of entries */

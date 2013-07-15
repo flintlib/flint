@@ -23,16 +23,11 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void fmpq_mat_print(const fmpq_mat_t mat)
 {
-    long i, j;
+    slong i, j;
 
     printf("<%ld x %ld matrix over Q>\n", mat->r, mat->c);
 

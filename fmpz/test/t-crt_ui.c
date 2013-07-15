@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
@@ -33,7 +33,7 @@
 
 int main()
 {
-    long i, j;
+    slong i, j;
     int sign;
 
     fmpz_t input;
@@ -57,7 +57,7 @@ int main()
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long nprimes;
+        slong nprimes;
 
         m2 = n_randtest_prime(state, 0);
         nprimes = 1 + n_randint(state, 4);

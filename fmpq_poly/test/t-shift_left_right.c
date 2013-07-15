@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        long shift = (long) n_randint(state, 100);
+        slong shift = (slong) n_randint(state, 100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -77,13 +77,13 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        long shift;
+        slong shift;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 100) + 1, 200);
 
-        shift = (long) n_randint(state, a->length);
+        shift = (slong) n_randint(state, a->length);
 
         fmpq_poly_shift_right(b, a, shift);
         fmpq_poly_shift_right(a, a, shift);
@@ -108,7 +108,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
-        long shift = (long) n_randint(state, 100);
+        slong shift = (slong) n_randint(state, 100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);

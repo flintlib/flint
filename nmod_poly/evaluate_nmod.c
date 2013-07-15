@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
 mp_limb_t
-_nmod_poly_evaluate_nmod(mp_srcptr poly, long len, mp_limb_t c, nmod_t mod)
+_nmod_poly_evaluate_nmod(mp_srcptr poly, slong len, mp_limb_t c, nmod_t mod)
 {
-    long m;
+    slong m;
     mp_limb_t val;
 
     if (len == 0)

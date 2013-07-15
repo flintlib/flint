@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
@@ -50,17 +50,17 @@ main(void)
     {
         fmpq_poly_t a;
         fmpq_t x, y;
-        long coeff, len;
+        slong coeff, len;
 
         fmpq_poly_init(a);
         fmpq_init(x);
         fmpq_init(y);
-        len = (long) (n_randint(state, 100) + 1);
+        len = (slong) (n_randint(state, 100) + 1);
 
         for (j = 0; j < 50; j++)
         {
             fmpq_randtest(x, state, 200);
-            coeff = (long) n_randint(state, len);
+            coeff = (slong) n_randint(state, len);
             fmpq_poly_set_coeff_fmpq(a, coeff, x);
             fmpq_poly_get_coeff_fmpq(y, a, coeff);
 

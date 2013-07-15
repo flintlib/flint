@@ -26,7 +26,7 @@
 #undef ulong /* prevent clash with standard library */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -38,8 +38,6 @@ mp_limb_t n_nth_prime(ulong n)
         abort();
     }
 
-    if (n > flint_num_primes)
-        n_compute_primes(n+1);
-
-    return flint_primes[n-1];
+    return n_primes_arr_readonly(n)[n-1];
 }
+

@@ -23,16 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
-                           const fmpz * poly, const fmpz_t den, long len)
+                           const fmpz * poly, const fmpz_t den, slong len)
 {
-    long k;
+    slong k;
     fmpz_t t;
 
     fmpz_init(t);
@@ -60,7 +60,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)
 {
-    long len = poly->length;
+    slong len = poly->length;
 
     if (len == 0)
     {

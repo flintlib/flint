@@ -23,13 +23,13 @@
    
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, long len,
+_fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len,
                     mp_bitcnt_t bit_size, int negate)
 {
     mp_bitcnt_t bits = 0;
@@ -37,7 +37,7 @@ _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, long len,
     mp_bitcnt_t b = bit_size % FLINT_BITS;
     mp_size_t l = bit_size / FLINT_BITS;
     int borrow = 0;
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
     {
@@ -58,9 +58,9 @@ void
 fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
                    mp_bitcnt_t bit_size)
 {
-    long len;
+    slong len;
     __mpz_struct * mpz;
-    long i, d;
+    slong i, d;
     int negate;
 
     len = fmpz_poly_length(poly);

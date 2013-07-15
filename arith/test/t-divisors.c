@@ -30,10 +30,10 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void arith_divisors_naive(fmpz_poly_t p, long n)
+void arith_divisors_naive(fmpz_poly_t p, slong n)
 {
-    long k;
-    long i = 0;
+    slong k;
+    slong i = 0;
 
     n = FLINT_ABS(n);
 
@@ -52,7 +52,7 @@ int main(void)
 {
     fmpz_t t;
     fmpz_poly_t a, b;
-    long n;
+    slong n;
 
     printf("divisors....");
     fflush(stdout);

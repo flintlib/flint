@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -32,11 +32,11 @@
 /* Assumes poly1 and poly2 are not length 0. */
 void
 _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
-                         long len1, mp_srcptr poly2, long len2, nmod_t mod)
+                         slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
 {
-    long i;
-    long log_len = FLINT_BIT_COUNT(len2);
-    long bits = FLINT_BITS - (long) mod.norm;
+    slong i;
+    slong log_len = FLINT_BIT_COUNT(len2);
+    slong bits = FLINT_BITS - (slong) mod.norm;
 
     if (2 * bits + log_len <= FLINT_BITS)
     {
@@ -78,7 +78,7 @@ void
 nmod_poly_mul_classical(nmod_poly_t res,
                         const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-    long len_out;
+    slong len_out;
 
     if ((poly1->length == 0) || (poly2->length == 0))
     {

@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
@@ -55,12 +55,12 @@ main(void)
     {
         fmpq_poly_t a;
         fmpz_t xnum, xden;
-        long coeff, len;
+        slong coeff, len;
 
         fmpq_poly_init(a);
         fmpz_init(xnum);
         fmpz_init(xden);
-        len = (long) (n_randint(state, 100) + 1);
+        len = (slong) (n_randint(state, 100) + 1);
 
         for (j = 0; j < 50; j++)
         {
@@ -69,7 +69,7 @@ main(void)
             fmpz_get_mpz(mpq_numref(n1), xnum);
             fmpz_get_mpz(mpq_denref(n1), xden);
             mpq_canonicalize(n1);
-            coeff = (long) n_randint(state, len);
+            coeff = (slong) n_randint(state, len);
             fmpq_poly_set_coeff_mpq(a, coeff, n1);
             fmpq_poly_get_coeff_mpq(n2, a, coeff);
 

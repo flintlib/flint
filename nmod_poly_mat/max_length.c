@@ -27,10 +27,10 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-long
+slong
 nmod_poly_mat_max_length(const nmod_poly_mat_t A)
 {
-    long i, j, len, max;
+    slong i, j, len, max;
 
     max = 0;
 

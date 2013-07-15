@@ -23,15 +23,15 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod)
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 {
-    long i, sparseness;
+    slong i, sparseness;
 
     if (n_randint(state, 2))
     {

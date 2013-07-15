@@ -24,14 +24,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <stdio.h>
 #include "flint.h"
 #include "nmod_poly.h"
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {
-    long i, length;
+    slong i, length;
     mp_limb_t n;
 
     if (fscanf(f, "%ld %lu", &length, &n) != 2)

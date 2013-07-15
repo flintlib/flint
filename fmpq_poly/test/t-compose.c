@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
@@ -111,7 +111,7 @@ main(void)
     {
         fmpq_poly_t f, g, h, s, t, u;
         mpq_t c;
-        long k;
+        slong k;
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);

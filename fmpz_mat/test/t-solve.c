@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -39,7 +39,7 @@ main(void)
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
     flint_rand_t state;
-    long i, m, n, r;
+    slong i, m, n, r;
     int success;
 
     printf("solve....");
@@ -127,6 +127,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

@@ -24,16 +24,16 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
-                              mp_srcptr B, long lenB, nmod_t mod)
+void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
+                              mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const long lenQ = lenA - lenB + 1;
+    const slong lenQ = lenA - lenB + 1;
     
     _nmod_poly_div_newton(Q, A, lenA, B, lenB, mod);
 
@@ -51,7 +51,7 @@ void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
                              const nmod_poly_t A, const nmod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
+    const slong lenA = A->length, lenB = B->length;
     mp_ptr q, r;
 
     if (lenB == 0)

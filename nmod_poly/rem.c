@@ -25,13 +25,13 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA, 
-                              mp_srcptr B, long lenB, nmod_t mod)
+void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA, 
+                              mp_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA - lenB == 1)
     {
@@ -55,7 +55,7 @@ void _nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA,
 
 void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
+    const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tR;
     mp_ptr r;
 

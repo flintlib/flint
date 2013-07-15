@@ -29,13 +29,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <pthread.h>
-#define ulong unsigned long
-#include <mpir.h>
+#define ulong mp_limb_t
+
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-
-unsigned int * sieve;
 
 const unsigned int flint_primes_small[] =
 {
@@ -51,57 +49,43 @@ const unsigned int flint_primes_small[] =
     953,967,971,977,983,991,997,1009,1013,1019,1021
 };
 
-mp_limb_t * flint_primes;
-mp_limb_t flint_primes_cutoff = 0;
 
-double * flint_prime_inverses;
+/* _flint_primes[i] holds an array of 2^i primes */
+FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
+FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
+FLINT_TLS_PREFIX int _flint_primes_used = 0;
 
-ulong flint_num_primes = 0;
-
-#if defined (__WIN32)
-pthread_mutex_t flint_num_primes_mutex = PTHREAD_MUTEX_INITIALIZER;
-#else
-pthread_mutex_t flint_num_primes_mutex;
-#endif
-
-void n_compute_primes(ulong num)
+void
+n_compute_primes(ulong num_primes)
 {
-    n_primes_t iter;
-    long i;
+    int i, m;
+    ulong num_computed;
 
-    if (flint_num_primes >= num) return;
+    m = FLINT_CLOG2(num_primes);
 
-    pthread_mutex_lock(&flint_num_primes_mutex);
-    if (flint_num_primes >= num) /* someone may have changed this before we locked */
+    if (m >= _flint_primes_used)
     {
-        pthread_mutex_unlock(&flint_num_primes_mutex);
-        return; 
+        n_primes_t iter;
+
+        num_computed = 1UL << m;
+        _flint_primes[m] = flint_malloc(sizeof(mp_limb_t) * num_computed);
+        _flint_prime_inverses[m] = flint_malloc(sizeof(double) * num_computed);
+
+        n_primes_init(iter);
+        for (i = 0; i < num_computed; i++)
+        {
+            _flint_primes[m][i] = n_primes_next(iter);
+            _flint_prime_inverses[m][i] = n_precompute_inverse(_flint_primes[m][i]);
+        }
+        n_primes_clear(iter);
+
+        /* copy to lower power-of-two slots */
+        for (i = m - 1; i >= _flint_primes_used; i--)
+        {
+            _flint_primes[i] = _flint_primes[m];
+            _flint_prime_inverses[i] = _flint_prime_inverses[m];
+        }
+        _flint_primes_used = m + 1;
     }
-
-    num = FLINT_MAX(num, 2 * flint_num_primes);
-    num = FLINT_MAX(num, 16384);
-
-    if (!flint_num_primes)
-    {
-        flint_primes = (mp_limb_t *) flint_malloc(sizeof(mp_limb_t) * num);
-        flint_prime_inverses = (double *) flint_malloc(sizeof(double) * num);
-    }
-    else
-    {
-        flint_primes = flint_realloc(flint_primes, sizeof(mp_limb_t) * num);
-        flint_prime_inverses = flint_realloc(flint_prime_inverses, sizeof(double) * num);
-    }
-
-    n_primes_init(iter);
-    for (i = 0; i < num; i++)
-    {
-        flint_primes[i] = n_primes_next(iter);
-        flint_prime_inverses[i] = n_precompute_inverse(flint_primes[i]);
-    }
-    n_primes_clear(iter);
-
-    flint_primes_cutoff = flint_primes[num - 1];
-    flint_num_primes = num;
-
-    pthread_mutex_unlock(&flint_num_primes_mutex);
 }
+

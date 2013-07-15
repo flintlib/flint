@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 ulong
-fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
+fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, slong n)
 {
     return (n < poly->length) ? fmpz_get_ui(poly->coeffs + n) : 0UL;
 }

@@ -24,14 +24,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, 
-                                const fmpz * poly, const fmpz_t den, long len, 
+                                const fmpz * poly, const fmpz_t den, slong len, 
                                 const fmpz_t r, const fmpz_t s)
 {
     fmpz_t gcd1;  /* GCD( poly, r ) */

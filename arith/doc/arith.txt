@@ -29,7 +29,7 @@
 
 *******************************************************************************
 
-void arith_primorial(fmpz_t res, long n)
+void arith_primorial(fmpz_t res, slong n)
 
     Sets \code{res} to ``$n$ primorial'' or $n \#$, the product of all prime 
     numbers less than or equal to $n$.
@@ -40,7 +40,7 @@ void arith_primorial(fmpz_t res, long n)
 
 *******************************************************************************
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
+void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
 
     Sets \code{(num, den)} to the reduced numerator and denominator of
     the $n$-th harmonic number $H_n = 1 + 1/2 + 1/3 + \dotsb + 1/n$. The
@@ -50,7 +50,7 @@ void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
     fit in single limb. For larger $n$, the function
     \code{flint_mpn_harmonic_odd_balanced()} is used.
 
-void arith_harmonic_number(fmpq_t x, long n)
+void arith_harmonic_number(fmpq_t x, slong n)
 
     Sets \code{x} to the $n$-th harmonic number. This function is
     equivalent to \code{_arith_harmonic_number} apart from the output
@@ -62,11 +62,11 @@ void arith_harmonic_number(fmpq_t x, long n)
 
 *******************************************************************************
 
-void arith_stirling_number_1u(fmpz_t s, long n, long k)
+void arith_stirling_number_1u(fmpz_t s, slong n, slong k)
 
-void arith_stirling_number_1(fmpz_t s, long n, long k)
+void arith_stirling_number_1(fmpz_t s, slong n, slong k)
 
-void arith_stirling_number_2(fmpz_t s, long n, long k)
+void arith_stirling_number_2(fmpz_t s, slong n, slong k)
 
     Sets $s$ to $S(n,k)$ where $S(n,k)$ denotes an unsigned Stirling
     number of the first kind $|S_1(n, k)|$, a signed Stirling number 
@@ -86,9 +86,9 @@ void arith_stirling_number_2(fmpz_t s, long n, long k)
     numbers efficiently. To compute a range of numbers, the vector or 
     matrix versions should generally be used.
 
-void arith_stirling_number_1u(fmpz * row, long n, long klen)
-void arith_stirling_number_1(fmpz * row, long n, long klen)
-void arith_stirling_number_2(fmpz * row, long n, long klen)
+void arith_stirling_number_1u(fmpz * row, slong n, slong klen)
+void arith_stirling_number_1(fmpz * row, slong n, slong klen)
+void arith_stirling_number_2(fmpz * row, slong n, slong klen)
 
     Computes the row of Stirling numbers
     \code{S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)}.
@@ -96,14 +96,14 @@ void arith_stirling_number_2(fmpz * row, long n, long klen)
     To compute a full row, this function can be called with 
     \code{klen = n+1}. It is assumed that \code{klen} is at most $n + 1$.
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n,
-    long klen)
+void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n,
+    slong klen)
 
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n,
-    long klen)
+void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n,
+    slong klen)
 
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n,
-    long klen)
+void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n,
+    slong klen)
 
     Given the vector \code{prev} containing a row of Stirling numbers
     \code{S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-2)}, computes
@@ -166,19 +166,19 @@ void arith_bell_number_multi_mod(fmpz_t res, ulong n)
     A bound for the number of needed primes is computed using
     \code{arith_bell_number_size}.
 
-void arith_bell_number_vec(fmpz * b, long n)
+void arith_bell_number_vec(fmpz * b, slong n)
 
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive. Automatically switches between the \code{recursive}
     and \code{multi_mod} algorithms depending on the size of $n$.
 
-void arith_bell_number_vec_recursive(fmpz * b, long n)
+void arith_bell_number_vec_recursive(fmpz * b, slong n)
 
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive. This function uses table lookup if $B_{n-1}$ fits in a
     single word, and a standard triangular recurrence otherwise.
 
-void arith_bell_number_vec_multi_mod(fmpz * b, long n)
+void arith_bell_number_vec_multi_mod(fmpz * b, slong n)
 
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive.
@@ -207,7 +207,7 @@ mp_limb_t bell_number_nmod(ulong n, nmod_t mod)
     calling\\ \code{bell_number_nmod_vec_recursive} and reading off the
     last entry when $p \le n$.
 
-void arith_bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
+void arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod)
 
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive modulo a prime $p$ given by \code{mod}. Automatically
@@ -215,14 +215,14 @@ void arith_bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
     depending on the size of $n$ and whether $p$ is large enough for the
     series algorithm to work.
 
-void arith_bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
+void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod)
 
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive modulo a prime $p$ given by \code{mod}. This function uses
     table lookup if $B_{n-1}$ fits in a single word, and a standard
     triangular recurrence otherwise.
 
-void arith_bell_number_nmod_vec_series(mp_ptr b, long n, nmod_t mod)
+void arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod)
 
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive modulo a prime $p$ given by \code{mod}. This function
@@ -254,7 +254,7 @@ void arith_bernoulli_number(fmpq_t x, ulong n)
     equivalent to\\ \code{_arith_bernoulli_number} apart from the output
     being a single \code{fmpq_t} variable.
 
-void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
     numerators and denominators of the Bernoulli numbers
@@ -262,7 +262,7 @@ void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, long n)
     chooses between the \code{recursive}, \code{zeta} and \code{multi_mod}
     algorithms according to the size of $n$.
 
-void arith_bernoulli_number_vec(fmpq * x, long n)
+void arith_bernoulli_number_vec(fmpq * x, slong n)
 
     Sets the \code{x} to the vector of Bernoulli numbers
     $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive. This function is
@@ -306,7 +306,7 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
     that rounds to the exact numerator. For tiny $n$, the numerator
     is looked up from a table to avoid unnecessary overhead.
 
-void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
     numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
@@ -325,14 +325,14 @@ void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
     %[1] http://en.wikipedia.org/w/index.php?
     %    title=Bernoulli_number&oldid=405938876
 
-void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
     numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
     inclusive. Uses repeated direct calls to\\
     \code{_arith_bernoulli_number_zeta}.
 
-void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
     numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
@@ -367,7 +367,7 @@ void arith_euler_number(fmpz_t res, ulong n)
     Sets \code{res} to the Euler number $E_n$. Currently calls
     \code{_arith_euler_number_zeta}.
 
-void arith_euler_number_vec(fmpz * res, long n)
+void arith_euler_number_vec(fmpz * res, slong n)
 
     Computes the Euler numbers $E_0, E_1, \dotsc, E_{n-1}$ for $n \geq 0$
     and stores the result in \code{res}, which must be an initialised
@@ -479,7 +479,7 @@ void arith_ramanujan_tau(fmpz_t res, const fmpz_t n)
     could be accomplished using a lookup table or by calling 
     \code{arith_ramanujan_tau_series()} directly.
 
-void arith_ramanujan_tau_series(fmpz_poly_t res, long n)
+void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 
     Sets \code{res} to the polynomial with coefficients 
     $\tau(0),\tau(1), \dotsc, \tau(n-1)$, giving the initial $n$ terms 
@@ -503,7 +503,7 @@ void arith_ramanujan_tau_series(fmpz_poly_t res, long n)
 *******************************************************************************
 
 void _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
-                                        long num_factors, ulong phi)
+                                        slong num_factors, ulong phi)
 
     Sets \code{a} to the lower half of the cyclotomic polynomial $\Phi_n(x)$,
     given $n \ge 3$ which must be squarefree.
@@ -557,7 +557,7 @@ void arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
     We factor $n$ into $n = qs$ where $q$ is squarefree,
     and compute $\Phi_q(x)$. Then $\Phi_n(x) = \Phi_q(x^s)$.
 
-void _arith_cos_minpoly(fmpz * coeffs, long d, ulong n)
+void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
 
     For $n \ge 1$, sets \code{(coeffs, d+1)} to the minimal polynomial
     $\Psi_n(x)$ of $\cos(2 \pi / n)$, scaled to have integer coefficients
@@ -611,7 +611,7 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
 
 *******************************************************************************
 
-void arith_landau_function_vec(fmpz * res, long len)
+void arith_landau_function_vec(fmpz * res, slong len)
 
     Computes the first \code{len} values of Landau's function $g(n)$
     starting with $g(0)$. Landau's function gives the largest order
@@ -729,12 +729,12 @@ void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
 *******************************************************************************
 
-void arith_number_of_partitions_vec(fmpz * res, long len)
+void arith_number_of_partitions_vec(fmpz * res, slong len)
 
     Computes first \code{len} values of the partition function $p(n)$
     starting with $p(0)$. Uses inversion of Euler's pentagonal series.
 
-void arith_number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod)
+void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod)
 
     Computes first \code{len} values of the partition function $p(n)$
     starting with $p(0)$, modulo the modulus defined by \code{mod}.
@@ -846,7 +846,7 @@ void arith_sum_of_squares(fmpz_t r, ulong k, const fmpz_t n)
     expansion up to $O(x^{n+1})$ and read off the last coefficient.
     This is generally optimal.
 
-void arith_sum_of_squares_vec(fmpz * r, ulong k, long n)
+void arith_sum_of_squares_vec(fmpz * r, ulong k, slong n)
 
     For $i = 0, 1, \ldots, n-1$, sets $r_i$ to the number of
     representations of $i$ a sum of $k$ squares, $r_k(i)$.

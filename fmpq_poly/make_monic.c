@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden, 
-                      const fmpz * poly, const fmpz_t den, long len)
+                      const fmpz * poly, const fmpz_t den, slong len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
     fmpz_set(rden, rpoly + (len - 1));
@@ -38,7 +38,7 @@ void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 {
-    long len = poly->length;
+    slong len = poly->length;
     if (len == 0)
     {
         fmpq_poly_zero(res);

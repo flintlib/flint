@@ -27,14 +27,14 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 
 void
 nmod_poly_factor_print(const nmod_poly_factor_t fac)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
     {

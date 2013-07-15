@@ -27,9 +27,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long 
+#define ulong mp_limb_t
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "qsieve.h"
@@ -37,7 +37,7 @@
 
 void qsieve_ll_do_sieving(qs_t qs_inf, char * sieve)
 {
-   long num_primes = qs_inf->num_primes;
+   slong num_primes = qs_inf->num_primes;
    mp_limb_t * soln1 = qs_inf->soln1;
    mp_limb_t * soln2 = qs_inf->soln2;
    prime_t * factor_base = qs_inf->factor_base;
@@ -46,9 +46,9 @@ void qsieve_ll_do_sieving(qs_t qs_inf, char * sieve)
    register char * pos1;
    register char * pos2;
    register char * bound;  
-   long size;
-   long diff;
-   long pind;
+   slong size;
+   slong diff;
+   slong pind;
    
    memset(sieve, 0, qs_inf->sieve_size + sizeof(ulong));
    *end = (char) 255;
@@ -89,22 +89,22 @@ void qsieve_ll_do_sieving(qs_t qs_inf, char * sieve)
    }
 }
 
-long qsieve_ll_evaluate_candidate(qs_t qs_inf, long i, char * sieve)
+slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
 {
-   long bits, exp, extra_bits;
+   slong bits, exp, extra_bits;
    mp_limb_t modp, prime;
-   long num_primes = qs_inf->num_primes;
+   slong num_primes = qs_inf->num_primes;
    prime_t * factor_base = qs_inf->factor_base;
    fac_t * factor = qs_inf->factor;
    mp_limb_t * soln1 = qs_inf->soln1;
    mp_limb_t * soln2 = qs_inf->soln2;
-   long * small = qs_inf->small;
+   slong * small = qs_inf->small;
    mp_limb_t A = qs_inf->A;
    mp_limb_t B = qs_inf->B;
    mp_limb_t pinv;
-   long num_factors = 0;
-   long relations = 0;
-   long j;
+   slong num_factors = 0;
+   slong relations = 0;
+   slong j;
    
    fmpz_t X, Y, res, p;
    fmpz_init(X); 
@@ -230,7 +230,7 @@ long qsieve_ll_evaluate_candidate(qs_t qs_inf, long i, char * sieve)
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
          mp_limb_t * A_ind = qs_inf->A_ind;
-         long i;
+         slong i;
 
          for (i = 0; i < qs_inf->s; i++) /* Commit any outstanding A factors */
          {
@@ -268,15 +268,15 @@ cleanup:
    return relations;
 }
 
-long qsieve_ll_evaluate_sieve(qs_t qs_inf, char * sieve)
+slong qsieve_ll_evaluate_sieve(qs_t qs_inf, char * sieve)
 {
-   long i = 0, j = 0;
+   slong i = 0, j = 0;
    ulong * sieve2 = (ulong *) sieve;
    char bits = qs_inf->sieve_bits;
-   long rels = 0;
+   slong rels = 0;
 
 #if (QS_DEBUG & 16)
-   long stats_limit;
+   slong stats_limit;
    for (i = 0; i < 256; i++)
        qs_inf->sieve_tally[i] = 0;
 #endif
@@ -336,12 +336,12 @@ long qsieve_ll_evaluate_sieve(qs_t qs_inf, char * sieve)
 
 void qsieve_ll_update_offsets(int poly_add, mp_limb_t * poly_corr, qs_t qs_inf)
 {
-   long num_primes = qs_inf->num_primes;
+   slong num_primes = qs_inf->num_primes;
    mp_limb_t * soln1 = qs_inf->soln1;
    mp_limb_t * soln2 = qs_inf->soln2;
    prime_t * factor_base = qs_inf->factor_base;
    mp_limb_t p, correction;
-   long pind;
+   slong pind;
 
    for (pind = 2; pind < num_primes; pind++) 
    {
@@ -355,14 +355,14 @@ void qsieve_ll_update_offsets(int poly_add, mp_limb_t * poly_corr, qs_t qs_inf)
    }
 }  
 
-long qsieve_ll_collect_relations(qs_t qs_inf, char * sieve)
+slong qsieve_ll_collect_relations(qs_t qs_inf, char * sieve)
 {
-   long s = qs_inf->s;
+   slong s = qs_inf->s;
    mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
    
    mp_limb_t * poly_corr;
-   long relations = 0;
-   long poly_index, j;
+   slong relations = 0;
+   slong poly_index, j;
    int poly_add;
    
    qsieve_ll_compute_poly_data(qs_inf);

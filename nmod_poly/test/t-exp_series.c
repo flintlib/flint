@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -45,8 +45,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B, AB, expA, expB, expAB, S;
-        long n;
-        long N = 100;
+        slong n;
+        slong N = 100;
         mp_limb_t mod;
 
         /* Make sure to workout the Newton code */
@@ -113,7 +113,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
-        long n;
+        slong n;
         mp_limb_t mod;
         mod = n_randtest_prime(state, 0);
         n = n_randtest(state) % 50;

@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -36,7 +36,7 @@
 void
 _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
                                        const fmpz * A, const fmpz * B,
-                                       long lenB)
+                                       slong lenB)
 {
     if (lenB <= FLINT_DIVREM_DIVCONQUER_CUTOFF)
     {
@@ -50,8 +50,8 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     }
     else
     {
-        const long n2 = lenB / 2;
-        const long n1 = lenB - n2;
+        const slong n2 = lenB / 2;
+        const slong n1 = lenB - n2;
 
         fmpz * W1 = W;
         fmpz * W2 = W + lenB;

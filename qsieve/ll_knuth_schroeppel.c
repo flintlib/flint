@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <math.h>
 #include "flint.h"
 #include "ulong_extras.h"

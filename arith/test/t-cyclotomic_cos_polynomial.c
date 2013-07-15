@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
@@ -97,7 +97,7 @@ static const short testdata[] = {
 int main()
 {
     fmpz_poly_t p;
-    long n;
+    slong n;
 
     printf("cyclotomic_cos_polynomial....");
     fflush(stdout);

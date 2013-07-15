@@ -24,13 +24,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
+void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
 {
     _fmpz_poly_sqr(res, poly, len);
     _fmpz_vec_scalar_mod_fmpz(res, res, 2 * len - 1, p);
@@ -38,7 +38,7 @@ void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
 
 void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 {
-    const long len = poly->length;
+    const slong len = poly->length;
 
     if (len == 0)
     {

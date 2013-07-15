@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "long_extras.h"
 #include "fmpz.h"
@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
-        long n;
+        slong n;
         int lhs, rhs;
 
         fmpz_init(a);

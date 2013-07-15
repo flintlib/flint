@@ -25,14 +25,14 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
 _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
-                                ulong e, long trunc, nmod_t mod)
+                                ulong e, slong trunc, nmod_t mod)
 {
     ulong bit = ~((~0UL) >> 1);
     mp_ptr v = _nmod_vec_init(trunc);
@@ -107,9 +107,9 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
 
 void
 nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
-                           const nmod_poly_t poly, ulong e, long trunc)
+                           const nmod_poly_t poly, ulong e, slong trunc)
 {
-    const long len = poly->length;
+    const slong len = poly->length;
     mp_ptr p;
     int pcopy = 0;
 

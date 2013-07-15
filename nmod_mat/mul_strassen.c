@@ -26,7 +26,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
@@ -35,8 +35,8 @@
 void
 nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long a, b, c;
-    long anr, anc, bnr, bnc;
+    slong a, b, c;
+    slong anr, anc, bnr, bnc;
 
     nmod_mat_t A11, A12, A21, A22;
     nmod_mat_t B11, B12, B21, B22;

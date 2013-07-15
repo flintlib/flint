@@ -23,16 +23,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
+_fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
 {
-    long i;
+    slong i;
     mpz_t d, t;
 
     mpz_init_set_ui(d, 1);
@@ -56,7 +56,7 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
     mpz_clear(t);
 }
 
-void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
+void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n)
 {
     if (n == 0)
     {

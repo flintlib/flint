@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len,
+_fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, slong len,
                            const fmpz_t a)
 {
     if (len == 0)
@@ -42,7 +42,7 @@ _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len,
     }
     else
     {
-        long i = len - 1;
+        slong i = len - 1;
         fmpz_t t;
 
         fmpz_init(t);

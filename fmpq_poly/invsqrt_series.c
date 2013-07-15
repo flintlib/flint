@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -35,9 +35,9 @@
 
 void 
 _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden, 
-                      const fmpz * poly, const fmpz_t den, long n)
+                      const fmpz * poly, const fmpz_t den, slong n)
 {
-    long m;
+    slong m;
     fmpz * t, * u;
     fmpz_t tden, uden;
 
@@ -78,7 +78,7 @@ _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
     _fmpz_vec_clear(u, n);
 }
 
-void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     fmpz *copy;
     int alloc;
@@ -102,7 +102,7 @@ void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     }
     else
     {
-        long i;
+        slong i;
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];

@@ -28,11 +28,11 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-long
+slong
 fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+                                    slong start_row, slong end_row, slong c)
 {
-    long best_row, best_length, best_bits, i;
+    slong best_row, best_length, best_bits, i;
 
     best_row = start_row;
     best_length = fmpz_poly_length(fmpz_poly_mat_entry(mat, start_row, c));
@@ -42,7 +42,7 @@ fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
 
     for (i = start_row + 1; i < end_row; i++)
     {
-        long b, l;
+        slong b, l;
 
         l = fmpz_poly_length(fmpz_poly_mat_entry(mat, i, c));
 

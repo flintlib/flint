@@ -23,15 +23,11 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int fmpq_mat_is_zero(const fmpq_mat_t mat)
 {
-    long i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {

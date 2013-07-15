@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -32,9 +32,6 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 {
    fmpz_t t1, t2;
    fmpz * f1, * g1;
-
-   fmpz_init(t1);
-   fmpz_init(t2);
 
    if (fmpz_is_zero(f))
    {
@@ -48,36 +45,47 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
       fmpz_set_si(b, 0);
    } else
    {
+      int sign1 = fmpz_sgn(f);
+      int sign2 = fmpz_sgn(g);
+
+      fmpz_init(t1);
+      fmpz_init(t2);
+
       /* support aliasing */
-      if (d == f || a == f)
+      if (d == f || a == f || sign1 < 0)
       {
          f1 = t1;
-         fmpz_set(f1, f);
+         if (sign1 < 0) fmpz_neg(f1, f);
+         else fmpz_set(f1, f);
       } else
          f1 = (fmpz *) f;
       
-      if (d == g || a == g)
+      if (d == g || a == g || sign2 < 0)
       {
          g1 = t2;
-         fmpz_set(g1, g);
+         if (sign2 < 0) fmpz_neg(g1, g);
+         else fmpz_set(g1, g);
       } else
          g1 = (fmpz *) g;
       
-      if (fmpz_cmp(f, g) < 0)
+      if (fmpz_cmp(f1, g1) < 0)
       {
-         fmpz_gcdinv(d, a, f, g);
+         fmpz_gcdinv(d, a, f1, g1);
          fmpz_mul(t1, a, f1);
          fmpz_sub(t1, d, t1);
          fmpz_divexact(b, t1, g1);
       } else /* g < f */
       {
-         fmpz_gcdinv(d, b, g, f);
+         fmpz_gcdinv(d, b, g1, f1);
          fmpz_mul(t2, b, g1);
          fmpz_sub(t2, d, t2);
          fmpz_divexact(a, t2, f1);
       }
-   } 
 
-   fmpz_clear(t1);
-   fmpz_clear(t2);
+      if (sign1 < 0) fmpz_neg(a, a);
+      if (sign2 < 0) fmpz_neg(b, b);
+
+      fmpz_clear(t1);
+      fmpz_clear(t2);
+   } 
 }

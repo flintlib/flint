@@ -23,18 +23,18 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, long len1, 
-                    const fmpz * poly2, const fmpz_t den2, long len2)
+                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
 {
-    long max = FLINT_MAX(len1, len2);
-    long min = FLINT_MIN(len1, len2);
+    slong max = FLINT_MAX(len1, len2);
+    slong min = FLINT_MIN(len1, len2);
     
     fmpz_t d;
     fmpz_init(d);
@@ -92,7 +92,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long len1 = poly1->length, len2, max;
+    slong len1 = poly1->length, len2, max;
     
     if (poly1 == poly2)  /* Set res = 2 * poly1 */
     {

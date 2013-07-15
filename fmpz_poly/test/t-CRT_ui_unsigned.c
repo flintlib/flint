@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -45,7 +45,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long bits, prime_bits, length, num_primes, j;
+        slong bits, prime_bits, length, num_primes, j;
         fmpz_t mod;
         fmpz_poly_t A, B, C;
         nmod_poly_t Amod;

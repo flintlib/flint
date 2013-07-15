@@ -23,17 +23,17 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_height(fmpz_t height, const fmpz * vec, long len)
+_fmpz_vec_height(fmpz_t height, const fmpz * vec, slong len)
 {
     if (len)
     {
-        long pos = _fmpz_vec_height_index(vec, len);
+        slong pos = _fmpz_vec_height_index(vec, len);
 
         fmpz_abs(height, vec + pos);
     }
