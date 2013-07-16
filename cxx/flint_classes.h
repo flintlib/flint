@@ -217,9 +217,10 @@ struct can_evaluate_into<T, U,
 } // traits
 } // flint
 
-#define FLINTXX_DEFINE_BASICS(name)                                            \
+#define FLINTXX_DEFINE_BASICS(name)                                           \
 public:                                                                       \
     typedef void IS_FLINT_CLASS;                                              \
+    typedef typename base_t::evaluated_t evaluated_t;                         \
                                                                               \
     template<class T>                                                         \
     struct doimplicit                                                         \
@@ -238,33 +239,27 @@ protected:                                                                    \
     template<class D, class O, class Da>                                      \
     friend class expression;
 
-#define _FLINTXX_DEFINE_CTORS(name, ctx, ctxarg, MAYBE_COMMA)                  \
+#define FLINTXX_DEFINE_CTORS(name)                                           \
 public:                                                                       \
-    name(ctx) : base_t(ctxarg) {}                                             \
+    name() : base_t() {}                                                      \
     template<class T>                                                         \
-    explicit name(ctx MAYBE_COMMA const T& t,                                 \
+    explicit name(const T& t,                                                 \
             typename mp::disable_if<doimplicit<T> >::type* = 0)               \
-        : base_t(ctxarg MAYBE_COMMA t) {}                                     \
+        : base_t(t) {}                                                        \
     template<class T>                                                         \
-    explicit name(ctx MAYBE_COMMA T& t,                                       \
+    explicit name(T& t,                                                       \
             typename mp::disable_if<doimplicit<T> >::type* = 0)               \
-        : base_t(ctxarg MAYBE_COMMA t) {}                                     \
+        : base_t(t) {}                                                        \
     template<class T>                                                         \
-    name(ctx MAYBE_COMMA const T& t,                                          \
+    name(const T& t,                                                          \
             typename mp::enable_if<doimplicit<T> >::type* = 0)                \
-        : base_t(ctxarg MAYBE_COMMA t) {}                                     \
+        : base_t(t) {}                                                        \
     template<class T>                                                         \
-    name(ctx MAYBE_COMMA T& t,                                                \
+    name(T& t,                                                                \
             typename mp::enable_if<doimplicit<T> >::type* = 0)                \
-        : base_t(ctxarg MAYBE_COMMA t) {}
-
-#define FLINTXX_EMPTY
-#define FLINTXX_DEFINE_CTORS(name) \
-    _FLINTXX_DEFINE_CTORS(name, FLINTXX_EMPTY, FLINTXX_EMPTY, FLINTXX_EMPTY)  \
+        : base_t(t) {}                                                        \
     template<class T, class U>                                                \
     name(const T& t, const U& u) : base_t(t, u) {}
-
-#define FLINTXX_COMMA ,
 
 #define FLINTXX_DEFINE_C_REF(name, ctype, accessname)                          \
 public:                                                                       \
@@ -289,6 +284,16 @@ public:                                                                       \
     static name make(const T& f)                                              \
     {                                                                         \
         return name(Data::make(f));                                           \
+    }                                                                         \
+    template<class T, class U>                                                \
+    static name make(T& f, const U& u)                                        \
+    {                                                                         \
+        return name(Data::make(f, u));                                        \
+    }                                                                         \
+    template<class T, class U>                                                \
+    static name make(const T& f, const U& u)                                  \
+    {                                                                         \
+        return name(Data::make(f, u));                                        \
     }
 
 #define FLINTXX_COND_S(Base) flint_classes::is_source_base<Base>::template type
@@ -297,7 +302,7 @@ public:                                                                       \
 #define FLINTXX_DEFINE_TO_STR(Base, eval) \
 template<class T> \
 struct to_string<T, \
-    typename mp::enable_if<FLINTXX_COND_S(Base)<T> >::type> \
+    typename mp::enable_if< FLINTXX_COND_S(Base)<T> >::type> \
 { \
     static std::string get(const T& from, int base) \
     { \
@@ -308,6 +313,19 @@ struct to_string<T, \
     } \
 };
 
+#define FLINTXX_DEFINE_CONVERSION_TMP(totype, Base, eval) \
+template<class T> \
+struct conversion<totype, T, \
+    typename mp::enable_if< FLINTXX_COND_S(Base)<T> >::type> \
+{ \
+    static totype get(const T& from) \
+    { \
+        totype to; \
+        eval; \
+        return to; \
+    } \
+};
+
 #define FLINTXX_DEFINE_CMP(Base, eval) \
 template<class T, class U> \
 struct cmp<T, U, \
@@ -315,6 +333,17 @@ struct cmp<T, U, \
         FLINTXX_COND_S(Base)<U> > >::type> \
 { \
     static int get(const T& e1, const U& e2) \
+    { \
+        return eval; \
+    } \
+};
+
+#define FLINTXX_DEFINE_EQUALS(Base, eval) \
+template<class T, class U> \
+struct equals<T, U, typename mp::enable_if<mp::and_< \
+    FLINTXX_COND_S(Base)<T>, FLINTXX_COND_S(Base)<U> > >::type> \
+{ \
+    static bool get(const T& e1, const U& e2) \
     { \
         return eval; \
     } \

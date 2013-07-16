@@ -148,6 +148,20 @@ test_functions()
     tassert(fuzzy_equals(log(exp(c)), c));
 }
 
+// test stuff which we should get automatically - references etc
+void
+test_extras()
+{
+    padicxx a(make_padic(fmpqxx(3, 5u)));
+    padicxx b(make_padic(fmpqxx(3, 1u)));
+
+    padicxx_ref ar(a);
+    padicxx_srcref asr(a);
+    tassert(a == ar && ar == asr);
+    ar = 3;
+    tassert(a == b && asr == b);
+}
+
 int
 main()
 {
@@ -158,6 +172,7 @@ main()
     test_conversion();
     test_arithmetic();
     test_functions();
+    test_extras();
 
     std::cout << "PASS" << std::endl;
     return 0;

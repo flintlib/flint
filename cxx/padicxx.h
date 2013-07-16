@@ -34,6 +34,7 @@
 #include "padic.h"
 
 #include "cxx/expression.h"
+#include "cxx/flint_classes.h"
 #include "cxx/stdmath.h"
 #include "cxx/traits.h"
 #include "cxx/tuple.h"
@@ -95,26 +96,13 @@ class padicxx_expression
 public:
     typedef expression<derived_wrapper< ::flint::padicxx_expression>,
               Operation, Data> base_t;
-    typedef typename base_t::evaluated_t evaluated_t;
 
-    template<class T>
-    explicit padicxx_expression(const T& t)
-        : base_t(t) {}
+    FLINTXX_DEFINE_BASICS(padicxx_expression)
+    FLINTXX_DEFINE_CTORS(padicxx_expression)
+    FLINTXX_DEFINE_C_REF(padicxx_expression, padic_struct, _padic)
 
-    template<class T, class U>
-    padicxx_expression(const T& t, const U& u)
-        : base_t(t, u) {}
-
-    template<class T>
-    padicxx_expression& operator=(const T& t)
-    {
-        this->set(t);
-        return *this;
-    }
-
+public:
     // These only make sense with immediates
-    padic_t& _padic() {return this->_data().p;}
-    const padic_t& _padic() const {return this->_data().p;}
     const padicxx_ctx& get_ctx() const {return this->_data().ctx;}
     fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
     fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
@@ -142,46 +130,100 @@ public:
     {
         return evaluated_t(estimate_ctx(), prec());
     }
-
-protected:
-    explicit padicxx_expression(const Data& d) : base_t(d) {}
-
-    template<class D, class O, class Da>
-    friend class expression;
 };
+
+namespace detail {
+struct padic_data;
+}
+
+typedef padicxx_expression<operations::immediate, detail::padic_data> padicxx;
+typedef padicxx_expression<operations::immediate,
+            flint_classes::ref_data<padicxx, padic_struct> > padicxx_ref;
+typedef padicxx_expression<operations::immediate,
+            flint_classes::srcref_data<padicxx, padicxx_ref, padic_struct> > padicxx_srcref;
+
+namespace flint_classes {
+template<class Padic>
+struct ref_data<Padic, padic_struct>
+{
+    typedef void IS_REF_OR_CREF;
+    typedef Padic wrapped_t;
+
+    typedef padic_struct* data_ref_t;
+    typedef const padic_struct* data_srcref_t;
+
+    padic_struct* inner;
+    const padicxx_ctx& ctx;
+
+    ref_data(Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}
+
+    static ref_data make(padic_struct* f, const padicxx_ctx& ctx)
+    {
+        return ref_data(f, ctx);
+    }
+
+private:
+    ref_data(padic_struct* fp, const padicxx_ctx& c) : inner(fp), ctx(c) {}
+};
+
+template<class Padic, class Ref>
+struct srcref_data<Padic, Ref, padic_struct>
+{
+    typedef void IS_REF_OR_CREF;
+    typedef Padic wrapped_t;
+
+    typedef const padic_struct* data_ref_t;
+    typedef const padic_struct* data_srcref_t;
+
+    const padic_struct* inner;
+    const padicxx_ctx& ctx;
+
+    srcref_data(const Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}
+    srcref_data(Ref o) : inner(o._data().inner) {}
+
+    static srcref_data make(const padic_struct* f, const padicxx_ctx& ctx)
+    {
+        return srcref_data(f, ctx);
+    }
+
+private:
+    srcref_data(const padic_struct* fp, const padicxx_ctx& c) : inner(fp), ctx(c) {}
+};
+} // flint_classes
 
 namespace detail {
 struct padic_data
 {
+    typedef padic_t& data_ref_t;
+    typedef const padic_t& data_srcref_t;
+
     const padicxx_ctx& ctx;
-    padic_t p;
+    padic_t inner;
 
     padic_data(const padicxx_ctx& c)
         : ctx(c)
     {
-        padic_init(p);
+        padic_init(inner);
     }
 
     padic_data(const padicxx_ctx& c, long N)
         : ctx(c)
     {
-        padic_init2(p, N);
+        padic_init2(inner, N);
     }
 
     padic_data(const padic_data& o)
         : ctx(o.ctx)
     {
-        padic_init2(p, padic_prec(o.p));
-        padic_set(p, o.p, ctx._ctx());
+        padic_init2(inner, padic_prec(o.inner));
+        padic_set(inner, o.inner, ctx._ctx());
     }
 
     // TODO more constructors? (e.g. unit, val?)
 
-    ~padic_data() {padic_clear(p);}
+    ~padic_data() {padic_clear(inner);}
 };
 } // detail
-
-typedef padicxx_expression<operations::immediate, detail::padic_data> padicxx;
 
 template<class Operation, class Data>
 inline const padicxx_ctx&
@@ -227,85 +269,56 @@ struct padicxx_max_prec<padicxx_expression<Op, Data> >
 } // detail
 
 namespace rules {
-FLINT_DEFINE_DOIT(assignment, padicxx, padicxx,
+#define PADICXX_COND_S FLINTXX_COND_S(padicxx)
+#define PADICXX_COND_T FLINTXX_COND_T(padicxx)
+
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, PADICXX_COND_S,
         padic_set(to._padic(), from._padic(), to._ctx()))
-FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_signed_integer, 
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, traits::is_signed_integer, 
         padic_set_si(to._padic(), from, to._ctx()))
-FLINT_DEFINE_DOIT_COND(assignment, padicxx, traits::is_unsigned_integer, 
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, traits::is_unsigned_integer, 
         padic_set_ui(to._padic(), from, to._ctx()))
-FLINT_DEFINE_DOIT_COND(assignment, padicxx, FMPZXX_COND_S,
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, FMPZXX_COND_S,
         padic_set_fmpz(to._padic(), from._fmpz(), to._ctx()))
-FLINT_DEFINE_DOIT(assignment, padicxx, fmpqxx,
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, FMPQXX_COND_S,
         padic_set_fmpq(to._padic(), from._fmpq(), to._ctx()))
 
-template<>
-struct conversion<fmpzxx, padicxx>
-{
-    static fmpzxx get(const padicxx& from)
-    {
-        fmpzxx res;
-        padic_get_fmpz(res._fmpz(), from._padic(), from._ctx());
-        return res;
-    }
-};
+FLINTXX_DEFINE_CONVERSION_TMP(fmpzxx, padicxx,
+        padic_get_fmpz(to._fmpz(), from._padic(), from._ctx()))
+FLINTXX_DEFINE_CONVERSION_TMP(fmpqxx, padicxx,
+        padic_get_fmpq(to._fmpq(), from._padic(), from._ctx()))
 
-template<>
-struct conversion<fmpqxx, padicxx>
-{
-    static fmpqxx get(const padicxx& from)
-    {
-        fmpqxx res;
-        padic_get_fmpq(res._fmpq(), from._padic(), from._ctx());
-        return res;
-    }
-};
+FLINTXX_DEFINE_TO_STR(padicxx, padic_get_str(0, from._padic(), from._ctx()))
 
-template<>
-struct to_string<padicxx>
-{
-    static std::string get(const padicxx& p, int base /* ignored! */)
-    {
-        char* str = padic_get_str(0, p._padic(), p._ctx());
-        std::string res(str);
-        std::free(str);
-        return res;
-    }
-};
+FLINTXX_DEFINE_EQUALS(padicxx, padic_equal(e1._padic(), e2._padic()))
 
-template<>
-struct equals<padicxx, padicxx>
-{
-    static bool get(const padicxx& p1, const padicxx& p2)
-    {
-        return padic_equal(p1._padic(), p2._padic());
-    }
-};
 
-FLINT_DEFINE_CBINARY_EXPR(plus, padicxx,
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, padicxx, PADICXX_COND_S, PADICXX_COND_S,
         padic_add(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-FLINT_DEFINE_BINARY_EXPR(minus, padicxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, padicxx, PADICXX_COND_S, PADICXX_COND_S,
         padic_sub(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-FLINT_DEFINE_CBINARY_EXPR(times, padicxx,
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, padicxx, PADICXX_COND_S, PADICXX_COND_S,
         padic_mul(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-FLINT_DEFINE_BINARY_EXPR(divided_by, padicxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, padicxx, PADICXX_COND_S, PADICXX_COND_S,
         padic_div(to._padic(), e1._padic(), e2._padic(), to._ctx()))
-FLINT_DEFINE_BINARY_EXPR_COND(shift, padicxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift, padicxx, PADICXX_COND_S,
         traits::fits_into_slong,
         padic_shift(to._padic(), e1._padic(), e2, to._ctx()))
 
-FLINT_DEFINE_UNARY_EXPR(negate, padicxx,
+FLINT_DEFINE_UNARY_EXPR_COND(negate, padicxx, PADICXX_COND_S,
         padic_neg(to._padic(), from._padic(), to._ctx()))
 
 // lazy functions
-FLINT_DEFINE_UNARY_EXPR(sqrt_op, padicxx,
+FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, padicxx, PADICXX_COND_S,
         detail::padic_check(
             padic_sqrt(to._padic(), from._padic(), to._ctx()), "sqrt"))
-FLINT_DEFINE_BINARY_EXPR_COND(pow_op, padicxx, traits::fits_into_slong,
+FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, padicxx, PADICXX_COND_S,
+        traits::fits_into_slong,
         padic_pow_si(to._padic(), e1._padic(), e2, to._ctx()))
-FLINT_DEFINE_UNARY_EXPR(exp_op, padicxx,
+FLINT_DEFINE_UNARY_EXPR_COND(exp_op, padicxx, PADICXX_COND_S,
         detail::padic_check(
             padic_exp(to._padic(), from._padic(), to._ctx()), "exp"))
-FLINT_DEFINE_UNARY_EXPR(log_op, padicxx,
+FLINT_DEFINE_UNARY_EXPR_COND(log_op, padicxx, PADICXX_COND_S,
         detail::padic_check(
             padic_log(to._padic(), from._padic(), to._ctx()), "log"))
 // TODO some more
