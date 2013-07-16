@@ -349,6 +349,14 @@ struct equals<T, U, typename mp::enable_if<mp::and_< \
     } \
 };
 
+#define FLINTXX_DEFINE_RANDFUNC(CBase, name) \
+static CBase##xx_expression name(frandxx& state, mp_bitcnt_t bits) \
+{ \
+    CBase##xx_expression res; \
+    CBase##_##name(res._data().inner, state._data(), bits); \
+    return res; \
+}
+
 
 #define FLINTXX_UNADORNED_MAKETYPES(Base, left, op, right) \
     Base##_expression< op, tuple< left, tuple< right, empty_tuple> > >

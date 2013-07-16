@@ -187,10 +187,12 @@ test_functions()
     tassert(rfac(a, 3u) == 2*3*4);
     tassert(a + fac(4u) == 2 + 4*3*2);
     tassert(bin(4u, 2u) == 6);
+    tassert(abs(a) == a);
 
     // check namespace std
     tassert(std::pow(a, 4u) == 16);
     tassert(std::sqrt(b) == 4);
+    tassert(std::abs(-a) == a);
 
     // check a composite expression
     tassert(2u + sqrt(a + a) == 4);
@@ -201,6 +203,12 @@ test_functions()
     tassert(divisible(a + a, (unsigned short)2));
     tassert(divisible(-a + b, 3) == false);
     tassert(divisible(c, a) == true);
+
+    // check member functions
+    long exp = 0;
+    double d = fmpzxx(3).get_d_2exp(exp);
+    double r = d * (1l << exp);
+    tassert(r >= 2.9 && r <= 3.1);
 }
 
 template<class T>
@@ -389,6 +397,25 @@ test_references()
     tassert(ar2 == 7 && acr2 == 7);
 }
 
+void
+test_randomisation()
+{
+    frandxx rand;
+    tassert(abs(fmpzxx::randbits(rand, 5)) <= 31);
+    tassert(abs(fmpzxx::randbits(rand, 5)) >= 16);
+    tassert(abs(fmpzxx::randtest(rand, 5)) <= 31);
+    tassert(fmpzxx::randtest_unsigned(rand, 5) <= 31);
+    tassert(fmpzxx::randtest_unsigned(rand, 5) >= 0);
+    tassert(fmpzxx::randtest_not_zero(rand, 5) != 0);
+    fmpzxx thirty(30);
+    tassert(fmpzxx::randm(rand, thirty) >= 0);
+    tassert(fmpzxx::randm(rand, thirty) <= 29);
+    tassert(fmpzxx::randtest_mod(rand, thirty) >= 0);
+    tassert(fmpzxx::randtest_mod(rand, thirty) <= 29);
+    tassert(fmpzxx::randtest_mod_signed(rand, thirty) > -15);
+    tassert(fmpzxx::randtest_mod_signed(rand, thirty) <= 15);
+}
+
 // TODO move
 void
 test_flint_classes()
@@ -428,6 +455,8 @@ main()
     test_ternary();
     test_ternary_assigments();
     test_references();
+    test_randomisation();
+
     test_flint_classes();
 
     // TODO test that certain things *don't* compile?

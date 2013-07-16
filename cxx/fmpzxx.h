@@ -32,6 +32,7 @@
 #include "cxx/expression.h"
 #include "cxx/expression_traits.h"
 #include "cxx/flint_classes.h"
+#include "cxx/frandxx.h"
 #include "cxx/stdmath.h"
 
 #include "fmpz.h"
@@ -49,6 +50,40 @@ public:
     FLINTXX_DEFINE_BASICS(fmpzxx_expression)
     FLINTXX_DEFINE_CTORS(fmpzxx_expression)
     FLINTXX_DEFINE_C_REF(fmpzxx_expression, fmpz, _fmpz)
+
+    // these only make sense with fmpzxx
+    FLINTXX_DEFINE_RANDFUNC(fmpz, randbits)
+    FLINTXX_DEFINE_RANDFUNC(fmpz, randtest)
+    FLINTXX_DEFINE_RANDFUNC(fmpz, randtest_unsigned)
+    FLINTXX_DEFINE_RANDFUNC(fmpz, randtest_not_zero)
+
+    template<class Fmpz>
+    static fmpzxx_expression randm(frandxx& state, const Fmpz& m)
+    {
+        fmpzxx_expression res;
+        fmpz_randm(res._fmpz(), state._data(), m._fmpz());
+        return res;
+    }
+    template<class Fmpz>
+    static fmpzxx_expression randtest_mod(frandxx& state, const Fmpz& m)
+    {
+        fmpzxx_expression res;
+        fmpz_randtest_mod(res._fmpz(), state._data(), m._fmpz());
+        return res;
+    }
+    template<class Fmpz>
+    static fmpzxx_expression randtest_mod_signed(frandxx& state, const Fmpz& m)
+    {
+        fmpzxx_expression res;
+        fmpz_randtest_mod_signed(res._fmpz(), state._data(), m._fmpz());
+        return res;
+    }
+
+    // These make sense with all expressions, but cause evaluation
+    double get_d_2exp(long& exp) const
+    {
+        return fmpz_get_d_2exp(&exp, this->evaluate()._fmpz());
+    }
 };
 
 namespace detail {
@@ -240,7 +275,7 @@ FLINTXX_DEFINE_TERNARY(fmpzxx,
 // FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////
 
-// These functions evaluate immediately and do not yield fmpzxxs
+// These functions evaluate immediately, and (often) do not yield fmpzxxs
 
 template<class T1, class T2>
 inline typename mp::enable_all_fmpzxx<bool, T1, T2>::type
@@ -295,6 +330,8 @@ FLINT_DEFINE_BINARY_EXPR_COND2(root_op, fmpzxx,
         fmpz_root(to._fmpz(), e1._fmpz(), e2))
 FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, fmpzxx, FMPZXX_COND_S,
         fmpz_sqrt(to._fmpz(), from._fmpz()))
+FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpzxx, FMPZXX_COND_S,
+        fmpz_abs(to._fmpz(), from._fmpz()))
 } // rules
 
 // TODO many more functions
