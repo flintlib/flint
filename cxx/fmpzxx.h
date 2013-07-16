@@ -109,7 +109,9 @@ struct fmpz_data
 // HELPERS
 ///////////////////////////////////////////////////////////////////
 namespace traits {
-template<class T> struct is_fmpzxx : is_T_expr<T, fmpzxx> { };
+template<class T> struct is_fmpzxx : mp::or_<
+     traits::is_T_expr<T, fmpzxx>,
+     flint_classes::is_source<fmpzxx, T> > { };
 } // traits
 namespace mp {
 template<class Out, class T1, class T2 = void>

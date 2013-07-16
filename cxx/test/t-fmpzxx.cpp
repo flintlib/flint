@@ -177,6 +177,7 @@ test_functions()
 {
     fmpzxx a(2);
     fmpzxx b(16);
+    fmpzxx_srcref c(a);
 
     tassert(pow(a, 4u) == 16);
     tassert(root(b, 4) == 2);
@@ -199,6 +200,7 @@ test_functions()
     tassert(divisible(b, a + a + 2u) == false);
     tassert(divisible(a + a, (unsigned short)2));
     tassert(divisible(-a + b, 3) == false);
+    tassert(divisible(c, a) == true);
 }
 
 template<class T>
