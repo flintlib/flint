@@ -172,6 +172,37 @@ struct is_target_base
 {
     template<class T> struct type : is_target<Base, T> { };
 };
+
+template<class T, class Right1, class Right2>
+struct ternary_assign_helper
+{
+    typedef tools::evaluate_2<Right1, Right2> ev2_t;
+    typedef typename ev2_t::temporaries_t temporaries_t;
+    typedef mp::back_tuple<temporaries_t> back_t;
+
+    typename back_t::type backing;
+    ev2_t ev2;
+
+    static temporaries_t backtemps(typename back_t::type& backing)
+    {
+        temporaries_t temps;
+        back_t::init(temps, backing);
+        return temps;
+    }
+
+    ternary_assign_helper(typename ev2_t::arg1_t r1, typename ev2_t::arg2_t r2)
+        : backing(mp::htuples::fill<typename back_t::type>(
+                    tools::temporaries_filler(r1+r2 /* XXX */))),
+          ev2(backtemps(backing), r1, r2) {}
+    const T& getleft() {return ev2.get1();}
+    const T& getright() {return ev2.get2();}
+};
+
+template<class T, class Right1, class Right2>
+struct enable_ternary_assign
+    : mp::enable_if<mp::and_<
+          traits::is_T_expr<typename traits::basetype<Right1>::type, T>,
+          traits::is_T_expr<typename traits::basetype<Right2>::type, T> >, T&> { };
 } // flint_classes
 
 namespace traits {
@@ -288,5 +319,119 @@ struct cmp<T, U, \
         return eval; \
     } \
 };
+
+
+#define FLINTXX_UNADORNED_MAKETYPES(Base, left, op, right) \
+    Base##_expression< op, tuple< left, tuple< right, empty_tuple> > >
+
+// Optimized evaluation rules using ternary arithmetic (addmul, submul)
+// NB: this has to be called in namespace flint, not flint::rules!
+#define FLINTXX_DEFINE_TERNARY(Base, addmuleval, submuleval, maketypes)       \
+namespace rules {                                                             \
+/* a +- b*c */                                                                \
+template<class Op, class Left, class Right1, class Right2>                    \
+struct evaluation<Op,                                                         \
+    tuple<Left, tuple<                                                        \
+        maketypes(Base, Right1, operations::times, Right2),                   \
+        /* NB: there is no particular reason to have the enable_if here,      \
+               many other similar places would do */                          \
+        typename mp::enable_if<mp::or_<                                       \
+                mp::equal_types<Op, operations::plus>,                        \
+                mp::equal_types<Op, operations::minus> >,                     \
+            empty_tuple>::type> >,                                            \
+    true, 1,                                                                  \
+    typename tools::ternary_helper<Base, Left, Right1, Right2>::enable::type> \
+{                                                                             \
+    /* Helpful for testing. */                                                \
+    static const unsigned TERNARY_OP_MARKER = 0;                              \
+                                                                              \
+    typedef Base return_t;                                                    \
+    typedef tools::ternary_helper<Base, Left, Right1, Right2> th;             \
+    typedef typename th::temporaries_t temporaries_t;                         \
+    typedef tuple<Left, tuple<                                                \
+        maketypes(Base, Right1, operations::times, Right2),                   \
+        empty_tuple> > data_t;                                                \
+    static const bool is_add = mp::equal_types<Op, operations::plus>::val;    \
+                                                                              \
+    static void doit(const data_t& input, temporaries_t temps, return_t* res) \
+    {                                                                         \
+        const Base* left = 0;                                                 \
+        const Base* right = 0;                                                \
+        th::doit(input.first(), input.second()._data().first(),               \
+                input.second()._data().second(), temps, res, right, left);    \
+        const Base& e1 = *left;                                               \
+        const Base& e2 = *right;                                              \
+        Base& to = *res;                                                      \
+        if(is_add)                                                            \
+        {                                                                     \
+            addmuleval;                                                       \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            submuleval;                                                       \
+        }                                                                     \
+    }                                                                         \
+};                                                                            \
+                                                                              \
+/* b*c + a */                                                                 \
+template<class Right, class Left1, class Left2>                               \
+struct evaluation<operations::plus,                                           \
+    tuple<maketypes(Base, Left1, operations::times, Left2),                   \
+        tuple<Right, empty_tuple> >,                                          \
+    true, 1,                                                                  \
+    typename tools::ternary_helper<Base,                                      \
+        Right, Left1, Left2, operations::times>::enable::type>                \
+{                                                                             \
+    /* Helpful for testing. */                                                \
+    static const unsigned TERNARY_OP_MARKER = 0;                              \
+                                                                              \
+    typedef Base return_t;                                                    \
+    typedef tools::ternary_helper<Base, Right, Left1, Left2> th;              \
+    typedef typename th::temporaries_t temporaries_t;                         \
+    typedef tuple<maketypes(Base, Left1, operations::times, Left2),           \
+        tuple<Right, empty_tuple> > data_t;                                   \
+                                                                              \
+    static void doit(const data_t& input, temporaries_t temps, return_t* res) \
+    {                                                                         \
+        const Base* left = 0;                                                 \
+        const Base* right = 0;                                                \
+        th::doit(input.second(), input.first()._data().first(),               \
+                input.first()._data().second(), temps, res, right, left);     \
+        const Base& e1 = *left;                                               \
+        const Base& e2 = *right;                                              \
+        Base& to = *res;                                                      \
+        addmuleval;                                                           \
+    }                                                                         \
+};                                                                            \
+} /* rules */                                                                 \
+                                                                              \
+/* TODO enable these with references on left hand side(?) */                  \
+/* a += b*c */                                                                \
+template<class Right1, class Right2>                                          \
+inline typename flint_classes::enable_ternary_assign<Base, Right1, Right2>::type \
+operator+=(Base& to,                                                          \
+        const maketypes(Base, Right1, operations::times, Right2)& other)      \
+{                                                                             \
+    flint_classes::ternary_assign_helper<Base, Right1, Right2> tah(           \
+            other._data().first(), other._data().second());                   \
+    const Base& e1 = tah.getleft();                                           \
+    const Base& e2 = tah.getright();                                          \
+    addmuleval;                                                               \
+    return to;                                                                \
+}                                                                             \
+                                                                              \
+/* a -= b*c */                                                                \
+template<class Right1, class Right2>                                          \
+inline typename flint_classes::enable_ternary_assign<Base, Right1, Right2>::type \
+operator-=(Base& to,                                                          \
+        const maketypes(Base, Right1, operations::times, Right2)& other)      \
+{                                                                             \
+    flint_classes::ternary_assign_helper<Base, Right1, Right2> tah(           \
+            other._data().first(), other._data().second());                   \
+    const Base& e1 = tah.getleft();                                           \
+    const Base& e2 = tah.getright();                                          \
+    submuleval;                                                               \
+    return to;                                                                \
+}
 
 #endif

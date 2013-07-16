@@ -108,6 +108,30 @@ test_arithmetic()
     tassert(-a == fmpqxx(-3, 5u));
 }
 
+// Won't compile if the expression is not done using addmul
+template<class T>
+bool is_ternary(const T&)
+{
+    return T::ev_traits_t::temp_rule_t::TERNARY_OP_MARKER + 1;
+}
+
+// test stuff which we should get automatically - addmul, references etc
+void
+test_extras()
+{
+    fmpqxx a(3, 5u), b(2, 7u), c(3, 1u);
+    tassert(is_ternary((a+a) - b*c));
+    tassert(is_ternary(b*c + (a+a)));
+    tassert((a+a) - b*c == fmpqxx(6*7 - 5*6, 5u*7u));
+    tassert(b*c + (a+a) == fmpqxx(6*7 + 5*6, 5u*7u));
+
+    fmpqxx_ref ar(a);
+    fmpqxx_srcref asr(a);
+    tassert(a == ar && ar == asr);
+    ar = 3;
+    tassert(a == c && asr == c);
+}
+
 int
 main()
 {
@@ -118,6 +142,7 @@ main()
     test_conversion();
     test_order();
     test_arithmetic();
+    test_extras();
 
     std::cout << "PASS" << std::endl;
     return 0;

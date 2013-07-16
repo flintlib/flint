@@ -153,7 +153,8 @@ FLINTXX_DEFINE_CMP(fmpzxx, fmpz_cmp(e1._fmpz(), e2._fmpz()))
 
 template<class T, class U>
 struct cmp<T, U,
-    typename mp::enable_if<mp::and_<FMPZXX_COND_S<T>, traits::is_signed_integer<U> > >::type>
+    typename mp::enable_if<mp::and_<
+        FMPZXX_COND_S<T>, traits::is_signed_integer<U> > >::type>
 {
     static int get(const T& v, const U& t)
     {
@@ -226,141 +227,12 @@ FLINT_DEFINE_BINARY_EXPR_COND2(modulo, fmpzxx,
 
 FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpzxx, FMPZXX_COND_S,
         fmpz_neg(to._fmpz(), from._fmpz()))
-
-
-// Optimized evaluation rules using ternary arithmetic (addmul, submul)
-// a +- b*c
-template<class Op, class Left, class Right1, class Right2>
-struct evaluation<Op,
-    tuple<Left, tuple<
-        fmpzxx_expression<operations::times,
-            tuple<Right1, tuple<Right2, empty_tuple> > >,
-        // NB: there is no particular reason to have the enable_if here,
-        //     many other similar places would do
-        typename mp::enable_if<mp::or_<
-                mp::equal_types<Op, operations::plus>,
-                mp::equal_types<Op, operations::minus> >,
-            empty_tuple>::type> >,
-    true, 1,
-    typename tools::ternary_helper<fmpzxx, Left, Right1, Right2>::enable::type>
-{
-    // Helpful for testing.
-    static const unsigned TERNARY_OP_MARKER = 0;
-
-    typedef fmpzxx return_t;
-    typedef tools::ternary_helper<fmpzxx, Left, Right1, Right2> th;
-    typedef typename th::temporaries_t temporaries_t;
-    typedef tuple<Left, tuple<
-        fmpzxx_expression<operations::times,
-            tuple<Right1, tuple<Right2, empty_tuple> > >,
-        empty_tuple> > data_t;
-    static const bool is_add = mp::equal_types<Op, operations::plus>::val;
-
-    static void doit(const data_t& input, temporaries_t temps, return_t* res)
-    {
-        const fmpzxx* left = 0;
-        const fmpzxx* right = 0;
-        th::doit(input.first(), input.second()._data().first(),
-                input.second()._data().second(), temps, res, right, left);
-        if(is_add)
-            fmpz_addmul(res->_fmpz(), left->_fmpz(), right->_fmpz());
-        else
-            fmpz_submul(res->_fmpz(), left->_fmpz(), right->_fmpz());
-    }
-};
-
-// b*c + a
-template<class Right, class Left1, class Left2>
-struct evaluation<operations::plus,
-    tuple<fmpzxx_expression<operations::times,
-            tuple<Left1, tuple<Left2, empty_tuple> > >,
-        tuple<Right, empty_tuple> >,
-    true, 1,
-    typename tools::ternary_helper<fmpzxx, 
-        Right, Left1, Left2, operations::times>::enable::type>
-{
-    // Helpful for testing.
-    static const unsigned TERNARY_OP_MARKER = 0;
-
-    typedef fmpzxx return_t;
-    typedef tools::ternary_helper<fmpzxx, Right, Left1, Left2> th;
-    typedef typename th::temporaries_t temporaries_t;
-    typedef tuple<fmpzxx_expression<operations::times,
-            tuple<Left1, tuple<Left2, empty_tuple> > >,
-        tuple<Right, empty_tuple> > data_t;
-
-    static void doit(const data_t& input, temporaries_t temps, return_t* res)
-    {
-        const fmpzxx* left = 0;
-        const fmpzxx* right = 0;
-        th::doit(input.second(), input.first()._data().first(),
-                input.first()._data().second(), temps, res, right, left);
-        fmpz_addmul(res->_fmpz(), left->_fmpz(), right->_fmpz());
-    }
-};
 } // rules
 
-// Assignment-arithmetic using ternaries.
-namespace detail {
-template<class Right1, class Right2>
-struct ternary_assign_helper
-{
-    typedef tools::evaluate_2<Right1, Right2> ev2_t;
-    typedef typename ev2_t::temporaries_t temporaries_t;
-    typedef mp::back_tuple<temporaries_t> back_t;
-
-    typename back_t::type backing;
-    ev2_t ev2;
-
-    static temporaries_t backtemps(typename back_t::type& backing)
-    {
-        temporaries_t temps;
-        back_t::init(temps, backing);
-        return temps;
-    }
-
-    ternary_assign_helper(typename ev2_t::arg1_t r1, typename ev2_t::arg2_t r2)
-        : backing(mp::htuples::fill<typename back_t::type>(
-                    tools::temporaries_filler(r1+r2 /* XXX */))),
-          ev2(backtemps(backing), r1, r2) {}
-    const fmpzxx& getleft() {return ev2.get1();}
-    const fmpzxx& getright() {return ev2.get2();}
-};
-
-template<class Right1, class Right2>
-struct enable_ternary_assign
-    : mp::enable_all_fmpzxx<fmpzxx&,
-        typename traits::basetype<Right1>::type,
-        typename traits::basetype<Right2>::type> { };
-} // detail
-
-// TODO enable these with references on left hand side
-// a += b*c
-template<class Right1, class Right2>
-inline typename detail::enable_ternary_assign<Right1, Right2>::type
-operator+=(fmpzxx& left, const fmpzxx_expression<operations::times,
-        tuple<Right1, tuple<Right2, empty_tuple> > >& other)
-{
-    detail::ternary_assign_helper<Right1, Right2> tah(
-            other._data().first(), other._data().second());
-    fmpz_addmul(left._fmpz(), tah.getleft()._fmpz(),
-            tah.getright()._fmpz());
-    return left;
-}
-
-// a -= b*c
-template<class Right1, class Right2>
-inline typename detail::enable_ternary_assign<Right1, Right2>::type
-operator-=(fmpzxx& left, const fmpzxx_expression<operations::times,
-        tuple<Right1, tuple<Right2, empty_tuple> > >& other)
-{
-    detail::ternary_assign_helper<Right1, Right2> tah(
-            other._data().first(), other._data().second());
-    fmpz_submul(left._fmpz(), tah.getleft()._fmpz(),
-            tah.getright()._fmpz());
-    return left;
-}
-
+FLINTXX_DEFINE_TERNARY(fmpzxx,
+        fmpz_addmul(to._fmpz(), e1._fmpz(), e2._fmpz()),
+        fmpz_submul(to._fmpz(), e1._fmpz(), e2._fmpz()),
+        FLINTXX_UNADORNED_MAKETYPES)
 
 ///////////////////////////////////////////////////////////////////////////
 // FUNCTIONS

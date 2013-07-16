@@ -136,10 +136,13 @@ FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
 FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpqxx, FMPQXX_COND_S,
         fmpq_neg(to._fmpq(), from._fmpq()))
 
-// TODO addmul
-
 // TODO functions
 } // rules
+
+FLINTXX_DEFINE_TERNARY(fmpqxx,
+        fmpq_addmul(to._fmpq(), e1._fmpq(), e2._fmpq()),
+        fmpq_submul(to._fmpq(), e1._fmpq(), e2._fmpq()),
+        FLINTXX_UNADORNED_MAKETYPES)
 } // flint
 
 #endif
