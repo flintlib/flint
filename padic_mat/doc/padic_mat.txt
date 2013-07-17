@@ -62,18 +62,18 @@ fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
     The return value can be used as an argument to 
     the functions in the \code{fmpz} module.
 
-long padic_mat_val(const padic_mat_t A)
+slong padic_mat_val(const padic_mat_t A)
 
     Returns the valuation of the matrix.
 
     This is implemented as a macro and can be used as an \emph{lvalue} 
     as well as an \emph{rvalue}.
 
-long padic_mat_nrows(const padic_mat_t A)
+slong padic_mat_nrows(const padic_mat_t A)
 
     Returns the number of rows of the matrix $A$.
 
-long padic_mat_ncols(const padic_mat_t A)
+slong padic_mat_ncols(const padic_mat_t A)
 
     Returns the number of columns of the matrix $A$.
 

@@ -125,15 +125,15 @@ void padic_poly_truncate(padic_poly_t poly, slong n, const fmpz_t p)
 
 *******************************************************************************
 
-long padic_poly_degree(padic_poly_t poly)
+slong padic_poly_degree(padic_poly_t poly)
 
     Returns the degree of the polynomial \code{poly}.
 
-long padic_poly_length(padic_poly_t poly)
+slong padic_poly_length(padic_poly_t poly)
 
     Returns the length of the polynomial \code{poly}.
 
-long padic_poly_val(padic_poly_t poly)
+slong padic_poly_val(padic_poly_t poly)
 
     Returns the valuation of the polynomial \code{poly}, 
     which is defined to be the minimum valuation of all 
@@ -144,7 +144,7 @@ long padic_poly_val(padic_poly_t poly)
     Note that this is implemented as a macro and can be 
     used as either a \code{lvalue} or a \code{rvalue}.
 
-long padic_poly_prec(padic_poly_t poly)
+slong padic_poly_prec(padic_poly_t poly)
 
     Returns the precision of the polynomial \code{poly}. 
 
