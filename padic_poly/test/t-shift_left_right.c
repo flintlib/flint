@@ -38,7 +38,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("shift_left/right... ");
     fflush(stdout);
@@ -49,7 +49,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         padic_poly_t a, b, c;
-        long shift = n_randint(state, 100);
+        slong shift = n_randint(state, 100);
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -88,7 +88,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         padic_poly_t a, b, c;
-        long shift = n_randint(state, 100);
+        slong shift = n_randint(state, 100);
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -127,7 +127,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         padic_poly_t a, b, c;
-        long shift = n_randint(state, 100);
+        slong shift = n_randint(state, 100);
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 

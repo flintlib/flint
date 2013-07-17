@@ -41,7 +41,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("mul... ");
     fflush(stdout);
@@ -126,7 +126,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_poly_t a1, a2, b, c, d, t;
-        long v;
+        slong v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -148,7 +148,7 @@ main(void)
 
         if (v >= 0 || -v < N)  /* Otherwise, no precision left */
         {
-            long N2 = (v >= 0) ? N : N + v;
+            slong N2 = (v >= 0) ? N : N + v;
 
             padic_poly_init2(a1, 0, N2);
             padic_poly_init2(a2, 0, N2);

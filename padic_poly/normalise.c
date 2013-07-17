@@ -29,7 +29,7 @@
 
 void _padic_poly_normalise(padic_poly_t poly)
 {
-    long len = poly->length;
+    slong len = poly->length;
 
     FMPZ_VEC_NORM(poly->coeffs, len);
 

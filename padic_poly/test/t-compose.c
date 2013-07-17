@@ -37,7 +37,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("compose... ");
     fflush(stdout);
@@ -91,7 +91,7 @@ main(void)
         }
         else
         {
-            long N2 = N + (f->length - 1) * padic_poly_val(g);
+            slong N2 = N + (f->length - 1) * padic_poly_val(g);
             padic_poly_t hX, h2X;
 
             padic_poly_init2(hX,  0, N2);

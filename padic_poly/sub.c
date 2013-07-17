@@ -26,12 +26,12 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_sub(fmpz *rop, long *val, long N, 
-                     const fmpz *op1, long val1, long len1, long N1, 
-                     const fmpz *op2, long val2, long len2, long N2, 
+void _padic_poly_sub(fmpz *rop, slong *val, slong N, 
+                     const fmpz *op1, slong val1, slong len1, slong N1, 
+                     const fmpz *op2, slong val2, slong len2, slong N2, 
                      const padic_ctx_t ctx)
 {
-    const long len = FLINT_MAX(len1, len2);
+    const slong len = FLINT_MAX(len1, len2);
 
     *val = FLINT_MIN(val1, val2);
 
@@ -90,7 +90,7 @@ void _padic_poly_sub(fmpz *rop, long *val, long N,
 
         if (N >= N1 && N >= N2)
         {
-            long i;
+            slong i;
             for (i = 0; i < len; i++)
                 if (fmpz_sgn(rop + i) < 0)
                     fmpz_add(rop + i, rop + i, pow);
@@ -114,9 +114,9 @@ void padic_poly_sub(padic_poly_t f,
                     const padic_poly_t g, const padic_poly_t h, 
                     const padic_ctx_t ctx)
 {
-    const long lenG = g->length;
-    const long lenH = h->length;
-    const long lenF = FLINT_MAX(lenG, lenH);
+    const slong lenG = g->length;
+    const slong lenH = h->length;
+    const slong lenF = FLINT_MAX(lenG, lenH);
 
     if (lenG == 0)
     {

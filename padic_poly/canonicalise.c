@@ -25,9 +25,9 @@
 
 #include "padic_poly.h"
 
-void _padic_poly_canonicalise(fmpz *poly, long *v, long len, const fmpz_t p)
+void _padic_poly_canonicalise(fmpz *poly, slong *v, slong len, const fmpz_t p)
 {
-    const long min = _fmpz_vec_ord_p(poly, len, p);
+    const slong min = _fmpz_vec_ord_p(poly, len, p);
 
     if (min == 0)
     {

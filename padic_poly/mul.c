@@ -25,9 +25,9 @@
 
 #include "padic_poly.h"
 
-void _padic_poly_mul(fmpz *rop, long *rval, long N, 
-                     const fmpz *op1, long val1, long len1, 
-                     const fmpz *op2, long val2, long len2, 
+void _padic_poly_mul(fmpz *rop, slong *rval, slong N, 
+                     const fmpz *op1, slong val1, slong len1, 
+                     const fmpz *op2, slong val2, slong len2, 
                      const padic_ctx_t ctx)
 {
     fmpz_t pow;
@@ -48,9 +48,9 @@ void padic_poly_mul(padic_poly_t f,
                     const padic_poly_t g, const padic_poly_t h, 
                     const padic_ctx_t ctx)
 {
-    const long lenG = g->length;
-    const long lenH = h->length;
-    const long lenF = lenG + lenH - 1;
+    const slong lenG = g->length;
+    const slong lenH = h->length;
+    const slong lenF = lenG + lenH - 1;
 
     if (lenG == 0 || lenH == 0 || g->val + h->val >= f->N)
     {

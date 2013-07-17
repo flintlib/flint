@@ -31,7 +31,7 @@
  */
 
 static void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den, 
-                                      const fmpz *op, long val, long len, 
+                                      const fmpz *op, slong val, slong len, 
                                       const fmpz_t p)
 {
     if (val == 0)
@@ -66,7 +66,7 @@ static void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den,
 void padic_poly_get_fmpq_poly(fmpq_poly_t rop, 
                               const padic_poly_t op, const padic_ctx_t ctx)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if (len == 0)
     {

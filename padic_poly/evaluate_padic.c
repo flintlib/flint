@@ -29,7 +29,7 @@
 /*
     TODO:  Move this bit of code into "padic".
  */
-static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
+static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(u))
     {
@@ -72,9 +72,9 @@ static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
     $p^{-nb} f(x)$ to precision $N-w-nb$.
  */
 
-void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N,  
-                                const fmpz *poly, long val, long len, 
-                                const fmpz_t a, long b, const padic_ctx_t ctx)
+void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,  
+                                const fmpz *poly, slong val, slong len, 
+                                const fmpz_t a, slong b, const padic_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -120,7 +120,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N,
     }
     else  /* b < 0 */
     {
-        const long n = len - 1;
+        const slong n = len - 1;
 
         if (val + n*b >= N)
         {
@@ -131,7 +131,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N,
         {
             fmpz_t pow;
             int alloc;
-            long i;
+            slong i;
             fmpz_t s, t;
 
             fmpz *vec = _fmpz_vec_init(len);

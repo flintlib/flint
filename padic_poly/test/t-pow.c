@@ -38,7 +38,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("pow... ");
     fflush(stdout);
@@ -49,7 +49,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_poly_t a, b, c;
-        long e;
+        slong e;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -91,7 +91,7 @@ main(void)
     {
         padic_poly_t a, b, c;
         fmpq_poly_t aQQ, bQQ;
-        long e;
+        slong e;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -129,7 +129,7 @@ main(void)
         {
             padic_poly_t blo, clo;
 
-            long N2 = N + (e - 1) * a->val;
+            slong N2 = N + (e - 1) * a->val;
 
             padic_poly_init2(blo, 0, N2);
             padic_poly_init2(clo, 0, N2);

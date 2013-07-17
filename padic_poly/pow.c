@@ -26,8 +26,8 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_pow(fmpz *rop, long *rval, long N, 
-                     const fmpz *op, long val, long len, ulong e,
+void _padic_poly_pow(fmpz *rop, slong *rval, slong N, 
+                     const fmpz *op, slong val, slong len, ulong e,
                      const padic_ctx_t ctx)
 {
     fmpz_t pow;
@@ -60,7 +60,7 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
     }
     else
     {
-        const long rlen = (long) e * (op->length - 1) + 1;
+        const slong rlen = (long) e * (op->length - 1) + 1;
         fmpz *t;
 
         if (rop == op)

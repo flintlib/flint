@@ -25,8 +25,8 @@
 
 #include "padic_poly.h"
 
-void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval, long N, 
-                                  const fmpz *op, long val, long len, 
+void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N, 
+                                  const fmpz *op, slong val, slong len, 
                                   const padic_t c, const padic_ctx_t ctx)
 {
     if (padic_is_zero(c) || val + padic_val(c) >= N)

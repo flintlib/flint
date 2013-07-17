@@ -37,7 +37,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("evaluate_padic... ");
     fflush(stdout);
@@ -91,7 +91,7 @@ main(void)
         }
         else
         {
-            long N2 = N + (f->length - 1) * padic_val(a);
+            slong N2 = N + (f->length - 1) * padic_val(a);
             padic_t y2, z2;
 
             padic_init2(y2, N2); 

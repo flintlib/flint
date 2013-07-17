@@ -58,20 +58,20 @@ void padic_poly_init(padic_poly_t poly)
     after finishing with the \code{padic_poly_t} to free the memory 
     used by the polynomial.
 
-void padic_poly_init2(padic_poly_t poly, long alloc, long prec)
+void padic_poly_init2(padic_poly_t poly, slong alloc, slong prec)
 
     Initialises \code{poly} with space for at least \code{alloc} coefficients 
     and sets the length to zero.  The allocated coefficients are all set to 
     zero.  The precision is set to \code{prec}.
 
-void padic_poly_realloc(padic_poly_t poly, long alloc, const fmpz_t p)
+void padic_poly_realloc(padic_poly_t poly, slong alloc, const fmpz_t p)
 
     Reallocates the given polynomial to have space for \code{alloc} 
     coefficients.  If \code{alloc} is zero the polynomial is cleared 
     and then reinitialised.  If the current length is greater than 
     \code{alloc} the polynomial is first truncated to length \code{alloc}.
 
-void padic_poly_fit_length(padic_poly_t poly, long len)
+void padic_poly_fit_length(padic_poly_t poly, slong len)
 
     If \code{len} is greater than the number of coefficients currently 
     allocated, then the polynomial is reallocated to have space for at 
@@ -83,13 +83,13 @@ void padic_poly_fit_length(padic_poly_t poly, long len)
     of allocated coefficients when length is larger than the number of 
     coefficients currently allocated.
 
-void _padic_poly_set_length(padic_poly_t poly, long len)
+void _padic_poly_set_length(padic_poly_t poly, slong len)
 
     Demotes the coefficients of \code{poly} beyond \code{len} and sets 
     the length of \code{poly} to \code{len}.
 
     Note that if the current length is greater than \code{len} the 
-    polynomial may no longer be in canonical form.
+    polynomial may no slonger be in canonical form.
 
 void padic_poly_clear(padic_poly_t poly)
 
@@ -102,7 +102,7 @@ void _padic_poly_normalise(padic_poly_t poly)
     If all coefficients are zero, the length is set to zero.  This function 
     is mainly used internally, as all functions guarantee normalisation.
 
-void _padic_poly_canonicalise(fmpz *poly, long *v, long len, const fmpz_t p)
+void _padic_poly_canonicalise(fmpz *poly, slong *v, slong len, const fmpz_t p)
 
 void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
 
@@ -115,7 +115,7 @@ void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)
     Reduces the polynomial \code{poly} modulo $p^N$, assuming 
     that it is in canonical form already.
 
-void padic_poly_truncate(padic_poly_t poly, long n, const fmpz_t p)
+void padic_poly_truncate(padic_poly_t poly, slong n, const fmpz_t p)
 
     Truncates the polynomial to length at most~$n$.
 
@@ -161,19 +161,19 @@ long padic_poly_prec(padic_poly_t poly)
 *******************************************************************************
 
 void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
-                         long len, const padic_ctx_t ctx)
+                         slong len, const padic_ctx_t ctx)
 
     Sets $f$ to a random polynomial of length at most \code{len} 
     with entries reduced modulo $p^N$.
 
 void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
-                                  long len, const padic_ctx_t ctx)
+                                  slong len, const padic_ctx_t ctx)
 
     Sets $f$ to a non-zero random polynomial of length at most \code{len} 
     with entries reduced modulo $p^N$.
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
-                             long val, long len, const padic_ctx_t ctx)
+                             slong val, slong len, const padic_ctx_t ctx)
 
     Sets $f$ to a random polynomial of length at most \code{len} 
     with at most the prescribed valuation \code{val} and entries 
@@ -201,14 +201,14 @@ void padic_poly_set(padic_poly_t poly1, const padic_poly_t poly2,
     Sets the polynomial \code{poly1} to the polynomial \code{poly2}, 
     reduced to the precision of \code{poly1}.
 
-void padic_poly_set_si(padic_poly_t poly, long x, const padic_ctx_t ctx)
+void padic_poly_set_si(padic_poly_t poly, slong x, const padic_ctx_t ctx)
 
-    Sets the polynomial \code{poly} to the \code{signed long} 
+    Sets the polynomial \code{poly} to the \code{signed slong} 
     integer $x$ reduced to the precision of the polynomial.
 
 void padic_poly_set_ui(padic_poly_t poly, ulong x, const padic_ctx_t ctx)
 
-    Sets the polynomial \code{poly} to the \code{unsigned long} 
+    Sets the polynomial \code{poly} to the \code{unsigned slong} 
     integer $x$ reduced to the precision of the polynomial.
 
 void padic_poly_set_fmpz(padic_poly_t poly, const fmpz_t x, 
@@ -270,13 +270,13 @@ void padic_poly_swap(padic_poly_t poly1, padic_poly_t poly2)
 
 *******************************************************************************
 
-void padic_poly_get_coeff_padic(padic_t c, const padic_poly_t poly, long n, 
+void padic_poly_get_coeff_padic(padic_t c, const padic_poly_t poly, slong n, 
                                            const padic_ctx_t ctx)
 
     Sets $c$ to the coefficient of $x^n$ in the polynomial, 
     reduced modulo the precision of $c$.
 
-void padic_poly_set_coeff_padic(padic_poly_t f, long n, const padic_t c, 
+void padic_poly_set_coeff_padic(padic_poly_t f, slong n, const padic_t c, 
                                                 const padic_ctx_t ctx)
 
     Sets the coefficient of $x^n$ in the polynomial $f$ to $c$, 
@@ -312,9 +312,9 @@ int padic_poly_is_one(const padic_poly_t poly, const padic_ctx_t ctx)
 
 *******************************************************************************
 
-void _padic_poly_add(fmpz *rop, long *rval, long N, 
-                     const fmpz *op1, long val1, long len1, long N1, 
-                     const fmpz *op2, long val2, long len2, long N2, 
+void _padic_poly_add(fmpz *rop, slong *rval, slong N, 
+                     const fmpz *op1, slong val1, slong len1, slong N1, 
+                     const fmpz *op2, slong val2, slong len2, slong N2, 
                      const padic_ctx_t ctx)
 
     Sets \code{(rop, *val, FLINT_MAX(len1, len2)} to the sum of 
@@ -333,9 +333,9 @@ void padic_poly_add(padic_poly_t f,
 
     Sets $f$ to the sum $g + h$.
 
-void _padic_poly_sub(fmpz *rop, long *rval, 
-                     const fmpz *op1, long val1, long len1, 
-                     const fmpz *op2, long val2, long len2, 
+void _padic_poly_sub(fmpz *rop, slong *rval, 
+                     const fmpz *op1, slong val1, slong len1, 
+                     const fmpz *op2, slong val2, slong len2, 
                      const padic_ctx_t ctx);
 
     Sets \code{(rop, *val, FLINT_MAX(len1, len2)} to the difference of 
@@ -365,8 +365,8 @@ void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
 
 *******************************************************************************
 
-void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval, 
-                                  const fmpz *op, long val, long len, 
+void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, 
+                                  const fmpz *op, slong val, slong len, 
                                   const padic_t c, const padic_ctx_t ctx)
 
     Sets \code{(rop, *rval, len)} to \code{(op, val, len)} multiplied 
@@ -389,9 +389,9 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
 
 *******************************************************************************
 
-void _padic_poly_mul(fmpz *rop, long *rval, long N, 
-                     const fmpz *op1, long val1, long len1, 
-                     const fmpz *op2, long val2, long len2, 
+void _padic_poly_mul(fmpz *rop, slong *rval, slong N, 
+                     const fmpz *op1, slong val1, slong len1, 
+                     const fmpz *op2, slong val2, slong len2, 
                      const padic_ctx_t ctx)
 
     Sets \code{(rop, *rval, len1 + len2 - 1)} to the product of 
@@ -416,8 +416,8 @@ void padic_poly_mul(padic_poly_t res,
 
 *******************************************************************************
 
-void _padic_poly_pow(fmpz *rop, long *rval, long N, 
-                     const fmpz *op, long val, long len, ulong e,
+void _padic_poly_pow(fmpz *rop, slong *rval, slong N, 
+                     const fmpz *op, slong val, slong len, ulong e,
                      const padic_ctx_t ctx)
 
     Sets the polynomial \code{(rop, *rval, e (len - 1) + 1)} to the 
@@ -450,7 +450,7 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
 
 *******************************************************************************
 
-void padic_poly_inv_series(padic_poly_t g, const padic_poly_t f, long n, 
+void padic_poly_inv_series(padic_poly_t g, const padic_poly_t f, slong n, 
                            const padic_ctx_t ctx)
 
     Computes the power series inverse $g$ of $f$ modulo $X^n$, 
@@ -474,8 +474,8 @@ void padic_poly_inv_series(padic_poly_t g, const padic_poly_t f, long n,
 
 *******************************************************************************
 
-void _padic_poly_derivative(fmpz *rop, long *rval, long N, 
-                            const fmpz *op, long val, long len, 
+void _padic_poly_derivative(fmpz *rop, slong *rval, slong N, 
+                            const fmpz *op, slong val, slong len, 
                             const padic_ctx_t ctx)
 
     Sets \code{(rop, rval)} to the derivative of \code{(op, val)} reduced 
@@ -495,13 +495,13 @@ void padic_poly_derivative(padic_poly_t rop,
 
 *******************************************************************************
 
-void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n, 
+void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, slong n, 
                            const padic_ctx_t ctx)
 
     Notationally, sets the polynomial \code{rop} to the polynomial \code{op} 
     multiplied by $x^n$, where $n \geq 0$, and reduces the result.
 
-void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n)
+void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, slong n)
 
     Notationally, sets the polynomial \code{rop} to the polynomial 
     \code{op} after floor division by $x^n$, where $n \geq 0$, ensuring 
@@ -513,9 +513,9 @@ void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n)
 
 *******************************************************************************
 
-void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N, 
-                                const fmpz *poly, long val, long len, 
-                                const fmpz_t a, long b, const padic_ctx_t ctx)
+void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N, 
+                                const fmpz *poly, slong val, slong len, 
+                                const fmpz_t a, slong b, const padic_ctx_t ctx)
 
 void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly, 
                                const padic_t a, const padic_ctx_t ctx)
@@ -537,9 +537,9 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
 
 *******************************************************************************
 
-void _padic_poly_compose(fmpz *rop, long *rval, long N,  
-                         const fmpz *op1, long val1, long len1, 
-                         const fmpz *op2, long val2, long len2, 
+void _padic_poly_compose(fmpz *rop, slong *rval, slong N,  
+                         const fmpz *op1, slong val1, slong len1, 
+                         const fmpz *op2, slong val2, slong len2, 
                          const padic_ctx_t ctx)
 
     Sets \code{(rop, *rval, (len1-1)*(len2-1)+1)} to the composition 
@@ -560,8 +560,8 @@ void padic_poly_compose(padic_poly_t rop,
     denote the polynomials \code{op1} and \code{op2}, respectively. 
     Then \code{rop} is set to $f(g(X))$.
 
-void _padic_poly_compose_pow(fmpz *rop, long *rval, long N, 
-                             const fmpz *op, long val, long len, long k, 
+void _padic_poly_compose_pow(fmpz *rop, slong *rval, slong N, 
+                             const fmpz *op, slong val, slong len, slong k, 
                              const padic_ctx_t ctx)
 
     Sets \code{(rop, *rval, (len - 1)*k + 1)} to the composition of 
@@ -571,7 +571,7 @@ void _padic_poly_compose_pow(fmpz *rop, long *rval, long N,
 
     Supports aliasing between the input and output polynomials.
 
-void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, long k, 
+void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k, 
                             const padic_ctx_t ctx)
 
     Sets \code{rop} to the composition of \code{op} and the monomial $x^k$, 
@@ -592,7 +592,7 @@ int padic_poly_debug(const padic_poly_t poly)
 
     In the current implementation, always returns $1$.
 
-int _padic_poly_fprint(FILE *file, const fmpz *poly, long val, long len, 
+int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, 
                        const padic_ctx_t ctx)
 
 int padic_poly_fprint(FILE *file, const padic_poly_t poly, 
@@ -617,7 +617,7 @@ int padic_poly_fprint(FILE *file, const padic_poly_t poly,
 
     In the current implementation, always returns $1$.
 
-int _padic_poly_print(const fmpz *poly, long val, long len, 
+int _padic_poly_print(const fmpz *poly, slong val, slong len, 
                       const padic_ctx_t ctx)
 
 int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
@@ -628,7 +628,7 @@ int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
     In the current implementation, always returns $1$.
 
 int _padic_poly_fprint_pretty(FILE *file, 
-                              const fmpz *poly, long val, long len, 
+                              const fmpz *poly, slong val, slong len, 
                               const char *var, 
                               const padic_ctx_t ctx)
 
@@ -637,7 +637,7 @@ int padic_poly_fprint_pretty(FILE *file,
                              const padic_ctx_t ctx)
 
 int _padic_poly_print_pretty(FILE *file, 
-                             const fmpz *poly, long val, long len, 
+                             const fmpz *poly, slong val, slong len, 
                              const char *var, 
                              const padic_ctx_t ctx)
 
@@ -650,12 +650,12 @@ int padic_poly_print_pretty(const padic_poly_t poly, const char *var,
 
 *******************************************************************************
 
-int _padic_poly_is_canonical(const fmpz *op, long val, long len, 
+int _padic_poly_is_canonical(const fmpz *op, slong val, slong len, 
                              const padic_ctx_t ctx);
 
 int padic_poly_is_canonical(const padic_poly_t op, const padic_ctx_t ctx);
 
-int _padic_poly_is_reduced(const fmpz *op, long val, long len, long N, 
+int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, 
                            const padic_ctx_t ctx);
 
 int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx);

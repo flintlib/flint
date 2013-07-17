@@ -28,10 +28,10 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_fprint(FILE *file, const fmpz *poly, long val, long len, 
+int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, 
                        const padic_ctx_t ctx)
 {
-    long i, v;
+    slong i, v;
     fmpz_t u;
 
     if (len == 0)

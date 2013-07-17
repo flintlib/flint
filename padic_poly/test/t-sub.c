@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
 
     fmpz_t p;
-    long N;
+    slong N;
     padic_ctx_t ctx;
 
     printf("sub... ");

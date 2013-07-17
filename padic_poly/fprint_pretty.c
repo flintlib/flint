@@ -26,11 +26,11 @@
 #include "padic_poly.h"
 
 int _padic_poly_fprint_pretty(FILE *file, 
-                              const fmpz *poly, long len, long val, 
+                              const fmpz *poly, slong len, slong val, 
                               const char *var, 
                               const padic_ctx_t ctx)
 {
-    long i;
+    slong i;
     padic_t x;
 
     padic_init(x);  /* Precision is not used anywhere! */

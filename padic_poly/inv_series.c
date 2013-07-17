@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, long n, 
+void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n, 
                            const padic_ctx_t ctx)
 {
     fmpz_t cinv;
@@ -62,7 +62,7 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, long n,
     }
     else
     {
-        long i;
+        slong i;
 
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)

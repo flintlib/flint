@@ -29,7 +29,7 @@
 /*
     TODO:  Move this bit of code into "padic".
  */
-static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
+static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(u))
     {
@@ -53,12 +53,12 @@ static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
 
 /* Assumes that len1 > 0. */
 
-void _padic_poly_compose(fmpz *rop, long *rval, long N, 
-                         const fmpz *op1, long val1, long len1, 
-                         const fmpz *op2, long val2, long len2, 
+void _padic_poly_compose(fmpz *rop, slong *rval, slong N, 
+                         const fmpz *op1, slong val1, slong len1, 
+                         const fmpz *op2, slong val2, slong len2, 
                          const padic_ctx_t ctx)
 {
-    const long lenr = (len1 - 1) * (len2 - 1) + 1;
+    const slong lenr = (len1 - 1) * (len2 - 1) + 1;
 
     if (len1 == 1 || len2 == 0)
     {
@@ -102,7 +102,7 @@ void _padic_poly_compose(fmpz *rop, long *rval, long N,
     }
     else  /* val2 < 0 */
     {
-        const long n = len1 - 1;
+        const slong n = len1 - 1;
 
         if (val1 + n*val2 >= N)
         {
@@ -115,7 +115,7 @@ void _padic_poly_compose(fmpz *rop, long *rval, long N,
             int alloc;
             fmpz *vec1;
             fmpz_t s, t;
-            long i;
+            slong i;
 
             vec1 = _fmpz_vec_init(len1);
             fmpz_init(s);
@@ -150,7 +150,7 @@ void padic_poly_compose(padic_poly_t rop,
                         const padic_poly_t op1, const padic_poly_t op2, 
                         const padic_ctx_t ctx)
 {
-    const long len1 = op1->length, len2 = op2->length;
+    const slong len1 = op1->length, len2 = op2->length;
 
     if (len1 == 0)
     {
@@ -167,7 +167,7 @@ void padic_poly_compose(padic_poly_t rop,
     }
     else
     {
-        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        const slong lenr = (len1 - 1) * (len2 - 1) + 1;
 
         if (rop != op1 && rop != op2)
         {

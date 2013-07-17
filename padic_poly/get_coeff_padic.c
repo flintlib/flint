@@ -25,7 +25,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_get_coeff_padic(padic_t x, const padic_poly_t f, long n, 
+void padic_poly_get_coeff_padic(padic_t x, const padic_poly_t f, slong n, 
                                 const padic_ctx_t ctx)
 {
     if (n < f->length && !fmpz_is_zero(f->coeffs + n))

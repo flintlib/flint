@@ -27,7 +27,7 @@
 
 void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)
 {
-    const long N = padic_poly_prec(poly);
+    const slong N = padic_poly_prec(poly);
 
     if (poly->length > 0)
     {

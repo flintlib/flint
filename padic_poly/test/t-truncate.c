@@ -41,7 +41,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("truncate... ");
     fflush(stdout);
@@ -52,7 +52,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         padic_poly_t a, b, c;
-        long m, n;
+        slong m, n;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -97,7 +97,7 @@ main(void)
     {
         padic_poly_t a;
         fmpq_poly_t b, c;
-        long n;
+        slong n;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 

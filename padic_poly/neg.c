@@ -29,7 +29,7 @@
 void padic_poly_neg(padic_poly_t f, const padic_poly_t g, 
                     const padic_ctx_t ctx)
 {
-    const long len = g->length;
+    const slong len = g->length;
 
     if (len == 0 || g->val >= padic_poly_prec(f))
     {

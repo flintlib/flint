@@ -26,8 +26,8 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_derivative(fmpz *rop, long *rval, long N, 
-                            const fmpz *op, long val, long len, 
+void _padic_poly_derivative(fmpz *rop, slong *rval, slong N, 
+                            const fmpz *op, slong val, slong len, 
                             const padic_ctx_t ctx)
 {
     fmpz_t pow;
@@ -49,7 +49,7 @@ void _padic_poly_derivative(fmpz *rop, long *rval, long N,
 void padic_poly_derivative(padic_poly_t rop, 
                            const padic_poly_t op, const padic_ctx_t ctx)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if (len < 2 || op->val >= rop->N)
     {

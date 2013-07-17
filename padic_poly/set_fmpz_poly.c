@@ -29,7 +29,7 @@
 void padic_poly_set_fmpz_poly(padic_poly_t f, const fmpz_poly_t g, 
                               const padic_ctx_t ctx)
 {
-    const long len = g->length;
+    const slong len = g->length;
 
     padic_poly_fit_length(f, len);
     _padic_poly_set_length(f, len);

@@ -25,7 +25,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_set_coeff_padic(padic_poly_t poly, long n, const padic_t x, 
+void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x, 
                                 const padic_ctx_t ctx)
 {
     if (padic_is_zero(x) || padic_val(x) >= padic_poly_prec(poly))

@@ -28,7 +28,7 @@
 int padic_poly_get_fmpz_poly(fmpz_poly_t rop, const padic_poly_t op, 
                              const padic_ctx_t ctx)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if (op->val < 0)
     {

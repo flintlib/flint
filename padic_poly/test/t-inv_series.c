@@ -37,7 +37,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("inv_series... ");
     fflush(stdout);
@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_poly_t a, b, c;
-        long n;
+        slong n;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -102,7 +102,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_poly_t a, b, c;
-        long n, N2;
+        slong n, N2;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - 1) + 1;
@@ -112,7 +112,7 @@ main(void)
         padic_poly_init2(b, 0, N);
 
         {
-            long i, len = n_randint(state, 10) + 1;
+            slong i, len = n_randint(state, 10) + 1;
             int alloc;
             fmpz_t pow;
 

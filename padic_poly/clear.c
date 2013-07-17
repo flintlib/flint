@@ -33,7 +33,7 @@ void padic_poly_clear(padic_poly_t poly)
 {
     if (poly->coeffs)
     {
-        long i;
+        slong i;
 
         for (i = 0; i < poly->alloc; i++)
             _fmpz_demote(poly->coeffs + i);

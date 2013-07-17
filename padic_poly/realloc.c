@@ -30,7 +30,7 @@
 #include "fmpz.h"
 #include "padic_poly.h"
 
-void padic_poly_realloc(padic_poly_t poly, long alloc, const fmpz_t p)
+void padic_poly_realloc(padic_poly_t poly, slong alloc, const fmpz_t p)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {

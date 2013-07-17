@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        slong N;
         padic_ctx_t ctx;
 
         padic_poly_t a, b, c;
@@ -90,7 +90,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        slong N;
         padic_ctx_t ctx;
 
         padic_poly_t a, b, c;
@@ -132,7 +132,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        slong N;
         padic_ctx_t ctx;
 
         padic_poly_t a, b, c, d;

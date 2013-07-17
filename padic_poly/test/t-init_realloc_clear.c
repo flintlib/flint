@@ -53,7 +53,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        long N;
+        slong N;
         fmpz_t p;
         padic_poly_t a;
 
@@ -73,7 +73,7 @@ main(void)
     {
         padic_ctx_t ctx;
         fmpz_t p;
-        long N;
+        slong N;
 
         padic_poly_t a;
 

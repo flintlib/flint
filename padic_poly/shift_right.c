@@ -25,7 +25,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n, 
+void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, slong n, 
                             const padic_ctx_t ctx)
 {
     if (n == 0)

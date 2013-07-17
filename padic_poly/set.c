@@ -30,7 +30,7 @@ void padic_poly_set(padic_poly_t poly1,
 {
     if (poly1 != poly2)         /* Aliasing is trivial */
     {
-        long len2 = poly2->length, N1 = padic_poly_prec(poly1);
+        slong len2 = poly2->length, N1 = padic_poly_prec(poly1);
 
         if (len2 == 0 || poly2->val >= N1)
         {

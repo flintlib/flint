@@ -30,7 +30,7 @@
 void padic_poly_set_fmpq_poly(padic_poly_t f, 
                               const fmpq_poly_t g, const padic_ctx_t ctx)
 {
-    const long len = g->length;
+    const slong len = g->length;
 
     if (len == 0)
     {
@@ -38,7 +38,7 @@ void padic_poly_set_fmpq_poly(padic_poly_t f,
     }
     else
     {
-        const long N = padic_poly_prec(f);
+        const slong N = padic_poly_prec(f);
         fmpz_t t;
 
         fmpz_init(t);

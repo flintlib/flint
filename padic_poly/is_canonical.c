@@ -25,7 +25,7 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_is_canonical(const fmpz *op, long val, long len, 
+int _padic_poly_is_canonical(const fmpz *op, slong val, slong len, 
                              const padic_ctx_t ctx)
 {
     if (len == 0)
@@ -34,7 +34,7 @@ int _padic_poly_is_canonical(const fmpz *op, long val, long len,
     }
     else
     {
-        long w = _fmpz_vec_ord_p(op, len, ctx->p);
+        slong w = _fmpz_vec_ord_p(op, len, ctx->p);
 
         return (w == 0);
     }

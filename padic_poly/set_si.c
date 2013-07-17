@@ -25,7 +25,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_set_si(padic_poly_t poly, long x, const padic_ctx_t ctx)
+void padic_poly_set_si(padic_poly_t poly, slong x, const padic_ctx_t ctx)
 {
     padic_t y;
 

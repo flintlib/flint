@@ -25,10 +25,10 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_is_reduced(const fmpz *op, long val, long len, long N, 
+int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, 
                            const padic_ctx_t ctx)
 {
-    long w;
+    slong w;
 
     if (len == 0)
     {
@@ -45,7 +45,7 @@ int _padic_poly_is_reduced(const fmpz *op, long val, long len, long N,
     {
         fmpz_t pow;
         int r, alloc;
-        long i;
+        slong i;
 
         alloc = _padic_ctx_pow_ui(pow, N - val, ctx);
 

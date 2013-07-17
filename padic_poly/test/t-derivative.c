@@ -38,7 +38,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("derivative... ");
     fflush(stdout);

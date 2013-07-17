@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "padic_poly.h"
 
-void padic_poly_fit_length(padic_poly_t poly, long len)
+void padic_poly_fit_length(padic_poly_t poly, slong len)
 {
     if (len > poly->alloc)
     {

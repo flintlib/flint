@@ -37,7 +37,7 @@ main(void)
 
     padic_ctx_t ctx;
     fmpz_t p;
-    long N;
+    slong N;
 
     printf("compose_pow... ");
     fflush(stdout);
@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_poly_t a, b, c;
-        long k;
+        slong k;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -88,7 +88,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_poly_t f, g, h1, h2;
-        long k;
+        slong k;
         padic_t one;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));

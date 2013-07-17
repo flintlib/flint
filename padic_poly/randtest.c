@@ -31,9 +31,9 @@
 #include "padic_poly.h"
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
-                             long val, long len, const padic_ctx_t ctx)
+                             slong val, slong len, const padic_ctx_t ctx)
 {
-    const long N = padic_poly_prec(f);
+    const slong N = padic_poly_prec(f);
 
     if (len == 0)
         return;
@@ -44,7 +44,7 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
     }
     else
     {
-        long i;
+        slong i;
         fmpz_t pow;
         int alloc;
 
@@ -74,11 +74,11 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
 }
 
 void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
-                         long len, const padic_ctx_t ctx)
+                         slong len, const padic_ctx_t ctx)
 {
-    const long N = padic_poly_prec(f);
+    const slong N = padic_poly_prec(f);
 
-    long min, max, val;
+    slong min, max, val;
 
     if (N > 0)
     {
@@ -102,9 +102,9 @@ void padic_poly_randtest(padic_poly_t f, flint_rand_t state,
 }
 
 void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state, 
-                                  long len, const padic_ctx_t ctx)
+                                  slong len, const padic_ctx_t ctx)
 {
-    long i;
+    slong i;
 
     if (len == 0)
     {

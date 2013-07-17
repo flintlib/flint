@@ -28,7 +28,7 @@
 void padic_poly_set_padic(padic_poly_t poly, 
                           const padic_t x, const padic_ctx_t ctx)
 {
-    long N1 = padic_poly_prec(poly);
+    slong N1 = padic_poly_prec(poly);
 
     if (padic_is_zero(x) || padic_val(x) >= N1)
     {
