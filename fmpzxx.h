@@ -61,21 +61,21 @@ public:
     static fmpzxx_expression randm(frandxx& state, const Fmpz& m)
     {
         fmpzxx_expression res;
-        fmpz_randm(res._fmpz(), state._data(), m._fmpz());
+        fmpz_randm(res._fmpz(), state._data(), m.evaluate()._fmpz());
         return res;
     }
     template<class Fmpz>
     static fmpzxx_expression randtest_mod(frandxx& state, const Fmpz& m)
     {
         fmpzxx_expression res;
-        fmpz_randtest_mod(res._fmpz(), state._data(), m._fmpz());
+        fmpz_randtest_mod(res._fmpz(), state._data(), m.evaluate()._fmpz());
         return res;
     }
     template<class Fmpz>
     static fmpzxx_expression randtest_mod_signed(frandxx& state, const Fmpz& m)
     {
         fmpzxx_expression res;
-        fmpz_randtest_mod_signed(res._fmpz(), state._data(), m._fmpz());
+        fmpz_randtest_mod_signed(res._fmpz(), state._data(), m.evaluate()._fmpz());
         return res;
     }
 
@@ -435,6 +435,7 @@ mul_tdiv_q_2exp(const Fmpz& g, long x, ulong exp)
     fmpz_mul_si_tdiv_q_2exp(res._fmpz(), g.evaluate()._fmpz(), x, exp);
     return res;
 }
+// TODO addmul, submul?
 
 // These cannot be lazy because we do not support two return values
 template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>

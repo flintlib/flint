@@ -1,3 +1,4 @@
+% vim: spell spelllang=en textwidth=80
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   This file is part of FLINT.
@@ -21,6 +22,7 @@
 %
 %   Copyright (C) 2007 William Hart, David Harvey
 %   Copyright (C) 2010 Sebastian Pancratz
+%   Copyright (C) 2013 Tom Bachmann
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1523,6 +1525,150 @@ The output is:
 \input{input/mpn_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C++ wrapper                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{flintxx}
+\epigraph{C++ wrapper library for FLINT}
+
+\section{Introduction}
+
+FLINT provides fast algorithms for number theoretic computations. For many
+reasons, it is written in C. Nonetheless, some users prefer object oriented
+syntax. FLINT ships with a set of wrapper C++ classes, together termed flintxx,
+which provide such an object oriented syntax.
+
+In this chapter, we describe how to \emph{use} flintxx. The FLINT developer
+wishing to extend the wrapper library should consult the
+appendix~\ref{app:genericxx}.
+
+In general, flintxx strives to behave just like the underlying FLINT C
+interface, except that we use classes and C++ operators to make the client code
+look more pleasant. The simple example from the section on \code{fmpz} can be
+transcribed into C++ as follows:
+
+\begin{lstlisting}[language=c++]
+#include "fmpzxx.h"
+...
+using namespace flint;
+fmpzxx x, y;
+x = 7u;
+y = x*x;
+std::cout << x << "^2 = " << y << std::endl;
+\end{lstlisting}
+
+As can be seen here, and in general, if a FLINT C interface is called \code{foo}
+and resides in \code{foo.h}, then the C++ version is called \code{fooxx} and
+resides in \code{fooxx.h}. All flintxx classes live inside
+\code{namespace flint}.
+
+\section{Overview}
+
+\paragraph{Expression templates}
+The implementation of flintxx tries very hard not to incur any overhead over
+using the native C interface. For this reason, we use \emph{expression
+templates} for lazily evaluating expressions. This allows us to avoid creating
+excessively many temporaries, for example. This means that even if \code{x} and
+\code{y} are of type \code{fmpzxx} (say), then \code{x + y} will \emph{not} be
+of type \code{fmpzxx}. Instead it will be an object which for most purposes
+behaves just like \code{fmpzxx}, but really only expresses the fact that it
+represents the sum of \code{x} and \code{y}.
+
+This distinction almost never matters, since expression templates are evaluated
+automatically in most cases. Thus \code{cout << x + y} or \code{x + y == 7} will
+work just as one might expect. There are ways to request explicit evaluation of
+an expression template, most notably \code{(x + y).evaluate()} and
+\code{fmpzxx(x + y)}.
+
+One caveat of the expression template approach is that compiler error messages
+can be long and hard to understand. TODO static assert
+
+\paragraph{Reference types}
+
+One subtlety in wrapping a C library is that references do not work as easily as
+one might expect. If we were to only ever use the \code{fmpzxx} class, and never
+use \code{fmpz_t}, there would be no problem in just using \code{fmpzxx&} and
+\code{const fmpzxx&} as reference types. However, in this case there is no way
+of turning an \code{fmpz_t} into an object which can interact with flintxx,
+without copying the entire \code{fmpz}. This may not seem like a big problem,
+until one realises that (e.g.) \code{fmpq_t} internally consists of two
+instances of \code{fmpz_t}, and that \code{fmpqxx} should be able to expose
+numerator and denominator.
+
+For this reason, for every C interface \code{foo}, flintxx provides two
+additional types, called \code{fooxx_ref} and \code{fooxx_srcref}, acting as
+replacements for \code{fooxx&} and \code{const foox&}, respectively. Instances
+of \code{fooxx_ref} or \code{fooxx_srcref} behave almost exactly like instances
+\code{fooxx}, in fact the user should never notice a difference. Any flintxx
+operation or expression which works on objects of type \code{foo} also works on
+objects of type \code{fooxx_ref} and \code{fooxx_srcref}. Moreover, instances
+of \code{foo} can be converted implicitly to \code{fooxx_ref} or
+\code{fooxx_srcref}, and \code{fooxx_ref} can be converted implicitly to
+\code{fooxx_srcref}. It is also possible to explicitly convert reference types
+\code{fooxx_*ref} to \code{fooxx} (since this entails copying, we provide no
+implicit conversion).
+
+\paragraph{Extending flintxx}
+
+Explanations on the inner workings of the flintxx expression template library
+and how they pertain to wrapping new C interfaces can be found in
+appendix~\ref{app:genericxx}. Here we just want to remark that the flintxx
+classes are not designed for inheritance. Instead, if you want to modify
+slightly the behaviour of one of the flintxx classes for your purposes, use
+composition: TODO describe forwarding.h.
+
+\section{Notations and conventions for the C++ interface documentation}
+As explained above, the flintxx classes and functions perform quite a number of
+operations which should be invisible to the user. Some template types implement
+methods which only make sense for some template arguments, etc. In what follows,
+we document a ``virtual'' set of classes and functions, which explain how the
+user should expect its objects to behave, and which we guarantee to maintain.
+Other interfaces should be considered implementation details and subject to
+change.
+
+For any interface \code{foo}, we introduce virtual types \code{Foo_expr},
+\code{Foo_target} and \code{Foo_src}. We use type names beginning with capital
+letters to denote the virtual types. The virtual type \code{Foo_expr} represents
+any
+expression built out of \code{fooxx}, \code{fooxx_ref} and \code{fooxx_srcref}
+by overloaded operators, lazily evaluated functions etc. The type
+\code{Foo_target} represents either \code{fooxx&} or \code{fooxx_ref}, whereas
+\code{Foo_src} represents one of \code{fooxx}, \code{fooxx_ref} or
+\code{fooxx_srcref}. For example, the static method documented as
+\code{fmpzxx::randm} only exists (nominally) in the class \code{fmpzxx}, and not
+in a reference type or expression template. On the other hand the method
+documented as \code{Fmpz_expr::is_zero} works on any expression built from
+fmpzxx or its reference types.
+
+When using virtual types, we will suppress reference notation. No flintxx types
+are ever copied automatically, unless the documentation explicitly says so.
+
+It is also often the case that flintxx functions are conditionally enabled
+templates. A notation such as \code{void foo(T:is_signed_integer)} denotes a
+template function which is enabled whenever the template parameter \code{T}
+satisfies the \emph{type trait} \code{is_signed_integer}. These type traits
+should be self-explanatory, and in any case are documented in TODO.
+
+In what follows, we will never document copy constructors, or
+or implicit conversion constructors pertaining to reference types. We will also
+not document assignment operators for expressions of the same type. (Thus if
+\code{x} is an \code{fmpzxx} and \code{y} is an \code{fmpqxx}, then \code{x = x}
+and \code{y = x} are both valid, but only the second assignment operator is
+documented explicitly.)
+
+Most flintxx functions and methods wrap underlying C functions in a way which is
+evident from the signature of the flintxx function/method. If this is the case,
+no further documentation is provided. For example, the function
+\code{double dlog(Fmpz_expr x)} simply wraps
+\code{double fmpz_dlog(const fmpz_t)}.  As is
+evident from the return type, \code{dlog} immediately evaluates its argument,
+and then computes the logarithm. In contrast, a function like
+\code{Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)} returns a lazily evaluated expression
+template (and wraps \code{void fmpz_gcd(fmpz_t, const fmpz_t, const fmpz_t)}).
+
+\input{input/flintxx.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % profiler                                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1542,6 +1688,17 @@ The output is:
 In this chapter we provide interfaces to various external packages.
 
 \input{input/interfaces.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% extending the C++ wrapper                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\chapter{Extending the C++ wrapper}
+\label{app:genericxx}
+
+\section{Introduction}
+
+\input{input/genericxx.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %

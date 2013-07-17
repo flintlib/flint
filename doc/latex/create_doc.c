@@ -56,6 +56,8 @@ static char * docsin[] = {
     "../../fft/doc/fft.txt",
     "../../qsieve/doc/qsieve.txt",
     "../../perm/doc/perm.txt",
+    "../../flintxx/doc/flintxx.txt",
+    "../../flintxx/doc/genericxx.txt",
 };
 
 static char * docsout[] = {
@@ -86,6 +88,8 @@ static char * docsout[] = {
     "input/fft.tex",
     "input/qsieve.tex",
     "input/perm.tex",
+    "input/flintxx.tex",
+    "input/genericxx.tex",
 };
 
 static const int ndocs = sizeof(docsin) / sizeof(char *);
