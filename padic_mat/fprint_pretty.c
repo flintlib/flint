@@ -29,10 +29,10 @@
 int padic_mat_fprint_pretty(FILE * file, 
                             const padic_mat_t A, const padic_ctx_t ctx)
 {
-    const long r = padic_mat(A)->r;
-    const long c = padic_mat(A)->c;
+    const slong r = padic_mat(A)->r;
+    const slong c = padic_mat(A)->c;
 
-    long i, j, v;
+    slong i, j, v;
     fmpz_t u;
 
     fmpz_init(u);

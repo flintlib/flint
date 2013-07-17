@@ -54,7 +54,7 @@ fmpz_mat_struct * padic_mat(const padic_mat_t A)
     The return value can be used as an argument to 
     the functions in the \code{fmpz_mat} module.
 
-fmpz * padic_mat_entry(const padic_mat_t A, long i, long j)
+fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
 
     Returns a pointer to unit part of the entry in position $(i, j)$. 
     Note that this is not necessarily a unit.
@@ -83,12 +83,12 @@ long padic_mat_ncols(const padic_mat_t A)
 
 *******************************************************************************
 
-void padic_mat_init(padic_mat_t A, long r, long c)
+void padic_mat_init(padic_mat_t A, slong r, slong c)
 
     Initialises the matrix $A$ as a zero matrix with the specified numbers 
     of rows and columns and precision \code{PADIC_DEFAULT_PREC}.
 
-void padic_mat_init2(padic_mat_t A, long r, long c, long prec)
+void padic_mat_init2(padic_mat_t A, slong r, slong c, slong prec)
 
     Initialises the matrix $A$ as a zero matrix with the specified numbers 
     of rows and columns and the given precision.
@@ -179,12 +179,12 @@ void padic_mat_get_fmpq_mat(fmpq_mat_t B,
 *******************************************************************************
 
 void padic_mat_get_entry_padic(padic_t rop, 
-                               const padic_mat_t op, long i, long j, 
+                               const padic_mat_t op, slong i, slong j, 
                                const padic_ctx_t ctx)
 
     Sets \code{rop} to the entry in position $(i, j)$ in the matrix \code{op}.
 
-void padic_mat_set_entry_padic(padic_mat_t rop, long i, long j, 
+void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
                                const padic_t op, const padic_ctx_t ctx)
 
     Sets the entry in position $(i, j)$ in the matrix to \code{rop}.

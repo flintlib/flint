@@ -26,7 +26,7 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_set_entry_padic(padic_mat_t rop, long i, long j, 
+void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
                                const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op))

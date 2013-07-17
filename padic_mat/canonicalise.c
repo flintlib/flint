@@ -28,10 +28,10 @@
 #include "padic_mat.h"
 
 static void 
-_padic_mat_canonicalise_fmpz(fmpz *vec, long len, long *val, const fmpz_t p)
+_padic_mat_canonicalise_fmpz(fmpz *vec, slong len, slong *val, const fmpz_t p)
 {
     int nonzero = 0;
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
     {
@@ -71,10 +71,10 @@ _padic_mat_canonicalise_fmpz(fmpz *vec, long len, long *val, const fmpz_t p)
 }
 
 static void 
-_padic_mat_canonicalise_si(fmpz *vec, long len, long *val, long p)
+_padic_mat_canonicalise_si(fmpz *vec, slong len, slong *val, slong p)
 {
     int nonzero = 0;
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
     {

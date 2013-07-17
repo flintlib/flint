@@ -30,9 +30,9 @@ void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t c
 {
     if (!padic_mat_is_empty(mat))
     {
-        const long N = padic_mat_prec(mat);
+        const slong N = padic_mat_prec(mat);
 
-        long i, j, min, max;
+        slong i, j, min, max;
         fmpz_t pow;
 
         if (N > 0)

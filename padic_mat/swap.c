@@ -28,7 +28,7 @@
 
 void padic_mat_swap(padic_mat_t A, padic_mat_t B)
 {
-    long t;
+    slong t;
 
     fmpz_mat_swap(padic_mat(A), padic_mat(B));
 

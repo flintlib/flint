@@ -39,9 +39,9 @@ main(void)
     flint_rand_t state;
 
     fmpz_t p;
-    long N;
+    slong N;
     padic_ctx_t ctx;
-    long m, n;
+    slong m, n;
 
     printf("neg... ");
     fflush(stdout);

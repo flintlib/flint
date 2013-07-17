@@ -39,9 +39,9 @@ main(void)
     flint_rand_t state;
 
     fmpz_t p;
-    long N;
+    slong N;
     padic_ctx_t ctx;
-    long m, n;
+    slong m, n;
 
     printf("mul... ");
     fflush(stdout);
@@ -208,7 +208,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_mat_t a, b, c, d, e, t1, t2;
-        long k, l, v;
+        slong k, l, v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -235,7 +235,7 @@ main(void)
 
         if ((v >= 0) || (-v < N))  /* Otherwise, no precision left */
         {
-            long N2 = (v >= 0) ? N : N + v;
+            slong N2 = (v >= 0) ? N : N + v;
 
             padic_mat_init2(d, k, n, N2);
             padic_mat_init2(e, k, n, N2);
@@ -279,8 +279,8 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         padic_mat_t a, b, c;
-        long l;
-        long v;
+        slong l;
+        slong v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -305,7 +305,7 @@ main(void)
 
         if (v >= 0 || -v < N)  /* Otherwise, no precision left */
         {
-            long N2 = (v >= 0) ? N : N + v;
+            slong N2 = (v >= 0) ? N : N + v;
 
             padic_mat_t lhs, rhs, s, t;
 

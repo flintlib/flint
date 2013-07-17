@@ -37,7 +37,7 @@ void padic_mat_get_fmpq_mat(fmpq_mat_t B,
         else
         {
             fmpz_t f;
-            long i, j;
+            slong i, j;
 
             fmpz_init(f);
             fmpz_pow_ui(f, ctx->p, FLINT_ABS(padic_mat_val(A)));

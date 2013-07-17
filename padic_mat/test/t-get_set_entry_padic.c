@@ -39,9 +39,9 @@ main(void)
     flint_rand_t state;
 
     fmpz_t p;
-    long N;
+    slong N;
     padic_ctx_t ctx;
-    long m, n;
+    slong m, n;
 
     printf("get/ set_entry_padic... ");
     fflush(stdout);
@@ -52,7 +52,7 @@ main(void)
     {
         padic_mat_t a;
         padic_t x, y;
-        long r, c;
+        slong r, c;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 

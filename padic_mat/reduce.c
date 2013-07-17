@@ -36,7 +36,7 @@ void _padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
         }
         else
         {
-            long i;
+            slong i;
             fmpz_t pow;
 
             fmpz_init(pow);

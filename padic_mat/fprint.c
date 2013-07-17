@@ -28,8 +28,8 @@
 
 int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 {
-    const long r = padic_mat(A)->r;
-    const long c = padic_mat(A)->c;
+    const slong r = padic_mat(A)->r;
+    const slong c = padic_mat(A)->c;
 
     if (padic_mat_is_empty(A))
     {
@@ -39,7 +39,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
     if (ctx->mode == PADIC_TERSE)
     {
-        long i, j, v;
+        slong i, j, v;
         fmpz_t s, t;
 
         fmpz_init(s);
@@ -89,7 +89,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     }
     else if (ctx->mode == PADIC_VAL_UNIT)
     {
-        long i, j, v;
+        slong i, j, v;
         fmpz_t t;
 
         fmpz_init(t);

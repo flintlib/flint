@@ -27,7 +27,7 @@
 #include "padic_mat.h"
 
 void padic_mat_get_entry_padic(padic_t rop, 
-                               const padic_mat_t op, long i, long j, 
+                               const padic_mat_t op, slong i, slong j, 
                                const padic_ctx_t ctx)
 {
     fmpz_set(padic_unit(rop), padic_mat_entry(op, i, j));

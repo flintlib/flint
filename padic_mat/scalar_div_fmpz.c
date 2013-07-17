@@ -48,7 +48,7 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
     else
     {
         fmpz_t d;
-        long v;
+        slong v;
 
         fmpz_init(d);
         v = fmpz_remove(d, c, ctx->p);
