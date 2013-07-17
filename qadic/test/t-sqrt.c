@@ -47,7 +47,7 @@ int main(void)
 /* PRIME p = 2 ***************************************************************/
 
     /* Check Artin Schreier preimages */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
         long d;
@@ -99,7 +99,7 @@ int main(void)
     }
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
         long d, N;
@@ -141,7 +141,7 @@ int main(void)
     }
 
     /* Test random squares over finite fields */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
         long deg, N;
@@ -190,7 +190,8 @@ int main(void)
             qadic_clear(d);
             qadic_clear(e);
         }
-        else
+        /* there is no reason for that to work */
+        /*else
         {
             printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
             printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
@@ -199,7 +200,7 @@ int main(void)
             printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
             abort();
-        }
+            }*/
 
         qadic_clear(a);
         qadic_clear(b);
@@ -209,7 +210,7 @@ int main(void)
     }
 
     /* Test random elements over finite fields */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
         long d, N;
@@ -263,8 +264,8 @@ int main(void)
         qadic_ctx_clear(ctx);
     }
 
-    /* Test random squares in Zq */
-    for (i = 0; i < 1000; i++)
+    /* Test random squares */
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
         long deg, N;
@@ -274,23 +275,29 @@ int main(void)
         qadic_t a, b, c;
 
         deg = n_randint(state, 10) + 1;
-        N = n_randint(state, 50) + 3;  /* N >= 3 */
+        /* N >= 3 */
+        N = n_randint(state, 50) + 3;
+
         qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "X", PADIC_SERIES);
-printf("i=%d\n", i), fflush(stdout);
 
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
 
+
+        qadic_randtest_val(b, state, 0, ctx);
         qadic_randtest_int(b, state, ctx);
         qadic_mul(a, b, b, ctx);
 
         ans = qadic_sqrt(c, a, ctx);
         if (ans)
         {
-            qadic_t d, e;
+            qadic_t d, e, u, v, w;
             qadic_init2(d, N + qadic_val(a)/2);
             qadic_init2(e, N + qadic_val(a)/2);
+            qadic_init2(u, N);
+            qadic_init2(v, N + qadic_val(a)/2);
+            qadic_init2(w, N + qadic_val(a)/2);
 
             qadic_mul(d, c, c, ctx);
             qadic_set(e, a, ctx);
@@ -316,13 +323,18 @@ printf("i=%d\n", i), fflush(stdout);
         }
         else
         {
-            printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans = %d\n", ans);
-            qadic_ctx_print(ctx);
-            abort();
+            if (N - qadic_val(a) >= 3)
+            {
+                printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
+                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+                printf("ans = %d\n", ans);
+                printf("N = %ld\n", N);
+                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                qadic_ctx_print(ctx);
+                abort();
+            }
         }
 
         qadic_clear(a);
@@ -333,21 +345,78 @@ printf("i=%d\n", i), fflush(stdout);
         qadic_ctx_clear(ctx);
     }
 
-#if (0)
+    /* Test random elements */
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_t p = {2L};
+        long d, N;
+        qadic_ctx_t ctx;
 
-/* PRIME (any) ***************************************************************/
+        int ans;
+        qadic_t a, b;
+
+        d = n_randint(state, 10) + 1;
+        N = z_randint(state, 50) + 1;
+
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
+
+        qadic_init2(a, N);
+        qadic_init2(b, N);
+
+        qadic_randtest(a, state, ctx);
+
+        ans = qadic_sqrt(b, a, ctx);
+        if (ans)
+        {
+            qadic_t c, d;
+            qadic_init2(c, N + qadic_val(a)/2);
+            qadic_init2(d, N + qadic_val(a)/2);
+
+            qadic_mul(c, b, b, ctx);
+            qadic_set(d, a, ctx);
+
+            result = (qadic_equal(c, d));
+            if (!result)
+            {
+                printf("FAIL (random elements):\n\n");
+                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
+                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
+                printf("ans = %d\n", ans);
+                printf("N = %ld\n", N);
+                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                qadic_ctx_print(ctx);
+                abort();
+            }
+
+            qadic_clear(c);
+            qadic_clear(d);
+        }
+
+        qadic_clear(a);
+        qadic_clear(b);
+
+        fmpz_clear(p);
+        qadic_ctx_clear(ctx);
+    }
+
+/* PRIME p != 2 **************************************************************/
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        long d, N, q;
         qadic_ctx_t ctx;
 
         int ans1, ans2;
         qadic_t a, b, c;
 
-        fmpz_init_set_ui(p, n_randint(state, 2) ? 2 : n_randprime(state, 2 + n_randint(state, 3), 1));
+        q = 2;
+        while (q == 2)
+            q = n_randprime(state, 2 + n_randint(state, 3), 1);
+        fmpz_init_set_ui(p, q);
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
@@ -382,16 +451,19 @@ printf("i=%d\n", i), fflush(stdout);
     }
 
     /* Test random squares over finite fields */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long deg, N;
+        long deg, N, q;
         qadic_ctx_t ctx;
 
         int ans;
         qadic_t a, b, c;
 
-        fmpz_init_set_ui(p, n_randint(state, 2) ? 2 : n_randprime(state, 2 + n_randint(state, 3), 1));
+        q = 2;
+        while (q == 2)
+            q = n_randprime(state, 2 + n_randint(state, 3), 1);
+        fmpz_init_set_ui(p, q);
         deg = n_randint(state, 10) + 1;
         N = 1;
         qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "X", PADIC_SERIES);
@@ -452,16 +524,19 @@ printf("i=%d\n", i), fflush(stdout);
     }
 
     /* Test random elements over finite fields */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        long d, N, q;
         qadic_ctx_t ctx;
 
         int ans;
         qadic_t a, b;
 
-        fmpz_init_set_ui(p, n_randint(state, 2) ? 2 : n_randprime(state, 2 + n_randint(state, 3), 1));
+        q = 2;
+        while (q == 2)
+            q = n_randprime(state, 2 + n_randint(state, 3), 1);
+        fmpz_init_set_ui(p, q);
         d = n_randint(state, 10) + 1;
         N = 1;
 
@@ -509,20 +584,22 @@ printf("i=%d\n", i), fflush(stdout);
     }
 
     /* Test random squares */
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long deg, N;
+        long deg, N, q;
         qadic_ctx_t ctx;
 
         int ans;
         qadic_t a, b, c;
 
-        fmpz_init_set_ui(p, n_randint(state, 2) ? 2 : n_randprime(state, 2 + n_randint(state, 3), 1));
-        deg = /* n_randint(state, 10) + 1; */ 3;
-        N = /* z_randint(state, 50) + 1; */ 2;
+        q = 2;
+        while (q == 2)
+            q = n_randprime(state, 2 + n_randint(state, 3), 1);
+        fmpz_init_set_ui(p, q);
+        deg = n_randint(state, 10) + 1;
+        N = z_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "X", PADIC_SERIES);
-printf("i=%d\n", i), fflush(stdout);
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
@@ -579,16 +656,19 @@ printf("i=%d\n", i), fflush(stdout);
     }
 
     /* Test random elements */
-    for (i = 0; i < 100000*0; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        long d, N, q;
         qadic_ctx_t ctx;
 
         int ans;
         qadic_t a, b;
 
-        fmpz_init_set_ui(p, n_randint(state, 2) ? 2 : n_randprime(state, 2 + n_randint(state, 3), 1));
+        q = 2;
+        while (q == 2)
+            q = n_randprime(state, 2 + n_randint(state, 3), 1);
+        fmpz_init_set_ui(p, q);
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
 
@@ -634,8 +714,6 @@ printf("i=%d\n", i), fflush(stdout);
         fmpz_clear(p);
         qadic_ctx_clear(ctx);
     }
-
-#endif
 
     flint_randclear(state);
     _fmpz_cleanup();
