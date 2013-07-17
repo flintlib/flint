@@ -112,7 +112,7 @@ test_initialisation_assignment()
     tassert(a == b && a == c&& a == d && a == e && a == f && a == g && a == h
             && a == i);
 
-    // test deep copying of (f)fmpzxx with more than one digit
+    // test deep copying of fmpzxx with more than one digit
     a = "100000000000000000000";
     b = a;
     tassert(a._fmpz()[0] != b._fmpz()[0]);
@@ -122,6 +122,15 @@ test_initialisation_assignment()
 
     // just here to test our assumptions on data format
     tassert(c._fmpz()[0] == d._fmpz()[0]);
+
+    // some more exotic "assignments"
+    a.set_ui_smod(15, 16);
+    tassert(a == -1);
+    a.set_uiui(27, 15);
+    tassert(a % (fmpzxx(1) << FLINT_BITS) == 15);
+    tassert((a >> FLINT_BITS) == 27);
+    b.neg_uiui(27, 15);
+    tassert(b == -a);
 }
 
 void
@@ -170,6 +179,9 @@ test_arithmetic()
     TAA(*=, 30);
     TAA(/=, 3);
     TAA(%=, 1);
+
+    tassert((fmpzxx(1) << 10) == 1024);
+    tassert((fmpzxx(1024) >> 9) == 2);
 }
 
 void
@@ -186,8 +198,24 @@ test_functions()
     tassert(sqrt(a) == 1);
     tassert(rfac(a, 3u) == 2*3*4);
     tassert(a + fac(4u) == 2 + 4*3*2);
+    tassert(fib(4u) == 3);
     tassert(bin(4u, 2u) == 6);
     tassert(abs(a) == a);
+    tassert(gcd(a, b) == 2);
+    tassert(lcm(a, b) == 16);
+
+    fmpzxx mb(-b);
+    fmpzxx three(3);
+    tassert(cdiv_q(mb, three) == -5);
+    tassert(fdiv_r(mb, three) == 2);
+    tassert(tdiv_q(mb, three) == -5);
+    tassert(cdiv_q(mb, 3) == -5);
+    tassert(tdiv_q(mb, 3) == -5);
+    tassert(cdiv_q(mb, 3u) == -5);
+    tassert(tdiv_q(mb, 3u) == -5);
+    tassert(tdiv_q_2exp(mb, 2u) == -4);
+    tassert(fdiv_r_2exp(mb, 2u) == 0);
+    tassert(divexact(b, a) == 8 && divexact(b, 2) == 8 && divexact(b, 2u) == 8);
 
     // check namespace std
     tassert(std::pow(a, 4u) == 16);
@@ -204,11 +232,40 @@ test_functions()
     tassert(divisible(-a + b, 3) == false);
     tassert(divisible(c, a) == true);
 
+    fmpzxx f(15);
+    tassert(clog(f, a) == 4 && clog(f, 2u) == 4);
+    tassert(flog(f, a) == 3 && flog(f, 2u) == 3);
+    tassert(2.7 < dlog(f) && dlog(f) < 2.8);
+
+    tassert(mul2_uiui(a, 15, 16) == a*15*16);
+    tassert(divexact2_uiui(b, 2, 2) == 4);
+    tassert(powm(a, 4, fmpzxx(5)) == 1);
+    tassert(powm(a, fmpzxx(4), fmpzxx(5)) == 1);
+    tassert(mul_tdiv_q_2exp(a, fmpzxx(-3), 2) == -1);
+    tassert(mul_tdiv_q_2exp(a, -3, 2) == -1);
+
+    fmpzxx q(1), rem(2);
+    fdiv_qr(q, rem, b, a); tassert(q == 8 && rem == 0);
+    q = 1;rem = 2; tdiv_qr(q, rem, b, a); tassert(q == 8 && rem == 0);
+
+    tassert(sqrtmod(q, fmpzxx(4), fmpzxx(5)));
+    tassert(q == 2 || q == 3);
+    sqrtrem(q, rem, fmpzxx(5));
+    tassert(q == 2 && rem == 1);
+    // TODO gcdinv, xgcd
+
     // check member functions
     long exp = 0;
     double d = fmpzxx(3).get_d_2exp(exp);
     double r = d * (1l << exp);
     tassert(r >= 2.9 && r <= 3.1);
+    fmpzxx one(1), mone(-1), zero(0), two(2);
+    tassert(one.is_one() && one.is_pm1() && one.is_odd() &&
+            !one.is_even() && !one.is_zero());
+    tassert(!zero.is_one() && !zero.is_pm1() && zero.is_zero());
+    tassert(mone.is_pm1());
+    tassert(two.is_even() && !two.is_odd());
+    tassert(one.is_square() && !two.is_square());
 }
 
 template<class T>
