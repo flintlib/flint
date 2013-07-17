@@ -44,12 +44,12 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c;
         padic_t x, y;
-        long j;
+        slong j;
         int ans;
 
         fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));

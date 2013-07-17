@@ -28,7 +28,7 @@
 void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
                          const qadic_ctx_t ctx)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if (len == 0)
     {

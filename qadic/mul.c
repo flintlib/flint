@@ -33,8 +33,8 @@
 
 static 
 void _qadic_mul(fmpz *rop, 
-                const fmpz *op1, long len1, const fmpz *op2, long len2, 
-                const fmpz *a, const long *j, long lena, const fmpz_t pN)
+                const fmpz *op1, slong len1, const fmpz *op2, slong len2, 
+                const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
 {
     _fmpz_poly_mul(rop, op1, len1, op2, len2);
     _fmpz_mod_poly_reduce(rop, len1 + len2 - 1, a, j, lena, pN);
@@ -43,11 +43,11 @@ void _qadic_mul(fmpz *rop,
 void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z, 
                           const qadic_ctx_t ctx)
 {
-    const long leny = y->length;
-    const long lenz = z->length;
-    const long lenx = leny + lenz - 1;
-    const long N    = qadic_prec(x);
-    const long d    = qadic_ctx_degree(ctx);
+    const slong leny = y->length;
+    const slong lenz = z->length;
+    const slong lenx = leny + lenz - 1;
+    const slong N    = qadic_prec(x);
+    const slong d    = qadic_ctx_degree(ctx);
 
     if (leny == 0 || lenz == 0 || y->val + z->val >= N)
     {

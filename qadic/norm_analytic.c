@@ -35,13 +35,13 @@
     Assumes that $y$ is non-zero.
  */
 
-void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, long v, long len, 
-                          const fmpz *a, const long *j, long lena, 
-                          const fmpz_t p, long N)
+void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, slong v, slong len, 
+                          const fmpz *a, const slong *j, slong lena, 
+                          const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
     fmpz_t pN, tru;
-    long trv;
+    slong trv;
     fmpz *lg;
 
     fmpz_init(pN);
@@ -72,8 +72,8 @@ void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, long v, long len,
 
 void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N  = padic_prec(rop);
-    const long d  = qadic_ctx_degree(ctx);
+    const slong N  = padic_prec(rop);
+    const slong d  = qadic_ctx_degree(ctx);
     const fmpz *p = (&ctx->pctx)->p;
 
     /* N(p^v u) = p^{dv} N(u) */
@@ -98,7 +98,7 @@ void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     else  /* len >= 2 */
     {
         fmpz *y;
-        long w;
+        slong w;
 
         y = _fmpz_vec_init(op->length);
 

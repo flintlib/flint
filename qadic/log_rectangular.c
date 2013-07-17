@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern long _padic_log_bound(long v, long N, const fmpz_t p);
+extern slong _padic_log_bound(slong) v, slong N, const fmpz_t p);
 
 /*
     Carries out the finite series evaluation for the logarithm 
@@ -45,11 +45,11 @@ extern long _padic_log_bound(long v, long N, const fmpz_t p);
     Supports aliasing between $y$ and $z$.
  */
 static void 
-_qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n, 
-                       const fmpz *a, const long *j, long lena, 
-                       const fmpz_t p, long N, const fmpz_t pN)
+_qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n, 
+                       const fmpz *a, const slong *j, slong lena, 
+                       const fmpz_t p, slong N, const fmpz_t pN)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (n <= 2)
     {
@@ -60,7 +60,7 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
         }
         else  /* n == 2;  z = y + y^2/2 */
         {
-            long i;
+            slong i;
             fmpz *t;
 
             t = _fmpz_vec_init(2 * len - 1);
@@ -84,10 +84,10 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
     }
     else  /* n >= 3 */
     {
-        const long b = n_sqrt(n);
-        const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
+        const slong b = n_sqrt(n);
+        const slong k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
 
-        long i, h;
+        slong i, h;
         fmpz_t f, pNk;
         fmpz *c, *t, *ypow;
 
@@ -111,8 +111,8 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
 
         for (h = (n + (b - 1)) / b - 1; h >= 0; h--)
         {
-            const long hi = FLINT_MIN(b, n - h*b);
-            long w;
+            const slong hi = FLINT_MIN(b, n - h*b);
+            slong w;
 
             /* Compute inner sum in c */
             fmpz_rfac_uiui(f, 1 + h*b, hi);
@@ -158,12 +158,12 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
     }
 }
 
-void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len, 
-                            const fmpz *a, const long *j, long lena, 
-                            const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, 
+                            const fmpz *a, const slong *j, slong lena, 
+                            const fmpz_t p, slong N, const fmpz_t pN)
 {
-    const long d = j[lena - 1];
-    const long n = _padic_log_bound(v, N, p) - 1;
+    const slong d = j[lena - 1];
+    const slong n = _padic_log_bound(v, N, p) - 1;
 
     _qadic_log_rectangular_series(z, y, len, n, a, j, lena, p, N, pN);
     _fmpz_mod_poly_neg(z, z, d, pN);
@@ -172,9 +172,9 @@ void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len,
 int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p  = (&ctx->pctx)->p;
-    const long d   = qadic_ctx_degree(ctx);
-    const long N   = qadic_prec(rop);
-    const long len = op->length;
+    const slong d   = qadic_ctx_degree(ctx);
+    const slong N   = qadic_prec(rop);
+    const slong len = op->length;
 
     if (op->val < 0)
     {
@@ -203,7 +203,7 @@ int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         }
         else
         {
-            const long v = _fmpz_vec_ord_p(x, len, p);
+            const slong v = _fmpz_vec_ord_p(x, len, p);
 
             if (v >= 2 || (*p != 2L && v >= 1))
             {

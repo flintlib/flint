@@ -36,13 +36,13 @@
  */
 
 static 
-void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
+void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, slong n, const fmpz_t pN)
 {
     fmpz *F;
     fmpz *a;
     fmpz *A;
     fmpz_t s;
-    long t, i, j, p, k;
+    slong t, i, j, p, k;
 
     F = _fmpz_vec_init(n);
     a = _fmpz_vec_init((n-1) * n);
@@ -107,11 +107,11 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
     fmpz_clear(s);
 }
 
-void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, long len, 
-                           const fmpz *a, const long *j, long lena, 
-                           const fmpz_t p, long N)
+void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, slong len, 
+                           const fmpz *a, const slong *j, slong lena, 
+                           const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     fmpz_t pN;
 
@@ -125,8 +125,8 @@ void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, long len,
     else  /* len >= 2 */
     {
         {
-            const long n = d + len - 1;
-            long i, k;
+            const slong n = d + len - 1;
+            slong i, k;
             fmpz *M;
 
             M = flint_calloc(n * n, sizeof(fmpz));
@@ -172,8 +172,8 @@ void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, long len,
 
 void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N = padic_prec(rop);
-    const long d = qadic_ctx_degree(ctx);
+    const slong N = padic_prec(rop);
+    const slong d = qadic_ctx_degree(ctx);
 
     /* N(p^v u) = p^{dv} N(u) */
 

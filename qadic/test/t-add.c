@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c;
@@ -87,7 +87,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c;
@@ -129,7 +129,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, c;
@@ -167,7 +167,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c1, c2;
@@ -212,7 +212,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c, lhs, rhs;

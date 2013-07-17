@@ -25,11 +25,11 @@
 
 #include "qadic.h"
 
-void _qadic_log(fmpz *z, const fmpz *y, long v, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N, const fmpz_t pN)
 {
-    if (N < (1L < 10) / (long) fmpz_bits(p))
+    if (N < (1L < 10) / (slong) fmpz_bits(p))
     {
         _qadic_log_rectangular(z, y, v, len, a, j, lena, p, N, pN);
     }
@@ -42,9 +42,9 @@ void _qadic_log(fmpz *z, const fmpz *y, long v, long len,
 int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p  = (&ctx->pctx)->p;
-    const long d   = qadic_ctx_degree(ctx);
-    const long N   = qadic_prec(rop);
-    const long len = op->length;
+    const slong d   = qadic_ctx_degree(ctx);
+    const slong N   = qadic_prec(rop);
+    const slong len = op->length;
 
     if (op->val < 0)
     {
@@ -73,7 +73,7 @@ int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         }
         else
         {
-            const long v = _fmpz_vec_ord_p(x, len, p);
+            const slong v = _fmpz_vec_ord_p(x, len, p);
 
             if (v >= 2 || (*p != 2L && v >= 1))
             {

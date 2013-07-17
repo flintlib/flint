@@ -38,11 +38,11 @@
     Supports aliasing between \code{rop} and \code{op}.
  */
 
-void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
-                        const fmpz *a, const long *j, long lena, 
-                        const fmpz_t p, long N)
+void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, 
+                        const fmpz *a, const slong *j, slong lena, 
+                        const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len == 1)
     {
@@ -56,13 +56,13 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
     }
     else  /* d, N >= 2 */
     {
-        long *e, i, n;
+        slong *e, i, n;
         fmpz *pow, *u, *t, *w;
         fmpz_t inv, q, qm1;
 
         n = FLINT_CLOG2(N) + 1;
 
-        e = flint_malloc(n * sizeof(long));
+        e = flint_malloc(n * sizeof(slong));
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
@@ -149,7 +149,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
 
 void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N = qadic_prec(rop);
+    const slong N = qadic_prec(rop);
 
     if (op->val < 0)
     {
@@ -163,7 +163,7 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
     else
     {
-        const long d = qadic_ctx_degree(ctx);
+        const slong d = qadic_ctx_degree(ctx);
 
         padic_poly_fit_length(rop, d);
 

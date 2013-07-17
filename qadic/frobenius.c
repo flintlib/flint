@@ -37,12 +37,12 @@
 
 static void 
 _fmpz_mod_poly_compose_smod_rectangular(fmpz *rop, 
-                           const fmpz *op1, long len1, 
-                           const fmpz *op2, long len2, 
-                           const fmpz *a, const long *j, long lena, 
+                           const fmpz *op1, slong len1, 
+                           const fmpz *op2, slong len2, 
+                           const fmpz *a, const slong *j, slong lena, 
                            const fmpz_t p)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len2 == 1)
     {
@@ -51,8 +51,8 @@ _fmpz_mod_poly_compose_smod_rectangular(fmpz *rop,
     }
     else
     {
-        const long B = n_sqrt(len1);
-        long i, k;
+        const slong B = n_sqrt(len1);
+        slong i, k;
         fmpz *pows, *t;
 
         pows = _fmpz_vec_init((B + 2) * d);
@@ -91,12 +91,12 @@ _fmpz_mod_poly_compose_smod_rectangular(fmpz *rop,
 
 static void 
 _fmpz_mod_poly_compose_smod_horner(fmpz *rop, 
-                           const fmpz *op1, long len1, 
-                           const fmpz *op2, long len2, 
-                           const fmpz *a, const long *j, long lena, 
+                           const fmpz *op1, slong len1, 
+                           const fmpz *op2, slong len2, 
+                           const fmpz *a, const slong *j, slong lena, 
                            const fmpz_t p)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len1 == 1)
     {
@@ -110,7 +110,7 @@ _fmpz_mod_poly_compose_smod_horner(fmpz *rop,
     }
     else
     {
-        long i;
+        slong i;
         fmpz *t;
 
         t = _fmpz_vec_init(2*d - 1);
@@ -144,9 +144,9 @@ _fmpz_mod_poly_compose_smod_horner(fmpz *rop,
 
 void 
 _fmpz_mod_poly_compose_smod(fmpz *rop, 
-                           const fmpz *op1, long len1, 
-                           const fmpz *op2, long len2, 
-                           const fmpz *a, const long *j, long lena, 
+                           const fmpz *op1, slong len1, 
+                           const fmpz *op2, slong len2, 
+                           const fmpz *a, const slong *j, slong lena, 
                            const fmpz_t p)
 {
     if (len1 < 6)
@@ -159,18 +159,18 @@ _fmpz_mod_poly_compose_smod(fmpz *rop,
     }
 }
 
-void _qadic_frobenius_a(fmpz *rop, long exp, 
-                    const fmpz *a, const long *j, long lena, 
-                    const fmpz_t p, long N)
+void _qadic_frobenius_a(fmpz *rop, slong exp, 
+                    const fmpz *a, const slong *j, slong lena, 
+                    const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
-    long *e, i, n;
+    slong *e, i, n;
     fmpz *pow, *f1, *f2, *inv, *s, *t;
 
     n = FLINT_CLOG2(N) + 1;
 
-    e = flint_malloc(n * sizeof(long));
+    e = flint_malloc(n * sizeof(slong));
     for (e[i = 0] = N; e[i] > 1; i++)
         e[i + 1] = (e[i] + 1) / 2;
 
@@ -208,7 +208,7 @@ void _qadic_frobenius_a(fmpz *rop, long exp,
 
     /* Dense representation of f and f' */
     {
-        long k;
+        slong k;
 
         for (k = 0; k < lena; k++)
             fmpz_set(f1 + j[k], a + k);
@@ -270,11 +270,11 @@ void _qadic_frobenius_a(fmpz *rop, long exp,
     raised to the e-th power.
  */
 
-void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
-                  const fmpz *a, const long *j, long lena, 
-                  const fmpz_t p, long N)
+void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+                  const fmpz *a, const slong *j, slong lena, 
+                  const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len == 1)  /* op is in Zp, not just Zq */
     {
@@ -309,10 +309,10 @@ void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e,
     }
 }
 
-void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
+void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t ctx)
 {
-    const long N = qadic_prec(rop);
-    const long d = qadic_ctx_degree(ctx);
+    const slong N = qadic_prec(rop);
+    const slong d = qadic_ctx_degree(ctx);
 
     e = e % d;
     if (e < 0)

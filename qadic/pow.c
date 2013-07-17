@@ -26,11 +26,11 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
-                   const fmpz *a, const long *j, long lena, 
+void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
+                   const fmpz *a, const slong *j, slong lena, 
                    const fmpz_t p)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (fmpz_is_zero(e))
     {
@@ -123,7 +123,7 @@ void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
 
 void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx)
 {
-    const long N = qadic_prec(x);
+    const slong N = qadic_prec(x);
 
     if (fmpz_sgn(e) < 0)
     {
@@ -156,7 +156,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
         }
         else 
         {
-            const long d = qadic_ctx_degree(ctx);
+            const slong d = qadic_ctx_degree(ctx);
             fmpz *t;
             fmpz_t pow;
             int alloc;

@@ -25,12 +25,12 @@
 
 #include "qadic.h"
 
-void _qadic_trace(fmpz_t rop, const fmpz *op, long len, 
-                  const fmpz *a, const long *j, long lena, const fmpz_t pN)
+void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, 
+                  const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
-    long i, l;
+    slong i, l;
     fmpz *t;
 
     t = _fmpz_vec_init(d);
@@ -64,7 +64,7 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, long len,
 
 void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N = padic_prec(rop);
+    const slong N = padic_prec(rop);
 
     if (qadic_is_zero(op) || op->val >= N)
     {

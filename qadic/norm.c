@@ -43,11 +43,11 @@
     important special case.
  */
 
-void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
-                 const fmpz *a, const long *j, long lena, 
-                 const fmpz_t p, long N)
+void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, 
+                 const fmpz *a, const slong *j, slong lena, 
+                 const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len == 1)
     {
@@ -61,7 +61,7 @@ void _qadic_norm(fmpz_t rop, const fmpz *op, long len,
     else
     {
         fmpz *y;
-        long w;
+        slong w;
 
         y = _fmpz_vec_init(len);
 
@@ -93,8 +93,8 @@ void _qadic_norm(fmpz_t rop, const fmpz *op, long len,
 
 void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N  = padic_prec(rop);
-    const long d  = qadic_ctx_degree(ctx);
+    const slong N  = padic_prec(rop);
+    const slong d  = qadic_ctx_degree(ctx);
     const fmpz *p = (&ctx->pctx)->p;
 
     /* N(p^v u) = p^{dv} N(u) */

@@ -26,14 +26,14 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern long _padic_exp_bound(long v, long N, const fmpz_t p);
+extern slong _padic_exp_bound(slong) v, slong N, const fmpz_t p);
 
-void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len, 
-                            const fmpz *a, const long *j, long lena, 
-                            const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
+                            const fmpz *a, const slong *j, slong lena, 
+                            const fmpz_t p, slong N, const fmpz_t pN)
 {
-    const long d = j[lena - 1];
-    const long n = _padic_exp_bound(v, N, p);
+    const slong d = j[lena - 1];
+    const slong n = _padic_exp_bound(v, N, p);
 
     if (n < 4)
     {
@@ -58,7 +58,7 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len,
         }
         else  /* y := 1 + x + x^2/2 */
         {
-            long i;
+            slong i;
             fmpz *x = _fmpz_vec_init(len + 1);
 
             fmpz_pow_ui(x + len, p, v);
@@ -84,11 +84,11 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len,
     }
     else  /* n >= 4 */
     {
-        const long k = fmpz_fits_si(p) ? 
+        const slong k = fmpz_fits_si(p) ? 
                        (n - 1 - 1) / (fmpz_get_si(p) - 1) : 0;
-        const long b = n_sqrt(n);
+        const slong b = n_sqrt(n);
 
-        long i;
+        slong i;
         fmpz_t c, f, pNk;
         fmpz *s, *t, *x;
 
@@ -118,8 +118,8 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len,
 
         for (i = (n + b - 1) / b - 1; i >= 0; i--)
         {
-            long lo = i * b;
-            long hi = FLINT_MIN(n - 1, lo + b - 1);
+            slong lo = i * b;
+            slong hi = FLINT_MIN(n - 1, lo + b - 1);
 
             _fmpz_vec_zero(s, d);
             fmpz_one(c);
@@ -163,8 +163,8 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len,
 
 int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N  = qadic_prec(rop);
-    const long v  = op->val;
+    const slong N  = qadic_prec(rop);
+    const slong v  = op->val;
     const fmpz *p = (&ctx->pctx)->p;
 
     if (padic_poly_is_zero(op))
@@ -181,7 +181,7 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     {
         if (v < N)
         {
-            const long d = qadic_ctx_degree(ctx);
+            const slong d = qadic_ctx_degree(ctx);
 
             fmpz *t;
             fmpz_t pN;

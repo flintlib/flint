@@ -26,17 +26,17 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len, 
-                           const fmpz *a, const long *j, long lena, 
-                           const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, 
+                           const fmpz *a, const slong *j, slong lena, 
+                           const fmpz_t p, slong N, const fmpz_t pN)
 {
-    if (N < (1L << 13) / (long) fmpz_bits(p))
+    if (N < (1L << 13) / (slong) fmpz_bits(p))
     {
         _qadic_exp_rectangular(rop, op, v, len, a, j, lena, p, N, pN);
     }
     else
     {
-        const long d = j[lena - 1];
+        const slong d = j[lena - 1];
 
         _qadic_exp_balanced(rop, op, v, len, a, j, lena, p, N, pN);
         _fmpz_vec_zero(rop + d, d - 1);
@@ -45,8 +45,8 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
 
 int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N  = qadic_prec(rop);
-    const long v  = op->val;
+    const slong N  = qadic_prec(rop);
+    const slong v  = op->val;
     const fmpz *p = (&ctx->pctx)->p;
 
     if (padic_poly_is_zero(op))
@@ -63,7 +63,7 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     {
         if (v < N)
         {
-            const long d = qadic_ctx_degree(ctx);
+            const slong d = qadic_ctx_degree(ctx);
 
             fmpz *t;
             fmpz_t pN;

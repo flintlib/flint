@@ -45,11 +45,11 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c;
-        long e;
+        slong e;
 
         fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
@@ -90,11 +90,11 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c, lhs, rhs;
-        long e;
+        slong e;
 
         fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
@@ -150,11 +150,11 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, s, s1, s2, lhs, rhs;
-        long e;
+        slong e;
 
         fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
@@ -210,11 +210,11 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, s, s1, s2, lhs, rhs;
-        long e;
+        slong e;
 
         fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;

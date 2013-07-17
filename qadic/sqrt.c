@@ -50,14 +50,14 @@
     and $d \geq 2$.
  */
 static void _find_nonresidue(fmpz *rop, 
-                             const fmpz *a, const long *j, long lena, 
+                             const fmpz *a, const slong *j, slong lena, 
                              const fmpz_t p)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     fmpz *w;
     fmpz_t pm1, z;
-    long i;
+    slong i;
 
     w = _fmpz_vec_init(2 * d - 1);
     fmpz_init(pm1);
@@ -117,23 +117,23 @@ static void _find_nonresidue(fmpz *rop,
     is zero.
  */
 int 
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, long len, 
-                         const fmpz *a, const long *j, long lena)
+_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len, 
+                         const fmpz *a, const slong *j, slong lena)
 {
-    const long d   = j[lena - 1];
+    const slong d   = j[lena - 1];
     const fmpz_t p = {2L};
 
     int ans;
 
     fmpz *e, *f;
     nmod_mat_t A;
-    long i, k, rk, *P;
+    slong i, k, rk, *P;
 
     e = _fmpz_vec_init(d);
     f = _fmpz_vec_init(2 * d - 1);
 
     nmod_mat_init(A, d, d, 2);
-    P  = flint_malloc(d * sizeof(long));
+    P  = flint_malloc(d * sizeof(slong));
 
     /* Construct Artin Schreier matrix ------------------------------------- */
 
@@ -186,7 +186,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, long len,
 
     if (ans)
     {
-        long c;
+        slong c;
 
         for (c = 0; c < d; c++)
             if (nmod_mat_entry(A, c, c) == 0)
@@ -230,11 +230,11 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, long len,
     Does not support aliasing.
  */
 static int 
-_fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, long len, 
-                         const fmpz *a, const long *j, long lena, 
+_fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len, 
+                         const fmpz *a, const slong *j, slong lena, 
                          const fmpz_t p)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
     int ans;
 
     /*
@@ -359,7 +359,7 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, long len,
      */
     else
     {
-        long i, s;
+        slong i, s;
 
         fmpz_t t, pm1, qm1, z;
 
@@ -408,7 +408,7 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, long len,
 
             while (!_fmpz_poly_is_one(b, d))
             {
-                long k;
+                slong k;
 
                 _fmpz_vec_set(bpow, b, d);
                 for (k = 1; (k < s) && !_fmpz_poly_is_one(bpow, d); k++)
@@ -466,11 +466,11 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, long len,
     Assumes that $d \geq 1$.
  */
 static void 
-_fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, long len, 
-                         const fmpz *a, const long *j, long lena)
+_fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, slong len, 
+                         const fmpz *a, const slong *j, slong lena)
 {
     const fmpz_t p = {2L};
-    const long d   = j[lena - 1];
+    const slong d   = j[lena - 1];
 
     fmpz_t z;
 
@@ -487,11 +487,11 @@ _fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, long len,
     Assumes that \code{(op, len)} has valuation $0$.
  */
 static int 
-_qadic_sqrt_p(fmpz *rop, const fmpz *op, long len, 
-              const fmpz *a, const long *j, long lena, 
-              const fmpz_t p, long N)
+_qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len, 
+              const fmpz *a, const slong *j, slong lena, 
+              const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
     int ans;
 
     if (N == 1)
@@ -501,14 +501,14 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
     }
     else
     {
-        long *e, i, k, n;
+        slong *e, i, k, n;
         fmpz *pow, *u;
         fmpz *r, *s, *t, *f;
 
         n = FLINT_CLOG2(N) + 1;
 
         /* Compute sequence of exponents */
-        e = flint_malloc(n * sizeof(long));
+        e = flint_malloc(n * sizeof(slong));
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
@@ -626,16 +626,16 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
     Assumes that \code{(op, len)} has valuation $0$.
  */
 static int 
-_qadic_sqrt_2(fmpz *rop, const fmpz *op, long len, 
-              const fmpz *a, const long *j, long lena, long N)
+_qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len, 
+              const fmpz *a, const slong *j, slong lena, slong N)
 {
     int ans;
 
-    const long d    = j[lena - 1];
+    const slong d    = j[lena - 1];
     const fmpz_t p  = {2L};
 
     fmpz *g, *r, *s, *t;
-    long i;
+    slong i;
 
     g = _fmpz_vec_init(2 * d - 1);
     r = _fmpz_vec_init(2 * d - 1);
@@ -703,13 +703,13 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
                 }
                 else  /* N >= 3 */
                 {
-                    long *e, n;
+                    slong *e, n;
                     fmpz *u;
 
                     n = FLINT_CLOG2(N - 1) + 1;
 
                     /* Compute sequence of exponents */
-                    e = flint_malloc(n * sizeof(long));
+                    e = flint_malloc(n * sizeof(slong));
                     for (e[i = 0] = N; e[i] > 2; i++)
                         e[i + 1] = e[i] / 2 + 1;
 
@@ -777,9 +777,9 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-int _qadic_sqrt(fmpz *rop, const fmpz *op, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N)
+int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N)
 {
     if (*p == 2L)
     {
@@ -794,8 +794,8 @@ int _qadic_sqrt(fmpz *rop, const fmpz *op, long len,
 int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p = (&ctx->pctx)->p;
-    const long d  = qadic_ctx_degree(ctx);
-    const long N  = qadic_prec(rop);
+    const slong d  = qadic_ctx_degree(ctx);
+    const slong N  = qadic_prec(rop);
 
     fmpz *t;
     int ans;

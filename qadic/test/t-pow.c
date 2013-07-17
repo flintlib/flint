@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b;
@@ -87,7 +87,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         qadic_t a, b, c;

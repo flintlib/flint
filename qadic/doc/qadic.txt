@@ -66,7 +66,7 @@
 *******************************************************************************
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx, 
-                           const fmpz_t p, long d, long min, long max, 
+                           const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode)
 
     Initialises the context \code{ctx} with prime $p$, extension degree $d$, 
@@ -91,7 +91,7 @@ void qadic_ctx_clear(qadic_ctx_t ctx);
 
     Clears all memory that has been allocated as part of the context.
 
-long qadic_ctx_degree(const qadic_ctx_t ctx)
+slong qadic_ctx_degree(const qadic_ctx_t ctx)
 
     Returns the extension degree.
 
@@ -109,7 +109,7 @@ void qadic_init(qadic_t rop)
 
     Initialises the element \code{rop}, setting its value to~$0$.
 
-void qadic_init2(qadic_t rop, long prec)
+void qadic_init2(qadic_t rop, slong prec)
 
     Initialises the element \code{rop} with the given output precision, 
     setting the value to~$0$.
@@ -118,8 +118,8 @@ void qadic_clear(qadic_t rop)
 
     Clears the element \code{rop}.
 
-void _fmpz_poly_reduce(fmpz *R, long lenR, 
-                       const fmpz *a, const long *j, long len)
+void _fmpz_poly_reduce(fmpz *R, slong lenR, 
+                       const fmpz *a, const slong *j, slong len)
 
     Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
     polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
@@ -130,8 +130,8 @@ void _fmpz_poly_reduce(fmpz *R, long lenR,
 
     Allows zero-padding in \code{(R, lenR)}.
 
-void _fmpz_mod_poly_reduce(fmpz *R, long lenR, 
-    const fmpz *a, const long *j, long len, const fmpz_t p)
+void _fmpz_mod_poly_reduce(fmpz *R, slong lenR, 
+    const fmpz *a, const slong *j, slong len, const fmpz_t p)
 
     Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
     polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
@@ -153,11 +153,11 @@ void qadic_reduce(qadic_t rop, const qadic_ctx_t ctx)
 
 *******************************************************************************
 
-long qadic_val(const qadic_t op)
+slong qadic_val(const qadic_t op)
 
     Returns the valuation of \code{op}.
 
-long qadic_prec(const qadic_t op)
+slong qadic_prec(const qadic_t op)
 
     Returns the precision of \code{op}.
 
@@ -176,7 +176,7 @@ void qadic_randtest_not_zero(qadic_t rop, flint_rand_t state,
 
     Generates a random non-zero element of $\mathbf{Q}_q$.
 
-void qadic_randtest_val(qadic_t rop, flint_rand_t state, long v, 
+void qadic_randtest_val(qadic_t rop, flint_rand_t state, slong v, 
                         const qadic_ctx_t ctx)
 
     Generates a random element of $\mathbf{Q}_q$ with prescribed 
@@ -279,9 +279,9 @@ void qadic_mul(qadic_t rop, const qadic_t op1, const qadic_t op2,
     Sets \code{rop} to the product of \code{op1} and \code{op2}, 
     reducing the output in the given context.
 
-void _qadic_inv(fmpz *rop, const fmpz *op, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N)
+void _qadic_inv(fmpz *rop, const fmpz *op, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N)
 
     Sets \code{(rop, d)} to the inverse of \code{(op, len)} 
     modulo $f(X)$ given by \code{(a,j,lena)} and $p^N$.
@@ -297,8 +297,8 @@ void qadic_inv(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Sets \code{rop} to the inverse of \code{op}, reduced in the given context.
 
-void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
-                const fmpz *a, const long *j, long lena, 
+void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
+                const fmpz *a, const slong *j, slong lena, 
                 const fmpz_t p)
 
     Sets \code{(rop, 2*d-1)} to \code{(op,len)} raised to the power~$e$, 
@@ -329,9 +329,9 @@ void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e,
 
 *******************************************************************************
 
-void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len, 
-                            const fmpz *a, const long *j, long lena, 
-                            const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
+                            const fmpz *a, const slong *j, slong lena, 
+                            const fmpz_t p, slong N, const fmpz_t pN)
 
     Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
     reduced modulo $p^N$, assuming that the series converges.
@@ -346,9 +346,9 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     and sets \code{rop} to its value reduced modulo in the given 
     context.
 
-void _qadic_exp_balanced(fmpz *rop, const fmpz *x, long v, long len, 
-                         const fmpz *a, const long *j, long lena, 
-                         const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_exp_balanced(fmpz *rop, const fmpz *x, slong v, slong len, 
+                         const fmpz *a, const slong *j, slong lena, 
+                         const fmpz_t p, slong N, const fmpz_t pN)
 
     Sets \code{(rop, d)} to the exponential of \code{(op, v, len)} 
     reduced modulo $p^N$, assuming that the series converges.
@@ -364,9 +364,9 @@ int qadic_exp_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     and sets \code{rop} to its value reduced modulo in the given 
     context.
 
-void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N)
+void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N)
 
     Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
     reduced modulo $p^N$, assuming that the series converges.
@@ -384,9 +384,9 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     The exponential series converges if the valuation of \code{op} 
     is at least~$2$ or $1$ when $p$ is even or odd, respectively.
 
-void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len, 
-                            const fmpz *a, const long *j, long lena, 
-                            const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, 
+                            const fmpz *a, const slong *j, slong lena, 
+                            const fmpz_t p, slong N, const fmpz_t pN)
 
     Computes 
     \begin{equation*}
@@ -415,9 +415,9 @@ int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
     Returns whether the $p$-adic logarithm function converges at 
     \code{op}, and if so sets \code{rop} to its value.
 
-void _qadic_log_balanced(fmpz *z, const fmpz *y, long len, 
-                         const fmpz *a, const long *j, long lena, 
-                         const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, 
+                         const fmpz *a, const slong *j, slong lena, 
+                         const fmpz_t p, slong N, const fmpz_t pN)
 
     Computes $(z, d)$ as 
     \begin{equation*}
@@ -434,9 +434,9 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     Returns whether the $p$-adic logarithm function converges at 
     \code{op}, and if so sets \code{rop} to its value.
 
-void _qadic_log(fmpz *z, const fmpz *y, long v, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N, const fmpz_t pN)
 
     Computes $(z, d)$ as 
     \begin{equation*}
@@ -472,9 +472,9 @@ int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     but this only converges when $\ord_p(x)$ is at least $2$ or $1$ 
     when $p = 2$ or $p > 2$, respectively.
 
-void _qadic_frobenius_a(fmpz *rop, long e, 
-                    const fmpz *a, const long *j, long lena, 
-                    const fmpz_t p, long N)
+void _qadic_frobenius_a(fmpz *rop, slong e, 
+                    const fmpz *a, const slong *j, slong lena, 
+                    const fmpz_t p, slong N)
 
     Computes $\sigma^e(X) \bmod{p^N}$ where $X$ is such that 
     $\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))$.
@@ -487,9 +487,9 @@ void _qadic_frobenius_a(fmpz *rop, long e,
     Sets \code{(rop, 2*d-1)}, although the actual length of the 
     output will be at most~$d$.
 
-void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
-                  const fmpz *a, const long *j, long lena, 
-                  const fmpz_t p, long N)
+void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+                  const fmpz *a, const slong *j, slong lena, 
+                  const fmpz_t p, slong N)
 
     Sets \code{(rop, 2*d-1)}$ to $\Sigma$ evaluated at \code{(op, len)}.
 
@@ -499,7 +499,7 @@ void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e,
 
     Does not support aliasing.
 
-void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
+void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t ctx)
 
     Evaluates the homomorphism $\Sigma^e$ at \code{op}.
 
@@ -512,9 +512,9 @@ void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ct
 
     This functionality is implemented as \code{GaloisImage()} in Magma.
 
-void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
-                        const fmpz *a, const long *j, long lena, 
-                        const fmpz_t p, long N)
+void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, 
+                        const fmpz *a, const slong *j, slong lena, 
+                        const fmpz_t p, slong N)
 
     Sets \code{(rop, d)} to the Teichm\"uller lift of \code{(op, len)} 
     modulo~$p^N$.
@@ -533,8 +533,8 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Raises an exception if the valuation of \code{op} is negative.
 
-void _qadic_trace(fmpz_t rop, const fmpz *op, long len, 
-                  const fmpz *a, const long *j, long lena, const fmpz_t pN)
+void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, 
+                  const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
 
 void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
@@ -546,9 +546,9 @@ void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     $\Gal(\mathbf{Q}_q / \mathbf{Q}_p)$ then the trace of $a$ is equal to 
     $\sum_{i=0}^{d-1} \Sigma^i (a)$.
 
-void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
-                 const fmpz *a, const long *j, long lena, 
-                 const fmpz_t p, long N)
+void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, 
+                 const fmpz *a, const slong *j, slong lena, 
+                 const fmpz_t p, slong N)
 
     Sets \code{rop} to the norm of the element \code{(op,len)} 
     in $\mathbf{Z}_q$ to precision $N$, where \code{len} is at 

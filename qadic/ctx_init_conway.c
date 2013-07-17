@@ -35,7 +35,7 @@
 #endif
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
-                           const fmpz_t p, long d, long min, long max, 
+                           const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode)
 {
     char *buf;
@@ -70,7 +70,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
         /* Same degree? */
         if (d == atoi(tmp))
         {
-            long i, j;
+            slong i, j;
             char *ptr;
 
             /* Find number of non-zero coefficients */
@@ -86,7 +86,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             }
 
             ctx->a = _fmpz_vec_init(ctx->len);
-            ctx->j = flint_malloc(ctx->len * sizeof(long));
+            ctx->j = flint_malloc(ctx->len * sizeof(slong));
 
             /* Copy the polynomial */
             j = 0;

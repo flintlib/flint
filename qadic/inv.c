@@ -26,11 +26,11 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_inv(fmpz *rop, const fmpz *op, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N)
+void _qadic_inv(fmpz *rop, const fmpz *op, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len == 1)
     {
@@ -40,7 +40,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, long len,
     else if (N == 1)
     {
         fmpz *P = _fmpz_vec_init(d + 1);
-        long k;
+        slong k;
 
         for (k = 0; k < lena; k++)
             fmpz_set(P + j[k], a + k);
@@ -51,14 +51,14 @@ void _qadic_inv(fmpz *rop, const fmpz *op, long len,
     }
     else  /* d, N >= 2 */
     {
-        long *e, i, n;
+        slong *e, i, n;
         fmpz *pow, *u;
         fmpz *s, *t;
 
         n = FLINT_CLOG2(N) + 1;
 
         /* Compute sequence of exponents */
-        e = flint_malloc(n * sizeof(long));
+        e = flint_malloc(n * sizeof(slong));
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
@@ -105,7 +105,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, long len,
         i = n - 1;
         {
             fmpz *P = _fmpz_vec_init(d + 1);
-            long k;
+            slong k;
 
             for (k = 0; k < lena; k++)
                 fmpz_set(P + j[k], a + k);
@@ -137,7 +137,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, long len,
 
 void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
 {
-    const long N = qadic_prec(x);
+    const slong N = qadic_prec(x);
 
     if (qadic_is_zero(y))
     {
@@ -155,7 +155,7 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
     }
     else
     {
-        const long d = qadic_ctx_degree(ctx);
+        const slong d = qadic_ctx_degree(ctx);
         fmpz *t;
 
         if (x == y)

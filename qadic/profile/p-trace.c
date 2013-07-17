@@ -46,20 +46,20 @@
 int
 main(void)
 {
-    long l, len = 20;
-    long runs[] = {
+    slong l, len = 20;
+    slong runs[] = {
         100000, 100000, 100000, 100000, 100000, 
         100000, 100000, 100000, 100000, 100000, 
         10000, 10000, 1000, 1000, 1000, 
         100, 100, 10, 10, 10
     };
-    long N[] = {
+    slong N[] = {
         1, 2, 4, 8, 16, 
         32, 64, 128, 256, 512, 
         1024, 1L << 11, 1L << 12, 1L << 13, 1L << 14, 
         1L << 15, 1L << 16, 1L << 17, 1L << 18, 1L << 19
     };
-    long T[20] = {0};
+    slong T[20] = {0};
 
     printf("Benchmark for q-adic trace.\n");
     fflush(stdout);
@@ -67,9 +67,9 @@ main(void)
 for (l = 0; l < len; l++)
 {
     flint_rand_t state;
-    long d = 97, i, n = N[l], r;
+    slong d = 97, i, n = N[l], r;
     clock_t c0, c1;
-    long double cputime;
+    long doublecputime;
 
     fmpz_t p;
     qadic_ctx_t ctx;
@@ -114,7 +114,7 @@ for (l = 0; l < len; l++)
 
     cputime = (long double) (c1 - c0) / (long double) CLOCKS_PER_SEC;
 
-    T[l] = (long) (cputime * (1000000000 / runs[l]));
+    T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
     printf("%2ld, %4LG, %8ld, %ld\n", 
         l, cputime, runs[l], T[l]);

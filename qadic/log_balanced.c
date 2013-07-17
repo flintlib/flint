@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern long _padic_log_bound(long v, long N, const fmpz_t p);
+extern slong _padic_log_bound(slong) v, slong N, const fmpz_t p);
 
 /*
     Assumes that P, T are vectors of length 2 d - 1.
@@ -40,10 +40,10 @@ extern long _padic_log_bound(long v, long N, const fmpz_t p);
 
 static void 
 _qadic_log_bsplit_series(fmpz *P, fmpz_t B, fmpz *T, 
-                         const fmpz *y, long len, long lo, long hi, 
-                         const fmpz *a, const long *j, long lena)
+                         const fmpz *y, slong len, slong lo, slong hi, 
+                         const fmpz *a, const slong *j, slong lena)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (hi - lo == 1)
     {
@@ -69,7 +69,7 @@ _qadic_log_bsplit_series(fmpz *P, fmpz_t B, fmpz *T,
     }
     else
     {
-        const long m = (lo + hi) / 2;
+        const slong m = (lo + hi) / 2;
 
         fmpz *RP, *RT, *W;
         fmpz_t RB;
@@ -115,15 +115,15 @@ _qadic_log_bsplit_series(fmpz *P, fmpz_t B, fmpz *T,
  */
 
 static void 
-_qadic_log_bsplit(fmpz *z, const fmpz *y, long v, long len, 
-                  const fmpz *a, const long *j, long lena, 
-                  const fmpz_t p, long N)
+_qadic_log_bsplit(fmpz *z, const fmpz *y, slong v, slong len, 
+                  const fmpz *a, const slong *j, slong lena, 
+                  const fmpz_t p, slong N)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     fmpz *P, *T;
     fmpz_t B, C;
-    long n;
+    slong n;
 
     n = _padic_log_bound(v, N, p);
     n = FLINT_MAX(n, 2);
@@ -174,15 +174,15 @@ _qadic_log_bsplit(fmpz *z, const fmpz *y, long v, long len,
     Does not support aliasing between $y$ and $z$.
  */
 
-void _qadic_log_balanced(fmpz *z, const fmpz *y, long len, 
-                         const fmpz *a, const long *j, long lena, 
-                         const fmpz_t p, long N, const fmpz_t pN)
+void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, 
+                         const fmpz *a, const slong *j, slong lena, 
+                         const fmpz_t p, slong N, const fmpz_t pN)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     fmpz_t pv;
     fmpz *r, *s, *t, *u;
-    long i, w;
+    slong i, w;
 
     r = _fmpz_vec_init(d);
     s = _fmpz_vec_init(2*d - 1);
@@ -240,9 +240,9 @@ void _qadic_log_balanced(fmpz *z, const fmpz *y, long len,
 int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p  = (&ctx->pctx)->p;
-    const long d   = qadic_ctx_degree(ctx);
-    const long N   = qadic_prec(rop);
-    const long len = op->length;
+    const slong d   = qadic_ctx_degree(ctx);
+    const slong N   = qadic_prec(rop);
+    const slong len = op->length;
 
     if (op->val < 0)
     {
@@ -271,7 +271,7 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         }
         else
         {
-            const long v = _fmpz_vec_ord_p(x, len, p);
+            const slong v = _fmpz_vec_ord_p(x, len, p);
 
             if (v >= 2 || (*p != 2L && v >= 1))
             {

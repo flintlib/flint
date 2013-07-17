@@ -31,8 +31,8 @@
 #include "long_extras.h"
 
 extern int 
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, long len, 
-                         const fmpz *a, const long *j, long lena);
+_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len, 
+                         const fmpz *a, const slong *j, slong lena);
 
 int main(void)
 {
@@ -50,7 +50,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
-        long d;
+        slong d;
         qadic_ctx_t ctx;
 
         int ans;
@@ -102,7 +102,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         int ans1, ans2;
@@ -144,7 +144,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
-        long deg, N;
+        slong deg, N;
         qadic_ctx_t ctx;
 
         int ans;
@@ -213,7 +213,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         int ans;
@@ -268,7 +268,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
-        long deg, N;
+        slong deg, N;
         qadic_ctx_t ctx;
 
         int ans;
@@ -349,7 +349,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p = {2L};
-        long d, N;
+        slong d, N;
         qadic_ctx_t ctx;
 
         int ans;
@@ -407,7 +407,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N, q;
+        slong d, N, q;
         qadic_ctx_t ctx;
 
         int ans1, ans2;
@@ -454,7 +454,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long deg, N, q;
+        slong deg, N, q;
         qadic_ctx_t ctx;
 
         int ans;
@@ -527,7 +527,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N, q;
+        slong d, N, q;
         qadic_ctx_t ctx;
 
         int ans;
@@ -587,7 +587,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long deg, N, q;
+        slong deg, N, q;
         qadic_ctx_t ctx;
 
         int ans;
@@ -659,7 +659,7 @@ int main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d, N, q;
+        slong d, N, q;
         qadic_ctx_t ctx;
 
         int ans;

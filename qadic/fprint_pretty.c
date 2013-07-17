@@ -28,7 +28,7 @@
 #include "qadic.h"
 #include "padic.h"
 
-int _qadic_fprint_pretty(FILE * file, const fmpz *u, long len, long v, 
+int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v, 
     const qadic_ctx_t ctx)
 {
     const fmpz *p = (&ctx->pctx)->p;
@@ -67,7 +67,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, long len, long v,
     else if ((&ctx->pctx)->mode == PADIC_SERIES)
     {
         fmpz *x, *d;
-        long i, j;
+        slong i, j;
 
         for (i = 0; i < len; i++)
             if (fmpz_sgn(u + i) < 0)
