@@ -140,6 +140,8 @@ void _padic_poly_compose(fmpz *rop, long *rval, long N,
             _fmpz_vec_clear(vec1, len1);
             fmpz_clear(s);
             fmpz_clear(t);
+            if (alloc)
+                fmpz_clear(pow);
         }
     }
 }

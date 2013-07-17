@@ -28,7 +28,7 @@
 
 #undef ulong /* interferes with system includes */
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <mpir.h>
 #include "flint.h"

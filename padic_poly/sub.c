@@ -128,7 +128,7 @@ void padic_poly_sub(padic_poly_t f,
         padic_poly_set(f, g, ctx);
         return;
     }
-    if (lenG == 0 && lenH == 0 || (FLINT_MIN(g->val, h->val) >= f->N))
+    if ((lenG == 0 && lenH == 0) || (FLINT_MIN(g->val, h->val) >= f->N))
     {
         padic_poly_zero(f);
         return;
