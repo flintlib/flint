@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern slong _padic_log_bound(slong) v, slong N, const fmpz_t p);
+extern slong _padic_log_bound(slong v, slong N, const fmpz_t p);
 
 /*
     Assumes that P, T are vectors of length 2 d - 1.

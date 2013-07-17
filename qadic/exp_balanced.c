@@ -25,7 +25,7 @@
 
 #include "qadic.h"
 
-extern slong _padic_exp_bound(slong) v, slong N, const fmpz_t p);
+extern slong _padic_exp_bound(slong v, slong N, const fmpz_t p);
 
 static void 
 _qadic_exp_bsplit_series(fmpz *P, fmpz_t Q, fmpz *T, 

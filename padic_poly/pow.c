@@ -33,7 +33,7 @@ void _padic_poly_pow(fmpz *rop, slong *rval, slong N,
     fmpz_t pow;
     int alloc;
 
-    *rval = (long) e * val;
+    *rval = (slong) e * val;
 
     alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
@@ -50,7 +50,7 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
     {
         padic_poly_one(rop);
     }
-    else if (op->length == 0 || (long) e * op->val >= rop->N)
+    else if (op->length == 0 || (slong) e * op->val >= rop->N)
     {
         padic_poly_zero(rop);
     }
@@ -60,7 +60,7 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
     }
     else
     {
-        const slong rlen = (long) e * (op->length - 1) + 1;
+        const slong rlen = (slong) e * (op->length - 1) + 1;
         fmpz *t;
 
         if (rop == op)

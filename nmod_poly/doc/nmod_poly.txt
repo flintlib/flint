@@ -2259,7 +2259,7 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     as factors.
 
     Requires that \code{degs} have enough space for irreducible polynomials'
-    powers (maximum space required is \code{n * sizeof(long)}).
+    powers (maximum space required is \code{n * sizeof(slong)}).
 
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
                                         const nmod_poly_t f)

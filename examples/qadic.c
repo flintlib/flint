@@ -35,7 +35,7 @@
 int main(void)
 {
     fmpz_t p;
-    long d, N;
+    slong d, N;
     qadic_ctx_t ctx;
 
     qadic_t a, b, c;

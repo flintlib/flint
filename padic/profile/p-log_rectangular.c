@@ -116,7 +116,7 @@ for (l = 0; l < FLINT_MIN(16, len); l++)
 
     cputime = (long double) (c1 - c0) / (long double) CLOCKS_PER_SEC;
 
-    T[l] = (long) (cputime * (1000000000 / runs[l]));
+    T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
     printf("%2ld, %4LG, %8ld, %ld\n", 
         l, cputime, runs[l], T[l]);

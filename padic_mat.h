@@ -40,8 +40,8 @@
 typedef struct
 {
     fmpz_mat_struct mat;
-    long val;
-    long N;
+    slong val;
+    slong N;
 } padic_mat_struct;
 
 typedef padic_mat_struct padic_mat_t[1];
@@ -58,9 +58,9 @@ typedef padic_mat_struct padic_mat_t[1];
 
 /* Memory management  ********************************************************/
 
-void padic_mat_init(padic_mat_t A, long r, long c);
+void padic_mat_init(padic_mat_t A, slong r, slong c);
 
-void padic_mat_init2(padic_mat_t A, long r, long c, long prec);
+void padic_mat_init2(padic_mat_t A, slong r, slong c, slong prec);
 
 void padic_mat_clear(padic_mat_t A);
 
@@ -91,7 +91,7 @@ padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
     }
     else
     {
-        long i, j;
+        slong i, j;
         int canonical = 0;
 
         for (i = 0; i < padic_mat(A)->r; i++)
@@ -115,8 +115,8 @@ padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
     }
     else if (padic_mat_is_canonical(A, ctx->p))
     {
-        const long v = padic_mat_val(A);
-        const long N = padic_mat_prec(A);
+        const slong v = padic_mat_val(A);
+        const slong N = padic_mat_prec(A);
 
         if (v >= N)
         {
@@ -124,7 +124,7 @@ padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
         }
         else
         {
-            long i, j;
+            slong i, j;
             fmpz_t pN;
             int reduced = 1;
             int alloc = _padic_ctx_pow_ui(pN, N - v, ctx);
@@ -166,10 +166,10 @@ void padic_mat_get_fmpq_mat(fmpq_mat_t B,
 /* Entries *******************************************************************/
 
 void padic_mat_get_entry_padic(padic_t rop, 
-                               const padic_mat_t op, long i, long j, 
+                               const padic_mat_t op, slong i, slong j, 
                                const padic_ctx_t ctx);
 
-void padic_mat_set_entry_padic(padic_mat_t rop, long i, long j, 
+void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
                                const padic_t op, const padic_ctx_t ctx);
 
 /* Comparison ****************************************************************/

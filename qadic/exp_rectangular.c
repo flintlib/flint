@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern slong _padic_exp_bound(slong) v, slong N, const fmpz_t p);
+extern slong _padic_exp_bound(slong v, slong N, const fmpz_t p);
 
 void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
                             const fmpz *a, const slong *j, slong lena, 
