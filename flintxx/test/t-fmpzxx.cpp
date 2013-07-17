@@ -26,8 +26,8 @@
 #include <sstream>
 #include <string>
 
-#include "cxx/fmpzxx.h"
-#include "cxx/test/helpers.h"
+#include "fmpzxx.h"
+#include "flintxx/test/helpers.h"
 
 #if !HAVE_FAST_COMPILER
 #warning "Some tests are disabled because your compiler is slow."

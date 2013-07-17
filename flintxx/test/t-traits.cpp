@@ -23,9 +23,9 @@
 
 ******************************************************************************/
 
-#include "cxx/test/helpers.h"
-#include "cxx/traits.h"
-#include "cxx/mp.h"
+#include "flintxx/test/helpers.h"
+#include "flintxx/traits.h"
+#include "flintxx/mp.h"
 
 using namespace flint;
 using namespace traits;

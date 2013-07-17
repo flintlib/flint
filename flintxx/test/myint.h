@@ -29,7 +29,7 @@
 #include <sstream>
 #include <string>
 
-#include "cxx/expression.h"
+#include "flintxx/expression.h"
 
 namespace flint {
 template<class Operation, class Data>

@@ -25,11 +25,11 @@
 
 #include<sstream>
 
-#include "cxx/expression.h"
-#include "cxx/tuple.h"
+#include "flintxx/expression.h"
+#include "flintxx/tuple.h"
 
-#include "cxx/test/helpers.h"
-#include "cxx/test/myint.h"
+#include "flintxx/test/helpers.h"
+#include "flintxx/test/myint.h"
 
 using namespace flint;
 using namespace mp;

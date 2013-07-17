@@ -27,8 +27,8 @@
 #include <sstream>
 #include <string>
 
-#include "cxx/padicxx.h"
-#include "cxx/test/helpers.h"
+#include "padicxx.h"
+#include "flintxx/test/helpers.h"
 
 using namespace flint;
 

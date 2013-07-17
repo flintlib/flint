@@ -26,10 +26,10 @@
 #include <iostream>
 #include <sstream>
 
-#include "cxx/forwarding.h"
+#include "flintxx/forwarding.h"
 
-#include "cxx/test/myint.h"
-#include "cxx/test/helpers.h"
+#include "flintxx/test/myint.h"
+#include "flintxx/test/helpers.h"
 
 using namespace flint;
 

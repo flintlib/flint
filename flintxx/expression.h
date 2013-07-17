@@ -32,12 +32,12 @@
 #include <iosfwd>
 #include <string>
 
-#include "cxx/evaluation_tools.h"
-#include "cxx/expression_traits.h"
-#include "cxx/mp.h"
-#include "cxx/rules.h"
-#include "cxx/traits.h"
-#include "cxx/tuple.h"
+#include "flintxx/evaluation_tools.h"
+#include "flintxx/expression_traits.h"
+#include "flintxx/mp.h"
+#include "flintxx/rules.h"
+#include "flintxx/traits.h"
+#include "flintxx/tuple.h"
 
 namespace flint {
 namespace detail {
@@ -560,7 +560,7 @@ operator%=(Expr1& e1, const Expr2& e2)
 }
 
 // TODO remove this?
-#include "cxx/default_rules.h"
+#include "flintxx/default_rules.h"
 
 
 ////////////////////////////////////////////////////////////////////////

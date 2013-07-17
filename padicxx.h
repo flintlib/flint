@@ -33,11 +33,11 @@
 
 #include "padic.h"
 
-#include "cxx/expression.h"
-#include "cxx/flint_classes.h"
-#include "cxx/stdmath.h"
-#include "cxx/traits.h"
-#include "cxx/tuple.h"
+#include "flintxx/expression.h"
+#include "flintxx/flint_classes.h"
+#include "flintxx/stdmath.h"
+#include "flintxx/traits.h"
+#include "flintxx/tuple.h"
 
 #include "fmpzxx.h"
 #include "fmpqxx.h"

@@ -28,12 +28,12 @@
 
 #include <cstdlib>
 
-#include "cxx/evaluation_tools.h"
-#include "cxx/expression.h"
-#include "cxx/expression_traits.h"
-#include "cxx/flint_classes.h"
-#include "cxx/frandxx.h"
-#include "cxx/stdmath.h"
+#include "flintxx/evaluation_tools.h"
+#include "flintxx/expression.h"
+#include "flintxx/expression_traits.h"
+#include "flintxx/flint_classes.h"
+#include "flintxx/frandxx.h"
+#include "flintxx/stdmath.h"
 
 #include "fmpz.h"
 

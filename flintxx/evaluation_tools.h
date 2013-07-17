@@ -32,10 +32,10 @@
 
 #include "flint.h" // FLINT_MAX and FLINT_MIN
 
-#include "cxx/expression_traits.h"
-#include "cxx/mp.h"
-#include "cxx/rules.h"
-#include "cxx/tuple.h"
+#include "flintxx/expression_traits.h"
+#include "flintxx/mp.h"
+#include "flintxx/rules.h"
+#include "flintxx/tuple.h"
 
 namespace flint {
 namespace mp {

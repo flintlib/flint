@@ -23,9 +23,27 @@
 
 ******************************************************************************/
 
-#ifndef CXX_H
-#define CXX_H
+#ifndef CXX_FRANDXX_H
+#define CXX_FRANDXX_H
 
-// nothing here yet
+#include "flint.h"
+
+namespace flint {
+class frandxx
+{
+private:
+    flint_rand_t inner;
+
+    // not copyable
+    frandxx(const frandxx&);
+
+public:
+    frandxx() {flint_randinit(inner);}
+    ~frandxx() {flint_randclear(inner);}
+
+    flint_rand_t& _data() {return inner;}
+    const flint_rand_t& _data() const {return inner;}
+};
+}
 
 #endif

@@ -29,10 +29,10 @@
 #include <iosfwd>
 #include <string>
 
-#include "cxx/evaluation_tools.h"
-#include "cxx/mp.h"
-#include "cxx/rules.h"
-#include "cxx/tuple.h"
+#include "flintxx/evaluation_tools.h"
+#include "flintxx/mp.h"
+#include "flintxx/rules.h"
+#include "flintxx/tuple.h"
 
 // TODO explain
 

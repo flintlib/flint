@@ -27,8 +27,8 @@
 // Contrary to other parts of this library, they are tailored very
 // specifically towards FLINT.
 
-#include "cxx/mp.h"
-#include "cxx/expression_traits.h"
+#include "flintxx/mp.h"
+#include "flintxx/expression_traits.h"
 
 #ifndef CXX_FLINT_CLASSES_H
 #define CXX_FLINT_CLASSES_H

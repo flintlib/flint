@@ -27,8 +27,8 @@
 #include <sstream>
 #include <string>
 
-#include "cxx/fmpqxx.h"
-#include "cxx/test/helpers.h"
+#include "fmpqxx.h"
+#include "flintxx/test/helpers.h"
 
 using namespace flint;
 

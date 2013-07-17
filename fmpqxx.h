@@ -30,9 +30,9 @@
 
 #include "fmpq.h"
 
-#include "cxx/expression.h"
-#include "cxx/flint_classes.h"
-#include "cxx/fmpzxx.h"
+#include "flintxx/expression.h"
+#include "flintxx/flint_classes.h"
+#include "fmpzxx.h"
 
 // TODO exhibit this as a specialisation of a generic fraction<fmpzxx>
 

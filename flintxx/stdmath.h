@@ -26,7 +26,7 @@
 #ifndef FLINT_CXX_STDMATH_H
 #define FLINT_CXX_STDMATH_H
 
-#include "cxx/expression.h"
+#include "flintxx/expression.h"
 
 namespace flint {
 FLINT_DEFINE_BINOP(pow)

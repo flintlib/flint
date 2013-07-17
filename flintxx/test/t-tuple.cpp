@@ -25,9 +25,9 @@
 
 #include <set>
 
-#include "cxx/test/helpers.h"
-#include "cxx/tuple.h"
-#include "cxx/mp.h"
+#include "flintxx/test/helpers.h"
+#include "flintxx/tuple.h"
+#include "flintxx/mp.h"
 
 using namespace flint;
 using namespace mp;

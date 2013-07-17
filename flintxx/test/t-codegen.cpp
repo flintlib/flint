@@ -56,11 +56,11 @@
 #define EXIT_STATEMENT throw skippable_exception("did not expect pass anyway")
 #endif
 
-#include "cxx/test/helpers.h"
-#include "cxx/tuple.h"
+#include "flintxx/test/helpers.h"
+#include "flintxx/tuple.h"
 
-#include "cxx/fmpzxx.h"
-#include "cxx/vector.h"
+#include "fmpzxx.h"
+#include "flintxx/vector.h"
 
 
 // Exception class to indicate that this test cannot proceed, e.g. because
