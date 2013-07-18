@@ -1698,7 +1698,169 @@ In this chapter we provide interfaces to various external packages.
 
 \section{Introduction}
 
-\input{input/genericxx.tex}
+This chapter is geared towards FLINT developers who wish to extend the C++
+wrapper, chiefly by adding new functions operating on existing wrapper classes,
+or by adding altogether new wrapper classes for data types they implemented in
+C. Part of the design effort of flintxx went into trying to make it possible to
+do this kind of extension with only cursory knowledge of the syntax of C++,
+without having to understand in detail things such as partial template
+specialisation.
+
+The easiest way to get started is probably to read \code{examples/fooxx.cpp}.
+As a matter of fact I hope that most day to day work on the wrapper should be
+doable by just copying similar code from other data types, so after reading the
+example you may already know everything you need.
+
+\section{Overview of flintxx}
+
+The flintxx library is composed of a variety of parts. The main expression
+template class \code{expression} resides in \code{flintxx/expression.h}.
+Concrete classes derive from it, and thereby automatically acquire overloaded
+operators etc. to construct and evaluate expression templates. Of course, this
+is only possible after telling the flintxx how to do the evaluation, by
+specialising evaluation rules defined in \code{flintxx/rules.h}. This file also
+provides convenience macros \code{FLINT_DEFINE_GET} etc., which can be used to
+simplify defining common rules. Using only these files it would already be
+possible to interact with flintxx.
+
+In many situations one needs to define rules which work with varying argument
+types, if those types satisfy certain conditions. This can be achieved using the
+so-called \code{enable_if} idioms together with some meta programming
+(implemented in \code{flintxx/mp.h}) and type traits (mainly in
+\code{flintxx/traits.h} and \code{flintxx/expression_traits.h}). These are the
+files a third party developer should use to interact with flintxx.
+
+In writing wrappers for FLINT C types, there are some more common idioms. These
+are usually expressed as macros \code{FLINTXX_???} and are defined in
+\code{flintxx/flint_classes.h}. As illustrated in the example, the
+\code{FLINTXX_???} macros are meant to complement, not supersede, the
+\code{FLINT_???} macros.
+
+\section{Some tidbits and caveats}
+
+One C++ idiom which may initially look staggering is \code{enable_if}. A typical
+usage is as follows:
+
+\begin{lstlisting}[language=c++]
+template<class T>
+void foo(T,
+    typename enable_if<is_signed_integer<T> >::type* = 0)
+{
+    cout << 'a';
+}
+
+template<class T>
+void foo(T,
+    typename enable_if<is_unsigned_integer<T> >::type* = 0)
+{
+    cout << 'b';
+}
+
+...
+foo(4);   // a
+foo(4u);  // b
+foo("x"); // error
+\end{lstlisting}
+
+What happens syntactically here is that we define two functions called
+\code{foo}. In C++ this is allowed, such a function is called \emph{overloaded},
+and depending on the arguments it is called with, the so-called overloading
+algorithm decides which instance to call. Additionally, both functions we define
+are actually \emph{function templates}. Normally, a function template like
+\code{template<class T> void foo(T)} can be called with arbitrary
+arguments, and so overloading makes little sense.\footnote{One may still overload
+e.g. \code{foo(T&)} and \code{foo(const T&)}, and say \code{foo(int)}; the
+overloading algorithm determines a ``best match'', and so this overloading can
+still be useful. However the details of what constitutes a best match are
+complicated, and if there are several equally-good matches (none of which is
+``best'') then an error will be issued.} But of course the point to observe is
+that our overloaded functions have an additional argument, which depends on
+\code{T}. Syntactically, there is an un-named pointer argument, which defaults
+to zero.\footnote{It is not terribly important that this is a pointer type, it
+could be say int, but \code{enable_if<...>::type} is defined to be void, and so
+converting to a pointer is the easiest way to turn this into a function
+argument.} What happens now is that depending on \code{T}, the function
+signature may be syntactically invalid! Indeed, the template
+\code{enable_if<cond>} has a member \code{type} only if \code{cond} is true.
+Otherwise \code{enable_if<cond>} is just completely empty, and the function
+signature makes no sense. But this is fine, according to the
+SFINAE\footnote{``Substitution Failure Is Not An Error''} rule of C++, if
+something like this happens during overload resolution, the algorithm just
+discards this possibility. So in general, what the overload algorithm does it
+looks for all function templates (and functions) which the overloaded call could
+possibly match (this by itself is a complicated procedure, because of so-called
+argument-dependent lookup ...), then tries to instantiate all the function
+templates, discards all which have substitution failures, and then tries to find
+the best match in the remaining list.
+
+Similar rules also apply in resolving partially specialised template types. In
+this case, the pattern usually looks like this:
+
+\begin{lstlisting}[language=c++]
+template<class T, class Enable = void>
+struct foo
+{
+    static const int a = 0;
+};
+
+template<class T>
+struct foo<T,
+    typename enable_if<is_unsigned_integer<T> >::type>
+{
+    static const int a = 1;
+};
+
+template<class T>
+struct foo<T,
+    typename enable_if<is_signed_integer<T> >::type>
+{
+    static const int a = 2;
+};
+
+...
+foo<const char*>::a; // 0
+foo<int>::a;         // 2
+foo<unsigned>::a;    // 1
+\end{lstlisting}
+
+It may seem tempting to enable member functions conditionally on class template
+arguments, like this:
+
+\begin{lstlisting}
+template<class T>
+struct foo
+{
+    void bar(typename enable_if<is_integer<T> >::type* = 0) {...}
+};
+\end{lstlisting}
+
+But this is not possible. The problem is, more or less,
+that when instantiating \code{foo<int>}, after replacing \code{T} by \code{int},
+the entire class signature has to be well-formed, which it just is not.
+Nonetheless it is typically straightforward to workaround this. You just have to
+ensure that the signature of your member function is well-formed for any
+template argument \code{T}. Then in the function body, which is instantiated
+only when the function is actually called, you can add a \code{STATIC_ASSERT} to
+make it plain that this function should only be called with integers, etc.
+
+Another thing to keep in mind is that in C++98, the expressions \code{> >} and
+\code{>>} are very different. The latter is a shift operator, and cannot be used
+to close template argument lists. Thus expressions like
+\code{not_<is_integer<T>>} are invalid in C++98, one has to write
+\code{not_<is_intiger<T> >} instead.
+
+On a similar note, the meaning of an expression involving template arguments can
+in some situations depend on the template parameter, and sometimes this has to
+be made explicit. A typical situation is \code{T::something}, which may refer to
+either a static member value, or a member type of T. If the latter is desired,
+in most situations one needs to write \code{typename T::something}. Similarly if
+\code{T} has a member template (function, say), then one cannot write
+\code{T::something<int>()}, but instead has to write
+\code{T::template something<int>()}. Most modern compilers will suggest the
+alternative syntax when such an error is encountered.
+
+% TODO
+%\input{input/genericxx.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %
