@@ -28,7 +28,7 @@
 #ifndef CXX_EVALUATION_TOOLS_H
 #define CXX_EVALUATION_TOOLS_H
 
-#include <iosfwd>
+#include <iostream>
 
 #include "flint.h" // FLINT_MAX and FLINT_MIN
 

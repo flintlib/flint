@@ -192,5 +192,8 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
+print-%:
+	@echo '$*=$($*)'
+
 .PHONY: profile library shared static clean examples tune check tests distclean dist install all
 
