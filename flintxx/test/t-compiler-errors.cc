@@ -99,6 +99,24 @@ main()
         a + (a*a + (a / n) + a)*a;
     }
 #endif
+#ifdef TEST_FMPZXX_ARITHFUNC_WRONG_NARGS
+    {
+        fmpzxx a;
+        gcd(a);
+    }
+#endif
+#ifdef TEST_FMPZXX_ARITHFUNC_WRONG_TYPE
+    {
+        newtype n;
+        dlog(n);
+    }
+#endif
+#ifdef TEST_FMPZXX_ARITHFUNC_WRONG_TYPE2
+    {
+        fmpzxx a;
+        fac(a);
+    }
+#endif
 #ifdef TEST_PADICXX_FORGET_EVAL
     {
         padicxx_ctx ctx(fmpzxx(5), 1, 2, PADIC_TERSE);
