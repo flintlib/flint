@@ -136,6 +136,7 @@ static __inline__ void fmpq_neg(fmpq_t dest, const fmpq_t src)
 static __inline__ void fmpq_abs(fmpq_t dest, const fmpq_t src)
 {
     fmpz_abs(fmpq_numref(dest), fmpq_numref(src));
+    fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
 int _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
