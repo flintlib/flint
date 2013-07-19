@@ -28,13 +28,12 @@
 
 #include <algorithm> // std::max
 #include <cstdlib>
-#include <stdexcept>
-#include <string>
 
 #include "padic.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
+#include "flintxx/flint_exception.h"
 #include "flintxx/stdmath.h"
 #include "flintxx/traits.h"
 #include "flintxx/tuple.h"
@@ -43,13 +42,6 @@
 #include "fmpqxx.h"
 
 namespace flint {
-class padicxx_exception
-    : public std::domain_error
-{
-public:
-    padicxx_exception(const std::string& what)
-        : std::domain_error("padic computation failed: " + what) {}
-};
 
 namespace detail {
 template<class T>
@@ -58,12 +50,6 @@ struct padicxx_max_prec
     // XXX is this a good idea?
     static slong get(const T&) {return 0;}
 };
-
-void padic_check(bool worked, const std::string& where)
-{
-    if(!worked)
-        throw padicxx_exception(where);
-}
 } // detail
 
 class padicxx_ctx
@@ -310,17 +296,17 @@ FLINT_DEFINE_UNARY_EXPR_COND(negate, padicxx, PADICXX_COND_S,
 
 // lazy functions
 FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, padicxx, PADICXX_COND_S,
-        detail::padic_check(
-            padic_sqrt(to._padic(), from._padic(), to._ctx()), "sqrt"))
+        execution_check(
+            padic_sqrt(to._padic(), from._padic(), to._ctx()), "sqrt", "padic"))
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, padicxx, PADICXX_COND_S,
         traits::fits_into_slong,
         padic_pow_si(to._padic(), e1._padic(), e2, to._ctx()))
 FLINT_DEFINE_UNARY_EXPR_COND(exp_op, padicxx, PADICXX_COND_S,
-        detail::padic_check(
-            padic_exp(to._padic(), from._padic(), to._ctx()), "exp"))
+        execution_check(
+            padic_exp(to._padic(), from._padic(), to._ctx()), "exp", "padic"))
 FLINT_DEFINE_UNARY_EXPR_COND(log_op, padicxx, PADICXX_COND_S,
-        detail::padic_check(
-            padic_log(to._padic(), from._padic(), to._ctx()), "log"))
+        execution_check(
+            padic_log(to._padic(), from._padic(), to._ctx()), "log", "padic"))
 // TODO some more
 } // rules
 // TODO non-lazy functions

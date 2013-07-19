@@ -23,29 +23,27 @@
 
 ******************************************************************************/
 
-#ifndef FLINT_CXX_STDMATH_H
-#define FLINT_CXX_STDMATH_H
+#ifndef FLINTXX_FLINT_EXCEPTION_H
+#define FLINTXX_FLINT_EXCEPTION_H
 
-#include "flintxx/expression.h"
+#include <stdexcept>
+#include <string>
 
 namespace flint {
-FLINT_DEFINE_BINOP(pow)
-FLINT_DEFINE_BINOP(root)
+class flint_exception
+    : public std::domain_error // ?
+{
+public:
+    flint_exception(const std::string& what)
+        : std::domain_error("FLINT: " + what) {}
+};
 
-FLINT_DEFINE_UNOP(abs)
-FLINT_DEFINE_UNOP(exp)
-FLINT_DEFINE_UNOP(log)
-FLINT_DEFINE_UNOP(sqrt)
-FLINT_DEFINE_UNOP(inv)
-} // flint
-
-namespace std {
-FLINT_DEFINE_BINOP_HERE(pow)
-
-FLINT_DEFINE_UNOP_HERE(abs)
-FLINT_DEFINE_UNOP_HERE(exp)
-FLINT_DEFINE_UNOP_HERE(log)
-FLINT_DEFINE_UNOP_HERE(sqrt)
+void execution_check(bool worked, const std::string& where,
+        const std::string& context)
+{
+    if(!worked)
+        throw flint_exception(context + " computation failed: " + where);
+}
 }
 
 #endif

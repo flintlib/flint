@@ -32,9 +32,12 @@
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
+#include "flintxx/flint_exception.h"
+#include "flintxx/frandxx.h"
 #include "fmpzxx.h"
 
 // TODO exhibit this as a specialisation of a generic fraction<fmpzxx>
+// TODO swap
 
 namespace flint {
 template<class Operation, class Data>
@@ -49,6 +52,37 @@ public:
     FLINTXX_DEFINE_CTORS(fmpqxx_expression)
     FLINTXX_DEFINE_C_REF(fmpqxx_expression, fmpq, _fmpq)
 
+    // static methods which only make sense with fmpqxx
+    FLINTXX_DEFINE_RANDFUNC(fmpq, randbits)
+    FLINTXX_DEFINE_RANDFUNC(fmpq, randtest)
+    FLINTXX_DEFINE_RANDFUNC(fmpq, randtest_not_zero)
+
+    // TODO does this make more sense as standalone function?
+    template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
+    static typename mp::enable_all_fmpzxx<
+        fmpqxx_expression, Fmpz1, Fmpz2, Fmpz3, Fmpz4>::type reconstruct(
+                const Fmpz1& a, const Fmpz2& m, const Fmpz3& N, const Fmpz4& D)
+    {
+        fmpqxx_expression res;
+        // TODO should this throw a different exception type?
+        execution_check(fmpq_reconstruct_fmpz_2(res._fmpq(),
+                    a.evaluate()._fmpz(), m.evaluate()._fmpz(),
+                    N.evaluate()._fmpz(), D.evaluate()._fmpz()),
+                "rational reconstruction (v2)", "fmpq");
+        return res;
+    }
+    template<class Fmpz1, class Fmpz2>
+    static typename mp::enable_all_fmpzxx<fmpqxx_expression, Fmpz1, Fmpz2>::type
+    reconstruct(const Fmpz1& a, const Fmpz2& m)
+    {
+        fmpqxx_expression res;
+        // TODO should this throw a different exception type?
+        execution_check(fmpq_reconstruct_fmpz(res._fmpq(),
+                    a.evaluate()._fmpz(), m.evaluate()._fmpz()),
+                "rational reconstruction", "fmpq");
+        return res;
+    }
+
     // These only make sense with immediates
     fmpzxx_ref num() {return fmpzxx_ref::make(fmpq_numref(_fmpq()));}
     fmpzxx_srcref num() const {return fmpzxx_srcref::make(fmpq_numref(_fmpq()));}
@@ -56,6 +90,10 @@ public:
     fmpzxx_srcref den() const {return fmpzxx_srcref::make(fmpq_denref(_fmpq()));}
     void canonicalise() {fmpq_canonicalise(_fmpq());}
     bool is_canonical() const {return fmpq_is_canonical(_fmpq());}
+
+    // These cause evaluation
+    bool is_zero() const {return fmpq_is_zero(this->evaluate()._fmpq());}
+    bool is_one() const {return fmpq_is_one(this->evaluate()._fmpq());}
 };
 
 namespace detail {
@@ -107,6 +145,13 @@ struct fmpq_data
 };
 } // detail
 
+// TODO macroize?
+namespace traits {
+template<class T> struct is_fmpqxx : mp::or_<
+     traits::is_T_expr<T, fmpqxx>,
+     flint_classes::is_source<fmpqxx, T> > { };
+} // traits
+
 namespace rules {
 #define FMPQXX_COND_S FLINTXX_COND_S(fmpqxx)
 #define FMPQXX_COND_T FLINTXX_COND_T(fmpqxx)
@@ -136,13 +181,53 @@ FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpqxx, FMPQXX_COND_S, FMPZXX_COND_S,
 FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpqxx, FMPQXX_COND_S,
         fmpq_neg(to._fmpq(), from._fmpq()))
 
-// TODO functions
+FLINT_DEFINE_BINARY_EXPR_COND2(modulo, fmpzxx, FMPQXX_COND_S, FMPZXX_COND_S,
+        execution_check(fmpq_mod_fmpz(to._fmpz(), e1._fmpq(), e2._fmpz()),
+            "modular inversion", "fmpq"))
+
+// TODO macroize?
+namespace rdetail {
+template<class Fmpq1, class Fmpq2, class T>
+void fmpqxx_shift(Fmpq1& to, const Fmpq2& from, T howmuch)
+{
+    if(howmuch < 0)
+        fmpq_div_2exp(to._fmpq(), from._fmpq(), -howmuch);
+    else
+        fmpq_mul_2exp(to._fmpq(), from._fmpq(), howmuch);
+}
+} // rdetail
+FLINT_DEFINE_BINARY_EXPR_COND2(shift, fmpqxx,
+        FMPQXX_COND_S, traits::is_integer,
+        rdetail::fmpqxx_shift(to, e1, e2))
 } // rules
 
 FLINTXX_DEFINE_TERNARY(fmpqxx,
         fmpq_addmul(to._fmpq(), e1._fmpq(), e2._fmpq()),
         fmpq_submul(to._fmpq(), e1._fmpq(), e2._fmpq()),
         FLINTXX_UNADORNED_MAKETYPES)
+
+// immediate functions
+// TODO maybe as a member function?
+template<class Fmpq>
+inline typename mp::enable_if<traits::is_fmpqxx<Fmpq>, mp_bitcnt_t>::type
+height_bits(const Fmpq& f)
+{
+    return fmpq_height_bits(f.evaluate()._fmpq());
+}
+
+FLINT_DEFINE_UNOP(height)
+namespace rules {
+FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpqxx, FMPQXX_COND_S,
+        fmpq_abs(to._fmpq(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(height_op, fmpzxx, FMPQXX_COND_S,
+        fmpq_height(to._fmpz(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(inv_op, fmpqxx, FMPQXX_COND_S,
+        fmpq_inv(to._fmpq(), from._fmpq()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpqxx,
+        FMPQXX_COND_S, traits::fits_into_slong,
+        fmpq_pow_si(to._fmpq(), e1._fmpq(), e2))
+}
 } // flint
 
 #endif

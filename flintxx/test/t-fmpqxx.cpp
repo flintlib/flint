@@ -106,6 +106,8 @@ test_arithmetic()
     tassert(a / c == fmpqxx(3, 10u));
 
     tassert(-a == fmpqxx(-3, 5u));
+
+    tassert(((a << 5) >> 4) == fmpzxx(2)*a);
 }
 
 // Won't compile if the expression is not done using addmul
@@ -130,6 +132,41 @@ test_extras()
     tassert(a == ar && ar == asr);
     ar = 3;
     tassert(a == c && asr == c);
+
+    tassert((-a) + a == fmpqxx(0, 0u));
+}
+
+void
+test_functions()
+{
+    fmpqxx a(-3, 5u);
+
+    // test lazy functions
+    tassert(abs(a) == -a);
+    tassert(height(a) == 5);
+    tassert(a % fmpzxx(7) == 5);
+    assert_exception((a % fmpzxx(5)).evaluate());
+
+    // test immediate functions
+    tassert(height_bits(a) == 3);
+    tassert((inv(a)*a).is_one());
+
+    // test member functions
+    fmpqxx zero(0, 0u), one(1, 1u);
+    tassert(zero.is_zero() && !zero.is_one());
+    tassert(!one.is_zero() && one.is_one());
+    tassert(pow(a, -3) == inv(a*a*a));
+
+    // test static member functions
+    frandxx rand;
+    tassert(abs(fmpqxx::randbits(rand, 5).den()) <= 31);
+    // NB: rand stuff comes from a single macro, no need for further testing
+    tassert(a == fmpqxx::reconstruct(
+                a % fmpzxx(41), fmpzxx(41), fmpzxx(3), fmpzxx(5)));
+    assert_exception(fmpqxx::reconstruct(
+                a % fmpzxx(7), fmpzxx(7), fmpzxx(1), fmpzxx(1)));
+    tassert(a == fmpqxx::reconstruct(a % fmpzxx(71), fmpzxx(71)));
+    assert_exception(fmpqxx::reconstruct(a % fmpzxx(7), fmpzxx(7)));
 }
 
 int
@@ -142,6 +179,7 @@ main()
     test_conversion();
     test_order();
     test_arithmetic();
+    test_functions();
     test_extras();
 
     std::cout << "PASS" << std::endl;

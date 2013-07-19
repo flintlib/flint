@@ -37,6 +37,8 @@
 
 #include "fmpz.h"
 
+// TODO swap
+
 namespace flint {
 
 template<class Operation, class Data>
@@ -187,15 +189,14 @@ template<class T> struct is_fmpzxx : mp::or_<
      flint_classes::is_source<fmpzxx, T> > { };
 } // traits
 namespace mp {
-template<class Out, class T1, class T2 = void, class T3 = void>
+template<class T1, class T2 = void, class T3 = void, class T4 = void>
+struct all_fmpzxx : mp::and_<all_fmpzxx<T1>, all_fmpzxx<T2, T3, T4> > { };
+template<class T>
+struct all_fmpzxx<T, void, void, void> : traits::is_fmpzxx<T> { };
+
+template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
 struct enable_all_fmpzxx
-    : mp::enable_if<mp::and_<traits::is_fmpzxx<T1>, traits::is_fmpzxx<T2>, traits::is_fmpzxx<T3> >, Out> { };
-template<class Out, class T1, class T2>
-struct enable_all_fmpzxx<Out, T1, T2, void>
-    : mp::enable_if<mp::and_<traits::is_fmpzxx<T1>, traits::is_fmpzxx<T2> >, Out> { };
-template<class Out, class T>
-struct enable_all_fmpzxx<Out, T, void>
-    : mp::enable_if<traits::is_fmpzxx<T>, Out> { };
+    : mp::enable_if<all_fmpzxx<T1, T2, T3, T4>, Out> { };
 } // mp
 
 ///////////////////////////////////////////////////////////////////

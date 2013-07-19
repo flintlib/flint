@@ -77,4 +77,26 @@ bool typed_equals(const T& a, const T& b)
     return a == b;
 }
 
+#define _assert_exception(expr, type) do \
+{ \
+    bool exception_occurred = false; \
+    try \
+    { \
+        expr; \
+    } \
+    catch(const type&) \
+    { \
+        exception_occurred = true; \
+    } \
+    if(!exception_occurred) \
+    { \
+        std::cout << "FAIL\n" __FILE__ ":" << __LINE__ \
+            << ": expression did not cause an exception: " #expr " \n"; \
+        EXIT_STATEMENT; \
+    } \
+} while(0)
+
+#define assert_exception(expr) _assert_exception(expr, flint_exception)
+
+
 #endif

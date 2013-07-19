@@ -132,16 +132,7 @@ test_functions()
     padicxx a(make_padic(fmpqxx(14, 25u)));
     tassert(fuzzy_equals(a, pow(sqrt(a), 2)));
 
-    bool exception_occured = false;
-    try
-    {
-        sqrt(make_padic(fmpqxx(2, 1u))).evaluate();
-    }
-    catch(const padicxx_exception&)
-    {
-        exception_occured = true;
-    }
-    tassert(exception_occured);
+    assert_exception(sqrt(make_padic(fmpqxx(2, 1u))).evaluate());
 
     fmpqxx cf(14*5, 1u);
     padicxx c = make_padic(fmpqxx(14*5, 1u));
