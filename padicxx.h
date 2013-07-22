@@ -34,6 +34,7 @@
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
 #include "flintxx/flint_exception.h"
+#include "flintxx/frandxx.h"
 #include "flintxx/stdmath.h"
 #include "flintxx/traits.h"
 #include "flintxx/tuple.h"
@@ -41,7 +42,17 @@
 #include "fmpzxx.h"
 #include "fmpqxx.h"
 
+// TODO swap
+
 namespace flint {
+// function "declarations"
+FLINT_DEFINE_UNOP(exp_rectangular)
+FLINT_DEFINE_UNOP(exp_balanced)
+FLINT_DEFINE_UNOP(log_rectangular)
+FLINT_DEFINE_UNOP(log_balanced)
+FLINT_DEFINE_UNOP(log_satoh)
+FLINT_DEFINE_UNOP(teichmuller)
+FLINT_DEFINE_BINOP(padic_val_fac)
 
 namespace detail {
 template<class T>
@@ -92,10 +103,10 @@ public:
     const padicxx_ctx& get_ctx() const {return this->_data().ctx;}
     fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
     fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
-    slong val() const {return padic_val(_padic());}
     slong _prec() const {return padic_prec(_padic());}
     padic_ctx_t& _ctx() const {return get_ctx()._ctx();}
-    // TODO reduce? canonicalise?
+    void reduce() {padic_reduce(_padic(), _ctx());}
+    // TODO canonicalise? set_zero? set_one?
 
     // Compute the maximal precision of all subexpressions
     slong prec() const
@@ -116,6 +127,34 @@ public:
     {
         return evaluated_t(estimate_ctx(), prec());
     }
+
+    // static methods which only make sense with padicxx
+    static padicxx_expression randtest(frandxx& state,
+            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+    {
+        padicxx_expression res(ctx, prec);
+        padic_randtest(res._padic(), state._data(), ctx._ctx());
+        return res;
+    }
+    static padicxx_expression randtest_not_zero(frandxx& state,
+            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+    {
+        padicxx_expression res(ctx, prec);
+        padic_randtest_not_zero(res._padic(), state._data(), ctx._ctx());
+        return res;
+    }
+    static padicxx_expression randtest_int(frandxx& state,
+            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+    {
+        padicxx_expression res(ctx, prec);
+        padic_randtest_int(res._padic(), state._data(), ctx._ctx());
+        return res;
+    }
+
+    // these cause evaluation
+    bool is_zero() const {return padic_is_zero(this->evaluate()._padic());}
+    bool is_one() const {return padic_is_one(this->evaluate()._padic());}
+    slong val() const {return padic_val(this->evaluate()._padic());}
 };
 
 namespace detail {
@@ -304,12 +343,45 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, padicxx, PADICXX_COND_S,
 FLINT_DEFINE_UNARY_EXPR_COND(exp_op, padicxx, PADICXX_COND_S,
         execution_check(
             padic_exp(to._padic(), from._padic(), to._ctx()), "exp", "padic"))
+FLINT_DEFINE_UNARY_EXPR_COND(exp_balanced_op, padicxx, PADICXX_COND_S,
+        execution_check(padic_exp_balanced(
+                to._padic(), from._padic(), to._ctx()), "exp_balanced", "padic"))
+FLINT_DEFINE_UNARY_EXPR_COND(exp_rectangular_op, padicxx, PADICXX_COND_S,
+        execution_check(padic_exp_rectangular(
+                to._padic(), from._padic(), to._ctx()),
+            "exp_rectangular", "padic"))
 FLINT_DEFINE_UNARY_EXPR_COND(log_op, padicxx, PADICXX_COND_S,
         execution_check(
             padic_log(to._padic(), from._padic(), to._ctx()), "log", "padic"))
-// TODO some more
+FLINT_DEFINE_UNARY_EXPR_COND(log_rectangular_op, padicxx, PADICXX_COND_S,
+        execution_check(padic_log_rectangular(
+                to._padic(), from._padic(), to._ctx()),
+            "log_rectangular", "padic"))
+FLINT_DEFINE_UNARY_EXPR_COND(log_balanced_op, padicxx, PADICXX_COND_S,
+        execution_check(padic_log_balanced(
+                to._padic(), from._padic(), to._ctx()), "log_balanced", "padic"))
+FLINT_DEFINE_UNARY_EXPR_COND(log_satoh_op, padicxx, PADICXX_COND_S,
+        execution_check(padic_log_satoh(to._padic(), from._padic(), to._ctx()),
+            "log_satoh", "padic"))
+FLINT_DEFINE_UNARY_EXPR_COND(inv_op, padicxx, PADICXX_COND_S,
+            padic_inv(to._padic(), from._padic(), to._ctx()))
+FLINT_DEFINE_UNARY_EXPR_COND(teichmuller_op, padicxx, PADICXX_COND_S,
+            padic_teichmuller(to._padic(), from._padic(), to._ctx()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(padic_val_fac_op, fmpzxx,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        ::padic_val_fac(to._fmpz(), e1._fmpz(), e2._fmpz()))
 } // rules
-// TODO non-lazy functions
+
+// immediate version of padic_val_fac
+template<class Fmpz, class T>
+inline typename mp::enable_if<mp::and_<
+        traits::is_unsigned_integer<T>, traits::is_fmpzxx<Fmpz> >,
+    ulong>::type
+padic_val_fac(T n, const Fmpz& p)
+{
+    return padic_val_fac_ui(n, p._fmpz());
+}
 } // flint
 
 #endif

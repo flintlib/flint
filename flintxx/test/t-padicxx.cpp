@@ -98,7 +98,7 @@ template<class T>
 padicxx make_padic(const T& t, long prec = PADIC_DEFAULT_PREC)
 {
     static padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
-    padicxx p(ctx);
+    padicxx p(ctx, prec);
     p = t;
     return p;
 }
@@ -129,6 +129,8 @@ test_arithmetic()
 void
 test_functions()
 {
+    padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
+
     padicxx a(make_padic(fmpqxx(14, 25u)));
     tassert(fuzzy_equals(a, pow(sqrt(a), 2)));
 
@@ -137,6 +139,32 @@ test_functions()
     fmpqxx cf(14*5, 1u);
     padicxx c = make_padic(fmpqxx(14*5, 1u));
     tassert(fuzzy_equals(log(exp(c)), c));
+    tassert(exp(c) == exp_rectangular(c) && exp(c) == exp_balanced(c));
+    c = exp(c);
+    tassert(log(c) == log_satoh(c) && log(c) == log_balanced(c)
+            && log(c) == log_rectangular(c));
+
+    padicxx b(make_padic(fmpqxx(14, 17u)));
+    tassert((inv(b)*b).is_one());
+
+    padicxx two(make_padic(fmpqxx(2, 1u)));
+    padicxx tl(teichmuller(two));
+    tassert(pow(tl, 4).is_one() && (tl - two).val() > 0);
+
+    // TODO test reduce
+
+    // test padic_val_fac functions
+    tassert(padic_val_fac(fmpzxx(26), fmpzxx(5)) == 6);
+    tassert(padic_val_fac(26u, fmpzxx(5)) == 6);
+
+    // test randomisation
+    frandxx rand;
+    tassert(padicxx::randtest(rand, ctx, 5).val() < 5
+            && padicxx::randtest(rand, ctx, 5).val() >= -1);
+    tassert(padicxx::randtest(rand, ctx, -5).val() < -5
+            && padicxx::randtest(rand, ctx, -5).val() >= -6);
+    tassert(!padicxx::randtest_not_zero(rand, ctx, 5).is_zero());
+    tassert(padicxx::randtest_int(rand, ctx, -5).is_zero());
 }
 
 // test stuff which we should get automatically - references etc
