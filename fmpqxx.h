@@ -38,8 +38,18 @@
 
 // TODO exhibit this as a specialisation of a generic fraction<fmpzxx>
 // TODO swap
+// TODO summation
 
 namespace flint {
+// function "declarations"
+FLINT_DEFINE_BINOP(fmpqxx_reconstruct)
+FLINT_DEFINE_UNOP(fmpqxx_next_minimal)
+FLINT_DEFINE_UNOP(fmpqxx_next_signed_minimal)
+FLINT_DEFINE_UNOP(fmpqxx_next_calkin_wilf)
+FLINT_DEFINE_UNOP(fmpqxx_next_signed_calkin_wilf)
+
+FLINT_DEFINE_UNOP(height)
+
 template<class Operation, class Data>
 class fmpqxx_expression
     : public expression<derived_wrapper<fmpqxx_expression>, Operation, Data>
@@ -57,7 +67,16 @@ public:
     FLINTXX_DEFINE_RANDFUNC(fmpq, randtest)
     FLINTXX_DEFINE_RANDFUNC(fmpq, randtest_not_zero)
 
+    template<class Vec>
+    static fmpqxx_expression from_cfrac(const Vec& v, slong n)
+    {
+        fmpqxx_expression res;
+        res.set_cfrac(v, n);
+        return res;
+    }
+
     // TODO does this make more sense as standalone function?
+    // TODO in any case we would like it to be lazy (but too many args..)
     template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
     static typename mp::enable_all_fmpzxx<
         fmpqxx_expression, Fmpz1, Fmpz2, Fmpz3, Fmpz4>::type reconstruct(
@@ -71,16 +90,12 @@ public:
                 "rational reconstruction (v2)", "fmpq");
         return res;
     }
+
     template<class Fmpz1, class Fmpz2>
-    static typename mp::enable_all_fmpzxx<fmpqxx_expression, Fmpz1, Fmpz2>::type
+    static FLINT_BINOP_ENABLE_RETTYPE(fmpqxx_reconstruct, Fmpz1, Fmpz2)
     reconstruct(const Fmpz1& a, const Fmpz2& m)
     {
-        fmpqxx_expression res;
-        // TODO should this throw a different exception type?
-        execution_check(fmpq_reconstruct_fmpz(res._fmpq(),
-                    a.evaluate()._fmpz(), m.evaluate()._fmpz()),
-                "rational reconstruction", "fmpq");
-        return res;
+        return fmpqxx_reconstruct(a, m);
     }
 
     // These only make sense with immediates
@@ -91,9 +106,23 @@ public:
     void canonicalise() {fmpq_canonicalise(_fmpq());}
     bool is_canonical() const {return fmpq_is_canonical(_fmpq());}
 
+    template<class Vec>
+    void set_cfrac(const Vec& v, slong n)
+    {
+        fmpq_set_cfrac(this->_fmpq(), v._array(), n);
+    }
+
     // These cause evaluation
     bool is_zero() const {return fmpq_is_zero(this->evaluate()._fmpq());}
     bool is_one() const {return fmpq_is_one(this->evaluate()._fmpq());}
+    // TODO make this only work on immediates?
+    slong cfrac_bound() const {return fmpq_cfrac_bound(this->evaluate()._fmpq());}
+
+    FLINTXX_DEFINE_MEMBER_UNOP(next_minimal, fmpqxx_next_minimal)
+    FLINTXX_DEFINE_MEMBER_UNOP(next_signed_minimal, fmpqxx_next_signed_minimal)
+    FLINTXX_DEFINE_MEMBER_UNOP(next_calkin_wilf, fmpqxx_next_calkin_wilf)
+    FLINTXX_DEFINE_MEMBER_UNOP(next_signed_calkin_wilf,
+            fmpqxx_next_signed_calkin_wilf)
 };
 
 namespace detail {
@@ -215,7 +244,19 @@ height_bits(const Fmpq& f)
     return fmpq_height_bits(f.evaluate()._fmpq());
 }
 
-FLINT_DEFINE_UNOP(height)
+// TODO maybe as a member function?
+template<class Fmpq1, class Fmpq2, class Vec>
+inline typename mp::enable_if<mp::and_<
+        traits::is_fmpqxx<Fmpq2>,
+        FMPQXX_COND_T<Fmpq1> >,
+    int>::type
+get_cfrac(Vec& v, Fmpq1& rem, const Fmpq2& x)
+{
+    return fmpq_get_cfrac(v._array(), rem._fmpq(), x.evaluate()._fmpq(),
+            v.size());
+}
+// TODO also set_cfrac? c/f fmpqxx::set_cfrac ...
+
 namespace rules {
 FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpqxx, FMPQXX_COND_S,
         fmpq_abs(to._fmpq(), from._fmpq()))
@@ -223,11 +264,66 @@ FLINT_DEFINE_UNARY_EXPR_COND(height_op, fmpzxx, FMPQXX_COND_S,
         fmpq_height(to._fmpz(), from._fmpq()))
 FLINT_DEFINE_UNARY_EXPR_COND(inv_op, fmpqxx, FMPQXX_COND_S,
         fmpq_inv(to._fmpq(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_next_minimal_op, fmpqxx, FMPQXX_COND_S,
+        fmpq_next_minimal(to._fmpq(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_next_signed_minimal_op, fmpqxx, FMPQXX_COND_S,
+        fmpq_next_signed_minimal(to._fmpq(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_next_calkin_wilf_op, fmpqxx, FMPQXX_COND_S,
+        fmpq_next_calkin_wilf(to._fmpq(), from._fmpq()))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_next_signed_calkin_wilf_op, fmpqxx, FMPQXX_COND_S,
+        fmpq_next_signed_calkin_wilf(to._fmpq(), from._fmpq()))
+
+// TODO should this throw a different exception type?
+FLINT_DEFINE_BINARY_EXPR_COND2(fmpqxx_reconstruct_op, fmpqxx,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        execution_check(fmpq_reconstruct_fmpz(
+                    to._fmpq(), e1._fmpz(), e2._fmpz()),
+                "rational reconstruction", "fmpq"))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpqxx,
         FMPQXX_COND_S, traits::fits_into_slong,
         fmpq_pow_si(to._fmpq(), e1._fmpq(), e2))
 }
+
 } // flint
+
+#if 0
+// fmpq_vecxx
+
+#include "flintxx/vector.h"
+
+namespace flint {
+namespace detail {
+struct fmpq_vector_data
+{
+    long size;
+    fmpq* array;
+
+    fmpq_vector_data(long n)
+        : size(n), array(_fmpq_vec_init(n)) {}
+
+    ~fmpq_vector_data() {_fmpq_vec_clear(array, size);}
+
+    fmpq_vector_data(const fmpq_vector_data& o)
+        : size(o.size), array(_fmpq_vec_init(o.size))
+    {
+        for(long i = 0;i < size;++i)
+            fmpq_set(array + i, o.array + i);
+    }
+
+    fmpqxx_ref at(long i) {return fmpqxx_ref::make(array + i);}
+    fmpqxx_srcref at(long i) const {return fmpqxx_srcref::make(array + i);}
+};
+} // detail
+
+typedef vector_expression<
+    detail::wrapped_vector_traits<fmpqxx, long, fmpqxx_ref, fmpqxx_srcref>,
+    operations::immediate,
+    detail::fmpq_vector_data> fmpq_vecxx;
+
+template<>
+struct enable_vector_rules<fmpq_vecxx> : mp::false_ { };
+}
+#endif
 
 #endif

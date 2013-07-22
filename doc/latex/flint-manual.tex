@@ -1562,6 +1562,19 @@ and resides in \code{foo.h}, then the C++ version is called \code{fooxx} and
 resides in \code{fooxx.h}. All flintxx classes live inside
 \code{namespace flint}.
 
+Function which operate on wrapper classes are usually implemented as overloaded
+stand-alone functions, with the type prefix dropped. So for example a call to
+\code{flint::gcd(f1, f2)} yields an expression template evaluating via
+\code{fmpz_gcd}, provided \code{f1} and \code{f2} are (evaluate to) instances of
+\code{fmpzxx}. Sometimes we felt that dropping the type prefix would yield
+incomprehensible names, as for example in \code{fmpq_next_minimal}, or
+\code{fmpq_reconstruct}. In these cases the type prefix is swapped for the
+flintxx equivalent, so the flintxx version would be called
+\code{fmpqxx_reconstruct}. In this situation, usually the same functionality is
+also exposed as a (possibly static) member function, and this is the preferred
+way of accessing the functionality. Thus one should write
+\code{fmpqxx::reconstruct(a, m)} or \code{fmpqxx(0, 1u).next_minimal()}.
+
 \section{Overview}
 
 \paragraph{Expression templates}

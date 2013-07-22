@@ -349,7 +349,7 @@ struct unary_op_helper_step2
 template<class Op, class type>
 struct unary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
 {
-    typedef int return_t;
+    struct return_t { };
 };
 template<class Op, class Expr>
 struct unary_op_helper
@@ -583,6 +583,9 @@ name(const T1& t1, const T2& t2) \
     return detail::binary_op_helper<T1, operations::name##_op, T2>::make(t1, t2); \
 }
 
+#define FLINT_BINOP_ENABLE_RETTYPE(name, T1, T2) \
+    typename detail::binary_op_helper<T1, operations::name##_op, T2>::enable::type
+
 // Introduce a new unary operation called "name"
 #define FLINT_DEFINE_UNOP(name) \
 namespace operations { \
@@ -594,6 +597,9 @@ name(const T1& t1) \
 { \
     return detail::unary_op_helper<operations::name##_op, T1>::make(t1); \
 }
+
+#define FLINT_UNOP_MAYBE_RETTYPE(name, T) \
+    typename detail::unary_op_helper<operations::name##_op, T>::return_t
 
 // To be called in any namespace
 

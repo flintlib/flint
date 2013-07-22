@@ -357,6 +357,18 @@ static CBase##xx_expression name(frandxx& state, mp_bitcnt_t bits) \
     return res; \
 }
 
+// XXX due to circular definition problems, this cannot use the usual
+// unary_op_helper type approach, and the unop must return the same type
+// of expression
+#define FLINTXX_DEFINE_MEMBER_UNOP(name, funcname) \
+typename base_t::template make_helper<operations::funcname##_op, \
+    tuple<typename detail::storage_traits<typename base_t::derived_t>::type, \
+            empty_tuple> >::type \
+name() const \
+{ \
+    return funcname(*this); \
+}
+
 
 #define FLINTXX_UNADORNED_MAKETYPES(Base, left, op, right) \
     Base##_expression< op, tuple< left, tuple< right, empty_tuple> > >

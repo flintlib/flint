@@ -62,6 +62,8 @@ public:
     typedef typename Underlying_traits::cref_t cref_t;
     typedef typename Underlying_traits::idx_t idx_t;
     typedef typename Underlying_traits::underlying_t underlying_t;
+    typedef typename Underlying_traits::arrayref_t arrayref_t;
+    typedef typename Underlying_traits::arraysrcref_t arraysrcref_t;
 
     vector_expression() {}
 
@@ -79,6 +81,9 @@ public:
     cref_t operator[](idx_t idx) const {return Underlying_traits::at(*this, idx);}
     idx_t size() const {return Underlying_traits::size(*this);}
 
+    arrayref_t _array() {return Underlying_traits::array(*this);}
+    arraysrcref_t _array() const {return Underlying_traits::array(*this);}
+
     typename base_t::evaluated_t create_temporary() const
     {
         return Underlying_traits::create_temporary(*this);
@@ -92,13 +97,15 @@ protected:
 };
 
 namespace detail {
-template<class T, class Ref, class Cref>
+template<class T, class Ref, class Cref, class ArrayT>
 struct basic_vector_traits
 {
     typedef unsigned idx_t;
     typedef Ref ref_t;
     typedef const Cref cref_t;
     typedef T underlying_t;
+    typedef ArrayT* arrayref_t;
+    typedef const ArrayT* arraysrcref_t;
 
     template<class Expr>
     static ref_t at(Expr& e, unsigned i)
@@ -111,10 +118,22 @@ struct basic_vector_traits
     {
         return e.evaluate()._data().array[i];
     }
+
+    template<class Expr>
+    static arrayref_t array(Expr& e)
+    {
+        return e.evaluate()._data().array;
+    }
+
+    template<class Expr>
+    static arraysrcref_t array(const Expr& e)
+    {
+        return e.evaluate()._data().array;
+    }
 };
-template<class T, class Ref = T&, class Cref = const T&>
+template<class T, class Ref = T&, class Cref = const T&, class ArrayT = T>
 struct rtfixed_size_traits
-    : basic_vector_traits<T, Ref, Cref>
+    : basic_vector_traits<T, Ref, Cref, ArrayT>
 {
     template<class Expr>
     static unsigned size(const Expr& e)
@@ -128,9 +147,9 @@ struct rtfixed_size_traits
         return typename Expr::evaluated_t(e.size());
     }
 };
-template<class T, class Ref = T&, class Cref = const T&>
+template<class T, class Ref = T&, class Cref = const T&, class ArrayT = T>
 struct fixed_size_traits
-    : basic_vector_traits<T, Ref, Cref>
+    : basic_vector_traits<T, Ref, Cref, ArrayT>
 {
     template<class Expr>
     static unsigned size(const Expr& e)
@@ -145,9 +164,9 @@ struct fixed_size_traits
     }
 };
 
-template<class T, class Size, class Ref, class Cref>
+template<class T, class Size, class Ref, class Cref, class ArrayT>
 struct wrapped_vector_traits
-    : rtfixed_size_traits<T, Ref, Cref>
+    : rtfixed_size_traits<T, Ref, Cref, ArrayT>
 {
     typedef Size idx_t;
 

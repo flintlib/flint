@@ -28,6 +28,8 @@
 #include <string>
 
 #include "fmpqxx.h"
+#include "fmpz_vecxx.h"
+
 #include "flintxx/test/helpers.h"
 
 using namespace flint;
@@ -152,10 +154,15 @@ test_functions()
     tassert((inv(a)*a).is_one());
 
     // test member functions
-    fmpqxx zero(0, 0u), one(1, 1u);
+    const fmpqxx zero(0, 0u), one(1, 1u);
     tassert(zero.is_zero() && !zero.is_one());
     tassert(!one.is_zero() && one.is_one());
     tassert(pow(a, -3) == inv(a*a*a));
+    tassert(zero.next_minimal().next_minimal().next_minimal() == fmpqxx(2, 1u));
+    tassert(zero.next_signed_minimal().next_signed_minimal() == fmpqxx(-1, 1u));
+    tassert(zero.next_calkin_wilf().next_calkin_wilf() == fmpqxx(1, 2u));
+    tassert(zero.next_signed_calkin_wilf().next_signed_calkin_wilf()
+            == fmpqxx(-1, 1u));
 
     // test static member functions
     frandxx rand;
@@ -166,7 +173,15 @@ test_functions()
     assert_exception(fmpqxx::reconstruct(
                 a % fmpzxx(7), fmpzxx(7), fmpzxx(1), fmpzxx(1)));
     tassert(a == fmpqxx::reconstruct(a % fmpzxx(71), fmpzxx(71)));
-    assert_exception(fmpqxx::reconstruct(a % fmpzxx(7), fmpzxx(7)));
+    assert_exception(fmpqxx::reconstruct(a % fmpzxx(7), fmpzxx(7)).evaluate());
+
+    // test partial fractions
+    fmpz_vecxx v(5);
+    fmpqxx tmp(7, 5u);
+    fmpqxx rem;
+    tassert(tmp == fmpqxx::from_cfrac(v, get_cfrac(v, rem, tmp)));
+    tassert(rem.is_zero());
+    tassert(3 <= tmp.cfrac_bound());
 }
 
 int

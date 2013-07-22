@@ -28,6 +28,7 @@
 
 #include "fmpzxx.h"
 #include "fmpz_vec.h"
+#include "flintxx/vector.h"
 
 namespace flint {
 namespace detail {
@@ -53,7 +54,7 @@ struct fmpz_vector_data
 } // detail
 
 typedef vector_expression<
-    detail::wrapped_vector_traits<fmpzxx, long, fmpzxx_ref, fmpzxx_srcref>,
+    detail::wrapped_vector_traits<fmpzxx, long, fmpzxx_ref, fmpzxx_srcref, fmpz>,
     operations::immediate,
     detail::fmpz_vector_data> fmpz_vecxx;
 
