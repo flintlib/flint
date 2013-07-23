@@ -101,11 +101,12 @@ public:
 public:
     // These only make sense with immediates
     const padicxx_ctx& get_ctx() const {return this->_data().ctx;}
-    fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
-    fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
     slong _prec() const {return padic_prec(_padic());}
     padic_ctx_t& _ctx() const {return get_ctx()._ctx();}
     void reduce() {padic_reduce(_padic(), _ctx());}
+    // TODO should these return copies on non-immediate expressions?
+    fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
+    fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
     // TODO canonicalise? set_zero? set_one?
 
     // Compute the maximal precision of all subexpressions
@@ -164,8 +165,8 @@ struct padic_data;
 typedef padicxx_expression<operations::immediate, detail::padic_data> padicxx;
 typedef padicxx_expression<operations::immediate,
             flint_classes::ref_data<padicxx, padic_struct> > padicxx_ref;
-typedef padicxx_expression<operations::immediate,
-            flint_classes::srcref_data<padicxx, padicxx_ref, padic_struct> > padicxx_srcref;
+typedef padicxx_expression<operations::immediate, flint_classes::srcref_data<
+    padicxx, padicxx_ref, padic_struct> > padicxx_srcref;
 
 namespace flint_classes {
 template<class Padic>
