@@ -42,8 +42,6 @@
 #include "fmpzxx.h"
 #include "fmpqxx.h"
 
-// TODO swap
-
 namespace flint {
 // function "declarations"
 FLINT_DEFINE_UNOP(exp_rectangular)
@@ -315,6 +313,8 @@ FLINTXX_DEFINE_CONVERSION_TMP(fmpqxx, padicxx,
         padic_get_fmpq(to._fmpq(), from._padic(), from._ctx()))
 
 FLINTXX_DEFINE_TO_STR(padicxx, padic_get_str(0, from._padic(), from._ctx()))
+
+FLINTXX_DEFINE_SWAP(padicxx, padic_swap(e1._padic(), e2._padic()))
 
 FLINTXX_DEFINE_EQUALS(padicxx, padic_equal(e1._padic(), e2._padic()))
 

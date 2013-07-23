@@ -183,6 +183,12 @@ test_functions()
     tassert(tmp == fmpqxx::from_cfrac(v, get_cfrac(v, rem, tmp)));
     tassert(rem.is_zero());
     tassert(3 <= tmp.cfrac_bound());
+
+    // test swap
+    a = 1;
+    fmpqxx b(zero);
+    swap(a, b);
+    tassert(a.is_zero() && b.is_one());
 }
 
 int

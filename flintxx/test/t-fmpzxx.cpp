@@ -481,6 +481,9 @@ test_references()
     b = 3;
     swap(b, ar);
     tassert(a == 3 && b == 2);
+    // make sure ADL is preferred over the general version in std
+    using namespace std;
+    swap(b, b);
 }
 
 void

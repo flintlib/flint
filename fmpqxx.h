@@ -37,7 +37,6 @@
 #include "fmpzxx.h"
 
 // TODO exhibit this as a specialisation of a generic fraction<fmpzxx>
-// TODO swap
 // TODO summation
 
 namespace flint {
@@ -193,6 +192,7 @@ FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, traits::fits_into_slong,
 
 FLINTXX_DEFINE_TO_STR(fmpqxx, fmpq_get_str(0,  base, from._fmpq()))
 FLINTXX_DEFINE_CMP(fmpqxx, fmpq_cmp(e1._fmpq(), e2._fmpq()))
+FLINTXX_DEFINE_SWAP(fmpqxx, fmpq_swap(e1._fmpq(), e2._fmpq()))
 
 FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_add(to._fmpq(), e1._fmpq(), e2._fmpq()))

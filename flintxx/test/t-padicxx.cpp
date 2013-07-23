@@ -165,6 +165,10 @@ test_functions()
             && padicxx::randtest(rand, ctx, -5).val() >= -6);
     tassert(!padicxx::randtest_not_zero(rand, ctx, 5).is_zero());
     tassert(padicxx::randtest_int(rand, ctx, -5).is_zero());
+
+    padicxx ap(a), bp(b);
+    swap(a, b);
+    tassert(a == bp && b == ap);
 }
 
 // test stuff which we should get automatically - references etc
