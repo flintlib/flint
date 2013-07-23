@@ -582,6 +582,8 @@ static void processfile(void)
         printf("Encountered malformed input on line %d \n", line);
         printf("in file %s.\n\n", name);
 
+        exit(1);
+
         NEXTSTATE(end);
     }
 

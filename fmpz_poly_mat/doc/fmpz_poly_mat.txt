@@ -203,7 +203,8 @@ void fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 
 *******************************************************************************
 
-void fmpz_poly_mat_evaluate_fmpz(fmpz_mat_t B, const fmpz_poly_mat_t A, const fmpz_t x)
+void fmpz_poly_mat_evaluate_fmpz(fmpz_mat_t B, const fmpz_poly_mat_t A,
+                                                               const fmpz_t x)
 
     Sets the \code{fmpz_mat_t} \code{B} to \code{A} evaluated entrywise
     at the point \code{x}.
@@ -289,7 +290,8 @@ void fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
     Sets \code{B} to the square of \code{A}, which must be a square matrix.
     Aliasing is allowed. This function uses Kronecker segmentation.
 
-void fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, slong len)
+void fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A,
+                                                                    slong len)
 
     Sets \code{B} to the square of \code{A}, which must be a square matrix,
     truncating all entries to length \code{len}.

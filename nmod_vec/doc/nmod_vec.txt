@@ -239,8 +239,8 @@ macro NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)
     The \code{nlimbs} parameter should be 0, 1, 2 or 3, specifying the
     number of limbs needed to represent the unreduced result.
 
-mp_limb_t
-_nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, slong len, nmod_t mod, int nlimbs)
+mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
+                                            slong len, nmod_t mod, int nlimbs)
 
     Returns the dot product of (\code{vec1}, \code{len}) and
     (\code{vec2}, \code{len}). The \code{nlimbs} parameter should be

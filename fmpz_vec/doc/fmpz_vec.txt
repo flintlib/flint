@@ -253,35 +253,35 @@ void _fmpz_vec_sub(fmpz * res, const fmpz * vec1,
 *******************************************************************************
 
 void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, slong len2, const fmpz_t x)
+                                const fmpz * vec2, slong len2, const fmpz_t x)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
     where $c$ is an \code{fmpz_t}.
 
-void _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
+id _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
     where $c$ is a \code{slong}.
 
 void _fmpz_vec_scalar_mul_ui(fmpz * vec1,
-                                         const fmpz * vec2, slong len2, ulong c)
+                                       const fmpz * vec2, slong len2, ulong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
     where $c$ is an \code{ulong}.
 
 void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
-                                       const fmpz * vec2, slong len2, ulong exp)
+                                     const fmpz * vec2, slong len2, ulong exp)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by \code{2^exp}.
 
 void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, slong len2, const fmpz_t x)
+                                const fmpz * vec2, slong len2, const fmpz_t x)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $x$, where the 
     division is assumed to be exact for every entry in \code{vec2}.
 
 void _fmpz_vec_scalar_divexact_si(fmpz * vec1, 
-                                          const fmpz * vec2, slong len2, slong c)
+                                        const fmpz * vec2, slong len2, slong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $x$, where the 
     division is assumed to be exact for every entry in \code{vec2}.
@@ -293,86 +293,86 @@ void _fmpz_vec_scalar_divexact_ui(fmpz * vec1,
     division is assumed to be exact for every entry in \code{vec2}.
 
 void _fmpz_vec_scalar_fdiv_q_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, slong len2, const fmpz_t c)
+                                const fmpz * vec2, slong len2, const fmpz_t c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     down towards minus infinity whenever the division is not exact.
 
 void _fmpz_vec_scalar_fdiv_q_si(fmpz * vec1, 
-                                          const fmpz * vec2, slong len2, slong c)
+                                        const fmpz * vec2, slong len2, slong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     down towards minus infinity whenever the division is not exact.
 
 void _fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, 
-                                         const fmpz * vec2, slong len2, ulong c)
+                                       const fmpz * vec2, slong len2, ulong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     down towards minus infinity whenever the division is not exact.
 
 void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, 
-                                       const fmpz * vec2, slong len2, ulong exp)
+                                     const fmpz * vec2, slong len2, ulong exp)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by \code{2^exp}, 
     rounding down towards minus infinity whenever the division is not exact.
 
 void _fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, 
-                                       const fmpz * vec2, slong len2, ulong exp)
+                                     const fmpz * vec2, slong len2, ulong exp)
 
     Sets \code{(vec1, len2)} to the remainder of \code{(vec2, len2)} 
     divided by \code{2^exp}, rounding down the quotient towards minus 
     infinity whenever the division is not exact.
 
 void _fmpz_vec_scalar_tdiv_q_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, slong len2, const fmpz_t c)
+                                const fmpz * vec2, slong len2, const fmpz_t c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_tdiv_q_si(fmpz * vec1, 
-                                          const fmpz * vec2, slong len2, slong c)
+                                        const fmpz * vec2, slong len2, slong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1, 
-                                         const fmpz * vec2, slong len2, ulong c)
+                                       const fmpz * vec2, slong len2, ulong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_tdiv_q_2exp(fmpz * vec1, 
-                                       const fmpz * vec2, slong len2, ulong exp)
+                                     const fmpz * vec2, slong len2, ulong exp)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by \code{2^exp}, 
     rounding down towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_addmul_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, slong len2, const fmpz_t c)
+                                const fmpz * vec2, slong len2, const fmpz_t c)
 
     Adds \code{(vec2, len2)} times $c$ to \code{(vec1, len2)}, where $c$ is a 
     \code{fmpz_t}.
 
 void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
-                                          const fmpz * vec2, slong len2, slong c)
+                                        const fmpz * vec2, slong len2, slong c)
 
     Adds \code{(vec2, len2)} times $c$ to \code{(vec1, len2)}, where $c$ is a 
     \code{slong}.
 
 void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
-                               const fmpz * vec2, slong len2, slong c, ulong exp)
+                             const fmpz * vec2, slong len2, slong c, ulong exp)
 
     Adds \code{(vec2, len2)} times \code{c * 2^exp} to \code{(vec1, len2)}, 
     where $c$ is a \code{slong}.
 
 void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, slong len2, const fmpz_t x)
+                                const fmpz * vec2, slong len2, const fmpz_t x)
 
     Subtracts \code{(vec2, len2)} times $c$ from \code{(vec1, len2)}, 
     where $c$ is a \code{fmpz_t}.
 
 void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
-                                          const fmpz * vec2, slong len2, slong c)
+                                        const fmpz * vec2, slong len2, slong c)
 
     Subtracts \code{(vec2, len2)} times $c$ from \code{(vec1, len2)}, 
     where $c$ is a \code{slong}.

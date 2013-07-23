@@ -219,7 +219,8 @@ void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
     Sets the rational polynomial \code{rop} to the same value 
     as the integer polynomial \code{op}.
 
-void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
+void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den,
+                                                     const mpq_t * a, slong n)
 
     Sets \code{(poly, den)} to the polynomial given by the 
     first $n \geq 1$ coefficients in the array $a$, from lowest 
@@ -436,7 +437,7 @@ void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 *******************************************************************************
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                        const fmpz * poly, const fmpz_t den, slong len, slong c)
+                      const fmpz * poly, const fmpz_t den, slong len, slong c)
 
     Sets \code{(rpoly, rden, len)} to the product of $c$ of 
     \code{(poly, den, len)}.
@@ -528,7 +529,7 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     Assumes that $c$ is not part of \code{(rpoly, rden)}.
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                                           const fmpz_t den, slong len, slong c)
+                                         const fmpz_t den, slong len, slong c)
 
     Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $c$, 
     in lowest terms.
@@ -608,18 +609,18 @@ void _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden,
     the inputs and outputs.
 
 void fmpq_poly_mullow(fmpq_poly_t res, 
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}, 
     truncated to length~$n$.
 
 void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, 
-                                                          const fmpq_poly_t op2)
+                                                        const fmpq_poly_t op2)
 
     Adds the product of \code{op1} and \code{op2} to \code{rop}.
 
 void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, 
-                                                          const fmpq_poly_t op2)
+                                                        const fmpq_poly_t op2)
 
     Subtracts the product of \code{op1} and \code{op2} from \code{rop}.
 
@@ -732,7 +733,8 @@ void _fmpq_poly_inv_series_newton(fmpz * rpoly, fmpz_t rden,
     Assumes that $n \geq 1$, that \code{poly} has length at least~$n$ 
     and non-zero constant term.  Does not support aliasing.
 
-void fmpq_poly_inv_series_newton(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
+void fmpq_poly_inv_series_newton(fmpq_poly_t res,
+                                              const fmpq_poly_t poly, slong n)
 
     Computes the first $n$ terms of the inverse power series 
     of \code{poly} using Newton iteration, assuming that \code{poly} 
@@ -1178,8 +1180,8 @@ fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
 *******************************************************************************
 
 void _fmpq_poly_compose(fmpz * res, fmpz_t den, 
-                             const fmpz * poly1, const fmpz_t den1, slong len1, 
-                             const fmpz * poly2, const fmpz_t den2, slong len2)
+                           const fmpz * poly1, const fmpz_t den1, slong len1, 
+                           const fmpz * poly2, const fmpz_t den2, slong len2)
 
     Sets \code{(res, den)} to the composition of \code{(poly1, den1, len1)} 
     and \code{(poly2, den2, len2)}, assuming \code{len1, len2 > 0}.
@@ -1193,7 +1195,7 @@ void fmpq_poly_compose(fmpq_poly_t res,
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}.
 
 void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly, 
-              const fmpz_t den, slong len, const fmpz_t anum, const fmpz_t aden)
+            const fmpz_t den, slong len, const fmpz_t anum, const fmpz_t aden)
 
     Sets \code{(res, denr, len)} to \code{(poly, den, len)} with the 
     indeterminate rescaled by \code{(anum, aden)}.
