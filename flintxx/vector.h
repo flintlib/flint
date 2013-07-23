@@ -31,9 +31,9 @@
 #include <string>
 #include <sstream>
 
-#include "flintxx/expression.h"
-#include "flintxx/evaluation_tools.h"
-#include "flintxx/mp.h"
+#include "expression.h"
+#include "evaluation_tools.h"
+#include "mp.h"
 
 namespace flint {
 template<class Underlying_traits, class Operation, class Data>

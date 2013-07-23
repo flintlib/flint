@@ -27,7 +27,7 @@
 #define CXX_TRAITS_H
 
 // only for true_/false_
-#include "flintxx/mp.h"
+#include "mp.h"
 
 namespace flint {
 namespace detail {

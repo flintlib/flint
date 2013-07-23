@@ -30,8 +30,8 @@
 #ifndef CXX_RULES_H
 #define CXX_RULES_H
 
-#include "flintxx/mp.h"
-#include "flintxx/traits.h"
+#include "mp.h"
+#include "traits.h"
 
 namespace flint {
 namespace rules {

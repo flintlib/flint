@@ -28,10 +28,10 @@
 #ifndef CXX_DEFAULT_RULES_H
 #define CXX_DEFAULT_RULES_H
 
-#include "flintxx/mp.h"
-#include "flintxx/expression.h" // because we want to reuse binary_op_helper etc
-#include "flintxx/expression_traits.h"
-#include "flintxx/evaluation_tools.h"
+#include "mp.h"
+#include "expression.h" // because we want to reuse binary_op_helper etc
+#include "expression_traits.h"
+#include "evaluation_tools.h"
 
 namespace flint {
 namespace rules {

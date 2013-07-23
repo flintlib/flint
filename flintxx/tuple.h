@@ -26,7 +26,7 @@
 #ifndef CXX_TUPLE_H
 #define CXX_TUPLE_H
 
-#include "flintxx/traits.h"
+#include "traits.h"
 
 namespace flint {
 ///////////////////////////

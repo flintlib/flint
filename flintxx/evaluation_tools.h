@@ -30,12 +30,12 @@
 
 #include <iostream>
 
-#include "flint.h" // FLINT_MAX and FLINT_MIN
+#include "../flint.h" // FLINT_MAX and FLINT_MIN
 
-#include "flintxx/expression_traits.h"
-#include "flintxx/mp.h"
-#include "flintxx/rules.h"
-#include "flintxx/tuple.h"
+#include "expression_traits.h"
+#include "mp.h"
+#include "rules.h"
+#include "tuple.h"
 
 namespace flint {
 namespace mp {

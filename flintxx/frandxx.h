@@ -26,7 +26,7 @@
 #ifndef CXX_FRANDXX_H
 #define CXX_FRANDXX_H
 
-#include "flint.h"
+#include "../flint.h"
 
 namespace flint {
 class frandxx

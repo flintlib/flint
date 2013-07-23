@@ -28,8 +28,8 @@
 #ifndef CXX_EXPRESSION_TRAITS_H
 #define CXX_EXPRESSION_TRAITS_H
 
-#include "flintxx/mp.h"
-#include "flintxx/traits.h"
+#include "mp.h"
+#include "traits.h"
 
 namespace flint {
 namespace operations {

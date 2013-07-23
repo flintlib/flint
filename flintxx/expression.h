@@ -32,12 +32,12 @@
 #include <iosfwd>
 #include <string>
 
-#include "flintxx/evaluation_tools.h"
-#include "flintxx/expression_traits.h"
-#include "flintxx/mp.h"
-#include "flintxx/rules.h"
-#include "flintxx/traits.h"
-#include "flintxx/tuple.h"
+#include "evaluation_tools.h"
+#include "expression_traits.h"
+#include "mp.h"
+#include "rules.h"
+#include "traits.h"
+#include "tuple.h"
 
 namespace flint {
 namespace detail {

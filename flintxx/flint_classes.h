@@ -27,11 +27,13 @@
 // Contrary to other parts of this library, they are tailored very
 // specifically towards FLINT.
 
-#include "flintxx/mp.h"
-#include "flintxx/expression_traits.h"
+#include "mp.h"
+#include "expression_traits.h"
 
 #ifndef CXX_FLINT_CLASSES_H
 #define CXX_FLINT_CLASSES_H
+
+// TODO explain
 
 namespace flint {
 namespace flint_classes {

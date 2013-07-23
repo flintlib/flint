@@ -149,6 +149,7 @@ else
 	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
 endif
 
+# TODO(Tom Bachmann): fmpzxx.h etc are not installed by this.
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
 	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
@@ -164,6 +165,7 @@ install: library
 	fi
 	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
 	cp qadic/CPimport.txt $(DESTDIR)$(FLINT_CPIMPORT_DIR)
+	cp flintxx/*.h $(DESTDIR)$(PREFIX)/include/flint/flintxx
 
 build:
 	mkdir -p build
