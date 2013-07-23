@@ -75,6 +75,10 @@ struct conversion
     }
 };
 
+// Rule for swapping
+template<class To, class From, class Enable = void>
+struct swap : UNIMPLEMENTED { };
+
 // If result_is_temporary is true, then the result coincides with the
 // first temporary (provided these have the same type)
 // Priorities 2, 1, 0 can be used to resolve conflicts.

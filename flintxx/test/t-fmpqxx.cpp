@@ -152,6 +152,7 @@ test_functions()
     // test immediate functions
     tassert(height_bits(a) == 3);
     tassert((inv(a)*a).is_one());
+    tassert(sgn(a) == -1 && sgn(-a) == 1 && sgn(fmpqxx(0, 0u)) == 0);
 
     // test member functions
     const fmpqxx zero(0, 0u), one(1, 1u);

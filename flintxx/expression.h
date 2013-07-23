@@ -497,6 +497,30 @@ operator%(const Expr1& e1, const Expr2& e2)
 
 template<class Expr1, class Expr2>
 inline typename detail::binary_op_helper<
+    Expr1, operations::binary_and, Expr2>::enable::type
+operator&(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::binary_and, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::binary_or, Expr2>::enable::type
+operator|(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::binary_or, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::binary_xor, Expr2>::enable::type
+operator^(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::binary_xor, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
     Expr1, operations::shift, Expr2>::enable::type
 operator<<(const Expr1& e1, const Expr2& e2)
 {
@@ -516,6 +540,13 @@ inline typename detail::unary_op_helper<operations::negate, Expr>::enable::type
 operator-(const Expr& e)
 {
     return detail::unary_op_helper<operations::negate, Expr>::make(e);
+}
+
+template<class Expr>
+inline typename detail::unary_op_helper<operations::complement, Expr>::enable::type
+operator~(const Expr& e)
+{
+    return detail::unary_op_helper<operations::complement, Expr>::make(e);
 }
 
 template<class Expr1, class Expr2>
@@ -556,6 +587,38 @@ operator%=(Expr1& e1, const Expr2& e2)
 {
     e1.set(e1 % e2);
     return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator|=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 | e2);
+    return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator&=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 & e2);
+    return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator^=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 ^ e2);
+    return e1;
+}
+
+// TODO move to std?
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<typename traits::is_implemented<
+    rules::swap<Expr1, Expr2> > >::type swap(Expr1& e1, Expr2& e2)
+{
+    rules::swap<Expr1, Expr2>::doit(e1, e2);
 }
 }
 

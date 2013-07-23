@@ -313,6 +313,17 @@ struct to_string<T, \
     } \
 };
 
+#define FLINTXX_DEFINE_SWAP(Base, eval) \
+template<class T, class U> \
+struct swap<T, U, typename mp::enable_if< mp::and_< \
+    FLINTXX_COND_T(Base)<T>, FLINTXX_COND_T(Base)<U> > >::type> \
+{ \
+    static void doit(T& e1, U& e2) \
+    { \
+        eval; \
+    } \
+};
+
 #define FLINTXX_DEFINE_CONVERSION_TMP(totype, Base, eval) \
 template<class T> \
 struct conversion<totype, T, \

@@ -37,7 +37,8 @@
 
 #include "fmpz.h"
 
-// TODO swap
+// TODO bit packing
+// TODO chinese remaindering
 
 namespace flint {
 
@@ -81,6 +82,14 @@ public:
         return res;
     }
 
+    template<class Fmpz_target, class Fmpz_expr1, class Fmpz_expr2>
+    static slong remove(Fmpz_target& rop,
+            const Fmpz_expr1& op, const Fmpz_expr2& f)
+    {
+        return fmpz_remove(rop._fmpz(), op.evaluate()._fmpz(),
+                f.evaluate()._fmpz());
+    }
+
     // TODO would these make more sense static?
     void set_ui_smod(mp_limb_t x, mp_limb_t m)
     {
@@ -94,6 +103,9 @@ public:
     {
         fmpz_neg_uiui(this->_fmpz(), hi, lo);
     }
+    // these only make sense with fmpzxx/fmpzxx_ref
+    void clrbit(ulong i) {fmpz_clrbit(_fmpz(), i);}
+    void combit(ulong i) {fmpz_combit(_fmpz(), i);}
 
     // These make sense with all expressions, but cause evaluation
     double get_d_2exp(long& exp) const
@@ -123,6 +135,18 @@ public:
     bool is_square() const
     {
         return fmpz_is_square(this->evaluate()._fmpz());
+    }
+    int popcnt() const
+    {
+        return fmpz_popcnt(this->evaluate()._fmpz());
+    }
+    bool is_probabprime() const
+    {
+        return fmpz_is_probabprime(this->evaluate()._fmpz());
+    }
+    bool is_prime_pseudosquare() const
+    {
+        return fmpz_is_prime_pseudosquare(this->evaluate()._fmpz());
     }
 };
 
@@ -253,6 +277,8 @@ struct cmp<fmpzxx, T,
 
 FLINTXX_DEFINE_TO_STR(fmpzxx, fmpz_get_str(0,  base, from._fmpz()))
 
+FLINTXX_DEFINE_SWAP(fmpzxx, fmpz_swap(e1._fmpz(), e2._fmpz()))
+
 FLINT_DEFINE_GET_COND(conversion, slong, FMPZXX_COND_S,
         fmpz_get_si(from._fmpz()))
 FLINT_DEFINE_GET_COND(conversion, ulong, FMPZXX_COND_S,
@@ -304,8 +330,20 @@ FLINT_DEFINE_BINARY_EXPR_COND2(modulo, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
         fmpz_mod_ui(to._fmpz(), e1._fmpz(), e2))
 
+FLINT_DEFINE_BINARY_EXPR_COND2(binary_and, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_and(to._fmpz(), e1._fmpz(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(binary_or, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_or(to._fmpz(), e1._fmpz(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(binary_xor, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_xor(to._fmpz(), e1._fmpz(), e2._fmpz()))
+
 FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpzxx, FMPZXX_COND_S,
         fmpz_neg(to._fmpz(), from._fmpz()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(complement, fmpzxx, FMPZXX_COND_S,
+        fmpz_complement(to._fmpz(), from._fmpz()))
 
 namespace rdetail {
 template<class Fmpz1, class Fmpz2, class T>
@@ -378,6 +416,13 @@ inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, double>::type
 dlog(const Fmpz& x)
 {
     return fmpz_dlog(x.evaluate()._fmpz());
+}
+
+template<class Fmpz1, class Fmpz2>
+inline typename mp::enable_all_fmpzxx<int, Fmpz1, Fmpz2>::type
+jacobi(const Fmpz1& a, const Fmpz2& p)
+{
+    return fmpz_jacobi(a.evaluate()._fmpz(), p.evaluate()._fmpz());
 }
 
 // TODO These cannot yet be made lazy since we have no code for ternary ops...
@@ -507,6 +552,8 @@ FLINT_DEFINE_BINOP(rfac)
 FLINT_DEFINE_BINOP(bin)
 FLINT_DEFINE_BINOP(gcd)
 FLINT_DEFINE_BINOP(lcm)
+FLINT_DEFINE_BINOP(invmod)
+FLINT_DEFINE_BINOP(negmod)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND2(rfac_op, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
@@ -560,6 +607,13 @@ FLINT_DEFINE_BINARY_EXPR_COND2(tdiv_q_2exp_op, fmpzxx,
 FLINT_DEFINE_BINARY_EXPR_COND2(fdiv_r_2exp_op, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
         fmpz_fdiv_r_2exp(to._fmpz(), e1._fmpz(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(invmod_op, fmpzxx,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_invmod(to._fmpz(), e1._fmpz(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(negmod_op, fmpzxx,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_negmod(to._fmpz(), e1._fmpz(), e2._fmpz()))
 
 // standard math functions (c/f stdmath.h)
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpzxx,

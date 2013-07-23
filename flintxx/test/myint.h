@@ -243,6 +243,20 @@ struct conversion<int, myint>
 };
 
 template<>
+struct swap<myint, myint>
+{
+    static void doit(myint& e1, myint& e2)
+    {
+        int tmp;
+        tmp = e1._data().payload;
+        e1._data().payload = e2._data().payload;
+        e2._data().payload = tmp;
+        e1._data().extra = 1234;
+        e2._data().extra = 1234;
+    }
+};
+
+template<>
 struct commutative_binary_expression<myint, operations::plus, myint>
 {
     typedef myint return_t;

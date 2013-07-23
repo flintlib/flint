@@ -39,6 +39,7 @@ namespace operations {
 // unary operations
 struct immediate { };
 struct negate { };
+struct complement { };
 
 // binary operations
 struct plus { };
@@ -47,6 +48,9 @@ struct times { };
 struct divided_by { };
 struct modulo { };
 struct shift { }; // left
+struct binary_and { };
+struct binary_or { };
+struct binary_xor { };
 } // operations
 
 namespace traits {

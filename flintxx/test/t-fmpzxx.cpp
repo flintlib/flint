@@ -180,8 +180,15 @@ test_arithmetic()
     TAA(/=, 3);
     TAA(%=, 1);
 
+    // shifting
     tassert((fmpzxx(1) << 10) == 1024);
     tassert((fmpzxx(1024) >> 9) == 2);
+
+    // binary logic
+    tassert((fmpzxx(1) | fmpzxx(2)) == 3);
+    tassert((fmpzxx(3) & fmpzxx(5)) == 1);
+    tassert((fmpzxx(17) ^ fmpzxx(23)) == (17ul ^ 23ul));
+    tassert(~fmpzxx(17) == ~17l);
 }
 
 void
@@ -203,6 +210,9 @@ test_functions()
     tassert(abs(a) == a);
     tassert(gcd(a, b) == 2);
     tassert(lcm(a, b) == 16);
+    fmpzxx p(31);
+    tassert((invmod(b % p, p) * b) % p == 1);
+    tassert((negmod(b % p, p) + b) % p == 0);
 
     fmpzxx mb(-b);
     fmpzxx three(3);
@@ -266,6 +276,19 @@ test_functions()
     tassert(mone.is_pm1());
     tassert(two.is_even() && !two.is_odd());
     tassert(one.is_square() && !two.is_square());
+    tassert(jacobi(b, p) == 1);
+    tassert(p.is_probabprime());
+    tassert(p.is_prime_pseudosquare());
+
+    fmpzxx rop;
+    tassert(fmpzxx::remove(rop, b*3, a) == 4 && rop == 3);
+
+    a = 17;
+    a.clrbit(0);
+    tassert(a == 16);
+    a.combit(1);
+    tassert(a == 18);
+    tassert(a.popcnt() == 2);
 }
 
 template<class T>
@@ -452,6 +475,12 @@ test_references()
     fmpzxx_srcref acr2 = fmpzxx_srcref::make(acr._fmpz());
     a = 7;
     tassert(ar2 == 7 && acr2 == 7);
+
+    // test swapping
+    a = 2;
+    b = 3;
+    swap(b, ar);
+    tassert(a == 3 && b == 2);
 }
 
 void

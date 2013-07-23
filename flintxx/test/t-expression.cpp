@@ -93,6 +93,14 @@ test_assignment()
 }
 
 void
+test_swap()
+{
+    myint a(2), b(3);
+    swap(a, b);
+    tassert(a == 3 && b == 2 && a._data().extra == 1234);
+}
+
+void
 test_traits()
 {
     typedef myint immediate_expression;
@@ -334,6 +342,7 @@ main()
     test_destruction();
     test_printing();
     test_assignment();
+    test_swap();
     test_equals();
     test_arithmetic();
     test_conversion();

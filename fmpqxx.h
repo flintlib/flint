@@ -257,6 +257,14 @@ get_cfrac(Vec& v, Fmpq1& rem, const Fmpq2& x)
 }
 // TODO also set_cfrac? c/f fmpqxx::set_cfrac ...
 
+// TODO maybe as a member function?
+template<class Fmpq>
+inline typename mp::enable_if<traits::is_fmpqxx<Fmpq>, int>::type
+sgn(const Fmpq& f)
+{
+    return fmpq_sgn(f.evaluate()._fmpq());
+}
+
 namespace rules {
 FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpqxx, FMPQXX_COND_S,
         fmpq_abs(to._fmpq(), from._fmpq()))
