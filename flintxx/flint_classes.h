@@ -394,6 +394,15 @@ name() const \
     return funcname(*this); \
 }
 
+#define FLINTXX_DEFINE_MEMBER_BINOP(name, funcname) \
+template<class T> \
+typename detail::binary_op_helper<typename base_t::derived_t, \
+    operations::funcname##_op, T>::enable::type \
+name(const T& t) const \
+{ \
+    return funcname(*this, t); \
+}
+
 
 #define FLINTXX_UNADORNED_MAKETYPES(Base, left, op, right) \
     Base##_expression< op, tuple< left, tuple< right, empty_tuple> > >

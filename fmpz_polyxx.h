@@ -43,6 +43,21 @@
 // TODO non-lazy functions
 
 namespace flint {
+namespace rules {
+// implementation of compeval
+// TODO do at level of "struct evaluation" instead?
+template<class T, class U>
+struct binary_expression<T,
+    typename mp::enable_if<mp::or_<
+        traits::is_implemented<binary_expression<T, operations::compose_op, U> >,
+        traits::is_implemented<binary_expression<T, operations::evaluate_op, U> >
+      >, operations::compeval_op>::type, U>
+    : mp::if_<
+    traits::is_implemented<binary_expression<T, operations::compose_op, U> >,
+    binary_expression<T, operations::compose_op, U>,
+    binary_expression<T, operations::evaluate_op, U> >::type { };
+} // rules
+
 // function "declarations"
 FLINT_DEFINE_BINOP(mul_classical)
 FLINT_DEFINE_BINOP(mulmid_classical)
@@ -63,6 +78,16 @@ FLINT_DEFINE_BINOP(pow_binexp)
 FLINT_DEFINE_BINOP(gcd_subresultant)
 FLINT_DEFINE_BINOP(gcd_heuristic)
 FLINT_DEFINE_BINOP(gcd_modular)
+FLINT_DEFINE_BINOP(div_basecase)
+FLINT_DEFINE_BINOP(div_divconquer)
+FLINT_DEFINE_BINOP(rem_basecase)
+FLINT_DEFINE_BINOP(div_root)
+FLINT_DEFINE_BINOP(inv_series_newton)
+FLINT_DEFINE_BINOP(pseudo_rem_cohen)
+FLINT_DEFINE_BINOP(evaluate_divconquer)
+FLINT_DEFINE_BINOP(evaluate_horner)
+FLINT_DEFINE_BINOP(compose_divconquer)
+FLINT_DEFINE_BINOP(compose_horner)
 
 namespace detail {
 template<class Poly>
@@ -84,6 +109,8 @@ public:
     typedef detail::fmpz_poly_traits<fmpz_polyxx_expression> poly_traits_t;
     typedef typename poly_traits_t::coeff_ref_t coeff_ref_t;
     typedef typename poly_traits_t::coeff_srcref_t coeff_srcref_t;
+
+    typedef void IS_FMPZ_POLYXX; // internal
 
     FLINTXX_DEFINE_BASICS(fmpz_polyxx_expression)
     FLINTXX_DEFINE_CTORS(fmpz_polyxx_expression)
@@ -178,6 +205,7 @@ public:
         return res;
     }
 
+    FLINTXX_DEFINE_MEMBER_BINOP(operator(), compeval)
     // TODO some lazy members?
 };
 
@@ -427,6 +455,56 @@ FLINT_DEFINE_UNARY_EXPR_COND(content_op, fmpzxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_content(to._fmpz(), from._poly()))
 FLINT_DEFINE_UNARY_EXPR_COND(primitive_part_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_primitive_part(to._poly(), from._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(div_basecase_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_div_basecase(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(div_divconquer_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_div_divconquer(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_div(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(rem_basecase_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_rem_basecase(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(modulo, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_rem(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(div_root_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_div_root(to._poly(), e1._poly(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_newton_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpz_poly_inv_series_newton(to._poly(), e1._poly(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpz_poly_inv_series(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(pseudo_rem_cohen_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_pseudo_rem_cohen(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(derivative_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_derivative(to._poly(), from._poly()))
+
+FMPZ_POLYXX_DEFINE_MUL(compose)
+FMPZ_POLYXX_DEFINE_MUL(compose_horner)
+FMPZ_POLYXX_DEFINE_MUL(compose_divconquer)
+
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_op, fmpzxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_evaluate_fmpz(to._fmpz(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_divconquer_op, fmpzxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_evaluate_divconquer_fmpz(to._fmpz(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_horner_op, fmpzxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_evaluate_horner_fmpz(to._fmpz(), e1._poly(), e2._fmpz()))
 } // rules
 
 // TODO functions which cannot be lazy b/c only two arguments allowd
@@ -474,6 +552,78 @@ name(Poly1& r, Poly2& s, const Poly3& f, const Poly4& g) \
 }
 FMPZ_POLYXX_DEFINE_XGCD(xgcd)
 FMPZ_POLYXX_DEFINE_XGCD(xgcd_modular)
+
+#define FMPZ_POLYXX_DEFINE_DIVREM(name) \
+template<class Poly1, class Poly2, class Poly3, class Poly4> \
+inline typename mp::enable_if<mp::and_< \
+    FMPZ_POLYXX_COND_T<Poly1>, FMPZ_POLYXX_COND_T<Poly2>, \
+    traits::is_fmpz_polyxx<Poly3>, traits::is_fmpz_polyxx<Poly4> > >::type \
+name(Poly1& Q, Poly2& R, const Poly3& A, const Poly4& B) \
+{ \
+    fmpz_poly_##name(Q._poly(), R._poly(), \
+            A.evaluate()._poly(), B.evaluate()._poly()); \
+}
+FMPZ_POLYXX_DEFINE_DIVREM(divrem_basecase)
+FMPZ_POLYXX_DEFINE_DIVREM(divrem_divconquer)
+FMPZ_POLYXX_DEFINE_DIVREM(divrem)
+
+template<class Poly1, class Poly2, class Poly3>
+inline typename mp::enable_if<mp::and_<
+    FMPZ_POLYXX_COND_T<Poly1>,
+    traits::is_fmpz_polyxx<Poly2>, traits::is_fmpz_polyxx<Poly3> >, bool>::type
+poly_divides(Poly1& Q, const Poly2& A, const Poly3& B)
+{
+    return fmpz_poly_divides(Q._poly(), A.evaluate()._poly(), B.evaluate()._poly());
+}
+
+template<class Poly1, class Poly2>
+inline typename mp::enable_all_fmpz_polyxx<fmpz_polyxx, Poly1, Poly2>::type
+div_series(const Poly1& A, const Poly2& B, slong n)
+{
+    fmpz_polyxx res;
+    fmpz_poly_div_series(res._poly(), A.evaluate()._poly(),
+            B.evaluate()._poly(), n);
+    return res;
+}
+
+// TODO these cannot officially be lazy b/c two return values
+#define FMPZ_POLYXX_DEFINE_PSEUDO_DIVREM(name) \
+template<class Poly1, class Poly2, class Poly3, class Poly4> \
+inline typename mp::enable_if<mp::and_< \
+    FMPZ_POLYXX_COND_T<Poly1>, FMPZ_POLYXX_COND_T<Poly2>, \
+    traits::is_fmpz_polyxx<Poly3>, traits::is_fmpz_polyxx<Poly4> > >::type \
+name(Poly1& Q, Poly2& R, ulong& d, const Poly3& A, const Poly4& B) \
+{ \
+    fmpz_poly_##name(Q._poly(), R._poly(), &d, \
+            A.evaluate()._poly(), B.evaluate()._poly()); \
+}
+FMPZ_POLYXX_DEFINE_PSEUDO_DIVREM(pseudo_divrem_basecase)
+FMPZ_POLYXX_DEFINE_PSEUDO_DIVREM(pseudo_divrem_divconquer)
+FMPZ_POLYXX_DEFINE_PSEUDO_DIVREM(pseudo_divrem)
+
+FMPZ_POLYXX_DEFINE_DIVREM(pseudo_divrem_cohen)
+
+#define FMPZ_POLYXX_DEFINE_PSEUDO_DIV(name) \
+template<class Poly3, class Poly4> \
+inline typename mp::enable_if<mp::and_< \
+    traits::is_fmpz_polyxx<Poly3>, traits::is_fmpz_polyxx<Poly4> >, \
+  fmpz_polyxx>::type \
+name(ulong& d, const Poly3& A, const Poly4& B) \
+{ \
+    fmpz_polyxx res; \
+    fmpz_poly_##name(res._poly(), &d, \
+            A.evaluate()._poly(), B.evaluate()._poly()); \
+    return res; \
+}
+FMPZ_POLYXX_DEFINE_PSEUDO_DIV(pseudo_div)
+FMPZ_POLYXX_DEFINE_PSEUDO_DIV(pseudo_rem)
+
+template<class Poly>
+inline typename mp::enable_all_fmpz_polyxx<mp_limb_t, Poly>::type
+evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)
+{
+    return fmpz_poly_evaluate_mod(p.evaluate()._poly(), x, n);
+}
 } // flint
 
 #endif
