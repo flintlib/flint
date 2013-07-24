@@ -205,7 +205,8 @@ int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
+void
+fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
 
     Sets the coefficient of $X^n$ in the polynomial to $x$, 
     assuming $n \geq 0$.
@@ -215,7 +216,8 @@ void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
     Sets the coefficient of $X^n$ in the polynomial to $x$,
     assuming $n \geq 0$.
 
-void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
+void
+fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
 
     Sets $x$ to the coefficient of $X^n$ in the polynomial, 
     assumng $n \geq 0$.
@@ -845,8 +847,8 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
-                           const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
-                           const fmpz_t p)
+                         const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                         const fmpz_t p)
 
     Computes \code{(G, lenA)}, \code{(S, lenB-1)} such that 
     $G \cong S A \pmod{B}$, returning the actual length of $G$.
@@ -960,9 +962,8 @@ void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
 
-void _fmpz_mod_poly_compose_divconquer(fmpz *res, const fmpz *poly1, slong len1,
-                                                  const fmpz *poly2, slong len2,
-                                                  const fmpz_t p)
+void _fmpz_mod_poly_compose_divconquer(fmpz *res,
+	const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
 
     Sets \code{res} to the composition of \code{(poly1, len1)} and 
     \code{(poly2, len2)} using a divide and conquer algorithm which 
@@ -1016,9 +1017,9 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
 *******************************************************************************
 
-void
-_fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
-				       const fmpz * h, slong lenh, const fmpz_t p);
+void _fmpz_mod_poly_compose_mod(fmpz * res,
+	                           const fmpz * f, slong lenf, const fmpz * g,
+				   const fmpz * h, slong lenh, const fmpz_t p);
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1032,9 +1033,9 @@ fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero.
 
-void
-_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
-					      const fmpz * h, slong lenh, const fmpz_t p);
+void _fmpz_mod_poly_compose_mod_horner(fmpz * res,
+	                                  const fmpz * f, slong lenf, const fmpz * g,
+					  const fmpz * h, slong lenh, const fmpz_t p);
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1062,8 +1063,8 @@ _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * f, slong len1,
 
     The algorithm used is the Brent-Kung matrix algorithm.
 
-void
-fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
+void fmpz_mod_poly_compose_mod_brent_kung(
+	                       fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
 			       const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
@@ -1126,7 +1127,7 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
     and that the leading coefficient is a unit.
 
 void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
-                          slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
+                        slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
 
     This is the main recursive function used by the 
     function \code{fmpz_mod_poly_radix()}.

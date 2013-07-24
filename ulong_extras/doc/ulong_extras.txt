@@ -498,7 +498,8 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
+slong
+n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
     are stored in an array which is created and whose address is stored in 

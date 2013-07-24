@@ -89,7 +89,8 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     large powers. Because of its high overhead, it should not be used as
     the first stage of trial division.
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop)
+int
+flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop)
 
     Searches for a factor of \code{(x, xsize)} among the primes in positions 
     \code{start, ..., stop-1} of \code{flint_primes}. Returns $i$ if 
@@ -226,7 +227,7 @@ void flint_mpn_rrandom(mp_limb_t *rp,
 
 void flint_mpn_urandomb(mp_limb_t *rp,
      			gmp_randstate_t state, mp_bitcnt_t n)
-			
+
     Generates a uniform random number \code{n} bits and stores 
     it on \code{rp}.
 

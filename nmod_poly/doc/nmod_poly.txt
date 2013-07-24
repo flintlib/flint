@@ -153,7 +153,8 @@ void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
 
     Generates a random polynomial with up to the given length.
 
-void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+void
+nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 
     Generates a random irreducible polynomial with up to the given length.
 
@@ -528,8 +529,8 @@ void nmod_poly_mulmod(nmod_poly_t res,
     \code{poly2} upon polynomial division by \code{f}.
 
 void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, long len1, 
-                              mp_srcptr poly2, long len2, mp_srcptr f,
-                              long lenf, mp_srcptr finv, long lenfinv, nmod_t mod)
+                          mp_srcptr poly2, long len2, mp_srcptr f,
+                          long lenf, mp_srcptr finv, long lenfinv, nmod_t mod)
 
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}.
@@ -857,7 +858,8 @@ void nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     coefficient of \code{Q} must be invertible modulo the modulus of 
     \code{Q}. This function can be viewed as inverting a power series.
 
-void _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
+void
+_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose constant coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
@@ -865,7 +867,8 @@ void _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     This function can be viewed as inverting a power series via Newton 
     iteration.
 
-void nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
+void
+nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
     modulo $x^n$. The constant coefficient of \code{Q} must be invertible 
@@ -2278,7 +2281,8 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
-    “baby step/giant step” strategy for the distinct-degree factorization step.
+    “baby step/giant step” strategy for the distinct-degree factorization
+    step.
 
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
                                           const nmod_poly_t f)

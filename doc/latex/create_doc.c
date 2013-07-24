@@ -109,6 +109,7 @@ struct fn_t {
     char mods[DOCS_WIDTH + 1];
     char name[DOCS_WIDTH + 1];
     char args[3 * DOCS_WIDTH + 1];
+    char rmods[DOCS_WIDTH + 1];
 };
 
 struct fn_t fnc;          /* Function data                      */
@@ -243,9 +244,9 @@ static int open_function()
     fprintf(out, "\\vspace*{0.5em}\n");
     fprintf(out, "\\begin{lstlisting}\n");
     if (fnc.mods[0] != '\0')
-        fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
+        fprintf(out, "%s %s(%s)%s\n", fnc.mods, fnc.name, fnc.args, fnc.rmods);
     else
-        fprintf(out, "%s(%s)\n", fnc.name, fnc.args);
+        fprintf(out, "%s(%s)%s\n", fnc.name, fnc.args, fnc.rmods);
     fprintf(out, "\\end{lstlisting}\n");
     fprintf(out, "\\vspace*{-0.5em}\n");
 
@@ -440,6 +441,11 @@ static void processfile(void)
             strncpy(fnc.args, buf + j + 1, k - (j + 1));
             fnc.args[k - (j + 1)] = '\0';
         }
+        else
+        {
+            /* no arguments */
+            fnc.args[0] = '\0';
+        }
 
         if (k == n)
             NEXTSTATE(7);
@@ -449,6 +455,17 @@ static void processfile(void)
 
     STATE(5z)
     {
+        for (k = 0; k < n && buf[k] != ')'; k++) ;
+        k += 1; /* skip ')' */
+        if (k < n)
+        {
+            strncpy(fnc.rmods, buf + k, n - k);
+            fnc.rmods[n - k] = '\0';
+        }
+        else
+        {
+            fnc.rmods[0] = '\0';
+        }
         open_function();
         NEXTSTATE(8);
     }
@@ -564,6 +581,8 @@ static void processfile(void)
         printf("Parse exception:\n");
         printf("Encountered malformed input on line %d \n", line);
         printf("in file %s.\n\n", name);
+
+        exit(1);
 
         NEXTSTATE(end);
     }
