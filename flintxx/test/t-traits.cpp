@@ -59,6 +59,11 @@ test_integrality()
     tassert(is_integer<signed long>::val == true);
     tassert(is_integer<newtype>::val == false);
 
+    tassert(is_string<int>::val == false);
+    tassert(is_string<const char*>::val == true);
+    tassert(is_string<char*>::val == true);
+    tassert(is_string<char[5]>::val == true);
+
     tassert(fits_into_slong<unsigned char>::val == true);
     tassert(fits_into_slong<unsigned short>::val == true);
     tassert(fits_into_slong<unsigned long>::val == false);

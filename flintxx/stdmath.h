@@ -37,6 +37,30 @@ FLINT_DEFINE_UNOP(exp)
 FLINT_DEFINE_UNOP(log)
 FLINT_DEFINE_UNOP(sqrt)
 FLINT_DEFINE_UNOP(inv)
+
+FLINT_DEFINE_UNOP(sqr)
+
+FLINT_DEFINE_UNOP(height)
+
+FLINT_DEFINE_BINOP(mul_2exp)
+FLINT_DEFINE_BINOP(fdiv_2exp)
+FLINT_DEFINE_BINOP(tdiv)
+FLINT_DEFINE_BINOP(tdiv_2exp)
+FLINT_DEFINE_BINOP(divexact)
+
+FLINT_DEFINE_BINOP(smod) // "symmetric" %
+
+// poly functions
+FLINT_DEFINE_BINOP(reverse)
+FLINT_DEFINE_BINOP(resultant)
+FLINT_DEFINE_BINOP(poly_bit_pack)
+FLINT_DEFINE_BINOP(poly_bit_unpack)
+FLINT_DEFINE_BINOP(poly_bit_unpack_unsigned)
+FLINT_DEFINE_BINOP(poly_shift_left)
+FLINT_DEFINE_BINOP(poly_shift_right)
+FLINT_DEFINE_UNOP(poly_2norm)
+FLINT_DEFINE_UNOP(content)
+FLINT_DEFINE_UNOP(primitive_part)
 } // flint
 
 namespace std {

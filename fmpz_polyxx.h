@@ -26,16 +26,44 @@
 #ifndef FMPZ_POLYXX_H
 #define FMPZ_POLYXX_H
 
+#include <cstdlib>
+#include <string>
+
 #include "fmpz_poly.h"
 
 #include "fmpzxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
+#include "flintxx/flint_exception.h"
+#include "flintxx/frandxx.h"
+#include "flintxx/traits.h"
 
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
+// TODO non-lazy functions
 
 namespace flint {
+// function "declarations"
+FLINT_DEFINE_BINOP(mul_classical)
+FLINT_DEFINE_BINOP(mulmid_classical)
+FLINT_DEFINE_BINOP(mul_karatsuba)
+FLINT_DEFINE_BINOP(mul_KS)
+FLINT_DEFINE_BINOP(mul_SS)
+FLINT_DEFINE_UNOP(sqr_KS)
+FLINT_DEFINE_UNOP(sqr_karatsuba)
+FLINT_DEFINE_UNOP(sqr_classical)
+FLINT_DEFINE_BINOP(sqrlow_KS)
+FLINT_DEFINE_BINOP(sqrlow_karatsuba_n)
+FLINT_DEFINE_BINOP(sqrlow_classical)
+FLINT_DEFINE_BINOP(sqrlow)
+FLINT_DEFINE_BINOP(pow_multinomial)
+FLINT_DEFINE_BINOP(pow_binomial)
+FLINT_DEFINE_BINOP(pow_addchains)
+FLINT_DEFINE_BINOP(pow_binexp)
+FLINT_DEFINE_BINOP(gcd_subresultant)
+FLINT_DEFINE_BINOP(gcd_heuristic)
+FLINT_DEFINE_BINOP(gcd_modular)
+
 namespace detail {
 template<class Poly>
 struct fmpz_poly_traits
@@ -60,6 +88,29 @@ public:
     FLINTXX_DEFINE_BASICS(fmpz_polyxx_expression)
     FLINTXX_DEFINE_CTORS(fmpz_polyxx_expression)
     FLINTXX_DEFINE_C_REF(fmpz_polyxx_expression, fmpz_poly_struct, _poly)
+
+    // static methods which only make sense with fmpz_polyxx
+    static fmpz_polyxx_expression randtest(frandxx& state, slong len,
+            mp_bitcnt_t bits)
+    {
+        fmpz_polyxx_expression res;
+        fmpz_poly_randtest(res._poly(), state._data(), len, bits);
+        return res;
+    }
+    static fmpz_polyxx_expression randtest_unsigned(frandxx& state, slong len,
+            mp_bitcnt_t bits)
+    {
+        fmpz_polyxx_expression res;
+        fmpz_poly_randtest_unsigned(res._poly(), state._data(), len, bits);
+        return res;
+    }
+    static fmpz_polyxx_expression randtest_not_zero(frandxx& state, slong len,
+            mp_bitcnt_t bits)
+    {
+        fmpz_polyxx_expression res;
+        fmpz_poly_randtest_not_zero(res._poly(), state._data(), len, bits);
+        return res;
+    }
 
     // These only make sense with immediates
     void realloc(slong alloc) {fmpz_poly_realloc(_poly(), alloc);}
@@ -107,6 +158,8 @@ public:
         fmpz_poly_set_coeff_ui(_poly(), n, x);
     }
 
+    void truncate(slong n) {fmpz_poly_truncate(_poly(), n);}
+
     // These cause evaluation
     slong length() const {return fmpz_poly_length(this->evaluate()._poly());}
     slong degree() const {return fmpz_poly_degree(this->evaluate()._poly());}
@@ -114,6 +167,18 @@ public:
     bool is_zero() const {return fmpz_poly_is_zero(this->evaluate()._poly());}
     bool is_unit() const {return fmpz_poly_is_unit(this->evaluate()._poly());}
     // TODO get_coeff with copies?
+    ulong max_limbs() const {return fmpz_poly_max_limbs(this->evaluate()._poly());}
+    slong max_bits() const {return fmpz_poly_max_bits(this->evaluate()._poly());}
+
+    std::string pretty(const char* x) const
+    {
+        char* str = fmpz_poly_get_str_pretty(this->evaluate()._poly(), x);
+        std::string res(str);
+        std::free(str);
+        return res;
+    }
+
+    // TODO some lazy members?
 };
 
 namespace detail {
@@ -178,11 +243,237 @@ struct fmpz_poly_data
 };
 } // detail
 
+namespace traits {
+template<class T> struct is_fmpz_polyxx : mp::or_<
+     traits::is_T_expr<T, fmpz_polyxx>,
+     flint_classes::is_source<fmpz_polyxx, T> > { };
+} // traits
+namespace mp {
+template<class T1, class T2 = void, class T3 = void, class T4 = void>
+struct all_fmpz_polyxx : mp::and_<all_fmpz_polyxx<T1>, all_fmpz_polyxx<T2, T3, T4> > { };
+template<class T>
+struct all_fmpz_polyxx<T, void, void, void> : traits::is_fmpz_polyxx<T> { };
+
+template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
+struct enable_all_fmpz_polyxx
+    : mp::enable_if<all_fmpz_polyxx<T1, T2, T3, T4>, Out> { };
+} // mp
+
 namespace rules {
 #define FMPZ_POLYXX_COND_S FLINTXX_COND_S(fmpz_polyxx)
 #define FMPZ_POLYXX_COND_T FLINTXX_COND_T(fmpz_polyxx)
 FLINTXX_DEFINE_EQUALS(fmpz_polyxx, fmpz_poly_equal(e1._poly(), e2._poly()))
+
+FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLYXX_COND_T, FMPZ_POLYXX_COND_S,
+        fmpz_poly_set(to._poly(), from._poly()))
+FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLYXX_COND_T,
+        traits::is_signed_integer,
+        fmpz_poly_set_si(to._poly(), from))
+FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLYXX_COND_T,
+        traits::is_unsigned_integer,
+        fmpz_poly_set_ui(to._poly(), from))
+FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLYXX_COND_T, FMPZXX_COND_S,
+        fmpz_poly_set_fmpz(to._poly(), from._fmpz()))
+FLINTXX_DEFINE_ASSIGN_STR(fmpz_polyxx, execution_check(
+            !fmpz_poly_set_str(to._poly(), from), "assign string", "fmpz_polyxx"))
+
+FLINTXX_DEFINE_TO_STR(fmpz_polyxx, fmpz_poly_get_str(from._poly()))
+FLINTXX_DEFINE_SWAP(fmpz_polyxx, fmpz_poly_swap(e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(reverse_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpz_poly_reverse(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(plus, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_add(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_sub(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_neg(to._poly(), from._poly()))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_scalar_mul_fmpz(to._poly(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_signed_integer,
+        fmpz_poly_scalar_mul_si(to._poly(), e1._poly(), e2))
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer,
+        fmpz_poly_scalar_mul_ui(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(mul_2exp_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer,
+        fmpz_poly_scalar_mul_2exp(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(divided_by, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_scalar_fdiv_fmpz(to._poly(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer,
+        fmpz_poly_scalar_fdiv_ui(to._poly(), e1._poly(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_signed_integer,
+        fmpz_poly_scalar_fdiv_si(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(fdiv_2exp_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer,
+        fmpz_poly_scalar_fdiv_2exp(to._poly(), e1._poly(), e2))
+
+#define FMPZ_POLYXX_DEFINE_SCALAR_DIVFUNCS(name) \
+FLINT_DEFINE_CBINARY_EXPR_COND2(name##_op, fmpz_polyxx, \
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S, \
+        fmpz_poly_scalar_##name##_fmpz(to._poly(), e1._poly(), e2._fmpz())) \
+FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, fmpz_polyxx, \
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer, \
+        fmpz_poly_scalar_##name##_ui(to._poly(), e1._poly(), e2)) \
+FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, fmpz_polyxx, \
+        FMPZ_POLYXX_COND_S, traits::is_signed_integer, \
+        fmpz_poly_scalar_##name##_si(to._poly(), e1._poly(), e2))
+FMPZ_POLYXX_DEFINE_SCALAR_DIVFUNCS(tdiv)
+FMPZ_POLYXX_DEFINE_SCALAR_DIVFUNCS(divexact)
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(tdiv_2exp_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer,
+        fmpz_poly_scalar_tdiv_2exp(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(modulo, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_scalar_mod_fmpz(to._poly(), e1._poly(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(smod_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_scalar_smod_fmpz(to._poly(), e1._poly(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_pack_op, fmpzxx,
+        FMPZ_POLYXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        fmpz_poly_bit_pack(to._fmpz(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_unpack_op, fmpz_polyxx,
+        FMPZXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        fmpz_poly_bit_unpack(to._poly(), e1._fmpz(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_unpack_unsigned_op, fmpz_polyxx,
+        FMPZXX_COND_S, traits::fits_into_mp_bitcnt_t,
+        fmpz_poly_bit_unpack_unsigned(to._poly(), e1._fmpz(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(times, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_mul(to._poly(), e1._poly(), e2._poly()))
+
+#define FMPZ_POLYXX_DEFINE_MUL(name) \
+FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, fmpz_polyxx, \
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S, \
+        fmpz_poly_##name(to._poly(), e1._poly(), e2._poly()))
+FMPZ_POLYXX_DEFINE_MUL(mul_classical)
+FMPZ_POLYXX_DEFINE_MUL(mulmid_classical)
+FMPZ_POLYXX_DEFINE_MUL(mul_karatsuba)
+FMPZ_POLYXX_DEFINE_MUL(mul_SS)
+FMPZ_POLYXX_DEFINE_MUL(mul_KS)
+
+FLINT_DEFINE_UNARY_EXPR_COND(sqr_KS_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_sqr_KS(to._poly(), from._poly()))
+FLINT_DEFINE_UNARY_EXPR_COND(sqr_karatsuba_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_sqr_karatsuba(to._poly(), from._poly()))
+FLINT_DEFINE_UNARY_EXPR_COND(sqr_classical_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_sqr_classical(to._poly(), from._poly()))
+FLINT_DEFINE_UNARY_EXPR_COND(sqr_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_sqr(to._poly(), from._poly()))
+
+#define FMPZ_POLYXX_DEFINE_SQRLOW(name) \
+FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, fmpz_polyxx, \
+        FMPZ_POLYXX_COND_S, traits::fits_into_slong, \
+        fmpz_poly_##name(to._poly(), e1._poly(), e2))
+FMPZ_POLYXX_DEFINE_SQRLOW(sqrlow_KS)
+FMPZ_POLYXX_DEFINE_SQRLOW(sqrlow_karatsuba_n)
+FMPZ_POLYXX_DEFINE_SQRLOW(sqrlow_classical)
+FMPZ_POLYXX_DEFINE_SQRLOW(sqrlow)
+
+#define FMPZ_POLYXX_DEFINE_POW(name) \
+FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, fmpz_polyxx, \
+        FMPZ_POLYXX_COND_S, traits::is_unsigned_integer, \
+        fmpz_poly_##name(to._poly(), e1._poly(), e2))
+FMPZ_POLYXX_DEFINE_POW(pow_multinomial)
+FMPZ_POLYXX_DEFINE_POW(pow_binomial)
+FMPZ_POLYXX_DEFINE_POW(pow_addchains)
+FMPZ_POLYXX_DEFINE_POW(pow_binexp)
+FMPZ_POLYXX_DEFINE_POW(pow)
+
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_left_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpz_poly_shift_left(to._poly(), e1._poly(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_right_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpz_poly_shift_right(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_UNARY_EXPR_COND(height_op, fmpzxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_height(to._fmpz(), from._poly()))
+FLINT_DEFINE_UNARY_EXPR_COND(poly_2norm_op, fmpzxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_2norm(to._fmpz(), from._poly()))
+
+FMPZ_POLYXX_DEFINE_MUL(gcd)
+FMPZ_POLYXX_DEFINE_MUL(gcd_subresultant)
+FMPZ_POLYXX_DEFINE_MUL(gcd_heuristic)
+FMPZ_POLYXX_DEFINE_MUL(gcd_modular)
+FMPZ_POLYXX_DEFINE_MUL(lcm)
+
+FLINT_DEFINE_BINARY_EXPR_COND2(resultant_op, fmpzxx,
+        FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+        fmpz_poly_resultant(to._fmpz(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(content_op, fmpzxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_content(to._fmpz(), from._poly()))
+FLINT_DEFINE_UNARY_EXPR_COND(primitive_part_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_primitive_part(to._poly(), from._poly()))
 } // rules
+
+// TODO functions which cannot be lazy b/c only two arguments allowd
+#define FMPZ_POLYXX_DEFINE_MULFUNC(name) \
+template<class Poly1, class Poly2> \
+inline typename mp::enable_all_fmpz_polyxx<fmpz_polyxx, Poly1, Poly2>::type \
+name(const Poly1& p1, const Poly2& p2, slong n) \
+{ \
+    fmpz_polyxx res; \
+    fmpz_poly_##name(res._poly(), p1.evaluate()._poly(), \
+            p2.evaluate()._poly(), n); \
+    return res; \
+}
+
+FMPZ_POLYXX_DEFINE_MULFUNC(mullow_classical)
+FMPZ_POLYXX_DEFINE_MULFUNC(mulhigh_classical)
+FMPZ_POLYXX_DEFINE_MULFUNC(mullow_karatsuba_n)
+FMPZ_POLYXX_DEFINE_MULFUNC(mulhigh_karatsuba_n)
+FMPZ_POLYXX_DEFINE_MULFUNC(mullow_KS)
+FMPZ_POLYXX_DEFINE_MULFUNC(mullow_SS)
+FMPZ_POLYXX_DEFINE_MULFUNC(mullow)
+FMPZ_POLYXX_DEFINE_MULFUNC(mulhigh_n)
+
+template<class Poly>
+inline typename mp::enable_if<traits::is_fmpz_polyxx<Poly>, fmpz_polyxx>::type
+pow_trunc(const Poly& p, ulong e, slong n)
+{
+    fmpz_polyxx res;
+    fmpz_poly_pow_trunc(res._poly(), p.evaluate()._poly(), e, n);
+    return res;
+}
+
+#define FMPZ_POLYXX_DEFINE_XGCD(name) \
+template<class Poly1, class Poly2, class Poly3, class Poly4> \
+inline typename mp::enable_if<mp::and_<\
+    FMPZ_POLYXX_COND_T<Poly1>, FMPZ_POLYXX_COND_T<Poly2>, \
+    traits::is_fmpz_polyxx<Poly3>, traits::is_fmpz_polyxx<Poly4> >, \
+  fmpzxx>::type \
+name(Poly1& r, Poly2& s, const Poly3& f, const Poly4& g) \
+{ \
+    fmpzxx res; \
+    fmpz_poly_##name(res._fmpz(), r._poly(), s._poly(), \
+            f.evaluate()._poly(), g.evaluate()._poly()); \
+    return res; \
+}
+FMPZ_POLYXX_DEFINE_XGCD(xgcd)
+FMPZ_POLYXX_DEFINE_XGCD(xgcd_modular)
 } // flint
 
 #endif

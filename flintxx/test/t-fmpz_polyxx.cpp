@@ -65,19 +65,54 @@ test_manipulation()
 void
 test_assignment()
 {
-    // TODO
+    fmpz_polyxx p, q;
+    p = 1;
+    tassert(p.is_one());
+    q = 0ul;
+    tassert(q.is_zero());
+    tassert(p != q);
+    p = q;
+    tassert(p == q);
+    p = "4  0 0 0 1";
+    q.set_coeff(3, 1);
+    tassert(p == q);
+
+    assert_exception(p = "4  1 2");
+    assert_exception(p = "2 1 2");
 }
 
 void
 test_conversion()
 {
-    // TODO
+    fmpz_polyxx p;
+    p.set_coeff(3, 1);
+    tassert(p.to_string() == "4  0 0 0 1");
+    tassert(p.pretty("x") == "x^3");
 }
 
 void
 test_arithmetic()
 {
-    // TODO
+    fmpz_polyxx p, q;
+    p = 1;
+    q = "4  0 0 0 1";
+    tassert((p + q).to_string() == "4  1 0 0 1");
+    tassert((p - q).to_string() == "4  1 0 0 -1");
+    tassert((-p).to_string() == "1  -1");
+
+    fmpzxx two(2);
+    tassert(two * q == 2 * q && 2u * q == q * 2
+            && (two * q).to_string() == "4  0 0 0 2");
+    q *= 2;
+    tassert(q / two == q / 2u && q / 2 == q / two &&
+            (q / two).to_string() == "4  0 0 0 1");
+    // q == "4  0 0 0 2"
+
+    q.set_coeff(1, 17); // q == "4 0 17 0 2"
+    tassert((q % fmpzxx(5)).to_string() == "4  0 2 0 2");
+
+    p = "3  1 0 1";
+    tassert((p*q).to_string() == "6  0 17 0 19 0 2");
 }
 
 // Won't compile if the expression is not done using addmul
@@ -97,7 +132,111 @@ test_extras()
 void
 test_functions()
 {
-    // TODO
+    // test swap
+    fmpz_polyxx p, q;
+    p = 1; q = 0;
+    swap(p, q);
+    tassert(p.is_zero() && q.is_one());
+    // p = 0, q = 1
+
+    fmpz_polyxx f, g;
+    f = "4  2 0 0 1"; // f = x^3 + 2
+    g = "5  1 2 3 4 5";
+    fmpzxx two(2);
+
+    // test lazy functions
+    tassert(reverse(q, 4u).pretty("x") == "x^3");
+    tassert(mul_2exp(f, 3u) == f * 8);
+    tassert(f == fdiv_2exp(mul_2exp(f, 3u), 3u));
+    tassert(tdiv(-f, two) == tdiv(-f, 2) && tdiv(-f, 2) == tdiv(-f, 2u)
+            && tdiv(-f, two).to_string() == "4  -1 0 0 0");
+    tassert(f == divexact(2*f, two) && f == divexact(2*f, 2u)
+            && f == divexact(2*f, 2));
+    tassert(-f == tdiv_2exp(-8*f - q, 3u));
+    tassert(smod(5*f, fmpzxx(3)).to_string() == "4  1 0 0 -1");
+    tassert(f == poly_bit_unpack(poly_bit_pack(f, 10u), 10u));
+    tassert(f == poly_bit_unpack_unsigned(poly_bit_pack(f, 10u), 10u));
+
+    tassert(mul_classical(f, g) == f*g);
+    tassert(mul_karatsuba(f, g) == f*g);
+    tassert(mul_SS(f, g) == f*g);
+    tassert(mul_KS(f, g) == f*g);
+
+    fmpz_polyxx res; res = f*g; res.truncate(3);
+    tassert(mullow_classical(f, g, 3) == res);
+    tassert(mullow_karatsuba_n(f, g, 3) == res);
+    tassert(mullow_KS(f, g, 3) == res);
+    tassert(mullow_SS(f, g, 3) == res);
+    tassert(mullow(f, g, 3) == res);
+
+    res = f*g; res.zero_coeffs(0, 5);
+    tassert(mulhigh_classical(f, g, 5) == res);
+    tassert(mulhigh_karatsuba_n(f, g, 6) == res);
+    res = mulhigh_n(f, g, 5);
+    res.zero_coeffs(0, 5);
+    tassert(res == mulhigh_classical(f, g, 5));
+
+    tassert(mulmid_classical(g, f).to_string() == "2  9 12");
+
+    tassert(sqr(f) == f*f);
+    tassert(sqr_KS(f) == f*f);
+    tassert(sqr_karatsuba(f) == f*f);
+    tassert(sqr_classical(f) == f*f);
+
+    res = sqr(f);res.truncate(4);
+    tassert(sqrlow(f, 4) == res);
+    tassert(sqrlow_KS(f, 4) == res);
+    tassert(sqrlow_karatsuba_n(f, 4) == res);
+    tassert(sqrlow_classical(f, 4) == res);
+
+    tassert(pow(f, 3u) == f*f*f);
+    tassert(pow_multinomial(f, 3u) == f*f*f);
+    tassert(pow_binexp(f, 3u) == f*f*f);
+    tassert(pow_addchains(f, 3u) == f*f*f);
+    res = pow(f, 10u);
+    res.truncate(10);
+    tassert(pow_trunc(f, 10u, 10) == res);
+    fmpz_polyxx binomial;
+    binomial = "2  1 2";
+    tassert(pow_binomial(binomial, 3u) == binomial*binomial*binomial);
+
+    fmpz_polyxx x; x = "2  0 1";
+    tassert(poly_shift_left(f, 5) == f*pow(x, 5u));
+    tassert(poly_shift_right(poly_shift_left(f, 5), 5) == f);
+
+    tassert(height(g) == 5);
+    tassert(poly_2norm(g) == 7);
+
+    tassert(resultant(f, g) == 1797);
+    tassert(gcd(f, g).is_one());
+    tassert(gcd_subresultant(f, g).is_one());
+    tassert(gcd_heuristic(f, g).is_one());
+    tassert(gcd_modular(f, g).is_one());
+
+    fmpz_polyxx r, s;
+    res = 1797;
+    tassert(xgcd(r, s, f, g) == 1797);
+    tassert(r*f + s*g == res);
+    tassert(xgcd_modular(r, s, f, g) == 1797);
+    tassert(r*f + s*g == res);
+
+    tassert(lcm(f, g) == f*g);
+
+    tassert(content(2*g) == 2);
+    tassert(primitive_part(2*g) == g);
+
+    // test immediate functions
+    p.set_coeff(3, 1);
+    p.truncate(2);
+    tassert(p.is_zero());
+    tassert(f.max_limbs() == 1);
+    tassert(g.max_bits() == 3);
+
+    // test static functions
+    frandxx state;
+    tassert(fmpz_polyxx::randtest(state, 4, 10).length() == 4);
+    tassert(fmpz_polyxx::randtest_unsigned(state, 4, 10).get_coeff(0) >= 0);
+    tassert(fmpz_polyxx::randtest_not_zero(state, 4, 10).is_zero() == false);
 }
 
 int

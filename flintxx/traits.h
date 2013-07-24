@@ -82,6 +82,15 @@ struct fits_into_slong<T, typename mp::enable_if<traits::is_integer<T> >::type>
             >
         > { };
 
+template<class T> struct fits_into_mp_bitcnt_t : is_unsigned_integer<T> { };
+
+// Compute if T is like const char*
+template<class T> struct is_string : mp::false_ { };
+template<> struct is_string<char*> : mp::true_ { };
+template<> struct is_string<const char*> : mp::true_ { };
+template<int n> struct is_string<char[n]> : mp::true_ { };
+template<int n> struct is_string<const char[n]> : mp::true_ { };
+
 // Compute a type appropriate for forwarding T. This is just the appropriate
 // constant reference type (but avoids things like const (int&)&, which cause
 // syntax errors.

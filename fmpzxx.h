@@ -242,16 +242,6 @@ FLINT_DEFINE_DOIT_COND2(assignment,
         FMPZXX_COND_T, traits::is_signed_integer,
         fmpz_set_si(to._fmpz(), from))
 
-template<class T, int n>
-struct assignment<T, char[n],
-    typename mp::enable_if<FMPZXX_COND_S<T> >::type>
-{
-    static void doit(T& target, const char* source)
-    {
-        fmpz_set_str(target._fmpz(), const_cast<char*>(source), 10);
-    }
-};
-
 FLINTXX_DEFINE_CMP(fmpzxx, fmpz_cmp(e1._fmpz(), e2._fmpz()))
 
 template<class T, class U>
@@ -264,6 +254,8 @@ struct cmp<T, U,
         return fmpz_cmp_si(v._fmpz(), t);
     }
 };
+
+FLINTXX_DEFINE_ASSIGN_STR(fmpzxx, fmpz_set_str(to._fmpz(), from, 10))
 
 template<class T>
 struct cmp<fmpzxx, T,
@@ -545,7 +537,6 @@ FLINT_DEFINE_BINOP(fdiv_r)
 FLINT_DEFINE_BINOP(tdiv_q)
 FLINT_DEFINE_BINOP(fdiv_r_2exp)
 FLINT_DEFINE_BINOP(tdiv_q_2exp)
-FLINT_DEFINE_BINOP(divexact)
 FLINT_DEFINE_UNOP(fac)
 FLINT_DEFINE_UNOP(fib)
 FLINT_DEFINE_BINOP(rfac)

@@ -362,6 +362,18 @@ struct equals<T, U, typename mp::enable_if<mp::and_< \
     } \
 };
 
+#define FLINTXX_DEFINE_ASSIGN_STR(Base, eval) \
+template<class T, class U> \
+struct assignment<T, U, \
+    typename mp::enable_if<mp::and_< \
+        FLINTXX_COND_T(Base)<T>, traits::is_string<U> > >::type> \
+{ \
+    static void doit(T& to, const char* from) \
+    { \
+        eval; \
+    } \
+};
+
 #define FLINTXX_DEFINE_RANDFUNC(CBase, name) \
 static CBase##xx_expression name(frandxx& state, mp_bitcnt_t bits) \
 { \

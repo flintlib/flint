@@ -47,8 +47,6 @@ FLINT_DEFINE_UNOP(fmpqxx_next_signed_minimal)
 FLINT_DEFINE_UNOP(fmpqxx_next_calkin_wilf)
 FLINT_DEFINE_UNOP(fmpqxx_next_signed_calkin_wilf)
 
-FLINT_DEFINE_UNOP(height)
-
 template<class Operation, class Data>
 class fmpqxx_expression
     : public expression<derived_wrapper<fmpqxx_expression>, Operation, Data>
