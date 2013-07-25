@@ -183,6 +183,8 @@ test_extras()
     tassert(a == ar && ar == asr);
     ar = 3;
     tassert(a == b && asr == b);
+
+    tassert(ar + asr == a + a);
 }
 
 int

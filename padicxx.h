@@ -53,7 +53,7 @@ FLINT_DEFINE_UNOP(teichmuller)
 FLINT_DEFINE_BINOP(padic_val_fac)
 
 namespace detail {
-template<class T>
+template<class T, class Enable = void>
 struct padicxx_max_prec
 {
     // XXX is this a good idea?
@@ -249,18 +249,27 @@ struct padic_data
 };
 } // detail
 
+#define PADICXX_COND_S FLINTXX_COND_S(padicxx)
+#define PADICXX_COND_T FLINTXX_COND_T(padicxx)
+
+namespace detail {
+struct is_padicxx_predicate
+{
+    template<class T> struct type : PADICXX_COND_S<T> { };
+};
+}
 template<class Operation, class Data>
 inline const padicxx_ctx&
 padicxx_expression<Operation, Data>::estimate_ctx() const
 {
-    return tools::find_subexpr_T<padicxx>(*this).get_ctx();
+    return tools::find_subexpr<detail::is_padicxx_predicate>(*this).get_ctx();
 }
 
 namespace detail {
-template<>
-struct padicxx_max_prec<padicxx>
+template<class T>
+struct padicxx_max_prec<T, typename mp::enable_if<PADICXX_COND_S<T> >::type>
 {
-    static slong get(const padicxx& p) {return p._prec();}
+    static slong get(const T& p) {return p._prec();}
 };
 
 template<class Data>
@@ -283,7 +292,8 @@ struct padicxx_max_prec_h<empty_tuple>
 };
 
 template<class Op, class Data>
-struct padicxx_max_prec<padicxx_expression<Op, Data> >
+struct padicxx_max_prec<padicxx_expression<Op, Data>,
+    typename mp::disable_if<mp::equal_types<Op, operations::immediate> >::type>
 {
     static slong get(const padicxx_expression<Op, Data>& e)
     {
@@ -293,8 +303,6 @@ struct padicxx_max_prec<padicxx_expression<Op, Data> >
 } // detail
 
 namespace rules {
-#define PADICXX_COND_S FLINTXX_COND_S(padicxx)
-#define PADICXX_COND_T FLINTXX_COND_T(padicxx)
 
 FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, PADICXX_COND_S,
         padic_set(to._padic(), from._padic(), to._ctx()))
