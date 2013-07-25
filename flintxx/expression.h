@@ -661,7 +661,7 @@ name(const T1& t1) \
     return detail::unary_op_helper<operations::name##_op, T1>::make(t1); \
 }
 
-#define FLINT_UNOP_MAYBE_RETTYPE(name, T) \
+#define FLINT_UNOP_ENABLE_RETTYPE(name, T) \
     typename detail::unary_op_helper<operations::name##_op, T>::return_t
 
 // To be called in any namespace

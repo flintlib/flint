@@ -61,10 +61,15 @@ FLINT_DEFINE_BINOP(poly_shift_right)
 FLINT_DEFINE_UNOP(poly_2norm)
 FLINT_DEFINE_UNOP(content)
 FLINT_DEFINE_UNOP(primitive_part)
-FLINT_DEFINE_BINOP(inv_series)
 FLINT_DEFINE_UNOP(derivative)
 FLINT_DEFINE_BINOP(evaluate)
 FLINT_DEFINE_BINOP(compose)
+FLINT_DEFINE_BINOP(div_root)
+FLINT_DEFINE_BINOP(taylor_shift)
+FLINT_DEFINE_UNOP(poly_bound_roots)
+
+FLINT_DEFINE_BINOP(inv_series)
+FLINT_DEFINE_BINOP(revert_series)
 
 // either compose or evaluate. Currently implemented in fmpz_polyxx.h.
 FLINT_DEFINE_BINOP(compeval)

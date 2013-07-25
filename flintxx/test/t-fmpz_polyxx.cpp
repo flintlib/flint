@@ -134,7 +134,7 @@ bool is_ternary(const T&)
 void
 test_extras()
 {
-    // TODO
+    // TODO addmul
 }
 
 ulong pow(ulong base, ulong exp)
@@ -148,6 +148,8 @@ ulong pow(ulong base, ulong exp)
 void
 test_functions()
 {
+    // TODO reorganise this ...
+
     // test swap
     fmpz_polyxx p, q;
     p = 1; q = 0;
@@ -261,6 +263,37 @@ test_functions()
     tassert(evaluate_divconquer(xp1, fmpzxx(1)) == 2);
     tassert(evaluate_mod(xp1, 1, 10) == 2);
 
+    fmpz_vecxx xs(3), ys(3);
+    xs[0] = 0; xs[1] = 1; xs[2] = 2;
+    ys[0] = 1; ys[1] = 2; ys[2] = 3;
+    tassert(evaluate(xp1, xs) == ys);
+
+    tassert(f(xp1) == taylor_shift(f, fmpzxx(1)));
+    tassert(f(xp1) == taylor_shift_horner(f, fmpzxx(1)));
+    tassert(f(xp1) == taylor_shift_divconquer(f, fmpzxx(1)));
+
+    fmpz_polyxx inner;inner = "3  0 -1 5";
+    res = g(inner); res.truncate(10);
+    tassert(compose_series(g, inner, 10) == res);
+    tassert(compose_series_horner(g, inner, 10) == res);
+    tassert(compose_series_brent_kung(g, inner, 10) == res);
+
+    res = "2  0 1";
+    tassert(compose_series(inner, revert_series(inner, 10), 10) == res);
+    tassert(compose_series(inner, revert_series_lagrange(inner, 10), 10)
+            == res);
+    tassert(compose_series(inner, revert_series_lagrange_fast(inner, 10), 10)
+            == res);
+    tassert(compose_series(inner, revert_series_newton(inner, 10), 10) == res);
+
+    tassert(sqrt(f*f) == f);
+    tassert(sqrt_classical(f*f) == f);
+    assert_exception(sqrt(f*f + xp1).evaluate());
+    assert_exception(sqrt_classical(f*f + xp1).evaluate());
+
+    res = "5  32 0 0 0 1";
+    tassert(poly_bound_roots(res) >= 2);
+
     // test immediate functions
     p.set_coeff(3, 1);
     p.truncate(2);
@@ -305,11 +338,20 @@ test_functions()
     tassert(r*f + s == g*4);
     tassert(pseudo_rem_cohen(g, f).to_string() == "3  -28 -32 12");
 
+    f = "4  1 0 0 1";
+    slong r1, r2;
+    f.signature(r1, r2);
+    tassert(r1 == 1 && r2 == 1);
+
     // test static functions
     frandxx state;
     tassert(fmpz_polyxx::randtest(state, 4, 10).length() == 4);
     tassert(fmpz_polyxx::randtest_unsigned(state, 4, 10).get_coeff(0) >= 0);
     tassert(fmpz_polyxx::randtest_not_zero(state, 4, 10).is_zero() == false);
+    tassert(fmpz_polyxx::interpolate(xs, ys) == xp1);
+
+    xs[0] = 0;xs[1] = -1; xs[2] = -1;
+    tassert(fmpz_polyxx::product_roots(xs) == x*xp1*xp1);
 }
 
 int

@@ -32,6 +32,7 @@
 #include "fmpz_poly.h"
 
 #include "fmpzxx.h"
+#include "fmpz_vecxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
@@ -41,17 +42,22 @@
 
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
 // TODO non-lazy functions
+// TODO newton basis?
+// TODO power series class?
+// TODO hensel lifting
+// TODO input
+// TODO modular reduction
 
 namespace flint {
 namespace rules {
 // implementation of compeval
 // TODO do at level of "struct evaluation" instead?
 template<class T, class U>
-struct binary_expression<T,
+struct binary_expression<T, operations::compeval_op, U,
     typename mp::enable_if<mp::or_<
         traits::is_implemented<binary_expression<T, operations::compose_op, U> >,
         traits::is_implemented<binary_expression<T, operations::evaluate_op, U> >
-      >, operations::compeval_op>::type, U>
+      > >::type>
     : mp::if_<
     traits::is_implemented<binary_expression<T, operations::compose_op, U> >,
     binary_expression<T, operations::compose_op, U>,
@@ -81,13 +87,21 @@ FLINT_DEFINE_BINOP(gcd_modular)
 FLINT_DEFINE_BINOP(div_basecase)
 FLINT_DEFINE_BINOP(div_divconquer)
 FLINT_DEFINE_BINOP(rem_basecase)
-FLINT_DEFINE_BINOP(div_root)
 FLINT_DEFINE_BINOP(inv_series_newton)
 FLINT_DEFINE_BINOP(pseudo_rem_cohen)
 FLINT_DEFINE_BINOP(evaluate_divconquer)
 FLINT_DEFINE_BINOP(evaluate_horner)
 FLINT_DEFINE_BINOP(compose_divconquer)
 FLINT_DEFINE_BINOP(compose_horner)
+FLINT_DEFINE_BINOP(taylor_shift_horner)
+FLINT_DEFINE_BINOP(taylor_shift_divconquer)
+FLINT_DEFINE_BINOP(revert_series_lagrange)
+FLINT_DEFINE_BINOP(revert_series_lagrange_fast)
+FLINT_DEFINE_BINOP(revert_series_newton)
+FLINT_DEFINE_UNOP(sqrt_classical)
+
+FLINT_DEFINE_BINOP(fmpz_polyxx_interpolate)
+FLINT_DEFINE_UNOP(fmpz_polyxx_product_roots)
 
 namespace detail {
 template<class Poly>
@@ -109,8 +123,6 @@ public:
     typedef detail::fmpz_poly_traits<fmpz_polyxx_expression> poly_traits_t;
     typedef typename poly_traits_t::coeff_ref_t coeff_ref_t;
     typedef typename poly_traits_t::coeff_srcref_t coeff_srcref_t;
-
-    typedef void IS_FMPZ_POLYXX; // internal
 
     FLINTXX_DEFINE_BASICS(fmpz_polyxx_expression)
     FLINTXX_DEFINE_CTORS(fmpz_polyxx_expression)
@@ -137,6 +149,21 @@ public:
         fmpz_polyxx_expression res;
         fmpz_poly_randtest_not_zero(res._poly(), state._data(), len, bits);
         return res;
+    }
+
+    template<class Fmpz_vec1, class Fmpz_vec2>
+    static FLINT_BINOP_ENABLE_RETTYPE(fmpz_polyxx_interpolate,
+        Fmpz_vec1, Fmpz_vec2)
+    interpolate(const Fmpz_vec1& xs, const Fmpz_vec2& ys)
+    {
+        return fmpz_polyxx_interpolate(xs, ys);
+    }
+
+    template<class Fmpz_vec>
+    static FLINT_UNOP_ENABLE_RETTYPE(fmpz_polyxx_product_roots, Fmpz_vec)
+    product_roots(const Fmpz_vec& xs)
+    {
+        return fmpz_polyxx_product_roots(xs);
     }
 
     // These only make sense with immediates
@@ -167,10 +194,10 @@ public:
 
     // These only make sense with target immediates
     template<class Fmpz>
-    typename mp::enable_if<FMPZXX_COND_S<Fmpz> >::type
+    typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type
     set_coeff(slong n, const Fmpz& x)
     {
-        fmpz_poly_set_coeff_fmpz(_poly(), n, x._fmpz());
+        fmpz_poly_set_coeff_fmpz(_poly(), n, x.evaluate()._fmpz());
     }
     template<class T>
     typename mp::enable_if<traits::is_signed_integer<T> >::type
@@ -203,6 +230,11 @@ public:
         std::string res(str);
         std::free(str);
         return res;
+    }
+
+    void signature(slong& r1, slong& r2) const
+    {
+        fmpz_poly_signature(&r1, &r2, this->evaluate()._poly());
     }
 
     FLINTXX_DEFINE_MEMBER_BINOP(operator(), compeval)
@@ -505,6 +537,45 @@ FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_divconquer_op, fmpzxx,
 FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_horner_op, fmpzxx,
         FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
         fmpz_poly_evaluate_horner_fmpz(to._fmpz(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_op, fmpz_vecxx,
+        FMPZ_POLYXX_COND_S, FMPZ_VECXX_COND_S,
+        fmpz_poly_evaluate_fmpz_vec(to._data().array, e1._poly(),
+            e2._data().array, e2.size()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_polyxx_interpolate_op, fmpz_polyxx,
+        FMPZ_VECXX_COND_S, FMPZ_VECXX_COND_S,
+        fmpz_poly_interpolate_fmpz_vec(to._poly(), e1._data().array,
+            e2._data().array, e2.size()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(taylor_shift_horner_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_taylor_shift_horner(to._poly(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(taylor_shift_divconquer_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_taylor_shift_divconquer(to._poly(), e1._poly(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(taylor_shift_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
+        fmpz_poly_taylor_shift(to._poly(), e1._poly(), e2._fmpz()))
+
+FMPZ_POLYXX_DEFINE_SQRLOW(revert_series)
+FMPZ_POLYXX_DEFINE_SQRLOW(revert_series_newton)
+FMPZ_POLYXX_DEFINE_SQRLOW(revert_series_lagrange_fast)
+FMPZ_POLYXX_DEFINE_SQRLOW(revert_series_lagrange)
+
+FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        execution_check(fmpz_poly_sqrt(to._poly(), from._poly()),
+            "sqrt", "fmpz_polyxx"))
+FLINT_DEFINE_UNARY_EXPR_COND(sqrt_classical_op, fmpz_polyxx, FMPZ_POLYXX_COND_S,
+        execution_check(fmpz_poly_sqrt_classical(to._poly(), from._poly()),
+            "sqrt_classical", "fmpz_polyxx"))
+
+FLINT_DEFINE_UNARY_EXPR_COND(fmpz_polyxx_product_roots_op, fmpz_polyxx,
+        FMPZ_VECXX_COND_S,
+        fmpz_poly_product_roots_fmpz_vec(to._poly(),
+            from._data().array, from.size()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(poly_bound_roots_op, fmpzxx, FMPZ_POLYXX_COND_S,
+        fmpz_poly_bound_roots(to._fmpz(), from._poly()))
 } // rules
 
 // TODO functions which cannot be lazy b/c only two arguments allowd
@@ -586,6 +657,27 @@ div_series(const Poly1& A, const Poly2& B, slong n)
     return res;
 }
 
+template<class Poly>
+inline typename mp::enable_all_fmpz_polyxx<mp_limb_t, Poly>::type
+evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)
+{
+    return fmpz_poly_evaluate_mod(p.evaluate()._poly(), x, n);
+}
+
+#define FMPZ_POLYXX_DEFINE_COMPOSE_SERIES(name) \
+template<class Poly1, class Poly2> \
+inline typename mp::enable_all_fmpz_polyxx<fmpz_polyxx, Poly1, Poly2>::type \
+name(const Poly1& p1, const Poly2& p2, slong n) \
+{ \
+    fmpz_polyxx res; \
+    fmpz_poly_##name(res._poly(), p1.evaluate()._poly(), \
+          p2.evaluate()._poly(), n); \
+    return res; \
+}
+FMPZ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series_horner)
+FMPZ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series_brent_kung)
+FMPZ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series)
+
 // TODO these cannot officially be lazy b/c two return values
 #define FMPZ_POLYXX_DEFINE_PSEUDO_DIVREM(name) \
 template<class Poly1, class Poly2, class Poly3, class Poly4> \
@@ -617,13 +709,6 @@ name(ulong& d, const Poly3& A, const Poly4& B) \
 }
 FMPZ_POLYXX_DEFINE_PSEUDO_DIV(pseudo_div)
 FMPZ_POLYXX_DEFINE_PSEUDO_DIV(pseudo_rem)
-
-template<class Poly>
-inline typename mp::enable_all_fmpz_polyxx<mp_limb_t, Poly>::type
-evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)
-{
-    return fmpz_poly_evaluate_mod(p.evaluate()._poly(), x, n);
-}
 } // flint
 
 #endif

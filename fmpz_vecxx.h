@@ -57,13 +57,18 @@ typedef vector_expression<
     detail::wrapped_vector_traits<fmpzxx, long, fmpzxx_ref, fmpzxx_srcref, fmpz>,
     operations::immediate,
     detail::fmpz_vector_data> fmpz_vecxx;
+// TODO references
 
 template<>
 struct enable_vector_rules<fmpz_vecxx> : mp::false_ { };
 
 namespace rules {
-template<>
-struct to_string<fmpz_vecxx>
+// TODO hack to make code look like references are implemented
+template<class T> struct FMPZ_VECXX_COND_S : mp::equal_types<T, fmpz_vecxx> { };
+#define FMPZ_VECXX_COND_T FMPZ_VECXX_COND_S
+
+template<class T>
+struct to_string<T, typename mp::enable_if<FMPZ_VECXX_COND_S<T> >::type>
 {
     static std::string get(const fmpz_vecxx& e, int base)
     {
@@ -85,11 +90,13 @@ struct to_string<fmpz_vecxx>
     }
 };
 
+// TODO references
 FLINT_DEFINE_GET(equals, bool, fmpz_vecxx,
         e1.size() == e2.size()
         && _fmpz_vec_equal(e1._data().array, e2._data().array, e1.size()))
 
-FLINT_DEFINE_CBINARY_EXPR(plus, fmpz_vecxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(plus, fmpz_vecxx,
+        FMPZ_VECXX_COND_S, FMPZ_VECXX_COND_S,
         _fmpz_vec_add(to._data().array, e1._data().array, e2._data().array,
             e1.size()))
 
