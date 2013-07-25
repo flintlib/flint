@@ -115,7 +115,7 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
 
 // Automatically invoke binary_expression or commutative_binary_expression
 namespace rdetail {
-template<class Expr1, class Op, class Expr2>
+template<class Expr1, class Op, class Expr2, class Enable = void>
 struct inverted_binary_expression
 {
   typedef commutative_binary_expression<Expr2, Op, Expr1> wrapped_t;
@@ -127,13 +127,13 @@ struct inverted_binary_expression
   }
 };
 
-template<template<class E1, class O, class E2> class BE,
+template<template<class E1, class O, class E2, class En> class BE,
     class Data1, class Op, class Data2>
 struct binary_expr_helper
 {
     typedef typename traits::basetype<Data1>::type data1_t;
     typedef typename traits::basetype<Data2>::type data2_t;
-    typedef BE<data1_t, Op, data2_t> wrapped_t;
+    typedef BE<data1_t, Op, data2_t, void> wrapped_t;
     typedef typename wrapped_t::return_t return_t;
     typedef empty_tuple temporaries_t;
     typedef typename mp::make_tuple<Data1, Data2>::type data_t;
