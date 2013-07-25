@@ -47,23 +47,9 @@
 // TODO hensel lifting
 // TODO input
 // TODO modular reduction
+// TODO addmul
 
 namespace flint {
-namespace rules {
-// implementation of compeval
-// TODO do at level of "struct evaluation" instead?
-template<class T, class U>
-struct binary_expression<T, operations::compeval_op, U,
-    typename mp::enable_if<mp::or_<
-        traits::is_implemented<binary_expression<T, operations::compose_op, U> >,
-        traits::is_implemented<binary_expression<T, operations::evaluate_op, U> >
-      > >::type>
-    : mp::if_<
-    traits::is_implemented<binary_expression<T, operations::compose_op, U> >,
-    binary_expression<T, operations::compose_op, U>,
-    binary_expression<T, operations::evaluate_op, U> >::type { };
-} // rules
-
 // function "declarations"
 FLINT_DEFINE_BINOP(mul_classical)
 FLINT_DEFINE_BINOP(mulmid_classical)
@@ -87,7 +73,6 @@ FLINT_DEFINE_BINOP(gcd_modular)
 FLINT_DEFINE_BINOP(div_basecase)
 FLINT_DEFINE_BINOP(div_divconquer)
 FLINT_DEFINE_BINOP(rem_basecase)
-FLINT_DEFINE_BINOP(inv_series_newton)
 FLINT_DEFINE_BINOP(pseudo_rem_cohen)
 FLINT_DEFINE_BINOP(evaluate_divconquer)
 FLINT_DEFINE_BINOP(evaluate_horner)
@@ -322,6 +307,7 @@ struct enable_all_fmpz_polyxx
 namespace rules {
 #define FMPZ_POLYXX_COND_S FLINTXX_COND_S(fmpz_polyxx)
 #define FMPZ_POLYXX_COND_T FLINTXX_COND_T(fmpz_polyxx)
+
 FLINTXX_DEFINE_EQUALS(fmpz_polyxx, fmpz_poly_equal(e1._poly(), e2._poly()))
 
 FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLYXX_COND_T, FMPZ_POLYXX_COND_S,

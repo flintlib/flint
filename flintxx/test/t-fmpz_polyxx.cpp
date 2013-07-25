@@ -345,7 +345,7 @@ test_functions()
 
     // test static functions
     frandxx state;
-    tassert(fmpz_polyxx::randtest(state, 4, 10).length() == 4);
+    tassert(fmpz_polyxx::randtest(state, 4, 10).length() <= 4);
     tassert(fmpz_polyxx::randtest_unsigned(state, 4, 10).get_coeff(0) >= 0);
     tassert(fmpz_polyxx::randtest_not_zero(state, 4, 10).is_zero() == false);
     tassert(fmpz_polyxx::interpolate(xs, ys) == xp1);
