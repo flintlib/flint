@@ -307,6 +307,13 @@ void fmpq_poly_get_slice(fmpq_poly_t rop,
     Returns the slice with coefficients from $x^i$ (including) to 
     $x^j$ (excluding).
 
+void fmpq_poly_reverse(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
+
+    This function considers the polynomial \code{poly} to be of length $n$, 
+    notionally truncating and zero padding if required, and reverses 
+    the result.  Since the function normalises its result \code{res} may be 
+    of length less than $n$.
+
 *******************************************************************************
 
     Getting and setting coefficients
