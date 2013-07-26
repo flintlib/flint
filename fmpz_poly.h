@@ -600,6 +600,12 @@ void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, slong len);
 
 void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly);
 
+/*  Square-free  *************************************************************/
+
+int _fmpz_poly_is_squarefree(const fmpz * poly, slong len);
+
+int fmpz_poly_is_squarefree(const fmpz_poly_t poly);
+
 /*  Euclidean division  ******************************************************/
 
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 

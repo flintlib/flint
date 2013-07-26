@@ -632,8 +632,6 @@ void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 
 /*  Square-free  *************************************************************/
 
-int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, slong len);
-
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
 /*  Input and output *********************************************************/
