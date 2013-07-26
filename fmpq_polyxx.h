@@ -202,6 +202,7 @@ public:
         return res;
     }
 
+    // lazy members
     FLINTXX_DEFINE_MEMBER_BINOP(operator(), compeval)
 
     template<class Slong> // NB: template to instantiate lazily

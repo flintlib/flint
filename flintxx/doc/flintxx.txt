@@ -1,5 +1,5 @@
 a*=============================================================================
-vim: spell spelllang=en textwidth=80
+vim: spell spelllang=en textwidth=79
 
     This file is part of FLINT.
 
@@ -760,6 +760,61 @@ Fmpq_poly_expr cos_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr sinh_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr cosh_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr tanh_series(Fmpq_poly_expr, T:fits_into_slong)
+
+
+
+*******************************************************************************
+
+    fmpz\_poly\_qxx
+
+*******************************************************************************
+
+fmpz_poly_qxx::fmpz_poly_qxx()
+
+static fmpz_poly_qxx fmpz_poly_qxx::randtest(frandxx& state,
+        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+static fmpz_poly_qxx fmpz_poly_qxx::randtest_not_zero(frandxx& state,
+        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+
+    See \code{fmpz_poly_q_randtest} etc.
+
+void Fmpz_poly_q_target::canonicalise()
+bool Fmpz_poly_q_src::is_canonical() const
+
+fmpz_polyxx_ref Fmpz_poly_q_target::get_numref()
+fmz_polyxx_srcref Fmpz_poly_q_src::get_numref() const
+fmpz_polyxx_ref Fmpz_poly_q_target::get_denref()
+fmz_polyxx_srcref Fmpz_poly_q_src::get_denref() const
+
+    Obtain a reference to the numerator or denominator of the rational
+    function.
+
+bool Fmpz_poly_q_expr::is_one() const
+bool Fmpz_poly_q_expr::is_zero() const
+
+std::string Fmpz_poly_q_expr::pretty(const char* x) const
+
+    See \code{fmpz_poly_q_get_str_pretty}.
+
+std::string Fmpz_poly_q_expr::to_string() const
+
+Fmpz_poly_q_target Fmpz_poly_q_target::operator=(T:fits_into_slong)
+Fmpz_poly_q_target Fmpz_poly_q_target::operator=(const char*)
+
+Fmpz_poly_q_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * /} are overloaded if both arguments are
+    functions.
+
+bool operator==(Fmpz_poly_q_expr, Fmpz_poly_q_expr)
+
+Fmpz_poly_q_expr operator-(Fmpz_poly_q_expr)
+
+Fmpz_poly_q_expr inv(Fmpz_poly_q_expr)
+
+Fmpz_poly_q_expr pow(Fmpz_poly_q_expr, T:is_unsigned_integer)
+
+Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
 
 
 
