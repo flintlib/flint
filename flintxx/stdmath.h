@@ -73,6 +73,9 @@ FLINT_DEFINE_UNOP(poly_bound_roots)
 FLINT_DEFINE_BINOP(inv_series)
 FLINT_DEFINE_BINOP(inv_series_newton)
 FLINT_DEFINE_BINOP(revert_series)
+FLINT_DEFINE_BINOP(revert_series_lagrange)
+FLINT_DEFINE_BINOP(revert_series_lagrange_fast)
+FLINT_DEFINE_BINOP(revert_series_newton)
 
 FLINT_DEFINE_BINOP(compeval)
 

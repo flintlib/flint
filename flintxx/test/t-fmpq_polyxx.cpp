@@ -181,6 +181,8 @@ test_functions()
     res = f*g; res.truncate(4);
     tassert(res == mullow(f, g, 4));
 
+    tassert(reverse(g, 5).to_string() == "5  1 2 3 4 5");
+
     tassert(pow(f, 5u) == f*f*f*f*f);
     tassert(poly_shift_left(f, 5) == f*pow(x, 5u));
     tassert(f == poly_shift_right(poly_shift_left(f, 5), 5));
@@ -211,11 +213,39 @@ test_functions()
     tassert(pow(sqrt_series(g, 10), 2u) % pow(x, 7u) == g);
     tassert((pow(invsqrt_series(g, 10), 2u)*g % pow(x, 7u)).is_one());
 
+    tassert(poly_rescale(f, fmpqxx(2, 1u)).to_string() == "4  2 0 0 8");
+
+    fmpq_polyxx inner;inner = "3  0 -1 5";
+    res = g(inner); res.truncate(10);
+    tassert(compose_series(g, inner, 10) == res);
+    tassert(compose_series_horner(g, inner, 10) == res);
+    tassert(compose_series_brent_kung(g, inner, 10) == res);
+
+    res = "2  0 1";
+    tassert(compose_series(inner, revert_series(inner, 10), 10) == res);
+    tassert(compose_series(inner, revert_series_lagrange(inner, 10), 10)
+            == res);
+    tassert(compose_series(inner, revert_series_lagrange_fast(inner, 10), 10)
+            == res);
+    tassert(compose_series(inner, revert_series_newton(inner, 10), 10) == res);
+
+    tassert(content(2*g) == fmpqxx(2, 1u));
+    tassert(primitive_part(2*g) == g);
+
+    tassert(f.is_monic() && !g.is_monic());
+    tassert(make_monic(2*f) == f);
+    tassert((4*g).is_squarefree());tassert(!(g*g).is_squarefree());
+
     // test static functions
     frandxx state;
     tassert(fmpq_polyxx::randtest(state, 4, 10).length() <= 4);
     tassert(fmpq_polyxx::randtest_unsigned(state, 4, 10).get_coeff_numref(0) >= 0);
     tassert(fmpq_polyxx::randtest_not_zero(state, 4, 10).is_zero() == false);
+
+    fmpz_vecxx xs(3), ys(3);
+    xs[0] = 0; xs[1] = 1; xs[2] = -1;
+    ys[0] = 0; ys[1] = 1; ys[2] = 1;
+    tassert(fmpq_polyxx::interpolate(xs, ys).to_string() == "3  0 0 1");
 }
 
 void

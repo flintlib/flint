@@ -44,6 +44,9 @@
 namespace flint {
 // function "declarations"
 FLINT_DEFINE_BINOP(fmpq_polyxx_get_coeff)
+FLINT_DEFINE_BINOP(fmpq_polyxx_interpolate)
+
+// TODO move to stdmath?
 FLINT_DEFINE_BINOP(sqrt_series)
 FLINT_DEFINE_BINOP(invsqrt_series)
 FLINT_DEFINE_BINOP(exp_series)
@@ -58,6 +61,10 @@ FLINT_DEFINE_BINOP(cos_series)
 FLINT_DEFINE_BINOP(sinh_series)
 FLINT_DEFINE_BINOP(cosh_series)
 FLINT_DEFINE_BINOP(tanh_series)
+
+// TODO move to stdmath?
+FLINT_DEFINE_BINOP(poly_rescale)
+FLINT_DEFINE_UNOP(make_monic)
 
 namespace detail {
 template<class Poly>
@@ -115,6 +122,14 @@ public:
         fmpq_polyxx_expression res;
         fmpq_poly_get_slice(res._poly(), p.evaluate()._poly(), i, j);
         return res;
+    }
+
+    template<class Fmpq_vec1, class Fmpq_vec2>
+    static FLINT_BINOP_ENABLE_RETTYPE(fmpq_polyxx_interpolate,
+        Fmpq_vec1, Fmpq_vec2)
+    interpolate(const Fmpq_vec1& xs, const Fmpq_vec2& ys)
+    {
+        return fmpq_polyxx_interpolate(xs, ys);
     }
 
     // These only make sense with immediates
@@ -175,6 +190,9 @@ public:
     slong degree() const {return fmpq_poly_degree(this->evaluate()._poly());}
     bool is_one() const {return fmpq_poly_is_one(this->evaluate()._poly());}
     bool is_zero() const {return fmpq_poly_is_zero(this->evaluate()._poly());}
+    bool is_monic() const {return fmpq_poly_is_monic(this->evaluate()._poly());}
+    bool is_squarefree() const
+        {return fmpq_poly_is_squarefree(this->evaluate()._poly());}
 
     std::string pretty(const char* x) const
     {
@@ -297,6 +315,10 @@ FLINTXX_DEFINE_ASSIGN_STR(fmpq_polyxx, execution_check(
 FLINTXX_DEFINE_TO_STR(fmpq_polyxx, fmpq_poly_get_str(from._poly()))
 FLINTXX_DEFINE_SWAP(fmpq_polyxx, fmpq_poly_swap(e1._poly(), e2._poly()))
 
+FLINT_DEFINE_BINARY_EXPR_COND2(reverse_op, fmpq_polyxx,
+        FMPQ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpq_poly_reverse(to._poly(), e1._poly(), e2))
+
 FLINTXX_DEFINE_CMP(fmpq_polyxx, fmpq_poly_cmp(e1._poly(), e2._poly()))
 
 FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpq_polyxx, FMPQ_POLYXX_COND_S,
@@ -413,6 +435,39 @@ FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_op, fmpqxx,
 FLINT_DEFINE_BINARY_EXPR_COND2(compose_op, fmpq_polyxx,
         FMPQ_POLYXX_COND_S, FMPQ_POLYXX_COND_S,
         fmpq_poly_compose(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(fmpq_polyxx_interpolate_op, fmpq_polyxx,
+        FMPZ_VECXX_COND_S, FMPZ_VECXX_COND_S,
+        fmpq_poly_interpolate_fmpz_vec(to._poly(), e1._data().array,
+            e2._data().array, e2.size()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_rescale_op, fmpq_polyxx,
+        FMPQ_POLYXX_COND_S, FMPQXX_COND_S,
+        fmpq_poly_rescale(to._poly(), e1._poly(), e2._fmpq()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(revert_series_op, fmpq_polyxx,
+        FMPQ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpq_poly_revert_series(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(revert_series_lagrange_op, fmpq_polyxx,
+        FMPQ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpq_poly_revert_series_lagrange(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(revert_series_lagrange_fast_op, fmpq_polyxx,
+        FMPQ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpq_poly_revert_series_lagrange_fast(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(revert_series_newton_op, fmpq_polyxx,
+        FMPQ_POLYXX_COND_S, traits::fits_into_slong,
+        fmpq_poly_revert_series_newton(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_UNARY_EXPR_COND(content_op, fmpqxx, FMPQ_POLYXX_COND_S,
+        fmpq_poly_content(to._fmpq(), from._poly()))
+FLINT_DEFINE_UNARY_EXPR_COND(primitive_part_op, fmpq_polyxx, FMPQ_POLYXX_COND_S,
+        fmpq_poly_primitive_part(to._poly(), from._poly()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(make_monic_op, fmpq_polyxx, FMPQ_POLYXX_COND_S,
+        fmpq_poly_make_monic(to._poly(), from._poly()))
 } // rules
 
 // NB: fmpq_poly addmul is just done by hand currently, no need to wrap that ..
@@ -437,7 +492,21 @@ div_series(const Poly1& A, const Poly2& B, slong n)
     return res;
 }
 
-// this cannot be lazy b/c two output values
+#define FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(name) \
+template<class Poly1, class Poly2> \
+inline typename mp::enable_all_fmpq_polyxx<fmpq_polyxx, Poly1, Poly2>::type \
+name(const Poly1& p1, const Poly2& p2, slong n) \
+{ \
+    fmpq_polyxx res; \
+    fmpq_poly_##name(res._poly(), p1.evaluate()._poly(), \
+          p2.evaluate()._poly(), n); \
+    return res; \
+}
+FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series_horner)
+FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series_brent_kung)
+FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series)
+
+// these cannot be lazy b/c two output values
 template<class Poly1, class Poly2, class Poly3, class Poly4>
 inline typename mp::enable_if<mp::and_<
     FMPQ_POLYXX_COND_T<Poly1>, FMPQ_POLYXX_COND_T<Poly2>,
