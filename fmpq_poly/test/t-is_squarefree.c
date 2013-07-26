@@ -92,6 +92,42 @@ main(void)
         fmpq_poly_clear(f);
     }
 
+    /* Check that f + N*(x^M + 1) is square-free, for N >> f, M > deg(f) */
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    {
+        fmpq_poly_t a, f;
+        fmpz_t N;
+
+        fmpq_poly_init(a);
+        fmpq_poly_set_coeff_si(a, 0, 1L);
+        fmpq_poly_set_coeff_si(a, n_randint(state, 20), 1L);
+        if (a->length < 2)
+        {
+            fmpq_poly_clear(a);
+            continue;
+        }
+        fmpq_poly_init(f);
+        fmpq_poly_randtest(f, state, a->length - 2, 40);
+
+        fmpz_init_set_ui(N, 1UL);
+        fmpz_mul_2exp(N, N, 45 + a->length);
+
+        fmpq_poly_scalar_mul_fmpz(a, a, N);
+        fmpq_poly_add(f, a, f);
+
+        result = fmpq_poly_is_squarefree(f);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpq_poly_debug(f), printf("\n");
+            abort();
+        }
+
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(f);
+        fmpz_clear(N);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
