@@ -58,7 +58,7 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, slong len)
         _fmpz_poly_derivative(w, poly, len);
         _fmpz_poly_gcd(w + len, poly, len, w, len - 1L);
         
-        for (gdeg = len - 2L; w[gdeg] == 0L; gdeg--) ;
+        for (gdeg = len - 2L; w[gdeg + len] == 0L; gdeg--) ;
         
         _fmpz_vec_clear(w, 2 * len);
         return (gdeg == 0);
