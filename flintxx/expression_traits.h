@@ -100,6 +100,10 @@ template<class To, class From, class Enable = void>
 struct can_evaluate_into : mp::false_ { };
 template<class T>
 struct can_evaluate_into<T, T> : mp::true_ { };
+
+// Decide if we should use temporary merging
+template<class Expr>
+struct use_temporary_merging : mp::true_ { };
 } // traits
 } // flint
 

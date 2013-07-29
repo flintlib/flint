@@ -100,16 +100,32 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
     typedef mp::merge_tuple<
         typename mp::make_tuple<interm_t*>::type,
         interm_temps_t> merger;
-    typedef typename merger::type temporaries_t;
+    typedef typename merger::type mixed_temporaries_t;
+
+    template<class Ignored>
+    struct do_merging : traits::use_temporary_merging<interm_t> { };
+    typedef typename mp::if_<do_merging<void>,
+            mixed_temporaries_t, interm_temps_t>::type temporaries_t;
 
     typedef typename mp::make_tuple<Data>::type data_t;
 
     template<class Return>
-    static void doit(const data_t& input, temporaries_t temps, Return* output)
+    static void doit(const data_t& input, temporaries_t temps, Return* output,
+        typename mp::enable_if<do_merging<Return> >::type* = 0)
     {
         interm_t* interm = merger::get_first(temps).head;
         ev_t::doit(input.head._data(), merger::get_second(temps), interm);
         *output = unop_helper::make(*interm);
+    }
+
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output,
+        typename mp::disable_if<do_merging<Return> >::type* = 0)
+    {
+        interm_t interm = rules::instantiate_temporaries<
+            typename data_t::head_t, interm_t>::get(input.head);
+        ev_t::doit(input.head._data(), temps, &interm);
+        *output = unop_helper::make(interm);
     }
 };
 
@@ -226,6 +242,9 @@ struct evaluated_type_pred
 };
 }
 
+template<class Expr, class T>
+struct use_default_temporary_instantiation : mp::true_ { };
+
 template<class Expr, class T, class Enable>
 struct instantiate_temporaries
 {
@@ -236,8 +255,9 @@ struct instantiate_temporaries
 };
 
 template<class Expr, class T>
-struct instantiate_temporaries<Expr, T, typename mp::enable_if<
-    tools::has_subexpr<rdetail::evaluated_type_pred<T>, Expr> >::type>
+struct instantiate_temporaries<Expr, T, typename mp::enable_if<mp::and_<
+    use_default_temporary_instantiation<Expr, T>,
+    tools::has_subexpr<rdetail::evaluated_type_pred<T>, Expr> > >::type>
 {
     static T get(const Expr& e)
     {

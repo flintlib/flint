@@ -131,6 +131,8 @@ template<class T, class U = void>
 struct enable_if : public enable_if_v<T::val, U> { };
 template<class T, class U = void>
 struct disable_if : public enable_if<not_<T>, U> { };
+
+struct empty { };
 } // mp
 } // flint
 

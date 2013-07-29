@@ -324,13 +324,34 @@ private:
     return1_t* ret1;
 
 public:
-    typedef typename merger::type temporaries_t;
+    typedef typename merger::type mixed_temporaries_t;
+    template<class Ignored>
+    struct do_merging : traits::use_temporary_merging<return1_t> { };
+    typedef typename mp::if_<do_merging<void>, mixed_temporaries_t,
+            temporaries1_t>::type temporaries_t;
+    typedef typename mp::if_<do_merging<void>, mp::empty, return1_t>::type
+        tmp_t;
+    tmp_t tmp1;
 
-    evaluate_2(temporaries_t temps, const Expr1& e1, ref2_t e2)
-        : ref2(e2)
+    template<class Ignored>
+    void init(Ignored, temporaries_t temps, const Expr1& e1,
+            typename mp::enable_if<do_merging<Ignored> >::type* = 0)
     {
         ret1 = merger::get_first(temps).head;
         rule_t::doit(e1._data(), merger::get_second(temps), ret1);
+    }
+    template<class Ignored>
+    void init(Ignored, temporaries_t temps, const Expr1& e1,
+            typename mp::disable_if<do_merging<Ignored> >::type* = 0)
+    {
+        ret1 = &tmp1;
+        rule_t::doit(e1._data(), temps, ret1);
+    }
+
+    evaluate_2(temporaries_t temps, const Expr1& e1, ref2_t e2)
+        : ref2(e2), tmp1(rules::instantiate_temporaries<Expr1, tmp_t>::get(e1))
+    {
+        init(0, temps, e1);
     }
 
     ref1_t get1() {return *ret1;}
@@ -363,12 +384,14 @@ public:
     ref2_t get2() {return ev2.get1();}
 };
 
-// Case where neither is immediate
+// Case where neither is immediate, all merging
 template<class Expr1, class Expr2>
 struct evaluate_2<Expr1, Expr2,
     typename mp::enable_if<mp::and_<
         traits::is_lazy_expr<Expr1>,
-        traits::is_lazy_expr<Expr2> > >::type>
+        traits::is_lazy_expr<Expr2>,
+        traits::use_temporary_merging<typename Expr1::evaluated_t>,
+        traits::use_temporary_merging<typename Expr2::evaluated_t> > >::type>
 {
 private:
     typedef typename Expr1::ev_traits_t::temp_rule_t rule1_t;
@@ -447,6 +470,129 @@ public:
     ref2_t get2() {return *ret2;}
 };
 
+// Case where neither is immediate, no merging
+template<class Expr1, class Expr2>
+struct evaluate_2<Expr1, Expr2,
+    typename mp::enable_if<mp::and_<
+        traits::is_lazy_expr<Expr1>,
+        traits::is_lazy_expr<Expr2>,
+        mp::not_<traits::use_temporary_merging<typename Expr1::evaluated_t> >,
+        mp::not_<traits::use_temporary_merging<typename Expr2::evaluated_t> >
+      > >::type>
+{
+private:
+    typedef typename Expr1::ev_traits_t::temp_rule_t rule1_t;
+    typedef typename Expr2::ev_traits_t::temp_rule_t rule2_t;
+
+public:
+    typedef typename rule1_t::return_t return1_t;
+    typedef typename rule2_t::return_t return2_t;
+    typedef const return1_t& ref1_t;
+    typedef const return2_t& ref2_t;
+    typedef const Expr1& arg1_t;
+    typedef const Expr2& arg2_t;
+
+private:
+    typedef typename rule1_t::temporaries_t temporaries1_t;
+    typedef typename rule2_t::temporaries_t temporaries2_t;
+
+    typedef mp::merge_tuple<temporaries1_t, temporaries2_t> merger;
+    return1_t tmp1;
+    return2_t tmp2;
+
+public:
+    typedef typename merger::type temporaries_t;
+
+    evaluate_2(temporaries_t temps, const Expr1& e1, const Expr2& e2)
+        : tmp1(rules::instantiate_temporaries<Expr1, return1_t>::get(e1)),
+          tmp2(rules::instantiate_temporaries<Expr2, return2_t>::get(e2))
+    {
+        rule1_t::doit(e1._data(), merger::get_first(temps), &tmp1);
+        rule2_t::doit(e2._data(), merger::get_second(temps), &tmp2);
+    }
+
+    ref1_t get1() {return tmp1;}
+    ref2_t get2() {return tmp2;}
+};
+
+// Case where neither is immediate, first has merging, second does not
+template<class Expr1, class Expr2>
+struct evaluate_2<Expr1, Expr2,
+    typename mp::enable_if<mp::and_<
+        traits::is_lazy_expr<Expr1>,
+        traits::is_lazy_expr<Expr2>,
+        traits::use_temporary_merging<typename Expr1::evaluated_t>,
+        mp::not_<traits::use_temporary_merging<typename Expr2::evaluated_t> >
+      > >::type>
+{
+private:
+    typedef typename Expr1::ev_traits_t::temp_rule_t rule1_t;
+    typedef typename Expr2::ev_traits_t::temp_rule_t rule2_t;
+
+public:
+    typedef typename rule1_t::return_t return1_t;
+    typedef typename rule2_t::return_t return2_t;
+    typedef const return1_t& ref1_t;
+    typedef const return2_t& ref2_t;
+    typedef const Expr1& arg1_t;
+    typedef const Expr2& arg2_t;
+
+private:
+    typedef typename rule1_t::temporaries_t temporaries1_t;
+    typedef typename rule2_t::temporaries_t temporaries2_t;
+
+    typedef mp::merge_tuple<typename mp::make_tuple<return1_t*>::type,
+              temporaries1_t> merger1;
+    typedef mp::merge_tuple<typename merger1::type, temporaries2_t> merger2;
+    return2_t tmp2;
+    return1_t* ret1;
+    
+public:
+    typedef typename merger2::type temporaries_t;
+
+    evaluate_2(temporaries_t temps, const Expr1& e1, const Expr2& e2)
+         : tmp2(rules::instantiate_temporaries<Expr2, return2_t>::get(e2))
+    {
+        rule2_t::doit(e2._data(), merger2::get_second(temps), &tmp2);
+        ret1 = merger1::get_first(merger2::get_first(temps)).head;
+        rule1_t::doit(e1._data(),
+                merger1::get_second(merger2::get_first(temps)), ret1);
+    }
+
+    ref1_t get1() {return *ret1;}
+    ref2_t get2() {return tmp2;}
+};
+
+// Case where neither is immediate, second has merging, first does not
+template<class Expr1, class Expr2>
+struct evaluate_2<Expr1, Expr2,
+    typename mp::enable_if<mp::and_<
+        traits::is_lazy_expr<Expr1>,
+        traits::is_lazy_expr<Expr2>,
+        traits::use_temporary_merging<typename Expr2::evaluated_t>,
+        mp::not_<traits::use_temporary_merging<typename Expr1::evaluated_t> >
+      > >::type>
+{
+    // XXX this is copy-paste from above case where right is immediate
+private:
+    typedef evaluate_2<Expr2, Expr1> ev2_t;
+    ev2_t ev2;
+
+public:
+    typedef typename ev2_t::return1_t return2_t;
+    typedef typename ev2_t::return2_t return1_t;
+    typedef typename ev2_t::ref1_t ref2_t;
+    typedef typename ev2_t::ref2_t ref1_t;
+    typedef typename ev2_t::arg1_t arg2_t;
+    typedef typename ev2_t::arg2_t arg1_t;
+    typedef typename ev2_t::temporaries_t temporaries_t;
+
+    evaluate_2(temporaries_t temps, const Expr1& e1, const Expr2& e2)
+        : ev2(temps, e2, e1) {};
+    ref1_t get1() {return ev2.get2();}
+    ref2_t get2() {return ev2.get1();}
+};
+
 ///////////////////////////////////////////////////////////////////////////
 // Helper to evaluate three homogeneous terms
 ///////////////////////////////////////////////////////////////////////////
@@ -492,6 +638,7 @@ struct ternary_hhelper;
 // *homogeneous* expressions. These are defined to be expressions evaluating to
 // type T, which only need temporaries of type T.
 // This condition is included in the checks done by the enable member type.
+// NOTE: This implementation does not honor use_temporary_merging!
 //
 template<class T, class Left, class Right1, class Right2,
     class disable_op = void, class Enable = void>
