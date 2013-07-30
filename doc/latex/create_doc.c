@@ -88,520 +88,58 @@ static char * docsout[] = {
     "input/perm.tex",
 };
 
+
 static const int ndocs = sizeof(docsin) / sizeof(char *);
-
-#define DOCS_WIDTH     79
-
-#define DOCS_EOF      (-1)
-#define DOCS_IOE      1
-#define DOCS_SUCCESS  0
 
 static FILE *in, *out;              /* Input and output handles           */
 
-static char buf[DOCS_WIDTH + 9];    /* Buffer for one line                */
-
-static char *name;                  /* Current file name                  */
 static int line;                    /* Current line number                */
+static int error;
 
-static char grp[DOCS_WIDTH + 1];    /* Group title                        */
 
-struct fn_t {
-    char mods[DOCS_WIDTH + 1];
-    char name[DOCS_WIDTH + 1];
-    char args[3 * DOCS_WIDTH + 1];
-    char rmods[DOCS_WIDTH + 1];
-};
-
-struct fn_t fnc;          /* Function data                      */
-
-static int grp_open = 0;  /* Whether a group section is open    */
-static int fnc_open = 0;  /* Whether a function section is open */
-static int dsc_open = 0;  /* Whether a description is open      */
-
-#define FSM
-#define STATE(x)      s_ ## x :
-#define NEXTSTATE(x)  goto s_ ## x
-
-#define next_event()                                                    \
-do {                                                                    \
-    r = readline(in, buf, &n);                                          \
-    ++line;                                                             \
-    if (r == DOCS_IOE)                                                  \
-        NEXTSTATE(ioe);                                                 \
-    if (r == DOCS_SUCCESS)                                              \
-    {                                                                   \
-        if (n > DOCS_WIDTH)                                             \
-        {                                                               \
-            printf("\n");                                               \
-            printf("Warning:\n");                                       \
-            printf("The parser encountered a line of length %d\n", n);  \
-            printf("in line %d in file %s.\n\n", line, name);           \
-        }                                                               \
-    }                                                                   \
-} while (0)
-
-/*
-    Reads one line from the file into the buffer c (of length at 
-    least DOCS_WIDTH + 2).  The number of characters, excluding any 
-    newline characters or the terminating '\0' character, written to 
-    the buffer c is written to n.
-
-    Returns zero in case of success.  Otherwise, returns one of 
-    DOCS_EOF and DOCS_IOE.
- */
-
-static int readline(FILE *file, char *c, int *n)
+/* print latex code for the function prototype "text" of length "len" */
+void
+printfuncheader(const char* text, int len)
 {
-    if (fgets(c, DOCS_WIDTH + 2, file))
-    {
-        int i;
-
-        for (i = 0; i < DOCS_WIDTH && c[i] != '\n'; i++) ;
-        c[i] = '\0';
-        *n = i;
-        return DOCS_SUCCESS;
-    }
-    else
-    {
-        return feof(file) ? DOCS_EOF : DOCS_IOE;
-    }
-}
-
-/*
-    Returns DOCS_SUCCESS if successful and DOCS_IOE otherwise.
- */
-
-static int printline(FILE *file, char *c)
-{
-    int r = 0;
-
-    r = r || (fputs(c, file) < 0);        /* fputs >= 0 if successful     */
-    r = r || (fputc('\n', file) == EOF);  /* fputc == EOF if unsuccessful */
-
-    return r ? DOCS_IOE : DOCS_SUCCESS;
-}
-
-/*
-    A really, really simple quadratic time implementation that removes 
-    leading, trailing and duplicate whitespace from a string.
- */
-
-static void _str_cleanup(char * str)
-{
-    int i, j, k, len = strlen(str);
-
-    /* Remove trailing whitespace */
-    for ( ; len >= 0 && str[len] == ' '; len--)
-        str[len] = '\0';
-
-    /* Remove leading whitespace */
-    for (j = 0; j < len && str[j] == ' '; j++) ;
-    if (j > 0)
-        for (k = j; k <= len; k++)
-            str[k - j] = str[k];
-    len = len - j;
-
-    /* Remove intermediate whitespace */
-    for (i = 1; i < len; i++)
-    {
-        if (str[i] == ' ' && i < len)
-            i++;
-        for (j = i; j < len && str[j] == ' '; j++) ;
-        if (j - i > 0)
-            for (k = j; k <= len; k++)
-                str[k - (j - i)] = str[k];
-        len = len - (j - i);
-    }
-}
-
-/*****************************************************************************/
-
-static int open_group()
-{
-    grp_open = 1;
-
-    fprintf(out, "\n");
-    fprintf(out, "\\section{%s}\n\n", grp);
-
-    return DOCS_SUCCESS;
-}
-
-static int close_group()
-{
-    grp_open = 0;
-
-    return DOCS_SUCCESS;
-}
-
-static int open_function()
-{
-    fnc_open = 1;
-
-    _str_cleanup(fnc.mods);
-    _str_cleanup(fnc.args);
-
+    /* We try to be clever and remove newlines and any whitespaces following
+       them. */
     fprintf(out, "\n");
     fprintf(out, "\\vspace*{0.5em}\n");
     fprintf(out, "\\begin{lstlisting}\n");
-    if (fnc.mods[0] != '\0')
-        fprintf(out, "%s %s(%s)%s\n", fnc.mods, fnc.name, fnc.args, fnc.rmods);
-    else
-        fprintf(out, "%s(%s)%s\n", fnc.name, fnc.args, fnc.rmods);
-    fprintf(out, "\\end{lstlisting}\n");
+    int i = 0;
+    while(i < len)
+    {
+        if(text[i] != '\n')
+            fprintf(out, "%c", text[i++]);
+        else
+        {
+            int hasspace = text[i - 1] == ' ';
+            while(i < len-1 && text[++i] == ' ');
+            if(!hasspace)
+                fprintf(out, " ");
+        }
+    }
+    fprintf(out, "\n\\end{lstlisting}\n");
     fprintf(out, "\\vspace*{-0.5em}\n");
-
-    return DOCS_SUCCESS;
 }
 
-static int close_function()
-{
-    fnc_open = 0;
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-    return DOCS_SUCCESS;
+/* We read at most 80 characters at a time. Reading more makes error reporting
+   less reliable, reading less makes the debug output even more horrible. */
+#define YY_INPUT(buf, result, max_size) \
+{ \
+    result = fread(buf, 1, MIN(max_size, 80), in); \
+    int myindex; \
+    for(myindex = 0;myindex < result;++myindex) line += (buf[myindex] == '\n'); \
 }
+/* use this debug switch if you are desperate enough */
+#if 0
+#define YY_DEBUG
+#endif
 
-static int open_description()
-{
-    dsc_open = 1;
-
-    return DOCS_SUCCESS;
-}
-
-static int close_description()
-{
-    dsc_open = 0;
-
-    return DOCS_SUCCESS;
-}
-
-/*****************************************************************************/
-
-/*
-    Proceeds until the first line with 79 characters equal to '*' has 
-    been read.  The return values are the same as for readline().
- */
-
-static void processfile(void)
-{
-    int i, j, k, m, n, r;
-
-    printf("Open file %s\n", name);
-    fflush(stdout);
-    line = 0;
-
-    STATE(0)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == DOCS_WIDTH)
-            {
-                for (i = 0; i < n && buf[i] == '*'; i++) ;
-                if (i == n)
-                    NEXTSTATE(1);
-            }
-            NEXTSTATE(0);
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(1)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == 0)
-                NEXTSTATE(1);
-            if (n > 4 && (buf[0] == ' ' && buf[1] == ' ' && buf[2] == ' ' 
-                                        && buf[3] == ' ' && (isalpha(buf[4]) || buf[4] == '_')))
-            {
-                strncpy(grp, buf + 4, n - 4);
-                grp[n - 4] = '\0';
-                open_group();
-
-                NEXTSTATE(2);
-            }
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(2)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == 0 || (n == 4 && buf[0] == ' ' && buf[1] == ' ' 
-                                  && buf[2] == ' ' && buf[3] == ' '))
-                NEXTSTATE(3);
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(3)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == DOCS_WIDTH)
-            {
-                for (i = 0; i < n && buf[i] == '*'; i++) ;
-                if (i == n)
-                {
-                    close_group();
-                    NEXTSTATE(4);
-                }
-            }
-            if (n == 0 || (n == 4 && buf[0] == ' ' && buf[1] == ' ' 
-                                  && buf[2] == ' ' && buf[3] == ' '))
-            {
-                printline(out, "");
-                NEXTSTATE(3);
-            }
-            if (n > 4 && (buf[0] == ' ' && buf[1] == ' ' && buf[2] == ' ' 
-                                        && buf[3] == ' '))
-            {
-                printline(out, buf + 4);
-                NEXTSTATE(3);
-            }
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(4)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == 0)
-                NEXTSTATE(5);
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(5)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == 0)
-                NEXTSTATE(5);
-            if (n == DOCS_WIDTH)
-            {
-                for (i = 0; i < n && buf[i] == '*'; i++) ;
-                if (i == n)
-                {
-                    /* Open group */
-                    NEXTSTATE(1);
-                }
-            }
-            if (isalpha(buf[0]) || buf[0] == '_')
-                NEXTSTATE(5a);
-        }
-        NEXTSTATE(eof);
-    }
-
-    /* isalpha(buf[0]) ---> Open a new function */
-    STATE(5a)
-    {
-        close_description();
-        close_function();
-
-        for (j = 0; j < n && buf[j] != '('; j++) ;
-        for (k = j; k < n && buf[k] != ')'; k++) ;
-
-        /* No opening bracket. */
-        if (j == n)
-        {
-            strncpy(fnc.mods, buf, n + 1);
-            NEXTSTATE(6);
-        }
-
-        for (m = j; m > 0 && buf[m - 1] != ' '; m--) ;
-        if (m == 0)
-        {
-            /* No modifiers */
-            fnc.mods[0] = '\0';
-        }
-        else
-        {
-            strncpy(fnc.mods, buf, m - 1);
-            fnc.mods[m - 1] = '\0';
-        }
-        strncpy(fnc.name, buf + m, j - m);
-        fnc.name[j - m] = '\0';
-
-        if (k - (j + 1) > 0)
-        {
-            strncpy(fnc.args, buf + j + 1, k - (j + 1));
-            fnc.args[k - (j + 1)] = '\0';
-        }
-        else
-        {
-            /* no arguments */
-            fnc.args[0] = '\0';
-        }
-
-        if (k == n)
-            NEXTSTATE(7);
-
-        NEXTSTATE(5z);
-    }
-
-    STATE(5z)
-    {
-        for (k = 0; k < n && buf[k] != ')'; k++) ;
-        k += 1; /* skip ')' */
-        if (k < n)
-        {
-            strncpy(fnc.rmods, buf + k, n - k);
-            fnc.rmods[n - k] = '\0';
-        }
-        else
-        {
-            fnc.rmods[0] = '\0';
-        }
-        open_function();
-        NEXTSTATE(8);
-    }
-
-    STATE(6)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS && n > 0)
-        {
-            for (j = 0; j < n && buf[j] != '('; j++) ;
-            for (k = j; k < n && buf[k] != ')'; k++) ;
-            if (j == n)
-                NEXTSTATE(pe);
-            strncpy(fnc.name, buf, j);
-            fnc.name[j] = '\0';
-            if (j < n)
-            {
-                m = (k < n) ? k - 1 : n;
-                strncpy(fnc.args, buf + (j + 1), m - (j + 1));
-                fnc.args[n - (j + 1)] = '\0';
-                if (k < n)
-                    NEXTSTATE(5z);
-                else
-                    NEXTSTATE(7);
-            }
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(7)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS && n > 0)
-        {
-            size_t len = strlen(fnc.args);
-
-            for (k = 0; k < n && buf[k] != ')'; k++) ;
-            strncpy(fnc.args + len, buf, k);
-            fnc.args[len + k] = '\0';
-            if (k < n)
-                NEXTSTATE(5z);
-            else
-                NEXTSTATE(7);
-        }
-        NEXTSTATE(pe);
-    }
-
-    STATE(8)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == 0 || (n == 4 && buf[0] == ' ' && buf[1] == ' ' 
-                                  && buf[2] == ' ' && buf[3] == ' '))
-            {
-                open_description();
-                NEXTSTATE(9);
-            }
-            if (isalpha(buf[0]) || buf[0] == '_')
-                NEXTSTATE(5a);
-            NEXTSTATE(pe);
-        }
-        NEXTSTATE(eof);
-    }
-
-    STATE(9)
-    {
-        next_event();
-
-        if (r == DOCS_SUCCESS)
-        {
-            if (n == 0)
-            {
-                /* Print empty line to LaTeX */
-                printline(out, "");
-                NEXTSTATE(9);
-            }
-            if (n >= 4 && buf[0] == ' ' && buf[1] == ' ' 
-                       && buf[2] == ' ' && buf[3] == ' ')
-            {
-                /* Print {buf + 4, n - 4} to LaTeX */
-                printline(out, buf + 4);
-                NEXTSTATE(9);
-            }
-            if (n == DOCS_WIDTH)
-            {
-                for (i = 0; i < n && buf[i] == '*'; i++) ;
-                if (i == n)
-                    NEXTSTATE(1);
-            }
-            if (isalpha(buf[0]) || buf[0] == '_')
-                NEXTSTATE(5a);
-            NEXTSTATE(pe);
-        }
-        NEXTSTATE(eof);
-    }
-
-    STATE(ioe)
-    {
-        printf("\n");
-        printf("Input/ output exception:\n");
-        printf("Raised when reading line %d in file %s.\n\n", line, name);
-
-        NEXTSTATE(end);
-    }
-
-    STATE(pe)
-    {
-        printf("\n");
-        printf("Parse exception:\n");
-        printf("Encountered malformed input on line %d \n", line);
-        printf("in file %s.\n\n", name);
-
-        exit(1);
-
-        NEXTSTATE(end);
-    }
-
-    STATE(eof)
-    {
-        NEXTSTATE(end);
-    }
-
-    STATE(end)
-    {
-        close_description();
-        close_function();
-        close_group();
-
-        printf("Close file %s\n", name);
-        fflush(stdout);
-    }
-}
+/* parser definition, automatically generated from create_doc.leg */
+#include "create_doc_gen.c"
 
 int main(void)
 {
@@ -609,12 +147,19 @@ int main(void)
 
     for (i = 0; i < ndocs; i++)
     {
-        name = docsin[i];
+        char* name = docsin[i];
         line = 0;
         in   = fopen(docsin[i], "r");
         out  = fopen(docsout[i], "w");
 
-        processfile();
+        if(yyparse() == 0 || !feof(in))
+        {
+            printf("\n");
+            printf("Parse exception:\n");
+            printf("Encountered malformed input near line %d \n", line);
+            printf("in file %s.\n\n", name);
+            return 1;
+        }
 
         fclose(in);
         fclose(out);

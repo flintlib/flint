@@ -1,5 +1,5 @@
 CC    ?= gcc
-CFLAGS = -ansi -pedantic
+CFLAGS = -ansi -pedantic -std=c99
 
 manual :
 	$(CC) -c $(CFLAGS) create_doc.c -o create_doc.o
