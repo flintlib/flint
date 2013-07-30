@@ -83,7 +83,7 @@ padic_mat_is_square(const padic_mat_t A)
 }
 
 static __inline__ int 
-padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
+padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx)
 {
     if (fmpz_mat_is_zero(padic_mat(A)))
     {
@@ -96,7 +96,7 @@ padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
 
         for (i = 0; i < padic_mat(A)->r; i++)
             for (j = 0; j < padic_mat(A)->c; j++)
-                if (!fmpz_divisible(padic_mat_entry(A, i, j), p))
+                if (!fmpz_divisible(padic_mat_entry(A, i, j), ctx->p))
                     canonical = 1;
         return canonical;
     }
@@ -113,7 +113,7 @@ padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
     {
         return (padic_mat_val(A) == 0);
     }
-    else if (padic_mat_is_canonical(A, ctx->p))
+    else if (padic_mat_is_canonical(A, ctx))
     {
         const slong v = padic_mat_val(A);
         const slong N = padic_mat_prec(A);
