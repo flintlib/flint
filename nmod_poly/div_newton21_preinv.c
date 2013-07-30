@@ -32,11 +32,11 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, long lenA,
-                                     mp_srcptr B, long lenB, mp_srcptr Binv,
-                                     long lenBinv, nmod_t mod)
+void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+                                     mp_srcptr B, slong lenB, mp_srcptr Binv,
+                                     slong lenBinv, nmod_t mod)
 {
-    const long lenQ = lenA - lenB + 1;
+    const slong lenQ = lenA - lenB + 1;
     mp_ptr Arev;
 
     Arev = _nmod_vec_init(lenA);
@@ -53,7 +53,7 @@ void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, long lenA,
 void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                     const nmod_poly_t B, const nmod_poly_t Binv)
 {
-    const long lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
+    const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
                lenBinv= Binv->length;
 
     mp_ptr q;

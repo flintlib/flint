@@ -183,7 +183,8 @@ int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     {
         if (v < N)
         {
-            _padic_exp(padic_unit(rop), padic_unit(op), padic_val(op), p, N);
+            _padic_exp_rectangular(padic_unit(rop), 
+                                   padic_unit(op), padic_val(op), p, N);
             padic_val(rop) = 0;
         }
         else

@@ -1,0 +1,620 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011, 2012, 2013 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Data structures
+
+    We represent an element of the extension 
+    $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$ as 
+    a polynomial in $\mathbf{Q}_p[X]$ of degree less 
+    than $\deg(f)$.
+
+    As such, \code{qadic_struct} and \code{qadic_t} are 
+    typedef'ed as \code{padic_poly_struct} and \code{padic_poly_t}.
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Context
+
+    We represent an unramified extension of $\mathbf{Q}_p$ 
+    via $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$, 
+    where $f \in \mathbf{Q}_p[X]$ is a monic, irreducible 
+    polynomial which we assume to actually be in $\mathbf{Z}[X]$.
+
+    The first field in the context structure is a $p$-adic 
+    context struct \code{pctx}, which contains data about 
+    the prime~$p$, precomputed powers, the printing mode etc.
+
+    The polynomial $f$ is represented as a sparse polynomial 
+    using two arrays $j$ and $a$ of length \code{len}, where 
+    $f(X) = \sum_{i} a_{i} X^{j_{i}}$.  We also assume that 
+    the array~$j$ is sorted in ascending order.
+
+    We choose this data structure to improve reduction 
+    modulo $f(X)$ in $\mathbf{Q}_p[X]$, assuming a sparse 
+    polynomial $f(X)$ is chosen.
+
+    The field \code{var} contains the name of a generator 
+    of the extension, which is used when printing the 
+    elements.
+
+*******************************************************************************
+
+void qadic_ctx_init_conway(qadic_ctx_t ctx, 
+                           const fmpz_t p, slong d, slong min, slong max, 
+                           const char *var, enum padic_print_mode mode)
+
+    Initialises the context \code{ctx} with prime $p$, extension degree $d$, 
+    variable name \code{var} and printing mode \code{mode}.
+
+    Stores powers of $p$ with exponents between \code{min} (inclusive) and 
+    \code{max} exclusive.  Assumes that \code{min} is at most \code{max}. 
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the string \code{var} is a null-terminated string 
+    of length at least one.
+
+    Assumes that the printing mode is one of \code{PADIC_TERSE}, 
+    \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.
+
+    This function also carries out some relevant precomputation for 
+    arithmetic in $\mathbf{Q}_p / (p^N)$ such as powers of $p$ close 
+    to $p^N$.
+
+void qadic_ctx_clear(qadic_ctx_t ctx);
+
+    Clears all memory that has been allocated as part of the context.
+
+slong qadic_ctx_degree(const qadic_ctx_t ctx)
+
+    Returns the extension degree.
+
+static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
+
+    Prints the data from the given context.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void qadic_init(qadic_t rop)
+
+    Initialises the element \code{rop}, setting its value to~$0$.
+
+void qadic_init2(qadic_t rop, slong prec)
+
+    Initialises the element \code{rop} with the given output precision, 
+    setting the value to~$0$.
+
+void qadic_clear(qadic_t rop)
+
+    Clears the element \code{rop}.
+
+void _fmpz_poly_reduce(fmpz *R, slong lenR, 
+                       const fmpz *a, const slong *j, slong len)
+
+    Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
+    polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
+    least~$2$.
+
+    Assumes that the array $j$ of positive length \code{len} is 
+    sorted in ascending order.
+
+    Allows zero-padding in \code{(R, lenR)}.
+
+void _fmpz_mod_poly_reduce(fmpz *R, slong lenR, 
+    const fmpz *a, const slong *j, slong len, const fmpz_t p)
+
+    Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
+    polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
+    least~$2$ in $\mathbf{Z}/(p)$, where $p$ is typically a prime 
+    power.
+
+    Assumes that the array $j$ of positive length \code{len} is 
+    sorted in ascending order.
+
+    Allows zero-padding in \code{(R, lenR)}.
+
+void qadic_reduce(qadic_t rop, const qadic_ctx_t ctx)
+
+    Reduces \code{rop} modulo $f(X)$ and $p^N$.
+
+*******************************************************************************
+
+    Properties
+
+*******************************************************************************
+
+slong qadic_val(const qadic_t op)
+
+    Returns the valuation of \code{op}.
+
+slong qadic_prec(const qadic_t op)
+
+    Returns the precision of \code{op}.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void qadic_randtest(qadic_t rop, flint_rand_t state, const qadic_ctx_t ctx)
+
+    Generates a random element of $\mathbf{Q}_q$.
+
+void qadic_randtest_not_zero(qadic_t rop, flint_rand_t state, 
+                             const qadic_ctx_t ctx)
+
+    Generates a random non-zero element of $\mathbf{Q}_q$.
+
+void qadic_randtest_val(qadic_t rop, flint_rand_t state, slong v, 
+                        const qadic_ctx_t ctx)
+
+    Generates a random element of $\mathbf{Q}_q$ with prescribed 
+    valuation \code{val}.
+
+    Note that if $v \geq N$ then the element is necessarily zero.
+
+void qadic_randtest_int(qadic_t rop, flint_rand_t state, const qadic_ctx_t ctx)
+
+    Generates a random element of $\mathbf{Q}_q$ with non-negative valuation.
+
+*******************************************************************************
+
+    Assignments and conversions
+
+*******************************************************************************
+
+void qadic_set(qadic_t rop, const qadic_t op)
+
+    Sets \code{rop} to \code{op}.
+
+void qadic_zero(qadic_t rop)
+
+    Sets \code{rop} to zero.
+
+void qadic_one(qadic_t rop, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to one, reduced in the given context.
+
+    Note that if the precision $N$ is non-positive then \code{rop} 
+    is actually set to zero.
+
+void qadic_gen(qadic_t rop, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the generator $X$ for the extension 
+    when $N > 0$, and zero otherwise.  If the extension degree 
+    is one, raises an abort signal.
+
+void qadic_set_ui(qadic_t rop, ulong op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the integer \code{op}, reduced in the 
+    context.
+
+int qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    If the element \code{op} lies in $\mathbf{Q}_p$, sets \code{rop} 
+    to its value and returns~$1$;  otherwise, returns~$0$.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int qadic_is_zero(const qadic_t op)
+
+    Returns whether \code{op} is equal to zero.
+
+int qadic_is_one(const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether \code{op} is equal to one in the given 
+    context.
+
+int qadic_equal(const qadic_t op1, const qadic_t op2)
+
+    Returns whether \code{op1} and \code{op2} are equal.
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void qadic_add(qadic_t rop, const qadic_t op1, const qadic_t op2, 
+               const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+
+    Assumes that both \code{op1} and \code{op2} are reduced in the 
+    given context and ensures that \code{rop} is, too.
+
+void qadic_sub(qadic_t rop, const qadic_t op1, const qadic_t op2, 
+               const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+
+    Assumes that both \code{op1} and \code{op2} are reduced in the 
+    given context and ensures that \code{rop} is, too.
+
+void qadic_neg(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the negative of \code{op}.
+
+    Assumes that \code{op} is reduced in the given context and 
+    ensures that \code{rop} is, too.
+
+void qadic_mul(qadic_t rop, const qadic_t op1, const qadic_t op2, 
+               const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2}, 
+    reducing the output in the given context.
+
+void _qadic_inv(fmpz *rop, const fmpz *op, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N)
+
+    Sets \code{(rop, d)} to the inverse of \code{(op, len)} 
+    modulo $f(X)$ given by \code{(a,j,lena)} and $p^N$.
+
+    Assumes that \code{(op,len)} has valuation~$0$, that is, 
+    that it represents a $p$-adic unit.
+
+    Assumes that \code{len} is at most $d$.
+
+    Does not support aliasing.
+
+void qadic_inv(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the inverse of \code{op}, reduced in the given context.
+
+void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p)
+
+    Sets \code{(rop, 2*d-1)} to \code{(op,len)} raised to the power~$e$, 
+    reduced modulo $f(X)$ given by \code{(a, j, lena)} and $p$, which 
+    is expected to be a prime power.
+
+    Assumes that $e \geq 0$ and that \code{len} is positive and at most~$d$.
+
+    Although we require that \code{rop} provides space for 
+    $2d - 1$ coefficients, the output will be reduces modulo 
+    $f(X)$, which is a polynomial of degree~$d$.
+
+    Does not support aliasing.
+
+void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e, 
+               const qadic_ctx_t ctx)
+
+    Sets \code{rop} the \code{op} raised to the power~$e$.
+
+    Currently assumes that $e \geq 0$.
+
+    Note that for any input \code{op}, \code{rop} is set to one in the 
+    given context whenever $e = 0$.
+
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
+                            const fmpz *a, const slong *j, slong lena, 
+                            const fmpz_t p, slong N, const fmpz_t pN)
+
+    Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
+    reduced modulo $p^N$, assuming that the series converges.
+
+    Assumes that \code{(op, v, len)} is non-zero.
+
+    Does not support aliasing.
+
+int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the exponential series converges at \code{op} 
+    and sets \code{rop} to its value reduced modulo in the given 
+    context.
+
+void _qadic_exp_balanced(fmpz *rop, const fmpz *x, slong v, slong len, 
+                         const fmpz *a, const slong *j, slong lena, 
+                         const fmpz_t p, slong N, const fmpz_t pN)
+
+    Sets \code{(rop, d)} to the exponential of \code{(op, v, len)} 
+    reduced modulo $p^N$, assuming that the series converges.
+
+    Assumes that \code{len} is in $[1,d)$ but supports zero padding, 
+    including the special case when \code{(op, len)} is zero.
+
+    Supports aliasing between \code{rop} and \code{op}.
+
+int qadic_exp_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the exponential series converges at \code{op} 
+    and sets \code{rop} to its value reduced modulo in the given 
+    context.
+
+void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N)
+
+    Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
+    reduced modulo $p^N$, assuming that the series converges.
+
+    Assumes that \code{(op, v, len)} is non-zero.
+
+    Does not support aliasing.
+
+int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the exponential series converges at \code{op} 
+    and sets \code{rop} to its value reduced modulo in the given 
+    context.
+
+    The exponential series converges if the valuation of \code{op} 
+    is at least~$2$ or $1$ when $p$ is even or odd, respectively.
+
+void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, 
+                            const fmpz *a, const slong *j, slong lena, 
+                            const fmpz_t p, slong N, const fmpz_t pN)
+
+    Computes 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
+    \begin{align*}
+    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
+    \end{align*}
+
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
+
+    Assumes that $y$ is reduced modulo $p^N$.
+
+    Assumes that $v < N$, and in particular $N \geq 2$.
+
+    Supports aliasing between $y$ and $z$.
+
+int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, 
+                         const fmpz *a, const slong *j, slong lena, 
+                         const fmpz_t p, slong N, const fmpz_t pN)
+
+    Computes $(z, d)$ as 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Assumes that $v = \ord_p(y)$ is at least $1$ when $p$ is odd and 
+    at least $2$ when $p = 2$ so that the series converges.
+
+    Supports aliasing between $z$ and $y$.
+
+int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
+                const fmpz *a, const slong *j, slong lena, 
+                const fmpz_t p, slong N, const fmpz_t pN)
+
+    Computes $(z, d)$ as 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
+    \begin{align*}
+    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
+    \end{align*}
+
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
+
+    Assumes that $(y, d)$ is reduced modulo $p^N$.
+
+    Assumes that $v < N$, and hence in particular $N \geq 2$.
+
+    Supports aliasing between $z$ and $y$.
+
+int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+    The $p$-adic logarithm function is defined by the usual series 
+    \begin{equation*}
+    \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
+    \end{equation*}
+    but this only converges when $\ord_p(x)$ is at least $2$ or $1$ 
+    when $p = 2$ or $p > 2$, respectively.
+
+void _qadic_frobenius_a(fmpz *rop, slong e, 
+                    const fmpz *a, const slong *j, slong lena, 
+                    const fmpz_t p, slong N)
+
+    Computes $\sigma^e(X) \bmod{p^N}$ where $X$ is such that 
+    $\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))$.
+
+    Assumes that the precision $N$ is at least~$2$ and that the 
+    extension is non-trivial, i.e.\ $d \geq 2$.
+
+    Assumes that $0 < e < d$.
+
+    Sets \code{(rop, 2*d-1)}, although the actual length of the 
+    output will be at most~$d$.
+
+void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+                  const fmpz *a, const slong *j, slong lena, 
+                  const fmpz_t p, slong N)
+
+    Sets \code{(rop, 2*d-1)}$ to $\Sigma$ evaluated at \code{(op, len)}.
+
+    Assumes that \code{len} is positive but at most~$d$.
+
+    Assumes that $0 < e < d$.
+
+    Does not support aliasing.
+
+void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t ctx)
+
+    Evaluates the homomorphism $\Sigma^e$ at \code{op}.
+
+    Recall that $\mathbf{Q}_q / \mathbf{Q}_p$ is Galois with Galois group 
+    $\langle \Sigma \rangle \cong \langle \sigma \rangle$, which is also 
+    isomorphic to $\mathbf{Z}/d\mathbf{Z}$, where 
+    $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element 
+    $\sigma \colon x \mapsto x^p$ and $\Sigma$ is its lift to 
+    $\Gal(\mathbf{Q}_q/\mathbf{Q}_p)$.
+
+    This functionality is implemented as \code{GaloisImage()} in Magma.
+
+void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, 
+                        const fmpz *a, const slong *j, slong lena, 
+                        const fmpz_t p, slong N)
+
+    Sets \code{(rop, d)} to the Teichm\"uller lift of \code{(op, len)} 
+    modulo~$p^N$.
+
+    Does not support aliasing.
+
+void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the Teichm\"uller lift of \code{op} to the 
+    precision given in the context.
+
+    For a unit \code{op}, this is the unique $(q-1)$th root of unity 
+    which is congruent to \code{op} modulo~$p$.
+
+    Sets \code{rop} to zero if \code{op} is zero in the given context.
+
+    Raises an exception if the valuation of \code{op} is negative.
+
+void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, 
+                  const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
+
+void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the trace of \code{op}.
+
+    For an element $a \in \mathbf{Q}_q$, multiplication by $a$ defines 
+    a $\mathbf{Q}_p$-linear map on $\mathbf{Q}_q$.  We define the trace 
+    of $a$ as the trace of this map.  Equivalently, if $\Sigma$ generates 
+    $\Gal(\mathbf{Q}_q / \mathbf{Q}_p)$ then the trace of $a$ is equal to 
+    $\sum_{i=0}^{d-1} \Sigma^i (a)$.
+
+void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, 
+                 const fmpz *a, const slong *j, slong lena, 
+                 const fmpz_t p, slong N)
+
+    Sets \code{rop} to the norm of the element \code{(op,len)} 
+    in $\mathbf{Z}_q$ to precision $N$, where \code{len} is at 
+    least one.
+
+    The result will be reduced modulo $p^N$.
+
+    Note that whenever \code{(op,len)} is a unit, so is its norm. 
+    Thus, the output \code{rop} of this function will typically 
+    not have to be canonicalised or reduced by the caller.
+
+void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Computes the norm of \code{op} to the given precision.
+
+    Algorithm selection is automatic depending on the input.
+
+void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Whenever \code{op} has valuation greater than $(p-1)^{-1}$, this 
+    routine computes its norm \code{rop} via 
+    \begin{equation*}
+    \Norm (x) = \exp \Bigl( \bigl( \Trace \log (x) \bigr) \Bigr).
+    \end{equation*}
+
+    In the special case that \code{op} lies in $\mathbf{Q}_p$, returns 
+    its norm as $\Norm(x) = x^d$, where $d$ is the extension degree.
+
+    Otherwise, raises an \code{abort} signal.
+
+    The complexity of this implementation is quasi-linear in $d$ and $N$, 
+    and polynomial in $\log p$.
+
+void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the norm of \code{op}, using the formula 
+    \begin{equation*}
+    \Norm(x) = \ell(f)^{-\deg(a)} \Res(f(X), a(X)),
+    \end{equation*}
+    where $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$, $\ell(f)$ is the 
+    leading coefficient of $f(X)$, and $a(X) \in mathbf{Q}_p[X]$ denotes 
+    the same polynomial as $x$.
+
+    The complexity of the current implementation is given by 
+    $\mathcal{O}(d^4 M(N \log p))$, where $M(n)$ denotes the 
+    complexity of multiplying to $n$-bit integers.
+
+*******************************************************************************
+
+    Output
+
+*******************************************************************************
+
+int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{file}.
+
+    In the current implementation, always returns~$1$.  The return code is 
+    part of the function's signature to allow for a later implementation to 
+    return the number of characters printed or a non-positive error code.
+
+int qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{stdout}.
+
+    In the current implementation, always returns~$1$.  The return code is 
+    part of the function's signature to allow for a later implementation to 
+    return the number of characters printed or a non-positive error code.
+

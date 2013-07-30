@@ -205,15 +205,14 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    /* Check that (a * b) * c == a * (b * c), correct only mod p^{N-v} */
+    /* Check that (a * b) * c == a * (b * c) (mod p^N) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
         slong N;
         padic_ctx_t ctx;
 
-        padic_t a, b, c, d, e, t;
-        slong v;
+        padic_t a, b, c, lhs1, lhs2, rhs1, rhs2;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -223,51 +222,42 @@ main(void)
         padic_init2(a, N);
         padic_init2(b, N);
         padic_init2(c, N);
-        padic_init2(d, N);
-        padic_init2(e, N);
-        padic_init2(t, N);
 
         padic_randtest(a, state, ctx);
         padic_randtest(b, state, ctx);
         padic_randtest(c, state, ctx);
 
-     /* v = min(val(a), val(b), val(c), 0) */
-        v = FLINT_MIN(padic_val(a), padic_val(b));
-        v = FLINT_MIN(v, padic_val(c));
-        v = FLINT_MIN(v, 0);
+        padic_init2(lhs1, N - padic_val(c));
+        padic_init2(lhs2, N);
+        padic_init2(rhs1, N - padic_val(a));
+        padic_init2(rhs2, N);
 
-        if ((v >= 0) || (-v < N)) /* Otherwise, no precision left */
+        padic_mul(lhs1, a, b, ctx);
+        padic_mul(lhs2, lhs1, c, ctx);
+        padic_mul(rhs1, b, c, ctx);
+        padic_mul(rhs2, a, rhs1, ctx);
+
+        result = (padic_equal(lhs2, rhs2));
+        if (!result)
         {
-            slong N2 = (v >= 0) ? N : N + v;
-
-            padic_prec(d) = N2;
-            padic_prec(e) = N2;
-
-            padic_mul(t, a, b, ctx);
-            padic_mul(d, d, c, ctx);
-
-            padic_mul(t, b, c, ctx);
-            padic_mul(e, a, e, ctx);
-
-            result = (padic_equal(d, e));
-            if (!result)
-            {
-                printf("FAIL ((a*b)*c = a*(b*c):\n\n");
-                printf("a = "), padic_print(a, ctx), printf("\n");
-                printf("b = "), padic_print(b, ctx), printf("\n");
-                printf("c = "), padic_print(c, ctx), printf("\n");
-                printf("d = "), padic_print(d, ctx), printf("\n");
-                printf("e = "), padic_print(e, ctx), printf("\n");
-                abort();
-            }
+            printf("FAIL ((a*b)*c = a*(b*c) mod p^N):\n\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("c = "), padic_print(c, ctx), printf("\n");
+            printf("lhs1 = "), padic_print(lhs1, ctx), printf("\n");
+            printf("lhs2 = "), padic_print(lhs2, ctx), printf("\n");
+            printf("rhs1 = "), padic_print(rhs1, ctx), printf("\n");
+            printf("rhs2 = "), padic_print(rhs2, ctx), printf("\n");
+            abort();
         }
 
         padic_clear(a);
         padic_clear(b);
         padic_clear(c);
-        padic_clear(d);
-        padic_clear(e);
-        padic_clear(t);
+        padic_clear(lhs1);
+        padic_clear(lhs2);
+        padic_clear(rhs1);
+        padic_clear(rhs2);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
@@ -288,10 +278,11 @@ main(void)
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         padic_init2(a, N);
+        padic_init2(b, 1);
         padic_init2(c, N);
-        padic_init2(b, FLINT_MAX(N, 1));
 
         padic_randtest(a, state, ctx);
+
         padic_one(b);
         padic_mul(c, a, b, ctx);
 

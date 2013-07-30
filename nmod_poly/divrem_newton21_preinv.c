@@ -32,10 +32,10 @@
 #include "ulong_extras.h"
 
 void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
-                                        long lenA, mp_srcptr B, long lenB,
-                                       mp_srcptr Binv, long lenBinv, nmod_t mod)
+                                        slong lenA, mp_srcptr B, slong lenB,
+                                       mp_srcptr Binv, slong lenBinv, nmod_t mod)
 {
-    const long lenQ = lenA - lenB + 1;
+    const slong lenQ = lenA - lenB + 1;
 
     _nmod_poly_div_newton21_preinv (Q, A, lenA, B, lenB, Binv, lenBinv, mod);
 
@@ -54,7 +54,7 @@ void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
                                       const nmod_poly_t A, const nmod_poly_t B,
                                       const nmod_poly_t Binv)
 {
-    const long lenA = A->length, lenB = B->length, lenBinv= Binv->length;
+    const slong lenA = A->length, lenB = B->length, lenBinv= Binv->length;
     mp_ptr q, r;
 
     if (lenB == 0)
