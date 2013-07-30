@@ -30,10 +30,6 @@
 #include "padic.h"
 #include "qadic.h"
 
-#ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT "/home/user/FLINT/flint-2/qadic/CPimport.txt"
-#endif
-
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode)
@@ -50,6 +46,13 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     buf  = flint_malloc(832);
     file = fopen(FLINT_CPIMPORT, "r");
+
+    if (!file)
+    {
+        /* Additional path in case we are in a devel tree
+           and installation was not performed yet. */
+        file = fopen("../qadic/CPimport.txt", "r");
+    }
 
     if (!file)
     {
