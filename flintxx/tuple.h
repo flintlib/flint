@@ -37,6 +37,20 @@ namespace flint {
 // So e.g. a pair of integers would be tuple<int, tuple<int, empty_tuple> >.
 //
 // There are some helpers in the mp namespace below.
+namespace detail {
+struct FILLIT { };
+} // detail
+namespace mp {
+namespace htuples {
+// Filling of tuples
+template<class Tuple, class Filler>
+Tuple fill(const Filler& f)
+{
+    return Tuple(detail::FILLIT(), f);
+}
+} // htuples
+} // mp
+
 template<class Head, class Tail>
 struct tuple
 {
@@ -68,6 +82,18 @@ struct tuple
     {
         return head == other.head && tail == other.tail;
     }
+
+private:
+    template<class Filler>
+    tuple(detail::FILLIT fillit, const Filler& f)
+        : head(f.template create<head_t>()), tail(fillit, f)
+    {
+    }
+
+    template<class Tuple, class Filler>
+    friend Tuple mp::htuples::fill(const Filler&);
+    template<class H, class T>
+    friend struct tuple;
 };
 
 struct empty_tuple
@@ -80,6 +106,19 @@ struct empty_tuple
     static const unsigned len = 0;
 
     bool operator==(const empty_tuple&) {return true;}
+
+    empty_tuple() {}
+
+private:
+    template<class Filler>
+    empty_tuple(detail::FILLIT fillit, const Filler& f)
+    {
+    }
+
+    template<class Tuple, class Filler>
+    friend Tuple mp::htuples::fill(const Filler&);
+    template<class Head, class Tail>
+    friend struct tuple;
 };
 
 namespace mp {
@@ -492,34 +531,6 @@ inline typename Tuple::tail_t
 removeres(const Tuple& tuple, typename Tuple::head_t res)
 {
     return hdetail::remove_helper<Tuple>::get(tuple, res);
-}
-
-
-
-// Filling of tuples
-namespace htdetail {
-template<class Filler, class Tuple>
-struct fill_helper
-{
-    static Tuple get(const Filler& f)
-    {
-        typedef typename Tuple::head_t head_t;
-        typedef typename Tuple::tail_t tail_t;
-        return Tuple(f.template create<head_t>(),
-                fill_helper<Filler, tail_t>::get(f));
-    }
-};
-
-template<class Filler>
-struct fill_helper<Filler, empty_tuple>
-{
-    static empty_tuple get(const Filler&) {return empty_tuple();}
-};
-} // htdetail
-template<class Tuple, class Filler>
-Tuple fill(const Filler& f)
-{
-    return htdetail::fill_helper<Filler, Tuple>::get(f);
 }
 } // htuples
 } // mp
