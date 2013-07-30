@@ -127,7 +127,7 @@ int main()
 
     flint_randclear(state);
     mpz_clear(num1);
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

@@ -61,8 +61,7 @@ int main(void)
         mpfr_clear(y);
     }
 
-    mpfr_free_cache();
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

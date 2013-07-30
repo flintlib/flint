@@ -121,8 +121,7 @@ int main()
 
     fmpz_poly_clear(p);
 
-    _fmpz_cleanup();
-    mpfr_free_cache();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

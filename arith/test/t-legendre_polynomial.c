@@ -78,7 +78,7 @@ int main()
     fmpq_poly_clear(Pn2);
     fmpq_poly_clear(R);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

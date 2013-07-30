@@ -112,7 +112,7 @@ int main(void)
     fmpz_clear(y);
     fmpz_clear(z);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

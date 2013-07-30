@@ -59,7 +59,7 @@ int main()
     fmpz_clear(s);
     fmpz_clear(t);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

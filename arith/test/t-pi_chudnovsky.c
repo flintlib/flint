@@ -58,7 +58,7 @@ int main(void)
         mpfr_clear(y);
     }
 
-    mpfr_free_cache();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

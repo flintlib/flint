@@ -85,8 +85,7 @@ int main()
         fmpq_poly_clear(Q);
     }
 
-    mpfr_free_cache();
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }
