@@ -258,7 +258,7 @@ void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, slong N);
 
 void _padic_inv_clear(padic_inv_t S);
 
-void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S);
+void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, const padic_inv_t S);
 
 void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N);
 

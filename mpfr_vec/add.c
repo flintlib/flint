@@ -30,7 +30,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, slong length)
+_mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)

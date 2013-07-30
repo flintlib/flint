@@ -30,8 +30,8 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1,
-                         __mpfr_struct * vec2, slong length)
+_mpfr_vec_scalar_product(mpfr_t res, const mpfr * vec1,
+                         const mpfr * vec2, slong length)
 {
     slong i;
     mpfr_t tmp;

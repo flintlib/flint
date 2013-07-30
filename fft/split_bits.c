@@ -32,7 +32,7 @@ or implied, of William Hart.
 #include "flint.h"
 #include "fft.h"
 
-mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs, 
+mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs, 
                 mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 {
    mp_size_t i, skip, length = (total_limbs - 1)/coeff_limbs + 1;
@@ -52,12 +52,12 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs,
    return length;
 }
 
-mp_size_t fft_split_bits(mp_limb_t ** poly, mp_limb_t * limbs, 
+mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs, 
                mp_size_t total_limbs, mp_bitcnt_t bits, mp_size_t output_limbs)
 {
    mp_size_t i, coeff_limbs, limbs_left, length = (FLINT_BITS*total_limbs - 1)/bits + 1;
    mp_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
-   mp_limb_t * limb_ptr;
+   mp_srcptr limb_ptr;
    mp_limb_t mask;
    
    if (top_bits == 0)

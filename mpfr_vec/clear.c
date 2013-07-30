@@ -30,7 +30,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_clear(__mpfr_struct * vec, slong length)
+_mpfr_vec_clear(mpfr * vec, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)

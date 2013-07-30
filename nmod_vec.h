@@ -205,7 +205,7 @@ void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)
 }
 
 static __inline__
-int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, slong len)
+int _nmod_vec_equal(mp_srcptr vec, mp_srcptr vec2, slong len)
 {
    slong i;
 

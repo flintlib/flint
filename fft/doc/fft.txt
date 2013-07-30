@@ -38,7 +38,7 @@ or implied, of William Hart.
 
 *******************************************************************************
 
-mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs, 
+mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs, 
          mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 
     Split an integer \code{(limbs, total_limbs)} into coefficients of length
@@ -49,7 +49,7 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs,
     is returned by the function and any coefficients beyond this point are
     not touched.
 
-mp_size_t fft_split_bits(mp_limb_t ** poly, mp_limb_t * limbs, 
+mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs, 
               mp_size_t total_limbs, mp_bitcnt_t bits, mp_size_t output_limbs)
 
     Split an integer \code{(limbs, total_limbs)} into coefficients of the 
@@ -608,8 +608,8 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
 *******************************************************************************
 
-void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
-              mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
+                        mp_srcptr i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 
     Integer multiplication using the radix 2 truncated sqrt2 transforms. 
 
@@ -624,8 +624,8 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
 
     If \code{n = 2^depth} then we require $nw$ to be at least 64.
 
-void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
-              mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
+                        mp_srcptr i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 
     As for \code{mul_truncate_sqrt2} except that the cache friendly matrix
     fourier algorithm is used.
@@ -633,8 +633,8 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
     If \code{n = 2^depth} then we require $nw$ to be at least 64. Here we
     also require $w$ to be $2^i$ for some $i \geq 0$. 
 
-void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
-                                                mp_limb_t * i2, mp_size_t n2)
+void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
+                        mp_srcptr i2, mp_size_t n2)
 
     The main integer multiplication routine. Sets \code{(r1, n1 + n2)} to
     \code{(i1, n1)} times \code{(i2, n2)}. We require \code{n1 >= n2 > 0}.

@@ -47,7 +47,7 @@ void _padic_inv_clear(padic_inv_t S)
     _fmpz_vec_clear(pow, 2 * n + 2);
 }
 
-void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
+void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, const padic_inv_t S)
 {
     slong i;
     fmpz *t, *u;

@@ -30,12 +30,12 @@
 
 *******************************************************************************
 
-__mpfr_struct * _mpfr_vec_init(slong len, mp_bitcnt_t prec)
+mpfr * _mpfr_vec_init(slong len, mp_bitcnt_t prec)
 
     Returns a vector of the given length of initialised \code{mpfr}'s 
     with the given exact precision.
  
-void _mpfr_vec_clear(__mpfr_struct * vec, slong len)
+void _mpfr_vec_clear(mpfr * vec, slong len)
 
     Clears the given vector.
 
@@ -49,28 +49,29 @@ void _mpfr_vec_zero(mpfr * vec, slong len)
 
     Zeros the vector \code{(vec, len)}.
 
-void _mpfr_vec_set(mpfr * vec1, mpfr * vec2, slong len)
+void _mpfr_vec_set(mpfr * vec1, const mpfr * vec2, slong len)
 
     Copies the vector \code{vec2} of the given length into \code{vec1}. 
     No check is made to ensure \code{vec1} and \code{vec2} are different.
 
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, slong len)
+void _mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong len)
 
     Adds the given vectors of the given length together and stores the 
     result in \code{res}.
 
-void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, slong len, mpfr_t c)
+void _mpfr_vec_scalar_mul_mpfr(mpfr * res, const mpfr * vec, 
+                                                           slong len, mpfr_t c)
 
     Multiplies the vector with given length by the scalar $c$ and 
     sets \code{res} to the result.
 
 void _mpfr_vec_scalar_mul_2exp(mpfr * res, 
-                               mpfr * vec, slong len, mp_bitcnt_t exp)
+                               const mpfr * vec, slong len, mp_bitcnt_t exp)
 
     Multiplies the given vector of the given length by \code{2^exp}.
 
-void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
-                                          __mpfr_struct * vec2, slong len)
+void _mpfr_vec_scalar_product(mpfr_t res, const mpfr * vec1, 
+                                          const mpfr * vec2, slong len)
 
    Sets \code{res} to the scalar product of \code{(vec1, len)} with 
     \code{(vec2, len)}. Assumes \code{len > 0}.
