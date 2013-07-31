@@ -238,7 +238,8 @@ template<class T>
 struct evaluated_type_pred
 {
     template<class Expr>
-    struct type : mp::equal_types<typename Expr::evaluated_t, T> { };
+    struct type : mp::equal_types<
+              typename tools::evaluation_helper<Expr>::type, T> { };
 };
 }
 
