@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include<sstream>
+#include <sstream>
 
 #include "flintxx/vector.h"
 

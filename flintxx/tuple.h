@@ -83,6 +83,25 @@ struct tuple
         return head == other.head && tail == other.tail;
     }
 
+    template<class T>
+    void set(const T& t)
+    {
+        head = t.head;
+        tail.set(t.tail);
+    }
+    template<class T>
+    void set(T& t)
+    {
+        head = t.head;
+        tail.set(t.tail);
+    }
+
+    template<class T>
+    bool equals_elementwise(const T& t) const
+    {
+        return head == t.head && tail.equals_elementwise(t.tail);
+    }
+
 private:
     template<class Filler>
     tuple(detail::FILLIT fillit, const Filler& f)
@@ -108,6 +127,9 @@ struct empty_tuple
     bool operator==(const empty_tuple&) {return true;}
 
     empty_tuple() {}
+
+    void set(empty_tuple) {}
+    bool equals_elementwise(empty_tuple) const {return true;}
 
 private:
     template<class Filler>
@@ -155,6 +177,38 @@ struct make_tuple<T1, void, void>
     static type make(typename traits::forwarding<T1>::type t1)
     {
         return type(t1, empty_tuple());
+    }
+};
+
+
+// Indexified access
+template<class Tuple, unsigned idx>
+struct tuple_get
+{
+    typedef tuple_get<typename Tuple::tail_t, idx-1> nget;
+    typedef typename nget::type type;
+
+    static typename traits::forwarding<type>::type get(const Tuple& t)
+    {
+        return nget::get(t.tail);
+    }
+    static typename traits::reference<type>::type get(Tuple& t)
+    {
+        return nget::get(t.tail);
+    }
+};
+
+template<class Tuple>
+struct tuple_get<Tuple, 0>
+{
+    typedef typename Tuple::head_t type;
+    static typename traits::forwarding<type>::type get(const Tuple& t)
+    {
+        return t.head;
+    }
+    static typename traits::reference<type>::type get(Tuple& t)
+    {
+        return t.head;
     }
 };
 

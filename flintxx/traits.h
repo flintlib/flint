@@ -95,7 +95,7 @@ template<int n> struct is_string<const char[n]> : mp::true_ { };
 // constant reference type (but avoids things like const (int&)&, which cause
 // syntax errors.
 template<class T, class E = void> struct forwarding {typedef const T& type;};
-template<class T> struct forwarding<T&> {typedef const T& type;};
+template<class T> struct forwarding<T&> {typedef T& type;};
 template<class T> struct forwarding<const T&> {typedef const T& type;};
 
 template<class T>
@@ -104,7 +104,11 @@ struct forwarding<T, typename mp::enable_if<is_integer<T> >::type>
     typedef T type;
 };
 
-// Compute a typeappropriate for referencing. Usually T&.
+// Compute a type appropriate for forwarding from a const instance
+template<class T> struct const_forwarding : forwarding<T> { };
+template<class T> struct const_forwarding<T&> {typedef const T& type;};
+
+// Compute a type appropriate for referencing. Usually T&.
 template<class T> struct reference {typedef T& type;};
 template<class T> struct reference<T&> {typedef T& type;};
 template<class T> struct reference<const T&> {typedef const T& type;};

@@ -83,10 +83,17 @@ test_manipulation()
     using mp::equal_types;
 
     tassert((equal_types<forwarding<int>::type, int>::val));
-    tassert((equal_types<forwarding<newtype&>::type, const newtype&>::val));
+    tassert((equal_types<forwarding<newtype&>::type, newtype&>::val));
     tassert((equal_types<forwarding<const newtype>::type,
                 const newtype&>::val));
     tassert((equal_types<forwarding<const newtype&>::type,
+                const newtype&>::val));
+
+    tassert((equal_types<const_forwarding<int>::type, int>::val));
+    tassert((equal_types<const_forwarding<newtype&>::type, const newtype&>::val));
+    tassert((equal_types<const_forwarding<const newtype>::type,
+                const newtype&>::val));
+    tassert((equal_types<const_forwarding<const newtype&>::type,
                 const newtype&>::val));
 
     tassert((equal_types<reference<int>::type, int&>::val));

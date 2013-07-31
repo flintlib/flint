@@ -356,6 +356,43 @@ test_htuples()
     tassert((maker3::make(0, 1, 0) == htuples::fill<maker3::type>(filler())));
 }
 
+void
+test_get()
+{
+    typedef make_tuple<int, int&, const int&>::type tuple_t;
+    int a, b;
+    tuple_t t(17, make_tuple<int&, const int&>::type(a,
+                make_tuple<const int&>::type(b, empty_tuple())));
+
+    tassert((equal_types<int, tuple_get<tuple_t, 0>::type>::val));
+    tassert((equal_types<int&, tuple_get<tuple_t, 1>::type>::val));
+    tassert((equal_types<const int&, tuple_get<tuple_t, 2>::type>::val));
+
+    tassert((tuple_get<tuple_t, 0>::get(t) == 17));
+    tuple_get<tuple_t, 1>::get(t) = 42;
+    b = 3;
+    tassert((tuple_get<tuple_t, 2>::get(t) == 3));
+    tassert(a == 42);
+    tassert((tuple_get<tuple_t, 1>::get(const_cast<const tuple_t&>(t))));
+}
+
+void
+test_set()
+{
+    make_tuple<int, int, int>::type tup;
+    tup.set(make_tuple<int, char, short>::make(1, 2, 3));
+    tassert((tup == make_tuple<int, int, int>::make(1, 2, 3)));
+}
+
+void
+test_equals_elementwise()
+{
+    tassert((make_tuple<int, int, int>::make(1, 2, 3).equals_elementwise(
+                    make_tuple<int, char, long>::make(1, 2, 3))));
+    tassert((!make_tuple<int, int, int>::make(0, 2, 3).equals_elementwise(
+                    make_tuple<int, char, long>::make(1, 2, 3))));
+}
+
 int
 main()
 {
@@ -367,6 +404,9 @@ main()
     test_merge();
     test_traits();
     test_htuples();
+    test_get();
+    test_set();
+    test_equals_elementwise();
 
     std::cout << "PASS" << std::endl;
     return 0;

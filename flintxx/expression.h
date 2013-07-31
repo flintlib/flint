@@ -294,6 +294,16 @@ struct derived_wrapper
     };
 };
 
+template<template<class E, class O, class D> class Derived, class Extra>
+struct derived_wrapper2
+{
+    template<class Operation, class Data>
+    struct type
+    {
+        typedef Derived<Extra, Operation, Data> result;
+    };
+};
+
 
 // operators
 

@@ -41,14 +41,7 @@ class vector_expression;
 
 namespace detail {
 template<class Traits>
-struct vector_wrapper
-{
-    template<class Op, class Da>
-    struct type
-    {
-        typedef vector_expression<Traits, Op, Da> result;
-    };
-};
+struct vector_wrapper : derived_wrapper2<vector_expression, Traits> { };
 }
 
 template<class Underlying_traits, class Operation, class Data>
