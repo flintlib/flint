@@ -31,23 +31,6 @@
 using namespace flint;
 
 void
-test_ltdetail()
-{
-    using namespace mp;
-
-    tassert((mp::equal_types<int&, ltdetail::to_ref<int>::type>::val));
-    tassert((mp::equal_types<fmpzxx_ref, ltdetail::to_ref<fmpzxx>::type>::val));
-    tassert((mp::equal_types<const int&, ltdetail::to_srcref<int>::type>::val));
-    tassert((mp::equal_types<fmpzxx_srcref,
-                ltdetail::to_srcref<fmpzxx>::type>::val));
-
-    tassert((mp::equal_types<make_tuple<int&, fmpzxx_ref>::type,
-                ltdetail::ref_tuple<make_tuple<int, fmpzxx>::type>::type>::val));
-    tassert((mp::equal_types<make_tuple<const int&, fmpzxx_srcref>::type,
-                ltdetail::srcref_tuple<make_tuple<int, fmpzxx>::type>::type>::val));
-}
-
-void
 test_traits()
 {
     typedef mp::make_tuple<fmpzxx, int>::type tuple_t;
@@ -55,13 +38,6 @@ test_traits()
     typedef make_ltuple<tuple_t>::ref_type ltuple_ref_t;
     typedef make_ltuple<tuple_t>::srcref_type ltuple_srcref_t;
 
-    tassert(traits::is_ltuple_source<ltuple_t>::val);
-    tassert(traits::is_ltuple_source<ltuple_ref_t>::val);
-    tassert(traits::is_ltuple_source<ltuple_srcref_t>::val);
-    tassert(traits::is_ltuple_target<ltuple_t>::val);
-    tassert(traits::is_ltuple_target<ltuple_ref_t>::val);
-    tassert(!traits::is_ltuple_target<ltuple_srcref_t>::val);
-    tassert(!traits::is_ltuple_source<int>::val);
     tassert(!traits::is_ltuple_expr<int>::val);
     tassert(!traits::is_ltuple_expr<fmpzxx>::val);
 }
@@ -80,17 +56,17 @@ void
 test_equals()
 {
     typedef mp::make_tuple<fmpzxx, int> maker;
-    typedef mp::make_tuple<fmpzxx_ref, int&> refmaker;
-    typedef mp::make_tuple<fmpzxx_srcref, const int&> srcrefmaker;
+    typedef mp::make_tuple<fmpzxx&, int&> refmaker;
+    typedef mp::make_tuple<const fmpzxx&, const int&> srcrefmaker;
     typedef make_ltuple<maker::type> lmaker;
 
     fmpzxx f;
-    int a;
+    int a = 12345;
     lmaker::type ltuple(detail::INSTANTIATE_FROM_TUPLE(),
             maker::make(fmpzxx(1), 2));
-    lmaker::ref_type lref(lmaker::ref_type::_make(refmaker::make(f, a)));
-    lmaker::srcref_type lsrcref(lmaker::srcref_type::_make(srcrefmaker::make(
-                    ltuple._data().inner.head, ltuple._data().inner.tail.head)));
+    lmaker::ref_type lref(detail::INSTANTIATE_FROM_TUPLE(), refmaker::make(f, a));
+    lmaker::srcref_type lsrcref(detail::INSTANTIATE_FROM_TUPLE(), srcrefmaker::make(
+                    ltuple._data().inner.head, ltuple._data().inner.tail.head));
 
     tassert(ltuple == ltuple);
     tassert(ltuple != lref);
@@ -108,22 +84,22 @@ void
 test_assignment()
 {
     typedef mp::make_tuple<fmpzxx, int> maker;
-    typedef mp::make_tuple<fmpzxx_ref, int&> refmaker;
-    typedef mp::make_tuple<fmpzxx_srcref, const int&> srcrefmaker;
+    typedef mp::make_tuple<fmpzxx&, int&> refmaker;
+    typedef mp::make_tuple<const fmpzxx&, const int&> srcrefmaker;
     typedef make_ltuple<maker::type> lmaker;
 
     fmpzxx f;
     int a;
     lmaker::type ltuple(detail::INSTANTIATE_FROM_TUPLE(),
             maker::make(fmpzxx(1), 2));
-    lmaker::ref_type lref(lmaker::ref_type::_make(refmaker::make(f, a)));
+    lmaker::ref_type lref(detail::INSTANTIATE_FROM_TUPLE(), refmaker::make(f, a));
     lref = ltuple;
     tassert(f == 1 && a == 2);
 
     f = 0;
     a = 0;
-    lmaker::srcref_type lsrcref(lmaker::srcref_type::_make(srcrefmaker::make(
-                    ltuple._data().inner.head, ltuple._data().inner.tail.head)));
+    lmaker::srcref_type lsrcref(detail::INSTANTIATE_FROM_TUPLE(), srcrefmaker::make(
+                    ltuple._data().inner.head, ltuple._data().inner.tail.head));
     ltuple._data().inner.head = 17;
     lref = lsrcref;
     tassert(f == 17 && a == 2);
@@ -143,10 +119,20 @@ test_ltupleref()
 {
     fmpzxx a, b;
     int c;
+
     ltupleref(c) = ltuple(2);
     tassert(c == 2);
+
     ltupleref(a, c) = ltuple(fmpzxx(3), 4);
     tassert(a == 3 && c == 4);
+
+    // test assignment with type conversion
+    ltupleref(a, b, c) = ltuple(1, 2, 4u);
+    tassert(a == 1 && b == 2 && c == 4);
+
+    // test assignment with c-style references
+    ltuple(fmpzxx_ref(a)) = ltuple(b);
+    tassert(a == 2);
 }
 
 int
@@ -154,7 +140,6 @@ main()
 {
     std::cout << "ltuple....";
 
-    test_ltdetail();
     test_traits();
     test_equals();
     test_assignment();
