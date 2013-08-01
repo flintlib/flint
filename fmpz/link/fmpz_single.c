@@ -77,12 +77,15 @@ void _fmpz_cleanup_mpz_content(void)
         mpz_clear(mpz_free_arr[i]);
         flint_free(mpz_free_arr[i]);
     }
+
+    mpz_free_num = mpz_free_alloc = 0;
 }
 
 void _fmpz_cleanup(void)
 {
     _fmpz_cleanup_mpz_content();
     flint_free(mpz_free_arr);
+    mpz_free_arr = NULL;
 }
 
 __mpz_struct * _fmpz_promote(fmpz_t f)
