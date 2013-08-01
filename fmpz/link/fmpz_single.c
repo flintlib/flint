@@ -119,7 +119,7 @@ void _fmpz_demote_val(fmpz_t f)
     __mpz_struct * mpz_ptr = COEFF_TO_PTR(*f);
     int size = mpz_ptr->_mp_size;
 
-    if (!(((unsigned int) size + 1U) & ~2U))  /* size +-1 */
+    if (size == 1 || size == -1)
     {
         ulong uval = mpz_ptr->_mp_d[0];
 
