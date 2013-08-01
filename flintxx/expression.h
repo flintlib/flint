@@ -315,67 +315,63 @@ struct storage_traits
           typename traits::forwarding<Expr>::type,
           Expr
         > { };
+template<>
+struct storage_traits<detail::UNUSED> {typedef detail::UNUSED type;};
 
 template<class ev_t, class Op, class type>
-struct binary_op_helper_step2
+struct nary_op_helper_step2
 {
     typedef typename ev_t::return_t Expr;
     typedef typename Expr::template make_helper<Op, type> make_helper;
     typedef typename make_helper::type return_t;
 };
 template<class Op, class type>
-struct binary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
+struct nary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
 {
-    typedef int return_t;
+    struct return_t { };
+    struct make_helper { };
 };
-template<class Expr1, class Op, class Expr2>
-struct binary_op_helper
+
+template<class Op, class Data>
+struct nary_op_helper
 {
-    typedef mp::make_tuple<
-        typename storage_traits<Expr1>::type,
-        typename storage_traits<Expr2>::type
-      > maker;
-    typedef typename maker::type type;
-    typedef typename mp::find_evaluation<Op, type, true>::type ev_t;
-    typedef binary_op_helper_step2<ev_t, Op, type> bohs2;
-    typedef typename bohs2::return_t return_t;
+    typedef typename mp::find_evaluation<Op, Data, true>::type ev_t;
+    typedef nary_op_helper_step2<ev_t, Op, Data> nohs2;
+    typedef typename nohs2::return_t return_t;
+    typedef typename nohs2::make_helper make_helper;
 
     typedef traits::is_implemented<ev_t> cond;
     typedef mp::enable_if<cond, return_t> enable;
+};
 
-    static return_t make(const Expr1& left, const Expr2& right)
+template<class Op, class Maker>
+struct nary_op_helper_maker
+    : nary_op_helper<Op, typename Maker::type>
+{
+    typedef Maker maker;
+};
+
+#define FLINTXX_NARY_OP_HELPER_MACRO(arg) typename storage_traits< arg >::type
+template<class Op, FLINTXX_MAKE_TUPLE_TEMPLATE_ARGS>
+struct nary_op_helper2
+    : nary_op_helper_maker<Op, mp::make_tuple<
+          FLINTXX_MAKE_TUPLE_TYPES_APPLYMACRO(FLINTXX_NARY_OP_HELPER_MACRO) > >
+{
+    typedef nary_op_helper2 noh2;
+    static typename noh2::return_t make(FLINTXX_MAKE_TUPLE_FUNC_ARGS)
     {
-        return bohs2::make_helper::make(maker::make(left, right));
+        return noh2::make_helper::make(noh2::maker::make(
+              FLINTXX_MAKE_TUPLE_FUNC_ARG_NAMES));
     }
 };
 
-template<class ev_t, class Op, class type>
-struct unary_op_helper_step2
-{
-    typedef typename ev_t::return_t Rexpr;
-    typedef typename Rexpr::template make_helper<Op, type> make_helper;
-    typedef typename make_helper::type return_t;
-};
-template<class Op, class type>
-struct unary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
-{
-    struct return_t { };
-};
+template<class Expr1, class Op, class Expr2>
+struct binary_op_helper
+    : nary_op_helper2<Op, Expr1, Expr2>
+{ };
+
 template<class Op, class Expr>
-struct unary_op_helper
-{
-    typedef tuple<typename storage_traits<Expr>::type, empty_tuple> type;
-    typedef typename mp::find_evaluation<Op, type, true>::type ev_t;
-    typedef unary_op_helper_step2<ev_t, Op, type> uohs2;
-    typedef typename uohs2::return_t return_t;
-
-    typedef mp::enable_if<traits::is_implemented<ev_t>, return_t> enable;
-
-    static return_t make(const Expr& e)
-    {
-        return uohs2::make_helper::make(type(e, empty_tuple()));
-    }
-};
+struct unary_op_helper : nary_op_helper2<Op, Expr> { };
 
 template<class Expr1, class Expr2>
 struct order_op_helper

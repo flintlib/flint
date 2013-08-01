@@ -143,41 +143,73 @@ private:
     friend struct tuple;
 };
 
+namespace detail {
+typedef void UNUSED;
+
+template<class T>
+struct maybe_forwarding
+{
+    typedef typename traits::forwarding<T>::type type;
+    static type default_value();
+};
+template<>
+struct maybe_forwarding<UNUSED>
+{
+    typedef UNUSED* type;
+    static type default_value() {return 0;}
+};
+}
 namespace mp {
 // Helper to conveniently define tuple types, and marshall objects into
 // tuples.
 // Typical usage:
 // typedef make_tuple<int, char, long> maker;
 // maker::type my_tuple = maker::make(1, 'a', 2l);
-template<class T1, class T2 = void, class T3 = void>
+// TODO this would be a prime use for variadic templates ...
+#define FLINTXX_MAKE_TUPLE_TEMPLATE_ARGS \
+    class T1 = detail::UNUSED, class T2 = detail::UNUSED, \
+    class T3 = detail::UNUSED, class T4 = detail::UNUSED, \
+    class T5 = detail::UNUSED, class T6 = detail::UNUSED, \
+    class T7 = detail::UNUSED, class T8 = detail::UNUSED
+#define FLINTXX_MAKE_TUPLE_FUNC_ARGS \
+    typename detail::maybe_forwarding<T1>::type t1 \
+        = detail::maybe_forwarding<T1>::default_value(), \
+    typename detail::maybe_forwarding<T2>::type t2 \
+        = detail::maybe_forwarding<T2>::default_value(), \
+    typename detail::maybe_forwarding<T3>::type t3 \
+        = detail::maybe_forwarding<T3>::default_value(), \
+    typename detail::maybe_forwarding<T4>::type t4 \
+        = detail::maybe_forwarding<T4>::default_value(), \
+    typename detail::maybe_forwarding<T5>::type t5 \
+        = detail::maybe_forwarding<T5>::default_value(), \
+    typename detail::maybe_forwarding<T6>::type t6 \
+        = detail::maybe_forwarding<T6>::default_value(), \
+    typename detail::maybe_forwarding<T7>::type t7 \
+        = detail::maybe_forwarding<T7>::default_value(), \
+    typename detail::maybe_forwarding<T8>::type t8 \
+        = detail::maybe_forwarding<T8>::default_value()
+#define FLINTXX_MAKE_TUPLE_TYPES_APPLYMACRO(func) \
+    func(T1), func(T2), func(T3), func(T4), \
+    func(T5), func(T6), func(T7), func(T8)
+#define FLINTXX_MAKE_TUPLE_FUNC_ARG_NAMES t1, t2, t3, t4, t5, t6, t7, t8
+template<FLINTXX_MAKE_TUPLE_TEMPLATE_ARGS>
 struct make_tuple
 {
-    typedef tuple<T1, tuple<T2, tuple<T3, empty_tuple> > > type;
-    static type make(typename traits::forwarding<T1>::type t1,
-              typename traits::forwarding<T2>::type t2,
-              typename traits::forwarding<T3>::type t3)
+    typedef make_tuple<T2, T3, T4, T5, T6, T7, T8> next;
+    typedef typename next::type tail_t;
+    typedef tuple<T1, tail_t> type;
+    static type make(FLINTXX_MAKE_TUPLE_FUNC_ARGS)
     {
-        return type(t1, make_tuple<T2, T3>::make(t2, t3));
+        return type(t1, next::make(t2, t3, t4, t5, t6, t7, t8));
     }
 };
-template<class T1, class T2>
-struct make_tuple<T1, T2, void>
+template<>
+struct make_tuple<detail::UNUSED, detail::UNUSED, detail::UNUSED,
+    detail::UNUSED, detail::UNUSED, detail::UNUSED, detail::UNUSED,
+    detail::UNUSED>
 {
-    typedef tuple<T1, tuple<T2, empty_tuple> > type;
-    static type make(typename traits::forwarding<T1>::type t1,
-              typename traits::forwarding<T2>::type t2)
-    {
-        return type(t1, make_tuple<T2>::make(t2));
-    }
-};
-template<class T1>
-struct make_tuple<T1, void, void>
-{
-    typedef tuple<T1, empty_tuple> type;
-    static type make(typename traits::forwarding<T1>::type t1)
-    {
-        return type(t1, empty_tuple());
-    }
+    typedef empty_tuple type;
+    static empty_tuple make(...) {return empty_tuple();}
 };
 
 

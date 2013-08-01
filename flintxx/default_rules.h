@@ -44,88 +44,41 @@ namespace rules {
 // rules for composition of two immediates.
 
 namespace rdetail {
-template<class Op, class Data1, class Data2, class Enable = void>
-struct binary_should_enable { };
+
+template<class Op, class Args>
+struct can_evaluate_tuple : traits::is_implemented<
+    typename mp::find_evaluation<Op,
+        typename tools::evaluated_args_tuple<Args>::type, true>::type> { };
+template<class Op, class Args, class Enable = void>
+struct should_evaluate_tuple : can_evaluate_tuple<Op, Args> { };
+template<class Op, class Args>
+struct should_evaluate_tuple<Op, Args,
+    typename mp::disable_if<tools::count_nonimm<Args> >::type> : mp::false_ { };
 
 template<class Op, class Data1, class Data2>
-struct binary_should_enable<Op, Data1, Data2,
-    typename mp::enable_if<mp::or_<
-        traits::is_lazy_expr<Data1>,
-        traits::is_lazy_expr<Data2>
-      > >::type>
+struct binary_should_enable
 {
-    typedef tools::evaluate_2<Data1, Data2> ev2_t;
-    typedef typename ev2_t::return1_t return1_t;
-    typedef typename ev2_t::return2_t return2_t;
-    typedef typename detail::binary_op_helper<return1_t, Op, return2_t>::cond cond;
-    typedef mp::enable_if<cond> enable;
+    typedef mp::enable_if<should_evaluate_tuple<
+              Op, typename mp::make_tuple<Data1, Data2>::type> > enable;
 };
 }
 
-template<bool result_is_temporary, class Op, class Data1, class Data2>
-struct evaluation<
-    Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
-    typename rdetail::binary_should_enable<Op, Data1, Data2>::enable::type>
+template<bool result_is_temporary, class Op, class Data>
+struct evaluation<Op, Data, result_is_temporary, 0,
+    typename mp::enable_if<rdetail::should_evaluate_tuple<Op, Data> >::type>
 {
-    typedef tools::evaluate_2<Data1, Data2> ev2_t;
-    typedef typename ev2_t::return1_t return1_t;
-    typedef typename ev2_t::return2_t return2_t;
-    typedef typename ev2_t::temporaries_t temporaries_t;
-
-    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
-    typedef typename binop_helper::return_t::evaluated_t return_t;
-    typedef typename mp::make_tuple<Data1, Data2>::type data_t;
-
-    template<class Return>
-    static void doit(const data_t& input, temporaries_t temps, Return* output)
-    {
-        ev2_t ev2(temps, input.first(), input.second());
-        *output = binop_helper::make(ev2.get1(), ev2.get2());
-    }
-};
-
-template<class Op, class Data, bool result_is_temporary>
-struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
-    typename mp::enable_if<traits::is_lazy_expr<Data> >::type>
-{
+    typedef tools::evaluate_n<Data> evn_t;
+    typedef typename evn_t::evtup_t evtup_t;
+    typedef typename evn_t::temporaries_t temporaries_t;
     typedef typename mp::find_evaluation<
-        typename Data::operation_t, typename Data::data_t,
-        true
-      >::type ev_t;
-    typedef typename ev_t::return_t interm_t;
-    typedef typename ev_t::temporaries_t interm_temps_t;
-
-    typedef detail::unary_op_helper<Op, interm_t> unop_helper;
-    typedef typename unop_helper::return_t::evaluated_t return_t;
-    typedef mp::merge_tuple<
-        typename mp::make_tuple<interm_t*>::type,
-        interm_temps_t> merger;
-    typedef typename merger::type mixed_temporaries_t;
-
-    template<class Ignored>
-    struct do_merging : traits::use_temporary_merging<interm_t> { };
-    typedef typename mp::if_<do_merging<void>,
-            mixed_temporaries_t, interm_temps_t>::type temporaries_t;
-
-    typedef typename mp::make_tuple<Data>::type data_t;
+              Op, evtup_t, result_is_temporary>::type rule_t;
+    typedef typename rule_t::return_t return_t;
 
     template<class Return>
-    static void doit(const data_t& input, temporaries_t temps, Return* output,
-        typename mp::enable_if<do_merging<Return> >::type* = 0)
+    static void doit(const Data& input, temporaries_t temps, Return* output)
     {
-        interm_t* interm = merger::get_first(temps).head;
-        ev_t::doit(input.head._data(), merger::get_second(temps), interm);
-        *output = unop_helper::make(*interm);
-    }
-
-    template<class Return>
-    static void doit(const data_t& input, temporaries_t temps, Return* output,
-        typename mp::disable_if<do_merging<Return> >::type* = 0)
-    {
-        interm_t interm = rules::instantiate_temporaries<
-            typename data_t::head_t, interm_t>::get(input.head);
-        ev_t::doit(input.head._data(), temps, &interm);
-        *output = unop_helper::make(interm);
+        evn_t ev(input, temps);
+        rule_t::doit(ev.gettuple(), empty_tuple(), output);
     }
 };
 
@@ -134,13 +87,13 @@ namespace rdetail {
 template<class Expr1, class Op, class Expr2, class Enable = void>
 struct inverted_binary_expression
 {
-  typedef commutative_binary_expression<Expr2, Op, Expr1> wrapped_t;
-  typedef typename wrapped_t::return_t return_t;
-  template<class Return>
-  static void doit(Return& to, const Expr1& e1, const Expr2& e2)
-  {
-    return wrapped_t::doit(to, e2, e1);
-  }
+    typedef commutative_binary_expression<Expr2, Op, Expr1> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    template<class Return>
+    static void doit(Return& to, const Expr1& e1, const Expr2& e2)
+    {
+        return wrapped_t::doit(to, e2, e1);
+    }
 };
 
 template<template<class E1, class O, class E2, class En> class BE,

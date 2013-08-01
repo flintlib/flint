@@ -178,7 +178,8 @@ struct is_target_base
 template<class T, class Right1, class Right2>
 struct ternary_assign_helper
 {
-    typedef tools::evaluate_2<Right1, Right2> ev2_t;
+    typedef typename mp::make_tuple<Right1, Right2>::type tup_t;
+    typedef tools::evaluate_n<tup_t> ev2_t;
     typedef typename ev2_t::temporaries_t temporaries_t;
     typedef mp::back_tuple<temporaries_t> back_t;
 
@@ -192,12 +193,13 @@ struct ternary_assign_helper
         return temps;
     }
 
-    ternary_assign_helper(typename ev2_t::arg1_t r1, typename ev2_t::arg2_t r2)
+    ternary_assign_helper(const tup_t& tup)
         : backing(mp::htuples::fill<typename back_t::type>(
-                    tools::temporaries_filler(r1+r2 /* XXX */))),
-          ev2(backtemps(backing), r1, r2) {}
-    const T& getleft() {return ev2.get1();}
-    const T& getright() {return ev2.get2();}
+                    tools::temporaries_filler(
+                        tup.first()+tup.second() /* XXX */))),
+          ev2(tup, backtemps(backing)) {}
+    const T& getleft() {return ev2.template get<0>();}
+    const T& getright() {return ev2.template get<1>();}
 };
 
 template<class T, class Right1, class Right2>
@@ -496,7 +498,7 @@ operator+=(Base& to,                                                          \
         const maketypes(Base, Right1, operations::times, Right2)& other)      \
 {                                                                             \
     flint_classes::ternary_assign_helper<Base, Right1, Right2> tah(           \
-            other._data().first(), other._data().second());                   \
+            other._data());                                                   \
     const Base& e1 = tah.getleft();                                           \
     const Base& e2 = tah.getright();                                          \
     addmuleval;                                                               \
@@ -510,7 +512,7 @@ operator-=(Base& to,                                                          \
         const maketypes(Base, Right1, operations::times, Right2)& other)      \
 {                                                                             \
     flint_classes::ternary_assign_helper<Base, Right1, Right2> tah(           \
-            other._data().first(), other._data().second());                   \
+            other._data());                                                   \
     const Base& e1 = tah.getleft();                                           \
     const Base& e2 = tah.getright();                                          \
     submuleval;                                                               \
