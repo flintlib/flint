@@ -373,7 +373,10 @@ test_get()
     b = 3;
     tassert((tuple_get<tuple_t, 2>::get(t) == 3));
     tassert(a == 42);
-    tassert((tuple_get<tuple_t, 1>::get(const_cast<const tuple_t&>(t))));
+
+    const tuple_t ct(t);
+    tuple_get<tuple_t, 1>::get(ct) = 17;
+    tassert((tuple_get<tuple_t, 1>::get(ct) == 17));
 }
 
 void

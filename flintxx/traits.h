@@ -104,10 +104,6 @@ struct forwarding<T, typename mp::enable_if<is_integer<T> >::type>
     typedef T type;
 };
 
-// Compute a type appropriate for forwarding from a const instance
-template<class T> struct const_forwarding : forwarding<T> { };
-template<class T> struct const_forwarding<T&> {typedef const T& type;};
-
 // Compute a type appropriate for referencing. Usually T&.
 template<class T> struct reference {typedef T& type;};
 template<class T> struct reference<T&> {typedef T& type;};

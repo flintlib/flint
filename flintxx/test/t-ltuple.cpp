@@ -48,7 +48,7 @@ FLINT_DEFINE_BINOP(make_lazy_test)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND2(make_lazy_test_op, fmpzxxint_pair,
         FMPZXX_COND_S, traits::is_signed_integer,
-        to._data().inner.head = e1;to._data().inner.tail.head = e2)
+        to.template get<0>() = e1;to.template get<1>() = e2)
 }
 }
 
@@ -135,6 +135,24 @@ test_ltupleref()
     tassert(a == 2);
 }
 
+template<class T>
+bool is_lazy(const T&)
+{
+    return traits::is_lazy_expr<T>::val;
+}
+void
+test_get()
+{
+    fmpzxx a(1); int b = 2;
+    tassert(ltuple(a, b).get<0>() == a && ltuple(a, b).get<1>() == b);
+    ltupleref(a, b).get<0>() = 17;
+    ltupleref(a, b).get<1>() = 15;
+    tassert(a == 17 && b == 15);
+    tassert(make_lazy_test(a, 3).get<0>() == 17);
+    tassert(is_lazy(make_lazy_test(a, 3).get<0>()));
+    tassert(make_lazy_test(a, 3).get<1>() == 3);
+}
+
 int
 main()
 {
@@ -144,6 +162,7 @@ main()
     test_equals();
     test_assignment();
     test_ltupleref();
+    test_get();
 
     std::cout << "PASS" << std::endl;
 

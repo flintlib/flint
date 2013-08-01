@@ -89,13 +89,6 @@ test_manipulation()
     tassert((equal_types<forwarding<const newtype&>::type,
                 const newtype&>::val));
 
-    tassert((equal_types<const_forwarding<int>::type, int>::val));
-    tassert((equal_types<const_forwarding<newtype&>::type, const newtype&>::val));
-    tassert((equal_types<const_forwarding<const newtype>::type,
-                const newtype&>::val));
-    tassert((equal_types<const_forwarding<const newtype&>::type,
-                const newtype&>::val));
-
     tassert((equal_types<reference<int>::type, int&>::val));
     tassert((equal_types<reference<newtype&>::type, newtype&>::val));
     tassert((equal_types<reference<const long>::type, const long&>::val));

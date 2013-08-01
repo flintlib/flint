@@ -34,8 +34,60 @@
 #include "tuple.h"
 
 namespace flint {
+namespace operations {
+template<unsigned n> struct ltuple_get_op { };
+} // operations
+
 namespace detail {
 struct INSTANTIATE_FROM_TUPLE { };
+
+template<unsigned n, class Underlying, class Operation, class Data, class Expr,
+    class Enable = void>
+struct ltuple_get_traits
+{
+    typedef unary_op_helper<operations::ltuple_get_op<n>, Expr> uoh;
+    typedef typename uoh::return_t type;
+    typedef type ctype;
+    static type get(const Expr& e)
+    {
+        return uoh::make(e);
+    }
+};
+
+template<unsigned n, class Underlying, class Data, class Expr>
+struct ltuple_get_traits<n, Underlying, operations::immediate, Data, Expr>
+{
+    typedef mp::tuple_get<Underlying, n> getter;
+    typedef typename getter::type btype;
+    typedef typename traits::forwarding<btype>::type ctype;
+    typedef typename traits::reference<btype>::type type;
+
+    static type get(Expr& t)
+    {
+        return getter::get(t._data().inner);
+    }
+    static ctype get(const Expr& t)
+    {
+        return getter::get(t._data().inner);
+    }
+};
+
+template<unsigned n, class Underlying, class Operation, class Data, class Expr>
+struct ltuple_get_traits<n, Underlying, Operation, Data, Expr,
+    typename mp::enable_if<mp::and_<
+        mp::not_<mp::equal_types<Operation, operations::immediate> >,
+        mp::not_<traits::is_expression<typename mp::tuple_get<Underlying, n>::type> >
+      > >::type>
+{
+    typedef mp::tuple_get<Underlying, n> getter;
+    typedef typename getter::type type;
+    typedef type ctype;
+
+    static type get(const Expr& t)
+    {
+        return getter::get(t.evaluate()._data().inner);
+    }
+};
 } // detail
 
 template<class Underlying, class Operation, class Data>
@@ -62,6 +114,22 @@ public:
     {
         this->set(t);
         return *this;
+    }
+
+    template<unsigned n>
+    typename detail::ltuple_get_traits<n, Underlying,
+             Operation, Data, ltuple_expression>::type get()
+    {
+        return detail::ltuple_get_traits<
+            n, Underlying, Operation, Data, ltuple_expression>::get(*this);
+    }
+    template<unsigned n>
+    typename detail::ltuple_get_traits<n, Underlying,
+             Operation, Data, ltuple_expression>::ctype
+    get() const
+    {
+        return detail::ltuple_get_traits<
+            n, Underlying, Operation, Data, ltuple_expression>::get(*this);
     }
 
 protected:
@@ -148,6 +216,21 @@ struct equals<Tuple1, Tuple2,
     static bool get(const Tuple1& to, const Tuple2& from)
     {
         return to._data().inner.equals_elementwise(from._data().inner);
+    }
+};
+
+template<class Tuple, unsigned n>
+struct unary_expression<operations::ltuple_get_op<n>, Tuple,
+    typename mp::enable_if<mp::and_<
+        traits::is_ltuple_expr<Tuple>,
+        traits::is_immediate<Tuple> > >::type>
+{
+    typedef typename mp::tuple_get<typename Tuple::underlying_t, n>::type
+        return_t;
+    template<class R>
+    static void doit(R& to, const Tuple& from)
+    {
+        to = from.template get<n>();
     }
 };
 } // rules
