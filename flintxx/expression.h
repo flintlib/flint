@@ -670,6 +670,21 @@ name(const T1& t1) \
 #define FLINT_UNOP_ENABLE_RETTYPE(name, T) \
     typename detail::unary_op_helper<operations::name##_op, T>::return_t
 
+#define FLINT_DEFINE_THREEARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+template<class T1, class T2, class T3> \
+inline typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3) \
+{ \
+    return detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::make( \
+        t1, t2, t3); \
+}
+
+#define FLINT_THREEARY_ENABLE_RETTYPE(name, T1, T2, T3) \
+    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::enable::type
+
 // To be called in any namespace
 
 // Make the binary operation "name" available in current namespace

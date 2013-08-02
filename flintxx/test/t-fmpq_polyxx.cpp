@@ -180,6 +180,7 @@ test_functions()
     g = "5  5 4 3 2 1";
     res = f*g; res.truncate(4);
     tassert(res == mullow(f, g, 4));
+    tassert(res == mullow3(f, g, 4));
 
     tassert(reverse(g, 5).to_string() == "5  1 2 3 4 5");
 

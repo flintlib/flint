@@ -121,6 +121,9 @@ struct commutative_binary_expression : UNIMPLEMENTED { };
 template<class Op, class T, class Enable = void>
 struct unary_expression : UNIMPLEMENTED { };
 // similarly
+
+template<class Op, class T, class U, class V, class Enable = void>
+struct threeary_expression : UNIMPLEMENTED { };
 } // rules
 
 
@@ -306,6 +309,19 @@ struct binary_expression<T, operations::name, U, \
     typedef rettype return_t; \
     template<class V> \
     static void doit(V& to, const T& e1, const U& e2) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_THREEARY_EXPR_COND3(name, rettype, cond1, cond2, cond3, eval) \
+template<class T, class U, class V> \
+struct threeary_expression<operations::name, T, U, V, \
+    typename mp::enable_if< mp::and_< cond1 <T>, cond2 <U>, cond3 <V> > >::type> \
+{ \
+    typedef rettype return_t; \
+    template<class R> \
+    static void doit(R& to, const T& e1, const U& e2, const V& e3) \
     { \
         eval; \
     } \

@@ -184,6 +184,35 @@ struct evaluation<Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
     }
 };
 
+
+// Automatically invoke threeary_expression
+template<bool result_is_temporary, class Op,
+    class Data1, class Data2, class Data3>
+struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, empty_tuple> > >,
+    result_is_temporary, 0,
+    typename mp::enable_if<
+        traits::is_implemented<
+            threeary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type> > >::type>
+{
+    typedef threeary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    typedef typename mp::make_tuple<Data1, Data2, Data3>::type data_t;
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
+    {
+        wrapped_t::doit(*output, mp::tuple_get<data_t, 0>::get(input),
+                mp::tuple_get<data_t, 1>::get(input),
+                mp::tuple_get<data_t, 2>::get(input));
+    }
+};
+
 // Instantiating temporaries
 
 namespace rdetail {

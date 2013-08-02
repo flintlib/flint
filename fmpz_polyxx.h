@@ -84,6 +84,7 @@ FLINT_DEFINE_BINOP(taylor_shift_divconquer)
 FLINT_DEFINE_UNOP(sqrt_classical)
 
 FLINT_DEFINE_BINOP(divrem_tuple)
+FLINT_DEFINE_THREEARY(mullow3)
 
 FLINT_DEFINE_BINOP(fmpz_polyxx_interpolate)
 FLINT_DEFINE_UNOP(fmpz_polyxx_product_roots)
@@ -571,6 +572,10 @@ FLINT_DEFINE_BINARY_EXPR_COND2(divrem_tuple_op, rdetail::divrem_tuple_return_t,
     FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
     fmpz_poly_divrem(to.template get<0>()._poly(), to.template get<1>()._poly(),
         e1._poly(), e2._poly()))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(mullow3_op, fmpz_polyxx,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S, traits::fits_into_slong,
+    fmpz_poly_mullow(to._poly(), e1._poly(), e2._poly()))
 } // rules
 
 // TODO functions which cannot be lazy b/c only two arguments allowd
