@@ -125,5 +125,6 @@ main()
     }
 #endif
 #ifndef EXTRACTING_SAMPLE
+    // TODO: assignment through tuple with wrong type
 }
 #endif

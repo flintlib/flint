@@ -187,6 +187,7 @@ test_functions()
     tassert(mullow_KS(f, g, 3) == res);
     tassert(mullow_SS(f, g, 3) == res);
     tassert(mullow(f, g, 3) == res);
+    tassert(mullow3(f, g, 3) == res);
 
     res = f*g; res.zero_coeffs(0, 5);
     tassert(mulhigh_classical(f, g, 5) == res);

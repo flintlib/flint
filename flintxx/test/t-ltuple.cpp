@@ -59,13 +59,15 @@ test_equals()
     typedef mp::make_tuple<fmpzxx&, int&> refmaker;
     typedef mp::make_tuple<const fmpzxx&, const int&> srcrefmaker;
     typedef make_ltuple<maker::type> lmaker;
+    typedef make_ltuple<refmaker::type> lrefmaker;
+    typedef make_ltuple<srcrefmaker::type> lsrcrefmaker;
 
     fmpzxx f;
     int a = 12345;
     lmaker::type ltuple(detail::INSTANTIATE_FROM_TUPLE(),
             maker::make(fmpzxx(1), 2));
-    lmaker::ref_type lref(detail::INSTANTIATE_FROM_TUPLE(), refmaker::make(f, a));
-    lmaker::srcref_type lsrcref(detail::INSTANTIATE_FROM_TUPLE(), srcrefmaker::make(
+    lrefmaker::ref_type lref(detail::INSTANTIATE_FROM_TUPLE(), refmaker::make(f, a));
+    lsrcrefmaker::srcref_type lsrcref(detail::INSTANTIATE_FROM_TUPLE(), srcrefmaker::make(
                     ltuple._data().inner.head, ltuple._data().inner.tail.head));
 
     tassert(ltuple == ltuple);

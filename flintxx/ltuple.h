@@ -30,6 +30,9 @@
 
 // TODO element-getters
 
+#ifndef FLINTXX_LTUPLE_H
+#define FLINTXX_LTUPLE_H
+
 #include "expression.h"
 #include "tuple.h"
 
@@ -180,9 +183,9 @@ struct make_ltuple
     typedef typename detail::transform_tuple<detail::to_srcref, Underlying>::type
         Underlying_srcref;
 
-    typedef ltuple_expression<Underlying, operations::immediate,
+    typedef ltuple_expression<Underlying_ref, operations::immediate,
               detail::ltuple_data<Underlying_ref> > ref_type;
-    typedef ltuple_expression<Underlying, operations::immediate,
+    typedef ltuple_expression<Underlying_srcref, operations::immediate,
               detail::ltuple_data<Underlying_srcref> > srcref_type;
 };
 
@@ -294,3 +297,5 @@ ltupleref(T& t, U& u, V& v)
 }
 
 } // flint
+
+#endif

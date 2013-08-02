@@ -33,12 +33,14 @@
 #include "flintxx/expression_traits.h"
 #include "flintxx/flint_classes.h"
 #include "flintxx/frandxx.h"
+#include "flintxx/ltuple.h"
 #include "flintxx/stdmath.h"
 
 #include "fmpz.h"
 
 // TODO bit packing
 // TODO chinese remaindering
+// TODO functions for addmul? inhomogeneous addmul?
 
 namespace flint {
 
@@ -417,119 +419,6 @@ jacobi(const Fmpz1& a, const Fmpz2& p)
     return fmpz_jacobi(a.evaluate()._fmpz(), p.evaluate()._fmpz());
 }
 
-// TODO These cannot yet be made lazy since we have no code for ternary ops...
-// In any case, the uiui suffix should probably be dropped.
-template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, fmpzxx>::type
-mul2_uiui(const Fmpz& g, ulong x, ulong y)
-{
-    fmpzxx res;
-    fmpz_mul2_uiui(res._fmpz(), g.evaluate()._fmpz(), x, y);
-    return res;
-}
-template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, fmpzxx>::type
-divexact2_uiui(const Fmpz& g, ulong x, ulong y)
-{
-    fmpzxx res;
-    fmpz_divexact2_uiui(res._fmpz(), g.evaluate()._fmpz(), x, y);
-    return res;
-}
-template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<fmpzxx, Fmpz1, Fmpz2>::type
-powm(const Fmpz1& g, ulong e, const Fmpz2& m)
-{
-    fmpzxx res;
-    fmpz_powm_ui(res._fmpz(), g.evaluate()._fmpz(), e, m.evaluate()._fmpz());
-    return res;
-}
-template<class Fmpz1, class Fmpz2, class Fmpz3>
-inline typename mp::enable_all_fmpzxx<fmpzxx, Fmpz1, Fmpz2, Fmpz3>::type
-powm(const Fmpz1& g, const Fmpz2 e, const Fmpz3& m)
-{
-    fmpzxx res;
-    fmpz_powm(res._fmpz(), g.evaluate()._fmpz(), e.evaluate()._fmpz(),
-            m.evaluate()._fmpz());
-    return res;
-}
-template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<fmpzxx, Fmpz1, Fmpz2>::type
-mul_tdiv_q_2exp(const Fmpz1& g, const Fmpz2& x, ulong exp)
-{
-    fmpzxx res;
-    fmpz_mul_tdiv_q_2exp(res._fmpz(), g.evaluate()._fmpz(),
-            x.evaluate()._fmpz(), exp);
-    return res;
-}
-template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, fmpzxx>::type
-mul_tdiv_q_2exp(const Fmpz& g, long x, ulong exp)
-{
-    fmpzxx res;
-    fmpz_mul_si_tdiv_q_2exp(res._fmpz(), g.evaluate()._fmpz(), x, exp);
-    return res;
-}
-// TODO addmul, submul?
-
-// These cannot be lazy because we do not support two return values
-template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
-inline typename mp::enable_if<mp::and_<
-        FMPZXX_COND_T<Fmpz1>, FMPZXX_COND_T<Fmpz2>,
-        traits::is_fmpzxx<Fmpz3>, traits::is_fmpzxx<Fmpz4>
-    > >::type
-fdiv_qr(Fmpz1& f, Fmpz2& s, const Fmpz3& g, const Fmpz4& h)
-{
-    fmpz_fdiv_qr(f._fmpz(), s._fmpz(), g.evaluate()._fmpz(), h.evaluate()._fmpz());
-}
-template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
-inline typename mp::enable_if<mp::and_<
-        FMPZXX_COND_T<Fmpz1>, FMPZXX_COND_T<Fmpz2>,
-        traits::is_fmpzxx<Fmpz3>, traits::is_fmpzxx<Fmpz4>
-    > >::type
-tdiv_qr(Fmpz1& f, Fmpz2& s, const Fmpz3& g, const Fmpz4& h)
-{
-    fmpz_tdiv_qr(f._fmpz(), s._fmpz(), g.evaluate()._fmpz(), h.evaluate()._fmpz());
-}
-
-template<class Fmpz1, class Fmpz2, class Fmpz3>
-inline typename mp::enable_if<mp::and_<
-        FMPZXX_COND_T<Fmpz1>,
-        traits::is_fmpzxx<Fmpz2>, traits::is_fmpzxx<Fmpz3>
-    >, bool>::type
-sqrtmod(Fmpz1& b, const Fmpz2& a, const Fmpz3& p)
-{
-    return fmpz_sqrtmod(b._fmpz(), a.evaluate()._fmpz(), p.evaluate()._fmpz());
-}
-template<class Fmpz1, class Fmpz2, class Fmpz3>
-inline typename mp::enable_if<mp::and_<
-        FMPZXX_COND_T<Fmpz1>, FMPZXX_COND_T<Fmpz2>,
-        traits::is_fmpzxx<Fmpz3>
-    > >::type
-sqrtrem(Fmpz1& f, Fmpz2& s, const Fmpz3& g)
-{
-    fmpz_sqrtrem(f._fmpz(), s._fmpz(), g.evaluate()._fmpz());
-}
-
-template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
-inline typename mp::enable_if<mp::and_<
-        FMPZXX_COND_T<Fmpz1>, FMPZXX_COND_T<Fmpz2>,
-        traits::is_fmpzxx<Fmpz3>, traits::is_fmpzxx<Fmpz4>
-    > >::type
-gcdinv(Fmpz1& d, Fmpz2& a, const Fmpz3& f, const Fmpz4& g)
-{
-    fmpz_gcdinv(d._fmpz(), a._fmpz(), f.evaluate()._fmpz(), g.evaluate()._fmpz());
-}
-template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4, class Fmpz5>
-inline typename mp::enable_if<mp::and_<
-        FMPZXX_COND_T<Fmpz1>, FMPZXX_COND_T<Fmpz2>, FMPZXX_COND_T<Fmpz3>,
-        traits::is_fmpzxx<Fmpz4>, traits::is_fmpzxx<Fmpz5>
-    > >::type
-gcdinv(Fmpz1& d, Fmpz2& a, Fmpz3& b, const Fmpz4& f, const Fmpz5& g)
-{
-    fmpz_xgcd(d._fmpz(), a._fmpz(), b._fmpz(),
-            f.evaluate()._fmpz(), g.evaluate()._fmpz());
-}
-
 // These functions are evaluated lazily
 
 FLINT_DEFINE_BINOP(cdiv_q)
@@ -545,6 +434,16 @@ FLINT_DEFINE_BINOP(gcd)
 FLINT_DEFINE_BINOP(lcm)
 FLINT_DEFINE_BINOP(invmod)
 FLINT_DEFINE_BINOP(negmod)
+FLINT_DEFINE_THREEARY(mul2)
+FLINT_DEFINE_THREEARY(divexact2)
+FLINT_DEFINE_THREEARY(powm)
+FLINT_DEFINE_THREEARY(mul_tdiv_q_2exp)
+FLINT_DEFINE_BINOP(fdiv_qr)
+FLINT_DEFINE_BINOP(tdiv_qr)
+FLINT_DEFINE_BINOP(sqrtmod)
+FLINT_DEFINE_UNOP(sqrtrem)
+FLINT_DEFINE_BINOP(gcdinv)
+FLINT_DEFINE_BINOP(xgcd)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND2(rfac_op, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
@@ -605,6 +504,63 @@ FLINT_DEFINE_BINARY_EXPR_COND2(invmod_op, fmpzxx,
 FLINT_DEFINE_BINARY_EXPR_COND2(negmod_op, fmpzxx,
         FMPZXX_COND_S, FMPZXX_COND_S,
         fmpz_negmod(to._fmpz(), e1._fmpz(), e2._fmpz()))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(mul2_op, fmpzxx,
+        FMPZXX_COND_S, traits::is_unsigned_integer, traits::is_unsigned_integer,
+        fmpz_mul2_uiui(to._fmpz(), e1._fmpz(), e2, e3))
+FLINT_DEFINE_THREEARY_EXPR_COND3(divexact2_op, fmpzxx,
+        FMPZXX_COND_S, traits::is_unsigned_integer, traits::is_unsigned_integer,
+        fmpz_divexact2_uiui(to._fmpz(), e1._fmpz(), e2, e3))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(powm_op, fmpzxx,
+        FMPZXX_COND_S, traits::is_unsigned_integer, FMPZXX_COND_S,
+        fmpz_powm_ui(to._fmpz(), e1._fmpz(), e2, e3._fmpz()))
+FLINT_DEFINE_THREEARY_EXPR_COND3(powm_op, fmpzxx,
+        FMPZXX_COND_S, FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_powm(to._fmpz(), e1._fmpz(), e2._fmpz(), e3._fmpz()))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(mul_tdiv_q_2exp_op, fmpzxx,
+        FMPZXX_COND_S, FMPZXX_COND_S, traits::is_unsigned_integer,
+        fmpz_mul_tdiv_q_2exp(to._fmpz(), e1._fmpz(), e2._fmpz(), e3))
+FLINT_DEFINE_THREEARY_EXPR_COND3(mul_tdiv_q_2exp_op, fmpzxx,
+        FMPZXX_COND_S, traits::fits_into_slong, traits::is_unsigned_integer,
+        fmpz_mul_si_tdiv_q_2exp(to._fmpz(), e1._fmpz(), e2, e3))
+// TODO addmul, submul?
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<fmpzxx, fmpzxx>::type>::type fmpzxx_pair;
+typedef make_ltuple<mp::make_tuple<fmpzxx, fmpzxx, fmpzxx>::type>::type fmpzxx_triple;
+typedef make_ltuple<mp::make_tuple<bool, fmpzxx>::type>::type
+    bool_fmpzxx_pair;
+} // rdetail
+
+FLINT_DEFINE_BINARY_EXPR_COND2(fdiv_qr_op, rdetail::fmpzxx_pair,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_fdiv_qr(to.template get<0>()._fmpz(), to.template get<1>()._fmpz(),
+            e1._fmpz(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(tdiv_qr_op, rdetail::fmpzxx_pair,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_tdiv_qr(to.template get<0>()._fmpz(), to.template get<1>()._fmpz(),
+            e1._fmpz(), e2._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(sqrtmod_op, rdetail::bool_fmpzxx_pair,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        to.template get<0>() = fmpz_sqrtmod(
+            to.template get<1>()._fmpz(), e1._fmpz(), e2._fmpz()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(sqrtrem_op, rdetail::fmpzxx_pair,
+        FMPZXX_COND_S,
+        fmpz_sqrtrem(to.template get<0>()._fmpz(),  to.template get<1>()._fmpz(),
+            from._fmpz()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(gcdinv_op, rdetail::fmpzxx_pair,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        fmpz_gcdinv(to.template get<0>()._fmpz(), to.template get<1>()._fmpz(),
+            e1._fmpz(), e2._fmpz()))
+FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_op, rdetail::fmpzxx_triple,
+        FMPZXX_COND_S, FMPZXX_COND_S, fmpz_xgcd(
+            to.template get<0>()._fmpz(), to.template get<1>()._fmpz(),
+            to.template get<2>()._fmpz(), e1._fmpz(), e2._fmpz()))
 
 // standard math functions (c/f stdmath.h)
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpzxx,

@@ -247,21 +247,21 @@ test_functions()
     tassert(flog(f, a) == 3 && flog(f, 2u) == 3);
     tassert(2.7 < dlog(f) && dlog(f) < 2.8);
 
-    tassert(mul2_uiui(a, 15, 16) == a*15*16);
-    tassert(divexact2_uiui(b, 2, 2) == 4);
-    tassert(powm(a, 4, fmpzxx(5)) == 1);
+    tassert(mul2(a, 15u, 16u) == a*15*16);
+    tassert(divexact2(b, 2u, 2u) == 4);
+    tassert(powm(a, 4u, fmpzxx(5)) == 1);
     tassert(powm(a, fmpzxx(4), fmpzxx(5)) == 1);
-    tassert(mul_tdiv_q_2exp(a, fmpzxx(-3), 2) == -1);
-    tassert(mul_tdiv_q_2exp(a, -3, 2) == -1);
+    tassert(mul_tdiv_q_2exp(a, fmpzxx(-3), 2u) == -1);
+    tassert(mul_tdiv_q_2exp(a, -3, 2u) == -1);
 
     fmpzxx q(1), rem(2);
-    fdiv_qr(q, rem, b, a); tassert(q == 8 && rem == 0);
-    q = 1;rem = 2; tdiv_qr(q, rem, b, a); tassert(q == 8 && rem == 0);
+    tassert(fdiv_qr(b, a) == ltuple(8, 0));
+    tassert(tdiv_qr(b, a) == ltuple(8, 0));
 
-    tassert(sqrtmod(q, fmpzxx(4), fmpzxx(5)));
-    tassert(q == 2 || q == 3);
-    sqrtrem(q, rem, fmpzxx(5));
-    tassert(q == 2 && rem == 1);
+    bool worked;
+    ltupleref(worked, q) = sqrtmod(fmpzxx(4), fmpzxx(5));
+    tassert(worked && (q == 2 || q == 3));
+    tassert(sqrtrem(fmpzxx(5)) == ltuple(2, 1));
     // TODO gcdinv, xgcd
 
     // check member functions
