@@ -93,6 +93,8 @@ void flint_cleanup()
         flint_cleanup_functions[i]();
 
     flint_free(flint_cleanup_functions);
+    flint_cleanup_functions = NULL;
+    flint_num_cleanup_functions = 0;
 
     mpfr_free_cache();
     _fmpz_cleanup();
