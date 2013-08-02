@@ -421,6 +421,7 @@ jacobi(const Fmpz1& a, const Fmpz2& p)
 
 // These functions are evaluated lazily
 
+// TODO move some of these to stdmath?
 FLINT_DEFINE_BINOP(cdiv_q)
 FLINT_DEFINE_BINOP(fdiv_r)
 FLINT_DEFINE_BINOP(tdiv_q)

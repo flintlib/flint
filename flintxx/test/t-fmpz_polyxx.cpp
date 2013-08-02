@@ -187,7 +187,6 @@ test_functions()
     tassert(mullow_KS(f, g, 3) == res);
     tassert(mullow_SS(f, g, 3) == res);
     tassert(mullow(f, g, 3) == res);
-    tassert(mullow3(f, g, 3) == res);
 
     res = f*g; res.zero_coeffs(0, 5);
     tassert(mulhigh_classical(f, g, 5) == res);
@@ -233,12 +232,13 @@ test_functions()
     tassert(gcd_heuristic(f, g).is_one());
     tassert(gcd_modular(f, g).is_one());
 
-    fmpz_polyxx r, s;
+    fmpz_polyxx r, s;fmpzxx number;
     res = 1797;
-    tassert(xgcd(r, s, f, g) == 1797);
-    tassert(r*f + s*g == res);
-    tassert(xgcd_modular(r, s, f, g) == 1797);
-    tassert(r*f + s*g == res);
+    ltupleref(number, r, s) = xgcd(f, g);
+    tassert(r*f + s*g == res && number == 1797);
+    r = 0; s = 0; number = 0;
+    ltupleref(number, r, s) = xgcd_modular(f, g);
+    tassert(r*f + s*g == res && number == 1797);
 
     tassert(lcm(f, g) == f*g);
 
@@ -262,7 +262,7 @@ test_functions()
     tassert(evaluate(xp1, fmpzxx(1)) == 2);
     tassert(evaluate_horner(xp1, fmpzxx(1)) == 2);
     tassert(evaluate_divconquer(xp1, fmpzxx(1)) == 2);
-    tassert(evaluate_mod(xp1, 1, 10) == 2);
+    tassert(evaluate_mod(xp1, 1u, 10u) == 2);
 
     fmpz_vecxx xs(3), ys(3);
     xs[0] = 0; xs[1] = 1; xs[2] = 2;
@@ -303,19 +303,15 @@ test_functions()
     tassert(g.max_bits() == 3);
 
     r = 0; s = 0;
-    divrem(r, s, g, f);
+    ltupleref(r, s) = divrem(g, f);
     tassert(r*f + s == g);
     tassert(r.to_string() == "2  4 5");
     r = 0; s = 0;
-    divrem_basecase(r, s, g, f);
+    ltupleref(r, s) = divrem_basecase(g, f);
     tassert(r*f + s == g);
     tassert(r.to_string() == "2  4 5");
     r = 0; s = 0;
-    divrem_divconquer(r, s, g, f);
-    tassert(r*f + s == g);
-    tassert(r.to_string() == "2  4 5");
-    r = 0; s = 0;
-    ltupleref(r, s) = divrem_tuple(g, f);
+    ltupleref(r, s) = divrem_divconquer(g, f);
     tassert(r*f + s == g);
     tassert(r.to_string() == "2  4 5");
 
@@ -326,20 +322,20 @@ test_functions()
 
     f *= 2;
     ulong d = 0;
-    pseudo_divrem(r, s, d, g, f);
+    ltupleref(r, s, d) = pseudo_divrem(g, f);
     tassert(r*f + s == g*pow(2, d));
     r = 0; r = 0; d = 0;
-    pseudo_divrem_basecase(r, s, d, g, f);
+    ltupleref(r, s, d) = pseudo_divrem_basecase(g, f);
     tassert(r*f + s == g*pow(2, d));
     r = 0; r = 0; d = 0;
-    pseudo_divrem_divconquer(r, s, d, g, f);
+    ltupleref(r, s, d) = pseudo_divrem_divconquer(g, f);
     tassert(r*f + s == g*pow(2, d));
 
-    tassert(pseudo_div(d, g, f) == r);
-    tassert(pseudo_rem(d, g, f) == s);
+    tassert(pseudo_div(g, f).get<0>() == r);
+    tassert(pseudo_rem(g, f).get<0>() == s);
 
     r = 0; r = 0;
-    pseudo_divrem_cohen(r, s, g, f);
+    ltupleref(r, s) = pseudo_divrem_cohen(g, f);
     tassert(r*f + s == g*4);
     tassert(pseudo_rem_cohen(g, f).to_string() == "3  -28 -32 12");
 
