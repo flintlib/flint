@@ -60,8 +60,9 @@
 #include "flintxx/tuple.h"
 
 #include "fmpzxx.h"
-#include "flintxx/vector.h"
 #include "fmpz_matxx.h"
+#include "fmpz_polyxx.h"
+#include "flintxx/vector.h"
 
 
 // Exception class to indicate that this test cannot proceed, e.g. because
@@ -497,6 +498,19 @@ DEFINE_FUNC(test_fmpz_matxx_2,
     fmpz_mat_clear(tmp1);
     fmpz_mat_clear(tmp2);
 }
+
+DEFINE_FUNC(test_fmpz_polyxx_divrem_1,
+        (fmpz_polyxx& A, fmpz_polyxx& B,
+         const fmpz_polyxx& f, const fmpz_polyxx& g))
+{
+    ltupleref(A, B) = divrem_tuple(f, g);
+}
+DEFINE_FUNC(test_fmpz_polyxx_divrem_2,
+        (fmpz_polyxx& A, fmpz_polyxx& B,
+         const fmpz_polyxx& f, const fmpz_polyxx& g))
+{
+    fmpz_poly_divrem(A._poly(), B._poly(), f._poly(), g._poly());
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -610,6 +624,14 @@ test_mat()
                 count(stripnop(ass2), "\n"), 0.1));
 }
 
+void
+test_poly()
+{
+    std::string ass1 = disass(program, "test_fmpz_polyxx_divrem_1");
+    std::string ass2 = disass(program, "test_fmpz_polyxx_divrem_2");
+    tassert(stripaddr(ass1) == stripaddr(ass2));
+}
+
 int
 main(int argc, char** argv)
 {
@@ -621,6 +643,7 @@ main(int argc, char** argv)
         test_fmpzxx();
         test_vector();
         test_mat();
+        test_poly();
     }
     catch(skippable_exception e)
     {

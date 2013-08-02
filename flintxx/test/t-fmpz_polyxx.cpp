@@ -313,6 +313,10 @@ test_functions()
     divrem_divconquer(r, s, g, f);
     tassert(r*f + s == g);
     tassert(r.to_string() == "2  4 5");
+    r = 0; s = 0;
+    ltupleref(r, s) = divrem_tuple(g, f);
+    tassert(r*f + s == g);
+    tassert(r.to_string() == "2  4 5");
 
     tassert(poly_divides(res, f*g, g));
     tassert(res == f);

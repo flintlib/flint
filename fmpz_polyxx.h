@@ -38,6 +38,7 @@
 #include "flintxx/flint_classes.h"
 #include "flintxx/flint_exception.h"
 #include "flintxx/frandxx.h"
+#include "flintxx/ltuple.h"
 #include "flintxx/traits.h"
 
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
@@ -81,6 +82,8 @@ FLINT_DEFINE_BINOP(compose_horner)
 FLINT_DEFINE_BINOP(taylor_shift_horner)
 FLINT_DEFINE_BINOP(taylor_shift_divconquer)
 FLINT_DEFINE_UNOP(sqrt_classical)
+
+FLINT_DEFINE_BINOP(divrem_tuple)
 
 FLINT_DEFINE_BINOP(fmpz_polyxx_interpolate)
 FLINT_DEFINE_UNOP(fmpz_polyxx_product_roots)
@@ -559,6 +562,15 @@ FLINT_DEFINE_UNARY_EXPR_COND(fmpz_polyxx_product_roots_op, fmpz_polyxx,
 
 FLINT_DEFINE_UNARY_EXPR_COND(poly_bound_roots_op, fmpzxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_bound_roots(to._fmpz(), from._poly()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<fmpz_polyxx, fmpz_polyxx>::type>::type
+    divrem_tuple_return_t;
+} // rdetail
+FLINT_DEFINE_BINARY_EXPR_COND2(divrem_tuple_op, rdetail::divrem_tuple_return_t,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    fmpz_poly_divrem(to.template get<0>()._poly(), to.template get<1>()._poly(),
+        e1._poly(), e2._poly()))
 } // rules
 
 // TODO functions which cannot be lazy b/c only two arguments allowd

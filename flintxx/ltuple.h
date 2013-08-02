@@ -192,6 +192,12 @@ struct is_ltuple_expr : mp::false_ { };
 template<class Tuple>
 struct is_ltuple_expr<Tuple, typename Tuple::IS_LTUPLE_EXPRESSION>
     : mp::true_ { };
+
+// enable evaluation directly into tuple
+template<class To, class From>
+struct can_evaluate_into<To, From,
+    typename mp::enable_if<mp::and_<is_ltuple_expr<From>,
+        is_ltuple_expr<To> > >::type> : mp::true_ { };
 } // traits
 
 namespace rules {
