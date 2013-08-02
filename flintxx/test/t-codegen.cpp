@@ -459,6 +459,19 @@ DEFINE_FUNC(test_fmpzxx_ref_2,
     fmpz_add(out._fmpz(), in1._fmpz(), in2._fmpz());
 }
 
+DEFINE_FUNC(test_fmpzxx_ltuple_comp_1,
+        (bool& out, const fmpzxx& in1, const fmpzxx& in2))
+{
+    out = (ltupleref(in1, in2) == ltuple(1, 2));
+}
+
+DEFINE_FUNC(test_fmpzxx_ltuple_comp_2,
+        (bool& out, const fmpzxx& in1, const fmpzxx& in2))
+{
+    out = ((fmpz_cmp_si(in1._fmpz(), 1) == 0)
+           && (fmpz_cmp_si(in2._fmpz(), 2) == 0));
+}
+
 DEFINE_FUNC(test_fmpzxx_vec_1,
         (fmpzxx_vector& out, const fmpzxx_vector& in1, const fmpzxx_vector& in2))
 {
@@ -499,11 +512,12 @@ DEFINE_FUNC(test_fmpz_matxx_2,
     fmpz_mat_clear(tmp2);
 }
 
+
 DEFINE_FUNC(test_fmpz_polyxx_divrem_1,
         (fmpz_polyxx& A, fmpz_polyxx& B,
          const fmpz_polyxx& f, const fmpz_polyxx& g))
 {
-    ltupleref(A, B) = divrem_tuple(f, g);
+    ltupleref(A, B) = divrem(f, g);
 }
 DEFINE_FUNC(test_fmpz_polyxx_divrem_2,
         (fmpz_polyxx& A, fmpz_polyxx& B,
@@ -603,6 +617,9 @@ test_fmpzxx()
 
     ass1 = disass(program, "test_fmpzxx_ref_1");
     ass2 = disass(program, "test_fmpzxx_ref_2");
+    tassert(count(ass1, "\n") == count(ass2, "\n"));
+    ass1 = disass(program, "test_fmpzxx_ltuple_comp_1");
+    ass2 = disass(program, "test_fmpzxx_ltuple_comp_2");
     tassert(count(ass1, "\n") == count(ass2, "\n"));
 }
 
