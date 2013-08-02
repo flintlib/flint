@@ -28,7 +28,7 @@
 // need not match (even for equality) as long as the operations can be performed
 // on underlying types.
 
-// TODO element-getters
+// TODO instantiate IGNORED_TYPE somewhere?
 
 #ifndef FLINTXX_LTUPLE_H
 #define FLINTXX_LTUPLE_H
@@ -91,6 +91,10 @@ struct ltuple_get_traits<n, Underlying, Operation, Data, Expr,
         return getter::get(t.evaluate()._data().inner);
     }
 };
+
+struct IGNORED_TYPE { };
+template<class Ltuple, class To, class Enable = void>
+struct ltuple_instantiate_ignored_types;
 } // detail
 
 template<class Underlying, class Operation, class Data>
@@ -115,7 +119,9 @@ public:
     template<class T>
     ltuple_expression& operator=(const T& t)
     {
-        this->set(t);
+        detail::ltuple_instantiate_ignored_types<
+            ltuple_expression, T> inst(*this, t);
+        inst.set(t);
         return *this;
     }
 
@@ -200,8 +206,82 @@ struct is_ltuple_expr<Tuple, typename Tuple::IS_LTUPLE_EXPRESSION>
 template<class To, class From>
 struct can_evaluate_into<To, From,
     typename mp::enable_if<mp::and_<is_ltuple_expr<From>,
-        is_ltuple_expr<To> > >::type> : mp::true_ { };
+        is_ltuple_expr<To>, mp::not_<mp::equal_types<To, From> >
+      > >::type> : mp::true_ { };
 } // traits
+
+namespace detail {
+template<class Ltuple, class To, class Enable>
+struct ltuple_instantiate_ignored_types
+{
+    // degenerate case: To is not a tuple
+    Ltuple& saved;
+    ltuple_instantiate_ignored_types(Ltuple& s, const To&) : saved(s) {}
+    void set(const To& to) {saved.set(to);}
+};
+template<class ToTuple, class FromTuple>
+struct tuple_instantiate_ignored
+{
+    typedef tuple_instantiate_ignored<typename ToTuple::tail_t,
+                typename FromTuple::tail_t> next_t;
+    typedef typename traits::reference<typename ToTuple::head_t>::type ref_t;
+    typedef tuple<ref_t, typename next_t::type> type;
+    next_t next;
+    ref_t ref;
+
+    template<class From>
+    tuple_instantiate_ignored(ToTuple& to, const From& from)
+        : next(to.tail, from), ref(to.head) {}
+
+    type get()
+    {
+        return type(ref, next.get());
+    }
+};
+template<>
+struct tuple_instantiate_ignored<empty_tuple, empty_tuple>
+{
+    typedef empty_tuple type;
+    template<class F>
+    tuple_instantiate_ignored(empty_tuple, const F&) {}
+    empty_tuple get() {return empty_tuple();}
+};
+template<class ToTail, class From, class FromTail>
+struct tuple_instantiate_ignored<
+    tuple<IGNORED_TYPE&, ToTail>, tuple<From, FromTail> >
+{
+    typedef tuple_instantiate_ignored<ToTail, FromTail> next_t;
+    typedef typename traits::reference<From>::type ref_t;
+    typedef tuple<ref_t, typename next_t::type> type;
+    next_t next;
+    From tmp;
+
+    template<class ToTuple, class FromExpr>
+    tuple_instantiate_ignored(ToTuple& to, const FromExpr& from)
+        : next(to.tail, from),
+          tmp(rules::instantiate_temporaries<FromExpr, From>::get(from)) {}
+
+    type get()
+    {
+        return type(tmp, next.get());
+    }
+};
+template<class Ltuple, class T>
+struct ltuple_instantiate_ignored_types<Ltuple, T,
+    typename mp::enable_if<traits::is_ltuple_expr<T> >::type>
+{
+    typedef tuple_instantiate_ignored<
+        typename Ltuple::underlying_t, typename T::underlying_t> tii_t;
+    tii_t tii;
+    ltuple_instantiate_ignored_types(Ltuple& l, const T& t)
+        : tii(l._data().inner, t) {}
+    void set(const T& t)
+    {
+        typename make_ltuple<typename tii_t::type>::type(INSTANTIATE_FROM_TUPLE(),
+            tii.get()).set(t);
+    }
+};
+}
 
 namespace rules {
 template<class Tuple1, class Tuple2>

@@ -30,6 +30,8 @@
 
 using namespace flint;
 
+detail::IGNORED_TYPE _;
+
 void
 test_traits()
 {
@@ -155,6 +157,18 @@ test_get()
     tassert(make_lazy_test(a, 3).get<1>() == 3);
 }
 
+void
+test_placeholder()
+{
+    fmpzxx a; int b;
+    ltupleref(a, _) = make_lazy_test(fmpzxx(17), 5);
+    tassert(a == 17);
+    ltupleref(_, b) = make_lazy_test(fmpzxx(18), 6);
+    tassert(b == 6 && a == 17);
+    ltupleref(_, _) = make_lazy_test(fmpzxx(1), 2);
+    tassert(b == 6 && a == 17);
+}
+
 int
 main()
 {
@@ -165,6 +179,7 @@ main()
     test_assignment();
     test_ltupleref();
     test_get();
+    test_placeholder();
 
     std::cout << "PASS" << std::endl;
 

@@ -64,7 +64,6 @@
 #include "fmpz_polyxx.h"
 #include "flintxx/vector.h"
 
-
 // Exception class to indicate that this test cannot proceed, e.g. because
 // binutils is not installed or because we cannot interpret the disassembled
 // code.
@@ -196,6 +195,8 @@ bool fuzzy_equals(T v1, T v2, double perc)
 
 using namespace flint;
 using namespace mp;
+
+detail::IGNORED_TYPE _;
 
 typedef make_vector_n<fmpzxx, 10>::type fmpzxx_vector;
 
@@ -525,6 +526,22 @@ DEFINE_FUNC(test_fmpz_polyxx_divrem_2,
 {
     fmpz_poly_divrem(A._poly(), B._poly(), f._poly(), g._poly());
 }
+
+DEFINE_FUNC(test_fmpz_polyxx_divrem_3,
+        (fmpz_polyxx& A,
+         const fmpz_polyxx& f, const fmpz_polyxx& g))
+{
+    ltupleref(A, _) = divrem(f, g);
+}
+DEFINE_FUNC(test_fmpz_polyxx_divrem_4,
+        (fmpz_polyxx& A,
+         const fmpz_polyxx& f, const fmpz_polyxx& g))
+{
+    fmpz_poly_t tmp;
+    fmpz_poly_init(tmp);
+    fmpz_poly_divrem(A._poly(), tmp, f._poly(), g._poly());
+    fmpz_poly_clear(tmp);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -647,6 +664,11 @@ test_poly()
     std::string ass1 = disass(program, "test_fmpz_polyxx_divrem_1");
     std::string ass2 = disass(program, "test_fmpz_polyxx_divrem_2");
     tassert(stripaddr(ass1) == stripaddr(ass2));
+
+    ass1 = disass(program, "test_fmpz_polyxx_divrem_1");
+    ass2 = disass(program, "test_fmpz_polyxx_divrem_2");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
 }
 
 int

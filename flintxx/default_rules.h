@@ -240,6 +240,7 @@ struct instantiate_temporaries
 template<class Expr, class T>
 struct instantiate_temporaries<Expr, T, typename mp::enable_if<mp::and_<
     use_default_temporary_instantiation<Expr, T>,
+    traits::is_expression<T>,
     tools::has_subexpr<rdetail::evaluated_type_pred<T>, Expr> > >::type>
 {
     static T get(const Expr& e)
