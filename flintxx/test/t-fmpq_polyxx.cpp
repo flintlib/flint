@@ -188,7 +188,7 @@ test_functions()
     tassert(f == poly_shift_right(poly_shift_left(f, 5), 5));
 
     fmpq_polyxx Q, R;
-    divrem(Q, R, g, f);
+    ltupleref(Q, R) = divrem(g, f);
     tassert(Q*f + R == g);
 
     f = "2  1 -1";
@@ -202,9 +202,9 @@ test_functions()
     tassert(gcd(f, g).is_one());
     tassert(lcm(f, g) == f*g / 5);
 
-    fmpq_polyxx r, s;
-    tassert(xgcd(r, s, f, g).is_one());
-    tassert((r*f + s*g).is_one());
+    fmpq_polyxx r, s, extra;
+    ltupleref(extra, r, s) = xgcd(f, g);
+    tassert(extra.is_one() && (r*f + s*g).is_one());
 
     res = "6  0 1 1 1 1 1";
     tassert(derivative(res) == g);

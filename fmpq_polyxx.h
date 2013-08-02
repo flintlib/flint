@@ -469,67 +469,36 @@ FLINT_DEFINE_UNARY_EXPR_COND(primitive_part_op, fmpq_polyxx, FMPQ_POLYXX_COND_S,
 
 FLINT_DEFINE_UNARY_EXPR_COND(make_monic_op, fmpq_polyxx, FMPQ_POLYXX_COND_S,
         fmpq_poly_make_monic(to._poly(), from._poly()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<
+    fmpq_polyxx, fmpq_polyxx, fmpq_polyxx>::type>::type fmpq_polyxx_triple;
+typedef make_ltuple<mp::make_tuple<
+    fmpq_polyxx, fmpq_polyxx>::type>::type fmpq_polyxx_pair;
+} // rdetail
+
+FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_op, rdetail::fmpq_polyxx_triple,
+    FMPQ_POLYXX_COND_S, FMPQ_POLYXX_COND_S,
+    fmpq_poly_xgcd(to.template get<0>()._poly(), to.template get<1>()._poly(),
+        to.template get<2>()._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(divrem_op, rdetail::fmpq_polyxx_pair,
+    FMPQ_POLYXX_COND_S, FMPQ_POLYXX_COND_S,
+    fmpq_poly_divrem(to.template get<0>()._poly(), to.template get<1>()._poly(),
+        e1._poly(), e2._poly()))
+
+#define FMPQ_POLYXX_DEFINE_SERIES_FUNC(name) \
+FLINT_DEFINE_THREEARY_EXPR_COND3(name##_op, fmpq_polyxx, \
+    FMPQ_POLYXX_COND_S, FMPQ_POLYXX_COND_S, traits::fits_into_slong, \
+    fmpq_poly_##name(to._poly(), e1._poly(), e2._poly(), e3))
+FMPQ_POLYXX_DEFINE_SERIES_FUNC(mullow)
+FMPQ_POLYXX_DEFINE_SERIES_FUNC(div_series)
+FMPQ_POLYXX_DEFINE_SERIES_FUNC(compose_series)
+FMPQ_POLYXX_DEFINE_SERIES_FUNC(compose_series_brent_kung)
+FMPQ_POLYXX_DEFINE_SERIES_FUNC(compose_series_horner)
 } // rules
 
 // NB: fmpq_poly addmul is just done by hand currently, no need to wrap that ..
 
-// TODO these should be lazy
-template<class Poly1, class Poly2>
-inline typename mp::enable_all_fmpq_polyxx<fmpq_polyxx, Poly1, Poly2>::type
-mullow(const Poly1& p1, const Poly2& p2, slong n)
-{
-    fmpq_polyxx res;
-    fmpq_poly_mullow(res._poly(), p1.evaluate()._poly(), p2.evaluate()._poly(), n);
-    return res;
-}
-
-template<class Poly1, class Poly2>
-inline typename mp::enable_all_fmpq_polyxx<fmpq_polyxx, Poly1, Poly2>::type
-div_series(const Poly1& A, const Poly2& B, slong n)
-{
-    fmpq_polyxx res;
-    fmpq_poly_div_series(res._poly(), A.evaluate()._poly(),
-            B.evaluate()._poly(), n);
-    return res;
-}
-
-#define FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(name) \
-template<class Poly1, class Poly2> \
-inline typename mp::enable_all_fmpq_polyxx<fmpq_polyxx, Poly1, Poly2>::type \
-name(const Poly1& p1, const Poly2& p2, slong n) \
-{ \
-    fmpq_polyxx res; \
-    fmpq_poly_##name(res._poly(), p1.evaluate()._poly(), \
-          p2.evaluate()._poly(), n); \
-    return res; \
-}
-FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series_horner)
-FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series_brent_kung)
-FMPQ_POLYXX_DEFINE_COMPOSE_SERIES(compose_series)
-
-// these cannot be lazy b/c two output values
-template<class Poly1, class Poly2, class Poly3, class Poly4>
-inline typename mp::enable_if<mp::and_<
-    FMPQ_POLYXX_COND_T<Poly1>, FMPQ_POLYXX_COND_T<Poly2>,
-    traits::is_fmpq_polyxx<Poly3>, traits::is_fmpq_polyxx<Poly4> >,
-  fmpq_polyxx>::type
-xgcd(Poly1& r, Poly2& s, const Poly3& f, const Poly4& g)
-{
-    fmpq_polyxx res;
-    fmpq_poly_xgcd(res._poly(), r._poly(), s._poly(),
-            f.evaluate()._poly(), g.evaluate()._poly());
-    return res;
-}
-
-template<class Poly1, class Poly2, class Poly3, class Poly4>
-inline typename mp::enable_if<mp::and_<
-    FMPQ_POLYXX_COND_T<Poly1>, FMPQ_POLYXX_COND_T<Poly2>,
-    traits::is_fmpq_polyxx<Poly3>, traits::is_fmpq_polyxx<Poly4> > >::type
-divrem(Poly1& Q, Poly2& R, const Poly3& A, const Poly4& B)
-{
-    fmpq_poly_divrem(Q._poly(), R._poly(),
-            A.evaluate()._poly(), B.evaluate()._poly());
-}
 } // flint
 
 #endif
