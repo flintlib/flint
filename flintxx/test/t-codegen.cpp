@@ -61,6 +61,7 @@
 
 #include "fmpzxx.h"
 #include "flintxx/vector.h"
+#include "fmpz_matxx.h"
 
 
 // Exception class to indicate that this test cannot proceed, e.g. because
@@ -477,6 +478,25 @@ DEFINE_FUNC(test_fmpzxx_vec_2,
     fmpz_add(out + 8, in1 + 8, in2 + 8);
     fmpz_add(out + 9, in1 + 9, in2 + 9);
 }
+
+
+DEFINE_FUNC(test_fmpz_matxx_1,
+        (fmpzxx& to, const fmpz_matxx& A))
+{
+    to = trace(transpose(A)*A);
+}
+DEFINE_FUNC(test_fmpz_matxx_2,
+        (fmpzxx& to, const fmpz_matxx& A))
+{
+    fmpz_mat_t tmp1, tmp2;
+    fmpz_mat_init(tmp1, fmpz_mat_nrows(A._mat()), fmpz_mat_ncols(A._mat()));
+    fmpz_mat_init(tmp2, fmpz_mat_ncols(A._mat()), fmpz_mat_ncols(A._mat()));
+    fmpz_mat_transpose(tmp1, A._mat());
+    fmpz_mat_mul(tmp1, tmp2, A._mat());
+    fmpz_mat_trace(to._fmpz(), tmp2);
+    fmpz_mat_clear(tmp1);
+    fmpz_mat_clear(tmp2);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -580,6 +600,16 @@ test_vector()
     tassert(stripaddr(ass1) == stripaddr(ass2));
 }
 
+void
+test_mat()
+{
+    std::string ass1 = disass(program, "test_fmpz_matxx_1");
+    std::string ass2 = disass(program, "test_fmpz_matxx_2");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
+                count(stripnop(ass2), "\n"), 0.1));
+}
+
 int
 main(int argc, char** argv)
 {
@@ -590,6 +620,7 @@ main(int argc, char** argv)
         test_tuple();
         test_fmpzxx();
         test_vector();
+        test_mat();
     }
     catch(skippable_exception e)
     {
