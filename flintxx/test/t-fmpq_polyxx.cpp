@@ -45,7 +45,7 @@ test_manipulation()
 {
     fmpq_polyxx p, q;
     p.set_coeff(5, 17);
-    p.denref() = 2;
+    p.den() = 2;
     tassert(p.degree() == 5);
     q.set_coeff(5, fmpqxx(17, 2u));
     tassert((q + fmpq_polyxx()).get_coeff(5) == fmpqxx(17, 2u));
@@ -60,6 +60,8 @@ test_manipulation()
     tassert(p.is_zero() && !p.is_one());
     p.set_coeff(0, 1);
     tassert(p.is_one());
+
+    tassert((p*q).den() == 2);
 }
 
 void

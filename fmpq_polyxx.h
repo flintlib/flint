@@ -39,12 +39,13 @@
 #include "flintxx/traits.h"
 
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
-// TODO non-lazy functions
+// TODO lazy version of numref?
 
 namespace flint {
 // function "declarations"
 FLINT_DEFINE_BINOP(fmpq_polyxx_get_coeff)
 FLINT_DEFINE_BINOP(fmpq_polyxx_interpolate)
+FLINT_DEFINE_UNOP(fmpq_polyxx_den)
 
 // TODO move to stdmath?
 FLINT_DEFINE_BINOP(sqrt_series)
@@ -70,8 +71,10 @@ namespace detail {
 template<class Poly>
 struct fmpq_poly_traits
 {
-    struct coeff_ref_t { };
-    struct coeff_srcref_t { };
+    typedef FLINT_UNOP_BUILD_RETTYPE(fmpq_polyxx_den, fmpzxx, Poly) coeff_ref_t;
+    typedef coeff_ref_t coeff_srcref_t;
+
+    static coeff_srcref_t den(const Poly& p) {return fmpq_polyxx_den(p);}
 };
 } // detail
 
@@ -148,14 +151,8 @@ public:
     {
         return coeff_srcref_t::make(fmpq_poly_numref(_poly()) + n);
     }
-    coeff_ref_t denref()
-    {
-        return coeff_ref_t::make(fmpq_poly_denref(_poly()));
-    }
-    coeff_srcref_t denref() const
-    {
-        return coeff_srcref_t::make(fmpq_poly_denref(_poly()));
-    }
+    coeff_ref_t den() {return poly_traits_t::den(*this);}
+    coeff_srcref_t den() const {return poly_traits_t::den(*this);}
 
     // These only make sense with target immediates
     template<class Fmpz>
@@ -231,23 +228,23 @@ typedef fmpq_polyxx_expression<operations::immediate,
 
 namespace detail {
 template<>
-struct fmpq_poly_traits<fmpq_polyxx>
-{
-    typedef fmpzxx_ref coeff_ref_t;
-    typedef fmpzxx_srcref coeff_srcref_t;
-};
-template<>
-struct fmpq_poly_traits<fmpq_polyxx_ref>
-{
-    typedef fmpzxx_ref coeff_ref_t;
-    typedef fmpzxx_srcref coeff_srcref_t;
-};
-template<>
 struct fmpq_poly_traits<fmpq_polyxx_srcref>
 {
     typedef fmpzxx_srcref coeff_ref_t;
     typedef fmpzxx_srcref coeff_srcref_t;
+    template<class P> static coeff_srcref_t den(const P& p)
+        {return coeff_srcref_t::make(fmpq_poly_denref(p._poly()));}
 };
+template<>
+struct fmpq_poly_traits<fmpq_polyxx_ref>
+    : fmpq_poly_traits<fmpq_polyxx_srcref>
+{
+    typedef fmpzxx_ref coeff_ref_t;
+    template<class P> static coeff_ref_t den(P& p)
+        {return coeff_ref_t::make(fmpq_poly_denref(p._poly()));}
+};
+template<> struct fmpq_poly_traits<fmpq_polyxx>
+    : fmpq_poly_traits<fmpq_polyxx_ref> { };
 
 struct fmpq_poly_data
 {
@@ -469,6 +466,9 @@ FLINT_DEFINE_UNARY_EXPR_COND(primitive_part_op, fmpq_polyxx, FMPQ_POLYXX_COND_S,
 
 FLINT_DEFINE_UNARY_EXPR_COND(make_monic_op, fmpq_polyxx, FMPQ_POLYXX_COND_S,
         fmpq_poly_make_monic(to._poly(), from._poly()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(fmpq_polyxx_den_op, fmpzxx, FMPQ_POLYXX_COND_S,
+        fmpz_set(to._fmpz(), fmpq_poly_denref(from._poly())))
 
 namespace rdetail {
 typedef make_ltuple<mp::make_tuple<
