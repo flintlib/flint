@@ -164,6 +164,17 @@ void
 test_extras()
 {
     // TODO addmul
+
+    // forwarded member functions
+    fmpq_polyxx f, g;
+    f = "4  1 2 3 4";
+    g = "5  0 4 3 2 1";
+    tassert(g.exp_series(10) == exp_series(g, 10));
+    tassert(f.make_monic() == make_monic(f));
+    tassert(f.derivative() == derivative(f));
+    tassert(f.content() == content(f));
+    tassert(f.divrem(g) == divrem(f, g));
+    tassert(f.compose_series(g, 5) == compose_series(f, g, 5));
 }
 
 void

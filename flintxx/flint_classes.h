@@ -411,7 +411,7 @@ name() const \
 #define FLINTXX_DEFINE_MEMBER_UNOP(name) FLINTXX_DEFINE_MEMBER_UNOP_(name, name)
 
 #define FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(rettype, name, funcname) \
-FLINT_UNOP_BUILD_RETTYPE(rettype, name, typename base_t::derived_t) \
+FLINT_UNOP_BUILD_RETTYPE(name, rettype, typename base_t::derived_t) \
 name() const \
 { \
     return flint::funcname(*this); \
