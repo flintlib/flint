@@ -38,12 +38,21 @@
 #include "flintxx/flint_classes.h"
 
 namespace flint {
+FLINT_DEFINE_UNOP(fmpz_poly_qxx_num)
+FLINT_DEFINE_UNOP(fmpz_poly_qxx_den)
+
 namespace detail {
 template<class Polyq>
 struct fmpz_poly_q_traits
 {
-    struct part_ref_t { };
-    struct part_srcref_t { };
+    typedef FLINT_UNOP_BUILD_RETTYPE(
+                fmpz_poly_qxx_num, fmpz_polyxx, Polyq) num_ref_t;
+    typedef FLINT_UNOP_BUILD_RETTYPE(
+                fmpz_poly_qxx_den, fmpz_polyxx, Polyq) den_ref_t;
+    typedef num_ref_t num_srcref_t;
+    typedef den_ref_t den_srcref_t;
+    static num_ref_t num(const Polyq& p) {return fmpz_poly_qxx_num(p);}
+    static den_ref_t den(const Polyq& p) {return fmpz_poly_qxx_den(p);}
 };
 } // detail
 
@@ -56,8 +65,10 @@ public:
     typedef expression<derived_wrapper< ::flint::fmpz_poly_qxx_expression>,
               Operation, Data> base_t;
     typedef detail::fmpz_poly_q_traits<fmpz_poly_qxx_expression> poly_traits_t;
-    typedef typename poly_traits_t::part_ref_t part_ref_t;
-    typedef typename poly_traits_t::part_srcref_t part_srcref_t;
+    typedef typename poly_traits_t::num_ref_t num_ref_t;
+    typedef typename poly_traits_t::num_srcref_t num_srcref_t;
+    typedef typename poly_traits_t::den_ref_t den_ref_t;
+    typedef typename poly_traits_t::den_srcref_t den_srcref_t;
 
     FLINTXX_DEFINE_BASICS(fmpz_poly_qxx_expression)
     FLINTXX_DEFINE_CTORS(fmpz_poly_qxx_expression)
@@ -81,15 +92,11 @@ public:
         return res;
     }
 
-    // These only make sense with immediates
-    part_ref_t numref()
-        {return part_ref_t::make(fmpz_poly_q_numref(_polyq()));}
-    part_ref_t denref()
-        {return part_ref_t::make(fmpz_poly_q_denref(_polyq()));}
-    part_srcref_t numref() const
-        {return part_srcref_t::make(fmpz_poly_q_numref(_polyq()));}
-    part_srcref_t denref() const
-        {return part_srcref_t::make(fmpz_poly_q_denref(_polyq()));}
+    // Numerator and denominator access
+    num_ref_t num() {return poly_traits_t::num(*this);}
+    num_srcref_t num() const {return poly_traits_t::num(*this);}
+    den_ref_t den() {return poly_traits_t::den(*this);}
+    den_srcref_t den() const {return poly_traits_t::den(*this);}
     bool is_canonical() const {return fmpz_poly_q_is_canonical(_polyq());}
 
     // these only make sense with target immediates
@@ -123,21 +130,33 @@ typedef fmpz_poly_qxx_expression<operations::immediate,
 
 namespace detail {
 template<>
-struct fmpz_poly_q_traits<fmpz_poly_qxx>
+struct fmpz_poly_q_traits<fmpz_poly_qxx_srcref>
 {
-    typedef fmpz_polyxx_ref part_ref_t;
-    typedef fmpz_polyxx_srcref part_srcref_t;
+    typedef fmpz_polyxx_srcref num_ref_t;
+    typedef fmpz_polyxx_srcref num_srcref_t;
+    typedef fmpz_polyxx_srcref den_ref_t;
+    typedef fmpz_polyxx_srcref den_srcref_t;
+    template<class P> static num_srcref_t num(const P& p)
+        {return num_srcref_t::make(fmpz_poly_q_numref(p._polyq()));}
+    template<class P> static den_srcref_t den(const P& p)
+        {return num_srcref_t::make(fmpz_poly_q_denref(p._polyq()));}
 };
 template<>
 struct fmpz_poly_q_traits<fmpz_poly_qxx_ref>
+    : fmpz_poly_q_traits<fmpz_poly_qxx_srcref>
 {
-    typedef fmpz_polyxx_ref part_ref_t;
-    typedef fmpz_polyxx_srcref part_srcref_t;
+    typedef fmpz_polyxx_ref num_ref_t;
+    typedef fmpz_polyxx_ref den_ref_t;
+    template<class P> static num_ref_t num(P& p)
+        {return num_ref_t::make(fmpz_poly_q_numref(p._polyq()));}
+    template<class P> static den_ref_t den(P& p)
+        {return num_ref_t::make(fmpz_poly_q_denref(p._polyq()));}
 };
 template<>
-struct fmpz_poly_q_traits<fmpz_poly_qxx_srcref>
+struct fmpz_poly_q_traits<fmpz_poly_qxx>
+    : fmpz_poly_q_traits<fmpz_poly_qxx_ref>
 {
-    typedef fmpz_polyxx_srcref part_ref_t;
+    typedef fmpz_polyxx_ref part_ref_t;
     typedef fmpz_polyxx_srcref part_srcref_t;
 };
 
@@ -214,6 +233,13 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpz_poly_qxx,
 
 FLINT_DEFINE_UNARY_EXPR_COND(derivative_op, fmpz_poly_qxx, FMPZ_POLY_QXX_COND_S,
         fmpz_poly_q_derivative(to._polyq(), from._polyq()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(fmpz_poly_qxx_num_op, fmpz_polyxx,
+        FMPZ_POLY_QXX_COND_S,
+        fmpz_poly_set(to._poly(), fmpz_poly_q_numref(from._polyq())))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpz_poly_qxx_den_op, fmpz_polyxx,
+        FMPZ_POLY_QXX_COND_S,
+        fmpz_poly_set(to._poly(), fmpz_poly_q_denref(from._polyq())))
 
 // XXX these should really be in fmpz_poly_q.h ...
 #if 0

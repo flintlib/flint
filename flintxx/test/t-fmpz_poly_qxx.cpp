@@ -37,12 +37,12 @@ void
 test_manipulation()
 {
     fmpz_poly_qxx f;
-    f.numref() = "3  0 1 1";
-    f.denref() = "3  0 -1 1";
+    f.num() = "3  0 1 1";
+    f.den() = "3  0 -1 1";
     tassert(!f.is_canonical());
     f.canonicalise();
-    tassert(f.numref().to_string() == "2  1 1");
-    tassert(f.denref().to_string() == "2  -1 1");
+    tassert(f.num().to_string() == "2  1 1");
+    tassert(f.den().to_string() == "2  -1 1");
 }
 
 void
@@ -57,10 +57,10 @@ test_assignment_conversion()
     tassert(f.to_string() == "0");
 
     f = "4  1 0 0 1";
-    tassert(f.numref().to_string() == "4  1 0 0 1");
-    tassert(f.denref().to_string() == "1  1");
+    tassert(f.num().to_string() == "4  1 0 0 1");
+    tassert(f.den().to_string() == "1  1");
 
-    f.denref() = "2  -1 1";
+    f.den() = "2  -1 1";
     tassert(f.to_string() == "4  1 0 0 1/2  -1 1");
     g = "4  1 0 0 1/2  -1 1";
     tassert(f == g);
@@ -82,7 +82,7 @@ test_arithmetic()
 
     tassert(2 * g == g * 2);
     f = 2*g;
-    tassert(f.numref() == 2*g.numref() && f.denref() == g.denref());
+    tassert(f.num() == 2*g.num() && f.den() == g.den());
     f /= 2;
     tassert(f == g);
 
@@ -93,10 +93,10 @@ test_arithmetic()
 #endif
 
     f = "1  1";
-    tassert((f*g).evaluate().numref() == f.numref()*g.numref());
-    tassert((f*g).evaluate().denref() == f.denref()*g.denref());
-    tassert((f/g).evaluate().numref() == f.numref()*g.denref());
-    tassert((f/g).evaluate().denref() == f.denref()*g.numref());
+    tassert((f*g).num() == f.num()*g.num());
+    tassert((f*g).den() == f.den()*g.den());
+    tassert((f/g).num() == f.num()*g.den());
+    tassert((f/g).den() == f.den()*g.num());
 }
 
 // Won't compile if the expression is not done using addmul
@@ -118,7 +118,7 @@ test_functions()
 {
     fmpz_poly_qxx f;
     tassert(f.is_zero() && !f.is_one());
-    f.numref() = 1;
+    f.num() = 1;
     tassert(f.is_one());
 
     f = "4  1 0 0 1/2  -1 1";
@@ -128,12 +128,12 @@ test_functions()
 
     // test static methods
     frandxx rand;
-    tassert(fmpz_poly_qxx::randtest(rand, 10, 8, 10, 8).numref().degree() < 10);
-    tassert(fmpz_poly_qxx::randtest(rand, 10, 8, 10, 8).denref().degree() < 10);
+    tassert(fmpz_poly_qxx::randtest(rand, 10, 8, 10, 8).num().degree() < 10);
+    tassert(fmpz_poly_qxx::randtest(rand, 10, 8, 10, 8).den().degree() < 10);
     tassert(flog(height(fmpz_poly_qxx::randtest(
-                        rand, 10, 8, 10, 8).numref()), 2) < 8);
+                        rand, 10, 8, 10, 8).num()), 2) < 8);
     tassert(flog(height(fmpz_poly_qxx::randtest(
-                        rand, 10, 8, 10, 8).denref()), 2) < 8);
+                        rand, 10, 8, 10, 8).den()), 2) < 8);
     tassert(!fmpz_poly_qxx::randtest_not_zero(rand, 10, 8, 10, 8).is_zero());
 }
 
