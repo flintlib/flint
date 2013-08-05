@@ -139,6 +139,9 @@ test_extras()
     tassert(a == c && asr == c);
 
     tassert((-a) + a == fmpqxx(0, 0u));
+
+    tassert(a.pow(3) == pow(a, 3));
+    tassert(a.height() == height(a));
 }
 
 void

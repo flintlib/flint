@@ -132,12 +132,21 @@ public:
     bool is_one() const {return fmpq_is_one(this->evaluate()._fmpq());}
     // TODO make this only work on immediates?
     slong cfrac_bound() const {return fmpq_cfrac_bound(this->evaluate()._fmpq());}
+    int sgn() const {return fmpq_sgn(this->evaluate()._fmpq());}
+    mp_bitcnt_t height_bits() const
+        {return fmpq_height_bits(this->evaluate()._fmpq());}
 
     FLINTXX_DEFINE_MEMBER_UNOP_(next_minimal, fmpqxx_next_minimal)
     FLINTXX_DEFINE_MEMBER_UNOP_(next_signed_minimal, fmpqxx_next_signed_minimal)
     FLINTXX_DEFINE_MEMBER_UNOP_(next_calkin_wilf, fmpqxx_next_calkin_wilf)
     FLINTXX_DEFINE_MEMBER_UNOP_(next_signed_calkin_wilf,
             fmpqxx_next_signed_calkin_wilf)
+
+    // forwarded member functions
+    FLINTXX_DEFINE_MEMBER_UNOP(abs)
+    FLINTXX_DEFINE_MEMBER_UNOP(inv)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, height)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
 };
 
 namespace detail {
@@ -279,12 +288,11 @@ FLINTXX_DEFINE_TERNARY(fmpqxx,
         FLINTXX_UNADORNED_MAKETYPES)
 
 // immediate functions
-// TODO maybe as a member function?
 template<class Fmpq>
 inline typename mp::enable_if<traits::is_fmpqxx<Fmpq>, mp_bitcnt_t>::type
 height_bits(const Fmpq& f)
 {
-    return fmpq_height_bits(f.evaluate()._fmpq());
+    return f.height_bits();
 }
 
 // TODO maybe as a member function?
@@ -300,12 +308,11 @@ get_cfrac(Vec& v, Fmpq1& rem, const Fmpq2& x)
 }
 // TODO also set_cfrac? c/f fmpqxx::set_cfrac ...
 
-// TODO maybe as a member function?
 template<class Fmpq>
 inline typename mp::enable_if<traits::is_fmpqxx<Fmpq>, int>::type
 sgn(const Fmpq& f)
 {
-    return fmpq_sgn(f.evaluate()._fmpq());
+    return f.sgn();
 }
 
 namespace rules {
