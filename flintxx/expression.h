@@ -373,6 +373,14 @@ struct binary_op_helper
 template<class Op, class Expr>
 struct unary_op_helper : nary_op_helper2<Op, Expr> { };
 
+template<class Ret, class Op, class Expr>
+struct unary_op_helper_with_rettype
+{
+    typedef mp::make_tuple<typename storage_traits<Expr>::type> maker;
+    typedef typename Ret::template make_helper<
+        Op, typename maker::type>::type return_t;
+};
+
 template<class Expr1, class Expr2>
 struct order_op_helper
 {
@@ -669,6 +677,9 @@ name(const T1& t1) \
 
 #define FLINT_UNOP_ENABLE_RETTYPE(name, T) \
     typename detail::unary_op_helper<operations::name##_op, T>::return_t
+#define FLINT_UNOP_BUILD_RETTYPE(name, rettype, T) \
+    typename detail::unary_op_helper_with_rettype<rettype, \
+        operations::name##_op, T>::return_t
 
 #define FLINT_DEFINE_THREEARY(name) \
 namespace operations { \

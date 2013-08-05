@@ -46,6 +46,20 @@ FLINT_DEFINE_UNOP(fmpqxx_next_minimal)
 FLINT_DEFINE_UNOP(fmpqxx_next_signed_minimal)
 FLINT_DEFINE_UNOP(fmpqxx_next_calkin_wilf)
 FLINT_DEFINE_UNOP(fmpqxx_next_signed_calkin_wilf)
+FLINT_DEFINE_UNOP(fmpqxx_num)
+FLINT_DEFINE_UNOP(fmpqxx_den)
+
+namespace detail {
+template<class Fmpq>
+struct fmpq_traits {
+    typedef FLINT_UNOP_BUILD_RETTYPE(fmpqxx_num, fmpzxx, Fmpq) numreturn_t;
+    typedef FLINT_UNOP_BUILD_RETTYPE(fmpqxx_den, fmpzxx, Fmpq) denreturn_t;
+    typedef numreturn_t cnumreturn_t;
+    typedef denreturn_t cdenreturn_t;
+    static numreturn_t num(const Fmpq& f) {return fmpqxx_num(f);}
+    static denreturn_t den(const Fmpq& f) {return fmpqxx_den(f);}
+};
+}
 
 template<class Operation, class Data>
 class fmpqxx_expression
@@ -96,10 +110,6 @@ public:
     }
 
     // These only make sense with immediates
-    fmpzxx_ref num() {return fmpzxx_ref::make(fmpq_numref(_fmpq()));}
-    fmpzxx_srcref num() const {return fmpzxx_srcref::make(fmpq_numref(_fmpq()));}
-    fmpzxx_ref den() {return fmpzxx_ref::make(fmpq_denref(_fmpq()));}
-    fmpzxx_srcref den() const {return fmpzxx_srcref::make(fmpq_denref(_fmpq()));}
     void canonicalise() {fmpq_canonicalise(_fmpq());}
     bool is_canonical() const {return fmpq_is_canonical(_fmpq());}
 
@@ -108,6 +118,14 @@ public:
     {
         fmpq_set_cfrac(this->_fmpq(), v._array(), n);
     }
+
+    // Numerator and denominator access
+    typedef detail::fmpq_traits<fmpqxx_expression> traits_t;
+    typename traits_t::numreturn_t num() {return traits_t::num(*this);}
+    typename traits_t::cnumreturn_t num() const {return traits_t::num(*this);}
+    typename traits_t::denreturn_t den() {return traits_t::den(*this);}
+    typename traits_t::cdenreturn_t den() const
+        {return traits_t::den(*this);}
 
     // These cause evaluation
     bool is_zero() const {return fmpq_is_zero(this->evaluate()._fmpq());}
@@ -133,6 +151,33 @@ typedef fmpqxx_expression<operations::immediate,
             flint_classes::srcref_data<fmpqxx, fmpqxx_ref, fmpq> > fmpqxx_srcref;
 
 namespace detail {
+template<>
+struct fmpq_traits<fmpqxx_srcref>
+{
+    typedef fmpzxx_srcref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    typedef fmpzxx_srcref denreturn_t;
+    typedef fmpzxx_srcref cdenreturn_t;
+    template<class T>
+    static cnumreturn_t num(const T& f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static cnumreturn_t den(const T& f)
+        {return cnumreturn_t::make(fmpq_denref(f._fmpq()));}
+};
+template<>
+struct fmpq_traits<fmpqxx_ref>
+    : fmpq_traits<fmpqxx_srcref>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_ref denreturn_t;
+    template<class T>
+    static numreturn_t num(T& f) {return numreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static numreturn_t den(T& f) {return numreturn_t::make(fmpq_denref(f._fmpq()));}
+};
+template<> struct fmpq_traits<fmpqxx> : fmpq_traits<fmpqxx_ref> { };
+
 struct fmpq_data
 {
     fmpq_t inner;
@@ -278,6 +323,11 @@ FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_next_calkin_wilf_op, fmpqxx, FMPQXX_COND_S,
         fmpq_next_calkin_wilf(to._fmpq(), from._fmpq()))
 FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_next_signed_calkin_wilf_op, fmpqxx, FMPQXX_COND_S,
         fmpq_next_signed_calkin_wilf(to._fmpq(), from._fmpq()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_num_op, fmpzxx, FMPQXX_COND_S,
+        fmpz_set(to._fmpz(), fmpq_numref(from._fmpq())))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_den_op, fmpzxx, FMPQXX_COND_S,
+        fmpz_set(to._fmpz(), fmpq_denref(from._fmpq())))
 
 // TODO should this throw a different exception type?
 FLINT_DEFINE_BINARY_EXPR_COND2(fmpqxx_reconstruct_op, fmpqxx,

@@ -79,6 +79,9 @@ test_conversion()
     std::ostringstream oss;
     oss << a;
     tassert(oss.str() == "3/5");
+
+    tassert((a + a).num() == 6);
+    tassert((a * a).den() == 25);
 }
 
 void test_order()
