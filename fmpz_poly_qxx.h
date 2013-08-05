@@ -112,6 +112,11 @@ public:
         std::free(str);
         return res;
     }
+
+    // forwarded lazy member functions
+    FLINTXX_DEFINE_MEMBER_UNOP(inv)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_UNOP(derivative)
 };
 
 namespace detail {

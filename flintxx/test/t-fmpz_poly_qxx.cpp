@@ -135,6 +135,10 @@ test_functions()
     tassert(flog(height(fmpz_poly_qxx::randtest(
                         rand, 10, 8, 10, 8).den()), 2u) < 8);
     tassert(!fmpz_poly_qxx::randtest_not_zero(rand, 10, 8, 10, 8).is_zero());
+
+    tassert(f.derivative() == derivative(f));
+    tassert(f.inv() == inv(f));
+    tassert(f.pow(7u) == pow(f, 7u));
 }
 
 int
