@@ -42,6 +42,9 @@
 #include "fmpzxx.h"
 #include "fmpqxx.h"
 
+// TODO check codegen ...
+// TODO lazy version of unit() ?
+
 namespace flint {
 // function "declarations"
 FLINT_DEFINE_UNOP(exp_rectangular)

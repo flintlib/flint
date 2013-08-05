@@ -257,7 +257,7 @@ public:
         fmpz_poly_signature(&r1, &r2, this->evaluate()._poly());
     }
 
-    FLINTXX_DEFINE_MEMBER_BINOP(operator(), compeval)
+    FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
     // TODO some lazy members?
 };
 

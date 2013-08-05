@@ -131,9 +131,9 @@ test_functions()
     tassert(fmpz_poly_qxx::randtest(rand, 10, 8, 10, 8).num().degree() < 10);
     tassert(fmpz_poly_qxx::randtest(rand, 10, 8, 10, 8).den().degree() < 10);
     tassert(flog(height(fmpz_poly_qxx::randtest(
-                        rand, 10, 8, 10, 8).num()), 2) < 8);
+                        rand, 10, 8, 10, 8).num()), 2u) < 8);
     tassert(flog(height(fmpz_poly_qxx::randtest(
-                        rand, 10, 8, 10, 8).den()), 2) < 8);
+                        rand, 10, 8, 10, 8).den()), 2u) < 8);
     tassert(!fmpz_poly_qxx::randtest_not_zero(rand, 10, 8, 10, 8).is_zero());
 }
 

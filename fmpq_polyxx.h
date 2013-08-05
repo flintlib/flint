@@ -200,7 +200,7 @@ public:
     }
 
     // lazy members
-    FLINTXX_DEFINE_MEMBER_BINOP(operator(), compeval)
+    FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
 
     template<class Slong> // NB: template to instantiate lazily
     FLINT_BINOP_ENABLE_RETTYPE(

@@ -61,6 +61,8 @@ test_manipulation()
     p.set_coeff(0, -1);
     tassert(p.is_unit());
 
+    const fmpz_polyxx pc = p;
+    tassert(p.get_coeff(0) == pc.get_coeff(0));
     tassert((p*q).get_coeff(0) == p.get_coeff(0)*q.get_coeff(0));
     tassert((p*q).lead() == p.lead()*q.lead());
 }

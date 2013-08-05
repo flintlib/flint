@@ -207,6 +207,19 @@ struct enable_ternary_assign
     : mp::enable_if<mp::and_<
           traits::is_T_expr<typename traits::basetype<Right1>::type, T>,
           traits::is_T_expr<typename traits::basetype<Right2>::type, T> >, T&> { };
+
+template<class Op, class Der, class T, class Enable = void>
+struct unop_rettype
+{
+    typedef T type;
+};
+template<class Op, class Der, class T>
+struct unop_rettype<Op, Der, T,
+    typename mp::enable_if<traits::is_expression<T> >::type>
+{
+    typedef typename detail::unary_op_helper_with_rettype<
+        T, Op, Der>::return_t type;
+};
 } // flint_classes
 
 namespace traits {
@@ -387,24 +400,48 @@ static CBase##xx_expression name(frandxx& state, mp_bitcnt_t bits) \
 // XXX due to circular definition problems, this cannot use the usual
 // unary_op_helper type approach, and the unop must return the same type
 // of expression
-#define FLINTXX_DEFINE_MEMBER_UNOP(name, funcname) \
+#define FLINTXX_DEFINE_MEMBER_UNOP_(name, funcname) \
 typename base_t::template make_helper<operations::funcname##_op, \
     tuple<typename detail::storage_traits<typename base_t::derived_t>::type, \
             empty_tuple> >::type \
 name() const \
 { \
-    return funcname(*this); \
+    return flint::funcname(*this); \
 }
+#define FLINTXX_DEFINE_MEMBER_UNOP(name) FLINTXX_DEFINE_MEMBER_UNOP_(name, name)
 
-#define FLINTXX_DEFINE_MEMBER_BINOP(name, funcname) \
+#define FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(rettype, name, funcname) \
+FLINT_UNOP_BUILD_RETTYPE(rettype, name, typename base_t::derived_t) \
+name() const \
+{ \
+    return flint::funcname(*this); \
+}
+#define FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(rettype, name) \
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(rettype, name, name)
+
+#define FLINTXX_DEFINE_MEMBER_BINOP_(name, funcname) \
 template<class T> \
 typename detail::binary_op_helper<typename base_t::derived_t, \
     operations::funcname##_op, T>::enable::type \
 name(const T& t) const \
 { \
-    return funcname(*this, t); \
+    return flint::funcname(*this, t); \
 }
 
+#define FLINTXX_DEFINE_MEMBER_BINOP(name) \
+    FLINTXX_DEFINE_MEMBER_BINOP_(name, name)
+
+#define FLINTXX_DEFINE_MEMBER_3OP_(name, funcname) \
+template<class T, class U> \
+typename detail::nary_op_helper2<operations::name##_op, \
+    typename base_t::derived_t, T, U>::enable::type \
+name(const T& t, const U& u) const \
+{ \
+    return flint::funcname(*this, t, u); \
+}
+
+#define FLINTXX_DEFINE_MEMBER_3OP(name) \
+    FLINTXX_DEFINE_MEMBER_3OP_(name, name)
 
 #define FLINTXX_UNADORNED_MAKETYPES(Base, left, op, right) \
     Base##_expression< op, tuple< left, tuple< right, empty_tuple> > >

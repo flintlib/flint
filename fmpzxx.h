@@ -41,8 +41,37 @@
 // TODO bit packing
 // TODO chinese remaindering
 // TODO functions for addmul? inhomogeneous addmul?
+// TODO use evaluate_n in immediate functions?
 
 namespace flint {
+FLINT_DEFINE_BINOP(cdiv_q)
+FLINT_DEFINE_BINOP(fdiv_r)
+FLINT_DEFINE_BINOP(tdiv_q)
+FLINT_DEFINE_BINOP(fdiv_r_2exp)
+FLINT_DEFINE_BINOP(tdiv_q_2exp)
+FLINT_DEFINE_UNOP(fac)
+FLINT_DEFINE_UNOP(fib)
+FLINT_DEFINE_BINOP(rfac)
+FLINT_DEFINE_BINOP(bin)
+FLINT_DEFINE_BINOP(gcd)
+FLINT_DEFINE_BINOP(lcm)
+FLINT_DEFINE_BINOP(invmod)
+FLINT_DEFINE_BINOP(negmod)
+FLINT_DEFINE_THREEARY(mul2)
+FLINT_DEFINE_THREEARY(divexact2)
+FLINT_DEFINE_THREEARY(powm)
+FLINT_DEFINE_THREEARY(mul_tdiv_q_2exp)
+FLINT_DEFINE_BINOP(fdiv_qr)
+FLINT_DEFINE_BINOP(tdiv_qr)
+FLINT_DEFINE_BINOP(sqrtmod)
+FLINT_DEFINE_UNOP(sqrtrem)
+FLINT_DEFINE_BINOP(gcdinv)
+FLINT_DEFINE_BINOP(xgcd)
+
+namespace mp {
+template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
+struct enable_all_fmpzxx;
+}
 
 template<class Operation, class Data>
 class fmpzxx_expression
@@ -150,6 +179,80 @@ public:
     {
         return fmpz_is_prime_pseudosquare(this->evaluate()._fmpz());
     }
+
+    template<class T2>
+    typename mp::enable_all_fmpzxx<bool, T2>::type
+    divisible(const T2& t2) const
+    {
+        return fmpz_divisible(this->evaluate()._fmpz(), t2.evaluate()._fmpz());
+    }
+    template<class T2>
+    typename mp::enable_if<traits::fits_into_slong<T2>, bool>::type
+    divisible(const T2& t2) const
+    {
+        return fmpz_divisible_si(this->evaluate()._fmpz(), t2);
+    }
+    template<class Fmpz2>
+    typename mp::enable_all_fmpzxx<long, Fmpz2>::type
+    clog(const Fmpz2& b) const
+    {
+        return fmpz_clog(this->evaluate()._fmpz(), b.evaluate()._fmpz());
+    }
+    template<class Int>
+    typename mp::enable_if<traits::is_unsigned_integer<Int>, long>::type
+    clog(Int b) const
+    {
+        return fmpz_clog_ui(this->evaluate()._fmpz(), b);
+    }
+    template<class Fmpz2>
+    typename mp::enable_all_fmpzxx<long, Fmpz2>::type
+    flog(const Fmpz2& b) const
+    {
+        return fmpz_flog(this->evaluate()._fmpz(), b.evaluate()._fmpz());
+    }
+    template<class Int>
+    typename mp::enable_if<traits::is_unsigned_integer<Int>, long>::type
+    flog(Int b) const
+    {
+        return fmpz_flog_ui(this->evaluate()._fmpz(), b);
+    }
+    double dlog() const
+    {
+        return fmpz_dlog(this->evaluate()._fmpz());
+    }
+    template<class Fmpz2>
+    typename mp::enable_all_fmpzxx<int, Fmpz2>::type
+    jacobi(const Fmpz2& p) const
+    {
+        return fmpz_jacobi(this->evaluate()._fmpz(), p.evaluate()._fmpz());
+    }
+
+    // lazy function forwarding
+    FLINTXX_DEFINE_MEMBER_BINOP(rfac)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd)
+    FLINTXX_DEFINE_MEMBER_BINOP(lcm)
+    FLINTXX_DEFINE_MEMBER_BINOP(cdiv_q)
+    FLINTXX_DEFINE_MEMBER_BINOP(tdiv_q)
+    FLINTXX_DEFINE_MEMBER_BINOP(divexact)
+    FLINTXX_DEFINE_MEMBER_BINOP(fdiv_r)
+    FLINTXX_DEFINE_MEMBER_BINOP(tdiv_q_2exp)
+    FLINTXX_DEFINE_MEMBER_BINOP(fdiv_r_2exp)
+    FLINTXX_DEFINE_MEMBER_BINOP(invmod)
+    FLINTXX_DEFINE_MEMBER_BINOP(negmod)
+    FLINTXX_DEFINE_MEMBER_3OP(mul2)
+    FLINTXX_DEFINE_MEMBER_3OP(divexact2)
+    FLINTXX_DEFINE_MEMBER_3OP(powm)
+    FLINTXX_DEFINE_MEMBER_3OP(mul_tdiv_q_2exp)
+    FLINTXX_DEFINE_MEMBER_BINOP(fdiv_qr)
+    FLINTXX_DEFINE_MEMBER_BINOP(tdiv_qr)
+    FLINTXX_DEFINE_MEMBER_BINOP(sqrtmod)
+    // FLINTXX_DEFINE_MEMBER_UNOP(sqrtrem) // TODO
+    FLINTXX_DEFINE_MEMBER_BINOP(gcdinv)
+    FLINTXX_DEFINE_MEMBER_BINOP(xgcd)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_BINOP(root)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqrt)
+    FLINTXX_DEFINE_MEMBER_UNOP(abs)
 };
 
 namespace detail {
@@ -220,7 +323,7 @@ struct all_fmpzxx : mp::and_<all_fmpzxx<T1>, all_fmpzxx<T2, T3, T4> > { };
 template<class T>
 struct all_fmpzxx<T, void, void, void> : traits::is_fmpzxx<T> { };
 
-template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
+template<class Out, class T1, class T2, class T3, class T4>
 struct enable_all_fmpzxx
     : mp::enable_if<all_fmpzxx<T1, T2, T3, T4>, Out> { };
 } // mp
@@ -366,85 +469,43 @@ FLINTXX_DEFINE_TERNARY(fmpzxx,
 // These functions evaluate immediately, and (often) do not yield fmpzxxs
 
 template<class T1, class T2>
-inline typename mp::enable_all_fmpzxx<bool, T1, T2>::type
+inline typename mp::enable_all_fmpzxx<bool, T1>::type
 divisible(const T1& t1, const T2& t2)
 {
-    return fmpz_divisible(t1.evaluate()._fmpz(), t2.evaluate()._fmpz());
-}
-template<class T1, class T2>
-inline typename mp::enable_if<mp::and_<
-    traits::is_fmpzxx<T1>, traits::fits_into_slong<T2> >, bool>::type
-divisible(const T1& t1, const T2& t2)
-{
-    return fmpz_divisible_si(t1.evaluate()._fmpz(), t2);
+    return t1.divisible(t2);
 }
 
 template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<long, Fmpz1, Fmpz2>::type
+inline typename mp::enable_all_fmpzxx<long, Fmpz1>::type
 clog(const Fmpz1& x, const Fmpz2& b)
 {
-    return fmpz_clog(x.evaluate()._fmpz(), b.evaluate()._fmpz());
-}
-template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, long>::type
-clog(const Fmpz& x, ulong b)
-{
-    return fmpz_clog_ui(x.evaluate()._fmpz(), b);
+    return x.clog(b);
 }
 
 template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<long, Fmpz1, Fmpz2>::type
+inline typename mp::enable_all_fmpzxx<long, Fmpz1>::type
 flog(const Fmpz1& x, const Fmpz2& b)
 {
-    return fmpz_flog(x.evaluate()._fmpz(), b.evaluate()._fmpz());
-}
-template<class Fmpz>
-inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, long>::type
-flog(const Fmpz& x, ulong b)
-{
-    return fmpz_flog_ui(x.evaluate()._fmpz(), b);
+    return x.flog(b);
 }
 
 template<class Fmpz>
 inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, double>::type
 dlog(const Fmpz& x)
 {
-    return fmpz_dlog(x.evaluate()._fmpz());
+    return x.dlog();
 }
 
 template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<int, Fmpz1, Fmpz2>::type
+inline typename mp::enable_all_fmpzxx<int, Fmpz1>::type
 jacobi(const Fmpz1& a, const Fmpz2& p)
 {
-    return fmpz_jacobi(a.evaluate()._fmpz(), p.evaluate()._fmpz());
+    return a.jacobi(p);
 }
 
 // These functions are evaluated lazily
 
 // TODO move some of these to stdmath?
-FLINT_DEFINE_BINOP(cdiv_q)
-FLINT_DEFINE_BINOP(fdiv_r)
-FLINT_DEFINE_BINOP(tdiv_q)
-FLINT_DEFINE_BINOP(fdiv_r_2exp)
-FLINT_DEFINE_BINOP(tdiv_q_2exp)
-FLINT_DEFINE_UNOP(fac)
-FLINT_DEFINE_UNOP(fib)
-FLINT_DEFINE_BINOP(rfac)
-FLINT_DEFINE_BINOP(bin)
-FLINT_DEFINE_BINOP(gcd)
-FLINT_DEFINE_BINOP(lcm)
-FLINT_DEFINE_BINOP(invmod)
-FLINT_DEFINE_BINOP(negmod)
-FLINT_DEFINE_THREEARY(mul2)
-FLINT_DEFINE_THREEARY(divexact2)
-FLINT_DEFINE_THREEARY(powm)
-FLINT_DEFINE_THREEARY(mul_tdiv_q_2exp)
-FLINT_DEFINE_BINOP(fdiv_qr)
-FLINT_DEFINE_BINOP(tdiv_qr)
-FLINT_DEFINE_BINOP(sqrtmod)
-FLINT_DEFINE_UNOP(sqrtrem)
-FLINT_DEFINE_BINOP(gcdinv)
-FLINT_DEFINE_BINOP(xgcd)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND2(rfac_op, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,

@@ -291,6 +291,24 @@ test_functions()
     tassert(a.popcnt() == 2);
 }
 
+void
+test_member_functions()
+{
+    // NB: only a sample, since these are done by macros anyway
+    fmpzxx a(2), b(3);
+    tassert((a*b).divisible(b));
+    tassert((a*b).divisible(3));
+    tassert(b.flog(3u) == 1);
+    tassert(a.clog(a) == 1);
+    tassert(a.rfac(3u) == rfac(a, 3u));
+    tassert(a.gcd(b) == gcd(a, b));
+    tassert(a.lcm(b) == lcm(a, b));
+    tassert(a.cdiv_q(b) == cdiv_q(a, b));
+    tassert(a.mul2(3u, 4u) == mul2(a, 3u, 4u));
+    tassert(a.sqrtmod(b) == sqrtmod(a, b));
+    tassert(b.sqrt() == sqrt(b));
+}
+
 template<class T>
 void assert_is_fmpzxx(const T&)
 {
@@ -303,8 +321,9 @@ test_traits()
     tassert(traits::is_fmpzxx<fmpzxx>::val == true);
     tassert(traits::is_fmpzxx<int>::val == false);
     assert_is_fmpzxx(fmpzxx(1) + fmpzxx(2));
-    tassert((traits::is_fmpzxx<fmpzxx_expression<
-                operations::immediate, newtype> >::val == false));
+    // the following does not even compile:
+    //tassert((traits::is_fmpzxx<fmpzxx_expression<
+    //            operations::immediate, newtype> >::val == false));
 }
 
 template<class T>
@@ -539,6 +558,7 @@ main()
     test_initialisation_assignment();
     test_arithmetic();
     test_functions();
+    test_member_functions();
     test_traits();
     test_temporaries();
     test_ternary();

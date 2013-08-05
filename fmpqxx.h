@@ -133,10 +133,10 @@ public:
     // TODO make this only work on immediates?
     slong cfrac_bound() const {return fmpq_cfrac_bound(this->evaluate()._fmpq());}
 
-    FLINTXX_DEFINE_MEMBER_UNOP(next_minimal, fmpqxx_next_minimal)
-    FLINTXX_DEFINE_MEMBER_UNOP(next_signed_minimal, fmpqxx_next_signed_minimal)
-    FLINTXX_DEFINE_MEMBER_UNOP(next_calkin_wilf, fmpqxx_next_calkin_wilf)
-    FLINTXX_DEFINE_MEMBER_UNOP(next_signed_calkin_wilf,
+    FLINTXX_DEFINE_MEMBER_UNOP_(next_minimal, fmpqxx_next_minimal)
+    FLINTXX_DEFINE_MEMBER_UNOP_(next_signed_minimal, fmpqxx_next_signed_minimal)
+    FLINTXX_DEFINE_MEMBER_UNOP_(next_calkin_wilf, fmpqxx_next_calkin_wilf)
+    FLINTXX_DEFINE_MEMBER_UNOP_(next_signed_calkin_wilf,
             fmpqxx_next_signed_calkin_wilf)
 };
 
