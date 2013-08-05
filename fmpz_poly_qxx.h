@@ -155,10 +155,7 @@ struct fmpz_poly_q_traits<fmpz_poly_qxx_ref>
 template<>
 struct fmpz_poly_q_traits<fmpz_poly_qxx>
     : fmpz_poly_q_traits<fmpz_poly_qxx_ref>
-{
-    typedef fmpz_polyxx_ref part_ref_t;
-    typedef fmpz_polyxx_srcref part_srcref_t;
-};
+{ };
 
 struct fmpz_poly_q_data
 {

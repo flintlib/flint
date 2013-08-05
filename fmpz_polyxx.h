@@ -42,7 +42,6 @@
 #include "flintxx/traits.h"
 
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
-// TODO non-lazy functions
 // TODO newton basis?
 // TODO power series class?
 // TODO hensel lifting
@@ -109,13 +108,26 @@ FLINT_DEFINE_THREEARY(pow_trunc)
 
 FLINT_DEFINE_BINOP(fmpz_polyxx_interpolate)
 FLINT_DEFINE_UNOP(fmpz_polyxx_product_roots)
+FLINT_DEFINE_UNOP(fmpz_polyxx_lead)
+FLINT_DEFINE_BINOP(fmpz_polyxx_get_coeff)
 
 namespace detail {
 template<class Poly>
 struct fmpz_poly_traits
 {
-    struct coeff_ref_t { };
-    struct coeff_srcref_t { };
+    typedef FLINT_UNOP_BUILD_RETTYPE(
+                fmpz_polyxx_lead, fmpzxx, Poly) lead_ref_t;
+    typedef lead_ref_t lead_srcref_t;
+    static lead_ref_t lead(const Poly& p) {return fmpz_polyxx_lead(p);}
+
+    template<class T>
+    struct get_coeff
+    {
+        typedef FLINT_BINOP_ENABLE_RETTYPE(fmpz_polyxx_get_coeff, Poly, T) ref_t;
+        typedef ref_t srcref_t;
+        static ref_t get(const Poly& p, const T& t)
+            {return fmpz_polyxx_get_coeff(p, t);}
+    };
 };
 }
 
@@ -128,8 +140,6 @@ public:
     typedef expression<derived_wrapper< ::flint::fmpz_polyxx_expression>,
               Operation, Data> base_t;
     typedef detail::fmpz_poly_traits<fmpz_polyxx_expression> poly_traits_t;
-    typedef typename poly_traits_t::coeff_ref_t coeff_ref_t;
-    typedef typename poly_traits_t::coeff_srcref_t coeff_srcref_t;
 
     FLINTXX_DEFINE_BASICS(fmpz_polyxx_expression)
     FLINTXX_DEFINE_CTORS(fmpz_polyxx_expression)
@@ -182,21 +192,24 @@ public:
 
     // The result of these are undefined if n is >= length
     // You also may have to call _normalise().
-    coeff_ref_t get_coeff(slong n)
+    template<class T>
+    typename poly_traits_t::template get_coeff<T>::ref_t get_coeff(const T& n)
     {
-        return coeff_ref_t::make(fmpz_poly_get_coeff_ptr(_poly(), n));
+        return poly_traits_t::template get_coeff<T>::get(*this, n);
     }
-    coeff_srcref_t get_coeff(slong n) const
+    template<class T>
+    typename poly_traits_t::template get_coeff<T>::srcref_t
+        get_coeff(const T& n) const
     {
-        return coeff_srcref_t::make(fmpz_poly_get_coeff_ptr(_poly(), n));
+        return poly_traits_t::template get_coeff<T>::get(*this, n);
     }
-    coeff_ref_t lead()
+    typename poly_traits_t::lead_ref_t lead()
     {
-        return coeff_ref_t::make(fmpz_poly_lead(_poly()));
+        return poly_traits_t::lead(*this);
     }
-    coeff_srcref_t lead() const
+    typename poly_traits_t::lead_srcref_t lead() const
     {
-        return coeff_srcref_t::make(fmpz_poly_lead(_poly()));
+        return poly_traits_t::lead(*this);
     }
 
     // These only make sense with target immediates
@@ -264,23 +277,52 @@ typedef fmpz_polyxx_expression<operations::immediate,
 
 namespace detail {
 template<>
-struct fmpz_poly_traits<fmpz_polyxx>
+struct fmpz_poly_traits<fmpz_polyxx_srcref>
 {
-    typedef fmpzxx_ref coeff_ref_t;
-    typedef fmpzxx_srcref coeff_srcref_t;
+    typedef fmpzxx_srcref lead_srcref_t;
+    typedef fmpzxx_srcref lead_ref_t;
+
+    template<class P>
+    static lead_srcref_t lead(const P& p)
+        {return lead_srcref_t::make(fmpz_poly_lead(p._poly()));}
+
+    template<class T>
+    struct get_coeff
+    {
+        typedef typename mp::enable_if<
+            traits::is_integer<T>, fmpzxx_srcref>::type ref_t;
+        typedef ref_t srcref_t;
+
+        template<class P>
+        static srcref_t get(const P& p, const T& n)
+            {return srcref_t::make(fmpz_poly_get_coeff_ptr(p._poly(), n));}
+    };
 };
 template<>
 struct fmpz_poly_traits<fmpz_polyxx_ref>
+    : fmpz_poly_traits<fmpz_polyxx_srcref>
 {
-    typedef fmpzxx_ref coeff_ref_t;
-    typedef fmpzxx_srcref coeff_srcref_t;
+    typedef fmpzxx_ref lead_ref_t;
+
+    template<class P>
+    static lead_ref_t lead(P& p)
+        {return lead_ref_t::make(fmpz_poly_lead(p._poly()));}
+
+    template<class T>
+    struct get_coeff
+        : fmpz_poly_traits<fmpz_polyxx_srcref>::template get_coeff<T>
+    {
+        typedef fmpzxx_ref ref_t;
+
+        template<class P>
+        static ref_t get(P& p, const T& n)
+            {return ref_t::make(fmpz_poly_get_coeff_ptr(p._poly(), n));}
+    };
 };
 template<>
-struct fmpz_poly_traits<fmpz_polyxx_srcref>
-{
-    typedef fmpzxx_srcref coeff_ref_t;
-    typedef fmpzxx_srcref coeff_srcref_t;
-};
+struct fmpz_poly_traits<fmpz_polyxx>
+    : fmpz_poly_traits<fmpz_polyxx_ref>
+{ };
 
 struct fmpz_poly_data
 {
@@ -581,6 +623,13 @@ FLINT_DEFINE_UNARY_EXPR_COND(fmpz_polyxx_product_roots_op, fmpz_polyxx,
         FMPZ_VECXX_COND_S,
         fmpz_poly_product_roots_fmpz_vec(to._poly(),
             from._data().array, from.size()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_polyxx_get_coeff_op, fmpzxx,
+        FMPZ_POLYXX_COND_S, traits::is_integer,
+        fmpz_poly_get_coeff_fmpz(to._fmpz(), e1._poly(), e2))
+FLINT_DEFINE_UNARY_EXPR_COND(fmpz_polyxx_lead_op, fmpzxx,
+        FMPZ_POLYXX_COND_S,
+        fmpz_set(to._fmpz(), fmpz_poly_lead(from._poly())))
 
 FLINT_DEFINE_UNARY_EXPR_COND(poly_bound_roots_op, fmpzxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_bound_roots(to._fmpz(), from._poly()))

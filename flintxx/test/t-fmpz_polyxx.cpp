@@ -60,6 +60,9 @@ test_manipulation()
     tassert(p.is_one() && p.is_unit());
     p.set_coeff(0, -1);
     tassert(p.is_unit());
+
+    tassert((p*q).get_coeff(0) == p.get_coeff(0)*q.get_coeff(0));
+    tassert((p*q).lead() == p.lead()*q.lead());
 }
 
 void
