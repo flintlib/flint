@@ -56,6 +56,38 @@ const flint_rand_t& frandxx::_data() const
 
 *******************************************************************************
 
+    ltuple
+
+    Lazy tuples are implemented in \code{flintxx/ltuple.h}. They are used
+    throughout flintxx to emulate functions with several return values.
+
+*******************************************************************************
+
+Ltuple<T1&, ..., Tn&> ltupleref(T1& t1, ..., Tn& tn)
+
+    Construct a lazy tuple of references, binding to the arguments \code{t1},
+    \dots, \code{tn}. Instances of \code{flint::detail::IGNORED_TYPE} can be
+    used as placeholders.
+
+Ltuple<T1, ..., Tn> ltuple(const T1& t1, ..., const Tn& tn)
+
+    Construct a lazy tuple containing copies of \code{t1}, \dots, \code{tn}.
+
+Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
+
+    If \code{Tk} is an expression template type, then the \code{get<k>()}
+    method returns a lazy expression evaluating to the kth element of the
+    (potentially lazy) lazy tuple.
+
+    If \code{Tk} is not an expression template type, this method evaluates the
+    lazy tuple, and returns the kth entry.
+
+    On lazy tuple immediates, reference versions are also available, which can
+    be used to manipulate the entries.
+
+
+*******************************************************************************
+
     fmpzxx
 
 *******************************************************************************
@@ -541,7 +573,7 @@ Fmpz_expr Fmpz_poly_expr::bit_unpack_unsigned(T:fits_into_mp_bitcnt_t) const
 
     See \code{poly_bit_unpack_unsigned}.
 
-TODO_expr Fmpz_poly_expr::divides(Fmpz_poly_expr) const
+Ltuple<bool, fmpzxx_poly>_expr Fmpz_poly_expr::divides(Fmpz_poly_expr) const
 
     See \code{poly_divides}.
 

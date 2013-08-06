@@ -1596,7 +1596,53 @@ an expression template, most notably \code{(x + y).evaluate()} and
 One caveat of the expression template approach is that compiler error messages
 can be long and hard to understand. TODO static assert
 
-\paragraph{Tuples} TODO
+\paragraph{Tuples}
+
+Many FLINT functions naturally return two (or more) arguments. A typical example
+is \code{divrem}. The underlying C function is (for example)
+\code{void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)}.
+Mapping this directly to C++ would yield something like
+\code{void divrem(fmpz_polyxx& Q, fmpz_polyxx& R, const fmpz_polyxx& A, const fmpz_polyxx& B)}.
+While functional, this is not particularly nice; the syntax
+\code{divrem(Q, R, A, B)}, where the first two arguments are modified, is just
+very reminiscent of C. We would prefer an expression closer to the
+python analogue \code{(Q, R) = divrem(A, B)}.
+
+This is where \emph{lazy tuples} enter. In fact, the following is a valid
+flintxx expression: \code{ltupleref(Q, R) = divrem(A, B)}.
+
+In generality, the implementation of ltuples is fairly involved template
+metaprogramming. For the purpose of this documentation, ltuple types are denoted
+as follows: \code{Ltuple<Type1, Type2, ..., Typer>}. So \code{divrem} would
+return an object of type \code{Ltuple<fmpz_polyxx, fmpz_polyxx>}. The user
+should never try to construct such types by hand; instead use the function
+\code{ltupleref} (and perhaps occasionally \code{ltuple}; both documented
+later).
+
+One thing to observe is that ltuples are typed fairly weakly. Thus assignments
+and equality comparisons can be performed as long as both sides have the same
+length, and the operation can be performed on all components (whether or not the
+component types match).
+
+Another interesting feature of ltuples is the type
+\code{flint::detail::IGNORED_TYPE}.
+In an ltuple assignment, where the left hand side contains a reference to this
+type, the relevant entry is just discarded. Thus in the following listing, the
+lines marked \code{(1)} and \code{(2)} have the same effect (but the second is
+potentially more efficient).
+
+\begin{lstlisting}[language=c++]
+#include "fmpz_polyxx.h"
+...
+using namespace flint;
+detail::IGNORED_TYPE _;
+
+fmpz_polyxx f, g;
+// ...
+fmpz_polyxx R;
+ltupleref(_, R) = divrem(f, g); // (1)
+R = f % g;                      // (2)
+\end{lstlisting}
 
 \paragraph{Reference types}
 
@@ -1635,7 +1681,7 @@ like a reference to a constant object of type \code{fooxx}, and so cannot be
 used as a left hand side. These objects are created by flintxx automatically,
 for example upon calling \code{fmpqxx::num()}.
 
-\paragraph{Unified coefficient access}
+\paragraph{Unified coefficient access} TODO
 
 \paragraph{Extending flintxx}
 
