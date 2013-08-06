@@ -1596,6 +1596,8 @@ an expression template, most notably \code{(x + y).evaluate()} and
 One caveat of the expression template approach is that compiler error messages
 can be long and hard to understand. TODO static assert
 
+\paragraph{Tuples} TODO
+
 \paragraph{Reference types}
 
 One subtlety in wrapping a C library is that references do not work as easily as
@@ -1632,6 +1634,8 @@ left hand side, just like \code{fooxx}. The class \code{fooxx_srcref} behaves
 like a reference to a constant object of type \code{fooxx}, and so cannot be
 used as a left hand side. These objects are created by flintxx automatically,
 for example upon calling \code{fmpqxx::num()}.
+
+\paragraph{Unified coefficient access}
 
 \paragraph{Extending flintxx}
 
@@ -1724,6 +1728,16 @@ evident from the return type, \code{dlog} immediately evaluates its argument,
 and then computes the logarithm. In contrast, a function like
 \code{Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)} returns a lazily evaluated expression
 template (and wraps \code{void fmpz_gcd(fmpz_t, const fmpz_t, const fmpz_t)}).
+
+\paragraph{Global functions or member functions?} Often it is not clear if
+functionality should be exposed as a global function,
+such as \code{gcd(a, b)}, or as a member
+function, such as \code{a.gcd(b)}. In flintxx, we strive to make both available
+when feasible. In the following documentation, the global versions are
+documented in detail (explaining the allowed types etc), whereas the member
+function versions are summarised more briefly under e.g.
+\code{Fmpz_expr::unary operation() const},
+\code{Fmpz_expr::binary operation(??) const} etc.
 
 \input{input/flintxx.tex}
 

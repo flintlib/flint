@@ -142,6 +142,19 @@ bool Fmpz_expr::is_probabprime() const
 
 bool Fmpz_expr::is_prime_pseudosquare() const
 
+bool Fmpz_expr::divisible(Fmpz_expr) const
+bool Fmpz_expr::divisible(T:fits_into_slong) const
+
+long Fmpz_expr::clog(Fmpz_expr) const
+long Fmpz_expr::clog(T:is_unsigned_integer) const
+
+long Fmpz_expr::flog(Fmpz_expr) const
+long Fmpz_expr::flog(T:is_unsigned_integer) const
+
+double Fmpz_expr::dlog() const
+
+int Fmpz_expr::jacobi(Fmpz_expr) const
+
 std::string Fmpz_expr::to_string(int base = 10) const
 
     Convert self into a \code{string}. See \code{fmpz_get_str}.
@@ -153,6 +166,24 @@ slong Fmpz_expr::to<slong>() const
 double Fmpz_expr::to<double>() const
 
     Convert self to \code{double}. See \code{fmpz_get_d}.
+
+Fmpz_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{sqrt}, \code{abs}.
+
+Fmpz_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{cdiv_q}, \code{divexact}, \code{fdiv_qr}, \code{fdiv_r},
+    \code{fdiv_r_2exp}, \code{gcd}, \code{gcdinv}, \code{invmod}, \code{lcm},
+    \code{negmod}, \code{pow}, \code{rfac}, \code{root}, \code{sqrtmod},
+    \code{tdiv_q}, \code{tdiv_q_2exp}, \code{tdiv_qr}, \code{xgcd}.
+
+Fmpz_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{divexact2}, \code{mul2}, \code{mul_tdiv_q_2exp}, \code{powm}.
 
 Fmpz_target Fmpz_target::operator=(const char*)
 Fmpz_target Fmpz_target::operator=(T:is_integer)
@@ -334,6 +365,12 @@ std::string Fmpq_expr::to_string(int base = 10) const
 bool Fmpq_expr::is_zero() const
 bool Fmpq_expr::is_one() const
 slong Fmpq_expr::cfrac_bound() const
+int Fmpq_expr::sgn() const
+mp_bitcnt_t Fmpq_expr::height_bits() const
+Fmpq_expr Fmpq_expr::abs() const
+Fmpq_expr Fmpq_expr::inv() const
+Fmpz_expr Fmpq_expr::height() const
+Fmpq_expr Fmpq_expr::pow(T:fits_into_slong) const
 
 Fmpq_expr Fmpq_expr::next_minimal() const
 Fmpq_expr Fmpq_expr::next_signed_minimal() const
@@ -452,6 +489,70 @@ std::string Fmpz_poly_expr::to_string() const
 void Fmpz_poly_expr::signature(slong& r1, slong& r2) const
 
     See \code{fmpz_poly_signature}.
+
+Fmpz_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{primitive_part}, \code{sqr}, \code{sqr_classical},
+    \code{sqr_karatsuba}, \code{sqr_KS}, \code{sqrt}, \code{sqrt_classical},
+    \code{content}, \code{height}.
+
+Fmpz_expr Fmpz_poly_expr::bound_roots() const
+
+    See \code{poly_bound_roots}.
+
+Fmpz_expr Fmpz_poly_expr::norm() const
+
+    See \code{poly_2norm}.
+
+Fmpz_poly_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},
+    \code{div_divconquer}, \code{divexact}, \code{divrem},
+    \code{divrem_basecase}, \code{divrem_divconquer}, \code{div_root},
+    \code{evaluate_divconquer}, \code{evaluate_horner}, \code{fdiv_2exp},
+    \code{gcd}, \code{gcd_heuristic}, \code{gcd_modular},
+    \code{gcd_subresultant}, \code{inv_series}, \code{inv_series_newton},
+    \code{lcm}, \code{mul_2exp}, \code{mul_classical}, \code{mul_karatsuba},
+    \code{mul_KS}, \code{mulmid_classical}, \code{mul_SS},
+    \code{poly_shift_left}, \code{poly_shift_right}, \code{pow},
+    \code{pow_addchains}, \code{pow_binexp}, \code{pow_binomial},
+    \code{pow_multinomial}, \code{pseudo_div}, \code{pseudo_divrem},
+    \code{pseudo_divrem_basecase}, \code{pseudo_divrem_cohen},
+    \code{pseudo_divrem_divconquer}, \code{pseudo_rem},
+    \code{pseudo_rem_cohen}, \code{resultant}, \code{reverse},
+    \code{revert_series}, \code{revert_series_lagrange},
+    \code{revert_series_lagrange_fast}, \code{revert_series_newton},
+    \code{smod}, \code{sqrlow}, \code{sqrlow_classical},
+    \code{sqrlow_karatsuba_n}, \code{sqrlow_KS}, \code{taylor_shift},
+    \code{taylor_shift_horner}, \code{taylor_shift_divconquer}, \code{tdiv},
+    \code{tdiv_2exp}, \code{xgcd}, \code{xgcd_modular}.
+
+Fmpz_expr Fmpz_poly_expr::bit_pack(T:fits_into_mp_bitcnt_t) const
+
+    See \code{poly_bit_pack}.
+
+Fmpz_expr Fmpz_poly_expr::bit_unpack(T:fits_into_mp_bitcnt_t) const
+
+    See \code{poly_bit_unpack}.
+
+Fmpz_expr Fmpz_poly_expr::bit_unpack_unsigned(T:fits_into_mp_bitcnt_t) const
+
+    See \code{poly_bit_unpack_unsigned}.
+
+TODO_expr Fmpz_poly_expr::divides(Fmpz_poly_expr) const
+
+    See \code{poly_divides}.
+
+Fmpz_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{compose_series}, \code{compose_series_brent_kung},
+    \code{compose_horner}, \code{div_series}, \code{mulhigh_classical},
+    \code{mulhigh_karatsuba_n}, \code{mulhigh_n}, \code{mullow},
+    \code{mullow_classical}, \code{mullow_karatsuba_n}, \code{mullow_KS},
+    \code{mullow_SS}, \code{pow_trunc}.
 
 Fmpz_poly_expr Fmpz_poly_expr::operator()(Fmpz_poly_expr) const
 Fmpz_poly_expr Fmpz_poly_expr::operator()(Fmpz_expr) const
@@ -686,6 +787,41 @@ Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_expr) const
 
     Overloaded \code{operator()} for evaluation or composition.
 
+Fmpq_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{inv}, \code{make_monic},
+    \code{primitive_part}, \code{content}.
+
+Fmpq_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{asinh_series), \code{asin_series}, \code{atanh_series},
+    \code{atan_series}, \code{cosh_series}, \code{cos_series}, \code{divrem},
+    \code{exp_series}, \code{gcd}, \code{inv_series}, \code{inv_series_newton},
+    \code{lcm}, \code{log_series}, \code{pow}, \code{resultant},
+    \code{reverse}, \code{revert_series}, \code{revert_series_lagrange},
+    \code{revert_series_lagrange_fast}, \code{revert_series_newton},
+    \code{sinh_series}, \code{tanh_series}, \code{tan_series}, \code{xgcd}.
+
+Fmpq_poly_expr Fmpq_poly_expr::rescale(Fmpq_expr) const
+
+    See \code{poly_rescale}.
+
+Fmpq_poly_expr Fmpq_poly_expr::shift_left(T:fits_into_slong) const
+
+    See \code{poly_shift_left}.
+
+Fmpq_poly_expr Fmpq_poly_expr::shift_right(T:fits_into_slong) const
+
+    See \code{poly_shift_right}.
+
+Fmpq_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{compose_series}, \code{compose_series_brent_kung},
+    \code{compose_series_horner}, \code{div_series}, \code{mullow}.
+
 Fmpq_poly_target Fmpq_poly_target::operator=(T:is_integer)
 Fmpq_poly_target Fmpq_poly_target::operator=(Fmpq_expr)
 Fmpq_poly_target Fmpq_poly_target::operator=(Fmpz_expr)
@@ -808,6 +944,10 @@ std::string Fmpz_poly_q_expr::pretty(const char* x) const
     See \code{fmpz_poly_q_get_str_pretty}.
 
 std::string Fmpz_poly_q_expr::to_string() const
+
+Fmpz_poly_q_expr Fmpz_poly_q_expr::inv() const
+Fmpz_poly_q_expr Fmpz_poly_q_expr::derivative() const
+Fmpz_poly_q_expr Fmpz_poly_q_expr::pow(T:is_unsigned_integer) const
 
 Fmpz_poly_q_target Fmpz_poly_q_target::operator=(T:fits_into_slong)
 Fmpz_poly_q_target Fmpz_poly_q_target::operator=(const char*)
@@ -937,6 +1077,15 @@ fmpqxx Padic_expr::to<fmpqxx>() const
     Convert self to \code{fmpqxx}. See \code{padic_get_fmpz}.
 
 std::string Fmpz_expr::to_string() const
+
+Padic_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{exp}, \code{exp_balanced}, \code{exp_rectangular}, \code{inv},
+    \code{log}, \code{log_balanced}, \code{log_satoh}, \code{sqrt},
+    \code{teichmuller}.
+
+Padic_expr Padic_expr::pow(T:fits_into_slong) const
 
 Padic_target Padic_target::operator=(T:is_integer)
 Padic_target Padic_target::operator=(Fmpz_expr)
