@@ -26,6 +26,16 @@ vim: spell spelllang=en textwidth=79
 
 *******************************************************************************
 
+    flint\_exception
+
+    This is the main exception type used by the flintxx library. It derives
+    from \code{std::domain_error}. As such its main method is \code{what()},
+    yielding an English language description of the problem encountered.
+
+*******************************************************************************
+
+*******************************************************************************
+
     frandxx
 
     The type \code{frandxx} wraps \code{flint_rand_t} and takes care of
@@ -134,15 +144,15 @@ bool Fmpz_expr::is_prime_pseudosquare() const
 
 std::string Fmpz_expr::to_string(int base = 10) const
 
-    Convert self into a string. See \code{fmpz_get_str}.
+    Convert self into a \code{string}. See \code{fmpz_get_str}.
 
 slong Fmpz_expr::to<slong>() const
 
-    Convert self to slong. See \code{fmpz_get_si}.
+    Convert self to \code{slong}. See \code{fmpz_get_si}.
 
 double Fmpz_expr::to<double>() const
 
-    Convert self to double. See \code{fmpz_get_d}.
+    Convert self to \code{double}. See \code{fmpz_get_d}.
 
 Fmpz_target Fmpz_target::operator=(const char*)
 Fmpz_target Fmpz_target::operator=(T:is_integer)
@@ -282,7 +292,7 @@ static fmpqxx fmpqxx::randtest_not_zero(frandxx& state)
 template<class Vec> static fmpqxx fmpqxx::from_cfrac(const Vec& v, slong n)
 
     Initialize from a partial fraction expansion. \code{v} must be an instance
-    of a class which provide a method \code{_array()} that returns (a
+    of a class which provides a method \code{_array()} that returns (a
     pointer to) an array of \code{fmpz}. One such class is \code{fmpz_vecxx}.
     The array must have size (at least) \code{n}.
 
@@ -290,8 +300,8 @@ static fmpqxx fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m, Fmpz_expr N,
         Fmpz_expr D)
 static Fmpq_expr fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m)
 
-    Rational reconstruction. May throw \code{flint_exception} if reconstruction
-    is not possible. See \code{fmpq_reconstruct_fmpz} and
+    Rational reconstruction. May raise a \code{flint_exception} if
+    reconstruction is not possible. See \code{fmpq_reconstruct_fmpz} and
     \code{fmpq_reconstruct_fmpz2}.
 
 static fmpqxx_ref fmpzxx_ref::make(fmpq* f)
@@ -344,9 +354,9 @@ Fmpq_expr operator*(Fmpz_expr, Fmpq_expr)
 Fmpq_expr operator/(Fmpq_expr, Fmpz_expr)
 Fmpq_expr operator%(Fmpq_expr, Fmpz_expr)
 
-    Arithmetic operators are overloaded for Fmpq arguments, and few other
+    Arithmetic operators are overloaded for Fmpq arguments, and a few other
     combinations.
-    The modular reduction operator may throw a \code{flint_exception} if
+    The modular reduction operator may raise a \code{flint_exception} if
     modular inversion is not possible.
 
 Fmpq_expr operator<<(Fmpq_expr, T:is_integer)
@@ -419,7 +429,7 @@ fmpzxx_srcref Fmpz_poly_src::get_coeff(slong n) const
 fmpzxx_ref Fmpz_poly_target::lead()
 fmpzxx_srcref Fmpz_poly_src::lead() const
 
-    Obtain a reference to the leading coefficient. The result is undefined of
+    Obtain a reference to the leading coefficient. The result is undefined if
     the length of the polynomial is zero.
 
 void Fmpz_poly_target::set_coeff(slong n, Fmpz_expr)
@@ -455,7 +465,8 @@ Fmpz_poly_target Fmpz_poly_target::operator=(const char*)
 Fmpz_poly_expr operator?(??, ??)
 
     Arithmetic operators \code{+ - * /} are overloaded if both arguments are
-    polynomials, or one poylnomial and one \code{Fmpz_expr} or integer.
+    polynomials, or one is a polynomial and one is an \code{Fmpz_expr} or
+    integer.
 
 Fmpz_poly_expr operator%(Fmpz_poly_expr, Fmpz_expr)
 Fmpz_poly_expr operator%(Fmpz_poly_expr, Fmpz_poly_expr)
@@ -919,11 +930,11 @@ slong Padic_expr::val() const
 
 fmpzxx Padic_expr::to<fmpzxx>() const
 
-    Convert self to fmpzxx, if possible. See \code{padic_get_fmpz}.
+    Convert self to \code{fmpzxx}, if possible. See \code{padic_get_fmpz}.
 
 fmpqxx Padic_expr::to<fmpqxx>() const
 
-    Convert self to fmpqxx. See \code{padic_get_fmpz}.
+    Convert self to \code{fmpqxx}. See \code{padic_get_fmpz}.
 
 std::string Fmpz_expr::to_string() const
 
@@ -946,7 +957,8 @@ Padic_expr operator-(Padic_expr)
 
 Padic_expr sqrt(Padic_expr)
 
-    Compute square root. May raise \code{flint_exception}.
+    Compute square root. May raise \code{flint_exception} if no square root
+    exists. See \code{padic_sqrt}.
 
 Padic_expr pow(Padic_expr, T:fits_into_slong)
 

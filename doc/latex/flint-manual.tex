@@ -1562,7 +1562,7 @@ and resides in \code{foo.h}, then the C++ version is called \code{fooxx} and
 resides in \code{fooxx.h}. All flintxx classes live inside
 \code{namespace flint}.
 
-Function which operate on wrapper classes are usually implemented as overloaded
+Functions which operate on wrapper classes are usually implemented as overloaded
 stand-alone functions, with the type prefix dropped. So for example a call to
 \code{flint::gcd(f1, f2)} yields an expression template evaluating via
 \code{fmpz_gcd}, provided \code{f1} and \code{f2} are (evaluate to) instances of
@@ -1599,19 +1599,24 @@ can be long and hard to understand. TODO static assert
 \paragraph{Reference types}
 
 One subtlety in wrapping a C library is that references do not work as easily as
-one might expect. If we were to only ever use the \code{fmpzxx} class, and never
-use \code{fmpz_t}, there would be no problem in just using \code{fmpzxx&} and
-\code{const fmpzxx&} as reference types. However, in this case there is no way
-of turning an \code{fmpz_t} into an object which can interact with flintxx,
-without copying the entire \code{fmpz}. This may not seem like a big problem,
-until one realises that (e.g.) \code{fmpq_t} internally consists of two
-instances of \code{fmpz_t}, and that \code{fmpqxx} should be able to expose
-numerator and denominator.
+one might expect. For example, consider the class \code{fmpqxx}, wrapping
+\code{fmpq_t}, i.e. rational numbers. As such, an instance of \code{fmpqxx} has a
+numerator and denominator. In C, these are accessible via macros
+\code{fmpq_numref} and \code{fmpq_denref}, which yield \code{fmpz*}, which can
+be used essentially interchangeably with \code{fmpz_t}. In particular, any
+library function which operates on \code{fmpz_t} can operate on the numerator or
+denominator of an \code{fmpq_t}. In C++, we would like to have a member function
+\code{den} (and \code{num}) which returns an object of type \code{fmpzxx&} (i.e.
+a reference to \code{fmpzxx}).
+
+However, this is not possible, since \code{fmpqxx} is \emph{not} implemented as
+a pair of \code{fmpzxx}, and instead simply contains an \code{fmpq_t}.
 
 For this reason, for every C interface \code{foo}, flintxx provides two
 additional types, called \code{fooxx_ref} and \code{fooxx_srcref}, acting as
-replacements for \code{fooxx&} and \code{const foox&}, respectively. Instances
-of \code{fooxx_ref} or \code{fooxx_srcref} behave almost exactly like instances
+replacements for \code{fooxx&} and \code{const foox&}, respectively, in
+situations where no underlying C++ object exists. Instances
+of \code{fooxx_ref} or \code{fooxx_srcref} behave exactly like instances
 \code{fooxx}, in fact the user should never notice a difference. Any flintxx
 operation or expression which works on objects of type \code{foo} also works on
 objects of type \code{fooxx_ref} and \code{fooxx_srcref}. Moreover, instances
@@ -1620,6 +1625,13 @@ of \code{foo} can be converted implicitly to \code{fooxx_ref} or
 \code{fooxx_srcref}. It is also possible to explicitly convert reference types
 \code{fooxx_*ref} to \code{fooxx} (since this entails copying, we provide no
 implicit conversion).
+
+In summary, the class \code{fooxx_ref} behaves like a reference to an object of
+type \code{fooxx}. As such it can be used both as a right hand side and as a
+left hand side, just like \code{fooxx}. The class \code{fooxx_srcref} behaves
+like a reference to a constant object of type \code{fooxx}, and so cannot be
+used as a left hand side. These objects are created by flintxx automatically,
+for example upon calling \code{fmpqxx::num()}.
 
 \paragraph{Extending flintxx}
 
@@ -1633,28 +1645,62 @@ composition: TODO describe forwarding.h.
 \section{Notations and conventions for the C++ interface documentation}
 As explained above, the flintxx classes and functions perform quite a number of
 operations which should be invisible to the user. Some template types implement
-methods which only make sense for some template arguments, etc. In what follows,
+methods which only make sense for some template arguments, etc. For example,
+every expression template built from \code{fmpq_polyxx} (polynomials with
+rational coefficients) has a method \code{set_coeff}. However, this method only
+makes sense for objects of type \code{fmpq_polyxx} or \code{fmpq_polyxx_ref}
+(calling it on other types will result in a compilation error),
+and its existence in objects of other types should be considered an
+implementation detail.
+
+In what follows,
 we document a ``virtual'' set of classes and functions, which explain how the
 user should expect its objects to behave, and which we guarantee to maintain.
 Other interfaces should be considered implementation details and subject to
 change.
 
-For any interface \code{foo}, we introduce virtual types \code{Foo_expr},
-\code{Foo_target} and \code{Foo_src}. We use type names beginning with capital
-letters to denote the virtual types. The virtual type \code{Foo_expr} represents
-any
-expression built out of \code{fooxx}, \code{fooxx_ref} and \code{fooxx_srcref}
-by overloaded operators, lazily evaluated functions etc. The type
-\code{Foo_target} represents either \code{fooxx&} or \code{fooxx_ref}, whereas
-\code{Foo_src} represents one of \code{fooxx}, \code{fooxx_ref} or
-\code{fooxx_srcref}. For example, the static method documented as
-\code{fmpzxx::randm} only exists (nominally) in the class \code{fmpzxx}, and not
-in a reference type or expression template. On the other hand the method
-documented as \code{Fmpz_expr::is_zero} works on any expression built from
-fmpzxx or its reference types.
+Consider the interface \code{fmpzxx}, and more concretely an instance \code{a}.
+As in the above discussion, we see that from \code{a} we can build a lot of
+different objects: expression templates like \code{a+a}, constant objects like
+\code{const fmpzxx& b = a;}, reference objects like \code{fmpzxx_ref c(a)}, etc.
+These by nature behave somewhat differently. For our purposes, we classify types
+into ``targets'' (things which can be assigned to), ``sources'' (things which
+contain actual computed data, or references thereto,
+as opposed to lazy expression templates) and
+``expressions'' (sources or expression templates). Note that every target is a
+source, and every source is an expression.
+
+We denote any type which can
+act as a target for \code{fmpzxx} as \code{Fmpz_target} (note the initial
+capital letter!), any \code{fmpzxx} source as \code{Fmpz_source} and any
+\code{fmpzxx} expression as \code{Fmpz_expr}. Such ``made up'' type names
+(always with initial capital letter) are
+referred to as ``virtual types'' in the sequel; these are used for all flint
+classes (e.g. \code{Fmpq_expr} or \code{Fmpz_polyxx_src}). Some examples of
+virtual types for \code{fmpzxx} are given in table
+\ref{tab:virtual-type-examples}.
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{ccc}
+\code|Fmpz_target| & \code|Fmpz_src| & \code|Fmpz_expr| \\
+  \hline
+\code|fmpzxx a;|          & \code|const fmpzxx a;|      & \code|a + b| \\
+\code|fmpzxx& b = a;|     & \code|const fmpzxx& b(a);|  & \code|a * b| \\
+\code|fmpzxx_ref c(a);|   & \code|fmpzxx_srcref c(a);|  & \code|gcd(a, b)| \\
+\end{tabular}
+\end{center}
+\caption{Examples of virtual types for \code{fmpzxx}.}
+\label{tab:virtual-type-examples}
+\end{table}
 
 When using virtual types, we will suppress reference notation. No flintxx types
 are ever copied automatically, unless the documentation explicitly says so.
+This is a general philosophy of flintxx: the library does as many things
+automatically as it can, without introducing additional
+calls to underlying flint C functions. So for example, it is not possible to
+implicitly convert \code{int} to \code{fmpzxx} (since doing so requires a C
+call). Of course explicit conversions (or assignments) work completely fine.
 
 It is also often the case that flintxx functions are conditionally enabled
 templates. A notation such as \code{void foo(T:is_signed_integer)} denotes a
@@ -1662,7 +1708,7 @@ template function which is enabled whenever the template parameter \code{T}
 satisfies the \emph{type trait} \code{is_signed_integer}. These type traits
 should be self-explanatory, and in any case are documented in TODO.
 
-In what follows, we will never document copy constructors, or
+In what follows, we will never document copy constructors,
 or implicit conversion constructors pertaining to reference types. We will also
 not document assignment operators for expressions of the same type. (Thus if
 \code{x} is an \code{fmpzxx} and \code{y} is an \code{fmpqxx}, then \code{x = x}
