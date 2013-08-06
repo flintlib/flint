@@ -169,6 +169,10 @@ test_functions()
     padicxx ap(a), bp(b);
     swap(a, b);
     tassert(a == bp && b == ap);
+
+    // test members (just a sample, since from macros)
+    tassert(b.inv() == inv(b));
+    tassert(b.pow(7) == pow(b, 7));
 }
 
 // test stuff which we should get automatically - references etc

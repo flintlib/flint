@@ -157,6 +157,18 @@ public:
     bool is_zero() const {return padic_is_zero(this->evaluate()._padic());}
     bool is_one() const {return padic_is_one(this->evaluate()._padic());}
     slong val() const {return padic_val(this->evaluate()._padic());}
+
+    // forwarding of lazy functions
+    FLINTXX_DEFINE_MEMBER_UNOP(exp)
+    FLINTXX_DEFINE_MEMBER_UNOP(exp_balanced)
+    FLINTXX_DEFINE_MEMBER_UNOP(exp_rectangular)
+    FLINTXX_DEFINE_MEMBER_UNOP(inv)
+    FLINTXX_DEFINE_MEMBER_UNOP(log)
+    FLINTXX_DEFINE_MEMBER_UNOP(log_balanced)
+    FLINTXX_DEFINE_MEMBER_UNOP(log_satoh)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqrt)
+    FLINTXX_DEFINE_MEMBER_UNOP(teichmuller)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
 };
 
 namespace detail {
