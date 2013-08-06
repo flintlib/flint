@@ -48,6 +48,7 @@
 // TODO input
 // TODO modular reduction
 // TODO addmul
+// TODO rename poly_divides to divides?
 
 namespace flint {
 // function "declarations"
@@ -72,6 +73,7 @@ FLINT_DEFINE_BINOP(mul_karatsuba)
 FLINT_DEFINE_BINOP(mul_KS)
 FLINT_DEFINE_BINOP(mulmid_classical)
 FLINT_DEFINE_BINOP(mul_SS)
+FLINT_DEFINE_BINOP(poly_divides)
 FLINT_DEFINE_BINOP(pow_addchains)
 FLINT_DEFINE_BINOP(pow_binexp)
 FLINT_DEFINE_BINOP(pow_binomial)
@@ -110,6 +112,10 @@ FLINT_DEFINE_BINOP(fmpz_polyxx_interpolate)
 FLINT_DEFINE_UNOP(fmpz_polyxx_product_roots)
 FLINT_DEFINE_UNOP(fmpz_polyxx_lead)
 FLINT_DEFINE_BINOP(fmpz_polyxx_get_coeff)
+
+namespace traits {
+template<class T> struct is_fmpz_polyxx;
+} // traits
 
 namespace detail {
 template<class Poly>
@@ -240,7 +246,6 @@ public:
     bool is_one() const {return fmpz_poly_is_one(this->evaluate()._poly());}
     bool is_zero() const {return fmpz_poly_is_zero(this->evaluate()._poly());}
     bool is_unit() const {return fmpz_poly_is_unit(this->evaluate()._poly());}
-    // TODO get_coeff with copies?
     ulong max_limbs() const {return fmpz_poly_max_limbs(this->evaluate()._poly());}
     slong max_bits() const {return fmpz_poly_max_bits(this->evaluate()._poly());}
 
@@ -257,8 +262,99 @@ public:
         fmpz_poly_signature(&r1, &r2, this->evaluate()._poly());
     }
 
+    // lazy member forwarding
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
-    // TODO some lazy members?
+    FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, poly_bit_pack)
+    FLINTXX_DEFINE_MEMBER_BINOP_(bit_unpack, poly_bit_unpack)
+    FLINTXX_DEFINE_MEMBER_BINOP_(bit_unpack_unsigned, poly_bit_unpack_unsigned)
+    FLINTXX_DEFINE_MEMBER_BINOP_(divides, poly_divides)
+
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(divexact)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_root)
+    FLINTXX_DEFINE_MEMBER_BINOP(evaluate_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(evaluate_horner)
+    FLINTXX_DEFINE_MEMBER_BINOP(fdiv_2exp)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd_heuristic)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd_modular)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd_subresultant)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series_newton)
+    FLINTXX_DEFINE_MEMBER_BINOP(lcm)
+    FLINTXX_DEFINE_MEMBER_BINOP(mul_2exp)
+    FLINTXX_DEFINE_MEMBER_BINOP(mul_classical)
+    FLINTXX_DEFINE_MEMBER_BINOP(mul_karatsuba)
+    FLINTXX_DEFINE_MEMBER_BINOP(mul_KS)
+    FLINTXX_DEFINE_MEMBER_BINOP(mulmid_classical)
+    FLINTXX_DEFINE_MEMBER_BINOP(mul_SS)
+    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_left)
+    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_right)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow_addchains)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow_binexp)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow_binomial)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow_multinomial)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_div)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_divrem)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_divrem_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_divrem_cohen)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_divrem_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_rem)
+    FLINTXX_DEFINE_MEMBER_BINOP(pseudo_rem_cohen)
+    FLINTXX_DEFINE_MEMBER_BINOP(resultant)
+    FLINTXX_DEFINE_MEMBER_BINOP(reverse)
+    FLINTXX_DEFINE_MEMBER_BINOP(revert_series)
+    FLINTXX_DEFINE_MEMBER_BINOP(revert_series_lagrange)
+    FLINTXX_DEFINE_MEMBER_BINOP(revert_series_lagrange_fast)
+    FLINTXX_DEFINE_MEMBER_BINOP(revert_series_newton)
+    FLINTXX_DEFINE_MEMBER_BINOP(smod)
+    FLINTXX_DEFINE_MEMBER_BINOP(sqrlow)
+    FLINTXX_DEFINE_MEMBER_BINOP(sqrlow_classical)
+    FLINTXX_DEFINE_MEMBER_BINOP(sqrlow_karatsuba_n)
+    FLINTXX_DEFINE_MEMBER_BINOP(sqrlow_KS)
+    FLINTXX_DEFINE_MEMBER_BINOP(taylor_shift)
+    FLINTXX_DEFINE_MEMBER_BINOP(taylor_shift_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(taylor_shift_horner)
+    FLINTXX_DEFINE_MEMBER_BINOP(tdiv)
+    FLINTXX_DEFINE_MEMBER_BINOP(tdiv_2exp)
+    FLINTXX_DEFINE_MEMBER_BINOP(xgcd)
+    FLINTXX_DEFINE_MEMBER_BINOP(xgcd_modular)
+
+    FLINTXX_DEFINE_MEMBER_UNOP(derivative)
+    FLINTXX_DEFINE_MEMBER_UNOP(primitive_part)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqr)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqr_classical)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqr_karatsuba)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqr_KS)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqrt)
+    FLINTXX_DEFINE_MEMBER_UNOP(sqrt_classical)
+
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, bound_roots, poly_bound_roots)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, norm, poly_2norm)
+
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, content)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, height)
+
+    FLINTXX_DEFINE_MEMBER_3OP(compose_series)
+    FLINTXX_DEFINE_MEMBER_3OP(compose_series_brent_kung)
+    FLINTXX_DEFINE_MEMBER_3OP(compose_series_horner)
+    FLINTXX_DEFINE_MEMBER_3OP(div_series)
+    FLINTXX_DEFINE_MEMBER_3OP(mulhigh_classical)
+    FLINTXX_DEFINE_MEMBER_3OP(mulhigh_karatsuba_n)
+    FLINTXX_DEFINE_MEMBER_3OP(mulhigh_n)
+    FLINTXX_DEFINE_MEMBER_3OP(mullow)
+    FLINTXX_DEFINE_MEMBER_3OP(mullow_classical)
+    FLINTXX_DEFINE_MEMBER_3OP(mullow_karatsuba_n)
+    FLINTXX_DEFINE_MEMBER_3OP(mullow_KS)
+    FLINTXX_DEFINE_MEMBER_3OP(mullow_SS)
+    FLINTXX_DEFINE_MEMBER_3OP(pow_trunc)
 };
 
 namespace detail {
@@ -692,6 +788,8 @@ typedef make_ltuple<mp::make_tuple<fmpz_polyxx, fmpz_polyxx, ulong>::type>::type
     fmpz_polyxx_pair_ulong;
 typedef make_ltuple<mp::make_tuple<fmpz_polyxx, ulong>::type>::type
     fmpz_polyxx_ulong;
+typedef make_ltuple<mp::make_tuple<bool, fmpz_polyxx>::type>::type
+    bool_fmpz_polyxx;
 }
 #define FMPZ_POLYXX_DEFINE_PSEUDO_DIVREM(name) \
 FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, rdetail::fmpz_polyxx_pair_ulong, \
@@ -710,18 +808,15 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pseudo_rem_op, rdetail::fmpz_polyxx_ulong,
     FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
     fmpz_poly_pseudo_rem(to.template get<0>()._poly(), &to.template get<1>(),
         e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(poly_divides_op, rdetail::bool_fmpz_polyxx,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    to.template get<0> () =
+        fmpz_poly_divides(to.template get<1>()._poly(), e1._poly(), e2._poly()))
 } // rules
 
 // immediate functions
-template<class Poly1, class Poly2, class Poly3>
-inline typename mp::enable_if<mp::and_<
-    FMPZ_POLYXX_COND_T<Poly1>,
-    traits::is_fmpz_polyxx<Poly2>, traits::is_fmpz_polyxx<Poly3> >, bool>::type
-poly_divides(Poly1& Q, const Poly2& A, const Poly3& B)
-{
-    return fmpz_poly_divides(Q._poly(), A.evaluate()._poly(), B.evaluate()._poly());
-}
-
+// TODO make lazy when we have nmod class
 template<class Poly>
 inline typename mp::enable_all_fmpz_polyxx<mp_limb_t, Poly>::type
 evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)

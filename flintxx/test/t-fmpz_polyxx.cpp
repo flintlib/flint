@@ -320,8 +320,9 @@ test_functions()
     tassert(r*f + s == g);
     tassert(r.to_string() == "2  4 5");
 
-    tassert(poly_divides(res, f*g, g));
-    tassert(res == f);
+    bool does_divide;
+    ltupleref(does_divide, res) = poly_divides(f*g, g);
+    tassert(does_divide && res == f);
 
     tassert(div_series(f, xp1, 10) * xp1 % pow(x, 10u) == f);
 
@@ -360,6 +361,22 @@ test_functions()
     tassert(fmpz_polyxx::product_roots(xs) == x*xp1*xp1);
 }
 
+void
+test_member_functions()
+{
+    // just a sample, since they all come from macros
+    fmpz_polyxx f, g;
+    f = "4  2 0 0 1";
+    g = "5  1 2 3 4 5";
+
+    tassert(f.bit_pack(17u) == poly_bit_pack(f, 17u));
+    tassert(f.divrem(g) == divrem(f, g));
+    tassert(f.derivative() == derivative(f));
+    tassert(f.bound_roots() == poly_bound_roots(f));
+    tassert(f.content() == content(f));
+    tassert(f.pow_trunc(15u, 10) == pow_trunc(f, 15u, 10));
+}
+
 int
 main()
 {
@@ -371,6 +388,7 @@ main()
     test_conversion();
     test_arithmetic();
     test_functions();
+    test_member_functions();
     test_extras();
 
     std::cout << "PASS" << std::endl;
