@@ -65,24 +65,24 @@ const flint_rand_t& frandxx::_data() const
 
 Ltuple<T1&, ..., Tn&> ltupleref(T1& t1, ..., Tn& tn)
 
-    Construct a lazy tuple of references, binding to the arguments \code{t1},
+    Construct an ltuple of references, binding to the arguments \code{t1},
     \dots, \code{tn}. Instances of \code{flint::detail::IGNORED_TYPE} can be
     used as placeholders.
 
 Ltuple<T1, ..., Tn> ltuple(const T1& t1, ..., const Tn& tn)
 
-    Construct a lazy tuple containing copies of \code{t1}, \dots, \code{tn}.
+    Construct an ltuple containing copies of \code{t1}, \dots, \code{tn}.
 
 Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
 
     If \code{Tk} is an expression template type, then the \code{get<k>()}
     method returns a lazy expression evaluating to the kth element of the
-    (potentially lazy) lazy tuple.
+    (potentially lazy) ltuple.
 
     If \code{Tk} is not an expression template type, this method evaluates the
-    lazy tuple, and returns the kth entry.
+    ltuple, and returns the kth entry.
 
-    On lazy tuple immediates, reference versions are also available, which can
+    On ltuple immediates, reference versions are also available, which can
     be used to manipulate the entries.
 
 

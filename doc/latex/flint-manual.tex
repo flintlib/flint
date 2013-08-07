@@ -1608,7 +1608,12 @@ While functional, this is not particularly nice; the syntax
 very reminiscent of C. We would prefer an expression closer to the
 python analogue \code{(Q, R) = divrem(A, B)}.
 
-This is where \emph{lazy tuples} enter. In fact, the following is a valid
+This is where \emph{ltuples} enter.\footnote{The `l' in \code{ltuple} stands for
+``lazy'', i.e. the fact that they can be used in expression templates.
+The reason for this name
+is that flintxx internally uses a non-lazy tuple class just
+called \code{tuple}, on which \code{ltuple} in fact is built.}
+In fact, the following is a valid
 flintxx expression: \code{ltupleref(Q, R) = divrem(A, B)}.
 
 In generality, the implementation of ltuples is fairly involved template
