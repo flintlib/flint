@@ -82,7 +82,7 @@ main(void)
         fmpz_init(b);
         fmpz_init(p);
 
-        N = n_randint(state, 1L < 40);
+        N = n_randint(state, 1L < 13);
         fmpz_set_ui(p, 2);
         fmpz_fac_ui(a, N);
 
@@ -118,8 +118,8 @@ main(void)
         fmpz_init(b);
         fmpz_init(p);
 
-        N = n_randint(state, 1L < 40);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 40), 0));
+        N = n_randint(state, 1L < 13);
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, FLINT_BITS - 4), 0));
         fmpz_fac_ui(a, N);
 
         s = padic_val_fac_ui(N, p);
@@ -155,9 +155,9 @@ main(void)
         fmpz_init(t);
         fmpz_init(z);
 
-        n = n_randint(state, 1L < 40);
+        n = n_randint(state, 1L < 13);
         fmpz_set_ui(z, n);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 40), 0));
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, FLINT_BITS - 4), 0));
         fmpz_fac_ui(a, n);
 
         s = padic_val_fac_ui(n, p);
