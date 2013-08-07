@@ -1780,6 +1780,17 @@ and then computes the logarithm. In contrast, a function like
 \code{Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)} returns a lazily evaluated expression
 template (and wraps \code{void fmpz_gcd(fmpz_t, const fmpz_t, const fmpz_t)}).
 
+In case the C function has more than one return value in the form of arguments
+passed in by reference, the C++ wrapper returns an \code{ltuple}. In this case,
+the order of the \code{ltuple} arguments is the same as the order of the
+function arguments; so for example \code{ltupleref(Q, R) = divrem(A, B)} has the
+same effect as \code{fmpz_poly_divrem(q, r, a, b)}, provided \code{Q, R, A, B}
+are \code{fmpz_polyxx} and \code{q, r, a, b} are the underlying
+\code{fmpz_poly_t}. If such a convention is followed, the documentation below
+may not further explain anything. In all other cases, further explanation is
+provided (this applies in particular if the C function has return type different
+from \code{void}).
+
 \paragraph{Global functions or member functions?} Often it is not clear if
 functionality should be exposed as a global function,
 such as \code{gcd(a, b)}, or as a member

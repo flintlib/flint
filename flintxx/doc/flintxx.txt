@@ -278,18 +278,20 @@ fmpzxx powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
 fmpzxx mul_tdiv_q_2exp(Fmpz_expr g, Fmpz_expr x, ulong exp)
 fmpzxx mul_tdiv_q_2exp(Fmpz_expr g, long x, ulong exp)
 
-void fdiv_qr(Fmpz_target f, Fmpz_target s, Fmpz_expr g, Fmpz_expr h)
+Ltuple<fmpzxx, fmpzxx>_expr fdiv_qr(Fmpz_expr g, Fmpz_expr h)
+Ltuple<fmpzxx, fmpzxx>_expr tdiv_qr(Fmpz_expr g, Fmpz_expr h)
 
-void tdiv_qr(Fmpz_target f, Fmpz_target s, Fmpz_expr g, Fmpz_expr h)
+Ltuple<bool, fmpzxx>_expr sqrtmod(Fmpz_expr a, Fmpz_expr b)
 
-bool sqrtmod(Fmpz_target b, Fmpz_expr a, Fmpz_expr b)
+    \code{ltupleref(b, N) = sqrtmod(A, B)} has the same effect as
+    \code{b = fmpz_sqrtmod(n, a, b)}, where \code{n, a, b} are the underlying
+    \code{fmpz_t} of \code{N, A, B}.
 
-void sqrtrem(Fmpz_target f, Fmpz_target s, Fmpz_expr g)
+Ltuple<fmpzxx, fmpzxx>_expr sqrtrem(Fmpz_expr g)
 
-void gcdinv(Fmpz_target d, Fmpz_target a, Fmpz_expr f, Fmpz_expr g)
+Ltuple<fmpzxx, fmpzxx>_expr gcdinv(Fmpz_expr f, Fmpz_expr g)
 
-void xgcd(Fmpz_target d, Fmpz_target a, Fmpz_target b, Fmpz_expr f,
-        Fmpz_expr g)
+Ltuple<fmpzxx, fmpzxx, fmpzxx>_expr xgcd(Fmpz_expr f, Fmpz_expr g)
 
 Fmpz_expr rfac(Fmpz_expr, T:is_unsigned_integer)
 
@@ -673,10 +675,14 @@ Fmpz_poly_expr gcd_heuristic(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr gcd_modular(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr lcm(Fmpz_poly_expr, Fmpz_poly_expr)
 
-fmpzxx xgcd(Fmpz_poly_target r, Fmpz_poly_target s, Fmpz_poly_expr f,
+Ltuple<fmpzxx, fmpz_polyxx, fmpz_polyxx>_expr xgcd(Fmpz_poly_expr f,
         Fmpz_poly_expr g)
-fmpzxx xgcd_modular(Fmpz_poly_target r, Fmpz_poly_target s, Fmpz_poly_expr f,
+Ltuple<fmpzxx, fmpz_polyxx, fmpz_polyxx>_expr xgcd_modular(Fmpz_poly_expr f,
         Fmpz_poly_expr g)
+
+    \code{ltupleref(N, Q, R) = xgcd(F, G)} has the same effect as
+    \code{fmpz_poly_xgcd(n, q, r, f, g)} where \code{n, q, r, f, g} are the
+    underlying C objects.
 
 Fmpz_expr resultant(Fmpz_poly_expr)
 Fmpz_expr content(Fmpz_poly_expr)
@@ -686,26 +692,46 @@ Fmpz_poly_expr div_divconquer(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr rem_basecase(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr pseudorem_cohen(Fmpz_poly_expr, Fmpz_poly_expr)
 
-void divrem(Fmpz_poly_target Q, Fmpz_poly_target R, Fmpz_poly_expr A,
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr divrem(Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr divrem_basecase(Fmpz_poly_expr A,
         Fmpz_poly_expr B)
-void divrem_basecase(Fmpz_poly_target Q, Fmpz_poly_target R, Fmpz_poly_expr A,
-        Fmpz_poly_expr B)
-void divrem_divconquer(Fmpz_poly_target Q, Fmpz_poly_target R,
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr divrem_divconquer(
         Fmpz_poly_expr A, Fmpz_poly_expr B)
 
-void pseudo_divrem(Fmpz_poly_target Q, Fmpz_poly_target R,
-        ulong& d, Fmpz_poly_expr A, Fmpz_poly_expr B)
-void pseudo_divrem_basecase(Fmpz_poly_target Q, Fmpz_poly_target R,
-        ulong& d, Fmpz_poly_expr A, Fmpz_poly_expr B)
-void pseudo_divrem_divconquer(Fmpz_poly_target Q, Fmpz_poly_target R,
-        ulong& d, Fmpz_poly_expr A, Fmpz_poly_expr B)
-void pseudo_divrem_cohen(Fmpz_poly_target Q, Fmpz_poly_target R, Fmpz_poly_expr A,
+    \code{ltupleref(Q, R) = divrem(A, B)} has the same effect as
+    \code{fmpz_poly_divrem(q, r, a, b)}, where \code{q, r, a, b} are the
+    underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
+
+Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_basecase(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_divconquer(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(Q, R, d) = pseudo_divrem(A, B)} has the same effect as
+    \code{fmpz_poly_pseudo_divrem(q, r, &d, a, b)}, where \code{q, r, a, b} are
+    the underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
+
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr pseudo_divrem_cohen(Fmpz_poly_expr A,
         Fmpz_poly_expr B)
 
-fmpz_polyxx pseudo_div(ulong& d, Fmpz_poly_expr A, Fmpz_poly_expr B)
-fmpz_polyxx pseudo_rem(ulong& d, Fmpz_poly_expr A, Fmpz_poly_expr B)
+    \code{ltupleref(Q, R) = pseudo_divrem_cohen(A, B)} has the same effect as
+    \code{fmpz_poly_pseudo_divrem_cohen(q, r, a, b)}, where \code{q, r, a, b}
+    are the underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
 
-bool poly_divides(Fmpz_poly_target Q, Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, ulong>_expr pseudo_div(Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, ulong>_expr pseudo_rem(Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(Q, d) = pseudo_div(A, B)} has the same effect as
+    \code{fmpz_poly_pseudo_div(q, &d, a, b)}, where \code{q, a, b} are the
+    underlying \code{fmpz_poly_t} corresponding to \code{Q, A, B}.
+
+Ltuple<bool, fmpz_polyxx>_expr poly_divides(Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(d, Q) = poly_divides(A, B)} sets \code{d} to \code{true}
+    and \code{Q} to \code{B/A} if \code{A} divides \code{B}, and else sets
+    \code{d} to \code{false}. See \code{fmpz_poly_divides}.
 
 Fmpz_poly_expr div_root(Fmpz_poly_expr, Fmpz_expr)
 
@@ -891,13 +917,20 @@ Fmpq_poly_expr poly_shift_right(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr gcd(Fmpq_poly_expr, Fmpq_poly_expr)
 Fmpq_poly_expr lcm(Fmpq_poly_expr, Fmpq_poly_expr)
 
-fmpqxx xgcd(Fmpq_poly_target r, Fmpq_poly_target s, Fmpq_poly_expr f,
-        Fmpq_poly_expr g)
+Ltuple<fmpq_polyxx, fmpq_polyxx, fmpq_polyxx>_expr xgcd(
+        Fmpq_poly_expr f, Fmpq_poly_expr g)
+
+    \code{ltupleref(G, S, T) = xgcd(A, B)} has the same effect as
+    \code{fmpq_poly_xgcd(g, s, t, a, b)}, where \code{g, s, t, a, b} denote the
+    underlying \code{fmpq_poly_t} corresponding to \code{G, S, T, A, B}.
 
 Fmpq_expr resultant(Fmpq_poly_expr)
 
-void divrem(Fmpq_poly_target Q, Fmpq_poly_target R, Fmpq_poly_expr A,
-        Fmpq_poly_expr B)
+Ltuple<fmpq_polyxx, fmpq_polyxx>_expr divrem(Fmpq_poly_expr A, Fmpq_poly_expr B)
+
+    \code{ltupleref(Q, R) = divrem(A, B)} has the same effect as
+    \code{fmpq_poly_divrem(q, r, a, b)} where \code{q, r, a, b} are the
+    underlying \code{fmpq_poly_t} corresponding to \code{Q, R, A, B}.
 
 bool poly_divides(Fmpq_poly_target Q, Fmpq_poly_expr A, Fmpq_poly_expr B)
 
