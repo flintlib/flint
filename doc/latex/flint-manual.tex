@@ -1686,7 +1686,31 @@ like a reference to a constant object of type \code{fooxx}, and so cannot be
 used as a left hand side. These objects are created by flintxx automatically,
 for example upon calling \code{fmpqxx::num()}.
 
-\paragraph{Unified coefficient access} TODO
+\paragraph{Unified coefficient access}
+
+Consider again the \code{x.num()} method of \code{fmpqxx}. In various
+situations,
+this can have different return types. Namely, if \code{x} is an
+\code{Fmpq_target}, then \code{x.num()} returns an \code{fmpzxx_ref}. In
+particular the return value behaves just like \code{fmpzxx}, no evaluation is
+necessary to obtain it, there are no copies, and it is possible to change the
+return value (and thus change \code{x}). If on the other hand \code{x} is an
+\code{Fmpq_src} (but not an \code{Fmpq_target}),
+then the return value of \code{x.num()} has type
+\code{fmpzxx_srcref}. This again behaves just like \code{fmpzxx} and no
+evaluations or copies are necessary, but this time it is not possible to change
+the return value (and so it is not possible to change \code{x}, either).
+Finally, if \code{x} is an \code{Fmpq_expr} (but not an \code{Fmpq_src}), then
+the return value is actually a lazy expression template. Thus to obtain the
+``actual'' value of \code{x.num()}, evaluations are necessary, and potentially
+so are copies.
+
+Thus in any case the return value behaves just like \code{fmpqxx}, but apart
+from that the behaviour of \code{x.num()} varies quite drastically in the
+different situations. We call this ``unified coefficient access'' (the
+coefficients of a \code{fmpqxx} being \code{num(), den()}), and the same
+behaviour occurs in many other flintxx types, e.g. in
+\code{fmpz_polyxx.get_coeff()}, etc.
 
 \paragraph{Extending flintxx}
 

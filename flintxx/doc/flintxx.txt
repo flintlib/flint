@@ -268,15 +268,15 @@ double dlog(Fmpz_expr x)
 
 int jacobi(Fmpz_expr a, Fmpz_expr p)
 
-fmpzxx mul2_uiui(Fmpz_expr g, ulong x, ulong y)
+Fmpz_expr mul2_uiui(Fmpz_expr g, ulong x, ulong y)
 
-fmpzxx divexact2_uiui(Fmpz_expr g, ulong x, ulong y)
+Fmpz_expr divexact2_uiui(Fmpz_expr g, ulong x, ulong y)
 
-fmpzxx powm(Fmpz_expr g, ulong e, Fmpz_expr m)
-fmpzxx powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
+Fmpz_expr powm(Fmpz_expr g, ulong e, Fmpz_expr m)
+Fmpz_expr powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
 
-fmpzxx mul_tdiv_q_2exp(Fmpz_expr g, Fmpz_expr x, ulong exp)
-fmpzxx mul_tdiv_q_2exp(Fmpz_expr g, long x, ulong exp)
+Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, Fmpz_expr x, ulong exp)
+Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, long x, ulong exp)
 
 Ltuple<fmpzxx, fmpzxx>_expr fdiv_qr(Fmpz_expr g, Fmpz_expr h)
 Ltuple<fmpzxx, fmpzxx>_expr tdiv_qr(Fmpz_expr g, Fmpz_expr h)
@@ -380,15 +380,14 @@ const fmpq* Fmpq_src::_fmpq() const
 
     Obtain a reference to the underlying C data type.
 
-Fmpq_ref Fmpq_target::num()
-Fmpq_srcref Fmpq_src::num() const
-Fmpq_ref Fmpq_target::den()
-Fmpq_srcref Fmpq_src::den() const
+?? Fmpq_expr::num() const
+?? Fmpq_expr::den() const
 
-    Obtain references to numerator/denominator.
+    Unified coefficient access to numerator and denominator. If this is used to
+    modify the object, a call to \code{canonicalise()} may be necessary.
 
 void Fmpq_target::canonicalise()
-bool Fmpq_src::is_canonical()
+bool Fmpq_src::is_canonical() const
 
 template<class Vec> void Fmpq_target::set_cfrac(const Vec& v, slong n)
 
@@ -491,16 +490,16 @@ void Fmpz_poly_target::_normalise()
 void Fmpz_poly_target::_set_length(slong len)
 void Fmpz_poly_target::zero_coeffs(slong i, slong j)
 
-fmpzxx_ref Fmpz_poly_target::get_coeff(slong n)
-fmpzxx_srcref Fmpz_poly_src::get_coeff(slong n) const
+?? Fmpz_poly_expr::get_coeff(slong n) const
 
-    Obtain a reference to coefficient $n$. The result is undefined if $n$ is
+    Unified coefficient access for coefficient $n$.
+    The result is undefined if $n$ is
     greater than the degree of the polynomial (or negative).
 
-fmpzxx_ref Fmpz_poly_target::lead()
-fmpzxx_srcref Fmpz_poly_src::lead() const
+?? Fmpz_poly_expr::lead() const
 
-    Obtain a reference to the leading coefficient. The result is undefined if
+    Unified coefficient access for the leading coefficient.
+    The result is undefined if
     the length of the polynomial is zero.
 
 void Fmpz_poly_target::set_coeff(slong n, Fmpz_expr)
@@ -635,15 +634,15 @@ Fmpz_poly_expr mul_karatsuba(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr mul_SS(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr mul_KS(Fmpz_poly_expr, Fmpz_poly_expr)
 
-fmpz_polyxx mullow(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx mullow_classical(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx mullow_karatsuba_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx mullow_KS(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx mullow_SS(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_classical(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_karatsuba_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_KS(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_SS(Fmpz_poly_expr, Fmpz_poly_expr, slong)
 
-fmpz_polyxx mulhigh_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx mulhigh_classical(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx mulhigh_karatsuba_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mulhigh_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mulhigh_classical(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mulhigh_karatsuba_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
 
 Fmpz_poly_expr sqr(Fmpz_poly_expr)
 Fmpz_poly_expr sqr_KS(Fmpz_poly_expr)
@@ -661,7 +660,7 @@ Fmpz_poly_expr pow_binomial(Fmpz_poly_expr, T:is_unsigned_integer)
 Fmpz_poly_expr pow_binexp(Fmpz_poly_expr, T:is_unsigned_integer)
 Fmpz_poly_expr pow_addchains(Fmpz_poly_expr, T:is_unsigned_integer)
 
-fmpz_polyxx pow_trunc(Fmpz_poly_expr, ulong e, slong n)
+Fmpz_poly_expr pow_trunc(Fmpz_poly_expr, ulong e, slong n)
 
 Fmpz_poly_expr poly_shift_left(Fmpz_poly_expr, T:fits_into_slong)
 Fmpz_poly_expr poly_shift_right(Fmpz_poly_expr, T:fits_into_slong)
@@ -745,9 +744,9 @@ Fmpz_poly_expr compose(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr compose_horner(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr compose_divconquer(Fmpz_poly_expr, Fmpz_poly_expr)
 
-fmpz_polyxx compose_series(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx compose_series_horner(Fmpz_poly_expr, Fmpz_poly_expr, slong)
-fmpz_polyxx compose_series_brent_kung(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr compose_series(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr compose_series_horner(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr compose_series_brent_kung(Fmpz_poly_expr, Fmpz_poly_expr, slong)
 
 Fmpz_expr evaluate(Fmpz_poly_expr, Fmpz_expr)
 Fmpz_vec_expr evaluate(Fmpz_poly_expr, Fmpz_vec_expr)
@@ -816,11 +815,15 @@ fmzqxx_srcref Fmpq_poly_src::get_coeff_numref(slong n) const
     Obtain a reference to the numerator of coefficient $n$.
     The result is undefined if $n$ is
     greater than the degree of the polynomial (or negative).
+    If this is used to modify the object, a call to \code{canonicalise()} may
+    be necessary.
+    (No unified access, see \code{get_coeff}.)
 
-fmpqxx_ref Fmpq_poly_target::denref()
-fmpqxx_srcref Fmpq_poly_src::denref() const
+?? Fmpq_poly_expr::den() const
 
-    Obtain a reference to the denominator of the polynomial.
+    Unified coefficient access to the denominator of the polynomial.
+    If this is used to modify the object, a call to \code{canonicalise()} may
+    be necessary.
 
 void Fmpq_poly_target::set_coeff(slong n, Fmpz_expr)
 void Fmpq_poly_target::set_coeff(slong n, Fmpq_expr)
@@ -832,7 +835,7 @@ bool Fmpq_poly_expr::is_one() const
 bool Fmpq_poly_expr::is_zero() const
 bool Fmpq_poly_expr::is_monic() const
 bool Fmpq_poly_expr::is_squarefree() const
-fmpqxx Fmpq_poly_expr::get_coeff(slong n) const
+Fmpqxx_expr Fmpq_poly_expr::get_coeff(slong n) const
 
 std::string Fmpq_poly_expr::pretty(const char* x) const
 
@@ -907,7 +910,7 @@ Fmpq_poly_expr inv(Fmpq_poly_expr)
 
 Fmpq_poly_expr reverse(Fmpq_poly_expr, T:fits_into_slong)
 
-fmpq_polyxx mullow(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr mullow(Fmpq_poly_expr, Fmpq_poly_expr, slong)
 
 Fmpq_poly_expr pow(Fmpq_poly_expr, T:is_unsigned_integer)
 
@@ -942,9 +945,9 @@ Fmpq_poly_expr derivative(Fmpq_poly_expr)
 
 Fmpq_poly_expr compose(Fmpq_poly_expr, Fmpq_poly_expr)
 
-fmpq_polyxx compose_series(Fmpq_poly_expr, Fmpq_poly_expr, slong)
-fmpq_polyxx compose_series_horner(Fmpq_poly_expr, Fmpq_poly_expr, slong)
-fmpq_polyxx compose_series_brent_kung(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series_horner(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series_brent_kung(Fmpq_poly_expr, Fmpq_poly_expr, slong)
 
 Fmpq_expr evaluate(Fmpq_poly_expr, Fmpq_expr)
 Fmpq_expr evaluate(Fmpq_poly_expr, Fmpz_expr)
@@ -993,13 +996,12 @@ static fmpz_poly_qxx fmpz_poly_qxx::randtest_not_zero(frandxx& state,
 void Fmpz_poly_q_target::canonicalise()
 bool Fmpz_poly_q_src::is_canonical() const
 
-fmpz_polyxx_ref Fmpz_poly_q_target::get_numref()
-fmz_polyxx_srcref Fmpz_poly_q_src::get_numref() const
-fmpz_polyxx_ref Fmpz_poly_q_target::get_denref()
-fmz_polyxx_srcref Fmpz_poly_q_src::get_denref() const
+?? Fmpz_poly_q_expr::num() const
+?? Fmpz_poly_q_expr::den() const
 
-    Obtain a reference to the numerator or denominator of the rational
-    function.
+    Unified coefficient access to the numerator or denominator of the rational
+    function. If this is used for modification, a call to \code{canonicalise()}
+    may be necessary.
 
 bool Fmpz_poly_q_expr::is_one() const
 bool Fmpz_poly_q_expr::is_zero() const
@@ -1184,7 +1186,8 @@ Padic_expr log_rectangular(Padic_expr)
 Padic_expr log_balanced(Padic_expr)
 Padic_expr log_satoh(Padic_expr)
 
-    Compute special functions. These may raise \code{flint_exceptions}.
+    Compute special functions. These may raise \code{flint_exception}s if the
+    series do not converge.
 
 Padic_expr inv(Padic_expr)
 
