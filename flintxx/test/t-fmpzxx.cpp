@@ -524,29 +524,6 @@ test_randomisation()
     tassert(fmpzxx::randtest_mod_signed(rand, thirty) <= 15);
 }
 
-// TODO move
-void
-test_flint_classes()
-{
-    using namespace flint_classes;
-    tassert((mp::equal_types<to_nonref<fmpzxx>::type, fmpzxx>::val));
-    tassert((mp::equal_types<to_nonref<fmpzxx_ref>::type, fmpzxx>::val));
-    tassert((mp::equal_types<to_nonref<fmpzxx_srcref>::type, fmpzxx>::val));
-    tassert((mp::equal_types<to_ref<fmpzxx>::type, fmpzxx_ref>::val));
-    tassert((mp::equal_types<to_srcref<fmpzxx>::type, fmpzxx_srcref>::val));
-    tassert((mp::equal_types<to_ref<fmpzxx_ref>::type, fmpzxx_ref>::val));
-    tassert((is_ref<fmpzxx, fmpzxx_ref>::val));
-    tassert((is_ref<fmpzxx_ref, fmpzxx_ref>::val));
-    tassert((!is_ref<fmpzxx, fmpzxx>::val));
-    tassert((!is_ref<fmpzxx, fmpzxx_srcref>::val));
-    tassert((is_srcref<fmpzxx, fmpzxx_srcref>::val));
-    tassert((!is_srcref<fmpzxx, fmpzxx>::val));
-    tassert((!is_srcref<fmpzxx, fmpzxx_ref>::val));
-    tassert(is_nonref<fmpzxx>::val);
-    tassert(!is_nonref<fmpzxx_srcref>::val);
-    tassert(!is_nonref<fmpzxx_ref>::val);
-}
-
 int
 main()
 {
@@ -565,8 +542,6 @@ main()
     test_ternary_assigments();
     test_references();
     test_randomisation();
-
-    test_flint_classes();
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_fmpzxx

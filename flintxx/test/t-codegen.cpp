@@ -513,6 +513,19 @@ DEFINE_FUNC(test_fmpz_matxx_2,
     fmpz_mat_clear(tmp2);
 }
 
+DEFINE_FUNC(test_fmpz_matxx_manip_1,
+        (fmpz_matxx& A))
+{
+    A.at(0, 0) += 2u;
+}
+
+DEFINE_FUNC(test_fmpz_matxx_manip_2,
+        (fmpz_matxx& A))
+{
+    fmpz_add_ui(fmpz_mat_entry(A._mat(), 0, 0),
+            fmpz_mat_entry(A._mat(), 0, 0), 2u);
+}
+
 
 DEFINE_FUNC(test_fmpz_polyxx_divrem_1,
         (fmpz_polyxx& A, fmpz_polyxx& B,
@@ -656,6 +669,11 @@ test_mat()
     tassert(count(ass1, "call") == count(ass2, "call"));
     tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
                 count(stripnop(ass2), "\n"), 0.1));
+
+    ass1 = disass(program, "test_fmpz_matxx_manip_1");
+    ass2 = disass(program, "test_fmpz_matxx_manip_2");
+    tassert(count(ass1, "call") == count(ass2, "call")); // 1
+    tassert(count(ass1, "\n") == count(ass2, "\n"));
 }
 
 void

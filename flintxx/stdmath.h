@@ -43,6 +43,7 @@ FLINT_DEFINE_UNOP(sqr)
 
 FLINT_DEFINE_UNOP(height)
 
+FLINT_DEFINE_BINOP(mul_classical)
 FLINT_DEFINE_BINOP(mul_2exp)
 FLINT_DEFINE_BINOP(fdiv_2exp)
 FLINT_DEFINE_BINOP(tdiv)
@@ -81,6 +82,13 @@ FLINT_DEFINE_BINOP(revert_series_newton)
 
 FLINT_DEFINE_BINOP(compeval)
 
+// matrix functions
+FLINT_DEFINE_UNOP(transpose)
+FLINT_DEFINE_UNOP(trace)
+FLINT_DEFINE_UNOP(det)
+FLINT_DEFINE_UNOP(charpoly)
+FLINT_DEFINE_UNOP(nullspace)
+
 // implementation of compeval
 namespace rules {
 // implementation of compeval
@@ -98,6 +106,7 @@ struct binary_expression<T, operations::compeval_op, U,
 } // rules
 } // flint
 
+// XXX is this a good idea?
 namespace std {
 FLINT_DEFINE_BINOP_HERE(pow)
 
