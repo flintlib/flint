@@ -232,6 +232,73 @@ struct can_evaluate_into<T, U,
         mp::not_<mp::equal_types<T, U> > > >::type>
     : flint_classes::is_ref<U, T> { };
 } // traits
+
+
+namespace detail {
+template<class Expr, class Enable = void>
+struct should_enable_extra_ternop : mp::false_ { };
+template<class Expr>
+struct should_enable_extra_ternop<Expr, typename mp::enable_if<
+    flint_classes::is_flint_class<Expr> >::type>
+    : mp::equal_types<Expr, typename flint_classes::to_ref<
+        typename flint_classes::to_nonref<Expr>::type>::type> { };
+} // detail
+
+// We add additional overloads for when the LHS is a reference type. The
+// problem is that the standard overloads take LHS via reference, and rvalues
+// (such as coming from fmpz_polyxx::get_coeff())
+// cannot bind to this. In this case instead objects should be taken by value.
+// However, this will make the overload ambiguous. Hence we take by const
+// reference and then make an additional copy.
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator+=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 * e2);
+    return e1;
+}
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator-=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 - e2);
+    return e1;
+}
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator*=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 * e2);
+    return e1;
+}
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator/=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 / e2);
+    return e1;
+}
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator%=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 % e2);
+    return e1;
+}
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator<<=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 << e2);
+    return e1;
+}
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
+operator>>=(const Expr1& e1, const Expr2& e2)
+{
+    Expr1(e1).set(e1 >> e2);
+    return e1;
+}
 } // flint
 
 #define FLINTXX_DEFINE_BASICS(name)                                           \
