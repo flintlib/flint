@@ -27,6 +27,7 @@
 #include "fmpzxx.h"
 
 #include "flintxx/test/helpers.h"
+#include "flintxx/test/myint.h"
 
 using namespace flint;
 
@@ -46,10 +47,14 @@ test_traits()
 
 namespace flint {
 typedef make_ltuple<mp::make_tuple<fmpzxx, int>::type>::type fmpzxxint_pair;
+typedef make_ltuple<mp::make_tuple<mylong, int>::type>::type mylongint_pair;
 FLINT_DEFINE_BINOP(make_lazy_test)
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND2(make_lazy_test_op, fmpzxxint_pair,
         FMPZXX_COND_S, traits::is_signed_integer,
+        to.template get<0>() = e1;to.template get<1>() = e2)
+FLINT_DEFINE_BINARY_EXPR2(make_lazy_test_op, mylongint_pair,
+        mylong, int,
         to.template get<0>() = e1;to.template get<1>() = e2)
 }
 }
@@ -169,6 +174,12 @@ test_placeholder()
     tassert(b == 6 && a == 17);
 }
 
+void
+test_create_temporaries()
+{
+    tassert(make_lazy_test(mylong(1), 2).get<0>() == mylong(1));
+}
+
 int
 main()
 {
@@ -180,6 +191,7 @@ main()
     test_ltupleref();
     test_get();
     test_placeholder();
+    test_create_temporaries();
 
     std::cout << "PASS" << std::endl;
 

@@ -141,6 +141,12 @@ public:
             n, Underlying, Operation, Data, ltuple_expression>::get(*this);
     }
 
+    typename base_t::evaluated_t create_temporary() const
+    {
+        return typename base_t::evaluated_t(detail::INSTANTIATE_FROM_TUPLE(),
+                mp::htuples::fill<underlying_t>(tools::temporaries_filler(*this)));
+    }
+
 protected:
     explicit ltuple_expression(const Data& d) : base_t(d) {}
 
