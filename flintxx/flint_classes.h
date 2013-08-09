@@ -28,7 +28,10 @@
 // specifically towards FLINT.
 
 #include "mp.h"
+#include "expression.h"
 #include "expression_traits.h"
+#include "evaluation_tools.h"
+#include "tuple.h"
 
 #ifndef CXX_FLINT_CLASSES_H
 #define CXX_FLINT_CLASSES_H
@@ -301,9 +304,8 @@ operator>>=(const Expr1& e1, const Expr2& e2)
 }
 } // flint
 
-#define FLINTXX_DEFINE_BASICS(name)                                           \
+#define FLINTXX_DEFINE_BASICS_NOFLINTCLASS(name)                              \
 public:                                                                       \
-    typedef void IS_FLINT_CLASS;                                              \
     typedef typename base_t::evaluated_t evaluated_t;                         \
                                                                               \
     template<class T>                                                         \
@@ -323,7 +325,12 @@ protected:                                                                    \
     template<class D, class O, class Da>                                      \
     friend class expression;
 
-#define FLINTXX_DEFINE_CTORS(name)                                           \
+#define FLINTXX_DEFINE_BASICS(name)                                           \
+public:                                                                       \
+    typedef void IS_FLINT_CLASS;                                              \
+    FLINTXX_DEFINE_BASICS_NOFLINTCLASS(name)                                  \
+
+#define FLINTXX_DEFINE_CTORS(name)                                            \
 public:                                                                       \
     name() : base_t() {}                                                      \
     template<class T>                                                         \

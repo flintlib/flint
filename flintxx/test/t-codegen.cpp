@@ -62,6 +62,7 @@
 #include "fmpzxx.h"
 #include "fmpz_matxx.h"
 #include "fmpz_polyxx.h"
+#include "nmod_vecxx.h"
 #include "flintxx/vector.h"
 
 // Exception class to indicate that this test cannot proceed, e.g. because
@@ -555,6 +556,25 @@ DEFINE_FUNC(test_fmpz_polyxx_divrem_4,
     fmpz_poly_divrem(A._poly(), tmp, f._poly(), g._poly());
     fmpz_poly_clear(tmp);
 }
+
+DEFINE_FUNC(test_nmodxx_1,
+        (mp_limb_t& to, mp_limb_t a_, mp_limb_t b_, nmod_t nm))
+{
+    nmodxx_ctx_srcref ctx = nmodxx_ctx_srcref::make(nm);
+    nmodxx a = nmodxx::make_nored(a_, ctx);
+    nmodxx b = nmodxx::make_nored(b_, ctx);
+    to = inv((a + b) * (a * b)).to<mp_limb_t>();
+}
+DEFINE_FUNC(test_nmodxx_2,
+        (mp_limb_t& to, mp_limb_t a, mp_limb_t b, nmod_t nm))
+{
+    mp_limb_t tmp1, tmp2;
+    tmp1 = nmod_add(a, b, nm);
+    tmp2 = nmod_mul(a, b, nm);
+    tmp1 = nmod_mul(tmp1, tmp2, nm);
+    tmp1 = nmod_inv(tmp1, nm);
+    to = tmp1;
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -689,6 +709,14 @@ test_poly()
     tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
 }
 
+void
+test_nmod()
+{
+    std::string ass1 = disass(program, "test_nmodxx_1");
+    std::string ass2 = disass(program, "test_nmodxx_2");
+    tassert(stripaddr(ass1) == stripaddr(ass2));
+}
+
 int
 main(int argc, char** argv)
 {
@@ -701,6 +729,7 @@ main(int argc, char** argv)
         test_vector();
         test_mat();
         test_poly();
+        test_nmod();
     }
     catch(skippable_exception e)
     {
