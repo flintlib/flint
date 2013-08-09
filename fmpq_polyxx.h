@@ -65,7 +65,6 @@ FLINT_DEFINE_BINOP(tanh_series)
 
 // TODO move to stdmath?
 FLINT_DEFINE_BINOP(poly_rescale)
-FLINT_DEFINE_UNOP(make_monic)
 
 namespace detail {
 template<class Poly>

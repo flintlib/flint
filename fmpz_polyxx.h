@@ -264,8 +264,6 @@ public:
     // lazy member forwarding
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
     FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, poly_bit_pack)
-    FLINTXX_DEFINE_MEMBER_BINOP_(bit_unpack, poly_bit_unpack)
-    FLINTXX_DEFINE_MEMBER_BINOP_(bit_unpack_unsigned, poly_bit_unpack_unsigned)
     FLINTXX_DEFINE_MEMBER_BINOP_(divides, poly_divides)
 
     FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)

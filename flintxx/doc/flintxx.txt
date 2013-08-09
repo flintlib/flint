@@ -1239,6 +1239,11 @@ const nmod_t& nmodxx_ctx_srcref::_nmod() const
 
     Obtain a reference to the underlying \code{nmod_t}.
 
+mp_limb_t nmodxx_ctx::n() const
+mp_limb_t nmodxx_ctx_srcref::n() const
+
+    Obtain the modulus stored in this context.
+
 nmodxx::nmodxx(nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to zero.

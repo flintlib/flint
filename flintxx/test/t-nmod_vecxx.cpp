@@ -36,6 +36,7 @@ test_init()
 {
     nmodxx_ctx c(31);
     tassert(test_conv(c));
+    tassert(c.n() == 31);
 
     nmodxx a = nmodxx::make_nored(65, c);
     tassert(a._limb() == 65);

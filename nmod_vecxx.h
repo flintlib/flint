@@ -50,6 +50,7 @@ public:
     // no destruction necessary
 
     bool operator==(const nmodxx_ctx& o) const {return nmod.n == o.nmod.n;}
+    mp_limb_t n() const {return nmod.n;}
 };
 
 class nmodxx_ctx_srcref
@@ -67,6 +68,7 @@ public:
         {return nmodxx_ctx_srcref(nm);}
 
     bool operator==(const nmodxx_ctx_srcref& o) const {return nmod.n == o.nmod.n;}
+    mp_limb_t n() const {return nmod.n;}
 };
 
 template<class Operation, class Data>
@@ -141,19 +143,37 @@ template<> struct use_temporary_merging<nmodxx> : mp::false_ { };
 } // traits
 #endif
 
+namespace traits {
+template<class T> struct has_nmodxx_ctx : mp::false_ { };
+
+// TODO this needs change with reference types
+template<> struct has_nmodxx_ctx<nmodxx> : mp::true_ { };
+} // traits
+
 namespace detail {
-struct is_nmodxx_predicate
+struct has_nmodxx_ctx_predicate
 {
-    // TODO this needs change with reference types
-    template<class T> struct type : mp::equal_types<T, nmodxx> { };
+    template<class T> struct type : traits::has_nmodxx_ctx<T> { };
 };
 } // detail
+namespace tools {
+template<class Expr>
+nmodxx_ctx_srcref find_nmodxx_ctx(const Expr& e)
+{
+    return tools::find_subexpr<detail::has_nmodxx_ctx_predicate>(e)._ctx();
+}
+} // tools
 template<class Operation, class Data>
 inline nmodxx_ctx_srcref
 nmodxx_expression<Operation, Data>::estimate_ctx() const
 {
-    return tools::find_subexpr<detail::is_nmodxx_predicate>(*this)._ctx();
+    return tools::find_nmodxx_ctx(*this);
 }
+
+namespace traits {
+// TODO this will have to change with reference types
+template<class T> struct is_nmodxx : traits::is_T_expr<T, nmodxx> { };
+} // traits
 
 namespace rules {
 // TODO hack to make code look like references are implemented
