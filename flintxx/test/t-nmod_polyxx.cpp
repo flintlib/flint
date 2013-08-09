@@ -110,6 +110,34 @@ test_arithmetic()
 
     tassert(g*nmodxx::red(3, ctx) == g + g + g);
     tassert(g.make_monic() == g*inv(g.get_coeff(g.degree())));
+
+    nmod_polyxx f(M);f.set_coeff(0, 15);
+    tassert(f*g == nmodxx::red(15, ctx)*g);
+    tassert(h.mul_classical(g) == h.mul_KS(g) && h.mul_KS(g) == h*g);
+
+    f = h*g;f.truncate(7);
+    tassert(f == mullow(h, g, 7));
+    tassert(f == h.mullow_KS(g, 7));
+    tassert(f == h.mullow_classical(g, 7));
+
+    f = (h*g).poly_shift_right(7);
+    tassert(f == h.mulhigh(g, 7).poly_shift_right(7));
+    tassert(f == h.mulhigh_classical(g, 7).poly_shift_right(7));
+
+    f = h / g;
+    tassert(f*g + (h % g) == h);
+    tassert(((h*g) % h).is_zero());
+
+    f.set_randtest(state, 10);
+    tassert(h.mulmod(g, f) == ((h*g) % f));
+
+
+    f = "3 31  1 0 1";
+    nmodxx x = nmodxx::red(7, ctx);
+    tassert(evaluate(f, x) == x*x + nmodxx::red(1, ctx));
+    f.realloc(0);f.set_coeff(31, 1);
+    tassert(evaluate(f, x) == x);
+    tassert(f(x) == x);
 }
 
 void
@@ -138,6 +166,23 @@ test_functions()
     tassert(g.is_irreducible());
 
     tassert(g == poly_bit_unpack(g.bit_pack(5u), 5u));
+
+    // multiplication, division, modulo tested in arithmetic
+
+    tassert(g.pow(3u) == g*g*g);
+    tassert(g.pow(5u) == g.pow_binexp(5u));
+
+    nmod_polyxx res(g.pow(15u));res.truncate(12);
+    tassert(res == g.pow_trunc(15u, 12));
+    tassert(res == g.pow_trunc_binexp(15u, 12));
+
+    nmod_polyxx f(M);f.set_randtest(rand, 10);
+    res = g.pow(10u) % f;
+    tassert(res == g.powmod_binexp(10u, f));
+
+    res = "5 31  1 1 1 1 1";
+    tassert(res.derivative().to_string() == "4 31  1 2 3 4");
+    tassert(g.integral().derivative() == g);
 }
 
 // test stuff which we should get automatically - addmul, references etc

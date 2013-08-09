@@ -31,6 +31,7 @@
 
 namespace flint {
 FLINT_DEFINE_BINOP(pow)
+FLINT_DEFINE_BINOP(pow_binexp)
 FLINT_DEFINE_BINOP(root)
 
 FLINT_DEFINE_UNOP(abs)
@@ -43,14 +44,20 @@ FLINT_DEFINE_UNOP(sqr)
 
 FLINT_DEFINE_UNOP(height)
 
-FLINT_DEFINE_BINOP(mul_classical)
-FLINT_DEFINE_BINOP(mul_2exp)
-FLINT_DEFINE_BINOP(fdiv_2exp)
-FLINT_DEFINE_BINOP(tdiv)
-FLINT_DEFINE_BINOP(tdiv_2exp)
 FLINT_DEFINE_BINOP(divexact)
 FLINT_DEFINE_BINOP(divrem)
+FLINT_DEFINE_BINOP(fdiv_2exp)
+FLINT_DEFINE_BINOP(mul_2exp)
+FLINT_DEFINE_BINOP(mul_classical)
+FLINT_DEFINE_BINOP(mul_KS)
+FLINT_DEFINE_BINOP(tdiv)
+FLINT_DEFINE_BINOP(tdiv_2exp)
+
+FLINT_DEFINE_THREEARY(mulhigh)
+FLINT_DEFINE_THREEARY(mulhigh_classical)
 FLINT_DEFINE_THREEARY(mullow)
+FLINT_DEFINE_THREEARY(mullow_classical)
+FLINT_DEFINE_THREEARY(mullow_KS)
 
 FLINT_DEFINE_BINOP(smod) // "symmetric" %
 
@@ -66,6 +73,7 @@ FLINT_DEFINE_BINOP(poly_shift_right)
 FLINT_DEFINE_BINOP(resultant)
 FLINT_DEFINE_BINOP(reverse)
 FLINT_DEFINE_BINOP(taylor_shift)
+
 FLINT_DEFINE_UNOP(content)
 FLINT_DEFINE_UNOP(derivative)
 FLINT_DEFINE_UNOP(integral)
@@ -80,6 +88,9 @@ FLINT_DEFINE_BINOP(revert_series)
 FLINT_DEFINE_BINOP(revert_series_lagrange)
 FLINT_DEFINE_BINOP(revert_series_lagrange_fast)
 FLINT_DEFINE_BINOP(revert_series_newton)
+
+FLINT_DEFINE_THREEARY(pow_trunc)
+FLINT_DEFINE_THREEARY(pow_trunc_binexp)
 
 FLINT_DEFINE_BINOP(compeval)
 
