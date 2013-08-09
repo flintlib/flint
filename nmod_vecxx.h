@@ -25,6 +25,7 @@
 
 // TODO actual nmod_vecxx class
 // TODO reference types
+// TODO addmul
 
 #ifndef NMOD_VECXX_H
 #define NMOD_VECXX_H
@@ -106,6 +107,9 @@ public:
     {
         return evaluated_t(estimate_ctx());
     }
+
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_UNOP(inv)
 };
 
 namespace detail {
@@ -194,7 +198,6 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, nmodxx, NMODXX_COND_S,
         traits::is_unsigned_integer,
         to.set_nored(nmod_pow_ui(e1._limb(), e2, to._nmod())))
 }
-// TODO addmul
 } // flint
 
 #endif

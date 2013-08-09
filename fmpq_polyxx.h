@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #ifndef FMPQ_POLYXX_H
-#define FMPQ_POLYXX_H FMPQ_POLYXX_H
+#define FMPQ_POLYXX_H
 
 #include <cstdlib>
 #include <string>

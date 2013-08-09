@@ -77,6 +77,9 @@ test_arithmetic()
     tassert((a / b) * b == a);
     tassert(inv(b) == nmodxx::red(1, c) / b);
     tassert(pow(a, 4u) == a*a*a*a);
+
+    tassert(b.inv() == inv(b));
+    tassert(a.pow(4u) == pow(a, 4u));
 }
 
 int

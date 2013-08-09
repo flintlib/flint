@@ -1195,6 +1195,97 @@ Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
 
 
 
+*******************************************************************************
+
+    nmodxx
+
+    The class \code{nmodxx} encapsulates the use of \code{mp_limb_t} together
+    with \code{nmod_t} for doing arithmetic modulo a word-sized integer. It is
+    defined in \code{nmod_vecxx.h}.
+
+    The C++ equivalent to \code{nmod_t} is \code{nmodxx_ctx}. There is a
+    reference version \code{nmodxx_ctx_srcref}.
+
+    The C++ equivalent to \code{mp_limb_t} in this context is \code{nmodxx}.
+    Immediate \code{nmodxx} expressions store both an \code{mp_limb_t} and an
+    \code{nmodxx_ctx_srcref}.
+
+    The most common ways to construct \code{nmodxx} are using the static member
+    functions \code{nmodxx::red} and \code{nmodxx::make_nored}.
+
+    Just like when \code{mp_limb_t} is passed to \code{nmod_t} operations, the
+    limb stored in \code{nmodxx} is assumed to be reduced, and under this
+    assumption, all computations yield reduced data.
+
+    It is assumed that any expression of \code{nmodxx} involves only one
+    modulus, so that all contexts are interchangeable.
+
+*******************************************************************************
+
+explicit nmodxx_ctx::nmodxx_ctx(mp_limb_t n)
+
+    Initialise a new context for operations modulo $n$.
+
+nmodxx_ctx_srcref::nmodxx_ctx_srcref(const nmodxx_ctx&)
+
+    Initialise a reference to an \code{nmodxx_ctx}.
+
+static nmodxx_ctx_srcref::make(const nmod_t& nm)
+
+    Initialise a reference pointing to an \code{nmod_t}.
+
+const nmod_t& nmodxx_ctx::_nmod() const
+const nmod_t& nmodxx_ctx_srcref::_nmod() const
+
+    Obtain a reference to the underlying \code{nmod_t}.
+
+nmodxx::nmodxx(nmodxx_ctx_srcref ctx)
+
+    Initialise an \code{nmodxx} to zero.
+
+static nmodxx nmodxx::make_nored(mp_limb_t n, nmodxx_ctx_srcref ctx)
+
+    Initialise an \code{nmodxx} to $n$, performing no reductions.
+
+static nmodxx nmodxx::red(mp_limb_t n, nmodxx_ctx_srcref ctx)
+
+    Initialise an \code{nmodxx} to the reduction of $n$.
+
+void Nmod_target::reduce()
+
+    Reduce the stored limb.
+
+void Nmod_target::set_nored(mp_limb_t n)
+
+    Set the stored limb to $n$.
+
+std::string Nmod_expr::to_string() const
+
+    Convert self into a string of the form ``a mod b''.
+
+mp_limb_t Nmod_expr::to<mp_limb_t>() const
+
+    Obtain the stored limb.
+
+nmodxx_ctx_srcref Nmod_expr::estimate_ctx() const
+
+    Obtain the context of any immediate subexpression. (By our homogeneity
+    assumptions, the result of this operation does not depend on the
+    subexpression chosen.)
+
+Nmod_expr Nmod_expr::inv() const
+Nmod_expr Nmod_expr::pow(T:is_unsigned_integer) const
+
+Nmod_expr operator??(Nmod_expr, Nmod_expr)
+
+    Arithmetic operators \code{+ - * /} are overloaded for nmod expressions.
+
+Nmod_expr operator-(Nmod_expr)
+Nmod_expr pow(Nmod_expr, T:is_unsigned_integer)
+Nmod_expr inv(Nmod_expr)
+
+
+
 
 *******************************************************************************
 
@@ -1251,8 +1342,8 @@ static padicxx padicxx::randtest_not_zero(frandxx& state,
     \code{padic_randtest}, \code{padic_randtest_int} and
     \code{padic_randtest_not_zero}.
 
-static padicxx_ref fmpzxx_ref::make(padic* f)
-static padicxx_srcref fmpzxx_srcref::make(const padic* f)
+static padicxx_ref padicxx_ref::make(padic* f)
+static padicxx_srcref padicxx_srcref::make(const padic* f)
 
     Obtain a flintxx reference object pointing to \code{*f}. Here \code{f} must
     not be zero.
