@@ -586,18 +586,18 @@ FLINT_DEFINE_BINARY_EXPR_COND2(gcd_euclidean_op, nmod_polyxx,
 
 namespace rdetail {
 typedef make_ltuple<mp::make_tuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>::type>::type
-    nmodxx_nmod_polyxx_pair;
+    nmod_polyxx_triple;
 } // rdetail
-FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_op, rdetail::nmodxx_nmod_polyxx_pair,
+FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_op, rdetail::nmod_polyxx_triple,
     NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
     nmod_poly_xgcd(to.template get<0>()._poly(), to.template get<1>()._poly(),
         to.template get<2>()._poly(), e1._poly(), e2._poly()))
-FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_hgcd_op, rdetail::nmodxx_nmod_polyxx_pair,
+FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_hgcd_op, rdetail::nmod_polyxx_triple,
     NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
     nmod_poly_xgcd_hgcd(to.template get<0>()._poly(),
         to.template get<1>()._poly(),
         to.template get<2>()._poly(), e1._poly(), e2._poly()))
-FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_euclidean_op, rdetail::nmodxx_nmod_polyxx_pair,
+FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_euclidean_op, rdetail::nmod_polyxx_triple,
     NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
     nmod_poly_xgcd_euclidean(to.template get<0>()._poly(),
         to.template get<1>()._poly(),

@@ -609,11 +609,12 @@ Fmpz_expr Fmpz_poly_expr::bit_pack(T:fits_into_mp_bitcnt_t) const
 
     See \code{poly_bit_pack}.
 
-Fmpz_expr Fmpz_poly_expr::bit_unpack(T:fits_into_mp_bitcnt_t) const
+static fmpz_polyxx fmpz_polyxx::bit_unpack(Fmpz_expr, T:fits_into_mp_bitcnt_t)
 
     See \code{poly_bit_unpack}.
 
-Fmpz_expr Fmpz_poly_expr::bit_unpack_unsigned(T:fits_into_mp_bitcnt_t) const
+static fmpz_polyxx fmpz_polyxx::bit_unpack_unsigned(
+        Fmpz_expr, T:fits_into_mp_bitcnt_t)
 
     See \code{poly_bit_unpack_unsigned}.
 
@@ -1305,6 +1306,388 @@ Nmod_expr operator??(Nmod_expr, Nmod_expr)
 Nmod_expr operator-(Nmod_expr)
 Nmod_expr pow(Nmod_expr, T:is_unsigned_integer)
 Nmod_expr inv(Nmod_expr)
+
+
+
+*******************************************************************************
+
+    nmod\_polyxx
+
+    The class \code{nmod_polyxx} wraps \code{nmod_poly_t}. Like \code{nmodxx},
+    instances of \code{nmod_polyxx} always have an associated \code{nmodxx_ctx}
+    storing the operating modulus. No expression must involve more than one
+    modulus at a time.
+
+    In order to reduce convert a \code{fmpz_polyxx} or \code{fmpq_polyxx} to
+    \code{nmod_polyxx}, see the \code{reduce} method of \code{fmpz_polyxx} or
+    \code{fmpq_polyxx}, respectively.
+
+*******************************************************************************
+
+nmodxx_ctx_srcref Nmod_poly_expr::estimate_ctx() const
+
+    Obtain the relevant context. This never causes evaluation.
+
+Nmod_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{make_monic}, \code{sqrt}.
+
+Nmod_poly_expr::binary operation() const
+
+    The following binary functions are made available as member functions:
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},
+    \code{div_divconquer}, \code{div_newton}, \code{divrem},
+    \code{divrem_basecase}, \code{divrem_divconquer},
+    \code{divrem_newton}, \code{div_root}, \code{evaluate_fast},
+    \code{evaluate_iter}, \code{gcd}, \code{gcd_euclidean}, \code{gcd_hgcd},
+    \code{inv_series}, \code{inv_series_basecase}, \code{inv_series_newton},
+    \code{invsqrt_series}, \code{mul_classical}, \code{mul_KS},
+    \code{poly_shift_left}, \code{poly_shift_right}, \code{pow},
+    \code{pow_binexp}, \code{rem_basecase}, \code{resultant},
+    \code{resultant_euclidean}, \code{reverse}, \code{revert_series},
+    \code{revert_series_lagrange}, \code{revert_series_lagrange_fast},
+    \code{revert_series_newton}, \code{sqrt_series}, \code{taylor_shift},
+    \code{taylor_shift_convolution}, \code{taylor_shift_horner}, \code{xgcd},
+    \code{xgcd_euclidean}, \code{xgcd_hgcd}, \code{log_series},
+    \code{exp_series}, \code{exp_series_basecase}, \code{atan_series},
+    \code{atanh_series}, \code{asin_series}, \code{asinh_series},
+    \code{sin_series}, \code{cos_series}, \code{tan_series},
+    \code{sinh_series}, \code{cosh_series}, \code{tanh_series}.
+
+Nmod_poly_expr Nmod_poly_expr::inflate(T:is_unsigned_integer) const
+
+    \code{See poly_inflate}.
+
+Nmod_poly_expr Nmod_poly_expr::deflate(T:is_unsigned_integer) const
+
+    \code{See poly_deflate}.
+
+Nmod_poly_expr::threeary operation(??, ??) const
+
+    The following threeary functions are made available as member functions:
+    \code{compose_mod}, \code{compose_mod_horner},
+    \code{compose_series_brent_kung}, \code{compose_series},
+    \code{compose_series_brent_kung}, \code{compose_series_divconquer},
+    \code{compose_series_horner}, \code{div_newton21_preinv},
+    \code{divrem_newton21_preinv}, \code{div_series}, \code{mulhigh},
+    \code{mulhigh_classical}, \code{mullow}, \code{mullow_classical},
+    \code{mullow_KS}, \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},
+    \code{pow_trunc_binexp}.
+
+Nmod_poly_expr Nmod_poly_expr::operator()(Nmod_poly_expr) const
+Nmod_expr Nmod_poly_expr::operator()(Nmod_expr) const
+Nmod_vec_expr Nmod_poly_expr::operator()(Nmod_vec_expr) const
+
+    The \code{operator()} is overloaded for evaluation or composition,
+    depending on the argument.
+
+Nmod_poly_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * / %} are overloaded when provided by
+    \code{nmod_poly_t}.
+
+Nmod_poly_expr operator-(Nmod_poly_expr)
+
+    The unary negation operator is overloaded.
+
+Nmod_poly_target Nmod_poly_target::operator=(const char*)
+
+    See \code{nmod_poly_set_str}. Raises \code{flint_exception} if the string
+    is malformed.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+nmod_polyxx::nmod_polyxx(mp_limb_t modulus)
+nmod_polyxx::nmod_polyxx(mp_limb_t modulus, slong alloc)
+nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx)
+nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
+
+    Instantiate \code{nmod_polyxx} relative to some modulus. If the second
+    argument is provided, space is allocated for \code{alloc} coefficients.
+
+void Nmod_poly_target realloc(slong alloc)
+void Nmod_poly_target::fit_length(slong len)
+void Nmod_poly_target::_normalise()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Nmod_poly_expr::length() const
+slong Nmod_poly_expr::degree() const
+slong Nmod_poly_expr::max_bits() const
+mp_limb_t Nmod_poly_expr::modulus() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment and basic manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_poly_target::truncate(slong)
+
+Nmod_poly_expr reverse(Nmod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_target::set_randtest(frandxx& state, slong len)
+void Nmod_target::set_randtest_irreducible(frandxx& state, slong len)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmodxx_expr Nmod_poly_expr::get_coeff(slong n) const
+void Nmod_target::set_coeff(slong i, Nmodxx_expr)
+void Nmod_target::set_coeff(slong i, mp_limb_t)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+std::string Nmod_poly_expr::to_string() const
+
+std::ostream& operator<<(std::ostream&, Nmod_poly_expr)
+
+    Output to streams is done by first converting to string.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Nmod_poly_expr::is_one() const
+bool Nmod_poly_expr::is_zero() const
+
+bool operator==(Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Scalar multiplication and division
+
+    Scalar multiplication is provided via overloaded \code{operator*}.
+    Additionally, the following functions are implemented:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr make_monic(Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit packing and unpacking
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Nmod_poly_expr::bit_pack(T:fits_into_mp_bitcnt_t) const
+static nmod_polyxx nmod_polyxx::bit_unpack(
+        Fmpz_expr, T:fits_into_mp_bitcnt_t) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplication
+
+    Basic multiplication is provided via overloaded \code{operator*}. Finer
+    control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr mul_classical(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr mul_KS(Nmod_poly_expr, Nmod_poly_expr)
+
+Nmod_poly_expr mullow(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mullow_classical(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mullow_KS(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mulhigh(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mulhigh_classical(Nmod_poly_expr, Nmod_poly_expr, slong)
+
+Nmod_poly_expr mulmod(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr pow(Nmod_poly_expr, T:is_unsigned_integer)
+Nmod_poly_expr pow_binexp(Nmod_poly_expr, T:is_unsigned_integer)
+Nmod_poly_expr pow_trunc(Nmod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Nmod_poly_expr pow_trunc_binexp(Nmod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Nmod_poly_expr powmod_binexp(Nmod_poly_expr, T:is_unsigned_integer,
+        Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Division
+
+    Basic division and remainder is provided by overloaded \code{operator/} and
+    \code{operator%}. Finer control can be obtained using the following
+    functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem(Nmod_poly_expr A, Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_basecase(Nmod_poly_expr A,
+        Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_divconquer(
+        Nmod_poly_expr A, Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton(
+        Nmod_poly_expr A, Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton21_preinv(
+        Nmod_poly_expr A, Nmod_poly_expr B)
+
+Nmod_poly_expr div_basecase(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr div_divconquer(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr div_newton(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr div_newton21_preinv(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+
+Nmod_poly_expr rem_basecase(Nmod_poly_expr, Nmod_poly_expr)
+
+Nmod_poly_expr inv_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr inv_series_basecase(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr inv_series_newton(Nmod_poly_expr, T:fits_into_slong)
+
+Nmod_poly_expr div_series(Nmod_poly_expr, Nmod_poly_expr, slong n)
+
+Nmod_poly_expr div_root(Nmod_poly_expr, Nmod_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative and integral
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr derivative(Nmod_poly_expr)
+Nmod_poly_expr integral(Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
+
+    Basic evaluation and multipoint evaluation can be achieved using the
+    overloaded \code{operator()}. Finer control can be obtained using the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_expr evaluate(Nmod_poly_expr, Nmod_expr)
+Nmod_vec_expr evaluate(Nmod_poly_expr, Nmod_vec_expr)
+Nmod_vec_expr evaluate_fast(Nmod_poly_expr, Nmod_vec_expr)
+Nmod_vec_expr evaluate_iter(Nmod_poly_expr, Nmod_vec_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Interpolation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Nmod_poly_expr fmpz_polyxx::interpolate(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+static Nmod_poly_expr fmpz_polyxx::interpolate_barycentric(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+static Nmod_poly_expr fmpz_polyxx::interpolate_fast(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+static Nmod_poly_expr fmpz_polyxx::interpolate_newton(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition
+
+    Basic composition can be achieved with the overloaded \code{operator()}.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr compose(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr compose_horner(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr compose_divconquer(Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Taylor Shift
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr taylor_shift(Nmod_poly_expr, Nmod_expr)
+Nmod_poly_expr taylor_shift_horner(Nmod_poly_expr, Nmod_expr)
+Nmod_poly_expr taylor_shift_convolution(Nmod_poly_expr, Nmod_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr compose_mod(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr compose_mod_horner(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+Nmod_poly_expr compose_mod_divconquer(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+Nmod_poly_expr compose_mod_brent_kung(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr gcd(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr gcd_euclidean(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr gcd_hgcd(Nmod_poly_expr, Nmod_poly_expr)
+
+Ltuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>_expr xgcd(
+        Nmod_poly_expr, Nmod_poly_expr)
+Ltuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>_expr xgcd_euclidean(
+        Nmod_poly_expr, Nmod_poly_expr)
+Ltuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>_expr xgcd_hgcd(
+        Nmod_poly_expr, Nmod_poly_expr)
+
+Nmod_expr resultant(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_expr resultant_euclidean(Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr compose_series(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr compose_series_horner(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr compose_series_brent_kung(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr compose_series_divconquer(Nmod_poly_expr, Nmod_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series reversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr revert_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr revert_series_newton(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr revert_series_lagrange(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr revert_series_lagrange_fast(Nmod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square roots
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr sqrt_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr invsqrt_series(Nmod_poly_expr, T:fits_into_slong)
+
+Nmod_poly_expr sqrt_series(Nmod_poly_expr p)
+
+    Compute the square root of $p$. Raises \code{flint_exception} if $p$ is not
+    a perfect square.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transcendental functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr exp_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr log_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr atan_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr atanh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr asin_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr asinh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr tan_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr sin_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr cos_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr sinh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr cosh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr tanh_series(Nmod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Products
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Nmod_poly_expr fmpz_polyxx::product_roots(Nmod_vec_expr xs)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inflation and deflation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr inflate(Nmod_poly_expr, T:is_unsigned_integer)
+Nmod_poly_expr deflate(Nmod_poly_expr, T:is_unsigned_integer)
+
+ulong Nmod_poly_expr::deflation() const
 
 
 
