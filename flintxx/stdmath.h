@@ -63,6 +63,12 @@ FLINT_DEFINE_BINOP(smod) // "symmetric" %
 
 // poly functions
 FLINT_DEFINE_BINOP(compose)
+FLINT_DEFINE_BINOP(compose_divconquer)
+FLINT_DEFINE_BINOP(compose_horner)
+FLINT_DEFINE_BINOP(div_basecase)
+FLINT_DEFINE_BINOP(div_divconquer)
+FLINT_DEFINE_BINOP(divrem_basecase)
+FLINT_DEFINE_BINOP(divrem_divconquer)
 FLINT_DEFINE_BINOP(div_root)
 FLINT_DEFINE_BINOP(evaluate)
 FLINT_DEFINE_BINOP(poly_bit_pack)
@@ -70,9 +76,11 @@ FLINT_DEFINE_BINOP(poly_bit_unpack)
 FLINT_DEFINE_BINOP(poly_bit_unpack_unsigned)
 FLINT_DEFINE_BINOP(poly_shift_left)
 FLINT_DEFINE_BINOP(poly_shift_right)
+FLINT_DEFINE_BINOP(rem_basecase)
 FLINT_DEFINE_BINOP(resultant)
 FLINT_DEFINE_BINOP(reverse)
 FLINT_DEFINE_BINOP(taylor_shift)
+FLINT_DEFINE_BINOP(taylor_shift_horner)
 
 FLINT_DEFINE_UNOP(content)
 FLINT_DEFINE_UNOP(derivative)
@@ -89,6 +97,7 @@ FLINT_DEFINE_BINOP(revert_series_lagrange)
 FLINT_DEFINE_BINOP(revert_series_lagrange_fast)
 FLINT_DEFINE_BINOP(revert_series_newton)
 
+FLINT_DEFINE_THREEARY(div_series)
 FLINT_DEFINE_THREEARY(pow_trunc)
 FLINT_DEFINE_THREEARY(pow_trunc_binexp)
 

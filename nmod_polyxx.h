@@ -34,11 +34,14 @@
 #include "nmod_vecxx.h"
 
 #include "flintxx/expression.h"
+#include "flintxx/ltuple.h"
 #include "flintxx/flint_classes.h"
 #include "flintxx/flint_exception.h"
 #include "flintxx/frandxx.h"
 #include "flintxx/stdmath.h"
 #include "flintxx/traits.h"
+
+// TODO !! codegen
 
 // TODO exhibit this as a specialisation of a generic poly<nmodxx>
 // TODO input
@@ -51,9 +54,23 @@
 // TODO 21.17, 21.20-
 
 namespace flint {
+FLINT_DEFINE_BINOP(div_newton)
+FLINT_DEFINE_BINOP(divrem_newton)
+FLINT_DEFINE_BINOP(evaluate_fast)
+FLINT_DEFINE_BINOP(evaluate_iter)
+FLINT_DEFINE_BINOP(inv_series_basecase)
 FLINT_DEFINE_BINOP(nmod_polyxx_get_coeff)
+FLINT_DEFINE_BINOP(taylor_shift_convolution)
+
+FLINT_DEFINE_THREEARY(div_newton21_preinv)
+FLINT_DEFINE_THREEARY(divrem_newton21_preinv)
 FLINT_DEFINE_THREEARY(mulmod)
 FLINT_DEFINE_THREEARY(powmod_binexp)
+
+FLINT_DEFINE_BINOP(nmod_polyxx_interpolate)
+FLINT_DEFINE_BINOP(nmod_polyxx_interpolate_barycentric)
+FLINT_DEFINE_BINOP(nmod_polyxx_interpolate_fast)
+FLINT_DEFINE_BINOP(nmod_polyxx_interpolate_newton)
 
 template<class Operation, class Data>
 class nmod_polyxx_expression
@@ -67,6 +84,36 @@ public:
     FLINTXX_DEFINE_BASICS(nmod_polyxx_expression)
     FLINTXX_DEFINE_CTORS(nmod_polyxx_expression)
     FLINTXX_DEFINE_C_REF(nmod_polyxx_expression, nmod_poly_struct, _poly)
+
+    // static functions for nmod_polyxx
+    template<class Nmod_vec1, class Nmod_vec2>
+    static FLINT_BINOP_ENABLE_RETTYPE(nmod_polyxx_interpolate,
+        Nmod_vec1, Nmod_vec2)
+    interpolate(const Nmod_vec1& xs, const Nmod_vec2& ys)
+    {
+        return nmod_polyxx_interpolate(xs, ys);
+    }
+    template<class Nmod_vec1, class Nmod_vec2>
+    static FLINT_BINOP_ENABLE_RETTYPE(nmod_polyxx_interpolate_fast,
+        Nmod_vec1, Nmod_vec2)
+    interpolate_fast(const Nmod_vec1& xs, const Nmod_vec2& ys)
+    {
+        return nmod_polyxx_interpolate_fast(xs, ys);
+    }
+    template<class Nmod_vec1, class Nmod_vec2>
+    static FLINT_BINOP_ENABLE_RETTYPE(nmod_polyxx_interpolate_newton,
+        Nmod_vec1, Nmod_vec2)
+    interpolate_newton(const Nmod_vec1& xs, const Nmod_vec2& ys)
+    {
+        return nmod_polyxx_interpolate_newton(xs, ys);
+    }
+    template<class Nmod_vec1, class Nmod_vec2>
+    static FLINT_BINOP_ENABLE_RETTYPE(nmod_polyxx_interpolate_barycentric,
+        Nmod_vec1, Nmod_vec2)
+    interpolate_barycentric(const Nmod_vec1& xs, const Nmod_vec2& ys)
+    {
+        return nmod_polyxx_interpolate_barycentric(xs, ys);
+    }
 
     // these only make sense with immediates
     void realloc(slong alloc) {nmod_poly_realloc(_poly(), alloc);}
@@ -115,13 +162,32 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, nmod_polyxx_get_coeff)
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
 
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_newton)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_newton)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_root)
+    FLINTXX_DEFINE_MEMBER_BINOP(evaluate_fast)
+    FLINTXX_DEFINE_MEMBER_BINOP(evaluate_iter)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series_newton)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_classical)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_KS)
     FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_left)
     FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
     FLINTXX_DEFINE_MEMBER_BINOP(pow_binexp)
+    FLINTXX_DEFINE_MEMBER_BINOP(rem_basecase)
     FLINTXX_DEFINE_MEMBER_BINOP(reverse)
+    FLINTXX_DEFINE_MEMBER_BINOP(taylor_shift)
+    FLINTXX_DEFINE_MEMBER_BINOP(taylor_shift_convolution)
+    FLINTXX_DEFINE_MEMBER_BINOP(taylor_shift_horner)
 
     FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, poly_bit_pack)
 
@@ -129,6 +195,9 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP(integral)
     FLINTXX_DEFINE_MEMBER_UNOP(make_monic)
 
+    FLINTXX_DEFINE_MEMBER_3OP(div_newton21_preinv)
+    FLINTXX_DEFINE_MEMBER_3OP(divrem_newton21_preinv)
+    FLINTXX_DEFINE_MEMBER_3OP(div_series)
     FLINTXX_DEFINE_MEMBER_3OP(mulhigh)
     FLINTXX_DEFINE_MEMBER_3OP(mulhigh_classical)
     FLINTXX_DEFINE_MEMBER_3OP(mullow)
@@ -274,13 +343,6 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(mulmod_op, nmod_polyxx,
     NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
     nmod_poly_mulmod(to._poly(), e1._poly(), e2._poly(), e3._poly()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(modulo, nmod_polyxx,
-        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
-        nmod_poly_rem(to._poly(), e1._poly(), e2._poly()))
-FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, nmod_polyxx,
-        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
-        nmod_poly_div(to._poly(), e1._poly(), e2._poly()))
-
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_binexp_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::is_unsigned_integer,
         nmod_poly_pow_binexp(to._poly(), e1._poly(), e2))
@@ -307,6 +369,118 @@ FLINT_DEFINE_UNARY_EXPR_COND(integral_op, nmod_polyxx, NMOD_POLYXX_COND_S,
 FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_op, nmodxx,
         NMOD_POLYXX_COND_S, NMODXX_COND_S,
         to.set_nored(nmod_poly_evaluate_nmod(e1._poly(), e2._limb())))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_op, nmod_vecxx,
+        NMOD_POLYXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_evaluate_nmod_vec(to._array(), e1._poly(), e2._array(),
+            to.size()))
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_fast_op, nmod_vecxx,
+        NMOD_POLYXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_evaluate_nmod_vec_fast(to._array(), e1._poly(), e2._array(),
+            to.size()))
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_iter_op, nmod_vecxx,
+        NMOD_POLYXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_evaluate_nmod_vec_iter(to._array(), e1._poly(), e2._array(),
+            to.size()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<nmod_polyxx, nmod_polyxx>::type>::type
+    nmod_polyxx_pair;
+} // rdetail
+#define NMOD_POLYXX_DEFINE_DIVREM(name) \
+FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, rdetail::nmod_polyxx_pair, \
+    NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, \
+    nmod_poly_##name(to.template get<0>()._poly(), to.template get<1>()._poly(), \
+        e1._poly(), e2._poly()))
+NMOD_POLYXX_DEFINE_DIVREM(divrem_basecase)
+NMOD_POLYXX_DEFINE_DIVREM(divrem_divconquer)
+NMOD_POLYXX_DEFINE_DIVREM(divrem_newton)
+NMOD_POLYXX_DEFINE_DIVREM(divrem)
+
+FLINT_DEFINE_BINARY_EXPR_COND2(div_basecase_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_div_basecase(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(div_divconquer_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_div_divconquer(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(div_newton_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_div_newton(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_div_divconquer(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(div_newton21_preinv_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_div_newton21_preinv(to._poly(),
+            e1._poly(), e2._poly(), e3._poly()))
+FLINT_DEFINE_THREEARY_EXPR_COND3(divrem_newton21_preinv_op,
+        rdetail::nmod_polyxx_pair,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_divrem_newton21_preinv(to.template get<0>()._poly(),
+            to.template get<1>()._poly(), e1._poly(), e2._poly(), e3._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(rem_basecase_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_rem_basecase(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(modulo, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_rem(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_newton_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, traits::fits_into_slong,
+        nmod_poly_inv_series_newton(to._poly(), e1._poly(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, traits::fits_into_slong,
+        nmod_poly_inv_series(to._poly(), e1._poly(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_basecase_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, traits::fits_into_slong,
+        nmod_poly_inv_series_basecase(to._poly(), e1._poly(), e2))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(div_series_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, traits::fits_into_slong,
+        nmod_poly_div_series(to._poly(), e1._poly(), e2._poly(), e3))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(compose_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_compose(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(compose_divconquer_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_compose_divconquer(to._poly(), e1._poly(), e2._poly()))
+FLINT_DEFINE_BINARY_EXPR_COND2(compose_horner_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_compose_horner(to._poly(), e1._poly(), e2._poly()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(div_root_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMODXX_COND_S,
+        nmod_poly_div_root(to._poly(), e1._poly(), e2._limb()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(nmod_polyxx_interpolate_op, nmod_polyxx,
+        NMOD_VECXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_interpolate_nmod_vec(to._poly(), e1._data().array,
+            e2._data().array, e2.size()))
+FLINT_DEFINE_BINARY_EXPR_COND2(nmod_polyxx_interpolate_fast_op, nmod_polyxx,
+        NMOD_VECXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_interpolate_nmod_vec_fast(to._poly(), e1._data().array,
+            e2._data().array, e2.size()))
+FLINT_DEFINE_BINARY_EXPR_COND2(nmod_polyxx_interpolate_newton_op, nmod_polyxx,
+        NMOD_VECXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_interpolate_nmod_vec_newton(to._poly(), e1._data().array,
+            e2._data().array, e2.size()))
+FLINT_DEFINE_BINARY_EXPR_COND2(nmod_polyxx_interpolate_barycentric_op, nmod_polyxx,
+        NMOD_VECXX_COND_S, NMOD_VECXX_COND_S,
+        nmod_poly_interpolate_nmod_vec_barycentric(to._poly(), e1._data().array,
+            e2._data().array, e2.size()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(taylor_shift_horner_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMODXX_COND_S,
+        nmod_poly_taylor_shift_horner(to._poly(), e1._poly(), e2._limb()))
+FLINT_DEFINE_BINARY_EXPR_COND2(taylor_shift_convolution_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMODXX_COND_S,
+        nmod_poly_taylor_shift_convolution(to._poly(), e1._poly(), e2._limb()))
+FLINT_DEFINE_BINARY_EXPR_COND2(taylor_shift_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMODXX_COND_S,
+        nmod_poly_taylor_shift(to._poly(), e1._poly(), e2._limb()))
 } // rules
 } // flint
 

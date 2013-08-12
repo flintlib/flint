@@ -138,6 +138,16 @@ test_arithmetic()
     f.realloc(0);f.set_coeff(31, 1);
     tassert(evaluate(f, x) == x);
     tassert(f(x) == x);
+
+    nmod_polyxx seven(M);
+    seven.set_coeff(0, x);
+    tassert(compose(f, seven).get_coeff(0) == f(x));
+    tassert(f(seven).length() == 1);
+
+    nmod_vecxx vec1(2, ctx), vec2(2, ctx);
+    vec1[0] = nmodxx::red(7, ctx); vec1[1] = nmodxx::red(15, ctx);
+    vec2[0] = f(vec1[0]); vec2[1] = f(vec1[1]);
+    tassert(f(vec1) == vec2);
 }
 
 void
@@ -145,7 +155,7 @@ test_functions()
 {
     mp_limb_t M = 31;
     nmod_polyxx g(M);
-    //nmodxx_ctx_srcref ctx = g.estimate_ctx();
+    nmodxx_ctx_srcref ctx = g.estimate_ctx();
 
     g.set_coeff(5, 15);
     tassert(g.max_bits() == 4);
@@ -183,6 +193,59 @@ test_functions()
     res = "5 31  1 1 1 1 1";
     tassert(res.derivative().to_string() == "4 31  1 2 3 4");
     tassert(g.integral().derivative() == g);
+
+    tassert(f.divrem(g) == ltuple(f / g, f % g));
+    tassert(f.divrem_basecase(g) == f.divrem(g));
+    tassert(f.divrem_divconquer(g) == f.divrem(g));
+
+    tassert(f.div_basecase(g) == f / g);
+    tassert(f.div_divconquer(g) == f / g);
+
+    tassert(f.rem_basecase(g) == f % g);
+
+    f.set_coeff(0, 17); // non-zero mod 31, so a unit
+    res = f*f.inv_series(15);res.truncate(15);
+    tassert(res.is_one());
+    tassert(f.inv_series(15) == f.inv_series_basecase(15));
+    tassert(f.inv_series(15) == f.inv_series_newton(15));
+
+    res = g * f.inv_series(15);res.truncate(15);
+    tassert(g.div_series(f, 15) == res);
+
+    f.set_coeff(f.degree(), 12); // unit
+    tassert(g.div_newton(f) == g / f);
+    tassert(g.divrem_newton(f) == g.divrem(f));
+    tassert(g.divrem(f) == g.divrem_newton21_preinv(f,
+                f.reverse(f.length()).inv_series(f.length())));
+    tassert(g /f == g.div_newton21_preinv(f,
+                f.reverse(f.length()).inv_series(f.length())));
+
+    res = "2 31  5 1";
+    tassert(f.div_root(-nmodxx::red(5, ctx)) == f / res);
+
+    nmod_vecxx v(10, ctx);
+    _nmod_vec_randtest(v._array(), rand._data(), v.size(), ctx._nmod());
+    tassert(f.evaluate_fast(v) == f(v));
+    tassert(f.evaluate_iter(v) == f(v));
+
+    nmod_vecxx xs(10, ctx);
+    for(unsigned i = 0;i < xs.size();++i)
+        xs[i] = nmodxx::red(i, ctx);
+    res = nmod_polyxx::interpolate(xs, v);
+    tassert(res.degree() < xs.size());
+    for(unsigned i = 0;i < xs.size();++i)
+        tassert(res(xs[i]) == v[i]);
+    tassert(nmod_polyxx::interpolate_fast(xs, v) == res);
+    tassert(nmod_polyxx::interpolate_newton(xs, v) == res);
+    tassert(nmod_polyxx::interpolate_barycentric(xs, v) == res);
+
+    tassert(f(g) == f.compose_divconquer(g));
+    tassert(f(g) == f.compose_horner(g));
+
+    res = "2 31  7 1";
+    tassert(f(res) == f.taylor_shift(nmodxx::red(7, ctx)));
+    tassert(f(res) == f.taylor_shift_horner(nmodxx::red(7, ctx)));
+    tassert(f(res) == f.taylor_shift_convolution(nmodxx::red(7, ctx)));
 }
 
 // test stuff which we should get automatically - addmul, references etc
