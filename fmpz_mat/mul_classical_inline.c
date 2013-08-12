@@ -120,14 +120,9 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
             else
             {
                 if (neg[0] > pos[0])
-                {
-                    fmpz_set_ui(fmpz_mat_entry(C, i, j), neg[0] - pos[0]);
-                    fmpz_neg(fmpz_mat_entry(C, i, j), fmpz_mat_entry(C, i, j));
-                }
+                    fmpz_neg_ui(fmpz_mat_entry(C, i, j), neg[0] - pos[0]);
                 else
-                {
                     fmpz_set_ui(fmpz_mat_entry(C, i, j), pos[0] - neg[0]);
-                }
             }
         }
     }
