@@ -178,8 +178,8 @@ test_functions()
             && f == divexact(2*f, 2));
     tassert(-f == tdiv_2exp(-8*f - q, 3u));
     tassert(smod(5*f, fmpzxx(3)).to_string() == "4  1 0 0 -1");
-    tassert(f == poly_bit_unpack(poly_bit_pack(f, 10u), 10u));
-    tassert(f == poly_bit_unpack_unsigned(poly_bit_pack(f, 10u), 10u));
+    tassert(f == fmpz_polyxx::bit_unpack(poly_bit_pack(f, 10u), 10u));
+    tassert(f == fmpz_polyxx::bit_unpack_unsigned(poly_bit_pack(f, 10u), 10u));
 
     tassert(mul_classical(f, g) == f*g);
     tassert(mul_karatsuba(f, g) == f*g);

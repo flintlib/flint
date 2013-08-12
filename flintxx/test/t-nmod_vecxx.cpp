@@ -52,6 +52,10 @@ test_init()
 
     a = zero;
     tassert(a == zero);
+
+    tassert(nmodxx::red(65, c) == nmodxx::red(fmpzxx(65), c));
+    tassert(nmodxx::red(3, c)/nmodxx::red(2, c)
+            == nmodxx::red(fmpqxx(3, 2u), c));
 }
 
 void

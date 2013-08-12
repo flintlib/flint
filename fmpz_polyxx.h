@@ -33,6 +33,7 @@
 
 #include "fmpzxx.h"
 #include "fmpz_vecxx.h"
+#include "nmod_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
@@ -83,9 +84,6 @@ FLINT_DEFINE_BINOP(sqrlow_KS)
 FLINT_DEFINE_BINOP(taylor_shift_divconquer)
 FLINT_DEFINE_BINOP(xgcd_modular)
 
-FLINT_DEFINE_THREEARY(compose_series)
-FLINT_DEFINE_THREEARY(compose_series_brent_kung)
-FLINT_DEFINE_THREEARY(compose_series_horner)
 FLINT_DEFINE_THREEARY(mulhigh_karatsuba_n)
 FLINT_DEFINE_THREEARY(mulhigh_n)
 FLINT_DEFINE_THREEARY(mullow_karatsuba_n)
@@ -96,6 +94,8 @@ FLINT_DEFINE_BINOP(fmpz_polyxx_interpolate)
 FLINT_DEFINE_UNOP(fmpz_polyxx_product_roots)
 FLINT_DEFINE_UNOP(fmpz_polyxx_lead)
 FLINT_DEFINE_BINOP(fmpz_polyxx_get_coeff)
+FLINT_DEFINE_BINOP(fmpz_polyxx_bit_unpack)
+FLINT_DEFINE_BINOP(fmpz_polyxx_bit_unpack_unsigned)
 
 namespace traits {
 template<class T> struct is_fmpz_polyxx;
@@ -173,6 +173,21 @@ public:
         return fmpz_polyxx_product_roots(xs);
     }
 
+    template<class Arg1, class Arg2>
+    static FLINT_BINOP_ENABLE_RETTYPE(fmpz_polyxx_bit_unpack,
+        Arg1, Arg2)
+    bit_unpack(const Arg1& a1, const Arg2& a2)
+    {
+        return fmpz_polyxx_bit_unpack(a1, a2);
+    }
+    template<class Arg1, class Arg2>
+    static FLINT_BINOP_ENABLE_RETTYPE(fmpz_polyxx_bit_unpack_unsigned,
+        Arg1, Arg2)
+    bit_unpack_unsigned(const Arg1& a1, const Arg2& a2)
+    {
+        return fmpz_polyxx_bit_unpack_unsigned(a1, a2);
+    }
+
     // These only make sense with immediates
     void realloc(slong alloc) {fmpz_poly_realloc(_poly(), alloc);}
     void fit_length(slong len) {fmpz_poly_fit_length(_poly(), len);}
@@ -244,6 +259,15 @@ public:
     void signature(slong& r1, slong& r2) const
     {
         fmpz_poly_signature(&r1, &r2, this->evaluate()._poly());
+    }
+
+    // XXX this cannot be (easily) lazy
+    // NB: tested in t-nmod_polyxx.cpp
+    nmod_polyxx reduce(nmodxx_ctx_srcref mod) const
+    {
+        nmod_polyxx res(mod);
+        fmpz_poly_get_nmod_poly(res._poly(), this->evaluate()._poly());
+        return res;
     }
 
     // lazy member forwarding
@@ -539,11 +563,11 @@ FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_pack_op, fmpzxx,
         FMPZ_POLYXX_COND_S, traits::fits_into_mp_bitcnt_t,
         fmpz_poly_bit_pack(to._fmpz(), e1._poly(), e2))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_unpack_op, fmpz_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_polyxx_bit_unpack_op, fmpz_polyxx,
         FMPZXX_COND_S, traits::fits_into_mp_bitcnt_t,
         fmpz_poly_bit_unpack(to._poly(), e1._fmpz(), e2))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_unpack_unsigned_op, fmpz_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_polyxx_bit_unpack_unsigned_op, fmpz_polyxx,
         FMPZXX_COND_S, traits::fits_into_mp_bitcnt_t,
         fmpz_poly_bit_unpack_unsigned(to._poly(), e1._fmpz(), e2))
 

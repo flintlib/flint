@@ -27,6 +27,8 @@
 #include <sstream>
 #include <string>
 
+#include "fmpq_polyxx.h"
+#include "fmpz_polyxx.h"
 #include "nmod_polyxx.h"
 
 #include "flintxx/test/helpers.h"
@@ -175,7 +177,7 @@ test_functions()
     tassert(g.is_squarefree());
     tassert(g.is_irreducible());
 
-    tassert(g == poly_bit_unpack(g.bit_pack(5u), 5u));
+    tassert(g == nmod_polyxx::bit_unpack(g.bit_pack(5u), 5u, ctx));
 
     // multiplication, division, modulo tested in arithmetic
 
@@ -246,6 +248,106 @@ test_functions()
     tassert(f(res) == f.taylor_shift(nmodxx::red(7, ctx)));
     tassert(f(res) == f.taylor_shift_horner(nmodxx::red(7, ctx)));
     tassert(f(res) == f.taylor_shift_convolution(nmodxx::red(7, ctx)));
+
+    nmod_polyxx h(M);
+    h.set_randtest(rand, 15);
+    tassert(f.compose_mod(g, h) == f(g) % h);
+    tassert(f.compose_mod(g, h) == f.compose_mod_horner(g, h));
+    tassert(f.compose_mod(g, h) == f.compose_mod_brent_kung(g, h));
+
+    h.set_randtest_irreducible(rand, 12);
+    tassert(h.gcd(f).is_one());
+    tassert(f.gcd_euclidean(f) == f.make_monic());
+    tassert(f.gcd_hgcd(g) == f.gcd(g));
+
+    nmod_polyxx R(M), S(M);
+    ltupleref(res, R, S) = f.xgcd(g);
+    tassert(res == R*f + S*g && res == gcd(f, g));
+    tassert(f.xgcd(g) == f.xgcd_hgcd(g));
+    tassert(f.xgcd(g) == f.xgcd_euclidean(g));
+
+    fmpz_polyxx lift1 = fmpz_polyxx::randtest(rand, 10, 6);
+    fmpz_polyxx lift2 = fmpz_polyxx::randtest(rand, 10, 6);
+    lift1.lead() = 1;
+    lift2.lead() = 1;
+    f = lift1.reduce(ctx);
+    for(unsigned i = 0;i < f.length();++i)
+        tassert(f.get_coeff(i) == nmodxx::red(lift1.get_coeff(i), ctx));
+
+    g = lift2.reduce(ctx);
+    tassert(f.resultant(g) == nmodxx::red(lift1.resultant(lift2), ctx));
+    tassert(f.resultant(g) == f.resultant_euclidean(g));
+
+    g.set_coeff(0, 0);
+    res = f(g); res.truncate(15);
+    tassert(f.compose_series(g, 15) == res);
+    tassert(f.compose_series_horner(g, 15) == res);
+    tassert(f.compose_series_brent_kung(g, 15) == res);
+    tassert(f.compose_series_divconquer(g, 15) == res);
+
+    res = "2 31  0 1";
+    g.set_coeff(1, 17); // unit
+    tassert(g.compose_series(g.revert_series(15), 15) == res);
+    tassert(g.revert_series_newton(15) == g.revert_series(15));
+    tassert(g.revert_series_lagrange(15) == g.revert_series(15));
+    tassert(g.revert_series_lagrange_fast(15) == g.revert_series(15));
+
+    f.set_coeff(0, 1);
+    tassert(f.sqrt_series(15).pow_trunc(2u, 15) == f);
+    tassert(f.invsqrt_series(15).pow_trunc(2u, 15) == f.inv_series(15));
+
+    tassert((f*f).sqrt() == f);
+    res = "1 31  1";
+    assert_exception((f*f + res).sqrt().evaluate());
+
+    f = nmod_polyxx::product_roots(xs);
+    tassert(f.degree() == xs.size());
+    for(unsigned i = 0;i < xs.size();++i)
+        tassert(f(nmodxx::red(i, ctx)).to<mp_limb_t>() == 0);
+
+    res = "2 31  0 1";
+    tassert(f.inflate(5u) == f(res.pow(5u)));
+    tassert(f.inflate(5u).deflate(5u) == f);
+    tassert(f.inflate(5u).deflation() >= 5);
+    tassert(f.deflate(f.deflation()).deflation() == 1);
+}
+
+void
+test_transcendental_functions()
+{
+    frandxx state;
+    mp_limb_t M = 1031; // prime
+    nmod_polyxx f(M);
+    nmodxx_ctx_srcref ctx = f.estimate_ctx();
+    fmpq_polyxx lift = fmpq_polyxx::randtest(state, 10, 9);
+    lift.set_coeff(0, 0);
+    f = lift.reduce(ctx);
+    for(unsigned i = 0;i < f.length();++i)
+        tassert(f.get_coeff(i) == nmodxx::red(lift.get_coeff(i), ctx));
+
+    tassert(f.exp_series(15) == lift.exp_series(15).reduce(ctx));
+    tassert(f.atan_series(15) == lift.atan_series(15).reduce(ctx));
+    tassert(f.atanh_series(15) == lift.atanh_series(15).reduce(ctx));
+    tassert(f.asin_series(15) == lift.asin_series(15).reduce(ctx));
+    tassert(f.asinh_series(15) == lift.asinh_series(15).reduce(ctx));
+    tassert(f.sin_series(15) == lift.sin_series(15).reduce(ctx));
+    tassert(f.cos_series(15) == lift.cos_series(15).reduce(ctx));
+    tassert(f.tan_series(15) == lift.tan_series(15).reduce(ctx));
+    tassert(f.sinh_series(15) == lift.sinh_series(15).reduce(ctx));
+    tassert(f.cosh_series(15) == lift.cosh_series(15).reduce(ctx));
+    tassert(f.tanh_series(15) == lift.tanh_series(15).reduce(ctx));
+
+    tassert(f.exp_series_basecase(15) == f.exp_series(15));
+
+    f.set_coeff(0, 1); lift.set_coeff(0, 1);
+    tassert(f.log_series(15) == lift.log_series(15).reduce(ctx));
+
+    f.realloc(0);
+    nmodxx a = nmodxx::red(7, ctx);
+    f.set_coeff(5, a);
+    tassert(f.exp_series(15) == exp_series_monomial(a, 5u, 15));
+    f.set_coeff(0, 1);
+    tassert(f.log_series(15) == log_series_monomial(a, 5u, 15));
 }
 
 // test stuff which we should get automatically - addmul, references etc
@@ -266,6 +368,7 @@ main()
     test_conversion();
     test_arithmetic();
     test_functions();
+    test_transcendental_functions();
     test_extras();
 
     std::cout << "PASS" << std::endl;

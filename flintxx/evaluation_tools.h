@@ -242,6 +242,7 @@ struct evaluation_helper
 {
     typedef typename traits::basetype<T>::type type;
     typedef typename traits::forwarding<type>::type ftype;
+    typedef ftype etype;
     static ftype get(const type& t) {return t;}
 
     typedef empty_tuple temporaries_t;
@@ -253,6 +254,7 @@ struct evaluation_helper<T,
 {
     typedef typename T::evaluated_t type;
     typedef const typename T::evaluated_t& ftype;
+    typedef type etype;
     static type get(const T& t) {return t.evaluate();}
 
     typedef typename T::ev_traits_t::temp_rule_t::temporaries_t temporaries_t;

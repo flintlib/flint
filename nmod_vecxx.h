@@ -36,7 +36,12 @@
 
 #include "nmod_vec.h"
 
+// TODO reduce dependencies?
+#include "fmpzxx.h"
+#include "fmpqxx.h"
+
 #include "flintxx/expression.h"
+#include "flintxx/evaluation_tools.h"
 #include "flintxx/flint_classes.h"
 #include "flintxx/stdmath.h"
 #include "flintxx/vector.h"
@@ -102,6 +107,20 @@ public:
         nmodxx_expression res = make_nored(n, c);
         res.reduce();
         return res;
+    }
+    template<class Fmpz>
+    static typename mp::enable_if<
+        traits::is_fmpzxx<Fmpz>, nmodxx_expression>::type red(
+                const Fmpz& n, nmodxx_ctx_srcref c)
+    {
+        return make_nored((n % c.n()).template to<mp_limb_t>(), c);
+    }
+    template<class Fmpq>
+    static typename mp::enable_if<
+        traits::is_fmpqxx<Fmpq>, nmodxx_expression>::type red(
+                const Fmpq& n, nmodxx_ctx_srcref c)
+    {
+        return make_nored((n % fmpzxx(c.n())).template to<mp_limb_t>(), c);
     }
     // TODO more
 

@@ -33,6 +33,7 @@
 
 #include "fmpqxx.h"
 #include "fmpz_polyxx.h"
+#include "nmod_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
@@ -48,20 +49,6 @@ FLINT_DEFINE_BINOP(fmpq_polyxx_interpolate)
 FLINT_DEFINE_UNOP(fmpq_polyxx_den)
 
 // TODO move to stdmath?
-FLINT_DEFINE_BINOP(sqrt_series)
-FLINT_DEFINE_BINOP(invsqrt_series)
-FLINT_DEFINE_BINOP(exp_series)
-FLINT_DEFINE_BINOP(log_series)
-FLINT_DEFINE_BINOP(atan_series)
-FLINT_DEFINE_BINOP(atanh_series)
-FLINT_DEFINE_BINOP(asin_series)
-FLINT_DEFINE_BINOP(asinh_series)
-FLINT_DEFINE_BINOP(tan_series)
-FLINT_DEFINE_BINOP(sin_series)
-FLINT_DEFINE_BINOP(cos_series)
-FLINT_DEFINE_BINOP(sinh_series)
-FLINT_DEFINE_BINOP(cosh_series)
-FLINT_DEFINE_BINOP(tanh_series)
 
 // TODO move to stdmath?
 FLINT_DEFINE_BINOP(poly_rescale)
@@ -196,6 +183,22 @@ public:
         std::string res(str);
         std::free(str);
         return res;
+    }
+
+    // sort of internal
+    nmod_polyxx _reduce(nmodxx_ctx_srcref c) const
+    {
+        nmod_polyxx res(c, length());
+        for(unsigned i = 0;i < length();++i)
+            res.set_coeff(i, nmodxx::red(get_coeff(i), c));
+        return res;
+    }
+
+    // XXX this cannot easily be lazy
+    // NB: tested in test-nmod_polyxx.cpp
+    nmod_polyxx reduce(nmodxx_ctx_srcref c) const
+    {
+        return this->evaluate()._reduce(c);
     }
 
     // lazy members
