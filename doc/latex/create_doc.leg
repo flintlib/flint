@@ -3,21 +3,25 @@
 
 start = group*
 
-group = comments groupopening comments function*
+group = comments groupopening comments (EOL|function|subgroupopening)*
 
 
 groupopening = stars blankline sectiontitle blankline content stars
+subgroupopening = pluses blankline? subsectiontitle blankline? content pluses
 
 sectiontitle = "    " < linecontent > EOL     {
     fprintf(out, "\\section{%.*s}\n", yyleng, yytext);}
 
+subsectiontitle = "    " < linecontent > EOL     {
+    fprintf(out, "\\subsection{%.*s}\n", yyleng, yytext);}
 
-function = functionheader functionfooter? EOL*
+
+function = functionheader functionfooter?
 
 functionheader = < funcnametype '(' funcargs ')' modifiers? ';'?
                       > whitespace? EOL {printfuncheader(yytext, yyleng);}
 
-funcnametype = !'*' ('operator()' | (! '(' .))*
+funcnametype = !('*'|'+') ('operator()' | (! '(' .))*
 funcargs = (! ')' .)*
 modifiers = whitespace? ("const" | "(macro)")
 
@@ -38,5 +42,6 @@ comment = '/*' (! "*/" .)* '*/'
 blankline = whitespace? EOL
 
 stars = "*******************************************************************************" EOL
+pluses = "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" EOL
 EOL = ('\r\n' | '\n' | '\r')
 whitespace = (' ' | '\t')+
