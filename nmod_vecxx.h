@@ -27,6 +27,8 @@
 // TODO reference types
 // TODO addmul
 
+// TODO document nmod_vecxx
+
 #ifndef NMOD_VECXX_H
 #define NMOD_VECXX_H
 
@@ -37,8 +39,12 @@
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
 #include "flintxx/stdmath.h"
+#include "flintxx/vector.h"
 
 namespace flint {
+//////////////////////////////////////////////////////////////////////////////
+// NMOD CLASS AND RULES
+//////////////////////////////////////////////////////////////////////////////
 class nmodxx_ctx
 {
 private:
@@ -71,6 +77,9 @@ public:
     mp_limb_t n() const {return nmod.n;}
 };
 
+namespace detail {
+struct nmodxx_fake_c_type { };
+} // detail
 template<class Operation, class Data>
 class nmodxx_expression
     : public expression<derived_wrapper<nmodxx_expression>, Operation, Data>
@@ -79,8 +88,9 @@ public:
     typedef expression<derived_wrapper< ::flint::nmodxx_expression>,
               Operation, Data> base_t;
 
-    FLINTXX_DEFINE_BASICS_NOFLINTCLASS(nmodxx_expression)
+    FLINTXX_DEFINE_BASICS(nmodxx_expression)
     FLINTXX_DEFINE_CTORS(nmodxx_expression)
+    FLINTXX_DEFINE_C_REF(nmodxx_expression, detail::nmodxx_fake_c_type, _limb)
 
     // static functions for nmodxx
     static nmodxx_expression make_nored(mp_limb_t n, nmodxx_ctx_srcref c)
@@ -98,10 +108,8 @@ public:
     // only makes sense on immediates
     nmodxx_ctx_srcref _ctx() const {return this->_data().ctx;}
     const nmod_t& _nmod() const {return this->_data().ctx._nmod();}
-    mp_limb_t& _limb() {return this->_data().limb;}
-    const mp_limb_t& _limb() const {return this->_data().limb;}
     void reduce() {NMOD_RED(_limb(), _limb(), _nmod());}
-    void set_nored(mp_limb_t n) {this->_data().limb = n;}
+    void set_nored(mp_limb_t n) {this->_data().inner = n;}
 
     nmodxx_ctx_srcref estimate_ctx() const;
 
@@ -115,26 +123,87 @@ public:
 };
 
 namespace detail {
+struct nmodxx_data;
+} // detail
+
+typedef nmodxx_expression<operations::immediate, detail::nmodxx_data> nmodxx;
+typedef nmodxx_expression<operations::immediate,
+            flint_classes::ref_data<nmodxx, detail::nmodxx_fake_c_type> > nmodxx_ref;
+typedef nmodxx_expression<operations::immediate, flint_classes::srcref_data<
+    nmodxx, nmodxx_ref, detail::nmodxx_fake_c_type> > nmodxx_srcref;
+
+namespace flint_classes {
+template<class Nmod>
+struct ref_data<Nmod, detail::nmodxx_fake_c_type>
+{
+    typedef void IS_REF_OR_CREF;
+    typedef Nmod wrapped_t;
+
+    typedef mp_limb_t& data_ref_t;
+    typedef const mp_limb_t& data_srcref_t;
+
+    mp_limb_t& inner;
+    nmodxx_ctx_srcref ctx;
+
+    ref_data(Nmod& o) : inner(o._data().inner), ctx(o._data().ctx) {}
+
+    static ref_data make(mp_limb_t& f, nmodxx_ctx_srcref ctx)
+    {
+        return ref_data(f, ctx);
+    }
+
+private:
+    ref_data(mp_limb_t& fp, nmodxx_ctx_srcref c) : inner(fp), ctx(c) {}
+};
+
+template<class Nmod, class Ref>
+struct srcref_data<Nmod, Ref, detail::nmodxx_fake_c_type>
+{
+    typedef void IS_REF_OR_CREF;
+    typedef Nmod wrapped_t;
+
+    typedef const mp_limb_t& data_ref_t;
+    typedef const mp_limb_t& data_srcref_t;
+
+    const mp_limb_t& inner;
+    nmodxx_ctx_srcref ctx;
+
+    srcref_data(const Nmod& o) : inner(o._data().inner), ctx(o._data().ctx) {}
+    srcref_data(Ref o) : inner(o._data().inner) {}
+
+    static srcref_data make(const mp_limb_t& f, nmodxx_ctx_srcref ctx)
+    {
+        return srcref_data(f, ctx);
+    }
+
+private:
+    srcref_data(const mp_limb_t& fp, nmodxx_ctx_srcref c) : inner(fp), ctx(c) {}
+};
+} // flint_classes
+namespace detail {
 struct nmodxx_data
 {
     nmodxx_ctx_srcref ctx;
-    mp_limb_t limb;
+    mp_limb_t inner;
+    typedef mp_limb_t& data_ref_t;
+    typedef const mp_limb_t& data_srcref_t;
 
-    nmodxx_data(nmodxx_ctx_srcref c) : ctx(c), limb(0) {}
+    nmodxx_data(nmodxx_ctx_srcref c) : ctx(c), inner(0) {}
 
 private:
     nmodxx_data(mp_limb_t n, nmodxx_ctx_srcref c)
-        : ctx(c), limb(n) {}
+        : ctx(c), inner(n) {}
 
 public:
     static nmodxx_data make_nored(mp_limb_t n, nmodxx_ctx_srcref c)
     {
         return nmodxx_data(n, c);
     }
+
+    nmodxx_data(const nmodxx_srcref& r)
+        : ctx(r.estimate_ctx()), inner(r._limb()) {}
 };
 } // detail
-
-typedef nmodxx_expression<operations::immediate, detail::nmodxx_data> nmodxx;
 
 #if 0
 namespace traits {
@@ -146,8 +215,9 @@ template<> struct use_temporary_merging<nmodxx> : mp::false_ { };
 namespace traits {
 template<class T> struct has_nmodxx_ctx : mp::false_ { };
 
-// TODO this needs change with reference types
 template<> struct has_nmodxx_ctx<nmodxx> : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmodxx_ref> : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmodxx_srcref> : mp::true_ { };
 } // traits
 
 namespace detail {
@@ -155,12 +225,25 @@ struct has_nmodxx_ctx_predicate
 {
     template<class T> struct type : traits::has_nmodxx_ctx<T> { };
 };
+
+// XXX this is needed for vectors ...
+template<class T>
+struct get_nmodxx_ctx
+{
+    static nmodxx_ctx_srcref get(const T& t) {return t._ctx();}
+};
+template<class T>
+nmodxx_ctx_srcref get_nmodxx_ctx_func(const T& t)
+{
+    return get_nmodxx_ctx<T>::get(t);
+}
 } // detail
 namespace tools {
 template<class Expr>
 nmodxx_ctx_srcref find_nmodxx_ctx(const Expr& e)
 {
-    return tools::find_subexpr<detail::has_nmodxx_ctx_predicate>(e)._ctx();
+    return detail::get_nmodxx_ctx_func(
+            tools::find_subexpr<detail::has_nmodxx_ctx_predicate>(e));
 }
 } // tools
 template<class Operation, class Data>
@@ -171,17 +254,16 @@ nmodxx_expression<Operation, Data>::estimate_ctx() const
 }
 
 namespace traits {
-// TODO this will have to change with reference types
-template<class T> struct is_nmodxx : traits::is_T_expr<T, nmodxx> { };
+template<class T> struct is_nmodxx : mp::or_<
+     traits::is_T_expr<T, nmodxx>,
+     flint_classes::is_source<nmodxx, T> > { };
 } // traits
 
 namespace rules {
-// TODO hack to make code look like references are implemented
-template<class T> struct NMODXX_COND_S : mp::equal_types<T, nmodxx> { };
-#define NMODXX_COND_T NMODXX_COND_S
+#define NMODXX_COND_S FLINTXX_COND_S(nmodxx)
+#define NMODXX_COND_T FLINTXX_COND_T(nmodxx)
 
-// TODO references
-FLINT_DEFINE_GET(equals, bool, nmodxx, e1._limb() == e2._limb())
+FLINTXX_DEFINE_EQUALS(nmodxx, e1._limb() == e2._limb())
 
 FLINT_DEFINE_GET_COND(conversion, mp_limb_t, NMODXX_COND_S, from._limb())
 
@@ -218,6 +300,83 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, nmodxx, NMODXX_COND_S,
         traits::is_unsigned_integer,
         to.set_nored(nmod_pow_ui(e1._limb(), e2, to._nmod())))
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// NMOD_VEC CLASS AND RULES
+//////////////////////////////////////////////////////////////////////////////
+namespace detail {
+struct nmod_vector_data
+{
+    long size;
+    mp_limb_t* array;
+    nmodxx_ctx_srcref ctx;
+
+    nmod_vector_data(long n, nmodxx_ctx_srcref c)
+        : size(n), array(_nmod_vec_init(n)), ctx(c) {}
+
+    ~nmod_vector_data() {_nmod_vec_clear(array);}
+
+    nmod_vector_data(const nmod_vector_data& o)
+        : size(o.size), array(_nmod_vec_init(o.size)), ctx(o.ctx)
+    {
+        _nmod_vec_set(array, o.array, size);
+    }
+
+    nmodxx_ref at(long i) {return nmodxx_ref::make(array[i], ctx);}
+    nmodxx_srcref at(long i) const {return nmodxx_srcref::make(array[i], ctx);}
+};
+
+struct nmod_vector_traits
+    : wrapped_vector_traits<nmodxx, long, nmodxx_ref, nmodxx_srcref, mp_limb_t>
+{
+    template<class Expr>
+    static typename Expr::evaluated_t create_temporary(const Expr& e)
+    {
+        return typename Expr::evaluated_t(e.size(), tools::find_nmodxx_ctx(e));
+    }
+};
+} // detail
+
+// TODO would it make more sense to have this have its own class?
+typedef vector_expression<
+    detail::nmod_vector_traits, operations::immediate,
+    detail::nmod_vector_data> nmod_vecxx;
+// TODO references
+
+namespace traits {
+template<> struct has_nmodxx_ctx<nmod_vecxx> : mp::true_ { };
+} // traits
+namespace detail {
+template<>
+struct get_nmodxx_ctx<nmod_vecxx>
+{
+    static nmodxx_ctx_srcref get(const nmod_vecxx& v)
+    {
+        return v._data().ctx;
+    }
+};
+} // detail
+
+template<>
+struct enable_vector_rules<nmod_vecxx> : mp::false_ { };
+
+namespace rules {
+// TODO hack to make code look like references are implemented
+template<class T> struct NMOD_VECXX_COND_S : mp::equal_types<T, nmod_vecxx> { };
+#define NMOD_VECXX_COND_T NMOD_VECXX_COND_S
+
+// TODO references
+FLINT_DEFINE_GET(equals, bool, nmod_vecxx,
+        e1.size() == e2.size()
+        && _nmod_vec_equal(e1._data().array, e2._data().array, e1.size()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(plus, nmod_vecxx,
+        NMOD_VECXX_COND_S, NMOD_VECXX_COND_S,
+        _nmod_vec_add(to._data().array, e1._data().array, e2._data().array,
+            to.size(), to._data().ctx._nmod()))
+
+// TODO more
+} // rules
 } // flint
 
 #endif

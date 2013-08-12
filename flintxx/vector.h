@@ -62,6 +62,8 @@ public:
 
     template<class T>
     explicit vector_expression(const T& t) : base_t(t) {}
+    template<class T, class U>
+    explicit vector_expression(const T& t, const U& u) : base_t(t, u) {}
 
     template<class T>
     vector_expression& operator=(const T& t)

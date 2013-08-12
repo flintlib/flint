@@ -83,6 +83,42 @@ test_arithmetic()
     tassert(a.pow(4u) == pow(a, 4u));
 }
 
+void
+test_references()
+{
+    nmodxx_ctx c(31);
+    nmodxx a = nmodxx::red(17, c);
+    nmodxx b = nmodxx::red(19, c);
+    nmodxx_ref ar(a);
+    nmodxx_srcref bsr(b);
+    tassert(a == ar);
+    tassert(bsr != ar);
+    ar = nmodxx::red(19, c);
+    tassert(a == bsr);
+    tassert(ar + bsr + a == nmodxx::red(3, c) * b);
+
+    nmodxx_ref ar2 = nmodxx_ref::make(a._limb(), a.estimate_ctx());
+    nmodxx_srcref asr2 = nmodxx_srcref::make(a._limb(), a.estimate_ctx());
+    ar2 = nmodxx::red(4, c);
+    tassert(asr2 == nmodxx::red(4, c));
+}
+
+void
+test_vec()
+{
+    nmodxx_ctx c(31);
+    nmod_vecxx v1(10, c), v2(10, c);
+    for(unsigned i = 0;i < v1.size();++i)
+    {
+        v1[i] = nmodxx::red(0, c);
+        v2[i] = nmodxx::red(0, c);
+    }
+    tassert(v1 == v2);
+    v1[0] = nmodxx::red(15, c);
+    tassert(v1 != v2);
+    tassert(v1 + v2 == v1);
+}
+
 int
 main()
 {
@@ -91,6 +127,8 @@ main()
     test_init();
     test_conversion();
     test_arithmetic();
+    test_references();
+    test_vec();
 
     std::cout << "PASS" << std::endl;
     return 0;

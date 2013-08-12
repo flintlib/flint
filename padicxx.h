@@ -261,6 +261,8 @@ struct padic_data
     // TODO more constructors? (e.g. unit, val?)
 
     ~padic_data() {padic_clear(inner);}
+
+    // TODO construct from reference
 };
 } // detail
 

@@ -1256,6 +1256,12 @@ static nmodxx nmodxx::red(mp_limb_t n, nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to the reduction of $n$.
 
+static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
+static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)
+
+    Obtain a flintxx reference object pointing to \code{l}, which is
+    interpreted as a limb reduced modulo \code{c}.
+
 void Nmod_target::reduce()
 
     Reduce the stored limb.
