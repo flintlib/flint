@@ -77,6 +77,9 @@ void flint_cleanup();
 #define FLINT_TLS_PREFIX
 #endif
 
+int flint_get_num_threads(void);
+void flint_set_num_threads(int num_threads);
+
 int flint_test_multiplier(void);
 
 typedef struct
