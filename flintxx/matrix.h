@@ -265,7 +265,7 @@ struct generic_traits_srcref : generic_traits<Mat>
         template<class M>
         static Srcref get(const M& m, T i, U j)
         {
-            return Srcref::make(mdetail::immediate_traits<M>::at(m, i, j));
+            return mdetail::immediate_traits<M>::at(m, i, j);
         }
     };
 };
@@ -282,11 +282,19 @@ struct generic_traits_ref : generic_traits_srcref<Mat, Srcref>
         template<class M>
         static Ref get(M& m, T i, U j)
         {
-            return Ref::make(mdetail::immediate_traits<M>::at(m, i, j));
+            return mdetail::immediate_traits<M>::at(m, i, j);
         }
     };
 };
 } // matrices
+
+// immediate functions
+template<class Mat>
+inline typename mp::enable_if<traits::is_mat<Mat>, slong>::type
+rank(const Mat& m)
+{
+    return m.rank();
+}
 } // flint
 
 // Define rows(), cols(), create_temporary() and at() methods.
@@ -305,11 +313,16 @@ slong rows() const {return Traits::rows(*this);} \
 slong cols() const {return Traits::cols(*this);} \
 evaluated_t create_temporary() const \
 { \
-    return create_temporary_rowscols(rows(), cols()); \
+    return create_temporary_rowscols(*this, rows(), cols()); \
 }
 
 // Disable temporary merging. Requires create_temporary_rowscols.
+// TODO do we really need the ltuple code everywhere?
 #define FLINTXX_DEFINE_TEMPORARY_RULES(Matrix) \
+namespace traits { \
+template<> struct use_temporary_merging<Matrix> : mp::false_ { }; \
+} /* traits */ \
+namespace rules { \
 template<class Expr> \
 struct use_default_temporary_instantiation<Expr, Matrix> : mp::false_ { }; \
 template<class Expr> \
@@ -321,7 +334,7 @@ struct instantiate_temporaries<Expr, Matrix, \
     static Matrix get(const Expr& e) \
     { \
         typedef typename Expr::operation_t op_t; \
-        return Matrix::create_temporary_rowscols( \
+        return Matrix::create_temporary_rowscols(e, \
                 matrices::outsize<op_t>::rows(e), \
                 matrices::outsize<op_t>::cols(e)); \
     } \
@@ -334,6 +347,7 @@ struct instantiate_temporaries<Expr, Matrix, \
     { \
         return e.create_temporary(); \
     } \
-};
+}; \
+} /* rules */
 
 #endif

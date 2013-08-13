@@ -1094,6 +1094,9 @@ struct ternary_hhelper<T, Left, right1_t, right2_t, false, false>
     }
 };
 } // tdetail
+
+template<class T>
+struct is_bool : mp::equal_types<T, bool> { };
 } // tools
 } // flint
 

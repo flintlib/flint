@@ -1221,7 +1221,9 @@ Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
     \code{nmodxx_ctx_srcref}.
 
     The most common ways to construct \code{nmodxx} are using the static member
-    functions \code{nmodxx::red} and \code{nmodxx::make_nored}.
+    functions \code{nmodxx::red} and \code{nmodxx::make_nored}. For
+    convenience, \code{operator%} is overloaded with right hand side
+    \code{nmodxx_ctx} (or \code{nmodxx_ctx_srcref}) to call \code{nmodxx::red}.
 
     Just like when \code{mp_limb_t} is passed to \code{nmod_t} operations, the
     limb stored in \code{nmodxx} is assumed to be reduced, and under this
@@ -1267,6 +1269,10 @@ static nmodxx nmodxx::red(Fmpz_expr n, nmodxx_ctx_srcref ctx)
 static nmodxx nmodxx::red(Fmpq_expr n, nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to the reduction of $n$.
+
+nmodxx operator%(?? n, nmodxx_ctx_srcref ctx)
+
+    This has the same effect as \code{nmodxx::red(n, ctx)}.
 
 static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
 static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)

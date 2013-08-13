@@ -197,6 +197,10 @@ public:
     expression(const T& t, const U& u)
         : data(t, u) {}
 
+    template<class T, class U, class V>
+    expression(const T& t, const U& u, const V& v)
+        : data(t, u, v) {}
+
     expression() : data(get_data()) {}
 
     expression& operator=(const expression& o)

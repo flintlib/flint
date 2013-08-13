@@ -396,6 +396,21 @@ FLINT_DEFINE_BINARY_EXPR_COND2(plus, nmod_vecxx,
 
 // TODO more
 } // rules
+
+template<class T>
+typename mp::enable_if<traits::is_integer<T>, nmodxx>::type operator%(
+        T t, nmodxx_ctx_srcref ctx)
+{
+    return nmodxx::red(t, ctx);
+}
+nmodxx operator%(fmpzxx_srcref t, nmodxx_ctx_srcref ctx)
+{
+    return nmodxx::red(t, ctx);
+}
+nmodxx operator%(fmpqxx_srcref t, nmodxx_ctx_srcref ctx)
+{
+    return nmodxx::red(t, ctx);
+}
 } // flint
 
 #endif

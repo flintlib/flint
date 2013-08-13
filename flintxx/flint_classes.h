@@ -358,9 +358,11 @@ public:                                                                       \
             typename mp::enable_if<doimplicit<T> >::type* = 0)                \
         : base_t(t) {}                                                        \
     template<class T, class U>                                                \
-    name(const T& t, const U& u) : base_t(t, u) {}
+    name(const T& t, const U& u) : base_t(t, u) {}                            \
+    template<class T, class U, class V>                                       \
+    name(const T& t, const U& u, const V& v) : base_t(t, u, v) {}
 
-#define FLINTXX_DEFINE_C_REF(name, ctype, accessname)                          \
+#define FLINTXX_DEFINE_C_REF(name, ctype, accessname)                         \
 public:                                                                       \
     typedef ctype c_base_t;                                                   \
     typedef flint_classes::maybe_data_ref<name> wrapped_traits;               \

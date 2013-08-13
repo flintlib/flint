@@ -26,12 +26,11 @@
 #ifndef FMPZ_MATXX_H
 #define FMPZ_MATXX_H FMPZ_MATXX_H
 
-#include <algorithm> // max
-
 #include "fmpz_mat.h"
 
 #include "fmpzxx.h"
 #include "fmpz_polyxx.h"
+
 #include "flintxx/ltuple.h"
 #include "flintxx/matrix.h"
 
@@ -75,7 +74,9 @@ public:
     FLINTXX_DEFINE_CTORS(fmpz_matxx_expression)
     FLINTXX_DEFINE_C_REF(fmpz_matxx_expression, fmpz_mat_struct, _mat)
 
-    static evaluated_t create_temporary_rowscols(slong rows, slong cols)
+    template<class Expr>
+    static evaluated_t create_temporary_rowscols(
+            const Expr&, slong rows, slong cols)
     {
         return evaluated_t(rows, cols);
     }
@@ -171,13 +172,13 @@ struct matrix_traits<fmpz_matxx>
         return fmpz_mat_ncols(m._mat());
     }
 
-    template<class M> static const fmpz* at(const M& m, slong i, slong j)
+    template<class M> static fmpzxx_srcref at(const M& m, slong i, slong j)
     {
-        return fmpz_mat_entry(m._mat(), i, j);
+        return fmpzxx_srcref::make(fmpz_mat_entry(m._mat(), i, j));
     }
-    template<class M> static fmpz* at(M& m, slong i, slong j)
+    template<class M> static fmpzxx_ref at(M& m, slong i, slong j)
     {
-        return fmpz_mat_entry(m._mat(), i, j);
+        return fmpzxx_ref::make(fmpz_mat_entry(m._mat(), i, j));
     }
 };
 
@@ -217,8 +218,6 @@ struct fmpz_mat_data
 #define FMPZ_MATXX_COND_T FLINTXX_COND_T(fmpz_matxx)
 
 namespace traits {
-template<> struct use_temporary_merging<fmpz_matxx> : mp::false_ { };
-
 template<class T> struct is_fmpz_matxx
     : flint_classes::is_Base<fmpz_matxx, T> { };
 } // traits
@@ -247,12 +246,10 @@ template<> struct outsize<operations::mat_solve_dixon_op>
     : outsize<operations::mat_solve_op> { };
 } // matrices
 
-namespace rules {
 // temporary instantiation stuff
 FLINTXX_DEFINE_TEMPORARY_RULES(fmpz_matxx)
 
-// ordinary rules
-
+namespace rules {
 FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_MATXX_COND_T, FMPZ_MATXX_COND_S,
         fmpz_mat_set(to._mat(), from._mat()))
 
@@ -307,18 +304,14 @@ FMPZ_MATXX_DEFINE_DET(det_bareiss)
 FMPZ_MATXX_DEFINE_DET(det_divisor)
 FMPZ_MATXX_DEFINE_DET(det_bound)
 
-namespace rdetail {
-template<class T>
-struct is_bool : mp::equal_types<T, bool> { };
-} // rdetail
 FLINT_DEFINE_BINARY_EXPR_COND2(det_modular_op, fmpzxx,
-        FMPZ_MATXX_COND_S, rdetail::is_bool,
+        FMPZ_MATXX_COND_S, tools::is_bool,
         fmpz_mat_det_modular(to._fmpz(), e1._mat(), e2))
 FLINT_DEFINE_BINARY_EXPR_COND2(det_modular_accelerated_op, fmpzxx,
-        FMPZ_MATXX_COND_S, rdetail::is_bool,
+        FMPZ_MATXX_COND_S, tools::is_bool,
         fmpz_mat_det_modular_accelerated(to._fmpz(), e1._mat(), e2))
 FLINT_DEFINE_THREEARY_EXPR_COND3(det_modular_given_divisor_op, fmpzxx,
-        FMPZ_MATXX_COND_S, FMPZXX_COND_S, rdetail::is_bool,
+        FMPZ_MATXX_COND_S, FMPZXX_COND_S, tools::is_bool,
         fmpz_mat_det_modular_given_divisor(to._fmpz(), e1._mat(), e2._fmpz(), e3))
 
 FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, fmpzxx,
@@ -378,14 +371,6 @@ FLINT_DEFINE_UNARY_EXPR_COND(nullspace_op, rdetail::fmpz_mat_nullspace_rt,
             to.template get<1>()._mat(), from._mat()))
 
 } // rules
-
-// immediate functions
-template<class Mat>
-inline typename mp::enable_if<traits::is_fmpz_matxx<Mat>, slong>::type
-rank(const Mat& m)
-{
-    return m.rank();
-}
 } // flint
 
 #endif
