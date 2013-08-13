@@ -197,7 +197,19 @@ test_functions()
 void
 test_extras()
 {
-    // TODO
+    fmpz_matxx A(10, 10), B(10, 10);
+    frandxx rand;
+    A.set_randtest(rand, 15);
+    B.set_randtest(rand, 15);
+    A.at(0, 0) = B.at(0, 0) + 1u;
+
+    fmpz_matxx_srcref Asr(A);
+    fmpz_matxx_ref Br(B);
+
+    tassert((A + A) + (B + B) == (Asr + Asr) + (Br + Br));
+
+    Br = Asr;
+    tassert(A == B);
 }
 
 void

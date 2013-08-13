@@ -33,6 +33,7 @@
 #include "fmpzxx.h"
 #include "fmpz_polyxx.h"
 #include "flintxx/ltuple.h"
+#include "flintxx/matrix.h"
 
 // TODO input and output
 // TODO modular reduction
@@ -46,53 +47,19 @@ namespace flint {
 FLINT_DEFINE_BINOP(det_modular)
 FLINT_DEFINE_BINOP(det_modular_accelerated)
 FLINT_DEFINE_BINOP(mul_multi_mod)
-FLINT_DEFINE_BINOP(mat_solve)
 FLINT_DEFINE_BINOP(mat_solve_fflu)
 FLINT_DEFINE_BINOP(mat_solve_dixon)
 FLINT_DEFINE_BINOP(mat_solve_cramer)
 FLINT_DEFINE_BINOP(mat_solve_bound)
 FLINT_DEFINE_THREEARY(det_modular_given_divisor)
-FLINT_DEFINE_THREEARY(fmpz_matxx_at)
 FLINT_DEFINE_UNOP(det_bareiss)
 FLINT_DEFINE_UNOP(det_bound)
 FLINT_DEFINE_UNOP(det_cofactor)
 FLINT_DEFINE_UNOP(det_divisor)
 
 namespace detail {
-template<class Operation>
-struct fmpz_matxx_outsize;
-
-struct fmpz_matxx_traits_generic
-{
-    template<class M>
-    static slong rows(const M& m)
-    {
-        return fmpz_matxx_outsize<typename M::operation_t>::rows(m);
-    }
-    template<class M>
-    static slong cols(const M& m)
-    {
-        return fmpz_matxx_outsize<typename M::operation_t>::cols(m);
-    }
-};
-
 template<class Mat>
-struct fmpz_matxx_traits
-    : fmpz_matxx_traits_generic
-{
-    template<class T, class U>
-    struct at
-    {
-        typedef FLINT_THREEARY_ENABLE_RETTYPE(fmpz_matxx_at, Mat, T, U)
-            entry_ref_t;
-        typedef entry_ref_t entry_srcref_t;
-
-        static entry_srcref_t get(const Mat& m, T i, U j)
-        {
-            return fmpz_matxx_at(m, i, j);
-        }
-    };
-};
+struct fmpz_matxx_traits : matrices::generic_traits<Mat> { };
 } // detail
 
 template<class Operation, class Data>
@@ -108,21 +75,11 @@ public:
     FLINTXX_DEFINE_CTORS(fmpz_matxx_expression)
     FLINTXX_DEFINE_C_REF(fmpz_matxx_expression, fmpz_mat_struct, _mat)
 
-public:
-    template<class T, class U>
-    typename traits_t::template at<T, U>::entry_ref_t at(T i, U j)
-        {return traits_t::template at<T, U>::get(*this, i, j);}
-    template<class T, class U>
-    typename traits_t::template at<T, U>::entry_ref_t at(T i, U j) const
-        {return traits_t::template at<T, U>::get(*this, i, j);}
-
-    slong rows() const {return traits_t::rows(*this);}
-    slong cols() const {return traits_t::cols(*this);}
-
-    evaluated_t create_temporary() const
+    static evaluated_t create_temporary_rowscols(slong rows, slong cols)
     {
-        return evaluated_t(rows(), cols());
+        return evaluated_t(rows, cols);
     }
+    FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
 
     // these only make sense with targets
     void set_randbits(frandxx& state, mp_bitcnt_t bits)
@@ -202,41 +159,36 @@ typedef fmpz_matxx_expression<operations::immediate,
 typedef fmpz_matxx_expression<operations::immediate, flint_classes::srcref_data<
     fmpz_matxx, fmpz_matxx_ref, fmpz_mat_struct> > fmpz_matxx_srcref;
 
+template<>
+struct matrix_traits<fmpz_matxx>
+{
+    template<class M> static slong rows(const M& m)
+    {
+        return fmpz_mat_nrows(m._mat());
+    }
+    template<class M> static slong cols(const M& m)
+    {
+        return fmpz_mat_ncols(m._mat());
+    }
+
+    template<class M> static const fmpz* at(const M& m, slong i, slong j)
+    {
+        return fmpz_mat_entry(m._mat(), i, j);
+    }
+    template<class M> static fmpz* at(M& m, slong i, slong j)
+    {
+        return fmpz_mat_entry(m._mat(), i, j);
+    }
+};
+
 namespace detail {
 template<>
 struct fmpz_matxx_traits<fmpz_matxx_srcref>
-    : fmpz_matxx_traits_generic
-{
-    template<class T, class U>
-    struct at
-    {
-        typedef fmpzxx_srcref entry_ref_t;
-        typedef fmpzxx_srcref entry_srcref_t;
+    : matrices::generic_traits_srcref<fmpz_matxx_srcref, fmpzxx_srcref> { };
 
-        template<class M>
-        static fmpzxx_srcref get(const M& m, T i, U j)
-        {
-            return fmpzxx_srcref::make(fmpz_mat_entry(m._mat(), i, j));
-        }
-    };
-};
 template<>
 struct fmpz_matxx_traits<fmpz_matxx_ref>
-    : fmpz_matxx_traits<fmpz_matxx_srcref>
-{
-    template<class T, class U>
-    struct at
-        : fmpz_matxx_traits<fmpz_matxx_srcref>::template at<T, U>
-    {
-        typedef fmpzxx_ref entry_ref_t;
-
-        template<class M>
-        static fmpzxx_ref get(M& m, T i, U j)
-        {
-            return fmpzxx_ref::make(fmpz_mat_entry(m._mat(), i, j));
-        }
-    };
-};
+    : matrices::generic_traits_ref<fmpz_matxx_ref, fmpzxx_ref, fmpzxx_srcref> { };
 template<> struct fmpz_matxx_traits<fmpz_matxx>
     : fmpz_matxx_traits<fmpz_matxx_ref> { };
 
@@ -267,9 +219,8 @@ struct fmpz_mat_data
 namespace traits {
 template<> struct use_temporary_merging<fmpz_matxx> : mp::false_ { };
 
-template<class T> struct is_fmpz_matxx : mp::or_<
-     traits::is_T_expr<T, fmpz_matxx>,
-     flint_classes::is_source<fmpz_matxx, T> > { };
+template<class T> struct is_fmpz_matxx
+    : flint_classes::is_Base<fmpz_matxx, T> { };
 } // traits
 namespace mp {
 template<class T1, class T2 = void, class T3 = void, class T4 = void>
@@ -282,166 +233,26 @@ struct enable_all_fmpz_matxx
     : mp::enable_if<all_fmpz_matxx<T1, T2, T3, T4>, Out> { };
 } // mp
 
-namespace detail {
-// TODO this does not actually have anything to do with *fmpz*_matxx
-template<class Operation>
-struct fmpz_matxx_outsize_generic
-{
-    template<class Mat>
-    static slong rows(const Mat& m)
-    {
-        return m._data().head.rows();
-    }
-    template<class Mat>
-    static slong cols(const Mat& m)
-    {
-        return m._data().head.cols();
-    }
-
-    template<class Data1, class Data2>
-    static slong rows(const fmpz_matxx_expression<
-            Operation, tuple<Data1, tuple<Data2, empty_tuple> > >& m,
-            typename mp::enable_if<traits::is_fmpz_matxx<
-                typename traits::basetype<Data2>::type> >::type* = 0)
-    {
-        return m._data().tail.head.rows();
-    }
-    template<class Data1, class Data2>
-    static slong cols(const fmpz_matxx_expression<
-            Operation, tuple<Data1, tuple<Data2, empty_tuple> > >& m,
-            typename mp::enable_if<traits::is_fmpz_matxx<
-                typename traits::basetype<Data2>::type> >::type* = 0)
-    {
-        return m._data().tail.head.cols();
-    }
-};
-template<class Operation>
-struct fmpz_matxx_outsize : fmpz_matxx_outsize_generic<Operation> { };
+namespace matrices {
 template<>
-struct fmpz_matxx_outsize<operations::immediate>
-{
-    template<class Mat>
-    static slong rows(const Mat& m)
-    {
-        return fmpz_mat_nrows(m._mat());
-    }
-    template<class Mat>
-    static slong cols(const Mat& m)
-    {
-        return fmpz_mat_ncols(m._mat());
-    }
-};
-
-template<class Mat>
-struct both_mat : mp::all_fmpz_matxx<
-    typename traits::basetype<typename Mat::data_t::head_t>::type,
-    typename traits::basetype<typename Mat::data_t::tail_t::head_t>::type> { };
+struct outsize<operations::mul_classical_op>
+    : outsize<operations::times> { };
 template<>
-struct fmpz_matxx_outsize<operations::times>
-{
-    template<class Mat>
-    static slong rows(const Mat& m,
-            typename mp::enable_if<both_mat<Mat> >::type* = 0)
-    {
-        return m._data().head.rows();
-    }
-    template<class Mat>
-    static slong cols(const Mat& m,
-            typename mp::enable_if<both_mat<Mat> >::type* = 0)
-    {
-        return m._data().tail.head.cols();
-    }
+struct outsize<operations::mul_multi_mod_op>
+    : outsize<operations::times> { };
 
-    template<class Mat>
-    static slong rows(const Mat& m,
-            typename mp::disable_if<both_mat<Mat> >::type* = 0)
-    {
-        return fmpz_matxx_outsize_generic<operations::times>::rows(m);
-    }
-    template<class Mat>
-    static slong cols(const Mat& m,
-            typename mp::disable_if<both_mat<Mat> >::type* = 0)
-    {
-        return fmpz_matxx_outsize_generic<operations::times>::cols(m);
-    }
-};
-template<>
-struct fmpz_matxx_outsize<operations::mul_classical_op>
-    : fmpz_matxx_outsize<operations::times> { };
-template<>
-struct fmpz_matxx_outsize<operations::mul_multi_mod_op>
-    : fmpz_matxx_outsize<operations::times> { };
-
-template<>
-struct fmpz_matxx_outsize<operations::transpose_op>
-{
-    template<class Mat>
-    static slong rows(const Mat& m)
-    {
-        return m._data().head.cols();
-    }
-    template<class Mat>
-    static slong cols(const Mat& m)
-    {
-        return m._data().head.rows();
-    }
-};
-
-template<>
-struct fmpz_matxx_outsize<operations::nullspace_op>
-{
-    template<class Mat>
-    static slong rows(const Mat& m)
-    {
-        return m._data().head.cols();
-    }
-    template<class Mat>
-    static slong cols(const Mat& m)
-    {
-        return m._data().head.cols();
-    }
-};
-
-template<unsigned n>
-struct fmpz_matxx_outsize<operations::ltuple_get_op<n> >
-{
-    template<class Mat>
-    static slong rows(const Mat& m)
-    {
-        return fmpz_matxx_outsize<
-            typename Mat::data_t::head_t::operation_t>::rows(m._data().head);
-    }
-    template<class Mat>
-    static slong cols(const Mat& m)
-    {
-        return fmpz_matxx_outsize<
-            typename Mat::data_t::head_t::operation_t>::cols(m._data().head);
-    }
-};
-
-// This is not actually a matrix expression, but called by the above ...
-template<>
-struct fmpz_matxx_outsize<operations::mat_solve_op>
-{
-    template<class Mat>
-    static slong rows(const Mat& m)
-    {
-        return m._data().second().rows();
-    }
-    template<class Mat>
-    static slong cols(const Mat& m)
-    {
-        return m._data().second().cols();
-    }
-};
-
-template<> struct fmpz_matxx_outsize<operations::mat_solve_cramer_op>
-    : fmpz_matxx_outsize<operations::mat_solve_op> { };
-template<> struct fmpz_matxx_outsize<operations::mat_solve_dixon_op>
-    : fmpz_matxx_outsize<operations::mat_solve_op> { };
-} // detail
+template<> struct outsize<operations::mat_solve_cramer_op>
+    : outsize<operations::mat_solve_op> { };
+template<> struct outsize<operations::mat_solve_dixon_op>
+    : outsize<operations::mat_solve_op> { };
+} // matrices
 
 namespace rules {
+// temporary instantiation stuff
+FLINTXX_DEFINE_TEMPORARY_RULES(fmpz_matxx)
+
+// ordinary rules
+
 FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_MATXX_COND_T, FMPZ_MATXX_COND_S,
         fmpz_mat_set(to._mat(), from._mat()))
 
@@ -510,7 +321,7 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(det_modular_given_divisor_op, fmpzxx,
         FMPZ_MATXX_COND_S, FMPZXX_COND_S, rdetail::is_bool,
         fmpz_mat_det_modular_given_divisor(to._fmpz(), e1._mat(), e2._fmpz(), e3))
 
-FLINT_DEFINE_THREEARY_EXPR_COND3(fmpz_matxx_at_op, fmpzxx,
+FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, fmpzxx,
         FMPZ_MATXX_COND_S, traits::fits_into_slong, traits::fits_into_slong,
         fmpz_set(to._fmpz(), fmpz_mat_entry(e1._mat(), e2, e3)))
 
@@ -566,33 +377,6 @@ FLINT_DEFINE_UNARY_EXPR_COND(nullspace_op, rdetail::fmpz_mat_nullspace_rt,
         FMPZ_MATXX_COND_S, to.template get<0>() = fmpz_mat_nullspace(
             to.template get<1>()._mat(), from._mat()))
 
-// temporary instantiation stuff
-
-template<class Expr>
-struct use_default_temporary_instantiation<Expr, fmpz_matxx> : mp::false_ { };
-template<class Expr>
-struct instantiate_temporaries<Expr, fmpz_matxx,
-    typename mp::disable_if<traits::is_fmpz_matxx<Expr> >::type>
-{
-    // The only case where this should ever happen is if Expr is an ltuple
-    // TODO static assert this
-    static fmpz_matxx get(const Expr& e)
-    {
-        typedef typename Expr::operation_t op_t;
-        return fmpz_matxx(
-                detail::fmpz_matxx_outsize<op_t>::rows(e),
-                detail::fmpz_matxx_outsize<op_t>::cols(e));
-    }
-};
-template<class Expr>
-struct instantiate_temporaries<Expr, fmpz_matxx,
-    typename mp::enable_if<traits::is_fmpz_matxx<Expr> >::type>
-{
-    static fmpz_matxx get(const Expr& e)
-    {
-        return e.create_temporary();
-    }
-};
 } // rules
 
 // immediate functions

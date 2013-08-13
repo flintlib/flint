@@ -237,6 +237,14 @@ struct can_evaluate_into<T, U,
 } // traits
 
 
+namespace flint_classes {
+// convenience helper
+template<class Base, class T> struct is_Base : mp::or_<
+     traits::is_T_expr<T, Base>,
+     is_source<Base, T> > { };
+} // flint_classes
+
+
 namespace detail {
 template<class Expr, class Enable = void>
 struct should_enable_extra_ternop : mp::false_ { };

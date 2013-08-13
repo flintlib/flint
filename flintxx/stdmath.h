@@ -120,12 +120,7 @@ FLINT_DEFINE_THREEARY(pow_trunc_binexp)
 
 FLINT_DEFINE_BINOP(compeval)
 
-// matrix functions
-FLINT_DEFINE_UNOP(transpose)
-FLINT_DEFINE_UNOP(trace)
-FLINT_DEFINE_UNOP(det)
-FLINT_DEFINE_UNOP(charpoly)
-FLINT_DEFINE_UNOP(nullspace)
+// matrix functions in flintxx/matrix.h
 
 // implementation of compeval
 namespace rules {
