@@ -41,8 +41,6 @@
 #include "flintxx/stdmath.h"
 #include "flintxx/traits.h"
 
-// TODO !! codegen
-
 // TODO exhibit this as a specialisation of a generic poly<nmodxx>
 // TODO input
 // TODO automatic mulmod, powmod etc?
@@ -178,7 +176,7 @@ public:
 
     evaluated_t create_temporary() const
     {
-        return evaluated_t(modulus());
+        return evaluated_t(estimate_ctx());
     }
 
     // These cause evaluation

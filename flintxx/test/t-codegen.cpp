@@ -57,12 +57,14 @@
 #endif
 
 #include "flintxx/test/helpers.h"
-#include "flintxx/tuple.h"
 
-#include "fmpzxx.h"
 #include "fmpz_matxx.h"
 #include "fmpz_polyxx.h"
+#include "fmpzxx.h"
+#include "nmod_polyxx.h"
 #include "nmod_vecxx.h"
+
+#include "flintxx/tuple.h"
 #include "flintxx/vector.h"
 
 // Exception class to indicate that this test cannot proceed, e.g. because
@@ -575,6 +577,54 @@ DEFINE_FUNC(test_nmodxx_2,
     tmp1 = nmod_inv(tmp1, nm);
     to = tmp1;
 }
+
+
+DEFINE_FUNC(test_nmod_polyxx_1,
+        (nmod_polyxx& to, const nmod_polyxx& p1, const nmod_polyxx& p2))
+{
+    to = (p1*p1) + (p2*p2);
+}
+
+DEFINE_FUNC(test_nmod_polyxx_2,
+        (nmod_polyxx& to, const nmod_polyxx& p1, const nmod_polyxx& p2))
+{
+    nmod_poly_t tmp1, tmp2;
+    nmod_poly_init_preinv(tmp1, p1.modulus(), p1.estimate_ctx()._nmod().ninv);
+    nmod_poly_init_preinv(tmp2, p1.modulus(), p1.estimate_ctx()._nmod().ninv);
+
+    nmod_poly_mul(tmp1, p1._poly(), p1._poly());
+    nmod_poly_mul(tmp2, p2._poly(), p2._poly());
+    nmod_poly_add(to._poly(), tmp1, tmp2);
+
+    nmod_poly_clear(tmp1);
+    nmod_poly_clear(tmp2);
+}
+
+DEFINE_FUNC(test_nmod_polyxx_3,
+        (nmod_polyxx& to, const nmod_polyxx& p1, const nmod_polyxx& p2))
+{
+    to = ((p1*p1) + (p2*p2)) + ((p1*p2) + (p2*p1));
+}
+DEFINE_FUNC(test_nmod_polyxx_4,
+        (nmod_polyxx& to, const nmod_polyxx& p1, const nmod_polyxx& p2))
+{
+    nmod_poly_t tmp1, tmp2, tmp3;
+    nmod_poly_init_preinv(tmp1, p1.modulus(), p1.estimate_ctx()._nmod().ninv);
+    nmod_poly_init_preinv(tmp2, p1.modulus(), p1.estimate_ctx()._nmod().ninv);
+    nmod_poly_init_preinv(tmp3, p1.modulus(), p1.estimate_ctx()._nmod().ninv);
+
+    nmod_poly_mul(tmp1, p1._poly(), p1._poly());
+    nmod_poly_mul(tmp2, p2._poly(), p2._poly());
+    nmod_poly_add(tmp1, tmp1, tmp2);
+    nmod_poly_mul(tmp2, p1._poly(), p2._poly());
+    nmod_poly_mul(tmp3, p2._poly(), p1._poly());
+    nmod_poly_add(tmp2, tmp2, tmp3);
+    nmod_poly_add(to._poly(), tmp1, tmp2);
+
+    nmod_poly_clear(tmp1);
+    nmod_poly_clear(tmp2);
+    nmod_poly_clear(tmp3);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -715,6 +765,17 @@ test_nmod()
     std::string ass1 = disass(program, "test_nmodxx_1");
     std::string ass2 = disass(program, "test_nmodxx_2");
     tassert(stripaddr(ass1) == stripaddr(ass2));
+
+    ass1 = disass(program, "test_nmod_polyxx_1");
+    ass2 = disass(program, "test_nmod_polyxx_2");
+    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.2));
+    tassert(count(ass1, "call") == count(ass2, "call"));
+
+    ass1 = disass(program, "test_nmod_polyxx_3");
+    ass2 = disass(program, "test_nmod_polyxx_4");
+    tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
+                count(stripnop(ass2), "\n"), 0.2));
+    tassert(count(ass1, "call") == count(ass2, "call"));
 }
 
 int
