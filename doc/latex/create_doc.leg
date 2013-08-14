@@ -17,7 +17,7 @@ function = functionheader functionfooter? EOL*
 functionheader = < funcnametype '(' funcargs ')' modifiers? ';'?
                       > whitespace? EOL {printfuncheader(yytext, yyleng);}
 
-funcnametype = !'*' (! '(' .)*
+funcnametype = !'*' ('operator()' | (! '(' .))*
 funcargs = (! ')' .)*
 modifiers = whitespace? ("const" | "(macro)")
 
