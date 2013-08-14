@@ -61,6 +61,16 @@ int gettimeofday(struct timeval * p, void * tz);
 
 typedef struct
 {
+    ulong size;
+    ulong peak;
+    ulong hwm;
+    ulong rss;
+} meminfo_t[1];
+
+void get_memory_usage(meminfo_t meminfo);
+
+typedef struct
+{
     slong cpu;
     slong wall;
 } timeit_t[1];
@@ -170,6 +180,66 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 #define DURATION_THRESHOLD 5000.0
 
 #define DURATION_TARGET 10000.0
+
+/******************************************************************************
+
+    Simple timing macros
+
+******************************************************************************/
+
+#define TIMEIT_PRINT(__timer, __reps) \
+    printf("cpu/wall(s): %g %g\n", \
+        __timer->cpu*0.001/__reps, __timer->wall*0.001 / __reps);
+
+#define TIMEIT_REPEAT(__timer, __reps) \
+    do \
+    { \
+        slong __timeit_k; \
+        __reps = 1; \
+        do \
+        { \
+            timeit_start(__timer); \
+            for (__timeit_k = 0; __timeit_k < __reps; __timeit_k++) \
+            {
+
+#define TIMEIT_END_REPEAT(__timer, __reps) \
+            } \
+            timeit_stop(__timer); \
+            __reps *= 10; \
+        } while (__timer->cpu < 100); \
+    } while (0);
+
+#define TIMEIT_START \
+    do { \
+        timeit_t __timer; slong __reps; \
+        TIMEIT_REPEAT(__timer, __reps)
+
+#define TIMEIT_STOP \
+        TIMEIT_END_REPEAT(__timer, __reps) \
+        TIMEIT_PRINT(__timer, __reps) \
+    } while (0);
+
+#define TIMEIT_ONCE_START \
+    do \
+    { \
+      timeit_t __timer; \
+      timeit_start(__timer); \
+      do { \
+
+#define TIMEIT_ONCE_STOP \
+      } while (0); \
+      timeit_stop(__timer); \
+      TIMEIT_PRINT(__timer, 1) \
+    } while (0); \
+
+#define SHOW_MEMORY_USAGE \
+    do { \
+        meminfo_t meminfo; \
+        get_memory_usage(meminfo); \
+        printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
+            meminfo->size / 1024.0, meminfo->peak / 1024.0, \
+            meminfo->rss / 1024.0, meminfo->hwm / 1024.0); \
+    } while (0);
 
 #ifdef __cplusplus
 }
