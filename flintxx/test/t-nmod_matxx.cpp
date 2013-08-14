@@ -163,13 +163,13 @@ test_functions()
     B.set_randrank(rand, 2);
     tassert(B*B.mat_solve(A) == A);
     nmod_vecxx X(2, ctx); X[0] = 1 % ctx; X[1] = 2 % ctx;
-    X = B.mat_solve_vec(X);
+    X = B.mat_solve(X);
     tassert(B.at(0, 0)*X[0] + B.at(0, 1) * X[1] == 1 % ctx);
     tassert(B.at(1, 0)*X[0] + B.at(1, 1) * X[1] == 2 % ctx);
 
     B.set_randrank(rand, 1);
     assert_exception(B.mat_solve(A).evaluate());
-    assert_exception(B.mat_solve_vec(X).evaluate());
+    assert_exception(B.mat_solve(X).evaluate());
 
     slong nullity;nmod_matxx C(3, 3, M);
     tassert(nullspace(A).get<1>().rows() == 3);

@@ -1369,9 +1369,9 @@ Nmod_poly_expr Nmod_poly_expr::deflate(T:is_unsigned_integer) const
 
     \code{See poly_deflate}.
 
-Nmod_poly_expr::threeary operation(??, ??) const
+Nmod_poly_expr::ternary operation(??, ??) const
 
-    The following threeary functions are made available as member functions:
+    The following ternary functions are made available as member functions:
     \code{compose_mod}, \code{compose_mod_horner},
     \code{compose_series_brent_kung}, \code{compose_series},
     \code{compose_series_brent_kung}, \code{compose_series_divconquer},
@@ -1694,6 +1694,180 @@ Nmod_poly_expr inflate(Nmod_poly_expr, T:is_unsigned_integer)
 Nmod_poly_expr deflate(Nmod_poly_expr, T:is_unsigned_integer)
 
 ulong Nmod_poly_expr::deflation() const
+
+
+
+*******************************************************************************
+
+    nmod\_matxx
+
+    The class \code{nmod_matxx} wraps \code{nmod_mat_t}. Like \code{nmodxx},
+    instances of \code{nmod_matxx} always have an associated \code{nmodxx_ctx}
+    storing the operating modulus. No expression must involve more than one
+    modulus at a time.
+
+    Like \code{fmpz_matxx}, many operations on \code{nmod_matxx} do not support
+    aliasing. The details can be found in the documentation of
+    \code{nmod_mat_t}. Since \code{nmot_matxx} does not use temporary merging,
+    evaluation of subexpressions never creates new aliases.
+
+*******************************************************************************
+
+nmodxx_ctx_srcref Nmod_mat_expr::estimate_ctx() const
+
+    Obtain the relevant context. This never causes evaluation.
+
+Nmod_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{inv}, \code{transpose}, \code{trace}, \code{det}.
+
+Nmod_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{mat_solve}, \code{mul_classical}, \code{mul_strassen}.
+
+Nmod_mat_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{mat_solve_tril}, \code{mat_solve_tril_recursive},
+    \code{mat_solve_tril_classical}, \code{mat_solve_triu},
+    \code{mat_solve_triu_recursive}, \code{mat_solve_triu_classical}.
+
+Nmod_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - *} are overloaded when provided by
+    \code{nmod_mat_t}.
+
+Nmod_mat_expr operator-(Nmod_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+nmod_matxx::nmod_matxx(slong m, slong n, mp_limb_t modulus)
+
+    See \code{nmod_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Nmod_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
+slong Nmod_mat_expr::rows() const
+slong Nmod_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
+bool Nmod_mat_expr::is_zero() const
+bool Nmod_mat_expr::is_empty() const
+bool Nmod_mat_expr::is_square() const
+mp_limb_t Nmod_mat_expr::modulus() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_mat_target::set_randtest(frandxx&)
+void Nmod_mat_target::set_randfull(frandxx&)
+void Nmod_mat_target::set_randrank(frandxx&, slong rank)
+void Nmod_mat_target::set_randtril(frandxx&, bool unit)
+void Nmod_mat_target::set_randtriu(frandxx&, bool unit)
+
+    See \code{nmod_mat_randtest} etc.
+
+int Nmod_mat_target::set_randpermdiag(frandxx&, const Vec& v)
+
+    \code{M.set_randpermdiag(Rand, V)} has the same effect as
+    \code{nmod_mat_randpermdiag(m, rand, V._array(), V.size())}, where \code{m}
+    and \code{rand} are the underlying C structs corresponding to \code{M} and
+    \code{Rand}.
+
+    One possibility for Vec is \code{nmod_vecxx}.
+
+void Nmod_target::apply_randops(frandxx&, slong count)
+
+    See \code{nmod_mat_randops}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr transpose(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Matrix multiplication
+
+    The overloaded \code{operator*} can be used for both matrix-matrix and
+    matrix-scalar multiplication. Finer control can be obtained with the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr mul_classical(Nmod_mat_expr, Nmod_mat_expr)
+Nmod_mat_expr mul_strassen(Nmod_mat_expr, Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_expr trace(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant and rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_expr det(Nmod_mat_expr)
+slong rank(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr inv(Nmod_mat_expr A)
+
+    Compute the inverse of the square matrix $A$. Raises \code{flint_exception}
+    if $A$ is singular. The modulus is required to be prime.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Triangular solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr mat_solve_triu(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr mat_solve_triu_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr mat_solve_triu_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr mat_solve_tril(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr mat_solve_tril_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr mat_solve_tril_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Non-singular square solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr mat_solve(Nmod_mat_expr B, Nmod_mat_expr X)
+Nmod_vec_expr mat_solve(Nmod_mat_expr B, Nmod_vec_expr X)
+
+    See \code{nmod_mat_solve} and \code{nmod_mat_solve_vec}.
+    Raises \code{flint_exception} if $B$ is singular.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Reduced row echelon form
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_mat_target::set_rref()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, nmod_matxx>_expr nullspace(Nmod_mat_expr)
+
 
 
 
