@@ -147,6 +147,8 @@ public:
         return res;
     }
 
+    FLINTXX_DEFINE_FORWARD_STATIC(from_ground)
+
     // these only make sense with immediates
     void realloc(slong alloc) {nmod_poly_realloc(_poly(), alloc);}
     void fit_length(slong len) {nmod_poly_fit_length(_poly(), len);}
@@ -329,6 +331,15 @@ struct nmod_poly_data
                 r._poly()->mod.ninv, r.length());
         nmod_poly_set(inner, r._poly());
     }
+
+    template<class Nmod>
+    static nmod_poly_data from_ground(const Nmod& x,
+            typename mp::enable_if<traits::is_nmodxx<Nmod> >::type* = 0)
+    {
+        nmod_poly_data res(x.estimate_ctx());
+        nmod_poly_set_coeff_ui(res.inner, 0, x.template to<mp_limb_t>());
+        return res;
+    }
 };
 } // detail
 namespace traits {
@@ -346,6 +357,8 @@ nmod_polyxx_expression<Operation, Data>::estimate_ctx() const
 namespace rules {
 #define NMOD_POLYXX_COND_S FLINTXX_COND_S(nmod_polyxx)
 #define NMOD_POLYXX_COND_T FLINTXX_COND_T(nmod_polyxx)
+
+NMODXX_DEFINE_INSTANTIATE_TEMPORARIES(nmod_polyxx)
 
 FLINT_DEFINE_DOIT_COND2(assignment, NMOD_POLYXX_COND_T, NMOD_POLYXX_COND_S,
         nmod_poly_set(to._poly(), from._poly()))

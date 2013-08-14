@@ -397,6 +397,18 @@ public:                                                                       \
         return name(Data::make(f, u));                                        \
     }
 
+#define FLINTXX_DEFINE_FORWARD_STATIC(name)                                   \
+    template<class T>                                                         \
+    static typename base_t::derived_t name(const T& f)                        \
+    {                                                                         \
+        return typename base_t::derived_t(Data::name(f));                     \
+    }                                                                         \
+    template<class T, class U>                                                \
+    static typename base_t::derived_t name(const T& f, const U& u)            \
+    {                                                                         \
+        return typename base_t::derived_t(Data::name(f, u));                  \
+    }
+
 #define FLINTXX_COND_S(Base) flint_classes::is_source_base<Base>::template type
 #define FLINTXX_COND_T(Base) flint_classes::is_target_base<Base>::template type
 

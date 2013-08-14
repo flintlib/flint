@@ -47,7 +47,6 @@ namespace flint {
 FLINT_DEFINE_BINOP(det_modular)
 FLINT_DEFINE_BINOP(det_modular_accelerated)
 FLINT_DEFINE_BINOP(mul_multi_mod)
-FLINT_DEFINE_BINOP(mat_solve_fflu)
 FLINT_DEFINE_BINOP(mat_solve_dixon)
 FLINT_DEFINE_BINOP(mat_solve_cramer)
 FLINT_DEFINE_BINOP(mat_solve_bound)
@@ -138,7 +137,6 @@ public:
     FLINTXX_DEFINE_MEMBER_3OP(det_modular_given_divisor)
 
     FLINTXX_DEFINE_MEMBER_UNOP(sqr)
-    FLINTXX_DEFINE_MEMBER_UNOP(inv)
     FLINTXX_DEFINE_MEMBER_UNOP(transpose)
 
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpz_polyxx, charpoly)
@@ -149,6 +147,7 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, det_divisor)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, trace)
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nullspace) // TODO
+    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, inv) // TODO
 };
 
 namespace detail {

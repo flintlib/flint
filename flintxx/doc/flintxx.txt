@@ -408,7 +408,7 @@ slong Fmpz_mat_expr::rank() const
 Fmpz_mat_expr::unary operation() const
 
     The following unary functions are made available as member functions:
-    \code{sqr}, \code{inv}, \code{nullspace}, \code{charpoly}, \code{det},
+    \code{sqr}, \code{charpoly}, \code{det},
     \code{det_bareiss}, \code{det_bound}, \code{det_cofactor},
     \code{det_divisor}, \code{trace}, \code{transpose}.
 
@@ -1415,6 +1415,11 @@ nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
 
     Instantiate \code{nmod_polyxx} relative to some modulus. If the second
     argument is provided, space is allocated for \code{alloc} coefficients.
+
+static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
+
+    Consider $e \in \mathbb{Z}/n\mathbb{Z}$ as an element of
+    $\mathbb{Z}/n\mathbb{Z}[X]$.
 
 void Nmod_poly_target realloc(slong alloc)
 void Nmod_poly_target::fit_length(slong len)

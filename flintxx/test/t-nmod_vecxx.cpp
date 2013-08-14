@@ -26,6 +26,7 @@
 #include <iostream>
 
 #include "nmod_vecxx.h"
+#include "flintxx/ltuple.h"
 #include "flintxx/test/helpers.h"
 
 using namespace flint;
@@ -127,6 +128,22 @@ test_vec()
     tassert(v1 + v2 == v1);
 }
 
+namespace flint {
+typedef make_ltuple<mp::make_tuple<nmodxx>::type>::type ltup_t;
+FLINT_DEFINE_UNOP(make_lazy_test)
+namespace rules {
+FLINT_DEFINE_UNARY_EXPR_COND(make_lazy_test_op, ltup_t, NMOD_VECXX_COND_S,
+        to.template get<0>() = from[0])
+}
+}
+void
+test_temporaries()
+{
+    nmodxx_ctx ctx(17);
+    nmod_vecxx v(1, ctx);v[0] = nmodxx::red(7, ctx);
+    tassert(make_lazy_test(v).get<0>() == v[0]);
+}
+
 int
 main()
 {
@@ -137,6 +154,7 @@ main()
     test_arithmetic();
     test_references();
     test_vec();
+    test_temporaries();
 
     std::cout << "PASS" << std::endl;
     return 0;

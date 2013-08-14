@@ -36,6 +36,7 @@
 
 namespace flint {
 FLINT_DEFINE_BINOP(mat_solve)
+FLINT_DEFINE_BINOP(mat_solve_fflu)
 FLINT_DEFINE_THREEARY(mat_at)
 FLINT_DEFINE_UNOP(transpose)
 FLINT_DEFINE_UNOP(trace)
@@ -222,6 +223,8 @@ struct outsize<operations::mat_solve_op>
         return m._data().second().cols();
     }
 };
+template<> struct outsize<operations::mat_solve_fflu_op>
+    : outsize<operations::mat_solve_op> { };
 
 namespace mdetail {
 struct base_traits

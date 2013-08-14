@@ -41,6 +41,11 @@ test_init()
     nmod_polyxx p(10);
     tassert(p.length() == 0);
     tassert(p.modulus() == 10);
+
+    nmodxx_ctx_srcref ctx = p.estimate_ctx();
+    tassert(p == nmod_polyxx::from_ground(0 % ctx));
+    p.set_coeff(0, 1);
+    tassert(p == nmod_polyxx::from_ground((1 % ctx) + (0 % ctx)));
 }
 
 void

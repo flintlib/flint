@@ -53,9 +53,7 @@
 
 namespace flint {
 // function "declarations"
-FLINT_DEFINE_UNOP(sqr_classical)
 FLINT_DEFINE_UNOP(sqr_karatsuba)
-FLINT_DEFINE_UNOP(sqr_KS)
 FLINT_DEFINE_UNOP(sqrt_classical)
 
 FLINT_DEFINE_BINOP(evaluate_divconquer)

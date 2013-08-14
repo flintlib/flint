@@ -282,6 +282,22 @@ namespace rules {
 #define NMODXX_COND_S FLINTXX_COND_S(nmodxx)
 #define NMODXX_COND_T FLINTXX_COND_T(nmodxx)
 
+#define NMODXX_DEFINE_INSTANTIATE_TEMPORARIES(Classname) \
+template<class Expr> \
+struct use_default_temporary_instantiation<Expr, Classname> : mp::false_ { }; \
+template<class Expr> \
+struct instantiate_temporaries<Expr, Classname> \
+{ \
+    static Classname get(const Expr& e) \
+    { \
+        return Classname(tools::find_nmodxx_ctx(e)); \
+    } \
+};
+
+// This is in order to make temporary allocation work even if there is no
+// immediate subexpression - c/f test_temporaries
+NMODXX_DEFINE_INSTANTIATE_TEMPORARIES(nmodxx)
+
 FLINTXX_DEFINE_EQUALS(nmodxx, e1._limb() == e2._limb())
 
 FLINT_DEFINE_GET_COND(conversion, mp_limb_t, NMODXX_COND_S, from._limb())
