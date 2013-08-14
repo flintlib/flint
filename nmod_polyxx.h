@@ -296,9 +296,6 @@ typedef nmod_polyxx_expression<operations::immediate,
                 nmod_polyxx, nmod_polyxx_ref, nmod_poly_struct> >
            nmod_polyxx_srcref;
 
-#define NMOD_POLYXX_COND_S FLINTXX_COND_S(nmod_polyxx)
-#define NMOD_POLYXX_COND_T FLINTXX_COND_T(nmod_polyxx)
-
 namespace detail {
 struct nmod_poly_data
 {
