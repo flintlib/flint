@@ -15,11 +15,13 @@ sectiontitle = "    " < linecontent > EOL     {
 subsectiontitle = "    " < linecontent > EOL     {
     fprintf(out, "\\subsection{%.*s}\n", yyleng, yytext);}
 
-
-function = functionheader functionfooter?
+function = (macroheader|functionheader) functionfooter? EOL*
 
 functionheader = < funcnametype '(' funcargs ')' modifiers? ';'?
                       > whitespace? EOL {printfuncheader(yytext, yyleng);}
+
+macroheader = < 'macro' whitespace linecontent > EOL    {
+    printfuncheader(yytext, yyleng);}
 
 funcnametype = !('*'|'+') ('operator()' | (! '(' .))*
 funcargs = (! ')' .)*
