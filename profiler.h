@@ -59,7 +59,7 @@ int gettimeofday(struct timeval * p, void * tz);
  extern "C" {
 #endif
 
-typedef struct
+typedef struct  
 {
     ulong size;
     ulong peak;
@@ -196,7 +196,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
     { \
         slong __timeit_k; \
         __reps = 1; \
-        do \
+        while (1) \
         { \
             timeit_start(__timer); \
             for (__timeit_k = 0; __timeit_k < __reps; __timeit_k++) \
@@ -205,8 +205,10 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 #define TIMEIT_END_REPEAT(__timer, __reps) \
             } \
             timeit_stop(__timer); \
+            if (__timer->cpu >= 100) \
+                break; \
             __reps *= 10; \
-        } while (__timer->cpu < 100); \
+        } \
     } while (0);
 
 #define TIMEIT_START \
