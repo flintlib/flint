@@ -211,6 +211,11 @@ struct fmpz_mat_data
         fmpz_mat_init_set(inner, o.inner);
     }
 
+    fmpz_mat_data(fmpz_matxx_srcref o)
+    {
+        fmpz_mat_init_set(inner, o._data().inner);
+    }
+
     ~fmpz_mat_data() {fmpz_mat_clear(inner);}
 };
 } // detail

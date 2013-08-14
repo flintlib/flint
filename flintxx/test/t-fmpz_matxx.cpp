@@ -210,6 +210,11 @@ test_extras()
 
     Br = Asr;
     tassert(A == B);
+
+    fmpz_matxx C(Asr);
+    tassert(C == A);
+    C.at(0, 0) += 2u;
+    tassert(C != A);
 }
 
 void
