@@ -1715,7 +1715,7 @@ ulong Nmod_poly_expr::deflation() const
 
     Like \code{fmpz_matxx}, many operations on \code{nmod_matxx} do not support
     aliasing. The details can be found in the documentation of
-    \code{nmod_mat_t}. Since \code{nmot_matxx} does not use temporary merging,
+    \code{nmod_mat_t}. Since \code{nmod_matxx} does not use temporary merging,
     evaluation of subexpressions never creates new aliases.
 
 *******************************************************************************
@@ -1874,6 +1874,170 @@ void Nmod_mat_target::set_rref()
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Ltuple<slong, nmod_matxx>_expr nullspace(Nmod_mat_expr)
+
+
+
+*******************************************************************************
+
+    nmod\_poly\_matxx
+
+    The class \code{nmod_poly_matxx} wraps \code{nmod_poly_mat_t}.
+    Like \code{nmod_matxx},
+    instances of \code{nmod_poly_matxx} always have an associated
+    \code{nmodxx_ctx} storing the operating modulus.
+    No expression must involve more than one modulus at a time.
+
+    Contrary to \code{nmod_poly_mat_t}, it is \emph{not} valid to use instances
+    of \code{nmod_poly_matxx} with zero rows or columns.
+
+    Like \code{fmpz_matxx}, many operations on \code{nmod_poly_matxx} do not support
+    aliasing. The details can be found in the documentation of
+    \code{nmod_poly_mat_t}. Since \code{nmod_poly_matxx}
+    does not use temporary merging,
+    evaluation of subexpressions never creates new aliases.
+
+*******************************************************************************
+
+nmodxx_ctx_srcref Nmod_poly_mat_expr::estimate_ctx() const
+
+    Obtain the relevant context. This never causes evaluation.
+
+Nmod_poly_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{det}, \code{det_fflu}, \code{det_interpolate}, \code{trace},
+    \code{sqr}, \code{sqr_classical}, \code{sqr_interpolate}, \code{sqr_KS},
+    \code{transpose}.
+
+Nmod_poly_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{mat_solve}, \code{mat_solve_fflu}, \code{mul_classical},
+    \code{mul_interpolate}, \code{mul_KS}, \code{pow}.
+
+Nmod_mat_expr Nmod_poly_mat_expr::operator()(Nmod_expr) const
+
+    \code{operator()} is overloaded for matrix evaluation.
+
+Nmod_poly_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - *} are overloaded when provided by
+    \code{nmod_poly_mat_t}.
+
+Nmod_poly_mat_expr operator-(Nmod_poly_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
+
+    See \code{nmod_poly_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Nmod_poly_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_poly_mat_target::set_randtest(frandxx&, slong)
+void Nmod_poly_mat_target::set_randtest_sparse(frandxx&, slong, float)
+
+    See \code{nmod_poly_mat_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic comparison and properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Nmod_poly_mat_expr::rows() const
+slong Nmod_poly_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
+bool Nmod_poly_mat_expr::is_zero() const
+bool Nmod_poly_mat_expr::is_empty() const
+bool Nmod_poly_mat_expr::is_square() const
+mp_limb_t Nmod_poly_mat_expr::modulus() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Norms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Nmod_poly_mat_expr::max_length() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - *}
+    can be used for both matrix-matrix and
+    matrix-scalar multiplication, and matrix-matrix addition/subtraction.
+    Finer control can be obtained with the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_mat_expr mul_classical(Nmod_poly_mat_expr, Nmod_poly_mat_expr)
+Nmod_poly_mat_expr mul_interpolate(Nmod_poly_mat_expr, Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_mat_expr transpose(Nmod_poly_mat_expr A)
+
+    Compute the transpose of $A$.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr trace(Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant and rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr det(Nmod_poly_mat_expr)
+Nmod_poly_expr det_fflu(Nmod_poly_mat_expr)
+Nmod_poly_expr det_interpolate(Nmod_poly_mat_expr)
+slong rank(Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr inv(Nmod_poly_mat_expr A)
+
+    \code{ltupleref(worked, M, P) = inv(A)} has the same effect as
+    \code{worked = nmod_poly_mat_inv(m, p, a)}, where \code{m, p, a} are the C
+    structs underlying \code{M, P, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, nmod_poly_matxx>_expr nullspace(Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve(Nmod_poly_mat_expr,
+        Nmod_poly_mat_expr)
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu(Nmod_poly_mat_expr,
+        Nmod_poly_mat_expr)
+    \code{ltupleref(worked, M, P) = solve(A, X)} has the same effect as
+    \code{worked = nmod_poly_mat_solve(m, p, a, x)}, where \code{m, p, a, x}
+    are the C structs underlying \code{M, P, A, X}.
 
 
 
