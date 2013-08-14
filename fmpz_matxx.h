@@ -41,6 +41,7 @@
 // TODO modular gaussian elimination
 // TODO echelon form
 // TODO randtest static versions
+// TODO nullspace member
 
 namespace flint {
 FLINT_DEFINE_BINOP(det_modular)
@@ -138,7 +139,6 @@ public:
 
     FLINTXX_DEFINE_MEMBER_UNOP(sqr)
     FLINTXX_DEFINE_MEMBER_UNOP(inv)
-    FLINTXX_DEFINE_MEMBER_UNOP(nullspace)
     FLINTXX_DEFINE_MEMBER_UNOP(transpose)
 
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpz_polyxx, charpoly)
@@ -148,6 +148,7 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, det_cofactor)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, det_divisor)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, trace)
+    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nullspace) // TODO
 };
 
 namespace detail {

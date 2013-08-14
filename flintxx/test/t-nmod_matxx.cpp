@@ -160,15 +160,27 @@ test_functions()
     tassert(B.mat_solve_triu_classical(A, true) == B.mat_solve_triu(A, true));
     tassert(B.mat_solve_triu_recursive(A, true) == B.mat_solve_triu(A, true));
 
-#if 0
-    slong nullity;nmod_matxx C(3, 3);
+    B.set_randrank(rand, 2);
+    tassert(B*B.mat_solve(A) == A);
+    nmod_vecxx X(2, ctx); X[0] = 1 % ctx; X[1] = 2 % ctx;
+    X = B.mat_solve_vec(X);
+    tassert(B.at(0, 0)*X[0] + B.at(0, 1) * X[1] == 1 % ctx);
+    tassert(B.at(1, 0)*X[0] + B.at(1, 1) * X[1] == 2 % ctx);
+
+    B.set_randrank(rand, 1);
+    assert_exception(B.mat_solve(A).evaluate());
+    assert_exception(B.mat_solve_vec(X).evaluate());
+
+    slong nullity;nmod_matxx C(3, 3, M);
     tassert(nullspace(A).get<1>().rows() == 3);
     tassert(nullspace(A).get<1>().cols() == 3);
     ltupleref(nullity, C) = nullspace(A);
     tassert(nullity == 3 - rank(A));
     tassert(C.rank() == nullity);
     tassert((A*C).is_zero());
-#endif
+
+    A.set_rref();
+    tassert(A.at(1, 0) == 0 % ctx);
 }
 
 void
