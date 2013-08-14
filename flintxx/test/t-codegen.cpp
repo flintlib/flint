@@ -61,6 +61,7 @@
 #include "fmpz_matxx.h"
 #include "fmpz_polyxx.h"
 #include "fmpzxx.h"
+#include "nmod_matxx.h"
 #include "nmod_polyxx.h"
 #include "nmod_vecxx.h"
 
@@ -625,6 +626,26 @@ DEFINE_FUNC(test_nmod_polyxx_4,
     nmod_poly_clear(tmp2);
     nmod_poly_clear(tmp3);
 }
+
+DEFINE_FUNC(test_nmod_matxx_1,
+        (nmodxx& to, const nmod_matxx& A))
+{
+    to = trace(transpose(A)*A);
+}
+DEFINE_FUNC(test_nmod_matxx_2,
+        (nmodxx& to, const nmod_matxx& A))
+{
+    nmod_mat_t tmp1, tmp2;
+    nmod_mat_init(tmp1, nmod_mat_nrows(A._mat()), nmod_mat_ncols(A._mat()),
+            A.modulus());
+    nmod_mat_init(tmp2, nmod_mat_ncols(A._mat()), nmod_mat_ncols(A._mat()),
+            A.modulus());
+    nmod_mat_transpose(tmp1, A._mat());
+    nmod_mat_mul(tmp1, tmp2, A._mat());
+    nmod_mat_clear(tmp1);
+    to.set_nored(nmod_mat_trace(tmp2));
+    nmod_mat_clear(tmp2);
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -775,6 +796,12 @@ test_nmod()
     ass2 = disass(program, "test_nmod_polyxx_4");
     tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
                 count(stripnop(ass2), "\n"), 0.2));
+    tassert(count(ass1, "call") == count(ass2, "call"));
+
+    ass1 = disass(program, "test_nmod_matxx_1");
+    ass2 = disass(program, "test_nmod_matxx_2");
+    tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
+                count(stripnop(ass2), "\n"), 0.05));
     tassert(count(ass1, "call") == count(ass2, "call"));
 }
 

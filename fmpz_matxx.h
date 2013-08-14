@@ -235,9 +235,6 @@ struct enable_all_fmpz_matxx
 
 namespace matrices {
 template<>
-struct outsize<operations::mul_classical_op>
-    : outsize<operations::times> { };
-template<>
 struct outsize<operations::mul_multi_mod_op>
     : outsize<operations::times> { };
 

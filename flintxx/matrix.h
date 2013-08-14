@@ -156,6 +156,9 @@ struct outsize<operations::times>
         return outsize_generic<operations::times>::cols(m);
     }
 };
+template<>
+struct outsize<operations::mul_classical_op>
+    : outsize<operations::times> { };
 
 template<>
 struct outsize<operations::transpose_op>
