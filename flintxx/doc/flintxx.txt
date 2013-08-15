@@ -2041,6 +2041,248 @@ Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu(Nmod_poly_mat_expr,
 
 
 
+*******************************************************************************
+
+    fmpz\_mod\_polyxx
+
+*******************************************************************************
+
+Fmpz_mod_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{make_monic}, \code{sqr}.
+
+Fmpz_mod_poly_expr::binary operation() const
+
+    The following binary functions are made available as member functions:
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},
+    \code{div_divconquer}, \code{div_newton}, \code{divrem},
+    \code{divrem_basecase}, \code{divrem_divconquer},
+    \code{divrem}, \code{divrem_f},
+    \code{gcd}, \code{gcd_euclidean}, \code{gcd_euclidean_f}, \code{gcd_f},
+    \code{gcdinv}, \code{invmod}, \code{inv_series_newton},
+    \code{poly_shift_left}, \code{poly_shift_right}, \code{pow},
+    \code{rem_basecase}, \code{xgcd}, \code{xgcd_euclidean}.
+
+Fmpz_mod_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{compose_mod}, \code{compose_mod_horner},
+    \code{compose_series_brent_kung}, \code{mullow},
+    \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},
+    \code{pow_trunc_binexp}.
+
+Fmpz_mod_poly_expr Fmpz_mod_poly_expr::operator()(Fmpz_mod_poly_expr) const
+Fmpz_mod_expr Fmpz_mod_poly_expr::operator()(Fmpz_mod_expr) const
+
+    The \code{operator()} is overloaded for evaluation or composition,
+    depending on the argument.
+
+Fmpz_mod_poly_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * %} are overloaded when provided by
+    \code{nmod_poly_t}.
+
+Fmpz_mod_poly_expr operator-(Fmpz_mod_poly_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n)
+fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n, slong alloc)
+
+void Fmpz_mod_poly_target realloc(slong alloc)
+void Fmpz_mod_poly_target::fit_length(slong len)
+void Fmpz_mod_poly_target::_normalise()
+void Fmpz_mod_poly_target::truncate(slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_mod_poly_mat_target::set_randtest(frandxx&, slong)
+void Fmpz_mod_poly_mat_target::set_randtest_irreducible(frandxx&, slong)
+void Fmpz_mod_poly_mat_target::set_randtest_not_zero(frandxx&, slong)
+
+    See \code{fmpz_mod_poly_randtest}, etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Attributes
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpzxx_srcref Fmpz_mod_poly_mat_expr::modulus() const
+
+    Obtain the relevant modulus. This never causes evaluation.
+
+slong Fmpz_mod_poly_expr::length() const
+slong Fmpz_mod_poly_expr::degree() const
+
+?? Fmpz_mod_poly_expr::lead() const
+
+    Unified coefficient access for the leading coefficient.
+    The result is undefined if the length of the polynomial is zero.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment and swap
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_mod_poly_target::zero_coeffs(slong i, slong j)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_target Fmpz_mod_poly_target::operator=(T:is_unsigned_integer)
+Fmpz_mod_poly_target Fmpz_mod_poly_target::operator=(Fmpz_expr)
+Fmpz_mod_poly_target Fmpz_mod_poly_target::operator=(Fmpz_poly_expr)
+
+    See \code{fmpz_mod_poly_set_ui}, \code{fmpz_mod_poly_set_fmpz} and
+    \code{fmpz_mod_poly_set_fmpz_poly}.
+
+Fmpz_poly_expr Fmpz_mod_poly_expr::to<fmpz_polyxx>() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_mod_poly_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Fmpz_mod_poly_expr::get_coeff(slong n) const
+void Fmpz_mod_target::set_coeff(slong i, Fmpz_expr)
+void Fmpz_mod_target::set_coeff(slong i, T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr poly_shift_left(Fmpz_mod_poly_expr, T:fits_into_slong)
+Fmpz_mod_poly_expr poly_shift_right(Fmpz_mod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplication
+
+    The overloaded \code{operator*} can be used for both poly-poly and
+    poly-scalar multiplication. Finer control can be obtained using the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr mullow(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr, slong)
+Fmpz_mod_poly_expr sqr(Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr mulmod(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr pow(Fmpz_mod_poly_expr, T:is_unsigned_integer)
+Fmpz_mod_poly_expr pow_binexp(Fmpz_mod_poly_expr, T:is_unsigned_integer)
+Fmpz_mod_poly_expr pow_trunc(Fmpz_mod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Fmpz_mod_poly_expr pow_trunc_binexp(Fmpz_mod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Fmpz_mod_poly_expr powmod_binexp(Fmpz_mod_poly_expr, T:is_unsigned_integer,
+        Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr powmod_binexp(Fmpz_mod_poly_expr, Fmpz_expr,
+        Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Division
+
+    The overloaded operators \code{/ %} can be used for division and remainder.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem_basecase(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem_divconquer(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+Ltuple<fmpzxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem_f(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+
+Fmpz_mod_poly_expr div_basecase(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr rem_basecase(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr rem(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
+slong Fmpz_mod_poly_target::remove(Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series inversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr inv_series_newton(Fmpz_mod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr gcd(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr gcd_euclidean(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr xgcd(
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr xgcd_euclidean(
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr gcdinv(
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
+Ltuple<fmpzxx, fmpz_mod_polyxx>_expr gcd_f(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+Ltuple<fmpzxx, fmpz_mod_polyxx>_expr gcd_euclidean_f(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+
+Fmpz_mod_poly_expr invmod(Fmpz_mod_poly_expr f, Fmpz_mod_poly_expr g)
+
+    See \code{fmpz_mod_poly_invmod}. Raises \code{flint_exception} if $f$ and
+    $g$ are not coprime.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr derivative(Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_expr evaluate(Fmpz_mod_poly_expr, Fmpz_mod_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition
+
+    Basic composition can be achieved with the overloaded \code{operator()}.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr compose(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_horner(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_divconquer(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr compose_mod(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_mod_horner(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_mod_divconquer(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_mod_brent_kung(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+
+
+
 
 
 *******************************************************************************

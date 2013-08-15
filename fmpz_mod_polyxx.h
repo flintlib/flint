@@ -43,11 +43,12 @@
 // TODO radix conversion
 
 namespace flint {
+FLINT_DEFINE_BINOP(divrem_f)
+FLINT_DEFINE_BINOP(gcd_euclidean_f)
+FLINT_DEFINE_BINOP(gcd_f)
+
 FLINT_DEFINE_UNOP(fmpz_mod_polyxx_lead) // TODO standardise?
 FLINT_DEFINE_BINOP(fmpz_mod_polyxx_get_coeff) // TODO standardise?
-FLINT_DEFINE_BINOP(divrem_f)
-FLINT_DEFINE_BINOP(gcd_f)
-FLINT_DEFINE_BINOP(gcd_euclidean_f)
 
 namespace detail {
 template<class Poly>
@@ -132,40 +133,40 @@ class fmpz_mod_polyxx_expression
     FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, fmpz_mod_polyxx_get_coeff)
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
 
+    FLINTXX_DEFINE_MEMBER_UNOP(derivative)
+    FLINTXX_DEFINE_MEMBER_UNOP(invmod)
     FLINTXX_DEFINE_MEMBER_UNOP(make_monic)
     FLINTXX_DEFINE_MEMBER_UNOP(sqr)
-    FLINTXX_DEFINE_MEMBER_UNOP(invmod)
-    FLINTXX_DEFINE_MEMBER_UNOP(derivative)
 
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
+    FLINTXX_DEFINE_MEMBER_BINOP(div_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_basecase)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_divconquer)
+    FLINTXX_DEFINE_MEMBER_BINOP(divrem_f)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd_euclidean)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd_euclidean_f)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcd_f)
+    FLINTXX_DEFINE_MEMBER_BINOP(gcdinv)
+    FLINTXX_DEFINE_MEMBER_BINOP(invmod)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series_newton)
     FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_left)
     FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
-    FLINTXX_DEFINE_MEMBER_BINOP(divrem)
-    FLINTXX_DEFINE_MEMBER_BINOP(divrem_f)
-    FLINTXX_DEFINE_MEMBER_BINOP(divrem_basecase)
-    FLINTXX_DEFINE_MEMBER_BINOP(divrem_divconquer)
-    FLINTXX_DEFINE_MEMBER_BINOP(div_basecase)
     FLINTXX_DEFINE_MEMBER_BINOP(rem_basecase)
-    FLINTXX_DEFINE_MEMBER_BINOP(inv_series_newton)
-    FLINTXX_DEFINE_MEMBER_BINOP(gcd)
-    FLINTXX_DEFINE_MEMBER_BINOP(gcd_f)
-    FLINTXX_DEFINE_MEMBER_BINOP(gcd_euclidean)
-    FLINTXX_DEFINE_MEMBER_BINOP(gcd_euclidean_f)
     FLINTXX_DEFINE_MEMBER_BINOP(xgcd)
     FLINTXX_DEFINE_MEMBER_BINOP(xgcd_euclidean)
-    FLINTXX_DEFINE_MEMBER_BINOP(gcdinv)
-    FLINTXX_DEFINE_MEMBER_BINOP(invmod)
-    FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
-    FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
 
+    FLINTXX_DEFINE_MEMBER_3OP(compose_mod)
+    FLINTXX_DEFINE_MEMBER_3OP(compose_mod_brent_kung)
+    FLINTXX_DEFINE_MEMBER_3OP(compose_mod_horner)
     FLINTXX_DEFINE_MEMBER_3OP(mullow)
     FLINTXX_DEFINE_MEMBER_3OP(mulmod)
     FLINTXX_DEFINE_MEMBER_3OP(powmod_binexp)
     FLINTXX_DEFINE_MEMBER_3OP(pow_trunc)
     FLINTXX_DEFINE_MEMBER_3OP(pow_trunc_binexp)
-    FLINTXX_DEFINE_MEMBER_3OP(compose_mod)
-    FLINTXX_DEFINE_MEMBER_3OP(compose_mod_horner)
-    FLINTXX_DEFINE_MEMBER_3OP(compose_mod_brent_kung)
 };
 
 namespace detail {
