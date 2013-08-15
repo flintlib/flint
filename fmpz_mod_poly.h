@@ -440,12 +440,20 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
                                    const fmpz_mod_poly_t A,
                                    const fmpz_mod_poly_t B);
 
+static __inline__ 
 slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, 
                           const fmpz *A, slong lenA, 
-                          const fmpz *B, slong lenB, const fmpz_t p);
+                          const fmpz *B, slong lenB, const fmpz_t p)
+{
+    return _fmpz_mod_poly_gcd_euclidean_f(f, G, A, lenA, B, lenB, p);
+}
 
+static __inline__ 
 void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G, 
-                         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+                         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_gcd_euclidean_f(f, G, A, B);
+}
 
 slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
                                    const fmpz *A, slong lenA, 
