@@ -118,7 +118,7 @@ printfuncheader(const char* text, int len)
         else
         {
             int hasspace = text[i - 1] == ' ';
-            while(i < len-1 && text[++i] == ' ');
+            while(i < len-1 && text[++i] == ' ' || text[i] == '\t');
             if(!hasspace)
                 fprintf(out, " ");
         }
