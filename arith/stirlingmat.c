@@ -26,7 +26,8 @@
 #include "arith.h"
 
 void
-_arith_stirling_next_row(fmpz * new, fmpz * prev, slong n, slong klen, int kind)
+_arith_stirling_next_row(fmpz * new, const fmpz * prev, slong n,
+        slong klen, int kind)
 {
     slong k;
     fmpz_t t, u;
@@ -90,17 +91,20 @@ _arith_stirling_mat(fmpz ** rows, slong r, slong c, int kind)
     }
 }
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+void arith_stirling_number_1u_vec_next(fmpz * row, const fmpz * prev,
+        slong n, slong klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 0);
 }
 
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+void arith_stirling_number_1_vec_next(fmpz * row, const fmpz * prev,
+        slong n, slong klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 1);
 }
 
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+void arith_stirling_number_2_vec_next(fmpz * row, const fmpz * prev,
+        slong n, slong klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 2);
 }
