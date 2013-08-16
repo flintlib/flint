@@ -25,7 +25,8 @@
 
 #include "arith.h"
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+void arith_stirling_number_1u_vec_next(fmpz * row,
+    const fmpz * prev, slong n, slong klen)
 {
     slong k;
 
@@ -42,7 +43,8 @@ void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong k
         fmpz_zero(row + k);
 }
 
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+void arith_stirling_number_1_vec_next(fmpz * row,
+    const fmpz * prev, slong n, slong klen)
 {
     slong k;
 
@@ -59,7 +61,8 @@ void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong kl
         fmpz_zero(row + k);
 }
 
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+void arith_stirling_number_2_vec_next(fmpz * row,
+    const fmpz * prev, slong n, slong klen)
 {
     slong k;
 
@@ -114,4 +117,3 @@ arith_stirling_matrix_2(fmpz_mat_t mat)
         arith_stirling_number_2_vec_next(mat->rows[n],
             mat->rows[n - (n != 0)], n, mat->c);
 }
-
