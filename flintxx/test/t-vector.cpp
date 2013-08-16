@@ -68,6 +68,7 @@ void test(const Vec& original, const char* str = "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     tassert(u == v + v);
     tassert(v == v + w);
     tassert(x == ((v + v) + (v + v)) + ((v + v) + (v + v)));
+    tassert((v + w)[0] == v[0] + w[0]);
 
     if(!mp::equal_types<Vec, fmpz_vecxx>::val)
         tassert(!has_vector_temporaries<Vec>(

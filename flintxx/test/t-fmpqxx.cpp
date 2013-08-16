@@ -197,6 +197,18 @@ test_functions()
     tassert(a.is_zero() && b.is_one());
 }
 
+void
+test_vector()
+{
+    fmpq_vecxx v1(10), v2(10), v3(1);
+    tassert(v1 == v2);
+    tassert(v1 != v3);
+    v1[0] = fmpqxx(1, 1u);
+    tassert(v1 != v2);
+    v2[0] = v1[0];
+    tassert(v1 == v2);
+}
+
 int
 main()
 {
@@ -209,6 +221,7 @@ main()
     test_arithmetic();
     test_functions();
     test_extras();
+    test_vector();
 
     std::cout << "PASS" << std::endl;
     return 0;

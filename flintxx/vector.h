@@ -36,12 +36,26 @@
 #include "mp.h"
 
 namespace flint {
+FLINT_DEFINE_BINOP(vector_at)
+
 template<class Underlying_traits, class Operation, class Data>
 class vector_expression;
 
 namespace detail {
 template<class Traits>
 struct vector_wrapper : derived_wrapper2<vector_expression, Traits> { };
+
+template<class Idx, class Operation, class Expr, class Traits>
+struct vector_at_traits
+{
+    typedef FLINT_BINOP_ENABLE_RETTYPE(vector_at, Expr, Idx) ref_t;
+    typedef ref_t cref_t;
+    static ref_t at(const Expr& v, Idx i)
+        {return vector_at(v, i);}
+};
+template<class Idx, class Expr, class Traits>
+struct vector_at_traits<Idx, operations::immediate, Expr, Traits>
+    : Traits { };
 }
 
 template<class Underlying_traits, class Operation, class Data>
@@ -72,8 +86,21 @@ public:
         return *this;
     }
 
-    ref_t operator[](idx_t idx) {return Underlying_traits::at(*this, idx);}
-    cref_t operator[](idx_t idx) const {return Underlying_traits::at(*this, idx);}
+    template<class Idx>
+    typename detail::vector_at_traits<Idx, Operation, vector_expression,
+                 Underlying_traits>::ref_t operator[](Idx idx)
+    {
+        return detail::vector_at_traits<Idx, Operation, vector_expression,
+                 Underlying_traits>::at(*this, idx);
+    }
+    template<class Idx>
+    typename detail::vector_at_traits<Idx, Operation, vector_expression,
+                 Underlying_traits>::cref_t operator[](Idx idx) const
+    {
+        return detail::vector_at_traits<Idx, Operation, vector_expression,
+                 Underlying_traits>::at(*this, idx);
+    }
+
     idx_t size() const {return Underlying_traits::size(*this);}
 
     arrayref_t _array() {return Underlying_traits::array(*this);}
@@ -90,6 +117,18 @@ protected:
     template<class D, class O, class Da>
     friend class expression;
 };
+
+namespace vectors {
+template<class Operation>
+struct outsize
+{
+    template<class Expr>
+    static unsigned get(const Expr& e)
+    {
+        return tools::find_subexpr_T<typename Expr::evaluated_t>(e)._data().size;
+    }
+};
+}
 
 namespace detail {
 template<class T, class Ref, class Cref, class ArrayT>
@@ -133,7 +172,7 @@ struct rtfixed_size_traits
     template<class Expr>
     static unsigned size(const Expr& e)
     {
-        return tools::find_subexpr_T<typename Expr::evaluated_t>(e)._data().size;
+        return vectors::outsize<typename Expr::operation_t>::get(e);
     }
 
     template<class Expr>
@@ -229,6 +268,21 @@ struct enable_vector_rules<
     : mp::true_ { };
 
 namespace rules {
+template<class Traits, class Data, class T>
+struct binary_expression<vector_expression<Traits, operations::immediate, Data>,
+    operations::vector_at_op, T>
+{
+    typedef typename Traits::underlying_t return_t;
+    template<class V>
+    static void doit(V& to,
+            const vector_expression<Traits, operations::immediate, Data>& v,
+            T i)
+    {
+        to = Traits::at(v, i);
+    }
+};
+
+
 template<class Expr>
 struct to_string<Expr, typename mp::enable_if<mp::and_<
     enable_vector_rules<Expr>,

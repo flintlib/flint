@@ -2443,3 +2443,158 @@ Padic_expr teichmuller(Padic_expr)
 
 Fmpz_expr padic_val_fac(Fmpz_expr, Fmpz_expr)
 ulong padic_val_fac(T:is_unsigned_integer, Fmpz_expr)
+
+
+
+
+
+*******************************************************************************
+
+    arithxx
+
+    The \code{arithxx} module wraps the \code{arith} module, i.e. provides
+    functions for computing number theoretic functions.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Primorials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr primorial(T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Harmonic numbers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr harmonic_number(T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Stirling numbers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr stirling_number_1u(T:fits_into_slong, T:fits_into_slong)
+Fmpz_expr stirling_number_1(T:fits_into_slong, T:fits_into_slong)
+Fmpz_expr stirling_number_2(T:fits_into_slong, T:fits_into_slong)
+
+Fmpz_vec_expr stirling_number_1u_vec(T:fits_into_slong, T:fits_into_slong)
+Fmpz_vec_expr stirling_number_1_vec(T:fits_into_slong, T:fits_into_slong)
+Fmpz_vec_expr stirling_number_2_vec(T:fits_into_slong, T:fits_into_slong)
+
+Fmpz_vec_expr stirling_number_1u_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
+Fmpz_vec_expr stirling_number_1_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
+Fmpz_vec_expr stirling_number_2_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
+
+    Given the vector $v$ of length $k$, compute the next vector of Stirling
+    numbers. The size of the new vector is $k + 1$ if $k = n$, and else $k$.
+
+    See \code{arith_stirling_number_1u_vec_next} etc.
+
+Fmpz_mat_expr stirling_matrix_1u(T:fits_into_slong m, T:fits_into_slong)
+Fmpz_mat_expr stirling_matrix_1(T:fits_into_slong m, T:fits_into_slong)
+Fmpz_mat_expr stirling_matrix_2(T:fits_into_slong m, T:fits_into_slong)
+
+    Compute an $m \times n$ Stirling matrix.
+
+    See \code{arith_stirling_matrix_1u} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bell numbers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr bell_number(T:is_unsigned_integer)
+Fmpz_expr bell_number_bsplit(T:is_unsigned_integer)
+Fmpz_expr bell_number_multi_mod(T:is_unsigned_integer)
+Fmpz_vec_expr bell_number_vec(T:is_unsigned_integer)
+Fmpz_vec_expr bell_number_vec_recursive(T:is_unsigned_integer)
+Fmpz_vec_expr bell_number_vec_multi_mod(T:is_unsigned_integer)
+
+Nmod_expr bell_number_nmod(T:is_unsigned_integer, Nmodxx_ctx_src)
+Nmod_vec_expr bell_number_nmod_vec(T:is_unsigned_integer, Nmodxx_ctx_src)
+Nmod_vec_expr bell_number_nmod_vec_recursive(T:is_unsigned_integer,
+    Nmodxx_ctx_src)
+Nmod_vec_expr bell_number_nmod_vec_series(T:is_unsigned_integer, Nmodxx_ctx_src)
+
+double bell_number_size(ulong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bernoulli numbers and polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr bernoulli_number(T:is_unsigned_integer)
+Fmpq_vec_expr bernoulli_number_vec(T:fits_into_slong)
+Fmpz_expr bernoulli_number_denom(T:is_unsigned_integer)
+double bernoulli_number_size(ulong)
+Fmpq_poly_expr bernoulli_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Euler numbers and polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr euler_number(T:is_unsigned_integer)
+Fmpq_vec_expr euler_number_vec(T:fits_into_slong)
+double euler_number_size(ulong)
+Fmpq_poly_expr euler_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Legendre polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr legendre_polynomial(T:is_unsigned_integer)
+Fmpz_poly_expr chebyshev_t_polynomial(T:is_unsigned_integer)
+Fmpz_poly_expr chebyshev_u_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplicative functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr euler_phi(Fmpz_expr)
+int moebius_mu(Fmpz_expr)
+Fmpz_expr divisor_sigma(Fmpz_expr, ulong)
+Fmpz_poly_expr divisors(Fmpz_expr)
+Fmpz_expr ramanujan_tau(Fmpz_expr)
+Fmpz_poly_expr ramanujan_tau_series(T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Cyclotomic polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr cyclotomic_polynomial(T:is_unsigned_integer)
+Fmpz_poly_expr cos_minpoly(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Swinnerton-Dyer polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr swinnerton_dyer_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Landau's function
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_vec_expr landau_function_vec(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Dedekind sums
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr dedekind_sum_naive(Fmpz_expr, Fmpz_expr)
+Fmpz_expr dedekind_sum_coprime_large(Fmpz_expr, Fmpz_expr)
+Fmpz_expr dedekind_sum_coprime(Fmpz_expr, Fmpz_expr)
+Fmpz_expr dedekind_sum(Fmpz_expr, Fmpz_expr)
+double dedekind_sum_d(double, double)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Number of partitions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_vec_expr number_of_partitions_vec(T:fits_into_slong)
+Nmod_vec_expr number_of_partitions_nmod_vec(T:fits_into_slong)
+Fmpz_expr number_of_partitions(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Sums of squares
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr sum_of_squares(T:is_unsigned_integer, Fmpz_expr)
+Fmpz_vec_expr sum_of_squares(T:is_unsigned_integer, T:fits_into_slong)

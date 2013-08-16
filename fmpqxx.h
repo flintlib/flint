@@ -350,7 +350,6 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpqxx,
 
 } // flint
 
-#if 0
 // fmpq_vecxx
 
 #include "flintxx/vector.h"
@@ -380,13 +379,32 @@ struct fmpq_vector_data
 } // detail
 
 typedef vector_expression<
-    detail::wrapped_vector_traits<fmpqxx, long, fmpqxx_ref, fmpqxx_srcref>,
+    detail::wrapped_vector_traits<fmpqxx, long, fmpqxx_ref, fmpqxx_srcref, fmpq>,
     operations::immediate,
     detail::fmpq_vector_data> fmpq_vecxx;
 
 template<>
 struct enable_vector_rules<fmpq_vecxx> : mp::false_ { };
+
+namespace detail {
+inline bool fmpq_vec_equal(const fmpq* v1, const fmpq* v2, slong n)
+{
+    for(slong i = 0;i < n;++i)
+        if(!fmpq_equal(v1+i, v2+i))
+            return false;
+    return true;
 }
-#endif
+}
+namespace rules {
+// TODO hack to make code look like references are implemented
+template<class T> struct FMPQ_VECXX_COND_S : mp::equal_types<T, fmpq_vecxx> { };
+#define FMPQ_VECXX_COND_T FMPQ_VECXX_COND_S
+
+// TODO references
+FLINT_DEFINE_GET(equals, bool, fmpq_vecxx,
+        e1.size() == e2.size()
+        && detail::fmpq_vec_equal(e1._data().array, e2._data().array, e1.size()))
+} // rules
+} // flint
 
 #endif

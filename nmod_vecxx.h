@@ -23,7 +23,6 @@
 
 ******************************************************************************/
 
-// TODO actual nmod_vecxx class
 // TODO reference types
 // TODO addmul
 
