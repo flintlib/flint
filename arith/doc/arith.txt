@@ -86,9 +86,9 @@ void arith_stirling_number_2(fmpz_t s, slong n, slong k)
     numbers efficiently. To compute a range of numbers, the vector or 
     matrix versions should generally be used.
 
-void arith_stirling_number_1u(fmpz * row, slong n, slong klen)
-void arith_stirling_number_1(fmpz * row, slong n, slong klen)
-void arith_stirling_number_2(fmpz * row, slong n, slong klen)
+void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen)
+void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
+void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 
     Computes the row of Stirling numbers
     \code{S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)}.
