@@ -25,9 +25,6 @@
 
 #include "arith.h"
 
-void _arith_stirling_next_row(fmpz * new, fmpz * prev, slong n, 
-                                               slong klen, int kind);
-
 static __inline__ void
 _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
 {
@@ -131,12 +128,7 @@ arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 {
     slong m;
 
-    klen = FLINT_MIN(klen, n+1);
-
-    if (klen < 1)
-        return;
-
-    fmpz_one(row);
-    for (m = 1; m <= n; m++)
-        _arith_stirling_next_row(row, row, m, klen, 2);
+    for (m = 0; m <= n; m++)
+        arith_stirling_number_2_vec_next(row, row, m, klen);
 }
+

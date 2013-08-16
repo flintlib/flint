@@ -110,12 +110,10 @@ void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n,
     and stores in the row argument 
     \code{S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)}.
 
-    If \code{klen} is equal to $n+1$, the last entry in the output
-    is 1. In this case, the input vector is allowed to be one entry
-    shorter than the output length \code{klen} i.e. only the inputs
-    up to \code{S(n-1,klen-2)} are read.
-
-    It is assumed that \code{klen} is at most $n + 1$.
+    If \code{klen} is greater than \code{n}, the output ends with
+    \code{S(n,n) = 1} followed by \code{S(n,n+1) = S(n,n+2) = ... = 0}.
+    In this case, the input only needs to have length \code{n-1};
+    only the input entries up to \code{S(n-1,n-2)} are read.
 
     The \code{row} and \code{prev} arguments are permitted to be the 
     same, meaning that the row will be updated in-place.
