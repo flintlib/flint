@@ -42,8 +42,6 @@
 
 namespace flint {
 FLINT_DEFINE_UNOP(sqr_interpolate)
-FLINT_DEFINE_UNOP(det_fflu)
-FLINT_DEFINE_UNOP(det_interpolate)
 FLINT_DEFINE_BINOP(mul_interpolate)
 
 namespace detail {

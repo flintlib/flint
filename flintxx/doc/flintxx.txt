@@ -1206,6 +1206,168 @@ Fmpz_poly_q_expr pow(Fmpz_poly_q_expr, T:is_unsigned_integer)
 Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
 
 
+*******************************************************************************
+
+    fmpz\_poly\_matxx
+
+    The class \code{fmpz_poly_matxx} wraps \code{fmpz_poly_mat_t}, and so
+    represents matrices with coefficients in $\mathbb{Z}[X]$. Its usage is
+    similar to \code{fmpz_matxx} in most regards.
+
+*******************************************************************************
+
+Fmpz_poly_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{det}, \code{det_fflu}, \code{det_interpolate}, \code{trace},
+    \code{sqr}, \code{sqr_classical}, \code{sqr_KS},
+    \code{transpose}.
+
+Fmpz_poly_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{mat_solve}, \code{mat_solve_fflu}, \code{mul_classical},
+    \code{mul_interpolate}, \code{mul_KS}, \code{pow}, \code{sqrlow}.
+
+Fmpz_poly_mat_expr::three operation(??) const
+
+    The following threeary functions are made available as member functions:
+    \code{mullow}, \code{pow_trunc}.
+
+Fmpz_mat_expr Fmpz_poly_mat_expr::operator()(Fmpz_expr) const
+
+    \code{operator()} is overloaded for matrix evaluation.
+
+Fmpz_poly_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - *} are overloaded when provided by
+    \code{fmpz_poly_mat_t}.
+
+Fmpz_poly_mat_expr operator-(Fmpz_poly_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_mat_expr::rows() const
+slong Fmpz_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_poly_mat_target::set_randtest(frandxx& state, slong len, mp_bitcnt_t)
+void Fmpz_poly_mat_target::set_randtest_unsigned(frandxx& state, slong len,
+        mp_bitcnt_t)
+void Fmpz_poly_mat_target::set_randtest_sparse(frandxx& state, slong len,
+        mp_bitcnt_t, float)
+
+    See \code{fmpz_poly_mat_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic comparison and properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_mat_expr::is_zero() const
+bool Fmpz_mat_expr::is_empty() const
+bool Fmpz_mat_expr::is_square() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Norms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_poly_mat_expr::max_length() const
+slong Fmpz_poly_mat_expr::max_bits() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_mat_expr transpose(Fmpz_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    Basic arithmetic is most easily done using the overloaded operators
+    \code{+ * -}. Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr mul_classical(Fmpz_mat_expr, Fmpz_mat_expr)
+Fmpz_mat_expr mul_KS(Fmpz_mat_expr, Fmpz_mat_expr)
+Fmpz_poly_mat_expr mullow(Fmpz_poly_mat_expr, Fmpz_poly_mat_expr, slong)
+Fmpz_poly_mat_expr sqr(Fmpz_poly_mat_expr)
+Fmpz_poly_mat_expr sqr_KS(Fmpz_poly_mat_expr)
+Fmpz_poly_mat_expr sqr_classical(Fmpz_poly_mat_expr)
+Fmpz_poly_mat_expr sqrlow(Fmpz_poly_mat_expr, T:fits_into_slong n)
+
+Fmpz_poly_mat_expr pow(Fmpz_poly_mat_expr, T:is_unsigned_integer)
+Fmpz_poly_mat_expr pow_trunc(Fmpz_poly_mat_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr trace(Fmpz_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant and rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr det(Fmpz_poly_mat_expr)
+Fmpz_poly_expr det_fflu(Fmpz_poly_mat_expr)
+Fmpz_poly_expr det_interpolate(Fmpz_poly_mat_expr)
+slong rank(Fmpz_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr inv(Fmpz_poly_mat_expr)
+
+    \code{ltupleref(b, M, D) = inv(A)} has the same effect as
+    \code{b = fmpz_poly_mat_inv(m, d, a)}, where \code{m, d, a} are the underlying C
+    objects corresponding to \code{M, D, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, fmpz_poly_matxx>_expr nullspace(Fmpz_poly_mat_expr A)
+
+    \code{ltupleref(n, B) = nullspace(A)} has the same effect as
+    \code{n = fmpz_poly_mat_nullspace(b, a)}, where \code{b, a} are the underlying
+    \code{fmpz_poly_mat_t} corresponding to \code{B, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr mat_solve(
+        Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr mat_solve_fflu(
+        Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
+
+    \code{ltupleref(w, M, D) = mat_solve(B, X)} has the same effect as
+    \code{w = fmpz_poly_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
+    underlying C objects corresponding to \code{M, D, B, X}.
+    Similarly for the other functions.
+
+
 
 *******************************************************************************
 

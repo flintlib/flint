@@ -41,6 +41,8 @@ FLINT_DEFINE_THREEARY(mat_at)
 FLINT_DEFINE_UNOP(transpose)
 FLINT_DEFINE_UNOP(trace)
 FLINT_DEFINE_UNOP(det)
+FLINT_DEFINE_UNOP(det_fflu)
+FLINT_DEFINE_UNOP(det_interpolate)
 FLINT_DEFINE_UNOP(charpoly)
 FLINT_DEFINE_UNOP(nullspace)
 
@@ -290,6 +292,11 @@ struct generic_traits_ref : generic_traits_srcref<Mat, Srcref>
         {
             return mdetail::immediate_traits<M>::at(m, i, j);
         }
+        template<class M>
+        static Srcref get(const M& m, T i, U j)
+        {
+            return mdetail::immediate_traits<M>::at(m, i, j);
+        }
     };
 };
 } // matrices
@@ -312,7 +319,7 @@ template<class T, class U> \
 typename Traits::template at<T, U>::entry_ref_t at(T i, U j) \
     {return Traits::template at<T, U>::get(*this, i, j);} \
 template<class T, class U> \
-typename Traits::template at<T, U>::entry_ref_t at(T i, U j) const \
+typename Traits::template at<T, U>::entry_srcref_t at(T i, U j) const \
     {return Traits::template at<T, U>::get(*this, i, j);} \
 \
 slong rows() const {return Traits::rows(*this);} \

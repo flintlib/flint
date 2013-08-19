@@ -186,6 +186,15 @@ public:
         return fmpz_polyxx_bit_unpack_unsigned(a1, a2);
     }
 
+    template<class T>
+    static fmpz_polyxx_expression from_ground(const T& t)
+    {
+        fmpz_polyxx_expression res;
+        fmpzxx u; u = t;
+        res.set_coeff(0, u);
+        return res;
+    }
+
     // These only make sense with immediates
     void realloc(slong alloc) {fmpz_poly_realloc(_poly(), alloc);}
     void fit_length(slong len) {fmpz_poly_fit_length(_poly(), len);}
