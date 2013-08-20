@@ -577,9 +577,9 @@ Fmpz_expr Fmpz_poly_expr::bound_roots() const
 
     See \code{bound_roots}.
 
-Fmpz_expr Fmpz_poly_expr::norm() const
+Fmpz_expr Fmpz_poly_expr::twonorm() const
 
-    See \code{poly_2norm}.
+    See \code{twonorm}.
 
 Fmpz_poly_expr::binary operation(??) const
 
@@ -710,7 +710,7 @@ Fmpz_poly_expr shift_left(Fmpz_poly_expr, T:fits_into_slong)
 Fmpz_poly_expr shift_right(Fmpz_poly_expr, T:fits_into_slong)
 
 Fmpz_expr height(Fmpz_poly_expr)
-Fmpz_expr poly_2norm(Fmpz_poly_expr)
+Fmpz_expr twonorm(Fmpz_poly_expr)
 
 Fmpz_poly_expr gcd(Fmpz_poly_expr, Fmpz_poly_expr)
 Fmpz_poly_expr gcd_subresultant(Fmpz_poly_expr, Fmpz_poly_expr)

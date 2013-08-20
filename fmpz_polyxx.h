@@ -348,8 +348,8 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP(sqrt)
     FLINTXX_DEFINE_MEMBER_UNOP(sqrt_classical)
 
-    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, bound_roots, bound_roots)
-    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, norm, poly_2norm)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, bound_roots)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, twonorm)
 
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, content)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, height)
@@ -628,7 +628,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(shift_right_op, fmpz_polyxx,
 
 FLINT_DEFINE_UNARY_EXPR_COND(height_op, fmpzxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_height(to._fmpz(), from._poly()))
-FLINT_DEFINE_UNARY_EXPR_COND(poly_2norm_op, fmpzxx, FMPZ_POLYXX_COND_S,
+FLINT_DEFINE_UNARY_EXPR_COND(twonorm_op, fmpzxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_2norm(to._fmpz(), from._poly()))
 
 FMPZ_POLYXX_DEFINE_MUL(gcd)

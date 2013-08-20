@@ -229,7 +229,7 @@ test_functions()
     tassert(shift_right(shift_left(f, 5), 5) == f);
 
     tassert(height(g) == 5);
-    tassert(poly_2norm(g) == 7);
+    tassert(twonorm(g) == 7);
 
     tassert(resultant(f, g) == 1797);
     tassert(gcd(f, g).is_one());

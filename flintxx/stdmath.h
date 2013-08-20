@@ -86,7 +86,7 @@ FLINT_DEFINE_UNOP(content)
 FLINT_DEFINE_UNOP(derivative)
 FLINT_DEFINE_UNOP(integral)
 FLINT_DEFINE_UNOP(make_monic)
-FLINT_DEFINE_UNOP(poly_2norm)
+FLINT_DEFINE_UNOP(twonorm)
 FLINT_DEFINE_UNOP(bound_roots)
 FLINT_DEFINE_UNOP(primitive_part)
 
