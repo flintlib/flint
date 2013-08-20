@@ -223,7 +223,7 @@ test_randomisation()
     frandxx rand;
     fmpz_matxx A(2, 2);
     A.set_randbits(rand, 5);
-    tassert(abs(A.at(0, 0)) <= 31 && abs(A.at(0, 0) >= 16));
+    tassert(abs(A.at(0, 0)) <= 31 && abs(A.at(0, 0)) >= 16);
     A.set_randtest(rand, 5);
     tassert(abs(A.at(0, 0)) <= 31);
 

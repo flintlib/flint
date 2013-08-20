@@ -941,6 +941,129 @@ Fmpq_expr pow(Fmpq_expr, T:fits_into_slong)
 
 *******************************************************************************
 
+    fmpq\_matxx
+
+    The class \code{fmpq_matxx} wraps \code{fmpq_mat_t}.
+    Like \code{fmpz_matxx}, many operations on \code{fmpq_matxx} do not support
+    aliasing. The details can be found in the documentation of
+    \code{fmpq_mat_t}. Since \code{fmpq_matxx} does not use temporary merging,
+    evaluation of subexpressions never creates new aliases.
+
+*******************************************************************************
+
+Fmpq_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{inv}, \code{transpose}, \code{det}, \code{trace}.
+
+Fmpq_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{solve_dixon}, \code{solve_fraction_free}, \code{mul_cleared},
+    \code{mul_direct}.
+
+Fmpq_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * /} are overloaded when provided by
+    \code{fmpq_mat_t}.
+
+Fmpq_mat_expr operator-(Fmpq_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpq_matxx::fmpq_matxx(slong m, slong n)
+
+    See \code{fmpq_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Entry access
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Fmpq_mat_expr::at(slong, slong) const
+
+    Unified coefficient access to the entries of the matrix.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_mat_expr transpose(Fmpq_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpq_mat_target::set_randtest(frandxx& state, slong len, mp_bitcnt_t)
+void Fmpq_mat_target::set_randtest_unsigned(frandxx& state, slong len,
+        mp_bitcnt_t)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Special matrices
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpq_target::set_hilbert_matrix()
+
+Fmpq_mat_expr hilbert_matrix(slong m, slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_mat_expr::is_zero() const
+bool Fmpq_mat_expr::is_empty() const
+bool Fmpq_mat_expr::is_square() const
+bool Fmpq_mat_expr::is_integral() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Matrix multiplication
+
+    The overloaded \code{operator*} can be used for matrix multiplication.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr mul_direct(Fmpq_mat_expr, Fmpq_mat_expr)
+Fmpq_mat_expr mul_cleared(Fmpq_mat_expr, Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr trace(Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr det(Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nonsingular solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr solve_dixon(Fmpq_mat_expr B, Fmpq_mat_expr X)
+Fmpq_mat_expr solve_fraction_free(Fmpq_mat_expr B, Fmpq_mat_expr X)
+
+    See \code{fmpq_mat_solve_dixon} and \code{fmpq_mat_solve_fraction_free}.
+    Raises \code{flint_exception} if $B$ is singular.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr inv(Fmpq_mat_expr A)
+
+    Compute the inverse of the square matrix $A$. Raises \code{flint_exception}
+    if $A$ is singular. The modulus is required to be prime.
+
+
+
+
+*******************************************************************************
+
     fmpq\_polyxx
 
 *******************************************************************************
