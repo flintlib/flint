@@ -127,9 +127,9 @@ test_arithmetic()
     tassert(f == h.mullow_KS(g, 7));
     tassert(f == h.mullow_classical(g, 7));
 
-    f = (h*g).poly_shift_right(7);
-    tassert(f == h.mulhigh(g, 7).poly_shift_right(7));
-    tassert(f == h.mulhigh_classical(g, 7).poly_shift_right(7));
+    f = (h*g).shift_right(7);
+    tassert(f == h.mulhigh(g, 7).shift_right(7));
+    tassert(f == h.mulhigh_classical(g, 7).shift_right(7));
 
     f = h / g;
     tassert(f*g + (h % g) == h);
@@ -171,8 +171,8 @@ test_functions()
     tassert(g.is_zero());
 
     g.set_coeff(15, 1);
-    tassert(g.poly_shift_right(15).is_one());
-    tassert(g.poly_shift_right(15).poly_shift_left(15) == g);
+    tassert(g.shift_right(15).is_one());
+    tassert(g.shift_right(15).shift_left(15) == g);
 
     frandxx rand;
     g.set_randtest(rand, 15);

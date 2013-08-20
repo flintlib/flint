@@ -51,7 +51,7 @@ FLINT_DEFINE_UNOP(fmpq_polyxx_den)
 // TODO move to stdmath?
 
 // TODO move to stdmath?
-FLINT_DEFINE_BINOP(poly_rescale)
+FLINT_DEFINE_BINOP(rescale)
 
 namespace detail {
 template<class Poly>
@@ -232,15 +232,15 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(lcm)
     FLINTXX_DEFINE_MEMBER_BINOP(log_series)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
-    FLINTXX_DEFINE_MEMBER_BINOP_(rescale, poly_rescale)
+    FLINTXX_DEFINE_MEMBER_BINOP_(rescale, rescale)
     FLINTXX_DEFINE_MEMBER_BINOP(resultant)
     FLINTXX_DEFINE_MEMBER_BINOP(reverse)
     FLINTXX_DEFINE_MEMBER_BINOP(revert_series)
     FLINTXX_DEFINE_MEMBER_BINOP(revert_series_lagrange)
     FLINTXX_DEFINE_MEMBER_BINOP(revert_series_lagrange_fast)
     FLINTXX_DEFINE_MEMBER_BINOP(revert_series_newton)
-    FLINTXX_DEFINE_MEMBER_BINOP_(shift_left, poly_shift_left)
-    FLINTXX_DEFINE_MEMBER_BINOP_(shift_right, poly_shift_right)
+    FLINTXX_DEFINE_MEMBER_BINOP_(shift_left, shift_left)
+    FLINTXX_DEFINE_MEMBER_BINOP_(shift_right, shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(sinh_series)
     FLINTXX_DEFINE_MEMBER_BINOP(sin_series)
     FLINTXX_DEFINE_MEMBER_BINOP(sqrt_series)
@@ -412,10 +412,10 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpq_polyxx,
         FMPQ_POLYXX_COND_S, traits::is_unsigned_integer,
         fmpq_poly_pow(to._poly(), e1._poly(), e2))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_left_op, fmpq_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_left_op, fmpq_polyxx,
         FMPQ_POLYXX_COND_S, traits::fits_into_slong,
         fmpq_poly_shift_left(to._poly(), e1._poly(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_right_op, fmpq_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_right_op, fmpq_polyxx,
         FMPQ_POLYXX_COND_S, traits::fits_into_slong,
         fmpq_poly_shift_right(to._poly(), e1._poly(), e2))
 
@@ -482,7 +482,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(fmpq_polyxx_interpolate_op, fmpq_polyxx,
         fmpq_poly_interpolate_fmpz_vec(to._poly(), e1._data().array,
             e2._data().array, e2.size()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_rescale_op, fmpq_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(rescale_op, fmpq_polyxx,
         FMPQ_POLYXX_COND_S, FMPQXX_COND_S,
         fmpq_poly_rescale(to._poly(), e1._poly(), e2._fmpq()))
 

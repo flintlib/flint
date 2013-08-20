@@ -416,11 +416,9 @@ Fmpz_mat_expr::binary operation(??) const
 
     The following binary functions are made available as member functions:
     \code{det_modular}, \code{det_modular_accelerated}, \code{divexact},
-    \code{mul_classical}, \code{mul_multi_mod}, \code{pow}.
-
-    Additionally, the methods \code{solve}, \code{solve_bound},
-    \code{solve_cramer}, \code{solve_dixon}, \code{solve_fflu} are equivalent
-    to \code{mat_solve}, etc., respectively.
+    \code{mul_classical}, \code{mul_multi_mod}, \code{pow}, 
+    code{solve}, \code{solve_bound},
+    \code{solve_cramer}, \code{solve_dixon}, \code{solve_fflu}.
 
 Fmpz_expr Fmpz_mat_expr::det_modular_given_divisor(
         Fmpz_mat_expr, Fmpz_expr) const
@@ -468,21 +466,21 @@ Ltuple<bool, fmpz_matxx, fmpzxx>_expr inv(Fmpz_mat_expr)
 
 Fmpz_poly_expr charpoly(Fmpz_mat_expr)
 
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr mat_solve(
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve(
         Fmpz_mat_expr B, Fmpz_mat_expr X)
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr mat_solve_dixon(
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_dixon(
         Fmpz_mat_expr B, Fmpz_mat_expr X)
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr mat_solve_cramer(
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_cramer(
         Fmpz_mat_expr B, Fmpz_mat_expr X)
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr mat_solve_fflu(
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_fflu(
         Fmpz_mat_expr B, Fmpz_mat_expr X)
 
-    \code{ltupleref(w, M, D) = mat_solve(B, X)} has the same effect as
+    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
     \code{w = fmpz_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
     underlying C objects corresponding to \code{M, D, B, X}.
     Similarly for the other functions.
 
-Ltuple<fmpzxx, fmpzxx>_expr mat_solve_bound(
+Ltuple<fmpzxx, fmpzxx>_expr solve_bound(
         Fmpz_mat_expr B, Fmpz_mat_expr X)
 
 Ltuple<slong, fmpz_matxx>_expr nullspace(Fmpz_mat_expr A)
@@ -577,7 +575,7 @@ Fmpz_poly_expr::unary operation() const
 
 Fmpz_expr Fmpz_poly_expr::bound_roots() const
 
-    See \code{poly_bound_roots}.
+    See \code{bound_roots}.
 
 Fmpz_expr Fmpz_poly_expr::norm() const
 
@@ -594,7 +592,7 @@ Fmpz_poly_expr::binary operation(??) const
     \code{gcd_subresultant}, \code{inv_series}, \code{inv_series_newton},
     \code{lcm}, \code{mul_2exp}, \code{mul_classical}, \code{mul_karatsuba},
     \code{mul_KS}, \code{mulmid_classical}, \code{mul_SS},
-    \code{poly_shift_left}, \code{poly_shift_right}, \code{pow},
+    \code{shift_left}, \code{shift_right}, \code{pow},
     \code{pow_addchains}, \code{pow_binexp}, \code{pow_binomial},
     \code{pow_multinomial}, \code{pseudo_div}, \code{pseudo_divrem},
     \code{pseudo_divrem_basecase}, \code{pseudo_divrem_cohen},
@@ -609,20 +607,20 @@ Fmpz_poly_expr::binary operation(??) const
 
 Fmpz_expr Fmpz_poly_expr::bit_pack(T:fits_into_mp_bitcnt_t) const
 
-    See \code{poly_bit_pack}.
+    See \code{bit_pack}.
 
 static fmpz_polyxx fmpz_polyxx::bit_unpack(Fmpz_expr, T:fits_into_mp_bitcnt_t)
 
-    See \code{poly_bit_unpack}.
+    See \code{bit_unpack}.
 
 static fmpz_polyxx fmpz_polyxx::bit_unpack_unsigned(
         Fmpz_expr, T:fits_into_mp_bitcnt_t)
 
-    See \code{poly_bit_unpack_unsigned}.
+    See \code{bit_unpack_unsigned}.
 
 Ltuple<bool, fmpzxx_poly>_expr Fmpz_poly_expr::divides(Fmpz_poly_expr) const
 
-    See \code{poly_divides}.
+    See \code{divides}.
 
 Fmpz_poly_expr::ternary operation(??, ??) const
 
@@ -669,9 +667,9 @@ Fmpz_poly_expr tdiv(Fmpz_poly_expr, T:is_integer)
 Fmpz_poly_expr divexact(Fmpz_poly_expr, Fmpz_expr)
 Fmpz_poly_expr divexact(Fmpz_poly_expr, T:is_integer)
 
-Fmpz_expr poly_bit_pack(Fmpz_poly_expr, T:fits_into_mp_bitcnt_t)
-Fmpz_poly_expr poly_bit_unpack(Fmpz_expr, T:fits_into_mp_bitcnt_t)
-Fmpz_poly_expr poly_bit_unpack_unsigned(
+Fmpz_expr bit_pack(Fmpz_poly_expr, T:fits_into_mp_bitcnt_t)
+Fmpz_poly_expr bit_unpack(Fmpz_expr, T:fits_into_mp_bitcnt_t)
+Fmpz_poly_expr bit_unpack_unsigned(
         Fmpz_expr, traits::fits_into_mp_bitcnt_t)
 
 Fmpz_poly_expr mul_classical(Fmpz_poly_expr, Fmpz_poly_expr)
@@ -708,8 +706,8 @@ Fmpz_poly_expr pow_addchains(Fmpz_poly_expr, T:is_unsigned_integer)
 
 Fmpz_poly_expr pow_trunc(Fmpz_poly_expr, ulong e, slong n)
 
-Fmpz_poly_expr poly_shift_left(Fmpz_poly_expr, T:fits_into_slong)
-Fmpz_poly_expr poly_shift_right(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr shift_left(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr shift_right(Fmpz_poly_expr, T:fits_into_slong)
 
 Fmpz_expr height(Fmpz_poly_expr)
 Fmpz_expr poly_2norm(Fmpz_poly_expr)
@@ -772,9 +770,9 @@ Ltuple<fmpz_polyxx, ulong>_expr pseudo_rem(Fmpz_poly_expr A, Fmpz_poly_expr B)
     \code{fmpz_poly_pseudo_div(q, &d, a, b)}, where \code{q, a, b} are the
     underlying \code{fmpz_poly_t} corresponding to \code{Q, A, B}.
 
-Ltuple<bool, fmpz_polyxx>_expr poly_divides(Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<bool, fmpz_polyxx>_expr divides(Fmpz_poly_expr A, Fmpz_poly_expr B)
 
-    \code{ltupleref(d, Q) = poly_divides(A, B)} sets \code{d} to \code{true}
+    \code{ltupleref(d, Q) = divides(A, B)} sets \code{d} to \code{true}
     and \code{Q} to \code{B/A} if \code{A} divides \code{B}, and else sets
     \code{d} to \code{false}. See \code{fmpz_poly_divides}.
 
@@ -816,7 +814,7 @@ Fmpz_poly_expr sqrt_classical(Fmpz_poly_expr p)
     Compute the square root of \code{p}, provided \code{p} is a perfect square.
     Else raise \code{flint_exception}. See \code{fmpz_poly_sqrt}.
 
-Fmpz_expr poly_bound_roots(Fmpz_poly_expr p)
+Fmpz_expr bound_roots(Fmpz_poly_expr p)
 
 
 *******************************************************************************
@@ -1038,15 +1036,15 @@ Fmpq_expr::binary operation(??) const
 
 Fmpq_poly_expr Fmpq_poly_expr::rescale(Fmpq_expr) const
 
-    See \code{poly_rescale}.
+    See \code{rescale}.
 
 Fmpq_poly_expr Fmpq_poly_expr::shift_left(T:fits_into_slong) const
 
-    See \code{poly_shift_left}.
+    See \code{shift_left}.
 
 Fmpq_poly_expr Fmpq_poly_expr::shift_right(T:fits_into_slong) const
 
-    See \code{poly_shift_right}.
+    See \code{shift_right}.
 
 Fmpq_expr::ternary operation(??, ??) const
 
@@ -1085,8 +1083,8 @@ Fmpq_poly_expr mullow(Fmpq_poly_expr, Fmpq_poly_expr, slong)
 
 Fmpq_poly_expr pow(Fmpq_poly_expr, T:is_unsigned_integer)
 
-Fmpq_poly_expr poly_shift_left(Fmpq_poly_expr, T:fits_into_slong)
-Fmpq_poly_expr poly_shift_right(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr shift_left(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr shift_right(Fmpq_poly_expr, T:fits_into_slong)
 
 Fmpq_poly_expr gcd(Fmpq_poly_expr, Fmpq_poly_expr)
 Fmpq_poly_expr lcm(Fmpq_poly_expr, Fmpq_poly_expr)
@@ -1106,7 +1104,7 @@ Ltuple<fmpq_polyxx, fmpq_polyxx>_expr divrem(Fmpq_poly_expr A, Fmpq_poly_expr B)
     \code{fmpq_poly_divrem(q, r, a, b)} where \code{q, r, a, b} are the
     underlying \code{fmpq_poly_t} corresponding to \code{Q, R, A, B}.
 
-bool poly_divides(Fmpq_poly_target Q, Fmpq_poly_expr A, Fmpq_poly_expr B)
+bool divides(Fmpq_poly_target Q, Fmpq_poly_expr A, Fmpq_poly_expr B)
 
 Fmpq_poly_expr inv_series_newton(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr inv_series(Fmpq_poly_expr, T:fits_into_slong)
@@ -1123,7 +1121,7 @@ Fmpq_poly_expr compose_series_brent_kung(Fmpq_poly_expr, Fmpq_poly_expr, slong)
 Fmpq_expr evaluate(Fmpq_poly_expr, Fmpq_expr)
 Fmpq_expr evaluate(Fmpq_poly_expr, Fmpz_expr)
 
-Fmpq_poly_expr poly_rescale(Fmpq_poly_expr, Fmpq_expr)
+Fmpq_poly_expr rescale(Fmpq_poly_expr, Fmpq_expr)
 
 Fmpq_poly_expr make_monic(Fmpq_poly_expr)
 
@@ -1226,7 +1224,7 @@ Fmpz_poly_mat_expr::unary operation() const
 Fmpz_poly_mat_expr::binary operation(??) const
 
     The following binary functions are made available as member functions:
-    \code{mat_solve}, \code{mat_solve_fflu}, \code{mul_classical},
+    \code{solve}, \code{solve_fflu}, \code{mul_classical},
     \code{mul_interpolate}, \code{mul_KS}, \code{pow}, \code{sqrlow}.
 
 Fmpz_poly_mat_expr::three operation(??) const
@@ -1357,12 +1355,12 @@ Ltuple<slong, fmpz_poly_matxx>_expr nullspace(Fmpz_poly_mat_expr A)
     Solving
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr mat_solve(
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve(
         Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
-Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr mat_solve_fflu(
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu(
         Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
 
-    \code{ltupleref(w, M, D) = mat_solve(B, X)} has the same effect as
+    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
     \code{w = fmpz_poly_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
     underlying C objects corresponding to \code{M, D, B, X}.
     Similarly for the other functions.
@@ -1513,7 +1511,7 @@ Nmod_poly_expr::binary operation() const
     \code{evaluate_iter}, \code{gcd}, \code{gcd_euclidean}, \code{gcd_hgcd},
     \code{inv_series}, \code{inv_series_basecase}, \code{inv_series_newton},
     \code{invsqrt_series}, \code{mul_classical}, \code{mul_KS},
-    \code{poly_shift_left}, \code{poly_shift_right}, \code{pow},
+    \code{shift_left}, \code{shift_right}, \code{pow},
     \code{pow_binexp}, \code{rem_basecase}, \code{resultant},
     \code{resultant_euclidean}, \code{reverse}, \code{revert_series},
     \code{revert_series_lagrange}, \code{revert_series_lagrange_fast},
@@ -1527,11 +1525,11 @@ Nmod_poly_expr::binary operation() const
 
 Nmod_poly_expr Nmod_poly_expr::inflate(T:is_unsigned_integer) const
 
-    \code{See poly_inflate}.
+    \code{See inflate}.
 
 Nmod_poly_expr Nmod_poly_expr::deflate(T:is_unsigned_integer) const
 
-    \code{See poly_deflate}.
+    \code{See deflate}.
 
 Nmod_poly_expr::ternary operation(??, ??) const
 
@@ -1894,14 +1892,14 @@ Nmod_mat_expr::unary operation() const
 Nmod_mat_expr::binary operation(??) const
 
     The following binary functions are made available as member functions:
-    \code{mat_solve}, \code{mul_classical}, \code{mul_strassen}.
+    \code{solve}, \code{mul_classical}, \code{mul_strassen}.
 
 Nmod_mat_expr::ternary operation(??, ??) const
 
     The following ternary functions are made available as member functions:
-    \code{mat_solve_tril}, \code{mat_solve_tril_recursive},
-    \code{mat_solve_tril_classical}, \code{mat_solve_triu},
-    \code{mat_solve_triu_recursive}, \code{mat_solve_triu_classical}.
+    \code{solve_tril}, \code{solve_tril_recursive},
+    \code{solve_tril_classical}, \code{solve_triu},
+    \code{solve_triu_recursive}, \code{solve_triu_classical}.
 
 Nmod_mat_expr operator?(??, ??)
 
@@ -2008,19 +2006,19 @@ Nmod_mat_expr inv(Nmod_mat_expr A)
     Triangular solving
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Nmod_mat_expr mat_solve_triu(Nmod_mat_expr, Nmod_mat_expr, bool unit)
-Nmod_mat_expr mat_solve_triu_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
-Nmod_mat_expr mat_solve_triu_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
-Nmod_mat_expr mat_solve_tril(Nmod_mat_expr, Nmod_mat_expr, bool unit)
-Nmod_mat_expr mat_solve_tril_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
-Nmod_mat_expr mat_solve_tril_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_triu(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_triu_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_triu_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_tril(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_tril_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_tril_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Non-singular square solving
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Nmod_mat_expr mat_solve(Nmod_mat_expr B, Nmod_mat_expr X)
-Nmod_vec_expr mat_solve(Nmod_mat_expr B, Nmod_vec_expr X)
+Nmod_mat_expr solve(Nmod_mat_expr B, Nmod_mat_expr X)
+Nmod_vec_expr solve(Nmod_mat_expr B, Nmod_vec_expr X)
 
     See \code{nmod_mat_solve} and \code{nmod_mat_solve_vec}.
     Raises \code{flint_exception} if $B$ is singular.
@@ -2074,7 +2072,7 @@ Nmod_poly_mat_expr::unary operation() const
 Nmod_poly_mat_expr::binary operation(??) const
 
     The following binary functions are made available as member functions:
-    \code{mat_solve}, \code{mat_solve_fflu}, \code{mul_classical},
+    \code{solve}, \code{solve_fflu}, \code{mul_classical},
     \code{mul_interpolate}, \code{mul_KS}, \code{pow}.
 
 Nmod_mat_expr Nmod_poly_mat_expr::operator()(Nmod_expr) const
@@ -2223,7 +2221,7 @@ Fmpz_mod_poly_expr::binary operation() const
     \code{divrem}, \code{divrem_f},
     \code{gcd}, \code{gcd_euclidean}, \code{gcd_euclidean_f}, \code{gcd_f},
     \code{gcdinv}, \code{invmod}, \code{inv_series_newton},
-    \code{poly_shift_left}, \code{poly_shift_right}, \code{pow},
+    \code{shift_left}, \code{shift_right}, \code{pow},
     \code{rem_basecase}, \code{xgcd}, \code{xgcd_euclidean}.
 
 Fmpz_mod_poly_expr::ternary operation(??, ??) const
@@ -2324,8 +2322,8 @@ void Fmpz_mod_target::set_coeff(slong i, T:is_unsigned_integer)
     Shifting
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Fmpz_mod_poly_expr poly_shift_left(Fmpz_mod_poly_expr, T:fits_into_slong)
-Fmpz_mod_poly_expr poly_shift_right(Fmpz_mod_poly_expr, T:fits_into_slong)
+Fmpz_mod_poly_expr shift_left(Fmpz_mod_poly_expr, T:fits_into_slong)
+Fmpz_mod_poly_expr shift_right(Fmpz_mod_poly_expr, T:fits_into_slong)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Multiplication

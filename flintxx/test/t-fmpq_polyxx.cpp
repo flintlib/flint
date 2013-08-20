@@ -197,8 +197,8 @@ test_functions()
     tassert(reverse(g, 5).to_string() == "5  1 2 3 4 5");
 
     tassert(pow(f, 5u) == f*f*f*f*f);
-    tassert(poly_shift_left(f, 5) == f*pow(x, 5u));
-    tassert(f == poly_shift_right(poly_shift_left(f, 5), 5));
+    tassert(shift_left(f, 5) == f*pow(x, 5u));
+    tassert(f == shift_right(shift_left(f, 5), 5));
 
     fmpq_polyxx Q, R;
     ltupleref(Q, R) = divrem(g, f);
@@ -226,7 +226,7 @@ test_functions()
     tassert(pow(sqrt_series(g, 10), 2u) % pow(x, 7u) == g);
     tassert((pow(invsqrt_series(g, 10), 2u)*g % pow(x, 7u)).is_one());
 
-    tassert(poly_rescale(f, fmpqxx(2, 1u)).to_string() == "4  2 0 0 8");
+    tassert(rescale(f, fmpqxx(2, 1u)).to_string() == "4  2 0 0 8");
 
     fmpq_polyxx inner;inner = "3  0 -1 5";
     res = g(inner); res.truncate(10);

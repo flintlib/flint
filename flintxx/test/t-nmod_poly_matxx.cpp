@@ -187,13 +187,13 @@ test_functions()
 #endif
 
     Bp.set_randrank(rand, 1);
-    tassert(nmod_poly_matxx::from_ground(Bp).mat_solve(A).get<0>() == false);
+    tassert(nmod_poly_matxx::from_ground(Bp).solve(A).get<0>() == false);
     Bp.set_randrank(rand, 2);
     nmod_poly_matxx P(A.rows(), A.cols(), A.modulus());
-    ltupleref(worked, P, den) = nmod_poly_matxx::from_ground(Bp).mat_solve(A);
+    ltupleref(worked, P, den) = nmod_poly_matxx::from_ground(Bp).solve(A);
     tassert(worked && nmod_poly_matxx::from_ground(Bp)*P == A*den);
     B = nmod_poly_matxx::from_ground(Bp);
-    tassert(B.mat_solve(A) == B.mat_solve_fflu(A));
+    tassert(B.solve(A) == B.solve_fflu(A));
 
     Bp.set_randtest(rand);
     B = nmod_poly_matxx::from_ground(Bp);

@@ -175,13 +175,13 @@ test_functions()
     tassert(rank(A) == 2);
 
     fmpz_matxx X(2, 3);
-    ltupleref(worked, X, d) = mat_solve(B, A);
+    ltupleref(worked, X, d) = solve(B, A);
     tassert(worked == true && (B*X).divexact(d) == A);
     ltupleref(worked, X, d) = B.solve_fflu(A);
     tassert(worked == true && (B*X).divexact(d) == A);
     ltupleref(worked, X, d) = B.solve_cramer(A);
     tassert(worked == true && (B*X).divexact(d) == A);
-    tassert(mat_solve(B, A).get<1>() == X);
+    tassert(solve(B, A).get<1>() == X);
 
     slong nullity;fmpz_matxx C(3, 3);
     tassert(nullspace(A).get<1>().rows() == 3);

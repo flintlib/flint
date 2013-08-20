@@ -43,14 +43,14 @@
 // TODO nullspace member
 
 namespace flint {
-FLINT_DEFINE_BINOP(mat_solve_vec)
+FLINT_DEFINE_BINOP(solve_vec)
 FLINT_DEFINE_BINOP(mul_strassen)
-FLINT_DEFINE_THREEARY(mat_solve_tril)
-FLINT_DEFINE_THREEARY(mat_solve_tril_classical)
-FLINT_DEFINE_THREEARY(mat_solve_tril_recursive)
-FLINT_DEFINE_THREEARY(mat_solve_triu)
-FLINT_DEFINE_THREEARY(mat_solve_triu_classical)
-FLINT_DEFINE_THREEARY(mat_solve_triu_recursive)
+FLINT_DEFINE_THREEARY(solve_tril)
+FLINT_DEFINE_THREEARY(solve_tril_classical)
+FLINT_DEFINE_THREEARY(solve_tril_recursive)
+FLINT_DEFINE_THREEARY(solve_triu)
+FLINT_DEFINE_THREEARY(solve_triu_classical)
+FLINT_DEFINE_THREEARY(solve_triu_recursive)
 
 namespace detail {
 template<class Mat>
@@ -119,7 +119,7 @@ public:
     bool is_square() const {return nmod_mat_is_square(this->evaluate()._mat());}
 
     // lazy members
-    FLINTXX_DEFINE_MEMBER_BINOP(mat_solve)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_classical)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_strassen)
     FLINTXX_DEFINE_MEMBER_UNOP(inv)
@@ -127,12 +127,12 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nmodxx, trace)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nmodxx, det)
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, nullspace) // TODO
-    FLINTXX_DEFINE_MEMBER_3OP(mat_solve_tril)
-    FLINTXX_DEFINE_MEMBER_3OP(mat_solve_tril_recursive)
-    FLINTXX_DEFINE_MEMBER_3OP(mat_solve_tril_classical)
-    FLINTXX_DEFINE_MEMBER_3OP(mat_solve_triu)
-    FLINTXX_DEFINE_MEMBER_3OP(mat_solve_triu_recursive)
-    FLINTXX_DEFINE_MEMBER_3OP(mat_solve_triu_classical)
+    FLINTXX_DEFINE_MEMBER_3OP(solve_tril)
+    FLINTXX_DEFINE_MEMBER_3OP(solve_tril_recursive)
+    FLINTXX_DEFINE_MEMBER_3OP(solve_tril_classical)
+    FLINTXX_DEFINE_MEMBER_3OP(solve_triu)
+    FLINTXX_DEFINE_MEMBER_3OP(solve_triu_recursive)
+    FLINTXX_DEFINE_MEMBER_3OP(solve_triu_classical)
 };
 
 namespace detail {
@@ -217,18 +217,18 @@ template<>
 struct outsize<operations::mul_strassen_op>
     : outsize<operations::times> { };
 
-template<> struct outsize<operations::mat_solve_tril_op>
-    : outsize<operations::mat_solve_op> { };
-template<> struct outsize<operations::mat_solve_tril_classical_op>
-    : outsize<operations::mat_solve_op> { };
-template<> struct outsize<operations::mat_solve_tril_recursive_op>
-    : outsize<operations::mat_solve_op> { };
-template<> struct outsize<operations::mat_solve_triu_op>
-    : outsize<operations::mat_solve_op> { };
-template<> struct outsize<operations::mat_solve_triu_classical_op>
-    : outsize<operations::mat_solve_op> { };
-template<> struct outsize<operations::mat_solve_triu_recursive_op>
-    : outsize<operations::mat_solve_op> { };
+template<> struct outsize<operations::solve_tril_op>
+    : outsize<operations::solve_op> { };
+template<> struct outsize<operations::solve_tril_classical_op>
+    : outsize<operations::solve_op> { };
+template<> struct outsize<operations::solve_tril_recursive_op>
+    : outsize<operations::solve_op> { };
+template<> struct outsize<operations::solve_triu_op>
+    : outsize<operations::solve_op> { };
+template<> struct outsize<operations::solve_triu_classical_op>
+    : outsize<operations::solve_op> { };
+template<> struct outsize<operations::solve_triu_recursive_op>
+    : outsize<operations::solve_op> { };
 }
 
 // temporary instantiation stuff
@@ -293,20 +293,20 @@ FLINT_DEFINE_UNARY_EXPR_COND(inv_op, nmod_matxx, NMOD_MATXX_COND_S,
 #define NMOD_MATXX_DEFINE_SOLVE_TRI(name) \
 FLINT_DEFINE_THREEARY_EXPR_COND3(name##_op, nmod_matxx, \
         NMOD_MATXX_COND_S, NMOD_MATXX_COND_S, tools::is_bool, \
-        nmod_##name(to._mat(), e1._mat(), e2._mat(), e3))
-NMOD_MATXX_DEFINE_SOLVE_TRI(mat_solve_tril)
-NMOD_MATXX_DEFINE_SOLVE_TRI(mat_solve_tril_classical)
-NMOD_MATXX_DEFINE_SOLVE_TRI(mat_solve_tril_recursive)
-NMOD_MATXX_DEFINE_SOLVE_TRI(mat_solve_triu)
-NMOD_MATXX_DEFINE_SOLVE_TRI(mat_solve_triu_classical)
-NMOD_MATXX_DEFINE_SOLVE_TRI(mat_solve_triu_recursive)
+        nmod_mat_##name(to._mat(), e1._mat(), e2._mat(), e3))
+NMOD_MATXX_DEFINE_SOLVE_TRI(solve_tril)
+NMOD_MATXX_DEFINE_SOLVE_TRI(solve_tril_classical)
+NMOD_MATXX_DEFINE_SOLVE_TRI(solve_tril_recursive)
+NMOD_MATXX_DEFINE_SOLVE_TRI(solve_triu)
+NMOD_MATXX_DEFINE_SOLVE_TRI(solve_triu_classical)
+NMOD_MATXX_DEFINE_SOLVE_TRI(solve_triu_recursive)
 
-FLINT_DEFINE_BINARY_EXPR_COND2(mat_solve_op, nmod_matxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(solve_op, nmod_matxx,
         NMOD_MATXX_COND_S, NMOD_MATXX_COND_S,
         execution_check(nmod_mat_solve(to._mat(), e1._mat(), e2._mat()),
             "solve", "nmod_mat"))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(mat_solve_op, nmod_vecxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(solve_op, nmod_vecxx,
         NMOD_MATXX_COND_S, NMOD_VECXX_COND_S,
         execution_check(nmod_mat_solve_vec(to._array(), e1._mat(), e2._array()),
             "solve_vec", "nmod_mat"))

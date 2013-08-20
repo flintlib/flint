@@ -114,8 +114,8 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP(transpose)
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, nullspace) // TODO
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
-    FLINTXX_DEFINE_MEMBER_BINOP(mat_solve)
-    FLINTXX_DEFINE_MEMBER_BINOP(mat_solve_fflu)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve_fflu)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_classical)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_interpolate)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_KS)
@@ -337,11 +337,11 @@ FLINT_DEFINE_UNARY_EXPR_COND(nullspace_op, rdetail::nmod_poly_mat_nullspace_rt,
         NMOD_POLY_MATXX_COND_S, to.template get<0>() = nmod_poly_mat_nullspace(
             to.template get<1>()._mat(), from._mat()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(mat_solve_op, rdetail::nmod_poly_mat_inv_rt,
+FLINT_DEFINE_BINARY_EXPR_COND2(solve_op, rdetail::nmod_poly_mat_inv_rt,
         NMOD_POLY_MATXX_COND_S, NMOD_POLY_MATXX_COND_S,
         to.template get<0>() = nmod_poly_mat_solve(to.template get<1>()._mat(),
             to.template get<2>()._poly(), e1._mat(), e2._mat()))
-FLINT_DEFINE_BINARY_EXPR_COND2(mat_solve_fflu_op, rdetail::nmod_poly_mat_inv_rt,
+FLINT_DEFINE_BINARY_EXPR_COND2(solve_fflu_op, rdetail::nmod_poly_mat_inv_rt,
         NMOD_POLY_MATXX_COND_S, NMOD_POLY_MATXX_COND_S,
         to.template get<0>() = nmod_poly_mat_solve_fflu(
             to.template get<1>()._mat(),

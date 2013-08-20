@@ -49,7 +49,6 @@
 // TODO input
 // TODO modular reduction
 // TODO addmul
-// TODO rename poly_divides to divides?
 
 namespace flint {
 // function "declarations"
@@ -64,7 +63,7 @@ FLINT_DEFINE_BINOP(gcd_subresultant)
 FLINT_DEFINE_BINOP(mul_karatsuba)
 FLINT_DEFINE_BINOP(mulmid_classical)
 FLINT_DEFINE_BINOP(mul_SS)
-FLINT_DEFINE_BINOP(poly_divides)
+FLINT_DEFINE_BINOP(divides)
 FLINT_DEFINE_BINOP(pow_addchains)
 FLINT_DEFINE_BINOP(pow_binomial)
 FLINT_DEFINE_BINOP(pow_multinomial)
@@ -279,8 +278,8 @@ public:
 
     // lazy member forwarding
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
-    FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, poly_bit_pack)
-    FLINTXX_DEFINE_MEMBER_BINOP_(divides, poly_divides)
+    FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, bit_pack)
+    FLINTXX_DEFINE_MEMBER_BINOP_(divides, divides)
 
     FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
     FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
@@ -307,8 +306,8 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(mul_KS)
     FLINTXX_DEFINE_MEMBER_BINOP(mulmid_classical)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_SS)
-    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_left)
-    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_right)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_left)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
     FLINTXX_DEFINE_MEMBER_BINOP(pow_addchains)
     FLINTXX_DEFINE_MEMBER_BINOP(pow_binexp)
@@ -349,7 +348,7 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP(sqrt)
     FLINTXX_DEFINE_MEMBER_UNOP(sqrt_classical)
 
-    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, bound_roots, poly_bound_roots)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, bound_roots, bound_roots)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpzxx, norm, poly_2norm)
 
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, content)
@@ -566,7 +565,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(smod_op, fmpz_polyxx,
         FMPZ_POLYXX_COND_S, FMPZXX_COND_S,
         fmpz_poly_scalar_smod_fmpz(to._poly(), e1._poly(), e2._fmpz()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_pack_op, fmpzxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(bit_pack_op, fmpzxx,
         FMPZ_POLYXX_COND_S, traits::fits_into_mp_bitcnt_t,
         fmpz_poly_bit_pack(to._fmpz(), e1._poly(), e2))
 
@@ -620,10 +619,10 @@ FMPZ_POLYXX_DEFINE_POW(pow_addchains)
 FMPZ_POLYXX_DEFINE_POW(pow_binexp)
 FMPZ_POLYXX_DEFINE_POW(pow)
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_left_op, fmpz_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_left_op, fmpz_polyxx,
         FMPZ_POLYXX_COND_S, traits::fits_into_slong,
         fmpz_poly_shift_left(to._poly(), e1._poly(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_right_op, fmpz_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_right_op, fmpz_polyxx,
         FMPZ_POLYXX_COND_S, traits::fits_into_slong,
         fmpz_poly_shift_right(to._poly(), e1._poly(), e2))
 
@@ -740,7 +739,7 @@ FLINT_DEFINE_UNARY_EXPR_COND(fmpz_polyxx_lead_op, fmpzxx,
         FMPZ_POLYXX_COND_S,
         fmpz_set(to._fmpz(), fmpz_poly_lead(from._poly())))
 
-FLINT_DEFINE_UNARY_EXPR_COND(poly_bound_roots_op, fmpzxx, FMPZ_POLYXX_COND_S,
+FLINT_DEFINE_UNARY_EXPR_COND(bound_roots_op, fmpzxx, FMPZ_POLYXX_COND_S,
         fmpz_poly_bound_roots(to._fmpz(), from._poly()))
 
 namespace rdetail {
@@ -822,7 +821,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pseudo_rem_op, rdetail::fmpz_polyxx_ulong,
     fmpz_poly_pseudo_rem(to.template get<0>()._poly(), &to.template get<1>(),
         e1._poly(), e2._poly()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_divides_op, rdetail::bool_fmpz_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(divides_op, rdetail::bool_fmpz_polyxx,
     FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
     to.template get<0> () =
         fmpz_poly_divides(to.template get<1>()._poly(), e1._poly(), e2._poly()))

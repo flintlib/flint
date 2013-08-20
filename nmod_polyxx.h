@@ -51,8 +51,6 @@
 // TODO subproduct trees?
 // TODO factorisation
 
-// TODO 21.17, 21.20-
-
 namespace flint {
 FLINT_DEFINE_BINOP(div_newton)
 FLINT_DEFINE_BINOP(divrem_newton)
@@ -63,8 +61,8 @@ FLINT_DEFINE_BINOP(gcd_euclidean)
 FLINT_DEFINE_BINOP(gcd_hgcd)
 FLINT_DEFINE_BINOP(inv_series_basecase)
 FLINT_DEFINE_BINOP(nmod_polyxx_get_coeff)
-FLINT_DEFINE_BINOP(poly_deflate)
-FLINT_DEFINE_BINOP(poly_inflate)
+FLINT_DEFINE_BINOP(deflate)
+FLINT_DEFINE_BINOP(inflate)
 FLINT_DEFINE_BINOP(resultant_euclidean)
 FLINT_DEFINE_BINOP(taylor_shift_convolution)
 FLINT_DEFINE_BINOP(xgcd_euclidean)
@@ -197,8 +195,8 @@ public:
     // Lazy members
     FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, nmod_polyxx_get_coeff)
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
-    FLINTXX_DEFINE_MEMBER_BINOP_(inflate, poly_inflate)
-    FLINTXX_DEFINE_MEMBER_BINOP_(deflate, poly_deflate)
+    FLINTXX_DEFINE_MEMBER_BINOP(inflate)
+    FLINTXX_DEFINE_MEMBER_BINOP(deflate)
 
     FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
     FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
@@ -221,8 +219,8 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(invsqrt_series)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_classical)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_KS)
-    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_left)
-    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_right)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_left)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
     FLINTXX_DEFINE_MEMBER_BINOP(pow_binexp)
     FLINTXX_DEFINE_MEMBER_BINOP(rem_basecase)
@@ -254,7 +252,7 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(cosh_series)
     FLINTXX_DEFINE_MEMBER_BINOP(tanh_series)
 
-    FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, poly_bit_pack)
+    FLINTXX_DEFINE_MEMBER_BINOP(bit_pack)
 
     FLINTXX_DEFINE_MEMBER_UNOP(derivative)
     FLINTXX_DEFINE_MEMBER_UNOP(integral)
@@ -385,10 +383,10 @@ FLINT_DEFINE_BINARY_EXPR_COND2(reverse_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::fits_into_slong,
         nmod_poly_reverse(to._poly(), e1._poly(), e2))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_left_op, nmod_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_left_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::fits_into_slong,
         nmod_poly_shift_left(to._poly(), e1._poly(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_right_op, nmod_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_right_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::fits_into_slong,
         nmod_poly_shift_right(to._poly(), e1._poly(), e2))
 
@@ -398,7 +396,7 @@ FLINT_DEFINE_CBINARY_EXPR_COND2(times, nmod_polyxx,
 FLINT_DEFINE_UNARY_EXPR_COND(make_monic_op, nmod_polyxx, NMOD_POLYXX_COND_S,
         nmod_poly_make_monic(to._poly(), from._poly()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_bit_pack_op, fmpzxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(bit_pack_op, fmpzxx,
         NMOD_POLYXX_COND_S, traits::fits_into_mp_bitcnt_t,
         nmod_poly_bit_pack(to._fmpz(), e1._poly(), e2))
 
@@ -671,10 +669,10 @@ FLINT_DEFINE_UNARY_EXPR_COND(nmod_polyxx_product_roots_op, nmod_polyxx,
         nmod_poly_product_roots_nmod_vec(to._poly(),
             from._data().array, from.size()))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_deflate_op, nmod_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(deflate_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::is_unsigned_integer,
         nmod_poly_deflate(to._poly(), e1._poly(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_inflate_op, nmod_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(inflate_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::is_unsigned_integer,
         nmod_poly_inflate(to._poly(), e1._poly(), e2))
 } // rules

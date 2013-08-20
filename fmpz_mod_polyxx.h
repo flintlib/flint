@@ -152,8 +152,8 @@ class fmpz_mod_polyxx_expression
     FLINTXX_DEFINE_MEMBER_BINOP(gcdinv)
     FLINTXX_DEFINE_MEMBER_BINOP(invmod)
     FLINTXX_DEFINE_MEMBER_BINOP(inv_series_newton)
-    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_left)
-    FLINTXX_DEFINE_MEMBER_BINOP(poly_shift_right)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_left)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
     FLINTXX_DEFINE_MEMBER_BINOP(rem_basecase)
     FLINTXX_DEFINE_MEMBER_BINOP(xgcd)
@@ -305,10 +305,10 @@ FLINT_DEFINE_UNARY_EXPR_COND(fmpz_mod_polyxx_lead_op, fmpzxx,
         FMPZ_MOD_POLYXX_COND_S,
         fmpz_set(to._fmpz(), fmpz_mod_poly_lead(from._poly())))
 
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_left_op, fmpz_mod_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_left_op, fmpz_mod_polyxx,
         FMPZ_MOD_POLYXX_COND_S, traits::fits_into_slong,
         fmpz_mod_poly_shift_left(to._poly(), e1._poly(), e2))
-FLINT_DEFINE_BINARY_EXPR_COND2(poly_shift_right_op, fmpz_mod_polyxx,
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_right_op, fmpz_mod_polyxx,
         FMPZ_MOD_POLYXX_COND_S, traits::fits_into_slong,
         fmpz_mod_poly_shift_right(to._poly(), e1._poly(), e2))
 

@@ -152,24 +152,24 @@ test_functions()
 #endif
 
     B.set_randtril(rand, false);
-    tassert(B*B.mat_solve_tril(A, false) == A);
-    tassert(B.mat_solve_tril_classical(A, false) == B.mat_solve_tril(A, false));
-    tassert(B.mat_solve_tril_recursive(A, false) == B.mat_solve_tril(A, false));
+    tassert(B*B.solve_tril(A, false) == A);
+    tassert(B.solve_tril_classical(A, false) == B.solve_tril(A, false));
+    tassert(B.solve_tril_recursive(A, false) == B.solve_tril(A, false));
     B.set_randtriu(rand, true);
-    tassert(B*B.mat_solve_triu(A, true) == A);
-    tassert(B.mat_solve_triu_classical(A, true) == B.mat_solve_triu(A, true));
-    tassert(B.mat_solve_triu_recursive(A, true) == B.mat_solve_triu(A, true));
+    tassert(B*B.solve_triu(A, true) == A);
+    tassert(B.solve_triu_classical(A, true) == B.solve_triu(A, true));
+    tassert(B.solve_triu_recursive(A, true) == B.solve_triu(A, true));
 
     B.set_randrank(rand, 2);
-    tassert(B*B.mat_solve(A) == A);
+    tassert(B*B.solve(A) == A);
     nmod_vecxx X(2, ctx); X[0] = 1 % ctx; X[1] = 2 % ctx;
-    X = B.mat_solve(X);
+    X = B.solve(X);
     tassert(B.at(0, 0)*X[0] + B.at(0, 1) * X[1] == 1 % ctx);
     tassert(B.at(1, 0)*X[0] + B.at(1, 1) * X[1] == 2 % ctx);
 
     B.set_randrank(rand, 1);
-    assert_exception(B.mat_solve(A).evaluate());
-    assert_exception(B.mat_solve(X).evaluate());
+    assert_exception(B.solve(A).evaluate());
+    assert_exception(B.solve(X).evaluate());
 
     slong nullity;nmod_matxx C(3, 3, M);
     tassert(nullspace(A).get<1>().rows() == 3);

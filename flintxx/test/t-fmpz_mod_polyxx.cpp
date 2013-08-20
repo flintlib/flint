@@ -156,8 +156,8 @@ test_functions()
 
     g.set_coeff(15, 1);
     fmpz_mod_polyxx one(M);one = 1u;
-    tassert(g.poly_shift_right(15) == one);
-    tassert(g.poly_shift_right(15).poly_shift_left(15) == g);
+    tassert(g.shift_right(15) == one);
+    tassert(g.shift_right(15).shift_left(15) == g);
 
     frandxx rand;
     g.set_randtest(rand, 15);

@@ -193,11 +193,11 @@ test_functions()
     tassert(Binv * B == d*eye);
 
     fmpz_poly_matxx X(2, 3);
-    ltupleref(worked, X, d) = mat_solve(B, A);
+    ltupleref(worked, X, d) = solve(B, A);
     tassert(worked == true && (B*X) == A*d);
-    ltupleref(worked, X, d) = B.mat_solve_fflu(A);
+    ltupleref(worked, X, d) = B.solve_fflu(A);
     tassert(worked == true && (B*X) == A*d);
-    tassert(mat_solve(B, A).get<1>() == X);
+    tassert(solve(B, A).get<1>() == X);
 
     slong nullity;
     tassert(nullspace(A).get<1>().rows() == 3);

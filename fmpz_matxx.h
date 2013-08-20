@@ -47,9 +47,9 @@ namespace flint {
 FLINT_DEFINE_BINOP(det_modular)
 FLINT_DEFINE_BINOP(det_modular_accelerated)
 FLINT_DEFINE_BINOP(mul_multi_mod)
-FLINT_DEFINE_BINOP(mat_solve_dixon)
-FLINT_DEFINE_BINOP(mat_solve_cramer)
-FLINT_DEFINE_BINOP(mat_solve_bound)
+FLINT_DEFINE_BINOP(solve_dixon)
+FLINT_DEFINE_BINOP(solve_cramer)
+FLINT_DEFINE_BINOP(solve_bound)
 FLINT_DEFINE_THREEARY(det_modular_given_divisor)
 FLINT_DEFINE_UNOP(det_bareiss)
 FLINT_DEFINE_UNOP(det_bound)
@@ -128,11 +128,11 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(mul_multi_mod)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
 
-    FLINTXX_DEFINE_MEMBER_BINOP_(solve, mat_solve)
-    FLINTXX_DEFINE_MEMBER_BINOP_(solve_bound, mat_solve_bound)
-    FLINTXX_DEFINE_MEMBER_BINOP_(solve_cramer, mat_solve_cramer)
-    FLINTXX_DEFINE_MEMBER_BINOP_(solve_dixon, mat_solve_dixon)
-    FLINTXX_DEFINE_MEMBER_BINOP_(solve_fflu, mat_solve_fflu)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve_bound)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve_cramer)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve_dixon)
+    FLINTXX_DEFINE_MEMBER_BINOP(solve_fflu)
 
     FLINTXX_DEFINE_MEMBER_3OP(det_modular_given_divisor)
 
@@ -242,10 +242,10 @@ template<>
 struct outsize<operations::mul_multi_mod_op>
     : outsize<operations::times> { };
 
-template<> struct outsize<operations::mat_solve_cramer_op>
-    : outsize<operations::mat_solve_op> { };
-template<> struct outsize<operations::mat_solve_dixon_op>
-    : outsize<operations::mat_solve_op> { };
+template<> struct outsize<operations::solve_cramer_op>
+    : outsize<operations::solve_op> { };
+template<> struct outsize<operations::solve_dixon_op>
+    : outsize<operations::solve_op> { };
 } // matrices
 
 // temporary instantiation stuff
@@ -338,7 +338,7 @@ typedef make_ltuple<mp::make_tuple<bool, fmpz_matxx, fmpzxx>::type >::type
     fmpz_mat_inv_rt;
 
 typedef make_ltuple<mp::make_tuple<fmpzxx, fmpzxx>::type >::type
-    fmpz_mat_solve_bound_rt;
+    fmpz_solve_bound_rt;
 
 typedef make_ltuple<mp::make_tuple<slong, fmpz_matxx>::type >::type
     fmpz_mat_nullspace_rt;
@@ -355,15 +355,15 @@ FLINT_DEFINE_UNARY_EXPR_COND(charpoly_op, fmpz_polyxx, FMPZ_MATXX_COND_S,
 #define FMPZ_MATXX_DEFINE_SOLVE(name) \
 FLINT_DEFINE_BINARY_EXPR_COND2(name##_op, rdetail::fmpz_mat_inv_rt, \
         FMPZ_MATXX_COND_S, FMPZ_MATXX_COND_S, \
-        to.template get<0>() = fmpz_##name(to.template get<1>()._mat(), \
+        to.template get<0>() = fmpz_mat_##name(to.template get<1>()._mat(), \
             to.template get<2>()._fmpz(), e1._mat(), e2._mat()))
-FMPZ_MATXX_DEFINE_SOLVE(mat_solve)
-FMPZ_MATXX_DEFINE_SOLVE(mat_solve_dixon)
-FMPZ_MATXX_DEFINE_SOLVE(mat_solve_cramer)
-FMPZ_MATXX_DEFINE_SOLVE(mat_solve_fflu)
+FMPZ_MATXX_DEFINE_SOLVE(solve)
+FMPZ_MATXX_DEFINE_SOLVE(solve_dixon)
+FMPZ_MATXX_DEFINE_SOLVE(solve_cramer)
+FMPZ_MATXX_DEFINE_SOLVE(solve_fflu)
 
-FLINT_DEFINE_BINARY_EXPR_COND2(mat_solve_bound_op,
-        rdetail::fmpz_mat_solve_bound_rt,
+FLINT_DEFINE_BINARY_EXPR_COND2(solve_bound_op,
+        rdetail::fmpz_solve_bound_rt,
         FMPZ_MATXX_COND_S, FMPZ_MATXX_COND_S,
         fmpz_mat_solve_bound(to.template get<0>()._fmpz(),
             to.template get<1>()._fmpz(), e1._mat(), e2._mat()))

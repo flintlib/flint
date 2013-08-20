@@ -178,8 +178,8 @@ test_functions()
             && f == divexact(2*f, 2));
     tassert(-f == tdiv_2exp(-8*f - q, 3u));
     tassert(smod(5*f, fmpzxx(3)).to_string() == "4  1 0 0 -1");
-    tassert(f == fmpz_polyxx::bit_unpack(poly_bit_pack(f, 10u), 10u));
-    tassert(f == fmpz_polyxx::bit_unpack_unsigned(poly_bit_pack(f, 10u), 10u));
+    tassert(f == fmpz_polyxx::bit_unpack(bit_pack(f, 10u), 10u));
+    tassert(f == fmpz_polyxx::bit_unpack_unsigned(bit_pack(f, 10u), 10u));
 
     tassert(mul_classical(f, g) == f*g);
     tassert(mul_karatsuba(f, g) == f*g);
@@ -225,8 +225,8 @@ test_functions()
     tassert(pow_binomial(binomial, 3u) == binomial*binomial*binomial);
 
     fmpz_polyxx x; x = "2  0 1";
-    tassert(poly_shift_left(f, 5) == f*pow(x, 5u));
-    tassert(poly_shift_right(poly_shift_left(f, 5), 5) == f);
+    tassert(shift_left(f, 5) == f*pow(x, 5u));
+    tassert(shift_right(shift_left(f, 5), 5) == f);
 
     tassert(height(g) == 5);
     tassert(poly_2norm(g) == 7);
@@ -298,7 +298,7 @@ test_functions()
     assert_exception(sqrt_classical(f*f + xp1).evaluate());
 
     res = "5  32 0 0 0 1";
-    tassert(poly_bound_roots(res) >= 2);
+    tassert(bound_roots(res) >= 2);
 
     // test immediate functions
     p.set_coeff(3, 1);
@@ -321,7 +321,7 @@ test_functions()
     tassert(r.to_string() == "2  4 5");
 
     bool does_divide;
-    ltupleref(does_divide, res) = poly_divides(f*g, g);
+    ltupleref(does_divide, res) = divides(f*g, g);
     tassert(does_divide && res == f);
 
     tassert(div_series(f, xp1, 10) * xp1 % pow(x, 10u) == f);
@@ -369,10 +369,10 @@ test_member_functions()
     f = "4  2 0 0 1";
     g = "5  1 2 3 4 5";
 
-    tassert(f.bit_pack(17u) == poly_bit_pack(f, 17u));
+    tassert(f.bit_pack(17u) == bit_pack(f, 17u));
     tassert(f.divrem(g) == divrem(f, g));
     tassert(f.derivative() == derivative(f));
-    tassert(f.bound_roots() == poly_bound_roots(f));
+    tassert(f.bound_roots() == bound_roots(f));
     tassert(f.content() == content(f));
     tassert(f.pow_trunc(15u, 10) == pow_trunc(f, 15u, 10));
 }

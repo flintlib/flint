@@ -35,8 +35,8 @@
 #include "tuple.h"
 
 namespace flint {
-FLINT_DEFINE_BINOP(mat_solve)
-FLINT_DEFINE_BINOP(mat_solve_fflu)
+FLINT_DEFINE_BINOP(solve)
+FLINT_DEFINE_BINOP(solve_fflu)
 FLINT_DEFINE_THREEARY(mat_at)
 FLINT_DEFINE_UNOP(transpose)
 FLINT_DEFINE_UNOP(trace)
@@ -212,7 +212,7 @@ struct outsize<operations::ltuple_get_op<n> >
 
 // This is not actually a matrix expression, but called by the above ...
 template<>
-struct outsize<operations::mat_solve_op>
+struct outsize<operations::solve_op>
 {
     template<class Mat>
     static slong rows(const Mat& m)
@@ -225,8 +225,8 @@ struct outsize<operations::mat_solve_op>
         return m._data().second().cols();
     }
 };
-template<> struct outsize<operations::mat_solve_fflu_op>
-    : outsize<operations::mat_solve_op> { };
+template<> struct outsize<operations::solve_fflu_op>
+    : outsize<operations::solve_op> { };
 
 namespace mdetail {
 struct base_traits
