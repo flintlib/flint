@@ -528,7 +528,7 @@ test_randomisation()
 void
 test_factoring()
 {
-    fmpz_factorxx f = factor(-2*3*5);
+    fmpz_factorxx f;f = factor(-2*3*5);
     tassert(f.size() == 3);
     tassert(f.sign() == -1);
     tassert(f.p(0) == 2 && f.exp(0) == 1);

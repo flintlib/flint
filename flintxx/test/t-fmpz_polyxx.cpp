@@ -28,6 +28,7 @@
 #include <string>
 
 #include "fmpz_polyxx.h"
+#include "fmpz_poly_factorxx.h"
 
 #include "flintxx/test/helpers.h"
 
@@ -377,6 +378,33 @@ test_member_functions()
     tassert(f.pow_trunc(15u, 10) == pow_trunc(f, 15u, 10));
 }
 
+void
+test_factoring()
+{
+    fmpz_polyxx f, g;
+    // two irreducible polynomials
+    f = "4  1 17 0 1";
+    g = "6  2 0 2 0 0 1";
+
+    // TODO are these deterministic?
+
+    fmpz_poly_factorxx f1, f2;
+    f1.insert(f, 1);
+    f2.insert(g, 2);
+    f1.content() = 7;
+    f1.concat(f2);
+
+    tassert(f1 == factor_zassenhaus(7*f*g*g));
+
+    f1.realloc(0);
+    f1.insert(f, 1);
+    f1.insert(g, 2);
+    f1.content() = 1;
+    tassert(f1 == factor_squarefree(f*g*g));
+
+    // TODO set_factor_zassenhaus_recombination
+}
+
 int
 main()
 {
@@ -390,6 +418,7 @@ main()
     test_functions();
     test_member_functions();
     test_extras();
+    test_factoring();
 
     std::cout << "PASS" << std::endl;
     return 0;

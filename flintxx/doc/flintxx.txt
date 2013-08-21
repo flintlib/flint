@@ -873,6 +873,73 @@ Fmpz_expr bound_roots(Fmpz_poly_expr p)
 
 *******************************************************************************
 
+    fmpz\_poly\_factorxx
+
+*******************************************************************************
+
+bool fmpz_poly_factorxx::operator==(const fmpz_poly_factorxx&)
+
+    Compare two factorisations.
+
+ulong fmpz_poly_factorxx::size() const
+
+    Return the number of stored factors.
+
+slong fmpz_poly_factorxx::exp(slong i) const
+slong& fmpz_poly_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+fmpz_polyxx_srcref fmpz_poly_factorxx::p(slong i) const
+fmpz_polyxx_ref fmpz_poly_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+fmpzxx_srcref fmpz_poly_factorxx::content() const
+fmpzxx_ref fmpz_poly_factorxx::content()
+
+    Obtain the content of the factorised polynomial.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_poly_factorxx::fmpz_poly_factorxx()
+explicit fmpz_poly_factorxx::fmpz_poly_factorxx(slong alloc)
+
+    Initialise an empty factorisation.
+
+fmpz_poly_factorxx::fmpz_poly_factorxx(const fmpz_poly_factorxx& o)
+
+    Copy a factorisation.
+
+void fmpz_poly_factorxx::realloc(slong a)
+void fmpz_poly_factorxx::fit_length(slong a)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Manipulating factors
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void fmpz_poly_factorxx::insert(Fmpz_poly_expr p, slong e)
+void fmpz_poly_factorxx::concat(const fmpz_poly_factorxx)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Factoring algorithms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void fmpz_poly_factorxx::set_factor_squarefree(Fmpz_poly_expr p)
+void fmpz_poly_factorxx::set_factor_zassenhaus(Fmpz_poly_expr p)
+void fmpz_poly_factorxx::set_factor_zassenhaus_recombination(
+        const fmpz_poly_factorxx& lifted_fac, Fmpz_poly_expr F,
+        Fmpz_expr P, slong exp)
+
+fmpz_poly_factorxx::factor_squarefree(Fmpz_poly_expr)
+fmpz_poly_factorxx::factor_zassenhaus(Fmpz_poly_expr)
+
+
+
+*******************************************************************************
+
     fmpqxx
 
 *******************************************************************************

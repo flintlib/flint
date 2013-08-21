@@ -49,13 +49,8 @@ class fmpz_factorxx_delayed
 private:
     fmpz_factor_t inner;
 
-public:
-    fmpz_factorxx_delayed() {fmpz_factor_init(inner);}
-    ~fmpz_factorxx_delayed() {fmpz_factor_clear(inner);}
-
-    fmpz_factorxx_delayed(const fmpz_factorxx_delayed& o)
+    void copy_init(const fmpz_factorxx_delayed& o)
     {
-	fmpz_factor_init(inner);
 	_fmpz_factor_fit_length(inner, o.inner->num);
 	_fmpz_factor_set_length(inner, o.inner->num);
 	inner->sign = o.inner->sign;
@@ -64,6 +59,22 @@ public:
 	    fmpz_set(inner->p + i, o.inner->p + i);
 	    inner->exp[i] = o.inner->exp[i];
 	}
+    }
+
+public:
+    fmpz_factorxx_delayed() {fmpz_factor_init(inner);}
+    ~fmpz_factorxx_delayed() {fmpz_factor_clear(inner);}
+
+    fmpz_factorxx_delayed(const fmpz_factorxx_delayed& o)
+    {
+	fmpz_factor_init(inner);
+	copy_init(o);
+    }
+
+    fmpz_factorxx_delayed& operator=(const fmpz_factorxx_delayed& o)
+    {
+	copy_init(o);
+	return *this;
     }
 
     bool operator==(const fmpz_factorxx_delayed& o)
