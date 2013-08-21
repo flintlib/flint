@@ -27,6 +27,7 @@
 #define NMOD_POLYXX_H
 
 #include <cstdlib>
+#include <vector>
 
 #include "nmod_poly.h"
 
@@ -49,7 +50,6 @@
 // TODO powmod_mpz*, powmod*preinv, compose_mod_brent_kung_preinv
 // TODO nmod_series class?
 // TODO subproduct trees?
-// TODO factorisation
 
 namespace flint {
 FLINT_DEFINE_BINOP(div_newton)
@@ -169,6 +169,12 @@ public:
         {nmod_poly_randtest(_poly(), state._data(), len);}
     void set_randtest_irreducible(frandxx& state, slong len)
         {nmod_poly_randtest_irreducible(_poly(), state._data(), len);}
+
+    template<class Poly>
+    slong remove(const Poly& p)
+    {
+        return nmod_poly_remove(_poly(), p.evaluate()._poly());
+    }
 
     // These work on any expression without evaluation
     nmodxx_ctx_srcref estimate_ctx() const;
@@ -341,6 +347,10 @@ namespace traits {
 template<> struct has_nmodxx_ctx<nmod_polyxx> : mp::true_ { };
 template<> struct has_nmodxx_ctx<nmod_polyxx_ref> : mp::true_ { };
 template<> struct has_nmodxx_ctx<nmod_polyxx_srcref> : mp::true_ { };
+
+template<class T> struct is_nmod_polyxx : mp::or_<
+     traits::is_T_expr<T, nmod_polyxx>,
+     flint_classes::is_source<nmod_polyxx, T> > { };
 } // traits
 template<class Operation, class Data>
 inline nmodxx_ctx_srcref
@@ -676,6 +686,124 @@ FLINT_DEFINE_BINARY_EXPR_COND2(inflate_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::is_unsigned_integer,
         nmod_poly_inflate(to._poly(), e1._poly(), e2))
 } // rules
+
+
+//////////////////////////////////////////////////////////////////////////////
+// FACTORISATION
+//////////////////////////////////////////////////////////////////////////////
+// TODO printing
+
+class nmod_poly_factorxx
+{
+private:
+    nmod_poly_factor_t inner;
+
+public:
+    nmod_poly_factorxx() {nmod_poly_factor_init(inner);}
+    ~nmod_poly_factorxx() {nmod_poly_factor_clear(inner);}
+
+    nmod_poly_factorxx(const nmod_poly_factorxx& o)
+    {
+        nmod_poly_factor_init(inner);
+        nmod_poly_factor_set(inner, o.inner);
+    }
+
+    bool operator==(const nmod_poly_factorxx& o)
+    {
+        if(o.size() != size())
+            return false;
+        for(slong i = 0;i < size();++i)
+            if(p(i) != o.p(i) || exp(i) != o.exp(i))
+            return false;
+        return true;
+    }
+
+    nmod_poly_factorxx& operator=(const nmod_poly_factorxx& o)
+    {
+        nmod_poly_factor_set(inner, o.inner);
+        return *this;
+    }
+
+    slong size() const {return inner->num;}
+    slong exp(slong i) const {return inner->exp[i];}
+    slong& exp(slong i) {return inner->exp[i];}
+    nmod_polyxx_srcref p(slong i) const
+        {return nmod_polyxx_srcref::make(inner->p + i);}
+    nmod_polyxx_ref p(slong i) {return nmod_polyxx_ref::make(inner->p + i);}
+
+    nmod_poly_factor_t& _data() {return inner;}
+    const nmod_poly_factor_t& _data() const {return inner;}
+
+    void realloc(slong a) {nmod_poly_factor_realloc(inner, a);}
+    void fit_length(slong a) {nmod_poly_factor_fit_length(inner, a);}
+
+    template<class Nmod_poly>
+    void insert(const Nmod_poly& p, slong e,
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0)
+        {nmod_poly_factor_insert(_data(), p.evaluate()._poly(), e);}
+
+    void concat(const nmod_poly_factorxx& o)
+        {nmod_poly_factor_concat(_data(), o._data());}
+
+    void pow(slong exp) {nmod_poly_factor_pow(_data(), exp);}
+
+#define NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(name) \
+    template<class Nmod_poly> \
+    void set_##name(const Nmod_poly& p, \
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0) \
+        {nmod_poly_##name(_data(), p.evaluate()._poly());}
+
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_squarefree)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_cantor_zassenhaus)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_berlekamp)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_kaltofen_shoup)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_with_cantor_zassenhaus)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_with_berlekamp)
+    NMOD_POLY_FACTORXX_DEFINE_SET_FACTOR(factor_with_kaltofen_shoup)
+
+    template<class Nmod_poly>
+    bool set_factor_equal_deg_probab(frandxx& state, const Nmod_poly& p, slong d,
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0)
+    {
+        return nmod_poly_factor_equal_deg_prob(_data(), state._data(),
+                p.evaluate()._poly(), d);
+    }
+    template<class Nmod_poly>
+    void set_factor_equal_deg(const Nmod_poly& p, slong d,
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0)
+    {
+        nmod_poly_factor_equal_deg(_data(), p.evaluate()._poly(), d);
+    }
+
+    template<class Nmod_poly>
+    void set_factor_distinct_deg(const Nmod_poly& p, std::vector<slong>& degs,
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0)
+    {
+        slong* dgs = &degs.front();
+        nmod_poly_factor_distinct_deg(_data(), p.evaluate()._poly(), &dgs);
+    }
+};
+
+#define NMOD_POLY_FACTORXX_DEFINE_FACTOR(name) \
+template<class Nmod_poly> \
+nmod_poly_factorxx name(const Nmod_poly& p, \
+        typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0) \
+{ \
+    nmod_poly_factorxx res; \
+    res.set_##name(p); \
+    return res; \
+}
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_squarefree)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_cantor_zassenhaus)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_berlekamp)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_kaltofen_shoup)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_cantor_zassenhaus)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_berlekamp)
+NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_kaltofen_shoup)
+
+// TODO do we want global versions of factor_distinct_deg etc?
 } // flint
 
 #endif

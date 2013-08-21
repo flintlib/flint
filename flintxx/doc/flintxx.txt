@@ -383,8 +383,8 @@ Fmpz_expr fmpz_factorxx::expand() const
 Fmpz_expr fmpz_factorxx::expand_iterative() const
 Fmpz_expr fmpz_factorxx::expand_multiexp() const
 
-factorxx factor(Fmpz_expr)
-factorxx factor(T:fits_into_slong)
+fmpz_factorxx factor(Fmpz_expr)
+fmpz_factorxx factor(T:fits_into_slong)
 Ltuple<bool, fmpz_factorxx>_expr factor_trial_range(Fmpz_expr)
 fmpz_factorxx factor_pp1(Fmpz_expr)
 
@@ -921,7 +921,7 @@ void fmpz_poly_factorxx::fit_length(slong a)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void fmpz_poly_factorxx::insert(Fmpz_poly_expr p, slong e)
-void fmpz_poly_factorxx::concat(const fmpz_poly_factorxx)
+void fmpz_poly_factorxx::concat(const fmpz_poly_factorxx&)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Factoring algorithms
@@ -2106,6 +2106,78 @@ Nmod_poly_expr deflate(Nmod_poly_expr, T:is_unsigned_integer)
 
 ulong Nmod_poly_expr::deflation() const
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Factorisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Nmod_poly_expr::is_squarefree() const
+bool Nmod_poly_expr::is_irreducible() const
+slong Nmod_poly_target::remove(Nmod_poly_expr)
+
+nmod_poly_factorxx::nmod_poly_factorxx()
+
+    Initialise an empty factorisation.
+
+nmod_poly_factorxx::nmod_poly_factorxx(const nmod_poly_factorxx& o)
+
+    Copy a factorisation.
+
+bool nmod_poly_factorxx::operator==(const nmod_poly_factorxx&)
+
+    Compare two factorisations.
+
+ulong nmod_poly_factorxx::size() const
+
+    Return the number of stored factors.
+
+slong nmod_poly_factorxx::exp(slong i) const
+slong& nmod_poly_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+nmod_polyxx_srcref nmod_poly_factorxx::p(slong i) const
+nmod_polyxx_ref nmod_poly_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+void nmod_poly_factorxx::realloc(slong a)
+void nmod_poly_factorxx::fit_length(slong a)
+void nmod_poly_factorxx::insert(Nmod_poly_expr p, slong e)
+void nmod_poly_factorxx::concat(const nmod_poly_factorxx&)
+
+void nmod_poly_factorxx::set_factor(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_cantor_zassenhaus(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_berlekamp(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_kaltofen_shoup(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_with_cantor_zassenhaus(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_with_berlekamp(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_with_kaltofen_shoup(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_squarefree(Nmod_poly_expr)
+
+    Factorise a polynomial and store its factors. See \code{nmod_poly_factor} etc.
+
+void nmod_poly_factorxx::set_factor_equal_deg_probab(frandxx&, Nmod_poly_expr,
+        slong)
+void nmod_poly_factorxx::set_factor_equal_deg(Nmod_poly_expr, slong)
+
+    See \code{nmod_poly_factor_equal_deg_prob} and
+    \code{nmod_poly_factor_equal_deg}.
+
+void nmod_poly_factorxx::set_factor_distinct_deg(Nmod_poly_expr p,
+        std::vector<slong>& degs)
+
+    See \code{nmod_poly_factor_distinct_deg}. Note that \code{degs} must have
+    sufficient size to hold all factors. The size of \code{degs} is not
+    modified.
+
+nmod_poly_factorxx factor(Nmod_poly_expr)
+nmod_poly_factorxx factor_cantor_zassenhaus(Nmod_poly_expr)
+nmod_poly_factorxx factor_berlekamp(Nmod_poly_expr)
+nmod_poly_factorxx factor_kaltofen_shoup(Nmod_poly_expr)
+nmod_poly_factorxx factor_with_cantor_zassenhaus(Nmod_poly_expr)
+nmod_poly_factorxx factor_with_berlekamp(Nmod_poly_expr)
+nmod_poly_factorxx factor_with_kaltofen_shoup(Nmod_poly_expr)
+nmod_poly_factorxx factor_squarefree(Nmod_poly_expr)
 
 
 *******************************************************************************

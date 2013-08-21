@@ -315,6 +315,11 @@ test_functions()
     tassert(f.inflate(5u).deflate(5u) == f);
     tassert(f.inflate(5u).deflation() >= 5);
     tassert(f.deflate(f.deflation()).deflation() == 1);
+
+    g.set_randtest_irreducible(rand, 4);
+    f.set_randtest_irreducible(rand, 5);
+    res = f*g*g;
+    tassert(res.remove(g) == 2 && res == f);
 }
 
 void
@@ -362,6 +367,73 @@ test_extras()
     // TODO
 }
 
+bool equiv_fac(const nmod_poly_factorxx& fac1, const nmod_poly_factorxx& fac2)
+{
+    tassert(fac1.size() == 2);
+    if(fac1.exp(0) == fac1.exp(1))
+    {
+        if(fac2.exp(0) != fac1.exp(0) || fac2.exp(1) != fac1.exp(0))
+            return false;
+        return (fac1.p(0) == fac2.p(0) && fac1.p(1) == fac2.p(1))
+            || (fac1.p(1) == fac2.p(0) && fac1.p(0) == fac2.p(1));
+    }
+    if(fac1.size() != fac2.size())
+        return false;
+    if(fac1.exp(0) == fac2.exp(0))
+        return fac1.exp(1) == fac2.exp(1)
+            && fac1.p(0) == fac2.p(0)
+            && fac1.p(1) == fac2.p(1);
+    else
+        return fac1.exp(0) == fac2.exp(1)
+            && fac1.exp(1) == fac2.exp(0)
+            && fac1.p(0) == fac2.p(1)
+            && fac1.p(1) == fac2.p(0);
+}
+void
+test_factoring()
+{
+    mp_limb_t M = 1031;
+    nmod_polyxx f(M), g(M);
+    frandxx state;
+    f.set_randtest_irreducible(state, 4); f = f.make_monic();
+    g.set_randtest_irreducible(state, 5); g = g.make_monic();
+
+    nmod_poly_factorxx fac = factor(f*f*g);
+    tassert(fac.size() == 2);
+    if(fac.exp(0) == 1)
+    {
+        tassert(fac.p(0) == g);
+        tassert(fac.p(1) == f && fac.exp(1) == 2);
+    }
+    else
+    {
+        tassert(fac.p(0) == f && fac.exp(0) == 2);
+        tassert(fac.p(1) == g && fac.exp(1) == 1);
+    }
+
+    nmod_poly_factorxx fac2;fac2 = fac;fac2.pow(2);
+    fac.insert(g, 1);
+    fac.insert(f, 2);
+    tassert(fac == fac2);
+
+    nmod_polyxx prod(f*f*f*g*g);
+    fac = factor(prod);
+    tassert(equiv_fac(fac, factor_cantor_zassenhaus(prod)));
+    tassert(equiv_fac(factor(f*g), factor_berlekamp(f*g)));
+    tassert(equiv_fac(fac, factor_kaltofen_shoup(prod)));
+    tassert(equiv_fac(fac, factor_with_cantor_zassenhaus(prod)));
+    tassert(equiv_fac(fac, factor_with_berlekamp(prod)));
+    tassert(equiv_fac(fac, factor_with_kaltofen_shoup(prod)));
+
+    std::vector<slong> degs(2);
+    fac.realloc(0);fac.set_factor_distinct_deg(f*g, degs);
+    tassert(degs.size() == 2);
+    tassert((degs[0] == f.degree() && degs[1] == g.degree())
+            || (degs[1] == f.degree() && degs[0] == g.degree()));
+
+    // TODO test set_factor_equal_deg*
+}
+
 int
 main()
 {
@@ -375,6 +447,7 @@ main()
     test_functions();
     test_transcendental_functions();
     test_extras();
+    test_factoring();
 
     std::cout << "PASS" << std::endl;
     return 0;
