@@ -27,6 +27,7 @@
 #include <string>
 
 #include "fmpzxx.h"
+#include "fmpz_factorxx.h"
 #include "flintxx/test/helpers.h"
 
 #if !HAVE_FAST_COMPILER
@@ -524,6 +525,25 @@ test_randomisation()
     tassert(fmpzxx::randtest_mod_signed(rand, thirty) <= 15);
 }
 
+void
+test_factoring()
+{
+    fmpz_factorxx f = factor(-2*3*5);
+    tassert(f.size() == 3);
+    tassert(f.sign() == -1);
+    tassert(f.p(0) == 2 && f.exp(0) == 1);
+    tassert(f.p(1) == 3 && f.exp(1) == 1);
+    tassert(f.p(2) == 5 && f.exp(2) == 1);
+    tassert(f == factor(fmpzxx(-2*3*5)));
+    tassert(f == fmpz_factorxx(f));
+    tassert(f == factor_trial_range(fmpzxx(-2*3*5), 0u, 2u).get<1>());
+    tassert(factor_trial_range(fmpzxx(-2*3*5), 0u, 2u).get<0>());
+
+    tassert(f.expand() == -2*3*5);
+    tassert(f.expand() == f.expand_iterative());
+    tassert(f.expand() == f.expand_multiexp());
+}
+
 int
 main()
 {
@@ -542,6 +562,7 @@ main()
     test_ternary_assigments();
     test_references();
     test_randomisation();
+    test_factoring();
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_fmpzxx

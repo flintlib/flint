@@ -337,6 +337,60 @@ Fmpz_expr abs(Fmpz_expr)
 
 *******************************************************************************
 
+    fmpz\_factorxx
+
+*******************************************************************************
+
+fmpz_factorxx::fmpz_factorxx()
+
+    Initialise an empty factorisation.
+
+fmpz_factorxx::fmpz_factorxx(const fmpz_factorxx& o)
+
+    Copy a factorisation.
+
+bool fmpz_factorxx::operator==(const fmpz_factorxx&)
+
+    Compare two factorisations.
+
+ulong fmpz_factorxx::size() const
+
+    Return the number of stored factors.
+
+ulong fmpz_factorxx::exp(slong i) const
+ulong& fmpz_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+fmpzxx_srcref fmpz_factorxx::p(slong i) const
+fmpzxx_ref fmpz_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+int fmpz_factorxx::sign() const
+int& fmpz_factorxx::sign()
+
+    Obtain the sign of the factored expression.
+
+void fmpz_factorxx::set_factor(Fmpz_expr)
+void fmpz_factorxx::set_factor(T:fits_into_slong)
+bool fmpz_factorxx::set_factor_trial_range(Fmpz_expr, ulong, ulong)
+bool fmpz_factorxx::set_factor_pp1(Fmpz_expr, ulong, ulong, ulong)
+
+    Factorise an integer and store its factors. See \code{fmpz_factor} etc.
+
+Fmpz_expr fmpz_factorxx::expand() const
+Fmpz_expr fmpz_factorxx::expand_iterative() const
+Fmpz_expr fmpz_factorxx::expand_multiexp() const
+
+factorxx factor(Fmpz_expr)
+factorxx factor(T:fits_into_slong)
+Ltuple<bool, fmpz_factorxx>_expr factor_trial_range(Fmpz_expr)
+fmpz_factorxx factor_pp1(Fmpz_expr)
+
+
+*******************************************************************************
+
     fmpz\_matxx
 
     The class \code{fmpz_matxx} wraps \code{fmpz_mat_t}, and so represents

@@ -204,17 +204,20 @@ struct name<T, U, typename mp::enable_if<mp::and_< cond1 <T>, cond2 <U> > >::typ
 };
 
 // Specialise the unary expression rule type->type.
-#define FLINT_DEFINE_UNARY_EXPR(name, type, eval) \
+#define FLINT_DEFINE_UNARY_EXPR_(name, rtype, type, eval) \
 template<> \
 struct unary_expression<operations::name, type> \
 { \
-    typedef type return_t; \
+    typedef rtype return_t; \
     template<class V> \
     static void doit(V& to, const type& from) \
     { \
         eval; \
     } \
 };
+
+#define FLINT_DEFINE_UNARY_EXPR(name, type, eval) \
+    FLINT_DEFINE_UNARY_EXPR_(name, type, type, eval)
 
 #define FLINT_DEFINE_UNARY_EXPR_COND(name, ret_type, cond, eval) \
 template<class T> \
