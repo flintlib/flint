@@ -2759,6 +2759,78 @@ Fmpz_mod_poly_expr compose_mod_brent_kung(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr
 
 
 
+*******************************************************************************
+
+    fmpz\_mod\_poly\_factorxx
+
+*******************************************************************************
+bool Fmpz_mod_poly_expr::is_squarefree() const
+bool Fmpz_mod_poly_expr::is_irreducible() const
+bool Fmpz_mod_poly_expr::is_irreducible_ddf() const
+bool Fmpz_mod_poly_expr::is_irreducible_rabin() const
+slong Fmpz_mod_poly_target::remove(Fmpz_mod_poly_expr)
+
+fmpz_mod_poly_factorxx::nmod_poly_factorxx()
+
+    Initialise an empty factorisation.
+
+fmpz_mod_poly_factorxx::nmod_poly_factorxx(const nmod_poly_factorxx& o)
+
+    Copy a factorisation.
+
+bool fmpz_mod_poly_factorxx::operator==(const nmod_poly_factorxx&)
+
+    Compare two factorisations.
+
+ulong fmpz_mod_poly_factorxx::size() const
+
+    Return the number of stored factors.
+
+slong fmpz_mod_poly_factorxx::exp(slong i) const
+slong& fmpz_mod_poly_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+fmpz_mod_polyxx_srcref nmod_poly_factorxx::p(slong i) const
+fmpz_mod_polyxx_ref nmod_poly_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+void fmpz_mod_poly_factorxx::realloc(slong a)
+void fmpz_mod_poly_factorxx::fit_length(slong a)
+void fmpz_mod_poly_factorxx::insert(Fmpz_mod_poly_expr p, slong e)
+void fmpz_mod_poly_factorxx::concat(const nmod_poly_factorxx&)
+
+void fmpz_mod_poly_factorxx::set_factor(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_cantor_zassenhaus(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_berlekamp(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_kaltofen_shoup(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_squarefree(Fmpz_mod_poly_expr)
+
+    Factorise a polynomial and store its factors. See \code{fmpz_mod_poly_factor} etc.
+
+void fmpz_mod_poly_factorxx::set_factor_equal_deg_probab(frandxx&, Fmpz_mod_poly_expr,
+        slong)
+void fmpz_mod_poly_factorxx::set_factor_equal_deg(Fmpz_mod_poly_expr, slong)
+
+    See \code{fmpz_mod_poly_factor_equal_deg_prob} and
+    \code{fmpz_mod_poly_factor_equal_deg}.
+
+void fmpz_mod_poly_factorxx::set_factor_distinct_deg(Fmpz_mod_poly_expr p,
+        std::vector<slong>& degs)
+
+    See \code{fmpz_mod_poly_factor_distinct_deg}. Note that \code{degs} must have
+    sufficient size to hold all factors. The size of \code{degs} is not
+    modified.
+
+fmpz_mod_poly_factorxx factor(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_cantor_zassenhaus(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_berlekamp(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_kaltofen_shoup(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_squarefree(Fmpz_mod_poly_expr)
+
+
+
 
 
 *******************************************************************************

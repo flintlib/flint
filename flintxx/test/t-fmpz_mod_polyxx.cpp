@@ -28,6 +28,7 @@
 #include <string>
 
 #include "fmpz_mod_polyxx.h"
+#include "fmpz_mod_poly_factorxx.h"
 
 #include "flintxx/test/helpers.h"
 
@@ -245,6 +246,74 @@ test_extras()
     // TODO
 }
 
+bool equiv_fac(const fmpz_mod_poly_factorxx& fac1,
+        const fmpz_mod_poly_factorxx& fac2)
+{
+    tassert(fac1.size() == 2);
+    if(fac1.exp(0) == fac1.exp(1))
+    {
+        if(fac2.exp(0) != fac1.exp(0) || fac2.exp(1) != fac1.exp(0))
+            return false;
+        return (fac1.p(0) == fac2.p(0) && fac1.p(1) == fac2.p(1))
+            || (fac1.p(1) == fac2.p(0) && fac1.p(0) == fac2.p(1));
+    }
+    if(fac1.size() != fac2.size())
+        return false;
+    if(fac1.exp(0) == fac2.exp(0))
+        return fac1.exp(1) == fac2.exp(1)
+            && fac1.p(0) == fac2.p(0)
+            && fac1.p(1) == fac2.p(1);
+    else
+        return fac1.exp(0) == fac2.exp(1)
+            && fac1.exp(1) == fac2.exp(0)
+            && fac1.p(0) == fac2.p(1)
+            && fac1.p(1) == fac2.p(0);
+}
+void
+test_factoring()
+{
+    fmpzxx M(1031);
+    fmpz_mod_polyxx f(M), g(M);
+    frandxx state;
+    f.set_randtest_irreducible(state, 4); f = f.make_monic();
+    g.set_randtest_irreducible(state, 5); g = g.make_monic();
+
+    fmpz_mod_poly_factorxx fac = factor(f*f*g);
+    tassert(fac.size() == 2);
+    if(fac.exp(0) == 1)
+    {
+        tassert(fac.p(0) == g);
+        tassert(fac.p(1) == f && fac.exp(1) == 2);
+    }
+    else
+    {
+        tassert(fac.p(0) == f && fac.exp(0) == 2);
+        tassert(fac.p(1) == g && fac.exp(1) == 1);
+    }
+
+    fmpz_mod_poly_factorxx fac2;fac2 = fac;fac2.pow(2);
+    fac.insert(g, 1);
+    fac.insert(f, 2);
+    tassert(fac == fac2);
+
+    fmpz_mod_polyxx prod(f*f*f*g*g);
+    fac = factor(prod);
+    tassert(equiv_fac(fac, factor_cantor_zassenhaus(prod)));
+    tassert(equiv_fac(factor(f*g), factor_berlekamp(f*g)));
+    tassert(equiv_fac(fac, factor_kaltofen_shoup(prod)));
+
+    std::vector<slong> degs(2);
+    fac.realloc(0);fac.set_factor_distinct_deg(f*g, degs);
+    tassert(degs.size() == 2);
+    tassert((degs[0] == f.degree() && degs[1] == g.degree())
+            || (degs[1] == f.degree() && degs[0] == g.degree()));
+
+    tassert(f.is_irreducible() && f.is_irreducible_ddf()
+            && f.is_irreducible_rabin());
+    tassert(f.is_squarefree());
+    // TODO test set_factor_equal_deg*
+}
+
 int
 main()
 {
@@ -257,6 +326,7 @@ main()
     test_arithmetic();
     test_functions();
     test_extras();
+    test_factoring();
 
     std::cout << "PASS" << std::endl;
     return 0;

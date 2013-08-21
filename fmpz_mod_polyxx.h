@@ -128,6 +128,14 @@ class fmpz_mod_polyxx_expression
     slong length() const {return fmpz_mod_poly_length(this->evaluate()._poly());}
     slong degree() const {return fmpz_mod_poly_degree(this->evaluate()._poly());}
     bool is_zero() const {return fmpz_mod_poly_is_zero(this->evaluate()._poly());}
+    bool is_squarefree() const
+        {return fmpz_mod_poly_is_squarefree(this->evaluate()._poly());}
+    bool is_irreducible() const
+        {return fmpz_mod_poly_is_irreducible(this->evaluate()._poly());}
+    bool is_irreducible_ddf() const
+        {return fmpz_mod_poly_is_irreducible_ddf(this->evaluate()._poly());}
+    bool is_irreducible_rabin() const
+        {return fmpz_mod_poly_is_irreducible_rabin(this->evaluate()._poly());}
 
     // Lazy members
     FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, fmpz_mod_polyxx_get_coeff)
@@ -256,6 +264,12 @@ fmpz_mod_polyxx_expression<Operation, Data>::modulus() const
 {
     return tools::find_subexpr<detail::is_fmpz_mod_polyxx_predicate>(
             *this)._mod();
+}
+
+namespace traits {
+template<class T> struct is_fmpz_mod_polyxx : mp::or_<
+     traits::is_T_expr<T, fmpz_mod_polyxx>,
+     flint_classes::is_source<fmpz_mod_polyxx, T> > { };
 }
 
 namespace rules {
