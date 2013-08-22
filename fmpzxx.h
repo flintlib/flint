@@ -68,6 +68,8 @@ FLINT_DEFINE_UNOP(sqrtrem)
 FLINT_DEFINE_BINOP(gcdinv)
 FLINT_DEFINE_BINOP(xgcd)
 
+FLINT_DEFINE_FIVEARY(CRT)
+
 namespace mp {
 template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
 struct enable_all_fmpzxx;
@@ -253,6 +255,8 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP(abs)
     FLINTXX_DEFINE_MEMBER_UNOP(sqrt)
     // FLINTXX_DEFINE_MEMBER_UNOP(sqrtrem) // TODO
+
+    FLINTXX_DEFINE_MEMBER_5OP(CRT)
 };
 
 namespace detail {
@@ -635,6 +639,10 @@ FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, fmpzxx, FMPZXX_COND_S,
         fmpz_sqrt(to._fmpz(), from._fmpz()))
 FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpzxx, FMPZXX_COND_S,
         fmpz_abs(to._fmpz(), from._fmpz()))
+
+FLINT_DEFINE_FIVEARY_EXPR_COND5(CRT_op, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
+        traits::is_unsigned_integer, traits::is_unsigned_integer, tools::is_bool,
+        fmpz_CRT_ui(to._fmpz(), e1._fmpz(), e2._fmpz(), e3, e4, e5));
 } // rules
 
 } // flint

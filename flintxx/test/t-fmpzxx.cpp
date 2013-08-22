@@ -544,6 +544,24 @@ test_factoring()
     tassert(f.expand() == f.expand_multiexp());
 }
 
+void
+test_crt()
+{
+    frandxx rand;
+    fmpzxx x = fmpzxx::randtest_unsigned(rand, 25);
+    mp_limb_t primes[] = {1031, 1033, 1039};
+    const unsigned nprimes = sizeof(primes)/sizeof(mp_limb_t);
+
+    fmpzxx prod(1);
+    fmpzxx res;
+    for(unsigned i = 0;i < nprimes;++i)
+    {
+        res = res.CRT(prod, (x % primes[i]).to<mp_limb_t>(), primes[i], false);
+        prod *= primes[i];
+    }
+    tassert(res == x);
+}
+
 int
 main()
 {
@@ -563,6 +581,7 @@ main()
     test_references();
     test_randomisation();
     test_factoring();
+    test_crt();
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_fmpzxx
