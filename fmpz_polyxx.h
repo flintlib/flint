@@ -33,7 +33,6 @@
 
 #include "fmpzxx.h"
 #include "fmpz_vecxx.h"
-#include "nmod_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
@@ -265,15 +264,6 @@ public:
     void signature(slong& r1, slong& r2) const
     {
         fmpz_poly_signature(&r1, &r2, this->evaluate()._poly());
-    }
-
-    // XXX this cannot be (easily) lazy
-    // NB: tested in t-nmod_polyxx.cpp
-    nmod_polyxx reduce(nmodxx_ctx_srcref mod) const
-    {
-        nmod_polyxx res(mod);
-        fmpz_poly_get_nmod_poly(res._poly(), this->evaluate()._poly());
-        return res;
     }
 
     // lazy member forwarding

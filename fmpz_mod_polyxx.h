@@ -30,6 +30,7 @@
 
 #include "fmpzxx.h"
 #include "fmpz_polyxx.h"
+#include "nmod_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"

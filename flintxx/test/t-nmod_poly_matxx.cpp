@@ -40,15 +40,15 @@ test_init()
     tassert(ctx.n() == M);
     tassert((A + A).modulus() == M);
     tassert(A.rows() == 3 && A.cols() == 4);
-    tassert(A.at(0, 0) == nmod_polyxx::from_ground(0 % ctx));
-    A.at(0, 0) = nmod_polyxx::from_ground(1 % ctx);
+    tassert(A.at(0, 0) == nmod_polyxx::from_ground(0, ctx));
+    A.at(0, 0) = nmod_polyxx::from_ground(1, ctx);
 
     nmod_poly_matxx B(A);
     tassert(A == B);
     tassert(B.rows() == 3 && B.cols() == 4);
-    tassert(B.at(0, 0) == nmod_polyxx::from_ground(1 % ctx));
-    B.at(0, 0) = nmod_polyxx::from_ground(0 % ctx);
-    tassert(A.at(0, 0) == nmod_polyxx::from_ground(1 % ctx));
+    tassert(B.at(0, 0) == nmod_polyxx::from_ground(1, ctx));
+    B.at(0, 0) = nmod_polyxx::from_ground(0, ctx);
+    tassert(A.at(0, 0) == nmod_polyxx::from_ground(1, ctx));
     tassert(A != B);
 
     B = A;
@@ -76,8 +76,8 @@ test_arithmetic()
     nmod_poly_matxx v(10, 1, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
     for(unsigned i = 0;i < 10;++i)
-        v.at(i, 0) = nmod_polyxx::from_ground(i % ctx);
-    nmod_polyxx two = nmod_polyxx::from_ground(2 % ctx);
+        v.at(i, 0) = nmod_polyxx::from_ground(i, ctx);
+    nmod_polyxx two = nmod_polyxx::from_ground(2, ctx);
 
     tassert(transpose(v).rows() == 1);
     tassert(v.transpose().cols() == 10);
@@ -92,24 +92,24 @@ test_arithmetic()
     tassert(!has_explicit_temporaries(trace(v*transpose(v) + v*transpose(v))));
     tassert(!has_explicit_temporaries(v*transpose(v) + v*transpose(v)));
 
-    tassert(trace(transpose(v)) == nmod_polyxx::from_ground(0 % ctx));
-    tassert(trace(A + v*transpose(v)) == nmod_polyxx::from_ground(285 % ctx));
-    tassert(trace(v*transpose(v) + A) == nmod_polyxx::from_ground(285 % ctx));
+    tassert(trace(transpose(v)) == nmod_polyxx::from_ground(0, ctx));
+    tassert(trace(A + v*transpose(v)) == nmod_polyxx::from_ground(285, ctx));
+    tassert(trace(v*transpose(v) + A) == nmod_polyxx::from_ground(285, ctx));
     tassert(trace(v*transpose(v) + v*transpose(v))
-            == nmod_polyxx::from_ground(2*285 % ctx));
-    tassert(trace((A+A)*(nmod_polyxx::from_ground(1 % ctx)
-                    + nmod_polyxx::from_ground(1 % ctx)))
-            == nmod_polyxx::from_ground(0 % ctx));
+            == nmod_polyxx::from_ground(2*285, ctx));
+    tassert(trace((A+A)*(nmod_polyxx::from_ground(1, ctx)
+                    + nmod_polyxx::from_ground(1, ctx)))
+            == nmod_polyxx::from_ground(0, ctx));
 
     for(unsigned i = 0;i < 10; ++i)
         for(unsigned j = 0; j < 10; ++j)
-            A.at(i, j) = nmod_polyxx::from_ground(i*j % ctx);
+            A.at(i, j) = nmod_polyxx::from_ground(i*j, ctx);
     tassert(A == v*transpose(v));
     tassert(A != transpose(v)*v);
-    A.at(0, 0) = nmod_polyxx::from_ground(15 % ctx);
+    A.at(0, 0) = nmod_polyxx::from_ground(15, ctx);
     tassert(A != v*transpose(v));
 
-    A.at(0, 0) = nmod_polyxx::from_ground(0 % ctx);
+    A.at(0, 0) = nmod_polyxx::from_ground(0, ctx);
     for(unsigned i = 0;i < 10; ++i)
         for(unsigned j = 0; j < 10; ++j)
             A.at(i, j) *= two;
@@ -118,10 +118,10 @@ test_arithmetic()
     tassert(((-A) + A).is_zero());
     tassert((A + A).at(0, 0) == A.at(0, 0) + A.at(0, 0));
 
-    tassert(A * (17 % ctx) == A * nmod_polyxx::from_ground(17 % ctx));
+    tassert(A * nmodxx::red(17, ctx) == A * nmod_polyxx::from_ground(17, ctx));
 
     frandxx rand;
-    nmodxx x = 17 % ctx;
+    nmodxx x = nmodxx::red(17, ctx);
     A.set_randtest(rand, 5);
     nmod_matxx B(A.rows(), A.cols(), M);
     B = A(x);
@@ -137,7 +137,7 @@ test_functions()
     mp_limb_t M = 1031;
     nmod_poly_matxx A(2, 3, M), B(2, 2, M), empty(0, 15, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
-    B.at(0, 0) = nmod_polyxx::from_ground(1 % ctx);
+    B.at(0, 0) = nmod_polyxx::from_ground(1, ctx);
     tassert(A.is_zero() && !A.is_empty() && !A.is_square());
     tassert(!B.is_zero() == B.is_square());
     tassert(empty.is_zero() && empty.is_empty());

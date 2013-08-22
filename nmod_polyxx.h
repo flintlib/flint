@@ -33,6 +33,8 @@
 
 #include "fmpzxx.h"
 #include "nmod_vecxx.h"
+#include "fmpz_polyxx.h"
+#include "fmpq_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/ltuple.h"
@@ -146,6 +148,7 @@ public:
     }
 
     FLINTXX_DEFINE_FORWARD_STATIC(from_ground)
+    FLINTXX_DEFINE_FORWARD_STATIC(reduce)
 
     // these only make sense with immediates
     void realloc(slong alloc) {nmod_poly_realloc(_poly(), alloc);}
@@ -340,6 +343,39 @@ struct nmod_poly_data
         nmod_poly_data res(x.estimate_ctx());
         nmod_poly_set_coeff_ui(res.inner, 0, x.template to<mp_limb_t>());
         return res;
+    }
+    static nmod_poly_data from_ground(mp_limb_t x, nmodxx_ctx_srcref c)
+    {
+        nmod_poly_data res(c);
+        nmod_poly_set_coeff_ui(res.inner, 0, x);
+        return res;
+    }
+
+    // TODO maybe make these lazy
+    template<class Fmpz_poly>
+    static nmod_poly_data reduce(const Fmpz_poly& p, nmodxx_ctx_srcref c,
+            typename mp::enable_if<traits::is_fmpz_polyxx<Fmpz_poly> >::type* = 0)
+    {
+        nmod_poly_data res(c);
+        fmpz_poly_get_nmod_poly(res.inner, p.evaluate()._poly());
+        return res;
+    }
+
+    template<class Fmpq_poly>
+    static nmod_poly_data reduce_(const Fmpq_poly& p, nmodxx_ctx_srcref c,
+            typename mp::enable_if<traits::is_fmpq_polyxx<Fmpq_poly> >::type* = 0)
+    {
+        nmod_poly_data res(c, p.length());
+        for(unsigned i = 0;i < p.length();++i)
+            nmod_poly_set_coeff_ui(res. inner, i,
+                    nmodxx::red(p.get_coeff(i), c).template to<mp_limb_t>());
+        return res;
+    }
+    template<class Fmpq_poly>
+    static nmod_poly_data reduce(const Fmpq_poly& p, nmodxx_ctx_srcref c,
+            typename mp::enable_if<traits::is_fmpq_polyxx<Fmpq_poly> >::type* = 0)
+    {
+        return reduce_(p.evaluate(), c);
     }
 };
 } // detail

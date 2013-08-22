@@ -33,7 +33,6 @@
 
 #include "fmpqxx.h"
 #include "fmpz_polyxx.h"
-#include "nmod_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
@@ -183,22 +182,6 @@ public:
         std::string res(str);
         std::free(str);
         return res;
-    }
-
-    // sort of internal
-    nmod_polyxx _reduce(nmodxx_ctx_srcref c) const
-    {
-        nmod_polyxx res(c, length());
-        for(unsigned i = 0;i < length();++i)
-            res.set_coeff(i, nmodxx::red(get_coeff(i), c));
-        return res;
-    }
-
-    // XXX this cannot easily be lazy
-    // NB: tested in test-nmod_polyxx.cpp
-    nmod_polyxx reduce(nmodxx_ctx_srcref c) const
-    {
-        return this->evaluate()._reduce(c);
     }
 
     // lazy members

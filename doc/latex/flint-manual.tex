@@ -1756,6 +1756,35 @@ coefficients of a \code{fmpqxx} being \code{num(), den()}), and the same
 behaviour occurs in many other flintxx types, e.g. in
 \code{fmpz_polyxx.coeff()}, etc.
 
+\paragraph{Type conversion}
+
+As a rule, flintxx does not perform automatic type conversions (except when
+related to the promotion to reference types, c/f earlier discussion). In
+expression templates, operands can be automatically promoted if the underlying
+C interface provides this facility. Beyond that, types have to be converted
+explicitly.
+
+There are two ways of doing this. The preferred one is using static constructor
+functions. Typical examples are
+\code{fmpz_polyxx::from_ground(fmpzarg)} and
+\code{nmod_polyxx::reduce(mplimbarg, nmodctxarg)}. The former takes an
+(expression template evaluating to) \code{fmpzxx} and returns an
+\code{fmpz_polyxx} representing the constant polynomial with value the
+\code{fmpzxx}. The latter takes an argument of type \code{mp_limb_t} and one of
+type \code{nmodxx_ctx_srcref} (essentially a word-sized modulus) and returns an
+\code{nmod_polyxx} representing the constant polynomial obtained by reducing
+\code{mplimbarg}.
+
+The general format for this is \code{totype::constructorname(arg1, arg2, ...)}.
+We prefer this because it makes explicit the type that is being converted to,
+and the way the arguments are to be interpreted.
+%In comparison, \code{fmpzarg.reduce(ctx)}
+%does not make it clear if the reduction should be to \code{nmodxx},
+%\code{nmod_polyxx} or perhaps \code{fmpz_mod_polyxx}.
+
+This format only works if the target type is part of flintxx. In other cases, we
+use a \code{.to<totype>()} syntax, as in \code{fmpzexpr.to<slong>()}.
+
 \paragraph{Extending flintxx}
 
 Explanations on the inner workings of the flintxx expression template library

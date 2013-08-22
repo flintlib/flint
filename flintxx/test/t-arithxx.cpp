@@ -73,11 +73,11 @@ test_bell()
     tassert(bell_number(10u) == bell_number_multi_mod(10u));
 
     nmodxx_ctx p(1031);
-    tassert(bell_number_nmod(10u, p) == bell_number(10u).evaluate() % p);
+    tassert(bell_number_nmod(10u, p) == nmodxx::red(bell_number(10u), p));
     nmod_vecxx v2(bell_number_nmod_vec(10u, p));
     tassert(v2.size() == 10);
     for(unsigned i = 0;i < v2.size();++i)
-        tassert(v2[i] == v[i] % p);
+        tassert(v2[i] == nmodxx::red(v[i], p));
 
     tassert(v2 == bell_number_nmod_vec_series(10u, p));
     tassert(v2 == bell_number_nmod_vec_recursive(10u, p));
@@ -196,7 +196,7 @@ test_number_of_partitions()
     for(unsigned i = 0;i < N;++i)
     {
         tassert(v1[i] == number_of_partitions(i));
-        tassert(v1[i] % p == v2[i]);
+        tassert(nmodxx::red(v1[i], p) == v2[i]);
     }
 }
 

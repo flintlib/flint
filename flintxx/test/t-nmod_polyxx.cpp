@@ -43,9 +43,10 @@ test_init()
     tassert(p.modulus() == 10);
 
     nmodxx_ctx_srcref ctx = p.estimate_ctx();
-    tassert(p == nmod_polyxx::from_ground(0 % ctx));
+    tassert(p == nmod_polyxx::from_ground(nmodxx::red(0, ctx)));
     p.set_coeff(0, 1);
-    tassert(p == nmod_polyxx::from_ground((1 % ctx) + (0 % ctx)));
+    tassert(p == nmod_polyxx::from_ground(
+                (nmodxx::red(1, ctx)) + (nmodxx::red(0, ctx))));
 }
 
 void
@@ -275,11 +276,11 @@ test_functions()
     fmpz_polyxx lift2 = fmpz_polyxx::randtest(rand, 10, 6);
     lift1.lead() = 1;
     lift2.lead() = 1;
-    f = lift1.reduce(ctx);
+    f = nmod_polyxx::reduce(lift1, ctx);
     for(unsigned i = 0;i < f.length();++i)
         tassert(f.get_coeff(i) == nmodxx::red(lift1.get_coeff(i), ctx));
 
-    g = lift2.reduce(ctx);
+    g = nmod_polyxx::reduce(lift2, ctx);
     tassert(f.resultant(g) == nmodxx::red(lift1.resultant(lift2), ctx));
     tassert(f.resultant(g) == f.resultant_euclidean(g));
 
@@ -331,26 +332,26 @@ test_transcendental_functions()
     nmodxx_ctx_srcref ctx = f.estimate_ctx();
     fmpq_polyxx lift = fmpq_polyxx::randtest(state, 10, 9);
     lift.set_coeff(0, 0);
-    f = lift.reduce(ctx);
+    f = nmod_polyxx::reduce(lift, ctx);
     for(unsigned i = 0;i < f.length();++i)
         tassert(f.get_coeff(i) == nmodxx::red(lift.get_coeff(i), ctx));
 
-    tassert(f.exp_series(15) == lift.exp_series(15).reduce(ctx));
-    tassert(f.atan_series(15) == lift.atan_series(15).reduce(ctx));
-    tassert(f.atanh_series(15) == lift.atanh_series(15).reduce(ctx));
-    tassert(f.asin_series(15) == lift.asin_series(15).reduce(ctx));
-    tassert(f.asinh_series(15) == lift.asinh_series(15).reduce(ctx));
-    tassert(f.sin_series(15) == lift.sin_series(15).reduce(ctx));
-    tassert(f.cos_series(15) == lift.cos_series(15).reduce(ctx));
-    tassert(f.tan_series(15) == lift.tan_series(15).reduce(ctx));
-    tassert(f.sinh_series(15) == lift.sinh_series(15).reduce(ctx));
-    tassert(f.cosh_series(15) == lift.cosh_series(15).reduce(ctx));
-    tassert(f.tanh_series(15) == lift.tanh_series(15).reduce(ctx));
+    tassert(f.exp_series(15) == nmod_polyxx::reduce(lift.exp_series(15), ctx));
+    tassert(f.atan_series(15) == nmod_polyxx::reduce(lift.atan_series(15), ctx));
+    tassert(f.atanh_series(15) == nmod_polyxx::reduce(lift.atanh_series(15), ctx));
+    tassert(f.asin_series(15) == nmod_polyxx::reduce(lift.asin_series(15), ctx));
+    tassert(f.asinh_series(15) == nmod_polyxx::reduce(lift.asinh_series(15), ctx));
+    tassert(f.sin_series(15) == nmod_polyxx::reduce(lift.sin_series(15), ctx));
+    tassert(f.cos_series(15) == nmod_polyxx::reduce(lift.cos_series(15), ctx));
+    tassert(f.tan_series(15) == nmod_polyxx::reduce(lift.tan_series(15), ctx));
+    tassert(f.sinh_series(15) == nmod_polyxx::reduce(lift.sinh_series(15), ctx));
+    tassert(f.cosh_series(15) == nmod_polyxx::reduce(lift.cosh_series(15), ctx));
+    tassert(f.tanh_series(15) == nmod_polyxx::reduce(lift.tanh_series(15), ctx));
 
     tassert(f.exp_series_basecase(15) == f.exp_series(15));
 
     f.set_coeff(0, 1); lift.set_coeff(0, 1);
-    tassert(f.log_series(15) == lift.log_series(15).reduce(ctx));
+    tassert(f.log_series(15) == nmod_polyxx::reduce(lift.log_series(15), ctx));
 
     f.realloc(0);
     nmodxx a = nmodxx::red(7, ctx);

@@ -53,7 +53,7 @@ public:
     {
         if(o.content() != content() || o.size() != size())
             return false;
-        for(slong i = 0;i < size();++i)
+        for(ulong i = 0;i < size();++i)
             if(p(i) != o.p(i) || exp(i) != o.exp(i))
             return false;
         return true;

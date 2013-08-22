@@ -576,11 +576,6 @@ static Fmpz_poly_expr fmpz_polyxx::product_roots(Fmpz_vec_expr xs)
 
     See \code{fmpz_poly_product_roots_fmpz_vec}.
 
-nmod_polyxx Fmpz_poly_expr::reduce(nmodxx_ctx_srcref c) const
-
-    Reduce the coefficients modulo the modulus stored in \code{c}. See
-    \code{fmpz_poly_get_nmod_poly}.
-
 void Fmpz_poly_target realloc(slong alloc)
 void Fmpz_poly_target::fit_length(slong len)
 void Fmpz_poly_target::_normalise()
@@ -1263,10 +1258,6 @@ std::string Fmpq_poly_expr::pretty(const char* x) const
 
 std::string Fmpq_poly_expr::to_string() const
 
-nmod_polyxx Fmpq_poly_expr::reduce(nmodxx_ctx_srcref c) const
-
-    Reduce the coefficients modulo the modulus stored in \code{c}.
-
 Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_poly_expr) const
 Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_expr) const
 
@@ -1687,10 +1678,6 @@ static nmodxx nmodxx::red(Fmpq_expr n, nmodxx_ctx_srcref ctx)
 
     Initialise an \code{nmodxx} to the reduction of $n$.
 
-nmodxx operator%(?? n, nmodxx_ctx_srcref ctx)
-
-    This has the same effect as \code{nmodxx::red(n, ctx)}.
-
 static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
 static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)
 
@@ -1820,6 +1807,21 @@ Nmod_poly_target Nmod_poly_target::operator=(const char*)
     is malformed.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, nmodxx_ctx_srcref)
+static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, nmodxx_ctx_srcref)
+
+    See \code{fmpz_poly_get_nmod_poly}.
+
+static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
+static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
+
+    Consider $e \in \mathbb{Z}/n\mathbb{Z}$ as an element of
+    $\mathbb{Z}/n\mathbb{Z}[X]$.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1830,11 +1832,6 @@ nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
 
     Instantiate \code{nmod_polyxx} relative to some modulus. If the second
     argument is provided, space is allocated for \code{alloc} coefficients.
-
-static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
-
-    Consider $e \in \mathbb{Z}/n\mathbb{Z}$ as an element of
-    $\mathbb{Z}/n\mathbb{Z}[X]$.
 
 void Nmod_poly_target realloc(slong alloc)
 void Nmod_poly_target::fit_length(slong len)
