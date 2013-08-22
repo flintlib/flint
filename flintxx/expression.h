@@ -641,7 +641,7 @@ inline typename mp::enable_if<typename traits::is_implemented<
 }
 
 // TODO remove this?
-#include "flintxx/default_rules.h"
+#include "default_rules.h"
 
 
 ////////////////////////////////////////////////////////////////////////
