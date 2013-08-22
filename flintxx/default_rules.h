@@ -212,6 +212,69 @@ struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, empty_tuple> > >,
                 mp::tuple_get<data_t, 2>::get(input));
     }
 };
+// Automatically invoke fourary_expression
+template<bool result_is_temporary, class Op,
+    class Data1, class Data2, class Data3, class Data4>
+struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, empty_tuple> > > >,
+    result_is_temporary, 0,
+    typename mp::enable_if<
+        traits::is_implemented<
+            fourary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type> > >::type>
+{
+    typedef fourary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    typedef typename mp::make_tuple<Data1, Data2, Data3, Data4>::type data_t;
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
+    {
+        wrapped_t::doit(*output, mp::tuple_get<data_t, 0>::get(input),
+                mp::tuple_get<data_t, 1>::get(input),
+                mp::tuple_get<data_t, 2>::get(input),
+                mp::tuple_get<data_t, 3>::get(input));
+    }
+};
+// Automatically invoke fivary_expression
+template<bool result_is_temporary, class Op,
+    class Data1, class Data2, class Data3, class Data4, class Data5>
+struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, tuple<Data5, empty_tuple> > > > >,
+    result_is_temporary, 0,
+    typename mp::enable_if<
+        traits::is_implemented<
+            fiveary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type,
+                typename traits::basetype<Data5>::type> > >::type>
+{
+    typedef fiveary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type,
+                typename traits::basetype<Data5>::type> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    typedef typename mp::make_tuple<Data1, Data2, Data3, Data4, Data5>::type data_t;
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
+    {
+        wrapped_t::doit(*output, mp::tuple_get<data_t, 0>::get(input),
+                mp::tuple_get<data_t, 1>::get(input),
+                mp::tuple_get<data_t, 2>::get(input),
+                mp::tuple_get<data_t, 3>::get(input),
+                mp::tuple_get<data_t, 4>::get(input));
+    }
+};
 
 // Instantiating temporaries
 

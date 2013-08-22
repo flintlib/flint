@@ -332,6 +332,13 @@ test_unrelated_overload()
     s = s * (myint(5) + myint(5));
 }
 
+void
+test_multiary()
+{
+    tassert(fourary_test(1, 2, 3, 4) == myint(1 + 2 + 3 + 4));
+    tassert(fiveary_test(1, 2, 3, 4, 5u) == 1 + 2 + 3 + 4 + 5);
+}
+
 int
 main()
 {
@@ -350,6 +357,7 @@ main()
     test_tools();
     test_temporaries();
     test_references();
+    test_multiary();
 
     test_unrelated_overload();
 

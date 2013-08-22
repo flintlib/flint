@@ -173,7 +173,18 @@ template<> struct is_target<mylong> : mp::true_ { };
 template<> struct is_target<mylong_ref> : mp::true_ { };
 }
 
+
+FLINT_DEFINE_FOURARY(fourary_test)
+FLINT_DEFINE_FIVEARY(fiveary_test)
+
 namespace rules {
+FLINT_DEFINE_FOURARY_EXPR_COND4(fourary_test_op, myint,
+        traits::is_integer, traits::is_integer, traits::is_integer, traits::is_integer,
+        to._data().payload = e1 + e2 + e3 + e4)
+FLINT_DEFINE_FIVEARY_EXPR_COND5(fiveary_test_op, myint,
+        traits::is_integer, traits::is_integer, traits::is_integer,
+        traits::is_integer, traits::is_integer,
+        to._data().payload = e1 + e2 + e3 + e4 + e5)
 
 template<>
 struct print<myint>

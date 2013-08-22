@@ -124,6 +124,10 @@ struct unary_expression : UNIMPLEMENTED { };
 
 template<class Op, class T, class U, class V, class Enable = void>
 struct threeary_expression : UNIMPLEMENTED { };
+template<class Op, class T, class U, class V, class W, class Enable = void>
+struct fourary_expression : UNIMPLEMENTED { };
+template<class Op, class T, class U, class V, class W, class X, class Enable = void>
+struct fiveary_expression : UNIMPLEMENTED { };
 } // rules
 
 
@@ -325,6 +329,32 @@ struct threeary_expression<operations::name, T, U, V, \
     typedef rettype return_t; \
     template<class R> \
     static void doit(R& to, const T& e1, const U& e2, const V& e3) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_FOURARY_EXPR_COND4(name, rettype, cond1, cond2, cond3, cond4, eval) \
+template<class T, class U, class V, class W> \
+struct fourary_expression<operations::name, T, U, V, W, \
+    typename mp::enable_if< mp::and_< cond1 <T>, cond2 <U>, cond3 <V>, cond4 <W> > >::type> \
+{ \
+    typedef rettype return_t; \
+    template<class R> \
+    static void doit(R& to, const T& e1, const U& e2, const V& e3, const W& e4) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_FIVEARY_EXPR_COND5(name, rettype, cond1, cond2, cond3, cond4, cond5, eval) \
+template<class T, class U, class V, class W, class X> \
+struct fiveary_expression<operations::name, T, U, V, W, X, \
+    typename mp::enable_if< mp::and_< cond1 <T>, cond2 <U>, cond3 <V>, cond4 <W>, cond5 <X> > >::type> \
+{ \
+    typedef rettype return_t; \
+    template<class R> \
+    static void doit(R& to, const T& e1, const U& e2, const V& e3, const W& e4, const X& e5) \
     { \
         eval; \
     } \

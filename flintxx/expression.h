@@ -700,6 +700,36 @@ name(const T1& t1, const T2& t2, const T3& t3) \
 #define FLINT_THREEARY_ENABLE_RETTYPE(name, T1, T2, T3) \
     typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::enable::type
 
+#define FLINT_DEFINE_FOURARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+template<class T1, class T2, class T3, class T4> \
+inline typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3, const T4& t4) \
+{ \
+    return detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::make( \
+        t1, t2, t3, t4); \
+}
+
+#define FLINT_FOURARY_ENABLE_RETTYPE(name, T1, T2, T3, T4) \
+    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::enable::type
+
+#define FLINT_DEFINE_FIVEARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+template<class T1, class T2, class T3, class T4, class T5> \
+inline typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5) \
+{ \
+    return detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::make( \
+        t1, t2, t3, t4, t5); \
+}
+
+#define FLINT_FIVEARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5) \
+    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::enable::type
+
 // To be called in any namespace
 
 // Make the binary operation "name" available in current namespace

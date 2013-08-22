@@ -539,6 +539,30 @@ name(const T& t, const U& u) const \
 #define FLINTXX_DEFINE_MEMBER_3OP(name) \
     FLINTXX_DEFINE_MEMBER_3OP_(name, name)
 
+#define FLINTXX_DEFINE_MEMBER_4OP_(name, funcname) \
+template<class T, class U, class V> \
+typename detail::nary_op_helper2<operations::name##_op, \
+    typename base_t::derived_t, T, U, V>::enable::type \
+name(const T& t, const U& u, const V& v) const \
+{ \
+    return flint::funcname(*this, t, u, v); \
+}
+
+#define FLINTXX_DEFINE_MEMBER_4OP(name) \
+    FLINTXX_DEFINE_MEMBER_4OP_(name, name)
+
+#define FLINTXX_DEFINE_MEMBER_5OP_(name, funcname) \
+template<class T, class U, class V, class W> \
+typename detail::nary_op_helper2<operations::name##_op, \
+    typename base_t::derived_t, T, U, V, W>::enable::type \
+name(const T& t, const U& u, const V& v, const W& w) const \
+{ \
+    return flint::funcname(*this, t, u, v, w); \
+}
+
+#define FLINTXX_DEFINE_MEMBER_5OP(name) \
+    FLINTXX_DEFINE_MEMBER_5OP_(name, name)
+
 #define FLINTXX_UNADORNED_MAKETYPES(Base, left, op, right) \
     Base##_expression< op, tuple< left, tuple< right, empty_tuple> > >
 
