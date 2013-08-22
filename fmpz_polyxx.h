@@ -108,7 +108,7 @@ struct fmpz_poly_traits
     static lead_ref_t lead(const Poly& p) {return fmpz_polyxx_lead(p);}
 
     template<class T>
-    struct get_coeff
+    struct coeff
     {
         typedef FLINT_BINOP_ENABLE_RETTYPE(fmpz_polyxx_get_coeff, Poly, T) ref_t;
         typedef ref_t srcref_t;
@@ -204,15 +204,15 @@ public:
     // The result of these are undefined if n is >= length
     // You also may have to call _normalise().
     template<class T>
-    typename poly_traits_t::template get_coeff<T>::ref_t get_coeff(const T& n)
+    typename poly_traits_t::template coeff<T>::ref_t coeff(const T& n)
     {
-        return poly_traits_t::template get_coeff<T>::get(*this, n);
+        return poly_traits_t::template coeff<T>::get(*this, n);
     }
     template<class T>
-    typename poly_traits_t::template get_coeff<T>::srcref_t
-        get_coeff(const T& n) const
+    typename poly_traits_t::template coeff<T>::srcref_t
+        coeff(const T& n) const
     {
-        return poly_traits_t::template get_coeff<T>::get(*this, n);
+        return poly_traits_t::template coeff<T>::get(*this, n);
     }
     typename poly_traits_t::lead_ref_t lead()
     {
@@ -278,14 +278,15 @@ public:
 
     // lazy member forwarding
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
-    FLINTXX_DEFINE_MEMBER_BINOP_(bit_pack, bit_pack)
-    FLINTXX_DEFINE_MEMBER_BINOP_(divides, divides)
+    FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, fmpz_polyxx_get_coeff)
 
+    FLINTXX_DEFINE_MEMBER_BINOP(bit_pack)
     FLINTXX_DEFINE_MEMBER_BINOP(compose_divconquer)
     FLINTXX_DEFINE_MEMBER_BINOP(compose_horner)
     FLINTXX_DEFINE_MEMBER_BINOP(div_basecase)
     FLINTXX_DEFINE_MEMBER_BINOP(div_divconquer)
     FLINTXX_DEFINE_MEMBER_BINOP(divexact)
+    FLINTXX_DEFINE_MEMBER_BINOP(divides)
     FLINTXX_DEFINE_MEMBER_BINOP(divrem)
     FLINTXX_DEFINE_MEMBER_BINOP(divrem_basecase)
     FLINTXX_DEFINE_MEMBER_BINOP(divrem_divconquer)
@@ -395,7 +396,7 @@ struct fmpz_poly_traits<fmpz_polyxx_srcref>
         {return lead_srcref_t::make(fmpz_poly_lead(p._poly()));}
 
     template<class T>
-    struct get_coeff
+    struct coeff
     {
         typedef typename mp::enable_if<
             traits::is_integer<T>, fmpzxx_srcref>::type ref_t;
@@ -403,7 +404,7 @@ struct fmpz_poly_traits<fmpz_polyxx_srcref>
 
         template<class P>
         static srcref_t get(const P& p, const T& n)
-            {return srcref_t::make(fmpz_poly_get_coeff_ptr(p._poly(), n));}
+            {return srcref_t::make(fmpz_poly_coeff_ptr(p._poly(), n));}
     };
 };
 template<>
@@ -417,8 +418,8 @@ struct fmpz_poly_traits<fmpz_polyxx_ref>
         {return lead_ref_t::make(fmpz_poly_lead(p._poly()));}
 
     template<class T>
-    struct get_coeff
-        : fmpz_poly_traits<fmpz_polyxx_srcref>::template get_coeff<T>
+    struct coeff
+        : fmpz_poly_traits<fmpz_polyxx_srcref>::template coeff<T>
     {
         typedef fmpzxx_ref ref_t;
 

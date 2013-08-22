@@ -587,17 +587,28 @@ void Fmpz_poly_target::_normalise()
 void Fmpz_poly_target::_set_length(slong len)
 void Fmpz_poly_target::zero_coeffs(slong i, slong j)
 
-?? Fmpz_poly_expr::get_coeff(slong n) const
+Fmpz_expr Fmpz_poly_expr::get_coeff(slong n)
+
+    Obtain coefficient $n$ of the polynomial. It is valid to call this with $n$
+    greater than the degree, in which case zero is returned.
+
+?? Fmpz_poly_expr::coeff(slong n) const
 
     Unified coefficient access for coefficient $n$.
     The result is undefined if $n$ is
     greater than the degree of the polynomial (or negative).
+
+    If the leading coefficient of the polynomial is set to zero in this way, a
+    call to \code{_normalise} is necessary.
 
 ?? Fmpz_poly_expr::lead() const
 
     Unified coefficient access for the leading coefficient.
     The result is undefined if
     the length of the polynomial is zero.
+
+    If this is used to set the leading coefficient to zero,
+    call to \code{_normalise} is necessary.
 
 void Fmpz_poly_target::set_coeff(slong n, Fmpz_expr)
 void Fmpz_poly_target::set_coeff(slong n, T:is_integer)

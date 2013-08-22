@@ -45,11 +45,12 @@ void
 test_manipulation()
 {
     fmpz_polyxx p, q;
+    tassert(p.get_coeff(5) == 0);
     p.set_coeff(5, 17);
     tassert(p.degree() == 5);
     q.set_coeff(5, 17u);
     p.set_coeff(0, fmpzxx(1));
-    q.get_coeff(0) = 1;
+    q.coeff(0) = 1;
     tassert(p == q);
 
     tassert(p.lead() == 17);
@@ -64,7 +65,7 @@ test_manipulation()
 
     const fmpz_polyxx pc = p;
     tassert(p.get_coeff(0) == pc.get_coeff(0));
-    tassert((p*q).get_coeff(0) == p.get_coeff(0)*q.get_coeff(0));
+    tassert((p*q).coeff(0) == p.get_coeff(0)*q.get_coeff(0));
     tassert((p*q).lead() == p.lead()*q.lead());
 }
 
