@@ -360,6 +360,14 @@ struct nmod_poly_data
         fmpz_poly_get_nmod_poly(res.inner, p.evaluate()._poly());
         return res;
     }
+    template<class Fmpz_poly>
+    static nmod_poly_data reduce(const Fmpz_poly& p, mp_limb_t m,
+            typename mp::enable_if<traits::is_fmpz_polyxx<Fmpz_poly> >::type* = 0)
+    {
+        nmod_poly_data res(m);
+        fmpz_poly_get_nmod_poly(res.inner, p.evaluate()._poly());
+        return res;
+    }
 
     template<class Fmpq_poly>
     static nmod_poly_data reduce_(const Fmpq_poly& p, nmodxx_ctx_srcref c,
@@ -376,6 +384,12 @@ struct nmod_poly_data
             typename mp::enable_if<traits::is_fmpq_polyxx<Fmpq_poly> >::type* = 0)
     {
         return reduce_(p.evaluate(), c);
+    }
+    template<class Fmpq_poly>
+    static nmod_poly_data reduce(const Fmpq_poly& p, mp_limb_t m,
+            typename mp::enable_if<traits::is_fmpq_polyxx<Fmpq_poly> >::type* = 0)
+    {
+        return reduce_(p.evaluate(), nmodxx_ctx(m));
     }
 };
 } // detail
@@ -840,6 +854,15 @@ NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_berlekamp)
 NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_kaltofen_shoup)
 
 // TODO do we want global versions of factor_distinct_deg etc?
+
+
+// CRT stuff
+// Here for circular dependency reasons
+namespace rules {
+FLINT_DEFINE_FOURARY_EXPR_COND4(CRT_op, fmpz_polyxx,
+        FMPZ_POLYXX_COND_T, FMPZXX_COND_S, NMOD_POLYXX_COND_S, tools::is_bool,
+        fmpz_poly_CRT_ui(to._poly(), e1._poly(), e2._fmpz(), e3._poly(), e4))
+} // rules
 } // flint
 
 #endif

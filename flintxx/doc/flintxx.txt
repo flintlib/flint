@@ -650,6 +650,10 @@ nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m,
 
 *******************************************************************************
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Not yet split into subsections
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 fmpz_polyxx::fmpz_polyxx()
 
 fmpz_polyxx::fmpz_polyxx(slong alloc)
@@ -973,6 +977,17 @@ Fmpz_poly_expr sqrt_classical(Fmpz_poly_expr p)
     Else raise \code{flint_exception}. See \code{fmpz_poly_sqrt}.
 
 Fmpz_expr bound_roots(Fmpz_poly_expr p)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction and reconstruction
+
+    For modular reduction, see \code{nmod_polyxx::reduce}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr Fmpz_poly_expr::CRT(Fmpz_expr, Nmod_poly_expr, bool)
+Fmpz_poly_expr CRT(Fmpz_poly_expr, Fmpz_expr, Nmod_poly_expr, bool)
+
+    See \code{fmpz_poly_CRT_ui}.
 
 
 *******************************************************************************
@@ -1910,6 +1925,8 @@ Nmod_poly_target Nmod_poly_target::operator=(const char*)
 
 static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, nmodxx_ctx_srcref)
 static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, nmodxx_ctx_srcref)
+static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, mp_limb_t)
+static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, mp_limb_t)
 
     See \code{fmpz_poly_get_nmod_poly}.
 

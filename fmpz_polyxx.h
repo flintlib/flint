@@ -46,7 +46,6 @@
 // TODO power series class?
 // TODO hensel lifting
 // TODO input
-// TODO modular reduction
 // TODO addmul
 
 namespace flint {
@@ -115,6 +114,10 @@ struct fmpz_poly_traits
             {return fmpz_polyxx_get_coeff(p, t);}
     };
 };
+}
+
+namespace traits {
+template<class T> struct is_nmod_polyxx;
 }
 
 template<class Operation, class Data>
@@ -191,6 +194,33 @@ public:
         fmpzxx u; u = t;
         res.set_coeff(0, u);
         return res;
+    }
+
+    template<class Nmod_poly>
+    static fmpz_polyxx_expression _lift(const Nmod_poly& poly)
+    {
+        fmpz_polyxx_expression res(poly.length());
+        fmpz_poly_set_nmod_poly(res._poly(), poly._poly());
+        return res;
+    }
+    template<class Nmod_poly>
+    static fmpz_polyxx_expression lift(const Nmod_poly& poly,
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0)
+    {
+        return _lift(poly.evaluate());
+    }
+    template<class Nmod_poly>
+    static fmpz_polyxx_expression _lift_unsigned(const Nmod_poly& poly)
+    {
+        fmpz_polyxx_expression res(poly.length());
+        fmpz_poly_set_nmod_poly_unsigned(res._poly(), poly.evaluate()._poly());
+        return res;
+    }
+    template<class Nmod_poly>
+    static fmpz_polyxx_expression lift_unsigned(const Nmod_poly& poly,
+            typename mp::enable_if<traits::is_nmod_polyxx<Nmod_poly> >::type* = 0)
+    {
+        return _lift_unsigned(poly.evaluate());
     }
 
     // These only make sense with immediates
@@ -358,6 +388,8 @@ public:
     FLINTXX_DEFINE_MEMBER_3OP(mullow_KS)
     FLINTXX_DEFINE_MEMBER_3OP(mullow_SS)
     FLINTXX_DEFINE_MEMBER_3OP(pow_trunc)
+
+    FLINTXX_DEFINE_MEMBER_4OP(CRT)
 };
 
 namespace detail {
@@ -827,5 +859,7 @@ evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)
     return fmpz_poly_evaluate_mod(p.evaluate()._poly(), x, n);
 }
 } // flint
+
+#include "nmod_polyxx.h" // modular reconstruction code
 
 #endif

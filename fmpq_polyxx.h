@@ -32,7 +32,6 @@
 #include "fmpq_poly.h"
 
 #include "fmpqxx.h"
-#include "fmpz_polyxx.h"
 
 #include "flintxx/expression.h"
 #include "flintxx/flint_classes.h"
@@ -315,7 +314,12 @@ template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
 struct enable_all_fmpq_polyxx
     : mp::enable_if<all_fmpq_polyxx<T1, T2, T3, T4>, Out> { };
 } // mp
+} // flint
 
+// here to deal with circular dependencies...
+#include "fmpz_polyxx.h"
+
+namespace flint {
 namespace rules {
 #define FMPQ_POLYXX_COND_S FLINTXX_COND_S(fmpq_polyxx)
 #define FMPQ_POLYXX_COND_T FLINTXX_COND_T(fmpq_polyxx)

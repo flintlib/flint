@@ -435,6 +435,39 @@ test_factoring()
     // TODO test set_factor_equal_deg*
 }
 
+void
+test_reduction_reconstruction()
+{
+    std::vector<mp_limb_t> primes;
+    primes.push_back(1031);
+    primes.push_back(1033);
+    primes.push_back(1039);
+    mp_limb_t M = primes[0];
+    nmodxx_ctx ctx(M);
+
+    frandxx rand;
+    fmpz_polyxx A = fmpz_polyxx::randtest(rand, 10, 8);
+    nmod_polyxx Ap = nmod_polyxx::reduce(A, ctx);
+    for(slong i = 0;i < A.length();++i)
+        tassert(Ap.get_coeff(i) == nmodxx::red(A.get_coeff(i), ctx));
+    tassert(A == fmpz_polyxx::lift(Ap));
+
+    for(slong i = 0;i < A.length();++i)
+            A.coeff(i) = abs(A.coeff(i));
+    tassert(A == fmpz_polyxx::lift_unsigned(nmod_polyxx::reduce(A, ctx)));
+
+    A = fmpz_polyxx::randtest(rand, 10, 25);
+
+    fmpzxx prod(1);
+    fmpz_polyxx res;
+    for(unsigned i = 0;i < primes.size();++i)
+    {
+        res = res.CRT(prod, nmod_polyxx::reduce(A, primes[i]), true);
+        prod *= primes[i];
+    }
+    tassert(res == A);
+}
+
 int
 main()
 {
@@ -449,6 +482,7 @@ main()
     test_transcendental_functions();
     test_extras();
     test_factoring();
+    test_reduction_reconstruction();
 
     std::cout << "PASS" << std::endl;
     return 0;
