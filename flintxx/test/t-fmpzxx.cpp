@@ -549,16 +549,26 @@ test_crt()
 {
     frandxx rand;
     fmpzxx x = fmpzxx::randtest_unsigned(rand, 25);
-    mp_limb_t primes[] = {1031, 1033, 1039};
-    const unsigned nprimes = sizeof(primes)/sizeof(mp_limb_t);
+    std::vector<mp_limb_t> primes;
+    primes.push_back(1031);
+    primes.push_back(1033);
+    primes.push_back(1039);
+
+    fmpz_combxx comb(primes);
+    std::vector<mp_limb_t> residues(primes.size());
+    multi_mod(residues, x, comb);
 
     fmpzxx prod(1);
     fmpzxx res;
-    for(unsigned i = 0;i < nprimes;++i)
+    for(unsigned i = 0;i < primes.size();++i)
     {
-        res = res.CRT(prod, (x % primes[i]).to<mp_limb_t>(), primes[i], false);
+        tassert(residues[i] == x % primes[i]);
+        res = res.CRT(prod, residues[i], primes[i], false);
         prod *= primes[i];
     }
+    tassert(res == x);
+
+    res = multi_CRT(residues, comb, false);
     tassert(res == x);
 }
 

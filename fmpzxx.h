@@ -27,6 +27,7 @@
 #define CXX_FMPZXX_H
 
 #include <cstdlib>
+#include <vector>
 
 #include "flintxx/evaluation_tools.h"
 #include "flintxx/expression.h"
@@ -69,6 +70,7 @@ FLINT_DEFINE_BINOP(gcdinv)
 FLINT_DEFINE_BINOP(xgcd)
 
 FLINT_DEFINE_FIVEARY(CRT)
+FLINT_DEFINE_THREEARY(multi_CRT)
 
 namespace mp {
 template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
@@ -639,12 +641,53 @@ FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, fmpzxx, FMPZXX_COND_S,
         fmpz_sqrt(to._fmpz(), from._fmpz()))
 FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpzxx, FMPZXX_COND_S,
         fmpz_abs(to._fmpz(), from._fmpz()))
-
-FLINT_DEFINE_FIVEARY_EXPR_COND5(CRT_op, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
-        traits::is_unsigned_integer, traits::is_unsigned_integer, tools::is_bool,
-        fmpz_CRT_ui(to._fmpz(), e1._fmpz(), e2._fmpz(), e3, e4, e5));
 } // rules
 
+// chinese remaindering
+class fmpz_combxx
+{
+private:
+    fmpz_comb_t comb;
+    mutable fmpz_comb_temp_t tmp;
+
+    // not copyable
+    fmpz_combxx(const fmpz_combxx&);
+
+public:
+    fmpz_combxx(const std::vector<mp_limb_t>& v)
+    {
+        fmpz_comb_init(comb, &v.front(), v.size());
+        fmpz_comb_temp_init(tmp, comb);
+    }
+
+    ~fmpz_combxx()
+    {
+        fmpz_comb_temp_clear(tmp);
+        fmpz_comb_clear(comb);
+    }
+
+    const fmpz_comb_t& _comb() const {return comb;}
+    fmpz_comb_temp_t& _temp() const {return tmp;}
+};
+
+// TODO make lazy somehow?
+template<class Fmpz>
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type
+multi_mod(std::vector<mp_limb_t>& out, const Fmpz& in, const fmpz_combxx& comb)
+{
+    fmpz_multi_mod_ui(&out.front(), in.evaluate()._fmpz(),
+            comb._comb(), comb._temp());
+}
+
+namespace rules {
+FLINT_DEFINE_FIVEARY_EXPR_COND5(CRT_op, fmpzxx, FMPZXX_COND_S, FMPZXX_COND_S,
+        traits::is_unsigned_integer, traits::is_unsigned_integer, tools::is_bool,
+        fmpz_CRT_ui(to._fmpz(), e1._fmpz(), e2._fmpz(), e3, e4, e5))
+
+FLINT_DEFINE_THREEARY_EXPR(multi_CRT_op, fmpzxx,
+        std::vector<mp_limb_t>, fmpz_combxx, bool,
+        fmpz_multi_CRT_ui(to._fmpz(), &e1.front(), e2._comb(), e2._temp(), e3))
+} // rules
 } // flint
 
 #endif

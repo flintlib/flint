@@ -94,6 +94,10 @@ Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
 
 *******************************************************************************
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Not yet split into subsections
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 fmpzxx::fmpzxx()
 
     Initialize to zero.
@@ -333,6 +337,37 @@ Fmpz_expr root(Fmpz_expr, T:fits_into_slong)
 Fmpz_expr sqrt(Fmpz_expr)
 
 Fmpz_expr abs(Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Chinese remaindering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Fmpz_expr::CRT(Fmpz_expr, T:is_unsigned_integer,
+        T:is_unsigned_integer, bool) const
+Fmpz_expr CRT(Fmpz_expr, Fmpz_expr, T:is_unsigned_integer,
+        T:is_unsigned_integer, bool)
+
+    See \code{fmpz_CRT_ui}.
+
+fmpz_combxx::fmpz_combxx(const std::vector<mp_limb_t>& primes)
+
+    The class \code{fmpz_combxx} wraps both \code{fmpz_comb_t} and
+    \code{fmpz_comb_temp_t}. The argument \code{primes} is the vector of moduli
+    to use, and must not be deallocated before the newly constructed
+    \code{fmpz_combxx}. Note that the internal \code{fmpz_comb_temp_t}
+    structure may be modified even on constant instances of \code{fmpz_combxx}.
+
+void multi_mod(std::vector<mp_limb_t>& out, Fmpz_expr in, const fmpz_combxx&
+        comb)
+
+    Reduce \code{in} modulo the primes stored in \code{comb}, and store the
+    results in \code{out}. The vector \code{out} must have sufficient size, and
+    its size will not be changed.
+
+Fmpz_expr multi_CRT(const std::vector<mp_limb_t>& residues, const fmpz_combxx
+        comb, bool sign)
+
+    Reconstruct an integer from its residues. See \code{fmpz_multi_CRT_ui}.
 
 
 *******************************************************************************

@@ -333,6 +333,17 @@ struct threeary_expression<operations::name, T, U, V, \
         eval; \
     } \
 };
+#define FLINT_DEFINE_THREEARY_EXPR(name, rettype, T1, T2, T3, eval) \
+template<> \
+struct threeary_expression<operations::name, T1, T2, T3> \
+{ \
+    typedef rettype return_t; \
+    template<class R> \
+    static void doit(R& to, const T1& e1, const T2& e2, const T3& e3) \
+    { \
+        eval; \
+    } \
+};
 
 #define FLINT_DEFINE_FOURARY_EXPR_COND4(name, rettype, cond1, cond2, cond3, cond4, eval) \
 template<class T, class U, class V, class W> \
