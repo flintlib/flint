@@ -114,6 +114,72 @@ public:
         return res;
     }
 
+    static fmpz_matxx_expression randbits(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randbits(state, bits);
+        return res;
+    }
+    static fmpz_matxx_expression randtest(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randtest(state, bits);
+        return res;
+    }
+    static fmpz_matxx_expression randintrel(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randintrel(state, bits);
+        return res;
+    }
+    static fmpz_matxx_expression randsimdioph(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randsimdioph(state, bits, bits2);
+        return res;
+    }
+    static fmpz_matxx_expression randntrulike(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits, ulong q)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randntrulike(state, bits, q);
+        return res;
+    }
+    static fmpz_matxx_expression randntrulike2(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits, ulong q)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randntrulike2(state, bits, q);
+        return res;
+    }
+    static fmpz_matxx_expression randajtai(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits, double alpha)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randajtai(state, bits, alpha);
+        return res;
+    }
+    static fmpz_matxx_expression randrank(slong rows, slong cols,
+            frandxx& state, slong rank, mp_bitcnt_t bits)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randrank(state, rank, bits);
+        return res;
+    }
+    template<class Fmpz>
+    static typename mp::enable_if<traits::is_fmpzxx<Fmpz>,
+                        fmpz_matxx_expression>::type
+    randdet(slong rows, slong cols, frandxx& state, const Fmpz& d)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_randdet(state, d);
+        return res;
+    }
+
     // these only make sense with targets
     void set_randbits(frandxx& state, mp_bitcnt_t bits)
         {fmpz_mat_randbits(_mat(), state._data(), bits);}

@@ -221,11 +221,11 @@ void
 test_randomisation()
 {
     frandxx rand;
-    fmpz_matxx A(2, 2);
-    A.set_randbits(rand, 5);
+    fmpz_matxx A = fmpz_matxx::randbits(2, 2, rand, 5);
     tassert(abs(A.at(0, 0)) <= 31 && abs(A.at(0, 0)) >= 16);
     A.set_randtest(rand, 5);
     tassert(abs(A.at(0, 0)) <= 31);
+    fmpz_matxx::randtest(2, 2, rand, 5);
 
     fmpz_matxx B(2, 3);
     B.set_randintrel(rand, 5);
@@ -243,11 +243,13 @@ test_randomisation()
 
     A.set_randrank(rand, 1, 5);
     tassert(abs(A.at(0, 0)) <= 31 && A.rank() == 1);
+    tassert(rank(fmpz_matxx::randrank(5, 6, rand, 3, 10)) == 3);
     A.apply_randops(rand, 17);
     tassert(abs(A.at(0, 0)) <= 31 && A.rank() == 1);
 
     A.set_randdet(rand, fmpzxx(17));
     tassert(det(A) == 17);
+    tassert(fmpz_matxx::randdet(5, 5, rand, fmpzxx(123)).det() == 123);
 }
 
 int

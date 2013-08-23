@@ -456,32 +456,6 @@ fmpz_matxx::fmpz_matxx(slong i, slong j)
 
     Allocate a matrix of size $i \times j$.
 
-void Fmpz_mat_target::set_randbits(frandxx& state, mp_bitcnt_t bits)
-void Fmpz_mat_target::set_randtest(frandxx& state, mp_bitcnt_t bits)
-void Fmpz_mat_target::set_randintrel(frandxx& state, mp_bitcnt_t bits)
-void Fmpz_mat_target::set_randsimdioph(frandxx& state, mp_bitcnt_t bits,
-        mp_bitcount_t bits2)
-void Fmpz_mat_target::set_randtrulike(frandxx& state, mp_bitcnt_t bits,
-        ulong q)
-void Fmpz_mat_target::set_randtrulike2(frandxx& state, mp_bitcnt_t bits,
-        ulong q)
-void Fmpz_mat_target::set_randajtai(frandxx& state, mp_bitcnt_t bits,
-        double alpha)
-void Fmpz_mat_target::set_randrank(frandxx& state, slong rank,
-        mp_bitcnt_t bits)
-void Fmpz_mat_target::set_randdet(frandxx& state, Fmpz_expr d)
-
-    See \code{fmpz_mat_randbits} etc.
-
-int Fmpz_mat_target::set_randpermdiag(frandxx& state, Vec v)
-
-    See \code{fmpz_mat_randpermdiag}. The type \code{vec} must have methods
-    \code{_array()} and \code{size()} similar to \code{fmpz_vecxx}.
-
-void Fmpz_mat_target::apply_randops(frandxx& state, slong count)
-
-    See \code{fmpz_mat_randops}.
-
 ?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
 
     Unified coefficient access to the matrix entries.
@@ -596,6 +570,58 @@ static fmpz_matxx fmpz_matxx::lift_unsigned(Nmod_mat_expr)
 static fmpz_matxx fmpz_matxx::reduce(Fmpq_mat_expr, Fmz_expr)
 
     See \code{fmpq_mat_get_fmpz_mat_mod_fmpz}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_mat_target::set_randbits(frandxx& state, mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randtest(frandxx& state, mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randintrel(frandxx& state, mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randsimdioph(frandxx& state, mp_bitcnt_t bits,
+        mp_bitcount_t bits2)
+void Fmpz_mat_target::set_randtrulike(frandxx& state, mp_bitcnt_t bits,
+        ulong q)
+void Fmpz_mat_target::set_randtrulike2(frandxx& state, mp_bitcnt_t bits,
+        ulong q)
+void Fmpz_mat_target::set_randajtai(frandxx& state, mp_bitcnt_t bits,
+        double alpha)
+void Fmpz_mat_target::set_randrank(frandxx& state, slong rank,
+        mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randdet(frandxx& state, Fmpz_expr d)
+
+    See \code{fmpz_mat_randbits} etc.
+
+static fmpz_matxx fmpz_matxx::randbits(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randtest(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randintrel(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randsimdioph(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, mp_bitcount_t bits2)
+static fmpz_matxx fmpz_matxx::randtrulike(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, ulong q)
+static fmpz_matxx fmpz_matxx::randtrulike2(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, ulong q)
+static fmpz_matxx fmpz_matxx::randajtai(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, double alpha)
+static fmpz_matxx fmpz_matxx::randrank(slong r, slong c,
+        frandxx& state, slong rank, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randdet(slong r, slong c,
+        frandxx& state, Fmpz_expr d)
+
+    Static versions of the above, where the first two arguments specify the
+    dimensions of the matrix.
+
+int Fmpz_mat_target::set_randpermdiag(frandxx& state, Vec v)
+
+    See \code{fmpz_mat_randpermdiag}. The type \code{vec} must have methods
+    \code{_array()} and \code{size()} similar to \code{fmpz_vecxx}.
+
+void Fmpz_mat_target::apply_randops(frandxx& state, slong count)
+
+    See \code{fmpz_mat_randops}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Modular reduction reconstruction
