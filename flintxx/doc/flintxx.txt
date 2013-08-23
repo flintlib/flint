@@ -1085,7 +1085,7 @@ template<class Vec> static fmpqxx fmpqxx::from_cfrac(const Vec& v, slong n)
     pointer to) an array of \code{fmpz}. One such class is \code{fmpz_vecxx}.
     The array must have size (at least) \code{n}.
 
-static fmpqxx fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m, Fmpz_expr N,
+static Fmpq_expr fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m, Fmpz_expr N,
         Fmpz_expr D)
 static Fmpq_expr fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m)
 

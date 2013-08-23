@@ -178,7 +178,7 @@ test_functions()
     tassert(a == fmpqxx::reconstruct(
                 a % fmpzxx(41), fmpzxx(41), fmpzxx(3), fmpzxx(5)));
     assert_exception(fmpqxx::reconstruct(
-                a % fmpzxx(7), fmpzxx(7), fmpzxx(1), fmpzxx(1)));
+                a % fmpzxx(7), fmpzxx(7), fmpzxx(1), fmpzxx(1)).evaluate());
     tassert(a == fmpqxx::reconstruct(a % fmpzxx(71), fmpzxx(71)));
     assert_exception(fmpqxx::reconstruct(a % fmpzxx(7), fmpzxx(7)).evaluate());
 

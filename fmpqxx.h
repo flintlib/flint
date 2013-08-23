@@ -42,6 +42,7 @@
 namespace flint {
 // function "declarations"
 FLINT_DEFINE_BINOP(fmpqxx_reconstruct)
+FLINT_DEFINE_FOURARY_HERE(fmpqxx_reconstruct) // four argument version
 FLINT_DEFINE_UNOP(fmpqxx_next_minimal)
 FLINT_DEFINE_UNOP(fmpqxx_next_signed_minimal)
 FLINT_DEFINE_UNOP(fmpqxx_next_calkin_wilf)
@@ -87,26 +88,18 @@ public:
     }
 
     // TODO does this make more sense as standalone function?
-    // TODO in any case we would like it to be lazy (but too many args..)
-    template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
-    static typename mp::enable_all_fmpzxx<
-        fmpqxx_expression, Fmpz1, Fmpz2, Fmpz3, Fmpz4>::type reconstruct(
-                const Fmpz1& a, const Fmpz2& m, const Fmpz3& N, const Fmpz4& D)
-    {
-        fmpqxx_expression res;
-        // TODO should this throw a different exception type?
-        execution_check(fmpq_reconstruct_fmpz_2(res._fmpq(),
-                    a.evaluate()._fmpz(), m.evaluate()._fmpz(),
-                    N.evaluate()._fmpz(), D.evaluate()._fmpz()),
-                "rational reconstruction (v2)", "fmpq");
-        return res;
-    }
-
     template<class Fmpz1, class Fmpz2>
     static FLINT_BINOP_ENABLE_RETTYPE(fmpqxx_reconstruct, Fmpz1, Fmpz2)
     reconstruct(const Fmpz1& a, const Fmpz2& m)
     {
         return fmpqxx_reconstruct(a, m);
+    }
+    template<class Fmpz1, class Fmpz2, class Fmpz3, class Fmpz4>
+    static FLINT_FOURARY_ENABLE_RETTYPE(fmpqxx_reconstruct,
+            Fmpz1, Fmpz2, Fmpz3, Fmpz4)
+    reconstruct(const Fmpz1& a, const Fmpz2& m, const Fmpz3& N, const Fmpz4& D)
+    {
+        return fmpqxx_reconstruct(a, m, N, D);
     }
 
     // These only make sense with immediates
@@ -342,6 +335,12 @@ FLINT_DEFINE_BINARY_EXPR_COND2(fmpqxx_reconstruct_op, fmpqxx,
         execution_check(fmpq_reconstruct_fmpz(
                     to._fmpq(), e1._fmpz(), e2._fmpz()),
                 "rational reconstruction", "fmpq"))
+FLINT_DEFINE_FOURARY_EXPR_COND4(fmpqxx_reconstruct_op, fmpqxx,
+        FMPZXX_COND_S, FMPZXX_COND_S, FMPZXX_COND_S, FMPZXX_COND_S,
+        execution_check(fmpq_reconstruct_fmpz_2(
+                    to._fmpq(), e1._fmpz(), e2._fmpz(), e3._fmpz(), e4._fmpz()),
+                "rational reconstruction (v2)", "fmpq"))
+
 
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpqxx,
         FMPQXX_COND_S, traits::fits_into_slong,
