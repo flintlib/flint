@@ -40,7 +40,6 @@
 #include "fmpz.h"
 
 // TODO bit packing
-// TODO chinese remaindering
 // TODO functions for addmul? inhomogeneous addmul?
 // TODO use evaluate_n in immediate functions?
 
@@ -68,9 +67,6 @@ FLINT_DEFINE_BINOP(sqrtmod)
 FLINT_DEFINE_UNOP(sqrtrem)
 FLINT_DEFINE_BINOP(gcdinv)
 FLINT_DEFINE_BINOP(xgcd)
-
-FLINT_DEFINE_FIVEARY(CRT)
-FLINT_DEFINE_THREEARY(multi_CRT)
 
 namespace mp {
 template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
@@ -644,6 +640,7 @@ FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpzxx, FMPZXX_COND_S,
 } // rules
 
 // chinese remaindering
+// TODO should this use nmod?
 class fmpz_combxx
 {
 private:

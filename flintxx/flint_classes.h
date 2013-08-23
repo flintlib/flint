@@ -265,7 +265,7 @@ template<class Expr1, class Expr2>
 inline typename mp::enable_if<detail::should_enable_extra_ternop<Expr1>, Expr1>::type
 operator+=(const Expr1& e1, const Expr2& e2)
 {
-    Expr1(e1).set(e1 * e2);
+    Expr1(e1).set(e1 + e2);
     return e1;
 }
 template<class Expr1, class Expr2>

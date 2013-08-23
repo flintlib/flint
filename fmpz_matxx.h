@@ -35,7 +35,6 @@
 #include "flintxx/matrix.h"
 
 // TODO input and output
-// TODO modular reduction
 // TODO addmul
 // TODO row reduction
 // TODO modular gaussian elimination
@@ -61,6 +60,10 @@ template<class Mat>
 struct fmpz_matxx_traits : matrices::generic_traits<Mat> { };
 } // detail
 
+namespace traits {
+template<class T> struct is_nmod_matxx;
+}
+
 template<class Operation, class Data>
 class fmpz_matxx_expression
     : public expression<derived_wrapper<fmpz_matxx_expression>, Operation, Data>
@@ -81,6 +84,23 @@ public:
         return evaluated_t(rows, cols);
     }
     FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
+
+    template<class Nmod_mat>
+    static fmpz_matxx_expression lift(const Nmod_mat& mat,
+            typename mp::enable_if<traits::is_nmod_matxx<Nmod_mat> >::type* = 0)
+    {
+        fmpz_matxx_expression res(mat.rows(), mat.cols());
+        fmpz_mat_set_nmod_mat(res._mat(), mat.evaluate()._mat());
+        return res;
+    }
+    template<class Nmod_mat>
+    static fmpz_matxx_expression lift_unsigned(const Nmod_mat& mat,
+            typename mp::enable_if<traits::is_nmod_matxx<Nmod_mat> >::type* = 0)
+    {
+        fmpz_matxx_expression res(mat.rows(), mat.cols());
+        fmpz_mat_set_nmod_mat_unsigned(res._mat(), mat.evaluate()._mat());
+        return res;
+    }
 
     // these only make sense with targets
     void set_randbits(frandxx& state, mp_bitcnt_t bits)
@@ -148,6 +168,8 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, trace)
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nullspace) // TODO
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, inv) // TODO
+
+    FLINTXX_DEFINE_MEMBER_4OP(CRT)
 };
 
 namespace detail {
@@ -374,5 +396,7 @@ FLINT_DEFINE_UNARY_EXPR_COND(nullspace_op, rdetail::fmpz_mat_nullspace_rt,
 
 } // rules
 } // flint
+
+#include "nmod_matxx.h" // modular reconstruction code
 
 #endif

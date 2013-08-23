@@ -124,6 +124,12 @@ FLINT_DEFINE_BINOP(compeval)
 
 // matrix functions in flintxx/matrix.h
 
+// chinese remaindering
+FLINT_DEFINE_FIVEARY(CRT)
+FLINT_DEFINE_FOURARY_HERE(CRT) // four argument version
+FLINT_DEFINE_THREEARY(multi_CRT)
+FLINT_DEFINE_BINOP_HERE(multi_CRT) // two argument version
+
 // implementation of compeval
 namespace rules {
 // implementation of compeval

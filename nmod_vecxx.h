@@ -304,7 +304,7 @@ FLINT_DEFINE_GET_COND(conversion, mp_limb_t, NMODXX_COND_S, from._limb())
 template<class Nmod>
 struct to_string<Nmod, typename mp::enable_if< NMODXX_COND_S<Nmod> >::type>
 {
-    static std::string get(const nmodxx& i, int base /* ignored */)
+    static std::string get(const Nmod& i, int base /* ignored */)
     {
         std::ostringstream oss;
         oss << i._limb() << " mod " << i._nmod().n;

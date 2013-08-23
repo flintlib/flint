@@ -448,6 +448,10 @@ fmpz_factorxx factor_pp1(Fmpz_expr)
 
 *******************************************************************************
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Not yet split into subsections
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 fmpz_matxx::fmpz_matxx(slong i, slong j)
 
     Allocate a matrix of size $i \times j$.
@@ -579,6 +583,65 @@ Ltuple<slong, fmpz_matxx>_expr nullspace(Fmpz_mat_expr A)
     \code{fmpz_mat_t} corresponding to \code{B, A}.
 
 slong rank(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpz_matxx lift(Nmod_mat_expr)
+static fmpz_matxx lift_unsigned(Nmod_mat_expr)
+
+    See \code{fmpz_mat_set_nmod_mat} and \code{fmpz_mat_set_nmod_mat_unsigned}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction reconstruction
+
+    To reduce a single matrix modulo a word-sized modulus, see
+    \code{nmod_matxx::reduce}.
+
+    We use a special class \code{nmod_mat_vector} to represent a vector of
+    matrices reduced with respect to differing moduli.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr Fmpz_mat_expr::CRT(Fmpz_expr, Nmod_mat_expr, bool)
+Fmpz_mat_expr CRT(Fmpz_mat_expr, Fmpz_expr, Nmod_mat_expr, bool)
+
+    See \code{fmpz_mat_CRT_ui}.
+
+nmod_mat_vector::nmod_mat_vector(slong rows, slong cols,
+        const std::vector<mp_limb_t>& primes)
+
+    Initialize a vector of matrices with dimensions given by \code{rows},
+    \code{cols} and moduli given by \code{primes}.
+
+nmod_matxx_ref nmod_mat_vector::operator[](std::size_t idx)
+nmod_matxx_srcref nmod_mat_vector::operator[](std::size_t idx) const
+
+    Obtain a reference to one of the stored matrices.
+
+std::size_t nmod_mat_vector::size() const
+
+    Obtain the number of stored matrices.
+
+void nmod_mat_vector::set_multi_mod(Fmpz_mat_expr m)
+
+    Reduce \code{m} modulo each of the primes stored in this vector, and store
+    the results. See \code{fmpz_mat_multi_mod_ui}.
+
+void nmod_mat_vector::set_multi_mod_precomp(Fmpz_mat_expr m,
+        const fmpz_combxx& comb)
+
+    Reduce \code{m} modulo each of the primes stored in this vector, and store
+    the results. Use precomputed data in \code{comp}.
+    See \code{fmpz_mat_multi_mod_ui_precomp}.
+
+nmod_mat_vector multi_mod(Fmpz_mat_expr m, const std::vector<mp_limb_t>&
+        primes)
+nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m,
+        const std::vector<mp_limb_t>& primes, const fmpz_combxx& comb)
+
+    Convenience functions combining the allocation of memory and modular
+    reduction.
 
 
 *******************************************************************************
@@ -2268,6 +2331,14 @@ Nmod_mat_expr operator?(??, ??)
 Nmod_mat_expr operator-(Nmod_mat_expr)
 
     The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static nmod_matxx::reduce(Fmpz_mat_expr, mp_limb_t modulus)
+
+    See \code{fmpz_mat_get_nmod_mat}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management

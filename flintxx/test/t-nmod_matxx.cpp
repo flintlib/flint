@@ -223,6 +223,59 @@ test_randomisation()
     tassert(A.at(1, 0) == nmodxx::red(0, ctx));
 }
 
+void
+test_reduction_reconstruction()
+{
+    std::vector<mp_limb_t> primes;
+    primes.push_back(1031);
+    primes.push_back(1033);
+    primes.push_back(1039);
+    mp_limb_t M = primes[0];
+
+    frandxx rand;
+    fmpz_matxx A(5, 7);A.set_randtest(rand, 8);
+    nmod_matxx Ap = nmod_matxx::reduce(A, M);
+    nmodxx_ctx_srcref ctx = Ap.estimate_ctx();
+    tassert(Ap.rows() == A.rows() && Ap.cols() == A.cols());
+    for(slong i = 0;i < A.rows();++i)
+        for(slong j = 0;j < A.cols();++j)
+            tassert(Ap.at(i, j) == nmodxx::red(A.at(i, j), ctx));
+    tassert(A == fmpz_matxx::lift(Ap));
+
+    for(slong i = 0;i < A.rows();++i)
+        for(slong j = 0;j < A.cols();++j)
+            A.at(i, j) = abs(A.at(i, j));
+    tassert(A == fmpz_matxx::lift_unsigned(nmod_matxx::reduce(A, M)));
+
+    nmod_mat_vector v1(A.rows(), A.cols(), primes);
+    nmod_mat_vector v2(v1);
+    tassert(v1 == v2);
+    v2[0].at(0, 0) += nmodxx::red(1, ctx);
+    tassert(v2[0].at(0, 0) != v1[0].at(0, 0));
+    tassert(v1 != v2);
+    v2 = v1;
+    tassert(v1 == v2);
+
+    A.set_randtest(rand, 25);
+    for(unsigned i = 0;i < primes.size();++i)
+        v1[i] = nmod_matxx::reduce(A, primes[i]);
+    tassert(v1 == multi_mod(A, primes));
+
+    fmpz_combxx comb(primes);
+    tassert(multi_mod(A, primes) == multi_mod_precomp(A, primes, comb));
+
+    fmpzxx prod(1);
+    fmpz_matxx res(A.rows(), A.cols());
+    for(unsigned i = 0;i < primes.size();++i)
+    {
+        res = res.CRT(prod, v1[i], true);
+        prod *= primes[i];
+    }
+    tassert(res == A);
+    tassert(res == multi_CRT(v1, true));
+    tassert(res == multi_CRT_precomp(v1, comb, true));
+}
+
 int
 main()
 {
@@ -233,6 +286,7 @@ main()
     test_functions();
     test_extras();
     test_randomisation();
+    test_reduction_reconstruction();
 
     std::cout << "PASS" << std::endl;
     return 0;

@@ -648,88 +648,6 @@ inline typename mp::enable_if<typename traits::is_implemented<
 // HELPER MACROS
 ////////////////////////////////////////////////////////////////////////
 
-// This set of macros should be called in namespace flint.
-
-// Introduce a new binary operation called "name"
-// NB: because of ADL bugs in g++ <= 4.4, the operation tag is called "name_op",
-// whereas the function corresponding to it is just called "name"
-#define FLINT_DEFINE_BINOP(name) \
-namespace operations { \
-struct name##_op { }; \
-} \
-template<class T1, class T2> \
-inline typename detail::binary_op_helper<T1, operations::name##_op, T2>::enable::type \
-name(const T1& t1, const T2& t2) \
-{ \
-    return detail::binary_op_helper<T1, operations::name##_op, T2>::make(t1, t2); \
-}
-
-#define FLINT_BINOP_ENABLE_RETTYPE(name, T1, T2) \
-    typename detail::binary_op_helper<T1, operations::name##_op, T2>::enable::type
-
-// Introduce a new unary operation called "name"
-#define FLINT_DEFINE_UNOP(name) \
-namespace operations { \
-struct name##_op { }; \
-} \
-template<class T1> \
-inline typename detail::unary_op_helper<operations::name##_op, T1>::enable::type \
-name(const T1& t1) \
-{ \
-    return detail::unary_op_helper<operations::name##_op, T1>::make(t1); \
-}
-
-#define FLINT_UNOP_ENABLE_RETTYPE(name, T) \
-    typename detail::unary_op_helper<operations::name##_op, T>::return_t
-#define FLINT_UNOP_BUILD_RETTYPE(name, rettype, T) \
-    typename detail::unary_op_helper_with_rettype<rettype, \
-        operations::name##_op, T>::return_t
-
-#define FLINT_DEFINE_THREEARY(name) \
-namespace operations { \
-struct name##_op { }; \
-} \
-template<class T1, class T2, class T3> \
-inline typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::enable::type \
-name(const T1& t1, const T2& t2, const T3& t3) \
-{ \
-    return detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::make( \
-        t1, t2, t3); \
-}
-
-#define FLINT_THREEARY_ENABLE_RETTYPE(name, T1, T2, T3) \
-    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::enable::type
-
-#define FLINT_DEFINE_FOURARY(name) \
-namespace operations { \
-struct name##_op { }; \
-} \
-template<class T1, class T2, class T3, class T4> \
-inline typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::enable::type \
-name(const T1& t1, const T2& t2, const T3& t3, const T4& t4) \
-{ \
-    return detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::make( \
-        t1, t2, t3, t4); \
-}
-
-#define FLINT_FOURARY_ENABLE_RETTYPE(name, T1, T2, T3, T4) \
-    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::enable::type
-
-#define FLINT_DEFINE_FIVEARY(name) \
-namespace operations { \
-struct name##_op { }; \
-} \
-template<class T1, class T2, class T3, class T4, class T5> \
-inline typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::enable::type \
-name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5) \
-{ \
-    return detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::make( \
-        t1, t2, t3, t4, t5); \
-}
-
-#define FLINT_FIVEARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5) \
-    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::enable::type
-
 // To be called in any namespace
 
 // Make the binary operation "name" available in current namespace
@@ -752,5 +670,89 @@ name(const T1& t1) \
 { \
   return ::flint::detail::unary_op_helper< ::flint::operations::name##_op, T1>::make(t1); \
 }
+
+#define FLINT_DEFINE_THREEARY_HERE(name) \
+template<class T1, class T2, class T3> \
+inline typename ::flint::detail::nary_op_helper2<\
+    ::flint::operations::name##_op, T1, T2, T3>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3) \
+{ \
+  return ::flint::detail::nary_op_helper2< \
+      ::flint::operations::name##_op, T1, T2, T3>::make(t1, t2, t3); \
+}
+
+#define FLINT_DEFINE_FOURARY_HERE(name) \
+template<class T1, class T2, class T3, class T4> \
+inline typename ::flint::detail::nary_op_helper2<\
+    ::flint::operations::name##_op, T1, T2, T3, T4>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3, const T4& t4) \
+{ \
+  return ::flint::detail::nary_op_helper2< \
+      ::flint::operations::name##_op, T1, T2, T3, T4>::make(t1, t2, t3, t4); \
+}
+
+#define FLINT_DEFINE_FIVEARY_HERE(name) \
+template<class T1, class T2, class T3, class T4, class T5> \
+inline typename ::flint::detail::nary_op_helper2<\
+    ::flint::operations::name##_op, T1, T2, T3, T4, T5>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5) \
+{ \
+  return ::flint::detail::nary_op_helper2< \
+      ::flint::operations::name##_op, T1, T2, T3, T4, T5>::make(t1, t2, t3, t4, t5); \
+}
+
+// This set of macros should be called in namespace flint.
+
+// Introduce a new binary operation called "name"
+// NB: because of ADL bugs in g++ <= 4.4, the operation tag is called "name_op",
+// whereas the function corresponding to it is just called "name"
+#define FLINT_DEFINE_BINOP(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_BINOP_HERE(name)
+
+#define FLINT_BINOP_ENABLE_RETTYPE(name, T1, T2) \
+    typename detail::binary_op_helper<T1, operations::name##_op, T2>::enable::type
+
+// Introduce a new unary operation called "name"
+#define FLINT_DEFINE_UNOP(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_UNOP_HERE(name)
+
+#define FLINT_UNOP_ENABLE_RETTYPE(name, T) \
+    typename detail::unary_op_helper<operations::name##_op, T>::return_t
+#define FLINT_UNOP_BUILD_RETTYPE(name, rettype, T) \
+    typename detail::unary_op_helper_with_rettype<rettype, \
+        operations::name##_op, T>::return_t
+
+#define FLINT_DEFINE_THREEARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_THREEARY_HERE(name)
+
+#define FLINT_THREEARY_ENABLE_RETTYPE(name, T1, T2, T3) \
+    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3>::enable::type
+
+#define FLINT_DEFINE_FOURARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_FOURARY_HERE(name)
+
+#define FLINT_FOURARY_ENABLE_RETTYPE(name, T1, T2, T3, T4) \
+    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4>::enable::type
+
+#define FLINT_DEFINE_FIVEARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_FIVEARY_HERE(name)
+
+#define FLINT_FIVEARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5) \
+    typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::enable::type
 
 #endif

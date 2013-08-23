@@ -27,10 +27,12 @@
 #define NMOD_MATXX_H
 
 #include <string>
+#include <vector>
 
 #include "nmod_mat.h"
 
 #include "nmod_vecxx.h"
+#include "fmpz_matxx.h" // for modular reduction
 
 #include "flintxx/flint_exception.h"
 #include "flintxx/ltuple.h"
@@ -51,6 +53,8 @@ FLINT_DEFINE_THREEARY(solve_tril_recursive)
 FLINT_DEFINE_THREEARY(solve_triu)
 FLINT_DEFINE_THREEARY(solve_triu_classical)
 FLINT_DEFINE_THREEARY(solve_triu_recursive)
+
+FLINT_DEFINE_THREEARY(multi_CRT_precomp)
 
 namespace detail {
 template<class Mat>
@@ -88,6 +92,16 @@ public:
         return evaluated_t(rows, cols, tools::find_nmodxx_ctx(e).n());
     }
     FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
+
+    template<class Fmpz_mat>
+    static nmod_matxx_expression reduce(const Fmpz_mat& mat,
+            mp_limb_t modulus,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
+    {
+        nmod_matxx_expression res(mat.rows(), mat.cols(), modulus);
+        fmpz_mat_get_nmod_mat(res._mat(), mat.evaluate()._mat());
+        return res;
+    }
 
     // these only make sense with targets
     void set_randtest(frandxx& state)
@@ -318,6 +332,148 @@ typedef make_ltuple<mp::make_tuple<slong, nmod_matxx>::type >::type
 FLINT_DEFINE_UNARY_EXPR_COND(nullspace_op, rdetail::nmod_mat_nullspace_rt,
         NMOD_MATXX_COND_S, to.template get<0>() = nmod_mat_nullspace(
             to.template get<1>()._mat(), from._mat()))
+} // rules
+
+//////////////////////////////////////////////////////////////////////////////
+// nmod_mat_vector class
+//////////////////////////////////////////////////////////////////////////////
+// This class stores a vector of nmod_matxx with differing moduli. It is *not*
+// an expression template class!
+
+class nmod_mat_vector
+{
+private:
+    nmod_mat_t* data;
+    std::size_t size_;
+
+    void init(const nmod_mat_vector& o)
+    {
+        size_ = o.size_;
+        data = new nmod_mat_t[size_];
+        for(std::size_t i = 0;i < size_;++i)
+            nmod_mat_init_set(data[i], o.data[i]);
+    }
+
+public:
+    ~nmod_mat_vector() {delete[] data;}
+    nmod_mat_vector(slong rows, slong cols, const std::vector<mp_limb_t>& primes)
+    {
+        size_ = primes.size();
+        data = new nmod_mat_t[primes.size()];
+        for(std::size_t i = 0;i < primes.size();++i)
+            nmod_mat_init(data[i], rows, cols, primes[i]);
+    }
+
+    nmod_mat_vector(const nmod_mat_vector& o)
+    {
+        init(o);
+    }
+
+    nmod_mat_vector& operator=(const nmod_mat_vector& o)
+    {
+        delete[] data;
+        init(o);
+        return *this;
+    }
+
+    nmod_matxx_ref operator[](std::size_t idx)
+        {return nmod_matxx_ref::make(data[idx]);}
+    nmod_matxx_srcref operator[](std::size_t idx) const
+        {return nmod_matxx_srcref::make(data[idx]);}
+
+    std::size_t size() const {return size_;}
+
+    const nmod_mat_t* _data() const {return data;}
+    nmod_mat_t* _data() {return data;}
+
+    bool operator==(const nmod_mat_vector& o)
+    {
+        if(size() != o.size())
+            return false;
+        for(std::size_t i = 0;i < size();++i)
+            if((*this)[i] != o[i])
+                return false;
+        return true;
+    }
+    bool operator!=(const nmod_mat_vector& o)
+    {
+        return !(*this == o);
+    }
+
+    template<class Fmpz_mat>
+    void set_multi_mod(const Fmpz_mat& m,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
+    {
+        fmpz_mat_multi_mod_ui(data, size(), m.evaluate()._mat());
+    }
+    template<class Fmpz_mat>
+    void set_multi_mod_precomp(const Fmpz_mat& m,
+            const fmpz_combxx& comb,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
+    {
+        fmpz_mat_multi_mod_ui_precomp(data, size(), m.evaluate()._mat(),
+                comb._comb(), comb._temp());
+    }
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// chinese remaindering
+/////////////////////////////////////////////////////////////////////////////
+// Note this operates on fmpz_matxx and fmpz_combxx (as well as nmod_matxx).
+// We define it here to deal with the circular dependencies. fmpz_matxx.h
+// includes nmod_matxx.h at the bottom.
+
+template<class Fmpz_mat>
+inline nmod_mat_vector multi_mod(const Fmpz_mat& m,
+        const std::vector<mp_limb_t>& primes,
+        typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
+{
+    nmod_mat_vector res(m.rows(), m.cols(), primes);
+    res.set_multi_mod(m);
+    return res;
+}
+template<class Fmpz_mat>
+inline nmod_mat_vector multi_mod_precomp(const Fmpz_mat& m,
+        const std::vector<mp_limb_t>& primes,
+        const fmpz_combxx& comb,
+        typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
+{
+    nmod_mat_vector res(m.rows(), m.cols(), primes);
+    res.set_multi_mod_precomp(m, comb);
+    return res;
+}
+
+namespace matrices {
+// outsize computation for multi-CRT
+struct outsize_CRT
+{
+    template<class Mat>
+    static slong rows(const Mat& m)
+    {
+        return m._data().first()[0].rows();
+    }
+    template<class Mat>
+    static slong cols(const Mat& m)
+    {
+        return m._data().first()[0].cols();
+    }
+};
+
+template<> struct outsize<operations::multi_CRT_op> : outsize_CRT { };
+template<> struct outsize<operations::multi_CRT_precomp_op> : outsize_CRT { };
+}
+
+namespace rules {
+FLINT_DEFINE_FOURARY_EXPR_COND4(CRT_op, fmpz_matxx,
+        FMPZ_MATXX_COND_T, FMPZXX_COND_S, NMOD_MATXX_COND_S, tools::is_bool,
+        fmpz_mat_CRT_ui(to._mat(), e1._mat(), e2._fmpz(), e3._mat(), e4))
+
+FLINT_DEFINE_BINARY_EXPR2(multi_CRT_op, fmpz_matxx, nmod_mat_vector, bool,
+        fmpz_mat_multi_CRT_ui(to._mat(), e1._data(), e1.size(), e2))
+FLINT_DEFINE_THREEARY_EXPR(multi_CRT_precomp_op, fmpz_matxx,
+        nmod_mat_vector, fmpz_combxx, bool,
+        fmpz_mat_multi_CRT_ui_precomp(to._mat(), e1._data(), e1.size(),
+            e2._comb(), e2._temp(), e3))
 } // rules
 } // flint
 
