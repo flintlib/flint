@@ -208,6 +208,23 @@ test_randomisation()
     tassert(height(A.at(0, 0)) <= 31);
 }
 
+void
+test_reduction_reconstruction()
+{
+    fmpq_matxx A(4, 7);
+    frandxx state;
+    A.set_randtest(state, 4);
+    fmpzxx M(123457891ul);
+    fmpz_matxx Ar = fmpz_matxx::reduce(A, M);
+    tassert(Ar.rows() == A.rows() && Ar.cols() == A.cols());
+    for(slong i = 0;i < A.rows();++i)
+        for(slong j = 0;j < A.cols();++j)
+            tassert(Ar.at(i, j) == A.at(i, j) % M);
+
+    tassert(A == fmpq_matxx::reconstruct(Ar, M));
+    // TODO test exception
+}
+
 int
 main()
 {
@@ -220,6 +237,7 @@ main()
     test_functions();
     test_extras();
     test_randomisation();
+    test_reduction_reconstruction();
 
     std::cout << "PASS" << std::endl;
     return 0;

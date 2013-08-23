@@ -588,10 +588,14 @@ slong rank(Fmpz_mat_expr)
     Conversion
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static fmpz_matxx lift(Nmod_mat_expr)
-static fmpz_matxx lift_unsigned(Nmod_mat_expr)
+static fmpz_matxx fmpz_matxx::lift(Nmod_mat_expr)
+static fmpz_matxx fmpz_matxx::lift_unsigned(Nmod_mat_expr)
 
     See \code{fmpz_mat_set_nmod_mat} and \code{fmpz_mat_set_nmod_mat_unsigned}.
+
+static fmpz_matxx fmpz_matxx::reduce(Fmpq_mat_expr, Fmz_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_mod_fmpz}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Modular reduction reconstruction
@@ -1257,6 +1261,17 @@ bool Fmpq_mat_expr::is_zero() const
 bool Fmpq_mat_expr::is_empty() const
 bool Fmpq_mat_expr::is_square() const
 bool Fmpq_mat_expr::is_integral() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction and rational reconstruction
+
+    To reduce an \code{fmpq_matxx} modulo an \code{fmpzxx} to get an
+    \code{fmpz_matxx}, see \code{fmpz_matxx::reduce}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpq_matxx fmpq_matxx::reconstruct(Fmpz_mat_expr, Fmpz_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat_mod_fmpz}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Matrix multiplication

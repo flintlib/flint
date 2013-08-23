@@ -40,6 +40,7 @@
 #include "flintxx/frandxx.h"
 #include "flintxx/ltuple.h"
 #include "flintxx/traits.h"
+#include "flintxx/traits_fwd.h"
 
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
 // TODO newton basis?
@@ -92,9 +93,6 @@ FLINT_DEFINE_BINOP(fmpz_polyxx_get_coeff)
 FLINT_DEFINE_BINOP(fmpz_polyxx_bit_unpack)
 FLINT_DEFINE_BINOP(fmpz_polyxx_bit_unpack_unsigned)
 
-namespace traits {
-template<class T> struct is_fmpz_polyxx;
-} // traits
 
 namespace detail {
 template<class Poly>
@@ -114,10 +112,6 @@ struct fmpz_poly_traits
             {return fmpz_polyxx_get_coeff(p, t);}
     };
 };
-}
-
-namespace traits {
-template<class T> struct is_nmod_polyxx;
 }
 
 template<class Operation, class Data>

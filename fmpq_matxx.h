@@ -72,6 +72,18 @@ public:
     }
     FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
 
+    template<class Fmpz_mat, class Fmpz>
+    static fmpq_matxx_expression reconstruct(const Fmpz_mat& mat, const Fmpz& mod,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        fmpq_matxx_expression res(mat.rows(), mat.cols());
+        execution_check(fmpq_mat_set_fmpz_mat_mod_fmpz(
+                    res._mat(), mat.evaluate()._mat(), mod.evaluate()._fmpz()),
+                "reconstruct", "fmpq_matxx");
+        return res;
+    }
+
     // these only make sense with targets
     void set_randbits(frandxx& state, mp_bitcnt_t bits)
         {fmpq_mat_randbits(_mat(), state._data(), bits);}

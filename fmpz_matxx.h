@@ -27,12 +27,14 @@
 #define FMPZ_MATXX_H FMPZ_MATXX_H
 
 #include "fmpz_mat.h"
+#include "fmpq_mat.h" // fmpq_mat_get_fmpz_mat_mod_fmpz
 
 #include "fmpzxx.h"
 #include "fmpz_polyxx.h"
 
 #include "flintxx/ltuple.h"
 #include "flintxx/matrix.h"
+#include "flintxx/traits_fwd.h"
 
 // TODO input and output
 // TODO addmul
@@ -61,7 +63,6 @@ struct fmpz_matxx_traits : matrices::generic_traits<Mat> { };
 } // detail
 
 namespace traits {
-template<class T> struct is_nmod_matxx;
 }
 
 template<class Operation, class Data>
@@ -99,6 +100,17 @@ public:
     {
         fmpz_matxx_expression res(mat.rows(), mat.cols());
         fmpz_mat_set_nmod_mat_unsigned(res._mat(), mat.evaluate()._mat());
+        return res;
+    }
+
+    template<class Fmpq_mat, class Fmpz>
+    static fmpz_matxx_expression reduce(const Fmpq_mat& mat, const Fmpz& mod,
+            typename mp::enable_if<traits::is_fmpq_matxx<Fmpq_mat> >::type* = 0,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        fmpz_matxx_expression res(mat.rows(), mat.cols());
+        fmpq_mat_get_fmpz_mat_mod_fmpz(res._mat(), mat.evaluate()._mat(),
+                mod.evaluate()._fmpz());
         return res;
     }
 
