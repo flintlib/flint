@@ -87,9 +87,12 @@ test_assignment()
     q.set_coeff(3, 1);
     tassert(p == q);
 
+    tassert(p == nmod_polyxx("4 31  0 0 0 1"));
+
     // TODO XXX this does not always fail?
     //assert_exception(p = "2 1 2");
     assert_exception(p = "2  x 2");
+    assert_exception(nmod_polyxx("2  x 2"));
 }
 
 void

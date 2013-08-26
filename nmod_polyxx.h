@@ -336,6 +336,14 @@ struct nmod_poly_data
         nmod_poly_set(inner, r._poly());
     }
 
+    nmod_poly_data(const char* str)
+    {
+        mp_limb_t n;slong length;
+        execution_check(sscanf(str, "%ld %lu", &length, &n) == 2
+            && (nmod_poly_init2(inner, n, length), nmod_poly_set_str(inner, str)),
+                "construct from string", "nmod_polyxx");
+    }
+
     template<class Nmod>
     static nmod_poly_data from_ground(const Nmod& x,
             typename mp::enable_if<traits::is_nmodxx<Nmod> >::type* = 0)

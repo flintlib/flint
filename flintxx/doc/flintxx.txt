@@ -2057,6 +2057,13 @@ nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
     Instantiate \code{nmod_polyxx} relative to some modulus. If the second
     argument is provided, space is allocated for \code{alloc} coefficients.
 
+nmod_polyxx::nmod_polyxx(const char* str)
+
+    Instantiate \code{nmod_polyxx} from a string representation. The modulus is
+    parsed (second integer in the string) and the polynomial is initialised
+    with this modulus, then \code{nmod_poly_set_str} is called. Raises
+    \code{flint_exception} if the string is malformed.
+
 void Nmod_poly_target realloc(slong alloc)
 void Nmod_poly_target::fit_length(slong len)
 void Nmod_poly_target::_normalise()
