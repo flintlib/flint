@@ -51,7 +51,7 @@ FLINT_DEFINE_UNOP(numden_entrywise)
 FLINT_DEFINE_UNOP(numden_matwise)
 FLINT_DEFINE_UNOP(numden_rowwise)
 FLINT_DEFINE_UNOP(num_rowwise)
-//FLINT_DEFINE_UNOP(fmpq_matxx_num_colwise)
+FLINT_DEFINE_UNOP(num_colwise)
 
 namespace detail {
 template<class Mat>
@@ -164,8 +164,8 @@ public:
             numden_colwise)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpz_matxx, num_rowwise,
             num_rowwise)
-    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpz_matxx, num_colwise,
-    //        fmpq_matxx_num_colwise)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpz_matxx, num_colwise,
+            num_colwise)
 
     FLINTXX_DEFINE_MEMBER_BINOP(mul_cleared)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_direct)
@@ -298,8 +298,8 @@ template<> struct outsize<operations::numden_matwise_op>
     : outsize<operations::numden_entrywise_op> { };
 template<> struct outsize<operations::num_rowwise_op>
     : outsize<operations::numden_entrywise_op> { };
-//template<> struct outsize<operations::fmpq_matxx_num_colwise_op>
-//    : outsize<operations::numden_entrywise_op> { };
+template<> struct outsize<operations::num_colwise_op>
+    : outsize<operations::numden_entrywise_op> { };
 } // matrices
 
 namespace vectors {
@@ -400,9 +400,9 @@ FLINT_DEFINE_UNARY_EXPR_COND(inv_op, fmpq_matxx, FMPQ_MATXX_COND_S,
 FLINT_DEFINE_UNARY_EXPR_COND(num_rowwise_op, fmpz_matxx,
         FMPQ_MATXX_COND_S,
         fmpq_mat_get_fmpz_mat_rowwise(to._mat(), 0, from._mat()))
-//FLINT_DEFINE_UNARY_EXPR_COND(fmpq_matxx_num_colwise_op, fmpz_matxx,
-//        FMPQ_MATXX_COND_S,
-//        fmpq_mat_get_fmpz_mat_colwise(to._mat(), 0, from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(num_colwise_op, fmpz_matxx,
+        FMPQ_MATXX_COND_S,
+        fmpq_mat_get_fmpz_mat_colwise(to._mat(), 0, from._mat()))
 FLINT_DEFINE_UNARY_EXPR_COND(numden_entrywise_op,
         detail::fmpq_matxx_numden_entrywise_rt, FMPQ_MATXX_COND_S,
         fmpq_mat_get_fmpz_mat_entrywise(to.template get<0>()._mat(),

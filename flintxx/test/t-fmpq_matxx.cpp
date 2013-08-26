@@ -96,7 +96,7 @@ test_conversion()
     A.at(0, 0) = 1;
     tassert(Aq.numden_entrywise() == ltupleref(A, den));
     tassert(Aq.num_rowwise().at(0, 0) == 1);
-    //tassert(Aq.num_colwise().at(0, 0) == 1);
+    tassert(Aq.num_colwise().at(0, 0) == 1);
     tassert(Aq.numden_matwise().get<1>() == 2);
 
     fmpz_vecxx rowdens(A.rows());
