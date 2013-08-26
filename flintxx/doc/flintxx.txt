@@ -456,6 +456,11 @@ fmpz_matxx::fmpz_matxx(slong i, slong j)
 
     Allocate a matrix of size $i \times j$.
 
+void Fmpq_mat_target::set_zero()
+void Fmpq_mat_target::set_one()
+static fmpq_matxx fmpq_matxx::zero(slong rows, slong cols)
+static fmpq_matxx fmpq_matxx::one(slong rows, slong cols)
+
 ?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
 
     Unified coefficient access to the matrix entries.
@@ -1107,6 +1112,11 @@ fmpqxx::fmqxx()
 
     Initialize to zero.
 
+void Fmpq_target::set_zero()
+void Fmpq_target::set_one()
+static fmpqxx fmpqxx::zero()
+static fmpqxx fmpqxx::one()
+
 fmpqxx::fmpqxx(Fmpz_src num, Fmpz_src den)
 fmpqxx::fmpqxx(T:fits_into_slong num, U:is_unsigned_integer den)
 
@@ -1295,15 +1305,24 @@ fmpq_matxx::fmpq_matxx(slong m, slong n)
     Basic assignment
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Fmpq_poly_mat_expr transpose(Fmpq_poly_mat_expr)
+Fmpq_mat_expr transpose(Fmpq_poly_mat_expr)
+
+void Fmpq_mat_target::set_zero()
+void Fmpq_mat_target::set_one()
+static fmpq_matxx fmpq_matxx::zero(slong rows, slong cols)
+static fmpq_matxx fmpq_matxx::one(slong rows, slong cols)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Random matrix generation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void Fmpq_mat_target::set_randtest(frandxx& state, slong len, mp_bitcnt_t)
+static fmpq_matxx fmpq_matxx::randtest(slong rows, slong cols, frandxx& state,
+        slong len, mp_bitcnt_t)
 void Fmpq_mat_target::set_randtest_unsigned(frandxx& state, slong len,
         mp_bitcnt_t)
+static fmpq_matxx fmpq_matxx::randtest_unsigned(slong rows, slong cols,
+        frandxx& state, slong len, mp_bitcnt_t)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Special matrices
@@ -1435,6 +1454,11 @@ static fmpq_polyxx fmpq_polyxx::randtest_not_zero(
         frandxx& state, slong len, mp_bitcnt_t bits)
 
     See \code{fmpq_poly_randtest} etc.
+
+void Fmpq_poly_target::set_zero()
+void Fmpq_poly_target::set_one()
+static fmpq_polyxx fmpq_polyxx::zero()
+static fmpq_polyxx fmpq_polyxx::one()
 
 static fmpq_polyxx fmpq_polyxx::get_slice(Fmpq_poly_expr, slong i, slong j)
 
@@ -1631,6 +1655,11 @@ fmpz_poly_qxx::fmpz_poly_qxx(const char*)
 
     See \code{fmpz_poly_q_set_str}.
 
+void Fmpz_poly_q_target::set_zero()
+void Fmpz_poly_q_target::set_one()
+static fmpz_poly_qxx fmpz_poly_qxx::zero()
+static fmpz_poly_qxx fmpz_poly_qxx::one()
+
 static fmpz_poly_qxx fmpz_poly_qxx::randtest(frandxx& state,
         slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
 static fmpz_poly_qxx fmpz_poly_qxx::randtest_not_zero(frandxx& state,
@@ -1741,6 +1770,15 @@ slong Fmpz_poly_mat_expr::cols() const
     Unified coefficient access to the matrix entries.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Standard matrices
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_poly_mat_target::set_zero()
+void Fmpz_poly_mat_target::set_one()
+static fmpz_poly_matxx fmpz_poly_matxx::zero(slong rows, slong cols)
+static fmpz_poly_matxx fmpz_poly_matxx::one(slong rows, slong cols)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Random matrix generation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1749,6 +1787,12 @@ void Fmpz_poly_mat_target::set_randtest_unsigned(frandxx& state, slong len,
         mp_bitcnt_t)
 void Fmpz_poly_mat_target::set_randtest_sparse(frandxx& state, slong len,
         mp_bitcnt_t, float)
+static fmpz_poly_matxx fmpz_poly_matxx::randtest(slong rows, slong cols,
+        frandxx&, slong len, mp_bitcnt_t)
+static fmpz_poly_matxx fmpz_poly_matxx::randtest_unsigned(slong rows,
+        slong cols, frandxx&, slong len, mp_bitcnt_t)
+static fmpz_poly_matxx fmpz_poly_matxx::randtest_sparse(slong rows, slong cols,
+        frandxx&, slong len, mp_bitcnt_t, float density)
 
     See \code{fmpz_poly_mat_randtest} etc.
 
@@ -1756,9 +1800,10 @@ void Fmpz_poly_mat_target::set_randtest_sparse(frandxx& state, slong len,
     Basic comparison and properties
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-bool Fmpz_mat_expr::is_zero() const
-bool Fmpz_mat_expr::is_empty() const
-bool Fmpz_mat_expr::is_square() const
+bool Fmpz_poly_mat_expr::is_zero() const
+bool Fmpz_poly_mat_expr::is_one() const
+bool Fmpz_poly_mat_expr::is_empty() const
+bool Fmpz_poly_mat_expr::is_square() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Norms
@@ -2521,6 +2566,19 @@ void Nmod_mat_target::set_randtriu(frandxx&, bool unit)
 
     See \code{nmod_mat_randtest} etc.
 
+static nmod_matxx nmod_matxx::randtest(slong rows, slong cols, mp_limb_t M,
+        frandxx&)
+static nmod_matxx nmod_matxx::randfull(slong rows, slong cols, mp_limb_t M,
+        frandxx&)
+static nmod_matxx nmod_matxx::randrank(slong rows, slong cols, mp_limb_t M,
+        frandxx&, slong rank)
+static nmod_matxx nmod_matxx::randtril(slong rows, slong cols, mp_limb_t M,
+        frandxx&, bool unit)
+static nmod_matxx nmod_matxx::randtriu(slong rows, slong cols, mp_limb_t M,
+        frandxx&, bool unit)
+
+    Static versions of the above.
+
 int Nmod_mat_target::set_randpermdiag(frandxx&, const Vec& v)
 
     \code{M.set_randpermdiag(Rand, V)} has the same effect as
@@ -2681,6 +2739,10 @@ nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
 
 void Nmod_poly_mat_target::set_randtest(frandxx&, slong)
 void Nmod_poly_mat_target::set_randtest_sparse(frandxx&, slong, float)
+static nmod_poly_matxx nmod_poly_matxx::randtest(slong rows, slong cols,
+        mp_limb_t n, slong len)
+static nmod_poly_matxx nmod_poly_matxx::randtest_sparse(slong rows, slong cols,
+        mp_limb_t n, slong len, float density)
 
     See \code{nmod_poly_mat_randtest} etc.
 
@@ -2840,6 +2902,14 @@ void Fmpz_mod_poly_mat_target::set_randtest_not_zero(frandxx&, slong)
 
     See \code{fmpz_mod_poly_randtest}, etc.
 
+static fmpz_mod_polyxx fmpz_mod_polyxx::randtest(Fmpz_expr, frandx&, slong)
+static fmpz_mod_polyxx fmpz_mod_polyxx::randtest_not_zero(Fmpz_expr,
+        frandx&, slong)
+static fmpz_mod_polyxx fmpz_mod_polyxx::randtest_irreducible(Fmpz_expr,
+        frandx&, slong)
+
+    Static versions of the above.
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Attributes
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2861,6 +2931,9 @@ slong Fmpz_mod_poly_expr::degree() const
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void Fmpz_mod_poly_target::zero_coeffs(slong i, slong j)
+void Fmpz_mod_poly_target::set_zero()
+
+static fmpz_mod_polyxx fmpz_mod_polyxx::zero(Fmpz_expr m)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Conversion

@@ -76,6 +76,35 @@ class fmpz_mod_polyxx_expression
     FLINTXX_DEFINE_CTORS(fmpz_mod_polyxx_expression)
     FLINTXX_DEFINE_C_REF(fmpz_mod_polyxx_expression, fmpz_mod_poly_struct, _poly)
 
+    template<class Fmpz>
+    static fmpz_mod_polyxx_expression randtest(const Fmpz& m,
+            frandxx& state, slong len)
+    {
+        fmpz_mod_polyxx_expression res(m);
+        res.set_randtest(state, len);
+        return res;
+    }
+    template<class Fmpz>
+    static fmpz_mod_polyxx_expression randtest_irreducible(const Fmpz& m,
+            frandxx& state, slong len)
+    {
+        fmpz_mod_polyxx_expression res(m);
+        res.set_randtest_irreducible(state, len);
+        return res;
+    }
+    template<class Fmpz>
+    static fmpz_mod_polyxx_expression randtest_not_zero(const Fmpz& m,
+            frandxx& state, slong len)
+    {
+        fmpz_mod_polyxx_expression res(m);
+        res.set_randtest_not_zero(state, len);
+        return res;
+    }
+
+    template<class Fmpz>
+    static fmpz_mod_polyxx_expression zero(const Fmpz& m)
+        {return fmpz_mod_polyxx_expression(m);}
+
     // these only make sense with immediates
     fmpzxx_srcref _mod() const
         {return fmpzxx_srcref::make(fmpz_mod_poly_modulus(_poly()));}
@@ -106,6 +135,8 @@ class fmpz_mod_polyxx_expression
     {
         return fmpz_mod_poly_remove(_poly(), p.evaluate()._poly());
     }
+
+    void set_zero() {fmpz_mod_poly_zero_coeffs(_poly());}
 
     // unified coefficient access
     typename poly_traits_t::lead_ref_t lead()

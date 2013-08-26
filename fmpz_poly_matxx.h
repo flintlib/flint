@@ -81,6 +81,37 @@ public:
         return res;
     }
 
+    static fmpz_poly_matxx_expression randtest(slong rows, slong cols,
+            frandxx& state, slong len, mp_bitcnt_t bits)
+    {
+        fmpz_poly_matxx_expression res(rows, cols);
+        res.set_randtest(state, len, bits);
+        return res;
+    }
+    static fmpz_poly_matxx_expression randtest_unsigned(slong rows, slong cols,
+            frandxx& state, slong len, mp_bitcnt_t bits)
+    {
+        fmpz_poly_matxx_expression res(rows, cols);
+        res.set_randtest_unsigned(state, len, bits);
+        return res;
+    }
+    static fmpz_poly_matxx_expression randtest_sparse(slong rows, slong cols,
+            frandxx& state, slong len, mp_bitcnt_t bits, float density)
+    {
+        fmpz_poly_matxx_expression res(rows, cols);
+        res.set_randtest_sparse(state, len, bits, density);
+        return res;
+    }
+
+    static fmpz_poly_matxx_expression zero(slong rows, slong cols)
+        {return fmpz_poly_matxx_expression(rows, cols);}
+    static fmpz_poly_matxx_expression one(slong rows, slong cols)
+    {
+        fmpz_poly_matxx_expression res(rows, cols);
+        res.set_one();
+        return res;
+    }
+
     // these only make sense with targets
     void set_randtest(frandxx& state, slong len, mp_bitcnt_t bits)
         {fmpz_poly_mat_randtest(_mat(), state._data(), len, bits);}
@@ -90,11 +121,17 @@ public:
             float density)
         {fmpz_poly_mat_randtest_sparse(_mat(), state._data(), len, bits, density);}
     void truncate(slong len) {fmpz_poly_mat_truncate(_mat(), len);}
+    void set_zero()
+        {fmpz_poly_mat_zero(_mat());}
+    void set_one()
+        {fmpz_poly_mat_one(_mat());}
 
     // these cause evaluation
     slong rank() const {return fmpz_poly_mat_rank(this->evaluate()._mat());}
     bool is_zero() const
         {return fmpz_poly_mat_is_zero(this->evaluate()._mat());}
+    bool is_one() const
+        {return fmpz_poly_mat_is_one(this->evaluate()._mat());}
     bool is_empty() const
         {return fmpz_poly_mat_is_empty(this->evaluate()._mat());}
     bool is_square() const

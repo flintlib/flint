@@ -131,9 +131,19 @@ public:
         return res;
     }
 
+    static fmpqxx_expression zero(){return fmpqxx_expression();}
+    static fmpqxx_expression one()
+    {
+        fmpqxx_expression res;
+        res.set_one();
+        return res;
+    }
+
     // These only make sense with immediates
     void canonicalise() {fmpq_canonicalise(_fmpq());}
     bool is_canonical() const {return fmpq_is_canonical(_fmpq());}
+    void set_zero() {fmpq_zero(_fmpq());}
+    void set_one() {fmpq_one(_fmpq());}
 
     template<class Vec>
     void set_cfrac(const Vec& v, slong n)

@@ -119,6 +119,14 @@ public:
         return fmpq_polyxx_interpolate(xs, ys);
     }
 
+    static fmpq_polyxx_expression zero() {return fmpq_polyxx_expression();}
+    static fmpq_polyxx_expression one()
+    {
+        fmpq_polyxx_expression res;
+        res.set_one();
+        return res;
+    }
+
     // These only make sense with immediates
     void realloc(slong alloc) {fmpq_poly_realloc(_poly(), alloc);}
     void fit_length(slong len) {fmpq_poly_fit_length(_poly(), len);}
@@ -126,6 +134,8 @@ public:
     void _set_length(slong len) {_fmpq_poly_set_length(_poly(), len);}
     void canonicalise() {fmpq_poly_canonicalise(_poly());}
     bool is_canonical() const {return fmpq_poly_is_canonical(_poly());}
+    void set_zero() {fmpq_poly_zero(_poly());}
+    void set_one() {fmpq_poly_one(_poly());}
 
     coeff_ref_t get_coeff_numref(slong n)
     {

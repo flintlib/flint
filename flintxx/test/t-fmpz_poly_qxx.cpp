@@ -43,6 +43,9 @@ test_manipulation()
     f.canonicalise();
     tassert(f.num().to_string() == "2  1 1");
     tassert(f.den().to_string() == "2  -1 1");
+
+    tassert(fmpz_poly_qxx::zero().is_zero());
+    tassert(fmpz_poly_qxx::one().is_one());
 }
 
 void

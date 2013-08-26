@@ -38,6 +38,8 @@ test_init()
 {
     fmpq_polyxx p(10);
     tassert(p.length() == 0);
+    tassert(fmpq_polyxx::zero().is_zero());
+    tassert(fmpq_polyxx::one().is_one());
 }
 
 void

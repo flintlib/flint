@@ -40,6 +40,7 @@ test_init()
     fmpz_mod_polyxx p(fmpzxx(2003));
     tassert(p.length() == 0);
     tassert(p.modulus() == 2003);
+    tassert(fmpz_mod_polyxx::zero(fmpzxx(2003)).is_zero());
 }
 
 void
@@ -314,6 +315,21 @@ test_factoring()
     // TODO test set_factor_equal_deg*
 }
 
+void
+test_randomisation()
+{
+    frandxx state, state2;
+    fmpzxx M(1031);
+    fmpz_mod_polyxx p(M);
+
+    p.set_randtest(state, 10);
+    tassert(p == fmpz_mod_polyxx::randtest(M, state2, 10));
+    p.set_randtest_irreducible(state, 10);
+    tassert(p == fmpz_mod_polyxx::randtest_irreducible(M, state2, 10));
+    p.set_randtest_not_zero(state, 10);
+    tassert(p == fmpz_mod_polyxx::randtest_not_zero(M, state2, 10));
+}
+
 int
 main()
 {
@@ -327,6 +343,7 @@ main()
     test_functions();
     test_extras();
     test_factoring();
+    test_randomisation();
 
     std::cout << "PASS" << std::endl;
     return 0;

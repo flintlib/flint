@@ -51,6 +51,8 @@ test_init()
     tassert(a.num() == -1 && a.den() == 2);
 
     tassert(fmpqxx::frac("4", 2) == fmpqxx::integer(-fmpzxx(-2)));
+
+    tassert(fmpqxx::zero().is_zero() && fmpqxx::one().is_one());
 }
 
 void

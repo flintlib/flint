@@ -85,6 +85,21 @@ public:
 
     FLINTXX_DEFINE_FORWARD_STATIC(from_ground)
 
+    static nmod_poly_matxx_expression randtest(slong rows, slong cols,
+            mp_limb_t M, frandxx& state, slong len)
+    {
+        nmod_poly_matxx_expression res(rows, cols, M);
+        res.set_randtest(state, len);
+        return res;
+    }
+    static nmod_poly_matxx_expression randtest_sparse(slong rows, slong cols,
+            mp_limb_t M, frandxx& state, slong len, float density)
+    {
+        nmod_poly_matxx_expression res(rows, cols, M);
+        res.set_randtest_sparse(state, len, density);
+        return res;
+    }
+
     // these only make sense with targets
     void set_randtest(frandxx& state, slong len)
         {nmod_poly_mat_randtest(_mat(), state._data(), len);}

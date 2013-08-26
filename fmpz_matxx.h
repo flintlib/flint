@@ -195,6 +195,15 @@ public:
         return res;
     }
 
+    static fmpz_matxx_expression zero(slong rows, slong cols)
+        {return fmpz_matxx_expression(rows, cols);}
+    static fmpz_matxx_expression one(slong rows, slong cols)
+    {
+        fmpz_matxx_expression res(rows, cols);
+        res.set_one();
+        return res;
+    }
+
     // these only make sense with targets
     void set_randbits(frandxx& state, mp_bitcnt_t bits)
         {fmpz_mat_randbits(_mat(), state._data(), bits);}
@@ -226,6 +235,11 @@ public:
 
     void apply_randops(frandxx& state, slong count)
         {fmpz_mat_randops(_mat(), state._data(), count);}
+
+    void set_zero()
+        {fmpz_mat_zero(_mat());}
+    void set_one()
+        {fmpz_mat_one(_mat());}
 
     // these cause evaluation
     slong rank() const {return fmpz_mat_rank(this->evaluate()._mat());}

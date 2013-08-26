@@ -114,6 +114,30 @@ public:
         return res;
     }
 
+    static fmpq_matxx_expression randbits(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits)
+    {
+        fmpq_matxx_expression res(rows, cols);
+        res.set_randbits(state, bits);
+        return res;
+    }
+    static fmpq_matxx_expression randtest(slong rows, slong cols,
+            frandxx& state, mp_bitcnt_t bits)
+    {
+        fmpq_matxx_expression res(rows, cols);
+        res.set_randtest(state, bits);
+        return res;
+    }
+
+    static fmpq_matxx_expression zero(slong rows, slong cols)
+        {return fmpq_matxx_expression(rows, cols);}
+    static fmpq_matxx_expression one(slong rows, slong cols)
+    {
+        fmpq_matxx_expression res(rows, cols);
+        res.set_one();
+        return res;
+    }
+
     // these only make sense with targets
     void set_randbits(frandxx& state, mp_bitcnt_t bits)
         {fmpq_mat_randbits(_mat(), state._data(), bits);}
@@ -121,6 +145,10 @@ public:
         {fmpq_mat_randtest(_mat(), state._data(), bits);}
     void set_hilbert_matrix()
         {fmpq_mat_hilbert_matrix(_mat());}
+    void set_zero()
+        {fmpq_mat_zero(_mat());}
+    void set_one()
+        {fmpq_mat_one(_mat());}
 
     template<class Fmpz_mat, class Fmpz>
     void set_frac(const Fmpz_mat& num, const Fmpz& den,

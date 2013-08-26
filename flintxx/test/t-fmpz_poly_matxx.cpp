@@ -45,6 +45,9 @@ test_init()
     tassert(B.at(0, 0) == fmpz_polyxx::from_ground(1));
     B.at(0, 0) = fmpz_polyxx::from_ground(0);
     tassert(A.at(0, 0) == fmpz_polyxx::from_ground(1));
+
+    tassert(fmpz_poly_matxx::zero(3, 3).is_zero());
+    tassert(fmpz_poly_matxx::one(3, 3).is_one());
 }
 
 void
@@ -130,7 +133,7 @@ test_functions()
 {
     fmpz_poly_matxx A(2, 3), B(2, 2), empty(0, 15);
     B.at(0, 0) = fmpz_polyxx::from_ground(1);
-    tassert(A.is_zero() && !A.is_empty() && !A.is_square());
+    tassert(A.is_zero() && !A.is_empty() && !A.is_square() && !A.is_one());
     tassert(!B.is_zero() == B.is_square());
     tassert(empty.is_zero() && empty.is_empty());
 
@@ -190,6 +193,7 @@ test_functions()
     tassert(worked);
     fmpz_poly_matxx eye(2, 2);
     eye.at(0, 0).set_coeff(0, 1);eye.at(1, 1).set_coeff(0, 1);
+    tassert(eye.is_one());
     tassert(Binv * B == d*eye);
 
     fmpz_poly_matxx X(2, 3);
@@ -223,14 +227,17 @@ test_extras()
 void
 test_randomisation()
 {
-    frandxx rand;
+    frandxx rand, rand2;
     fmpz_poly_matxx A(2, 2);
     A.set_randtest(rand, 4, 5);
     tassert(abs(A.at(0, 0).get_coeff(0)) <= 31);
+    tassert(A == fmpz_poly_matxx::randtest(2, 2, rand2, 4, 5));
     A.set_randtest_unsigned(rand, 4, 5);
     tassert(A.at(0, 0).get_coeff(0) >= 0);
+    tassert(A == fmpz_poly_matxx::randtest_unsigned(2, 2, rand2, 4, 5));
     A.set_randtest_sparse(rand, 4, 5, 0.5);
     tassert(abs(fmpz_polyxx_get_coeff(A.at(0, 0), 0)) <= 31);
+    tassert(A == fmpz_poly_matxx::randtest_sparse(2, 2, rand2, 4, 5, 0.5));
 }
 
 int

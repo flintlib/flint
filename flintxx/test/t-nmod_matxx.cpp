@@ -221,6 +221,22 @@ test_randomisation()
 
     A.set_randtriu(rand, false);
     tassert(A.at(1, 0) == nmodxx::red(0, ctx));
+
+    frandxx rand2, rand3;
+    nmod_matxx B(2, 2, M);
+
+    B.set_randtest(rand2);
+    tassert(B == nmod_matxx::randtest(2, 2, M, rand3));
+    B.set_randfull(rand2);
+    tassert(B == nmod_matxx::randfull(2, 2, M, rand3));
+    B.set_randrank(rand2, 1);
+    tassert(B == nmod_matxx::randrank(2, 2, M, rand3, 1));
+    B.set_randtril(rand2, false);
+    tassert(B == nmod_matxx::randtril(2, 2, M, rand3, false));
+    B.set_randtriu(rand2, false);
+    tassert(B == nmod_matxx::randtriu(2, 2, M, rand3, false));
+    B.set_randpermdiag(rand2, v);
+    tassert(B == nmod_matxx::randpermdiag(2, 2, M, rand3, v));
 }
 
 void

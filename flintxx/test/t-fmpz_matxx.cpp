@@ -46,6 +46,12 @@ test_init()
     tassert(B.at(0, 0) == 1);
     B.at(0, 0) = 0;
     tassert(A.at(0, 0) == 1);
+
+    tassert(fmpz_matxx::zero(3, 4).is_zero());
+    fmpz_matxx eye = fmpz_matxx::one(4, 4);
+    for(slong i = 0;i < eye.rows();++i)
+        for(slong j = 0;j < eye.cols();++j)
+            tassert(eye.at(i, j) == int(i == j));
 }
 
 void

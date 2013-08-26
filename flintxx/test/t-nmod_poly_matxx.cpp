@@ -215,14 +215,16 @@ test_extras()
 void
 test_randomisation()
 {
-    frandxx rand;
+    frandxx rand, rand2;
     mp_limb_t M = 1031;
     nmod_poly_matxx A(2, 2, M);
 
     A.set_randtest(rand, 17);
     tassert(A.at(0, 0).length() <= 17);
+    tassert(A == nmod_poly_matxx::randtest(2, 2, M, rand2, 17));
     A.set_randtest_sparse(rand, 17, 0.5);
     tassert(A.at(0, 0).length() <= 17);
+    tassert(A == nmod_poly_matxx::randtest_sparse(2, 2, M, rand2, 17, 0.5));
 }
 
 int

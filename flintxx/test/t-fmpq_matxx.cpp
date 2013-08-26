@@ -45,6 +45,12 @@ test_init()
     tassert(B.at(0, 0).is_one());
     B.at(0, 0) = 0;
     tassert(A.at(0, 0).is_one());
+
+    tassert(fmpq_matxx::zero(3, 4).is_zero());
+    fmpq_matxx eye = fmpq_matxx::one(4, 4);
+    for(slong i = 0;i < eye.rows();++i)
+        for(slong j = 0;j < eye.cols();++j)
+            tassert(eye.at(i, j) == fmpqxx::integer(int(i == j)));
 }
 
 void
@@ -256,6 +262,12 @@ test_randomisation()
     tassert(height(A.at(0, 0)) <= 31);
     A.set_randtest(rand, 5);
     tassert(height(A.at(0, 0)) <= 31);
+
+    frandxx rand2, rand3;
+    A.set_randbits(rand2, 5);
+    tassert(A == fmpq_matxx::randbits(2, 2, rand3, 5));
+    A.set_randtest(rand2, 5);
+    tassert(A == fmpq_matxx::randtest(2, 2, rand3, 5));
 }
 
 void

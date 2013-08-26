@@ -92,6 +92,14 @@ public:
         return res;
     }
 
+    static fmpz_poly_qxx_expression zero(){return fmpz_poly_qxx_expression();}
+    static fmpz_poly_qxx_expression one()
+    {
+        fmpz_poly_qxx_expression res;
+        res.set_one();
+        return res;
+    }
+
     // Numerator and denominator access
     num_ref_t num() {return poly_traits_t::num(*this);}
     num_srcref_t num() const {return poly_traits_t::num(*this);}
@@ -101,8 +109,8 @@ public:
 
     // these only make sense with target immediates
     void canonicalise() {fmpz_poly_q_canonicalise(_polyq());}
-    bool is_one() const {return fmpz_poly_q_is_one(this->evaluate()._polyq());}
-    bool is_zero() const {return fmpz_poly_q_is_zero(this->evaluate()._polyq());}
+    void set_zero() {fmpz_poly_q_zero(_polyq());}
+    void set_one() {fmpz_poly_q_one(_polyq());}
 
     // These cause evaluation
     std::string pretty(const char* x) const
@@ -112,6 +120,8 @@ public:
         std::free(str);
         return res;
     }
+    bool is_one() const {return fmpz_poly_q_is_one(this->evaluate()._polyq());}
+    bool is_zero() const {return fmpz_poly_q_is_zero(this->evaluate()._polyq());}
 
     // forwarded lazy member functions
     FLINTXX_DEFINE_MEMBER_UNOP(inv)

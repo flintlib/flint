@@ -103,6 +103,52 @@ public:
         return res;
     }
 
+    static nmod_matxx_expression randtest(slong rows, slong cols, mp_limb_t n,
+            frandxx& state)
+    {
+        nmod_matxx_expression res(rows, cols, n);
+        res.set_randtest(state);
+        return res;
+    }
+    static nmod_matxx_expression randfull(slong rows, slong cols, mp_limb_t n,
+            frandxx& state)
+    {
+        nmod_matxx_expression res(rows, cols, n);
+        res.set_randfull(state);
+        return res;
+    }
+    static nmod_matxx_expression randrank(slong rows, slong cols, mp_limb_t n,
+            frandxx& state, slong rank)
+    {
+        nmod_matxx_expression res(rows, cols, n);
+        res.set_randrank(state, rank);
+        return res;
+    }
+    static nmod_matxx_expression randtril(slong rows, slong cols, mp_limb_t n,
+            frandxx& state, bool unit)
+    {
+        nmod_matxx_expression res(rows, cols, n);
+        res.set_randtril(state, unit);
+        return res;
+    }
+    static nmod_matxx_expression randtriu(slong rows, slong cols, mp_limb_t n,
+            frandxx& state,
+            bool unit)
+    {
+        nmod_matxx_expression res(rows, cols, n);
+        res.set_randtriu(state, unit);
+        return res;
+    }
+
+    template<class Vec>
+    static nmod_matxx_expression randpermdiag(slong rows, slong cols, mp_limb_t n,
+            frandxx& state, const Vec& v)
+    {
+        nmod_matxx_expression res(rows, cols, n);
+        res.set_randpermdiag(state, v);
+        return res;
+    }
+
     // these only make sense with targets
     void set_randtest(frandxx& state)
         {nmod_mat_randtest(_mat(), state._data());}
