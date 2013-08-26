@@ -1423,6 +1423,10 @@ fmpq_polyxx::fmpq_polyxx(slong alloc)
 
     See \code{fmpq_poly_init2}.
 
+fmpq_polyxx::fmpq_polyxx(const char* str)
+
+    See \code{fmpq_poly_set_str}.
+
 static fmpq_polyxx fmpq_polyxx::randtest(
         frandxx& state, slong len, mp_bitcnt_t bits)
 static fmpq_polyxx fmpq_polyxx::randtest_unsigned(
@@ -1622,6 +1626,10 @@ Fmpq_poly_expr tanh_series(Fmpq_poly_expr, T:fits_into_slong)
 *******************************************************************************
 
 fmpz_poly_qxx::fmpz_poly_qxx()
+
+fmpz_poly_qxx::fmpz_poly_qxx(const char*)
+
+    See \code{fmpz_poly_q_set_str}.
 
 static fmpz_poly_qxx fmpz_poly_qxx::randtest(frandxx& state,
         slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)

@@ -79,10 +79,12 @@ test_assignment()
     p = "4  0 0 0 1";
     q.set_coeff(3, 1);
     tassert(p == q);
+    tassert(p == fmpq_polyxx("4  0 0 0 1"));
 
     // TODO XXX this does not always fail?
     //assert_exception(p = "4  1 2");
     assert_exception(p = "2 1 2");
+    assert_exception(fmpq_polyxx("2 1 2"));
 
     fmpz_polyxx pz;
     pz = 1;

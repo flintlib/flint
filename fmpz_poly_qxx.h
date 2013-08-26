@@ -182,6 +182,13 @@ struct fmpz_poly_q_data
         fmpz_poly_q_init(inner);
         fmpz_poly_q_set(inner, r._polyq());
     }
+
+    fmpz_poly_q_data(const char* str)
+    {
+        fmpz_poly_q_init(inner);
+        execution_check(!fmpz_poly_q_set_str(inner, str),
+                "construct from string", "fmpz_poly_qxx");
+    }
 };
 } // detail
 

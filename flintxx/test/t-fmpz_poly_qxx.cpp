@@ -64,6 +64,7 @@ test_assignment_conversion()
     tassert(f.to_string() == "4  1 0 0 1/2  -1 1");
     g = "4  1 0 0 1/2  -1 1";
     tassert(f == g);
+    tassert(f == fmpz_poly_qxx("4  1 0 0 1/2  -1 1"));
 
     tassert(f.pretty("x") == "(x^3+1)/(x-1)");
 }

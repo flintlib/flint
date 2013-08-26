@@ -296,6 +296,13 @@ struct fmpq_poly_data
     {
         fmpq_poly_init2(inner, alloc);
     }
+
+    fmpq_poly_data(const char* str)
+    {
+        fmpq_poly_init(inner);
+        execution_check(!fmpq_poly_set_str(inner, str),
+                "construct from string", "fmpq_polyxx");
+    }
 };
 } // detail
 
