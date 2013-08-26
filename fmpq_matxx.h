@@ -30,15 +30,15 @@
 
 #include "fmpqxx.h"
 #include "fmpz_matxx.h"
+#include "fmpz_vecxx.h"
 
 #include "flintxx/ltuple.h"
 #include "flintxx/matrix.h"
 
 // TODO wrap entry_num, entry_den?
 // TODO input and output
-// TODO fmpz_mat conversion
-// TODO modular reduction
 // TODO pivoting and row reduction
+// TODO numden_rowwise_2
 
 namespace flint {
 FLINT_DEFINE_BINOP(hilbert_matrix)
@@ -46,9 +46,24 @@ FLINT_DEFINE_BINOP(mul_direct)
 FLINT_DEFINE_BINOP(mul_cleared)
 FLINT_DEFINE_BINOP(solve_fraction_free)
 
+FLINT_DEFINE_UNOP(numden_colwise)
+FLINT_DEFINE_UNOP(numden_entrywise)
+FLINT_DEFINE_UNOP(numden_matwise)
+FLINT_DEFINE_UNOP(numden_rowwise)
+FLINT_DEFINE_UNOP(num_rowwise)
+//FLINT_DEFINE_UNOP(fmpq_matxx_num_colwise)
+
 namespace detail {
 template<class Mat>
 struct fmpq_matxx_traits : matrices::generic_traits<Mat> { };
+
+typedef make_ltuple<mp::make_tuple<fmpz_matxx, fmpz_matxx>::type>::type
+    fmpq_matxx_numden_entrywise_rt;
+typedef make_ltuple<mp::make_tuple<fmpz_matxx, fmpzxx>::type>::type
+    fmpq_matxx_numden_matwise_rt;
+typedef make_ltuple<mp::make_tuple<fmpz_matxx, fmpz_vecxx>::type>::type
+    fmpq_matxx_numden_rowwise_rt;
+typedef fmpq_matxx_numden_rowwise_rt fmpq_matxx_numden_colwise_rt;
 } // detail
 
 template<class Operation, class Data>
@@ -78,9 +93,24 @@ public:
             typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
     {
         fmpq_matxx_expression res(mat.rows(), mat.cols());
-        execution_check(fmpq_mat_set_fmpz_mat_mod_fmpz(
-                    res._mat(), mat.evaluate()._mat(), mod.evaluate()._fmpz()),
-                "reconstruct", "fmpq_matxx");
+        res.set_reconstruct(mat, mod);
+        return res;
+    }
+    template<class Fmpz_mat, class Fmpz>
+    static fmpq_matxx_expression frac(const Fmpz_mat& num, const Fmpz& den,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        fmpq_matxx_expression res(num.rows(), num.cols());
+        res.set_frac(num, den);
+        return res;
+    }
+    template<class Fmpz_mat>
+    static fmpq_matxx_expression integer_matrix(const Fmpz_mat& mat,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0)
+    {
+        fmpq_matxx_expression res(mat.rows(), mat.cols());
+        res = mat;
         return res;
     }
 
@@ -91,6 +121,24 @@ public:
         {fmpq_mat_randtest(_mat(), state._data(), bits);}
     void set_hilbert_matrix()
         {fmpq_mat_hilbert_matrix(_mat());}
+
+    template<class Fmpz_mat, class Fmpz>
+    void set_frac(const Fmpz_mat& num, const Fmpz& den,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        fmpq_mat_set_fmpz_mat_div_fmpz(num.evaluate()._mat(),
+                den.evaluate()._fmpz());
+    }
+    template<class Fmpz_mat, class Fmpz>
+    void set_reconstruct(const Fmpz_mat& mat, const Fmpz& mod,
+            typename mp::enable_if<traits::is_fmpz_matxx<Fmpz_mat> >::type* = 0,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        execution_check(fmpq_mat_set_fmpz_mat_mod_fmpz(
+                    _mat(), mat.evaluate()._mat(), mod.evaluate()._fmpz()),
+                "reconstruct", "fmpq_matxx");
+    }
 
     // these cause evaluation
     slong rank() const {return fmpq_mat_rank(this->evaluate()._mat());}
@@ -105,6 +153,19 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP(transpose)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpqxx, det)
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpqxx, trace)
+
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(detail::fmpq_matxx_numden_entrywise_rt,
+            numden_entrywise)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(detail::fmpq_matxx_numden_matwise_rt,
+            numden_matwise)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(detail::fmpq_matxx_numden_rowwise_rt,
+            numden_rowwise)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(detail::fmpq_matxx_numden_colwise_rt,
+            numden_colwise)
+    FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpz_matxx, num_rowwise,
+            num_rowwise)
+    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE_(fmpz_matxx, num_colwise,
+    //        fmpq_matxx_num_colwise)
 
     FLINTXX_DEFINE_MEMBER_BINOP(mul_cleared)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_direct)
@@ -220,7 +281,47 @@ struct outsize<operations::hilbert_matrix_op>
     template<class Expr>
     static slong cols(const Expr& e) {return e._data().second();}
 };
+
+template<>
+struct outsize<operations::numden_entrywise_op>
+{
+    template<class Expr>
+    static slong rows(const Expr& e) {return e._data().first().rows();}
+    template<class Expr>
+    static slong cols(const Expr& e) {return e._data().first().cols();}
+};
+template<> struct outsize<operations::numden_colwise_op>
+    : outsize<operations::numden_entrywise_op> { };
+template<> struct outsize<operations::numden_rowwise_op>
+    : outsize<operations::numden_entrywise_op> { };
+template<> struct outsize<operations::numden_matwise_op>
+    : outsize<operations::numden_entrywise_op> { };
+template<> struct outsize<operations::num_rowwise_op>
+    : outsize<operations::numden_entrywise_op> { };
+//template<> struct outsize<operations::fmpq_matxx_num_colwise_op>
+//    : outsize<operations::numden_entrywise_op> { };
 } // matrices
+
+namespace vectors {
+template<>
+struct outsize<operations::numden_rowwise_op>
+{
+    template<class Expr>
+    static unsigned get(const Expr& e)
+    {
+        return e._data().first().rows();
+    }
+};
+template<>
+struct outsize<operations::numden_colwise_op>
+{
+    template<class Expr>
+    static unsigned get(const Expr& e)
+    {
+        return e._data().first().cols();
+    }
+};
+} // vectors
 
 // temporary instantiation stuff
 FLINTXX_DEFINE_TEMPORARY_RULES(fmpq_matxx)
@@ -228,6 +329,8 @@ FLINTXX_DEFINE_TEMPORARY_RULES(fmpq_matxx)
 namespace rules {
 FLINT_DEFINE_DOIT_COND2(assignment, FMPQ_MATXX_COND_T, FMPQ_MATXX_COND_S,
         fmpq_mat_set(to._mat(), from._mat()))
+FLINT_DEFINE_DOIT_COND2(assignment, FMPQ_MATXX_COND_T, FMPZ_MATXX_COND_S,
+        fmpq_mat_set_fmpz_mat(to._mat(), from._mat()))
 
 FLINTXX_DEFINE_SWAP(fmpq_matxx, fmpq_mat_swap(e1._mat(), e2._mat()))
 
@@ -293,6 +396,29 @@ FLINT_DEFINE_BINARY_EXPR_COND2(solve_dixon_op, fmpq_matxx,
 FLINT_DEFINE_UNARY_EXPR_COND(inv_op, fmpq_matxx, FMPQ_MATXX_COND_S,
         execution_check(fmpq_mat_inv(to._mat(), from._mat()),
             "inv", "fmpq_mat"))
+
+FLINT_DEFINE_UNARY_EXPR_COND(num_rowwise_op, fmpz_matxx,
+        FMPQ_MATXX_COND_S,
+        fmpq_mat_get_fmpz_mat_rowwise(to._mat(), 0, from._mat()))
+//FLINT_DEFINE_UNARY_EXPR_COND(fmpq_matxx_num_colwise_op, fmpz_matxx,
+//        FMPQ_MATXX_COND_S,
+//        fmpq_mat_get_fmpz_mat_colwise(to._mat(), 0, from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(numden_entrywise_op,
+        detail::fmpq_matxx_numden_entrywise_rt, FMPQ_MATXX_COND_S,
+        fmpq_mat_get_fmpz_mat_entrywise(to.template get<0>()._mat(),
+            to.template get<1>()._mat(), from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(numden_matwise_op,
+        detail::fmpq_matxx_numden_matwise_rt, FMPQ_MATXX_COND_S,
+        fmpq_mat_get_fmpz_mat_matwise(to.template get<0>()._mat(),
+            to.template get<1>()._fmpz(), from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(numden_rowwise_op,
+        detail::fmpq_matxx_numden_rowwise_rt, FMPQ_MATXX_COND_S,
+        fmpq_mat_get_fmpz_mat_rowwise(to.template get<0>()._mat(),
+            to.template get<1>()._array(), from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(numden_colwise_op,
+        detail::fmpq_matxx_numden_colwise_rt, FMPQ_MATXX_COND_S,
+        fmpq_mat_get_fmpz_mat_colwise(to.template get<0>()._mat(),
+            to.template get<1>()._array(), from._mat()))
 } // rules
 } // flint
 

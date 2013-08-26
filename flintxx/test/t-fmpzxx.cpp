@@ -109,12 +109,12 @@ test_initialisation_assignment()
     f = 4;
     g = 4l;
     h = 4u;
-    i = "4";
+    i = fmpzxx("4");
     tassert(a == b && a == c&& a == d && a == e && a == f && a == g && a == h
             && a == i);
 
     // test deep copying of fmpzxx with more than one digit
-    a = "100000000000000000000";
+    a = fmpzxx("100000000000000000000");
     b = a;
     tassert(a._fmpz()[0] != b._fmpz()[0]);
     fmpzxx j(a);

@@ -102,6 +102,35 @@ public:
         return fmpqxx_reconstruct(a, m, N, D);
     }
 
+    template<class F1, class F2>
+    void set_frac(const F1& f1, const F2& f2)
+    {
+        num() = f1;
+        den() = f2;
+        canonicalise();
+    }
+    template<class F1, class F2>
+    static fmpqxx_expression frac(const F1& f1, const F2& f2)
+    {
+        fmpqxx_expression res;
+        res.set_frac(f1, f2);
+        return res;
+    }
+
+    template<class T>
+    void set_integer(const T& t)
+    {
+        num() = t;
+        den() = 1u;
+    }
+    template<class T>
+    static fmpqxx_expression integer(const T& t)
+    {
+        fmpqxx_expression res;
+        res.set_integer(t);
+        return res;
+    }
+
     // These only make sense with immediates
     void canonicalise() {fmpq_canonicalise(_fmpq());}
     bool is_canonical() const {return fmpq_is_canonical(_fmpq());}
@@ -195,16 +224,16 @@ struct fmpq_data
         fmpq_set(inner, o.inner);
     }
 
-    fmpq_data(fmpzxx_srcref num, fmpzxx_srcref den)
-    {
-        fmpq_init(inner);
-        fmpq_set_fmpz_frac(inner, num._fmpz(), den._fmpz());
-    }
-
     fmpq_data(fmpqxx_srcref r)
     {
         fmpq_init(inner);
         fmpq_set(inner, r._fmpq());
+    }
+
+    fmpq_data(fmpzxx_srcref num, fmpzxx_srcref den)
+    {
+        fmpq_init(inner);
+        fmpq_set_fmpz_frac(inner, num._fmpz(), den._fmpz());
     }
 
     template<class T, class U>

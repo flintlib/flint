@@ -96,6 +96,8 @@ test_conversion()
     p.set_coeff(3, 1);
     tassert(p.to_string() == "4  0 0 0 1");
     tassert(p.pretty("x") == "x^3");
+
+    tassert(p == fmpz_polyxx("4  0 0 0 1"));
 }
 
 void

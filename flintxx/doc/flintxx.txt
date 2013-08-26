@@ -571,6 +571,12 @@ static fmpz_matxx fmpz_matxx::reduce(Fmpq_mat_expr, Fmz_expr)
 
     See \code{fmpq_mat_get_fmpz_mat_mod_fmpz}.
 
+static fmpz_matxx fmpz_matxx::from_integral_fraction(Fmpq_mat_expr)
+void Fmpz_mat_target::set_integral_fraction(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat}. Raises \code{flint_exception} if the
+    argument has non-integer entries.
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Randomisation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -689,6 +695,10 @@ fmpz_polyxx::fmpz_polyxx()
 fmpz_polyxx::fmpz_polyxx(slong alloc)
 
     See \code{fmpz_poly_init2}.
+
+fmpz_polyxx::fmpz_polyxx(const char* str)
+
+    See \code{fmpz_poly_set_str}.
 
 static fmpz_polyxx fmpz_polyxx::randtest(
         frandxx& state, slong len, mp_bitcnt_t bits)
@@ -1102,6 +1112,24 @@ fmpqxx::fmpqxx(T:fits_into_slong num, U:is_unsigned_integer den)
 
     Initialize from numerator \code{num} and denominator \code{den}.
 
+static fmpqxx fmpqxx::frac(const T& t, const U& u)
+
+    Same as \code{fmpqxx res;res.set_frac(t, u)}.
+
+static fmpqxx fmpqxx::integer(const T& t)
+
+    Same as \code{fmpqxx res;res.set_integer(t)}.
+
+void Fmpq_target::set_frac(const T& t, const U& u)
+
+    \code{f.set_frac(t, u)} has the same effect as
+    \code{f.num() = t;f.den() = u;f.canonicalise()}.
+
+void Fmpq_target::set_integer(const T& t)
+
+    \code{f.set_integer(t)} has the same effect as
+    \code{f.num() = t;f.den() = 1u};
+
 static fmpqxx fmpqxx::randbits(frandxx& state)
 
 static fmpqxx fmpqxx::randtest(frandxx& state)
@@ -1224,7 +1252,9 @@ Fmpq_expr pow(Fmpq_expr, T:fits_into_slong)
 Fmpq_mat_expr::unary operation() const
 
     The following unary functions are made available as member functions:
-    \code{inv}, \code{transpose}, \code{det}, \code{trace}.
+    \code{inv}, \code{transpose}, \code{det}, \code{trace},
+    \code{numden_entrywise}, \code{numden_rowwise}, \code{numden_colwise},
+    \code{numden_matwise}, \code{num_rowwise}.
 
 Fmpq_mat_expr::binary operation(??) const
 
@@ -1240,6 +1270,10 @@ Fmpq_mat_expr operator?(??, ??)
 Fmpq_mat_expr operator-(Fmpq_mat_expr)
 
     The unary negation operator is overloaded.
+
+Fmpq_mat_target Fmpq_mat_target::operator=(Fmpz_mat_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
@@ -1287,6 +1321,40 @@ bool Fmpq_mat_expr::is_zero() const
 bool Fmpq_mat_expr::is_empty() const
 bool Fmpq_mat_expr::is_square() const
 bool Fmpq_mat_expr::is_integral() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Integer matrix conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpq_matxx fmpq_matxx::frac(Fmpz_mat_expr, Fmpz_expr)
+void Fmpq_mat_target::set_frac(Fmpz_mat_expr, Fmpz_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat_div_fmpz}.
+
+static fmpq_matxx fmpq_matxx::integer_matrix(Fmpz_mat_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat}.
+
+Fmpz_mat_expr num_rowwise(Fmpq_mat_expr)
+
+    This has the effect of calling \code{fmpq_mat_get_fmpz_mat_rowwise} with
+    second argument \code{NULL}.
+
+Ltuple<fmpz_matxx, fmpz_matxx>_expr numden_entrywise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_entrywise}.
+
+Ltuple<fmpz_matxx, fmpzxx>_expr numden_matwise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_matwise}.
+
+Ltuple<fmpz_matxx, fmpz_vecxx>_expr numden_rowwise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_rowwise}.
+
+Ltuple<fmpz_matxx, fmpz_vecxx>_expr numden_colwise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_colwise}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Modular reduction and rational reconstruction
@@ -1649,8 +1717,8 @@ Fmpz_poly_mat_expr operator-(Fmpz_poly_mat_expr)
     Basic properties
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-slong Fmpz_mat_expr::rows() const
-slong Fmpz_mat_expr::cols() const
+slong Fmpz_poly_mat_expr::rows() const
+slong Fmpz_poly_mat_expr::cols() const
 
     Obtain the number of rows/columns in this matrix. These functions never
     cause evaluation (the matrix size is computed from the operations in the
@@ -1660,7 +1728,7 @@ slong Fmpz_mat_expr::cols() const
     Basic assignment and manipulation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+?? Fmpz_poly_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
 
     Unified coefficient access to the matrix entries.
 

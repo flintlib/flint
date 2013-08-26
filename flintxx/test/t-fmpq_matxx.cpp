@@ -50,13 +50,63 @@ test_init()
 void
 test_assignment()
 {
-    // TODO
+    frandxx state;
+    fmpz_matxx A = fmpz_matxx::randtest(3, 4, state, 10);
+    fmpq_matxx Aq(A.rows(), A.cols());
+    Aq = A;
+    tassert(Aq == fmpq_matxx::integer_matrix(A));
 }
 
 void
 test_conversion()
 {
-    // TODO
+    frandxx state;
+    fmpz_matxx A = fmpz_matxx::randtest(3, 4, state, 10);
+    fmpq_matxx Aq = fmpq_matxx::integer_matrix(A);
+    tassert(Aq.rows() == A.rows() && Aq.cols() == A.cols());
+    for(slong i = 0;i < A.rows();++i)
+        for(slong j = 0;j < A.cols();++j)
+            tassert(Aq.at(i, j) == fmpqxx::integer(A.at(i, j)));
+    tassert(A == fmpz_matxx::from_integral_fraction(Aq));
+    Aq.at(0, 0) = fmpqxx::frac(1, 2);
+    assert_exception(fmpz_matxx::from_integral_fraction(Aq));
+
+    tassert(Aq.numden_entrywise().get<0>().rows() == A.rows()
+            && Aq.numden_entrywise().get<0>().cols() == A.cols()
+            && Aq.numden_entrywise().get<1>().rows() == A.rows()
+            && Aq.numden_entrywise().get<1>().cols() == A.cols());
+
+    tassert(Aq.numden_matwise().get<0>().rows() == A.rows()
+            && Aq.numden_matwise().get<0>().cols() == A.cols());
+
+    tassert(Aq.numden_rowwise().get<0>().rows() == A.rows()
+            && Aq.numden_rowwise().get<0>().cols() == A.cols()
+            && Aq.numden_rowwise().get<1>().size() == A.rows());
+
+    tassert(Aq.numden_colwise().get<0>().rows() == A.rows()
+            && Aq.numden_colwise().get<0>().cols() == A.cols()
+            && Aq.numden_colwise().get<1>().size() == A.cols());
+
+    fmpz_matxx den(A.rows(), A.cols());
+    for(slong i = 0;i < A.rows();++i)
+        for(slong j = 0;j < A.cols();++j)
+            den.at(i, j) = 1u;
+    den.at(0, 0) = 2u;
+
+    A.at(0, 0) = 1;
+    tassert(Aq.numden_entrywise() == ltupleref(A, den));
+    tassert(Aq.num_rowwise().at(0, 0) == 1);
+    //tassert(Aq.num_colwise().at(0, 0) == 1);
+    tassert(Aq.numden_matwise().get<1>() == 2);
+
+    fmpz_vecxx rowdens(A.rows());
+    rowdens[0] = 2;
+    for(slong i = 1;i < A.rows();++i)
+        rowdens[i] = 1;
+    for(slong i = 1;i < A.cols();++i)
+        A.at(0, i) *= 2;
+    tassert(Aq.numden_rowwise() == ltupleref(A, rowdens));
+    tassert(Aq.numden_colwise().get<1>()[0] == 2);
 }
 
 template<class Expr>

@@ -75,6 +75,17 @@ void test(const Vec& original, const char* str = "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
                     ((v + v) + (v + v)) + ((v + v) + (v + v))));
 }
 
+// b/c generic vector has no assignment implementation ...
+void
+test_fmpz_vecxx()
+{
+    fmpz_vecxx a(10), b(10);
+    a[0] = 1;
+    tassert(a != b);
+    a = b;
+    tassert(a == b);
+}
+
 int
 main()
 {
@@ -86,6 +97,7 @@ main()
     test(intvec(10));
     test(intvec10());
     test(fmpz_vecxx(10), "10  0 1 2 3 4 5 6 7 8 9");
+    test_fmpz_vecxx();
 
     std::cout << "PASS" << std::endl;
 

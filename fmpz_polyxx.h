@@ -474,6 +474,13 @@ struct fmpz_poly_data
     {
         fmpz_poly_init2(inner, alloc);
     }
+
+    fmpz_poly_data(const char* str)
+    {
+        fmpz_poly_init(inner);
+        execution_check(!fmpz_poly_set_str(inner, str),
+                "construct from string", "fmpz_polyxx");
+    }
 };
 } // detail
 

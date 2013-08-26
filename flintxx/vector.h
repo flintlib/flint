@@ -33,6 +33,7 @@
 
 #include "expression.h"
 #include "evaluation_tools.h"
+#include "ltuple.h"
 #include "mp.h"
 
 namespace flint {
@@ -126,6 +127,17 @@ struct outsize
     static unsigned get(const Expr& e)
     {
         return tools::find_subexpr_T<typename Expr::evaluated_t>(e)._data().size;
+    }
+};
+
+template<unsigned n>
+struct outsize<operations::ltuple_get_op<n> >
+{
+    template<class Expr>
+    static unsigned get(const Expr& e)
+    {
+        return outsize<typename Expr::data_t::head_t::operation_t>::get(
+                e._data().head);
     }
 };
 }
@@ -268,6 +280,20 @@ struct enable_vector_rules<
     : mp::true_ { };
 
 namespace rules {
+// temporary allocation inside ltuples
+template<class Operation, class Data, class U,
+    class Traits, class Op, class Da>
+struct instantiate_temporaries<ltuple_expression<U, Operation, Data>,
+    vector_expression<Traits, Op, Da> >
+{
+    typedef ltuple_expression<U, Operation, Data> Expr;
+    typedef vector_expression<Traits, Op, Da> T;
+    static T get(const Expr& e)
+    {
+        return T(vectors::outsize<Operation>::get(e));
+    }
+};
+
 template<class Traits, class Data, class T>
 struct binary_expression<vector_expression<Traits, operations::immediate, Data>,
     operations::vector_at_op, T>

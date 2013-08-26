@@ -41,7 +41,6 @@
 // TODO row reduction
 // TODO modular gaussian elimination
 // TODO echelon form
-// TODO randtest static versions
 // TODO nullspace member
 
 namespace flint {
@@ -112,6 +111,22 @@ public:
         fmpq_mat_get_fmpz_mat_mod_fmpz(res._mat(), mat.evaluate()._mat(),
                 mod.evaluate()._fmpz());
         return res;
+    }
+
+    template<class Fmpq_mat>
+    static fmpz_matxx_expression from_integral_fraction(const Fmpq_mat& mat,
+            typename mp::enable_if<traits::is_fmpq_matxx<Fmpq_mat> >::type* = 0)
+    {
+        fmpz_matxx_expression res(mat.rows(), mat.cols());
+        res.set_integral_fraction(mat);
+        return res;
+    }
+    template<class Fmpq_mat>
+    void set_integral_fraction(const Fmpq_mat& mat,
+            typename mp::enable_if<traits::is_fmpq_matxx<Fmpq_mat> >::type* = 0)
+    {
+        execution_check(fmpq_mat_get_fmpz_mat(_mat(), mat.evaluate()._mat()),
+                "set_integral_fraction", "fmpq_matxx");
     }
 
     static fmpz_matxx_expression randbits(slong rows, slong cols,

@@ -100,6 +100,9 @@ FLINT_DEFINE_BINARY_EXPR_COND2(plus, fmpz_vecxx,
         _fmpz_vec_add(to._data().array, e1._data().array, e2._data().array,
             e1.size()))
 
+FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_VECXX_COND_T, FMPZ_VECXX_COND_S,
+        _fmpz_vec_set(to._array(), from._array(), to.size()))
+
 // TODO more
 } // rules
 } // flint

@@ -37,7 +37,8 @@ using namespace flint;
 void
 test_init()
 {
-    fmpqxx a, b(fmpzxx(6), fmpzxx(10)), c((unsigned short)6, 10u);
+    fmpqxx a, b = fmpqxx::frac(6, fmpzxx(10)),
+           c = fmpqxx::frac((unsigned short)6, 10u);
 
     tassert(a.num() == 0 && a.den() == 1);
     tassert(b.num() == 3 && b.den() == 5);
@@ -48,13 +49,15 @@ test_init()
     tassert(!a.is_canonical());
     a.canonicalise();
     tassert(a.num() == -1 && a.den() == 2);
+
+    tassert(fmpqxx::frac("4", 2) == fmpqxx::integer(-fmpzxx(-2)));
 }
 
 void
 test_assignment()
 {
     fmpqxx a;
-    fmpqxx b(fmpzxx("100000000000000000000"), fmpzxx("100000000000000000001"));
+    fmpqxx b = fmpqxx::frac("100000000000000000000", "100000000000000000001");
     fmpqxx c(b);
     a = b;
     tassert(a == b && c == b);
@@ -72,7 +75,7 @@ test_assignment()
 void
 test_conversion()
 {
-    fmpqxx a(3, 5u);
+    fmpqxx a = fmpqxx::frac(3, 5);
     tassert(a.to_string() == "3/5");
     tassert(a.to_string(5) == "3/10");
 
@@ -101,16 +104,16 @@ test_arithmetic()
     fmpqxx a(3, 5u), b(2, 7u);
     fmpzxx c(2);
 
-    tassert(a + b == fmpqxx(3*7 + 2*5, 35u));
-    tassert(a * b == fmpqxx(6, 35u));
-    tassert(a - b == fmpqxx(3*7 - 5*2, 35u));
-    tassert(a / b == fmpqxx(3*7, 10u));
+    tassert(a + b == fmpqxx::frac(3*7 + 2*5, 35u));
+    tassert(a * b == fmpqxx::frac(6, 35u));
+    tassert(a - b == fmpqxx::frac(3*7 - 5*2, 35u));
+    tassert(a / b == fmpqxx::frac(3*7, 10u));
 
-    tassert((a+a) * (c+c) == fmpqxx(24, 5u));
-    tassert(c * a == fmpqxx(6, 5u));
-    tassert(a / c == fmpqxx(3, 10u));
+    tassert((a+a) * (c+c) == fmpqxx::frac(24, 5u));
+    tassert(c * a == fmpqxx::frac(6, 5u));
+    tassert(a / c == fmpqxx::frac(3, 10u));
 
-    tassert(-a == fmpqxx(-3, 5u));
+    tassert(-a == fmpqxx::frac(-3, 5u));
 
     tassert(((a << 5) >> 4) == fmpzxx(2)*a);
 }
@@ -129,8 +132,8 @@ test_extras()
     fmpqxx a(3, 5u), b(2, 7u), c(3, 1u);
     tassert(is_ternary((a+a) - b*c));
     tassert(is_ternary(b*c + (a+a)));
-    tassert((a+a) - b*c == fmpqxx(6*7 - 5*6, 5u*7u));
-    tassert(b*c + (a+a) == fmpqxx(6*7 + 5*6, 5u*7u));
+    tassert((a+a) - b*c == fmpqxx::frac(6*7 - 5*6, 5u*7u));
+    tassert(b*c + (a+a) == fmpqxx::frac(6*7 + 5*6, 5u*7u));
 
     fmpqxx_ref ar(a);
     fmpqxx_srcref asr(a);
@@ -138,7 +141,7 @@ test_extras()
     ar = 3;
     tassert(a == c && asr == c);
 
-    tassert((-a) + a == fmpqxx(0, 0u));
+    tassert((-a) + a == fmpqxx::frac(0, 0u));
 
     tassert(a.pow(3) == pow(a, 3));
     tassert(a.height() == height(a));
@@ -158,18 +161,18 @@ test_functions()
     // test immediate functions
     tassert(height_bits(a) == 3);
     tassert((inv(a)*a).is_one());
-    tassert(sgn(a) == -1 && sgn(-a) == 1 && sgn(fmpqxx(0, 0u)) == 0);
+    tassert(sgn(a) == -1 && sgn(-a) == 1 && sgn(fmpqxx::frac(0, 0u)) == 0);
 
     // test member functions
     const fmpqxx zero(0, 0u), one(1, 1u);
     tassert(zero.is_zero() && !zero.is_one());
     tassert(!one.is_zero() && one.is_one());
     tassert(pow(a, -3) == inv(a*a*a));
-    tassert(zero.next_minimal().next_minimal().next_minimal() == fmpqxx(2, 1u));
-    tassert(zero.next_signed_minimal().next_signed_minimal() == fmpqxx(-1, 1u));
-    tassert(zero.next_calkin_wilf().next_calkin_wilf() == fmpqxx(1, 2u));
+    tassert(zero.next_minimal().next_minimal().next_minimal() == fmpqxx::frac(2, 1u));
+    tassert(zero.next_signed_minimal().next_signed_minimal() == fmpqxx::frac(-1, 1u));
+    tassert(zero.next_calkin_wilf().next_calkin_wilf() == fmpqxx::frac(1, 2u));
     tassert(zero.next_signed_calkin_wilf().next_signed_calkin_wilf()
-            == fmpqxx(-1, 1u));
+            == fmpqxx::frac(-1, 1u));
 
     // test static member functions
     frandxx rand;
@@ -203,7 +206,7 @@ test_vector()
     fmpq_vecxx v1(10), v2(10), v3(1);
     tassert(v1 == v2);
     tassert(v1 != v3);
-    v1[0] = fmpqxx(1, 1u);
+    v1[0] = fmpqxx::frac(1, 1u);
     tassert(v1 != v2);
     v2[0] = v1[0];
     tassert(v1 == v2);

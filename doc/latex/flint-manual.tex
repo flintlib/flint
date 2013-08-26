@@ -1693,6 +1693,13 @@ ltupleref(_, R) = divrem(f, g); // (1)
 R = f % g;                      // (2)
 \end{lstlisting}
 
+Note finally that using \code{ltuple} intermediates often results in more copies
+than necessary. For example the expression
+\code{ltupleref(num, _) = divrem(a, b)} assigns the quotient to \code{num},
+creating just a temporary \code{fmpzxx} to hold the remainder. In contrast,
+\code{num = divrem(a, b).get<0>()} creates two temporary instances of
+\code{fmpzxx}.
+
 \paragraph{Reference types}
 
 One subtlety in wrapping a C library is that references do not work as easily as
