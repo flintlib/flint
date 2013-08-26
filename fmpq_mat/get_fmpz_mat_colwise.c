@@ -45,7 +45,8 @@ fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat)
         for (i = 1; i < mat->r; i++)
             fmpz_lcm(lcm, lcm, fmpq_mat_entry_den(mat, i, j));
 
-        fmpz_set(den + j, lcm);
+        if (den != NULL)
+            fmpz_set(den + j, lcm);
 
         /* Rescale numerators in column */
         if (fmpz_is_one(lcm))
