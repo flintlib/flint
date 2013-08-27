@@ -128,7 +128,7 @@ extern FLINT_TLS_PREFIX int _flint_primes_used;
 
 void n_compute_primes(ulong num_primes);
 
-void n_cleanup_primes();
+void n_cleanup_primes(void);
 
 const mp_limb_t * n_primes_arr_readonly(ulong n);
 const double * n_prime_inverses_arr_readonly(ulong n);
