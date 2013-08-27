@@ -149,6 +149,9 @@ public:
         return res;
     }
 
+    static nmod_matxx_expression zero(slong rows, slong cols, mp_limb_t n)
+        {return nmod_matxx_expression(rows, cols, n);}
+
     // these only make sense with targets
     void set_randtest(frandxx& state)
         {nmod_mat_randtest(_mat(), state._data());}
@@ -171,6 +174,7 @@ public:
         {nmod_mat_randops(_mat(), count, state._data());}
 
     slong set_rref() {return nmod_mat_rref(_mat());}
+    void set_zero() {nmod_mat_zero(_mat());}
 
     // these cause evaluation
     slong rank() const {return nmod_mat_rank(this->evaluate()._mat());}

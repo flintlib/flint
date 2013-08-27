@@ -100,15 +100,28 @@ public:
         return res;
     }
 
+    static nmod_poly_matxx_expression zero(slong rows, slong cols, mp_limb_t n)
+        {return nmod_poly_matxx_expression(rows, cols, n);}
+    static nmod_poly_matxx_expression one(slong rows, slong cols, mp_limb_t n)
+    {
+        nmod_poly_matxx_expression res(rows, cols, n);
+        res.set_one();
+        return res;
+    }
+
     // these only make sense with targets
     void set_randtest(frandxx& state, slong len)
         {nmod_poly_mat_randtest(_mat(), state._data(), len);}
     void set_randtest_sparse(frandxx& state, slong len, float density)
         {nmod_poly_mat_randtest_sparse(_mat(), state._data(), len, density);}
+    void set_zero() {nmod_poly_mat_zero(_mat());}
+    void set_one() {nmod_poly_mat_one(_mat());}
 
     // these cause evaluation
     bool is_zero() const
         {return nmod_poly_mat_is_zero(this->evaluate()._mat());}
+    bool is_one() const
+        {return nmod_poly_mat_is_one(this->evaluate()._mat());}
     bool is_square() const
         {return nmod_poly_mat_is_square(this->evaluate()._mat());}
     bool is_empty() const

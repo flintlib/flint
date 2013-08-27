@@ -39,6 +39,9 @@ test_init()
 {
     fmpz_polyxx p(10);
     tassert(p.length() == 0);
+
+    tassert(fmpz_polyxx::zero().is_zero());
+    tassert(fmpz_polyxx::one().is_one());
 }
 
 void

@@ -635,7 +635,7 @@ void Fmpz_mat_target::apply_randops(frandxx& state, slong count)
     See \code{fmpz_mat_randops}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Modular reduction reconstruction
+    Modular reduction and reconstruction
 
     To reduce a single matrix modulo a word-sized modulus, see
     \code{nmod_matxx::reduce}.
@@ -704,6 +704,11 @@ fmpz_polyxx::fmpz_polyxx(slong alloc)
 fmpz_polyxx::fmpz_polyxx(const char* str)
 
     See \code{fmpz_poly_set_str}.
+
+void Fmpz_poly_target::set_zero()
+void Fmpz_poly_target::set_one()
+static fmpz_polyxx fmpz_polyxx::zero()
+static fmpz_polyxx fmpz_polyxx::one()
 
 static fmpz_polyxx fmpz_polyxx::randtest(
         frandxx& state, slong len, mp_bitcnt_t bits)
@@ -2117,6 +2122,9 @@ nmod_polyxx::nmod_polyxx(const char* str)
     with this modulus, then \code{nmod_poly_set_str} is called. Raises
     \code{flint_exception} if the string is malformed.
 
+static nmod_polyxx nmod_polyxx::zero(mp_limb_t n)
+static nmod_polyxx nmod_polyxx::one(mp_limb_t n)
+
 void Nmod_poly_target realloc(slong alloc)
 void Nmod_poly_target::fit_length(slong len)
 void Nmod_poly_target::_normalise()
@@ -2135,6 +2143,8 @@ mp_limb_t Nmod_poly_expr::modulus() const
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void Nmod_poly_target::truncate(slong)
+void Nmod_poly_target::set_zero()
+void Nmod_poly_target::set_one()
 
 Nmod_poly_expr reverse(Nmod_poly_expr, T:fits_into_slong)
 
@@ -2144,6 +2154,10 @@ Nmod_poly_expr reverse(Nmod_poly_expr, T:fits_into_slong)
 
 void Nmod_target::set_randtest(frandxx& state, slong len)
 void Nmod_target::set_randtest_irreducible(frandxx& state, slong len)
+static nmod_polyxx nmod_polyxx::randtest(mp_limb_t n,
+    frandxx& state, slong len)
+static nmod_polyxx nmod_polyxx::randtest_irreducible(mp_limb_t n,
+    frandxx& state, slong len)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Getting and setting coefficients
@@ -2554,6 +2568,11 @@ bool Nmod_mat_expr::is_empty() const
 bool Nmod_mat_expr::is_square() const
 mp_limb_t Nmod_mat_expr::modulus() const
 
+void Nmod_mat_target::set_zero()
+static nmod_matxx nmod_matxx::zero(slong rows, slong cols, mp_limb_t modulus)
+
+    See \code{nmod_mat_zero}.
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Random matrix generation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2734,6 +2753,17 @@ nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
     Unified coefficient access to the matrix entries.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Standard matrices
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static nmod_poly_matxx nmod_poly_matxx::zero(slong rows, slong cols,
+    mp_limb_t n)
+static nmod_poly_matxx nmod_poly_matxx::one(slong rows, slong cols,
+    mp_limb_t n)
+void Nmod_poly_mat_target::set_zero()
+void Nmod_poly_mat_target::set_one()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Random matrix generation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2758,6 +2788,7 @@ slong Nmod_poly_mat_expr::cols() const
     expression template and the size of the input matrices).
 
 bool Nmod_poly_mat_expr::is_zero() const
+bool Nmod_poly_mat_expr::is_one() const
 bool Nmod_poly_mat_expr::is_empty() const
 bool Nmod_poly_mat_expr::is_square() const
 mp_limb_t Nmod_poly_mat_expr::modulus() const
@@ -3202,6 +3233,13 @@ padicxx::padicxx(const padicxx_ctx&)
 padicxx::padicxx(const padicxx_ctx& c, long N)
 
     Initialize padic number to precision $N$. See \code{padic_init2}.
+
+void Padic_target::set_zero()
+void Padic_target::set_one()
+static padicxx padicxx::zero(const padicxx_ctx& c)
+static padicxx padicxx::zero(const padicxx_ctx& c, long N)
+static padicxx padicxx::one(const padicxx_ctx& c)
+static padicxx padicxx::one(const padicxx_ctx& c, long N)
 
 static padicxx padicxx::randtest(frandxx& state, const padicxx_ctx& ctx,
         slong prec = PADIC_DEFAULT_PREC)

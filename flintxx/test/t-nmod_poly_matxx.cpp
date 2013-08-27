@@ -61,6 +61,9 @@ test_init()
     for(slong i = 0;i < A.rows();++i)
         for(slong j = 0;j < A.cols();++j)
             tassert(A.at(i, j) == nmod_polyxx::from_ground(C.at(i, j)));
+
+    tassert(nmod_poly_matxx::zero(2, 2, M).is_zero()
+            && nmod_poly_matxx::one(2, 2, M).is_one());
 }
 
 template<class Expr>
@@ -138,9 +141,11 @@ test_functions()
     nmod_poly_matxx A(2, 3, M), B(2, 2, M), empty(0, 15, M);
     nmodxx_ctx_srcref ctx = A.estimate_ctx();
     B.at(0, 0) = nmod_polyxx::from_ground(1, ctx);
-    tassert(A.is_zero() && !A.is_empty() && !A.is_square());
+    tassert(A.is_zero() && !A.is_empty() && !A.is_square() && !A.is_one());
     tassert(!B.is_zero() == B.is_square());
     tassert(empty.is_zero() && empty.is_empty());
+    B.at(1, 1) = B.at(0, 0);
+    tassert(B.is_one());
 
     // transpose tested in arithmetic
     // mul tested in arithmetic
@@ -204,6 +209,8 @@ test_functions()
     tassert(nullity == 2 - rank(B));
     tassert(C.rank() == nullity);
     tassert((B*C).is_zero());
+
+    B.set_zero();tassert(B.is_zero());
 }
 
 void

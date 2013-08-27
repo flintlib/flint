@@ -217,12 +217,22 @@ public:
         return _lift_unsigned(poly.evaluate());
     }
 
+    static fmpz_polyxx_expression zero() {return fmpz_polyxx_expression();}
+    static fmpz_polyxx_expression one()
+    {
+        fmpz_polyxx_expression res;
+        res.set_one();
+        return res;
+    }
+
     // These only make sense with immediates
     void realloc(slong alloc) {fmpz_poly_realloc(_poly(), alloc);}
     void fit_length(slong len) {fmpz_poly_fit_length(_poly(), len);}
     void _normalise() {_fmpz_poly_normalise(_poly());}
     void _set_length(slong len) {_fmpz_poly_set_length(_poly(), len);}
     void zero_coeffs(slong i, slong j) {fmpz_poly_zero_coeffs(_poly(), i, j);}
+    void set_zero() {fmpz_poly_zero(_poly());}
+    void set_one() {fmpz_poly_one(_poly());}
 
     // The result of these are undefined if n is >= length
     // You also may have to call _normalise().

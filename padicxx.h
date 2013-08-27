@@ -108,7 +108,25 @@ public:
     // TODO should these return copies on non-immediate expressions?
     fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
     fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
-    // TODO canonicalise? set_zero? set_one?
+    void set_zero() {padic_zero(_padic());}
+    void set_one() {padic_one(_padic());}
+
+    static padicxx_expression zero(const padicxx_ctx& ctx)
+        {return padicxx_expression(ctx);}
+    static padicxx_expression zero(const padicxx_ctx& ctx, long N)
+        {return padicxx_expression(ctx, N);}
+    static padicxx_expression one(const padicxx_ctx& ctx)
+    {
+        padicxx_expression res(ctx);
+        res.set_one();
+        return res;
+    }
+    static padicxx_expression one(const padicxx_ctx& ctx, long N)
+    {
+        padicxx_expression res(ctx, N);
+        res.set_one();
+        return res;
+    }
 
     // Compute the maximal precision of all subexpressions
     slong prec() const

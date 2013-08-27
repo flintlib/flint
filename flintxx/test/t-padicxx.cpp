@@ -56,6 +56,9 @@ test_init()
 
     padicxx e(a + b);
     tassert(e.prec() == 30);
+
+    tassert(padicxx::zero(ctx).is_zero() && padicxx::zero(ctx, 25).is_zero());
+    tassert(padicxx::one(ctx).is_one() && padicxx::one(ctx, 25).is_one());
 }
 
 void

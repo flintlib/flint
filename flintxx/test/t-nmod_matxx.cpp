@@ -53,6 +53,9 @@ test_init()
 
     B = A;
     tassert(A == B);
+
+    A.set_zero();
+    tassert(A.is_zero() && A == nmod_matxx::zero(A.rows(), A.cols(), A.modulus()));
 }
 
 template<class Expr>

@@ -150,12 +150,39 @@ public:
     FLINTXX_DEFINE_FORWARD_STATIC(from_ground)
     FLINTXX_DEFINE_FORWARD_STATIC(reduce)
 
+    static nmod_polyxx_expression zero(mp_limb_t n)
+        {return nmod_polyxx_expression(n);}
+    static nmod_polyxx_expression one(mp_limb_t n)
+    {
+        nmod_polyxx_expression res(n);
+        res.set_one();
+        return res;
+    }
+
+    static nmod_polyxx_expression randtest(mp_limb_t n,
+            frandxx& state, slong len)
+    {
+        nmod_polyxx_expression res(n);
+        res.set_randtest(state, len);
+        return res;
+    }
+
+    static nmod_polyxx_expression randtest_irreducible(mp_limb_t n,
+            frandxx& state, slong len)
+    {
+        nmod_polyxx_expression res(n);
+        res.set_randtest_irreducible(state, len);
+        return res;
+    }
+
     // these only make sense with immediates
     void realloc(slong alloc) {nmod_poly_realloc(_poly(), alloc);}
     void fit_length(slong len) {nmod_poly_fit_length(_poly(), len);}
     void _normalise() {_nmod_poly_normalise(_poly());}
     nmodxx_ctx_srcref _ctx() const
         {return nmodxx_ctx_srcref::make(_poly()->mod);}
+    void set_zero() {nmod_poly_zero(_poly());}
+    void set_one() {nmod_poly_one(_poly());}
 
     // These only make sense with target immediates
     void set_coeff(slong n, ulong c) {nmod_poly_set_coeff_ui(_poly(), n, c);}

@@ -47,6 +47,8 @@ test_init()
     p.set_coeff(0, 1);
     tassert(p == nmod_polyxx::from_ground(
                 (nmodxx::red(1, ctx)) + (nmodxx::red(0, ctx))));
+
+    tassert(nmod_polyxx::zero(13).is_zero() && nmod_polyxx::one(13).is_one());
 }
 
 void
@@ -471,6 +473,18 @@ test_reduction_reconstruction()
     tassert(res == A);
 }
 
+void
+test_randomisation()
+{
+    frandxx state1, state2;
+    mp_limb_t N = 1031;
+    nmod_polyxx p(N);
+    p.set_randtest(state1, 7);
+    tassert(p == nmod_polyxx::randtest(N, state2, 7));
+    p.set_randtest_irreducible(state1, 7);
+    tassert(p == nmod_polyxx::randtest_irreducible(N, state2, 7));
+}
+
 int
 main()
 {
@@ -486,6 +500,7 @@ main()
     test_extras();
     test_factoring();
     test_reduction_reconstruction();
+    test_randomisation();
 
     std::cout << "PASS" << std::endl;
     return 0;
