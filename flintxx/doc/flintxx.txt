@@ -87,6 +87,54 @@ Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
     On ltuple immediates, reference versions are also available, which can
     be used to manipulate the entries.
 
+*******************************************************************************
+
+    permxx
+
+    Permutations are mostly used by row reduction algorithms. Even though we
+    support limited arithmetic on them (e.g. composition), permutations are not
+    implemented as expression templates.
+
+    \code{permxx} wraps the C interface \code{perm} operating on \code{slong*}.
+
+*******************************************************************************
+
+permxx::permxx(slong n)
+static permxx permxx::one(slong n)
+
+    Initialize an identity permutation on the set $[n] = \{0, 1, \dots, n-1\}$.
+
+static permxx permxx::randtest(slong n)
+
+    Generate a random permutation on $[n]$. See \code{_perm_randtest}.
+
+bool permxx::operator==(const permxx&)
+bool permxx::operator!=(const permxx&)
+
+slong permxx::size() const
+
+    Return the size of the set being permuted ($n$ in the constructors).
+
+slong& operator[](slong i)
+slong operator[](slong i) const
+
+    Return the image of $i$ under the permutation.
+
+permxx permxx::operator*(const permxx&)
+permxx compose(const permxx& p1, const permxx& p2)
+
+    Compute the composition of two permutations. See \code{_perm_compose}.
+
+void permxx::set_inv(const permxx& o)
+
+    Set self to the inverse permutation of \code{o}.
+
+permxx permxx::inv() const
+permxx inv(const permxx&)
+
+    Return the inverse permutation.
+
+
 
 *******************************************************************************
 
@@ -683,6 +731,35 @@ nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m,
 
     Convenience functions combining the allocation of memory and modular
     reduction.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Row reduction
+
+    Beware that compared to the C interface, the flintxx row reduction
+    interface changes some argument orders. This is to facilitate default
+    arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong find_pivot_any(Fmpz_mat_expr, slong, slong, slong)
+
+    See \code{fmpz_mat_find_pivot_any}.
+
+Ltuple<slong, fmpz_matxx, fmpzxx>_expr fflu(Fmpz_mat_expr A, permxx* perm = 0,
+    bool rankcheck = false)
+
+    See \code{fmpz_mat_fflu}.
+
+Ltuple<slong, fmpz_matxx, fmpzxx>_expr rref(Fmpz_mat_expr A)
+
+    See \code{fmpz_mat_rref}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular gaussian elimination
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_mat_target::set_rref_mod(Fmpz_expr n, permxx* perm = 0)
+
+    See \code{fmpz_mat_rref_mod}.
 
 
 *******************************************************************************
@@ -1432,6 +1509,19 @@ Fmpq_mat_expr inv(Fmpq_mat_expr A)
     Compute the inverse of the square matrix $A$. Raises \code{flint_exception}
     if $A$ is singular. The modulus is required to be prime.
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Echelon form
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_mat_target::pivot(slong r, slong c, permxx* perm = 0)
+
+    See \code{fmpq_mat_pivot}.
+
+Ltuple<slong, fmpq_matxx>_expr rref(Fmpq_mat_expr)
+Ltuple<slong, fmpq_matxx>_expr rref_classical(Fmpq_mat_expr)
+Ltuple<slong, fmpq_matxx>_expr rref_fraction_free(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_rref} etc.
 
 
 
@@ -1841,6 +1931,31 @@ Fmpz_poly_mat_expr sqrlow(Fmpz_poly_mat_expr, T:fits_into_slong n)
 Fmpz_poly_mat_expr pow(Fmpz_poly_mat_expr, T:is_unsigned_integer)
 Fmpz_poly_mat_expr pow_trunc(Fmpz_poly_mat_expr, T:is_unsigned_integer,
         T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Row reduction
+
+    Beware that compared to the C interface, the flintxx row reduction
+    interface changes some argument orders. This is to facilitate default
+    arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong find_pivot_any(Fmpz_poly_mat_expr, slong, slong, slong)
+
+    See \code{fmpz_poly_mat_find_pivot_any}.
+
+slong find_pivot_partial(Fmpz_poly_mat_expr, slong, slong, slong)
+
+    See \code{fmpz_poly_mat_find_pivot_partial}.
+
+Ltuple<slong, fmpz_poly_matxx, fmpzxx>_expr fflu(Fmpz_poly_mat_expr A,
+    permxx* perm = 0, bool rankcheck = false)
+
+    See \code{fmpz_poly_mat_fflu}.
+
+Ltuple<slong, fmpz_poly_matxx, fmpzxx>_expr rref(Fmpz_poly_mat_expr A)
+
+    See \code{fmpz_poly_mat_rref}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Trace
@@ -2672,6 +2787,16 @@ Nmod_vec_expr solve(Nmod_mat_expr B, Nmod_vec_expr X)
     Raises \code{flint_exception} if $B$ is singular.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    LU decomposition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Tuple<slong, permxx> Nmod_mat_target::set_lu(bool rank_check = false)
+Tuple<slong, permxx> Nmod_mat_target::set_lu_classical(bool rank_check = false)
+Tuple<slong, permxx> Nmod_mat_target::set_lu_recursive(bool rank_check = false)
+
+    See \code{nmod_mat_lu} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Reduced row echelon form
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2811,6 +2936,31 @@ slong Nmod_poly_mat_expr::max_length() const
 
 Nmod_poly_mat_expr mul_classical(Nmod_poly_mat_expr, Nmod_poly_mat_expr)
 Nmod_poly_mat_expr mul_interpolate(Nmod_poly_mat_expr, Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Row reduction
+
+    Beware that compared to the C interface, the flintxx row reduction
+    interface changes some argument orders. This is to facilitate default
+    arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong find_pivot_any(Nmod_poly_mat_expr, slong, slong, slong)
+
+    See \code{nmod_poly_mat_find_pivot_any}.
+
+slong find_pivot_partial(Nmod_poly_mat_expr, slong, slong, slong)
+
+    See \code{nmod_poly_mat_find_pivot_partial}.
+
+Ltuple<slong, nmod_poly_matxx, fmpzxx>_expr fflu(Nmod_poly_mat_expr A,
+    permxx* perm = 0, bool rankcheck = false)
+
+    See \code{nmod_poly_mat_fflu}.
+
+Ltuple<slong, nmod_poly_matxx, fmpzxx>_expr rref(Nmod_poly_mat_expr A)
+
+    See \code{nmod_poly_mat_rref}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Transpose

@@ -37,8 +37,8 @@
 
 // TODO wrap entry_num, entry_den?
 // TODO input and output
-// TODO pivoting and row reduction
 // TODO numden_rowwise_2
+// TODO rref members
 
 namespace flint {
 FLINT_DEFINE_BINOP(hilbert_matrix)
@@ -52,6 +52,9 @@ FLINT_DEFINE_UNOP(numden_matwise)
 FLINT_DEFINE_UNOP(numden_rowwise)
 FLINT_DEFINE_UNOP(num_rowwise)
 FLINT_DEFINE_UNOP(num_colwise)
+
+FLINT_DEFINE_UNOP(rref_classical)
+FLINT_DEFINE_UNOP(rref_fraction_free)
 
 namespace detail {
 template<class Mat>
@@ -167,6 +170,9 @@ public:
                     _mat(), mat.evaluate()._mat(), mod.evaluate()._fmpz()),
                 "reconstruct", "fmpq_matxx");
     }
+
+    bool pivot(slong r, slong c, permxx* perm = 0)
+        {return fmpq_mat_pivot(maybe_perm_data(perm), _mat(), r, c);}
 
     // these cause evaluation
     slong rank() const {return fmpq_mat_rank(this->evaluate()._mat());}
@@ -447,6 +453,24 @@ FLINT_DEFINE_UNARY_EXPR_COND(numden_colwise_op,
         detail::fmpq_matxx_numden_colwise_rt, FMPQ_MATXX_COND_S,
         fmpq_mat_get_fmpz_mat_colwise(to.template get<0>()._mat(),
             to.template get<1>()._array(), from._mat()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<slong, fmpq_matxx>::type>::type
+    fmpq_matxx_rref_rt;
+}
+
+FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::fmpq_matxx_rref_rt,
+        FMPQ_MATXX_COND_S,
+        to.template get<0>() =
+             fmpq_mat_rref(to.template get<1>()._mat(), from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(rref_classical_op, rdetail::fmpq_matxx_rref_rt,
+        FMPQ_MATXX_COND_S,
+        to.template get<0>() =
+             fmpq_mat_rref_classical(to.template get<1>()._mat(), from._mat()))
+FLINT_DEFINE_UNARY_EXPR_COND(rref_fraction_free_op, rdetail::fmpq_matxx_rref_rt,
+        FMPQ_MATXX_COND_S,
+        to.template get<0>() =
+             fmpq_mat_rref_fraction_free(to.template get<1>()._mat(), from._mat()))
 } // rules
 } // flint
 

@@ -287,6 +287,26 @@ test_reduction_reconstruction()
     // TODO test exception
 }
 
+void
+test_row_reduction()
+{
+    frandxx state;
+    fmpq_matxx A = fmpq_matxx::randtest(5, 5, state, 15);
+    slong rank1, rank2;
+    permxx p1(5), p2(5);
+    fmpq_matxx res1(A.rows(), A.cols()), res2(A.rows(), A.cols());
+
+    fmpq_matxx B(A);
+    tassert(B.pivot(1, 1, &p1) == fmpq_mat_pivot(p1._data(), A._mat(), 1, 1));
+    tassert(A == B);
+
+    ltupleref(rank1, res1) = rref(A);
+    rank2 = fmpq_mat_rref(res2._mat(), A._mat());
+    tassert(rank1 == rank2 && res1 == res2);
+
+    tassert(rref_classical(A) == rref(A) && rref_fraction_free(A) == rref(A));
+}
+
 int
 main()
 {
@@ -300,6 +320,7 @@ main()
     test_extras();
     test_randomisation();
     test_reduction_reconstruction();
+    test_row_reduction();
 
     std::cout << "PASS" << std::endl;
     return 0;

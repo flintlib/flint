@@ -33,6 +33,7 @@
 
 #include "nmod_vecxx.h"
 #include "fmpz_matxx.h" // for modular reduction
+#include "permxx.h"
 
 #include "flintxx/flint_exception.h"
 #include "flintxx/ltuple.h"
@@ -41,8 +42,8 @@
 // TODO printing
 // TODO addmul
 // TODO default argument for mat_solve_triu etc?
-// TODO LU decomposition
 // TODO nullspace member
+// TODO unnecessary perm copies in set_lu*
 
 namespace flint {
 FLINT_DEFINE_BINOP(solve_vec)
@@ -175,6 +176,29 @@ public:
 
     slong set_rref() {return nmod_mat_rref(_mat());}
     void set_zero() {nmod_mat_zero(_mat());}
+
+    typedef mp::make_tuple<slong, permxx>::type lu_rt;
+    lu_rt set_lu(bool rank_check = false)
+    {
+        lu_rt res = mp::make_tuple<slong, permxx>::make(0, permxx(rows()));
+        res.first() = nmod_mat_lu(res.second()._data(), _mat(), rank_check);
+        return res;
+    }
+    lu_rt set_lu_classical(bool rank_check = false)
+    {
+        lu_rt res = mp::make_tuple<slong, permxx>::make(0, permxx(rows()));
+        res.first() = nmod_mat_lu_classical(
+                res.second()._data(), _mat(), rank_check);
+        return res;
+    }
+    lu_rt set_lu_recursive(bool rank_check = false)
+    {
+        lu_rt res = mp::make_tuple<slong, permxx>::make(0, permxx(rows()));
+        res.first() = nmod_mat_lu_recursive(
+                res.second()._data(), _mat(), rank_check);
+        return res;
+    }
+
 
     // these cause evaluation
     slong rank() const {return nmod_mat_rank(this->evaluate()._mat());}

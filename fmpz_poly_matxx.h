@@ -35,7 +35,6 @@
 
 // TODO printing
 // TODO prod
-// TODO row reduction
 // TODO solve_fflu_precomp
 
 namespace flint {
@@ -140,6 +139,16 @@ public:
         {return fmpz_poly_mat_max_length(this->evaluate()._mat());}
     slong max_bits() const
         {return fmpz_poly_mat_max_bits(this->evaluate()._mat());}
+    slong find_pivot_any(slong start, slong end, slong c) const
+    {
+        return fmpz_poly_mat_find_pivot_any(
+                this->evaluate()._mat(), start, end, c);
+    }
+    slong find_pivot_partial(slong start, slong end, slong c) const
+    {
+        return fmpz_poly_mat_find_pivot_partial(
+                this->evaluate()._mat(), start, end, c);
+    }
 
     // forwarded lazy ops
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
@@ -165,6 +174,9 @@ public:
 
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nullspace) // TODO
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, inv) // TODO
+    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, rref) // TODO
+
+    FLINTXX_DEFINE_MEMBER_FFLU
 };
 
 namespace detail {
@@ -360,6 +372,21 @@ FLINT_DEFINE_BINARY_EXPR_COND2(solve_fflu_op, rdetail::fmpz_poly_mat_inv_rt,
         to.template get<0>() = fmpz_poly_mat_solve_fflu(
             to.template get<1>()._mat(),
             to.template get<2>()._poly(), e1._mat(), e2._mat()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<slong, fmpz_poly_matxx, fmpz_polyxx>::type>::type
+    fmpz_poly_matxx_fflu_rt;
+} // rdetail
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(fflu_op, rdetail::fmpz_poly_matxx_fflu_rt,
+        FMPZ_POLY_MATXX_COND_S, traits::is_maybe_perm, tools::is_bool,
+        to.template get<0>() = fmpz_poly_mat_fflu(to.template get<1>()._mat(),
+            to.template get<2>()._poly(), maybe_perm_data(e2), e1._mat(), e3))
+
+FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::fmpz_poly_matxx_fflu_rt,
+        FMPZ_POLY_MATXX_COND_S,
+        to.template get<0>() = fmpz_poly_mat_rref(to.template get<1>()._mat(),
+            to.template get<2>()._poly(), from._mat()))
 } // rules
 } // flint
 

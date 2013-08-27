@@ -35,7 +35,6 @@
 #include "flintxx/stdmath.h"
 
 // NOTE: it is *not* valid to use empty nmod_poly_matxx matrices!
-// TODO row reduction
 // TODO nullspace member
 // TODO printing
 // TODO solve_fflu_precomp
@@ -129,6 +128,16 @@ public:
     slong max_length() const
         {return nmod_poly_mat_max_length(this->evaluate()._mat());}
     slong rank() const {return nmod_poly_mat_rank(this->evaluate()._mat());}
+    slong find_pivot_any(slong start, slong end, slong c) const
+    {
+        return nmod_poly_mat_find_pivot_any(
+                this->evaluate()._mat(), start, end, c);
+    }
+    slong find_pivot_partial(slong start, slong end, slong c) const
+    {
+        return nmod_poly_mat_find_pivot_partial(
+                this->evaluate()._mat(), start, end, c);
+    }
 
     // lazy members
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nmod_polyxx, det)
@@ -148,6 +157,10 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(mul_interpolate)
     FLINTXX_DEFINE_MEMBER_BINOP(mul_KS)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
+
+    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, rref) // TODO
+
+    FLINTXX_DEFINE_MEMBER_FFLU
 };
 
 namespace detail {
@@ -374,6 +387,21 @@ FLINT_DEFINE_BINARY_EXPR_COND2(solve_fflu_op, rdetail::nmod_poly_mat_inv_rt,
         to.template get<0>() = nmod_poly_mat_solve_fflu(
             to.template get<1>()._mat(),
             to.template get<2>()._poly(), e1._mat(), e2._mat()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<slong, nmod_poly_matxx, nmod_polyxx>::type>::type
+    nmod_poly_matxx_fflu_rt;
+} // rdetail
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(fflu_op, rdetail::nmod_poly_matxx_fflu_rt,
+        NMOD_POLY_MATXX_COND_S, traits::is_maybe_perm, tools::is_bool,
+        to.template get<0>() = nmod_poly_mat_fflu(to.template get<1>()._mat(),
+            to.template get<2>()._poly(), maybe_perm_data(e2), e1._mat(), e3))
+
+FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::nmod_poly_matxx_fflu_rt,
+        NMOD_POLY_MATXX_COND_S,
+        to.template get<0>() = nmod_poly_mat_rref(to.template get<1>()._mat(),
+            to.template get<2>()._poly(), from._mat()))
 } // rules
 } // flint
 

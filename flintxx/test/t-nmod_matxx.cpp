@@ -295,6 +295,24 @@ test_reduction_reconstruction()
     tassert(res == multi_CRT_precomp(v1, comb, true));
 }
 
+void
+test_lu()
+{
+    frandxx rand;
+    nmod_matxx A = nmod_matxx::randtest(5, 5, 1031, rand);
+    nmod_matxx B1(A), B2(A);
+    nmod_matxx::lu_rt res = B1.set_lu();
+    permxx perm(5);
+    slong rank = nmod_mat_lu(perm._data(), B2._mat(), false);
+    tassert(B1 == B2 && rank == res.first() && perm == res.second());
+
+    B1 = A; B2 = A;
+    tassert(B1.set_lu_classical() == B2.set_lu() && B1 == B2);
+
+    B1 = A; B2 = A;
+    tassert(B1.set_lu_recursive() == B2.set_lu() && B1 == B2);
+}
+
 int
 main()
 {
@@ -306,6 +324,7 @@ main()
     test_extras();
     test_randomisation();
     test_reduction_reconstruction();
+    test_lu();
 
     std::cout << "PASS" << std::endl;
     return 0;

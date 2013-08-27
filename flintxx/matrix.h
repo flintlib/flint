@@ -38,13 +38,17 @@ namespace flint {
 FLINT_DEFINE_BINOP(solve)
 FLINT_DEFINE_BINOP(solve_fflu)
 FLINT_DEFINE_THREEARY(mat_at)
-FLINT_DEFINE_UNOP(transpose)
-FLINT_DEFINE_UNOP(trace)
+FLINT_DEFINE_UNOP(charpoly)
 FLINT_DEFINE_UNOP(det)
 FLINT_DEFINE_UNOP(det_fflu)
 FLINT_DEFINE_UNOP(det_interpolate)
-FLINT_DEFINE_UNOP(charpoly)
 FLINT_DEFINE_UNOP(nullspace)
+FLINT_DEFINE_UNOP(rref)
+FLINT_DEFINE_UNOP(trace)
+FLINT_DEFINE_UNOP(transpose)
+
+FLINT_DEFINE_THREEARY(fflu)
+FLINT_DEFINE_THREEARY_HERE_2DEFAULT(fflu, permxx*, 0, bool, false)
 
 template<class T> struct matrix_traits : rules::UNIMPLEMENTED { };
 // override this for the non-reference type of your choice
@@ -308,6 +312,20 @@ rank(const Mat& m)
 {
     return m.rank();
 }
+
+template<class Mat>
+inline typename mp::enable_if<traits::is_mat<Mat>, slong>::type
+find_pivot_any(const Mat& m, slong start, slong end, slong c)
+{
+    return m.find_pivot_any(start, end, c);
+}
+
+template<class Mat>
+inline typename mp::enable_if<traits::is_mat<Mat>, slong>::type
+find_pivot_partial(const Mat& m, slong start, slong end, slong c)
+{
+    return m.find_pivot_partial(start, end, c);
+}
 } // flint
 
 // Define rows(), cols(), create_temporary() and at() methods.
@@ -362,5 +380,13 @@ struct instantiate_temporaries<Expr, Matrix, \
     } \
 }; \
 } /* rules */
+
+#define FLINTXX_DEFINE_MEMBER_FFLU \
+template<class T> typename detail::nary_op_helper2<operations::fflu_op, \
+    typename base_t::derived_t, permxx*, T>::enable::type \
+fflu(permxx* p, const T& t) const \
+{ \
+    return flint::fflu(*this, p, t); \
+}
 
 #endif

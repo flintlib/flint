@@ -234,6 +234,33 @@ test_randomisation()
     tassert(A == nmod_poly_matxx::randtest_sparse(2, 2, M, rand2, 17, 0.5));
 }
 
+void
+test_row_reduction()
+{
+    frandxx state;
+    nmod_poly_matxx A = nmod_poly_matxx::randtest(5, 5, 1031, state, 7);
+    slong rank1, rank2;
+    nmod_polyxx den1(A.modulus()), den2(A.modulus());
+    nmod_poly_matxx res1(A.rows(), A.cols(), A.modulus());
+    nmod_poly_matxx res2(res1);
+
+    tassert(find_pivot_any(A, 2, 4, 1)
+            == nmod_poly_mat_find_pivot_any(A._mat(), 2, 4, 1));
+    tassert(find_pivot_partial(A, 2, 4, 1)
+            == nmod_poly_mat_find_pivot_partial(A._mat(), 2, 4, 1));
+    tassert(A.fflu(0, false).get<1>().rows() == A.rows());
+    permxx p1(5), p2(5);
+    ltupleref(rank1, res1, den1) = fflu(A, &p1);
+    rank2 = nmod_poly_mat_fflu(res2._mat(), den2._poly(), p2._data(),
+            A._mat(), false);
+    tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
+    tassert(rank1 == A.fflu(0, false).get<0>());
+
+    ltupleref(rank1, res1, den1) = rref(A);
+    rank2 = nmod_poly_mat_rref(res2._mat(), den2._poly(), A._mat());
+    tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
+}
+
 int
 main()
 {
@@ -244,6 +271,7 @@ main()
     test_functions();
     test_extras();
     test_randomisation();
+    test_row_reduction();
 
     std::cout << "PASS" << std::endl;
     return 0;

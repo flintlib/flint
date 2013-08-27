@@ -258,6 +258,36 @@ test_randomisation()
     tassert(fmpz_matxx::randdet(5, 5, rand, fmpzxx(123)).det() == 123);
 }
 
+void
+test_row_reduction()
+{
+    frandxx state;
+    fmpz_matxx A = fmpz_matxx::randtest(5, 5, state, 15);
+    slong rank1, rank2;
+    fmpzxx den1, den2;
+    fmpz_matxx res1(A.rows(), A.cols()), res2(A.rows(), A.cols());
+
+    tassert(find_pivot_any(A, 2, 4, 1)
+            == fmpz_mat_find_pivot_any(A._mat(), 2, 4, 1));
+    tassert(A.fflu(0, false).get<1>().rows() == A.rows());
+    permxx p1(5), p2(5);
+    ltupleref(rank1, res1, den1) = fflu(A, &p1);
+    rank2 = fmpz_mat_fflu(res2._mat(), den2._fmpz(), p2._data(),
+            A._mat(), false);
+    tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
+    tassert(rank1 == A.fflu(0, false).get<0>());
+
+    ltupleref(rank1, res1, den1) = rref(A);
+    rank2 = fmpz_mat_rref(res2._mat(), den2._fmpz(), A._mat());
+    tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
+
+    fmpz_matxx B(A);
+    fmpzxx n(1031);
+    A.set_rref_mod(n, &p1);
+    fmpz_mat_rref_mod(p2._data(), B._mat(), n._fmpz());
+    tassert(A == B && p1 == p2);
+}
+
 int
 main()
 {
@@ -270,6 +300,7 @@ main()
     test_functions();
     test_extras();
     test_randomisation();
+    test_row_reduction();
 
     std::cout << "PASS" << std::endl;
     return 0;

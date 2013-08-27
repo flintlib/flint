@@ -103,6 +103,8 @@ struct forwarding<T, typename mp::enable_if<is_integer<T> >::type>
 {
     typedef T type;
 };
+template<class T> struct forwarding<T*> {typedef T* type;};
+template<> struct forwarding<bool> {typedef bool type;};
 
 // Compute a type appropriate for referencing. Usually T&.
 template<class T> struct reference {typedef T& type;};

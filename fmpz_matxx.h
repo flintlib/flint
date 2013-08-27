@@ -31,6 +31,7 @@
 
 #include "fmpzxx.h"
 #include "fmpz_polyxx.h"
+#include "permxx.h"
 
 #include "flintxx/ltuple.h"
 #include "flintxx/matrix.h"
@@ -38,9 +39,6 @@
 
 // TODO input and output
 // TODO addmul
-// TODO row reduction
-// TODO modular gaussian elimination
-// TODO echelon form
 // TODO nullspace member
 
 namespace flint {
@@ -241,11 +239,20 @@ public:
     void set_one()
         {fmpz_mat_one(_mat());}
 
+    template<class Fmpz>
+    slong set_rref_mod(const Fmpz& p, permxx* perm = 0,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        return fmpz_mat_rref_mod(maybe_perm_data(perm), _mat(), p.evaluate()._fmpz());
+    }
+
     // these cause evaluation
     slong rank() const {return fmpz_mat_rank(this->evaluate()._mat());}
     bool is_zero() const {return fmpz_mat_is_zero(this->evaluate()._mat());}
     bool is_empty() const {return fmpz_mat_is_empty(this->evaluate()._mat());}
     bool is_square() const {return fmpz_mat_is_square(this->evaluate()._mat());}
+    slong find_pivot_any(slong start, slong end, slong c) const
+        {return fmpz_mat_find_pivot_any(this->evaluate()._mat(), start, end, c);}
 
     // forwarded lazy ops
     FLINTXX_DEFINE_MEMBER_BINOP(det_modular)
@@ -275,8 +282,11 @@ public:
     FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(fmpzxx, trace)
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(nullspace) // TODO
     //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, inv) // TODO
+    //FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(???, rref) // TODO
 
     FLINTXX_DEFINE_MEMBER_4OP(CRT)
+
+    FLINTXX_DEFINE_MEMBER_FFLU
 };
 
 namespace detail {
@@ -501,6 +511,20 @@ FLINT_DEFINE_UNARY_EXPR_COND(nullspace_op, rdetail::fmpz_mat_nullspace_rt,
         FMPZ_MATXX_COND_S, to.template get<0>() = fmpz_mat_nullspace(
             to.template get<1>()._mat(), from._mat()))
 
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<slong, fmpz_matxx, fmpzxx>::type>::type
+    fmpz_matxx_fflu_rt;
+} // rdetail
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(fflu_op, rdetail::fmpz_matxx_fflu_rt,
+        FMPZ_MATXX_COND_S, traits::is_maybe_perm, tools::is_bool,
+        to.template get<0>() = fmpz_mat_fflu(to.template get<1>()._mat(),
+            to.template get<2>()._fmpz(), maybe_perm_data(e2), e1._mat(), e3))
+
+FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::fmpz_matxx_fflu_rt,
+        FMPZ_MATXX_COND_S,
+        to.template get<0>() = fmpz_mat_rref(to.template get<1>()._mat(),
+            to.template get<2>()._fmpz(), from._mat()))
 } // rules
 } // flint
 

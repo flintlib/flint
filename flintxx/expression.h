@@ -680,6 +680,15 @@ name(const T1& t1, const T2& t2, const T3& t3) \
   return ::flint::detail::nary_op_helper2< \
       ::flint::operations::name##_op, T1, T2, T3>::make(t1, t2, t3); \
 }
+#define FLINT_DEFINE_THREEARY_HERE_2DEFAULT(name, type1, val1, type2, val2) \
+template<class T1> \
+inline typename ::flint::detail::nary_op_helper2<\
+    ::flint::operations::name##_op, T1, type1, type2 >::enable::type \
+name(const T1& t1, type1 t2 = val1) \
+{ \
+  return ::flint::detail::nary_op_helper2< \
+      ::flint::operations::name##_op, T1, type1, type2>::make(t1, t2, val2); \
+}
 
 #define FLINT_DEFINE_FOURARY_HERE(name) \
 template<class T1, class T2, class T3, class T4> \
