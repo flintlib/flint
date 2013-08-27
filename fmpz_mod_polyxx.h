@@ -38,15 +38,16 @@
 #include "flintxx/frandxx.h"
 #include "flintxx/ltuple.h"
 #include "flintxx/stdmath.h"
+#include "flintxx/vector.h"
 
 // TODO create/use fmpz_modxx class?
 // TODO printing
-// TODO radix conversion
 
 namespace flint {
 FLINT_DEFINE_BINOP(divrem_f)
 FLINT_DEFINE_BINOP(gcd_euclidean_f)
 FLINT_DEFINE_BINOP(gcd_f)
+FLINT_DEFINE_BINOP(radix)
 
 FLINT_DEFINE_UNOP(fmpz_mod_polyxx_lead) // TODO standardise?
 FLINT_DEFINE_BINOP(fmpz_mod_polyxx_get_coeff) // TODO standardise?
@@ -195,6 +196,7 @@ class fmpz_mod_polyxx_expression
     FLINTXX_DEFINE_MEMBER_BINOP(shift_left)
     FLINTXX_DEFINE_MEMBER_BINOP(shift_right)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_BINOP(radix)
     FLINTXX_DEFINE_MEMBER_BINOP(rem_basecase)
     FLINTXX_DEFINE_MEMBER_BINOP(xgcd)
     FLINTXX_DEFINE_MEMBER_BINOP(xgcd_euclidean)
@@ -507,6 +509,165 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(compose_mod_brent_kung_op, fmpz_mod_polyxx,
         fmpz_mod_poly_compose_mod_brent_kung(
             to._poly(), e1._poly(), e2._poly(), e3._poly()))
 } // rules
+
+
+///////////////////////////////////////////////////////////////////////////////
+// fmpz_mod_poly_vecxx (for radix conversion)
+///////////////////////////////////////////////////////////////////////////////
+namespace detail {
+struct fmpz_mod_poly_vector_data
+{
+    long size;
+    fmpz_mod_poly_struct** array;
+
+    template<class Fmpz>
+    void init(long n, const Fmpz& f)
+    {
+        size = n;
+        array = new fmpz_mod_poly_struct*[n];
+        for(long i = 0;i < n;++i)
+        {
+            array[i] = new fmpz_mod_poly_struct();
+            fmpz_mod_poly_init(array[i], f._fmpz());
+        }
+    }
+
+    template<class Fmpz>
+    fmpz_mod_poly_vector_data(long n, const Fmpz& f,
+            typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+    {
+        init(n, f.evaluate());
+    }
+
+    ~fmpz_mod_poly_vector_data()
+    {
+        for(long i = 0;i < size;++i)
+        {
+            fmpz_mod_poly_clear(array[i]);
+            delete array[i];
+        }
+        delete[] array;
+    }
+
+    fmpz_mod_poly_vector_data(const fmpz_mod_poly_vector_data& o)
+        : size(o.size)
+    {
+        array = new fmpz_mod_poly_struct*[size];
+        for(long i = 0;i < size;++i)
+        {
+            array[i] = new fmpz_mod_poly_struct();
+            fmpz_mod_poly_init(array[i], &o.array[0]->p);
+            fmpz_mod_poly_set(array[i], o.array[i]);
+        }
+    }
+
+    fmpz_mod_polyxx_ref at(long i)
+        {return fmpz_mod_polyxx_ref::make(array[i]);}
+    fmpz_mod_polyxx_srcref at(long i) const
+        {return fmpz_mod_polyxx_srcref::make(array[i]);}
+
+    bool equals(const fmpz_mod_poly_vector_data& o) const
+    {
+        if(size != o.size)
+            return false;
+        for(long i = 0;i < size;++i)
+            if(!fmpz_mod_poly_equal(array[i], o.array[i]))
+                return false;
+        return true;
+    }
+};
+
+// TODO extend this somewhat similarly to the nmod* setup
+template<class T>
+fmpzxx_srcref find_fmpz_mod_polyxx_mod(const T& t)
+{
+    // this works because there are not actually any functions operating on
+    // fmpz_mod_poly_vecxx
+    return tools::find_subexpr<detail::is_fmpz_mod_polyxx_predicate>(
+            t)._mod();
+}
+
+struct fmpz_mod_poly_vector_traits
+    : wrapped_vector_traits<fmpz_mod_polyxx, long, fmpz_mod_polyxx_ref,
+          fmpz_mod_polyxx_srcref, fmpz_mod_poly_struct*>
+{
+    template<class Expr>
+    static typename Expr::evaluated_t create_temporary(const Expr& e)
+    {
+        return typename Expr::evaluated_t(
+                e.size(), find_fmpz_mod_polyxx_mod(e));
+    }
+};
+} // detail
+
+// TODO would it make more sense to have this have its own class?
+typedef vector_expression<
+    detail::fmpz_mod_poly_vector_traits, operations::immediate,
+    detail::fmpz_mod_poly_vector_data> fmpz_mod_poly_vecxx;
+// TODO references
+
+template<>
+struct enable_vector_rules<fmpz_mod_poly_vecxx> : mp::false_ { };
+
+namespace rules {
+// TODO hack to make code look like references are implemented
+template<class T> struct FMPZ_MOD_POLY_VECXX_COND_S
+    : mp::equal_types<T, fmpz_mod_poly_vecxx> { };
+#define FMPZ_MOD_POLY_VECXX_COND_T FMPZ_MOD_POLY_VECXX_COND_S
+
+// TODO references
+FLINT_DEFINE_GET(equals, bool, fmpz_mod_poly_vecxx, e1._data().equals(e2._data()))
+} // rules
+
+
+///////////////////////////////////////////////////////////////////////////////
+// radix conversion
+///////////////////////////////////////////////////////////////////////////////
+
+class fmpz_mod_poly_radixxx
+{
+private:
+    fmpz_mod_poly_radix_t inner;
+
+    // not copyable
+    fmpz_mod_poly_radixxx(const fmpz_mod_poly_radixxx&);
+
+public:
+    template<class Fmpz_mod_poly>
+    fmpz_mod_poly_radixxx(const Fmpz_mod_poly& r, slong deg,
+            typename mp::enable_if<
+                traits::is_fmpz_mod_polyxx<Fmpz_mod_poly> >::type* = 0)
+        {fmpz_mod_poly_radix_init(inner, r.evaluate()._poly(), deg);}
+    ~fmpz_mod_poly_radixxx() {fmpz_mod_poly_radix_clear(inner);}
+
+    fmpz_mod_poly_radix_t& _data() {return inner;}
+    const fmpz_mod_poly_radix_t& _data() const {return inner;}
+
+    slong degR() const {return inner->degR;}
+};
+
+namespace traits {
+template<class T> struct is_fmpz_mod_poly_radixxx
+   : mp::equal_types<T, fmpz_mod_poly_radixxx> { };
+} // traits
+
+namespace vectors {
+template<>
+struct outsize<operations::radix_op>
+{
+    template<class Expr>
+    static unsigned get(const Expr& e)
+    {
+        return e._data().first().degree() / e._data().second().degR() + 1;
+    }
+};
+}
+
+namespace rules {
+FLINT_DEFINE_BINARY_EXPR_COND2(radix_op, fmpz_mod_poly_vecxx,
+        FMPZ_MOD_POLYXX_COND_S, traits::is_fmpz_mod_poly_radixxx,
+        fmpz_mod_poly_radix(to._array(), e1._poly(), e2._data()))
+}
 } // flint
 
 #endif

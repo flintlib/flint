@@ -330,6 +330,34 @@ test_randomisation()
     tassert(p == fmpz_mod_polyxx::randtest_not_zero(M, state2, 10));
 }
 
+void
+test_radix()
+{
+    fmpzxx M(1031);
+    fmpz_mod_poly_vecxx v1(10, M), v2(10, M);
+    v1[0].set_coeff(7, 1);
+    tassert(v1 != v2);
+    fmpz_mod_poly_vecxx v3(v1);
+    tassert(v3 == v1);
+    v3[0].set_coeff(1, 1);
+    tassert(v3 != v1);
+    v2[0].set_coeff(7, 1);
+    tassert(v1 == v2);
+
+    frandxx rand;
+    fmpz_mod_polyxx F = fmpz_mod_polyxx::randtest(M, rand, 10);
+    fmpz_mod_polyxx R = fmpz_mod_polyxx::randtest(M, rand, 3);
+    fmpz_mod_poly_vecxx b(F.degree() / R.degree() + 1, M);
+    fmpz_mod_poly_radixxx rad(R, 15);
+    b = F.radix(rad);
+    tassert(b == F.radix(rad));
+
+    fmpz_mod_polyxx f(M);
+    for(ulong i = 0;i < b.size();++i)
+        f += b[i]*R.pow(i);
+    tassert(f == F);
+}
+
 int
 main()
 {
@@ -344,6 +372,7 @@ main()
     test_extras();
     test_factoring();
     test_randomisation();
+    test_radix();
 
     std::cout << "PASS" << std::endl;
     return 0;

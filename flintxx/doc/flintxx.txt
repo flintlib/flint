@@ -3266,6 +3266,23 @@ Fmpz_mod_poly_expr compose_mod_divconquer(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr
 Fmpz_mod_poly_expr compose_mod_brent_kung(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
         Fmpz_mod_poly_expr)
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Radix conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_mod_poly_radixxx::fmpz_mod_poly_radixxx(Fmpz_poly_expr, slong deg)
+
+    Initialise temporary data for radix conversion.
+    See \code{fmpz_mod_poly_radix_init}.
+
+Fmpz_mod_poly_vec_expr Fmpz_mod_poly_expr::radix(const fmpz_mod_poly_radxxx&)
+Fmpz_mod_poly_vec_expr radix(Fmpz_mod_poly_expr F, const fmpz_mod_poly_radxxx&)
+
+    Perform radix conversion. See \code{fmpz_mod_poly_radix}.
+    Note that computing the output vector size requires knowing the degree of
+    \code{F}. In the current implementation, this will result in evaluating
+    \code{F} twice. In order to avoid this, pass in \code{F} in evaluated form,
+    or do not form expressions requiring temporaries.
 
 
 *******************************************************************************
