@@ -39,7 +39,6 @@
 
 #include "fmpz.h"
 
-// TODO bit packing
 // TODO functions for addmul? inhomogeneous addmul?
 // TODO use evaluate_n in immediate functions?
 
@@ -67,6 +66,9 @@ FLINT_DEFINE_BINOP(sqrtmod)
 FLINT_DEFINE_UNOP(sqrtrem)
 FLINT_DEFINE_BINOP(gcdinv)
 FLINT_DEFINE_BINOP(xgcd)
+
+FLINT_DEFINE_FIVEARY(fmpzxx_bit_unpack)
+FLINT_DEFINE_THREEARY(fmpzxx_bit_unpack_unsigned)
 
 namespace mp {
 template<class Out, class T1, class T2 = void, class T3 = void, class T4 = void>
@@ -255,6 +257,22 @@ public:
     // FLINTXX_DEFINE_MEMBER_UNOP(sqrtrem) // TODO
 
     FLINTXX_DEFINE_MEMBER_5OP(CRT)
+
+    template<class Arg1, class Arg2>
+    static FLINT_FIVEARY_ENABLE_RETTYPE(fmpzxx_bit_unpack,
+        Arg1, Arg2, mp_bitcnt_t, int, bool)
+    bit_unpack(const Arg1& arr, const Arg2& bits,
+            mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+    {
+        return fmpzxx_bit_unpack(arr, bits, shift, negate, borrow);
+    }
+    template<class Arg1, class Arg2>
+    static FLINT_THREEARY_ENABLE_RETTYPE(fmpzxx_bit_unpack_unsigned,
+        Arg1, Arg2, mp_bitcnt_t)
+    bit_unpack_unsigned(const Arg1& arr, const Arg2& bits, mp_bitcnt_t shift = 0)
+    {
+        return fmpzxx_bit_unpack_unsigned(arr, bits, shift);
+    }
 };
 
 namespace detail {
@@ -505,9 +523,17 @@ jacobi(const Fmpz1& a, const Fmpz2& p)
     return a.jacobi(p);
 }
 
-// These functions are evaluated lazily
+template<class Fmpz>
+inline bool bit_pack(std::vector<mp_limb_t>& arr, mp_bitcnt_t bits,
+        const Fmpz& coeff, mp_bitcnt_t shift = 0, int negate = 0,
+        bool borrow = false,
+        typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
+{
+    return fmpz_bit_pack(&arr.front(), shift, bits,
+            coeff.evaluate()._fmpz(), negate, borrow);
+}
 
-// TODO move some of these to stdmath?
+// These functions are evaluated lazily
 namespace rules {
 FLINT_DEFINE_BINARY_EXPR_COND2(rfac_op, fmpzxx,
         FMPZXX_COND_S, traits::is_unsigned_integer,
@@ -625,6 +651,20 @@ FLINT_DEFINE_BINARY_EXPR_COND2(xgcd_op, rdetail::fmpzxx_triple,
         FMPZXX_COND_S, FMPZXX_COND_S, fmpz_xgcd(
             to.template get<0>()._fmpz(), to.template get<1>()._fmpz(),
             to.template get<2>()._fmpz(), e1._fmpz(), e2._fmpz()))
+
+namespace rdetail {
+template<class T> struct is_mplimb_t_vec
+    : mp::equal_types<T, std::vector<mp_limb_t> > { };
+}
+FLINT_DEFINE_FIVEARY_EXPR_COND5(fmpzxx_bit_unpack_op, rdetail::bool_fmpzxx_pair,
+        rdetail::is_mplimb_t_vec, traits::fits_into_mp_bitcnt_t,
+        traits::fits_into_mp_bitcnt_t, traits::is_integer, tools::is_bool,
+        to.template get<0>() = fmpz_bit_unpack(to.template get<1>()._fmpz(),
+            &e1.front(), e3, e2, e4, e5))
+FLINT_DEFINE_THREEARY_EXPR_COND3(fmpzxx_bit_unpack_unsigned_op, fmpzxx,
+        rdetail::is_mplimb_t_vec, traits::fits_into_mp_bitcnt_t,
+        traits::fits_into_mp_bitcnt_t,
+        fmpz_bit_unpack_unsigned(to._fmpz(), &e1.front(), e3, e2))
 
 // standard math functions (c/f stdmath.h)
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, fmpzxx,

@@ -290,6 +290,15 @@ test_functions()
     a.combit(1);
     tassert(a == 18);
     tassert(a.popcnt() == 2);
+
+
+    frandxx rand;
+    mp_bitcnt_t bits = 123; // some extra space in two words
+    std::vector<mp_bitcnt_t> arr(bits / FLINT_BITS + 2);
+    fmpzxx tostore = fmpzxx::randtest_unsigned(rand, bits);
+    bit_pack(arr, bits, tostore);
+    tassert(tostore == fmpzxx::bit_unpack_unsigned(arr, bits));
+    tassert(tostore == fmpzxx::bit_unpack(arr, bits).get<1>());
 }
 
 void

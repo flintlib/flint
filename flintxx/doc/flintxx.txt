@@ -417,6 +417,20 @@ Fmpz_expr multi_CRT(const std::vector<mp_limb_t>& residues, const fmpz_combxx
 
     Reconstruct an integer from its residues. See \code{fmpz_multi_CRT_ui}.
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit packing and unpacking
+
+    Beware that argument orders are different relative to the C interface, to
+    facilitate default arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool bit_pack(std::vector<mp_limb_t>& arr, mp_bitcnt_t bits,
+        mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+Fmpz_expr fmpzxx::bit_unpack(const std::vector<mp_limb_t>& arr, mp_bitcnt_t
+        bits, mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+Fmpz_expr fmpzxx::bit_unpack_unsigned(const std::vector<mp_limb_t>& arr, mp_bitcnt_t
+        bits, mp_bitcnt_t shift = 0)
+
 
 *******************************************************************************
 
