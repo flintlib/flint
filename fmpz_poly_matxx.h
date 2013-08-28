@@ -34,10 +34,11 @@
 #include "flintxx/matrix.h"
 
 // TODO printing
-// TODO prod
 // TODO solve_fflu_precomp
 
 namespace flint {
+FLINT_DEFINE_UNOP(prod)
+
 namespace detail {
 template<class Mat>
 struct fmpz_poly_matxx_traits : matrices::generic_traits<Mat> { };
@@ -388,6 +389,99 @@ FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::fmpz_poly_matxx_fflu_rt,
         to.template get<0>() = fmpz_poly_mat_rref(to.template get<1>()._mat(),
             to.template get<2>()._poly(), from._mat()))
 } // rules
+
+
+////////////////////////////////////////////////////////////////////////////
+// fmpz_poly_mat_vecxx and prod
+////////////////////////////////////////////////////////////////////////////
+namespace detail {
+struct fmpz_poly_mat_vector_data
+{
+    long size;
+    fmpz_poly_mat_t* array;
+
+    fmpz_poly_mat_vector_data(long n, slong rows, slong cols)
+        : size(n)
+    {
+        array = new fmpz_poly_mat_t[n];
+        for(long i = 0;i < n;++i)
+            fmpz_poly_mat_init(array[i], rows, cols);
+    }
+
+    ~fmpz_poly_mat_vector_data()
+    {
+        for(long i = 0;i < size;++i)
+            fmpz_poly_mat_clear(array[i]);
+        delete[] array;
+    }
+
+    fmpz_poly_mat_vector_data(const fmpz_poly_mat_vector_data& o)
+        : size(o.size)
+    {
+        array = new fmpz_poly_mat_t[size];
+        for(long i = 0;i < size;++i)
+            fmpz_poly_mat_init_set(array[i], o.array[i]);
+    }
+
+    fmpz_poly_matxx_ref at(long i)
+        {return fmpz_poly_matxx_ref::make(array[i]);}
+    fmpz_poly_matxx_srcref at(long i) const
+        {return fmpz_poly_matxx_srcref::make(array[i]);}
+
+    bool equals(const fmpz_poly_mat_vector_data& o) const
+    {
+        if(size != o.size)
+            return false;
+        for(long i = 0;i < size;++i)
+            if(!fmpz_poly_mat_equal(array[i], o.array[i]))
+                return false;
+        return true;
+    }
+};
+} // detail
+// TODO temporary allocation
+
+typedef vector_expression<
+    detail::wrapped_vector_traits<fmpz_poly_matxx, long,
+        fmpz_poly_matxx_ref, fmpz_poly_matxx_srcref, fmpz_poly_mat_t>,
+    operations::immediate,
+    detail::fmpz_poly_mat_vector_data> fmpz_poly_mat_vecxx;
+// TODO references
+
+template<>
+struct enable_vector_rules<fmpz_poly_mat_vecxx> : mp::false_ { };
+
+namespace matrices {
+template<>
+struct outsize<operations::prod_op>
+{
+    template<class Mat>
+    static slong rows(const Mat& m)
+    {
+        return m._data().head[0].rows();
+    }
+    template<class Mat>
+    static slong cols(const Mat& m)
+    {
+        return m._data().head[0].cols();
+    }
+};
+}
+
+namespace rules {
+// TODO hack to make code look like references are implemented
+template<class T> struct FMPZ_POLY_MAT_VECXX_COND_S
+    : mp::equal_types<T, fmpz_poly_mat_vecxx> { };
+#define FMPZ_POLY_MAT_VECXX_COND_T FMPZ_POLY_MAT_VECXX_COND_S
+
+// TODO references
+FLINT_DEFINE_GET(equals, bool, fmpz_poly_mat_vecxx, e1._data().equals(e2._data()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(prod_op, fmpz_poly_matxx,
+        FMPZ_POLY_MAT_VECXX_COND_S,
+        fmpz_poly_mat_prod(to._mat(), from._array(), from.size()))
+} // rules
+
 } // flint
 
 #endif

@@ -266,6 +266,25 @@ test_row_reduction()
     tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
 }
 
+void
+test_prod()
+{
+    fmpz_poly_mat_vecxx v1(10, 3, 3), v2(10, 3, 3), v3(9, 3, 3), v4(v1);
+    tassert(v1 == v2);
+    tassert(v1 != v3);
+    v1[0].at(0, 0).set_coeff(0, 7u);
+    tassert(v1 != v4);
+
+    frandxx rand;
+    fmpz_poly_matxx prod = fmpz_poly_matxx::one(3, 3);
+    for(slong i = 0;i < v1.size();++i)
+    {
+        v1[i].set_randtest(rand, 4, 17);
+        prod *= v1[i];
+    }
+    tassert(flint::prod(v1) == prod);
+}
+
 int
 main()
 {
@@ -279,6 +298,7 @@ main()
     test_extras();
     test_randomisation();
     test_row_reduction();
+    test_prod();
 
     std::cout << "PASS" << std::endl;
     return 0;
