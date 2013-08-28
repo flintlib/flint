@@ -47,9 +47,7 @@
 // TODO exhibit this as a specialisation of a generic poly<nmodxx>
 // TODO input
 // TODO automatic mulmod, powmod etc?
-// TODO mulmod_preinv
 // TODO use underscore function versions?
-// TODO powmod_mpz*, powmod*preinv, compose_mod_brent_kung_preinv
 // TODO nmod_series class?
 // TODO subproduct trees?
 
@@ -85,6 +83,10 @@ FLINT_DEFINE_BINOP(nmod_polyxx_interpolate_barycentric)
 FLINT_DEFINE_BINOP(nmod_polyxx_interpolate_fast)
 FLINT_DEFINE_BINOP(nmod_polyxx_interpolate_newton)
 FLINT_DEFINE_UNOP(nmod_polyxx_product_roots)
+
+FLINT_DEFINE_FOURARY(compose_mod_brent_kung_preinv)
+FLINT_DEFINE_FOURARY(mulmod_preinv)
+FLINT_DEFINE_FOURARY(powmod_binexp_preinv)
 
 template<class Operation, class Data>
 class nmod_polyxx_expression
@@ -314,6 +316,10 @@ public:
     FLINTXX_DEFINE_MEMBER_3OP(powmod_binexp)
     FLINTXX_DEFINE_MEMBER_3OP(pow_trunc)
     FLINTXX_DEFINE_MEMBER_3OP(pow_trunc_binexp)
+
+    FLINTXX_DEFINE_MEMBER_4OP(compose_mod_brent_kung_preinv)
+    FLINTXX_DEFINE_MEMBER_4OP(mulmod_preinv)
+    FLINTXX_DEFINE_MEMBER_4OP(powmod_binexp_preinv)
 };
 
 namespace detail {
@@ -522,6 +528,12 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(mulmod_op, nmod_polyxx,
     NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
     nmod_poly_mulmod(to._poly(), e1._poly(), e2._poly(), e3._poly()))
 
+FLINT_DEFINE_FOURARY_EXPR_COND4(mulmod_preinv_op, nmod_polyxx,
+    NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+    NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+    nmod_poly_mulmod_preinv(to._poly(), e1._poly(), e2._poly(),
+        e3._poly(), e4._poly()))
+
 FLINT_DEFINE_BINARY_EXPR_COND2(pow_binexp_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, traits::is_unsigned_integer,
         nmod_poly_pow_binexp(to._poly(), e1._poly(), e2))
@@ -532,6 +544,12 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, nmod_polyxx,
 FLINT_DEFINE_THREEARY_EXPR_COND3(powmod_binexp_op, nmod_polyxx,
     NMOD_POLYXX_COND_S, traits::is_unsigned_integer, NMOD_POLYXX_COND_S,
     nmod_poly_powmod_ui_binexp(to._poly(), e1._poly(), e2, e3._poly()))
+
+FLINT_DEFINE_FOURARY_EXPR_COND4(powmod_binexp_preinv_op, nmod_polyxx,
+    NMOD_POLYXX_COND_S, traits::is_unsigned_integer,
+    NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+    nmod_poly_powmod_ui_binexp_preinv(to._poly(), e1._poly(), e2,
+        e3._poly(), e4._poly()))
 
 FLINT_DEFINE_THREEARY_EXPR_COND3(pow_trunc_op, nmod_polyxx,
     NMOD_POLYXX_COND_S, traits::is_unsigned_integer, traits::fits_into_slong,
@@ -674,6 +692,11 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(compose_mod_brent_kung_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
         nmod_poly_compose_mod_brent_kung(
             to._poly(), e1._poly(), e2._poly(), e3._poly()))
+FLINT_DEFINE_FOURARY_EXPR_COND4(compose_mod_brent_kung_preinv_op, nmod_polyxx,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
+        nmod_poly_compose_mod_brent_kung_preinv(
+            to._poly(), e1._poly(), e2._poly(), e3._poly(), e4._poly()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(gcd_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,

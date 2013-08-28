@@ -143,6 +143,8 @@ test_arithmetic()
 
     f.set_randtest(state, 10);
     tassert(h.mulmod(g, f) == ((h*g) % f));
+    tassert(h.mulmod(g, f) == h.mulmod_preinv(g, f,
+                f.reverse(f.length()).inv_series(f.length())));
 
 
     f = "3 31  1 0 1";
@@ -202,6 +204,8 @@ test_functions()
     nmod_polyxx f(M);f.set_randtest(rand, 10);
     res = g.pow(10u) % f;
     tassert(res == g.powmod_binexp(10u, f));
+    tassert(res == g.powmod_binexp_preinv(10u, f,
+                f.reverse(f.length()).inv_series(f.length())));
 
     res = "5 31  1 1 1 1 1";
     tassert(res.derivative().to_string() == "4 31  1 2 3 4");
@@ -265,6 +269,8 @@ test_functions()
     tassert(f.compose_mod(g, h) == f(g) % h);
     tassert(f.compose_mod(g, h) == f.compose_mod_horner(g, h));
     tassert(f.compose_mod(g, h) == f.compose_mod_brent_kung(g, h));
+    tassert(f.compose_mod(g, h) == f.compose_mod_brent_kung_preinv(g, h,
+                h.reverse(h.length()).inv_series(h.length())));
 
     h.set_randtest_irreducible(rand, 12);
     tassert(h.gcd(f).is_one());

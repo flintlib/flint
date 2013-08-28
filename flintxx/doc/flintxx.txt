@@ -1958,6 +1958,7 @@ Fmpz_poly_mat_expr sqrlow(Fmpz_poly_mat_expr, T:fits_into_slong n)
 Fmpz_poly_mat_expr pow(Fmpz_poly_mat_expr, T:is_unsigned_integer)
 Fmpz_poly_mat_expr pow_trunc(Fmpz_poly_mat_expr, T:is_unsigned_integer,
         T:fits_into_slong)
+Fmpz_poly_mat_expr prod(Fmpz_poly_mat_vec_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Row reduction
@@ -2027,6 +2028,9 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve(
         Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
 Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu(
         Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
+        const permxx&, Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr FFLU,
+        Fmpz_poly_mat_expr X)
 
     \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
     \code{w = fmpz_poly_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
@@ -2207,6 +2211,13 @@ Nmod_poly_expr::ternary operation(??, ??) const
     \code{mullow_KS}, \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},
     \code{pow_trunc_binexp}.
 
+Nmod_poly_expr::fourary operation(??, ??, ??) const
+
+    The following functions of four arguments
+    are made available as member functions:
+    \code{compose_mod_brent_kung_preinv}, \code{mulmod_preinv},
+    \code{powmod_binexp_preinv}.
+
 Nmod_poly_expr Nmod_poly_expr::operator()(Nmod_poly_expr) const
 Nmod_expr Nmod_poly_expr::operator()(Nmod_expr) const
 Nmod_vec_expr Nmod_poly_expr::operator()(Nmod_vec_expr) const
@@ -2362,6 +2373,8 @@ Nmod_poly_expr mulhigh(Nmod_poly_expr, Nmod_poly_expr, slong)
 Nmod_poly_expr mulhigh_classical(Nmod_poly_expr, Nmod_poly_expr, slong)
 
 Nmod_poly_expr mulmod(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr mulmod_preinv(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Powering
@@ -2375,6 +2388,8 @@ Nmod_poly_expr pow_trunc_binexp(Nmod_poly_expr, T:is_unsigned_integer,
         T:fits_into_slong)
 Nmod_poly_expr powmod_binexp(Nmod_poly_expr, T:is_unsigned_integer,
         Nmod_poly_expr)
+Nmod_poly_expr powmod_binexp_preinv(Nmod_poly_expr, T:is_unsigned_integer,
+        Nmod_poly_expr, Nmod_poly_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Division
@@ -2473,6 +2488,8 @@ Nmod_poly_expr compose_mod_divconquer(Nmod_poly_expr, Nmod_poly_expr,
         Nmod_poly_expr)
 Nmod_poly_expr compose_mod_brent_kung(Nmod_poly_expr, Nmod_poly_expr,
         Nmod_poly_expr)
+Nmod_poly_expr compose_mod_brent_kung_preinv(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr, Nmod_poly_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Greatest common divisor
@@ -3036,6 +3053,10 @@ Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve(Nmod_poly_mat_expr,
         Nmod_poly_mat_expr)
 Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu(Nmod_poly_mat_expr,
         Nmod_poly_mat_expr)
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu_precomp(
+        const permxx&, Nmod_poly_mat_expr B, Nmod_poly_mat_expr FFLU,
+        Nmod_poly_mat_expr X)
+
     \code{ltupleref(worked, M, P) = solve(A, X)} has the same effect as
     \code{worked = nmod_poly_mat_solve(m, p, a, x)}, where \code{m, p, a, x}
     are the C structs underlying \code{M, P, A, X}.
