@@ -337,6 +337,8 @@ test_multiary()
 {
     tassert(fourary_test(1, 2, 3, 4) == myint(1 + 2 + 3 + 4));
     tassert(fiveary_test(1, 2, 3, 4, 5u) == 1 + 2 + 3 + 4 + 5);
+    tassert(sixary_test(1, 2, 3, 4, 5, 6) == 1 + 2 + 3 + 4 + 5 + 6);
+    tassert(sevenary_test(1, 2, 3, 4, 5, 6, 7) == 1 + 2 + 3 + 4 + 5 + 6 + 7);
 }
 
 int

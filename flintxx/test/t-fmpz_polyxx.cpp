@@ -29,6 +29,7 @@
 
 #include "fmpz_polyxx.h"
 #include "fmpz_poly_factorxx.h"
+#include "nmod_polyxx.h"
 
 #include "flintxx/test/helpers.h"
 
@@ -411,6 +412,42 @@ test_factoring()
     // TODO set_factor_zassenhaus_recombination
 }
 
+detail::IGNORED_TYPE _;
+void
+test_hensel()
+{
+    mp_limb_t pl = 1031;
+    frandxx state;
+    nmod_polyxx gl(nmod_polyxx::randtest_irreducible(pl, state, 5).make_monic());
+    nmod_polyxx hl(nmod_polyxx::randtest_irreducible(pl, state, 6).make_monic());
+    nmod_polyxx al(pl), bl(pl);
+    ltupleref(_, al, bl) = xgcd(gl, hl);
+    tassert((al*gl + bl*hl).is_one());
+
+    fmpz_polyxx f = fmpz_polyxx::lift(gl*hl);
+    fmpz_polyxx g = fmpz_polyxx::lift(gl);
+    fmpz_polyxx h = fmpz_polyxx::lift(hl);
+    fmpz_polyxx a = fmpz_polyxx::lift(al);
+    fmpz_polyxx b = fmpz_polyxx::lift(bl);
+
+    fmpz_polyxx G, H, A, B;
+    fmpzxx p(pl), p1(1031);
+    tassert(((f - g*h) % p).is_zero());
+
+    ltupleref(G, H, A, B) = hensel_lift(f, g, h, a, b, p, p1);
+    tassert(((f - G*H) % (p1*p)).is_zero());
+    tassert(((A*G + B*H) % (p1*p)).is_one());
+
+    tassert(ltupleref(G, H) == hensel_lift_without_inverse(f, g, h, a, b, p, p1));
+    tassert(ltupleref(A, B) == hensel_lift_only_inverse(G, H, a, b, p, p1));
+
+    nmod_poly_factorxx local_fac = factor(gl*hl);
+    fmpz_poly_factorxx lifted_fac = hensel_lift_once(f, local_fac, 3);
+    tassert(lifted_fac.size() == 2
+            && lifted_fac.exp(0) == 1 && lifted_fac.exp(1) == 1);
+    tassert(((lifted_fac.p(0)*lifted_fac.p(1) - f) % p.pow(3u)).is_zero());
+}
+
 int
 main()
 {
@@ -425,6 +462,7 @@ main()
     test_member_functions();
     test_extras();
     test_factoring();
+    test_hensel();
 
     std::cout << "PASS" << std::endl;
     return 0;

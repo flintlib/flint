@@ -57,8 +57,8 @@ struct not_ : value_of<!T::val> { };
 
 // Compute logical and of the input values.
 template<class T1, class T2, class T3 = void,
-    class T4 = void, class T5 = void, class T6 = void>
-struct and_ : and_<T1, and_<T2, T3, T4, T5> > { };
+    class T4 = void, class T5 = void, class T6 = void, class T7 = void, class T8 = void>
+struct and_ : and_<T1, and_<T2, T3, T4, T5, T6, T7, T8> > { };
 
 template<class T, class U>
 struct and_<T, U, void, void, void, void> : value_of<T::val && U::val> { };

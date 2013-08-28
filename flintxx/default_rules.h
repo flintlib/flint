@@ -242,7 +242,7 @@ struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, empty_
                 mp::tuple_get<data_t, 3>::get(input));
     }
 };
-// Automatically invoke fivary_expression
+// Automatically invoke fiveary_expression
 template<bool result_is_temporary, class Op,
     class Data1, class Data2, class Data3, class Data4, class Data5>
 struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, tuple<Data5, empty_tuple> > > > >,
@@ -273,6 +273,81 @@ struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, tuple<
                 mp::tuple_get<data_t, 2>::get(input),
                 mp::tuple_get<data_t, 3>::get(input),
                 mp::tuple_get<data_t, 4>::get(input));
+    }
+};
+// Automatically invoke sixary_expression
+template<bool result_is_temporary, class Op,
+    class Data1, class Data2, class Data3, class Data4, class Data5, class Data6>
+struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, tuple<Data5, tuple<Data6, empty_tuple> > > > > >,
+    result_is_temporary, 0,
+    typename mp::enable_if<
+        traits::is_implemented<
+            sixary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type,
+                typename traits::basetype<Data5>::type,
+                typename traits::basetype<Data6>::type> > >::type>
+{
+    typedef sixary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type,
+                typename traits::basetype<Data5>::type,
+                typename traits::basetype<Data6>::type> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    typedef typename mp::make_tuple<Data1, Data2, Data3, Data4, Data5, Data6>::type data_t;
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
+    {
+        wrapped_t::doit(*output, mp::tuple_get<data_t, 0>::get(input),
+                mp::tuple_get<data_t, 1>::get(input),
+                mp::tuple_get<data_t, 2>::get(input),
+                mp::tuple_get<data_t, 3>::get(input),
+                mp::tuple_get<data_t, 4>::get(input),
+                mp::tuple_get<data_t, 5>::get(input));
+    }
+};
+// Automatically invoke sevenary_expression
+template<bool result_is_temporary, class Op,
+    class Data1, class Data2, class Data3, class Data4, class Data5, class Data6, class Data7>
+struct evaluation<Op, tuple<Data1, tuple<Data2, tuple<Data3, tuple<Data4, tuple<Data5, tuple<Data6, tuple<Data7, empty_tuple> > > > > > >,
+    result_is_temporary, 0,
+    typename mp::enable_if<
+        traits::is_implemented<
+            sevenary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type,
+                typename traits::basetype<Data5>::type,
+                typename traits::basetype<Data6>::type,
+                typename traits::basetype<Data7>::type> > >::type>
+{
+    typedef sevenary_expression<Op,
+                typename traits::basetype<Data1>::type,
+                typename traits::basetype<Data2>::type,
+                typename traits::basetype<Data3>::type,
+                typename traits::basetype<Data4>::type,
+                typename traits::basetype<Data5>::type,
+                typename traits::basetype<Data6>::type,
+                typename traits::basetype<Data7>::type> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    typedef typename mp::make_tuple<Data1, Data2, Data3, Data4, Data5, Data6, Data7>::type data_t;
+    template<class Return>
+    static void doit(const data_t& input, temporaries_t temps, Return* output)
+    {
+        wrapped_t::doit(*output, mp::tuple_get<data_t, 0>::get(input),
+                mp::tuple_get<data_t, 1>::get(input),
+                mp::tuple_get<data_t, 2>::get(input),
+                mp::tuple_get<data_t, 3>::get(input),
+                mp::tuple_get<data_t, 4>::get(input),
+                mp::tuple_get<data_t, 5>::get(input),
+                mp::tuple_get<data_t, 6>::get(input));
     }
 };
 

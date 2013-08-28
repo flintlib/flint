@@ -353,8 +353,8 @@ test_radix()
     tassert(b == F.radix(rad));
 
     fmpz_mod_polyxx f(M);
-    for(ulong i = 0;i < b.size();++i)
-        f += b[i]*R.pow(i);
+    for(slong i = 0;i < b.size();++i)
+        f += b[i]*R.pow(static_cast<ulong>(i));
     tassert(f == F);
 }
 

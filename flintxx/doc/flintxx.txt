@@ -1116,6 +1116,33 @@ Fmpz_poly_expr CRT(Fmpz_poly_expr, Fmpz_expr, Nmod_poly_expr, bool)
 
     See \code{fmpz_poly_CRT_ui}.
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Hensel lifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpz_polyxx, fmpz_polyxx, fmpz_polyxx, fmpz_polyxx>_expr hensel_lift(
+        Fmpz_poly_expr f, Fmpz_poly_expr g, Fmpz_poly_expr h,
+        Fmpz_poly_expr a, Fmpz_poly_expr b,
+        Fmpz_expr p, Fmpz_expr p1)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr hensel_lift_without_inverse(
+        Fmpz_poly_expr f, Fmpz_poly_expr g, Fmpz_poly_expr h,
+        Fmpz_poly_expr a, Fmpz_poly_expr b,
+        Fmpz_expr p, Fmpz_expr p1)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr hensel_lift_only_inverse(
+        Fmpz_poly_expr G, Fmpz_poly_expr H,
+        Fmpz_poly_expr a, Fmpz_poly_expr b,
+        Fmpz_expr p, Fmpz_expr p1)
+
+    See \code{fmpz_poly_hensel_lift} etc.
+
+fmpz_poly_factorxx::set_hensel_lift_once(Fmpz_poly_expr, const
+        nmod_poly_factorxx&, slong)
+fmpz_poly_factorxx hensel_lift_once(Fmpz_poly_expr,
+        const nmod_poly_factorxx&, slong)
+
+    See \code{fmpz_poly_hensel_lift_once}. Note that these two
+    functions are defined in the \code{fmpz_factorxx} module.
+
 
 *******************************************************************************
 

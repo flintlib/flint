@@ -30,6 +30,7 @@
 
 #include "fmpz_poly_factor.h"
 #include "fmpz_polyxx.h"
+#include "nmod_polyxx.h"
 
 namespace flint {
 class fmpz_poly_factorxx
@@ -109,6 +110,15 @@ public:
     void set_factor_zassenhaus(const Fmpz_poly& p,
             typename mp::enable_if<traits::is_fmpz_polyxx<Fmpz_poly> >::type* = 0)
         {fmpz_poly_factor_zassenhaus(_data(), p.evaluate()._poly());}
+
+    template<class Fmpz_poly>
+    void set_hensel_lift_once(const Fmpz_poly& f,
+            const nmod_poly_factorxx& local_fac, slong N,
+            typename mp::enable_if<traits::is_fmpz_polyxx<Fmpz_poly> >::type* = 0)
+    {
+        fmpz_poly_hensel_lift_once(_data(), f.evaluate()._poly(),
+                local_fac._data(), N);
+    }
 };
 
 template<class Fmpz_poly>
@@ -125,6 +135,16 @@ inline fmpz_poly_factorxx factor_zassenhaus(const Fmpz_poly& p,
 {
     fmpz_poly_factorxx res;
     res.set_factor_zassenhaus(p);
+    return res;
+}
+
+template<class Fmpz_poly>
+inline fmpz_poly_factorxx hensel_lift_once(const Fmpz_poly& f,
+        const nmod_poly_factorxx& local_fac, slong N,
+        typename mp::enable_if<traits::is_fmpz_polyxx<Fmpz_poly> >* = 0)
+{
+    fmpz_poly_factorxx res;
+    res.set_hensel_lift_once(f, local_fac, N);
     return res;
 }
 } // flint

@@ -45,9 +45,9 @@
 // TODO exhibit this as a specialisation of a generic poly<fmpzxx>
 // TODO newton basis?
 // TODO power series class?
-// TODO hensel lifting
 // TODO input
 // TODO addmul
+// TODO more hensel lifting?
 
 namespace flint {
 // function "declarations"
@@ -92,6 +92,10 @@ FLINT_DEFINE_UNOP(fmpz_polyxx_lead)
 FLINT_DEFINE_BINOP(fmpz_polyxx_get_coeff)
 FLINT_DEFINE_BINOP(fmpz_polyxx_bit_unpack)
 FLINT_DEFINE_BINOP(fmpz_polyxx_bit_unpack_unsigned)
+
+FLINT_DEFINE_SEVENARY(hensel_lift)
+FLINT_DEFINE_SEVENARY(hensel_lift_without_inverse)
+FLINT_DEFINE_SIXARY(hensel_lift_only_inverse)
 
 
 namespace detail {
@@ -859,6 +863,39 @@ FLINT_DEFINE_BINARY_EXPR_COND2(divides_op, rdetail::bool_fmpz_polyxx,
     FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
     to.template get<0> () =
         fmpz_poly_divides(to.template get<1>()._poly(), e1._poly(), e2._poly()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<
+        fmpz_polyxx, fmpz_polyxx, fmpz_polyxx, fmpz_polyxx>::type>::type
+    fmpz_polyxx_quadruple;
+}
+FLINT_DEFINE_SEVENARY_EXPR_COND7(hensel_lift_op, rdetail::fmpz_polyxx_quadruple,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    FMPZXX_COND_S, FMPZXX_COND_S,
+    fmpz_poly_hensel_lift(to.template get<0>()._poly(),
+        to.template get<1>()._poly(), to.template get<2>()._poly(),
+        to.template get<3>()._poly(),
+        e1._poly(), e2._poly(), e3._poly(), e4._poly(), e5._poly(),
+        e6._fmpz(), e7._fmpz()))
+FLINT_DEFINE_SEVENARY_EXPR_COND7(hensel_lift_without_inverse_op,
+    rdetail::fmpz_polyxx_pair,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    FMPZXX_COND_S, FMPZXX_COND_S,
+    fmpz_poly_hensel_lift_without_inverse(to.template get<0>()._poly(),
+        to.template get<1>()._poly(),
+        e1._poly(), e2._poly(), e3._poly(), e4._poly(), e5._poly(),
+        e6._fmpz(), e7._fmpz()))
+FLINT_DEFINE_SIXARY_EXPR_COND6(hensel_lift_only_inverse_op,
+    rdetail::fmpz_polyxx_pair,
+    FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S, FMPZ_POLYXX_COND_S,
+    FMPZ_POLYXX_COND_S,
+    FMPZXX_COND_S, FMPZXX_COND_S,
+    fmpz_poly_hensel_lift_only_inverse(to.template get<0>()._poly(),
+        to.template get<1>()._poly(),
+        e1._poly(), e2._poly(), e3._poly(), e4._poly(),
+        e5._fmpz(), e6._fmpz()))
 } // rules
 
 // immediate functions

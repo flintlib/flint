@@ -710,6 +710,26 @@ name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5) \
       ::flint::operations::name##_op, T1, T2, T3, T4, T5>::make(t1, t2, t3, t4, t5); \
 }
 
+#define FLINT_DEFINE_SIXARY_HERE(name) \
+template<class T1, class T2, class T3, class T4, class T5, class T6> \
+inline typename ::flint::detail::nary_op_helper2<\
+    ::flint::operations::name##_op, T1, T2, T3, T4, T5, T6>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6) \
+{ \
+  return ::flint::detail::nary_op_helper2< \
+      ::flint::operations::name##_op, T1, T2, T3, T4, T5, T6>::make(t1, t2, t3, t4, t5, t6); \
+}
+
+#define FLINT_DEFINE_SEVENARY_HERE(name) \
+template<class T1, class T2, class T3, class T4, class T5, class T6, class T7> \
+inline typename ::flint::detail::nary_op_helper2<\
+    ::flint::operations::name##_op, T1, T2, T3, T4, T5, T6, T7>::enable::type \
+name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const T6& t6, const T7& t7) \
+{ \
+  return ::flint::detail::nary_op_helper2< \
+      ::flint::operations::name##_op, T1, T2, T3, T4, T5, T6, T7>::make(t1, t2, t3, t4, t5, t6, t7); \
+}
+
 // This set of macros should be called in namespace flint.
 
 // Introduce a new binary operation called "name"
@@ -763,5 +783,17 @@ FLINT_DEFINE_FIVEARY_HERE(name)
 
 #define FLINT_FIVEARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5) \
     typename detail::nary_op_helper2<operations::name##_op, T1, T2, T3, T4, T5>::enable::type
+
+#define FLINT_DEFINE_SIXARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_SIXARY_HERE(name)
+
+#define FLINT_DEFINE_SEVENARY(name) \
+namespace operations { \
+struct name##_op { }; \
+} \
+FLINT_DEFINE_SEVENARY_HERE(name)
 
 #endif

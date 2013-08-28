@@ -128,6 +128,10 @@ template<class Op, class T, class U, class V, class W, class Enable = void>
 struct fourary_expression : UNIMPLEMENTED { };
 template<class Op, class T, class U, class V, class W, class X, class Enable = void>
 struct fiveary_expression : UNIMPLEMENTED { };
+template<class Op, class T, class U, class V, class W, class X, class Y, class Enable = void>
+struct sixary_expression : UNIMPLEMENTED { };
+template<class Op, class T, class U, class V, class W, class X, class Y, class Z, class Enable = void>
+struct sevenary_expression : UNIMPLEMENTED { };
 } // rules
 
 
@@ -366,6 +370,32 @@ struct fiveary_expression<operations::name, T, U, V, W, X, \
     typedef rettype return_t; \
     template<class R> \
     static void doit(R& to, const T& e1, const U& e2, const V& e3, const W& e4, const X& e5) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_SIXARY_EXPR_COND6(name, rettype, cond1, cond2, cond3, cond4, cond5, cond6, eval) \
+template<class T, class U, class V, class W, class X, class Y> \
+struct sixary_expression<operations::name, T, U, V, W, X, Y, \
+    typename mp::enable_if< mp::and_< cond1 <T>, cond2 <U>, cond3 <V>, cond4 <W>, cond5 <X>, cond6<Y> > >::type> \
+{ \
+    typedef rettype return_t; \
+    template<class R> \
+    static void doit(R& to, const T& e1, const U& e2, const V& e3, const W& e4, const X& e5, const Y& e6) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_SEVENARY_EXPR_COND7(name, rettype, cond1, cond2, cond3, cond4, cond5, cond6, cond7, eval) \
+template<class T, class U, class V, class W, class X, class Y, class Z> \
+struct sevenary_expression<operations::name, T, U, V, W, X, Y, Z, \
+    typename mp::enable_if< mp::and_< cond1 <T>, cond2 <U>, cond3 <V>, cond4 <W>, cond5 <X>, cond6<Y>, cond7<Z> > >::type> \
+{ \
+    typedef rettype return_t; \
+    template<class R> \
+    static void doit(R& to, const T& e1, const U& e2, const V& e3, const W& e4, const X& e5, const Y& e6, const Z& e7) \
     { \
         eval; \
     } \

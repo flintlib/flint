@@ -357,6 +357,14 @@ ltuple(const T& t, const U& u, const V& v)
             detail::INSTANTIATE_FROM_TUPLE(),
             mp::make_tuple<T, U, V>::make(t, u, v));
 }
+template<class T, class U, class V, class W>
+inline typename make_ltuple<typename mp::make_tuple<T, U, V, W>::type>::type
+ltuple(const T& t, const U& u, const V& v, const W& w)
+{
+    return typename make_ltuple<typename mp::make_tuple<T, U, V, W>::type>::type(
+            detail::INSTANTIATE_FROM_TUPLE(),
+            mp::make_tuple<T, U, V, W>::make(t, u, v, w));
+}
 template<class T>
 inline typename make_ltuple<typename mp::make_tuple<T&>::type>::type
 ltupleref(T& t)
@@ -380,6 +388,14 @@ ltupleref(T& t, U& u, V& v)
     return typename make_ltuple<typename mp::make_tuple<T&, U&, V&>::type>::type(
             detail::INSTANTIATE_FROM_TUPLE(),
             mp::make_tuple<T&, U&, V&>::make(t, u, v));
+}
+template<class T, class U, class V, class W>
+inline typename make_ltuple<typename mp::make_tuple<T&, U&, V&, W&>::type>::type
+ltupleref(T& t, U& u, V& v, W& w)
+{
+    return typename make_ltuple<typename mp::make_tuple<T&, U&, V&, W&>::type>::type(
+            detail::INSTANTIATE_FROM_TUPLE(),
+            mp::make_tuple<T&, U&, V&, W&>::make(t, u, v, w));
 }
 
 } // flint
