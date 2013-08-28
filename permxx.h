@@ -104,6 +104,7 @@ inline slong* maybe_perm_data(int zero) {return 0;}
 namespace traits {
 template<class T> struct is_maybe_perm
     : mp::or_<mp::equal_types<T, permxx*>, mp::equal_types<T, int> > { };
+template<class T> struct is_permxx : mp::equal_types<T, permxx> { };
 } // traits
 } // flint
 

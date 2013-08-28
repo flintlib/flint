@@ -38,6 +38,7 @@ namespace flint {
 FLINT_DEFINE_BINOP(solve)
 FLINT_DEFINE_BINOP(solve_fflu)
 FLINT_DEFINE_THREEARY(mat_at)
+FLINT_DEFINE_THREEARY(solve_fflu_precomp)
 FLINT_DEFINE_UNOP(charpoly)
 FLINT_DEFINE_UNOP(det)
 FLINT_DEFINE_UNOP(det_fflu)
@@ -231,6 +232,20 @@ struct outsize<operations::solve_op>
 };
 template<> struct outsize<operations::solve_fflu_op>
     : outsize<operations::solve_op> { };
+template<>
+struct outsize<operations::solve_fflu_precomp_op>
+{
+    template<class Mat>
+    static slong rows(const Mat& m)
+    {
+        return m._data().tail.second().rows();
+    }
+    template<class Mat>
+    static slong cols(const Mat& m)
+    {
+        return m._data().tail.second().cols();
+    }
+};
 
 namespace mdetail {
 struct base_traits

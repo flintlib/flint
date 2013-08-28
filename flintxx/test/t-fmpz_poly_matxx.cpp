@@ -203,6 +203,10 @@ test_functions()
     tassert(worked == true && (B*X) == A*d);
     tassert(solve(B, A).get<1>() == X);
 
+    permxx perm(B.rows());
+    tassert(solve_fflu_precomp(perm, B.fflu(&perm, false).get<1>().evaluate(), A)
+            == B.solve_fflu(A).get<1>());
+
     slong nullity;
     tassert(nullspace(A).get<1>().rows() == 3);
     tassert(nullspace(A).get<1>().cols() == 3);

@@ -30,11 +30,11 @@
 
 #include "fmpz_matxx.h"
 #include "fmpz_polyxx.h"
+#include "permxx.h"
 
 #include "flintxx/matrix.h"
 
 // TODO printing
-// TODO solve_fflu_precomp
 
 namespace flint {
 FLINT_DEFINE_UNOP(prod)
@@ -388,6 +388,11 @@ FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::fmpz_poly_matxx_fflu_rt,
         FMPZ_POLY_MATXX_COND_S,
         to.template get<0>() = fmpz_poly_mat_rref(to.template get<1>()._mat(),
             to.template get<2>()._poly(), from._mat()))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(solve_fflu_precomp_op, fmpz_poly_matxx,
+        traits::is_permxx, FMPZ_POLY_MATXX_COND_S, FMPZ_POLY_MATXX_COND_S,
+        fmpz_poly_mat_solve_fflu_precomp(to._mat(), e1._data(),
+            e2._mat(), e3._mat()))
 } // rules
 
 
