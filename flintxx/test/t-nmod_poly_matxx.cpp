@@ -200,6 +200,10 @@ test_functions()
     B = nmod_poly_matxx::from_ground(Bp);
     tassert(B.solve(A) == B.solve_fflu(A));
 
+    permxx perm(B.rows());
+    tassert(solve_fflu_precomp(perm, B.fflu(&perm, false).get<1>().evaluate(), A)
+            == B.solve_fflu(A).get<1>());
+
     Bp.set_randtest(rand);
     B = nmod_poly_matxx::from_ground(Bp);
     slong nullity;nmod_poly_matxx C(2, 2, M);

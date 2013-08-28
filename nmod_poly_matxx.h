@@ -30,6 +30,7 @@
 
 #include "nmod_matxx.h"
 #include "nmod_polyxx.h"
+#include "permxx.h"
 
 #include "flintxx/matrix.h"
 #include "flintxx/stdmath.h"
@@ -37,7 +38,6 @@
 // NOTE: it is *not* valid to use empty nmod_poly_matxx matrices!
 // TODO nullspace member
 // TODO printing
-// TODO solve_fflu_precomp
 
 namespace flint {
 FLINT_DEFINE_UNOP(sqr_interpolate)
@@ -402,6 +402,11 @@ FLINT_DEFINE_UNARY_EXPR_COND(rref_op, rdetail::nmod_poly_matxx_fflu_rt,
         NMOD_POLY_MATXX_COND_S,
         to.template get<0>() = nmod_poly_mat_rref(to.template get<1>()._mat(),
             to.template get<2>()._poly(), from._mat()))
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(solve_fflu_precomp_op, nmod_poly_matxx,
+        traits::is_permxx, NMOD_POLY_MATXX_COND_S, NMOD_POLY_MATXX_COND_S,
+        nmod_poly_mat_solve_fflu_precomp(to._mat(), e1._data(),
+            e2._mat(), e3._mat()))
 } // rules
 } // flint
 
