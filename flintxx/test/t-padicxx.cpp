@@ -49,7 +49,7 @@ test_init()
     tassert(&(a + b).estimate_ctx() == &ctx);
     tassert((a + b).prec() == 30);
 
-    tassert((a + b).create_temporary()._prec() == 30);
+    tassert((a + b).create_temporary().prec() == 30);
     padicxx d((a + b).create_temporary());
     tassert(&d.get_ctx() == &ctx);
     tassert(d.prec() == 30);
@@ -59,6 +59,16 @@ test_init()
 
     tassert(padicxx::zero(ctx).is_zero() && padicxx::zero(ctx, 25).is_zero());
     tassert(padicxx::one(ctx).is_one() && padicxx::one(ctx, 25).is_one());
+
+    a.prec() = 25;
+    tassert(a.prec() == 25);
+    a.val() = 17;
+    tassert(a.val() == 17);
+
+    padicxx zero = padicxx::zero(ctx);
+    tassert(zero.unit() == 0);
+    tassert((zero + zero).unit() == 0);
+    tassert((zero + zero).val() == 0);
 }
 
 void
@@ -101,9 +111,7 @@ template<class T>
 padicxx make_padic(const T& t, long prec = PADIC_DEFAULT_PREC)
 {
     static padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
-    padicxx p(ctx, prec);
-    p = t;
-    return p;
+    return padicxx::from_QQ(t, ctx, prec);
 }
 template<class T, class U>
 bool fuzzy_equals(const T& t, const U& u)
@@ -192,6 +200,23 @@ test_extras()
     tassert(a == b && asr == b);
 
     tassert(ar + asr == a + a);
+    tassert(padicxx(ar) == ar);
+    tassert(padicxx(asr) == ar);
+}
+
+void
+test_prec()
+{
+    padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
+    padicxx a(ctx, 5), b(ctx, 7);
+    padicxx_ref ar(a);
+    padicxx_srcref br(b);
+
+    tassert((a + a).prec() == 5);
+    tassert((a + ar).prec() == 5);
+    tassert((a + b).prec() == 7);
+    tassert((a + br).prec() == 7);
+    tassert((a.toN(15) + br.toN(10)).prec() == 15);
 }
 
 int
@@ -205,6 +230,7 @@ main()
     test_arithmetic();
     test_functions();
     test_extras();
+    test_prec();
 
     std::cout << "PASS" << std::endl;
     return 0;

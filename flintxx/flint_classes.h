@@ -395,6 +395,11 @@ public:                                                                       \
     static name make(const T& f, const U& u)                                  \
     {                                                                         \
         return name(Data::make(f, u));                                        \
+    }                                                                         \
+    template<class T, class U, class V>                                       \
+    static name make(const T& f, const U& u, const V& v)                      \
+    {                                                                         \
+        return name(Data::make(f, u, v));                                     \
     }
 
 #define FLINTXX_DEFINE_FORWARD_STATIC(name)                                   \

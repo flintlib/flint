@@ -43,7 +43,6 @@
 #include "fmpqxx.h"
 
 // TODO check codegen ...
-// TODO lazy version of unit() ?
 
 namespace flint {
 // function "declarations"
@@ -54,15 +53,6 @@ FLINT_DEFINE_UNOP(log_balanced)
 FLINT_DEFINE_UNOP(log_satoh)
 FLINT_DEFINE_UNOP(teichmuller)
 FLINT_DEFINE_BINOP(padic_val_fac)
-
-namespace detail {
-template<class T, class Enable = void>
-struct padicxx_max_prec
-{
-    // XXX is this a good idea?
-    static slong get(const T&) {return 0;}
-};
-} // detail
 
 class padicxx_ctx
 {
@@ -87,6 +77,99 @@ public:
     ~padicxx_ctx() {padic_ctx_clear(ctx);}
 };
 
+namespace traits {
+template<class T> struct has_padicxx_ctx : mp::false_ { };
+
+template<class T> struct is_padic_expr
+    : has_padicxx_ctx<typename tools::evaluation_helper<T>::type> { };
+} // traits
+namespace detail {
+struct has_padicxx_ctx_predicate
+{
+    template<class T> struct type : traits::has_padicxx_ctx<T> { };
+};
+
+template<class T, class Enable = void>
+struct padicxx_max_prec;
+
+template<class T>
+struct padicxx_max_prec<T,
+    typename mp::enable_if<traits::has_padicxx_ctx<T> >::type>
+{
+    static slong get(const T& p) {return p.prec();}
+};
+
+template<class T>
+struct padicxx_max_prec<T,
+    typename mp::disable_if<traits::is_padic_expr<T> >::type>
+{
+    static slong get(const T&) {return 0;}
+};
+
+template<class Data>
+struct padicxx_max_prec_h;
+template<class Head, class Tail>
+struct padicxx_max_prec_h<tuple<Head, Tail> >
+{
+    static slong get(const tuple<Head, Tail>& t)
+    {
+        slong p1 = padicxx_max_prec_h<Tail>::get(t.tail);
+        slong p2 =
+            padicxx_max_prec<typename traits::basetype<Head>::type>::get(t.head);
+        return std::max(p1, p2);
+    }
+};
+template<>
+struct padicxx_max_prec_h<empty_tuple>
+{
+    static slong get(empty_tuple) {return 0;}
+};
+
+template<class T>
+struct padicxx_max_prec<T, typename mp::enable_if<mp::and_<
+    traits::is_padic_expr<T>,
+    mp::not_<traits::is_immediate<T> > > >::type>
+{
+    static slong get(const T& e)
+        {return padicxx_max_prec_h<typename T::data_t>::get(e._data());}
+};
+} // detail
+namespace tools {
+template<class Expr>
+const padicxx_ctx& find_padicxx_ctx(const Expr& e)
+{
+    return tools::find_subexpr<detail::has_padicxx_ctx_predicate>(e).get_ctx();
+}
+
+template<class Expr>
+slong padic_output_prec(const Expr& e)
+{
+    return detail::padicxx_max_prec<Expr>::get(e);
+}
+} // tools
+
+FLINT_DEFINE_UNOP(padicxx_unit)
+
+namespace detail {
+template<class Padic>
+struct padic_traits
+{
+    typedef FLINT_UNOP_BUILD_RETTYPE(padicxx_unit, fmpzxx, Padic)
+        unit_srcref_t;
+
+    typedef slong prec_ref_t;
+    typedef slong prec_srcref_t;
+
+    typedef slong val_ref_t;
+    typedef slong val_srcref_t;
+
+    static slong prec(const Padic& p) {return tools::padic_output_prec(p);}
+    static slong val(const Padic& p) {return padic_val(p.evaluate()._padic());}
+
+    static unit_srcref_t unit(const Padic& p) {return padicxx_unit(p);}
+};
+} //detail
+
 template<class Operation, class Data>
 class padicxx_expression
     : public expression<derived_wrapper<padicxx_expression>, Operation, Data>
@@ -100,16 +183,17 @@ public:
     FLINTXX_DEFINE_C_REF(padicxx_expression, padic_struct, _padic)
 
 public:
+    typedef detail::padic_traits<padicxx_expression> traits_t;
+
     // These only make sense with immediates
-    const padicxx_ctx& get_ctx() const {return this->_data().ctx;}
-    slong _prec() const {return padic_prec(_padic());}
-    padic_ctx_t& _ctx() const {return get_ctx()._ctx();}
     void reduce() {padic_reduce(_padic(), _ctx());}
-    // TODO should these return copies on non-immediate expressions?
-    fmpzxx_ref unit() {return fmpzxx_ref::make(padic_unit(_padic()));}
-    fmpzxx_srcref unit() const {return fmpzxx_srcref::make(padic_unit(_padic()));}
     void set_zero() {padic_zero(_padic());}
     void set_one() {padic_one(_padic());}
+
+#define PADICXX_DEFINE_CTX \
+    const padicxx_ctx& get_ctx() const {return this->_data().ctx;} \
+    padic_ctx_t& _ctx() const {return get_ctx()._ctx();}
+    PADICXX_DEFINE_CTX
 
     static padicxx_expression zero(const padicxx_ctx& ctx)
         {return padicxx_expression(ctx);}
@@ -128,21 +212,40 @@ public:
         return res;
     }
 
-    // Compute the maximal precision of all subexpressions
-    slong prec() const
+    template<class T>
+    static padicxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+            typename mp::enable_if<mp::or_<traits::is_fmpqxx<T>,
+                traits::is_fmpzxx<T>, traits::is_integer<T> > >::type* = 0)
     {
-        return detail::padicxx_max_prec<padicxx_expression>::get(*this);
+        padicxx_expression res(ctx);
+        res = q;
+        return res;
     }
+    template<class T>
+    static padicxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+            slong N,
+            typename mp::enable_if<mp::or_<traits::is_fmpqxx<T>,
+                traits::is_fmpzxx<T>, traits::is_integer<T> > >::type* = 0)
+    {
+        padicxx_expression res(ctx, N);
+        res = q;
+        return res;
+    }
+    // TODO more?
 
     // The above method get_ctx() only works on immediates, i.e. instances of
     // padicxx. This next one here works on any composite expression which
     // contains at least one instance of padicxx. Returns the context of one of
     // those immediate subexpressions.
-    const padicxx_ctx& estimate_ctx() const;
+#define PADICXX_DEFINE_ESTIMATE_CTX \
+    const padicxx_ctx& estimate_ctx() const \
+    { \
+        return tools::find_padicxx_ctx(*this); \
+    }
+    PADICXX_DEFINE_ESTIMATE_CTX
 
     // Create a temporary. The context will be estimated, and the precision
     // will be the maximum of all subexpressions.
-    // TODO should we incorporate target precision, if available?
     evaluated_t create_temporary() const
     {
         return evaluated_t(estimate_ctx(), prec());
@@ -171,10 +274,34 @@ public:
         return res;
     }
 
+#define PADICXX_DEFINE_TON \
+    typename flint_classes::to_srcref<typename base_t::derived_t>::type \
+    toN(slong N) const \
+    { \
+        return flint_classes::to_srcref<typename base_t::derived_t>::type::make( \
+                this->_data().inner, get_ctx(), N); \
+    }
+    PADICXX_DEFINE_TON
+
+    typename traits_t::unit_srcref_t unit() const
+        {return traits_t::unit(*this);}
+
+    // Compute the maximal precision of all subexpressions
+#define PADICXX_DEFINE_PREC \
+    typename traits_t::prec_ref_t prec() {return traits_t::prec(*this);} \
+    typename traits_t::prec_srcref_t prec() const \
+        {return traits_t::prec(*this);}
+    PADICXX_DEFINE_PREC
+
+#define PADICXX_DEFINE_VAL \
+    typename traits_t::val_ref_t val() {return traits_t::val(*this);} \
+    typename traits_t::val_srcref_t val() const \
+        {return traits_t::val(*this);}
+    PADICXX_DEFINE_VAL
+
     // these cause evaluation
     bool is_zero() const {return padic_is_zero(this->evaluate()._padic());}
     bool is_one() const {return padic_is_one(this->evaluate()._padic());}
-    slong val() const {return padic_val(this->evaluate()._padic());}
 
     // forwarding of lazy functions
     FLINTXX_DEFINE_MEMBER_UNOP(exp)
@@ -189,6 +316,13 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
 };
 
+#define PADICXX_DEFINE_STD \
+    PADICXX_DEFINE_CTX \
+    PADICXX_DEFINE_ESTIMATE_CTX \
+    PADICXX_DEFINE_TON \
+    PADICXX_DEFINE_PREC \
+    PADICXX_DEFINE_VAL
+
 namespace detail {
 struct padic_data;
 }
@@ -199,54 +333,118 @@ typedef padicxx_expression<operations::immediate,
 typedef padicxx_expression<operations::immediate, flint_classes::srcref_data<
     padicxx, padicxx_ref, padic_struct> > padicxx_srcref;
 
-namespace flint_classes {
-template<class Padic>
-struct ref_data<Padic, padic_struct>
+namespace traits {
+template<> struct has_padicxx_ctx<padicxx> : mp::true_ { };
+template<> struct has_padicxx_ctx<padicxx_ref> : mp::true_ { };
+template<> struct has_padicxx_ctx<padicxx_srcref> : mp::true_ { };
+
+template<class T> struct is_padicxx : flint_classes::is_Base<padicxx, T> { };
+} // traits
+
+namespace detail {
+template<>
+struct padic_traits<padicxx_srcref>
 {
-    typedef void IS_REF_OR_CREF;
-    typedef Padic wrapped_t;
+    typedef fmpzxx_srcref unit_srcref_t;
+    template<class Poly>
+    static fmpzxx_srcref unit(const Poly& p)
+        {return fmpzxx_srcref::make(padic_unit(p._padic()));}
 
-    typedef padic_struct* data_ref_t;
-    typedef const padic_struct* data_srcref_t;
+    typedef slong prec_ref_t;
+    typedef slong prec_srcref_t;
 
-    padic_struct* inner;
-    const padicxx_ctx& ctx;
+    typedef slong val_ref_t;
+    typedef slong val_srcref_t;
 
-    ref_data(Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}
-
-    static ref_data make(padic_struct* f, const padicxx_ctx& ctx)
-    {
-        return ref_data(f, ctx);
-    }
-
-private:
-    ref_data(padic_struct* fp, const padicxx_ctx& c) : inner(fp), ctx(c) {}
+    template<class P>
+    static slong prec(P p) {return p._data().N;}
+    template<class P>
+    static slong val(P p) {return padic_val(p._padic());}
 };
 
-template<class Padic, class Ref>
-struct srcref_data<Padic, Ref, padic_struct>
+template<>
+struct padic_traits<padicxx_ref>
+    : padic_traits<padicxx_srcref>
 {
-    typedef void IS_REF_OR_CREF;
-    typedef Padic wrapped_t;
+    typedef slong& prec_ref_t;
+    typedef slong& val_ref_t;
 
-    typedef const padic_struct* data_ref_t;
-    typedef const padic_struct* data_srcref_t;
+    template<class P>
+    static slong& prec(P& p) {return padic_prec(p._padic());}
+    template<class P>
+    static slong prec(const P& p) {return padic_prec(p._padic());}
 
-    const padic_struct* inner;
-    const padicxx_ctx& ctx;
-
-    srcref_data(const Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}
-    srcref_data(Ref o) : inner(o._data().inner) {}
-
-    static srcref_data make(const padic_struct* f, const padicxx_ctx& ctx)
-    {
-        return srcref_data(f, ctx);
-    }
-
-private:
-    srcref_data(const padic_struct* fp, const padicxx_ctx& c) : inner(fp), ctx(c) {}
+    template<class P>
+    static slong& val(P& p) {return padic_val(p._padic());}
+    template<class P>
+    static slong val(const P& p) {return padic_val(p._padic());}
 };
-} // flint_classes
+template<>
+struct padic_traits<padicxx>
+    : padic_traits<padicxx_ref> { };
+} // detail
+
+#define PADICXX_DEFINE_REF_STRUCTS(structname, precname)                      \
+namespace flint_classes {                                                     \
+template<class Padic>                                                         \
+struct ref_data<Padic, structname>                                            \
+{                                                                             \
+    typedef void IS_REF_OR_CREF;                                              \
+    typedef Padic wrapped_t;                                                  \
+                                                                              \
+    typedef structname* data_ref_t;                                           \
+    typedef const structname* data_srcref_t;                                  \
+                                                                              \
+    structname* inner;                                                        \
+    const padicxx_ctx& ctx;                                                   \
+                                                                              \
+    ref_data(Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}        \
+                                                                              \
+    static ref_data make(structname* f, const padicxx_ctx& ctx)               \
+    {                                                                         \
+        return ref_data(f, ctx);                                              \
+    }                                                                         \
+                                                                              \
+private:                                                                      \
+    ref_data(structname* fp, const padicxx_ctx& c) : inner(fp), ctx(c) {}     \
+};                                                                            \
+                                                                              \
+template<class Padic, class Ref>                                              \
+struct srcref_data<Padic, Ref, structname>                                    \
+{                                                                             \
+    typedef void IS_REF_OR_CREF;                                              \
+    typedef Padic wrapped_t;                                                  \
+                                                                              \
+    typedef const structname* data_ref_t;                                     \
+    typedef const structname* data_srcref_t;                                  \
+                                                                              \
+    const structname* inner;                                                  \
+    const padicxx_ctx& ctx;                                                   \
+    slong N;                                                                  \
+                                                                              \
+    srcref_data(const Padic& o)                                               \
+        : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}         \
+    srcref_data(Ref o)                                                        \
+        : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}         \
+                                                                              \
+    static srcref_data make(const structname* f, const padicxx_ctx& ctx)      \
+    {                                                                         \
+        return srcref_data(f, ctx);                                           \
+    }                                                                         \
+    static srcref_data make(const structname* f, const padicxx_ctx& ctx,      \
+            slong N)                                                          \
+    {                                                                         \
+        return srcref_data(f, ctx, N);                                        \
+    }                                                                         \
+                                                                              \
+private:                                                                      \
+    srcref_data(const structname* fp, const padicxx_ctx& c)                   \
+        : inner(fp), ctx(c), N(precname(fp)) {}                               \
+    srcref_data(const structname* fp, const padicxx_ctx& c, slong n)          \
+        : inner(fp), ctx(c), N(n) {}                                          \
+};                                                                            \
+} /* flint_classes */
+PADICXX_DEFINE_REF_STRUCTS(padic_struct, padic_prec)
 
 namespace detail {
 struct padic_data
@@ -276,66 +474,19 @@ struct padic_data
         padic_set(inner, o.inner, ctx._ctx());
     }
 
-    // TODO more constructors? (e.g. unit, val?)
-
     ~padic_data() {padic_clear(inner);}
 
-    // TODO construct from reference
+    padic_data(padicxx_srcref c)
+        : ctx(c.get_ctx())
+    {
+        padic_init2(inner, c.prec());
+        padic_set(inner, c._padic(), ctx._ctx());
+    }
 };
 } // detail
 
 #define PADICXX_COND_S FLINTXX_COND_S(padicxx)
 #define PADICXX_COND_T FLINTXX_COND_T(padicxx)
-
-namespace detail {
-struct is_padicxx_predicate
-{
-    template<class T> struct type : PADICXX_COND_S<T> { };
-};
-}
-template<class Operation, class Data>
-inline const padicxx_ctx&
-padicxx_expression<Operation, Data>::estimate_ctx() const
-{
-    return tools::find_subexpr<detail::is_padicxx_predicate>(*this).get_ctx();
-}
-
-namespace detail {
-template<class T>
-struct padicxx_max_prec<T, typename mp::enable_if<PADICXX_COND_S<T> >::type>
-{
-    static slong get(const T& p) {return p._prec();}
-};
-
-template<class Data>
-struct padicxx_max_prec_h;
-template<class Head, class Tail>
-struct padicxx_max_prec_h<tuple<Head, Tail> >
-{
-    static slong get(const tuple<Head, Tail>& t)
-    {
-        slong p1 = padicxx_max_prec_h<Tail>::get(t.tail);
-        slong p2 =
-            padicxx_max_prec<typename traits::basetype<Head>::type>::get(t.head);
-        return std::max(p1, p2);
-    }
-};
-template<>
-struct padicxx_max_prec_h<empty_tuple>
-{
-    static slong get(empty_tuple) {return 0;}
-};
-
-template<class Op, class Data>
-struct padicxx_max_prec<padicxx_expression<Op, Data>,
-    typename mp::disable_if<mp::equal_types<Op, operations::immediate> >::type>
-{
-    static slong get(const padicxx_expression<Op, Data>& e)
-    {
-        return padicxx_max_prec_h<Data>::get(e._data());
-    }
-};
-} // detail
 
 namespace rules {
 
@@ -360,6 +511,9 @@ FLINTXX_DEFINE_TO_STR(padicxx, padic_get_str(0, from._padic(), from._ctx()))
 FLINTXX_DEFINE_SWAP(padicxx, padic_swap(e1._padic(), e2._padic()))
 
 FLINTXX_DEFINE_EQUALS(padicxx, padic_equal(e1._padic(), e2._padic()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(padicxx_unit_op, fmpzxx, PADICXX_COND_S,
+        fmpz_set(to._fmpz(), padic_unit(from._padic())))
 
 
 FLINT_DEFINE_CBINARY_EXPR_COND2(plus, padicxx, PADICXX_COND_S, PADICXX_COND_S,
