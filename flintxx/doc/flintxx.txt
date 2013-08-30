@@ -3438,7 +3438,17 @@ fmpz_mod_poly_factorxx factor_squarefree(Fmpz_mod_poly_expr)
             subexpression.
     \end{itemize}
 
+    In most use cases, all objects in a compound expression have the same
+    precision, and so temporary expressions are evaluated to this precision. If
+    you need temporary subexpressions to be evaluated to higher precision, the
+    \code{toN} method can be used on immediates to increase their effective
+    precision, thus (potentially) increasing the precision of intermediates.
+
 *******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Context
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 padicxx_ctx::padicxx_ctx(Fmpz_src p, long min, long max, padic_print_mode mode)
 
@@ -3455,6 +3465,55 @@ padic_ctx_t& padicxx_ctx::_ctx() const
     If this is called on a constant instance of \code{padicxx_ctx}, you must
     ensure that no user-visible state is changed.
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const padicxx_ctx& Padic_src::get_ctx() const
+padic_ctx_t& Padic_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+const padicxx_ctx& Padic_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression. As per the
+    first rule in the introduction to this section, all such contexts are the
+    same by definition.
+
+Padic_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{exp}, \code{exp_balanced}, \code{exp_rectangular}, \code{inv},
+    \code{log}, \code{log_balanced}, \code{log_satoh}, \code{sqrt},
+    \code{teichmuller}.
+
+Padic_expr Padic_expr::pow(T:fits_into_slong) const
+
+padicxx_srcref Padic_src::toN(slong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Data structures
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Padic_expr::unit() const
+
+    See \code{padic_unit}.
+
+slong Padic_expr::val() const
+slong& Padic_target::val()
+
+slong Padic_expr::prec() const
+slong& Padic_target::prec()
+
+    Obtain the precision of this instance. See \code{padic_prec}.
+    Note that this never requires evaluation.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 padicxx::padicxx(const padicxx_ctx&)
 
     Initialize padic number to default precision. See \code{padic_init}.
@@ -3463,12 +3522,13 @@ padicxx::padicxx(const padicxx_ctx& c, long N)
 
     Initialize padic number to precision $N$. See \code{padic_init2}.
 
-void Padic_target::set_zero()
-void Padic_target::set_one()
-static padicxx padicxx::zero(const padicxx_ctx& c)
-static padicxx padicxx::zero(const padicxx_ctx& c, long N)
-static padicxx padicxx::one(const padicxx_ctx& c)
-static padicxx padicxx::one(const padicxx_ctx& c, long N)
+void Padic_target::reduce()
+
+    See \code{padic_reduce}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 static padicxx padicxx::randtest(frandxx& state, const padicxx_ctx& ctx,
         slong prec = PADIC_DEFAULT_PREC)
@@ -3483,48 +3543,31 @@ static padicxx padicxx::randtest_not_zero(frandxx& state,
     \code{padic_randtest}, \code{padic_randtest_int} and
     \code{padic_randtest_not_zero}.
 
-static padicxx_ref padicxx_ref::make(padic* f)
-static padicxx_srcref padicxx_srcref::make(const padic* f)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    Obtain a flintxx reference object pointing to \code{*f}. Here \code{f} must
-    not be zero.
+Padic_target Padic_target::operator=(T:is_integer)
+Padic_target Padic_target::operator=(Fmpz_expr)
+Padic_target Padic_target::operator=(Fmpq_expr)
 
-padic* Padic_target::_padic()
-const padic* Padic_src::_padic() const
+padicxx padicxx::from_QQ(Fmpq_expr, const padicxx_ctx&)
+padicxx padicxx::from_QQ(Fmpz_expr, const padicxx_ctx&)
+padicxx padicxx::from_QQ(T:is_integer, const padicxx_ctx&)
+padicxx padicxx::from_QQ(Fmpq_expr, const padicxx_ctx&, slong N)
+padicxx padicxx::from_QQ(Fmpz_expr, const padicxx_ctx&, slong N)
+padicxx padicxx::from_QQ(T:is_integer, const padicxx_ctx&, slong N)
 
-    Obtain a reference to the underlying C data type.
+void Padic_target::set_zero()
+void Padic_target::set_one()
 
-const padicxx_ctx& Padic_src::get_ctx() const
-padic_ctx_t& Padic_src::_ctx() const
-
-    Obtain a reference to the context of this instance.
-
-slong Padic_src::_prec() const
-
-    Obtain the precision of this instance. See \code{padic_prec}.
-
-void Padic_target::reduce()
-
-    See \code{padic_reduce}.
-
-fmpzxx_ref Padic_target::unit()
-fmpzxx_srcref Padic_src::unit() const
-
-    See \code{padic_unit}.
-
-slong Padic_expr::prec() const
-
-    Compute the maximum precision of any subexpression.
-
-const padicxx_ctx& Padic_expr::estimate_ctx() const
-
-    Obtain a reference to a context occurring in a subexpression. As per the
-    first rule in the introduction to this section, all such contexts are the
-    same by definition.
+padicxx padicxx::zero(const padicxx_ctx&)
+padicxx padicxx::zero(const padicxx_ctx&, slong N)
+padicxx padicxx::one(const padicxx_ctx&)
+padicxx padicxx::one(const padicxx_ctx&, slong N)
 
 bool Padic_expr::is_zero() const
 bool Padic_expr::is_one() const
-slong Padic_expr::val() const
 
 fmpzxx Padic_expr::to<fmpzxx>() const
 
@@ -3536,31 +3579,14 @@ fmpqxx Padic_expr::to<fmpqxx>() const
 
 std::string Fmpz_expr::to_string() const
 
-Padic_expr::unary operation() const
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic operations
 
-    The following unary functions are made available as member functions:
-    \code{exp}, \code{exp_balanced}, \code{exp_rectangular}, \code{inv},
-    \code{log}, \code{log_balanced}, \code{log_satoh}, \code{sqrt},
-    \code{teichmuller}.
+    The overloaded operators \code{+ - * / << >>} can be used for arithmetic
+    operations, provided these are implemented for \code{padic_t}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Padic_expr Padic_expr::pow(T:fits_into_slong) const
-
-Padic_target Padic_target::operator=(T:is_integer)
-Padic_target Padic_target::operator=(Fmpz_expr)
-Padic_target Padic_target::operator=(Fmpq_expr)
-
-bool operator==(Padic_expr, Padic_expr)
-
-Padic_expr operator??(Padic_expr, Padic_expr)
-
-    Arithmetic operators \code{+ - * /} are overloaded for padic expressions.
-
-Padic_expr operator<<(Padic_expr, T:fits_into_slong)
-Padic_expr operator>>(Padic_expr, T:fits_into_slong)
-
-    Shift operators are overloaded.
-
-Padic_expr operator-(Padic_expr)
+Padic_expr inv(Padic_expr)
 
 Padic_expr sqrt(Padic_expr)
 
@@ -3569,23 +3595,345 @@ Padic_expr sqrt(Padic_expr)
 
 Padic_expr pow(Padic_expr, T:fits_into_slong)
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Exponential
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Padic_expr exp(Padic_expr)
 Padic_expr exp_rectangular(Padic_expr)
 Padic_expr exp_balanced(Padic_expr)
+
+    Compute the exponential function. These may raise \code{flint_exception}s if the
+    series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Logarithm
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Padic_expr log(Padic_expr)
 Padic_expr log_rectangular(Padic_expr)
 Padic_expr log_balanced(Padic_expr)
 Padic_expr log_satoh(Padic_expr)
 
-    Compute special functions. These may raise \code{flint_exception}s if the
+    Compute the logarithm function. These may raise \code{flint_exception}s if the
     series do not converge.
 
-Padic_expr inv(Padic_expr)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Special functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Padic_expr teichmuller(Padic_expr)
 
 Fmpz_expr padic_val_fac(Fmpz_expr, Fmpz_expr)
 ulong padic_val_fac(T:is_unsigned_integer, Fmpz_expr)
+
+
+
+*******************************************************************************
+
+    padic\_polyxx
+
+    The type \code{padic_polyxx} wraps \code{padic_poly}. Like \code{padicxx},
+    every instance of \code{padic_polyxx} contains a reference to a context
+    \code{padicxx_ctx}, and stores its own precision. The same rules regarding
+    temporary expressions apply to \code{padic_polyxx} as to \code{padicxx}.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const padicxx_ctx& Padic_poly_src::get_ctx() const
+padic_ctx_t& Padic_poly_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+const padicxx_ctx& Padic_poly_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression.
+
+Padic_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}.
+
+Padic_poly_expr::binary operation() const
+
+    The following binary functions are made available as member functions:
+    \code{pow}, \code{compose_pow}, \code{inv_series}, \code{shift_left},
+    \code{shift_right}.
+
+padic_polyxx_srcref Padic_poly_src::toN(slong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_polyxx::padic_polyxx(const padicxx_ctx&)
+
+    Initialise to zero. See \code{padic_poly_init}.
+
+padic_polyxx::padic_polyxx(const padicxx_ctx&, slong prec, slong alloc = 0)
+
+    See \code{padic_poly_init2}.
+
+void Padic_poly_target realloc(slong alloc)
+void Padic_poly_target::fit_length(slong len)
+void Padic_poly_target::canonicalise()
+void Padic_poly_target::reduce()
+void Padic_poly_target::truncate(slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial parameters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Padic_poly_expr::length() const
+slong Padic_poly_expr::degree() const
+
+slong Padic_expr::val() const
+slong& Padic_target::val()
+
+slong Padic_expr::prec() const
+slong& Padic_target::prec()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static padic_polyxx padic_polyxx::randtest(frandxx& state, const padicxx_ctx& ctx,
+        slong len,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static padic_polyxx padic_polyxx::randtest_val(frandxx& state, const padicxx_ctx& ctx,
+        slong len, slong val,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static padic_polyxx padic_polyxx::randtest_not_zero(frandxx& state,
+        slong len,
+        const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment an basic manipulation
+
+    The overloaded \code{operator=} can be used for assignments. Additionally,
+    we provide the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, const padicxx_ctx&, slong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, const padicxx_ctx&, slong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, const padicxx_ctx&, slong N)
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, const padicxx_ctx&)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, const padicxx_ctx&)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, const padicxx_ctx&)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, const padicxx_ctx&, slong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpq_poly_expr, const padicxx_ctx&, slong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, const padicxx_ctx&)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, const padicxx_ctx&)
+padic_polyxx padic_polyxx::from_ground(Padic_expr)
+
+fmpz_polyxx Padic_poly_expr::to<fmpz_polyxx>() const
+
+    Convert to an integer polynomial. Raises \code{flint_exception} if the
+    polynomial is not p-adically integral. See \code{padic_poly_get_fmpz_poly}.
+
+fmpq_polyxx Padic_poly_expr::to<fmpq_polyxx>() const
+
+    See \code{padic_poly_get_fmpq_poly}.
+
+padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&)
+padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&, slong N)
+padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&)
+padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&, slong N)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr Padic_poly_expr::get_coeff(slong n) const
+void Padic_poly_target::set_coeff(slong i, Padic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded \code{operator==} can be used for comparison.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Padic_poly_expr::is_zero() const
+bool Padic_poly_expr::is_one() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - *} can be used for arithmetic.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr pow(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Series inversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr inv_series_newton(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr derivative(Padic_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr shift_left(Padic_poly_expr, T:fits_into_slong)
+Padic_poly_expr shift_right(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation and composition
+
+    The overloaded \code{operator()} can be used for both evaluation and
+    composition.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr evaluate(Padic_poly_expr, Padic_expr)
+Padic_poly_expr compose(Padic_poly_expr, Padic_poly_expr)
+Padic_poly_expr compose_pow(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Testing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Padic_poly_src::is_canonical() const
+bool Padic_poly_src::is_reduced() const
+
+
+
+
+*******************************************************************************
+
+    padic\_matxx
+
+    The type \code{padic_matxx} wraps \code{padic_mat}. Like \code{padicxx},
+    every instance of \code{padic_matxx} contains a reference to a context
+    \code{padicxx_ctx}, and stores its own precision. The same rules regarding
+    temporary expressions apply to \code{padic_matxx} as to \code{padicxx}.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const padicxx_ctx& Padic_mat_src::get_ctx() const
+padic_ctx_t& Padic_mat_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+const padicxx_ctx& Padic_mat_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression.
+
+padic_matxx_srcref Padic_mat_src::toN(slong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
+slong Padic_mat_expr::rows() const
+slong Padic_mat_expr::cols() const
+
+    Obtain the number of rows/columns of this matrix. This never evaluates.
+
+slong Padic_mat_expr::val() const
+slong& Padic_mat_target::val()
+
+Padic_mat_expr Padic_mat_expr::transpose() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_matxx::padic_matxx(const padicxx_ctx&, slong rows, slong cols)
+
+    See \code{padic_mat_init}.
+
+padic_matxx::padic_matxx(const padicxx_ctx&, slong rows, slong cols, slong prec)
+
+    See \code{padic_mat_init2}.
+
+void Padic_mat_target::canonicalise()
+void Padic_mat_target::reduce()
+bool Padic_mat_src::is_canonical() const
+bool Padic_mat_src::is_reduced() const
+bool Padic_mat_src::is_square() const
+bool Padic_mat_src::is_empty() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment
+
+    Overloaded \code{operatior=} can be used for assignment.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Padic_mat_target::set_zero()
+void Padic_mat_target::set_one()
+padic_matxx padic_matxx::zero(const padicxx_ctx&)
+padic_matxx padic_matxx::zero(const padicxx_ctx&, slong N)
+padic_matxx padic_matxx::one(const padicxx_ctx&)
+padic_matxx padic_matxx::one(const padicxx_ctx&, slong N)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
+
+    Converting from a \code{fmpq_matxx} can be done using \code{operator=}, or
+    the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_matxx padic_matxx::from_QQ(Fmpq_mat_expr, const padicxx_ctx&)
+fmpq_matxx Padic_mat_expr::to<fmpq_matxx>() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Entries
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Padic_mat_expr::at(slong i, slong j)
+
+    Unified coefficient access to the underlying integer matrix. See
+    \code{padic_mat_entry}.
+
+Fmpz_expr Padic_mat_expr::get_entry(slong i, slong j)
+void Padic_mat_target::set_entry(slong i, slong j, Padic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    Overloaded \code{operator==} can be used for comparison.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Padic_mat_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static padic_polyxx padic_polyxx::randtest(slong rows, slong cols,
+        frandxx& state, const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_mat_expr transpose(Padic_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    Overloaded operators \code{+ - * /} can be used for arithmetic.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 

@@ -141,6 +141,8 @@ test_functions()
     for(slong i = 0;i < B.rows();++i)
         for(slong j = 0;j < B.cols();++j)
             tassert(B.get_entry(i, j) == A.get_entry(j, i));
+
+    tassert(!A.is_square() && !A.is_empty());
 }
 
 // test stuff which we should get automatically - references etc

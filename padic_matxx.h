@@ -34,6 +34,7 @@
 #include "flintxx/matrix.h"
 
 // TODO input and output
+// TODO wrap padic_mat, padic_one
 
 namespace flint {
 FLINT_DEFINE_THREEARY(padic_matxx_get_entry)
