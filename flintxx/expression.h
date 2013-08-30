@@ -200,6 +200,9 @@ public:
     template<class T, class U, class V>
     expression(const T& t, const U& u, const V& v)
         : data(t, u, v) {}
+    template<class T, class U, class V, class W>
+    expression(const T& t, const U& u, const V& v, const W& w)
+        : data(t, u, v, w) {}
 
     expression() : data(get_data()) {}
 

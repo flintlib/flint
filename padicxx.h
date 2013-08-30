@@ -43,6 +43,8 @@
 #include "fmpqxx.h"
 
 // TODO check codegen ...
+// TODO padic_output_prec does not work on non-padic expressions,
+//      is that a problem?
 
 namespace flint {
 // function "declarations"

@@ -360,7 +360,10 @@ public:                                                                       \
     template<class T, class U>                                                \
     name(const T& t, const U& u) : base_t(t, u) {}                            \
     template<class T, class U, class V>                                       \
-    name(const T& t, const U& u, const V& v) : base_t(t, u, v) {}
+    name(const T& t, const U& u, const V& v) : base_t(t, u, v) {}             \
+    template<class T, class U, class V, class W>                              \
+    name(const T& t, const U& u, const V& v, const W& w)                      \
+        : base_t(t, u, v, w) {}
 
 #define FLINTXX_DEFINE_C_REF(name, ctype, accessname)                         \
 public:                                                                       \
@@ -534,7 +537,7 @@ name(const T& t) const \
 
 #define FLINTXX_DEFINE_MEMBER_3OP_(name, funcname) \
 template<class T, class U> \
-typename detail::nary_op_helper2<operations::name##_op, \
+typename detail::nary_op_helper2<operations::funcname##_op, \
     typename base_t::derived_t, T, U>::enable::type \
 name(const T& t, const U& u) const \
 { \
@@ -546,7 +549,7 @@ name(const T& t, const U& u) const \
 
 #define FLINTXX_DEFINE_MEMBER_4OP_(name, funcname) \
 template<class T, class U, class V> \
-typename detail::nary_op_helper2<operations::name##_op, \
+typename detail::nary_op_helper2<operations::funcname##_op, \
     typename base_t::derived_t, T, U, V>::enable::type \
 name(const T& t, const U& u, const V& v) const \
 { \
@@ -558,7 +561,7 @@ name(const T& t, const U& u, const V& v) const \
 
 #define FLINTXX_DEFINE_MEMBER_5OP_(name, funcname) \
 template<class T, class U, class V, class W> \
-typename detail::nary_op_helper2<operations::name##_op, \
+typename detail::nary_op_helper2<operations::funcname##_op, \
     typename base_t::derived_t, T, U, V, W>::enable::type \
 name(const T& t, const U& u, const V& v, const W& w) const \
 { \
