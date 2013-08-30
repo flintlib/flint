@@ -36,6 +36,11 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+
 /*  Type definitions  ********************************************************/
 
 typedef struct
@@ -415,6 +420,10 @@ int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N,
                            const padic_ctx_t ctx);
 
 int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

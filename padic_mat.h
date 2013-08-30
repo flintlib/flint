@@ -37,6 +37,11 @@
 #include "fmpq_mat.h"
 #include "padic.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+
 typedef struct
 {
     fmpz_mat_struct mat;
@@ -246,6 +251,10 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
 
 void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
