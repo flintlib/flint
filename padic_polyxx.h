@@ -29,9 +29,16 @@
 #include "padic_poly.h"
 
 #include "padicxx.h"
+#include "fmpz_polyxx.h"
+#include "fmpq_polyxx.h"
+
+#include "flintxx/stdmath.h"
+
+// TODO input and output
 
 namespace flint {
 FLINT_DEFINE_BINOP(padic_polyxx_get_coeff)
+FLINT_DEFINE_BINOP(compose_pow)
 
 namespace detail {
 template<class Padic>
@@ -44,7 +51,7 @@ struct padic_poly_traits
     typedef slong val_srcref_t;
 
     static slong prec(const Padic& p) {return tools::padic_output_prec(p);}
-    static slong val(const Padic& p) {return padic_poly_val(p.evaluate()._padic());}
+    static slong val(const Padic& p) {return padic_poly_val(p.evaluate()._poly());}
 };
 } //detail
 
@@ -101,7 +108,38 @@ public:
         res = q;
         return res;
     }
-    // TODO more?
+    template<class T>
+    static padic_polyxx_expression from_QQX(const T& q, const padicxx_ctx& ctx,
+            typename mp::enable_if<mp::or_<traits::is_fmpq_polyxx<T>,
+                traits::is_fmpz_polyxx<T> > >::type* = 0)
+    {
+        padic_polyxx_expression res(ctx);
+        res = q;
+        return res;
+    }
+    template<class T>
+    static padic_polyxx_expression from_QQX(const T& q, const padicxx_ctx& ctx,
+            slong N,
+            typename mp::enable_if<mp::or_<traits::is_fmpq_polyxx<T>,
+                traits::is_fmpz_polyxx<T> > >::type* = 0)
+    {
+        padic_polyxx_expression res(ctx, N);
+        res = q;
+        return res;
+    }
+    template<class T>
+    static padic_polyxx_expression _from_ground(const T& q)
+    {
+        padic_polyxx_expression res(q.get_ctx(), q.prec());
+        res = q;
+        return res;
+    }
+    template<class T>
+    static padic_polyxx_expression from_ground(const T& q,
+            typename mp::enable_if<traits::is_padicxx<T> >::type* = 0)
+    {
+        return _from_ground(q.evaluate());
+    }
 
     // Create a temporary. The context will be estimated, and the precision
     // will be the maximum of all subexpressions.
@@ -110,30 +148,31 @@ public:
         return evaluated_t(estimate_ctx(), prec());
     }
 
-#if 0
     // static methods which only make sense with padicxx
     static padic_polyxx_expression randtest(frandxx& state,
+            slong len,
             const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_polyxx_expression res(ctx, prec);
-        padic_randtest(res._padic(), state._data(), ctx._ctx());
+        padic_poly_randtest(res._poly(), state._data(), len, ctx._ctx());
         return res;
     }
     static padic_polyxx_expression randtest_not_zero(frandxx& state,
+            slong len,
             const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_polyxx_expression res(ctx, prec);
-        padic_randtest_not_zero(res._padic(), state._data(), ctx._ctx());
+        padic_poly_randtest_not_zero(res._poly(), state._data(), len, ctx._ctx());
         return res;
     }
-    static padic_polyxx_expression randtest_int(frandxx& state,
+    static padic_polyxx_expression randtest_val(frandxx& state,
+            slong val, slong len,
             const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_polyxx_expression res(ctx, prec);
-        padic_randtest_int(res._padic(), state._data(), ctx._ctx());
+        padic_poly_randtest_val(res._poly(), state._data(), val, len, ctx._ctx());
         return res;
     }
-#endif
 
     // These only make sense with immediates
     void reduce() {padic_poly_reduce(_poly(), _ctx());}
@@ -144,20 +183,30 @@ public:
     void set_zero() {padic_poly_zero(_poly());}
     void set_one() {padic_poly_one(_poly());}
     void truncate(slong n) {fmpz_poly_truncate(_poly(), n);}
+    void canonicalise() {padic_poly_canonicalise(_poly());}
+    bool is_canonical() const {return padic_poly_is_canonical(_poly());}
+    bool is_reduced() const {return padic_poly_is_reduced(_poly());}
 
     template<class Padic>
     void set_coeff(slong n, const Padic& p,
             typename mp::enable_if<traits::is_padicxx<Padic> >::type* = 0)
-        {padic_poly_set_coeff_padic(_poly(), n, p._padic());}
+        {padic_poly_set_coeff_padic(_poly(), n, p._padic(), _ctx());}
 
     // these cause evaluation
-    bool is_zero() const {return padic_poly_is_zero(this->evaluate()._padic());}
-    bool is_one() const {return padic_poly_is_one(this->evaluate()._padic());}
+    bool is_zero() const {return padic_poly_is_zero(this->evaluate()._poly());}
+    bool is_one() const {return padic_poly_is_one(this->evaluate()._poly());}
     slong length() const {return padic_poly_length(this->evaluate()._poly());}
     slong degree() const {return padic_poly_degree(this->evaluate()._poly());}
 
     // forwarding of lazy functions
     FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, padic_polyxx_get_coeff)
+    FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
+    FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_BINOP(compose_pow)
+    FLINTXX_DEFINE_MEMBER_BINOP(inv_series)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_left)
+    FLINTXX_DEFINE_MEMBER_BINOP(shift_right)
+    FLINTXX_DEFINE_MEMBER_UNOP(derivative)
 };
 
 namespace detail {
@@ -191,7 +240,7 @@ struct padic_poly_traits<padic_polyxx_srcref>
     template<class P>
     static slong prec(P p) {return p._data().N;}
     template<class P>
-    static slong val(P p) {return padic_poly_val(p._padic_poly());}
+    static slong val(P p) {return padic_poly_val(p._poly());}
 };
 
 template<>
@@ -202,14 +251,14 @@ struct padic_poly_traits<padic_polyxx_ref>
     typedef slong& val_ref_t;
 
     template<class P>
-    static slong& prec(P& p) {return padic_poly_prec(p._padic_poly());}
+    static slong& prec(P& p) {return padic_poly_prec(p._poly());}
     template<class P>
-    static slong prec(const P& p) {return padic_poly_prec(p._padic_poly());}
+    static slong prec(const P& p) {return padic_poly_prec(p._poly());}
 
     template<class P>
-    static slong& val(P& p) {return padic_poly_val(p._padic_poly());}
+    static slong& val(P& p) {return padic_poly_val(p._poly());}
     template<class P>
-    static slong val(const P& p) {return padic_poly_val(p._padic_poly());}
+    static slong val(const P& p) {return padic_poly_val(p._poly());}
 };
 template<>
 struct padic_poly_traits<padic_polyxx>
@@ -264,16 +313,81 @@ struct padic_poly_data
 namespace rules {
 FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, PADIC_POLYXX_COND_S,
         padic_poly_set(to._poly(), from._poly(), to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, PADICXX_COND_S,
+        padic_poly_set_padic(to._poly(), from._padic(), to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, traits::is_signed_integer,
+        padic_poly_set_si(to._poly(), from, to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, traits::is_unsigned_integer,
+        padic_poly_set_ui(to._poly(), from, to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, FMPZXX_COND_S,
+        padic_poly_set_fmpz(to._poly(), from._fmpz(), to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, FMPQXX_COND_S,
+        padic_poly_set_fmpq(to._poly(), from._fmpq(), to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, FMPZ_POLYXX_COND_S,
+        padic_poly_set_fmpz_poly(to._poly(), from._poly(), to._ctx()))
+FLINT_DEFINE_DOIT_COND2(assignment, PADIC_POLYXX_COND_T, FMPQ_POLYXX_COND_S,
+        padic_poly_set_fmpq_poly(to._poly(), from._poly(), to._ctx()))
 
 FLINTXX_DEFINE_SWAP(padic_polyxx, padic_poly_swap(e1._poly(), e2._poly()))
 
 FLINTXX_DEFINE_EQUALS(padic_polyxx, padic_poly_equal(e1._poly(), e2._poly()))
 
+FLINTXX_DEFINE_CONVERSION_TMP(fmpz_polyxx, padic_polyxx,
+        execution_check(padic_poly_get_fmpz_poly(
+                to._poly(), from._poly(), from._ctx()),
+            "to<fmpz_polyxx>", "padic_polyxx"))
+FLINTXX_DEFINE_CONVERSION_TMP(fmpq_polyxx, padic_polyxx,
+        padic_poly_get_fmpq_poly(to._poly(), from._poly(), from._ctx()))
+
 FLINT_DEFINE_BINARY_EXPR_COND2(padic_polyxx_get_coeff_op, padicxx,
         PADIC_POLYXX_COND_S, traits::fits_into_slong,
         padic_poly_get_coeff_padic(to._padic(), e1._poly(), e2, to._ctx()))
-} // rules
 
+FLINT_DEFINE_CBINARY_EXPR_COND2(plus, padic_polyxx,
+        PADIC_POLYXX_COND_S, PADIC_POLYXX_COND_S,
+        padic_poly_add(to._poly(), e1._poly(), e2._poly(), to._ctx()))
+FLINT_DEFINE_BINARY_EXPR_COND2(minus, padic_polyxx,
+        PADIC_POLYXX_COND_S, PADIC_POLYXX_COND_S,
+        padic_poly_sub(to._poly(), e1._poly(), e2._poly(), to._ctx()))
+FLINT_DEFINE_UNARY_EXPR_COND(negate, padic_polyxx, PADIC_POLYXX_COND_S,
+        padic_poly_neg(to._poly(), from._poly(), to._ctx()))
+
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, padic_polyxx,
+        PADIC_POLYXX_COND_S, PADICXX_COND_S,
+        padic_poly_scalar_mul_padic(to._poly(), e1._poly(), e2._padic(), to._ctx()))
+FLINT_DEFINE_CBINARY_EXPR_COND2(times, padic_polyxx,
+        PADIC_POLYXX_COND_S, PADIC_POLYXX_COND_S,
+        padic_poly_mul(to._poly(), e1._poly(), e2._poly(), to._ctx()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, padic_polyxx, PADIC_POLYXX_COND_S,
+        traits::is_unsigned_integer,
+        padic_poly_pow(to._poly(), e1._poly(), e2, to._ctx()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_op, padic_polyxx,
+        PADIC_POLYXX_COND_S, traits::fits_into_slong,
+        padic_poly_inv_series(to._poly(), e1._poly(), e2, to._ctx()))
+
+FLINT_DEFINE_UNARY_EXPR_COND(derivative_op, padic_polyxx, PADIC_POLYXX_COND_S,
+        padic_poly_derivative(to._poly(), from._poly(), to._ctx()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_left_op, padic_polyxx,
+        PADIC_POLYXX_COND_S, traits::fits_into_slong,
+        padic_poly_shift_left(to._poly(), e1._poly(), e2, to._ctx()))
+FLINT_DEFINE_BINARY_EXPR_COND2(shift_right_op, padic_polyxx,
+        PADIC_POLYXX_COND_S, traits::fits_into_slong,
+        padic_poly_shift_right(to._poly(), e1._poly(), e2, to._ctx()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(evaluate_op, padicxx,
+        PADIC_POLYXX_COND_S, PADICXX_COND_S,
+        padic_poly_evaluate_padic(to._padic(), e1._poly(), e2._padic(), to._ctx()))
+
+FLINT_DEFINE_BINARY_EXPR_COND2(compose_op, padic_polyxx,
+        PADIC_POLYXX_COND_S, PADIC_POLYXX_COND_S,
+        padic_poly_compose(to._poly(), e1._poly(), e2._poly(), to._ctx()))
+FLINT_DEFINE_BINARY_EXPR_COND2(compose_pow_op, padic_polyxx,
+        PADIC_POLYXX_COND_S, traits::fits_into_slong,
+        padic_poly_compose_pow(to._poly(), e1._poly(), e2, to._ctx()))
+} // rules
 } // flint
 
 #endif
