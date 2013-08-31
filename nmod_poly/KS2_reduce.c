@@ -45,7 +45,7 @@ _nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op, slong n, ulong w,
    else if (w == 2)
    {
       for (; n; n--, res += s, op += 2)
-         NMOD_RED2(*res, op[1], op[0], mod);
+         NMOD2_RED2(*res, op[1], op[0], mod);
    }
    else /* w == 3 */
    {
@@ -123,7 +123,7 @@ _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
       x1 = *op1++;
       if (y0 < x0)
          y1--;
-      NMOD_RED2(*res, y1 >> b2, x0 + (y1 << b), mod);
+      NMOD2_RED2(*res, y1 >> b2, x0 + (y1 << b), mod);
       res += s;
       y1 += borrow;
       borrow = (x1 < y1);
@@ -161,7 +161,7 @@ _nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
       x1 = *op1++;
       if (y0 < x0)
          y1--;
-      NMOD_RED2(*res, y1, x0, mod);
+      NMOD2_RED2(*res, y1, x0, mod);
       res += s;
       y1 += borrow;
       borrow = (x1 < y1);
