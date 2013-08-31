@@ -43,8 +43,6 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
     bits = FLINT_BITS - (slong) mod.norm;
     bits2 = FLINT_BIT_COUNT(len1);
 
-    tmp = flint_malloc(sizeof(mp_limb_t) * (len1 + len2 - 1));
-
     if (2 * bits + bits2 <= FLINT_BITS && len1 + len2 < 16)
         _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
     else if (bits * len2 > 2000)
@@ -53,8 +51,6 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
         _nmod_poly_mul_KS2(res, poly1, len1, poly2, len2, mod);
     else
         _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, 0, mod);
-
-    flint_free(tmp);
 }
 
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
