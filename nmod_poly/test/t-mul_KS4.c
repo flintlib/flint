@@ -133,6 +133,7 @@ main(void)
     }
 
     /* Test bug */
+#if FLINT64
     {
         nmod_poly_t a, b, c, d;
         mp_limb_t mod = 2289285083314003039UL;
@@ -160,6 +161,7 @@ main(void)
         nmod_poly_clear(c);
         nmod_poly_clear(d);
     }
+#endif
 
     flint_randclear(state);
 
