@@ -25,6 +25,11 @@
 
 ******************************************************************************/
 
+int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n)
+
+    If \code{op1 >= op2} return 0 and set \code{res} to \code{op1 - op2}
+    else return 1 and set \code{res} to \code{op2 - op1}.
+
 *******************************************************************************
 
     Memory management
@@ -387,6 +392,83 @@ void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f,
     represented by the integer \code{f}.
 
 
+void _nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
+                ulong b, ulong k, slong r)
+
+    Same as \code{_nmod_poly_KS2_pack}, but requires \code{b <= FLINT_BITS}.
+
+void _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
+               ulong b, ulong k, slong r)
+
+    Bit packing routine used by KS2 and KS4 multiplication.
+
+void _nmod_poly_KS2_unpack1(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                  ulong k)
+
+    Same as \code{_nmod_poly_KS2_unpack}, but requires \code{b <= FLINT_BITS}
+    (i.e. writes one word per coefficient).
+
+void _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                  ulong k)
+
+    Same as \code{_nmod_poly_KS2_unpack}, but requires 
+    \code{FLINT_BITS < b <= 2 * FLINT_BITS} (i.e. writes two words per 
+    coefficient).
+
+void _nmod_poly_KS2_unpack3(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                  ulong k)
+
+    Same as \code{_nmod_poly_KS2_unpack}, but requires 
+    \code{2 * FLINT_BITS < b < 3 * FLINT_BITS} (i.e. writes three words per 
+    coefficient).
+
+void _nmod_poly_KS2_unpack(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                 ulong k)
+
+    Bit unpacking code used by KS2 and KS4 multiplication.
+
+
+*******************************************************************************
+
+    KS2/KS4 Reduction
+
+*******************************************************************************
+
+void _nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op, slong n, ulong w,
+                     nmod_t mod)
+
+    Reduction code used by KS2 and KS4 multiplication.
+
+void _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
+                          mp_srcptr op2, slong n, ulong b, nmod_t mod)
+
+    Same as \code{_nmod_poly_KS2_recover_reduce}, but requires 
+    \code{0 < 2 * b <= FLINT_BITS}.
+
+void _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
+                          mp_srcptr op2, slong n, ulong b, nmod_t mod)
+
+    Same as \code{_nmod_poly_KS2_recover_reduce}, but requires 
+    \code{FLINT_BITS < 2 * b < 2*FLINT_BITS}.
+
+void _nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
+                          mp_srcptr op2, slong n, ulong b, nmod_t mod)
+
+    Same as \code{_nmod_poly_KS2_recover_reduce}, but requires 
+    \code{b == FLINT_BITS}.
+
+void _nmod_poly_KS2_recover_reduce3(mp_ptr res, slong s, mp_srcptr op1,
+                          mp_srcptr op2, slong n, ulong b, nmod_t mod)
+
+    Same as \code{_nmod_poly_KS2_recover_reduce}, but requires 
+    \code{2 * FLINT_BITS < 2 * b <= 3 * FLINT_BITS}.
+
+void _nmod_poly_KS2_recover_reduce(mp_ptr res, slong s, mp_srcptr op1,
+                          mp_srcptr op2, slong n, ulong b, nmod_t mod)
+
+    Reduction code used by KS4 multiplication.
+
+
 *******************************************************************************
 
     Multiplication
@@ -438,7 +520,7 @@ void nmod_poly_mulhigh_classical(nmod_poly_t res,
 void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1, 
                      mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod)
 
-    Sets \code{res} to the product of \code{poly1} and \code{poly2} 
+    Sets \code{res} to the product of \code{in1} and \code{in2} 
     assuming the output coefficients are at most the given number of 
     bits wide. If \code{bits} is set to $0$ an appropriate value is 
     computed automatically.  Assumes that \code{len1 >= len2 > 0}.
@@ -451,6 +533,28 @@ void nmod_poly_mul_KS(nmod_poly_t res,
     bits wide. If \code{bits} is set to $0$ an appropriate value 
     is computed automatically.
 
+void _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
+                  mp_srcptr op2, slong n2, nmod_t mod)
+
+    Sets \code{res} to the product of \code{op1} and \code{op2}. 
+    Assumes that \code{len1 >= len2 > 0}.
+
+void nmod_poly_mul_KS2(nmod_poly_t res,
+                 const nmod_poly_t poly1, const nmod_poly_t poly2)
+
+    Sets \code{res} to the product of \code{poly1} and \code{poly2}. 
+    
+void _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
+                  mp_srcptr op2, slong n2, nmod_t mod)
+
+    Sets \code{res} to the product of \code{op1} and \code{op2}. 
+    Assumes that \code{len1 >= len2 > 0}.
+
+void nmod_poly_mul_KS4(nmod_poly_t res,
+                 const nmod_poly_t poly1, const nmod_poly_t poly2)
+
+    Sets \code{res} to the product of \code{poly1} and \code{poly2}. 
+    
 void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
                 mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod)
 
