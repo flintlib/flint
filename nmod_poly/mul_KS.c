@@ -59,10 +59,7 @@ _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1,
 
     res = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * (limbs1 + limbs2));
 
-    if (in1 != in2)
-        mpn_mul(res, mpn1, limbs1, mpn2, limbs2);
-    else
-        mpn_mul_n(res, mpn1, mpn1, limbs1);
+    mpn_mul(res, mpn1, limbs1, mpn2, limbs2);
 
     _nmod_poly_bit_unpack(out, len_out, res, bits, mod);
     
