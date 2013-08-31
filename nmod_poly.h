@@ -103,6 +103,27 @@ typedef struct
 
 typedef nmod_poly_struct nmod_poly_t[1];
 
+/* zn_poly helper functions  ************************************************
+
+Copyright (C) 2007, 2008 David Harvey
+
+*/
+
+static __inline__
+int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n)
+{
+   if (mpn_cmp(op1, op2, n) >= 0)
+   {
+      mpn_sub_n(res, op1, op2, n);
+      return 0;
+   }
+   else
+   {
+      mpn_sub_n(res, op2, op1, n);
+      return 1;
+   }
+}
+
 /* Memory management  ********************************************************/
 
 void nmod_poly_init(nmod_poly_t poly, mp_limb_t n);
@@ -348,10 +369,46 @@ void _nmod_poly_make_monic(mp_ptr output,
 
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input);
 
-/* Bit packing and unpacking  ************************************************/
+/* Bit packing and unpacking aand reduction  **********************************/
+
+void _nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
+                                                    ulong b, ulong k, slong r);
+
+void _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
+                                                    ulong b, ulong k, slong r);
+
+void _nmod_poly_KS2_unpack1(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                                                                      ulong k);
+
+void _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                                                                      ulong k);
+
+void _nmod_poly_KS2_unpack3(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                                                                      ulong k);
+
+void _nmod_poly_KS2_unpack(mp_ptr res, mp_srcptr op, slong n, ulong b,
+                                                                      ulong k);
+
+void _nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op, 
+                                                 slong n, ulong w, nmod_t mod);
+
+void _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
+                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
+
+void _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
+                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
+
+void _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
+                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
+
+void _nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
+                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
+
+void _nmod_poly_KS2_recover_reduce(mp_ptr res, slong s, mp_srcptr op1,
+                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
 
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
-                                              slong len, mp_bitcnt_t bits);
+                                                  slong len, mp_bitcnt_t bits);
 
 void _nmod_poly_bit_unpack(mp_ptr res, slong len, 
                                   mp_srcptr mpn, mp_bitcnt_t bits, nmod_t mod);
@@ -361,6 +418,10 @@ void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
 
 void
 nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size);
+
+void
+_nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
+               ulong b, ulong k, slong r);
 
 /* Multiplication  ***********************************************************/
 
@@ -374,25 +435,37 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1,
                            mp_srcptr poly2, slong len2, slong trunc, nmod_t mod);
 
 void nmod_poly_mullow_classical(nmod_poly_t res, 
-                 const nmod_poly_t poly1, const nmod_poly_t poly2, slong trunc);
+                  const nmod_poly_t poly1, const nmod_poly_t poly2, slong trunc);
 
 void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, slong len1, 
                            mp_srcptr poly2, slong len2, slong start, nmod_t mod);
 
 void nmod_poly_mulhigh_classical(nmod_poly_t res, 
-                 const nmod_poly_t poly1, const nmod_poly_t poly2, slong start);
+                  const nmod_poly_t poly1, const nmod_poly_t poly2, slong start);
 
 void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, slong len1, 
-                       mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod);
+                        mp_srcptr in2, slong len2, mp_bitcnt_t bits, nmod_t mod);
 
 void nmod_poly_mul_KS(nmod_poly_t res, 
-           const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits);
+             const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits);
+
+void _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
+                                            mp_srcptr op2, slong n2, nmod_t mod);
+
+void nmod_poly_mul_KS2(nmod_poly_t res,
+                               const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_mul_KS4(mp_ptr res, mp_srcptr op1, slong n1,
+                                            mp_srcptr op2, slong n2, nmod_t mod);
+
+void nmod_poly_mul_KS4(nmod_poly_t res,
+                               const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
                mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod);
 
 void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
-                            const nmod_poly_t poly2, mp_bitcnt_t bits, slong n);
+                             const nmod_poly_t poly2, mp_bitcnt_t bits, slong n);
 
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
                                        mp_srcptr poly2, slong len2, nmod_t mod);
