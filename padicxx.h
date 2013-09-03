@@ -79,6 +79,29 @@ public:
     ~padicxx_ctx() {padic_ctx_clear(ctx);}
 };
 
+class padicxx_ctx_srcref
+{
+private:
+    mutable padic_ctx_struct* ctx;
+
+    padicxx_ctx_srcref(padic_ctx_struct* c) : ctx(c) {}
+
+public:
+    // NB: you must not modify user-visible state of ctx through a constant
+    // instance of padicxx_ctx
+    padic_ctx_struct* _ctx() const {return ctx;}
+
+    // XXX these two are not actually exposed in the C api ...
+    fmpzxx_ref get_p() {return fmpzxx_ref::make(ctx[0].p);}
+    fmpzxx_srcref get_p() const {return fmpzxx_srcref::make(ctx[0].p);}
+
+    padicxx_ctx_srcref(padicxx_ctx& c)
+        : ctx(c._ctx()) {}
+
+    static padicxx_ctx_srcref make(padic_ctx_struct* c)
+        {return padicxx_ctx_srcref(c);}
+};
+
 namespace traits {
 template<class T> struct has_padicxx_ctx : mp::false_ { };
 
@@ -138,7 +161,7 @@ struct padicxx_max_prec<T, typename mp::enable_if<mp::and_<
 } // detail
 namespace tools {
 template<class Expr>
-const padicxx_ctx& find_padicxx_ctx(const Expr& e)
+padicxx_ctx_srcref find_padicxx_ctx(const Expr& e)
 {
     return tools::find_subexpr<detail::has_padicxx_ctx_predicate>(e).get_ctx();
 }
@@ -193,21 +216,21 @@ public:
     void set_one() {padic_one(_padic());}
 
 #define PADICXX_DEFINE_CTX \
-    const padicxx_ctx& get_ctx() const {return this->_data().ctx;} \
-    padic_ctx_t& _ctx() const {return get_ctx()._ctx();}
+    padicxx_ctx_srcref get_ctx() const {return this->_data().ctx;} \
+    padic_ctx_struct* _ctx() const {return get_ctx()._ctx();}
     PADICXX_DEFINE_CTX
 
-    static padicxx_expression zero(const padicxx_ctx& ctx)
+    static padicxx_expression zero(padicxx_ctx_srcref ctx)
         {return padicxx_expression(ctx);}
-    static padicxx_expression zero(const padicxx_ctx& ctx, long N)
+    static padicxx_expression zero(padicxx_ctx_srcref ctx, long N)
         {return padicxx_expression(ctx, N);}
-    static padicxx_expression one(const padicxx_ctx& ctx)
+    static padicxx_expression one(padicxx_ctx_srcref ctx)
     {
         padicxx_expression res(ctx);
         res.set_one();
         return res;
     }
-    static padicxx_expression one(const padicxx_ctx& ctx, long N)
+    static padicxx_expression one(padicxx_ctx_srcref ctx, long N)
     {
         padicxx_expression res(ctx, N);
         res.set_one();
@@ -215,7 +238,7 @@ public:
     }
 
     template<class T>
-    static padicxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+    static padicxx_expression from_QQ(const T& q, padicxx_ctx_srcref ctx,
             typename mp::enable_if<mp::or_<traits::is_fmpqxx<T>,
                 traits::is_fmpzxx<T>, traits::is_integer<T> > >::type* = 0)
     {
@@ -224,7 +247,7 @@ public:
         return res;
     }
     template<class T>
-    static padicxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+    static padicxx_expression from_QQ(const T& q, padicxx_ctx_srcref ctx,
             slong N,
             typename mp::enable_if<mp::or_<traits::is_fmpqxx<T>,
                 traits::is_fmpzxx<T>, traits::is_integer<T> > >::type* = 0)
@@ -240,7 +263,7 @@ public:
     // contains at least one instance of padicxx. Returns the context of one of
     // those immediate subexpressions.
 #define PADICXX_DEFINE_ESTIMATE_CTX \
-    const padicxx_ctx& estimate_ctx() const \
+    padicxx_ctx_srcref estimate_ctx() const \
     { \
         return tools::find_padicxx_ctx(*this); \
     }
@@ -255,21 +278,21 @@ public:
 
     // static methods which only make sense with padicxx
     static padicxx_expression randtest(frandxx& state,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padicxx_expression res(ctx, prec);
         padic_randtest(res._padic(), state._data(), ctx._ctx());
         return res;
     }
     static padicxx_expression randtest_not_zero(frandxx& state,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padicxx_expression res(ctx, prec);
         padic_randtest_not_zero(res._padic(), state._data(), ctx._ctx());
         return res;
     }
     static padicxx_expression randtest_int(frandxx& state,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padicxx_expression res(ctx, prec);
         padic_randtest_int(res._padic(), state._data(), ctx._ctx());
@@ -386,7 +409,7 @@ struct padic_traits<padicxx>
     : padic_traits<padicxx_ref> { };
 } // detail
 
-#define PADICXX_DEFINE_REF_STRUCTS(structname, precname)                      \
+#define PADICXX_DEFINE_REF_STRUCTS_(structname, precname, ctxtype)            \
 namespace flint_classes {                                                     \
 template<class Padic>                                                         \
 struct ref_data<Padic, structname>                                            \
@@ -398,17 +421,17 @@ struct ref_data<Padic, structname>                                            \
     typedef const structname* data_srcref_t;                                  \
                                                                               \
     structname* inner;                                                        \
-    const padicxx_ctx& ctx;                                                   \
+    ctxtype ctx;                                                   \
                                                                               \
     ref_data(Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}        \
                                                                               \
-    static ref_data make(structname* f, const padicxx_ctx& ctx)               \
+    static ref_data make(structname* f, ctxtype ctx)               \
     {                                                                         \
         return ref_data(f, ctx);                                              \
     }                                                                         \
                                                                               \
 private:                                                                      \
-    ref_data(structname* fp, const padicxx_ctx& c) : inner(fp), ctx(c) {}     \
+    ref_data(structname* fp, ctxtype c) : inner(fp), ctx(c) {}     \
 };                                                                            \
                                                                               \
 template<class Padic, class Ref>                                              \
@@ -421,7 +444,7 @@ struct srcref_data<Padic, Ref, structname>                                    \
     typedef const structname* data_srcref_t;                                  \
                                                                               \
     const structname* inner;                                                  \
-    const padicxx_ctx& ctx;                                                   \
+    ctxtype ctx;                                                   \
     slong N;                                                                  \
                                                                               \
     srcref_data(const Padic& o)                                               \
@@ -429,23 +452,25 @@ struct srcref_data<Padic, Ref, structname>                                    \
     srcref_data(Ref o)                                                        \
         : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}         \
                                                                               \
-    static srcref_data make(const structname* f, const padicxx_ctx& ctx)      \
+    static srcref_data make(const structname* f, ctxtype ctx)      \
     {                                                                         \
         return srcref_data(f, ctx);                                           \
     }                                                                         \
-    static srcref_data make(const structname* f, const padicxx_ctx& ctx,      \
+    static srcref_data make(const structname* f, ctxtype ctx,      \
             slong N)                                                          \
     {                                                                         \
         return srcref_data(f, ctx, N);                                        \
     }                                                                         \
                                                                               \
 private:                                                                      \
-    srcref_data(const structname* fp, const padicxx_ctx& c)                   \
+    srcref_data(const structname* fp, ctxtype c)                   \
         : inner(fp), ctx(c), N(precname(fp)) {}                               \
-    srcref_data(const structname* fp, const padicxx_ctx& c, slong n)          \
+    srcref_data(const structname* fp, ctxtype c, slong n)          \
         : inner(fp), ctx(c), N(n) {}                                          \
 };                                                                            \
 } /* flint_classes */
+#define PADICXX_DEFINE_REF_STRUCTS(structname, precname) \
+    PADICXX_DEFINE_REF_STRUCTS_(structname, precname, padicxx_ctx_srcref)
 PADICXX_DEFINE_REF_STRUCTS(padic_struct, padic_prec)
 
 namespace detail {
@@ -454,16 +479,16 @@ struct padic_data
     typedef padic_t& data_ref_t;
     typedef const padic_t& data_srcref_t;
 
-    const padicxx_ctx& ctx;
+    padicxx_ctx_srcref ctx;
     padic_t inner;
 
-    padic_data(const padicxx_ctx& c)
+    padic_data(padicxx_ctx_srcref c)
         : ctx(c)
     {
         padic_init(inner);
     }
 
-    padic_data(const padicxx_ctx& c, long N)
+    padic_data(padicxx_ctx_srcref c, long N)
         : ctx(c)
     {
         padic_init2(inner, N);

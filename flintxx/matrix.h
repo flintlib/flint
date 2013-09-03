@@ -31,8 +31,11 @@
 #include "flint_classes.h"
 #include "mp.h"
 #include "rules.h"
+#include "stdmath.h"
+#include "ltuple.h"
 #include "traits.h"
 #include "tuple.h"
+#include "../permxx.h"
 
 namespace flint {
 FLINT_DEFINE_BINOP(solve)

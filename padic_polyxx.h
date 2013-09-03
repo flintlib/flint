@@ -72,17 +72,17 @@ public:
 
     PADICXX_DEFINE_STD
 
-    static padic_polyxx_expression zero(const padicxx_ctx& ctx)
+    static padic_polyxx_expression zero(padicxx_ctx_srcref ctx)
         {return padic_polyxx_expression(ctx);}
-    static padic_polyxx_expression zero(const padicxx_ctx& ctx, long N)
+    static padic_polyxx_expression zero(padicxx_ctx_srcref ctx, long N)
         {return padic_polyxx_expression(ctx, N);}
-    static padic_polyxx_expression one(const padicxx_ctx& ctx)
+    static padic_polyxx_expression one(padicxx_ctx_srcref ctx)
     {
         padic_polyxx_expression res(ctx);
         res.set_one();
         return res;
     }
-    static padic_polyxx_expression one(const padicxx_ctx& ctx, long N)
+    static padic_polyxx_expression one(padicxx_ctx_srcref ctx, long N)
     {
         padic_polyxx_expression res(ctx, N);
         res.set_one();
@@ -90,7 +90,7 @@ public:
     }
 
     template<class T>
-    static padic_polyxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+    static padic_polyxx_expression from_QQ(const T& q, padicxx_ctx_srcref ctx,
             typename mp::enable_if<mp::or_<traits::is_fmpqxx<T>,
                 traits::is_fmpzxx<T>, traits::is_integer<T> > >::type* = 0)
     {
@@ -99,7 +99,7 @@ public:
         return res;
     }
     template<class T>
-    static padic_polyxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+    static padic_polyxx_expression from_QQ(const T& q, padicxx_ctx_srcref ctx,
             slong N,
             typename mp::enable_if<mp::or_<traits::is_fmpqxx<T>,
                 traits::is_fmpzxx<T>, traits::is_integer<T> > >::type* = 0)
@@ -109,7 +109,7 @@ public:
         return res;
     }
     template<class T>
-    static padic_polyxx_expression from_QQX(const T& q, const padicxx_ctx& ctx,
+    static padic_polyxx_expression from_QQX(const T& q, padicxx_ctx_srcref ctx,
             typename mp::enable_if<mp::or_<traits::is_fmpq_polyxx<T>,
                 traits::is_fmpz_polyxx<T> > >::type* = 0)
     {
@@ -118,7 +118,7 @@ public:
         return res;
     }
     template<class T>
-    static padic_polyxx_expression from_QQX(const T& q, const padicxx_ctx& ctx,
+    static padic_polyxx_expression from_QQX(const T& q, padicxx_ctx_srcref ctx,
             slong N,
             typename mp::enable_if<mp::or_<traits::is_fmpq_polyxx<T>,
                 traits::is_fmpz_polyxx<T> > >::type* = 0)
@@ -151,7 +151,7 @@ public:
     // static methods which only make sense with padicxx
     static padic_polyxx_expression randtest(frandxx& state,
             slong len,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_polyxx_expression res(ctx, prec);
         padic_poly_randtest(res._poly(), state._data(), len, ctx._ctx());
@@ -159,7 +159,7 @@ public:
     }
     static padic_polyxx_expression randtest_not_zero(frandxx& state,
             slong len,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_polyxx_expression res(ctx, prec);
         padic_poly_randtest_not_zero(res._poly(), state._data(), len, ctx._ctx());
@@ -167,7 +167,7 @@ public:
     }
     static padic_polyxx_expression randtest_val(frandxx& state,
             slong val, slong len,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_polyxx_expression res(ctx, prec);
         padic_poly_randtest_val(res._poly(), state._data(), val, len, ctx._ctx());
@@ -273,16 +273,16 @@ struct padic_poly_data
     typedef padic_poly_t& data_ref_t;
     typedef const padic_poly_t& data_srcref_t;
 
-    const padicxx_ctx& ctx;
+    padicxx_ctx_srcref ctx;
     padic_poly_t inner;
 
-    padic_poly_data(const padicxx_ctx& c)
+    padic_poly_data(padicxx_ctx_srcref c)
         : ctx(c)
     {
         padic_poly_init(inner);
     }
 
-    padic_poly_data(const padicxx_ctx& c, slong N, slong alloc = 0)
+    padic_poly_data(padicxx_ctx_srcref c, slong N, slong alloc = 0)
         : ctx(c)
     {
         padic_poly_init2(inner, alloc, N);

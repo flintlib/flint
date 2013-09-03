@@ -38,7 +38,7 @@ void
 test_init()
 {
     padic_matxx a(ctx, 5, 7, 20);
-    tassert(&a.get_ctx() == &ctx);
+    tassert(a.get_ctx()._ctx() == &ctx._ctx()[0]);
     tassert(a.prec() == 20);
     tassert(a.rows() == 5 && a.cols() == 7);
 
@@ -46,12 +46,12 @@ test_init()
     tassert(a == c);
 
     padic_matxx b(ctx, 3, 4, 30);
-    tassert(&(a + b).estimate_ctx() == &ctx);
+    tassert((a + b).estimate_ctx()._ctx() == &ctx._ctx()[0]);
     tassert((a + b).prec() == 30);
 
     tassert((a + b).create_temporary().prec() == 30);
     padic_matxx d((a + b).create_temporary());
-    tassert(&d.get_ctx() == &ctx);
+    tassert(d.get_ctx()._ctx() == &ctx._ctx()[0]);
     tassert(d.prec() == 30);
 
     padic_matxx e(a + b);

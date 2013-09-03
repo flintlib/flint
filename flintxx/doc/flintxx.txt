@@ -3469,12 +3469,12 @@ padic_ctx_t& padicxx_ctx::_ctx() const
     C++ particulars
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-const padicxx_ctx& Padic_src::get_ctx() const
+padicxx_ctx_srcref Padic_src::get_ctx() const
 padic_ctx_t& Padic_src::_ctx() const
 
     Obtain a reference to the context of this instance.
 
-const padicxx_ctx& Padic_expr::estimate_ctx() const
+padicxx_ctx_srcref Padic_expr::estimate_ctx() const
 
     Obtain a reference to a context occurring in a subexpression. As per the
     first rule in the introduction to this section, all such contexts are the
@@ -3514,11 +3514,11 @@ slong& Padic_target::prec()
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padicxx::padicxx(const padicxx_ctx&)
+padicxx::padicxx(padicxx_ctx_srcref)
 
     Initialize padic number to default precision. See \code{padic_init}.
 
-padicxx::padicxx(const padicxx_ctx& c, long N)
+padicxx::padicxx(padicxx_ctx_srcref c, long N)
 
     Initialize padic number to precision $N$. See \code{padic_init2}.
 
@@ -3530,14 +3530,14 @@ void Padic_target::reduce()
     Randomisation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static padicxx padicxx::randtest(frandxx& state, const padicxx_ctx& ctx,
+static padicxx padicxx::randtest(frandxx& state, padicxx_ctx_srcref ctx,
         slong prec = PADIC_DEFAULT_PREC)
 
-static padicxx padicxx::randtest_int(frandxx& state, const padicxx_ctx& ctx,
+static padicxx padicxx::randtest_int(frandxx& state, padicxx_ctx_srcref ctx,
         slong prec = PADIC_DEFAULT_PREC)
 
 static padicxx padicxx::randtest_not_zero(frandxx& state,
-        const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+        padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
 
     Obtain a random padic number of precision \code{prec}. See
     \code{padic_randtest}, \code{padic_randtest_int} and
@@ -3551,20 +3551,20 @@ Padic_target Padic_target::operator=(T:is_integer)
 Padic_target Padic_target::operator=(Fmpz_expr)
 Padic_target Padic_target::operator=(Fmpq_expr)
 
-padicxx padicxx::from_QQ(Fmpq_expr, const padicxx_ctx&)
-padicxx padicxx::from_QQ(Fmpz_expr, const padicxx_ctx&)
-padicxx padicxx::from_QQ(T:is_integer, const padicxx_ctx&)
-padicxx padicxx::from_QQ(Fmpq_expr, const padicxx_ctx&, slong N)
-padicxx padicxx::from_QQ(Fmpz_expr, const padicxx_ctx&, slong N)
-padicxx padicxx::from_QQ(T:is_integer, const padicxx_ctx&, slong N)
+padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref)
+padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref)
+padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref)
+padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, slong N)
+padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, slong N)
+padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref, slong N)
 
 void Padic_target::set_zero()
 void Padic_target::set_one()
 
-padicxx padicxx::zero(const padicxx_ctx&)
-padicxx padicxx::zero(const padicxx_ctx&, slong N)
-padicxx padicxx::one(const padicxx_ctx&)
-padicxx padicxx::one(const padicxx_ctx&, slong N)
+padicxx padicxx::zero(padicxx_ctx_srcref)
+padicxx padicxx::zero(padicxx_ctx_srcref, slong N)
+padicxx padicxx::one(padicxx_ctx_srcref)
+padicxx padicxx::one(padicxx_ctx_srcref, slong N)
 
 bool Padic_expr::is_zero() const
 bool Padic_expr::is_one() const
@@ -3644,12 +3644,12 @@ ulong padic_val_fac(T:is_unsigned_integer, Fmpz_expr)
     C++ particulars
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-const padicxx_ctx& Padic_poly_src::get_ctx() const
+padicxx_ctx_srcref Padic_poly_src::get_ctx() const
 padic_ctx_t& Padic_poly_src::_ctx() const
 
     Obtain a reference to the context of this instance.
 
-const padicxx_ctx& Padic_poly_expr::estimate_ctx() const
+padicxx_ctx_srcref Padic_poly_expr::estimate_ctx() const
 
     Obtain a reference to a context occurring in a subexpression.
 
@@ -3672,11 +3672,11 @@ padic_polyxx_srcref Padic_poly_src::toN(slong N) const
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padic_polyxx::padic_polyxx(const padicxx_ctx&)
+padic_polyxx::padic_polyxx(padicxx_ctx_srcref)
 
     Initialise to zero. See \code{padic_poly_init}.
 
-padic_polyxx::padic_polyxx(const padicxx_ctx&, slong prec, slong alloc = 0)
+padic_polyxx::padic_polyxx(padicxx_ctx_srcref, slong prec, slong alloc = 0)
 
     See \code{padic_poly_init2}.
 
@@ -3703,17 +3703,17 @@ slong& Padic_target::prec()
     Randomisation
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static padic_polyxx padic_polyxx::randtest(frandxx& state, const padicxx_ctx& ctx,
+static padic_polyxx padic_polyxx::randtest(frandxx& state, padicxx_ctx_srcref ctx,
         slong len,
         slong prec = PADIC_DEFAULT_PREC)
 
-static padic_polyxx padic_polyxx::randtest_val(frandxx& state, const padicxx_ctx& ctx,
+static padic_polyxx padic_polyxx::randtest_val(frandxx& state, padicxx_ctx_srcref ctx,
         slong len, slong val,
         slong prec = PADIC_DEFAULT_PREC)
 
 static padic_polyxx padic_polyxx::randtest_not_zero(frandxx& state,
         slong len,
-        const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+        padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Assignment an basic manipulation
@@ -3722,16 +3722,16 @@ static padic_polyxx padic_polyxx::randtest_not_zero(frandxx& state,
     we provide the following functions.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padic_polyxx padic_polyxx::from_QQ(T:is_integer, const padicxx_ctx&, slong N)
-padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, const padicxx_ctx&, slong N)
-padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, const padicxx_ctx&, slong N)
-padic_polyxx padic_polyxx::from_QQ(T:is_integer, const padicxx_ctx&)
-padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, const padicxx_ctx&)
-padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, const padicxx_ctx&)
-padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, const padicxx_ctx&, slong N)
-padic_polyxx padic_polyxx::from_QQX(Fmpq_poly_expr, const padicxx_ctx&, slong N)
-padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, const padicxx_ctx&)
-padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, const padicxx_ctx&)
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpq_poly_expr, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref)
 padic_polyxx padic_polyxx::from_ground(Padic_expr)
 
 fmpz_polyxx Padic_poly_expr::to<fmpz_polyxx>() const
@@ -3831,12 +3831,12 @@ bool Padic_poly_src::is_reduced() const
     C++ particulars
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-const padicxx_ctx& Padic_mat_src::get_ctx() const
+padicxx_ctx_srcref Padic_mat_src::get_ctx() const
 padic_ctx_t& Padic_mat_src::_ctx() const
 
     Obtain a reference to the context of this instance.
 
-const padicxx_ctx& Padic_mat_expr::estimate_ctx() const
+padicxx_ctx_srcref Padic_mat_expr::estimate_ctx() const
 
     Obtain a reference to a context occurring in a subexpression.
 
@@ -3858,11 +3858,11 @@ Padic_mat_expr Padic_mat_expr::transpose() const
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padic_matxx::padic_matxx(const padicxx_ctx&, slong rows, slong cols)
+padic_matxx::padic_matxx(padicxx_ctx_srcref, slong rows, slong cols)
 
     See \code{padic_mat_init}.
 
-padic_matxx::padic_matxx(const padicxx_ctx&, slong rows, slong cols, slong prec)
+padic_matxx::padic_matxx(padicxx_ctx_srcref, slong rows, slong cols, slong prec)
 
     See \code{padic_mat_init2}.
 
@@ -3881,10 +3881,10 @@ bool Padic_mat_src::is_empty() const
 
 void Padic_mat_target::set_zero()
 void Padic_mat_target::set_one()
-padic_matxx padic_matxx::zero(const padicxx_ctx&)
-padic_matxx padic_matxx::zero(const padicxx_ctx&, slong N)
-padic_matxx padic_matxx::one(const padicxx_ctx&)
-padic_matxx padic_matxx::one(const padicxx_ctx&, slong N)
+padic_matxx padic_matxx::zero(padicxx_ctx_srcref)
+padic_matxx padic_matxx::zero(padicxx_ctx_srcref, slong N)
+padic_matxx padic_matxx::one(padicxx_ctx_srcref)
+padic_matxx padic_matxx::one(padicxx_ctx_srcref, slong N)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Conversion
@@ -3893,7 +3893,7 @@ padic_matxx padic_matxx::one(const padicxx_ctx&, slong N)
     the following functions.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padic_matxx padic_matxx::from_QQ(Fmpq_mat_expr, const padicxx_ctx&)
+padic_matxx padic_matxx::from_QQ(Fmpq_mat_expr, padicxx_ctx_srcref)
 fmpq_matxx Padic_mat_expr::to<fmpq_matxx>() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3921,7 +3921,7 @@ bool Padic_mat_expr::is_zero() const
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 static padic_polyxx padic_polyxx::randtest(slong rows, slong cols,
-        frandxx& state, const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+        frandxx& state, padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Transpose
@@ -3935,6 +3935,191 @@ Padic_mat_expr transpose(Padic_mat_expr)
     Overloaded operators \code{+ - * /} can be used for arithmetic.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+
+
+*******************************************************************************
+
+    qadicxx
+
+    The type \code{qadicxx} wraps the C interface \code{qadic_t}, and the type
+    \code{qadicxx_ctx} wraps \code{qadic_ctx_t}.
+
+    Evaluating composite expressions requires temporary objects, which must be
+    initialised to a certain precision and with a certain context. The same
+    rules apply as for \code{padicxx}.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Context
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+qadicxx_ctx::qadicxx_ctx(Fmpz_src p, slong dlong min, long max,
+        padic_print_mode mode, const char* var = "x")
+
+    Initialize a qadic context. See \code{qadic_ctx_init_conway}.
+
+qadic_ctx_t& qadicxx_ctx::_ctx() const
+
+    Obtain a reference to the underlying C data structure.
+    Note that this reference is mutable even if the instance of
+    \code{qadicxx_ctx} it
+    is obtained from is not. This is because the context contains data which is
+    not user-visible, and the C functions change them.
+
+    If this is called on a constant instance of \code{qadicxx_ctx}, you must
+    ensure that no user-visible state is changed.
+
+padicxx_ctx_srcref qadicxx_ctx::pctx() const
+
+    Obtain a reference to the underlying padic context.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx_ctx_srcref Qadic_src::get_ctx() const
+const qadicxx_ctx& Qadic_src::get_qctx() const
+qadic_ctx_t& Qadic_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+const qadicxx_ctx& Qadic_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression. As per the
+    first rule in the introduction to this section, all such contexts are the
+    same by definition.
+
+Qadic_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{exp}, \code{exp_balanced}, \code{exp_rectangular}, \code{inv},
+    \code{log}, \code{log_balanced}, \code{teichmuller}, \code{trace},
+    \code{norm}, \code{norm_analytic}, \code{norm_resultant}.
+
+Qadic_expr Qadic_expr::pow(Fmpz_expr) const
+Qadic_expr Qadic_expr::frobenius(T:fits_into_slong) const
+
+qadicxx_srcref Qadic_src::toN(slong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Data structures
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Qadic_expr::val() const
+
+slong Qadic_expr::prec() const
+
+    Obtain the precision of this instance. See \code{qadic_prec}.
+    Note that this never requires evaluation.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+qadicxx::qadicxx(const qadicxx_ctx&)
+
+    Initialize qadic number to default precision. See \code{qadic_init}.
+
+qadicxx::qadicxx(const qadicxx_ctx& c, long N)
+
+    Initialize qadic number to precision $N$. See \code{qadic_init2}.
+
+void Qadic_target::reduce()
+
+    See \code{qadic_reduce}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static qadicxx qadicxx::randtest(frandxx& state, const qadicxx_ctx& ctx,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static qadicxx qadicxx::randtest_int(frandxx& state, slong val,
+        const qadicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+
+static qadicxx qadicxx::randtest_val(frandxx& state, const qadicxx_ctx& ctx,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static qadicxx qadicxx::randtest_not_zero(frandxx& state,
+        const qadicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+
+    Obtain a random qadic number of precision \code{prec}. See
+    \code{qadic_randtest}, \code{qadic_randtest_int} and
+    \code{qadic_randtest_not_zero}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_target Qadic_target::operator=(T:is_unsigned_integer)
+Qadic_target Qadic_target::operator=(Padic_expr)
+
+qadicxx qadicxx::from_ground(Padic_expr, const qadicxx_ctx&)
+
+void Qadic_target::set_zero()
+void Qadic_target::set_one()
+void Qadic_target::set_gen(const qadicxx_ctx&)
+
+qadicxx qadicxx::zero(const qadicxx_ctx&)
+qadicxx qadicxx::zero(const qadicxx_ctx&, slong N)
+qadicxx qadicxx::one(const qadicxx_ctx&)
+qadicxx qadicxx::one(const qadicxx_ctx&, slong N)
+qadicxx qadicxx::gen(const qadicxx_ctx&)
+qadicxx qadicxx::gen(const qadicxx_ctx&, slong N)
+
+bool Qadic_expr::is_zero() const
+bool Qadic_expr::is_one() const
+
+padicxx Qadic_expr::to<padicxx>() const
+
+    Convert self to \code{padicxx}, if possible. See \code{qadic_get_padic}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic operations
+
+    The overloaded operators \code{+ - * / << >>} can be used for arithmetic
+    operations, provided these are implemented for \code{qadic_t}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr inv(Qadic_expr)
+
+Qadic_expr pow(Qadic_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Exponential
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr exp(Qadic_expr)
+Qadic_expr exp_rectangular(Qadic_expr)
+Qadic_expr exp_balanced(Qadic_expr)
+
+    Compute the exponential function. These may raise \code{flint_exception}s if the
+    series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Logarithm
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr log(Qadic_expr)
+Qadic_expr log_balanced(Qadic_expr)
+
+    Compute the logarithm function. These may raise \code{flint_exception}s if the
+    series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Special functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr teichmuller(Qadic_expr)
+Padic_expr trace(Qadic_expr)
+Padic_expr norm(Qadic_expr)
+Padic_expr norm_analytic(Qadic_expr)
+Padic_expr norm_resultant(Qadic_expr)
 
 
 

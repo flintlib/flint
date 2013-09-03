@@ -71,21 +71,21 @@ public:
 
     PADICXX_DEFINE_STD
 
-    static padic_matxx_expression zero(const padicxx_ctx& ctx,
+    static padic_matxx_expression zero(padicxx_ctx_srcref ctx,
             slong rows, slong cols)
         {return padic_matxx_expression(ctx, rows, cols);}
-    static padic_matxx_expression zero(const padicxx_ctx& ctx,
+    static padic_matxx_expression zero(padicxx_ctx_srcref ctx,
             slong rows, slong cols, long N)
         {return padic_matxx_expression(ctx, rows, cols, N);}
 
-    static padic_matxx_expression one(const padicxx_ctx& ctx,
+    static padic_matxx_expression one(padicxx_ctx_srcref ctx,
             slong rows, slong cols)
     {
         padic_matxx_expression res(ctx, rows, cols);
         res.set_one();
         return res;
     }
-    static padic_matxx_expression one(const padicxx_ctx& ctx,
+    static padic_matxx_expression one(padicxx_ctx_srcref ctx,
             slong rows, slong cols, long N)
     {
         padic_matxx_expression res(ctx, rows, cols, N);
@@ -94,7 +94,7 @@ public:
     }
 
     template<class T>
-    static padic_matxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+    static padic_matxx_expression from_QQ(const T& q, padicxx_ctx_srcref ctx,
             typename mp::enable_if<traits::is_fmpq_matxx<T> >::type* = 0)
     {
         padic_matxx_expression res(ctx, q.rows(), q.cols());
@@ -102,7 +102,7 @@ public:
         return res;
     }
     template<class T>
-    static padic_matxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
+    static padic_matxx_expression from_QQ(const T& q, padicxx_ctx_srcref ctx,
             slong N,
             typename mp::enable_if<traits::is_fmpq_matxx<T> >::type* = 0)
     {
@@ -123,7 +123,7 @@ public:
     // static methods which only make sense with padicxx
     static padic_matxx_expression randtest(slong rows, slong cols,
             frandxx& state,
-            const padicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+            padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
     {
         padic_matxx_expression res(ctx, rows, cols, prec);
         padic_mat_randtest(res._mat(), state._data(), ctx._ctx());
@@ -246,16 +246,16 @@ struct padic_mat_data
     typedef padic_mat_t& data_ref_t;
     typedef const padic_mat_t& data_srcref_t;
 
-    const padicxx_ctx& ctx;
+    padicxx_ctx_srcref ctx;
     padic_mat_t inner;
 
-    padic_mat_data(const padicxx_ctx& c, slong rows, slong cols)
+    padic_mat_data(padicxx_ctx_srcref c, slong rows, slong cols)
         : ctx(c)
     {
         padic_mat_init(inner, rows, cols);
     }
 
-    padic_mat_data(const padicxx_ctx& c, slong rows, slong cols, slong N)
+    padic_mat_data(padicxx_ctx_srcref c, slong rows, slong cols, slong N)
         : ctx(c)
     {
         padic_mat_init2(inner, rows, cols, N);

@@ -359,10 +359,17 @@ public:                                                                       \
         : base_t(t) {}                                                        \
     template<class T, class U>                                                \
     name(const T& t, const U& u) : base_t(t, u) {}                            \
+    template<class T, class U>                                                \
+    name(T& t, const U& u) : base_t(t, u) {}                            \
     template<class T, class U, class V>                                       \
     name(const T& t, const U& u, const V& v) : base_t(t, u, v) {}             \
+    template<class T, class U, class V>                                       \
+    name(T& t, const U& u, const V& v) : base_t(t, u, v) {}             \
     template<class T, class U, class V, class W>                              \
     name(const T& t, const U& u, const V& v, const W& w)                      \
+        : base_t(t, u, v, w) {}                                               \
+    template<class T, class U, class V, class W>                              \
+    name(T& t, const U& u, const V& v, const W& w)                      \
         : base_t(t, u, v, w) {}
 
 #define FLINTXX_DEFINE_C_REF(name, ctype, accessname)                         \

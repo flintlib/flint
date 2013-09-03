@@ -36,19 +36,19 @@ void
 test_init()
 {
     padic_polyxx a(ctx, 20);
-    tassert(&a.get_ctx() == &ctx);
+    tassert(a.get_ctx()._ctx() == ctx._ctx());
     tassert(a.prec() == 20);
 
     padic_polyxx c(a);
     tassert(a == c);
 
     padic_polyxx b(ctx, 30);
-    tassert(&(a + b).estimate_ctx() == &ctx);
+    tassert((a + b).estimate_ctx()._ctx() == ctx._ctx());
     tassert((a + b).prec() == 30);
 
     tassert((a + b).create_temporary().prec() == 30);
     padic_polyxx d((a + b).create_temporary());
-    tassert(&d.get_ctx() == &ctx);
+    tassert(d.get_ctx()._ctx() == ctx._ctx());
     tassert(d.prec() == 30);
 
     padic_polyxx e(a + b);
