@@ -80,7 +80,7 @@ int main(void)
     _fmpz_vec_clear(r, N);
     fmpz_clear(t);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

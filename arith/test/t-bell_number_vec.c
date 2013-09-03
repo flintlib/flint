@@ -61,7 +61,7 @@ int main(void)
     _fmpz_vec_clear(b1, maxn);
     _fmpz_vec_clear(b2, maxn);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

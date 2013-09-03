@@ -146,7 +146,7 @@ int main(void)
     mpq_clear(y);
     fmpq_clear(t);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

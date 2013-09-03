@@ -43,7 +43,7 @@ main(void)
     fflush(stdout);
 
     /* Check reading and writing to a file */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -58,13 +58,13 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         nmod_poly_fprint(f, a);
         fflush(f);
         fclose(f);
         f = fopen("nmod_poly_test", "r");
         r1 = nmod_poly_fread(f, b);
-        
+
         result = (r1 && nmod_poly_equal(a, b));
         if (!result)
         {

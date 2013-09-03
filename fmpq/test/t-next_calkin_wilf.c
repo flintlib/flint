@@ -111,7 +111,7 @@ main(void)
     fmpq_clear(r);
     fmpq_clear(ans);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

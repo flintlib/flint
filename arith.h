@@ -43,8 +43,6 @@
 
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
 void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
-void mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd);
-void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd);
 
 /* Various arithmetic functions **********************************************/
 
@@ -73,9 +71,12 @@ void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen);
 void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen);
 void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen);
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen);
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen);
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen);
+void arith_stirling_number_1u_vec_next(fmpz * row,
+        const fmpz * prev, slong n, slong klen);
+void arith_stirling_number_1_vec_next(fmpz * row,
+        const fmpz * prev, slong n, slong klen);
+void arith_stirling_number_2_vec_next(fmpz * row,
+        const fmpz * prev, slong n, slong klen);
 
 void arith_stirling_matrix_1u(fmpz_mat_t mat);
 void arith_stirling_matrix_1(fmpz_mat_t mat);

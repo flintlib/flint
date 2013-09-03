@@ -165,8 +165,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
-    n_cleanup_primes();
+    flint_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;
 }

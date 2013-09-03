@@ -137,7 +137,7 @@ int main()
         fmpz_clear(ref);
     }
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

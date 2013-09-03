@@ -74,7 +74,7 @@ main(void)
     fmpz_clear(z);
     fmpz_clear(w);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

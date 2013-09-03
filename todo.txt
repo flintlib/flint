@@ -13,14 +13,6 @@ general
 fmpz
 ----
 
-* fmpz_single currently hangs on to all mpz's. It might be better to release
-  ones that are over a certain size (careful, checking every single one might
-  be expensive. It might be better to have some kind of garbage collection;
-  then again checking whether the garbage collection needs to be run every time
-  also costs time, though a garbage collector can do more).
-
-* Use fmpz_init and fmpz_clear in the t-fmpz test
-
 * [maybe] Improve the functions fmpz_get_str and fmpz_set_str
 
 * [maybe] figure out how to write robust test code for fmpz_read (which reads
@@ -35,14 +27,6 @@ fmpz
 
 ulong_extras
 ------------
-
-* Jeff Gilchrist has confirmed that the standard BPSW primality test returns
-  no pseudoprimes to 2^64. http://gilchrist.ca/jeff/factoring/pseudoprimes.html
-  We should implement this test as specified and use this for primality testing
-  up to 2^64. From private correspondence, Jeff tells me the BPSW variant used
-  is that implemented by T.R. Nicely: http://www.trnicely.net/misc/bpsw.html
-  Thus, if we want to use this algorithm, we must specifically use that version
-  of the algorithm.
 
 * in is_prime_pocklington allow the cofactor to be a perfect power not just
   prime
@@ -253,11 +237,6 @@ arith
 
 * Change the partition function code to use an fmpz (or mpz) instead of
   ulong for n, to allow n larger than 10^9 on 32 bits (or 10^19 on 64 bits!)
-
-* Make partition_function_mpfr more general by allowing it to be
-  used for approximate calculation of p(n) (i.e. using less than
-  the full precision). This should be a simple modification (some care
-  is needed to get all conditionals right and to write proper tests).
 
 * Write tests for the arith_hrr_expsum_factored functions.
 

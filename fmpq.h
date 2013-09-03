@@ -306,35 +306,6 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n);
 
 slong fmpq_cfrac_bound(const fmpq_t x);
 
-typedef struct
-{
-    fmpz_t P;
-    fmpz_t Q;
-    fmpz_t B;
-    fmpz_t T;
-    fmpz_t C;
-    fmpz_t D;
-    fmpz_t V;
-} fmpq_bsplit_struct;
-
-typedef fmpq_bsplit_struct fmpq_bsplit_t[1];
-
-void fmpq_bsplit_init(fmpq_bsplit_t s);
-
-void fmpq_bsplit_clear(fmpq_bsplit_t s);
-
-void fmpq_bsplit_get_fmpq(fmpq_t x, const fmpq_bsplit_t s);
-
-void fmpq_bsplit_get_mpfr(mpfr_t x, const fmpq_bsplit_t s);
-
-void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, slong n1, slong n2);
-
-void fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * pq, slong n1, slong n2);
-
-void fmpq_bsplit_sum_abcdpq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * cd, const fmpq * pq, slong n1, slong n2);
-
 #ifdef __cplusplus
 }
 #endif

@@ -141,7 +141,7 @@ int main(void)
     fmpz_clear(x);
     mpz_clear(y);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

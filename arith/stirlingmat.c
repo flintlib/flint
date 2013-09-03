@@ -19,106 +19,101 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010, 2013 Fredrik Johansson
 
 ******************************************************************************/
 
 #include "arith.h"
 
-void
-_arith_stirling_next_row(fmpz * new, fmpz * prev, slong n, slong klen, int kind)
+void arith_stirling_number_1u_vec_next(fmpz * row,
+    const fmpz * prev, slong n, slong klen)
 {
     slong k;
-    fmpz_t t, u;
 
-    if (n == 0)
+    if (klen > n) fmpz_one(row + n);
+    if (n != 0 && klen != 0) fmpz_zero(row);
+
+    for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
     {
-        fmpz_one(new);
-        return;
+        fmpz_mul_ui(row + k, prev + k, n - 1UL);
+        fmpz_add(row + k, prev + k - 1, row + k);
     }
 
-    if (klen <= 0)
-        return;
+    for (k = n + 1; k < klen; k++)
+        fmpz_zero(row + k);
+}
 
-    fmpz_init(t);
-    fmpz_init(u);
-    fmpz_zero(new);
+void arith_stirling_number_1_vec_next(fmpz * row,
+    const fmpz * prev, slong n, slong klen)
+{
+    slong k;
 
-    if (klen > n)
-        fmpz_one(new + n);
+    if (klen > n) fmpz_one(row + n);
+    if (n != 0 && klen != 0) fmpz_zero(row);
 
-    for (k = 1; k < FLINT_MIN(n, klen); k++)
+    for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
     {
-        fmpz_set(u, prev + k);
-        fmpz_set(new + k, t);
-        switch (kind)
-        {
-        case 0:
-            fmpz_addmul_ui(new + k, u, n - 1UL);
-            break;
-        case 1:
-            fmpz_submul_ui(new + k, u, n - 1UL);
-            break;
-        case 2:
-            fmpz_addmul_ui(new + k, u, k);
-            break;
-        }
-        fmpz_set(t, u);
+        fmpz_mul_ui(row + k, prev + k, n - 1UL);
+        fmpz_sub(row + k, prev + k - 1, row + k);
     }
-    fmpz_clear(t);
-    fmpz_clear(u);
+
+    for (k = n + 1; k < klen; k++)
+        fmpz_zero(row + k);
 }
 
-static void
-_arith_stirling_mat(fmpz ** rows, slong r, slong c, int kind)
+void arith_stirling_number_2_vec_next(fmpz * row,
+    const fmpz * prev, slong n, slong klen)
 {
-    slong i, j;
+    slong k;
 
-    if (r == 0 || c == 0)
-        return;
+    if (klen > n) fmpz_one(row + n);
+    if (n != 0 && klen != 0) fmpz_zero(row);
 
-    fmpz_one(rows[0]);
-    for (i = 1; i < c; i++)
-        fmpz_zero(rows[0] + i);
-
-    for (i = 1; i < r; i++)
+    for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
     {
-        _arith_stirling_next_row(rows[i], rows[i-1], i, FLINT_MIN(c,i+1), kind);
-
-        for (j = i + 1; j < c; j++)
-            fmpz_zero(rows[i] + j);
+        fmpz_mul_ui(row + k, prev + k, k);
+        fmpz_add(row + k, prev + k - 1, row + k);
     }
-}
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-{
-    _arith_stirling_next_row(row, prev, n, klen, 0);
-}
-
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-{
-    _arith_stirling_next_row(row, prev, n, klen, 1);
-}
-
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
-{
-    _arith_stirling_next_row(row, prev, n, klen, 2);
+    for (k = n + 1; k < klen; k++)
+        fmpz_zero(row + k);
 }
 
 void
 arith_stirling_matrix_1u(fmpz_mat_t mat)
 {
-    _arith_stirling_mat(mat->rows, mat->r, mat->c, 0);
+    slong n;
+
+    if (fmpz_mat_is_empty(mat))
+        return;
+
+    for (n = 0; n < mat->r; n++)
+        arith_stirling_number_1u_vec_next(mat->rows[n],
+            mat->rows[n - (n != 0)], n, mat->c);
 }
 
 void
 arith_stirling_matrix_1(fmpz_mat_t mat)
 {
-    _arith_stirling_mat(mat->rows, mat->r, mat->c, 1);
+    slong n;
+
+    if (fmpz_mat_is_empty(mat))
+        return;
+
+    for (n = 0; n < mat->r; n++)
+        arith_stirling_number_1_vec_next(mat->rows[n],
+            mat->rows[n - (n != 0)], n, mat->c);
 }
 
 void
 arith_stirling_matrix_2(fmpz_mat_t mat)
 {
-    _arith_stirling_mat(mat->rows, mat->r, mat->c, 2);
+    slong n;
+
+    if (fmpz_mat_is_empty(mat))
+        return;
+
+    for (n = 0; n < mat->r; n++)
+        arith_stirling_number_2_vec_next(mat->rows[n],
+            mat->rows[n - (n != 0)], n, mat->c);
 }
