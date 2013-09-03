@@ -32,6 +32,8 @@ using namespace flint;
 
 padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
 
+detail::IGNORED_TYPE _;
+
 void
 test_init()
 {
@@ -62,6 +64,14 @@ test_init()
     tassert(a.prec() == 25);
     a.val() = 17;
     tassert(a.val() == 17);
+
+    padic_matxx eye = padic_matxx::one(ctx, 3, 3);
+    for(slong i = 0;i < eye.rows();++i)
+        for(slong j = 0;j < eye.cols();++j)
+            if(i == j)
+                tassert(eye.get_entry(i, j).is_one());
+            else
+                tassert(eye.get_entry(i, j).is_zero());
 }
 
 void
@@ -128,7 +138,7 @@ test_arithmetic()
 
     fmpzxx s = fmpzxx::randtest(state, 15);
     tassert(ap * s == padic_matxx::from_QQ(aq * s, ctx));
-    fmpzxx::remove(s, s, ctx.get_p());
+    ltupleref(_, s) = s.remove(ctx.get_p());
     tassert(ap / s == padic_matxx::from_QQ(aq / s, ctx));
 }
 

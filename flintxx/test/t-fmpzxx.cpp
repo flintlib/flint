@@ -281,8 +281,7 @@ test_functions()
     tassert(p.is_probabprime());
     tassert(p.is_prime_pseudosquare());
 
-    fmpzxx rop;
-    tassert(fmpzxx::remove(rop, b*3, a) == 4 && rop == 3);
+    tassert((3*b).remove(a) == ltuple(4, 3));
 
     a = 17;
     a.clrbit(0);

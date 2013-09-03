@@ -170,8 +170,6 @@ static fmpzxx fmpzxx::randtest_mod(frandxx& state, Fmpz_expr m)
 
 static fmpzxx fmpzxx::randtest_mod_signed(frandxx& state, Fmpz_expr m)
 
-static slong fmpzxx::remove(Fmpz_expr rop, Fmpz_expr op, Fmpz_expr f)
-
 static fmpzxx_ref fmpzxx_ref::make(fmpz* f)
 static fmpzxx_srcref fmpzxx_srcref::make(const fmpz* f)
 
@@ -321,6 +319,8 @@ long flog(Fmpz_expr x, ulong b)
 double dlog(Fmpz_expr x)
 
 int jacobi(Fmpz_expr a, Fmpz_expr p)
+
+Ltuple<slong, fmpzxx>_expr remove(Fmpzxx a, Fmpzxx b)
 
 Fmpz_expr mul2_uiui(Fmpz_expr g, ulong x, ulong y)
 

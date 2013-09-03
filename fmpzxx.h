@@ -66,6 +66,7 @@ FLINT_DEFINE_BINOP(sqrtmod)
 FLINT_DEFINE_UNOP(sqrtrem)
 FLINT_DEFINE_BINOP(gcdinv)
 FLINT_DEFINE_BINOP(xgcd)
+FLINT_DEFINE_BINOP(remove)
 
 FLINT_DEFINE_FIVEARY(fmpzxx_bit_unpack)
 FLINT_DEFINE_THREEARY(fmpzxx_bit_unpack_unsigned)
@@ -113,14 +114,6 @@ public:
         fmpzxx_expression res;
         fmpz_randtest_mod_signed(res._fmpz(), state._data(), m.evaluate()._fmpz());
         return res;
-    }
-
-    template<class Fmpz_target, class Fmpz_expr1, class Fmpz_expr2>
-    static slong remove(Fmpz_target& rop,
-            const Fmpz_expr1& op, const Fmpz_expr2& f)
-    {
-        return fmpz_remove(rop._fmpz(), op.evaluate()._fmpz(),
-                f.evaluate()._fmpz());
     }
 
     // TODO would these make more sense static?
@@ -245,6 +238,7 @@ public:
     FLINTXX_DEFINE_MEMBER_BINOP(lcm)
     FLINTXX_DEFINE_MEMBER_BINOP(negmod)
     FLINTXX_DEFINE_MEMBER_BINOP(pow)
+    FLINTXX_DEFINE_MEMBER_BINOP(remove)
     FLINTXX_DEFINE_MEMBER_BINOP(rfac)
     FLINTXX_DEFINE_MEMBER_BINOP(root)
     FLINTXX_DEFINE_MEMBER_BINOP(sqrtmod)
@@ -677,6 +671,14 @@ FLINT_DEFINE_UNARY_EXPR_COND(sqrt_op, fmpzxx, FMPZXX_COND_S,
         fmpz_sqrt(to._fmpz(), from._fmpz()))
 FLINT_DEFINE_UNARY_EXPR_COND(abs_op, fmpzxx, FMPZXX_COND_S,
         fmpz_abs(to._fmpz(), from._fmpz()))
+
+namespace rdetail {
+typedef make_ltuple<mp::make_tuple<slong, fmpzxx>::type>::type slong_fmpzxx_pair;
+} // rdetail
+FLINT_DEFINE_BINARY_EXPR_COND2(remove_op, rdetail::slong_fmpzxx_pair,
+        FMPZXX_COND_S, FMPZXX_COND_S,
+        to.template get<0>() = fmpz_remove(to.template get<1>()._fmpz(),
+            e1._fmpz(), e2._fmpz()))
 } // rules
 
 // chinese remaindering

@@ -34,7 +34,6 @@
 #include "flintxx/matrix.h"
 
 // TODO input and output
-// TODO wrap padic_mat, padic_one
 
 namespace flint {
 FLINT_DEFINE_THREEARY(padic_matxx_get_entry)
@@ -79,6 +78,21 @@ public:
             slong rows, slong cols, long N)
         {return padic_matxx_expression(ctx, rows, cols, N);}
 
+    static padic_matxx_expression one(const padicxx_ctx& ctx,
+            slong rows, slong cols)
+    {
+        padic_matxx_expression res(ctx, rows, cols);
+        res.set_one();
+        return res;
+    }
+    static padic_matxx_expression one(const padicxx_ctx& ctx,
+            slong rows, slong cols, long N)
+    {
+        padic_matxx_expression res(ctx, rows, cols, N);
+        res.set_one();
+        return res;
+    }
+
     template<class T>
     static padic_matxx_expression from_QQ(const T& q, const padicxx_ctx& ctx,
             typename mp::enable_if<traits::is_fmpq_matxx<T> >::type* = 0)
@@ -119,6 +133,7 @@ public:
     // These only make sense with immediates
     void reduce() {padic_mat_reduce(_mat(), _ctx());}
     void set_zero() {padic_mat_zero(_mat());}
+    void set_one() {padic_mat_one(_mat());}
     void truncate(slong n) {fmpz_poly_truncate(_mat(), n);}
     void canonicalise() {padic_mat_canonicalise(_mat());}
     bool is_canonical() const {return padic_mat_is_canonical(_mat());}
