@@ -651,6 +651,16 @@ fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t 
                              const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
 
 void
+_fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
+                 slong len1, const fmpz * poly2, const fmpz * poly3, slong len3,
+                 const fmpz * poly3inv, slong len3inv, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
+                   const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv);
+
+void
 _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
                                               const fmpz * h, slong lenh, const fmpz_t p);
 
