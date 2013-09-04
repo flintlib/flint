@@ -71,6 +71,12 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
         abort();
     }
 
+    if (lenf <= len1 || lenf <= len2)
+    {
+        printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
+        abort();
+    }
+
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {
         nmod_poly_zero(res);
