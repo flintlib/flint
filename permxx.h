@@ -31,8 +31,6 @@
 #include "flintxx/frandxx.h"
 #include "flintxx/mp.h"
 
-// TODO printing
-
 namespace flint {
 class permxx
 {
@@ -106,6 +104,11 @@ template<class T> struct is_maybe_perm
     : mp::or_<mp::equal_types<T, permxx*>, mp::equal_types<T, int> > { };
 template<class T> struct is_permxx : mp::equal_types<T, permxx> { };
 } // traits
+
+inline int print(const permxx& p)
+{
+    return _perm_print(p._data(), p.size());
+}
 } // flint
 
 #endif

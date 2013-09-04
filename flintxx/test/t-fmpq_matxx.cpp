@@ -228,6 +228,10 @@ test_functions()
 
     assert_exception(fmpq_matxx(2, 2).solve_fraction_free(A).evaluate());
     assert_exception(fmpq_matxx(2, 2).solve_dixon(A).evaluate());
+
+    // make sure this compiles
+    if(0)
+        print(B);
 }
 
 void

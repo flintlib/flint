@@ -462,6 +462,9 @@ FLINT_DEFINE_DOIT_COND2(assignment, NMOD_POLYXX_COND_T, NMOD_POLYXX_COND_S,
 FLINTXX_DEFINE_ASSIGN_STR(nmod_polyxx, execution_check(
             nmod_poly_set_str(to._poly(), from), "assign string", "nmod_polyxx"))
 
+FLINT_DEFINE_PRINT_COND(NMOD_POLYXX_COND_S, nmod_poly_fprint(to, from._poly()))
+FLINT_DEFINE_READ_COND(NMOD_POLYXX_COND_T, nmod_poly_fread(from, to._poly()))
+
 FLINTXX_DEFINE_EQUALS(nmod_polyxx, nmod_poly_equal(e1._poly(), e2._poly()))
 FLINTXX_DEFINE_TO_STR(nmod_polyxx, nmod_poly_get_str(from._poly()))
 FLINTXX_DEFINE_SWAP(nmod_polyxx, nmod_poly_swap(e1._poly(), e2._poly()))
@@ -799,7 +802,6 @@ FLINT_DEFINE_BINARY_EXPR_COND2(inflate_op, nmod_polyxx,
 //////////////////////////////////////////////////////////////////////////////
 // FACTORISATION
 //////////////////////////////////////////////////////////////////////////////
-// TODO printing
 
 class nmod_poly_factorxx
 {
@@ -844,6 +846,8 @@ public:
 
     void realloc(slong a) {nmod_poly_factor_realloc(inner, a);}
     void fit_length(slong a) {nmod_poly_factor_fit_length(inner, a);}
+
+    void print() const {nmod_poly_factor_print(inner);}
 
     template<class Nmod_poly>
     void insert(const Nmod_poly& p, slong e,
@@ -912,6 +916,11 @@ NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_berlekamp)
 NMOD_POLY_FACTORXX_DEFINE_FACTOR(factor_with_kaltofen_shoup)
 
 // TODO do we want global versions of factor_distinct_deg etc?
+
+inline void print(const nmod_poly_factorxx& f)
+{
+    f.print();
+}
 
 
 // CRT stuff

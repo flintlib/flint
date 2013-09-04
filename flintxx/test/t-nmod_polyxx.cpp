@@ -444,6 +444,9 @@ test_factoring()
             || (degs[1] == f.degree() && degs[0] == g.degree()));
 
     // TODO test set_factor_equal_deg*
+
+    if(0)
+        print(fac); // make sure this compiles
 }
 
 void
@@ -507,6 +510,9 @@ main()
     test_factoring();
     test_reduction_reconstruction();
     test_randomisation();
+
+    frandxx rand;
+    test_print_read(nmod_polyxx::randtest(7, rand, 5));
 
     std::cout << "PASS" << std::endl;
     return 0;

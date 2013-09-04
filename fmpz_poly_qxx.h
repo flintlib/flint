@@ -218,6 +218,10 @@ FLINTXX_DEFINE_ASSIGN_STR(fmpz_poly_qxx, execution_check(
             !fmpz_poly_q_set_str(to._polyq(), from),
             "assign string", "fmpz_poly_qxx"))
 
+FLINT_DEFINE_PRINT_COND(FMPZ_POLY_QXX_COND_S, fmpz_poly_q_print(from._polyq()))
+FLINT_DEFINE_PRINT_PRETTY_COND_2(FMPZ_POLY_QXX_COND_S, const char*,
+        fmpz_poly_q_print_pretty(from._polyq(), extra))
+
 FLINTXX_DEFINE_EQUALS(fmpz_poly_qxx, fmpz_poly_q_equal(e1._polyq(), e2._polyq()))
 
 FLINT_DEFINE_UNARY_EXPR_COND(negate, fmpz_poly_qxx, FMPZ_POLY_QXX_COND_S,

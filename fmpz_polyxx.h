@@ -304,6 +304,11 @@ public:
         fmpz_poly_signature(&r1, &r2, this->evaluate()._poly());
     }
 
+    int read_pretty(char** x, FILE* f = stdin)
+    {
+        return fmpz_poly_fread_pretty(f, _poly(), x);
+    }
+
     // lazy member forwarding
     FLINTXX_DEFINE_MEMBER_BINOP_(operator(), compeval)
     FLINTXX_DEFINE_MEMBER_BINOP_(get_coeff, fmpz_polyxx_get_coeff)
@@ -532,6 +537,11 @@ FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLYXX_COND_T, FMPZXX_COND_S,
         fmpz_poly_set_fmpz(to._poly(), from._fmpz()))
 FLINTXX_DEFINE_ASSIGN_STR(fmpz_polyxx, execution_check(
             !fmpz_poly_set_str(to._poly(), from), "assign string", "fmpz_polyxx"))
+
+FLINT_DEFINE_PRINT_COND(FMPZ_POLYXX_COND_S, fmpz_poly_fprint(to, from._poly()))
+FLINT_DEFINE_PRINT_PRETTY_COND_2(FMPZ_POLYXX_COND_S, const char*,
+        fmpz_poly_fprint_pretty(to, from._poly(), extra))
+FLINT_DEFINE_READ_COND(FMPZ_POLYXX_COND_T, fmpz_poly_fread(from, to._poly()))
 
 FLINTXX_DEFINE_TO_STR(fmpz_polyxx, fmpz_poly_get_str(from._poly()))
 FLINTXX_DEFINE_SWAP(fmpz_polyxx, fmpz_poly_swap(e1._poly(), e2._poly()))
@@ -905,6 +915,19 @@ inline typename mp::enable_all_fmpz_polyxx<mp_limb_t, Poly>::type
 evaluate_mod(const Poly& p, mp_limb_t x, mp_limb_t n)
 {
     return fmpz_poly_evaluate_mod(p.evaluate()._poly(), x, n);
+}
+
+template<class Fmpz_poly>
+int read_pretty(Fmpz_poly& f, char** x,
+        typename mp::enable_if<FMPZ_POLYXX_COND_T<Fmpz_poly> >::type* = 0)
+{
+    return f.read_pretty(x);
+}
+template<class Fmpz_poly>
+int read_pretty(FILE* fi, Fmpz_poly& f, char** x,
+        typename mp::enable_if<FMPZ_POLYXX_COND_T<Fmpz_poly> >::type* = 0)
+{
+    return f.read_pretty(x, fi);
 }
 } // flint
 

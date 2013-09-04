@@ -26,7 +26,6 @@
 #ifndef FMPZ_POLY_FACTORXX_H
 #define FMPZ_POLY_FACTORXX_H
 
-// TODO printing
 
 #include "fmpz_poly_factor.h"
 #include "fmpz_polyxx.h"
@@ -81,6 +80,8 @@ public:
 
     void realloc(slong a) {fmpz_poly_factor_realloc(inner, a);}
     void fit_length(slong a) {fmpz_poly_factor_fit_length(inner, a);}
+
+    void print() const {fmpz_poly_factor_print(inner);}
 
     template<class Fmpz_poly>
     void insert(const Fmpz_poly& p, slong e,
@@ -146,6 +147,11 @@ inline fmpz_poly_factorxx hensel_lift_once(const Fmpz_poly& f,
     fmpz_poly_factorxx res;
     res.set_hensel_lift_once(f, local_fac, N);
     return res;
+}
+
+inline void print(const fmpz_poly_factorxx& f)
+{
+    f.print();
 }
 } // flint
 

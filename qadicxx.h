@@ -36,8 +36,6 @@
 
 #include "padicxx.h"
 
-// TODO printing
-
 namespace flint {
 FLINT_DEFINE_BINOP(frobenius)
 FLINT_DEFINE_UNOP(norm)
@@ -65,6 +63,11 @@ public:
 
     ~qadicxx_ctx() {qadic_ctx_clear(ctx);}
 };
+
+inline void print(const qadicxx_ctx& c)
+{
+    qadic_ctx_print(c._ctx());
+}
 
 namespace traits {
 template<class T> struct has_qadicxx_ctx : mp::false_ { };
@@ -333,6 +336,9 @@ FLINT_DEFINE_DOIT_COND2(assignment, QADICXX_COND_T, traits::is_unsigned_integer,
         qadic_set_ui(to._qadic(), from, to._ctx()))
 FLINT_DEFINE_DOIT_COND2(assignment, QADICXX_COND_T, PADICXX_COND_S,
         padic_poly_set_padic(to._qadic(), from._padic(), from._ctx()))
+
+FLINT_DEFINE_PRINT_PRETTY_COND(QADICXX_COND_S,
+        qadic_fprint_pretty(to, from._qadic(), from._ctx()))
 
 template<class T>
 struct conversion<padicxx, T,

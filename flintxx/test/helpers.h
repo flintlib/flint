@@ -26,7 +26,12 @@
 #define CXX_TEST_HELPERS_H
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <streambuf>
 #include <cstdlib>
+
+#include "flintxx/flint_classes.h"
 
 #ifndef EXIT_STATEMENT
 #define EXIT_STATEMENT std::exit(1)
@@ -97,6 +102,98 @@ bool typed_equals(const T& a, const T& b)
 } while(0)
 
 #define assert_exception(expr) _assert_exception(expr, flint_exception)
+
+template<class T>
+void test_print_read(const T& t)
+{
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+    T tmp(t); tmp.set_zero();
+    FILE * f = std::fopen("test_print_read", "w+");
+    tassert(f);
+    print(f, t+t);
+    std::fflush(f);
+    std::fclose(f);
+
+    f = std::fopen("test_print_read", "r");
+    typename flint::flint_classes::to_ref<T>::type tmpref(tmp);
+    tassert(read(f, tmpref) > 0);
+    tassert(t+t == tmp);
+    tassert(std::remove("test_print_read") == 0);
+#endif
+}
+
+template<class T>
+void test_print_read_pretty(const T& t)
+{
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+    T tmp(t); tmp.set_zero();
+    FILE * f = std::fopen("test_print_read", "w+");
+    tassert(f);
+    print_pretty(f, t+t, "x");
+    std::fflush(f);
+    std::fclose(f);
+
+    f = std::fopen("test_print_read", "r");
+    char* rvar;
+    typename flint::flint_classes::to_ref<T>::type tmpref(tmp);
+    tassert(read_pretty(f, tmpref, &rvar) > 0);
+    tassert(t+t == tmp);
+    tassert(std::remove("test_print_read") == 0);
+    flint_free(rvar);
+#endif
+}
+
+inline std::string readfile(const char* name)
+{
+    std::ifstream t(name);
+    return std::string(std::istreambuf_iterator<char>(t),
+                 std::istreambuf_iterator<char>());
+}
+
+template<class T>
+void tassert_fprint(const T& t, const char* expected)
+{
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+    FILE * f = std::fopen("test_fprint", "w+");
+    tassert(f);
+    print(f, t);
+    std::fflush(f);
+    std::fclose(f);
+
+    tassert(readfile("test_fprint") == expected);
+    tassert(std::remove("test_fprint") == 0);
+#endif
+}
+
+template<class T, class U>
+void tassert_fprint_pretty(const T& t, const U& extra, const char* expected)
+{
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+    FILE * f = std::fopen("test_fprint_pretty", "w+");
+    tassert(f);
+    print_pretty(f, t, extra);
+    std::fflush(f);
+    std::fclose(f);
+
+    tassert(readfile("test_fprint_pretty") == expected);
+    tassert(std::remove("test_fprint_pretty") == 0);
+#endif
+}
+
+template<class T>
+void tassert_fprint_pretty(const T& t, const char* expected)
+{
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+    FILE * f = std::fopen("test_fprint_pretty", "w+");
+    tassert(f);
+    print_pretty(f, t);
+    std::fflush(f);
+    std::fclose(f);
+
+    tassert(readfile("test_fprint_pretty") == expected);
+    tassert(std::remove("test_fprint_pretty") == 0);
+#endif
+}
 
 
 #endif

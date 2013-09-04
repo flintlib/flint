@@ -39,7 +39,6 @@
 #include "flintxx/ltuple.h"
 #include "flintxx/matrix.h"
 
-// TODO printing
 // TODO addmul
 // TODO default argument for mat_solve_triu etc?
 // TODO nullspace member
@@ -337,6 +336,9 @@ FLINT_DEFINE_DOIT_COND2(assignment, NMOD_MATXX_COND_T, NMOD_MATXX_COND_S,
 FLINTXX_DEFINE_SWAP(nmod_matxx, nmod_mat_swap(e1._mat(), e2._mat()))
 
 FLINTXX_DEFINE_EQUALS(nmod_matxx, nmod_mat_equal(e1._mat(), e2._mat()))
+
+FLINT_DEFINE_PRINT_PRETTY_COND(NMOD_MATXX_COND_S,
+        (nmod_mat_print_pretty(from._mat()), 0))
 
 FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, nmodxx,
         NMOD_MATXX_COND_S, traits::fits_into_slong, traits::fits_into_slong,

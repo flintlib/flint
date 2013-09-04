@@ -145,16 +145,29 @@ test_functions()
     tassert(f.pow(7u) == pow(f, 7u));
 }
 
+void
+test_printing()
+{
+    if(0)
+    {
+        // make sure these compile
+        fmpz_poly_qxx f;
+        print(f);
+        print_pretty(f, "x");
+    }
+}
+
 int
 main()
 {
-    std::cout << "fmpz_polyxx....";
+    std::cout << "fmpz_poly_qxx....";
 
     test_manipulation();
     test_assignment_conversion();
     test_arithmetic();
     test_functions();
     test_extras();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

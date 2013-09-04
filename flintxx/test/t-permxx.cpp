@@ -59,6 +59,9 @@ main()
     tassert(maybe_perm_data(&p1) == p1._data());
     tassert(maybe_perm_data(0) == 0);
 
+    if(0)
+        print(p1); // make sure this compiles
+
     std::cout << "PASS" << std::endl;
 
     return 0;

@@ -32,7 +32,6 @@
 #include "fmpzxx.h"
 #include "flintxx/ltuple.h"
 
-// TODO printing
 // TODO codegen
 // TODO factor_pp1 multiple return values
 
@@ -97,6 +96,8 @@ public:
 
     fmpz_factor_t& _data() {return inner;}
     const fmpz_factor_t& _data() const {return inner;}
+
+    void print() const {fmpz_factor_print(inner);}
 
     template<class Fmpz>
     typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type
@@ -178,6 +179,11 @@ factor_pp1(const Fmpz& f, ulong B1, ulong B2_sqrt, ulong c)
     fmpz_factorxx res;
     res.set_factor_pp1(f, B1, B2_sqrt, c);
     return res;
+}
+
+inline void print(const fmpz_factorxx& f)
+{
+    f.print();
 }
 } // flint
 

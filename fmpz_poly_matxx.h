@@ -34,8 +34,6 @@
 
 #include "flintxx/matrix.h"
 
-// TODO printing
-
 namespace flint {
 FLINT_DEFINE_UNOP(prod)
 
@@ -276,6 +274,9 @@ FLINT_DEFINE_DOIT_COND2(assignment, FMPZ_POLY_MATXX_COND_T, FMPZ_POLY_MATXX_COND
 FLINTXX_DEFINE_SWAP(fmpz_poly_matxx, fmpz_poly_mat_swap(e1._mat(), e2._mat()))
 
 FLINTXX_DEFINE_EQUALS(fmpz_poly_matxx, fmpz_poly_mat_equal(e1._mat(), e2._mat()))
+
+FLINT_DEFINE_PRINT_COND(FMPZ_POLY_MATXX_COND_S,
+        (fmpz_poly_mat_print(from._mat()), 0))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(times, fmpz_poly_matxx,
         FMPZ_POLY_MATXX_COND_S, FMPZ_POLY_MATXX_COND_S,

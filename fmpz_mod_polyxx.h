@@ -41,7 +41,6 @@
 #include "flintxx/vector.h"
 
 // TODO create/use fmpz_modxx class?
-// TODO printing
 
 namespace flint {
 FLINT_DEFINE_BINOP(divrem_f)
@@ -137,7 +136,7 @@ class fmpz_mod_polyxx_expression
         return fmpz_mod_poly_remove(_poly(), p.evaluate()._poly());
     }
 
-    void set_zero() {fmpz_mod_poly_zero_coeffs(_poly());}
+    void set_zero() {fmpz_mod_poly_zero(_poly());}
 
     // unified coefficient access
     typename poly_traits_t::lead_ref_t lead()
@@ -325,6 +324,11 @@ FLINTXX_DEFINE_EQUALS(fmpz_mod_polyxx, fmpz_mod_poly_equal(e1._poly(), e2._poly(
 FLINT_DEFINE_BINARY_EXPR_COND2(fmpz_mod_polyxx_get_coeff_op, fmpzxx,
         FMPZ_MOD_POLYXX_COND_S, traits::fits_into_slong,
         fmpz_mod_poly_get_coeff_fmpz(to._fmpz(), e1._poly(), e2))
+
+FLINT_DEFINE_PRINT_COND(FMPZ_MOD_POLYXX_COND_S, fmpz_mod_poly_fprint(to, from._poly()))
+FLINT_DEFINE_PRINT_PRETTY_COND_2(FMPZ_MOD_POLYXX_COND_S, const char*,
+        fmpz_mod_poly_fprint_pretty(to, from._poly(), extra))
+FLINT_DEFINE_READ_COND(FMPZ_MOD_POLYXX_COND_T, fmpz_mod_poly_fread(from, to._poly()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(plus, fmpz_mod_polyxx,
         FMPZ_MOD_POLYXX_COND_S, FMPZ_MOD_POLYXX_COND_S,

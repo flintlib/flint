@@ -313,6 +313,13 @@ test_lu()
     tassert(B1.set_lu_recursive() == B2.set_lu() && B1 == B2);
 }
 
+void
+test_printing()
+{
+    if(0)
+        print_pretty(nmod_matxx::zero(2, 2, 7)); // make sure this compiles
+}
+
 int
 main()
 {
@@ -325,6 +332,7 @@ main()
     test_randomisation();
     test_reduction_reconstruction();
     test_lu();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

@@ -200,6 +200,8 @@ test_functions()
     fmpqxx b(zero);
     swap(a, b);
     tassert(a.is_zero() && b.is_one());
+
+    tassert_fprint(fmpqxx::frac(7, 29), "7/29");
 }
 
 void

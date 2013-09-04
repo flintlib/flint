@@ -313,6 +313,9 @@ test_factoring()
             && f.is_irreducible_rabin());
     tassert(f.is_squarefree());
     // TODO test set_factor_equal_deg*
+
+    if(0)
+        print(fac); // test this compiles
 }
 
 void
@@ -358,6 +361,18 @@ test_radix()
     tassert(f == F);
 }
 
+void
+test_printing()
+{
+    frandxx state;
+    fmpz_mod_polyxx f = fmpz_mod_polyxx::randtest(fmpzxx(7), state, 4);
+    test_print_read(f);
+    f.set_zero();
+    f.set_coeff(0, 3);
+    f.set_coeff(1, 1);
+    tassert_fprint_pretty(f, "x", "x+3");
+}
+
 int
 main()
 {
@@ -373,6 +388,7 @@ main()
     test_factoring();
     test_randomisation();
     test_radix();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

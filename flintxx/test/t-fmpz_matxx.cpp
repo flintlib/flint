@@ -288,6 +288,16 @@ test_row_reduction()
     tassert(A == B && p1 == p2);
 }
 
+void
+test_printing()
+{
+    frandxx rand;
+    fmpz_matxx A = fmpz_matxx::randtest(2, 2, rand, 5);
+    test_print_read(A);
+    A.set_one();
+    tassert_fprint_pretty(A, "[[1 0]\n[0 1]\n]");
+}
+
 int
 main()
 {
@@ -301,6 +311,7 @@ main()
     test_extras();
     test_randomisation();
     test_row_reduction();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

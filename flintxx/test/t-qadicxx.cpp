@@ -176,6 +176,15 @@ test_prec()
     tassert((a.toN(15) + br.toN(10)).prec() == 15);
 }
 
+void
+test_printing()
+{
+    qadicxx_ctx ctx(fmpzxx(5), 3, 10, 20, PADIC_TERSE);
+    if(0)
+        print(ctx); // make sure this compiles
+    tassert_fprint_pretty(qadicxx::gen(ctx).pow(fmpzxx(2)), "x^2");
+}
+
 int
 main()
 {
@@ -188,6 +197,7 @@ main()
     test_functions();
     test_extras();
     test_prec();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

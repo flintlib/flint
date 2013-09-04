@@ -190,6 +190,13 @@ test_prec()
     tassert((a.toN(15) + br.toN(10)).prec() == 15);
 }
 
+void
+test_printing()
+{
+    tassert_fprint(padic_matxx::one(ctx, 2, 2), "2 2  1 0 0 1");
+    tassert_fprint_pretty(padic_matxx::one(ctx, 2, 2), "[[1 0]\n[0 1]]");
+}
+
 int
 main()
 {
@@ -202,6 +209,7 @@ main()
     test_functions();
     test_extras();
     test_prec();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

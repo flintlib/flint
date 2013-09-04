@@ -360,6 +360,11 @@ FLINTXX_DEFINE_ASSIGN_STR(fmpq_polyxx, execution_check(
 FLINTXX_DEFINE_TO_STR(fmpq_polyxx, fmpq_poly_get_str(from._poly()))
 FLINTXX_DEFINE_SWAP(fmpq_polyxx, fmpq_poly_swap(e1._poly(), e2._poly()))
 
+FLINT_DEFINE_PRINT_COND(FMPQ_POLYXX_COND_S, fmpq_poly_fprint(to, from._poly()))
+FLINT_DEFINE_PRINT_PRETTY_COND_2(FMPQ_POLYXX_COND_S, const char*,
+        fmpq_poly_fprint_pretty(to, from._poly(), extra))
+FLINT_DEFINE_READ_COND(FMPQ_POLYXX_COND_T, fmpq_poly_fread(from, to._poly()))
+
 FLINT_DEFINE_BINARY_EXPR_COND2(reverse_op, fmpq_polyxx,
         FMPQ_POLYXX_COND_S, traits::fits_into_slong,
         fmpq_poly_reverse(to._poly(), e1._poly(), e2))

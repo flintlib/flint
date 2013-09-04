@@ -219,6 +219,12 @@ test_prec()
     tassert((a.toN(15) + br.toN(10)).prec() == 15);
 }
 
+void
+test_printing()
+{
+    tassert_fprint(padicxx(0), "0");
+}
+
 int
 main()
 {
@@ -231,6 +237,7 @@ main()
     test_functions();
     test_extras();
     test_prec();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

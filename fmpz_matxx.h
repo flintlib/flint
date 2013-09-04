@@ -398,6 +398,11 @@ FLINTXX_DEFINE_SWAP(fmpz_matxx, fmpz_mat_swap(e1._mat(), e2._mat()))
 
 FLINTXX_DEFINE_EQUALS(fmpz_matxx, fmpz_mat_equal(e1._mat(), e2._mat()))
 
+FLINT_DEFINE_PRINT_COND(FMPZ_MATXX_COND_S, fmpz_mat_fprint(to, from._mat()))
+FLINT_DEFINE_READ_COND(FMPZ_MATXX_COND_T, fmpz_mat_fread(from, to._mat()))
+FLINT_DEFINE_PRINT_PRETTY_COND(FMPZ_MATXX_COND_S,
+        fmpz_mat_fprint_pretty(to, from._mat()))
+
 FLINT_DEFINE_BINARY_EXPR_COND2(times, fmpz_matxx,
         FMPZ_MATXX_COND_S, FMPZ_MATXX_COND_S,
         fmpz_mat_mul(to._mat(), e1._mat(), e2._mat()))

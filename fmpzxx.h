@@ -132,6 +132,8 @@ public:
     // these only make sense with fmpzxx/fmpzxx_ref
     void clrbit(ulong i) {fmpz_clrbit(_fmpz(), i);}
     void combit(ulong i) {fmpz_combit(_fmpz(), i);}
+    void set_zero() {fmpz_zero(_fmpz());}
+    void set_one() {fmpz_one(_fmpz());}
 
     // These make sense with all expressions, but cause evaluation
     double get_d_2exp(long& exp) const
@@ -374,8 +376,6 @@ struct cmp<T, U,
     }
 };
 
-FLINTXX_DEFINE_ASSIGN_STR(fmpzxx, fmpz_set_str(to._fmpz(), from, 10))
-
 template<class T>
 struct cmp<fmpzxx, T,
     typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
@@ -386,9 +386,13 @@ struct cmp<fmpzxx, T,
     }
 };
 
+FLINTXX_DEFINE_ASSIGN_STR(fmpzxx, fmpz_set_str(to._fmpz(), from, 10))
 FLINTXX_DEFINE_TO_STR(fmpzxx, fmpz_get_str(0,  base, from._fmpz()))
 
 FLINTXX_DEFINE_SWAP(fmpzxx, fmpz_swap(e1._fmpz(), e2._fmpz()))
+
+FLINT_DEFINE_PRINT_COND(FMPZXX_COND_S, fmpz_fprint(to, from._fmpz()))
+FLINT_DEFINE_READ_COND(FMPZXX_COND_T, fmpz_fread(from, to._fmpz()))
 
 FLINT_DEFINE_GET_COND(conversion, slong, FMPZXX_COND_S,
         fmpz_get_si(from._fmpz()))

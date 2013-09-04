@@ -332,6 +332,11 @@ FLINTXX_DEFINE_SWAP(padic_polyxx, padic_poly_swap(e1._poly(), e2._poly()))
 
 FLINTXX_DEFINE_EQUALS(padic_polyxx, padic_poly_equal(e1._poly(), e2._poly()))
 
+FLINT_DEFINE_PRINT_COND(PADIC_POLYXX_COND_S,
+        padic_poly_fprint(to, from._poly(), from._ctx()))
+FLINT_DEFINE_PRINT_PRETTY_COND_2(PADIC_POLYXX_COND_S, const char*,
+        padic_poly_fprint_pretty(to, from._poly(), extra, from._ctx()))
+
 FLINTXX_DEFINE_CONVERSION_TMP(fmpz_polyxx, padic_polyxx,
         execution_check(padic_poly_get_fmpz_poly(
                 to._poly(), from._poly(), from._ctx()),

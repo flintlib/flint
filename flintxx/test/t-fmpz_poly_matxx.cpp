@@ -214,6 +214,9 @@ test_functions()
     tassert(nullity == 3 - rank(A));
     tassert(C.rank() == nullity);
     tassert((A*C).is_zero());
+
+    if(0)
+        print(A); // make sure this compiles
 }
 
 void

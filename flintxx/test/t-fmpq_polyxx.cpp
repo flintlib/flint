@@ -287,6 +287,16 @@ test_transcendental_series()
                 - pow(sinh_series(x, 10), 2u)) % pow(x, 10u)).is_one());
 }
 
+void
+test_printing()
+{
+    frandxx state;
+    fmpq_polyxx f = fmpq_polyxx::randtest(state, 4, 10);
+    test_print_read(f);
+    f = "2  3 1";
+    tassert_fprint_pretty(f, "x", "x+3");
+}
+
 int
 main()
 {
@@ -300,6 +310,7 @@ main()
     test_functions();
     test_transcendental_series();
     test_extras();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

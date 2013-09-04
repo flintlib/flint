@@ -296,6 +296,11 @@ FLINTXX_DEFINE_SWAP(padic_matxx, padic_mat_swap(e1._mat(), e2._mat()))
 
 FLINTXX_DEFINE_EQUALS(padic_matxx, padic_mat_equal(e1._mat(), e2._mat()))
 
+FLINT_DEFINE_PRINT_COND(PADIC_MATXX_COND_S,
+        padic_mat_fprint(to, from._mat(), from._ctx()))
+FLINT_DEFINE_PRINT_PRETTY_COND(PADIC_MATXX_COND_S,
+        padic_mat_fprint_pretty(to, from._mat(), from._ctx()))
+
 template<class T>
 struct conversion<fmpq_matxx, T,
     typename mp::enable_if< PADIC_MATXX_COND_S<T> >::type>

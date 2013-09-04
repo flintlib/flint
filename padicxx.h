@@ -542,6 +542,9 @@ FLINTXX_DEFINE_EQUALS(padicxx, padic_equal(e1._padic(), e2._padic()))
 FLINT_DEFINE_UNARY_EXPR_COND(padicxx_unit_op, fmpzxx, PADICXX_COND_S,
         fmpz_set(to._fmpz(), padic_unit(from._padic())))
 
+FLINT_DEFINE_PRINT_COND(PADICXX_COND_S,
+        padic_fprint(to, from._padic(), from._ctx()))
+
 
 FLINT_DEFINE_CBINARY_EXPR_COND2(plus, padicxx, PADICXX_COND_S, PADICXX_COND_S,
         padic_add(to._padic(), e1._padic(), e2._padic(), to._ctx()))

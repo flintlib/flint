@@ -550,6 +550,9 @@ test_factoring()
     tassert(f.expand() == -2*3*5);
     tassert(f.expand() == f.expand_iterative());
     tassert(f.expand() == f.expand_multiexp());
+
+    if(0)
+        print(f); // make sure this compiles
 }
 
 void
@@ -600,6 +603,7 @@ main()
     test_randomisation();
     test_factoring();
     test_crt();
+    test_print_read(fmpzxx(-17));
 
     // TODO test that certain things *don't* compile?
     // TODO test enable_all_fmpzxx

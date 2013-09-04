@@ -410,6 +410,9 @@ test_factoring()
     tassert(f1 == factor_squarefree(f*g*g));
 
     // TODO set_factor_zassenhaus_recombination
+
+    if(0)
+        print(f1); // make sure this compiles
 }
 
 detail::IGNORED_TYPE _;
@@ -448,6 +451,15 @@ test_hensel()
     tassert(((lifted_fac.p(0)*lifted_fac.p(1) - f) % p.pow(3u)).is_zero());
 }
 
+void
+test_printing()
+{
+    frandxx state;
+    fmpz_polyxx f = fmpz_polyxx::randtest(state, 4, 10);
+    test_print_read(f);
+    test_print_read_pretty(f);
+}
+
 int
 main()
 {
@@ -463,6 +475,7 @@ main()
     test_extras();
     test_factoring();
     test_hensel();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;

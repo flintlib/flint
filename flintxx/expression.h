@@ -255,13 +255,14 @@ public:
     {
         return rules::print_pretty<evaluated_t>::doit(f, evaluate());
     }
+    template<class T>
+    int print_pretty(const T& extra, FILE* f = stdout) const
+    {
+        return rules::print_pretty<evaluated_t>::doit(f, evaluate(), extra);
+    }
     int read(FILE* f = stdin)
     {
         return rules::read<derived_t>::doit(f, downcast());
-    }
-    int read_pretty(FILE* f = stdin)
-    {
-        return rules::read_pretty<derived_t>::doit(f, downcast());
     }
 
     typename traits::make_const<evaluation_return_t>::type evaluate() const
@@ -676,6 +677,20 @@ print(FILE* f, const T& t)
 {
     return t.print(f);
 }
+template<class T, class U>
+typename mp::enable_if<traits::is_implemented<
+    rules::print_pretty<typename T::evaluated_t> >, int>::type
+print_pretty(const T& t, const U& extra)
+{
+    return t.print_pretty(extra);
+}
+template<class T, class U>
+typename mp::enable_if<traits::is_implemented<
+    rules::print_pretty<typename T::evaluated_t> >, int>::type
+print_pretty(FILE* f, const T& t, const U& extra)
+{
+    return t.print_pretty(extra, f);
+}
 template<class T>
 typename mp::enable_if<traits::is_implemented<
     rules::print_pretty<typename T::evaluated_t> >, int>::type
@@ -703,20 +718,6 @@ typename mp::enable_if<traits::is_implemented<
 read(FILE* f, T& t)
 {
     return t.read(f);
-}
-template<class T>
-typename mp::enable_if<traits::is_implemented<
-    rules::read_pretty<typename T::evaluated_t> >, int>::type
-read_pretty(T& t)
-{
-    return t.read_pretty();
-}
-template<class T>
-typename mp::enable_if<traits::is_implemented<
-    rules::read_pretty<typename T::evaluated_t> >, int>::type
-read_pretty(FILE* f, T& t)
-{
-    return t.read_pretty(f);
 }
 
 // TODO move to std?

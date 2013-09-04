@@ -26,7 +26,6 @@
 #ifndef FMPZ_POLY_FACTORXX_H
 #define FMPZ_POLY_FACTORXX_H
 
-// TODO printing
 
 #include "fmpz_mod_poly_factor.h"
 #include "fmpz_mod_polyxx.h"
@@ -75,6 +74,8 @@ public:
 
     void realloc(slong a) {fmpz_mod_poly_factor_realloc(inner, a);}
     void fit_length(slong a) {fmpz_mod_poly_factor_fit_length(inner, a);}
+
+    void print() const {fmpz_mod_poly_factor_print(inner);}
 
     template<class Fmpz_mod_poly>
     void insert(const Fmpz_mod_poly& p, slong e,
@@ -137,6 +138,11 @@ FMPZ_MOD_POLY_FACTORXX_DEFINE_FACTOR(factor_berlekamp)
 FMPZ_MOD_POLY_FACTORXX_DEFINE_FACTOR(factor_kaltofen_shoup)
 
 // TODO do we want global versions of factor_distinct_deg etc?
+
+inline void print(const fmpz_mod_poly_factorxx& f)
+{
+    f.print();
+}
 } // flint
 
 #endif

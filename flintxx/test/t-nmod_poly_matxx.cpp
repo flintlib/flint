@@ -265,6 +265,14 @@ test_row_reduction()
     tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
 }
 
+
+void
+test_printing()
+{
+    if(0)
+        print_pretty(nmod_poly_matxx::zero(2, 2, 7), "x"); // make sure this compiles
+}
+
 int
 main()
 {
@@ -276,6 +284,7 @@ main()
     test_extras();
     test_randomisation();
     test_row_reduction();
+    test_printing();
 
     std::cout << "PASS" << std::endl;
     return 0;
