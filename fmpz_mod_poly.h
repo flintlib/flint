@@ -287,6 +287,15 @@ void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1,
 void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                     const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f);
 
+void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
+                    const fmpz * poly2, slong len2, const fmpz * f, slong lenf,
+                    const fmpz* finv, slong lenfinv, const fmpz_t p);
+
+void
+fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                         const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f,
+                         const fmpz_mod_poly_t finv);
+
 /*  Powering *****************************************************************/
 
 void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e, 
