@@ -28,7 +28,7 @@
 
 #include <limits.h>
 
-#include <mpir.h>
+#include <gmp.h>
 #include "fmpz.h"
 #include "fmpq.h"
 #include "padic.h"

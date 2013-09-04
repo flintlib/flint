@@ -28,7 +28,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "nmod_poly.h"
