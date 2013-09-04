@@ -514,6 +514,31 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that the leading coefficient of $B$ is invertible 
     modulo $p$.
 
+void _fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+                            slong lenA, const fmpz* B, slong lenB,
+                            const fmpz* Binv, slong lenBinv, const fmpz_t mod)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
+    \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
+    coefficients. Furthermore, we assume that $Binv$ is the inverse of the
+    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call
+    \code{div_newton21_preinv()} and then multiply out and compute
+    the remainder.
+
+void fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
+    We assume $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to call \code{div_newton21()} and then multiply out
+    and compute the remainder.
+
 void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
     const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
@@ -532,6 +557,37 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
     $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
+
+void _fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
+                                    const fmpz* B, slong lenB, const fmpz* Binv,
+                                    slong lenBinv, const fmpz_t mod)
+
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA}
+    and \code{B} is of length \code{lenB}, but return only $Q$.
+
+    We require that $Q$ have space for \code{lenA - lenB + 1} coefficients
+    and assume that the leading coefficient of $B$ is a unit. Furthermore, we
+    assume that $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+void fmpz_mod_poly_div_newton21_preinv(fmpz_mod_poly_t Q,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv)
+
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R) < \len(B)$, but returns only $Q$.
+
+    We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
+    the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
 
 ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 
