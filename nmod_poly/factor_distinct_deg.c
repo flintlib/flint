@@ -28,7 +28,7 @@
 #include "nmod_poly.h"
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong **degs)
+                                   const nmod_poly_t poly, slong * const *degs)
 {
     nmod_poly_t f, g, s, v, vinv, reducedH0, tmp;
     nmod_poly_t *h, *H, *I;
