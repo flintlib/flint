@@ -70,6 +70,11 @@ void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
         return;
     }
 
+    if (lenA > 2*lenB-2)
+    {
+        flint_printf ("Exception (nmod_poly_div_newton_preinv).\n");
+    }
+
     if (Q == A || Q == B || Q == Binv)
     {
         q = flint_malloc(lenQ * sizeof(mp_limb_t));
