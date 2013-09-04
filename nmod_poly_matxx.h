@@ -275,7 +275,7 @@ FLINTXX_DEFINE_SWAP(nmod_poly_matxx, nmod_poly_mat_swap(e1._mat(), e2._mat()))
 FLINTXX_DEFINE_EQUALS(nmod_poly_matxx, nmod_poly_mat_equal(e1._mat(), e2._mat()))
 
 FLINT_DEFINE_PRINT_PRETTY_COND_2(NMOD_POLY_MATXX_COND_S, const char*,
-        (nmod_poly_mat_print(from._mat(), extra), 0))
+        (nmod_poly_mat_print(from._mat(), extra), 1))
 
 FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, nmod_polyxx,
         NMOD_POLY_MATXX_COND_S, traits::fits_into_slong, traits::fits_into_slong,

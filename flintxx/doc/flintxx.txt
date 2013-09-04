@@ -134,6 +134,8 @@ permxx inv(const permxx&)
 
     Return the inverse permutation.
 
+int print(const permxx&)
+
 
 
 *******************************************************************************
@@ -387,6 +389,15 @@ Fmpz_expr sqrt(Fmpz_expr)
 Fmpz_expr abs(Fmpz_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Fmpz_expr)
+int print(FILE*, Fmpz_expr)
+int read(Fmpz_target)
+int read(FILE*, Fmpz_target)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Chinese remaindering
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -484,6 +495,8 @@ fmpz_factorxx factor(Fmpz_expr)
 fmpz_factorxx factor(T:fits_into_slong)
 Ltuple<bool, fmpz_factorxx>_expr factor_trial_range(Fmpz_expr)
 fmpz_factorxx factor_pp1(Fmpz_expr)
+
+void print(const fmpz_factorxx&)
 
 
 *******************************************************************************
@@ -624,6 +637,17 @@ Ltuple<slong, fmpz_matxx>_expr nullspace(Fmpz_mat_expr A)
     \code{fmpz_mat_t} corresponding to \code{B, A}.
 
 slong rank(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpz_mat_expr)
+print(FILE*, Fmpz_mat_expr)
+print_pretty(Fmpz_mat_expr)
+print_pretty(FILE*, Fmpz_mat_expr)
+read(Fmpz_mat_target)
+read(FILE*, Fmpz_mat_target)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Conversion
@@ -1120,6 +1144,18 @@ Fmpz_poly_expr sqrt_classical(Fmpz_poly_expr p)
 Fmpz_expr bound_roots(Fmpz_poly_expr p)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+print(Fmpz_poly_expr)
+print(FILE*, Fmpz_poly_expr)
+print_pretty(Fmpz_poly_expr, const char* var)
+print_pretty(FILE*, Fmpz_poly_expr, const char* var)
+read(Fmpz_poly_target)
+read(FILE*, Fmpz_poly_target)
+read_pretty(Fmpz_poly_target, const char* var)
+read_pretty(FILE*, Fmpz_poly_target, const char* var)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Modular reduction and reconstruction
 
     For modular reduction, see \code{nmod_polyxx::reduce}.
@@ -1368,6 +1404,8 @@ Fmpq_expr height(Fmpq_expr)
 Fmpq_expr inv(Fmpq_expr)
 Fmpq_expr pow(Fmpq_expr, T:fits_into_slong)
 
+int print(Fmpq_expr)
+
 
 
 *******************************************************************************
@@ -1415,6 +1453,11 @@ Fmpq_mat_target Fmpq_mat_target::operator=(Fmpz_mat_expr)
 fmpq_matxx::fmpq_matxx(slong m, slong n)
 
     See \code{fmpq_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int print(Fmpq_mat_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Entry access
@@ -1571,6 +1614,10 @@ Ltuple<slong, fmpq_matxx>_expr rref_fraction_free(Fmpq_mat_expr)
     fmpq\_polyxx
 
 *******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Not yet split into subsections
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 fmpq_polyxx::fmpq_polyxx()
 
@@ -1777,6 +1824,16 @@ Fmpq_poly_expr sinh_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr cosh_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr tanh_series(Fmpq_poly_expr, T:fits_into_slong)
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpq_poly_expr)
+print(FILE*, Fmpq_poly_expr)
+print_pretty(Fmpq_poly_expr, const char* var)
+print_pretty(FILE*, Fmpq_poly_expr, const char* var)
+read(Fmpq_poly_target)
+read(FILE*, Fmpq_poly_target)
 
 
 *******************************************************************************
@@ -1844,6 +1901,9 @@ Fmpz_poly_q_expr pow(Fmpz_poly_q_expr, T:is_unsigned_integer)
 
 Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
 
+int print(Fmpz_poly_q_expr)
+int print_pretty(Fmpz_poly_q_expr, const char* var)
+
 
 *******************************************************************************
 
@@ -1885,6 +1945,12 @@ Fmpz_poly_mat_expr operator?(??, ??)
 Fmpz_poly_mat_expr operator-(Fmpz_poly_mat_expr)
 
     The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Fmpz_poly_mat_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Basic properties
@@ -2269,6 +2335,15 @@ static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
 
     Consider $e \in \mathbb{Z}/n\mathbb{Z}$ as an element of
     $\mathbb{Z}/n\mathbb{Z}[X]$.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Nmod_poly_expr)
+print(FILE*, Nmod_poly_expr)
+read(Nmod_poly_target)
+read(FILE*, Nmod_poly_target)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
@@ -2714,6 +2789,12 @@ static nmod_matxx::reduce(Fmpz_mat_expr, mp_limb_t modulus)
     See \code{fmpz_mat_get_nmod_mat}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2920,6 +3001,12 @@ Nmod_poly_mat_expr operator-(Nmod_poly_mat_expr)
     The unary negation operator is overloaded.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print_pretty(Nmod_poly_mat_expr, const char*)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3122,6 +3209,17 @@ Fmpz_mod_poly_expr operator?(??, ??)
 Fmpz_mod_poly_expr operator-(Fmpz_mod_poly_expr)
 
     The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpz_mod_poly_expr)
+print(FILE*, Fmpz_mod_poly_expr)
+print_pretty(Fmpz_mod_poly_expr, const char* var)
+print_pretty(FILE*, Fmpz_mod_poly_expr, const char* var)
+read(Fmpz_mod_poly_target)
+read(FILE*, Fmpz_mod_poly_target)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
@@ -3494,6 +3592,13 @@ padicxx_srcref Padic_src::toN(slong N) const
     Obtain a new version of the operand, with changed effective precision.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Padic_expr)
+int print(FILE*, Padic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Data structures
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3667,6 +3772,15 @@ Padic_poly_expr::binary operation() const
 padic_polyxx_srcref Padic_poly_src::toN(slong N) const
 
     Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Padic_expr)
+int print(FILE*, Padic_expr)
+int print_pretty(Padic_expr, const char*)
+int print_pretty(FILE*, Padic_expr, const char*)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
@@ -3855,6 +3969,15 @@ slong& Padic_mat_target::val()
 Padic_mat_expr Padic_mat_expr::transpose() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Padic_mat_expr)
+int print(FILE*, Padic_mat_expr)
+int print_pretty(Padic_mat_expr)
+int print_pretty(FILE*, Padic_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4004,6 +4127,13 @@ Qadic_expr Qadic_expr::frobenius(T:fits_into_slong) const
 qadicxx_srcref Qadic_src::toN(slong N) const
 
     Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Data structures
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print_pretty(Qadic_expr)
+int print_pretty(FILE*, Qadic_expr)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Data structures

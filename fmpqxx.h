@@ -278,7 +278,7 @@ FLINTXX_DEFINE_TO_STR(fmpqxx, fmpq_get_str(0,  base, from._fmpq()))
 FLINTXX_DEFINE_CMP(fmpqxx, fmpq_cmp(e1._fmpq(), e2._fmpq()))
 FLINTXX_DEFINE_SWAP(fmpqxx, fmpq_swap(e1._fmpq(), e2._fmpq()))
 
-FLINT_DEFINE_PRINT_COND(FMPQXX_COND_S, (fmpq_fprint(to, from._fmpq()), 0))
+FLINT_DEFINE_PRINT_COND(FMPQXX_COND_S, (fmpq_fprint(to, from._fmpq()), 1))
 
 FLINT_DEFINE_CBINARY_EXPR_COND2(plus, fmpqxx, FMPQXX_COND_S, FMPQXX_COND_S,
         fmpq_add(to._fmpq(), e1._fmpq(), e2._fmpq()))

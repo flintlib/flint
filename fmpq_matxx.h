@@ -369,7 +369,7 @@ FLINTXX_DEFINE_SWAP(fmpq_matxx, fmpq_mat_swap(e1._mat(), e2._mat()))
 
 FLINTXX_DEFINE_EQUALS(fmpq_matxx, fmpq_mat_equal(e1._mat(), e2._mat()))
 
-FLINT_DEFINE_PRINT_COND(FMPQ_MATXX_COND_S, (fmpq_mat_print(from._mat()), 0))
+FLINT_DEFINE_PRINT_COND(FMPQ_MATXX_COND_S, (fmpq_mat_print(from._mat()), 1))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(times, fmpq_matxx,
         FMPQ_MATXX_COND_S, FMPQ_MATXX_COND_S,

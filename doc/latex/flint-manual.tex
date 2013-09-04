@@ -1792,6 +1792,21 @@ and the way the arguments are to be interpreted.
 This format only works if the target type is part of flintxx. In other cases, we
 use a \code{.to<totype>()} syntax, as in \code{fmpzexpr.to<slong>()}.
 
+\paragraph{Input and output}
+
+In C++ it is customary to provide input and output via iostreams, and
+overloading the operators \code{<<} and \code{>>}. When wrapping a C library
+which works on the \code{FILE} interface, this is rather hard to accomplish. For
+this reason, flintxx only provides streaming output (i.e. \code{<<}), and only
+when there is a \code{to_string} method. Unfortunately this applies to only a
+small subset of the FLINT types.
+
+For output in other cases, and input in all cases, we provide C-like functions.
+Namely, the functions \code{print}, \code{print_pretty}, \code{read} and
+\code{read_pretty} can be used similar to the C \code{printf} and \code{scanf}.
+For example, \code{print(x)} where \code{x} is an \code{fmpz} has the same
+effect as \code{std::cout << x}.
+
 \paragraph{Extending flintxx}
 
 Explanations on the inner workings of the flintxx expression template library
