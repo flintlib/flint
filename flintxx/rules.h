@@ -75,6 +75,23 @@ struct conversion
     }
 };
 
+// Rule for c-style printing
+template<class T, class Enable = void>
+struct cprint : UNIMPLEMENTED { };
+// static int doit(FILE*, const T&)
+
+template<class T, class Enable = void>
+struct print_pretty : UNIMPLEMENTED { };
+// static int doit(FILE*, const T&)
+
+template<class T, class Enable = void>
+struct read : UNIMPLEMENTED { };
+// static int doit(FILE*, T&)
+
+template<class T, class Enable = void>
+struct read_pretty : UNIMPLEMENTED { };
+// static int doit(FILE*, T&)
+
 // Rule for swapping
 template<class To, class From, class Enable = void>
 struct swap : UNIMPLEMENTED { };
@@ -210,6 +227,33 @@ struct name<T, U, typename mp::enable_if<mp::and_< cond1 <T>, cond2 <U> > >::typ
         eval; \
     } \
 };
+
+#define FLINT_DEFINE_PRINT_COND_(name, cond, eval) \
+template<class T> \
+struct name<T, typename mp::enable_if< cond <T> >::type> \
+{ \
+    static int doit(FILE* to, const T& from) \
+    { \
+        return eval; \
+    } \
+};
+#define FLINT_DEFINE_READ_COND_(name, cond, eval) \
+template<class T> \
+struct name<T, typename mp::enable_if< cond <T> >::type> \
+{ \
+    static int doit(FILE* from, T& to) \
+    { \
+        return eval; \
+    } \
+};
+#define FLINT_DEFINE_PRINT_COND(cond, eval) \
+    FLINT_DEFINE_PRINT_COND_(cprint, cond, eval)
+#define FLINT_DEFINE_PRINT_PRETTY_COND(cond, eval) \
+    FLINT_DEFINE_PRINT_COND_(print_pretty, cond, eval)
+#define FLINT_DEFINE_READ_COND(cond, eval) \
+    FLINT_DEFINE_READ_COND_(read, cond, eval)
+#define FLINT_DEFINE_READ_PRETTY_COND(cond, eval) \
+    FLINT_DEFINE_READ_COND_(read_pretty, cond, eval)
 
 // Specialise the unary expression rule type->type.
 #define FLINT_DEFINE_UNARY_EXPR_(name, rtype, type, eval) \

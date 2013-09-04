@@ -31,6 +31,7 @@
 
 #include <iosfwd>
 #include <string>
+#include <cstdio>
 
 #include "evaluation_tools.h"
 #include "expression_traits.h"
@@ -244,6 +245,23 @@ public:
     T to() const
     {
         return rules::conversion<T, evaluated_t>::get(evaluate());
+    }
+
+    int print(FILE* f = stdout) const
+    {
+        return rules::cprint<evaluated_t>::doit(f, evaluate());
+    }
+    int print_pretty(FILE* f = stdout) const
+    {
+        return rules::print_pretty<evaluated_t>::doit(f, evaluate());
+    }
+    int read(FILE* f = stdin)
+    {
+        return rules::read<derived_t>::doit(f, downcast());
+    }
+    int read_pretty(FILE* f = stdin)
+    {
+        return rules::read_pretty<derived_t>::doit(f, downcast());
     }
 
     typename traits::make_const<evaluation_return_t>::type evaluate() const
@@ -641,6 +659,64 @@ operator^=(Expr1& e1, const Expr2& e2)
 {
     e1.set(e1 ^ e2);
     return e1;
+}
+
+// IO
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::cprint<typename T::evaluated_t> >, int>::type
+print(const T& t)
+{
+    return t.print();
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::cprint<typename T::evaluated_t> >, int>::type
+print(FILE* f, const T& t)
+{
+    return t.print(f);
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::print_pretty<typename T::evaluated_t> >, int>::type
+print_pretty(const T& t)
+{
+    return t.print_pretty();
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::print_pretty<typename T::evaluated_t> >, int>::type
+print_pretty(FILE* f, const T& t)
+{
+    return t.print_pretty(f);
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::read<typename T::evaluated_t> >, int>::type
+read(T& t)
+{
+    return t.read();
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::read<typename T::evaluated_t> >, int>::type
+read(FILE* f, T& t)
+{
+    return t.read(f);
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::read_pretty<typename T::evaluated_t> >, int>::type
+read_pretty(T& t)
+{
+    return t.read_pretty();
+}
+template<class T>
+typename mp::enable_if<traits::is_implemented<
+    rules::read_pretty<typename T::evaluated_t> >, int>::type
+read_pretty(FILE* f, T& t)
+{
+    return t.read_pretty(f);
 }
 
 // TODO move to std?

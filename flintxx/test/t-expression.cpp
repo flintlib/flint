@@ -341,6 +341,31 @@ test_multiary()
     tassert(sevenary_test(1, 2, 3, 4, 5, 6, 7) == 1 + 2 + 3 + 4 + 5 + 6 + 7);
 }
 
+void
+test_cstyle_io()
+{
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+    mylong c(17), d(0);
+    FILE * f = std::fopen("expression_test", "w+");
+    tassert(f);
+    print(f, c);
+    std::fprintf(f, "\n");
+    print_pretty(f, c);
+    std::fflush(f);
+    std::fclose(f);
+
+    f = std::fopen("expression_test", "r");
+    tassert(read(f, d) > 0);
+    tassert(d == c);
+    d = 0l;
+    std::fscanf(f, "\n");
+    tassert(read_pretty(f, d) > 0);
+    tassert(d == c);
+    fclose(f);
+    tassert(std::remove("expression_test") == 0);
+#endif
+}
+
 int
 main()
 {
@@ -360,6 +385,7 @@ main()
     test_temporaries();
     test_references();
     test_multiary();
+    test_cstyle_io();
 
     test_unrelated_overload();
 
