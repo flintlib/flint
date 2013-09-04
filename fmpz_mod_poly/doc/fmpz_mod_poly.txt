@@ -394,6 +394,30 @@ void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}.
 
+void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
+                    const fmpz * poly2, slong len2, const fmpz * f, slong lenf,
+                    const fmpz* finv, slong lenfinv, const fmpz_t p)
+
+    Sets \code{res, len1 + len2 - 1} to the remainder of the product of
+    \code{poly1} and \code{poly2} upon polynomial division by \code{f}.
+
+    It is required that \code{finv} is the inverse of the reverse of \code{f}
+    mod \code{x^lenf}. It is required that \code{len1 + len2 - lenf > 0},
+    which is equivalent to requiring that the result will actually be reduced.
+    It is required that \code{len1 < lenf} and \code{len2 < lenf}.
+    Otherwise, simply use \code{_fmpz_mod_poly_mul} instead.
+
+    Aliasing of \code{f} or \code{finv} and \code{res} is not permitted.
+
+void fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
+                       const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}. \code{finv} is the
+    inverse of the reverse of \code{f}. It is required that \code{poly1} and
+    \code{poly2} are reduced modulo \code{f}.
+
 *******************************************************************************
 
     Powering
