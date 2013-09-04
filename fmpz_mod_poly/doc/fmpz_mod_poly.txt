@@ -1129,7 +1129,7 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
 void _fmpz_mod_poly_compose_mod(fmpz * res,
 	                           const fmpz * f, slong lenf, const fmpz * g,
-				   const fmpz * h, slong lenh, const fmpz_t p);
+				   const fmpz * h, slong lenh, const fmpz_t p)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1138,14 +1138,14 @@ void _fmpz_mod_poly_compose_mod(fmpz * res,
 
 void
 fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
-		    const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+		    const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero.
 
 void _fmpz_mod_poly_compose_mod_horner(fmpz * res,
 	                                  const fmpz * f, slong lenf, const fmpz * g,
-					  const fmpz * h, slong lenh, const fmpz_t p);
+					  const fmpz * h, slong lenh, const fmpz_t p)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1156,7 +1156,7 @@ void _fmpz_mod_poly_compose_mod_horner(fmpz * res,
 
 void
 fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
-			   const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+			   const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero. The algorithm used is Horner's rule.
