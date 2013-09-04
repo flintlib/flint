@@ -648,6 +648,7 @@ void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
     It is required that \code{finv} is the inverse of the reverse of \code{f}
     mod \code{x^lenf}. It is required that \code{len1 + len2 - lenf > 0},
     which is equivalent to requiring that the result will actually be reduced.
+    It is required that \code{len1 < lenf} and \code{len2 < lenf}.
     Otherwise, simply use \code{_nmod_poly_mul} instead.
 
     Aliasing of \code{f} or \code{finv} and \code{res} is not permitted.
@@ -658,7 +659,8 @@ void nmod_poly_mulmod_preinv(nmod_poly_t res,
 
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}. \code{finv} is the
-    inverse of the reverse of \code{f}.
+    inverse of the reverse of \code{f}. It is required that \code{poly1} and
+    \code{poly2} are reduced modulo \code{f}.
 
 *******************************************************************************
 
@@ -1067,6 +1069,9 @@ void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
     We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
     the inverse of the reverse of $B$ mod $x^{\len(B)}$.
 
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
     The algorithm used is to reverse the polynomials and divide the 
     resulting power series, then reverse the result.
 
@@ -1102,6 +1107,10 @@ void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
     We assume $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
     The algorithm used is to call \code{div_newton21()} and then multiply out 
     and compute the remainder.
 
