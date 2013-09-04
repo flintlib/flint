@@ -1181,6 +1181,30 @@ void fmpz_mod_poly_compose_mod_brent_kung(
     $h$ is nonzero and that $f$ has smaller degree than $h$.
     The algorithm used is the Brent-Kung matrix algorithm.
 
+void
+_fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * f,
+                 slong lenf, const fmpz * g, const fmpz * h, slong lenh,
+                 const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t g,
+                   const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that $f$ has smaller degree than $h$. Furthermore,
+    we require \code{hinv} to be the inverse of the reverse of \code{h}.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
 *******************************************************************************
 
     Radix conversion
