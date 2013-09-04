@@ -134,7 +134,7 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
         return NULL;
 }
 
-/*  Assignment and swap ******************************************************/
+/*  Assignment and basic manipulation ****************************************/
 
 void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2);
 
@@ -147,6 +147,25 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
 }
 
 void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j);
+
+static __inline__
+void
+fmpz_mod_poly_reverse(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
+{
+    slong len = FLINT_MIN(n, poly->length);
+    if (len == 0)
+    {
+        fmpz_mod_poly_zero(res);
+        return;
+    }
+
+    fmpz_mod_poly_fit_length(res, n);
+
+    _fmpz_poly_reverse(res->coeffs, poly->coeffs, len, n);
+
+    _fmpz_mod_poly_set_length(res, n);
+    _fmpz_mod_poly_normalise(res);
+}
 
 /*  Conversion ***************************************************************/
 
@@ -321,6 +340,25 @@ void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+void
+_fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
+                                    const fmpz* B, slong lenB, const fmpz* Binv,
+                                    slong lenBinv, const fmpz_t mod);
+
+void
+fmpz_mod_poly_div_newton21_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                           const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
+
+void
+_fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+                            slong lenA, const fmpz* B, slong lenB,
+                            const fmpz* Binv, slong lenBinv, const fmpz_t mod);
+
+void
+fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv);
 
 ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t p);
 
