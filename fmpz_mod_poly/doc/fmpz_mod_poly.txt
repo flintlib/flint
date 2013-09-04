@@ -138,7 +138,7 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-    Assignment and swap
+    Assignment and basic manipulation
 
 *******************************************************************************
 
@@ -159,6 +159,14 @@ void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 
     Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial 
     to zero.
+
+void fmpz_mod_poly_reverse(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, slong n)
+
+    This function considers the polynomial \code{poly} to be of length $n$,
+    notionally truncating and zero padding if required, and reverses
+    the result.  Since the function normalises its result \code{res} may be
+    of length less than $n$.
 
 *******************************************************************************
 
