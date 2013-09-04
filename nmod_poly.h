@@ -1093,7 +1093,7 @@ int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, slong d);
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong **degs);
+                                   const nmod_poly_t poly, slong * const *degs);
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
