@@ -28,6 +28,9 @@
 
 #include "../flint.h"
 
+// This class contains a first-class wrapper of flint_rand_t.
+// Note that frandxx is not copyable.
+
 namespace flint {
 class frandxx
 {
@@ -44,6 +47,6 @@ public:
     flint_rand_t& _data() {return inner;}
     const flint_rand_t& _data() const {return inner;}
 };
-}
+} // flint
 
 #endif

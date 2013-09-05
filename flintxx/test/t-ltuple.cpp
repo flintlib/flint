@@ -36,11 +36,6 @@ detail::IGNORED_TYPE _;
 void
 test_traits()
 {
-    typedef mp::make_tuple<fmpzxx, int>::type tuple_t;
-    typedef make_ltuple<tuple_t>::type ltuple_t;
-    typedef make_ltuple<tuple_t>::ref_type ltuple_ref_t;
-    typedef make_ltuple<tuple_t>::srcref_type ltuple_srcref_t;
-
     tassert(!traits::is_ltuple_expr<int>::val);
     tassert(!traits::is_ltuple_expr<fmpzxx>::val);
 }

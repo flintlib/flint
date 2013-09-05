@@ -222,7 +222,7 @@ test_prec()
 void
 test_printing()
 {
-    tassert_fprint(padicxx(0), "0");
+    tassert_fprint(make_padic(0), "0");
 }
 
 int

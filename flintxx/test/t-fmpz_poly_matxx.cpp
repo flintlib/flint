@@ -216,7 +216,7 @@ test_functions()
     tassert((A*C).is_zero());
 
     if(0)
-        print(A); // make sure this compiles
+        print_pretty(A, "x"); // make sure this compiles
 }
 
 void

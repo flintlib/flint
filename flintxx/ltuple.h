@@ -37,13 +37,19 @@
 #include "tuple.h"
 
 namespace flint {
+// For lazy get<n>, this operation type is created.
 namespace operations {
 template<unsigned n> struct ltuple_get_op { };
 } // operations
 
 namespace detail {
+// Empty marker type
 struct INSTANTIATE_FROM_TUPLE { };
 
+// Traits for the ltuple expression template get<> operation. If the ltuple is
+// an immediate, return references. Else if the return type is an expression
+// template, return an expression template. Otherwise, evaluate the ltuple and
+// return a copy of the entry.
 template<unsigned n, class Underlying, class Operation, class Data, class Expr,
     class Enable = void>
 struct ltuple_get_traits
@@ -92,11 +98,14 @@ struct ltuple_get_traits<n, Underlying, Operation, Data, Expr,
     }
 };
 
+// Instances of this can be passed to ltuple[ref]() and will be replaced by
+// temporaries of the right type before assigment.
 struct IGNORED_TYPE { };
 template<class Ltuple, class To, class Enable = void>
 struct ltuple_instantiate_ignored_types;
 } // detail
 
+// The ltuple expression template class. Underlying is a tuple type.
 template<class Underlying, class Operation, class Data>
 class ltuple_expression
     : public expression<derived_wrapper2<ltuple_expression, Underlying>,
@@ -184,6 +193,7 @@ struct transform_tuple<Transform, empty_tuple>
 };
 } // detail
 
+// Helper for building ltuple types.
 template<class Underlying>
 struct make_ltuple
 {
@@ -332,6 +342,8 @@ struct unary_expression<operations::ltuple_get_op<n>, Tuple,
 
 // TODO we would really like variadic templates / lvalue references here
 
+// Helpers to build ltuples from (references to) arguments.
+
 template<class T>
 inline typename make_ltuple<typename mp::make_tuple<T>::type>::type
 ltuple(const T& t)
@@ -397,7 +409,6 @@ ltupleref(T& t, U& u, V& v, W& w)
             detail::INSTANTIATE_FROM_TUPLE(),
             mp::make_tuple<T&, U&, V&, W&>::make(t, u, v, w));
 }
-
 } // flint
 
 #endif

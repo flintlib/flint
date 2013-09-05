@@ -34,7 +34,9 @@
 #include "rules.h"
 #include "tuple.h"
 
-// TODO explain
+// XXX This file is UNFINISHED. It is/was meant to use for extending flintxx by
+// compisition, in particular for the NTL wrapper.
+// Ask Tom (e_mc_h2@web.de) if you want to use it.
 
 namespace flint {
 namespace forwarding {

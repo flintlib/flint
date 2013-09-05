@@ -470,8 +470,6 @@ struct assignment<T, myint,
 
 FLINT_DEFINE_READ_COND(mylong_traits::is_target,
         std::fscanf(from, "%ld", &to._data().payload))
-FLINT_DEFINE_READ_PRETTY_COND(mylong_traits::is_target,
-        std::fscanf(from, "<%ld>", &to._data().payload))
 FLINT_DEFINE_PRINT_COND(mylong_traits::is_source,
         std::fprintf(to, "%ld", from._data().payload))
 FLINT_DEFINE_PRINT_PRETTY_COND(mylong_traits::is_source,

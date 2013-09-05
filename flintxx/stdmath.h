@@ -29,6 +29,9 @@
 #include "expression.h"
 #include "expression_traits.h"
 
+// This file defines lazy operations which are used by several different flint
+// classes.
+
 namespace flint {
 FLINT_DEFINE_BINOP(pow)
 FLINT_DEFINE_BINOP(pow_binexp)

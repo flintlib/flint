@@ -71,6 +71,7 @@ template<class T> struct is_mat<T,
 } // traits
 namespace matrices {
 namespace mdetail {
+// Some helper traits used below.
 template<class Data> struct second_is_mat_data : mp::false_ { };
 template<class Data1, class Data2>
 struct second_is_mat_data<tuple<Data1, tuple<Data2, empty_tuple> > >
@@ -86,10 +87,20 @@ struct both_mat : mp::and_<
         typename traits::basetype<typename Mat::data_t::tail_t::head_t>::type>
   > { };
 
+// A more convenient way to obtain the traits associated to a non-immediate
+// or non-nonref expression.
 template<class Expr> struct immediate_traits
     : matrix_traits<typename flint_classes::to_nonref<Expr>::type> { };
 } // mdetail
 
+// For matrix expressions to create temporaries, it is necessary to know the
+// dimensions of the result of a computation. This is a generic implementation,
+// which assumes that the output dimensions are the same as the dimensions of
+// the first argument, which is assumed to be a matrix, except if there are
+// precisely two arguments only the second of which is a matrix, in which case
+// we assume its the dimension of that.
+// This implementation works correctly in many cases, e.g. matrix-addition or
+// matrix-scalar multiplication.
 template<class Operation>
 struct outsize_generic
 {
@@ -120,9 +131,15 @@ struct outsize_generic
     }
 };
 
+// This is the expression template used for computing the dimensions of an
+// operation. Without further specialisation, it is just the generic
+// implementation described above.
+// If you introduce a new operation where the generic implementation is
+// incorrect, you must specialise this template.
 template<class Operation>
 struct outsize : outsize_generic<Operation> { };
 
+// Specialise immediates, where the dimensions are stored with the object.
 template<>
 struct outsize<operations::immediate>
 {
@@ -138,6 +155,9 @@ struct outsize<operations::immediate>
     }
 };
 
+// Specialise multiplication. For matrix-matrix multiplication, use
+// the usual formula. For matrix-scalar multiplication, use the generic
+// implementation.
 template<>
 struct outsize<operations::times>
 {
@@ -167,10 +187,12 @@ struct outsize<operations::times>
         return outsize_generic<operations::times>::cols(m);
     }
 };
+// Any particular multipication algorithm also has to be specialised.
 template<>
 struct outsize<operations::mul_classical_op>
     : outsize<operations::times> { };
 
+// Specialise transpose.
 template<>
 struct outsize<operations::transpose_op>
 {
@@ -186,6 +208,10 @@ struct outsize<operations::transpose_op>
     }
 };
 
+// Specialise nullspace. Note that the nullspace computation functions in
+// flint return a matrix the columns of which span the nullspace. Since the
+// nullity is not known in advance in general, we have to allocate a square
+// matrix.
 template<>
 struct outsize<operations::nullspace_op>
 {
@@ -201,6 +227,11 @@ struct outsize<operations::nullspace_op>
     }
 };
 
+// This is a bit of a hack. Matrix operations returning a tuple typically
+// only return one matrix. We key outsize on the inner operation to find out
+// the dimensions. So e.g. solve(A, X).get<1>() (say) will invoke outsize
+// with ltuple_get_op<1> as argument, which then invokes outsize with solve_op
+// and (A, X) as argument.
 template<unsigned n>
 struct outsize<operations::ltuple_get_op<n> >
 {
@@ -266,6 +297,8 @@ struct base_traits
 };
 } // mdetail
 
+// These traits classes are useful for implementing unified coefficient access.
+// See fmpz_matxx etc for example usage.
 template<class Mat>
 struct generic_traits : mdetail::base_traits
 {
@@ -399,6 +432,7 @@ struct instantiate_temporaries<Expr, Matrix, \
 }; \
 } /* rules */
 
+// Add a fflu() member function to the matrix class.
 #define FLINTXX_DEFINE_MEMBER_FFLU \
 template<class T> typename detail::nary_op_helper2<operations::fflu_op, \
     typename base_t::derived_t, permxx*, T>::enable::type \

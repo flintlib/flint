@@ -1950,7 +1950,7 @@ Fmpz_poly_mat_expr operator-(Fmpz_poly_mat_expr)
     Input and output
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-int print(Fmpz_poly_mat_expr)
+int print_pretty(Fmpz_poly_mat_expr, const char* x)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Basic properties

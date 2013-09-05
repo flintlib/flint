@@ -56,17 +56,8 @@
 #define EXIT_STATEMENT throw skippable_exception("did not expect pass anyway")
 #endif
 
-#include "flintxx/test/helpers.h"
-
-#include "fmpz_matxx.h"
-#include "fmpz_polyxx.h"
-#include "fmpzxx.h"
-#include "nmod_matxx.h"
-#include "nmod_polyxx.h"
-#include "nmod_vecxx.h"
-
-#include "flintxx/tuple.h"
-#include "flintxx/vector.h"
+#include <string>
+#include <stdexcept>
 
 // Exception class to indicate that this test cannot proceed, e.g. because
 // binutils is not installed or because we cannot interpret the disassembled
@@ -78,6 +69,18 @@ class skippable_exception
 public:
     skippable_exception(const std::string& n) : std::runtime_error(n) {}
 };
+
+#include "flintxx/test/helpers.h"
+
+#include "fmpz_matxx.h"
+#include "fmpz_polyxx.h"
+#include "fmpzxx.h"
+#include "nmod_matxx.h"
+#include "nmod_polyxx.h"
+#include "nmod_vecxx.h"
+
+#include "flintxx/tuple.h"
+#include "flintxx/vector.h"
 
 // Run a command and recver the output.
 std::string exec(const std::string& cmd)

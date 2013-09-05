@@ -34,7 +34,6 @@
 namespace flint {
 namespace operations {
 // These are the operation tags the expression class creates directly.
-// XXX move somewhere else?
 
 // unary operations
 struct immediate { };

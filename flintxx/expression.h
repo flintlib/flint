@@ -42,6 +42,9 @@
 
 namespace flint {
 namespace detail {
+// Helper traits used by the "expression" class, in particular the evaluate()
+// method. This is the general (i.e. non-immediate) case,
+// which requires actual work.
 template<class Operation, class Expr, class Data>
 struct evaluation_traits
 {
@@ -88,6 +91,8 @@ struct evaluation_traits
     }
 };
 
+// This is the special case of an immediate argument, where "evaluation" is
+// at most assignment.
 template<class Expr, class Data>
 struct evaluation_traits<operations::immediate, Expr, Data>
 {
@@ -111,7 +116,20 @@ struct evaluation_traits<operations::immediate, Expr, Data>
 };
 } // detail
 
-// Note that, wihle Data does not have to be default constructible,
+// The main expression template class.
+//
+// The argument Derived must have the following form:
+// struct derived
+// {
+//     template<class Operation, class Data>
+//     struct type
+//     {
+//         typedef XYZ result;
+//     };
+// };
+// See derived_wrapper below for a common example.
+//
+// Note that, while Data does not have to be default constructible,
 // it *does* need to be copy-constructible, and have a working destructor.
 template<class Derived, class Operation, class Data>
 class expression
@@ -186,6 +204,7 @@ private:
     static data_t get_data() {return data_t();}
 
 public:
+    // forwarded constructors
     template<class T>
     explicit expression(const T& t)
         : data(get_data(t)) {}
@@ -319,6 +338,11 @@ public:
     };
 };
 
+// If your expression template is of the form
+//   template<class Operation, class Data>
+//   class my_expression ...
+// then derived_wrapper<my_expression> is a valid argument for Derived in
+// the expression class above.
 template<template<class O, class D> class Derived>
 struct derived_wrapper
 {
@@ -329,6 +353,12 @@ struct derived_wrapper
     };
 };
 
+// If your expression template is of the form
+//   template<class Extra, class Opeartion, class Data>
+//   class my_expression2 ...
+// where Extra is some extra information which should be passed on unchanged,
+// then derived_wrapper2<my_expression2, Extra> is a valid argument for Derived
+// in the expression class above.
 template<template<class E, class O, class D> class Derived, class Extra>
 struct derived_wrapper2
 {
@@ -343,6 +373,12 @@ struct derived_wrapper2
 // operators
 
 namespace detail {
+// These traits determine how arguments of an expression template are stored.
+// E.g. (e1 + e2) yields a new expression template with a two-argument tuple
+// as Data. If e1 is an immediate, then we want to (usually) store it by
+// reference, to avoid copies. If not, we can just store by value (since
+// copying e1 just copies the references anyway) and avoid indirection.
+// (Similarly for e2.)
 template<class Expr>
 struct storage_traits
     : mp::if_<
@@ -350,6 +386,7 @@ struct storage_traits
           typename traits::forwarding<Expr>::type,
           Expr
         > { };
+// See tuple.h.
 template<>
 struct storage_traits<detail::UNUSED> {typedef detail::UNUSED type;};
 
@@ -367,6 +404,10 @@ struct nary_op_helper_step2<rules::UNIMPLEMENTED, Op, type>
     struct make_helper { };
 };
 
+// Helper to determine the return type of an expression, where Data is already
+// the correct tuple type.
+// The step1/step2 splitting above is necessary to avoid compiler errors in
+// case there is not actually any rule.
 template<class Op, class Data>
 struct nary_op_helper
 {
@@ -387,6 +428,9 @@ struct nary_op_helper_maker
 };
 
 #define FLINTXX_NARY_OP_HELPER_MACRO(arg) typename storage_traits< arg >::type
+
+// nary_op_helper<Op, Arg1, Arg2, ...> invokes nary_op_helper with the correct
+// tuple type as argument.
 template<class Op, FLINTXX_MAKE_TUPLE_TEMPLATE_ARGS>
 struct nary_op_helper2
     : nary_op_helper_maker<Op, mp::make_tuple<
@@ -400,14 +444,18 @@ struct nary_op_helper2
     }
 };
 
+// Special casing for binary operators.
 template<class Expr1, class Op, class Expr2>
 struct binary_op_helper
     : nary_op_helper2<Op, Expr1, Expr2>
 { };
 
+// Special casing for unary operations.
 template<class Op, class Expr>
 struct unary_op_helper : nary_op_helper2<Op, Expr> { };
 
+// For unary member operators, determining the return type the normal way can
+// lead to cyclic dependencies. See FLINTXX_DEFINE_MEMBER_UNOP_RTYPE.
 template<class Ret, class Op, class Expr>
 struct unary_op_helper_with_rettype
 {
@@ -416,6 +464,7 @@ struct unary_op_helper_with_rettype
         Op, typename maker::type>::type return_t;
 };
 
+// Common helper for implementing comparison operators.
 template<class Expr1, class Expr2>
 struct order_op_helper
 {
@@ -439,7 +488,7 @@ struct order_op_helper
             tools::evaluation_helper<Expr2>::get(e2));
     }
 };
-}
+} // detail
 
 template<class Expr>
 inline typename mp::enable_if<traits::is_expression<Expr>, std::ostream&>::type
@@ -662,7 +711,7 @@ operator^=(Expr1& e1, const Expr2& e2)
     return e1;
 }
 
-// IO
+// c-style IO
 template<class T>
 typename mp::enable_if<traits::is_implemented<
     rules::cprint<typename T::evaluated_t> >, int>::type
@@ -760,6 +809,7 @@ name(const T1& t1) \
   return ::flint::detail::unary_op_helper< ::flint::operations::name##_op, T1>::make(t1); \
 }
 
+// Make the threeary operation "name" available in current namespace
 #define FLINT_DEFINE_THREEARY_HERE(name) \
 template<class T1, class T2, class T3> \
 inline typename ::flint::detail::nary_op_helper2<\
@@ -769,6 +819,14 @@ name(const T1& t1, const T2& t2, const T3& t3) \
   return ::flint::detail::nary_op_helper2< \
       ::flint::operations::name##_op, T1, T2, T3>::make(t1, t2, t3); \
 }
+
+// Make the threeary operation "name" available in current namespace,
+// but with only two arguments, the second of which is of type type1 and
+// defaults to val1, and the third argument always (implicitly) of type type2
+// and value val2.
+// The suggested usage of this macro is to first call FLINT_DEFINE_THREEARY_HERE,
+// and then call FLINT_DEFINE_THREEARY_HERE_2DEFAULT. The effect will be an
+// operation which can be invoked with 1, 2 or 3 arguments.
 #define FLINT_DEFINE_THREEARY_HERE_2DEFAULT(name, type1, val1, type2, val2) \
 template<class T1> \
 inline typename ::flint::detail::nary_op_helper2<\
@@ -779,6 +837,7 @@ name(const T1& t1, type1 t2 = val1) \
       ::flint::operations::name##_op, T1, type1, type2>::make(t1, t2, val2); \
 }
 
+// Make the fourary operation "name" available in current namespace
 #define FLINT_DEFINE_FOURARY_HERE(name) \
 template<class T1, class T2, class T3, class T4> \
 inline typename ::flint::detail::nary_op_helper2<\
@@ -789,6 +848,7 @@ name(const T1& t1, const T2& t2, const T3& t3, const T4& t4) \
       ::flint::operations::name##_op, T1, T2, T3, T4>::make(t1, t2, t3, t4); \
 }
 
+// Make the fiveary operation "name" available in current namespace
 #define FLINT_DEFINE_FIVEARY_HERE(name) \
 template<class T1, class T2, class T3, class T4, class T5> \
 inline typename ::flint::detail::nary_op_helper2<\
@@ -799,6 +859,7 @@ name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5) \
       ::flint::operations::name##_op, T1, T2, T3, T4, T5>::make(t1, t2, t3, t4, t5); \
 }
 
+// Make the sixary operation "name" available in current namespace
 #define FLINT_DEFINE_SIXARY_HERE(name) \
 template<class T1, class T2, class T3, class T4, class T5, class T6> \
 inline typename ::flint::detail::nary_op_helper2<\
@@ -809,6 +870,7 @@ name(const T1& t1, const T2& t2, const T3& t3, const T4& t4, const T5& t5, const
       ::flint::operations::name##_op, T1, T2, T3, T4, T5, T6>::make(t1, t2, t3, t4, t5, t6); \
 }
 
+// Make the sevenary operation "name" available in current namespace
 #define FLINT_DEFINE_SEVENARY_HERE(name) \
 template<class T1, class T2, class T3, class T4, class T5, class T6, class T7> \
 inline typename ::flint::detail::nary_op_helper2<\
@@ -830,6 +892,15 @@ struct name##_op { }; \
 } \
 FLINT_DEFINE_BINOP_HERE(name)
 
+// This macro can be used to conditionally enable a function, and is mostly
+// used for forwarding.
+// A typical usage is
+//   template<class T, class U>
+//   FLINT_BINOP_ENABLE_RETTYPE(myop, T, U) myop_other(const T& t, const U& u)
+//   {
+//       // perhaps something more interesting
+//       return myop(t, u);
+//   }
 #define FLINT_BINOP_ENABLE_RETTYPE(name, T1, T2) \
     typename detail::binary_op_helper<T1, operations::name##_op, T2>::enable::type
 
@@ -842,6 +913,8 @@ FLINT_DEFINE_UNOP_HERE(name)
 
 #define FLINT_UNOP_ENABLE_RETTYPE(name, T) \
     typename detail::unary_op_helper<operations::name##_op, T>::return_t
+
+// See FLINTXX_DEFINE_MEMBER_UNOP_RTYPE
 #define FLINT_UNOP_BUILD_RETTYPE(name, rettype, T) \
     typename detail::unary_op_helper_with_rettype<rettype, \
         operations::name##_op, T>::return_t

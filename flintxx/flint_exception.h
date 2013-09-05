@@ -30,6 +30,10 @@
 #include <string>
 
 namespace flint {
+// This is the common flintxx exception class, which is raised whenever the
+// C++ layer diagnoses a problem.
+// Note that the C layer will sometimes abort() with a message (in this case
+// no exception is thrown).
 class flint_exception
     : public std::domain_error // ?
 {
@@ -38,12 +42,14 @@ public:
         : std::domain_error("FLINT: " + what) {}
 };
 
+// Helper function. If worked is true, does nothing, else raises
+// flint_exception.
 void execution_check(bool worked, const std::string& where,
         const std::string& context)
 {
     if(!worked)
         throw flint_exception(context + " computation failed: " + where);
 }
-}
+} // flint
 
 #endif

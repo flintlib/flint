@@ -192,12 +192,20 @@ struct find_subexpr_helper2<Pred, empty_tuple>
 };
 } // tdetail
 
+// A predicate which applies if the argument type equals T.
 template<class T>
 struct equal_types_pred
 {
     template<class U> struct type : mp::equal_types<T, U> { };
 };
 
+// Given an expression template Expr, traverse the tree of data arguments
+// until an argument matching the predicate Pred is found. Here pred must have
+// a member template "type" performing the boolean computation.
+// See equal_types_pred for an example.
+// If there is no matching subexpression, a compile time error will be
+// encountered.
+// The current implementation performs depth-first search.
 template<class Pred, class Expr>
 inline typename tdetail::find_subexpr_helper<Pred, Expr>::rtype
 find_subexpr(const Expr& e)
@@ -205,12 +213,14 @@ find_subexpr(const Expr& e)
     return tdetail::find_subexpr_helper<Pred, Expr>::get(e);
 }
 
+// Find a subexpression of type T.
 template<class T, class Expr>
 inline const T& find_subexpr_T(const Expr& e)
 {
     return find_subexpr<equal_types_pred<T> >(e);
 }
 
+// Boolean computation to determine if find_subexpr above will work.
 template<class Pred, class Expr>
 struct has_subexpr
     : tdetail::find_subexpr_helper<Pred, Expr> { };
@@ -1095,6 +1105,7 @@ struct ternary_hhelper<T, Left, right1_t, right2_t, false, false>
 };
 } // tdetail
 
+// A helper condition for use with FLINT_DEFINE_*_COND?
 template<class T>
 struct is_bool : mp::equal_types<T, bool> { };
 } // tools

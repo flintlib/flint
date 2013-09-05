@@ -123,6 +123,13 @@ protected:
 };
 
 namespace vectors {
+// Similar to matrices, the size of a vector expression has to be known in
+// order to allocate temporary objects. In this case, the generic
+// implementation looks for any vector immediate subexpression and returs its
+// size. This makes sense since mixing vectors of differing sizes usually makes
+// no sense.
+// Thus specialisation is usually only necessary in constructor-like operations,
+// which do not involve vector immediates.
 template<class Operation>
 struct outsize
 {
@@ -133,6 +140,7 @@ struct outsize
     }
 };
 
+// Hack for ltuple_get, similar to the matrices case.
 template<unsigned n>
 struct outsize<operations::ltuple_get_op<n> >
 {

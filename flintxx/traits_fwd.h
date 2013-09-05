@@ -26,7 +26,7 @@
 #ifndef FLINTXX_TRAITS_FWD_H
 #define FLINTXX_TRAITS_FWD_H
 
-// Use this to break cyclic dependencies
+// Use this to break cyclic dependencies, by forward-declaring traits.
 
 namespace flint {
 namespace traits {

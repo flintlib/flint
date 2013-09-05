@@ -135,6 +135,7 @@ template<class Op, class T, class Enable = void>
 struct unary_expression : UNIMPLEMENTED { };
 // similarly
 
+// Rules for more arguments.
 template<class Op, class T, class U, class V, class Enable = void>
 struct threeary_expression : UNIMPLEMENTED { };
 template<class Op, class T, class U, class V, class W, class Enable = void>
@@ -165,6 +166,8 @@ struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
 ///////////////////////////////////////////////////////////////////////////////////
 
 // These macros should be called in namespace flint::rules
+// In general the easiest way to find out what they do is to read the
+// definition directly.
 
 // Specialise a getter called "name". The getter has one argument called "from"
 // of type "fromtype", and "eval" which should yield "totype". 
