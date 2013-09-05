@@ -208,8 +208,11 @@ struct make_tuple<detail::UNUSED, detail::UNUSED, detail::UNUSED,
     detail::UNUSED, detail::UNUSED, detail::UNUSED, detail::UNUSED,
     detail::UNUSED>
 {
+    typedef detail::UNUSED* T;
     typedef empty_tuple type;
-    static empty_tuple make(...) {return empty_tuple();}
+    // g++-4.4 bolts if we use (...), even though all arguments are PODs
+    static empty_tuple make(T=0, T=0, T=0, T=0, T=0, T=0, T=0, T=0)
+        {return empty_tuple();}
 };
 
 
