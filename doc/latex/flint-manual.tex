@@ -1950,8 +1950,6 @@ In this chapter we provide interfaces to various external packages.
 \chapter{Extending the C++ wrapper}
 \label{app:genericxx}
 
-TODO: definition of matrix classes
-
 \section{Introduction}
 
 This chapter is geared towards FLINT developers who wish to extend the C++
@@ -1991,6 +1989,99 @@ are usually expressed as macros \code{FLINTXX_???} and are defined in
 \code{flintxx/flint_classes.h}. As illustrated in the example, the
 \code{FLINTXX_???} macros are meant to complement, not supersede, the
 \code{FLINT_???} macros.
+
+The above considerations and examples should explain how to modify any existing
+class, or write a simple new one, like \code{fmpzxx}. The remaining subsections
+deal with particular difficulties that require work beyond what has been
+explained so far.
+
+\subsection{Patterns for implementing unified coefficient access}
+
+Recall that ``unified coefficient access'' refers to automatically adjusting the
+return type of coefficient access methods, depending on the argument. Let's
+focus on the \code{fmpqxx} example, and in particular the \code{num} method.
+Consider the expression \code{x.num()}. There are three cases: if \code{x} is of
+type \code{fmpqxx} or \code{fmpqxx_ref}, this should return \code{fmpzxx_ref}.
+If \code{x} is of type \code{const fmpqxx}, or \code{fmpqxx_srcref}, this should
+return \code{fmpzxx_srcref}. Otherwise (i.e. if \code{x} is a lazy expression
+template), this should return a lazy expression template.
+
+The way this is implemented is using a traits type. First of all, we need a new
+lazy function to obtain the numerator:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_UNOP(fmpqxx_num)
+\end{lstlisting}
+
+We call the function \code{fmpqxx_num} to hide it somewhat, and discourage
+calling \code{num} as a global function (because this won't have the unified
+coefficient access properties). Next (even before the expression template
+definition), we put the generic traits:
+
+\begin{lstlisting}[language=c++]
+template<class Fmpq>
+struct fmpq_traits {
+    typedef FLINT_UNOP_BUILD_RETTYPE(fmpqxx_num, fmpzxx, Fmpq) numreturn_t;
+    typedef numreturn_t cnumreturn_t;
+    static numreturn_t num(const Fmpq& f)
+        {return fmpqxx_num(f);}
+    // ...
+};
+\end{lstlisting}
+
+After the definition of the expression template classes, we put the following
+specialisations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpq_traits<fmpqxx_srcref>
+{
+    typedef fmpzxx_srcref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+
+    template<class T>
+    static cnumreturn_t num(const T& f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<>
+struct fmpq_traits<fmpqxx_ref>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+
+    template<class T>
+    static cnumreturn_t num(const T& f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static numreturn_t num(T& f)
+        {return numreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<> struct fmpq_traits<fmpqxx> : fmpq_traits<fmpqxx_ref> { };
+\end{lstlisting}
+
+TODO check and explain
+
+The \code{fmpqxx_expression} class can use the traits as follows:
+
+\begin{lstlisting}[language=c++]
+    typedef detail::fmpq_traits<fmpqxx_expression> traits_t;
+    typename traits_t::numreturn_t num()
+        {return traits_t::num(*this);}
+\end{lstlisting}
+
+The example of traits usage we see here illustrates how careful one has to be to
+avoid circular class dependencies. In particular, the traits can only be
+specialised after the expression template class has been defined and the special
+immediate cases have been \code{typedef}d. However, they have to be specialised
+before any of the related templates is instantiated.
+
+\subsection{Nmod classes}
+
+\subsection{Matrix classes}
+
+\subsection{Padic classes}
+
+\subsection{Vector classes}
 
 \section{Some tidbits and caveats}
 
