@@ -316,8 +316,8 @@ struct generic_traits : mdetail::base_traits
     };
 };
 
-template<class Mat, class Srcref>
-struct generic_traits_srcref : generic_traits<Mat>
+template<class Srcref>
+struct generic_traits_srcref : mdetail::base_traits
 {
     template<class T, class U>
     struct at
@@ -326,27 +326,45 @@ struct generic_traits_srcref : generic_traits<Mat>
         typedef Srcref entry_srcref_t;
 
         template<class M>
-        static Srcref get(const M& m, T i, U j)
+        static Srcref get(M m, T i, U j)
         {
             return mdetail::immediate_traits<M>::at(m, i, j);
         }
     };
 };
 
-template<class Mat, class Ref, class Srcref>
-struct generic_traits_ref : generic_traits_srcref<Mat, Srcref>
+template<class Ref>
+struct generic_traits_ref : mdetail::base_traits
 {
     template<class T, class U>
     struct at
-        : generic_traits_srcref<Mat, Srcref>::template at<T, U>
     {
         typedef Ref entry_ref_t;
+        typedef Ref entry_srcref_t;
+
+        template<class M>
+        static Ref get(M m, T i, U j)
+        {
+            return mdetail::immediate_traits<M>::at(m, i, j);
+        }
+    };
+};
+
+template<class Ref, class Srcref>
+struct generic_traits_nonref : mdetail::base_traits
+{
+    template<class T, class U>
+    struct at
+    {
+        typedef Ref entry_ref_t;
+        typedef Srcref entry_srcref_t;
 
         template<class M>
         static Ref get(M& m, T i, U j)
         {
             return mdetail::immediate_traits<M>::at(m, i, j);
         }
+
         template<class M>
         static Srcref get(const M& m, T i, U j)
         {

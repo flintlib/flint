@@ -158,19 +158,32 @@ struct fmpz_poly_q_traits<fmpz_poly_qxx_srcref>
 };
 template<>
 struct fmpz_poly_q_traits<fmpz_poly_qxx_ref>
-    : fmpz_poly_q_traits<fmpz_poly_qxx_srcref>
 {
     typedef fmpz_polyxx_ref num_ref_t;
     typedef fmpz_polyxx_ref den_ref_t;
-    template<class P> static num_ref_t num(P& p)
+    typedef fmpz_polyxx_ref num_srcref_t;
+    typedef fmpz_polyxx_ref den_srcref_t;
+    template<class P> static num_ref_t num(P p)
         {return num_ref_t::make(fmpz_poly_q_numref(p._polyq()));}
-    template<class P> static den_ref_t den(P& p)
+    template<class P> static den_ref_t den(P p)
         {return num_ref_t::make(fmpz_poly_q_denref(p._polyq()));}
 };
 template<>
 struct fmpz_poly_q_traits<fmpz_poly_qxx>
-    : fmpz_poly_q_traits<fmpz_poly_qxx_ref>
-{ };
+{
+    typedef fmpz_polyxx_ref num_ref_t;
+    typedef fmpz_polyxx_ref den_ref_t;
+    typedef fmpz_polyxx_srcref num_srcref_t;
+    typedef fmpz_polyxx_srcref den_srcref_t;
+    template<class P> static num_ref_t num(P& p)
+        {return num_ref_t::make(fmpz_poly_q_numref(p._polyq()));}
+    template<class P> static den_ref_t den(P& p)
+        {return num_ref_t::make(fmpz_poly_q_denref(p._polyq()));}
+    template<class P> static num_srcref_t num(const P& p)
+        {return num_srcref_t::make(fmpz_poly_q_numref(p._polyq()));}
+    template<class P> static den_srcref_t den(const P& p)
+        {return num_srcref_t::make(fmpz_poly_q_denref(p._polyq()));}
+};
 
 struct fmpz_poly_q_data
 {

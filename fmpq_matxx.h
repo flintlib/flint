@@ -241,13 +241,12 @@ struct matrix_traits<fmpq_matxx>
 namespace detail {
 template<>
 struct fmpq_matxx_traits<fmpq_matxx_srcref>
-    : matrices::generic_traits_srcref<fmpq_matxx_srcref, fmpqxx_srcref> { };
-
+    : matrices::generic_traits_srcref<fmpqxx_srcref> { };
 template<>
 struct fmpq_matxx_traits<fmpq_matxx_ref>
-    : matrices::generic_traits_ref<fmpq_matxx_ref, fmpqxx_ref, fmpqxx_srcref> { };
+    : matrices::generic_traits_ref<fmpqxx_ref> { };
 template<> struct fmpq_matxx_traits<fmpq_matxx>
-    : fmpq_matxx_traits<fmpq_matxx_ref> { };
+    : matrices::generic_traits_nonref<fmpqxx_ref, fmpqxx_srcref> { };
 
 struct fmpq_mat_data
 {

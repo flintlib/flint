@@ -265,13 +265,12 @@ template<> struct has_nmodxx_ctx<nmod_matxx_srcref> : mp::true_ { };
 namespace detail {
 template<>
 struct nmod_matxx_traits<nmod_matxx_srcref>
-    : matrices::generic_traits_srcref<nmod_matxx_srcref, nmodxx_srcref> { };
-
+    : matrices::generic_traits_srcref<nmodxx_srcref> { };
 template<>
 struct nmod_matxx_traits<nmod_matxx_ref>
-    : matrices::generic_traits_ref<nmod_matxx_ref, nmodxx_ref, nmodxx_srcref> { };
+    : matrices::generic_traits_ref<nmodxx_ref> { };
 template<> struct nmod_matxx_traits<nmod_matxx>
-    : nmod_matxx_traits<nmod_matxx_ref> { };
+    : matrices::generic_traits_nonref<nmodxx_ref, nmodxx_srcref> { };
 
 struct nmod_mat_data
 {

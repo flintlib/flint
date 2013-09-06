@@ -235,23 +235,32 @@ struct fmpz_mod_poly_traits<fmpz_mod_polyxx_srcref>
     typedef fmpzxx_srcref lead_ref_t;
 
     template<class P>
-    static lead_srcref_t lead(const P& p)
+    static lead_srcref_t lead(P p)
         {return lead_srcref_t::make(fmpz_mod_poly_lead(p._poly()));}
 };
 template<>
 struct fmpz_mod_poly_traits<fmpz_mod_polyxx_ref>
-    : fmpz_mod_poly_traits<fmpz_mod_polyxx_srcref>
 {
     typedef fmpzxx_ref lead_ref_t;
+    typedef fmpzxx_ref lead_srcref_t;
 
     template<class P>
-    static lead_ref_t lead(P& p)
+    static lead_ref_t lead(P p)
         {return lead_ref_t::make(fmpz_mod_poly_lead(p._poly()));}
 };
 template<>
 struct fmpz_mod_poly_traits<fmpz_mod_polyxx>
-    : fmpz_mod_poly_traits<fmpz_mod_polyxx_ref>
-{ };
+{
+    typedef fmpzxx_ref lead_ref_t;
+    typedef fmpzxx_srcref lead_srcref_t;
+
+    template<class P>
+    static lead_ref_t lead(P& p)
+        {return lead_ref_t::make(fmpz_mod_poly_lead(p._poly()));}
+    template<class P>
+    static lead_srcref_t lead(const P& p)
+        {return lead_srcref_t::make(fmpz_mod_poly_lead(p._poly()));}
+};
 
 struct fmpz_mod_poly_data
 {

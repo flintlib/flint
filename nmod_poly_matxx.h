@@ -207,15 +207,12 @@ template<> struct has_nmodxx_ctx<nmod_poly_matxx_srcref> : mp::true_ { };
 namespace detail {
 template<>
 struct nmod_poly_matxx_traits<nmod_poly_matxx_srcref>
-    : matrices::generic_traits_srcref<
-        nmod_poly_matxx_srcref, nmod_polyxx_srcref> { };
-
+    : matrices::generic_traits_srcref<nmod_polyxx_srcref> { };
 template<>
 struct nmod_poly_matxx_traits<nmod_poly_matxx_ref>
-    : matrices::generic_traits_ref<
-        nmod_poly_matxx_ref, nmod_polyxx_ref, nmod_polyxx_srcref> { };
+    : matrices::generic_traits_ref<nmod_polyxx_ref> { };
 template<> struct nmod_poly_matxx_traits<nmod_poly_matxx>
-    : nmod_poly_matxx_traits<nmod_poly_matxx_ref> { };
+    : matrices::generic_traits_nonref<nmod_polyxx_ref, nmod_polyxx_srcref> { };
 
 struct nmod_poly_mat_data
 {

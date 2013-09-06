@@ -373,6 +373,15 @@ test_printing()
     tassert_fprint_pretty(f, "x", "x+3");
 }
 
+void
+test_unified_access()
+{
+    fmpz_mod_polyxx p(fmpzxx(1031));
+    p.set_coeff(0, 1);
+    const fmpz_mod_polyxx& q = p;
+    tassert(q.lead() == 1);
+}
+
 int
 main()
 {
@@ -389,6 +398,7 @@ main()
     test_randomisation();
     test_radix();
     test_printing();
+    test_unified_access();
 
     std::cout << "PASS" << std::endl;
     return 0;

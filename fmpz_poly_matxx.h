@@ -217,15 +217,12 @@ struct matrix_traits<fmpz_poly_matxx>
 namespace detail {
 template<>
 struct fmpz_poly_matxx_traits<fmpz_poly_matxx_srcref>
-    : matrices::generic_traits_srcref<fmpz_poly_matxx_srcref,
-          fmpz_polyxx_srcref> { };
-
+    : matrices::generic_traits_srcref<fmpz_polyxx_srcref> { };
 template<>
 struct fmpz_poly_matxx_traits<fmpz_poly_matxx_ref>
-    : matrices::generic_traits_ref<fmpz_poly_matxx_ref, fmpz_polyxx_ref,
-          fmpz_polyxx_srcref> { };
+    : matrices::generic_traits_ref<fmpz_polyxx_ref> { };
 template<> struct fmpz_poly_matxx_traits<fmpz_poly_matxx>
-    : fmpz_poly_matxx_traits<fmpz_poly_matxx_ref> { };
+    : matrices::generic_traits_nonref<fmpz_polyxx_ref, fmpz_polyxx_srcref> { };
 
 struct fmpz_poly_mat_data
 {

@@ -297,6 +297,14 @@ test_printing()
     tassert_fprint_pretty(f, "x", "x+3");
 }
 
+void
+test_unified_access()
+{
+    fmpq_polyxx f;
+    const fmpq_polyxx& g = f;
+    tassert(g.den().is_one());
+}
+
 int
 main()
 {
@@ -311,6 +319,7 @@ main()
     test_transcendental_series();
     test_extras();
     test_printing();
+    test_unified_access();
 
     std::cout << "PASS" << std::endl;
     return 0;

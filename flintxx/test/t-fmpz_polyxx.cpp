@@ -460,6 +460,14 @@ test_printing()
     test_print_read_pretty(f);
 }
 
+void
+test_unified_access()
+{
+    fmpz_polyxx a = fmpz_polyxx::from_ground(1);
+    const fmpz_polyxx& b = a;
+    tassert(b.lead() == 1 && b.coeff(0) == 1);
+}
+
 int
 main()
 {
@@ -476,6 +484,7 @@ main()
     test_factoring();
     test_hensel();
     test_printing();
+    test_unified_access();
 
     std::cout << "PASS" << std::endl;
     return 0;

@@ -444,29 +444,52 @@ struct fmpz_poly_traits<fmpz_polyxx_srcref>
 };
 template<>
 struct fmpz_poly_traits<fmpz_polyxx_ref>
-    : fmpz_poly_traits<fmpz_polyxx_srcref>
 {
     typedef fmpzxx_ref lead_ref_t;
+    typedef fmpzxx_ref lead_srcref_t;
 
     template<class P>
-    static lead_ref_t lead(P& p)
+    static lead_ref_t lead(P p)
         {return lead_ref_t::make(fmpz_poly_lead(p._poly()));}
 
     template<class T>
     struct coeff
-        : fmpz_poly_traits<fmpz_polyxx_srcref>::template coeff<T>
     {
         typedef fmpzxx_ref ref_t;
+        typedef fmpzxx_ref srcref_t;
 
         template<class P>
-        static ref_t get(P& p, const T& n)
+        static ref_t get(P p, const T& n)
             {return ref_t::make(fmpz_poly_get_coeff_ptr(p._poly(), n));}
     };
 };
 template<>
 struct fmpz_poly_traits<fmpz_polyxx>
-    : fmpz_poly_traits<fmpz_polyxx_ref>
-{ };
+{
+    typedef fmpzxx_ref lead_ref_t;
+    typedef fmpzxx_srcref lead_srcref_t;
+
+    template<class P>
+    static lead_ref_t lead(P& p)
+        {return lead_ref_t::make(fmpz_poly_lead(p._poly()));}
+    template<class P>
+    static lead_srcref_t lead(const P& p)
+        {return lead_srcref_t::make(fmpz_poly_lead(p._poly()));}
+
+    template<class T>
+    struct coeff
+    {
+        typedef fmpzxx_ref ref_t;
+        typedef fmpzxx_srcref srcref_t;
+
+        template<class P>
+        static ref_t get(P& p, const T& n)
+            {return ref_t::make(fmpz_poly_get_coeff_ptr(p._poly(), n));}
+        template<class P>
+        static srcref_t get(const P& p, const T& n)
+            {return srcref_t::make(fmpz_poly_get_coeff_ptr(p._poly(), n));}
+    };
+};
 
 struct fmpz_poly_data
 {

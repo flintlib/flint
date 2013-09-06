@@ -216,6 +216,17 @@ test_vector()
     tassert(v1 == v2);
 }
 
+void
+test_unified_access()
+{
+    fmpqxx a = fmpqxx::frac(1, 2);
+    const fmpqxx& b = a;
+    tassert(b.num() == 1);
+    const fmpqxx_ref c(a);
+    c.num() = 3;
+    tassert(c.num() == 3);
+}
+
 int
 main()
 {
@@ -229,6 +240,7 @@ main()
     test_functions();
     test_extras();
     test_vector();
+    test_unified_access();
 
     std::cout << "PASS" << std::endl;
     return 0;

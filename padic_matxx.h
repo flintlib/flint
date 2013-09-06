@@ -210,15 +210,8 @@ struct padic_matxx_srcref_traits_no_std_matrix
     template<class P>
     static slong val(P p) {return padic_mat_val(p._mat());}
 };
-template<>
-struct padic_mat_traits<padic_matxx_srcref>
-    : matrices::generic_traits_srcref<fmpz_matxx_srcref, fmpzxx_srcref>,
-      padic_matxx_srcref_traits_no_std_matrix { };
-
-template<>
-struct padic_mat_traits<padic_matxx_ref>
-    : matrices::generic_traits_ref<padic_matxx_ref, fmpzxx_ref, fmpzxx_srcref>,
-      padic_matxx_srcref_traits_no_std_matrix
+struct padic_matxx_ref_traits_no_std_matrix
+    : padic_matxx_srcref_traits_no_std_matrix
 {
     typedef slong& prec_ref_t;
     typedef slong& val_ref_t;
@@ -234,8 +227,17 @@ struct padic_mat_traits<padic_matxx_ref>
     static slong val(const P& p) {return padic_mat_val(p._mat());}
 };
 template<>
+struct padic_mat_traits<padic_matxx_srcref>
+    : matrices::generic_traits_srcref<fmpzxx_srcref>,
+      padic_matxx_srcref_traits_no_std_matrix { };
+template<>
+struct padic_mat_traits<padic_matxx_ref>
+    : matrices::generic_traits_ref<fmpzxx_ref>, 
+      padic_matxx_ref_traits_no_std_matrix { };
+template<>
 struct padic_mat_traits<padic_matxx>
-    : padic_mat_traits<padic_matxx_ref> { };
+    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref>, 
+      padic_matxx_ref_traits_no_std_matrix { };
 } // detail
 
 PADICXX_DEFINE_REF_STRUCTS(padic_mat_struct, padic_mat_prec)

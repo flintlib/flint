@@ -311,6 +311,16 @@ test_row_reduction()
     tassert(rref_classical(A) == rref(A) && rref_fraction_free(A) == rref(A));
 }
 
+void
+test_unified_access()
+{
+    fmpq_matxx A(2, 2);
+    const fmpq_matxx& Ar = A;
+    const fmpq_matxx_ref Ar2(A);
+    Ar2.at(0, 0) = fmpqxx::one();
+    tassert(Ar.at(0, 0).is_one());
+}
+
 int
 main()
 {
@@ -325,6 +335,7 @@ main()
     test_randomisation();
     test_reduction_reconstruction();
     test_row_reduction();
+    test_unified_access();
 
     std::cout << "PASS" << std::endl;
     return 0;

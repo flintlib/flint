@@ -272,14 +272,25 @@ struct fmpq_poly_traits<fmpq_polyxx_srcref>
 };
 template<>
 struct fmpq_poly_traits<fmpq_polyxx_ref>
-    : fmpq_poly_traits<fmpq_polyxx_srcref>
 {
     typedef fmpzxx_ref coeff_ref_t;
-    template<class P> static coeff_ref_t den(P& p)
+    typedef fmpzxx_ref coeff_srcref_t;
+    template<class P>
+    static coeff_ref_t den(P p)
         {return coeff_ref_t::make(fmpq_poly_denref(p._poly()));}
 };
-template<> struct fmpq_poly_traits<fmpq_polyxx>
-    : fmpq_poly_traits<fmpq_polyxx_ref> { };
+template<>
+struct fmpq_poly_traits<fmpq_polyxx>
+{
+    typedef fmpzxx_ref coeff_ref_t;
+    typedef fmpzxx_srcref coeff_srcref_t;
+    template<class P>
+    static coeff_ref_t den(P& p)
+        {return coeff_ref_t::make(fmpq_poly_denref(p._poly()));}
+    template<class P>
+    static coeff_srcref_t den(const P& p)
+        {return coeff_srcref_t::make(fmpq_poly_denref(p._poly()));}
+};
 
 struct fmpq_poly_data
 {

@@ -157,6 +157,14 @@ test_printing()
     }
 }
 
+void
+test_unified_access()
+{
+    fmpz_poly_qxx a;
+    const fmpz_poly_qxx& b = a;
+    tassert(b.num().is_zero() && b.den().is_one());
+}
+
 int
 main()
 {
@@ -168,6 +176,7 @@ main()
     test_functions();
     test_extras();
     test_printing();
+    test_unified_access();
 
     std::cout << "PASS" << std::endl;
     return 0;

@@ -324,13 +324,12 @@ struct matrix_traits<fmpz_matxx>
 namespace detail {
 template<>
 struct fmpz_matxx_traits<fmpz_matxx_srcref>
-    : matrices::generic_traits_srcref<fmpz_matxx_srcref, fmpzxx_srcref> { };
-
+    : matrices::generic_traits_srcref<fmpzxx_srcref> { };
 template<>
 struct fmpz_matxx_traits<fmpz_matxx_ref>
-    : matrices::generic_traits_ref<fmpz_matxx_ref, fmpzxx_ref, fmpzxx_srcref> { };
+    : matrices::generic_traits_ref<fmpzxx_ref> { };
 template<> struct fmpz_matxx_traits<fmpz_matxx>
-    : fmpz_matxx_traits<fmpz_matxx_ref> { };
+    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref> { };
 
 struct fmpz_mat_data
 {

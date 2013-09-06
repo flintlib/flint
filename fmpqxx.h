@@ -200,24 +200,45 @@ struct fmpq_traits<fmpqxx_srcref>
     typedef fmpzxx_srcref denreturn_t;
     typedef fmpzxx_srcref cdenreturn_t;
     template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static cnumreturn_t den(T f)
+        {return cnumreturn_t::make(fmpq_denref(f._fmpq()));}
+};
+template<>
+struct fmpq_traits<fmpqxx_ref>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_ref denreturn_t;
+    typedef fmpzxx_ref cnumreturn_t;
+    typedef fmpzxx_ref cdenreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static cnumreturn_t den(T f)
+        {return cnumreturn_t::make(fmpq_denref(f._fmpq()));}
+};
+template<> struct fmpq_traits<fmpqxx>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_ref denreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    typedef fmpzxx_srcref cdenreturn_t;
+    template<class T>
     static cnumreturn_t num(const T& f)
         {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
     template<class T>
     static cnumreturn_t den(const T& f)
         {return cnumreturn_t::make(fmpq_denref(f._fmpq()));}
-};
-template<>
-struct fmpq_traits<fmpqxx_ref>
-    : fmpq_traits<fmpqxx_srcref>
-{
-    typedef fmpzxx_ref numreturn_t;
-    typedef fmpzxx_ref denreturn_t;
     template<class T>
-    static numreturn_t num(T& f) {return numreturn_t::make(fmpq_numref(f._fmpq()));}
+    static numreturn_t num(T& f)
+        {return numreturn_t::make(fmpq_numref(f._fmpq()));}
     template<class T>
-    static numreturn_t den(T& f) {return numreturn_t::make(fmpq_denref(f._fmpq()));}
+    static numreturn_t den(T& f)
+        {return numreturn_t::make(fmpq_denref(f._fmpq()));}
 };
-template<> struct fmpq_traits<fmpqxx> : fmpq_traits<fmpqxx_ref> { };
 
 struct fmpq_data
 {
