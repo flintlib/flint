@@ -2192,6 +2192,173 @@ and returning the modulus of the first such object found.
 
 \subsection{Matrix classes}
 
+A related but subtly different problem is posed by matrix classes. Again, these
+are not default instantiable, but one instead needs to specify their dimension
+(numbers of rows and columns). Two new problems arise. First, it is very common
+to mix matrices of differing dimensions in one expression (consider transposing
+a non-square matrix). Second, FLINT does no resizing of matrices.
+
+The latter is problematic, because flintxx uses a technique we call ``temporary
+merging'' where temporary objects needed in a calculation are only identified by
+type, and allowed to be reused. This reduces memory allocation and deallocation.
+
+In the current design, temporary merging cannot be used with matrix classes. The
+type trait \code{traits::use_temporary_merging<T>} must be used to disable it.
+After that, we can override \code{create_temporary} in the usual way, except
+that the method will now be called more often.\footnote{Actually, additional care
+has to be taken with regard to ltuples. We ignore this here for simplicity.}
+
+However, the \code{create_temporary} method still has to figure out the
+dimensions of the resulting matrix. For this, we use the type trait
+\code{outsize}. There are static functions \code{outsize<operation>::rows(m)}
+and \code{outsize<operation>::cols(m)} which yield the dimensions. Of course,
+the \code{outsize} trait has to be specialised appropriately.
+
+All in all, this is quite a lot of work, much of which is independent of the
+actual coefficient ring. For this reason, we have the helper file
+\code{flintxx/matrix.h}. It contains the following:
+\begin{enumerate}
+  \item The \code{matrix_traits} template.
+  \item Definition of operations for common matrix functions (e.g. transpose).
+  \item The \code{matrices::outsize} and \code{matrices::outsize_generic}
+        templates, and appropriate specialisations for common functions
+        (e.g. transpose, multiplication).
+  \item The templates \code{generic_traits_ref}, \code{generic_traits_srcref}
+        and \code{generic_traits_nonref} to simplify unified coefficient access.
+  \item Some convenience macros.
+\end{enumerate}
+
+To see how these things are used, consider the example of \code{fmpz_matxx}.
+We begin with the generic traits type for unified coefficient access:
+
+\begin{lstlisting}[language=c++]
+namespace detail {
+template<class Mat>
+struct fmpz_matxx_traits
+    : matrices::generic_traits<Mat> { };
+} // detail
+\end{lstlisting}
+
+This defines a traits type, which will be used to implement the
+\code{at(i, j)} method with unified access. The implementation defined above is
+the generic one, which is implemented via a call to the lazy operation
+\code{mat_at}.
+
+Next, inside the
+\code{fmpz_matxx_expression} class, the trait is used as follows:
+
+\begin{lstlisting}[language=c++]
+    ...
+    typedef detail::fmpz_matxx_traits<fmpz_matxx_expression> traits_t;
+
+    template<class Expr>
+    static evaluated_t create_temporary_rowscols(
+            const Expr&, slong rows, slong cols)
+    {
+        return evaluated_t(rows, cols);
+    }
+
+    FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
+    ...
+\end{lstlisting}
+
+The macro \code{FLINTXX_DEFINE_MATRIX_METHODS} adds methods \code{at},
+\code{rows}, \code{cols} and \code{create_temporary} for us (the function
+\code{create_temporary_rowscols} is used by the implementation of
+\code{create_temporary}). However, these
+methods cannot work unless we provide more information to the matrix helpers.
+The main thing we have to do is to specialise the \code{matrix_traits} trait:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct matrix_traits<fmpz_matxx>
+{
+    template<class M> static slong rows(const M& m)
+    {
+        return fmpz_mat_nrows(m._mat());
+    }
+    template<class M> static slong cols(const M& m)
+    {
+        return fmpz_mat_ncols(m._mat());
+    }
+
+    template<class M> static fmpzxx_srcref at(const M& m, slong i, slong j)
+    {
+        return fmpzxx_srcref::make(fmpz_mat_entry(m._mat(), i, j));
+    }
+    template<class M> static fmpzxx_ref at(M& m, slong i, slong j)
+    {
+        return fmpzxx_ref::make(fmpz_mat_entry(m._mat(), i, j));
+    }
+};
+\end{lstlisting}
+
+This trait means that the class \code{fmpz_matxx} (and all the classes built
+from it, like reference types and lazy expressions) wants to use the matrix
+helpers framework. It also specifies how to determine the dimension of immediate
+objects, and how to access their coefficients. (The framework will never call
+these trait functions with non-immediates, but we use a template nonetheless so
+the functions also work on reference types.)
+
+Furthermore, we have to specialise some more type traits to disable temporary
+merging. This is done using the following convenience macro:
+
+\begin{lstlisting}[language=c++]
+// temporary instantiation stuff
+FLINTXX_DEFINE_TEMPORARY_RULES(fmpz_matxx)
+\end{lstlisting}
+
+The matrix class is now almost operational. In standard expressions (involving
+transpose, matrix multiplication etc.) temporary objects of the correct dimensions
+will be allocated automatically. What remains to be done is to implement the rest of
+the unified coefficient access, and matrix dimension rules for more esoteric
+functions.
+
+The unified coefficient access implementation can in principle be done precisely
+as described in a previous subsection.
+However, it is essentially the same in all matrix classes,
+which is why we provide default implementations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpz_matxx_traits<fmpz_matxx_srcref>
+    : matrices::generic_traits_srcref<fmpzxx_srcref> { };
+template<>
+struct fmpz_matxx_traits<fmpz_matxx_ref>
+    : matrices::generic_traits_ref<fmpzxx_ref> { };
+template<> struct fmpz_matxx_traits<fmpz_matxx>
+    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref> { };
+\end{lstlisting}
+
+We still have to provide a \code{mat_at} rule:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, fmpzxx,
+        FMPZ_MATXX_COND_S, traits::fits_into_slong, traits::fits_into_slong,
+        fmpz_set(to._fmpz(), fmpz_mat_entry(e1._mat(), e2, e3)))
+\end{lstlisting}
+
+Now all that remains to be done is to inform the matrices framework of dimension
+calculations for functions it is not aware of. For \code{fmpz_matxx}, one
+example is a particular multiplication algorithm. Of course, the rule is just
+the same as for ordinary multiplication, so the specialisation is very simple:
+
+\begin{lstlisting}[language=c++]
+namespace matrices {
+template<>
+struct outsize<operations::mul_multi_mod_op>
+    : outsize<operations::times> { };
+} // matrices
+\end{lstlisting}
+
+In general, if there is no rule, a default case will be used. If the number of
+arguments is not two, this assumes that the first argument is a matrix, and that
+the dimensions of the output will match the dimensions of this first argument.
+If there are two arguments, at least one of which is a matrix, then the
+dimension of one of those is returned (with no guarantee which if there are two
+matrices). This default rule works for matrix addition, matrix-scalar
+multiplication (on either side), and ``elementwise'' operations.
+
 \subsection{Padic classes}
 
 \subsection{Vector classes}

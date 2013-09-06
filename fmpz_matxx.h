@@ -59,9 +59,6 @@ template<class Mat>
 struct fmpz_matxx_traits : matrices::generic_traits<Mat> { };
 } // detail
 
-namespace traits {
-}
-
 template<class Operation, class Data>
 class fmpz_matxx_expression
     : public expression<derived_wrapper<fmpz_matxx_expression>, Operation, Data>
