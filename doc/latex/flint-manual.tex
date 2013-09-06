@@ -2029,37 +2029,13 @@ struct fmpq_traits {
 };
 \end{lstlisting}
 
-After the definition of the expression template classes, we put the following
-specialisations:
-
-\begin{lstlisting}[language=c++]
-template<>
-struct fmpq_traits<fmpqxx_srcref>
-{
-    typedef fmpzxx_srcref numreturn_t;
-    typedef fmpzxx_srcref cnumreturn_t;
-
-    template<class T>
-    static cnumreturn_t num(const T& f)
-        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
-};
-template<>
-struct fmpq_traits<fmpqxx_ref>
-{
-    typedef fmpzxx_ref numreturn_t;
-    typedef fmpzxx_srcref cnumreturn_t;
-
-    template<class T>
-    static cnumreturn_t num(const T& f)
-        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
-    template<class T>
-    static numreturn_t num(T& f)
-        {return numreturn_t::make(fmpq_numref(f._fmpq()));}
-};
-template<> struct fmpq_traits<fmpqxx> : fmpq_traits<fmpqxx_ref> { };
-\end{lstlisting}
-
-TODO check and explain
+This has two typedefs \code{numreturn_t} and \code{cnumreturn_t}, which are the
+types the \code{num()} method should return on non-constant and constant
+instances, respectively. As this trait deals with the lazy expression case, we
+should return a lazy expression in both the constant and non-constant case. Thus
+we get by with only one static function, which can be called with a constant or
+non-constant argument, and which creates a new lazy expression involving our new
+function \code{fmpqxx_num}.
 
 The \code{fmpqxx_expression} class can use the traits as follows:
 
@@ -2069,13 +2045,150 @@ The \code{fmpqxx_expression} class can use the traits as follows:
         {return traits_t::num(*this);}
 \end{lstlisting}
 
+After the definition of the expression template classes, we put the following
+specialisations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpq_traits<fmpqxx_srcref>
+{
+    typedef fmpzxx_srcref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<>
+struct fmpq_traits<fmpqxx_ref>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_ref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<> struct fmpq_traits<fmpqxx>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(const T& f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static numreturn_t num(T& f)
+        {return numreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+\end{lstlisting}
+
+Note how we have to take care of quite a few special cases, and there is not
+actually any obvious duplication going on here. The way the code is written,
+calling \code{num()} on a constant instance of \code{fmpqxx_ref} will yield a
+writable object. This makes sense -- given a constant instance, one can just
+make a (non-constant) copy, and write through it -- but is not really mandatory.
+In
+general, flintxx does not support this kind of writing through const reference.
+For example, \code{set_zero} will not work on a \code{const fmpqxx_ref}.
+Thus it would be possible to share some code between the ref and
+nonref implementations of the traits classes. This is done for example in
+\code{padicxx}.
+
+Finally, in the \code{rules} namespace, we have to place an implementation of
+\code{fmpqxx_num}:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_num_op, fmpzxx,
+    FMPQXX_COND_S,
+    fmpz_set(to._fmpz(), fmpq_numref(from._fmpq())))
+\end{lstlisting}
+
 The example of traits usage we see here illustrates how careful one has to be to
 avoid circular class dependencies. In particular, the traits can only be
 specialised after the expression template class has been defined and the special
 immediate cases have been \code{typedef}d. However, they have to be specialised
 before any of the related templates is instantiated.
 
+Note also how the \code{fmpq_traits<fmpqxx_ref>} functions take their argument
+by value, thus automatically obtaining non-constant versions, while declaring
+the argument type via a template. This again delays instantiation, and breaks
+circular dependencies.
+
 \subsection{Nmod classes}
+
+Another common complication is when the underlying C objects are not ``default
+constructible''. For example, the \code{nmod_*} interfaces (\code{nmod_poly},
+\code{nmod_mat}, etc.) always require a modulus for initialisation. This is
+mainly problematic when evaluating compound expressions which require temporary
+objects. In principle flintxx has an easy workaround for this: the expression
+template class can define a \code{create_temporary()} method which is used to
+instantiate a temporary object of the same type as the return type of the
+current expression. However, this only really shifts the problem: now the
+expression template class has to figure out its own modulus.
+
+To complicate matters further, the moduli are not stored in a single type. The
+structures \code{nmod_mat_t}, \code{nmod_poly_t}, \code{nmod_poly_mat_t} all
+store a modulus. Even an expression built out of (say) \code{nmod_poly_mat} can
+return a (say) \code{nmod_poly} (e.g. the determinant), and so the
+\code{nmod_polyxx} class must be able to instantiate a temporary for an
+expression which does not contain any immediate polynomials!
+
+As a final complication, the C objects do not actually only store the modulus
+$n$, but also extra information computed from $n$. This extra information is
+conveniently wrapped up in \code{nmod_t}, although most of the C interfaces do
+not expose this data structure directly.
+
+These problems are overcome as follows. First of all, we do not allow any mixing
+of moduli in compound expressions. Thus the only task of the
+\code{create_temporary} method is to locate \emph{any} modulus inside a
+subexpression. Next, we require objects with a modulus to be recognisable by
+type.\footnote{This is why we disallow empty matrices over
+$\mathbb{Z}/n\mathbb{Z}[X]$. The \code{nmod_poly_mat_t} does not store a
+modulus, so we have to look at an entry.} With these conventions in place, it is
+a matter of bookkeeping (and searching the subexpression tree) to locate a
+modulus.
+
+Additionally, we have a class \code{nmodxx_ctx_srcref} (which is not an
+expression template) which stores a reference to an \code{nmod_t}. All classes
+which want to provide moduli must implement a \code{_ctx()} method which returns
+such an \code{nmodxx_ctx_srcref} object.
+
+In practice, there is a type trait \code{traits::has_nmodxx_ctx<T>} which should
+be specialised for all (immediate) classes wishing to participate in the modulus
+determination. For example, the following lines enable looking up moduli in
+\code{nmod_poly}:
+
+\begin{lstlisting}[language=c++]
+namespace traits {
+template<> struct has_nmodxx_ctx<nmod_polyxx>
+    : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmod_polyxx_ref>
+    : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmod_polyxx_srcref>
+    : mp::true_ { };
+} // traits
+\end{lstlisting}
+
+In addition to this, as mentioned above, the \code{create_temporary} method has
+to be overridden:
+
+\begin{lstlisting}[language=c++]
+    nmodxx_ctx_srcref estimate_ctx() const
+    {
+        return tools::find_nmodxx_ctx(*this);
+    }
+
+    evaluated_t create_temporary() const
+    {
+        return evaluated_t(estimate_ctx());
+    }
+\end{lstlisting}
+
+The function \code{tools::find_nmodxx_ctx} is implemented in \code{nmod_vec.h}
+and traverses the subexpression tree, searching for objects containing moduli,
+and returning the modulus of the first such object found.
+
+%There is one final complication, which is what to do if there are no
+%immediate subexpressions containing moduli.
+% TODO this is probably not worth explaining here
 
 \subsection{Matrix classes}
 
