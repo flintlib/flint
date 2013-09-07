@@ -109,7 +109,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;
 }

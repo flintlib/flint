@@ -19,64 +19,61 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "arith.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
+#include "flint.h"
 #include "ulong_extras.h"
 
-
-int main(void)
+int
+main(void)
 {
-    slong k;
+    slong iter;
     flint_rand_t state;
 
-    printf("zeta_ui_bsplit....");
+    printf("fmpz_cleanup....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (k = 0; k < 100; k++)
+    for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
     {
-        slong prec, n;
-        mpfr_t x, y;
+        slong i, n;
+        fmpz *A, *B;
 
-        n = 2 + n_randint(state, 20);
-        prec = 2 + n_randint(state, 10000);
+        n = n_randint(state, 100);
+        A = _fmpz_vec_init(n);
+        B = _fmpz_vec_init(n);
 
-        mpfr_init2(x, prec);
-        mpfr_init2(y, prec);
-
-        mpfr_zeta_ui(x, n, MPFR_RNDN);
-        mpfr_zeta_ui_bsplit(y, n, MPFR_RNDN);
-
-        if (!mpfr_equal_p(x, y))
+        for (i = 0; i < n; i++)
         {
-            printf("FAIL:\n");
-            printf("Wrong value at n = %ld, prec = %ld\n", n, prec);
-            printf("x:\n");
-            mpfr_out_str(stdout, 10, 0, x, MPFR_RNDN);
-            printf("\n");
-            printf("x:\n");
-            mpfr_out_str(stdout, 10, 0, y, MPFR_RNDN);
-            printf("\n");
-            abort();
+            fmpz_randtest(A + i, state, 1 + n_randint(state, 1000));
+            fmpz_randtest(B + i, state, 1 + n_randint(state, 1000));
         }
 
-        mpfr_clear(x);
-        mpfr_clear(y);
+        for (i = 0; i < n; i++)
+        {
+            fmpz_addmul(A + n_randint(state, n),
+                A + n_randint(state, n), B + n_randint(state, n));
+            fmpz_addmul(B + n_randint(state, n),
+                A + n_randint(state, n), B + n_randint(state, n));
+
+            if (n_randint(state, 10) == 0)
+            {
+                flint_cleanup();
+            }
+        }
+
+        _fmpz_vec_clear(A, n);
+        _fmpz_vec_clear(B, n);
     }
 
     flint_randclear(state);
-    mpfr_free_cache();
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }
+

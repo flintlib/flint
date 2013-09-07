@@ -63,6 +63,11 @@ n_compute_primes(ulong num_primes)
 
     m = FLINT_CLOG2(num_primes);
 
+    if (_flint_primes_used == 0)
+    {
+        flint_register_cleanup_function(n_cleanup_primes);
+    }
+
     if (m >= _flint_primes_used)
     {
         n_primes_t iter;

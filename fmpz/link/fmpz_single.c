@@ -77,12 +77,15 @@ void _fmpz_cleanup_mpz_content(void)
         mpz_clear(mpz_free_arr[i]);
         flint_free(mpz_free_arr[i]);
     }
+
+    mpz_free_num = mpz_free_alloc = 0;
 }
 
 void _fmpz_cleanup(void)
 {
     _fmpz_cleanup_mpz_content();
     flint_free(mpz_free_arr);
+    mpz_free_arr = NULL;
 }
 
 __mpz_struct * _fmpz_promote(fmpz_t f)
@@ -116,7 +119,7 @@ void _fmpz_demote_val(fmpz_t f)
     __mpz_struct * mpz_ptr = COEFF_TO_PTR(*f);
     int size = mpz_ptr->_mp_size;
 
-    if (!(((unsigned int) size + 1U) & ~2U))  /* size +-1 */
+    if (size == 1 || size == -1)
     {
         ulong uval = mpz_ptr->_mp_d[0];
 

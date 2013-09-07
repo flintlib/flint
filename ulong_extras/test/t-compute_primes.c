@@ -80,9 +80,8 @@ int main()
 
     flint_free(ref_primes);
     flint_free(ref_inverses);
-    n_cleanup_primes();
-
     flint_randclear(state);
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

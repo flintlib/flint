@@ -94,8 +94,7 @@ int main()
     _fmpz_vec_clear(den2, N);
     _fmpz_vec_clear(den3, N);
 
-    mpfr_free_cache();
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

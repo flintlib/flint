@@ -112,8 +112,7 @@ int main()
     fmpz_clear(num2);
     fmpz_clear(den2);
 
-    mpfr_free_cache();
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

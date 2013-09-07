@@ -1537,7 +1537,7 @@ int main(int argc, char *argv[])
     test_get_str_pretty("2  1 1/1  2", "(t+1)/2");
     test_get_str_pretty("1  1/1  2", "1/2");
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;
 }

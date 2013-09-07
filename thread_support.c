@@ -19,50 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include <mpfr.h>
 #include "flint.h"
-#include "arith.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
 
+FLINT_TLS_PREFIX int _flint_num_threads = 1;
 
-int main(void)
+int flint_get_num_threads()
 {
-    slong k;
-
-    printf("const_euler_brent_mcmillan....");
-    fflush(stdout);
-
-    for (k = 2; k < 17; k++)
-    {
-        mpfr_t x, y;
-
-        mpfr_init2(x, 1L << k);
-        mpfr_init2(y, 1L << k);
-
-        mpfr_const_euler(x, MPFR_RNDN);
-        mpfr_const_euler_brent_mcmillan(y, MPFR_RNDN);
-
-        if (!mpfr_equal_p(x, y))
-        {
-            printf("FAIL:\n");
-            printf("Wrong value at prec = %ld\n", 1L << k);
-            abort();
-        }
-
-        mpfr_clear(x);
-        mpfr_clear(y);
-    }
-
-    mpfr_free_cache();
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+    return _flint_num_threads;
 }
+
+void flint_set_num_threads(int num_threads)
+{
+    _flint_num_threads = num_threads;
+}
+

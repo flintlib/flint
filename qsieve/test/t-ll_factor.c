@@ -84,7 +84,7 @@ int main(void)
    fmpz_clear(n);
    
    flint_randclear(state);
-   _fmpz_cleanup();
+   flint_cleanup();
    printf("PASS\n");
    return 0;
 }

@@ -86,9 +86,9 @@ void arith_stirling_number_2(fmpz_t s, slong n, slong k)
     numbers efficiently. To compute a range of numbers, the vector or 
     matrix versions should generally be used.
 
-void arith_stirling_number_1u(fmpz * row, slong n, slong klen)
-void arith_stirling_number_1(fmpz * row, slong n, slong klen)
-void arith_stirling_number_2(fmpz * row, slong n, slong klen)
+void arith_stirling_number_1u_vec(fmpz * row, slong n, slong klen)
+void arith_stirling_number_1_vec(fmpz * row, slong n, slong klen)
+void arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 
     Computes the row of Stirling numbers
     \code{S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)}.
@@ -106,10 +106,14 @@ void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n,
     slong klen)
 
     Given the vector \code{prev} containing a row of Stirling numbers
-    \code{S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-2)}, computes
+    \code{S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-1)}, computes
     and stores in the row argument 
     \code{S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)}.
-    It is assumed that \code{klen} is at most $n + 1$.
+
+    If \code{klen} is greater than \code{n}, the output ends with
+    \code{S(n,n) = 1} followed by \code{S(n,n+1) = S(n,n+2) = ... = 0}.
+    In this case, the input only needs to have length \code{n-1};
+    only the input entries up to \code{S(n-1,n-2)} are read.
 
     The \code{row} and \code{prev} arguments are permitted to be the 
     same, meaning that the row will be updated in-place.
@@ -870,47 +874,3 @@ void mpfr_pi_chudnovsky(mpfr_t x, mpfr_rnd_t rnd)
     faster than the MPFR default function. As currently implemented, the
     value is not cached for repeated use.
 
-void mpfr_const_euler_brent_mcmillan(mpfr_t x, mpfr_rnd_t rnd)
-
-    Sets \code{x} to Euler's constant $\gamma$, rounded
-    in the direction \code{rnd}.
-
-    Uses the Brent-McMillan (or Bessel function) algorithm, implemented
-    using the generic code for binary splitting of rational series
-    provided in the \code{fmpq} module. We have
-
-    $$\gamma + \frac{S_0}{I_0} + \frac{K_0}{I_0^2} - \log n + O(e^{-8n})$$
-
-    where
-
-    $$S_0 = \sum_{k=0}^{\beta n} \left(\frac{n^k}{k!} \right)^2 H_k$$
-
-    $$I_0 = \sum_{k=0}^{\beta n} \left(\frac{n^k}{k!} \right)^2$$
-
-    $$K_0 = \frac{1}{4n} \sum_{k=0}^{2n} \frac{[(2k)!]^3}{(k!)^4 (16n)^{2k}}$$
-
-    where $\beta = 4.9706\ldots$ satisfies $\beta (\log \beta -1) = 3$.
-    (See \cite{GouSeb2004}).
-
-    As currently implemented, the value is not cached for repeated use.
-
-void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd)
-
-    Sets \code{x} to $\zeta(s)$ for $s > 1$, rounded heuristically in the
-    direction \code{rnd}.
-
-    Uses Borwein's approximation \cite{Borwein2000}, which is also
-    used by the MPFR default function \code{mpfr_zeta_ui}, but implemented
-    using binary splitting. Our binary splitting scheme can be derived by
-    writing down a matrix recurrence for the partial sums, clearing
-    denominators, and removing redundant operations.
-
-    To improve efficiency, we store denominators of the Chebyshev
-    polynomial (Q1), powers (Q2), and their product (Q3),
-    separately.
-
-    The complexity is quasilinear with respect to the
-    precision and roughly linear with respect to $s$. Especially for
-    large $s$, this function may require extremely
-    high precision (10000s of digits or more) to overtake the default
-    implementation provided by MPFR.

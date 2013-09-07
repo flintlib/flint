@@ -614,6 +614,26 @@ Derived from this there are the two macros \code{FLINT_FLOG2(x)} and
 \code{FLINT_CLOG2(x)} which, for any $x \geq 1$, compute $\floor{\log_2{x}}$ 
 and $\ceil{\log_2{x}}$.
 
+\chapter{Memory management}
+
+The file \code{flint.h} defines functions \code{flint_malloc},
+\code{flint_realloc}, \code{flint_calloc} and \code{flint_free}.
+They have the same interface as the standard library functions, but
+may perform additional error checking.
+
+FLINT may cache some data (such as allocated integers
+and tables of prime numbers) to speed up various computations.
+If FLINT is built in threadsafe mode, cached data is kept in thread-local
+storage. Cached data can be freed by calling the \code{flint_cleanup()}
+function. It is recommended to call \code{flint_cleanup()} right before
+exiting a thread, and at the end of the main program.
+
+The user can register additional cleanup functions to be invoked
+by \code{flint_cleanup()}. This is done by passing a pointer
+to a function with signature \code{void cleanup_function(void)}
+to \code{flint_register_cleanup_function()}.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integers                                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -56,6 +56,10 @@ void * flint_realloc(void * ptr, size_t size);
 void * flint_calloc(size_t num, size_t size);
 void flint_free(void * ptr);
 
+typedef void (*flint_cleanup_function_t)(void);
+void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
+void flint_cleanup(void);
+
 #if __GMP_BITS_PER_MP_LIMB == 64
     #define FLINT_BITS 64
     #define FLINT_D_BITS 53
@@ -72,6 +76,9 @@ void flint_free(void * ptr);
 #else
 #define FLINT_TLS_PREFIX
 #endif
+
+int flint_get_num_threads(void);
+void flint_set_num_threads(int num_threads);
 
 int flint_test_multiplier(void);
 

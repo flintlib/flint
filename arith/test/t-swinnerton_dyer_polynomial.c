@@ -72,7 +72,7 @@ int main()
         fmpz_poly_clear(S);
     }
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

@@ -371,7 +371,7 @@ int main(void)
     mpz_clear(curr);
     fmpz_clear(p);
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     return EXIT_SUCCESS;
 }
 

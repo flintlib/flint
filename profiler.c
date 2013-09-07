@@ -20,12 +20,16 @@
 /******************************************************************************
 
     Copyright (C) 2007 William Hart and David Harvey
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "profiler.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #include <float.h>
+#include <string.h>
+#include "profiler.h"
 
 /*
    clock_last[i] is the last read clock value for clock #i.
@@ -106,3 +110,40 @@ prof_repeat(double *min, double *max, profile_target_t target, void *arg)
     if (max)
         *max = max_time;
 }
+
+void get_memory_usage(meminfo_t meminfo)
+{
+    FILE * file = fopen("/proc/self/status", "r");
+
+    ulong result;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL)
+    {
+        result = 0;
+
+        if (strncmp(line, "VmSize:", 7) == 0)
+        {
+            sscanf(line, "VmSize: %lu kB\n", &result);
+            meminfo->size = result;
+        }
+        else if (strncmp(line, "VmPeak:", 7) == 0)
+        {
+            sscanf(line, "VmPeak: %lu kB\n", &result);
+            meminfo->peak = result;
+        }
+        else if (strncmp(line, "VmHWM:", 6) == 0)
+        {
+            sscanf(line, "VmHWM: %lu kB\n", &result);
+            meminfo->hwm = result;
+        }
+        else if (strncmp(line, "VmRSS:", 6) == 0)
+        {
+            sscanf(line, "VmRSS: %lu kB\n", &result);
+            meminfo->rss = result;
+        }
+    }
+
+    fclose(file);
+}
+

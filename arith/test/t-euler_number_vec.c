@@ -73,8 +73,7 @@ int main()
         _fmpz_vec_clear(r, n + 1);
     }
 
-    mpfr_free_cache();
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }

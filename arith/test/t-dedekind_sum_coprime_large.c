@@ -75,7 +75,7 @@ int main(void)
     fmpq_clear(s1);
     fmpq_clear(s2);
 
-    _fmpz_cleanup();
+    flint_cleanup();
     printf("PASS\n");
     return 0;
 }
