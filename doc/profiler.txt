@@ -136,8 +136,8 @@ void get_memory_usage(meminfo_t meminfo)
 macro TIMEIT_REPEAT(timer, reps)
 macro TIMEIT_END_REPEAT(timer, reps)
 
-    Repeatedly runs the code between the TIMEIT_REPEAT and the
-    TIMEIT_END_REPEAT markers, automatically increasing the number of
+    Repeatedly runs the code between the \code{TIMEIT_REPEAT} and the
+    \code{TIMEIT_END_REPEAT} markers, automatically increasing the number of
     repetitions until the elapsed time exceeds the timer resolution.
     The macro takes as input a predefined \code{timeit_t} object
     and an integer variable to hold the number of repetitions.
@@ -145,7 +145,8 @@ macro TIMEIT_END_REPEAT(timer, reps)
 macro TIMEIT_START
 macro TIMEIT_STOP
 
-    Repeatedly runs the code between the TIMEIT_START and the TIMEIT_STOP
+    Repeatedly runs the code between the \code{TIMEIT_START} and the
+    \code{TIMEIT_STOP}
     markers, automatically increasing the number of repetitions until the
     elapsed time exceeds the timer resolution, and then prints the average
     elapsed cpu and wall time for a single repetition.
@@ -153,7 +154,8 @@ macro TIMEIT_STOP
 macro TIMEIT_ONCE_START
 macro TIMEIT_ONCE_STOP
 
-    Runs the code between the TIMEIT_ONCE_START and the TIMEIT_ONCE_STOP
+    Runs the code between the \code{TIMEIT_ONCE_START} and the
+    \code{TIMEIT_ONCE_STOP}
     markers exactly once and then prints the elapsed cpu and wall time.
     This does not give a precise measurement if the elapsed time is short
     compared to the timer resolution.
