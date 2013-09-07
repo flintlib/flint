@@ -70,6 +70,9 @@ public:
     fmpzxx_ref get_p() {return fmpzxx_ref::make(ctx[0].p);}
     fmpzxx_srcref get_p() const {return fmpzxx_srcref::make(ctx[0].p);}
 
+    padic_print_mode mode() const {return _ctx()->mode;}
+    padic_print_mode& mode() {return _ctx()->mode;}
+
     // TODO more constructors? Should we wrap padic_print_mode?
     padicxx_ctx(fmpzxx_srcref p, long min, long max, padic_print_mode mode)
     {
@@ -94,6 +97,8 @@ public:
     // XXX these two are not actually exposed in the C api ...
     fmpzxx_ref get_p() {return fmpzxx_ref::make(ctx[0].p);}
     fmpzxx_srcref get_p() const {return fmpzxx_srcref::make(ctx[0].p);}
+
+    padic_print_mode mode() const {return _ctx()->mode;}
 
     padicxx_ctx_srcref(padicxx_ctx& c)
         : ctx(c._ctx()) {}

@@ -150,14 +150,4 @@ struct binary_expression<T, operations::compeval_op, U,
 } // rules
 } // flint
 
-// XXX is this a good idea?
-namespace std {
-FLINT_DEFINE_BINOP_HERE(pow)
-
-FLINT_DEFINE_UNOP_HERE(abs)
-FLINT_DEFINE_UNOP_HERE(exp)
-FLINT_DEFINE_UNOP_HERE(log)
-FLINT_DEFINE_UNOP_HERE(sqrt)
-}
-
 #endif

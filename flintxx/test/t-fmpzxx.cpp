@@ -238,11 +238,6 @@ test_functions()
     tassert(fdiv_r_2exp(mb, 2u) == 0);
     tassert(divexact(b, a) == 8 && divexact(b, 2) == 8 && divexact(b, 2u) == 8);
 
-    // check namespace std
-    tassert(std::pow(a, 4u) == 16);
-    tassert(std::sqrt(b) == 4);
-    tassert(std::abs(-a) == a);
-
     // check a composite expression
     tassert(2u + sqrt(a + a) == 4);
 

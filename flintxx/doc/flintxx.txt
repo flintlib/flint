@@ -3563,6 +3563,9 @@ padic_ctx_t& padicxx_ctx::_ctx() const
     If this is called on a constant instance of \code{padicxx_ctx}, you must
     ensure that no user-visible state is changed.
 
+padic_print_mode& padicxx_ctx::mode()
+padic_print_mode padicxx_ctx::mode() const
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     C++ particulars
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
