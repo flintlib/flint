@@ -51,6 +51,9 @@ test_printing()
 
     fmpzxx b(-15);
     tassert((a + b).to_string() == "16");
+
+    char astr[] = "15";
+    tassert(fmpzxx(astr) == 15);
 }
 
 void

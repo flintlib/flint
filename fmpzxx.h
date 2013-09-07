@@ -318,12 +318,6 @@ struct fmpz_data
     ~fmpz_data() {fmpz_clear(inner);}
     fmpz_data(const fmpz_data& o) {fmpz_init_set(inner, o.inner);}
 
-    fmpz_data(const char* str)
-    {
-        fmpz_init(inner);
-        fmpz_set_str(inner, str, 10);
-    }
-
     template<class T>
     fmpz_data(const T& t)
     {
@@ -340,6 +334,12 @@ struct fmpz_data
     {
         fmpz_init(inner);
         fmpz_set_si(inner, t);
+    }
+
+    void init(const char* str)
+    {
+        fmpz_init(inner);
+        fmpz_set_str(inner, str, 10);
     }
 
     void init(const fmpzxx_srcref& r)
