@@ -199,6 +199,13 @@ test_functions()
     fmpzxx b(16);
     fmpzxx_srcref c(a);
 
+    tassert(sgn(a) == 1);
+    tassert(size(b) == 1);
+    tassert(val2(b) == 4);
+    tassert(bits(b) == 5);
+    tassert(sizeinbase(b, 2) == 5);
+    tassert(b.tstbit(0) == false);
+
     tassert(pow(a, 4u) == 16);
     tassert(root(b, 4) == 2);
     tassert(root(b, (unsigned short)4) == 2);

@@ -41,6 +41,7 @@
 
 // TODO functions for addmul? inhomogeneous addmul?
 // TODO use evaluate_n in immediate functions?
+// TODO fmpz_abs_ubound_ui_2exp, lbound
 
 namespace flint {
 FLINT_DEFINE_BINOP(cdiv_q)
@@ -132,6 +133,7 @@ public:
     // these only make sense with fmpzxx/fmpzxx_ref
     void clrbit(ulong i) {fmpz_clrbit(_fmpz(), i);}
     void combit(ulong i) {fmpz_combit(_fmpz(), i);}
+    void setbit(ulong i) {fmpz_setbit(_fmpz(), i);}
     void set_zero() {fmpz_zero(_fmpz());}
     void set_one() {fmpz_one(_fmpz());}
 
@@ -175,6 +177,18 @@ public:
     bool is_prime_pseudosquare() const
     {
         return fmpz_is_prime_pseudosquare(this->evaluate()._fmpz());
+    }
+    bool abs_fits_ui() const
+    {
+        return fmpz_abs_fits_ui(this->evaluate()._fmpz());
+    }
+    bool fits_si() const
+    {
+        return fmpz_fits_si(this->evaluate()._fmpz());
+    }
+    bool tstbit(ulong i) const
+    {
+        return fmpz_tstbit(this->evaluate()._fmpz(), i);
     }
 
     template<class T2>
@@ -223,6 +237,17 @@ public:
     {
         return fmpz_jacobi(this->evaluate()._fmpz(), p.evaluate()._fmpz());
     }
+
+    size_t sizeinbase(int b) const
+        {return fmpz_sizeinbase(this->evaluate()._fmpz(), b);}
+    mp_bitcnt_t bits() const
+        {return fmpz_bits(this->evaluate()._fmpz());}
+    mp_bitcnt_t size() const
+        {return fmpz_size(this->evaluate()._fmpz());}
+    mp_bitcnt_t val2() const
+        {return fmpz_val2(this->evaluate()._fmpz());}
+    int sgn() const
+        {return fmpz_sgn(this->evaluate()._fmpz());}
 
     // lazy function forwarding
     FLINTXX_DEFINE_MEMBER_3OP(divexact2)
@@ -519,6 +544,37 @@ inline typename mp::enable_all_fmpzxx<int, Fmpz1>::type
 jacobi(const Fmpz1& a, const Fmpz2& p)
 {
     return a.jacobi(p);
+}
+
+template<class Fmpz>
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, size_t>::type
+sizeinbase(const Fmpz& a, int b)
+{
+    return a.sizeinbase(b);
+}
+template<class Fmpz>
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, mp_bitcnt_t>::type
+bits(const Fmpz& a)
+{
+    return a.bits();
+}
+template<class Fmpz>
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, mp_bitcnt_t>::type
+val2(const Fmpz& a)
+{
+    return a.val2();
+}
+template<class Fmpz>
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, mp_bitcnt_t>::type
+size(const Fmpz& a)
+{
+    return a.size();
+}
+template<class Fmpz>
+inline typename mp::enable_if<traits::is_fmpzxx<Fmpz>, int>::type
+sgn(const Fmpz& a)
+{
+    return a.sgn();
 }
 
 template<class Fmpz>
