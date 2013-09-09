@@ -2060,6 +2060,7 @@ function \code{fmpqxx_num}.
 The \code{fmpqxx_expression} class can use the traits as follows:
 
 \begin{lstlisting}[language=c++]
+// class fmpqxx_expression
     typedef detail::fmpq_traits<fmpqxx_expression> traits_t;
     typename traits_t::numreturn_t num()
         {return traits_t::num(*this);}
@@ -2106,7 +2107,8 @@ calling \code{num()} on a constant instance of \code{fmpqxx_ref} will yield a
 writable object. This makes sense -- given a constant instance, one can just
 make a (non-constant) copy, and write through it -- but is not really mandatory.
 In
-general, flintxx does not support this kind of writing through const reference.
+general, flintxx does not support this kind of writing through constant
+instances of reference classes.
 For example, \code{set_zero} will not work on a \code{const fmpqxx_ref}.
 Thus it would be possible to share some code between the ref and
 nonref implementations of the traits classes. This is done for example in
@@ -2191,6 +2193,7 @@ In addition to this, as mentioned above, the \code{create_temporary} method has
 to be overridden:
 
 \begin{lstlisting}[language=c++]
+// class nmod_polyxx
     nmodxx_ctx_srcref estimate_ctx() const
     {
         return tools::find_nmodxx_ctx(*this);
@@ -2268,7 +2271,7 @@ Next, inside the
 \code{fmpz_matxx_expression} class, the trait is used as follows:
 
 \begin{lstlisting}[language=c++]
-    ...
+// class fmpz_matxx_expression
     typedef detail::fmpz_matxx_traits<fmpz_matxx_expression> traits_t;
 
     template<class Expr>
@@ -2279,7 +2282,6 @@ Next, inside the
     }
 
     FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
-    ...
 \end{lstlisting}
 
 The macro \code{FLINTXX_DEFINE_MATRIX_METHODS} adds methods \code{at},
@@ -2380,6 +2382,88 @@ matrices). This default rule works for matrix addition, matrix-scalar
 multiplication (on either side), and ``elementwise'' operations.
 
 \subsection{Padic classes}
+
+The classes representing padic numbers (\code{padicxx}, \code{padic_polyxx},
+\code{padic_matxx} and \code{qadic}) come with their own difficulties. These are
+twofold.
+
+First of all, padic number data is split into two data structures: the actual
+number data (e.g. \code{padic_t}), and a \emph{context} (\code{padic_ctx_t})
+containing meta data.
+Any operation on padic numbers needs to be passed both the number data and a
+context. In order to facilitate this, all C++ wrappers for padics store a
+reference to a context. We can then use a lookup scheme similar to the
+\code{nmod_*} case to find a context suitable for a whole expression.
+
+One difference is that the context reference has to be stored with every
+immediate object (e.g. in \code{padic_data}). This also includes the reference
+types, and hence requires specialising \code{flint_classes::ref_data} and
+\code{flint_classes::srcref_data}.
+
+Secondly, all padic computations are necessarily just approximations. That is to
+say, like real numbers, padic numbers cannot in general be stored exactly. Thus
+every padic number also stores its own precision. When the C library is asked to
+perform an operations (such as \code{a = b + c}), it will treat \code{b} and
+\code{c} as exact padic numbers (similarly to how we can treat a decimal
+approximation to a real number, such as $3.14$, as the exact real number
+$3.140000\dots$). Then it implements an algorithm which is equivalent to
+performing the computation \code{b + c} exactly and truncating to the precision
+of \code{c} in the end. This gives very well-defined semantics, and very fine
+control over the behaviour, but is unfortunately not very well-suited to
+implementing automatic evaluation of compound expressions. In flintxx, we have
+decided to (notionally) assign a precision to every compound expression. All
+temporaries used will be instantiated with this precision.
+
+The precision of a compound expression is computed as the maximum of the
+precision of all of its (immediate) subexpressions. In order to still be able to
+change this precision, all immediates have a \code{.toN(n)} method which
+(notionally) raises or lowers their precision. This is implemented by extending
+the functionality of the \code{padicxx_srcref} type. Namely, in
+\code{padicxx_srcref}, in addition to a \code{const padic_struct*} and
+\code{padicxx_ctx_srcref}, we also store an additional \code{slong N}
+representing the notional precision. The usual constructors of
+\code{padicxx_srcref} just initialise \code{N} from the underlying
+\code{padic_struct}. But we provide additional constructors which allow setting
+this parameter explicitly. The \code{toN} method makes use of these
+constructors.
+
+We thus see that quite a bit of infrastructure is needed to build a new padic
+class. To facilitate this, \code{padicxx.h} defines some convenience macros. In
+summary, the following steps are necessary:
+
+\begin{enumerate}
+\item Implement a traits type for computing \code{prec()} and \code{val()}.
+  In the general case, \code{prec()} should return
+  \code{tools::padic_output_prec}.
+
+\item In the expression class, typedef \code{traits_t} and invoke the macro
+  \code{PADICXX_DEFINE_STD}.\footnote{This adds context estimation, \code{toN},
+  \code{prec} and \code{val} methods. Alternatively invoke a subset of
+  \code{PADICXX_DEFINE_CTX}, \code{PADICXX_DEFINE_ESTIMATE_CTX},
+  \code{PADICXX_DEFINE_TON}, \code{PADICXX_DEFINE_PREC},
+  \code{PADICXX_DEFINE_VAL}.}
+
+\item Enable the trait \code{has_padicxx_ctx} for your immediate classes.
+
+\item Specialise the traits type. For reference and non-reference immediates,
+  it should return the precision stored with the objects. For srcref, it should
+  return the N field in \code{_data()}.\footnote{\code{val()} can be an ordinary
+  unified access implementation.}
+
+\item Invoke the macro
+  \code{PADICXX_DEFINE_REF_STRUCTS(classname, structname, precname)}.
+  Here \code{classname} is the name of the non-reference immediate (e.g.
+  \code{padicxx}), \code{structname} is the name of the underlying C struct (e.g.
+  \code{padic_struct}) and \code{precname} is the name of the function for
+  accessing the precision (e.g. \code{padic_prec}). This specialises the
+  \code{flint_classes::ref_data} and \code{flint_classes::srcref_data}
+  templates, adding a context reference and \code{toN} support.
+\end{enumerate}
+
+The implementation of \code{qadicxx} is slightly different since it uses a
+larger context. But this contains \code{padic_ctx} as a substruct, and hence it
+is not difficult to incorporate \code{qadicxx} into the context lookup
+infrastructure. See the source for more details.
 
 \subsection{Vector classes}
 
