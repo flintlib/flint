@@ -265,7 +265,7 @@ struct padic_poly_traits<padic_polyxx>
     : padic_poly_traits<padic_polyxx_ref> { };
 } // detail
 
-PADICXX_DEFINE_REF_STRUCTS(padic_poly_struct, padic_poly_prec)
+PADICXX_DEFINE_REF_STRUCTS(padic_polyxx, padic_poly_struct, padic_poly_prec)
 
 namespace detail {
 struct padic_poly_data

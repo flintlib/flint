@@ -30,6 +30,9 @@
 #include "qadicxx.h"
 #include "flintxx/test/helpers.h"
 
+// This is a test in itself: used to not compile.
+#include "padic_polyxx.h"
+
 using namespace flint;
 
 void

@@ -240,7 +240,7 @@ struct padic_mat_traits<padic_matxx>
       padic_matxx_ref_traits_no_std_matrix { };
 } // detail
 
-PADICXX_DEFINE_REF_STRUCTS(padic_mat_struct, padic_mat_prec)
+PADICXX_DEFINE_REF_STRUCTS(padic_matxx, padic_mat_struct, padic_mat_prec)
 
 namespace detail {
 struct padic_mat_data

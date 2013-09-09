@@ -412,56 +412,70 @@ struct padic_traits<padicxx_ref>
 template<>
 struct padic_traits<padicxx>
     : padic_traits<padicxx_ref> { };
+
+template<class T, class U>
+struct faketemplate : mp::enable_if<mp::equal_types<T, U> > { };
 } // detail
 
-#define PADICXX_DEFINE_REF_STRUCTS_(structname, precname, ctxtype)            \
+// NB: usually, the "padicname" parameter would not be necessary. We would
+// leave that as a template, identifying the type by structname alone, and
+// conveniently delay all instantiations. Unfortunately qadic and padic_poly
+// have the same structname, so we cannot do this.
+// Instead we pass in the class name explicitly, and delay relevant functions
+// by hand...
+#define PADICXX_DEFINE_REF_STRUCTS_(padicname, structname, precname, ctxtype) \
 namespace flint_classes {                                                     \
-template<class Padic>                                                         \
-struct ref_data<Padic, structname>                                            \
+template<>                                                                    \
+struct ref_data<padicname, structname>                                        \
 {                                                                             \
     typedef void IS_REF_OR_CREF;                                              \
-    typedef Padic wrapped_t;                                                  \
+    typedef padicname wrapped_t;                                              \
                                                                               \
     typedef structname* data_ref_t;                                           \
     typedef const structname* data_srcref_t;                                  \
                                                                               \
     structname* inner;                                                        \
-    ctxtype ctx;                                                   \
+    ctxtype ctx;                                                              \
                                                                               \
-    ref_data(Padic& o) : inner(o._data().inner), ctx(o._data().ctx) {}        \
+    template<class T>                                                         \
+    ref_data(T& o, typename detail::faketemplate<T, padicname>::type* = 0)    \
+        : inner(o._data().inner), ctx(o._data().ctx) {}                       \
                                                                               \
-    static ref_data make(structname* f, ctxtype ctx)               \
+    static ref_data make(structname* f, ctxtype ctx)                          \
     {                                                                         \
         return ref_data(f, ctx);                                              \
     }                                                                         \
                                                                               \
 private:                                                                      \
-    ref_data(structname* fp, ctxtype c) : inner(fp), ctx(c) {}     \
+    ref_data(structname* fp, ctxtype c) : inner(fp), ctx(c) {}                \
 };                                                                            \
                                                                               \
-template<class Padic, class Ref>                                              \
-struct srcref_data<Padic, Ref, structname>                                    \
+template<class Ref>                                                           \
+struct srcref_data<padicname, Ref, structname>                                \
 {                                                                             \
     typedef void IS_REF_OR_CREF;                                              \
-    typedef Padic wrapped_t;                                                  \
+    typedef padicname wrapped_t;                                              \
                                                                               \
     typedef const structname* data_ref_t;                                     \
     typedef const structname* data_srcref_t;                                  \
                                                                               \
     const structname* inner;                                                  \
-    ctxtype ctx;                                                   \
+    ctxtype ctx;                                                              \
     slong N;                                                                  \
                                                                               \
-    srcref_data(const Padic& o)                                               \
-        : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}         \
-    srcref_data(Ref o)                                                        \
-        : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}         \
+    template<class T>                                                         \
+    srcref_data(const T& o,                                                   \
+            typename detail::faketemplate<T, padicname>::type* = 0)           \
+        : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}          \
+    template<class T>                                                         \
+    srcref_data(T o, typename detail::faketemplate<T, Ref>::type* = 0)        \
+        : inner(o._data().inner), ctx(o._data().ctx), N(o.prec()) {}          \
                                                                               \
-    static srcref_data make(const structname* f, ctxtype ctx)      \
+    static srcref_data make(const structname* f, ctxtype ctx)                 \
     {                                                                         \
         return srcref_data(f, ctx);                                           \
     }                                                                         \
-    static srcref_data make(const structname* f, ctxtype ctx,      \
+    static srcref_data make(const structname* f, ctxtype ctx,                 \
             slong N)                                                          \
     {                                                                         \
         return srcref_data(f, ctx, N);                                        \
@@ -474,9 +488,9 @@ private:                                                                      \
         : inner(fp), ctx(c), N(n) {}                                          \
 };                                                                            \
 } /* flint_classes */
-#define PADICXX_DEFINE_REF_STRUCTS(structname, precname) \
-    PADICXX_DEFINE_REF_STRUCTS_(structname, precname, padicxx_ctx_srcref)
-PADICXX_DEFINE_REF_STRUCTS(padic_struct, padic_prec)
+#define PADICXX_DEFINE_REF_STRUCTS(padicname, structname, precname) \
+    PADICXX_DEFINE_REF_STRUCTS_(padicname, structname, precname, padicxx_ctx_srcref)
+PADICXX_DEFINE_REF_STRUCTS(padicxx, padic_struct, padic_prec)
 
 namespace detail {
 struct padic_data

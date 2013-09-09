@@ -284,7 +284,7 @@ struct qadic_traits<qadicxx_ref>
 template<> struct qadic_traits<qadicxx> : qadic_traits<qadicxx_ref> { };
 }
 
-PADICXX_DEFINE_REF_STRUCTS_(qadic_struct, qadic_prec, const qadicxx_ctx&)
+PADICXX_DEFINE_REF_STRUCTS_(qadicxx, qadic_struct, qadic_prec, const qadicxx_ctx&)
 
 namespace detail {
 struct qadic_data
