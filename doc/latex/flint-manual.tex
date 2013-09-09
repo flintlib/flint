@@ -2403,7 +2403,7 @@ types, and hence requires specialising \code{flint_classes::ref_data} and
 Secondly, all padic computations are necessarily just approximations. That is to
 say, like real numbers, padic numbers cannot in general be stored exactly. Thus
 every padic number also stores its own precision. When the C library is asked to
-perform an operations (such as \code{a = b + c}), it will treat \code{b} and
+perform an operations, such as \code{a = b + c}, it will treat \code{b} and
 \code{c} as exact padic numbers (similarly to how we can treat a decimal
 approximation to a real number, such as $3.14$, as the exact real number
 $3.140000\dots$). Then it implements an algorithm which is equivalent to
@@ -2466,6 +2466,15 @@ is not difficult to incorporate \code{qadicxx} into the context lookup
 infrastructure. See the source for more details.
 
 \subsection{Vector classes}
+
+Vectors do not have very good representation in FLINT. Usually, but not
+universally, a vector of type
+\code{foo_t} is represented as \code{foo_struct*}, with size passed in
+explicitly. Some vector types have support functions in FLINT, typically all
+underscored.
+
+In flintxx we implement some first class vectors, but the interfaces are not
+very well developed and relatively ad-hoc.
 
 \section{Some tidbits and caveats}
 
