@@ -145,7 +145,29 @@ int print(const permxx&)
 *******************************************************************************
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Not yet split into subsections
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{sqrt}, \code{abs}.
+
+Fmpz_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{cdiv_q}, \code{divexact}, \code{fdiv_qr}, \code{fdiv_r},
+    \code{fdiv_r_2exp}, \code{gcd}, \code{gcdinv}, \code{invmod}, \code{lcm},
+    \code{negmod}, \code{pow}, \code{rfac}, \code{root}, \code{sqrtmod},
+    \code{tdiv_q}, \code{tdiv_q_2exp}, \code{tdiv_qr}, \code{xgcd}.
+
+Fmpz_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{divexact2}, \code{mul2}, \code{mul_tdiv_q_2exp}, \code{powm}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 fmpzxx::fmpzxx()
@@ -157,6 +179,10 @@ fmpzxx::fmpzxx(T:is_integer)
 
     Initialize from a primitive data type. See \code{fmpz_set_str},
     \code{fmpz_set_si} and \code{fmpz_set_ui}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 static fmpzxx fmpzxx::randbits(frandxx& state)
 
@@ -172,31 +198,81 @@ static fmpzxx fmpzxx::randtest_mod(frandxx& state, Fmpz_expr m)
 
 static fmpzxx fmpzxx::randtest_mod_signed(frandxx& state, Fmpz_expr m)
 
-static fmpzxx_ref fmpzxx_ref::make(fmpz* f)
-static fmpzxx_srcref fmpzxx_srcref::make(const fmpz* f)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    Obtain a flintxx reference object pointing to \code{f}. Here \code{f} must
-    not be zero.
+std::string Fmpz_expr::to_string(int base = 10) const
 
-fmpz_t& fmpzxx::_fmpz()
-const fmpz_t& fmpzxx::_fmpz() const
-fmpz* fmpzxx_ref::_fmpz()
-const fmpz* fmpzxx_ref::_fmpz() const
-const fmpz* fmpzxx_srcref::_fmpz() const
+    Convert self into a \code{string}. See \code{fmpz_get_str}.
 
-    Obtain a reference to the underlying C data type.
+slong Fmpz_expr::to<slong>() const
+
+    Convert self to \code{slong}. See \code{fmpz_get_si}.
+
+slong Fmpz_expr::to<ulong>() const
+
+    Convert self to \code{ulong}. See \code{fmpz_get_si}.
+
+double Fmpz_expr::to<double>() const
+
+    Convert self to \code{double}. See \code{fmpz_get_d}.
+
+double Fmpz_expr::get_d_2exp(long& exp) const
+
+Fmpz_target Fmpz_target::operator=(const char*)
+Fmpz_target Fmpz_target::operator=(T:is_integer)
+
+    See \code{fmpz_set_str}, \code{fmpz_set_ui} and \code{fmpz_set_si}.
 
 void Fmpz_target::set_ui_smod(mp_limb_t x, mv_limb_t m)
 
-void Fmpz_target::set_ui_ui(mp_limb_t x, mv_limb_t m)
+void Fmpz_target::set_uiui(mp_limb_t x, mv_limb_t m)
 
-void Fmpz_target::neg_ui_ui(mp_limb_t x, mv_limb_t m)
+void Fmpz_target::neg_uiui(mp_limb_t x, mv_limb_t m)
 
-void Fmpz_target::clrbit(ulong i)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void Fmpz_target::combit(ulong i)
+int print(Fmpz_expr)
+int print(FILE*, Fmpz_expr)
+int read(Fmpz_target)
+int read(FILE*, Fmpz_target)
 
-double Fmpz_expr::get_d_2exp(long& exp) const
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+size_t Fmpz_expr::sizeinbase(int) const
+size_t sizeinbase(Fmpz_expr, int)
+mp_bitcnt_t Fmpz_expr::bits() const
+mp_bitcnt_t bits(Fmpz_expr)
+mp_bitcnt_t Fmpz_expr::size() const
+mp_bitcnt_t size(Fmpz_expr)
+mp_bitcnt_t Fmpz_expr::val2() const
+mp_bitcnt_t val2(Fmpz_expr)
+int Fmpz_expr::sign() const
+int sign(Fmpz_expr)
+
+void Fmpz_target::set_zero()
+void Fmpz_target::set_one()
+
+bool Fmpz_expr::abs_fits_ui() const
+bool Fmpz_expr::fits_si() const
+
+void Fmpz_target::setbit(ulong)
+bool Fmpz_expr::tstbit(ulong) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparision
+
+    Relational operators \code{<=}, \code{>}
+    etc are overloaded, where \code{e1} and \code{e2} can be any
+    combination of \code{Fmpz_expr} and
+    \code{T:is_integer}.
+    See \code{fmpz_cmp}, \code{fmpz_cmp_si} and \code{fmpz_cmp_ui}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 bool Fmpz_expr::is_zero() const
 
@@ -218,73 +294,8 @@ bool Fmpz_expr::is_odd() const
 
     Return if the expression evaluates to an odd integer.
 
-bool Fmpz_expr::is_square() const
-
-    Return if this expression evaluates to a square integer.
-
-int Fmpz_expr::popcnt() const
-
-bool Fmpz_expr::is_probabprime() const
-
-bool Fmpz_expr::is_prime_pseudosquare() const
-
-bool Fmpz_expr::divisible(Fmpz_expr) const
-bool Fmpz_expr::divisible(T:fits_into_slong) const
-
-long Fmpz_expr::clog(Fmpz_expr) const
-long Fmpz_expr::clog(T:is_unsigned_integer) const
-
-long Fmpz_expr::flog(Fmpz_expr) const
-long Fmpz_expr::flog(T:is_unsigned_integer) const
-
-double Fmpz_expr::dlog() const
-
-int Fmpz_expr::jacobi(Fmpz_expr) const
-
-std::string Fmpz_expr::to_string(int base = 10) const
-
-    Convert self into a \code{string}. See \code{fmpz_get_str}.
-
-slong Fmpz_expr::to<slong>() const
-
-    Convert self to \code{slong}. See \code{fmpz_get_si}.
-
-double Fmpz_expr::to<double>() const
-
-    Convert self to \code{double}. See \code{fmpz_get_d}.
-
-Fmpz_expr::unary operation() const
-
-    The following unary functions are made available as member functions:
-    \code{sqrt}, \code{abs}.
-
-Fmpz_expr::binary operation(??) const
-
-    The following binary functions are made available as member functions:
-    \code{cdiv_q}, \code{divexact}, \code{fdiv_qr}, \code{fdiv_r},
-    \code{fdiv_r_2exp}, \code{gcd}, \code{gcdinv}, \code{invmod}, \code{lcm},
-    \code{negmod}, \code{pow}, \code{rfac}, \code{root}, \code{sqrtmod},
-    \code{tdiv_q}, \code{tdiv_q_2exp}, \code{tdiv_qr}, \code{xgcd}.
-
-Fmpz_expr::ternary operation(??, ??) const
-
-    The following ternary functions are made available as member functions:
-    \code{divexact2}, \code{mul2}, \code{mul_tdiv_q_2exp}, \code{powm}.
-
-Fmpz_target Fmpz_target::operator=(const char*)
-Fmpz_target Fmpz_target::operator=(T:is_integer)
-
-    See \code{fmpz_set_str}, \code{fmpz_set_ui} and \code{fmpz_set_si}.
-
-bool operator??(?? e1, ?? e2)
-
-    Relational operators \code{<=}, \code{>}
-    etc are overloaded, where e1 and e2 can be any
-    combination of \code{Fmpz_expr},
-    \code{T:is_signed_integer} and \code{T:is_unsigned_integer}.
-    See \code{fmpz_cmp}, \code{fmpz_cmp_si} and \code{fmpz_cmp_ui}.
-
-Fmpz_expr operator?(?? e1, ?? e2)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic arithmetic
 
     Arithmetic operators \code{+}, \code{-}, \code{*}, \code{/}, \code{%},
     \code{<<} and \code{>>} are overloaded. See the \code{fmpz} documentation
@@ -294,76 +305,11 @@ Fmpz_expr operator?(?? e1, ?? e2)
 
     The shift operators wrap \code{fmpz_fdiv_q_2exp} and \code{fmpz_mul_2exp}.
     The division operators use \code{fmpz_fdiv}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    Binary logic operators \code{& | ^} (and, or, xor) are also overloaded
-    (implemented when both arguments are \code{Fmpz_expr}).
-
-Fmpz_target operator?=(?? e)
-
-    Assignment-arithmetic operators are overloaded whenever their long form
-    would be.
-
-Fmpz_expr operator-(Fmpz_expr)
-
-    Negate the argument. See \code{fmpz_neg}.
-
-bool divisible(Fmpz_expr n, Fmpz_expr d)
-bool divisible(Fmpz_expr n, T:fits_into_slong d)
-
-    Return if $d$ divides $n$. See \code{fmpz_divisible}.
-
-long clog(Fmpz_expr x, Fmpz_expr b)
-long clog(Fmpz_expr x, ulong b)
-
-long flog(Fmpz_expr x, Fmpz_expr b)
-long flog(Fmpz_expr x, ulong b)
-
-double dlog(Fmpz_expr x)
-
-int jacobi(Fmpz_expr a, Fmpz_expr p)
-
-Ltuple<slong, fmpzxx>_expr remove(Fmpzxx a, Fmpzxx b)
+Fmpz_expr abs(Fmpz_expr)
 
 Fmpz_expr mul2_uiui(Fmpz_expr g, ulong x, ulong y)
-
-Fmpz_expr divexact2_uiui(Fmpz_expr g, ulong x, ulong y)
-
-Fmpz_expr powm(Fmpz_expr g, ulong e, Fmpz_expr m)
-Fmpz_expr powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
-
-Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, Fmpz_expr x, ulong exp)
-Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, long x, ulong exp)
-
-Ltuple<fmpzxx, fmpzxx>_expr fdiv_qr(Fmpz_expr g, Fmpz_expr h)
-Ltuple<fmpzxx, fmpzxx>_expr tdiv_qr(Fmpz_expr g, Fmpz_expr h)
-
-Ltuple<bool, fmpzxx>_expr sqrtmod(Fmpz_expr a, Fmpz_expr b)
-
-    \code{ltupleref(b, N) = sqrtmod(A, B)} has the same effect as
-    \code{b = fmpz_sqrtmod(n, a, b)}, where \code{n, a, b} are the underlying
-    \code{fmpz_t} of \code{N, A, B}.
-
-Ltuple<fmpzxx, fmpzxx>_expr sqrtrem(Fmpz_expr g)
-
-Ltuple<fmpzxx, fmpzxx>_expr gcdinv(Fmpz_expr f, Fmpz_expr g)
-
-Ltuple<fmpzxx, fmpzxx, fmpzxx>_expr xgcd(Fmpz_expr f, Fmpz_expr g)
-
-Fmpz_expr rfac(Fmpz_expr, T:is_unsigned_integer)
-
-Fmpz_expr fac(T:is_unsigned_integer)
-
-Fmpz_expr fib(T:is_unsigned_integer)
-
-Fmpz_expr bin(T:is_unsigned_integer, U:is_unsigned_integer)
-
-Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)
-
-Fmpz_expr lcm(Fmpz_expr, Fmpz_expr)
-
-Fmpz_expr invmod(Fmpz_expr, Fmpz_expr)
-
-Fmpz_expr negmod(Fmpz_expr, Fmpz_expr)
 
 Fmpz_expr cdiv_q(Fmpz_expr, Fmpz_expr)
 Fmpz_expr cdiv_q(Fmpz_expr, T:is_integer)
@@ -380,22 +326,124 @@ Fmpz_expr tdiv_q_2exp(Fmpz_expr, T:is_unsigned_integer)
 
 Fmpz_expr fdiv_r_2exp(Fmpz_expr, T:is_unsigned_integer)
 
+Fmpz_expr divexact2(Fmpz_expr g, ulong x, ulong y)
+
+Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, Fmpz_expr x, ulong exp)
+Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, long x, ulong exp)
+
+Ltuple<fmpzxx, fmpzxx>_expr fdiv_qr(Fmpz_expr g, Fmpz_expr h)
+Ltuple<fmpzxx, fmpzxx>_expr tdiv_qr(Fmpz_expr g, Fmpz_expr h)
+
+bool Fmpz_expr::divisible(Fmpz_expr) const
+bool Fmpz_expr::divisible(T:fits_into_slong) const
+bool divisible(Fmpz_expr n, Fmpz_expr d)
+bool divisible(Fmpz_expr n, T:fits_into_slong d)
+
+    Return if $d$ divides $n$. See \code{fmpz_divisible}.
+
+Fmpz_expr powm(Fmpz_expr g, ulong e, Fmpz_expr m)
+Fmpz_expr powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
+
 Fmpz_expr pow(Fmpz_expr, T:is_unsigned_integer)
 
-Fmpz_expr root(Fmpz_expr, T:fits_into_slong)
+long clog(Fmpz_expr x, Fmpz_expr b)
+long clog(Fmpz_expr x, ulong b)
+
+long flog(Fmpz_expr x, Fmpz_expr b)
+long flog(Fmpz_expr x, ulong b)
+
+double dlog(Fmpz_expr x)
+
+long Fmpz_expr::clog(Fmpz_expr) const
+long Fmpz_expr::clog(T:is_unsigned_integer) const
+
+long Fmpz_expr::flog(Fmpz_expr) const
+long Fmpz_expr::flog(T:is_unsigned_integer) const
+
+double Fmpz_expr::dlog() const
+
+Ltuple<bool, fmpzxx>_expr sqrtmod(Fmpz_expr a, Fmpz_expr b)
+
+    \code{ltupleref(b, N) = sqrtmod(A, B)} has the same effect as
+    \code{b = fmpz_sqrtmod(n, a, b)}, where \code{n, a, b} are the underlying
+    \code{fmpz_t} of \code{N, A, B}.
+
+Ltuple<fmpzxx, fmpzxx>_expr sqrtrem(Fmpz_expr g)
 
 Fmpz_expr sqrt(Fmpz_expr)
 
-Fmpz_expr abs(Fmpz_expr)
+bool Fmpz_expr::is_square() const
+
+    Return if this expression evaluates to a square integer.
+
+Fmpz_expr root(Fmpz_expr, T:fits_into_slong)
+
+Fmpz_expr rfac(Fmpz_expr, T:is_unsigned_integer)
+
+Fmpz_expr fac(T:is_unsigned_integer)
+
+Fmpz_expr fib(T:is_unsigned_integer)
+
+Fmpz_expr bin(T:is_unsigned_integer, U:is_unsigned_integer)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Input and output
+    Greatest common divisor
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-int print(Fmpz_expr)
-int print(FILE*, Fmpz_expr)
-int read(Fmpz_target)
-int read(FILE*, Fmpz_target)
+Ltuple<fmpzxx, fmpzxx>_expr gcdinv(Fmpz_expr f, Fmpz_expr g)
+
+Ltuple<fmpzxx, fmpzxx, fmpzxx>_expr xgcd(Fmpz_expr f, Fmpz_expr g)
+
+Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)
+
+Fmpz_expr lcm(Fmpz_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular arithmetic
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, fmpzxx>_expr remove(Fmpzxx a, Fmpzxx b)
+
+int jacobi(Fmpz_expr a, Fmpz_expr p)
+int Fmpz_expr::jacobi(Fmpz_expr) const
+
+Fmpz_expr invmod(Fmpz_expr, Fmpz_expr)
+
+Fmpz_expr negmod(Fmpz_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit packing and unpacking
+
+    Beware that argument orders are different relative to the C interface, to
+    facilitate default arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Fmpz_expr fmpzxx::bit_unpack(const vector<mp_limb_t>& v,
+            mp_bitcnt_t bits, mp_bitcnt_t shift = 0,
+            int negate = 0, bool borrow = false)
+static Fmpz_expr fmpzxx::bit_unpack_unsigned(const vector<mp_limb_t>& v,
+            mp_bitcnt_t bits, mp_bitcnt_t shift = 0)
+
+    Unpack an \code{fmpzxx} from \code{v}.
+
+bool bit_pack(std::vector<mp_limb_t>& v, mp_bitcnt_t bits, Fmpz_expr,
+            mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+
+    Pack an \code{fmpzxx} to \code{v}. The vector \code{v} is required to be of
+    sufficient size.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Logic operations
+
+    Binary logic operators \code{& | ^} (and, or, xor) are also overloaded
+    (implemented when both arguments are \code{Fmpz_expr}).
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_target::clrbit(ulong i)
+
+void Fmpz_target::combit(ulong i)
+
+int Fmpz_expr::popcnt() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Chinese remaindering
@@ -429,18 +477,12 @@ Fmpz_expr multi_CRT(const std::vector<mp_limb_t>& residues, const fmpz_combxx
     Reconstruct an integer from its residues. See \code{fmpz_multi_CRT_ui}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Bit packing and unpacking
-
-    Beware that argument orders are different relative to the C interface, to
-    facilitate default arguments.
+    Primality testing
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-bool bit_pack(std::vector<mp_limb_t>& arr, mp_bitcnt_t bits,
-        mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
-Fmpz_expr fmpzxx::bit_unpack(const std::vector<mp_limb_t>& arr, mp_bitcnt_t
-        bits, mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
-Fmpz_expr fmpzxx::bit_unpack_unsigned(const std::vector<mp_limb_t>& arr, mp_bitcnt_t
-        bits, mp_bitcnt_t shift = 0)
+bool Fmpz_expr::is_probabprime() const
+
+bool Fmpz_expr::is_prime_pseudosquare() const
 
 
 *******************************************************************************

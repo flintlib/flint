@@ -42,6 +42,8 @@
 // TODO functions for addmul? inhomogeneous addmul?
 // TODO use evaluate_n in immediate functions?
 // TODO fmpz_abs_ubound_ui_2exp, lbound
+// TODO cmpabs
+// TODO xgcd_partial
 
 namespace flint {
 FLINT_DEFINE_BINOP(cdiv_q)
