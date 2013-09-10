@@ -65,7 +65,7 @@ clean:
 	rm -rf build
 
 distclean: clean
-	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile
+	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
 	git archive --format tar --prefix flint-2.3/ flint-2.3 > ../flint-2.3.tar; gzip ../flint-2.3.tar
