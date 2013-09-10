@@ -17,6 +17,7 @@ STATIC=1
 TLS=1
 PTHREAD=1
 REENTRANT=0
+WANT_GC=0
 BUILD=
 EXTENSIONS=
 EXT_MODS=
@@ -46,6 +47,7 @@ usage()
    echo "     --disable-static     Do not build a static library"
    echo "     --single             Faster [non-reentrant if tls or pthread not used] version of library (default)"
    echo "     --reentrant          Build fully reentrant [with or without tls, with pthread] version of library"
+   echo "     --with-gc            GC safe build"
    echo "     --enable-pthread     Use pthread (default)"
    echo "     --disable-pthread    Do not use pthread"
    echo "     --enable-tls         Use thread-local storage (default)"
@@ -117,6 +119,9 @@ while [ "$1" != "" ]; do
          ;;
       --reentrant)
          REENTRANT=1
+         ;;
+      --with-gc)
+	 WANT_GC=1
          ;;
       --enable-pthread)
          PTHREAD=1
@@ -240,16 +245,20 @@ if [ -z "$AR" ]; then
    AR=ar
 fi
 
-#handle reentrant flag
+#handle gc and reentrant flags
 
-if [ "$REENTRANT" = "1" ]; then
-   cp fmpz/link/fmpz_reentrant.c fmpz/fmpz.c
-   cp fmpz-conversions-reentrant.in fmpz-conversions.h
+if [ "$WANT_GC" = "1" ]; then
+      cp fmpz/link/fmpz_gc.c fmpz/fmpz.c
+      cp fmpz-conversions-gc.in fmpz-conversions.h
 else
-   cp fmpz/link/fmpz_single.c fmpz/fmpz.c
-   cp fmpz-conversions-single.in fmpz-conversions.h
+   if [ "$REENTRANT" = "1" ]; then
+      cp fmpz/link/fmpz_reentrant.c fmpz/fmpz.c
+      cp fmpz-conversions-reentrant.in fmpz-conversions.h
+   else
+      cp fmpz/link/fmpz_single.c fmpz/fmpz.c
+      cp fmpz-conversions-single.in fmpz-conversions.h
+   fi
 fi
-
 # Architecture handler
 
 KERNEL=`uname`
