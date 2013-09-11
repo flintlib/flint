@@ -1860,7 +1860,40 @@ Ltuple<slong, fmpq_matxx>_expr rref_fraction_free(Fmpq_mat_expr)
 *******************************************************************************
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Not yet split into subsections
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_poly_expr) const
+Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_expr) const
+
+    Overloaded \code{operator()} for evaluation or composition.
+
+Fmpq_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{inv}, \code{make_monic},
+    \code{primitive_part}, \code{content}.
+
+Fmpq_poly_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{asinh_series), \code{asin_series}, \code{atanh_series},
+    \code{atan_series}, \code{cosh_series}, \code{cos_series}, \code{divrem},
+    \code{exp_series}, \code{gcd}, \code{inv_series}, \code{inv_series_newton},
+    \code{lcm}, \code{log_series}, \code{pow}, \code{resultant},
+    \code{reverse}, \code{revert_series}, \code{revert_series_lagrange},
+    \code{revert_series_lagrange_fast}, \code{revert_series_newton},
+    \code{sinh_series}, \code{tanh_series}, \code{tan_series}, \code{xgcd},
+    \code{rescale}, \code{shift_left}, \code{shift_right}.
+
+Fmpq_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{compose_series}, \code{compose_series_brent_kung},
+    \code{compose_series_horner}, \code{div_series}, \code{mullow}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 fmpq_polyxx::fmpq_polyxx()
@@ -1873,33 +1906,23 @@ fmpq_polyxx::fmpq_polyxx(const char* str)
 
     See \code{fmpq_poly_set_str}.
 
-static fmpq_polyxx fmpq_polyxx::randtest(
-        frandxx& state, slong len, mp_bitcnt_t bits)
-static fmpq_polyxx fmpq_polyxx::randtest_unsigned(
-        frandxx& state, slong len, mp_bitcnt_t bits)
-static fmpq_polyxx fmpq_polyxx::randtest_not_zero(
-        frandxx& state, slong len, mp_bitcnt_t bits)
-
-    See \code{fmpq_poly_randtest} etc.
-
-void Fmpq_poly_target::set_zero()
-void Fmpq_poly_target::set_one()
-static fmpq_polyxx fmpq_polyxx::zero()
-static fmpq_polyxx fmpq_polyxx::one()
-
-static fmpq_polyxx fmpq_polyxx::get_slice(Fmpq_poly_expr, slong i, slong j)
-
-static Fmpq_poly_expr fmpq_polyxx::interpolate(
-        Fmpz_vec_expr xs, Fmpz_vec_expr ys)
-
-    See \code{fmpq_poly_interpolate_fmpq_vec}.
-
 void Fmpq_poly_target realloc(slong alloc)
 void Fmpq_poly_target::fit_length(slong len)
 void Fmpq_poly_target::_normalise()
 void Fmpq_poly_target::_set_length(slong len)
 void Fmpq_poly_target::canonicalise()
 bool Fmpq_poly_src::is_canonical() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial parameters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpq_poly_expr::length() const
+slong Fmpq_poly_expr::degree() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Accessing the numerator and denominator
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 fmzqxx_ref Fmpq_poly_target::get_coeff_numref(slong n)
 fmzqxx_srcref Fmpq_poly_src::get_coeff_numref(slong n) const
@@ -1917,63 +1940,22 @@ fmzqxx_srcref Fmpq_poly_src::get_coeff_numref(slong n) const
     If this is used to modify the object, a call to \code{canonicalise()} may
     be necessary.
 
-void Fmpq_poly_target::set_coeff(slong n, Fmpz_expr)
-void Fmpq_poly_target::set_coeff(slong n, Fmpq_expr)
-void Fmpq_poly_target::set_coeff(slong n, T:is_integer)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random testing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-slong Fmpq_poly_expr::length() const
-slong Fmpq_poly_expr::degree() const
-bool Fmpq_poly_expr::is_one() const
-bool Fmpq_poly_expr::is_zero() const
-bool Fmpq_poly_expr::is_monic() const
-bool Fmpq_poly_expr::is_squarefree() const
-Fmpqxx_expr Fmpq_poly_expr::get_coeff(slong n) const
+static fmpq_polyxx fmpq_polyxx::randtest(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+static fmpq_polyxx fmpq_polyxx::randtest_unsigned(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+static fmpq_polyxx fmpq_polyxx::randtest_not_zero(
+        frandxx& state, slong len, mp_bitcnt_t bits)
 
-std::string Fmpq_poly_expr::pretty(const char* x) const
+    See \code{fmpq_poly_randtest} etc.
 
-    See \code{fmpq_poly_get_str_pretty}.
-
-std::string Fmpq_poly_expr::to_string() const
-
-Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_poly_expr) const
-Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_expr) const
-
-    Overloaded \code{operator()} for evaluation or composition.
-
-Fmpq_expr::unary operation() const
-
-    The following unary functions are made available as member functions:
-    \code{derivative}, \code{integral}, \code{inv}, \code{make_monic},
-    \code{primitive_part}, \code{content}.
-
-Fmpq_expr::binary operation(??) const
-
-    The following binary functions are made available as member functions:
-    \code{asinh_series), \code{asin_series}, \code{atanh_series},
-    \code{atan_series}, \code{cosh_series}, \code{cos_series}, \code{divrem},
-    \code{exp_series}, \code{gcd}, \code{inv_series}, \code{inv_series_newton},
-    \code{lcm}, \code{log_series}, \code{pow}, \code{resultant},
-    \code{reverse}, \code{revert_series}, \code{revert_series_lagrange},
-    \code{revert_series_lagrange_fast}, \code{revert_series_newton},
-    \code{sinh_series}, \code{tanh_series}, \code{tan_series}, \code{xgcd}.
-
-Fmpq_poly_expr Fmpq_poly_expr::rescale(Fmpq_expr) const
-
-    See \code{rescale}.
-
-Fmpq_poly_expr Fmpq_poly_expr::shift_left(T:fits_into_slong) const
-
-    See \code{shift_left}.
-
-Fmpq_poly_expr Fmpq_poly_expr::shift_right(T:fits_into_slong) const
-
-    See \code{shift_right}.
-
-Fmpq_expr::ternary operation(??, ??) const
-
-    The following ternary functions are made available as member functions:
-    \code{compose_series}, \code{compose_series_brent_kung},
-    \code{compose_series_horner}, \code{div_series}, \code{mullow}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpq_poly_target Fmpq_poly_target::operator=(T:is_integer)
 Fmpq_poly_target Fmpq_poly_target::operator=(Fmpq_expr)
@@ -1981,33 +1963,91 @@ Fmpq_poly_target Fmpq_poly_target::operator=(Fmpz_expr)
 Fmpq_poly_target Fmpq_poly_target::operator=(Fmpz_poly_expr)
 Fmpq_poly_target Fmpq_poly_target::operator=(const char*)
 
-Fmpq_poly_expr operator?(??, ??)
-
-    Arithmetic operators \code{+ - * /} are overloaded if both arguments are
-    polynomials, or one poylnomial and one \code{Fmpq_expr}, \code{Fmpz_expr}
-    or integer.
-
-bool operator??(Fmpq_poly_expr, Fmpq_poly_expr)
-
-    Relational operators \code{>= > <= < == !=} are overloaded, see
-    \code{fmpq_poly_cmp}.
-
-Fmpq_poly_expr operator%(Fmpq_poly_expr, Fmpq_poly_expr)
-
-    See \code{fmpq_poly_rem}.
-
-Fmpq_poly_expr operator-(Fmpq_poly_expr)
+void Fmpq_poly_target::set_zero()
+void Fmpq_poly_target::set_one()
+static fmpq_polyxx fmpq_polyxx::zero()
+static fmpq_polyxx fmpq_polyxx::one()
 
 Fmpq_poly_expr inv(Fmpq_poly_expr)
 
+static fmpq_polyxx fmpq_polyxx::get_slice(Fmpq_poly_expr, slong i, slong j)
+void Fmpq_poly_target::truncate(slong)
+
 Fmpq_poly_expr reverse(Fmpq_poly_expr, T:fits_into_slong)
+
+std::string Fmpq_poly_expr::pretty(const char* x) const
+
+    See \code{fmpq_poly_get_str_pretty}.
+
+std::string Fmpq_poly_expr::to_string() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpqxx_expr Fmpq_poly_expr::get_coeff(slong n) const
+
+void Fmpq_poly_target::set_coeff(slong n, Fmpz_expr)
+void Fmpq_poly_target::set_coeff(slong n, Fmpq_expr)
+void Fmpq_poly_target::set_coeff(slong n, T:is_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded operators \code{== != >= >} etc. can be used for comparison.
+    Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_poly_expr::is_one() const
+bool Fmpq_poly_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{* / + -} can be used for both
+    polynomial-polynomial and polynomial-scalar arithmetic. Additionally, we
+    provide the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpq_poly_expr mullow(Fmpq_poly_expr, Fmpq_poly_expr, slong)
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Fmpq_poly_expr pow(Fmpq_poly_expr, T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpq_poly_expr shift_left(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr shift_right(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Euclidean division
+
+    The overloaded operators \code{/ %} can be used for euclidean division and
+    remainder. Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpq_polyxx, fmpq_polyxx>_expr divrem(Fmpq_poly_expr A, Fmpq_poly_expr B)
+
+    \code{ltupleref(Q, R) = divrem(A, B)} has the same effect as
+    \code{fmpq_poly_divrem(q, r, a, b)} where \code{q, r, a, b} are the
+    underlying \code{fmpq_poly_t} corresponding to \code{Q, R, A, B}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series division
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr inv_series_newton(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr inv_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr div_series(Fmpq_poly_expr, Fmpq_poly_expr, slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpq_poly_expr gcd(Fmpq_poly_expr, Fmpq_poly_expr)
 Fmpq_poly_expr lcm(Fmpq_poly_expr, Fmpq_poly_expr)
@@ -2021,40 +2061,24 @@ Ltuple<fmpq_polyxx, fmpq_polyxx, fmpq_polyxx>_expr xgcd(
 
 Fmpq_expr resultant(Fmpq_poly_expr)
 
-Ltuple<fmpq_polyxx, fmpq_polyxx>_expr divrem(Fmpq_poly_expr A, Fmpq_poly_expr B)
-
-    \code{ltupleref(Q, R) = divrem(A, B)} has the same effect as
-    \code{fmpq_poly_divrem(q, r, a, b)} where \code{q, r, a, b} are the
-    underlying \code{fmpq_poly_t} corresponding to \code{Q, R, A, B}.
-
-bool divides(Fmpq_poly_target Q, Fmpq_poly_expr A, Fmpq_poly_expr B)
-
-Fmpq_poly_expr inv_series_newton(Fmpq_poly_expr, T:fits_into_slong)
-Fmpq_poly_expr inv_series(Fmpq_poly_expr, T:fits_into_slong)
-Fmpq_poly_expr div_series(Fmpq_poly_expr, Fmpq_poly_expr, slong n)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative and integral
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpq_poly_expr derivative(Fmpq_poly_expr)
+Fmpq_poly_expr integral(Fmpq_poly_expr)
 
-Fmpq_poly_expr compose(Fmpq_poly_expr, Fmpq_poly_expr)
-
-Fmpq_poly_expr compose_series(Fmpq_poly_expr, Fmpq_poly_expr, slong)
-Fmpq_poly_expr compose_series_horner(Fmpq_poly_expr, Fmpq_poly_expr, slong)
-Fmpq_poly_expr compose_series_brent_kung(Fmpq_poly_expr, Fmpq_poly_expr, slong)
-
-Fmpq_expr evaluate(Fmpq_poly_expr, Fmpq_expr)
-Fmpq_expr evaluate(Fmpq_poly_expr, Fmpz_expr)
-
-Fmpq_poly_expr rescale(Fmpq_poly_expr, Fmpq_expr)
-
-Fmpq_poly_expr make_monic(Fmpq_poly_expr)
-
-Fmpq_poly_expr revert_series(Fmpq_poly_expr, T:fits_into_slong)
-Fmpq_poly_expr revert_series_newton(Fmpq_poly_expr, T:fits_into_slong)
-Fmpq_poly_expr revert_series_lagrange(Fmpq_poly_expr, T:fits_into_slong)
-Fmpq_poly_expr revert_series_lagrange_fast(Fmpq_poly_expr, T:fits_into_slong)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square roots
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpq_poly_expr sqrt_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr invsqrt_series(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transcendental functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 Fmpq_poly_expr exp_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr log_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr atan_series(Fmpq_poly_expr, T:fits_into_slong)
@@ -2067,6 +2091,65 @@ Fmpq_poly_expr cos_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr sinh_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr cosh_series(Fmpq_poly_expr, T:fits_into_slong)
 Fmpq_poly_expr tanh_series(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
+
+    The overloaded \code{operator()} can be used for evaluation. Additionally
+    we have the following.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr evaluate(Fmpq_poly_expr, Fmpq_expr)
+Fmpq_expr evaluate(Fmpq_poly_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Interpolation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Fmpq_poly_expr fmpq_polyxx::interpolate(
+        Fmpz_vec_expr xs, Fmpz_vec_expr ys)
+
+    See \code{fmpq_poly_interpolate_fmpq_vec}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr compose(Fmpq_poly_expr, Fmpq_poly_expr)
+
+Fmpq_poly_expr rescale(Fmpq_poly_expr, Fmpq_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr compose_series(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series_horner(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series_brent_kung(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series reversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr revert_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr revert_series_newton(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr revert_series_lagrange(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr revert_series_lagrange_fast(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Gaussian content
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr content(Fmpq_poly_expr)
+Fmpq_poly_expr primitive_part(Fmpq_poly_expr)
+bool Fmpq_poly_expr::is_monic() const
+Fmpq_poly_expr make_monic(Fmpq_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square-free
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_poly_expr::is_squarefree() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Input and output
