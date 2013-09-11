@@ -1603,7 +1603,7 @@ syntax. FLINT ships with a set of wrapper C++ classes, together termed flintxx,
 which provide such an object oriented syntax.
 
 In this chapter, we describe how to \emph{use} flintxx. The FLINT developer
-wishing to extend the wrapper library should consult the
+wishing to extend the wrapper library should consult
 appendix~\ref{app:genericxx}.
 
 In general, flintxx strives to behave just like the underlying FLINT C
@@ -1658,7 +1658,11 @@ an expression template, most notably \code{(x + y).evaluate()} and
 \code{fmpzxx(x + y)}.
 
 One caveat of the expression template approach is that compiler error messages
-can be long and hard to understand. TODO static assert
+can be long and hard to understand.
+In flintxx we strive to type-check template parameters as early as possible in
+order to keep error messages short and close to the actual user error.
+Excessively long error messages are often indicative of a bug in flintxx.
+%TODO static assert
 
 \paragraph{Tuples}
 
@@ -1761,17 +1765,17 @@ for example upon calling \code{fmpqxx::num()}.
 
 Consider again the \code{x.num()} method of \code{fmpqxx}. In various
 situations,
-this can have different return types. Namely, if \code{x} is an
-\code{Fmpq_target}, then \code{x.num()} returns an \code{fmpzxx_ref}. In
+this can have different return types. Namely, if \code{x} is a writable
+expression, then \code{x.num()} returns an \code{fmpzxx_ref}. In
 particular the return value behaves just like \code{fmpzxx}, no evaluation is
 necessary to obtain it, there are no copies, and it is possible to change the
-return value (and thus change \code{x}). If on the other hand \code{x} is an
-\code{Fmpq_src} (but not an \code{Fmpq_target}),
+return value (and thus change \code{x}). If on the other hand \code{x} is a
+readonly immediate,
 then the return value of \code{x.num()} has type
 \code{fmpzxx_srcref}. This again behaves just like \code{fmpzxx} and no
 evaluations or copies are necessary, but this time it is not possible to change
 the return value (and so it is not possible to change \code{x}, either).
-Finally, if \code{x} is an \code{Fmpq_expr} (but not an \code{Fmpq_src}), then
+Finally, if \code{x} is a lazy expression, then
 the return value is actually a lazy expression template. Thus to obtain the
 ``actual'' value of \code{x.num()}, evaluations are necessary, and potentially
 so are copies.
@@ -1823,7 +1827,7 @@ small subset of the FLINT types.
 
 For output in other cases, and input in all cases, we provide C-like functions.
 Namely, the functions \code{print}, \code{print_pretty}, \code{read} and
-\code{read_pretty} can be used similar to the C \code{printf} and \code{scanf}.
+\code{read_pretty} can be used similarly to the C \code{printf} and \code{scanf}.
 For example, \code{print(x)} where \code{x} is an \code{fmpz} has the same
 effect as \code{std::cout << x}.
 
@@ -1832,9 +1836,10 @@ effect as \code{std::cout << x}.
 Explanations on the inner workings of the flintxx expression template library
 and how they pertain to wrapping new C interfaces can be found in
 appendix~\ref{app:genericxx}. Here we just want to remark that the flintxx
-classes are not designed for inheritance. Instead, if you want to modify
-slightly the behaviour of one of the flintxx classes for your purposes, use
-composition: TODO describe forwarding.h.
+classes are not designed for inheritance. If you want to modify behaviour, you
+should wrap flintxx types into your own classes (extension by aggregation, not
+inheritance). The header \code{flintxx/forwarding.h} was meant to facilitate
+this, but has not been finished.
 
 \section{Notations and conventions for the C++ interface documentation}
 As explained above, the flintxx classes and functions perform quite a number of
