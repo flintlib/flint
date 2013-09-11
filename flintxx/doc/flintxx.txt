@@ -569,18 +569,19 @@ void print(const fmpz_factorxx&)
     Not yet split into subsections
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-fmpz_matxx::fmpz_matxx(slong i, slong j)
+slong Fmpz_mat_expr::rank() const
 
-    Allocate a matrix of size $i \times j$.
+Fmpz_expr Fmpz_mat_expr::det_modular_given_divisor(
+        Fmpz_mat_expr, Fmpz_expr) const
 
-void Fmpq_mat_target::set_zero()
-void Fmpq_mat_target::set_one()
-static fmpq_matxx fmpq_matxx::zero(slong rows, slong cols)
-static fmpq_matxx fmpq_matxx::one(slong rows, slong cols)
+    See \code{fmpz_mat_det_modular_given_divisor}.
 
-?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+Fmpz_mat_target Fmpz_mat_target::operator=(T:fits_into_slong)
+Fmpz_mat_target Fmpz_mat_target::operator=(const char*)
 
-    Unified coefficient access to the matrix entries.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 slong Fmpz_mat_expr::rows() const
 slong Fmpz_mat_expr::cols() const
@@ -588,11 +589,6 @@ slong Fmpz_mat_expr::cols() const
     Obtain the number of rows/columns in this matrix. These functions never
     cause evaluation (the matrix size is computed from the operations in the
     expression template and the size of the input matrices).
-
-bool Fmpz_mat_expr::is_zero() const
-bool Fmpz_mat_expr::is_empty() const
-bool Fmpz_mat_expr::is_quare() const
-slong Fmpz_mat_expr::rank() const
 
 Fmpz_mat_expr::unary operation() const
 
@@ -609,76 +605,26 @@ Fmpz_mat_expr::binary operation(??) const
     code{solve}, \code{solve_bound},
     \code{solve_cramer}, \code{solve_dixon}, \code{solve_fflu}.
 
-Fmpz_expr Fmpz_mat_expr::det_modular_given_divisor(
-        Fmpz_mat_expr, Fmpz_expr) const
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    See \code{fmpz_mat_det_modular_given_divisor}.
+fmpz_matxx::fmpz_matxx(slong i, slong j)
 
-Fmpz_mat_target Fmpz_mat_target::operator=(T:fits_into_slong)
-Fmpz_mat_target Fmpz_mat_target::operator=(const char*)
+    Allocate a matrix of size $i \times j$.
 
-Fmpz_mat_expr operator?(??, ??)
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    Arithmetic operators \code{+ - *} are overloaded in the cases supported by
-    \code{fmpz_mat_t}.
+?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
 
-bool operator==(Fmpz_mat_expr, Fmpz_mat_expr)
+    Unified coefficient access to the matrix entries.
 
-Fmpz_mat_expr operator-(Fmpz_mat_expr)
-
-Fmpz_mat_expr divexact(Fmpz_mat_expr, Fmpz_expr)
-Fmpz_mat_expr divexact(Fmpz_mat_expr, T:is_integer)
-
-Fmpz_mat_expr trace(Fmpz_mat_expr)
-Fmpz_expr transpose(Fmpz_mat_expr)
-
-Fmpz_expr det(Fmpz_mat_expr)
-Fmpz_expr det_cofactor(Fmpz_mat_expr)
-Fmpz_expr det_bareiss(Fmpz_mat_expr)
-Fmpz_expr det_divisor(Fmpz_mat_expr)
-Fmpz_expr det_bound(Fmpz_mat_expr)
-Fmpz_expr det_modular(Fmpz_mat_expr, bool proved)
-Fmpz_expr det_modular_accelerated(Fmpz_mat_expr, bool proved)
-Fmpz_expr det_modular_given_divisor(Fmpz_mat_expr, Fmpz_expr, bool proved)
-
-Fmpz_mat_expr mul_classical(Fmpz_mat_expr, Fmpz_mat_expr)
-Fmpz_mat_expr mul_multi_mod(Fmpz_mat_expr, Fmpz_mat_expr)
-
-Fmpz_expr sqr(Fmpz_mat_expr)
-Fmpz_mat_expr pow(Fmpz_mat_expr, T:is_unsigned_integer)
-
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr inv(Fmpz_mat_expr)
-
-    \code{ltupleref(b, M, D) = inv(A)} has the same effect as
-    \code{b = fmpz_mat_inv(m, d, a)}, where \code{m, d, a} are the underlying C
-    objects corresponding to \code{M, D, A}.
-
-Fmpz_poly_expr charpoly(Fmpz_mat_expr)
-
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve(
-        Fmpz_mat_expr B, Fmpz_mat_expr X)
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_dixon(
-        Fmpz_mat_expr B, Fmpz_mat_expr X)
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_cramer(
-        Fmpz_mat_expr B, Fmpz_mat_expr X)
-Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_fflu(
-        Fmpz_mat_expr B, Fmpz_mat_expr X)
-
-    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
-    \code{w = fmpz_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
-    underlying C objects corresponding to \code{M, D, B, X}.
-    Similarly for the other functions.
-
-Ltuple<fmpzxx, fmpzxx>_expr solve_bound(
-        Fmpz_mat_expr B, Fmpz_mat_expr X)
-
-Ltuple<slong, fmpz_matxx>_expr nullspace(Fmpz_mat_expr A)
-
-    \code{ltupleref(n, B) = nullspace(A)} has the same effect as
-    \code{n = fmpz_mat_nullspace(b, a)}, where \code{b, a} are the underlying
-    \code{fmpz_mat_t} corresponding to \code{B, A}.
-
-slong rank(Fmpz_mat_expr)
+void Fmpq_mat_target::set_zero()
+void Fmpq_mat_target::set_one()
+static fmpq_matxx fmpq_matxx::zero(slong rows, slong cols)
+static fmpq_matxx fmpq_matxx::one(slong rows, slong cols)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Input and output
@@ -690,6 +636,17 @@ print_pretty(Fmpz_mat_expr)
 print_pretty(FILE*, Fmpz_mat_expr)
 read(Fmpz_mat_target)
 read(FILE*, Fmpz_mat_target)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded operator \code{==} can be used for equality testing.
+    Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_mat_expr::is_zero() const
+bool Fmpz_mat_expr::is_empty() const
+bool Fmpz_mat_expr::is_quare() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Conversion
@@ -763,6 +720,12 @@ void Fmpz_mat_target::apply_randops(frandxx& state, slong count)
     See \code{fmpz_mat_randops}.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr transpose(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Modular reduction and reconstruction
 
     To reduce a single matrix modulo a word-sized modulus, see
@@ -813,6 +776,85 @@ nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m,
     reduction.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - *} can be used for ordinary
+    matrix-matrix and matrix-scalar arithmetic. Additionally, we provide the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr divexact(Fmpz_mat_expr, Fmpz_expr)
+Fmpz_mat_expr divexact(Fmpz_mat_expr, T:is_integer)
+
+Fmpz_mat_expr mul_classical(Fmpz_mat_expr, Fmpz_mat_expr)
+Fmpz_mat_expr mul_multi_mod(Fmpz_mat_expr, Fmpz_mat_expr)
+
+Fmpz_expr sqr(Fmpz_mat_expr)
+Fmpz_mat_expr pow(Fmpz_mat_expr, T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr inv(Fmpz_mat_expr)
+
+    \code{ltupleref(b, M, D) = inv(A)} has the same effect as
+    \code{b = fmpz_mat_inv(m, d, a)}, where \code{m, d, a} are the underlying C
+    objects corresponding to \code{M, D, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr trace(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr det(Fmpz_mat_expr)
+Fmpz_expr det_cofactor(Fmpz_mat_expr)
+Fmpz_expr det_bareiss(Fmpz_mat_expr)
+Fmpz_expr det_divisor(Fmpz_mat_expr)
+Fmpz_expr det_bound(Fmpz_mat_expr)
+Fmpz_expr det_modular(Fmpz_mat_expr, bool proved)
+Fmpz_expr det_modular_accelerated(Fmpz_mat_expr, bool proved)
+Fmpz_expr det_modular_given_divisor(Fmpz_mat_expr, Fmpz_expr, bool proved)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Characteristic polynomial
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr charpoly(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong rank(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Non-singular solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_dixon(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_cramer(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_fflu(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+
+    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
+    \code{w = fmpz_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
+    underlying C objects corresponding to \code{M, D, B, X}.
+    Similarly for the other functions.
+
+Ltuple<fmpzxx, fmpzxx>_expr solve_bound(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Row reduction
 
     Beware that compared to the C interface, the flintxx row reduction
@@ -840,6 +882,17 @@ Ltuple<slong, fmpz_matxx, fmpzxx>_expr rref(Fmpz_mat_expr A)
 slong Fmpz_mat_target::set_rref_mod(Fmpz_expr n, permxx* perm = 0)
 
     See \code{fmpz_mat_rref_mod}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, fmpz_matxx>_expr nullspace(Fmpz_mat_expr A)
+
+    \code{ltupleref(n, B) = nullspace(A)} has the same effect as
+    \code{n = fmpz_mat_nullspace(b, a)}, where \code{b, a} are the underlying
+    \code{fmpz_mat_t} corresponding to \code{B, A}.
+
 
 
 *******************************************************************************
@@ -2033,23 +2086,15 @@ read(FILE*, Fmpq_poly_target)
 
 *******************************************************************************
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 fmpz_poly_qxx::fmpz_poly_qxx()
 
 fmpz_poly_qxx::fmpz_poly_qxx(const char*)
 
     See \code{fmpz_poly_q_set_str}.
-
-void Fmpz_poly_q_target::set_zero()
-void Fmpz_poly_q_target::set_one()
-static fmpz_poly_qxx fmpz_poly_qxx::zero()
-static fmpz_poly_qxx fmpz_poly_qxx::one()
-
-static fmpz_poly_qxx fmpz_poly_qxx::randtest(frandxx& state,
-        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
-static fmpz_poly_qxx fmpz_poly_qxx::randtest_not_zero(frandxx& state,
-        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
-
-    See \code{fmpz_poly_q_randtest} etc.
 
 void Fmpz_poly_q_target::canonicalise()
 bool Fmpz_poly_q_src::is_canonical() const
@@ -2061,39 +2106,74 @@ bool Fmpz_poly_q_src::is_canonical() const
     function. If this is used for modification, a call to \code{canonicalise()}
     may be necessary.
 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpz_poly_qxx fmpz_poly_qxx::randtest(frandxx& state,
+        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+static fmpz_poly_qxx fmpz_poly_qxx::randtest_not_zero(frandxx& state,
+        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+
+    See \code{fmpz_poly_q_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_target Fmpz_poly_q_target::operator=(T:fits_into_slong)
+
+void Fmpz_poly_q_target::set_zero()
+void Fmpz_poly_q_target::set_one()
+static fmpz_poly_qxx fmpz_poly_qxx::zero()
+static fmpz_poly_qxx fmpz_poly_qxx::one()
+
+Fmpz_poly_q_expr inv(Fmpz_poly_q_expr)
+Fmpz_poly_q_expr Fmpz_poly_q_expr::inv() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded operator \code{==} can be used for comparison. Additionally,
+    we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 bool Fmpz_poly_q_expr::is_one() const
 bool Fmpz_poly_q_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_expr pow(Fmpz_poly_q_expr, T:is_unsigned_integer)
+Fmpz_poly_q_expr Fmpz_poly_q_expr::pow(T:is_unsigned_integer) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_expr Fmpz_poly_q_expr::derivative() const
+Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_target Fmpz_poly_q_target::operator=(const char*)
+
+    See \code{fmpz_poly_q_set_str}.
+
+std::string Fmpz_poly_q_expr::to_string() const
+
+    See \code{fmpz_poly_q_get_str}.
 
 std::string Fmpz_poly_q_expr::pretty(const char* x) const
 
     See \code{fmpz_poly_q_get_str_pretty}.
 
-std::string Fmpz_poly_q_expr::to_string() const
-
-Fmpz_poly_q_expr Fmpz_poly_q_expr::inv() const
-Fmpz_poly_q_expr Fmpz_poly_q_expr::derivative() const
-Fmpz_poly_q_expr Fmpz_poly_q_expr::pow(T:is_unsigned_integer) const
-
-Fmpz_poly_q_target Fmpz_poly_q_target::operator=(T:fits_into_slong)
-Fmpz_poly_q_target Fmpz_poly_q_target::operator=(const char*)
-
-Fmpz_poly_q_expr operator?(??, ??)
-
-    Arithmetic operators \code{+ - * /} are overloaded if both arguments are
-    functions.
-
-bool operator==(Fmpz_poly_q_expr, Fmpz_poly_q_expr)
-
-Fmpz_poly_q_expr operator-(Fmpz_poly_q_expr)
-
-Fmpz_poly_q_expr inv(Fmpz_poly_q_expr)
-
-Fmpz_poly_q_expr pow(Fmpz_poly_q_expr, T:is_unsigned_integer)
-
-Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
-
 int print(Fmpz_poly_q_expr)
 int print_pretty(Fmpz_poly_q_expr, const char* var)
+
 
 
 *******************************************************************************

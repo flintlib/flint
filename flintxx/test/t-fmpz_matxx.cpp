@@ -279,7 +279,7 @@ test_row_reduction()
 
     ltupleref(rank1, res1, den1) = rref(A);
     rank2 = fmpz_mat_rref(res2._mat(), den2._fmpz(), A._mat());
-    tassert(rank1 == rank2 && res1 == res2 && p1 == p2 && den1 == den2);
+    tassert(rank1 == rank2 && res1 == res2 && den1 == den2);
 
     fmpz_matxx B(A);
     fmpzxx n(1031);
