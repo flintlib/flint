@@ -1,0 +1,166 @@
+/*=============================================================================
+vim: spell spelllang=en textwidth=79
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 Tom Bachmann
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Rules and standard methods
+
+    A typical expression template class begins with the following lines of code:
+
+    \begin{lstlisting}[language=c++]
+    template<class Operation, class Data>
+    class some_expression
+        : public expression<derived_wrapper<some_expression>, Operation, Data>
+    {
+        // ...
+    };
+    \end{lstlisting}
+
+    We document here methods this class inherits from its base, and how they
+    relate to rules.
+
+    There are the following public typedefs:
+
+    \begin{description}
+    \item[ev\_traits\_t] A specialisation of \code{detail::evaluation_traits}.
+        Used to compute the rule for evaluation.
+    \item[derived\_t] The specialised derived class.
+    \item[evaluated\_t] The resulting type of evaluating this expression.
+    \item[evaluation\_return\_t] The return type of \code{evaluate()}. This
+        differs from the above for immediates, where evaluation returns a
+        reference instead of a copy.
+    \item[data\_t] The same as \code{Data}.
+    \item[operation\_t] The same as \code{Operation}.
+    \end{description}
+
+*******************************************************************************
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Standard methods
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+data_t& some_expression::_data()
+const data_t& some_expression::_data() const
+
+    Obtain the data related to this expression template.
+
+evaluated_t some_expression::create_temporary() const
+
+    Default instantiate a temporary. Override this if your class is not default
+    instantiable.
+
+template<class T> T some_expression::to() const
+
+    Convert self to type \code{T} (after evaluating). Uses
+    \code{rules::conversion}.
+
+void some_expression::print(std::ostream& o) const
+
+    Print self to \code{o}. Uses \code{rules::print} or
+    \code{rules::to_string}.
+
+int some_expression::print(FILE* f = stdout) const
+
+    Print self to \code{f}. Uses \code{rules::cprint}.
+
+int some_expression::print_pretty(FILE* f = stdout) const
+
+    Print self to \code{f}. Uses \code{rules::print_pretty}.
+
+template<class T> int some_expression::print_pretty(const T& extra,
+        FILE* f = stdout) const
+
+    Print self to \code{f}. Uses \code{rules::print_pretty} with two arguments.
+
+int some_expression::read(FILE* f = stdin)
+
+    Read self from \code{f}. Uses \code{rules::read}.
+
+const evaluation_return_t some_expression::evaluate() const
+
+    Evaluate self.
+
+template<class T> void some_expression::set(const T& t)
+
+    Assign \code{t} to self. Uses evaluation and/or \code{rules::assignment}.
+
+template<class T> bool some_expression::equals(const T& t) const
+
+    Determine if \code{t} is equal to self. Uses \code{rules::equals} or
+    \code{rules::cmp}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Global functions
+
+    In addition to member functions, flintxx also provides a number of global
+    functions. In general these operate on sets of arguments at least one of
+    which derives from \code{expression}, and are conditionally enabled only if
+    the relevant operation is implemented (via a rule).
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template<class Expr> std::ostream& operator<<(std::ostream& o, const Expr& e)
+
+    Print \code{e} to \code{o}. Uses the member \code{print}.
+
+template<class Expr1, class Expr2> bool operator==(const Expr1&, const Expr2&)
+template<class Expr1, class Expr2> bool operator!=(const Expr1&, const Expr2&)
+
+    Compare two expressions. Uses the member \code{equals}.
+
+template<class Expr1, class Expr2> bool operator??(const Expr1&, const Expr2&)
+
+    Relational operators \code{< > <= =>} are implemented using
+    \code{rules::cmp}.
+
+template<class Expr1, class Expr2> ?? operator??(const Expr1&, const Expr2&)
+
+    Arithmetic operators \code{+ - * / % & | ^ << >>} are implemented
+    by constructing new expression templates with operation
+    \code{operations::plus} etc.
+
+template<class Expr1> ?? operator??(const Expr1&)
+
+    Unary operators \code{- ~} are implemented by constructing new expression
+    templates with operation \code{operations::negate} and
+    \code{operations::complement}.
+
+template<class Expr1, class Expr2> ?? operator?=(const Expr1&, const Expr2&)
+
+    Arithmetic-assignment operators \code{+= -= *= /= %= |= &= ^=}.
+
+template<class Expr1> int print(const Expr1&)
+template<class Expr1> int print(FILE*f, const Expr1&)
+template<class Expr1> int print_pretty(const Expr1&)
+template<class Expr1> int print_pretty(FILE*f, const Expr1&)
+template<class Expr1, class T> int print_pretty(const Expr1&, const T& extra)
+template<class Expr1, class T> int print_pretty(FILE*f, const Expr1&,
+        const T& extra)
+
+    Forward to member.
+
+template<class Expr1, class Expr2> void swap(Expr1& e1, Expr2& e2)
+
+    Swap \code{e1} and \code{e2} using \code{rules::swap}. Note that via ADL,
+    this can be used by STL containers.
