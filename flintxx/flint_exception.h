@@ -44,7 +44,7 @@ public:
 
 // Helper function. If worked is true, does nothing, else raises
 // flint_exception.
-void execution_check(bool worked, const std::string& where,
+inline void execution_check(bool worked, const std::string& where,
         const std::string& context)
 {
     if(!worked)

@@ -70,10 +70,12 @@ Ltuple<T1&, ..., Tn&> ltupleref(T1& t1, ..., Tn& tn)
     Construct an ltuple of references, binding to the arguments \code{t1},
     \dots, \code{tn}. Instances of \code{flint::detail::IGNORED_TYPE} can be
     used as placeholders.
+    Currently \code{n \le 4}.
 
 Ltuple<T1, ..., Tn> ltuple(const T1& t1, ..., const Tn& tn)
 
     Construct an ltuple containing copies of \code{t1}, \dots, \code{tn}.
+    Currently \code{n \le 4}.
 
 Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
 
