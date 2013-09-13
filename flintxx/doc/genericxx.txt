@@ -164,3 +164,121 @@ template<class Expr1, class Expr2> void swap(Expr1& e1, Expr2& e2)
 
     Swap \code{e1} and \code{e2} using \code{rules::swap}. Note that via ADL,
     this can be used by STL containers.
+
+
+*******************************************************************************
+
+    Convenience macros
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx/rules.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+FLINT_DEFINE_GET2(name, totype, fromtype1, fromtype2, eval)
+
+    Speciallise a getter called \code{name}, which takes arguments \code{e1} of
+    type \code{fromtype1} and \code{e2} of type \code{fromtype2}. It returns
+    \code{totype} by executing \code{eval}.
+
+FLINT_DEFINE_GET(name, totype, fromtype, eval)
+
+    Same as \code{FLINT_DEFINE_GET2(name, totype, fromtype, fromtype, eval)}.
+
+FLINT_DEFINE_GET_COND(name, totye, cond, eval)
+
+    Specialise a getter called \code{name}, which takes an argument \code{from}
+    of type \code{T:cond} It returns \code{totype} by
+    executing \code{eval}.
+
+FLINT_DEFINE_DOIT(name, totype, fromtype, eval)
+
+    Specialise a doit rule called \code{name}, which takes arguments
+    \code{to} of type \code{totype&} and \code{from} of type
+    \code{const fromtype&}, and executes \code{eval}.
+
+FLINT_DEFINE_DOIT_COND(name, totype, cond, eval)
+
+    Same as above, but takes \code{const T& from} for any \code{T:cond}.
+
+FLINT_DEFINE_DOIT_COND2(name, cond1, cond2, eval)
+
+    Same as \code{FLINT_DEFINE_DOIT_COND}, but takes \code{T& to} and
+    \code{const U& from} for any \code{T} satisfying \code{cond1<T>} and
+    \code{U} satisfying \code{cond2<U>}.
+
+FLINT_DEFINE_PRINT_COND(cond, eval)
+
+    Specialise the \code{cprint} rule. This takes a arguments \code{FILE* to}
+    and \code{const T& from} for any \code{T:cond}. It
+    prints \code{from} to \code{to} and returns \code{int} by executing
+    \code{eval}.
+
+FLINT_DEFINE_PRINT_PRETTY_COND(cond, eval)
+
+    Same as above, but with \code{print_pretty} instead of \code{cprint}.
+
+FLINT_DEFINE_PRINT_PRETTY_COND2(cond, extratype, eval)
+
+    Same as above, but takes an additional argument \code{extratype extra}.
+    Useful e.g. when printing polynomials and taking an extra variable name.
+
+FLINT_DEFINE_READ_COND(cond, eval)
+
+    Specialise the \code{read} rule. This takes a arguments \code{FILE* from}
+    and \code{T& to} for any \code{T:cond}. It
+    reads \code{to} from \code{from} and returns \code{int} by executing
+    \code{eval}.
+
+FLINT_DEFINE_UNARY_EXPR_(name, rtype, type, eval)
+
+    Specialise the unary expression rule for \code{operations::name} with
+    nominal return type \code{rtype}. It takes
+    arguments \code{V& to} and \code{const type& from}. Here \code{V} is any
+    type which \code{rtype} can be evaluated into. Executes \code{eval}.
+
+FLINT_DEFINE_UNARY_EXPR(name, type, eval)
+
+    Same as \code{FLINT_DEFINE_UNARY_EXPR_(name, type, type, eval)}.
+
+FLINT_DEFINE_BINARY_EXPR2(name, rtype, type1, type2, eval)
+
+    Specialise the binary expression rule for \code{operations::name} of
+    nominal return type \code{rtype}, and arguments \code{type1} and
+    \code{type2}.
+
+FLINT_DEFINE_BINARY_EXPR(name, type, eval)
+
+    Same as \code{FLINT_DEFINE_BINARY_EXPR2(name, type, type, type, eval)}.
+
+FLINT_DEFINE_CBINARY_EXPR(name, type, eval)
+
+    Same as above, but with \code{commutative_binary_expression} instead of
+    \code{binary_expression}.
+
+FLINT_DEFINE_BINARY_EXPR_COND(name, type, cond, eval)
+FLINT_DEFINE_CBINARY_EXPR_COND(name, type, cond, eval)
+
+    Specialise the (commutative) binary expression rule for
+    \code{operations::name} of nominal return type \code{type}, and arguments
+    \code{type} and \code{T:cond}.
+
+FLINT_DEFINE_BINARY_EXPR_COND2(name, rettype, cond1, cond2, eval)
+FLINT_DEFINE_CBINARY_EXPR_COND2(name, rettype, cond1, cond2, eval)
+
+    Specialise the (commutative) binary expression rule for
+    \code{operations::name} of nominal return type \code{rettype}, and arguments
+    \code{T:cond1} and \code{U:cond2}.
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(name, rettype, cond1, cond2, cond3, eval)
+FLINT_DEFINE_FOURARY_EXPR_COND4(name, retttype, cond1 ... cond4, eval)
+FLINT_DEFINE_FIVEARY_EXPR_COND5(name, rettype, cond1 ... cond5, eval)
+FLINT_DEFINE_SIXARY_EXPR_COND6(name, rettype, cond1 ... cond6, eval)
+FLINT_DEFINE_SEVENARY_EXPR_COND7(name, rettype, cond1 ... cond7, eval)
+
+    Specialise higher order rules, similarly to the above.
+
+FLINT_DEFINE_THREEARY_EXPR(name, retttype, T1, T2, T3, eval)
+
+    Specialise a threeary expression rule unconditionally.
