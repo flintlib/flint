@@ -27,15 +27,13 @@
 #include "flint.h"
 #include "mpn_extras.h"
 
-#define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
-
-/* ret+(xp,n)=(yp,n)*(zp,n) % 2^b+1  
-   needs (tp,2n) temp space , everything reduced mod 2^b 
-   inputs,outputs are fully reduced
+/* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  
+   needs (tp,2n) temp space, everything reduced mod 2^b 
+   inputs, outputs are fully reduced
    NOTE: 2n is not the same as 2b rounded up to nearest limb
 */
 static __inline__ int
-mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
+flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     mp_bitcnt_t b, mp_ptr tp)
 {
     mp_size_t n, k;
@@ -87,7 +85,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
     {
         if (cz == 0)
         {
-            c = mpn_mulmod_2expp1_internal(xp, yp, zp, b, tp);
+            c = flint_mpn_mulmod_2expp1_internal(xp, yp, zp, b, tp);
         }
         else
         {
@@ -99,7 +97,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
     else
     {
         if (cz == 0)
-	    {
+	     {
             c = mpn_neg_n(xp, zp, n);
             c = mpn_add_1(xp, xp, n, c);
             xp[n - 1] &= GMP_NUMB_MASK >> k;
