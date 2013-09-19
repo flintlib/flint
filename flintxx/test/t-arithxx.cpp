@@ -67,8 +67,8 @@ test_bell()
     fmpz_vecxx v(bell_number_vec(10));
     tassert(v == bell_number_vec_recursive(10));
     tassert(v == bell_number_vec_multi_mod(10));
-    for(unsigned i = 0;i < v.size();++i)
-        tassert(v[i] == bell_number(i));
+    for(long i = 0;i < v.size();++i)
+        tassert(v[i] == bell_number(static_cast<unsigned>(i)));
     tassert(bell_number(10u) == bell_number_bsplit(10u));
     tassert(bell_number(10u) == bell_number_multi_mod(10u));
 
@@ -76,7 +76,7 @@ test_bell()
     tassert(bell_number_nmod(10u, p) == nmodxx::red(bell_number(10u), p));
     nmod_vecxx v2(bell_number_nmod_vec(10u, p));
     tassert(v2.size() == 10);
-    for(unsigned i = 0;i < v2.size();++i)
+    for(long i = 0;i < v2.size();++i)
         tassert(v2[i] == nmodxx::red(v[i], p));
 
     tassert(v2 == bell_number_nmod_vec_series(10u, p));
@@ -92,13 +92,13 @@ test_bernoulli()
 {
     tassert(bernoulli_number(10u).den() == bernoulli_number_denom(10u));
     tassert(fmpqxx(2, 1u).pow(
-                static_cast<unsigned> (bernoulli_number_size(10u)))
+                static_cast<slong> (bernoulli_number_size(10u)))
             > bernoulli_number(10u));
     fmpq_polyxx poly(bernoulli_polynomial(10u));
     tassert(poly.degree() == 10);
-    for(unsigned i = 0;i < poly.length();++i)
+    for(long i = 0;i < poly.length();++i)
         tassert(poly.get_coeff(i)
-                == fmpqxx(bin(10u, i)*bernoulli_number(10u - i)));
+                == fmpqxx(bin(10u, (unsigned) i)*bernoulli_number(10u - (unsigned) i)));
     tassert(bernoulli_number_vec(10u).size() == 10);
     for(unsigned i = 0;i < 10;++i)
         tassert(bernoulli_number_vec(10u)[i] == bernoulli_number(i));
@@ -112,7 +112,7 @@ test_euler()
             > euler_number(10u));
     fmpq_polyxx poly(euler_polynomial(10u));
     tassert(poly.degree() == 10);
-    tassert(poly(fmpqxx(1, 2u))*fmpqxx(2, 1u).pow(10u)
+    tassert(poly(fmpqxx(1, 2u))*fmpqxx(2, 1u).pow(10)
             == fmpqxx(euler_number(10u).evaluate(), fmpzxx(1)));
     tassert(euler_number_vec(10u).size() == 10);
     for(unsigned i = 0;i < 10;++i)
@@ -122,7 +122,7 @@ test_euler()
 void
 test_legendre()
 {
-    const unsigned N = 10;
+    const unsigned short N = 10;
     fmpq_polyxx f; f = "3  -1 0 1";
     f = f.pow(N);
     for(unsigned i = 0;i < N;++i)
@@ -136,7 +136,7 @@ test_legendre()
     f.truncate(N);
     tassert(f == cos_series(N*x, N));
     tassert(chebyshev_u_polynomial(N)*(N + 1)
-            == chebyshev_t_polynomial(N+1).derivative());
+            == chebyshev_t_polynomial(N+1u).derivative());
 }
 
 void
@@ -155,8 +155,8 @@ test_multiplicative()
     for(unsigned i = 3;i < 10;++i)
         res *= (one - q.pow(i)).pow(24u);
     res.truncate(10);
-    tassert(res == ramanujan_tau_series(10u));
-    for(unsigned i = 0;i < 10;++i)
+    tassert(res == ramanujan_tau_series(10));
+    for(int i = 0;i < 10;++i)
         tassert(ramanujan_tau_series(i+1).get_coeff(i)
                 == ramanujan_tau(fmpzxx(i)));
 }
@@ -188,7 +188,7 @@ test_dedekind()
 void
 test_number_of_partitions()
 {
-    unsigned N = 15;
+    unsigned short N = 15;
     nmodxx_ctx p(1031);
     fmpz_vecxx v1(number_of_partitions_vec(N));
     nmod_vecxx v2(number_of_partitions_nmod_vec(N, p));
@@ -203,7 +203,7 @@ test_number_of_partitions()
 void
 test_sum_of_squares()
 {
-    unsigned N = 15;
+    unsigned short N = 15;
     fmpz_vecxx v(sum_of_squares_vec(7u, N));
     tassert(v.size() == N);
     for(unsigned i = 0;i < N;++i)

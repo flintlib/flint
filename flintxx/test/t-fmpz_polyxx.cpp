@@ -177,7 +177,7 @@ test_functions()
     fmpzxx two(2);
 
     // test lazy functions
-    tassert(reverse(q, 4u).pretty("x") == "x^3");
+    tassert(reverse(q, 4).pretty("x") == "x^3");
     tassert(mul_2exp(f, 3u) == f * 8);
     tassert(f == fdiv_2exp(mul_2exp(f, 3u), 3u));
     tassert(tdiv(-f, two) == tdiv(-f, 2) && tdiv(-f, 2) == tdiv(-f, 2u)
@@ -423,6 +423,10 @@ test_hensel()
     frandxx state;
     nmod_polyxx gl(nmod_polyxx::randtest_irreducible(pl, state, 5).make_monic());
     nmod_polyxx hl(nmod_polyxx::randtest_irreducible(pl, state, 6).make_monic());
+    while(gl.length() != 5)
+        gl = nmod_polyxx::randtest_irreducible(pl, state, 5).make_monic();
+    while(hl.length() != 5)
+        hl = nmod_polyxx::randtest_irreducible(pl, state, 5).make_monic();
     nmod_polyxx al(pl), bl(pl);
     ltupleref(_, al, bl) = xgcd(gl, hl);
     tassert((al*gl + bl*hl).is_one());
@@ -437,7 +441,8 @@ test_hensel()
     fmpzxx p(pl), p1(1031);
     tassert(((f - g*h) % p).is_zero());
 
-    ltupleref(G, H, A, B) = hensel_lift(f, g, h, a, b, p, p1);
+    //ltupleref(G, H, A, B) = hensel_lift(f, g, h, a, b, p, p1);
+    fmpz_poly_hensel_lift(G._poly(), H._poly(), A._poly(), B._poly(), f._poly(), g._poly(), h._poly(), a._poly(), b._poly(), p._fmpz(), p1._fmpz());
     tassert(((f - G*H) % (p1*p)).is_zero());
     tassert(((A*G + B*H) % (p1*p)).is_one());
 

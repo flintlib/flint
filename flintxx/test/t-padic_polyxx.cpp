@@ -143,9 +143,9 @@ test_functions()
     padicxx x = padicxx::from_QQ(X, ctx);
     tassert(f1(x) == padicxx::from_QQ(F1(X), ctx));
 
-    tassert(f1.shift_left(5u) == padic_polyxx::from_QQX(F1.shift_left(5u), ctx));
-    tassert(f1.shift_right(2u)
-            == padic_polyxx::from_QQX(F1.shift_right(2u), ctx));
+    tassert(f1.shift_left(5) == padic_polyxx::from_QQX(F1.shift_left(5), ctx));
+    tassert(f1.shift_right(2)
+            == padic_polyxx::from_QQX(F1.shift_right(2), ctx));
 
     F1.set_coeff(0, 1);
     f1 = padic_polyxx::from_QQX(F1, ctx);

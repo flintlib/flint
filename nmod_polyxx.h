@@ -415,7 +415,7 @@ struct nmod_poly_data
             typename mp::enable_if<traits::is_fmpq_polyxx<Fmpq_poly> >::type* = 0)
     {
         nmod_poly_data res(c, p.length());
-        for(unsigned i = 0;i < p.length();++i)
+        for(slong i = 0;i < p.length();++i)
             nmod_poly_set_coeff_ui(res. inner, i,
                     nmodxx::red(p.get_coeff(i), c).template to<mp_limb_t>());
         return res;

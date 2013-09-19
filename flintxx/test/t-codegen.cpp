@@ -46,7 +46,8 @@
 #elif defined(__GNUC__)
 // TODO this will need tweaking
 #define DO_CODEGEN_CHECKS \
-    (__GNUC__ == 4 && __GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ == 3)
+    (__GNUC__ == 4 && __GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ == 3 \
+     && __x86_64__)
 #else
 #define DO_CODEGEN_CHECKS 0
 #endif

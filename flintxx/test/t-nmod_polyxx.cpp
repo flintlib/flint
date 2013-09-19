@@ -246,11 +246,11 @@ test_functions()
     tassert(f.evaluate_iter(v) == f(v));
 
     nmod_vecxx xs(10, ctx);
-    for(unsigned i = 0;i < xs.size();++i)
+    for(int i = 0;i < xs.size();++i)
         xs[i] = nmodxx::red(i, ctx);
     res = nmod_polyxx::interpolate(xs, v);
     tassert(res.degree() < xs.size());
-    for(unsigned i = 0;i < xs.size();++i)
+    for(int i = 0;i < xs.size();++i)
         tassert(res(xs[i]) == v[i]);
     tassert(nmod_polyxx::interpolate_fast(xs, v) == res);
     tassert(nmod_polyxx::interpolate_newton(xs, v) == res);
@@ -285,10 +285,10 @@ test_functions()
 
     fmpz_polyxx lift1 = fmpz_polyxx::randtest(rand, 10, 6);
     fmpz_polyxx lift2 = fmpz_polyxx::randtest(rand, 10, 6);
-    lift1.lead() = 1;
-    lift2.lead() = 1;
+    lift1.set_coeff(10, 1);
+    lift2.set_coeff(10, 1);
     f = nmod_polyxx::reduce(lift1, ctx);
-    for(unsigned i = 0;i < f.length();++i)
+    for(int i = 0;i < f.length();++i)
         tassert(f.get_coeff(i) == nmodxx::red(lift1.get_coeff(i), ctx));
 
     g = nmod_polyxx::reduce(lift2, ctx);
@@ -319,7 +319,7 @@ test_functions()
 
     f = nmod_polyxx::product_roots(xs);
     tassert(f.degree() == xs.size());
-    for(unsigned i = 0;i < xs.size();++i)
+    for(int i = 0;i < xs.size();++i)
         tassert(f(nmodxx::red(i, ctx)).to<mp_limb_t>() == 0);
 
     res = "2 31  0 1";
@@ -344,7 +344,7 @@ test_transcendental_functions()
     fmpq_polyxx lift = fmpq_polyxx::randtest(state, 10, 9);
     lift.set_coeff(0, 0);
     f = nmod_polyxx::reduce(lift, ctx);
-    for(unsigned i = 0;i < f.length();++i)
+    for(int i = 0;i < f.length();++i)
         tassert(f.get_coeff(i) == nmodxx::red(lift.get_coeff(i), ctx));
 
     tassert(f.exp_series(15) == nmod_polyxx::reduce(lift.exp_series(15), ctx));
