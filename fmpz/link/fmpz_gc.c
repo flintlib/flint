@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2013 William Hart
 
 ******************************************************************************/
 
@@ -35,6 +35,9 @@
 #define MPZ_BLOCK 64 
 
 FLINT_TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
+FLINT_TLS_PREFIX __mpz_struct ** mpz_arr = NULL;
+FLINT_TLS_PREFIX ulong mpz_num = 0;
+FLINT_TLS_PREFIX ulong mpz_alloc = 0;
 FLINT_TLS_PREFIX ulong mpz_free_num = 0;
 FLINT_TLS_PREFIX ulong mpz_free_alloc = 0;
 
@@ -47,6 +50,14 @@ __mpz_struct * _fmpz_new_mpz(void)
     else
     {
         __mpz_struct * z = flint_malloc(sizeof(__mpz_struct));
+
+        if (mpz_num == mpz_alloc) /* store pointer to prevent gc cleanup */
+        {
+           mpz_alloc = FLINT_MAX(64, mpz_alloc * 2);
+           mpz_arr = flint_realloc(mpz_arr, mpz_alloc * sizeof(__mpz_struct *));
+        }
+        mpz_arr[mpz_num++] = z;
+
         mpz_init(z);
         return z;
     }
@@ -78,14 +89,16 @@ void _fmpz_cleanup_mpz_content(void)
         flint_free(mpz_free_arr[i]);
     }
 
-    mpz_free_num = mpz_free_alloc = 0;
+    mpz_num = mpz_alloc = mpz_free_num = mpz_free_alloc = 0;
 }
 
 void _fmpz_cleanup(void)
 {
     _fmpz_cleanup_mpz_content();
     flint_free(mpz_free_arr);
+    flint_free(mpz_arr);
     mpz_free_arr = NULL;
+    mpz_arr = NULL;
 }
 
 __mpz_struct * _fmpz_promote(fmpz_t f)

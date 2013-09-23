@@ -53,6 +53,8 @@
         (bn) = __tn;           \
     } while (0)
 
+#define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
+
 /* Not defined in gmp.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
