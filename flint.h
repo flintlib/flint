@@ -46,8 +46,6 @@
 
 extern char version[];
 
-typedef mp_size_t slong;
-
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
 
