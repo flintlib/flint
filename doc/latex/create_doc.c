@@ -45,7 +45,11 @@ static char * docsin[] = {
     "../../nmod_poly/doc/nmod_poly.txt",
     "../../nmod_poly_mat/doc/nmod_poly_mat.txt",
     "../../fmpz_mod_poly/doc/fmpz_mod_poly.txt",
+    "../../fmpz_mod_poly_factor/doc/fmpz_mod_poly_factor.txt",
     "../../padic/doc/padic.txt", 
+    "../../padic_mat/doc/padic_mat.txt", 
+    "../../padic_poly/doc/padic_poly.txt", 
+    "../../qadic/doc/qadic.txt", 
     "../../arith/doc/arith.txt", 
     "../../ulong_extras/doc/ulong_extras.txt",
     "../../long_extras/doc/long_extras.txt",
@@ -56,6 +60,8 @@ static char * docsin[] = {
     "../../fft/doc/fft.txt",
     "../../qsieve/doc/qsieve.txt",
     "../../perm/doc/perm.txt",
+    "../../flintxx/doc/flintxx.txt",
+    "../../flintxx/doc/genericxx.txt",
 };
 
 static char * docsout[] = {
@@ -75,7 +81,11 @@ static char * docsout[] = {
     "input/nmod_poly.tex",
     "input/nmod_poly_mat.tex",
     "input/fmpz_mod_poly.tex",
+    "input/fmpz_mod_poly_factor.tex",
     "input/padic.tex", 
+    "input/padic_mat.tex", 
+    "input/padic_poly.tex", 
+    "input/qadic.tex", 
     "input/arith.tex", 
     "input/ulong_extras.tex",
     "input/long_extras.tex",
@@ -86,6 +96,8 @@ static char * docsout[] = {
     "input/fft.tex",
     "input/qsieve.tex",
     "input/perm.tex",
+    "input/flintxx.tex",
+    "input/genericxx.tex",
 };
 
 
@@ -114,7 +126,7 @@ printfuncheader(const char* text, int len)
         else
         {
             int hasspace = text[i - 1] == ' ';
-            while(i < len-1 && text[++i] == ' ');
+            while(i < len-1 && text[++i] == ' ' || text[i] == '\t');
             if(!hasspace)
                 fprintf(out, " ");
         }

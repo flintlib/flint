@@ -20,7 +20,7 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
 export
 
 SOURCES = clz_tab.c memory_manager.c version.c profiler.c thread_support.c
-LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
+LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))
 
 HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h
 
@@ -164,6 +164,9 @@ install: library
 	fi
 	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
 	cp qadic/CPimport.txt $(DESTDIR)$(FLINT_CPIMPORT_DIR)
+	mkdir -p $(DESTDIR)$(PREFIX)/include/flint/flintxx
+	cp flintxx/*.h $(DESTDIR)$(PREFIX)/include/flint/flintxx
+	cp *xx.h $(DESTDIR)$(PREFIX)/include/flint
 
 build:
 	mkdir -p build
@@ -191,6 +194,9 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
+
+print-%:
+	@echo '$*=$($*)'
 
 .PHONY: profile library shared static clean examples tune check tests distclean dist install all
 

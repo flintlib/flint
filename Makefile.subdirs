@@ -5,6 +5,7 @@ AT=@
 SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard ../*.h)
+TEST_HEADERS = $(wildcard *.h)
 
 OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
@@ -12,12 +13,14 @@ LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo
 
 TEST_SOURCES = $(wildcard test/*.c)
+TESTXX_SOURCES = $(wildcard test/*.cpp)
 
 PROF_SOURCES = $(wildcard profile/*.c)
 
 TUNE_SOURCES = $(wildcard tune/*.c)
 
-TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES))
+TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES)) \
+        $(patsubst %.cpp, $(BUILD_DIR)/%$(EXEEXT), $(TESTXX_SOURCES))
 
 TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
 
@@ -53,8 +56,11 @@ tests: $(TESTS)
 
 check: tests $(TESTS_RUN)
 
-$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o $(HEADERS)
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o $(HEADERS) $(TEST_HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS)
+
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o $(HEADERS) $(TEST_HEADERS)
+	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS)
 
 %_RUN: %
 	@$<

@@ -209,7 +209,7 @@ void mpn_tdiv_q(mp_ptr qp,
 	   mp_srcptr np, mp_size_t nn,
 	   mp_srcptr dp, mp_size_t dn)
     {
-    mp_ptr _scratch = flint_malloc(dn * sizeof(mp_limb_t));
+    mp_ptr _scratch = (mp_ptr) flint_malloc(dn * sizeof(mp_limb_t));
     mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
     flint_free(_scratch);
     }

@@ -41,6 +41,10 @@
 #include "padic.h"
 #include "padic_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Data types and context ****************************************************/
 
 typedef padic_poly_t qadic_t;
@@ -451,6 +455,10 @@ static __inline__ int qadic_debug(const qadic_t op)
 {
     return padic_poly_debug(op);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

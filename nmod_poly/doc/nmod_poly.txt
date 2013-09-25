@@ -25,6 +25,12 @@
 
 ******************************************************************************/
 
+*******************************************************************************
+
+    Helper functions
+
+*******************************************************************************
+
 int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n)
 
     If \code{op1 >= op2} return 0 and set \code{res} to \code{op1 - op2}
@@ -488,7 +494,7 @@ void nmod_poly_mul_classical(nmod_poly_t res,
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
 void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, 
-                           mp_srcptr poly2, slong len2, slong trunc, nmod_t mod)
+                          mp_srcptr poly2, slong len2, slong trunc, nmod_t mod)
 
     Sets \code{res} to the lower \code{trunc} coefficients of the product of 
     \code{(poly1, len1)} and \code{(poly2, len2)}. Assumes that 
@@ -496,7 +502,7 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1,
     output is not permitted.
 
 void nmod_poly_mullow_classical(nmod_poly_t res, 
-                  const nmod_poly_t poly1, const nmod_poly_t poly2, slong trunc)
+                 const nmod_poly_t poly1, const nmod_poly_t poly2, slong trunc)
 
     Sets \code{res} to the lower \code{trunc} coefficients of the product 
     of \code{poly1} and \code{poly2}.
@@ -511,7 +517,7 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
     and output is not permitted.
 
 void nmod_poly_mulhigh_classical(nmod_poly_t res, 
-                  const nmod_poly_t poly1, const nmod_poly_t poly2, slong start)
+                 const nmod_poly_t poly1, const nmod_poly_t poly2, slong start)
 
     Computes the product of \code{poly1} and \code{poly2} and writes the 
     coefficients from \code{start} onwards into the high coefficients of 
@@ -556,7 +562,7 @@ void nmod_poly_mul_KS4(nmod_poly_t res,
     Sets \code{res} to the product of \code{poly1} and \code{poly2}. 
     
 void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
-                mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod)
+              mp_srcptr in2, slong len2, mp_bitcnt_t bits, slong n, nmod_t mod)
 
     Sets \code{out} to the low $n$ coefficients of \code{in1} of length
     \code{len1} times \code{in2} of length \code{len2}. The output must have
@@ -564,13 +570,13 @@ void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
     and that \code{0 < n <= len1 + len2 - 1}. 
 
 void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
-                             const nmod_poly_t poly2, mp_bitcnt_t bits, slong n)
+                            const nmod_poly_t poly2, mp_bitcnt_t bits, slong n)
 
     Set \code{res} to the low $n$ coefficients of \code{in1} of length
     \code{len1} times \code{in2} of length \code{len2}. 
 
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
-                                        mp_srcptr poly2, slong len2, nmod_t mod)
+                                       mp_srcptr poly2, slong len2, nmod_t mod)
 
     Sets \code{res} to the product of \code{poly1} of length \code{len1} 
     and \code{poly2} of length \code{len2}. Assumes \code{len1 >= len2 > 0}.
@@ -582,7 +588,7 @@ void nmod_poly_mul(nmod_poly_t res,
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
 void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, 
-                                mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+                              mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 
     Sets \code{res} to the first \code{n} coefficients of the 
     product of \code{poly1} of length \code{len1} and \code{poly2} of
@@ -591,13 +597,13 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
     is permitted.
 
 void nmod_poly_mullow(nmod_poly_t res, const nmod_poly_t poly1, 
-                                           const nmod_poly_t poly2, slong trunc)
+                                          const nmod_poly_t poly2, slong trunc)
 
     Sets \code{res} to the first \code{trunc} coefficients of the 
     product of \code{poly1} and \code{poly2}.
 
 void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, slong len1, 
-                                mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+                              mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 
     Sets all but the low $n$ coefficients of \code{res} to the 
     corresponding coefficients of the product of \code{poly1} of length 
@@ -634,7 +640,7 @@ void nmod_poly_mulmod(nmod_poly_t res,
 
 void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1, 
                           mp_srcptr poly2, slong len2, mp_srcptr f,
-                          slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+                         slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
 
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}.
@@ -804,7 +810,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q,
     If $\len(B) = 0$ an exception is raised.
 
 void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, slong A_len, 
-                                          mp_srcptr B, slong B_len, nmod_t mod);
+                                         mp_srcptr B, slong B_len, nmod_t mod);
 
     Notionally finds polynomials $Q$ and $R$ such that $A = B Q + R$ with 
     $\len(R) < \len(B)$, but returns only \code{Q}. If $\len(B) = 0$ an 
@@ -819,7 +825,7 @@ void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     exception is raised.
 
 void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,  
-                     mp_ptr V, mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
+                    mp_ptr V, mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
     \code{lenB}, where \code{A} is of length \code{2 * lenB - 1} and \code{B} 
@@ -830,7 +836,7 @@ void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,
     coefficients computed by \code{NMOD_DIVREM_DC_ITCH(lenB, mod)}.
 
 void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
-                    mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+                  mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
     \code{lenB}, where \code{A} is of length \code{lenA} and \code{B} is of 
@@ -866,7 +872,7 @@ void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R,
     Does not support aliasing or zero-padding.
 
 void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, 
-                    mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+                  mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
     \code{lenB}, where \code{A} is of length \code{lenA} and \code{B} is of 
@@ -879,7 +885,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
 
 void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
-                               mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
+                              mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
     \code{lenB}, where \code{A} is of length \code{2 * lenB - 1} and \code{B} 
@@ -889,7 +895,7 @@ void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
     coefficients computed by \code{NMOD_DIV_DC_ITCH(lenB, mod)}. 
 
 void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA, 
-                                            mp_srcptr B, slong lenB, nmod_t mod)
+                                           mp_srcptr B, slong lenB, nmod_t mod)
 
     Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
     $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
@@ -903,7 +909,7 @@ void nmod_poly_div_divconquer(nmod_poly_t Q,
     $\len(R) < \len(B)$, but returns only $Q$.
 
 void _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, 
-                                            mp_srcptr B, slong lenB, nmod_t mod)
+                                           mp_srcptr B, slong lenB, nmod_t mod)
 
     Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
     $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
@@ -1081,7 +1087,7 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
     and compute the remainder.
 
 void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
- slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
+slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
     \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length 
@@ -1351,7 +1357,7 @@ void nmod_poly_compose_divconquer(nmod_poly_t res,
     the divide and conquer algorithm.
 
 void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, 
-                                        mp_srcptr poly2, slong len2, nmod_t mod)
+                                       mp_srcptr poly2, slong len2, nmod_t mod)
 
     Composes \code{poly1} of length \code{len1} with \code{poly2} of length
     \code{len2} and sets \code{res} to the result, i.e.\ evaluates \code{poly1}
@@ -1449,7 +1455,8 @@ void nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
     $h$ is nonzero and that $f$ has smaller degree than $h$.
     The algorithm used is the Brent-Kung matrix algorithm.
 
-void _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr f, slong lenf,
+void _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr f,
+                            slong lenf,
                             mp_srcptr g, mp_srcptr h, slong lenh,
                             mp_srcptr hinv, slong lenhinv, nmod_t mod)
 
@@ -1494,7 +1501,7 @@ void nmod_poly_compose_mod(nmod_poly_t res,
 *******************************************************************************
 
 slong _nmod_poly_gcd_euclidean(mp_ptr G, 
-                    mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+                  mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
     \code{lenB}, where \code{lenA >= lenB > 0}. The length of the GCD $G$
@@ -1550,7 +1557,7 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G,
     For further details, see~\citep{ThullYap1990}.
 
 slong _nmod_poly_gcd(mp_ptr G, 
-                    mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+                  mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
     \code{lenB}, where \code{lenA >= lenB > 0}. The length of the GCD $G$
@@ -1755,7 +1762,8 @@ void nmod_poly_compose_series_brent_kung(nmod_poly_t res,
     This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
 
 void _nmod_poly_compose_series_divconquer(mp_ptr res, 
-    mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong N, nmod_t mod)
+           mp_srcptr poly1, slong len1,
+	   mp_srcptr poly2, slong len2, slong N, nmod_t mod)
 
     Composes \code{poly1} of length $\ell_1$ with \code{poly2} of 
     length $\ell_2$ modulo $x^N$ and sets \code{res} to the result, 

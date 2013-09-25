@@ -323,7 +323,7 @@ void _padic_poly_add(fmpz *rop, slong *rval, slong N,
     Assumes that the input is reduced and guarantees that this is 
     also the case for the output.
 
-    Assumes that $\min\{v_1, v_2} < N$.
+    Assumes that $\min\{v_1, v_2\} < N$.
 
     Supports aliasing between the output and input arguments.
 
@@ -344,7 +344,7 @@ void _padic_poly_sub(fmpz *rop, slong *rval,
     Assumes that the input is reduced and guarantees that this is 
     also the case for the output.
 
-    Assumes that $\min\{v_1, v_2} < N$.
+    Assumes that $\min\{v_1, v_2\} < N$.
 
     Support aliasing between the output and input arguments.
 

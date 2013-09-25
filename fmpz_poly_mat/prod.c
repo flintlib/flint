@@ -29,7 +29,7 @@
 #include "fmpz_poly_mat.h"
 
 static void
-binary_splitting(fmpz_poly_mat_t P, fmpz_poly_mat_t * const factors,
+binary_splitting(fmpz_poly_mat_t P, const fmpz_poly_mat_t * factors,
                                                             slong n1, slong n2)
 {
     if (n2 - n1 <= 0)
@@ -64,7 +64,7 @@ binary_splitting(fmpz_poly_mat_t P, fmpz_poly_mat_t * const factors,
 
 void
 fmpz_poly_mat_prod(fmpz_poly_mat_t res,
-                        fmpz_poly_mat_t * const factors, slong n)
+                        const fmpz_poly_mat_t * factors, slong n)
 {
     binary_splitting(res, factors, 0, n);
 }

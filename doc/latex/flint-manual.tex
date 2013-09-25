@@ -1,3 +1,4 @@
+% vim: spell spelllang=en textwidth=80
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   This file is part of FLINT.
@@ -21,6 +22,7 @@
 %
 %   Copyright (C) 2007 William Hart, David Harvey
 %   Copyright (C) 2010 Sebastian Pancratz
+%   Copyright (C) 2013 Tom Bachmann
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -125,6 +127,7 @@
 \usepackage{tocloft}
 
 \addtolength{\cftsecnumwidth}{0.8em}
+\addtolength{\cftsubsecnumwidth}{0.8em}
 \addtolength{\cftbeforesecskip}{0.05em}
 
 %%%%%%%%%%%%
@@ -226,6 +229,10 @@
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\ord}{ord}
 \DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Norm}{N}
+\DeclareMathOperator{\Trace}{Tr}
+\DeclareMathOperator{\Res}{Res}
 
 \allowdisplaybreaks[4]
 %\numberwithin{equation}{section}
@@ -1392,6 +1399,15 @@ We now describe the functions available in \code{fmpz_mod_poly}.
 \input{input/fmpz_mod_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Polynomial factorisation over Z/nZ                                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_mod\_poly\_factor}
+\epigraph{Factorisation of polynomials over $\Z/n\Z$ for general moduli}{}
+
+\input{input/fmpz_mod_poly_factor.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Padic numbers                                                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1420,6 +1436,27 @@ operation exactly and then reduce the result to the precision of the
 output variable.
 
 \input{input/padic.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matrices of padic numbers                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{padic\_mat}
+\input{input/padic_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Polynomials of padic numbers                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{padic\_poly}
+\input{input/padic_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Finite unramified extensions of the padic numbers                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{qadic}
+\input{input/qadic.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Arithmetic functions                                                         %
@@ -1526,6 +1563,15 @@ The output is:
 \input{input/qsieve.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Permutations                                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{perm}
+\epigraph{Permutations}{}
+
+\input{input/perm.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % longlong.h                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1541,6 +1587,365 @@ The output is:
 \chapter{mpn\_extras}
 
 \input{input/mpn_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C++ wrapper                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{flintxx}
+\epigraph{C++ wrapper library for FLINT}
+
+\section{Introduction}
+
+FLINT provides fast algorithms for number theoretic computations. For many
+reasons, it is written in C. Nonetheless, some users prefer object oriented
+syntax. FLINT ships with a set of wrapper C++ classes, together termed flintxx,
+which provide such an object oriented syntax.
+
+In this chapter, we describe how to \emph{use} flintxx. The FLINT developer
+wishing to extend the wrapper library should consult
+appendix~\ref{app:genericxx}.
+
+In general, flintxx strives to behave just like the underlying FLINT C
+interface, except that we use classes and C++ operators to make the client code
+look more pleasant. The simple example from the section on \code{fmpz} can be
+transcribed into C++ as follows:
+
+\begin{lstlisting}[language=c++]
+#include "fmpzxx.h"
+...
+using namespace flint;
+fmpzxx x, y;
+x = 7u;
+y = x*x;
+std::cout << x << "^2 = " << y << std::endl;
+\end{lstlisting}
+
+As can be seen here, and in general, if a FLINT C interface is called \code{foo}
+and resides in \code{foo.h}, then the C++ version is called \code{fooxx} and
+resides in \code{fooxx.h}. All flintxx classes live inside
+\code{namespace flint}.
+
+Functions which operate on wrapper classes are usually implemented as overloaded
+stand-alone functions, with the type prefix dropped. So for example a call to
+\code{flint::gcd(f1, f2)} yields an expression template evaluating via
+\code{fmpz_gcd}, provided \code{f1} and \code{f2} are (evaluate to) instances of
+\code{fmpzxx}. Sometimes we felt that dropping the type prefix would yield
+incomprehensible names, as for example in \code{fmpq_next_minimal}, or
+\code{fmpq_reconstruct}. In these cases the type prefix is swapped for the
+flintxx equivalent, so the flintxx version would be called
+\code{fmpqxx_reconstruct}. In this situation, usually the same functionality is
+also exposed as a (possibly static) member function, and this is the preferred
+way of accessing the functionality. Thus one should write
+\code{fmpqxx::reconstruct(a, m)} or \code{fmpqxx(0, 1u).next_minimal()}.
+
+\section{Overview}
+
+\paragraph{Expression templates}
+The implementation of flintxx tries very hard not to incur any overhead over
+using the native C interface. For this reason, we use \emph{expression
+templates} for lazily evaluating expressions. This allows us to avoid creating
+excessively many temporaries, for example. This means that even if \code{x} and
+\code{y} are of type \code{fmpzxx} (say), then \code{x + y} will \emph{not} be
+of type \code{fmpzxx}. Instead it will be an object which for most purposes
+behaves just like \code{fmpzxx}, but really only expresses the fact that it
+represents the sum of \code{x} and \code{y}.
+
+This distinction almost never matters, since expression templates are evaluated
+automatically in most cases. Thus \code{cout << x + y} or \code{x + y == 7} will
+work just as one might expect. There are ways to request explicit evaluation of
+an expression template, most notably \code{(x + y).evaluate()} and
+\code{fmpzxx(x + y)}.
+
+One caveat of the expression template approach is that compiler error messages
+can be long and hard to understand.
+In flintxx we strive to type-check template parameters as early as possible in
+order to keep error messages short and close to the actual user error.
+Excessively long error messages are often indicative of a bug in flintxx.
+%TODO static assert
+
+\paragraph{Tuples}
+
+Many FLINT functions naturally return two (or more) arguments. A typical example
+is \code{divrem}. The underlying C function is (for example)
+\code{void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)}.
+Mapping this directly to C++ would yield something like
+\code{void divrem(fmpz_polyxx& Q, fmpz_polyxx& R, const fmpz_polyxx& A, const fmpz_polyxx& B)}.
+While functional, this is not particularly nice; the syntax
+\code{divrem(Q, R, A, B)}, where the first two arguments are modified, is just
+very reminiscent of C. We would prefer an expression closer to the
+python analogue \code{(Q, R) = divrem(A, B)}.
+
+This is where \emph{ltuples} enter.\footnote{The `l' in \code{ltuple} stands for
+``lazy'', i.e. the fact that they can be used in expression templates.
+The reason for this name
+is that flintxx internally uses a non-lazy tuple class just
+called \code{tuple}, on which \code{ltuple} in fact is built.}
+In fact, the following is a valid
+flintxx expression: \code{ltupleref(Q, R) = divrem(A, B)}.
+
+In generality, the implementation of ltuples is fairly involved template
+metaprogramming. For the purpose of this documentation, ltuple types are denoted
+as follows: \code{Ltuple<Type1, Type2, ..., Typer>}. So \code{divrem} would
+return an object of type \code{Ltuple<fmpz_polyxx, fmpz_polyxx>}. The user
+should never try to construct such types by hand; instead use the function
+\code{ltupleref} (and perhaps occasionally \code{ltuple}; both documented
+later).
+
+One thing to observe is that ltuples are typed fairly weakly. Thus assignments
+and equality comparisons can be performed as long as both sides have the same
+length, and the operation can be performed on all components (whether or not the
+component types match).
+
+Another interesting feature of ltuples is the type
+\code{flint::detail::IGNORED_TYPE}.
+In an ltuple assignment, where the left hand side contains a reference to this
+type, the relevant entry is just discarded. Thus in the following listing, the
+lines marked \code{(1)} and \code{(2)} have the same effect (but the second is
+potentially more efficient).
+
+\begin{lstlisting}[language=c++]
+#include "fmpz_polyxx.h"
+...
+using namespace flint;
+detail::IGNORED_TYPE _;
+
+fmpz_polyxx f, g;
+// ...
+fmpz_polyxx R;
+ltupleref(_, R) = divrem(f, g); // (1)
+R = f % g;                      // (2)
+\end{lstlisting}
+
+Note finally that using \code{ltuple} intermediates often results in more copies
+than necessary. For example the expression
+\code{ltupleref(num, _) = divrem(a, b)} assigns the quotient to \code{num},
+creating just a temporary \code{fmpzxx} to hold the remainder. In contrast,
+\code{num = divrem(a, b).get<0>()} creates two temporary instances of
+\code{fmpzxx}.
+
+\paragraph{Reference types}
+
+One subtlety in wrapping a C library is that references do not work as easily as
+one might expect. For example, consider the class \code{fmpqxx}, wrapping
+\code{fmpq_t}, i.e. rational numbers. As such, an instance of \code{fmpqxx} has a
+numerator and denominator. In C, these are accessible via macros
+\code{fmpq_numref} and \code{fmpq_denref}, which yield \code{fmpz*}, which can
+be used essentially interchangeably with \code{fmpz_t}. In particular, any
+library function which operates on \code{fmpz_t} can operate on the numerator or
+denominator of an \code{fmpq_t}. In C++, we would like to have a member function
+\code{den} (and \code{num}) which returns an object of type \code{fmpzxx&} (i.e.
+a reference to \code{fmpzxx}).
+
+However, this is not possible, since \code{fmpqxx} is \emph{not} implemented as
+a pair of \code{fmpzxx}, and instead simply contains an \code{fmpq_t}.
+
+For this reason, for every C interface \code{foo}, flintxx provides two
+additional types, called \code{fooxx_ref} and \code{fooxx_srcref}, acting as
+replacements for \code{fooxx&} and \code{const foox&}, respectively, in
+situations where no underlying C++ object exists. Instances
+of \code{fooxx_ref} or \code{fooxx_srcref} behave exactly like instances
+\code{fooxx}, in fact the user should never notice a difference. Any flintxx
+operation or expression which works on objects of type \code{foo} also works on
+objects of type \code{fooxx_ref} and \code{fooxx_srcref}. Moreover, instances
+of \code{foo} can be converted implicitly to \code{fooxx_ref} or
+\code{fooxx_srcref}, and \code{fooxx_ref} can be converted implicitly to
+\code{fooxx_srcref}. It is also possible to explicitly convert reference types
+\code{fooxx_*ref} to \code{fooxx} (since this entails copying, we provide no
+implicit conversion).
+
+In summary, the class \code{fooxx_ref} behaves like a reference to an object of
+type \code{fooxx}. As such it can be used both as a right hand side and as a
+left hand side, just like \code{fooxx}. The class \code{fooxx_srcref} behaves
+like a reference to a constant object of type \code{fooxx}, and so cannot be
+used as a left hand side. These objects are created by flintxx automatically,
+for example upon calling \code{fmpqxx::num()}.
+
+\paragraph{Unified coefficient access}
+
+Consider again the \code{x.num()} method of \code{fmpqxx}. In various
+situations,
+this can have different return types. Namely, if \code{x} is a writable
+expression, then \code{x.num()} returns an \code{fmpzxx_ref}. In
+particular the return value behaves just like \code{fmpzxx}, no evaluation is
+necessary to obtain it, there are no copies, and it is possible to change the
+return value (and thus change \code{x}). If on the other hand \code{x} is a
+readonly immediate,
+then the return value of \code{x.num()} has type
+\code{fmpzxx_srcref}. This again behaves just like \code{fmpzxx} and no
+evaluations or copies are necessary, but this time it is not possible to change
+the return value (and so it is not possible to change \code{x}, either).
+Finally, if \code{x} is a lazy expression, then
+the return value is actually a lazy expression template. Thus to obtain the
+``actual'' value of \code{x.num()}, evaluations are necessary, and potentially
+so are copies.
+
+Thus in any case the return value behaves just like \code{fmpqxx}, but apart
+from that the behaviour of \code{x.num()} varies quite drastically in the
+different situations. We call this ``unified coefficient access'' (the
+coefficients of a \code{fmpqxx} being \code{num(), den()}), and the same
+behaviour occurs in many other flintxx types, e.g. in
+\code{fmpz_polyxx.coeff()}, etc.
+
+\paragraph{Type conversion}
+
+As a rule, flintxx does not perform automatic type conversions (except when
+related to the promotion to reference types, c/f earlier discussion). In
+expression templates, operands can be automatically promoted if the underlying
+C interface provides this facility. Beyond that, types have to be converted
+explicitly.
+
+There are two ways of doing this. The preferred one is using static constructor
+functions. Typical examples are
+\code{fmpz_polyxx::from_ground(fmpzarg)} and
+\code{nmod_polyxx::reduce(mplimbarg, nmodctxarg)}. The former takes an
+(expression template evaluating to) \code{fmpzxx} and returns an
+\code{fmpz_polyxx} representing the constant polynomial with value the
+\code{fmpzxx}. The latter takes an argument of type \code{mp_limb_t} and one of
+type \code{nmodxx_ctx_srcref} (essentially a word-sized modulus) and returns an
+\code{nmod_polyxx} representing the constant polynomial obtained by reducing
+\code{mplimbarg}.
+
+The general format for this is \code{totype::constructorname(arg1, arg2, ...)}.
+We prefer this because it makes explicit the type that is being converted to,
+and the way the arguments are to be interpreted.
+%In comparison, \code{fmpzarg.reduce(ctx)}
+%does not make it clear if the reduction should be to \code{nmodxx},
+%\code{nmod_polyxx} or perhaps \code{fmpz_mod_polyxx}.
+
+This format only works if the target type is part of flintxx. In other cases, we
+use a \code{.to<totype>()} syntax, as in \code{fmpzexpr.to<slong>()}.
+
+\paragraph{Input and output}
+
+In C++ it is customary to provide input and output via iostreams, and
+overloading the operators \code{<<} and \code{>>}. When wrapping a C library
+which works on the \code{FILE} interface, this is rather hard to accomplish. For
+this reason, flintxx only provides streaming output (i.e. \code{<<}), and only
+when there is a \code{to_string} method. Unfortunately this applies to only a
+small subset of the FLINT types.
+
+For output in other cases, and input in all cases, we provide C-like functions.
+Namely, the functions \code{print}, \code{print_pretty}, \code{read} and
+\code{read_pretty} can be used similarly to the C \code{printf} and \code{scanf}.
+For example, \code{print(x)} where \code{x} is an \code{fmpz} has the same
+effect as \code{std::cout << x}.
+
+\paragraph{Extending flintxx}
+
+Explanations on the inner workings of the flintxx expression template library
+and how they pertain to wrapping new C interfaces can be found in
+appendix~\ref{app:genericxx}. Here we just want to remark that the flintxx
+classes are not designed for inheritance. If you want to modify behaviour, you
+should wrap flintxx types into your own classes (extension by aggregation, not
+inheritance). The header \code{flintxx/forwarding.h} was meant to facilitate
+this, but has not been finished.
+
+\section{Notations and conventions for the C++ interface documentation}
+As explained above, the flintxx classes and functions perform quite a number of
+operations which should be invisible to the user. Some template types implement
+methods which only make sense for some template arguments, etc. For example,
+every expression template built from \code{fmpq_polyxx} (polynomials with
+rational coefficients) has a method \code{set_coeff}. However, this method only
+makes sense for objects of type \code{fmpq_polyxx} or \code{fmpq_polyxx_ref}
+(calling it on other types will result in a compilation error),
+and its existence in objects of other types should be considered an
+implementation detail.
+
+In what follows,
+we document a ``virtual'' set of classes and functions, which explain how the
+user should expect its objects to behave, and which we guarantee to maintain.
+Other interfaces should be considered implementation details and subject to
+change.
+
+Consider the interface \code{fmpzxx}, and more concretely an instance \code{a}.
+As in the above discussion, we see that from \code{a} we can build a lot of
+different objects: expression templates like \code{a+a}, constant objects like
+\code{const fmpzxx& b = a;}, reference objects like \code{fmpzxx_ref c(a)}, etc.
+These by nature behave somewhat differently. For our purposes, we classify types
+into ``targets'' (things which can be assigned to), ``sources'' (things which
+contain actual computed data, or references thereto,
+as opposed to lazy expression templates) and
+``expressions'' (sources or expression templates). Note that every target is a
+source, and every source is an expression.
+
+We denote any type which can
+act as a target for \code{fmpzxx} as \code{Fmpz_target} (note the initial
+capital letter!), any \code{fmpzxx} source as \code{Fmpz_source} and any
+\code{fmpzxx} expression as \code{Fmpz_expr}. Such ``made up'' type names
+(always with initial capital letter) are
+referred to as ``virtual types'' in the sequel; these are used for all flint
+classes (e.g. \code{Fmpq_expr} or \code{Fmpz_polyxx_src}). Some examples of
+virtual types for \code{fmpzxx} are given in table
+\ref{tab:virtual-type-examples}.
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{ccc}
+\code|Fmpz_target| & \code|Fmpz_src| & \code|Fmpz_expr| \\
+  \hline
+\code|fmpzxx a;|          & \code|const fmpzxx a;|      & \code|a + b| \\
+\code|fmpzxx& b = a;|     & \code|const fmpzxx& b(a);|  & \code|a * b| \\
+\code|fmpzxx_ref c(a);|   & \code|fmpzxx_srcref c(a);|  & \code|gcd(a, b)| \\
+\end{tabular}
+\end{center}
+\caption{Examples of virtual types for \code{fmpzxx}.}
+\label{tab:virtual-type-examples}
+\end{table}
+
+When using virtual types, we will suppress reference notation. No flintxx types
+are ever copied automatically, unless the documentation explicitly says so.
+This is a general philosophy of flintxx: the library does as many things
+automatically as it can, without introducing additional
+calls to underlying flint C functions. So for example, it is not possible to
+implicitly convert \code{int} to \code{fmpzxx} (since doing so requires a C
+call). Of course explicit conversions (or assignments) work completely fine.
+
+It is also often the case that flintxx functions are conditionally enabled
+templates. A notation such as \code{void foo(T:is_signed_integer)} denotes a
+template function which is enabled whenever the template parameter \code{T}
+satisfies the \emph{type trait} \code{is_signed_integer}. These type traits
+should be self-explanatory, and in any case are documented in TODO.
+
+In what follows, we will never document copy constructors,
+or implicit conversion constructors pertaining to reference types. We will also
+not document assignment operators for expressions of the same type. (Thus if
+\code{x} is an \code{fmpzxx} and \code{y} is an \code{fmpqxx}, then \code{x = x}
+and \code{y = x} are both valid, but only the second assignment operator is
+documented explicitly.)
+
+Most flintxx functions and methods wrap underlying C functions in a way which is
+evident from the signature of the flintxx function/method. If this is the case,
+no further documentation is provided. For example, the function
+\code{double dlog(Fmpz_expr x)} simply wraps
+\code{double fmpz_dlog(const fmpz_t)}.  As is
+evident from the return type, \code{dlog} immediately evaluates its argument,
+and then computes the logarithm. In contrast, a function like
+\code{Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)} returns a lazily evaluated expression
+template (and wraps \code{void fmpz_gcd(fmpz_t, const fmpz_t, const fmpz_t)}).
+
+In case the C function has more than one return value in the form of arguments
+passed in by reference, the C++ wrapper returns an \code{ltuple}. In this case,
+the order of the \code{ltuple} arguments is the same as the order of the
+function arguments; so for example \code{ltupleref(Q, R) = divrem(A, B)} has the
+same effect as \code{fmpz_poly_divrem(q, r, a, b)}, provided \code{Q, R, A, B}
+are \code{fmpz_polyxx} and \code{q, r, a, b} are the underlying
+\code{fmpz_poly_t}. If such a convention is followed, the documentation below
+may not further explain anything. In all other cases, further explanation is
+provided (this applies in particular if the C function has return type different
+from \code{void}).
+
+\paragraph{Global functions or member functions?} Often it is not clear if
+functionality should be exposed as a global function,
+such as \code{gcd(a, b)}, or as a member
+function, such as \code{a.gcd(b)}. In flintxx, we strive to make both available
+when feasible. In the following documentation, the global versions are
+documented in detail (explaining the allowed types etc), whereas the member
+function versions are summarised more briefly under e.g.
+\code{Fmpz_expr::unary operation() const},
+\code{Fmpz_expr::binary operation(??) const} etc.
+
+\input{input/flintxx.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % profiler                                                                     %
@@ -1562,6 +1967,644 @@ The output is:
 In this chapter we provide interfaces to various external packages.
 
 \input{input/interfaces.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% extending the C++ wrapper                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\chapter{Extending the C++ wrapper}
+\label{app:genericxx}
+
+\section{Introduction}
+
+This chapter is geared towards FLINT developers who wish to extend the C++
+wrapper, chiefly by adding new functions operating on existing wrapper classes,
+or by adding altogether new wrapper classes for data types they implemented in
+C. Part of the design effort of flintxx went into trying to make it possible to
+do this kind of extension with only cursory knowledge of the syntax of C++,
+without having to understand in detail things such as partial template
+specialisation.
+
+The easiest way to get started is probably to read \code{examples/fooxx.cpp}.
+As a matter of fact I hope that most day to day work on the wrapper should be
+doable by just copying similar code from other data types, so after reading the
+example you may already know everything you need.
+
+\section{Overview of flintxx}
+
+The flintxx library is composed of a variety of parts. The main expression
+template class \code{expression} resides in \code{flintxx/expression.h}.
+Concrete classes derive from it, and thereby automatically acquire overloaded
+operators etc. to construct and evaluate expression templates. Of course, this
+is only possible after telling the flintxx how to do the evaluation, by
+specialising evaluation rules defined in \code{flintxx/rules.h}. This file also
+provides convenience macros \code{FLINT_DEFINE_GET} etc., which can be used to
+simplify defining common rules. Using only these files it would already be
+possible to interact with flintxx.
+
+In many situations one needs to define rules which work with varying argument
+types, if those types satisfy certain conditions. This can be achieved using the
+so-called \code{enable_if} idioms together with some meta programming
+(implemented in \code{flintxx/mp.h}) and type traits (mainly in
+\code{flintxx/traits.h} and \code{flintxx/expression_traits.h}). These are the
+files a third party developer should use to interact with flintxx.
+
+In writing wrappers for FLINT C types, there are some more common idioms. These
+are usually expressed as macros \code{FLINTXX_???} and are defined in
+\code{flintxx/flint_classes.h}. As illustrated in the example, the
+\code{FLINTXX_???} macros are meant to complement, not supersede, the
+\code{FLINT_???} macros.
+
+The above considerations and examples should explain how to modify any existing
+class, or write a simple new one, like \code{fmpzxx}. The remaining subsections
+deal with particular difficulties that require work beyond what has been
+explained so far.
+
+\subsection{Patterns for implementing unified coefficient access}
+
+Recall that ``unified coefficient access'' refers to automatically adjusting the
+return type of coefficient access methods, depending on the argument. Let's
+focus on the \code{fmpqxx} example, and in particular the \code{num} method.
+Consider the expression \code{x.num()}. There are three cases: if \code{x} is of
+type \code{fmpqxx} or \code{fmpqxx_ref}, this should return \code{fmpzxx_ref}.
+If \code{x} is of type \code{const fmpqxx}, or \code{fmpqxx_srcref}, this should
+return \code{fmpzxx_srcref}. Otherwise (i.e. if \code{x} is a lazy expression
+template), this should return a lazy expression template.
+
+The way this is implemented is using a traits type. First of all, we need a new
+lazy function to obtain the numerator:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_UNOP(fmpqxx_num)
+\end{lstlisting}
+
+We call the function \code{fmpqxx_num} to hide it somewhat, and discourage
+calling \code{num} as a global function (because this won't have the unified
+coefficient access properties). Next (even before the expression template
+definition), we put the generic traits:
+
+\begin{lstlisting}[language=c++]
+template<class Fmpq>
+struct fmpq_traits {
+    typedef FLINT_UNOP_BUILD_RETTYPE(fmpqxx_num, fmpzxx, Fmpq) numreturn_t;
+    typedef numreturn_t cnumreturn_t;
+    static numreturn_t num(const Fmpq& f)
+        {return fmpqxx_num(f);}
+    // ...
+};
+\end{lstlisting}
+
+This has two typedefs \code{numreturn_t} and \code{cnumreturn_t}, which are the
+types the \code{num()} method should return on non-constant and constant
+instances, respectively. As this trait deals with the lazy expression case, we
+should return a lazy expression in both the constant and non-constant case. Thus
+we get by with only one static function, which can be called with a constant or
+non-constant argument, and which creates a new lazy expression involving our new
+function \code{fmpqxx_num}.
+
+The \code{fmpqxx_expression} class can use the traits as follows:
+
+\begin{lstlisting}[language=c++]
+// class fmpqxx_expression
+    typedef detail::fmpq_traits<fmpqxx_expression> traits_t;
+    typename traits_t::numreturn_t num()
+        {return traits_t::num(*this);}
+\end{lstlisting}
+
+After the definition of the expression template classes, we put the following
+specialisations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpq_traits<fmpqxx_srcref>
+{
+    typedef fmpzxx_srcref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<>
+struct fmpq_traits<fmpqxx_ref>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_ref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<> struct fmpq_traits<fmpqxx>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(const T& f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static numreturn_t num(T& f)
+        {return numreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+\end{lstlisting}
+
+Note how we have to take care of quite a few special cases, and there is not
+actually any obvious duplication going on here. The way the code is written,
+calling \code{num()} on a constant instance of \code{fmpqxx_ref} will yield a
+writable object. This makes sense -- given a constant instance, one can just
+make a (non-constant) copy, and write through it -- but is not really mandatory.
+In
+general, flintxx does not support this kind of writing through constant
+instances of reference classes.
+For example, \code{set_zero} will not work on a \code{const fmpqxx_ref}.
+Thus it would be possible to share some code between the ref and
+nonref implementations of the traits classes. This is done for example in
+\code{padicxx}.
+
+Finally, in the \code{rules} namespace, we have to place an implementation of
+\code{fmpqxx_num}:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_num_op, fmpzxx,
+    FMPQXX_COND_S,
+    fmpz_set(to._fmpz(), fmpq_numref(from._fmpq())))
+\end{lstlisting}
+
+The example of traits usage we see here illustrates how careful one has to be to
+avoid circular class dependencies. In particular, the traits can only be
+specialised after the expression template class has been defined and the special
+immediate cases have been \code{typedef}d. However, they have to be specialised
+before any of the related templates is instantiated.
+
+Note also how the \code{fmpq_traits<fmpqxx_ref>} functions take their argument
+by value, thus automatically obtaining non-constant versions, while declaring
+the argument type via a template. This again delays instantiation, and breaks
+circular dependencies.
+
+\subsection{Nmod classes}
+
+Another common complication is when the underlying C objects are not ``default
+constructible''. For example, the \code{nmod_*} interfaces (\code{nmod_poly},
+\code{nmod_mat}, etc.) always require a modulus for initialisation. This is
+mainly problematic when evaluating compound expressions which require temporary
+objects. In principle flintxx has an easy workaround for this: the expression
+template class can define a \code{create_temporary()} method which is used to
+instantiate a temporary object of the same type as the return type of the
+current expression. However, this only really shifts the problem: now the
+expression template class has to figure out its own modulus.
+
+To complicate matters further, the moduli are not stored in a single type. The
+structures \code{nmod_mat_t}, \code{nmod_poly_t}, \code{nmod_poly_mat_t} all
+store a modulus. Even an expression built out of (say) \code{nmod_poly_mat} can
+return a (say) \code{nmod_poly} (e.g. the determinant), and so the
+\code{nmod_polyxx} class must be able to instantiate a temporary for an
+expression which does not contain any immediate polynomials!
+
+As a final complication, the C objects do not actually only store the modulus
+$n$, but also extra information computed from $n$. This extra information is
+conveniently wrapped up in \code{nmod_t}, although most of the C interfaces do
+not expose this data structure directly.
+
+These problems are overcome as follows. First of all, we do not allow any mixing
+of moduli in compound expressions. Thus the only task of the
+\code{create_temporary} method is to locate \emph{any} modulus inside a
+subexpression. Next, we require objects with a modulus to be recognisable by
+type.\footnote{This is why we disallow empty matrices over
+$\mathbb{Z}/n\mathbb{Z}[X]$. The \code{nmod_poly_mat_t} does not store a
+modulus, so we have to look at an entry.} With these conventions in place, it is
+a matter of bookkeeping (and searching the subexpression tree) to locate a
+modulus.
+
+Additionally, we have a class \code{nmodxx_ctx_srcref} (which is not an
+expression template) which stores a reference to an \code{nmod_t}. All classes
+which want to provide moduli must implement a \code{_ctx()} method which returns
+such an \code{nmodxx_ctx_srcref} object.
+
+In practice, there is a type trait \code{traits::has_nmodxx_ctx<T>} which should
+be specialised for all (immediate) classes wishing to participate in the modulus
+determination. For example, the following lines enable looking up moduli in
+\code{nmod_poly}:
+
+\begin{lstlisting}[language=c++]
+namespace traits {
+template<> struct has_nmodxx_ctx<nmod_polyxx>
+    : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmod_polyxx_ref>
+    : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmod_polyxx_srcref>
+    : mp::true_ { };
+} // traits
+\end{lstlisting}
+
+In addition to this, as mentioned above, the \code{create_temporary} method has
+to be overridden:
+
+\begin{lstlisting}[language=c++]
+// class nmod_polyxx
+    nmodxx_ctx_srcref estimate_ctx() const
+    {
+        return tools::find_nmodxx_ctx(*this);
+    }
+
+    evaluated_t create_temporary() const
+    {
+        return evaluated_t(estimate_ctx());
+    }
+\end{lstlisting}
+
+The function \code{tools::find_nmodxx_ctx} is implemented in \code{nmod_vec.h}
+and traverses the subexpression tree, searching for objects containing moduli,
+and returning the modulus of the first such object found.
+
+%There is one final complication, which is what to do if there are no
+%immediate subexpressions containing moduli.
+% TODO this is probably not worth explaining here
+
+\subsection{Matrix classes}
+
+A related but subtly different problem is posed by matrix classes. Again, these
+are not default instantiable, but one instead needs to specify their dimension
+(numbers of rows and columns). Two new problems arise. First, it is very common
+to mix matrices of differing dimensions in one expression (consider transposing
+a non-square matrix). Second, FLINT does no resizing of matrices.
+
+The latter is problematic, because flintxx uses a technique we call ``temporary
+merging'' where temporary objects needed in a calculation are only identified by
+type, and allowed to be reused. This reduces memory allocation and deallocation.
+
+In the current design, temporary merging cannot be used with matrix classes. The
+type trait \code{traits::use_temporary_merging<T>} must be used to disable it.
+After that, we can override \code{create_temporary} in the usual way, except
+that the method will now be called more often.\footnote{Actually, additional care
+has to be taken with regard to ltuples. We ignore this here for simplicity.}
+
+However, the \code{create_temporary} method still has to figure out the
+dimensions of the resulting matrix. For this, we use the type trait
+\code{outsize}. There are static functions \code{outsize<operation>::rows(m)}
+and \code{outsize<operation>::cols(m)} which yield the dimensions. Of course,
+the \code{outsize} trait has to be specialised appropriately.
+
+All in all, this is quite a lot of work, much of which is independent of the
+actual coefficient ring. For this reason, we have the helper file
+\code{flintxx/matrix.h}. It contains the following:
+\begin{enumerate}
+  \item The \code{matrix_traits} template.
+  \item Definition of operations for common matrix functions (e.g. transpose).
+  \item The \code{matrices::outsize} and \code{matrices::outsize_generic}
+        templates, and appropriate specialisations for common functions
+        (e.g. transpose, multiplication).
+  \item The templates \code{generic_traits_ref}, \code{generic_traits_srcref}
+        and \code{generic_traits_nonref} to simplify unified coefficient access.
+  \item Some convenience macros.
+\end{enumerate}
+
+To see how these things are used, consider the example of \code{fmpz_matxx}.
+We begin with the generic traits type for unified coefficient access:
+
+\begin{lstlisting}[language=c++]
+namespace detail {
+template<class Mat>
+struct fmpz_matxx_traits
+    : matrices::generic_traits<Mat> { };
+} // detail
+\end{lstlisting}
+
+This defines a traits type, which will be used to implement the
+\code{at(i, j)} method with unified access. The implementation defined above is
+the generic one, which is implemented via a call to the lazy operation
+\code{mat_at}.
+
+Next, inside the
+\code{fmpz_matxx_expression} class, the trait is used as follows:
+
+\begin{lstlisting}[language=c++]
+// class fmpz_matxx_expression
+    typedef detail::fmpz_matxx_traits<fmpz_matxx_expression> traits_t;
+
+    template<class Expr>
+    static evaluated_t create_temporary_rowscols(
+            const Expr&, slong rows, slong cols)
+    {
+        return evaluated_t(rows, cols);
+    }
+
+    FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
+\end{lstlisting}
+
+The macro \code{FLINTXX_DEFINE_MATRIX_METHODS} adds methods \code{at},
+\code{rows}, \code{cols} and \code{create_temporary} for us (the function
+\code{create_temporary_rowscols} is used by the implementation of
+\code{create_temporary}). However, these
+methods cannot work unless we provide more information to the matrix helpers.
+The main thing we have to do is to specialise the \code{matrix_traits} trait:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct matrix_traits<fmpz_matxx>
+{
+    template<class M> static slong rows(const M& m)
+    {
+        return fmpz_mat_nrows(m._mat());
+    }
+    template<class M> static slong cols(const M& m)
+    {
+        return fmpz_mat_ncols(m._mat());
+    }
+
+    template<class M> static fmpzxx_srcref at(const M& m, slong i, slong j)
+    {
+        return fmpzxx_srcref::make(fmpz_mat_entry(m._mat(), i, j));
+    }
+    template<class M> static fmpzxx_ref at(M& m, slong i, slong j)
+    {
+        return fmpzxx_ref::make(fmpz_mat_entry(m._mat(), i, j));
+    }
+};
+\end{lstlisting}
+
+This trait means that the class \code{fmpz_matxx} (and all the classes built
+from it, like reference types and lazy expressions) wants to use the matrix
+helpers framework. It also specifies how to determine the dimension of immediate
+objects, and how to access their coefficients. (The framework will never call
+these trait functions with non-immediates, but we use a template nonetheless so
+the functions also work on reference types.)
+
+Furthermore, we have to specialise some more type traits to disable temporary
+merging. This is done using the following convenience macro:
+
+\begin{lstlisting}[language=c++]
+// temporary instantiation stuff
+FLINTXX_DEFINE_TEMPORARY_RULES(fmpz_matxx)
+\end{lstlisting}
+
+The matrix class is now almost operational. In standard expressions (involving
+transpose, matrix multiplication etc.) temporary objects of the correct dimensions
+will be allocated automatically. What remains to be done is to implement the rest of
+the unified coefficient access, and matrix dimension rules for more esoteric
+functions.
+
+The unified coefficient access implementation can in principle be done precisely
+as described in a previous subsection.
+However, it is essentially the same in all matrix classes,
+which is why we provide default implementations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpz_matxx_traits<fmpz_matxx_srcref>
+    : matrices::generic_traits_srcref<fmpzxx_srcref> { };
+template<>
+struct fmpz_matxx_traits<fmpz_matxx_ref>
+    : matrices::generic_traits_ref<fmpzxx_ref> { };
+template<> struct fmpz_matxx_traits<fmpz_matxx>
+    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref> { };
+\end{lstlisting}
+
+We still have to provide a \code{mat_at} rule:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, fmpzxx,
+        FMPZ_MATXX_COND_S, traits::fits_into_slong, traits::fits_into_slong,
+        fmpz_set(to._fmpz(), fmpz_mat_entry(e1._mat(), e2, e3)))
+\end{lstlisting}
+
+Now all that remains to be done is to inform the matrices framework of dimension
+calculations for functions it is not aware of. For \code{fmpz_matxx}, one
+example is a particular multiplication algorithm. Of course, the rule is just
+the same as for ordinary multiplication, so the specialisation is very simple:
+
+\begin{lstlisting}[language=c++]
+namespace matrices {
+template<>
+struct outsize<operations::mul_multi_mod_op>
+    : outsize<operations::times> { };
+} // matrices
+\end{lstlisting}
+
+In general, if there is no rule, a default case will be used. If the number of
+arguments is not two, this assumes that the first argument is a matrix, and that
+the dimensions of the output will match the dimensions of this first argument.
+If there are two arguments, at least one of which is a matrix, then the
+dimension of one of those is returned (with no guarantee which if there are two
+matrices). This default rule works for matrix addition, matrix-scalar
+multiplication (on either side), and ``elementwise'' operations.
+
+\subsection{Padic classes}
+
+The classes representing padic numbers (\code{padicxx}, \code{padic_polyxx},
+\code{padic_matxx} and \code{qadic}) come with their own difficulties. These are
+twofold.
+
+First of all, padic number data is split into two data structures: the actual
+number data (e.g. \code{padic_t}), and a \emph{context} (\code{padic_ctx_t})
+containing meta data.
+Any operation on padic numbers needs to be passed both the number data and a
+context. In order to facilitate this, all C++ wrappers for padics store a
+reference to a context. We can then use a lookup scheme similar to the
+\code{nmod_*} case to find a context suitable for a whole expression.
+
+One difference is that the context reference has to be stored with every
+immediate object (e.g. in \code{padic_data}). This also includes the reference
+types, and hence requires specialising \code{flint_classes::ref_data} and
+\code{flint_classes::srcref_data}.
+
+Secondly, all padic computations are necessarily just approximations. That is to
+say, like real numbers, padic numbers cannot in general be stored exactly. Thus
+every padic number also stores its own precision. When the C library is asked to
+perform an operations, such as \code{a = b + c}, it will treat \code{b} and
+\code{c} as exact padic numbers (similarly to how we can treat a decimal
+approximation to a real number, such as $3.14$, as the exact real number
+$3.140000\dots$). Then it implements an algorithm which is equivalent to
+performing the computation \code{b + c} exactly and truncating to the precision
+of \code{c} in the end. This gives very well-defined semantics, and very fine
+control over the behaviour, but is unfortunately not very well-suited to
+implementing automatic evaluation of compound expressions. In flintxx, we have
+decided to (notionally) assign a precision to every compound expression. All
+temporaries used will be instantiated with this precision.
+
+The precision of a compound expression is computed as the maximum of the
+precision of all of its (immediate) subexpressions. In order to still be able to
+change this precision, all immediates have a \code{.toN(n)} method which
+(notionally) raises or lowers their precision. This is implemented by extending
+the functionality of the \code{padicxx_srcref} type. Namely, in
+\code{padicxx_srcref}, in addition to a \code{const padic_struct*} and
+\code{padicxx_ctx_srcref}, we also store an additional \code{slong N}
+representing the notional precision. The usual constructors of
+\code{padicxx_srcref} just initialise \code{N} from the underlying
+\code{padic_struct}. But we provide additional constructors which allow setting
+this parameter explicitly. The \code{toN} method makes use of these
+constructors.
+
+We thus see that quite a bit of infrastructure is needed to build a new padic
+class. To facilitate this, \code{padicxx.h} defines some convenience macros. In
+summary, the following steps are necessary:
+
+\begin{enumerate}
+\item Implement a traits type for computing \code{prec()} and \code{val()}.
+  In the general case, \code{prec()} should return
+  \code{tools::padic_output_prec}.
+
+\item In the expression class, typedef \code{traits_t} and invoke the macro
+  \code{PADICXX_DEFINE_STD}.\footnote{This adds context estimation, \code{toN},
+  \code{prec} and \code{val} methods. Alternatively invoke a subset of
+  \code{PADICXX_DEFINE_CTX}, \code{PADICXX_DEFINE_ESTIMATE_CTX},
+  \code{PADICXX_DEFINE_TON}, \code{PADICXX_DEFINE_PREC},
+  \code{PADICXX_DEFINE_VAL}.}
+
+\item Enable the trait \code{has_padicxx_ctx} for your immediate classes.
+
+\item Specialise the traits type. For reference and non-reference immediates,
+  it should return the precision stored with the objects. For srcref, it should
+  return the N field in \code{_data()}.\footnote{\code{val()} can be an ordinary
+  unified access implementation.}
+
+\item Invoke the macro
+  \code{PADICXX_DEFINE_REF_STRUCTS(classname, structname, precname)}.
+  Here \code{classname} is the name of the non-reference immediate (e.g.
+  \code{padicxx}), \code{structname} is the name of the underlying C struct (e.g.
+  \code{padic_struct}) and \code{precname} is the name of the function for
+  accessing the precision (e.g. \code{padic_prec}). This specialises the
+  \code{flint_classes::ref_data} and \code{flint_classes::srcref_data}
+  templates, adding a context reference and \code{toN} support.
+\end{enumerate}
+
+The implementation of \code{qadicxx} is slightly different since it uses a
+larger context. But this contains \code{padic_ctx} as a substruct, and hence it
+is not difficult to incorporate \code{qadicxx} into the context lookup
+infrastructure. See the source for more details.
+
+\subsection{Vector classes}
+
+Vectors do not have very good representation in FLINT. Usually, but not
+universally, a vector of type
+\code{foo_t} is represented as \code{foo_struct*}, with size passed in
+explicitly. Some vector types have support functions in FLINT, typically all
+underscored.
+
+In flintxx we implement some first class vectors, but the interfaces are not
+very well developed and relatively ad-hoc.
+
+\section{Some tidbits and caveats}
+
+One C++ idiom which may initially look staggering is \code{enable_if}. A typical
+usage is as follows:
+
+\begin{lstlisting}[language=c++]
+template<class T>
+void foo(T,
+    typename enable_if<is_signed_integer<T> >::type* = 0)
+{
+    cout << 'a';
+}
+
+template<class T>
+void foo(T,
+    typename enable_if<is_unsigned_integer<T> >::type* = 0)
+{
+    cout << 'b';
+}
+
+...
+foo(4);   // a
+foo(4u);  // b
+foo("x"); // error
+\end{lstlisting}
+
+What happens syntactically here is that we define two functions called
+\code{foo}. In C++ this is allowed, such a function is called \emph{overloaded},
+and depending on the arguments it is called with, the so-called overloading
+algorithm decides which instance to call. Additionally, both functions we define
+are actually \emph{function templates}. Normally, a function template like
+\code{template<class T> void foo(T)} can be called with arbitrary
+arguments, and so overloading makes little sense.\footnote{One may still overload
+e.g. \code{foo(T&)} and \code{foo(const T&)}, and say \code{foo(int)}; the
+overloading algorithm determines a ``best match'', and so this overloading can
+still be useful. However the details of what constitutes a best match are
+complicated, and if there are several equally-good matches (none of which is
+``best'') then an error will be issued.} But of course the point to observe is
+that our overloaded functions have an additional argument, which depends on
+\code{T}. Syntactically, there is an un-named pointer argument, which defaults
+to zero.\footnote{It is not terribly important that this is a pointer type, it
+could be say int, but \code{enable_if<...>::type} is defined to be void, and so
+converting to a pointer is the easiest way to turn this into a function
+argument.} What happens now is that depending on \code{T}, the function
+signature may be syntactically invalid! Indeed, the template
+\code{enable_if<cond>} has a member \code{type} only if \code{cond} is true.
+Otherwise \code{enable_if<cond>} is just completely empty, and the function
+signature makes no sense. But this is fine, according to the
+SFINAE\footnote{``Substitution Failure Is Not An Error''} rule of C++, if
+something like this happens during overload resolution, the algorithm just
+discards this possibility. So in general, what the overload algorithm does it
+looks for all function templates (and functions) which the overloaded call could
+possibly match (this by itself is a complicated procedure, because of so-called
+argument-dependent lookup ...), then tries to instantiate all the function
+templates, discards all which have substitution failures, and then tries to find
+the best match in the remaining list.
+
+Similar rules also apply in resolving partially specialised template types. In
+this case, the pattern usually looks like this:
+
+\begin{lstlisting}[language=c++]
+template<class T, class Enable = void>
+struct foo
+{
+    static const int a = 0;
+};
+
+template<class T>
+struct foo<T,
+    typename enable_if<is_unsigned_integer<T> >::type>
+{
+    static const int a = 1;
+};
+
+template<class T>
+struct foo<T,
+    typename enable_if<is_signed_integer<T> >::type>
+{
+    static const int a = 2;
+};
+
+...
+foo<const char*>::a; // 0
+foo<int>::a;         // 2
+foo<unsigned>::a;    // 1
+\end{lstlisting}
+
+It may seem tempting to enable member functions conditionally on class template
+arguments, like this:
+
+\begin{lstlisting}
+template<class T>
+struct foo
+{
+    void bar(typename enable_if<is_integer<T> >::type* = 0) {...}
+};
+\end{lstlisting}
+
+But this is not possible. The problem is, more or less,
+that when instantiating \code{foo<int>}, after replacing \code{T} by \code{int},
+the entire class signature has to be well-formed, which it just is not.
+Nonetheless it is typically straightforward to workaround this. You just have to
+ensure that the signature of your member function is well-formed for any
+template argument \code{T}. Then in the function body, which is instantiated
+only when the function is actually called, you can add a \code{STATIC_ASSERT} to
+make it plain that this function should only be called with integers, etc.
+
+Another thing to keep in mind is that in C++98, the expressions \code{> >} and
+\code{>>} are very different. The latter is a shift operator, and cannot be used
+to close template argument lists. Thus expressions like
+\code{not_<is_integer<T>>} are invalid in C++98, one has to write
+\code{not_<is_intiger<T> >} instead.
+
+On a similar note, the meaning of an expression involving template arguments can
+in some situations depend on the template parameter, and sometimes this has to
+be made explicit. A typical situation is \code{T::something}, which may refer to
+either a static member value, or a member type of T. If the latter is desired,
+in most situations one needs to write \code{typename T::something}. Similarly if
+\code{T} has a member template (function, say), then one cannot write
+\code{T::something<int>()}, but instead has to write
+\code{T::template something<int>()}. Most modern compilers will suggest the
+alternative syntax when such an error is encountered.
+
+\input{input/genericxx.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %
