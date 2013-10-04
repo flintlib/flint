@@ -31,7 +31,7 @@
 #include "qadic.h"
 
 #ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT "/home/user/FLINT/flint-2/qadic/CPimport.txt"
+#define FLINT_CPIMPORT "CPimport.txt"
 #endif
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
@@ -53,8 +53,13 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     if (!file)
     {
-        flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
-        abort();
+        file = fopen("CPimport.txt", "r");
+
+        if (!file)
+        {
+            flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
+            abort();
+        }
     }
 
     while (fgets(buf, 832, file))
