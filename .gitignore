@@ -1,0 +1,14 @@
+*~
+*.orig
+*.d
+*.o
+*.a
+*.so
+*.P
+*/.deps/*
+fmpz/fmpz.c
+build/
+config.h
+fft_tuning.h
+fmpz-conversions.h
+Makefile
