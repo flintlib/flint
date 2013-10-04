@@ -45,7 +45,7 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
         /* unsigned limb by limb multiply (assembly for most CPU's) */
         umul_ppmm(prod[1], prod[0], uc2, x);
-        if (c2 < 0L)
+        if (c2 < WORD(0))
             fmpz_neg_uiui(f, prod[1], prod[0]);
         else
             fmpz_set_uiui(f, prod[1], prod[0]);

@@ -37,11 +37,11 @@ n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
     mp_ptr t, u, v;
     mp_limb_t r, s;
 
-    if (p == 1UL || n >= p)
-        return 0UL;
+    if (p == UWORD(1) || n >= p)
+        return UWORD(0);
 
     if (n <= 1)
-        return 1UL;
+        return UWORD(1);
 
     nmod_init(&mod, p);
 
@@ -51,9 +51,9 @@ n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
     u = _nmod_vec_init(m + 1);
     v = _nmod_vec_init(m + 1);
 
-    t[0] = 0UL;
+    t[0] = UWORD(0);
     for (i = 1; i < m; i++)
-        t[i] = n_submod(t[i-1], 1UL, p);
+        t[i] = n_submod(t[i-1], UWORD(1), p);
 
     _nmod_poly_product_roots_nmod_vec(u, t, m, mod);
 

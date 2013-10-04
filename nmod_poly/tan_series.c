@@ -38,7 +38,7 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     if (n <= 3)
     {
-        g[0] = 0UL;
+        g[0] = UWORD(0);
         if (n >= 2) g[1] = h[1];
         if (n >= 3) g[2] = h[2];
         return;
@@ -53,8 +53,8 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     u = _nmod_vec_init(n);
 
     _nmod_poly_mul(u, g, m, g, m, mod);
-    u[0] = 1UL;
-    if (2*m - 1 < n) u[n-1] = 0UL;
+    u[0] = UWORD(1);
+    if (2*m - 1 < n) u[n-1] = UWORD(0);
 
     _nmod_poly_atan_series(t, g, n, mod);
     _nmod_vec_sub(t + m, h + m, t + m, n - m, mod);
@@ -73,7 +73,7 @@ nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     
     h_len = h->length;
 
-    if (h_len > 0 && h->coeffs[0] != 0UL)
+    if (h_len > 0 && h->coeffs[0] != UWORD(0))
     {
         flint_printf("Exception (nmod_poly_tan_series). Constant term != 0.\n");
         abort();

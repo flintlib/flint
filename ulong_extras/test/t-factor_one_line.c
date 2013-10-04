@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    flint_rand_t state;
    
    flint_printf("factor_one_line....");
@@ -52,14 +52,14 @@ int main(void)
          bits = n_randint(state, 20);
 #endif
          n1 = n_randtest_bits(state, bits + 1);
-      } while (n_is_prime(n1) || (n1 == 1UL));
+      } while (n_is_prime(n1) || (n1 == UWORD(1)));
       
       n2 = n_factor_one_line(n1, 50000);
       
       if (n2)
       {
          count++;
-         result = ((n1%n2) == 0UL);
+         result = ((n1%n2) == UWORD(0));
 
          if (!result)
          {

@@ -53,7 +53,7 @@ int main()
         arith_chebyshev_t_polynomial(T2, n);
 
         /* Verify T_{n+1} = 2 x T_n - T_{n-1} */
-        fmpz_poly_scalar_mul_ui(t, T1, 2UL);
+        fmpz_poly_scalar_mul_ui(t, T1, UWORD(2));
         fmpz_poly_shift_left(t, t, 1);
         fmpz_poly_sub(t, t, T0);
 

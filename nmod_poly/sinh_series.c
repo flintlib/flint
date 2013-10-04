@@ -35,7 +35,7 @@ _nmod_poly_sinh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
     mp_ptr g = _nmod_vec_init(n);
     _nmod_poly_exp_expinv_series(f, g, h, n, mod);
     _nmod_vec_sub(f, f, g, n, mod);
-    _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(2UL, mod.n), mod);
+    _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(UWORD(2), mod.n), mod);
     _nmod_vec_clear(g);
 }
 
@@ -48,7 +48,7 @@ nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     
     h_len = h->length;
 
-    if (h_len > 0 && h->coeffs[0] != 0UL)
+    if (h_len > 0 && h->coeffs[0] != UWORD(0))
     {
         flint_printf("Exception (nmod_poly_sinh_series). Constant term != 0.\n");
         abort();

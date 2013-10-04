@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    mp_limb_t d, j;
    mpz_t d_m;
    flint_rand_t state;
@@ -49,7 +49,7 @@ int main(void)
       do
       {
          d = n_randtest_not_zero(state);
-         if (d == 1UL) d++;
+         if (d == UWORD(1)) d++;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -58,8 +58,8 @@ int main(void)
       do
       {
          j = n_randtest(state) % d;
-         if ((j == 1L) && (d != 2UL)) j++;
-      } while (n_gcd(d, j) != 1UL);
+         if ((j == WORD(1)) && (d != UWORD(2))) j++;
+      } while (n_gcd(d, j) != UWORD(1));
 
       result = n_is_probabprime_fermat(d, j);
       if (!result)
@@ -79,15 +79,15 @@ int main(void)
       do
       {
          d = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
-         if (d < 2UL) d = 2;
+         if (d < UWORD(2)) d = 2;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       do
       {
          j = n_randtest(state) % d;
-         if ((j == 1L) && (d != 2UL)) j++;
-      } while (n_gcd(d, j) != 1UL);
+         if ((j == WORD(1)) && (d != UWORD(2))) j++;
+      } while (n_gcd(d, j) != UWORD(1));
 
       if (n_is_probabprime_fermat(d, j)) count++;
       

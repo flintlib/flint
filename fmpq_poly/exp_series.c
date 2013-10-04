@@ -75,7 +75,7 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (poly->length == 0)
     {
-        fmpq_poly_set_ui(res, 1UL);
+        fmpq_poly_set_ui(res, UWORD(1));
         return;
     }
 
@@ -88,7 +88,7 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
     if (n < 2)
     {
         if (n == 0) fmpq_poly_zero(res);
-        if (n == 1) fmpq_poly_set_ui(res, 1UL);
+        if (n == 1) fmpq_poly_set_ui(res, UWORD(1));
         return;
     }
 

@@ -59,7 +59,7 @@ main(void)
         if (m)
             fmpz_randtest(det, state, 30);
         else
-            fmpz_set_ui(det, 1UL);
+            fmpz_set_ui(det, UWORD(1));
 
         fmpz_mat_randdet(A, state, det);
         fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));

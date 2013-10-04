@@ -56,7 +56,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
     }
     
     mpz_init(z);
-    if (*poly->den == 1L)
+    if (*poly->den == WORD(1))
     {
         denlen = 0;
     }

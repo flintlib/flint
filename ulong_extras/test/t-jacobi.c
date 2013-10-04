@@ -49,7 +49,7 @@ int main(void)
       mpz_init(d_m);
       
       a = n_randtest(state);
-      d = n_randtest_not_zero(state) | 1L;
+      d = n_randtest_not_zero(state) | WORD(1);
       
       r1 = n_jacobi(a, d);
 

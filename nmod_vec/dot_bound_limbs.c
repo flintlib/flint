@@ -37,7 +37,7 @@ _nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
     umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
     umul_ppmm(t2, t1, t1, len);
     umul_ppmm(u1, u0, t0, len);
-    add_sssaaaaaa(t2, t1, t0,  t2, t1, 0UL,  0UL, u1, u0);
+    add_sssaaaaaa(t2, t1, t0,  t2, t1, UWORD(0),  UWORD(0), u1, u0);
 
     if (t2 != 0) return 3;
     if (t1 != 0) return 2;

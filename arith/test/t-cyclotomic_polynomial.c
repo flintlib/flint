@@ -39,7 +39,7 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 
     fmpz_poly_init(t);
 
-    fmpz_poly_set_ui(poly, 1UL);
+    fmpz_poly_set_ui(poly, UWORD(1));
     for (d = 1; d <= n; d++)
     {
         if (n % d == 0)
@@ -109,8 +109,8 @@ int main()
     {
         fmpz_t h, ref;
 
-        const ulong nn = 10163195UL;
-        /* const ulong nn = 169828113UL;  64-bit case */
+        const ulong nn = UWORD(10163195);
+        /* const ulong nn = UWORD(169828113);  64-bit case */
 
         fmpz_init(h);
         fmpz_init(ref);
@@ -118,7 +118,7 @@ int main()
         /* fmpz_set_str(ref, "31484567640915734941", 10);  64-bit case */
 
         fmpz_poly_init(A);
-        arith_cyclotomic_polynomial(A, 10163195UL);
+        arith_cyclotomic_polynomial(A, UWORD(10163195));
         fmpz_poly_height(h, A);
 
         if (!fmpz_equal(h, ref))

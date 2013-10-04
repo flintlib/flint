@@ -148,7 +148,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     qsieve_ll_poly_init(qs_inf);
 
     /************************************************************************
-        INITIALISE RELATION/LINALG DATA:
+        INITIALISE RELATION/LINAXYXYXYXY DATA:
         
         Create space for all the relations and matrix information
     ************************************************************************/

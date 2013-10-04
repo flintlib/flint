@@ -207,7 +207,7 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         padic_zero(rop);
         return 1;
     }
-    if (padic_val(op) & 1L)
+    if (padic_val(op) & WORD(1))
     {
         return 0;
     }

@@ -53,7 +53,7 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_randtest(b, state, n_randint(state, 10), 100);
 
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
 
         fmpz_poly_pow_binexp(a, b, exp);
         fmpz_poly_pow_binexp(b, b, exp);
@@ -82,7 +82,7 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_randtest(b, state, n_randint(state, 10), 100);
 
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
 
         fmpz_poly_pow_binexp(a, b, exp);
         fmpz_poly_pow(b, b, exp);

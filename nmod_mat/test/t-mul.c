@@ -43,7 +43,7 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     {
         for (j = 0; j < B->c; j++)
         {
-            s0 = s1 = s2 = 0UL;
+            s0 = s1 = s2 = UWORD(0);
 
             for (k = 0; k < A->c; k++)
             {

@@ -49,7 +49,7 @@ int main(void)
         n1 = n_randtest_not_zero(state);
         n_factor(&factors, n1, 0);
 
-        n2 = 1UL;
+        n2 = UWORD(1);
         for (j = 0; j < factors.num; j++)
         {
             n2 *= n_pow(factors.p[j], factors.exp[j]);
@@ -70,10 +70,10 @@ int main(void)
 
         n_factor_init(&factors);
 
-        n1 = 4253857039UL;
+        n1 = UWORD(4253857039);
         n_factor(&factors, n1, 0);
 
-        n2 = 1UL;
+        n2 = UWORD(1);
         for (j = 0; j < factors.num; j++)
         {
             n2 *= n_pow(factors.p[j], factors.exp[j]);

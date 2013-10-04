@@ -62,7 +62,7 @@ main(void)
         nmod_mat_randtest(B, state);
 
         nmod_mat_scalar_mul(C, A, c);
-        nmod_mat_scalar_mul(D, A, nmod_sub(c, 1UL, A->mod));
+        nmod_mat_scalar_mul(D, A, nmod_sub(c, UWORD(1), A->mod));
 
         /* c*A - (c-1)*A == A */
         nmod_mat_sub(D, C, D);

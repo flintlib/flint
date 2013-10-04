@@ -53,7 +53,7 @@ arith_bell_number_vec_multi_mod(fmpz * res, slong n)
     polys = flint_malloc(num_primes * sizeof(mp_ptr));
 
     /* Compute Bell numbers mod p */
-    primes[0] = n_nextprime(1UL<<prime_bits, 0);
+    primes[0] = n_nextprime(UWORD(1)<<prime_bits, 0);
     for (k = 1; k < num_primes; k++)
         primes[k] = n_nextprime(primes[k-1], 0);
 

@@ -64,8 +64,8 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
       return fft_split_limbs(poly, limbs, total_limbs, bits/FLINT_BITS, output_limbs);
 
    coeff_limbs = (bits/FLINT_BITS) + 1;
-   mask = (1L<<top_bits) - 1L;
-   shift_bits = 0L;
+   mask = (WORD(1)<<top_bits) - WORD(1);
+   shift_bits = WORD(0);
    limb_ptr = limbs;                      
     
    for (i = 0; i < length - 1; i++)

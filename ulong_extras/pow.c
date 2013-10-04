@@ -33,7 +33,7 @@ mp_limb_t n_pow(mp_limb_t n, ulong exp)
    ulong i;
    mp_limb_t res;
 
-   res = 1UL;
+   res = UWORD(1);
    for (i = 0; i < exp; i++)
       res *= n;
 

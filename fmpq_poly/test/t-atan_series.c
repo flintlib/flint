@@ -39,7 +39,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("atan_series....");
     fflush(stdout);
@@ -56,7 +56,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_canonicalise(a);
 
@@ -91,14 +91,14 @@ main(void)
         fmpq_poly_init(atanB);
 
         fmpq_poly_randtest_not_zero(A, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(A, 0, 0UL);
+        fmpq_poly_set_coeff_ui(A, 0, UWORD(0));
 
         fmpq_poly_randtest_not_zero(B, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(B, 0, 0UL);
+        fmpq_poly_set_coeff_ui(B, 0, UWORD(0));
 
         fmpq_poly_mullow(B, A, A, n);
         fmpq_poly_neg(B, B);
-        fmpq_poly_set_coeff_ui(B, 0, 1UL);
+        fmpq_poly_set_coeff_ui(B, 0, UWORD(1));
         fmpq_poly_div_series(B, A, B, n);
         fmpq_poly_add(B, B, B);
 

@@ -44,7 +44,7 @@ _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* cos(x) = (1-tan(x/2)^2)/(1+tan(x/2)^2) */
-    fmpz_mul_ui(uden, hden, 2UL);
+    fmpz_mul_ui(uden, hden, UWORD(2));
     _fmpq_poly_tan_series(t, tden, h, uden, n);
     _fmpq_poly_mullow(u, uden, t, tden, n, t, tden, n, n);
 
@@ -71,7 +71,7 @@ fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 
     if (f->length == 0)
     {
-        fmpq_poly_set_ui(res, 1UL);
+        fmpq_poly_set_ui(res, UWORD(1));
         return;
     }
 
@@ -84,7 +84,7 @@ fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
     if (n < 2)
     {
         if (n == 0) fmpq_poly_zero(res);
-        if (n == 1) fmpq_poly_set_ui(res, 1UL);
+        if (n == 1) fmpq_poly_set_ui(res, UWORD(1));
         return;
     }
 

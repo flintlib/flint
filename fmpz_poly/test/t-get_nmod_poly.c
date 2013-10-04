@@ -64,7 +64,7 @@ main(void)
         else
             fmpz_poly_set_nmod_poly_unsigned(A, M);
 
-        fmpz_poly_scalar_mul_ui(A, A, 2UL);
+        fmpz_poly_scalar_mul_ui(A, A, UWORD(2));
         nmod_poly_add(M, M, M);
         fmpz_poly_get_nmod_poly(M2, A);
 

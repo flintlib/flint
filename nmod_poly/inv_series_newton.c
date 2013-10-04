@@ -46,7 +46,7 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
         slong *a, i, m;
         mp_ptr W;
 
-        for (i = 1; (1L << i) < n; i++) ;
+        for (i = 1; (WORD(1) << i) < n; i++) ;
 
         W = flint_malloc(n * sizeof(mp_limb_t) + i * sizeof(slong));
         a = (slong *) (W + n);

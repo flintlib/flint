@@ -60,12 +60,12 @@ main(void)
         nmod_poly_init(one, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_cosh_series(coshA, A, n);
         nmod_poly_sinh_series(sinhA, A, n);
         nmod_poly_mullow(B, coshA, coshA, n);
-        nmod_poly_set_coeff_ui(one, 0, 1UL);
+        nmod_poly_set_coeff_ui(one, 0, UWORD(1));
         nmod_poly_sub(B, B, one);
         nmod_poly_mullow(C, sinhA, sinhA, n);
 
@@ -103,7 +103,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_cosh_series(B, A, n);
         nmod_poly_cosh_series(A, A, n);

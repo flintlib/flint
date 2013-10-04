@@ -46,7 +46,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
     fmpz_mul(rden, den, t);
 
-    fmpz_set_ui(t, 2UL);
+    fmpz_set_ui(t, UWORD(2));
     for (k = 3; k < len; k++)
     {
         fmpz_mul(rpoly + k, rpoly + k, t);

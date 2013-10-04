@@ -60,7 +60,7 @@ main(void)
         coeff = n_randlimb(state) % mod;
         power = 1 + n_randint(state, 2*n + 1);
 
-        nmod_poly_set_coeff_ui(A, 0, 1UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(1));
         nmod_poly_set_coeff_ui(A, power, coeff);
 
         nmod_poly_log_series(logA, A, n);

@@ -53,8 +53,8 @@ int main(void)
 
       sdiv_qrnnd(q, r, nh, nl, d);
       smul_ppmm(ph, pl, d, q);
-      if (r < 0L) sub_ddmmss(ph, pl, ph, pl, 0UL, -r);
-      else add_ssaaaa(ph, pl, ph, pl, 0UL, r);
+      if (r < WORD(0)) sub_ddmmss(ph, pl, ph, pl, UWORD(0), -r);
+      else add_ssaaaa(ph, pl, ph, pl, UWORD(0), r);
 
       result = ((ph == nh) && (pl == nl));
 

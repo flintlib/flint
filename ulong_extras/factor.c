@@ -45,10 +45,10 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
    mp_limb_t cofactor, factor, cutoff;
 
    cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
-   if (cofactor == 1UL) return;
+   if (cofactor == UWORD(1)) return;
    if (is_prime(cofactor, proved)) 
    {
-      n_factor_insert(factors, cofactor, 1UL);
+      n_factor_insert(factors, cofactor, UWORD(1));
       return;
    }
 

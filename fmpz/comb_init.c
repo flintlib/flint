@@ -40,7 +40,7 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
     temp->n = n = comb->n;
     temp->comb_temp = (fmpz **) flint_malloc(n * sizeof(fmpz *));
 
-    j = (1L << (n - 1));
+    j = (WORD(1) << (n - 1));
     for (i = 0; i < n; i++)
     {
         temp->comb_temp[i] = _fmpz_vec_init(j);
@@ -79,7 +79,7 @@ fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
     comb->res = (fmpz **) flint_malloc(n * sizeof(fmpz *));
 
     /* Size of top level */
-    j = (1L << (n - 1));
+    j = (WORD(1) << (n - 1));
 
     /* Initialise arrays at each level */
 	for (i = 0; i < n; i++)
@@ -105,7 +105,7 @@ fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
 	}
 
     /* Set the rest of the entries on that row of the comb to 1 */
-    num = (1L << n);
+    num = (WORD(1) << n);
 	for (; i < num; i += 2, j++)
     {
         fmpz_one(comb->comb[0] + j);
@@ -142,7 +142,7 @@ fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
     /* Compute remaining inverses, each level
        combining pairs from the level below */
 	log_res = 1;
-    num = (1L << (n - 1));
+    num = (WORD(1) << (n - 1));
 
     while (log_res < n)
     {

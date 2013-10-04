@@ -44,12 +44,12 @@ nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
             else if (i == j)
             {
                 nmod_mat_entry(mat, i, j) = n_randlimb(state) % (mat->mod.n);
-                if (unit || nmod_mat_entry(mat, i, j) == 0UL)
-                    nmod_mat_entry(mat, i, j) = 1UL;
+                if (unit || nmod_mat_entry(mat, i, j) == UWORD(0))
+                    nmod_mat_entry(mat, i, j) = UWORD(1);
             }
             else
             {
-                nmod_mat_entry(mat, i, j) = 0UL;
+                nmod_mat_entry(mat, i, j) = UWORD(0);
             }
         }
     }

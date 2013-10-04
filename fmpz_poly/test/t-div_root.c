@@ -64,7 +64,7 @@ main(void)
 
         fmpz_poly_set_coeff_fmpz(D, 0, c);
         fmpz_poly_neg(D, D);
-        fmpz_poly_set_coeff_ui(D, 1, 1UL);
+        fmpz_poly_set_coeff_ui(D, 1, UWORD(1));
 
         fmpz_poly_div_basecase(DQ, P, D);
 

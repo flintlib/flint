@@ -45,7 +45,7 @@ void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, slong n, const fmpz_t x)
         flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
     }
     
-    if (*poly->den == 1L)
+    if (*poly->den == WORD(1))
     {
         fmpz_set(poly->coeffs + n, x);
         if (replace)

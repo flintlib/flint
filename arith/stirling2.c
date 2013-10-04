@@ -100,7 +100,7 @@ arith_stirling_number_2(fmpz_t s, slong n, slong k)
             /* S(n,n-1) = binomial(n,2) */
             fmpz_set_ui(s, n);
             fmpz_mul_ui(s, s, n-1);
-            fmpz_divexact_ui(s, s, 2UL);
+            fmpz_divexact_ui(s, s, UWORD(2));
         }
         return;
     }
@@ -115,7 +115,7 @@ arith_stirling_number_2(fmpz_t s, slong n, slong k)
             /* S(n,2) = 2^(n-1)-1 */
             fmpz_one(s);
             fmpz_mul_2exp(s, s, n-1);
-            fmpz_sub_ui(s, s, 1UL);
+            fmpz_sub_ui(s, s, UWORD(1));
         }
         return;
     }

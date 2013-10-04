@@ -38,7 +38,7 @@ mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
 
     m = n_randlimb(state);
 
-    if (m & 7UL)
+    if (m & UWORD(7))
     {
         n = n_randbits(state, bits);
     }
@@ -46,28 +46,28 @@ mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
     {
         m >>= 3;
 
-        switch (m & 7UL)
+        switch (m & UWORD(7))
         {
             case 0:  n = 0;         break;
             case 1:  n = 1;         break;
             case 2:  n = COEFF_MAX; break;
             case 3:  n = LONG_MAX;  break;
             case 4:  n = ULONG_MAX; break;
-            case 5:  n =  (1UL<<n_randint(state, FLINT_BITS)) 
-                        - (1UL<<n_randint(state, FLINT_BITS));
+            case 5:  n =  (UWORD(1)<<n_randint(state, FLINT_BITS)) 
+                        - (UWORD(1)<<n_randint(state, FLINT_BITS));
                                     break;
-            case 6:  n =  (1UL<<n_randint(state, FLINT_BITS));
+            case 6:  n =  (UWORD(1)<<n_randint(state, FLINT_BITS));
                                     break;
-            case 7:  n = -(1UL<<n_randint(state, FLINT_BITS));
+            case 7:  n = -(UWORD(1)<<n_randint(state, FLINT_BITS));
                                     break;
             default: n = 0;
         }
 
         if (bits < FLINT_BITS)
-           n &= ((1UL<<bits) - 1UL); /* mask it off */
+           n &= ((UWORD(1)<<bits) - UWORD(1)); /* mask it off */
 
         if (bits) /* set most significant bit */
-           n |= (1UL<<(bits - 1));
+           n |= (UWORD(1)<<(bits - 1));
         else
            n = 0;
     }

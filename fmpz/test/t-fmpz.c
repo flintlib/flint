@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_t a, b;
 
-        *a = 0L;
+        *a = WORD(0);
 
         fmpz_randtest(a, state, FLINT_BITS - 2);
 

@@ -58,7 +58,7 @@ int _fmpz_poly_is_squarefree(const fmpz * poly, slong len)
         fmpz * w = _fmpz_vec_init(2 * len);
         
         _fmpz_poly_derivative(w, poly, len);
-        _fmpz_poly_gcd(w + len, poly, len, w, len - 1L);
+        _fmpz_poly_gcd(w + len, poly, len, w, len - WORD(1));
         ans = _fmpz_vec_is_zero(w + len + 1, len - 2);
  
         _fmpz_vec_clear(w, 2 * len);

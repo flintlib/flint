@@ -73,7 +73,7 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
 
         fmpz_set_limbs(rop, xp, lw);
 
-        if (op < 0L)
+        if (op < WORD(0))
             fmpz_neg(rop, rop);
     }
 }
@@ -100,7 +100,7 @@ void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
       mpn_copyi(xp, m->_mp_d, lw);
    } else
    {
-      if (c < 0L)
+      if (c < WORD(0))
          xp[0] = -c;
       else
          xp[0] = c;

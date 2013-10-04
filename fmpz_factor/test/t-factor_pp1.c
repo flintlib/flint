@@ -35,7 +35,7 @@
 int main(void)
 {
    int i, j, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    gmp_randstate_t st;
    flint_rand_t state;
    gmp_randinit_default(st);

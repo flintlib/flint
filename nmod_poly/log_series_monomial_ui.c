@@ -46,12 +46,12 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
     coeff = n_negmod(coeff, mod.n);
 
     /* Construct geometric series */
-    if (coeff == 1UL)
+    if (coeff == UWORD(1))
     {
         for (j = 0; j < rlen; j++)
             res[j] = a;
     }
-    else if (a == 1UL)
+    else if (a == UWORD(1))
     {
         for (j = 0; j < rlen; j++)
             res[j] = (j % 2) ? coeff : a;
@@ -72,12 +72,12 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
     if (power != 1)
     {
         for (j = rlen * power + 1; j < n; j++)
-            res[j] = 0UL;
+            res[j] = UWORD(0);
         for (j = rlen; j > 0; j--)
         {
             res[j * power] = res[j];
             for (k = power; k > 0; k--)
-                res[j * power - k] = 0UL;
+                res[j * power - k] = UWORD(0);
         }
     }
 }
@@ -93,10 +93,10 @@ nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
         abort();
     }
 
-    if (coeff != 1UL)
+    if (coeff != UWORD(1))
         coeff = n_mod2_preinv(coeff, res->mod.n, res->mod.ninv);
 
-    if (n <= 1 || coeff == 0UL)
+    if (n <= 1 || coeff == UWORD(0))
     {
         nmod_poly_zero(res);
         return;

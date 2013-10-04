@@ -57,7 +57,7 @@ main(void)
         fmpz_init(den);
 
         for (j = 0; j < m; j++)
-            fmpz_set_ui(&I->rows[j][j], 1UL);
+            fmpz_set_ui(&I->rows[j][j], UWORD(1));
 
         /* Verify that A * A^-1 = I for random matrices */
 

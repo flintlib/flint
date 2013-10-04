@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    flint_rand_t state;
    
    flint_printf("is_strong_probabprime2_preinv....");
@@ -55,12 +55,12 @@ int main(void)
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
       } while (mpz_size(d_m) > 1);
-      if (d == 2UL) d++;
+      if (d == UWORD(2)) d++;
          
       for (j = 0; j < 100; j++)
       {
          do a = n_randtest(state) % d;
-         while (a == 0UL);
+         while (a == UWORD(0));
       
          dinv = n_preinvert_limb(d);
          count_trailing_zeros(norm, d - 1);
@@ -88,14 +88,14 @@ int main(void)
       do
       {
          d = n_randtest(state) | 1;
-         if (d == 1UL) d++;
+         if (d == UWORD(1)) d++;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       for (j = 0; j < 100; j++)
       {
          do a = n_randtest(state) % d;
-         while (a == 0UL);
+         while (a == UWORD(0));
       
          dinv = n_preinvert_limb(d);
          count_trailing_zeros(norm, d - 1);

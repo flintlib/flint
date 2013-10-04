@@ -101,7 +101,7 @@ slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
         if (link[i] < 0)
         {
             fmpz_poly_scalar_smod_fmpz(lifted_fac->p + (- link[i] - 1), v[i], P);
-            lifted_fac->exp[- link[i] - 1] = 1L; 
+            lifted_fac->exp[- link[i] - 1] = WORD(1); 
         }
     }
     lifted_fac->num = r;

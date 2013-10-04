@@ -47,7 +47,7 @@ int main(void)
 
       count_trailing_zeros(count, n);
 
-      result = ((n == 0UL) || (((n >> count) & 1UL) && (l_shift(n, FLINT_BITS-count) == 0UL)));
+      result = ((n == UWORD(0)) || (((n >> count) & UWORD(1)) && (l_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)
       {
          flint_printf("FAIL:\n");

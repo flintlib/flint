@@ -60,12 +60,12 @@ main(void)
 
         nmod_poly_product_roots_nmod_vec(P, x, n);
 
-        nmod_poly_set_coeff_ui(Q, 0, 1UL);
+        nmod_poly_set_coeff_ui(Q, 0, UWORD(1));
 
         for (j = 0; j < n; j++)
         {
             nmod_poly_zero(tmp);
-            nmod_poly_set_coeff_ui(tmp, 1, 1UL);
+            nmod_poly_set_coeff_ui(tmp, 1, UWORD(1));
             nmod_poly_set_coeff_ui(tmp, 0, n_negmod(x[j], mod));
             nmod_poly_mul(Q, Q, tmp);
         }

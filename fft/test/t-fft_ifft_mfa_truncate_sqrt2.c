@@ -52,9 +52,9 @@ main(void)
     {
         for (w = 1; w <= 5; w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_size_t trunc = 2*n + n_randint(state, 2*n) + 1;
-            mp_size_t n1 = (1UL<<(depth/2));
+            mp_size_t n1 = (UWORD(1)<<(depth/2));
             mp_size_t limbs = (n*w)/GMP_LIMB_BITS;
             mp_size_t size = limbs + 1;
             mp_size_t i;

@@ -51,7 +51,7 @@ int main(void)
 
       udiv_qrnnd(q, r, nh, nl, d);
       umul_ppmm(ph, pl, d, q);
-      add_ssaaaa(ph, pl, ph, pl, 0UL, r);
+      add_ssaaaa(ph, pl, ph, pl, UWORD(0), r);
 
       result = ((ph == nh) && (pl == nl));
 

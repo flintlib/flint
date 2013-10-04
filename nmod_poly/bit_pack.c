@@ -40,7 +40,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
     ulong total_limbs = (len * bits - 1) / FLINT_BITS + 1;
     mp_limb_t temp_lower, temp_upper;
 
-    res[0] = 0L;
+    res[0] = WORD(0);
 
     if (bits < FLINT_BITS)
     {
@@ -73,7 +73,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
                 {
                     current_limb++;
                     if (current_limb < total_limbs)
-                        res[current_limb] = 0L;
+                        res[current_limb] = WORD(0);
                     current_bit = 0;
                 }
             }
@@ -89,7 +89,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
         for (i = 0; i < len; i++)
         {
             res[current_limb++] = poly[i];
-            res[current_limb++] = 0L;
+            res[current_limb++] = WORD(0);
         }
     }
     else if (bits < 2 * FLINT_BITS)
@@ -110,7 +110,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
                 current_bit -= FLINT_BITS;
                 current_limb++;
                 if (current_limb < total_limbs)
-                    res[current_limb] = 0L;
+                    res[current_limb] = WORD(0);
             }
         }
     }
@@ -125,7 +125,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
             res[current_limb++] = temp_upper;
 
             if (current_limb < total_limbs)
-                res[current_limb] = 0L;
+                res[current_limb] = WORD(0);
             current_bit += bits - 2 * FLINT_BITS;
 
             if (current_bit >= FLINT_BITS)
@@ -133,7 +133,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, mp_bitcnt_t bits)
                 current_bit -= FLINT_BITS;
                 current_limb++;
                 if (current_limb < total_limbs)
-                    res[current_limb] = 0L;
+                    res[current_limb] = WORD(0);
             }
         }
     }

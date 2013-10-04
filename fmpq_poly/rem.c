@@ -57,13 +57,13 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
     lenR++;
     
     /* 1.  lead^d == +-1.  {R, r} = {R, a} up to sign */
-    if (d == 0UL || *lead == 1L || *lead == -1L)
+    if (d == UWORD(0) || *lead == WORD(1) || *lead == WORD(-1))
     {
         fmpz_one(r);
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
-        if (*lead == -1L && d % 2UL)
+        if (*lead == WORD(-1) && d % UWORD(2))
             _fmpz_vec_neg(R, R, lenR);
     }
     /* 2.  lead^d != +-1.  {R, r} = {R, a lead^d} */

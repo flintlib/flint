@@ -61,7 +61,7 @@ int main(void)
       do
       {
          c = n_randlimb(state);
-      } while (c <= 2UL);
+      } while (c <= UWORD(2));
 
       if (fmpz_factor_pp1(p, n, B1, B1/100, c))
       {

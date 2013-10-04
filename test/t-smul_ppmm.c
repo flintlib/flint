@@ -52,22 +52,22 @@ int main(void)
       m2 = n2;
 
       sign = 1;
-      if ((mp_limb_signed_t) m1 < 0L) 
+      if ((mp_limb_signed_t) m1 < WORD(0)) 
       {
          sign = -1;
          m1 = -m1;
       }
       
-      if ((mp_limb_signed_t) m2 < 0L) 
+      if ((mp_limb_signed_t) m2 < WORD(0)) 
       {
          sign = -sign;
          m2 = -m2;
       }
       
-      pl2old = 0UL;
-      pl2 = 0UL;
-      ph2 = 0UL;
-      bit = 1UL;
+      pl2old = UWORD(0);
+      pl2 = UWORD(0);
+      ph2 = UWORD(0);
+      bit = UWORD(1);
       for (j = 0; j < FLINT_BITS; j++)
       {
          if (m2 & bit)

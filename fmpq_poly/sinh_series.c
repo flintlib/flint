@@ -43,7 +43,7 @@ _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden,
     _fmpq_poly_exp_series(g, gden, h, hden, n);
     _fmpq_poly_inv_series(t, tden, g, gden, n);
     _fmpq_poly_sub(g, gden, g, gden, n, t, tden, n);
-    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, 2UL);
+    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, UWORD(2));
     _fmpq_poly_canonicalise(g, gden, n);
 
     _fmpz_vec_clear(t, n);

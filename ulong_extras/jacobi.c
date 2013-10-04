@@ -38,9 +38,9 @@ n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
     b = y;
     s = 1;
 
-    if ((a < b) && (b != 1UL))
+    if ((a < b) && (b != UWORD(1)))
     {
-        if (a == 0UL)
+        if (a == UWORD(0))
             return 0;
 
         temp = a;
@@ -51,15 +51,15 @@ n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
         b >>= exp;
 
         /* We are only interested in values mod 8, so overflows don't matter here */
-        if (((exp * (a * a - 1)) / 8) % 2 == 1UL)
+        if (((exp * (a * a - 1)) / 8) % 2 == UWORD(1))
             s = -s;
 
         /* We are only interested in values mod 4, so overflows don't matter here */
-        if ((((a - 1) * (b - 1)) / 4) % 2 == 1UL)
+        if ((((a - 1) * (b - 1)) / 4) % 2 == UWORD(1))
             s = -s;
     }
 
-    while (b != 1UL)
+    while (b != UWORD(1))
     {
         if ((a >> 2) < b)
         {
@@ -79,18 +79,18 @@ n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
             b = temp;
         }
 
-        if (b == 0UL)
+        if (b == UWORD(0))
             return 0;
 
         count_trailing_zeros(exp, b);
         b >>= exp;
 
         /* We are only interested in values mod 8, so overflows don't matter here */
-        if (((exp * (a * a - 1)) / 8) % 2 == 1UL)
+        if (((exp * (a * a - 1)) / 8) % 2 == UWORD(1))
             s = -s;
 
         /* We are only interested in values mod 4, so overflows don't matter here */
-        if ((((a - 1) * (b - 1)) / 4) % 2 == 1UL)
+        if ((((a - 1) * (b - 1)) / 4) % 2 == UWORD(1))
             s = -s;
     }
 
@@ -100,9 +100,9 @@ n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
 int
 n_jacobi(mp_limb_signed_t x, mp_limb_t y)
 {
-    if (x < 0L)
+    if (x < WORD(0))
     {
-        if (((y - 1) / 2) % 2 == 1UL)
+        if (((y - 1) / 2) % 2 == UWORD(1))
             return -n_jacobi_unsigned(-x, y);
         else
             return n_jacobi_unsigned(-x, y);

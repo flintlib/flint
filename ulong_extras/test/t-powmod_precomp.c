@@ -55,7 +55,7 @@ int main(void)
       do
       {
          a = n_randtest(state) % d;
-      } while (n_gcd(d, a) != 1UL);
+      } while (n_gcd(d, a) != UWORD(1));
       exp = n_randtest(state);
       
       dpre = n_precompute_inverse(d);
@@ -63,7 +63,7 @@ int main(void)
 
       mpz_set_ui(a_m, a);
       mpz_set_ui(d_m, d);
-      if (exp < 0L)
+      if (exp < WORD(0))
       {
          mpz_powm_ui(r2_m, a_m, -exp, d_m);
          mpz_invert(r2_m, r2_m, d_m);

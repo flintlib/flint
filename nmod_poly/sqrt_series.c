@@ -56,7 +56,7 @@ nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
         abort();
     }
 
-    if (h->length == 0 || h->coeffs[0] != 1UL)
+    if (h->length == 0 || h->coeffs[0] != UWORD(1))
     {
         flint_printf("Exception (nmod_poly_sqrt_series). Requires constant term 1.\n");
         abort();

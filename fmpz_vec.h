@@ -36,7 +36,7 @@
 
 #define FMPZ_VEC_NORM(vec, i)          \
 do {                                   \
-    while ((i) && vec[(i) - 1] == 0L)  \
+    while ((i) && vec[(i) - 1] == WORD(0))  \
         (i)--;                         \
 } while (0)
 

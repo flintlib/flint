@@ -60,7 +60,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
         {
             rand = n_randbits(state, bits);
             rand = n_nextprime(rand, proved);
-        } while ((rand >> bits) > 0L);
+        } while ((rand >> bits) > WORD(0));
     }
 
     return rand;

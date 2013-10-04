@@ -433,7 +433,7 @@ void qsieve_ll_compute_C(qs_t qs_inf)
    mp_limb_t A = qs_inf->A;
    mp_limb_t B = qs_inf->B;
    
-   if ((mp_limb_signed_t) B < 0L) B = -B;
+   if ((mp_limb_signed_t) B < WORD(0)) B = -B;
    fmpz_set_ui(qs_inf->C, B);
    fmpz_mul_ui(qs_inf->C, qs_inf->C, B);
    fmpz_sub(qs_inf->C, qs_inf->C, qs_inf->kn);

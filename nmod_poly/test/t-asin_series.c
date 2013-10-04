@@ -58,11 +58,11 @@ main(void)
         nmod_poly_init(atanB, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_mullow(B, A, A, n);
         nmod_poly_neg(B, B);
-        nmod_poly_set_coeff_ui(B, 0, 1UL);
+        nmod_poly_set_coeff_ui(B, 0, UWORD(1));
         nmod_poly_invsqrt_series(B, B, n);
         nmod_poly_mullow(B, A, B, n);
 
@@ -101,7 +101,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_asin_series(B, A, n);
         nmod_poly_asin_series(A, A, n);

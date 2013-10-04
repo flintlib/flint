@@ -78,7 +78,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
 
 void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
 {
-    if (c == 0L)
+    if (c == WORD(0))
     {
         flint_printf("Exception (fmpq_poly_scalar_div_si). Division by zero.\n");
         abort();

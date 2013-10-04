@@ -188,7 +188,7 @@ void _qadic_frobenius_a(fmpz *rop, slong exp,
     }
     for (i--; i >= 1; i--)
     {
-        if (e[i] & 1L)
+        if (e[i] & WORD(1))
         {
             fmpz_mul(pow + i, t, pow + (i + 1));
             fmpz_mul(t, t, t);
@@ -200,7 +200,7 @@ void _qadic_frobenius_a(fmpz *rop, slong exp,
         }
     }
     {
-        if (e[i] & 1L)
+        if (e[i] & WORD(1))
             fmpz_mul(pow + i, t, pow + (i + 1));
         else
             fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
@@ -219,7 +219,7 @@ void _qadic_frobenius_a(fmpz *rop, slong exp,
     /* Run Newton iteration */
     i = n - 1;
     {
-        fmpz op[2] = {0L, 1L};
+        fmpz op[2] = {WORD(0), WORD(1)};
 
         fmpz_pow_ui(t, p, exp);
         _qadic_pow(rop, op, 2, t, a, j, lena, pow + i);

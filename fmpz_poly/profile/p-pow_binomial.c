@@ -65,7 +65,7 @@ main(void)
             slong k;
             for (k = 0; k < len; k++)
                 fmpz_randbits(f->coeffs + k, state, bits);
-            if ((f->coeffs)[len-1] == 0L)
+            if ((f->coeffs)[len-1] == WORD(0))
                 fmpz_randtest_not_zero(f->coeffs + (len-1), state, bits);
             f->length = len;
         }

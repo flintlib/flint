@@ -76,9 +76,9 @@ fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
             }
 
             /* adding 1 caused overflow to the next power of two */
-            if ((m & (m - 1UL)) == 0UL)
+            if ((m & (m - UWORD(1))) == UWORD(0))
             {
-                m = 1UL << (bits - 1);
+                m = UWORD(1) << (bits - 1);
                 e++;
             }
 
@@ -96,9 +96,9 @@ fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
         m = (m >> e) + 1;
 
         /* overflowed to next power of two */
-        if ((m & (m - 1)) == 0UL)
+        if ((m & (m - 1)) == UWORD(0))
         {
-            m = 1UL << (bits - 1);
+            m = UWORD(1) << (bits - 1);
             e++;
         }
     }

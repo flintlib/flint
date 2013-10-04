@@ -39,10 +39,10 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
     fmpz_t d;
     fmpz_init(d);
     fmpz_one(d);
-    if (*den1 != 1L && *den2 != 1L)
+    if (*den1 != WORD(1) && *den2 != WORD(1))
         fmpz_gcd(d, den1, den2);
     
-    if (*d == 1L)
+    if (*d == WORD(1))
     {
         _fmpz_vec_scalar_mul_fmpz(rpoly, poly1, len1, den2);
         _fmpz_vec_scalar_submul_fmpz(rpoly, poly2, min, den1);
@@ -77,10 +77,10 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
             fmpz_t e;
             fmpz_init(e);
             _fmpz_vec_content(e, rpoly, max);
-            if (*e != 1L)
+            if (*e != WORD(1))
                 fmpz_gcd(e, e, d);
             
-            if (*e == 1L)
+            if (*e == WORD(1))
                 fmpz_mul(rden, den1, den22);
             else
             {

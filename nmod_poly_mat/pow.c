@@ -61,7 +61,7 @@ nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp)
         {
             nmod_poly_mat_sqr(U, T);
 
-            if (exp & (1L << i))
+            if (exp & (WORD(1) << i))
                 nmod_poly_mat_mul(T, U, A);
             else
                 nmod_poly_mat_swap(T, U);

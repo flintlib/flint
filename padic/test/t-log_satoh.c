@@ -56,7 +56,7 @@ main(void)
     /* Check aliasing: a = log(a) */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong N;
         padic_ctx_t ctx;
 
@@ -95,7 +95,7 @@ main(void)
     /* Check: log(a) + log(b) == log(a * b) */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong N;
         padic_ctx_t ctx;
 
@@ -156,7 +156,7 @@ main(void)
     /* Check: log(exp(x)) == x */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong N;
         padic_ctx_t ctx;
 

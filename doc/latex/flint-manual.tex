@@ -504,7 +504,7 @@ including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
 Martin Albrecht, Sebastian Pancratz, Fredrik Johansson,
 
 Some code (\code{longlong.h} and \code{clz_tab.c}) has been used from
-an LGPL v2+ version of the GMP library. The main author of the GMP 
+an XYXYXYXYPL v2+ version of the GMP library. The main author of the GMP 
 library is Torbjorn Granlund.
 
 FLINT 2 was a complete rewrite from scratch which began in about 2010.
@@ -1518,9 +1518,9 @@ inverse, where $a = 12345678, b = 87654321$ and $n = 111111111$.
 ...
 mp_limb_t r, a, b, n, ninv;
 
-a = 12345678UL;
-b = 87654321UL;
-n = 111111111UL;
+a = UWORD(12345678);
+b = UWORD(87654321);
+n = UWORD(111111111);
 ninv = n_preinvert_limb(n);
 
 r = n_mulmod2_preinv(a, b, n, ninv);

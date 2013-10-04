@@ -72,7 +72,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
-        fmpz_set_ui(a + (len - 1), 1UL);
+        fmpz_set_ui(a + (len - 1), UWORD(1));
 
         result = (!_fmpz_vec_is_zero(a, len));
         if (!result)

@@ -121,7 +121,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
                          const fmpz *a, const slong *j, slong lena)
 {
     const slong d   = j[lena - 1];
-    const fmpz_t p = {2L};
+    const fmpz_t p = {WORD(2)};
 
     int ans;
 
@@ -247,7 +247,7 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
         multiply this by $x$ to obtain the potential square root $x^{(q+1)/4}$,
         and then combine these two powers to find $x^{(q-1)/2}$.
      */
-    if (fmpz_fdiv_ui(p, 4) == 3 && (d & 1L))
+    if (fmpz_fdiv_ui(p, 4) == 3 && (d & WORD(1)))
     {
         fmpz_t z;
         fmpz *v, *w;
@@ -285,7 +285,7 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
         and $y = v w = x^{(q-1)/4}$.  If $y = +1$ we return $w$, and if 
         $y = -1$ we return $2^{(q-1)/4} x^{(q+3)/8} = 2^{(q-1)/4} w$.
      */
-    else if (fmpz_fdiv_ui(p, 8) == 5 && (d & 1L))
+    else if (fmpz_fdiv_ui(p, 8) == 5 && (d & WORD(1)))
     {
         fmpz_t f, g, pm1;
 
@@ -322,7 +322,7 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
             }
             else
             {
-                fmpz_t two = {2L};
+                fmpz_t two = {WORD(2)};
 
                 fmpz_zero(g);
                 fmpz_pow_ui(g, p, d);
@@ -469,7 +469,7 @@ static void
 _fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, slong len, 
                          const fmpz *a, const slong *j, slong lena)
 {
-    const fmpz_t p = {2L};
+    const fmpz_t p = {WORD(2)};
     const slong d   = j[lena - 1];
 
     fmpz_t z;
@@ -526,7 +526,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
         }
         for (i--; i >= 1; i--)
         {
-            if (e[i] & 1L)
+            if (e[i] & WORD(1))
             {
                 fmpz_mul(pow + i, t, pow + (i + 1));
                 fmpz_mul(t, t, t);
@@ -538,7 +538,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
             }
         }
         {
-            if (e[i] & 1L)
+            if (e[i] & WORD(1))
                 fmpz_mul(pow + i, t, pow + (i + 1));
             else
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
@@ -632,7 +632,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
     int ans;
 
     const slong d    = j[lena - 1];
-    const fmpz_t p  = {2L};
+    const fmpz_t p  = {WORD(2)};
 
     fmpz *g, *r, *s, *t;
     slong i;
@@ -781,7 +781,7 @@ int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena, 
                 const fmpz_t p, slong N)
 {
-    if (*p == 2L)
+    if (*p == WORD(2))
     {
         return _qadic_sqrt_2(rop, op, len, a, j, lena, N);
     }
@@ -805,7 +805,7 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         qadic_zero(rop);
         return 1;
     }
-    if (op->val & 1L)
+    if (op->val & WORD(1))
     {
         return 0;
     }

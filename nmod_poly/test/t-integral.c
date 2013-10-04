@@ -63,7 +63,7 @@ main(void)
         c0 = nmod_poly_get_coeff_ui(b, 0);
         nmod_poly_derivative(c, b);
 
-        result = (c0 == 0UL) && nmod_poly_equal(a, c);
+        result = (c0 == UWORD(0)) && nmod_poly_equal(a, c);
 
         if (!result)
         {

@@ -235,8 +235,8 @@ int main(void)
             {
                 r = fmpz_poly_fread_pretty(in, t, &rvar);
                 result = (r > 0) && rvar && (strcmp(str, rvar) == 0) && 
-                         (t->length == 2) && (t->coeffs[0] == 0L) && 
-                         (t->coeffs[1] == 1L);
+                         (t->length == 2) && (t->coeffs[0] == WORD(0)) && 
+                         (t->coeffs[1] == WORD(1));
                 if (!result)
                 {
                     flint_printf("FAIL:\n");

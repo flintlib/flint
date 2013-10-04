@@ -50,12 +50,12 @@ extern __mpz_struct * fmpz_arr;
 extern gmp_randstate_t fmpz_randstate;
 
 /* maximum positive value a small coefficient can have */
-#define COEFF_MAX ((1L << (FLINT_BITS - 2)) - 1L)
+#define COEFF_MAX ((WORD(1) << (FLINT_BITS - 2)) - WORD(1))
 
 /* minimum negative value a small coefficient can have */
-#define COEFF_MIN (-((1L << (FLINT_BITS - 2)) - 1L))
+#define COEFF_MIN (-((WORD(1) << (FLINT_BITS - 2)) - WORD(1)))
 
-#define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == 1L)  /* is x a pointer not an integer */
+#define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == WORD(1))  /* is x a pointer not an integer */
 
 __mpz_struct * _fmpz_new_mpz(void);
 
@@ -75,7 +75,7 @@ void _fmpz_demote(fmpz_t f)
     if (COEFF_IS_MPZ(*f)) 
     {
         _fmpz_clear_mpz(*f);
-        (*f) = 0L;
+        (*f) = WORD(0);
 	}
 }
 
@@ -88,7 +88,7 @@ void _fmpz_clear_readonly_mpz(mpz_t);
 static __inline__
 void fmpz_init(fmpz_t f)
 {
-	(*f) = 0L;
+	(*f) = WORD(0);
 }
 
 void fmpz_init2(fmpz_t f, ulong limbs);
@@ -259,7 +259,7 @@ static __inline__
 void fmpz_zero(fmpz_t f)
 {
    _fmpz_demote(f);	
-   (*f) = 0L;
+   (*f) = WORD(0);
 }
 
 static __inline__ 
@@ -269,7 +269,7 @@ void fmpz_one(fmpz_t f)
     {
         _fmpz_clear_mpz(*f);
 	}
-    *f = 1L;
+    *f = WORD(1);
 }
 
 static __inline__
@@ -334,7 +334,7 @@ int fmpz_is_even(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
     {
-        return !((*f) & 1L);
+        return !((*f) & WORD(1));
     }
     else
     {
@@ -347,7 +347,7 @@ int fmpz_is_odd(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
     {
-        return ((*f) & 1L);
+        return ((*f) & WORD(1));
     }
     else
     {

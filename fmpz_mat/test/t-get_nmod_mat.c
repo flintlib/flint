@@ -65,7 +65,7 @@ main(void)
         else
             fmpz_mat_set_nmod_mat_unsigned(A, M);
 
-        fmpz_mat_scalar_mul_ui(A, A, 2UL);
+        fmpz_mat_scalar_mul_ui(A, A, UWORD(2));
         nmod_mat_add(M, M, M);
         fmpz_mat_get_nmod_mat(M2, A);
 

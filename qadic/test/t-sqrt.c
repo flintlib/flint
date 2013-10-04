@@ -49,7 +49,7 @@ int main(void)
     /* Check Artin Schreier preimages */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong d;
         qadic_ctx_t ctx;
 
@@ -101,7 +101,7 @@ int main(void)
     /* Check aliasing: a = sqrt(a) */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong d, N;
         qadic_ctx_t ctx;
 
@@ -143,7 +143,7 @@ int main(void)
     /* Test random squares over finite fields */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong deg, N;
         qadic_ctx_t ctx;
 
@@ -212,7 +212,7 @@ int main(void)
     /* Test random elements over finite fields */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong d, N;
         qadic_ctx_t ctx;
 
@@ -267,7 +267,7 @@ int main(void)
     /* Test random squares */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong deg, N;
         qadic_ctx_t ctx;
 
@@ -348,7 +348,7 @@ int main(void)
     /* Test random elements */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong d, N;
         qadic_ctx_t ctx;
 

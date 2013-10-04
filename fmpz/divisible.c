@@ -33,7 +33,7 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
     fmpz y = *x;
     fmpz q = *p;
 
-    if (y == 0L)
+    if (y == WORD(0))
     {
         return 1;
     }

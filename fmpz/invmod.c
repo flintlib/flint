@@ -40,8 +40,8 @@ z_gcdinv(ulong * inv, slong a, ulong b)
 
     g = n_gcdinv(inv, ua, b);
 
-    if (a < 0L)
-        *inv = n_submod(0UL, *inv, b);
+    if (a < WORD(0))
+        *inv = n_submod(UWORD(0), *inv, b);
 
     return g;
 }
@@ -64,26 +64,26 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
             ulong inv, gcd;
-            if (c2 < 0L)
+            if (c2 < WORD(0))
                 c2 = -c2;
-            if (c2 == 1L)
+            if (c2 == WORD(1))
                 return 0;       /* special case not handled by n_invmod */
             gcd = z_gcdinv(&inv, c1, c2);
 
-            return (gcd == 1UL ? fmpz_set_si(f, inv), 1 : 0);
+            return (gcd == UWORD(1) ? fmpz_set_si(f, inv), 1 : 0);
         }
         else                    /* h is large and g is small */
         {
             __mpz_struct temp;  /* put g into a temporary mpz_t */
             __mpz_struct *mpz_ptr;
 
-            if (c1 < 0L)
+            if (c1 < WORD(0))
             {
                 c1 = -c1;
                 temp._mp_d = (mp_limb_t *) & c1;
                 temp._mp_size = -1;
             }
-            else if (c1 == 0L)
+            else if (c1 == WORD(0))
                 temp._mp_size = 0;
             else
             {
@@ -103,9 +103,9 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
             ulong gcd, inv, r;
-            if (c2 < 0L)
+            if (c2 < WORD(0))
                 c2 = -c2;
-            if (c2 == 1L)
+            if (c2 == WORD(1))
                 return 0;       /* special case not handled by z_gcd_invert */
             /* reduce g mod h first */
 
@@ -113,7 +113,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
             gcd = z_gcdinv(&inv, r, c2);
 
-            return (gcd == 1UL ? fmpz_set_si(f, inv), 1 : 0);
+            return (gcd == UWORD(1) ? fmpz_set_si(f, inv), 1 : 0);
         }
         else                    /* both are large */
         {

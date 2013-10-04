@@ -39,7 +39,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("log_series....");
     fflush(stdout);
@@ -56,7 +56,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 1UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(1));
 
         fmpq_poly_canonicalise(a);
 
@@ -94,10 +94,10 @@ main(void)
         fmpq_poly_init(loga_logb);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(a, 0, 1UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(1));
 
         fmpq_poly_randtest_not_zero(b, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(b, 0, 1UL);
+        fmpq_poly_set_coeff_ui(b, 0, UWORD(1));
 
         fmpq_poly_mullow(ab, a, b, n);
 

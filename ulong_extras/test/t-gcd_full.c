@@ -51,7 +51,7 @@ int main(void)
       {
          a = n_randtest_bits(state, bits1);
          b = n_randtest_bits(state, bits2);
-      } while ((n_gcd_full(a, b) != 1UL));
+      } while ((n_gcd_full(a, b) != UWORD(1)));
 
       c = n_randtest_bits(state, bits3);
 

@@ -65,7 +65,7 @@ void sample(void * arg, ulong count)
 
     prof_stop();
 
-    if (C->entries[0] == 5893479483L) abort();
+    if (C->entries[0] == WORD(5893479483)) abort();
 
     nmod_mat_clear(A);
     nmod_mat_clear(B);

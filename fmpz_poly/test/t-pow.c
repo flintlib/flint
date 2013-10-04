@@ -53,7 +53,7 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_randtest(b, state, n_randint(state, 10), 100);
 
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
 
         fmpz_poly_pow(a, b, exp);
         fmpz_poly_pow(b, b, exp);
@@ -83,11 +83,11 @@ main(void)
         fmpz_poly_init(c);
         fmpz_poly_randtest(b, state, n_randint(state, 10), 100);
 
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
 
         fmpz_poly_pow(a, b, exp);
 
-        if (exp == 0UL)
+        if (exp == UWORD(0))
         {
             fmpz_poly_set_ui(c, 1);
         }

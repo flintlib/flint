@@ -40,7 +40,7 @@ mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
       {
          bits = FLINT_BIT_COUNT(vec[i]);
          if (bits == FLINT_BITS) break;
-         else mask = ~(mp_limb_t) 0 - ((1UL << bits) - 1UL);
+         else mask = ~(mp_limb_t) 0 - ((UWORD(1) << bits) - UWORD(1));
       }
    }
    

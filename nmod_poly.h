@@ -144,7 +144,7 @@ void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 static __inline__
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
-    while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
+    while (poly->length && (poly->coeffs[poly->length - 1] == WORD(0)))
         poly->length--;
 }
 

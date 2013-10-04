@@ -79,10 +79,10 @@ main(void)
         }
 
         fmpz_mul(mod, N, D);
-        fmpz_mul_ui(mod, mod, 2UL);
+        fmpz_mul_ui(mod, mod, UWORD(2));
         /* Next prime greater than or equal */
         fmpz_get_mpz(tmp, mod);
-        mpz_sub_ui(tmp, tmp, 1UL);
+        mpz_sub_ui(tmp, tmp, UWORD(1));
         mpz_nextprime(tmp, tmp);
         fmpz_set_mpz(mod, tmp);
 
@@ -91,9 +91,9 @@ main(void)
 
         /* Special case: both 1 and -1 have residue 1 mod 2.
            There's probably no particular reason to disallow this. */
-        special_case = (fmpz_cmp_ui(mod, 2UL) == 0 &&
-                        fmpz_get_si(&x->num) == -1L &&
-                        fmpz_cmp_ui(&x->den, 1UL) == 0);
+        special_case = (fmpz_cmp_ui(mod, UWORD(2)) == 0 &&
+                        fmpz_get_si(&x->num) == WORD(-1) &&
+                        fmpz_cmp_ui(&x->den, UWORD(1)) == 0);
 
         if (special_case)
         {

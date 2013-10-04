@@ -32,7 +32,7 @@
 static mp_limb_t
 n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    mp_limb_t prod = 1UL % p;
+    mp_limb_t prod = UWORD(1) % p;
 
     while (n)
     {

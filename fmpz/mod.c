@@ -39,9 +39,9 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
             slong r;
-            if (c2 < 0L)
+            if (c2 < WORD(0))
                 c2 = -c2;
-            if (c1 < 0L)
+            if (c1 < WORD(0))
             {
                 r = c2 - (-c1 % c2);    /* C doesn't correctly handle negative mods */
                 if (r == c2)
@@ -54,7 +54,7 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* h is large and g is small */
         {
-            if (c1 < 0L)
+            if (c1 < WORD(0))
             {
                 fmpz_abs(f, h);
                 fmpz_sub_ui(f, f, -c1);
@@ -67,7 +67,7 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
-            if (c2 < 0L)
+            if (c2 < WORD(0))
                 fmpz_set_si(f, mpz_fdiv_ui(COEFF_TO_PTR(c1), -c2));
             else
                 fmpz_set_ui(f, mpz_fdiv_ui(COEFF_TO_PTR(c1), c2));

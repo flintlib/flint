@@ -78,7 +78,7 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
         for (j = 0; j < FLINT_MIN(i, n); j++)
             nmod_mat_entry(L, i, j) = nmod_mat_entry(LU, i, j);
         if (i < rank)
-            nmod_mat_entry(L, i, i) = 1UL;
+            nmod_mat_entry(L, i, i) = UWORD(1);
         for (j = i; j < n; j++)
             nmod_mat_entry(U, i, j) = nmod_mat_entry(LU, i, j);
     }

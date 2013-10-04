@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    mp_limb_t d;
    mpz_t d_m;
    flint_rand_t state;

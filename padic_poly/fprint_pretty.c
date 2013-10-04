@@ -53,7 +53,7 @@ int _padic_poly_fprint_pretty(FILE *file,
         {
             flint_fprintf(file, "%s", var);
         }
-        else if (*(padic_unit(x)) == -1L && padic_val(x) == 0)
+        else if (*(padic_unit(x)) == WORD(-1) && padic_val(x) == 0)
         {
             flint_fprintf(file, "-%s", var);
         }
@@ -91,7 +91,7 @@ int _padic_poly_fprint_pretty(FILE *file,
 
             if (padic_is_one(x))
                flint_fprintf(file, "%s^%wd", var, i);
-            else if (*(padic_unit(x)) == -1L && padic_val(x) == 0)
+            else if (*(padic_unit(x)) == WORD(-1) && padic_val(x) == 0)
                flint_fprintf(file, "-%s^%wd", var, i);
             else
             {

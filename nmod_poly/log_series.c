@@ -38,7 +38,7 @@ _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong n, nmod_t mod)
     f_diff = _nmod_vec_init(n);
     f_inv = _nmod_vec_init(n);
 
-    _nmod_poly_derivative(f_diff, f, n, mod); f_diff[n-1] = 0UL;
+    _nmod_poly_derivative(f_diff, f, n, mod); f_diff[n-1] = UWORD(0);
     _nmod_poly_inv_series(f_inv, f, n, mod);
     _nmod_poly_mullow(res, f_diff, n - 1, f_inv, n - 1, n - 1, mod);
     _nmod_poly_integral(res, res, n, mod);
@@ -54,7 +54,7 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
     slong k;
     slong flen = f->length;
 
-    if (flen < 1 || f->coeffs[0] != 1UL)
+    if (flen < 1 || f->coeffs[0] != UWORD(1))
     {
         flint_printf("Exception (nmod_poly_log_series). Constant term != 1.\n");
         abort();
@@ -69,7 +69,7 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
     nmod_poly_fit_length(res, n);
 
     /* Efficiently handle monomials */
-    for (k = 1; f->coeffs[k] == 0UL && k < n - 1; k++);
+    for (k = 1; f->coeffs[k] == UWORD(0) && k < n - 1; k++);
     if (k == flen - 1 || k == n - 1)
     {
         flen = FLINT_MIN(flen, n);

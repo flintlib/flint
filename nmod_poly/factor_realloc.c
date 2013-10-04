@@ -56,7 +56,7 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
             for (i = fac->alloc; i < alloc; i++)
             {
                 nmod_poly_init_preinv(fac->p + i, 0, 0);
-                fac->exp[i] = 0L;
+                fac->exp[i] = WORD(0);
             }
             fac->alloc = alloc;
         }

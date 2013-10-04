@@ -36,7 +36,7 @@ fmpz_fdiv_ui(const fmpz_t g, ulong h)
     fmpz c1 = *g;
     ulong r;
 
-    if (h == 0UL)
+    if (h == UWORD(0))
     {
         flint_printf("Exception (fmpz_fdiv_ui). Division by 0.\n");
         abort();
@@ -44,7 +44,7 @@ fmpz_fdiv_ui(const fmpz_t g, ulong h)
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {
-        if (c1 < 0L)
+        if (c1 < WORD(0))
         {
             r = h - (-c1 % h);  /* C doesn't correctly handle negative mods */
             if (r == h)

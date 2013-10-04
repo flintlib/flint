@@ -37,7 +37,7 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
    slong size_f = l + 1;
    mp_limb_t * coeff;
 
-   mp_limb_t mask = -1L;
+   mp_limb_t mask = WORD(-1);
    slong bits = 0, limbs = 0, size_j, i, c;
    int sign = 1, signed_c;
    
@@ -75,22 +75,22 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
       {
          limbs = size_j - 1;
          bits = FLINT_BIT_COUNT(coeff[size_j - 1]); 
-         if (bits == FLINT_BITS) mask = 0L;
-         else mask = -1L - ((1L<<bits) - 1);  
+         if (bits == FLINT_BITS) mask = WORD(0);
+         else mask = WORD(-1) - ((WORD(1)<<bits) - 1);  
       } else if (size_j == limbs + 1) /* coeff is same size as prev biggest */
       {
          if (coeff[size_j - 1] & mask) /* see if we have more bits than before */
          {
             bits = FLINT_BIT_COUNT(coeff[size_j - 1]);   
-            if (bits == FLINT_BITS) mask = 0L;
-            else mask = -1L - ((1L<<bits) - 1);
+            if (bits == FLINT_BITS) mask = WORD(0);
+            else mask = WORD(-1) - ((WORD(1)<<bits) - 1);
          }
       }
       
       if (signed_c) /* write out FFT coefficient, ensuring sign is correct */
       {
          mpn_neg_n(coeffs_f[i], coeff, size_j); 
-         flint_mpn_store(coeffs_f[i] + size_j, size_f - size_j, -1L); 
+         flint_mpn_store(coeffs_f[i] + size_j, size_f - size_j, WORD(-1)); 
       } else
       {
          flint_mpn_copyi(coeffs_f[i], coeff, size_j); 

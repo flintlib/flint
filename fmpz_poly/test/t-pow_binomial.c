@@ -56,7 +56,7 @@ main(void)
         fmpz_randtest_not_zero(b->coeffs + 1, state, 100);
         _fmpz_poly_set_length(b, 2);
         
-        exp = n_randtest(state) % 100UL;
+        exp = n_randtest(state) % UWORD(100);
 
         fmpz_poly_pow_binomial(a, b, exp);
         fmpz_poly_pow_binomial(b, b, exp);
@@ -88,7 +88,7 @@ main(void)
         fmpz_randtest_not_zero(b->coeffs + 1, state, 100);
         _fmpz_poly_set_length(b, 2);
 
-        exp = n_randtest(state) % 100UL;
+        exp = n_randtest(state) % UWORD(100);
 
         fmpz_poly_pow_binomial(a, b, exp);
         fmpz_poly_pow(b, b, exp);

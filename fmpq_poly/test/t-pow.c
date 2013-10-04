@@ -37,7 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("pow....");
     fflush(stdout);
@@ -54,7 +54,7 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_randtest(b, state, n_randint(state, 10), 100);
 
-        exp = (ulong) n_randtest(state) % 20UL;
+        exp = (ulong) n_randtest(state) % UWORD(20);
 
         fmpq_poly_pow(a, b, exp);
         fmpq_poly_pow(b, b, exp);
@@ -87,7 +87,7 @@ main(void)
         fmpq_poly_init(c);
         fmpq_poly_randtest(b, state, n_randint(state, 10), 100);
 
-        exp = (ulong) n_randtest(state) % 20UL;
+        exp = (ulong) n_randtest(state) % UWORD(20);
 
         fmpq_poly_pow(a, b, exp);
 

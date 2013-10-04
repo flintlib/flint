@@ -49,8 +49,8 @@ int main(void)
       
       r1 = n_submod(a, b, d);
 
-      add_ssaaaa(s1, r2, 0UL, a, 0UL, d);
-      sub_ddmmss(s1, r2, s1, r2, 0UL, b);
+      add_ssaaaa(s1, r2, UWORD(0), a, UWORD(0), d);
+      sub_ddmmss(s1, r2, s1, r2, UWORD(0), b);
       if ((s1) || (r2 >= d)) r2 -= d;
       
       result = (r1 == r2);

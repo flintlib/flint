@@ -46,7 +46,7 @@ int main(void)
       n_factor_init(&factors);
 
       n1 = n_randtest_not_zero(state);
-      n2 = n_factor_trial_range(&factors, n1, 100UL, 10000UL);
+      n2 = n_factor_trial_range(&factors, n1, UWORD(100), UWORD(10000));
       
       for (j = 0; j < factors.num; j++)
       {

@@ -41,7 +41,7 @@ void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
         flint_printf("DIGIT %3d/%wd: ", i, xsize);
         for (j = 0; j < FLINT_BITS; j++)
         {
-            byte[j % 8] = (x[i] & (1UL<<j)) ? '1' : '0';
+            byte[j % 8] = (x[i] & (UWORD(1)<<j)) ? '1' : '0';
             if (j % 8 == 7)
                 flint_printf("%s ", byte);
         }

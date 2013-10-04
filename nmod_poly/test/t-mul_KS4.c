@@ -136,7 +136,7 @@ main(void)
 #if FLINT64
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t mod = 2289285083314003039UL;
+        mp_limb_t mod = UWORD(2289285083314003039);
 
         nmod_poly_init(a, mod);
         nmod_poly_init(b, mod);

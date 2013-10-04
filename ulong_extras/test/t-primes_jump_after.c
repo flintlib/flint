@@ -49,7 +49,7 @@ int main(void)
         {
             mp_limb_t p, q;
 
-            q = n_randtest(state) % 1000000000UL;
+            q = n_randtest(state) % UWORD(1000000000);
 
             n_primes_jump_after(iter, q);
 

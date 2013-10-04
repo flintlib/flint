@@ -44,7 +44,7 @@ _fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* sin(x) = 2*tan(x/2)/(1+tan(x/2)^2) */
-    fmpz_mul_ui(uden, hden, 2UL);
+    fmpz_mul_ui(uden, hden, UWORD(2));
     _fmpq_poly_tan_series(t, tden, h, uden, n);
 
     _fmpq_poly_mullow(u, uden, t, tden, n, t, tden, n, n);
@@ -52,7 +52,7 @@ _fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
     _fmpq_poly_canonicalise(u, uden, n);
 
     _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
-    _fmpq_poly_scalar_mul_ui(g, gden, g, gden, n, 2UL);
+    _fmpq_poly_scalar_mul_ui(g, gden, g, gden, n, UWORD(2));
     _fmpq_poly_canonicalise(g, gden, n);
 
     _fmpz_vec_clear(t, n);

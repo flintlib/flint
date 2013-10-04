@@ -32,10 +32,10 @@
 
 void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)
 {
-    if (*den == 1L)
+    if (*den == WORD(1))
         return;
     
-    if (*den == -1L)
+    if (*den == WORD(-1))
     {
         _fmpz_vec_neg(poly, poly, len);
         fmpz_one(den);
@@ -49,11 +49,11 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)
         fmpz_t gcd;
         fmpz_init(gcd);
         _fmpz_vec_content(gcd, poly, len);
-        if (*gcd != 1L)
+        if (*gcd != WORD(1))
             fmpz_gcd(gcd, gcd, den);
         if (fmpz_sgn(den) < 0)
             fmpz_neg(gcd, gcd);
-        if (*gcd != 1L)
+        if (*gcd != WORD(1))
         {
             _fmpz_vec_scalar_divexact_fmpz(poly, poly, len, gcd);
             fmpz_divexact(den, den, gcd);

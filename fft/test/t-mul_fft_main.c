@@ -56,7 +56,7 @@ main(void)
             
             for (i = 0; i < iter; i++)
             {
-               mp_size_t n = (1UL<<depth);
+               mp_size_t n = (UWORD(1)<<depth);
                mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
                mp_size_t len1 = 2*n + n_randint(state, 2*n) + 1;
                mp_size_t len2 = 2*n + 2 - len1 + n_randint(state, 2*n);

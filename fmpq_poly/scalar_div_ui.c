@@ -33,7 +33,7 @@
 void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                               const fmpz_t den, slong len, ulong c)
 {
-    if (c == 1UL)
+    if (c == UWORD(1))
     {
         if (rpoly != poly)
             _fmpz_vec_set(rpoly, poly, len);
@@ -60,7 +60,7 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
 
 void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 {
-    if (c == 0UL)
+    if (c == UWORD(0))
     {
         flint_printf("Exception (fmpq_poly_scalar_div_ui). Division by zero.\n");
         abort();

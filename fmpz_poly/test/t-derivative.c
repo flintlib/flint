@@ -79,7 +79,7 @@ main(void)
 
         fmpz_poly_derivative(b, a);
 
-        result = (b->length == 0UL);
+        result = (b->length == UWORD(0));
         if (!result)
         {
             flint_printf("FAIL:\n");

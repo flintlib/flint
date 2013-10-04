@@ -41,7 +41,7 @@ void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
    mp_bitcnt_t bits = params->bits;
-   ulong i, j, res, primes = (1L<<(bits/3))/10 + 1;
+   ulong i, j, res, primes = (WORD(1)<<(bits/3))/10 + 1;
    n_factor_t factors;
    mp_limb_t n2;
    

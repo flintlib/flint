@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, j, result;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     slong n;
     mpq_t n_mpq;

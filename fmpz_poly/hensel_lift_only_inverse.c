@@ -68,7 +68,7 @@ void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
     const fmpz *a, slong lenA, const fmpz *b, slong lenB, 
     const fmpz_t p, const fmpz_t p1)
 {
-    const fmpz one[1] = {1L};
+    const fmpz one[1] = {WORD(1)};
     const slong lenC = FLINT_MAX(lenA + lenG - 1, lenB + lenH - 1);
     const slong lenM = FLINT_MAX(lenG, lenH);
     const slong lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);

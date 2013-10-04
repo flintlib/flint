@@ -32,15 +32,15 @@ n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre)
 {
     mp_limb_t x, y;
 
-    if (n == 1UL)
-        return 0L;
+    if (n == UWORD(1))
+        return WORD(0);
 
-    x = 1UL;
+    x = UWORD(1);
     y = a;
 
     while (exp)
     {
-        if (exp & 1L)
+        if (exp & WORD(1))
             x = n_mulmod_precomp(x, y, n, npre);
         exp >>= 1;
         if (exp)

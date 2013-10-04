@@ -56,8 +56,8 @@ typedef fmpq fmpq_t[1];
 
 static __inline__ void fmpq_init(fmpq_t x)
 {
-    x->num = 0L;
-    x->den = 1L;
+    x->num = WORD(0);
+    x->den = WORD(1);
 }
 
 static __inline__ void fmpq_clear(fmpq_t x)

@@ -65,7 +65,7 @@ main(void)
         {
             int iters = 100*((mp_size_t) 1 << (3*(10 - depth)/2)), i;
             
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t len1 = 2*n;
             mp_size_t len2 = 2*n;
@@ -127,7 +127,7 @@ main(void)
         for (w = 1; w <= 2; w++)
         {
             int iters, i;
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits = n*w;
             mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
             mp_limb_t * i1, * i2, * r1, * tt;
@@ -148,7 +148,7 @@ main(void)
             depth1 = FLINT_CLOG2(bits);
             depth1 = depth1/2;
 
-            w1 = bits/(1UL<<(2*depth1));
+            w1 = bits/(UWORD(1)<<(2*depth1));
 
             best_off = -1;
             

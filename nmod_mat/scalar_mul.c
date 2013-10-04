@@ -32,15 +32,15 @@
 void
 nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
 {
-    if (c == 0UL)
+    if (c == UWORD(0))
     {
         nmod_mat_zero(B);
     }
-    else if (c == 1UL)
+    else if (c == UWORD(1))
     {
         nmod_mat_set(B, A);
     }
-    else if (c == A->mod.n - 1UL)
+    else if (c == A->mod.n - UWORD(1))
     {
         nmod_mat_neg(B, A);
     }

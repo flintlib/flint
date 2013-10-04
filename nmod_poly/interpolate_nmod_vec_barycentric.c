@@ -51,7 +51,7 @@ _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
 
     for (i = 0; i < n; i++)
     {
-        w[i] = 1UL;
+        w[i] = UWORD(1);
         for (j = 0; j < n; j++)
         {
             if (i != j)

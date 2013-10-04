@@ -69,7 +69,7 @@ fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
         {
             fmpz_poly_mat_sqrlow(U, T, len);
 
-            if (exp & (1L << i))
+            if (exp & (WORD(1) << i))
                 fmpz_poly_mat_mullow(T, U, A, len);
             else
                 fmpz_poly_mat_swap(T, U);

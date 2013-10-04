@@ -49,9 +49,9 @@ int main()
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         n = n_randint(state, 10);
-        num_primes = (1L << n);
+        num_primes = (WORD(1) << n);
         primes = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
-        p = n_nextprime((1UL << (FLINT_BITS-1)) - 10000000L, 0);
+        p = n_nextprime((UWORD(1) << (FLINT_BITS-1)) - WORD(10000000), 0);
 
         for (j = 0; j < num_primes; j++)
         {

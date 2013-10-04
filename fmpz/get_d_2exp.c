@@ -39,17 +39,17 @@ fmpz_get_d_2exp(slong *exp, const fmpz_t f)
     if (!COEFF_IS_MPZ(d))
     {
         ulong d_abs;
-        if (d == 0L)
+        if (d == WORD(0))
         {
-            (*exp) = 0L;
+            (*exp) = WORD(0);
             return 0.0;
         }
         d_abs = FLINT_ABS(d);
         (*exp) = FLINT_BIT_COUNT(d_abs);
-        if (d < 0L)
-            return __gmpn_get_d((mp_limb_t *) &d_abs, 1L, -1L, -*exp);
+        if (d < WORD(0))
+            return __gmpn_get_d((mp_limb_t *) &d_abs, WORD(1), WORD(-1), -*exp);
         else
-            return __gmpn_get_d((mp_limb_t *) &d, 1L, 1L, -*exp);
+            return __gmpn_get_d((mp_limb_t *) &d, WORD(1), WORD(1), -*exp);
     }
     else
         return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));

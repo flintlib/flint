@@ -47,7 +47,7 @@ int main(void)
       exp1 = n_randint(state, 5);
       exp2 = n_randint(state, 5);
       
-      if ((exp1 == 0L) && (exp2 == 0L)) bits = n_randint(state, 64) + 1;
+      if ((exp1 == WORD(0)) && (exp2 == WORD(0))) bits = n_randint(state, 64) + 1;
       else bits /= (exp1 + exp2);
       
       n = n_randtest_bits(state, bits);

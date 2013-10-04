@@ -137,7 +137,7 @@ void fmpz_poly_zero(fmpz_poly_t poly)
 static __inline__
 void fmpz_poly_one(fmpz_poly_t poly)
 {
-    fmpz_poly_set_ui(poly, 1UL);
+    fmpz_poly_set_ui(poly, UWORD(1));
 }
 
 void fmpz_poly_zero_coeffs(fmpz_poly_t poly, slong i, slong j);
@@ -209,13 +209,13 @@ int _fmpz_poly_is_one(const fmpz *poly, slong len)
 static __inline__
 int fmpz_poly_is_one(const fmpz_poly_t op)
 {
-    return (op->length) == 1 && (*(op->coeffs) == 1L);
+    return (op->length) == 1 && (*(op->coeffs) == WORD(1));
 }
 
 static __inline__
 int fmpz_poly_is_unit(const fmpz_poly_t op)
 {
-    return (op->length == 1) && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
+    return (op->length == 1) && (*(op->coeffs) == WORD(1) || *(op->coeffs) == WORD(-1));
 }
 
 static __inline__

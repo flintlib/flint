@@ -39,7 +39,7 @@ _fmpz_vec_max_bits_ref(const fmpz * vec, slong len)
         if (bits > max_bits)
             max_bits = bits;
         if (fmpz_sgn(vec + i) < 0)
-            sign = -1L;
+            sign = WORD(-1);
     }
 
     return max_bits * sign;

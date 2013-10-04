@@ -47,7 +47,7 @@ main(void)
     /* Twice to check demotion */
     for (n = 0; n < 2; n++)
     {
-        fmpz_set_ui(y, 1UL);
+        fmpz_set_ui(y, UWORD(1));
 
         for (i = 0; i < 100; i++)
         {

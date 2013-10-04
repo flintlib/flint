@@ -26,7 +26,7 @@
 #include "arith.h"
 
 /* Small enough that a numerical computation is safe */
-#define DOUBLE_CUTOFF (1UL << 21)
+#define DOUBLE_CUTOFF (UWORD(1) << 21)
 
 void
 arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
@@ -44,7 +44,7 @@ arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
             t -= 0.5;
 
         fmpz_set_d(fmpq_numref(s), t);
-        fmpz_set_ui(fmpq_denref(s), 6UL * (*k));
+        fmpz_set_ui(fmpq_denref(s), UWORD(6) * (*k));
         fmpq_canonicalise(s);
     }
     else

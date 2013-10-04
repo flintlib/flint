@@ -68,11 +68,11 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     }
     else if (len == 2)
     {
-        if (poly[1] == 1L)
+        if (poly[1] == WORD(1))
         {
             flint_fprintf(file, "%s", x);
         }
-        else if (poly[1] == -1L)
+        else if (poly[1] == WORD(-1))
         {
             flint_fprintf(file, "-%s", x);
         }
@@ -96,9 +96,9 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     {
         slong i = len - 1;  /* i >= 2 */
         {
-            if (poly[i] == 1L)
+            if (poly[i] == WORD(1))
                flint_fprintf(file, "%s^%wd", x, i);
-            else if (poly[i] == -1L)
+            else if (poly[i] == WORD(-1))
                flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
@@ -113,9 +113,9 @@ int _fmpq_poly_fprint_pretty(FILE * file,
             if (poly[i] == 0)
                 continue;
 
-            if (poly[i] == 1L)
+            if (poly[i] == WORD(1))
                 flint_fprintf(file, "+%s^%wd", x, i);
-            else if (poly[i] == -1L)
+            else if (poly[i] == WORD(-1))
                 flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
@@ -130,12 +130,12 @@ int _fmpq_poly_fprint_pretty(FILE * file,
 
         if (poly[1])
         {
-            if (poly[1] == 1L)
+            if (poly[1] == WORD(1))
             {
                 fputc('+', file);
                 fputs(x, file);
             }
-            else if (poly[1] == -1L)
+            else if (poly[1] == WORD(-1))
             {
                 fputc('-', file);
                 fputs(x, file);

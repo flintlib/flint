@@ -52,7 +52,7 @@ main(void)
     {
         for (w = 1; w <= 5; w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;
@@ -89,7 +89,7 @@ main(void)
     {
         for (w = 1; w <= 5; w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;

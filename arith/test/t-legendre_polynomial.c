@@ -48,8 +48,8 @@ int main()
     fmpq_poly_init(Pn2);
     fmpq_poly_init(R);
 
-    fmpq_poly_set_ui(Pn, 1UL);
-    fmpq_poly_set_coeff_ui(Pn1, 1, 1UL);
+    fmpq_poly_set_ui(Pn, UWORD(1));
+    fmpq_poly_set_coeff_ui(Pn1, 1, UWORD(1));
 
     for (n = 0; n <= 500; n++)
     {

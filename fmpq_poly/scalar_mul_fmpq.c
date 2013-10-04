@@ -47,18 +47,18 @@ void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden,
     fmpz_init(gcd2);
     fmpz_one(gcd1);
     fmpz_one(gcd2);
-    if (*s != 1L)
+    if (*s != WORD(1))
     {
         _fmpz_vec_content(gcd1, poly, len);
-        if (*gcd1 != 1L)
+        if (*gcd1 != WORD(1))
             fmpz_gcd(gcd1, gcd1, s);
     }
-    if (*den != 1L && *r != 1L)
+    if (*den != WORD(1) && *r != WORD(1))
         fmpz_gcd(gcd2, r, den);
     
-    if (*gcd1 == 1L)
+    if (*gcd1 == WORD(1))
     {
-        if (*gcd2 == 1L)
+        if (*gcd2 == WORD(1))
         {
             _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, r);
             fmpz_mul(rden, den, s);
@@ -79,7 +79,7 @@ void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden,
         fmpz_t s2;
         fmpz_init(s2);
         fmpz_divexact(s2, s, gcd1);
-        if (*gcd2 == 1L)
+        if (*gcd2 == WORD(1))
         {
             _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
             _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, r);

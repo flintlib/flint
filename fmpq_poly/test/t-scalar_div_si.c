@@ -40,7 +40,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("scalar_div_si....");
     fflush(stdout);
@@ -121,9 +121,9 @@ main(void)
         while ((n2 = (slong) n_randbits(state, FLINT_BITS / 2 - 1)) == 0) ;
 
         m = n_randlimb(state);
-        if (m & 1UL)
+        if (m & UWORD(1))
             n1 = -n1;
-        if (m & 2UL)
+        if (m & UWORD(2))
             n2 = -n2;
 
         fmpq_poly_init(a);

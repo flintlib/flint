@@ -62,7 +62,7 @@ int main()
         m2 = n_randtest_prime(state, 0);
         nprimes = 1 + n_randint(state, 4);
 
-        fmpz_set_ui(m1, 1UL);
+        fmpz_set_ui(m1, UWORD(1));
         for (j = 0; j < nprimes; )
         {
             ulong t = n_randtest_prime(state, 0);

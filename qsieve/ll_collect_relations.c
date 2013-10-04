@@ -289,9 +289,9 @@ slong qsieve_ll_evaluate_sieve(qs_t qs_inf, char * sieve)
    while (j < qs_inf->sieve_size/sizeof(ulong))
    {
 #if FLINT64
-       while ((sieve2[j] & 0xE0E0E0E0E0E0E0E0UL) == 0) 
+       while ((sieve2[j] & UWORD(0xE0E0E0E0E0E0E0E0)) == 0) 
 #else
-       while ((sieve2[j] & 0xE0E0E0E0UL) == 0) 
+       while ((sieve2[j] & UWORD(0xE0E0E0E0)) == 0) 
 #endif
        {
 #if (QS_DEBUG & 16)
@@ -370,7 +370,7 @@ slong qsieve_ll_collect_relations(qs_t qs_inf, char * sieve)
    for (poly_index = 1; poly_index < (1<<(s - 1)); poly_index++)
    {
       for (j = 0; j < s; j++)
-         if (((poly_index >> j) & 1UL) != 0UL) break;
+         if (((poly_index >> j) & UWORD(1)) != UWORD(0)) break;
       
       poly_add = ((poly_index >> j) & 2);
       

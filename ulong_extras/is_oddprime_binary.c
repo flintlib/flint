@@ -46,7 +46,7 @@ int n_is_oddprime_binary(mp_limb_t n)
     {
         ulong diff2;
         if (primes[prime_lo + diff] <= n) prime_lo += diff;
-        if (diff <= 1UL) break;
+        if (diff <= UWORD(1)) break;
         diff  = (diff + 1)/2;
         diff2 = (prime_hi - prime_lo + 1)/2;
         if (diff > diff2) diff = diff2;

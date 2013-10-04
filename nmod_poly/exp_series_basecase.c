@@ -38,7 +38,7 @@ _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
     mp_ptr a;
     mp_limb_t s;
 
-    f[0] = 1UL;
+    f[0] = UWORD(1);
 
     a = _nmod_vec_init(FLINT_MIN(n, hlen));
     for (k = 1; k < FLINT_MIN(n, hlen); k++)
@@ -63,7 +63,7 @@ nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n)
     nmod_poly_fit_length(f, n);
     hlen = h->length;
 
-    if (hlen > 0 && h->coeffs[0] != 0UL)
+    if (hlen > 0 && h->coeffs[0] != UWORD(0))
     {
         flint_printf("Exception (nmod_poly_exp_series_basecase). Constant term != 0.\n");
         abort();
@@ -77,7 +77,7 @@ nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n)
         }
         else
         {
-            f->coeffs[0] = 1UL;
+            f->coeffs[0] = UWORD(1);
             f->length = 1;
         }
         return;

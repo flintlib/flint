@@ -42,7 +42,7 @@ void sample(void * arg, ulong count)
    {
       int j;
       d = n_randtest(state);
-      if (d == 0UL) d++;
+      if (d == UWORD(0)) d++;
 
       dpre = n_precompute_inverse(d);
 

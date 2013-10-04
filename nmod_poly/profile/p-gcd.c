@@ -121,7 +121,7 @@ int main(void)
             cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) (100*r);
             cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) (100*r);
 
-            flint_printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
+            flint_printf("%4ld %10.WORD(8)f %10.WORD(8)f\n", A->length, cpu[i][0][k], cpu[i][1][k]);
             fflush(stdout);
 
             nmod_poly_clear(A);
@@ -135,11 +135,11 @@ int main(void)
     {
         flint_printf("[[");
         for (k = 0; k < N; k++)
-            flint_printf("%.8Lf,", cpu[i][0][k]);
+            flint_printf("%.WORD(8)f,", cpu[i][0][k]);
         flint_printf("],");
         flint_printf("[");
         for (k = 0; k < N; k++)
-            flint_printf("%.8Lf,", cpu[i][1][k]);
+            flint_printf("%.WORD(8)f,", cpu[i][1][k]);
         flint_printf("]],");
     }
     flint_printf("]\n");

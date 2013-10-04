@@ -39,7 +39,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("sin_series....");
     fflush(stdout);
@@ -56,7 +56,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_canonicalise(a);
 
@@ -90,7 +90,7 @@ main(void)
         fmpq_poly_init(asinsina);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 60) + 1, 80);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_sin_series(sina, a, n);
         fmpq_poly_asin_series(asinsina, sina, n);

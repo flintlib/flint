@@ -57,7 +57,7 @@ int main(void)
       do
       {
          c = n_randint(state, n);
-      } while (c <= 2UL);
+      } while (c <= UWORD(2));
 
       p = n_factor_pp1(n, B1, c);
       if (p >= 2)

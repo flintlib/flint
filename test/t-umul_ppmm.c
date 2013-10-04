@@ -47,10 +47,10 @@ int main(void)
       
       umul_ppmm(ph1, pl1, m1, m2);
       
-      pl2old = 0UL;
-      pl2 = 0UL;
-      ph2 = 0UL;
-      bit = 1UL;
+      pl2old = UWORD(0);
+      pl2 = UWORD(0);
+      ph2 = UWORD(0);
+      bit = UWORD(1);
       for (j = 0; j < FLINT_BITS; j++)
       {
          if (m2 & bit)

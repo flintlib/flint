@@ -52,7 +52,7 @@ int main(void)
       {
          a = n_randtest_bits(state, bits1);
          b = n_randtest_bits(state, bits2);
-      } while ((n_gcd(a, b) != 1UL) || (b > a));
+      } while ((n_gcd(a, b) != UWORD(1)) || (b > a));
 
       c = n_randtest_bits(state, bits3);
 
@@ -62,7 +62,7 @@ int main(void)
       umul_ppmm(qh, ql, b*c, t);
       sub_ddmmss(ph, pl, ph, pl, qh, ql);
       
-      result = ((g == c) && (ph == 0UL) && (pl == c));
+      result = ((g == c) && (ph == UWORD(0)) && (pl == c));
       if (!result)
       {
          flint_printf("FAIL:\n");

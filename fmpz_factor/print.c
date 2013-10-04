@@ -54,7 +54,7 @@ fmpz_factor_print(const fmpz_factor_t factor)
     {
         fmpz_print(factor->p + i);
 
-        if (factor->exp[i] != 1UL)
+        if (factor->exp[i] != UWORD(1))
             flint_printf("^%wu", factor->exp[i]);
 
         if (i != factor->num - 1)

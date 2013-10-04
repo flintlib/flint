@@ -46,7 +46,7 @@ _nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, slong len, nmod_
 
     tmp = _nmod_vec_init(len + 1);
     height = FLINT_CLOG2(len);
-    n = 1L << (height - 1);
+    n = WORD(1) << (height - 1);
 
     _nmod_poly_mul(tmp, tree[height-1], n + 1,
                         tree[height-1] + (n + 1), (len - n + 1), mod);
@@ -78,7 +78,7 @@ _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
 
     for (i = 0; i < FLINT_CLOG2(len); i++)
     {
-        pow = (1L << i);
+        pow = (WORD(1) << i);
         pa = tree[i];
         pb = poly;
         left = len;

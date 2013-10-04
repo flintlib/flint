@@ -49,8 +49,8 @@ int main(void)
       
       r1 = n_addmod(a, b, d);
 
-      add_ssaaaa(s1, r2, 0UL, a, 0UL, b);
-      if (s1) sub_ddmmss(s1, r2, s1, r2, 0UL, d);
+      add_ssaaaa(s1, r2, UWORD(0), a, UWORD(0), b);
+      if (s1) sub_ddmmss(s1, r2, s1, r2, UWORD(0), d);
       else if (r2 >= d) r2 -= d;
       
       result = (r1 == r2);

@@ -50,7 +50,7 @@ int main(void)
       do
       {
          d = n_randint(state, cutoff) | 1;
-         if (d == 1UL) d += 2;
+         if (d == UWORD(1)) d += 2;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);

@@ -50,9 +50,9 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     {
         for (j = 0; j < bc; j++)
         {
-            mpz_set_ui(t, 0UL);
+            mpz_set_ui(t, UWORD(0));
 
-            pos[2] = pos[1] = pos[0] = neg[2] = neg[1] = neg[0] = 0UL;
+            pos[2] = pos[1] = pos[0] = neg[2] = neg[1] = neg[0] = UWORD(0);
 
             for (k = 0; k < br; k++)
             {
@@ -71,7 +71,7 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
 
                         umul_ppmm(au, bu, au, bu);
 
-                        if ((a ^ b) >= 0L)
+                        if ((a ^ b) >= WORD(0))
                             add_sssaaaaaa(pos[2], pos[1], pos[0],
                                           pos[2], pos[1], pos[0], 0, au, bu);
                         else

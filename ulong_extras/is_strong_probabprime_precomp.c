@@ -37,7 +37,7 @@ n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a,
 
     y = n_powmod_ui_precomp(a, t, n, npre);
 
-    if (y == 1UL)
+    if (y == UWORD(1))
         return 1;
     t <<= 1;
 

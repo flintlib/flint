@@ -56,7 +56,7 @@ main(void)
         nmod_mat_init(I, m, m, mod);
 
         for (j = 0; j < m; j++)
-            I->rows[j][j] = 1UL;
+            I->rows[j][j] = UWORD(1);
 
         /* Verify that A * A^-1 = I for random matrices */
 

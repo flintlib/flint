@@ -66,9 +66,9 @@ main(void)
         nmod_poly_init(S, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, N));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
         nmod_poly_randtest(B, state, n_randint(state, N));
-        nmod_poly_set_coeff_ui(B, 0, 0UL);
+        nmod_poly_set_coeff_ui(B, 0, UWORD(0));
 
         /* Randomly generate a monomial */
         if (n_randlimb(state) % 100 == 0)
@@ -76,7 +76,7 @@ main(void)
             nmod_poly_zero(A);
             nmod_poly_set_coeff_ui(A, n_randlimb(state) % (n+5), \
                 n_randtest_not_zero(state) % mod);
-            nmod_poly_set_coeff_ui(A, 0, 0UL);
+            nmod_poly_set_coeff_ui(A, 0, UWORD(0));
         }
 
         nmod_poly_exp_series(expA, A, n);
@@ -122,7 +122,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_exp_series(B, A, n);
         nmod_poly_exp_series(A, A, n);

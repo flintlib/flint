@@ -58,7 +58,7 @@ main(void)
 
         fmpz_init(mult);
         fmpz_randtest_not_zero(mult, state, 200);
-        fmpz_add_ui(mult, mult, 1UL);
+        fmpz_add_ui(mult, mult, UWORD(1));
 
         fmpz_mul(&x->num, &x->num, mult);
         fmpz_mul(&x->den, &x->den, mult);

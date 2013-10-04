@@ -64,7 +64,7 @@ main(void)
         rem = nmod_poly_div_root(Q, P, r);
 
         nmod_poly_set_coeff_ui(D, 0, n_negmod(r, mod));
-        nmod_poly_set_coeff_ui(D, 1, 1UL);
+        nmod_poly_set_coeff_ui(D, 1, UWORD(1));
 
         nmod_poly_divrem(DQ, DR, P, D);
 

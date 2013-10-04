@@ -66,7 +66,7 @@ main(void)
     check(x, 1);
 
     fmpz_set_ui(x, ULONG_MAX);
-    fmpz_add_ui(x, x, 1UL);
+    fmpz_add_ui(x, x, UWORD(1));
     check(x, 0);
 
     fmpz_neg(x, x);
@@ -74,7 +74,7 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpz_set_ui(x, 1UL);
+        fmpz_set_ui(x, UWORD(1));
         fmpz_mul_2exp(x, x, i);
         check(x, i < FLINT_BITS);
         fmpz_neg(x, x);

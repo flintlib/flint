@@ -81,7 +81,7 @@ main(void)
             
                 timeit_t t[2];
                 int l, loops = 1, r = 0;
-                slong s[2] = {0L, 0L};
+                slong s[2] = {WORD(0), WORD(0)};
                 double T[2];
             
                 /*
@@ -91,7 +91,7 @@ main(void)
                     slong ell;
                     for (ell = 0; ell < len; ell++)
                         fmpz_randbits(f->coeffs + ell, state, bits);
-                    if ((f->coeffs)[len - 1] == 0L)
+                    if ((f->coeffs)[len - 1] == WORD(0))
                         fmpz_randtest_not_zero(f->coeffs + (len - 1), state, bits);
                     f->length = len;
                 }

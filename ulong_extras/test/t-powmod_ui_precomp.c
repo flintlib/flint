@@ -55,7 +55,7 @@ int main(void)
       do
       {
          a = n_randtest(state) % d;
-      } while (n_gcd(d, a) != 1UL);
+      } while (n_gcd(d, a) != UWORD(1));
       exp = n_randtest(state);
       
       dpre = n_precompute_inverse(d);

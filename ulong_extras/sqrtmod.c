@@ -44,7 +44,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     if (n_jacobi_unsigned(a, p) == -1)
         return 0;
 
-    if ((p & 3UL) == 3)
+    if ((p & UWORD(3)) == 3)
     {
         return n_powmod2_ui_preinv(a, (p + 1) / 4, p, pinv);
     }
@@ -53,9 +53,9 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     p1 = p - 1;
 
     do {
-        p1 >>= 1UL; 
+        p1 >>= UWORD(1); 
         r++;
-    } while ((p1 & 1UL) == 0);
+    } while ((p1 & UWORD(1)) == 0);
 
     b = n_powmod2_ui_preinv(a, p1, p, pinv);
 

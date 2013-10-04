@@ -120,7 +120,7 @@ main(void)
 
         fmpz_poly_divrem_divconquer(q, r, d, a);
 
-        result = (r->length == 0L);
+        result = (r->length == WORD(0));
         if (!result)
         {
             flint_printf("FAIL (check a | gcd(af, ag)):\n");

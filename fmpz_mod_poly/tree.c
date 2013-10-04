@@ -90,7 +90,7 @@ _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong le
     for (i = 0; i < height - 1; i++)
     {
         left = len;
-        pow = 1L << i;
+        pow = WORD(1) << i;
         pa = tree[i];
         pb = tree[i + 1];
 

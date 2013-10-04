@@ -47,7 +47,7 @@ int main(void)
 
       n1 = n_randtest_not_zero(state);
       limit = n_sqrt(n1);
-      n2 = n_factor_trial_partial(&factors, n1, &prod, 10000UL, limit);
+      n2 = n_factor_trial_partial(&factors, n1, &prod, UWORD(10000), limit);
       
       if (n1 != n2*prod)
       {

@@ -36,7 +36,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
     
     flint_printf("get_slice....");
     fflush(stdout);

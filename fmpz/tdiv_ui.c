@@ -34,7 +34,7 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
 {
     fmpz c1 = *g;
 
-    if (h == 0UL)
+    if (h == UWORD(0))
     {
         flint_printf("Exception (fmpz_tdiv_ui). Division by 0.\n");
         abort();
@@ -44,7 +44,7 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
     {
 		/* We need the absolut value of the remainder and
 		   C 90 guarantees truncation towards zero. */
-		if (c1 < 0L)
+		if (c1 < WORD(0))
 			return -c1 % h;
 		else
 			return c1 % h;

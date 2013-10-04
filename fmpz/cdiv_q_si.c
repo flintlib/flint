@@ -46,7 +46,7 @@ fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
         fmpz q = c1 / c2;       /* compute C quotient */
         fmpz r = c1 - c2 * q;   /* compute remainder */
 
-        if (r && ((c1 ^ c2) > 0L))
+        if (r && ((c1 ^ c2) > WORD(0)))
             ++q;
 
         fmpz_set_si(f, q);

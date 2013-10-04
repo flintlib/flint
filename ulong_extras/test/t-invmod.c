@@ -46,7 +46,7 @@ int main(void)
       {
          a = n_randtest(state);
          b = n_randtest(state);
-      } while ((a >= b) || (n_gcd(b, a) != 1UL));
+      } while ((a >= b) || (n_gcd(b, a) != UWORD(1)));
 
       t = n_invmod(a, b);
       
@@ -54,7 +54,7 @@ int main(void)
       umul_ppmm(ph, pl, t, a);
       r = n_ll_mod_preinv(ph, pl, b, binv);
 
-      result = (((r == 0UL) && (b == 1UL)) || (r == 1UL));
+      result = (((r == UWORD(0)) && (b == UWORD(1))) || (r == UWORD(1)));
       if (!result)
       {
          flint_printf("FAIL:\n");

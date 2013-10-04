@@ -43,7 +43,7 @@ void fmpz_poly_gmprand(fmpz_poly_t rop, gmp_randstate_t state, slong len, slong 
     for (i = 0; i < len; i++)
     {
         mpz_urandomb(c, state, bits);
-        if (rand() & 1L)
+        if (rand() & WORD(1))
             mpz_neg(c, c);
         fmpz_set_mpz(d, c);
         fmpz_poly_set_coeff_fmpz(rop, i, d);
@@ -72,8 +72,8 @@ main(void)
     gmp_randstate_t state;
     
     gmp_randinit_default(state);
-    gmp_randseed_ui(state, 362436069UL);
-    srand(521288629UL);
+    gmp_randseed_ui(state, UWORD(362436069));
+    srand(UWORD(521288629));
         
     fmpz_poly_init(f);
     fmpz_poly_init(g);
@@ -91,7 +91,7 @@ main(void)
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
         {
             int c, n, reps = 0;
-            slong s = 0L;
+            slong s = WORD(0);
             
             for (n = 0; n < ncases; n++)
             {

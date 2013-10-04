@@ -63,7 +63,7 @@ _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
             }
             
             fmpz_addmul(rnum, rden, f + i);
-            if (*rnum == 0L)
+            if (*rnum == WORD(0))
                 fmpz_one(rden);
         } while (i);
         

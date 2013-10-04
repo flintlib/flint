@@ -36,11 +36,11 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, slong len, nmod_t mod)
 	for (j = 1; j < len; j++)
 	{
 		if (k <= 1) 
-            x_prime[j - 1] = k == 0 ? 0L : x[j];     
+            x_prime[j - 1] = k == 0 ? WORD(0) : x[j];     
         else 
             x_prime[j - 1] = n_mulmod2_preinv(x[j], k, mod.n, mod.ninv);
 		
-        if (++k == mod.n) k = 0L;
+        if (++k == mod.n) k = WORD(0);
 	}
 
 }

@@ -141,7 +141,7 @@ void _fmpz_demote_val(fmpz_t f)
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
    __mpz_struct *ptr;
-   *f = 0L;
+   *f = WORD(0);
    ptr = _fmpz_promote(f);
 
    mpz_clear(ptr);

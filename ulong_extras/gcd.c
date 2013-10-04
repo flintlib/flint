@@ -36,14 +36,14 @@ n_gcd(mp_limb_t x, mp_limb_t y)
     u3 = x;
     v3 = y;
 
-    if ((mp_limb_signed_t) (x & y) < 0L)  /* x and y both have top bit set */
+    if ((mp_limb_signed_t) (x & y) < WORD(0))  /* x and y both have top bit set */
     {
         quot = u3 - v3;
         u3 = v3;
         v3 = quot;
     }
 
-    while ((mp_limb_signed_t) (v3 << 1) < 0L)  /* second value has second msb set */
+    while ((mp_limb_signed_t) (v3 << 1) < WORD(0))  /* second value has second msb set */
     {
         quot = u3 - v3;
         u3   = v3;

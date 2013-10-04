@@ -40,8 +40,8 @@ _nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
     _nmod_vec_add(t, h, h, n, mod);
     _nmod_poly_exp_series(u, t, n, mod);
     _nmod_vec_set(t, u, n);
-    t[0] = 0UL;
-    u[0] = 2UL;
+    t[0] = UWORD(0);
+    u[0] = UWORD(2);
     _nmod_poly_div_series(f, t, u, n, mod);
 
     _nmod_vec_clear(t);
@@ -54,7 +54,7 @@ nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     mp_ptr h_coeffs;
     slong h_len = h->length;
 
-    if (h_len > 0 && h->coeffs[0] != 0UL)
+    if (h_len > 0 && h->coeffs[0] != UWORD(0))
     {
         flint_printf("Exception (nmod_poly_tanh_series). Constant term != 0.\n");
         abort();

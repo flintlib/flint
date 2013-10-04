@@ -60,11 +60,11 @@ main(void)
 
         fmpz_poly_product_roots_fmpz_vec(P, x, n);
 
-        fmpz_poly_set_ui(Q, 1UL);
+        fmpz_poly_set_ui(Q, UWORD(1));
         for (j = 0; j < n; j++)
         {
             fmpz_poly_zero(tmp);
-            fmpz_poly_set_coeff_si(tmp, 1, -1L);
+            fmpz_poly_set_coeff_si(tmp, 1, WORD(-1));
             fmpz_poly_set_coeff_fmpz(tmp, 0, x + j);
             fmpz_poly_neg(tmp, tmp);
             fmpz_poly_mul(Q, Q, tmp);

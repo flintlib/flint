@@ -47,7 +47,7 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
     {
         if (R1[iR] == 0)
         {
-            ptrQ[iR] = 0L;
+            ptrQ[iR] = WORD(0);
         }
         else 
         {
@@ -90,9 +90,9 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
         mp_limb_t r = 
             n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n, mod.ninv);
 
-        while ((iR + 1 >= lenB) && (r == 0L))
+        while ((iR + 1 >= lenB) && (r == WORD(0)))
         {
-            ptrQ[iR--] = 0L;
+            ptrQ[iR--] = WORD(0);
             if (iR + 1 >= lenB)
                 r = n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n,
                                     mod.ninv);
@@ -143,9 +143,9 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
             n_lll_mod_preinv(R3[3 * iR + 2], R3[3 * iR + 1],
                              R3[3 * iR], mod.n, mod.ninv);
 
-        while ((iR + 1 >= lenB) && (r == 0L))
+        while ((iR + 1 >= lenB) && (r == WORD(0)))
         {
-            ptrQ[iR--] = 0L;
+            ptrQ[iR--] = WORD(0);
             if (iR + 1 >= lenB)
                 r = n_lll_mod_preinv(R3[3 * iR + 2], R3[3 * iR + 1],
                                      R3[3 * iR], mod.n, mod.ninv);

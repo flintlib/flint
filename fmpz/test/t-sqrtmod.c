@@ -46,7 +46,7 @@ int main(void)
         fmpz_t a, b, c, p;
         mp_limb_t prime;
 
-        prime = n_randint(state, 1UL << (FLINT_BITS - 1));
+        prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);
 
         fmpz_init(a);
@@ -85,7 +85,7 @@ int main(void)
         fmpz_t a, b, c, d, p;
         mp_limb_t prime;
 
-        prime = n_randint(state, 1UL << (FLINT_BITS - 1));
+        prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);
 
         fmpz_init(a);

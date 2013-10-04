@@ -37,7 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("compose....");
     fflush(stdout);
@@ -124,8 +124,8 @@ main(void)
         fmpq_poly_randtest(h, state, n_randint(state, 20), 65);
         
         fmpq_poly_zero(s);
-        fmpq_poly_set_ui(t, 1UL);
-        for (k = 0L; k < g->length; k++)
+        fmpq_poly_set_ui(t, UWORD(1));
+        for (k = WORD(0); k < g->length; k++)
         {
             fmpq_poly_get_coeff_mpq(c, g, k);
             fmpq_poly_scalar_mul_mpq(u, t, c);

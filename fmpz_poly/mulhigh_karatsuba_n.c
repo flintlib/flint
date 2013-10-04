@@ -96,9 +96,9 @@ _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1,
         return;
     }
 
-    while ((1L << loglen) < len)
+    while ((WORD(1) << loglen) < len)
         loglen++;
-    length = (1L << loglen);
+    length = (WORD(1) << loglen);
 
     temp = _fmpz_vec_init(2 * length);
 

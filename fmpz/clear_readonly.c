@@ -35,7 +35,7 @@ void fmpz_clear_readonly(fmpz_t f)
 
         mpz_init(ptr);
         _fmpz_clear_mpz(*f);
-        *f = 0L;
+        *f = WORD(0);
     }
 }
 

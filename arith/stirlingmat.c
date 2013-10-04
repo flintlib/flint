@@ -35,7 +35,7 @@ void arith_stirling_number_1u_vec_next(fmpz * row,
 
     for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
     {
-        fmpz_mul_ui(row + k, prev + k, n - 1UL);
+        fmpz_mul_ui(row + k, prev + k, n - UWORD(1));
         fmpz_add(row + k, prev + k - 1, row + k);
     }
 
@@ -53,7 +53,7 @@ void arith_stirling_number_1_vec_next(fmpz * row,
 
     for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
     {
-        fmpz_mul_ui(row + k, prev + k, n - 1UL);
+        fmpz_mul_ui(row + k, prev + k, n - UWORD(1));
         fmpz_sub(row + k, prev + k - 1, row + k);
     }
 

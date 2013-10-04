@@ -37,7 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("scalar_mul_ui....");
     fflush(stdout);

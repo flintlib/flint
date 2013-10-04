@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, j, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    flint_rand_t state;
    
    flint_printf("is_strong_probabprime_precomp....");
@@ -56,12 +56,12 @@ int main(void)
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
       } while (FLINT_BIT_COUNT(d) > FLINT_D_BITS);
-      if (d == 2UL) d++;
+      if (d == UWORD(2)) d++;
          
       for (j = 0; j < 100; j++)
       {
          do a = n_randint(state, d);
-         while (a == 0UL);
+         while (a == UWORD(0));
       
          dpre = n_precompute_inverse(d);
          count_trailing_zeros(norm, d - 1);
@@ -96,7 +96,7 @@ int main(void)
       for (j = 0; j < 100; j++)
       {
          do a = n_randint(state, d);
-         while (a == 0UL);
+         while (a == UWORD(0));
       
          dpre = n_precompute_inverse(d);
          count_trailing_zeros(norm, d - 1);

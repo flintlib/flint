@@ -131,7 +131,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     
     /* Copy the denominator into an mpz_t */
     mpz_init(z);
-    if (*den == 1L)
+    if (*den == WORD(1))
     {
         densize = 0;
     }

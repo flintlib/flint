@@ -99,8 +99,8 @@ main(void)
         fmpz_t N;
 
         fmpz_poly_init(a);
-        fmpz_poly_set_coeff_si(a, 0, 1L);
-        fmpz_poly_set_coeff_si(a, n_randint(state, 20), 1L);
+        fmpz_poly_set_coeff_si(a, 0, WORD(1));
+        fmpz_poly_set_coeff_si(a, n_randint(state, 20), WORD(1));
         if (a->length < 2)
         {
             fmpz_poly_clear(a);
@@ -109,7 +109,7 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_randtest(f, state, a->length - 2, 40);
 
-        fmpz_init_set_ui(N, 1UL);
+        fmpz_init_set_ui(N, UWORD(1));
         fmpz_mul_2exp(N, N, 45 + a->length);
 
         fmpz_poly_scalar_mul_fmpz(a, a, N);

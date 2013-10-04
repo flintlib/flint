@@ -32,7 +32,7 @@ int
 n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
 {
     if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
-        return (n_powmod(i, n - 1, n) == 1UL);
+        return (n_powmod(i, n - 1, n) == UWORD(1));
     else
-        return n_powmod2_ui_preinv(i, n - 1, n, n_preinvert_limb(n)) == 1UL;
+        return n_powmod2_ui_preinv(i, n - 1, n, n_preinvert_limb(n)) == UWORD(1);
 }

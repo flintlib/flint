@@ -51,7 +51,7 @@ n_remove(mp_limb_t * n, mp_limb_t p)
             break;
         quot = (*n) / powp[i];
         rem = (*n) - quot * powp[i];
-        if (rem != 0UL)
+        if (rem != UWORD(0))
             break;
         powp[i + 1] = powp[i] * powp[i];
         (*n) = quot;
@@ -66,9 +66,9 @@ n_remove(mp_limb_t * n, mp_limb_t p)
             continue;
         quot = (*n) / powp[i];
         rem = (*n) - quot * powp[i];
-        if (rem == 0UL)
+        if (rem == UWORD(0))
         {
-            exp += (1UL << i);
+            exp += (UWORD(1) << i);
             (*n) = quot;
         }
     }

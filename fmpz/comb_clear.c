@@ -37,7 +37,7 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
     slong n, i, j;
 
     n = temp->n;
-    j = (1L << (n - 1));
+    j = (WORD(1) << (n - 1));
 
 	for (i = 0; i < n; i++)
     {
@@ -59,7 +59,7 @@ fmpz_comb_clear(fmpz_comb_t comb)
     n = comb->n;
 
     /* Size of top level */
-    j = (1L << (n - 1));
+    j = (WORD(1) << (n - 1));
 
     /* Clear arrays at each level  */
     for (i = 0; i < n; i++)

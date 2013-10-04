@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, result;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
     flint_rand_t state;
 
     flint_printf("scalar_div_fmpq....");

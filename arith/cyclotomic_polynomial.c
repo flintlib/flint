@@ -44,7 +44,7 @@ _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
     }
 
     /* Phi_{2n}(x) = Phi_n(-x)*/
-    if (factors[0] == 2UL)
+    if (factors[0] == UWORD(2))
     {
         _arith_cyclotomic_polynomial(a, n / 2, factors + 1,
             num_factors - 1, phi);
@@ -59,17 +59,17 @@ _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
 
     /* Coefficients are guaranteed not to overflow an fmpz */
     small = (num_factors == 2) ||                  /* Always +1/0/-1*/
-            (n < 10163195L) ||                     /* At most 27 bits */
-            (FLINT_BITS == 64 && n < 169828113L);  /* At most 60 bits */
+            (n < WORD(10163195)) ||                     /* At most 27 bits */
+            (FLINT_BITS == 64 && n < WORD(169828113));  /* At most 60 bits */
 
     /* Iterate over all divisors of n */
-    for (k = 0; k < (1L << num_factors); k++)
+    for (k = 0; k < (WORD(1) << num_factors); k++)
     {
         int mu;
         ulong d;
 
         mu = (num_factors & 1) ? -1 : 1;
-        d = 1L;
+        d = WORD(1);
         for (i = 0; i < num_factors; i++)
         {
             if ((k >> i) & 1)
@@ -108,13 +108,13 @@ arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
     {
         if (n == 0)
         {
-            fmpz_poly_set_ui(poly, 1UL);
+            fmpz_poly_set_ui(poly, UWORD(1));
         }
         else
         {
             fmpz_poly_fit_length(poly, 2);
-            fmpz_set_si(poly->coeffs, (n == 1) ? -1L : 1L);
-            fmpz_set_si(poly->coeffs + 1, 1L);
+            fmpz_set_si(poly->coeffs, (n == 1) ? WORD(-1) : WORD(1));
+            fmpz_set_si(poly->coeffs + 1, WORD(1));
             _fmpz_poly_set_length(poly, 2);
         }
         return;
@@ -124,7 +124,7 @@ arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
       and compute phi(s) which determines the degree of the polynomial. */
     n_factor_init(&factors);
     n_factor(&factors, n, 1);
-    s = phi = 1UL;
+    s = phi = UWORD(1);
     for (i = 0; i < factors.num; i++)
     {
         phi *= factors.p[i] - 1;

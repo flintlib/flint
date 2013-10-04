@@ -72,7 +72,7 @@ _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr poly1, slong len1,
     _nmod_vec_set(B->rows[i], poly1 + i*m, len1 % m);
 
     /* Set rows of A to powers of poly2 */
-    A->rows[0][0] = 1UL;
+    A->rows[0][0] = UWORD(1);
     _nmod_vec_set(A->rows[1], poly2, n);
     for (i = 2; i < m; i++)
         _nmod_poly_mulmod(A->rows[i], A->rows[i-1],

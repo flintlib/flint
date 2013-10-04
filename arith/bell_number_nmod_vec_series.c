@@ -46,12 +46,12 @@ arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
         tmp[k] = c;
         c = n_mulmod2_preinv(c, k, mod.n, mod.ninv);
     }
-    tmp[0] = 0UL;
+    tmp[0] = UWORD(0);
 
     _nmod_poly_exp_series(res, tmp, n, mod);
 
     /* Multiply by factorials */
-    c = 1UL;
+    c = UWORD(1);
     for (k = 1; k < n; k++)
     {
         c = n_mulmod2_preinv(c, k, mod.n, mod.ninv);

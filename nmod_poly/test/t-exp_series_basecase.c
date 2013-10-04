@@ -61,16 +61,16 @@ main(void)
         nmod_poly_init(S, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
         nmod_poly_randtest(B, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(B, 0, 0UL);
+        nmod_poly_set_coeff_ui(B, 0, UWORD(0));
 
         if (n_randlimb(state) % 100 == 0)
         {
             nmod_poly_zero(A);
             nmod_poly_set_coeff_ui(A, n_randlimb(state) % (n+5), \
                 n_randtest_not_zero(state) % mod);
-            nmod_poly_set_coeff_ui(A, 0, 0UL);
+            nmod_poly_set_coeff_ui(A, 0, UWORD(0));
         }
 
         nmod_poly_exp_series_basecase(expA, A, n);
@@ -116,7 +116,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_exp_series_basecase(B, A, n);
         nmod_poly_exp_series_basecase(A, A, n);

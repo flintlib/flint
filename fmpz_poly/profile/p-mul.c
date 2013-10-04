@@ -104,7 +104,7 @@ main(void)
             int c, n, reps = 0;
             
             for (c = 0; c < nalgs; c++)
-                s[c] = 0L;
+                s[c] = WORD(0);
             
             for (n = 0; n < ncases; n++)
             {
@@ -121,9 +121,9 @@ main(void)
                         fmpz_randbits(f->coeffs + k, state, bits);
                         fmpz_randbits(g->coeffs + k, state, bits);
                     }
-                    if ((f->coeffs)[len-1] == 0L)
+                    if ((f->coeffs)[len-1] == WORD(0))
                         fmpz_randtest_not_zero(f->coeffs + (len - 1), state, bits);
-                    if ((g->coeffs)[len-1] == 0L)
+                    if ((g->coeffs)[len-1] == WORD(0))
                         fmpz_randtest_not_zero(g->coeffs + (len - 1), state, bits);
                     f->length = len;
                     g->length = len;

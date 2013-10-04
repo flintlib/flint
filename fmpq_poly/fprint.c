@@ -68,7 +68,7 @@ _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
                 fmpz_gcd(g, poly + i, den);
                 fmpz_divexact(n, poly + i, g);
                 fmpz_divexact(d, den, g);
-                if (*d == 1L)
+                if (*d == WORD(1))
                     r = fmpz_fprint(file, n);
                 else
                 {

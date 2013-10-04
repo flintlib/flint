@@ -44,8 +44,8 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
    mp_bitcnt_t depth = 0;
    mp_bitcnt_t depth2 = 0;
    
-   while ((1UL<<depth) < n2) depth++;
-   while ((1UL<<depth2) < n1) depth2++;
+   while ((UWORD(1)<<depth) < n2) depth++;
+   while ((UWORD(1)<<depth2) < n1) depth2++;
 
    ii += 2*n;
    jj += 2*n;

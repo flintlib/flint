@@ -52,7 +52,7 @@ void sample(void * arg, ulong count)
    for (i = 0; i < count; i++)
    {
       n = n_randbits(state, bits);
-      if (n == 0UL) n++;
+      if (n == UWORD(0)) n++;
       c = n_randint(state, n);
       for (j = 0; j < length; j++)
          vec[j] = n_randint(state, n);

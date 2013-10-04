@@ -49,14 +49,14 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
             fmpz q = c1 / c2;      /* compute C quotient */
             fmpz r = c1 - c2 * q;  /* compute remainder  */
 
-            if (r && ((c2 ^ r) > 0L))  /* r != 0, c2 and r same sign */
+            if (r && ((c2 ^ r) > WORD(0)))  /* r != 0, c2 and r same sign */
                 ++q;
 
             fmpz_set_si(f, q);
         }
         else  /* h is large and g is small */
         {
-            if ((c1 < 0L && fmpz_sgn(h) < 0) || (c1 > 0L && fmpz_sgn(h) > 0))  /* signs are the same */
+            if ((c1 < WORD(0) && fmpz_sgn(h) < 0) || (c1 > WORD(0) && fmpz_sgn(h) > 0))  /* signs are the same */
                 fmpz_one(f);  /* quotient is positive, round up to one */
             else
                 fmpz_zero(f);  /* quotient is zero, or negative, round up to zero */  

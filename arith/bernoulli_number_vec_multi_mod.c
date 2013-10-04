@@ -45,10 +45,10 @@ __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
     }
 
     _nmod_poly_inv_series(res, tmp, m, mod);
-    res[0] = 1UL;
+    res[0] = UWORD(1);
 
     /* N_(2k) = -1 * D_(2k) * (2k)! / (2k-1) */
-    c = n_negmod(1UL, mod.n);
+    c = n_negmod(UWORD(1), mod.n);
     for (k = 1; k < m; k++)
     {
         t = fmpz_fdiv_ui(den + 2*k, mod.n);
@@ -93,7 +93,7 @@ void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
     polys = flint_malloc(num_primes * sizeof(mp_ptr));
 
     /* Compute Bernoulli numbers mod p */
-    primes[0] = n_nextprime(1UL<<prime_bits, 0);
+    primes[0] = n_nextprime(UWORD(1)<<prime_bits, 0);
     for (k = 1; k < num_primes; k++)
         primes[k] = n_nextprime(primes[k-1], 0);
     temppoly = _nmod_vec_init(m);
@@ -113,7 +113,7 @@ void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
 
     /* Trivial entries */
     if (n > 1)
-        fmpz_set_si(num + 1, -1L);
+        fmpz_set_si(num + 1, WORD(-1));
     for (k = 3; k < n; k += 2)
         fmpz_zero(num + k);
 

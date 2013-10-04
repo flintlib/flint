@@ -49,11 +49,11 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     }
     else if (len == 2)
     {
-        if (*(poly + 1) == 1L)
+        if (*(poly + 1) == WORD(1))
         {
             r = flint_fprintf(file, "%s", x);
         }
-        else if (*(poly + 1) == -1L)
+        else if (*(poly + 1) == WORD(-1))
         {
             r = flint_fprintf(file, "-%s", x);
         }

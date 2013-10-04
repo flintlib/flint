@@ -37,7 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("scalar_div_ui....");
     fflush(stdout);
@@ -79,10 +79,10 @@ main(void)
         fmpq_poly_t a, b, c;
         ulong n1 = n_randbits(state, FLINT_BITS / 2);
         ulong n2 = n_randbits(state, FLINT_BITS / 2);
-        if (n1 == 0UL)
-            n1 = 1UL;
-        if (n2 == 0UL)
-            n2 = 1UL;
+        if (n1 == UWORD(0))
+            n1 = UWORD(1);
+        if (n2 == UWORD(0))
+            n2 = UWORD(1);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);

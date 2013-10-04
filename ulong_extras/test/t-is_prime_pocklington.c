@@ -73,7 +73,7 @@ int main(void)
       do
       {
          d = n_randtest(state) | 1;
-         if (d == 1UL) d++;
+         if (d == UWORD(1)) d++;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 

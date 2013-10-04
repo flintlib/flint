@@ -452,7 +452,7 @@
 #define invert_limb(invxl, xl)                      \
    do {                                             \
       mp_limb_t dummy;                              \
-      udiv_qrnnd (invxl, dummy, ~(xl), ~(0L), xl);  \
+      udiv_qrnnd (invxl, dummy, ~(xl), ~(WORD(0)), xl);  \
    } while (0)
 
 /*

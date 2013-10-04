@@ -46,13 +46,13 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    char t;
    
    t = mod31[n%31];
-   if (!t) return 0UL;
+   if (!t) return UWORD(0);
 
    t &= mod44[n%44];
-   if (!t) return 0UL;
+   if (!t) return UWORD(0);
 
    t &= mod61[n%61];
-   if (!t) return 0UL;
+   if (!t) return UWORD(0);
 
    t&= mod63[n%63];
 
@@ -89,5 +89,5 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
       }
    }
 
-   return 0UL;
+   return UWORD(0);
 }

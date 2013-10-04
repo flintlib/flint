@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, j, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    flint_rand_t state;
    flint_randinit(state);
 
@@ -46,7 +46,7 @@ int main(void)
       do
       {
          n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
-      } while (n_is_prime(n1) || (n1 < 2UL));
+      } while (n_is_prime(n1) || (n1 < UWORD(2)));
 
       for (j = 0; j < 20; j++)
       {
@@ -57,7 +57,7 @@ int main(void)
       if (n2 > 1)
       {
          count++;
-         result = ((n1%n2) == 0UL);
+         result = ((n1%n2) == UWORD(0));
          if (!result)
          {
             flint_printf("FAIL:\n");

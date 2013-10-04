@@ -74,7 +74,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
         }
         for (i--; i >= 1; i--)
         {
-            if (e[i] & 1L)
+            if (e[i] & WORD(1))
             {
                 fmpz_mul(pow + i, t, pow + (i + 1));
                 fmpz_mul(t, t, t);
@@ -86,7 +86,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
             }
         }
         {
-            if (e[i] & 1L)
+            if (e[i] & WORD(1))
                 fmpz_mul(pow + i, t, pow + (i + 1));
             else
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));

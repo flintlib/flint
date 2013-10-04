@@ -117,13 +117,13 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
         if (exp <= 2)
         {
-            if (exp == 0UL)
+            if (exp == UWORD(0))
             {
                 fmpz_mod_poly_fit_length(res, 1);
                 fmpz_one(res->coeffs);
                 _fmpz_mod_poly_set_length(res, 1);
             }
-            else if (exp == 1UL)
+            else if (exp == UWORD(1))
             {
                 fmpz_mod_poly_set(res, poly);
             }

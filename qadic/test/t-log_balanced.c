@@ -176,7 +176,7 @@ main(void)
         qadic_init2(b, N);
         qadic_init2(c, N);
 
-        qadic_randtest_val(a, state, (*p == 2L) + 1, ctx);
+        qadic_randtest_val(a, state, (*p == WORD(2)) + 1, ctx);
 
         qadic_exp(b, a, ctx);
         qadic_log_balanced(c, b, ctx);

@@ -35,7 +35,7 @@ fmpz_cmp_ui(const fmpz_t f, ulong g)
 
     if (!COEFF_IS_MPZ(c))    /* f is small */
     {
-        if (c < 0L || g > COEFF_MAX)
+        if (c < WORD(0) || g > COEFF_MAX)
             return -1;
         else 
             return c < (slong) g ? -1 : c > (slong) g;

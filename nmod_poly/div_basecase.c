@@ -47,9 +47,9 @@ _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
     {
         R1[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
 
-        while (coeff >= 0 && R1[coeff] == 0L)
+        while (coeff >= 0 && R1[coeff] == WORD(0))
         {
-            Q[coeff--] = 0L;
+            Q[coeff--] = WORD(0);
             if (coeff >= 0)
                 R1[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
         }
@@ -106,9 +106,9 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
         r_coeff =
             n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n, mod.ninv);
 
-        while (coeff >= 0 && r_coeff == 0L)
+        while (coeff >= 0 && r_coeff == WORD(0))
         {
-            Q[coeff--] = 0L;
+            Q[coeff--] = WORD(0);
             if (coeff >= 0)
                 r_coeff =
                     n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n,
@@ -170,9 +170,9 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
             n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],
                              R3[3 * coeff], mod.n, mod.ninv);
 
-        while (coeff >= 0 && r_coeff == 0L)
+        while (coeff >= 0 && r_coeff == WORD(0))
         {
-            Q[coeff--] = 0L;
+            Q[coeff--] = WORD(0);
             if (coeff >= 0)
                 r_coeff =
                     n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],

@@ -51,7 +51,7 @@ void sample(void * arg, ulong count)
    {
       int j;
       d = n_randbits(state, bits);
-      if (d == 0UL) d++;
+      if (d == UWORD(0)) d++;
 
       dinv = n_preinvert_limb(d);
       dpre = n_precompute_inverse(d);
@@ -66,7 +66,7 @@ void sample(void * arg, ulong count)
 	  /*case 1:
 
          prof_start();
-         for (mp_size_t j = 0; j < 10000UL; j++)
+         for (mp_size_t j = 0; j < UWORD(10000); j++)
          {
             r += n_empty(arr[j&1023], d, dinv);  
          }
@@ -88,7 +88,7 @@ void sample(void * arg, ulong count)
 	  /*case 3:
 
          prof_start();
-         for (mp_size_t j = 0; j < 10000UL; j++)
+         for (mp_size_t j = 0; j < UWORD(10000); j++)
          {
             r += n_mod3_preinv(arr[j&1023], d, dinv);  
          }
@@ -121,7 +121,7 @@ void sample(void * arg, ulong count)
 
    }
   
-   if (r == 9879875897UL) abort();
+   if (r == UWORD(9879875897)) abort();
 
    flint_randclear(state);
    flint_free(arr);

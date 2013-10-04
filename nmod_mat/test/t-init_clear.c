@@ -55,7 +55,7 @@ main(void)
         {
             for (j = 0; j < n; j++)
             {
-                if (A->rows[i][j] != 0UL)
+                if (A->rows[i][j] != UWORD(0))
                 {
                     flint_printf("FAIL: entries not zero!\n");
                     abort();

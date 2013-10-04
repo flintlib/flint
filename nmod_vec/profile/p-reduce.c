@@ -55,7 +55,7 @@ void sample(void * arg, ulong count)
    for (i = 0; i < count; i++)
    {
       n = n_randbits(state, bits);
-      if (n == 0UL) n++;
+      if (n == UWORD(0)) n++;
       
 	  nmod_init(&mod, n);
       _nmod_vec_reduce(vec2, vec, 1000, mod);

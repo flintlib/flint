@@ -45,7 +45,7 @@ __euler_number_vec_mod_p(mp_ptr res, mp_ptr tmp, slong m, nmod_t mod)
     _nmod_poly_inv_series(res, tmp, m, mod);
 
     /* Multiply by factorials */
-    c = 1UL;
+    c = UWORD(1);
     for (k = 0; k < m; k++)
     {
         res[k] = n_mulmod2_preinv(res[k], c, mod.n, mod.ninv);
@@ -85,7 +85,7 @@ void __euler_number_vec_multi_mod(fmpz * res, slong n)
     polys = flint_malloc(num_primes * sizeof(mp_ptr));
 
     /* Compute Euler numbers mod p */
-    primes[0] = n_nextprime(1UL<<prime_bits, 0);
+    primes[0] = n_nextprime(UWORD(1)<<prime_bits, 0);
     for (k = 1; k < num_primes; k++)
         primes[k] = n_nextprime(primes[k-1], 0);
     temppoly = _nmod_vec_init(m);

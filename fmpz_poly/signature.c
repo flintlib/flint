@@ -60,7 +60,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
     fmpz_one(h);
     
     s = 1;
-    t = (lenA & 1L) ? -s : s;
+    t = (lenA & WORD(1)) ? -s : s;
     *r1 = 1;
     
     while (1)
@@ -80,7 +80,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
 			abort();
 		}
       
-        if ((fmpz_sgn(B + (lenB - 1)) > 0) || (delta & 1L))
+        if ((fmpz_sgn(B + (lenB - 1)) > 0) || (delta & WORD(1)))
             _fmpz_vec_neg(A, A, lenA);
 
         sgnA = fmpz_sgn(A + (lenA - 1));
@@ -89,7 +89,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
 			s = -s;
 			(*r1)--;
         }
-		if (sgnA != ((lenA & 1L) ? t : -t))
+		if (sgnA != ((lenA & WORD(1)) ? t : -t))
 		{
 			t = -t;
 			(*r1)++;

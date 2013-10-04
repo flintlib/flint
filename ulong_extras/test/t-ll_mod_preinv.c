@@ -47,7 +47,7 @@ int main(void)
       m = n_randtest(state);
       r1 = n_randtest(state) % d;
       umul_ppmm(nh, nl, m, d);
-      add_ssaaaa(nh, nl, nh, nl, 0UL, r1);
+      add_ssaaaa(nh, nl, nh, nl, UWORD(0), r1);
 
       dinv = n_preinvert_limb(d);
 

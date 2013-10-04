@@ -39,7 +39,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     flint_printf("cosh_series....");
     fflush(stdout);
@@ -56,7 +56,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_canonicalise(a);
 
@@ -93,12 +93,12 @@ main(void)
         fmpq_poly_init(one);
 
         fmpq_poly_randtest_not_zero(A, state, n_randint(state, 60) + 1, 80);
-        fmpq_poly_set_coeff_ui(A, 0, 0UL);
+        fmpq_poly_set_coeff_ui(A, 0, UWORD(0));
 
         fmpq_poly_cosh_series(coshA, A, n);
         fmpq_poly_sinh_series(sinhA, A, n);
         fmpq_poly_mullow(B, coshA, coshA, n);
-        fmpq_poly_set_coeff_ui(one, 0, 1UL);
+        fmpq_poly_set_coeff_ui(one, 0, UWORD(1));
         fmpq_poly_sub(B, B, one);
         fmpq_poly_mullow(C, sinhA, sinhA, n);
 

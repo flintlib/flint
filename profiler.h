@@ -39,8 +39,8 @@ static __inline__ int gettimeofday(struct timeval * p, void * tz)
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
-    p->tv_usec=(slong)((now.ns100 / 10LL) % 1000000LL );
-    p->tv_sec= (slong)((now.ns100-(116444736000000000LL))/10000000LL);
+    p->tv_usec=(slong)((now.ns100 / WORD(10)L) % WORD(1000000)L );
+    p->tv_sec= (slong)((now.ns100-(WORD(116444736000000000)L))/WORD(10000000)L);
 	
     return 0;
 }

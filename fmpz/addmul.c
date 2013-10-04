@@ -37,7 +37,7 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 	
 	if (!COEFF_IS_MPZ(c1))  /* g is small */
 	{
-		if (c1 < 0L) fmpz_submul_ui(f, h, -c1);
+		if (c1 < WORD(0)) fmpz_submul_ui(f, h, -c1);
 		else fmpz_addmul_ui(f, h, c1);
 		return;
 	} 
@@ -46,7 +46,7 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
    
 	if (!COEFF_IS_MPZ(c2))  /* h is small */
 	{
-		if (c2 < 0L) fmpz_submul_ui(f, g, -c2);
+		if (c2 < WORD(0)) fmpz_submul_ui(f, g, -c2);
 		else fmpz_addmul_ui(f, g, c2);
 		return;
 	} 

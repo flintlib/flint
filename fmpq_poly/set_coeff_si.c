@@ -36,7 +36,7 @@ void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
     slong len = poly->length;
     const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
     
-    if (!replace && (x == 0L))
+    if (!replace && (x == WORD(0)))
         return;
     
     if (n + 1 > len)
@@ -46,7 +46,7 @@ void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
         flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
     }
     
-    if (*poly->den == 1L)
+    if (*poly->den == WORD(1))
     {
         fmpz_set_si(poly->coeffs + n, x);
         if (replace)

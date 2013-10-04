@@ -54,7 +54,7 @@ arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
 {
     if (n == 0)
     {
-        fmpz_poly_set_ui(poly, 1UL);
+        fmpz_poly_set_ui(poly, UWORD(1));
         return;
     }
 

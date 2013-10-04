@@ -128,15 +128,15 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         
         for (k = 2; k <= exp; k++) /* find highest power of 2 dividing a */
         {
-            if (a & ((1UL<<k) - 1))
+            if (a & ((UWORD(1)<<k) - 1))
                 break;
         }
         k--;
         
         if (a == 0)
         {
-           a = (1UL<<(exp - k/2));
-           num = (1UL<<(k/2));
+           a = (UWORD(1)<<(exp - k/2));
+           num = (UWORD(1)<<(k/2));
            s = flint_malloc(num*sizeof(mp_limb_t));
            for (i = 0; i < num; i++)
                s[i] = i*a;
@@ -151,15 +151,15 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
             return 0;
         }
         
-        pow = (1UL<<k);
+        pow = (UWORD(1)<<k);
 
         exp -= k;
         a /= pow;
 
         num = n_sqrtmod_2pow(&s, a, exp); /* divide through by 2^k and recurse */
         
-        a = (1UL<<(k/2));
-        r = a*(1UL<<exp);
+        a = (UWORD(1)<<(k/2));
+        r = a*(UWORD(1)<<exp);
         
         if (num == 0) /* check that roots were actually returned */
         {

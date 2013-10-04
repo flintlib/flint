@@ -35,7 +35,7 @@ n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
 
     if (a < n)
         return a;
-    if ((mp_limb_signed_t) n < 0L)
+    if ((mp_limb_signed_t) n < WORD(0))
         return a - n;
 
     if (n == 1)
@@ -52,7 +52,7 @@ n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
         quot -= (mp_limb_t) ((double) (-rem) * npre);
     else if (rem >= (slong) n)
         quot += (mp_limb_t) ((double) rem * npre);
-    else if (rem < 0L)
+    else if (rem < WORD(0))
         return rem + n;
     else
         return rem;
@@ -60,7 +60,7 @@ n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
     rem = a - quot * n;
     if (rem >= (slong) n)
         return rem - n;
-    else if (rem < 0L)
+    else if (rem < WORD(0))
         return rem + n;
     else
         return rem;

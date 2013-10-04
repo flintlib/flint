@@ -63,7 +63,7 @@ main(void)
 
         fmpz_init(mod);
         num_primes = 0;
-        primes[0] = n_nextprime(1UL << prime_bits, 0);
+        primes[0] = n_nextprime(UWORD(1) << prime_bits, 0);
         fmpz_set_ui(mod, primes[0]);
 
         /* + 1 for sign */

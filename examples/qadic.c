@@ -44,8 +44,8 @@ int main(void)
 
     /*************************************************************************/
 
-    fmpz_t e = {4L};
-    fmpz_t nine = {9L};
+    fmpz_t e = {WORD(4)};
+    fmpz_t nine = {WORD(9)};
 
     fmpz_init_set_ui(p, 3);
     d = 2;
@@ -119,8 +119,8 @@ int main(void)
     qadic_init2(b, N);
 
     padic_poly_fit_length(a, 2);
-    a->coeffs[0] = 78L;
-    a->coeffs[1] = 45L;
+    a->coeffs[0] = WORD(78);
+    a->coeffs[1] = WORD(45);
     a->val = 0;
     _padic_poly_set_length(a, 2);
 
@@ -149,9 +149,9 @@ int main(void)
     qadic_init2(b, N);
 
     padic_poly_fit_length(a, d);
-    a->coeffs[0] = 1L;
-    a->coeffs[1] = 3L;
-    a->coeffs[2] = 1L;
+    a->coeffs[0] = WORD(1);
+    a->coeffs[1] = WORD(3);
+    a->coeffs[2] = WORD(1);
     a->val = 0;
     _padic_poly_set_length(a, d);
 

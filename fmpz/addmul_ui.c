@@ -44,13 +44,13 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
         return;
     }
 
-    if (x == 1UL)  /* special case, adding g*1 to f */
+    if (x == UWORD(1))  /* special case, adding g*1 to f */
     {
         fmpz_add(f, f, g);
         return;
     }
 
-    if (c1 == 1UL)  /* special case, adding 1*x to f */
+    if (c1 == UWORD(1))  /* special case, adding 1*x to f */
     {
         fmpz_add_ui(f, f, x);
         return;
@@ -65,13 +65,13 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
         if (prod[1] == 0)  /* product fits in one limb */
         {
-            if (c1 < 0L)
+            if (c1 < WORD(0))
                 fmpz_sub_ui(f, f, prod[0]);
             else
                 fmpz_add_ui(f, f, prod[0]);
             return;
         }
-        else if ((prod[1] == 1) && (!COEFF_IS_MPZ(r)) && ((r ^ c1) < 0L))
+        else if ((prod[1] == 1) && (!COEFF_IS_MPZ(r)) && ((r ^ c1) < WORD(0)))
         {
             /*
                only chance at cancellation is if product is one bit past 
@@ -81,7 +81,7 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
             if (ur > prod[0])  /* cancellation will occur */
             {
                 fmpz_set_ui(f, prod[0] - ur);
-                if (r > 0L)
+                if (r > WORD(0))
                     fmpz_neg(f, f);
                 return;
             }
@@ -95,7 +95,7 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
             __mpz_struct * mpz_ptr = _fmpz_promote_val(f);
             mpz_t temp;  /* set up a temporary, cheap mpz_t to contain prod */
             temp->_mp_d = prod;
-            temp->_mp_size = (c1 < 0L ? -2 : 2);
+            temp->_mp_size = (c1 < WORD(0) ? -2 : 2);
             mpz_add(mpz_ptr, mpz_ptr, temp);
             _fmpz_demote_val(f);  /* cancellation may have occurred */
         }

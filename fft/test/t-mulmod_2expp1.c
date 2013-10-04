@@ -55,7 +55,7 @@ main(void)
         {
             for (w = 1; w <= 2; w++)
             {
-                mp_size_t n = (1UL<<depth);
+                mp_size_t n = (UWORD(1)<<depth);
                 mp_bitcnt_t bits = n*w;
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
@@ -103,7 +103,7 @@ main(void)
         {
             for (w = 1; w <= 2; w++)
             {
-                mp_size_t n = (1UL<<depth);
+                mp_size_t n = (UWORD(1)<<depth);
                 mp_bitcnt_t bits = n*w;
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;

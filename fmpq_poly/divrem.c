@@ -58,7 +58,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1)); lenR--) ;
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a}, {R, r} = {R, a} up to sign */
-    if (d == 0UL || *lead == 1L || *lead == -1L)
+    if (d == UWORD(0) || *lead == WORD(1) || *lead == WORD(-1))
     {
         fmpz_one(q);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
@@ -68,7 +68,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
-        if (*lead == -1L && d % 2UL)
+        if (*lead == WORD(-1) && d % UWORD(2))
         {
             _fmpz_vec_neg(Q, Q, lenQ);
             _fmpz_vec_neg(R, R, lenR);

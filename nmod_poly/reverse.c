@@ -40,7 +40,7 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
             output[m - i - 1] = input[i];
 
         for ( ; i < m; i++)
-            output[m - i - 1] = 0L;
+            output[m - i - 1] = WORD(0);
     } else
     {
         for (i = 0; i < m/2; i++)

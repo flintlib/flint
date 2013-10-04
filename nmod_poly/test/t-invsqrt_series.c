@@ -49,7 +49,7 @@ main(void)
 
         mp_limb_t n;
         do n = n_randtest_prime(state, 0);
-        while (n == 2UL);
+        while (n == UWORD(2));
 
         nmod_poly_init(h, n);
         nmod_poly_init(g, n);
@@ -57,7 +57,7 @@ main(void)
 
         do nmod_poly_randtest(h, state, n_randint(state, 1000));
         while (h->length == 0);
-        nmod_poly_set_coeff_ui(h, 0, 1UL);
+        nmod_poly_set_coeff_ui(h, 0, UWORD(1));
 
         m = n_randint(state, h->length) + 1;
 
@@ -91,13 +91,13 @@ main(void)
 
         mp_limb_t n;
         do n = n_randtest_prime(state, 0);
-        while (n == 2UL);
+        while (n == UWORD(2));
 
         nmod_poly_init(h, n);
         nmod_poly_init(g, n);
         do nmod_poly_randtest(h, state, n_randint(state, 500));
         while (h->length == 0);
-        nmod_poly_set_coeff_ui(h, 0, 1UL);
+        nmod_poly_set_coeff_ui(h, 0, UWORD(1));
 
         m = n_randint(state, h->length) + 1;
 

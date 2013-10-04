@@ -43,10 +43,10 @@
  extern "C" {
 #endif
 
-#define PADIC_DEFAULT_PREC 20L
+#define PADIC_DEFAULT_PREC WORD(20)
 
-#define PADIC_TEST_PREC_MIN -100L
-#define PADIC_TEST_PREC_MAX  100L
+#define PADIC_TEST_PREC_MIN WORD(-100)
+#define PADIC_TEST_PREC_MAX  WORD(100)
 
 typedef struct {
     fmpz u;

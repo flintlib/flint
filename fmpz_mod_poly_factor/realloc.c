@@ -63,7 +63,7 @@ fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, slong alloc)
             for (i = fac->alloc; i < alloc; i++)
             {
                 fmpz_mod_poly_init(fac->poly + i, p);
-                fac->exp[i] = 0L;
+                fac->exp[i] = WORD(0);
             }
             fac->alloc = alloc;
         }

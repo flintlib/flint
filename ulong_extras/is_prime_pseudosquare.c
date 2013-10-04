@@ -61,11 +61,11 @@ int n_is_prime_pseudosquare(mp_limb_t n)
     const mp_limb_t * primes;
     const double * inverses;
 
-    if (n < 2UL) return 0;
+    if (n < UWORD(2)) return 0;
 
-    if ((n & 1UL) == 0UL)
+    if ((n & UWORD(1)) == UWORD(0))
     {
-        return (n == 2UL);
+        return (n == UWORD(2));
     }
 
     primes = n_primes_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
@@ -94,7 +94,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
     for (j = 0; j <= i; j++)
     {
         mp_limb_t mod = n_powmod2(primes[j], exp, n);
-        if ((mod != 1UL) && (mod != n - 1)) return 0;
+        if ((mod != UWORD(1)) && (mod != n - 1)) return 0;
         if (mod == n - 1) m1 = 1;
     }
 
@@ -104,7 +104,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 
     if (mod8 == 5)
     {
-        mp_limb_t mod = n_powmod2(2UL, exp, n);
+        mp_limb_t mod = n_powmod2(UWORD(2), exp, n);
         if (mod == n - 1) return 1;
         flint_printf("Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
         abort();

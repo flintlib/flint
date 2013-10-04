@@ -59,7 +59,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        if (exp >= FLINT_BITS)
        {
            fmpz_set_ui(f, prod[1] >> (exp - FLINT_BITS));
-           if ((c2 ^ x) < 0L)
+           if ((c2 ^ x) < WORD(0))
                fmpz_neg(f, f);
            return;
        }
@@ -73,7 +73,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        if (!prod[1])
        {
            fmpz_set_ui(f, prod[0]);
-           if ((c2 ^ x) < 0L)
+           if ((c2 ^ x) < WORD(0))
                fmpz_neg(f, f);
            return;
        }
@@ -84,7 +84,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
            /* two limbs, least significant first, native endian, no
 nails, stored in prod */
            mpz_import(mpz_ptr, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
-           if ((c2 ^ x) < 0L)
+           if ((c2 ^ x) < WORD(0))
                mpz_neg(mpz_ptr, mpz_ptr);
        }
    }

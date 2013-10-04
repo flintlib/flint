@@ -32,7 +32,7 @@
 int main(void)
 {
    int i, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    mp_limb_t d;
    mpz_t d_m;
    flint_rand_t state;
@@ -70,7 +70,7 @@ int main(void)
 
       do
       {
-         d = n_randtest(state) | 1UL;
+         d = n_randtest(state) | UWORD(1);
          if ((d % 5) == 0) d+=2;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));

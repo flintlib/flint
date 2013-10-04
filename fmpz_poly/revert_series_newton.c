@@ -50,7 +50,7 @@ _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
         V = _fmpz_vec_init(n);
 
         k = n;
-        for (i = 1; (1L << i) < k; i++);
+        for (i = 1; (WORD(1) << i) < k; i++);
         a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = k;
         while (k >= FLINT_REVERSE_NEWTON_CUTOFF)

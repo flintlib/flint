@@ -61,7 +61,15 @@ typedef void (*flint_cleanup_function_t)(void);
 void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 void flint_cleanup(void);
 
+#if defined(_WIN64)
+#define WORD_FMT "%ll"
+#define WORD(xx) (xx##LL)
+#define UWORD(xx) (xx##ULL)
+#else
+#define WORD(xx) (xx##L)
+#define UWORD(xx) (xx##UL)
 #define WORD_FMT "%l"
+#endif
 
 #if __GMP_BITS_PER_MP_LIMB == 64
     #define FLINT_BITS 64
@@ -100,11 +108,11 @@ void flint_randinit(flint_rand_t state)
 {
     state->gmp_init = 0;
 #if FLINT64
-    state->__randval = 13845646450878251009UL;
-    state->__randval2 = 13142370077570254774UL;
+    state->__randval = UWORD(13845646450878251009);
+    state->__randval2 = UWORD(13142370077570254774);
 #else
-    state->__randval = 4187301858UL;
-    state->__randval2 = 3721271368UL;
+    state->__randval = UWORD(4187301858);
+    state->__randval2 = UWORD(3721271368);
 #endif
 }
 
@@ -145,10 +153,10 @@ typedef __mpfr_struct mpfr;
     } while (0)
 
 #define r_shift(in, shift) \
-    ((shift == FLINT_BITS) ? 0L : ((in) >> (shift)))
+    ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
 
 #define l_shift(in, shift) \
-    ((shift == FLINT_BITS) ? 0L : ((in) << (shift)))
+    ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
 extern unsigned char __flint_clz_tab[128];
@@ -171,7 +179,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
     { \
         slong ixxx; \
         for (ixxx = 0; ixxx < (nnn); ixxx++) \
-            (xxx)[ixxx] = 0UL; \
+            (xxx)[ixxx] = UWORD(0); \
     } while (0)
 
 #define flint_mpn_copyi(xxx, yyy, nnn) \

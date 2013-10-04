@@ -53,7 +53,7 @@ int main()
         arith_euler_number_vec(r, n + 1);
 
         /* sum binomial(n,k) E_k = 0 */
-        fmpz_set_ui(t, 1UL);
+        fmpz_set_ui(t, UWORD(1));
         for (k = 0; k <= n; k++)
         {
             fmpz_addmul(s, r + k, t);

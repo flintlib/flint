@@ -82,7 +82,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
                {A + lenB - 1, 1} + {x * r1, n2} - {h, n2}
          */
 
-        if (lenB & 1L)
+        if (lenB & WORD(1))
         {
             _fmpz_vec_sub(h, r1, h, n2);
         }
@@ -100,7 +100,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
            Note the bottom n2 - 1 coefficients of t are irrelevant
          */
 
-        t += (lenB & 1L);
+        t += (lenB & WORD(1));
         
         _fmpz_poly_div_divconquer_recursive(q0, temp + lenB, t, B + n1, n2);
     }

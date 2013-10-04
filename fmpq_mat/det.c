@@ -31,7 +31,7 @@ void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
 
     if (n == 0)
     {
-        fmpq_set_si(det, 1L, 1L);
+        fmpq_set_si(det, WORD(1), WORD(1));
         return;
     }
     else if (n == 1)

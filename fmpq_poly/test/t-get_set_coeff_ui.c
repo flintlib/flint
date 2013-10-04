@@ -36,7 +36,7 @@ main(void)
 {
     int i, j, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     ulong n;
     mpq_t n_mpq;

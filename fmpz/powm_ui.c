@@ -68,7 +68,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
                 {
                     g2 = n_mod2_preinv(-g2, m2, minv);
                     *f = n_powmod2_ui_preinv(g2, e, m2, minv);
-                    if ((e & 1UL))
+                    if ((e & UWORD(1)))
                         *f = n_negmod(*f, m2);
                 }
             }

@@ -32,7 +32,7 @@ int fmpz_divisible_si(const fmpz_t x, slong p)
 {
     fmpz y = *x;
 
-    if (y == 0L)
+    if (y == WORD(0))
     {
         return 1;
     }

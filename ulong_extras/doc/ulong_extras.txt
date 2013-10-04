@@ -697,7 +697,7 @@ int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     $n - 1$ the algorithm can still proceed.
 
     One can also specify a number of iterations if less time 
-    should be taken. Simply set this to \code{~0L} if this is irrelevant.
+    should be taken. Simply set this to \code{~WORD(0)} if this is irrelevant.
     In most cases a greater number of iterations will not 
     significantly affect timings as most of the time is spent 
     factoring.
@@ -1006,7 +1006,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 
     Attempts to split $n$ using the given number of iterations
-    of SQUFOF. Simply set \code{iters} to \code{~0L} for maximum 
+    of SQUFOF. Simply set \code{iters} to \code{~WORD(0)} for maximum 
     persistence.
 
     The version of SQUFOF imlemented here is as described by Gower 

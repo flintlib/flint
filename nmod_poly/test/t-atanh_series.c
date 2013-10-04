@@ -58,10 +58,10 @@ main(void)
         nmod_poly_init(atanhB, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_mullow(B, A, A, n);
-        nmod_poly_set_coeff_ui(B, 0, 1UL);
+        nmod_poly_set_coeff_ui(B, 0, UWORD(1));
         nmod_poly_div_series(B, A, B, n);
         nmod_poly_add(B, B, B);
 
@@ -101,7 +101,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_atanh_series(B, A, n);
         nmod_poly_atanh_series(A, A, n);

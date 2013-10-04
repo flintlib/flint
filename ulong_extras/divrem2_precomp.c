@@ -35,13 +35,13 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
 
     if (a < n)
     {
-        (*q) = 0UL;
+        (*q) = UWORD(0);
         return a;
     }
 
-    if ((mp_limb_signed_t) n < 0L)
+    if ((mp_limb_signed_t) n < WORD(0))
     {
-        (*q) = 1UL;
+        (*q) = UWORD(1);
         return a - n;
     }
 
@@ -59,7 +59,7 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
         quot -= (mp_limb_t) ((double) (-rem) * npre);
     else if (rem >= (slong) n)
         quot += (mp_limb_t) ((double) rem * npre);
-    else if (rem < 0L)
+    else if (rem < WORD(0))
     {
         (*q) = quot - 1;
         return rem + n;
@@ -76,7 +76,7 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
         (*q) = quot + 1;
         return rem - n;
     }
-    else if (rem < 0L)
+    else if (rem < WORD(0))
     {
         (*q) = quot - 1;
         return rem + n;

@@ -45,7 +45,7 @@ int main(void)
       double dpre;
 
       d = n_randtest(state);
-      if (d == 0UL) d++;
+      if (d == UWORD(0)) d++;
   
       n = n_randtest(state);
       

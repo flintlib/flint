@@ -68,7 +68,7 @@ int main()
         mpz_clear(t);
 
         fmpq_poly_zero(P);
-        fmpq_poly_set_coeff_ui(P, n, 1UL);
+        fmpq_poly_set_coeff_ui(P, n, UWORD(1));
 
         if (!fmpq_poly_equal(P, Q))
         {

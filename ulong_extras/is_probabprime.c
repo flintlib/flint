@@ -39,14 +39,14 @@ int n_is_probabprime(mp_limb_t n)
     unsigned int norm;
 	mp_limb_t ninv;
 
-    if (n <= 1UL) return 0;
-    if (n == 2UL) return 1;
-    if ((n & 1UL) == 0) return 0;
+    if (n <= UWORD(1)) return 0;
+    if (n == UWORD(2)) return 1;
+    if ((n & UWORD(1)) == 0) return 0;
 
     if (n_is_perfect_power235(n)) return 0;
 
 #if FLINT64
-    if (n >= 10000000000000000UL) return n_is_probabprime_BPSW(n);
+    if (n >= UWORD(10000000000000000)) return n_is_probabprime_BPSW(n);
 #endif
 
     d = n - 1;
@@ -54,9 +54,9 @@ int n_is_probabprime(mp_limb_t n)
     d >>= norm;
 
 #if FLINT64
-    if (n < 1122004669633UL)
+    if (n < UWORD(1122004669633))
 #else
-    if (n < 2147483648UL)
+    if (n < UWORD(2147483648))
 #endif  
     {
         double npre;
@@ -68,42 +68,42 @@ int n_is_probabprime(mp_limb_t n)
       
         npre = n_precompute_inverse(n);
 
-        if (n < 9080191UL) 
+        if (n < UWORD(9080191)) 
         {
-            if (n_is_strong_probabprime_precomp(n, npre, 31UL, d)
-                && n_is_strong_probabprime_precomp(n, npre, 73UL, d)) return 1;
+            if (n_is_strong_probabprime_precomp(n, npre, UWORD(31), d)
+                && n_is_strong_probabprime_precomp(n, npre, UWORD(73), d)) return 1;
             else return 0;
         }
 
 #if FLINT64
-        if (n < 4759123141UL)
+        if (n < UWORD(4759123141))
         {
 #endif
-        if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
-            && n_is_strong_probabprime_precomp(n, npre, 7UL, d) 
-            && n_is_strong_probabprime_precomp(n, npre, 61UL, d)) return 1;
+        if (n_is_strong_probabprime_precomp(n, npre, UWORD(2), d) 
+            && n_is_strong_probabprime_precomp(n, npre, UWORD(7), d) 
+            && n_is_strong_probabprime_precomp(n, npre, UWORD(61), d)) return 1;
         else return 0;
 #if FLINT64
         }
 
-        if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
-            && n_is_strong_probabprime_precomp(n, npre, 13UL, d) 
-            && n_is_strong_probabprime_precomp(n, npre, 23UL, d) 
-            && n_is_strong_probabprime_precomp(n, npre, 1662803UL, d))
-            if (n != 46856248255981UL) return 1;
+        if (n_is_strong_probabprime_precomp(n, npre, UWORD(2), d) 
+            && n_is_strong_probabprime_precomp(n, npre, UWORD(13), d) 
+            && n_is_strong_probabprime_precomp(n, npre, UWORD(23), d) 
+            && n_is_strong_probabprime_precomp(n, npre, UWORD(1662803), d))
+            if (n != UWORD(46856248255981)) return 1;
         return 0;
 #endif
     }
 
 	ninv = n_preinvert_limb(n);
 
-    if (n_is_strong_probabprime2_preinv(n, ninv, 2UL, d) 
-        && n_is_strong_probabprime2_preinv(n, ninv, 3UL, d) 
-        && n_is_strong_probabprime2_preinv(n, ninv, 7UL, d) 
-        && n_is_strong_probabprime2_preinv(n, ninv, 61UL, d) 
-        && n_is_strong_probabprime2_preinv(n, ninv, 24251UL, d))
+    if (n_is_strong_probabprime2_preinv(n, ninv, UWORD(2), d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, UWORD(3), d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, UWORD(7), d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, UWORD(61), d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, UWORD(24251), d))
 #if FLINT64
-        if (n != 46856248255981UL) 
+        if (n != UWORD(46856248255981)) 
 #endif
         return 1;
 

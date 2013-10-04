@@ -57,7 +57,7 @@ main(void)
         nmod_poly_init(B, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_sin_series(sinA, A, n);
         nmod_poly_asin_series(B, sinA, n);
@@ -94,7 +94,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_sin_series(B, A, n);
         nmod_poly_sin_series(A, A, n);

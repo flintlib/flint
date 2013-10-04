@@ -33,7 +33,7 @@ mp_limb_t z_randint(flint_rand_t state, mp_limb_t limit)
 {
     mp_limb_t z;
 
-    if ((limit == 0UL) || (limit > LONG_MAX))
+    if ((limit == UWORD(0)) || (limit > LONG_MAX))
         limit = LONG_MAX;
 
     z = n_randlimb(state) % limit;

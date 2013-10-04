@@ -49,7 +49,7 @@ void sample(void * arg, ulong count)
    flint_randinit(state);
    
    n = n_randbits(state, bits);
-   if (n == 0UL) n++;
+   if (n == UWORD(0)) n++;
       
    nmod_init(&mod, n);
 
