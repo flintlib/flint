@@ -35,7 +35,7 @@ int main(void)
     int i;
     flint_rand_t state;
     
-    printf("mpz_init_set_readonly....");
+    flint_printf("mpz_init_set_readonly....");
     fflush(stdout);
     
     flint_randinit(state);
@@ -84,9 +84,9 @@ int main(void)
 
         if (!fmpz_equal(f, g))
         {
-            printf("FAIL:\n\n");
-            printf("f = "), fmpz_print(f), printf("\n");
-            printf("g = "), fmpz_print(g), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
+            flint_printf("g = "), fmpz_print(g), flint_printf("\n");
             gmp_printf("z = %Zd\n", z);
         }
 
@@ -97,6 +97,6 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

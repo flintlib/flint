@@ -56,7 +56,7 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
 
     if (lenB == 0)
     {
-        printf("Exception (nmod_poly_divrem_newton). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_divrem_newton). Division by zero.\n");
         abort();
     }
 

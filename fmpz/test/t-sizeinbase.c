@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sizeinbase....");
+    flint_printf("sizeinbase....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,10 +63,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("b = %Zd\n", b);
-            printf("base = %d\n", base);
-            printf("r1 = %lu\n, r2 = %lu\n", (ulong) r1, (ulong) r2);
+            flint_printf("base = %d\n", base);
+            flint_printf("r1 = %wu\n, r2 = %wu\n", (ulong) r1, (ulong) r2);
             abort();
         }
 
@@ -76,6 +76,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

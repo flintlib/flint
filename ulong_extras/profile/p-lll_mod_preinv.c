@@ -98,7 +98,7 @@ int main(void)
 	  info.type = 1;
       prof_repeat(&min1, &max, sample, (void *) &info);
 
-	  printf("bits %d, ll_inv %.1f c/l\n", 
+	  flint_printf("bits %d, ll_inv %.1f c/l\n", 
            i,
 		   (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
  	  );

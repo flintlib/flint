@@ -37,7 +37,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("equal....");
+    flint_printf("equal....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -58,7 +58,7 @@ main(void)
 
         if (fmpz_mat_equal(A, D) || fmpz_mat_equal(A, E))
         {
-            printf("FAIL: different dimensions should not be equal\n");
+            flint_printf("FAIL: different dimensions should not be equal\n");
             abort();
         }
 
@@ -67,7 +67,7 @@ main(void)
 
         if (!fmpz_mat_equal(A, B))
         {
-            printf("FAIL: copied matrices should be equal\n");
+            flint_printf("FAIL: copied matrices should be equal\n");
             abort();
         }
 
@@ -78,7 +78,7 @@ main(void)
 
             if (fmpz_mat_equal(A, B))
             {
-                printf("FAIL: modified matrices should not be equal\n");
+                flint_printf("FAIL: modified matrices should not be equal\n");
                 abort();
             }
         }
@@ -92,6 +92,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -51,7 +51,7 @@ int main(void)
 
         if (!polyfile)
         {
-            printf("Error.  Could not read P1 from file.\n");
+            flint_printf("Error.  Could not read P1 from file.\n");
             abort();
         }
         fmpz_poly_fread(polyfile, f);
@@ -61,9 +61,9 @@ int main(void)
 
     fmpz_poly_factor_zassenhaus(facs, f);
 
-    printf("Polynomial:\n");
+    flint_printf("Polynomial:\n");
     fmpz_poly_print(f);
-    printf("\nFactorisation:\n");
+    flint_printf("\nFactorisation:\n");
     fmpz_poly_factor_print(facs);
 
     fmpz_poly_clear(f);

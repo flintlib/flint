@@ -39,7 +39,7 @@ int main(void)
 
     const slong maxn = 1000;
 
-    printf("bell_number_vec....");
+    flint_printf("bell_number_vec....");
     fflush(stdout);
 
     b1 = _fmpz_vec_init(maxn);
@@ -52,8 +52,8 @@ int main(void)
 
         if (!_fmpz_vec_equal(b1, b2, n))
         {
-            printf("FAIL:\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
     }
@@ -62,6 +62,6 @@ int main(void)
     _fmpz_vec_clear(b2, maxn);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -34,7 +34,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("clog....");
+    flint_printf("clog....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -54,16 +54,16 @@ int main(void)
         result = (x < a && ((k > 0) ? ((a + b - 1) / b <= x) : (a <= 1)));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
-            printf("x = %lu\n", x);
-            printf("k = %lu\n", k);
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
+            flint_printf("x = %wu\n", x);
+            flint_printf("k = %wu\n", k);
         }
     }
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

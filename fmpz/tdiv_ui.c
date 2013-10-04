@@ -36,7 +36,7 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
 
     if (h == 0UL)
     {
-        printf("Exception (fmpz_tdiv_ui). Division by 0.\n");
+        flint_printf("Exception (fmpz_tdiv_ui). Division by 0.\n");
         abort();
     }
 

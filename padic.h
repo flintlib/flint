@@ -110,9 +110,9 @@ int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
         slong l = (slong) e;
         if (l < 0)
         {
-            printf("WTF??\n");
-            printf("e = %lu\n", e);
-            printf("l = %ld\n", l);
+            flint_printf("WTF??\n");
+            flint_printf("e = %wu\n", e);
+            flint_printf("l = %wd\n", l);
             abort();
         }
 
@@ -328,9 +328,9 @@ static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 static __inline__ void padic_debug(const padic_t op)
 {
-    printf("(");
+    flint_printf("(");
     fmpz_print(padic_unit(op)); 
-    printf(" %ld %ld)", padic_val(op), padic_prec(op));
+    flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
 }
 
 #ifdef __cplusplus

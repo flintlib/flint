@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("sqrtrem....");
+   flint_printf("sqrtrem....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -60,8 +60,8 @@ int main(void)
       result = ((r1 == r2) && (s1 == s2));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, r1 = %ld, r2 = %lu, s1 = %ld, s2 = %lu\n", a, r1, r2, s1, s2); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2); 
          abort();
       }
 
@@ -93,8 +93,8 @@ int main(void)
       result = ((r1 == r2) && (s1 == s2));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, r1 = %ld, r2 = %lu, s1 = %ld, s2 = %lu\n", a, r1, r2, s1, s2); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2); 
          abort();
       }
 
@@ -105,6 +105,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

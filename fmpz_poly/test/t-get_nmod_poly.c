@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("get/set_nmod_poly....");
+    flint_printf("get/set_nmod_poly....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -70,7 +70,7 @@ main(void)
 
         if (!nmod_poly_equal(M, M2))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
@@ -82,6 +82,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

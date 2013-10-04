@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("reconstruct_fmpz....");
+    flint_printf("reconstruct_fmpz....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -85,24 +85,24 @@ main(void)
             if (!modresult || !result ||
                 !fmpz_is_one(&y->num) || !fmpz_is_one(&y->den))
             {
-                printf("FAIL: special case: -1 mod 2\n");
+                flint_printf("FAIL: special case: -1 mod 2\n");
                 abort();
             }
         }
         else if (!modresult || !result || !fmpq_equal(x, y))
         {
-            printf("FAIL: reconstruction failed\n");
-            printf("input = ");
+            flint_printf("FAIL: reconstruction failed\n");
+            flint_printf("input = ");
             fmpq_print(x);
-            printf("\nmodulus = ");
+            flint_printf("\nmodulus = ");
             fmpz_print(mod);
-            printf("\nresidue = ");
+            flint_printf("\nresidue = ");
             fmpz_print(res);
-            printf("\nreconstructed = ");
+            flint_printf("\nreconstructed = ");
             fmpq_print(y);
-            printf("\nfmpq_mod_fmpz return value = %d", modresult);
-            printf("\nfmpq_reconstruct_fmpz return value = %d", result);
-            printf("\n");
+            flint_printf("\nfmpq_mod_fmpz return value = %d", modresult);
+            flint_printf("\nfmpq_reconstruct_fmpz return value = %d", result);
+            flint_printf("\n");
             abort();
         }
 
@@ -116,6 +116,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

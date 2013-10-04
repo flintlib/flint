@@ -61,7 +61,7 @@ main(void)
     };
     slong T[20] = {0};
 
-    printf("Benchmark for q-adic Teichmuller.\n");
+    flint_printf("Benchmark for q-adic Teichmuller.\n");
     fflush(stdout);
 
 for (l = 0; l < len; l++)
@@ -107,7 +107,7 @@ for (l = 0; l < len; l++)
 
     T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
-    printf("%2ld, %4LG, %8ld, %ld\n", 
+    flint_printf("%2ld, %4LG, %8ld, %wd\n", 
         l, cputime, runs[l], T[l]);
 
     qadic_clear(c);
@@ -118,9 +118,9 @@ for (l = 0; l < len; l++)
     flint_randclear(state);
 }
 
-    printf("Output as a list:\n");
+    flint_printf("Output as a list:\n");
     for (l = 0; l < len; l++)
-        printf("%ld, ", T[l]);
-    printf("\n");
+        flint_printf("%wd, ", T[l]);
+    flint_printf("\n");
 }
 

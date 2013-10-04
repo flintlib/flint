@@ -37,7 +37,7 @@ main(void)
     int cflags = 0, i, result;
     flint_rand_t state;
     
-    printf("lcm....");
+    flint_printf("lcm....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,11 +61,11 @@ main(void)
         result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(c), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(c), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -93,11 +93,11 @@ main(void)
         result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(c), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(c), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -128,11 +128,11 @@ main(void)
                   && (fmpq_poly_is_zero(c) || fmpq_poly_is_monic(c)));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(c), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(c), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -162,11 +162,11 @@ main(void)
         result = fmpq_poly_equal(lcm, a);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(lcm), printf("\n\n");
-            fmpq_poly_debug(gcd), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(lcm), flint_printf("\n\n");
+            fmpq_poly_debug(gcd), flint_printf("\n\n");
             abort();
         }
 
@@ -202,11 +202,11 @@ main(void)
                   && (fmpq_poly_is_zero(c) || fmpq_poly_is_monic(c)));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(c), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(c), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -241,11 +241,11 @@ main(void)
         result = fmpq_poly_equal(lcm, a);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(lcm), printf("\n\n");
-            fmpq_poly_debug(gcd), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(lcm), flint_printf("\n\n");
+            fmpq_poly_debug(gcd), flint_printf("\n\n");
             abort();
         }
 
@@ -258,7 +258,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

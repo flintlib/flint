@@ -147,7 +147,7 @@ main(void)
             else
                 X[i][j] = 1;
         }
-        printf("len1 = %d, time = %ldms\n", len1, s[0] + s[1]), fflush(stdout);
+        flint_printf("len1 = %d, time = %wdms\n", len1, s[0] + s[1]), fflush(stdout);
     }
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
@@ -159,8 +159,8 @@ main(void)
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
-            printf("%d", X[i][j]);
-        printf("\n");
+            flint_printf("%d", X[i][j]);
+        flint_printf("\n");
     }
 
     flint_randclear(state);

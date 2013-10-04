@@ -43,7 +43,7 @@ int main()
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("comb_init/clear....");
+    flint_printf("comb_init/clear....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -66,6 +66,6 @@ int main()
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

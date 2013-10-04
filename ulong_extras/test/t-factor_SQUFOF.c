@@ -36,7 +36,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("factor_SQUFOF....");
+   flint_printf("factor_SQUFOF....");
    fflush(stdout);
 
    for (i = 0; i < 300 * flint_test_multiplier(); i++) /* Test random numbers */
@@ -60,8 +60,8 @@ int main(void)
          result = ((n1%n2) == 0UL);
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            flint_printf("FAIL:\n");
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
             abort();
          }
       }
@@ -69,13 +69,13 @@ int main(void)
    
    if (count < 280 * flint_test_multiplier())
    {
-      printf("FAIL:\n");
-      printf("Only %lu numbers factored\n", count); 
+      flint_printf("FAIL:\n");
+      flint_printf("Only %wu numbers factored\n", count); 
       abort();
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

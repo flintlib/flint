@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("evaluate_mpz....");
+    flint_printf("evaluate_mpz....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,8 +73,8 @@ main(void)
         result = (mpq_equal(y, z));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n\n");
             gmp_printf("y = %Qd\n\n", y);
             gmp_printf("z = %Qd\n\n", z);
             abort();
@@ -119,8 +119,8 @@ main(void)
         result = (mpq_equal(y, z));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n\n");
             gmp_printf("y = %Qd\n\n", y);
             gmp_printf("z = %Qd\n\n", z);
             abort();
@@ -137,6 +137,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

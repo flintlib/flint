@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     ulong cflags = 0UL;
 
-    printf("rescale....");
+    flint_printf("rescale....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,10 +65,10 @@ main(void)
         result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(g), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (aliasing):\n");
+            fmpq_poly_debug(f), flint_printf("\n\n");
+            fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -99,10 +99,10 @@ main(void)
         result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
-            printf("FAIL (composition of a and 1/a):\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(g), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (composition of a and 1/a):\n");
+            fmpq_poly_debug(f), flint_printf("\n\n");
+            fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -113,6 +113,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

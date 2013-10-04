@@ -41,7 +41,7 @@ int main(void)
     mp_size_t size;
     mp_bitcnt_t norm;
     
-    printf("mulmod_preinv1....");
+    flint_printf("mulmod_preinv1....");
     fflush(stdout);
 
     mpz_init(a);
@@ -92,7 +92,7 @@ int main(void)
        result = (mpz_cmp(r1, r2) == 0);
        if (!result)
        {
-          printf("FAIL:\n");
+          flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", a);
           gmp_printf("%Zd\n", b);
           gmp_printf("%Zd\n", d);
@@ -113,6 +113,6 @@ int main(void)
     gmp_randclear(st);
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

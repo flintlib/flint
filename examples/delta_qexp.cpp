@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 
     if (argc != 2 || N < 1)
     {
-        printf("Syntax: delta_qexp <integer>\n");
-        printf("where <integer> is the (positive) number of terms to compute\n");
+        flint_printf("Syntax: delta_qexp <integer>\n");
+        flint_printf("where <integer> is the (positive) number of terms to compute\n");
         return 1;
     }
 

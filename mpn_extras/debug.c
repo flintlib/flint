@@ -35,16 +35,16 @@ void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
     char byte[9];
     byte[8] = 0;
 
-    printf("\n");
+    flint_printf("\n");
     for (i = 0; i < xsize; i++)
     {
-        printf("DIGIT %3d/%ld: ", i, xsize);
+        flint_printf("DIGIT %3d/%wd: ", i, xsize);
         for (j = 0; j < FLINT_BITS; j++)
         {
             byte[j % 8] = (x[i] & (1UL<<j)) ? '1' : '0';
             if (j % 8 == 7)
-                printf("%s ", byte);
+                flint_printf("%s ", byte);
         }
-        printf(" (%lu)\n", x[i]);
+        flint_printf(" (%wu)\n", x[i]);
     }
 }

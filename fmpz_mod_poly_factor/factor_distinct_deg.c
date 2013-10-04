@@ -53,8 +53,8 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct))))
     {
-        printf("Exception (fmpz_mod_poly_factor_distinct_deg):\n");
-        printf("Not enough memory.\n");
+        flint_printf("Exception (fmpz_mod_poly_factor_distinct_deg):\n");
+        flint_printf("Not enough memory.\n");
         abort();
     }
     H = h + (l + 1);

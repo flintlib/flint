@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("scalar_fdiv_q_fmpz....");
+    flint_printf("scalar_fdiv_q_fmpz....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -83,7 +83,7 @@ main(void)
             result = (mpz_cmp(f, e) == 0);
             if (!result)
             {
-                printf("FAIL:\n");
+                flint_printf("FAIL:\n");
                 gmp_printf("d = %Zd, m = %Zd, e = %Zd, f = %Zd\n", d, m, e, f);
                 abort();
             }
@@ -140,7 +140,7 @@ main(void)
             result = (mpz_cmp(f, e) == 0);
             if (!result)
             {
-                printf("FAIL:\n");
+                flint_printf("FAIL:\n");
                 gmp_printf("d = %Zd, m = %Zd, e = %Zd, f = %Zd\n", d, m, e, f);
                 abort();
             }
@@ -158,6 +158,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

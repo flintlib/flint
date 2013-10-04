@@ -34,7 +34,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sqrtmod_primepow....");
+    flint_printf("sqrtmod_primepow....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -78,17 +78,17 @@ int main(void)
         result = btest & (i == num);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = %lu\n", p);
-            printf("exp = %ld\n", exp);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
-            printf("num = %ld\n", num);
+            flint_printf("FAIL:\n");
+            flint_printf("p = %wu\n", p);
+            flint_printf("exp = %wd\n", exp);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
+            flint_printf("num = %wd\n", num);
             
             if (!btest)
-                printf("Square root not found.\n");
+                flint_printf("Square root not found.\n");
             if (i != num)
-                printf("%lu not a square root of %lu mod %lu\n", sqrt[i], a, pow);
+                flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, pow);
 
             abort();
         }
@@ -140,17 +140,17 @@ int main(void)
         result = btest & (i == num);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = %lu\n", p);
-            printf("exp = %ld\n", exp);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
-            printf("num = %ld\n", num);
+            flint_printf("FAIL:\n");
+            flint_printf("p = %wu\n", p);
+            flint_printf("exp = %wd\n", exp);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
+            flint_printf("num = %wd\n", num);
             
             if (!btest)
-                printf("Square root not found.\n");
+                flint_printf("Square root not found.\n");
             if (i != num)
-                printf("%lu not a square root of %lu mod %lu\n", sqrt[i], a, pow);
+                flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, pow);
 
             abort();
         }
@@ -178,8 +178,8 @@ int main(void)
         {
             if (n_mulmod2_preinv(sqrt[0], sqrt[0], pow, pinv) != a)
             {
-                printf("FAIL:\n");
-                printf("%lu^2 is not %lu mod %lu\n", sqrt[0], a, pow);
+                flint_printf("FAIL:\n");
+                flint_printf("%wu^2 is not %wu mod %wu\n", sqrt[0], a, pow);
                 abort();
             }
             
@@ -196,11 +196,11 @@ int main(void)
         result = (b == pow);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = %lu\n", p);
-            printf("exp = %ld\n", exp);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
+            flint_printf("FAIL:\n");
+            flint_printf("p = %wu\n", p);
+            flint_printf("exp = %wd\n", exp);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
 
             abort();
         }
@@ -210,6 +210,6 @@ int main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

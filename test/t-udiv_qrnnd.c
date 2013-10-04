@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("udiv_qrnnd....");
+   flint_printf("udiv_qrnnd....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -57,15 +57,15 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("nh = %lu, nl = %lu, d = %lu\n", nh, nl, d); 
-         printf("ph = %lu, pl = %lu\n", ph, pl);
+         flint_printf("FAIL:\n");
+         flint_printf("nh = %wu, nl = %wu, d = %wu\n", nh, nl, d); 
+         flint_printf("ph = %wu, pl = %wu\n", ph, pl);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

@@ -33,7 +33,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("mul... ");
+    flint_printf("mul... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,10 +65,10 @@ main(void)
         result = (padic_equal(a, d));
         if (!result)
         {
-            printf("FAIL (alias a = a*b):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
+            flint_printf("FAIL (alias a = a*b):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -107,10 +107,10 @@ main(void)
         result = (padic_equal(b, d));
         if (!result)
         {
-            printf("FAIL (alias b = a*b):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
+            flint_printf("FAIL (alias b = a*b):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -147,9 +147,9 @@ main(void)
         result = (padic_equal(a, d));
         if (!result)
         {
-            printf("FAIL (alias a = a*a):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
+            flint_printf("FAIL (alias a = a*a):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -188,11 +188,11 @@ main(void)
         result = (padic_equal(c, d));
         if (!result)
         {
-            printf("FAIL (a*b = b*a):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
+            flint_printf("FAIL (a*b = b*a):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -240,14 +240,14 @@ main(void)
         result = (padic_equal(lhs2, rhs2));
         if (!result)
         {
-            printf("FAIL ((a*b)*c = a*(b*c) mod p^N):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("lhs1 = "), padic_print(lhs1, ctx), printf("\n");
-            printf("lhs2 = "), padic_print(lhs2, ctx), printf("\n");
-            printf("rhs1 = "), padic_print(rhs1, ctx), printf("\n");
-            printf("rhs2 = "), padic_print(rhs2, ctx), printf("\n");
+            flint_printf("FAIL ((a*b)*c = a*(b*c) mod p^N):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("lhs1 = "), padic_print(lhs1, ctx), flint_printf("\n");
+            flint_printf("lhs2 = "), padic_print(lhs2, ctx), flint_printf("\n");
+            flint_printf("rhs1 = "), padic_print(rhs1, ctx), flint_printf("\n");
+            flint_printf("rhs2 = "), padic_print(rhs2, ctx), flint_printf("\n");
             abort();
         }
 
@@ -289,10 +289,10 @@ main(void)
         result = (padic_equal(a, c));
         if (!result)
         {
-            printf("FAIL (a*1 = a):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
+            flint_printf("FAIL (a*1 = a):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -305,7 +305,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

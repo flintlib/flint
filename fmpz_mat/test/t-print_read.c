@@ -52,7 +52,7 @@ int main(void)
     int fd[2];
     pid_t childpid;
 
-    printf("print/ read....");
+    flint_printf("print/ read....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -72,15 +72,15 @@ int main(void)
 
         if (pipe(fd))
         {
-            printf("FAIL:\n");
-            printf("Failed to set-up the pipe.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to set-up the pipe.\n");
             abort();
         }
 
         if((childpid = fork()) == -1)
         {
-            printf("FAIL:\n");
-            printf("Failed to fork the process.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to fork the process.\n");
             abort();
         }
 
@@ -92,8 +92,8 @@ int main(void)
             out = fdopen(fd[1], "w");
             if (out == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open output file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open output file at the pipe.\n");
                 abort();
             }
 
@@ -101,12 +101,12 @@ int main(void)
             {
                 r = fmpz_mat_fprint(out, M[j]);
                 if ((j < k - 1) && (r > 0))
-                    r = fprintf(out, "\n");
+                    r = flint_fprintf(out, "\n");
 
                 if (r <= 0)
                 {
-                    printf("FAIL:\n");
-                    printf("Write error.\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("Write error.\n");
                     abort();
                 }
             }
@@ -123,8 +123,8 @@ int main(void)
             in = fdopen(fd[0], "r");
             if (in == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open input file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open input file at the pipe.\n");
                 abort();
             }
 
@@ -135,17 +135,17 @@ int main(void)
                 r = fmpz_mat_fread(in, t);
                 if (r <= 0)
                 {
-                    printf("FAIL:\n");
-                    printf("Read error.\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("Read error.\n");
                     abort();
                 }
 
                 result = fmpz_mat_equal(t, M[i]);
                 if (!result)
                 {
-                    printf("FAIL:\n");
-                    printf("M[i] = "), fmpz_mat_print(M[i]), printf("\n");
-                    printf("t    = "), fmpz_mat_print(t), printf("\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("M[i] = "), fmpz_mat_print(M[i]), flint_printf("\n");
+                    flint_printf("t    = "), fmpz_mat_print(t), flint_printf("\n");
                     abort();
                 }
 
@@ -157,8 +157,8 @@ int main(void)
 
         if (i != k)
         {
-            printf("FAIL:\n");
-            printf("Only %d out of %d objects were processed.\n", i, n);
+            flint_printf("FAIL:\n");
+            flint_printf("Only %d out of %d objects were processed.\n", i, n);
             abort();
         }
 
@@ -173,15 +173,15 @@ int main(void)
 
         if (pipe(fd))
         {
-            printf("FAIL:\n");
-            printf("Failed to set-up the pipe.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to set-up the pipe.\n");
             abort();
         }
 
         if((childpid = fork()) == -1)
         {
-            printf("FAIL:\n");
-            printf("Failed to fork the process.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to fork the process.\n");
             abort();
         }
 
@@ -193,16 +193,16 @@ int main(void)
             out = fdopen(fd[1], "w");
             if (out == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open output file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open output file at the pipe.\n");
                 abort();
             }
 
-            r = fprintf(out, "blah");
+            r = flint_fprintf(out, "blah");
             if (r <= 0)
             {
-                printf("FAIL:\n");
-                printf("Write error.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Write error.\n");
                 abort();
             }
 
@@ -218,8 +218,8 @@ int main(void)
             in = fdopen(fd[0], "r");
             if (in == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open input file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open input file at the pipe.\n");
                 abort();
             }
 
@@ -231,8 +231,8 @@ int main(void)
                 r = fmpz_mat_fread(in, t);
                 if (r > 0)
                 {
-                    printf("FAIL:\n");
-                    printf("r = %d\n", r);
+                    flint_printf("FAIL:\n");
+                    flint_printf("r = %d\n", r);
                     abort();
                 }
                 ++i;
@@ -245,15 +245,15 @@ int main(void)
         /* For {'b','l','a','h','\0'} we expect 5 reads */
         if (i != 5)
         {
-            printf("FAIL:\n");
-            printf("Carried out %d reads, but \"%s\" has only 4 characters.\n", i, str);
+            flint_printf("FAIL:\n");
+            flint_printf("Carried out %d reads, but \"%s\" has only 4 characters.\n", i, str);
             abort();
         }
     }
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 
@@ -261,9 +261,9 @@ int main(void)
 
 int main(void)
 {
-    printf("print/ read....");
+    flint_printf("print/ read....");
     fflush(stdout);
-    printf("SKIPPED\n");
+    flint_printf("SKIPPED\n");
     return EXIT_SUCCESS;
 }
 

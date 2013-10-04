@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-        printf("Syntax: crt <integer>\n");
+        flint_printf("Syntax: crt <integer>\n");
         return EXIT_FAILURE;
     }
     

@@ -89,13 +89,13 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
     if (lenf == 0)
     {
-        printf("Exception: fmpz_mod_poly_powmod: divide by zero\n");
+        flint_printf("Exception: fmpz_mod_poly_powmod: divide by zero\n");
         abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        printf("Exception: fmpz_mod_poly_powmod: negative exp not implemented\n");
+        flint_printf("Exception: fmpz_mod_poly_powmod: negative exp not implemented\n");
         abort();
     }
 

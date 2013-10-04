@@ -36,7 +36,7 @@ int main(void)
    const mp_limb_t * primes;
    const double * inverses;
 
-   printf("remove2_precomp....");
+   flint_printf("remove2_precomp....");
    fflush(stdout);
  
    primes = n_primes_arr_readonly(10000);
@@ -69,8 +69,8 @@ int main(void)
          result = ((exp1 == exp2) && (n1 == n2));
          if (!result)
          {
-            printf("FAIL\n");
-            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
+            flint_printf("FAIL\n");
+            flint_printf("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
             abort();
          }
       }
@@ -109,8 +109,8 @@ int main(void)
          result = ((exp1 == exp2) && (n1 == n2));
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
             abort();
          }
       }
@@ -122,6 +122,6 @@ int main(void)
    
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

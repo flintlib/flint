@@ -158,7 +158,7 @@ int main(void)
 	     info.type = 5;
          prof_repeat(&min5, &max, sample, (void *) &info);
 
-         printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l, pre %.1f c/l\n", 
+         flint_printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l, pre %.1f c/l\n", 
            i,
 		   /* (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
@@ -169,7 +169,7 @@ int main(void)
 
 	  } else
 	  {
-         printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l\n", 
+         flint_printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l\n", 
            i,
 		   /* (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,

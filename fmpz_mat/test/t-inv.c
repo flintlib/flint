@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     slong i, j, m, r;
 
-    printf("inv....");
+    flint_printf("inv....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,12 +73,12 @@ main(void)
 
         if (!fmpz_mat_equal(C, I))
         {
-            printf("FAIL:\n");
-            printf("A * A^-1 != I!\n");
-            printf("A:\n"),         fmpz_mat_print_pretty(A), printf("\n");
-            printf("A^-1:\n"),      fmpz_mat_print_pretty(B), printf("\n");
-            printf("den(A^-1) = "), fmpz_print(den), printf("\n");
-            printf("A * A^-1:\n"),  fmpz_mat_print_pretty(C), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A * A^-1 != I!\n");
+            flint_printf("A:\n"),         fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("A^-1:\n"),      fmpz_mat_print_pretty(B), flint_printf("\n");
+            flint_printf("den(A^-1) = "), fmpz_print(den), flint_printf("\n");
+            flint_printf("A * A^-1:\n"),  fmpz_mat_print_pretty(C), flint_printf("\n");
             abort();
         }
 
@@ -90,9 +90,9 @@ main(void)
 
         if (!fmpz_mat_equal(B, I))
         {
-            printf("FAIL:\n");
-            printf("aliasing failed!\n");
-            fmpz_mat_print(C); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("aliasing failed!\n");
+            fmpz_mat_print(C); flint_printf("\n");
             abort();
         }
 
@@ -123,8 +123,8 @@ main(void)
         fmpz_mat_inv(B, den, A);
         if (!fmpz_is_zero(den))
         {
-            printf("FAIL:\n");
-            printf("singular system gave nonzero denominator\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system gave nonzero denominator\n");
             abort();
         }
 
@@ -132,8 +132,8 @@ main(void)
         fmpz_mat_inv(A, den, A);
         if (!fmpz_is_zero(den))
         {
-            printf("FAIL:\n");
-            printf("singular system gave nonzero denominator\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system gave nonzero denominator\n");
             abort();
         }
 
@@ -144,6 +144,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

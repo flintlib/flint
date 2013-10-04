@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("invmod....");
+   flint_printf("invmod....");
    fflush(stdout);
    
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
@@ -57,14 +57,14 @@ int main(void)
       result = (((r == 0UL) && (b == 1UL)) || (r == 1UL));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, r = %ld\n", a, b, r); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, r = %wd\n", a, b, r); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

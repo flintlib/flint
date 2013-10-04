@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("cmp....");
+    flint_printf("cmp....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -54,8 +54,8 @@ main(void)
         result = (fmpq_poly_cmp(f, f) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n");
             abort();
         }
 
@@ -81,10 +81,10 @@ main(void)
             || (fmpq_poly_cmp(f, h) <= 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n");
-            fmpq_poly_debug(g), printf("\n");
-            fmpq_poly_debug(h), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n");
+            fmpq_poly_debug(g), flint_printf("\n");
+            fmpq_poly_debug(h), flint_printf("\n");
             abort();
         }
 
@@ -108,10 +108,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n");
-            fmpq_poly_debug(g), printf("\n");
-            printf("cmp(f,g) = %d\n", fmpq_poly_cmp(f, g));
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n");
+            fmpq_poly_debug(g), flint_printf("\n");
+            flint_printf("cmp(f,g) = %d\n", fmpq_poly_cmp(f, g));
             abort();
         }
 
@@ -121,6 +121,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

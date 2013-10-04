@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("pow_trunc....");
+    flint_printf("pow_trunc....");
     fflush(stdout);
 
     /* Check powering against naive method */
@@ -63,12 +63,12 @@ main(void)
             || (a->length == 0 && e == 0 && c->length == 1 && c->coeffs[0] == 1));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu, exp = %ld, trunc = %ld\n", 
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu, exp = %wd, trunc = %wd\n", 
                 a->length, a->mod.n, e, trunc);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(c), printf("\n\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -99,12 +99,12 @@ main(void)
         result = (nmod_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu, exp = %ld, trunc = %ld\n", 
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu, exp = %wd, trunc = %wd\n", 
                 a->length, a->mod.n, e, trunc);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(c), printf("\n\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -115,6 +115,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

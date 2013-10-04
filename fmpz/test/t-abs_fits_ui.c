@@ -35,8 +35,8 @@ static void check(fmpz_t x, int expected)
 {
     if (fmpz_abs_fits_ui(x) != expected)
     {
-        printf("FAIL:\n\n");
-        printf("x = "), fmpz_print(x), printf("\n");
+        flint_printf("FAIL:\n\n");
+        flint_printf("x = "), fmpz_print(x), flint_printf("\n");
         abort();
     }
 }
@@ -47,7 +47,7 @@ main(void)
     slong i;
     fmpz_t x;
 
-    printf("abs_fits_ui....");
+    flint_printf("abs_fits_ui....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -84,6 +84,6 @@ main(void)
     fmpz_clear(x);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

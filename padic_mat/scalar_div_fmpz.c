@@ -37,7 +37,7 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
 
     if (fmpz_is_zero(c))
     {
-        printf("ERROR (padic_mat_scalar_div_fmpz).  c is zero.\n");
+        flint_printf("ERROR (padic_mat_scalar_div_fmpz).  c is zero.\n");
         abort();
     }
 

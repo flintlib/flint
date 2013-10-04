@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sqrt....");
+    flint_printf("sqrt....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -67,7 +67,7 @@ main(void)
         result = (mpz_cmp(mf2, mf) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("mf = %Zd, mf2 = %Zd, mg = %Zd\n", mf, mf2, mg);
             abort();
         }
@@ -104,7 +104,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("mf = %Zd, mf2 = %Zd\n", mf, mf2);
             abort();
         }
@@ -117,6 +117,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

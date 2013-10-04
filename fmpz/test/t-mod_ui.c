@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("mod_ui....");
+    flint_printf("mod_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -67,9 +67,9 @@ main(void)
         result = ((mpz_cmp(e, f) == 0) && (r1 == r2));
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
-                ("d = %Zd, e = %Zd, f = %Zd, x = %lu, r1 = %lu, r2 = %lu\n", d,
+                ("d = %Zd, e = %Zd, f = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", d,
                  e, f, x, r1, r2);
             abort();
         }
@@ -108,9 +108,9 @@ main(void)
         result = ((mpz_cmp(e, f) == 0) && (r1 == r2));
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
-                ("d = %Zd, e = %Zd, f = %Zd, x = %lu, r1 = %lu, r2 = %lu\n", d,
+                ("d = %Zd, e = %Zd, f = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", d,
                  e, f, x, r1, r2);
             abort();
         }
@@ -124,6 +124,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

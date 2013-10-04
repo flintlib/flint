@@ -41,7 +41,7 @@ int main(void)
    gmp_randinit_default(st);
    flint_randinit(state);
 
-   printf("factor_pp1....");
+   flint_printf("factor_pp1....");
    fflush(stdout);
 
    for (i = 0; i < 50 * flint_test_multiplier(); i++) /* Test random numbers */
@@ -80,13 +80,13 @@ int main(void)
          result = (fmpz_is_zero(r));
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("n1 = ");
+            flint_printf("FAIL:\n");
+            flint_printf("n1 = ");
             fmpz_print(n1);
-            printf(", n2 = ");
+            flint_printf(", n2 = ");
             fmpz_print(n2);
-            printf("\n"); 
-            fmpz_print(r); printf("\n");
+            flint_printf("\n"); 
+            fmpz_print(r); flint_printf("\n");
             abort();
          }
       }
@@ -100,14 +100,14 @@ int main(void)
    
    if (count < 49 * flint_test_multiplier())
    {
-      printf("FAIL:\n");
-      printf("Only %lu numbers factored\n", count); 
+      flint_printf("FAIL:\n");
+      flint_printf("Only %wu numbers factored\n", count); 
       abort();
    }
 
    flint_randclear(state);
    gmp_randclear(st);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

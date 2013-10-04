@@ -16,7 +16,7 @@ main(int argc, char * argv[])
     }
 
     ulong n;
-    sscanf(argv[1], "%lu", &n);
+    flint_sscanf(argv[1], "%wu", &n);
 
     std::cout << "p(" << n << ") =\n" << number_of_partitions(n) << '\n';
 

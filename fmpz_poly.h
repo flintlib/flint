@@ -950,18 +950,18 @@ int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
 static __inline__
 void fmpz_poly_debug(const fmpz_poly_t poly)
 {
-    printf("(alloc = %ld, length = %ld, vec = ", poly->alloc, poly->length);
+    flint_printf("(alloc = %wd, length = %wd, vec = ", poly->alloc, poly->length);
     if (poly->coeffs)
     {
-        printf("{");
+        flint_printf("{");
         _fmpz_vec_print(poly->coeffs, poly->alloc);
-        printf("}");
+        flint_printf("}");
     }
     else
     {
-        printf("NULL");
+        flint_printf("NULL");
     }
-    printf(")");
+    flint_printf(")");
     fflush(stdout);
 }
 

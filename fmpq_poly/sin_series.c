@@ -69,7 +69,7 @@ fmpq_poly_sin_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 
     if (flen && !fmpz_is_zero(f->coeffs))
     {
-        printf("Exception (fmpq_poly_sin_series). Constant term != 0.\n");
+        flint_printf("Exception (fmpq_poly_sin_series). Constant term != 0.\n");
         abort();
     }
 

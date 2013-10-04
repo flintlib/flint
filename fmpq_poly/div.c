@@ -90,7 +90,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception (fmpq_poly_div). Division by zero.\n");
+        flint_printf("Exception (fmpq_poly_div). Division by zero.\n");
         abort();
     }
 

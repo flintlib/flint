@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     ulong cflags = 0UL;
 
-    printf("get_set_str....");
+    flint_printf("get_set_str....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,11 +61,11 @@ main(void)
         result = (ans == 0 && fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f      = "), fmpq_poly_debug(f), printf("\n\n");
-            printf("g      = "), fmpq_poly_debug(g), printf("\n\n");
-            printf("ans    = %d\n\n", ans);
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            flint_printf("f      = "), fmpq_poly_debug(f), flint_printf("\n\n");
+            flint_printf("g      = "), fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("ans    = %d\n\n", ans);
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -76,6 +76,6 @@ main(void)
     
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

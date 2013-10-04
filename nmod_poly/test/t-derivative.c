@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("derivative....");
+    flint_printf("derivative....");
     fflush(stdout);
 
     fmpz_init(t);
@@ -71,10 +71,10 @@ main(void)
         
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -100,10 +100,10 @@ main(void)
         result = nmod_poly_equal(a, b);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -113,6 +113,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("gcd....");
+   flint_printf("gcd....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -58,14 +58,14 @@ int main(void)
       result = (n_gcd(a*c, b*c) == c);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, c = %lu\n", a, b, c); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

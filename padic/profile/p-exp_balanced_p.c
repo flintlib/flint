@@ -59,7 +59,7 @@ main(void)
     };
     long T[20] = {0};
 
-    printf("Benchmark for p-adic exponential (balanced).\n");
+    flint_printf("Benchmark for p-adic exponential (balanced).\n");
     fflush(stdout);
 
 for (l = 0; l < len; l++)
@@ -107,7 +107,7 @@ for (l = 0; l < len; l++)
 
     T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
-    printf("%2ld, %4LG, %9ld, %ld\n", 
+    flint_printf("%2ld, %4LG, %9ld, %wd\n", 
         l, cputime, runs[l], T[l]);
 
     padic_clear(d, ctx);
@@ -118,9 +118,9 @@ for (l = 0; l < len; l++)
     flint_randclear(state);
 }
 
-    printf("Output as a list:\n");
+    flint_printf("Output as a list:\n");
     for (l = 0; l < len; l++)
-        printf("%ld, ", T[l]);
-    printf("\n");
+        flint_printf("%wd, ", T[l]);
+    flint_printf("\n");
 }
 

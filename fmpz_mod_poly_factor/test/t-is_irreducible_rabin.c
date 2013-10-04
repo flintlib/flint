@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_irreducible_rabin....");
+    flint_printf("is_irreducible_rabin....");
     fflush(stdout);
 
     for (iter = 0; iter < 100; iter++)
@@ -80,10 +80,10 @@ main(void)
 
         if (fmpz_mod_poly_is_irreducible_rabin(poly1))
         {
-            printf("Error: reducible polynomial declared irreducible!\n");
-            printf("poly:\n");
+            flint_printf("Error: reducible polynomial declared irreducible!\n");
+            flint_printf("poly:\n");
             fmpz_mod_poly_print(poly1);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -94,6 +94,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -108,7 +108,7 @@ void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
         if ((w < 2 && *p == 2L) || w < 1)
         {
-            printf("ERROR (qadic_norm_analytic).  w = %ld.\n", w);
+            flint_printf("ERROR (qadic_norm_analytic).  w = %wd.\n", w);
             abort();
         }
 

@@ -35,7 +35,7 @@ int main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("parity....");
+    flint_printf("parity....");
     fflush(stdout);
 
     /* check inv(inv(a)) == a */
@@ -62,16 +62,16 @@ int main(void)
 
         if (ap != ap2 || bp != bp2 || cp != cp2)
         {
-            printf("FAIL:\n");
-            printf("a: "); _perm_print(a, n); printf("\n\n");
-            printf("b: "); _perm_print(b, n); printf("\n\n");
-            printf("c: "); _perm_print(c, n); printf("\n\n");
-            printf("ap = %d\n", ap);
-            printf("bp = %d\n", bp);
-            printf("cp = %d\n", cp);
-            printf("ap2 = %d\n", ap2);
-            printf("bp2 = %d\n", bp2);
-            printf("cp2 = %d\n", cp2);
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
+            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
+            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
+            flint_printf("ap = %d\n", ap);
+            flint_printf("bp = %d\n", bp);
+            flint_printf("cp = %d\n", cp);
+            flint_printf("ap2 = %d\n", ap2);
+            flint_printf("bp2 = %d\n", bp2);
+            flint_printf("cp2 = %d\n", cp2);
             abort();
         }
 
@@ -81,6 +81,6 @@ int main(void)
     }
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

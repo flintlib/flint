@@ -37,7 +37,7 @@ int main(void)
    mpz_t d_m;
    flint_rand_t state;
    
-   printf("is_probabprime_fermat....");
+   flint_printf("is_probabprime_fermat....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -64,8 +64,8 @@ int main(void)
       result = n_is_probabprime_fermat(d, j);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -97,13 +97,13 @@ int main(void)
    result = (count < 200 * flint_test_multiplier());
    if (!result)
    {
-      printf("FAIL:\n");
-      printf("%lu composites declared prime\n", count); 
+      flint_printf("FAIL:\n");
+      flint_printf("%wu composites declared prime\n", count); 
       abort();
    }
    
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

@@ -38,7 +38,7 @@ main(void)
     slong m, n, rep;
     flint_rand_t state;
 
-    printf("charpoly....");
+    flint_printf("charpoly....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -69,11 +69,11 @@ main(void)
 
         if (!fmpz_poly_equal(f, g))
         {
-            printf("FAIL: charpoly(AB) != charpoly(BA).\n");
-            printf("Matrix A:\n"), fmpz_mat_print(A), printf("\n");
-            printf("Matrix B:\n"), fmpz_mat_print(B), printf("\n");
-            printf("cp(AB) = "), fmpz_poly_print_pretty(f, "X"), printf("\n");
-            printf("cp(BA) = "), fmpz_poly_print_pretty(g, "X"), printf("\n");
+            flint_printf("FAIL: charpoly(AB) != charpoly(BA).\n");
+            flint_printf("Matrix A:\n"), fmpz_mat_print(A), flint_printf("\n");
+            flint_printf("Matrix B:\n"), fmpz_mat_print(B), flint_printf("\n");
+            flint_printf("cp(AB) = "), fmpz_poly_print_pretty(f, "X"), flint_printf("\n");
+            flint_printf("cp(BA) = "), fmpz_poly_print_pretty(g, "X"), flint_printf("\n");
             abort();
         }
 
@@ -87,6 +87,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

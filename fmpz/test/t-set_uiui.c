@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("set_uiui....");
+    flint_printf("set_uiui....");
     fflush(stdout);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -61,11 +61,11 @@ main(void)
         result = fmpz_equal(a, b);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("hi = %lu\n", hi);
-            printf("lo = %lu\n", lo);
-            printf("a = "); fmpz_print(a); printf("\n");
-            printf("b = "); fmpz_print(b); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("hi = %wu\n", hi);
+            flint_printf("lo = %wu\n", lo);
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             abort();
         }
 
@@ -75,6 +75,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

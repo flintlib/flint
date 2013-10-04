@@ -42,7 +42,7 @@ main(void)
     
     flint_rand_t state;
 
-    printf("fft/ifft_truncate....");
+    flint_printf("fft/ifft_truncate....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -93,8 +93,8 @@ main(void)
             {
                 if (mpn_cmp(ii[i], jj[i], size) != 0)
                 {
-                    printf("FAIL:\n");
-                    printf("Error in entry %ld\n", i);
+                    flint_printf("FAIL:\n");
+                    flint_printf("Error in entry %wd\n", i);
                     abort();
                 }
             }
@@ -106,6 +106,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

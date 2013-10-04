@@ -59,9 +59,9 @@ fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     bit_size += FLINT_BIT_COUNT(B->r);
 
 /*
-    printf("A: BITS %ld LEN %ld\n", A_bits, A_len);
-    printf("B: BITS %ld LEN %ld\n", B_bits, B_len);
-    printf("bit_size: %ld\n", bit_size);
+    flint_printf("A: BITS %wd LEN %wd\n", A_bits, A_len);
+    flint_printf("B: BITS %wd LEN %wd\n", B_bits, B_len);
+    flint_printf("bit_size: %wd\n", bit_size);
 */
 
     fmpz_mat_init(AA, A->r, A->c);

@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("set_si....");
+    flint_printf("set_si....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -65,11 +65,11 @@ main(void)
 
         if (!fmpq_is_canonical(y) || !fmpq_equal(x, y))
         {
-            printf("FAIL");
-            printf("p: "); fmpz_print(p); printf("\n"); 
-            printf("q: "); fmpz_print(q); printf("\n"); 
-            printf("x: "); fmpq_print(x); printf("\n"); 
-            printf("y: "); fmpq_print(y); printf("\n"); 
+            flint_printf("FAIL");
+            flint_printf("p: "); fmpz_print(p); flint_printf("\n"); 
+            flint_printf("q: "); fmpz_print(q); flint_printf("\n"); 
+            flint_printf("x: "); fmpq_print(x); flint_printf("\n"); 
+            flint_printf("y: "); fmpq_print(y); flint_printf("\n"); 
             abort();
         }
 
@@ -82,6 +82,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

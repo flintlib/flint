@@ -85,7 +85,7 @@ main(void)
     fmpz_poly_fit_length(q, lenhi);
     fmpz_poly_fit_length(r, 2 * lenhi - 1);
     
-    printf("3 2 1");
+    flint_printf("3 2 1");
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
@@ -126,11 +126,11 @@ main(void)
             }
 
             X[i][j] = (double) s / (double) reps;
-            printf(" .");
+            flint_printf(" .");
             fflush(stdout);
         }
     }
-    printf("\n");
+    flint_printf("\n");
 
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
@@ -140,8 +140,8 @@ main(void)
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
-            printf("%8.3f", X[i][j]);
-        printf("\n");
+            flint_printf("%8.3f", X[i][j]);
+        flint_printf("\n");
     }
 
     gmp_randclear(state);

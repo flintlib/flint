@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("jacobi....");
+   flint_printf("jacobi....");
    fflush(stdout);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
@@ -60,8 +60,8 @@ int main(void)
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, d = %lu\n", a, d); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, d = %wu\n", a, d); 
          abort();
       }
 
@@ -71,6 +71,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

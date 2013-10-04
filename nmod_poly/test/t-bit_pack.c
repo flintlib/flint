@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("bit_pack/bit_unpack....");
+    flint_printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
     /* Check aliasing of a and c */
@@ -74,9 +74,9 @@ main(void)
         result = (nmod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -111,17 +111,17 @@ main(void)
         if (!nmod_poly_equal(A, B))
         {
             mpz_t zz;
-            printf("FAIL:\n");
-            printf("INPUT: ");
+            flint_printf("FAIL:\n");
+            flint_printf("INPUT: ");
             nmod_poly_print(A);
-            printf("\n");
+            flint_printf("\n");
             mpz_init(zz); fmpz_get_mpz(zz, f);
-            printf("PACKED: ");
+            flint_printf("PACKED: ");
             mpz_out_str(stdout, 2, zz);
-            printf("\n");
-            printf("OUTPUT: ");
+            flint_printf("\n");
+            flint_printf("OUTPUT: ");
             nmod_poly_print(B);
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -132,6 +132,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

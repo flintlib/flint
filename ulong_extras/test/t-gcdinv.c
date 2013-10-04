@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("gcdinv....");
+   flint_printf("gcdinv....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -63,14 +63,14 @@ int main(void)
       result = ((g == g2) && (t == t2));
       if (!result)
       {
-         printf("FAIL\n");
-         printf("a = %lu, b = %lu, c = %lu, g = %lu, g2 = %lu, t = %ld, t2 = %ld\n", a, b, c, g, g2, t, t2); 
+         flint_printf("FAIL\n");
+         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, g2 = %wu, t = %wd, t2 = %wd\n", a, b, c, g, g2, t, t2); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

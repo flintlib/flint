@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("inv....");
+    flint_printf("inv....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -79,12 +79,12 @@ main(void)
 
         if (!fmpq_mat_equal(A, C) || !success1 || !success2)
         {
-            printf("FAIL!\n");
-            printf("A:\n");
+            flint_printf("FAIL!\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
             abort();
         }
@@ -124,10 +124,10 @@ main(void)
 
         if (!fmpq_mat_equal(A, B) || !success1 || !success2)
         {
-            printf("FAIL!\n");
-            printf("A:\n");
+            flint_printf("FAIL!\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
             abort();
         }
@@ -170,8 +170,8 @@ main(void)
 
             if (success)
             {
-                printf("FAIL:\n");
-                printf("matrix reported as invertible:\n");
+                flint_printf("FAIL:\n");
+                flint_printf("matrix reported as invertible:\n");
                 fmpq_mat_print(A);
                 abort();
             }
@@ -186,6 +186,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

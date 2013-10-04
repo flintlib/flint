@@ -37,7 +37,7 @@ main(void)
     int cflags = 0, i, result;
     flint_rand_t state;
     
-    printf("xgcd....");
+    flint_printf("xgcd....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -70,13 +70,13 @@ main(void)
         result = (fmpq_poly_equal(d, e) && !cflags);
         if (!result)
         {
-            printf("FAIL (correctness #1):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(d), printf("\n\n");
-            fmpq_poly_debug(s), printf("\n\n");
-            fmpq_poly_debug(t), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL (correctness #1):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(d), flint_printf("\n\n");
+            fmpq_poly_debug(s), flint_printf("\n\n");
+            fmpq_poly_debug(t), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -111,13 +111,13 @@ main(void)
         result = (fmpq_poly_equal(d, a) && !cflags);
         if (!result)
         {
-            printf("FAIL (GCD #1):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(d), printf("\n\n");
-            fmpq_poly_debug(s), printf("\n\n");
-            fmpq_poly_debug(t), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL (GCD #1):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(d), flint_printf("\n\n");
+            fmpq_poly_debug(s), flint_printf("\n\n");
+            fmpq_poly_debug(t), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -158,13 +158,13 @@ main(void)
         result = (fmpq_poly_equal(d, a) && !cflags);
         if (!result)
         {
-            printf("FAIL (correctness #2):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(d), printf("\n\n");
-            fmpq_poly_debug(s), printf("\n\n");
-            fmpq_poly_debug(t), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL (correctness #2):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(d), flint_printf("\n\n");
+            fmpq_poly_debug(s), flint_printf("\n\n");
+            fmpq_poly_debug(t), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -202,13 +202,13 @@ main(void)
         result = (fmpq_poly_equal(d, a) && !cflags);
         if (!result)
         {
-            printf("FAIL (GCD #2):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(d), printf("\n\n");
-            fmpq_poly_debug(s), printf("\n\n");
-            fmpq_poly_debug(t), printf("\n\n");
-            printf("cflags = %d\n\n", cflags);
+            flint_printf("FAIL (GCD #2):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(d), flint_printf("\n\n");
+            fmpq_poly_debug(s), flint_printf("\n\n");
+            fmpq_poly_debug(t), flint_printf("\n\n");
+            flint_printf("cflags = %d\n\n", cflags);
             abort();
         }
 
@@ -222,7 +222,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

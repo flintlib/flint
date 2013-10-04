@@ -49,7 +49,7 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("Exception (_fmpz_vec_fread). Length does not fit into a slong.\n");
+        flint_printf("Exception (_fmpz_vec_fread). Length does not fit into a slong.\n");
         abort();
     }
     if (alloc)

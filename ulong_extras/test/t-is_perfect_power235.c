@@ -36,7 +36,7 @@ int main(void)
    mp_limb_t d;
    flint_rand_t state;
    
-   printf("is_perfect_power235....");
+   flint_printf("is_perfect_power235....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -49,8 +49,8 @@ int main(void)
       result = n_is_perfect_power235(n_pow(d, 2));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d^2 = %lu is declared not a perfect power\n", d*d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d^2 = %wu is declared not a perfect power\n", d*d); 
          abort();
       }
 
@@ -65,8 +65,8 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d^3 = %lu is declared not a perfect power\n", d*d*d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d^3 = %wu is declared not a perfect power\n", d*d*d); 
          abort();
       }
 
@@ -81,8 +81,8 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d^5 = %lu is declared not a perfect power\n", d*d*d*d*d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d^5 = %wu is declared not a perfect power\n", d*d*d*d*d); 
          abort();
       }
 
@@ -102,8 +102,8 @@ int main(void)
       result = !n_is_perfect_power235(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared a perfect power\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared a perfect power\n", d); 
          abort();
       }
 
@@ -112,6 +112,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

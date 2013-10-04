@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_irreducible....");
+    flint_printf("is_irreducible....");
     fflush(stdout);
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
@@ -70,9 +70,9 @@ main(void)
         result &= (factors->num == 1);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("Irreducible polynomial should not have non-trivial factors!\n");
-            printf("poly = "), nmod_poly_print(poly), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Irreducible polynomial should not have non-trivial factors!\n");
+            flint_printf("poly = "), nmod_poly_print(poly), flint_printf("\n");
             abort();
         }
         nmod_poly_factor_clear(factors);
@@ -92,8 +92,8 @@ main(void)
         result &= !nmod_poly_is_irreducible(poly3);
         if (!result)
         {
-            printf("Error: reducible polynomial declared irreducible!\n");
-            nmod_poly_print(poly3); printf("\n");
+            flint_printf("Error: reducible polynomial declared irreducible!\n");
+            nmod_poly_print(poly3); flint_printf("\n");
             abort();
         }
 
@@ -103,6 +103,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

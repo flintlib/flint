@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("rank....");
+    flint_printf("rank....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -82,10 +82,10 @@ main(void)
 
         if (rank != zrank)
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             nmod_poly_mat_print(A, "x");
-            printf("Computed rank: %ld (zrank = %ld)\n", rank, zrank);
+            flint_printf("Computed rank: %wd (zrank = %wd)\n", rank, zrank);
             abort();
         }
 
@@ -95,6 +95,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

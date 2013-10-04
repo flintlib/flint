@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("xgcd....");
+   flint_printf("xgcd....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -65,14 +65,14 @@ int main(void)
       result = ((g == c) && (ph == 0UL) && (pl == c));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, c = %lu, g = %lu, s = %lu, t = %lu\n", a, b, c, g, s, t); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a, b, c, g, s, t); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

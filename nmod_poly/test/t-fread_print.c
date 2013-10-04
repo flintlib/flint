@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("fread_print....");
+    flint_printf("fread_print....");
     fflush(stdout);
 
     /* Check reading and writing to a file */
@@ -51,7 +51,7 @@ main(void)
 
         if (!f)
         {
-            printf("Error: unable to open file for writing.\n");
+            flint_printf("Error: unable to open file for writing.\n");
             abort();
         }
 
@@ -68,10 +68,10 @@ main(void)
         result = (r1 && nmod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("r1 = %d, n = %lu\n", r1, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("r1 = %d, n = %wu\n", r1, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             fclose(f);
             remove("nmod_poly_test");
             abort();
@@ -80,7 +80,7 @@ main(void)
         fclose(f);
         if (remove("nmod_poly_test"))
         {
-            printf("Error, unable to delete file nmod_poly_test\n");
+            flint_printf("Error, unable to delete file nmod_poly_test\n");
             abort();
         }
         nmod_poly_clear(a);
@@ -89,7 +89,7 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 
@@ -97,9 +97,9 @@ main(void)
 
 int main(void)
 {
-    printf("print/ read....");
+    flint_printf("print/ read....");
     fflush(stdout);
-    printf("SKIPPED\n");
+    flint_printf("SKIPPED\n");
     return EXIT_SUCCESS;
 }
 

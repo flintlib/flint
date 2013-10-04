@@ -63,19 +63,19 @@ int main(void)
     mpz_init(curr);
     fmpz_init(p);
 
-    printf("Random polynomials\n");
+    flint_printf("Random polynomials\n");
     mpz_set_ui(pz, 2);
     mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
-        printf("========== p: "); fmpz_print(p); printf(" ==========\n");
+        flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = degs[j];
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -110,7 +110,7 @@ int main(void)
                 fmpz_mod_poly_clear(f);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -124,19 +124,19 @@ int main(void)
     /* This code checks whether fmpz_mod_poly_factor
        made a correct choice between CZ and KS */
 
-    printf("Check choice correctness\n");
+    flint_printf("Check choice correctness\n");
     mpz_set_ui(pz, 2);
     mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
-        printf("========== p: "); fmpz_print(p); printf(" ==========\n");
+        flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = degs[j];
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -171,7 +171,7 @@ int main(void)
                 fmpz_mod_poly_clear(f);
             }
 
-            printf("CZ: %.2lf F: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf F: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -182,19 +182,19 @@ int main(void)
         mpz_mul_ui(curr, curr, 10);
     }
 
-    printf("Irreducible polynomials\n");
+    flint_printf("Irreducible polynomials\n");
     mpz_set_ui(pz, 2);
     mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
-        printf("========== p: "); fmpz_print(p); printf(" ==========\n");
+        flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = degs[j];
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -229,7 +229,7 @@ int main(void)
                 fmpz_mod_poly_clear(f);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -240,19 +240,19 @@ int main(void)
         mpz_mul_ui(curr, curr, 10);
     }
 
-    printf("Product of two irreducible polynomials\n");
+    flint_printf("Product of two irreducible polynomials\n");
     mpz_set_ui(pz, 2);
     mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
-        printf("========== p: "); fmpz_print(p); printf(" ==========\n");
+        flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = (degs[j] >> 1);
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -291,7 +291,7 @@ int main(void)
                 fmpz_mod_poly_clear(g);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -302,19 +302,19 @@ int main(void)
         mpz_mul_ui(curr, curr, 10);
     }
 
-    printf("Product of 8 small irreducible polynomials\n");
+    flint_printf("Product of 8 small irreducible polynomials\n");
     mpz_set_ui(pz, 2);
     mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
-        printf("========== p: "); fmpz_print(p); printf(" ==========\n");
+        flint_printf("========== p: "); fmpz_print(p); flint_printf(" ==========\n");
         fflush(stdout);
 
         for (j = 1; j < ND; j++)
         {
             n = (degs[j] >> 3);
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -356,7 +356,7 @@ int main(void)
                 fmpz_mod_poly_clear(g);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)

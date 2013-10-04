@@ -35,7 +35,7 @@ char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
 
         if (str == NULL)
         {
-            printf("Exception (_fmpq_get_str). Not enough memory.\n");
+            flint_printf("Exception (_fmpq_get_str). Not enough memory.\n");
             abort();
         }
     }

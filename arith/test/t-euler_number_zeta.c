@@ -41,7 +41,7 @@ int main()
     fmpz_t res;
     slong n, N;
 
-    printf("euler_number_zeta....");
+    flint_printf("euler_number_zeta....");
     fflush(stdout);
 
     N = 3000;
@@ -56,8 +56,8 @@ int main()
         arith_euler_number(res, n);
         if (!fmpz_equal(res, ress + n))
         {
-            printf("FAIL: n = %ld\n", n);
-            printf("Value: "); fmpz_print(res); printf("\n");
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("Value: "); fmpz_print(res); flint_printf("\n");
             abort();
         }
 
@@ -67,6 +67,6 @@ int main()
     _fmpz_vec_clear(ress, N);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

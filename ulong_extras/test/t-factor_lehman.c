@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("factor_lehman....");
+   flint_printf("factor_lehman....");
    fflush(stdout);
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
@@ -56,8 +56,8 @@ int main(void)
       result = ((n1%n2) == 0UL && n1 != n2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+         flint_printf("FAIL:\n");
+         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
          abort();
       }
    }
@@ -94,14 +94,14 @@ int main(void)
       result = ((n%n3) == 0UL && n != n3);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n = %ld, n3 = %lu\n", n, n3);
+         flint_printf("FAIL:\n");
+         flint_printf("n = %wd, n3 = %wu\n", n, n3);
          abort();
       }
    }
    
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

@@ -39,7 +39,7 @@
     returned.  If an error occurs, EOF is returned and the error indicator 
     is set''
 
-    where the EOF macro expands to a negative int, and fprintf (of type int)
+    where the EOF macro expands to a negative int, and flint_fprintf (of type int)
 
     ``On success, the total number of characters written is returned.
     On failure, a negative number is returned.''
@@ -56,7 +56,7 @@ _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
     fmpz_init(d);
     fmpz_init(g);
 
-    r = fprintf(file, "%li", len);
+    r = flint_fprintf(file, "%li", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

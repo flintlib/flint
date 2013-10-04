@@ -35,7 +35,7 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
     int r;
     slong i;
 
-    r = fprintf(file, "%ld ", len);
+    r = flint_fprintf(file, "%wd ", len);
     if (r <= 0)
         return r;
 
@@ -46,13 +46,13 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
     if (len == 0)
         return r;
 
-    r = fprintf(file, " ");
+    r = flint_fprintf(file, " ");
     if (r <= 0)
         return r;
 
     for (i = 0; (r > 0) && (i < len); i++)
     {
-        r = fprintf(file, " ");
+        r = flint_fprintf(file, " ");
         if (r <= 0)
             return r;
         r = fmpz_fprint(file, poly + i);

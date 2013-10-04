@@ -120,14 +120,14 @@ fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t 
 
     if (len3 == 0)
     {
-        printf("Exception: division by zero in "
+        flint_printf("Exception: division by zero in "
                "fmpz_mod_poly_compose_mod_brent_kung\n");
         abort();
     }
 
     if (len1 >= len3)
     {
-        printf("Exception: fmpz_mod_poly_compose_brent_kung: the degree of the"
+        flint_printf("Exception: fmpz_mod_poly_compose_brent_kung: the degree of the"
                " first polynomial must be smaller than that of the modulus\n");
         abort();
     }

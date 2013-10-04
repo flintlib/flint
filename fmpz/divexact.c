@@ -38,7 +38,7 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        printf("Exception (fmpz_divexact). Division by zero.\n");
+        flint_printf("Exception (fmpz_divexact). Division by zero.\n");
         abort();
     }
 

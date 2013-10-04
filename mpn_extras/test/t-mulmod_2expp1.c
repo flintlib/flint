@@ -43,7 +43,7 @@ int main(void)
     
     gmp_randinit_default(rands);
     
-    printf("mulmod_2expp1_basecase....");
+    flint_printf("mulmod_2expp1_basecase....");
     fflush(stdout);
 
     b = 1;
@@ -87,8 +87,8 @@ int main(void)
         
           result = (mpn_cmp(tp, rp, dn) == 0);
           if (!result) {
-             printf("FAIL:\n");
-             printf("b = %ld\n", b);
+             flint_printf("FAIL:\n");
+             flint_printf("b = %wd\n", b);
              abort();
           }        
        }
@@ -144,8 +144,8 @@ int main(void)
           result = (mpn_cmp(tp, rp, dn) == 0);
           if (!result)
           {
-             printf("FAIL:\n");
-             printf("b = %ld\n", b);
+             flint_printf("FAIL:\n");
+             flint_printf("b = %wd\n", b);
              abort();
           }        
        }
@@ -200,8 +200,8 @@ int main(void)
          
           result = (mpn_cmp(tp, rp, dn) == 0);
           if (!result) {
-             printf("FAIL\n");
-             printf("b = %ld\n", b);
+             flint_printf("FAIL\n");
+             flint_printf("b = %wd\n", b);
              abort();
           }        
        }
@@ -241,8 +241,8 @@ int main(void)
        
           result = (mpn_cmp(tp, rp, dn) == 0);
           if (!result) {
-             printf("FAIL\n");
-             printf("b = %ld\n", b);
+             flint_printf("FAIL\n");
+             flint_printf("b = %wd\n", b);
              abort();
           }        
        }
@@ -250,6 +250,6 @@ int main(void)
 
     gmp_randclear(rands);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

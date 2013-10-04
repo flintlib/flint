@@ -703,9 +703,9 @@ fmpz_init(y);
 fmpz_set_ui(x, 7);
 fmpz_mul(y, x, x);
 fmpz_print(x);
-printf("^2 = ");
+flint_printf("^2 = ");
 fmpz_print(y);
-printf("\n");
+flint_printf("\n");
 fmpz_clear(x);
 fmpz_clear(y);
 \end{lstlisting}
@@ -781,9 +781,9 @@ for (i = 0; i < 2; i++)
     for (j = 0; j < 2; j++)
         fmpz_set_ui(fmpz_mat_entry(A, i, j), 2*i+j);
 fmpz_mat_mul(B, A, A);
-printf("A = \n");
+flint_printf("A = \n");
 fmpz_mat_print_pretty(A);
-printf("A^2 = \n");
+flint_printf("A^2 = \n");
 fmpz_mat_print_pretty(B);
 fmpz_mat_clear(A);
 fmpz_mat_clear(B);
@@ -838,8 +838,8 @@ fmpz_poly_init(y);
 fmpz_poly_set_coeff_ui(x, 3, 5);
 fmpz_poly_set_coeff_si(x, 0, -1);
 fmpz_poly_mul(y, x, x);
-fmpz_poly_print(x); printf("\n");
-fmpz_poly_print(y); printf("\n");
+fmpz_poly_print(x); flint_printf("\n");
+fmpz_poly_print(y); flint_printf("\n");
 fmpz_poly_clear(x);
 fmpz_poly_clear(y);
 \end{lstlisting}
@@ -1074,7 +1074,7 @@ strf = fmpz_poly_q_get_str_pretty(f, "t");
 strg = fmpz_poly_q_get_str_pretty(g, "t");
 fmpz_poly_q_mul(f, f, g);
 str  = fmpz_poly_q_get_str_pretty(f, "t");
-printf("%s * %s = %s\n", strf, strg, str);
+flint_printf("%s * %s = %s\n", strf, strg, str);
 free(str);
 free(strf);
 free(strg);
@@ -1195,8 +1195,8 @@ nmod_poly_init(y, 7);
 nmod_poly_set_coeff_ui(x, 3, 5);
 nmod_poly_set_coeff_ui(x, 0, 6);
 nmod_poly_mul(y, x, x);
-nmod_poly_print(x); printf("\n");
-nmod_poly_print(y); printf("\n");
+nmod_poly_print(x); flint_printf("\n");
+nmod_poly_print(y); flint_printf("\n");
 nmod_poly_clear(x);
 nmod_poly_clear(y);
 \end{lstlisting}
@@ -1352,8 +1352,8 @@ fmpz_mod_poly_init(y, n);
 fmpz_mod_poly_set_coeff_ui(x, 3, 5);
 fmpz_mod_poly_set_coeff_ui(x, 0, 6);
 fmpz_mod_poly_sqr(y, x);
-fmpz_mod_poly_print(x); printf("\n");
-fmpz_mod_poly_print(y); printf("\n");
+fmpz_mod_poly_print(x); flint_printf("\n");
+fmpz_mod_poly_print(y); flint_printf("\n");
 fmpz_mod_poly_clear(x);
 fmpz_mod_poly_clear(y);
 fmpz_clear(n);
@@ -1525,7 +1525,7 @@ ninv = n_preinvert_limb(n);
 
 r = n_mulmod2_preinv(a, b, n, ninv);
 
-printf("%lu*%lu mod %lu is %lu\n", a, b, n, r);
+flint_printf("%wu*%wu mod %wu is %wu\n", a, b, n, r);
 \end{lstlisting}
 
 The output is:
@@ -1827,7 +1827,7 @@ small subset of the FLINT types.
 
 For output in other cases, and input in all cases, we provide C-like functions.
 Namely, the functions \code{print}, \code{print_pretty}, \code{read} and
-\code{read_pretty} can be used similarly to the C \code{printf} and \code{scanf}.
+\code{read_pretty} can be used similarly to the C \code{flint_printf} and \code{scanf}.
 For example, \code{print(x)} where \code{x} is an \code{fmpz} has the same
 effect as \code{std::cout << x}.
 

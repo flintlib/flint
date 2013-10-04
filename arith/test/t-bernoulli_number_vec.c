@@ -45,7 +45,7 @@ int main()
     fmpz * den3;
     slong i, n, N;
 
-    printf("bernoulli_number_vec....");
+    flint_printf("bernoulli_number_vec....");
     fflush(stdout);
 
     N = 2000;
@@ -68,20 +68,20 @@ int main()
             if (!fmpz_equal(num1 + i, num2 + i) ||
                 !fmpz_equal(num1 + i, num3 + i))
             {
-                printf("FAIL: n = %ld, numerator of B_%ld\n", n, i);
-                printf("recursive: "); fmpz_print(num1 + i); printf("\n");
-                printf("multi_mod: "); fmpz_print(num2 + i); printf("\n");
-                printf("zeta:      "); fmpz_print(num3 + i); printf("\n");
+                flint_printf("FAIL: n = %wd, numerator of B_%wd\n", n, i);
+                flint_printf("recursive: "); fmpz_print(num1 + i); flint_printf("\n");
+                flint_printf("multi_mod: "); fmpz_print(num2 + i); flint_printf("\n");
+                flint_printf("zeta:      "); fmpz_print(num3 + i); flint_printf("\n");
                 abort();
             }
 
             if (!fmpz_equal(den1 + i, den2 + i) ||
                 !fmpz_equal(den1 + i, den3 + i))
             {
-                printf("FAIL: n = %ld, denominator of B_%ld\n", n, i);
-                printf("recursive: "); fmpz_print(den1 + i); printf("\n");
-                printf("multi_mod: "); fmpz_print(den2 + i); printf("\n");
-                printf("zeta:      "); fmpz_print(den3 + i); printf("\n");
+                flint_printf("FAIL: n = %wd, denominator of B_%wd\n", n, i);
+                flint_printf("recursive: "); fmpz_print(den1 + i); flint_printf("\n");
+                flint_printf("multi_mod: "); fmpz_print(den2 + i); flint_printf("\n");
+                flint_printf("zeta:      "); fmpz_print(den3 + i); flint_printf("\n");
                 abort();
             }
         }
@@ -95,6 +95,6 @@ int main()
     _fmpz_vec_clear(den3, N);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

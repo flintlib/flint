@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("divexact_ui....");
+    flint_printf("divexact_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,8 +68,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL1\n");
-            gmp_printf("n = %lu, e = %Zd, f = %Zd, g = %Zd\n", n, e, f, g);
+            flint_printf("FAIL1\n");
+            gmp_printf("n = %wu, e = %Zd, f = %Zd, g = %Zd\n", n, e, f, g);
             abort();
         }
 
@@ -107,8 +107,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, n = %lu, f = %Zd, g = %Zd\n", d, n, f, g);
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, n = %wu, f = %Zd, g = %Zd\n", d, n, f, g);
             abort();
         }
 
@@ -121,6 +121,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -37,8 +37,8 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
 
     if (!(degs = flint_malloc(fmpz_mod_poly_degree(poly) * sizeof(slong))))
     {
-        printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
-        printf("Not enough memory.\n");
+        flint_printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
+        flint_printf("Not enough memory.\n");
         abort();
     }
 

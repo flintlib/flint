@@ -34,7 +34,7 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
     slong i, length;
     mp_limb_t n;
 
-    if (fscanf(f, "%ld %lu", &length, &n) != 2)
+    if (flint_fscanf(f, "%wd %wu", &length, &n) != 2)
         return 0;
     
     nmod_poly_clear(poly);
@@ -44,7 +44,7 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
     
     for (i = 0; i < length; i++)
     {
-        if (!fscanf(f, "%lu", &poly->coeffs[i]))
+        if (!flint_fscanf(f, "%wu", &poly->coeffs[i]))
         {
             poly->length = i;
             return 0;

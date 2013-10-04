@@ -57,13 +57,13 @@ int main (void)
 
       if (!nmod_poly_is_one (h))
       {
-        printf ("i= %d\n", i);
+        flint_printf ("i= %d\n", i);
         nmod_poly_factor_t factors;
         nmod_poly_factor_init (factors);
         t= clock();
         nmod_poly_factor (factors, h);
                     t = (clock() - t) / CLOCKS_PER_SEC;
-                printf("factorization %.2lf\n", t);
+                flint_printf("factorization %.2lf\n", t);
         nmod_poly_factor_clear (factors);
       }
 

@@ -39,7 +39,7 @@ main(void)
     fmpz_t p;
     slong N;
 
-    printf("evaluate_padic... ");
+    flint_printf("evaluate_padic... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -81,11 +81,11 @@ main(void)
             result = (padic_equal(y, z));
             if (!result)
             {
-                printf("FAIL (cmp with QQ):\n");
-                printf("f = "), padic_poly_print(f, ctx), printf("\n\n");
-                printf("a = "), padic_print(a, ctx), printf("\n\n");
-                printf("y = "), padic_print(y, ctx), printf("\n\n");
-                printf("z = "), padic_print(z, ctx), printf("\n\n");
+                flint_printf("FAIL (cmp with QQ):\n");
+                flint_printf("f = "), padic_poly_print(f, ctx), flint_printf("\n\n");
+                flint_printf("a = "), padic_print(a, ctx), flint_printf("\n\n");
+                flint_printf("y = "), padic_print(y, ctx), flint_printf("\n\n");
+                flint_printf("z = "), padic_print(z, ctx), flint_printf("\n\n");
                 abort();
             }
         }
@@ -103,13 +103,13 @@ main(void)
             result = (padic_equal(y2, z2));
             if (!result)
             {
-                printf("FAIL (cmp with QQ):\n");
-                printf("f  = "), padic_poly_print(f, ctx), printf("\n\n");
-                printf("a  = "), padic_print(a,  ctx), printf("\n\n");
-                printf("y  = "), padic_print(y,  ctx), printf("\n\n");
-                printf("z  = "), padic_print(z,  ctx), printf("\n\n");
-                printf("y2 = "), padic_print(y2, ctx), printf("\n\n");
-                printf("z2 = "), padic_print(z2, ctx), printf("\n\n");
+                flint_printf("FAIL (cmp with QQ):\n");
+                flint_printf("f  = "), padic_poly_print(f, ctx), flint_printf("\n\n");
+                flint_printf("a  = "), padic_print(a,  ctx), flint_printf("\n\n");
+                flint_printf("y  = "), padic_print(y,  ctx), flint_printf("\n\n");
+                flint_printf("z  = "), padic_print(z,  ctx), flint_printf("\n\n");
+                flint_printf("y2 = "), padic_print(y2, ctx), flint_printf("\n\n");
+                flint_printf("z2 = "), padic_print(z2, ctx), flint_printf("\n\n");
                 abort();
             }
 
@@ -131,6 +131,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

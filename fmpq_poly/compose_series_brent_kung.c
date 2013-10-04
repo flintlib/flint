@@ -175,7 +175,7 @@ fmpq_poly_compose_series_brent_kung(fmpq_poly_t res,
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {
-        printf("Exception (fmpq_poly_compose_series_brent_kung). \n"
+        flint_printf("Exception (fmpq_poly_compose_series_brent_kung). \n"
                "Inner polynomial must have zero constant term.\n");
         abort();
     }

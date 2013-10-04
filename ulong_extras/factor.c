@@ -85,7 +85,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
                factors_left++;
 				} else
 				{
-               printf("Exception (n_factor). Failed to factor %ld.\n", n);
+               flint_printf("Exception (n_factor). Failed to factor %wd.\n", n);
                abort();
 				}
          } else

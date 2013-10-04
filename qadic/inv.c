@@ -141,7 +141,7 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
 
     if (qadic_is_zero(y))
     {
-        printf("Exception (qadic_inv).  Zero is not invertible.\n");
+        flint_printf("Exception (qadic_inv).  Zero is not invertible.\n");
         abort();
     }
 

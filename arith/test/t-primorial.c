@@ -36,7 +36,7 @@ int main(void)
     fmpz_t x;
     fmpz_t y;
 
-    printf("primorial....");
+    flint_printf("primorial....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -50,10 +50,10 @@ int main(void)
           fmpz_mul_ui(y, y, k);
        if (!fmpz_equal(x, y))
        {
-          printf("FAIL:\n");
-          printf("primorial of %lu disagrees with direct product\n", k); 
+          flint_printf("FAIL:\n");
+          flint_printf("primorial of %wu disagrees with direct product\n", k); 
           fmpz_print(x);
-          printf("\n");
+          flint_printf("\n");
           abort();
        }
     }
@@ -62,6 +62,6 @@ int main(void)
     fmpz_clear(y);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

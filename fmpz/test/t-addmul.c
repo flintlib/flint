@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("addmul....");
+    flint_printf("addmul....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -72,7 +72,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -115,7 +115,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, f = %Zd, g = %Zd\n", d, f, g);
             abort();
         }
@@ -156,7 +156,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd\n", d, e, f);
             abort();
         }
@@ -197,7 +197,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd\n", d, e, f);
             abort();
         }
@@ -212,6 +212,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

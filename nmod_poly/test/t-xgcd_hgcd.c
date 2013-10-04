@@ -35,7 +35,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("xgcd_hgcd....");
+    flint_printf("xgcd_hgcd....");
     fflush(stdout);
 
     /* 
@@ -77,16 +77,16 @@ main(void)
             && (g1->length == 0 || g1->coeffs[g1->length - 1] == 1));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(c), printf("\n\n");
-            nmod_poly_print(g1), printf("\n\n");
-            nmod_poly_print(g2), printf("\n\n");
-            nmod_poly_print(sum), printf("\n\n");
-            nmod_poly_print(s), printf("\n\n");
-            nmod_poly_print(t), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(c), flint_printf("\n\n");
+            nmod_poly_print(g1), flint_printf("\n\n");
+            nmod_poly_print(g2), flint_printf("\n\n");
+            nmod_poly_print(sum), flint_printf("\n\n");
+            nmod_poly_print(s), flint_printf("\n\n");
+            nmod_poly_print(t), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
         
@@ -124,11 +124,11 @@ main(void)
         result = (nmod_poly_equal(a, g));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -162,11 +162,11 @@ main(void)
         result = (nmod_poly_equal(b, g));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -200,10 +200,10 @@ main(void)
         result = (nmod_poly_equal(s, a));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(s), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(s), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -237,10 +237,10 @@ main(void)
         result = (nmod_poly_equal(s, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(s), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(s), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -274,10 +274,10 @@ main(void)
         result = (nmod_poly_equal(t, a));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(t), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(t), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -311,10 +311,10 @@ main(void)
         result = (nmod_poly_equal(t, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(t), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(t), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -327,6 +327,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

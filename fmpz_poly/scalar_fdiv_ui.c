@@ -35,7 +35,7 @@ fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 {
     if (x == 0)
     {
-        printf("Exception (fmpz_poly_scalar_fdiv_ui). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_scalar_fdiv_ui). Division by zero.\n");
         abort();
     }
 

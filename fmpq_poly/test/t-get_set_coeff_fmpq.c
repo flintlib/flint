@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     ulong cflags = 0UL;
 
-    printf("get/set_coeff_fmpq....");
+    flint_printf("get/set_coeff_fmpq....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,13 +68,13 @@ main(void)
             result = (fmpq_equal(x, y) && !cflags);
             if (!result)
             {
-                printf("FAIL:\n\n");
-                printf("a     = "), fmpq_poly_debug(a), printf("\n\n");
-                printf("coeff = %ld\n\n", coeff);
-                printf("len   = %ld\n\n", len);
-                printf("cflags = %lu\n\n", cflags);
-                printf("x = "), fmpq_print(x), printf("\n");
-                printf("y = "), fmpq_print(y), printf("\n");
+                flint_printf("FAIL:\n\n");
+                flint_printf("a     = "), fmpq_poly_debug(a), flint_printf("\n\n");
+                flint_printf("coeff = %wd\n\n", coeff);
+                flint_printf("len   = %wd\n\n", len);
+                flint_printf("cflags = %wu\n\n", cflags);
+                flint_printf("x = "), fmpq_print(x), flint_printf("\n");
+                flint_printf("y = "), fmpq_print(y), flint_printf("\n");
                 abort();
             }
         }
@@ -86,6 +86,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

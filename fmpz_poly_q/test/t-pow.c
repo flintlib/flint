@@ -11,7 +11,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("pow... ");
+    flint_printf("pow... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -33,9 +33,9 @@ main(void)
         result = fmpz_poly_q_equal(a, b) && fmpz_poly_q_is_canonical(a);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_q_print(a), printf("\n\n");
-            fmpz_poly_q_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_q_print(a), flint_printf("\n\n");
+            fmpz_poly_q_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -45,6 +45,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

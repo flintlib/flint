@@ -36,7 +36,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("taylor_shift....");
+    flint_printf("taylor_shift....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,9 +60,9 @@ main(void)
 
         if (!nmod_poly_equal(g, f))
         {
-            printf("FAIL\n");
-            nmod_poly_print(f); printf("\n");
-            nmod_poly_print(g); printf("\n");
+            flint_printf("FAIL\n");
+            nmod_poly_print(f); flint_printf("\n");
+            nmod_poly_print(g); flint_printf("\n");
             abort();
         }
 
@@ -94,11 +94,11 @@ main(void)
 
         if (!nmod_poly_equal(h1, h2))
         {
-            printf("FAIL\n");
-            nmod_poly_print(f); printf("\n");
-            nmod_poly_print(g); printf("\n");
-            nmod_poly_print(h1); printf("\n");
-            nmod_poly_print(h2); printf("\n");
+            flint_printf("FAIL\n");
+            nmod_poly_print(f); flint_printf("\n");
+            nmod_poly_print(g); flint_printf("\n");
+            nmod_poly_print(h1); flint_printf("\n");
+            nmod_poly_print(h2); flint_printf("\n");
             abort();
         }
 
@@ -132,11 +132,11 @@ main(void)
 
         if (!nmod_poly_equal(h1, h2))
         {
-            printf("FAIL\n");
-            nmod_poly_print(f); printf("\n");
-            nmod_poly_print(g); printf("\n");
-            nmod_poly_print(h1); printf("\n");
-            nmod_poly_print(h2); printf("\n");
+            flint_printf("FAIL\n");
+            nmod_poly_print(f); flint_printf("\n");
+            nmod_poly_print(g); flint_printf("\n");
+            nmod_poly_print(h1); flint_printf("\n");
+            nmod_poly_print(h2); flint_printf("\n");
             abort();
         }
 
@@ -147,6 +147,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -36,21 +36,21 @@ int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len,
 
     if (len == 0)
     {
-        fprintf(file, "0");
+        flint_fprintf(file, "0");
         return 1;
     }
 
     fmpz_init(u);
 
-    fprintf(file, "%ld ", len);
+    flint_fprintf(file, "%wd ", len);
 
     for (i = 0; i < len; i++)
     {
-        fprintf(file, " ");
+        flint_fprintf(file, " ");
 
         if (fmpz_is_zero(poly + i))
         {
-            fprintf(file, "0");
+            flint_fprintf(file, "0");
         }
         else
         {

@@ -163,7 +163,7 @@ slong qsieve_ll_merge_sort(qs_t qs_inf)
    qs_inf->num_unmerged = 0;
 
 #if (QS_DEBUG & 64)
-   printf("%ld new, %ld dups\n", columns, dups);
+   flint_printf("%wd new, %wd dups\n", columns, dups);
 #endif   
 
    return columns;

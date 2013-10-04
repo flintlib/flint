@@ -39,7 +39,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sqrt... ");
+    flint_printf("sqrt... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -82,10 +82,10 @@ int main(void)
 
             if (!result)
             {
-                printf("FAIL (Artin Schreier preimages):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+                flint_printf("FAIL (Artin Schreier preimages):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -125,11 +125,11 @@ int main(void)
         result = ((ans1 == ans2) && (!ans1 || qadic_equal(a, b)));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans1,ans2 = %d,%d\n", ans1, ans2);
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("ans1,ans2 = %d,%d\n", ans1, ans2);
             qadic_ctx_print(ctx);
             abort();
         }
@@ -174,15 +174,15 @@ int main(void)
             result = (qadic_equal(d, e));
             if (!result)
             {
-                printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("e = "), qadic_print_pretty(e, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("e = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -193,11 +193,11 @@ int main(void)
         /* there is no reason for that to work */
         /*else
         {
-            printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans = %d\n", ans);
+            flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
             abort();
             }*/
@@ -242,14 +242,14 @@ int main(void)
             result = (qadic_equal(c, d));
             if (!result)
             {
-                printf("FAIL (random elements):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (random elements):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -305,15 +305,15 @@ int main(void)
             result = (qadic_equal(d, e));
             if (!result)
             {
-                printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("e = "), qadic_print_pretty(e, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("e = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -325,13 +325,13 @@ int main(void)
         {
             if (N - qadic_val(a) >= 3)
             {
-                printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -378,14 +378,14 @@ int main(void)
             result = (qadic_equal(c, d));
             if (!result)
             {
-                printf("FAIL (random elements):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (random elements):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -434,11 +434,11 @@ int main(void)
         result = ((ans1 == ans2) && (!ans1 || qadic_equal(a, b)));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans1,ans2 = %d,%d\n", ans1, ans2);
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("ans1,ans2 = %d,%d\n", ans1, ans2);
             qadic_ctx_print(ctx);
             abort();
         }
@@ -488,15 +488,15 @@ int main(void)
             result = (qadic_equal(d, e));
             if (!result)
             {
-                printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("e = "), qadic_print_pretty(e, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("e = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -506,11 +506,11 @@ int main(void)
         }
         else
         {
-            printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans = %d\n", ans);
+            flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
             abort();
         }
@@ -560,14 +560,14 @@ int main(void)
             result = (qadic_equal(c, d));
             if (!result)
             {
-                printf("FAIL (random elements):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (random elements):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -620,15 +620,15 @@ int main(void)
             result = (qadic_equal(d, e));
             if (!result)
             {
-                printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("e = "), qadic_print_pretty(e, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("e = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -638,11 +638,11 @@ int main(void)
         }
         else
         {
-            printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans = %d\n", ans);
+            flint_printf("FAIL (a = b^2, c = sqrt(a), d = c^2 == a):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
             abort();
         }
@@ -692,14 +692,14 @@ int main(void)
             result = (qadic_equal(c, d));
             if (!result)
             {
-                printf("FAIL (random elements):\n\n");
-                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-                printf("d = "), qadic_print_pretty(d, ctx), printf("\n");
-                printf("ans = %d\n", ans);
-                printf("N = %ld\n", N);
-                printf("N + val(a)/2 = %ld\n", N + qadic_val(a)/2);
+                flint_printf("FAIL (random elements):\n\n");
+                flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+                flint_printf("d = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+                flint_printf("ans = %d\n", ans);
+                flint_printf("N = %wd\n", N);
+                flint_printf("N + val(a)/2 = %wd\n", N + qadic_val(a)/2);
                 qadic_ctx_print(ctx);
                 abort();
             }
@@ -717,7 +717,7 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

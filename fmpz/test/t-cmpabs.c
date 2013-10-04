@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("cmpabs....");
+    flint_printf("cmpabs....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -55,9 +55,9 @@ main(void)
 
         if (result != 0)
         {
-            printf("FAIL\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
+            flint_printf("FAIL\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -90,7 +90,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("c = %Zd, d = %Zd\n", c, d);
             abort();
         }
@@ -104,6 +104,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

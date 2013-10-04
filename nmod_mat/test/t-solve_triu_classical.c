@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("solve_triu_classical....");
+    flint_printf("solve_triu_classical....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -66,14 +66,14 @@ main(void)
         nmod_mat_solve_triu_classical(Y, A, B, unit);
         if (!nmod_mat_equal(Y, X))
         {
-            printf("FAIL!\n");
-            printf("A:\n");
+            flint_printf("FAIL!\n");
+            flint_printf("A:\n");
             nmod_mat_print_pretty(A);
-            printf("X:\n");
+            flint_printf("X:\n");
             nmod_mat_print_pretty(X);
-            printf("B:\n");
+            flint_printf("B:\n");
             nmod_mat_print_pretty(B);
-            printf("Y:\n");
+            flint_printf("Y:\n");
             nmod_mat_print_pretty(Y);
             abort();
         }
@@ -82,11 +82,11 @@ main(void)
         nmod_mat_solve_triu_classical(B, A, B, unit);
         if (!nmod_mat_equal(B, X))
         {
-            printf("FAIL!\n");
-            printf("aliasing test failed");
-            printf("A:\n");
+            flint_printf("FAIL!\n");
+            flint_printf("aliasing test failed");
+            flint_printf("A:\n");
             nmod_mat_print_pretty(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             nmod_mat_print_pretty(B);
             abort();
         }
@@ -99,6 +99,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("lll_mod_preinv....");
+   flint_printf("lll_mod_preinv....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -57,15 +57,15 @@ int main(void)
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("nh = %lu, nm = %ld, nl = %lu, d = %lu, dinv = %lu\n", nh, nm, nl, d, dinv); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("nh = %wu, nm = %wd, nl = %wu, d = %wu, dinv = %wu\n", nh, nm, nl, d, dinv); 
+         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

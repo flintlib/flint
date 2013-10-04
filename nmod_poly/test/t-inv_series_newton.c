@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("inv_series_newton....");
+    flint_printf("inv_series_newton....");
     fflush(stdout);
 
     /* Check Q * Qinv = 1 mod x^n */
@@ -67,11 +67,11 @@ main(void)
         result = (prod->length == 1 && prod->coeffs[0] == 1);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(qinv), printf("\n\n");
-            nmod_poly_print(prod), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(q), flint_printf("\n\n");
+            nmod_poly_print(qinv), flint_printf("\n\n");
+            nmod_poly_print(prod), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
         
@@ -103,11 +103,11 @@ main(void)
         result = (nmod_poly_equal(q, qinv));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(qinv), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
-            printf("n = %ld, m = %ld\n", n, m);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(q), flint_printf("\n\n");
+            nmod_poly_print(qinv), flint_printf("\n\n");
+            nmod_poly_print(q), flint_printf("\n\n");
+            flint_printf("n = %wd, m = %wd\n", n, m);
             abort();
         }
 
@@ -117,6 +117,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

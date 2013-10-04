@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("is_oddprime_small....");
+   flint_printf("is_oddprime_small....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -57,8 +57,8 @@ int main(void)
       result = n_is_oddprime_small(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -81,8 +81,8 @@ int main(void)
       result = !n_is_oddprime_small(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared prime\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared prime\n", d); 
          abort();
       }
 
@@ -91,6 +91,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

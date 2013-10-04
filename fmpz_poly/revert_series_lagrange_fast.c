@@ -100,7 +100,7 @@ fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
-        printf("Exception (fmpz_poly_revert_series_lagrange_fast). Input must \n"
+        flint_printf("Exception (fmpz_poly_revert_series_lagrange_fast). Input must \n"
                "have zero constant term and +1 or -1 as coefficient of x^1.\n");
         abort();
     }

@@ -42,7 +42,7 @@ main(void)
     
     flint_rand_t state;
 
-    printf("mul_fft_main....");
+    flint_printf("mul_fft_main....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -99,7 +99,7 @@ main(void)
                {
                    if (r1[j] != r2[j]) 
                    {
-                       printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                       flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                        abort();
                    }
                }
@@ -111,6 +111,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

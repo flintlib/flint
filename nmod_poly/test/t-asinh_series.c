@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("asinh_series....");
+    flint_printf("asinh_series....");
     fflush(stdout);
 
     /* Check asinh(A) = atanh(A/sqrt(1+A^2)) */
@@ -72,12 +72,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %ld, mod = %lu\n", n, mod);
-            printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("B: "); nmod_poly_print(B), printf("\n\n");
-            printf("asinh(A): "); nmod_poly_print(asinhA), printf("\n\n");
-            printf("atanh(B): "); nmod_poly_print(atanhB), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd, mod = %wu\n", n, mod);
+            flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
+            flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
+            flint_printf("asinh(A): "); nmod_poly_print(asinhA), flint_printf("\n\n");
+            flint_printf("atanh(B): "); nmod_poly_print(atanhB), flint_printf("\n\n");
             abort();
         }
 
@@ -108,9 +108,9 @@ main(void)
         result = nmod_poly_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(A), printf("\n\n");
-            nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(A), flint_printf("\n\n");
+            nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -120,6 +120,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

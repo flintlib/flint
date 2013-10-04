@@ -70,21 +70,21 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     {
         if (poly[1] == 1L)
         {
-            fprintf(file, "%s", x);
+            flint_fprintf(file, "%s", x);
         }
         else if (poly[1] == -1L)
         {
-            fprintf(file, "-%s", x);
+            flint_fprintf(file, "-%s", x);
         }
         else
         {
             __fmpq_fprint(poly + 1, den);
-            fprintf(file, "*%s", x);
+            flint_fprintf(file, "*%s", x);
         }
         
         if (fmpz_sgn(poly + 0) > 0)
         {
-            fprintf(file, "+");
+            flint_fprintf(file, "+");
             __fmpq_fprint(poly + 0, den);
         }
         else if (fmpz_sgn(poly + 0) < 0)
@@ -97,13 +97,13 @@ int _fmpq_poly_fprint_pretty(FILE * file,
         slong i = len - 1;  /* i >= 2 */
         {
             if (poly[i] == 1L)
-               fprintf(file, "%s^%ld", x, i);
+               flint_fprintf(file, "%s^%wd", x, i);
             else if (poly[i] == -1L)
-               fprintf(file, "-%s^%ld", x, i);
+               flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
                __fmpq_fprint(poly + i, den);
-               fprintf(file, "*%s^%ld", x, i);
+               flint_fprintf(file, "*%s^%wd", x, i);
             }
             --i;
         }
@@ -114,9 +114,9 @@ int _fmpq_poly_fprint_pretty(FILE * file,
                 continue;
 
             if (poly[i] == 1L)
-                fprintf(file, "+%s^%ld", x, i);
+                flint_fprintf(file, "+%s^%wd", x, i);
             else if (poly[i] == -1L)
-                fprintf(file, "-%s^%ld", x, i);
+                flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
                 if (fmpz_sgn(poly + i) > 0)
@@ -124,7 +124,7 @@ int _fmpq_poly_fprint_pretty(FILE * file,
                     fputc('+', file);
                 }
                 __fmpq_fprint(poly + i, den);
-                fprintf(file, "*%s^%ld", x, i);
+                flint_fprintf(file, "*%s^%wd", x, i);
             }
         }
 

@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_empty....");
+    flint_printf("is_empty....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -51,7 +51,7 @@ main(void)
 
         if (fmpz_mat_is_empty(A) != (rows == 0 || cols == 0))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
         fmpz_mat_clear(A);
@@ -60,6 +60,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

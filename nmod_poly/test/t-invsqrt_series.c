@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("invsqrt_series....");
+    flint_printf("invsqrt_series....");
     fflush(stdout);
 
     /* Check 1/g^2 = h mod x^m */
@@ -70,11 +70,11 @@ main(void)
         result = (nmod_poly_equal(r, h));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(h), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(h), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            nmod_poly_print(r), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
         
@@ -107,10 +107,10 @@ main(void)
         result = (nmod_poly_equal(g, h));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(h), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            printf("n = %ld, m = %ld\n", n, m);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(h), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            flint_printf("n = %wd, m = %wd\n", n, m);
             abort();
         }
 
@@ -120,6 +120,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

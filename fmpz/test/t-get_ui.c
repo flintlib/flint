@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("get/set_ui....");
+    flint_printf("get/set_ui....");
     fflush(stdout);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -56,8 +56,8 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
+            flint_printf("FAIL:\n");
+            flint_printf("b = %wd, c = %wd\n", b, c);
             abort();
         }
 
@@ -66,6 +66,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

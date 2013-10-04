@@ -188,7 +188,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 ******************************************************************************/
 
 #define TIMEIT_PRINT(__timer, __reps) \
-    printf("cpu/wall(s): %g %g\n", \
+    flint_printf("cpu/wall(s): %g %g\n", \
         __timer->cpu*0.001/__reps, __timer->wall*0.001 / __reps);
 
 #define TIMEIT_REPEAT(__timer, __reps) \
@@ -238,7 +238,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
     do { \
         meminfo_t meminfo; \
         get_memory_usage(meminfo); \
-        printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
+        flint_printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
             meminfo->size / 1024.0, meminfo->peak / 1024.0, \
             meminfo->rss / 1024.0, meminfo->hwm / 1024.0); \
     } while (0);

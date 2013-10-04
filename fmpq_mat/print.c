@@ -29,18 +29,18 @@ void fmpq_mat_print(const fmpq_mat_t mat)
 {
     slong i, j;
 
-    printf("<%ld x %ld matrix over Q>\n", mat->r, mat->c);
+    flint_printf("<%wd x %wd matrix over Q>\n", mat->r, mat->c);
 
     for (i = 0; i < mat->r; i++)
     {
-        printf("[");
+        flint_printf("[");
         for (j = 0; j < mat->c; j++)
         {
             fmpq_print(fmpq_mat_entry(mat, i, j));
             if (j + 1 < mat->c)
-                printf(", ");
+                flint_printf(", ");
         }
-        printf("]\n");
+        flint_printf("]\n");
     }
-    printf("\n");
+    flint_printf("\n");
 }

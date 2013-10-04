@@ -35,7 +35,7 @@ int main(void)
    ulong count = 0UL;
    flint_rand_t state;
    
-   printf("factor_one_line....");
+   flint_printf("factor_one_line....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -63,8 +63,8 @@ int main(void)
 
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            flint_printf("FAIL:\n");
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
             abort();
          }
       }
@@ -72,13 +72,13 @@ int main(void)
    
    if (count < 450 * flint_test_multiplier())
    {
-      printf("FAIL:\n");
-      printf("Only %lu numbers factored\n", count);
+      flint_printf("FAIL:\n");
+      flint_printf("Only %wu numbers factored\n", count);
       abort();
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

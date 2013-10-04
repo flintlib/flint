@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    slong cutoff = 100000;
    
-   printf("is_oddprime_binary....");
+   flint_printf("is_oddprime_binary....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -60,8 +60,8 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -85,8 +85,8 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared prime\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared prime\n", d); 
          abort();
       }
 
@@ -95,6 +95,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

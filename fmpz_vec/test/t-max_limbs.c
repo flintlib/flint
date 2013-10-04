@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("max_limbs....");
+    flint_printf("max_limbs....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,11 +61,11 @@ main(void)
         result = (limbs >= limbs2);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("bits   = %ld\n", bits);
-            printf("limbs  = %ld\n", limbs);
-            printf("a      = {"), _fmpz_vec_print(a, len), printf("}\n");
-            printf("limbs2 = %ld\n", limbs2);
+            flint_printf("FAIL:\n");
+            flint_printf("bits   = %wd\n", bits);
+            flint_printf("limbs  = %wd\n", limbs);
+            flint_printf("a      = {"), _fmpz_vec_print(a, len), flint_printf("}\n");
+            flint_printf("limbs2 = %wd\n", limbs2);
             abort();
         }
 
@@ -74,6 +74,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

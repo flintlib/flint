@@ -41,7 +41,7 @@ main(void)
     slong i, m, n, r;
     int success;
 
-    printf("solve_dixon....");
+    flint_printf("solve_dixon....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -77,13 +77,13 @@ main(void)
 
         if (!fmpz_mat_equal(AXm, Bm) || !success)
         {
-            printf("FAIL:\n");
-            printf("AX != B!\n");
-            printf("A:\n"),      fmpz_mat_print_pretty(A),  printf("\n");
-            printf("B:\n"),      fmpz_mat_print_pretty(B),  printf("\n");
-            printf("X:\n"),      fmpz_mat_print_pretty(X),  printf("\n");
-            printf("mod = "),    fmpz_print(mod),           printf("\n");
-            printf("AX:\n"),     fmpz_mat_print_pretty(AX), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("AX != B!\n");
+            flint_printf("A:\n"),      fmpz_mat_print_pretty(A),  flint_printf("\n");
+            flint_printf("B:\n"),      fmpz_mat_print_pretty(B),  flint_printf("\n");
+            flint_printf("X:\n"),      fmpz_mat_print_pretty(X),  flint_printf("\n");
+            flint_printf("mod = "),    fmpz_print(mod),           flint_printf("\n");
+            flint_printf("AX:\n"),     fmpz_mat_print_pretty(AX), flint_printf("\n");
             abort();
         }
 
@@ -117,8 +117,8 @@ main(void)
 
         if (fmpz_mat_solve_dixon(X, mod, A, B) != 0)
         {
-            printf("FAIL:\n");
-            printf("singular system, returned nonzero\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system, returned nonzero\n");
             abort();
         }
 
@@ -130,6 +130,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -37,7 +37,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("taylor_shift_divconquer....");
+    flint_printf("taylor_shift_divconquer....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -62,9 +62,9 @@ main(void)
 
         if (!fmpz_poly_equal(g, f))
         {
-            printf("FAIL\n");
-            fmpz_poly_print(f); printf("\n");
-            fmpz_poly_print(g); printf("\n");
+            flint_printf("FAIL\n");
+            fmpz_poly_print(f); flint_printf("\n");
+            fmpz_poly_print(g); flint_printf("\n");
             abort();
         }
 
@@ -99,11 +99,11 @@ main(void)
 
         if (!fmpz_poly_equal(h1, h2))
         {
-            printf("FAIL\n");
-            fmpz_poly_print(f); printf("\n");
-            fmpz_poly_print(g); printf("\n");
-            fmpz_poly_print(h1); printf("\n");
-            fmpz_poly_print(h2); printf("\n");
+            flint_printf("FAIL\n");
+            fmpz_poly_print(f); flint_printf("\n");
+            fmpz_poly_print(g); flint_printf("\n");
+            fmpz_poly_print(h1); flint_printf("\n");
+            fmpz_poly_print(h2); flint_printf("\n");
             abort();
         }
 
@@ -116,6 +116,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

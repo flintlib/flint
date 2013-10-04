@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("div_2exp....");
+    flint_printf("div_2exp....");
     fflush(stdout);
 
     /* x = y * 2^exp */
@@ -67,12 +67,12 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: result not canonical!\n");
-            printf("x = ");
+            flint_printf("FAIL: result not canonical!\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\nc = %lu\n", c);
+            flint_printf("\nc = %wu\n", c);
             abort();
         }
 
@@ -83,12 +83,12 @@ main(void)
 
         if (!mpq_equal(X, Y))
         {
-            printf("FAIL: fmpq_div_2exp(x,y,c) != mpq_div_2exp(X,Y,c)\n");
-            printf("x = ");
+            flint_printf("FAIL: fmpq_div_2exp(x,y,c) != mpq_div_2exp(X,Y,c)\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -122,23 +122,23 @@ main(void)
 
         if (!fmpq_is_canonical(y))
         {
-            printf("FAIL: result not canonical!\n");
-            printf("x = ");
+            flint_printf("FAIL: result not canonical!\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\nc = %lu\n", c);
+            flint_printf("\nc = %wu\n", c);
             abort();
         }
 
         if (!fmpq_equal(x, y))
         {
-            printf("FAIL: fmpq_div_2exp(x,y,c) != fmpq_div_2exp(y,y,c)\n");
-            printf("x = ");
+            flint_printf("FAIL: fmpq_div_2exp(x,y,c) != fmpq_div_2exp(y,y,c)\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\nc = %lu\n", c);
+            flint_printf("\nc = %wu\n", c);
             abort();
         }
 
@@ -149,6 +149,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

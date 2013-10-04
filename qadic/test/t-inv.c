@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("inv... ");
+    flint_printf("inv... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,10 +68,10 @@ main(void)
         result = (qadic_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -109,9 +109,9 @@ main(void)
         result = qadic_is_one(b);
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             abort();
         }
 
@@ -124,7 +124,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

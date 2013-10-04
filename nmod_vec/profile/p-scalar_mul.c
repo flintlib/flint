@@ -86,7 +86,7 @@ int main(void)
 	  info.length = 65536;
 	  prof_repeat(&min2, &max, sample, (void *) &info);
 
-      printf("bits %ld, length 128 %.1lf c/l, length 65536 %.1lf c/l\n", 
+      flint_printf("bits %wd, length 128 %.1lf c/l, length 65536 %.1lf c/l\n", 
          i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*30),
 		 (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*30)
 	  );

@@ -37,7 +37,7 @@ main(void)
     slong m, n, rep;
     flint_rand_t state;
 
-    printf("transpose....");
+    flint_printf("transpose....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -62,7 +62,7 @@ main(void)
 
         if (!fmpz_mat_equal(C, A))
         {
-            printf("FAIL: C != A\n");
+            flint_printf("FAIL: C != A\n");
             abort();
         }
 
@@ -88,7 +88,7 @@ main(void)
 
         if (!fmpz_mat_equal(B, A))
         {
-            printf("FAIL: B != A\n");
+            flint_printf("FAIL: B != A\n");
             abort();
         }
 
@@ -98,6 +98,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,7 +35,7 @@ int main(void)
    ulong count = 0UL;
    flint_rand_t state;
    
-   printf("is_strong_probabprime_precomp....");
+   flint_printf("is_strong_probabprime_precomp....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -69,8 +69,8 @@ int main(void)
 
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("a = %lu, d = %lu\n", a, d); 
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu, d = %wu\n", a, d); 
             abort();
          }
       }
@@ -110,13 +110,13 @@ int main(void)
 
    if (count > 220 * flint_test_multiplier()) 
    {
-      printf("FAIL:\n");
-      printf("count = %lu\n", count);
+      flint_printf("FAIL:\n");
+      flint_printf("count = %wu\n", count);
       abort();
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

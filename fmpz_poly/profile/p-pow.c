@@ -61,14 +61,14 @@ main(void)
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g, exphi * (lenhi - 1) + 1);
     
-    printf("Comparative timing for fmpz_poly_pow\n");
-    printf("\n");
-    printf("Length:    [%d..%d] with step size %d\n", lenlo, lenhi, lenh);
-    printf("Bit size:  [%d..%d] with step size %d\n", bitslo, bitshi, bitsh);
-    printf("Exponents: [%d..%d] with step size %d\n", explo, exphi, exph);
-    printf("\n");
-    printf("exp len bits (Binary exponentiation) Multinomials\n");
-    printf("\n");
+    flint_printf("Comparative timing for fmpz_poly_pow\n");
+    flint_printf("\n");
+    flint_printf("Length:    [%d..%d] with step size %d\n", lenlo, lenhi, lenh);
+    flint_printf("Bit size:  [%d..%d] with step size %d\n", bitslo, bitshi, bitsh);
+    flint_printf("Exponents: [%d..%d] with step size %d\n", explo, exphi, exph);
+    flint_printf("\n");
+    flint_printf("exp len bits (Binary exponentiation) Multinomials\n");
+    flint_printf("\n");
     
     for (exp = explo, k = 0; exp <= exphi; exp += exph, k++)
     {
@@ -125,7 +125,7 @@ main(void)
                 T[0] = s[0] / (double) r;
                 T[1] = s[1] / (double) r;
                 
-                printf("%d %d %d %f %f\n", exp, len, bits, T[0], T[1]);
+                flint_printf("%d %d %d %f %f\n", exp, len, bits, T[0], T[1]);
                 fflush(stdout);
             }
         }

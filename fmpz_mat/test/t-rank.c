@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     slong i, m, n, b, d, r;
 
-    printf("rank....");
+    flint_printf("rank....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,8 +59,8 @@ main(void)
             fmpz_mat_randrank(A, state, r, b);
             if (r != fmpz_mat_rank(A))
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
             fmpz_mat_clear(A);
@@ -82,8 +82,8 @@ main(void)
             fmpz_mat_randops(A, state, d);
             if (r != fmpz_mat_rank(A))
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
             fmpz_mat_clear(A);
@@ -92,6 +92,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

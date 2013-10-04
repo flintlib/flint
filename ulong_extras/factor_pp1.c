@@ -49,7 +49,7 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
       y >>= norm;
    } 
 
-   printf("[%lu, %lu]", x, y);
+   flint_printf("[%wu, %wu]", x, y);
 }
 
 #define n_pp1_2k(x, y, n, ninv, x0, norm)       \

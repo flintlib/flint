@@ -78,7 +78,7 @@ int write_rgb_ppm(const char* file_name, unsigned char* pixels,
     FILE* file = fopen(file_name, "wb");
     if (file == NULL)
         return -1;
-    fprintf(file, "P6\n%d %d\n255\n", width, height);
+    flint_fprintf(file, "P6\n%d %d\n255\n", width, height);
     fwrite(pixels, sizeof(unsigned char), width * height * 3, file);
     fclose(file);
     return 0;
@@ -179,15 +179,15 @@ main(void)
                    sum += s[c];
             }
         }
-        printf("len = %ld, time = %ldms\n", len, sum), fflush(stdout);
+        flint_printf("len = %wd, time = %wdms\n", len, sum), fflush(stdout);
         for (k = 0; k < rows; k++)
         {
             if (X[k][j] == -1) 
-                printf(" ");
+                flint_printf(" ");
             else 
-                printf("%d", X[k][j]);
+                flint_printf("%d", X[k][j]);
         }
-        printf("\n");
+        flint_printf("\n");
     }
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
@@ -201,11 +201,11 @@ main(void)
         for (j = 0; j < cols; j++)
         {
             if (X[i][j] == -1) 
-                printf(" ");
+                flint_printf(" ");
             else 
-                printf("%d", X[i][j]);
+                flint_printf("%d", X[i][j]);
         }
-        printf("\n");
+        flint_printf("\n");
     }
     
     /*
@@ -253,7 +253,7 @@ main(void)
         
         if (k)
         {
-            printf("Exception:  writing ppm image failed\n");
+            flint_printf("Exception:  writing ppm image failed\n");
         }
     }
 

@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("remove....");
+    flint_printf("remove....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -76,7 +76,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -131,7 +131,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -167,9 +167,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n");
-            fmpz_print(c), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n");
+            fmpz_print(c), flint_printf("\n");
             abort();
         }
 
@@ -200,10 +200,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n");
-            fmpz_print(b), printf("\n");
-            fmpz_print(c), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n");
+            fmpz_print(b), flint_printf("\n");
+            fmpz_print(c), flint_printf("\n");
             abort();
         }
 
@@ -235,10 +235,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n");
-            fmpz_print(b), printf("\n");
-            fmpz_print(c), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n");
+            fmpz_print(b), flint_printf("\n");
+            fmpz_print(c), flint_printf("\n");
             abort();
         }
 
@@ -249,6 +249,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

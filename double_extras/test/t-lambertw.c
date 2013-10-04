@@ -41,7 +41,7 @@ main()
 
     flint_rand_t state;
    
-    printf("lambertw....");
+    flint_printf("lambertw....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -124,8 +124,8 @@ main()
 
         if (mpfr_get_d(t, MPFR_RNDA) > tol)
         {
-            printf("FAIL\n");
-            printf("x = %.17g, w = %.17g, error = %g\n", x, w,
+            flint_printf("FAIL\n");
+            flint_printf("x = %.17g, w = %.17g, error = %g\n", x, w,
                 mpfr_get_d(t, MPFR_RNDA));
             abort();
         }
@@ -133,8 +133,8 @@ main()
 #if 0
         if (mpfr_cmp(t, max_err) > 0)
         {
-            printf("new record: ");
-            printf("x=%.20g w=%.20g wnew=%.20g relative error: %g\n",
+            flint_printf("new record: ");
+            flint_printf("x=%.20g w=%.20g wnew=%.20g relative error: %g\n",
                 x, w, mpfr_get_d(wnew, MPFR_RNDN), mpfr_get_d(t, MPFR_RNDN));
             mpfr_set(max_err, t, MPFR_RNDN);
         }
@@ -155,6 +155,6 @@ main()
     mpfr_free_cache();
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

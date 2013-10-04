@@ -79,7 +79,7 @@ int main(void)
 
 	  prof_repeat(&min, &max, sample, (void *) &info);
 
-      printf("bits %ld, c/l = %.1lf\n", 
+      flint_printf("bits %wd, c/l = %.1lf\n", 
          i, (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
 	  );
    }

@@ -86,7 +86,7 @@ void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
        mpn_copyi(ty, y, nn);
    }
 
-   printf("["), gmp_printf("%Nd", tx, nn), printf(", "), gmp_printf("%Nd", ty, nn), printf("]");
+   flint_printf("["), gmp_printf("%Nd", tx, nn), flint_printf(", "), gmp_printf("%Nd", ty, nn), flint_printf("]");
 
    flint_free(tx);
    flint_free(ty);
@@ -211,7 +211,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    }
 
 #if DEBUG
-   printf("starting stage 1\n");
+   flint_printf("starting stage 1\n");
 #endif
 
    n_primes_init(iter);
@@ -320,7 +320,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
 #if DEBUG
       ulong primorial;
-      printf("starting stage 2\n");
+      flint_printf("starting stage 2\n");
 #endif
 
       /* find primorial <= B2sqrt ... */
@@ -338,14 +338,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
 #if DEBUG
       primorial = pp1_primorial[num];
-      printf("found primorial %lu\n", primorial);
+      flint_printf("found primorial %wu\n", primorial);
 #endif
 
       /* adjust B2sqrt to multiple of primorial */
       B2sqrt = (((B2sqrt - 1)/ pp1_primorial[num]) + 1) * pp1_primorial[num];
 
 #if DEBUG
-      printf("adjusted B2sqrt %lu\n", B2sqrt);
+      flint_printf("adjusted B2sqrt %wu\n", B2sqrt);
 #endif
 
       /* compute num roots */
@@ -359,8 +359,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("computed num_roots %lu\n", num_roots);
-      printf("B2 = %lu\n", num_roots * B2sqrt);
+      flint_printf("computed num_roots %wu\n", num_roots);
+      flint_printf("B2 = %wu\n", num_roots * B2sqrt);
 #endif
 
       /* construct roots */
@@ -381,7 +381,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       evals = _fmpz_vec_init(num_roots);
 
 #if DEBUG
-      printf("constructed roots\n");
+      flint_printf("constructed roots\n");
 #endif
 
       /* compute differences table v0, ... */
@@ -403,7 +403,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("conputed differences table\n");
+      flint_printf("conputed differences table\n");
 #endif
 
       /* initial positions */
@@ -468,7 +468,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("roots computed %ld\n", index);
+      flint_printf("roots computed %wd\n", index);
 #endif
 
       /* v_1 */
@@ -497,7 +497,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("roots2 computed %lu\n", num_roots);
+      flint_printf("roots2 computed %wu\n", num_roots);
 #endif
 
       for (i = 0; i < num_roots; i++)
@@ -525,7 +525,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("normalised roots\n");
+      flint_printf("normalised roots\n");
 #endif
 
       tree = _fmpz_mod_poly_tree_alloc(num_roots);
@@ -537,7 +537,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       fmpz_poly_mul(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)-1], tree2[FLINT_CLOG2(num_roots)-1]+1);
      
 #if DEBUG
-      printf("built trees\n");
+      flint_printf("built trees\n");
 #endif
 
       _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, tree2[FLINT_CLOG2(num_roots)]->coeffs, tree2[FLINT_CLOG2(num_roots)]->length, tree, num_roots, n_in);
@@ -545,7 +545,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       _fmpz_mod_poly_tree_free(tree2, num_roots);
       
 #if DEBUG
-      printf("evaluated at roots\n");
+      flint_printf("evaluated at roots\n");
 #endif
 
       for (i = 0; i < num_roots; i++)
@@ -570,7 +570,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    }
 
 #if DEBUG
-   printf("done stage2\n");
+   flint_printf("done stage2\n");
 #endif
 
 cleanup:

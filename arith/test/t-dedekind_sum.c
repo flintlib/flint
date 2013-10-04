@@ -98,7 +98,7 @@ int main(void)
     fmpq_t s1, s2;
     slong i, h, k;
 
-    printf("dedekind_sum....");
+    flint_printf("dedekind_sum....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -119,10 +119,10 @@ int main(void)
 
             if (!fmpq_equal(s1, s2))
             {
-                printf("FAIL:\n");
-                printf("s(%ld,%ld)\n", h, k);
-                printf("s1: "); fmpq_print(s1); printf("\n");
-                printf("s2: "); fmpq_print(s2); printf("\n");
+                flint_printf("FAIL:\n");
+                flint_printf("s(%wd,%wd)\n", h, k);
+                flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
+                flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
                 abort();
             }
         }
@@ -144,10 +144,10 @@ int main(void)
 
         if (!fmpq_equal(s1, s2))
         {
-            printf("FAIL:\n");
-            printf("s(%ld,%ld)\n", h, k);
-            printf("s1: "); fmpq_print(s1); printf("\n");
-            printf("s2: "); fmpq_print(s2); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("s(%wd,%wd)\n", h, k);
+            flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
+            flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
             abort();
         }
     }
@@ -164,9 +164,9 @@ int main(void)
     if ((fmpz_fdiv_ui(fmpq_numref(s1), 1000000000) != 906445312) ||
         (fmpz_fdiv_ui(fmpq_denref(s1), 1000000000) != 8416259))
     {
-        printf("Wrong large value:\n");
+        flint_printf("Wrong large value:\n");
         fmpq_print(s1);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -187,6 +187,6 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -84,7 +84,7 @@ int main(void)
     bernoulli_vec_t params;
     slong n;
 
-    printf("n / recursive / multi_mod / zeta / best [times in us]\n");
+    flint_printf("n / recursive / multi_mod / zeta / best [times in us]\n");
 
     for (n = 2; n <= 10000; n = (slong) ((double) n * 1.2) + 1)
     {
@@ -104,16 +104,16 @@ int main(void)
         params.algorithm = 2;
         prof_repeat(&min_zeta, &max, sample, &params);
 
-        printf("%ld %.2f %.2f %.2f ", 
+        flint_printf("%wd %.2f %.2f %.2f ", 
             n, min_recursive, min_multi_mod, min_zeta);
 
         if (min_recursive && min_recursive < min_multi_mod && \
             min_recursive < min_zeta)
-            printf("(recursive)\n");
+            flint_printf("(recursive)\n");
         else if (min_multi_mod < min_zeta)
-            printf("(multi_mod)\n");
+            flint_printf("(multi_mod)\n");
         else
-            printf("(zeta)\n");
+            flint_printf("(zeta)\n");
     }
 
     return 0;

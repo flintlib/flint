@@ -270,7 +270,7 @@ void try_compute_A(qs_t qs_inf)
    return;
 
 out_of_polys:
-   printf("Out of polynomials, s = %ld\n", qs_inf->s);
+   flint_printf("Out of polynomials, s = %wd\n", qs_inf->s);
    abort();
 }
 
@@ -287,7 +287,7 @@ void qsieve_ll_compute_A(qs_t qs_inf)
           || qs_inf->A < qs_inf->target_A / P_GOODNESS2) && qs_inf->s == 2)));
 
 #if QS_DEBUG > 1
-   printf("A = %ld, target A = %ld\n", qs_inf->A, qs_inf->target_A);
+   flint_printf("A = %wd, target A = %wd\n", qs_inf->A, qs_inf->target_A);
 #endif    
  
     for (i = 0; i < qs_inf->s; i++)

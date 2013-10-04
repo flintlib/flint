@@ -40,7 +40,7 @@ main(void)
     char *str;
     fmpz_poly_t a;
 
-    printf("get_str_pretty....");
+    flint_printf("get_str_pretty....");
     fflush(stdout);
 
     fmpz_poly_init(a);
@@ -49,9 +49,9 @@ main(void)
     result = strcmp(str, "0") == 0;
     if (!result)
     {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
+        flint_printf("FAIL:\n");
+        flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
+        flint_printf("str(a) = {%s}\n", str);
         abort();
     }
     flint_free(str);
@@ -61,9 +61,9 @@ main(void)
     result = strcmp(str, "-2") == 0;
     if (!result)
     {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
+        flint_printf("FAIL:\n");
+        flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
+        flint_printf("str(a) = {%s}\n", str);
         abort();
     }
     flint_free(str);
@@ -73,14 +73,14 @@ main(void)
     result = strcmp(str, "t^3-2") == 0;
     if (!result)
     {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
+        flint_printf("FAIL:\n");
+        flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
+        flint_printf("str(a) = {%s}\n", str);
         abort();
     }
     flint_free(str);
     fmpz_poly_clear(a);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

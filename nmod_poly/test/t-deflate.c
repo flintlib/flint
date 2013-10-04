@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("deflate....");
+    flint_printf("deflate....");
     fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -59,14 +59,14 @@ main(void)
         {
             if (nmod_poly_deflation(poly1) != nmod_poly_length(poly1))
             {
-                printf("FAIL: wrong deflation for constant polynomial\n");
+                flint_printf("FAIL: wrong deflation for constant polynomial\n");
                 abort();
             }
 
             nmod_poly_deflate(poly2, poly1, n_randint(state, 5) + 1);
             if (!nmod_poly_equal(poly2, poly1))
             {
-                printf("FAIL: constant polynomial changed on deflation\n");
+                flint_printf("FAIL: constant polynomial changed on deflation\n");
                 abort();
             }
         }
@@ -82,29 +82,29 @@ main(void)
 
             if (deflation != infl * infl1)
             {
-                printf("FAIL: deflation = %lu, inflation: %lu, %lu\n",
+                flint_printf("FAIL: deflation = %wu, inflation: %wu, %wu\n",
                     deflation, infl, infl1);
-                printf("poly1:\n"); nmod_poly_print(poly1); printf("\n\n");
-                printf("poly2:\n"); nmod_poly_print(poly2); printf("\n\n");
+                flint_printf("poly1:\n"); nmod_poly_print(poly1); flint_printf("\n\n");
+                flint_printf("poly2:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
                 abort();
             }
 
             nmod_poly_deflate(poly3, poly2, infl);
             if (!nmod_poly_equal(poly3, poly1))
             {
-                printf("FAIL: deflation = %lu, inflation: %lu, %lu\n",
+                flint_printf("FAIL: deflation = %wu, inflation: %wu, %wu\n",
                     deflation, infl, infl1);
-                printf("Deflated polynomial not equal to input:\n");
-                printf("poly1:\n"); nmod_poly_print(poly1); printf("\n\n");
-                printf("poly2:\n"); nmod_poly_print(poly2); printf("\n\n");
-                printf("poly3:\n"); nmod_poly_print(poly2); printf("\n\n");
+                flint_printf("Deflated polynomial not equal to input:\n");
+                flint_printf("poly1:\n"); nmod_poly_print(poly1); flint_printf("\n\n");
+                flint_printf("poly2:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
+                flint_printf("poly3:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
                 abort();
             }
 
             nmod_poly_deflate(poly2, poly2, infl);
             if (!nmod_poly_equal(poly3, poly2))
             {
-                printf("FAIL: aliasing\n");
+                flint_printf("FAIL: aliasing\n");
                 abort();
             }
         }
@@ -115,6 +115,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

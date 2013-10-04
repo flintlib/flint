@@ -36,10 +36,10 @@ static void check(fmpz_t x, int expected)
 {
     if (fmpz_fits_si(x) != expected)
     {
-        printf("FAIL:\n\n");
-        printf("x = "), fmpz_print(x), printf("\n");
-        printf("fmpz_fits_si(x) = %d\n", fmpz_fits_si(x));
-        printf("LONG_MIN = %ld\n", LONG_MIN);
+        flint_printf("FAIL:\n\n");
+        flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+        flint_printf("fmpz_fits_si(x) = %d\n", fmpz_fits_si(x));
+        flint_printf("LONG_MIN = %wd\n", LONG_MIN);
         abort();
     }
 }
@@ -50,7 +50,7 @@ main(void)
     slong i;
     fmpz_t x;
 
-    printf("fits_si....");
+    flint_printf("fits_si....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -94,6 +94,6 @@ main(void)
     fmpz_clear(x);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

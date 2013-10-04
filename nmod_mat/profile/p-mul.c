@@ -78,7 +78,7 @@ int main(void)
     mat_mul_t params;
     slong dim;
 
-    printf("nmod_mat_mul:\n");
+    flint_printf("nmod_mat_mul:\n");
 
     params.modulus = 40000;
 
@@ -92,7 +92,7 @@ int main(void)
         params.algorithm = 2;
         prof_repeat(&min_strassen, &max, sample, &params);
 
-        printf("dim = %ld, classical %.2f us strassen %.2f us\n", 
+        flint_printf("dim = %wd, classical %.2f us strassen %.2f us\n", 
             dim, min_classical, min_strassen);
     }
 

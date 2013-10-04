@@ -40,7 +40,7 @@ main(void)
     slong N;
     padic_ctx_t ctx;
 
-    printf("neg... ");
+    flint_printf("neg... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,10 +68,10 @@ main(void)
         result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(b, ctx), printf("\n\n");
-            padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(b, ctx), flint_printf("\n\n");
+            padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -105,10 +105,10 @@ main(void)
         result = (padic_poly_equal(a, c) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(b, ctx), printf("\n\n");
-            padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(b, ctx), flint_printf("\n\n");
+            padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -122,6 +122,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

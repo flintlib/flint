@@ -38,7 +38,7 @@ main(void)
     slong m, n, rep, res1, res2;
     flint_rand_t state;
 
-    printf("max_bits....");
+    flint_printf("max_bits....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -58,7 +58,7 @@ main(void)
 
         if (res1 != res2)
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
@@ -67,6 +67,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

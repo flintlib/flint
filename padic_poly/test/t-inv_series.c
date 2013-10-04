@@ -39,7 +39,7 @@ main(void)
     fmpz_t p;
     slong N;
 
-    printf("inv_series... ");
+    flint_printf("inv_series... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -77,10 +77,10 @@ main(void)
         result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
-            printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
-            printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), padic_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -147,12 +147,12 @@ main(void)
         result = (padic_poly_is_one(c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
-            printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
-            printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
-            printf("N = %ld\n", N);
-            printf("N2 = %ld\n", N2);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), padic_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), padic_poly_print(c, ctx), flint_printf("\n\n");
+            flint_printf("N = %wd\n", N);
+            flint_printf("N2 = %wd\n", N2);
             abort();
         }
 
@@ -166,6 +166,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

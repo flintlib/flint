@@ -43,7 +43,7 @@ main(void)
 
     flint_rand_t state;
 
-    printf("split/combine_bits....");
+    flint_printf("split/combine_bits....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,8 +73,8 @@ main(void)
         {
            if (in[j] != out[j])
            {
-              printf("FAIL:\n");
-              printf("Error in limb %ld, %lu != %lu\n", j, in[j], out[j]);
+              flint_printf("FAIL:\n");
+              flint_printf("Error in limb %wd, %wu != %wu\n", j, in[j], out[j]);
               abort();
            }
         }
@@ -90,6 +90,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -34,7 +34,7 @@ int main(void)
     flint_rand_t state;
     slong j, k, l;
 
-    printf("primes_jump_after....");
+    flint_printf("primes_jump_after....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,8 +60,8 @@ int main(void)
 
                 if (p != q)
                 {
-                    printf("FAIL\n");
-                    printf("p = %lu, q = %lu\n", p, q);
+                    flint_printf("FAIL\n");
+                    flint_printf("p = %wu, q = %wu\n", p, q);
                     abort();
                 }
             }
@@ -71,6 +71,6 @@ int main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

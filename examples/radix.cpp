@@ -69,25 +69,25 @@ int main(void)
     
     fmpz_mod_polyxx t = fmpz_mod_polyxx::randtest(m, state, n + 1);
 
-    printf("Radix conversion\n");
-    printf("----------------\n");
-    printf("  Degree of the radix:     %ld\n", r.degree());
-    printf("  Bit size of the modulus: %ld\n", (slong) bits(r.modulus()));
-    printf("  Degree of the input:     %ld\n", t.degree());
+    flint_printf("Radix conversion\n");
+    flint_printf("----------------\n");
+    flint_printf("  Degree of the radix:     %wd\n", r.degree());
+    flint_printf("  Bit size of the modulus: %wd\n", (slong) bits(r.modulus()));
+    flint_printf("  Degree of the input:     %wd\n", t.degree());
 
     clock_t c0 = clock();
     fmpz_mod_poly_radixxx S(r, n + 1);
     clock_t c1 = clock();
     double c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
 
-    printf("  Precomputation:          %fs\n", c);
+    flint_printf("  Precomputation:          %fs\n", c);
 
     c0 = clock();
     b = t.radix(S);
     c1 = clock();
     c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
 
-    printf("  Conversion:              %fs\n", c);
+    flint_printf("  Conversion:              %fs\n", c);
 
     return 0;
 }

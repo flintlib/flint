@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("zero....");
+    flint_printf("zero....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -57,8 +57,8 @@ main(void)
         result = (_fmpz_vec_is_zero(a, len));
         if (!result)
         {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
+            flint_printf("FAIL:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
             abort();
         }
 
@@ -67,6 +67,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

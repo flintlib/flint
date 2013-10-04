@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 {
     if (argc != 2)
     {
-        printf("Syntax: stirling_matrix <integer>\n");
+        flint_printf("Syntax: stirling_matrix <integer>\n");
         return 1;
     }
 
@@ -49,17 +49,17 @@ int main(int argc, char* argv[])
 
     fmpz_matxx S1(stirling_matrix_1(n, n)), S2(stirling_matrix_2(n, n));
 
-    printf("S1 [Stirling numbers of 1st kind]:\n");
+    flint_printf("S1 [Stirling numbers of 1st kind]:\n");
     print_pretty(S1);
-    printf("\n\n");
+    flint_printf("\n\n");
 
-    printf("S2 [Stirling numbers of 2nd kind]:\n");
+    flint_printf("S2 [Stirling numbers of 2nd kind]:\n");
     print_pretty(S2);
-    printf("\n\n");
+    flint_printf("\n\n");
 
-    printf("S1 * S2:\n");
+    flint_printf("S1 * S2:\n");
     print_pretty(S1*S2);
-    printf("\n\n");
+    flint_printf("\n\n");
 
     return 0;
 }

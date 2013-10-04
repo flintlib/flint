@@ -40,7 +40,7 @@ int main(void)
 
     flint_rand_t state;
 
-    printf("sizeinbase....");
+    flint_printf("sizeinbase....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,8 +61,8 @@ int main(void)
 
         if (size1 != size2)
         {
-            printf("FAIL: n = %lu, base = %d\n", n, base);
-            printf("n_sizeinbase: %d, strlen: %d\n", size1, size2);
+            flint_printf("FAIL: n = %wu, base = %d\n", n, base);
+            flint_printf("n_sizeinbase: %d, strlen: %d\n", size1, size2);
             abort();
         }
     }
@@ -72,6 +72,6 @@ int main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

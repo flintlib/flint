@@ -90,31 +90,31 @@ static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
 {
     slong i, k;
 
-    printf("p    = "), fmpz_print((&ctx->pctx)->p), printf("\n");
-    printf("d    = %ld\n", ctx->j[ctx->len - 1]);
-    printf("f(X) = ");
+    flint_printf("p    = "), fmpz_print((&ctx->pctx)->p), flint_printf("\n");
+    flint_printf("d    = %wd\n", ctx->j[ctx->len - 1]);
+    flint_printf("f(X) = ");
     fmpz_print(ctx->a + 0);
     for (k = 1; k < ctx->len; k++)
     {
         i = ctx->j[k];
-        printf(" + ");
+        flint_printf(" + ");
         if (fmpz_is_one(ctx->a + k))
         {
             if (i == 1)
-                printf("X");
+                flint_printf("X");
             else
-                printf("X^%ld", i);
+                flint_printf("X^%wd", i);
         }
         else
         {
             fmpz_print(ctx->a + k);
             if (i == 1)
-                printf("*X");
+                flint_printf("*X");
             else
-                printf("*X^%ld", i);
+                flint_printf("*X^%wd", i);
         }
     }
-    printf("\n");
+    flint_printf("\n");
 }
 
 /* Memory management *********************************************************/
@@ -275,7 +275,7 @@ static __inline__ void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
     }
     else
     {
-        printf("Exception (qadic_gen).  Extension degree d = 1.\n");
+        flint_printf("Exception (qadic_gen).  Extension degree d = 1.\n");
         abort();
     }
 }

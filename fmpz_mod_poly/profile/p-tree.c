@@ -74,7 +74,7 @@ main(void)
 
     timeit_stop(t);
 
-    printf("len = %ld, time = %ldms\n", len, ((slong) t->cpu)/10);
+    flint_printf("len = %wd, time = %wdms\n", len, ((slong) t->cpu)/10);
         
     fmpz_mod_poly_clear(f);
     

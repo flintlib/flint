@@ -34,7 +34,7 @@ int main(void)
 {
     slong k;
 
-    printf("pi_chudnovsky....");
+    flint_printf("pi_chudnovsky....");
     fflush(stdout);
 
     for (k = 2; k < 20; k++)
@@ -49,8 +49,8 @@ int main(void)
 
         if (!mpfr_equal_p(x, y))
         {
-            printf("FAIL:\n");
-            printf("Wrong value at prec = %ld\n", 1L << k);
+            flint_printf("FAIL:\n");
+            flint_printf("Wrong value at prec = %wd\n", 1L << k);
             abort();
         }
 
@@ -59,6 +59,6 @@ int main(void)
     }
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

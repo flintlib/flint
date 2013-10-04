@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("pow_binomial....");
+    flint_printf("pow_binomial....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,10 +64,10 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL(1):\n");
-            printf("exp = %lu\n", exp);
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            flint_printf("FAIL(1):\n");
+            flint_printf("exp = %wu\n", exp);
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -96,10 +96,10 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL(2):\n");
-            printf("exp = %lu\n", exp);
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            flint_printf("FAIL(2):\n");
+            flint_printf("exp = %wu\n", exp);
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -109,6 +109,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

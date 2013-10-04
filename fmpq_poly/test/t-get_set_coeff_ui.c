@@ -41,7 +41,7 @@ main(void)
     ulong n;
     mpq_t n_mpq;
 
-    printf("get/set_coeff_ui....");
+    flint_printf("get/set_coeff_ui....");
     fflush(stdout);
     
     flint_randinit(state);
@@ -69,12 +69,12 @@ main(void)
                    && !cflags);
             if (!result)
             {
-                printf("FAIL:\n");
-                printf("a      = "), fmpq_poly_debug(a), printf("\n");
-                printf("len    = %ld\n", len);
-                printf("coeff  = %ld\n", coeff);
-                printf("cflags = %lu\n", cflags);
-                printf("n      = %lu\n", n);
+                flint_printf("FAIL:\n");
+                flint_printf("a      = "), fmpq_poly_debug(a), flint_printf("\n");
+                flint_printf("len    = %wd\n", len);
+                flint_printf("coeff  = %wd\n", coeff);
+                flint_printf("cflags = %wu\n", cflags);
+                flint_printf("n      = %wu\n", n);
                 gmp_printf("n_mpq  = %Qd\n", n_mpq);
                 abort();
             }
@@ -86,6 +86,6 @@ main(void)
     
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

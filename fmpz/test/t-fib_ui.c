@@ -37,7 +37,7 @@ main(void)
     slong i, n;
     fmpz_t x, y, z, w;
 
-    printf("fib_ui....");
+    flint_printf("fib_ui....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -57,13 +57,13 @@ main(void)
 
             if (!fmpz_equal(w, z))
             {
-                printf("FAIL: %ld\n", i);
+                flint_printf("FAIL: %wd\n", i);
                 fmpz_print(x);
-                printf("\n");
+                flint_printf("\n");
                 fmpz_print(y);
-                printf("\n");
+                flint_printf("\n");
                 fmpz_print(z);
-                printf("\n");
+                flint_printf("\n");
                 abort();
             }
         }
@@ -75,6 +75,6 @@ main(void)
     fmpz_clear(w);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

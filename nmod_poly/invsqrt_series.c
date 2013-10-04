@@ -83,13 +83,13 @@ void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
     {
-        printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
         abort();
     }
 
     if (h->coeffs[0] != 1UL)
     {
-        printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
+        flint_printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
         abort();
     }
 

@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("equal_ui....");
+    flint_printf("equal_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -62,12 +62,12 @@ main(void)
         result = (lhs == rhs);
         if (result == 0)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("n = %lu\n", n);
-            printf("equal(a, b) = %d\n", fmpz_equal(a, b));
-            printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
+            flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
+            flint_printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
             abort();
         }
 
@@ -95,12 +95,12 @@ main(void)
         result = (lhs == rhs) && (lhs == 1);
         if (result == 0)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("n = %lu\n", n);
-            printf("equal(a, b) = %d\n", fmpz_equal(a, b));
-            printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
+            flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
+            flint_printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
             abort();
         }
 
@@ -110,6 +110,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

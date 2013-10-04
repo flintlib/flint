@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("div....");
+    flint_printf("div....");
     fflush(stdout);
 
     /* Check result of div against divrem */
@@ -65,12 +65,12 @@ main(void)
         result = (nmod_poly_equal(q, q2));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(q2), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(q), flint_printf("\n\n");
+            nmod_poly_print(q2), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
         
@@ -103,11 +103,11 @@ main(void)
         result = (nmod_poly_equal(a, q));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(q), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -138,11 +138,11 @@ main(void)
         result = (nmod_poly_equal(b, q));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(q), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -153,6 +153,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

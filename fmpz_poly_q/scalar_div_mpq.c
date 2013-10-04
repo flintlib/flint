@@ -32,7 +32,7 @@ void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop,
 
     if (mpz_sgn(mpq_numref(x)) == 0)
     {
-        printf("Exception (fmpz_poly_q_scalar_div_mpq). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_q_scalar_div_mpq). Division by zero.\n");
         abort();
     }
 

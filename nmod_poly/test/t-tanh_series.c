@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("tanh_series....");
+    flint_printf("tanh_series....");
     fflush(stdout);
 
     /* Check atanh(tanh(A)) = A */
@@ -68,11 +68,11 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %ld, mod = %lu\n", n, mod);
-            printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("tanh(A): "); nmod_poly_print(tanhA), printf("\n\n");
-            printf("B: "); nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd, mod = %wu\n", n, mod);
+            flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
+            flint_printf("tanh(A): "); nmod_poly_print(tanhA), flint_printf("\n\n");
+            flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -102,9 +102,9 @@ main(void)
         result = nmod_poly_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(A), printf("\n\n");
-            nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(A), flint_printf("\n\n");
+            nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -114,6 +114,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

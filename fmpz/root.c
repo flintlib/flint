@@ -39,7 +39,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     
     if (n == 0)
     {
-        printf("Exception (fmpz_root). Unable to take 0-th root.\n");
+        flint_printf("Exception (fmpz_root). Unable to take 0-th root.\n");
         abort();
     }
 
@@ -55,7 +55,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
         {
             if (c < 0L)
             {
-                printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
+                flint_printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
                 abort();
             }
 

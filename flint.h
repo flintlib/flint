@@ -28,6 +28,7 @@
 
 #include <gmp.h>
 #include <mpfr.h>
+#include <stdio.h>
 #include "longlong.h"
 #include "config.h"
 
@@ -59,6 +60,8 @@ void flint_free(void * ptr);
 typedef void (*flint_cleanup_function_t)(void);
 void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 void flint_cleanup(void);
+
+#define WORD_FMT "%l"
 
 #if __GMP_BITS_PER_MP_LIMB == 64
     #define FLINT_BITS 64
@@ -214,6 +217,16 @@ void mpn_tdiv_q(mp_ptr qp,
     flint_free(_scratch);
     }
 #endif
+
+int parse_fmt(int * floating, const char * fmt);
+
+size_t flint_printf(const char * str, ...); /* flint version of printf */
+size_t flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
+
+int flint_scanf(const char * str, ...); /* flint version of scanf */
+int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
 
 #ifdef __cplusplus
 }

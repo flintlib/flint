@@ -95,7 +95,7 @@ int main(void)
     {
         params.bits = bits;
 
-        printf("fmpz_mat_mul (bits = %ld):\n", params.bits);
+        flint_printf("fmpz_mat_mul (bits = %wd):\n", params.bits);
 
         for (dim = 1; dim <= 512; dim = (slong) ((double) dim * 1.3) + 1)
         {
@@ -115,14 +115,14 @@ int main(void)
             params.algorithm = 3;
             prof_repeat(&min_multi_mod, &max, sample, &params);
 
-            printf("dim = %ld default/classical/inline/multi_mod %.2f %.2f %.2f %.2f (us)\n", 
+            flint_printf("dim = %wd default/classical/inline/multi_mod %.2f %.2f %.2f %.2f (us)\n", 
                 dim, min_default, min_classical, min_inline, min_multi_mod);
 
             if (min_multi_mod < 0.6*min_default)
-                printf("BAD!\n");
+                flint_printf("BAD!\n");
 
             if (min_inline < 0.6*min_default)
-                printf("BAD!\n");
+                flint_printf("BAD!\n");
 
             if (min_multi_mod < 0.7*min_inline)
                 break;

@@ -50,7 +50,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_set(f, F);
 
 #if TRACE == 1
-    fmpz_poly_factor_print(lifted_fac); printf(" lifted_fac\n");
+    fmpz_poly_factor_print(lifted_fac); flint_printf(" lifted_fac\n");
 #endif
 
     leadF = fmpz_poly_lead(F);
@@ -93,8 +93,8 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
                 fmpz_poly_divrem(Q, R, f, tryme);
 
 #if TRACE == 1
-                fmpz_poly_print(tryme); printf(" is tryme\n");
-                fmpz_poly_print(R); printf(" is R\n");
+                fmpz_poly_print(tryme); flint_printf(" is tryme\n");
+                fmpz_poly_print(R); flint_printf(" is R\n");
 #endif
 
                 if (fmpz_poly_is_zero(R))

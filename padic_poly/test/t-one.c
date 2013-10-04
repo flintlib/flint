@@ -43,7 +43,7 @@ main(void)
     fmpz_t p;
     slong N;
 
-    printf("one....");
+    flint_printf("one....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,9 +64,9 @@ main(void)
         result = (padic_poly_is_one(a) || N <= 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
-            printf("N = %ld\n\n", N);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("N = %wd\n\n", N);
             abort();
         }
 
@@ -78,7 +78,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

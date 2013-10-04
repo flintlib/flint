@@ -37,7 +37,7 @@ main(void)
     slong m, n, rep;
     flint_rand_t state;
 
-    printf("add/sub/neg....");
+    flint_printf("add/sub/neg....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,7 +65,7 @@ main(void)
 
         if (!fmpz_mat_equal(A, C))
         {
-            printf("FAIL: matrices not equal!\n");
+            flint_printf("FAIL: matrices not equal!\n");
             abort();
         }
 
@@ -76,6 +76,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

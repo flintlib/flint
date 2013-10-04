@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_squarefree....");
+    flint_printf("is_squarefree....");
     fflush(stdout);
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
@@ -88,8 +88,8 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL: %lu, %ld, %d\n", modulus, max_exp, v);
-            nmod_poly_print(poly); printf("\n");
+            flint_printf("FAIL: %wu, %wd, %d\n", modulus, max_exp, v);
+            nmod_poly_print(poly); flint_printf("\n");
             abort();
         }
 
@@ -100,6 +100,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

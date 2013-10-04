@@ -39,7 +39,7 @@ int main(void)
     mp_limb_t d1, d2, inv;
     slong s1, s2;
     
-    printf("divrem_preinv1....");
+    flint_printf("divrem_preinv1....");
     fflush(stdout);
 
     mpz_init(a);
@@ -91,7 +91,7 @@ int main(void)
        result = (mpz_cmp(q, q2) == 0 && mpz_cmp(a2, r) == 0);
        if (!result)
        {
-          printf("FAIL:\n");
+          flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", a);
           gmp_printf("%Zd\n", b);
           gmp_printf("%Zd\n", q);
@@ -113,6 +113,6 @@ int main(void)
     gmp_randclear(st);
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

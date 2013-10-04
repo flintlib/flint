@@ -49,7 +49,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         str = flint_malloc(2);
         if (!str)
         {
-            printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
+            flint_printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
             abort();
         }
         str[0] = '0';
@@ -89,7 +89,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         str   = flint_malloc(size);
         if (!str)
         {
-            printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
+            flint_printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
             abort();
         }
 
@@ -157,7 +157,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     str = flint_malloc(size);
     if (!str)
     {
-        printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
+        flint_printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
         mpz_clear(z);
         mpq_clear(q);
         abort();
@@ -180,9 +180,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             str[j++] = '*';
         }
     }
-    j += sprintf(str + j, "%s", var);
+    j += flint_sprintf(str + j, "%s", var);
     str[j++] = '^';
-    j += sprintf(str + j, "%li", len - 1);
+    j += flint_sprintf(str + j, "%li", len - 1);
     
     i = len - 1;
     while (i)
@@ -212,11 +212,11 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         if (i > 0)
         {
             str[j++] = '*';
-            j += sprintf(str + j, "%s", var);
+            j += flint_sprintf(str + j, "%s", var);
             if (i > 1)
             {
                 str[j++] = '^';
-                j += sprintf(str + j, "%li", i);
+                j += flint_sprintf(str + j, "%li", i);
             }
         }
     }

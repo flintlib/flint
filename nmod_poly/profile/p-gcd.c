@@ -79,7 +79,7 @@ int main(void)
 
     for (i = 0; i < 3; i++)
     {
-        printf("---[Modulus %lu]---\n", p[i]), fflush(stdout);
+        flint_printf("---[Modulus %wu]---\n", p[i]), fflush(stdout);
 
         for (k = 0; k < N; k++)
         {
@@ -121,7 +121,7 @@ int main(void)
             cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) (100*r);
             cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) (100*r);
 
-            printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
+            flint_printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
             fflush(stdout);
 
             nmod_poly_clear(A);
@@ -130,19 +130,19 @@ int main(void)
         }
     }
 
-    printf("cpu = [");
+    flint_printf("cpu = [");
     for (i = 0; i < 3; i++)
     {
-        printf("[[");
+        flint_printf("[[");
         for (k = 0; k < N; k++)
-            printf("%.8Lf,", cpu[i][0][k]);
-        printf("],");
-        printf("[");
+            flint_printf("%.8Lf,", cpu[i][0][k]);
+        flint_printf("],");
+        flint_printf("[");
         for (k = 0; k < N; k++)
-            printf("%.8Lf,", cpu[i][1][k]);
-        printf("]],");
+            flint_printf("%.8Lf,", cpu[i][1][k]);
+        flint_printf("]],");
     }
-    printf("]\n");
+    flint_printf("]\n");
 
     flint_randclear(state);
     return EXIT_SUCCESS;

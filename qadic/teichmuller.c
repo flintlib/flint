@@ -153,7 +153,7 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     if (op->val < 0)
     {
-        printf("Exception (qadic_teichmuller).  val(op) is negative.\n");
+        flint_printf("Exception (qadic_teichmuller).  val(op) is negative.\n");
         abort();
     }
 

@@ -54,7 +54,7 @@ int main()
     mp_limb_t r;
     slong n;
 
-    printf("swinnerton_dyer_polynomial....");
+    flint_printf("swinnerton_dyer_polynomial....");
     fflush(stdout);
 
     for (n = 0; n <= 10; n++)
@@ -65,7 +65,7 @@ int main()
 
         if (r != known_values[n])
         {
-            printf("ERROR: wrong evaluation of S_%ld\n", n);
+            flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
             abort();
         }
 
@@ -73,6 +73,6 @@ int main()
     }
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

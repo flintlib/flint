@@ -29,7 +29,7 @@
 
 static void flint_memory_error()
 {
-    printf("Exception (FLINT memory_manager). Unable to allocate memory.\n");
+    flint_printf("Exception (FLINT memory_manager). Unable to allocate memory.\n");
     abort();
 }
 

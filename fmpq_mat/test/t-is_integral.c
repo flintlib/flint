@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_integral....");
+    flint_printf("is_integral....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -57,7 +57,7 @@ main(void)
 
         if (!fmpq_mat_is_integral(A))
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
 
@@ -71,7 +71,7 @@ main(void)
 
             if (fmpq_mat_is_integral(A))
             {
-                printf("FAIL\n");
+                flint_printf("FAIL\n");
                 abort();
             }
         }
@@ -84,6 +84,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

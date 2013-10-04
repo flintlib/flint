@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("val2....");
+    flint_printf("val2....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -70,8 +70,8 @@ main(void)
         result = ((v1 == v2) == 1);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("v1 = %ld  v2 = %ld\n", v1, v2);
+            flint_printf("FAIL:\n");
+            flint_printf("v1 = %wd  v2 = %wd\n", v1, v2);
             abort();
         }
 
@@ -80,6 +80,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

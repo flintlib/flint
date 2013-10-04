@@ -133,7 +133,7 @@ int main(void)
       info.alg= 1;
       prof_repeat(&min, &max, sample, (void *) &info);
          
-      printf("length %ld, modulus degree %ld, min %.3g ms, max %.3g ms, norm %.3g\n", 
+      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
            info.n, info.s, 
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
@@ -144,7 +144,7 @@ int main(void)
       info.alg= 2;
       prof_repeat(&min, &max, sample, (void *) &info);
          
-      printf("length %ld, modulus degree %ld, min %.3g ms, max %.3g ms, norm %.3g\n", 
+      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
            info.n, info.s, 
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,

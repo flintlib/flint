@@ -38,7 +38,7 @@ fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
     if (c != r)
     {
-        printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
+        flint_printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
         abort();
     }
 

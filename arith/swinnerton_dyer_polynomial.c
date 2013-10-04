@@ -67,7 +67,7 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     N = 1L << n;
 
     prec = __bound_prec(n);
-    /* printf("prec: %ld\n", prec); */
+    /* flint_printf("prec: %wd\n", prec); */
 
     fmpz_poly_fit_length(poly, N + 1);
     T = poly->coeffs;

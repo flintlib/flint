@@ -11,7 +11,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("add... ");
+    flint_printf("add... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -33,10 +33,10 @@ main(void)
         result = (fmpz_poly_q_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_q_print(a), printf("\n\n");
-            fmpz_poly_q_print(b), printf("\n\n");
-            fmpz_poly_q_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_q_print(a), flint_printf("\n\n");
+            fmpz_poly_q_print(b), flint_printf("\n\n");
+            fmpz_poly_q_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -62,10 +62,10 @@ main(void)
         result = fmpz_poly_q_equal(b, c);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_q_print(a), printf("\n\n");
-            fmpz_poly_q_print(b), printf("\n\n");
-            fmpz_poly_q_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_q_print(a), flint_printf("\n\n");
+            fmpz_poly_q_print(b), flint_printf("\n\n");
+            fmpz_poly_q_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -93,11 +93,11 @@ main(void)
                                          && fmpz_poly_q_is_canonical(d);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_q_print(a), printf("\n\n");
-            fmpz_poly_q_print(b), printf("\n\n");
-            fmpz_poly_q_print(c), printf("\n\n");
-            fmpz_poly_q_print(d), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_q_print(a), flint_printf("\n\n");
+            fmpz_poly_q_print(b), flint_printf("\n\n");
+            fmpz_poly_q_print(c), flint_printf("\n\n");
+            fmpz_poly_q_print(d), flint_printf("\n\n");
             abort();
         }
 
@@ -109,6 +109,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

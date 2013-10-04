@@ -54,7 +54,7 @@ main(void)
     fmpz_poly_init2(g[0], ehi * (lenhi - 1) + 1);
     fmpz_poly_init2(g[1], ehi * (lenhi - 1) + 1);
     
-    printf("| len | exp | binomial |\n");
+    flint_printf("| len | exp | binomial |\n");
     
     for (len = lenlo; len <= lenhi; len += lenh)
     {
@@ -92,7 +92,7 @@ main(void)
             s[0] += t[0]->cpu;
             r    += loops;
             
-            printf("%d %d %lf\n", len, e, s[0] / (double) r);
+            flint_printf("%d %d %lf\n", len, e, s[0] / (double) r);
         }
     }
     

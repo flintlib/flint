@@ -38,7 +38,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
    
-   printf("is_prime_pocklington....");
+   flint_printf("is_prime_pocklington....");
    fflush(stdout);
    
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
@@ -58,8 +58,8 @@ int main(void)
 
       if (result == 0)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -82,8 +82,8 @@ int main(void)
 
       if (result == 1)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared prime\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared prime\n", d); 
          abort();
       }
 
@@ -92,12 +92,12 @@ int main(void)
 
    if (count > 200 * flint_test_multiplier())
    {
-      printf("FAIL: Pocklington-Lehmer failed too many times (%lu times)\n", count);
+      flint_printf("FAIL: Pocklington-Lehmer failed too many times (%wu times)\n", count);
       abort();
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

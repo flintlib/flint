@@ -37,7 +37,7 @@ int main()
     fmpz_poly_t T0, T1, T2, t;
     slong n;
 
-    printf("chebyshev_t_polynomial....");
+    flint_printf("chebyshev_t_polynomial....");
     fflush(stdout);
 
     fmpz_poly_init(T0);
@@ -59,9 +59,9 @@ int main()
 
         if (!fmpz_poly_equal(t, T2))
         {
-            printf("FAIL: n = %ld\n", n);
-            printf("t: "); fmpz_poly_print_pretty(t, "x"); printf("\n");
-            printf("T2: "); fmpz_poly_print_pretty(T2, "x"); printf("\n");
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("t: "); fmpz_poly_print_pretty(t, "x"); flint_printf("\n");
+            flint_printf("T2: "); fmpz_poly_print_pretty(T2, "x"); flint_printf("\n");
             abort();
         }
 
@@ -75,6 +75,6 @@ int main()
     fmpz_poly_clear(t);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

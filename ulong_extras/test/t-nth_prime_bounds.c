@@ -40,8 +40,8 @@ void check(ulong n, mp_limb_t ans)
     if (ok && reasonable)
         return;
 
-    printf("FAIL:\n");
-    printf("n = %lu: %lu < %lu < %lu\n", n, lo, ans, hi);
+    flint_printf("FAIL:\n");
+    flint_printf("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi);
     abort();
 }
 
@@ -49,7 +49,7 @@ int main(void)
 {
     int n;
 
-    printf("nth_prime_bounds....");
+    flint_printf("nth_prime_bounds....");
     fflush(stdout);
 
     for (n=6; n<7500 * FLINT_MIN(10, flint_test_multiplier()); n++)
@@ -78,6 +78,6 @@ int main(void)
     check(100000000000000000UL, 4185296581467695669UL);
 #endif
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

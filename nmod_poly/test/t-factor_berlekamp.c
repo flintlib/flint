@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor_berlekamp....");
+    flint_printf("factor_berlekamp....");
     fflush(stdout);
 
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
@@ -92,7 +92,7 @@ main(void)
         result = (res->num == num);
         if (!result)
         {
-            printf("FAIL: %lu, %ld, %ld\n", modulus, num, res->num);
+            flint_printf("FAIL: %wu, %wd, %wd\n", modulus, num, res->num);
             abort();
         }
       
@@ -104,6 +104,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

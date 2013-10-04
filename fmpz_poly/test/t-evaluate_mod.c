@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("evaluate_mod....");
+    flint_printf("evaluate_mod....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -66,12 +66,12 @@ main(void)
         result = (r == fmpz_mod_ui(s, s, n));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(f), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(f), flint_printf("\n\n");
             gmp_printf("a = %Mu\n\n", a);
             gmp_printf("n = %Mu\n\n", n);
             gmp_printf("r = %Mu\n\n", r);
-            printf("s = "), fmpz_print(s), printf("\n\n");
+            flint_printf("s = "), fmpz_print(s), flint_printf("\n\n");
             abort();
         }
 
@@ -82,6 +82,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

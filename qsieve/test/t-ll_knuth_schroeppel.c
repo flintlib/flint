@@ -35,7 +35,7 @@ int main(void)
    int i;
    flint_rand_t state;
    
-   printf("ll_knuth_schroeppel....");
+   flint_printf("ll_knuth_schroeppel....");
    fflush(stdout);
  
    flint_randinit(state);
@@ -61,6 +61,6 @@ int main(void)
    
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

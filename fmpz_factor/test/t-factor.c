@@ -45,19 +45,19 @@ void check(fmpz_t n)
 
     if (!fmpz_equal(n, m))
     {
-        printf("ERROR: factors do not unfactor to original number!\n");
+        flint_printf("ERROR: factors do not unfactor to original number!\n");
 
-        printf("input: ");
+        flint_printf("input: ");
         fmpz_print(n);
-        printf("\n");
+        flint_printf("\n");
 
-        printf("computed factors: ");
+        flint_printf("computed factors: ");
         fmpz_factor_print(factor);
-        printf("\n");
+        flint_printf("\n");
 
-        printf("value: ");
+        flint_printf("value: ");
         fmpz_print(m);
-        printf("\n");
+        flint_printf("\n");
 
         abort();
     }
@@ -72,7 +72,7 @@ int main(void)
     fmpz_t x;
     mpz_t y;
 
-    printf("factor....");
+    flint_printf("factor....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -142,6 +142,6 @@ int main(void)
     mpz_clear(y);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

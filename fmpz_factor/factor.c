@@ -102,7 +102,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
             }
 
             _fmpz_factor_append_ui(factor, p, exp);
-            /* printf("added %lu %lu\n", p, exp); */
+            /* flint_printf("added %wu %wu\n", p, exp); */
 
             /* Continue using only trial division whilst it is successful.
                This allows quickly factoring huge highly composite numbers

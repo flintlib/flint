@@ -39,7 +39,7 @@ int main(void)
 
     const slong maxn = 3000;
 
-    printf("bell_number_nmod_vec....");
+    flint_printf("bell_number_nmod_vec....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,8 +63,8 @@ int main(void)
 
         if (!_nmod_vec_equal(b1, b2, n))
         {
-            printf("FAIL:\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
     }
@@ -74,6 +74,6 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

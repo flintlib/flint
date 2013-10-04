@@ -68,7 +68,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 
     if (lenB == 0)
     {
-        printf("Exception (nmod_poly_div_newton). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_div_newton). Division by zero.\n");
         abort();
     }
 

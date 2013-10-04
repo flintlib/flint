@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("get_cfrac....");
+    flint_printf("get_cfrac....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -61,7 +61,7 @@ main(void)
 
         if (!fmpq_is_zero(r))
         {
-            printf("FAIL: expected zero remainder\n");
+            flint_printf("FAIL: expected zero remainder\n");
             abort();
         }
 
@@ -77,15 +77,15 @@ main(void)
 
         if (n1 != n2)
         {
-            printf("FAIL: n1 = %ld, n2 = %ld\n", n1, n2);
+            flint_printf("FAIL: n1 = %wd, n2 = %wd\n", n1, n2);
             abort();
         }
 
         if (!_fmpz_vec_equal(c1, c2, n1))
         {
-            printf("FAIL: vectors not equal\n");
-            _fmpz_vec_print(c1, n1); printf("\n");
-            _fmpz_vec_print(c2, n2); printf("\n");
+            flint_printf("FAIL: vectors not equal\n");
+            _fmpz_vec_print(c1, n1); flint_printf("\n");
+            _fmpz_vec_print(c2, n2); flint_printf("\n");
             abort();
         }
 
@@ -98,6 +98,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

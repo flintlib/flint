@@ -55,7 +55,7 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
 
     if (lenB < 2)
     {
-        printf("Exception (fmpz_mod_poly_gcdinv). lenB < 2.\n");
+        flint_printf("Exception (fmpz_mod_poly_gcdinv). lenB < 2.\n");
         abort();
     }
     if (lenA >= lenB)

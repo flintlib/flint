@@ -37,7 +37,7 @@ main(void)
     slong iter;
     flint_rand_t state;
 
-    printf("bound_roots....");
+    flint_printf("bound_roots....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -89,10 +89,10 @@ main(void)
 
         if (fmpz_cmp(nbound, bound) < 0)
         {
-            printf("FAIL\n");
-            printf("f = "); fmpz_poly_print(f); printf("\n\n");
-            printf("bound = "); fmpz_print(bound); printf("\n\n");
-            printf("computed bound = "); fmpz_print(nbound); printf("\n\n");
+            flint_printf("FAIL\n");
+            flint_printf("f = "); fmpz_poly_print(f); flint_printf("\n\n");
+            flint_printf("bound = "); fmpz_print(bound); flint_printf("\n\n");
+            flint_printf("computed bound = "); fmpz_print(nbound); flint_printf("\n\n");
             abort(); 
        }
 
@@ -107,6 +107,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -33,15 +33,15 @@ int fmpq_poly_debug(const fmpq_poly_t poly)
 {
     slong i;
 
-    printf("{alloc: %ld, length: %ld, coeffs:", poly->alloc, poly->length);
+    flint_printf("{alloc: %wd, length: %wd, coeffs:", poly->alloc, poly->length);
     for (i = 0; i < poly->alloc; i++)
     {
-        printf(" ");
+        flint_printf(" ");
         fmpz_print(poly->coeffs + i);
     }
-    printf(", den: ");
+    flint_printf(", den: ");
     fmpz_print(poly->den);
-    printf("}");
+    flint_printf("}");
 
     return 1;
 }

@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("rfac_ui... ");
+    flint_printf("rfac_ui... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,10 +60,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL (aliasing)\n\n");
-            printf("x: "); fmpz_print(x); printf("\n\n");
-            printf("a = %lu\n\n", a);
-            printf("r: "); fmpz_print(r); printf("\n\n");
+            flint_printf("FAIL (aliasing)\n\n");
+            flint_printf("x: "); fmpz_print(x); flint_printf("\n\n");
+            flint_printf("a = %wu\n\n", a);
+            flint_printf("r: "); fmpz_print(r); flint_printf("\n\n");
             abort();
         }
 
@@ -99,12 +99,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n\n");
-            printf("x: "); fmpz_print(x); printf("\n\n");
-            printf("a = %lu, b = %lu\n\n", a, b);
-            printf("rf(x,a): "); fmpz_print(r1); printf("\n\n");
-            printf("rf(x+a,b): "); fmpz_print(r2); printf("\n\n");
-            printf("rf(x,a+b): "); fmpz_print(r3); printf("\n\n");
+            flint_printf("FAIL\n\n");
+            flint_printf("x: "); fmpz_print(x); flint_printf("\n\n");
+            flint_printf("a = %wu, b = %wu\n\n", a, b);
+            flint_printf("rf(x,a): "); fmpz_print(r1); flint_printf("\n\n");
+            flint_printf("rf(x+a,b): "); fmpz_print(r2); flint_printf("\n\n");
+            flint_printf("rf(x,a+b): "); fmpz_print(r3); flint_printf("\n\n");
             abort();
         }
 
@@ -117,7 +117,7 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     flint_cleanup();
     return EXIT_SUCCESS;
 }

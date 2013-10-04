@@ -61,7 +61,7 @@ main(void)
     slong iter;
     flint_rand_t state;
 
-    printf("abs_lbound_ui_2exp....");
+    flint_printf("abs_lbound_ui_2exp....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -83,12 +83,12 @@ main(void)
 
         if (FLINT_BIT_COUNT(man) != bits || (man != yman) || (exp != yexp))
         {
-            printf("FAIL\n");
-            printf("bits = %ld, count = %u\n\n", bits, FLINT_BIT_COUNT(man));
-            printf("x = "); fmpz_print(x); printf("\n\n");
-            printf("bits(x) = %ld\n\n", fmpz_bits(x));
-            printf("man = %lu, exp = %ld\n", man, exp);
-            printf("yman = %lu, yexp = %ld\n", yman, yexp);
+            flint_printf("FAIL\n");
+            flint_printf("bits = %wd, count = %u\n\n", bits, FLINT_BIT_COUNT(man));
+            flint_printf("x = "); fmpz_print(x); flint_printf("\n\n");
+            flint_printf("bits(x) = %wd\n\n", fmpz_bits(x));
+            flint_printf("man = %wu, exp = %wd\n", man, exp);
+            flint_printf("yman = %wu, yexp = %wd\n", yman, yexp);
             abort();
         }
 
@@ -97,6 +97,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -39,6 +39,6 @@ nmod_poly_factor_print(const nmod_poly_factor_t fac)
     for (i = 0; i < fac->num; i++)
     {
         nmod_poly_print(fac->p + i);
-        printf(" ^ %ld\n", fac->exp[i]);
+        flint_printf(" ^ %wd\n", fac->exp[i]);
     }
 }

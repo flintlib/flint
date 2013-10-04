@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
     x.set_coeff(3, 5);
     x.set_coeff(0, 6);
 
-    print(x);printf("\n");
-    print(x.sqr());printf("\n");
+    print(x);flint_printf("\n");
+    print(x.sqr());flint_printf("\n");
 
     return 0;
 }

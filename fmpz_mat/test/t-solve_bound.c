@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("solve_bound....");
+    flint_printf("solve_bound....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -72,17 +72,17 @@ main(void)
 
         if (fmpz_cmpabs(D, den) < 0)
         {
-            printf("FAIL:\n");
-            printf("denominator bound:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("denominator bound:\n");
             fmpz_print(D);
-            printf("\ndenominator:\n");
+            flint_printf("\ndenominator:\n");
             fmpz_print(den);
-            printf("\n");
-            printf("A:\n");
+            flint_printf("\n");
+            flint_printf("A:\n");
             fmpz_mat_print_pretty(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_mat_print_pretty(B);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -92,17 +92,17 @@ main(void)
             {
                 if (fmpz_cmpabs(N, fmpz_mat_entry(X, j, k)) < 0)
                 {
-                    printf("FAIL:\n");
-                    printf("numerator bound:\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("numerator bound:\n");
                     fmpz_print(N);
-                    printf("\nnumerator:\n");
+                    flint_printf("\nnumerator:\n");
                     fmpz_print(fmpz_mat_entry(X, j, k));
-                    printf("\n");
-                    printf("A:\n");
+                    flint_printf("\n");
+                    flint_printf("A:\n");
                     fmpz_mat_print_pretty(A);
-                    printf("B:\n");
+                    flint_printf("B:\n");
                     fmpz_mat_print_pretty(B);
-                    printf("\n");
+                    flint_printf("\n");
                     abort();
                 }
             }
@@ -119,6 +119,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

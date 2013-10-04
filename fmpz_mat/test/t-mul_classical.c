@@ -38,7 +38,7 @@ int main(void)
     slong i;
     flint_rand_t state;
 
-    printf("mul_classical....");
+    flint_printf("mul_classical....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -67,7 +67,7 @@ int main(void)
 
         if (!fmpz_mat_equal(C, D))
         {
-            printf("FAIL: results not equal\n");
+            flint_printf("FAIL: results not equal\n");
             abort();
         }
 
@@ -79,6 +79,6 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

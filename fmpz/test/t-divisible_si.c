@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("divisible_si....");
+    flint_printf("divisible_si....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,8 +68,8 @@ main(void)
         result = (e == f);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = %ld, b = ", a), fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wd, b = ", a), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -103,8 +103,8 @@ main(void)
         result = (e == f && e == 1);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = %ld, b = ", a), fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wd, b = ", a), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -114,7 +114,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

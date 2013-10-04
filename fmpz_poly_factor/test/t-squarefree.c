@@ -35,7 +35,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("squarefree....");
+    flint_printf("squarefree....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -87,13 +87,13 @@ int main(void)
         result &= fmpz_poly_equal(f, h);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f = "), fmpz_poly_print_pretty(f, "x"), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("f = "), fmpz_poly_print_pretty(f, "x"), flint_printf("\n\n");
             for (k = 0; k < n; k++)
             {
-                printf("g[%ld] = ", k), fmpz_poly_print_pretty(g[k], "x"), printf("\n\n");
+                flint_printf("g[%wd] = ", k), fmpz_poly_print_pretty(g[k], "x"), flint_printf("\n\n");
             }
-            printf("h = "), fmpz_poly_print_pretty(h, "x"), printf("\n\n");
+            flint_printf("h = "), fmpz_poly_print_pretty(h, "x"), flint_printf("\n\n");
             fmpz_poly_factor_print(fac);
             abort();
         }
@@ -108,7 +108,7 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

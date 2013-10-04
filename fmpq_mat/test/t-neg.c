@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("neg....");
+    flint_printf("neg....");
     fflush(stdout);
 
     /* Aliasing */
@@ -63,10 +63,10 @@ main(void)
         result = fmpq_mat_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
             abort();
         }
@@ -98,10 +98,10 @@ main(void)
         result = fmpq_mat_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
             abort();
         }
@@ -113,6 +113,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

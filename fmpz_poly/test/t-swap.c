@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("swap....");
+    flint_printf("swap....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -58,10 +58,10 @@ main(void)
         result = (fmpz_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -72,6 +72,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

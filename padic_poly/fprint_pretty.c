@@ -51,18 +51,18 @@ int _padic_poly_fprint_pretty(FILE *file,
 
         if (padic_is_one(x))
         {
-            fprintf(file, "%s", var);
+            flint_fprintf(file, "%s", var);
         }
         else if (*(padic_unit(x)) == -1L && padic_val(x) == 0)
         {
-            fprintf(file, "-%s", var);
+            flint_fprintf(file, "-%s", var);
         }
         else
         {
             fputc('(', file);
             padic_fprint(file, x, ctx);
             fputc(')', file);
-            fprintf(file, "*%s", var);
+            flint_fprintf(file, "*%s", var);
         }
 
         fmpz_abs(padic_unit(x), poly);
@@ -90,15 +90,15 @@ int _padic_poly_fprint_pretty(FILE *file,
             _padic_canonicalise(x, ctx);
 
             if (padic_is_one(x))
-               fprintf(file, "%s^%ld", var, i);
+               flint_fprintf(file, "%s^%wd", var, i);
             else if (*(padic_unit(x)) == -1L && padic_val(x) == 0)
-               fprintf(file, "-%s^%ld", var, i);
+               flint_fprintf(file, "-%s^%wd", var, i);
             else
             {
                 fputc('(', file);
                 padic_fprint(file, x, ctx);
                 fputc(')', file);
-                fprintf(file, "*%s^%ld", var, i);
+                flint_fprintf(file, "*%s^%wd", var, i);
             }
             --i;
         }
@@ -118,13 +118,13 @@ int _padic_poly_fprint_pretty(FILE *file,
                 fputc('-', file);
 
             if (padic_is_one(x))
-                fprintf(file, "%s^%ld", var, i);
+                flint_fprintf(file, "%s^%wd", var, i);
             else
             {
                 fputc('(', file);
                 padic_fprint(file, x, ctx);
                 fputc(')', file);
-                fprintf(file, "*%s^%ld", var, i);
+                flint_fprintf(file, "*%s^%wd", var, i);
             }
         }
 

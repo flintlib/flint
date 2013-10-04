@@ -39,7 +39,7 @@ int main(void)
     fmpq_t s2;
     slong h, k;
 
-    printf("dedekind_sum_coprime_d....");
+    flint_printf("dedekind_sum_coprime_d....");
     fflush(stdout);
 
     fmpz_init(hh);
@@ -63,11 +63,11 @@ int main(void)
 
                 if (fabs(s1 - s2f) > 1e-10)
                 {
-                    printf("FAIL:\n");
-                    printf("s(%ld,%ld)\n", h, k);
-                    printf("s1: %.20f\n", s1);
-                    printf("s2: %.20f\n", s2f);
-                    printf("Exact: "); fmpq_print(s2); printf("\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("s(%wd,%wd)\n", h, k);
+                    flint_printf("s1: %.20f\n", s1);
+                    flint_printf("s2: %.20f\n", s2f);
+                    flint_printf("Exact: "); fmpq_print(s2); flint_printf("\n");
                     abort();
                 }
             }
@@ -79,6 +79,6 @@ int main(void)
     fmpq_clear(s2);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

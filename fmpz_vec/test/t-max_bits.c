@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("max_bits....");
+    flint_printf("max_bits....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,8 +59,8 @@ main(void)
         result = (bits >= FLINT_ABS(bits2) && bits2 == bits3);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("bits = %ld, bits2 = %ld bits3 = %ld\n", bits, bits2, bits3);
+            flint_printf("FAIL:\n");
+            flint_printf("bits = %wd, bits2 = %wd bits3 = %wd\n", bits, bits2, bits3);
             abort();
         }
 
@@ -69,6 +69,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

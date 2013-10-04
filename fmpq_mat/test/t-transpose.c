@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("transpose....");
+    flint_printf("transpose....");
     fflush(stdout);
 
     /* Aliasing, B = B^t */
@@ -65,12 +65,12 @@ main(void)
         result = fmpq_mat_equal(B, C);
         if (!result)
         {
-            printf("FAIL (B = B^t):\n");
-            printf("A:\n");
+            flint_printf("FAIL (B = B^t):\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
             abort();
         }
@@ -103,10 +103,10 @@ main(void)
         result = fmpq_mat_equal(A, B);
         if (!result)
         {
-            printf("FAIL ((B^t)^t == B):\n");
-            printf("A:\n");
+            flint_printf("FAIL ((B^t)^t == B):\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
             abort();
         }
@@ -118,7 +118,7 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

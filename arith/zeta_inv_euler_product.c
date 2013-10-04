@@ -56,7 +56,7 @@ void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
         slong i;
         powprec = prec - s*log(p)*1.4426950408889634 + 1;
 
-        /* printf("prime %lu, powprec %ld\n", p, powprec); */
+        /* flint_printf("prime %wu, powprec %wd\n", p, powprec); */
 
         if (powprec < 5)
             break;

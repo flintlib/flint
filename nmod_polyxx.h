@@ -372,7 +372,7 @@ struct nmod_poly_data
     nmod_poly_data(const char* str)
     {
         mp_limb_t n;slong length;
-        execution_check(sscanf(str, "%ld %lu", &length, &n) == 2
+        execution_check(flint_sscanf(str, "%wd %wu", &length, &n) == 2
             && (nmod_poly_init2(inner, n, length), nmod_poly_set_str(inner, str)),
                 "construct from string", "nmod_polyxx");
     }

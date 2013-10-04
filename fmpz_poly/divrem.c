@@ -47,7 +47,7 @@ void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (lenB == 0)
     {
-        printf("Exception (fmpz_poly_divrem). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_divrem). Division by zero.\n");
         abort();
     }
 

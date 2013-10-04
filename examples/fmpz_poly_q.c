@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     strg = fmpz_poly_q_get_str_pretty(g, "t");
     fmpz_poly_q_mul(f, f, g);
     str  = fmpz_poly_q_get_str_pretty(f, "t");
-    printf("%s * %s = %s\n", strf, strg, str);
+    flint_printf("%s * %s = %s\n", strf, strg, str);
     flint_free(str);
     flint_free(strf);
     flint_free(strg);

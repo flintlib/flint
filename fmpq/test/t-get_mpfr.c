@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("get_mpfr....");
+    flint_printf("get_mpfr....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -73,14 +73,14 @@ main(void)
 
         if (r1 != r2 || !mpfr_equal_p(f1, f2))
         {
-            printf("FAIL\n");
-            fmpq_print(x); printf("\n");
-            printf("r1 = %d, r2 = %d\n", r1, r2);
-            printf("\nf1: \n");
+            flint_printf("FAIL\n");
+            fmpq_print(x); flint_printf("\n");
+            flint_printf("r1 = %d, r2 = %d\n", r1, r2);
+            flint_printf("\nf1: \n");
             mpfr_out_str(stdout, 10, 0, f1, MPFR_RNDN);
-            printf("\n\nf1: \n");
+            flint_printf("\n\nf1: \n");
             mpfr_out_str(stdout, 10, 0, f2, MPFR_RNDN);
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -92,6 +92,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

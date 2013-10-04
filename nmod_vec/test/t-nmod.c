@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("nmod....");
+    flint_printf("nmod....");
     fflush(stdout);
 
     /* nmod_add */
@@ -66,8 +66,8 @@ main(void)
 
         if (mpz_cmp_ui(z, c) != 0)
         {
-            printf("FAIL (add):\n");
-            printf("m = %lu\n", m);
+            flint_printf("FAIL (add):\n");
+            flint_printf("m = %wu\n", m);
             abort();
         }
 
@@ -102,8 +102,8 @@ main(void)
 
         if (mpz_cmp_ui(z, c) != 0)
         {
-            printf("FAIL (sub):\n");
-            printf("m = %lu\n", m);
+            flint_printf("FAIL (sub):\n");
+            flint_printf("m = %wu\n", m);
             abort();
         }
 
@@ -138,8 +138,8 @@ main(void)
 
         if (mpz_cmp_ui(z, c) != 0)
         {
-            printf("FAIL (mul):\n");
-            printf("m = %lu\n", m);
+            flint_printf("FAIL (mul):\n");
+            flint_printf("m = %wu\n", m);
             abort();
         }
 
@@ -177,8 +177,8 @@ main(void)
 
         if (mpz_cmp_ui(z, c) != 0)
         {
-            printf("FAIL (div):\n");
-            printf("m = %lu\n", m);
+            flint_printf("FAIL (div):\n");
+            flint_printf("m = %wu\n", m);
             abort();
         }
 
@@ -211,8 +211,8 @@ main(void)
 
         if (mpz_cmp_ui(z, c) != 0)
         {
-            printf("FAIL (div):\n");
-            printf("m = %lu\n", m);
+            flint_printf("FAIL (div):\n");
+            flint_printf("m = %wu\n", m);
             abort();
         }
 
@@ -246,8 +246,8 @@ main(void)
 
         if (mpz_cmp_ui(z, c) != 0)
         {
-            printf("FAIL (pow):\n");
-            printf("m = %lu\n", m);
+            flint_printf("FAIL (pow):\n");
+            flint_printf("m = %wu\n", m);
             abort();
         }
 
@@ -258,6 +258,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

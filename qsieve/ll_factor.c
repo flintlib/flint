@@ -56,7 +56,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         Initialise the qs_t structure. 
     ************************************************************************/
 #if QS_DEBUG
-    printf("\nStart:\n");
+    flint_printf("\nStart:\n");
 #endif
 
     qsieve_ll_init(qs_inf, hi, lo);
@@ -68,7 +68,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
        mpz_set_ui(_n, hi);
        mpz_mul_2exp(_n, _n, FLINT_BITS);
        mpz_add_ui(_n, _n, lo);
-       gmp_printf("Factoring %Zd of %ld bits\n", _n, qs_inf->bits);
+       gmp_printf("Factoring %Zd of %wd bits\n", _n, qs_inf->bits);
        mpz_clear(_n);
     }
 #endif
@@ -81,14 +81,14 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         during this process it is returned.
     ************************************************************************/
 #if QS_DEBUG
-    printf("\nKnuth-Schroeppel:\n");
+    flint_printf("\nKnuth-Schroeppel:\n");
 #endif
 
     factor = qsieve_ll_knuth_schroeppel(qs_inf); 
     if (factor) 
 	{
 #if QS_DEBUG
-        printf("Found small factor %ld in Knuth-Schroeppel\n", factor);
+        flint_printf("Found small factor %wd in Knuth-Schroeppel\n", factor);
 #endif
 		qsieve_ll_clear(qs_inf);
         return factor;
@@ -116,7 +116,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         during this process it is returned.
     ************************************************************************/
 #if QS_DEBUG
-    printf("\nCompute factor base:\n");
+    flint_printf("\nCompute factor base:\n");
 #endif
 
     /* compute factor base primes and associated data*/
@@ -124,7 +124,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
 	if (factor) 
     {
 #if QS_DEBUG
-        printf("Found small factor %ld whilst generating factor base\n", factor);
+        flint_printf("Found small factor %wd whilst generating factor base\n", factor);
 #endif
 		qsieve_ll_clear(qs_inf);
         return factor;
@@ -136,7 +136,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         Create space for all the polynomial information
     ************************************************************************/
 #if QS_DEBUG
-    printf("\nInitialise poly:\n");
+    flint_printf("\nInitialise poly:\n");
 #endif
 
     /* set (hi, lo) to kn */
@@ -153,7 +153,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         Create space for all the relations and matrix information
     ************************************************************************/
 #if QS_DEBUG
-    printf("\nInitialise relations and linear algebra:\n");
+    flint_printf("\nInitialise relations and linear algebra:\n");
 #endif
 
     qsieve_ll_linalg_init(qs_inf);
@@ -164,7 +164,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         Sieve for relations
     ************************************************************************/
 #if QS_DEBUG
-    printf("\nSieve:\n");
+    flint_printf("\nSieve:\n");
 #endif
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
@@ -174,7 +174,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
         rels_found += qsieve_ll_collect_relations(qs_inf, sieve);
 
 #if (QS_DEBUG & 128)
-        printf("%ld/%ld relations.\n", rels_found, qs_inf->num_primes + qs_inf->extra_rels);
+        flint_printf("%wd/%wd relations.\n", rels_found, qs_inf->num_primes + qs_inf->extra_rels);
 #endif
     }
 
@@ -190,7 +190,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     nrows = qs_inf->num_primes;
 
 #if QS_DEBUG
-    printf("Reduce matrix:\n");
+    flint_printf("Reduce matrix:\n");
 #endif
 
 	reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix); 
@@ -202,7 +202,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     ************************************************************************/
 
 #if QS_DEBUG
-    printf("Block lanczos:\n");
+    flint_printf("Block lanczos:\n");
 #endif
 
     flint_randinit(state); /* initialise the random generator */
@@ -224,7 +224,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     flint_randclear(state); /* clean up random state */
 
 #if QS_DEBUG
-    printf("%ld nullspace vectors found\n", count);
+    flint_printf("%wd nullspace vectors found\n", count);
 #endif
 
     /************************************************************************
@@ -234,7 +234,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     ************************************************************************/
 
 #if QS_DEBUG
-    printf("Square root:\n");
+    flint_printf("Square root:\n");
 #endif
 	
     fmpz_fdiv_q_ui(qs_inf->kn, qs_inf->kn, qs_inf->k); /* divide kn by multiplier */
@@ -271,13 +271,13 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     ************************************************************************/
 
 #if QS_DEBUG
-    printf("\nClean up:\n");
+    flint_printf("\nClean up:\n");
 #endif
 
     qsieve_ll_clear(qs_inf);
 
 #if QS_DEBUG
-    printf("\nDone.\n");
+    flint_printf("\nDone.\n");
 #endif
 
     return factor;

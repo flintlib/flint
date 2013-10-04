@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("mod2_precomp....");
+   flint_printf("mod2_precomp....");
    fflush(stdout);
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
@@ -55,15 +55,15 @@ int main(void)
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n = %lu, d = %lu, dpre = %f\n", n, d, dpre); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre); 
+         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

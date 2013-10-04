@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("powm_ui....");
+    flint_printf("powm_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -74,8 +74,8 @@ main(void)
         result = (mpz_cmp(e, f) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %lu, m = %Zd\n", d, e, f, x, m);
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %wu, m = %Zd\n", d, e, f, x, m);
             abort();
         }
 
@@ -110,11 +110,11 @@ main(void)
         result = (fmpz_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
-            printf("n = %lu\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
             abort();
         }
 
@@ -144,11 +144,11 @@ main(void)
         result = (fmpz_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
-            printf("n = %lu\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
             abort();
         }
 
@@ -176,10 +176,10 @@ main(void)
         result = (fmpz_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
-            printf("n = %lu\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
             abort();
         }
 
@@ -189,6 +189,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

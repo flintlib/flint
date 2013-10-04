@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
     if (argc != 3)
     {
-        printf("Syntax: crt <integer> <num_primes>\n");
+        flint_printf("Syntax: crt <integer> <num_primes>\n");
         return EXIT_FAILURE;
     }
 
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
     if (num_primes < 1)
     {
-        printf("Requires num_primes >= 1\n");
+        flint_printf("Requires num_primes >= 1\n");
         return EXIT_FAILURE;
     }
 
@@ -84,11 +84,11 @@ int main(int argc, char* argv[])
     fmpz_multi_CRT_ui(y, residues, comb, comb_temp, 1);
 
     for (i = 0; i < num_primes; i++)
-        printf("residue mod %lu = %lu\n", primes[i], residues[i]);
+        flint_printf("residue mod %wu = %wu\n", primes[i], residues[i]);
 
-    printf("reconstruction = ");
+    flint_printf("reconstruction = ");
     fmpz_print(y);
-    printf("\n");
+    flint_printf("\n");
 
     fmpz_clear(x);
     fmpz_clear(y);

@@ -42,7 +42,7 @@ int main(void)
     padic_ctx_t ctx;
     slong m, n;
 
-    printf("add... ");
+    flint_printf("add... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,10 +73,10 @@ int main(void)
         result = (padic_mat_equal(a, d) && padic_mat_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("b = "), padic_mat_print(b, ctx), printf("\n");
-            printf("d = "), padic_mat_print(d, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_mat_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -114,10 +114,10 @@ int main(void)
         result = (padic_mat_equal(b, d) && padic_mat_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("b = "), padic_mat_print(b, ctx), printf("\n");
-            printf("d = "), padic_mat_print(d, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_mat_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -155,12 +155,12 @@ int main(void)
         result = (padic_mat_equal(b, c) && padic_mat_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL (alias b = b + b):\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("b = "), padic_mat_print(b, ctx), printf("\n");
-            printf("c = "), padic_mat_print(c, ctx), printf("\n");
-            printf("N = %ld\n", N);
-            printf("p = "), fmpz_print(p), printf("\n");
+            flint_printf("FAIL (alias b = b + b):\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_mat_print(c, ctx), flint_printf("\n");
+            flint_printf("N = %wd\n", N);
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n");
             abort();
         }
 
@@ -199,11 +199,11 @@ int main(void)
         result = (padic_mat_equal(c, d) && padic_mat_is_reduced(c, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print_pretty(a, ctx), printf("\n");
-            printf("b = "), padic_mat_print_pretty(b, ctx), printf("\n");
-            printf("c = "), padic_mat_print_pretty(c, ctx), printf("\n");
-            printf("d = "), padic_mat_print_pretty(d, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_mat_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_mat_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_mat_print_pretty(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -239,9 +239,9 @@ int main(void)
         result = (padic_mat_equal(a, b) && padic_mat_is_canonical(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("b = "), padic_mat_print(b, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_mat_print(b, ctx), flint_printf("\n");
             abort();
         }
 
@@ -254,7 +254,7 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

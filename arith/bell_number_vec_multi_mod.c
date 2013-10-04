@@ -59,7 +59,7 @@ arith_bell_number_vec_multi_mod(fmpz * res, slong n)
 
     for (k = 0; k < num_primes; k++)
     {
-        /* printf("prime %ld of %ld\n", k, num_primes); */
+        /* flint_printf("prime %wd of %wd\n", k, num_primes); */
         polys[k] = _nmod_vec_init(n);
         nmod_init(&mod, primes[k]);
         arith_bell_number_nmod_vec(polys[k], n, mod);

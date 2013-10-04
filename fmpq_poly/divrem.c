@@ -106,12 +106,12 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception (fmpq_poly_divrem). Division by zero.\n");
+        flint_printf("Exception (fmpq_poly_divrem). Division by zero.\n");
         abort();
     }
     if (Q == R)
     {
-        printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
+        flint_printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
         abort();
     }
     

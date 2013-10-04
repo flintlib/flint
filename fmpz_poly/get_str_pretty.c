@@ -72,13 +72,13 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
     else if (poly[i] == -1L)
         str[off++] = '-';
     else if (!COEFF_IS_MPZ(poly[i]))
-        off += sprintf(str + off, "%ld*", poly[i]);
+        off += flint_sprintf(str + off, "%wd*", poly[i]);
     else
         off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
     if (i > 1)
-        off += sprintf(str + off, "%s^%ld", x, i);
+        off += flint_sprintf(str + off, "%s^%wd", x, i);
     else
-        off += sprintf(str + off, "%s", x);
+        off += flint_sprintf(str + off, "%s", x);
 
     for (--i; i > 0; --i)
     {
@@ -91,14 +91,14 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
         if (poly[i] != 1L && poly[i] != -1L)
         {
             if (!COEFF_IS_MPZ(poly[i]))
-                off += sprintf(str + off, "%ld*", poly[i]);
+                off += flint_sprintf(str + off, "%wd*", poly[i]);
             else
                 off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
         }
         if (i > 1)
-            off += sprintf(str + off, "%s^%ld", x, i);
+            off += flint_sprintf(str + off, "%s^%wd", x, i);
         else
-            off += sprintf(str + off, "%s", x);
+            off += flint_sprintf(str + off, "%s", x);
     }
 
     if (poly[i] != 0L)
@@ -106,7 +106,7 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
         if (fmpz_sgn(poly + i) > 0)
             str[off++] = '+';
         if (!COEFF_IS_MPZ(poly[i]))
-            off += sprintf(str + off, "%ld", poly[i]);
+            off += flint_sprintf(str + off, "%wd", poly[i]);
         else
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
     }

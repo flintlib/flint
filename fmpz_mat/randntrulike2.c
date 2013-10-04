@@ -37,7 +37,7 @@ fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulo
 
     if ((c != r) || (c != 2 * d))
     {
-        printf("Exception (fmpz_mat_randntrulike2). Ill-formed matrix.\n");
+        flint_printf("Exception (fmpz_mat_randntrulike2). Ill-formed matrix.\n");
         abort();
     }
 

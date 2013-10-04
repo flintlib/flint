@@ -43,8 +43,8 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
-        printf("Exception (qadic_ctx_init_conway).  Conway polynomials \n");
-        printf("are only available for primes up to 109987.\n");
+        flint_printf("Exception (qadic_ctx_init_conway).  Conway polynomials \n");
+        flint_printf("are only available for primes up to 109987.\n");
         abort();
     }
 
@@ -53,7 +53,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     if (!file)
     {
-        printf("Exception (qadic_ctx_init_conway).  File loading.\n");
+        flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
         abort();
     }
 
@@ -126,8 +126,8 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     fclose(file);
     flint_free(buf);
 
-    printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
-    printf("(p,d) = (%ld,%ld) is not present in the database.\n", *p, d);
+    flint_printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
+    flint_printf("(p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
     abort();
 }
 

@@ -50,7 +50,7 @@ void numerical_test(fmpq_t res, slong n, double ans)
 
     if (err > tol)
     {
-        printf("FAIL: %ld %.16f %.16f\n", n, mpq_get_d(tmp), ans);
+        flint_printf("FAIL: %wd %.16f %.16f\n", n, mpq_get_d(tmp), ans);
         abort();
     }
 
@@ -91,7 +91,7 @@ int main(void)
     mpq_t x, y;
     fmpq_t t;
 
-    printf("harmonic_number....");
+    flint_printf("harmonic_number....");
     fflush(stdout);
 
     fmpq_init(t);
@@ -106,7 +106,7 @@ int main(void)
 
         if (!mpq_equal(x, y))
         {
-            printf("FAIL: %ld\n", i);
+            flint_printf("FAIL: %wd\n", i);
             abort();
         }
     }
@@ -147,6 +147,6 @@ int main(void)
     fmpq_clear(t);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

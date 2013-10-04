@@ -462,7 +462,7 @@ _arith_number_of_partitions_mpfr(mpfr_t x, ulong n, slong N0, slong N)
 
 #if VERBOSE
     timeit_stop(t0);
-    printf("TERM 1: %ld ms\n", t0->cpu);
+    flint_printf("TERM 1: %wd ms\n", t0->cpu);
 #endif
 
     for (k = N0; k <= N; k++)

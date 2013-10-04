@@ -227,7 +227,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
     if (!fmpz_mat_is_square(A))
     {
-        printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
+        flint_printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
         abort();
     }
 

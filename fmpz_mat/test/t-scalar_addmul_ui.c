@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("scalar_add/submul_ui....");
+    flint_printf("scalar_add/submul_ui....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -67,7 +67,7 @@ main(void)
 
         if (!fmpz_mat_equal(B, C))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
@@ -79,6 +79,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("smul_ppmm....");
+   flint_printf("smul_ppmm....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -87,15 +87,15 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("m1 = %lu, m2 = %lu\n", n1, n2); 
-         printf("ph2 = %lu, ph1 = %lu, pl2 = %lu, pl1 = %lu\n", ph2, ph1, pl2, pl1);
+         flint_printf("FAIL:\n");
+         flint_printf("m1 = %wu, m2 = %wu\n", n1, n2); 
+         flint_printf("ph2 = %wu, ph1 = %wu, pl2 = %wu, pl1 = %wu\n", ph2, ph1, pl2, pl1);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

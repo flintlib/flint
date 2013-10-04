@@ -35,7 +35,7 @@ int main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor....");
+    flint_printf("factor....");
     fflush(stdout);
 
     /* Test random numbers */
@@ -58,8 +58,8 @@ int main(void)
         result = (n1 == n2);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            flint_printf("FAIL:\n");
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
             abort();
         }
     }
@@ -82,14 +82,14 @@ int main(void)
         result = (n1 == n2);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            flint_printf("FAIL:\n");
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
             abort();
         }
     }
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
