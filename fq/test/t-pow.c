@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        long d;
         fq_ctx_t ctx;
 
         fq_t a, b;
@@ -55,7 +55,6 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        N = z_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
         fq_init(a);
@@ -89,7 +88,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long d, N;
+        long d;
         fq_ctx_t ctx;
 
         fq_t a, b, c;
@@ -98,7 +97,6 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        N = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
         fq_init(a);

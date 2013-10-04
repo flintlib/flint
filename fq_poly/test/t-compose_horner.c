@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 50; i++)
     {
         fmpz_t p;
-        long d, len;
+        long d;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h;
@@ -54,7 +54,6 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
         fq_poly_init(f);
         fq_poly_init(g);
@@ -88,7 +87,7 @@ main(void)
     for (i = 0; i < 50; i++)
     {
         fmpz_t p;
-        long d, len;
+        long d;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h;
@@ -96,7 +95,6 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
         fq_poly_init(f);
         fq_poly_init(g);
@@ -130,7 +128,7 @@ main(void)
     for (i = 0; i < 50; i++)
     {
         fmpz_t p;
-        long d, len;
+        long d;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h, s, t;
@@ -139,7 +137,6 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
         fq_poly_init(f);
         fq_poly_init(g);

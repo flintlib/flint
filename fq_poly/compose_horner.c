@@ -57,7 +57,7 @@ void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1,
             _fq_poly_add(rop, t, lenr, op1 + i, 1, ctx);
         }
         
-        _fmpz_vec_clear(t, alloc);
+        _fmpz_vec_clear((fmpz*)t, alloc);
     }
 }
 

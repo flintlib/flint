@@ -29,7 +29,7 @@
 #include "fq.h"
 
 #ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT "/home/user/FLINT/flint-2/fq/CP.txt"
+#define FLINT_CPIMPORT "../qadic/CPimport.txt"
 #endif
 
 void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
@@ -49,8 +49,13 @@ void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 
     if (!file)
     {
-        printf("Exception (fq_ctx_init_conway).  File loading.\n");
-        abort();
+        file = fopen("../qadic/CPimport.txt", "r");
+
+        if (!file)
+        {
+            printf("Exception (fq_ctx_init_conway).  File loading.\n");
+            abort();
+        }
     }
 
     while (fgets(buf, 832, file))
