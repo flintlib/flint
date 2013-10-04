@@ -37,6 +37,12 @@ void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
 {
     const slong lenQ = lenA - lenB + 1;
 
+    if (lenA == lenB + 1)
+    {
+        _nmod_poly_divrem_q1 (Q, R, A, lenA, B, lenB, mod);
+        return;
+    }
+
     _nmod_poly_div_newton21_preinv (Q, A, lenA, B, lenB, Binv, lenBinv, mod);
 
     if (lenB > 1)
