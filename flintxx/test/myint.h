@@ -111,7 +111,7 @@ public:
 
     evaluated_t create_temporary() const
     {
-        return evaluated_t(0l);
+        return evaluated_t(WORD(0));
     }
 
 protected:
