@@ -36,9 +36,9 @@ int fmpz_fits_si(const fmpz_t f)
     else
     {
 #if defined(_WIN64)
-       return mpz_fits_slong_p(COEFF_TO_PTR(*f));
-#else
        return mpz_fits_si_p(COEFF_TO_PTR(*f));
+#else
+       return mpz_fits_slong_p(COEFF_TO_PTR(*f));
 #endif
     }
 }
