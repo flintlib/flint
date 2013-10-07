@@ -4437,7 +4437,7 @@ Padic_mat_expr transpose(Padic_mat_expr)
     Context
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-qadicxx_ctx::qadicxx_ctx(Fmpz_src p, slong dlong min, long max,
+qadicxx_ctx::qadicxx_ctx(Fmpz_src p, slong min, long max,
         padic_print_mode mode, const char* var = "x")
 
     Initialize a qadic context. See \code{qadic_ctx_init_conway}.
