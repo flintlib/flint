@@ -280,7 +280,7 @@ test_reduction_reconstruction()
     fmpq_matxx A(4, 7);
     frandxx state;
     A.set_randtest(state, 4);
-    fmpzxx M(123457891ul);
+    fmpzxx M(UWORD(123457891));
     fmpz_matxx Ar = fmpz_matxx::reduce(A, M);
     tassert(Ar.rows() == A.rows() && Ar.cols() == A.cols());
     for(slong i = 0;i < A.rows();++i)
