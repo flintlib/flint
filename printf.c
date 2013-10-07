@@ -38,38 +38,38 @@ int parse_fmt(int * floating, const char * fmt)
    fmt++; /* skip % */
    
    if (fmt[0] == '%')
-	   return 0; /* special case, print % */
+      return 0; /* special case, print % */
 
    if (fmt[0] == ' ' || fmt[0] == '+' || fmt[0] == '-')
-	   fmt++; /* skip flag */
+      fmt++; /* skip flag */
 
    if (fmt[0] == '*') 
    {
-	   args++;
-	   fmt++; /* skip * */
+      args++;
+      fmt++; /* skip * */
    } else
-	   while (isdigit(fmt[0]))
-		   fmt++; /* skip width */
+      while (isdigit(fmt[0]))
+         fmt++; /* skip width */
 
    if (fmt[0] == '.')
    {
       fmt++; /* skip . */
-	   if (fmt[0] == '*')
-	   {
-		   args++;
-	      fmt++; /* skip * */
+      if (fmt[0] == '*')
+      {
+         args++;
+         fmt++; /* skip * */
       } else
          while (isdigit(fmt[0]))
-		      fmt++; /* skip precision */
+            fmt++; /* skip precision */
    } 
 
    if (fmt[0] == 'h' || fmt[0] == 'l' || fmt[0] == 'L')
-	   fmt++; /* skip length */
+      fmt++; /* skip length */
 
    if (fmt[0] == 'e' || fmt[0] == 'E' || fmt[0] == 'f' || fmt[0] == 'g' || fmt[0] == 'G')
-	   (*floating) = 1;
+      (*floating) = 1;
    else 
-	   (*floating) = 0;
+      (*floating) = 0;
 
    return args;
 }
@@ -99,66 +99,66 @@ size_t flint_printf(const char * str, ...)
 
    while (len) /* deal with fmt spec prefixed strings */
    {
-	   n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
-	   strncpy(str2, str, n);
+      n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
+      strncpy(str2, str, n);
       str2[n] = '\0';
-	
+   
       switch (str[1])
-	   {
-	   case 'w':
-		   if (str[2] == 'x')
-		   {
-			   wu = (ulong) va_arg(ap, ulong);
-		      ret += printf(WORD_FMT "x", wu);
-			   ret += printf("%s", str2 + 3);
-		   } else if (str[2] == 'u')
+      {
+      case 'w':
+         if (str[2] == 'x')
          {
             wu = (ulong) va_arg(ap, ulong);
-		      ret += printf(WORD_FMT "u", wu);
+            ret += printf(WORD_FMT "x", wu);
+            ret += printf("%s", str2 + 3);
+         } else if (str[2] == 'u')
+         {
+            wu = (ulong) va_arg(ap, ulong);
+            ret += printf(WORD_FMT "u", wu);
             ret += printf("%s", str2 + 3);
          } else if (str[2] == 'd')
-		   {
-			   w = (slong) va_arg(ap, slong);
-		      ret += printf(WORD_FMT "d", w);
-			   ret += printf("%s", str2 + 3);
-		   } else
-		   {
-			   w = (slong) va_arg(ap, slong);
-		      ret += printf(WORD_FMT "d", w);
-			   ret += printf("%s", str2 + 2);
-		   }
-		   break;
-	   default: /* pass to printf */
-		   args = parse_fmt(&floating, str2);
-		   if (args) 
-		   {
-			   if (args == 3)
-	            w1 = va_arg(ap, int);
+         {
+            w = (slong) va_arg(ap, slong);
+            ret += printf(WORD_FMT "d", w);
+            ret += printf("%s", str2 + 3);
+         } else
+         {
+            w = (slong) va_arg(ap, slong);
+            ret += printf(WORD_FMT "d", w);
+            ret += printf("%s", str2 + 2);
+         }
+         break;
+      default: /* pass to printf */
+         args = parse_fmt(&floating, str2);
+         if (args) 
+         {
+            if (args == 3)
+               w1 = va_arg(ap, int);
             if (args >= 2)
-		         w2 = va_arg(ap, int);
+               w2 = va_arg(ap, int);
             if (floating)
-			   {
-				   d = va_arg(ap, double);
-				   if (args == 2)
-			         ret += printf(str2, w2, d);
-				   else if (args == 3)
-			         ret += printf(str2, w1, w2, d);
-				   else
-					   ret += printf(str2, d);
-			   } else
-			   {
-				   w3 = va_arg(ap, void *);
-			      if (args == 2)
-			         ret += printf(str2, w2, w3);
-				   else if (args == 3)
-			         ret += printf(str2, w1, w2, w3);
-				   else
-					   ret += printf(str2, w3);
-			   }
-	      } else ret += printf("%s", str2); /* zero args */
-	   }
+            {
+               d = va_arg(ap, double);
+               if (args == 2)
+                  ret += printf(str2, w2, d);
+               else if (args == 3)
+                  ret += printf(str2, w1, w2, d);
+               else
+                  ret += printf(str2, d);
+            } else
+            {
+               w3 = va_arg(ap, void *);
+               if (args == 2)
+                  ret += printf(str2, w2, w3);
+               else if (args == 3)
+                  ret += printf(str2, w1, w2, w3);
+               else
+                  ret += printf(str2, w3);
+            }
+         } else ret += printf("%s", str2); /* zero args */
+      }
 
-	   len -= n;
+      len -= n;
       str += n;
    }
 

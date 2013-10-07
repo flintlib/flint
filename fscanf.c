@@ -57,75 +57,75 @@ int flint_fscanf(FILE * f, const char * str, ...)
 
    while (len) /* deal with fmt spec prefixed strings */
    {
-	   n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
-	   strncpy(str2, str, n);
+      n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
+      strncpy(str2, str, n);
       str2[n] = '\0';
-	
+   
       switch (str[1])
-	   {
-	   case 'w':
-		   if (str[2] == 'x')
-		   {
-			   wu = (ulong *) va_arg(ap, ulong *);
-		      ret += fscanf(f, WORD_FMT "x", wu);
-			   if (!fread(str2 + 3, 1, n - 3, f) && n > 3)
-               goto cleanup;
-		   } else if (str[2] == 'u')
+      {
+      case 'w':
+         if (str[2] == 'x')
          {
             wu = (ulong *) va_arg(ap, ulong *);
-		      ret += fscanf(f, WORD_FMT "u", wu);
+            ret += fscanf(f, WORD_FMT "x", wu);
+            if (!fread(str2 + 3, 1, n - 3, f) && n > 3)
+               goto cleanup;
+         } else if (str[2] == 'u')
+         {
+            wu = (ulong *) va_arg(ap, ulong *);
+            ret += fscanf(f, WORD_FMT "u", wu);
             if (!fread(str2 + 3, 1, n - 3, f) && n > 3)
                goto cleanup;
          } else if (str[2] == 'd')
-		   {
-			   w = (slong *) va_arg(ap, slong *);
-		      ret += fscanf(f, WORD_FMT "d", w);
-			   if (!fread(str2 + 3, 1, n - 3, f) && n > 3)
+         {
+            w = (slong *) va_arg(ap, slong *);
+            ret += fscanf(f, WORD_FMT "d", w);
+            if (!fread(str2 + 3, 1, n - 3, f) && n > 3)
                goto cleanup;
-		   } else
-		   {
-			   w = (slong *) va_arg(ap, slong *);
-		      ret += fscanf(f, WORD_FMT "d", w);
-			   if (!fread(str2 + 2, 1, n - 2, f) && n > 2)
+         } else
+         {
+            w = (slong *) va_arg(ap, slong *);
+            ret += fscanf(f, WORD_FMT "d", w);
+            if (!fread(str2 + 2, 1, n - 2, f) && n > 2)
                goto cleanup;
-		   }
-		   break;
-	   default: /* pass to printf */
-		   args = parse_fmt(&floating, str2);
-		   if (args) 
-		   {
-			   if (args == 3)
-	            w1 = va_arg(ap, int *);
+         }
+         break;
+      default: /* pass to printf */
+         args = parse_fmt(&floating, str2);
+         if (args) 
+         {
+            if (args == 3)
+               w1 = va_arg(ap, int *);
             if (args >= 2)
-		         w2 = va_arg(ap, int *);
+               w2 = va_arg(ap, int *);
             if (floating)
-			   {
-				   d = va_arg(ap, double *);
-				   if (args == 2)
-			         ret += fscanf(f, str2, w2, d);
-				   else if (args == 3)
-			         ret += fscanf(f, str2, w1, w2, d);
-				   else
-					   ret += fscanf(f, str2, d);
-			   } else
-			   {
-				   w3 = va_arg(ap, void *);
-			      if (args == 2)
-			         ret += fscanf(f, str2, w2, w3);
-				   else if (args == 3)
-			         ret += fscanf(f, str2, w1, w2, w3);
-				   else
-					   ret += fscanf(f, str2, w3);
-			   }
-	      } else 
+            {
+               d = va_arg(ap, double *);
+               if (args == 2)
+                  ret += fscanf(f, str2, w2, d);
+               else if (args == 3)
+                  ret += fscanf(f, str2, w1, w2, d);
+               else
+                  ret += fscanf(f, str2, d);
+            } else
+            {
+               w3 = va_arg(ap, void *);
+               if (args == 2)
+                  ret += fscanf(f, str2, w2, w3);
+               else if (args == 3)
+                  ret += fscanf(f, str2, w1, w2, w3);
+               else
+                  ret += fscanf(f, str2, w3);
+            }
+         } else 
          {
             if (!fread(str2, 1, n, f) && n > 0) /* zero args */
                goto cleanup;
          }
                
-	   }
+      }
 
-	   len -= n;
+      len -= n;
       str += n;
    }
 

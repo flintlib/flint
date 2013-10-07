@@ -57,51 +57,51 @@ int flint_sscanf(const char * s, const char * str, ...)
 
    while (len) /* deal with fmt spec prefixed strings */
    {
-	   n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
-	   strncpy(str2, str, n);
+      n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
+      strncpy(str2, str, n);
       str2[n] = '\0';
-	
+   
       switch (str[1])
-	   {
-	   case 'w':
-		   if (str[2] == 'x')
-		   {
-			   wu = (ulong *) va_arg(ap, ulong *);
-		      ret += sscanf(s, WORD_FMT "x", wu);
-            s += sprintf(str2, WORD_FMT "x", *wu);
-            s += n - 3;
-		   } else if (str[2] == 'u')
+      {
+      case 'w':
+         if (str[2] == 'x')
          {
             wu = (ulong *) va_arg(ap, ulong *);
-		      ret += sscanf(s, WORD_FMT "u", wu);
+            ret += sscanf(s, WORD_FMT "x", wu);
+            s += sprintf(str2, WORD_FMT "x", *wu);
+            s += n - 3;
+         } else if (str[2] == 'u')
+         {
+            wu = (ulong *) va_arg(ap, ulong *);
+            ret += sscanf(s, WORD_FMT "u", wu);
             s += sprintf(str2, WORD_FMT "u", *wu);
             s += n - 3;
          } else if (str[2] == 'd')
-		   {
-			   w = (slong *) va_arg(ap, slong *);
-		      ret += sscanf(s, WORD_FMT "d", w);
+         {
+            w = (slong *) va_arg(ap, slong *);
+            ret += sscanf(s, WORD_FMT "d", w);
             s += sprintf(str2, WORD_FMT "d", *w);
             s += n - 3;
-		   } else
-		   {
-			   w = (slong *) va_arg(ap, slong *);
-		      ret += sscanf(s, WORD_FMT "d", w);
+         } else
+         {
+            w = (slong *) va_arg(ap, slong *);
+            ret += sscanf(s, WORD_FMT "d", w);
             s += sprintf(str2, WORD_FMT "d", *w);
             s += n - 2;
-		   }
-		   break;
-	   default: /* pass to printf */
-		   args = parse_fmt(&floating, str2);
-		   if (args) 
-		   {
-			   if (args == 3)
-	            w1 = va_arg(ap, int *);
+         }
+         break;
+      default: /* pass to printf */
+         args = parse_fmt(&floating, str2);
+         if (args) 
+         {
+            if (args == 3)
+               w1 = va_arg(ap, int *);
             if (args >= 2)
-		         w2 = va_arg(ap, int *);
+               w2 = va_arg(ap, int *);
             if (floating)
-			   {
-				   d = va_arg(ap, double *);
-				   if (args == 2)
+            {
+               d = va_arg(ap, double *);
+               if (args == 2)
                {
                   ret += sscanf(s, str2, w2, d);
                   s += sprintf(s2, str2, *w2, *d);
@@ -111,35 +111,35 @@ int flint_sscanf(const char * s, const char * str, ...)
                   ret += sscanf(s, str2, w1, w2, d);
                   s += sprintf(s2, str2, *w1, *w2, *d);
                }
-				   else
+               else
                {
                   ret += sscanf(s, str2, d);
                   s += sprintf(s2, str2, *d);
                }
-			   } else
-			   {
-				   w3 = va_arg(ap, void **);
-			      if (args == 2)
+            } else
+            {
+               w3 = va_arg(ap, void **);
+               if (args == 2)
                {
                   ret += sscanf(s, str2, w2, w3);
                   s += sprintf(s2, str2, *w2, *w3);
                }
-				   else if (args == 3)
+               else if (args == 3)
                {
                   ret += sscanf(s, str2, w1, w2, w3);
                   s += sprintf(s2, str2, *w1, *w2, *w3);
                }
-				   else
+               else
                {
                   ret += sscanf(s, str2, w3);
                   s += sprintf(s2, str2, *w3);
                }
-			   }
+            }
          } else /* zero args */
             s += n;
-	   }
+      }
 
-	   len -= n;
+      len -= n;
       str += n;
    }
 
