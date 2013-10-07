@@ -29,6 +29,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
+#include "limits.h"
 #include "longlong.h"
 #include "config.h"
 
@@ -65,10 +66,14 @@ void flint_cleanup(void);
 #define WORD_FMT "%ll"
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
+#define UWORD_MAX ULLONG_MAX
+#define WORD_MAX LLONG_MAX
 #else
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
 #define WORD_FMT "%l"
+#define UWORD_MAX ULONG_MAX
+#define WORD_MAX LONG_MAX
 #endif
 
 #if __GMP_BITS_PER_MP_LIMB == 64

@@ -97,7 +97,7 @@ main(void)
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         padic_poly_init2(f,  0, N);
-        padic_poly_init2(g,  0, LONG_MAX);  /* TODO:  Check this is OK */
+        padic_poly_init2(g,  0, WORD_MAX);  /* TODO:  Check this is OK */
         padic_poly_init2(h1, 0, N);
         padic_poly_init2(h2, 0, N);
 

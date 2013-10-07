@@ -84,7 +84,7 @@ main(void)
         ulong n;
 
         n = n_randtest_not_zero(state);
-        if (n > LONG_MAX)
+        if (n > WORD_MAX)
             n >>= 1;
 
         fmpq_poly_init(a);

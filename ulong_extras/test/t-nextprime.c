@@ -50,9 +50,9 @@ int main(void)
         abort();
     }
 
-    if (n_nextprime(ULONG_MAX_PRIME - 1, 0) != ULONG_MAX_PRIME)
+    if (n_nextprime(UWORD_MAX_PRIME - 1, 0) != UWORD_MAX_PRIME)
     {
-        flint_printf("FAIL: expected n_nextprime(ULONG_MAX_PRIME-1) = ULONG_MAX_PRIME");
+        flint_printf("FAIL: expected n_nextprime(UWORD_MAX_PRIME-1) = UWORD_MAX_PRIME");
         abort();
     }
 

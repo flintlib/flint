@@ -58,14 +58,14 @@ main(void)
     fmpz_set_si(x, COEFF_MAX);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     fmpz_neg(x, x);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     fmpz_add_ui(x, x, UWORD(1));
     check(x, 0);
 

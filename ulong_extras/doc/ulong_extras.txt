@@ -74,7 +74,7 @@ mp_limb_t n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
-    values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased
+    values $0$, $1$, \code{COEFF_MAX} and \code{WORD_MAX} is increased
     as is the probability of a value with sparse binary representation.  
     This random function is mainly used for testing purposes.
     This function is intended for use in test code. 

@@ -61,20 +61,20 @@ main(void)
     fmpz_set_si(x, COEFF_MAX);
     check(x, 1);
 
-    fmpz_set_si(x, LONG_MAX);
+    fmpz_set_si(x, WORD_MAX);
     check(x, 1);
 
     fmpz_set_si(x, LONG_MIN);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     check(x, 0);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     fmpz_neg(x, x);
     check(x, 0);
 
-    fmpz_set_si(x, LONG_MAX);
+    fmpz_set_si(x, WORD_MAX);
     fmpz_add_ui(x, x, 1);
     check(x, 0);
 

@@ -807,14 +807,14 @@ general
 ulong_extras
 ------------
   * implemented the improved Lehman algorithm
-  * added n_jacobi_unsigned to allow n > LONG_MAX
-  * fixed n_sqrtmod for n > LONG_MAX
+  * added n_jacobi_unsigned to allow n > WORD_MAX
+  * fixed n_sqrtmod for n > WORD_MAX
   * fixed bug causing n_sqrtmod to hang
   * added sublinear algorithm for computing factorials mod p
   * added n_sqrtmod_primepow, n_sqrtmodn and associated functions for
     computing square roots modulo composite integers
   * fixed bugs in n_is_prime_pocklington
-  * fixed ULONG_MAX case in powmod and powmod2
+  * fixed UWORD_MAX case in powmod and powmod2
   * fixed problems with the random number generators
   * fixed rare bug in n_mod_precomp
   * fixed rare bug in n_is_prime_pseudosquare

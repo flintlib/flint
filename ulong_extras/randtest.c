@@ -51,8 +51,8 @@ mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
             case 0:  n = 0;         break;
             case 1:  n = 1;         break;
             case 2:  n = COEFF_MAX; break;
-            case 3:  n = LONG_MAX;  break;
-            case 4:  n = ULONG_MAX; break;
+            case 3:  n = WORD_MAX;  break;
+            case 4:  n = UWORD_MAX; break;
             case 5:  n =  (UWORD(1)<<n_randint(state, FLINT_BITS)) 
                         - (UWORD(1)<<n_randint(state, FLINT_BITS));
                                     break;

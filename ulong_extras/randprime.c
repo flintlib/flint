@@ -46,7 +46,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
     if (bits == FLINT_BITS)
     {
         do { rand = n_randbits(state, bits); }
-            while (rand >= ULONG_MAX_PRIME);
+            while (rand >= UWORD_MAX_PRIME);
 
         rand = n_nextprime(rand, proved);
     }

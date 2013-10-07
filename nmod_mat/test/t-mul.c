@@ -87,11 +87,11 @@ main(void)
                 mod = n_randtest_not_zero(state);
                 break;
             case 1:
-                mod = ULONG_MAX/2 + 1 - n_randbits(state, 4);
+                mod = UWORD_MAX/2 + 1 - n_randbits(state, 4);
                 break;
             case 2:
             default:
-                mod = ULONG_MAX - n_randbits(state, 4);
+                mod = UWORD_MAX - n_randbits(state, 4);
                 break;
         }
 

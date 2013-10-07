@@ -71,7 +71,7 @@ static __inline__ slong _fmpz_vec_ord_p(const fmpz *vec, slong len, const fmpz_t
     else
     {
         fmpz_t t;
-        slong i, min = LONG_MAX, v;
+        slong i, min = WORD_MAX, v;
 
         fmpz_init(t);
         for (i = 0; (min > 0) && (i < len); i++)
@@ -83,7 +83,7 @@ static __inline__ slong _fmpz_vec_ord_p(const fmpz *vec, slong len, const fmpz_t
             }
         }
         fmpz_clear(t);
-        return (min < LONG_MAX) ? min : 0;
+        return (min < WORD_MAX) ? min : 0;
     }
 }
 

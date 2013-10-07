@@ -63,7 +63,7 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
     lo = n;
     n--;
 
-    /* TODO: speedup for n in the range of sqrt(ULONG_MAX) */
+    /* TODO: speedup for n in the range of sqrt(UWORD_MAX) */
     while (n > MAX_SMALL_FACTORIAL)
     {
         umul_ppmm(hi, lo, lo, n);

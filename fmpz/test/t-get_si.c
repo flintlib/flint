@@ -70,7 +70,7 @@ main(void)
     fmpz_set_si(x, LONG_MIN);
     if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
     {
-        flint_printf("FAIL: LONG_MAX");
+        flint_printf("FAIL: WORD_MAX");
         abort();
     }
 

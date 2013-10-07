@@ -79,9 +79,9 @@ int main(void)
     mpz_init(y);
 
     /* Some corner cases */
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     check(x);
-    fmpz_set_si(x, LONG_MAX);
+    fmpz_set_si(x, WORD_MAX);
     check(x);
     fmpz_set_si(x, LONG_MIN);
     check(x);

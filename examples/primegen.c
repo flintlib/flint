@@ -42,9 +42,9 @@ int main(int argc, char* argv[])
     }
 
     N = strtoul(argv[argc-1], NULL, 10);
-    if (N == ULONG_MAX)
+    if (N == UWORD_MAX)
     {
-        flint_printf("N must be smaller than %wu\n", ULONG_MAX);
+        flint_printf("N must be smaller than %wu\n", UWORD_MAX);
         return EXIT_FAILURE;
     }
 
