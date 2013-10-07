@@ -6,7 +6,11 @@
 #ifdef POPCNT_INTRINSICS
 static __inline__ mp_bitcnt_t shortCount(slong val)
 {
-        return __builtin_popcountl(val);
+#if defined(_WIN64)
+   return __builtin_popcountll(val);  
+#else
+   return __builtin_popcountl(val);
+#endif
 }
 #else
 /* A naive implementation if neither your processor nor your compiler want to
