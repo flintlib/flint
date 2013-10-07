@@ -319,7 +319,7 @@ test_traits()
 
     tassert(is_tuple<empty_tuple>::val == true);
     tassert(is_tuple<make_tuple<int>::type>::val == true);
-    tassert((is_tuple<make_tuple<int, long>::type>::val == true));
+    tassert((is_tuple<make_tuple<int, slong>::type>::val == true));
     tassert(is_tuple<int>::val == false);
 }
 
@@ -328,7 +328,7 @@ struct filler
     template<class T>
     T create() const
     {
-        if(mp::equal_types<T, long>::val)
+        if(mp::equal_types<T, slong>::val)
             return 1;
         return 0;
     }
@@ -352,7 +352,7 @@ test_htuples()
     tassert(htuples::removeres(tpl, 3) == make2::make(1, 2));
     tassert(htuples::removeres(tpl, 4) == make2::make(1, 2));
 
-    typedef make_tuple<int, long, int> maker3;
+    typedef make_tuple<int, slong, int> maker3;
     tassert((maker3::make(0, 1, 0) == htuples::fill<maker3::type>(filler())));
 }
 
@@ -391,9 +391,9 @@ void
 test_equals_elementwise()
 {
     tassert((make_tuple<int, int, int>::make(1, 2, 3).equals_elementwise(
-                    make_tuple<int, char, long>::make(1, 2, 3))));
+                    make_tuple<int, char, slong>::make(1, 2, 3))));
     tassert((!make_tuple<int, int, int>::make(0, 2, 3).equals_elementwise(
-                    make_tuple<int, char, long>::make(1, 2, 3))));
+                    make_tuple<int, char, slong>::make(1, 2, 3))));
 }
 
 int

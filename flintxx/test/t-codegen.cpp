@@ -219,12 +219,12 @@ void name args
 #endif
 
 DEFINE_FUNC(test_tuple_merge_1,
-        (int& o1, int& o2, int& o3, int i1, long i2, char i3, int i4))
+        (int& o1, int& o2, int& o3, int i1, slong i2, char i3, int i4))
 {
-    typedef make_tuple<long, int, char> make3;
+    typedef make_tuple<slong, int, char> make3;
     typedef make_tuple<int, int> make2;
     typedef merge_tuple<make3::type, make2::type> merge;
-    merge::type merged; // <char, int, long, int>
+    merge::type merged; // <char, int, slong, int>
     merged.head = i3;
     merged.tail.head = i1;
     merged.tail.tail.head = i2;
@@ -236,7 +236,7 @@ DEFINE_FUNC(test_tuple_merge_1,
 }
 
 DEFINE_FUNC(test_tuple_merge_2,
-        (int& o1, int& o2, int& o3, int i1, long i2, char i3, int i4))
+        (int& o1, int& o2, int& o3, int i1, slong i2, char i3, int i4))
 {
     o1 = i2;
     o2 = i1;
@@ -266,9 +266,9 @@ DEFINE_FUNC(test_tuple_concat_2,
 }
 
 DEFINE_FUNC(test_tuple_back_1,
-        (make_tuple<int, long, char>::type& out, int i1, long i2, char i3))
+        (make_tuple<int, slong, char>::type& out, int i1, slong i2, char i3))
 {
-    typedef make_tuple<int*, long*, char*>::type type;
+    typedef make_tuple<int*, slong*, char*>::type type;
     type pointers;
     back_tuple<type>::init(pointers, out, 0);
     *pointers.head = i1;
@@ -277,7 +277,7 @@ DEFINE_FUNC(test_tuple_back_1,
 }
 
 DEFINE_FUNC(test_tuple_back_2,
-        (make_tuple<int, long, char>::type& out, int i1, long i2, char i3))
+        (make_tuple<int, slong, char>::type& out, int i1, slong i2, char i3))
 {
     out.head = i1;
     out.tail.head = i2;

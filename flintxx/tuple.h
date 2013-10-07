@@ -164,7 +164,7 @@ namespace mp {
 // tuples.
 // Typical usage:
 // typedef make_tuple<int, char, slong> maker;
-// maker::type my_tuple = maker::make(1, 'a', 2l);
+// maker::type my_tuple = maker::make(1, 'a', WORD(2));
 // TODO this would be a prime use for variadic templates ...
 #define FLINTXX_MAKE_TUPLE_TEMPLATE_ARGS \
     class T1 = detail::UNUSED, class T2 = detail::UNUSED, \
