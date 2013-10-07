@@ -60,15 +60,15 @@ main(void)
         abort();
     }
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    fmpz_set_si(x, WORD_MIN);
+    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != WORD_MIN)
     {
-        flint_printf("FAIL: LONG_MIN");
+        flint_printf("FAIL: WORD_MIN");
         abort();
     }
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    fmpz_set_si(x, WORD_MIN);
+    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != WORD_MIN)
     {
         flint_printf("FAIL: WORD_MAX");
         abort();

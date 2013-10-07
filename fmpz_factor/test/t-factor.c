@@ -83,7 +83,7 @@ int main(void)
     check(x);
     fmpz_set_si(x, WORD_MAX);
     check(x);
-    fmpz_set_si(x, LONG_MIN);
+    fmpz_set_si(x, WORD_MIN);
     check(x);
     fmpz_set_si(x, COEFF_MAX);
     check(x);

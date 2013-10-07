@@ -53,7 +53,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     }
     else
     {
-        if (c > LONG_MIN || fmpz_cmp_ui(gcd, - (ulong) LONG_MIN))
+        if (c > WORD_MIN || fmpz_cmp_ui(gcd, - (ulong) WORD_MIN))
         {
             slong g = fmpz_get_si(gcd);
 
@@ -63,7 +63,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
         else
         {
             _fmpz_vec_neg(rpoly, poly, len);
-            fmpz_divexact_ui(rden, den, - (ulong) LONG_MIN);
+            fmpz_divexact_ui(rden, den, - (ulong) WORD_MIN);
         }
     }
     fmpz_clear(gcd);

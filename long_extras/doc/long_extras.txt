@@ -47,7 +47,7 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
     Returns a pseudo random number with a random number of bits, from 
     $0$ to \code{FLINT_BITS}.  The probability of the special values $0$, 
     $\pm 1$, \code{COEFF_MAX}, \code{COEFF_MIN}, \code{WORD_MAX} and 
-    \code{LONG_MIN} is increased.
+    \code{WORD_MIN} is increased.
 
     This random function is mainly used for testing purposes.
 

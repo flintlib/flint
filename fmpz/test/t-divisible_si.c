@@ -55,7 +55,7 @@ main(void)
         mpz_init(d);
 
         a = z_randtest(state);
-        if (a == LONG_MIN)
+        if (a == WORD_MIN)
             a = 1;
         a = FLINT_ABS(a) + 1;
         fmpz_randtest(b, state, 200);
@@ -89,7 +89,7 @@ main(void)
         mpz_init(d);
 
         a = z_randtest(state);
-        if (a == LONG_MIN)
+        if (a == WORD_MIN)
             a = 1;
         a = FLINT_ABS(a) + 1;
         fmpz_randtest(b, state, 200);

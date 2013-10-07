@@ -53,7 +53,7 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
             case 3:  z = COEFF_MAX; break;
             case 4:  z = COEFF_MIN; break;
             case 5:  z = WORD_MAX;  break;
-            case 6:  z = LONG_MIN;  break;
+            case 6:  z = WORD_MIN;  break;
             default: z = 0;
         }
     }

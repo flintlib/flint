@@ -67,13 +67,17 @@ void flint_cleanup(void);
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
 #define UWORD_MAX ULLONG_MAX
+#define UWORD_MIN ULLONG_MIN
 #define WORD_MAX LLONG_MAX
+#define WORD_MIN LLONG_MIN
 #else
+#define WORD_FMT "%l"
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
-#define WORD_FMT "%l"
 #define UWORD_MAX ULONG_MAX
+#define UWORD_MIN ULONG_MIN
 #define WORD_MAX LONG_MAX
+#define WORD_MIN LONG_MIN
 #endif
 
 #if __GMP_BITS_PER_MP_LIMB == 64

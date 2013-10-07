@@ -47,7 +47,7 @@ int main(void)
       {
          d = n_randtest_not_zero(state);
          nh = n_randtest(state);
-      } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == LONG_MIN));
+      } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == WORD_MIN));
 
       nl = n_randtest(state);
 

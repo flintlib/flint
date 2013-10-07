@@ -39,7 +39,7 @@ static void check(fmpz_t x, int expected)
         flint_printf("FAIL:\n\n");
         flint_printf("x = "), fmpz_print(x), flint_printf("\n");
         flint_printf("fmpz_fits_si(x) = %d\n", fmpz_fits_si(x));
-        flint_printf("LONG_MIN = %wd\n", LONG_MIN);
+        flint_printf("WORD_MIN = %wd\n", WORD_MIN);
         abort();
     }
 }
@@ -64,7 +64,7 @@ main(void)
     fmpz_set_si(x, WORD_MAX);
     check(x, 1);
 
-    fmpz_set_si(x, LONG_MIN);
+    fmpz_set_si(x, WORD_MIN);
     check(x, 1);
 
     fmpz_set_ui(x, UWORD_MAX);
@@ -78,7 +78,7 @@ main(void)
     fmpz_add_ui(x, x, 1);
     check(x, 0);
 
-    fmpz_set_si(x, LONG_MIN);
+    fmpz_set_si(x, WORD_MIN);
     fmpz_sub_ui(x, x, 1);
     check(x, 0);
 
@@ -88,7 +88,7 @@ main(void)
         fmpz_mul_2exp(x, x, i);
         check(x, i < FLINT_BITS - 1);
         fmpz_neg(x, x);
-        check(x, i < FLINT_BITS);  /* LONG_MIN fits */
+        check(x, i < FLINT_BITS);  /* WORD_MIN fits */
     }
 
     fmpz_clear(x);
