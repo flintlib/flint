@@ -67,7 +67,7 @@ test_bell()
     fmpz_vecxx v(bell_number_vec(10));
     tassert(v == bell_number_vec_recursive(10));
     tassert(v == bell_number_vec_multi_mod(10));
-    for(long i = 0;i < v.size();++i)
+    for(slong i = 0;i < v.size();++i)
         tassert(v[i] == bell_number(static_cast<unsigned>(i)));
     tassert(bell_number(10u) == bell_number_bsplit(10u));
     tassert(bell_number(10u) == bell_number_multi_mod(10u));
@@ -76,7 +76,7 @@ test_bell()
     tassert(bell_number_nmod(10u, p) == nmodxx::red(bell_number(10u), p));
     nmod_vecxx v2(bell_number_nmod_vec(10u, p));
     tassert(v2.size() == 10);
-    for(long i = 0;i < v2.size();++i)
+    for(slong i = 0;i < v2.size();++i)
         tassert(v2[i] == nmodxx::red(v[i], p));
 
     tassert(v2 == bell_number_nmod_vec_series(10u, p));
@@ -96,7 +96,7 @@ test_bernoulli()
             > bernoulli_number(10u));
     fmpq_polyxx poly(bernoulli_polynomial(10u));
     tassert(poly.degree() == 10);
-    for(long i = 0;i < poly.length();++i)
+    for(slong i = 0;i < poly.length();++i)
         tassert(poly.get_coeff(i)
                 == fmpqxx(bin(10u, (unsigned) i)*bernoulli_number(10u - (unsigned) i)));
     tassert(bernoulli_number_vec(10u).size() == 10);
