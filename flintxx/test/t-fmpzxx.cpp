@@ -85,10 +85,10 @@ test_order()
     TO(a, 0u, 1u, -1);
     TO(a, (signed short)(0), (signed short)(1), (signed short)(-1));
     TO(a, (unsigned short)(0), (unsigned short)(1), -1);
-    TO(a, 0l, 1l, -1l);
+    TO(a, WORD(0), WORD(1), WORD(-1));
     TO(0, c, b, d);
     TO(0u, c, b, d);
-    TO(0l, c, b, d);
+    TO(WORD(0), c, b, d);
     TO((short)0, c, b, d);
     TO((unsigned short)0, c, b, d);
 }
@@ -106,11 +106,11 @@ test_conversion()
 void
 test_initialisation_assignment()
 {
-    fmpzxx a(4), b(4l), c(4u), d("4");
+    fmpzxx a(4), b(WORD(4)), c(4u), d("4");
     fmpzxx e(a);
     fmpzxx f, g, h, i;
     f = 4;
-    g = 4l;
+    g = WORD(4);
     h = 4u;
     i = fmpzxx("4");
     tassert(a == b && a == c&& a == d && a == e && a == f && a == g && a == h
@@ -152,11 +152,11 @@ test_arithmetic()
 
     TA(fmpzxx(7), fmpzxx(3));
     TA(fmpzxx(7), 3u);
-    TAC(7ul, fmpzxx(3));
+    TAC(UWORD(7), fmpzxx(3));
 
     // test signed builtins (only div and mul)
     tassert(-7 * fmpzxx(3) == -21);
-    tassert(fmpzxx(7) * (-3l) == -21);
+    tassert(fmpzxx(7) * (WORD(-3)) == -21);
     tassert(fmpzxx(21) / -3 == -7);
 
     // test composite arithmetic
@@ -191,8 +191,8 @@ test_arithmetic()
     // binary logic
     tassert((fmpzxx(1) | fmpzxx(2)) == 3);
     tassert((fmpzxx(3) & fmpzxx(5)) == 1);
-    tassert((fmpzxx(17) ^ fmpzxx(23)) == (17ul ^ 23ul));
-    tassert(~fmpzxx(17) == ~17l);
+    tassert((fmpzxx(17) ^ fmpzxx(23)) == (UWORD(17) ^ UWORD(23)));
+    tassert(~fmpzxx(17) == ~WORD(17));
 }
 
 void
@@ -271,9 +271,9 @@ test_functions()
     // TODO gcdinv, xgcd
 
     // check member functions
-    long exp = 0;
+    slong exp = 0;
     double d = fmpzxx(3).get_d_2exp(exp);
-    double r = d * (1l << exp);
+    double r = d * (WORD(1) << exp);
     tassert(r >= 2.9 && r <= 3.1);
     fmpzxx one(1), mone(-1), zero(0), two(2);
     tassert(one.is_one() && one.is_pm1() && one.is_odd() &&
@@ -381,19 +381,19 @@ test_ternary()
     do{ struct inner { static void doit() { \
     fmpzxx b(2), c(3), d(4); \
     tassert(count_temporaries2(m1 + m2*m3) == ntemps); \
-    tassert(b + (m1 + m2*m3) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    tassert(b + (m1 + m2*m3) == 2 + m1.to<slong>() + m2.to<slong>()*m3.to<slong>()); \
     tassert(count_temporaries2(m1 + m3*m2) == ntemps); \
-    tassert(b + (m1 + m3*m2) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    tassert(b + (m1 + m3*m2) == 2 + m1.to<slong>() + m2.to<slong>()*m3.to<slong>()); \
     \
     tassert(count_temporaries2(m2*m3 + m1) == ntemps); \
-    tassert(b + (m2*m3 + m1) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    tassert(b + (m2*m3 + m1) == 2 + m1.to<slong>() + m2.to<slong>()*m3.to<slong>()); \
     tassert(count_temporaries2(m1 + m3*m2) == ntemps); \
-    tassert(b + (m3*m2 + m1) == 2 + m1.to<long>() + m2.to<long>()*m3.to<long>()); \
+    tassert(b + (m3*m2 + m1) == 2 + m1.to<slong>() + m2.to<slong>()*m3.to<slong>()); \
     \
     tassert(count_temporaries2(m1 - m2*m3) == ntemps); \
-    tassert(b + (m1 - m2*m3) == 2 + m1.to<long>() - m2.to<long>()*m3.to<long>()); \
+    tassert(b + (m1 - m2*m3) == 2 + m1.to<slong>() - m2.to<slong>()*m3.to<slong>()); \
     tassert(count_temporaries2(m1 - m3*m2) == ntemps); \
-    tassert(b + (m1 - m3*m2) == 2 + m1.to<long>() - m2.to<long>()*m3.to<long>()); \
+    tassert(b + (m1 - m3*m2) == 2 + m1.to<slong>() - m2.to<slong>()*m3.to<slong>()); \
     } }; inner::doit();} while(0)
 #define TT(m1, m2, ntemps) TT3(m1, m2, d, ntemps)
 
@@ -491,7 +491,7 @@ test_references()
     tassert(rfac(acr, 1u) == 2);
 
     ar = bin(4u, 2u); tassert(acr == 6);
-    tassert(acr.to<long>() == 6l);
+    tassert(acr.to<slong>() == WORD(6));
     tassert(ar.to_string() == "6");
     ar += b;
     ar += bcr;

@@ -140,7 +140,7 @@ public:
     void set_one() {fmpz_one(_fmpz());}
 
     // These make sense with all expressions, but cause evaluation
-    double get_d_2exp(long& exp) const
+    double get_d_2exp(slong& exp) const
     {
         return fmpz_get_d_2exp(&exp, this->evaluate()._fmpz());
     }
@@ -206,25 +206,25 @@ public:
         return fmpz_divisible_si(this->evaluate()._fmpz(), t2);
     }
     template<class Fmpz2>
-    typename mp::enable_all_fmpzxx<long, Fmpz2>::type
+    typename mp::enable_all_fmpzxx<slong, Fmpz2>::type
     clog(const Fmpz2& b) const
     {
         return fmpz_clog(this->evaluate()._fmpz(), b.evaluate()._fmpz());
     }
     template<class Int>
-    typename mp::enable_if<traits::is_unsigned_integer<Int>, long>::type
+    typename mp::enable_if<traits::is_unsigned_integer<Int>, slong>::type
     clog(Int b) const
     {
         return fmpz_clog_ui(this->evaluate()._fmpz(), b);
     }
     template<class Fmpz2>
-    typename mp::enable_all_fmpzxx<long, Fmpz2>::type
+    typename mp::enable_all_fmpzxx<slong, Fmpz2>::type
     flog(const Fmpz2& b) const
     {
         return fmpz_flog(this->evaluate()._fmpz(), b.evaluate()._fmpz());
     }
     template<class Int>
-    typename mp::enable_if<traits::is_unsigned_integer<Int>, long>::type
+    typename mp::enable_if<traits::is_unsigned_integer<Int>, slong>::type
     flog(Int b) const
     {
         return fmpz_flog_ui(this->evaluate()._fmpz(), b);
@@ -521,14 +521,14 @@ divisible(const T1& t1, const T2& t2)
 }
 
 template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<long, Fmpz1>::type
+inline typename mp::enable_all_fmpzxx<slong, Fmpz1>::type
 clog(const Fmpz1& x, const Fmpz2& b)
 {
     return x.clog(b);
 }
 
 template<class Fmpz1, class Fmpz2>
-inline typename mp::enable_all_fmpzxx<long, Fmpz1>::type
+inline typename mp::enable_all_fmpzxx<slong, Fmpz1>::type
 flog(const Fmpz1& x, const Fmpz2& b)
 {
     return x.flog(b);
