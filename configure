@@ -267,9 +267,11 @@ if [ -z "$BUILD" ]; then
    ARCH=`uname -m`
 
    if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
-      OS="MINGW32"
-   elif [ "$(uname | cut -d_ -f1)" = "MINGW64" ]; then
-      OS="MINGW64"
+      if [ "$ABI" = "32" ]; then
+         OS="MINGW32"
+      else
+         OS="MINGW64"
+      fi
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
       OS="CYGWIN"
    else
@@ -316,6 +318,9 @@ elif [ "$ABI" = "64" ]; then
    ABI_FLAG="-m64"
    if [ "$MACHINE" = "sparc" ]; then
       MACHINE="sparc64"
+   fi
+   if [ "$MACHINE" = "x86" ]; then
+      MACHINE="x86_64"
    fi
 fi
 
@@ -408,7 +413,11 @@ fi
 #defaults for CFLAGS
 
 if [ -z "$CFLAGS" ]; then
-   CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   if [ "$OS" = "MINGW64" ]; then
+      CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   else
+      CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   fi
 fi
 
 #Conway polynomials database
