@@ -352,7 +352,7 @@ case "$OS" in
       if [ "$STATIC" = "1" ] && [ "$SHARED" = "1" ]; then
          echo "Building both static and shared versions of MPIR/GMP on $OS is currently"
          echo "unsupported, and so is it for MPFR and FLINT."
-         echo "You should pass --disable--shared or --disable-static to configure"
+         echo "You should pass --disable-shared or --disable-static to configure"
          echo "depending on the versions of MPIR/GMP and MPFR you built."
          exit 1
       fi
