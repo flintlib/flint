@@ -78,6 +78,11 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
     }
 }
 
+void fmpz_set_ZZ_p(fmpz_t rop, const ZZ_p& op) 
+{
+    fmpz_set_ZZ(rop, rep(op));
+}
+
 void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
 {
    mp_limb_t *xp;
@@ -108,6 +113,13 @@ void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
    
    if (fmpz_sgn(op) < 0) ZZ_SIZE(*x) = -lw;
    else ZZ_SIZE(*x) = lw;
+}
+
+void fmpz_get_ZZ_p(ZZ_p& rop, const fmpz_t op) 
+{
+    ZZ a;
+    fmpz_get_ZZ(a, op);
+    conv(rop, a);
 }
 
 void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
@@ -154,6 +166,149 @@ void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
         }
     }
 }
+
+
+void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op)
+{
+    const slong len = op->length;
+
+    if (len == 0)
+    {
+        rop = 0;
+    }
+    else
+    {
+        slong i;
+        ZZ_p *ap;
+
+        rop.rep.SetLength(len);
+
+        for (i = 0, ap = rop.rep.elts(); i < len; i++, ap++)
+        {
+            fmpz_get_ZZ_p(*ap, op->coeffs + i);
+        }
+    }
+}
+
+void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op)
+{
+    const slong len = deg(op) + 1;
+
+    if (len == 0)
+    {
+        fmpz_mod_poly_zero(rop);
+    }
+    else
+    {
+        slong i;
+        const ZZ_p *ap; 
+
+        fmpz_mod_poly_fit_length(rop, len);
+        _fmpz_mod_poly_set_length(rop, len);
+
+        for (i = 0, ap = op.rep.elts(); i < len; i++, ap++)
+        {
+            fmpz_set_ZZ_p(rop->coeffs + i, *ap);
+        }
+    }
+}
+
+void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op)
+{
+    ZZ_pX p;
+
+    const slong len = op->length;
+
+    if (len == 0)
+    {
+        rop = 0;
+    }
+    else
+    {
+        slong i;
+        ZZ_p *ap;
+
+        p.rep.SetLength(len);
+
+        for (i = 0, ap = p.rep.elts(); i < len; i++, ap++)
+        {
+            fmpz_get_ZZ_p(*ap, op->coeffs + i);
+        }
+        conv(rop, p);
+    }
+}
+
+void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op)
+{
+    const slong len = deg(rep(op)) + 1;
+
+    if (len == 0)
+    {
+        fq_zero(rop);
+    }
+    else
+    {
+        slong i;
+        const ZZ_p *ap; 
+
+        fmpz_poly_fit_length(rop, len);
+        _fmpz_poly_set_length(rop, len);
+
+        for (i = 0, ap = rep(op).rep.elts(); i < len; i++, ap++)
+        {
+            fmpz_set_ZZ_p(rop->coeffs + i, *ap);
+        }
+        _fmpz_poly_normalise(rop);
+    }
+}
+
+
+void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op)
+{
+    const slong len = op->length;
+
+    if (len == 0)
+    {
+        rop = 0;
+    }
+    else
+    {
+        slong i;
+        ZZ_pE *ap;
+
+        rop.rep.SetLength(len);
+
+        for (i = 0, ap = rop.rep.elts(); i < len; i++, ap++)
+        {
+            fq_get_ZZ_pE(*ap, op->coeffs + i);
+        }
+    }
+}
+
+void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op)
+{
+    const slong len = deg(op) + 1;
+
+    if (len == 0)
+    {
+        fq_poly_zero(rop);
+    }
+    else
+    {
+        slong i;
+        const ZZ_pE *ap; 
+
+        fq_poly_fit_length(rop, len);
+        _fq_poly_set_length(rop, len);
+
+        for (i = 0, ap = op.rep.elts(); i < len; i++, ap++)
+        {
+            fq_set_ZZ_pE(rop->coeffs + i, *ap);
+        }
+        _fq_poly_normalise(rop);
+    }
+}
+
 
 #undef ZZ_SIZE
 #undef ZZ_DATA

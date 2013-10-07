@@ -21,6 +21,7 @@
 
     Copyright (C) 2009 William Hart
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -28,10 +29,10 @@
 
     NTL Interface
 
-    The NTL interface allows conversion between NTL objects and FLINT objects 
-    and vice versa. The interface is built using C$++$ and is not built as a 
-    part of the FLINT library library by default. To build the NTL interface 
-    one must specify the location of NTL with the \code{--with-ntl=path} option 
+    The NTL interface allows conversion between NTL objects and FLINT objects
+    and vice versa. The interface is built using C$++$ and is not built as a
+    part of the FLINT library library by default. To build the NTL interface
+    one must specify the location of NTL with the \code{--with-ntl=path} option
     to configure. NTL version 5.5.2 or later is required.
 
 *******************************************************************************
@@ -40,13 +41,26 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
 
     Converts an NTL \code{ZZ} to an \code{fmpz_t}.
 
-    Assumes the \code{fmpz_t} has already been allocated to have sufficient
-    space.
+    Assumes the \code{fmpz_t} has already been allocated to have
+    sufficient space.
 
 void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
 
-    Converts an \code{fmpz_t} to an NTL \code{ZZ}. Allocation is automatically
-    handled.
+    Converts an \code{fmpz_t} to an NTL \code{ZZ}. Allocation is
+    automatically handled.
+
+void fmpz_set_ZZ_p(fmpz_t rop, const ZZ_p& op)
+
+    Converts an NTL \code{ZZ_p} to an \code{fmpz_t}.
+
+    Assumes the \code{fmpz_t} has already been allocated to have
+    sufficient space.
+
+void fmpz_get_ZZ_p(ZZ_p& rop, const fmpz_t op)
+
+    Converts an \code{fmpz_t} to an NTL \code{ZZ_p}. Allocation is
+    automatically handled. Requires that \code{ZZ_p::init()} has
+    already been called.
 
 void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
 
@@ -55,3 +69,31 @@ void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
 void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
 
     Converts an NTL \code{ZZX} to an \code{fmpz_poly_t}.
+
+void fmpz_mod_poly_get_ZZ_pX(ZZ_pX& rop, const fmpz_mod_poly_t op)
+
+    Converts an \code{fmpz_mod_poly_t} to an NTL
+    \code{ZZ_pX}. Requires that \code{ZZ_p::init()} has already been
+    called.
+
+void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op)
+
+    Converts an NTL \code{ZZ_pX} to an \code{fmpz_mod_poly_t}.
+
+void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op)
+
+     Converts an \code{fq_t} to an NTL \code{ZZ_pE}.  Requires that
+     \code{ZZ_pE::init()} has already been called.
+
+void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op)
+
+     Converts and NTL \code{ZZ_pE} to an \code{fq_t}.
+
+void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op)
+
+     Converts an \code{fq_poly_t} to an NTL \code{ZZ_pEX}.  Requires
+     that \code{ZZ_pE::init()} has already been called.
+
+void fq_poly_set_ZZ_pE(fq_poly_t rop, const ZZ_pE& op)
+
+     Converts and NTL \code{ZZ_pEX} to an \code{fq_poly_t}.

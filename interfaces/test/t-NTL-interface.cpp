@@ -32,6 +32,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 #include "NTL-interface.h"
 
@@ -126,15 +127,216 @@ int test_ZZX_to_fmpz_poly()
     return 1;
 }
 
+int test_ZZ_pX_to_fmpz_mod_poly()
+{
+    fmpz_t p;
+    fmpz_mod_poly_t f_poly1, f_poly2;
+    slong length;
+    flint_rand_t state;
+    int i, result;
+   
+    flint_printf("ZZ_pX_to_fmpz_mod_poly....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    /* Check aliasing of a and c */
+    for (i = 0; i < 10000; i++)
+    {
+        ZZ_pX ZZ_pX_poly;
+        ZZ mod;
+
+        length = n_randint(state, 1000);
+
+        fmpz_init(p);
+        fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
+        fmpz_add_ui(p, p, 2);
+
+        fmpz_get_ZZ(mod, p);
+        ZZ_p::init(mod);
+
+        fmpz_mod_poly_init(f_poly1, p);
+        fmpz_mod_poly_init(f_poly2, p);
+          
+        fmpz_mod_poly_randtest(f_poly1, state, length);
+          
+        fmpz_mod_poly_get_ZZ_pX(ZZ_pX_poly, f_poly1);
+        fmpz_mod_poly_set_ZZ_pX(f_poly2, ZZ_pX_poly);
+          
+        result = fmpz_mod_poly_equal(f_poly1, f_poly2);  
+        if (!result)
+        {
+           flint_printf("FAIL:\n");
+           flint_printf("f_poly1 = "); fmpz_mod_poly_print(f_poly1); flint_printf("\n");
+           flint_printf("f_poly2 = "); fmpz_mod_poly_print(f_poly2); flint_printf("\n");
+           return 0;
+        }
+        
+        fmpz_clear(p);
+        fmpz_mod_poly_clear(f_poly1);
+        fmpz_mod_poly_clear(f_poly2);
+    }
+      
+    return 1;
+}
+
+int test_ZZ_pE_to_fq()
+{
+    fmpz_t p;
+    fq_t f1, f2;
+    flint_rand_t state;
+    int i, result;
+
+    fq_ctx_t ctx;
+   
+    flint_printf("ZZ_pE_to_fq....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    /* Check aliasing of a and c */
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_mod_poly_t fmod;
+        long d;
+        ZZ prime;
+        ZZ_pX mod;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));
+
+        d = n_randint(state, 10) + 1;
+
+        fmpz_get_ZZ(prime, p);
+        ZZ_p::init(prime);
+
+        BuildIrred(mod, d);
+        ZZ_pE::init(mod);
+
+        fmpz_mod_poly_init(fmod, p);
+        fmpz_mod_poly_set_ZZ_pX(fmod, mod);
+
+        fq_ctx_init_modulus(ctx, p, d, fmod, "a");
+
+        ZZ_pE zzpe;
+
+        fq_init(f1);
+        fq_init(f2);
+
+        fq_randtest(f1, state, ctx);
+
+        fq_get_ZZ_pE(zzpe, f1);
+        fq_set_ZZ_pE(f2, zzpe);
+          
+        result = fq_equal(f1, f2);
+        if (!result)
+        {
+           flint_printf("FAIL:\n");
+           flint_printf("p = "); fmpz_print(p); flint_printf("\n");
+           flint_printf("mod = "); fmpz_mod_poly_print_pretty(fmod, "x"); flint_printf("\n");
+           flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %ld", f1->length); flint_printf("\n");
+           flint_printf("zzpe:"); cout << zzpe; flint_printf("\n");
+           flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %ld", f2->length); flint_printf("\n");
+           return 0;
+        }
+        
+        fmpz_clear(p);
+        fq_clear(f1);
+        fq_clear(f2);
+
+        fmpz_mod_poly_clear(fmod);
+        fq_ctx_clear(ctx);
+    }
+      
+    return 1;
+}
+
+int test_ZZ_pEX_to_fq_poly()
+{
+    fmpz_t p;
+    fq_poly_t f1, f2;
+    slong length;
+    flint_rand_t state;
+    int i, result;
+
+    fq_ctx_t ctx;
+   
+    flint_printf("ZZ_pEX_to_fq_poly....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_mod_poly_t fmod;
+        long d;
+        ZZ prime;
+        ZZ_pX mod;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));
+
+        d = n_randint(state, 10) + 1;
+
+        fmpz_get_ZZ(prime, p);
+        ZZ_p::init(prime);
+
+        BuildIrred(mod, d);
+        ZZ_pE::init(mod);
+
+        fmpz_mod_poly_init(fmod, p);
+        fmpz_mod_poly_set_ZZ_pX(fmod, mod);
+
+        fq_ctx_init_modulus(ctx, p, d, fmod, "a");
+
+        ZZ_pEX zzpex;
+
+        fq_poly_init(f1);
+        fq_poly_init(f2);
+
+        length = n_randint(state, 1000);
+
+        fq_poly_randtest(f1, state, length, ctx);
+
+        fq_poly_get_ZZ_pEX(zzpex, f1);
+        fq_poly_set_ZZ_pEX(f2, zzpex);
+          
+        result = fq_poly_equal(f1, f2);
+        if (!result)
+        {
+           flint_printf("FAIL:\n");
+           flint_printf("p = "); fmpz_print(p); flint_printf("\n");
+           flint_printf("mod = "); fmpz_mod_poly_print_pretty(fmod, "x"); flint_printf("\n");
+           flint_printf("f1 = "); fq_poly_print_pretty(f1, "x", ctx); flint_printf("\n");
+           flint_printf("zzpex:"); cout << zzpex; flint_printf("\n");
+           flint_printf("f2 = "); fq_poly_print_pretty(f2, "x", ctx); flint_printf("\n");
+           return 0;
+        }
+        
+        fmpz_clear(p);
+        fq_poly_clear(f1);
+        fq_poly_clear(f2);
+
+        fmpz_mod_poly_clear(fmod);
+        fq_ctx_clear(ctx);
+    }
+      
+    return 1;
+}
+
+
 int
 main(void)
 {
-    int r1, r2;
+    int r = 1;
+    
+    if ((r &= test_ZZ_to_fmpz())) flint_printf("PASS\n");
+    if ((r &= test_ZZX_to_fmpz_poly())) flint_printf("PASS\n");
+    if ((r &= test_ZZ_pX_to_fmpz_mod_poly())) flint_printf("PASS\n");
+    if ((r &= test_ZZ_pE_to_fq())) flint_printf("PASS\n");
+    if ((r &= test_ZZ_pEX_to_fq_poly())) flint_printf("PASS\n");
 
-    if ((r1 = test_ZZ_to_fmpz())) flint_printf("PASS\n");
-    if ((r2 = test_ZZX_to_fmpz_poly())) flint_printf("PASS\n");
-
-    if (!r1 || !r2) abort();
+    if (!r) abort();
 
     _fmpz_cleanup();
     
