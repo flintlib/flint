@@ -72,7 +72,7 @@ test_assignment()
     fmpq_polyxx p, q;
     p = 1;
     tassert(p.is_one());
-    q = 0ul;
+    q = UWORD(0);
     tassert(q.is_zero());
     tassert(p != q);
     p = q;
@@ -95,7 +95,7 @@ test_assignment()
 
     p = fmpzxx(0);
     tassert(p.is_zero());
-    p = fmpqxx(1, 1ul);
+    p = fmpqxx(1, UWORD(1));
     tassert(p.is_one());
 }
 
