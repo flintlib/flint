@@ -135,9 +135,9 @@ template<> struct can_evaluate_into<mylong_ref, mylong> : mp::true_ { };
 
 struct long_data
 {
-    long payload;
+    slong payload;
     // no default constructor
-    long_data(long d) : payload(d) {}
+    long_data(slong d) : payload(d) {}
     long_data(const myint& m) : payload(m._data().payload) {}
 
     long_data(const mylong_ref&);
@@ -146,14 +146,14 @@ struct long_data
 
 struct longref_data
 {
-    long& payload;
+    slong& payload;
 
     longref_data(mylong& l) : payload(l._data().payload) {}
 };
 
 struct longcref_data
 {
-    const long& payload;
+    const slong& payload;
 
     longcref_data(const mylong& l) : payload(l._data().payload) {}
     longcref_data(mylong_ref lr) : payload(lr._data().payload) {}
@@ -217,9 +217,9 @@ struct assignment<myint, myint>
 };
 
 template<>
-struct assignment<myint, long>
+struct assignment<myint, slong>
 {
-    static void doit(myint& to, long from)
+    static void doit(myint& to, slong from)
     {
         to._data().payload = from;
         to._data().extra = 5;
@@ -379,10 +379,10 @@ struct equals<T, U, typename mp::enable_if<mp::and_<
 };
 
 template<class T>
-struct equals<T, long,
+struct equals<T, slong,
     typename mp::enable_if<mylong_traits::is_source<T> >::type>
 {
-    static bool get(const T& i1, long i2)
+    static bool get(const T& i1, slong i2)
     {
         return i1._data().payload == i2;
     }
@@ -449,10 +449,10 @@ struct assignment<T, U, typename mp::enable_if<mp::and_<
 };
 
 template<class T>
-struct assignment<T, long,
+struct assignment<T, slong,
     typename mp::enable_if<mylong_traits::is_target<T> >::type>
 {
-    static void doit(T& to, long from)
+    static void doit(T& to, slong from)
     {
         to._data().payload = from;
     }
