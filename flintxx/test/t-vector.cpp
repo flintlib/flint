@@ -57,7 +57,7 @@ void test(const Vec& original, const char* str = "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     for(long i = 0;i < v.size();++i)
     {
         v[i] = i;
-        w[i] = 0l;
+        w[i] = WORD(0);
         u[i] = 2*i;
         x[i] = 8*i;
     }
