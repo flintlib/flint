@@ -81,7 +81,7 @@ test_assignment()
     a = 17; tassert(a != b);
     b = 17; tassert(a == b);
     b = 0; tassert(a != b);
-    b = 17ul; tassert(a == b);
+    b = UWORD(17); tassert(a == b);
     b = 0; b = c; tassert(a == b);
     b = 0; b = fmpzxx_ref(c); tassert(a == b);
     b = 0; b = fmpzxx_srcref(c); tassert(a == b);
@@ -108,7 +108,7 @@ test_conversion()
 }
 
 template<class T>
-padicxx make_padic(const T& t, long prec = PADIC_DEFAULT_PREC)
+padicxx make_padic(const T& t, slong prec = PADIC_DEFAULT_PREC)
 {
     static padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
     return padicxx::from_QQ(t, ctx, prec);
@@ -116,7 +116,7 @@ padicxx make_padic(const T& t, long prec = PADIC_DEFAULT_PREC)
 template<class T, class U>
 bool fuzzy_equals(const T& t, const U& u)
 {
-    long prec = std::min(t.prec(), u.prec()) - 5;
+    slong prec = std::min(t.prec(), u.prec()) - 5;
     padicxx a(t.estimate_ctx(), prec); a = t;
     padicxx b(t.estimate_ctx(), prec); b = u;
     return a == b;
