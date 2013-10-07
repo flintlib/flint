@@ -84,7 +84,7 @@ test_assignment()
     tassert(a._data().payload == 43);
     tassert(a._data().extra == 4);
 
-    a = 44l;
+    a = WORD(44);
     tassert(a._data().payload == 44 && a._data().extra == 5);
 
     mylong c(0);
@@ -170,7 +170,7 @@ test_arithmetic()
     // Test arithmetic with immediates
     tassert(a + 4 == 7);
     tassert(4 + a == 7);
-    tassert(a + 4l == 7);
+    tassert(a + WORD(4) == 7);
     tassert(4u + a == 7);
 
     // Test composite arithmetic
@@ -198,20 +198,20 @@ test_arithmetic()
     tassert(-((-a) + (-b)) == a + b);
 
     // Test mixed arithmetic
-    mylong al(3l);
-    mylong bl(4l);
-    mylong cl(7l);
+    mylong al(WORD(3));
+    mylong bl(WORD(4));
+    mylong cl(WORD(7));
 
     tassert(al + bl == cl);
     tassert(al + bl == 7l);
     tassert(al + b  == 7l);
     tassert(a + bl  == 7l);
-    tassert((a + bl) + cl  == 14l);
-    tassert((a + b) + cl  == 14l);
-    tassert((al + b) + c  == 14l);
-    tassert(cl + (a + bl)  == 14l);
-    tassert(cl + (a + b)  == 14l);
-    tassert(c + (al + b)  == 14l);
+    tassert((a + bl) + cl  == WORD(14));
+    tassert((a + b) + cl  == WORD(14));
+    tassert((al + b) + c  == WORD(14));
+    tassert(cl + (a + bl)  == WORD(14));
+    tassert(cl + (a + b)  == WORD(14));
+    tassert(c + (al + b)  == WORD(14));
     tassert((a + bl) + (cl + d) == 15l);
     tassert((a + bl) + (c + d) == 15l);
 
@@ -223,7 +223,7 @@ void
 test_conversion()
 {
     myint a(4);
-    mylong b(4l);
+    mylong b(WORD(4));
     tassert(typed_equals(a.to<int>(), 4));
     tassert(typed_equals(a.to<mylong>(), b));
     tassert(typed_equals((a + a).to<int>(), 8));
@@ -252,10 +252,10 @@ test_tools()
 {
     typedef tools::equal_types_pred<myint> intpred;
     myint a(1);
-    mylong b(2l);
+    mylong b(WORD(2));
     tassert(tools::find_subexpr<intpred>(a) == 1);
     tassert(tools::find_subexpr<intpred>(a + b) == 1);
-    tassert(tools::find_subexpr_T<mylong>(a + b) == 2l);
+    tassert(tools::find_subexpr_T<mylong>(a + b) == WORD(2));
     tassert(tools::find_subexpr<intpred>(b + (a + 2) + b) == 1);
     tassert(is_subexpr<myint>(a+b));
     tassert(!is_subexpr<mylong>(a+a));
@@ -282,7 +282,7 @@ test_references()
     tassert(a == ar);
     tassert(a == acr);
     tassert(ar == acr);
-    tassert(ar == 4l && acr == 4l);
+    tassert(ar == WORD(4) && acr == WORD(4));
 
     ar = 5l;
     tassert(a == 5l && acr == 5l && ar == 5l);
@@ -296,24 +296,24 @@ test_references()
     ar = bcr;
     tassert(a == b);
 
-    a = 4l;
+    a = WORD(4);
     b = 5l;
     tassert(a + bcr == 9l);
     tassert(ar + bcr == 9l);
     a = acr + b;
     tassert(a == 9l);
     ar = acr + bcr;
-    tassert(a == 14l);
+    tassert(a == WORD(14));
 
-    a = 4l;
-    tassert((a + a) + bcr == 13l);
-    tassert((acr + acr) + b == 13l);
-    tassert(((a + bcr) + acr + (ar + bcr)) + ((a + a) + (bcr + bcr)) == 40l);
+    a = WORD(4);
+    tassert((a + a) + bcr == WORD(13));
+    tassert((acr + acr) + b == WORD(13));
+    tassert(((a + bcr) + acr + (ar + bcr)) + ((a + a) + (bcr + bcr)) == WORD(40));
     a = ((a + bcr) + acr + (ar + bcr)) + ((a + a) + (bcr + bcr));
-    tassert(a == 40l);
-    a = 4l;
+    tassert(a == WORD(40));
+    a = WORD(4);
     ar = ((a + bcr) + acr + (ar + bcr)) + ((a + a) + (bcr + bcr));
-    tassert(a == 40l);
+    tassert(a == WORD(40));
 }
 
 struct S { };
