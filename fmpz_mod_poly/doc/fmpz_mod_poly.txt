@@ -33,59 +33,59 @@
 
 void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p)
 
-    Initialises \code{poly} for use over $\mathbf{Z} / p \mathbf{Z}$, 
+    Initialises \code{poly} for use over $\mathbf{Z} / p \mathbf{Z}$,
     setting its length to zero.
 
-    A corresponding call to \code{fmpz_mod_poly_clear()} must be made after 
-    finishing with the \code{fmpz_mod_poly_t} to free the memory used by 
-    the polynomial.  The user is also responsible to clearing the 
+    A corresponding call to \code{fmpz_mod_poly_clear()} must be made after
+    finishing with the \code{fmpz_mod_poly_t} to free the memory used by
+    the polynomial.  The user is also responsible to clearing the
     integer~$p$.
 
 void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, slong alloc)
 
-    Initialises \code{poly} with space for at least \code{alloc} coefficients 
-    and sets the length to zero.  The allocated coefficients are all set to 
+    Initialises \code{poly} with space for at least \code{alloc} coefficients
+    and sets the length to zero.  The allocated coefficients are all set to
     zero.
 
 void fmpz_mod_poly_clear(fmpz_mod_poly_t poly)
 
-    Clears the given polynomial, releasing any memory used.  It must 
+    Clears the given polynomial, releasing any memory used.  It must
     be reinitialised in order to be used again.
 
 void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc)
 
-    Reallocates the given polynomial to have space for \code{alloc} 
-    coefficients.  If \code{alloc} is zero the polynomial is cleared 
-    and then reinitialised.  If the current length is greater than 
+    Reallocates the given polynomial to have space for \code{alloc}
+    coefficients.  If \code{alloc} is zero the polynomial is cleared
+    and then reinitialised.  If the current length is greater than
     \code{alloc} the polynomial is first truncated to length \code{alloc}.
 
 void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len)
 
-    If \code{len} is greater than the number of coefficients currently 
-    allocated, then the polynomial is reallocated to have space for at 
-    least \code{len} coefficients.  No data is lost when calling this 
+    If \code{len} is greater than the number of coefficients currently
+    allocated, then the polynomial is reallocated to have space for at
+    least \code{len} coefficients.  No data is lost when calling this
     function.
 
-    The function efficiently deals with the case where it is called 
-    many times in small increments by at least doubling the number of 
-    allocated coefficients when length is larger than the number of 
+    The function efficiently deals with the case where it is called
+    many times in small increments by at least doubling the number of
+    allocated coefficients when length is larger than the number of
     coefficients currently allocated.
 
 void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
 
-    Sets the length of \code{poly} so that the top coefficient is non-zero. 
-    If all coefficients are zero, the length is set to zero.  This function 
+    Sets the length of \code{poly} so that the top coefficient is non-zero.
+    If all coefficients are zero, the length is set to zero.  This function
     is mainly used internally, as all functions guarantee normalisation.
 
 void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, slong len)
 
-    Demotes the coefficients of \code{poly} beyond \code{len} and sets 
+    Demotes the coefficients of \code{poly} beyond \code{len} and sets
     the length of \code{poly} to \code{len}.
 
 void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len)
 
-    If the current length of \code{poly} is greater than \code{len}, it 
-    is truncated to have the given length.  Discarded coefficients are 
+    If the current length of \code{poly} is greater than \code{len}, it
+    is truncated to have the given length.  Discarded coefficients are
     not necessarily set to zero.
 
 *******************************************************************************
@@ -104,10 +104,10 @@ void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
     Sets the polynomial~$f$ to a random irreducible polynomial of length
     up~\code{len}, assuming \code{len} is positive.
 
-void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
+void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
                                      flint_rand_t state, slong len)
 
-    Sets the polynomial~$f$ to a random polynomial of length up~\code{len}, 
+    Sets the polynomial~$f$ to a random polynomial of length up~\code{len},
     assuming \code{len} is positive.
 
 *******************************************************************************
@@ -118,22 +118,22 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 
 fmpz * fmpz_mod_poly_modulus(const fmpz_mod_poly_t poly)
 
-    Returns the modulus of this polynomial.  This function is 
+    Returns the modulus of this polynomial.  This function is
     implemented as a macro.
 
 slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly)
 
-    Returns the degree of the polynomial.  The degree of the zero 
+    Returns the degree of the polynomial.  The degree of the zero
     polynomial is defined to be $-1$.
 
 slong fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
 
-    Returns the length of the polynomial, which is one more than 
+    Returns the length of the polynomial, which is one more than
     its degree.
 
 fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
 
-    Returns a pointer to the first leading coefficient of \code{poly} 
+    Returns a pointer to the first leading coefficient of \code{poly}
     if this is non-zero, otherwise returns \code{NULL}.
 
 *******************************************************************************
@@ -148,7 +148,7 @@ void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
 
 void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1, fmpz_mod_poly_t poly2)
 
-    Swaps the two polynomials.  This is done efficiently by swapping 
+    Swaps the two polynomials.  This is done efficiently by swapping
     pointers rather than individual coefficients.
 
 void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
@@ -157,7 +157,7 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
 
 void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 
-    Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial 
+    Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial
     to zero.
 
 *******************************************************************************
@@ -176,12 +176,12 @@ void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t f, const fmpz_t c)
 
 void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
 
-    Sets $f$ to $g$ reduced modulo $p$, where $p$ is the modulus that 
+    Sets $f$ to $g$ reduced modulo $p$, where $p$ is the modulus that
     is part of the data structure of $f$.
 
 void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
 
-    Sets $f$ to $g$.  This is done simply by lifting the coefficients 
+    Sets $f$ to $g$.  This is done simply by lifting the coefficients
     of $g$ taking representatives $[0, p) \subset \mathbf{Z}$.
 
 *******************************************************************************
@@ -190,7 +190,7 @@ void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
 
 *******************************************************************************
 
-int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1, 
+int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1,
                         const fmpz_mod_poly_t poly2)
 
     Returns non-zero if the two polynomials are equal.
@@ -208,7 +208,7 @@ int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 void
 fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
 
-    Sets the coefficient of $X^n$ in the polynomial to $x$, 
+    Sets the coefficient of $X^n$ in the polynomial to $x$,
     assuming $n \geq 0$.
 
 void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
@@ -219,7 +219,7 @@ void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
 void
 fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
 
-    Sets $x$ to the coefficient of $X^n$ in the polynomial, 
+    Sets $x$ to the coefficient of $X^n$ in the polynomial,
     assumng $n \geq 0$.
 
 *******************************************************************************
@@ -228,38 +228,38 @@ fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
 
 *******************************************************************************
 
-void _fmpz_mod_poly_shift_left(fmpz * res, 
+void _fmpz_mod_poly_shift_left(fmpz * res,
                                const fmpz * poly, slong len, slong n)
 
-    Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by 
-    $n$ coefficients.  
+    Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by
+    $n$ coefficients.
 
-    Inserts zero coefficients at the lower end.  Assumes that \code{len} 
+    Inserts zero coefficients at the lower end.  Assumes that \code{len}
     and $n$ are positive, and that \code{res} fits \code{len + n} elements.
     Supports aliasing between \code{res} and \code{poly}.
 
-void fmpz_mod_poly_shift_left(fmpz_mod_poly_t f, 
+void fmpz_mod_poly_shift_left(fmpz_mod_poly_t f,
                               const fmpz_mod_poly_t g, slong n)
 
-    Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero 
+    Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero
     coefficients are inserted.
 
-void _fmpz_mod_poly_shift_right(fmpz * res, 
+void _fmpz_mod_poly_shift_right(fmpz * res,
                                 const fmpz * poly, slong len, slong n)
 
-    Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by 
-    $n$ coefficients.  
+    Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by
+    $n$ coefficients.
 
-    Assumes that \code{len} and $n$ are positive, that \code{len > n}, 
-    and that \code{res} fits \code{len - n} elements.  Supports aliasing 
-    between \code{res} and \code{poly}, although in this case the top 
+    Assumes that \code{len} and $n$ are positive, that \code{len > n},
+    and that \code{res} fits \code{len - n} elements.  Supports aliasing
+    between \code{res} and \code{poly}, although in this case the top
     coefficients of \code{poly} are not set to zero.
 
-void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f, 
+void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f,
                                const fmpz_mod_poly_t g, slong n)
 
-    Sets \code{res} to \code{poly} shifted right by $n$ coefficients.  If $n$ 
-    is equal to or greater than the current length of \code{poly}, \code{res} 
+    Sets \code{res} to \code{poly} shifted right by $n$ coefficients.  If $n$
+    is equal to or greater than the current length of \code{poly}, \code{res}
     is set to the zero polynomial.
 
 *******************************************************************************
@@ -268,37 +268,37 @@ void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1, 
-                                   const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2,
                                    const fmpz_t p)
 
-    Sets \code{res} to the sum of \code{(poly1, len1)} and 
-    \code{(poly2, len2)}.  It is assumed that \code{res} has 
+    Sets \code{res} to the sum of \code{(poly1, len1)} and
+    \code{(poly2, len2)}.  It is assumed that \code{res} has
     sufficient space for the longer of the two polynomials.
 
-void fmpz_mod_poly_add(fmpz_mod_poly_t res, 
-                       const fmpz_mod_poly_t poly1, 
+void fmpz_mod_poly_add(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly1,
                        const fmpz_mod_poly_t poly2)
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
-void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1, 
-                                   const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2,
                                    const fmpz_t p)
 
-    Sets \code{res} to \code{(poly1, len1)} minus \code{(poly2, len2)}.  It 
-    is assumed that \code{res} has sufficient space for the longer of the 
+    Sets \code{res} to \code{(poly1, len1)} minus \code{(poly2, len2)}.  It
+    is assumed that \code{res} has sufficient space for the longer of the
     two polynomials.
 
-void fmpz_mod_poly_sub(fmpz_mod_poly_t res, 
-                       const fmpz_mod_poly_t poly1, 
+void fmpz_mod_poly_sub(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly1,
                        const fmpz_mod_poly_t poly2)
 
     Sets \code{res} to \code{poly1} minus \code{poly2}.
 
 void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
 
-    Sets \code{(res, len)} to the negative of \code{(poly, len)} 
+    Sets \code{(res, len)} to the negative of \code{(poly, len)}
     modulo $p$.
 
 void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
@@ -311,13 +311,13 @@ void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len,
                                     const fmpz_t x, const fmpz_t p)
 
-    Sets \code{(res, len}) to \code{(poly, len)} multiplied by $x$, 
+    Sets \code{(res, len}) to \code{(poly, len)} multiplied by $x$,
     reduced modulo $p$.
 
-void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, 
+void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res,
     const fmpz_mod_poly_t poly, const fmpz_t x)
 
     Sets \code{res} to \code{poly} multiplied by $x$.
@@ -328,35 +328,35 @@ void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1, 
-                                   const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2,
                                    const fmpz_t p)
 
-    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
-    and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows 
+    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)}
+    and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows
     zero-padding of the two input polynomials.
 
-void fmpz_mod_poly_mul(fmpz_mod_poly_t res, 
-                       const fmpz_mod_poly_t poly1, 
+void fmpz_mod_poly_mul(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly1,
                        const fmpz_mod_poly_t poly2)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
-void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, 
-                                      const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1,
+                                      const fmpz *poly2, slong len2,
                                       const fmpz_t p, slong n)
 
-    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of 
+    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
     \code{(poly1, len1)} and \code{(poly2, len2)}.
 
-    Assumes \code{len1 >= len2 > 0} and \code{0 < n <= len1 + len2 - 1}.  
-    Allows for zero-padding in the inputs.  Does not support aliasing between 
+    Assumes \code{len1 >= len2 > 0} and \code{0 < n <= len1 + len2 - 1}.
+    Allows for zero-padding in the inputs.  Does not support aliasing between
     the inputs and the output.
 
-void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 
+void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
 
-    Sets \code{res} to the lowest $n$ coefficients of the product of 
+    Sets \code{res} to the lowest $n$ coefficients of the product of
     \code{poly1} and \code{poly2}.
 
 void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
@@ -392,16 +392,16 @@ void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e, 
+void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e,
                         const fmpz_t p)
 
-    Sets \code{res = poly^e}, assuming that $e > 1$ and \code{elen > 0}, 
-    and that \code{res} has space for \code{e*(len - 1) + 1} coefficients. 
+    Sets \code{res = poly^e}, assuming that $e > 1$ and \code{elen > 0},
+    and that \code{res} has space for \code{e*(len - 1) + 1} coefficients.
     Does not support aliasing.
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
 
-    Computes \code{res = poly^e}.  If $e$ is zero, returns one, 
+    Computes \code{res = poly^e}.  If $e$ is zero, returns one,
     so that in particular \code{0^0 = 1}.
 
 void _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
@@ -483,46 +483,46 @@ void fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
-    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
+void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R,
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 
-    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that
     $A = B Q + R$ with $0 \leq \len(R) < \len(B)$.
 
-    Assumes that the leading coefficient of $B$ is invertible 
+    Assumes that the leading coefficient of $B$ is invertible
     modulo $p$, and that \code{invB} is the inverse.
 
-    Assumes that $\len(A), \len(B) > 0$.  Allows zero-padding in 
-    \code{(A, lenA)}.  $R$ and $A$ may be aliased, but apart from this no 
+    Assumes that $\len(A), \len(B) > 0$.  Allows zero-padding in
+    \code{(A, lenA)}.  $R$ and $A$ may be aliased, but apart from this no
     aliasing of input and output operands is allowed.
 
-void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Computes $Q$, $R$ such that $A = B Q + R$ with 
+    Computes $Q$, $R$ such that $A = B Q + R$ with
     $0 \leq \len(R) < \len(B)$.
 
-    Assumes that the leading coefficient of $B$ is invertible 
+    Assumes that the leading coefficient of $B$ is invertible
     modulo $p$.
 
-void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
-    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
+void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 
-    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with
     $0 \leq \len(R) < \len(B)$ but only sets \code{(Q, lenA - lenB + 1)}.
 
-    Requires temporary space \code{(R, lenA)}.  Allows aliasing 
-    only between $A$ and $R$.  Allows zero-padding in $A$ but 
-    not in $B$.  Assumes that the leading coefficient of $B$ 
+    Requires temporary space \code{(R, lenA)}.  Allows aliasing
+    only between $A$ and $R$.  Allows zero-padding in $A$ but
+    not in $B$.  Assumes that the leading coefficient of $B$
     is a unit modulo $p$.
 
-void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
+void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
-    $0 \leq \len(R) < \len(B)$ assuming that the leading term 
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with
+    $0 \leq \len(R) < \len(B)$ assuming that the leading term
     of $B$ is a unit.
 
 ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
@@ -530,125 +530,170 @@ ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
     Removes the highest possible power of \code{g} from \code{f} and
     returns the exponent.
 
-void _fmpz_mod_poly_rem_basecase(fmpz * R, 
-    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
+void _fmpz_mod_poly_rem_basecase(fmpz * R,
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 
-    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with
     $0 \leq \len(R) < \len(B)$ but only sets \code{(R, lenA)}.
 
-    Allows aliasing only between $A$ and $R$.  Allows zero-padding 
-    in $A$ but not in $B$.  Assumes that the leading coefficient 
+    Allows aliasing only between $A$ and $R$.  Allows zero-padding
+    in $A$ but not in $B$.  Assumes that the leading coefficient
     of $B$ is a unit modulo $p$.
 
-void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, 
+void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
-    $0 \leq \len(R) < \len(B)$ assuming that the leading term 
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with
+    $0 \leq \len(R) < \len(B)$ assuming that the leading term
     of $B$ is a unit.
 
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
-    const fmpz * A, const fmpz * B, slong lenB, 
+    const fmpz * A, const fmpz * B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 
-    Computes \code{(Q, lenB)}, \code{(BQ, 2 lenB - 1)} such that 
+    Computes \code{(Q, lenB)}, \code{(BQ, 2 lenB - 1)} such that
     $BQ = B \times Q$ and $A = B Q + R$ where $0 \leq \len(R) < \len(B)$.
 
-    Assumes that the leading coefficient of $B$ is invertible 
+    Assumes that the leading coefficient of $B$ is invertible
     modulo $p$, and that \code{invB} is the inverse.
 
-    Assumes $\len(B) > 0$.  Allows zero-padding in \code{(A, lenA)}.  Requires 
-    a temporary array \code{(W, 2 lenB - 1)}.  No aliasing of input and output 
+    Assumes $\len(B) > 0$.  Allows zero-padding in \code{(A, lenA)}.  Requires
+    a temporary array \code{(W, 2 lenB - 1)}.  No aliasing of input and output
     operands is allowed.
 
-    This function does not read the bottom $\len(B) - 1$ coefficients from 
-    $A$, which means that they might not even need to exist in allocated 
+    This function does not read the bottom $\len(B) - 1$ coefficients from
+    $A$, which means that they might not even need to exist in allocated
     memory.
 
-void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
+void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R,
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 
-    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that
     $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
 
-    Assumes that the leading coefficient of $B$ is invertible 
+    Assumes that the leading coefficient of $B$ is invertible
     modulo $p$, and that \code{invB} is the inverse.
 
-    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
-    \code{(A, lenA)}.  No aliasing of input and output operands is 
+    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in
+    \code{(A, lenA)}.  No aliasing of input and output operands is
     allowed.
 
-void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Computes $Q$, $R$ such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
 
-    Assumes that $B$ is non-zero and that the leading coefficient 
+    Assumes that $B$ is non-zero and that the leading coefficient
     of $B$ is invertible modulo $p$.
 
-void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, 
+void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
     const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
-    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that
     $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
 
-    Assumes that $B$ is non-zero, that the leading coefficient 
-    of $B$ is invertible modulo $p$ and that \code{invB} is 
+    Assumes that $B$ is non-zero, that the leading coefficient
+    of $B$ is invertible modulo $p$ and that \code{invB} is
     the inverse.
 
-    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
-    \code{(A, lenA)}.  No aliasing of input and output operands is 
+    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in
+    \code{(A, lenA)}.  No aliasing of input and output operands is
     allowed.
 
-void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Computes $Q$, $R$ such that $A = B Q + R$ and 
+    Computes $Q$, $R$ such that $A = B Q + R$ and
     $0 \leq \len(R) < \len(B)$.
 
-    Assumes that $B$ is non-zero and that the leading coefficient 
+    Assumes that $B$ is non-zero and that the leading coefficient
     of $B$ is invertible modulo $p$.
 
-void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Either finds a non-trivial factor~$f$ of the modulus~$p$, or computes 
+    Either finds a non-trivial factor~$f$ of the modulus~$p$, or computes
     $Q$, $R$ such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
 
-    If the leading coefficient of $B$ is invertible in $\mathbf{Z}/(p)$, 
-    the division with remainder operation is carried out, $Q$ and $R$ are 
-    computed correctly, and $f$ is set to $1$.  Otherwise, $f$ is set to 
+    If the leading coefficient of $B$ is invertible in $\mathbf{Z}/(p)$,
+    the division with remainder operation is carried out, $Q$ and $R$ are
+    computed correctly, and $f$ is set to $1$.  Otherwise, $f$ is set to
     a non-trivial factor of $p$ and $Q$ and $R$ are not touched.
 
     Assumes that $B$ is non-zero.
 
-void _fmpz_mod_poly_rem(fmpz *R, 
-                        const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+void _fmpz_mod_poly_rem(fmpz *R,
+                        const fmpz *A, slong lenA, const fmpz *B, slong lenB,
                         const fmpz_t invB, const fmpz_t p)
 
-    Notationally, computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} 
-    such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$, returning 
+    Notationally, computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)}
+    such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$, returning
     only the remainder part.
 
-    Assumes that $B$ is non-zero, that the leading coefficient 
-    of $B$ is invertible modulo $p$ and that \code{invB} is 
+    Assumes that $B$ is non-zero, that the leading coefficient
+    of $B$ is invertible modulo $p$ and that \code{invB} is
     the inverse.
 
-    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
-    \code{(A, lenA)}.  No aliasing of input and output operands is 
+    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in
+    \code{(A, lenA)}.  No aliasing of input and output operands is
     allowed.
 
-void fmpz_mod_poly_rem(fmpz_mod_poly_t R, 
+void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Notationally, computes $Q$, $R$ such that $A = B Q + R$ 
-    and $0 \leq \len(R) < \len(B)$, returning only the remainder 
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$
+    and $0 \leq \len(R) < \len(B)$, returning only the remainder
     part.
 
-    Assumes that $B$ is non-zero and that the leading coefficient 
+    Assumes that $B$ is non-zero and that the leading coefficient
     of $B$ is invertible modulo $p$.
+
+void _fmpz_mod_poly_div_newton_preinv (fmpz* Q, fmpz* A, slong lenA,
+            fmpz* B, slong lenB, fmpz* Binv, slong lenBinv, fmpz_t p)
+
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA}
+    and \code{B} is of length \code{lenB}, but return only $Q$.
+
+    We require that $Q$ have space for \code{lenA - lenB + 1} coefficients
+    and assume that the leading coefficient of $B$ is a unit. Furthermore, we
+    assume that $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+void fmpz_mod_poly_div_newton_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                                 const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
+
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R) < \len(B)$, but returns only $Q$.
+
+    We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
+    the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+void _fmpz_mod_poly_divrem_newton_preinv (fmpz* Q, fmpz* R, fmpz* A,
+slong lenA, fmpz* B, slong lenB, fmpz* Binv, slong lenBinv, fmpz_t p)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
+    \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
+    coefficients. Furthermore, we assume that $Binv$ is the inverse of the
+    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call
+    \code{div_newton_preinv()} and then multiply out and compute
+    the remainder.
+
+void fmpz_mod_poly_divrem_newton_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+            const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
+    We assume $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+    The algorithm used is to call \code{div_newton()} and then multiply out
+    and compute the remainder.
 
 *******************************************************************************
 
@@ -656,18 +701,18 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
+void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
                                       const fmpz_t cinv, const fmpz_t p)
 
-    Sets \code{(Qinv, n)} to the inverse of \code{(Q, n)} modulo $x^n$, 
-    where $n \geq 1$, assuming that the bottom coefficient of $Q$ is 
+    Sets \code{(Qinv, n)} to the inverse of \code{(Q, n)} modulo $x^n$,
+    where $n \geq 1$, assuming that the bottom coefficient of $Q$ is
     invertible modulo $p$ and that its inverse is \code{cinv}.
 
-void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
+void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
     const fmpz_mod_poly_t Q, slong n)
 
-    Sets \code{Qinv} to the inverse of \code{Q} modulo $x^n$, 
-    where $n \geq 1$, assuming that the bottom coefficient of 
+    Sets \code{Qinv} to the inverse of \code{Q} modulo $x^n$,
+    where $n \geq 1$, assuming that the bottom coefficient of
     $Q$ is a unit.
 
 *******************************************************************************
@@ -678,129 +723,129 @@ void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
 
 void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
-    If \code{poly} is non-zero, sets \code{res} to \code{poly} divided 
-    by its leading coefficient.  This assumes that the leading coefficient 
+    If \code{poly} is non-zero, sets \code{res} to \code{poly} divided
+    by its leading coefficient.  This assumes that the leading coefficient
     of \code{poly} is invertible modulo $p$.
 
     Otherwise, if \code{poly} is zero, sets \code{res} to zero.
 
-slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, 
-                                           const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
+                                           const fmpz *B, slong lenB,
                                            const fmpz_t invB, const fmpz_t p)
 
-    Sets $G$ to the greatest common divisor of $(A, \len(A))$ 
+    Sets $G$ to the greatest common divisor of $(A, \len(A))$
     and $(B, \len(B))$ and returns its length.
 
-    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has
     space for sufficiently many coefficients.
 
-    Assumes that \code{invB} is the inverse of the leading coefficients 
+    Assumes that \code{invB} is the inverse of the leading coefficients
     of $B$ modulo the prime number $p$.
 
-void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, 
+void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B)
 
     Sets $G$ to the greatest common divisor of $A$ and $B$.
 
-    The algorithm used to compute $G$ is the classical Euclidean 
+    The algorithm used to compute $G$ is the classical Euclidean
     algorithm.
 
-    In general, the greatest common divisor is defined in the polynomial 
-    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    In general, the greatest common divisor is defined in the polynomial
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
     number.  Thus, this function assumes that $p$ is prime.
 
-slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
-                                 const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA,
+                                 const fmpz *B, slong lenB,
                                  const fmpz_t invB, const fmpz_t p)
 
-    Sets $G$ to the greatest common divisor of $(A, \len(A))$ 
+    Sets $G$ to the greatest common divisor of $(A, \len(A))$
     and $(B, \len(B))$ and returns its length.
 
-    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has
     space for sufficiently many coefficients.
 
-    Assumes that \code{invB} is the inverse of the leading coefficients 
+    Assumes that \code{invB} is the inverse of the leading coefficients
     of $B$ modulo the prime number $p$.
 
-void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, 
+void fmpz_mod_poly_gcd(fmpz_mod_poly_t G,
                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Sets $G$ to the greatest common divisor of $A$ and $B$.
 
-    In general, the greatest common divisor is defined in the polynomial 
-    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    In general, the greatest common divisor is defined in the polynomial
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
     number.  Thus, this function assumes that $p$ is prime.
 
-slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
+slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
     const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
-    Either sets $f = 1$ and $G$ to the greatest common divisor 
-    of $(A, \len(A))$ and $(B, \len(B))$ and returns its length, 
-    or sets $f \in (1,p)$ to a non-trivial factor of $p$ and 
+    Either sets $f = 1$ and $G$ to the greatest common divisor
+    of $(A, \len(A))$ and $(B, \len(B))$ and returns its length,
+    or sets $f \in (1,p)$ to a non-trivial factor of $p$ and
     leaves the contents of the vector $(G, lenB)$ undefined.
 
-    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has
     space for sufficiently many coefficients.
 
-    Does not support aliasing of any of the input arguments 
+    Does not support aliasing of any of the input arguments
     with any of the output argument.
 
-void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
+void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Either sets $f = 1$ and $G$ to the greatest common divisor 
+    Either sets $f = 1$ and $G$ to the greatest common divisor
     of $A$ and $B$, or $ \in (1,p)$ to a non-trivial factor of $p$.
 
-    In general, the greatest common divisor is defined in the polynomial 
-    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    In general, the greatest common divisor is defined in the polynomial
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
     number.
 
-slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, 
+slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA,
                           const fmpz *B, slong lenB, const fmpz_t p)
 
-    Either sets $f = 1$ and $G$ to the greatest common divisor 
-    of $(A, \len(A))$ and $(B, \len(B))$ and returns its length, 
-    or sets $f \in (1,p)$ to a non-trivial factor of $p$ and 
+    Either sets $f = 1$ and $G$ to the greatest common divisor
+    of $(A, \len(A))$ and $(B, \len(B))$ and returns its length,
+    or sets $f \in (1,p)$ to a non-trivial factor of $p$ and
     leaves the contents of the vector $(G, lenB)$ undefined.
 
-    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has
     space for sufficiently many coefficients.
 
-    Does not support aliasing of any of the input arguments 
+    Does not support aliasing of any of the input arguments
     with any of the output argument.
 
-void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G, 
+void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Either sets $f = 1$ and $G$ to the greatest common divisor 
+    Either sets $f = 1$ and $G$ to the greatest common divisor
     of $A$ and $B$, or $ \in (1,p)$ to a non-trivial factor of $p$.
 
-    In general, the greatest common divisor is defined in the polynomial 
-    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    In general, the greatest common divisor is defined in the polynomial
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
     number.
 
-slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
-                                   const fmpz *A, slong lenA, 
-                                   const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
                                    const fmpz_t invB, const fmpz_t p)
 
-    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$ 
+    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$
     such that $S A + T B = G$.  Returns the length of $G$.
 
-    Assumes that $\len(A) \geq \len(B) \geq 1$ and 
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and
     $(\len(A),\len(B)) \neq (1,1)$.
 
     No attempt is made to make the GCD monic.
 
-    Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
-    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively. 
-    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and 
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively.
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and
     $\len(T) \leq \max(\len(A) - \len(G), 1)$.
 
     No aliasing of input and output operands is permitted.
 
-void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G, 
+void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
                              fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
@@ -809,31 +854,31 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     polynomial $P$ is defined to be $P$. Except in the case where
     the GCD is zero, the GCD $G$ is made monic.
 
-    Polynomials \code{S} and \code{T} are computed such that 
-    \code{S*A + T*B = G}. The length of \code{S} will be at most 
+    Polynomials \code{S} and \code{T} are computed such that
+    \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
-slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, 
-                         const fmpz *A, slong lenA, 
-                         const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
+                         const fmpz *A, slong lenA,
+                         const fmpz *B, slong lenB,
                          const fmpz_t invB, const fmpz_t p)
 
-    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$ 
+    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$
     such that $S A + T B = G$.  Returns the length of $G$.
 
-    Assumes that $\len(A) \geq \len(B) \geq 1$ and 
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and
     $(\len(A),\len(B)) \neq (1,1)$.
 
     No attempt is made to make the GCD monic.
 
-    Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
-    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively. 
-    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and 
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively.
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and
     $\len(T) \leq \max(\len(A) - \len(G), 1)$.
 
     No aliasing of input and output operands is permitted.
 
-void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, 
+void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
                         fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
@@ -842,54 +887,54 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
     polynomial $P$ is defined to be $P$. Except in the case where
     the GCD is zero, the GCD $G$ is made monic.
 
-    Polynomials \code{S} and \code{T} are computed such that 
-    \code{S*A + T*B = G}. The length of \code{S} will be at most 
+    Polynomials \code{S} and \code{T} are computed such that
+    \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
-slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
-                         const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
+                         const fmpz *A, slong lenA, const fmpz *B, slong lenB,
                          const fmpz_t p)
 
-    Computes \code{(G, lenA)}, \code{(S, lenB-1)} such that 
+    Computes \code{(G, lenA)}, \code{(S, lenB-1)} such that
     $G \cong S A \pmod{B}$, returning the actual length of $G$.
 
     Assumes that $0 < \len(A) < \len(B)$.
 
-void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Computes polynomials $G$ and $S$, both reduced modulo~$B$, 
-    such that $G \cong S A \pmod{B}$, where $B$ is assumed to 
+    Computes polynomials $G$ and $S$, both reduced modulo~$B$,
+    such that $G \cong S A \pmod{B}$, where $B$ is assumed to
     have $\len(B) \geq 2$.
 
     In the case that $A = 0 \pmod{B}$, returns $G = S = 0$.
 
-int _fmpz_mod_poly_invmod(fmpz *A, 
-                          const fmpz *B, slong lenB, 
+int _fmpz_mod_poly_invmod(fmpz *A,
+                          const fmpz *B, slong lenB,
                           const fmpz *P, slong lenP, const fmpz_t p)
 
-    Attempts to set \code{(A, lenP-1)} to the inverse of \code{(B, lenB)} 
-    modulo the polynomial \code{(P, lenP)}.  Returns $1$ if \code{(B, lenB)} 
+    Attempts to set \code{(A, lenP-1)} to the inverse of \code{(B, lenB)}
+    modulo the polynomial \code{(P, lenP)}.  Returns $1$ if \code{(B, lenB)}
     is invertible and $0$ otherwise.
 
-    Assumes that $0 < \len(B) < \len(P)$, and hence also $\len(P) \geq 2$, 
+    Assumes that $0 < \len(B) < \len(P)$, and hence also $\len(P) \geq 2$,
     but supports zero-padding in \code{(B, lenB)}.
 
     Does not support aliasing.
 
     Assumes that $p$ is a prime number.
 
-int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, 
+int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
 
-    Attempts to set $A$ to the inverse of $B$ modulo $P$ in the polynomial 
-    ring $(\mathbf{Z}/p\mathbf{Z})[X]$, where we assume that $p$ is a prime 
+    Attempts to set $A$ to the inverse of $B$ modulo $P$ in the polynomial
+    ring $(\mathbf{Z}/p\mathbf{Z})[X]$, where we assume that $p$ is a prime
     number.
 
     If $\deg(P) < 2$, raises an exception.
 
-    If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and 
-    sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value 
+    If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and
+    sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value
     of $A$ on exit is undefined.
 
 *******************************************************************************
@@ -898,11 +943,11 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len,
                                const fmpz_t p)
 
-    Sets \code{(res, len - 1)} to the derivative of \code{(poly, len)}.  
-    Also handles the cases where \code{len} is $0$ or $1$ correctly. 
+    Sets \code{(res, len - 1)} to the derivative of \code{(poly, len)}.
+    Also handles the cases where \code{len} is $0$ or $1$ correctly.
     Supports aliasing of \code{res} and \code{poly}.
 
 void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
@@ -915,20 +960,20 @@ void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len,
                                   const fmpz_t a, const fmpz_t p)
 
-    Evaluates the polynomial \code{(poly, len)} at the integer $a$ and sets 
+    Evaluates the polynomial \code{(poly, len)} at the integer $a$ and sets
     \code{res} to the result.  Aliasing between \code{res} and $a$ or any
     of the coefficients of \code{poly} is not supported.
 
-void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
                                  const fmpz_mod_poly_t poly, const fmpz_t a)
 
-    Evaluates the polynomial \code{poly} at the integer $a$ and sets 
+    Evaluates the polynomial \code{poly} at the integer $a$ and sets
     \code{res} to the result.
 
-    As expected, aliasing between \code{res} and $a$ is supported.  However, 
+    As expected, aliasing between \code{res} and $a$ is supported.  However,
     \code{res} may not be aliased with a coefficient of \code{poly}.
 
 *******************************************************************************
@@ -937,78 +982,78 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, 
-                                              const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1,
+                                              const fmpz *poly2, slong len2,
                                               const fmpz_t p)
 
-    Sets \code{res} to the composition of \code{(poly1, len1)} and 
+    Sets \code{res} to the composition of \code{(poly1, len1)} and
     \code{(poly2, len2)} using Horner's algorithm.
 
-    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1} 
-    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually 
-    be the length of the resulting polynomial when $p$ is not a prime.  
+    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1}
+    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually
+    be the length of the resulting polynomial when $p$ is not a prime.
 
-    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.  
+    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.
     Does not support aliasing between any of the inputs and the output.
 
-void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, 
-                                  const fmpz_mod_poly_t poly1, 
+void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
+                                  const fmpz_mod_poly_t poly1,
                                   const fmpz_mod_poly_t poly2)
 
-    Sets \code{res} to the composition of \code{poly1} and \code{poly2} 
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
     using Horner's algorithm.
 
-    To be precise about the order of composition, denoting \code{res}, 
-    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
+    To be precise about the order of composition, denoting \code{res},
+    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively,
     sets $f(t) = g(h(t))$.
 
 void _fmpz_mod_poly_compose_divconquer(fmpz *res,
 	const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
 
-    Sets \code{res} to the composition of \code{(poly1, len1)} and 
-    \code{(poly2, len2)} using a divide and conquer algorithm which 
+    Sets \code{res} to the composition of \code{(poly1, len1)} and
+    \code{(poly2, len2)} using a divide and conquer algorithm which
     takes out factors of \code{poly2} raised to $2^i$ where possible.
 
-    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1} 
-    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually 
-    be the length of the resulting polynomial when $p$ is not a prime.  
+    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1}
+    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually
+    be the length of the resulting polynomial when $p$ is not a prime.
 
-    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.  
+    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.
     Does not support aliasing between any of the inputs and the output.
 
-void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res, 
-                                      const fmpz_mod_poly_t poly1, 
+void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res,
+                                      const fmpz_mod_poly_t poly1,
                                       const fmpz_mod_poly_t poly2)
 
-    Sets \code{res} to the composition of \code{poly1} and \code{poly2} 
-    using a divide and conquer algorithm which takes out factors of 
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    using a divide and conquer algorithm which takes out factors of
     \code{poly2} raised to $2^i$ where possible.
 
-    To be precise about the order of composition, denoting \code{res}, 
-    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
+    To be precise about the order of composition, denoting \code{res},
+    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively,
     sets $f(t) = g(h(t))$.
 
-void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, 
-                                       const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1,
+                                       const fmpz *poly2, slong len2,
                                        const fmpz_t p)
 
-    Sets \code{res} to the composition of \code{(poly1, len1)} and 
-    \code{(poly2, len2)}.  
+    Sets \code{res} to the composition of \code{(poly1, len1)} and
+    \code{(poly2, len2)}.
 
-    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1} 
-    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually 
-    be the length of the resulting polynomial when $p$ is not a prime.  
+    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1}
+    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually
+    be the length of the resulting polynomial when $p$ is not a prime.
 
-    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.  
+    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.
     Does not support aliasing between any of the inputs and the output.
 
-void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
+void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                                                 const fmpz_mod_poly_t poly2)
 
-    Sets \code{res} to the composition of \code{poly1} and \code{poly2}.  
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}.
 
-    To be precise about the order of composition, denoting \code{res}, 
-    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
+    To be precise about the order of composition, denoting \code{res},
+    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively,
     sets $f(t) = g(h(t))$.
 
 *******************************************************************************
@@ -1075,139 +1120,139 @@ void fmpz_mod_poly_compose_mod_brent_kung(
 
     Radix conversion
 
-    The following functions provide the functionality to solve the 
-    radix conversion problems for polynomials, which is to express 
-    a polynomial $f(X)$ with respect to a given radix $r(X)$ as 
+    The following functions provide the functionality to solve the
+    radix conversion problems for polynomials, which is to express
+    a polynomial $f(X)$ with respect to a given radix $r(X)$ as
     \begin{equation*}
     f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
     \end{equation*}
     where $N = \floor{\deg(f) / \deg(r)}$.
 
-    The algorithm implemented here is a recursive one, which performs 
-    Euclidean divisions by powers of $r$ of the form $r^{2^i}$, and it 
+    The algorithm implemented here is a recursive one, which performs
+    Euclidean divisions by powers of $r$ of the form $r^{2^i}$, and it
     has time complexity $\Theta(\deg(f) \log \deg(f))$.
 
-    It facilitates the repeated use of precomputed data, namely the 
-    powers of $r$ and their power series inverses.  This data is stored 
-    in objects of type \code{fmpz_mod_poly_radix_t} and it is computed 
-    using the function \code{fmpz_mod_poly_radix_init()}, which only 
+    It facilitates the repeated use of precomputed data, namely the
+    powers of $r$ and their power series inverses.  This data is stored
+    in objects of type \code{fmpz_mod_poly_radix_t} and it is computed
+    using the function \code{fmpz_mod_poly_radix_init()}, which only
     depends on~$r$ and an upper bound on the degree of~$f$.
 
 *******************************************************************************
 
-void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
-                    const fmpz *R, slong lenR, slong k, 
+void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
+                    const fmpz *R, slong lenR, slong k,
                     const fmpz_t invL, const fmpz_t p)
 
-    Computes powers of $R$ of the form $R^{2^i}$ and their Newton inverses 
+    Computes powers of $R$ of the form $R^{2^i}$ and their Newton inverses
     modulo $x^{2^{i} \deg(R)}$ for $i = 0, \dotsc, k-1$.
 
-    Assumes that the vectors \code{Rpow[i]} and \code{Rinv[i]} have space 
+    Assumes that the vectors \code{Rpow[i]} and \code{Rinv[i]} have space
     for $2^i \deg(R) + 1$ and $2^i \deg(R)$ coefficients, respectively.
 
     Assumes that the polynomial $R$ is non-constant, i.e.\ $\deg(R) \geq 1$.
 
-    Assumes that the leading coefficient of $R$ is a unit and that the 
+    Assumes that the leading coefficient of $R$ is a unit and that the
     argument \code{invL} is the inverse of the coefficient modulo~$p$.
 
-    The argument~$p$ is the modulus, which in $p$-adic applications is 
-    typically a prime power, although this is not necessary.  Here, we 
+    The argument~$p$ is the modulus, which in $p$-adic applications is
+    typically a prime power, although this is not necessary.  Here, we
     only assume that $p \geq 2$.
 
-    Note that this precomputed data can be used for any $F$ such that 
+    Note that this precomputed data can be used for any $F$ such that
     $\len(F) \leq 2^k \deg(R)$.
 
-void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
+void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
                               const fmpz_mod_poly_t R, slong degF)
 
-    Carries out the precomputation necessary to perform radix conversion 
+    Carries out the precomputation necessary to perform radix conversion
     to radix~$R$ for polynomials~$F$ of degree at most \code{degF}.
 
-    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$, 
+    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$,
     and that the leading coefficient is a unit.
 
-void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
+void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
                         slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
 
-    This is the main recursive function used by the 
+    This is the main recursive function used by the
     function \code{fmpz_mod_poly_radix()}.
 
-    Assumes that, for all $i = 0, \dotsc, N$, the vector 
+    Assumes that, for all $i = 0, \dotsc, N$, the vector
     \code{B[i]} has space for $\deg(R)$ coefficients.
 
-    The variable $k$ denotes the factors of $r$ that have 
-    previously been counted for the polynomial $F$, which 
-    is assumed to have length $2^{i+1} \deg(R)$, possibly 
+    The variable $k$ denotes the factors of $r$ that have
+    previously been counted for the polynomial $F$, which
+    is assumed to have length $2^{i+1} \deg(R)$, possibly
     including zero-padding.
 
-    Assumes that $W$ is a vector providing temporary space 
+    Assumes that $W$ is a vector providing temporary space
     of length $\len(F) = 2^{i+1} \deg(R)$.
 
-    The entire computation takes place over $\mathbf{Z} / p \mathbf{Z}$, 
+    The entire computation takes place over $\mathbf{Z} / p \mathbf{Z}$,
     where $p \geq 2$ is a natural number.
 
-    Thus, the top level call will have $F$ as in the original 
+    Thus, the top level call will have $F$ as in the original
     problem, and $k = 0$.
 
-void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F, 
+void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
                          const fmpz_mod_poly_radix_t D)
 
-    Given a polynomial $F$ and the precomputed data $D$ for the radix $R$, 
-    computes polynomials $B_0, \dotsc, B_N$ of degree less than $\deg(R)$ 
-    such that 
+    Given a polynomial $F$ and the precomputed data $D$ for the radix $R$,
+    computes polynomials $B_0, \dotsc, B_N$ of degree less than $\deg(R)$
+    such that
     \begin{equation*}
-    F = B_0 + B_1 R + \dotsb + B_N R^N, 
+    F = B_0 + B_1 R + \dotsb + B_N R^N,
     \end{equation*}
     where necessarily $N = \floor{\deg(F) / \deg(R)}$.
 
-    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$, 
+    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$,
     and that the leading coefficient is a unit.
 
 *******************************************************************************
 
     Input and output
 
-    The printing options supported by this module are very similar to 
-    what can be found in the two related modules \code{fmpz_poly} and 
+    The printing options supported by this module are very similar to
+    what can be found in the two related modules \code{fmpz_poly} and
     \code{nmod_poly}.
 
-    Consider, for example, the polynomial $f(x) = 5x^3 + 2x + 1$ in 
-    $(\mathbf{Z}/6\mathbf{Z})[x]$.  Its simple string representation 
-    is \code{"4 6  1 2 0 5"}, where the first two numbers denote the 
-    length of the polynomial and the modulus.  The pretty string 
+    Consider, for example, the polynomial $f(x) = 5x^3 + 2x + 1$ in
+    $(\mathbf{Z}/6\mathbf{Z})[x]$.  Its simple string representation
+    is \code{"4 6  1 2 0 5"}, where the first two numbers denote the
+    length of the polynomial and the modulus.  The pretty string
     representation is \code{"5*x^3+2*x+1"}.
 
 *******************************************************************************
 
-int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
                           const fmpz_t p)
 
     Prints the polynomial \code{(poly, len)} to the stream \code{file}.
 
-    In case of success, returns a positive value.  In case of failure, 
+    In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
 int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly)
 
     Prints the polynomial to the stream \code{file}.
 
-    In case of success, returns a positive value.  In case of failure, 
+    In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-int fmpz_mod_poly_fprint_pretty(FILE * file, 
+int fmpz_mod_poly_fprint_pretty(FILE * file,
                                 const fmpz_mod_poly_t poly, const char * x)
 
-    Prints the pretty representation of \code{(poly, len)} to the stream 
+    Prints the pretty representation of \code{(poly, len)} to the stream
     \code{file}, using the string \code{x} to represent the indeterminate.
 
-    In case of success, returns a positive value.  In case of failure, 
+    In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
 int fmpz_mod_poly_print(const fmpz_mod_poly_t poly)
 
     Prints the polynomial to \code{stdout}.
 
-    In case of success, returns a positive value.  In case of failure, 
+    In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
 int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
@@ -1215,6 +1260,5 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
     Prints the pretty representation of \code{poly} to \code{stdout},
     using the string \code{x} to represent the indeterminate.
 
-    In case of success, returns a positive value.  In case of failure, 
+    In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
-
