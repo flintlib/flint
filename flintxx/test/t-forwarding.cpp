@@ -104,7 +104,7 @@ test_assignment()
 {
     fwint f1, f2(4);
 
-    f1 = 3l; // TODO understand why "3" seems to lead to circular dependency
+    f1 = WORD(3); // TODO understand why "3" seems to lead to circular dependency
     tassert(f1 == 3);
 
     f1 = f2;
