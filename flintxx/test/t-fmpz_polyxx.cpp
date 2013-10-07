@@ -79,7 +79,7 @@ test_assignment()
     fmpz_polyxx p, q;
     p = 1;
     tassert(p.is_one());
-    q = 0ul;
+    q = UWORD(0);
     tassert(q.is_zero());
     tassert(p != q);
     p = q;
