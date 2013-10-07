@@ -44,7 +44,7 @@ namespace traits {
 ///////////////////////
 // These helpers can be used to manipulate and inquire type information.
 // For example, given an arbitrary type T, one might be interested in knowing
-// if it is an integral type (int, short, unsigned long, etc).
+// if it is an integral type (int, short, ulong, etc).
 //
 // This file contains generic traits, not specific to FLINT.
 
@@ -56,21 +56,20 @@ template<class T> struct is_signed_integer : false_ { };
 template<> struct is_signed_integer<signed char> : true_ { };
 template<> struct is_signed_integer<signed short> : true_ { };
 template<> struct is_signed_integer<signed int> : true_ { };
-template<> struct is_signed_integer<signed long> : true_ { };
+template<> struct is_signed_integer<slong> : true_ { };
 
 // Compute if T belongs to the unsigned integer types.
 template<class T> struct is_unsigned_integer : false_ { };
 template<> struct is_unsigned_integer<unsigned char> : true_ { };
 template<> struct is_unsigned_integer<unsigned short> : true_ { };
 template<> struct is_unsigned_integer<unsigned int> : true_ { };
-template<> struct is_unsigned_integer<unsigned long> : true_ { };
+template<> struct is_unsigned_integer<ulong> : true_ { };
 
 // Compute if T belongs to the signed or unsigned integer types
 template<class T> struct is_integer
     : mp::or_<is_unsigned_integer<T>, is_signed_integer<T> > { };
 
-// Compute if T can always losslessly be converted into signed long
-// TODO should we use slong here instead of long?
+// Compute if T can always losslessly be converted into an slong
 template<class T, class Enable = void> struct fits_into_slong : mp::false_ { };
 template<class T>
 struct fits_into_slong<T, typename mp::enable_if<traits::is_integer<T> >::type>
@@ -78,7 +77,7 @@ struct fits_into_slong<T, typename mp::enable_if<traits::is_integer<T> >::type>
           is_signed_integer<T>,
           mp::and_v<
               is_unsigned_integer<T>,
-              sizeof(T) < sizeof(long)
+              sizeof(T) < sizeof(slong)
             >
         > { };
 
