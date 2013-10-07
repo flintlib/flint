@@ -53,6 +53,24 @@ void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     _fmpz_poly_normalise(rop);
 }
 
+void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+{
+    const long d = fq_ctx_degree(ctx);
+    long i;
+
+    fmpz_poly_fit_length(rop, d);
+
+    for (i = 0; i < d - 1; i++)
+    {
+        fmpz_randm(rop->coeffs + i, state, fq_ctx_prime(ctx));
+    }
+
+    fmpz_one(rop->coeffs + d - 1);
+
+    _fmpz_poly_set_length(rop, d);
+    _fmpz_poly_normalise(rop);
+}
+
 void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
     long i;

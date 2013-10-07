@@ -178,6 +178,8 @@ void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
 
 void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
+void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+
 void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
 /* Comparison ****************************************************************/
