@@ -89,7 +89,7 @@ test_assignment()
 
     mylong c(0);
     c = a + b;
-    tassert(c == 87l);
+    tassert(c == WORD(87));
 }
 
 void
@@ -203,17 +203,17 @@ test_arithmetic()
     mylong cl(WORD(7));
 
     tassert(al + bl == cl);
-    tassert(al + bl == 7l);
-    tassert(al + b  == 7l);
-    tassert(a + bl  == 7l);
+    tassert(al + bl == WORD(7));
+    tassert(al + b  == WORD(7));
+    tassert(a + bl  == WORD(7));
     tassert((a + bl) + cl  == WORD(14));
     tassert((a + b) + cl  == WORD(14));
     tassert((al + b) + c  == WORD(14));
     tassert(cl + (a + bl)  == WORD(14));
     tassert(cl + (a + b)  == WORD(14));
     tassert(c + (al + b)  == WORD(14));
-    tassert((a + bl) + (cl + d) == 15l);
-    tassert((a + bl) + (c + d) == 15l);
+    tassert((a + bl) + (cl + d) == WORD(15));
+    tassert((a + bl) + (c + d) == WORD(15));
 
     tassert((a << 2) == 12);
     tassert(((a << 2) >> 2) == a);
@@ -284,24 +284,24 @@ test_references()
     tassert(ar == acr);
     tassert(ar == WORD(4) && acr == WORD(4));
 
-    ar = 5l;
-    tassert(a == 5l && acr == 5l && ar == 5l);
+    ar = WORD(5);
+    tassert(a == WORD(5) && acr == WORD(5) && ar == WORD(5));
 
     mylong b(6);
     ar = b;
     tassert(a == b);
 
     mylong_cref bcr(b);
-    b = 7l;
+    b = WORD(7);
     ar = bcr;
     tassert(a == b);
 
     a = WORD(4);
-    b = 5l;
-    tassert(a + bcr == 9l);
-    tassert(ar + bcr == 9l);
+    b = WORD(5);
+    tassert(a + bcr == WORD(9));
+    tassert(ar + bcr == WORD(9));
     a = acr + b;
-    tassert(a == 9l);
+    tassert(a == WORD(9));
     ar = acr + bcr;
     tassert(a == WORD(14));
 
