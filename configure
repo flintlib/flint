@@ -177,7 +177,7 @@ else
 fi
 LIB_DIRS="${LIB_DIRS} ${GMP_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${GMP_INC_DIR}"
-LIBS="gmp ${LIBS}"
+LIBS="${LIBS} gmp"
 
 if [ -d "${MPFR_DIR}/lib" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib"
@@ -197,7 +197,7 @@ else
 fi
 LIB_DIRS="${LIB_DIRS} ${MPFR_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${MPFR_INC_DIR}"
-LIBS="mpfr ${LIBS}"
+LIBS="${LIBS} mpfr"
 
 #configure extra libraries
 
@@ -214,7 +214,7 @@ if [ "$WANT_NTL" = "1" ]; then
    fi
    EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${NTL_INC_DIR}"
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${NTL_LIB_DIR}"
-   EXTRA_LIBS="ntl ${EXTRA_LIBS}"
+   EXTRA_LIBS="${EXTRA_LIBS} ntl"
 fi
 
 if [ "$WANT_BLAS" = "1" ]; then
@@ -227,7 +227,7 @@ if [ "$WANT_BLAS" = "1" ]; then
    fi
    EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${BLAS_INC_DIR}"
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${BLAS_LIB_DIR}"
-   EXTRA_LIBS="openblas ${EXTRA_LIBS}"
+   EXTRA_LIBS="${EXTRA_LIBS} openblas"
 fi
 CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
 
