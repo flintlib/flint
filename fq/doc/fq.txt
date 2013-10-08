@@ -1,0 +1,312 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2012, 2013 Andres Goens
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Data structures
+
+    We represent an element of the finite field 
+    $\mathbb{F}_{p^n} \cong \mathbb{F}_p[X]/(f(X))$,
+    where $f(X) \in \mathbb{F}_p[X]$ is a monic, irreducible polynomial 
+    of degree~$n$, as a polynomial in $\mathbb{F}_p[X]$ of degree less 
+    than $n$.
+
+    The default choice for $f(X)$ is the Conway polynomial 
+    for the pair $(p,n)$.  Frank Luebeck's data base of 
+    Conway polynomials is made available in the file \code{CP.txt}.
+
+*******************************************************************************
+
+void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+
+    Initialises the context for prime~$p$ and extension degree~$d$, 
+    with name \code{var} for the generator.
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the string \code{var} is a null-terminated string 
+    of length at least one.
+
+void fq_ctx_clear(fq_ctx_t ctx);
+
+    Clears all memory that has been allocated as part of the context.
+
+long fq_ctx_degree(const fq_ctx_t ctx)
+
+    Returns the degree of the field extension 
+    $[\mathbf{F}_{q} : \mathbf{F}_{p}]$, which 
+    is equal to $\log_{p} q$.
+
+fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+
+    Returns a pointer to the prime $p$ in the context.
+
+void fq_ctx_print(const fq_ctx_t ctx)
+
+    Prints the context information to {\tt{stdout}}.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fq_init(fq_t rop)
+
+    Initialises the element \code{rop}, setting its value to~$0$.
+
+void fq_init_2(fq_t rop, const fq_ctx_t ctx)
+
+    Initialises \code{poly} with at least enough space for it to be an element
+    of \code{ctx} and sets it to~$0$.
+
+void fq_clear(fq_t rop)
+
+    Clears the element \code{rop}.
+
+void _fq_reduce(fmpz *R, long lenR, 
+                const fmpz *a, const long *j, long len, const fmpz_t p)
+
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given 
+    by the triple \code{(a, j, len)} and the integer $p$.  
+    This does not depend on p being prime.
+
+void fq_reduce(fq_t rop, const fq_ctx_t ctx)
+
+    Reduces the polynomial \code{rop} as an element of 
+    $\mathbf{F}_p[X] / (f(X))$.
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+
+void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+
+void fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the negative of \code{op}.
+
+void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2}, 
+    reducing the output in the given context.
+
+void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $x$, 
+    reducing the output in the given context.
+
+void fq_mul_si(fq_t rop, const fq_t op, long x, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $x$, 
+    reducing the output in the given context.
+
+void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $x$, 
+    reducing the output in the given context.
+
+void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the square of \code{op}, 
+    reducing the output in the given context.
+
+void _fq_inv(fmpz *rop, const fmpz *op, long len, 
+             const fmpz *a, const long *j, long lena, const fmpz_t p)
+
+    Sets \code{(rop, d)} to the inverse of the non-zero element 
+    \code{(op, len)}.
+
+    N.B.  The integer $p \geq 2$ does not necessarily have to 
+    be a prime.  That is to say, this function could be used 
+    from the module for $\mathbf{Q}_{q}$ modulo a prime power $p^N$. 
+    However, this function would not make use of $p$-adic 
+    lifting techniques.
+
+void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the inverse of the non-zero element \code{op}.
+
+void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
+             const fmpz *a, const long *j, long lena, const fmpz_t p)
+
+    Sets \code{(rop, 2*d-1)} to \code{(op,len)} raised to the power~$e$, 
+    reduced modulo $f(X)$ given by \code{(a, j, lena)} and the integer 
+    $p \geq 2$, which is not expected to be a prime.
+
+    Assumes that $e \geq 0$ and that \code{len} is positive and at most~$d$.
+
+    Although we require that \code{rop} provides space for 
+    $2d - 1$ coefficients, the output will be reduces modulo 
+    $f(X)$, which is a polynomial of degree~$d$.
+
+    Does not support aliasing.
+
+void fq_pow(qadic_t rop, const qadic_t op, const fmpz_t e, const fq_ctx_t ctx)
+
+    Sets \code{rop} the \code{op} raised to the power~$e$.
+
+    Currently assumes that $e \geq 0$.
+
+    Note that for any input \code{op}, \code{rop} is set to~$1$ 
+    whenever $e = 0$.
+
+*******************************************************************************
+
+    Output
+
+*******************************************************************************
+
+int fq_fprint_pretty(FILE *file, const fq_t op, const fq_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{file}.
+
+    In the current implementation, always returns~$1$.  The return code is 
+    part of the function's signature to allow for a later implementation to 
+    return the number of characters printed or a non-positive error code.
+
+int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{stdout}.
+
+    In the current implementation, always returns~$1$.  The return code is 
+    part of the function's signature to allow for a later implementation to 
+    return the number of characters printed or a non-positive error code.
+
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+
+    Generates a random element of $\mathbb{F}_q$.
+
+void fq_randtest_not_zero(fq_t rop, flint_rand_t state, 
+                             const fq_ctx_t ctx)
+
+    Generates a random non-zero element of $\mathbb{F}_q$.
+
+*******************************************************************************
+
+    Assignments and conversions
+
+*******************************************************************************
+
+void fq_set(fq_t rop, const fq_t op)
+
+    Sets \code{rop} to \code{op}.
+
+void fq_swap(fq_t op1, fq_t op2)
+
+    Swaps the two elements \code{op1} and \code{op2}.
+
+void fq_zero(fq_t rop)
+
+    Sets \code{rop} to zero.
+
+void fq_one(fq_t rop, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to one, reduced in the given context.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fq_is_zero(const fq_t op)
+
+    Returns whether \code{op} is equal to zero.
+
+int fq_is_one(const fq_t op)
+
+    Returns whether \code{op} is equal to one.
+
+int fq_equal(const fq_t op1, const fq_t op2)
+
+    Returns whether \code{op1} and \code{op2} are equal.
+
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void _fq_trace(fmpz_t rop, const fmpz *op, long len, 
+               const fmpz *a, const long *j, long lena, const fmpz_t p)
+
+    Sets \code{rop} to the trace of the non-zero element \code{(op, len)} 
+    in $\mathbf{F}_{q}$.
+
+    We note that the same code may also be called to compute the 
+    trace of a non-zero element of $\mathbf{Z}_p$ represented as 
+    an integer polynomial modulo~$p^N$.
+
+void fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the trace of \code{op}.
+
+    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines
+    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the
+    trace of $a$ as the trace of this map.  Equivalently, if $\Sigma$
+    generates $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of
+    $a$ is equal to $\sum_{i=0}^{d-1} \Sigma^i (a)$, where $d =
+    \log_{p} q$.
+
+void fq_norm(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Computes the norm of \code{op}.
+
+    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines 
+    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the norm 
+    of $a$ as the determinant of this map.  Equivalently, if $\Sigma$ generates 
+    $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of $a$ is equal to 
+    $\prod_{i=0}^{d-1} \Sigma^i (a)$, where
+    $d = \text{dim}_{\mathbb{F}_p}(\mathbb{F}_q)$.
+
+    Algorithm selection is automatic depending on the input.
+
+void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
+
+    Evaluates the homomorphism $\Sigma^e$ at \code{op}.
+
+    Recall that $\mathbb{F}_q / \mathbb{F}_p$ is Galois with Galois group 
+    $\langle \sigma \rangle$, which is also isomorphic to
+    $\mathbf{Z}/d\mathbf{Z}$, where 
+    $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element 
+    $\sigma \colon x \mapsto x^p$.
+
