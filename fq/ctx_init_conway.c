@@ -71,26 +71,13 @@ void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
         /* Same degree? */
         if (d == atoi(tmp))
         {
-            long i, j;
+            fmpz_mod_poly_t mod;
+            long i;
             char *ptr;
 
-            /* Find number of non-zero coefficients */
-            ctx->len = 1;
-            ptr = tmp;
-
-            for (i = 0; i < d; i++)
-            {
-                while (*ptr++ != ' ') ;
-
-                if (atoi(ptr))
-                    ctx->len ++;
-            }
-
-            ctx->a = _fmpz_vec_init(ctx->len);
-            ctx->j = flint_malloc(ctx->len * sizeof(long));
+            fmpz_mod_poly_init(mod, p);
 
             /* Copy the polynomial */
-            j = 0;
             ptr = tmp;
 
             for (i = 0; i < d; i++)
@@ -100,22 +87,11 @@ void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
                 while (*ptr++ != ' ') ;
 
                 coeff = atoi(ptr);
-
-                if (coeff)
-                {
-                    fmpz_set_ui(ctx->a + j, coeff);
-                    ctx->j[j] = i;
-                    j++;
-                }
+                fmpz_mod_poly_set_coeff_ui(mod, i, coeff);
             }
+            fmpz_mod_poly_set_coeff_ui(mod, d, 1);
 
-            fmpz_set_ui(ctx->a + j, 1);
-            ctx->j[j] = d;
-
-            fmpz_init_set(fq_ctx_prime(ctx), p);
-
-            ctx->var = flint_malloc(strlen(var) + 1);
-            strcpy(ctx->var, var);
+            fq_ctx_init_modulus(ctx, p, d, mod, var);
 
             fclose(file);
             flint_free(buf);

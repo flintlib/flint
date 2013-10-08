@@ -47,6 +47,9 @@ typedef struct
     long *j;
     long len;
 
+    fmpz_mod_poly_t modulus;
+    fmpz_mod_poly_t inv;
+
     char *var;
 }
 fq_ctx_struct;
@@ -64,39 +67,17 @@ void fq_ctx_clear(fq_ctx_t ctx);
 
 static __inline__ long fq_ctx_degree(const fq_ctx_t ctx)
 {
-    return ctx->j[ctx->len - 1];
+    return ctx->modulus->length - 1;
 }
 
 #define fq_ctx_prime(ctx)  (&((ctx)->p))
 
 static __inline__ void fq_ctx_print(const fq_ctx_t ctx)
 {
-    long i, k;
-
     printf("p = "), fmpz_print(fq_ctx_prime(ctx)), printf("\n");
-    printf("d = %ld\n", ctx->j[ctx->len - 1]);
+    printf("d = %ld\n", fq_ctx_degree(ctx));
     printf("f(X) = ");
-    fmpz_print(ctx->a + 0);
-    for (k = 1; k < ctx->len; k++)
-    {
-        i = ctx->j[k];
-        printf(" + ");
-        if (fmpz_is_one(ctx->a + k))
-        {
-            if (i == 1)
-                printf("X");
-            else
-                printf("X^%ld", i);
-        }
-        else
-        {
-            fmpz_print(ctx->a + k);
-            if (i == 1)
-                printf("*X");
-            else
-                printf("*X^%ld", i);
-        }
-    }
+    fmpz_mod_poly_print_pretty(ctx->modulus, "X");
     printf("\n");
 }
 
@@ -144,8 +125,31 @@ void _fq_reduce(fmpz *R, long lenR,
 
 static __inline__ void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 {
-    _fq_reduce(rop->coeffs, rop->length, 
-               ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+    fmpz  *q, *r;
+    
+    if (rop->length < ctx->modulus->length)
+    {
+        _fmpz_vec_scalar_mod_fmpz(rop->coeffs, rop->coeffs, rop->length,
+                                  fq_ctx_prime(ctx));
+        _fmpz_poly_normalise(rop);
+        return;
+    }
+    
+    q = _fmpz_vec_init(rop->length - ctx->modulus->length + 1);
+    r = _fmpz_vec_init(ctx->modulus->length - 1);
+
+    _fmpz_mod_poly_divrem_newton_preinv(q, r, rop->coeffs, rop->length, 
+                                        ctx->modulus->coeffs, ctx->modulus->length,
+                                        ctx->inv->coeffs, ctx->inv->length,
+                                        fq_ctx_prime(ctx));
+
+    _fmpz_vec_clear(q, rop->length - ctx->modulus->length + 1);
+    _fmpz_vec_clear(rop->coeffs, rop->alloc);
+
+    rop->coeffs = r;
+    rop->alloc = ctx->modulus->length - 1;
+    rop->length = ctx->modulus->length - 1;
+
     _fmpz_poly_normalise(rop);
 }
 
