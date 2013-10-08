@@ -5,6 +5,7 @@
 *.a
 *.so
 *.P
+*.ppm
 */.deps/*
 fmpz/fmpz.c
 build/
