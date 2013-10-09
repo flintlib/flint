@@ -36,6 +36,11 @@
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/ZZ_pE.h>
 #include <NTL/ZZ_pEX.h>
+#include <NTL/lzz_p.h>
+#include <NTL/lzz_pX.h>
+#include <NTL/lzz_pXFactoring.h>
+#include <NTL/lzz_pE.h>
+#include <NTL/lzz_pEX.h>
 #include <NTL/vec_ZZ.h>
 
 #ifdef __cplusplus
@@ -77,6 +82,16 @@ void fmpz_set_ZZ_p(fmpz_t rop, const ZZ_p& op);
  */
 void fmpz_get_ZZ_p(ZZ_p& rop, const fmpz_t op);
 
+/* 
+   Converts an NTL zz_p to an fmpz_t.
+*/
+void fmpz_set_zz_p(fmpz_t rop, const zz_p& op);
+
+/* 
+   Converts an fmpz_t to an NTL zz_p.
+ */
+void fmpz_get_zz_p(zz_p& rop, const fmpz_t op);
+
 /*
   Converts an fmpz_poly_t to an NTL ZZX.
 */
@@ -117,6 +132,37 @@ void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op);
   Converts an NTL ZZ_pEX to an fq_poly_t.
 */
 void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op);
+
+/*
+  Converts an fmpz_mod_poly_t to an NTL zz_pX.
+*/
+void fmpz_mod_poly_get_zz_pX(zz_pX& rop, const fmpz_mod_poly_t op);
+
+/*
+  Converts an NTL zz_pX to an fmpz_poly_t.
+*/
+void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op);
+
+/*
+  Converts an fq_t to an NTL zz_pE.
+*/
+void fq_get_zz_pE(zz_pE& rop, const fq_t op);
+
+/*
+  Converts an NTL zz_pE to an fq_t.
+*/
+void fq_set_zz_pE(fq_t rop, const zz_pE& op);
+
+
+/*
+  Converts an fq_poly_t to an NTL zz_pEX.
+*/
+void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op);
+
+/*
+  Converts an NTL zz_pEX to an fq_poly_t.
+*/
+void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op);
 
 #ifdef __cplusplus
 }
