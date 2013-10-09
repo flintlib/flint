@@ -507,6 +507,32 @@ void _fq_poly_compose(fq_struct *rop, const fq_struct *op1, long len1,
 void fq_poly_compose(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                      const fq_ctx_t ctx);
 
+void
+_fq_poly_compose_mod(fq_struct * res, 
+                     const fq_struct * f, slong lenf, 
+                     const fq_struct * g,
+                     const fq_struct * h, slong lenh, 
+                     const fq_ctx_t ctx);
+
+void
+fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
+                    const fq_poly_t poly2, const fq_poly_t poly3,
+                    const fq_ctx_t ctx);
+
+void
+_fq_poly_compose_mod_horner(fq_struct * res,
+                            const fq_struct * f, slong lenf, 
+                            const fq_struct * g,
+                            const fq_struct * h, slong lenh, 
+                            const fq_ctx_t ctx);
+
+void
+fq_poly_compose_mod_horner(fq_poly_t res,
+                           const fq_poly_t poly1,
+                           const fq_poly_t poly2,
+                           const fq_poly_t poly3,
+                           const fq_ctx_t ctx);
+
 /*  Input and output  ********************************************************/
 
 int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
