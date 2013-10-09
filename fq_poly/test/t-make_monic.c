@@ -35,7 +35,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("make_monic....");
+    flint_printf("make_monic....");
     fflush(stdout);
 
     /* test aliasing */
@@ -61,9 +61,9 @@ main(void)
         result = fq_poly_equal(a,b);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
             
         }
 
@@ -95,9 +95,9 @@ main(void)
         result = fq_is_one(fq_poly_lead(a));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("lead ="), fq_print_pretty(fq_poly_lead(a), ctx), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("lead ="), fq_print_pretty(fq_poly_lead(a), ctx), flint_printf("\n");
         }
 
         fq_poly_clear(a);
@@ -105,6 +105,6 @@ main(void)
     }
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

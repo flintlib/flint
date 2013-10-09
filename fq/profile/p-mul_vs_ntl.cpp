@@ -109,7 +109,7 @@ main(int argc, char** argv)
         fmpz_get_ZZ(prime, p);
         ZZ_p::init(prime);
 
-        printf("p = "); fmpz_print(p); printf("\n");
+        flint_printf("p = "); fmpz_print(p); flint_printf("\n");
 
         for (len = lenlo, j = 0; len <= lenhi; len *= lenh, j++)
         {
@@ -167,14 +167,14 @@ main(int argc, char** argv)
                 reps += loops;
             }
             
-            printf("len: %6d:", len);
+            flint_printf("len: %6d:", len);
             for (c = 0; c < nalgs; c++)
             {
                 T[i][j][c] = s[c] / (double) reps;
-                printf("%10f", T[i][j][c]);
+                flint_printf("%10f", T[i][j][c]);
                 fflush(stdout);
             }
-            printf("\n");
+            flint_printf("\n");
             
             if (s[0] <= s[1])
                 X[i][j] = 0;
@@ -188,7 +188,7 @@ main(int argc, char** argv)
            slong sum = 0, c;
            for (c = 0; c < nalgs; c++)
               sum += s[c];
-           printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);
+           flint_printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);
         }
     }
 
@@ -203,8 +203,8 @@ main(int argc, char** argv)
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
-            printf("%d", X[i][j]);
-        printf("\n");
+            flint_printf("%d", X[i][j]);
+        flint_printf("\n");
     }
     
     /*
@@ -245,7 +245,7 @@ main(int argc, char** argv)
         
         if (k)
         {
-            printf("Exception:  writing ppm image failed\n");
+            flint_printf("Exception:  writing ppm image failed\n");
         }
     }
 

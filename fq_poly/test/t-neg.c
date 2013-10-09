@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("neg... ");
+    flint_printf("neg... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,9 +68,9 @@ main(void)
         result = (fq_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
             abort();
         }
 
@@ -106,9 +106,9 @@ main(void)
         result = (fq_poly_equal(a , b));
         if (!result)
         {
-            printf("FAIL (-(-a) == a):\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
+            flint_printf("FAIL (-(-a) == a):\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
             abort();
         }
 
@@ -144,9 +144,9 @@ main(void)
         result = (fq_poly_is_zero(a));
         if (!result)
         {
-            printf("FAIL (a + (-a) == 0):\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
+            flint_printf("FAIL (a + (-a) == 0):\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
             abort();
         }
 
@@ -159,7 +159,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

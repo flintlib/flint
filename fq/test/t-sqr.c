@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sqr... ");
+    flint_printf("sqr... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -67,9 +67,9 @@ main(void)
         result = (fq_equal(a, c));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -110,11 +110,11 @@ main(void)
         result = (fq_equal(c, d));
         if (!result)
         {
-            printf("FAIL (a^2 + a^2 == a(a + a)):\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            printf("d = "), fq_print_pretty(d, ctx), printf("\n");
+            flint_printf("FAIL (a^2 + a^2 == a(a + a)):\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("d = "), fq_print_pretty(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -129,7 +129,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

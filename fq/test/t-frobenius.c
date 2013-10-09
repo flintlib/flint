@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("frobenius... ");
+    flint_printf("frobenius... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -71,11 +71,11 @@ main(void)
         result = (fq_equal(b, c));
         if (!result)
         {
-            printf("FAIL (alias):\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (alias):\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("e = %ld\n", e);
             abort();
         }
 
@@ -122,11 +122,11 @@ main(void)
         result = (fq_equal(b,c));
         if (!result)
         {
-            printf("FAIL (sigma^e(x) = x^{p^e}):\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (sigma^e(x) = x^{p^e}):\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("e = %ld\n", e);
             abort();
         }
 
@@ -174,15 +174,15 @@ main(void)
         result = (fq_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL (sigma(a+b) = sigma(a) + sigma(b)):\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("s = "), fq_print_pretty(s, ctx), printf("\n");
-            printf("s1 = "), fq_print_pretty(s1, ctx), printf("\n");
-            printf("s2 = "), fq_print_pretty(s2, ctx), printf("\n");
-            printf("lhs = "), fq_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), fq_print_pretty(rhs, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (sigma(a+b) = sigma(a) + sigma(b)):\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("s = "), fq_print_pretty(s, ctx), flint_printf("\n");
+            flint_printf("s1 = "), fq_print_pretty(s1, ctx), flint_printf("\n");
+            flint_printf("s2 = "), fq_print_pretty(s2, ctx), flint_printf("\n");
+            flint_printf("lhs = "), fq_print_pretty(lhs, ctx), flint_printf("\n");
+            flint_printf("rhs = "), fq_print_pretty(rhs, ctx), flint_printf("\n");
+            flint_printf("e = %ld\n", e);
             abort();
         }
 
@@ -234,15 +234,15 @@ main(void)
         result = (fq_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL (sigma(a*b) = sigma(a) * sigma(b)):\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("s = "), fq_print_pretty(s, ctx), printf("\n");
-            printf("s1 = "), fq_print_pretty(s1, ctx), printf("\n");
-            printf("s2 = "), fq_print_pretty(s2, ctx), printf("\n");
-            printf("lhs = "), fq_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), fq_print_pretty(rhs, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (sigma(a*b) = sigma(a) * sigma(b)):\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("s = "), fq_print_pretty(s, ctx), flint_printf("\n");
+            flint_printf("s1 = "), fq_print_pretty(s1, ctx), flint_printf("\n");
+            flint_printf("s2 = "), fq_print_pretty(s2, ctx), flint_printf("\n");
+            flint_printf("lhs = "), fq_print_pretty(lhs, ctx), flint_printf("\n");
+            flint_printf("rhs = "), fq_print_pretty(rhs, ctx), flint_printf("\n");
+            flint_printf("e = %ld\n", e);
             abort();
         }
 
@@ -260,7 +260,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

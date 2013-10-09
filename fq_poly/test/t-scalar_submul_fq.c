@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("scalar_submul_fq... ");
+    flint_printf("scalar_submul_fq... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,11 +73,11 @@ main(void)
         result = (fq_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL (alias):\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
-            printf("x = "), fq_print_pretty(x, ctx), printf("\n");
+            flint_printf("FAIL (alias):\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
+            flint_printf("x = "), fq_print_pretty(x, ctx), flint_printf("\n");
             abort();
         }
 
@@ -122,11 +122,11 @@ main(void)
         result = (fq_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
-            printf("x = "), fq_print_pretty(x, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
+            flint_printf("x = "), fq_print_pretty(x, ctx), flint_printf("\n");
             abort();
         }
 
@@ -141,7 +141,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

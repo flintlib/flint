@@ -46,7 +46,7 @@ long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA,
     while(lenR2 > 0)
       {
           if(!fq_is_zero(&R2[lenR2-1])) fq_inv(inv,&R2[lenR2-1],ctx);
-             else printf("something wrong with length");
+             else flint_printf("something wrong with length");
 	_fq_poly_rem(R1, R1, lenR1, R2, lenR2, inv, ctx);
 	_fq_poly_normalise2(R1,&lenR1);
 	

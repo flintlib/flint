@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("evaluate_fq... ");
+    flint_printf("evaluate_fq... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -72,11 +72,11 @@ main(void)
         result = (fq_equal(x, y));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("f = "), fq_poly_print_pretty(f, "X", ctx), printf("\n");
-            printf("x = "), fq_print_pretty(x, ctx), printf("\n");
-            printf("y = "), fq_print_pretty(y, ctx), printf("\n");
-            printf("z = "), fq_print_pretty(z, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("f = "), fq_poly_print_pretty(f, "X", ctx), flint_printf("\n");
+            flint_printf("x = "), fq_print_pretty(x, ctx), flint_printf("\n");
+            flint_printf("y = "), fq_print_pretty(y, ctx), flint_printf("\n");
+            flint_printf("z = "), fq_print_pretty(z, ctx), flint_printf("\n");
             abort();
         }
 
@@ -124,13 +124,13 @@ main(void)
         result = (fq_equal(y, z));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("f = "), fq_poly_print_pretty(f, "X", ctx), printf("\n");
-            printf("g = "), fq_poly_print_pretty(g, "X", ctx), printf("\n");
-            printf("h = "), fq_poly_print_pretty(h, "X", ctx), printf("\n");
-            printf("x = "), fq_print_pretty(x, ctx), printf("\n");
-            printf("y = "), fq_print_pretty(y, ctx), printf("\n");
-            printf("z = "), fq_print_pretty(z, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("f = "), fq_poly_print_pretty(f, "X", ctx), flint_printf("\n");
+            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
+            flint_printf("h = "), fq_poly_print_pretty(h, "X", ctx), flint_printf("\n");
+            flint_printf("x = "), fq_print_pretty(x, ctx), flint_printf("\n");
+            flint_printf("y = "), fq_print_pretty(y, ctx), flint_printf("\n");
+            flint_printf("z = "), fq_print_pretty(z, ctx), flint_printf("\n");
             abort();
         }
 
@@ -147,7 +147,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

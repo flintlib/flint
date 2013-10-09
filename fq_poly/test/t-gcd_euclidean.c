@@ -35,7 +35,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("gcd_euclidean....");
+    flint_printf("gcd_euclidean....");
     fflush(stdout);
 
     /* Check that gcd(a,a) = a (made monic) */
@@ -65,10 +65,10 @@ main(void)
         result = (fq_poly_equal(g, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-            printf("g = "), fq_poly_print_pretty(g, "X", ctx), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
             abort();
         }
         
@@ -112,8 +112,8 @@ main(void)
         }
 
         if(!fq_poly_is_one(g)){ 
-            printf("FAIL:\n");
-            printf("could not find coprime polynomials after %ld tries\n",j+1);
+            flint_printf("FAIL:\n");
+            flint_printf("could not find coprime polynomials after %ld tries\n",j+1);
             abort();
         }
 
@@ -121,8 +121,8 @@ main(void)
                     fq_poly_randtest_not_zero(c, state, len+2, ctx);
 
         if(c->length<2){
-            printf("FAIL:\n");
-            printf("could not find non-unit polynomial after %ld tries\n",j+1);
+            flint_printf("FAIL:\n");
+            flint_printf("could not find non-unit polynomial after %ld tries\n",j+1);
             abort();
         }
 
@@ -136,11 +136,11 @@ main(void)
         result = (fq_poly_equal(g, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
-            printf("g = "), fq_poly_print_pretty(g, "X", ctx), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
+            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
             abort();
         }
         
@@ -177,10 +177,10 @@ main(void)
         result = (fq_poly_equal(g, a));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-            printf("g = "), fq_poly_print_pretty(g, "X", ctx), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
             abort();
         }
         
@@ -217,10 +217,10 @@ main(void)
         result = (fq_poly_equal(g, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-            printf("g = "), fq_poly_print_pretty(g, "X", ctx), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
             abort();
         }
         
@@ -231,6 +231,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

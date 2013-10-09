@@ -47,7 +47,7 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
 
     if (len == 0)
     {
-        printf("Exception (fq_poly_randtest_not_zero).  len = 0.\n");
+        flint_printf("Exception (fq_poly_randtest_not_zero).  len = 0.\n");
         abort();
     }
     

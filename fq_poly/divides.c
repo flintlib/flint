@@ -48,7 +48,7 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
 {
     if (fq_poly_is_zero(B))
     {
-        printf("Exception (fq_poly_divides).  B is zero.\n");
+        flint_printf("Exception (fq_poly_divides).  B is zero.\n");
         abort();
     }
 

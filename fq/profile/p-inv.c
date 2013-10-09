@@ -52,13 +52,13 @@ main()
 
     fq_randtest_not_zero(a,state,ctx);
 
-    printf("INV benchmark:single repeated inversion: \n");
+    flint_printf("INV benchmark:single repeated inversion: \n");
     timeit_start(t0);
     for(i=0;i<REPS;i++) fq_inv(b,a,ctx);
     timeit_stop(t0);
-    printf ( " cpu = %ld ms, wall = %ld ms \n " , t0->cpu , t0->wall );
+    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , t0->cpu , t0->wall );
 
-    printf("random inversions: \n");
+    flint_printf("random inversions: \n");
 
     wall = 0;
     cpu = 0;
@@ -72,7 +72,7 @@ main()
     wall = wall + t0->wall;
     }
 
-    printf ( " cpu = %ld ms, wall = %ld ms \n " , cpu , wall );
+    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , cpu , wall );
 
 
     return 0;

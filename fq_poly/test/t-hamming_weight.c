@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("hamming_weight... ");
+    flint_printf("hamming_weight... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -69,10 +69,10 @@ main(void)
         result = (w1 == w2);
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-	    printf("w1 = %ld \n w2 = %ld \n",w1,w2);
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+	    flint_printf("w1 = %ld \n w2 = %ld \n",w1,w2);
             abort();
         }
 
@@ -113,10 +113,10 @@ main(void)
         result = (wsum <= w1+w2);
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
-            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
-	    printf("w1 = %ld \n w2 = %ld \n wsum = %ld",w1,w2,wsum);
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
+            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
+	    flint_printf("w1 = %ld \n w2 = %ld \n wsum = %ld",w1,w2,wsum);
             abort();
         }
 
@@ -131,7 +131,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

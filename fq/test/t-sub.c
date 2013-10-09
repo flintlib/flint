@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sub... ");
+    flint_printf("sub... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -69,10 +69,10 @@ main(void)
         result = (fq_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -111,10 +111,10 @@ main(void)
         result = (fq_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -151,9 +151,9 @@ main(void)
         result = (fq_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -193,11 +193,11 @@ main(void)
         result = (fq_equal(c1, c2));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a  = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b  = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c1 = "), fq_print_pretty(c1, ctx), printf("\n");
-            printf("c2 = "), fq_print_pretty(c2, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a  = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b  = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c1 = "), fq_print_pretty(c1, ctx), flint_printf("\n");
+            flint_printf("c2 = "), fq_print_pretty(c2, ctx), flint_printf("\n");
             abort();
         }
 
@@ -242,12 +242,12 @@ main(void)
         result = (fq_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a   = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b   = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c   = "), fq_print_pretty(c, ctx), printf("\n");
-            printf("lhs = "), fq_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), fq_print_pretty(rhs, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a   = "), fq_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b   = "), fq_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c   = "), fq_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("lhs = "), fq_print_pretty(lhs, ctx), flint_printf("\n");
+            flint_printf("rhs = "), fq_print_pretty(rhs, ctx), flint_printf("\n");
             abort();
         }
 
@@ -263,7 +263,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

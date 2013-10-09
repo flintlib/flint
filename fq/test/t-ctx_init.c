@@ -37,7 +37,7 @@ main(void)
     int i, j, k, result;
     flint_rand_t state;
 
-    printf("ctx_init... ");
+    flint_printf("ctx_init... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -79,11 +79,11 @@ main(void)
             result = (fq_equal(lhs, rhs));
             if (!result)
             {
-                printf("FAIL:\n\n");
-                printf("a   = "), fq_print_pretty(a, ctx_conway), printf("\n");
-                printf("b   = "), fq_print_pretty(b, ctx_mod), printf("\n");
-                printf("lhs = "), fq_print_pretty(lhs, ctx_conway), printf("\n");
-                printf("rhs = "), fq_print_pretty(rhs, ctx_mod), printf("\n");
+                flint_printf("FAIL:\n\n");
+                flint_printf("a   = "), fq_print_pretty(a, ctx_conway), flint_printf("\n");
+                flint_printf("b   = "), fq_print_pretty(b, ctx_mod), flint_printf("\n");
+                flint_printf("lhs = "), fq_print_pretty(lhs, ctx_conway), flint_printf("\n");
+                flint_printf("rhs = "), fq_print_pretty(rhs, ctx_mod), flint_printf("\n");
                 abort();
             }
 
@@ -103,7 +103,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
 
     return EXIT_SUCCESS;
 }
