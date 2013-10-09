@@ -55,13 +55,13 @@
 #define lenhi    4096
 #define lenh     2
 #define bitslo   2
-#define bitshi   53
+#define bitshi   50
 #define bitsh    2
 #define cols     12 //((lenhi + 1 - lenlo + (lenh - 1)) / lenh)
 #define rows     ((bitshi + 1 - bitslo + (bitsh - 1)) / bitsh)
 #define cpumin   10
 #define ncases   1
-#define nalgs    2
+#define nalgs    3
 #define img      1
 #define imgname  "fq-ntl_vs_mul.ppm"
 
@@ -89,6 +89,7 @@ main(int argc, char** argv)
     fmpz_t p;
     ZZ prime;
     ZZ_pX mod;
+    zz_pX nmod;
     fq_t f, g, h;
     fq_ctx_t ctx;
     fmpz_mod_poly_t fmod;
@@ -108,8 +109,9 @@ main(int argc, char** argv)
         fmpz_set_ui(p, n_randprime(state, bits, 1));
         fmpz_get_ZZ(prime, p);
         ZZ_p::init(prime);
+        zz_p::init(fmpz_get_si(p));
 
-        flint_printf("p = "); fmpz_print(p); flint_printf("\n");
+        flint_printf("Row: p = "); fmpz_print(p); flint_printf("\n");
 
         for (len = lenlo, j = 0; len <= lenhi; len *= lenh, j++)
         {
@@ -119,8 +121,10 @@ main(int argc, char** argv)
             fmpz_mod_poly_randtest_not_zero(fmod, state, len);
             fmpz_mod_poly_set_coeff_ui(fmod, len - 1, 1);
             fmpz_mod_poly_get_ZZ_pX(mod, fmod);
+            fmpz_mod_poly_get_zz_pX(nmod, fmod);
 
             ZZ_pE::init(mod);
+            zz_pE::init(nmod);
 
             fq_ctx_init_modulus(ctx, p, len, fmod, "a");
 
@@ -132,6 +136,7 @@ main(int argc, char** argv)
                 timeit_t t[nalgs];
                 int l, loops = 1;
                 ZZ_pE nf, ng, nh;
+                zz_pE nnf, nng, nnh;
                 
                 /*
                    Construct random elements of fq
@@ -139,8 +144,10 @@ main(int argc, char** argv)
                 {
                     fq_randtest_dense(f, state, ctx);
                     fq_get_ZZ_pE(nf, f);
+                    fq_get_zz_pE(nnf, f);
                     fq_randtest_dense(g, state, ctx);
                     fq_get_ZZ_pE(ng, g);
+                    fq_get_zz_pE(nng, g);
                 }
                 
               loop:
@@ -155,6 +162,11 @@ main(int argc, char** argv)
                     mul(nh, nf, ng);
                 timeit_stop(t[1]);
 
+                timeit_start(t[2]);
+                for (l = 0; l < loops; l++)
+                    mul(nnh, nnf, nng);
+                timeit_stop(t[2]);
+
                 for (c = 0; c < nalgs; c++)
                     if (t[c]->cpu <= cpumin)
                     {
@@ -167,7 +179,7 @@ main(int argc, char** argv)
                 reps += loops;
             }
             
-            flint_printf("len: %6d:", len);
+            flint_printf("%8d:", len);
             for (c = 0; c < nalgs; c++)
             {
                 T[i][j][c] = s[c] / (double) reps;
@@ -183,12 +195,6 @@ main(int argc, char** argv)
             
             fmpz_mod_poly_clear(fmod);
             fq_ctx_clear(ctx);
-        }
-        {
-           slong sum = 0, c;
-           for (c = 0; c < nalgs; c++)
-              sum += s[c];
-           flint_printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);
         }
     }
 

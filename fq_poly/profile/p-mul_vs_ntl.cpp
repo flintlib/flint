@@ -119,7 +119,7 @@ main(int argc, char** argv)
         fq_poly_init(g);
         fq_poly_init(h);
 
-        printf("d = %d\n", ext);
+        printf("Row: d = %d\n", ext);
 
         for (len = lenlo, j = 0; len <= lenhi; len *= lenh, j++)
         {
@@ -168,7 +168,7 @@ main(int argc, char** argv)
                 reps += loops;
             }
             
-            printf("len: %6d:", len);
+            printf("%8d:", len);
             for (c = 0; c < nalgs; c++)
             {
                 T[i][j][c] = s[c] / (double) reps;
@@ -187,7 +187,6 @@ main(int argc, char** argv)
            slong sum = 0, c;
            for (c = 0; c < nalgs; c++)
               sum += s[c];
-           printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);
         }
         fq_poly_clear(f);
         fq_poly_clear(g);
