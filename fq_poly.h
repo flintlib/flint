@@ -151,6 +151,35 @@ void fq_poly_factor_concat(fq_poly_factor_t res, const fq_poly_factor_t fac,
 
 void fq_poly_factor_pow(fq_poly_factor_t fac, slong exp);
 
+int
+_fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx);
+
+int
+fq_poly_is_squarefree(const fq_poly_t f, const fq_ctx_t ctx);
+
+int
+fq_poly_is_irreducible(const fq_poly_t f, const fq_ctx_t ctx);
+
+int 
+fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx);
+
+void
+fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly, 
+                            slong * const *degs, const fq_ctx_t ctx);
+
+int
+fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
+                              const fq_poly_t pol, slong d,
+                              const fq_ctx_t ctx);
+
+void
+fq_poly_factor_equal_deg(fq_poly_factor_t factors, const fq_poly_t pol, 
+                         slong d, const fq_ctx_t ctx);
+
+void
+fq_poly_factor_cantor_zassenhaus(fq_poly_factor_t res, const fq_poly_t f,
+                                 const fq_ctx_t ctx);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
@@ -187,6 +216,25 @@ void fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n, const fq_ctx_t ctx);
 
 void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x, const fq_ctx_t ctx);
+
+static __inline__
+void fq_poly_set_coeff_fmpz(fq_poly_t poly, long n, const fmpz_t x, const fq_ctx_t ctx)
+{
+    /* TODO: Fix me. */
+    fq_t f;
+    fq_init(f);
+    fq_set_fmpz(f, x, ctx);
+    fq_poly_set_coeff(poly, n, f, ctx);
+    fq_clear(f);
+}
+
+static __inline__ int 
+fq_poly_is_gen(const fq_poly_t poly,  const fq_ctx_t ctx)
+{
+    return ((poly->length == 2) &&
+            fq_is_zero(poly->coeffs, ctx) &&
+            fq_is_one(poly->coeffs + 1, ctx));
+}
 
 /*  Comparison  **************************************************************/
 
@@ -399,6 +447,13 @@ void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t o
 
 long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
                             const fq_struct* B, long lenB, const fq_ctx_t ctx);
+
+static __inline__
+long _fq_poly_gcd(fq_struct* G, const fq_struct* A, long lenA, 
+                  const fq_struct* B, long lenB, const fq_ctx_t ctx)
+{
+    return _fq_poly_gcd_euclidean(G, A, lenA, B, lenB, ctx);
+}
 
 static __inline__
 void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
