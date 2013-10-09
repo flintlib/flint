@@ -176,6 +176,8 @@ static __inline__ void fq_poly_zero(fq_poly_t poly, const fq_ctx_t ctx)
 
 void fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx);
 
+void fq_poly_gen(fq_poly_t f, const fq_ctx_t ctx);
+
 void _fq_poly_make_monic(fq_struct *rop, const fq_struct *op, long length, const fq_ctx_t ctx);
 
 void fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
@@ -407,6 +409,8 @@ void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
 
 
 /*  Euclidean division  ******************************************************/
+
+ulong fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx);
 
 void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, 
     const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
