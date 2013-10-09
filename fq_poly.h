@@ -448,6 +448,25 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
 int fq_poly_fprint_pretty(FILE * file, const fq_poly_t poly, const char *x, 
                           const fq_ctx_t ctx);
 
+int _fq_poly_fprint(FILE * file, const fq_struct *poly, long len, 
+                    const fq_ctx_t ctx);
+
+int fq_poly_fprint(FILE * file, const fq_poly_t poly, 
+                   const fq_ctx_t ctx);
+
+static __inline__ 
+int _fq_poly_print(const fq_struct *poly, slong len, const fq_ctx_t ctx)
+{
+    return _fq_poly_fprint(stdout, poly, len, ctx);
+}
+
+static __inline__
+int fq_poly_print(const fq_poly_t poly, const fq_ctx_t ctx)
+{
+    return fq_poly_fprint(stdout, poly, ctx);
+}
+
+
 static __inline__ 
 int _fq_poly_print_pretty(const fq_struct *poly, long len, 
                           const char *x, const fq_ctx_t ctx)
