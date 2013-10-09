@@ -242,6 +242,18 @@ static __inline__ void fq_gen(fq_t rop, const fq_ctx_t ctx)
 
 /* Output ********************************************************************/
 
+static __inline__
+int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
+{
+    return fmpz_poly_fprint(file, op);
+}
+
+static __inline__
+void fq_print(const fq_t op, const fq_ctx_t ctx)
+{
+    fmpz_poly_print(op);
+}
+
 static __inline__ 
 int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
