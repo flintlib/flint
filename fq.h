@@ -63,6 +63,8 @@ void fq_ctx_init_modulus(fq_ctx_t ctx,
                          const fmpz_t p, long d, fmpz_mod_poly_t modulus,
                          const char *var);
 
+void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
+
 void fq_ctx_clear(fq_ctx_t ctx);
 
 static __inline__ long fq_ctx_degree(const fq_ctx_t ctx)
