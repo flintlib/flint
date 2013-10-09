@@ -59,7 +59,7 @@ void fq_poly_mullow_classical(fq_poly_t rop,
 
     if (op1->length == 0 || op2->length == 0 || n == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
         return;
     }
 
@@ -78,11 +78,11 @@ void fq_poly_mullow_classical(fq_poly_t rop,
     }
     else
     {
-        fq_poly_fit_length(rop, n);
+        fq_poly_fit_length(rop, n, ctx);
         _fq_poly_mullow_classical(rop->coeffs, op1->coeffs, op1->length, 
                                                op2->coeffs, op2->length, n, ctx);
     }
 
-    _fq_poly_set_length(rop, n);
-    _fq_poly_normalise(rop);
+    _fq_poly_set_length(rop, n, ctx);
+    _fq_poly_normalise(rop, ctx);
 }

@@ -109,7 +109,7 @@ main(void)
         fmpz_randtest_unsigned(e, state, 6);
 
         fq_pow(b, a, e, ctx);
-        fq_one(c);
+        fq_one(c, ctx);
         for (fmpz_one(f); fmpz_cmp(f, e) <= 0; fmpz_add_ui(f, f, 1))
         {
             fq_mul(c, c, a, ctx);

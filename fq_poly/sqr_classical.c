@@ -64,7 +64,7 @@ void fq_poly_sqr_classical(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx
 
     if (op->length == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
         return;
     }
 
@@ -79,9 +79,9 @@ void fq_poly_sqr_classical(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx
     }
     else
     {
-        fq_poly_fit_length(rop, len);
+        fq_poly_fit_length(rop, len, ctx);
         _fq_poly_sqr_classical(rop->coeffs, op->coeffs, op->length, ctx);
     }
 
-    _fq_poly_set_length(rop, len);
+    _fq_poly_set_length(rop, len, ctx);
 }

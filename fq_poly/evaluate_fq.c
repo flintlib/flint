@@ -30,9 +30,9 @@ void _fq_poly_evaluate_fq(fq_t rop, const fq_struct *op, long len,
 {
     if (len == 0)
     {
-        fq_zero(rop);
+        fq_zero(rop, ctx);
     }
-    else if (len == 1 || fq_is_zero(a))
+    else if (len == 1 || fq_is_zero(a, ctx))
     {
         fq_set(rop, op + 0);
     }

@@ -51,7 +51,7 @@ void fq_poly_mullow(fq_poly_t rop,
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
         return;
     }
 
@@ -70,11 +70,11 @@ void fq_poly_mullow(fq_poly_t rop,
     }
     else
     {
-        fq_poly_fit_length(rop, n);
+        fq_poly_fit_length(rop, n, ctx);
         _fq_poly_mullow(rop->coeffs, op1->coeffs, op1->length, 
                                      op2->coeffs, op2->length, n, ctx);
     }
 
-    _fq_poly_set_length(rop, n);
-    _fq_poly_normalise(rop);
+    _fq_poly_set_length(rop, n, ctx);
+    _fq_poly_normalise(rop, ctx);
 }

@@ -61,10 +61,10 @@ main(void)
         fq_poly_init(b);
 
         fq_poly_randtest(a, state, len, ctx);
-	fq_poly_set(b,a);
+	fq_poly_set(b, a, ctx);
 
-	w1 = fq_poly_hamming_weight(a);
-	w2 = fq_poly_hamming_weight(b);
+	w1 = fq_poly_hamming_weight(a, ctx);
+	w2 = fq_poly_hamming_weight(b, ctx);
 
         result = (w1 == w2);
         if (!result)
@@ -106,9 +106,9 @@ main(void)
         fq_poly_randtest(b, state, len, ctx);
 	fq_poly_add(c,a,b,ctx);
 	
-	w1 = fq_poly_hamming_weight(a);
-	w2 = fq_poly_hamming_weight(b);
-	wsum = fq_poly_hamming_weight(c);
+	w1 = fq_poly_hamming_weight(a, ctx);
+	w2 = fq_poly_hamming_weight(b, ctx);
+	wsum = fq_poly_hamming_weight(c, ctx);
 	
         result = (wsum <= w1+w2);
         if (!result)

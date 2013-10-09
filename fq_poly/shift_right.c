@@ -26,7 +26,7 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_shift_right(fq_struct *rop, const fq_struct *op, long len, long n)
+void _fq_poly_shift_right(fq_struct *rop, const fq_struct *op, long len, long n, const fq_ctx_t ctx)
 {
     long i;
 
@@ -42,20 +42,20 @@ void _fq_poly_shift_right(fq_struct *rop, const fq_struct *op, long len, long n)
     }
 }
 
-void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n)
+void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n, const fq_ctx_t ctx)
 {
     if (n == 0)
     {
-        fq_poly_set(rop, op);
+        fq_poly_set(rop, op, ctx);
     }
     else if (op->length <= n)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
-        fq_poly_fit_length(rop, op->length - n);
-        _fq_poly_shift_right(rop->coeffs, op->coeffs, op->length, n);
-        _fq_poly_set_length(rop, op->length - n);
+        fq_poly_fit_length(rop, op->length - n, ctx);
+        _fq_poly_shift_right(rop->coeffs, op->coeffs, op->length, n, ctx);
+        _fq_poly_set_length(rop, op->length - n, ctx);
     }
 }

@@ -26,17 +26,17 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_normalise(fq_poly_t poly)
+void _fq_poly_normalise(fq_poly_t poly, const fq_ctx_t ctx)
 {
     long i;
 
-    for (i = poly->length - 1; (i >= 0) && fq_is_zero(poly->coeffs + i); i--) ;
+    for (i = poly->length - 1; (i >= 0) && fq_is_zero(poly->coeffs + i, ctx); i--) ;
     poly->length = i + 1;
 }
 
-void _fq_poly_normalise2(fq_struct *poly, long *length)
+void _fq_poly_normalise2(fq_struct *poly, long *length, const fq_ctx_t ctx)
 {
     long i;
-    for (i = (*length) - 1; (i >= 0) && fq_is_zero(poly + i); i--) ;
+    for (i = (*length) - 1; (i >= 0) && fq_is_zero(poly + i, ctx); i--) ;
     (*length) = i + 1;
 }

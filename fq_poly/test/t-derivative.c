@@ -61,7 +61,7 @@ main(void)
         fq_poly_init(c);
 
         fq_poly_randtest(a, state, len, ctx);
-        fq_poly_set(b, a);
+        fq_poly_set(b, a, ctx);
         fq_poly_derivative(c, b, ctx);
         fq_poly_derivative(b, b, ctx);
 

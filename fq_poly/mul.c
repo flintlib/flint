@@ -54,7 +54,7 @@ void fq_poly_mul(fq_poly_t rop,
 
     if (len1 == 0 || len2 == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
         return;
     }
 
@@ -70,10 +70,10 @@ void fq_poly_mul(fq_poly_t rop,
     }
     else
     {
-        fq_poly_fit_length(rop, rlen);
+        fq_poly_fit_length(rop, rlen, ctx);
         _fq_poly_mul(rop->coeffs, op1->coeffs, len1, 
                                   op2->coeffs, len2, ctx);
     }
 
-    _fq_poly_set_length(rop, rlen);
+    _fq_poly_set_length(rop, rlen, ctx);
 }

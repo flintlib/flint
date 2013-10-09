@@ -36,8 +36,8 @@ void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R,
 
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
-        if (fq_is_zero(R + iR))
-            fq_zero(Q + iQ);
+        if (fq_is_zero(R + iR, ctx))
+            fq_zero(Q + iQ, ctx);
         else
         {
             fq_mul(Q + iQ, R + iR, invB, ctx);
@@ -57,8 +57,8 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
 
     if (lenA < lenB)
     {
-        fq_poly_set(R, A);
-        fq_poly_zero(Q);
+        fq_poly_set(R, A, ctx);
+        fq_poly_zero(Q, ctx);
         return;
     }
 
@@ -71,7 +71,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     else
     {
-        fq_poly_fit_length(Q, lenQ);
+        fq_poly_fit_length(Q, lenQ, ctx);
         q = Q->coeffs;
     }
     if (R == B)
@@ -80,7 +80,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     else
     {
-        fq_poly_fit_length(R, lenA);
+        fq_poly_fit_length(R, lenA, ctx);
         r = R->coeffs;
     }
 
@@ -96,7 +96,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     else
     {
-        _fq_poly_set_length(Q, lenQ);
+        _fq_poly_set_length(Q, lenQ, ctx);
     }
     if (R == B)
     {
@@ -105,8 +105,8 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
         R->alloc  = lenA;
         R->length = lenA;
     }
-    _fq_poly_set_length(R, lenB - 1);
-    _fq_poly_normalise(R);
+    _fq_poly_set_length(R, lenB - 1, ctx);
+    _fq_poly_normalise(R, ctx);
 
     fq_clear(invB);
 }

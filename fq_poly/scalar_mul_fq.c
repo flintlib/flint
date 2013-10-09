@@ -38,14 +38,14 @@ void _fq_poly_scalar_mul_fq(fq_struct *rop,
 void fq_poly_scalar_mul_fq(fq_poly_t rop, 
     const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
 {
-    if (fq_is_zero(x) || fq_poly_is_zero(op))
+    if (fq_is_zero(x, ctx) || fq_poly_is_zero(op))
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
-        fq_poly_fit_length(rop, op->length);
+        fq_poly_fit_length(rop, op->length, ctx);
         _fq_poly_scalar_mul_fq(rop->coeffs, op->coeffs, op->length, x, ctx);
-        _fq_poly_set_length(rop, op->length);
+        _fq_poly_set_length(rop, op->length, ctx);
     }
 }

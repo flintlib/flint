@@ -51,7 +51,7 @@ void _fq_inv(fmpz *rop, const fmpz *op, long len,
 
 void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
-    if (fq_is_zero(op))
+    if (fq_is_zero(op, ctx))
     {
 
 

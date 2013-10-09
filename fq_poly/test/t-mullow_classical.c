@@ -68,7 +68,7 @@ main(void)
 
         fq_poly_mullow_classical(c, a, b, n, ctx);
         fq_poly_mul(d, a, b, ctx);
-        fq_poly_truncate(d, n);
+        fq_poly_truncate(d, n, ctx);
 
         result = (fq_poly_equal(c, d));
         if (!result)

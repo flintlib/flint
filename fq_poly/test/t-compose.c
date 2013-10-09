@@ -147,7 +147,7 @@ main(void)
         fq_poly_randtest(g, state, n_randint(state, 40), ctx);
         fq_poly_randtest(h, state, n_randint(state, 20), ctx);
 
-        fq_poly_one(t);
+        fq_poly_one(t, ctx);
         for (k = 0; k < fq_poly_length(g); k++)
         {
             fq_poly_scalar_addmul_fq(s, t, g->coeffs + k, ctx);

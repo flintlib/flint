@@ -35,14 +35,14 @@ void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len)
         fq_set(rop + i, op + i);
 }
 
-void fq_poly_set(fq_poly_t rop, const fq_poly_t op)
+void fq_poly_set(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
     if (rop != op)         /* Aliasing is trivial */
     {
         long i, len = op->length;
 
-        fq_poly_fit_length(rop, len);
-        _fq_poly_set_length(rop, len);
+        fq_poly_fit_length(rop, len, ctx);
+        _fq_poly_set_length(rop, len, ctx);
 
         for (i = 0; i < len; i++)
             fq_set(rop->coeffs + i, op->coeffs + i);

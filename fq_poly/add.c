@@ -50,11 +50,11 @@ void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
 {
     const long max  = FLINT_MAX(poly1->length, poly2->length);
 
-    fq_poly_fit_length(res, max);
+    fq_poly_fit_length(res, max, ctx);
 
     _fq_poly_add(res->coeffs, poly1->coeffs, poly1->length, 
                               poly2->coeffs, poly2->length, ctx);
 
-    _fq_poly_set_length(res, max);
-    _fq_poly_normalise(res);
+    _fq_poly_set_length(res, max, ctx);
+    _fq_poly_normalise(res, ctx);
 }

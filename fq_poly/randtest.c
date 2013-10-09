@@ -31,13 +31,13 @@ void fq_poly_randtest(fq_poly_t f, flint_rand_t state,
 {
     long i;
     
-    fq_poly_fit_length(f, len);
+    fq_poly_fit_length(f, len, ctx);
     for(i = 0; i < len; i++)
     {
         fq_randtest(f->coeffs + i, state, ctx);
     }
-    _fq_poly_set_length(f, len);
-    _fq_poly_normalise(f);
+    _fq_poly_set_length(f, len, ctx);
+    _fq_poly_normalise(f, ctx);
 }
 
 void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state, 
@@ -55,5 +55,5 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
     for(i = 0; (i < 10) && fq_poly_is_zero(f); i++)
         fq_poly_randtest(f, state, len, ctx);
     if (fq_poly_is_zero(f))
-        fq_poly_one(f);
+        fq_poly_one(f, ctx);
 }

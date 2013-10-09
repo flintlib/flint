@@ -76,10 +76,10 @@ void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     long i;
 
     fq_randtest(rop, state, ctx);
-    for (i = 0; fq_is_zero(rop) && (i < 10); i++)
+    for (i = 0; fq_is_zero(rop, ctx) && (i < 10); i++)
         fq_randtest(rop, state, ctx);
 
-    if (fq_is_zero(rop))
-        fq_one(rop);
+    if (fq_is_zero(rop, ctx))
+        fq_one(rop, ctx);
 }
 

@@ -26,15 +26,15 @@
 
 #include "fq_poly.h"
 
-void fq_poly_truncate(fq_poly_t poly, long len)
+void fq_poly_truncate(fq_poly_t poly, long len, const fq_ctx_t ctx)
 {
     if (poly->length > len)
     {
         long i;
 
         for (i = len; i < poly->length; i++)
-            fq_zero(poly->coeffs + i);
+            fq_zero(poly->coeffs + i, ctx);
         poly->length = len;
-        _fq_poly_normalise(poly);
+        _fq_poly_normalise(poly, ctx);
     }  
 }

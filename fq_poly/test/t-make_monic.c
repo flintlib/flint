@@ -92,7 +92,7 @@ main(void)
         fq_poly_randtest_not_zero(a, state, len, ctx);
         fq_poly_make_monic(a,a,ctx);
         
-        result = fq_is_one(fq_poly_lead(a));
+        result = fq_is_one(fq_poly_lead(a), ctx);
         if (!result)
         {
             flint_printf("FAIL:\n");

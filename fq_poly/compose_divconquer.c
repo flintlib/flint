@@ -80,13 +80,13 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     
     for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
-        if (!fq_is_zero(op1 + (j + 1)))
+        if (!fq_is_zero(op1 + (j + 1), ctx))
         {
             _fq_poly_scalar_mul_fq(h[i], op2, len2, op1 + j + 1, ctx);
             fq_add(h[i], h[i], op1 + j, ctx);
             hlen[i] = len2;
         }
-        else if (!fq_is_zero(op1 + j))
+        else if (!fq_is_zero(op1 + j, ctx))
         {
             fq_set(h[i], op1 + j);
             hlen[i] = 1;
@@ -94,7 +94,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     }
     if ((len1 & 1L))
     {
-        if (!fq_is_zero(op1 + j))
+        if (!fq_is_zero(op1 + j, ctx))
         {
             fq_set(h[i], op1 + j);
             hlen[i] = 1;
@@ -158,19 +158,19 @@ void fq_poly_compose_divconquer(fq_poly_t rop,
     
     if (len1 == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else if (len1 == 1 || len2 == 0)
     {
-        fq_poly_set_fq(rop, op1->coeffs + 0);
+        fq_poly_set_fq(rop, op1->coeffs + 0, ctx);
     }
     else if (rop != op1 && rop != op2)
     {
-        fq_poly_fit_length(rop, lenr);
+        fq_poly_fit_length(rop, lenr, ctx);
         _fq_poly_compose_divconquer(rop->coeffs, op1->coeffs, len1, 
                                                  op2->coeffs, len2, ctx);
-        _fq_poly_set_length(rop, lenr);
-        _fq_poly_normalise(rop);
+        _fq_poly_set_length(rop, lenr, ctx);
+        _fq_poly_normalise(rop, ctx);
     }
     else
     {
@@ -179,8 +179,8 @@ void fq_poly_compose_divconquer(fq_poly_t rop,
         fq_poly_init2(t, lenr);
         _fq_poly_compose_divconquer(t->coeffs, op1->coeffs, len1,
                                                op2->coeffs, len2, ctx);
-        _fq_poly_set_length(t, lenr);
-        _fq_poly_normalise(t);
+        _fq_poly_set_length(t, lenr, ctx);
+        _fq_poly_normalise(t, ctx);
         fq_poly_swap(rop, t);
         fq_poly_clear(t);
     }

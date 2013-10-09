@@ -213,13 +213,13 @@ void fq_poly_mul_reorder(fq_poly_t rop,
 
     if (op1->length == 0 || op2->length == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
-        fq_poly_fit_length(rop, len);
+        fq_poly_fit_length(rop, len, ctx);
         _fq_poly_mul_reorder(rop->coeffs, op1->coeffs, op1->length, 
                                            op2->coeffs, op2->length, ctx);
-        _fq_poly_set_length(rop, len);
+        _fq_poly_set_length(rop, len, ctx);
     }
 }

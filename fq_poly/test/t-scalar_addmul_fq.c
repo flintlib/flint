@@ -64,8 +64,8 @@ main(void)
         fq_init(x);
 
         fq_poly_randtest(a, state, len, ctx);
-        fq_poly_set(b, a);
-        fq_poly_set(c, a);
+        fq_poly_set(b, a, ctx);
+        fq_poly_set(c, a, ctx);
 
         fq_poly_scalar_addmul_fq(b, a, x, ctx);
         fq_poly_scalar_addmul_fq(a, a, x, ctx);
@@ -113,7 +113,7 @@ main(void)
 
         fq_poly_randtest(a, state, len, ctx);
         fq_poly_randtest(b, state, len, ctx);
-        fq_poly_set(a, c);
+        fq_poly_set(a, c, ctx);
 
         fq_poly_scalar_mul_fq(c, a, x, ctx);
         fq_poly_add(c, b, c, ctx);

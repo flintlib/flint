@@ -54,36 +54,36 @@ void fq_poly_init(fq_poly_t poly);
 
 void fq_poly_init2(fq_poly_t poly, long alloc);
 
-void fq_poly_realloc(fq_poly_t poly, long alloc);
+void fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx);
 
-void fq_poly_truncate(fq_poly_t poly, long len);
+void fq_poly_truncate(fq_poly_t poly, long len, const fq_ctx_t ctx);
 
-void fq_poly_fit_length(fq_poly_t poly, long len);
+void fq_poly_fit_length(fq_poly_t poly, long len, const fq_ctx_t ctx);
 
 void _fq_poly_clear(fq_struct *v, long len);
 
 void fq_poly_clear(fq_poly_t poly);
 
-void _fq_poly_normalise(fq_poly_t poly);
+void _fq_poly_normalise(fq_poly_t poly, const fq_ctx_t ctx);
 
-void _fq_poly_normalise2(fq_struct *poly, long *length);
+void _fq_poly_normalise2(fq_struct *poly, long *length, const fq_ctx_t ctx);
 
-static __inline__ void _fq_poly_set_length(fq_poly_t poly, long len)
+static __inline__ void _fq_poly_set_length(fq_poly_t poly, long len, const fq_ctx_t ctx)
 {
     if (poly->length > len)
     {
         long i;
 
         for (i = len; i < poly->length; i++)
-            fq_zero(poly->coeffs + i);
+            fq_zero(poly->coeffs + i, ctx);
     }
     poly->length = len;
 }
 
-#define FQ_VEC_NORM(vec, i)                     \
-do {                                            \
-    while ((i) && fq_is_zero((vec) + (i) - 1))  \
-        (i)--;                                  \
+#define FQ_VEC_NORM(vec, i, ctx)                    \
+do {                                                \
+    while ((i) && fq_is_zero((vec) + (i) - 1, ctx)) \
+        (i)--;                                      \
 } while (0)
 
 /*  Polynomial parameters  ***************************************************/
@@ -115,26 +115,26 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
 
 void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
 
-void fq_poly_set(fq_poly_t rop, const fq_poly_t op);
+void fq_poly_set(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
-void fq_poly_set_fq(fq_poly_t poly, const fq_t c);
+void fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx);
 
 void fq_poly_swap(fq_poly_t op1, fq_poly_t op2);
 
-static __inline__ void _fq_poly_zero(fq_struct *rop, long len)
+static __inline__ void _fq_poly_zero(fq_struct *rop, long len, const fq_ctx_t ctx)
 {
     long i;
 
     for (i = 0; i < len; i++)
-        fq_zero(rop + i);
+        fq_zero(rop + i, ctx);
 }
 
-static __inline__ void fq_poly_zero(fq_poly_t poly)
+static __inline__ void fq_poly_zero(fq_poly_t poly, const fq_ctx_t ctx)
 {
-   _fq_poly_set_length(poly, 0);
+    _fq_poly_set_length(poly, 0, ctx);
 }
 
-void fq_poly_one(fq_poly_t poly);
+void fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx);
 
 void _fq_poly_make_monic(fq_struct *rop, const fq_struct *op, long length, const fq_ctx_t ctx);
 
@@ -142,9 +142,9 @@ void fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Getting and setting coefficients  ****************************************/
 
-void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n);
+void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n, const fq_ctx_t ctx);
 
-void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x);
+void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x, const fq_ctx_t ctx);
 
 /*  Comparison  **************************************************************/
 
@@ -155,19 +155,19 @@ static __inline__ int fq_poly_is_zero(const fq_poly_t poly)
     return (poly->length == 0);
 }
 
-static __inline__ int fq_poly_is_one(const fq_poly_t op)
+static __inline__ int fq_poly_is_one(const fq_poly_t op, const fq_ctx_t ctx)
 {
-    return (op->length == 1) && (fq_is_one(op->coeffs + 0));
+    return (op->length == 1) && (fq_is_one(op->coeffs + 0, ctx));
 }
 
-static __inline__ int fq_poly_is_unit(const fq_poly_t op)
+static __inline__ int fq_poly_is_unit(const fq_poly_t op, const fq_ctx_t ctx)
 {
-    return (op->length == 1) && (!(fq_is_zero(op->coeffs + 0)));
+    return (op->length == 1) && (!(fq_is_zero(op->coeffs + 0, ctx)));
 }
 
-static __inline__ int fq_poly_equal_fq(const fq_poly_t poly, const fq_t c)
+static __inline__ int fq_poly_equal_fq(const fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
 {
-	return ((poly->length == 0) && fq_is_zero(c)) ||
+    return ((poly->length == 0) && fq_is_zero(c, ctx)) ||
         ((poly->length == 1) && fq_equal(poly->coeffs, c));
 }
 
@@ -309,19 +309,19 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
 
 /*  Shifting  ****************************************************************/
 
-void _fq_poly_shift_left(fq_struct *rop, const fq_struct *op, long len, long n);
+void _fq_poly_shift_left(fq_struct *rop, const fq_struct *op, long len, long n, const fq_ctx_t ctx);
 
-void fq_poly_shift_left(fq_poly_t rop, const fq_poly_t op, long n);
+void fq_poly_shift_left(fq_poly_t rop, const fq_poly_t op, long n, const fq_ctx_t ctx);
 
-void _fq_poly_shift_right(fq_struct *rop, const fq_struct *op, long len, long n);
+void _fq_poly_shift_right(fq_struct *rop, const fq_struct *op, long len, long n, const fq_ctx_t ctx);
 
-void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n);
+void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n, const fq_ctx_t ctx);
 
 /*  Norms  *******************************************************************/
 
-long _fq_poly_hamming_weight(const fq_struct *op, long len);
+long _fq_poly_hamming_weight(const fq_struct *op, long len, const fq_ctx_t ctx);
 
-long fq_poly_hamming_weight(const fq_poly_t op);
+long fq_poly_hamming_weight(const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Greatest common divisor  *************************************************/
 

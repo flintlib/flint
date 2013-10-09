@@ -67,7 +67,7 @@ main(void)
 
         fq_trace(x, a, ctx);
 
-        fq_zero(b);
+        fq_zero(b, ctx);
         for (j = 0; j < d; j++)
         {
             fq_frobenius(c, a, j, ctx);

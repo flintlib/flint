@@ -36,7 +36,7 @@ void _fq_poly_neg(fq_struct *rop, const fq_struct *op, long len,
 
 void fq_poly_neg(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
-    fq_poly_fit_length(rop, op->length);
+    fq_poly_fit_length(rop, op->length, ctx);
     _fq_poly_neg(rop->coeffs, op->coeffs, op->length, ctx);
-    _fq_poly_set_length(rop, op->length);
+    _fq_poly_set_length(rop, op->length, ctx);
 }

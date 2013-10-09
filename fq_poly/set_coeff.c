@@ -26,19 +26,19 @@
 
 #include "fq_poly.h"
 
-void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x)
+void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x, const fq_ctx_t ctx)
 {
     long i;
 
-    fq_poly_fit_length(poly, n + 1);
+    fq_poly_fit_length(poly, n + 1, ctx);
 
     if (n + 1 > poly->length)   /* Insert zeros if needed */
     {
         for(i = poly->length; i < n; i++)
-            fq_zero(poly->coeffs + i);
+            fq_zero(poly->coeffs + i, ctx);
         poly->length = n + 1;
     }
 
     fq_set(poly->coeffs + n, x);
-    _fq_poly_normalise(poly);
+    _fq_poly_normalise(poly, ctx);
 }

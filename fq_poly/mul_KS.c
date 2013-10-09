@@ -35,13 +35,13 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
     long bits, i;
     fmpz *f, *g, *h;
 
-    FQ_VEC_NORM(op1, len1);
-    FQ_VEC_NORM(op2, len2);
+    FQ_VEC_NORM(op1, len1, ctx);
+    FQ_VEC_NORM(op2, len2, ctx);
 
     if (!len1 | !len2)
     {
         if (in1_len + in2_len - 1 > 0)
-            _fq_poly_zero(rop, in1_len + in2_len - 1);
+            _fq_poly_zero(rop, in1_len + in2_len - 1, ctx);
         return;
     }
 
@@ -72,7 +72,7 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
         fq_reduce(rop + i, ctx);
     }
 
-    _fq_poly_zero(rop + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2));
+    _fq_poly_zero(rop + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2), ctx);
 
     _fmpz_vec_clear(f, (len1 + len2 - 1) + (len1) + (len2));
 }
@@ -87,13 +87,13 @@ void fq_poly_mul_KS(fq_poly_t rop,
 
     if (len1 == 0 || len2 == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
-        fq_poly_fit_length(rop, rlen);
+        fq_poly_fit_length(rop, rlen, ctx);
         _fq_poly_mul_KS(rop->coeffs, op1->coeffs, len1, 
                                      op2->coeffs, len2, ctx);
-        _fq_poly_set_length(rop, rlen);
+        _fq_poly_set_length(rop, rlen, ctx);
     }
 }

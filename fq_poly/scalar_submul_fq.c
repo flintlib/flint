@@ -29,10 +29,10 @@
 void _fq_poly_scalar_submul_fq(fq_struct *rop, 
     const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx)
 {
-    if (fq_is_zero(x))
+    if (fq_is_zero(x, ctx))
         return;
 
-    if (fq_is_one(x))
+    if (fq_is_one(x, ctx))
     {
         _fq_poly_sub(rop, rop, len, op, len, ctx);
     }
@@ -56,11 +56,11 @@ void _fq_poly_scalar_submul_fq(fq_struct *rop,
 void fq_poly_scalar_submul_fq(fq_poly_t rop, 
     const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
 {
-    if (!(fq_is_zero(x) || fq_poly_is_zero(op)))
+    if (!(fq_is_zero(x, ctx) || fq_poly_is_zero(op)))
     {
-        fq_poly_fit_length(rop, op->length);
+        fq_poly_fit_length(rop, op->length, ctx);
         _fq_poly_scalar_submul_fq(rop->coeffs, op->coeffs, op->length, x, ctx);
-        _fq_poly_set_length(rop, FLINT_MAX(rop->length, op->length));
-        _fq_poly_normalise(rop);
+        _fq_poly_set_length(rop, FLINT_MAX(rop->length, op->length), ctx);
+        _fq_poly_normalise(rop, ctx);
     }
 }

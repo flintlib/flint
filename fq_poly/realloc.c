@@ -26,7 +26,7 @@
 
 #include "fq_poly.h"
 
-void fq_poly_realloc(fq_poly_t poly, long alloc)
+void fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
 {
     long i;
 
@@ -46,7 +46,7 @@ void fq_poly_realloc(fq_poly_t poly, long alloc)
             fq_init(poly->coeffs + i);
 
         poly->length = FLINT_MIN(poly->length, alloc);
-        _fq_poly_normalise(poly);
+        _fq_poly_normalise(poly, ctx);
     }
     else                        /* Nothing allocated already so do it now */
     {

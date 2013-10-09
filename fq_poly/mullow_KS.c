@@ -35,12 +35,12 @@ void _fq_poly_mullow_KS(fq_struct *rop,
     long bits, i, m;
     fmpz *f, *g, *h;
 
-    FQ_VEC_NORM(op1, len1);
-    FQ_VEC_NORM(op2, len2);
+    FQ_VEC_NORM(op1, len1, ctx);
+    FQ_VEC_NORM(op2, len2, ctx);
 
     if (!len1 | !len2)
     {
-        _fq_poly_zero(rop, n);
+        _fq_poly_zero(rop, n, ctx);
         return;
     }
 
@@ -74,7 +74,7 @@ void _fq_poly_mullow_KS(fq_struct *rop,
     }
     for ( ; i < n; i++)
     {
-        fq_zero(rop + i);
+        fq_zero(rop + i, ctx);
     }
 
     _fmpz_vec_clear(f, n + len1 + len2);
@@ -89,7 +89,7 @@ void fq_poly_mullow_KS(fq_poly_t rop,
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
@@ -98,10 +98,10 @@ void fq_poly_mullow_KS(fq_poly_t rop,
         if (n > lenr)
             n = lenr;
 
-        fq_poly_fit_length(rop, n);
+        fq_poly_fit_length(rop, n, ctx);
         _fq_poly_mullow_KS(rop->coeffs, op1->coeffs, len1, 
                                         op2->coeffs, len2, n, ctx);
-        _fq_poly_set_length(rop, n);
-        _fq_poly_normalise(rop);
+        _fq_poly_set_length(rop, n, ctx);
+        _fq_poly_normalise(rop, ctx);
     }
 }

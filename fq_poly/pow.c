@@ -134,22 +134,22 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
     if ((len < 2) | (e < 3UL))
     {
         if (e == 0UL)
-            fq_poly_one(rop);
+            fq_poly_one(rop, ctx);
         else if (len == 0)
-            fq_poly_zero(rop);
+            fq_poly_zero(rop, ctx);
         else if (len == 1)
         {
             fmpz_t f;
             fmpz_init_set_ui(f, e);
 
-            fq_poly_fit_length(rop, 1);
+            fq_poly_fit_length(rop, 1, ctx);
             fq_pow(rop->coeffs + 0, op->coeffs + 0, f, ctx);
-            _fq_poly_set_length(rop, 1);
+            _fq_poly_set_length(rop, 1, ctx);
 
             fmpz_clear(f);
         }
         else if (e == 1UL)
-            fq_poly_set(rop, op);
+            fq_poly_set(rop, op, ctx);
         else  /* e == 2UL */
             fq_poly_sqr(rop, op, ctx);
     }
@@ -159,16 +159,16 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
 
         if (rop != op)
         {
-            fq_poly_fit_length(rop, rlen);
+            fq_poly_fit_length(rop, rlen, ctx);
             _fq_poly_pow(rop->coeffs, op->coeffs, len, e, ctx);
-            _fq_poly_set_length(rop, rlen);
+            _fq_poly_set_length(rop, rlen, ctx);
         }
         else
         {
             fq_poly_t t;
             fq_poly_init2(t, rlen);
             _fq_poly_pow(t->coeffs, op->coeffs, len, e, ctx);
-            _fq_poly_set_length(t, rlen);
+            _fq_poly_set_length(t, rlen, ctx);
             fq_poly_swap(rop, t);
             fq_poly_clear(t);
         }

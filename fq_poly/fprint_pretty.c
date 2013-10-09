@@ -50,14 +50,14 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
     }
     else if (len == 2)
     {
-        if (fq_is_one(poly + 1))
+        if (fq_is_one(poly + 1, ctx))
             flint_fprintf(file, "%s", x);
         else
         {
             __fq_print(file, poly + 1, ctx);
             flint_fprintf(file, "*%s", x);
         }
-        if (!fq_is_zero(poly + 0))
+        if (!fq_is_zero(poly + 0, ctx))
         {
             fputc('+', file);
             __fq_print(file, poly + 0, ctx);
@@ -68,7 +68,7 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
         long i = len - 1;
 
         {
-            if (fq_is_one(poly + i))
+            if (fq_is_one(poly + i, ctx))
                 flint_fprintf(file, "%s^%ld", x, i);
             else
             {
@@ -80,10 +80,10 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
 
         for (; i > 1; --i)
         {
-            if (fq_is_zero(poly + i))
+            if (fq_is_zero(poly + i, ctx))
                 continue;
 
-            if (fq_is_one(poly + i))
+            if (fq_is_one(poly + i, ctx))
                 flint_fprintf(file, "+%s^%ld", x, i);
             else
             {
@@ -93,9 +93,9 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
             }
         }
 
-        if (!fq_is_zero(poly + 1))
+        if (!fq_is_zero(poly + 1, ctx))
         {
-            if (fq_is_one(poly + 1))
+            if (fq_is_one(poly + 1, ctx))
             {
                 fputc('+', file);
                 fputs(x, file);
@@ -108,7 +108,7 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
                 fputs(x, file);
             }
         }
-        if (!fq_is_zero(poly + 0))
+        if (!fq_is_zero(poly + 0, ctx))
         {
             fputc('+', file);
             __fq_print(file, poly + 0, ctx);

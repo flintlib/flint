@@ -104,14 +104,14 @@ main(void)
         fq_poly_randtest_not_zero(a, state, len, ctx);
 
       
-        for(j=0;(j<100* flint_test_multiplier()) && !fq_poly_is_one(g);j++){
+        for(j=0;(j<100* flint_test_multiplier()) && !fq_poly_is_one(g, ctx);j++){
         fq_poly_randtest_not_zero(b, state, len, ctx);
         fq_poly_gcd_euclidean(g,a,b,ctx);
         
 
         }
 
-        if(!fq_poly_is_one(g)){ 
+        if(!fq_poly_is_one(g, ctx)){ 
             flint_printf("FAIL:\n");
             flint_printf("could not find coprime polynomials after %ld tries\n",j+1);
             abort();

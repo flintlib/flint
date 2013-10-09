@@ -64,7 +64,7 @@ main(void)
 
         fq_poly_randtest(a, state, len, ctx);
         exp = n_randtest(state) % 20UL;
-        fq_poly_set(b, a);
+        fq_poly_set(b, a, ctx);
         fq_poly_pow(c, b, exp, ctx);
         fq_poly_pow(b, b, exp, ctx);
 
@@ -113,13 +113,13 @@ main(void)
 
         if (exp == 0)
         {
-            fq_poly_one(c);
+            fq_poly_one(c, ctx);
         }
         else
         {
             long j;
 
-            fq_poly_set(c, b);
+            fq_poly_set(c, b, ctx);
             for (j = 1; j < exp; j++)
                 fq_poly_mul(c, c, b, ctx);
         }

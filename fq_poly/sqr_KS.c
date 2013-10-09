@@ -34,12 +34,12 @@ void _fq_poly_sqr_KS(fq_struct *rop, const fq_struct *op, long len,
     long bits, i;
     fmpz *f, *g;
 
-    FQ_VEC_NORM(op, len);
+    FQ_VEC_NORM(op, len, ctx);
 
     if (!len)
     {
         if (2 * in_len - 1 > 0)
-            _fq_poly_zero(rop, 2 * in_len - 1);
+            _fq_poly_zero(rop, 2 * in_len - 1, ctx);
         return;
     }
 
@@ -62,7 +62,7 @@ void _fq_poly_sqr_KS(fq_struct *rop, const fq_struct *op, long len,
         fq_reduce(rop + i, ctx);
     }
 
-    _fq_poly_zero(rop + (2 * len - 1), 2 * (in_len - len));
+    _fq_poly_zero(rop + (2 * len - 1), 2 * (in_len - len), ctx);
 
     _fmpz_vec_clear(f, (2 * len - 1) + len);
 }
@@ -73,12 +73,12 @@ void fq_poly_sqr_KS(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 
     if (op->length == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
-        fq_poly_fit_length(rop, len);
+        fq_poly_fit_length(rop, len, ctx);
         _fq_poly_sqr_KS(rop->coeffs, op->coeffs, op->length, ctx);
-        _fq_poly_set_length(rop, len);
+        _fq_poly_set_length(rop, len, ctx);
     }
 }

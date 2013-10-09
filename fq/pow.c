@@ -129,11 +129,11 @@ void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
 
     if (fmpz_is_zero(e))
     {
-        fq_one(rop);
+        fq_one(rop, ctx);
     }
-    else if (fq_is_zero(op))
+    else if (fq_is_zero(op, ctx))
     {
-        fq_zero(rop);
+        fq_zero(rop, ctx);
     }
     else if (fmpz_is_one(e))
     {

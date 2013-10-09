@@ -68,7 +68,7 @@ main(void)
 
         fq_norm(x, a, ctx);
 
-        fq_one(b);
+        fq_one(b, ctx);
         for (j = 0; j < d; j++)
         {
             fq_frobenius(c, a, j, ctx);

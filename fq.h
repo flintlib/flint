@@ -72,6 +72,12 @@ static __inline__ long fq_ctx_degree(const fq_ctx_t ctx)
 
 #define fq_ctx_prime(ctx)  (&((ctx)->p))
 
+static __inline__ void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
+{
+    fmpz_set(f, fq_ctx_prime(ctx));
+    fmpz_pow_ui(f, f, fq_ctx_degree(ctx));
+}
+
 static __inline__ void fq_ctx_print(const fq_ctx_t ctx)
 {
     printf("p = "), fmpz_print(fq_ctx_prime(ctx)), printf("\n");
@@ -193,12 +199,12 @@ static __inline__ int fq_equal(const fq_t op1, const fq_t op2)
     return fmpz_poly_equal(op1, op2);
 }
 
-static __inline__ int fq_is_zero(const fq_t op)
+static __inline__ int fq_is_zero(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_zero(op);
 }
 
-static __inline__ int fq_is_one(const fq_t op)
+static __inline__ int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_is_one(op);
 }
@@ -215,14 +221,21 @@ static __inline__ void fq_swap(fq_t op1, fq_t op2)
     fmpz_poly_swap(op1, op2);
 }
 
-static __inline__ void fq_zero(fq_t rop)
+static __inline__ void fq_zero(fq_t rop,  const fq_ctx_t ctx)
 {
     fmpz_poly_zero(rop);
 }
 
-static __inline__ void fq_one(fq_t rop)
+static __inline__ void fq_one(fq_t rop,  const fq_ctx_t ctx)
 {
     fmpz_poly_one(rop);
+}
+
+static __inline__ void fq_gen(fq_t rop, const fq_ctx_t ctx)
+{
+    fmpz_poly_zero(rop);
+    fmpz_poly_set_coeff_ui(rop, 0, 0);
+    fmpz_poly_set_coeff_ui(rop, 1, 1);
 }
 
 /* Output ********************************************************************/

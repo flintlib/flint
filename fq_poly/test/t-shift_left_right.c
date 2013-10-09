@@ -62,11 +62,11 @@ main(void)
         fq_poly_init(c);
 
         fq_poly_randtest(a, state, len, ctx);
-        fq_poly_set(b, a);
+        fq_poly_set(b, a, ctx);
         shift = n_randint(state, 100);
 
-        fq_poly_shift_left(c, b, shift);
-        fq_poly_shift_left(b, b, shift);
+        fq_poly_shift_left(c, b, shift, ctx);
+        fq_poly_shift_left(b, b, shift, ctx);
 
         result = (fq_poly_equal(b, c));
         if (!result)
@@ -105,11 +105,11 @@ main(void)
         fq_poly_init(c);
 
         fq_poly_randtest(a, state, len, ctx);
-        fq_poly_set(b, a);
+        fq_poly_set(b, a, ctx);
         shift = n_randint(state, 100);
 
-        fq_poly_shift_right(c, b, shift);
-        fq_poly_shift_right(b, b, shift);
+        fq_poly_shift_right(c, b, shift, ctx);
+        fq_poly_shift_right(b, b, shift, ctx);
 
         result = (fq_poly_equal(b, c));
         if (!result)
@@ -150,8 +150,8 @@ main(void)
         fq_poly_randtest(a, state, len, ctx);
         shift = n_randint(state, 100);
 
-        fq_poly_shift_left(b, a, shift);
-        fq_poly_shift_right(c, b, shift);
+        fq_poly_shift_left(b, a, shift, ctx);
+        fq_poly_shift_right(c, b, shift, ctx);
 
         result = (fq_poly_equal(c, a));
         if (!result)

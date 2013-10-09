@@ -108,7 +108,7 @@ main(void)
         fq_inv(b, a, ctx);
         fq_mul(c, a, b, ctx);
 
-        result = (fq_is_one(c));
+        result = (fq_is_one(c, ctx));
         if (!result)
         {
             flint_printf("FAIL (a * (~a) == 1):\n\n");

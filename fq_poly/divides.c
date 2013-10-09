@@ -37,7 +37,7 @@ int _fq_poly_divides(fq_struct *Q,
 
     _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
 
-    FQ_VEC_NORM(R, lenR);
+    FQ_VEC_NORM(R, lenR, ctx);
     _fq_poly_clear(R, lenA);
 
     return (lenR == 0);
@@ -54,7 +54,7 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
 
     if (fq_poly_is_zero(A))
     {
-        fq_poly_zero(Q);
+        fq_poly_zero(Q, ctx);
         return 1;
     }
     if (fq_poly_length(A) < fq_poly_length(B))
@@ -77,18 +77,18 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
             fq_poly_init2(T, lenQ);
             ans = _fq_poly_divides(T->coeffs, A->coeffs, A->length, 
                                               B->coeffs, B->length, invB, ctx);
-            _fq_poly_set_length(T, lenQ);
-            _fq_poly_normalise(T);
+            _fq_poly_set_length(T, lenQ, ctx);
+            _fq_poly_normalise(T, ctx);
             fq_poly_swap(Q, T);
             fq_poly_clear(T);
         }
         else
         {
-            fq_poly_fit_length(Q, lenQ);
+            fq_poly_fit_length(Q, lenQ, ctx);
             ans = _fq_poly_divides(Q->coeffs, A->coeffs, A->length, 
                                               B->coeffs, B->length, invB, ctx);
-            _fq_poly_set_length(Q, lenQ);
-            _fq_poly_normalise(Q);
+            _fq_poly_set_length(Q, lenQ, ctx);
+            _fq_poly_normalise(Q, ctx);
         }
         fq_clear(invB);
 
