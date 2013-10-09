@@ -318,6 +318,23 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
 void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, 
                  const fq_ctx_t ctx);
 
+void
+_fq_poly_powmod_fmpz_binexp(fq_struct * res, const fq_struct * poly,
+                            const fmpz_t e, const fq_struct * f, slong lenf, 
+                            const fq_ctx_t ctx);
+
+void
+fq_poly_powmod_fmpz_binexp(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
+                           const fq_poly_t f, const fq_ctx_t ctx);
+
+void
+_fq_poly_powmod_ui_binexp(fq_struct * res, const fq_struct * poly, ulong e, 
+                          const fq_struct * f, slong lenf, const fq_ctx_t ctx);
+
+void
+fq_poly_powmod_ui_binexp(fq_poly_t res, const fq_poly_t poly, ulong e,
+                         const fq_poly_t f, const fq_ctx_t ctx);
+
 /*  Shifting  ****************************************************************/
 
 void _fq_poly_shift_left(fq_struct *rop, const fq_struct *op, long len, long n, const fq_ctx_t ctx);
