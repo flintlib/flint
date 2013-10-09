@@ -184,6 +184,8 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
 
 void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
 
+void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
+
 /* Randomisation *************************************************************/
 
 void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
