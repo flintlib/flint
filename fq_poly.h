@@ -112,6 +112,45 @@ void fq_poly_randtest(fq_poly_t f, flint_rand_t state,
 void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state, 
                                long len, const fq_ctx_t ctx);
 
+/*  Factoring ****************************************************************/
+typedef struct
+{
+    fq_poly_struct *poly;
+    slong *exp;
+    slong num;
+    slong alloc;
+} fq_poly_factor_struct;
+
+typedef fq_poly_factor_struct fq_poly_factor_t[1];
+
+
+void fq_poly_factor_init(fq_poly_factor_t fac, const fq_ctx_t ctx);
+
+void fq_poly_factor_clear(fq_poly_factor_t fac);
+
+void fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc,
+                            const fq_ctx_t ctx);
+
+void fq_poly_factor_fit_length(fq_poly_factor_t fac, slong len,
+                               const fq_ctx_t ctx);
+
+void fq_poly_factor_set(fq_poly_factor_t res, const fq_poly_factor_t fac,
+                        const fq_ctx_t ctx);
+
+void fq_poly_factor_insert(fq_poly_factor_t fac, const fq_poly_t poly, 
+                           slong exp, const fq_ctx_t ctx);
+
+void fq_poly_factor_print(const fq_poly_factor_t fac, const fq_ctx_t ctx);
+
+void
+fq_poly_factor_print_pretty(const fq_poly_factor_t fac, const char * var,
+                            const fq_ctx_t ctx);
+
+void fq_poly_factor_concat(fq_poly_factor_t res, const fq_poly_factor_t fac,
+                           const fq_ctx_t ctx);
+
+void fq_poly_factor_pow(fq_poly_factor_t fac, slong exp);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
