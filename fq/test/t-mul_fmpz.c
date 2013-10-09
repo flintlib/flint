@@ -61,7 +61,7 @@ main(void)
 	fmpz_init(x);
 
         fq_randtest(a, state, ctx);
-        fmpz_randm(x,state,fq_ctx_prime(ctx));
+        fmpz_randtest_mod_signed(x,state,fq_ctx_prime(ctx));
         fq_mul_fmpz(b, a, x, ctx);
         fq_mul_fmpz(a, a, x, ctx);
 
@@ -103,7 +103,7 @@ main(void)
 	fmpz_poly_init(b);
 
         fq_randtest(a, state, ctx);
-        fmpz_randm(x,state,fq_ctx_prime(ctx));
+        fmpz_randtest_mod_signed(x,state,fq_ctx_prime(ctx));
         fq_mul_fmpz(c, a, x, ctx);
         fmpz_poly_scalar_mul_fmpz(b,a,x);
 	fq_reduce(b,ctx);
