@@ -80,14 +80,40 @@ static __inline__ void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
     fmpz_pow_ui(f, f, fq_ctx_degree(ctx));
 }
 
+static __inline__ int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
+{
+    int r;
+
+    r = flint_fprintf(file, "p = ");
+    if (r <= 0)
+        return r;
+
+    r = fmpz_fprint(file, fq_ctx_prime(ctx));
+    if (r <= 0)
+        return r;
+
+    r = flint_fprintf(file, "\nd = %ld\n", fq_ctx_degree(ctx));
+    if (r <= 0)
+        return r;
+
+    r = flint_fprintf(file, "f(X) = ");
+    if (r <= 0)
+        return r;
+
+    r = fmpz_mod_poly_fprint_pretty(file, ctx->modulus, "X");
+    if (r <= 0)
+        return r;
+
+    r = flint_fprintf(file, "\n");
+
+    return r;
+}
+
 static __inline__ void fq_ctx_print(const fq_ctx_t ctx)
 {
-    printf("p = "), fmpz_print(fq_ctx_prime(ctx)), printf("\n");
-    printf("d = %ld\n", fq_ctx_degree(ctx));
-    printf("f(X) = ");
-    fmpz_mod_poly_print_pretty(ctx->modulus, "X");
-    printf("\n");
+    fq_ctx_fprint(stdout, ctx);
 }
+
 
 /* Memory managment  *********************************************************/
 
