@@ -40,11 +40,11 @@ profile: $(PROFS)
 
 -include $(patsubst %, %.d, $(PROFS))
 
-$(BUILD_DIR)/profile/%$(EXEEXT): profile/%.c $(BUILD_DIR)/../../profiler.o
+$(BUILD_DIR)/profile/%$(EXEEXT): profile/%.c $(BUILD_DIR)/../profiler.o
 	$(QUIET_CC) $(CC) $(ABI_FLAG) $(CFLAGS) $(INCS) $< ../build/profiler.o -o $@ $(LIBS)  -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
-$(BUILD_DIR)/profile/%$(EXEEXT): profile/%.cpp $(BUILD_DIR)/../../profiler.o
-	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../profiler.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+$(BUILD_DIR)/profile/%$(EXEEXT): profile/%.cpp $(BUILD_DIR)/../profiler.o
+	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
 
 tune: $(TUNE_SOURCES) $(HEADERS)
