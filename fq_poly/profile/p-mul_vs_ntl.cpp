@@ -107,8 +107,8 @@ main(int argc, char** argv)
         slong s[nalgs];
   
         fmpz_mod_poly_init(fmod, p);
-        fmpz_mod_poly_randtest_not_zero(fmod, state, ext);
-        fmpz_mod_poly_set_coeff_ui(fmod, ext - 1, 1);
+        fmpz_mod_poly_randtest_not_zero(fmod, state, ext + 1);
+        fmpz_mod_poly_set_coeff_ui(fmod, ext, 1);
         fmpz_mod_poly_get_ZZ_pX(mod, fmod);
         
         ZZ_pE::init(mod);

@@ -118,8 +118,8 @@ main(int argc, char** argv)
             int c, n, reps = 0;
 
             fmpz_mod_poly_init(fmod, p);
-            fmpz_mod_poly_randtest_not_zero(fmod, state, len);
-            fmpz_mod_poly_set_coeff_ui(fmod, len - 1, 1);
+            fmpz_mod_poly_randtest_not_zero(fmod, state, len + 1);
+            fmpz_mod_poly_set_coeff_ui(fmod, len, 1);
             fmpz_mod_poly_get_ZZ_pX(mod, fmod);
             fmpz_mod_poly_get_zz_pX(nmod, fmod);
 
