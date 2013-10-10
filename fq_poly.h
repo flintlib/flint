@@ -157,6 +157,10 @@ _fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx);
 int
 fq_poly_is_squarefree(const fq_poly_t f, const fq_ctx_t ctx);
 
+void
+fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
+                          const fq_ctx_t ctx);
+
 int
 fq_poly_is_irreducible(const fq_poly_t f, const fq_ctx_t ctx);
 
