@@ -35,15 +35,16 @@ void _fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
     const slong lenQ = lenA - lenB + 1;
     fmpz * Arev;
 
-    Arev = _fmpz_vec_init(lenA);
+    Arev = _fmpz_vec_init(lenQ);
 
-    _fmpz_poly_reverse(Arev, A, lenA, lenA);
+    _fmpz_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
 
-    _fmpz_mod_poly_mullow(Q, Arev, lenA, Binv, lenBinv, mod, lenQ);
+    _fmpz_mod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), mod,
+                          lenQ);
 
     _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
 
-    _fmpz_vec_clear(Arev, lenA);
+    _fmpz_vec_clear(Arev, lenQ);
 }
 
 

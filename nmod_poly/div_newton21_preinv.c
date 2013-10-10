@@ -39,11 +39,10 @@ void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
     const slong lenQ = lenA - lenB + 1;
     mp_ptr Arev;
 
-    Arev = _nmod_vec_init(lenA);
+    Arev = _nmod_vec_init(lenQ);
+    _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
 
-    _nmod_poly_reverse(Arev, A, lenA, lenA);
-
-    _nmod_poly_mullow(Q, Arev, lenA, Binv, lenBinv, lenQ, mod);
+    _nmod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN (lenQ,lenBinv), lenQ, mod);
 
     _nmod_poly_reverse(Q, Q, lenQ, lenQ);
 
