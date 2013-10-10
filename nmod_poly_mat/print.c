@@ -33,19 +33,19 @@ nmod_poly_mat_print(const nmod_poly_mat_t A, const char * x)
 {
     slong i, j;
 
-    printf("<%ld x %ld matrix over Z/nZ[%s]>\n", A->r, A->c, x);
+    flint_printf("<%wd x %wd matrix over Z/nZ[%s]>\n", A->r, A->c, x);
 
     for (i = 0; i < A->r; i++)
     {
-        printf("[");
+        flint_printf("[");
         for (j = 0; j < A->c; j++)
         {
             /* TODO: pretty */
             nmod_poly_print(nmod_poly_mat_entry(A, i, j));
             if (j + 1 < A->c)
-                printf(", ");
+                flint_printf(", ");
         }
-        printf("]\n");
+        flint_printf("]\n");
     }
-    printf("\n");
+    flint_printf("\n");
 }

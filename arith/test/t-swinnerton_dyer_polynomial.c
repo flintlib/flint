@@ -35,17 +35,17 @@
 
 static const mp_limb_t known_values[] =
 {
-    2147483629UL,
-    1073742093UL,
-    1342248677UL,
-    3319936736UL,
-    2947821228UL,
-    1019513834UL,
-    3324951530UL,
-    1995039408UL,
-    3505683295UL,
-    3567639420UL,
-    394942914UL
+    UWORD(2147483629),
+    UWORD(1073742093),
+    UWORD(1342248677),
+    UWORD(3319936736),
+    UWORD(2947821228),
+    UWORD(1019513834),
+    UWORD(3324951530),
+    UWORD(1995039408),
+    UWORD(3505683295),
+    UWORD(3567639420),
+    UWORD(394942914)
 };
 
 int main()
@@ -54,18 +54,18 @@ int main()
     mp_limb_t r;
     slong n;
 
-    printf("swinnerton_dyer_polynomial....");
+    flint_printf("swinnerton_dyer_polynomial....");
     fflush(stdout);
 
     for (n = 0; n <= 10; n++)
     {
         fmpz_poly_init(S);
         arith_swinnerton_dyer_polynomial(S, n);
-        r = fmpz_poly_evaluate_mod(S, 2147483629UL, 4294967291UL);
+        r = fmpz_poly_evaluate_mod(S, UWORD(2147483629), UWORD(4294967291));
 
         if (r != known_values[n])
         {
-            printf("ERROR: wrong evaluation of S_%ld\n", n);
+            flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
             abort();
         }
 
@@ -73,6 +73,6 @@ int main()
     }
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

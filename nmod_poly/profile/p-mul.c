@@ -98,7 +98,7 @@ int main(void)
    
       prof_repeat(&min, &max, sample, (void *) &info);
          
-      printf("length %ld, min %.3g ms, max %.3g ms, norm %.3g\n", 
+      flint_printf("length %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
            info.n,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,

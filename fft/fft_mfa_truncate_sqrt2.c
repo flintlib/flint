@@ -137,8 +137,8 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
    mp_bitcnt_t depth = 0;
    mp_bitcnt_t depth2 = 0;
    
-   while ((1UL<<depth) < n2) depth++;
-   while ((1UL<<depth2) < n1) depth2++;
+   while ((UWORD(1)<<depth) < n2) depth++;
+   while ((UWORD(1)<<depth2) < n1) depth2++;
 
    /* first half matrix fourier FFT : n2 rows, n1 cols */
    
@@ -248,8 +248,8 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
    mp_bitcnt_t depth = 0;
    mp_bitcnt_t depth2 = 0;
    
-   while ((1UL<<depth) < n2) depth++;
-   while ((1UL<<depth2) < n1) depth2++;
+   while ((UWORD(1)<<depth) < n2) depth++;
+   while ((UWORD(1)<<depth2) < n1) depth2++;
 
    /* first half matrix fourier FFT : n2 rows, n1 cols */
    

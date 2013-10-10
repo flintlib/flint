@@ -37,13 +37,13 @@ void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     {
         if (d >= 0)
         {
-            fmpz_set_ui(f, exp < (FLINT_BITS - 2) ? d & ((1L << exp) - 1) : d);
+            fmpz_set_ui(f, exp < (FLINT_BITS - 2) ? d & ((WORD(1) << exp) - 1) : d);
         }
         else
         {
             if (exp <= FLINT_BITS - 2)
             {
-                fmpz_set_ui(f, d & ((1L << exp) - 1));
+                fmpz_set_ui(f, d & ((WORD(1) << exp) - 1));
             }
             else
             {

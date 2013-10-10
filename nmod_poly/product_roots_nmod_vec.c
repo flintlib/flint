@@ -31,13 +31,13 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod
 {
     if (n == 0)
     {
-        poly[0] = 1UL;
+        poly[0] = UWORD(1);
     }
     else if (n < 20)
     {
         slong i, j;
 
-        poly[n] = 1UL;
+        poly[n] = UWORD(1);
         poly[n - 1] = nmod_neg(xs[0], mod);
 
         for (i = 1; i < n; i++)

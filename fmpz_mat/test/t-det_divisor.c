@@ -40,7 +40,7 @@ main(void)
     slong i;
     int result;
 
-    printf("det_divisor....");
+    flint_printf("det_divisor....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -86,10 +86,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("det: ");  fmpz_print(det);    printf("\n");
-            printf("d: "); fmpz_print(d); printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("det: ");  fmpz_print(det);    flint_printf("\n");
+            flint_printf("d: "); fmpz_print(d); flint_printf("\n");
             abort();
         }
 
@@ -102,6 +102,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,7 +35,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sqrtmod....");
+    flint_printf("sqrtmod....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -46,7 +46,7 @@ int main(void)
         fmpz_t a, b, c, p;
         mp_limb_t prime;
 
-        prime = n_randint(state, 1UL << (FLINT_BITS - 1));
+        prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);
 
         fmpz_init(a);
@@ -65,11 +65,11 @@ int main(void)
         result = (ans == 0 || fmpz_equal(a, c));
         if (!result)
         {
-            printf("FAIL (random):\n");
-            printf("p = "), fmpz_print(p), printf("\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
+            flint_printf("FAIL (random):\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
             abort();
         }
 
@@ -85,7 +85,7 @@ int main(void)
         fmpz_t a, b, c, d, p;
         mp_limb_t prime;
 
-        prime = n_randint(state, 1UL << (FLINT_BITS - 1));
+        prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);
 
         fmpz_init(a);
@@ -117,13 +117,13 @@ int main(void)
         result = (ans && fmpz_equal(a, d));
         if (!result)
         {
-            printf("FAIL (squares):\n");
-            printf("p            = "), fmpz_print(p), printf("\n");
-            printf("a (= b^2)    = "), fmpz_print(a), printf("\n");
-            printf("b            = "), fmpz_print(b), printf("\n");
-            printf("c (= sqrt(a) = "), fmpz_print(c), printf("\n");
-            printf("d (= c^2)    = "), fmpz_print(d), printf("\n");
-            printf("ans          = %d\n", ans);
+            flint_printf("FAIL (squares):\n");
+            flint_printf("p            = "), fmpz_print(p), flint_printf("\n");
+            flint_printf("a (= b^2)    = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b            = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("c (= sqrt(a) = "), fmpz_print(c), flint_printf("\n");
+            flint_printf("d (= c^2)    = "), fmpz_print(d), flint_printf("\n");
+            flint_printf("ans          = %d\n", ans);
             abort();
         }
 
@@ -136,6 +136,6 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

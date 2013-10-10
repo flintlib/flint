@@ -39,7 +39,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("interpolate_fmpz_vec....");
+    flint_printf("interpolate_fmpz_vec....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -75,10 +75,10 @@ main(void)
 
             if (!fmpz_equal(z + j, y + j) || !fmpz_is_one(fmpq_denref(q)))
             {
-                printf("FAIL:\n");
-                printf("x:\n"); _fmpz_vec_print(x, n); printf("\n\n");
-                printf("y:\n"); _fmpz_vec_print(y, n); printf("\n\n");
-                printf("P:\n"); fmpq_poly_print(P), printf("\n\n");
+                flint_printf("FAIL:\n");
+                flint_printf("x:\n"); _fmpz_vec_print(x, n); flint_printf("\n\n");
+                flint_printf("y:\n"); _fmpz_vec_print(y, n); flint_printf("\n\n");
+                flint_printf("P:\n"); fmpq_poly_print(P), flint_printf("\n\n");
                 abort();
             }
         }
@@ -92,6 +92,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

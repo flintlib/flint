@@ -38,7 +38,7 @@ mp_limb_t n_sqrt(mp_limb_t a)
 
     is -= (is*is > a);
 #if FLINT64
-    if (is == 4294967296UL) is--;
+    if (is == UWORD(4294967296)) is--;
 #endif
     return is;
 }

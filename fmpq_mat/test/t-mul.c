@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("mul....");
+    flint_printf("mul....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -67,14 +67,14 @@ main(void)
         result = fmpq_mat_equal(C, D);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
-            printf("D:\n");
+            flint_printf("D:\n");
             fmpq_mat_print(D);
             abort();
         }
@@ -87,6 +87,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

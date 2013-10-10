@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("get_d....");
+    flint_printf("get_d....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,10 +61,10 @@ main(void)
         result = (a == b);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("x = "), fmpz_print(x), printf("\n");
-            printf("a = %f\n", a);
-            printf("b = %f\n", b);
+            flint_printf("FAIL:\n");
+            flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+            flint_printf("a = %f\n", a);
+            flint_printf("b = %f\n", b);
             abort();
         }
 
@@ -78,10 +78,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("x = "), fmpz_print(x), printf("\n");
-            printf("y = "), fmpz_print(y), printf("\n");
-            printf("a = %f\n", a);
+            flint_printf("FAIL:\n");
+            flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+            flint_printf("y = "), fmpz_print(y), flint_printf("\n");
+            flint_printf("a = %f\n", a);
             abort();
         }
 
@@ -92,6 +92,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

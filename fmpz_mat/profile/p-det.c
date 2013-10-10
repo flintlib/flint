@@ -89,7 +89,7 @@ int main(void)
     for (bits = 2; bits <= 4096; bits *= 2)
     {
         params.bits = bits;
-        printf("fmpz_mat_det (bits = %ld):\n", params.bits);
+        flint_printf("fmpz_mat_det (bits = %wd):\n", params.bits);
 
         for (dim = 2; dim <= 512; dim = (slong) ((double) dim * 1.1) + 1)
         {
@@ -104,7 +104,7 @@ int main(void)
             params.algorithm = 2;
             prof_repeat(&min_modular_2, &max, sample, &params);
 
-            printf("dim = %ld classical/modular/acc. %.2f %.2f %.2f (us)\n", 
+            flint_printf("dim = %wd classical/modular/acc. %.2f %.2f %.2f (us)\n", 
                 dim, min_classical, min_modular, min_modular_2);
 
             if (min_modular > 1.1*min_modular_2)

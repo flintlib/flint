@@ -45,7 +45,7 @@ int main()
 
     flint_rand_t state;
 
-    printf("CRT_ui....");
+    flint_printf("CRT_ui....");
     fflush(stdout);
 
     fmpz_init(input);
@@ -62,7 +62,7 @@ int main()
         m2 = n_randtest_prime(state, 0);
         nprimes = 1 + n_randint(state, 4);
 
-        fmpz_set_ui(m1, 1UL);
+        fmpz_set_ui(m1, UWORD(1));
         for (j = 0; j < nprimes; )
         {
             ulong t = n_randtest_prime(state, 0);
@@ -89,16 +89,16 @@ int main()
 
         if (!fmpz_equal(result, input))
         {
-            printf("FAIL:\n");
-            printf("m1: "); fmpz_print(m1); printf("\n");
-            printf("m2: %lu\n", m2);
-            printf("m1*m2: "); fmpz_print(mprod); printf("\n");
-            printf("input: "); fmpz_print(input); printf("\n");
-            printf("r1: "); fmpz_print(r1); printf("\n");
-            printf("r2: %lu\n", r2);
-            printf("result: "); fmpz_print(result); printf("\n");
-            printf("%ld Equalness: %d\n", i, fmpz_equal(result, input));
-            printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("m1: "); fmpz_print(m1); flint_printf("\n");
+            flint_printf("m2: %wu\n", m2);
+            flint_printf("m1*m2: "); fmpz_print(mprod); flint_printf("\n");
+            flint_printf("input: "); fmpz_print(input); flint_printf("\n");
+            flint_printf("r1: "); fmpz_print(r1); flint_printf("\n");
+            flint_printf("r2: %wu\n", r2);
+            flint_printf("result: "); fmpz_print(result); flint_printf("\n");
+            flint_printf("%wd Equalness: %d\n", i, fmpz_equal(result, input));
+            flint_printf("\n");
             abort();
         }
     }
@@ -112,6 +112,6 @@ int main()
 
     flint_cleanup();
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

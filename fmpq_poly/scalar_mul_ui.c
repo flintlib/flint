@@ -45,7 +45,7 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
     fmpz_init(gcd);
     fmpz_set_ui(gcd, c);
     fmpz_gcd(gcd, gcd, den);
-    if (*gcd == 1L)
+    if (*gcd == WORD(1))
     {
         _fmpz_vec_scalar_mul_ui(rpoly, poly, len, c);
         fmpz_set(rden, den);

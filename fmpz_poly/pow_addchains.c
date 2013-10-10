@@ -110,9 +110,9 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
     const slong len = poly->length;
     
-    if ((len < 2) | (e < 3UL))
+    if ((len < 2) | (e < UWORD(3)))
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
             fmpz_poly_set_ui(res, 1);
         else if (len == 0)
             fmpz_poly_zero(res);
@@ -122,14 +122,14 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_pow_ui(res->coeffs, poly->coeffs, e);
             _fmpz_poly_set_length(res, 1);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
             fmpz_poly_set(res, poly);
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             fmpz_poly_sqr(res, poly);
         return;
     }
     
-    if (e <= 148UL)
+    if (e <= UWORD(148))
     {
         /*
            An array storing a tree with shortest addition chains (star chains, 
@@ -196,7 +196,7 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     }
     else
     {
-        printf("Exception (fmpz_poly_addchains). Powering via chains not implemented for e > 148.\n");
+        flint_printf("Exception (fmpz_poly_addchains). Powering via chains not implemented for e > 148.\n");
         abort();
     }
 }

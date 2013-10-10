@@ -39,7 +39,7 @@ void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
    mpz_realloc(m, limbs + 1);
    flint_mpn_copyi(m->_mp_d, i, limbs + 1);
    hi = i[limbs];
-   if (hi < 0L)
+   if (hi < WORD(0))
    {
       mpn_neg_n(m->_mp_d, m->_mp_d, limbs + 1);
       m->_mp_size = limbs + 1;

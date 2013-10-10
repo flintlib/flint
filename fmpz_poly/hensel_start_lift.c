@@ -60,7 +60,7 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
 
         if (fmpz_invmod(t, t, P) == 0)
         {
-            printf("Exception (fmpz_poly_start_hensel_lift).\n");
+            flint_printf("Exception (fmpz_poly_start_hensel_lift).\n");
             abort();
         }
 
@@ -105,7 +105,7 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
         if (link[i] < 0)
         {
             fmpz_poly_scalar_smod_fmpz(lifted_fac->p + (- link[i] - 1), v[i], P);
-            lifted_fac->exp[- link[i] - 1] = 1L; 
+            lifted_fac->exp[- link[i] - 1] = WORD(1); 
         }
     }
     lifted_fac->num = r;

@@ -36,7 +36,7 @@ int main()
     fmpz_t s, t;
     slong n;
 
-    printf("bernoulli_number_denom....");
+    flint_printf("bernoulli_number_denom....");
     fflush(stdout);
 
     fmpz_init(s);
@@ -52,7 +52,7 @@ int main()
 
     if (!fmpz_equal(s, t))
     {
-        printf("FAIL: Hash disagrees with known value\n");
+        flint_printf("FAIL: Hash disagrees with known value\n");
         abort();
     }
 
@@ -60,6 +60,6 @@ int main()
     fmpz_clear(t);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,7 +35,7 @@ int main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("compose....");
+    flint_printf("compose....");
     fflush(stdout);
 
     /* check (b^(-1))(b(a)) = a */
@@ -59,11 +59,11 @@ int main(void)
 
         if (!_perm_equal(a, c, n))
         {
-            printf("FAIL:\n");
-            printf("a: "); _perm_print(a, n); printf("\n\n");
-            printf("b: "); _perm_print(b, n); printf("\n\n");
-            printf("binv: "); _perm_print(binv, n); printf("\n\n");
-            printf("c: "); _perm_print(c, n); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
+            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
+            flint_printf("binv: "); _perm_print(binv, n); flint_printf("\n\n");
+            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
             abort();
         }
 
@@ -92,10 +92,10 @@ int main(void)
 
         if (!_perm_equal(b, c, n))
         {
-            printf("FAIL:\n");
-            printf("a: "); _perm_print(a, n); printf("\n\n");
-            printf("b: "); _perm_print(b, n); printf("\n\n");
-            printf("c: "); _perm_print(c, n); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
+            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
+            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
             abort();
         }
 
@@ -106,6 +106,6 @@ int main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

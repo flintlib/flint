@@ -107,8 +107,8 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     const slong lenF = f->length;
 
     #if TRACE_ZASSENHAUS == 1
-    printf("\n[Zassenhaus]\n");
-    printf("|f = "), fmpz_poly_print(f), printf("\n");
+    flint_printf("\n[Zassenhaus]\n");
+    flint_printf("|f = "), fmpz_poly_print(f), flint_printf("\n");
     #endif
 
     if (lenF == 2)
@@ -170,7 +170,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
         if (r > cutoff)
         {
-            printf("Exception (fmpz_poly_factor_zassenhaus). r > cutoff.\n");
+            flint_printf("Exception (fmpz_poly_factor_zassenhaus). r > cutoff.\n");
             nmod_poly_factor_clear(fac);
             abort();
         }
@@ -199,10 +199,10 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
 
             #if TRACE_ZASSENHAUS == 1
-            printf("|p = %ld, a = %ld\n", p, a);
-            printf("|Pre hensel lift factorisation (nmod_poly):\n");
+            flint_printf("|p = %wd, a = %wd\n", p, a);
+            flint_printf("|Pre hensel lift factorisation (nmod_poly):\n");
             nmod_poly_factor_print(fac);
-            printf("|Post hensel lift factorisation (fmpz_poly):\n");
+            flint_printf("|Post hensel lift factorisation (fmpz_poly):\n");
             fmpz_poly_factor_print(lifted_fac);
             #endif
 

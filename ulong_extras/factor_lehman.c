@@ -38,7 +38,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
     slong bound;
 
 #if FLINT64 /* cannot compute enough primes */
-    if (n > 10000000000000000UL) return n;
+    if (n > UWORD(10000000000000000)) return n;
 #endif
 
     if ((n & 1) == 0) return 2;

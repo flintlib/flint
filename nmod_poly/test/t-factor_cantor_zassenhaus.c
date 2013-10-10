@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor_cantor_zassenhaus....");
+    flint_printf("factor_cantor_zassenhaus....");
     fflush(stdout);
 
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
@@ -104,7 +104,7 @@ main(void)
 
         if (!result)
         {
-            printf("Error: number of factors incorrect, %ld, %ld\n",
+            flint_printf("Error: number of factors incorrect, %wd, %wd\n",
                 res->num, num);
         }
 
@@ -120,9 +120,9 @@ main(void)
 
         if (!result)
         {
-            printf("Error: product of factors does not equal original polynomial\n");
-            nmod_poly_print(pol1); printf("\n");
-            nmod_poly_print(product); printf("\n");
+            flint_printf("Error: product of factors does not equal original polynomial\n");
+            nmod_poly_print(pol1); flint_printf("\n");
+            nmod_poly_print(product); flint_printf("\n");
         }
 
         if (!result)
@@ -138,6 +138,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

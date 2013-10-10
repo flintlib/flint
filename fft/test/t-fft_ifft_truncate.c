@@ -42,7 +42,7 @@ main(void)
     
     flint_rand_t state;
 
-    printf("fft/ifft_truncate....");
+    flint_printf("fft/ifft_truncate....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -52,7 +52,7 @@ main(void)
     {
         for (w = 1; w <= 5; w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_size_t trunc = n_randint(state, 2*n) + 1;
             mp_size_t limbs = (n*w)/GMP_LIMB_BITS;
             mp_size_t size = limbs + 1;
@@ -93,8 +93,8 @@ main(void)
             {
                 if (mpn_cmp(ii[i], jj[i], size) != 0)
                 {
-                    printf("FAIL:\n");
-                    printf("Error in entry %ld\n", i);
+                    flint_printf("FAIL:\n");
+                    flint_printf("Error in entry %wd\n", i);
                     abort();
                 }
             }
@@ -106,6 +106,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

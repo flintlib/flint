@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("divexact....");
+    flint_printf("divexact....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -70,7 +70,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -110,7 +110,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, f = %Zd, g = %Zd\n", d, f, g);
             abort();
         }
@@ -153,7 +153,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -198,7 +198,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -215,6 +215,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

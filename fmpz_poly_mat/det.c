@@ -35,7 +35,7 @@ fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A)
 
     if (n == 0)
     {
-        fmpz_poly_set_ui(det, 1UL);
+        fmpz_poly_set_ui(det, UWORD(1));
     }
     else if (n == 1)
     {

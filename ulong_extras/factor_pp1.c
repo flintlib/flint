@@ -49,12 +49,12 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
       y >>= norm;
    } 
 
-   printf("[%lu, %lu]", x, y);
+   flint_printf("[%wu, %wu]", x, y);
 }
 
 #define n_pp1_2k(x, y, n, ninv, x0, norm)       \
    do {                                         \
-      const mp_limb_t two = (2UL << norm);      \
+      const mp_limb_t two = (UWORD(2) << norm);      \
       y = n_mulmod_preinv(y, x, n, ninv, norm); \
       y = n_submod(y, x0, n);                   \
       x = n_mulmod_preinv(x, x, n, ninv, norm); \
@@ -63,7 +63,7 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 
 #define n_pp1_2kp1(x, y, n, ninv, x0, norm)     \
    do {                                         \
-      const mp_limb_t two = (2UL << norm);      \
+      const mp_limb_t two = (UWORD(2) << norm);      \
       x = n_mulmod_preinv(x, y, n, ninv, norm); \
       x = n_submod(x, x0, n);                   \
       y = n_mulmod_preinv(y, y, n, ninv, norm); \
@@ -74,8 +74,8 @@ void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
                     mp_limb_t n, mp_limb_t ninv, ulong norm)
 {
    const mp_limb_t x0 = *x;
-   const mp_limb_t two = (2UL << norm);
-   ulong bit = ((1UL << FLINT_BIT_COUNT(exp)) >> 2);
+   const mp_limb_t two = (UWORD(2) << norm);
+   ulong bit = ((UWORD(1) << FLINT_BIT_COUNT(exp)) >> 2);
 
    (*y) = n_mulmod_preinv(*x, *x, n, ninv, norm);
    (*y) = n_submod(*y, two, n);

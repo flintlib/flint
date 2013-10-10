@@ -45,7 +45,11 @@ static char * docsin[] = {
     "../../nmod_poly/doc/nmod_poly.txt",
     "../../nmod_poly_mat/doc/nmod_poly_mat.txt",
     "../../fmpz_mod_poly/doc/fmpz_mod_poly.txt",
+    "../../fmpz_mod_poly_factor/doc/fmpz_mod_poly_factor.txt",
     "../../padic/doc/padic.txt", 
+    "../../padic_mat/doc/padic_mat.txt", 
+    "../../padic_poly/doc/padic_poly.txt", 
+    "../../qadic/doc/qadic.txt", 
     "../../arith/doc/arith.txt", 
     "../../ulong_extras/doc/ulong_extras.txt",
     "../../long_extras/doc/long_extras.txt",
@@ -56,6 +60,8 @@ static char * docsin[] = {
     "../../fft/doc/fft.txt",
     "../../qsieve/doc/qsieve.txt",
     "../../perm/doc/perm.txt",
+    "../../flintxx/doc/flintxx.txt",
+    "../../flintxx/doc/genericxx.txt",
 };
 
 static char * docsout[] = {
@@ -75,7 +81,11 @@ static char * docsout[] = {
     "input/nmod_poly.tex",
     "input/nmod_poly_mat.tex",
     "input/fmpz_mod_poly.tex",
+    "input/fmpz_mod_poly_factor.tex",
     "input/padic.tex", 
+    "input/padic_mat.tex", 
+    "input/padic_poly.tex", 
+    "input/qadic.tex", 
     "input/arith.tex", 
     "input/ulong_extras.tex",
     "input/long_extras.tex",
@@ -86,6 +96,8 @@ static char * docsout[] = {
     "input/fft.tex",
     "input/qsieve.tex",
     "input/perm.tex",
+    "input/flintxx.tex",
+    "input/genericxx.tex",
 };
 
 
@@ -99,28 +111,28 @@ static int error;
 
 /* print latex code for the function prototype "text" of length "len" */
 void
-printfuncheader(const char* text, int len)
+flint_printfuncheader(const char* text, int len)
 {
     /* We try to be clever and remove newlines and any whitespaces following
        them. */
-    fprintf(out, "\n");
-    fprintf(out, "\\vspace*{0.5em}\n");
-    fprintf(out, "\\begin{lstlisting}\n");
+    flint_fprintf(out, "\n");
+    flint_fprintf(out, "\\vspace*{0.5em}\n");
+    flint_fprintf(out, "\\begin{lstlisting}\n");
     int i = 0;
     while(i < len)
     {
         if(text[i] != '\n')
-            fprintf(out, "%c", text[i++]);
+            flint_fprintf(out, "%c", text[i++]);
         else
         {
             int hasspace = text[i - 1] == ' ';
-            while(i < len-1 && text[++i] == ' ');
+            while(i < len-1 && text[++i] == ' ' || text[i] == '\t');
             if(!hasspace)
-                fprintf(out, " ");
+                flint_fprintf(out, " ");
         }
     }
-    fprintf(out, "\n\\end{lstlisting}\n");
-    fprintf(out, "\\vspace*{-0.5em}\n");
+    flint_fprintf(out, "\n\\end{lstlisting}\n");
+    flint_fprintf(out, "\\vspace*{-0.5em}\n");
 }
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -154,10 +166,10 @@ int main(void)
 
         if(yyparse() == 0 || !feof(in))
         {
-            printf("\n");
-            printf("Parse exception:\n");
-            printf("Encountered malformed input near line %d \n", line);
-            printf("in file %s.\n\n", name);
+            flint_printf("\n");
+            flint_printf("Parse exception:\n");
+            flint_printf("Encountered malformed input near line %d \n", line);
+            flint_printf("in file %s.\n\n", name);
             return 1;
         }
 

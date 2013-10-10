@@ -45,7 +45,7 @@ _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
     {
         for (i = 0; i < factors->num; i++)
         {
-            fmpz_set_ui(r, factors->exp[i] + 1UL);
+            fmpz_set_ui(r, factors->exp[i] + UWORD(1));
             fmpz_mul(res, res, r);
         }
         return;
@@ -57,9 +57,9 @@ _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
             p = factors->p + i;
             fmpz_set(p, factors->p + i);
             fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, factors->exp[i]  + 1UL);
-            fmpz_sub_ui(r, r, 1UL);
-            fmpz_sub_ui(p, p, 1UL);
+            fmpz_pow_ui(r, p, factors->exp[i]  + UWORD(1));
+            fmpz_sub_ui(r, r, UWORD(1));
+            fmpz_sub_ui(p, p, UWORD(1));
             fmpz_divexact(p, r, p);
         }
 

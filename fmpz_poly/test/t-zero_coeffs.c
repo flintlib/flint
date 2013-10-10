@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("zero_coeffs....");
+    flint_printf("zero_coeffs....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,8 +59,8 @@ main(void)
         result = (fmpz_poly_length(a) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
             abort();
         }
 
@@ -69,6 +69,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -72,7 +72,7 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
     tree_height = FLINT_CLOG2(len);
     while (height >= tree_height)
         height--;
-    pow = 1L << height;
+    pow = WORD(1) << height;
 
     for (i = j = 0; i < len; i += pow, j++)
     {
@@ -83,7 +83,7 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
 
     for (i = height - 1; i >= 0; i--)
     {
-        pow = 1L << i;
+        pow = WORD(1) << i;
         left = len;
         pa = tree[i];
         pb = t;

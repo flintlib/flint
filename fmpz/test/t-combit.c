@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("combit....");
+    flint_printf("combit....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,10 +64,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             gmp_printf("b = %Zd\n", b);
-            printf("j = %ld\n", j);
+            flint_printf("j = %wd\n", j);
             abort();
         }
 
@@ -78,6 +78,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

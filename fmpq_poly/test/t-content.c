@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("content....");
+    flint_printf("content....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,12 +68,12 @@ main(void)
         result = (fmpq_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
-            fmpq_print(a), printf("\n\n");
-            fmpq_print(b), printf("\n\n");
-            fmpq_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_print(f), flint_printf("\n\n");
+            fmpq_poly_print(g), flint_printf("\n\n");
+            fmpq_print(a), flint_printf("\n\n");
+            fmpq_print(b), flint_printf("\n\n");
+            fmpq_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -86,6 +86,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

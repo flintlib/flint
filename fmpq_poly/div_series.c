@@ -48,7 +48,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
                                          const fmpq_poly_t B, slong n)
 {
     fmpz *a, *b;
-    ulong flags = 0UL;  /* 2^0 for a, 2^1 for b */
+    ulong flags = UWORD(0);  /* 2^0 for a, 2^1 for b */
 
     if (Q == A)
     {
@@ -73,7 +73,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
         for (i = 0; i < A->length; i++)
             a[i] = A->coeffs[i];
         flint_mpn_zero((mp_ptr) a + A->length, n - A->length);
-        flags |= 1UL;
+        flags |= UWORD(1);
     }
 
     if (B->length >= n)
@@ -87,7 +87,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
         for (i = 0; i < B->length; i++)
             b[i] = B->coeffs[i];
         flint_mpn_zero((mp_ptr) b + B->length, n - B->length);
-        flags |= 2UL;
+        flags |= UWORD(2);
     }
 
     _fmpq_poly_div_series(Q->coeffs, Q->den, a, A->den, b, B->den, n);
@@ -95,9 +95,9 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
     _fmpq_poly_set_length(Q, n);
     fmpq_poly_canonicalise(Q);
 
-    if ((flags & 1UL))
+    if ((flags & UWORD(1)))
         flint_free(a);
-    if ((flags & 2UL))
+    if ((flags & UWORD(2)))
         flint_free(b);
 }
 

@@ -36,7 +36,7 @@ main(void)
     int i, j, result;
     flint_rand_t state;
 
-    printf("get/set_coeff_ui....");
+    flint_printf("get/set_coeff_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,7 +60,7 @@ main(void)
             result = (n1 == n2);
             if (!result)
             {
-                printf("FAIL: n1 = %lu, n2 = %lu, coeff = %ld, length = %ld\n",
+                flint_printf("FAIL: n1 = %wu, n2 = %wu, coeff = %wd, length = %wd\n",
                        n1, n2, coeff, len);
                 abort();
             }
@@ -71,6 +71,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

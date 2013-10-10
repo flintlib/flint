@@ -59,7 +59,7 @@ int main(void)
     fmpz_t m, a, b;
     slong n, k;
 
-    printf("divisor_sigma....");
+    flint_printf("divisor_sigma....");
     fflush(stdout);
 
     fmpz_init(a);
@@ -75,8 +75,8 @@ int main(void)
             fmpz_sigma_naive(b, n, k);
             if (!fmpz_equal(a, b))
             {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
+                flint_printf("FAIL:\n");
+                flint_printf("wrong value for n=%wd, k=%wd\n", n, k);
                 abort();
             }
         }
@@ -87,6 +87,6 @@ int main(void)
     fmpz_clear(m);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

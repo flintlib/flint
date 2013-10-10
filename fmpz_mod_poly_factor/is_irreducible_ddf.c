@@ -42,8 +42,8 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f)
 
     if (!(degs = (slong *)flint_malloc(n * sizeof(slong))))
     {
-        printf("Exception (fmpz_mod_poly_is_irreducible_ddf): \n");
-        printf("Not enough memory.\n");
+        flint_printf("Exception (fmpz_mod_poly_is_irreducible_ddf): \n");
+        flint_printf("Not enough memory.\n");
         abort();
     }
 

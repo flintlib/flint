@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("hensel_lift_without_only_inverse....");
+    flint_printf("hensel_lift_without_only_inverse....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -168,12 +168,12 @@ main(void)
 
         if (!result) 
         {
-            printf("FAIL:\n");
-            printf("length = %ld, bits = %ld, n = %ld, exp = %ld\n", length, bits, n, exp);
-            fmpz_poly_print(F_poly); printf("\n\n");
-            fmpz_poly_print(F_poly2); printf("\n\n");
-            fmpz_poly_print(F_poly3); printf("\n\n");
-            fmpz_poly_print(Prod_1); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("length = %wd, bits = %wd, n = %wd, exp = %wd\n", length, bits, n, exp);
+            fmpz_poly_print(F_poly); flint_printf("\n\n");
+            fmpz_poly_print(F_poly2); flint_printf("\n\n");
+            fmpz_poly_print(F_poly3); flint_printf("\n\n");
+            fmpz_poly_print(Prod_1); flint_printf("\n\n");
             abort();
         } 
 
@@ -207,6 +207,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

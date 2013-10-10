@@ -38,7 +38,7 @@ main(void)
     mp_bitcnt_t r1, r2;
     flint_rand_t state;
 
-    printf("popcnt....");
+    flint_printf("popcnt....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,10 +61,10 @@ main(void)
 
         if (!result && fmpz_cmp_si(a,0) >= 0)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
             gmp_printf("b = %Zd\n", b);
-            printf("r1 = %lu  r2 = %lu\n", r1, r2);
+            flint_printf("r1 = %wu  r2 = %wu\n", r1, r2);
             abort();
         }
 
@@ -74,6 +74,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -174,7 +174,7 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 	} while (r != reduced_rows);
 
 #if (QS_DEBUG & 128)
-	printf("reduce to %ld x %ld in %ld passes\n", 
+	flint_printf("reduce to %wd x %wd in %wd passes\n", 
 			reduced_rows, reduced_cols, passes);
 #endif
 
@@ -437,7 +437,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 				
 		if (j == 64) {
 #if (QS_DEBUG & 128)
-			printf("lanczos error: submatrix "
+			flint_printf("lanczos error: submatrix "
 					"is not invertible\n");
 #endif
 			return 0;
@@ -476,7 +476,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 
 	if (mask != (uint64_t)(-1)) {
 #if (QS_DEBUG & 128)
-		printf("lanczos error: not all columns used\n");
+		flint_printf("lanczos error: not all columns used\n");
 #endif
 		return 0;
 	}
@@ -906,7 +906,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	}
 
 #if (QS_DEBUG & 128)
-	printf("lanczos halted after %ld iterations\n", iter);
+	flint_printf("lanczos halted after %wd iterations\n", iter);
 #endif
 
 	/* free unneeded storage */
@@ -932,7 +932,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 
 	if (dim0 == 0) {
 #if (QS_DEBUG & 128)
-		printf("linear algebra failed; retrying...\n");
+		flint_printf("linear algebra failed; retrying...\n");
 #endif
 		flint_free(x);
 		flint_free(v[0]);
@@ -958,7 +958,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 			break;
 	}
 	if (i < ncols) {
-		printf("lanczos error: dependencies don't work %ld\n",i);
+		flint_printf("lanczos error: dependencies don't work %wd\n",i);
 		abort();
 	}
 	

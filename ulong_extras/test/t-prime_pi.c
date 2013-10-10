@@ -32,15 +32,15 @@ int main(void)
 {
     int n;
 
-    printf("prime_pi....");
+    flint_printf("prime_pi....");
     fflush(stdout);
 
     for (n=1; n<10000 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
         if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
         {
-            printf("FAIL:\n");
-            printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
+            flint_printf("FAIL:\n");
+            flint_printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
             abort();
         }
     }
@@ -49,12 +49,12 @@ int main(void)
     {
         if (n_prime_pi(n_nth_prime(n)) != n)
         {
-            printf("FAIL:\n");
-            printf("expected pi(prime(%d)) = %d\n", n, n); 
+            flint_printf("FAIL:\n");
+            flint_printf("expected pi(prime(%d)) = %d\n", n, n); 
             abort();
         }
     }
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

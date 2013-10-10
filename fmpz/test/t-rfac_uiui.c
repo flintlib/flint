@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("rfac_uiui... ");
+    flint_printf("rfac_uiui... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -71,12 +71,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n\n");
-            printf("x: %lu", x); printf("\n\n");
-            printf("a = %lu, b = %lu\n\n", a, b);
-            printf("rf(x,a): "); fmpz_print(r1); printf("\n\n");
-            printf("rf(x+a,b): "); fmpz_print(r2); printf("\n\n");
-            printf("rf(x,a+b): "); fmpz_print(r3); printf("\n\n");
+            flint_printf("FAIL\n\n");
+            flint_printf("x: %wu", x); flint_printf("\n\n");
+            flint_printf("a = %wu, b = %wu\n\n", a, b);
+            flint_printf("rf(x,a): "); fmpz_print(r1); flint_printf("\n\n");
+            flint_printf("rf(x+a,b): "); fmpz_print(r2); flint_printf("\n\n");
+            flint_printf("rf(x,a+b): "); fmpz_print(r3); flint_printf("\n\n");
             abort();
         }
 
@@ -88,7 +88,7 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     flint_cleanup();
     return EXIT_SUCCESS;
 }

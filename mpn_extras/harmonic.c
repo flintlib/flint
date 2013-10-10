@@ -111,8 +111,8 @@ flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
 {
     mp_size_t ts, vs;
 
-    *t = 0UL;
-    *v = 1UL;
+    *t = UWORD(0);
+    *v = UWORD(1);
     ts = 1;
     vs = 1;
 
@@ -125,7 +125,7 @@ flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
             while (k <= (n >> d))
                 d += 1;
             r = ((mp_limb_t) k) << (d-1);
-            s = (1UL << d) - 1UL;
+            s = (UWORD(1) << d) - UWORD(1);
             MPN_MUL_1(t, ts, t, ts, r);
             MPN_ADDMUL_1(t, ts, v, vs, s);
             MPN_MUL_1(v, vs, v, vs, r);
@@ -140,8 +140,8 @@ flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
             MPN_ADD(t, ts, t, ts, v, vs);
             MPN_MUL_1(v, vs, v, vs, a);
         }
-        MPN_MUL_1(t, ts, t, ts, (1UL<<d) - 1UL);
-        MPN_MUL_1(v, vs, v, vs, 1UL << (d-1));
+        MPN_MUL_1(t, ts, t, ts, (UWORD(1)<<d) - UWORD(1));
+        MPN_MUL_1(v, vs, v, vs, UWORD(1) << (d-1));
     }
 
     *tsize = ts;

@@ -36,9 +36,9 @@ or implied, of William Hart.
 void mul_mfa_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 {
-   mp_size_t n = (1UL<<depth);
+   mp_size_t n = (UWORD(1)<<depth);
    mp_bitcnt_t bits1 = (n*w - (depth+1))/2; 
-   mp_size_t sqrt = (1UL<<(depth/2));
+   mp_size_t sqrt = (UWORD(1)<<(depth/2));
 
    mp_size_t r_limbs = n1 + n2;
    mp_size_t limbs = (n*w)/FLINT_BITS;

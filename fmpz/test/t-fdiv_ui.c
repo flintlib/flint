@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("fdiv_ui....");
+    flint_printf("fdiv_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,9 +61,9 @@ main(void)
         result = (r1 == r2);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
-                ("b = %Zd, x = %lu, r1 = %lu, r2 = %lu\n", b, x, r1, r2);
+                ("b = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", b, x, r1, r2);
             abort();
         }
 
@@ -73,6 +73,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

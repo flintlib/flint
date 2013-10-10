@@ -45,8 +45,8 @@ int main(int argc, char* argv[])
     fmpz_mod_poly_set_coeff_ui(x, 3, 5);
     fmpz_mod_poly_set_coeff_ui(x, 0, 6);
     fmpz_mod_poly_sqr(y, x);
-    fmpz_mod_poly_print(x); printf("\n");
-    fmpz_mod_poly_print(y); printf("\n");
+    fmpz_mod_poly_print(x); flint_printf("\n");
+    fmpz_mod_poly_print(y); flint_printf("\n");
     fmpz_mod_poly_clear(x);
     fmpz_mod_poly_clear(y);
     fmpz_clear(n);

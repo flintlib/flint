@@ -36,7 +36,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("set_ui_smod....");
+    flint_printf("set_ui_smod....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,11 +61,11 @@ main(void)
 
         if (!fmpz_equal(a, b))
         {
-            printf("FAIL:\n");
-            printf("a: "); fmpz_print(a); printf("\n");
-            printf("m: %lu\n", m);
-            printf("r: %lu\n", m);
-            printf("b: "); fmpz_print(b); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); fmpz_print(a); flint_printf("\n");
+            flint_printf("m: %wu\n", m);
+            flint_printf("r: %wu\n", m);
+            flint_printf("b: "); fmpz_print(b); flint_printf("\n");
             abort();
         }
 
@@ -76,6 +76,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

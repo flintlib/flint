@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("scalar_mul....");
+    flint_printf("scalar_mul....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -62,14 +62,14 @@ main(void)
         nmod_mat_randtest(B, state);
 
         nmod_mat_scalar_mul(C, A, c);
-        nmod_mat_scalar_mul(D, A, nmod_sub(c, 1UL, A->mod));
+        nmod_mat_scalar_mul(D, A, nmod_sub(c, UWORD(1), A->mod));
 
         /* c*A - (c-1)*A == A */
         nmod_mat_sub(D, C, D);
 
         if (!nmod_mat_equal(A, D))
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
 
@@ -79,7 +79,7 @@ main(void)
 
         if (!nmod_mat_equal(A, C))
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
 
@@ -91,6 +91,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

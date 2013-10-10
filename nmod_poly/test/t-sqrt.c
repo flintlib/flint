@@ -36,7 +36,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("sqrt... ");
+    flint_printf("sqrt... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -62,10 +62,10 @@ main(void)
 
         if ((square1 != square2) || (square1 && !nmod_poly_equal(a, b)))
         {
-            printf("FAIL: aliasing:\n");
-            printf("square1 = %d, square2 = %d\n\n", square1, square2);
-            printf("a: "); nmod_poly_print(a); printf("\n\n");
-            printf("b: "); nmod_poly_print(b); printf("\n\n");
+            flint_printf("FAIL: aliasing:\n");
+            flint_printf("square1 = %d, square2 = %d\n\n", square1, square2);
+            flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
+            flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
             abort();
         }
 
@@ -91,20 +91,20 @@ main(void)
 
         if (!square)
         {
-            printf("FAIL: square reported nonsquare:\n");
-            printf("a: "); nmod_poly_print(a); printf("\n\n");
-            printf("b: "); nmod_poly_print(b); printf("\n\n");
-            printf("c: "); nmod_poly_print(c); printf("\n\n");
+            flint_printf("FAIL: square reported nonsquare:\n");
+            flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
+            flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
+            flint_printf("c: "); nmod_poly_print(c); flint_printf("\n\n");
             abort();
         }
 
         nmod_poly_mul(c, c, c);
         if (!nmod_poly_equal(c, b))
         {
-            printf("FAIL: sqrt(b)^2 != b:\n");
-            printf("a: "); nmod_poly_print(a); printf("\n\n");
-            printf("b: "); nmod_poly_print(b); printf("\n\n");
-            printf("c: "); nmod_poly_print(c); printf("\n\n");
+            flint_printf("FAIL: sqrt(b)^2 != b:\n");
+            flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
+            flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
+            flint_printf("c: "); nmod_poly_print(c); flint_printf("\n\n");
             abort();
         }
 
@@ -140,10 +140,10 @@ main(void)
             nmod_poly_mul(c, c, c);
             if (!nmod_poly_equal(c, b))
             {
-                printf("FAIL: sqrt(b)^2 != b:\n");
-                printf("a: "); nmod_poly_print(a); printf("\n\n");
-                printf("b: "); nmod_poly_print(b); printf("\n\n");
-                printf("c: "); nmod_poly_print(c); printf("\n\n");
+                flint_printf("FAIL: sqrt(b)^2 != b:\n");
+                flint_printf("a: "); nmod_poly_print(a); flint_printf("\n\n");
+                flint_printf("b: "); nmod_poly_print(b); flint_printf("\n\n");
+                flint_printf("c: "); nmod_poly_print(c); flint_printf("\n\n");
                 abort();
             }
         }
@@ -154,6 +154,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

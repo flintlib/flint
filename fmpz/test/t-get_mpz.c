@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("get/set_mpz....");
+    flint_printf("get/set_mpz....");
     fflush(stdout);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -66,7 +66,7 @@ main(void)
         result = (mpz_cmp(b, c) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("b = %Zd, c = %Zd\n", b, c);
             abort();
         }
@@ -79,6 +79,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,7 +35,7 @@ _padic_mat_canonicalise_fmpz(fmpz *vec, slong len, slong *val, const fmpz_t p)
 
     for (i = 0; i < len; i++)
     {
-        if (vec[i] != 0L)
+        if (vec[i] != WORD(0))
         {
             nonzero = 1;
             if (!fmpz_divisible(vec + i, p))
@@ -78,7 +78,7 @@ _padic_mat_canonicalise_si(fmpz *vec, slong len, slong *val, slong p)
 
     for (i = 0; i < len; i++)
     {
-        if (vec[i] != 0L)
+        if (vec[i] != WORD(0))
         {
             nonzero = 1;
             if (!fmpz_divisible_si(vec + i, p))

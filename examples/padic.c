@@ -42,10 +42,10 @@ int main(void)
     char *str;
     padic_t x, y;
 
-    printf("Output:\n\n");
+    flint_printf("Output:\n\n");
 
     /* Case 1 */
-    printf("Positive integer:  x = 127 mod 7^10\n");
+    flint_printf("Positive integer:  x = 127 mod 7^10\n");
 
     fmpz_init(p);
     fmpz_set_ui(p, 7);
@@ -56,20 +56,20 @@ int main(void)
 
     ctx->mode = PADIC_TERSE;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_SERIES;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     padic_clear(x);
@@ -78,7 +78,7 @@ int main(void)
     fmpz_clear(p);
 
     /* Case 2 */
-    printf("Positive integer larger than p^N:  x = 1057 mod 2^10\n");
+    flint_printf("Positive integer larger than p^N:  x = 1057 mod 2^10\n");
 
     fmpz_init(p);
     fmpz_set_ui(p, 2);
@@ -89,20 +89,20 @@ int main(void)
 
     ctx->mode = PADIC_TERSE;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_SERIES;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     padic_clear(x);
@@ -111,7 +111,7 @@ int main(void)
     fmpz_clear(p);
 
     /* Case 3 */
-    printf("Negative integer:  x = -127 mod 3^10\n");
+    flint_printf("Negative integer:  x = -127 mod 3^10\n");
 
     fmpz_init(p);
     fmpz_set_ui(p, 3);
@@ -122,14 +122,14 @@ int main(void)
 
     ctx->mode = PADIC_TERSE;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = padic_get_str(NULL, x, ctx);
-    printf("print:   "), padic_print(x, ctx), printf("\n");
-    printf("get_str: %s\n", str);
+    flint_printf("print:   "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("get_str: %s\n", str);
     flint_free(str);
 
     padic_clear(x);
@@ -138,7 +138,7 @@ int main(void)
     fmpz_clear(p);
 
     /* Log */
-    printf("Log of 7380996 mod 5^20\n");
+    flint_printf("Log of 7380996 mod 5^20\n");
 
     fmpz_init(p);
     fmpz_set_ui(p, 5);
@@ -150,8 +150,8 @@ int main(void)
 
     padic_log(y, x, ctx);
 
-    printf("x = "), padic_print(x, ctx), printf("\n");
-    printf("y = "), padic_print(y, ctx), printf("\n");
+    flint_printf("x = "), padic_print(x, ctx), flint_printf("\n");
+    flint_printf("y = "), padic_print(y, ctx), flint_printf("\n");
 
     padic_clear(x);
     padic_clear(y);

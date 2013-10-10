@@ -36,7 +36,7 @@ main(void)
     slong i;
     fmpq_t r, ans;
 
-    printf("next_calkin_wilf....");
+    flint_printf("next_calkin_wilf....");
     fflush(stdout);
 
     fmpq_init(r);
@@ -49,11 +49,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: enum from 0\n");
+        flint_printf("FAIL: enum from 0\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -64,11 +64,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: signed enum from 0\n");
+        flint_printf("FAIL: signed enum from 0\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -82,11 +82,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: enum from 2^64\n");
+        flint_printf("FAIL: enum from 2^64\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -99,11 +99,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: signed enum from 2^64\n");
+        flint_printf("FAIL: signed enum from 2^64\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -112,6 +112,6 @@ main(void)
     fmpq_clear(ans);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

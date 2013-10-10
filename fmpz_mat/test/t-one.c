@@ -37,7 +37,7 @@ main(void)
     slong m, n, i, j, rep;
     flint_rand_t state;
 
-    printf("one....");
+    flint_printf("one....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,7 +60,7 @@ main(void)
             {
                 if (fmpz_cmp_ui(fmpz_mat_entry(A,i,j), i == j) != 0)
                 {
-                    printf("FAIL: nonzero entry\n");
+                    flint_printf("FAIL: nonzero entry\n");
                     abort();
                 }
             }
@@ -71,6 +71,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

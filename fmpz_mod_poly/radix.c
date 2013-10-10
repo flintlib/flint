@@ -39,17 +39,17 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     fmpz *W;
 
     fmpz_init_set(invLP, invL);
-    W = flint_malloc((1L << (k - 1)) * degR * sizeof(fmpz));
+    W = flint_malloc((WORD(1) << (k - 1)) * degR * sizeof(fmpz));
 
     _fmpz_vec_set(Rpow[0], R, lenR);
     for (i = 1; i < k; i++)
     {
-        _fmpz_mod_poly_sqr(Rpow[i], Rpow[i - 1], degR * (1L << (i - 1)) + 1, p);
+        _fmpz_mod_poly_sqr(Rpow[i], Rpow[i - 1], degR * (WORD(1) << (i - 1)) + 1, p);
     }
 
     for (i = 0; i < k; i++)
     {
-        const slong lenQ = (1L << i) * degR;
+        const slong lenQ = (WORD(1) << i) * degR;
         slong j;
 
         /* W := rev{Rpow[i], lenQ} */
@@ -86,8 +86,8 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
     {
         const slong N = degF / degR;
         const slong k = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}} */
-        const slong lenV = degR * ((1L << k) - 1) + k;
-        const slong lenW = degR * ((1L << k) - 1);
+        const slong lenV = degR * ((WORD(1) << k) - 1) + k;
+        const slong lenW = degR * ((WORD(1) << k) - 1);
 
         slong i;
 
@@ -99,8 +99,8 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
 
         for (i = 0; i < k; i++)
         {
-            D->Rpow[i] = D->V + (degR * ((1L << i) - 1) + i);
-            D->Rinv[i] = D->W + (degR * ((1L << i) - 1));
+            D->Rpow[i] = D->V + (degR * ((WORD(1) << i) - 1) + i);
+            D->Rinv[i] = D->W + (degR * ((WORD(1) << i) - 1));
         }
 
         fmpz_init(&(D->invL));
@@ -120,8 +120,8 @@ void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
     {
         const slong degR = D->degR;
         const slong k    = D->k;
-        const slong lenV = degR * ((1L << k) - 1) + k;
-        const slong lenW = degR * ((1L << k) - 1);
+        const slong lenV = degR * ((WORD(1) << k) - 1) + k;
+        const slong lenW = degR * ((WORD(1) << k) - 1);
 
         _fmpz_vec_clear(D->V, lenV + lenW);
         flint_free(D->Rpow);
@@ -139,7 +139,7 @@ void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
     }
     else
     {
-        const slong lenQ = (1L << i) * degR;
+        const slong lenQ = (WORD(1) << i) * degR;
 
         fmpz *Frev = W;
         fmpz *Q    = W + lenQ;
@@ -149,7 +149,7 @@ void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
         _fmpz_mod_poly_mullow(Q, Frev, lenQ, Rinv[i], lenQ, p, lenQ);
         _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
 
-        _fmpz_mod_poly_radix(B, Q, Rpow, Rinv, degR, k + (1L << i), i-1, W, p);
+        _fmpz_mod_poly_radix(B, Q, Rpow, Rinv, degR, k + (WORD(1) << i), i-1, W, p);
 
         _fmpz_mod_poly_mullow(S, Rpow[i], lenQ, Q, lenQ, p, lenQ);
         _fmpz_mod_poly_sub(S, F, lenQ, S, lenQ, p);
@@ -174,7 +174,7 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B,
     else
     {
         const slong k    = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}}    */
-        const slong lenG = (1L << k) * degR;       /* Padded size            */
+        const slong lenG = (WORD(1) << k) * degR;       /* Padded size            */
         const slong t    = (lenG - 1) / degR - N;  /* Extra {degR}-blocks    */
 
         fmpz *G;                                  /* Padded copy of F       */

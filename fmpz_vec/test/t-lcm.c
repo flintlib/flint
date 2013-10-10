@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("lcm....");
+    flint_printf("lcm....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -75,8 +75,8 @@ main(void)
 
         if (!result)
         {
-            fmpz_print(c), printf("\n\n");
-            fmpz_print(d), printf("\n\n");
+            fmpz_print(c), flint_printf("\n\n");
+            fmpz_print(d), flint_printf("\n\n");
             abort();
         }
 
@@ -88,6 +88,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

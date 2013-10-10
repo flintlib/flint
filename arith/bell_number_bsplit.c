@@ -54,9 +54,9 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, slong a, slong b, slong n, slong bmax)
         mpz_t u;
         slong k;
         mpz_init(u);
-        mpz_set_ui(P, 0UL);
-        mpz_set_ui(Q, 0UL);
-        mpz_set_ui(Q, (b - 1 == bmax) ? 1UL : b);
+        mpz_set_ui(P, UWORD(0));
+        mpz_set_ui(Q, UWORD(0));
+        mpz_set_ui(Q, (b - 1 == bmax) ? UWORD(1) : b);
         for (k = b - 1; k >= a; k--)
         {
             mpz_set_ui(u, k);

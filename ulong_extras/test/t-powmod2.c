@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("powmod2....");
+   flint_printf("powmod2....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -53,14 +53,14 @@ int main(void)
       do
       {
          a = n_randtest(state) % d;
-      } while (n_gcd(d, a) != 1UL);
+      } while (n_gcd(d, a) != UWORD(1));
       exp = n_randtest(state);
       
       r1 = n_powmod2(a, exp, d);
 
       mpz_set_ui(a_m, a);
       mpz_set_ui(d_m, d);
-      if (exp < 0L)
+      if (exp < WORD(0))
       {
          mpz_powm_ui(r2_m, a_m, -exp, d_m);
          mpz_invert(r2_m, r2_m, d_m);
@@ -71,9 +71,9 @@ int main(void)
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, exp = %ld, d = %lu\n", a, exp, d); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, exp = %wd, d = %wu\n", a, exp, d); 
+         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          abort();
       }
 
@@ -84,6 +84,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

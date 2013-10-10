@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("inflate....");
+    flint_printf("inflate....");
     fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -64,19 +64,19 @@ main(void)
 
         if (!nmod_poly_equal(poly2, poly3))
         {
-            printf("FAIL: not equal to compose (inflation = %lu)\n", inflation);
-            printf("poly1:\n"); nmod_poly_print(poly1); printf("\n\n");
-            printf("poly2:\n"); nmod_poly_print(poly2); printf("\n\n");
-            printf("poly3:\n"); nmod_poly_print(poly3); printf("\n\n");
+            flint_printf("FAIL: not equal to compose (inflation = %wu)\n", inflation);
+            flint_printf("poly1:\n"); nmod_poly_print(poly1); flint_printf("\n\n");
+            flint_printf("poly2:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
+            flint_printf("poly3:\n"); nmod_poly_print(poly3); flint_printf("\n\n");
             abort();
         }
 
         nmod_poly_inflate(poly1, poly1, inflation);
         if (!nmod_poly_equal(poly1, poly2))
         {
-            printf("FAIL: aliasing (inflation = %lu)\n", inflation);
-            printf("poly1:\n"); nmod_poly_print(poly1); printf("\n\n");
-            printf("poly2:\n"); nmod_poly_print(poly2); printf("\n\n");
+            flint_printf("FAIL: aliasing (inflation = %wu)\n", inflation);
+            flint_printf("poly1:\n"); nmod_poly_print(poly1); flint_printf("\n\n");
+            flint_printf("poly2:\n"); nmod_poly_print(poly2); flint_printf("\n\n");
             abort();
         }
 
@@ -87,6 +87,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

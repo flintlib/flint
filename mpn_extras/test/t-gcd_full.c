@@ -38,7 +38,7 @@ int main(void)
     flint_rand_t state;
     slong s1, s2;
     
-    printf("gcd_full....");
+    flint_printf("gcd_full....");
     fflush(stdout);
 
     mpz_init(a);
@@ -77,7 +77,7 @@ int main(void)
        result = (mpz_cmp(g, c) == 0);
        if (!result)
        {
-          printf("FAIL:\n");
+          flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", g);
           gmp_printf("%Zd\n", c);
           abort();
@@ -93,6 +93,6 @@ int main(void)
     gmp_randclear(st);
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

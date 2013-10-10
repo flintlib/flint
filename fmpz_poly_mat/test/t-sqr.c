@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("sqr....");
+    flint_printf("sqr....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -76,12 +76,12 @@ main(void)
 
         if (!fmpz_mat_equal(c, d))
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpz_poly_mat_print(C, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -116,12 +116,12 @@ main(void)
 
         if (!fmpz_poly_mat_equal(B, A))
         {
-            printf("FAIL (aliasing):\n");
-            printf("A:\n");
+            flint_printf("FAIL (aliasing):\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -131,6 +131,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

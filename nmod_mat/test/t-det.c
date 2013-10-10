@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("det....");
+    flint_printf("det....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -83,7 +83,7 @@ main(void)
 
         if (Adet != fmpz_get_ui(Bdet))
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
 
@@ -95,6 +95,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

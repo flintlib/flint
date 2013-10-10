@@ -74,7 +74,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("rref....");
+    flint_printf("rref....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -105,9 +105,9 @@ main(void)
 
         if (!check_rref_form(perm, B, rank1))
         {
-            printf("FAIL (malformed rref)\n");
-            nmod_mat_print_pretty(A); printf("\n\n");
-            nmod_mat_print_pretty(B); printf("\n\n");
+            flint_printf("FAIL (malformed rref)\n");
+            nmod_mat_print_pretty(A); flint_printf("\n\n");
+            nmod_mat_print_pretty(B); flint_printf("\n\n");
             abort();
         }
 
@@ -147,10 +147,10 @@ main(void)
 
         if (!equal)
         {
-            printf("FAIL (rank1 = %ld, rank2 = %ld)!\n", rank1, rank2);
-            nmod_mat_print_pretty(A); printf("\n\n");
-            nmod_mat_print_pretty(B); printf("\n\n");
-            nmod_mat_print_pretty(D); printf("\n\n");
+            flint_printf("FAIL (rank1 = %wd, rank2 = %wd)!\n", rank1, rank2);
+            nmod_mat_print_pretty(A); flint_printf("\n\n");
+            nmod_mat_print_pretty(B); flint_printf("\n\n");
+            nmod_mat_print_pretty(D); flint_printf("\n\n");
             abort();
         }
 
@@ -162,6 +162,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

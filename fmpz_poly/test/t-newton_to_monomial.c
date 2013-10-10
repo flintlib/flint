@@ -37,7 +37,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("newton_to_monomial....");
+    flint_printf("newton_to_monomial....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -67,9 +67,9 @@ main(void)
 
         if (!fmpz_poly_equal(f, g))
         {
-            printf("FAIL: roundtrip\n");
-            fmpz_poly_print(f); printf("\n");
-            fmpz_poly_print(g); printf("\n");
+            flint_printf("FAIL: roundtrip\n");
+            fmpz_poly_print(f); flint_printf("\n");
+            fmpz_poly_print(g); flint_printf("\n");
             abort();
         }
 
@@ -80,6 +80,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

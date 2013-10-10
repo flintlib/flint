@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("ll_mod_preinv....");
+   flint_printf("ll_mod_preinv....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -47,7 +47,7 @@ int main(void)
       m = n_randtest(state);
       r1 = n_randtest(state) % d;
       umul_ppmm(nh, nl, m, d);
-      add_ssaaaa(nh, nl, nh, nl, 0UL, r1);
+      add_ssaaaa(nh, nl, nh, nl, UWORD(0), r1);
 
       dinv = n_preinvert_limb(d);
 
@@ -56,15 +56,15 @@ int main(void)
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("nh = %lu, nl = %lu, d = %lu, dinv = %lu\n", nh, nl, d, dinv); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl, d, dinv); 
+         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor....");
+    flint_printf("factor....");
     fflush(stdout);
 
     /* Default algorithm */
@@ -121,7 +121,7 @@ main(void)
         result &= (res->num == num);
         if (!result)
         {
-            printf("Error: number of factors incorrect, %ld, %ld\n",
+            flint_printf("Error: number of factors incorrect, %wd, %wd\n",
                 res->num, num);
             abort();
         }
@@ -135,9 +135,9 @@ main(void)
         result &= nmod_poly_equal(pol1, product);
         if (!result)
         {
-            printf("Error: product of factors does not equal original polynomial\n");
-            nmod_poly_print(pol1); printf("\n");
-            nmod_poly_print(product); printf("\n");
+            flint_printf("Error: product of factors does not equal original polynomial\n");
+            nmod_poly_print(pol1); flint_printf("\n");
+            nmod_poly_print(product); flint_printf("\n");
             abort();
         }
         nmod_poly_clear(product);
@@ -232,7 +232,7 @@ main(void)
 
         if (res->num != res2->num)
         {
-            printf("FAIL: different number of factors found\n");
+            flint_printf("FAIL: different number of factors found\n");
             abort();
         }
 
@@ -251,7 +251,7 @@ main(void)
 
             if (!found)
             {
-                printf("FAIL: factor not found\n");
+                flint_printf("FAIL: factor not found\n");
                 abort();
             }
         }
@@ -265,6 +265,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -107,13 +107,13 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
     if (lenf == 0)
     {
-        printf("Exception (nmod_poly_powmod). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_powmod). Divide by zero.\n");
         abort();
     }
 
     if (mpz_sgn(e) < 0)
     {
-        printf("Exception (nmod_poly_powmod). Negative exp not implemented.\n");
+        flint_printf("Exception (nmod_poly_powmod). Negative exp not implemented.\n");
         abort();
     }
 
@@ -135,13 +135,13 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
         if (exp <= 2)
         {
-            if (exp == 0UL)
+            if (exp == UWORD(0))
             {
                 nmod_poly_fit_length(res, 1);
-                res->coeffs[0] = 1UL;
+                res->coeffs[0] = UWORD(1);
                 res->length = 1;
             }
-            else if (exp == 1UL)
+            else if (exp == UWORD(1))
             {
                 nmod_poly_set(res, poly);
             }

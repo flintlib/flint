@@ -112,7 +112,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
     if (mat->r != mat->c)
     {
-        printf("Exception (fmpz_mat_charpoly).  Non-square matrix.\n");
+        flint_printf("Exception (fmpz_mat_charpoly).  Non-square matrix.\n");
         abort();
     }
 

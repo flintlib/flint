@@ -64,7 +64,7 @@ main(void)
    
     flint_rand_t state;
 
-    printf("butterfly_lshB....");
+    flint_printf("butterfly_lshB....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -116,20 +116,20 @@ main(void)
 
                     if (mpz_cmp(ma, m2a) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("butterfly_lshB error a\n");
-                        printf("x = %ld, y = %ld, limbs = %ld\n", x, y, limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("butterfly_lshB error a\n");
+                        flint_printf("x = %wd, y = %wd, limbs = %wd\n", x, y, limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", ma);
                         gmp_printf("got  %Zx\n", m2a);
                         abort();
                     }
                     if (mpz_cmp(mb, m2b) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("butterfly_lshB error b\n");
-                        printf("x = %ld, y = %ld, limbs = %ld\n", x, y, limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("butterfly_lshB error b\n");
+                        flint_printf("x = %wd, y = %wd, limbs = %wd\n", x, y, limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", mb);
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
@@ -154,6 +154,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

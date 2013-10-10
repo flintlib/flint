@@ -45,7 +45,7 @@ fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
     fmpz * q;
     int qcopy = 0;
 
-    if (len < 2 || e < 3UL || trunc == 0)
+    if (len < 2 || e < UWORD(3) || trunc == 0)
     {
         if (len == 0 || trunc == 0)
             fmpz_mod_poly_zero(res);
@@ -56,18 +56,18 @@ fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
             _fmpz_mod_poly_set_length(res, 1);
             _fmpz_mod_poly_normalise(res);
         }
-        else if (e == 0UL)
+        else if (e == UWORD(0))
         {
-            fmpz_mod_poly_set_coeff_ui(res, 0, 1UL);
+            fmpz_mod_poly_set_coeff_ui(res, 0, UWORD(1));
             _fmpz_mod_poly_set_length(res, 1);
             _fmpz_mod_poly_normalise(res);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
         {
             fmpz_mod_poly_set(res, poly);
             fmpz_mod_poly_truncate(res, trunc);
         }
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             fmpz_mod_poly_mullow(res, poly, poly, trunc);
 
         return;

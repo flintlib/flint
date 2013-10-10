@@ -33,7 +33,7 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
 {
     fmpz c1;
 
-    if (exp == 0L)
+    if (exp == WORD(0))
     {
         fmpz_one(f);
         return;
@@ -58,7 +58,7 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
             _fmpz_demote_val(f);    /* may actually fit into a small after all */
         }
 
-        if ((c1 < 0L) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
+        if ((c1 < WORD(0)) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
             fmpz_neg(f, f);
     }
     else

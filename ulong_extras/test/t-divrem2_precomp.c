@@ -36,7 +36,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("divrem2_precomp....");
+   flint_printf("divrem2_precomp....");
    fflush(stdout);
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
@@ -45,7 +45,7 @@ int main(void)
       double dpre;
 
       d = n_randtest(state);
-      if (d == 0UL) d++;
+      if (d == UWORD(0)) d++;
   
       n = n_randtest(state);
       
@@ -58,15 +58,15 @@ int main(void)
       result = ((r1 == r2) && (q1 == q2));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n = %lu, d = %lu, dpre = %f\n", n, d, dpre); 
-         printf("q1 = %lu, q2 = %lu, r1 = %lu, r2 = %lu\n", q1, q2, r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre); 
+         flint_printf("q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n", q1, q2, r1, r2);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

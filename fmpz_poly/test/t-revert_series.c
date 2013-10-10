@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("revert_series....");
+    flint_printf("revert_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -66,9 +66,9 @@ main(void)
         result = (fmpz_poly_equal(f, g));
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
-            fmpz_poly_print(f), printf("\n\n");
-            fmpz_poly_print(g), printf("\n\n");
+            flint_printf("FAIL (aliasing):\n");
+            fmpz_poly_print(f), flint_printf("\n\n");
+            fmpz_poly_print(g), flint_printf("\n\n");
             abort();
         }
 
@@ -100,10 +100,10 @@ main(void)
                 fmpz_is_one(h->coeffs + 1)));
         if (!result)
         {
-            printf("FAIL (comparison):\n");
-            fmpz_poly_print(f), printf("\n\n");
-            fmpz_poly_print(g), printf("\n\n");
-            fmpz_poly_print(h), printf("\n\n");
+            flint_printf("FAIL (comparison):\n");
+            fmpz_poly_print(f), flint_printf("\n\n");
+            fmpz_poly_print(g), flint_printf("\n\n");
+            fmpz_poly_print(h), flint_printf("\n\n");
             abort();
         }
 
@@ -114,6 +114,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

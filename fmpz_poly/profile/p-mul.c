@@ -74,7 +74,7 @@ int write_rgb_ppm(const char* file_name, unsigned char* pixels,
     FILE* file = fopen(file_name, "wb");
     if (file == NULL)
         return -1;
-    fprintf(file, "P6\n%d %d\n255\n", width, height);
+    flint_fprintf(file, "P6\n%d %d\n255\n", width, height);
     fwrite(pixels, sizeof(unsigned char), width * height * 3, file);
     fclose(file);
     return 0;
@@ -104,7 +104,7 @@ main(void)
             int c, n, reps = 0;
             
             for (c = 0; c < nalgs; c++)
-                s[c] = 0L;
+                s[c] = WORD(0);
             
             for (n = 0; n < ncases; n++)
             {
@@ -121,9 +121,9 @@ main(void)
                         fmpz_randbits(f->coeffs + k, state, bits);
                         fmpz_randbits(g->coeffs + k, state, bits);
                     }
-                    if ((f->coeffs)[len-1] == 0L)
+                    if ((f->coeffs)[len-1] == WORD(0))
                         fmpz_randtest_not_zero(f->coeffs + (len - 1), state, bits);
-                    if ((g->coeffs)[len-1] == 0L)
+                    if ((g->coeffs)[len-1] == WORD(0))
                         fmpz_randtest_not_zero(g->coeffs + (len - 1), state, bits);
                     f->length = len;
                     g->length = len;
@@ -172,7 +172,7 @@ main(void)
            slong sum = 0, c;
            for (c = 0; c < nalgs; c++)
               sum += s[c];
-           printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);
+           flint_printf("len = %d, time = %wdms\n", len, sum), fflush(stdout);
         }
     }
     fmpz_poly_clear(f);
@@ -185,8 +185,8 @@ main(void)
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
-            printf("%d", X[i][j]);
-        printf("\n");
+            flint_printf("%d", X[i][j]);
+        flint_printf("\n");
     }
     
     /*
@@ -227,7 +227,7 @@ main(void)
         
         if (k)
         {
-            printf("Exception:  writing ppm image failed\n");
+            flint_printf("Exception:  writing ppm image failed\n");
         }
     }
 

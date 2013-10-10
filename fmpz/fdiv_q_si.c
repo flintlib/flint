@@ -38,7 +38,7 @@ fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     if (h == 0)
     {
-        printf("Exception (fmpq_fdiv_q_si). Division by zero.\n");
+        flint_printf("Exception (fmpq_fdiv_q_si). Division by zero.\n");
         abort();
     }
 

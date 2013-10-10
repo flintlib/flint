@@ -35,7 +35,7 @@ _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len, mp_limb_t c, nmod_t mod)
     slong i;
 
     if (len < 2)
-        return 0UL;
+        return UWORD(0);
 
     t = A[len - 2];
     r = Q[len - 2] = A[len - 1];
@@ -62,7 +62,7 @@ nmod_poly_div_root(nmod_poly_t Q,
     if (len == 0)
     {
         nmod_poly_zero(Q);
-        return 0UL;
+        return UWORD(0);
     }
 
     if (len == 1)

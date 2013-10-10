@@ -43,7 +43,7 @@ void fmpz_poly_gmprand(fmpz_poly_t rop, gmp_randstate_t state, slong len, slong 
     for (i = 0; i < len; i++)
     {
         mpz_urandomb(c, state, bits);
-        if (rand() & 1L)
+        if (rand() & WORD(1))
             mpz_neg(c, c);
         fmpz_set_mpz(d, c);
         fmpz_poly_set_coeff_fmpz(rop, i, d);
@@ -72,8 +72,8 @@ main(void)
     gmp_randstate_t state;
     
     gmp_randinit_default(state);
-    gmp_randseed_ui(state, 362436069UL);
-    srand(521288629UL);
+    gmp_randseed_ui(state, UWORD(362436069));
+    srand(UWORD(521288629));
         
     fmpz_poly_init(f);
     fmpz_poly_init(g);
@@ -85,13 +85,13 @@ main(void)
     fmpz_poly_fit_length(q, lenhi);
     fmpz_poly_fit_length(r, 2 * lenhi - 1);
     
-    printf("3 2 1");
+    flint_printf("3 2 1");
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
         {
             int c, n, reps = 0;
-            slong s = 0L;
+            slong s = WORD(0);
             
             for (n = 0; n < ncases; n++)
             {
@@ -126,11 +126,11 @@ main(void)
             }
 
             X[i][j] = (double) s / (double) reps;
-            printf(" .");
+            flint_printf(" .");
             fflush(stdout);
         }
     }
-    printf("\n");
+    flint_printf("\n");
 
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
@@ -140,8 +140,8 @@ main(void)
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
-            printf("%8.3f", X[i][j]);
-        printf("\n");
+            flint_printf("%8.3f", X[i][j]);
+        flint_printf("\n");
     }
 
     gmp_randclear(state);

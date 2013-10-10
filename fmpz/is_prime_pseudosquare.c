@@ -222,7 +222,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
 #endif
    else
    {
-      printf("Exception (fmpz_set_pseudosquare). Index too large.\n");
+      flint_printf("Exception (fmpz_set_pseudosquare). Index too large.\n");
       abort();
    }
 }
@@ -308,9 +308,9 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
            ret = 1;
            goto cleanup;
         }
-        printf("Whoah, ");
+        flint_printf("Whoah, ");
         fmpz_print(n);
-        printf("is a probable prime, but not prime, please report!!\n");
+        flint_printf("is a probable prime, but not prime, please report!!\n");
         abort();
     }
     else
@@ -332,15 +332,15 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
             }
             if (!fmpz_is_one(mod))
             {
-                printf("Whoah, ");
+                flint_printf("Whoah, ");
                 fmpz_print(n);
-                printf("is a probable prime, but not prime, please report!!\n");
+                flint_printf("is a probable prime, but not prime, please report!!\n");
                 abort();
             }
         }
-        printf("Whoah, ");
+        flint_printf("Whoah, ");
         fmpz_print(n);
-        printf("is a probable prime, but not prime, please report!!\n");
+        flint_printf("is a probable prime, but not prime, please report!!\n");
         abort();
     }
 

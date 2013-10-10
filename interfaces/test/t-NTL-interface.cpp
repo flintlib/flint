@@ -46,7 +46,7 @@ int test_ZZ_to_fmpz()
    
     ZZ z;
 
-    printf("ZZ_to_fmpz....");
+    flint_printf("ZZ_to_fmpz....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,9 +68,9 @@ int test_ZZ_to_fmpz()
         result = fmpz_equal(int1, int2);
         if (!result)
         {
-           printf("FAIL:\n");
-           printf("int1 = %ld  ", *int1); fmpz_print(int1); printf("\n");
-           printf("int2 = %ld  ", *int2); fmpz_print(int2); printf("\n");
+           flint_printf("FAIL:\n");
+           flint_printf("int1 = %wd  ", *int1); fmpz_print(int1); flint_printf("\n");
+           flint_printf("int2 = %wd  ", *int2); fmpz_print(int2); flint_printf("\n");
            return 0;
         }
 
@@ -89,7 +89,7 @@ int test_ZZX_to_fmpz_poly()
     flint_rand_t state;
     int i, result;
    
-    printf("ZZX_to_fmpz_poly....");
+    flint_printf("ZZX_to_fmpz_poly....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -113,9 +113,9 @@ int test_ZZX_to_fmpz_poly()
         result = fmpz_poly_equal(f_poly1, f_poly2);  
         if (!result)
         {
-           printf("FAIL:\n");
-           printf("f_poly1 = "); fmpz_poly_print(f_poly1); printf("\n");
-           printf("f_poly2 = "); fmpz_poly_print(f_poly2); printf("\n");
+           flint_printf("FAIL:\n");
+           flint_printf("f_poly1 = "); fmpz_poly_print(f_poly1); flint_printf("\n");
+           flint_printf("f_poly2 = "); fmpz_poly_print(f_poly2); flint_printf("\n");
            return 0;
         }
           
@@ -131,8 +131,8 @@ main(void)
 {
     int r1, r2;
 
-    if ((r1 = test_ZZ_to_fmpz())) printf("PASS\n");
-    if ((r2 = test_ZZX_to_fmpz_poly())) printf("PASS\n");
+    if ((r1 = test_ZZ_to_fmpz())) flint_printf("PASS\n");
+    if ((r2 = test_ZZX_to_fmpz_poly())) flint_printf("PASS\n");
 
     if (!r1 || !r2) abort();
 

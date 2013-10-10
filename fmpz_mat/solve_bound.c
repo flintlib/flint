@@ -54,7 +54,7 @@ fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,
 
     fmpz_sqrtrem(t, u, t);
     if (!fmpz_is_zero(u))
-        fmpz_add_ui(t, t, 1UL);
+        fmpz_add_ui(t, t, UWORD(1));
 
     fmpz_mul(N, D, t);
 

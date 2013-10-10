@@ -90,7 +90,7 @@ static __inline__
 mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 {
     mpn_divrem_1(x, 0, x, xsize, d);
-    if (x[xsize - 1] == 0UL)
+    if (x[xsize - 1] == UWORD(0))
         xsize -= 1;
     return xsize;
 }

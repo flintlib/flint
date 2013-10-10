@@ -39,9 +39,9 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("sin_series....");
+    flint_printf("sin_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -56,7 +56,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_canonicalise(a);
 
@@ -68,10 +68,10 @@ main(void)
         result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -90,7 +90,7 @@ main(void)
         fmpq_poly_init(asinsina);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 60) + 1, 80);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_sin_series(sina, a, n);
         fmpq_poly_asin_series(asinsina, sina, n);
@@ -101,11 +101,11 @@ main(void)
         result = (fmpq_poly_equal(asinsina, a) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
-            printf("sin(a) = "), fmpq_poly_debug(sina), printf("\n\n");
-            printf("asin(sin(a)) = "), fmpq_poly_debug(asinsina), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("sin(a) = "), fmpq_poly_debug(sina), flint_printf("\n\n");
+            flint_printf("asin(sin(a)) = "), fmpq_poly_debug(asinsina), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -116,6 +116,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

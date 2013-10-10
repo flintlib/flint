@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("scalar_divexact_ui....");
+    flint_printf("scalar_divexact_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,9 +60,9 @@ main(void)
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
-            _fmpz_vec_print(b, len), printf("\n\n");
+            flint_printf("FAIL:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
+            _fmpz_vec_print(b, len), flint_printf("\n\n");
             abort();
         }
 
@@ -88,9 +88,9 @@ main(void)
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
-            _fmpz_vec_print(b, len), printf("\n\n");
+            flint_printf("FAIL:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
+            _fmpz_vec_print(b, len), flint_printf("\n\n");
             abort();
         }
 
@@ -100,6 +100,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

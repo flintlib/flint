@@ -36,15 +36,15 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        printf("primegen N - print all primes <= N\n");
-        printf("primegen -c N - generate the primes but just count them\n");
+        flint_printf("primegen N - print all primes <= N\n");
+        flint_printf("primegen -c N - generate the primes but just count them\n");
         return EXIT_FAILURE;
     }
 
     N = strtoul(argv[argc-1], NULL, 10);
-    if (N == ULONG_MAX)
+    if (N == UWORD_MAX)
     {
-        printf("N must be smaller than %lu\n", ULONG_MAX);
+        flint_printf("N must be smaller than %wu\n", UWORD_MAX);
         return EXIT_FAILURE;
     }
 
@@ -55,13 +55,13 @@ int main(int argc, char* argv[])
         while ((p = n_primes_next(iter)) <= N)
             count++;
         n_primes_clear(iter);
-        printf("pi(%lu) = %lu\n", N, count);
+        flint_printf("pi(%wu) = %wu\n", N, count);
     }
     else
     {
         n_primes_init(iter);
         while ((p = n_primes_next(iter)) <= N)
-            printf("%lu\n", p);
+            flint_printf("%wu\n", p);
         n_primes_clear(iter);
     }
 

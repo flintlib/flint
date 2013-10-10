@@ -35,8 +35,8 @@ static void check(fmpz_t x, int expected)
 {
     if (fmpz_abs_fits_ui(x) != expected)
     {
-        printf("FAIL:\n\n");
-        printf("x = "), fmpz_print(x), printf("\n");
+        flint_printf("FAIL:\n\n");
+        flint_printf("x = "), fmpz_print(x), flint_printf("\n");
         abort();
     }
 }
@@ -47,7 +47,7 @@ main(void)
     slong i;
     fmpz_t x;
 
-    printf("abs_fits_ui....");
+    flint_printf("abs_fits_ui....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -58,15 +58,15 @@ main(void)
     fmpz_set_si(x, COEFF_MAX);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     fmpz_neg(x, x);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
-    fmpz_add_ui(x, x, 1UL);
+    fmpz_set_ui(x, UWORD_MAX);
+    fmpz_add_ui(x, x, UWORD(1));
     check(x, 0);
 
     fmpz_neg(x, x);
@@ -74,7 +74,7 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpz_set_ui(x, 1UL);
+        fmpz_set_ui(x, UWORD(1));
         fmpz_mul_2exp(x, x, i);
         check(x, i < FLINT_BITS);
         fmpz_neg(x, x);
@@ -84,6 +84,6 @@ main(void)
     fmpz_clear(x);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

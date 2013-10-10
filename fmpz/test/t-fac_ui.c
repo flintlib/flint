@@ -38,7 +38,7 @@ main(void)
     fmpz_t x;
     fmpz_t y;
 
-    printf("fac_ui....");
+    flint_printf("fac_ui....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -47,7 +47,7 @@ main(void)
     /* Twice to check demotion */
     for (n = 0; n < 2; n++)
     {
-        fmpz_set_ui(y, 1UL);
+        fmpz_set_ui(y, UWORD(1));
 
         for (i = 0; i < 100; i++)
         {
@@ -55,11 +55,11 @@ main(void)
             fmpz_mul_ui(y, y, FLINT_MAX(1, i));
             if (!fmpz_equal(x, y))
             {
-                printf("FAIL: %ld\n", i);
+                flint_printf("FAIL: %wd\n", i);
                 fmpz_print(x);
-                printf("\n");
+                flint_printf("\n");
                 fmpz_print(y);
-                printf("\n");
+                flint_printf("\n");
                 abort();
             }
         }
@@ -69,6 +69,6 @@ main(void)
     fmpz_clear(y);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -53,13 +53,13 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
     _fmpz_poly_pseudo_div(Q, &d, A, lenA, B, lenB);
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a} up to sign */
-    if (d == 0UL || *lead == 1L || *lead == -1L)
+    if (d == UWORD(0) || *lead == WORD(1) || *lead == WORD(-1))
     {
         fmpz_one(q);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, a);
         
-        if (*lead == -1L && d % 2UL)
+        if (*lead == WORD(-1) && d % UWORD(2))
             _fmpz_vec_neg(Q, Q, lenQ);
     }
     /* 2.  lead^d != +-1.  {Q, q} = {b Q, a lead^d} */
@@ -90,7 +90,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception (fmpq_poly_div). Division by zero.\n");
+        flint_printf("Exception (fmpq_poly_div). Division by zero.\n");
         abort();
     }
 

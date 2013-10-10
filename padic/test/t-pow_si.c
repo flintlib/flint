@@ -33,7 +33,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("pow_si... ");
+    flint_printf("pow_si... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,11 +68,11 @@ main(void)
         result = (padic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -116,11 +116,11 @@ main(void)
         result = (padic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (cmp with multiplication):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (cmp with multiplication):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -170,13 +170,13 @@ main(void)
         result = (padic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (cmp with fmpq):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("s = "), fmpq_print(s), printf("\n");
-            printf("t = "), fmpq_print(t), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (cmp with fmpq):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("s = "), fmpq_print(s), flint_printf("\n");
+            flint_printf("t = "), fmpq_print(t), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -227,15 +227,15 @@ main(void)
         result = (padic_equal(c, d));
         if (!result)
         {
-            printf("FAIL (cmp with fmpq):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
-            printf("e = %ld\n", e);
-            printf("N_lo  = %ld\n", N_lo);
-            printf("N_hi  = %ld\n", N_hi);
-            printf("N_res = %ld\n", N_res);
+            flint_printf("FAIL (cmp with fmpq):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
+            flint_printf("N_lo  = %wd\n", N_lo);
+            flint_printf("N_hi  = %wd\n", N_hi);
+            flint_printf("N_res = %wd\n", N_res);
             abort();
         }
 
@@ -251,7 +251,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

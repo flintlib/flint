@@ -204,13 +204,13 @@ int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
 static __inline__
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 {
-    return poly->length == 0L;
+    return poly->length == WORD(0);
 }
 
 static __inline__
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 {
-    return (poly->length == 1L) && (fmpz_equal(poly->coeffs, poly->den));
+    return (poly->length == WORD(1)) && (fmpz_equal(poly->coeffs, poly->den));
 }
 
 /*  Addition and subtraction  ************************************************/

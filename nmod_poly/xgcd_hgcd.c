@@ -218,7 +218,7 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                     __sub(S, lenS, v, lenv, q, lenq);
 
                 __mul(q, lenq, T, lenT, R[0], lenR[0]);
-                if (sgnR > 0L)
+                if (sgnR > WORD(0))
                     __sub(T, lenT, q, lenq, w, lenw);
                 else
                     __sub(T, lenT, w, lenw, q, lenq);

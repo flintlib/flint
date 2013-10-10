@@ -51,7 +51,7 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (slong) e * (len - 1L) + 1L;
+    rlen = (slong) e * (len - WORD(1)) + WORD(1);
 
     if (res != poly)
     {

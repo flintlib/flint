@@ -36,7 +36,7 @@ main(void)
     flint_rand_t state;
     int iter;
 
-    printf("zero/is_zero....");
+    flint_printf("zero/is_zero....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -57,7 +57,7 @@ main(void)
 
         if (!nmod_poly_mat_is_zero(A))
         {
-            printf("FAIL: expected matrix to be zero\n");
+            flint_printf("FAIL: expected matrix to be zero\n");
             abort();
         }
 
@@ -69,7 +69,7 @@ main(void)
 
             if (nmod_poly_mat_is_zero(A))
             {
-                printf("FAIL: expected matrix not to be zero\n");
+                flint_printf("FAIL: expected matrix not to be zero\n");
                 abort();
             }
         }
@@ -78,6 +78,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

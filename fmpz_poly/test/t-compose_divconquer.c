@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("compose_divconquer....");
+    flint_printf("compose_divconquer....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,9 +60,9 @@ main(void)
         result = (fmpz_poly_equal(f, g));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(f), printf("\n\n");
-            fmpz_poly_print(g), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(f), flint_printf("\n\n");
+            fmpz_poly_print(g), flint_printf("\n\n");
             abort();
         }
 
@@ -88,9 +88,9 @@ main(void)
         result = (fmpz_poly_equal(f, h));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(f), printf("\n\n");
-            fmpz_poly_print(h), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(f), flint_printf("\n\n");
+            fmpz_poly_print(h), flint_printf("\n\n");
             abort();
         }
 
@@ -117,9 +117,9 @@ main(void)
         result = (fmpz_poly_equal(f1, f2));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(f1), printf("\n\n");
-            fmpz_poly_print(f2), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(f1), flint_printf("\n\n");
+            fmpz_poly_print(f2), flint_printf("\n\n");
             abort();
         }
 
@@ -131,6 +131,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -40,8 +40,8 @@ void check(mp_limb_t n, ulong ans)
     if (ok && reasonable)
         return;
 
-    printf("FAIL:\n");
-    printf("n = %lu: %lu < %lu < %lu\n", n, lo, ans, hi);
+    flint_printf("FAIL:\n");
+    flint_printf("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi);
     abort();
 }
 
@@ -49,7 +49,7 @@ int main(void)
 {
     int n;
 
-    printf("prime_pi_bounds....");
+    flint_printf("prime_pi_bounds....");
     fflush(stdout);
 
     for (n=17; n<10000 * FLINT_MIN(10, flint_test_multiplier()); n++)
@@ -57,26 +57,26 @@ int main(void)
         check(n, n_prime_pi(n));
     }
 
-    check(10UL, 4UL);
-    check(100UL, 25UL);
-    check(1000UL, 168UL);
-    check(10000UL, 1229UL);
-    check(100000UL, 9592UL);
-    check(1000000UL, 78498UL);
-    check(10000000UL, 664579UL);
-    check(100000000UL, 5761455UL);
-    check(1000000000UL, 50847534UL);
+    check(UWORD(10), UWORD(4));
+    check(UWORD(100), UWORD(25));
+    check(UWORD(1000), UWORD(168));
+    check(UWORD(10000), UWORD(1229));
+    check(UWORD(100000), UWORD(9592));
+    check(UWORD(1000000), UWORD(78498));
+    check(UWORD(10000000), UWORD(664579));
+    check(UWORD(100000000), UWORD(5761455));
+    check(UWORD(1000000000), UWORD(50847534));
 #if FLINT64
-    check(10000000000UL, 455052511UL);
-    check(100000000000UL, 4118054813UL);
-    check(1000000000000UL, 37607912018UL);
-    check(10000000000000UL, 346065536839UL);
-    check(100000000000000UL, 3204941750802UL);
-    check(1000000000000000UL, 29844570422669UL);
-    check(10000000000000000UL, 279238341033925UL);
-    check(100000000000000000UL, 2623557157654233UL);
+    check(UWORD(10000000000), UWORD(455052511));
+    check(UWORD(100000000000), UWORD(4118054813));
+    check(UWORD(1000000000000), UWORD(37607912018));
+    check(UWORD(10000000000000), UWORD(346065536839));
+    check(UWORD(100000000000000), UWORD(3204941750802));
+    check(UWORD(1000000000000000), UWORD(29844570422669));
+    check(UWORD(10000000000000000), UWORD(279238341033925));
+    check(UWORD(100000000000000000), UWORD(2623557157654233));
 #endif
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

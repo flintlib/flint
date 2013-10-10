@@ -549,7 +549,7 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
 
     prec = mpfr_get_prec(res) + 64;
     terms = prec / (BITS_PER_DIGIT * DIGITS_PER_ITER);
-    while ((1L<<depth)<terms)
+    while ((WORD(1)<<depth)<terms)
         depth++;
     depth++;
 

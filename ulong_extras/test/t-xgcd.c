@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("xgcd....");
+   flint_printf("xgcd....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -52,7 +52,7 @@ int main(void)
       {
          a = n_randtest_bits(state, bits1);
          b = n_randtest_bits(state, bits2);
-      } while ((n_gcd(a, b) != 1UL) || (b > a));
+      } while ((n_gcd(a, b) != UWORD(1)) || (b > a));
 
       c = n_randtest_bits(state, bits3);
 
@@ -62,17 +62,17 @@ int main(void)
       umul_ppmm(qh, ql, b*c, t);
       sub_ddmmss(ph, pl, ph, pl, qh, ql);
       
-      result = ((g == c) && (ph == 0UL) && (pl == c));
+      result = ((g == c) && (ph == UWORD(0)) && (pl == c));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, c = %lu, g = %lu, s = %lu, t = %lu\n", a, b, c, g, s, t); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a, b, c, g, s, t); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

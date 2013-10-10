@@ -44,7 +44,7 @@ main(void)
 
     flint_rand_t state;
 
-    printf("mul_mfa_truncate_sqrt2....");
+    flint_printf("mul_mfa_truncate_sqrt2....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -56,14 +56,14 @@ main(void)
     truncation = 0.5;
 
     {
-       mp_size_t n = (1UL<<depth);
+       mp_size_t n = (UWORD(1)<<depth);
        mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
        mp_bitcnt_t bits = 2*n*bits1;
        mp_size_t int_limbs = ((mp_size_t)(truncation*bits))/FLINT_BITS;
        mp_size_t j;
        mp_limb_t * i1, *i2, *r1, *r2;
         
-       printf("limbs = %ld\n", int_limbs);
+       flint_printf("limbs = %wd\n", int_limbs);
        
        i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
        i2 = i1 + int_limbs;
@@ -82,6 +82,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("done\n");
+    flint_printf("done\n");
     return 0;
 }

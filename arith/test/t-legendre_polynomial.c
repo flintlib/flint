@@ -40,7 +40,7 @@ int main()
 
     slong n;
 
-    printf("legendre_polynomial....");
+    flint_printf("legendre_polynomial....");
     fflush(stdout);
 
     fmpq_poly_init(Pn);
@@ -48,8 +48,8 @@ int main()
     fmpq_poly_init(Pn2);
     fmpq_poly_init(R);
 
-    fmpq_poly_set_ui(Pn, 1UL);
-    fmpq_poly_set_coeff_ui(Pn1, 1, 1UL);
+    fmpq_poly_set_ui(Pn, UWORD(1));
+    fmpq_poly_set_coeff_ui(Pn1, 1, UWORD(1));
 
     for (n = 0; n <= 500; n++)
     {
@@ -57,9 +57,9 @@ int main()
 
         if (!fmpq_poly_equal(Pn, R))
         {
-            printf("FAIL: n = %ld\n", n);
-            printf("Direct: "); fmpq_poly_print_pretty(R, "x"); printf("\n");
-            printf("Recur.: "); fmpq_poly_print_pretty(Pn, "x"); printf("\n");
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("Direct: "); fmpq_poly_print_pretty(R, "x"); flint_printf("\n");
+            flint_printf("Recur.: "); fmpq_poly_print_pretty(Pn, "x"); flint_printf("\n");
             abort();
         }
 
@@ -79,6 +79,6 @@ int main()
     fmpq_poly_clear(R);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

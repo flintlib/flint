@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("invmod....");
+   flint_printf("invmod....");
    fflush(stdout);
    
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
@@ -46,7 +46,7 @@ int main(void)
       {
          a = n_randtest(state);
          b = n_randtest(state);
-      } while ((a >= b) || (n_gcd(b, a) != 1UL));
+      } while ((a >= b) || (n_gcd(b, a) != UWORD(1)));
 
       t = n_invmod(a, b);
       
@@ -54,17 +54,17 @@ int main(void)
       umul_ppmm(ph, pl, t, a);
       r = n_ll_mod_preinv(ph, pl, b, binv);
 
-      result = (((r == 0UL) && (b == 1UL)) || (r == 1UL));
+      result = (((r == UWORD(0)) && (b == UWORD(1))) || (r == UWORD(1)));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, r = %ld\n", a, b, r); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, r = %wd\n", a, b, r); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

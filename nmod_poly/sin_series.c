@@ -38,9 +38,9 @@ _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     u = _nmod_vec_init(n);
 
     /* sin(x) = 2*tan(x/2)/(1+tan(x/2)^2) */
-    _nmod_vec_scalar_mul_nmod(u, h, n, n_invmod(2UL, mod.n), mod);
+    _nmod_vec_scalar_mul_nmod(u, h, n, n_invmod(UWORD(2), mod.n), mod);
     _nmod_poly_tan_series(t, u, n, mod);
-    _nmod_poly_mullow(u, t, n, t, n, n, mod); u[0] = 1UL;
+    _nmod_poly_mullow(u, t, n, t, n, n, mod); u[0] = UWORD(1);
     _nmod_poly_div_series(g, t, u, n, mod);
     _nmod_vec_add(g, g, g, n, mod);
 
@@ -54,9 +54,9 @@ nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     mp_ptr h_coeffs;
     slong h_len = h->length;
 
-    if (h_len > 0 && h->coeffs[0] != 0UL)
+    if (h_len > 0 && h->coeffs[0] != UWORD(0))
     {
-        printf("Exception (nmod_poly_sin_series). Constant term != 0.\n");
+        flint_printf("Exception (nmod_poly_sin_series). Constant term != 0.\n");
         abort();
     }
 

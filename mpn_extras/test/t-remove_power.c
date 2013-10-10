@@ -70,13 +70,13 @@ void test_exact(int d)
 
 int main(void)
 {
-    printf("remove_power....");
+    flint_printf("remove_power....");
     fflush(stdout);
 
     test_exact(3);
     test_exact(10);
     test_exact(7429);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

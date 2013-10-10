@@ -36,7 +36,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("det_interpolate....");
+    flint_printf("det_interpolate....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,15 +64,15 @@ main(void)
 
         if (!nmod_poly_equal(a, b))
         {
-            printf("FAIL:\n");
-            printf("determinants don't agree!\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("determinants don't agree!\n");
+            flint_printf("A:\n");
             nmod_poly_mat_print(A, "x");
-            printf("det(A):\n");
+            flint_printf("det(A):\n");
             nmod_poly_print(a);
-            printf("\ndet_interpolate(A):\n");
+            flint_printf("\ndet_interpolate(A):\n");
             nmod_poly_print(b);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -83,6 +83,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

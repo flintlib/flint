@@ -37,9 +37,9 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("compose....");
+    flint_printf("compose....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,10 +63,10 @@ main(void)
         result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
-            printf("FAIL (aliasing 1):\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(g), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (aliasing 1):\n");
+            fmpq_poly_debug(f), flint_printf("\n\n");
+            fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -94,10 +94,10 @@ main(void)
         result = (fmpq_poly_equal(f, h) && !cflags);
         if (!result)
         {
-            printf("FAIL (aliasing 2):\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(h), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (aliasing 2):\n");
+            fmpq_poly_debug(f), flint_printf("\n\n");
+            fmpq_poly_debug(h), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -124,8 +124,8 @@ main(void)
         fmpq_poly_randtest(h, state, n_randint(state, 20), 65);
         
         fmpq_poly_zero(s);
-        fmpq_poly_set_ui(t, 1UL);
-        for (k = 0L; k < g->length; k++)
+        fmpq_poly_set_ui(t, UWORD(1));
+        for (k = WORD(0); k < g->length; k++)
         {
             fmpq_poly_get_coeff_mpq(c, g, k);
             fmpq_poly_scalar_mul_mpq(u, t, c);
@@ -138,11 +138,11 @@ main(void)
         result = (fmpq_poly_equal(f, s));
         if (!result)
         {
-            printf("FAIL (compare with naive):\n");
-            printf("g = "), fmpq_poly_debug(g), printf("\n\n");
-            printf("h = "), fmpq_poly_debug(h), printf("\n\n");
-            printf("f = "), fmpq_poly_debug(f), printf("\n\n");
-            printf("s = "), fmpq_poly_debug(s), printf("\n\n");
+            flint_printf("FAIL (compare with naive):\n");
+            flint_printf("g = "), fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("h = "), fmpq_poly_debug(h), flint_printf("\n\n");
+            flint_printf("f = "), fmpq_poly_debug(f), flint_printf("\n\n");
+            flint_printf("s = "), fmpq_poly_debug(s), flint_printf("\n\n");
             abort();
         }
 
@@ -157,6 +157,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -36,7 +36,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("sdiv_qrnnd....");
+   flint_printf("sdiv_qrnnd....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -47,28 +47,28 @@ int main(void)
       {
          d = n_randtest_not_zero(state);
          nh = n_randtest(state);
-      } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == LONG_MIN));
+      } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == WORD_MIN));
 
       nl = n_randtest(state);
 
       sdiv_qrnnd(q, r, nh, nl, d);
       smul_ppmm(ph, pl, d, q);
-      if (r < 0L) sub_ddmmss(ph, pl, ph, pl, 0UL, -r);
-      else add_ssaaaa(ph, pl, ph, pl, 0UL, r);
+      if (r < WORD(0)) sub_ddmmss(ph, pl, ph, pl, UWORD(0), -r);
+      else add_ssaaaa(ph, pl, ph, pl, UWORD(0), r);
 
       result = ((ph == nh) && (pl == nl));
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("nh = %lu, nl = %lu, d = %lu\n", nh, nl, d); 
-         printf("ph = %lu, pl = %lu\n", ph, pl);
+         flint_printf("FAIL:\n");
+         flint_printf("nh = %wu, nl = %wu, d = %wu\n", nh, nl, d); 
+         flint_printf("ph = %wu, pl = %wu\n", ph, pl);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

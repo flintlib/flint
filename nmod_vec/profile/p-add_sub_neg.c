@@ -49,7 +49,7 @@ void sample(void * arg, ulong count)
    flint_randinit(state);
    
    n = n_randbits(state, bits);
-   if (n == 0UL) n++;
+   if (n == UWORD(0)) n++;
       
    nmod_init(&mod, n);
 
@@ -117,7 +117,7 @@ int main(void)
 	  info.type = 3;
 	  prof_repeat(&min3, &max, sample, (void *) &info);
 
-      printf("bits %ld, add = %.1lf c/l, sub = %.1lf c/l, neg = %.1lf c/l\n", 
+      flint_printf("bits %wd, add = %.1lf c/l, sub = %.1lf c/l, neg = %.1lf c/l\n", 
          i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
             (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
             (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000

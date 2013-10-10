@@ -65,7 +65,7 @@ char * fmpz_poly_q_get_str(const fmpz_poly_q_t op)
     str = flint_malloc(strlen(numstr) + strlen(denstr) + 2);
     if (str == NULL)
     {
-        printf("Exception (fmpz_poly_q_get_str). Memory allocation failed.\n");
+        flint_printf("Exception (fmpz_poly_q_get_str). Memory allocation failed.\n");
         abort();
     }
     

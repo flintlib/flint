@@ -42,7 +42,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("solve_vec....");
+    flint_printf("solve_vec....");
     fflush(stdout);
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
@@ -67,17 +67,17 @@ main(void)
 
         if (!nmod_mat_equal(Ax, b) || !solved)
         {
-            printf("FAIL:\n");
-            printf("Ax != b!\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Ax != b!\n");
+            flint_printf("A:\n");
             nmod_mat_print_pretty(A);
-            printf("b:\n");
+            flint_printf("b:\n");
             nmod_mat_print_pretty(b);
-            printf("x:\n");
+            flint_printf("x:\n");
             nmod_mat_print_pretty(x);
-            printf("Ax:\n");
+            flint_printf("Ax:\n");
             nmod_mat_print_pretty(Ax);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -110,8 +110,8 @@ main(void)
 
         if (solved)
         {
-            printf("FAIL:\n");
-            printf("singular system was 'solved'\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system was 'solved'\n");
             abort();
         }
 
@@ -123,6 +123,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

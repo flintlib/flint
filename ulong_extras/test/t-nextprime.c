@@ -39,20 +39,20 @@ int main(void)
     mpz_t mpz_n;
     flint_rand_t state;
     
-    printf("nextprime....");
+    flint_printf("nextprime....");
     fflush(stdout);
 
     flint_randinit(state);
 
     if (n_nextprime(0, 0) != 2)
     {
-        printf("FAIL: expected n_nextprime(0) = 2");
+        flint_printf("FAIL: expected n_nextprime(0) = 2");
         abort();
     }
 
-    if (n_nextprime(ULONG_MAX_PRIME - 1, 0) != ULONG_MAX_PRIME)
+    if (n_nextprime(UWORD_MAX_PRIME - 1, 0) != UWORD_MAX_PRIME)
     {
-        printf("FAIL: expected n_nextprime(ULONG_MAX_PRIME-1) = ULONG_MAX_PRIME");
+        flint_printf("FAIL: expected n_nextprime(UWORD_MAX_PRIME-1) = UWORD_MAX_PRIME");
         abort();
     }
 
@@ -61,7 +61,7 @@ int main(void)
     for (rep = 0; rep < 10000 * flint_test_multiplier(); rep++)
     {
         ulong bits = n_randint(state, FLINT_D_BITS-1)+1;
-        n = n_randtest(state) % ((1UL<<bits) - 1UL) + 1; 
+        n = n_randtest(state) % ((UWORD(1)<<bits) - UWORD(1)) + 1; 
         mpz_set_ui(mpz_n, n);
 
         for (i = 0; i < 1; i++)
@@ -75,8 +75,8 @@ int main(void)
 
         if (res1 != res2)
         {
-            printf("FAIL:\n");
-            printf("%lu, %lu\n", res1, res2); 
+            flint_printf("FAIL:\n");
+            flint_printf("%wu, %wu\n", res1, res2); 
             abort();
         }
     }
@@ -85,6 +85,6 @@ int main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

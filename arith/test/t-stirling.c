@@ -45,7 +45,7 @@ int main(void)
 
     const slong maxn = 40;
 
-    printf("stirling....");
+    flint_printf("stirling....");
     fflush(stdout);
 
     fmpz_init(s);
@@ -67,11 +67,11 @@ int main(void)
                     arith_stirling_number_1u_vec(row, n, k);
                     if (!_fmpz_vec_equal(row, mat->rows[n], k))
                     {
-                        printf("stirling1u mat != vec ");
-                        printf("nn,n,k=%ld,%ld,%ld\n", nn, n, k);
-                        printf("mat: ");
+                        flint_printf("stirling1u mat != vec ");
+                        flint_printf("nn,n,k=%wd,%wd,%wd\n", nn, n, k);
+                        flint_printf("mat: ");
                         _fmpz_vec_print(mat->rows[n], k);
-                        printf("\nvec: ");
+                        flint_printf("\nvec: ");
                         _fmpz_vec_print(row, k);
                         abort();
                     }
@@ -80,11 +80,11 @@ int main(void)
                     arith_stirling_number_1u(s, n, k);
                     if (!fmpz_equal(mat->rows[n]+k, s))
                     {
-                        printf("stirling1u mat != single ");
-                        printf("nn,n,k=%ld,%ld,%ld\n", nn, n, k);
-                        printf("mat: ");
+                        flint_printf("stirling1u mat != single ");
+                        flint_printf("nn,n,k=%wd,%wd,%wd\n", nn, n, k);
+                        flint_printf("mat: ");
                         fmpz_print(mat->rows[n]+k);
-                        printf("\nsingle: ");
+                        flint_printf("\nsingle: ");
                         fmpz_print(s);
                         abort();
                     }
@@ -108,11 +108,11 @@ int main(void)
                     arith_stirling_number_1_vec(row, n, k);
                     if (!_fmpz_vec_equal(row, mat->rows[n], k))
                     {
-                        printf("stirling1 mat != vec ");
-                        printf("nn,n,k=%ld,%ld,%ld\n", nn, n, k);
-                        printf("mat: ");
+                        flint_printf("stirling1 mat != vec ");
+                        flint_printf("nn,n,k=%wd,%wd,%wd\n", nn, n, k);
+                        flint_printf("mat: ");
                         _fmpz_vec_print(mat->rows[n], k);
-                        printf("\nvec: ");
+                        flint_printf("\nvec: ");
                         _fmpz_vec_print(row, k);
                         abort();
                     }
@@ -121,11 +121,11 @@ int main(void)
                     arith_stirling_number_1(s, n, k);
                     if (!fmpz_equal(mat->rows[n]+k, s))
                     {
-                        printf("stirling1 mat != single ");
-                        printf("nn,n,k=%ld,%ld,%ld\n", nn, n, k);
-                        printf("mat: ");
+                        flint_printf("stirling1 mat != single ");
+                        flint_printf("nn,n,k=%wd,%wd,%wd\n", nn, n, k);
+                        flint_printf("mat: ");
                         fmpz_print(mat->rows[n]+k);
-                        printf("\nsingle: ");
+                        flint_printf("\nsingle: ");
                         fmpz_print(s);
                         abort();
                     }
@@ -149,11 +149,11 @@ int main(void)
                     arith_stirling_number_2_vec(row, n, k);
                     if (!_fmpz_vec_equal(row, mat->rows[n], k))
                     {
-                        printf("stirling2 mat != vec ");
-                        printf("nn,n,k=%ld,%ld,%ld\n", nn, n, k);
-                        printf("mat: ");
+                        flint_printf("stirling2 mat != vec ");
+                        flint_printf("nn,n,k=%wd,%wd,%wd\n", nn, n, k);
+                        flint_printf("mat: ");
                         _fmpz_vec_print(mat->rows[n], k);
-                        printf("\nvec: ");
+                        flint_printf("\nvec: ");
                         _fmpz_vec_print(row, k);
                         abort();
                     }
@@ -162,11 +162,11 @@ int main(void)
                     arith_stirling_number_2(s, n, k);
                     if (!fmpz_equal(mat->rows[n]+k, s))
                     {
-                        printf("stirling2 mat != single ");
-                        printf("nn,n,k=%ld,%ld,%ld\n", nn, n, k);
-                        printf("mat: ");
+                        flint_printf("stirling2 mat != single ");
+                        flint_printf("nn,n,k=%wd,%wd,%wd\n", nn, n, k);
+                        flint_printf("mat: ");
                         fmpz_print(mat->rows[n]+k);
-                        printf("\nsingle: ");
+                        flint_printf("\nsingle: ");
                         fmpz_print(s);
                         abort();
                     }
@@ -195,7 +195,7 @@ int main(void)
             {
                 if (fmpz_get_ui(mat3->rows[n]+k) != (n == k))
                 {
-                    printf("not identity matrix: %ld, %ld, %ld\n", nn, n, k);
+                    flint_printf("not identity matrix: %wd, %wd, %wd\n", nn, n, k);
                     abort();
                 }
             }
@@ -208,6 +208,6 @@ int main(void)
     fmpz_clear(s);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

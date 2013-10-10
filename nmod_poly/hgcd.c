@@ -108,8 +108,8 @@ do {                                                                \
 
 static __inline__ void __mat_one(mp_ptr *M, slong *lenM)
 {
-    M[0][0] = 1L;
-    M[3][0] = 1L;
+    M[0][0] = WORD(1);
+    M[3][0] = WORD(1);
     lenM[0] = 1;
     lenM[1] = 0;
     lenM[2] = 0;

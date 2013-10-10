@@ -36,7 +36,7 @@ main(void)
     int i;
     flint_rand_t state;
     
-    printf("init/init2/clear....");
+    flint_printf("init/init2/clear....");
     fflush(stdout);
     
     flint_randinit(state);
@@ -64,6 +64,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

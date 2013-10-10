@@ -31,7 +31,7 @@
 void
 fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
 {
-    if (c == 0UL)
+    if (c == UWORD(0))
         fmpz_poly_zero(poly);
     else
     {

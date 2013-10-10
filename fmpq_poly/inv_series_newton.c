@@ -59,7 +59,7 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
         W = _fmpz_vec_init(alloc + 1);
         Wden = W + alloc;
 
-        for (i = 1; (1L << i) < n; i++) ;
+        for (i = 1; (WORD(1) << i) < n; i++) ;
 
         a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = n;

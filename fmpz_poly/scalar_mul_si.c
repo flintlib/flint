@@ -34,21 +34,21 @@ fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
     slong i;
 
     /* Either scalar or input poly is zero */
-    if ((x == 0L) || (poly2->length == 0))
+    if ((x == WORD(0)) || (poly2->length == 0))
     {
         fmpz_poly_zero(poly1);
         return;
     }
 
     /* Special case, multiply by 1 */
-    if (x == 1L)
+    if (x == WORD(1))
     {
         fmpz_poly_set(poly1, poly2);
         return;
     }
 
     /* Special case, multiply by -1 */
-    if (x == -1L)
+    if (x == WORD(-1))
     {
         fmpz_poly_neg(poly1, poly2);
         return;

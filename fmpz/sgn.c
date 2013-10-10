@@ -36,7 +36,7 @@ fmpz_sgn(const fmpz_t f)
     if (d == 0)
         return 0;
     if (!COEFF_IS_MPZ(d))       /* c1 is small */
-        return (d > 0L ? 1 : -1);
+        return (d > WORD(0) ? 1 : -1);
     else
         return mpz_sgn(COEFF_TO_PTR(d));
 }

@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("resultant....");
+    flint_printf("resultant....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,10 +59,10 @@ main(void)
         result = (fmpz_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f = "), fmpz_poly_print(f), printf("\n\n");
-            printf("g = "), fmpz_poly_print(g), printf("\n\n");
-            printf("res(f, h)  = "), fmpz_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
+            flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n\n");
+            flint_printf("res(f, h)  = "), fmpz_print(a), flint_printf("\n\n");
             abort();
         }
 
@@ -99,13 +99,13 @@ main(void)
         result = (fmpz_equal(c, d));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f = "), fmpz_poly_print(f), printf("\n\n");
-            printf("g = "), fmpz_poly_print(g), printf("\n\n");
-            printf("h = "), fmpz_poly_print(h), printf("\n\n");
-            printf("res(f, h)  = "), fmpz_print(a), printf("\n\n");
-            printf("res(g, h)  = "), fmpz_print(b), printf("\n\n");
-            printf("res(fg, h) = "), fmpz_print(d), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n\n");
+            flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n\n");
+            flint_printf("h = "), fmpz_poly_print(h), flint_printf("\n\n");
+            flint_printf("res(f, h)  = "), fmpz_print(a), flint_printf("\n\n");
+            flint_printf("res(g, h)  = "), fmpz_print(b), flint_printf("\n\n");
+            flint_printf("res(fg, h) = "), fmpz_print(d), flint_printf("\n\n");
             abort();
         }
 
@@ -121,6 +121,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -137,7 +137,7 @@ void fmpz_poly_zero(fmpz_poly_t poly)
 static __inline__
 void fmpz_poly_one(fmpz_poly_t poly)
 {
-    fmpz_poly_set_ui(poly, 1UL);
+    fmpz_poly_set_ui(poly, UWORD(1));
 }
 
 void fmpz_poly_zero_coeffs(fmpz_poly_t poly, slong i, slong j);
@@ -209,13 +209,13 @@ int _fmpz_poly_is_one(const fmpz *poly, slong len)
 static __inline__
 int fmpz_poly_is_one(const fmpz_poly_t op)
 {
-    return (op->length) == 1 && (*(op->coeffs) == 1L);
+    return (op->length) == 1 && (*(op->coeffs) == WORD(1));
 }
 
 static __inline__
 int fmpz_poly_is_unit(const fmpz_poly_t op)
 {
-    return (op->length == 1) && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
+    return (op->length == 1) && (*(op->coeffs) == WORD(1) || *(op->coeffs) == WORD(-1));
 }
 
 static __inline__
@@ -950,18 +950,18 @@ int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
 static __inline__
 void fmpz_poly_debug(const fmpz_poly_t poly)
 {
-    printf("(alloc = %ld, length = %ld, vec = ", poly->alloc, poly->length);
+    flint_printf("(alloc = %wd, length = %wd, vec = ", poly->alloc, poly->length);
     if (poly->coeffs)
     {
-        printf("{");
+        flint_printf("{");
         _fmpz_vec_print(poly->coeffs, poly->alloc);
-        printf("}");
+        flint_printf("}");
     }
     else
     {
-        printf("NULL");
+        flint_printf("NULL");
     }
-    printf(")");
+    flint_printf(")");
     fflush(stdout);
 }
 

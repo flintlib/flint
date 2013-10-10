@@ -39,7 +39,7 @@ main(void)
     mpz_t z;
     flint_rand_t state;
 
-    printf("bin_uiui....");
+    flint_printf("bin_uiui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,7 +59,7 @@ main(void)
 
         if (!fmpz_equal(x, y))
         {
-            printf("FAIL: n,k = %lu,%lu\n", n, k);
+            flint_printf("FAIL: n,k = %wu,%wu\n", n, k);
             abort();
         }
 
@@ -71,6 +71,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

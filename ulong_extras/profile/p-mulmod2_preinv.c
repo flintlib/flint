@@ -68,7 +68,7 @@ int main(void)
    
    prof_repeat(&min, &max, sample, NULL);
    
-   printf("mulmod2_precomp min time is %.3f cycles, max time is %.3f cycles\n", 
+   flint_printf("mulmod2_precomp min time is %.3f cycles, max time is %.3f cycles\n", 
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
 
    return 0;

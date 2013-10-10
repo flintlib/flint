@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("evaluate_fmpz_vec_fast....");
+    flint_printf("evaluate_fmpz_vec_fast....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -78,17 +78,17 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("mod=");
+            flint_printf("FAIL:\n");
+            flint_printf("mod=");
             fmpz_print(mod);
-            printf(", n=%ld, npoints=%ld\n\n", n, npoints);
-            printf("P: "); fmpz_mod_poly_print(P); printf("\n\n");
+            flint_printf(", n=%wd, npoints=%wd\n\n", n, npoints);
+            flint_printf("P: "); fmpz_mod_poly_print(P); flint_printf("\n\n");
             for (j = 0; j < npoints; j++)
-               fmpz_print(y + j), printf(" ");
-            printf("\n");
+               fmpz_print(y + j), flint_printf(" ");
+            flint_printf("\n");
             for (j = 0; j < npoints; j++)
-               fmpz_print(z + j), printf(" ");
-            printf("\n");
+               fmpz_print(z + j), flint_printf(" ");
+            flint_printf("\n");
             abort();
         }
 
@@ -101,6 +101,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("fmpz....");
+    flint_printf("fmpz....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_t a, b;
 
-        *a = 0L;
+        *a = WORD(0);
 
         fmpz_randtest(a, state, FLINT_BITS - 2);
 
@@ -58,13 +58,13 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
     }
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

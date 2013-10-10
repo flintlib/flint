@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("init/init2/realloc/clear....");
+    flint_printf("init/init2/realloc/clear....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -72,6 +72,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

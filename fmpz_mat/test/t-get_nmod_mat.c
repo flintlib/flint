@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("get/set_nmod_mat....");
+    flint_printf("get/set_nmod_mat....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -65,13 +65,13 @@ main(void)
         else
             fmpz_mat_set_nmod_mat_unsigned(A, M);
 
-        fmpz_mat_scalar_mul_ui(A, A, 2UL);
+        fmpz_mat_scalar_mul_ui(A, A, UWORD(2));
         nmod_mat_add(M, M, M);
         fmpz_mat_get_nmod_mat(M2, A);
 
         if (!nmod_mat_equal(M, M2))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
@@ -82,6 +82,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

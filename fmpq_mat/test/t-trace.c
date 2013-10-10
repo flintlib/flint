@@ -37,7 +37,7 @@ main(void)
     slong i;
     flint_rand_t state;
 
-    printf("trace....");
+    flint_printf("trace....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -71,13 +71,13 @@ main(void)
 
         if (!fmpq_equal(trab, trba))
         {
-            printf("FAIL:\n");
-            fmpq_mat_print(A), printf("\n");
-            fmpq_mat_print(B), printf("\n");
-            fmpq_mat_print(AB), printf("\n");
-            fmpq_mat_print(BA), printf("\n");
-            printf("tr(AB): "),  fmpq_print(trab),    printf("\n");
-            printf("tr(BA): "),  fmpq_print(trba),    printf("\n");
+            flint_printf("FAIL:\n");
+            fmpq_mat_print(A), flint_printf("\n");
+            fmpq_mat_print(B), flint_printf("\n");
+            fmpq_mat_print(AB), flint_printf("\n");
+            fmpq_mat_print(BA), flint_printf("\n");
+            flint_printf("tr(AB): "),  fmpq_print(trab),    flint_printf("\n");
+            flint_printf("tr(BA): "),  fmpq_print(trba),    flint_printf("\n");
             abort();
         }
 
@@ -91,6 +91,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

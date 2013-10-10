@@ -31,13 +31,13 @@
 
 /* Avoid computing every reciprocal */
 #if FLINT64
-#define PROD_TAKE4 65535UL
-#define PROD_TAKE3 2642245UL
-#define PROD_TAKE2 4294967295UL
+#define PROD_TAKE4 UWORD(65535)
+#define PROD_TAKE3 UWORD(2642245)
+#define PROD_TAKE2 UWORD(4294967295)
 #else
-#define PROD_TAKE4 255UL
-#define PROD_TAKE3 1625UL
-#define PROD_TAKE2 65535UL
+#define PROD_TAKE4 UWORD(255)
+#define PROD_TAKE3 UWORD(1625)
+#define PROD_TAKE2 UWORD(65535)
 #endif
 
 #define MUL3(xx,yy,zz) n_mulmod2_preinv(xx,\
@@ -82,7 +82,7 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
         }
     }
 
-    x_int[0] = 0UL;
+    x_int[0] = UWORD(0);
 }
 
 void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)

@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("shift_left_right....");
+    flint_printf("shift_left_right....");
     fflush(stdout);
 
     /* Check a << shift >> shift == a */
@@ -57,11 +57,11 @@ main(void)
         result = (nmod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("shift = %ld, a->length = %ld, n = %lu\n", 
+            flint_printf("FAIL:\n");
+            flint_printf("shift = %wd, a->length = %wd, n = %wu\n", 
                 shift, a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -88,11 +88,11 @@ main(void)
         result = (nmod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("shift = %ld, c->length = %ld, n = %lu\n", 
+            flint_printf("FAIL:\n");
+            flint_printf("shift = %wd, c->length = %wd, n = %wu\n", 
                 shift, c->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -103,6 +103,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

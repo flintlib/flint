@@ -89,7 +89,7 @@ void
 _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits)
 {
     slong i;
-    for (i = 0; i < (1L << bits) - 1; i++)
+    for (i = 0; i < (WORD(1) << bits) - 1; i++)
     {
         slong j = n_revbin(n_revbin(i, bits) + 1, bits);
         fmpz_add(in1 + j, in1 + j, in2 + i);
@@ -106,7 +106,7 @@ void
 _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
                               fmpz * temp, slong bits)
 {
-    slong length = (1L << bits);
+    slong length = (WORD(1) << bits);
     slong m = length / 2;
 
     if (length == 1)
@@ -147,9 +147,9 @@ _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
         return;
     }
 
-    while ((1L << loglen) < len1)
+    while ((WORD(1) << loglen) < len1)
         loglen++;
-    length = (1L << loglen);
+    length = (WORD(1) << loglen);
 
     rev1 = (fmpz *) flint_calloc(4 * length, sizeof(fmpz *));
     rev2 = rev1 + length;

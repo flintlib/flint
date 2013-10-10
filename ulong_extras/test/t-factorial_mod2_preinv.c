@@ -32,7 +32,7 @@
 static mp_limb_t
 n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    mp_limb_t prod = 1UL % p;
+    mp_limb_t prod = UWORD(1) % p;
 
     while (n)
     {
@@ -50,7 +50,7 @@ int main(void)
     int j;
     flint_randinit(state);
 
-    printf("factorial_mod2_preinv....");
+    flint_printf("factorial_mod2_preinv....");
     fflush(stdout);
 
     for (n = 0; n < 100 * flint_test_multiplier(); n++)
@@ -66,14 +66,14 @@ int main(void)
 
             if (x != y)
             {
-                printf("FAIL:\n");
-                printf("n = %lu\np = %lu\nx = %lu\ny = %lu\n", n, p, x, y);
+                flint_printf("FAIL:\n");
+                flint_printf("n = %wu\np = %wu\nx = %wu\ny = %wu\n", n, p, x, y);
                 abort();
             }
         }
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

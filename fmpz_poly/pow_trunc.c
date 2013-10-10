@@ -32,7 +32,7 @@
 void
 _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong n)
 {
-    ulong bit = ~((~0UL) >> 1);
+    ulong bit = ~((~UWORD(0)) >> 1);
     fmpz *v = _fmpz_vec_init(n);
     fmpz *R, *S, *T;
 
@@ -40,7 +40,7 @@ _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong n)
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
     
-    while ((bit & e) == 0UL)
+    while ((bit & e) == UWORD(0))
         bit >>= 1;
     
     bit >>= 1;
@@ -56,7 +56,7 @@ _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, slong n)
         if ((bit2 & e))
             swaps = ~swaps;
         while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
+            if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
         
         if (swaps == 0U)

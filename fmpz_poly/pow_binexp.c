@@ -33,7 +33,7 @@
 void
 _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
-    ulong bit = ~((~0UL) >> 1);
+    ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
     slong alloc = (slong) e * (len - 1) + 1;
     fmpz *v = _fmpz_vec_init(alloc);
@@ -43,7 +43,7 @@ _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
     
-    while ((bit & e) == 0UL)
+    while ((bit & e) == UWORD(0))
         bit >>= 1;
     
     bit >>= 1;
@@ -59,7 +59,7 @@ _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, slong len, ulong e)
         if ((bit2 & e))
             swaps = ~swaps;
         while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
+            if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
         
         if (swaps == 0U)
@@ -117,9 +117,9 @@ fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     const slong len = poly->length;
     slong rlen;
 
-    if ((len < 2) | (e < 3UL))
+    if ((len < 2) | (e < UWORD(3)))
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
             fmpz_poly_set_ui(res, 1);
         else if (len == 0)
             fmpz_poly_zero(res);
@@ -129,9 +129,9 @@ fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_pow_ui(res->coeffs, poly->coeffs, e);
             _fmpz_poly_set_length(res, 1);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
             fmpz_poly_set(res, poly);
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             fmpz_poly_sqr(res, poly);
         return;
     }

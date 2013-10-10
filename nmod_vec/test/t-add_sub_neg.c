@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("add/sub/neg....");
+    flint_printf("add/sub/neg....");
     fflush(stdout);
 
     /* Check (a + b) - b == a */
@@ -62,8 +62,8 @@ main(void)
         result = _nmod_vec_equal(vec, vec3, len);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("len = %ld, n = %ld\n", len, n);
+            flint_printf("FAIL:\n");
+            flint_printf("len = %wd, n = %wd\n", len, n);
             abort();
         }
 
@@ -95,8 +95,8 @@ main(void)
         result = _nmod_vec_equal(vec, vec3, len);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("len = %ld, n = %ld\n", len, n);
+            flint_printf("FAIL:\n");
+            flint_printf("len = %wd, n = %wd\n", len, n);
             abort();
         }
 
@@ -107,6 +107,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

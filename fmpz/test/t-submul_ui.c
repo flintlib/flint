@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("submul_ui....");
+    flint_printf("submul_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -69,8 +69,8 @@ main(void)
         result = (mpz_cmp(e, f) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %lu\n", d, e, f, x);
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %wu\n", d, e, f, x);
             abort();
         }
 
@@ -107,8 +107,8 @@ main(void)
         result = (mpz_cmp(d, e) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, x = %lu\n", d, e, x);
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, x = %wu\n", d, e, x);
             abort();
         }
 
@@ -120,6 +120,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -72,7 +72,7 @@ n_compute_primes(ulong num_primes)
     {
         n_primes_t iter;
 
-        num_computed = 1UL << m;
+        num_computed = UWORD(1) << m;
         _flint_primes[m] = flint_malloc(sizeof(mp_limb_t) * num_computed);
         _flint_prime_inverses[m] = flint_malloc(sizeof(double) * num_computed);
 

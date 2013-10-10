@@ -38,7 +38,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("CRT_ui....");
+    flint_printf("CRT_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,7 +64,7 @@ main(void)
 
         fmpz_init(mod);
         num_primes = 0;
-        primes[0] = n_nextprime(1UL << prime_bits, 0);
+        primes[0] = n_nextprime(UWORD(1) << prime_bits, 0);
         fmpz_set_ui(mod, primes[0]);
 
         /* + 1 for sign */
@@ -93,15 +93,15 @@ main(void)
 
         if (!fmpz_mat_equal(B, A))
         {
-            printf("FAIL!\n");
-            printf("primes: ");
+            flint_printf("FAIL!\n");
+            flint_printf("primes: ");
             for (j = 0; j < num_primes; j++)
-                printf("%lu ", primes[j]);
-            printf("\nA: \n");
+                flint_printf("%wu ", primes[j]);
+            flint_printf("\nA: \n");
             fmpz_mat_print_pretty(A);
-            printf("\nB: \n");
+            flint_printf("\nB: \n");
             fmpz_mat_print_pretty(B);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -114,6 +114,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

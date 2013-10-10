@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("2norm_normalised_bits....");
+    flint_printf("2norm_normalised_bits....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,11 +68,11 @@ main(void)
         result = (b1 == b2 || b1 + 1 == b2);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n\n");
-            fmpz_print(b), printf("\n\n");
-            fmpz_print(c), printf("\n\n");
-            printf("b1 = %ld, b2 = %ld\n", b1, b2);
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n\n");
+            fmpz_print(b), flint_printf("\n\n");
+            fmpz_print(c), flint_printf("\n\n");
+            flint_printf("b1 = %wd, b2 = %wd\n", b1, b2);
             abort();
         }
 
@@ -84,6 +84,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

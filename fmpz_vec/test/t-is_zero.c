@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("is_zero....");
+    flint_printf("is_zero....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -56,8 +56,8 @@ main(void)
         result = (_fmpz_vec_is_zero(a, len));
         if (!result)
         {
-            printf("FAIL1:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
+            flint_printf("FAIL1:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
             abort();
         }
 
@@ -72,13 +72,13 @@ main(void)
 
         a = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
-        fmpz_set_ui(a + (len - 1), 1UL);
+        fmpz_set_ui(a + (len - 1), UWORD(1));
 
         result = (!_fmpz_vec_is_zero(a, len));
         if (!result)
         {
-            printf("FAIL2:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
+            flint_printf("FAIL2:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
             abort();
         }
 
@@ -87,6 +87,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

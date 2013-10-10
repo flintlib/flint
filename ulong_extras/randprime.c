@@ -39,14 +39,14 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
 
     if (bits < 2)
     {
-        printf("Exception in n_randprime: attempt to generate prime < 2!\n");
+        flint_printf("Exception in n_randprime: attempt to generate prime < 2!\n");
         abort();
     }
 
     if (bits == FLINT_BITS)
     {
         do { rand = n_randbits(state, bits); }
-            while (rand >= ULONG_MAX_PRIME);
+            while (rand >= UWORD_MAX_PRIME);
 
         rand = n_nextprime(rand, proved);
     }
@@ -60,7 +60,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
         {
             rand = n_randbits(state, bits);
             rand = n_nextprime(rand, proved);
-        } while ((rand >> bits) > 0L);
+        } while ((rand >> bits) > WORD(0));
     }
 
     return rand;

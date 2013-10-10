@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("compose_horner....");
+    flint_printf("compose_horner....");
     fflush(stdout);
 
     /* Check (f(x-1))(x+1) == f */
@@ -63,10 +63,10 @@ main(void)
         result = nmod_poly_equal(a, r);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(r), flint_printf("\n\n");
             abort();
         }
 
@@ -101,11 +101,11 @@ main(void)
         result = nmod_poly_equal(r1, r2);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(r1), printf("\n\n");
-            nmod_poly_print(r2), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
+            nmod_poly_print(r1), flint_printf("\n\n");
+            nmod_poly_print(r2), flint_printf("\n\n");
             abort();
         }
 
@@ -118,6 +118,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -44,7 +44,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, mp_bitcnt_t bits,
     {
         ulong boundary_limit_bit = FLINT_BITS - bits;
 
-        mp_limb_t mask = (1L << bits) - 1L;
+        mp_limb_t mask = (WORD(1) << bits) - WORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -94,7 +94,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, mp_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 2 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (1L << (bits - FLINT_BITS)) - 1L;
+        mp_limb_t mask = (WORD(1) << (bits - FLINT_BITS)) - WORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -150,7 +150,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, mp_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 3 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (1L << (bits - 2 * FLINT_BITS)) - 1L;
+        mp_limb_t mask = (WORD(1) << (bits - 2 * FLINT_BITS)) - WORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -220,7 +220,7 @@ nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 
     if (fmpz_sgn(f) < 0)
     {
-        printf("Exception (nmod_poly_bit_unpack). f < 0.\n");
+        flint_printf("Exception (nmod_poly_bit_unpack). f < 0.\n");
         abort();
     }
 

@@ -46,7 +46,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("log_balanced... ");
+    flint_printf("log_balanced... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -56,7 +56,7 @@ main(void)
     /* Check aliasing: a = log(a) */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong N;
         padic_ctx_t ctx;
 
@@ -80,9 +80,9 @@ main(void)
         result = (ans1 == ans2) && (!ans1 || padic_equal(a, b));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             abort();
         }
 
@@ -95,7 +95,7 @@ main(void)
     /* Check: log(a) + log(b) == log(a * b) */
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong N;
         padic_ctx_t ctx;
 
@@ -131,14 +131,14 @@ main(void)
         result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g)));
         if (!result)
         {
-            printf("FAIL (functional equation):\n\n");
-            printf("a                   = "), padic_print(a, ctx), printf("\n");
-            printf("b                   = "), padic_print(b, ctx), printf("\n");
-            printf("c = a * b           = "), padic_print(c, ctx), printf("\n");
-            printf("d = log(a)          = "), padic_print(d, ctx), printf("\n");
-            printf("e = log(b)          = "), padic_print(e, ctx), printf("\n");
-            printf("f = log(a) + log(b) = "), padic_print(f, ctx), printf("\n");
-            printf("g = log(a * b)      = "), padic_print(g, ctx), printf("\n");
+            flint_printf("FAIL (functional equation):\n\n");
+            flint_printf("a                   = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b                   = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = a * b           = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("d = log(a)          = "), padic_print(d, ctx), flint_printf("\n");
+            flint_printf("e = log(b)          = "), padic_print(e, ctx), flint_printf("\n");
+            flint_printf("f = log(a) + log(b) = "), padic_print(f, ctx), flint_printf("\n");
+            flint_printf("g = log(a * b)      = "), padic_print(g, ctx), flint_printf("\n");
             abort();
         }
 
@@ -156,7 +156,7 @@ main(void)
     /* Check: log(exp(x)) == x */
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t p = {2L};
+        fmpz_t p = {WORD(2)};
         slong N;
         padic_ctx_t ctx;
 
@@ -179,12 +179,12 @@ main(void)
         result = !ans1 || (ans1 == ans2 && padic_equal(a, c));
         if (!result)
         {
-            printf("FAIL (log(exp(x)) == x):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("ans1 = %d\n", ans1);
-            printf("ans2 = %d\n", ans2);
+            flint_printf("FAIL (log(exp(x)) == x):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("ans1 = %d\n", ans1);
+            flint_printf("ans2 = %d\n", ans2);
             abort();
         }
 
@@ -225,9 +225,9 @@ main(void)
         result = (ans1 == ans2) && (!ans1 || padic_equal(a, b));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             abort();
         }
 
@@ -281,17 +281,17 @@ main(void)
         result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g)));
         if (!result)
         {
-            printf("FAIL (functional equation):\n\n");
-            printf("a                   = "), padic_print(a, ctx), printf("\n");
-            printf("b                   = "), padic_print(b, ctx), printf("\n");
-            printf("c = a * b           = "), padic_print(c, ctx), printf("\n");
-            printf("d = log(a)          = "), padic_print(d, ctx), printf("\n");
-            printf("e = log(b)          = "), padic_print(e, ctx), printf("\n");
-            printf("f = log(a) + log(b) = "), padic_print(f, ctx), printf("\n");
-            printf("g = log(a * b)      = "), padic_print(g, ctx), printf("\n");
-            printf("ans1 = %d\n", ans1);
-            printf("ans2 = %d\n", ans2);
-            printf("ans3 = %d\n", ans3);
+            flint_printf("FAIL (functional equation):\n\n");
+            flint_printf("a                   = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b                   = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = a * b           = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("d = log(a)          = "), padic_print(d, ctx), flint_printf("\n");
+            flint_printf("e = log(b)          = "), padic_print(e, ctx), flint_printf("\n");
+            flint_printf("f = log(a) + log(b) = "), padic_print(f, ctx), flint_printf("\n");
+            flint_printf("g = log(a * b)      = "), padic_print(g, ctx), flint_printf("\n");
+            flint_printf("ans1 = %d\n", ans1);
+            flint_printf("ans2 = %d\n", ans2);
+            flint_printf("ans3 = %d\n", ans3);
             abort();
         }
 
@@ -335,12 +335,12 @@ main(void)
         result = !ans1 || (ans1 == ans2 && padic_equal(a, c));
         if (!result)
         {
-            printf("FAIL (log(exp(x)) == x):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("ans1 = %d\n", ans1);
-            printf("ans2 = %d\n", ans2);
+            flint_printf("FAIL (log(exp(x)) == x):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
+            flint_printf("ans1 = %d\n", ans1);
+            flint_printf("ans2 = %d\n", ans2);
             abort();
         }
 
@@ -354,7 +354,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

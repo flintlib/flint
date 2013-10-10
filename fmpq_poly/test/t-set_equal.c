@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("set/equal....");
+    flint_printf("set/equal....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -57,12 +57,12 @@ main(void)
         result = (fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n");
-            printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
-            printf("equal(a, b) = %d\n", result);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", a->alloc, a->length);
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
+            flint_printf("equal(a, b) = %d\n", result);
             abort();
         }
 
@@ -98,12 +98,12 @@ main(void)
         result = (!fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n");
-            printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
-            printf("!equal(a, b) = %d\n", result);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", a->alloc, a->length);
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
+            flint_printf("!equal(a, b) = %d\n", result);
             abort();
         }
 
@@ -116,6 +116,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

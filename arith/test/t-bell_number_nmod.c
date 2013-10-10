@@ -37,7 +37,7 @@ int main(void)
     flint_rand_t state;
     slong i, j;
 
-    printf("bell_number_nmod....");
+    flint_printf("bell_number_nmod....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,7 +63,7 @@ int main(void)
 
             if (u != b[j])
             {
-                printf("FAIL: p = %lu, i = %ld\n", p, j);
+                flint_printf("FAIL: p = %wu, i = %wd\n", p, j);
                 abort();
             }
         }
@@ -73,6 +73,6 @@ int main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

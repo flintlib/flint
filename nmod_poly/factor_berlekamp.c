@@ -42,7 +42,7 @@ nmod_poly_to_nmod_mat_col(nmod_mat_t mat, slong col, nmod_poly_t poly)
         nmod_mat_entry(mat, i, col) = poly->coeffs[i];
 
     for ( ; i < mat->r; i++)
-        nmod_mat_entry(mat, i, col) = 0UL;
+        nmod_mat_entry(mat, i, col) = UWORD(0);
 }
 
 static void

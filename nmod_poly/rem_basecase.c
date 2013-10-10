@@ -162,7 +162,7 @@ nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
     if (lenB == 0)
     {
-        printf("Exception (nmod_poly_rem_basecase). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_rem_basecase). Division by zero.\n");
         abort();
     }
     if (lenA < lenB)

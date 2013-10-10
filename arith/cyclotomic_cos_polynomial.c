@@ -177,19 +177,19 @@ _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
         switch (s % 4)
         {
             case 0:
-                fmpz_set_si(coeffs, 1L);
+                fmpz_set_si(coeffs, WORD(1));
                 fmpz_set_si(coeffs + 1, -s);
                 break;
             case 1:
-                fmpz_set_si(coeffs, 1L);
+                fmpz_set_si(coeffs, WORD(1));
                 fmpz_set_si(coeffs + 1, s + 1);
                 break;
             case 2:
-                fmpz_set_si(coeffs, -1L);
+                fmpz_set_si(coeffs, WORD(-1));
                 fmpz_set_si(coeffs + 1, s);
                 break;
             case 3:
-                fmpz_set_si(coeffs, -1L);
+                fmpz_set_si(coeffs, WORD(-1));
                 fmpz_set_si(coeffs + 1, -s - 1);
                 break;
         }
@@ -255,7 +255,7 @@ arith_cos_minpoly(fmpz_poly_t poly, ulong n)
 {
     if (n == 0)
     {
-        fmpz_poly_set_ui(poly, 1UL);
+        fmpz_poly_set_ui(poly, UWORD(1));
     }
     else
     {

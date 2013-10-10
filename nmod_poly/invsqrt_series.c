@@ -39,7 +39,7 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
 
     if (n == 1)
     {
-        g[0] = 1UL;
+        g[0] = UWORD(1);
         return;
     }
 
@@ -55,12 +55,12 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
 
     _nmod_poly_mul(t, g, m, g, m, mod);
     if (2*m - 1 < n)
-        t[n-1] = 0UL;
+        t[n-1] = UWORD(0);
 
     _nmod_poly_mullow(u, t, n, g, n, n, mod);
     _nmod_poly_mullow(t, u, n, h, n, n, mod);
 
-    c = n_invmod(mod.n - 2UL, mod.n);
+    c = n_invmod(mod.n - UWORD(2), mod.n);
     _nmod_vec_scalar_mul_nmod(g + m, t + m, n - m, c, mod);
 
     if (alloc)
@@ -83,13 +83,13 @@ void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
     {
-        printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
         abort();
     }
 
-    if (h->coeffs[0] != 1UL)
+    if (h->coeffs[0] != UWORD(1))
     {
-        printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
+        flint_printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
         abort();
     }
 

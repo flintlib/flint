@@ -134,7 +134,7 @@ _padic_exp_bsplit(fmpz_t y, const fmpz_t x, slong v, const fmpz_t p, slong N)
 
 void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, slong xv, slong N)
 {
-    const fmpz_t p = {2L};
+    const fmpz_t p = {WORD(2)};
 
     fmpz_t r, t;
     slong w;

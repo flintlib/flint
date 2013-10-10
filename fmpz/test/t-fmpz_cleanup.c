@@ -34,7 +34,7 @@ main(void)
     slong iter;
     flint_rand_t state;
 
-    printf("fmpz_cleanup....");
+    flint_printf("fmpz_cleanup....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,7 +73,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

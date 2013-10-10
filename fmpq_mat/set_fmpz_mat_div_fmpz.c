@@ -35,7 +35,7 @@ fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xnum,
     {
         fmpq_mat_set_fmpz_mat(X, Xnum);
     }
-    else if (*den == -1L)
+    else if (*den == WORD(-1))
     {
         fmpz_t t;
         fmpz_init(t);

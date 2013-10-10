@@ -58,7 +58,7 @@ nmod_poly_div(nmod_poly_t Q,
     
     if (B_len == 0)
     {
-        printf("Exception (nmod_poly_divrem). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
         abort();
     }
 

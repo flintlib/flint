@@ -39,9 +39,9 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("tan_series....");
+    flint_printf("tan_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -56,7 +56,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_canonicalise(a);
 
@@ -68,10 +68,10 @@ main(void)
         result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -90,7 +90,7 @@ main(void)
         fmpq_poly_init(atantana);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 60) + 1, 80);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_tan_series(tana, a, n);
         fmpq_poly_atan_series(atantana, tana, n);
@@ -101,11 +101,11 @@ main(void)
         result = (fmpq_poly_equal(atantana, a) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
-            printf("tan(a) = "), fmpq_poly_debug(tana), printf("\n\n");
-            printf("atan(tan(a)) = "), fmpq_poly_debug(atantana), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("tan(a) = "), fmpq_poly_debug(tana), flint_printf("\n\n");
+            flint_printf("atan(tan(a)) = "), fmpq_poly_debug(atantana), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -116,6 +116,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("cfrac_bound....");
+    flint_printf("cfrac_bound....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -69,7 +69,7 @@ main(void)
 
         if (n > bound)
         {
-            printf("FAIL: length=%ld > bound=%ld\n", n, bound);
+            flint_printf("FAIL: length=%wd > bound=%wd\n", n, bound);
             abort();
         }
 
@@ -81,6 +81,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

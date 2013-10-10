@@ -46,7 +46,7 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
             break;
 
         case 1:
-            if (nmod_mat_entry(A, 0, 0) == 0UL)
+            if (nmod_mat_entry(A, 0, 0) == UWORD(0))
             {
                 result = 0;
             }
@@ -61,7 +61,7 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
         default:
             nmod_mat_init(I, dim, dim, B->mod.n);
             for (i = 0; i < dim; i++)
-                nmod_mat_entry(I, i, i) = 1UL;
+                nmod_mat_entry(I, i, i) = UWORD(1);
             result = nmod_mat_solve(B, A, I);
             nmod_mat_clear(I);
     }

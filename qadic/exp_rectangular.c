@@ -65,7 +65,7 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
             _fmpz_vec_scalar_mul_fmpz(x, op, len, x + len);
 
             _fmpz_poly_sqr(rop, x, len);
-            if (*p != 2L)
+            if (*p != WORD(2))
             {
                 for (i = 0; i < 2 * len - 1; i++)
                     if (fmpz_is_odd(rop + i))
@@ -173,7 +173,7 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return 1;
     }
 
-    if ((*p == 2L && v <= 1) || (v <= 0))
+    if ((*p == WORD(2) && v <= 1) || (v <= 0))
     {
         return 0;
     }

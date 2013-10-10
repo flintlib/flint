@@ -66,7 +66,7 @@ _fmpq_poly_revert_series_newton(fmpz * Qinv, fmpz_t den,
         fmpz_init(Vden);
 
         k = n;
-        for (i = 1; (1L << i) < k; i++);
+        for (i = 1; (WORD(1) << i) < k; i++);
         a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = k;
         while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
@@ -111,7 +111,7 @@ fmpq_poly_revert_series_newton(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        printf("Exception (fmpq_poly_revert_series_newton). Input must have \n"
+        flint_printf("Exception (fmpq_poly_revert_series_newton). Input must have \n"
                "zero constant term and nonzero coefficient of x^1.\n");
         abort();
     }

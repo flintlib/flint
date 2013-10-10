@@ -49,7 +49,7 @@ main(void)
     int i, result, d1, d2;
     flint_rand_t state;
     
-    printf("gcd_heuristic....");
+    flint_printf("gcd_heuristic....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -72,9 +72,9 @@ main(void)
                                            && _t_gcd_is_canonical(a)));
         if (!result)
         {
-            printf("FAIL (aliasing a and b):\n");
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            flint_printf("FAIL (aliasing a and b):\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -101,9 +101,9 @@ main(void)
                                            && _t_gcd_is_canonical(a)));
         if (!result)
         {
-            printf("FAIL (aliasing a and c):\n");
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("c = "), fmpz_poly_print(c), printf("\n\n");
+            flint_printf("FAIL (aliasing a and c):\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -138,11 +138,11 @@ main(void)
            result = fmpz_poly_is_zero(r) && _t_gcd_is_canonical(d);
            if (!result)
            {
-              printf("FAIL (check a | gcd(af, ag)):\n");
-              printf("f = "), fmpz_poly_print(f), printf("\n");
-              printf("g = "), fmpz_poly_print(g), printf("\n");
-              printf("a = "), fmpz_poly_print(a), printf("\n");
-              printf("d = "), fmpz_poly_print(d), printf("\n");
+              flint_printf("FAIL (check a | gcd(af, ag)):\n");
+              flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
+              flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
+              flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
+              flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
               abort();
            }
         }
@@ -184,11 +184,11 @@ main(void)
            result = fmpz_poly_equal(d, a) && _t_gcd_is_canonical(d);
            if (!result)
            {
-              printf("FAIL (check a == gcd(af, ag) when gcd(f, g) = 1):\n");
-              printf("f = "), fmpz_poly_print(f), printf("\n");
-              printf("g = "), fmpz_poly_print(g), printf("\n");
-              printf("a = "), fmpz_poly_print(a), printf("\n");
-              printf("d = "), fmpz_poly_print(d), printf("\n");
+              flint_printf("FAIL (check a == gcd(af, ag) when gcd(f, g) = 1):\n");
+              flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
+              flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
+              flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n");
+              flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
               abort();
            }
         } 
@@ -218,8 +218,8 @@ main(void)
        result = (d->length == 1 && fmpz_is_one(d->coeffs));
        if (!result)
        {
-          printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
-          fmpz_poly_print(d); printf("\n"); 
+          flint_printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
+          fmpz_poly_print(d); flint_printf("\n"); 
           abort();
        }
 
@@ -230,6 +230,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

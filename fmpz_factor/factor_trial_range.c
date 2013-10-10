@@ -73,7 +73,7 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
     {
        xsize = flint_mpn_remove_2exp(xd, xsize, &exp);
        if (exp != 0)
-           _fmpz_factor_append_ui(factor, 2UL, exp);
+           _fmpz_factor_append_ui(factor, UWORD(2), exp);
     }
 
     trial_start = FLINT_MAX(1, start);
@@ -107,7 +107,7 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
             }
 
             _fmpz_factor_append_ui(factor, p, exp);
-            /* printf("added %lu %lu\n", p, exp); */
+            /* flint_printf("added %wu %wu\n", p, exp); */
 
             /* Continue using only trial division whilst it is successful.
                This allows quickly factoring huge highly composite numbers

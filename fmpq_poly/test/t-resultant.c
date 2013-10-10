@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("resultant....");
+    flint_printf("resultant....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -66,11 +66,11 @@ main(void)
         result = fmpq_equal(x, y);
         if (!result)
         {
-            printf("FAIL (res(f,g) == (-1)^(m * n) res(g, f)):\n");
-            printf("f = "), fmpq_poly_print(f), printf("\n\n");
-            printf("g = "), fmpq_poly_print(g), printf("\n\n");
-            printf("x = "), fmpq_print(x), printf("\n\n");
-            printf("y = "), fmpq_print(y), printf("\n\n");
+            flint_printf("FAIL (res(f,g) == (-1)^(m * n) res(g, f)):\n");
+            flint_printf("f = "), fmpq_poly_print(f), flint_printf("\n\n");
+            flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
+            flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
             abort();
         }
 
@@ -106,12 +106,12 @@ main(void)
         result = fmpq_equal(x, y);
         if (!result)
         {
-            printf("FAIL (res(f h, g) == res(f, g) res(h, g)):\n");
-            printf("f = "), fmpq_poly_print(f), printf("\n\n");
-            printf("g = "), fmpq_poly_print(g), printf("\n\n");
-            printf("h = "), fmpq_poly_print(h), printf("\n\n");
-            printf("x = "), fmpq_print(x), printf("\n\n");
-            printf("y = "), fmpq_print(y), printf("\n\n");
+            flint_printf("FAIL (res(f h, g) == res(f, g) res(h, g)):\n");
+            flint_printf("f = "), fmpq_poly_print(f), flint_printf("\n\n");
+            flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
+            flint_printf("h = "), fmpq_poly_print(h), flint_printf("\n\n");
+            flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
             abort();
         }
 
@@ -168,9 +168,9 @@ main(void)
         result = fmpq_equal(x, y);
         if (!result)
         {
-            printf("FAIL (res(f,g) == (-1)^(m * n) res(g, f)):\n");
-            printf("x = "), fmpq_print(x), printf("\n\n");
-            printf("y = "), fmpq_print(y), printf("\n\n");
+            flint_printf("FAIL (res(f,g) == (-1)^(m * n) res(g, f)):\n");
+            flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
             abort();
         }
 
@@ -182,7 +182,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("scalar_mod_fmpz....");
+    flint_printf("scalar_mod_fmpz....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -67,7 +67,7 @@ main(void)
 
         if (!fmpz_mat_equal(A, Amod))
         {
-            printf("FAIL: aliasing!\n");
+            flint_printf("FAIL: aliasing!\n");
             abort();
         }
 
@@ -79,6 +79,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("dlog....");
+    flint_printf("dlog....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,10 +68,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("x = "), fmpz_print(x), printf("\n");
-            printf("y = %.20g\n", y);
-            printf("w = %.20g\n", w);
+            flint_printf("FAIL:\n");
+            flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+            flint_printf("y = %.20g\n", y);
+            flint_printf("w = %.20g\n", w);
             abort();
         }
 
@@ -83,7 +83,7 @@ main(void)
     mpfr_free_cache();
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

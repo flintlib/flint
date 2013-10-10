@@ -44,8 +44,8 @@ int main(void)
 
     /*************************************************************************/
 
-    fmpz_t e = {4L};
-    fmpz_t nine = {9L};
+    fmpz_t e = {WORD(4)};
+    fmpz_t nine = {WORD(9)};
 
     fmpz_init_set_ui(p, 3);
     d = 2;
@@ -56,25 +56,25 @@ int main(void)
     qadic_init2(b, N);
     qadic_init2(c, N);
 
-    printf("Compute a power and a sum\n");
+    flint_printf("Compute a power and a sum\n");
     padic_poly_fit_length(a, 2);
     fmpz_one(a->coeffs + 0);
     fmpz_set_ui(a->coeffs + 1, 2);
     a->val = 0;
     _padic_poly_set_length(a, 2);
 
-    qadic_print_pretty(a, ctx); printf("\n");
+    qadic_print_pretty(a, ctx); flint_printf("\n");
 
     qadic_pow(a, a, e, ctx);
     padic_poly_set_ui(b, 3249, &ctx->pctx);
     qadic_add(c, a, b, ctx);
 
-    qadic_print_pretty(a, ctx); printf("\n");
-    qadic_print_pretty(b, ctx); printf("\n");
-    qadic_print_pretty(c, ctx); printf("\n");
-    printf("\n");
+    qadic_print_pretty(a, ctx); flint_printf("\n");
+    qadic_print_pretty(b, ctx); flint_printf("\n");
+    qadic_print_pretty(c, ctx); flint_printf("\n");
+    flint_printf("\n");
 
-    printf("Compute a Teichmuller lift\n");
+    flint_printf("Compute a Teichmuller lift\n");
     padic_poly_fit_length(a, 2);
     fmpz_one(a->coeffs + 0);
     fmpz_set_ui(a->coeffs + 1, 2);
@@ -84,20 +84,20 @@ int main(void)
     qadic_teichmuller(b, a, ctx);
     qadic_pow(c, b, nine, ctx);
 
-    qadic_print_pretty(a, ctx); printf("\n");
-    qadic_print_pretty(b, ctx); printf("\n");
-    qadic_print_pretty(c, ctx); printf("\n");
-    printf("\n");
+    qadic_print_pretty(a, ctx); flint_printf("\n");
+    qadic_print_pretty(b, ctx); flint_printf("\n");
+    qadic_print_pretty(c, ctx); flint_printf("\n");
+    flint_printf("\n");
 
-    printf("Compute an inverse\n");
+    flint_printf("Compute an inverse\n");
     qadic_set(a, b, ctx);
     qadic_inv(b, a, ctx);
     qadic_mul(c, a, b, ctx);
 
-    qadic_print_pretty(a, ctx); printf("\n");
-    qadic_print_pretty(b, ctx); printf("\n");
-    qadic_print_pretty(c, ctx); printf("\n");
-    printf("\n");
+    qadic_print_pretty(a, ctx); flint_printf("\n");
+    qadic_print_pretty(b, ctx); flint_printf("\n");
+    qadic_print_pretty(c, ctx); flint_printf("\n");
+    flint_printf("\n");
 
     qadic_clear(a);
     qadic_clear(b);
@@ -108,7 +108,7 @@ int main(void)
 
     /*************************************************************************/
 
-    printf("Compute a Frobenius image\n");
+    flint_printf("Compute a Frobenius image\n");
 
     fmpz_init_set_ui(p, 3);
     d = 2;
@@ -119,16 +119,16 @@ int main(void)
     qadic_init2(b, N);
 
     padic_poly_fit_length(a, 2);
-    a->coeffs[0] = 78L;
-    a->coeffs[1] = 45L;
+    a->coeffs[0] = WORD(78);
+    a->coeffs[1] = WORD(45);
     a->val = 0;
     _padic_poly_set_length(a, 2);
 
     qadic_frobenius(b, a, 1, ctx);
-    printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-    printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-    printf("Context:\n"), qadic_ctx_print(ctx);
-    printf("\n");
+    flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+    flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+    flint_printf("Context:\n"), qadic_ctx_print(ctx);
+    flint_printf("\n");
 
     qadic_clear(a);
     qadic_clear(b);
@@ -138,7 +138,7 @@ int main(void)
 
     /*************************************************************************/
 
-    printf("Compute a square root\n");
+    flint_printf("Compute a square root\n");
 
     fmpz_init_set_ui(p, 2);
     d = 3;
@@ -149,18 +149,18 @@ int main(void)
     qadic_init2(b, N);
 
     padic_poly_fit_length(a, d);
-    a->coeffs[0] = 1L;
-    a->coeffs[1] = 3L;
-    a->coeffs[2] = 1L;
+    a->coeffs[0] = WORD(1);
+    a->coeffs[1] = WORD(3);
+    a->coeffs[2] = WORD(1);
     a->val = 0;
     _padic_poly_set_length(a, d);
 
     ans = qadic_sqrt(b, a, ctx);
-    printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-    printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-    printf("ans = %d\n", ans);
-    printf("Context:\n"), qadic_ctx_print(ctx);
-    printf("\n");
+    flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+    flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+    flint_printf("ans = %d\n", ans);
+    flint_printf("Context:\n"), qadic_ctx_print(ctx);
+    flint_printf("\n");
 
     qadic_clear(a);
     qadic_clear(b);

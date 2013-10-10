@@ -33,7 +33,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
     if (padic_mat_is_empty(A))
     {
-        fprintf(file, "%ld %ld\n", r, c);
+        flint_fprintf(file, "%wd %wd\n", r, c);
         return 1;
     }
 
@@ -45,16 +45,16 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
         fmpz_init(s);
         fmpz_init(t);
 
-        fprintf(file, "%ld %ld ", r, c);
+        flint_fprintf(file, "%wd %wd ", r, c);
 
         for (i = 0; i < r; i++)
             for (j = 0; j < c; j++)
             {
-                fprintf(file, " ");
+                flint_fprintf(file, " ");
 
                 if (fmpz_is_zero(padic_mat_entry(A, i, j)))
                 {
-                    fprintf(file, "0");
+                    flint_fprintf(file, "0");
                 }
                 else
                 {
@@ -84,7 +84,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     }
     else if (ctx->mode == PADIC_SERIES)
     {
-        printf("ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
+        flint_printf("ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
         abort();
     }
     else if (ctx->mode == PADIC_VAL_UNIT)
@@ -94,16 +94,16 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 
         fmpz_init(t);
 
-        fprintf(file, "%ld %ld ", r, c);
+        flint_fprintf(file, "%wd %wd ", r, c);
 
         for (i = 0; i < r; i++)
             for (j = 0; j < c; j++)
             {
-                fprintf(file, " ");
+                flint_fprintf(file, " ");
 
                 if (fmpz_is_zero(padic_mat_entry(A, i, j)))
                 {
-                    fprintf(file, "0");
+                    flint_fprintf(file, "0");
                 }
                 else
                 {
@@ -117,13 +117,13 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
                     else if (v == 1)
                     {
                         fmpz_fprint(file, ctx->p);
-                        fprintf(file, "*");
+                        flint_fprintf(file, "*");
                         fmpz_fprint(file, t);
                     }
                     else
                     {
                         fmpz_fprint(file, ctx->p);
-                        fprintf(file, "^%ld*", v);
+                        flint_fprintf(file, "^%wd*", v);
                         fmpz_fprint(file, t);
                     }
                 }
@@ -133,7 +133,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     }
     else
     {
-        printf("ERROR (_padic_mat_fprint).  Unknown print mode.\n");
+        flint_printf("ERROR (_padic_mat_fprint).  Unknown print mode.\n");
         abort();
     }
 

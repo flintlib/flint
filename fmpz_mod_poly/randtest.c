@@ -52,7 +52,7 @@ fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
 {
     if (len == 0)
     {
-        printf("Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
+        flint_printf("Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
         abort();
     }
 
@@ -67,7 +67,7 @@ fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 {
     if (len == 0)
     {
-        printf("Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
+        flint_printf("Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
         abort();
     }
 

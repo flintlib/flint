@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor_distinct_deg....");
+    flint_printf("factor_distinct_deg....");
     fflush(stdout);
 
     for (iter = 0; iter < 200; iter++)
@@ -92,7 +92,7 @@ main(void)
 
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
         {
-            printf("Fatal error: not enough memory.");
+            flint_printf("Fatal error: not enough memory.");
             abort();
         }
         nmod_poly_factor_init(res);
@@ -108,9 +108,9 @@ main(void)
 
         if (!nmod_poly_equal(poly1, product))
         {
-            printf("Error: product of factors does not equal to the original polynomial\n");
-            printf("poly:\n"); nmod_poly_print(poly1); printf("\n");
-            printf("product:\n"); nmod_poly_print(product); printf("\n");
+            flint_printf("Error: product of factors does not equal to the original polynomial\n");
+            flint_printf("poly:\n"); nmod_poly_print(poly1); flint_printf("\n");
+            flint_printf("product:\n"); nmod_poly_print(product); flint_printf("\n");
             abort();
         }
 
@@ -125,6 +125,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

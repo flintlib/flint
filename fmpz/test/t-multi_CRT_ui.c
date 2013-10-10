@@ -50,7 +50,7 @@ int main()
 
     flint_rand_t state;
 
-    printf("multi_CRT_ui....");
+    flint_printf("multi_CRT_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,7 +68,7 @@ int main()
         num_primes = ((bits + 1)*primes_per_limb)/FLINT_BITS + 1;
 
         primes = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
-        prime = n_nextprime((1UL << (FLINT_BITS-1)) - 10000000L, 0);
+        prime = n_nextprime((UWORD(1) << (FLINT_BITS-1)) - WORD(10000000), 0);
 
         for (j = 0; j < num_primes; j++)
         {
@@ -98,9 +98,9 @@ int main()
 
         if (!result)
         {
-            printf("FAIL: bits = %ld, num_primes = %ld\n", bits, num_primes);
-            fmpz_print(temp); printf("\n");
-            fmpz_print(input); printf("\n");
+            flint_printf("FAIL: bits = %wd, num_primes = %wd\n", bits, num_primes);
+            fmpz_print(temp); flint_printf("\n");
+            fmpz_print(input); flint_printf("\n");
             abort();
         }
 
@@ -111,8 +111,8 @@ int main()
 		  
             if (!result)
             {
-                printf("FAIL: bits = %ld, num_primes = %ld\n", bits, num_primes);
-                printf("FAIL: k = %ld, output[k] = %ld, output2[k] = %ld\n", k, output[k], output2[k]);
+                flint_printf("FAIL: bits = %wd, num_primes = %wd\n", bits, num_primes);
+                flint_printf("FAIL: k = %wd, output[k] = %wd, output2[k] = %wd\n", k, output[k], output2[k]);
                 abort();
             }
         }
@@ -128,7 +128,7 @@ int main()
     flint_randclear(state);
     mpz_clear(num1);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

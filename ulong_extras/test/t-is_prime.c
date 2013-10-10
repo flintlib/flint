@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    mp_limb_t d;
    mpz_t d_m;
-   printf("is_prime....");
+   flint_printf("is_prime....");
    fflush(stdout);
    
    flint_randinit(state);
@@ -55,8 +55,8 @@ int main(void)
       result = n_is_prime(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -70,15 +70,15 @@ int main(void)
       do
       {
          d = n_randtest(state) | 1;
-         if (d == 1UL) d++;
+         if (d == UWORD(1)) d++;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       result = !n_is_prime(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared prime\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared prime\n", d); 
          abort();
       }
 
@@ -87,6 +87,6 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

@@ -38,7 +38,7 @@ fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        printf("Exception: division by zero in fmpz_tdiv_qr\n");
+        flint_printf("Exception: division by zero in fmpz_tdiv_qr\n");
         abort();
     }
 
@@ -54,7 +54,7 @@ fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
         }
         else                    /* h is large and g is small */
         {
-            fmpz_set_ui(f, 0L); /* g is zero */
+            fmpz_set_ui(f, WORD(0)); /* g is zero */
             fmpz_set_si(s, c1);
         }
     }

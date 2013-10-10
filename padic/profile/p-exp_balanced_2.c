@@ -54,12 +54,12 @@ main(void)
     long N[] = {
         1, 2, 4, 8, 16, 
         32, 64, 128, 256, 512, 
-        1024, 1L << 11, 1L << 12, 1L << 13, 1L << 14, 
-        1L << 15, 1L << 16, 1L << 17, 1L << 18, 1L << 19
+        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14, 
+        WORD(1) << 15, WORD(1) << 16, WORD(1) << 17, WORD(1) << 18, WORD(1) << 19
     };
     long T[20] = {0};
 
-    printf("Benchmark for p-adic exponential (balanced).\n");
+    flint_printf("Benchmark for p-adic exponential (balanced).\n");
     fflush(stdout);
 
 for (l = 0; l < len; l++)
@@ -84,7 +84,7 @@ for (l = 0; l < len; l++)
 
     if (n > 1)
     {
-        fmpz_t f = {3L}, pow;
+        fmpz_t f = {WORD(3)}, pow;
 
         fmpz_init(pow);
         fmpz_pow_ui(pow, p, n - 2);
@@ -107,7 +107,7 @@ for (l = 0; l < len; l++)
 
     T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
-    printf("%2ld, %4LG, %9ld, %ld\n", 
+    flint_printf("%2ld, %4XYXYXYXY, %9ld, %wd\n", 
         l, cputime, runs[l], T[l]);
 
     padic_clear(d, ctx);
@@ -118,9 +118,9 @@ for (l = 0; l < len; l++)
     flint_randclear(state);
 }
 
-    printf("Output as a list:\n");
+    flint_printf("Output as a list:\n");
     for (l = 0; l < len; l++)
-        printf("%ld, ", T[l]);
-    printf("\n");
+        flint_printf("%wd, ", T[l]);
+    flint_printf("\n");
 }
 

@@ -42,7 +42,7 @@ int main(void)
     fmpz * res;
     slong k, n;
 
-    printf("landau_function_vec....");
+    flint_printf("landau_function_vec....");
     fflush(stdout);
 
     n = 45;
@@ -53,8 +53,8 @@ int main(void)
     {
         if (fmpz_cmp_ui(res + k, known[k]))
         {
-            printf("FAIL:\n");
-            printf("k = %ld, res[k] = %ld, expected: %ld\n",
+            flint_printf("FAIL:\n");
+            flint_printf("k = %wd, res[k] = %wd, expected: %wd\n",
                 k, fmpz_get_si(res + k), known[k]);
             abort();
         }
@@ -63,6 +63,6 @@ int main(void)
     _fmpz_vec_clear(res, n);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

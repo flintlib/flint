@@ -38,7 +38,7 @@ main(void)
     slong i;
     flint_rand_t state;
 
-    printf("trace....");
+    flint_printf("trace....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -74,13 +74,13 @@ main(void)
 
         if (!fmpz_poly_equal(trab, trba))
         {
-            printf("FAIL:\n");
-            fmpz_poly_mat_print(A, "x"), printf("\n");
-            fmpz_poly_mat_print(B, "x"), printf("\n");
-            fmpz_poly_mat_print(AB, "x"), printf("\n");
-            fmpz_poly_mat_print(BA, "x"), printf("\n");
-            printf("tr(AB): "),  fmpz_poly_print(trab),    printf("\n");
-            printf("tr(BA): "),  fmpz_poly_print(trba),    printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_mat_print(A, "x"), flint_printf("\n");
+            fmpz_poly_mat_print(B, "x"), flint_printf("\n");
+            fmpz_poly_mat_print(AB, "x"), flint_printf("\n");
+            fmpz_poly_mat_print(BA, "x"), flint_printf("\n");
+            flint_printf("tr(AB): "),  fmpz_poly_print(trab),    flint_printf("\n");
+            flint_printf("tr(BA): "),  fmpz_poly_print(trba),    flint_printf("\n");
             abort();
         }
 
@@ -94,6 +94,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

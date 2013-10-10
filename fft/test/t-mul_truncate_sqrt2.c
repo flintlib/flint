@@ -42,7 +42,7 @@ main(void)
     
     flint_rand_t state;
 
-    printf("mul_truncate_sqrt2....");
+    flint_printf("mul_truncate_sqrt2....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -52,7 +52,7 @@ main(void)
     {
         for (w = 1; w <= 5; w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;
@@ -75,7 +75,7 @@ main(void)
             {
                 if (r1[j] != r2[j]) 
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                     abort();
                 }
             }
@@ -89,7 +89,7 @@ main(void)
     {
         for (w = 1; w <= 5; w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;
@@ -110,7 +110,7 @@ main(void)
             {
                 if (r1[j] != r2[j]) 
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                     abort();
                 }
             }
@@ -121,6 +121,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

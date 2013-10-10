@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("init/clear....");
+    flint_printf("init/clear....");
     fflush(stdout);
 
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
@@ -55,9 +55,9 @@ main(void)
         {
             for (j = 0; j < n; j++)
             {
-                if (A->rows[i][j] != 0UL)
+                if (A->rows[i][j] != UWORD(0))
                 {
-                    printf("FAIL: entries not zero!\n");
+                    flint_printf("FAIL: entries not zero!\n");
                     abort();
                 }
             }
@@ -65,7 +65,7 @@ main(void)
 
         if (A->mod.n != mod)
         {
-            printf("FAIL: bad modulus\n");
+            flint_printf("FAIL: bad modulus\n");
             abort();
         }
 
@@ -74,6 +74,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

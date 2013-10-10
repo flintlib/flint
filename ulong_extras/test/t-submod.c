@@ -34,7 +34,7 @@ int main(void)
    int i, result;
    flint_rand_t state;
    
-   printf("submod....");
+   flint_printf("submod....");
    fflush(stdout);
 
    flint_randinit(state);
@@ -49,22 +49,22 @@ int main(void)
       
       r1 = n_submod(a, b, d);
 
-      add_ssaaaa(s1, r2, 0UL, a, 0UL, d);
-      sub_ddmmss(s1, r2, s1, r2, 0UL, b);
+      add_ssaaaa(s1, r2, UWORD(0), a, UWORD(0), d);
+      sub_ddmmss(s1, r2, s1, r2, UWORD(0), b);
       if ((s1) || (r2 >= d)) r2 -= d;
       
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, d = %lu\n", a, b, d); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, d = %wu\n", a, b, d); 
+         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

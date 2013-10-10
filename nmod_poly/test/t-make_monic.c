@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("make_monic....");
+    flint_printf("make_monic....");
     fflush(stdout);
 
     /* Check new leading coeff = gcd old leading coeff and modulus */
@@ -59,11 +59,11 @@ main(void)
         result = (l == b->coeffs[b->length - 1]);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("l = %lu, a->lead = %ld, n = %lu\n", 
+            flint_printf("FAIL:\n");
+            flint_printf("l = %wu, a->lead = %wd, n = %wu\n", 
                 l, a->coeffs[a->length - 1], a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -89,10 +89,10 @@ main(void)
         result = (l == a->coeffs[a->length - 1]);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("l = %lu, a->lead = %ld, n = %lu\n", 
+            flint_printf("FAIL:\n");
+            flint_printf("l = %wu, a->lead = %wd, n = %wu\n", 
                 l, a->coeffs[a->length - 1], a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(a), flint_printf("\n\n");
             abort();
         }
 
@@ -101,6 +101,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

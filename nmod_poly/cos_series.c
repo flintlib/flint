@@ -38,11 +38,11 @@ _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     u = _nmod_vec_init(n);
 
     /* cos(x) = (1-tan(x/2)^2)/(1+tan(x/2)^2) */
-    _nmod_vec_scalar_mul_nmod(u, h, n, n_invmod(2UL, mod.n), mod);
+    _nmod_vec_scalar_mul_nmod(u, h, n, n_invmod(UWORD(2), mod.n), mod);
     _nmod_poly_tan_series(t, u, n, mod);
     _nmod_poly_mullow(u, t, n, t, n, n, mod);
     _nmod_vec_neg(t, u, n, mod);
-    t[0] = u[0] = 1UL;
+    t[0] = u[0] = UWORD(1);
     _nmod_poly_div_series(g, t, u, n, mod);
 
     _nmod_vec_clear(t);
@@ -55,9 +55,9 @@ nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     mp_ptr h_coeffs;
     slong h_len = h->length;
 
-    if (h_len > 0 && h->coeffs[0] != 0UL)
+    if (h_len > 0 && h->coeffs[0] != UWORD(0))
     {
-        printf("Exception (nmod_poly_cos_series). Constant term != 0.\n");
+        flint_printf("Exception (nmod_poly_cos_series). Constant term != 0.\n");
         abort();
     }
 
@@ -65,7 +65,7 @@ nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     {
         nmod_poly_zero(g);
         if (n > 0)
-            nmod_poly_set_coeff_ui(g, 0, 1UL);
+            nmod_poly_set_coeff_ui(g, 0, UWORD(1));
         return;
     }
 

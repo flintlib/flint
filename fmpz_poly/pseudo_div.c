@@ -46,7 +46,7 @@ void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A,
 
     if (B->length == 0)
     {
-        printf("Exception (fmpz_poly_pseudo_div). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_pseudo_div). Division by zero.\n");
         abort();
     }
     if (A->length < B->length)

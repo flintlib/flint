@@ -5,6 +5,7 @@ AT=@
 SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard ../*.h)
+TEST_HEADERS = $(wildcard *.h)
 
 OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
@@ -12,12 +13,14 @@ LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo
 
 TEST_SOURCES = $(wildcard test/*.c)
+TESTXX_SOURCES = $(wildcard test/*.cpp)
 
 PROF_SOURCES = $(wildcard profile/*.c)
 
 TUNE_SOURCES = $(wildcard tune/*.c)
 
-TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES))
+TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES)) \
+        $(patsubst %.cpp, $(BUILD_DIR)/%$(EXEEXT), $(TESTXX_SOURCES))
 
 TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
 
@@ -37,14 +40,18 @@ profile: $(PROF_SOURCES) $(BUILD_DIR)/../../build/profiler.o $(HEADERS)
 tune: $(TUNE_SOURCES) $(HEADERS)
 	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
-$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c $(HEADERS)
-	$(QUIET_CC) $(CC) $(CFLAGS) -c $(INCS) $< -o $@
+-include $(OBJS:.o=.d)
+
+$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@ -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$@"
 
 $(MOD_LOBJ): $(LOBJS)
 	$(QUIET_CC) $(CC) $(ABI_FLAG) -Wl,-r $^ -o $@ -nostdlib
 
-$(BUILD_DIR)/%.lo: %.c $(HEADERS)
-	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@
+-include $(LOBJS:.lo=.d)
+
+$(BUILD_DIR)/%.lo: %.c
+	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@ -MMD -MP -MF "$(BUILD_DIR)/$*.d" -MT "$(BUILD_DIR)/$*.d" -MT "$@"
 
 clean:
 	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
@@ -53,8 +60,13 @@ tests: $(TESTS)
 
 check: tests $(TESTS_RUN)
 
-$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o $(HEADERS)
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS)
+-include $(patsubst %, %.d, $(TESTS))
+
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
+	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
 %_RUN: %
 	@$<

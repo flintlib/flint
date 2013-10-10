@@ -33,15 +33,15 @@ fmpz_set_mpz(fmpz_t f, const mpz_t x)
 {
     slong size = (slong) x->_mp_size;
 
-    if (size == 0L)             /* x is zero */
+    if (size == WORD(0))             /* x is zero */
     {
         fmpz_zero(f);
     }
-    else if (size == 1L)        /* x is positive and 1 limb */
+    else if (size == WORD(1))        /* x is positive and 1 limb */
     {
         fmpz_set_ui(f, mpz_get_ui(x));
     }
-    else if (size == -1L)       /* x is negative and 1 limb */
+    else if (size == WORD(-1))       /* x is negative and 1 limb */
     {
         ulong uval = mpz_get_ui(x);
         if (uval <= COEFF_MAX)  /* x is small */

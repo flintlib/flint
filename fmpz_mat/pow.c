@@ -62,7 +62,7 @@ fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
         {
             fmpz_mat_sqr(U, T);
 
-            if (exp & (1L << i))
+            if (exp & (WORD(1) << i))
                 fmpz_mat_mul(T, U, A);
             else
                 fmpz_mat_swap(T, U);

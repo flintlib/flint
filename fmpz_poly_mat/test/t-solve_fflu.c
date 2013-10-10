@@ -36,7 +36,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("solve....");
+    flint_printf("solve....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,7 +73,7 @@ main(void)
         {
             if (solved == 0)
             {
-                printf("FAIL: expected empty system to pass\n");
+                flint_printf("FAIL: expected empty system to pass\n");
                 abort();
             }
         }
@@ -85,16 +85,16 @@ main(void)
                 if (!fmpz_poly_equal(den, det))
                 {
                     fmpz_poly_neg(det, det);
-                    printf("FAIL: den != +/- det(A)\n");
-                    printf("den:\n"); fmpz_poly_print_pretty(den, "x");
-                    printf("\n\n");
-                    printf("det:\n"); fmpz_poly_print_pretty(det, "x");
-                    printf("\n\n");
-                    printf("A:\n");
+                    flint_printf("FAIL: den != +/- det(A)\n");
+                    flint_printf("den:\n"); fmpz_poly_print_pretty(den, "x");
+                    flint_printf("\n\n");
+                    flint_printf("det:\n"); fmpz_poly_print_pretty(det, "x");
+                    flint_printf("\n\n");
+                    flint_printf("A:\n");
                     fmpz_poly_mat_print(A, "x");
-                    printf("B:\n");
+                    flint_printf("B:\n");
                     fmpz_poly_mat_print(B, "x");
-                    printf("X:\n");
+                    flint_printf("X:\n");
                     fmpz_poly_mat_print(X, "x");
                     abort();
                 }
@@ -103,7 +103,7 @@ main(void)
 
         if (solved != !fmpz_poly_is_zero(den))
         {
-            printf("FAIL: return value does not match denominator\n");
+            flint_printf("FAIL: return value does not match denominator\n");
             abort();
         }
 
@@ -112,16 +112,16 @@ main(void)
 
         if (!fmpz_poly_mat_equal(AX, Bden))
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
-            printf("X:\n");
+            flint_printf("X:\n");
             fmpz_poly_mat_print(X, "x");
-            printf("AX:\n");
+            flint_printf("AX:\n");
             fmpz_poly_mat_print(AX, "x");
-            printf("Bden:\n");
+            flint_printf("Bden:\n");
             fmpz_poly_mat_print(Bden, "x");
             abort();
         }
@@ -137,6 +137,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

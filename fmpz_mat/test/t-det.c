@@ -42,7 +42,7 @@ main(void)
 
     fmpz_t det, result;
 
-    printf("det....");
+    flint_printf("det....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,7 +59,7 @@ main(void)
         if (m)
             fmpz_randtest(det, state, 30);
         else
-            fmpz_set_ui(det, 1UL);
+            fmpz_set_ui(det, UWORD(1));
 
         fmpz_mat_randdet(A, state, det);
         fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
@@ -68,11 +68,11 @@ main(void)
 
         if (!fmpz_equal(det, result))
         {
-            printf("FAIL:\n");
-            printf("wrong determinant!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("expected: "),  fmpz_print(det),    printf("\n");
-            printf("ncomputed: "), fmpz_print(result), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("wrong determinant!\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("expected: "),  fmpz_print(det),    flint_printf("\n");
+            flint_printf("ncomputed: "), fmpz_print(result), flint_printf("\n");
             abort();
         }
 
@@ -94,9 +94,9 @@ main(void)
         fmpz_mat_det(det, A);
         if (*det)
         {
-            printf("FAIL:\n");
-            printf("expected zero determinant!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("expected zero determinant!\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
             abort();
         }
 
@@ -106,6 +106,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

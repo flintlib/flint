@@ -88,7 +88,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
                     fmpz_fprint(file, d);
                     fputc('*', file);
                     fmpz_fprint(file, p);
-                    fprintf(file, "^%ld", j + v);
+                    flint_fprintf(file, "^%wd", j + v);
                 }
                 else
                 {
@@ -109,15 +109,15 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
             {
                 if (j + v != 0)
                 {
-                    fprintf(file, " + ");
+                    flint_fprintf(file, " + ");
                     fmpz_fprint(file, d);
                     fputc('*', file);
                     fmpz_fprint(file, p);
-                    fprintf(file, "^%ld", j + v);
+                    flint_fprintf(file, "^%wd", j + v);
                 }
                 else
                 {
-                    fprintf(file, " + ");
+                    flint_fprintf(file, " + ");
                     fmpz_fprint(file, d);
                 }
             }
@@ -143,12 +143,12 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
             fmpz_fprint(file, u);
             fputc('*', file);
             fmpz_fprint(file, p);
-            fprintf(file, "^%ld", v);
+            flint_fprintf(file, "^%wd", v);
         }
     }
     else
     {
-        printf("Exception (_padic_fprint).  Unknown print mode.\n");
+        flint_printf("Exception (_padic_fprint).  Unknown print mode.\n");
         abort();
     }
 

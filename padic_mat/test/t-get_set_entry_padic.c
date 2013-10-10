@@ -43,7 +43,7 @@ main(void)
     padic_ctx_t ctx;
     slong m, n;
 
-    printf("get/ set_entry_padic... ");
+    flint_printf("get/ set_entry_padic... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -78,10 +78,10 @@ main(void)
         result = (padic_equal(x, y) && padic_mat_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("x = "), padic_print(x, ctx), printf("\n");
-            printf("y = "), padic_print(y, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("x = "), padic_print(x, ctx), flint_printf("\n");
+            flint_printf("y = "), padic_print(y, ctx), flint_printf("\n");
             abort();
         }
 
@@ -95,7 +95,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

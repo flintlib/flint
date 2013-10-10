@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("product_roots_nmod_vec....");
+    flint_printf("product_roots_nmod_vec....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,12 +60,12 @@ main(void)
 
         nmod_poly_product_roots_nmod_vec(P, x, n);
 
-        nmod_poly_set_coeff_ui(Q, 0, 1UL);
+        nmod_poly_set_coeff_ui(Q, 0, UWORD(1));
 
         for (j = 0; j < n; j++)
         {
             nmod_poly_zero(tmp);
-            nmod_poly_set_coeff_ui(tmp, 1, 1UL);
+            nmod_poly_set_coeff_ui(tmp, 1, UWORD(1));
             nmod_poly_set_coeff_ui(tmp, 0, n_negmod(x[j], mod));
             nmod_poly_mul(Q, Q, tmp);
         }
@@ -73,9 +73,9 @@ main(void)
         result = (nmod_poly_equal(P, Q));
         if (!result)
         {
-            printf("FAIL (P != Q):\n");
-            nmod_poly_print(P), printf("\n\n");
-            nmod_poly_print(Q), printf("\n\n");
+            flint_printf("FAIL (P != Q):\n");
+            nmod_poly_print(P), flint_printf("\n\n");
+            nmod_poly_print(Q), flint_printf("\n\n");
             abort();
         }
 
@@ -86,6 +86,6 @@ main(void)
     }
 
     flint_randclear(state);
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -37,7 +37,7 @@ int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly)
     ulong res;
 
     fmpz_init(coeff);
-    if (fscanf(f, "%ld", &length) != 1) {
+    if (flint_fscanf(f, "%wd", &length) != 1) {
         fmpz_clear(coeff);
         return 0;
     }

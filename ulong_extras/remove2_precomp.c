@@ -31,7 +31,7 @@ int
 n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre)
 {
     int exp = 0;
-    mp_limb_t quot, rem = 0UL;
+    mp_limb_t quot, rem = UWORD(0);
 
     if (p == 2)
     {

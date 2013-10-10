@@ -41,7 +41,7 @@ void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
    mp_bitcnt_t bits = params->bits;
-   ulong i, j, res, primes = (1L<<(bits/3))/10 + 1;
+   ulong i, j, res, primes = (WORD(1)<<(bits/3))/10 + 1;
    n_factor_t factors;
    mp_limb_t n2;
    
@@ -53,10 +53,10 @@ void sample(void * arg, ulong count)
 		  /*n_factor_init(&factors);
 	      n_factor(&factors, params->composites[j & 1023], 0);
 		  if ((factors.num == 0) || (factors.num == 1 && factors.exp[0] < 2))
-			  printf("Error %ld\n", params->composites[j & 1023]);*/
+			  flint_printf("Error %wd\n", params->composites[j & 1023]);*/
         n2 = n_factor_lehman(params->composites[j & 1023]);
         if (n2 == params->composites[j & 1023])
-           printf("Error n = %ld\n", params->composites[j & 1023]);
+           flint_printf("Error n = %wd\n", params->composites[j & 1023]);
 	  }
 	  prof_stop();
    }
@@ -90,14 +90,14 @@ int main(void)
 
    params.composites = flint_malloc(1024*sizeof(ulong));
 
-   printf("factor_one_line:\n");
+   flint_printf("factor_one_line:\n");
    
    for (i = 4; i <= 64; i++)
    {
       fill_array(params.composites, i, state);
       params.bits = i;
 	  prof_repeat(&min, &max, sample, &params);
-      printf("bits = %d, time is %.3f us\n", 
+      flint_printf("bits = %d, time is %.3f us\n", 
 		  i, max/(double)ITERS);
    }
 

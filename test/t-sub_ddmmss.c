@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("sub_ddmmss....");
+   flint_printf("sub_ddmmss....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -58,15 +58,15 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("mh = %lu, ml = %lu, sh = %lu, sl = %lu\n", mh, ml, sh, sl); 
-         printf("dh2 = %lu, dh1 = %lu, dl2 = %lu, dl1 = %lu\n", dh2, dh1, dl2, dl1);
+         flint_printf("FAIL:\n");
+         flint_printf("mh = %wu, ml = %wu, sh = %wu, sl = %wu\n", mh, ml, sh, sl); 
+         flint_printf("dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n", dh2, dh1, dl2, dl1);
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

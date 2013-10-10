@@ -130,7 +130,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
 
         _fmpz_vec_swap(QB + n1, d3q2, n2 - 1);
 
-        if (lenB & 1L)
+        if (lenB & WORD(1))
             fmpz_zero(QB + n2);
         _fmpz_vec_add(QB + n2, QB + n2, W, n1 - 1);
 

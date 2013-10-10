@@ -44,7 +44,7 @@ fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             __mpz_struct *mpz3 = _fmpz_promote(f);  /* g is saved and h is large */
             __mpz_struct *mpz2 = COEFF_TO_PTR(c2);
-            if (c1 < 0L)
+            if (c1 < WORD(0))
             {
                 mpz_add_ui(mpz3, mpz2, -c1);
                 mpz_neg(mpz3, mpz3);
@@ -60,7 +60,7 @@ fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             __mpz_struct *mpz3 = _fmpz_promote(f);  /* h is saved and g is large */
             __mpz_struct *mpz1 = COEFF_TO_PTR(c1);
-            if (c2 < 0L)
+            if (c2 < WORD(0))
                 mpz_add_ui(mpz3, mpz1, -c2);
             else
                 mpz_sub_ui(mpz3, mpz1, c2);

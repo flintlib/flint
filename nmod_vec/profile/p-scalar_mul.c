@@ -52,7 +52,7 @@ void sample(void * arg, ulong count)
    for (i = 0; i < count; i++)
    {
       n = n_randbits(state, bits);
-      if (n == 0UL) n++;
+      if (n == UWORD(0)) n++;
       c = n_randint(state, n);
       for (j = 0; j < length; j++)
          vec[j] = n_randint(state, n);
@@ -86,7 +86,7 @@ int main(void)
 	  info.length = 65536;
 	  prof_repeat(&min2, &max, sample, (void *) &info);
 
-      printf("bits %ld, length 128 %.1lf c/l, length 65536 %.1lf c/l\n", 
+      flint_printf("bits %wd, length 128 %.1lf c/l, length 65536 %.1lf c/l\n", 
          i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*30),
 		 (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*30)
 	  );

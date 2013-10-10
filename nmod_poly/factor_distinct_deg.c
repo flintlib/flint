@@ -51,8 +51,8 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(nmod_poly_struct))))
     {
-        printf("Exception (nmod_poly_factor_distinct_deg):\n");
-        printf("Not enough memory.\n");
+        flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
+        flint_printf("Not enough memory.\n");
         abort();
     }
     H = h + (l + 1);

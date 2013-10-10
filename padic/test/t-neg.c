@@ -33,7 +33,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("neg... ");
+    flint_printf("neg... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,9 +63,9 @@ main(void)
         result = (padic_equal(a, d));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -101,9 +101,9 @@ main(void)
         result = (padic_equal(a, d));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("d = "), padic_print(d, ctx), flint_printf("\n");
             abort();
         }
 
@@ -140,9 +140,9 @@ main(void)
         result = (padic_is_zero(b));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             abort();
         }
 
@@ -155,7 +155,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

@@ -130,7 +130,7 @@ fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
         case 3:  _fmpz_mat_det_cofactor_3x3(det, A->rows); break;
         case 4:  _fmpz_mat_det_cofactor_4x4(det, A->rows); break;
         default:
-            printf("Exception (fmpz_mat_det_cofactor). dim > 4 not implemented.");
+            flint_printf("Exception (fmpz_mat_det_cofactor). dim > 4 not implemented.");
             abort();
     }
 }

@@ -144,7 +144,7 @@ void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 static __inline__
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
-    while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
+    while (poly->length && (poly->coeffs[poly->length - 1] == WORD(0)))
         poly->length--;
 }
 
@@ -298,16 +298,16 @@ int nmod_poly_print(const nmod_poly_t a)
     int r;
     slong i;
 
-    r = printf("%ld %lu", a->length, a->mod.n);
+    r = flint_printf("%wd %wu", a->length, a->mod.n);
 
     if (a->length == 0)
         return r;
     else
         if (r > 0)
-            r = printf(" ");
+            r = flint_printf(" ");
 
     for (i = 0; (r > 0) && (i < a->length); i++)
-        r = printf(" %lu", a->coeffs[i]);
+        r = flint_printf(" %wu", a->coeffs[i]);
 
     return r;
 }

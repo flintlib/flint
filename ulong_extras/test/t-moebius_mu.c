@@ -33,8 +33,8 @@ void check(mp_limb_t n, int mu1, int mu2)
 {
     if (mu1 != mu2)
     {
-        printf("FAIL:\n");
-        printf("mu(%lu): %d != %d\n", n, mu1, mu2); 
+        flint_printf("FAIL:\n");
+        flint_printf("mu(%wu): %d != %d\n", n, mu1, mu2); 
         abort();
     }
 }
@@ -44,7 +44,7 @@ int main(void)
     int n, k, s;
     int * mu;
 
-    printf("moebius_mu....");
+    flint_printf("moebius_mu....");
     fflush(stdout);
 
     check(0, n_moebius_mu(0), 0);
@@ -83,11 +83,11 @@ int main(void)
 
     if (s != -23)
     {
-        printf("FAIL:\n");
-        printf("expected mu(k), k <= 10000 to sum to %d (got %d)\n", -23, s);
+        flint_printf("FAIL:\n");
+        flint_printf("expected mu(k), k <= 10000 to sum to %d (got %d)\n", -23, s);
         abort();
     }
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

@@ -49,7 +49,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
    if (prod > limit) return cofactor;
    if (is_prime2(cofactor, proved)) 
    {
-      n_factor_insert(factors, cofactor, 1UL);
+      n_factor_insert(factors, cofactor, UWORD(1));
       return 1;
    }
 
@@ -86,7 +86,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
                factors_left++;
 				} else
 				{
-               printf("Error (n_factor_partial). Failed to factor %ld.\n", n);
+               flint_printf("Error (n_factor_partial). Failed to factor %wd.\n", n);
                abort();
 				}
          } else

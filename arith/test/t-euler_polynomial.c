@@ -42,7 +42,7 @@ int main()
 
     slong k, n;
 
-    printf("euler_polynomial....");
+    flint_printf("euler_polynomial....");
     fflush(stdout);
 
     for (n = 0; n <= 100; n++)
@@ -68,16 +68,16 @@ int main()
         mpz_clear(t);
 
         fmpq_poly_zero(P);
-        fmpq_poly_set_coeff_ui(P, n, 1UL);
+        fmpq_poly_set_coeff_ui(P, n, UWORD(1));
 
         if (!fmpq_poly_equal(P, Q))
         {
-            printf("ERROR: sum up to n = %ld did not add to x^n\n", n);
-            printf("Sum: ");
+            flint_printf("ERROR: sum up to n = %wd did not add to x^n\n", n);
+            flint_printf("Sum: ");
             fmpq_poly_print_pretty(Q, "x");
-            printf("\nExpected: ");
+            flint_printf("\nExpected: ");
             fmpq_poly_print_pretty(P, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -86,6 +86,6 @@ int main()
     }
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

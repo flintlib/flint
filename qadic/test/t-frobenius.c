@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("frobenius... ");
+    flint_printf("frobenius... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -70,11 +70,11 @@ main(void)
         result = (qadic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (alias):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (alias):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -126,13 +126,13 @@ main(void)
         result = (qadic_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL (sigma^e(x) = x^{p^e} mod p):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (sigma^e(x) = x^{p^e} mod p):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("lhs = "), qadic_print_pretty(lhs, ctx), flint_printf("\n");
+            flint_printf("rhs = "), qadic_print_pretty(rhs, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -182,15 +182,15 @@ main(void)
         result = (qadic_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL (sigma(a+b) = sigma(a) + sigma(b)):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("s = "), qadic_print_pretty(s, ctx), printf("\n");
-            printf("s1 = "), qadic_print_pretty(s1, ctx), printf("\n");
-            printf("s2 = "), qadic_print_pretty(s2, ctx), printf("\n");
-            printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (sigma(a+b) = sigma(a) + sigma(b)):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("s = "), qadic_print_pretty(s, ctx), flint_printf("\n");
+            flint_printf("s1 = "), qadic_print_pretty(s1, ctx), flint_printf("\n");
+            flint_printf("s2 = "), qadic_print_pretty(s2, ctx), flint_printf("\n");
+            flint_printf("lhs = "), qadic_print_pretty(lhs, ctx), flint_printf("\n");
+            flint_printf("rhs = "), qadic_print_pretty(rhs, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -242,15 +242,15 @@ main(void)
         result = (qadic_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL (sigma(a*b) = sigma(a) * sigma(b)):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("s = "), qadic_print_pretty(s, ctx), printf("\n");
-            printf("s1 = "), qadic_print_pretty(s1, ctx), printf("\n");
-            printf("s2 = "), qadic_print_pretty(s2, ctx), printf("\n");
-            printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL (sigma(a*b) = sigma(a) * sigma(b)):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("s = "), qadic_print_pretty(s, ctx), flint_printf("\n");
+            flint_printf("s1 = "), qadic_print_pretty(s1, ctx), flint_printf("\n");
+            flint_printf("s2 = "), qadic_print_pretty(s2, ctx), flint_printf("\n");
+            flint_printf("lhs = "), qadic_print_pretty(lhs, ctx), flint_printf("\n");
+            flint_printf("rhs = "), qadic_print_pretty(rhs, ctx), flint_printf("\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -268,7 +268,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

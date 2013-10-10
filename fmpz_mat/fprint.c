@@ -26,7 +26,7 @@
 #include "fmpz_mat.h"
 
 /*
-    The macros xxx_putc, xxx_printf, and xxx_fmpz_print are provided 
+    The macros xxx_putc, xxx_flint_printf, and xxx_fmpz_print are provided 
     as wrappers to handle return values and error conditions.  While 
     this is not exactly pretty, it improves the readability of the 
     functions fmpz_mat_fprint and fmpz_mat_fprint_pretty.  Moreover, 
@@ -43,9 +43,9 @@ do {                       \
         return z;          \
 } while (0)
 
-#define xxx_printf()                       \
+#define xxx_flint_printf()                       \
 do {                                       \
-    z = fprintf(file, "%li %li  ", r, c);  \
+    z = flint_fprintf(file, "%li %li  ", r, c);  \
     if (z <= 0)                            \
         return z;                          \
 } while (0)
@@ -64,7 +64,7 @@ int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
     slong r = mat->r;
     slong c = mat->c;
 
-    xxx_printf();
+    xxx_flint_printf();
     for (i = 0; (i < r); i++)
     {
         for (j = 0; j < c; j++)
@@ -106,6 +106,6 @@ int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 }
 
 #undef xxx_putc
-#undef xxx_printf
+#undef xxx_flint_printf
 #undef xxx_fmpz_print
 

@@ -36,7 +36,7 @@ main(void)
     flint_rand_t state;
     slong i;
 
-    printf("inv....");
+    flint_printf("inv....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -76,9 +76,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL (aliasing)!\n");
-            nmod_poly_mat_print(A, "x"); printf("\n");
-            nmod_poly_mat_print(Ainv, "x"); printf("\n");
+            flint_printf("FAIL (aliasing)!\n");
+            nmod_poly_mat_print(A, "x"); flint_printf("\n");
+            nmod_poly_mat_print(Ainv, "x"); flint_printf("\n");
             abort();
         }
 
@@ -118,7 +118,7 @@ main(void)
         {
             if (nonsingular == 0 || !nmod_poly_is_one(den))
             {
-                printf("FAIL: expected empty matrix to pass\n");
+                flint_printf("FAIL: expected empty matrix to pass\n");
                 abort();
             }
         }
@@ -127,7 +127,7 @@ main(void)
             if (!nmod_poly_equal(den, det))
             {
                 nmod_poly_neg(det, det);
-                printf("FAIL: den != det(A)\n");
+                flint_printf("FAIL: den != det(A)\n");
                 abort();
             }
 
@@ -137,14 +137,14 @@ main(void)
 
             if (!nmod_poly_mat_equal(B, Iden))
             {
-                printf("FAIL:\n");
-                printf("A:\n");
+                flint_printf("FAIL:\n");
+                flint_printf("A:\n");
                 nmod_poly_mat_print(A, "x");
-                printf("Ainv:\n");
+                flint_printf("Ainv:\n");
                 nmod_poly_mat_print(Ainv, "x");
-                printf("B:\n");
+                flint_printf("B:\n");
                 nmod_poly_mat_print(B, "x");
-                printf("den:\n");
+                flint_printf("den:\n");
                 nmod_poly_print(den);
                 abort();
             }
@@ -160,6 +160,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

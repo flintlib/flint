@@ -309,7 +309,7 @@ int fmpz_print(fmpz_t x)
     returns a non-positive number.
 
     This convention is adopted in light of the return values of 
-    \code{printf} from the standard library and \code{mpz_out_str} 
+    \code{flint_printf} from the standard library and \code{mpz_out_str} 
     from MPIR.
 
 int fmpz_fprint(FILE * file, fmpz_t x)
@@ -323,7 +323,7 @@ int fmpz_fprint(FILE * file, fmpz_t x)
     returns a non-positive number.
 
     This convention is adopted in light of the return values of 
-    \code{printf} from the standard library and \code{mpz_out_str} 
+    \code{flint_printf} from the standard library and \code{mpz_out_str} 
     from MPIR.
 
 *******************************************************************************

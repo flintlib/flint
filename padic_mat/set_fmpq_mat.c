@@ -34,7 +34,7 @@ void padic_mat_set_fmpq_mat(padic_mat_t B,
     {
         const slong N = padic_mat_prec(B);
 
-        slong i, j, m = LONG_MAX, v, w;
+        slong i, j, m = WORD_MAX, v, w;
         fmpz_t f, g, s, t;
 
         fmpz_init(f);

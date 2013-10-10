@@ -80,7 +80,7 @@ fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits,
         if (!COEFF_IS_MPZ(c))
         {
             /* compute d = -b - borrow */
-            mp_limb_t d = (c < 0L ? c - borrow : -c - borrow);
+            mp_limb_t d = (c < WORD(0) ? c - borrow : -c - borrow);
 
             /* store d << shift and add save back into place */
             arr[0] = (d << shift) + save;
@@ -145,7 +145,7 @@ fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits,
         if (!COEFF_IS_MPZ(c))
         {
             /* compute d = b - borrow */
-            mp_limb_t d = (c < 0L ? -c - borrow : c - borrow);
+            mp_limb_t d = (c < WORD(0) ? -c - borrow : c - borrow);
 
             /* store d<<shift and add save back into place */
             arr[0] = (d << shift) + save;

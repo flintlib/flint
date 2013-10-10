@@ -252,7 +252,7 @@ int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
     do                                                                      \
     {                                                                       \
         mp_limb_t s0, s1, s2, t0, t1;                                       \
-        s0 = s1 = s2 = 0UL;                                                 \
+        s0 = s1 = s2 = UWORD(0);                                                 \
         switch (nlimbs)                                                     \
         {                                                                   \
             case 1:                                                         \
@@ -263,7 +263,7 @@ int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
                 NMOD_RED(s0, s0, mod);                                      \
                 break;                                                      \
             case 2:                                                         \
-                if (mod.n <= (1UL << (FLINT_BITS / 2)))                     \
+                if (mod.n <= (UWORD(1) << (FLINT_BITS / 2)))                     \
                 {                                                           \
                     for (i = 0; i < len; i++)                               \
                     {                                                       \

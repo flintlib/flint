@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("powmod_ui_binexp_preinv....");
+    flint_printf("powmod_ui_binexp_preinv....");
     fflush(stdout);
 
     /* Aliasing of res and a */
@@ -73,11 +73,11 @@ main(void)
         result = (nmod_poly_equal(res1, a));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("exp: %lu\n\n", exp);
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
@@ -118,11 +118,11 @@ main(void)
         result = (nmod_poly_equal(res1, f));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("exp: %lu\n\n", exp);
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
@@ -163,12 +163,12 @@ main(void)
         result = (nmod_poly_equal(res1, finv));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("exp: %lu\n\n", exp);
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("finv:\n"); nmod_poly_print(finv), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("finv:\n"); nmod_poly_print(finv), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
@@ -215,12 +215,12 @@ main(void)
         result = (nmod_poly_equal(res1, res2));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("exp: %lu\n\n", exp);
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
-            printf("res2:\n"); nmod_poly_print(res2), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n\n", exp);
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
+            flint_printf("res2:\n"); nmod_poly_print(res2), flint_printf("\n\n");
             abort();
         }
 
@@ -234,6 +234,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

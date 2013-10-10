@@ -39,10 +39,10 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     fmpz_t d;
     fmpz_init(d);
     fmpz_one(d);
-    if (*den1 != 1L && *den2 != 1L)
+    if (*den1 != WORD(1) && *den2 != WORD(1))
         fmpz_gcd(d, den1, den2);
     
-    if (*d == 1L)
+    if (*d == WORD(1))
     {
         _fmpz_vec_scalar_mul_fmpz(rpoly, poly1, len1, den2);
         _fmpz_vec_scalar_addmul_fmpz(rpoly, poly2, min, den1);
@@ -71,10 +71,10 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
             fmpz_t e;
             fmpz_init(e);
             _fmpz_vec_content(e, rpoly, max);
-            if (*e != 1L)
+            if (*e != WORD(1))
                 fmpz_gcd(e, e, d);
             
-            if (*e == 1L)
+            if (*e == WORD(1))
                 fmpz_mul(rden, den1, den22);
             else
             {
@@ -103,7 +103,7 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         fmpq_poly_fit_length(res, len1);
         _fmpq_poly_set_length(res, len1);
         
-        if (*rem == 0UL)
+        if (*rem == UWORD(0))
         {
             _fmpz_vec_set(res->coeffs, poly1->coeffs, len1);
             fmpz_fdiv_q_2exp(res->den, poly1->den, 1);

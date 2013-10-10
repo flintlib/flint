@@ -36,7 +36,7 @@ fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
     if (!COEFF_IS_MPZ(c))       /* coeff is small */
     {
         mp_limb_t sum[2];
-        if (c < 0L)             /* g negative, x positive, so difference is negative */
+        if (c < WORD(0))             /* g negative, x positive, so difference is negative */
         {
             add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
             fmpz_neg_uiui(f, sum[1], sum[0]);

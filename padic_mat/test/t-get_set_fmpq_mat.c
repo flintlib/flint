@@ -43,7 +43,7 @@ main(void)
     padic_ctx_t ctx;
     slong m, n;
 
-    printf("get/ set_fmpq_mat... ");
+    flint_printf("get/ set_fmpq_mat... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -74,10 +74,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("c = "), padic_mat_print(c, ctx), printf("\n");
-            printf("b = "), fmpq_mat_print(b), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_mat_print(c, ctx), flint_printf("\n");
+            flint_printf("b = "), fmpq_mat_print(b), flint_printf("\n");
             abort();
         }
 
@@ -91,7 +91,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

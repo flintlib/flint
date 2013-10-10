@@ -39,8 +39,8 @@ static __inline__ int gettimeofday(struct timeval * p, void * tz)
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
-    p->tv_usec=(slong)((now.ns100 / 10LL) % 1000000LL );
-    p->tv_sec= (slong)((now.ns100-(116444736000000000LL))/10000000LL);
+    p->tv_usec=(slong)((now.ns100 / WORD(10)L) % WORD(1000000)L );
+    p->tv_sec= (slong)((now.ns100-(WORD(116444736000000000)L))/WORD(10000000)L);
 	
     return 0;
 }
@@ -188,7 +188,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 ******************************************************************************/
 
 #define TIMEIT_PRINT(__timer, __reps) \
-    printf("cpu/wall(s): %g %g\n", \
+    flint_printf("cpu/wall(s): %g %g\n", \
         __timer->cpu*0.001/__reps, __timer->wall*0.001 / __reps);
 
 #define TIMEIT_REPEAT(__timer, __reps) \
@@ -238,7 +238,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
     do { \
         meminfo_t meminfo; \
         get_memory_usage(meminfo); \
-        printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
+        flint_printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
             meminfo->size / 1024.0, meminfo->peak / 1024.0, \
             meminfo->rss / 1024.0, meminfo->hwm / 1024.0); \
     } while (0);

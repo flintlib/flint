@@ -43,7 +43,7 @@ main(void)
     fmpz_t p;
     slong N;
 
-    printf("zero....");
+    flint_printf("zero....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,8 +64,8 @@ main(void)
         result = (padic_poly_is_zero(a));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -77,7 +77,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

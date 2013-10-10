@@ -177,7 +177,7 @@ else
 fi
 LIB_DIRS="${LIB_DIRS} ${GMP_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${GMP_INC_DIR}"
-LIBS="gmp ${LIBS}"
+LIBS="${LIBS} gmp"
 
 if [ -d "${MPFR_DIR}/lib" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib"
@@ -197,7 +197,7 @@ else
 fi
 LIB_DIRS="${LIB_DIRS} ${MPFR_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${MPFR_INC_DIR}"
-LIBS="mpfr ${LIBS}"
+LIBS="${LIBS} mpfr"
 
 #configure extra libraries
 
@@ -214,7 +214,7 @@ if [ "$WANT_NTL" = "1" ]; then
    fi
    EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${NTL_INC_DIR}"
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${NTL_LIB_DIR}"
-   EXTRA_LIBS="ntl ${EXTRA_LIBS}"
+   EXTRA_LIBS="${EXTRA_LIBS} ntl"
 fi
 
 if [ "$WANT_BLAS" = "1" ]; then
@@ -227,7 +227,7 @@ if [ "$WANT_BLAS" = "1" ]; then
    fi
    EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${BLAS_INC_DIR}"
    EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${BLAS_LIB_DIR}"
-   EXTRA_LIBS="openblas ${EXTRA_LIBS}"
+   EXTRA_LIBS="${EXTRA_LIBS} openblas"
 fi
 CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
 
@@ -267,9 +267,11 @@ if [ -z "$BUILD" ]; then
    ARCH=`uname -m`
 
    if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
-      OS="MINGW32"
-   elif [ "$(uname | cut -d_ -f1)" = "MINGW64" ]; then
-      OS="MINGW64"
+      if [ "$ABI" = "32" ]; then
+         OS="MINGW32"
+      else
+         OS="MINGW64"
+      fi
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
       OS="CYGWIN"
    else
@@ -317,6 +319,9 @@ elif [ "$ABI" = "64" ]; then
    if [ "$MACHINE" = "sparc" ]; then
       MACHINE="sparc64"
    fi
+   if [ "$MACHINE" = "x86" ]; then
+      MACHINE="x86_64"
+   fi
 fi
 
 echo "Configuring...${MACHINE}-${OS}"
@@ -352,7 +357,7 @@ case "$OS" in
       if [ "$STATIC" = "1" ] && [ "$SHARED" = "1" ]; then
          echo "Building both static and shared versions of MPIR/GMP on $OS is currently"
          echo "unsupported, and so is it for MPFR and FLINT."
-         echo "You should pass --disable--shared or --disable-static to configure"
+         echo "You should pass --disable-shared or --disable-static to configure"
          echo "depending on the versions of MPIR/GMP and MPFR you built."
          exit 1
       fi
@@ -376,7 +381,13 @@ mkdir -p build
 rm -f build/test-popcnt > /dev/null 2>&1
 MSG="Testing __builtin_popcountl..."
 ([ -x /bin/echo ] && /bin/echo -n "$MSG") || echo "$MSG"
-echo "int main(int argc, char ** argv) {return __builtin_popcountl(argc) == 100;}" > build/test-popcnt.c
+echo "int main(int argc, char ** argv) { 
+#if defined(_WIN64)
+return __builtin_popcountll(argc) == 100;
+#else
+return __builtin_popcountl(argc) == 100;
+#endif 
+}" > build/test-popcnt.c
 $CC build/test-popcnt.c -o ./build/test-popcnt > /dev/null 2>&1
 if [ $? -eq 0 ]; then
    echo "yes"
@@ -408,7 +419,11 @@ fi
 #defaults for CFLAGS
 
 if [ -z "$CFLAGS" ]; then
-   CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   if [ "$OS" = "MINGW64" ]; then
+      CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   else
+      CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   fi
 fi
 
 #Conway polynomials database

@@ -47,13 +47,13 @@ void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
     else  /* n > 1 */
     {
         slong i = n - 1;
-        fmpz_t t = {1L};
+        fmpz_t t = {WORD(1)};
 
         fmpz_set(pow + i, p);
 
         for (i--; i >= 1; i--)
         {
-            if (a[i] & 1L)
+            if (a[i] & WORD(1))
             {
                 fmpz_mul(pow + i, t, pow + (i + 1));
                 fmpz_mul(t, t, t);
@@ -65,7 +65,7 @@ void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
             }
         }
         {
-            if (a[i] & 1L)
+            if (a[i] & WORD(1))
                 fmpz_mul(pow + i, t, pow + (i + 1));
             else
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));

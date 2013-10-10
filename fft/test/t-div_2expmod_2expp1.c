@@ -53,7 +53,7 @@ main(void)
 
     flint_rand_t state;
 
-    printf("div_2expmod_2expp1....");
+    flint_printf("div_2expmod_2expp1....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -94,8 +94,8 @@ main(void)
                     
                     if (mpz_cmp(m1, m2) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("mpn_div_2expmod_2expp1 error\n");
+                        flint_printf("FAIL:\n");
+                        flint_printf("mpn_div_2expmod_2expp1 error\n");
                         gmp_printf("want %Zx\n\n", m1);
                         gmp_printf("got  %Zx\n", m2);
                         abort();
@@ -116,6 +116,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

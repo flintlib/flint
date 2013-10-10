@@ -491,7 +491,7 @@ void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e,
                   const fmpz *a, const slong *j, slong lena, 
                   const fmpz_t p, slong N)
 
-    Sets \code{(rop, 2*d-1)}$ to $\Sigma$ evaluated at \code{(op, len)}.
+    Sets \code{(rop, 2*d-1)} to $\Sigma$ evaluated at \code{(op, len)}.
 
     Assumes that \code{len} is positive but at most~$d$.
 

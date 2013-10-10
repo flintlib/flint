@@ -34,23 +34,23 @@ int main(void)
 {
     slong k;
 
-    printf("pi_chudnovsky....");
+    flint_printf("pi_chudnovsky....");
     fflush(stdout);
 
     for (k = 2; k < 20; k++)
     {
         mpfr_t x, y;
 
-        mpfr_init2(x, 1L << k);
-        mpfr_init2(y, 1L << k);
+        mpfr_init2(x, WORD(1) << k);
+        mpfr_init2(y, WORD(1) << k);
 
         mpfr_const_pi(x, MPFR_RNDN);
         mpfr_pi_chudnovsky(y, MPFR_RNDN);
 
         if (!mpfr_equal_p(x, y))
         {
-            printf("FAIL:\n");
-            printf("Wrong value at prec = %ld\n", 1L << k);
+            flint_printf("FAIL:\n");
+            flint_printf("Wrong value at prec = %wd\n", WORD(1) << k);
             abort();
         }
 
@@ -59,6 +59,6 @@ int main(void)
     }
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

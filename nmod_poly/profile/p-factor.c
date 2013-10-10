@@ -58,17 +58,17 @@ int main(void)
 
     flint_randinit(state);
 
-    printf("Random polynomials\n");
+    flint_printf("Random polynomials\n");
     for (i = 0; i < NP; i++)
     {
         modulus = n_randtest_prime(state, 0);
-        printf("========== p: %lu\n", modulus);
+        flint_printf("========== p: %wu\n", modulus);
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = degs[j];
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -103,7 +103,7 @@ int main(void)
                 nmod_poly_clear(f);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -115,17 +115,17 @@ int main(void)
     /* This code checks whether nmod_poly_factor
        made a correct choice between CZ, B and KS */
 
-    printf("Check choice correctness\n");
+    flint_printf("Check choice correctness\n");
     for (i = 0; i < NP; i++)
     {
         modulus = n_randtest_prime(state, 0);
-        printf("========== p: %lu\n", modulus);
+        flint_printf("========== p: %wu\n", modulus);
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = degs[j];
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -168,7 +168,7 @@ int main(void)
                 nmod_poly_clear(f);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf F: %.2lf\n", T1, T2, T3, T4);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf F: %.2lf\n", T1, T2, T3, T4);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -177,17 +177,17 @@ int main(void)
         }
     }
 
-    printf("Irreducible polynomials\n");
+    flint_printf("Irreducible polynomials\n");
     for (i = 0; i < NP; i++)
     {
         modulus = n_randtest_prime(state, 0);
-        printf("========== p: %lu\n", modulus);
+        flint_printf("========== p: %wu\n", modulus);
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = degs[j];
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -222,7 +222,7 @@ int main(void)
                 nmod_poly_clear(f);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -230,17 +230,17 @@ int main(void)
         }
     }
 
-    printf("Product of two irreducible polynomials\n");
+    flint_printf("Product of two irreducible polynomials\n");
     for (i = 0; i < NP; i++)
     {
         modulus = n_randtest_prime(state, 0);
-        printf("========== p: %lu\n", modulus);
+        flint_printf("========== p: %wu\n", modulus);
         fflush(stdout);
 
         for (j = 0; j < ND; j++)
         {
             n = (degs[j] >> 1);
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -279,7 +279,7 @@ int main(void)
                 nmod_poly_clear(g);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)
@@ -287,17 +287,17 @@ int main(void)
         }
     }
 
-    printf("Product of 8 small irreducible polynomials\n");
+    flint_printf("Product of 8 small irreducible polynomials\n");
     for (i = 0; i < NP; i++)
     {
         modulus = n_randtest_prime(state, 0);
-        printf("========== p: %lu\n", modulus);
+        flint_printf("========== p: %wu\n", modulus);
         fflush(stdout);
 
         for (j = 1; j < ND; j++)
         {
             n = (degs[j] >> 3);
-            printf(">>>>>n: %d\n", n);
+            flint_printf(">>>>>n: %d\n", n);
             fflush(stdout);
 
             T1 = 0;
@@ -339,7 +339,7 @@ int main(void)
                 nmod_poly_clear(g);
             }
 
-            printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
+            flint_printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
 
             if (T1 > T3 + 1)

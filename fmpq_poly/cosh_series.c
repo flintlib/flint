@@ -43,7 +43,7 @@ _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden,
     _fmpq_poly_exp_series(g, gden, h, hden, n);
     _fmpq_poly_inv_series(t, tden, g, gden, n);
     _fmpq_poly_add(g, gden, g, gden, n, t, tden, n);
-    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, 2UL);
+    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, UWORD(2));
     _fmpq_poly_canonicalise(g, gden, n);
 
     _fmpz_vec_clear(t, n);
@@ -57,20 +57,20 @@ void fmpq_poly_cosh_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (poly->length == 0)
     {
-        fmpq_poly_set_ui(res, 1UL);
+        fmpq_poly_set_ui(res, UWORD(1));
         return;
     }
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        printf("Exception (fmpq_poly_cosh_series): Constant term != 0.\n");
+        flint_printf("Exception (fmpq_poly_cosh_series): Constant term != 0.\n");
         abort();
     }
 
     if (n < 2)
     {
         if (n == 0) fmpq_poly_zero(res);
-        if (n == 1) fmpq_poly_set_ui(res, 1UL);
+        if (n == 1) fmpq_poly_set_ui(res, UWORD(1));
         return;
     }
 

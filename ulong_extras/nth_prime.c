@@ -34,7 +34,7 @@ mp_limb_t n_nth_prime(ulong n)
 {
     if (n == 0)
     {
-        printf("Exception (n_nth_prime). n_nth_prime(0) is undefined.\n");
+        flint_printf("Exception (n_nth_prime). n_nth_prime(0) is undefined.\n");
         abort();
     }
 

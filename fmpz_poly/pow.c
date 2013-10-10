@@ -32,7 +32,7 @@
 void
 _fmpz_poly_pow(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
-    if (e < 5UL)
+    if (e < UWORD(5))
         _fmpz_poly_pow_small(res, poly, len, e);
     else if (len == 2)
         _fmpz_poly_pow_binomial(res, poly, e);
@@ -40,7 +40,7 @@ _fmpz_poly_pow(fmpz * res, const fmpz * poly, slong len, ulong e)
     {
         ulong limbs = (ulong) _fmpz_vec_max_limbs(poly, len);
         
-        if (limbs < ((3UL * e) / 2UL + 150UL) / (ulong) len)
+        if (limbs < ((UWORD(3) * e) / UWORD(2) + UWORD(150)) / (ulong) len)
             _fmpz_poly_pow_multinomial(res, poly, len, e);
         else
             _fmpz_poly_pow_binexp(res, poly, len, e);
@@ -53,9 +53,9 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     const slong len = poly->length;
     slong rlen;
 
-    if ((len < 2) | (e < 3UL))
+    if ((len < 2) | (e < UWORD(3)))
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
             fmpz_poly_set_ui(res, 1);
         else if (len == 0)
             fmpz_poly_zero(res);
@@ -65,9 +65,9 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_pow_ui(res->coeffs, poly->coeffs, e);
             _fmpz_poly_set_length(res, 1);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
             fmpz_poly_set(res, poly);
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             fmpz_poly_sqr(res, poly);
         return;
     }

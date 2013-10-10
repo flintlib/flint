@@ -45,7 +45,7 @@ fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 
         fmpz_sqrtrem(s, t, s);
         if (!fmpz_is_zero(t))
-            fmpz_add_ui(s, s, 1UL);
+            fmpz_add_ui(s, s, UWORD(1));
 
         fmpz_mul(p, p, s);
     }

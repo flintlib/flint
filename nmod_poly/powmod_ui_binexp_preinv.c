@@ -62,7 +62,7 @@ _nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
         _nmod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f,
                                           lenf, finv, lenfinv, mod);
 
-        if (e & (1UL << i))
+        if (e & (UWORD(1) << i))
         {
             _nmod_poly_mul(T, res, lenf - 1, poly, lenf - 1, mod);
             _nmod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f,
@@ -87,7 +87,7 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res,
 
     if (lenf == 0)
     {
-        printf("Exception (nmod_poly_powmod). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_powmod). Divide by zero.\n");
         abort();
     }
 
@@ -105,13 +105,13 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res,
 
     if (e <= 2)
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
         {
             nmod_poly_fit_length(res, 1);
-            res->coeffs[0] = 1UL;
+            res->coeffs[0] = UWORD(1);
             res->length = 1;
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
         {
             nmod_poly_set(res, poly);
         }

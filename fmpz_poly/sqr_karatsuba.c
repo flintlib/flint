@@ -45,7 +45,7 @@ extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
 void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
                                    fmpz * temp, slong bits)
 {
-    slong len = (1L << bits);
+    slong len = (WORD(1) << bits);
     slong m = len / 2;
 
     if (len == 1)
@@ -80,9 +80,9 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, slong len)
         return;
     }
 
-    while ((1L << loglen) < len)
+    while ((WORD(1) << loglen) < len)
         loglen++;
-    length = (1L << loglen);
+    length = (WORD(1) << loglen);
 
     rev  = flint_calloc(3 * length, sizeof(fmpz *));
     out  = rev + length;

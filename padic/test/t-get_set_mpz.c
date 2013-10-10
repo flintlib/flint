@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("get_set_mpz... ");
+    flint_printf("get_set_mpz... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -70,9 +70,9 @@ main(void)
         result = (padic_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
             gmp_printf("c = %Zd\n", c);
             abort();
         }
@@ -87,7 +87,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

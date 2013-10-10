@@ -74,7 +74,7 @@ mp_limb_t n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
-    values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased
+    values $0$, $1$, \code{COEFF_MAX} and \code{WORD_MAX} is increased
     as is the probability of a value with sparse binary representation.  
     This random function is mainly used for testing purposes.
     This function is intended for use in test code. 
@@ -697,7 +697,7 @@ int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     $n - 1$ the algorithm can still proceed.
 
     One can also specify a number of iterations if less time 
-    should be taken. Simply set this to \code{~0L} if this is irrelevant.
+    should be taken. Simply set this to \code{~WORD(0)} if this is irrelevant.
     In most cases a greater number of iterations will not 
     significantly affect timings as most of the time is spent 
     factoring.
@@ -1006,7 +1006,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 
     Attempts to split $n$ using the given number of iterations
-    of SQUFOF. Simply set \code{iters} to \code{~0L} for maximum 
+    of SQUFOF. Simply set \code{iters} to \code{~WORD(0)} for maximum 
     persistence.
 
     The version of SQUFOF imlemented here is as described by Gower 

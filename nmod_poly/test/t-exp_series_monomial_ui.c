@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("exp_series_monomial_ui....");
+    flint_printf("exp_series_monomial_ui....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -69,12 +69,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %ld, mod = %lu\n", n, mod);
-            printf("power = %lu, coeff = %lu\n", power, coeff);
-            printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("exp(A): "); nmod_poly_print(expA), printf("\n\n");
-            printf("res: "); nmod_poly_print(res), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd, mod = %wu\n", n, mod);
+            flint_printf("power = %wu, coeff = %wu\n", power, coeff);
+            flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
+            flint_printf("exp(A): "); nmod_poly_print(expA), flint_printf("\n\n");
+            flint_printf("res: "); nmod_poly_print(res), flint_printf("\n\n");
             abort();
         }
 
@@ -85,6 +85,6 @@ main(void)
 
     flint_randclear(state);
 
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

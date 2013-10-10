@@ -38,7 +38,7 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, const fmpz_t input,
     slong n = comb->n;
     slong p;
 
-    if (n == 0L)
+    if (n == WORD(0))
     {
         if (fmpz_is_zero(input)) 
         {
@@ -98,7 +98,7 @@ void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     }
 
     /* First layer of reconstruction */
-    num = (1L << n);
+    num = (WORD(1) << n);
 
     for (i = 0, j = 0; i + 2 <= num_primes; i += 2, j++)
     {

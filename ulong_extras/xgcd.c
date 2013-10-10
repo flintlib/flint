@@ -30,10 +30,10 @@
 mp_limb_t
 n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
 {
-    mp_limb_signed_t u1 = 1UL;
-    mp_limb_signed_t u2 = 0UL;
-    mp_limb_signed_t v1 = 0UL;
-    mp_limb_signed_t v2 = 1UL;
+    mp_limb_signed_t u1 = UWORD(1);
+    mp_limb_signed_t u2 = UWORD(0);
+    mp_limb_signed_t v1 = UWORD(0);
+    mp_limb_signed_t v2 = UWORD(1);
     mp_limb_signed_t t1, t2;
     mp_limb_t u3, v3;
     mp_limb_t quot, rem;
@@ -53,7 +53,7 @@ n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
         v3 = rem;
     }
 
-    if ((mp_limb_signed_t) (x & y) < 0L)  /* x and y both have top bit set */
+    if ((mp_limb_signed_t) (x & y) < WORD(0))  /* x and y both have top bit set */
     {
         quot = u3 - v3;
         t2 = v2;
@@ -66,7 +66,7 @@ n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
         v3 = quot;
     }
 
-    while ((mp_limb_signed_t) (v3 << 1) < 0L)  /*second value has second msb set */
+    while ((mp_limb_signed_t) (v3 << 1) < WORD(0))  /*second value has second msb set */
     {
         quot = u3 - v3;
         if (quot < v3)
@@ -159,7 +159,7 @@ n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
     }
 
     /* Quite remarkably, this always has |u1| < x/2 at this point, thus comparison with 0 is valid */
-    if (u1 <= 0L)
+    if (u1 <= WORD(0))
     {
         u1 += y;
         v1 -= x;

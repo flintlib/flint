@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("jacobi....");
+    flint_printf("jacobi....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -74,7 +74,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("b = %Zd, q = %Zd\n", b, q);
             abort();
         }
@@ -88,6 +88,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

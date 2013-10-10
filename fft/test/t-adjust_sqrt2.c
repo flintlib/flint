@@ -67,7 +67,7 @@ main(void)
    
     flint_rand_t state;
 
-    printf("adjust_sqrt2....");
+    flint_printf("adjust_sqrt2....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -109,10 +109,10 @@ main(void)
                     
                     if (mpz_cmp(m2a, m2b) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("adjust_sqrt2 error a\n");
-                        printf("limbs = %ld\n", limbs);
-                        printf("n = %ld, w = %ld, c = %ld\n", n, w, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("adjust_sqrt2 error a\n");
+                        flint_printf("limbs = %wd\n", limbs);
+                        flint_printf("n = %wd, w = %wd, c = %wd\n", n, w, c);
                         gmp_printf("want %Zx\n\n", m2a);
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
@@ -133,7 +133,7 @@ main(void)
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
   */
     return 0;
 }

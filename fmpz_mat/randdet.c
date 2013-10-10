@@ -37,7 +37,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     n = mat->r;
     if (n != mat->c)
     {
-        printf("Exception (fmpz_mat_randdet). Non-square matrix.\n");
+        flint_printf("Exception (fmpz_mat_randdet). Non-square matrix.\n");
         abort();
     }
 
@@ -47,7 +47,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     /* Start with the zero matrix */
     fmpz_mat_zero(mat);
 
-    if (*det == 0L)
+    if (*det == WORD(0))
         return;
 
     fmpz_factor_init(factor);

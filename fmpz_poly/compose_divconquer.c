@@ -142,21 +142,21 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
     
     for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
-        if (poly1[j + 1] != 0L)
+        if (poly1[j + 1] != WORD(0))
         {
             _fmpz_vec_scalar_mul_fmpz(h[i], poly2, len2, poly1 + j + 1);
             fmpz_add(h[i], h[i], poly1 + j);
             hlen[i] = len2;
         }
-        else if (poly1[j] != 0L)
+        else if (poly1[j] != WORD(0))
         {
             fmpz_set(h[i], poly1 + j);
             hlen[i] = 1;
         }
     }
-    if ((len1 & 1L))
+    if ((len1 & WORD(1)))
     {
-        if (poly1[j] != 0L)
+        if (poly1[j] != WORD(0))
         {
             fmpz_set(h[i], poly1 + j);
             hlen[i] = 1;
@@ -187,7 +187,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
             _fmpz_poly_add(h[i], h[i], hlen[i], h[2*i], hlen[2*i]);
             hlen[i] = FLINT_MAX(hlen[i], hlen[2*i]);
         }
-        if ((n & 1L))
+        if ((n & WORD(1)))
         {
             _fmpz_vec_set(h[i], h[2*i], hlen[2*i]);
             hlen[i] = hlen[2*i];

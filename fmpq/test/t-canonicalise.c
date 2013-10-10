@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("canonicalise....");
+    flint_printf("canonicalise....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -50,24 +50,24 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: expected fmpq_randtest output to be canonical\n");
+            flint_printf("FAIL: expected fmpq_randtest output to be canonical\n");
             fmpq_print(x);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
         fmpz_init(mult);
         fmpz_randtest_not_zero(mult, state, 200);
-        fmpz_add_ui(mult, mult, 1UL);
+        fmpz_add_ui(mult, mult, UWORD(1));
 
         fmpz_mul(&x->num, &x->num, mult);
         fmpz_mul(&x->den, &x->den, mult);
 
         if (fmpq_is_canonical(x))
         {
-            printf("FAIL: expected fmpq_is_canonical to detect common factor\n");
+            flint_printf("FAIL: expected fmpq_is_canonical to detect common factor\n");
             fmpq_print(x);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -75,9 +75,9 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: result not canonical after calling fmpq_canonicalise\n");
+            flint_printf("FAIL: result not canonical after calling fmpq_canonicalise\n");
             fmpq_print(x);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -85,9 +85,9 @@ main(void)
 
         if (fmpq_is_canonical(x))
         {
-            printf("FAIL: negative denominator reported as being canonical\n");
+            flint_printf("FAIL: negative denominator reported as being canonical\n");
             fmpq_print(x);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -95,9 +95,9 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: result not canonical after calling fmpq_canonicalise\n");
+            flint_printf("FAIL: result not canonical after calling fmpq_canonicalise\n");
             fmpq_print(x);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -108,6 +108,6 @@ main(void)
     flint_randclear(state);
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

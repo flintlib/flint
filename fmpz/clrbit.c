@@ -31,7 +31,7 @@ void fmpz_clrbit(fmpz_t f, ulong i)
     {
         if (i < FLINT_BITS - 2)
         {
-            *f &= ~(1L << i);
+            *f &= ~(WORD(1) << i);
         }
         /* i >= FLINT_BITS  --> nop */
     }

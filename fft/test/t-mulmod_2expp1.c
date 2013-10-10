@@ -43,7 +43,7 @@ main(void)
 
     flint_rand_t state;
 
-    printf("mulmod_2expp1....");
+    flint_printf("mulmod_2expp1....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -55,7 +55,7 @@ main(void)
         {
             for (w = 1; w <= 2; w++)
             {
-                mp_size_t n = (1UL<<depth);
+                mp_size_t n = (UWORD(1)<<depth);
                 mp_bitcnt_t bits = n*w;
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
@@ -80,14 +80,14 @@ main(void)
                 {
                     if (r1[j] != r2[j]) 
                     {
-                        printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                        flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                         abort();
                     }
                 }
 
                 if (c != r2[int_limbs])
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, c, r2[j]);
+                    flint_printf("error in limb %wd, %wx != %wx\n", j, c, r2[j]);
                     abort();
                 }
 
@@ -103,7 +103,7 @@ main(void)
         {
             for (w = 1; w <= 2; w++)
             {
-                mp_size_t n = (1UL<<depth);
+                mp_size_t n = (UWORD(1)<<depth);
                 mp_bitcnt_t bits = n*w;
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
@@ -125,14 +125,14 @@ main(void)
                 {
                     if (r1[j] != r2[j]) 
                     {
-                        printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                        flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                         abort();
                     }
                 }
 
                 if (c != r2[int_limbs])
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, c, r2[j]);
+                    flint_printf("error in limb %wd, %wx != %wx\n", j, c, r2[j]);
                     abort();
                 }
 
@@ -143,6 +143,6 @@ main(void)
     
     flint_randclear(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

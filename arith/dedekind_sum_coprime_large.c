@@ -32,7 +32,7 @@ arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
     int sign;
 
-    if (fmpz_cmp_ui(k, 2UL) <= 0)
+    if (fmpz_cmp_ui(k, UWORD(2)) <= 0)
     {
         fmpq_zero(s);
         return;
@@ -48,7 +48,7 @@ arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
     fmpz_init(a);
     fmpz_init(t);
 
-    fmpz_set_ui(p, 1UL);
+    fmpz_set_ui(p, UWORD(1));
     fmpz_set(hh, h);
     fmpz_set(kk, k);
 
@@ -73,7 +73,7 @@ arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
     }
 
     if (sign < 0)
-        fmpz_sub_ui(sigma, sigma, 3UL);
+        fmpz_sub_ui(sigma, sigma, UWORD(3));
 
     /* s = (sigma + (h - p*s) / p) / 12 */
     if (sign < 0)
@@ -82,7 +82,7 @@ arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
         fmpz_sub(fmpq_numref(s), h, pp);
 
     fmpz_addmul(fmpq_numref(s), sigma, p);
-    fmpz_mul_ui(fmpq_denref(s), p, 12UL);
+    fmpz_mul_ui(fmpq_denref(s), p, UWORD(12));
 
     _fmpq_canonicalise(fmpq_numref(s), fmpq_denref(s));
 

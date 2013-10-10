@@ -51,7 +51,7 @@ nmod_mat_rref(nmod_mat_t A)
     /* Clear L */
     for (i = 0; i < A->r; i++)
         for (j = 0; j < FLINT_MIN(i, rank); j++)
-            nmod_mat_entry(A, i, j) = 0UL;
+            nmod_mat_entry(A, i, j) = UWORD(0);
 
     /* We now reorder U to proper upper triangular form U | V
        with U full-rank triangular, set V = U^(-1) V, and then
@@ -68,7 +68,7 @@ nmod_mat_rref(nmod_mat_t A)
 
     for (i = j = k = 0; i < rank; i++)
     {
-        while (nmod_mat_entry(A, i, j) == 0UL)
+        while (nmod_mat_entry(A, i, j) == UWORD(0))
         {
             nonpivots[k] = j;
             k++;

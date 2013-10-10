@@ -40,7 +40,7 @@ int main()
     fmpz_t s, t;
     slong k, n;
 
-    printf("euler_number_vec....");
+    flint_printf("euler_number_vec....");
     fflush(stdout);
 
     for (n = 2; n <= 3000; n += (n<100) ? 2 : n/3)
@@ -53,7 +53,7 @@ int main()
         arith_euler_number_vec(r, n + 1);
 
         /* sum binomial(n,k) E_k = 0 */
-        fmpz_set_ui(t, 1UL);
+        fmpz_set_ui(t, UWORD(1));
         for (k = 0; k <= n; k++)
         {
             fmpz_addmul(s, r + k, t);
@@ -63,7 +63,7 @@ int main()
 
         if (!fmpz_is_zero(s))
         {
-            printf("ERROR: sum over 0,...,n = %ld\n", n);
+            flint_printf("ERROR: sum over 0,...,n = %wd\n", n);
             _fmpz_vec_print(r, n + 1);
             abort();
         }
@@ -74,6 +74,6 @@ int main()
     }
 
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

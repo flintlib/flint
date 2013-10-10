@@ -73,7 +73,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 
     /* Bound x = det(A) / d */
     fmpz_mat_det_bound(bound, A);
-    fmpz_mul_ui(bound, bound, 2UL);  /* accomodate sign */
+    fmpz_mul_ui(bound, bound, UWORD(2));  /* accomodate sign */
     fmpz_cdiv_q(bound, bound, d);
 
     nmod_mat_init(Amod, n, n, 2);
@@ -81,9 +81,9 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     fmpz_one(prod);
 
 #if DEBUG_USE_SMALL_PRIMES
-    p = 1UL;
+    p = UWORD(1);
 #else
-    p = 1UL << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
 #endif
 
     /* Compute x = det(A) / d */

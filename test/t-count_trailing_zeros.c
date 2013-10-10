@@ -35,7 +35,7 @@ int main(void)
    flint_rand_t state;
    flint_randinit(state);
 
-   printf("count_trailing_zeros....");
+   flint_printf("count_trailing_zeros....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -47,17 +47,17 @@ int main(void)
 
       count_trailing_zeros(count, n);
 
-      result = ((n == 0UL) || (((n >> count) & 1UL) && (l_shift(n, FLINT_BITS-count) == 0UL)));
+      result = ((n == UWORD(0)) || (((n >> count) & UWORD(1)) && (l_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n = %lu, count = %u\n", n, count); 
+         flint_printf("FAIL:\n");
+         flint_printf("n = %wu, count = %u\n", n, count); 
          abort();
       }
    }
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 }

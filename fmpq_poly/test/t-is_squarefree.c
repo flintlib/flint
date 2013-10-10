@@ -38,7 +38,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("is_squarefree....");
+    flint_printf("is_squarefree....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -54,8 +54,8 @@ main(void)
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n");
             abort();
         }
 
@@ -83,8 +83,8 @@ main(void)
         result = (!fmpq_poly_is_squarefree(f));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n");
             abort();
         }
 
@@ -99,8 +99,8 @@ main(void)
         fmpz_t N;
 
         fmpq_poly_init(a);
-        fmpq_poly_set_coeff_si(a, 0, 1L);
-        fmpq_poly_set_coeff_si(a, n_randint(state, 20), 1L);
+        fmpq_poly_set_coeff_si(a, 0, WORD(1));
+        fmpq_poly_set_coeff_si(a, n_randint(state, 20), WORD(1));
         if (a->length < 2)
         {
             fmpq_poly_clear(a);
@@ -109,7 +109,7 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_randtest(f, state, a->length - 2, 40);
 
-        fmpz_init_set_ui(N, 1UL);
+        fmpz_init_set_ui(N, UWORD(1));
         fmpz_mul_2exp(N, N, 45 + a->length);
 
         fmpq_poly_scalar_mul_fmpz(a, a, N);
@@ -118,8 +118,8 @@ main(void)
         result = fmpq_poly_is_squarefree(f);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n");
             abort();
         }
 
@@ -130,6 +130,6 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

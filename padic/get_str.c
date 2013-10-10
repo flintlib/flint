@@ -89,7 +89,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
             str = flint_malloc(b);
             if (!str)
             {
-                printf("Exception (padic_get_str).  Memory allocation failed.\n");
+                flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
                 abort();
             }
         }
@@ -118,7 +118,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
                     fmpz_get_str(s, 10, p);
                     while (*++s != '\0') ;
                     *s++ = '^';
-                    sprintf(s, "%ld", j + v);
+                    flint_sprintf(s, "%wd", j + v);
                     while (*++s != '\0') ;
                 }
                 else
@@ -150,7 +150,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
                     fmpz_get_str(s, 10, p);
                     while (*++s != '\0') ;
                     *s++ = '^';
-                    sprintf(s, "%ld", j + v);
+                    flint_sprintf(s, "%wd", j + v);
                     while (*++s != '\0') ;
                 }
                 else
@@ -177,7 +177,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
             str = flint_malloc(b);
             if (!str)
             {
-                printf("Exception (padic_get_str).  Memory allocation failed.\n");
+                flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
                 abort();
             }
         }
@@ -205,7 +205,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
             fmpz_get_str(s, 10, p);
             while (*++s != '\0') ;
             *s++ = '^';
-            sprintf(s, "%ld", v);
+            flint_sprintf(s, "%wd", v);
         }
     }
 

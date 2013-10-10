@@ -53,11 +53,11 @@ _fmpz_poly_get_str(const fmpz * poly, slong len)
     strbase = (char *) flint_malloc(bound * sizeof(char));
     str = strbase;
 
-    str += sprintf(str, "%li ", len);
+    str += flint_sprintf(str, "%wd ", len);
     do
     {
         if (!COEFF_IS_MPZ(*poly))
-            str += sprintf(str, " %li", *poly);
+            str += flint_sprintf(str, " %wd", *poly);
         else
             str += gmp_sprintf(str, " %Zd", COEFF_TO_PTR(*poly));
     } while (poly++, --len);
