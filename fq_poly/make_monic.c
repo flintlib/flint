@@ -44,6 +44,7 @@ fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
     if (op->length == 0)
     {
         fq_poly_zero(rop, ctx);
+        return;
     }
 
     fq_poly_fit_length(rop, op->length, ctx);
