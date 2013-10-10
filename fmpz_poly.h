@@ -43,6 +43,8 @@
  extern "C" {
 #endif
 
+#define FMPZ_POLY_INV_NEWTON_CUTOFF  32
+
 /*  Type definitions *********************************************************/
 
 typedef struct

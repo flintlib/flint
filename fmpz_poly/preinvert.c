@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010, 2011 Sebastian Pancratz
     Copyright (C) 2013 William Hart
    
 ******************************************************************************/
@@ -28,17 +29,58 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void
-_fmpz_poly_preinvert(fmpz * B_inv, const fmpz * B, slong n)
+void 
+_fmpz_poly_preinvert(fmpz * Binv, const fmpz * B, slong len)
 {
-   fmpz * X2n = _fmpz_vec_init(2*n - 1);
+    if (len == 1)  /* B is +-1 */
+    {
+        fmpz_set(Binv, B);
+    }
+    else
+    {
+        const slong alloc = len + FLINT_MAX(len, 3 * FMPZ_POLY_INV_NEWTON_CUTOFF);
+        slong *a, i, m, n = len;
+        fmpz *T, *W;
 
-   fmpz_set_ui(X2n + 2*n - 2, 1);
-   _fmpz_poly_div(B_inv, X2n, 2*n - 1, B, n);
+        T = _fmpz_vec_init(alloc);
+        W = T + len;
 
-   _fmpz_vec_clear(X2n, 2*n - 1);
+        for (i = 1; (WORD(1) << i) < n; i++) ;
+    
+        a = (slong *) flint_malloc(i * sizeof(slong));
+        a[i = 0] = n;
+        while (n >= FMPZ_POLY_INV_NEWTON_CUTOFF)
+            a[++i] = (n = (n + 1) / 2);
+        
+        if (len != n) 
+           _fmpz_poly_reverse(T, B, len, len); /* only reverse if it ... */
+        
+        /* Base case */
+        {
+            fmpz *Brev = W + 2 * FMPZ_POLY_INV_NEWTON_CUTOFF;
+            if (len != n) 
+               _fmpz_poly_reverse(Brev, T, n, n); /* ... won't be undone */
+            else Brev = (fmpz *) B;
 
-   _fmpz_poly_reverse(B_inv, B_inv, n, n);
+            _fmpz_vec_zero(W, 2*n - 2);
+            fmpz_one(W + (2*n - 2));
+            _fmpz_poly_div_basecase(Binv, W, W, 2*n - 1, Brev, n);
+            _fmpz_poly_reverse(Binv, Binv, n, n);
+        }
+        
+        for (i--; i >= 0; i--)
+        {
+            m = n;
+            n = a[i];
+
+            _fmpz_poly_mullow(W, T, n, Binv, m, n);
+            _fmpz_poly_mullow(Binv + m, Binv, m, W + m, n - m, n - m);
+            _fmpz_vec_neg(Binv + m, Binv + m, n - m);
+        }
+
+        _fmpz_vec_clear(T, alloc);
+        flint_free(a);
+    }
 }
 
 void

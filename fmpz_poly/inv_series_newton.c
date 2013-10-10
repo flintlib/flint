@@ -30,8 +30,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#define FMPZ_POLY_INV_NEWTON_CUTOFF  32
-
 void 
 _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
 {
