@@ -1568,6 +1568,56 @@ void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
     Computes the quotient \code{(Q, len-1)} of \code{(A, len)} upon
     division by $x - c$.
 
+*******************************************************************************
+
+    Division with precomputed inverse
+
+*******************************************************************************
+
+void _fmpz_poly_preinvert(fmpz * B_inv, const fmpz * B, slong n)
+
+    Given a monic polynomial \code{B} of length \code{n}, compute a precomputed
+    inverse \code{B_inv} of length \code{n} for use in the functions below. No 
+    aliasing of B and B_inv is permitted. We assume \code{n} is not zero.
+
+void fmpz_poly_preinvert(fmpz_poly_t B_inv, const fmpz_poly_t B)
+
+    Given a monic polynomial \code{B}, compute a precomputed inverse 
+    \code{B_inv} for use in the functions below. An exception is raised if
+    \code{B} is zero.
+
+void _fmpz_poly_div_preinv(fmpz * Q, const fmpz * A, slong len1, 
+                               const fmpz * B, const fmpz * B_inv, slong len2)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B} of 
+    length \code{len2}, compute the quotient \code{Q} of \code{A} by \code{B}.
+    We assume the length \code{len1} of \code{A} is at least \code{len2}. The
+    polynomial \code{Q} must have space for \code{len1 - len2 + 1} 
+    coefficients. No aliasing of operands is permitted.
+
+void fmpz_poly_div_preinv(fmpz_poly_t Q, const fmpz_poly_t A, 
+                                 const fmpz_poly_t B, const fmpz_poly_t B_inv)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B}, 
+    compute the quotient \code{Q} of \code{A} by \code{B}. Aliasing of \code{B}
+    and \code{B_inv} is not permitted. 
+
+void _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1, 
+                               const fmpz * B, const fmpz * B_inv, slong len2)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B} of 
+    length \code{len2}, compute the quotient \code{Q} of \code{A} by \code{B}.
+    The remainder is then placed in \code{A}. We assume the length \code{len1}
+    of \code{A} is at least \code{len2}. The polynomial \code{Q} must have
+    space for \code{len1 - len2 + 1} coefficients. No aliasing of operands is 
+    permitted.
+
+void fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R, 
+            const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B}, 
+    compute the quotient \code{Q} of \code{A} by \code{B} and the remainder
+    \code{R}. Aliasing of \code{B} and \code{B_inv} is not permitted. 
 
 *******************************************************************************
 
