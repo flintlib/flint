@@ -129,4 +129,8 @@ TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
                      slong len2,
                      const TEMPLATE(T, ctx_t) ctx);
 
+#ifdef __cplusplus
+ }
+#endif
+
 #endif
