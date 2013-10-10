@@ -148,6 +148,8 @@ main(void)
         fq_poly_clear(b);
         fq_poly_clear(c);
         fq_poly_clear(g);
+
+        fq_ctx_clear(ctx);
     }
 
     /* Check aliasing of a and g */
@@ -187,6 +189,8 @@ main(void)
         fq_poly_clear(a);
         fq_poly_clear(b);
         fq_poly_clear(g);
+
+        fq_ctx_clear(ctx);
     }
 
 
@@ -227,6 +231,8 @@ main(void)
         fq_poly_clear(a);
         fq_poly_clear(b);
         fq_poly_clear(g);
+
+        fq_ctx_clear(ctx);
     }
 
     flint_randclear(state);
