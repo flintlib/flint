@@ -34,7 +34,10 @@ _fq_poly_compose_mod(fq_struct * res,
                      const fq_struct * h, slong lenh, 
                      const fq_ctx_t ctx)
 {
-    _fq_poly_compose_mod_horner(res, f, lenf, g, h, lenh, ctx);
+    if (lenh < 12 || lenf >= lenh)
+        _fq_poly_compose_mod_horner(res, f, lenf, g, h, lenh, ctx);
+    else
+        _fq_poly_compose_mod_brent_kung(res, f, lenf, g, h, lenh, ctx);
 }
 
 void

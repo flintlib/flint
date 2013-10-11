@@ -600,6 +600,18 @@ fq_poly_compose_mod_horner(fq_poly_t res,
                            const fq_poly_t poly3,
                            const fq_ctx_t ctx);
 
+void
+fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
+                               const fq_poly_t poly2, const fq_poly_t poly3,
+                               const fq_ctx_t ctx);
+
+void
+_fq_poly_compose_mod_brent_kung(fq_struct * res,
+                                const fq_struct * poly1, slong len1,
+                                const fq_struct * poly2,
+                                const fq_struct * poly3, slong len3,
+                                const fq_ctx_t ctx);
+
 /*  Input and output  ********************************************************/
 
 int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
