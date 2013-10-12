@@ -120,7 +120,7 @@ void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op);
 /*
   Converts an NTL ZZ_pE to an fq_t.
 */
-void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op);
+void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx);
 
 
 /*
@@ -131,7 +131,7 @@ void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op);
 /*
   Converts an NTL ZZ_pEX to an fq_poly_t.
 */
-void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op);
+void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, const fq_ctx_t ctx);
 
 /*
   Converts an fmpz_mod_poly_t to an NTL zz_pX.
@@ -151,7 +151,7 @@ void fq_get_zz_pE(zz_pE& rop, const fq_t op);
 /*
   Converts an NTL zz_pE to an fq_t.
 */
-void fq_set_zz_pE(fq_t rop, const zz_pE& op);
+void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx);
 
 
 /*
@@ -162,7 +162,7 @@ void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op);
 /*
   Converts an NTL zz_pEX to an fq_poly_t.
 */
-void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op);
+void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op, const fq_ctx_t ctx);
 
 #ifdef __cplusplus
 }

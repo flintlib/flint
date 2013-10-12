@@ -293,13 +293,13 @@ void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op)
     }
 }
 
-void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op)
+void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx)
 {
     const slong len = deg(rep(op)) + 1;
 
     if (len == 0)
     {
-        fq_zero(rop);
+        fq_zero(rop, ctx);
     }
     else
     {
@@ -340,27 +340,27 @@ void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op)
     }
 }
 
-void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op)
+void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, fq_ctx_t ctx)
 {
     const slong len = deg(op) + 1;
 
     if (len == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
         slong i;
         const ZZ_pE *ap; 
 
-        fq_poly_fit_length(rop, len);
-        _fq_poly_set_length(rop, len);
+        fq_poly_fit_length(rop, len, ctx);
+        _fq_poly_set_length(rop, len, ctx);
 
         for (i = 0, ap = op.rep.elts(); i < len; i++, ap++)
         {
-            fq_set_ZZ_pE(rop->coeffs + i, *ap);
+            fq_set_ZZ_pE(rop->coeffs + i, *ap, ctx);
         }
-        _fq_poly_normalise(rop);
+        _fq_poly_normalise(rop, ctx);
     }
 }
 
@@ -390,13 +390,13 @@ void fq_get_zz_pE(zz_pE& rop, const fq_t op)
     }
 }
 
-void fq_set_zz_pE(fq_t rop, const zz_pE& op)
+void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx)
 {
     const slong len = deg(rep(op)) + 1;
 
     if (len == 0)
     {
-        fq_zero(rop);
+        fq_zero(rop, ctx);
     }
     else
     {
@@ -437,27 +437,27 @@ void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op)
     }
 }
 
-void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op)
+void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op, const fq_ctx_t ctx)
 {
     const slong len = deg(op) + 1;
 
     if (len == 0)
     {
-        fq_poly_zero(rop);
+        fq_poly_zero(rop, ctx);
     }
     else
     {
         slong i;
         const zz_pE *ap; 
 
-        fq_poly_fit_length(rop, len);
-        _fq_poly_set_length(rop, len);
+        fq_poly_fit_length(rop, len, ctx);
+        _fq_poly_set_length(rop, len, ctx);
 
         for (i = 0, ap = op.rep.elts(); i < len; i++, ap++)
         {
-            fq_set_zz_pE(rop->coeffs + i, *ap);
+            fq_set_zz_pE(rop->coeffs + i, *ap, ctx);
         }
-        _fq_poly_normalise(rop);
+        _fq_poly_normalise(rop, ctx);
     }
 }
 
