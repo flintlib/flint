@@ -482,6 +482,8 @@ void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
 
 /*  Euclidean division  ******************************************************/
 
+#define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16
+
 ulong fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx);
 
 void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R, 
@@ -500,12 +502,32 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
                              const fq_poly_t A, const fq_poly_t B, 
                              const fq_ctx_t ctx);
 
+void
+_fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * W, 
+                                     const fq_struct * A,
+                                     const fq_struct * B, slong lenB, 
+                                     const fq_t invB,
+                                     const fq_ctx_t ctx);
+
+
+
+void _fq_poly_divrem_divconquer(fq_struct *Q, fq_struct *R, 
+                                const fq_struct *A, slong lenA,
+                                const fq_struct *B, slong lenB, 
+                                const fq_t invB,
+                                const fq_ctx_t ctx);
+
+void
+fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
+                          const fq_poly_t A, const fq_poly_t B,
+                          const fq_ctx_t ctx);
+
 static __inline__ 
 void _fq_poly_divrem(fq_struct *Q, fq_struct *R, 
     const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
     const fq_t invB, const fq_ctx_t ctx)
 {
-    _fq_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, ctx);
+    _fq_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, ctx);
 }
 
 static __inline__ 
@@ -513,7 +535,7 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
                     const fq_poly_t A, const fq_poly_t B, 
                     const fq_ctx_t ctx)
 {
-    fq_poly_divrem_basecase(Q, R, A, B, ctx);
+    fq_poly_divrem_divconquer(Q, R, A, B, ctx);
 }
 
 static __inline__ 
