@@ -27,11 +27,12 @@
 #include "fq_mat.h"
 
 void
-_fq_poly_compose_mod_brent_kung(fq_struct * res,
-                                const fq_struct * poly1, slong len1,
-                                const fq_struct * poly2,
-                                const fq_struct * poly3, slong len3,
-                                const fq_ctx_t ctx)
+_fq_poly_compose_mod_brent_kung_preinv(fq_struct * res,
+                                       const fq_struct * poly1, slong len1,
+                                       const fq_struct * poly2,
+                                       const fq_struct * poly3, slong len3,
+                                       const fq_struct * poly3inv, slong len3inv,
+                                       const fq_ctx_t ctx)
 {
     fq_mat_t A, B, C;
     fq_struct * t, * h, * tmp;
@@ -75,7 +76,8 @@ _fq_poly_compose_mod_brent_kung(fq_struct * res,
     tmp = _fq_vec_init(2 * n - 1, ctx);
     for (i = 2; i < m; i++)
     {
-        _fq_poly_mulmod(tmp, A->rows[i - 1], n, poly2, n, poly3, len3, ctx);
+        _fq_poly_mulmod_preinv(tmp, A->rows[i - 1], n, poly2, n, poly3, len3,
+                               poly3inv, len3inv, ctx);
         _fq_vec_set(A->rows[i], tmp, n);
     }
     _fq_vec_clear(tmp, 2 * n - 1);
@@ -84,11 +86,13 @@ _fq_poly_compose_mod_brent_kung(fq_struct * res,
 
     /* Evaluate block composition using the Horner scheme */
     _fq_vec_set(res, C->rows[m - 1], n);
-    _fq_poly_mulmod(h, A->rows[m - 1], n, poly2, n, poly3, len3, ctx);
+    _fq_poly_mulmod_preinv(h, A->rows[m - 1], n, poly2, n, poly3, len3,
+                           poly3inv, len3inv, ctx);
 
     for (i = m - 2; i >= 0; i--)
     {
-        _fq_poly_mulmod(t, res, n, h, n, poly3, len3, ctx);
+        _fq_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
+                               poly3inv, len3inv, ctx);
         _fq_poly_add(res, t, n, C->rows[i], n, ctx);
     }
 
@@ -101,13 +105,14 @@ _fq_poly_compose_mod_brent_kung(fq_struct * res,
 }
 
 void
-fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
-                               const fq_poly_t poly2, const fq_poly_t poly3,
-                               const fq_ctx_t ctx)
+fq_poly_compose_mod_brent_kung_preinv(fq_poly_t res, const fq_poly_t poly1,
+                                      const fq_poly_t poly2, const fq_poly_t poly3,
+                                      const fq_poly_t poly3inv, const fq_ctx_t ctx)
 {
     slong len1 = poly1->length;
     slong len2 = poly2->length;
     slong len3 = poly3->length;
+    slong len3inv = poly3inv->length;
     slong len = len3 - 1;
     slong vec_len = FLINT_MAX(len3 - 1, len2);
 
@@ -117,7 +122,7 @@ fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
     if (len3 == 0)
     {
         printf("Exception: division by zero in "
-               "fq_poly_compose_mod_brent_kung\n");
+               "fq_poly_compose_mod_brent_kung_preinv\n");
         abort();
     }
 
@@ -144,7 +149,7 @@ fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
     {
         fq_poly_t tmp;
         fq_poly_init(tmp);
-        fq_poly_compose_mod_brent_kung(tmp, poly1, poly2, poly3, ctx);
+        fq_poly_compose_mod_brent_kung_preinv(tmp, poly1, poly2, poly3, poly3inv, ctx);
         fq_poly_swap(tmp, res);
         fq_poly_clear(tmp);
         return;
@@ -167,8 +172,9 @@ fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
     }
 
     fq_poly_fit_length(res, len, ctx);
-    _fq_poly_compose_mod_brent_kung(res->coeffs, poly1->coeffs, len1,
-                                    ptr2, poly3->coeffs, len3, ctx);
+    _fq_poly_compose_mod_brent_kung_preinv(res->coeffs, poly1->coeffs, len1,
+                                           ptr2, poly3->coeffs, len3,
+                                           poly3inv->coeffs, len3inv, ctx);
     _fq_poly_set_length(res, len, ctx);
     _fq_poly_normalise(res, ctx);
 

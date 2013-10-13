@@ -390,9 +390,10 @@ void _fq_poly_mulmod(fq_struct * res,
 void fq_poly_mulmod(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
                     const fq_poly_t f, const fq_ctx_t ctx);
 
-void _fq_poly_mulmod_preinv(fq_struct *res, fq_struct *poly1, slong len1,
-                            fq_struct  *poly2, slong len2, fq_struct *f,
-                            slong lenf, fq_struct *finv, slong lenfinv,
+void _fq_poly_mulmod_preinv(fq_struct *res, const fq_struct *poly1, slong len1,
+                            const fq_struct  *poly2, slong len2,
+                            const fq_struct *f, slong lenf,
+                            const fq_struct *finv, slong lenfinv,
                             const fq_ctx_t ctx);
 void
 fq_poly_mulmod_preinv(fq_poly_t res, const fq_poly_t poly1,
@@ -442,12 +443,34 @@ fq_poly_powmod_fmpz_binexp(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
                            const fq_poly_t f, const fq_ctx_t ctx);
 
 void
+_fq_poly_powmod_fmpz_binexp_preinv(fq_struct * res, const fq_struct * poly,
+                                   const fmpz_t e, const fq_struct * f, slong lenf, 
+                                   const fq_struct *finv, slong lenfinv,
+                                   const fq_ctx_t ctx);
+
+void
+fq_poly_powmod_fmpz_binexp_preinv(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
+                                  const fq_poly_t f, const fq_poly_t finv,
+                                  const fq_ctx_t ctx);
+
+void
 _fq_poly_powmod_ui_binexp(fq_struct * res, const fq_struct * poly, ulong e, 
                           const fq_struct * f, slong lenf, const fq_ctx_t ctx);
 
 void
 fq_poly_powmod_ui_binexp(fq_poly_t res, const fq_poly_t poly, ulong e,
                          const fq_poly_t f, const fq_ctx_t ctx);
+
+void
+_fq_poly_powmod_ui_binexp_preinv(fq_struct * res, const fq_struct * poly, ulong e, 
+                                 const fq_struct * f, slong lenf,
+                                 const fq_struct * finv, slong lenfinv,
+                                 const fq_ctx_t ctx);
+
+void
+fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
+                                const fq_poly_t f, const fq_poly_t finv,
+                                const fq_ctx_t ctx);
 
 /*  Shifting  ****************************************************************/
 
@@ -685,6 +708,19 @@ _fq_poly_compose_mod_brent_kung(fq_struct * res,
                                 const fq_struct * poly2,
                                 const fq_struct * poly3, slong len3,
                                 const fq_ctx_t ctx);
+
+void
+_fq_poly_compose_mod_brent_kung_preinv(fq_struct * res,
+                                       const fq_struct * poly1, slong len1,
+                                       const fq_struct * poly2,
+                                       const fq_struct * poly3, slong len3,
+                                       const fq_struct * poly3inv, slong len3inv,
+                                       const fq_ctx_t ctx);
+void
+fq_poly_compose_mod_brent_kung_preinv(fq_poly_t res, const fq_poly_t poly1,
+                                      const fq_poly_t poly2, const fq_poly_t poly3,
+                                      const fq_poly_t poly3inv, const fq_ctx_t ctx);
+
 
 /*  Input and output  ********************************************************/
 
