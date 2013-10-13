@@ -219,6 +219,15 @@ void _fq_poly_make_monic(fq_struct *rop, const fq_struct *op, long length, const
 
 void fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
+void
+_fq_poly_reverse(fq_struct * res, const fq_struct * poly, slong len, slong n,
+                 const fq_ctx_t ctx);
+
+void
+fq_poly_reverse(fq_poly_t res, const fq_poly_t poly, slong n,
+                const fq_ctx_t ctx);
+
+
 /*  Getting and setting coefficients  ****************************************/
 
 void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n, const fq_ctx_t ctx);
@@ -475,6 +484,14 @@ void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
 
 ulong fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx);
 
+void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R, 
+                           const fq_struct *A, slong lenA,
+                           const fq_struct *B, slong lenB, 
+                           const fq_t invB, const fq_ctx_t ctx);
+
+void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
+                          const fq_ctx_t ctx);
+
 void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, 
     const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
     const fq_t invB, const fq_ctx_t ctx);
@@ -522,6 +539,12 @@ void fq_poly_rem(fq_poly_t R,
     fq_poly_clear(Q);
 }
 
+void 
+_fq_poly_inv_series_newton(fq_struct * Qinv, const fq_struct * Q, slong n, 
+                           const fq_t cinv, const fq_ctx_t ctx);
+
+void fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
+                               const fq_ctx_t ctx);
 
 /*  Divisibility testing  ***************************************************/
 
