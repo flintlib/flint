@@ -390,6 +390,14 @@ void _fq_poly_mulmod(fq_struct * res,
 void fq_poly_mulmod(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
                     const fq_poly_t f, const fq_ctx_t ctx);
 
+void _fq_poly_mulmod_preinv(fq_struct *res, fq_struct *poly1, slong len1,
+                            fq_struct  *poly2, slong len2, fq_struct *f,
+                            slong lenf, fq_struct *finv, slong lenfinv,
+                            const fq_ctx_t ctx);
+void
+fq_poly_mulmod_preinv(fq_poly_t res, const fq_poly_t poly1,
+                      const fq_poly_t poly2, const fq_poly_t f,
+                      const fq_poly_t finv, const fq_ctx_t ctx);
 
 /* Squaring ******************************************************************/
 
