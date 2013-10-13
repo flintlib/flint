@@ -30,7 +30,7 @@ void
 fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
                             slong * const *degs, const fq_ctx_t ctx)
 {
-    fq_poly_t f, g, s, v, tmp;
+    fq_poly_t f, g, s, v, vinv, tmp;
     fq_poly_t *h, *H, *I;
     fmpz_t q;
     slong i, j, l, m, n, index;
@@ -48,6 +48,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     fq_poly_init(g);
     fq_poly_init(s);
     fq_poly_init(v);
+    fq_poly_init(vinv);
     fq_poly_init(tmp);
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fq_poly_struct))))
@@ -68,15 +69,18 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
 
     fq_poly_make_monic(v, poly, ctx);
 
+    fq_poly_reverse(vinv, v, v->length, ctx);
+    fq_poly_inv_series_newton(vinv, vinv, v->length, ctx);
+
     /* compute baby steps: h[i]=x^{q^i}mod v */
     fq_poly_gen(h[0], ctx);
     for (i = 1; i < l + 1; i++)
-        fq_poly_powmod_fmpz_binexp(h[i], h[i - 1], q, v, ctx);
+        fq_poly_powmod_fmpz_binexp_preinv(h[i], h[i - 1], q, v, vinv, ctx);
 
     /* compute giant steps: H[i]=x^{q^(li)}mod v */
     fq_poly_set(H[0], h[l], ctx);
     for (j = 1; j < m; j++)
-        fq_poly_compose_mod(H[j], H[j - 1], H[0], v, ctx);
+        fq_poly_compose_mod_brent_kung_preinv(H[j], H[j - 1], H[0], v, vinv, ctx);
 
     /* compute interval polynomials I[j] = (H_j-h_0)*...*(H_j-h_{l-1}) */
     for (j = 0; j < m; j++)
@@ -85,7 +89,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
         for (i = 0; i < l; i++)
         {
             fq_poly_sub(tmp, H[j], h[i], ctx);
-            fq_poly_mulmod(I[j], tmp, I[j], v, ctx);
+            fq_poly_mulmod_preinv(I[j], tmp, I[j], v, vinv, ctx);
         }
     }
 
@@ -136,6 +140,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     fq_poly_clear(g);
     fq_poly_clear(s);
     fq_poly_clear(v);
+    fq_poly_clear(vinv);
     fq_poly_clear(tmp);
 
     for (i = 0; i < l + 1; i++)
