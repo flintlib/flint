@@ -568,6 +568,27 @@ _fq_poly_inv_series_newton(fq_struct * Qinv, const fq_struct * Q, slong n,
 void fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
                                const fq_ctx_t ctx);
 
+void _fq_poly_div_newton_preinv (fq_struct *Q, const fq_struct *A, slong lenA,
+                                 const fq_struct* B, slong lenB,
+                                 const fq_struct* Binv, slong lenBinv,
+                                 const fq_ctx_t ctx);
+
+void fq_poly_div_newton_preinv (fq_poly_t Q, const fq_poly_t A,
+                                const fq_poly_t B, const fq_poly_t Binv,
+                                const fq_ctx_t ctx);
+
+void
+_fq_poly_divrem_newton_preinv (fq_struct* Q, fq_struct* R,
+                               const fq_struct* A, slong lenA,
+                               const fq_struct* B, slong lenB,
+                               const fq_struct* Binv, slong lenBinv, 
+                               const fq_ctx_t ctx);
+
+void
+fq_poly_divrem_newton_preinv(fq_poly_t Q, fq_poly_t R,
+                             const fq_poly_t A, const fq_poly_t B,
+                             const fq_poly_t Binv, const fq_ctx_t ctx);
+
 /*  Divisibility testing  ***************************************************/
 
 int _fq_poly_divides(fq_struct *Q, 
