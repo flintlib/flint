@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2013 Martin Lee
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
