@@ -558,7 +558,7 @@ void _fq_poly_divrem(fq_struct *Q, fq_struct *R,
     const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
     const fq_t invB, const fq_ctx_t ctx)
 {
-    _fq_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, ctx);
+    _fq_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, ctx);
 }
 
 static __inline__ 
@@ -566,7 +566,7 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
                     const fq_poly_t A, const fq_poly_t B, 
                     const fq_ctx_t ctx)
 {
-    fq_poly_divrem_divconquer(Q, R, A, B, ctx);
+    fq_poly_divrem_basecase(Q, R, A, B, ctx);
 }
 
 static __inline__ 
