@@ -122,7 +122,6 @@ main(int argc, char** argv)
         for (c = 0; c < nalgs; c++)
             if (t[c]->cpu <= cpumin)
             {
-                flint_printf("%d ", t[c]->cpu);
                 loops *= 2;
                 goto loop;
             }
