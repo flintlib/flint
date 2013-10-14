@@ -188,6 +188,10 @@ void
 fq_poly_factor_kaltofen_shoup(fq_poly_factor_t res, const fq_poly_t poly,
                               const fq_ctx_t ctx);
 
+void
+fq_poly_factor_berlekamp(fq_poly_factor_t factors, const fq_poly_t f,
+                         const fq_ctx_t ctx);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
