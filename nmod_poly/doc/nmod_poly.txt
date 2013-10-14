@@ -791,6 +791,29 @@ void nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
 
+void
+_nmod_poly_powmod_mpz_binexp_preinv (mp_ptr res, mp_srcptr poly,
+                                    mpz_srcptr e, mp_srcptr f, slong lenf,
+                                    mp_srcptr finv, slong lenfinv, nmod_t mod)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
+                           const nmod_poly_t poly, mpz_srcptr e,
+                           const nmod_poly_t f, const nmod_poly_t finv)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
 *******************************************************************************
 
     Division
