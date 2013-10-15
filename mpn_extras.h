@@ -206,12 +206,18 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
+void flint_mpn_mod_n_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr d,
+                                                  mp_size_t n, mp_srcptr dinv);
+
+void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
+                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
+
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
-int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
-    mp_bitcnt_t b, mp_ptr tp);
+int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
+    int c, mp_bitcnt_t b, mp_ptr tp);
 
 static __inline__
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
