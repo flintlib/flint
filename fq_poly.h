@@ -112,6 +112,12 @@ void fq_poly_randtest(fq_poly_t f, flint_rand_t state,
 void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state, 
                                long len, const fq_ctx_t ctx);
 
+void fq_poly_randtest_monic (fq_poly_t f, flint_rand_t state,
+                             long len, const fq_ctx_t ctx);
+
+void fq_poly_randtest_irreducible (fq_poly_t f, flint_rand_t state,
+                                   long len, const fq_ctx_t ctx);
+
 /*  Factoring ****************************************************************/
 typedef struct
 {
