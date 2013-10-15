@@ -88,13 +88,13 @@ fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
 
     if (lenf == 0)
     {
-        printf("Exception: fmpz_mod_poly_powmod_preinv: divide by zero\n");
+        flint_printf("Exception: fmpz_mod_poly_powmod_preinv: divide by zero\n");
         abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        printf("Exception: fmpz_mod_poly_powmod_preinv: "
+        flint_printf("Exception: fmpz_mod_poly_powmod_preinv: "
                " negative exp not implemented\n");
         abort();
     }
