@@ -1700,7 +1700,9 @@ component types match).
 Another interesting feature of ltuples is the type
 \code{flint::detail::IGNORED_TYPE}.
 In an ltuple assignment, where the left hand side contains a reference to this
-type, the relevant entry is just discarded. Thus in the following listing, the
+type, the relevant entry is just discarded. Since the \code{ltuple.h} header
+automatically creates a static instance \code{_} of this type,
+in the following listing, the
 lines marked \code{(1)} and \code{(2)} have the same effect (but the second is
 potentially more efficient).
 
@@ -1708,7 +1710,6 @@ potentially more efficient).
 #include "fmpz_polyxx.h"
 ...
 using namespace flint;
-detail::IGNORED_TYPE _;
 
 fmpz_polyxx f, g;
 // ...
