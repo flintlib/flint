@@ -49,6 +49,15 @@ typedef gmp_randstate_t fmpz_randstate_t;
 extern __mpz_struct * fmpz_arr;
 extern gmp_randstate_t fmpz_randstate;
 
+typedef struct
+{
+   mp_ptr dinv;
+   slong n;
+   mp_bitcnt_t norm;
+} fmpz_preinvn_struct;
+
+typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
+
 /* maximum positive value a small coefficient can have */
 #define COEFF_MAX ((WORD(1) << (FLINT_BITS - 2)) - WORD(1))
 
@@ -523,6 +532,10 @@ void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
 ulong fmpz_tdiv_ui(const fmpz_t g, ulong h);
 
 void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f);
+
+void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 

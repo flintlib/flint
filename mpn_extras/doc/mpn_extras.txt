@@ -166,7 +166,36 @@ void flint_mpn_mod_n_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr d,
     The value $r$ is expected to have space for $n$ limbs, however it may
     also be aliased with the first $n$ limbs of $a$. No other overlap is
     permitted between $r$ and $a$.
-    
+
+void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, 
+                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+
+    Given a normalised integer $d$ with precomputed inverse \code{dinv} 
+    provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
+    and stores the result in $q$ and the remainder in $r$. The value $a$ is
+    expected to have \code{2*n} limbs of space (zero padded if necessary) and
+    the upper $n$ limbs must be reduced modulo \code{d}.
+
+    The values $q$ and $r$ are expected to have space for $n$ limbs, however
+    $r$ may also be aliased with the first $n$ limbs of $a$. No other overlap
+    is permitted between $r$ and $a$ and no aliasing is permitted between $q$
+    and the other operands. Nor may $r$ alias with any of the source operands.
+   
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr a, mp_size_t m, 
+                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+
+    Given a normalised integer $d$ with precomputed inverse \code{dinv} 
+    provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
+    and stores the result in $q$ and the remainder in the lower $n$ limbs of
+    $a$.
+
+    The values $q$ is expected to have space for $m - n$ limbs is $m > n$, and
+    $a$ is expected to have space for $2*n$ limbs. No aliasing is permitted
+    between $q$ and the other operands. Nor may $a$ alias with any of the
+    source operands.
+
+   
+
 void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
