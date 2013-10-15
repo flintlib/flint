@@ -73,7 +73,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
 
     if (lenf <= len1 || lenf <= len2)
     {
-        printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
+        flint_printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
         abort();
     }
 
