@@ -19,7 +19,9 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens, 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -32,16 +34,15 @@
 #define FLINT_CPIMPORT "../qadic/CPimport.txt"
 #endif
 
-void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+
 {
     char *buf;
     FILE *file;
 
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
-        flint_printf("Exception (fq_ctx_init_conway).  Conway polynomials \n");
-        flint_printf("are only available for primes up to 109987.\n");
-        abort();
+        return 0;
     }
 
     buf  = flint_malloc(832);
@@ -95,15 +96,28 @@ void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 
             fclose(file);
             flint_free(buf);
-            return;
+            return 1;
         }
     }
-
     fclose(file);
     flint_free(buf);
-
-    flint_printf("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
-    fmpz_print(p), flint_printf(",%ld) is not present in the database.\n", d);
-    abort();
+    return 0;
 }
 
+void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+{
+    int result;
+    if (fmpz_cmp_ui(p, 109987) > 0)
+    {
+        flint_printf("Exception (fq_ctx_init_conway).  Conway polynomials \n");
+        flint_printf("are only available for primes up to 109987.\n");
+        abort();
+    }
+
+    result = _fq_ctx_init_conway(ctx, p, d, var);
+    if (!result) {
+        flint_printf("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
+        fmpz_print(p), flint_printf(",%ld) is not present in the database.\n", d);
+        abort();
+    }
+}

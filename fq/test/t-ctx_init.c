@@ -45,6 +45,19 @@ main(void)
     for (i = 0; i < 30; i++) {
         fmpz_t p;
         long d;
+        fq_ctx_t ctx;
+        
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 50), 1));
+        d = n_randint(state, 20) + 1;
+
+        fq_ctx_init(ctx, p, d, "a");
+        fq_ctx_clear(ctx);
+    }
+
+    for (i = 0; i < 30; i++) {
+        fmpz_t p;
+        long d;
         fq_ctx_t ctx_conway, ctx_mod;
         fmpz_mod_poly_t modulus;
 

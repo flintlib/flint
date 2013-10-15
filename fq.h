@@ -56,8 +56,11 @@ fq_ctx_struct;
 
 typedef fq_ctx_struct fq_ctx_t[1];
 
-void fq_ctx_init_conway(fq_ctx_t ctx,
-                        const fmpz_t p, long d, const char *var);
+void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, long d, const char *var);
+
+int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var);
+
+void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var);
 
 void fq_ctx_init_modulus(fq_ctx_t ctx,
                          const fmpz_t p, long d, fmpz_mod_poly_t modulus,
