@@ -31,8 +31,6 @@
 
 using namespace flint;
 
-detail::IGNORED_TYPE _;
-
 void
 test_traits()
 {

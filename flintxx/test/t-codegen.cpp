@@ -204,8 +204,6 @@ bool fuzzy_equals(T v1, T v2, double perc)
 using namespace flint;
 using namespace mp;
 
-detail::IGNORED_TYPE _;
-
 typedef make_vector_n<fmpzxx, 10>::type fmpzxx_vector;
 
 extern "C" {

@@ -415,7 +415,6 @@ test_factoring()
         print(f1); // make sure this compiles
 }
 
-detail::IGNORED_TYPE _;
 void
 test_hensel()
 {

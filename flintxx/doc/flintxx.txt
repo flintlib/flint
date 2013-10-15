@@ -63,6 +63,11 @@ const flint_rand_t& frandxx::_data() const
     Lazy tuples are implemented in \code{flintxx/ltuple.h}. They are used
     throughout flintxx to emulate functions with several return values.
 
+    This header automatically creates a static instance of
+    \code{flint::detail::IGNORED_TYPE}. It is accessible in namespace flint,
+    under the name \code{FLINT_LTUPLE_PLACEHOLDER_NAME}, which defaults to
+    \code{_}. See \code{ltupleref} documentation for how to use this.
+
 *******************************************************************************
 
 Ltuple<T1&, ..., Tn&> ltupleref(T1& t1, ..., Tn& tn)
@@ -70,7 +75,7 @@ Ltuple<T1&, ..., Tn&> ltupleref(T1& t1, ..., Tn& tn)
     Construct an ltuple of references, binding to the arguments \code{t1},
     \dots, \code{tn}. Instances of \code{flint::detail::IGNORED_TYPE} can be
     used as placeholders.
-    Currently \code{n \le 4}.
+    Currently $n \le 4$.
 
 Ltuple<T1, ..., Tn> ltuple(const T1& t1, ..., const Tn& tn)
 
