@@ -36,8 +36,8 @@
 #include <NTL/ZZ_pEXFactoring.h>
 
 #define nalgs 2
-#define ncases 1
-#define cpumin 10
+#define ncases 5
+#define cpumin 2
 
 int
 main(int argc, char** argv)
@@ -48,7 +48,7 @@ main(int argc, char** argv)
     fmpz_t p, temp;
     ZZ prime;
     ZZ_pX mod;
-    fq_poly_t f;
+    fq_poly_t f, g;
     fq_ctx_t ctx;
     fmpz_mod_poly_t fmod;
     
@@ -82,6 +82,7 @@ main(int argc, char** argv)
     fq_ctx_init_modulus(ctx, p, ext, fmod, "a");
     
     fq_poly_init(f);
+    fq_poly_init(g);
 
     for (c = 0; c < nalgs; c++)
     {
@@ -100,7 +101,9 @@ main(int argc, char** argv)
            Construct random elements of fq
         */
         {
-            fq_poly_randtest(f, state, len, ctx);
+            fq_poly_randtest_irreducible(f, state, len + 1, ctx);
+            fq_poly_randtest_irreducible(g, state, len + 2, ctx);
+            fq_poly_mul(f, f, g, ctx);
             fq_poly_make_monic(f, f, ctx);
             fq_poly_get_ZZ_pEX(nf, f);
         }
@@ -109,10 +112,17 @@ main(int argc, char** argv)
         fflush(stdout);
         timeit_start(t[0]);
         for (l = 0; l < loops; l++)
+        {
             fq_poly_factor_init(res, ctx);
             fq_poly_factor_kaltofen_shoup(res, f, ctx);
             fq_poly_factor_clear(res);
+        }
         timeit_stop(t[0]);
+        if (res->num != 2)
+        {
+            flint_printf("# of factors incorrect\n");
+            abort();
+        }
 
         timeit_start(t[1]);
         for (l = 0; l < loops; l++)
@@ -122,7 +132,7 @@ main(int argc, char** argv)
         for (c = 0; c < nalgs; c++)
             if (t[c]->cpu <= cpumin)
             {
-                loops *= 2;
+                loops += 2;
                 goto loop;
             }
         
@@ -139,6 +149,7 @@ main(int argc, char** argv)
     printf("\n");
         
     fq_poly_clear(f);
+    fq_poly_clear(g);
     fmpz_mod_poly_clear(fmod);
     fq_ctx_clear(ctx);
     fmpz_clear(p);
