@@ -10,10 +10,10 @@ groupopening = stars blankline sectiontitle blankline content stars
 subgroupopening = pluses blankline? subsectiontitle blankline? content pluses
 
 sectiontitle = "    " < linecontent > EOL     {
-    flint_fprintf(out, "\\section{%.*s}\n", yyleng, yytext);}
+    fprintf(out, "\\section{%.*s}\n", yyleng, yytext);}
 
 subsectiontitle = "    " < linecontent > EOL     {
-    flint_fprintf(out, "\\subsection{%.*s}\n", yyleng, yytext);}
+    fprintf(out, "\\subsection{%.*s}\n", yyleng, yytext);}
 
 function = (macroheader|functionheader) functionfooter? EOL*
 
@@ -31,7 +31,7 @@ functionfooter = content
 
 
 content = < (contentline | blankline)* >       {
-    flint_fprintf(out, "%.*s", yyleng, yytext);}
+    fprintf(out, "%.*s", yyleng, yytext);}
 
 contentline = "    " linecontent EOL
 

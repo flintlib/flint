@@ -115,24 +115,24 @@ flint_printfuncheader(const char* text, int len)
 {
     /* We try to be clever and remove newlines and any whitespaces following
        them. */
-    flint_fprintf(out, "\n");
-    flint_fprintf(out, "\\vspace*{0.5em}\n");
-    flint_fprintf(out, "\\begin{lstlisting}\n");
+    fprintf(out, "\n");
+    fprintf(out, "\\vspace*{0.5em}\n");
+    fprintf(out, "\\begin{lstlisting}\n");
     int i = 0;
     while(i < len)
     {
         if(text[i] != '\n')
-            flint_fprintf(out, "%c", text[i++]);
+            fprintf(out, "%c", text[i++]);
         else
         {
             int hasspace = text[i - 1] == ' ';
             while(i < len-1 && text[++i] == ' ' || text[i] == '\t');
             if(!hasspace)
-                flint_fprintf(out, " ");
+                fprintf(out, " ");
         }
     }
-    flint_fprintf(out, "\n\\end{lstlisting}\n");
-    flint_fprintf(out, "\\vspace*{-0.5em}\n");
+    fprintf(out, "\n\\end{lstlisting}\n");
+    fprintf(out, "\\vspace*{-0.5em}\n");
 }
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -166,10 +166,10 @@ int main(void)
 
         if(yyparse() == 0 || !feof(in))
         {
-            flint_printf("\n");
-            flint_printf("Parse exception:\n");
-            flint_printf("Encountered malformed input near line %d \n", line);
-            flint_printf("in file %s.\n\n", name);
+            printf("\n");
+            printf("Parse exception:\n");
+            printf("Encountered malformed input near line %d \n", line);
+            printf("in file %s.\n\n", name);
             return 1;
         }
 
