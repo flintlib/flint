@@ -485,6 +485,10 @@ struct merge_tuple<empty_tuple, Tuple2>
     }
 };
 
+// It seems like this code path is unnecessary and in fact ambiguous.
+// I am fairly convinced by now this is correct.
+// However, in case issues ever come up, it seemed useful to me to retain this.
+// -- Tom Bachmann (15/10/2013)
 #if 0
 // Termination case 2
 template<class Tuple1>

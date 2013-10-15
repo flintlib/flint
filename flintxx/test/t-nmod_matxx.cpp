@@ -149,12 +149,6 @@ test_functions()
     A.set_randrank(rand, 2);
     tassert(rank(A) == 2);
 
-#if 0
-    tassert(B.charpoly().get_coeff(0) == B.det());
-    tassert(charpoly(B).get_coeff(1) == -B.trace());
-    tassert(charpoly(B).lead() == 1);
-#endif
-
     B.set_randtril(rand, false);
     tassert(B*B.solve_tril(A, false) == A);
     tassert(B.solve_tril_classical(A, false) == B.solve_tril(A, false));

@@ -185,12 +185,6 @@ test_functions()
 
     tassert(rank(B) == 2);
 
-#if 0
-    tassert(B.charpoly().get_coeff(0) == B.det());
-    tassert(charpoly(B).get_coeff(1) == -B.trace());
-    tassert(charpoly(B).lead() == 1);
-#endif
-
     Bp.set_randrank(rand, 1);
     tassert(nmod_poly_matxx::from_ground(Bp).solve(A).get<0>() == false);
     Bp.set_randrank(rand, 2);

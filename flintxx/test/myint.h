@@ -388,28 +388,6 @@ struct equals<T, slong,
     }
 };
 
-#if 0
-template<bool c, class Op, class Data>
-struct evaluation<
-    my_expression<
-        operations::plus,
-        make_tuple<const mylong&, const mylong&>::type>,
-    Op, Data,
-    c, 0>
-{
-    typedef mylong return_t;
-    typedef empty_tuple temporaries_t;
-    typedef my_expression<
-        operations::plus,
-        make_tuple<const mylong&, const mylong&>::type> expr_t;
-    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
-    {
-        output->_data().payload = input._data().first()._data().payload
-                                + input._data().second()._data().payload;
-    }
-};
-#endif
-
 template<class T, class U>
 struct commutative_binary_expression<T, typename mp::enable_if<mp::and_<
         mylong_traits::is_source<T>,

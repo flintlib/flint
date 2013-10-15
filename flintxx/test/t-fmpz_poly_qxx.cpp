@@ -90,12 +90,6 @@ test_arithmetic()
     f /= 2;
     tassert(f == g);
 
-#if 0
-    tassert((f * fmpzxx(2)) / fmpzxx(3) == f * fmpqxx(2, 3u));
-    tassert((f * fmpzxx(3)) / fmpzxx(2) == f / fmpqxx(2, 3u));
-    tassert(f * fmpzxx(2) == f * 2 && f / fmpzxx(2) == f / 2);
-#endif
-
     f = "1  1";
     tassert((f*g).num() == f.num()*g.num());
     tassert((f*g).den() == f.den()*g.den());
