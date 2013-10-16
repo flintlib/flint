@@ -198,6 +198,23 @@ void
 fq_poly_factor_berlekamp(fq_poly_factor_t factors, const fq_poly_t f,
                          const fq_ctx_t ctx);
 
+void
+fq_poly_factor_with_berlekamp(fq_poly_factor_t result, fq_t leading_coeff,
+                              const fq_poly_t input, const fq_ctx_t ctx);
+
+void
+fq_poly_factor_with_cantor_zassenhaus(fq_poly_factor_t result, fq_t leading_coeff,
+                                      const fq_poly_t input, const fq_ctx_t ctx);
+
+void
+fq_poly_factor_with_kaltofen_shoup(fq_poly_factor_t result, fq_t leading_coeff,
+                                   const fq_poly_t input, const fq_ctx_t ctx);
+
+void
+fq_poly_factor(fq_poly_factor_t result, fq_t leading_coeff,
+               const fq_poly_t input, const fq_ctx_t ctx);
+
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
