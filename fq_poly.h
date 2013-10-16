@@ -237,6 +237,16 @@ void
 fq_poly_reverse(fq_poly_t res, const fq_poly_t poly, slong n,
                 const fq_ctx_t ctx);
 
+ulong
+fq_poly_deflation(const fq_poly_t input, const fq_ctx_t ctx);
+
+void
+fq_poly_deflate(fq_poly_t result, const fq_poly_t input, ulong deflation,
+                const fq_ctx_t ctx);
+
+void
+fq_poly_inflate(fq_poly_t result, const fq_poly_t input, ulong inflation,
+                const fq_ctx_t ctx);
 
 /*  Getting and setting coefficients  ****************************************/
 
