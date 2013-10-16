@@ -154,58 +154,52 @@ void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
     We require that $d$ is normalised, i.e. with the most significant
     bit of the most significant limb set.
 
-void flint_mpn_mod_n_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr d,
-                                                  mp_size_t n, mp_srcptr dinv)
+void flint_mpn_mod_n_preinvn(mp_ptr a, mp_size_t m, 
+                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
-    Given a normalised integer $d$ with precomputed inverse \code{dinv} 
+    Given a normalised integer $d$ with precomputed inverse \code{dinv}
     provided by \code{flint_mpn_preinvn}, computes $a \pmod{d}$ and
-    stores the result in $r$. The value $a$ is expected to have
-    \code{2*n} limbs of space (zero padded if necessary) and the upper $n$
-    limbs must be reduced modulo \code{d}.
+    stores the result in the low $n$ limbs of $a$. The upper $n$
+    limbs of $a$ must be reduced modulo \code{d}.
 
-    The value $r$ is expected to have space for $n$ limbs, however it may
-    also be aliased with the first $n$ limbs of $a$. No other overlap is
-    permitted between $r$ and $a$.
+    We require $2*n >= m >= n$. No other overlap is permitted between $a$ and
+    any of the other operands.
 
-void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, 
+void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
     Given a normalised integer $d$ with precomputed inverse \code{dinv} 
     provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
-    and stores the result in $q$ and the remainder in $r$. The value $a$ is
-    expected to have \code{2*n} limbs of space (zero padded if necessary) and
-    the upper $n$ limbs must be reduced modulo \code{d}.
+    and stores the result in $q$ and the remainder in the lower $n$ limbs of
+    $a$. The remaining limbs of $a$ are destroyed. The upper $n$ limbs of $a$
+    must be reduced modulo \code{d}.
 
-    The values $q$ and $r$ are expected to have space for $n$ limbs, however
-    $r$ may also be aliased with the first $n$ limbs of $a$. No other overlap
-    is permitted between $r$ and $a$ and no aliasing is permitted between $q$
-    and the other operands. Nor may $r$ alias with any of the source operands.
+    We require $2*n >= m >= n$. The value $q$ is expected to have space for
+    $m - n$ limbs. No aliasing is permitted between $q$ and $a$ or these and 
+    any of the other operands.
    
+void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
+                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+
+    Given a normalised integer $d$ of $n$ limbs, with precomputed inverse
+    \code{dinv} provided by \code{flint_mpn_preinvn} and integer $a$ of $m$
+    limbs, computes $a \pmod{d}$ and stores the result in-place in the lower
+    $n$ limbs of $a$. The remaining limbs of $a$ are destroyed.
+
+    We require $m \geq n$. No aliasing of $a$ with any of the other operands
+    is permitted.
+
 mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr a, mp_size_t m, 
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
     Given a normalised integer $d$ with precomputed inverse \code{dinv} 
     provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
     and stores the result in $q$ and the remainder in the lower $n$ limbs of
-    $a$.
+    $a$. The remaining limbs of $a$ are destroyed.
 
-    The values $q$ is expected to have space for $m - n$ limbs is $m > n$, and
-    $a$ is expected to have space for $2*n$ limbs. No aliasing is permitted
-    between $q$ and the other operands. Nor may $a$ alias with any of the
-    source operands.
-
-   
-
-void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
-                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
-
-    Given a normalised integer $d$ of $n$ limbs, with precomputed inverse
-    \code{dinv} provided by \code{flint_mpn_preinvn} and integer $a$ of $m$
-    limbs, computes $a \pmod{d}$ and stores the result in-place in the lower $n$
-    limbs of $a$. The remaining limbs of $a$ are destroyed.
-
-    The value $a$ is expected to have at least \code{2*n} limbs of space (zero
-    padded if necessary). There are no restrictions on $m$ except $m \geq 0$.
+    The value $q$ is expected to have space for $m - n$ limbs and we require
+    $m >= n$. No aliasing is permitted between $q$ and $a$ or between these
+    and any of the other operands. 
 
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
