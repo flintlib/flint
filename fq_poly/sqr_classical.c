@@ -37,7 +37,7 @@ void _fq_poly_sqr_classical(fq_struct *rop,
         long i;
         fq_t t;
 
-        fq_init(t);
+        fq_init(t, ctx);
 
         _fq_poly_scalar_mul_fq(rop, op, len, op, ctx);
 
@@ -54,7 +54,7 @@ void _fq_poly_sqr_classical(fq_struct *rop,
             fq_sqr(t, op + i, ctx);
             fq_add(rop + 2 * i, rop + 2 * i, t, ctx);
         }
-        fq_clear(t);
+        fq_clear(t, ctx);
     }
 }
 
@@ -72,10 +72,10 @@ void fq_poly_sqr_classical(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx
     {
         fq_poly_t t;
 
-        fq_poly_init2(t, len);
+        fq_poly_init2(t, len, ctx);
         _fq_poly_sqr_classical(t->coeffs, op->coeffs, op->length, ctx);
-        fq_poly_swap(rop, t);
-        fq_poly_clear(t);
+        fq_poly_swap(rop, t, ctx);
+        fq_poly_clear(t, ctx);
     }
     else
     {

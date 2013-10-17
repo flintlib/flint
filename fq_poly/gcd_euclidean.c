@@ -37,12 +37,12 @@ long _fq_poly_gcd_euclidean(fq_struct * G, const fq_struct * A, long lenA,
 
     fq_t inv;
 
-    fq_init (inv);
+    fq_init (inv, ctx);
     T = _fq_vec_init (lenA, ctx);
     R1 = _fq_vec_init (lenA, ctx);
     R2 = _fq_vec_init (lenB, ctx);
-    _fq_vec_set (R1, A, lenA);
-    _fq_vec_set (R2, B, lenB);
+    _fq_vec_set (R1, A, lenA, ctx);
+    _fq_vec_set (R2, B, lenB, ctx);
 
     while (lenR2 > 0)
     {
@@ -53,19 +53,19 @@ long _fq_poly_gcd_euclidean(fq_struct * G, const fq_struct * A, long lenA,
         _fq_poly_rem (R1, R1, lenR1, R2, lenR2, inv, ctx);
         _fq_poly_normalise2 (R1, &lenR1, ctx);
 
-        _fq_vec_set (T, R1, lenR1);
-        _fq_vec_set (R1, R2, lenR2);
-        _fq_vec_set (R2, T, lenR1);
+        _fq_vec_set (T, R1, lenR1, ctx);
+        _fq_vec_set (R1, R2, lenR2, ctx);
+        _fq_vec_set (R2, T, lenR1, ctx);
         lenT = lenR1;
         lenR1 = lenR2;
         lenR2 = lenT;
     }
 
-    _fq_poly_set (G, R1, lenR1);
-    _fq_vec_clear(T, lenA);
-    _fq_vec_clear(R1, lenA);
-    _fq_vec_clear(R2, lenB);
-    fq_clear(inv);
+    _fq_poly_set (G, R1, lenR1, ctx);
+    _fq_vec_clear(T, lenA, ctx);
+    _fq_vec_clear(R1, lenA, ctx);
+    _fq_vec_clear(R2, lenB, ctx);
+    fq_clear(inv, ctx);
     return lenR1;
 }
 
@@ -170,7 +170,7 @@ void fq_poly_gcd_euclidean(fq_poly_t G,
         {
             if (G == A || G == B)
             {
-                fq_poly_init2(tG, FLINT_MIN(lenA, lenB));
+                fq_poly_init2(tG, FLINT_MIN(lenA, lenB), ctx);
                 g = tG->coeffs;
             }
             else
@@ -184,15 +184,15 @@ void fq_poly_gcd_euclidean(fq_poly_t G,
 
             if (G == A || G == B)
             {
-                fq_poly_swap(tG, G);
-                fq_poly_clear(tG);
+                fq_poly_swap(tG, G, ctx);
+                fq_poly_clear(tG, ctx);
             }
             G->length = lenG;
 
             if (G->length == 1)
                 fq_one(&(G->coeffs[0]), ctx);
             else
-                fq_poly_make_monic(G, G,ctx);
+                fq_poly_make_monic(G, G, ctx);
         }
     }
 }

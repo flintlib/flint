@@ -52,10 +52,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
         
-        fq_poly_init(pol1);
-        fq_poly_init(poly);
-        fq_poly_init(quot);
-        fq_poly_init(rem);
+        fq_poly_init(pol1, ctx);
+        fq_poly_init(poly, ctx);
+        fq_poly_init(quot, ctx);
+        fq_poly_init(rem, ctx);
 
         fq_poly_one(pol1, ctx);
 
@@ -124,11 +124,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(quot);
-        fq_poly_clear(rem);
-        fq_poly_clear(pol1);
-        fq_poly_clear(poly);
-        fq_poly_factor_clear(res);
+        fq_poly_clear(quot, ctx);
+        fq_poly_clear(rem, ctx);
+        fq_poly_clear(pol1, ctx);
+        fq_poly_clear(poly, ctx);
+        fq_poly_factor_clear(res, ctx);
         
         fq_ctx_clear(ctx);
     }

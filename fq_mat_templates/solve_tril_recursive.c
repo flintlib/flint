@@ -52,25 +52,25 @@ TEMPLATE(T, mat_solve_tril_recursive)(TEMPLATE(T, mat_t) X,
     [C D]  [Y]  ==  [-D^ C A^    D^] [Y]  ==  [D^ (Y - C A^ X)]
     */
 
-    TEMPLATE(T, mat_window_init)(LA, L, 0, 0, r, r);
-    TEMPLATE(T, mat_window_init)(LC, L, r, 0, n, r);
-    TEMPLATE(T, mat_window_init)(LD, L, r, r, n, n);
-    TEMPLATE(T, mat_window_init)(BX, B, 0, 0, r, m);
-    TEMPLATE(T, mat_window_init)(BY, B, r, 0, n, m);
-    TEMPLATE(T, mat_window_init)(XX, X, 0, 0, r, m);
-    TEMPLATE(T, mat_window_init)(XY, X, r, 0, n, m);
+    TEMPLATE(T, mat_window_init)(LA, L, 0, 0, r, r, ctx);
+    TEMPLATE(T, mat_window_init)(LC, L, r, 0, n, r, ctx);
+    TEMPLATE(T, mat_window_init)(LD, L, r, r, n, n, ctx);
+    TEMPLATE(T, mat_window_init)(BX, B, 0, 0, r, m, ctx);
+    TEMPLATE(T, mat_window_init)(BY, B, r, 0, n, m, ctx);
+    TEMPLATE(T, mat_window_init)(XX, X, 0, 0, r, m, ctx);
+    TEMPLATE(T, mat_window_init)(XY, X, r, 0, n, m, ctx);
 
     TEMPLATE(T, mat_solve_tril)(XX, LA, BX, unit, ctx);
     TEMPLATE(T, mat_submul)(XY, BY, LC, XX, ctx);
     TEMPLATE(T, mat_solve_tril)(XY, LD, XY, unit, ctx);
 
-    TEMPLATE(T, mat_window_clear)(LA);
-    TEMPLATE(T, mat_window_clear)(LC);
-    TEMPLATE(T, mat_window_clear)(LD);
-    TEMPLATE(T, mat_window_clear)(BX);
-    TEMPLATE(T, mat_window_clear)(BY);
-    TEMPLATE(T, mat_window_clear)(XX);
-    TEMPLATE(T, mat_window_clear)(XY);
+    TEMPLATE(T, mat_window_clear)(LA, ctx);
+    TEMPLATE(T, mat_window_clear)(LC, ctx);
+    TEMPLATE(T, mat_window_clear)(LD, ctx);
+    TEMPLATE(T, mat_window_clear)(BX, ctx);
+    TEMPLATE(T, mat_window_clear)(BY, ctx);
+    TEMPLATE(T, mat_window_clear)(XX, ctx);
+    TEMPLATE(T, mat_window_clear)(XY, ctx);
 }
 
 

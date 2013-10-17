@@ -38,7 +38,7 @@ void _fq_poly_sub(fq_struct *res,
 
     if (poly1 != res)
         for (i = min; i < len1; i++)
-            fq_set(res + i, poly1 + i);
+            fq_set(res + i, poly1 + i, ctx);
 
     for (i = min; i < len2; i++)
         fq_neg(res + i, poly2 + i, ctx);

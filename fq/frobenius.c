@@ -67,7 +67,7 @@ void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
     }
     else if (e == 0)
     {
-        fq_set(rop, op);
+        fq_set(rop, op, ctx);
     }
     else
     {

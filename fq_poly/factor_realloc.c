@@ -32,7 +32,7 @@ fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc, const fq_ctx_t ctx)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {
-        fq_poly_factor_clear(fac);
+        fq_poly_factor_clear(fac, ctx);
         fq_poly_factor_init(fac, ctx);
     }
     else if (fac->alloc)        /* Realloc */
@@ -42,7 +42,7 @@ fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc, const fq_ctx_t ctx)
             slong i;
 
             for (i = alloc; i < fac->num; i++)
-                fq_poly_clear(fac->poly + i);
+                fq_poly_clear(fac->poly + i, ctx);
 
             fac->poly =
                 flint_realloc(fac->poly, alloc * sizeof(fq_poly_struct));
@@ -59,7 +59,7 @@ fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc, const fq_ctx_t ctx)
 
             for (i = fac->alloc; i < alloc; i++)
             {
-                fq_poly_init(fac->poly + i);
+                fq_poly_init(fac->poly + i, ctx);
                 fac->exp[i] = 0L;
             }
             fac->alloc = alloc;
@@ -73,7 +73,7 @@ fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc, const fq_ctx_t ctx)
         fac->exp = flint_calloc(alloc, sizeof(slong));
 
         for (i = 0; i < alloc; i++)
-            fq_poly_init(fac->poly + i);
+            fq_poly_init(fac->poly + i, ctx);
         fac->num = 0;
         fac->alloc = alloc;
     }

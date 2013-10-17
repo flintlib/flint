@@ -32,18 +32,18 @@ void fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
 
     if (alloc == 0)             /* Clear up, reinitialise */
     {
-        fq_poly_clear(poly);
-        fq_poly_init(poly);
+        fq_poly_clear(poly, ctx);
+        fq_poly_init(poly, ctx);
     }
     else if (poly->alloc)       /* Realloc */
     {
         for (i = alloc; i < poly->alloc; i++)
-            fq_clear(poly->coeffs + i);
+            fq_clear(poly->coeffs + i, ctx);
 
         poly->coeffs = (fq_struct *) flint_realloc(poly->coeffs, alloc * sizeof(fq_struct));
 
         for (i = poly->alloc; i < alloc; i++)
-            fq_init(poly->coeffs + i);
+            fq_init(poly->coeffs + i, ctx);
 
         poly->length = FLINT_MIN(poly->length, alloc);
         _fq_poly_normalise(poly, ctx);
@@ -53,7 +53,7 @@ void fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
         poly->coeffs = (fq_struct *) flint_malloc(alloc * sizeof(fq_struct));
 
         for(i = 0; i < alloc; i++)
-            fq_init(poly->coeffs + i);
+            fq_init(poly->coeffs + i, ctx);
     }
     poly->alloc = alloc;
 }

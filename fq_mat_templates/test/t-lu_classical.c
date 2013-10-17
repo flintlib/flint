@@ -78,17 +78,17 @@ void check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong r
     for (i = 0; i < m; i++)
     {
         for (j = 0; j < FLINT_MIN(i, n); j++)
-            TEMPLATE(T, mat_entry_set)(L, i, j, TEMPLATE(T, mat_entry)(LU, i, j));
+            TEMPLATE(T, mat_entry_set)(L, i, j, TEMPLATE(T, mat_entry)(LU, i, j), ctx);
         if (i < rank)
             TEMPLATE(T, one)(TEMPLATE(T, mat_entry)(L, i, i), ctx);
         for (j = i; j < n; j++)
-            TEMPLATE(T, mat_entry_set)(U, i, j, TEMPLATE(T, mat_entry)(LU, i, j));
+            TEMPLATE(T, mat_entry_set)(U, i, j, TEMPLATE(T, mat_entry)(LU, i, j), ctx);
     }
 
     TEMPLATE(T, mat_mul)(B, L, U, ctx);
     perm(B, P);
 
-    if (!TEMPLATE(T, mat_equal)(A, B))
+    if (!TEMPLATE(T, mat_equal)(A, B, ctx))
     {
         printf("FAIL\n");
         printf("A:\n");
@@ -100,9 +100,9 @@ void check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong r
         abort();
     }
 
-    TEMPLATE(T, mat_clear)(B);
-    TEMPLATE(T, mat_clear)(L);
-    TEMPLATE(T, mat_clear)(U);
+    TEMPLATE(T, mat_clear)(B, ctx);
+    TEMPLATE(T, mat_clear)(L, ctx);
+    TEMPLATE(T, mat_clear)(U, ctx);
 }
 
 
@@ -160,8 +160,8 @@ main(void)
 
             check(P, LU, A, rank, ctx);
 
-            TEMPLATE(T, mat_clear)(A);
-            TEMPLATE(T, mat_clear)(LU);
+            TEMPLATE(T, mat_clear)(A, ctx);
+            TEMPLATE(T, mat_clear)(LU, ctx);
             flint_free(P);
 
         }

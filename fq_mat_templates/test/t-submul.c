@@ -71,7 +71,7 @@ main(void)
         TEMPLATE(T, mat_mul)(T, A, B, ctx);
         TEMPLATE(T, mat_sub)(E, C, T, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(D, E))
+        if (!TEMPLATE(T, mat_equal)(D, E, ctx))
         {
             printf("FAIL: results not equal\n");
             TEMPLATE(T, mat_print_pretty)(A, ctx);
@@ -85,7 +85,7 @@ main(void)
         /* Check aliasing */
         TEMPLATE(T, mat_submul)(C, C, A, B, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(C, E))
+        if (!TEMPLATE(T, mat_equal)(C, E, ctx))
         {
             printf("FAIL: results not equal (aliasing)\n");
             TEMPLATE(T, mat_print_pretty)(A, ctx);
@@ -96,12 +96,12 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, mat_clear)(A);
-        TEMPLATE(T, mat_clear)(B);
-        TEMPLATE(T, mat_clear)(C);
-        TEMPLATE(T, mat_clear)(D);
-        TEMPLATE(T, mat_clear)(E);
-        TEMPLATE(T, mat_clear)(T);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(C, ctx);
+        TEMPLATE(T, mat_clear)(D, ctx);
+        TEMPLATE(T, mat_clear)(E, ctx);
+        TEMPLATE(T, mat_clear)(T, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

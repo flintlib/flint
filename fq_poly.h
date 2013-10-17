@@ -49,11 +49,11 @@ typedef fq_poly_struct fq_poly_t[1];
 
 /*  Memory management ********************************************************/
 
-fq_struct * _fq_poly_init(long len);
+fq_struct * _fq_poly_init(long len, const fq_ctx_t ctx);
 
-void fq_poly_init(fq_poly_t poly);
+void fq_poly_init(fq_poly_t poly, const fq_ctx_t ctx);
 
-void fq_poly_init2(fq_poly_t poly, long alloc);
+void fq_poly_init2(fq_poly_t poly, long alloc, const fq_ctx_t ctx);
 
 void fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx);
 
@@ -61,9 +61,9 @@ void fq_poly_truncate(fq_poly_t poly, long len, const fq_ctx_t ctx);
 
 void fq_poly_fit_length(fq_poly_t poly, long len, const fq_ctx_t ctx);
 
-void _fq_poly_clear(fq_struct *v, long len);
+void _fq_poly_clear(fq_struct *v, long len, const fq_ctx_t ctx);
 
-void fq_poly_clear(fq_poly_t poly);
+void fq_poly_clear(fq_poly_t poly, const fq_ctx_t ctx);
 
 void _fq_poly_normalise(fq_poly_t poly, const fq_ctx_t ctx);
 
@@ -89,17 +89,17 @@ do {                                                \
 
 /*  Polynomial parameters  ***************************************************/
 
-static __inline__ long fq_poly_length(const fq_poly_t poly)
+static __inline__ long fq_poly_length(const fq_poly_t poly, const fq_ctx_t ctx)
 {
     return poly->length;
 }
 
-static __inline__ long fq_poly_degree(const fq_poly_t poly)
+static __inline__ long fq_poly_degree(const fq_poly_t poly, const fq_ctx_t ctx)
 {
     return poly->length - 1;
 }
 
-static __inline__ fq_struct * fq_poly_lead(const fq_poly_t poly)
+static __inline__ fq_struct * fq_poly_lead(const fq_poly_t poly, const fq_ctx_t ctx)
 {
     return poly->length > 0 ? poly->coeffs + (poly->length - 1) : NULL;
 }
@@ -132,7 +132,7 @@ typedef fq_poly_factor_struct fq_poly_factor_t[1];
 
 void fq_poly_factor_init(fq_poly_factor_t fac, const fq_ctx_t ctx);
 
-void fq_poly_factor_clear(fq_poly_factor_t fac);
+void fq_poly_factor_clear(fq_poly_factor_t fac, const fq_ctx_t ctx);
 
 void fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc,
                             const fq_ctx_t ctx);
@@ -155,7 +155,7 @@ fq_poly_factor_print_pretty(const fq_poly_factor_t fac, const char * var,
 void fq_poly_factor_concat(fq_poly_factor_t res, const fq_poly_factor_t fac,
                            const fq_ctx_t ctx);
 
-void fq_poly_factor_pow(fq_poly_factor_t fac, slong exp);
+void fq_poly_factor_pow(fq_poly_factor_t fac, slong exp, const fq_ctx_t ctx);
 
 int
 _fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx);
@@ -217,13 +217,13 @@ fq_poly_factor(fq_poly_factor_t result, fq_t leading_coeff,
 
 /*  Assignment and basic manipulation  ***************************************/
 
-void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
+void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len, const fq_ctx_t ctx);
 
 void fq_poly_set(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 void fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx);
 
-void fq_poly_swap(fq_poly_t op1, fq_poly_t op2);
+void fq_poly_swap(fq_poly_t op1, fq_poly_t op2, const fq_ctx_t ctx);
 
 static __inline__ void _fq_poly_zero(fq_struct *rop, long len, const fq_ctx_t ctx)
 {
@@ -276,10 +276,10 @@ void fq_poly_set_coeff_fmpz(fq_poly_t poly, long n, const fmpz_t x, const fq_ctx
 {
     /* TODO: Fix me. */
     fq_t f;
-    fq_init(f);
+    fq_init(f, ctx);
     fq_set_fmpz(f, x, ctx);
     fq_poly_set_coeff(poly, n, f, ctx);
-    fq_clear(f);
+    fq_clear(f, ctx);
 }
 
 static __inline__ int 
@@ -292,9 +292,9 @@ fq_poly_is_gen(const fq_poly_t poly,  const fq_ctx_t ctx)
 
 /*  Comparison  **************************************************************/
 
-int fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2);
+int fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2, const fq_ctx_t ctx);
 
-static __inline__ int fq_poly_is_zero(const fq_poly_t poly)
+static __inline__ int fq_poly_is_zero(const fq_poly_t poly, const fq_ctx_t ctx)
 {
     return (poly->length == 0);
 }
@@ -312,7 +312,7 @@ static __inline__ int fq_poly_is_unit(const fq_poly_t op, const fq_ctx_t ctx)
 static __inline__ int fq_poly_equal_fq(const fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
 {
     return ((poly->length == 0) && fq_is_zero(c, ctx)) ||
-        ((poly->length == 1) && fq_equal(poly->coeffs, c));
+        ((poly->length == 1) && fq_equal(poly->coeffs, c, ctx));
 }
 
 /*  Addition and subtraction  ************************************************/
@@ -374,23 +374,22 @@ void _fq_poly_mul_reorder(fq_struct *rop,
                           const fq_struct *op2, long len2, 
                           const fq_ctx_t ctx);
 
-void fq_poly_mul_reorder(fq_poly_t rop, 
-    const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx);
+void fq_poly_mul_reorder(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
+                         const fq_ctx_t ctx);
 
 void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1, 
                                      const fq_struct *op2, long len2, 
                                      const fq_ctx_t ctx);
 
-void fq_poly_mul_KS(fq_poly_t rop, 
-                    const fq_poly_t op1, const fq_poly_t op2, 
+void fq_poly_mul_KS(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                     const fq_ctx_t ctx);
 
 void _fq_poly_mul(fq_struct *rop, const fq_struct *op1, long len1, 
                                   const fq_struct *op2, long len2, 
                                   const fq_ctx_t ctx);
 
-void fq_poly_mul(fq_poly_t rop, 
-                 const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx);
+void fq_poly_mul(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
+                 const fq_ctx_t ctx);
 
 void _fq_poly_mullow_classical(fq_struct *rop, 
                                const fq_struct *op1, long len1, 
@@ -611,9 +610,9 @@ void _fq_poly_rem(fq_struct *R, const fq_struct *A, long lenA,
                   const fq_struct *B, long lenB, const fq_t invB,
                   const fq_ctx_t ctx)
 {
-    fq_struct *Q = _fq_poly_init(lenA + lenB); /*TODO: smaller bound */
+    fq_struct *Q = _fq_poly_init(lenA + lenB, ctx); /*TODO: smaller bound */
     _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
-    _fq_poly_clear(Q,lenA+lenB);
+    _fq_poly_clear(Q, lenA + lenB, ctx);
 }
 
 
@@ -624,9 +623,9 @@ void fq_poly_rem(fq_poly_t R,
                     const fq_ctx_t ctx)
 {
     fq_poly_t Q;
-    fq_poly_init2(Q,A->length+B->length);/*TDOO: smaller bound*/
+    fq_poly_init2(Q,A->length+B->length, ctx);/*TDOO: smaller bound*/
     fq_poly_divrem_basecase(Q, R, A, B, ctx);
-    fq_poly_clear(Q);
+    fq_poly_clear(Q, ctx);
 }
 
 void 

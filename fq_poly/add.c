@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -38,11 +39,11 @@ void _fq_poly_add(fq_struct *res,
 
     if (poly1 != res)
         for (i = min; i < len1; i++)
-            fq_set(res + i, poly1 + i);
+            fq_set(res + i, poly1 + i, ctx);
 
     if (poly2 != res)
         for (i = min; i < len2; i++)
-            fq_set(res + i, poly2 + i);
+            fq_set(res + i, poly2 + i, ctx);
 }
 
 void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, 

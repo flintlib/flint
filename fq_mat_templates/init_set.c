@@ -33,7 +33,7 @@ TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) src,
                           const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, mat_init)(mat, src->r, src->c, ctx);
-    TEMPLATE(T, mat_set)(mat, src);
+    TEMPLATE(T, mat_set)(mat, src, ctx);
 }
 
 

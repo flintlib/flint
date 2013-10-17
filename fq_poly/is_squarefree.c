@@ -49,7 +49,7 @@ _fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx)
     else
         res = 0;   /* gcd(f, 0) = f, and len(f) > 2 */
 
-    _fq_vec_clear(fd, 2 * (len - 1));
+    _fq_vec_clear(fd, 2 * (len - 1), ctx);
     return res;
 }
 

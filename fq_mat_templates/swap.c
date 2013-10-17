@@ -29,7 +29,8 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2)
+TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
+                      const TEMPLATE(T, ctx_t) ctx)
 {
     if (mat1 != mat2)
     {

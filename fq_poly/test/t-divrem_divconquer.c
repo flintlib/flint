@@ -44,11 +44,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
-        fq_poly_init(t);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
+        fq_poly_init(t, ctx);
         fq_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
@@ -57,7 +57,7 @@ main(void)
         fq_poly_mul(t, q, b, ctx);
         fq_poly_add(t, t, r, ctx);
 
-        result = (fq_poly_equal(a, t));
+        result = (fq_poly_equal(a, t, ctx));
         if (!result)
         {
             printf("FAIL #1:\n");
@@ -69,11 +69,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
-        fq_poly_clear(t);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
+        fq_poly_clear(t, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -85,17 +85,17 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
         fq_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
         fq_poly_divrem_divconquer(q, r, a, b, ctx);
         fq_poly_divrem_divconquer(a, b, a, b, ctx);
 
-        result = (fq_poly_equal(q, a) && fq_poly_equal(r, b));
+        result = (fq_poly_equal(q, a, ctx) && fq_poly_equal(r, b, ctx));
         if (!result)
         {
             printf("FAIL #2:\n");
@@ -106,10 +106,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -121,17 +121,17 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
         fq_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
         fq_poly_divrem_divconquer(q, r, a, b, ctx);
         fq_poly_divrem_divconquer(b, a, a, b, ctx);
 
-        result = (fq_poly_equal(q, b) && fq_poly_equal(r, a));
+        result = (fq_poly_equal(q, b, ctx) && fq_poly_equal(r, a, ctx));
         if (!result)
         {
             printf("FAIL #3:\n");
@@ -142,10 +142,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 

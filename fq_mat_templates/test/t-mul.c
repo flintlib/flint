@@ -64,7 +64,7 @@ main(void)
         TEMPLATE(T, mat_mul)(C, A, B, ctx);
         TEMPLATE(T, mat_mul)(A, A, B, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(C, A))
+        if (!TEMPLATE(T, mat_equal)(C, A, ctx))
         {
             printf("FAIL:\n");
             printf("A:\n");
@@ -77,9 +77,9 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, mat_clear)(A);
-        TEMPLATE(T, mat_clear)(B);
-        TEMPLATE(T, mat_clear)(C);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(C, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }
@@ -107,7 +107,7 @@ main(void)
         TEMPLATE(T, mat_mul)(C, A, B, ctx);
         TEMPLATE(T, mat_mul)(B, A, B, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(C, B))
+        if (!TEMPLATE(T, mat_equal)(C, B, ctx))
         {
             printf("FAIL:\n");
             printf("A:\n");
@@ -120,9 +120,9 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, mat_clear)(A);
-        TEMPLATE(T, mat_clear)(B);
-        TEMPLATE(T, mat_clear)(C);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(C, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

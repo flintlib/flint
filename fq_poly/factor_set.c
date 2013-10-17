@@ -33,7 +33,7 @@ fq_poly_factor_set(fq_poly_factor_t res, const fq_poly_factor_t fac,
     {
         if (fac->num == 0)
         {
-            fq_poly_factor_clear(res);
+            fq_poly_factor_clear(res, ctx);
             fq_poly_factor_init(res, ctx);
         }
         else

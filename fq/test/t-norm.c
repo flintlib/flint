@@ -57,9 +57,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
         fmpz_init(x);
         fmpz_init(y);
 
@@ -92,9 +92,9 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
         fmpz_clear(x);
         fmpz_clear(y);
 

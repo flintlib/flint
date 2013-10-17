@@ -49,10 +49,10 @@ _fq_poly_powmod_fmpz_binexp(fq_struct * res, const fq_struct * poly,
     T = _fq_vec_init(lenT + lenQ, ctx);
     Q = T + lenT;
 
-    fq_init(invf);
+    fq_init(invf, ctx);
     fq_inv(invf, f + lenf - 1, ctx);
 
-    _fq_vec_set(res, poly, lenf - 1);
+    _fq_vec_set(res, poly, lenf - 1, ctx);
 
     for (i = fmpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {
@@ -66,8 +66,8 @@ _fq_poly_powmod_fmpz_binexp(fq_struct * res, const fq_struct * poly,
         }
     }
 
-    fq_clear(invf);
-    _fq_vec_clear(T, lenT + lenQ);
+    fq_clear(invf, ctx);
+    _fq_vec_clear(T, lenT + lenQ, ctx);
 }
 
 
@@ -96,12 +96,12 @@ fq_poly_powmod_fmpz_binexp(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
     if (len >= lenf)
     {
         fq_poly_t t, r;
-        fq_poly_init(t);
-        fq_poly_init(r);
+        fq_poly_init(t, ctx);
+        fq_poly_init(r, ctx);
         fq_poly_divrem(t, r, poly, f, ctx);
         fq_poly_powmod_fmpz_binexp(res, r, e, f, ctx);
-        fq_poly_clear(t);
-        fq_poly_clear(r);
+        fq_poly_clear(t, ctx);
+        fq_poly_clear(r, ctx);
         return;
     }
 
@@ -136,7 +136,7 @@ fq_poly_powmod_fmpz_binexp(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
     if (poly->length < trunc)
     {
         q = _fq_vec_init(trunc, ctx);
-        _fq_vec_set(q, poly->coeffs, len);
+        _fq_vec_set(q, poly->coeffs, len, ctx);
         _fq_vec_zero(q + len, trunc - len, ctx);
         qcopy = 1;
     }
@@ -148,21 +148,21 @@ fq_poly_powmod_fmpz_binexp(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
     if ((res == poly && !qcopy) || (res == f))
     {
         fq_poly_t t;
-        fq_poly_init2(t, 2 * lenf - 3);
+        fq_poly_init2(t, 2 * lenf - 3, ctx);
         _fq_poly_powmod_fmpz_binexp(t->coeffs, q, e, 
-                                              f->coeffs, lenf, ctx);
-        fq_poly_swap(res, t);
-        fq_poly_clear(t);
+                                    f->coeffs, lenf, ctx);
+        fq_poly_swap(res, t, ctx);
+        fq_poly_clear(t, ctx);
     }
     else
     {
         fq_poly_fit_length(res, 2 * lenf - 3, ctx);
         _fq_poly_powmod_fmpz_binexp(res->coeffs, q, e, 
-                                              f->coeffs, lenf, ctx);
+                                    f->coeffs, lenf, ctx);
     }
 
     if (qcopy)
-        _fq_vec_clear(q, trunc);
+        _fq_vec_clear(q, trunc, ctx);
 
     _fq_poly_set_length(res, trunc, ctx);
     _fq_poly_normalise(res, ctx);

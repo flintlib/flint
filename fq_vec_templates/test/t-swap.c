@@ -57,10 +57,10 @@ main(void)
         _TEMPLATE(T, vec_randtest)(a, state, len, ctx);
         _TEMPLATE(T, vec_randtest)(b, state, len, ctx);
 
-        _TEMPLATE(T, vec_set)(c, b, len);
-        _TEMPLATE(T, vec_swap)(a, b, len);
+        _TEMPLATE(T, vec_set)(c, b, len, ctx);
+        _TEMPLATE(T, vec_swap)(a, b, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(a, c, len));
+        result = (_TEMPLATE(T, vec_equal)(a, c, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -70,9 +70,9 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
-        _TEMPLATE(T, vec_clear)(b, len);
-        _TEMPLATE(T, vec_clear)(c, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear)(b, len, ctx);
+        _TEMPLATE(T, vec_clear)(c, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

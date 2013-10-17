@@ -33,12 +33,12 @@ void _fq_poly_shift_left(fq_struct *rop, const fq_struct *op, long len, long n, 
     if (rop != op)
     {
         for (i = len; i--; )
-            fq_set(rop + n + i, op + i);
+            fq_set(rop + n + i, op + i, ctx);
     }
     else
     {
         for (i = len; i--; )
-            fq_swap(rop + n + i, rop + i);
+            fq_swap(rop + n + i, rop + i, ctx);
     }
 
     for (i = 0; i < n; i++)
@@ -51,7 +51,7 @@ void fq_poly_shift_left(fq_poly_t rop, const fq_poly_t op, long n, const fq_ctx_
     {
         fq_poly_set(rop, op, ctx);
     }
-    else if (fq_poly_is_zero(op))
+    else if (fq_poly_is_zero(op, ctx))
     {
         fq_poly_zero(rop, ctx);
     }

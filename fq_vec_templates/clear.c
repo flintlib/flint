@@ -29,11 +29,12 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, vec_clear)(TEMPLATE(T, struct) * vec, slong len)
+_TEMPLATE(T, vec_clear)(TEMPLATE(T, struct) * vec, slong len,
+                        const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        TEMPLATE(T, clear)(vec + i);
+        TEMPLATE(T, clear)(vec + i, ctx);
     flint_free(vec);
 }
 

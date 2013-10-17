@@ -52,10 +52,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(pol1);
-        fq_poly_init(poly);
-        fq_poly_init(quot);
-        fq_poly_init(rem);
+        fq_poly_init(pol1, ctx);
+        fq_poly_init(poly, ctx);
+        fq_poly_init(quot, ctx);
+        fq_poly_init(rem, ctx);
 
         fq_poly_zero(pol1, ctx);
         fq_poly_one(pol1, ctx);
@@ -88,7 +88,7 @@ main(void)
 
         fq_poly_factor_init(res, ctx);
 
-        fq_init(lead);
+        fq_init(lead, ctx);
 
         switch (n_randint(state, 4))
         {
@@ -119,13 +119,13 @@ main(void)
             abort();
         }
 
-        fq_poly_init(product);
+        fq_poly_init(product, ctx);
         fq_poly_one(product, ctx);
         for (i = 0; i < res->num; i++)
             for (j = 0; j < res->exp[i]; j++)
                 fq_poly_mul(product, product, res->poly + i, ctx);
         fq_poly_scalar_mul_fq(product, product, lead, ctx);
-        result &= fq_poly_equal(pol1, product);
+        result &= fq_poly_equal(pol1, product, ctx);
         if (!result)
         {
             flint_printf("Error: product of factors does not equal original polynomial\n");
@@ -133,14 +133,14 @@ main(void)
             fq_poly_print_pretty(product, "x", ctx); flint_printf("\n");
             abort();
         }
-        fq_poly_clear(product);
+        fq_poly_clear(product, ctx);
 
-        fq_poly_clear(quot);
-        fq_poly_clear(rem);
-        fq_poly_clear(pol1);
-        fq_poly_clear(poly);
-        fq_poly_factor_clear(res);
-        fq_clear(lead);
+        fq_poly_clear(quot, ctx);
+        fq_poly_clear(rem, ctx);
+        fq_poly_clear(pol1, ctx);
+        fq_poly_clear(poly, ctx);
+        fq_poly_factor_clear(res, ctx);
+        fq_clear(lead, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -158,10 +158,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(pol1);
-        fq_poly_init(poly);
-        fq_poly_init(quot);
-        fq_poly_init(rem);
+        fq_poly_init(pol1, ctx);
+        fq_poly_init(poly, ctx);
+        fq_poly_init(quot, ctx);
+        fq_poly_init(rem, ctx);
 
         fq_poly_zero(pol1, ctx);
         fq_poly_one(pol1, ctx);
@@ -198,7 +198,7 @@ main(void)
         fq_poly_factor_init(res, ctx);
         fq_poly_factor_init(res2, ctx);
 
-        fq_init(lead);
+        fq_init(lead, ctx);
 
         switch (n_randint(state, 4))
         {
@@ -229,7 +229,7 @@ main(void)
             found = 0;
             for (j = 0; j < res2->num; j++)
             {
-                if (fq_poly_equal(res->poly + i, res2->poly + j) &&
+                if (fq_poly_equal(res->poly + i, res2->poly + j, ctx) &&
                         res->exp[i] == res2->exp[j])
                 {
                     found = 1;
@@ -244,14 +244,14 @@ main(void)
             }
         }
 
-        fq_poly_clear(quot);
-        fq_poly_clear(rem);
-        fq_poly_clear(pol1);
-        fq_poly_clear(poly);
-        fq_poly_factor_clear(res);
-        fq_poly_factor_clear(res2);
+        fq_poly_clear(quot, ctx);
+        fq_poly_clear(rem, ctx);
+        fq_poly_clear(pol1, ctx);
+        fq_poly_clear(poly, ctx);
+        fq_poly_factor_clear(res, ctx);
+        fq_poly_factor_clear(res2, ctx);
 
-        fq_clear(lead);
+        fq_clear(lead, ctx);
         fq_ctx_clear(ctx);
     }
 

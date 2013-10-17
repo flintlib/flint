@@ -56,9 +56,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
@@ -66,7 +66,7 @@ main(void)
         fq_sub(c, a, b, ctx);
         fq_sub(a, a, b, ctx);
 
-        result = (fq_equal(a, c));
+        result = (fq_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -76,9 +76,9 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -98,9 +98,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d,"a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
@@ -108,7 +108,7 @@ main(void)
         fq_sub(c, a, b, ctx);
         fq_sub(b, a, b, ctx);
 
-        result = (fq_equal(b, c));
+        result = (fq_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -118,9 +118,9 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -140,15 +140,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
 
         fq_sub(c, a, a, ctx);
         fq_sub(a, a, a, ctx);
 
-        result = (fq_equal(a, c));
+        result = (fq_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -157,8 +157,8 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -178,10 +178,10 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c1);
-        fq_init(c2);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c1, ctx);
+        fq_init(c2, ctx);
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
@@ -190,7 +190,7 @@ main(void)
         fq_sub(c2, b, a, ctx);
         fq_neg(c2, c2, ctx);
 
-        result = (fq_equal(c1, c2));
+        result = (fq_equal(c1, c2, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -201,10 +201,10 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c1);
-        fq_clear(c2);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c1, ctx);
+        fq_clear(c2, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -224,11 +224,11 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
-        fq_init(lhs);
-        fq_init(rhs);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
+        fq_init(lhs, ctx);
+        fq_init(rhs, ctx);
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
@@ -239,7 +239,7 @@ main(void)
         fq_add(rhs, b, c, ctx);
         fq_sub(rhs, a, rhs, ctx);
 
-        result = (fq_equal(lhs, rhs));
+        result = (fq_equal(lhs, rhs, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -251,11 +251,11 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
-        fq_clear(lhs);
-        fq_clear(rhs);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
+        fq_clear(lhs, ctx);
+        fq_clear(rhs, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

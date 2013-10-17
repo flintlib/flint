@@ -31,14 +31,14 @@ void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1,
 {
     if (len1 == 1)
     {
-        fq_set(rop, op1 + 0);
+        fq_set(rop, op1 + 0, ctx);
     }
     else
     {
         const long alloc = (len1 - 1) * (len2 - 1) + 1;
 
         long i = len1 - 1, lenr;
-        fq_struct *t = _fq_poly_init(alloc);
+        fq_struct *t = _fq_poly_init(alloc, ctx);
         
         /*
            Perform the first two steps as one, 
@@ -89,13 +89,13 @@ void fq_poly_compose_horner(fq_poly_t rop,
     {
         fq_poly_t t;
 
-        fq_poly_init2(t, lenr);
+        fq_poly_init2(t, lenr, ctx);
         _fq_poly_compose_horner(t->coeffs, op1->coeffs, len1,
                                            op2->coeffs, len2, ctx);
         _fq_poly_set_length(t, lenr, ctx);
         _fq_poly_normalise(t, ctx);
-        fq_poly_swap(rop, t);
-        fq_poly_clear(t);
+        fq_poly_swap(rop, t, ctx);
+        fq_poly_clear(t, ctx);
     }
 }
 

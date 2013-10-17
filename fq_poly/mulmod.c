@@ -48,13 +48,13 @@ _fq_poly_mulmod(fq_struct * res,
     else
         _fq_poly_mul(T, poly2, len2, poly1, len1, ctx);
 
-    fq_init(invf);
+    fq_init(invf, ctx);
     fq_inv(invf, f + lenf - 1, ctx);
 
     _fq_poly_divrem(Q, res, T, lenT, f, lenf, invf, ctx);
 
-    _fq_vec_clear(T, lenT + lenQ);
-    fq_clear(invf);
+    _fq_vec_clear(T, lenT + lenQ, ctx);
+    fq_clear(invf, ctx);
 }
 
 void
@@ -86,7 +86,7 @@ fq_poly_mulmod(fq_poly_t res,
         if (f == res)
         {
             fcoeffs = _fq_vec_init(lenf, ctx);
-            _fq_vec_set(fcoeffs, f->coeffs, lenf);
+            _fq_vec_set(fcoeffs, f->coeffs, lenf, ctx);
         }
         else
             fcoeffs = f->coeffs;
@@ -96,7 +96,7 @@ fq_poly_mulmod(fq_poly_t res,
                         poly1->coeffs, len1,
                         poly2->coeffs, len2, fcoeffs, lenf, ctx);
         if (f == res)
-            _fq_vec_clear(fcoeffs, lenf);
+            _fq_vec_clear(fcoeffs, lenf, ctx);
 
         _fq_poly_set_length(res, lenf - 1, ctx);
         _fq_poly_normalise(res, ctx);

@@ -137,7 +137,7 @@ void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
     }
     else if (fmpz_is_one(e))
     {
-        fq_set(rop, op);
+        fq_set(rop, op, ctx);
     }
     else
     {

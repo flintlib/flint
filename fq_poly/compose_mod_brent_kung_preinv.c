@@ -45,7 +45,7 @@ _fq_poly_compose_mod_brent_kung_preinv(fq_struct * res,
 
     if (len1 == 1)
     {
-        fq_set(res, poly1);
+        fq_set(res, poly1, ctx);
         return;
     }
 
@@ -66,26 +66,26 @@ _fq_poly_compose_mod_brent_kung_preinv(fq_struct * res,
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
-        _fq_vec_set(B->rows[i], poly1 + i * m, m);
+        _fq_vec_set(B->rows[i], poly1 + i * m, m, ctx);
 
-    _fq_vec_set(B->rows[i], poly1 + i * m, len1 % m);
+    _fq_vec_set(B->rows[i], poly1 + i * m, len1 % m, ctx);
 
     /* Set rows of A to powers of poly2 */
     fq_one(A->rows[0], ctx);
-    _fq_vec_set(A->rows[1], poly2, n);
+    _fq_vec_set(A->rows[1], poly2, n, ctx);
     tmp = _fq_vec_init(2 * n - 1, ctx);
     for (i = 2; i < m; i++)
     {
         _fq_poly_mulmod_preinv(tmp, A->rows[i - 1], n, poly2, n, poly3, len3,
                                poly3inv, len3inv, ctx);
-        _fq_vec_set(A->rows[i], tmp, n);
+        _fq_vec_set(A->rows[i], tmp, n, ctx);
     }
-    _fq_vec_clear(tmp, 2 * n - 1);
+    _fq_vec_clear(tmp, 2 * n - 1, ctx);
 
     fq_mat_mul(C, B, A, ctx);
 
     /* Evaluate block composition using the Horner scheme */
-    _fq_vec_set(res, C->rows[m - 1], n);
+    _fq_vec_set(res, C->rows[m - 1], n, ctx);
     _fq_poly_mulmod_preinv(h, A->rows[m - 1], n, poly2, n, poly3, len3,
                            poly3inv, len3inv, ctx);
 
@@ -96,12 +96,12 @@ _fq_poly_compose_mod_brent_kung_preinv(fq_struct * res,
         _fq_poly_add(res, t, n, C->rows[i], n, ctx);
     }
 
-    _fq_vec_clear(h, 2 * n - 1);
-    _fq_vec_clear(t, 2 * n - 1);
+    _fq_vec_clear(h, 2 * n - 1, ctx);
+    _fq_vec_clear(t, 2 * n - 1, ctx);
 
-    fq_mat_clear(A);
-    fq_mat_clear(B);
-    fq_mat_clear(C);
+    fq_mat_clear(A, ctx);
+    fq_mat_clear(B, ctx);
+    fq_mat_clear(C, ctx);
 }
 
 void
@@ -148,10 +148,10 @@ fq_poly_compose_mod_brent_kung_preinv(fq_poly_t res, const fq_poly_t poly1,
     if (res == poly3 || res == poly1)
     {
         fq_poly_t tmp;
-        fq_poly_init(tmp);
+        fq_poly_init(tmp, ctx);
         fq_poly_compose_mod_brent_kung_preinv(tmp, poly1, poly2, poly3, poly3inv, ctx);
-        fq_poly_swap(tmp, res);
-        fq_poly_clear(tmp);
+        fq_poly_swap(tmp, res, ctx);
+        fq_poly_clear(tmp, ctx);
         return;
     }
 
@@ -159,16 +159,16 @@ fq_poly_compose_mod_brent_kung_preinv(fq_poly_t res, const fq_poly_t poly1,
 
     if (len2 <= len)
     {
-        _fq_vec_set(ptr2, poly2->coeffs, len2);
+        _fq_vec_set(ptr2, poly2->coeffs, len2, ctx);
         _fq_vec_zero(ptr2 + len2, vec_len - len2, ctx);
     }
     else
     {
-        fq_init(inv3);
+        fq_init(inv3, ctx);
         fq_inv(inv3, poly3->coeffs + len, ctx);
         _fq_poly_rem(ptr2, poly2->coeffs, len2,
                      poly3->coeffs, len3, inv3, ctx);
-        fq_clear(inv3);
+        fq_clear(inv3, ctx);
     }
 
     fq_poly_fit_length(res, len, ctx);
@@ -178,5 +178,5 @@ fq_poly_compose_mod_brent_kung_preinv(fq_poly_t res, const fq_poly_t poly1,
     _fq_poly_set_length(res, len, ctx);
     _fq_poly_normalise(res, ctx);
 
-    _fq_vec_clear(ptr2, vec_len);
+    _fq_vec_clear(ptr2, vec_len, ctx);
 }

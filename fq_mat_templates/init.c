@@ -43,7 +43,7 @@ TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong cols,
             mat->rows[i] = mat->entries + i * cols;
             for (j = 0; j < cols; j++)
             {
-                TEMPLATE(T, init)(mat->rows[i] + j);
+                TEMPLATE(T, init)(mat->rows[i] + j, ctx);
             }
         }
     }

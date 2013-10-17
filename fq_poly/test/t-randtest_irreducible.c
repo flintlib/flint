@@ -44,7 +44,7 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(poly);
+        fq_poly_init(poly, ctx);
 
         length = n_randint(state, 20) + 2;
         fq_poly_randtest_irreducible(poly, state, length, ctx);
@@ -58,7 +58,7 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(poly);
+        fq_poly_clear(poly, ctx);
 
         fq_ctx_clear(ctx);
     }

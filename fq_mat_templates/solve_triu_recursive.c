@@ -52,25 +52,25 @@ TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
     [0 D]  [Y]  ==  [    D^ Y       ]
     */
 
-    TEMPLATE(T, mat_window_init)(UA, U, 0, 0, r, r);
-    TEMPLATE(T, mat_window_init)(UB, U, 0, r, r, n);
-    TEMPLATE(T, mat_window_init)(UD, U, r, r, n, n);
-    TEMPLATE(T, mat_window_init)(BX, B, 0, 0, r, m);
-    TEMPLATE(T, mat_window_init)(BY, B, r, 0, n, m);
-    TEMPLATE(T, mat_window_init)(XX, X, 0, 0, r, m);
-    TEMPLATE(T, mat_window_init)(XY, X, r, 0, n, m);
+    TEMPLATE(T, mat_window_init)(UA, U, 0, 0, r, r, ctx);
+    TEMPLATE(T, mat_window_init)(UB, U, 0, r, r, n, ctx);
+    TEMPLATE(T, mat_window_init)(UD, U, r, r, n, n, ctx);
+    TEMPLATE(T, mat_window_init)(BX, B, 0, 0, r, m, ctx);
+    TEMPLATE(T, mat_window_init)(BY, B, r, 0, n, m, ctx);
+    TEMPLATE(T, mat_window_init)(XX, X, 0, 0, r, m, ctx);
+    TEMPLATE(T, mat_window_init)(XY, X, r, 0, n, m, ctx);
 
     TEMPLATE(T, mat_solve_triu)(XY, UD, BY, unit, ctx);
     TEMPLATE(T, mat_submul)(XX, BX, UB, XY, ctx);
     TEMPLATE(T, mat_solve_triu)(XX, UA, XX, unit, ctx);
 
-    TEMPLATE(T, mat_window_clear)(UA);
-    TEMPLATE(T, mat_window_clear)(UB);
-    TEMPLATE(T, mat_window_clear)(UD);
-    TEMPLATE(T, mat_window_clear)(BX);
-    TEMPLATE(T, mat_window_clear)(BY);
-    TEMPLATE(T, mat_window_clear)(XX);
-    TEMPLATE(T, mat_window_clear)(XY);
+    TEMPLATE(T, mat_window_clear)(UA, ctx);
+    TEMPLATE(T, mat_window_clear)(UB, ctx);
+    TEMPLATE(T, mat_window_clear)(UD, ctx);
+    TEMPLATE(T, mat_window_clear)(BX, ctx);
+    TEMPLATE(T, mat_window_clear)(BY, ctx);
+    TEMPLATE(T, mat_window_clear)(XX, ctx);
+    TEMPLATE(T, mat_window_clear)(XY, ctx);
 }
 
 

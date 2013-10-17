@@ -26,7 +26,7 @@
 #include "fq_poly.h"
 
 void
-fq_poly_factor_pow(fq_poly_factor_t fac, slong exp)
+fq_poly_factor_pow(fq_poly_factor_t fac, slong exp, const fq_ctx_t ctx)
 {
     slong i;
 

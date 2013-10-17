@@ -35,5 +35,5 @@ fq_poly_factor_init(fq_poly_factor_t fac, const fq_ctx_t ctx)
     fac->exp = flint_malloc(sizeof(slong) * 5);
 
     for (i = 0; i < fac->alloc; i++)
-        fq_poly_init(fac->poly + i);
+        fq_poly_init(fac->poly + i, ctx);
 }

@@ -33,12 +33,12 @@ int _fq_poly_divides(fq_struct *Q,
     fq_struct *R;
     long lenR;
 
-    R = _fq_poly_init(lenA);
+    R = _fq_poly_init(lenA, ctx);
 
     _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
 
     FQ_VEC_NORM(R, lenR, ctx);
-    _fq_poly_clear(R, lenA);
+    _fq_poly_clear(R, lenA, ctx);
 
     return (lenR == 0);
 }
@@ -46,41 +46,41 @@ int _fq_poly_divides(fq_struct *Q,
 int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, 
                                  const fq_ctx_t ctx)
 {
-    if (fq_poly_is_zero(B))
+    if (fq_poly_is_zero(B, ctx))
     {
         flint_printf("Exception (fq_poly_divides).  B is zero.\n");
         abort();
     }
 
-    if (fq_poly_is_zero(A))
+    if (fq_poly_is_zero(A, ctx))
     {
         fq_poly_zero(Q, ctx);
         return 1;
     }
-    if (fq_poly_length(A) < fq_poly_length(B))
+    if (fq_poly_length(A, ctx) < fq_poly_length(B, ctx))
     {
         return 0;
     }
 
     {
-        const long lenQ = fq_poly_length(A) - fq_poly_length(B) + 1;
+        const long lenQ = fq_poly_length(A, ctx) - fq_poly_length(B, ctx) + 1;
         int ans;
         fq_t invB;
 
-        fq_init(invB);
-        fq_inv(invB, fq_poly_lead(B), ctx);
+        fq_init(invB, ctx);
+        fq_inv(invB, fq_poly_lead(B, ctx), ctx);
 
         if (Q == A || Q == B)
         {
             fq_poly_t T;
 
-            fq_poly_init2(T, lenQ);
+            fq_poly_init2(T, lenQ, ctx);
             ans = _fq_poly_divides(T->coeffs, A->coeffs, A->length, 
                                               B->coeffs, B->length, invB, ctx);
             _fq_poly_set_length(T, lenQ, ctx);
             _fq_poly_normalise(T, ctx);
-            fq_poly_swap(Q, T);
-            fq_poly_clear(T);
+            fq_poly_swap(Q, T, ctx);
+            fq_poly_clear(T, ctx);
         }
         else
         {
@@ -90,7 +90,7 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
             _fq_poly_set_length(Q, lenQ, ctx);
             _fq_poly_normalise(Q, ctx);
         }
-        fq_clear(invB);
+        fq_clear(invB, ctx);
 
         return ans;
     }

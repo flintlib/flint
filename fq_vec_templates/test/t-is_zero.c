@@ -63,7 +63,7 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }
@@ -88,7 +88,7 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

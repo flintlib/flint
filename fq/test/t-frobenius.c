@@ -57,18 +57,18 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
-        fq_set(b, a);
+        fq_set(b, a, ctx);
         e = n_randint(state, 10) % d;
 
         fq_frobenius(c, b, e, ctx);
         fq_frobenius(b, b, e, ctx);
 
-        result = (fq_equal(b, c));
+        result = (fq_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL (alias):\n\n");
@@ -79,9 +79,9 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -102,9 +102,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
         e = n_randint(state, 10) % d;
@@ -119,7 +119,7 @@ main(void)
             fmpz_clear(t);
         }
 
-        result = (fq_equal(b,c));
+        result = (fq_equal(b,c,ctx));
         if (!result)
         {
             flint_printf("FAIL (sigma^e(x) = x^{p^e}):\n\n");
@@ -130,9 +130,9 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -153,13 +153,13 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(s);
-        fq_init(s1);
-        fq_init(s2);
-        fq_init(lhs);
-        fq_init(rhs);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(s, ctx);
+        fq_init(s1, ctx);
+        fq_init(s2, ctx);
+        fq_init(lhs, ctx);
+        fq_init(rhs, ctx);
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
@@ -171,7 +171,7 @@ main(void)
         fq_frobenius(s2, b, e, ctx);
         fq_add(rhs, s1, s2, ctx);
 
-        result = (fq_equal(lhs, rhs));
+        result = (fq_equal(lhs, rhs, ctx));
         if (!result)
         {
             flint_printf("FAIL (sigma(a+b) = sigma(a) + sigma(b)):\n\n");
@@ -186,13 +186,13 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(s);
-        fq_clear(s1);
-        fq_clear(s2);
-        fq_clear(lhs);
-        fq_clear(rhs);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(s, ctx);
+        fq_clear(s1, ctx);
+        fq_clear(s2, ctx);
+        fq_clear(lhs, ctx);
+        fq_clear(rhs, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -213,13 +213,13 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(s);
-        fq_init(s1);
-        fq_init(s2);
-        fq_init(lhs);
-        fq_init(rhs);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(s, ctx);
+        fq_init(s1, ctx);
+        fq_init(s2, ctx);
+        fq_init(lhs, ctx);
+        fq_init(rhs, ctx);
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
@@ -231,7 +231,7 @@ main(void)
         fq_frobenius(s2, b, e, ctx);
         fq_mul(rhs, s1, s2, ctx);
 
-        result = (fq_equal(lhs, rhs));
+        result = (fq_equal(lhs, rhs, ctx));
         if (!result)
         {
             flint_printf("FAIL (sigma(a*b) = sigma(a) * sigma(b)):\n\n");
@@ -246,13 +246,13 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(s);
-        fq_clear(s1);
-        fq_clear(s2);
-        fq_clear(lhs);
-        fq_clear(rhs);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(s, ctx);
+        fq_clear(s1, ctx);
+        fq_clear(s2, ctx);
+        fq_clear(lhs, ctx);
+        fq_clear(rhs, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

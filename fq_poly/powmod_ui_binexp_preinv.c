@@ -47,7 +47,7 @@ _fq_poly_powmod_ui_binexp_preinv(fq_struct * res, const fq_struct * poly, ulong 
     T = _fq_vec_init(lenT + lenQ, ctx);
     Q = T + lenT;
 
-    _fq_vec_set(res, poly, lenf - 1);
+    _fq_vec_set(res, poly, lenf - 1, ctx);
 
     for (i = ((int) FLINT_BIT_COUNT(e) - 2); i >= 0; i--)
     {
@@ -63,7 +63,7 @@ _fq_poly_powmod_ui_binexp_preinv(fq_struct * res, const fq_struct * poly, ulong 
         }
     }
 
-    _fq_vec_clear(T, lenT + lenQ);
+    _fq_vec_clear(T, lenT + lenQ, ctx);
 }
 
 
@@ -87,12 +87,12 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
     if (len >= lenf)
     {
         fq_poly_t t, r;
-        fq_poly_init(t);
-        fq_poly_init(r);
+        fq_poly_init(t, ctx);
+        fq_poly_init(r, ctx);
         fq_poly_divrem(t, r, poly, f, ctx);
         fq_poly_powmod_ui_binexp_preinv(res, r, e, f, finv, ctx);
-        fq_poly_clear(t);
-        fq_poly_clear(r);
+        fq_poly_clear(t, ctx);
+        fq_poly_clear(r, ctx);
         return;
     }
 
@@ -122,7 +122,7 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
     if (len < trunc)
     {
         q = _fq_vec_init(trunc, ctx);
-        _fq_vec_set(q, poly->coeffs, len);
+        _fq_vec_set(q, poly->coeffs, len, ctx);
         _fq_vec_zero(q + len, trunc - len, ctx);
         qcopy = 1;
     } else
@@ -131,13 +131,13 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
     if ((res == poly && !qcopy) || (res == f))
     {
         fq_poly_t t;
-        fq_poly_init2(t, 2 * lenf - 3);
+        fq_poly_init2(t, 2 * lenf - 3, ctx);
         _fq_poly_powmod_ui_binexp_preinv(t->coeffs, q, e,
                                          f->coeffs, lenf,
                                          finv->coeffs, finv->length,
                                          ctx);
-        fq_poly_swap(res, t);
-        fq_poly_clear(t);
+        fq_poly_swap(res, t, ctx);
+        fq_poly_clear(t, ctx);
     }
     else
     {
@@ -149,7 +149,7 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
     }
 
     if (qcopy)
-        _fq_vec_clear(q, trunc);
+        _fq_vec_clear(q, trunc, ctx);
 
     _fq_poly_set_length(res, trunc, ctx);
     _fq_poly_normalise(res, ctx);

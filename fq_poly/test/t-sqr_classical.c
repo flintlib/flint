@@ -57,15 +57,15 @@ main(void)
         d   = n_randint(state, 10) + 1;
         len = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(c);
+        fq_poly_init(a, ctx);
+        fq_poly_init(c, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_sqr_classical(c, a, ctx);
         fq_poly_sqr_classical(a, a, ctx);
 
-        result = (fq_poly_equal(a, c));
+        result = (fq_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL (aliasing):\n\n");
@@ -74,8 +74,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(c);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -95,10 +95,10 @@ main(void)
         deg = n_randint(state, 10) + 1;
         len = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, deg, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(d);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(d, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
@@ -108,7 +108,7 @@ main(void)
         fq_poly_add(d, a, a, ctx);
         fq_poly_mul(d, a, d, ctx);
 
-        result = (fq_poly_equal(c, d));
+        result = (fq_poly_equal(c, d, ctx));
         if (!result)
         {
             flint_printf("FAIL (a^2 + a^2 == a(a + a)):\n\n");
@@ -119,10 +119,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(d);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(d, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -142,16 +142,16 @@ main(void)
         deg = n_randint(state, 10) + 1;
         len = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, deg, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_mul(b, a, a, ctx);
         fq_poly_sqr_classical(c, a, ctx);
 
-        result = (fq_poly_equal(b, c));
+        result = (fq_poly_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL (cmp with mul):\n\n");
@@ -161,9 +161,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

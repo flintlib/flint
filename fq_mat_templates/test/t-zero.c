@@ -76,7 +76,7 @@ main(void)
             }
         }
 
-        TEMPLATE(T, mat_clear)(A);
+        TEMPLATE(T, mat_clear)(A, ctx);
         TEMPLATE(T, ctx_clear)(ctx);
     }
 

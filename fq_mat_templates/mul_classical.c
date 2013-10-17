@@ -53,12 +53,12 @@ TEMPLATE(T, mat_mul_classical)(TEMPLATE(T, mat_t) C,
         TEMPLATE(T, mat_t) T;
         TEMPLATE(T, mat_init)(T, ar, bc, ctx);
         TEMPLATE(T, mat_mul_classical)(T, A, B, ctx);
-        TEMPLATE(T, mat_swap)(C, T);
-        TEMPLATE(T, mat_clear)(T);
+        TEMPLATE(T, mat_swap)(C, T, ctx);
+        TEMPLATE(T, mat_clear)(T, ctx);
         return;
     }
 
-    TEMPLATE(T, init)(t);
+    TEMPLATE(T, init)(t, ctx);
 
     for (i = 0; i < ar; i++)
     {
@@ -83,7 +83,7 @@ TEMPLATE(T, mat_mul_classical)(TEMPLATE(T, mat_t) C,
         }
     }
 
-    TEMPLATE(T, clear)(t);
+    TEMPLATE(T, clear)(t, ctx);
 }
 
 

@@ -30,14 +30,15 @@
 
 int
 _TEMPLATE(T, vec_equal)(const TEMPLATE(T, struct) * vec1,
-                        const TEMPLATE(T, struct) * vec2, slong len)
+                        const TEMPLATE(T, struct) * vec2, slong len,
+                        const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     if (vec1 == vec2)
         return 1;
 
     for (i = 0; i < len; i++)
-        if (!TEMPLATE(T, equal)(vec1 + i, vec2 + i))
+        if (!TEMPLATE(T, equal)(vec1 + i, vec2 + i, ctx))
             return 0;
 
     return 1;

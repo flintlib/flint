@@ -32,7 +32,7 @@ void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R,
     long iQ, iR;
 
     if (R != A)
-        _fq_poly_set(R, A, lenA);
+        _fq_poly_set(R, A, lenA, ctx);
 
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
@@ -62,12 +62,12 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
         return;
     }
 
-    fq_init(invB);
-    fq_inv(invB, fq_poly_lead(B), ctx);
+    fq_init(invB, ctx);
+    fq_inv(invB, fq_poly_lead(B, ctx), ctx);
 
     if (Q == A || Q == B)
     {
-        q = _fq_poly_init(lenQ);
+        q = _fq_poly_init(lenQ, ctx);
     }
     else
     {
@@ -76,7 +76,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     if (R == B)
     {
-        r = _fq_poly_init(lenA);
+        r = _fq_poly_init(lenA, ctx);
     }
     else
     {
@@ -89,7 +89,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
 
     if (Q == A || Q == B)
     {
-        _fq_poly_clear(Q->coeffs, Q->alloc);
+        _fq_poly_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
         Q->alloc  = lenQ;
         Q->length = lenQ;
@@ -100,7 +100,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     if (R == B)
     {
-        _fq_poly_clear(R->coeffs, R->alloc);
+        _fq_poly_clear(R->coeffs, R->alloc, ctx);
         R->coeffs = r;
         R->alloc  = lenA;
         R->length = lenA;
@@ -108,6 +108,6 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     _fq_poly_set_length(R, lenB - 1, ctx);
     _fq_poly_normalise(R, ctx);
 
-    fq_clear(invB);
+    fq_clear(invB, ctx);
 }
 

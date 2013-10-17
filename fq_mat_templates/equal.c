@@ -28,7 +28,8 @@
 
 #include "templates.h"
 
-int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2)
+int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     slong j;
 
@@ -42,7 +43,7 @@ int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_
 
     for (j = 0; j < mat1->r; j++)
     {
-        if (!_TEMPLATE(T, vec_equal)(mat1->rows[j], mat2->rows[j], mat1->c))
+        if (!_TEMPLATE(T, vec_equal)(mat1->rows[j], mat2->rows[j], mat1->c, ctx))
         {
             return 0;
         }

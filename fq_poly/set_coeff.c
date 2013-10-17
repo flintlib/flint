@@ -39,6 +39,6 @@ void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x, const fq_ctx_t ctx)
         poly->length = n + 1;
     }
 
-    fq_set(poly->coeffs + n, x);
+    fq_set(poly->coeffs + n, x, ctx);
     _fq_poly_normalise(poly, ctx);
 }

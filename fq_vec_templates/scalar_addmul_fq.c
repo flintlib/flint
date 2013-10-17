@@ -38,7 +38,7 @@ _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T))(TEMPLATE(T, struct) * poly1,
     slong i;
     TEMPLATE(T, t) y;
 
-    TEMPLATE(T, init)(y);
+    TEMPLATE(T, init)(y, ctx);
 
     for (i = 0; i < len2; i++)
     {
@@ -46,7 +46,7 @@ _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T))(TEMPLATE(T, struct) * poly1,
         TEMPLATE(T, add)(poly1 + i, poly1 + i, y, ctx);
     }
 
-    TEMPLATE(T, clear)(y);
+    TEMPLATE(T, clear)(y, ctx);
 }
 
 

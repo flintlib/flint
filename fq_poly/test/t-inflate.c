@@ -45,23 +45,23 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(poly1);
-        fq_poly_init(poly2);
-        fq_poly_init(poly3);
-        fq_poly_init(xp);
+        fq_poly_init(poly1, ctx);
+        fq_poly_init(poly2, ctx);
+        fq_poly_init(poly3, ctx);
+        fq_poly_init(xp, ctx);
 
         fq_poly_randtest(poly1, state, n_randint(state, 20), ctx);
         inflation = n_randint(state, 10);
 
         fq_poly_inflate(poly2, poly1, inflation, ctx);
 
-        fq_init(one);
+        fq_init(one, ctx);
         fq_one(one, ctx);
         fq_poly_set_coeff(xp, inflation, one, ctx);
         fq_poly_compose(poly3, poly1, xp, ctx);
-        fq_clear(one);
+        fq_clear(one, ctx);
 
-        if (!fq_poly_equal(poly2, poly3))
+        if (!fq_poly_equal(poly2, poly3, ctx))
         {
             flint_printf("FAIL: not equal to compose (inflation = %wu)\n", inflation);
             flint_printf("poly1:\n"); fq_poly_print(poly1, ctx); flint_printf("\n\n");
@@ -71,7 +71,7 @@ main(void)
         }
 
         fq_poly_inflate(poly1, poly1, inflation, ctx);
-        if (!fq_poly_equal(poly1, poly2))
+        if (!fq_poly_equal(poly1, poly2, ctx))
         {
             flint_printf("FAIL: aliasing (inflation = %wu)\n", inflation);
             flint_printf("poly1:\n"); fq_poly_print(poly1, ctx); flint_printf("\n\n");
@@ -79,10 +79,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(poly1);
-        fq_poly_clear(poly2);
-        fq_poly_clear(poly3);
-        fq_poly_clear(xp);
+        fq_poly_clear(poly1, ctx);
+        fq_poly_clear(poly2, ctx);
+        fq_poly_clear(poly3, ctx);
+        fq_poly_clear(xp, ctx);
         fq_ctx_clear(ctx);
     }
 

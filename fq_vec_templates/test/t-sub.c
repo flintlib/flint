@@ -61,7 +61,7 @@ main(void)
         _TEMPLATE(T, vec_sub)(c, a, b, len, ctx);
         _TEMPLATE(T, vec_sub)(a, a, b, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(a, c, len));
+        result = (_TEMPLATE(T, vec_equal)(a, c, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -70,9 +70,9 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
-        _TEMPLATE(T, vec_clear)(b, len);
-        _TEMPLATE(T, vec_clear)(c, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear)(b, len, ctx);
+        _TEMPLATE(T, vec_clear)(c, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }
@@ -95,7 +95,7 @@ main(void)
         _TEMPLATE(T, vec_sub)(c, a, b, len, ctx);
         _TEMPLATE(T, vec_sub)(b, a, b, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(b, c, len));
+        result = (_TEMPLATE(T, vec_equal)(b, c, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -104,9 +104,9 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
-        _TEMPLATE(T, vec_clear)(b, len);
-        _TEMPLATE(T, vec_clear)(c, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear)(b, len, ctx);
+        _TEMPLATE(T, vec_clear)(c, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }
@@ -132,7 +132,7 @@ main(void)
         _TEMPLATE(T, vec_add)(c, a, b, len, ctx);
         _TEMPLATE(T, vec_sub)(d, c, b, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(d, a, len));
+        result = (_TEMPLATE(T, vec_equal)(d, a, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -141,10 +141,10 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
-        _TEMPLATE(T, vec_clear)(b, len);
-        _TEMPLATE(T, vec_clear)(c, len);
-        _TEMPLATE(T, vec_clear)(d, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear)(b, len, ctx);
+        _TEMPLATE(T, vec_clear)(c, len, ctx);
+        _TEMPLATE(T, vec_clear)(d, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

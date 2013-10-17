@@ -34,8 +34,8 @@ ulong fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx)
     fq_poly_t q, r;
     ulong i = 0;
 
-    fq_poly_init(q);
-    fq_poly_init(r);
+    fq_poly_init(q, ctx);
+    fq_poly_init(r, ctx);
 
     while (1)
     {
@@ -43,14 +43,14 @@ ulong fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx)
             break;
         fq_poly_divrem(q, r, f, g, ctx);
         if (r->length == 0)
-            fq_poly_swap(q, f);
+            fq_poly_swap(q, f, ctx);
         else
             break;
         i++;
     }
 
-    fq_poly_clear(q);
-    fq_poly_clear(r);
+    fq_poly_clear(q, ctx);
+    fq_poly_clear(r, ctx);
 
     return i;
 }

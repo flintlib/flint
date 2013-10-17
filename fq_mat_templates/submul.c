@@ -39,7 +39,7 @@ TEMPLATE(T, mat_submul)(TEMPLATE(T, mat_t) D,
     TEMPLATE(T, mat_init)(tmp, A->r, B->c, ctx);
     TEMPLATE(T, mat_mul)(tmp, A, B, ctx);
     TEMPLATE(T, mat_sub)(D, C, tmp, ctx);
-    TEMPLATE(T, mat_clear)(tmp);
+    TEMPLATE(T, mat_clear)(tmp, ctx);
 }
 
 

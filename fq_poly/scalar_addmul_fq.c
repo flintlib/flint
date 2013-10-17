@@ -41,7 +41,7 @@ void _fq_poly_scalar_addmul_fq(fq_struct *rop,
         long i;
         fq_t t;
 
-        fq_init(t);
+        fq_init(t, ctx);
 
         for (i = 0; i < len; i++)
         {
@@ -49,14 +49,14 @@ void _fq_poly_scalar_addmul_fq(fq_struct *rop,
             fq_add(rop + i, rop + i, t, ctx);
         }
 
-        fq_clear(t);
+        fq_clear(t, ctx);
     }
 }
 
 void fq_poly_scalar_addmul_fq(fq_poly_t rop, 
     const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
 {
-    if (!(fq_is_zero(x, ctx) || fq_poly_is_zero(op)))
+    if (!(fq_is_zero(x, ctx) || fq_poly_is_zero(op, ctx)))
     {
         fq_poly_fit_length(rop, op->length, ctx);
         _fq_poly_scalar_addmul_fq(rop->coeffs, op->coeffs, op->length, x, ctx);

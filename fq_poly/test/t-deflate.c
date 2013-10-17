@@ -44,22 +44,22 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(poly1);
-        fq_poly_init(poly2);
-        fq_poly_init(poly3);
+        fq_poly_init(poly1, ctx);
+        fq_poly_init(poly2, ctx);
+        fq_poly_init(poly3, ctx);
 
         fq_poly_randtest(poly1, state, n_randint(state, 15), ctx);
 
-        if (fq_poly_length(poly1) <= 1)
+        if (fq_poly_length(poly1, ctx) <= 1)
         {
-            if (fq_poly_deflation(poly1, ctx) != fq_poly_length(poly1))
+            if (fq_poly_deflation(poly1, ctx) != fq_poly_length(poly1, ctx))
             {
                 flint_printf("FAIL: wrong deflation for constant polynomial\n");
                 abort();
             }
 
             fq_poly_deflate(poly2, poly1, n_randint(state, 5) + 1, ctx);
-            if (!fq_poly_equal(poly2, poly1))
+            if (!fq_poly_equal(poly2, poly1, ctx))
             {
                 flint_printf("FAIL: constant polynomial changed on deflation\n");
                 abort();
@@ -85,7 +85,7 @@ main(void)
             }
 
             fq_poly_deflate(poly3, poly2, infl, ctx);
-            if (!fq_poly_equal(poly3, poly1))
+            if (!fq_poly_equal(poly3, poly1, ctx))
             {
                 flint_printf("FAIL: deflation = %wu, inflation: %wu, %wu\n",
                     deflation, infl, infl1);
@@ -97,16 +97,16 @@ main(void)
             }
 
             fq_poly_deflate(poly2, poly2, infl, ctx);
-            if (!fq_poly_equal(poly3, poly2))
+            if (!fq_poly_equal(poly3, poly2, ctx))
             {
                 flint_printf("FAIL: aliasing\n");
                 abort();
             }
         }
 
-        fq_poly_clear(poly1);
-        fq_poly_clear(poly2);
-        fq_poly_clear(poly3);
+        fq_poly_clear(poly1, ctx);
+        fq_poly_clear(poly2, ctx);
+        fq_poly_clear(poly3, ctx);
         fq_ctx_clear(ctx);
     }
 

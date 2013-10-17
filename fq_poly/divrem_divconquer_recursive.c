@@ -35,12 +35,12 @@ _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * 
     if (lenB <= FQ_POLY_DIVREM_DIVCONQUER_CUTOFF)
     {
         _fq_vec_zero(BQ, lenB - 1, ctx);
-        _fq_vec_set(BQ + (lenB - 1), A + (lenB - 1), lenB);
+        _fq_vec_set(BQ + (lenB - 1), A + (lenB - 1), lenB, ctx);
 
         _fq_poly_divrem_basecase(Q, BQ, BQ, 2 * lenB - 1, B, lenB, invB, ctx);
 
         _fq_poly_neg(BQ, BQ, lenB - 1, ctx);
-        _fq_vec_set(BQ + (lenB - 1), A + (lenB - 1), lenB);
+        _fq_vec_set(BQ + (lenB - 1), A + (lenB - 1), lenB, ctx);
     }
     else
     {
@@ -83,7 +83,7 @@ _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * 
            Compute dq1 = d1 q1 x^n2 + d2 q1, of length 2 n1 + n2 - 1
          */
 
-        _fq_vec_swap(dq1, d2q1, n2);
+        _fq_vec_swap(dq1, d2q1, n2, ctx);
         _fq_poly_add(dq1 + n2, dq1 + n2, n1 - 1, d2q1 + n2, n1 - 1, ctx);
 
         /*
@@ -122,7 +122,7 @@ _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * 
            Compute dq2 = d3q2 x^n1 + d4q2, of length n1 + 2 n2 - 1
          */
 
-        _fq_vec_swap(BQ, d4q2, n2);
+        _fq_vec_swap(BQ, d4q2, n2, ctx);
         _fq_poly_add(BQ + n2, BQ + n2, n1 - 1, d4q2 + n2, n1 - 1, ctx);
         _fq_poly_add(BQ + n1, BQ + n1, 2 * n2 - 1, d3q2, 2 * n2 - 1, ctx);
 

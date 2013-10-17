@@ -33,7 +33,7 @@ void fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
     else
     {
         fq_poly_fit_length(poly, 1, ctx);
-        fq_set(poly->coeffs + 0, c);
+        fq_set(poly->coeffs + 0, c, ctx);
         _fq_poly_set_length(poly, 1, ctx);
     }
 }

@@ -34,14 +34,14 @@ fq_poly_factor_kaltofen_shoup(fq_poly_factor_t res, const fq_poly_t poly,
     slong i, j, k, l, res_num, dist_deg_num;
     slong *degs;
 
-    if (!(degs = flint_malloc(fq_poly_degree(poly) * sizeof(slong))))
+    if (!(degs = flint_malloc(fq_poly_degree(poly, ctx) * sizeof(slong))))
     {
         flint_printf("Exception (fq_poly_factor_kaltofen_shoup): \n");
         flint_printf("Not enough memory.\n");
         abort();
     }
 
-    fq_poly_init(v);
+    fq_poly_init(v, ctx);
 
     fq_poly_make_monic(v, poly, ctx);
 
@@ -69,7 +69,7 @@ fq_poly_factor_kaltofen_shoup(fq_poly_factor_t res, const fq_poly_t poly,
     }
 
     flint_free(degs);
-    fq_poly_clear(v);
-    fq_poly_factor_clear(dist_deg);
-    fq_poly_factor_clear(sq_free);
+    fq_poly_clear(v, ctx);
+    fq_poly_factor_clear(dist_deg, ctx);
+    fq_poly_factor_clear(sq_free, ctx);
 }

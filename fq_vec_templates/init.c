@@ -35,7 +35,7 @@ _TEMPLATE(T, vec_init)(slong len, const TEMPLATE(T, ctx_t) ctx)
     TEMPLATE(T, struct) * v;
     v = flint_malloc(len * sizeof(TEMPLATE(T, struct)));
     for (i = 0; i < len; i++)
-        TEMPLATE(T, init)(v + i);
+        TEMPLATE(T, init)(v + i, ctx);
     return v;
 }
 

@@ -81,9 +81,9 @@ TEMPLATE(T, mat_lu_classical)(slong * P,
     for (i = 0; i < m; i++)
         P[i] = i;
 
-    TEMPLATE(T, init)(d);
-    TEMPLATE(T, init)(e);
-    TEMPLATE(T, init)(neg_e);
+    TEMPLATE(T, init)(d, ctx);
+    TEMPLATE(T, init)(e, ctx);
+    TEMPLATE(T, init)(neg_e, ctx);
 
     while (row < m && col < n)
     {
@@ -116,15 +116,15 @@ TEMPLATE(T, mat_lu_classical)(slong * P,
             }
 
             TEMPLATE(T, zero)(a[i] + col, ctx);
-            TEMPLATE(T, set)(a[i] + rank - 1, e);
+            TEMPLATE(T, set)(a[i] + rank - 1, e, ctx);
         }
         row++;
         col++;
     }
    
-    TEMPLATE(T, clear)(d);
-    TEMPLATE(T, clear)(e);
-    TEMPLATE(T, clear)(neg_e);
+    TEMPLATE(T, clear)(d, ctx);
+    TEMPLATE(T, clear)(e, ctx);
+    TEMPLATE(T, clear)(neg_e, ctx);
 
     return rank;
 }

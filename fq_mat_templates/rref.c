@@ -45,7 +45,7 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
 
     n = A->c;
 
-    P = _perm_init(TEMPLATE(T, mat_nrows)(A));
+    P = _perm_init(TEMPLATE(T, mat_nrows)(A, ctx));
     rank = TEMPLATE(T, mat_lu)(P, A, 0, ctx);
     _perm_clear(P);
 
@@ -91,13 +91,13 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     for (i = 0; i < rank; i++)
     {
         for (j = 0; j <= i; j++)
-            TEMPLATE(T, mat_entry_set)(U, j, i, TEMPLATE(T, mat_entry)(A, j, pivots[i]));
+            TEMPLATE(T, mat_entry_set)(U, j, i, TEMPLATE(T, mat_entry)(A, j, pivots[i]), ctx);
     }
 
     for (i = 0; i < n - rank; i++)
     {
         for (j = 0; j < rank; j++)
-            TEMPLATE(T, mat_entry_set)(V, j, i, TEMPLATE(T, mat_entry)(A, j, nonpivots[i]));
+            TEMPLATE(T, mat_entry_set)(V, j, i, TEMPLATE(T, mat_entry)(A, j, nonpivots[i]), ctx);
     }
 
     TEMPLATE(T, mat_solve_triu)(V, U, V, 0, ctx);
@@ -122,11 +122,11 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     for (i = 0; i < n - rank; i++)
     {
         for (j = 0; j < rank; j++)
-            TEMPLATE(T, mat_entry_set)(A, j, nonpivots[i], TEMPLATE(T, mat_entry)(V, j, i));
+            TEMPLATE(T, mat_entry_set)(A, j, nonpivots[i], TEMPLATE(T, mat_entry)(V, j, i), ctx);
     }
 
-    TEMPLATE(T, mat_clear)(U);
-    TEMPLATE(T, mat_clear)(V);
+    TEMPLATE(T, mat_clear)(U, ctx);
+    TEMPLATE(T, mat_clear)(V, ctx);
 
     flint_free(pivots);
     flint_free(nonpivots);

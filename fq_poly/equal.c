@@ -26,7 +26,7 @@
 
 #include "fq_poly.h"
 
-int fq_poly_equal(const fq_poly_t op1, const fq_poly_t op2)
+int fq_poly_equal(const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx)
 {
     long i;
 
@@ -37,7 +37,7 @@ int fq_poly_equal(const fq_poly_t op1, const fq_poly_t op2)
         return 0;
 
     for (i = 0; i < op1->length; i++)
-        if (!fq_equal(op1->coeffs + i, op2->coeffs + i))
+        if (!fq_equal(op1->coeffs + i, op2->coeffs + i, ctx))
             return 0;
 
     return 1;

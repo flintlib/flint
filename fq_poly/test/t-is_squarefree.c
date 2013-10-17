@@ -50,10 +50,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(poly);
-        fq_poly_init(t);
-        fq_poly_init(Q);
-        fq_poly_init(R);
+        fq_poly_init(poly, ctx);
+        fq_poly_init(t, ctx);
+        fq_poly_init(Q, ctx);
+        fq_poly_init(R, ctx);
 
         fmpz_init(x);
         fmpz_randtest_mod(x, state, fq_ctx_prime(ctx));
@@ -67,14 +67,14 @@ main(void)
             do {
                 fq_poly_randtest(t, state, n_randint(state, 10), ctx);
             } while (!fq_poly_is_irreducible(t, ctx) ||
-                    (fq_poly_length(t) < 2));
+                    (fq_poly_length(t, ctx) < 2));
 
             exp = n_randint(state, 4) + 1;
             if (n_randint(state, 2) == 0)
                 exp = 1;
 
             fq_poly_divrem(Q, R, poly, t, ctx);
-            if (!fq_poly_is_zero(R))
+            if (!fq_poly_is_zero(R, ctx))
             {
                 fq_poly_pow(t, t, exp, ctx);
                 fq_poly_mul(poly, poly, t, ctx);
@@ -85,9 +85,9 @@ main(void)
         v = fq_poly_is_squarefree(poly, ctx);
 
         if (v == 1)
-            result = (max_exp <= 1 && !fq_poly_is_zero(poly));
+            result = (max_exp <= 1 && !fq_poly_is_zero(poly, ctx));
         else
-            result = (max_exp > 1 || fq_poly_is_zero(poly));
+            result = (max_exp > 1 || fq_poly_is_zero(poly, ctx));
 
         if (!result)
         {
@@ -98,10 +98,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(poly);
-        fq_poly_clear(t);
-        fq_poly_clear(Q);
-        fq_poly_clear(R);
+        fq_poly_clear(poly, ctx);
+        fq_poly_clear(t, ctx);
+        fq_poly_clear(Q, ctx);
+        fq_poly_clear(R, ctx);
 
         fq_ctx_clear(ctx);
     }

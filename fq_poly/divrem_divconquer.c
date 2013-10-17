@@ -66,11 +66,11 @@ __fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
            then compute R = A - BQ
          */
 
-        _fq_vec_swap(R, d2q1, n2);
+        _fq_vec_swap(R, d2q1, n2, ctx);
         _fq_poly_add(R + n2, R + n2, n1 - 1, d2q1 + n2, n1 - 1, ctx);
         _fq_poly_sub(R, A, lenA, R, lenA, ctx);
 
-        _fq_vec_clear(W, (2 * n1 - 1) + lenB - 1);
+        _fq_vec_clear(W, (2 * n1 - 1) + lenB - 1, ctx);
     }
     else  /* lenA = 2 * lenB - 1 */
     {
@@ -80,7 +80,7 @@ __fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
 
         _fq_poly_sub(R, A, lenB - 1, R, lenB - 1, ctx);
 
-        _fq_vec_clear(W, lenA);
+        _fq_vec_clear(W, lenA, ctx);
     }
 }
 
@@ -99,7 +99,7 @@ void _fq_poly_divrem_divconquer(fq_struct *Q, fq_struct *R,
         slong shift, n = 2 * lenB - 1;
         fq_struct *QB, *W;
 
-        _fq_vec_set(R, A, lenA);
+        _fq_vec_set(R, A, lenA, ctx);
         W = _fq_vec_init(2 * n, ctx);
         QB = W + n;
 
@@ -116,10 +116,10 @@ void _fq_poly_divrem_divconquer(fq_struct *Q, fq_struct *R,
         if (lenA >= lenB)
         {
             __fq_poly_divrem_divconquer(Q, W, R, lenA, B, lenB, invB, ctx);
-            _fq_vec_swap(W, R, lenA);
+            _fq_vec_swap(W, R, lenA, ctx);
         }
 
-        _fq_vec_clear(W, 2 * n);
+        _fq_vec_clear(W, 2 * n, ctx);
     }
 }
 
@@ -142,8 +142,8 @@ fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
         return;
     }
 
-    fq_init(invB);
-    fq_inv(invB, fq_poly_lead(B), ctx);
+    fq_init(invB, ctx);
+    fq_inv(invB, fq_poly_lead(B, ctx), ctx);
 
     if (Q == A || Q == B)
     {
@@ -170,7 +170,7 @@ fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
 
     if (Q == A || Q == B)
     {
-        _fq_vec_clear(Q->coeffs, Q->alloc);
+        _fq_vec_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
         Q->alloc  = lenQ;
         Q->length = lenQ;
@@ -182,7 +182,7 @@ fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
 
     if (R == A || R == B)
     {
-        _fq_vec_clear(R->coeffs, R->alloc);
+        _fq_vec_clear(R->coeffs, R->alloc, ctx);
         R->coeffs = r;
         R->alloc  = lenA;
         R->length = lenA;
@@ -190,5 +190,5 @@ fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
     _fq_poly_set_length(R, lenB - 1, ctx);
     _fq_poly_normalise(R, ctx);
 
-    fq_clear(invB);
+    fq_clear(invB, ctx);
 }

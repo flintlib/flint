@@ -48,7 +48,7 @@ void _fq_poly_div_newton_preinv (fq_struct *Q, const fq_struct *A, slong lenA,
 
     _fq_poly_reverse(Q, Q, lenQ, lenQ, ctx);
 
-    _fq_vec_clear(Arev, 2*lenQ);
+    _fq_vec_clear(Arev, 2*lenQ, ctx);
 }
 
 void fq_poly_div_newton_preinv (fq_poly_t Q, const fq_poly_t A,

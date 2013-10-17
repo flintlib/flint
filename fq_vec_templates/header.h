@@ -41,7 +41,8 @@
 
 TEMPLATE(T, struct) * _TEMPLATE(T, vec_init)(slong len, const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, vec_clear)(TEMPLATE(T, struct) * vec, slong len);
+void _TEMPLATE(T, vec_clear)(TEMPLATE(T, struct) * vec, slong len,
+                             const TEMPLATE(T, ctx_t) ctx);
 
 /*  Randomisation  ***********************************************************/
 void
@@ -71,12 +72,12 @@ int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
 void
 _TEMPLATE(T, vec_set)(TEMPLATE(T, struct) * v, 
                       const TEMPLATE(T, struct) * f, 
-                      long len);
+                      long len, const TEMPLATE(T, ctx_t) ctx);
 
 void
 _TEMPLATE(T, vec_swap)(TEMPLATE(T, struct) * vec1,
                        TEMPLATE(T, struct) * vec2,
-                       slong len2);
+                       slong len2, const TEMPLATE(T, ctx_t) ctx);
 
 void
 _TEMPLATE(T, vec_zero)(TEMPLATE(T, struct) * v, 
@@ -96,7 +97,8 @@ _TEMPLATE(T, vec_is_zero)(const TEMPLATE(T, struct) * vec, slong len,
 
 int
 _TEMPLATE(T, vec_equal)(const TEMPLATE(T, struct) * vec1,
-                        const TEMPLATE(T, struct) * vec2, slong len);
+                        const TEMPLATE(T, struct) * vec2, slong len,
+                        const TEMPLATE(T, ctx_t) ctx);
 
 /*  Sorting  *****************************************************************/
 

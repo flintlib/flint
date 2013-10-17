@@ -27,7 +27,7 @@
 int
 fq_poly_is_irreducible(const fq_poly_t f, const fq_ctx_t ctx)
 {
-    if (fq_poly_length(f) > 2)
+    if (fq_poly_length(f, ctx) > 2)
     {
         return fq_poly_is_irreducible_ddf(f, ctx);
     }

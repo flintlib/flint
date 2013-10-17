@@ -50,7 +50,7 @@ TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
 
     TEMPLATE(T, mat_zero)(mat, ctx);
     for (i = 0; i < n; i++)
-        TEMPLATE(T, mat_entry_set)(mat, rows[i], cols[i], diag + i);
+        TEMPLATE(T, mat_entry_set)(mat, rows[i], cols[i], diag + i, ctx);
 
     _perm_clear(rows);
     _perm_clear(cols);

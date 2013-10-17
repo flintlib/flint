@@ -46,7 +46,7 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
     fmpz_init(q);
     fq_ctx_order(q, ctx);
 
-    fq_poly_init(a);
+    fq_poly_init(a, ctx);
 
     do
     {
@@ -57,11 +57,11 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
 
     if (factor->length != 1)
     {
-        fq_poly_clear(a);
+        fq_poly_clear(a, ctx);
         return 1;
     }
 
-    fq_poly_init(b);
+    fq_poly_init(b, ctx);
 
     fmpz_init(exp);
     if (fmpz_cmp_ui(fq_ctx_prime(ctx), 2) > 0)
@@ -78,7 +78,7 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
         /* compute b = (a^{2^{k*d-1}}+a^{2^{k*d-2}}+...+a^4+a^2+a) rem pol */
         k = d * fq_ctx_degree(ctx); /* TODO: Handle overflow? */
         fq_poly_rem(b, a, pol, ctx);
-        fq_poly_init(c);
+        fq_poly_init(c, ctx);
         fq_poly_set(c, b, ctx);
         for (i = 1; i < k; i++)
         {
@@ -87,22 +87,22 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
             fq_poly_add(b, b, c, ctx);
         }
         fq_poly_rem(b, b, pol, ctx);
-        fq_poly_clear(c);
+        fq_poly_clear(c, ctx);
     }
     fmpz_clear(exp);
 
-    fq_init(t);
+    fq_init(t, ctx);
     fq_sub_one(t, b->coeffs + 0, ctx);
     fq_poly_set_coeff(b, 0, t, ctx);
-    fq_clear(t);
+    fq_clear(t, ctx);
 
     fq_poly_gcd(factor, b, pol, ctx);
 
     if ((factor->length <= 1) || (factor->length == pol->length))
         res = 0;
 
-    fq_poly_clear(a);
-    fq_poly_clear(b);
+    fq_poly_clear(a, ctx);
+    fq_poly_clear(b, ctx);
     fmpz_clear(q);
 
     return res;

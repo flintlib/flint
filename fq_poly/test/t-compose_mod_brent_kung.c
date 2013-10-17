@@ -46,11 +46,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(d);
-        fq_poly_init(e);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(d, ctx);
+        fq_poly_init(e, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 20) + 1, ctx);
         fq_poly_randtest(b, state, n_randint(state, 20) + 1, ctx);
@@ -61,7 +61,7 @@ main(void)
         fq_poly_compose(e, a, b, ctx);
         fq_poly_rem(e, e, c, ctx);
 
-        if (!fq_poly_equal(d, e))
+        if (!fq_poly_equal(d, e, ctx))
         {
             printf("FAIL (composition):\n");
             printf("a:\n"); fq_poly_print(a, ctx); printf("\n");
@@ -72,11 +72,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(d);
-        fq_poly_clear(e);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(d, ctx);
+        fq_poly_clear(e, ctx);
 
         fq_ctx_clear(ctx);
     }
@@ -89,10 +89,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(d);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(d, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 20) + 1, ctx);
         fq_poly_randtest(b, state, n_randint(state, 20) + 1, ctx);
@@ -102,7 +102,7 @@ main(void)
         fq_poly_compose_mod_brent_kung(d, a, b, c, ctx);
         fq_poly_compose_mod_brent_kung(a, a, b, c, ctx);
 
-        if (!fq_poly_equal(d, a))
+        if (!fq_poly_equal(d, a, ctx))
         {
             printf("FAIL (aliasing a):\n");
             printf("a:\n"); fq_poly_print(a, ctx); printf("\n");
@@ -112,10 +112,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(d);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(d, ctx);
 
         fq_ctx_clear(ctx);
     }
@@ -128,10 +128,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
         
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(d);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(d, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 20) + 1, ctx);
         fq_poly_randtest(b, state, n_randint(state, 20) + 1, ctx);
@@ -141,7 +141,7 @@ main(void)
         fq_poly_compose_mod_brent_kung(d, a, b, c, ctx);
         fq_poly_compose_mod_brent_kung(b, a, b, c, ctx);
 
-        if (!fq_poly_equal(d, b))
+        if (!fq_poly_equal(d, b, ctx))
         {
             printf("FAIL (aliasing b)\n");
             printf("a:\n"); fq_poly_print(a, ctx); printf("\n");
@@ -151,10 +151,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(d);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(d, ctx);
 
         fq_ctx_clear(ctx);
     }
@@ -167,10 +167,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(d);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(d, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 20) + 1, ctx);
         fq_poly_randtest(b, state, n_randint(state, 20) + 1, ctx);
@@ -180,7 +180,7 @@ main(void)
         fq_poly_compose_mod_brent_kung(d, a, b, c, ctx);
         fq_poly_compose_mod_brent_kung(c, a, b, c, ctx);
 
-        if (!fq_poly_equal(d, c))
+        if (!fq_poly_equal(d, c, ctx))
         {
             printf("FAIL (aliasing c)\n");
             printf("a:\n"); fq_poly_print(a, ctx); printf("\n");
@@ -190,10 +190,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(d);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(d, ctx);
 
         fq_ctx_clear(ctx);
     }

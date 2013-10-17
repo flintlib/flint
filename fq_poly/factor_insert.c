@@ -35,7 +35,7 @@ fq_poly_factor_insert(fq_poly_factor_t fac, const fq_poly_t poly, slong exp,
 
     for (i = 0; i < fac->num; i++)
     {
-        if (fq_poly_equal(poly, fac->poly + i))
+        if (fq_poly_equal(poly, fac->poly + i, ctx))
         {
             fac->exp[i] += exp;
             return;
@@ -51,7 +51,7 @@ fq_poly_factor_insert(fq_poly_factor_t fac, const fq_poly_t poly, slong exp,
         fac->exp = flint_realloc(fac->exp, sizeof(slong) * new_size);
 
         for (i = fac->alloc; i < new_size; i++)
-            fq_poly_init(fac->poly + i);
+            fq_poly_init(fac->poly + i, ctx);
 
         fac->alloc = new_size;
     }

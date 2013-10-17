@@ -33,7 +33,7 @@ fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx)
     slong *degs;
     fq_poly_factor_t dist_deg;
 
-    n = fq_poly_degree(f);
+    n = fq_poly_degree(f, ctx);
 
     if (n < 2)
         return 1;
@@ -55,19 +55,19 @@ fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx)
         if (degs[i] == n)
         {
             flint_free(degs);
-            fq_poly_factor_clear(dist_deg);
+            fq_poly_factor_clear(dist_deg, ctx);
             return 1;
         }
         if (degs[i] > 0)
         {
             flint_free(degs);
-            fq_poly_factor_clear(dist_deg);
+            fq_poly_factor_clear(dist_deg, ctx);
             return 0;
         }
     }
 
     flint_free(degs);
-    fq_poly_factor_clear(dist_deg);
+    fq_poly_factor_clear(dist_deg, ctx);
 
     return 1;
 }

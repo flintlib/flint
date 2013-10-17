@@ -48,10 +48,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(poly1);
-        fq_poly_init(poly);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(poly1, ctx);
+        fq_poly_init(poly, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         fq_poly_zero(poly1, ctx);
         fq_poly_one(poly1, ctx);
@@ -103,7 +103,7 @@ main(void)
             abort();
         }
 
-        fq_poly_init(product);
+        fq_poly_init(product, ctx);
         fq_poly_one(product, ctx);
         for (i = 0; i < res->num; i++)
             for (j = 0; j < res->exp[i]; j++)
@@ -112,7 +112,7 @@ main(void)
         fq_poly_scalar_mul_fq(product, product,
                               poly1->coeffs + (poly1->length - 1), ctx);
 
-        if (!fq_poly_equal(poly1, product))
+        if (!fq_poly_equal(poly1, product, ctx))
         {
             flint_printf
                 ("Error: product of factors does not equal to the original polynomial\n");
@@ -125,12 +125,12 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(product);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
-        fq_poly_clear(poly1);
-        fq_poly_clear(poly);
-        fq_poly_factor_clear(res);
+        fq_poly_clear(product, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
+        fq_poly_clear(poly1, ctx);
+        fq_poly_clear(poly, ctx);
+        fq_poly_factor_clear(res, ctx);
 
         fq_ctx_clear(ctx);
     }

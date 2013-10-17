@@ -19,17 +19,14 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz, 2012 Andres Goens
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike hansen
  
 ******************************************************************************/
 
 #ifndef FQ_H
 #define FQ_H
-
-#undef ulong                /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#define ulong unsigned long
 
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
@@ -120,7 +117,7 @@ static __inline__ void fq_ctx_print(const fq_ctx_t ctx)
 
 /* Memory managment  *********************************************************/
 
-static __inline__ void fq_init(fq_t rop)
+static __inline__ void fq_init(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_init(rop);
 }
@@ -130,7 +127,7 @@ static __inline__ void fq_init2(fq_t rop, const fq_ctx_t ctx)
     fmpz_poly_init2(rop, fq_ctx_degree(ctx));
 }
 
-static __inline__ void fq_clear(fq_t rop)
+static __inline__ void fq_clear(fq_t rop, const fq_ctx_t ctx)
 {
     fmpz_poly_clear(rop);
 }
@@ -231,7 +228,7 @@ void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
 /* Comparison ****************************************************************/
 
-static __inline__ int fq_equal(const fq_t op1, const fq_t op2)
+static __inline__ int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
     return fmpz_poly_equal(op1, op2);
 }
@@ -248,7 +245,7 @@ static __inline__ int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 
 /* Assignments and conversions ***********************************************/
 
-static __inline__ void fq_set(fq_t rop, const fq_t op)
+static __inline__ void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     fmpz_poly_set(rop, op);
 }
@@ -275,7 +272,7 @@ static __inline__ void fq_set_ui(fq_t rop, const ulong x, const fq_ctx_t ctx)
     fmpz_clear(rx);
 }
 
-static __inline__ void fq_swap(fq_t op1, fq_t op2)
+static __inline__ void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t ctx)
 {
     fmpz_poly_swap(op1, op2);
 }

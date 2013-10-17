@@ -58,16 +58,16 @@ main(void)
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_init(x);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_init(x, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_scalar_mul_fq(b, a, x, ctx);
         fq_poly_scalar_mul_fq(a, a, x, ctx);
 
-        result = (fq_poly_equal(a, b));
+        result = (fq_poly_equal(a, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -77,9 +77,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_clear(x);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_clear(x, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

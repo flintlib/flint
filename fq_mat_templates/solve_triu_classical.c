@@ -55,27 +55,27 @@ TEMPLATE(T, mat_solve_triu_classical)(TEMPLATE(T, mat_t) X,
     for (i = 0; i < m; i++)
     {
         for (j = 0; j < n; j++)
-            TEMPLATE(T, set)(tmp + j, TEMPLATE(T, mat_entry)(X, j, i));
+            TEMPLATE(T, set)(tmp + j, TEMPLATE(T, mat_entry)(X, j, i), ctx);
 
         for (j = n - 1; j >= 0; j--)
         {
             TEMPLATE(T, t) s;
-            TEMPLATE(T, init)(s);
+            TEMPLATE(T, init)(s, ctx);
             TEMPLATE(T, vec_dot)(s, U->rows[j] + j + 1,  tmp + j + 1, n - j - 1, ctx);
             TEMPLATE(T, sub)(s, TEMPLATE(T, mat_entry)(B, j, i), s, ctx);
             if (!unit)
                 TEMPLATE(T, mul)(s, s, inv + j, ctx);
-            TEMPLATE(T, set)(tmp + j, s);
-            TEMPLATE(T, clear)(s);
+            TEMPLATE(T, set)(tmp + j, s, ctx);
+            TEMPLATE(T, clear)(s, ctx);
         }
 
         for (j = 0; j < n; j++)
-            TEMPLATE(T, mat_entry_set)(X, j, i, tmp + j);
+            TEMPLATE(T, mat_entry_set)(X, j, i, tmp + j, ctx);
     }
 
-    _TEMPLATE(T, vec_clear)(tmp, n);
+    _TEMPLATE(T, vec_clear)(tmp, n, ctx);
     if (!unit)
-        _TEMPLATE(T, vec_clear)(inv, n);
+        _TEMPLATE(T, vec_clear)(inv, n, ctx);
 }
 
 

@@ -37,7 +37,7 @@ TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
 {
     slong i;
     TEMPLATE(T, t) x;
-    TEMPLATE(T, init)(x);
+    TEMPLATE(T, init)(x, ctx);
 
     TEMPLATE(T, zero)(res, ctx);
 

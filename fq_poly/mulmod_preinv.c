@@ -50,7 +50,7 @@ void _fq_poly_mulmod_preinv(fq_struct *res,
 
     _fq_poly_divrem_newton_preinv(Q, res, T, lenT, f, lenf,
                                   finv, lenfinv, ctx);
-    _fq_vec_clear(T, lenT + lenQ);
+    _fq_vec_clear(T, lenT + lenQ, ctx);
 }
 
 void
@@ -82,7 +82,7 @@ fq_poly_mulmod_preinv(fq_poly_t res, const fq_poly_t poly1,
         if (f == res)
         {
             fcoeffs = _fq_vec_init(lenf, ctx);
-            _fq_vec_set(fcoeffs, f->coeffs, lenf);
+            _fq_vec_set(fcoeffs, f->coeffs, lenf, ctx);
         }
         else
             fcoeffs = f->coeffs;
@@ -94,7 +94,7 @@ fq_poly_mulmod_preinv(fq_poly_t res, const fq_poly_t poly1,
                                finv->coeffs, finv->length,
                                ctx);
         if (f == res)
-            _fq_vec_clear(fcoeffs, lenf);
+            _fq_vec_clear(fcoeffs, lenf, ctx);
 
         res->length = lenf - 1;
         _fq_poly_normalise(res, ctx);

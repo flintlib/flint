@@ -57,9 +57,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
         fq_poly_randtest(b, state, len, ctx);
@@ -67,7 +67,7 @@ main(void)
         fq_poly_mul_KS(c, a, b, ctx);
         fq_poly_mul_KS(a, a, b, ctx);
 
-        result = (fq_poly_equal(a, c));
+        result = (fq_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -77,9 +77,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -99,9 +99,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
         fq_poly_randtest(b, state, len, ctx);
@@ -109,7 +109,7 @@ main(void)
         fq_poly_mul_KS(c, a, b, ctx);
         fq_poly_mul_KS(b, a, b, ctx);
 
-        result = (fq_poly_equal(b, c));
+        result = (fq_poly_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -119,9 +119,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -141,15 +141,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(c);
+        fq_poly_init(a, ctx);
+        fq_poly_init(c, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_mul_KS(c, a, a, ctx);
         fq_poly_mul_KS(a, a, a, ctx);
 
-        result = (fq_poly_equal(a, c));
+        result = (fq_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -158,8 +158,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(c);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -179,10 +179,10 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(e);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(e, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
         fq_poly_randtest(b, state, len, ctx);
@@ -190,7 +190,7 @@ main(void)
         fq_poly_mul_KS(c, a, b, ctx);
         fq_poly_mul_KS(e, b, a, ctx);
 
-        result = (fq_poly_equal(e, c));
+        result = (fq_poly_equal(e, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -201,10 +201,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(e);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(e, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -224,11 +224,11 @@ main(void)
         deg = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, deg, "a");
-        fq_poly_init(a1);
-        fq_poly_init(a2);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(d);
+        fq_poly_init(a1, ctx);
+        fq_poly_init(a2, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(d, ctx);
 
         fq_poly_randtest(b, state, len, ctx);
         fq_poly_randtest(c, state, len, ctx);
@@ -241,7 +241,7 @@ main(void)
         fq_poly_add(c, c, d, ctx);
         fq_poly_mul_KS(a2, b, c, ctx);
 
-        result = (fq_poly_equal(a1, a2));
+        result = (fq_poly_equal(a1, a2, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -253,11 +253,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a1);
-        fq_poly_clear(a2);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(d);
+        fq_poly_clear(a1, ctx);
+        fq_poly_clear(a2, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(d, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

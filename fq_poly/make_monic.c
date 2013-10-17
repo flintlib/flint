@@ -32,10 +32,10 @@ _fq_poly_make_monic(fq_struct *rop,
                     const fq_struct *op, long length, const fq_ctx_t ctx)
 {
     fq_t inv;
-    fq_init(inv);
+    fq_init(inv, ctx);
     fq_inv(inv, &op[length - 1], ctx);
     _fq_poly_scalar_mul_fq(rop, op, length, inv, ctx);
-    fq_clear(inv);
+    fq_clear(inv, ctx);
 }
 
 void

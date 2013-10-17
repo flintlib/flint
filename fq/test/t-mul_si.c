@@ -56,15 +56,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
 
         fq_randtest(a, state, ctx);
         x = z_randtest(state);
         fq_mul_si(b, a, x, ctx);
         fq_mul_si(a, a, x, ctx);
 
-        result = (fq_equal(a, b));
+        result = (fq_equal(a, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -74,8 +74,8 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -96,8 +96,8 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(c, ctx);
 	fmpz_poly_init(b);
 
         fq_randtest(a, state, ctx);
@@ -107,7 +107,7 @@ main(void)
 	fq_reduce(b,ctx);
 
 
-        result = (fq_equal(c, b));
+        result = (fq_equal(c, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -117,8 +117,8 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(c, ctx);
         fmpz_poly_clear(b);
         fmpz_clear(p);
         fq_ctx_clear(ctx);

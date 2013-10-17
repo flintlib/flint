@@ -57,8 +57,8 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
         fmpz_init(e);
 
         fq_randtest(a, state, ctx);
@@ -67,7 +67,7 @@ main(void)
         fq_pow(b, a, e, ctx);
         fq_pow(a, a, e, ctx);
 
-        result = (fq_equal(a, b));
+        result = (fq_equal(a, b, ctx));
         if (!result)
         {
             flint_printf("FAIL (alias):\n\n");
@@ -76,8 +76,8 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
         fmpz_clear(e);
 
         fmpz_clear(p);
@@ -99,9 +99,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
         fmpz_init(f);
         fmpz_init(e);
 
@@ -115,7 +115,7 @@ main(void)
             fq_mul(c, c, a, ctx);
         }
 
-        result = (fq_equal(b, c));
+        result = (fq_equal(b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL (cmp with mul):\n\n");
@@ -126,9 +126,9 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
         fmpz_clear(e);
         fmpz_clear(f);
 

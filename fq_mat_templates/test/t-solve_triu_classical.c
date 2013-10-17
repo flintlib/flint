@@ -66,7 +66,7 @@ main(void)
 
         /* Check Y = A^(-1) * (A * X) = X */
         TEMPLATE(T, mat_solve_triu_classical)(Y, A, B, unit, ctx);
-        if (!TEMPLATE(T, mat_equal)(Y, X))
+        if (!TEMPLATE(T, mat_equal)(Y, X, ctx))
         {
             printf("FAIL!\n");
             printf("A:\n");
@@ -82,7 +82,7 @@ main(void)
 
         /* Check aliasing */
         TEMPLATE(T, mat_solve_triu_classical)(B, A, B, unit, ctx);
-        if (!TEMPLATE(T, mat_equal)(B, X))
+        if (!TEMPLATE(T, mat_equal)(B, X, ctx))
         {
             printf("FAIL!\n");
             printf("aliasing test failed");
@@ -93,10 +93,10 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, mat_clear)(A);
-        TEMPLATE(T, mat_clear)(B);
-        TEMPLATE(T, mat_clear)(X);
-        TEMPLATE(T, mat_clear)(Y);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(X, ctx);
+        TEMPLATE(T, mat_clear)(Y, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

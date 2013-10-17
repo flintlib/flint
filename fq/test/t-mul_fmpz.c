@@ -56,8 +56,8 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(b);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
 	fmpz_init(x);
 
         fq_randtest(a, state, ctx);
@@ -65,18 +65,18 @@ main(void)
         fq_mul_fmpz(b, a, x, ctx);
         fq_mul_fmpz(a, a, x, ctx);
 
-        result = (fq_equal(a, b));
+        result = (fq_equal(a, b, ctx));
         if (!result)
         {
-            flint_printf("FAIL:\n\n");
+            flint_printf("fail:\n\n");
             flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
 	    flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
 	fmpz_clear(x);
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -97,8 +97,8 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(c, ctx);
 	fmpz_init(x);
 	fmpz_poly_init(b);
 
@@ -109,7 +109,7 @@ main(void)
 	fq_reduce(b,ctx);
 
 
-        result = (fq_equal(c, b));
+        result = (fq_equal(c, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -119,8 +119,8 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(c, ctx);
         fmpz_poly_clear(b);
         fmpz_clear(p);
 	fmpz_clear(x);

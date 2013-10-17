@@ -75,21 +75,21 @@ main(void)
 
         fq_ctx_init_modulus(ctx_mod, p, d, modulus, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(lhs);
-        fq_init(rhs);
+        fq_init(a, ctx_conway);
+        fq_init(b, ctx_mod);
+        fq_init(lhs, ctx_conway);
+        fq_init(rhs, ctx_mod);
 
         for (k = 0; k < 30; k++)
         {
 
             fq_randtest(a, state, ctx_conway);
-            fq_set(b, a);
+            fq_set(b, a, ctx_mod);
 
             fq_mul(lhs, a, a, ctx_conway);
             fq_mul(rhs, b, b, ctx_mod);
 
-            result = (fq_equal(lhs, rhs));
+            result = (fq_equal(lhs, rhs, ctx_mod));
             if (!result)
             {
                 flint_printf("FAIL:\n\n");
@@ -102,10 +102,10 @@ main(void)
 
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(lhs);
-        fq_clear(rhs);
+        fq_clear(a, ctx_conway);
+        fq_clear(b, ctx_mod);
+        fq_clear(lhs, ctx_conway);
+        fq_clear(rhs, ctx_mod);
 
         fmpz_mod_poly_clear(modulus);
         fq_ctx_clear(ctx_conway);

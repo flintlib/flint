@@ -55,11 +55,11 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         fq_poly_randtest(         a, state, n_randint(state, 50),     ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
@@ -68,7 +68,7 @@ main(void)
         fq_poly_mul(c, q, b, ctx);
         fq_poly_add(c, c, r, ctx);
 
-        result = (fq_poly_equal(a, c));
+        result = (fq_poly_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -80,11 +80,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -103,10 +103,10 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         fq_poly_randtest(         a, state, n_randint(state, 50),     ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
@@ -114,7 +114,7 @@ main(void)
         fq_poly_divrem_basecase(q, r, a, b, ctx);
         fq_poly_divrem_basecase(q, a, a, b, ctx);
 
-        result = (fq_poly_equal(a, r));
+        result = (fq_poly_equal(a, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -125,10 +125,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -147,10 +147,10 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         fq_poly_randtest(         a, state, n_randint(state, 50),     ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
@@ -158,7 +158,7 @@ main(void)
         fq_poly_divrem_basecase(q, r, a, b, ctx);
         fq_poly_divrem_basecase(q, b, a, b, ctx);
 
-        result = (fq_poly_equal(b, r));
+        result = (fq_poly_equal(b, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -169,10 +169,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -191,10 +191,10 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         fq_poly_randtest(         a, state, n_randint(state, 50),     ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
@@ -202,7 +202,7 @@ main(void)
         fq_poly_divrem_basecase(q, r, a, b, ctx);
         fq_poly_divrem_basecase(a, r, a, b, ctx);
 
-        result = (fq_poly_equal(a, q));
+        result = (fq_poly_equal(a, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -213,10 +213,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -235,10 +235,10 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d   = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         fq_poly_randtest(         a, state, n_randint(state, 50),     ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
@@ -246,7 +246,7 @@ main(void)
         fq_poly_divrem_basecase(q, r, a, b, ctx);
         fq_poly_divrem_basecase(b, r, a, b, ctx);
 
-        result = (fq_poly_equal(b, q));
+        result = (fq_poly_equal(b, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -257,10 +257,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

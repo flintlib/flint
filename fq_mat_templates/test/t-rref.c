@@ -102,7 +102,7 @@ main(void)
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
-        TEMPLATE(T, init)(c);
+        TEMPLATE(T, init)(c, ctx);
         
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -161,7 +161,7 @@ main(void)
                 for (k = 0; k < n; k++)
                 {
                     equal = equal && TEMPLATE(T, equal)(TEMPLATE(T, mat_entry)(B, j, k),
-                                                        TEMPLATE(T, mat_entry)(D, j, k));
+                                                        TEMPLATE(T, mat_entry)(D, j, k), ctx);
                 }
             for (j = rank2; j < 2 * rank2; j++)
                 for (k = 0; k < n; k++)
@@ -180,12 +180,12 @@ main(void)
         }
 
         _perm_clear(perm);
-        TEMPLATE(T, mat_clear)(A);
-        TEMPLATE(T, mat_clear)(B);
-        TEMPLATE(T, mat_clear)(C);
-        TEMPLATE(T, mat_clear)(D);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(C, ctx);
+        TEMPLATE(T, mat_clear)(D, ctx);
 
-        TEMPLATE(T, clear)(c);
+        TEMPLATE(T, clear)(c, ctx);
         TEMPLATE(T, ctx_clear)(ctx);
     }
 

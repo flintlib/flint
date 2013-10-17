@@ -50,10 +50,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(f);
-        fq_poly_init(res);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(f, ctx);
+        fq_poly_init(res, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         fq_poly_randtest(b, state, n_randint(state, 50), ctx);
@@ -62,7 +62,7 @@ main(void)
         fq_poly_mulmod(res, a, b, f, ctx);
         fq_poly_mulmod(a, a, b, f, ctx);
 
-        result = (fq_poly_equal(res, a));
+        result = (fq_poly_equal(res, a, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -73,10 +73,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(f);
-        fq_poly_clear(res);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(res, ctx);
         
         fq_ctx_clear(ctx);
     }
@@ -89,10 +89,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(f);
-        fq_poly_init(res);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(f, ctx);
+        fq_poly_init(res, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         fq_poly_randtest(b, state, n_randint(state, 50), ctx);
@@ -101,7 +101,7 @@ main(void)
         fq_poly_mulmod(res, a, b, f, ctx);
         fq_poly_mulmod(b, a, b, f, ctx);
 
-        result = (fq_poly_equal(res, b));
+        result = (fq_poly_equal(res, b, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -112,10 +112,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(f);
-        fq_poly_clear(res);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(res, ctx);
 
         fq_ctx_clear(ctx);
     }
@@ -128,10 +128,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
         
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(f);
-        fq_poly_init(res);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(f, ctx);
+        fq_poly_init(res, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         fq_poly_randtest(b, state, n_randint(state, 50), ctx);
@@ -140,7 +140,7 @@ main(void)
         fq_poly_mulmod(res, a, b, f, ctx);
         fq_poly_mulmod(f, a, b, f, ctx);
 
-        result = (fq_poly_equal(res, f));
+        result = (fq_poly_equal(res, f, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -151,10 +151,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(f);
-        fq_poly_clear(res);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(res, ctx);
         
         fq_ctx_clear(ctx);
     }
@@ -167,22 +167,22 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(f);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(f, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         fq_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
-        fq_poly_init(res1);
-        fq_poly_init(res2);
-        fq_poly_init(t);
+        fq_poly_init(res1, ctx);
+        fq_poly_init(res2, ctx);
+        fq_poly_init(t, ctx);
         fq_poly_mulmod(res1, a, b, f, ctx);
         fq_poly_mul(res2, a, b, ctx);
         fq_poly_divrem(t, res2, res2, f, ctx);
 
-        result = (fq_poly_equal(res1, res2));
+        result = (fq_poly_equal(res1, res2, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -194,12 +194,12 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(f);
-        fq_poly_clear(res1);
-        fq_poly_clear(res2);
-        fq_poly_clear(t);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(res1, ctx);
+        fq_poly_clear(res2, ctx);
+        fq_poly_clear(t, ctx);
         
         fq_ctx_clear(ctx);
     }

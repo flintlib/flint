@@ -36,7 +36,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     slong i, j, l, m, n, index, d;
     double beta;
 
-    n = fq_poly_degree(poly);
+    n = fq_poly_degree(poly, ctx);
     beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);
@@ -44,13 +44,13 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     fmpz_init(q);
     fq_ctx_order(q, ctx);
 
-    fq_poly_init(f);
-    fq_poly_init(g);
-    fq_poly_init(s);
-    fq_poly_init(reducedH0);
-    fq_poly_init(v);
-    fq_poly_init(vinv);
-    fq_poly_init(tmp);
+    fq_poly_init(f, ctx);
+    fq_poly_init(g, ctx);
+    fq_poly_init(s, ctx);
+    fq_poly_init(reducedH0, ctx);
+    fq_poly_init(v, ctx);
+    fq_poly_init(vinv, ctx);
+    fq_poly_init(tmp, ctx);
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fq_poly_struct))))
     {
@@ -61,11 +61,11 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     H = h + (l + 1);
     I = H + m;
     for (i = 0; i < l + 1; i++)
-        fq_poly_init(h[i]);
+        fq_poly_init(h[i], ctx);
     for (i = 0; i < m; i++)
     {
-        fq_poly_init(H[i]);
-        fq_poly_init(I[i]);
+        fq_poly_init(H[i], ctx);
+        fq_poly_init(I[i], ctx);
     }
 
     fq_poly_make_monic(v, poly, ctx);
@@ -158,20 +158,20 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
 
     /* cleanup */
     fmpz_clear(q);
-    fq_poly_clear(f);
-    fq_poly_clear(g);
-    fq_poly_clear(s);
-    fq_poly_clear(reducedH0);
-    fq_poly_clear(v);
-    fq_poly_clear(vinv);
-    fq_poly_clear(tmp);
+    fq_poly_clear(f, ctx);
+    fq_poly_clear(g, ctx);
+    fq_poly_clear(s, ctx);
+    fq_poly_clear(reducedH0, ctx);
+    fq_poly_clear(v, ctx);
+    fq_poly_clear(vinv, ctx);
+    fq_poly_clear(tmp, ctx);
 
     for (i = 0; i < l + 1; i++)
-        fq_poly_clear(h[i]);
+        fq_poly_clear(h[i], ctx);
     for (i = 0; i < m; i++)
     {
-        fq_poly_clear(H[i]);
-        fq_poly_clear(I[i]);
+        fq_poly_clear(H[i], ctx);
+        fq_poly_clear(I[i], ctx);
     }
     flint_free(h);
 }

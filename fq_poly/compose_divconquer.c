@@ -37,7 +37,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     if (len1 <= 2 || len2 <= 1)
     {
         if (len1 == 1)
-            fq_set(rop, op1);
+            fq_set(rop, op1, ctx);
         else if (len2 == 1)
             _fq_poly_evaluate_fq(rop, op1, len1, op2, ctx);
         else  /* len1 == 2 */
@@ -64,7 +64,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
 
-    v = _fq_poly_init(alloc + 2 * powlen);
+    v = _fq_poly_init(alloc + 2 * powlen, ctx);
     h = (fq_struct **) flint_malloc(((len1 + 1) / 2) * sizeof(fq_struct *));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
@@ -88,7 +88,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
         }
         else if (!fq_is_zero(op1 + j, ctx))
         {
-            fq_set(h[i], op1 + j);
+            fq_set(h[i], op1 + j, ctx);
             hlen[i] = 1;
         }
     }
@@ -96,7 +96,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     {
         if (!fq_is_zero(op1 + j, ctx))
         {
-            fq_set(h[i], op1 + j);
+            fq_set(h[i], op1 + j, ctx);
             hlen[i] = 1;
         }
     }
@@ -127,7 +127,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
         }
         if ((n & 1L))
         {
-            _fq_poly_set(h[i], h[2*i], hlen[2*i]);
+            _fq_poly_set(h[i], h[2*i], hlen[2*i], ctx);
             hlen[i] = hlen[2*i];
         }
         
@@ -143,7 +143,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     _fq_poly_mul(rop, pow, powlen, h[1], hlen[1], ctx);
     _fq_poly_add(rop, rop, hlen[0], h[0], hlen[0], ctx);
     
-    _fq_poly_clear(v, alloc + 2 * powlen);
+    _fq_poly_clear(v, alloc + 2 * powlen, ctx);
     flint_free(h);
     flint_free(hlen);
 }
@@ -176,13 +176,13 @@ void fq_poly_compose_divconquer(fq_poly_t rop,
     {
         fq_poly_t t;
 
-        fq_poly_init2(t, lenr);
+        fq_poly_init2(t, lenr, ctx);
         _fq_poly_compose_divconquer(t->coeffs, op1->coeffs, len1,
                                                op2->coeffs, len2, ctx);
         _fq_poly_set_length(t, lenr, ctx);
         _fq_poly_normalise(t, ctx);
-        fq_poly_swap(rop, t);
-        fq_poly_clear(t);
+        fq_poly_swap(rop, t, ctx);
+        fq_poly_clear(t, ctx);
     }
 }
 

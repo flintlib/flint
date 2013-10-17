@@ -29,8 +29,8 @@ void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 {
     fq_t one;
 
-    fq_init(one);
+    fq_init(one, ctx);
     fq_one(one, ctx);
     fq_sub(rop, op1, one, ctx);
-    fq_clear(one);
+    fq_clear(one, ctx);
 }

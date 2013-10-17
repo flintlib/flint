@@ -99,13 +99,13 @@ fq_poly_divrem_newton_preinv(fq_poly_t Q, fq_poly_t R,
 
     if (Q == A || Q == B || Q == Binv)
     {
-        _fq_vec_clear(Q->coeffs, lenA - lenB + 1);
+        _fq_vec_clear(Q->coeffs, lenA - lenB + 1, ctx);
         Q->coeffs = q;
         Q->alloc  = lenA - lenB + 1;
     }
     if (R == A || R == B || R == Binv)
     {
-        _fq_vec_clear(R->coeffs, lenB - 1);
+        _fq_vec_clear(R->coeffs, lenB - 1, ctx);
         R->coeffs = r;
         R->alloc  = lenB - 1;
     }

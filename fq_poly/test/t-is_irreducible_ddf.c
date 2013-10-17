@@ -50,14 +50,14 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(poly1);
-        fq_poly_init(poly2);
+        fq_poly_init(poly1, ctx);
+        fq_poly_init(poly2, ctx);
 
         length = n_randint(state, 10) + 2;
         do
         {
             fq_poly_randtest(poly1, state, length, ctx);
-            if (!fq_poly_is_zero(poly1))
+            if (!fq_poly_is_zero(poly1, ctx))
                 fq_poly_make_monic(poly1, poly1, ctx);
         }
         while ((!fq_poly_is_irreducible_ddf(poly1, ctx)) || (poly1->length < 2));
@@ -69,7 +69,7 @@ main(void)
             do
             {
                 fq_poly_randtest(poly2, state, length, ctx);
-                if (!fq_poly_is_zero(poly2))
+                if (!fq_poly_is_zero(poly2, ctx))
                     fq_poly_make_monic(poly2, poly2, ctx);
             }
             while ((!fq_poly_is_irreducible_ddf(poly2, ctx)) || (poly2->length < 2));
@@ -86,8 +86,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(poly1);
-        fq_poly_clear(poly2);
+        fq_poly_clear(poly1, ctx);
+        fq_poly_clear(poly2, ctx);
 
         fq_ctx_clear(ctx);
     }

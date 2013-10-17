@@ -61,7 +61,7 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, init)(x);
+        TEMPLATE(T, init)(x, ctx);
         TEMPLATE(T, randtest_not_zero)(x, state, ctx);
         
         if (rows && cols)
@@ -76,8 +76,8 @@ main(void)
             }
         }
 
-        TEMPLATE(T, clear)(x);
-        TEMPLATE(T, mat_clear)(A);
+        TEMPLATE(T, clear)(x, ctx);
+        TEMPLATE(T, mat_clear)(A, ctx);
         TEMPLATE(T, ctx_clear)(ctx);
     }
 

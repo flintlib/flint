@@ -57,8 +57,8 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 	fq_poly_set(b, a, ctx);
@@ -76,8 +76,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
 
 
         fmpz_clear(p);
@@ -98,9 +98,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
         fq_poly_randtest(b, state, len, ctx);
@@ -120,9 +120,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
 
 
         fmpz_clear(p);

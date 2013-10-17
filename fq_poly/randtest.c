@@ -52,8 +52,8 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
     }
     
     fq_poly_randtest(f, state, len, ctx);
-    for(i = 0; (i < 10) && fq_poly_is_zero(f); i++)
+    for(i = 0; (i < 10) && fq_poly_is_zero(f, ctx); i++)
         fq_poly_randtest(f, state, len, ctx);
-    if (fq_poly_is_zero(f))
+    if (fq_poly_is_zero(f, ctx))
         fq_poly_one(f, ctx);
 }

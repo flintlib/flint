@@ -46,12 +46,12 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
         
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
-        fq_poly_init(test);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
+        fq_poly_init(test, ctx);
 
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
@@ -66,7 +66,7 @@ main(void)
         fq_poly_mul(test, q, b, ctx);
         fq_poly_add(test, test, r, ctx);
 
-        result = (fq_poly_equal(a, test));
+        result = (fq_poly_equal(a, test, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -78,12 +78,12 @@ main(void)
             abort();
         }
         
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
-        fq_poly_clear(test);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
+        fq_poly_clear(test, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -96,11 +96,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
         
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
@@ -115,7 +115,7 @@ main(void)
         fq_poly_divrem_newton_preinv(q, r, a, b, binv, ctx);
         fq_poly_divrem_newton_preinv(a, r, a, b, binv, ctx);
 
-        result = (fq_poly_equal(a, q));
+        result = (fq_poly_equal(a, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -126,11 +126,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -143,11 +143,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
         
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
@@ -162,7 +162,7 @@ main(void)
         fq_poly_divrem_newton_preinv(q, r, a, b, binv, ctx);
         fq_poly_divrem_newton_preinv(b, r, a, b, binv, ctx);
 
-        result = (fq_poly_equal(b, q));
+        result = (fq_poly_equal(b, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -173,11 +173,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -190,11 +190,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
         
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
         
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
@@ -209,7 +209,7 @@ main(void)
         fq_poly_divrem_newton_preinv(q, r, a, b, binv, ctx);
         fq_poly_divrem_newton_preinv(binv, r, a, b, binv, ctx);
 
-        result = (fq_poly_equal(binv, q));
+        result = (fq_poly_equal(binv, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -221,11 +221,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -238,11 +238,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
         while (b->length <= 2);
@@ -256,7 +256,7 @@ main(void)
         fq_poly_divrem_newton_preinv(q, r, a, b, binv, ctx);
         fq_poly_divrem_newton_preinv(q, a, a, b, binv, ctx);
 
-        result = (fq_poly_equal(a, r));
+        result = (fq_poly_equal(a, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -267,11 +267,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -284,11 +284,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
@@ -303,7 +303,7 @@ main(void)
         fq_poly_divrem_newton_preinv(q, r, a, b, binv, ctx);
         fq_poly_divrem_newton_preinv(q, b, a, b, binv, ctx);
 
-        result = (fq_poly_equal(b, r));
+        result = (fq_poly_equal(b, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -314,11 +314,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -331,11 +331,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(binv);
-        fq_poly_init(q);
-        fq_poly_init(r);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(binv, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(r, ctx);
 
         do
             fq_poly_randtest(b, state, n_randint(state, 200), ctx);
@@ -350,7 +350,7 @@ main(void)
         fq_poly_divrem_newton_preinv(q, r, a, b, binv, ctx);
         fq_poly_divrem_newton_preinv(q, binv, a, b, binv, ctx);
 
-        result = (fq_poly_equal(binv, r));
+        result = (fq_poly_equal(binv, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -362,11 +362,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(binv);
-        fq_poly_clear(q);
-        fq_poly_clear(r);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(binv, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(r, ctx);
         fq_ctx_clear(ctx);
     }
 

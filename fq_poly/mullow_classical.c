@@ -70,11 +70,11 @@ void fq_poly_mullow_classical(fq_poly_t rop,
     {
         fq_poly_t t;
 
-        fq_poly_init2(t, n);
+        fq_poly_init2(t, n, ctx);
         _fq_poly_mullow_classical(t->coeffs, op1->coeffs, op1->length, 
                                              op2->coeffs, op2->length, n, ctx);
-        fq_poly_swap(rop, t);
-        fq_poly_clear(t);
+        fq_poly_swap(rop, t, ctx);
+        fq_poly_clear(t, ctx);
     }
     else
     {

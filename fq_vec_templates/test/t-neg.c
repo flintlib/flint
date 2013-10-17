@@ -57,7 +57,7 @@ main(void)
         _TEMPLATE(T, vec_neg)(b, a, len, ctx);
         _TEMPLATE(T, vec_neg)(a, a, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(a, b, len));
+        result = (_TEMPLATE(T, vec_equal)(a, b, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -66,8 +66,8 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
-        _TEMPLATE(T, vec_clear)(b, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear)(b, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }
@@ -88,7 +88,7 @@ main(void)
         _TEMPLATE(T, vec_neg)(b, a, len, ctx);
         _TEMPLATE(T, vec_neg)(b, b, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(a, b, len));
+        result = (_TEMPLATE(T, vec_equal)(a, b, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -97,8 +97,8 @@ main(void)
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len);
-        _TEMPLATE(T, vec_clear)(b, len);
+        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear)(b, len, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

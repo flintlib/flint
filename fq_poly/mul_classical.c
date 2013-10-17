@@ -65,11 +65,11 @@ void fq_poly_mul_classical(fq_poly_t rop,
     {
         fq_poly_t t;
 
-        fq_poly_init2(t, len);
+        fq_poly_init2(t, len, ctx);
         _fq_poly_mul_classical(t->coeffs, op1->coeffs, op1->length, 
                                           op2->coeffs, op2->length, ctx);
-        fq_poly_swap(rop, t);
-        fq_poly_clear(t);
+        fq_poly_swap(rop, t, ctx);
+        fq_poly_clear(t, ctx);
     }
     else
     {

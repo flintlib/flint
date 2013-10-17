@@ -75,10 +75,10 @@ fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
     if (res == poly3 || res == poly1)
     {
         fq_poly_t tmp;
-        fq_poly_init(tmp);
+        fq_poly_init(tmp, ctx);
         fq_poly_compose_mod(tmp, poly1, poly2, poly3, ctx);
-        fq_poly_swap(tmp, res);
-        fq_poly_clear(tmp);
+        fq_poly_swap(tmp, res, ctx);
+        fq_poly_clear(tmp, ctx);
         return;
     }
 
@@ -86,16 +86,16 @@ fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
 
     if (len2 <= len)
     {
-        _fq_vec_set(ptr2, poly2->coeffs, len2);
+        _fq_vec_set(ptr2, poly2->coeffs, len2, ctx);
         _fq_vec_zero(ptr2 + len2, len - len2, ctx);
     }
     else
     {
-        fq_init(inv3);
+        fq_init(inv3, ctx);
         fq_inv(inv3, poly3->coeffs + len, ctx);
         _fq_poly_rem(ptr2, poly2->coeffs, len2,
                                poly3->coeffs, len3, inv3, ctx);
-        fq_clear(inv3);
+        fq_clear(inv3, ctx);
     }
 
     fq_poly_fit_length(res, len, ctx);
@@ -107,5 +107,5 @@ fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
     _fq_poly_set_length(res, len, ctx);
     _fq_poly_normalise(res, ctx);
 
-    _fq_vec_clear(ptr2, vec_len);
+    _fq_vec_clear(ptr2, vec_len, ctx);
 }

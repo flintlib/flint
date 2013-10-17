@@ -29,7 +29,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window)
+TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window, const TEMPLATE(T, ctx_t) ctx)
 {
     flint_free(window->rows);
 }

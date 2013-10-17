@@ -51,7 +51,7 @@ _fq_poly_reverse(fq_struct * res, const fq_struct * poly, slong len, slong n,
             fq_zero(res + i, ctx);
 
         for (i = 0; i < len; i++)
-            fq_set(res + (n - len) + i, poly + (len - 1) - i);
+            fq_set(res + (n - len) + i, poly + (len - 1) - i, ctx);
     }
 }
 

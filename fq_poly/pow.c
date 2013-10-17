@@ -25,33 +25,13 @@
 
 #include "fq_poly.h"
 
-static fq_struct * __vec_init(long len)
-{
-    long i;
-    fq_struct *v;
-
-    v = flint_malloc(len * sizeof(fq_struct));
-    for (i = 0; i < len; i++)
-        fq_init(v + i);
-    return v;
-}
-
-static void __vec_clear(fq_struct *v, long len)
-{
-    long i;
-
-    for (i = 0; i < len; i++)
-        fq_clear(v + i);
-    flint_free(v);
-}
-
 void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e, 
                                   const fq_ctx_t ctx)
 {
     ulong bit = ~((~0UL) >> 1);
     long rlen;
     long alloc = (long) e * (len - 1) + 1;
-    fq_struct *v = __vec_init(alloc);
+    fq_struct *v = _fq_vec_init(alloc, ctx);
     fq_struct *R, *S, *T;
 
     /*
@@ -123,7 +103,7 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
         }
     }
     
-    __vec_clear(v, alloc);
+    _fq_vec_clear(v, alloc, ctx);
 }
 
 void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, 
@@ -166,11 +146,11 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
         else
         {
             fq_poly_t t;
-            fq_poly_init2(t, rlen);
+            fq_poly_init2(t, rlen, ctx);
             _fq_poly_pow(t->coeffs, op->coeffs, len, e, ctx);
             _fq_poly_set_length(t, rlen, ctx);
-            fq_poly_swap(rop, t);
-            fq_poly_clear(t);
+            fq_poly_swap(rop, t, ctx);
+            fq_poly_clear(t, ctx);
         }
     }
 }

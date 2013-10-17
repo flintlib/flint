@@ -36,12 +36,12 @@ void fq_poly_randtest_irreducible (fq_poly_t f, flint_rand_t state,
     fmpz_init_set(q, fq_ctx_prime(ctx));
     fmpz_pow_ui(q, q, fq_ctx_degree(ctx));
 
-    fq_poly_init(x);
+    fq_poly_init(x, ctx);
     fq_poly_gen(x, ctx);
-    fq_poly_init(xq);
-    fq_poly_init(xqi);
-    fq_poly_init(g_i);
-    fq_poly_init(finv);
+    fq_poly_init(xq, ctx);
+    fq_poly_init(xqi, ctx);
+    fq_poly_init(g_i, ctx);
+    fq_poly_init(finv, ctx);
 
     while (1)
     {
@@ -76,10 +76,10 @@ void fq_poly_randtest_irreducible (fq_poly_t f, flint_rand_t state,
         }
     }
 
-    fq_poly_clear(x);
-    fq_poly_clear(xq);
-    fq_poly_clear(xqi);
-    fq_poly_clear(g_i);
-    fq_poly_clear(finv);
+    fq_poly_clear(x, ctx);
+    fq_poly_clear(xq, ctx);
+    fq_poly_clear(xqi, ctx);
+    fq_poly_clear(g_i, ctx);
+    fq_poly_clear(finv, ctx);
     fmpz_clear(q);
 }

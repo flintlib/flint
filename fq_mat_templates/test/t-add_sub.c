@@ -67,15 +67,15 @@ main(void)
         TEMPLATE(T, mat_sub)(A, A, B, ctx);
         TEMPLATE(T, mat_neg)(A, A, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(A, C))
+        if (!TEMPLATE(T, mat_equal)(A, C, ctx))
         {
             printf("FAIL: matrices not equal!\n");
             abort();
         }
 
-        TEMPLATE(T, mat_clear)(A);
-        TEMPLATE(T, mat_clear)(B);
-        TEMPLATE(T, mat_clear)(C);
+        TEMPLATE(T, mat_clear)(A, ctx);
+        TEMPLATE(T, mat_clear)(B, ctx);
+        TEMPLATE(T, mat_clear)(C, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

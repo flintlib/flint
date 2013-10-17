@@ -37,10 +37,10 @@ fq_poly_factor_cantor_zassenhaus(fq_poly_factor_t res, const fq_poly_t f,
     fmpz_init(q);
     fq_ctx_order(q, ctx);
 
-    fq_poly_init(h);
-    fq_poly_init(g);
-    fq_poly_init(v);
-    fq_poly_init(x);
+    fq_poly_init(h, ctx);
+    fq_poly_init(g, ctx);
+    fq_poly_init(v, ctx);
+    fq_poly_init(x, ctx);
 
     fq_poly_gen(h, ctx);
     fq_poly_gen(x, ctx);
@@ -72,9 +72,9 @@ fq_poly_factor_cantor_zassenhaus(fq_poly_factor_t res, const fq_poly_t f,
     if (v->length > 1)
         fq_poly_factor_insert(res, v, 1, ctx);
 
-    fq_poly_clear(g);
-    fq_poly_clear(h);
-    fq_poly_clear(v);
-    fq_poly_clear(x);
+    fq_poly_clear(g, ctx);
+    fq_poly_clear(h, ctx);
+    fq_poly_clear(v, ctx);
+    fq_poly_clear(x, ctx);
     fmpz_clear(q);
 }

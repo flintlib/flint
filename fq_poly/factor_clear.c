@@ -27,13 +27,13 @@
 #include "fq_poly.h"
 
 void
-fq_poly_factor_clear(fq_poly_factor_t fac)
+fq_poly_factor_clear(fq_poly_factor_t fac, const fq_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < fac->alloc; i++)
     {
-        fq_poly_clear(fac->poly + i);
+        fq_poly_clear(fac->poly + i, ctx);
     }
 
     flint_free(fac->poly);

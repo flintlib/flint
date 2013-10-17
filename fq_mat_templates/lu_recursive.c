@@ -82,16 +82,16 @@ TEMPLATE(T, mat_lu_recursive)(slong * P,
         P[i] = i;
 
     P1 = flint_malloc(sizeof(slong) * m);
-    TEMPLATE(T, mat_window_init)(A0, A, 0, 0, m, n1);
-    TEMPLATE(T, mat_window_init)(A1, A, 0, n1, m, n);
+    TEMPLATE(T, mat_window_init)(A0, A, 0, 0, m, n1, ctx);
+    TEMPLATE(T, mat_window_init)(A1, A, 0, n1, m, n, ctx);
 
     r1 = TEMPLATE(T, mat_lu)(P1, A0, rank_check, ctx);
 
     if (rank_check && (r1 != n1))
     {
         flint_free(P1);
-        TEMPLATE(T, mat_window_clear)(A0);
-        TEMPLATE(T, mat_window_clear)(A1);
+        TEMPLATE(T, mat_window_clear)(A0, ctx);
+        TEMPLATE(T, mat_window_clear)(A1, ctx);
         return 0;
     }
 
@@ -100,10 +100,10 @@ TEMPLATE(T, mat_lu_recursive)(slong * P,
         _apply_permutation(P, A, P1, m, 0);
     }
 
-    TEMPLATE(T, mat_window_init)(A00, A, 0, 0, r1, r1);
-    TEMPLATE(T, mat_window_init)(A10, A, r1, 0, m, r1);
-    TEMPLATE(T, mat_window_init)(A01, A, 0, n1, r1, n);
-    TEMPLATE(T, mat_window_init)(A11, A, r1, n1, m, n);
+    TEMPLATE(T, mat_window_init)(A00, A, 0, 0, r1, r1, ctx);
+    TEMPLATE(T, mat_window_init)(A10, A, r1, 0, m, r1, ctx);
+    TEMPLATE(T, mat_window_init)(A01, A, 0, n1, r1, n, ctx);
+    TEMPLATE(T, mat_window_init)(A11, A, r1, n1, m, n, ctx);
 
     if (r1 != 0)
     {
@@ -129,7 +129,7 @@ TEMPLATE(T, mat_lu_recursive)(slong * P,
                 TEMPLATE(T, struct) * row = A->rows[r1 + i];
                 for (j = 0; j < FLINT_MIN(i, r2); j++)
                 {
-                    TEMPLATE(T, set)(row + r1 + j, row + n1 + j);
+                    TEMPLATE(T, set)(row + r1 + j, row + n1 + j, ctx);
                     TEMPLATE(T, zero)(row + n1 + j, ctx);
                 }
             }
@@ -137,12 +137,12 @@ TEMPLATE(T, mat_lu_recursive)(slong * P,
     }
 
     flint_free(P1);
-    TEMPLATE(T, mat_window_clear)(A00);
-    TEMPLATE(T, mat_window_clear)(A01);
-    TEMPLATE(T, mat_window_clear)(A10);
-    TEMPLATE(T, mat_window_clear)(A11);
-    TEMPLATE(T, mat_window_clear)(A0);
-    TEMPLATE(T, mat_window_clear)(A1);
+    TEMPLATE(T, mat_window_clear)(A00, ctx);
+    TEMPLATE(T, mat_window_clear)(A01, ctx);
+    TEMPLATE(T, mat_window_clear)(A10, ctx);
+    TEMPLATE(T, mat_window_clear)(A11, ctx);
+    TEMPLATE(T, mat_window_clear)(A0, ctx);
+    TEMPLATE(T, mat_window_clear)(A1, ctx);
 
     return r1 + r2;
 }

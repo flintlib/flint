@@ -57,15 +57,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_neg(b, a, ctx);
         fq_poly_neg(a, a, ctx);
 
-        result = (fq_poly_equal(a, b));
+        result = (fq_poly_equal(a, b, ctx));
         if (!result)
         {
             flint_printf("FAIL (aliasing):\n\n");
@@ -74,8 +74,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -95,15 +95,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_neg(b, a, ctx);
         fq_poly_neg(b, b, ctx);
 
-        result = (fq_poly_equal(a , b));
+        result = (fq_poly_equal(a , b, ctx));
         if (!result)
         {
             flint_printf("FAIL (-(-a) == a):\n\n");
@@ -112,8 +112,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -133,15 +133,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
 
         fq_poly_randtest(a, state, len, ctx);
 
         fq_poly_neg(b, a, ctx);
         fq_poly_add(a, a, b, ctx);
 
-        result = (fq_poly_is_zero(a));
+        result = (fq_poly_is_zero(a, ctx));
         if (!result)
         {
             flint_printf("FAIL (a + (-a) == 0):\n\n");
@@ -150,8 +150,8 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

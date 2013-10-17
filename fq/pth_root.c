@@ -31,12 +31,12 @@ fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
     long i, d;
     if (fq_is_zero(op1, ctx) || fq_is_one(op1, ctx))
     {
-        fq_set(rop, op1);
+        fq_set(rop, op1, ctx);
         return;
     }
 
     d = fq_ctx_degree(ctx) - 1;
-    fq_set(rop, op1);
+    fq_set(rop, op1, ctx);
     for (i = 0; i < d; i++)
     {
         fq_pow(rop, rop, fq_ctx_prime(ctx), ctx);

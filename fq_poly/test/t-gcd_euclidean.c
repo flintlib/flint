@@ -53,16 +53,16 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(g);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(g, ctx);
 
 
         fq_poly_randtest_not_zero(a, state, len, ctx);
         fq_poly_make_monic(b,a,ctx);
         fq_poly_gcd_euclidean(g,a,a,ctx);      
 
-        result = (fq_poly_equal(g, b));
+        result = (fq_poly_equal(g, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -72,9 +72,9 @@ main(void)
             abort();
         }
         
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(g);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(g, ctx);
     }
     
 
@@ -95,10 +95,10 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(g);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(g, ctx);
 
 
         fq_poly_randtest_not_zero(a, state, len, ctx);
@@ -133,7 +133,7 @@ main(void)
 
         fq_poly_gcd_euclidean(g, a, b,ctx);
 
-        result = (fq_poly_equal(g, c));
+        result = (fq_poly_equal(g, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -144,10 +144,10 @@ main(void)
             abort();
         }
         
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(g);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(g, ctx);
 
         fq_ctx_clear(ctx);
     }
@@ -166,9 +166,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(g);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(g, ctx);
 
         fq_poly_randtest_not_zero(a, state, len, ctx);
         fq_poly_randtest_not_zero(b, state, len, ctx);
@@ -176,7 +176,7 @@ main(void)
         fq_poly_gcd_euclidean(g, a, b,ctx);
         fq_poly_gcd_euclidean(a, a, b,ctx);
         
-        result = (fq_poly_equal(g, a));
+        result = (fq_poly_equal(g, a, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -186,9 +186,9 @@ main(void)
             abort();
         }
         
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(g);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(g, ctx);
 
         fq_ctx_clear(ctx);
     }
@@ -208,9 +208,9 @@ main(void)
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(g);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(g, ctx);
 
         fq_poly_randtest_not_zero(a, state, len, ctx);
         fq_poly_randtest_not_zero(b, state, len, ctx);
@@ -218,7 +218,7 @@ main(void)
         fq_poly_gcd_euclidean(g, a, b,ctx);
         fq_poly_gcd_euclidean(b, a, b,ctx);
         
-        result = (fq_poly_equal(g, b));
+        result = (fq_poly_equal(g, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -228,9 +228,9 @@ main(void)
             abort();
         }
         
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(g);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(g, ctx);
 
         fq_ctx_clear(ctx);
     }

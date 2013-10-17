@@ -38,7 +38,7 @@ void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R,
     if (alloc)
         R = _fq_vec_init(alloc, ctx);
     if (R != A)
-        _fq_vec_set(R + lenR, A + lenR, lenA - lenR);
+        _fq_vec_set(R + lenR, A + lenR, lenA - lenR, ctx);
 
     for (iQ = lenA - lenB; iQ >= 0; iQ--)
     {
@@ -63,7 +63,7 @@ void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R,
     }
 
     if (alloc)
-        _fq_vec_clear(R, alloc);
+        _fq_vec_clear(R, alloc, ctx);
 }
 
 void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
@@ -79,7 +79,7 @@ void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
         return;
     }
 
-    fq_init(invB);
+    fq_init(invB, ctx);
     fq_inv(invB, B->coeffs + (lenB - 1), ctx);
 
     if (Q == A || Q == B)
@@ -97,7 +97,7 @@ void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
 
     if (Q == A || Q == B)
     {
-        _fq_vec_clear(Q->coeffs, Q->alloc);
+        _fq_vec_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
         Q->alloc  = lenQ;
         Q->length = lenQ;
@@ -107,6 +107,6 @@ void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
         _fq_poly_set_length(Q, lenQ, ctx);
     }
 
-    fq_clear(invB);
+    fq_clear(invB, ctx);
 }
 

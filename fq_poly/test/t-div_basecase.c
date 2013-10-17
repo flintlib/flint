@@ -46,11 +46,11 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
         
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
-        fq_poly_init(q2);
-        fq_poly_init(r2);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
+        fq_poly_init(q2, ctx);
+        fq_poly_init(r2, ctx);
 
         fq_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
@@ -58,7 +58,7 @@ main(void)
         fq_poly_div_basecase(q, a, b, ctx);
         fq_poly_divrem_basecase(q2, r2, a, b, ctx);
 
-        result = (fq_poly_equal(q, q2));
+        result = (fq_poly_equal(q, q2, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -71,11 +71,11 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
-        fq_poly_clear(q2);
-        fq_poly_clear(r2);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
+        fq_poly_clear(q2, ctx);
+        fq_poly_clear(r2, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -87,16 +87,16 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
         fq_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
         fq_poly_div_basecase(q, a, b, ctx);
         fq_poly_div_basecase(a, a, b, ctx);
 
-        result = (fq_poly_equal(q, a));
+        result = (fq_poly_equal(q, a, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -107,9 +107,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
         fq_ctx_clear(ctx);
     }
 
@@ -121,16 +121,16 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(q);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(q, ctx);
         fq_poly_randtest(a, state, n_randint(state, 100), ctx);
         fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
         fq_poly_div_basecase(q, a, b, ctx);
         fq_poly_div_basecase(b, a, b, ctx);
 
-        result = (fq_poly_equal(q, b));
+        result = (fq_poly_equal(q, b, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -141,9 +141,9 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(q);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(q, ctx);
         fq_ctx_clear(ctx);
     }
 

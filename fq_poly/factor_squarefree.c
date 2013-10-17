@@ -50,19 +50,19 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
     fmpz_init(p);
     fmpz_set(p, fq_ctx_prime(ctx));
     
-    deg = fq_poly_degree(f);
+    deg = fq_poly_degree(f, ctx);
 
     /* Step 1, look at f', if it is zero then we are done since f = h(x)^p
        for some particular h(x), clearly f(x) = sum a_k x^kp, k <= deg(f) */
 
-    fq_init(x);
-    fq_poly_init(g_1);
-    fq_poly_init(f_d);
-    fq_poly_init(g);
+    fq_init(x, ctx);
+    fq_poly_init(g_1, ctx);
+    fq_poly_init(f_d, ctx);
+    fq_poly_init(g, ctx);
     fq_poly_derivative(f_d, f, ctx);
 
     /* Case 1 */
-    if (fq_poly_is_zero(f_d))
+    if (fq_poly_is_zero(f_d, ctx))
     {
         fq_poly_factor_t new_res;
         fq_poly_t h;
@@ -70,7 +70,7 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
         /* We can do this since deg is a multiple of p in this case */
         p_ui = fmpz_get_ui(p);
 
-        fq_poly_init(h);
+        fq_poly_init(h, ctx);
 
         for (i = 0; i <= deg / p_ui; i++)   /* this will be an integer since f'=0 */
         {
@@ -83,25 +83,25 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
         fq_poly_factor_init(new_res, ctx);
 
         fq_poly_factor_squarefree(new_res, h, ctx);
-        fq_poly_factor_pow(new_res, p_ui);
+        fq_poly_factor_pow(new_res, p_ui, ctx);
 
         fq_poly_factor_concat(res, new_res, ctx);
-        fq_poly_clear(h);
-        fq_poly_factor_clear(new_res);
+        fq_poly_clear(h, ctx);
+        fq_poly_factor_clear(new_res, ctx);
     }
     else
     {
         fq_poly_t h, z;
 
-        fq_poly_init(r);
+        fq_poly_init(r, ctx);
 
         fq_poly_gcd(g, f, f_d, ctx);
         fq_poly_divrem(g_1, r, f, g, ctx);
 
         i = 1;
 
-        fq_poly_init(h);
-        fq_poly_init(z);
+        fq_poly_init(h, ctx);
+        fq_poly_init(z, ctx);
 
         /* Case 2 */
         while (g_1->length > 1)
@@ -125,9 +125,9 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
             fq_poly_divrem(g, r, g, h, ctx);
         }
 
-        fq_poly_clear(h);
-        fq_poly_clear(z);
-        fq_poly_clear(r);
+        fq_poly_clear(h, ctx);
+        fq_poly_clear(z, ctx);
+        fq_poly_clear(r, ctx);
 
         fq_poly_make_monic(g, g, ctx);
 
@@ -137,11 +137,11 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
             fq_poly_t g_p;    /* g^(1/p) */
             fq_poly_factor_t new_res_2;
 
-            fq_poly_init(g_p);
+            fq_poly_init(g_p, ctx);
             
             p_ui = fmpz_get_ui(p);
 
-            for (i = 0; i <= fq_poly_degree(g) / p_ui; i++)
+            for (i = 0; i <= fq_poly_degree(g, ctx) / p_ui; i++)
             {
                 fq_poly_get_coeff(x, g, i * p_ui, ctx);
                 fq_pth_root(x, x, ctx);
@@ -152,17 +152,17 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
 
             /* squarefree(g^(1/p)) */
             fq_poly_factor_squarefree(new_res_2, g_p, ctx);
-            fq_poly_factor_pow(new_res_2, p_ui);
+            fq_poly_factor_pow(new_res_2, p_ui, ctx);
 
             fq_poly_factor_concat(res, new_res_2, ctx);
-            fq_poly_clear(g_p);
-            fq_poly_factor_clear(new_res_2);
+            fq_poly_clear(g_p, ctx);
+            fq_poly_factor_clear(new_res_2, ctx);
         }
     }
 
     fmpz_clear(p);
-    fq_clear(x);
-    fq_poly_clear(g_1);
-    fq_poly_clear(f_d);
-    fq_poly_clear(g);
+    fq_clear(x, ctx);
+    fq_poly_clear(g_1, ctx);
+    fq_poly_clear(f_d, ctx);
+    fq_poly_clear(g, ctx);
 }

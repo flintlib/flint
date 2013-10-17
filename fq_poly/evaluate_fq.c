@@ -34,21 +34,21 @@ void _fq_poly_evaluate_fq(fq_t rop, const fq_struct *op, long len,
     }
     else if (len == 1 || fq_is_zero(a, ctx))
     {
-        fq_set(rop, op + 0);
+        fq_set(rop, op + 0, ctx);
     }
     else
     {
         long i = len - 1;
         fq_t t;
 
-        fq_init(t);
-        fq_set(rop, op + i);
+        fq_init(t, ctx);
+        fq_set(rop, op + i, ctx);
         for (i = len - 2; i >= 0; i--)
         {
             fq_mul(t, rop, a, ctx);
             fq_add(rop, op + i, t, ctx);
         }
-        fq_clear(t);
+        fq_clear(t, ctx);
     }
 }
 
@@ -58,10 +58,10 @@ void fq_poly_evaluate_fq(fq_t rop, const fq_poly_t f, const fq_t a,
     if (rop == a)
     {
         fq_t t;
-        fq_init(t);
+        fq_init(t, ctx);
         _fq_poly_evaluate_fq(t, f->coeffs, f->length, a, ctx);
-        fq_swap(rop, t);
-        fq_clear(t);
+        fq_swap(rop, t, ctx);
+        fq_clear(t, ctx);
     }
     else
     {

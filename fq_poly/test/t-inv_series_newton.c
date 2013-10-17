@@ -46,10 +46,10 @@ main(void)
 
         fq_ctx_randtest(ctx, state);
 
-        fq_poly_init(a);
-        fq_poly_init(b);
-        fq_poly_init(c);
-        fq_poly_init(one);
+        fq_poly_init(a, ctx);
+        fq_poly_init(b, ctx);
+        fq_poly_init(c, ctx);
+        fq_poly_init(one, ctx);
 
         fq_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, ctx);
         fq_randtest_not_zero(a->coeffs, state, ctx);
@@ -58,7 +58,7 @@ main(void)
         fq_poly_inv_series_newton(b, a, n, ctx);
         fq_poly_mullow(c, a, b, n, ctx);
 
-        result = (fq_poly_equal(c, one));
+        result = (fq_poly_equal(c, one, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -69,10 +69,10 @@ main(void)
             abort();
         }
 
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(one);
+        fq_poly_clear(a, ctx);
+        fq_poly_clear(b, ctx);
+        fq_poly_clear(c, ctx);
+        fq_poly_clear(one, ctx);
         fq_ctx_clear(ctx);
     }
 

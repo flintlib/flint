@@ -39,7 +39,7 @@ fq_poly_factor_equal_deg(fq_poly_factor_t factors, const fq_poly_t pol,
         fq_poly_t f, g, r;
         flint_rand_t state;
 
-        fq_poly_init(f);
+        fq_poly_init(f, ctx);
 
         flint_randinit(state);
 
@@ -49,14 +49,14 @@ fq_poly_factor_equal_deg(fq_poly_factor_t factors, const fq_poly_t pol,
 
         flint_randclear(state);
 
-        fq_poly_init(g);
-        fq_poly_init(r);
+        fq_poly_init(g, ctx);
+        fq_poly_init(r, ctx);
         fq_poly_divrem(g, r, pol, f, ctx);
-        fq_poly_clear(r);
+        fq_poly_clear(r, ctx);
 
         fq_poly_factor_equal_deg(factors, f, d, ctx);
-        fq_poly_clear(f);
+        fq_poly_clear(f, ctx);
         fq_poly_factor_equal_deg(factors, g, d, ctx);
-        fq_poly_clear(g);
+        fq_poly_clear(g, ctx);
     }
 }

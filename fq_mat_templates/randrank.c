@@ -47,7 +47,7 @@ TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_t state, slong rank
 
     TEMPLATE(T, mat_randpermdiag)(mat, state, diag, rank, ctx);
 
-    _TEMPLATE(T, vec_clear)(diag, rank);
+    _TEMPLATE(T, vec_clear)(diag, rank, ctx);
 }
 
 

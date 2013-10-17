@@ -56,15 +56,15 @@ main(void)
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
 
-        fq_init(a);
-        fq_init(c);
+        fq_init(a, ctx);
+        fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
 
         fq_sqr(c, a, ctx);
         fq_sqr(a, a, ctx);
 
-        result = (fq_equal(a, c));
+        result = (fq_equal(a, c, ctx));
         if (!result)
         {
             flint_printf("FAIL (aliasing):\n\n");
@@ -73,8 +73,8 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(c);
+        fq_clear(a, ctx);
+        fq_clear(c, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -94,10 +94,10 @@ main(void)
         deg = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, deg, "a");
 
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
-        fq_init(d);
+        fq_init(a, ctx);
+        fq_init(b, ctx);
+        fq_init(c, ctx);
+        fq_init(d, ctx);
 
         fq_randtest(a, state, ctx);
 
@@ -107,7 +107,7 @@ main(void)
         fq_add(d, a, a, ctx);
         fq_mul(d, a, d, ctx);
 
-        result = (fq_equal(c, d));
+        result = (fq_equal(c, d, ctx));
         if (!result)
         {
             flint_printf("FAIL (a^2 + a^2 == a(a + a)):\n\n");
@@ -118,10 +118,10 @@ main(void)
             abort();
         }
 
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
-        fq_clear(d);
+        fq_clear(a, ctx);
+        fq_clear(b, ctx);
+        fq_clear(c, ctx);
+        fq_clear(d, ctx);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
