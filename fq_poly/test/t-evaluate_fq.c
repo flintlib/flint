@@ -45,18 +45,14 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d,len;
+        long len;
         fq_ctx_t ctx;
 
         fq_poly_t f;
         fq_t x, y, z;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(f, ctx);
         fq_init(x, ctx);
         fq_init(y, ctx);
@@ -85,25 +81,20 @@ main(void)
         fq_clear(y, ctx);
         fq_clear(z, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check (f + g)(a) == f(a) + g(a) */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d,len;
+        long len;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h;
         fq_t x, y, z;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(f, ctx);
         fq_poly_init(g, ctx);
         fq_poly_init(h, ctx);
@@ -141,7 +132,6 @@ main(void)
         fq_clear(y, ctx);
         fq_clear(z, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

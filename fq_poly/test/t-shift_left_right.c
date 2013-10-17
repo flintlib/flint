@@ -46,17 +46,13 @@ main(void)
     /* Check aliasing for left shift */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d   = n_randint(state, 10) + 1;
         long len = n_randint(state, 100);
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
         long shift;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -82,24 +78,20 @@ main(void)
         fq_poly_clear(b, ctx);
         fq_poly_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check aliasing for right shift */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d   = n_randint(state, 10) + 1;
         long len = n_randint(state, 100);
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
         long shift;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
+
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -125,24 +117,19 @@ main(void)
         fq_poly_clear(b, ctx);
         fq_poly_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check shift left then right does nothing */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d   = n_randint(state, 10) + 1;
         long len = n_randint(state, 100);
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
         long shift;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -167,7 +154,6 @@ main(void)
         fq_poly_clear(b, ctx);
         fq_poly_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

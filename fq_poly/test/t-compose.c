@@ -45,16 +45,11 @@ main(void)
     /* Check aliasing of the first argument */
     for (i = 0; i < 50; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d   = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(f, ctx);
         fq_poly_init(g, ctx);
         fq_poly_init(h, ctx);
@@ -79,23 +74,17 @@ main(void)
         fq_poly_clear(g, ctx);
         fq_poly_clear(h, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check aliasing of the second argument */
     for (i = 0; i < 50; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d   = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(f, ctx);
         fq_poly_init(g, ctx);
         fq_poly_init(h, ctx);
@@ -120,24 +109,18 @@ main(void)
         fq_poly_clear(g, ctx);
         fq_poly_clear(h, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Compare with the naive method */
     for (i = 0; i < 50; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t f, g, h, s, t;
         long k;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d   = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(f, ctx);
         fq_poly_init(g, ctx);
         fq_poly_init(h, ctx);
@@ -174,7 +157,6 @@ main(void)
         fq_poly_clear(s, ctx);
         fq_poly_clear(t, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

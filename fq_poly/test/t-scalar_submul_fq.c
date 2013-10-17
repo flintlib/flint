@@ -45,18 +45,14 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d, len;
+        long len;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
         fq_t x;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
 
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
@@ -86,25 +82,20 @@ main(void)
         fq_poly_clear(c, ctx);
         fq_clear(x, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check that b += x*a is the same as c = b + x*a */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d, len;
+        long len;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
         fq_t x;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
 
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
@@ -135,7 +126,6 @@ main(void)
         fq_poly_clear(c, ctx);
         fq_clear(x, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

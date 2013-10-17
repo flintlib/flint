@@ -45,17 +45,13 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d,len;
+        long len;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -79,23 +75,17 @@ main(void)
         fq_poly_clear(b, ctx);
         fq_poly_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check constants have derivative zero */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t a, b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
 
@@ -114,23 +104,17 @@ main(void)
         fq_poly_clear(a, ctx);
         fq_poly_clear(b, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check (f g)' == f' g + f g'  */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long deg;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c, d, lhs, rhs;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        deg = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, deg, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -169,7 +153,6 @@ main(void)
         fq_poly_clear(lhs, ctx);
         fq_poly_clear(rhs, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

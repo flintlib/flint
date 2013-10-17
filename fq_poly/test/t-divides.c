@@ -45,16 +45,11 @@ main(void)
     /* Check that b divides a b and that the quotient is a */
     for (i = 0; i < 500; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c, q;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -80,23 +75,17 @@ main(void)
         fq_poly_clear(c, ctx);
         fq_poly_clear(q, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check aliasing of a and q */
     for (i = 0; i < 100; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -119,23 +108,17 @@ main(void)
         fq_poly_clear(b, ctx);
         fq_poly_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check aliasing of b and q */
     for (i = 0; i < 100; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_poly_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
         fq_poly_init(a, ctx);
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
@@ -158,7 +141,6 @@ main(void)
         fq_poly_clear(b, ctx);
         fq_poly_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
