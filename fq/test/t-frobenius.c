@@ -45,25 +45,20 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_t a, b, c;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
-
+        fq_ctx_randtest(ctx, state);
+        
         fq_init(a, ctx);
         fq_init(b, ctx);
         fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
         fq_set(b, a, ctx);
-        e = n_randint(state, 10) % d;
+        e = n_randint(state, 10) % fq_ctx_degree(ctx);
 
         fq_frobenius(c, b, e, ctx);
         fq_frobenius(b, b, e, ctx);
@@ -83,38 +78,31 @@ main(void)
         fq_clear(b, ctx);
         fq_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check sigma^e(x) == x^{p^e}  */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
-
         fq_t a, b, c;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
-
+        fq_ctx_randtest(ctx, state);
+        
         fq_init(a, ctx);
         fq_init(b, ctx);
         fq_init(c, ctx);
 
         fq_randtest(a, state, ctx);
-        e = n_randint(state, 10) % d;
+        e = n_randint(state, 10) % fq_ctx_degree(ctx);
 
         fq_frobenius(b, a, e, ctx);
         {
             fmpz_t t;
 
             fmpz_init(t);
-            fmpz_pow_ui(t, p, e);
+            fmpz_pow_ui(t, fq_ctx_prime(ctx), e);
             fq_pow(c, a, t, ctx);
             fmpz_clear(t);
         }
@@ -134,24 +122,18 @@ main(void)
         fq_clear(b, ctx);
         fq_clear(c, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check sigma^e(x + y) = sigma^e(x) + sigma^e(y) */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_t a, b, s, s1, s2, lhs, rhs;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
 
         fq_init(a, ctx);
         fq_init(b, ctx);
@@ -163,7 +145,7 @@ main(void)
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
-        e = n_randint(state, 10) % d;
+        e = n_randint(state, 10) % fq_ctx_degree(ctx);
 
         fq_add(s, a, b, ctx);
         fq_frobenius(lhs, s, e, ctx);
@@ -194,24 +176,18 @@ main(void)
         fq_clear(lhs, ctx);
         fq_clear(rhs, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* Check sigma^e(x * y) = sigma^e(x) * sigma^e(y) on Zq */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
 
         fq_t a, b, s, s1, s2, lhs, rhs;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
 
         fq_init(a, ctx);
         fq_init(b, ctx);
@@ -223,7 +199,7 @@ main(void)
 
         fq_randtest(a, state, ctx);
         fq_randtest(b, state, ctx);
-        e = n_randint(state, 10) % d;
+        e = n_randint(state, 10) % fq_ctx_degree(ctx);
 
         fq_mul(s, a, b, ctx);
         fq_frobenius(lhs, s, e, ctx);
@@ -254,7 +230,6 @@ main(void)
         fq_clear(lhs, ctx);
         fq_clear(rhs, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

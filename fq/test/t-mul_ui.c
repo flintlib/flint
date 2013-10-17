@@ -45,17 +45,12 @@ main(void)
     /* Check aliasing of a, b */
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
         ulong x;
         fq_t a, b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
-
+        fq_ctx_randtest(ctx, state);
+        
         fq_init(a, ctx);
         fq_init(b, ctx);
 
@@ -77,24 +72,18 @@ main(void)
         fq_clear(a, ctx);
         fq_clear(b, ctx);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
     /* compare with direct multiplication */
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
         ulong x;
         fq_t a, c;
 	fmpz_poly_t b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
 
         fq_init(a, ctx);
         fq_init(c, ctx);
@@ -120,7 +109,6 @@ main(void)
         fq_clear(a, ctx);
         fq_clear(c, ctx);
         fmpz_poly_clear(b);
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 

@@ -44,18 +44,12 @@ main(void)
     /* Compare with sum of Galois conjugates */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_t p;
-        long d;
         fq_ctx_t ctx;
-
         fq_t a, b, c;
         fmpz_t x, y;
         long j;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_ctx_randtest(ctx, state);
 
         fq_init(a, ctx);
         fq_init(b, ctx);
@@ -68,7 +62,7 @@ main(void)
         fq_trace(x, a, ctx);
 
         fq_zero(b, ctx);
-        for (j = 0; j < d; j++)
+        for (j = 0; j < fq_ctx_degree(ctx); j++)
         {
             fq_frobenius(c, a, j, ctx);
             fq_add(b, b, c, ctx);
@@ -83,7 +77,7 @@ main(void)
             flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             flint_printf("y = "), fmpz_print(y), flint_printf("\n");
-            for (j = 0; j < d; j++)
+            for (j = 0; j < fq_ctx_degree(ctx); j++)
             {
                 fq_frobenius(c, a, j, ctx);
                 flint_printf("sigma^%ld = ", j), fq_print_pretty(c, ctx), flint_printf("\n");
@@ -97,7 +91,6 @@ main(void)
         fmpz_clear(x);
         fmpz_clear(y);
 
-        fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
 
