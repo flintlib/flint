@@ -97,9 +97,9 @@ main(int argc, char** argv)
     flint_rand_t state;
     flint_randinit(state);
 
-    fq_init(f);
-    fq_init(g);
-    fq_init(h);
+    fq_init(f, ctx);
+    fq_init(g, ctx);
+    fq_init(h, ctx);
     
     for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
     {
@@ -199,9 +199,9 @@ main(int argc, char** argv)
     }
 
     fmpz_clear(p);
-    fq_clear(f);
-    fq_clear(g);
-    fq_clear(h);
+    fq_clear(f, ctx);
+    fq_clear(g, ctx);
+    fq_clear(h, ctx);
     
     /* 
        Print 2-D ASCII image of the winning algorithms

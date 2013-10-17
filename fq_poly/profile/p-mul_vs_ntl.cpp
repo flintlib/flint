@@ -115,9 +115,9 @@ main(int argc, char** argv)
 
         fq_ctx_init_modulus(ctx, p, ext, fmod, "a");
     
-        fq_poly_init(f);
-        fq_poly_init(g);
-        fq_poly_init(h);
+        fq_poly_init(f, ctx);
+        fq_poly_init(g, ctx);
+        fq_poly_init(h, ctx);
 
         printf("Row: d = %d\n", ext);
 
@@ -188,9 +188,9 @@ main(int argc, char** argv)
            for (c = 0; c < nalgs; c++)
               sum += s[c];
         }
-        fq_poly_clear(f);
-        fq_poly_clear(g);
-        fq_poly_clear(h);
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(g, ctx);
+        fq_poly_clear(h, ctx);
 
         fmpz_mod_poly_clear(fmod);
         fq_ctx_clear(ctx);

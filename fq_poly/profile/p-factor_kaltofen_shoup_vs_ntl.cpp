@@ -81,8 +81,8 @@ main(int argc, char** argv)
 
     fq_ctx_init_modulus(ctx, p, ext, fmod, "a");
     
-    fq_poly_init(f);
-    fq_poly_init(g);
+    fq_poly_init(f, ctx);
+    fq_poly_init(g, ctx);
 
     for (c = 0; c < nalgs; c++)
     {
@@ -115,7 +115,7 @@ main(int argc, char** argv)
         {
             fq_poly_factor_init(res, ctx);
             fq_poly_factor_kaltofen_shoup(res, f, ctx);
-            fq_poly_factor_clear(res);
+            fq_poly_factor_clear(res, ctx);
         }
         timeit_stop(t[0]);
         if (res->num != 2)
@@ -148,8 +148,8 @@ main(int argc, char** argv)
     }
     printf("\n");
         
-    fq_poly_clear(f);
-    fq_poly_clear(g);
+    fq_poly_clear(f, ctx);
+    fq_poly_clear(g, ctx);
     fmpz_mod_poly_clear(fmod);
     fq_ctx_clear(ctx);
     fmpz_clear(p);

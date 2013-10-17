@@ -48,9 +48,9 @@ main()
     d = n_randint(state,10)+1;
     fq_ctx_init_conway(ctx,p,d,"a");
 
-    fq_init(a);
-    fq_init(b);
-    fq_init(c);
+    fq_init(a, ctx);
+    fq_init(b, ctx);
+    fq_init(c, ctx);
 
     fq_randtest_not_zero(a,state,ctx);
     fq_randtest_not_zero(b,state,ctx);
