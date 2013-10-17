@@ -25,10 +25,9 @@
 
 #include "fq.h"
 
-void _fq_trace(fmpz_t rop, const fmpz *op, long len, 
-               const fmpz *a, const long *j, long lena, const fmpz_t pN)
+void _fq_trace(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx)
 {
-    const long d = j[lena - 1];
+    const long d = fq_ctx_degree(ctx);
 
     long i, l;
     fmpz *t;
@@ -38,18 +37,18 @@ void _fq_trace(fmpz_t rop, const fmpz *op, long len,
     fmpz_set_ui(t + 0, d);
     for (i = 1; i < d; i++)
     {
-        for (l = lena - 2; l >= 0 && j[l] >= d - (i - 1); l--)
+        for (l = ctx->len - 2; l >= 0 && ctx->j[l] >= d - (i - 1); l--)
         {
-            fmpz_addmul(t + i, t + (j[l] + i - d), a + l);
+            fmpz_addmul(t + i, t + (ctx->j[l] + i - d), ctx->a + l);
         }
 
-        if (l >= 0 && j[l] == d - i)
+        if (l >= 0 && ctx->j[l] == d - i)
         {
-            fmpz_addmul_ui(t + i, a + l, i);
+            fmpz_addmul_ui(t + i, ctx->a + l, i);
         }
 
         fmpz_neg(t + i, t + i);
-        fmpz_mod(t + i, t + i, pN);
+        fmpz_mod(t + i, t + i, fq_ctx_prime(ctx));
     }
 
     fmpz_zero(rop);
@@ -57,7 +56,7 @@ void _fq_trace(fmpz_t rop, const fmpz *op, long len,
     {
         fmpz_addmul(rop, op + i, t + i);
     }
-    fmpz_mod(rop, rop, pN);
+    fmpz_mod(rop, rop, fq_ctx_prime(ctx));
 
     _fmpz_vec_clear(t, d);
 }
@@ -70,8 +69,7 @@ void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
     }
     else
     {
-        _fq_trace(rop, op->coeffs, op->length, 
-                  ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+        _fq_trace(rop, op->coeffs, op->length, ctx);
     }
 }
 

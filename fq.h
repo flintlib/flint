@@ -133,8 +133,8 @@ static __inline__ void fq_clear(fq_t rop, const fq_ctx_t ctx)
 }
 
 static __inline__ 
-void _fq_reduce(fmpz *R, long lenR, 
-                const fmpz *a, const long *j, long len, const fmpz_t p)
+void _fq_sparse_reduce(fmpz *R, long lenR, 
+                       const fmpz *a, const long *j, long len, const fmpz_t p)
 {
     const long d = j[len - 1];
 
@@ -155,6 +155,30 @@ void _fq_reduce(fmpz *R, long lenR,
     }
 
     _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), p);
+}
+
+static __inline__ void _fq_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
+{
+    fmpz  *q, *r;
+
+    if (lenR < ctx->modulus->length)
+    {
+        _fmpz_vec_scalar_mod_fmpz(R, R, lenR, fq_ctx_prime(ctx));
+        return;
+    }
+    
+    q = _fmpz_vec_init(lenR - ctx->modulus->length + 1);
+    r = _fmpz_vec_init(ctx->modulus->length - 1);
+
+    _fmpz_mod_poly_divrem_newton_preinv(q, r, R, lenR, 
+                                        ctx->modulus->coeffs, ctx->modulus->length,
+                                        ctx->inv->coeffs, ctx->inv->length,
+                                        fq_ctx_prime(ctx));
+
+    _fmpz_vec_set(R, r, ctx->modulus->length - 1);
+    _fmpz_vec_clear(q, lenR - ctx->modulus->length + 1);
+    _fmpz_vec_clear(r, ctx->modulus->length - 1);
+
 }
 
 static __inline__ void fq_reduce(fq_t rop, const fq_ctx_t ctx)
@@ -209,8 +233,8 @@ void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
-             const fmpz *a, const long *j, long lena, const fmpz_t p);
+void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
+             const fq_ctx_t ctx);
 
 void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
 
@@ -322,20 +346,16 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 
 /* Special functions *********************************************************/
 
-void _fq_trace(fmpz_t rop, const fmpz *op, long len, 
-               const fmpz *a, const long *j, long lena, const fmpz_t p);
+void _fq_trace(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx);
 
 void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
-                   const fmpz *a, const long *j, long lena, 
-                   const fmpz_t p);
+                   const fq_ctx_t ctx);
 
 void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx);
 
-void _fq_norm(fmpz_t rop, const fmpz *op, long len, 
-                          const fmpz *a, const long *j, long lena, 
-                          const fmpz_t p, long N);
+void _fq_norm(fmpz_t rop, const fmpz *op, long len, long N, const fq_ctx_t ctx);
 
 void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 

@@ -25,10 +25,10 @@
 
 #include "fq.h"
 
-void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
-             const fmpz *a, const long *j, long lena, const fmpz_t p)
+void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
+             const fq_ctx_t ctx)
 {
-    const long d = j[lena - 1];
+    const long d = fq_ctx_degree(ctx);
 
     if (fmpz_is_zero(e))
     {
@@ -85,12 +85,12 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
          */
 
         _fmpz_poly_sqr(R, op, len);
-        _fq_reduce(R, 2 * len - 1, a, j, lena, p);
+        _fq_reduce(R, 2 * len - 1, ctx);
 
         if (fmpz_tstbit(e, bit))
         {
             _fmpz_poly_mul(S, R, d, op, len);
-            _fq_reduce(S, d + len - 1, a, j, lena, p);
+            _fq_reduce(S, d + len - 1, ctx);
             T = R;
             R = S;
             S = T;
@@ -101,14 +101,14 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
             if (fmpz_tstbit(e, bit))
             {
                 _fmpz_poly_sqr(S, R, d);
-                _fq_reduce(S, 2 * d - 1, a, j, lena, p);
+                _fq_reduce(S, 2 * d - 1, ctx);
                 _fmpz_poly_mul(R, S, d, op, len);
-                _fq_reduce(R, d + len - 1, a, j, lena, p);
+                _fq_reduce(R, d + len - 1, ctx);
             }
             else
             {
                 _fmpz_poly_sqr(S, R, d);
-                _fq_reduce(S, 2 * d - 1, a, j, lena, p);
+                _fq_reduce(S, 2 * d - 1, ctx);
                 T = R;
                 R = S;
                 S = T;
@@ -154,8 +154,7 @@ void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _fq_pow(t, op->coeffs, op->length, e, ctx->a, ctx->j, ctx->len, 
-                fq_ctx_prime(ctx));
+        _fq_pow(t, op->coeffs, op->length, e, ctx);
 
         if (rop == op)
         {

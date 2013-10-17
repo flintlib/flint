@@ -119,13 +119,13 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
     When $N = 1$, this computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_norm(fmpz_t rop, const fmpz *op, long len, 
-                          const fmpz *a, const long *j, long lena, 
-                          const fmpz_t p, long N)
+void _fq_norm(fmpz_t rop, const fmpz *op, long len, long N,
+              const fq_ctx_t ctx)
 {
-    const long d = j[lena - 1];
+    const long d = fq_ctx_degree(ctx);
 
     fmpz *pN;
+    const fmpz *p = fq_ctx_prime(ctx);
 
     if (N == 1)
     {
@@ -154,9 +154,9 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
 
             for (k = 0; k < len-1; k++)
             {
-                for (i = 0; i < lena; i++)
+                for (i = 0; i < ctx->len; i++)
                 {
-                    M[k * n + k + (d - j[i])] = a[i];
+                    M[k * n + k + (d - ctx->j[i])] = ctx->a[i];
                 }
             }
             for (k = 0; k < d; k++)
@@ -176,12 +176,12 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
             XXX:  This part of the code is currently untested as the Conway 
             polynomials used for the extension Fq/Fp are monic.
          */
-        if (!fmpz_is_one(a + (lena - 1)))
+        if (!fmpz_is_one(ctx->a + (ctx->len - 1)))
         {
             fmpz_t f;
 
             fmpz_init(f);
-            fmpz_powm_ui(f, a + (lena - 1), len - 1, pN);
+            fmpz_powm_ui(f, ctx->a + (ctx->len - 1), len - 1, pN);
             fmpz_invmod(f, f, pN);
             fmpz_mul(rop, f, rop);
             fmpz_mod(rop, rop, pN);
@@ -204,8 +204,7 @@ void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
     }
     else
     {
-        _fq_norm(rop, op->coeffs, op->length, 
-                 ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx), 1);
+        _fq_norm(rop, op->coeffs, op->length, 1, ctx);
     }
 }
 

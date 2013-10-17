@@ -31,11 +31,10 @@
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 
-void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
-                   const fmpz *a, const long *j, long lena, 
-                   const fmpz_t p)
+void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e,
+                   const fq_ctx_t ctx)
 {
-    const long d = j[lena - 1];
+    const long d = fq_ctx_degree(ctx);
 
     if (len == 1)  /* op is in Fp, not just Fq */
     {
@@ -47,8 +46,8 @@ void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e,
         fmpz_t t;
 
         fmpz_init(t);
-        fmpz_pow_ui(t, p, e);
-        _fq_pow(rop, op, len, t, a, j, lena, p);
+        fmpz_pow_ui(t, fq_ctx_prime(ctx), e);
+        _fq_pow(rop, op, len, t, ctx);
         fmpz_clear(t);
     }
 }
@@ -83,8 +82,7 @@ void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _fq_frobenius(t, op->coeffs, op->length, e, 
-                      ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+        _fq_frobenius(t, op->coeffs, op->length, e, ctx);
 
         if (rop == op)
         {
