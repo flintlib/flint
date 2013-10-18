@@ -119,10 +119,11 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
     When $N = 1$, this computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_norm(fmpz_t rop, const fmpz *op, long len, long N,
+void _fq_norm(fmpz_t rop, const fmpz *op, long len,
               const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
+    const long N = 1;
 
     fmpz *pN;
     const fmpz *p = fq_ctx_prime(ctx);
@@ -204,7 +205,7 @@ void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
     }
     else
     {
-        _fq_norm(rop, op->coeffs, op->length, 1, ctx);
+        _fq_norm(rop, op->coeffs, op->length, ctx);
     }
 }
 

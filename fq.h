@@ -355,7 +355,7 @@ void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e,
 
 void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx);
 
-void _fq_norm(fmpz_t rop, const fmpz *op, long len, long N, const fq_ctx_t ctx);
+void _fq_norm(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx);
 
 void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
