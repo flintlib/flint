@@ -33,11 +33,11 @@ void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
                           mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 {
    mp_limb_t cy;
-   mp_limb_t ts[150];
+   mp_limb_t ts[600];
    mp_ptr t;
    mp_size_t size = m - n;
 
-   if (n <= 50)
+   if (n <= 200)
       t = ts;
    else
       t = flint_malloc(3*n*sizeof(mp_limb_t));
@@ -67,7 +67,7 @@ void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
       mpn_add_1(q, q, n, 1);
    }
 
-   if (n > 50)
+   if (n > 200)
       flint_free(t);
 }
 

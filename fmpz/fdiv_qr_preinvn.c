@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2013 William Hart
+    Copyright 1991, 1993-1996, 2000, 2001, 2005 Free Software Foundation, Inc.
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -31,6 +32,128 @@
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
+
+void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
+                          mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
+{
+   slong size1 = a->_mp_size, size2 = d->_mp_size;
+   ulong usize1 = FLINT_ABS(size1);
+   ulong usize2 = FLINT_ABS(size2);
+   ulong qsize = usize1 - usize2 + 1;
+   
+   mp_ptr qp, rp, ap, dp, tp;
+
+   mpz_realloc2(r, (usize1 + (inv->norm != 0))*FLINT_BITS);
+
+   if (usize1 < usize2) /* special case preinv code can't deal with */
+   {
+      mpz_set(r, a); /* remainder equals numerator */
+      q->_mp_size = 0; /* quotient is zero */
+      
+      return;
+   }
+
+   mpz_realloc2(q, (qsize + (inv->norm != 0))*FLINT_BITS);
+
+   dp = d->_mp_d;
+   ap = a->_mp_d;
+   qp = q->_mp_d;
+   rp = r->_mp_d;
+
+   if ((r == d || q == d) && (inv->norm == 0)) /* we have alias with d */
+   {
+      tp = flint_malloc(usize2*FLINT_BITS);
+      mpn_copyi(tp, dp, usize2);
+      dp = tp; 
+   }
+   
+   if (r == a || q == a) /* we have alias with a */
+   {
+      tp = flint_malloc(usize1*FLINT_BITS);
+      mpn_copyi(tp, ap, usize1);
+      ap = tp; 
+   }
+
+   if (inv->norm) {
+      tp = flint_malloc(usize2*FLINT_BITS);
+      mpn_lshift(tp, dp, usize2, inv->norm);
+      dp = tp; 
+
+      rp[usize1] = mpn_lshift(rp, ap, usize1, inv->norm);
+      if (rp[usize1] != 0) usize1++, qsize++;
+   } else
+      mpn_copyi(rp, ap, usize1);
+
+   qp[qsize - 1] = flint_mpn_divrem_preinvn(qp, rp, usize1, dp, usize2, inv->dinv);
+   qsize -= (qp[qsize - 1] == 0);
+
+   if (inv->norm)
+      mpn_rshift(rp, rp, usize2, inv->norm);
+   MPN_NORM(rp, usize2);
+
+   q->_mp_size = ((size1 ^ size2) < 0 ? -qsize : qsize);
+   r->_mp_size = (size1 < 0 ? -usize2 : usize2);
+
+   if (r == d || q == d || (inv->norm != 0))
+      flint_free(dp);
+
+   if (r == a || q == a)
+      flint_free(ap);
+}
+
+void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
+                          mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
+{
+   slong size1 = a->_mp_size;
+   slong size2 = d->_mp_size;
+   ulong usize2 = FLINT_ABS(size2);
+   mpz_t t;
+
+   if (q == d || r == d) /* we need d later, so make sure it doesn't alias */
+   {
+      t->_mp_d = flint_malloc(usize2*FLINT_BITS);
+      t->_mp_size = d->_mp_size;
+      t->_mp_alloc = d->_mp_alloc;
+      mpn_copyi(t->_mp_d, d->_mp_d, usize2);
+      d = t;
+   }
+
+   _mpz_tdiv_qr_preinvn(q, r, a, d, inv);
+
+   if ((size1 ^ size2) < 0 && r->_mp_size != 0)
+   {
+      mpz_sub_ui(q, q, 1);
+      mpz_add(r, r, d);
+   }
+
+   if (q == d || r == d)
+      flint_free(d->_mp_d);
+}
+
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2009, 2013 William Hart
+
+******************************************************************************/
 
 void
 fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 
@@ -48,60 +171,7 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
-        {
-            mp_limb_t hi, lo, p[2], cy, dinv, q;
-
-            /* set up dividend and divisor, normalising */
-            mp_limb_t a = FLINT_ABS(c1);
-            mp_limb_t d = (FLINT_ABS(c2) << inv->norm);
-            dinv = inv->dinv[0];
-
-            hi = r_shift(a, FLINT_BITS - inv->norm);
-            lo = (a << inv->norm);
-
-            /* precomputed divrem */
-            if (hi)
-            {
-               umul_ppmm(p[1], p[0], dinv, hi);
-               add_ssaaaa(cy, q, 0, p[1], 0, hi);
-
-               umul_ppmm(p[1], p[0], d, q);
-               
-               cy = hi - p[1];
-               sub_ddmmss(cy, lo, cy, lo, 0, p[0]);
-
-               while (cy)
-               {
-                  sub_ddmmss(cy, lo, cy, lo, 0, d);
-                  q++;
-               }
-            } else
-               q = 0;
-
-            if (lo >= d)
-            {
-               lo -= d;
-               q++;
-            }
-           
-            /* deal with signed inputs */
-            if (((c2 ^ c1) < 0))
-            {
-               if (lo != 0)
-               {
-                  q++;
-                  lo = d - lo;
-               }
-
-               q = -q;
-            }
-
-            fmpz_set_si(f, q);
-            if (c2 < 0)
-               fmpz_set_si(s, -(lo >> inv->norm)); /* shift remainder */
-            else
-               fmpz_set_si(s, lo >> inv->norm);
-        }
+            fmpz_fdiv_qr(f, s, g, h);
         else                    /* h is large and g is small */
         {
             if (c1 == WORD(0))
@@ -124,93 +194,19 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
     else /* g is large */
     {
         __mpz_struct *mpz_ptr, *mpz_ptr2;
-        slong size1, size2 = FLINT_ABS(fmpz_size(h));
-        mpz_t qt, rt;
-
-        /* set up quotient and remainder for division */
-        mpz_init(rt);
-        mpz_mul_2exp(rt, COEFF_TO_PTR(c1), inv->norm);
-        size1 = FLINT_ABS(rt->_mp_size);
-
-        if (size1 < size2)
+        
+        if (!COEFF_IS_MPZ(c2))  /* h is small */
+           fmpz_fdiv_qr(f, s, g, h);
+        else
         {
-           mpz_init(qt);
-           mpz_abs(rt, rt);
-        } else
-        {
-           mpz_init2(qt, (size1 - size2 + 1)*FLINT_BITS);
+           _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
+           mpz_ptr2 = _fmpz_promote(s);
+		     mpz_ptr  = COEFF_TO_PTR(*f);
 
-		     if (!COEFF_IS_MPZ(c2))  /* h is small */
-           {
-              ulong c2u = (FLINT_ABS(c2) << inv->norm);
-              qt->_mp_d[size1 - size2] 
-                 = flint_mpn_divrem_preinvn(qt->_mp_d, rt->_mp_d, size1, &c2u, 1, inv->dinv); 
-              qt->_mp_size = size1 - size2 + (qt->_mp_d[size1 - size2] != 0);
-              rt->_mp_size = 1 - (rt->_mp_d[0] == 0);
-           }
-           else /* both are large */
-           {
-              mp_ptr d;
-            
-              /* compute shifted d */
-              if (inv->norm)
-              {
-                 d = flint_malloc(FLINT_ABS(COEFF_TO_PTR(c2)->_mp_size)*sizeof(mp_limb_t));
-                 mpn_lshift(d, COEFF_TO_PTR(c2)->_mp_d, size2, inv->norm);
-              } else
-                 d = COEFF_TO_PTR(c2)->_mp_d;
-            
-              qt->_mp_d[size1 - size2] 
-                 = flint_mpn_divrem_preinvn(qt->_mp_d, rt->_mp_d, size1, d, size2, inv->dinv); 
-            
-              /* normalise */
-              qt->_mp_size = size1 - size2 + (qt->_mp_d[size1 - size2] != 0);
-              while (size2 && rt->_mp_d[size2 - 1] == 0) size2--;
-              rt->_mp_size = size2;
+           _mpz_fdiv_qr_preinvn(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), inv);
 
-              if (inv->norm)
-                 flint_free(d);
-           }
+           _fmpz_demote_val(f);    /* division by h may result in small value */
+           _fmpz_demote_val(s);    /* division by h may result in small value */
         }
-           
-        /* shift remainer */
-        mpz_fdiv_q_2exp(rt, rt, inv->norm);
-
-        /* deal with signed inputs */
-        if ((fmpz_sgn(g) ^ fmpz_sgn(h)) < 0)
-        {
-           if (mpz_sgn(rt) != 0)
-           {
-              mpz_add_ui(qt, qt, 1);
-              if (!COEFF_IS_MPZ(c2))
-                 mpz_ui_sub(rt, FLINT_ABS(c2), rt);
-              else if (fmpz_sgn(h) < 0)
-              {
-                 mpz_add(rt, rt, COEFF_TO_PTR(c2));
-                 mpz_neg(rt, rt);
-              } else
-                 mpz_sub(rt, COEFF_TO_PTR(c2), rt);
-           }
-
-           mpz_neg(qt, qt);
-        }
-
-        if (fmpz_sgn(h) < 0)
-           mpz_neg(rt, rt);
-
-        /* set results */
-        _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
-        mpz_ptr2 = _fmpz_promote(s);
-		  mpz_ptr  = COEFF_TO_PTR(*f);
-
-        mpz_swap(mpz_ptr, qt);
-        mpz_swap(mpz_ptr2, rt);
-
-        /* clean up */
-        mpz_clear(qt);
-        mpz_clear(rt);
-            
-        _fmpz_demote_val(f);    /* division by h may result in small value */
-        _fmpz_demote_val(s);    /* division by h may result in small value */
     }
 }

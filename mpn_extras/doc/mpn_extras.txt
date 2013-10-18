@@ -165,6 +165,9 @@ void flint_mpn_mod_n_preinvn(mp_ptr a, mp_size_t m,
     We require $2*n >= m >= n$. No other overlap is permitted between $a$ and
     any of the other operands.
 
+    This function will be faster than its standard counterpart when the
+    number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
+
 void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
@@ -178,6 +181,9 @@ void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
     $m - n$ limbs. No aliasing is permitted between $q$ and $a$ or these and 
     any of the other operands.
    
+    This function will be faster than its standard counterpart when the
+    number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
+
 void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
@@ -188,6 +194,9 @@ void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m,
 
     We require $m \geq n$. No aliasing of $a$ with any of the other operands
     is permitted.
+
+    This function will be faster than its standard counterpart when the
+    number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
 
 mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr a, mp_size_t m, 
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
@@ -200,6 +209,9 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
     The value $q$ is expected to have space for $m - n$ limbs and we require
     $m >= n$. No aliasing is permitted between $q$ and $a$ or between these
     and any of the other operands. 
+
+    This function will be faster than its standard counterpart when the
+    number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
 
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
