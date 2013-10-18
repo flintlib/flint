@@ -33,6 +33,7 @@
 #include "mpn_extras.h"
 #include "fmpz.h"
 
+/* these functions were adapted from similar functions in an old version of GMP */
 void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
