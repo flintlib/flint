@@ -270,12 +270,16 @@ void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x, const fq_ctx_t ctx)
 static __inline__
 void fq_poly_set_coeff_fmpz(fq_poly_t poly, long n, const fmpz_t x, const fq_ctx_t ctx)
 {
-    /* TODO: Fix me. */
-    fq_t f;
-    fq_init(f, ctx);
-    fq_set_fmpz(f, x, ctx);
-    fq_poly_set_coeff(poly, n, f, ctx);
-    fq_clear(f, ctx);
+    if (fmpz_is_zero(x))
+    {
+        fq_poly_zero(poly, ctx);
+    }
+    else
+    {
+        fq_poly_fit_length(poly, 1, ctx);
+        fq_set_fmpz(poly->coeffs, x, ctx);
+        _fq_poly_set_length(poly, 1, ctx);
+    }
 }
 
 static __inline__ int 

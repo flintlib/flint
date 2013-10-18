@@ -276,24 +276,14 @@ static __inline__ void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 
 static __inline__ void fq_set_fmpz(fq_t rop, const fmpz_t x, const fq_ctx_t ctx)
 {
-    /* TODO: This should use something like _fmpz_mod_poly_set_fmpz */
-    fmpz_t rx;
-    fmpz_init(rx);
-    fmpz_mod(rx, x, fq_ctx_prime(ctx));
-    fmpz_poly_zero(rop);
-    fmpz_poly_set_coeff_fmpz(rop, 0, rx);
-    fmpz_clear(rx);
+    fmpz_poly_set_fmpz(rop, x);
+    fq_reduce(rop, ctx);
 }
 
 static __inline__ void fq_set_ui(fq_t rop, const ulong x, const fq_ctx_t ctx)
 {
-    /* TODO: This should use something like _fmpz_mod_poly_set_ui */
-    fmpz_t rx;
-    fmpz_init_set_ui(rx, x);
-    fmpz_mod(rx, rx, fq_ctx_prime(ctx));
-    fmpz_poly_zero(rop);
-    fmpz_poly_set_coeff_fmpz(rop, 0, rx);
-    fmpz_clear(rx);
+    fmpz_poly_set_ui(rop, x);
+    fq_reduce(rop, ctx);
 }
 
 static __inline__ void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t ctx)

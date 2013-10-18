@@ -161,7 +161,7 @@ __fq_poly_factor_berlekamp(fq_poly_factor_t factors, flint_rand_t state,
             col++;
         }
         fq_mat_col_to_shifted(basis[i], matrix, col, shift, ctx);
-        fq_poly_set_coeff(basis[i], col, neg_one, ctx); /* TODO: What here? */
+        fq_poly_set_coeff(basis[i], col, neg_one, ctx);
         shift[col] = 1;
         col++;
     }
