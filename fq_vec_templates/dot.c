@@ -29,11 +29,11 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
-                     const TEMPLATE(T, struct) * vec1,
-                     const TEMPLATE(T, struct) * vec2,
-                     slong len2,
-                     const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
+                      const TEMPLATE(T, struct) * vec1,
+                      const TEMPLATE(T, struct) * vec2,
+                      slong len2,
+                      const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     TEMPLATE(T, t) x;
@@ -46,6 +46,8 @@ TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
         TEMPLATE(T, mul)(x, vec1 + i, vec2 + i, ctx);
         TEMPLATE(T, add)(res, res, x, ctx);
     }
+
+    TEMPLATE(T, clear)(x, ctx);
 }
 
 #endif

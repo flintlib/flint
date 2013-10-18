@@ -72,7 +72,7 @@ int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
 void
 _TEMPLATE(T, vec_set)(TEMPLATE(T, struct) * v, 
                       const TEMPLATE(T, struct) * f, 
-                      long len, const TEMPLATE(T, ctx_t) ctx);
+                      slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void
 _TEMPLATE(T, vec_swap)(TEMPLATE(T, struct) * vec1,
@@ -81,7 +81,7 @@ _TEMPLATE(T, vec_swap)(TEMPLATE(T, struct) * vec1,
 
 void
 _TEMPLATE(T, vec_zero)(TEMPLATE(T, struct) * v, 
-                       long len,
+                       slong len,
                        const TEMPLATE(T, ctx_t) ctx);
 
 void
@@ -132,11 +132,11 @@ _TEMPLATE(T, TEMPLATE(vec_scalar_submul, T))(TEMPLATE(T, struct) * poly1,
 
 /* ****************************************************************************/
 void
-TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
-                     const TEMPLATE(T, struct) * vec1,
-                     const TEMPLATE(T, struct) * vec2,
-                     slong len2,
-                     const TEMPLATE(T, ctx_t) ctx);
+_TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
+                      const TEMPLATE(T, struct) * vec1,
+                      const TEMPLATE(T, struct) * vec2,
+                      slong len2,
+                      const TEMPLATE(T, ctx_t) ctx);
 
 #ifdef __cplusplus
  }
