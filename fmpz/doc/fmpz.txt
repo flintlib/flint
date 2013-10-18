@@ -680,6 +680,12 @@ void fmpz_preinvn_clear(fmpz_preinvn_t inv)
     Clean up the resources used by a precomputed inverse created with the
     \code{fmpz_preinvn_init} function.
 
+void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 
+                                     const fmpz_t h, const fmpz_preinvn_t hinv)
+
+    As per \code{fmpz_fdiv_qr}, but takes a precomputed inverse \code{hinv}
+    of $h$ constructed using \code{fmpz_preinvn}.
+
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g^x$ where $x$ is an \code{ulong}.  If 

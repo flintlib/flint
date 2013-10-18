@@ -509,6 +509,9 @@ void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
+void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 
+                                     const fmpz_t h, const fmpz_preinvn_t inv);
+
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h);
