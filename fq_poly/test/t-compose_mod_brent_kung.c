@@ -39,7 +39,7 @@ main(void)
     printf("compose_mod_brent_kung....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, c, d, e;
@@ -82,7 +82,7 @@ main(void)
     }
 
     /* Test aliasing of res and a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, c, d;
@@ -121,7 +121,7 @@ main(void)
     }
 
     /* Test aliasing of res and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, c, d;
@@ -160,7 +160,7 @@ main(void)
     }
 
     /* Test aliasing of res and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, c, d;

@@ -40,7 +40,7 @@ main(void)
     fflush(stdout);
 
     /* Default algorithm */
-    for (iter = 0; iter < 2 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < flint_test_multiplier(); iter++)
     {
         int result = 1;
         fq_poly_t pol1, poly, quot, rem, product;
@@ -60,26 +60,26 @@ main(void)
         fq_poly_zero(pol1, ctx);
         fq_poly_one(pol1, ctx);
 
-        length = n_randint(state, 7) + 2;
+        length = n_randint(state, 4) + 2;
         fq_poly_randtest_irreducible(poly, state, length, ctx);
 
-        exp[0] = n_randint(state, 30) + 1;
+        exp[0] = n_randint(state, 3) + 1;
         prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
             fq_poly_mul(pol1, pol1, poly, ctx);
 
-        num = n_randint(state, 5) + 1;
+        num = n_randint(state, 3) + 1;
         for (i = 1; i < num; i++)
         {
             do 
             {
-                length = n_randint(state, 7) + 2;
+                length = n_randint(state, 3) + 2;
                 fq_poly_randtest_irreducible(poly, state, length, ctx);
                 fq_poly_divrem(quot, rem, pol1, poly, ctx);
             }
             while ((poly->length < 2) || (rem->length == 0));
             
-            exp[i] = n_randint(state, 30) + 1;
+            exp[i] = n_randint(state, 3) + 1;
             prod1 *= exp[i];
 
             for (j = 0; j < exp[i]; j++)
@@ -145,7 +145,7 @@ main(void)
     }
 
     /* Test deflation trick */
-    for (iter = 0; iter < 2 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < flint_test_multiplier(); iter++)
     {
         fq_poly_t pol1, poly, quot, rem;
         fq_poly_factor_t res, res2;
@@ -168,7 +168,7 @@ main(void)
 
         inflation = n_randint(state, 7) + 1;
 
-        length = n_randint(state, 7) + 2;
+        length = n_randint(state, 4) + 2;
         fq_poly_randtest_irreducible(poly, state, length, ctx);
         fq_poly_inflate(poly, poly, inflation, ctx);
 

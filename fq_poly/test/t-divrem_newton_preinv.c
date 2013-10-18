@@ -54,9 +54,9 @@ main(void)
         fq_poly_init(test, ctx);
 
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 
@@ -103,9 +103,9 @@ main(void)
         fq_poly_init(r, ctx);
         
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 
@@ -150,9 +150,9 @@ main(void)
         fq_poly_init(r, ctx);
         
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 
@@ -197,9 +197,9 @@ main(void)
         fq_poly_init(r, ctx);
         
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 
@@ -244,9 +244,9 @@ main(void)
         fq_poly_init(q, ctx);
         fq_poly_init(r, ctx);
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 
@@ -291,9 +291,9 @@ main(void)
         fq_poly_init(r, ctx);
 
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 
@@ -338,9 +338,9 @@ main(void)
         fq_poly_init(r, ctx);
 
         do
-            fq_poly_randtest(b, state, n_randint(state, 200), ctx);
+            fq_poly_randtest(b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        fq_poly_randtest(a, state, n_randint(state, 200), ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
         if (a->length > 2*(b->length)-3)
             fq_poly_truncate (a, 2*(b->length)-3, ctx);
 

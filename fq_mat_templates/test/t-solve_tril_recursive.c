@@ -42,7 +42,7 @@ main(void)
     printf("solve_tril_recursive....");
     fflush(stdout);
 
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, mat_t) A, X, B, Y;
@@ -52,8 +52,8 @@ main(void)
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         
-        rows = n_randint(state, 200);
-        cols = n_randint(state, 200);
+        rows = n_randint(state, 50);
+        cols = n_randint(state, 50);
         unit = n_randint(state, 2);
 
         TEMPLATE(T, mat_init)(A, rows, rows, ctx);

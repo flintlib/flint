@@ -42,7 +42,7 @@ main(void)
     printf("submul....");
     fflush(stdout);
 
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 2 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, mat_t) A, B, C, D, T, E;
@@ -51,9 +51,9 @@ main(void)
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
-        m = n_randint(state, 100);
-        k = n_randint(state, 100);
-        n = n_randint(state, 100);
+        m = n_randint(state, 50);
+        k = n_randint(state, 50);
+        n = n_randint(state, 50);
 
         TEMPLATE(T, mat_init)(A, m, k, ctx);
         TEMPLATE(T, mat_init)(B, k, n, ctx);

@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check that b divides a b and that the quotient is a */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
 
@@ -55,8 +55,8 @@ main(void)
         fq_poly_init(c, ctx);
         fq_poly_init(q, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
         fq_poly_mul(c, a, b, ctx);
 
         result = fq_poly_divides(q, c, b, ctx) && fq_poly_equal(q, a, ctx);
@@ -79,7 +79,7 @@ main(void)
     }
 
     /* Check aliasing of a and q */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
 
@@ -90,8 +90,8 @@ main(void)
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
         fq_poly_mul(c, a, b, ctx);
 
         result = fq_poly_divides(c, c, b, ctx) && fq_poly_equal(c, a, ctx);
@@ -112,7 +112,7 @@ main(void)
     }
 
     /* Check aliasing of b and q */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
 
@@ -123,8 +123,8 @@ main(void)
         fq_poly_init(b, ctx);
         fq_poly_init(c, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
+        fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
         fq_poly_mul(c, a, b, ctx);
 
         result = fq_poly_divides(b, c, b, ctx) && fq_poly_equal(b, a, ctx);

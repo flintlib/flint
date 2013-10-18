@@ -37,7 +37,7 @@ main(void)
     flint_printf("factor_cantor_zassenhaus....");
     fflush(stdout);
 
-    for (iter = 0; iter < 20; iter++)
+    for (iter = 0; iter < 2 * flint_test_multiplier(); iter++)
     {
         fq_poly_t poly1, poly, q, r, product;
         fq_poly_factor_t res;
@@ -56,7 +56,7 @@ main(void)
         fq_poly_zero(poly1, ctx);
         fq_poly_one(poly1, ctx);
 
-        length = n_randint(state, 7) + 2;
+        length = n_randint(state, 4) + 2;
         do
         {
             fq_poly_randtest(poly, state, length, ctx);
@@ -66,7 +66,7 @@ main(void)
         while ((poly->length != length)
                || (!fq_poly_is_irreducible(poly, ctx)));
 
-        exp[0] = n_randint(state, 30) + 1;
+        exp[0] = n_randint(state, 5) + 1;
         for (i = 0; i < exp[0]; i++)
             fq_poly_mul(poly1, poly1, poly, ctx);
 
@@ -76,7 +76,7 @@ main(void)
         {
             do
             {
-                length = n_randint(state, 7) + 2;
+                length = n_randint(state, 4) + 2;
                 fq_poly_randtest(poly, state, length, ctx);
                 if (poly->length)
                 {
@@ -88,7 +88,7 @@ main(void)
                    || (!fq_poly_is_irreducible(poly, ctx))
                    || (r->length == 0));
 
-            exp[i] = n_randint(state, 30) + 1;
+            exp[i] = n_randint(state, 5) + 1;
             for (j = 0; j < exp[i]; j++)
                 fq_poly_mul(poly1, poly1, poly, ctx);
         }

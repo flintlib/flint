@@ -53,7 +53,7 @@ main(void)
         fq_poly_init(poly1, ctx);
         fq_poly_init(poly2, ctx);
 
-        length = n_randint(state, 10) + 2;
+        length = n_randint(state, 7) + 2;
         do
         {
             fq_poly_randtest(poly1, state, length, ctx);

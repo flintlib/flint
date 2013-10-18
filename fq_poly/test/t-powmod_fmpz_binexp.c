@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing of res and a */
-    for (i = 0; i < 25; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, res, t, f;
@@ -58,8 +58,8 @@ main(void)
         fq_poly_init(res, ctx);
         fq_poly_init(t, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 20), ctx);
+        fq_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, ctx);
 
         fq_poly_powmod_fmpz_binexp(res, a, expz, f, ctx);
         fq_poly_powmod_fmpz_binexp(a, a, expz, f, ctx);
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 25; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, res, t, f;
@@ -101,8 +101,8 @@ main(void)
         fq_poly_init(res, ctx);
         fq_poly_init(t, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 20), ctx);
+        fq_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, ctx);
 
         fq_poly_powmod_fmpz_binexp(res, a, expz, f, ctx);
         fq_poly_powmod_fmpz_binexp(f, a, expz, f, ctx);
@@ -127,7 +127,7 @@ main(void)
     }
 
     /* No aliasing */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, res1, res2, t, f;
@@ -144,8 +144,8 @@ main(void)
         fq_poly_init(res2, ctx);
         fq_poly_init(t, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 20), ctx);
+        fq_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, ctx);
         fmpz_init_set_ui(expz, exp);
 
         fq_poly_powmod_fmpz_binexp(res1, a, expz, f, ctx);
@@ -173,7 +173,7 @@ main(void)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, res1, res2, res3, res4, t, f;
@@ -196,8 +196,8 @@ main(void)
         fq_poly_init(res4, ctx);
         fq_poly_init(t, ctx);
 
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
+        fq_poly_randtest(a, state, n_randint(state, 20), ctx);
+        fq_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, ctx);
 
         fq_poly_powmod_fmpz_binexp(res1, a, exp1, f, ctx);
         fq_poly_powmod_fmpz_binexp(res2, a, exp2, f, ctx);

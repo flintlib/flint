@@ -41,7 +41,7 @@ main(void)
     flint_printf("factor_squarefree....");
     fflush(stdout);
 
-    for (iter = 0; iter < 500; iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         int result = 1;
         fq_ctx_t ctx;
@@ -59,7 +59,7 @@ main(void)
 
         fq_poly_one(pol1, ctx);
 
-        length = n_randint(state, 7) + 2;
+        length = n_randint(state, 5) + 2;
 
         do
         {

@@ -36,7 +36,7 @@ main(void)
     flint_printf("factor_equal_deg_prob....");
     fflush(stdout);
 
-    for (iter = 0; iter < 50; iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         fq_ctx_t ctx;
         fq_poly_t poly1, poly2, q, r;

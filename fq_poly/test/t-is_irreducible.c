@@ -41,7 +41,7 @@ main(void)
     printf("is_irreducible....");
     fflush(stdout);
 
-    for (iter = 0; iter < 50; iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         fq_ctx_t ctx;
         fq_poly_t poly1, poly2;
@@ -53,7 +53,7 @@ main(void)
         fq_poly_init(poly1, ctx);
         fq_poly_init(poly2, ctx);
 
-        length = n_randint(state, 10) + 2;
+        length = n_randint(state, 5) + 2;
         do
         {
             fq_poly_randtest(poly1, state, length, ctx);

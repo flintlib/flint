@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of res and a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, res, f;
@@ -82,7 +82,7 @@ main(void)
     }
 
     /* Check aliasing of res and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, f, res;
@@ -121,7 +121,7 @@ main(void)
     }
 
     /* Check aliasing of res and f */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, f, res;
@@ -160,7 +160,7 @@ main(void)
     }
 
     /* No aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         fq_poly_t a, b, res1, res2, t, f;

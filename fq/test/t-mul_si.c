@@ -43,7 +43,7 @@ main(void)
 
     flint_randinit(state);
     /* Check aliasing of a, b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         long x;
@@ -76,7 +76,7 @@ main(void)
     }
 
     /* compare with direct multiplication */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fq_ctx_t ctx;
         long x;
