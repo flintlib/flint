@@ -33,12 +33,12 @@ int _fq_poly_divides(fq_struct *Q,
     fq_struct *R;
     long lenR;
 
-    R = _fq_poly_init(lenA, ctx);
+    R = _fq_vec_init(lenA, ctx);
 
     _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
 
     FQ_VEC_NORM(R, lenR, ctx);
-    _fq_poly_clear(R, lenA, ctx);
+    _fq_vec_clear(R, lenA, ctx);
 
     return (lenR == 0);
 }

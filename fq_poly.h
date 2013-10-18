@@ -49,8 +49,6 @@ typedef fq_poly_struct fq_poly_t[1];
 
 /*  Memory management ********************************************************/
 
-fq_struct * _fq_poly_init(long len, const fq_ctx_t ctx);
-
 void fq_poly_init(fq_poly_t poly, const fq_ctx_t ctx);
 
 void fq_poly_init2(fq_poly_t poly, long alloc, const fq_ctx_t ctx);
@@ -60,8 +58,6 @@ void fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx);
 void fq_poly_truncate(fq_poly_t poly, long len, const fq_ctx_t ctx);
 
 void fq_poly_fit_length(fq_poly_t poly, long len, const fq_ctx_t ctx);
-
-void _fq_poly_clear(fq_struct *v, long len, const fq_ctx_t ctx);
 
 void fq_poly_clear(fq_poly_t poly, const fq_ctx_t ctx);
 
@@ -610,9 +606,9 @@ void _fq_poly_rem(fq_struct *R, const fq_struct *A, long lenA,
                   const fq_struct *B, long lenB, const fq_t invB,
                   const fq_ctx_t ctx)
 {
-    fq_struct *Q = _fq_poly_init(lenA + lenB, ctx); /*TODO: smaller bound */
+    fq_struct *Q = _fq_vec_init(lenA + lenB, ctx); /*TODO: smaller bound */
     _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
-    _fq_poly_clear(Q, lenA + lenB, ctx);
+    _fq_vec_clear(Q, lenA + lenB, ctx);
 }
 
 

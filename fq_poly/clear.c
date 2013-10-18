@@ -27,20 +27,10 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_clear(fq_struct *v, long len, const fq_ctx_t ctx)
-{
-    long i;
-
-    for (i = 0; i < len; i++)
-        fq_clear(v + i, ctx);
-
-    flint_free(v);
-}
-
 void fq_poly_clear(fq_poly_t poly, const fq_ctx_t ctx)
 {
     if (poly->coeffs)
     {
-        _fq_poly_clear(poly->coeffs, poly->alloc, ctx);
+        _fq_vec_clear(poly->coeffs, poly->alloc, ctx);
     }
 }

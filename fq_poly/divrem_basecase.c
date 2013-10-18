@@ -67,7 +67,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
 
     if (Q == A || Q == B)
     {
-        q = _fq_poly_init(lenQ, ctx);
+        q = _fq_vec_init(lenQ, ctx);
     }
     else
     {
@@ -76,7 +76,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     if (R == B)
     {
-        r = _fq_poly_init(lenA, ctx);
+        r = _fq_vec_init(lenA, ctx);
     }
     else
     {
@@ -89,7 +89,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
 
     if (Q == A || Q == B)
     {
-        _fq_poly_clear(Q->coeffs, Q->alloc, ctx);
+        _fq_vec_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
         Q->alloc  = lenQ;
         Q->length = lenQ;
@@ -100,7 +100,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
     if (R == B)
     {
-        _fq_poly_clear(R->coeffs, R->alloc, ctx);
+        _fq_vec_clear(R->coeffs, R->alloc, ctx);
         R->coeffs = r;
         R->alloc  = lenA;
         R->length = lenA;

@@ -38,7 +38,7 @@ void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1,
         const long alloc = (len1 - 1) * (len2 - 1) + 1;
 
         long i = len1 - 1, lenr;
-        fq_struct *t = _fq_poly_init(alloc, ctx);
+        fq_struct *t = _fq_vec_init(alloc, ctx);
         
         /*
            Perform the first two steps as one, 
@@ -57,7 +57,7 @@ void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1,
             _fq_poly_add(rop, t, lenr, op1 + i, 1, ctx);
         }
         
-        _fmpz_vec_clear((fmpz*)t, alloc);
+        _fq_vec_clear(t, alloc, ctx);
     }
 }
 
