@@ -30,7 +30,7 @@ int
 fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
                               const fq_poly_t pol, slong d, const fq_ctx_t ctx)
 {
-    fq_poly_t a, b, c;
+    fq_poly_t a, b, c, polinv;
     fq_t t;
     fmpz_t exp, q;
     int res = 1;
@@ -62,6 +62,10 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
     }
 
     fq_poly_init(b, ctx);
+    fq_poly_init(polinv, ctx);
+
+    fq_poly_reverse(polinv, pol, pol->length, ctx);
+    fq_poly_inv_series_newton(polinv, polinv, polinv->length, ctx);
 
     fmpz_init(exp);
     if (fmpz_cmp_ui(fq_ctx_prime(ctx), 2) > 0)
@@ -71,7 +75,7 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
         fmpz_sub_ui(exp, exp, 1);
         fmpz_fdiv_q_2exp(exp, exp, 1);
 
-        fq_poly_powmod_fmpz_binexp(b, a, exp, pol, ctx);
+        fq_poly_powmod_fmpz_binexp_preinv(b, a, exp, pol, polinv, ctx);
     }
     else
     {
@@ -83,7 +87,7 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
         for (i = 1; i < k; i++)
         {
             /* c = a^{2^i} = (a^{2^{i-1}})^2 */
-            fq_poly_powmod_ui_binexp(c, c, 2, pol, ctx);
+            fq_poly_powmod_ui_binexp_preinv(c, c, 2, pol, polinv, ctx);
             fq_poly_add(b, b, c, ctx);
         }
         fq_poly_rem(b, b, pol, ctx);
@@ -103,6 +107,7 @@ fq_poly_factor_equal_deg_prob(fq_poly_t factor, flint_rand_t state,
 
     fq_poly_clear(a, ctx);
     fq_poly_clear(b, ctx);
+    fq_poly_clear(polinv, ctx);
     fmpz_clear(q);
 
     return res;
