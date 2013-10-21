@@ -69,7 +69,7 @@ void sample(void * arg, ulong count)
 	  prof_start();
       for (j = 0; j < scale; j++)
       {
-          nmod_poly_mul_KS(c, a, b);
+          nmod_poly_mul(c, a, b);
       }
 	  prof_stop();
       if (c->coeffs[n - 2] == 123) abort();

@@ -243,17 +243,17 @@ void mpn_tdiv_q(mp_ptr qp,
       struct __tmp_struct * next; \
    } __tmp_t; \
    __tmp_t * __tmp_root; \
-   __tmp_t * __t
+   __tmp_t * __tpx
 
 #define TMP_START \
    __tmp_root = NULL
 
 #define TMP_ALLOC(size) \
    ((size) > 8192 ? \
-      (__t = alloca(sizeof(__tmp_t)), \
-       __t->next = __tmp_root, \
-       __tmp_root = __t, \
-       __t->block = malloc(size)) : \
+      (__tpx = alloca(sizeof(__tmp_t)), \
+       __tpx->next = __tmp_root, \
+       __tmp_root = __tpx, \
+       __tpx->block = malloc(size)) : \
       alloca(size))
 
 #define TMP_END \
