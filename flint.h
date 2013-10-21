@@ -29,6 +29,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
+#include <alloca.h>
 #include "limits.h"
 #include "longlong.h"
 #include "config.h"
@@ -234,6 +235,32 @@ void mpn_tdiv_q(mp_ptr qp,
     flint_free(_scratch);
     }
 #endif
+
+/* temporary allocation */
+#define TMP_INIT \
+   typedef struct __tmp_struct { \
+      void * block; \
+      struct __tmp_struct * next; \
+   } __tmp_t; \
+   __tmp_t * __tmp_root; \
+   __tmp_t * __t
+
+#define TMP_START \
+   __tmp_root = NULL
+
+#define TMP_ALLOC(size) \
+   ((size) > 8192 ? \
+      (__t = alloca(sizeof(__tmp_t)), \
+       __t->next = __tmp_root, \
+       __tmp_root = __t, \
+       __t->block = malloc(size)) : \
+      alloca(size))
+
+#define TMP_END \
+   while (__tmp_root) { \
+      free(__tmp_root->block); \
+      __tmp_root = __tmp_root->next; \
+   }
 
 int parse_fmt(int * floating, const char * fmt);
 

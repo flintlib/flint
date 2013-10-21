@@ -34,13 +34,11 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
         mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
    mp_limb_t cy;
-   mp_limb_t ts[150];
    mp_ptr t;
+   TMP_INIT;
 
-   if (n <= 30)
-      t = ts;
-   else
-      t = flint_malloc(5*n*sizeof(mp_limb_t));
+   TMP_START;
+   t = TMP_ALLOC(5*n*sizeof(mp_limb_t));
 
    mpn_mul_n(t, a, b, n);
    if (norm)
@@ -58,6 +56,5 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
    if (mpn_cmp(r, d, n) >= 0)
       mpn_sub_n(r, r, d, n);
 
-   if (n > 30)
-      flint_free(t);
+   TMP_END;
 }
