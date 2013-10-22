@@ -22,38 +22,40 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
-#include <stdio.h>
-#include <gmp.h>
-#include "fmpz.h"
+
 #include "fq_poly.h"
 
-int _fq_poly_fprint(FILE * file, const fq_struct *poly, slong len, 
-                    const fq_ctx_t ctx)
+int
+main(void)
 {
-    int r;
-    slong i;
+    int i, len;
+    char *str;
+    fq_poly_t a;
+    fq_ctx_t ctx;
+    flint_rand_t state;
 
-    r = fprintf(file, "%ld ", len);
-    if (r <= 0)
-        return r;
+    flint_printf("get_str....");
+    fflush(stdout);
 
-    if (len == 0)
-        return r;
+    flint_randinit(state);
 
-    for (i = 0; (r > 0) && (i < len); i++)
-    {
-        r = fprintf(file, " ");
-        if (r <= 0)
-            return r;
-        r = fq_fprint(file, poly + i, ctx);
-        if (r <= 0)
-            return r;
-    }
+    fq_ctx_randtest(ctx, state);
+    
+    fq_poly_init(a, ctx);
+    for (len = 0; len < 100; len++)
+        for (i = 0; i < 10; i++)
+        {
+            fq_poly_randtest(a, state, len, ctx);
+            str = fq_poly_get_str(a, ctx);
+            /* printf("\n\n"); */
+            /* fq_poly_print(a, ctx); */
+            /* printf("\n%s\n", str); */
+            flint_free(str);
+        }
 
-    return r;
-}
+    fq_poly_clear(a, ctx);
+    fq_ctx_clear(ctx);
 
-int fq_poly_fprint(FILE * file, const fq_poly_t poly, const fq_ctx_t ctx)
-{
-    return _fq_poly_fprint(file, poly->coeffs, poly->length, ctx);
+    flint_printf("PASS\n");
+    return 0;
 }

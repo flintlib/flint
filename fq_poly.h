@@ -799,5 +799,19 @@ int fq_poly_print_pretty(const fq_poly_t poly, const char *x,
     return fq_poly_fprint_pretty(stdout, poly, x, ctx);
 }
 
+char *
+_fq_poly_get_str_pretty(const fq_struct * poly, slong len, const char *x,
+                        const fq_ctx_t ctx);
+
+char *
+fq_poly_get_str_pretty(const fq_poly_t poly, const char *x, const fq_ctx_t ctx);
+
+char *
+_fq_poly_get_str(const fq_struct * poly, slong len, const fq_ctx_t ctx);
+
+char *
+fq_poly_get_str(const fq_poly_t poly, const fq_ctx_t ctx);
+
+
 #endif
 

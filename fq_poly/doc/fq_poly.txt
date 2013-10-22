@@ -1357,6 +1357,28 @@ int fq_poly_print(const fq_poly_t poly, const fq_ctx_t ctx)
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+char * _fq_poly_get_str(const fq_struct * poly, slong len, const fq_ctx_t ctx)
+
+    Returns the plain FLINT string representation of the polynomial
+    \code{(poly, len)}.
+
+char * fq_poly_get_str(const fq_poly_t poly, const fq_ctx_t ctx)
+
+    Returns the plain FLINT string representation of the polynomial
+    \code{poly}.
+
+char * _fq_poly_get_str_pretty(const fq_struct * poly, slong len,
+                               const char * x, const fq_ctx_t ctx)
+
+    Returns a pretty representation of the polynomial
+    \code{(poly, len)} using the null-terminated string~\code{x} as the
+    variable name.
+
+char * fq_poly_get_str_pretty(const fq_poly_t poly, const char * x,
+                              const fq_ctx_t ctx)
+
+    Returns a pretty representation of the polynomial~\code{poly} using the
+    null-terminated string \code{x} as the variable name
 
 *******************************************************************************
 
