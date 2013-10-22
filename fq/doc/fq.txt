@@ -150,12 +150,18 @@ void fq_clear(fq_t rop, const fq_ctx_t ctx)
 void _fq_sparse_reduce(fmpz *R, long lenR, const fq_ctx_t ctx)
 
     Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
-    modulus of \code{ctx}.  This performs the reduction in-place
+    modulus of \code{ctx}.
+
+void _fq_dense_reduce(fmpz *R, long lenR, const fq_ctx_t ctx)
+
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
+    modulus of \code{ctx} using Newton division.
 
 void _fq_reduce(fmpz *r, long lenR, const fq_ctx_t ctx)
 
-    Reduces \code{(R, lenR)} modulo the polynomial $f$ given
-    by the modulus of \code{ctx}.
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
+    modulus of \code{ctx}.  Does either sparse or dense reduction
+    based on \code{ctx->sparse_modulus}.
 
 void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 

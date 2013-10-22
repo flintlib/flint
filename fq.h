@@ -40,6 +40,8 @@ typedef struct
 {
     fmpz p;
 
+    int sparse_modulus;
+
     fmpz *a;
     long *j;
     long len;
@@ -133,10 +135,9 @@ static __inline__ void fq_clear(fq_t rop, const fq_ctx_t ctx)
 }
 
 static __inline__ 
-void _fq_sparse_reduce(fmpz *R, long lenR, 
-                       const fmpz *a, const long *j, long len, const fmpz_t p)
+void _fq_sparse_reduce(fmpz *R, long lenR, const fq_ctx_t ctx)
 {
-    const long d = j[len - 1];
+    const long d = ctx->j[ctx->len - 1];
 
     FMPZ_VEC_NORM(R, lenR);
 
@@ -146,18 +147,18 @@ void _fq_sparse_reduce(fmpz *R, long lenR,
 
         for (i = lenR - 1; i >= d; i--)
         {
-            for (k = len - 2; k >= 0; k--)
+            for (k = ctx->len - 2; k >= 0; k--)
             {
-                fmpz_submul(R + j[k] + i - d, R + i, a + k);
+                fmpz_submul(R + ctx->j[k] + i - d, R + i, ctx->a + k);
             }
             fmpz_zero(R + i);
         }
     }
 
-    _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), p);
+    _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), fq_ctx_prime(ctx));
 }
 
-static __inline__ void _fq_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
+static __inline__ void _fq_dense_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
 {
     fmpz  *q, *r;
 
@@ -181,33 +182,19 @@ static __inline__ void _fq_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
 
 }
 
+
+static __inline__ void _fq_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
+{
+    if (ctx->sparse_modulus)
+        _fq_sparse_reduce(R, lenR, ctx);
+    else
+        _fq_dense_reduce(R, lenR, ctx);    
+}
+
 static __inline__ void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 {
-    fmpz  *q, *r;
-    
-    if (rop->length < ctx->modulus->length)
-    {
-        _fmpz_vec_scalar_mod_fmpz(rop->coeffs, rop->coeffs, rop->length,
-                                  fq_ctx_prime(ctx));
-        _fmpz_poly_normalise(rop);
-        return;
-    }
-    
-    q = _fmpz_vec_init(rop->length - ctx->modulus->length + 1);
-    r = _fmpz_vec_init(ctx->modulus->length - 1);
-
-    _fmpz_mod_poly_divrem_newton_preinv(q, r, rop->coeffs, rop->length, 
-                                        ctx->modulus->coeffs, ctx->modulus->length,
-                                        ctx->inv->coeffs, ctx->inv->length,
-                                        fq_ctx_prime(ctx));
-
-    _fmpz_vec_clear(q, rop->length - ctx->modulus->length + 1);
-    _fmpz_vec_clear(rop->coeffs, rop->alloc);
-
-    rop->coeffs = r;
-    rop->alloc = ctx->modulus->length - 1;
-    rop->length = ctx->modulus->length - 1;
-
+    _fq_reduce(rop->coeffs, rop->length, ctx);
+    rop->length = FLINT_MIN(rop->length, ctx->modulus->length - 1);
     _fmpz_poly_normalise(rop);
 }
 

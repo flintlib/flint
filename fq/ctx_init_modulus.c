@@ -59,6 +59,11 @@ void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
         }
     }
 
+    if (ctx->len < 6)
+        ctx->sparse_modulus = 1;
+    else
+        ctx->sparse_modulus = 0;
+
     fmpz_init_set(fq_ctx_prime(ctx), p);
 
     ctx->var = flint_malloc(strlen(var) + 1);
