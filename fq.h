@@ -334,6 +334,12 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
     return fmpz_poly_print_pretty(op, ctx->var);
 }
 
+char *
+fq_get_str(const fq_t op, const fq_ctx_t ctx);
+
+char *
+fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx);
+
 /* Special functions *********************************************************/
 
 void _fq_trace(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx);
