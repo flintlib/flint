@@ -720,55 +720,58 @@ int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b);
 
 /*  Pseudo division  *********************************************************/
 
-void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
-                    const fmpz * A, slong A_len, const fmpz * B, slong B_len);
+void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, 
+                   ulong * d, const fmpz * A, slong A_len, 
+                        const fmpz * B, slong B_len, const fmpz_preinvn_t inv);
 
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
-                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
+                          ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
 
-void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                       const fmpz * A, slong lenA, const fmpz * B, slong lenB);
+void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 
+                    ulong * d, const fmpz * A, slong lenA, 
+                         const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
 
 void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
-                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
+                          ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
 
 void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
                                        slong lenA, const fmpz * B, slong lenB);
 
 void fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
-                                   const fmpz_poly_t A, const fmpz_poly_t B);
+                                     const fmpz_poly_t A, const fmpz_poly_t B);
 
 void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, slong lenA, 
-                                                  const fmpz * B, slong lenB);
+                                                   const fmpz * B, slong lenB);
 
 void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, 
-                                                        const fmpz_poly_t B);
+                                                          const fmpz_poly_t B);
 
 static __inline__
-void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, 
-                    const fmpz * A, slong A_len, const fmpz * B, slong B_len)
+void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, 
+                    ulong * d, const fmpz * A, slong A_len, 
+                         const fmpz * B, slong B_len, const fmpz_preinvn_t inv)
 {
-    _fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, A_len, B, B_len);
+    _fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, A_len, B, B_len, inv);
 }
 
 static __inline__
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, 
-                       ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
+                           ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 {
     fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, B);
 }
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB);
+                         const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
 
 void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, 
-                                                    const fmpz_poly_t B);
+                                                          const fmpz_poly_t B);
 
 void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB);
+                         const fmpz * B, slong lenB, const fmpz_preinvn_t inv);
 
 void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, 
-                                                    const fmpz_poly_t B);
+                                                          const fmpz_poly_t B);
 
 /*  Derivative  **************************************************************/
 
