@@ -41,10 +41,12 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
    ulong usize1 = FLINT_ABS(size1);
    ulong usize2 = FLINT_ABS(size2);
    ulong qsize = usize1 - usize2 + 1;
-   
-   mp_ptr qp, rp, ap, dp, tp;
+   TMP_INIT;
 
-   mpz_realloc2(r, (usize1 + (inv->norm != 0))*FLINT_BITS);
+   mp_ptr qp, rp, ap, dp, tp, sp;
+
+   if (r->_mp_alloc < usize1 + 1)
+      mpz_realloc2(r, (usize1 + 1)*FLINT_BITS);
 
    if (usize1 < usize2) /* special case preinv code can't deal with */
    {
@@ -54,38 +56,41 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
       return;
    }
 
-   mpz_realloc2(q, (qsize + (inv->norm != 0))*FLINT_BITS);
+   if (q->_mp_alloc < qsize + 1)
+      mpz_realloc2(q, (qsize + 1)*FLINT_BITS);
 
    dp = d->_mp_d;
    ap = a->_mp_d;
    qp = q->_mp_d;
    rp = r->_mp_d;
 
+   TMP_START;
    if ((r == d || q == d) && (inv->norm == 0)) /* we have alias with d */
    {
-      tp = flint_malloc(usize2*FLINT_BITS);
+      tp = TMP_ALLOC(usize2*FLINT_BITS);
       mpn_copyi(tp, dp, usize2);
       dp = tp; 
    }
    
    if (r == a || q == a) /* we have alias with a */
    {
-      tp = flint_malloc(usize1*FLINT_BITS);
+      tp = TMP_ALLOC(usize1*FLINT_BITS);
       mpn_copyi(tp, ap, usize1);
       ap = tp; 
    }
 
    if (inv->norm) {
-      tp = flint_malloc(usize2*FLINT_BITS);
+      tp = TMP_ALLOC(usize2*FLINT_BITS);
       mpn_lshift(tp, dp, usize2, inv->norm);
       dp = tp; 
 
       rp[usize1] = mpn_lshift(rp, ap, usize1, inv->norm);
       if (rp[usize1] != 0) usize1++, qsize++;
+      sp = rp;
    } else
-      mpn_copyi(rp, ap, usize1);
+      sp = ap;
 
-   qp[qsize - 1] = flint_mpn_divrem_preinvn(qp, rp, usize1, dp, usize2, inv->dinv);
+   qp[qsize - 1] = flint_mpn_divrem_preinvn(qp, rp, sp, usize1, dp, usize2, inv->dinv);
    qsize -= (qp[qsize - 1] == 0);
 
    if (inv->norm)
@@ -95,11 +100,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
    q->_mp_size = ((size1 ^ size2) < 0 ? -qsize : qsize);
    r->_mp_size = (size1 < 0 ? -usize2 : usize2);
 
-   if (r == d || q == d || (inv->norm != 0))
-      flint_free(dp);
-
-   if (r == a || q == a)
-      flint_free(ap);
+   TMP_END;
 }
 
 void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
@@ -109,10 +110,12 @@ void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
    slong size2 = d->_mp_size;
    ulong usize2 = FLINT_ABS(size2);
    mpz_t t;
+   TMP_INIT;
 
+   TMP_START;
    if (q == d || r == d) /* we need d later, so make sure it doesn't alias */
    {
-      t->_mp_d = flint_malloc(usize2*FLINT_BITS);
+      t->_mp_d = TMP_ALLOC(usize2*FLINT_BITS);
       t->_mp_size = d->_mp_size;
       t->_mp_alloc = d->_mp_alloc;
       mpn_copyi(t->_mp_d, d->_mp_d, usize2);
@@ -127,8 +130,7 @@ void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
       mpz_add(r, r, d);
    }
 
-   if (q == d || r == d)
-      flint_free(d->_mp_d);
+   TMP_END;
 }
 
 /*=============================================================================

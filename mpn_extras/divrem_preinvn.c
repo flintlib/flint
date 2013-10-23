@@ -29,64 +29,88 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 
-void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t m,
                           mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 {
-   mp_limb_t cy;
-   mp_ptr t;
-   mp_size_t size = m - n;
+   mp_limb_t cy, hi = 0;
+   mp_ptr t, q, r, a;
+   mp_size_t size;
    TMP_INIT;
 
-   TMP_START;
-   t = TMP_ALLOC(3*n*sizeof(mp_limb_t));
-   
-   if (size)
-   {
-      mpn_mul(t + n, dinv, n, a + n, size);
-      cy = mpn_add_n(q, t + 2*n, a + n, size);
+   a = (mp_ptr) ap + m - 2*n;
+   r = rp + m - 2*n;
 
-      mpn_mul(t, d, n, q, size);
-      if (cy && m < 2*n)
-         mpn_add_n(t + size, t + size, d, n);
-      
-      cy = a[n] - t[n] - mpn_sub_n(a, a, t, n);
+   /* check if top n limbs of a exceed d */
+   if (mpn_cmp(a + n, d, n) >= 0)
+   {
+      mpn_sub_n(r + n, a + n, d, n);
+      hi = 1;
+   } else if (r != a)
+      mpn_copyi(r + n, a + n, n);
+
+   q = qp + m - 2*n;
+
+   TMP_START;
+   t = TMP_ALLOC(2*n*sizeof(mp_limb_t));
+
+   /* 2n by n division */
+   while (m >= 2*n)
+   {
+      mpn_mul_n(t, dinv, r + n, n);
+      cy = mpn_add_n(q, t + n, r + n, n);
+
+      mpn_mul_n(t, d, q, n);
+      cy = r[n] - t[n] - mpn_sub_n(r, a, t, n);
 
       while (cy > 0)
       {
-         cy -= mpn_sub_n(a, a, d, n);
+         cy -= mpn_sub_n(r, r, d, n);
          mpn_add_1(q, q, n, 1);
       }
-   } else
-      mpn_zero(q, size);
 
-   if (mpn_cmp(a, d, n) >= 0)
+      if (mpn_cmp(r, d, n) >= 0)
+      {
+         mpn_sub_n(r, r, d, n);
+         mpn_add_1(q, q, n, 1);
+      }
+
+      m -= n;
+      r -= n;
+      a -= n;
+      q -= n;
+   }
+
+   size = m - n;
+
+   /* m by n division with 2n > m > n */
+   if (size)
    {
-      mpn_sub_n(a, a, d, n);
-      mpn_add_1(q, q, n, 1);
+      if (rp != ap)
+         mpn_copyi(rp, ap, size);
+      
+      mpn_mul(t, dinv, n, rp + n, size);
+      cy = mpn_add_n(qp, t + n, rp + n, size);
+
+      mpn_mul(t, d, n, qp, size);
+      if (cy)
+         mpn_add_n(t + size, t + size, d, n + 1 - size);
+      
+      cy = rp[n] - t[n] - mpn_sub_n(rp, rp, t, n);
+
+      while (cy > 0)
+      {
+         cy -= mpn_sub_n(rp, rp, d, n);
+         mpn_add_1(qp, qp, size, 1);
+      }
+
+      if (mpn_cmp(rp, d, n) >= 0)
+      {
+         mpn_sub_n(rp, rp, d, n);
+         mpn_add_1(qp, qp, size, 1);
+      }
    }
 
    TMP_END;
-}
-
-mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr a, mp_size_t m, 
-                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
-{
-   mp_limb_t hi = 0;
-   
-   if (mpn_cmp(a + m - n, d, n) >= 0)
-   {
-      mpn_sub_n(a + m - n, a + m - n, d, n);
-      hi = 1;
-   }
-      
-   while (m > 2*n)
-   {
-      flint_mpn_divrem_n_preinvn(q + m - 2*n, a + m - 2*n, 2*n, d, n, dinv);
-      m -= n;
-   }
-
-   flint_mpn_divrem_n_preinvn(q, a, m, d, n, dinv);
 
    return hi;
 }
-

@@ -154,37 +154,7 @@ void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
     We require that $d$ is normalised, i.e. with the most significant
     bit of the most significant limb set.
 
-void flint_mpn_mod_n_preinvn(mp_ptr a, mp_size_t m, 
-                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
-
-    Given a normalised integer $d$ with precomputed inverse \code{dinv}
-    provided by \code{flint_mpn_preinvn}, computes $a \pmod{d}$ and
-    stores the result in the low $n$ limbs of $a$. The upper $n$
-    limbs of $a$ must be reduced modulo \code{d}.
-
-    We require $2*n >= m >= n$. No other overlap is permitted between $a$ and
-    any of the other operands.
-
-    This function will be faster than its standard counterpart when the
-    number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
-
-void flint_mpn_divrem_n_preinvn(mp_ptr q, mp_ptr a, mp_size_t m,
-                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
-
-    Given a normalised integer $d$ with precomputed inverse \code{dinv} 
-    provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
-    and stores the result in $q$ and the remainder in the lower $n$ limbs of
-    $a$. The remaining limbs of $a$ are destroyed. The upper $n$ limbs of $a$
-    must be reduced modulo \code{d}.
-
-    We require $2*n >= m >= n$. The value $q$ is expected to have space for
-    $m - n$ limbs. No aliasing is permitted between $q$ and $a$ or these and 
-    any of the other operands.
-   
-    This function will be faster than its standard counterpart when the
-    number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
-
-void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
+void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
                                       mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
     Given a normalised integer $d$ of $n$ limbs, with precomputed inverse
@@ -198,8 +168,8 @@ void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m,
     This function will be faster than its standard counterpart when the
     number of limbs of $d$ is at least \code{PREINVN_CUTOFF}.
 
-mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr a, mp_size_t m, 
-                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, 
+                         mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 
     Given a normalised integer $d$ with precomputed inverse \code{dinv} 
     provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
