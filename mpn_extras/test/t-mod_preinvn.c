@@ -85,7 +85,7 @@ int main(void)
        while (size && r2->_mp_d[size - 1] == 0) size--;
        r2->_mp_size = size;
        
-       result = (mpz_cmp(r1, a) == 0);
+       result = (mpz_cmp(r1, r2) == 0);
        if (!result)
        {
           flint_printf("FAIL:\n");

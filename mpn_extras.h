@@ -35,8 +35,6 @@
  extern "C" {
 #endif
 
-#define PREINVN_CUTOFF 120
-
 #define MPN_NORM(a, an)                         \
     do {                                        \
         while ((an) != 0 && (a)[(an) - 1] == 0) \
