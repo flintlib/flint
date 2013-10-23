@@ -80,22 +80,32 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
       ap = tp; 
    }
 
-   if (nm) {
-      tp = TMP_ALLOC(usize2*FLINT_BITS);
-      mpn_lshift(tp, dp, usize2, inv->norm);
-      dp = tp; 
+   /* 
+      TODO: speedup mpir's mullow and mulhigh and use in 
+      flint_mpn_divrem_preinvn so we can remove this first 
+      case here
+   */
+   if (usize2 == 2 || (usize2 > 15 && usize2 < 120)) 
+      mpn_tdiv_qr(qp, rp, 0, ap, usize1, dp, usize2);
+   else {
+      if (nm) {
+         tp = TMP_ALLOC(usize2*FLINT_BITS);
+         mpn_lshift(tp, dp, usize2, inv->norm);
+         dp = tp; 
 
-      rp[usize1] = mpn_lshift(rp, ap, usize1, inv->norm);
-      if (rp[usize1] != 0) usize1++, qsize++;
-      sp = rp;
-   } else
-      sp = ap;
+         rp[usize1] = mpn_lshift(rp, ap, usize1, inv->norm);
+         if (rp[usize1] != 0) usize1++, qsize++;
+         sp = rp;
+      } else
+         sp = ap;
 
-   qp[qsize - 1] = flint_mpn_divrem_preinvn(qp, rp, sp, usize1, dp, usize2, inv->dinv);
+      qp[qsize - 1] = flint_mpn_divrem_preinvn(qp, rp, sp, usize1, dp, usize2, inv->dinv);
+   
+      if (nm)
+         mpn_rshift(rp, rp, usize2, inv->norm);
+   }
+         
    qsize -= (qp[qsize - 1] == 0);
-
-   if (nm)
-      mpn_rshift(rp, rp, usize2, inv->norm);
    MPN_NORM(rp, usize2);
 
    q->_mp_size = ((size1 ^ size2) < 0 ? -qsize : qsize);

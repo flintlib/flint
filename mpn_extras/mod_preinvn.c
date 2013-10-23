@@ -29,6 +29,10 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 
+/* 
+   TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
+*/  
+
 void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m, 
                           mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 {
