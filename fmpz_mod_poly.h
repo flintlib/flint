@@ -207,6 +207,25 @@ void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
         fmpz_zero(x);
 }
 
+static __inline__ void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n,
+    const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_mod_poly_set_coeff_fmpz(poly, n, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly, slong n)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_mod_poly_get_coeff_fmpz(t, poly, n);
+    fmpz_get_mpz(x, t);
+    fmpz_clear(t);
+}
+
+
 /*  Shifting *****************************************************************/
 
 void _fmpz_mod_poly_shift_left(fmpz * res, const fmpz * poly, slong len, slong n);
