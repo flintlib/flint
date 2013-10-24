@@ -35,6 +35,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -659,6 +660,29 @@ _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, slong len1
 void
 fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                              const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
+
+void
+_fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
+                                   const fmpz_mod_poly_t f);
+
+void
+_fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * poly1,
+                          const fmpz * poly2, slong len2, const fmpz * poly2inv,
+                          slong len2inv, const fmpz_t p);
+
+void
+fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
+                   const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly2inv);
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
+         const fmpz * poly1, slong len1, const fmpz_mat_t A, const fmpz * poly3,
+         slong len3, const fmpz * poly3inv, slong len3inv, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t poly1, const fmpz_mat_t A,
+                   const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv);
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
