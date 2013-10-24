@@ -35,6 +35,7 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_t *h, *H, *I;
     slong i, j, l, m, n, index, d;
     fmpz_t p;
+    fmpz_mat_t HH, HHH;
     double beta;
 
     n = fmpz_mod_poly_degree(poly);
@@ -84,16 +85,28 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_set(s, v);
     fmpz_mod_poly_set(H[0], h[l]);
     fmpz_mod_poly_set(reducedH0, H[0]);
+    fmpz_mat_init (HH, n_sqrt (v->length-1) + 1, v->length-1);
+    fmpz_mod_poly_precompute_matrix (HH, reducedH0, s, vinv);
     d= 1;
     for (j = 0; j < m; j++)
     {
         /* compute giant steps: H[i]=x^{p^(li)}mod v */
         if (j > 0)
         {
-            fmpz_mod_poly_rem (reducedH0, reducedH0, s);
-            fmpz_mod_poly_rem (tmp, H[j-1], s);
-            fmpz_mod_poly_compose_mod_brent_kung_preinv(H[j], tmp, reducedH0,
-                                                        s, vinv);
+            if (I[j-1]->length > 1)
+            {
+                _fmpz_mod_poly_reduce_matrix_mod_poly (HHH, HH, s);
+                fmpz_mat_clear (HH);
+                fmpz_mat_init_set (HH, HHH);
+                fmpz_mat_clear (HHH);
+                fmpz_mod_poly_rem (reducedH0, reducedH0, s);
+                fmpz_mod_poly_rem (tmp, H[j-1], s);
+                fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(H[j], tmp,
+                                                            HH, s, vinv);
+            }
+            else
+                fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(H[j],H[j-1],
+                                                           HH, s, vinv);
         }
         /* compute interval polynomials */
         fmpz_mod_poly_set_coeff_ui(I[j], 0, 1);
@@ -163,6 +176,8 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_clear(v);
     fmpz_mod_poly_clear(vinv);
     fmpz_mod_poly_clear(tmp);
+
+    fmpz_mat_clear(HH);
 
     for (i = 0; i < l + 1; i++)
         fmpz_mod_poly_clear(h[i]);
