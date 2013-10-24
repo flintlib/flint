@@ -35,6 +35,7 @@
 
 #include "flint.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -811,14 +812,36 @@ void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c);
 /* Modular composition  ******************************************************/
 
 void
-_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf, 
-                            mp_srcptr g,
-                            mp_srcptr h, slong lenh, nmod_t mod);
+_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf,
+                            mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);
 
 void
 nmod_poly_compose_mod_brent_kung(nmod_poly_t res, 
                     const nmod_poly_t f, const nmod_poly_t g,
                     const nmod_poly_t h);
+
+void
+_nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+                          const nmod_poly_t f);
+
+void
+_nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
+               slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod);
+
+void
+nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
+                          const nmod_poly_t poly2, const nmod_poly_t poly2inv);
+
+void
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
+                            slong len1, const nmod_mat_t A, mp_srcptr poly3,
+                            slong len3, mp_srcptr poly3inv, slong len3inv,
+                            nmod_t mod);
+
+void
+nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
+                    const nmod_poly_t poly1, const nmod_mat_t A,
+                    const nmod_poly_t poly3, const nmod_poly_t poly3inv);
 
 void
 _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
