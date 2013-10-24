@@ -1510,6 +1510,63 @@ void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
     we require \code{hinv} to be the inverse of the reverse of \code{h}.
     The algorithm used is the Brent-Kung matrix algorithm.
 
+void
+_nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+                          const nmod_poly_t f);
+
+    Sets the ith row of \code{A} to the reduction of the ith row of $B$ modulo
+    $f$ for $i=1,\ldots,\sqrt{\deg(f)}$. We require $B$ to be at least
+    a $\sqrt{\deg(f)}\times \deg(f)$ matrix and $f$ to be nonzero.
+
+void
+_nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr f, mp_srcptr g,
+               slong leng, mp_srcptr ginv, slong lenginv, nmod_t mod);
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g} and $g$ to be
+    nonzero.
+
+void
+nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t f,
+                          const nmod_poly_t g, const nmod_poly_t ginv);
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g}.
+
+
+void
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr f,
+                            slong lenf, const nmod_mat_t A, mp_srcptr h,
+                            slong h, mp_srcptr hinv, slong lenhinv,
+                            nmod_t mod);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
+    $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
+                    const nmod_poly_t f, const nmod_mat_t A,
+                    const nmod_poly_t h, const nmod_poly_t hinv);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that the
+    ith row of $A$ contains $g^i$ for $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We require that $h$ is nonzero and
+    that $f$ has smaller degree than $h$. Furthermore, we require \code{hinv} to
+    be the inverse of the reverse of \code{h}. This version of Brent-Kung
+    modular composition is particularly useful if one has to perform several
+    modular composition of the form $f(g)$ modulo $h$ for fixed $g$ and $h$.
+
 void _nmod_poly_compose_mod(mp_ptr res,
     mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
 
