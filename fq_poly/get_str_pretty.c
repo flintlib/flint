@@ -69,12 +69,12 @@ _fq_poly_get_str_pretty(const fq_struct * poly, slong len, const char *x,
     {
     }
     else
-        off += flint_sprintf(str + off, "(%s)", coeffstrs[i]);
+        off += flint_sprintf(str + off, "*(%s)", coeffstrs[i]);
 
     if (i > 1)
-        off += flint_sprintf(str + off, "*%s^%wd", x, i);
+        off += flint_sprintf(str + off, "%s^%wd", x, i);
     else
-        off += flint_sprintf(str + off, "*%s", x);
+        off += flint_sprintf(str + off, "%s", x);
 
     for (--i; i > 0; --i)
     {
