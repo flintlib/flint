@@ -31,7 +31,7 @@
 #include <stdio.h>
 #define ulong mp_limb_t
 
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
