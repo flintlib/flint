@@ -36,7 +36,7 @@ int flint_sscanf(const char * s, const char * str, ...)
    size_t len = strlen(str);
    char * str2 = malloc(len + 1);
    char * s2 = malloc(strlen(s) + 1);
-   int * w1, * w2;
+   int * w1 = NULL, * w2 = NULL;
    void ** w3;
    double * d;
    ulong * wu;

@@ -35,7 +35,7 @@ int flint_scanf(const char * str, ...)
    va_list ap;
    size_t len = strlen(str);
    char * str2 = malloc(len + 1);
-   int * w1, * w2;
+   int * w1 = NULL, * w2 = NULL;
    void * w3;
    double * d;
    ulong * wu;
