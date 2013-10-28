@@ -167,7 +167,7 @@ typedef __mpfr_struct mpfr;
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
-extern unsigned char __flint_clz_tab[128];
+extern const unsigned char __flint_clz_tab[128];
 #endif
 
 static __inline__
