@@ -1501,7 +1501,7 @@ void _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr f,
 
     The algorithm used is the Brent-Kung matrix algorithm.
 
-void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res, 
+void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
                     const nmod_poly_t f, const nmod_poly_t g,
                     const nmod_poly_t h, const nmod_poly_t hinv)
 
@@ -1512,7 +1512,7 @@ void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
 
 void
 _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
-                          const nmod_poly_t f);
+                          const nmod_poly_t f)
 
     Sets the ith row of \code{A} to the reduction of the ith row of $B$ modulo
     $f$ for $i=1,\ldots,\sqrt{\deg(f)}$. We require $B$ to be at least
@@ -1520,7 +1520,7 @@ _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
 
 void
 _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr f, mp_srcptr g,
-               slong leng, mp_srcptr ginv, slong lenginv, nmod_t mod);
+               slong leng, mp_srcptr ginv, slong lenginv, nmod_t mod)
 
     Sets the ith row of \code{A} to $f^i$ modulo $g$ for
     $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
@@ -1530,7 +1530,7 @@ _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr f, mp_srcptr g,
 
 void
 nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t f,
-                          const nmod_poly_t g, const nmod_poly_t ginv);
+                          const nmod_poly_t g, const nmod_poly_t ginv)
 
     Sets the ith row of \code{A} to $f^i$ modulo $g$ for
     $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
@@ -1542,7 +1542,7 @@ void
 _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr f,
                             slong lenf, const nmod_mat_t A, mp_srcptr h,
                             slong h, mp_srcptr hinv, slong lenhinv,
-                            nmod_t mod);
+                            nmod_t mod)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
@@ -1557,7 +1557,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr f,
 void
 nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
                     const nmod_poly_t f, const nmod_mat_t A,
-                    const nmod_poly_t h, const nmod_poly_t hinv);
+                    const nmod_poly_t h, const nmod_poly_t hinv)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that the
     ith row of $A$ contains $g^i$ for $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
