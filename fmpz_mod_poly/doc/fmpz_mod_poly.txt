@@ -1205,6 +1205,62 @@ void fmpz_mod_poly_compose_mod_brent_kung(
     The algorithm used is the Brent-Kung matrix algorithm.
 
 void
+_fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
+                                   const fmpz_mod_poly_t f)
+
+    Sets the ith row of \code{A} to the reduction of the ith row of $B$ modulo
+    $f$ for $i=1,\ldots,\sqrt{\deg(f)}$. We require $B$ to be at least
+    a $\sqrt{\deg(f)}\times \deg(f)$ matrix and $f$ to be nonzero.
+
+void
+_fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * f,
+                          const fmpz * g, slong leng, const fmpz * ginv,
+                          slong lenginv, const fmpz_t p)
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g} and $g$ to be
+    nonzero.
+
+void
+fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t f,
+                   const fmpz_mod_poly_t g, const fmpz_mod_poly_t ginv)
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g}.
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
+         const fmpz * f, slong lenf, const fmpz_mat_t A, const fmpz * h,
+         slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
+    $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t f, const fmpz_mat_t A,
+                   const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that the
+    ith row of $A$ contains $g^i$ for $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We require that $h$ is nonzero and
+    that $f$ has smaller degree than $h$. Furthermore, we require \code{hinv} to
+    be the inverse of the reverse of \code{h}. This version of Brent-Kung
+    modular composition is particularly useful if one has to perform several
+    modular composition of the form $f(g)$ modulo $h$ for fixed $g$ and $h$.
+
+void
 _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * f,
                  slong lenf, const fmpz * g, const fmpz * h, slong lenh,
                  const fmpz * hinv, slong lenhinv, const fmpz_t p)
