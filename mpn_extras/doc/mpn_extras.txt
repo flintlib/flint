@@ -154,6 +154,33 @@ void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
     We require that $d$ is normalised, i.e. with the most significant
     bit of the most significant limb set.
 
+void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
+                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+
+    Given a normalised integer $d$ of $n$ limbs, with precomputed inverse
+    \code{dinv} provided by \code{flint_mpn_preinvn} and integer $a$ of $m$
+    limbs, computes $a \pmod{d}$ and stores the result in-place in the lower
+    $n$ limbs of $a$. The remaining limbs of $a$ are destroyed.
+
+    We require $m \geq n$. No aliasing of $a$ with any of the other operands
+    is permitted.
+
+    Note that this function is not always as fast as ordinary division.
+
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, 
+                         mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv)
+
+    Given a normalised integer $d$ with precomputed inverse \code{dinv} 
+    provided by \code{flint_mpn_preinvn}, computes the quotient of $a$ by $d$ 
+    and stores the result in $q$ and the remainder in the lower $n$ limbs of
+    $a$. The remaining limbs of $a$ are destroyed.
+
+    The value $q$ is expected to have space for $m - n$ limbs and we require
+    $m >= n$. No aliasing is permitted between $q$ and $a$ or between these
+    and any of the other operands. 
+
+    Note that this function is not always as fast as ordinary division.
+
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_srcptr dinv, ulong norm)
@@ -170,6 +197,8 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 
     We require $a$ and $b$ to be reduced modulo $n$ before calling the
     function. 
+
+    Note that this function is not always as fast as ordinary division.
 
 *******************************************************************************
 

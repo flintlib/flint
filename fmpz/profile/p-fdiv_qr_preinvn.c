@@ -25,59 +25,65 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "profiler.h"
 #include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "fmpz.h"
 
 typedef struct
 {
-   slong n;
+   slong limbs;
+   int algo;
 } info_t;
 
 void sample(void * arg, ulong count)
 {
    info_t * info = (info_t *) arg;
-   slong n = info->n, i, j;
-   slong scale;
+   slong limbs = info->limbs, i, j;
+   int algo = info->algo;
+   int scale = 200;
 
    flint_rand_t state;
    flint_randinit(state);
-   nmod_poly_t a, b, c;
-   mp_limb_t m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2));
-   if (m == 0) m = 2;
-   
-   nmod_poly_init2(a, m, n);
-   nmod_poly_init2(b, m, n);
-   nmod_poly_init2(c, m, 2*n - 1);
-   
-   for (i = 0; i < n; i++)
-   {
-       a->coeffs[i] = n_randint(state, m);
-       b->coeffs[i] = n_randint(state, m);
-   }
-   a->length = n;
-   b->length = n;
 
-   scale = 1;
-   if (n < 100000) scale = 10;
-   if (n < 10000) scale = 100;
-   if (n < 100) scale = 1000;
-      
+   fmpz_t a, b, c, r;
+   fmpz_preinvn_t inv;
+   
+   fmpz_init(a);
+   fmpz_init(b);
+   fmpz_init(c);
+   fmpz_init(r);
+           
    for (i = 0; i < count; i++)
    {
-	  prof_start();
-      for (j = 0; j < scale; j++)
+      fmpz_randbits(a, state, (2*limbs - 1)*FLINT_BITS);
+      fmpz_randbits(b, state, limbs*FLINT_BITS);
+      
+      fmpz_preinvn_init(inv, b);
+	
+      prof_start();
+      if (algo == 1)
       {
-          nmod_poly_mul(c, a, b);
-      }
-	  prof_stop();
-      if (c->coeffs[n - 2] == 123) abort();
+         for (j = 0; j < scale; j++)
+         {
+            fmpz_fdiv_qr_preinvn(c, r, a, b, inv);
+         }
+      } else
+      {
+         for (j = 0; j < scale; j++)
+         {
+            fmpz_fdiv_qr(c, r, a, b);
+         }
+     }
+	   prof_stop();
    }
   
-   nmod_poly_clear(a);
-   nmod_poly_clear(b);
-   nmod_poly_clear(c);
+   fmpz_preinvn_clear(inv);
+   fmpz_clear(a);
+   fmpz_clear(b);
+   fmpz_clear(c);
+   fmpz_clear(r);
    flint_randclear(state);
 }
 
@@ -87,23 +93,32 @@ int main(void)
    info_t info;
    slong k, scale;
 
-   for (k = 2; k <= 30; k++)
-   {
-      info.n = 1<<k;
+   printf("1: With precomputed inverse\n");
+   printf("2: Without precomputed inverse\n\n");
 
-      scale = 1;
-      if (info.n < 100000) scale = 10;
-      if (info.n < 10000) scale = 100;
-      if (info.n < 100) scale = 1000;
+   for (k = 1; k <= 10000; k = (slong) ceil(1.1*k))
+   {
+      info.limbs = k;
+      info.algo = 1;
+
+      scale = 200;
    
       prof_repeat(&min, &max, sample, (void *) &info);
          
-      flint_printf("length %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
-           info.n,
+      flint_printf("1: limbs %wd, min %.3g ms, max %.3g ms\n", 
+           info.limbs,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
-           ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
-           (((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0)
-              *500000.0/info.n/FLINT_BIT_COUNT(info.n)
+           ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0
+	     );
+
+     info.algo = 2;
+     
+     prof_repeat(&min, &max, sample, (void *) &info);
+         
+      flint_printf("2: limbs %wd, min %.3g ms, max %.3g ms\n\n", 
+           info.limbs,
+		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
+           ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0
 	     );
    }
 

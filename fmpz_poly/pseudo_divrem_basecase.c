@@ -34,7 +34,7 @@
 void
 _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
                                   const fmpz * A, slong lenA, const fmpz * B,
-                                  slong lenB)
+                                  slong lenB, const fmpz_preinvn_t inv)
 {
     const fmpz * leadB = B + (lenB - 1);
     slong iQ = lenA - lenB, iR = lenA - 1;
@@ -49,7 +49,11 @@ _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
 
     while (iR >= lenB - 1)
     {
-        fmpz_fdiv_qr(Q + iQ, rem, R + iR, leadB);
+        if (inv)
+           fmpz_fdiv_qr_preinvn(Q + iQ, rem, R + iR, leadB, inv);
+        else
+           fmpz_fdiv_qr(Q + iQ, rem, R + iR, leadB);
+
         if (!fmpz_is_zero(rem))
         {
             _fmpz_vec_scalar_mul_fmpz(Q, Q, lenA - lenB + 1, leadB);
@@ -115,7 +119,7 @@ fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     }
     
     _fmpz_poly_pseudo_divrem_basecase(q, r, d, A->coeffs, A->length, 
-                                               B->coeffs, B->length);
+                                               B->coeffs, B->length, NULL);
     
     for (lenr = B->length - 2; (lenr >= 0) && !r[lenr]; lenr--) ;
     lenr++;

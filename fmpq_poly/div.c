@@ -32,7 +32,7 @@
 
 void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
                     const fmpz * A, const fmpz_t a, slong lenA, 
-                    const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 {
     slong lenQ = lenA - lenB + 1;
     ulong d;
@@ -50,7 +50,7 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
        and thus
            {A, a} = {b * Q, a * lead^d} * {B, b} + {R, a * lead^d}.
      */
-    _fmpz_poly_pseudo_div(Q, &d, A, lenA, B, lenB);
+    _fmpz_poly_pseudo_div(Q, &d, A, lenA, B, lenB, inv);
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a} up to sign */
     if (d == UWORD(0) || *lead == WORD(1) || *lead == WORD(-1))
@@ -120,7 +120,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
     
     _fmpq_poly_div(Q->coeffs, Q->den, 
                    poly1->coeffs, poly1->den, poly1->length, 
-                   poly2->coeffs, poly2->den, poly2->length);
+                   poly2->coeffs, poly2->den, poly2->length, NULL);
     
     _fmpq_poly_set_length(Q, lenQ);
 }

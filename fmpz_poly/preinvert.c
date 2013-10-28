@@ -20,47 +20,52 @@
 /******************************************************************************
 
     Copyright (C) 2010, 2011 Sebastian Pancratz
-
+    Copyright (C) 2013 William Hart
+   
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void 
-_fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+_fmpz_poly_preinvert(fmpz * Binv, const fmpz * B, slong len)
 {
-    if (n == 1)  /* Q is +-1 */
+    if (len == 1)  /* B is +-1 */
     {
-        fmpz_set(Qinv, Q);
+        fmpz_set(Binv, B);
     }
     else
     {
-        const slong alloc = FLINT_MAX(n, 3 * FMPZ_POLY_INV_NEWTON_CUTOFF);
-        slong *a, i, m;
-        fmpz *W;
+        const slong alloc = len + FLINT_MAX(len, 3 * FMPZ_POLY_INV_NEWTON_CUTOFF);
+        slong *a, i, m, n = len;
+        fmpz *T, *W;
 
-        W = _fmpz_vec_init(alloc);
+        T = _fmpz_vec_init(alloc);
+        W = T + len;
 
         for (i = 1; (WORD(1) << i) < n; i++) ;
-
+    
         a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = n;
         while (n >= FMPZ_POLY_INV_NEWTON_CUTOFF)
             a[++i] = (n = (n + 1) / 2);
-
+        
+        if (len != n) 
+           _fmpz_poly_reverse(T, B, len, len); /* only reverse if it ... */
+        
         /* Base case */
         {
-            fmpz *Qrev = W + 2 * FMPZ_POLY_INV_NEWTON_CUTOFF;
+            fmpz *Brev = W + 2 * FMPZ_POLY_INV_NEWTON_CUTOFF;
+            if (len != n) 
+               _fmpz_poly_reverse(Brev, T, n, n); /* ... won't be undone */
+            else Brev = (fmpz *) B;
 
-            _fmpz_poly_reverse(Qrev, Q, n, n);
             _fmpz_vec_zero(W, 2*n - 2);
             fmpz_one(W + (2*n - 2));
-            _fmpz_poly_div_basecase(Qinv, W, W, 2*n - 1, Qrev, n);
-            _fmpz_poly_reverse(Qinv, Qinv, n, n);
+            _fmpz_poly_div_basecase(Binv, W, W, 2*n - 1, Brev, n);
+            _fmpz_poly_reverse(Binv, Binv, n, n);
         }
         
         for (i--; i >= 0; i--)
@@ -68,54 +73,49 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
             m = n;
             n = a[i];
 
-            _fmpz_poly_mullow(W, Q, n, Qinv, m, n);
-            _fmpz_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m);
-            _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
+            _fmpz_poly_mullow(W, T, n, Binv, m, n);
+            _fmpz_poly_mullow(Binv + m, Binv, m, W + m, n - m, n - m);
+            _fmpz_vec_neg(Binv + m, Binv + m, n - m);
         }
 
-        _fmpz_vec_clear(W, alloc);
+        _fmpz_vec_clear(T, alloc);
         flint_free(a);
     }
 }
 
-void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
+void
+fmpz_poly_preinvert(fmpz_poly_t B_inv, const fmpz_poly_t B)
 {
-    fmpz *Qcopy;
-    int Qalloc;
+    slong n = B->length;
+    fmpz_poly_t temp;
+    fmpz * Binv_coeffs;
 
-    if (Q->length >= n)
+    if (n == 0)
     {
-        Qcopy = Q->coeffs;
-        Qalloc = 0;
-    }
-    else
-    {
-        slong i;
-        Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < Q->length; i++)
-            Qcopy[i] = Q->coeffs[i];
-        flint_mpn_zero((mp_ptr) Qcopy + i, n - i);
-        Qalloc = 1;
+        flint_printf("Exception (fmpz_poly_preinvert). Division by zero.\n");
+        abort();
     }
 
-    if (Qinv != Q)
+    if (B == B_inv)
     {
-        fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_inv_series_newton(Qinv->coeffs, Qcopy, n);
-    }
-    else
+       fmpz_poly_init2(temp, n);
+       Binv_coeffs = temp->coeffs;
+    } else
     {
-        fmpz_poly_t t;
-        fmpz_poly_init2(t, n);
-        _fmpz_poly_inv_series_newton(t->coeffs, Qcopy, n);
-        fmpz_poly_swap(Qinv, t);
-        fmpz_poly_clear(t);
+       fmpz_poly_fit_length(B_inv, n);
+       Binv_coeffs = B_inv->coeffs;
     }
-    
-    _fmpz_poly_set_length(Qinv, n);
-    _fmpz_poly_normalise(Qinv);
 
-    if (Qalloc)
-        flint_free(Qcopy);
+    _fmpz_poly_preinvert(Binv_coeffs, B->coeffs, n);
+
+
+    if (B == B_inv)
+    {
+       _fmpz_poly_set_length(temp, n);
+       fmpz_poly_swap(B_inv, temp);
+       fmpz_poly_clear(temp);
+    } else
+       _fmpz_poly_set_length(B_inv, n);
+
+    /* no need to normalise */
 }
-

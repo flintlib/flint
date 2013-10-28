@@ -19,46 +19,52 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 William Hart
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "longlong.h"
+#include "ulong_extras.h"
 #include "mpn_extras.h"
+#include "fmpz.h"
 
-/* 
-   TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
-*/  
-
-void flint_mpn_mulmod_preinvn(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
-        mp_srcptr d, mp_srcptr dinv, ulong norm)
+void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f)
 {
-   mp_limb_t cy;
+   fmpz c = *f;
+   mp_bitcnt_t norm;
    mp_ptr t;
-   TMP_INIT;
 
-   TMP_START;
-   t = TMP_ALLOC(5*n*sizeof(mp_limb_t));
+   if (c == 0)
+   {
+      flint_printf("Exception (fmpz_preinvn_init). Division by zero.\n");
+      abort();
+   } else if (!COEFF_IS_MPZ(c)) /* c is small */
+   {
+      inv->dinv = flint_malloc(sizeof(mp_limb_t));
+      if (c < 0) c = -c;
+      count_leading_zeros(norm, c);
+      if (norm) c <<= norm;
+      flint_mpn_preinvn(inv->dinv, (mp_ptr) &c, 1);
+      inv->n = 1;
+   } else /* c is big */
+   {
+      __mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
+      slong size = FLINT_ABS(mpz_ptr->_mp_size);
+      inv->dinv = flint_malloc(size*sizeof(mp_limb_t));
+      count_leading_zeros(norm, mpz_ptr->_mp_d[size - 1]);
+      if (norm) 
+      {
+         t = flint_malloc(size*sizeof(mp_limb_t));
+         mpn_lshift(t, mpz_ptr->_mp_d, size, norm);
+      } else
+         t = mpz_ptr->_mp_d;
 
-   mpn_mul_n(t, a, b, n);
-   if (norm)
-      mpn_rshift(t, t, 2*n, norm);
-
-   mpn_mul_n(t + 3*n, t + n, dinv, n);
-   mpn_add_n(t + 4*n, t + 4*n, t + n, n);
-
-   mpn_mul_n(t + 2*n, t + 4*n, d, n);
-   cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n);
-
-   while (cy > 0)
-      cy -= mpn_sub_n(r, r, d, n);
-   
-   if (mpn_cmp(r, d, n) >= 0)
-      mpn_sub_n(r, r, d, n);
-
-   TMP_END;
+      flint_mpn_preinvn(inv->dinv, t, size);
+      
+      inv->n = size;
+      if (norm) flint_free(t);
+   }
+      
+   inv->norm = norm;
 }

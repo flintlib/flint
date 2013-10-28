@@ -75,7 +75,7 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
             fmpz_one(W + (2*n - 2));
             fmpz_one(Wden);
 
-            _fmpq_poly_div(Qinv, Qinvden, W, Wden, 2*n - 1, rev, Qden, n);
+            _fmpq_poly_div(Qinv, Qinvden, W, Wden, 2*n - 1, rev, Qden, n, NULL);
             _fmpq_poly_canonicalise(Qinv, Qinvden, n);
 
             _fmpz_poly_reverse(Qinv, Qinv, n, n);

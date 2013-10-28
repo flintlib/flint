@@ -77,10 +77,10 @@ for (l = 0; l < len; l++)
 
     fmpz_init_set_ui(p, 17);
 
-    padic_ctx_init(ctx, p, n, PADIC_VAL_UNIT);
+    padic_ctx_init(ctx, p, n, n, PADIC_VAL_UNIT);
 
-    padic_init(a, ctx);
-    padic_init(z, ctx);
+    padic_init(a);
+    padic_init(z);
 
     {
         fmpz_t f = {WORD(3)}, pow;
@@ -107,8 +107,8 @@ for (l = 0; l < len; l++)
     flint_printf("%2ld, %4XYXYXYXY, %8ld, %wd\n", 
         l, cputime, runs[l], T[l]);
 
-    padic_clear(a, ctx);
-    padic_clear(z, ctx);
+    padic_clear(a);
+    padic_clear(z);
 
     fmpz_clear(p);
     padic_ctx_clear(ctx);
