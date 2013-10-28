@@ -38,7 +38,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
                  const fmpz * poly3inv, slong len3inv, const fmpz_t p)
 {
     fmpz_mat_t A, B, C;
-    fmpz * t, * h, * tmp;
+    fmpz * t, * h;
     slong i, j, n, m;
 
     n = len3 - 1;
@@ -76,14 +76,9 @@ _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
     /* Set rows of A to powers of poly2 */
     fmpz_one(A->rows[0]);
     _fmpz_vec_set(A->rows[1], poly2, n);
-    tmp = _fmpz_vec_init(2 * n - 1);
     for (i = 2; i < m; i++)
-    {
-        _fmpz_mod_poly_mulmod_preinv (tmp, A->rows[i - 1], n, poly2, n, poly3,
-                                      len3, poly3inv, len3inv, p);
-        _fmpz_vec_set(A->rows[i], tmp, n);
-    }
-    _fmpz_vec_clear(tmp, 2 * n - 1);
+        _fmpz_mod_poly_mulmod_preinv (A->rows[i], A->rows[i - 1], n, poly2, n,
+                                      poly3, len3, poly3inv, len3inv, p);
 
     fmpz_mat_mul(C, B, A);
     for (i = 0; i < m; i++)
@@ -119,7 +114,6 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
     slong len2 = poly2->length;
     slong len3 = poly3->length;
     slong len = len3 - 1;
-    slong vec_len = FLINT_MAX(len3 - 1, len2);
 
     fmpz * ptr2;
     fmpz_t inv3;
@@ -162,12 +156,12 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
         return;
     }
 
-    ptr2 = _fmpz_vec_init(vec_len);
+    ptr2 = _fmpz_vec_init(len);
 
     if (len2 <= len)
     {
         _fmpz_vec_set(ptr2, poly2->coeffs, len2);
-        _fmpz_vec_zero(ptr2 + len2, vec_len - len2);
+        _fmpz_vec_zero(ptr2 + len2, len - len2);
     }
     else
     {
@@ -185,5 +179,5 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
     _fmpz_mod_poly_set_length(res, len);
     _fmpz_mod_poly_normalise(res);
 
-    _fmpz_vec_clear(ptr2, vec_len);
+    _fmpz_vec_clear(ptr2, len);
 }

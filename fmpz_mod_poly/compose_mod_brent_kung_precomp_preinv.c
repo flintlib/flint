@@ -164,8 +164,8 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
     fmpz_mat_init(B, m, m);
     fmpz_mat_init(C, m, n);
 
-    h = _fmpz_vec_init(2 * n - 1);
-    t = _fmpz_vec_init(2 * n - 1);
+    h = _fmpz_vec_init(n);
+    t = _fmpz_vec_init(n);
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
@@ -190,8 +190,8 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
         _fmpz_mod_poly_add(res, t, n, C->rows[i], n, p);
     }
 
-    _fmpz_vec_clear(h, 2 * n - 1);
-    _fmpz_vec_clear(t, 2 * n - 1);
+    _fmpz_vec_clear(h, n);
+    _fmpz_vec_clear(t, n);
 
     fmpz_mat_clear(B);
     fmpz_mat_clear(C);
