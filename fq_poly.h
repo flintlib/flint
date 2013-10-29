@@ -682,6 +682,8 @@ void fq_poly_evaluate_fq(fq_t res, const fq_poly_t f, const fq_t a,
                          const fq_ctx_t ctx);
 
 /*  Composition  *************************************************************/
+#define FQ_COMPOSE_MOD_LENH_CUTOFF 6
+#define FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
 
 void _fq_poly_compose_divconquer(fq_struct *rop, 
                                  const fq_struct *op1, long len1, 

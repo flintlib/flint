@@ -35,7 +35,7 @@ _fq_poly_compose_mod_preinv(fq_struct * res,
                             const fq_struct * hinv, slong lenhinv, 
                             const fq_ctx_t ctx)
 {
-    if (lenh < 12 || lenf >= lenh)
+    if (lenh < FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF || lenf >= lenh)
         _fq_poly_compose_mod_horner_preinv(res, f, lenf, g, h, lenh,
                                            hinv, lenhinv, ctx);
     else
