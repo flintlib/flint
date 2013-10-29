@@ -1212,6 +1212,33 @@ void fq_poly_compose_mod_horner(fq_poly_t res, const fq_poly_t f,
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero. The algorithm used is Horner's rule.
 
+void _fq_poly_compose_mod_horner_preinv(fq_struct * res,
+                                        const fq_struct * f, slong lenf,
+                                        const fq_struct * g,
+                                        const fq_struct * h, slong lenh,
+                                        const fq_struct * hinv, slong lenhiv,
+                                        const fq_ctx_t ctx)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require
+    that $h$ is nonzero and that the length of $g$ is one less than
+    the length of $h$ (possibly with zero padding). We also require
+    that the length of $f$ is less than the length of
+    $h$. Furthermore, we require \code{hinv} to be the inverse of the
+    reverse of \code{h}.  The output is not allowed to be aliased with
+    any of the inputs.
+
+    The algorithm used is Horner's rule.
+
+void fq_poly_compose_mod_horner_preinv(fq_poly_t res, const fq_poly_t f,
+                                       const fq_poly_t g, const fq_poly_t h,
+                                       const fq_poly_t hinv,
+                                       const fq_ctx_t ctx)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require
+    that $h$ is nonzero and that $f$ has smaller degree than
+    $h$. Furthermore, we require \code{hinv} to be the inverse of the
+    reverse of \code{h}.  The algorithm used is Horner's rule.
+
 
 void _fq_poly_compose_mod_brent_kung(fq_struct * res,
                                      const fq_struct * f, slong lenf,
@@ -1277,6 +1304,33 @@ void fq_poly_compose_mod(fq_poly_t res, const fq_poly_t f, const fq_poly_t g,
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require
     that $h$ is nonzero.
+
+void _fq_poly_compose_mod_preinv(fq_struct * res,
+                                 const fq_struct * f, slong lenf,
+                                 const fq_struct * g,
+                                 const fq_struct * h, slong lenh,
+                                 const fq_struct * hinv, slong lenhiv,
+                                 const fq_ctx_t ctx)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require
+    that $h$ is nonzero and that the length of $g$ is one less than
+    the length of $h$ (possibly with zero padding). We also require
+    that the length of $f$ is less than the length of
+    $h$. Furthermore, we require \code{hinv} to be the inverse of the
+    reverse of \code{h}.  The output is not allowed to be aliased with
+    any of the inputs.
+
+void fq_poly_compose_mod_preinv(fq_poly_t res, const fq_poly_t f,
+                                const fq_poly_t g, const fq_poly_t h,
+                                const fq_poly_t hinv,
+                                const fq_ctx_t ctx)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require
+    that $h$ is nonzero and that $f$ has smaller degree than
+    $h$. Furthermore, we require \code{hinv} to be the inverse of the
+    reverse of \code{h}.
+
+
 
 
 

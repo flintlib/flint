@@ -720,6 +720,20 @@ fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
                     const fq_ctx_t ctx);
 
 void
+_fq_poly_compose_mod_preinv(fq_struct * res, 
+                            const fq_struct * f, slong lenf, 
+                            const fq_struct * g,
+                            const fq_struct * h, slong lenh, 
+                            const fq_struct * hinv, slong lenhinv, 
+                            const fq_ctx_t ctx);
+
+void
+fq_poly_compose_mod_preinv(fq_poly_t res, const fq_poly_t poly1,
+                           const fq_poly_t poly2, const fq_poly_t poly3,
+                           const fq_poly_t poly3inv, const fq_ctx_t ctx);
+
+
+void
 _fq_poly_compose_mod_horner(fq_struct * res,
                             const fq_struct * f, slong lenf, 
                             const fq_struct * g,
@@ -732,6 +746,19 @@ fq_poly_compose_mod_horner(fq_poly_t res,
                            const fq_poly_t poly2,
                            const fq_poly_t poly3,
                            const fq_ctx_t ctx);
+
+void
+_fq_poly_compose_mod_horner_preinv(fq_struct * res,
+                                   const fq_struct * f, slong lenf, 
+                                   const fq_struct * g,
+                                   const fq_struct * h, slong lenh, 
+                                   const fq_struct * hinv, slong lenhinv, 
+                                   const fq_ctx_t ctx);
+
+void
+fq_poly_compose_mod_horner_preinv(fq_poly_t res, const fq_poly_t poly1,
+                                  const fq_poly_t poly2, const fq_poly_t poly3,
+                                  const fq_poly_t poly3inv, const fq_ctx_t ctx);
 
 void
 fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
