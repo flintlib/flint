@@ -24,9 +24,7 @@ export
 SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-INSTALL_HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h templates.h
-TEMPLATE_HEADERS = $(patsubst %, %/header.h, $(TEMPLATE_DIRS))
-HEADERS = $(INSTALL_HEADERS) $(TEMPLATE_HEADERS)
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h templates.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
@@ -160,18 +158,16 @@ endif
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
 	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
-	$(foreach dir, $(TEMPLATE_DIRS), mkdir -p $(DESTDIR)$(PREFIX)/include/flint/$(dir);)
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/lib; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
-	cp $(INSTALL_HEADERS) $(DESTDIR)$(PREFIX)/include/flint
+	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/flint
 	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
 		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint; \
 	fi
-	$(foreach dir, $(TEMPLATE_DIRS), cp $(dir)/header.h $(DESTDIR)$(PREFIX)/include/flint/$(dir);)
 	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
 	cp qadic/CPimport.txt $(DESTDIR)$(FLINT_CPIMPORT_DIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/flint/flintxx

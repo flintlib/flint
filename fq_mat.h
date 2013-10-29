@@ -38,7 +38,7 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_mat_templates/header.h"
+#include "fq_mat_templates.h"
 #undef CAP_T
 #undef T
 
