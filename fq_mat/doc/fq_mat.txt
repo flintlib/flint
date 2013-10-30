@@ -235,24 +235,21 @@ void fq_mat_mul(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
     Sets $C = AB$. Dimensions must be compatible for matrix
     multiplication.  $C$ is not allowed to be aliased with $A$ or
     $B$. This function automatically chooses between classical and
-    Strassen multiplication.
+    KS multiplication.
 
 void fq_mat_mul_classical(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
                           const fq_ctx_t ctx)
 
     Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
     $C$ is not allowed to be aliased with $A$ or $B$. Uses classical
-    matrix multiplication, creating a temporary transposed copy of $B$
-    to improve memory locality if the matrices are large enough,
-    and packing several entries of $B$ into each word if the modulus
-    is very small.
-
-void fq_mat_mul_strassen(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
+    matrix multiplication.
+void fq_mat_mul_KS(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
                          const fq_ctx_t ctx)
 
-    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
-    $C$ is not allowed to be aliased with $A$ or $B$. Uses Strassen
-    multiplication (the Strassen-Winograd variant).
+    Sets $C = AB$. Dimensions must be compatible for matrix
+    multiplication.  $C$ is not allowed to be aliased with $A$ or
+    $B$. Uses Kronecker substitution to perform the multiplication
+    over the integers.
 
 void fq_mat_submul(fq_mat_t D, const fq_mat_t C, const fq_mat_t A,
                    const fq_mat_t B, const fq_ctx_t ctx)
