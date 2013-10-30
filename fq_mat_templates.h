@@ -210,6 +210,13 @@ TEMPLATE(T, mat_mul_classical)(TEMPLATE(T, mat_t) C,
                                const TEMPLATE(T, mat_t) B, 
                                const TEMPLATE(T, ctx_t) ctx);
 
+
+void
+TEMPLATE(T, mat_mul_KS)(TEMPLATE(T, mat_t) C,
+                        const TEMPLATE(T, mat_t) A,
+                        const TEMPLATE(T, mat_t) B, 
+                        const TEMPLATE(T, ctx_t) ctx);
+
 slong 
 TEMPLATE(T, mat_lu)(slong * P,
                     TEMPLATE(T, mat_t) A,
