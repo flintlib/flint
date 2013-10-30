@@ -36,6 +36,14 @@
 /* Cutoff between classical and recursive LU decomposition */
 #define FQ_MAT_LU_RECURSIVE_CUTOFF 4
 
+static __inline__ int FQ_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_ctx_t ctx)
+{
+    if (5 * FLINT_MIN(r, c) > 8 * fq_ctx_degree(ctx) + 29)
+        return 1;
+    else
+        return 0;
+}
+
 #define T fq
 #define CAP_T FQ
 #include "fq_mat_templates.h"
