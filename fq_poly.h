@@ -210,6 +210,20 @@ void
 fq_poly_factor(fq_poly_factor_t result, fq_t leading_coeff,
                const fq_poly_t input, const fq_ctx_t ctx);
 
+static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
+{
+    if ((fq_ctx_degree(ctx) == 2 && length > 10) ||
+        (fmpz_cmp_ui(fq_ctx_prime(ctx), 2) == 0 && 2*length > fq_ctx_degree(ctx)) ||
+        (fmpz_cmp_ui(fq_ctx_prime(ctx), 3) == 0 && 10*length > fq_ctx_degree(ctx)) ||
+        (fmpz_cmp_ui(fq_ctx_prime(ctx), 5) == 0 && 15*length > fq_ctx_degree(ctx)))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 /*  Assignment and basic manipulation  ***************************************/
 

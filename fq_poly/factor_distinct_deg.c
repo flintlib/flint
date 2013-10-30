@@ -75,10 +75,20 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
 
     /* compute baby steps: h[i]=x^{q^i}mod v */
     /*     h[0] = x */
-    fq_poly_gen(h[0], ctx);
-    fq_poly_powmod_fmpz_binexp_preinv(h[1], h[0], q, v, vinv, ctx);
-    for (i = 2; i < l + 1; i++)
-        fq_poly_compose_mod_brent_kung_preinv(h[i], h[i-1], h[1], v, vinv, ctx);
+    /* TODO: Better cutoff */
+    if (FQ_POLY_ITERATED_FROBENIUS_CUTOFF(ctx, v->length))
+    {
+        fq_poly_gen(h[0], ctx);
+        for (i = 1; i < l + 1; i++)
+            fq_poly_powmod_fmpz_binexp_preinv(h[i], h[i-1], q, v, vinv, ctx);
+    }
+    else
+    {
+        fq_poly_gen(h[0], ctx);
+        fq_poly_powmod_fmpz_binexp_preinv(h[1], h[0], q, v, vinv, ctx);
+        for (i = 2; i < l + 1; i++)
+            fq_poly_compose_mod_brent_kung_preinv(h[i], h[i-1], h[1], v, vinv, ctx);
+    }
 
     /* compute coarse distinct-degree factorisation */
     index = 0;
