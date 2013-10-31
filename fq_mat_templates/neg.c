@@ -29,9 +29,9 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_neg)(TEMPLATE(T, mat_t) res,
-                     const TEMPLATE(T, mat_t) mat,
-                     const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_neg) (TEMPLATE(T, mat_t) res,
+                      const TEMPLATE(T, mat_t) mat,
+                      const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
@@ -39,7 +39,7 @@ TEMPLATE(T, mat_neg)(TEMPLATE(T, mat_t) res,
         return;
 
     for (i = 0; i < res->r; i++)
-        _TEMPLATE(T, vec_neg)(res->rows[i], mat->rows[i], res->c, ctx);
+        _TEMPLATE(T, vec_neg) (res->rows[i], mat->rows[i], res->c, ctx);
 }
 
 

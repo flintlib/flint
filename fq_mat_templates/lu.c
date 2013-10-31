@@ -28,11 +28,11 @@
 
 #include "templates.h"
 
-slong 
-TEMPLATE(T, mat_lu)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
-                    const TEMPLATE(T, ctx_t) ctx)
+slong
+TEMPLATE(T, mat_lu) (slong * P, TEMPLATE(T, mat_t) A, int rank_check,
+                     const TEMPLATE(T, ctx_t) ctx)
 {
-    return TEMPLATE(T, mat_lu_recursive)(P, A, rank_check, ctx);
+    return TEMPLATE(T, mat_lu_recursive) (P, A, rank_check, ctx);
 }
 
 

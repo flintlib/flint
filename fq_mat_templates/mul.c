@@ -29,15 +29,14 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_mul)(TEMPLATE(T, mat_t) C,
-                     const TEMPLATE(T, mat_t) A,
-                     const TEMPLATE(T, mat_t) B,
-                     const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_mul) (TEMPLATE(T, mat_t) C,
+                      const TEMPLATE(T, mat_t) A,
+                      const TEMPLATE(T, mat_t) B, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (TEMPLATE(CAP_T, MAT_MUL_KS_CUTOFF)(A->r, B->c, ctx))
-        TEMPLATE(T, mat_mul_KS)(C, A, B, ctx);
+    if (TEMPLATE(CAP_T, MAT_MUL_KS_CUTOFF) (A->r, B->c, ctx))
+        TEMPLATE(T, mat_mul_KS) (C, A, B, ctx);
     else
-        TEMPLATE(T, mat_mul_classical)(C, A, B, ctx);
+        TEMPLATE(T, mat_mul_classical) (C, A, B, ctx);
 }
 
 

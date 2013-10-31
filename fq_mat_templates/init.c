@@ -29,21 +29,21 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong cols,
-                      const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_init) (TEMPLATE(T, mat_t) mat, slong rows, slong cols,
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     if ((rows) && (cols))       /* Allocate space for r*c small entries */
     {
         slong i, j;
         mat->entries = flint_malloc(rows * cols * sizeof(TEMPLATE(T, struct)));
-        mat->rows =  flint_malloc(rows * sizeof(TEMPLATE(T, struct) *));    /* Initialise rows */
+        mat->rows = flint_malloc(rows * sizeof(TEMPLATE(T, struct) *)); /* Initialise rows */
 
         for (i = 0; i < rows; i++)
         {
             mat->rows[i] = mat->entries + i * cols;
             for (j = 0; j < cols; j++)
             {
-                TEMPLATE(T, init)(mat->rows[i] + j, ctx);
+                TEMPLATE(T, init) (mat->rows[i] + j, ctx);
             }
         }
     }

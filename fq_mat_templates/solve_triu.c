@@ -29,18 +29,18 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_solve_triu)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) U,
-                            const TEMPLATE(T, mat_t) B, int unit,
-                            const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_solve_triu) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) U,
+                             const TEMPLATE(T, mat_t) B, int unit,
+                             const TEMPLATE(T, ctx_t) ctx)
 {
     if (B->r < TEMPLATE(CAP_T, MAT_SOLVE_TRI_ROWS_CUTOFF) ||
         B->c < TEMPLATE(CAP_T, MAT_SOLVE_TRI_COLS_CUTOFF))
     {
-        TEMPLATE(T, mat_solve_triu_classical)(X, U, B, unit, ctx);
+        TEMPLATE(T, mat_solve_triu_classical) (X, U, B, unit, ctx);
     }
     else
     {
-        TEMPLATE(T, mat_solve_triu_recursive)(X, U, B, unit, ctx);
+        TEMPLATE(T, mat_solve_triu_recursive) (X, U, B, unit, ctx);
     }
 }
 

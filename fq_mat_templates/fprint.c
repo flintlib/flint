@@ -68,8 +68,8 @@ do {                                                   \
         return z;                                      \
 } while(0)
 
-int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat,
-                            const TEMPLATE(T, ctx_t) ctx)
+int TEMPLATE(T, mat_fprint) (FILE * file, const TEMPLATE(T, mat_t) mat,
+                             const TEMPLATE(T, ctx_t) ctx)
 {
     int z;
     slong i, j;
@@ -92,8 +92,8 @@ int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat,
     return z;
 }
 
-int TEMPLATE(T, mat_fprint_pretty)(FILE * file, const TEMPLATE(T, mat_t) mat,
-                                   const TEMPLATE(T, ctx_t) ctx)
+int TEMPLATE(T, mat_fprint_pretty) (FILE * file, const TEMPLATE(T, mat_t) mat,
+                                    const TEMPLATE(T, ctx_t) ctx)
 {
     int z;
     slong i, j;

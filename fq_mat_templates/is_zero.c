@@ -29,8 +29,8 @@
 #include "templates.h"
 
 int
-TEMPLATE(T, mat_is_zero)(const TEMPLATE(T, mat_t) mat,
-                         const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_is_zero) (const TEMPLATE(T, mat_t) mat,
+                          const TEMPLATE(T, ctx_t) ctx)
 {
     slong j;
 
@@ -39,7 +39,7 @@ TEMPLATE(T, mat_is_zero)(const TEMPLATE(T, mat_t) mat,
 
     for (j = 0; j < mat->r; j++)
     {
-        if (!_TEMPLATE(T, vec_is_zero)(mat->rows[j], mat->c, ctx))
+        if (!_TEMPLATE(T, vec_is_zero) (mat->rows[j], mat->c, ctx))
             return 0;
     }
 

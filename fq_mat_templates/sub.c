@@ -29,10 +29,10 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_sub)(TEMPLATE(T, mat_t) res,
-                     const TEMPLATE(T, mat_t) mat1,
-                     const TEMPLATE(T, mat_t) mat2,
-                     const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_sub) (TEMPLATE(T, mat_t) res,
+                      const TEMPLATE(T, mat_t) mat1,
+                      const TEMPLATE(T, mat_t) mat2,
+                      const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
@@ -40,7 +40,8 @@ TEMPLATE(T, mat_sub)(TEMPLATE(T, mat_t) res,
         return;
 
     for (i = 0; i < res->r; i++)
-        _TEMPLATE(T, vec_sub)(res->rows[i], mat1->rows[i], mat2->rows[i], res->c, ctx);
+        _TEMPLATE(T, vec_sub) (res->rows[i], mat1->rows[i], mat2->rows[i],
+                               res->c, ctx);
 }
 
 

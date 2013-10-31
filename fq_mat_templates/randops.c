@@ -29,8 +29,8 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count, flint_rand_t state,
-                         const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat, slong count,
+                          flint_rand_t state, const TEMPLATE(T, ctx_t) ctx)
 {
     slong c, i, j, k;
     slong m = mat->r;
@@ -48,16 +48,12 @@ TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count, flint_rand_t state
 
             if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
-                    TEMPLATE(T, add)(mat->rows[j] + k,
-                                     mat->rows[j] + k,
-                                     mat->rows[i] + k,
-                                     ctx);
+                    TEMPLATE(T, add) (mat->rows[j] + k,
+                                      mat->rows[j] + k, mat->rows[i] + k, ctx);
             else
                 for (k = 0; k < n; k++)
-                    TEMPLATE(T, sub)(mat->rows[j] + k,
-                                     mat->rows[j] + k,
-                                     mat->rows[i] + k,
-                                     ctx);
+                    TEMPLATE(T, sub) (mat->rows[j] + k,
+                                      mat->rows[j] + k, mat->rows[i] + k, ctx);
         }
         else
         {
@@ -65,16 +61,12 @@ TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count, flint_rand_t state
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
-                    TEMPLATE(T, add)(mat->rows[k] + j,
-                                     mat->rows[k] + j,
-                                     mat->rows[k] + i,
-                                     ctx);
+                    TEMPLATE(T, add) (mat->rows[k] + j,
+                                      mat->rows[k] + j, mat->rows[k] + i, ctx);
             else
                 for (k = 0; k < m; k++)
-                    TEMPLATE(T, sub)(mat->rows[k] + j, 
-                                     mat->rows[k] + j,
-                                     mat->rows[k] + i,
-                                     ctx);
+                    TEMPLATE(T, sub) (mat->rows[k] + j,
+                                      mat->rows[k] + j, mat->rows[k] + i, ctx);
         }
     }
 }

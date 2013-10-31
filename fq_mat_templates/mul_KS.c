@@ -30,10 +30,10 @@
 #include "fmpz_mat.h"
 
 void
-TEMPLATE(T, mat_mul_KS)(TEMPLATE(T, mat_t) C,
-                        const TEMPLATE(T, mat_t) A,
-                        const TEMPLATE(T, mat_t) B, 
-                        const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
+                         const TEMPLATE(T, mat_t) A,
+                         const TEMPLATE(T, mat_t) B,
+                         const TEMPLATE(T, ctx_t) ctx)
 {
     long bits;
     slong ar, bc, br;
@@ -47,12 +47,12 @@ TEMPLATE(T, mat_mul_KS)(TEMPLATE(T, mat_t) C,
 
     if (br == 0)
     {
-        TEMPLATE(T, mat_zero)(C, ctx);
+        TEMPLATE(T, mat_zero) (C, ctx);
         return;
     }
 
     /* Compute the number of bits needed */
-    
+
     /* TODO: Make this generic based on say an TEMPLATE(T,
      * bits_needed) and TEMPLATE(T, bit_pack) */
     fmpz_init(beta);
@@ -70,22 +70,22 @@ TEMPLATE(T, mat_mul_KS)(TEMPLATE(T, mat_t) C,
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)
             fmpz_poly_bit_pack(fmpz_mat_entry(fa, i, j),
-                               TEMPLATE(T, mat_entry)(A, i, j), bits);
+                               TEMPLATE(T, mat_entry) (A, i, j), bits);
 
     for (i = 0; i < B->r; i++)
         for (j = 0; j < B->c; j++)
             fmpz_poly_bit_pack(fmpz_mat_entry(fb, i, j),
-                               TEMPLATE(T, mat_entry)(B, i, j), bits);
-    
+                               TEMPLATE(T, mat_entry) (B, i, j), bits);
+
     fmpz_mat_mul(fc, fa, fb);
 
     for (i = 0; i < ar; i++)
     {
         for (j = 0; j < bc; j++)
         {
-            fmpz_poly_bit_unpack_unsigned(TEMPLATE(T, mat_entry)(C, i, j),
+            fmpz_poly_bit_unpack_unsigned(TEMPLATE(T, mat_entry) (C, i, j),
                                           fmpz_mat_entry(fc, i, j), bits);
-            TEMPLATE(T, reduce)(TEMPLATE(T, mat_entry)(C, i, j), ctx);
+            TEMPLATE(T, reduce) (TEMPLATE(T, mat_entry) (C, i, j), ctx);
         }
     }
 

@@ -29,8 +29,8 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_t state, slong rank,
-                          const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_randrank) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
+                           slong rank, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     TEMPLATE(T, struct) * diag;
@@ -41,13 +41,13 @@ TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_t state, slong rank
         abort();
     }
 
-    diag = _TEMPLATE(T, vec_init)(rank, ctx);
+    diag = _TEMPLATE(T, vec_init) (rank, ctx);
     for (i = 0; i < rank; i++)
-        TEMPLATE(T, randtest_not_zero)(diag + i, state, ctx);
+        TEMPLATE(T, randtest_not_zero) (diag + i, state, ctx);
 
-    TEMPLATE(T, mat_randpermdiag)(mat, state, diag, rank, ctx);
+    TEMPLATE(T, mat_randpermdiag) (mat, state, diag, rank, ctx);
 
-    _TEMPLATE(T, vec_clear)(diag, rank, ctx);
+    _TEMPLATE(T, vec_clear) (diag, rank, ctx);
 }
 
 

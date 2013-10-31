@@ -29,17 +29,17 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_submul)(TEMPLATE(T, mat_t) D,
-                        const TEMPLATE(T, mat_t) C,
-                        const TEMPLATE(T, mat_t) A,
-                        const TEMPLATE(T, mat_t) B,
-                        const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_submul) (TEMPLATE(T, mat_t) D,
+                         const TEMPLATE(T, mat_t) C,
+                         const TEMPLATE(T, mat_t) A,
+                         const TEMPLATE(T, mat_t) B,
+                         const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, mat_t) tmp;
-    TEMPLATE(T, mat_init)(tmp, A->r, B->c, ctx);
-    TEMPLATE(T, mat_mul)(tmp, A, B, ctx);
-    TEMPLATE(T, mat_sub)(D, C, tmp, ctx);
-    TEMPLATE(T, mat_clear)(tmp, ctx);
+    TEMPLATE(T, mat_init) (tmp, A->r, B->c, ctx);
+    TEMPLATE(T, mat_mul) (tmp, A, B, ctx);
+    TEMPLATE(T, mat_sub) (D, C, tmp, ctx);
+    TEMPLATE(T, mat_clear) (tmp, ctx);
 }
 
 

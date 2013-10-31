@@ -34,18 +34,19 @@
 #include "ulong_extras.h"
 
 static __inline__ int
-TEMPLATE(T, mat_pivot)(TEMPLATE(T, mat_t) A, slong * P, slong start_row, slong col,
-                       const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_pivot) (TEMPLATE(T, mat_t) A, slong * P, slong start_row,
+                        slong col, const TEMPLATE(T, ctx_t) ctx)
 {
     slong j, t;
     TEMPLATE(T, struct) * u;
 
-    if (!TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(A, start_row, col), ctx))
+    if (!TEMPLATE(T, is_zero)
+        (TEMPLATE(T, mat_entry) (A, start_row, col), ctx))
         return 1;
 
     for (j = start_row + 1; j < A->r; j++)
     {
-        if (!TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(A, j, col), ctx))
+        if (!TEMPLATE(T, is_zero) (TEMPLATE(T, mat_entry) (A, j, col), ctx))
         {
             u = A->rows[j];
             A->rows[j] = A->rows[start_row];
@@ -62,14 +63,13 @@ TEMPLATE(T, mat_pivot)(TEMPLATE(T, mat_t) A, slong * P, slong start_row, slong c
 }
 
 
-slong 
-TEMPLATE(T, mat_lu_classical)(slong * P,
-                              TEMPLATE(T, mat_t) A,
-                              int rank_check,
-                              const TEMPLATE(T, ctx_t) ctx)
+slong
+TEMPLATE(T, mat_lu_classical) (slong * P,
+                               TEMPLATE(T, mat_t) A,
+                               int rank_check, const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, t) d, e, neg_e;
-    TEMPLATE(T, struct) **a;
+    TEMPLATE(T, struct) ** a;
     slong i, m, n, rank, length, row, col;
 
     m = A->r;
@@ -81,13 +81,13 @@ TEMPLATE(T, mat_lu_classical)(slong * P,
     for (i = 0; i < m; i++)
         P[i] = i;
 
-    TEMPLATE(T, init)(d, ctx);
-    TEMPLATE(T, init)(e, ctx);
-    TEMPLATE(T, init)(neg_e, ctx);
+    TEMPLATE(T, init) (d, ctx);
+    TEMPLATE(T, init) (e, ctx);
+    TEMPLATE(T, init) (neg_e, ctx);
 
     while (row < m && col < n)
     {
-        if (TEMPLATE(T, mat_pivot)(A, P, row, col, ctx) == 0)
+        if (TEMPLATE(T, mat_pivot) (A, P, row, col, ctx) == 0)
         {
             if (rank_check)
                 return 0;
@@ -97,34 +97,31 @@ TEMPLATE(T, mat_lu_classical)(slong * P,
 
         rank++;
 
-        TEMPLATE(T, inv)(d, a[row] + col, ctx);
+        TEMPLATE(T, inv) (d, a[row] + col, ctx);
 
         length = n - col - 1;
 
         for (i = row + 1; i < m; i++)
         {
-            TEMPLATE(T, mul)(e, a[i] + col, d, ctx);
+            TEMPLATE(T, mul) (e, a[i] + col, d, ctx);
             if (length != 0)
             {
-                TEMPLATE(T, neg)(neg_e, e, ctx);
-                _TEMPLATE(T, TEMPLATE(vec_scalar_addmul, T))(
-                    a[i] + col + 1,
-                    a[row] + col + 1,
-                    length,
-                    neg_e,
-                    ctx);
+                TEMPLATE(T, neg) (neg_e, e, ctx);
+                _TEMPLATE3(T, vec_scalar_addmul, T) (a[i] + col + 1,
+                                                     a[row] + col + 1,
+                                                     length, neg_e, ctx);
             }
 
-            TEMPLATE(T, zero)(a[i] + col, ctx);
-            TEMPLATE(T, set)(a[i] + rank - 1, e, ctx);
+            TEMPLATE(T, zero) (a[i] + col, ctx);
+            TEMPLATE(T, set) (a[i] + rank - 1, e, ctx);
         }
         row++;
         col++;
     }
-   
-    TEMPLATE(T, clear)(d, ctx);
-    TEMPLATE(T, clear)(e, ctx);
-    TEMPLATE(T, clear)(neg_e, ctx);
+
+    TEMPLATE(T, clear) (d, ctx);
+    TEMPLATE(T, clear) (e, ctx);
+    TEMPLATE(T, clear) (neg_e, ctx);
 
     return rank;
 }

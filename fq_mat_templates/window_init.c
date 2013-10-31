@@ -29,15 +29,15 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
-                             const TEMPLATE(T, mat_t) mat,
-                             slong r1, slong c1, slong r2, slong c2,
-                             const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_window_init) (TEMPLATE(T, mat_t) window,
+                              const TEMPLATE(T, mat_t) mat,
+                              slong r1, slong c1, slong r2, slong c2,
+                              const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     window->entries = NULL;
 
-    window->rows = flint_malloc((r2 - r1) * sizeof(TEMPLATE(T, struct)*));
+    window->rows = flint_malloc((r2 - r1) * sizeof(TEMPLATE(T, struct) *));
 
     for (i = 0; i < r2 - r1; i++)
         window->rows[i] = mat->rows[r1 + i] + c1;

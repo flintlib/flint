@@ -28,14 +28,13 @@
 
 #include "templates.h"
 
-void
-TEMPLATE(T, mat_zero)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
+void TEMPLATE(T, mat_zero) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)
-            TEMPLATE(T, zero)(TEMPLATE(T, mat_entry)(A, i, j), ctx);
+            TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, i, j), ctx);
 }
 
 
