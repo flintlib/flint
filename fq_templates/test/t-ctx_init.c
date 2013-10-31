@@ -39,7 +39,7 @@
 int
 main(void)
 {
-    int i, j, k, result;
+    int i, k, result;
     flint_rand_t state;
 
     flint_printf("ctx_init... ");
@@ -64,7 +64,6 @@ main(void)
         fmpz_t p;
         long d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;
-        fmpz_mod_poly_t modulus;
 
         TEMPLATE(T, t) a, b, lhs, rhs;
 
@@ -73,12 +72,7 @@ main(void)
         d = n_randint(state, 10) + 1;
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
 
-        fmpz_mod_poly_init(modulus, p);
-        fmpz_mod_poly_zero(modulus);
-        for (j = 0; j < ctx_conway->len; j++)
-            fmpz_mod_poly_set_coeff_fmpz(modulus, ctx_conway->j[j], &ctx_conway->a[j]);
-
-        TEMPLATE(T, ctx_init_modulus)(ctx_mod, p, d, modulus, "a");
+        TEMPLATE(T, ctx_init_modulus)(ctx_mod, p, d, ctx_conway->modulus, "a");
 
         TEMPLATE(T, init)(a, ctx_conway);
         TEMPLATE(T, init)(b, ctx_mod);
@@ -112,7 +106,6 @@ main(void)
         TEMPLATE(T, clear)(lhs, ctx_conway);
         TEMPLATE(T, clear)(rhs, ctx_mod);
 
-        fmpz_mod_poly_clear(modulus);
         TEMPLATE(T, ctx_clear)(ctx_conway);
         TEMPLATE(T, ctx_clear)(ctx_mod);
 
