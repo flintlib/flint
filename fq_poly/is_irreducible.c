@@ -22,15 +22,17 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
+
 #include "fq_poly.h"
 
-int
-fq_poly_is_irreducible(const fq_poly_t f, const fq_ctx_t ctx)
-{
-    if (fq_poly_length(f, ctx) > 2)
-    {
-        return fq_poly_is_irreducible_ddf(f, ctx);
-    }
 
-    return 1;
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/is_irreducible.c"
+#undef CAP_T
+#undef T

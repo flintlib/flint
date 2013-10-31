@@ -21,37 +21,20 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-ulong
-fq_poly_deflation(const fq_poly_t input, const fq_ctx_t ctx)
-{
-    ulong deflation;
-    slong i, coeff;
 
-    if (input->length <= 1)
-        return input->length;
 
-    coeff = 1;
-    while (fq_is_zero(input->coeffs + coeff, ctx))
-        coeff++;
+#ifdef T
+#undef T
+#endif
 
-    deflation = n_gcd_full(input->length - 1, coeff);
-
-    while ((deflation > 1) && (coeff + deflation < input->length))
-    {
-        for (i = 0; i < deflation - 1; i++)
-        {
-            coeff++;
-            if (!fq_is_zero(input->coeffs + coeff, ctx))
-                deflation = n_gcd_full(coeff, deflation);
-        }
-        if (i == deflation - 1)
-            coeff++;
-    }
-
-    return deflation;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/deflation.c"
+#undef CAP_T
+#undef T

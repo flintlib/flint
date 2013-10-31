@@ -20,25 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_neg(fq_struct * rop, const fq_struct * op, long len,
-             const fq_ctx_t ctx)
-{
-    long i;
 
-    for (i = 0; i < len; i++)
-        fq_neg(rop + i, op + i, ctx);
-}
 
-void
-fq_poly_neg(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
-{
-    fq_poly_fit_length(rop, op->length, ctx);
-    _fq_poly_neg(rop->coeffs, op->coeffs, op->length, ctx);
-    _fq_poly_set_length(rop, op->length, ctx);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/neg.c"
+#undef CAP_T
+#undef T

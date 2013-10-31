@@ -20,109 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-/*
-    TODO:  When op has only one non-zero term, this 
-    function would omit the parentheses.
- */
 
-static void
-__fq_print(FILE * file, const fq_struct * op, const fq_ctx_t ctx)
-{
-    fputc('(', file);
-    fq_fprint_pretty(file, op, ctx);
-    fputc(')', file);
-}
 
-int
-_fq_poly_fprint_pretty(FILE * file, const fq_struct * poly, long len,
-                       const char *x, const fq_ctx_t ctx)
-{
-    if (len == 0)
-    {
-        fputc('0', file);
-    }
-    else if (len == 1)
-    {
-        fq_fprint_pretty(file, poly + 0, ctx);
-    }
-    else if (len == 2)
-    {
-        if (fq_is_one(poly + 1, ctx))
-            flint_fprintf(file, "%s", x);
-        else
-        {
-            __fq_print(file, poly + 1, ctx);
-            flint_fprintf(file, "*%s", x);
-        }
-        if (!fq_is_zero(poly + 0, ctx))
-        {
-            fputc('+', file);
-            __fq_print(file, poly + 0, ctx);
-        }
-    }
-    else
-    {
-        long i = len - 1;
+#ifdef T
+#undef T
+#endif
 
-        {
-            if (fq_is_one(poly + i, ctx))
-                flint_fprintf(file, "%s^%ld", x, i);
-            else
-            {
-                __fq_print(file, poly + i, ctx);
-                flint_fprintf(file, "*%s^%ld", x, i);
-            }
-            --i;
-        }
-
-        for (; i > 1; --i)
-        {
-            if (fq_is_zero(poly + i, ctx))
-                continue;
-
-            if (fq_is_one(poly + i, ctx))
-                flint_fprintf(file, "+%s^%ld", x, i);
-            else
-            {
-                fputc('+', file);
-                __fq_print(file, poly + i, ctx);
-                flint_fprintf(file, "*%s^%ld", x, i);
-            }
-        }
-
-        if (!fq_is_zero(poly + 1, ctx))
-        {
-            if (fq_is_one(poly + 1, ctx))
-            {
-                fputc('+', file);
-                fputs(x, file);
-            }
-            else
-            {
-                fputc('+', file);
-                __fq_print(file, poly + 1, ctx);
-                fputc('*', file);
-                fputs(x, file);
-            }
-        }
-        if (!fq_is_zero(poly + 0, ctx))
-        {
-            fputc('+', file);
-            __fq_print(file, poly + 0, ctx);
-        }
-    }
-
-    return 1;
-}
-
-int
-fq_poly_fprint_pretty(FILE * file, const fq_poly_t poly, const char *x,
-                      const fq_ctx_t ctx)
-{
-    return _fq_poly_fprint_pretty(file, poly->coeffs, poly->length, x, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/fprint_pretty.c"
+#undef CAP_T
+#undef T

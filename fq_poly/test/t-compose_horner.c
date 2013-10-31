@@ -20,149 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "fq_poly.h"
 
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("compose_horner... ");
-    fflush(stdout);
+#ifdef T
+#undef T
+#endif
 
-    flint_randinit(state);
-
-    /* Check aliasing of the first argument */
-    for (i = 0; i < 50; i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t f, g, h;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(f, ctx);
-        fq_poly_init(g, ctx);
-        fq_poly_init(h, ctx);
-
-        fq_poly_randtest(f, state, n_randint(state, 40), ctx);
-        fq_poly_randtest(g, state, n_randint(state, 20), ctx);
-
-        fq_poly_compose_horner(h, f, g, ctx);
-        fq_poly_compose_horner(f, f, g, ctx);
-
-        result = (fq_poly_equal(f, h, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("f = "), fq_poly_print_pretty(f, "X", ctx), flint_printf("\n");
-            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
-            flint_printf("h = "), fq_poly_print_pretty(h, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(f, ctx);
-        fq_poly_clear(g, ctx);
-        fq_poly_clear(h, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Check aliasing of the second argument */
-    for (i = 0; i < 50; i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t f, g, h;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(f, ctx);
-        fq_poly_init(g, ctx);
-        fq_poly_init(h, ctx);
-
-        fq_poly_randtest(f, state, n_randint(state, 40), ctx);
-        fq_poly_randtest(g, state, n_randint(state, 20), ctx);
-
-        fq_poly_compose_horner(h, f, g, ctx);
-        fq_poly_compose_horner(g, f, g, ctx);
-
-        result = (fq_poly_equal(g, h, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("f = "), fq_poly_print_pretty(f, "X", ctx), flint_printf("\n");
-            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
-            flint_printf("h = "), fq_poly_print_pretty(h, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(f, ctx);
-        fq_poly_clear(g, ctx);
-        fq_poly_clear(h, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Compare with the naive method */
-    for (i = 0; i < 50; i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t f, g, h, s, t;
-        long k;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(f, ctx);
-        fq_poly_init(g, ctx);
-        fq_poly_init(h, ctx);
-        fq_poly_init(s, ctx);
-        fq_poly_init(t, ctx);
-
-        fq_poly_randtest(g, state, n_randint(state, 40), ctx);
-        fq_poly_randtest(h, state, n_randint(state, 20), ctx);
-
-        fq_poly_one(t, ctx);
-        for (k = 0; k < fq_poly_length(g, ctx); k++)
-        {
-            fq_poly_scalar_addmul_fq(s, t, g->coeffs + k, ctx);
-            fq_poly_mul(t, t, h, ctx);
-        }
-
-        fq_poly_compose_horner(f, g, h, ctx);
-
-        result = (fq_poly_equal(f, s, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("f = "), fq_poly_print_pretty(f, "X", ctx), flint_printf("\n");
-            flint_printf("g = "), fq_poly_print_pretty(g, "X", ctx), flint_printf("\n");
-            flint_printf("h = "), fq_poly_print_pretty(h, "X", ctx), flint_printf("\n");
-            flint_printf("s = "), fq_poly_print_pretty(s, "X", ctx), flint_printf("\n");
-            flint_printf("t = "), fq_poly_print_pretty(t, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(f, ctx);
-        fq_poly_clear(g, ctx);
-        fq_poly_clear(h, ctx);
-        fq_poly_clear(s, ctx);
-        fq_poly_clear(t, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-compose_horner.c"
+#undef CAP_T
+#undef T

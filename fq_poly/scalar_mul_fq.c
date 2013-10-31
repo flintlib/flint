@@ -21,34 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_scalar_mul_fq(fq_struct * rop,
-                       const fq_struct * op, long len, const fq_t x,
-                       const fq_ctx_t ctx)
-{
-    long i;
 
-    for (i = 0; i < len; i++)
-        fq_mul(rop + i, op + i, x, ctx);
-}
 
-void
-fq_poly_scalar_mul_fq(fq_poly_t rop,
-                      const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
-{
-    if (fq_is_zero(x, ctx) || fq_poly_is_zero(op, ctx))
-    {
-        fq_poly_zero(rop, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(rop, op->length, ctx);
-        _fq_poly_scalar_mul_fq(rop->coeffs, op->coeffs, op->length, x, ctx);
-        _fq_poly_set_length(rop, op->length, ctx);
-    }
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/scalar_mul_fq.c"
+#undef CAP_T
+#undef T

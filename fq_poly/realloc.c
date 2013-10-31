@@ -21,42 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
    
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_realloc(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
-{
-    long i;
 
-    if (alloc == 0)             /* Clear up, reinitialise */
-    {
-        fq_poly_clear(poly, ctx);
-        fq_poly_init(poly, ctx);
-    }
-    else if (poly->alloc)       /* Realloc */
-    {
-        for (i = alloc; i < poly->alloc; i++)
-            fq_clear(poly->coeffs + i, ctx);
 
-        poly->coeffs =
-            (fq_struct *) flint_realloc(poly->coeffs,
-                                        alloc * sizeof(fq_struct));
+#ifdef T
+#undef T
+#endif
 
-        for (i = poly->alloc; i < alloc; i++)
-            fq_init(poly->coeffs + i, ctx);
-
-        poly->length = FLINT_MIN(poly->length, alloc);
-        _fq_poly_normalise(poly, ctx);
-    }
-    else                        /* Nothing allocated already so do it now */
-    {
-        poly->coeffs = (fq_struct *) flint_malloc(alloc * sizeof(fq_struct));
-
-        for (i = 0; i < alloc; i++)
-            fq_init(poly->coeffs + i, ctx);
-    }
-    poly->alloc = alloc;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/realloc.c"
+#undef CAP_T
+#undef T

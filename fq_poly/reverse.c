@@ -25,51 +25,14 @@
 
 #include "fq_poly.h"
 
-void
-_fq_poly_reverse(fq_struct * res, const fq_struct * poly, slong len, slong n,
-                 const fq_ctx_t ctx)
-{
-    if (res == poly)
-    {
-        slong i;
 
-        for (i = 0; i < n / 2; i++)
-        {
-            fq_struct t = res[i];
-            res[i] = res[n - 1 - i];
-            res[n - 1 - i] = t;
-        }
 
-        for (i = 0; i < n - len; i++)
-            fq_zero(res + i, ctx);
-    }
-    else
-    {
-        slong i;
+#ifdef T
+#undef T
+#endif
 
-        for (i = 0; i < n - len; i++)
-            fq_zero(res + i, ctx);
-
-        for (i = 0; i < len; i++)
-            fq_set(res + (n - len) + i, poly + (len - 1) - i, ctx);
-    }
-}
-
-void
-fq_poly_reverse(fq_poly_t res, const fq_poly_t poly, slong n,
-                const fq_ctx_t ctx)
-{
-    slong len = FLINT_MIN(n, poly->length);
-    if (len == 0)
-    {
-        fq_poly_zero(res, ctx);
-        return;
-    }
-
-    fq_poly_fit_length(res, n, ctx);
-
-    _fq_poly_reverse(res->coeffs, poly->coeffs, len, n, ctx);
-
-    _fq_poly_set_length(res, n, ctx);
-    _fq_poly_normalise(res, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/reverse.c"
+#undef CAP_T
+#undef T

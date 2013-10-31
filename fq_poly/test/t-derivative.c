@@ -20,145 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "fq_poly.h"
 
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("derivative... ");
-    fflush(stdout);
+#ifdef T
+#undef T
+#endif
 
-    flint_randinit(state);
-
-    /* Check aliasing */
-    for (i = 0; i < 2000; i++)
-    {
-        long len;
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c;
-
-        len = n_randint(state, 15) + 1;
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-
-        fq_poly_randtest(a, state, len, ctx);
-        fq_poly_set(b, a, ctx);
-        fq_poly_derivative(c, b, ctx);
-        fq_poly_derivative(b, b, ctx);
-
-        result = (fq_poly_equal(b, c, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Check constants have derivative zero */
-    for (i = 0; i < 2000; i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 2), ctx);
-        fq_poly_derivative(b, a, ctx);
-
-        result = (fq_poly_is_zero(b, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Check (f g)' == f' g + f g'  */
-    for (i = 0; i < 2000; i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c, d, lhs, rhs;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-        fq_poly_init(d, ctx);
-        fq_poly_init(lhs, ctx);
-        fq_poly_init(rhs, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest(b, state, n_randint(state, 100), ctx);
-
-        fq_poly_mul(lhs, a, b, ctx);
-        fq_poly_derivative(lhs, lhs, ctx);
-        fq_poly_derivative(c, a, ctx);
-        fq_poly_derivative(d, b, ctx);
-        fq_poly_mul(c, c, b, ctx);
-        fq_poly_mul(d, a, d, ctx);
-        fq_poly_add(rhs, c, d, ctx);
-
-        result = (fq_poly_equal(lhs, rhs, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a   = "), fq_poly_print_pretty(a,   "X", ctx), flint_printf("\n");
-            flint_printf("b   = "), fq_poly_print_pretty(b,   "X", ctx), flint_printf("\n");
-            flint_printf("c   = "), fq_poly_print_pretty(c,   "X", ctx), flint_printf("\n");
-            flint_printf("d   = "), fq_poly_print_pretty(d,   "X", ctx), flint_printf("\n");
-            flint_printf("lhs = "), fq_poly_print_pretty(lhs, "X", ctx), flint_printf("\n");
-            flint_printf("rhs = "), fq_poly_print_pretty(rhs, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-        fq_poly_clear(d, ctx);
-        fq_poly_clear(lhs, ctx);
-        fq_poly_clear(rhs, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-derivative.c"
+#undef CAP_T
+#undef T

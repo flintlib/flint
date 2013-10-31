@@ -22,32 +22,20 @@
     Copyright (C) 2007, David Howden.
     Copyright (C) 2010 William Hart
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_make_monic(fq_struct * rop,
-                    const fq_struct * op, long length, const fq_ctx_t ctx)
-{
-    fq_t inv;
-    fq_init(inv, ctx);
-    fq_inv(inv, &op[length - 1], ctx);
-    _fq_poly_scalar_mul_fq(rop, op, length, inv, ctx);
-    fq_clear(inv, ctx);
-}
 
-void
-fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
-{
-    if (op->length == 0)
-    {
-        fq_poly_zero(rop, ctx);
-        return;
-    }
 
-    fq_poly_fit_length(rop, op->length, ctx);
-    _fq_poly_make_monic(rop->coeffs, op->coeffs, op->length, ctx);
-    _fq_poly_set_length(rop, op->length, ctx);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/make_monic.c"
+#undef CAP_T
+#undef T

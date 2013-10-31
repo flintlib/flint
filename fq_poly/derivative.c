@@ -20,35 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_derivative(fq_struct * rop, const fq_struct * op, long len,
-                    const fq_ctx_t ctx)
-{
-    long i;
 
-    for (i = 1; i < len; i++)
-        fq_mul_ui(rop + (i - 1), op + i, i, ctx);
-}
 
-void
-fq_poly_derivative(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
-{
-    const long len = op->length;
+#ifdef T
+#undef T
+#endif
 
-    if (len < 2)
-    {
-        fq_poly_zero(rop, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(rop, len - 1, ctx);
-        _fq_poly_derivative(rop->coeffs, op->coeffs, len, ctx);
-        _fq_poly_set_length(rop, len - 1, ctx);
-        _fq_poly_normalise(rop, ctx);
-    }
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/derivative.c"
+#undef CAP_T
+#undef T

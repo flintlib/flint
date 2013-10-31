@@ -21,19 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
    
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_fit_length(fq_poly_t poly, long len, const fq_ctx_t ctx)
-{
-    if (len > poly->alloc)
-    {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * poly->alloc)
-            len = 2 * poly->alloc;
-        fq_poly_realloc(poly, len, ctx);
-    }
-}
+
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/fit_length.c"
+#undef CAP_T
+#undef T

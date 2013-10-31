@@ -26,55 +26,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_factor_cantor_zassenhaus(fq_poly_factor_t res, const fq_poly_t f,
-                                 const fq_ctx_t ctx)
-{
-    fq_poly_t h, v, g, x;
-    fmpz_t q;
-    slong i, j, num;
 
-    fmpz_init(q);
-    fq_ctx_order(q, ctx);
 
-    fq_poly_init(h, ctx);
-    fq_poly_init(g, ctx);
-    fq_poly_init(v, ctx);
-    fq_poly_init(x, ctx);
+#ifdef T
+#undef T
+#endif
 
-    fq_poly_gen(h, ctx);
-    fq_poly_gen(x, ctx);
-
-    fq_poly_make_monic(v, f, ctx);
-
-    i = 0;
-    do
-    {
-        i++;
-        fq_poly_powmod_fmpz_binexp(h, h, q, v, ctx);
-
-        fq_poly_sub(h, h, x, ctx);
-        fq_poly_gcd(g, h, v, ctx);
-        fq_poly_add(h, h, x, ctx);
-
-        if (g->length != 1)
-        {
-            fq_poly_make_monic(g, g, ctx);
-            num = res->num;
-
-            fq_poly_factor_equal_deg(res, g, i, ctx);
-            for (j = num; j < res->num; j++)
-                res->exp[j] = fq_poly_remove(v, res->poly + j, ctx);
-        }
-    }
-    while (v->length >= 2 * i + 3);
-
-    if (v->length > 1)
-        fq_poly_factor_insert(res, v, 1, ctx);
-
-    fq_poly_clear(g, ctx);
-    fq_poly_clear(h, ctx);
-    fq_poly_clear(v, ctx);
-    fq_poly_clear(x, ctx);
-    fmpz_clear(q);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_cantor_zassenhaus.c"
+#undef CAP_T
+#undef T

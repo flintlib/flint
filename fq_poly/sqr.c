@@ -20,56 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_sqr(fq_struct * rop,
-             const fq_struct * op, long len, const fq_ctx_t ctx)
-{
-    const long d = fq_ctx_degree(ctx);
 
-    if (len < 6)
-    {
-        _fq_poly_sqr_classical(rop, op, len, ctx);
-    }
-    else if (d < 4)
-    {
-        _fq_poly_sqr_reorder(rop, op, len, ctx);
-    }
-    else
-    {
-        _fq_poly_sqr_KS(rop, op, len, ctx);
-    }
-}
 
-void
-fq_poly_sqr(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
-{
-    const long rlen = 2 * op->length - 1;
+#ifdef T
+#undef T
+#endif
 
-    if (op->length == 0)
-    {
-        fq_poly_zero(rop, ctx);
-        return;
-    }
-
-    if (rop == op)
-    {
-        fq_poly_t t;
-
-        fq_poly_init2(t, rlen, ctx);
-        _fq_poly_sqr(t->coeffs, op->coeffs, op->length, ctx);
-        fq_poly_swap(rop, t, ctx);
-        fq_poly_clear(t, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(rop, rlen, ctx);
-        _fq_poly_sqr(rop->coeffs, op->coeffs, op->length, ctx);
-    }
-
-    _fq_poly_set_length(rop, rlen, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/sqr.c"
+#undef CAP_T
+#undef T

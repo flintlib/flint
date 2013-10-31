@@ -20,133 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "fq_poly.h"
 
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("divides... ");
-    fflush(stdout);
+#ifdef T
+#undef T
+#endif
 
-    flint_randinit(state);
-
-    /* Check that b divides a b and that the quotient is a */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c, q;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-        fq_poly_init(q, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
-        fq_poly_mul(c, a, b, ctx);
-
-        result = fq_poly_divides(q, c, b, ctx) && fq_poly_equal(q, a, ctx);
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            flint_printf("q = "), fq_poly_print_pretty(q, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-        fq_poly_clear(q, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Check aliasing of a and q */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
-        fq_poly_mul(c, a, b, ctx);
-
-        result = fq_poly_divides(c, c, b, ctx) && fq_poly_equal(c, a, ctx);
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Check aliasing of b and q */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c;
-
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 50), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, ctx);
-        fq_poly_mul(c, a, b, ctx);
-
-        result = fq_poly_divides(b, c, b, ctx) && fq_poly_equal(b, a, ctx);
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-divides.c"
+#undef CAP_T
+#undef T

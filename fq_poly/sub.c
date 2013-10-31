@@ -20,41 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_sub(fq_struct * res,
-             const fq_struct * poly1, long len1,
-             const fq_struct * poly2, long len2, const fq_ctx_t ctx)
-{
-    const long min = FLINT_MIN(len1, len2);
-    long i;
 
-    for (i = 0; i < min; i++)
-        fq_sub(res + i, poly1 + i, poly2 + i, ctx);
 
-    if (poly1 != res)
-        for (i = min; i < len1; i++)
-            fq_set(res + i, poly1 + i, ctx);
+#ifdef T
+#undef T
+#endif
 
-    for (i = min; i < len2; i++)
-        fq_neg(res + i, poly2 + i, ctx);
-}
-
-void
-fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
-            const fq_ctx_t ctx)
-{
-    const long max = FLINT_MAX(poly1->length, poly2->length);
-
-    fq_poly_fit_length(res, max, ctx);
-
-    _fq_poly_sub(res->coeffs, poly1->coeffs, poly1->length,
-                 poly2->coeffs, poly2->length, ctx);
-
-    _fq_poly_set_length(res, max, ctx);
-    _fq_poly_normalise(res, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/sub.c"
+#undef CAP_T
+#undef T

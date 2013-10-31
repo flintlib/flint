@@ -27,128 +27,14 @@
 
 #include "fq_poly.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("div_basecase....");
-    fflush(stdout);
 
-    flint_randinit(state);
+#ifdef T
+#undef T
+#endif
 
-    /* Compare to divrem_basecase */
-    for (i = 0; i < 500; i++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t a, b, q, q2, r2;
-
-        fq_ctx_randtest(ctx, state);
-        
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(q, ctx);
-        fq_poly_init(q2, ctx);
-        fq_poly_init(r2, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
-
-        fq_poly_div_basecase(q, a, b, ctx);
-        fq_poly_divrem_basecase(q2, r2, a, b, ctx);
-
-        result = (fq_poly_equal(q, q2, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("ctx = "), fq_ctx_print(ctx), flint_printf("\n\n");
-            flint_printf("a = "), fq_poly_print(a, ctx), flint_printf("\n\n");
-            flint_printf("b = "), fq_poly_print(b, ctx), flint_printf("\n\n");
-            flint_printf("q = "), fq_poly_print(q, ctx), flint_printf("\n\n");
-            flint_printf("q2 = "), fq_poly_print(q2, ctx), flint_printf("\n\n");
-            flint_printf("r2 = "), fq_poly_print(r2, ctx), flint_printf("\n\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(q, ctx);
-        fq_poly_clear(q2, ctx);
-        fq_poly_clear(r2, ctx);
-        fq_ctx_clear(ctx);
-    }
-
-    /* Alias a and q */
-    for (i = 0; i < 500; i++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t a, b, q;
-
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(q, ctx);
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
-
-        fq_poly_div_basecase(q, a, b, ctx);
-        fq_poly_div_basecase(a, a, b, ctx);
-
-        result = (fq_poly_equal(q, a, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("ctx = "), fq_ctx_print(ctx), flint_printf("\n\n");
-            flint_printf("a = "), fq_poly_print(a, ctx), flint_printf("\n\n");
-            flint_printf("b = "), fq_poly_print(b, ctx), flint_printf("\n\n");
-            flint_printf("q = "), fq_poly_print(q, ctx), flint_printf("\n\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(q, ctx);
-        fq_ctx_clear(ctx);
-    }
-
-    /* Alias b and q */
-    for (i = 0; i < 500; i++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t a, b, q;
-
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(q, ctx);
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
-
-        fq_poly_div_basecase(q, a, b, ctx);
-        fq_poly_div_basecase(b, a, b, ctx);
-
-        result = (fq_poly_equal(q, b, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("ctx = "), fq_ctx_print(ctx), flint_printf("\n\n");
-            flint_printf("a = "), fq_poly_print(a, ctx), flint_printf("\n\n");
-            flint_printf("b = "), fq_poly_print(b, ctx), flint_printf("\n\n");
-            flint_printf("q = "), fq_poly_print(q, ctx), flint_printf("\n\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(q, ctx);
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-div_basecase.c"
+#undef CAP_T
+#undef T

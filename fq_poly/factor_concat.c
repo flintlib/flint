@@ -25,12 +25,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_factor_concat(fq_poly_factor_t res, const fq_poly_factor_t fac,
-                      const fq_ctx_t ctx)
-{
-    slong i;
 
-    for (i = 0; i < fac->num; i++)
-        fq_poly_factor_insert(res, fac->poly + i, fac->exp[i], ctx);
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_concat.c"
+#undef CAP_T
+#undef T

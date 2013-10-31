@@ -21,25 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_normalise(fq_poly_t poly, const fq_ctx_t ctx)
-{
-    long i;
 
-    for (i = poly->length - 1; (i >= 0) && fq_is_zero(poly->coeffs + i, ctx);
-         i--) ;
-    poly->length = i + 1;
-}
 
-void
-_fq_poly_normalise2(fq_struct * poly, long *length, const fq_ctx_t ctx)
-{
-    long i;
-    for (i = (*length) - 1; (i >= 0) && fq_is_zero(poly + i, ctx); i--) ;
-    (*length) = i + 1;
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/normalise.c"
+#undef CAP_T
+#undef T

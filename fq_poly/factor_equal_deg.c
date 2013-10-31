@@ -24,39 +24,14 @@
 ******************************************************************************/
 
 #include "fq_poly.h"
-#include "ulong_extras.h"
 
-void
-fq_poly_factor_equal_deg(fq_poly_factor_t factors, const fq_poly_t pol,
-                         slong d, const fq_ctx_t ctx)
-{
-    if (pol->length == d + 1)
-    {
-        fq_poly_factor_insert(factors, pol, 1, ctx);
-    }
-    else
-    {
-        fq_poly_t f, g, r;
-        flint_rand_t state;
 
-        fq_poly_init(f, ctx);
+#ifdef T
+#undef T
+#endif
 
-        flint_randinit(state);
-
-        while (!fq_poly_factor_equal_deg_prob(f, state, pol, d, ctx))
-        {
-        };
-
-        flint_randclear(state);
-
-        fq_poly_init(g, ctx);
-        fq_poly_init(r, ctx);
-        fq_poly_divrem(g, r, pol, f, ctx);
-        fq_poly_clear(r, ctx);
-
-        fq_poly_factor_equal_deg(factors, f, d, ctx);
-        fq_poly_clear(f, ctx);
-        fq_poly_factor_equal_deg(factors, g, d, ctx);
-        fq_poly_clear(g, ctx);
-    }
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_equal_deg.c"
+#undef CAP_T
+#undef T

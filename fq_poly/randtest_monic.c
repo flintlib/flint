@@ -27,18 +27,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_randtest_monic(fq_poly_t f, flint_rand_t state,
-                       long len, const fq_ctx_t ctx)
-{
-    long i;
 
-    fq_poly_fit_length(f, len, ctx);
-    for (i = 0; i < len - 1; i++)
-    {
-        fq_randtest(f->coeffs + i, state, ctx);
-    }
-    fq_one(f->coeffs + (len - 1), ctx);
-    _fq_poly_set_length(f, len, ctx);
-    _fq_poly_normalise(f, ctx);
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/randtest_monic.c"
+#undef CAP_T
+#undef T

@@ -23,58 +23,16 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
 #include "fq_poly.h"
 
-void
-fq_poly_factor_realloc(fq_poly_factor_t fac, slong alloc, const fq_ctx_t ctx)
-{
-    if (alloc == 0)             /* Clear up, reinitialise */
-    {
-        fq_poly_factor_clear(fac, ctx);
-        fq_poly_factor_init(fac, ctx);
-    }
-    else if (fac->alloc)        /* Realloc */
-    {
-        if (fac->alloc > alloc)
-        {
-            slong i;
 
-            for (i = alloc; i < fac->num; i++)
-                fq_poly_clear(fac->poly + i, ctx);
 
-            fac->poly =
-                flint_realloc(fac->poly, alloc * sizeof(fq_poly_struct));
-            fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
-            fac->alloc = alloc;
-        }
-        else if (fac->alloc < alloc)
-        {
-            slong i;
+#ifdef T
+#undef T
+#endif
 
-            fac->poly =
-                flint_realloc(fac->poly, alloc * sizeof(fq_poly_struct));
-            fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
-
-            for (i = fac->alloc; i < alloc; i++)
-            {
-                fq_poly_init(fac->poly + i, ctx);
-                fac->exp[i] = 0L;
-            }
-            fac->alloc = alloc;
-        }
-    }
-    else                        /* Nothing allocated already so do it now */
-    {
-        slong i;
-
-        fac->poly = flint_malloc(alloc * sizeof(fq_poly_struct));
-        fac->exp = flint_calloc(alloc, sizeof(slong));
-
-        for (i = 0; i < alloc; i++)
-            fq_poly_init(fac->poly + i, ctx);
-        fac->num = 0;
-        fac->alloc = alloc;
-    }
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_realloc.c"
+#undef CAP_T
+#undef T

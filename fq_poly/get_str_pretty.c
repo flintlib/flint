@@ -24,94 +24,14 @@
 ******************************************************************************/
 
 #include "fq_poly.h"
-#include <string.h>
-#include <math.h>
 
-char *
-_fq_poly_get_str_pretty(const fq_struct * poly, slong len, const char *x,
-                        const fq_ctx_t ctx)
-{
-    char *str, **coeffstrs;
-    size_t off;
-    slong i, bound, nz;
 
-    if (len == 0)
-    {
-        str = flint_malloc(2);
-        str[0] = '0';
-        str[1] = '\0';
-        return str;
-    }
+#ifdef T
+#undef T
+#endif
 
-    if (len == 1)
-    {
-        return fq_get_str_pretty(poly, ctx);
-    }
-
-    coeffstrs = (char **) flint_malloc(len * sizeof(char *));
-
-    nz = 0;
-    bound = 1;
-    for (i = 0; i < len; i++)
-        if (!fq_is_zero(poly + i, ctx))
-        {
-            coeffstrs[i] = fq_get_str_pretty(poly + i, ctx);
-            bound += strlen(coeffstrs[i]);
-            nz++;
-        }
-    bound += nz * (5 + strlen(x) + (slong) (ceil(log10(len))));
-
-    str = flint_malloc(bound);
-    off = 0;
-    i = len - 1;
-
-    if (fq_is_one(poly + i, ctx))
-    {
-    }
-    else
-        off += flint_sprintf(str + off, "*(%s)", coeffstrs[i]);
-
-    if (i > 1)
-        off += flint_sprintf(str + off, "%s^%wd", x, i);
-    else
-        off += flint_sprintf(str + off, "%s", x);
-
-    for (--i; i > 0; --i)
-    {
-        if (fq_is_zero(poly + i, ctx))
-            continue;
-        if (!fq_is_one(poly + i, ctx))
-        {
-            off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
-        }
-        else
-        {
-            off += flint_sprintf(str + off, "+");
-        }
-        if (i > 1)
-            off += flint_sprintf(str + off, "*%s^%wd", x, i);
-        else
-            off += flint_sprintf(str + off, "*%s", x);
-    }
-
-    if (!fq_is_zero(poly + i, ctx))
-    {
-        off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
-    }
-
-    for (i = 0; i < len; i++)
-        if (!fq_is_zero(poly + i, ctx))
-        {
-            flint_free(coeffstrs[i]);
-        }
-
-    flint_free(coeffstrs);
-
-    return str;
-}
-
-char *
-fq_poly_get_str_pretty(const fq_poly_t poly, const char *x, const fq_ctx_t ctx)
-{
-    return _fq_poly_get_str_pretty(poly->coeffs, poly->length, x, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/get_str_pretty.c"
+#undef CAP_T
+#undef T

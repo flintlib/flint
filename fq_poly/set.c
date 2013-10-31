@@ -22,32 +22,20 @@
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_set(fq_struct * rop, const fq_struct * op, long len,
-             const fq_ctx_t ctx)
-{
-    long i;
 
-    for (i = 0; i < len; i++)
-        fq_set(rop + i, op + i, ctx);
-}
 
-void
-fq_poly_set(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
-{
-    if (rop != op)              /* Aliasing is trivial */
-    {
-        long i, len = op->length;
+#ifdef T
+#undef T
+#endif
 
-        fq_poly_fit_length(rop, len, ctx);
-        _fq_poly_set_length(rop, len, ctx);
-
-        for (i = 0; i < len; i++)
-            fq_set(rop->coeffs + i, op->coeffs + i, ctx);
-    }
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/set.c"
+#undef CAP_T
+#undef T

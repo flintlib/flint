@@ -22,92 +22,17 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
+
 #include "fq_poly.h"
 
-int
-main(void)
-{
-    int iter;
-    flint_rand_t state;
-    flint_randinit(state);
 
-    flint_printf("is_squarefree....");
-    fflush(stdout);
 
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t poly, Q, R, t;
-        fmpz_t x;
-        slong i, num_factors, exp, max_exp;
-        int v, result;
+#ifdef T
+#undef T
+#endif
 
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(poly, ctx);
-        fq_poly_init(t, ctx);
-        fq_poly_init(Q, ctx);
-        fq_poly_init(R, ctx);
-
-        fmpz_init(x);
-        fmpz_randtest_mod(x, state, fq_ctx_prime(ctx));
-
-        fq_poly_set_coeff_fmpz(poly, 0, x, ctx);
-        num_factors = n_randint(state, 5);
-
-        max_exp = 0;
-        for (i = 0; i < num_factors; i++)
-        {
-            do {
-                fq_poly_randtest(t, state, n_randint(state, 10), ctx);
-            } while (!fq_poly_is_irreducible(t, ctx) ||
-                    (fq_poly_length(t, ctx) < 2));
-
-            exp = n_randint(state, 4) + 1;
-            if (n_randint(state, 2) == 0)
-                exp = 1;
-
-            fq_poly_divrem(Q, R, poly, t, ctx);
-            if (!fq_poly_is_zero(R, ctx))
-            {
-                fq_poly_pow(t, t, exp, ctx);
-                fq_poly_mul(poly, poly, t, ctx);
-                max_exp = FLINT_MAX(exp, max_exp);
-            }
-        }
-
-        v = fq_poly_is_squarefree(poly, ctx);
-
-        if (v == 1)
-            result = (max_exp <= 1 && !fq_poly_is_zero(poly, ctx));
-        else
-            result = (max_exp > 1 || fq_poly_is_zero(poly, ctx));
-
-        if (!result)
-        {
-            flint_printf("FAIL: ");
-            fq_ctx_print(ctx);
-            flint_printf(" %ld, %d\n", max_exp, v);
-            fq_poly_print(poly, ctx); flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(poly, ctx);
-        fq_poly_clear(t, ctx);
-        fq_poly_clear(Q, ctx);
-        fq_poly_clear(R, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return 0;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-is_squarefree.c"
+#undef CAP_T
+#undef T

@@ -23,77 +23,16 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 #include "fq_poly.h"
 
-int
-main(void)
-{
-    int iter;
-    flint_rand_t state;
-    flint_randinit(state);
 
-    printf("is_irreducible....");
-    fflush(stdout);
 
-    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t poly1, poly2;
-        slong length;
-        int i, num;
+#ifdef T
+#undef T
+#endif
 
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(poly1, ctx);
-        fq_poly_init(poly2, ctx);
-
-        length = n_randint(state, 5) + 2;
-        do
-        {
-            fq_poly_randtest(poly1, state, length, ctx);
-            if (!fq_poly_is_zero(poly1, ctx))
-                fq_poly_make_monic(poly1, poly1, ctx);
-        }
-        while ((!fq_poly_is_irreducible(poly1, ctx)) || (poly1->length < 2));
-
-        num = n_randint(state, 5) + 1;
-
-        for (i = 0; i < num; i++)
-        {
-            do
-            {
-                fq_poly_randtest(poly2, state, length, ctx);
-                if (!fq_poly_is_zero(poly2, ctx))
-                    fq_poly_make_monic(poly2, poly2, ctx);
-            }
-            while ((!fq_poly_is_irreducible(poly2, ctx)) || (poly2->length < 2));
-
-            fq_poly_mul(poly1, poly1, poly2, ctx);
-        }
-
-        if (fq_poly_is_irreducible(poly1, ctx))
-        {
-            flint_printf("Error: reducible polynomial declared irreducible!\n");
-            flint_printf("poly:\n");
-            fq_poly_print(poly1, ctx);
-            flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(poly1, ctx);
-        fq_poly_clear(poly2, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return 0;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-is_irreducible.c"
+#undef CAP_T
+#undef T

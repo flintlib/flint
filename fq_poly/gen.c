@@ -22,13 +22,17 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
+
 #include "fq_poly.h"
 
-void
-fq_poly_gen(fq_poly_t f, const fq_ctx_t ctx)
-{
-    fq_poly_fit_length(f, 2, ctx);
-    fq_zero(f->coeffs, ctx);
-    fq_one(f->coeffs + 1, ctx);
-    _fq_poly_set_length(f, 2, ctx);
-}
+
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/gen.c"
+#undef CAP_T
+#undef T

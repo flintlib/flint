@@ -23,48 +23,16 @@
 
 ******************************************************************************/
 
-
 #include "fq_poly.h"
 
-int
-main(void)
-{
-    int iter;
-    flint_rand_t state;
-    flint_randinit(state);
 
-    printf("randtest_irreducible....");
-    fflush(stdout);
 
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t poly;
-        slong length;
+#ifdef T
+#undef T
+#endif
 
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(poly, ctx);
-
-        length = n_randint(state, 20) + 2;
-        fq_poly_randtest_irreducible(poly, state, length, ctx);
-
-        if (!fq_poly_is_irreducible(poly, ctx))
-        {
-            printf("Error: reducible polynomial created!\n");
-            printf("poly:\n");
-            fq_poly_print_pretty(poly, "x", ctx);
-            printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(poly, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-randtest_irreducible.c"
+#undef CAP_T
+#undef T

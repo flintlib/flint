@@ -29,29 +29,14 @@
 
 #include "fq_poly.h"
 
-ulong
-fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx)
-{
-    fq_poly_t q, r;
-    ulong i = 0;
 
-    fq_poly_init(q, ctx);
-    fq_poly_init(r, ctx);
 
-    while (1)
-    {
-        if (f->length < g->length)
-            break;
-        fq_poly_divrem(q, r, f, g, ctx);
-        if (r->length == 0)
-            fq_poly_swap(q, f, ctx);
-        else
-            break;
-        i++;
-    }
+#ifdef T
+#undef T
+#endif
 
-    fq_poly_clear(q, ctx);
-    fq_poly_clear(r, ctx);
-
-    return i;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/remove.c"
+#undef CAP_T
+#undef T

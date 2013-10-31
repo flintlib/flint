@@ -26,28 +26,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_deflate(fq_poly_t result, const fq_poly_t input, ulong deflation,
-                const fq_ctx_t ctx)
-{
-    slong res_length, i;
 
-    if (deflation == 0)
-    {
-        flint_printf("Exception (fq_poly_deflate). Division by zero.\n");
-        abort();
-    }
 
-    if (input->length <= 1 || deflation == 1)
-    {
-        fq_poly_set(result, input, ctx);
-        return;
-    }
+#ifdef T
+#undef T
+#endif
 
-    res_length = (input->length - 1) / deflation + 1;
-    fq_poly_fit_length(result, res_length, ctx);
-    for (i = 0; i < res_length; i++)
-        fq_set(result->coeffs + i, input->coeffs + (i * deflation), ctx);
-
-    result->length = res_length;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/deflate.c"
+#undef CAP_T
+#undef T

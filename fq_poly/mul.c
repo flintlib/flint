@@ -20,60 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_mul(fq_struct * rop,
-             const fq_struct * op1, long len1,
-             const fq_struct * op2, long len2, const fq_ctx_t ctx)
-{
-    const long d = fq_ctx_degree(ctx);
 
-    if (FLINT_MAX(len1, len2) < 6)
-    {
-        _fq_poly_mul_classical(rop, op1, len1, op2, len2, ctx);
-    }
-    else if (d < 4)
-    {
-        _fq_poly_mul_reorder(rop, op1, len1, op2, len2, ctx);
-    }
-    else
-    {
-        _fq_poly_mul_KS(rop, op1, len1, op2, len2, ctx);
-    }
-}
 
-void
-fq_poly_mul(fq_poly_t rop,
-            const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx)
-{
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long rlen = op1->length + op2->length - 1;
+#ifdef T
+#undef T
+#endif
 
-    if (len1 == 0 || len2 == 0)
-    {
-        fq_poly_zero(rop, ctx);
-        return;
-    }
-
-    if (rop == op1 || rop == op2)
-    {
-        fq_poly_t t;
-
-        fq_poly_init2(t, rlen, ctx);
-        _fq_poly_mul(t->coeffs, op1->coeffs, len1, op2->coeffs, len2, ctx);
-        fq_poly_swap(rop, t, ctx);
-        fq_poly_clear(t, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(rop, rlen, ctx);
-        _fq_poly_mul(rop->coeffs, op1->coeffs, len1, op2->coeffs, len2, ctx);
-    }
-
-    _fq_poly_set_length(rop, rlen, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/mul.c"
+#undef CAP_T
+#undef T

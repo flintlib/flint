@@ -22,41 +22,17 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
+
 #include "fq_poly.h"
 
-void
-fq_poly_factor_insert(fq_poly_factor_t fac, const fq_poly_t poly, slong exp,
-                      const fq_ctx_t ctx)
-{
-    slong i;
 
-    if (poly->length <= 1)
-        return;
 
-    for (i = 0; i < fac->num; i++)
-    {
-        if (fq_poly_equal(poly, fac->poly + i, ctx))
-        {
-            fac->exp[i] += exp;
-            return;
-        }
-    }
+#ifdef T
+#undef T
+#endif
 
-    if (fac->alloc == fac->num)
-    {
-        slong new_size = 2 * fac->alloc;
-
-        fac->poly =
-            flint_realloc(fac->poly, sizeof(fq_poly_struct) * new_size);
-        fac->exp = flint_realloc(fac->exp, sizeof(slong) * new_size);
-
-        for (i = fac->alloc; i < new_size; i++)
-            fq_poly_init(fac->poly + i, ctx);
-
-        fac->alloc = new_size;
-    }
-
-    fq_poly_set(fac->poly + fac->num, poly, ctx);
-    fac->exp[fac->num] = exp;
-    fac->num++;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_insert.c"
+#undef CAP_T
+#undef T

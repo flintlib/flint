@@ -20,138 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2010, 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_pow(fq_struct * rop, const fq_struct * op, long len, ulong e,
-             const fq_ctx_t ctx)
-{
-    ulong bit = ~((~0UL) >> 1);
-    long rlen;
-    long alloc = (long) e * (len - 1) + 1;
-    fq_struct *v = _fq_vec_init(alloc, ctx);
-    fq_struct *R, *S, *T;
 
-    /*
-       Set bits to the bitmask with a 1 one place lower than the msb of e
-     */
 
-    while ((bit & e) == 0UL)
-        bit >>= 1;
+#ifdef T
+#undef T
+#endif
 
-    bit >>= 1;
-
-    /*
-       Trial run without any polynomial arithmetic to determine the parity 
-       of the number of swaps;  then set R and S accordingly
-     */
-
-    {
-        unsigned int swaps = 0U;
-        ulong bit2 = bit;
-        if ((bit2 & e))
-            swaps = ~swaps;
-        while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
-                swaps = ~swaps;
-
-        if (swaps == 0U)
-        {
-            R = rop;
-            S = v;
-        }
-        else
-        {
-            R = v;
-            S = rop;
-        }
-    }
-
-    /*
-       We unroll the first step of the loop, referring to {poly, len}
-     */
-
-    _fq_poly_sqr(R, op, len, ctx);
-    rlen = 2 * len - 1;
-    if ((bit & e))
-    {
-        _fq_poly_mul(S, R, rlen, op, len, ctx);
-        rlen += len - 1;
-        T = R;
-        R = S;
-        S = T;
-    }
-
-    while ((bit >>= 1))
-    {
-        if ((bit & e))
-        {
-            _fq_poly_sqr(S, R, rlen, ctx);
-            rlen += rlen - 1;
-            _fq_poly_mul(R, S, rlen, op, len, ctx);
-            rlen += len - 1;
-        }
-        else
-        {
-            _fq_poly_sqr(S, R, rlen, ctx);
-            rlen += rlen - 1;
-            T = R;
-            R = S;
-            S = T;
-        }
-    }
-
-    _fq_vec_clear(v, alloc, ctx);
-}
-
-void
-fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, const fq_ctx_t ctx)
-{
-    const long len = op->length;
-
-    if ((len < 2) | (e < 3UL))
-    {
-        if (e == 0UL)
-            fq_poly_one(rop, ctx);
-        else if (len == 0)
-            fq_poly_zero(rop, ctx);
-        else if (len == 1)
-        {
-            fmpz_t f;
-            fmpz_init_set_ui(f, e);
-
-            fq_poly_fit_length(rop, 1, ctx);
-            fq_pow(rop->coeffs + 0, op->coeffs + 0, f, ctx);
-            _fq_poly_set_length(rop, 1, ctx);
-
-            fmpz_clear(f);
-        }
-        else if (e == 1UL)
-            fq_poly_set(rop, op, ctx);
-        else                    /* e == 2UL */
-            fq_poly_sqr(rop, op, ctx);
-    }
-    else
-    {
-        const long rlen = (long) e * (len - 1) + 1;
-
-        if (rop != op)
-        {
-            fq_poly_fit_length(rop, rlen, ctx);
-            _fq_poly_pow(rop->coeffs, op->coeffs, len, e, ctx);
-            _fq_poly_set_length(rop, rlen, ctx);
-        }
-        else
-        {
-            fq_poly_t t;
-            fq_poly_init2(t, rlen, ctx);
-            _fq_poly_pow(t->coeffs, op->coeffs, len, e, ctx);
-            _fq_poly_set_length(t, rlen, ctx);
-            fq_poly_swap(rop, t, ctx);
-            fq_poly_clear(t, ctx);
-        }
-    }
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/pow.c"
+#undef CAP_T
+#undef T

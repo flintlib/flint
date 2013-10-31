@@ -20,73 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "fq_poly.h"
 
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("mullow... ");
-    fflush(stdout);
+#ifdef T
+#undef T
+#endif
 
-    flint_randinit(state);
-
-    /* Compare with truncated product of a and b */
-    for (i = 0; i < 2000; i++)
-    {
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c, d;
-        long n;
-
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-        fq_poly_init(d, ctx);
-
-        fq_poly_randtest(a, state, n_randint(state, 100), ctx);
-        fq_poly_randtest(b, state, n_randint(state, 100), ctx);
-        n = n_randint(state, 100);
-
-        fq_poly_mullow(c, a, b, n, ctx);
-        fq_poly_mul(d, a, b, ctx);
-        fq_poly_truncate(d, n, ctx);
-
-        result = (fq_poly_equal(c, d, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            flint_printf("d = "), fq_poly_print_pretty(d, "X", ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-        fq_poly_clear(d, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-mullow.c"
+#undef CAP_T
+#undef T

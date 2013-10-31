@@ -20,24 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-long
-_fq_poly_hamming_weight(const fq_struct * op, long len, const fq_ctx_t ctx)
-{
-    long i, sum = 0;
-    for (i = 0; i < len; i++)
-        sum += !fq_is_zero(op + i, ctx);
 
-    return sum;
-}
 
-long
-fq_poly_hamming_weight(const fq_poly_t op, const fq_ctx_t ctx)
-{
+#ifdef T
+#undef T
+#endif
 
-    return _fq_poly_hamming_weight(op->coeffs, op->length, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/hamming_weight.c"
+#undef CAP_T
+#undef T

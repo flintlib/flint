@@ -25,62 +25,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_randtest_irreducible(fq_poly_t f, flint_rand_t state,
-                             long len, const fq_ctx_t ctx)
-{
-    fq_poly_t xq, xqi, x, g_i, finv;
-    fmpz_t q;
-    slong i, restart;
 
-    /* Compute q */
-    fmpz_init_set(q, fq_ctx_prime(ctx));
-    fmpz_pow_ui(q, q, fq_ctx_degree(ctx));
 
-    fq_poly_init(x, ctx);
-    fq_poly_gen(x, ctx);
-    fq_poly_init(xq, ctx);
-    fq_poly_init(xqi, ctx);
-    fq_poly_init(g_i, ctx);
-    fq_poly_init(finv, ctx);
+#ifdef T
+#undef T
+#endif
 
-    while (1)
-    {
-        restart = 0;
-
-        /* Generate random monic polynomial of length len */
-        fq_poly_randtest_monic(f, state, len, ctx);
-
-        fq_poly_reverse(finv, f, f->length, ctx);
-        fq_poly_inv_series_newton(finv, finv, f->length, ctx);
-
-        /* Compute xq = x^q mod f */
-        fq_poly_powmod_fmpz_binexp_preinv(xq, x, q, f, finv, ctx);
-        fq_poly_set(xqi, xq, ctx);
-
-        for (i = 1; i <= (len - 1) / 2; i++)
-        {
-            fq_poly_sub(xqi, xqi, x, ctx);
-            fq_poly_gcd(g_i, xqi, f, ctx);
-            fq_poly_add(xqi, xqi, x, ctx);
-            if (!fq_poly_is_one(g_i, ctx))
-            {
-                restart = 1;
-                break;
-            }
-            fq_poly_compose_mod_brent_kung_preinv(xqi, xqi, xq, f, finv, ctx);
-
-        }
-        if (!restart)
-        {
-            break;
-        }
-    }
-
-    fq_poly_clear(x, ctx);
-    fq_poly_clear(xq, ctx);
-    fq_poly_clear(xqi, ctx);
-    fq_poly_clear(g_i, ctx);
-    fq_poly_clear(finv, ctx);
-    fmpz_clear(q);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/randtest_irreducible.c"
+#undef CAP_T
+#undef T

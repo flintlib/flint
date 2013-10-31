@@ -21,23 +21,20 @@
 
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_init(fq_poly_t poly, const fq_ctx_t ctx)
-{
-    poly->coeffs = NULL;
-    poly->alloc = 0;
-    poly->length = 0;
-}
 
-void
-fq_poly_init2(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
-{
-    poly->coeffs = (alloc) ? _fq_vec_init(alloc, ctx) : NULL;
-    poly->alloc = alloc;
-    poly->length = 0;
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/init.c"
+#undef CAP_T
+#undef T

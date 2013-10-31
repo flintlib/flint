@@ -22,16 +22,20 @@
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n, const fq_ctx_t ctx)
-{
-    if (n < poly->length)
-        fq_set(x, poly->coeffs + n, ctx);
-    else
-        fq_zero(x, ctx);
-}
+
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/get_coeff.c"
+#undef CAP_T
+#undef T

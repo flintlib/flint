@@ -22,18 +22,17 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
-#include <stdio.h>
+
 #include "fq_poly.h"
 
-void
-fq_poly_factor_print_pretty(const fq_poly_factor_t fac, const char *var,
-                            const fq_ctx_t ctx)
-{
-    slong i;
 
-    for (i = 0; i < fac->num; i++)
-    {
-        fq_poly_print_pretty(fac->poly + i, var, ctx);
-        flint_printf(" ^ %ld\n", fac->exp[i]);
-    }
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_print_pretty.c"
+#undef CAP_T
+#undef T

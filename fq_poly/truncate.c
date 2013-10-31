@@ -21,21 +21,20 @@
 
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
    
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_truncate(fq_poly_t poly, long len, const fq_ctx_t ctx)
-{
-    if (poly->length > len)
-    {
-        long i;
 
-        for (i = len; i < poly->length; i++)
-            fq_zero(poly->coeffs + i, ctx);
-        poly->length = len;
-        _fq_poly_normalise(poly, ctx);
-    }
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/truncate.c"
+#undef CAP_T
+#undef T

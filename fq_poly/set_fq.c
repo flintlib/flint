@@ -20,21 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
+
 #include "fq_poly.h"
 
-void
-fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
-{
-    if (fq_is_zero(c, ctx))
-    {
-        fq_poly_zero(poly, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(poly, 1, ctx);
-        fq_set(poly->coeffs + 0, c, ctx);
-        _fq_poly_set_length(poly, 1, ctx);
-    }
-}
+
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/set_fq.c"
+#undef CAP_T
+#undef T

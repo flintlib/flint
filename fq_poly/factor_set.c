@@ -25,33 +25,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_factor_set(fq_poly_factor_t res, const fq_poly_factor_t fac,
-                   const fq_ctx_t ctx)
-{
-    if (res != fac)
-    {
-        if (fac->num == 0)
-        {
-            fq_poly_factor_clear(res, ctx);
-            fq_poly_factor_init(res, ctx);
-        }
-        else
-        {
-            slong i;
 
-            fq_poly_factor_fit_length(res, fac->num, ctx);
-            for (i = 0; i < fac->num; i++)
-            {
-                fq_poly_set(res->poly + i, fac->poly + i, ctx);
-                res->exp[i] = fac->exp[i];
-            }
-            for (; i < res->num; i++)
-            {
-                fq_poly_zero(res->poly + i, ctx);
-                res->exp[i] = 0;
-            }
-            res->num = fac->num;
-        }
-    }
-}
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_set.c"
+#undef CAP_T
+#undef T

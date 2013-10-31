@@ -23,51 +23,16 @@
 
 ******************************************************************************/
 
-#include "math.h"
 #include "fq_poly.h"
 
-int
-fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx)
-{
-    slong i, n;
-    slong *degs;
-    fq_poly_factor_t dist_deg;
 
-    n = fq_poly_degree(f, ctx);
 
-    if (n < 2)
-        return 1;
+#ifdef T
+#undef T
+#endif
 
-    if (!fq_poly_is_squarefree(f, ctx))
-        return 0;
-
-    if (!(degs = (slong *) flint_malloc(n * sizeof(slong))))
-    {
-        flint_printf("Exception (fq_poly_is_irreducible_ddf): \n");
-        flint_printf("Not enough memory.\n");
-        abort();
-    }
-
-    fq_poly_factor_init(dist_deg, ctx);
-    fq_poly_factor_distinct_deg(dist_deg, f, &degs, ctx);
-    for (i = 0; i < dist_deg->num; i++)
-    {
-        if (degs[i] == n)
-        {
-            flint_free(degs);
-            fq_poly_factor_clear(dist_deg, ctx);
-            return 1;
-        }
-        if (degs[i] > 0)
-        {
-            flint_free(degs);
-            fq_poly_factor_clear(dist_deg, ctx);
-            return 0;
-        }
-    }
-
-    flint_free(degs);
-    fq_poly_factor_clear(dist_deg, ctx);
-
-    return 1;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/is_irreducible_ddf.c"
+#undef CAP_T
+#undef T

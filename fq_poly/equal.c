@@ -21,25 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
    
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-int
-fq_poly_equal(const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx)
-{
-    long i;
 
-    if (op1 == op2)
-        return 1;
 
-    if (op1->length != op2->length)
-        return 0;
+#ifdef T
+#undef T
+#endif
 
-    for (i = 0; i < op1->length; i++)
-        if (!fq_equal(op1->coeffs + i, op2->coeffs + i, ctx))
-            return 0;
-
-    return 1;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/equal.c"
+#undef CAP_T
+#undef T

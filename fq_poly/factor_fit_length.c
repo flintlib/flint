@@ -25,14 +25,14 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_factor_fit_length(fq_poly_factor_t fac, slong len, const fq_ctx_t ctx)
-{
-    if (len > fac->alloc)
-    {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * fac->alloc)
-            len = 2 * fac->alloc;
-        fq_poly_factor_realloc(fac, len, ctx);
-    }
-}
+
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/factor_fit_length.c"
+#undef CAP_T
+#undef T

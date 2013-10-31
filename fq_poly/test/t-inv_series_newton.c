@@ -21,64 +21,20 @@
 
     Copyright (C) 2009 William Hart
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("inv_series_newton....");
-    fflush(stdout);
 
-    flint_randinit(state);
+#ifdef T
+#undef T
+#endif
 
-    /* Check Q^{-1} * Q is congruent 1 mod t^n */
-    for (i = 0; i < 1000; i++)
-    {
-        fq_ctx_t ctx;
-        fq_poly_t a, b, c, one;
-        slong n = n_randint(state, 80) + 1;
-
-        fq_ctx_randtest(ctx, state);
-
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-        fq_poly_init(one, ctx);
-
-        fq_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, ctx);
-        fq_randtest_not_zero(a->coeffs, state, ctx);
-        fq_poly_one(one, ctx);
-
-        fq_poly_inv_series_newton(b, a, n, ctx);
-        fq_poly_mullow(c, a, b, n, ctx);
-
-        result = (fq_poly_equal(c, one, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = "), fq_poly_print(a, ctx), flint_printf("\n\n");
-            flint_printf("b = "), fq_poly_print(b, ctx), flint_printf("\n\n");
-            flint_printf("c = "), fq_poly_print(c, ctx), flint_printf("\n\n");
-            flint_printf("ctx = "), fq_ctx_print(ctx), flint_printf("\n\n");
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-        fq_poly_clear(one, ctx);
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-inv_series_newton.c"
+#undef CAP_T
+#undef T

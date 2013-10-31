@@ -21,122 +21,20 @@
 
     Copyright (C) 2012 Sebastian Pancratz 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "fq_poly.h"
 
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("pow... ");
-    fflush(stdout);
+#ifdef T
+#undef T
+#endif
 
-    flint_randinit(state);
-
-    /* Check aliasing  */
-    for (i = 0; i < 200; i++)
-    {
-        long len;
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c;
-        ulong exp;
-
-        len = n_randint(state, 15) + 1;
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-
-        fq_poly_randtest(a, state, len, ctx);
-        exp = n_randtest(state) % 20UL;
-        fq_poly_set(b, a, ctx);
-        fq_poly_pow(c, b, exp, ctx);
-        fq_poly_pow(b, b, exp, ctx);
-
-        result = (fq_poly_equal(b, c, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            flint_printf("exp = %lu\n", exp);
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* Compare with repeated multiplications by the base */
-    for (i = 0; i < 1000; i++)
-    {
-        long len;
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c;
-        ulong exp;
-
-        len = n_randint(state, 15) + 1;
-        fq_ctx_randtest(ctx, state);
-        fq_poly_init(a, ctx);
-        fq_poly_init(b, ctx);
-        fq_poly_init(c, ctx);
-
-        fq_poly_randtest(b, state, len, ctx);
-        exp = n_randtest(state) % 20UL;
-
-        fq_poly_pow(a, b, exp, ctx);
-
-        if (exp == 0)
-        {
-            fq_poly_one(c, ctx);
-        }
-        else
-        {
-            long j;
-
-            fq_poly_set(c, b, ctx);
-            for (j = 1; j < exp; j++)
-                fq_poly_mul(c, c, b, ctx);
-        }
-
-        result = (fq_poly_equal(a, c, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_poly_print_pretty(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), fq_poly_print_pretty(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), fq_poly_print_pretty(c, "X", ctx), flint_printf("\n");
-            flint_printf("exp = %lu\n", exp);
-            fq_ctx_print(ctx);
-            abort();
-        }
-
-        fq_poly_clear(a, ctx);
-        fq_poly_clear(b, ctx);
-        fq_poly_clear(c, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-pow.c"
+#undef CAP_T
+#undef T

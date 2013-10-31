@@ -21,49 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_scalar_addmul_fq(fq_struct * rop,
-                          const fq_struct * op, long len, const fq_t x,
-                          const fq_ctx_t ctx)
-{
-    if (fq_is_zero(x, ctx))
-        return;
 
-    if (fq_is_one(x, ctx))
-    {
-        _fq_poly_add(rop, rop, len, op, len, ctx);
-    }
-    else
-    {
-        long i;
-        fq_t t;
 
-        fq_init(t, ctx);
+#ifdef T
+#undef T
+#endif
 
-        for (i = 0; i < len; i++)
-        {
-            fq_mul(t, op + i, x, ctx);
-            fq_add(rop + i, rop + i, t, ctx);
-        }
-
-        fq_clear(t, ctx);
-    }
-}
-
-void
-fq_poly_scalar_addmul_fq(fq_poly_t rop,
-                         const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
-{
-    if (!(fq_is_zero(x, ctx) || fq_poly_is_zero(op, ctx)))
-    {
-        fq_poly_fit_length(rop, op->length, ctx);
-        _fq_poly_scalar_addmul_fq(rop->coeffs, op->coeffs, op->length, x, ctx);
-        _fq_poly_set_length(rop, FLINT_MAX(rop->length, op->length), ctx);
-        _fq_poly_normalise(rop, ctx);
-    }
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/scalar_addmul_fq.c"
+#undef CAP_T
+#undef T

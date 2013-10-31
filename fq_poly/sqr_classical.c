@@ -20,70 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_sqr_classical(fq_struct * rop,
-                       const fq_struct * op, long len, const fq_ctx_t ctx)
-{
-    if (len == 1)
-    {
-        fq_mul(rop, op, op, ctx);
-    }
-    else
-    {
-        long i;
-        fq_t t;
 
-        fq_init(t, ctx);
 
-        _fq_poly_scalar_mul_fq(rop, op, len, op, ctx);
+#ifdef T
+#undef T
+#endif
 
-        _fq_poly_scalar_mul_fq(rop + len, op + 1, len - 1, op + len - 1, ctx);
-
-        for (i = 1; i < len - 1; i++)
-            _fq_poly_scalar_addmul_fq(rop + i + 1, op + 1, i - 1, op + i, ctx);
-
-        for (i = 1; i < 2 * len - 2; i++)
-            fq_add(rop + i, rop + i, rop + i, ctx);
-
-        for (i = 1; i < len - 1; i++)
-        {
-            fq_sqr(t, op + i, ctx);
-            fq_add(rop + 2 * i, rop + 2 * i, t, ctx);
-        }
-        fq_clear(t, ctx);
-    }
-}
-
-void
-fq_poly_sqr_classical(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
-{
-    const long len = 2 * op->length - 1;
-
-    if (op->length == 0)
-    {
-        fq_poly_zero(rop, ctx);
-        return;
-    }
-
-    if (rop == op)
-    {
-        fq_poly_t t;
-
-        fq_poly_init2(t, len, ctx);
-        _fq_poly_sqr_classical(t->coeffs, op->coeffs, op->length, ctx);
-        fq_poly_swap(rop, t, ctx);
-        fq_poly_clear(t, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(rop, len, ctx);
-        _fq_poly_sqr_classical(rop->coeffs, op->coeffs, op->length, ctx);
-    }
-
-    _fq_poly_set_length(rop, len, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/sqr_classical.c"
+#undef CAP_T
+#undef T

@@ -20,15 +20,20 @@
 /******************************************************************************
 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
    
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx)
-{
-    fq_poly_fit_length(poly, 1, ctx);
-    fq_one(poly->coeffs + 0, ctx);
-    _fq_poly_set_length(poly, 1, ctx);
-}
+
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/one.c"
+#undef CAP_T
+#undef T

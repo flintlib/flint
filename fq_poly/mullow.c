@@ -21,61 +21,20 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010, 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-_fq_poly_mullow(fq_struct * rop,
-                const fq_struct * op1, long len1,
-                const fq_struct * op2, long len2, long n, const fq_ctx_t ctx)
-{
-    if (FLINT_MAX(len1, len2) < 6)
-    {
-        _fq_poly_mullow_classical(rop, op1, len1, op2, len2, n, ctx);
-    }
-    else
-    {
-        _fq_poly_mullow_KS(rop, op1, len1, op2, len2, n, ctx);
-    }
-}
 
-void
-fq_poly_mullow(fq_poly_t rop,
-               const fq_poly_t op1, const fq_poly_t op2, long n,
-               const fq_ctx_t ctx)
-{
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long lenr = op1->length + op2->length - 1;
 
-    if (len1 == 0 || len2 == 0 || n == 0)
-    {
-        fq_poly_zero(rop, ctx);
-        return;
-    }
+#ifdef T
+#undef T
+#endif
 
-    if (n > lenr)
-        n = lenr;
-
-    if (rop == op1 || rop == op2)
-    {
-        fq_poly_t t;
-
-        fq_poly_init2(t, n, ctx);
-        _fq_poly_mullow(t->coeffs, op1->coeffs, op1->length,
-                        op2->coeffs, op2->length, n, ctx);
-        fq_poly_swap(rop, t, ctx);
-        fq_poly_clear(t, ctx);
-    }
-    else
-    {
-        fq_poly_fit_length(rop, n, ctx);
-        _fq_poly_mullow(rop->coeffs, op1->coeffs, op1->length,
-                        op2->coeffs, op2->length, n, ctx);
-    }
-
-    _fq_poly_set_length(rop, n, ctx);
-    _fq_poly_normalise(rop, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/mullow.c"
+#undef CAP_T
+#undef T

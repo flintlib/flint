@@ -25,37 +25,14 @@
 
 #include "fq_poly.h"
 
-int
-main(void)
-{
-    int i, len;
-    char *str;
-    fq_poly_t a;
-    fq_ctx_t ctx;
-    flint_rand_t state;
 
-    flint_printf("get_str_pretty....");
-    fflush(stdout);
 
-    flint_randinit(state);
+#ifdef T
+#undef T
+#endif
 
-    fq_ctx_randtest(ctx, state);
-    
-    fq_poly_init(a, ctx);
-    for (len = 0; len < 100; len++)
-        for (i = 0; i < 10; i++)
-        {
-            fq_poly_randtest(a, state, len, ctx);
-            str = fq_poly_get_str_pretty(a, "x", ctx);
-            /* printf("\n\n"); */
-            /* fq_poly_print_pretty(a, "x", ctx); */
-            /* printf("\n%s\n", str); */
-            flint_free(str);
-        }
-
-    fq_poly_clear(a, ctx);
-    fq_ctx_clear(ctx);
-
-    flint_printf("PASS\n");
-    return 0;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-get_str_pretty.c"
+#undef CAP_T
+#undef T

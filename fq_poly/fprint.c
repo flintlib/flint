@@ -22,40 +22,17 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
-#include <stdio.h>
-#include <gmp.h>
-#include "fmpz.h"
+
 #include "fq_poly.h"
 
-int
-_fq_poly_fprint(FILE * file, const fq_struct * poly, slong len,
-                const fq_ctx_t ctx)
-{
-    int r;
-    slong i;
 
-    r = fprintf(file, "%ld ", len);
-    if (r <= 0)
-        return r;
 
-    if (len == 0)
-        return r;
+#ifdef T
+#undef T
+#endif
 
-    for (i = 0; (r > 0) && (i < len); i++)
-    {
-        r = fprintf(file, " ");
-        if (r <= 0)
-            return r;
-        r = fq_fprint(file, poly + i, ctx);
-        if (r <= 0)
-            return r;
-    }
-
-    return r;
-}
-
-int
-fq_poly_fprint(FILE * file, const fq_poly_t poly, const fq_ctx_t ctx)
-{
-    return _fq_poly_fprint(file, poly->coeffs, poly->length, ctx);
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/fprint.c"
+#undef CAP_T
+#undef T
