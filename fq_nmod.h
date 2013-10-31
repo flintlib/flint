@@ -388,5 +388,15 @@ mp_limb_t _fq_nmod_norm(const mp_limb_t *op, long len,
 
 mp_limb_t fq_nmod_norm(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
+/* Bit packing ******************************************************/
+
+void
+fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
+                 const fq_nmod_ctx_t ctx);
+
+void
+fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+                   const fq_nmod_ctx_t ctx);
+
 #endif
 
