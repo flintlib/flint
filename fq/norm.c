@@ -35,8 +35,8 @@
     Assumes that $n$ is at least $2$.
  */
 
-static 
-void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
+static void
+_fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, long n, const fmpz_t pN)
 {
     if (n == 1)
     {
@@ -51,19 +51,19 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
         long t, i, j, p, k;
 
         F = _fmpz_vec_init(n);
-        a = _fmpz_vec_init((n-1) * n);
+        a = _fmpz_vec_init((n - 1) * n);
         A = _fmpz_vec_init(n);
 
         fmpz_init(s);
 
-        fmpz_neg(F + 0, M + 0*n + 0);
+        fmpz_neg(F + 0, M + 0 * n + 0);
 
         for (t = 1; t < n; t++)
         {
             for (i = 0; i <= t; i++)
-                fmpz_set(a + 0*n + i, M + i*n + t);
+                fmpz_set(a + 0 * n + i, M + i * n + t);
 
-            fmpz_set(A + 0, M + t*n + t);
+            fmpz_set(A + 0, M + t * n + t);
 
             for (p = 1; p < t; p++)
             {
@@ -71,44 +71,44 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
                 {
                     fmpz_zero(s);
                     for (j = 0; j <= t; j++)
-                        fmpz_addmul(s, M + i*n + j, a + (p-1)*n + j);
-                    fmpz_mod(a + p*n + i, s, pN);
+                        fmpz_addmul(s, M + i * n + j, a + (p - 1) * n + j);
+                    fmpz_mod(a + p * n + i, s, pN);
                 }
 
-                fmpz_set(A + p, a + p*n + t);
+                fmpz_set(A + p, a + p * n + t);
             }
 
             fmpz_zero(s);
             for (j = 0; j <= t; j++)
-                fmpz_addmul(s, M + t*n + j, a + (t-1)*n + j);
+                fmpz_addmul(s, M + t * n + j, a + (t - 1) * n + j);
             fmpz_mod(A + t, s, pN);
 
             for (p = 0; p <= t; p++)
             {
                 fmpz_sub(F + p, F + p, A + p);
                 for (k = 0; k < p; k++)
-                    fmpz_submul(F + p, A + k, F + (p-k-1));
+                    fmpz_submul(F + p, A + k, F + (p - k - 1));
                 fmpz_mod(F + p, F + p, pN);
             }
         }
 
         /*
-            Now [F{n-1}, F{n-2}, ..., F{0}, 1] is the 
-            characteristic polynomial of the matrix M.
+           Now [F{n-1}, F{n-2}, ..., F{0}, 1] is the 
+           characteristic polynomial of the matrix M.
          */
 
         if (n % 2L == 0)
         {
-            fmpz_set(rop, F + (n-1));
+            fmpz_set(rop, F + (n - 1));
         }
         else
         {
-            fmpz_neg(rop, F + (n-1));
+            fmpz_neg(rop, F + (n - 1));
             fmpz_mod(rop, rop, pN);
         }
 
         _fmpz_vec_clear(F, n);
-        _fmpz_vec_clear(a, (n-1)*n);
+        _fmpz_vec_clear(a, (n - 1) * n);
         _fmpz_vec_clear(A, n);
         fmpz_clear(s);
     }
@@ -119,8 +119,8 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, long n, const fmpz_t pN)
     When $N = 1$, this computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_norm(fmpz_t rop, const fmpz *op, long len,
-              const fq_ctx_t ctx)
+void
+_fq_norm(fmpz_t rop, const fmpz * op, long len, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
     const long N = 1;
@@ -130,7 +130,7 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
 
     if (N == 1)
     {
-        pN = (fmpz *) p;  /* XXX:  Read-only */
+        pN = (fmpz *) p;        /* XXX:  Read-only */
     }
     else
     {
@@ -143,7 +143,7 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
     {
         fmpz_powm_ui(rop, op + 0, d, pN);
     }
-    else 
+    else
     {
         /* Construct an ad hoc matrix M and set rop to det(M) */
         {
@@ -153,7 +153,7 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
 
             M = flint_calloc(n * n, sizeof(fmpz));
 
-            for (k = 0; k < len-1; k++)
+            for (k = 0; k < len - 1; k++)
             {
                 for (i = 0; i < ctx->len; i++)
                 {
@@ -164,7 +164,7 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
             {
                 for (i = 0; i < len; i++)
                 {
-                    M[(len-1 + k) * n + k + (len-1 - i)] = op[i];
+                    M[(len - 1 + k) * n + k + (len - 1 - i)] = op[i];
                 }
             }
 
@@ -174,8 +174,8 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
         }
 
         /*
-            XXX:  This part of the code is currently untested as the Conway 
-            polynomials used for the extension Fq/Fp are monic.
+           XXX:  This part of the code is currently untested as the Conway 
+           polynomials used for the extension Fq/Fp are monic.
          */
         if (!fmpz_is_one(ctx->a + (ctx->len - 1)))
         {
@@ -197,7 +197,8 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len,
     }
 }
 
-void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
+void
+fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op, ctx))
     {
@@ -208,4 +209,3 @@ void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
         _fq_norm(rop, op->coeffs, op->length, ctx);
     }
 }
-

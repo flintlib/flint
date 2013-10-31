@@ -26,7 +26,8 @@
 
 #include "fq.h"
 
-void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+void
+fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     fmpz_poly_sqr(rop, op);
 

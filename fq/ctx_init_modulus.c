@@ -29,8 +29,9 @@
 #include "fq.h"
 #include "fq_poly.h"
 
-void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
-                         fmpz_mod_poly_t modulus, const char *var)
+void
+fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
+                    fmpz_mod_poly_t modulus, const char *var)
 {
     long nz;
     int i, j;
@@ -39,7 +40,8 @@ void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
     nz = 0;
     for (i = 0; i < modulus->length; i++)
     {
-        if (!fmpz_is_zero(modulus->coeffs + i)) {
+        if (!fmpz_is_zero(modulus->coeffs + i))
+        {
             nz += 1;
         }
     }
@@ -52,10 +54,11 @@ void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
     j = 0;
     for (i = 0; i < modulus->length; i++)
     {
-        if (!fmpz_is_zero(modulus->coeffs + i)) {
+        if (!fmpz_is_zero(modulus->coeffs + i))
+        {
             fmpz_set(ctx->a + j, modulus->coeffs + i);
             ctx->j[j] = i;
-            j ++;
+            j++;
         }
     }
 

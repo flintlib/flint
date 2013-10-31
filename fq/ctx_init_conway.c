@@ -34,8 +34,8 @@
 #define FLINT_CPIMPORT "../qadic/CPimport.txt"
 #endif
 
-int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
-
+int
+_fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 {
     char *buf;
     FILE *file;
@@ -45,7 +45,7 @@ int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
         return 0;
     }
 
-    buf  = flint_malloc(832);
+    buf = flint_malloc(832);
     file = fopen(FLINT_CPIMPORT, "r");
 
     if (!file)
@@ -104,7 +104,8 @@ int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
     return 0;
 }
 
-void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+void
+fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 {
     int result;
     if (fmpz_cmp_ui(p, 109987) > 0)
@@ -115,9 +116,12 @@ void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
     }
 
     result = _fq_ctx_init_conway(ctx, p, d, var);
-    if (!result) {
-        flint_printf("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
-        fmpz_print(p), flint_printf(",%ld) is not present in the database.\n", d);
+    if (!result)
+    {
+        flint_printf
+            ("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
+        fmpz_print(p);
+        flint_printf(",%ld) is not present in the database.\n", d);
         abort();
     }
 }

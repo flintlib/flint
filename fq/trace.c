@@ -25,7 +25,8 @@
 
 #include "fq.h"
 
-void _fq_trace(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx)
+void
+_fq_trace(fmpz_t rop, const fmpz * op, long len, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
 
@@ -61,7 +62,8 @@ void _fq_trace(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx)
     _fmpz_vec_clear(t, d);
 }
 
-void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
+void
+fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op, ctx))
     {
@@ -72,4 +74,3 @@ void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
         _fq_trace(rop, op->coeffs, op->length, ctx);
     }
 }
-

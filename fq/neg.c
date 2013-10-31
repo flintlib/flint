@@ -26,7 +26,8 @@
 
 #include "fq.h"
 
-void fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+void
+fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     long len = op->length;
 

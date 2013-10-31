@@ -26,7 +26,8 @@
 
 #include "fq.h"
 
-void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+void
+fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
     fmpz_poly_mul(rop, op1, op2);
 

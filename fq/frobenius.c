@@ -31,15 +31,15 @@
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 
-void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e,
-                   const fq_ctx_t ctx)
+void
+_fq_frobenius(fmpz * rop, const fmpz * op, long len, long e, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
 
-    if (len == 1)  /* op is in Fp, not just Fq */
+    if (len == 1)               /* op is in Fp, not just Fq */
     {
         _fmpz_vec_set(rop, op, len);
-        _fmpz_vec_zero(rop + len, (2*d - 1)  - len);
+        _fmpz_vec_zero(rop + len, (2 * d - 1) - len);
     }
     else
     {
@@ -52,7 +52,8 @@ void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e,
     }
 }
 
-void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
+void
+fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
 
@@ -88,7 +89,7 @@ void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
         {
             _fmpz_vec_clear(rop->coeffs, rop->alloc);
             rop->coeffs = t;
-            rop->alloc  = 2 * d - 1;
+            rop->alloc = 2 * d - 1;
             rop->length = d;
         }
         else
@@ -98,4 +99,3 @@ void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
         _fmpz_poly_normalise(rop);
     }
 }
-

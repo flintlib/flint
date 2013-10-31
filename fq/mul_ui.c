@@ -25,7 +25,8 @@
 
 #include "fq.h"
 
-void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx)
+void
+fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx)
 {
     fmpz_poly_scalar_mul_ui(rop, op, x);
 

@@ -26,7 +26,8 @@
 
 #include "fq.h"
 
-void fq_ctx_clear(fq_ctx_t ctx)
+void
+fq_ctx_clear(fq_ctx_t ctx)
 {
     fmpz_mod_poly_clear(ctx->modulus);
     fmpz_mod_poly_clear(ctx->inv);

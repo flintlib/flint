@@ -27,7 +27,8 @@
 #include "fq.h"
 
 /* TODO: optimize */
-void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx)
+void
+fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx)
 {
     fmpz_t exp;
     fmpz_init_set_ui(exp, e);

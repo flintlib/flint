@@ -26,14 +26,15 @@
 
 #include "fq.h"
 
-void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+void
+fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
     long max = FLINT_MAX(op1->length, op2->length);
 
     fmpz_poly_fit_length(rop, max);
 
-    _fmpz_mod_poly_add(rop->coeffs, 
-                       op1->coeffs, op1->length, op2->coeffs, op2->length, 
+    _fmpz_mod_poly_add(rop->coeffs,
+                       op1->coeffs, op1->length, op2->coeffs, op2->length,
                        fq_ctx_prime(ctx));
 
     _fmpz_poly_set_length(rop, max);

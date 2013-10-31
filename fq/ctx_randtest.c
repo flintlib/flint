@@ -27,7 +27,8 @@
 
 #include "fq.h"
 
-void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
+void
+fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t p;
     long d;

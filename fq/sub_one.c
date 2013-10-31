@@ -25,7 +25,8 @@
 
 #include "fq.h"
 
-void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
+void
+fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 {
     fq_t one;
 

@@ -29,7 +29,8 @@
 #include "fq.h"
 #include "fq_poly.h"
 
-void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+void
+fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 {
     flint_rand_t state;
     fmpz_mod_poly_t poly;
@@ -38,12 +39,12 @@ void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
     {
         return;
     }
-    
+
     flint_randinit(state);
 
     fmpz_mod_poly_init2(poly, p, d + 1);
     fmpz_mod_poly_randtest_irreducible(poly, state, d);
-    
+
     fq_ctx_init_modulus(ctx, p, d, poly, var);
 
     fmpz_mod_poly_clear(poly);

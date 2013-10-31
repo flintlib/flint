@@ -25,8 +25,9 @@
 
 #include "fq.h"
 
-void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
-             const fq_ctx_t ctx)
+void
+_fq_pow(fmpz * rop, const fmpz * op, long len, const fmpz_t e,
+        const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
 
@@ -58,7 +59,7 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
            Trial run without any polynomial arithmetic to determine the parity 
            of the number of swaps;  then set R and S accordingly
          */
-        
+
         {
             unsigned int swaps = 0U;
             ulong bit2 = bit;
@@ -67,7 +68,7 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
             while (bit2--)
                 if (!fmpz_tstbit(e, bit2))
                     swaps = ~swaps;
-            
+
             if (swaps == 0U)
             {
                 R = rop;
@@ -79,7 +80,7 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
                 S = rop;
             }
         }
-        
+
         /*
            We unroll the first step of the loop, referring to {op, len}
          */
@@ -119,7 +120,8 @@ void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
     }
 }
 
-void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
+void
+fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
 {
     if (fmpz_sgn(e) < 0)
     {
@@ -160,7 +162,7 @@ void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
         {
             _fmpz_vec_clear(rop->coeffs, rop->alloc);
             rop->coeffs = t;
-            rop->alloc  = 2 * d - 1;
+            rop->alloc = 2 * d - 1;
             rop->length = d;
         }
         else
@@ -170,4 +172,3 @@ void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
         _fmpz_poly_normalise(rop);
     }
 }
-

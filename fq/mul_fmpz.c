@@ -25,7 +25,8 @@
 
 #include "fq.h"
 
-void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx)
+void
+fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx)
 {
     fmpz_poly_scalar_mul_fmpz(rop, op, x);
 

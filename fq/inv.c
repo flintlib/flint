@@ -25,8 +25,9 @@
 
 #include "fq.h"
 
-void _fq_inv(fmpz *rop, const fmpz *op, long len, 
-             const fmpz *a, const long *j, long lena, const fmpz_t p)
+void
+_fq_inv(fmpz * rop, const fmpz * op, long len,
+        const fmpz * a, const long *j, long lena, const fmpz_t p)
 {
     const long d = j[lena - 1];
 
@@ -49,7 +50,8 @@ void _fq_inv(fmpz *rop, const fmpz *op, long len,
     }
 }
 
-void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+void
+fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op, ctx))
     {
@@ -73,14 +75,14 @@ void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _fq_inv(t, op->coeffs, op->length, 
+        _fq_inv(t, op->coeffs, op->length,
                 ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
 
         if (rop == op)
         {
             _fmpz_vec_clear(rop->coeffs, rop->alloc);
             rop->coeffs = t;
-            rop->alloc  = d;
+            rop->alloc = d;
             rop->length = d;
         }
         else

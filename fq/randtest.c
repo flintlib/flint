@@ -26,7 +26,8 @@
 
 #include "fq.h"
 
-void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+void
+fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
     long i, sparse;
@@ -53,7 +54,8 @@ void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     _fmpz_poly_normalise(rop);
 }
 
-void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+void
+fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
     long i;
@@ -71,7 +73,8 @@ void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     _fmpz_poly_normalise(rop);
 }
 
-void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+void
+fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
     long i;
 
@@ -82,4 +85,3 @@ void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
     if (fq_is_zero(rop, ctx))
         fq_one(rop, ctx);
 }
-
