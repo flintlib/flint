@@ -29,12 +29,12 @@
 #include "templates.h"
 
 int
-_TEMPLATE(T, vec_is_zero)(const TEMPLATE(T, struct) * vec, slong len,
-                          const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, vec_is_zero) (const TEMPLATE(T, struct) * vec, slong len,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     for (i = 0; i < len; i++)
-        if (!TEMPLATE(T, is_zero)(vec + i, ctx))
+        if (!TEMPLATE(T, is_zero) (vec + i, ctx))
             return 0;
     return 1;
 }

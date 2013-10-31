@@ -30,17 +30,16 @@
 
 
 void
-_TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f, 
-                           flint_rand_t state, 
-                           slong len, 
-                           const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, vec_randtest) (TEMPLATE(T, struct) * f,
+                            flint_rand_t state,
+                            slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, sparseness;
 
     if (n_randint(state, 2))
     {
         for (i = 0; i < len; i++)
-            TEMPLATE(T, randtest)(f + i, state, ctx);
+            TEMPLATE(T, randtest) (f + i, state, ctx);
     }
     else
     {
@@ -49,9 +48,9 @@ _TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f,
         for (i = 0; i < len; i++)
         {
             if (n_randint(state, sparseness))
-                TEMPLATE(T, zero)(f + i, ctx);
+                TEMPLATE(T, zero) (f + i, ctx);
             else
-                TEMPLATE(T, randtest)(f + i, state, ctx);
+                TEMPLATE(T, randtest) (f + i, state, ctx);
         }
     }
 }

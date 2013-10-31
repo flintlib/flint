@@ -44,10 +44,9 @@
     On failure, a negative number is returned.''
  */
 
-int _TEMPLATE(T, vec_fprint)(FILE * file,
-                             const TEMPLATE(T, struct) * vec,
-                             slong len,
-                             const TEMPLATE(T, ctx_t) ctx)
+int _TEMPLATE(T, vec_fprint) (FILE * file,
+                              const TEMPLATE(T, struct) * vec,
+                              slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     int r;
     slong i;
@@ -60,7 +59,7 @@ int _TEMPLATE(T, vec_fprint)(FILE * file,
         {
             r = fputc(' ', file);
             if (r > 0)
-                r = TEMPLATE(T, fprint)(file, vec + i, ctx);
+                r = TEMPLATE(T, fprint) (file, vec + i, ctx);
         }
     }
 
