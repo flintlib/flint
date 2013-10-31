@@ -29,7 +29,8 @@
 
 #include "fq_poly.h"
 
-ulong fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx)
+ulong
+fq_poly_remove(fq_poly_t f, const fq_poly_t g, const fq_ctx_t ctx)
 {
     fq_poly_t q, r;
     ulong i = 0;

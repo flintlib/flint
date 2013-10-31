@@ -26,13 +26,13 @@
 
 #include "fq_poly.h"
 
-void fq_poly_randtest(fq_poly_t f, flint_rand_t state, 
-                      long len, const fq_ctx_t ctx)
+void
+fq_poly_randtest(fq_poly_t f, flint_rand_t state, long len, const fq_ctx_t ctx)
 {
     long i;
-    
+
     fq_poly_fit_length(f, len, ctx);
-    for(i = 0; i < len; i++)
+    for (i = 0; i < len; i++)
     {
         fq_randtest(f->coeffs + i, state, ctx);
     }
@@ -40,8 +40,9 @@ void fq_poly_randtest(fq_poly_t f, flint_rand_t state,
     _fq_poly_normalise(f, ctx);
 }
 
-void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state, 
-                               long len, const fq_ctx_t ctx)
+void
+fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
+                          long len, const fq_ctx_t ctx)
 {
     long i;
 
@@ -50,9 +51,9 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
         flint_printf("Exception (fq_poly_randtest_not_zero).  len = 0.\n");
         abort();
     }
-    
+
     fq_poly_randtest(f, state, len, ctx);
-    for(i = 0; (i < 10) && fq_poly_is_zero(f, ctx); i++)
+    for (i = 0; (i < 10) && fq_poly_is_zero(f, ctx); i++)
         fq_poly_randtest(f, state, len, ctx);
     if (fq_poly_is_zero(f, ctx))
         fq_poly_one(f, ctx);

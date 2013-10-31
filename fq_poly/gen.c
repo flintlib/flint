@@ -24,7 +24,8 @@
 ******************************************************************************/
 #include "fq_poly.h"
 
-void fq_poly_gen(fq_poly_t f, const fq_ctx_t ctx)
+void
+fq_poly_gen(fq_poly_t f, const fq_ctx_t ctx)
 {
     fq_poly_fit_length(f, 2, ctx);
     fq_zero(f->coeffs, ctx);

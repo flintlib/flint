@@ -25,8 +25,9 @@
 
 #include "fq_poly.h"
 
-void fq_poly_randtest_irreducible (fq_poly_t f, flint_rand_t state,
-                                   long len, const fq_ctx_t ctx)
+void
+fq_poly_randtest_irreducible(fq_poly_t f, flint_rand_t state,
+                             long len, const fq_ctx_t ctx)
 {
     fq_poly_t xq, xqi, x, g_i, finv;
     fmpz_t q;
@@ -56,7 +57,7 @@ void fq_poly_randtest_irreducible (fq_poly_t f, flint_rand_t state,
         /* Compute xq = x^q mod f */
         fq_poly_powmod_fmpz_binexp_preinv(xq, x, q, f, finv, ctx);
         fq_poly_set(xqi, xq, ctx);
-        
+
         for (i = 1; i <= (len - 1) / 2; i++)
         {
             fq_poly_sub(xqi, xqi, x, ctx);
@@ -68,7 +69,7 @@ void fq_poly_randtest_irreducible (fq_poly_t f, flint_rand_t state,
                 break;
             }
             fq_poly_compose_mod_brent_kung_preinv(xqi, xqi, xq, f, finv, ctx);
-        
+
         }
         if (!restart)
         {

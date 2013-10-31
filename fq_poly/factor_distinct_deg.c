@@ -80,14 +80,14 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     {
         fq_poly_gen(h[0], ctx);
         for (i = 1; i < l + 1; i++)
-            fq_poly_powmod_fmpz_binexp_preinv(h[i], h[i-1], q, v, vinv, ctx);
+            fq_poly_powmod_fmpz_binexp_preinv(h[i], h[i - 1], q, v, vinv, ctx);
     }
     else
     {
         fq_poly_gen(h[0], ctx);
         fq_poly_powmod_fmpz_binexp_preinv(h[1], h[0], q, v, vinv, ctx);
         for (i = 2; i < l + 1; i++)
-            fq_poly_compose_mod_preinv(h[i], h[i-1], h[1], v, vinv, ctx);
+            fq_poly_compose_mod_preinv(h[i], h[i - 1], h[1], v, vinv, ctx);
     }
 
     /* compute coarse distinct-degree factorisation */
@@ -101,18 +101,18 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
         /* compute giant steps: H[j]=x^{q^(lj)}mod s */
         if (j > 0)
         {
-            fq_poly_rem (reducedH0, reducedH0, s, ctx);
-            fq_poly_rem(tmp, H[j-1], s, ctx);
+            fq_poly_rem(reducedH0, reducedH0, s, ctx);
+            fq_poly_rem(tmp, H[j - 1], s, ctx);
             fq_poly_compose_mod_preinv(H[j], tmp, reducedH0, s, vinv, ctx);
         }
-        
+
         /* compute interval polynomials */
         fq_poly_one(I[j], ctx);
-        for (i = l-1; (i >= 0) && (2*d <= s->length-1); i--, d++)
+        for (i = l - 1; (i >= 0) && (2 * d <= s->length - 1); i--, d++)
         {
             fq_poly_rem(tmp, h[i], s, ctx);
             fq_poly_sub(tmp, H[j], tmp, ctx);
-            fq_poly_mulmod_preinv (I[j], tmp, I[j], s, vinv, ctx);
+            fq_poly_mulmod_preinv(I[j], tmp, I[j], s, vinv, ctx);
         }
 
         /* compute F_j=f^{[j*l+1]} * ... * f^{[j*l+l]} */
@@ -121,10 +121,10 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
         if (I[j]->length > 1)
         {
             fq_poly_remove(s, I[j], ctx);
-            fq_poly_reverse (vinv, s, s->length, ctx);
-            fq_poly_inv_series_newton (vinv, vinv, s->length, ctx);
+            fq_poly_reverse(vinv, s, s->length, ctx);
+            fq_poly_inv_series_newton(vinv, vinv, s->length, ctx);
         }
-        if (s->length-1 < 2*d)
+        if (s->length - 1 < 2 * d)
         {
             break;
         }
@@ -139,10 +139,10 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
     /* compute fine distinct-degree factorisation */
     for (j = 0; j < m; j++)
     {
-        if (I[j]->length-1 > (j+1)*l || j == 0)
+        if (I[j]->length - 1 > (j + 1) * l || j == 0)
         {
             fq_poly_set(g, I[j], ctx);
-            for (i = l - 1; i >= 0 && (g->length > 1); i-- )
+            for (i = l - 1; i >= 0 && (g->length > 1); i--)
             {
                 /* compute f^{[l*(j+1)-i]} */
                 fq_poly_sub(tmp, H[j], h[i], ctx);
@@ -162,7 +162,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
         {
             fq_poly_make_monic(I[j], I[j], ctx);
             fq_poly_factor_insert(res, I[j], 1, ctx);
-            (*degs)[index++] = I[j]->length-1;
+            (*degs)[index++] = I[j]->length - 1;
         }
     }
 

@@ -26,7 +26,7 @@
 #include "math.h"
 #include "fq_poly.h"
 
-int 
+int
 fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx)
 {
     slong i, n;
@@ -41,7 +41,7 @@ fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx)
     if (!fq_poly_is_squarefree(f, ctx))
         return 0;
 
-    if (!(degs = (slong *)flint_malloc(n * sizeof(slong))))
+    if (!(degs = (slong *) flint_malloc(n * sizeof(slong))))
     {
         flint_printf("Exception (fq_poly_is_irreducible_ddf): \n");
         flint_printf("Not enough memory.\n");

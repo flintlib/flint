@@ -28,10 +28,11 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_div_newton_preinv (fq_struct *Q, const fq_struct *A, slong lenA,
-                                 const fq_struct* B, slong lenB,
-                                 const fq_struct* Binv, slong lenBinv,
-                                 const fq_ctx_t ctx)
+void
+_fq_poly_div_newton_preinv(fq_struct * Q, const fq_struct * A, slong lenA,
+                           const fq_struct * B, slong lenB,
+                           const fq_struct * Binv, slong lenBinv,
+                           const fq_ctx_t ctx)
 {
     const slong lenQ = lenA - lenB + 1;
     fq_struct *Arev;
@@ -40,23 +41,22 @@ void _fq_poly_div_newton_preinv (fq_struct *Q, const fq_struct *A, slong lenA,
 
     _fq_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ, ctx);
 
-    _fq_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv),  lenQ, ctx);
+    _fq_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
 
     _fq_poly_reverse(Q, Q, lenQ, lenQ, ctx);
 
     _fq_vec_clear(Arev, lenQ, ctx);
 }
 
-void fq_poly_div_newton_preinv (fq_poly_t Q, const fq_poly_t A,
-                                const fq_poly_t B, const fq_poly_t Binv,
-                                const fq_ctx_t ctx)
+void
+fq_poly_div_newton_preinv(fq_poly_t Q, const fq_poly_t A,
+                          const fq_poly_t B, const fq_poly_t Binv,
+                          const fq_ctx_t ctx)
 {
     const slong lenA = A->length,
-        lenB = B->length,
-        lenQ = lenA - lenB + 1,
-        lenBinv= Binv->length;
+        lenB = B->length, lenQ = lenA - lenB + 1, lenBinv = Binv->length;
 
-    fq_struct* q;
+    fq_struct *q;
 
     if (lenB == 0)
     {
@@ -87,7 +87,7 @@ void fq_poly_div_newton_preinv (fq_poly_t Q, const fq_poly_t A,
     {
         flint_free(Q->coeffs);
         Q->coeffs = q;
-        Q->alloc  = lenQ;
+        Q->alloc = lenQ;
     }
     Q->length = lenQ;
 }

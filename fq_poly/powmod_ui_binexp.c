@@ -30,10 +30,10 @@
 #include "fq_poly.h"
 
 void
-_fq_poly_powmod_ui_binexp(fq_struct * res, const fq_struct * poly, ulong e, 
+_fq_poly_powmod_ui_binexp(fq_struct * res, const fq_struct * poly, ulong e,
                           const fq_struct * f, slong lenf, const fq_ctx_t ctx)
 {
-    fq_struct * T, * Q;
+    fq_struct *T, *Q;
     fq_t invf;
     slong lenT, lenQ;
     int i;
@@ -76,7 +76,7 @@ void
 fq_poly_powmod_ui_binexp(fq_poly_t res, const fq_poly_t poly, ulong e,
                          const fq_poly_t f, const fq_ctx_t ctx)
 {
-    fq_struct * q;
+    fq_struct *q;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;
@@ -129,23 +129,22 @@ fq_poly_powmod_ui_binexp(fq_poly_t res, const fq_poly_t poly, ulong e,
         _fq_vec_set(q, poly->coeffs, len, ctx);
         _fq_vec_zero(q + len, trunc - len, ctx);
         qcopy = 1;
-    } else
+    }
+    else
         q = poly->coeffs;
 
     if ((res == poly && !qcopy) || (res == f))
     {
         fq_poly_t t;
         fq_poly_init2(t, 2 * lenf - 3, ctx);
-        _fq_poly_powmod_ui_binexp(t->coeffs, q, e,
-                                            f->coeffs, lenf, ctx);
+        _fq_poly_powmod_ui_binexp(t->coeffs, q, e, f->coeffs, lenf, ctx);
         fq_poly_swap(res, t, ctx);
         fq_poly_clear(t, ctx);
     }
     else
     {
         fq_poly_fit_length(res, 2 * lenf - 3, ctx);
-        _fq_poly_powmod_ui_binexp(res->coeffs, q, e,
-                                            f->coeffs, lenf, ctx);
+        _fq_poly_powmod_ui_binexp(res->coeffs, q, e, f->coeffs, lenf, ctx);
     }
 
     if (qcopy)

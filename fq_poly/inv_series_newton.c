@@ -28,11 +28,11 @@
 
 #define FQ_POLY_INV_NEWTON_CUTOFF  64
 
-void 
-_fq_poly_inv_series_newton(fq_struct * Qinv, const fq_struct * Q, slong n, 
+void
+_fq_poly_inv_series_newton(fq_struct * Qinv, const fq_struct * Q, slong n,
                            const fq_t cinv, const fq_ctx_t ctx)
 {
-    if (n == 1)  /* {Q,1} x* cinv == 1 mod (x) */
+    if (n == 1)                 /* {Q,1} x* cinv == 1 mod (x) */
     {
         fq_set(Qinv, cinv, ctx);
     }
@@ -56,12 +56,12 @@ _fq_poly_inv_series_newton(fq_struct * Qinv, const fq_struct * Q, slong n,
             fq_struct *Qrev = W + 2 * FQ_POLY_INV_NEWTON_CUTOFF;
 
             _fq_poly_reverse(Qrev, Q, n, n, ctx);
-            _fq_vec_zero(W, 2*n - 2, ctx);
-            fq_one(W + (2*n - 2), ctx);
-            _fq_poly_div_basecase(Qinv, W, W, 2*n - 1, Qrev, n, cinv, ctx);
+            _fq_vec_zero(W, 2 * n - 2, ctx);
+            fq_one(W + (2 * n - 2), ctx);
+            _fq_poly_div_basecase(Qinv, W, W, 2 * n - 1, Qrev, n, cinv, ctx);
             _fq_poly_reverse(Qinv, Qinv, n, n, ctx);
         }
-        
+
         for (i--; i >= 0; i--)
         {
             m = n;
@@ -77,8 +77,9 @@ _fq_poly_inv_series_newton(fq_struct * Qinv, const fq_struct * Q, slong n,
     }
 }
 
-void fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
-                               const fq_ctx_t ctx)
+void
+fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
+                          const fq_ctx_t ctx)
 {
     fq_t cinv;
     fq_struct *Qcopy;
@@ -112,7 +113,7 @@ void fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
 
         _fq_vec_clear(Qinv->coeffs, Qinv->alloc, ctx);
         Qinv->coeffs = t;
-        Qinv->alloc  = n;
+        Qinv->alloc = n;
         Qinv->length = n;
     }
     _fq_poly_set_length(Qinv, n, ctx);
@@ -122,4 +123,3 @@ void fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
         _fq_vec_clear(Qcopy, n, ctx);
     fq_clear(cinv, ctx);
 }
-

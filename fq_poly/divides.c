@@ -25,10 +25,11 @@
 
 #include "fq_poly.h"
 
-int _fq_poly_divides(fq_struct *Q, 
-                     const fq_struct *A, long lenA, 
-                     const fq_struct *B, long lenB, const fq_t invB, 
-                     const fq_ctx_t ctx)
+int
+_fq_poly_divides(fq_struct * Q,
+                 const fq_struct * A, long lenA,
+                 const fq_struct * B, long lenB, const fq_t invB,
+                 const fq_ctx_t ctx)
 {
     fq_struct *R;
     long lenR;
@@ -43,8 +44,9 @@ int _fq_poly_divides(fq_struct *Q,
     return (lenR == 0);
 }
 
-int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, 
-                                 const fq_ctx_t ctx)
+int
+fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
+                const fq_ctx_t ctx)
 {
     if (fq_poly_is_zero(B, ctx))
     {
@@ -75,8 +77,8 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
             fq_poly_t T;
 
             fq_poly_init2(T, lenQ, ctx);
-            ans = _fq_poly_divides(T->coeffs, A->coeffs, A->length, 
-                                              B->coeffs, B->length, invB, ctx);
+            ans = _fq_poly_divides(T->coeffs, A->coeffs, A->length,
+                                   B->coeffs, B->length, invB, ctx);
             _fq_poly_set_length(T, lenQ, ctx);
             _fq_poly_normalise(T, ctx);
             fq_poly_swap(Q, T, ctx);
@@ -85,8 +87,8 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
         else
         {
             fq_poly_fit_length(Q, lenQ, ctx);
-            ans = _fq_poly_divides(Q->coeffs, A->coeffs, A->length, 
-                                              B->coeffs, B->length, invB, ctx);
+            ans = _fq_poly_divides(Q->coeffs, A->coeffs, A->length,
+                                   B->coeffs, B->length, invB, ctx);
             _fq_poly_set_length(Q, lenQ, ctx);
             _fq_poly_normalise(Q, ctx);
         }
@@ -95,4 +97,3 @@ int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
         return ans;
     }
 }
-

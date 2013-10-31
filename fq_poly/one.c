@@ -25,7 +25,8 @@
 
 #include "fq_poly.h"
 
-void fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx)
+void
+fq_poly_one(fq_poly_t poly, const fq_ctx_t ctx)
 {
     fq_poly_fit_length(poly, 1, ctx);
     fq_one(poly->coeffs + 0, ctx);

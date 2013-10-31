@@ -26,10 +26,10 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_mullow(fq_struct *rop, 
-                     const fq_struct *op1, long len1, 
-                     const fq_struct *op2, long len2, long n, 
-                     const fq_ctx_t ctx)
+void
+_fq_poly_mullow(fq_struct * rop,
+                const fq_struct * op1, long len1,
+                const fq_struct * op2, long len2, long n, const fq_ctx_t ctx)
 {
     if (FLINT_MAX(len1, len2) < 6)
     {
@@ -41,9 +41,10 @@ void _fq_poly_mullow(fq_struct *rop,
     }
 }
 
-void fq_poly_mullow(fq_poly_t rop, 
-                    const fq_poly_t op1, const fq_poly_t op2, long n, 
-                    const fq_ctx_t ctx)
+void
+fq_poly_mullow(fq_poly_t rop,
+               const fq_poly_t op1, const fq_poly_t op2, long n,
+               const fq_ctx_t ctx)
 {
     const long len1 = op1->length;
     const long len2 = op2->length;
@@ -63,16 +64,16 @@ void fq_poly_mullow(fq_poly_t rop,
         fq_poly_t t;
 
         fq_poly_init2(t, n, ctx);
-        _fq_poly_mullow(t->coeffs, op1->coeffs, op1->length, 
-                                   op2->coeffs, op2->length, n, ctx);
+        _fq_poly_mullow(t->coeffs, op1->coeffs, op1->length,
+                        op2->coeffs, op2->length, n, ctx);
         fq_poly_swap(rop, t, ctx);
         fq_poly_clear(t, ctx);
     }
     else
     {
         fq_poly_fit_length(rop, n, ctx);
-        _fq_poly_mullow(rop->coeffs, op1->coeffs, op1->length, 
-                                     op2->coeffs, op2->length, n, ctx);
+        _fq_poly_mullow(rop->coeffs, op1->coeffs, op1->length,
+                        op2->coeffs, op2->length, n, ctx);
     }
 
     _fq_poly_set_length(rop, n, ctx);

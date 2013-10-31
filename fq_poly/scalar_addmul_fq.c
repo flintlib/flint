@@ -26,8 +26,10 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_scalar_addmul_fq(fq_struct *rop, 
-    const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx)
+void
+_fq_poly_scalar_addmul_fq(fq_struct * rop,
+                          const fq_struct * op, long len, const fq_t x,
+                          const fq_ctx_t ctx)
 {
     if (fq_is_zero(x, ctx))
         return;
@@ -53,8 +55,9 @@ void _fq_poly_scalar_addmul_fq(fq_struct *rop,
     }
 }
 
-void fq_poly_scalar_addmul_fq(fq_poly_t rop, 
-    const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
+void
+fq_poly_scalar_addmul_fq(fq_poly_t rop,
+                         const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
 {
     if (!(fq_is_zero(x, ctx) || fq_poly_is_zero(op, ctx)))
     {

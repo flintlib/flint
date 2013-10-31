@@ -47,7 +47,7 @@ fq_poly_deflate(fq_poly_t result, const fq_poly_t input, ulong deflation,
     res_length = (input->length - 1) / deflation + 1;
     fq_poly_fit_length(result, res_length, ctx);
     for (i = 0; i < res_length; i++)
-        fq_set(result->coeffs + i, input->coeffs + (i*deflation), ctx);
+        fq_set(result->coeffs + i, input->coeffs + (i * deflation), ctx);
 
     result->length = res_length;
 }

@@ -25,9 +25,9 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1, 
-                                             const fq_struct *op2, long len2, 
-                                             const fq_ctx_t ctx)
+void
+_fq_poly_compose_horner(fq_struct * rop, const fq_struct * op1, long len1,
+                        const fq_struct * op2, long len2, const fq_ctx_t ctx)
 {
     if (len1 == 1)
     {
@@ -39,10 +39,10 @@ void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1,
 
         long i = len1 - 1, lenr;
         fq_struct *t = _fq_vec_init(alloc, ctx);
-        
+
         /*
            Perform the first two steps as one, 
-             "res = a(m) * poly2 + a(m-1)".
+           "res = a(m) * poly2 + a(m-1)".
          */
         {
             lenr = len2;
@@ -56,19 +56,20 @@ void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1,
             lenr += len2 - 1;
             _fq_poly_add(rop, t, lenr, op1 + i, 1, ctx);
         }
-        
+
         _fq_vec_clear(t, alloc, ctx);
     }
 }
 
-void fq_poly_compose_horner(fq_poly_t rop, 
-                            const fq_poly_t op1, const fq_poly_t op2, 
-                            const fq_ctx_t ctx)
+void
+fq_poly_compose_horner(fq_poly_t rop,
+                       const fq_poly_t op1, const fq_poly_t op2,
+                       const fq_ctx_t ctx)
 {
     const long len1 = op1->length;
     const long len2 = op2->length;
     const long lenr = (len1 - 1) * (len2 - 1) + 1;
-    
+
     if (len1 == 0)
     {
         fq_poly_zero(rop, ctx);
@@ -80,8 +81,8 @@ void fq_poly_compose_horner(fq_poly_t rop,
     else if (rop != op1 && rop != op2)
     {
         fq_poly_fit_length(rop, lenr, ctx);
-        _fq_poly_compose_horner(rop->coeffs, op1->coeffs, len1, 
-                                             op2->coeffs, len2, ctx);
+        _fq_poly_compose_horner(rop->coeffs, op1->coeffs, len1,
+                                op2->coeffs, len2, ctx);
         _fq_poly_set_length(rop, lenr, ctx);
         _fq_poly_normalise(rop, ctx);
     }
@@ -91,11 +92,10 @@ void fq_poly_compose_horner(fq_poly_t rop,
 
         fq_poly_init2(t, lenr, ctx);
         _fq_poly_compose_horner(t->coeffs, op1->coeffs, len1,
-                                           op2->coeffs, len2, ctx);
+                                op2->coeffs, len2, ctx);
         _fq_poly_set_length(t, lenr, ctx);
         _fq_poly_normalise(t, ctx);
         fq_poly_swap(rop, t, ctx);
         fq_poly_clear(t, ctx);
     }
 }
-

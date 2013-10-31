@@ -31,7 +31,8 @@
     $X$-direction.
  */
 
-static fmpz_poly_struct * __vec_init(long len)
+static fmpz_poly_struct *
+__vec_init(long len)
 {
     long i;
     fmpz_poly_struct *v;
@@ -42,7 +43,8 @@ static fmpz_poly_struct * __vec_init(long len)
     return v;
 }
 
-static fmpz_poly_struct * __vec_init2(long len, long n)
+static fmpz_poly_struct *
+__vec_init2(long len, long n)
 {
     long i;
     fmpz_poly_struct *v;
@@ -53,7 +55,8 @@ static fmpz_poly_struct * __vec_init2(long len, long n)
     return v;
 }
 
-static void __vec_clear(fmpz_poly_struct *v, long len)
+static void
+__vec_clear(fmpz_poly_struct * v, long len)
 {
     long i;
 
@@ -62,8 +65,9 @@ static void __vec_clear(fmpz_poly_struct *v, long len)
     flint_free(v);
 }
 
-static void __scalar_addmul(fmpz_poly_struct *rop, 
-    const fmpz_poly_struct *op, long len, const fmpz_poly_t x)
+static void
+__scalar_addmul(fmpz_poly_struct * rop,
+                const fmpz_poly_struct * op, long len, const fmpz_poly_t x)
 {
     long i;
 
@@ -90,8 +94,9 @@ static void __scalar_addmul(fmpz_poly_struct *rop,
     }
 }
 
-static void __scalar_mul(fmpz_poly_struct *rop, 
-    const fmpz_poly_struct *op, long len, const fmpz_poly_t x)
+static void
+__scalar_mul(fmpz_poly_struct * rop,
+             const fmpz_poly_struct * op, long len, const fmpz_poly_t x)
 {
     long i;
 
@@ -112,7 +117,8 @@ static void __scalar_mul(fmpz_poly_struct *rop,
     }
 }
 
-static void __sqr(fmpz_poly_struct *rop, fmpz_poly_struct *op, long len)
+static void
+__sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, long len)
 {
     if (len == 1)
     {
@@ -144,8 +150,9 @@ static void __sqr(fmpz_poly_struct *rop, fmpz_poly_struct *op, long len)
     }
 }
 
-void _fq_poly_sqr_reorder(fq_struct *rop, 
-                          const fq_struct *op, long len, const fq_ctx_t ctx)
+void
+_fq_poly_sqr_reorder(fq_struct * rop,
+                     const fq_struct * op, long len, const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
 
@@ -158,7 +165,7 @@ void _fq_poly_sqr_reorder(fq_struct *rop,
     /* Convert (op, len) to (g, d) */
     for (i = 0; i < len; i++)
         for (j = 0; j < fmpz_poly_length(op + i); j++)
-            fmpz_set( (g + j)->coeffs + i, (op + i)->coeffs + j );
+            fmpz_set((g + j)->coeffs + i, (op + i)->coeffs + j);
 
     for (j = 0; j < d; j++)
     {
@@ -180,7 +187,8 @@ void _fq_poly_sqr_reorder(fq_struct *rop,
         {
             for (k = ctx->len - 2; k >= 0; k--)
             {
-                fmpz_poly_scalar_submul_fmpz(f + ctx->j[k] + i - d, f + i, ctx->a + k);
+                fmpz_poly_scalar_submul_fmpz(f + ctx->j[k] + i - d, f + i,
+                                             ctx->a + k);
             }
             fmpz_poly_zero(f + i);
         }
@@ -196,7 +204,7 @@ void _fq_poly_sqr_reorder(fq_struct *rop,
     }
     for (j = 0; j < d; j++)
         for (i = 0; i < fmpz_poly_length(f + j); i++)
-            fmpz_set( (rop + i)->coeffs + j, (f + j)->coeffs + i );
+            fmpz_set((rop + i)->coeffs + j, (f + j)->coeffs + i);
     for (i = 0; i < 2 * len - 1; i++)
     {
         _fmpz_poly_set_length(rop + i, d);
@@ -207,7 +215,8 @@ void _fq_poly_sqr_reorder(fq_struct *rop,
     __vec_clear(g, d);
 }
 
-void fq_poly_sqr_reorder(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+void
+fq_poly_sqr_reorder(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
     const long len = 2 * op->length - 1;
 

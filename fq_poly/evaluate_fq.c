@@ -25,8 +25,9 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_evaluate_fq(fq_t rop, const fq_struct *op, long len, 
-                                    const fq_t a, const fq_ctx_t ctx)
+void
+_fq_poly_evaluate_fq(fq_t rop, const fq_struct * op, long len,
+                     const fq_t a, const fq_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -52,8 +53,9 @@ void _fq_poly_evaluate_fq(fq_t rop, const fq_struct *op, long len,
     }
 }
 
-void fq_poly_evaluate_fq(fq_t rop, const fq_poly_t f, const fq_t a, 
-                                   const fq_ctx_t ctx)
+void
+fq_poly_evaluate_fq(fq_t rop, const fq_poly_t f, const fq_t a,
+                    const fq_ctx_t ctx)
 {
     if (rop == a)
     {
@@ -68,4 +70,3 @@ void fq_poly_evaluate_fq(fq_t rop, const fq_poly_t f, const fq_t a,
         _fq_poly_evaluate_fq(rop, f->coeffs, f->length, a, ctx);
     }
 }
-

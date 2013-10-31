@@ -48,8 +48,8 @@ _fq_poly_get_str_pretty(const fq_struct * poly, slong len, const char *x,
         return fq_get_str_pretty(poly, ctx);
     }
 
-    coeffstrs = (char **) flint_malloc(len * sizeof(char*));
-    
+    coeffstrs = (char **) flint_malloc(len * sizeof(char *));
+
     nz = 0;
     bound = 1;
     for (i = 0; i < len; i++)
@@ -87,7 +87,7 @@ _fq_poly_get_str_pretty(const fq_struct * poly, slong len, const char *x,
         else
         {
             off += flint_sprintf(str + off, "+");
-        } 
+        }
         if (i > 1)
             off += flint_sprintf(str + off, "*%s^%wd", x, i);
         else
@@ -98,7 +98,7 @@ _fq_poly_get_str_pretty(const fq_struct * poly, slong len, const char *x,
     {
         off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
     }
-    
+
     for (i = 0; i < len; i++)
         if (!fq_is_zero(poly + i, ctx))
         {

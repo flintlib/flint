@@ -27,11 +27,11 @@
 #include "fq_poly.h"
 
 void
-_fq_poly_divrem_newton_preinv (fq_struct* Q, fq_struct* R,
-                               const fq_struct* A, slong lenA,
-                               const fq_struct* B, slong lenB,
-                               const fq_struct* Binv, slong lenBinv, 
-                               const fq_ctx_t ctx)
+_fq_poly_divrem_newton_preinv(fq_struct * Q, fq_struct * R,
+                              const fq_struct * A, slong lenA,
+                              const fq_struct * B, slong lenB,
+                              const fq_struct * Binv, slong lenBinv,
+                              const fq_ctx_t ctx)
 {
     const slong lenQ = lenA - lenB + 1;
 
@@ -53,12 +53,13 @@ fq_poly_divrem_newton_preinv(fq_poly_t Q, fq_poly_t R,
                              const fq_poly_t A, const fq_poly_t B,
                              const fq_poly_t Binv, const fq_ctx_t ctx)
 {
-    const slong lenA = A->length, lenB = B->length, lenBinv= Binv->length;
+    const slong lenA = A->length, lenB = B->length, lenBinv = Binv->length;
     fq_struct *q, *r;
 
     if (lenB == 0)
     {
-        printf("Exception (fq_poly_divrem_newton_preinv). Division by zero.\n");
+        printf
+            ("Exception (fq_poly_divrem_newton_preinv). Division by zero.\n");
         abort();
     }
 
@@ -69,9 +70,9 @@ fq_poly_divrem_newton_preinv(fq_poly_t Q, fq_poly_t R,
         return;
     }
 
-    if (lenA > 2*lenB-2)
+    if (lenA > 2 * lenB - 2)
     {
-        printf ("Exception (fq_poly_divrem_newton_preinv).\n");
+        printf("Exception (fq_poly_divrem_newton_preinv).\n");
     }
 
     if (Q == A || Q == B || Q == Binv)
@@ -93,21 +94,20 @@ fq_poly_divrem_newton_preinv(fq_poly_t Q, fq_poly_t R,
         r = R->coeffs;
     }
 
-    _fq_poly_divrem_newton_preinv (q, r, A->coeffs, lenA,
-                                   B->coeffs, lenB, Binv->coeffs,
-                                   lenBinv, ctx);
+    _fq_poly_divrem_newton_preinv(q, r, A->coeffs, lenA,
+                                  B->coeffs, lenB, Binv->coeffs, lenBinv, ctx);
 
     if (Q == A || Q == B || Q == Binv)
     {
         _fq_vec_clear(Q->coeffs, lenA - lenB + 1, ctx);
         Q->coeffs = q;
-        Q->alloc  = lenA - lenB + 1;
+        Q->alloc = lenA - lenB + 1;
     }
     if (R == A || R == B || R == Binv)
     {
         _fq_vec_clear(R->coeffs, lenB - 1, ctx);
         R->coeffs = r;
-        R->alloc  = lenB - 1;
+        R->alloc = lenB - 1;
     }
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;

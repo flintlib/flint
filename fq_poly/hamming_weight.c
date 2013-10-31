@@ -25,7 +25,8 @@
 
 #include "fq_poly.h"
 
-long _fq_poly_hamming_weight(const fq_struct *op, long len, const fq_ctx_t ctx)
+long
+_fq_poly_hamming_weight(const fq_struct * op, long len, const fq_ctx_t ctx)
 {
     long i, sum = 0;
     for (i = 0; i < len; i++)
@@ -34,9 +35,9 @@ long _fq_poly_hamming_weight(const fq_struct *op, long len, const fq_ctx_t ctx)
     return sum;
 }
 
-long fq_poly_hamming_weight(const fq_poly_t op, const fq_ctx_t ctx)
+long
+fq_poly_hamming_weight(const fq_poly_t op, const fq_ctx_t ctx)
 {
-  
+
     return _fq_poly_hamming_weight(op->coeffs, op->length, ctx);
 }
-

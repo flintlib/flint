@@ -25,10 +25,11 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_compose_divconquer(fq_struct *rop, 
-                                 const fq_struct *op1, long len1, 
-                                 const fq_struct *op2, long len2, 
-                                 const fq_ctx_t ctx)
+void
+_fq_poly_compose_divconquer(fq_struct * rop,
+                            const fq_struct * op1, long len1,
+                            const fq_struct * op2, long len2,
+                            const fq_ctx_t ctx)
 {
     long i, j, k, n;
     long *hlen, alloc, powlen;
@@ -40,13 +41,13 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
             fq_set(rop, op1, ctx);
         else if (len2 == 1)
             _fq_poly_evaluate_fq(rop, op1, len1, op2, ctx);
-        else  /* len1 == 2 */
+        else                    /* len1 == 2 */
             _fq_poly_compose_horner(rop, op1, len1, op2, len2, ctx);
         return;
     }
 
     /* Initialisation */
-    
+
     hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
 
     k = FLINT_CLOG2(len1) - 1;
@@ -59,7 +60,7 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
     powlen = (1 << k) * (len2 - 1) + 1;
-    
+
     alloc = 0;
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
@@ -70,14 +71,14 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
     for (i = 0; i < (len1 - 1) / 2; i++)
     {
         h[i + 1] = h[i] + hlen[i];
-        hlen[i]  = 0;
+        hlen[i] = 0;
     }
     hlen[(len1 - 1) / 2] = 0;
-    pow  = v + alloc;
+    pow = v + alloc;
     temp = pow + powlen;
-    
+
     /* Let's start the actual work */
-    
+
     for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
         if (!fq_is_zero(op1 + (j + 1), ctx))
@@ -100,10 +101,10 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
             hlen[i] = 1;
         }
     }
-    
+
     _fq_poly_sqr(pow, op2, len2, ctx);
     powlen = 2 * len2 - 1;
-    
+
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
     {
         if (hlen[1] > 0)
@@ -113,49 +114,52 @@ void _fq_poly_compose_divconquer(fq_struct *rop,
             _fq_poly_add(h[0], temp, templen, h[0], hlen[0], ctx);
             hlen[0] = FLINT_MAX(hlen[0], templen);
         }
-        
+
         for (i = 1; i < n / 2; i++)
         {
-            if (hlen[2*i + 1] > 0)
+            if (hlen[2 * i + 1] > 0)
             {
-                _fq_poly_mul(h[i], pow, powlen, h[2*i + 1], hlen[2*i + 1], ctx);
-                hlen[i] = hlen[2*i + 1] + powlen - 1;
-            } else
+                _fq_poly_mul(h[i], pow, powlen, h[2 * i + 1], hlen[2 * i + 1],
+                             ctx);
+                hlen[i] = hlen[2 * i + 1] + powlen - 1;
+            }
+            else
                 hlen[i] = 0;
-            _fq_poly_add(h[i], h[i], hlen[i], h[2*i], hlen[2*i], ctx);
-            hlen[i] = FLINT_MAX(hlen[i], hlen[2*i]);
+            _fq_poly_add(h[i], h[i], hlen[i], h[2 * i], hlen[2 * i], ctx);
+            hlen[i] = FLINT_MAX(hlen[i], hlen[2 * i]);
         }
         if ((n & 1L))
         {
-            _fq_poly_set(h[i], h[2*i], hlen[2*i], ctx);
-            hlen[i] = hlen[2*i];
+            _fq_poly_set(h[i], h[2 * i], hlen[2 * i], ctx);
+            hlen[i] = hlen[2 * i];
         }
-        
+
         _fq_poly_sqr(temp, pow, powlen, ctx);
         powlen += powlen - 1;
         {
             fq_struct *t = pow;
-            pow          = temp;
-            temp         = t;
+            pow = temp;
+            temp = t;
         }
     }
 
     _fq_poly_mul(rop, pow, powlen, h[1], hlen[1], ctx);
     _fq_poly_add(rop, rop, hlen[0], h[0], hlen[0], ctx);
-    
+
     _fq_vec_clear(v, alloc + 2 * powlen, ctx);
     flint_free(h);
     flint_free(hlen);
 }
 
-void fq_poly_compose_divconquer(fq_poly_t rop, 
-                                const fq_poly_t op1, const fq_poly_t op2, 
-                                const fq_ctx_t ctx)
+void
+fq_poly_compose_divconquer(fq_poly_t rop,
+                           const fq_poly_t op1, const fq_poly_t op2,
+                           const fq_ctx_t ctx)
 {
     const long len1 = op1->length;
     const long len2 = op2->length;
     const long lenr = (len1 - 1) * (len2 - 1) + 1;
-    
+
     if (len1 == 0)
     {
         fq_poly_zero(rop, ctx);
@@ -167,8 +171,8 @@ void fq_poly_compose_divconquer(fq_poly_t rop,
     else if (rop != op1 && rop != op2)
     {
         fq_poly_fit_length(rop, lenr, ctx);
-        _fq_poly_compose_divconquer(rop->coeffs, op1->coeffs, len1, 
-                                                 op2->coeffs, len2, ctx);
+        _fq_poly_compose_divconquer(rop->coeffs, op1->coeffs, len1,
+                                    op2->coeffs, len2, ctx);
         _fq_poly_set_length(rop, lenr, ctx);
         _fq_poly_normalise(rop, ctx);
     }
@@ -178,11 +182,10 @@ void fq_poly_compose_divconquer(fq_poly_t rop,
 
         fq_poly_init2(t, lenr, ctx);
         _fq_poly_compose_divconquer(t->coeffs, op1->coeffs, len1,
-                                               op2->coeffs, len2, ctx);
+                                    op2->coeffs, len2, ctx);
         _fq_poly_set_length(t, lenr, ctx);
         _fq_poly_normalise(t, ctx);
         fq_poly_swap(rop, t, ctx);
         fq_poly_clear(t, ctx);
     }
 }
-

@@ -27,12 +27,13 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_mulmod_preinv(fq_struct *res,
-                            const fq_struct *poly1, slong len1,
-                            const fq_struct  *poly2, slong len2,
-                            const fq_struct *f, slong lenf,
-                            const fq_struct *finv, slong lenfinv,
-                            const fq_ctx_t ctx)
+void
+_fq_poly_mulmod_preinv(fq_struct * res,
+                       const fq_struct * poly1, slong len1,
+                       const fq_struct * poly2, slong len2,
+                       const fq_struct * f, slong lenf,
+                       const fq_struct * finv, slong lenfinv,
+                       const fq_ctx_t ctx)
 {
     fq_struct *T, *Q;
     slong lenT, lenQ;
@@ -90,9 +91,7 @@ fq_poly_mulmod_preinv(fq_poly_t res, const fq_poly_t poly1,
         fq_poly_fit_length(res, lenf - 1, ctx);
         _fq_poly_mulmod_preinv(res->coeffs, poly1->coeffs, len1,
                                poly2->coeffs, len2,
-                               fcoeffs, lenf,
-                               finv->coeffs, finv->length,
-                               ctx);
+                               fcoeffs, lenf, finv->coeffs, finv->length, ctx);
         if (f == res)
             _fq_vec_clear(fcoeffs, lenf, ctx);
 

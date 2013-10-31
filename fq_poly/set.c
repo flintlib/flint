@@ -27,7 +27,9 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len, const fq_ctx_t ctx)
+void
+_fq_poly_set(fq_struct * rop, const fq_struct * op, long len,
+             const fq_ctx_t ctx)
 {
     long i;
 
@@ -35,9 +37,10 @@ void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len, const fq_ctx_t 
         fq_set(rop + i, op + i, ctx);
 }
 
-void fq_poly_set(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+void
+fq_poly_set(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
-    if (rop != op)         /* Aliasing is trivial */
+    if (rop != op)              /* Aliasing is trivial */
     {
         long i, len = op->length;
 

@@ -26,7 +26,8 @@
 
 #include "fq_poly.h"
 
-void fq_poly_fit_length(fq_poly_t poly, long len, const fq_ctx_t ctx)
+void
+fq_poly_fit_length(fq_poly_t poly, long len, const fq_ctx_t ctx)
 {
     if (len > poly->alloc)
     {

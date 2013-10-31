@@ -28,40 +28,41 @@
 #include <stdlib.h>
 #include "fq_poly.h"
 
-long _fq_poly_gcd_euclidean(fq_struct * G, const fq_struct * A, long lenA,
-                            const fq_struct * B, long lenB, const fq_ctx_t ctx)
+long
+_fq_poly_gcd_euclidean(fq_struct * G, const fq_struct * A, long lenA,
+                       const fq_struct * B, long lenB, const fq_ctx_t ctx)
 {
     long lenR1 = lenA, lenR2 = lenB, lenT;  /* assumes lenA \geq lenB */
 
-    fq_struct * R1, *R2, *T;
+    fq_struct *R1, *R2, *T;
 
     fq_t inv;
 
-    fq_init (inv, ctx);
-    T = _fq_vec_init (lenA, ctx);
-    R1 = _fq_vec_init (lenA, ctx);
-    R2 = _fq_vec_init (lenB, ctx);
-    _fq_vec_set (R1, A, lenA, ctx);
-    _fq_vec_set (R2, B, lenB, ctx);
+    fq_init(inv, ctx);
+    T = _fq_vec_init(lenA, ctx);
+    R1 = _fq_vec_init(lenA, ctx);
+    R2 = _fq_vec_init(lenB, ctx);
+    _fq_vec_set(R1, A, lenA, ctx);
+    _fq_vec_set(R2, B, lenB, ctx);
 
     while (lenR2 > 0)
     {
-        if (!fq_is_zero (R2 + (lenR2 - 1), ctx))
-            fq_inv (inv, R2 + (lenR2 - 1), ctx);
+        if (!fq_is_zero(R2 + (lenR2 - 1), ctx))
+            fq_inv(inv, R2 + (lenR2 - 1), ctx);
         else
             flint_printf("something wrong with length");
-        _fq_poly_rem (R1, R1, lenR1, R2, lenR2, inv, ctx);
-        _fq_poly_normalise2 (R1, &lenR1, ctx);
+        _fq_poly_rem(R1, R1, lenR1, R2, lenR2, inv, ctx);
+        _fq_poly_normalise2(R1, &lenR1, ctx);
 
-        _fq_vec_set (T, R1, lenR1, ctx);
-        _fq_vec_set (R1, R2, lenR2, ctx);
-        _fq_vec_set (R2, T, lenR1, ctx);
+        _fq_vec_set(T, R1, lenR1, ctx);
+        _fq_vec_set(R1, R2, lenR2, ctx);
+        _fq_vec_set(R2, T, lenR1, ctx);
         lenT = lenR1;
         lenR1 = lenR2;
         lenR2 = lenT;
     }
 
-    _fq_poly_set (G, R1, lenR1, ctx);
+    _fq_poly_set(G, R1, lenR1, ctx);
     _fq_vec_clear(T, lenA, ctx);
     _fq_vec_clear(R1, lenA, ctx);
     _fq_vec_clear(R2, lenB, ctx);
@@ -69,28 +70,29 @@ long _fq_poly_gcd_euclidean(fq_struct * G, const fq_struct * A, long lenA,
     return lenR1;
 }
 
-void fq_poly_gcd_euclidean(fq_poly_t G, 
-                           const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
+void
+fq_poly_gcd_euclidean(fq_poly_t G,
+                      const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
 {
     if (A->length < B->length)
     {
         fq_poly_gcd_euclidean(G, B, A, ctx);
     }
-    else /* lenA >= lenB >= 0 */
+    else                        /* lenA >= lenB >= 0 */
     {
         long lenA = A->length, lenB = B->length, lenG;
         fq_poly_t tG;
         fq_struct *g;
 
-        if (lenA == 0) /* lenA = lenB = 0 */
+        if (lenA == 0)          /* lenA = lenB = 0 */
         {
             fq_poly_zero(G, ctx);
-        } 
-        else if (lenB == 0) /* lenA > lenB = 0 */
+        }
+        else if (lenB == 0)     /* lenA > lenB = 0 */
         {
             fq_poly_make_monic(G, A, ctx);
         }
-        else /* lenA >= lenB >= 1 */
+        else                    /* lenA >= lenB >= 1 */
         {
             if (G == A || G == B)
             {
@@ -104,7 +106,7 @@ void fq_poly_gcd_euclidean(fq_poly_t G,
             }
 
             lenG = _fq_poly_gcd_euclidean(g, A->coeffs, lenA,
-                                               B->coeffs, lenB, ctx);
+                                          B->coeffs, lenB, ctx);
 
             if (G == A || G == B)
             {

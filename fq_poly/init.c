@@ -26,16 +26,18 @@
 
 #include "fq_poly.h"
 
-void fq_poly_init(fq_poly_t poly, const fq_ctx_t ctx)
+void
+fq_poly_init(fq_poly_t poly, const fq_ctx_t ctx)
 {
     poly->coeffs = NULL;
-    poly->alloc  = 0;
+    poly->alloc = 0;
     poly->length = 0;
 }
 
-void fq_poly_init2(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
+void
+fq_poly_init2(fq_poly_t poly, long alloc, const fq_ctx_t ctx)
 {
     poly->coeffs = (alloc) ? _fq_vec_init(alloc, ctx) : NULL;
-    poly->alloc  = alloc;
+    poly->alloc = alloc;
     poly->length = 0;
 }

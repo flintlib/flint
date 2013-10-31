@@ -25,12 +25,12 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_sub(fq_struct *res, 
-                  const fq_struct *poly1, long len1, 
-                  const fq_struct *poly2, long len2, 
-                  const fq_ctx_t ctx)
+void
+_fq_poly_sub(fq_struct * res,
+             const fq_struct * poly1, long len1,
+             const fq_struct * poly2, long len2, const fq_ctx_t ctx)
 {
-    const long min  = FLINT_MIN(len1, len2);
+    const long min = FLINT_MIN(len1, len2);
     long i;
 
     for (i = 0; i < min; i++)
@@ -44,15 +44,16 @@ void _fq_poly_sub(fq_struct *res,
         fq_neg(res + i, poly2 + i, ctx);
 }
 
-void fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, 
-                 const fq_ctx_t ctx)
+void
+fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
+            const fq_ctx_t ctx)
 {
-    const long max  = FLINT_MAX(poly1->length, poly2->length);
+    const long max = FLINT_MAX(poly1->length, poly2->length);
 
     fq_poly_fit_length(res, max, ctx);
 
-    _fq_poly_sub(res->coeffs, poly1->coeffs, poly1->length, 
-                              poly2->coeffs, poly2->length, ctx);
+    _fq_poly_sub(res->coeffs, poly1->coeffs, poly1->length,
+                 poly2->coeffs, poly2->length, ctx);
 
     _fq_poly_set_length(res, max, ctx);
     _fq_poly_normalise(res, ctx);

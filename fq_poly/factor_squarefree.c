@@ -49,7 +49,7 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
 
     fmpz_init(p);
     fmpz_set(p, fq_ctx_prime(ctx));
-    
+
     deg = fq_poly_degree(f, ctx);
 
     /* Step 1, look at f', if it is zero then we are done since f = h(x)^p
@@ -114,8 +114,7 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
             {
                 fq_poly_factor_insert(res, z, 1, ctx);
                 fq_poly_make_monic(res->poly + (res->num - 1),
-                                   res->poly + (res->num - 1),
-                                   ctx);
+                                   res->poly + (res->num - 1), ctx);
                 if (res->num)
                     res->exp[res->num - 1] *= i;
             }
@@ -134,11 +133,11 @@ fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
         if (g->length > 1)
         {
             /* so now we multiply res with squarefree(g^1/p) ^ p  */
-            fq_poly_t g_p;    /* g^(1/p) */
+            fq_poly_t g_p;      /* g^(1/p) */
             fq_poly_factor_t new_res_2;
 
             fq_poly_init(g_p, ctx);
-            
+
             p_ui = fmpz_get_ui(p);
 
             for (i = 0; i <= fq_poly_degree(g, ctx) / p_ui; i++)

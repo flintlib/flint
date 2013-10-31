@@ -25,8 +25,9 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e, 
-                                  const fq_ctx_t ctx)
+void
+_fq_poly_pow(fq_struct * rop, const fq_struct * op, long len, ulong e,
+             const fq_ctx_t ctx)
 {
     ulong bit = ~((~0UL) >> 1);
     long rlen;
@@ -37,17 +38,17 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
     /*
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
-    
+
     while ((bit & e) == 0UL)
         bit >>= 1;
-    
+
     bit >>= 1;
-    
+
     /*
        Trial run without any polynomial arithmetic to determine the parity 
        of the number of swaps;  then set R and S accordingly
      */
-    
+
     {
         unsigned int swaps = 0U;
         ulong bit2 = bit;
@@ -56,7 +57,7 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
         while (bit2 >>= 1)
             if ((bit2 & e) == 0UL)
                 swaps = ~swaps;
-        
+
         if (swaps == 0U)
         {
             R = rop;
@@ -68,11 +69,11 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
             S = rop;
         }
     }
-    
+
     /*
        We unroll the first step of the loop, referring to {poly, len}
      */
-    
+
     _fq_poly_sqr(R, op, len, ctx);
     rlen = 2 * len - 1;
     if ((bit & e))
@@ -83,7 +84,7 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
         R = S;
         S = T;
     }
-    
+
     while ((bit >>= 1))
     {
         if ((bit & e))
@@ -102,12 +103,12 @@ void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e,
             S = T;
         }
     }
-    
+
     _fq_vec_clear(v, alloc, ctx);
 }
 
-void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, 
-                                const fq_ctx_t ctx)
+void
+fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, const fq_ctx_t ctx)
 {
     const long len = op->length;
 
@@ -130,7 +131,7 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
         }
         else if (e == 1UL)
             fq_poly_set(rop, op, ctx);
-        else  /* e == 2UL */
+        else                    /* e == 2UL */
             fq_poly_sqr(rop, op, ctx);
     }
     else
@@ -154,4 +155,3 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
         }
     }
 }
-

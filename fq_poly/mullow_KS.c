@@ -26,10 +26,11 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_mullow_KS(fq_struct *rop, 
-                        const fq_struct *op1, long len1, 
-                        const fq_struct *op2, long len2, long n, 
-                        const fq_ctx_t ctx)
+void
+_fq_poly_mullow_KS(fq_struct * rop,
+                   const fq_struct * op1, long len1,
+                   const fq_struct * op2, long len2, long n,
+                   const fq_ctx_t ctx)
 {
     const long d = fq_ctx_degree(ctx);
     long bits, i, m;
@@ -44,8 +45,8 @@ void _fq_poly_mullow_KS(fq_struct *rop,
         return;
     }
 
-    bits = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
-           + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
+    bits = 2 * fmpz_bits(fq_ctx_prime(ctx))
+        + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
 
     f = _fmpz_vec_init(n + len1 + len2);
     g = f + n;
@@ -72,7 +73,7 @@ void _fq_poly_mullow_KS(fq_struct *rop,
         fmpz_poly_bit_unpack_unsigned(rop + i, f + i, bits);
         fq_reduce(rop + i, ctx);
     }
-    for ( ; i < n; i++)
+    for (; i < n; i++)
     {
         fq_zero(rop + i, ctx);
     }
@@ -80,9 +81,10 @@ void _fq_poly_mullow_KS(fq_struct *rop,
     _fmpz_vec_clear(f, n + len1 + len2);
 }
 
-void fq_poly_mullow_KS(fq_poly_t rop, 
-                       const fq_poly_t op1, const fq_poly_t op2, long n, 
-                       const fq_ctx_t ctx)
+void
+fq_poly_mullow_KS(fq_poly_t rop,
+                  const fq_poly_t op1, const fq_poly_t op2, long n,
+                  const fq_ctx_t ctx)
 {
     const long len1 = op1->length;
     const long len2 = op2->length;
@@ -99,8 +101,8 @@ void fq_poly_mullow_KS(fq_poly_t rop,
             n = lenr;
 
         fq_poly_fit_length(rop, n, ctx);
-        _fq_poly_mullow_KS(rop->coeffs, op1->coeffs, len1, 
-                                        op2->coeffs, len2, n, ctx);
+        _fq_poly_mullow_KS(rop->coeffs, op1->coeffs, len1,
+                           op2->coeffs, len2, n, ctx);
         _fq_poly_set_length(rop, n, ctx);
         _fq_poly_normalise(rop, ctx);
     }

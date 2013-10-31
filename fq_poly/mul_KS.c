@@ -26,9 +26,9 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1, 
-                                     const fq_struct *op2, long len2, 
-                                     const fq_ctx_t ctx)
+void
+_fq_poly_mul_KS(fq_struct * rop, const fq_struct * op1, long len1,
+                const fq_struct * op2, long len2, const fq_ctx_t ctx)
 {
     const long in1_len = len1, in2_len = len2;
     const long d = fq_ctx_degree(ctx);
@@ -45,8 +45,8 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
         return;
     }
 
-    bits = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
-           + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
+    bits = 2 * fmpz_bits(fq_ctx_prime(ctx))
+        + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
 
     f = _fmpz_vec_init((len1 + len2 - 1) + (len1) + (len2));
     g = f + (len1 + len2 - 1);
@@ -72,14 +72,15 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
         fq_reduce(rop + i, ctx);
     }
 
-    _fq_poly_zero(rop + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2), ctx);
+    _fq_poly_zero(rop + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2),
+                  ctx);
 
     _fmpz_vec_clear(f, (len1 + len2 - 1) + (len1) + (len2));
 }
 
-void fq_poly_mul_KS(fq_poly_t rop, 
-                    const fq_poly_t op1, const fq_poly_t op2, 
-                    const fq_ctx_t ctx)
+void
+fq_poly_mul_KS(fq_poly_t rop,
+               const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx)
 {
     const long len1 = op1->length;
     const long len2 = op2->length;
@@ -92,8 +93,8 @@ void fq_poly_mul_KS(fq_poly_t rop,
     else
     {
         fq_poly_fit_length(rop, rlen, ctx);
-        _fq_poly_mul_KS(rop->coeffs, op1->coeffs, len1, 
-                                     op2->coeffs, len2, ctx);
+        _fq_poly_mul_KS(rop->coeffs, op1->coeffs, len1,
+                        op2->coeffs, len2, ctx);
         _fq_poly_set_length(rop, rlen, ctx);
     }
 }

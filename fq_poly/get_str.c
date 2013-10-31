@@ -42,8 +42,8 @@ _fq_poly_get_str(const fq_struct * poly, slong len, const fq_ctx_t ctx)
         return str;
     }
 
-    coeffstrs = (char **) flint_malloc(len * sizeof(char*));
-    
+    coeffstrs = (char **) flint_malloc(len * sizeof(char *));
+
     nz = 0;
     bound = (slong) (ceil(log10((double) (len + 1)))) + 2;
     for (i = 0; i < len; i++)
@@ -60,7 +60,7 @@ _fq_poly_get_str(const fq_struct * poly, slong len, const fq_ctx_t ctx)
         }
     }
 
-    str = (char*)flint_malloc(bound * sizeof(char));
+    str = (char *) flint_malloc(bound * sizeof(char));
     off = 0;
 
     off += flint_sprintf(str + off, "%wd ", len);

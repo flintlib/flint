@@ -27,11 +27,11 @@
 
 void
 _fq_poly_powmod_fmpz_binexp_preinv(fq_struct * res, const fq_struct * poly,
-                                   const fmpz_t e, const fq_struct * f, slong lenf, 
-                                   const fq_struct *finv, slong lenfinv,
-                                   const fq_ctx_t ctx)
+                                   const fmpz_t e, const fq_struct * f,
+                                   slong lenf, const fq_struct * finv,
+                                   slong lenfinv, const fq_ctx_t ctx)
 {
-    fq_struct * T, * Q;
+    fq_struct *T, *Q;
     slong lenT, lenQ;
     slong i;
 
@@ -68,11 +68,11 @@ _fq_poly_powmod_fmpz_binexp_preinv(fq_struct * res, const fq_struct * poly,
 
 
 void
-fq_poly_powmod_fmpz_binexp_preinv(fq_poly_t res, const fq_poly_t poly, const fmpz_t e,
-                                  const fq_poly_t f, const fq_poly_t finv,
-                                  const fq_ctx_t ctx)
+fq_poly_powmod_fmpz_binexp_preinv(fq_poly_t res, const fq_poly_t poly,
+                                  const fmpz_t e, const fq_poly_t f,
+                                  const fq_poly_t finv, const fq_ctx_t ctx)
 {
-    fq_struct * q;
+    fq_struct *q;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;
@@ -80,13 +80,15 @@ fq_poly_powmod_fmpz_binexp_preinv(fq_poly_t res, const fq_poly_t poly, const fmp
 
     if (lenf == 0)
     {
-        flint_printf("Exception: fq_poly_powmod_fmpz_binexp_preinv: divide by zero\n");
+        flint_printf
+            ("Exception: fq_poly_powmod_fmpz_binexp_preinv: divide by zero\n");
         abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception: fq_poly_powmod_fmpz_binexp_preinv: negative exp not implemented\n");
+        flint_printf
+            ("Exception: fq_poly_powmod_fmpz_binexp_preinv: negative exp not implemented\n");
         abort();
     }
 
@@ -146,17 +148,16 @@ fq_poly_powmod_fmpz_binexp_preinv(fq_poly_t res, const fq_poly_t poly, const fmp
     {
         fq_poly_t t;
         fq_poly_init2(t, 2 * lenf - 3, ctx);
-        _fq_poly_powmod_fmpz_binexp_preinv(t->coeffs, q, e, 
+        _fq_poly_powmod_fmpz_binexp_preinv(t->coeffs, q, e,
                                            f->coeffs, lenf,
-                                           finv->coeffs, finv->length,
-                                           ctx);
+                                           finv->coeffs, finv->length, ctx);
         fq_poly_swap(res, t, ctx);
         fq_poly_clear(t, ctx);
     }
     else
     {
         fq_poly_fit_length(res, 2 * lenf - 3, ctx);
-        _fq_poly_powmod_fmpz_binexp_preinv(res->coeffs, q, e, 
+        _fq_poly_powmod_fmpz_binexp_preinv(res->coeffs, q, e,
                                            f->coeffs, lenf,
                                            finv->coeffs, finv->length, ctx);
     }

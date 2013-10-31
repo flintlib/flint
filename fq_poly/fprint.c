@@ -27,8 +27,9 @@
 #include "fmpz.h"
 #include "fq_poly.h"
 
-int _fq_poly_fprint(FILE * file, const fq_struct *poly, slong len, 
-                    const fq_ctx_t ctx)
+int
+_fq_poly_fprint(FILE * file, const fq_struct * poly, slong len,
+                const fq_ctx_t ctx)
 {
     int r;
     slong i;
@@ -53,7 +54,8 @@ int _fq_poly_fprint(FILE * file, const fq_struct *poly, slong len,
     return r;
 }
 
-int fq_poly_fprint(FILE * file, const fq_poly_t poly, const fq_ctx_t ctx)
+int
+fq_poly_fprint(FILE * file, const fq_poly_t poly, const fq_ctx_t ctx)
 {
     return _fq_poly_fprint(file, poly->coeffs, poly->length, ctx);
 }

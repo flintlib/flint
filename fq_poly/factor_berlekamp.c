@@ -41,7 +41,7 @@ fq_to_mat_col(fq_mat_t mat, slong col, fq_poly_t poly, const fq_ctx_t ctx)
 }
 
 static void
-fq_mat_col_to_shifted(fq_poly_t poly, fq_mat_t mat, slong col, slong *shift,
+fq_mat_col_to_shifted(fq_poly_t poly, fq_mat_t mat, slong col, slong * shift,
                       const fq_ctx_t ctx)
 {
     slong i, j, rows = mat->r;

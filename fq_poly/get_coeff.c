@@ -27,7 +27,8 @@
 
 #include "fq_poly.h"
 
-void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n, const fq_ctx_t ctx)
+void
+fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n, const fq_ctx_t ctx)
 {
     if (n < poly->length)
         fq_set(x, poly->coeffs + n, ctx);

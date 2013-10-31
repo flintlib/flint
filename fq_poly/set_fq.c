@@ -24,9 +24,10 @@
 ******************************************************************************/
 #include "fq_poly.h"
 
-void fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
+void
+fq_poly_set_fq(fq_poly_t poly, const fq_t c, const fq_ctx_t ctx)
 {
-    if(fq_is_zero(c, ctx))
+    if (fq_is_zero(c, ctx))
     {
         fq_poly_zero(poly, ctx);
     }

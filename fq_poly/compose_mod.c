@@ -28,11 +28,10 @@
 #include "fq_poly.h"
 
 void
-_fq_poly_compose_mod(fq_struct * res, 
-                     const fq_struct * f, slong lenf, 
+_fq_poly_compose_mod(fq_struct * res,
+                     const fq_struct * f, slong lenf,
                      const fq_struct * g,
-                     const fq_struct * h, slong lenh, 
-                     const fq_ctx_t ctx)
+                     const fq_struct * h, slong lenh, const fq_ctx_t ctx)
 {
     if (lenh < FQ_COMPOSE_MOD_LENH_CUTOFF || lenf >= lenh)
         _fq_poly_compose_mod_horner(res, f, lenf, g, h, lenh, ctx);
@@ -52,7 +51,7 @@ fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
     slong len = len3 - 1;
     slong vec_len = FLINT_MAX(len3 - 1, len2);
 
-    fq_struct * ptr2;
+    fq_struct *ptr2;
 
     if (len3 == 0)
     {
@@ -94,16 +93,13 @@ fq_poly_compose_mod(fq_poly_t res, const fq_poly_t poly1,
         fq_init(inv3, ctx);
         fq_inv(inv3, poly3->coeffs + len, ctx);
         _fq_poly_rem(ptr2, poly2->coeffs, len2,
-                               poly3->coeffs, len3, inv3, ctx);
+                     poly3->coeffs, len3, inv3, ctx);
         fq_clear(inv3, ctx);
     }
 
     fq_poly_fit_length(res, len, ctx);
     _fq_poly_compose_mod(res->coeffs,
-                                   poly1->coeffs, len1, 
-                                   ptr2, 
-                                   poly3->coeffs, len3,
-                                   ctx);
+                         poly1->coeffs, len1, ptr2, poly3->coeffs, len3, ctx);
     _fq_poly_set_length(res, len, ctx);
     _fq_poly_normalise(res, ctx);
 

@@ -39,7 +39,7 @@ fq_poly_inflate(fq_poly_t result, const fq_poly_t input, ulong inflation,
     {
         fq_t v;
         fq_init(v, ctx);
-        fq_one(v,  ctx);
+        fq_one(v, ctx);
         fq_poly_evaluate_fq(v, input, v, ctx);
         fq_poly_zero(result, ctx);
         fq_poly_set_coeff(result, 0, v, ctx);
@@ -53,7 +53,7 @@ fq_poly_inflate(fq_poly_t result, const fq_poly_t input, ulong inflation,
 
         for (i = input->length - 1; i > 0; i--)
         {
-            fq_set(result->coeffs + (i*inflation), input->coeffs + i, ctx);
+            fq_set(result->coeffs + (i * inflation), input->coeffs + i, ctx);
             for (j = i * inflation - 1; j > (i - 1) * inflation; j--)
                 fq_zero(result->coeffs + j, ctx);
         }

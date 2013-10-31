@@ -26,9 +26,9 @@
 #include "fq_poly.h"
 
 static void
-__fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R, 
+__fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
                             const fq_struct * A, slong lenA,
-                            const fq_struct * B, slong lenB, 
+                            const fq_struct * B, slong lenB,
                             const fq_t invB, const fq_ctx_t ctx)
 {
     if (lenA < 2 * lenB - 1)
@@ -40,16 +40,16 @@ __fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
         const slong n1 = lenA - lenB + 1;
         const slong n2 = lenB - n1;
 
-        const fq_struct * p1 = A + n2;
-        const fq_struct * d1 = B + n2;
-        const fq_struct * d2 = B;
+        const fq_struct *p1 = A + n2;
+        const fq_struct *d1 = B + n2;
+        const fq_struct *d2 = B;
 
-        fq_struct * W = _fq_vec_init((2 * n1 - 1) + lenB - 1, ctx);
+        fq_struct *W = _fq_vec_init((2 * n1 - 1) + lenB - 1, ctx);
 
-        fq_struct * d1q1 = R + n2;
-        fq_struct * d2q1 = W + (2 * n1 - 1);
+        fq_struct *d1q1 = R + n2;
+        fq_struct *d2q1 = W + (2 * n1 - 1);
 
-        _fq_poly_divrem_divconquer_recursive(Q, d1q1, W, p1, d1, n1, 
+        _fq_poly_divrem_divconquer_recursive(Q, d1q1, W, p1, d1, n1,
                                              invB, ctx);
 
         /*
@@ -72,9 +72,9 @@ __fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
 
         _fq_vec_clear(W, (2 * n1 - 1) + lenB - 1, ctx);
     }
-    else  /* lenA = 2 * lenB - 1 */
+    else                        /* lenA = 2 * lenB - 1 */
     {
-        fq_struct * W = _fq_vec_init(lenA, ctx);
+        fq_struct *W = _fq_vec_init(lenA, ctx);
 
         _fq_poly_divrem_divconquer_recursive(Q, R, W, A, B, lenB, invB, ctx);
 
@@ -84,17 +84,17 @@ __fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
     }
 }
 
-void _fq_poly_divrem_divconquer(fq_struct *Q, fq_struct *R, 
-                                const fq_struct *A, slong lenA,
-                                const fq_struct *B, slong lenB, 
-                                const fq_t invB,
-                                const fq_ctx_t ctx)
+void
+_fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R,
+                           const fq_struct * A, slong lenA,
+                           const fq_struct * B, slong lenB,
+                           const fq_t invB, const fq_ctx_t ctx)
 {
     if (lenA <= 2 * lenB - 1)
     {
         __fq_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, ctx);
     }
-    else  /* lenA > 2 * lenB - 1 */
+    else                        /* lenA > 2 * lenB - 1 */
     {
         slong shift, n = 2 * lenB - 1;
         fq_struct *QB, *W;
@@ -165,14 +165,14 @@ fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
         r = R->coeffs;
     }
 
-    _fq_poly_divrem_divconquer(q, r, A->coeffs, lenA, 
+    _fq_poly_divrem_divconquer(q, r, A->coeffs, lenA,
                                B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {
         _fq_vec_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
-        Q->alloc  = lenQ;
+        Q->alloc = lenQ;
         Q->length = lenQ;
     }
     else
@@ -184,7 +184,7 @@ fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
     {
         _fq_vec_clear(R->coeffs, R->alloc, ctx);
         R->coeffs = r;
-        R->alloc  = lenA;
+        R->alloc = lenA;
         R->length = lenA;
     }
     _fq_poly_set_length(R, lenB - 1, ctx);

@@ -35,7 +35,7 @@
 
 #include <NTL/ZZ_pEXFactoring.h>
 
-#define nalgs 2
+#define nalgs 1
 #define ncases 5
 #define cpumin 2
 
@@ -124,10 +124,10 @@ main(int argc, char** argv)
             abort();
         }
 
-        timeit_start(t[1]);
+        /*timeit_start(t[1]);
         for (l = 0; l < loops; l++)
             v = CanZass(nf);
-        timeit_stop(t[1]);
+            timeit_stop(t[1]);*/
 
         for (c = 0; c < nalgs; c++)
             if (t[c]->cpu <= cpumin)

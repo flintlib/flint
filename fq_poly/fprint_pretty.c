@@ -30,15 +30,17 @@
     function would omit the parentheses.
  */
 
-static void __fq_print(FILE *file, const fq_struct *op, const fq_ctx_t ctx)
+static void
+__fq_print(FILE * file, const fq_struct * op, const fq_ctx_t ctx)
 {
     fputc('(', file);
     fq_fprint_pretty(file, op, ctx);
     fputc(')', file);
 }
 
-int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
-                           const char *x, const fq_ctx_t ctx)
+int
+_fq_poly_fprint_pretty(FILE * file, const fq_struct * poly, long len,
+                       const char *x, const fq_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -118,9 +120,9 @@ int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
     return 1;
 }
 
-int fq_poly_fprint_pretty(FILE *file, const fq_poly_t poly, const char *x, 
-                          const fq_ctx_t ctx)
+int
+fq_poly_fprint_pretty(FILE * file, const fq_poly_t poly, const char *x,
+                      const fq_ctx_t ctx)
 {
     return _fq_poly_fprint_pretty(file, poly->coeffs, poly->length, x, ctx);
 }
-

@@ -27,10 +27,11 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R, 
-                           const fq_struct *A, slong lenA,
-                           const fq_struct *B, slong lenB, 
-                           const fq_t invB, const fq_ctx_t ctx)
+void
+_fq_poly_div_basecase(fq_struct * Q, fq_struct * R,
+                      const fq_struct * A, slong lenA,
+                      const fq_struct * B, slong lenB,
+                      const fq_t invB, const fq_ctx_t ctx)
 {
     const slong alloc = (R == NULL) ? lenA : 0;
     slong lenR = lenB - 1, iQ;
@@ -50,7 +51,8 @@ void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R,
         {
             fq_mul(Q + iQ, R + lenA - 1, invB, ctx);
 
-            _fq_vec_scalar_submul_fq(R + lenA - lenR - 1, B, lenR, Q + iQ, ctx);
+            _fq_vec_scalar_submul_fq(R + lenA - lenR - 1, B, lenR, Q + iQ,
+                                     ctx);
         }
 
         if (lenR - 1 >= iQ)
@@ -66,8 +68,9 @@ void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R,
         _fq_vec_clear(R, alloc, ctx);
 }
 
-void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
-                          const fq_ctx_t ctx)
+void
+fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
+                     const fq_ctx_t ctx)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     fq_struct *q;
@@ -99,7 +102,7 @@ void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
     {
         _fq_vec_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
-        Q->alloc  = lenQ;
+        Q->alloc = lenQ;
         Q->length = lenQ;
     }
     else
@@ -109,4 +112,3 @@ void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B,
 
     fq_clear(invB, ctx);
 }
-

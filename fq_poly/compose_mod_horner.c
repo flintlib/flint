@@ -29,13 +29,13 @@
 
 void
 _fq_poly_compose_mod_horner(fq_struct * res,
-                            const fq_struct * f, slong lenf, 
+                            const fq_struct * f, slong lenf,
                             const fq_struct * g,
-                            const fq_struct * h, slong lenh, 
+                            const fq_struct * h, slong lenh,
                             const fq_ctx_t ctx)
 {
     slong i, len;
-    fq_struct * t;
+    fq_struct *t;
 
     if (lenh == 1)
         return;
@@ -77,8 +77,7 @@ void
 fq_poly_compose_mod_horner(fq_poly_t res,
                            const fq_poly_t poly1,
                            const fq_poly_t poly2,
-                           const fq_poly_t poly3,
-                           const fq_ctx_t ctx)
+                           const fq_poly_t poly3, const fq_ctx_t ctx)
 {
     fq_t inv3;
     slong len1 = poly1->length;
@@ -87,11 +86,12 @@ fq_poly_compose_mod_horner(fq_poly_t res,
     slong len = len3 - 1;
     slong vec_len = FLINT_MAX(len3 - 1, len2);
 
-    fq_struct * ptr2;
+    fq_struct *ptr2;
 
     if (len3 == 0)
     {
-        flint_printf("Exception: division by zero in fq_poly_compose_mod_horner\n");
+        flint_printf
+            ("Exception: division by zero in fq_poly_compose_mod_horner\n");
         abort();
     }
 
@@ -129,16 +129,14 @@ fq_poly_compose_mod_horner(fq_poly_t res,
         fq_init(inv3, ctx);
         fq_inv(inv3, poly3->coeffs + len, ctx);
         _fq_poly_rem(ptr2, poly2->coeffs, len2,
-                               poly3->coeffs, len3, inv3, ctx);
+                     poly3->coeffs, len3, inv3, ctx);
         fq_clear(inv3, ctx);
     }
 
     fq_poly_fit_length(res, len, ctx);
     _fq_poly_compose_mod_horner(res->coeffs,
-                                          poly1->coeffs, len1, 
-                                          ptr2,
-                                          poly3->coeffs, len3,
-                                          ctx);
+                                poly1->coeffs, len1,
+                                ptr2, poly3->coeffs, len3, ctx);
     _fq_poly_set_length(res, len, ctx);
     _fq_poly_normalise(res, ctx);
 

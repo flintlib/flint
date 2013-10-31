@@ -26,12 +26,12 @@
 #include "fq_poly.h"
 
 void
-_fq_poly_powmod_ui_binexp_preinv(fq_struct * res, const fq_struct * poly, ulong e, 
-                                 const fq_struct * f, slong lenf,
+_fq_poly_powmod_ui_binexp_preinv(fq_struct * res, const fq_struct * poly,
+                                 ulong e, const fq_struct * f, slong lenf,
                                  const fq_struct * finv, slong lenfinv,
                                  const fq_ctx_t ctx)
 {
-    fq_struct * T, * Q;
+    fq_struct *T, *Q;
     slong lenT, lenQ;
     int i;
 
@@ -72,7 +72,7 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
                                 const fq_poly_t f, const fq_poly_t finv,
                                 const fq_ctx_t ctx)
 {
-    fq_struct * q;
+    fq_struct *q;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;
@@ -125,7 +125,8 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
         _fq_vec_set(q, poly->coeffs, len, ctx);
         _fq_vec_zero(q + len, trunc - len, ctx);
         qcopy = 1;
-    } else
+    }
+    else
         q = poly->coeffs;
 
     if ((res == poly && !qcopy) || (res == f))
@@ -134,8 +135,7 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
         fq_poly_init2(t, 2 * lenf - 3, ctx);
         _fq_poly_powmod_ui_binexp_preinv(t->coeffs, q, e,
                                          f->coeffs, lenf,
-                                         finv->coeffs, finv->length,
-                                         ctx);
+                                         finv->coeffs, finv->length, ctx);
         fq_poly_swap(res, t, ctx);
         fq_poly_clear(t, ctx);
     }
@@ -144,8 +144,7 @@ fq_poly_powmod_ui_binexp_preinv(fq_poly_t res, const fq_poly_t poly, ulong e,
         fq_poly_fit_length(res, 2 * lenf - 3, ctx);
         _fq_poly_powmod_ui_binexp_preinv(res->coeffs, q, e,
                                          f->coeffs, lenf,
-                                         finv->coeffs, finv->length,
-                                         ctx);
+                                         finv->coeffs, finv->length, ctx);
     }
 
     if (qcopy)

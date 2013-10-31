@@ -25,8 +25,9 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_sqr_classical(fq_struct *rop, 
-                            const fq_struct *op, long len, const fq_ctx_t ctx)
+void
+_fq_poly_sqr_classical(fq_struct * rop,
+                       const fq_struct * op, long len, const fq_ctx_t ctx)
 {
     if (len == 1)
     {
@@ -58,7 +59,8 @@ void _fq_poly_sqr_classical(fq_struct *rop,
     }
 }
 
-void fq_poly_sqr_classical(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+void
+fq_poly_sqr_classical(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
     const long len = 2 * op->length - 1;
 

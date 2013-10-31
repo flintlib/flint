@@ -25,9 +25,10 @@
 
 #include "fq_poly.h"
 
-void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, 
-    const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
-    const fq_t invB, const fq_ctx_t ctx)
+void
+_fq_poly_divrem_basecase(fq_struct * Q, fq_struct * R,
+                         const fq_struct * A, long lenA, const fq_struct * B,
+                         long lenB, const fq_t invB, const fq_ctx_t ctx)
 {
     long iQ, iR;
 
@@ -47,9 +48,10 @@ void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R,
     }
 }
 
-void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R, 
-                             const fq_poly_t A, const fq_poly_t B, 
-                             const fq_ctx_t ctx)
+void
+fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
+                        const fq_poly_t A, const fq_poly_t B,
+                        const fq_ctx_t ctx)
 {
     const long lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     fq_struct *q, *r;
@@ -85,13 +87,13 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     }
 
     _fq_poly_divrem_basecase(q, r, A->coeffs, lenA,
-                                   B->coeffs, lenB, invB, ctx);
+                             B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {
         _fq_vec_clear(Q->coeffs, Q->alloc, ctx);
         Q->coeffs = q;
-        Q->alloc  = lenQ;
+        Q->alloc = lenQ;
         Q->length = lenQ;
     }
     else
@@ -102,7 +104,7 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
     {
         _fq_vec_clear(R->coeffs, R->alloc, ctx);
         R->coeffs = r;
-        R->alloc  = lenA;
+        R->alloc = lenA;
         R->length = lenA;
     }
     _fq_poly_set_length(R, lenB - 1, ctx);
@@ -110,4 +112,3 @@ void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R,
 
     fq_clear(invB, ctx);
 }
-

@@ -96,7 +96,7 @@ __fq_poly_factor(fq_poly_factor_t result, fq_t leading_coeff,
     }
 
     fq_poly_factor_clear(sqfree_factors, ctx);
-    
+
     return;
 }
 
@@ -173,8 +173,10 @@ fq_poly_factor_with_berlekamp(fq_poly_factor_t result, fq_t leading_coeff,
 }
 
 void
-fq_poly_factor_with_cantor_zassenhaus(fq_poly_factor_t result, fq_t leading_coeff,
-                                      const fq_poly_t input, const fq_ctx_t ctx)
+fq_poly_factor_with_cantor_zassenhaus(fq_poly_factor_t result,
+                                      fq_t leading_coeff,
+                                      const fq_poly_t input,
+                                      const fq_ctx_t ctx)
 {
     __fq_poly_factor_deflation(result, leading_coeff, input, ZASSENHAUS, ctx);
 }

@@ -34,7 +34,7 @@ _fq_poly_compose_mod_brent_kung(fq_struct * res,
                                 const fq_ctx_t ctx)
 {
     fq_mat_t A, B, C;
-    fq_struct * t, * h, * tmp;
+    fq_struct *t, *h, *tmp;
     slong i, n, m;
 
     n = len3 - 1;
@@ -111,7 +111,7 @@ fq_poly_compose_mod_brent_kung(fq_poly_t res, const fq_poly_t poly1,
     slong len = len3 - 1;
     slong vec_len = FLINT_MAX(len3 - 1, len2);
 
-    fq_struct * ptr2;
+    fq_struct *ptr2;
     fq_t inv3;
 
     if (len3 == 0)

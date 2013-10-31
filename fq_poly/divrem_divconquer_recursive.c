@@ -26,11 +26,10 @@
 #include "fq_poly.h"
 
 void
-_fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * W, 
-                                     const fq_struct * A,
-                                     const fq_struct * B, slong lenB, 
-                                     const fq_t invB,
-                                     const fq_ctx_t ctx)
+_fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ,
+                                     fq_struct * W, const fq_struct * A,
+                                     const fq_struct * B, slong lenB,
+                                     const fq_t invB, const fq_ctx_t ctx)
 {
     if (lenB <= FQ_POLY_DIVREM_DIVCONQUER_CUTOFF)
     {
@@ -47,20 +46,20 @@ _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * 
         const slong n2 = lenB / 2;
         const slong n1 = lenB - n2;
 
-        fq_struct * W1 = W;
-        fq_struct * W2 = W + lenB;
+        fq_struct *W1 = W;
+        fq_struct *W2 = W + lenB;
 
-        const fq_struct * p1 = A + 2 * n2;
-        const fq_struct * p2;
-        const fq_struct * d1 = B + n2;
-        const fq_struct * d2 = B;
-        const fq_struct * d3 = B + n1;
-        const fq_struct * d4 = B;
+        const fq_struct *p1 = A + 2 * n2;
+        const fq_struct *p2;
+        const fq_struct *d1 = B + n2;
+        const fq_struct *d2 = B;
+        const fq_struct *d3 = B + n1;
+        const fq_struct *d4 = B;
 
-        fq_struct * q1   = Q + n2;
-        fq_struct * q2   = Q;
-        fq_struct * dq1  = BQ + n2;
-        fq_struct * d1q1 = BQ + 2 * n2;
+        fq_struct *q1 = Q + n2;
+        fq_struct *q2 = Q;
+        fq_struct *dq1 = BQ + n2;
+        fq_struct *d1q1 = BQ + 2 * n2;
 
         fq_struct *d2q1, *d3q2, *d4q2, *t;
 
@@ -69,7 +68,7 @@ _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * 
            being of length n1;  d1q1 = d1 q1 is of length 2 n1 - 1
          */
 
-        _fq_poly_divrem_divconquer_recursive(q1, d1q1, W1, 
+        _fq_poly_divrem_divconquer_recursive(q1, d1q1, W1,
                                              p1, d1, n1, invB, ctx);
 
         /* 
@@ -108,7 +107,7 @@ _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * 
          */
 
         d3q2 = W1;
-        _fq_poly_divrem_divconquer_recursive(q2, d3q2, W2, 
+        _fq_poly_divrem_divconquer_recursive(q2, d3q2, W2,
                                              p2, d3, n2, invB, ctx);
 
         /*
