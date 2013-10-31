@@ -30,44 +30,66 @@
 
 long
 _fq_poly_gcd_euclidean(fq_struct * G, const fq_struct * A, long lenA,
-                       const fq_struct * B, long lenB, const fq_ctx_t ctx)
+                       const fq_struct * B, long lenB, const fq_t invB,
+                       const fq_ctx_t ctx)
 {
-    long lenR1 = lenA, lenR2 = lenB, lenT;  /* assumes lenA \geq lenB */
-
-    fq_struct *R1, *R2, *T;
-
-    fq_t inv;
-
-    fq_init(inv, ctx);
-    T = _fq_vec_init(lenA, ctx);
-    R1 = _fq_vec_init(lenA, ctx);
-    R2 = _fq_vec_init(lenB, ctx);
-    _fq_vec_set(R1, A, lenA, ctx);
-    _fq_vec_set(R2, B, lenB, ctx);
-
-    while (lenR2 > 0)
+    if (lenB == 1)
     {
-        if (!fq_is_zero(R2 + (lenR2 - 1), ctx))
-            fq_inv(inv, R2 + (lenR2 - 1), ctx);
-        else
-            flint_printf("something wrong with length");
-        _fq_poly_rem(R1, R1, lenR1, R2, lenR2, inv, ctx);
-        _fq_poly_normalise2(R1, &lenR1, ctx);
+        fq_one(G, ctx);
+        return 1;
+    }
+    else  /* lenA >= lenB > 1 */
+    {
+        const slong lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
+        fq_t invR3;
+        fq_struct *Q, *R1, *R2, *R3, *T, *W;
+        slong lenR2, lenR3;
 
-        _fq_vec_set(T, R1, lenR1, ctx);
-        _fq_vec_set(R1, R2, lenR2, ctx);
-        _fq_vec_set(R2, T, lenR1, ctx);
-        lenT = lenR1;
-        lenR1 = lenR2;
-        lenR2 = lenT;
+        W  = _fq_vec_init(lenW, ctx);
+        Q  = W;
+        R1 = W + FLINT_MAX(lenA - lenB + 1, lenB);
+        R2 = R1 + lenA;
+        R3 = R2 + lenB;
+
+        _fq_poly_divrem(Q, R1, A, lenA, B, lenB, invB, ctx);
+
+        lenR3 = lenB - 1;
+        FQ_VEC_NORM(R1, lenR3, ctx);
+
+        if (lenR3 == 0)
+        {
+            _fq_vec_set(G, B, lenB, ctx);
+            _fq_vec_clear(W, lenW, ctx);
+            return lenB;
+        }
+
+        fq_init(invR3, ctx);
+
+        T  = R3;
+        R3 = R1;
+        R1 = T;
+        _fq_vec_set(R2, B, lenB, ctx);
+        lenR2 = lenB;
+
+        do
+        {
+            fq_inv(invR3, R3 + (lenR3 - 1), ctx);
+
+            _fq_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, invR3, ctx);
+            lenR2 = lenR3--;
+            FQ_VEC_NORM(R1, lenR3, ctx);
+            T = R2; R2 = R3; R3 = R1; R1 = T;
+        } 
+        while (lenR3 > 0);
+
+        _fq_vec_set(G, R2, lenR2, ctx);
+
+        _fq_vec_clear(W, lenW, ctx);
+        fq_clear(invR3, ctx);
+
+        return lenR2;
     }
 
-    _fq_poly_set(G, R1, lenR1, ctx);
-    _fq_vec_clear(T, lenA, ctx);
-    _fq_vec_clear(R1, lenA, ctx);
-    _fq_vec_clear(R2, lenB, ctx);
-    fq_clear(inv, ctx);
-    return lenR1;
 }
 
 void
@@ -81,7 +103,7 @@ fq_poly_gcd_euclidean(fq_poly_t G,
     else                        /* lenA >= lenB >= 0 */
     {
         long lenA = A->length, lenB = B->length, lenG;
-        fq_poly_t tG;
+        fq_t invB;
         fq_struct *g;
 
         if (lenA == 0)          /* lenA = lenB = 0 */
@@ -96,27 +118,31 @@ fq_poly_gcd_euclidean(fq_poly_t G,
         {
             if (G == A || G == B)
             {
-                fq_poly_init2(tG, FLINT_MIN(lenA, lenB), ctx);
-                g = tG->coeffs;
+                g = _fq_vec_init(FLINT_MIN(lenA, lenB), ctx);
             }
             else
             {
                 fq_poly_fit_length(G, FLINT_MIN(lenA, lenB), ctx);
                 g = G->coeffs;
             }
-
+            
+            fq_init(invB, ctx);
+            fq_inv(invB, fq_poly_lead(B, ctx), ctx);
             lenG = _fq_poly_gcd_euclidean(g, A->coeffs, lenA,
-                                          B->coeffs, lenB, ctx);
+                                          B->coeffs, lenB, invB, ctx);
+            fq_clear(invB, ctx);
 
             if (G == A || G == B)
             {
-                fq_poly_swap(tG, G, ctx);
-                fq_poly_clear(tG, ctx);
+                _fq_vec_clear(G->coeffs, G->alloc, ctx);
+                G->coeffs = g;
+                G->alloc = FLINT_MIN(lenA, lenB);
+                G->length = FLINT_MIN(lenA, lenB);
             }
-            G->length = lenG;
+            _fq_poly_set_length(G, lenG, ctx);
 
             if (G->length == 1)
-                fq_one(&(G->coeffs[0]), ctx);
+                fq_one(G->coeffs, ctx);
             else
                 fq_poly_make_monic(G, G, ctx);
         }

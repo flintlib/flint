@@ -29,6 +29,7 @@ int
 _fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx)
 {
     fq_struct *fd, *g;
+    fq_t invfd;
     slong dlen;
     int res;
 
@@ -44,7 +45,10 @@ _fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx)
 
     if (dlen)
     {
-        res = (_fq_poly_gcd(g, f, len, fd, dlen, ctx) == 1);
+        fq_init(invfd, ctx);
+        fq_inv(invfd, fd + (dlen - 1), ctx);
+        res = (_fq_poly_gcd(g, f, len, fd, dlen, invfd, ctx) == 1);
+        fq_clear(invfd, ctx);
     }
     else
         res = 0;                /* gcd(f, 0) = f, and len(f) > 2 */

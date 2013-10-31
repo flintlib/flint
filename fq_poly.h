@@ -544,13 +544,15 @@ void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t o
                  const fq_ctx_t ctx);
 
 long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
-                            const fq_struct* B, long lenB, const fq_ctx_t ctx);
+                            const fq_struct* B, long lenB, const fq_t invB,
+                            const fq_ctx_t ctx);
 
 static __inline__
 long _fq_poly_gcd(fq_struct* G, const fq_struct* A, long lenA, 
-                  const fq_struct* B, long lenB, const fq_ctx_t ctx)
+                  const fq_struct* B, long lenB, const fq_t invB,
+                  const fq_ctx_t ctx)
 {
-    return _fq_poly_gcd_euclidean(G, A, lenA, B, lenB, ctx);
+    return _fq_poly_gcd_euclidean(G, A, lenA, B, lenB, invB, ctx);
 }
 
 static __inline__
@@ -608,7 +610,7 @@ void _fq_poly_divrem(fq_struct *Q, fq_struct *R,
     const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
     const fq_t invB, const fq_ctx_t ctx)
 {
-    _fq_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, ctx);
+    _fq_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, ctx);
 }
 
 static __inline__ 
@@ -616,7 +618,7 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
                     const fq_poly_t A, const fq_poly_t B, 
                     const fq_ctx_t ctx)
 {
-    fq_poly_divrem_basecase(Q, R, A, B, ctx);
+    fq_poly_divrem_divconquer(Q, R, A, B, ctx);
 }
 
 static __inline__ 
@@ -624,9 +626,22 @@ void _fq_poly_rem(fq_struct *R, const fq_struct *A, long lenA,
                   const fq_struct *B, long lenB, const fq_t invB,
                   const fq_ctx_t ctx)
 {
-    fq_struct *Q = _fq_vec_init(lenA + lenB, ctx); /*TODO: smaller bound */
-    _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
-    _fq_vec_clear(Q, lenA + lenB, ctx);
+    fq_struct *Q = _fq_vec_init(lenA - lenB + 1, ctx);
+
+    if (lenA < lenB)
+    {
+        _fq_vec_set(R, A, lenA, ctx);
+        _fq_vec_zero(R + lenA, lenB - 1 - lenA, ctx);
+    } 
+    else
+    {
+        fq_struct *T = _fq_vec_init(lenA, ctx);
+       _fq_poly_divrem_divconquer(Q, T, A, lenA, B, lenB, invB, ctx);
+       _fq_vec_set(R, T, lenB - 1, ctx);
+       _fq_vec_clear(T, lenA, ctx);
+    }
+
+    _fq_vec_clear(Q, lenA - lenB + 1, ctx);
 }
 
 
@@ -637,8 +652,8 @@ void fq_poly_rem(fq_poly_t R,
                     const fq_ctx_t ctx)
 {
     fq_poly_t Q;
-    fq_poly_init2(Q,A->length+B->length, ctx);/*TDOO: smaller bound*/
-    fq_poly_divrem_basecase(Q, R, A, B, ctx);
+    fq_poly_init(Q, ctx);
+    fq_poly_divrem(Q, R, A, B, ctx);
     fq_poly_clear(Q, ctx);
 }
 
