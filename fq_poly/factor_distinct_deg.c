@@ -87,7 +87,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
         fq_poly_gen(h[0], ctx);
         fq_poly_powmod_fmpz_binexp_preinv(h[1], h[0], q, v, vinv, ctx);
         for (i = 2; i < l + 1; i++)
-            fq_poly_compose_mod_brent_kung_preinv(h[i], h[i-1], h[1], v, vinv, ctx);
+            fq_poly_compose_mod_preinv(h[i], h[i-1], h[1], v, vinv, ctx);
     }
 
     /* compute coarse distinct-degree factorisation */
@@ -103,7 +103,7 @@ fq_poly_factor_distinct_deg(fq_poly_factor_t res, const fq_poly_t poly,
         {
             fq_poly_rem (reducedH0, reducedH0, s, ctx);
             fq_poly_rem(tmp, H[j-1], s, ctx);
-            fq_poly_compose_mod_brent_kung_preinv(H[j], tmp, reducedH0, s, vinv, ctx);
+            fq_poly_compose_mod_preinv(H[j], tmp, reducedH0, s, vinv, ctx);
         }
         
         /* compute interval polynomials */
