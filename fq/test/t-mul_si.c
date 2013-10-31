@@ -21,99 +21,19 @@
 
     Copyright (C) 2009 William Hart
     Copyright (C) 2013 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fq.h" 
-#include "long_extras.h"
-
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
-
-    flint_printf("mul_si....");
-    fflush(stdout);
-
-    flint_randinit(state);
-    /* Check aliasing of a, b */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
-    {
-        fq_ctx_t ctx;
-        long x;
-        fq_t a, b;
-
-        fq_ctx_randtest(ctx, state);
-        
-        fq_init(a, ctx);
-        fq_init(b, ctx);
-
-        fq_randtest(a, state, ctx);
-        x = z_randtest(state);
-        fq_mul_si(b, a, x, ctx);
-        fq_mul_si(a, a, x, ctx);
-
-        result = (fq_equal(a, b, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
-            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = %ld\n",x);
-            abort();
-        }
-
-        fq_clear(a, ctx);
-        fq_clear(b, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    /* compare with direct multiplication */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
-    {
-        fq_ctx_t ctx;
-        long x;
-        fq_t a, c;
-	fmpz_poly_t b;
-
-        fq_ctx_randtest(ctx, state);
-
-        fq_init(a, ctx);
-        fq_init(c, ctx);
-	fmpz_poly_init(b);
-
-        fq_randtest(a, state, ctx);
-        x = z_randtest(state);
-        fq_mul_si(c, a, x, ctx);
-        fmpz_poly_scalar_mul_si(b,a,x);
-	fq_reduce(b,ctx);
 
 
-        result = (fq_equal(c, b, ctx));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
-            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = %ld\n",x);
-            abort();
-        }
+#ifdef T
+#undef T
+#endif
 
-        fq_clear(a, ctx);
-        fq_clear(c, ctx);
-        fmpz_poly_clear(b);
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return 0;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_templates/test/t-mul_si.c"
+#undef CAP_T
+#undef T

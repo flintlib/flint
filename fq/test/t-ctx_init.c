@@ -23,100 +23,16 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "fq.h"
-#include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
-
-int
-main(void)
-{
-    int i, j, k, result;
-    flint_rand_t state;
-
-    flint_printf("ctx_init... ");
-    fflush(stdout);
-
-    flint_randinit(state);
-
-    for (i = 0; i < 30; i++) {
-        fmpz_t p;
-        long d;
-        fq_ctx_t ctx;
-        
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 50), 1));
-        d = n_randint(state, 20) + 1;
-
-        fq_ctx_init(ctx, p, d, "a");
-        fq_ctx_clear(ctx);
-    }
-
-    for (i = 0; i < 30; i++) {
-        fmpz_t p;
-        long d;
-        fq_ctx_t ctx_conway, ctx_mod;
-        fmpz_mod_poly_t modulus;
-
-        fq_t a, b, lhs, rhs;
-
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx_conway, p, d, "a");
-
-        fmpz_mod_poly_init(modulus, p);
-        fmpz_mod_poly_zero(modulus);
-        for (j = 0; j < ctx_conway->len; j++)
-            fmpz_mod_poly_set_coeff_fmpz(modulus, ctx_conway->j[j], &ctx_conway->a[j]);
-
-        fq_ctx_init_modulus(ctx_mod, p, d, modulus, "a");
-
-        fq_init(a, ctx_conway);
-        fq_init(b, ctx_mod);
-        fq_init(lhs, ctx_conway);
-        fq_init(rhs, ctx_mod);
-
-        for (k = 0; k < 30; k++)
-        {
-
-            fq_randtest(a, state, ctx_conway);
-            fq_set(b, a, ctx_mod);
-
-            fq_mul(lhs, a, a, ctx_conway);
-            fq_mul(rhs, b, b, ctx_mod);
-
-            result = (fq_equal(lhs, rhs, ctx_mod));
-            if (!result)
-            {
-                flint_printf("FAIL:\n\n");
-                flint_printf("a   = "), fq_print_pretty(a, ctx_conway), flint_printf("\n");
-                flint_printf("b   = "), fq_print_pretty(b, ctx_mod), flint_printf("\n");
-                flint_printf("lhs = "), fq_print_pretty(lhs, ctx_conway), flint_printf("\n");
-                flint_printf("rhs = "), fq_print_pretty(rhs, ctx_mod), flint_printf("\n");
-                abort();
-            }
-
-        }
-
-        fq_clear(a, ctx_conway);
-        fq_clear(b, ctx_mod);
-        fq_clear(lhs, ctx_conway);
-        fq_clear(rhs, ctx_mod);
-
-        fmpz_mod_poly_clear(modulus);
-        fq_ctx_clear(ctx_conway);
-        fq_ctx_clear(ctx_mod);
-
-    }
 
 
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
+#ifdef T
+#undef T
+#endif
 
-    return EXIT_SUCCESS;
-}
+#define T fq
+#define CAP_T FQ
+#include "fq_templates/test/t-ctx_init.c"
+#undef CAP_T
+#undef T

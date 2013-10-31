@@ -25,56 +25,15 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-
 #include "fq.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
 
-    flint_printf("pth_root... ");
-    fflush(stdout);
+#ifdef T
+#undef T
+#endif
 
-    flint_randinit(state);
-
-    /* Compare with sum of Galois conjugates */
-    for (i = 0; i < 1000; i++)
-    {
-        fq_ctx_t ctx;
-        fq_t a, b;
-
-        fq_ctx_randtest(ctx, state);
-
-        fq_init(a, ctx);
-        fq_init(b, ctx);
-
-        fq_randtest(a, state, ctx);
-        fq_pth_root(b, a, ctx);
-        fq_pow(b, b, fq_ctx_prime(ctx), ctx);
-
-        result = fq_equal(a, b, ctx);
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), fq_print_pretty(a, ctx), flint_printf("\n");
-            flint_printf("b = "), fq_print_pretty(b, ctx), flint_printf("\n");
-            abort();
-        }
-
-        fq_clear(a, ctx);
-        fq_clear(b, ctx);
-
-        fq_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_templates/test/t-pth_root.c"
+#undef CAP_T
+#undef T
