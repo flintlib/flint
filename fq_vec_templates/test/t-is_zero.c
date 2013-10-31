@@ -47,50 +47,50 @@ main(void)
     for (i = 0; i < 50; i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, struct) *a;
+        TEMPLATE(T, struct) * a;
         slong len = n_randint(state, 100);
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        
-        a = _TEMPLATE(T, vec_init)(len, ctx);
-        _TEMPLATE(T, vec_zero)(a, len, ctx);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        result = (_TEMPLATE(T, vec_is_zero)(a, len, ctx));
+        a = _TEMPLATE(T, vec_init) (len, ctx);
+        _TEMPLATE(T, vec_zero) (a, len, ctx);
+
+        result = (_TEMPLATE(T, vec_is_zero) (a, len, ctx));
         if (!result)
         {
             printf("FAIL1:\n");
-            _TEMPLATE(T, vec_print)(a, len, ctx), printf("\n\n");
+            _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear) (a, len, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check non-zero vector */
     for (i = 0; i < 50; i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, struct) *a;
+        TEMPLATE(T, struct) * a;
         slong len = n_randint(state, 100) + 1;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        a = _TEMPLATE(T, vec_init)(len, ctx);
-        TEMPLATE(T, one)(a + (len - 1), ctx);
+        a = _TEMPLATE(T, vec_init) (len, ctx);
+        TEMPLATE(T, one) (a + (len - 1), ctx);
 
-        result = (!_TEMPLATE(T, vec_is_zero)(a, len, ctx));
+        result = (!_TEMPLATE(T, vec_is_zero) (a, len, ctx));
         if (!result)
         {
             printf("FAIL2:\n");
-            _TEMPLATE(T, vec_print)(a, len, ctx), printf("\n\n");
+            _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len, ctx);
+        _TEMPLATE(T, vec_clear) (a, len, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     flint_randclear(state);

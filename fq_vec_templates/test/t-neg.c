@@ -45,62 +45,62 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, struct) *a, *b;
+        TEMPLATE(T, struct) * a, *b;
         slong len = n_randint(state, 100);
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        a = _TEMPLATE(T, vec_init)(len, ctx);
-        b = _TEMPLATE(T, vec_init)(len, ctx);
-        _TEMPLATE(T, vec_randtest)(a, state, len, ctx);
+        a = _TEMPLATE(T, vec_init) (len, ctx);
+        b = _TEMPLATE(T, vec_init) (len, ctx);
+        _TEMPLATE(T, vec_randtest) (a, state, len, ctx);
 
-        _TEMPLATE(T, vec_neg)(b, a, len, ctx);
-        _TEMPLATE(T, vec_neg)(a, a, len, ctx);
+        _TEMPLATE(T, vec_neg) (b, a, len, ctx);
+        _TEMPLATE(T, vec_neg) (a, a, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(a, b, len, ctx));
+        result = (_TEMPLATE(T, vec_equal) (a, b, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
-            _TEMPLATE(T, vec_print)(a, len, ctx), printf("\n\n");
-            _TEMPLATE(T, vec_print)(b, len, ctx), printf("\n\n");
+            _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
+            _TEMPLATE(T, vec_print) (b, len, ctx), printf("\n\n");
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len, ctx);
-        _TEMPLATE(T, vec_clear)(b, len, ctx);
+        _TEMPLATE(T, vec_clear) (a, len, ctx);
+        _TEMPLATE(T, vec_clear) (b, len, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check -(-a) == a */
     for (i = 0; i < 100; i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, struct) *a, *b;
+        TEMPLATE(T, struct) * a, *b;
         slong len = n_randint(state, 100);
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        a = _TEMPLATE(T, vec_init)(len, ctx);
-        b = _TEMPLATE(T, vec_init)(len, ctx);
-        _TEMPLATE(T, vec_randtest)(a, state, len, ctx);
+        a = _TEMPLATE(T, vec_init) (len, ctx);
+        b = _TEMPLATE(T, vec_init) (len, ctx);
+        _TEMPLATE(T, vec_randtest) (a, state, len, ctx);
 
-        _TEMPLATE(T, vec_neg)(b, a, len, ctx);
-        _TEMPLATE(T, vec_neg)(b, b, len, ctx);
+        _TEMPLATE(T, vec_neg) (b, a, len, ctx);
+        _TEMPLATE(T, vec_neg) (b, b, len, ctx);
 
-        result = (_TEMPLATE(T, vec_equal)(a, b, len, ctx));
+        result = (_TEMPLATE(T, vec_equal) (a, b, len, ctx));
         if (!result)
         {
             printf("FAIL:\n");
-            _TEMPLATE(T, vec_print)(a, len, ctx), printf("\n\n");
-            _TEMPLATE(T, vec_print)(b, len, ctx), printf("\n\n");
+            _TEMPLATE(T, vec_print) (a, len, ctx), printf("\n\n");
+            _TEMPLATE(T, vec_print) (b, len, ctx), printf("\n\n");
             abort();
         }
 
-        _TEMPLATE(T, vec_clear)(a, len, ctx);
-        _TEMPLATE(T, vec_clear)(b, len, ctx);
+        _TEMPLATE(T, vec_clear) (a, len, ctx);
+        _TEMPLATE(T, vec_clear) (b, len, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     flint_randclear(state);
