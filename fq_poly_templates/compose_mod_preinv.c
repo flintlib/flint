@@ -39,7 +39,7 @@ _TEMPLATE(T, poly_compose_mod_preinv)(TEMPLATE(T, struct) * res,
                             const TEMPLATE(T, struct) * hinv, slong lenhinv,
                             const TEMPLATE(T, ctx_t) ctx)
 {
-    if (lenh < FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF || lenf >= lenh)
+    if (lenh < TEMPLATE(CAP_T, COMPOSE_MOD_PREINV_LENH_CUTOFF) || lenf >= lenh)
         _TEMPLATE(T, poly_compose_mod_horner_preinv)(res, f, lenf, g, h, lenh,
                                            hinv, lenhinv, ctx);
     else

@@ -34,7 +34,7 @@ _TEMPLATE(T, poly_divrem_divconquer_recursive)(TEMPLATE(T, struct) * Q, TEMPLATE
                                      const TEMPLATE(T, struct) * B, slong lenB,
                                      const TEMPLATE(T, t) invB, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (lenB <= FQ_POLY_DIVREM_DIVCONQUER_CUTOFF)
+    if (lenB <= TEMPLATE(CAP_T, POLY_DIVREM_DIVCONQUER_CUTOFF))
     {
         _TEMPLATE(T, vec_zero)(BQ, lenB - 1, ctx);
         _TEMPLATE(T, vec_set)(BQ + (lenB - 1), A + (lenB - 1), lenB, ctx);

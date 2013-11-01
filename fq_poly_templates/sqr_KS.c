@@ -29,6 +29,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "fmpz_poly.h"
 
 void
 _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len,
@@ -39,7 +40,7 @@ _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) *
     long bits, i;
     fmpz *f, *g;
 
-    FQ_VEC_NORM(op, len, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(op, len, ctx);
 
     if (!len)
     {
@@ -56,15 +57,14 @@ _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) *
 
     for (i = 0; i < len; i++)
     {
-        fmpz_poly_bit_pack(g + i, op + i, bits);
+        TEMPLATE(T, bit_pack)(g + i, op + i, bits, ctx);
     }
 
     _fmpz_poly_sqr(f, g, len);
 
     for (i = 0; i < 2 * len - 1; i++)
     {
-        fmpz_poly_bit_unpack_unsigned(rop + i, f + i, bits);
-        TEMPLATE(T, reduce)(rop + i, ctx);
+        TEMPLATE(T, bit_unpack)(rop + i, f + i, bits, ctx);
     }
 
     _TEMPLATE(T, poly_zero)(rop + (2 * len - 1), 2 * (in_len - len), ctx);

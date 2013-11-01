@@ -57,7 +57,7 @@ _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct) * G, const TEMPLATE(T, stru
         _TEMPLATE(T, poly_divrem)(Q, R1, A, lenA, B, lenB, invB, ctx);
 
         lenR3 = lenB - 1;
-        FQ_VEC_NORM(R1, lenR3, ctx);
+        TEMPLATE(CAP_T, VEC_NORM)(R1, lenR3, ctx);
 
         if (lenR3 == 0)
         {
@@ -80,7 +80,7 @@ _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct) * G, const TEMPLATE(T, stru
 
             _TEMPLATE(T, poly_divrem)(Q, R1, R2, lenR2, R3, lenR3, invR3, ctx);
             lenR2 = lenR3--;
-            FQ_VEC_NORM(R1, lenR3, ctx);
+            TEMPLATE(CAP_T, VEC_NORM)(R1, lenR3, ctx);
             T = R2; R2 = R3; R3 = R1; R1 = T;
         } 
         while (lenR3 > 0);

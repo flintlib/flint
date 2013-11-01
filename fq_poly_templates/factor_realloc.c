@@ -48,7 +48,7 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
                 TEMPLATE(T, poly_clear)(fac->poly + i, ctx);
 
             fac->poly =
-                flint_realloc(fac->poly, alloc * sizeof(fq_poly_struct));
+                flint_realloc(fac->poly, alloc * sizeof(TEMPLATE(T, poly_struct)));
             fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
             fac->alloc = alloc;
         }
@@ -57,7 +57,7 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
             slong i;
 
             fac->poly =
-                flint_realloc(fac->poly, alloc * sizeof(fq_poly_struct));
+                flint_realloc(fac->poly, alloc * sizeof(TEMPLATE(T, poly_struct)));
             fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
 
             for (i = fac->alloc; i < alloc; i++)
@@ -72,7 +72,7 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
     {
         slong i;
 
-        fac->poly = flint_malloc(alloc * sizeof(fq_poly_struct));
+        fac->poly = flint_malloc(alloc * sizeof(TEMPLATE(T, poly_struct)));
         fac->exp = flint_calloc(alloc, sizeof(slong));
 
         for (i = 0; i < alloc; i++)

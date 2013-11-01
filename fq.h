@@ -342,5 +342,16 @@ void _fq_norm(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx);
 
 void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
+
+/* Bit packing ******************************************************/
+
+void
+fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
+            const fq_ctx_t ctx);
+
+void
+fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+              const fq_ctx_t ctx);
+
 #endif
 

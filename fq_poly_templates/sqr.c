@@ -39,10 +39,12 @@ _TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) * rop,
     {
         _TEMPLATE(T, poly_sqr_classical)(rop, op, len, ctx);
     }
+#ifdef USE_SQR_REORDER
     else if (d < 4)
     {
         _TEMPLATE(T, poly_sqr_reorder)(rop, op, len, ctx);
     }
+#endif
     else
     {
         _TEMPLATE(T, poly_sqr_KS)(rop, op, len, ctx);

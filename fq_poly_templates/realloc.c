@@ -47,7 +47,7 @@ TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, long alloc, const TEMPLATE(T
 
         poly->coeffs =
             (TEMPLATE(T, struct) *) flint_realloc(poly->coeffs,
-                                        alloc * sizeof(fq_struct));
+                                                  alloc * sizeof(TEMPLATE(T, struct)));
 
         for (i = poly->alloc; i < alloc; i++)
             TEMPLATE(T, init)(poly->coeffs + i, ctx);
@@ -57,7 +57,7 @@ TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, long alloc, const TEMPLATE(T
     }
     else                        /* Nothing allocated already so do it now */
     {
-        poly->coeffs = (TEMPLATE(T, struct) *) flint_malloc(alloc * sizeof(fq_struct));
+        poly->coeffs = (TEMPLATE(T, struct) *) flint_malloc(alloc * sizeof(TEMPLATE(T, struct)));
 
         for (i = 0; i < alloc; i++)
             TEMPLATE(T, init)(poly->coeffs + i, ctx);

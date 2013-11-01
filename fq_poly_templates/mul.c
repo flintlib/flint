@@ -40,10 +40,12 @@ _TEMPLATE(T, poly_mul)(TEMPLATE(T, struct) * rop,
     {
         _TEMPLATE(T, poly_mul_classical)(rop, op1, len1, op2, len2, ctx);
     }
+#ifdef USE_MUL_REORDER    
     else if (d < 4)
     {
         _TEMPLATE(T, poly_mul_reorder)(rop, op1, len1, op2, len2, ctx);
     }
+#endif
     else
     {
         _TEMPLATE(T, poly_mul_KS)(rop, op1, len1, op2, len2, ctx);

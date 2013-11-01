@@ -113,9 +113,9 @@ typedef struct
     slong *exp;
     slong num;
     slong alloc;
-} fq_poly_factor_struct;
+} TEMPLATE(T, poly_factor_struct);
 
-typedef TEMPLATE(T, poly_factor_struct) fq_poly_factor_t[1];
+typedef TEMPLATE(T, poly_factor_struct) TEMPLATE(T, poly_factor_t)[1];
 
 
 void TEMPLATE(T, poly_factor_init)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T, ctx_t) ctx);
@@ -202,7 +202,7 @@ void
 TEMPLATE(T, poly_factor)(TEMPLATE(T, poly_factor_t) result, TEMPLATE(T, t) leading_coeff,
                const TEMPLATE(T, poly_t) input, const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const TEMPLATE(T, ctx_t) ctx, slong length)
+static __inline__ int TEMPLATE(CAP_T, POLY_ITERATED_FROBENIUS_CUTOFF)(const TEMPLATE(T, ctx_t) ctx, slong length)
 {
     if ((TEMPLATE(T, ctx_degree)(ctx) == 2 && length > 10) ||
         (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0 && 2*length > TEMPLATE(T, ctx_degree)(ctx)) ||
@@ -535,13 +535,13 @@ long TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op, const TEMPLA
 void TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                  const TEMPLATE(T, ctx_t) ctx);
 
-long _TEMPLATE(T, poly_gcd_euclidean)(fq_struct* G,const fq_struct* A, long lenA, 
-                            const fq_struct* B, long lenB, const TEMPLATE(T, t) invB,
+long _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,const TEMPLATE(T, struct)* A, long lenA, 
+                            const TEMPLATE(T, struct)* B, long lenB, const TEMPLATE(T, t) invB,
                             const TEMPLATE(T, ctx_t) ctx);
 
 static __inline__
-long _TEMPLATE(T, poly_gcd)(fq_struct* G, const fq_struct* A, long lenA, 
-                  const fq_struct* B, long lenB, const TEMPLATE(T, t) invB,
+long _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G, const TEMPLATE(T, struct)* A, long lenA, 
+                  const TEMPLATE(T, struct)* B, long lenB, const TEMPLATE(T, t) invB,
                   const TEMPLATE(T, ctx_t) ctx)
 {
     return _TEMPLATE(T, poly_gcd_euclidean)(G, A, lenA, B, lenB, invB, ctx);
@@ -655,8 +655,8 @@ void TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, poly_t) Qinv, const TEMPLAT
                                const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_div_newton_preinv) (TEMPLATE(T, struct) *Q, const TEMPLATE(T, struct) *A, slong lenA,
-                                 const fq_struct* B, slong lenB,
-                                 const fq_struct* Binv, slong lenBinv,
+                                 const TEMPLATE(T, struct)* B, slong lenB,
+                                 const TEMPLATE(T, struct)* Binv, slong lenBinv,
                                  const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_div_newton_preinv) (TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
@@ -664,10 +664,10 @@ void TEMPLATE(T, poly_div_newton_preinv) (TEMPLATE(T, poly_t) Q, const TEMPLATE(
                                 const TEMPLATE(T, ctx_t) ctx);
 
 void
-_TEMPLATE(T, poly_divrem_newton_preinv) (fq_struct* Q, fq_struct* R,
-                               const fq_struct* A, slong lenA,
-                               const fq_struct* B, slong lenB,
-                               const fq_struct* Binv, slong lenBinv, 
+_TEMPLATE(T, poly_divrem_newton_preinv) (TEMPLATE(T, struct)* Q, TEMPLATE(T, struct)* R,
+                               const TEMPLATE(T, struct)* A, slong lenA,
+                               const TEMPLATE(T, struct)* B, slong lenB,
+                               const TEMPLATE(T, struct)* Binv, slong lenBinv, 
                                const TEMPLATE(T, ctx_t) ctx);
 
 void
