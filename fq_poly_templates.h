@@ -202,7 +202,7 @@ void
 TEMPLATE(T, poly_factor)(TEMPLATE(T, poly_factor_t) result, TEMPLATE(T, t) leading_coeff,
                const TEMPLATE(T, poly_t) input, const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const TEMPLATE(T, ctx_t) ctx, slong length)
+static __inline__ int TEMPLATE(CAP_T, POLY_ITERATED_FROBENIUS_CUTOFF)(const TEMPLATE(T, ctx_t) ctx, slong length)
 {
     if ((TEMPLATE(T, ctx_degree)(ctx) == 2 && length > 10) ||
         (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0 && 2*length > TEMPLATE(T, ctx_degree)(ctx)) ||

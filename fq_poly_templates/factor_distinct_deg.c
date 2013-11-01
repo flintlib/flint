@@ -80,7 +80,7 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     /* compute baby steps: h[i]=x^{q^i}mod v */
     /*     h[0] = x */
     /* TODO: Better cutoff */
-    if (FQ_POLY_ITERATED_FROBENIUS_CUTOFF(ctx, v->length))
+    if (TEMPLATE(CAP_T, POLY_ITERATED_FROBENIUS_CUTOFF)(ctx, v->length))
     {
         TEMPLATE(T, poly_gen)(h[0], ctx);
         for (i = 1; i < l + 1; i++)
