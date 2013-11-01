@@ -37,7 +37,7 @@ _TEMPLATE(T, poly_compose_mod)(TEMPLATE(T, struct) * res,
                      const TEMPLATE(T, struct) * g,
                      const TEMPLATE(T, struct) * h, slong lenh, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (lenh < FQ_COMPOSE_MOD_LENH_CUTOFF || lenf >= lenh)
+    if (lenh < TEMPLATE(CAP_T, COMPOSE_MOD_LENH_CUTOFF) || lenf >= lenh)
         _TEMPLATE(T, poly_compose_mod_horner)(res, f, lenf, g, h, lenh, ctx);
     else
         _TEMPLATE(T, poly_compose_mod_brent_kung)(res, f, lenf, g, h, lenh, ctx);

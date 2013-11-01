@@ -51,7 +51,7 @@ TEMPLATE(T, poly_factor_insert)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T
         slong new_size = 2 * fac->alloc;
 
         fac->poly =
-            flint_realloc(fac->poly, sizeof(fq_poly_struct) * new_size);
+            flint_realloc(fac->poly, sizeof(TEMPLATE(T, poly_struct)) * new_size);
         fac->exp = flint_realloc(fac->exp, sizeof(slong) * new_size);
 
         for (i = fac->alloc; i < new_size; i++)

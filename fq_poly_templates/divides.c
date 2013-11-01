@@ -42,7 +42,7 @@ _TEMPLATE(T, poly_divides)(TEMPLATE(T, struct) * Q,
 
     _TEMPLATE(T, poly_divrem)(Q, R, A, lenA, B, lenB, invB, ctx);
 
-    FQ_VEC_NORM(R, lenR, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(R, lenR, ctx);
     _TEMPLATE(T, vec_clear)(R, lenA, ctx);
 
     return (lenR == 0);

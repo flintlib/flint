@@ -80,7 +80,7 @@ main(void)
             TEMPLATE(T, poly_mul)(poly1, poly1, poly2, ctx);
         }
 
-        while (!fq_poly_factor_equal_deg_prob
+        while (!TEMPLATE(T, poly_factor_equal_deg_prob)
                (poly2, state, poly1, length - 1, ctx))
         {
         };

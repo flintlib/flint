@@ -88,7 +88,6 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
             TEMPLATE(T, bit_unpack) (TEMPLATE(T, mat_entry) (C, i, j),
                                      fmpz_mat_entry(fc, i, j), bits,
                                      ctx);
-            TEMPLATE(T, reduce) (TEMPLATE(T, mat_entry) (C, i, j), ctx);
         }
     }
 

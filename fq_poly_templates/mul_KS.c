@@ -29,6 +29,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "fmpz_poly.h"
 
 void
 _TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op1, long len1,
@@ -39,8 +40,8 @@ _TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) *
     long bits, i;
     fmpz *f, *g, *h;
 
-    FQ_VEC_NORM(op1, len1, ctx);
-    FQ_VEC_NORM(op2, len2, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(op1, len1, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(op2, len2, ctx);
 
     if (!len1 | !len2)
     {
@@ -58,11 +59,11 @@ _TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) *
 
     for (i = 0; i < len1; i++)
     {
-        fmpz_poly_bit_pack(g + i, op1 + i, bits);
+        TEMPLATE(T, bit_pack)(g + i, op1 + i, bits, ctx);
     }
     for (i = 0; i < len2; i++)
     {
-        fmpz_poly_bit_pack(h + i, op2 + i, bits);
+        TEMPLATE(T, bit_pack)(h + i, op2 + i, bits, ctx);
     }
 
     if (len1 >= len2)
@@ -72,12 +73,12 @@ _TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) *
 
     for (i = 0; i < len1 + len2 - 1; i++)
     {
-        fmpz_poly_bit_unpack_unsigned(rop + i, f + i, bits);
-        TEMPLATE(T, reduce)(rop + i, ctx);
+        TEMPLATE(T, bit_unpack)(rop + i, f + i, bits, ctx);
     }
 
-    _TEMPLATE(T, poly_zero)(rop + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2),
-                  ctx);
+    _TEMPLATE(T, poly_zero)(rop + (len1 + len2 - 1),
+                            (in1_len - len1) + (in2_len - len2),
+                            ctx);
 
     _fmpz_vec_clear(f, (len1 + len2 - 1) + (len1) + (len2));
 }

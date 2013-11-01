@@ -32,8 +32,10 @@
 #undef T
 #endif
 
+#define USE_MUL_REORDER 1
 #define T fq
 #define CAP_T FQ
 #include "fq_poly_templates/mul.c"
 #undef CAP_T
 #undef T
+#undef USE_MUL_REORDER

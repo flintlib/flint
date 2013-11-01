@@ -29,6 +29,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "fmpz_poly.h"
 
 void
 _TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, struct) * rop,
@@ -40,8 +41,8 @@ _TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, struct) * rop,
     long bits, i, m;
     fmpz *f, *g, *h;
 
-    FQ_VEC_NORM(op1, len1, ctx);
-    FQ_VEC_NORM(op2, len2, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(op1, len1, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(op2, len2, ctx);
 
     if (!len1 | !len2)
     {
@@ -58,11 +59,11 @@ _TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, struct) * rop,
 
     for (i = 0; i < len1; i++)
     {
-        fmpz_poly_bit_pack(g + i, op1 + i, bits);
+        TEMPLATE(T, bit_pack)(g + i, op1 + i, bits, ctx);
     }
     for (i = 0; i < len2; i++)
     {
-        fmpz_poly_bit_pack(h + i, op2 + i, bits);
+        TEMPLATE(T, bit_pack)(h + i, op2 + i, bits, ctx);
     }
 
     m = FLINT_MIN(n, len1 + len2 - 1);
@@ -74,8 +75,7 @@ _TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, struct) * rop,
 
     for (i = 0; i < m; i++)
     {
-        fmpz_poly_bit_unpack_unsigned(rop + i, f + i, bits);
-        TEMPLATE(T, reduce)(rop + i, ctx);
+        TEMPLATE(T, bit_unpack)(rop + i, f + i, bits, ctx);
     }
     for (; i < n; i++)
     {
@@ -106,7 +106,7 @@ TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, poly_t) rop,
 
         TEMPLATE(T, poly_fit_length)(rop, n, ctx);
         _TEMPLATE(T, poly_mullow_KS)(rop->coeffs, op1->coeffs, len1,
-                           op2->coeffs, len2, n, ctx);
+                                     op2->coeffs, len2, n, ctx);
         _TEMPLATE(T, poly_set_length)(rop, n, ctx);
         _TEMPLATE(T, poly_normalise)(rop, ctx);
     }

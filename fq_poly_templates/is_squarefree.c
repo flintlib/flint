@@ -45,7 +45,7 @@ _TEMPLATE(T, poly_is_squarefree)(const TEMPLATE(T, struct) * f, slong len, const
 
     _TEMPLATE(T, poly_derivative)(fd, f, len, ctx);
     dlen = len - 1;
-    FQ_VEC_NORM(fd, dlen, ctx);
+    TEMPLATE(CAP_T, VEC_NORM)(fd, dlen, ctx);
 
     if (dlen)
     {

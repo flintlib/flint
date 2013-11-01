@@ -35,7 +35,7 @@ TEMPLATE(T, poly_factor_init)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T, 
 
     fac->alloc = 5;
     fac->num = 0;
-    fac->poly = flint_malloc(sizeof(fq_poly_struct) * 5);
+    fac->poly = flint_malloc(sizeof(TEMPLATE(T, poly_struct)) * 5);
     fac->exp = flint_malloc(sizeof(slong) * 5);
 
     for (i = 0; i < fac->alloc; i++)
