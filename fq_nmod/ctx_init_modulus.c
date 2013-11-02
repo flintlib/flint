@@ -30,7 +30,7 @@
 
 void
 fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const fmpz_t p, long d,
-                         nmod_poly_t modulus, const char *var)
+                         const nmod_poly_t modulus, const char *var)
 {
     long nz;
     int i, j;
