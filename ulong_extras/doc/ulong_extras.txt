@@ -1184,7 +1184,7 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 
 *******************************************************************************
 
-    Primitive Roots
+    Primitive Roots and Discrete Logarithms
 
 *******************************************************************************
 
@@ -1198,3 +1198,12 @@ mp_limb_t n_primitive_root_prime(mp_limb_t p)
 
     Returns a primitive root for the multiplicative subgroup of $Z/pZ$
     where $p$ is prime.
+
+mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n)
+
+    Returns the discrete logarithm of $b$ with respect to $a$ in the
+    multiplicative subgroup of $Z/nZ$ when $Z/nZ$ is cyclic That is,
+    it returns an number $x$ such that $a^x = b \bmod n$.  The
+    multiplicative subgroup is only cyclic when $n$ is $2$, $4$,
+    $p^k$, or $2p^k$ where $p$ is an odd prime and $k$ is a positive
+    integer.

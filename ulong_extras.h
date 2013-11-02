@@ -372,6 +372,8 @@ mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors);
 
 mp_limb_t n_primitive_root_prime(mp_limb_t p);
 
+mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n);
+
 #ifdef __cplusplus
 }
 #endif
