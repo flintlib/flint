@@ -34,14 +34,12 @@ _TEMPLATE(T, poly_mul)(TEMPLATE(T, struct) * rop,
              const TEMPLATE(T, struct) * op1, long len1,
              const TEMPLATE(T, struct) * op2, long len2, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long d = TEMPLATE(T, ctx_degree)(ctx);
-
     if (FLINT_MAX(len1, len2) < 6)
     {
         _TEMPLATE(T, poly_mul_classical)(rop, op1, len1, op2, len2, ctx);
     }
 #ifdef USE_MUL_REORDER    
-    else if (d < 4)
+    else if (TEMPLATE(T, ctx_degree)(ctx) < 4)
     {
         _TEMPLATE(T, poly_mul_reorder)(rop, op1, len1, op2, len2, ctx);
     }

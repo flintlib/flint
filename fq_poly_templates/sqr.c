@@ -33,14 +33,12 @@ void
 _TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) * rop,
              const TEMPLATE(T, struct) * op, long len, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long d = TEMPLATE(T, ctx_degree)(ctx);
-
     if (len < 6)
     {
         _TEMPLATE(T, poly_sqr_classical)(rop, op, len, ctx);
     }
 #ifdef USE_SQR_REORDER
-    else if (d < 4)
+    else if (TEMPLATE(T, ctx_degree)(ctx) < 4)
     {
         _TEMPLATE(T, poly_sqr_reorder)(rop, op, len, ctx);
     }
