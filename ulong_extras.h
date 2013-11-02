@@ -368,6 +368,10 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
 mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
+mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors);
+
+mp_limb_t n_primitive_root_prime(mp_limb_t p);
+
 #ifdef __cplusplus
 }
 #endif
