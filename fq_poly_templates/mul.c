@@ -34,7 +34,7 @@ _TEMPLATE(T, poly_mul)(TEMPLATE(T, struct) * rop,
              const TEMPLATE(T, struct) * op1, long len1,
              const TEMPLATE(T, struct) * op2, long len2, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (FLINT_MAX(len1, len2) < 6)
+    if (FLINT_MAX(len1, len2) < TEMPLATE(CAP_T, MUL_CLASSICAL_CUTOFF))
     {
         _TEMPLATE(T, poly_mul_classical)(rop, op1, len1, op2, len2, ctx);
     }
