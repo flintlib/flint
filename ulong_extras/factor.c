@@ -31,7 +31,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int is_prime(mp_limb_t n, int proved)
+static int is_prime(mp_limb_t n, int proved)
 {
     return proved ? n_is_prime(n) : n_is_probabprime(n);
 }

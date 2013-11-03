@@ -37,7 +37,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -69,7 +69,7 @@ for (l = 0; l < len; l++)
     flint_rand_t state;
     slong d = 97, i, n = N[l], r;
     clock_t c0, c1;
-    long doublecputime;
+    long double cputime;
 
     fmpz_t p;
     qadic_ctx_t ctx;
@@ -80,10 +80,10 @@ for (l = 0; l < len; l++)
 
     fmpz_init_set_ui(p, 17);
 
-    qadic_ctx_init_conway(ctx, p, d, n, "X", PADIC_VAL_UNIT);
+    qadic_ctx_init_conway(ctx, p, d, n, n, "X", PADIC_VAL_UNIT);
 
     qadic_init(a);
-    _padic_init(z);
+    padic_init(z);
 
     padic_poly_fit_length(a, d);
     _padic_poly_set_length(a, d);
@@ -120,7 +120,7 @@ for (l = 0; l < len; l++)
         l, cputime, runs[l], T[l]);
 
     qadic_clear(a);
-    _padic_clear(z);
+    padic_clear(z);
 
     fmpz_clear(p);
     qadic_ctx_clear(ctx);

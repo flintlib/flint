@@ -221,6 +221,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     mp_ptr Q_coeffs, W;
     nmod_poly_t t1;
     slong Alen, Blen;
+    TMP_INIT;
 
     Blen = B->length;
 
@@ -251,7 +252,8 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
         Q_coeffs = Q->coeffs;
     }
 
-    W = _nmod_vec_init(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod));
+    TMP_START;
+    W = TMP_ALLOC(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod)*sizeof(mp_limb_t));
     
     _nmod_poly_div_basecase(Q_coeffs, W, A->coeffs, Alen,
                                B->coeffs, Blen, B->mod);
@@ -264,6 +266,6 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     
     Q->length = Alen - Blen + 1;
 
-    _nmod_vec_clear(W);
+    TMP_END;
     _nmod_poly_normalise(Q);
 }

@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    flint_printf("fdiv_qr....");
+    flint_printf("fdiv_qr_preinvn....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -45,8 +45,7 @@ main(void)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
-        slong j;
-
+        fmpz_preinvn_t inv;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -60,16 +59,14 @@ main(void)
         mpz_init(h);
         mpz_init(s);
 
-        fmpz_randbits(a, state, 1000);
-        do { 
-           fmpz_randbits(b, state, 500);
-        } while(fmpz_is_zero(b));
+        fmpz_randtest(a, state, 400);
+        fmpz_randtest_not_zero(b, state, 400);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        for (j = 1; j < 100; j++)
-           fmpz_fdiv_qr(c, r, a, b);
+        fmpz_preinvn_init(inv, b);
+        fmpz_fdiv_qr_preinvn(c, r, a, b, inv);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, c);
@@ -85,6 +82,7 @@ main(void)
             abort();
         }
 
+        fmpz_preinvn_clear(inv);
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
@@ -103,6 +101,7 @@ main(void)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
+        fmpz_preinvn_t inv;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -122,7 +121,8 @@ main(void)
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        fmpz_fdiv_qr(a, r, a, b);
+        fmpz_preinvn_init(inv, b);
+        fmpz_fdiv_qr_preinvn(a, r, a, b, inv);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, a);
@@ -138,6 +138,7 @@ main(void)
             abort();
         }
 
+        fmpz_preinvn_clear(inv);
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
@@ -156,6 +157,7 @@ main(void)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
+        fmpz_preinvn_t inv;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -175,7 +177,8 @@ main(void)
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        fmpz_fdiv_qr(b, r, a, b);
+        fmpz_preinvn_init(inv, b);
+        fmpz_fdiv_qr_preinvn(b, r, a, b, inv);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, b);
@@ -191,6 +194,7 @@ main(void)
             abort();
         }
 
+        fmpz_preinvn_clear(inv);
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
@@ -209,6 +213,7 @@ main(void)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
+        fmpz_preinvn_t inv;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -228,7 +233,8 @@ main(void)
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        fmpz_fdiv_qr(c, a, a, b);
+        fmpz_preinvn_init(inv, b);
+        fmpz_fdiv_qr_preinvn(c, a, a, b, inv);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, c);
@@ -244,6 +250,7 @@ main(void)
             abort();
         }
 
+        fmpz_preinvn_clear(inv);
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
@@ -262,6 +269,7 @@ main(void)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
+        fmpz_preinvn_t inv;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -281,7 +289,8 @@ main(void)
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        fmpz_fdiv_qr(c, b, a, b);
+        fmpz_preinvn_init(inv, b);
+        fmpz_fdiv_qr_preinvn(c, b, a, b, inv);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, c);
@@ -297,6 +306,7 @@ main(void)
             abort();
         }
 
+        fmpz_preinvn_clear(inv);
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);

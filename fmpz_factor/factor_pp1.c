@@ -37,6 +37,9 @@
 
 #define DEBUG 0 /* turn on some trace information */
 
+#define pp1_mulmod(rxx, axx, bxx, nnn, nxx, ninv, norm)             \
+   flint_mpn_mulmod_preinvn(rxx, axx, bxx, nnn, nxx, ninv, norm)
+
 #ifdef FLINT64
 static
 ulong pp1_primorial[15] =
@@ -95,11 +98,11 @@ void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
 void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
             mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
-   flint_mpn_mulmod_preinvn(y, y, x, nn, n, ninv, norm);
+   pp1_mulmod(y, y, x, nn, n, ninv, norm);
    if (mpn_sub_n(y, y, x0, nn))
       mpn_add_n(y, y, n, nn);
 
-   flint_mpn_mulmod_preinvn(x, x, x, nn, n, ninv, norm);
+   pp1_mulmod(x, x, x, nn, n, ninv, norm);
    if (mpn_sub_1(x, x, nn, UWORD(2) << norm))
       mpn_add_n(x, x, n, nn);
 }
@@ -107,11 +110,11 @@ void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n,
 void pp1_2kp1(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
               mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
-   flint_mpn_mulmod_preinvn(x, x, y, nn, n, ninv, norm);
+   pp1_mulmod(x, x, y, nn, n, ninv, norm);
    if (mpn_sub_n(x, x, x0, nn))
       mpn_add_n(x, x, n, nn);
 
-   flint_mpn_mulmod_preinvn(y, y, y, nn, n, ninv, norm);
+   pp1_mulmod(y, y, y, nn, n, ninv, norm);
    if (mpn_sub_1(y, y, nn, UWORD(2) << norm))
       mpn_add_n(y, y, n, nn);
 }
@@ -127,7 +130,7 @@ void pp1_pow_ui(mp_ptr x, mp_ptr y, mp_size_t nn,
       x0 = flint_malloc(nn*sizeof(mp_limb_t));
    mpn_copyi(x0, x, nn);
 
-   flint_mpn_mulmod_preinvn(y, x, x, nn, n, ninv, norm);
+   pp1_mulmod(y, x, x, nn, n, ninv, norm);
    if (mpn_sub_1(y, y, nn, UWORD(2) << norm))
       mpn_add_n(y, y, n, nn);
 
@@ -389,7 +392,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       diff[0] = (UWORD(2) << norm);
 
       /* ... v2, ... */
-      flint_mpn_mulmod_preinvn(diff + nn, x, x, nn, n, ninv, norm);
+      pp1_mulmod(diff + nn, x, x, nn, n, ninv, norm);
       if (mpn_sub_1(diff + nn, diff + nn, nn, UWORD(2) << norm))
          mpn_add_n(diff + nn, diff + nn, n, nn);
 
@@ -397,7 +400,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       k = 2*nn;
       for (i = 2; i < 16384; i++, k += nn)
       {
-         flint_mpn_mulmod_preinvn(diff + k, diff + k - nn, diff + nn, nn, n, ninv, norm);
+         pp1_mulmod(diff + k, diff + k - nn, diff + nn, nn, n, ninv, norm);
          if (mpn_sub_n(diff + k, diff + k, diff + k - 2*nn, nn))
             mpn_add_n(diff + k, diff + k, n, nn);
       }
@@ -446,7 +449,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
                      ptr_0 = COEFF_TO_PTR(roots[sieve_index[2*j - i]])->_mp_d;
                      ptr_1 = COEFF_TO_PTR(roots[sieve_index[j]])->_mp_d;
                      ptr_k = diff + (i - j)*nn;
-                     flint_mpn_mulmod_preinvn(ptr_2, ptr_1, ptr_k, nn, n, ninv, norm);
+                     pp1_mulmod(ptr_2, ptr_1, ptr_k, nn, n, ninv, norm);
                      if (mpn_sub_n(ptr_2, ptr_2, ptr_0, nn))
                         mpn_add_n(ptr_2, ptr_2, n, nn);
                      break;
@@ -479,7 +482,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
       /* v_2 */
       ptr_1 = COEFF_TO_PTR(roots2[1])->_mp_d;
-      flint_mpn_mulmod_preinvn(ptr_1, ptr_0, ptr_0, nn, n, ninv, norm);
+      pp1_mulmod(ptr_1, ptr_0, ptr_0, nn, n, ninv, norm);
       if (mpn_sub_1(ptr_1, ptr_1, nn, UWORD(2) << norm))
          mpn_add_n(ptr_1, ptr_1, n, nn);
      
@@ -488,7 +491,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
          /* V_{k+n} = V_k V_n - V_{k-n} */
          ptr_2 = COEFF_TO_PTR(roots2[i])->_mp_d;
       
-         flint_mpn_mulmod_preinvn(ptr_2, ptr_1, oldx, nn, n, ninv, norm);
+         pp1_mulmod(ptr_2, ptr_1, oldx, nn, n, ninv, norm);
          if (mpn_sub_n(ptr_2, ptr_2, ptr_0, nn))
              mpn_add_n(ptr_2, ptr_2, n, nn);
                      

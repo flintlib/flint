@@ -31,10 +31,10 @@
 #include "fmpz_poly.h"
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB)
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 {
     fmpz * R = _fmpz_vec_init(lenA);
-    _fmpz_poly_pseudo_divrem(Q, R, d, A, lenA, B, lenB);
+    _fmpz_poly_pseudo_divrem(Q, R, d, A, lenA, B, lenB, inv);
     _fmpz_vec_clear(R, lenA);
 }
 
@@ -66,7 +66,7 @@ void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A,
     }
 
     _fmpz_poly_pseudo_div(q, d, A->coeffs, A->length, 
-                                B->coeffs, B->length);
+                                B->coeffs, B->length, NULL);
 
     if (Q == A || Q == B)
     {

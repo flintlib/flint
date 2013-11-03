@@ -711,7 +711,9 @@ void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, slong len1,
 
     Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
     and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows 
-    zero-padding of the two input polynomials.
+    zero-padding of the two input polynomials. Does not support aliasing 
+    between the inputs and the output.
+
 
 void fmpz_poly_mul(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -1701,8 +1703,9 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
 
 *******************************************************************************
 
-void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
-                        const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, 
+                     ulong * d, const fmpz * A, slong lenA, 
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     If $\ell$ is the leading coefficient of $B$, then computes $Q$, $R$ such 
     that $\ell^d A = Q B + R$.  This function is used for simulating division 
@@ -1713,6 +1716,10 @@ void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
     coefficients.  Supports aliasing of \code{(R, lenA)} and \code{(A, lenA)}. 
     But other than this,  no aliasing of the inputs and outputs is suppported.
 
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
+
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -1720,8 +1727,9 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     that $\ell^d A = Q B + R$.  This function is used for simulating division 
     over~$\Q$.
 
-void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                        const fmpz * A, slong lenB, const fmpz * B, slong lenB)
+void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 
+                     ulong * d, const fmpz * A, slong lenB, 
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
     $\ell^d A = B Q + R$, only setting the bottom $\len(B) - 1$ coefficients 
@@ -1730,6 +1738,10 @@ void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
     Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
     \code{(A, lenA)}.  No aliasing of input and output operands is allowed.
+
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
 
 void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
@@ -1783,7 +1795,7 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
     in~\citep[Algorithm~3.1.2]{Coh1996}.
 
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, 
-                                        slong lenA, const fmpz * B, slong lenB)
+              slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     If $\ell$ is the leading coefficient of $B$, then computes 
     \code{(Q, lenA - lenB + 1)}, \code{(R, lenB - 1)} and $d$ such that 
@@ -1798,13 +1810,17 @@ void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A,
     Supports aliasing of \code{(R, lenA)} and \code{(A, lenA)}.  But other 
     than this, no aliasing of the inputs and outputs is suppported.
 
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
+
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes $Q$, $R$, and $d$ such that $\ell^d A = B Q + R$.
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB)
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Pseudo-division, only returning the quotient.
 
@@ -1814,7 +1830,7 @@ void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A,
     Pseudo-division, only returning the quotient.
 
 void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB)
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Pseudo-division, only returning the remainder.
 

@@ -19,32 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
 #include <gmp.h>
-#include <stdlib.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "padic_poly.h"
 
-void padic_poly_init(padic_poly_t poly)
+void fmpz_preinvn_clear(fmpz_preinvn_t inv)
 {
-    poly->coeffs = NULL;
-    poly->alloc  = 0;
-    poly->length = 0;
-    poly->val    = 0;
-    poly->N      = PADIC_DEFAULT_PREC;
+   flint_free(inv->dinv);
 }
-
-void padic_poly_init2(padic_poly_t poly, slong alloc, slong prec)
-{
-    poly->coeffs = alloc ? (fmpz *) flint_calloc(alloc, sizeof(fmpz)) : NULL;
-    poly->alloc  = alloc;
-    poly->length = 0;
-    poly->val    = 0;
-    poly->N      = prec;
-}
-

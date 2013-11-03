@@ -192,6 +192,7 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     const slong lenA = A->length, lenB = B->length;
     mp_ptr Q_coeffs, R_coeffs, W;
     nmod_poly_t t1, t2;
+    TMP_INIT;
 
     if (lenB == 0)
     {
@@ -228,7 +229,8 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         R_coeffs = R->coeffs;
     }
 
-    W = _nmod_vec_init(NMOD_DIVREM_BC_ITCH(lenA, lenB, A->mod));
+    TMP_START;
+    W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, A->mod)*sizeof(mp_limb_t));
     
     _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, lenA,
                                B->coeffs, lenB, B->mod);
@@ -246,6 +248,6 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;
 
-    _nmod_vec_clear(W);
+    TMP_END;
     _nmod_poly_normalise(R);
 }

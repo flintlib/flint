@@ -206,11 +206,11 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
-void flint_mpn_mod_n_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr d,
-                                                  mp_size_t n, mp_srcptr dinv);
+void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
+                                     mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-void flint_mpn_mod_preinvn(mp_ptr a, mp_size_t m, 
-                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, 
+                                     mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 

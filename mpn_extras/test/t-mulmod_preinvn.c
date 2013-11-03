@@ -55,7 +55,7 @@ int main(void)
 
     for (i = 0; i < 10000; i++)
     {
-       size = n_randint(state, 200) + 2;
+       size = n_randint(state, 200) + 1;
        
        mpz_rrandomb(a, st, size*FLINT_BITS);
        mpz_rrandomb(b, st, size*FLINT_BITS);
