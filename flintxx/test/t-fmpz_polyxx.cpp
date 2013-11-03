@@ -147,7 +147,7 @@ bool is_ternary(const T&)
 void
 test_extras()
 {
-    // TODO addmul
+    // TODO addmul when we have it
 }
 
 ulong pow(ulong base, ulong exp)
@@ -161,8 +161,6 @@ ulong pow(ulong base, ulong exp)
 void
 test_functions()
 {
-    // TODO reorganise this ...
-
     // test swap
     fmpz_polyxx p, q;
     p = 1; q = 0;
@@ -394,7 +392,6 @@ test_factoring()
     g = "6  2 0 2 0 0 1";
 
     // TODO are these deterministic?
-
     fmpz_poly_factorxx f1, f2;
     f1.insert(f, 1);
     f2.insert(g, 2);
@@ -409,7 +406,7 @@ test_factoring()
     f1.content() = 1;
     tassert(f1 == factor_squarefree(f*g*g));
 
-    // TODO set_factor_zassenhaus_recombination
+    // TODO test set_factor_zassenhaus_recombination
 
     if(0)
         print(f1); // make sure this compiles

@@ -134,8 +134,6 @@ test_arithmetic()
     tassert((two*v).rows() == 10);
     tassert((v*two).rows() == 10);
     tassert((v*transpose(v)).rows() == 10 && (v*transpose(v)).cols() == 10);
-    //tassert(mul_classical(v, transpose(v)).rows() == 10);
-    //tassert(mul_multi_mod(v, transpose(v)).cols() == 10);
 
     tassert(!has_explicit_temporaries(trace(transpose(v))));
     tassert(!has_explicit_temporaries(trace(A + v*transpose(v))));

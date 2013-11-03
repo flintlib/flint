@@ -167,7 +167,7 @@ bool is_ternary(const T&)
 void
 test_extras()
 {
-    // TODO addmul
+    // TODO addmul when implemented
 
     // forwarded member functions
     fmpq_polyxx f, g;
