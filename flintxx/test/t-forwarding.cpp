@@ -23,6 +23,9 @@
 
 ******************************************************************************/
 
+// XXX NOTE: the forwarding code was never completed, and neither was this
+//           test file.
+
 #include <iostream>
 #include <sstream>
 

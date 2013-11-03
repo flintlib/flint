@@ -212,12 +212,6 @@ test_functions()
 }
 
 void
-test_extras()
-{
-    // TODO
-}
-
-void
 test_randomisation()
 {
     frandxx rand, rand2;
@@ -275,7 +269,6 @@ main()
     test_init();
     test_arithmetic();
     test_functions();
-    test_extras();
     test_randomisation();
     test_row_reduction();
     test_printing();

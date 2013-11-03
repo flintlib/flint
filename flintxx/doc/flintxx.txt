@@ -2592,7 +2592,7 @@ Nmod_expr inv(Nmod_expr)
 
     The class \code{nmod_polyxx} wraps \code{nmod_poly_t}. Like \code{nmodxx},
     instances of \code{nmod_polyxx} always have an associated \code{nmodxx_ctx}
-    storing the operating modulus. No expression must involve more than one
+    storing the operating modulus. No expression may involve more than one
     modulus at a time.
 
     In order to reduce convert a \code{fmpz_polyxx} or \code{fmpq_polyxx} to
@@ -3101,7 +3101,7 @@ nmod_poly_factorxx factor_squarefree(Nmod_poly_expr)
 
     The class \code{nmod_matxx} wraps \code{nmod_mat_t}. Like \code{nmodxx},
     instances of \code{nmod_matxx} always have an associated \code{nmodxx_ctx}
-    storing the operating modulus. No expression must involve more than one
+    storing the operating modulus. No expression may involve more than one
     modulus at a time.
 
     Like \code{fmpz_matxx}, many operations on \code{nmod_matxx} do not support
@@ -3318,7 +3318,7 @@ Ltuple<slong, nmod_matxx>_expr nullspace(Nmod_mat_expr)
     Like \code{nmod_matxx},
     instances of \code{nmod_poly_matxx} always have an associated
     \code{nmodxx_ctx} storing the operating modulus.
-    No expression must involve more than one modulus at a time.
+    No expression may involve more than one modulus at a time.
 
     Contrary to \code{nmod_poly_mat_t}, it is \emph{not} valid to use instances
     of \code{nmod_poly_matxx} with zero rows or columns.
@@ -4592,8 +4592,8 @@ Qadic_expr exp(Qadic_expr)
 Qadic_expr exp_rectangular(Qadic_expr)
 Qadic_expr exp_balanced(Qadic_expr)
 
-    Compute the exponential function. These may raise \code{flint_exception}s if the
-    series do not converge.
+    Compute the exponential function. These may raise \code{flint_exception}s
+    if the series do not converge.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Logarithm
@@ -4602,8 +4602,8 @@ Qadic_expr exp_balanced(Qadic_expr)
 Qadic_expr log(Qadic_expr)
 Qadic_expr log_balanced(Qadic_expr)
 
-    Compute the logarithm function. These may raise \code{flint_exception}s if the
-    series do not converge.
+    Compute the logarithm function. These may raise \code{flint_exception}s
+    if the series do not converge.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Special functions

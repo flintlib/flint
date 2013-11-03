@@ -50,18 +50,6 @@ test_init()
     tassert(fmpz_poly_matxx::one(3, 3).is_one());
 }
 
-void
-test_assignment()
-{
-    // TODO
-}
-
-void
-test_conversion()
-{
-    // TODO
-}
-
 template<class Expr>
 bool has_explicit_temporaries(const Expr&)
 {
@@ -292,8 +280,6 @@ main()
     std::cout << "fmpz_poly_matxx....";
 
     test_init();
-    test_assignment();
-    test_conversion();
     test_arithmetic();
     test_functions();
     test_extras();
