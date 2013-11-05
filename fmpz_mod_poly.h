@@ -357,6 +357,15 @@ fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
                            const fmpz_mod_poly_t poly, const fmpz_t e,
                            const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
+void
+_fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
+                                    slong lenf, const fmpz* finv, slong lenfinv,
+                                    const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
+                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+
 /*  Division *****************************************************************/
 
 void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
