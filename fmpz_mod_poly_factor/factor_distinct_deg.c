@@ -77,8 +77,22 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_inv_series_newton (vinv, vinv, v->length);
     /* compute baby steps: h[i]=x^{p^i}mod v */
     fmpz_mod_poly_set_coeff_ui(h[0], 1, 1);
-    for (i = 1; i < l + 1; i++)
-        fmpz_mod_poly_powmod_fmpz_binexp_preinv(h[i], h[i - 1], p, v, vinv);
+    fmpz_mod_poly_powmod_x_fmpz_preinv (h[1], p, v, vinv);
+    if (fmpz_sizeinbase(p, 2) > ((n_sqrt (v->length-1)+1)*3)/4)
+    {
+        fmpz_mat_init (HH, n_sqrt (v->length-1) + 1, v->length-1);
+        fmpz_mod_poly_precompute_matrix (HH, h[1], v, vinv);
+        for (i = 2; i < l + 1; i++)
+            fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(h[i], h[i-1],
+                                                            HH, v, vinv);
+        fmpz_mat_clear (HH);
+    }
+    else
+    {
+        for (i = 2; i < l + 1; i++)
+            fmpz_mod_poly_powmod_fmpz_binexp_preinv(h[i], h[i-1], p,
+                                              v, vinv);
+    }
 
     /* compute coarse distinct-degree factorisation */
     index= 0;
