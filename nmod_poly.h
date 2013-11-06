@@ -555,6 +555,14 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res,
                            const nmod_poly_t f, const nmod_poly_t finv);
 
 void
+_nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
+                               mp_srcptr finv, slong lenfinv, nmod_t mod);
+
+void
+nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
+                             const nmod_poly_t finv);
+
+void
 _nmod_poly_powmod_mpz_binexp_preinv (mp_ptr res, mp_srcptr poly,
                                     mpz_srcptr e, mp_srcptr f, slong lenf,
                                     mp_srcptr finv, slong lenfinv, nmod_t mod);
