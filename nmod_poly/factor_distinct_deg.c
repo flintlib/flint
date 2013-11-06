@@ -79,8 +79,22 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     nmod_poly_inv_series(vinv, vinv, v->length);
     /* compute baby steps: h[i]=x^{p^i}mod v */
     nmod_poly_set_coeff_ui(h[0], 1, 1);
-    for (i = 1; i < l + 1; i++)
-        nmod_poly_powmod_ui_binexp_preinv(h[i], h[i - 1], poly->mod.n, v, vinv); /* may be for large l use compose_mod instead */
+    nmod_poly_powmod_x_ui_preinv (h[1], poly->mod.n, v, vinv);
+    if (FLINT_BIT_COUNT (poly->mod.n) > ((n_sqrt (v->length-1)+1)*3)/4)
+    {
+        nmod_mat_init (HH, n_sqrt (v->length-1) + 1, v->length-1, poly->mod.n);
+        nmod_poly_precompute_matrix (HH, h[1], v, vinv);
+        for (i = 2; i < l + 1; i++)
+            nmod_poly_compose_mod_brent_kung_precomp_preinv(h[i], h[i-1],
+                                                            HH, v, vinv);
+        nmod_mat_clear (HH);
+    }
+    else
+    {
+        for (i = 2; i < l + 1; i++)
+            nmod_poly_powmod_ui_binexp_preinv(h[i], h[i-1], poly->mod.n,
+                                              v, vinv);
+    }
 
     /* compute coarse distinct-degree factorisation */
     index = 0;
