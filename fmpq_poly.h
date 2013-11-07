@@ -240,12 +240,12 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_add(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
-void _fmpq_poly_add_nocan(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
-                    const fmpz * poly2, const fmpz_t den2, slong len2);
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can);
 
-void fmpq_poly_add_nocan(fmpq_poly_t res, 
-                   const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_add_can(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
 
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
@@ -254,12 +254,12 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_sub(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
-void _fmpq_poly_sub_nocan(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
-                    const fmpz * poly2, const fmpz_t den2, slong len2);
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can);
 
-void fmpq_poly_sub_nocan(fmpq_poly_t res, 
-                   const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_sub_can(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
 
 /*  Scalar multiplication and division  **************************************/
 
