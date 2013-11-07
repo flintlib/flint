@@ -19,25 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
-    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include "fq.h"
-#include "fq_mat.h"
-
-#define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16
-#define FQ_COMPOSE_MOD_LENH_CUTOFF 6
-#define FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
+#include "fq_nmod_poly.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_templates.h"
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_poly_templates/compose_mod_brent_kung_precomp_preinv.c"
 #undef CAP_T
 #undef T

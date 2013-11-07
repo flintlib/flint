@@ -39,6 +39,7 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     fmpz_t q;
     slong i, j, l, m, n, index, d;
     double beta;
+    TEMPLATE(T, mat_t) HH, HHH;
 
     n = TEMPLATE(T, poly_degree)(poly, ctx);
     beta = 0.5 * (1. - (log(2) / log(n)));
@@ -99,15 +100,32 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     TEMPLATE(T, poly_set)(s, v, ctx);
     TEMPLATE(T, poly_set)(H[0], h[l], ctx);
     TEMPLATE(T, poly_set)(reducedH0, H[0], ctx);
+    TEMPLATE(T, mat_init) (HH, n_sqrt(v->length-1) + 1, v->length-1, ctx);
+    TEMPLATE(T, poly_precompute_matrix) (HH, reducedH0, s, vinv, ctx);
+
     d = 1;
     for (j = 0; j < m; j++)
     {
         /* compute giant steps: H[j]=x^{q^(lj)}mod s */
         if (j > 0)
         {
-            TEMPLATE(T, poly_rem)(reducedH0, reducedH0, s, ctx);
-            TEMPLATE(T, poly_rem)(tmp, H[j - 1], s, ctx);
-            TEMPLATE(T, poly_compose_mod_preinv)(H[j], tmp, reducedH0, s, vinv, ctx);
+            if (I[j-1]->length > 1)
+            {
+                _TEMPLATE(T, poly_reduce_matrix_mod_poly) (HHH, HH, s, ctx);
+                TEMPLATE(T, mat_clear) (HH, ctx);
+                TEMPLATE(T, mat_init_set) (HH, HHH, ctx);
+                TEMPLATE(T, mat_clear) (HHH, ctx);
+                TEMPLATE(T, poly_rem) (reducedH0, reducedH0, s, ctx);
+                TEMPLATE(T, poly_rem) (tmp, H[j-1], s, ctx);
+                TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)
+                    (H[j], tmp, HH, s, vinv, ctx);
+            }
+            else
+            {
+                TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)
+                    (H[j], H[j-1], HH, s, vinv, ctx);
+
+            }
         }
 
         /* compute interval polynomials */
@@ -179,6 +197,7 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     TEMPLATE(T, poly_clear)(v, ctx);
     TEMPLATE(T, poly_clear)(vinv, ctx);
     TEMPLATE(T, poly_clear)(tmp, ctx);
+    TEMPLATE(T, mat_clear)(HH, ctx);
 
     for (i = 0; i < l + 1; i++)
         TEMPLATE(T, poly_clear)(h[i], ctx);

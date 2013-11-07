@@ -803,6 +803,36 @@ TEMPLATE(T, poly_compose_mod_brent_kung_preinv)(TEMPLATE(T, poly_t) res, const T
                                       const TEMPLATE(T, poly_t) poly2, const TEMPLATE(T, poly_t) poly3,
                                       const TEMPLATE(T, poly_t) poly3inv, const TEMPLATE(T, ctx_t) ctx);
 
+void
+_TEMPLATE(T, poly_reduce_matrix_mod_poly) (TEMPLATE(T, mat_t) A,
+                                           const TEMPLATE(T, mat_t) B,
+                                           const TEMPLATE(T, poly_t) f,
+                                           const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE(T, poly_precompute_matrix) (TEMPLATE(T, mat_t A), const TEMPLATE(T, struct)* poly1,
+                                      const TEMPLATE(T, struct)* poly2, slong len2,
+                                      const TEMPLATE(T, struct)* poly2inv, slong len2inv,
+                                      const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE(T, poly_precompute_matrix) (TEMPLATE(T, mat_t A), const TEMPLATE(T, poly_t) poly1,
+                                     const TEMPLATE(T, poly_t) poly2,
+                                     const TEMPLATE(T, poly_t) poly2inv,
+                                     const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)
+                           (TEMPLATE(T, struct)* res, const TEMPLATE(T, struct)* poly1,
+                            slong len1, const TEMPLATE(T, mat_t) A, const TEMPLATE(T, struct)* poly3,
+                            slong len3, const TEMPLATE(T, struct)* poly3inv, slong len3inv,
+                            const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(TEMPLATE(T, poly_t) res,
+                    const TEMPLATE(T, poly_t) poly1, const TEMPLATE(T, mat_t) A,
+                    const TEMPLATE(T, poly_t) poly3, const TEMPLATE(T, poly_t) poly3inv,
+                    const TEMPLATE(T, ctx_t) ctx);
 
 /*  Input and output  ********************************************************/
 
