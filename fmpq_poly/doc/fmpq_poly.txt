@@ -86,6 +86,11 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)
     position \code{len - 1} whenever \code{len > 0}.  Assumes that \code{den} 
     is non-zero.
 
+void _fmpq_poly_canonicalise_weak(fmpz * poly, fmpz_t den, slong len)
+
+    As per \code{_fmpq_poly_canonicalise}, but canonicalisation is only
+    carried out if the denominator is over \code{WEAK_CANONICALISE_CUTOFF}.
+
 void fmpq_poly_canonicalise(fmpq_poly_t poly)
 
     Puts the polynomial \code{poly} into canonical form.  Firstly, the length 
@@ -93,6 +98,11 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
     polynomials, it is then ensured that the numerator and denominator are 
     coprime and that the denominator is positive.  The canonical form of the 
     zero polynomial is a zero numerator polynomial and a one denominator.
+
+void fmpq_poly_canonicalise_weak(fmpq_poly_t poly)
+
+    As per \code{fmpq_poly_canonicalise}, but canonicalisation is only
+    carried out if the denominator is over \code{WEAK_CANONICALISE_CUTOFF}.
 
 int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len)
 
@@ -412,10 +422,24 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     but \code{(rpoly, rden)} and \code{(poly2, den2)} may \emph{not} 
     be aliased.
 
+void _fmpq_poly_add_nocan(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
+
+    As per \code{_fmpq_poly_add} except that the output may not be canonical.
+    This function is intended to be used with weak canonicalisation to
+    prevent explosion in memory usage. It exists for performance reasons.
+
 void fmpq_poly_add(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}, using 
     Henrici's algorithm.
+
+void fmpq_poly_add_nocan(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
+
+    As per \code{fmpq_poly_add} except that the output may not be canonical.
+    This function is intended to be used with weak canonicalisation to
+    prevent explosion in memory usage. It exists for performance reasons.
 
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
@@ -432,10 +456,24 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
     but \code{(rpoly, rden)} and \code{(poly2, den2, len2)} may \emph{not} be 
     aliased.
 
+void _fmpq_poly_sub_nocan(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
+
+    As per \code{_fmpq_poly_sub} except that the output may not be canonical.
+    This function is intended to be used with weak canonicalisation to
+    prevent explosion in memory usage. It exists for performance reasons.
+
 void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}, 
     using Henrici's algorithm.
+
+void fmpq_poly_sub_nocan(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
+
+    As per \code{fmpq_poly_sub} except that the output may not be canonical.
+    This function is intended to be used with weak canonicalisation to
+    prevent explosion in memory usage. It exists for performance reasons.
 
 *******************************************************************************
 

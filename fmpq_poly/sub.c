@@ -29,6 +29,58 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
+void _fmpq_poly_sub_nocan(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
+{
+    slong max = FLINT_MAX(len1, len2);
+    slong min = FLINT_MIN(len1, len2);
+    
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_one(d);
+    if (*den1 != WORD(1) && *den2 != WORD(1))
+        fmpz_gcd(d, den1, den2);
+    
+    if (*d == WORD(1))
+    {
+        _fmpz_vec_scalar_mul_fmpz(rpoly, poly1, len1, den2);
+        _fmpz_vec_scalar_submul_fmpz(rpoly, poly2, min, den1);
+        if (len1 < len2)
+        {
+            _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly2 + min, max - min, den1);
+            _fmpz_vec_neg(rpoly + min, rpoly + min, max - min);
+        }
+        fmpz_mul(rden, den1, den2);
+    }
+    else
+    {
+        fmpz_t den11;
+        fmpz_t den22;
+        fmpz_init(den11);
+        fmpz_init(den22);
+        fmpz_divexact(den11, den1, d);
+        fmpz_divexact(den22, den2, d);
+        
+        _fmpz_vec_scalar_mul_fmpz(rpoly, poly1, len1, den22);
+        _fmpz_vec_scalar_submul_fmpz(rpoly, poly2, len2, den11);
+        if (len1 < len2)
+        {
+            _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly2 + min, max - min, den11);
+            _fmpz_vec_neg(rpoly + min, rpoly + min, max - min);
+        }
+        
+        if (_fmpz_vec_is_zero(rpoly, max))
+            fmpz_one(rden);
+        else
+            fmpz_mul(rden, den1, den22);
+
+        fmpz_clear(den11);
+        fmpz_clear(den22);
+    }
+    fmpz_clear(d);
+}
+
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1, 
                     const fmpz * poly2, const fmpz_t den2, slong len2)
@@ -118,6 +170,37 @@ void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
     else
     {
         _fmpq_poly_sub(res->coeffs, res->den, 
+                       poly2->coeffs, poly2->den, len2, 
+                       poly1->coeffs, poly1->den, len1);
+        _fmpz_vec_neg(res->coeffs, res->coeffs, max);
+    }
+    
+    _fmpq_poly_set_length(res, max);
+    _fmpq_poly_normalise(res);
+}
+
+void fmpq_poly_sub_nocan(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+{
+    slong len1, len2, max;
+
+    if (poly1 == poly2)
+    {
+        fmpq_poly_zero(res);
+        return;
+    }
+    
+    len1 = poly1->length;
+    len2 = poly2->length;
+    max  = FLINT_MAX(poly1->length, poly2->length);
+    fmpq_poly_fit_length(res, max);
+    
+    if (res != poly2)
+        _fmpq_poly_sub_nocan(res->coeffs, res->den, 
+                       poly1->coeffs, poly1->den, len1, 
+                       poly2->coeffs, poly2->den, len2);
+    else
+    {
+        _fmpq_poly_sub_nocan(res->coeffs, res->den, 
                        poly2->coeffs, poly2->den, len2, 
                        poly1->coeffs, poly1->den, len1);
         _fmpz_vec_neg(res->coeffs, res->coeffs, max);
