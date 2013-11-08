@@ -85,12 +85,12 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     {
         TEMPLATE(T, poly_gen)(h[0], ctx);
         for (i = 1; i < l + 1; i++)
-            TEMPLATE(T, poly_powmod_fmpz_binexp_preinv)(h[i], h[i - 1], q, v, vinv, ctx);
+            TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(h[i], h[i - 1], q, 0, v, vinv, ctx);
     }
     else
     {
         TEMPLATE(T, poly_gen)(h[0], ctx);
-        TEMPLATE(T, poly_powmod_fmpz_binexp_preinv)(h[1], h[0], q, v, vinv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(h[1], h[0], q, 0, v, vinv, ctx);
         for (i = 2; i < l + 1; i++)
             TEMPLATE(T, poly_compose_mod_preinv)(h[i], h[i - 1], h[1], v, vinv, ctx);
     }
