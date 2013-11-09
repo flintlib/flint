@@ -16,7 +16,8 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_poly_factor \
    fmpz_factor fmpz_poly_factor fft qsieve double_extras \
    padic_poly padic_mat qadic fq fq_poly fq_vec fq_mat \
-   fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly
+   fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly \
+   fq_zech fq_zech_vec fq_zech_mat fq_zech_poly
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates
 

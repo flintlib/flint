@@ -68,6 +68,7 @@ main(void)
         }
 
         TEMPLATE(T, poly_clear)(a, ctx);
+        TEMPLATE(T, ctx_clear)(ctx);
     }
 
 
@@ -97,6 +98,7 @@ main(void)
         }
 
         TEMPLATE(T, poly_clear)(a, ctx);
+        TEMPLATE(T, ctx_clear)(ctx);
 
     }
     flint_randclear(state);
