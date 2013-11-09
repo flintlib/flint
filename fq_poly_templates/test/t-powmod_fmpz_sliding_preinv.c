@@ -64,8 +64,8 @@ main(void)
         TEMPLATE(T, poly_reverse)(finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton)(finv, finv, f->length, ctx);
 
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res, a, expz, f, finv, ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(a, a, expz, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res, a, expz, 0, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(a, a, expz, 0, f, finv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(res, a, ctx));
         if (!result)
@@ -112,8 +112,8 @@ main(void)
         TEMPLATE(T, poly_reverse)(finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton)(finv, finv, f->length, ctx);
 
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res, a, expz, f, finv, ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(f, a, expz, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res, a, expz, 0, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(f, a, expz, 0, f, finv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(res, f, ctx));
         if (!result)
@@ -161,8 +161,8 @@ main(void)
         TEMPLATE(T, poly_reverse)(finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton)(finv, finv, f->length, ctx);
 
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res1, a, expz, f, finv, ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res2, a, expz, f, finv, ctx); /* TODO: Fix */
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res1, a, expz, 0, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res2, a, expz, 0, f, finv, ctx); /* TODO: Fix */
 
         result = (TEMPLATE(T, poly_equal)(res1, res2, ctx));
         if (!result)
@@ -217,12 +217,12 @@ main(void)
         TEMPLATE(T, poly_reverse)(finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton)(finv, finv, f->length, ctx);
 
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res1, a, exp1, f, finv, ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res2, a, exp2, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res1, a, exp1, 0, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res2, a, exp2, 0, f, finv, ctx);
         TEMPLATE(T, poly_mulmod)(res4, res1, res2, f, ctx);
         fmpz_init(exp3);
         fmpz_add(exp3, exp1, exp2);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res3, a, exp3, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res3, a, exp3, 0, f, finv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(res4, res3, ctx));
         if (!result)
