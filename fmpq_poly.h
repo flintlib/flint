@@ -50,6 +50,14 @@ typedef struct
 
 typedef fmpq_poly_struct fmpq_poly_t[1];
 
+typedef struct
+{
+   fmpq_poly_struct * powers;
+   slong len;
+} fmpq_poly_powers_precomp_struct;
+
+typedef fmpq_poly_powers_precomp_struct fmpq_poly_powers_precomp_t[1];
+
 #define WEAK_CANONICALISE_CUTOFF 25600
 
 /*  Memory management  *******************************************************/
@@ -392,6 +400,25 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
 
 void fmpq_poly_rem(fmpq_poly_t R,
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+/*  Precomputed inverse  *****************************************************/
+
+fmpq_poly_struct * _fmpq_poly_powers_precompute(const fmpz * B, 
+                                                 const fmpz_t denB, slong len);
+
+void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, 
+                                                             fmpq_poly_t poly);
+
+void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len);
+
+void fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv);
+
+void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
+                              const fmpz * B, const fmpz_t denB, slong n, 
+                                              const fmpq_poly_struct * powers);
+
+void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
+                  const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv);
 
 /*  Power series division  ***************************************************/
 

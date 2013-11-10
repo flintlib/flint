@@ -781,6 +781,56 @@ void fmpq_poly_rem(fmpq_poly_t R,
 
 *******************************************************************************
 
+    Euclidean division
+
+*******************************************************************************
+
+fmpq_poly_struct * _fmpq_poly_powers_precompute(const fmpz * B, 
+                                                  const fmpz_t denB, slong len)
+
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, 
+                                                              fmpq_poly_t poly)
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
+
+    Clean up resources used by precomputed powers which have been computed
+    by \code{_fmpq_poly_powers_precompute}.
+
+void fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv)
+
+    Clean up resources used by precomputed powers which have been computed
+    by \code{fmpq_poly_powers_precompute}.
+
+void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
+                              const fmpz * B, const fmpz_t denB, slong n, 
+                                               const fmpq_poly_struct * powers)
+
+    Set $A$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{_fmpq_poly_powers_precompute}. No aliasing is allowed.
+
+    This function is only faster if $m \leq 2*n - 1$.
+
+    The output of this function is only weak canonicalised.
+
+void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
+                   const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv)
+
+    Set $R$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{fmpq_poly_powers_precompute}.
+
+    This function is only faster if \code{A->length <= 2*B->length - 1}.
+
+    The output of this function is only weak canonicalised.
+
+*******************************************************************************
+
     Power series division
 
 *******************************************************************************

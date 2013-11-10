@@ -32,7 +32,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-#define BITS 1000
+#define BITS 100
 
 typedef struct
 {
@@ -70,11 +70,12 @@ void sample(void * arg, ulong count)
    flint_rand_t state;
    flint_randinit(state);
 
-   fmpz_poly_t p1, p2, q, r, pinv;
+   fmpz_poly_t p1, p2, b, q, r;
+   fmpz_poly_powers_precomp_t pinv;
            
-   fmpz_poly_init(pinv);
    fmpz_poly_init(p1);
    fmpz_poly_init(p2);
+   fmpz_poly_init(b);
    fmpz_poly_init(q);
    fmpz_poly_init(r);
 
@@ -83,15 +84,15 @@ void sample(void * arg, ulong count)
       random_fmpz_poly(p1, state, 2*length - 1);
       random_fmpz_poly(p2, state, length);
       fmpz_set_ui(p2->coeffs + p2->length - 1, 1); /* p2 must be monic */
-
-      fmpz_poly_preinvert(pinv, p2);
+      
+      fmpz_poly_powers_precompute(pinv, p2);
 	
       if (algo)
       {
          prof_start();
          for (j = 0; j < scale; j++)
          {
-            fmpz_poly_divrem_preinv(q, r, p1, p2, pinv);
+            fmpz_poly_rem_powers_precomp(r, p1, p2, pinv);
          }
 	      prof_stop();
       } else
@@ -99,15 +100,17 @@ void sample(void * arg, ulong count)
          prof_start();
          for (j = 0; j < scale; j++)
          {
-            fmpz_poly_divrem(q, r, p1, p2);
+            fmpz_poly_rem(r, p1, p2);
          }
 	      prof_stop();
       }
+
+      fmpz_poly_powers_clear(pinv);
    }
   
-   fmpz_poly_clear(pinv);
    fmpz_poly_clear(p1);
    fmpz_poly_clear(p2);
+   fmpz_poly_clear(b);
    fmpz_poly_clear(q);
    fmpz_poly_clear(r);
 
@@ -120,7 +123,7 @@ int main(void)
    info_t info;
    slong k, scale;
 
-   printf("fmpz_poly_divrem with precomputed inverse\n");
+   printf("fmpz_poly_rem with precomputed powers\n");
    flint_printf("bits = %ld\n", BITS);
 
    for (k = 1; k <= 1000; k = (slong) ceil(1.1*k))
@@ -144,7 +147,7 @@ int main(void)
      
      prof_repeat(&min, &max, sample, (void *) &info);
          
-      flint_printf("With inverse: length %wd, min %.3g ms, max %.3g ms\n\n", 
+      flint_printf("With powers: length %wd, min %.3g ms, max %.3g ms\n\n", 
            info.length,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0

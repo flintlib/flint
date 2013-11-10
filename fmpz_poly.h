@@ -56,6 +56,14 @@ typedef struct
 
 typedef fmpz_poly_struct fmpz_poly_t[1];
 
+typedef struct
+{
+   fmpz ** powers;
+   slong len;
+} fmpz_poly_powers_precomp_struct;
+
+typedef fmpz_poly_powers_precomp_struct fmpz_poly_powers_precomp_t[1];
+
 typedef struct {
     fmpz c;
     fmpz_poly_struct *p;
@@ -669,6 +677,22 @@ void _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1,
 
 void fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R, 
             const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv);
+
+fmpz ** _fmpz_poly_powers_precompute(const fmpz * B, slong len);
+
+void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv, 
+                                                             fmpz_poly_t poly);
+
+void _fmpz_poly_powers_clear(fmpz ** powers, slong len);
+
+void fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv);
+
+void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
+                                const fmpz * B, slong n, const fmpz ** powers);
+
+void fmpz_poly_rem_powers_precomp(fmpz_poly_t R, 
+                             const fmpz_poly_t A, const fmpz_poly_t B, 
+                                       const fmpz_poly_powers_precomp_t B_inv);
 
 void _fmpz_poly_rem_basecase(fmpz * Q, const fmpz * A, slong lenA,
                                                    const fmpz * B, slong lenB);
