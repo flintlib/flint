@@ -19,21 +19,11 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
-    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include "fq_zech_mat.h"
-
-#define FQ_ZECH_POLY_DIVREM_DIVCONQUER_CUTOFF  16
-#define FQ_ZECH_COMPOSE_MOD_LENH_CUTOFF 6
-#define FQ_ZECH_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
-#define FQ_ZECH_SQR_CLASSICAL_CUTOFF 215
-#define FQ_ZECH_MUL_CLASSICAL_CUTOFF 150
-#define FQ_ZECH_MULLOW_CLASSICAL_CUTOFF 150
-
+#include "fq_zech_poly.h"
 
 #ifdef T
 #undef T
@@ -41,6 +31,6 @@
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
-#include "fq_poly_templates.h"
+#include "fq_poly_templates/profile/p-mullow.c"
 #undef CAP_T
 #undef T

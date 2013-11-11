@@ -31,6 +31,6 @@
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
-#include "fq_poly_templates/profile/p-mul.c"
+#include "fq_poly_templates/profile/p-sqr.c"
 #undef CAP_T
 #undef T

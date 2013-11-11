@@ -35,7 +35,7 @@ _TEMPLATE(T, poly_mullow)(TEMPLATE(T, struct) * rop,
                 const TEMPLATE(T, struct) * op1, long len1,
                 const TEMPLATE(T, struct) * op2, long len2, long n, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (FLINT_MAX(len1, len2) < 6)
+    if ( n < TEMPLATE(CAP_T, MULLOW_CLASSICAL_CUTOFF) || FLINT_MAX(len1, len2) < 6)
     {
         _TEMPLATE(T, poly_mullow_classical)(rop, op1, len1, op2, len2, n, ctx);
     }
