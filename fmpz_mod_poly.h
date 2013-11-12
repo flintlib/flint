@@ -108,6 +108,10 @@ void
 fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                 flint_rand_t state, slong len);
 
+void
+fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
+                                          flint_rand_t state, slong len);
+
 /*  Attributes ***************************************************************/
 
 #define fmpz_mod_poly_modulus(poly)  (&((poly)->p))
