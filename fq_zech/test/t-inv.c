@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     fq_zech_ctx_t ctx;
 
-    printf("inv... ");
+    flint_printf("inv... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,12 +64,12 @@ main(void)
             result = (fq_zech_equal(b, c, ctx));
             if (!result)
             {
-                printf("FAIL (aliasing):\n\n");
+                flint_printf("FAIL (aliasing):\n\n");
                 fq_zech_ctx_print(ctx);
-                printf("\n");
-                printf("a = "), fq_zech_print_pretty(a, ctx), printf("\n");
-                printf("b = "), fq_zech_print_pretty(b, ctx), printf("\n");
-                printf("c = "), fq_zech_print_pretty(c, ctx), printf("\n");
+                flint_printf("\n");
+                flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
                 fq_zech_ctx_print(ctx);
                 abort();
             }
@@ -96,12 +96,12 @@ main(void)
             result = (fq_zech_is_one(c, ctx));
             if (!result)
             {
-                printf("FAIL (a * (~a) == 1):\n\n");
+                flint_printf("FAIL (a * (~a) == 1):\n\n");
                 fq_zech_ctx_print(ctx);
-                printf("\n");
-                printf("a = "), fq_zech_print_pretty(a, ctx), printf("\n");
-                printf("b = "), fq_zech_print_pretty(b, ctx), printf("\n");
-                printf("c = "), fq_zech_print_pretty(c, ctx), printf("\n");
+                flint_printf("\n");
+                flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
                 abort();
             }
 
@@ -116,6 +116,6 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

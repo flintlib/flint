@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     fq_zech_ctx_t ctx;
 
-    printf("trace... ");
+    flint_printf("trace... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -67,18 +67,18 @@ main(void)
             result = fmpz_equal(t1, t2);
             if (!result)
             {
-                printf("FAIL:\n\n");
+                flint_printf("FAIL:\n\n");
                 fq_zech_ctx_print(ctx);
-                printf("\n");
-                printf("aa = ");
+                flint_printf("\n");
+                flint_printf("aa = ");
                 fq_nmod_print_pretty(aa, ctx->fq_nmod_ctx);
-                printf("\n");
-                printf("Tr(aa) = "); fmpz_print(t1);
-                printf("a = ");
+                flint_printf("\n");
+                flint_printf("Tr(aa) = "); fmpz_print(t1);
+                flint_printf("a = ");
                 fq_zech_print_pretty(a, ctx);
-                printf("\n");
-                printf("Tr(a) = "); fmpz_print(t2);
-                printf("\n");
+                flint_printf("\n");
+                flint_printf("Tr(a) = "); fmpz_print(t2);
+                flint_printf("\n");
                 abort();
             }
 
@@ -94,6 +94,6 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

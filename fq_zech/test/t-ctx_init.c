@@ -43,7 +43,7 @@ main(void)
     fq_zech_ctx_t ctx;
     flint_rand_t state;
 
-    printf("ctx_init... ");
+    flint_printf("ctx_init... ");
 
     fflush(stdout);
     flint_randinit(state);
@@ -91,15 +91,15 @@ main(void)
 
                 if (!fq_nmod_equal(lhs, rhs, fq_nmod_ctx))
                 {
-                    printf("FAIL:\n\n");
-                    printf("K = GF(%ld^%ld)\n", primes[i], d);
-                    printf("Z(%d) = %ld\n", j, ctx->zech_log_table[j]);
-                    printf("LHS: ");
+                    flint_printf("FAIL:\n\n");
+                    flint_printf("K = GF(%ld^%ld)\n", primes[i], d);
+                    flint_printf("Z(%d) = %ld\n", j, ctx->zech_log_table[j]);
+                    flint_printf("LHS: ");
                     fq_nmod_print_pretty(lhs, fq_nmod_ctx);
-                    printf("\n");
-                    printf("RHS: ");
+                    flint_printf("\n");
+                    flint_printf("RHS: ");
                     fq_nmod_print_pretty(rhs, fq_nmod_ctx);
-                    printf("\n");
+                    flint_printf("\n");
                     abort();
                 }
             }
@@ -116,7 +116,7 @@ main(void)
     fmpz_clear(p);
     fmpz_clear(e);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
 
     return EXIT_SUCCESS;
 }

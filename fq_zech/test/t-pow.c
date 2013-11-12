@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     fq_zech_ctx_t ctx;
 
-    printf("pow... ");
+    flint_printf("pow... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,9 +65,9 @@ main(void)
             result = (fq_zech_equal(a, b, ctx));
             if (!result)
             {
-                printf("FAIL (alias):\n\n");
-                printf("a = "), fq_zech_print_pretty(a, ctx), printf("\n");
-                printf("b = "), fq_zech_print_pretty(b, ctx), printf("\n");
+                flint_printf("FAIL (alias):\n\n");
+                flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 abort();
             }
 
@@ -101,11 +101,11 @@ main(void)
             result = (fq_zech_equal(b, c, ctx));
             if (!result)
             {
-                printf("FAIL (cmp with mul):\n\n");
-                printf("a = "), fq_zech_print_pretty(a, ctx), printf("\n");
-                printf("b = "), fq_zech_print_pretty(b, ctx), printf("\n");
-                printf("c = "), fq_zech_print_pretty(b, ctx), printf("\n");
-                printf("e = "), fmpz_print(e), printf("\n");
+                flint_printf("FAIL (cmp with mul):\n\n");
+                flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
+                flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("c = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
+                flint_printf("e = "), fmpz_print(e), flint_printf("\n");
                 abort();
             }
 
@@ -122,6 +122,6 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
