@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
-                                 const fmpz * B, slong n, const fmpz ** powers)
+                                 const fmpz * B, slong n, fmpz ** const powers)
 {
    slong i;
    fmpz * prod;

@@ -1645,7 +1645,7 @@ void fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv)
     by \code{fmpz_poly_powers_precompute}.
 
 void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
-                                 const fmpz * B, slong n, const fmpz ** powers)
+                                 const fmpz * B, slong n, fmpz ** const powers)
 
     Set $A$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
     provided by \code{_fmpz_poly_powers_precompute}. No aliasing is allowed.

@@ -96,20 +96,6 @@ void _fmpq_poly_canonicalise(fmpz * rpoly, fmpz_t den, slong len);
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly);
 
-static __inline__
-void _fmpq_poly_canonicalise_weak(fmpz * rpoly, fmpz_t den, slong len)
-{
-   if (fmpz_bits(den) > WEAK_CANONICALISE_CUTOFF)
-      _fmpq_poly_canonicalise(rpoly, den, len);
-}
-
-static __inline__
-void fmpq_poly_canonicalise_weak(fmpq_poly_t poly)
-{
-   if (fmpz_bits(fmpq_poly_denref(poly)) > WEAK_CANONICALISE_CUTOFF)
-      fmpq_poly_canonicalise(poly);
-}
-
 int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len);
 
 int fmpq_poly_is_canonical(const fmpq_poly_t poly);
@@ -415,7 +401,7 @@ void fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv);
 
 void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
                               const fmpz * B, const fmpz_t denB, slong n, 
-                                              const fmpq_poly_struct * powers);
+                                              fmpq_poly_struct * const powers);
 
 void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
                   const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv);

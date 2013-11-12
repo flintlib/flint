@@ -31,7 +31,7 @@
 
 void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
                                  const fmpz * B, const fmpz_t denB, slong n, 
-                                 const fmpq_poly_struct * powers)
+                                 fmpq_poly_struct * const powers)
 {
    slong i;
    fmpq_poly_t prod;
@@ -69,8 +69,6 @@ void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m,
       _fmpq_poly_add_can(A, denA, A, denA, n - 1, fmpq_poly_numref(prod), 
          fmpq_poly_denref(prod), powers[i].length, 0);
    }
-
-   _fmpq_poly_canonicalise_weak(A, denA, n - 1);
 
    fmpq_poly_clear(prod);
    fmpz_clear(den);

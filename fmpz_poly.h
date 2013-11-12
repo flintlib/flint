@@ -688,7 +688,7 @@ void _fmpz_poly_powers_clear(fmpz ** powers, slong len);
 void fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv);
 
 void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
-                                const fmpz * B, slong n, const fmpz ** powers);
+                                const fmpz * B, slong n, fmpz ** const powers);
 
 void fmpz_poly_rem_powers_precomp(fmpz_poly_t R, 
                              const fmpz_poly_t A, const fmpz_poly_t B, 
