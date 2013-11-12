@@ -10,18 +10,18 @@ groupopening = stars blankline sectiontitle blankline content stars
 subgroupopening = pluses blankline? subsectiontitle blankline? content pluses
 
 sectiontitle = "    " < linecontent > EOL     {
-    flint_fprintf(out, "\\section{%.*s}\n", yyleng, yytext);}
+    fprintf(out, "\\section{%.*s}\n", yyleng, yytext);}
 
 subsectiontitle = "    " < linecontent > EOL     {
-    flint_fprintf(out, "\\subsection{%.*s}\n", yyleng, yytext);}
+    fprintf(out, "\\subsection{%.*s}\n", yyleng, yytext);}
 
 function = (macroheader|functionheader) functionfooter? EOL*
 
 functionheader = < funcnametype '(' funcargs ')' modifiers? ';'?
-                      > whitespace? EOL {flint_printfuncheader(yytext, yyleng);}
+                      > whitespace? EOL {printfuncheader(yytext, yyleng);}
 
 macroheader = < 'macro' whitespace linecontent > EOL    {
-    flint_printfuncheader(yytext, yyleng);}
+    printfuncheader(yytext, yyleng);}
 
 funcnametype = !('*'|'+') ('operator()' | (! '(' .))*
 funcargs = (! ')' .)*
@@ -31,7 +31,7 @@ functionfooter = content
 
 
 content = < (contentline | blankline)* >       {
-    flint_fprintf(out, "%.*s", yyleng, yytext);}
+    fprintf(out, "%.*s", yyleng, yytext);}
 
 contentline = "    " linecontent EOL
 
