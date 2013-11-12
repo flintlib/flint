@@ -25,8 +25,8 @@
 
 #include "fq_nmod.h"
 
-mp_limb_t _fq_nmod_trace(const mp_limb_t *op, long len, 
-                         const fq_nmod_ctx_t ctx)
+void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, long len, 
+                    const fq_nmod_ctx_t ctx)
 {
     const long d = fq_nmod_ctx_degree(ctx);
 
@@ -68,16 +68,17 @@ mp_limb_t _fq_nmod_trace(const mp_limb_t *op, long len,
 
     _nmod_vec_clear(t);
 
-    return rop;
+    fmpz_set_ui(rop2, rop);
 }
 
-mp_limb_t fq_nmod_trace(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     if (fq_nmod_is_zero(op, ctx))
     {
-        return 0L;
+        fmpz_zero(rop);
+        return;
     }
 
-    return _fq_nmod_trace(op->coeffs, op->length, ctx);
+    _fq_nmod_trace(rop, op->coeffs, op->length, ctx);
 }
 

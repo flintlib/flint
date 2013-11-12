@@ -31,12 +31,12 @@
     When $N = 1$, this computes the norm on $\mathbf{F}_q$.
  */
 
-mp_limb_t _fq_nmod_norm(const mp_limb_t *op, long len, 
+void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len, 
                         const fq_nmod_ctx_t ctx)
 {
-    const long d = ctx->j[ctx->len - 1];
+    const long d = fq_nmod_ctx_degree(ctx);
 
-    mp_limb_t  rop;
+    mp_limb_t rop;
 
     if (len == 1)
     {
@@ -85,19 +85,20 @@ mp_limb_t _fq_nmod_norm(const mp_limb_t *op, long len,
         }
     }
 
-    return rop;
+    fmpz_set_ui(rop2, rop);
 
 }
 
-mp_limb_t fq_nmod_norm(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     if (fq_nmod_is_zero(op, ctx))
     {
-        return 0;
+        fmpz_zero(rop);
+        return;
     }
     else
     {
-        return _fq_nmod_norm(op->coeffs, op->length, ctx);
+        _fq_nmod_norm(rop, op->coeffs, op->length, ctx);
     }
 }
 

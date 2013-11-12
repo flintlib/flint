@@ -373,20 +373,20 @@ fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-mp_limb_t _fq_nmod_trace(const mp_limb_t *op, long len, 
-                         const fq_nmod_ctx_t ctx);
+void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, long len, 
+                    const fq_nmod_ctx_t ctx);
 
-mp_limb_t fq_nmod_trace(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, long len, long e, 
                         const fq_nmod_ctx_t ctx);
 
 void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, long e, const fq_nmod_ctx_t ctx);
 
-mp_limb_t _fq_nmod_norm(const mp_limb_t *op, long len, 
-                        const fq_nmod_ctx_t ctx);
+void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, long len, 
+                   const fq_nmod_ctx_t ctx);
 
-mp_limb_t fq_nmod_norm(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Bit packing ******************************************************/
 

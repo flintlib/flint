@@ -23,75 +23,14 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-
 #include "fq_nmod.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
+#ifdef T
+#undef T
+#endif
 
-    printf("norm... ");
-    fflush(stdout);
-
-    flint_randinit(state);
-
-    /* Compare with product of Galois conjugates */
-    for (i = 0; i < 2000; i++)
-    {
-        fq_nmod_ctx_t ctx;
-
-        fq_nmod_t a, b, c;
-        mp_limb_t x, y;
-        long j;
-
-        fq_nmod_ctx_randtest(ctx, state);
-
-        fq_nmod_init(a, ctx);
-        fq_nmod_init(b, ctx);
-        fq_nmod_init(c, ctx);
-
-        fq_nmod_randtest(a, state, ctx);
-        fq_nmod_reduce(a, ctx);
-
-        x = fq_nmod_norm(a, ctx);
-
-        fq_nmod_one(b, ctx);
-        for (j = 0; j < fq_nmod_ctx_degree(ctx); j++)
-        {
-            fq_nmod_frobenius(c, a, j, ctx);
-            fq_nmod_mul(b, b, c, ctx);
-        }
-        y = nmod_poly_get_coeff_ui(b, 0);
-
-        result = (x == y);
-        if (!result)
-        {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-            printf("x = %lu\n", x);
-            printf("y = %lu\n", y);
-            for (j = 0; j < fq_nmod_ctx_degree(ctx); j++)
-            {
-                fq_nmod_frobenius(c, a, j, ctx);
-                printf("sigma^%ld = ", j), fq_nmod_print_pretty(c, ctx), printf("\n");
-            }
-            abort();
-        }
-
-        fq_nmod_clear(a, ctx);
-        fq_nmod_clear(b, ctx);
-        fq_nmod_clear(c, ctx);
-        fq_nmod_ctx_clear(ctx);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return EXIT_SUCCESS;
-}
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_templates/test/t-norm.c"
+#undef CAP_T
+#undef T

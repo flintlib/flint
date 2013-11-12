@@ -65,23 +65,25 @@ main(void)
         TEMPLATE(T, randtest)(a, state, ctx);
 
         TEMPLATE(T, trace)(x, a, ctx);
-
+        
         TEMPLATE(T, zero)(b, ctx);
         for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
         {
             TEMPLATE(T, frobenius)(c, a, j, ctx);
             TEMPLATE(T, add)(b, b, c, ctx);
         }
-        fmpz_poly_get_coeff_fmpz(y, b, 0);
 
-        result = fmpz_equal(x, y);
+        TEMPLATE(T, zero)(c, ctx);
+        TEMPLATE(T, set_fmpz)(c, x, ctx);
+
+        result = TEMPLATE(T, equal)(b, c, ctx);
         if (!result)
         {
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
+            flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
-            flint_printf("y = "), fmpz_print(y), flint_printf("\n");
             for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
             {
                 TEMPLATE(T, frobenius)(c, a, j, ctx);
