@@ -298,12 +298,12 @@ fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-mp_limb_t  fq_zech_trace(const fq_zech_t op, const fq_zech_ctx_t ctx);
+void fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, long e,
                        const fq_zech_ctx_t ctx);
 
-mp_limb_t fq_zech_norm(const fq_zech_t op, const fq_zech_ctx_t ctx);
+void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 /* Bit packing ******************************************************/
 

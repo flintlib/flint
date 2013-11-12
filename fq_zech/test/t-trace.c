@@ -48,20 +48,23 @@ main(void)
 
         for (i = 0; i < 200; i++)
         {
-            mp_limb_t t1, t2;
+            fmpz_t t1, t2;
             fq_nmod_t aa;
             fq_zech_t a;
 
+            fmpz_init(t1);
+            fmpz_init(t2);
+            
             fq_nmod_init(aa, ctx->fq_nmod_ctx);
             fq_zech_init(a, ctx);
 
             fq_nmod_randtest(aa, state, ctx->fq_nmod_ctx);
             fq_zech_set_fq_nmod(a, aa, ctx);
 
-            t1 = fq_nmod_trace(aa, ctx->fq_nmod_ctx);
-            t2 = fq_zech_trace(a, ctx);
+            fq_nmod_trace(t1, aa, ctx->fq_nmod_ctx);
+            fq_zech_trace(t2, a, ctx);
 
-            result = (t1 == t2);
+            result = fmpz_equal(t1, t2);
             if (!result)
             {
                 printf("FAIL:\n\n");
@@ -70,16 +73,19 @@ main(void)
                 printf("aa = ");
                 fq_nmod_print_pretty(aa, ctx->fq_nmod_ctx);
                 printf("\n");
-                printf("Tr(aa) = %lu\n", t1);
+                printf("Tr(aa) = "); fmpz_print(t1);
                 printf("a = ");
                 fq_zech_print_pretty(a, ctx);
                 printf("\n");
-                printf("Tr(a) = %lu\n", t2);
+                printf("Tr(a) = "); fmpz_print(t2);
+                printf("\n");
                 abort();
             }
 
             fq_zech_clear(a, ctx);
             fq_nmod_clear(aa, ctx->fq_nmod_ctx);
+            fmpz_clear(t1);
+            fmpz_clear(t2);
         }
 
         fq_zech_ctx_clear(ctx);

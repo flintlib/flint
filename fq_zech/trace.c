@@ -25,15 +25,16 @@
 
 #include "fq_zech.h"
 
-mp_limb_t
-fq_zech_trace(const fq_zech_t op, const fq_zech_ctx_t ctx)
+void
+fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     mp_limb_t p_i, trace;
     fq_zech_t t, op_p_i;
     double qm1inv;
     if (fq_zech_is_zero(op, ctx))
     {
-        return 0;
+        fmpz_zero(rop);
+        return;
     }
 
     fq_zech_zero(t, ctx);
@@ -50,12 +51,12 @@ fq_zech_trace(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     if (fq_zech_is_zero(t, ctx))
     {
-        return 0;
+        fmpz_zero(rop);
     }
     else
     {
         trace = t->value / ctx->qm1opm1;
         trace = n_powmod(ctx->prime_root, trace, ctx->p);
-        return trace;
+        fmpz_set_ui(rop, trace);
     }
 }

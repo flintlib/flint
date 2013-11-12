@@ -25,15 +25,14 @@
 
 #include "fq_zech.h"
 
-mp_limb_t
-fq_zech_norm(const fq_zech_t op, const fq_zech_ctx_t ctx)
+void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     if (fq_zech_is_zero(op, ctx))
     {
-        return 0;
+        fmpz_zero(rop);
     }
     else
     {
-        return n_powmod(ctx->prime_root, op->value, ctx->p);
+        fmpz_set_ui(rop, n_powmod(ctx->prime_root, op->value, ctx->p));
     }
 }
