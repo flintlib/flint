@@ -265,8 +265,9 @@ void fq_mat_mul_classical(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
     Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
     $C$ is not allowed to be aliased with $A$ or $B$. Uses classical
     matrix multiplication.
+
 void fq_mat_mul_KS(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
-                         const fq_ctx_t ctx)
+                   const fq_ctx_t ctx)
 
     Sets $C = AB$. Dimensions must be compatible for matrix
     multiplication.  $C$ is not allowed to be aliased with $A$ or
@@ -278,6 +279,7 @@ void fq_mat_submul(fq_mat_t D, const fq_mat_t C, const fq_mat_t A,
 
     Sets $D = C + AB$. $C$ and $D$ may be aliased with each other but
     not with $A$ or $B$.
+
 *******************************************************************************
 
     LU decomposition
