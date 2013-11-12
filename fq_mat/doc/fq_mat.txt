@@ -119,6 +119,28 @@ int fq_mat_fprint(FILE * file, const fq_mat_t mat, const fq_ctx_t ctx)
 
 *******************************************************************************
 
+    Window
+
+*******************************************************************************
+
+void fq_mat_window_init(fq_mat_t window, const fq_mat_t mat, slong r1,
+                        slong c1, slong r2, slong c2, const fq_ctx_t ctx)
+
+     Initializes the matrix \code{window} to be an \code{r2 - r1} by
+     \code{c2 - c1} submatrix of \code{mat} whose \code{(0,0)} entry
+     is the \code{(r1, c1)} entry of \code{mat}.  The memory for the
+     elements of \code{window} is shared with \code{mat}.
+
+
+void fq_mat_window_clear(fq_mat_t window, const fq_ctx_t ctx)
+
+     Clears the matrix \code{window} and releases any memory that it
+     uses.  Note that the memory to the underlying matrix that
+     \code{window} points to is not freed.
+
+
+*******************************************************************************
+
     Random matrix generation
 
 *******************************************************************************

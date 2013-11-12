@@ -21,6 +21,7 @@
 
     Copyright (C) 2012,2013 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -720,11 +721,11 @@ _fq_poly_powmod_fmpz_binexp_preinv(fq_struct* res, const fq_struct* poly,
                                    const fq_ctx_t ctx)
 
     Sets \code{res} to \code{poly} raised to the power \code{e} modulo
-    \code{f}, using binary exponentiation. We reqfmpzre \code{e > 0}.
-    We reqfmpzre \code{finv} to be the inverse of the reverse of
+    \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of
     \code{f}.
 
-    We reqfmpzre \code{lenf > 1}. It is assumed that \code{poly} is
+    We require \code{lenf > 1}. It is assumed that \code{poly} is
     already reduced modulo \code{f} and zero-padded as necessary to
     have length exactly \code{lenf - 1}. The output \code{res} must
     have room for \code{lenf - 1} coefficients.
@@ -739,6 +740,35 @@ fq_poly_powmod_fmpz_binexp_preinv(fq_poly_t res, const fq_poly_t poly, fmpz_t e,
     We require \code{finv} to be the inverse of the reverse of
     \code{f}.
 
+void
+_fq_poly_powmod_fmpz_sliding_preinv(fq_struct* res, const fq_struct* poly,
+                                    fmpz_t e, ulong k, const fq_struct* f, slong lenf,
+                                    const fq_struct* finv, slong lenfinv,
+                                    const fq_ctx_t ctx)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e} modulo
+    \code{f}, using sliding-window exponentiation with window size
+    \code{k}. We require \code{e > 0}.  We require \code{finv} to be
+    the inverse of the reverse of \code{f}. If \code{k} is set to
+    zero, then an "optimum" size will be selected automatically base
+    on \code{e}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is
+    already reduced modulo \code{f} and zero-padded as necessary to
+    have length exactly \code{lenf - 1}. The output \code{res} must
+    have room for \code{lenf - 1} coefficients.
+
+void
+fq_poly_powmod_fmpz_sliding_preinv(fq_poly_t res, const fq_poly_t poly, fmpz_t e,
+                                   ulong k, const fq_poly_t f, const fq_poly_t finv,
+                                   const fq_ctx_t ctx)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e} modulo
+    \code{f}, using sliding-window exponentiation with window size
+    \code{k}. We require \code{e >= 0}.  We require \code{finv} to be
+    the inverse of the reverse of \code{f}.  If \code{k} is set to
+    zero, then an "optimum" size will be selected automatically base
+    on \code{e}.
 
 *******************************************************************************
 
@@ -1596,6 +1626,11 @@ int fq_poly_is_irreducible_ddf(const fq_poly_t f, const fq_ctx_t ctx)
 
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
     Uses fast distinct-degree factorisation.
+
+int fq_poly_is_irreducible_ben_or(const fq_poly_t f, const fq_ctx_t ctx)
+
+    Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
+    Uses Ben-Or's irreducibility test.
 
 int _fq_poly_is_squarefree(const fq_struct * f, slong len, const fq_ctx_t ctx)
 
