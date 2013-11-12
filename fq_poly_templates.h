@@ -161,6 +161,9 @@ TEMPLATE(T, poly_is_irreducible)(const TEMPLATE(T, poly_t) f, const TEMPLATE(T, 
 int 
 TEMPLATE(T, poly_is_irreducible_ddf)(const TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx);
 
+int
+TEMPLATE(T, poly_is_irreducible_ben_or)(const TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx);
+
 void
 TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMPLATE(T, poly_t) poly, 
                             slong * const *degs, const TEMPLATE(T, ctx_t) ctx);
