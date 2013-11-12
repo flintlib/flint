@@ -291,6 +291,9 @@ nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len)
 void
 nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
 
+void
+nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
 /* Getting and setting coefficients  *****************************************/
 
 static __inline__
