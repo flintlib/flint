@@ -52,5 +52,9 @@ fmpz_get_d_2exp(slong *exp, const fmpz_t f)
             return __gmpn_get_d((mp_limb_t *) &d, WORD(1), WORD(1), -*exp);
     }
     else
-        return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
+#if defined(__MPIR_VERSION)
+       return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
+#else
+       return mpz_get_d_2exp((long *) exp, COEFF_TO_PTR(d));
+#endif
 }
