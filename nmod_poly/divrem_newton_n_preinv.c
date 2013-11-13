@@ -31,7 +31,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
+void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
                                         slong lenA, mp_srcptr B, slong lenB,
                                        mp_srcptr Binv, slong lenBinv, nmod_t mod)
 {
@@ -43,7 +43,7 @@ void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
         return;
     }
 
-    _nmod_poly_div_newton21_preinv (Q, A, lenA, B, lenB, Binv, lenBinv, mod);
+    _nmod_poly_div_newton_n_preinv (Q, A, lenA, B, lenB, Binv, lenBinv, mod);
 
     if (lenB > 1)
     {
@@ -56,7 +56,7 @@ void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
     }
 }
 
-void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
+void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
                                       const nmod_poly_t A, const nmod_poly_t B,
                                       const nmod_poly_t Binv)
 {
@@ -100,7 +100,7 @@ void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
         r = R->coeffs;
     }
 
-    _nmod_poly_divrem_newton21_preinv (q, r, A->coeffs, lenA,
+    _nmod_poly_divrem_newton_n_preinv (q, r, A->coeffs, lenA,
                                        B->coeffs, lenB, Binv->coeffs,
                                        lenBinv, B->mod);
 

@@ -82,13 +82,13 @@ _nmod_poly_powmod_mpz_binexp_preinv(mp_ptr res, mp_srcptr poly, mpz_srcptr e,
     for (i = mpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {
         _nmod_poly_mul(T, res, lenf - 1, res, lenf - 1, mod);
-        _nmod_poly_divrem_newton21_preinv (Q, res, T, 2 * lenf - 3, f, lenf,
+        _nmod_poly_divrem_newton_n_preinv (Q, res, T, 2 * lenf - 3, f, lenf,
                                            finv, lenfinv, mod);
 
         if (mpz_tstbit(e, i))
         {
             _nmod_poly_mul(T, res, lenf - 1, poly, lenf - 1, mod);
-            _nmod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
+            _nmod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
                                               finv, lenfinv, mod);
         }
     }

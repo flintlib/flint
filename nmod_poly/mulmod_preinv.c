@@ -48,7 +48,7 @@ void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
     else
         _nmod_poly_mul(T, poly2, len2, poly1, len1, mod);
 
-    _nmod_poly_divrem_newton21_preinv(Q, res, T, lenT, f, lenf,
+    _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenT, f, lenf,
                                       finv, lenfinv, mod);
     _nmod_vec_clear(T);
 }

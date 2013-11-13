@@ -32,7 +32,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
                                      mp_srcptr B, slong lenB, mp_srcptr Binv,
                                      slong lenBinv, nmod_t mod)
 {
@@ -49,7 +49,7 @@ void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
     _nmod_vec_clear(Arev);
 }
 
-void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
+void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                     const nmod_poly_t B, const nmod_poly_t Binv)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
@@ -84,7 +84,7 @@ void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
         q = Q->coeffs;
     }
 
-    _nmod_poly_div_newton21_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
+    _nmod_poly_div_newton_n_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
                                     Binv->coeffs, lenBinv, B->mod);
 
     if (Q == A || Q == B || Q == Binv)
