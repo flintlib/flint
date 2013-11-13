@@ -42,7 +42,7 @@ fmpz_dlog(const fmpz_t x)
         slong e;
 
 #if defined(__MPIR_VERSION)
-        s = mpz_get_d_2exp((long *) &e, COEFF_TO_PTR(*x));
+        s = mpz_get_d_2exp(&e, COEFF_TO_PTR(*x));
 #else
         s = mpz_get_d_2exp((long *) &e, COEFF_TO_PTR(*x));
 #endif        
