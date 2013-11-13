@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    flint_printf("divrem_newton21_preinv....");
+    flint_printf("divrem_newton_n_preinv....");
     fflush(stdout);
 
     /* Check result of divrem */
@@ -66,7 +66,7 @@ main(void)
 
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
         nmod_poly_mul(test, q, b);
         nmod_poly_add(test, test, r);
 
@@ -115,8 +115,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
-        nmod_poly_divrem_newton21_preinv(a, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(a, r, a, b, binv);
 
         result = (nmod_poly_equal(a, q));
         if (!result)
@@ -161,8 +161,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
-        nmod_poly_divrem_newton21_preinv(b, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(b, r, a, b, binv);
 
         result = (nmod_poly_equal(b, q));
         if (!result)
@@ -207,8 +207,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
-        nmod_poly_divrem_newton21_preinv(binv, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(binv, r, a, b, binv);
 
         result = (nmod_poly_equal(binv, q));
         if (!result)
@@ -254,8 +254,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
-        nmod_poly_divrem_newton21_preinv(q, a, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, a, a, b, binv);
 
         result = (nmod_poly_equal(a, r));
         if (!result)
@@ -300,8 +300,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
-        nmod_poly_divrem_newton21_preinv(q, b, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, b, a, b, binv);
 
         result = (nmod_poly_equal(b, r));
         if (!result)
@@ -346,8 +346,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_divrem_newton21_preinv(q, r, a, b, binv);
-        nmod_poly_divrem_newton21_preinv(q, binv, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, r, a, b, binv);
+        nmod_poly_divrem_newton_n_preinv(q, binv, a, b, binv);
 
         result = (nmod_poly_equal(binv, r));
         if (!result)

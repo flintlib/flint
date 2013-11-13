@@ -1089,7 +1089,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
     The algorithm used is to reverse the polynomials and divide the 
     resulting power series, then reverse the result.
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
             mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
@@ -1103,7 +1103,7 @@ void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
     The algorithm used is to reverse the polynomials and divide the 
     resulting power series, then reverse the result.
 
-void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
+void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                  const nmod_poly_t B, const nmod_poly_t Binv)
 
     Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
@@ -1134,7 +1134,7 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
     The algorithm used is to call \code{div_newton()} and then multiply out 
     and compute the remainder.
 
-void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
+void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
 slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
@@ -1142,10 +1142,10 @@ slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
     \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
     coefficients. Furthermore, we assume that $Binv$ is the inverse of the 
     reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call 
-    \code{div_newton21_preinv()} and then multiply out and compute
+    \code{div_newton_n_preinv()} and then multiply out and compute
     the remainder.
 
-void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
+void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
             const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
@@ -1154,7 +1154,7 @@ void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
     It is required that the length of $A$ is less than or equal to
     2*the length of $B$ - 2.
 
-    The algorithm used is to call \code{div_newton21()} and then multiply out 
+    The algorithm used is to call \code{div_newton_n()} and then multiply out 
     and compute the remainder.
 
 mp_limb_t _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len,

@@ -67,7 +67,7 @@ _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
     if (c == 0)
     {
         _nmod_poly_shift_left(T, res, lenf - 1, window);
-        _nmod_poly_divrem_newton21_preinv(Q, res, T, lenf - 1 + window, f,
+        _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window, f,
                                           lenf, finv, lenfinv, mod);
         c= l+1;
         window= 0;
@@ -76,7 +76,7 @@ _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
     for (; i >= 0; i--)
     {
         _nmod_poly_mul(T, res, lenf - 1, res, lenf - 1, mod);
-        _nmod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f,
+        _nmod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f,
                                           lenf, finv, lenfinv, mod);
 
         c--;
@@ -92,7 +92,7 @@ _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
         if (c == 0)
         {
             _nmod_poly_shift_left(T, res, lenf - 1, window);
-            _nmod_poly_divrem_newton21_preinv(Q, res, T, lenf - 1 + window, f,
+            _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window, f,
                                               lenf, finv, lenfinv, mod);
 
             c= l+1;
