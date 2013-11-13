@@ -28,7 +28,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
                                    const fmpz* B, slong lenB, const fmpz* Binv,
                                    slong lenBinv, const fmpz_t mod)
 {
@@ -48,7 +48,7 @@ void _fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
 }
 
 
-void fmpz_mod_poly_div_newton21_preinv(fmpz_mod_poly_t Q,
+void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
                                const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                const fmpz_mod_poly_t Binv)
 {
@@ -83,7 +83,7 @@ void fmpz_mod_poly_div_newton21_preinv(fmpz_mod_poly_t Q,
         q = Q->coeffs;
     }
 
-    _fmpz_mod_poly_div_newton21_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
+    _fmpz_mod_poly_div_newton_n_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
                                     Binv->coeffs, lenBinv, &(B->p));
 
     if (Q == A || Q == B || Q == Binv)

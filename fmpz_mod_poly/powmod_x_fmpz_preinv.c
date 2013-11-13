@@ -66,7 +66,7 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
     if (c == 0)
     {
         _fmpz_mod_poly_shift_left(T, res, lenf - 1, window);
-        _fmpz_mod_poly_divrem_newton21_preinv(Q, res, T, lenf - 1 + window, f,
+        _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window, f,
                                               lenf, finv, lenfinv, p);
         c= l+1;
         window= 0;
@@ -75,7 +75,7 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
     for (; i >= 0; i--)
     {
         _fmpz_mod_poly_sqr(T, res, lenf - 1, p);
-        _fmpz_mod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
+        _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
                                               finv, lenfinv, p);
 
         c--;
@@ -92,7 +92,7 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
         {
             _fmpz_mod_poly_shift_left(T, res, lenf - 1, window);
             
-            _fmpz_mod_poly_divrem_newton21_preinv(Q, res, T, lenf - 1 + window,
+            _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window,
                                                   f, lenf, finv, lenfinv, p);
             c= l+1;
             window= 0;

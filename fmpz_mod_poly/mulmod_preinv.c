@@ -49,7 +49,7 @@ void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
     else
         _fmpz_mod_poly_mul(T, poly2, len2, poly1, len1, p);
 
-    _fmpz_mod_poly_divrem_newton21_preinv(Q, res, T, lenT, f, lenf,
+    _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, lenT, f, lenf,
                                           finv, lenfinv, p);
 
     _fmpz_vec_clear(T, lenT + lenQ);

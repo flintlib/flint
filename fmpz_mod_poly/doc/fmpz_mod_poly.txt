@@ -604,7 +604,7 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that the leading coefficient of $B$ is invertible 
     modulo $p$.
 
-void _fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                             slong lenA, const fmpz* B, slong lenB,
                             const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 
@@ -613,10 +613,10 @@ void _fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
     \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
     coefficients. Furthermore, we assume that $Binv$ is the inverse of the
     reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call
-    \code{div_newton21_preinv()} and then multiply out and compute
+    \code{div_newton_n_preinv()} and then multiply out and compute
     the remainder.
 
-void fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                                const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                const fmpz_mod_poly_t Binv)
 
@@ -626,7 +626,7 @@ void fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     It is required that the length of $A$ is less than or equal to
     2*the length of $B$ - 2.
 
-    The algorithm used is to call \code{div_newton21()} and then multiply out
+    The algorithm used is to call \code{div_newton_n()} and then multiply out
     and compute the remainder.
 
 void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
@@ -648,7 +648,7 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
 
-void _fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
                                     const fmpz* B, slong lenB, const fmpz* Binv,
                                     slong lenBinv, const fmpz_t mod)
 
@@ -663,7 +663,7 @@ void _fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void fmpz_mod_poly_div_newton21_preinv(fmpz_mod_poly_t Q,
+void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
                                const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                const fmpz_mod_poly_t Binv)
 

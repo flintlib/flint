@@ -27,13 +27,13 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                               slong lenA, const fmpz* B, slong lenB,
                               const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
 
-    _fmpz_mod_poly_div_newton21_preinv(Q, A, lenA, B, lenB, Binv, lenBinv, mod);
+    _fmpz_mod_poly_div_newton_n_preinv(Q, A, lenA, B, lenB, Binv, lenBinv, mod);
 
     if (lenB > 1)
     {
@@ -47,7 +47,7 @@ void _fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
     }
 }
 
-void fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                               const fmpz_mod_poly_t Binv)
 {
@@ -93,7 +93,7 @@ void fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem_newton21_preinv (q, r, A->coeffs, lenA,
+    _fmpz_mod_poly_divrem_newton_n_preinv (q, r, A->coeffs, lenA,
                                            B->coeffs, lenB, Binv->coeffs,
                                            lenBinv, &(B->p));
 
