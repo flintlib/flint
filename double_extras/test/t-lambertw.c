@@ -30,7 +30,7 @@
 #include "ulong_extras.h"
 #include "double_extras.h"
 
-#define ONE_OVER_E 0.36787944117144228
+#define ONE_OVER_E ldexp(6627126856707895.0, -54)
 
 int
 main()
