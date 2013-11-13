@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    flint_printf("div_newton21_preinv....");
+    flint_printf("div_newton_n_preinv....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -83,7 +83,7 @@ main(void)
         fmpz_mod_poly_reverse (binv, b, b->length);
         fmpz_mod_poly_inv_series_newton (binv, binv, b->length);
         fmpz_mod_poly_div_basecase(q, a, b);
-        fmpz_mod_poly_div_newton21_preinv(q2, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(q2, a, b, binv);
 
         result = (fmpz_mod_poly_equal(q, q2));
         if (!result)
@@ -142,8 +142,8 @@ main(void)
 
         fmpz_mod_poly_reverse (binv, b, b->length);
         fmpz_mod_poly_inv_series_newton (binv, binv, b->length);
-        fmpz_mod_poly_div_newton21_preinv(q, a, b, binv);
-        fmpz_mod_poly_div_newton21_preinv(a, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(q, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(a, a, b, binv);
 
         result = (fmpz_mod_poly_equal(q, a));
         if (!result)
@@ -200,8 +200,8 @@ main(void)
 
         fmpz_mod_poly_reverse (binv, b, b->length);
         fmpz_mod_poly_inv_series_newton (binv, binv, b->length);
-        fmpz_mod_poly_div_newton21_preinv(q, a, b, binv);
-        fmpz_mod_poly_div_newton21_preinv(b, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(q, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(b, a, b, binv);
 
         result = (fmpz_mod_poly_equal(q, b));
         if (!result)
@@ -259,8 +259,8 @@ main(void)
 
         fmpz_mod_poly_reverse (binv, b, b->length);
         fmpz_mod_poly_inv_series_newton (binv, binv, b->length);
-        fmpz_mod_poly_div_newton21_preinv(q, a, b, binv);
-        fmpz_mod_poly_div_newton21_preinv(binv, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(q, a, b, binv);
+        fmpz_mod_poly_div_newton_n_preinv(binv, a, b, binv);
 
         result = (fmpz_mod_poly_equal(q, binv));
         if (!result)

@@ -382,21 +382,21 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
 void
-_fmpz_mod_poly_div_newton21_preinv (fmpz* Q, const fmpz* A, slong lenA,
+_fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
                                     const fmpz* B, slong lenB, const fmpz* Binv,
                                     slong lenBinv, const fmpz_t mod);
 
 void
-fmpz_mod_poly_div_newton21_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                            const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
 
 void
-_fmpz_mod_poly_divrem_newton21_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+_fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                             slong lenA, const fmpz* B, slong lenB,
                             const fmpz* Binv, slong lenBinv, const fmpz_t mod);
 
 void
-fmpz_mod_poly_divrem_newton21_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                                const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                const fmpz_mod_poly_t Binv);
 
