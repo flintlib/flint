@@ -31,7 +31,9 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
+#if !defined(__MINGW64__) /* MinGW64 hss alloca, but not alloca.h */
 #include <alloca.h>
+#endif
 #include "limits.h"
 #include "longlong.h"
 #include "config.h"
