@@ -2641,8 +2641,8 @@ Nmod_poly_expr::ternary operation(??, ??) const
     \code{compose_mod}, \code{compose_mod_horner},
     \code{compose_series_brent_kung}, \code{compose_series},
     \code{compose_series_brent_kung}, \code{compose_series_divconquer},
-    \code{compose_series_horner}, \code{div_newton21_preinv},
-    \code{divrem_newton21_preinv}, \code{div_series}, \code{mulhigh},
+    \code{compose_series_horner}, \code{div_newton_n_preinv},
+    \code{divrem_newton_n_preinv}, \code{div_series}, \code{mulhigh},
     \code{mulhigh_classical}, \code{mullow}, \code{mullow_classical},
     \code{mullow_KS}, \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},
     \code{pow_trunc_binexp}.
@@ -2851,13 +2851,13 @@ Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_divconquer(
         Nmod_poly_expr A, Nmod_poly_expr B)
 Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton(
         Nmod_poly_expr A, Nmod_poly_expr B)
-Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton21_preinv(
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton_n_preinv(
         Nmod_poly_expr A, Nmod_poly_expr B)
 
 Nmod_poly_expr div_basecase(Nmod_poly_expr, Nmod_poly_expr)
 Nmod_poly_expr div_divconquer(Nmod_poly_expr, Nmod_poly_expr)
 Nmod_poly_expr div_newton(Nmod_poly_expr, Nmod_poly_expr)
-Nmod_poly_expr div_newton21_preinv(Nmod_poly_expr, Nmod_poly_expr,
+Nmod_poly_expr div_newton_n_preinv(Nmod_poly_expr, Nmod_poly_expr,
         Nmod_poly_expr)
 
 Nmod_poly_expr rem_basecase(Nmod_poly_expr, Nmod_poly_expr)

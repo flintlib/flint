@@ -19,8 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2010 Sebastian Pancratz
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2013 Martin Lee
 
 ******************************************************************************/
 
@@ -28,36 +27,40 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R, 
-    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
-    const fmpz_t invB, const fmpz_t p)
+void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+                              slong lenA, const fmpz* B, slong lenB,
+                              const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 {
-    slong iQ, iR;
+    const slong lenQ = lenA - lenB + 1;
 
-    if (R != A)
-        _fmpz_vec_set(R, A, lenA);
+    _fmpz_mod_poly_div_newton_n_preinv(Q, A, lenA, B, lenB, Binv, lenBinv, mod);
 
-    for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
+    if (lenB > 1)
     {
-        if (fmpz_is_zero(R + iR))
-            fmpz_zero(Q + iQ);
+        if (lenQ >= lenB - 1)
+            _fmpz_mod_poly_mullow(R, Q, lenQ, B, lenB - 1, mod, lenB - 1);
         else
-        {
-            fmpz_mul(Q + iQ, R + iR, invB);
-            fmpz_mod(Q + iQ, Q + iQ, p);
+            _fmpz_mod_poly_mullow(R, B, lenB - 1, Q, lenQ, mod, lenB - 1);
 
-            _fmpz_vec_scalar_submul_fmpz(R + iQ, B, lenB, Q + iQ);
-            _fmpz_vec_scalar_mod_fmpz(R + iQ, R + iQ, lenB, p);
-        }
+        _fmpz_vec_sub(R, A, R, lenB - 1);
+        _fmpz_vec_scalar_mod_fmpz(R, R, lenB - 1, mod);
     }
 }
 
-void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
-    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                              const fmpz_mod_poly_t Binv)
 {
-    const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
-    fmpz *q, *r;
-    fmpz_t invB;
+    const slong lenA = A->length, lenB = B->length, lenBinv= Binv->length,
+                       lenQ= lenA - lenB + 1;
+    fmpz* q, * r;
+
+    if (lenB == 0)
+    {
+        flint_printf("Exception (fmpz_mod_poly_divrem_newton_preinv)."
+               " Division by zero.\n");
+        abort();
+    }
 
     if (lenA < lenB)
     {
@@ -66,10 +69,12 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         return;
     }
 
-    fmpz_init(invB);
-    fmpz_invmod(invB, B->coeffs + (lenB - 1), &(B->p));
+    if (lenA > 2*lenB-2)
+    {
+        flint_printf ("Exception (fmpz_mod_poly_divrem_newton_preinv).\n");
+    }
 
-    if (Q == A || Q == B)
+    if (Q == A || Q == B || Q == Binv)
     {
         q = _fmpz_vec_init(lenQ);
     }
@@ -78,20 +83,21 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         fmpz_mod_poly_fit_length(Q, lenQ);
         q = Q->coeffs;
     }
-    if (R == B)
+    if (R == A || R == B || R == Binv)
     {
-        r = _fmpz_vec_init(lenA);
+        r = _fmpz_vec_init(lenB - 1);
     }
     else
     {
-        fmpz_mod_poly_fit_length(R, lenA);
+        fmpz_mod_poly_fit_length(R, lenB - 1);
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem_basecase(q, r, A->coeffs, lenA,
-                                         B->coeffs, lenB, invB, &(B->p));
+    _fmpz_mod_poly_divrem_newton_n_preinv (q, r, A->coeffs, lenA,
+                                           B->coeffs, lenB, Binv->coeffs,
+                                           lenBinv, &(B->p));
 
-    if (Q == A || Q == B)
+    if (Q == A || Q == B || Q == Binv)
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
         Q->coeffs = q;
@@ -102,7 +108,7 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     {
         _fmpz_mod_poly_set_length(Q, lenQ);
     }
-    if (R == B)
+    if (R == A || R == B || R == Binv)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
@@ -115,7 +121,4 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     }
 
     _fmpz_mod_poly_normalise(R);
-
-    fmpz_clear(invB);
 }
-

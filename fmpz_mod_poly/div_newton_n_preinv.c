@@ -28,48 +28,52 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R, 
-    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
-    const fmpz_t invB, const fmpz_t p)
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
+                                   const fmpz* B, slong lenB, const fmpz* Binv,
+                                   slong lenBinv, const fmpz_t mod)
 {
-    slong iQ, iR;
+    const slong lenQ = lenA - lenB + 1;
+    fmpz * Arev;
 
-    if (R != A)
-        _fmpz_vec_set(R, A, lenA);
+    Arev = _fmpz_vec_init(lenQ);
 
-    for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
-    {
-        if (fmpz_is_zero(R + iR))
-            fmpz_zero(Q + iQ);
-        else
-        {
-            fmpz_mul(Q + iQ, R + iR, invB);
-            fmpz_mod(Q + iQ, Q + iQ, p);
+    _fmpz_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
 
-            _fmpz_vec_scalar_submul_fmpz(R + iQ, B, lenB, Q + iQ);
-            _fmpz_vec_scalar_mod_fmpz(R + iQ, R + iQ, lenB, p);
-        }
-    }
+    _fmpz_mod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), mod,
+                          lenQ);
+
+    _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
+
+    _fmpz_vec_clear(Arev, lenQ);
 }
 
-void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
-    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv)
 {
-    const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
-    fmpz *q, *r;
-    fmpz_t invB;
+    const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
+                lenBinv= Binv->length;
+    fmpz *q;
+
+    if (lenB == 0)
+    {
+        flint_printf("Exception (fmpz_mod_poly_div_newton). Division by zero.\n");
+        abort();
+    }
 
     if (lenA < lenB)
     {
-        fmpz_mod_poly_set(R, A);
         fmpz_mod_poly_zero(Q);
         return;
     }
 
-    fmpz_init(invB);
-    fmpz_invmod(invB, B->coeffs + (lenB - 1), &(B->p));
+    if (lenA > 2*lenB-2)
+    {
+        flint_printf ("Exception (fmpz_mod_poly_div_newton).\n");
+    }
 
-    if (Q == A || Q == B)
+    if (Q == A || Q == B || Q == Binv)
     {
         q = _fmpz_vec_init(lenQ);
     }
@@ -78,20 +82,11 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         fmpz_mod_poly_fit_length(Q, lenQ);
         q = Q->coeffs;
     }
-    if (R == B)
-    {
-        r = _fmpz_vec_init(lenA);
-    }
-    else
-    {
-        fmpz_mod_poly_fit_length(R, lenA);
-        r = R->coeffs;
-    }
 
-    _fmpz_mod_poly_divrem_basecase(q, r, A->coeffs, lenA,
-                                         B->coeffs, lenB, invB, &(B->p));
+    _fmpz_mod_poly_div_newton_n_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
+                                    Binv->coeffs, lenBinv, &(B->p));
 
-    if (Q == A || Q == B)
+    if (Q == A || Q == B || Q == Binv)
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
         Q->coeffs = q;
@@ -102,20 +97,4 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     {
         _fmpz_mod_poly_set_length(Q, lenQ);
     }
-    if (R == B)
-    {
-        _fmpz_vec_clear(R->coeffs, R->alloc);
-        R->coeffs = r;
-        R->alloc  = lenB - 1;
-        R->length = lenB - 1;
-    }
-    else
-    {
-      _fmpz_mod_poly_set_length(R, lenB - 1);
-    }
-
-    _fmpz_mod_poly_normalise(R);
-
-    fmpz_clear(invB);
 }
-
