@@ -23,10 +23,10 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* prevent clash with standard library */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"

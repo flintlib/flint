@@ -26,8 +26,11 @@
 #ifndef FMPZ_POLY_Q_H
 #define FMPZ_POLY_Q_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
+#undef ulong
+#include <gmp.h>
 #define ulong mp_limb_t
 
 #include "flint.h"

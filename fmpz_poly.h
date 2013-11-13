@@ -29,15 +29,19 @@
 #ifndef FMPZ_POLY_H
 #define FMPZ_POLY_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "nmod_poly.h"
+
 
 #ifdef __cplusplus
  extern "C" {

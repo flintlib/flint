@@ -26,6 +26,8 @@
 #ifndef FLINT_H
 #define FLINT_H
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
@@ -33,6 +35,7 @@
 #include "limits.h"
 #include "longlong.h"
 #include "config.h"
+#undef ulong
 
 #ifdef __cplusplus
  extern "C" {

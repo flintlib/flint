@@ -33,6 +33,7 @@
 #include "fmpq.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {

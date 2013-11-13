@@ -409,9 +409,10 @@ If you have any difficulties with conflicts with system headers on
 your machine, you can do the following in your code:
 
 \begin{lstlisting}[language=C]
-#undef ulong
+#define ulong ulongxx
 #include <stdio.h>
 // other system headers
+#undef ulong
 #define ulong mp_limb_t
 \end{lstlisting}
 

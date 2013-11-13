@@ -22,9 +22,13 @@
     Copyright 2007 William Hart and David Harvey
 
 ******************************************************************************/
+#ifndef FLINT_PROFILER_H
+#define FLINT_PROFILER_H
+
 #include "flint.h"
 
-#undef ulong /* interferes with system includes, redefined by flint.h below */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <time.h>
 #include <sys/time.h>
 #if defined (__WIN32) && !defined(__CYGWIN__)
@@ -50,10 +54,8 @@ int gettimeofday(struct timeval * p, void * tz);
 #else
 #include <sys/resource.h>
 #endif
+#undef ulong
 #define ulong mp_limb_t
-
-#ifndef FLINT_PROFILER_H
-#define FLINT_PROFILER_H
 
 #ifdef __cplusplus
  extern "C" {

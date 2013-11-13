@@ -27,11 +27,13 @@
 #ifndef FMPZ_MAT_H
 #define FMPZ_MAT_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
 #include "flint.h"
 #include "fmpz.h"
 #include "nmod_mat.h"
