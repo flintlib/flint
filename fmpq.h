@@ -27,15 +27,18 @@
 #ifndef FMPQ_H
 #define FMPQ_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
 #include <mpfr.h>
+#define ulong mp_limb_t
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+
 
 #ifdef __cplusplus
  extern "C" {

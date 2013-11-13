@@ -267,13 +267,22 @@ if [ -z "$BUILD" ]; then
    ARCH=`uname -m`
 
    if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
-      if [ "$ABI" = "32" ]; then
-         OS="MINGW32"
-      else
+      if [ "$ABI" = "64" ]; then
          OS="MINGW64"
+      else
+         OS="MINGW32"
       fi
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
-      OS="CYGWIN"
+      if [ "$ARCH" = "x86_64" ]; then
+         if [ "$ABI" = "32" ]; then
+            OS="CYGWIN32"
+         else
+            OS="CYGWIN64"
+            ABI="64"
+         fi
+      else
+         OS="CYGWIN32"
+      fi
    else
       OS=`uname -s`
    fi
@@ -332,7 +341,7 @@ if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
          FLINT_LIB="libflint.dylib";;
-      CYGWIN | MINGW*)
+      CYGWIN* | MINGW*)
          FLINT_LIB="libflint.dll";;
       *)
          FLINT_LIB="libflint.so";;
@@ -343,7 +352,7 @@ fi
 
 if [ -z "$EXEEXT" ]; then
    case "$OS" in
-      CYGWIN | MINGW*)
+      CYGWIN* | MINGW*)
          EXEEXT=".exe";;
       *)
          EXEEXT="";;
@@ -353,7 +362,7 @@ fi
 #don't build both shared and static lib on MinGW and Cygwin
 
 case "$OS" in
-   CYGWIN | MINGW*)
+   CYGWIN* | MINGW*)
       if [ "$STATIC" = "1" ] && [ "$SHARED" = "1" ]; then
          echo "Building both static and shared versions of MPIR/GMP on $OS is currently"
          echo "unsupported, and so is it for MPFR and FLINT."
@@ -364,7 +373,7 @@ case "$OS" in
       ;;
    *)
       ;;
-esac
+esac 
 
 #select fft_tuning parameters
 
@@ -421,6 +430,8 @@ fi
 if [ -z "$CFLAGS" ]; then
    if [ "$OS" = "MINGW64" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   elif [ "$OS" = "CYGWIN64" ]; then
+      CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
    else
       CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    fi
@@ -440,7 +451,7 @@ fi
 
 if [ -z "$PIC_FLAG" ]; then
    case "$OS" in
-      CYGWIN | MINGW*)
+      CYGWIN* | MINGW*)
          ;;
       *)
          PIC_FLAG="-fPIC";;
@@ -512,7 +523,7 @@ LIBS="$LLIBS $lLIBS"
 #paths for dynamic linker
 
 case "$OS" in
-   CYGWIN | MINGW*)
+   CYGWIN* | MINGW*)
       DLPATH="PATH";;
    Darwin)
       DLPATH="DYLD_LIBRARY_PATH";;

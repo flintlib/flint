@@ -26,11 +26,13 @@
 #ifndef NMOD_VEC_H
 #define NMOD_VEC_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
+#undef ulong
+#include <gmp.h>
 #define ulong mp_limb_t
 
-#include <gmp.h>
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "flint.h"

@@ -33,10 +33,11 @@ The following modifications were made by William Hart:
 --------------------------------------------------------------------*/
 
 
-#undef ulong /* avoid clash with stdlib */
+#define ulong ulongxx /* interferes with system includes */
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
 #define ulong mp_limb_t
 
 #include <gmp.h>

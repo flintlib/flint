@@ -26,16 +26,19 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "nmod_vec.h"
 #include "fmpz-conversions.h"
+
 
 #ifdef __cplusplus
  extern "C" {
