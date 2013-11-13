@@ -1621,6 +1621,42 @@ void fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R,
     compute the quotient \code{Q} of \code{A} by \code{B} and the remainder
     \code{R}. Aliasing of \code{B} and \code{B_inv} is not permitted. 
 
+fmpz ** _fmpz_poly_powers_precompute(const fmpz * B, slong len)
+
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv,
+                                                              fmpz_poly_t poly)
+
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void _fmpz_poly_powers_clear(fmpz ** powers, slong len)
+
+    Clean up resources used by precomputed powers which have been computed
+    by \code{_fmpz_poly_powers_precompute}.
+
+void fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv)
+
+    Clean up resources used by precomputed powers which have been computed
+    by \code{fmpz_poly_powers_precompute}.
+
+void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
+                                 const fmpz * B, slong n, fmpz ** const powers)
+
+    Set $A$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{_fmpz_poly_powers_precompute}. No aliasing is allowed.
+
+void fmpz_poly_rem_powers_precomp(fmpz_poly_t R, 
+                             const fmpz_poly_t A, const fmpz_poly_t B, 
+                                        const fmpz_poly_powers_precomp_t B_inv)
+
+    Set $R$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{fmpz_poly_powers_precompute}.
+
 *******************************************************************************
 
     Divisibility testing

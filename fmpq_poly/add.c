@@ -29,9 +29,9 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1, 
-                    const fmpz * poly2, const fmpz_t den2, slong len2)
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can)
 {
     slong max = FLINT_MAX(len1, len2);
     slong min = FLINT_MIN(len1, len2);
@@ -68,21 +68,25 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
             fmpz_one(rden);
         else
         {
-            fmpz_t e;
-            fmpz_init(e);
-            _fmpz_vec_content(e, rpoly, max);
-            if (*e != WORD(1))
-                fmpz_gcd(e, e, d);
-            
-            if (*e == WORD(1))
-                fmpz_mul(rden, den1, den22);
-            else
+            if (can)
             {
-                _fmpz_vec_scalar_divexact_fmpz(rpoly, rpoly, max, e);
-                fmpz_divexact(den11, den1, e);
-                fmpz_mul(rden, den11, den22);
-            }
-            fmpz_clear(e);
+               fmpz_t e;
+               fmpz_init(e);
+               _fmpz_vec_content(e, rpoly, max);
+               if (*e != WORD(1))
+                  fmpz_gcd(e, e, d);
+            
+               if (*e == WORD(1))
+                  fmpz_mul(rden, den1, den22);
+               else
+               {
+                   _fmpz_vec_scalar_divexact_fmpz(rpoly, rpoly, max, e);
+                   fmpz_divexact(den11, den1, e);
+                   fmpz_mul(rden, den11, den22);
+               }
+               fmpz_clear(e);
+            } else
+               fmpz_mul(rden, den1, den22);
         }
         fmpz_clear(den11);
         fmpz_clear(den22);
@@ -90,7 +94,15 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     fmpz_clear(d);
 }
 
-void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
+{
+   _fmpq_poly_add_can(rpoly, rden, poly1, den1, len1, poly2, den2, len2, 1);
+}
+
+void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1, 
+                                    const fmpq_poly_t poly2, int can)
 {
     slong len1 = poly1->length, len2, max;
     
@@ -122,15 +134,21 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
     fmpq_poly_fit_length(res, max);
     
     if (res != poly2)
-        _fmpq_poly_add(res->coeffs, res->den, 
+        _fmpq_poly_add_can(res->coeffs, res->den, 
                        poly1->coeffs, poly1->den, len1, 
-                       poly2->coeffs, poly2->den, len2);
+                       poly2->coeffs, poly2->den, len2, can);
     else
-        _fmpq_poly_add(res->coeffs, res->den, 
+        _fmpq_poly_add_can(res->coeffs, res->den, 
                        poly2->coeffs, poly2->den, len2, 
-                       poly1->coeffs, poly1->den, len1);
+                       poly1->coeffs, poly1->den, len1, can);
     
     _fmpq_poly_set_length(res, max);
     _fmpq_poly_normalise(res);
+}
+
+void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, 
+                                    const fmpq_poly_t poly2)
+{
+   fmpq_poly_add_can(res, poly1, poly2, 1);
 }
 

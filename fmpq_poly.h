@@ -50,6 +50,16 @@ typedef struct
 
 typedef fmpq_poly_struct fmpq_poly_t[1];
 
+typedef struct
+{
+   fmpq_poly_struct * powers;
+   slong len;
+} fmpq_poly_powers_precomp_struct;
+
+typedef fmpq_poly_powers_precomp_struct fmpq_poly_powers_precomp_t[1];
+
+#define WEAK_CANONICALISE_CUTOFF 25600
+
 /*  Memory management  *******************************************************/
 
 void fmpq_poly_init(fmpq_poly_t poly);
@@ -66,14 +76,6 @@ void fmpq_poly_clear(fmpq_poly_t poly);
 
 void _fmpq_poly_normalise(fmpq_poly_t poly);
 
-void _fmpq_poly_canonicalise(fmpz * rpoly, fmpz_t den, slong len);
-
-void fmpq_poly_canonicalise(fmpq_poly_t poly);
-
-int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len);
-
-int fmpq_poly_is_canonical(const fmpq_poly_t poly);
-
 /*  Accessing numerator and denominator  *************************************/
 
 #define fmpq_poly_numref(poly)  ((poly)->coeffs)
@@ -87,6 +89,16 @@ fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
     _fmpz_vec_set(res->coeffs, poly->coeffs, poly->length);
     _fmpz_poly_set_length(res, poly->length);
 }
+
+/*  Canonicalisation  *************************************/
+
+void _fmpq_poly_canonicalise(fmpz * rpoly, fmpz_t den, slong len);
+
+void fmpq_poly_canonicalise(fmpq_poly_t poly);
+
+int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len);
+
+int fmpq_poly_is_canonical(const fmpq_poly_t poly);
 
 /*  Polynomial parameters  ***************************************************/
 
@@ -222,12 +234,26 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_add(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can);
+
+void fmpq_poly_add_can(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
+
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
                     const fmpz * poly2, const fmpz_t den2, slong len2);
 
 void fmpq_poly_sub(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can);
+
+void fmpq_poly_sub_can(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
 
 /*  Scalar multiplication and division  **************************************/
 
@@ -360,6 +386,25 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
 
 void fmpq_poly_rem(fmpq_poly_t R,
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+/*  Precomputed inverse  *****************************************************/
+
+fmpq_poly_struct * _fmpq_poly_powers_precompute(const fmpz * B, 
+                                                 const fmpz_t denB, slong len);
+
+void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, 
+                                                             fmpq_poly_t poly);
+
+void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len);
+
+void fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv);
+
+void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
+                              const fmpz * B, const fmpz_t denB, slong n, 
+                                              fmpq_poly_struct * const powers);
+
+void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
+                  const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv);
 
 /*  Power series division  ***************************************************/
 
