@@ -428,8 +428,10 @@ fi
 #defaults for CFLAGS
 
 if [ -z "$CFLAGS" ]; then
-   if [ "$OS" = "MINGW64" ] || [ "$OS" = "CYGWIN64" ]; then
+   if [ "$OS" = "MINGW64" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   elif [ "$OS" = "CYGWIN64" ]; then
+      CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
    else
       CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    fi
