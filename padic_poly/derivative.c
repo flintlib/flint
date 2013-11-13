@@ -44,6 +44,8 @@ void _padic_poly_derivative(fmpz *rop, slong *rval, slong N,
 
     if (alloc)
         fmpz_clear(pow);
+
+    _padic_poly_canonicalise(rop, rval, len - 1, ctx->p);
 }
 
 void padic_poly_derivative(padic_poly_t rop, 
