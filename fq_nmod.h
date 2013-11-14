@@ -28,11 +28,6 @@
 #ifndef FQ_NMOD_H
 #define FQ_NMOD_H
 
-#undef ulong                /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#define ulong unsigned long
-
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 

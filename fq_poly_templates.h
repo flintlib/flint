@@ -27,12 +27,6 @@
 
 #ifdef T
 
-#undef ulong                /* interferes with system includes */
-
-#include <stdlib.h>
-#include <stdio.h>
-#define ulong unsigned long
-
 #ifdef __cplusplus
 extern "C" {
 #endif

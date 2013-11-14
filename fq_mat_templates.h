@@ -24,10 +24,6 @@
 ******************************************************************************/
 #ifdef T
 
-#undef ulong /* interferes with system includes */
-#include <stdio.h>
-#define ulong mp_limb_t
-
 #include "flint.h"
 #include "templates.h"
 #include "ulong_extras.h"
