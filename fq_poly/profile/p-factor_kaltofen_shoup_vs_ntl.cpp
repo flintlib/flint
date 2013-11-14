@@ -105,7 +105,7 @@ main(int argc, char** argv)
             fq_poly_randtest_irreducible(g, state, len + 2, ctx);
             fq_poly_mul(f, f, g, ctx);
             fq_poly_make_monic(f, f, ctx);
-            fq_poly_get_ZZ_pEX(nf, f);
+            fq_poly_get_ZZ_pEX(nf, f, ctx);
         }
         
     loop:

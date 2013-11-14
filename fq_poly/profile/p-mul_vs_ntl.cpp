@@ -139,9 +139,9 @@ main(int argc, char** argv)
                  */
                 {
                     fq_poly_randtest(f, state, len, ctx);
-                    fq_poly_get_ZZ_pEX(nf, f);
+                    fq_poly_get_ZZ_pEX(nf, f, ctx);
                     fq_poly_randtest(g, state, len, ctx);
-                    fq_poly_get_ZZ_pEX(ng, g);
+                    fq_poly_get_ZZ_pEX(ng, g, ctx);
                 }
                 
               loop:
