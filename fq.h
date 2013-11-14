@@ -33,6 +33,10 @@
 
 /* Data types and context ****************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef fmpz_poly_t fq_t;
 typedef fmpz_poly_struct fq_struct;
 
@@ -352,6 +356,10 @@ fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
 void
 fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
               const fq_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

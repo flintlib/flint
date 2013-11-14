@@ -37,6 +37,9 @@
 #include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef nmod_poly_t fq_nmod_t;
 typedef nmod_poly_struct fq_nmod_struct;
@@ -397,6 +400,10 @@ fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
 void
 fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

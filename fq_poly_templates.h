@@ -33,6 +33,10 @@
 #include <stdio.h>
 #define ulong unsigned long
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -908,5 +912,8 @@ _TEMPLATE(T, poly_get_str)(const TEMPLATE(T, struct) * poly, slong len, const TE
 char *
 TEMPLATE(T, poly_get_str)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

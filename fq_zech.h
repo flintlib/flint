@@ -34,6 +34,9 @@
 #include "fq_nmod.h"
 
 /* Data types and context ****************************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct
 {
@@ -314,5 +317,9 @@ fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size,
 void
 fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
