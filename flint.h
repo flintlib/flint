@@ -34,6 +34,9 @@
 #if !defined(__MINGW64__) && !defined(__MINGW32__) /* MinGW hss alloca, but not alloca.h */
 #include <alloca.h>
 #endif
+#if defined(__MINGW32__)
+#include <malloc.h> /* for alloca */
+#endif
 #include "limits.h"
 #include "longlong.h"
 #include "config.h"
