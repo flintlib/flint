@@ -36,13 +36,13 @@
 static __inline__
 int is_varsymbol0(char c)
 {
-    return isalpha(c);
+    return isalpha((unsigned char) c);
 }
 
 static __inline__
 int is_varsymbol1(char c)
 {
-    return isalnum(c) || (c == '_');
+    return isalnum((unsigned char) c) || (c == '_');
 }
 
 #define next_event()                                                      \
@@ -116,7 +116,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     if (c == '-')
         goto s_1;
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_2;
     if (is_varsymbol0(c))
     {
@@ -130,7 +130,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_2;
     if (is_varsymbol0(c))
     {
@@ -151,7 +151,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_2;
     if (c == '*')
     {
@@ -237,7 +237,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_6;
 
     goto s_parse_error;
@@ -246,7 +246,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_6;
 
     {
