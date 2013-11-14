@@ -102,7 +102,7 @@ void padic_ctx_clear(padic_ctx_t ctx);
 static __inline__ 
 int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
-    if (ctx->min <= e && e < ctx->max)
+    if (ctx->min <= (slong) e && (slong) e < ctx->max)
     {
         *rop   = *(ctx->pow + (e - ctx->min));
         return 0;
