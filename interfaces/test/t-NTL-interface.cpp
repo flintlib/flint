@@ -270,15 +270,15 @@ int test_ZZ_pE_to_fq()
 
         ZZ_pE zzpe;
 
-        fq_init(f1);
-        fq_init(f2);
+        fq_init(f1, ctx);
+        fq_init(f2, ctx);
 
         fq_randtest(f1, state, ctx);
 
         fq_get_ZZ_pE(zzpe, f1);
         fq_set_ZZ_pE(f2, zzpe, ctx);
           
-        result = fq_equal(f1, f2);
+        result = fq_equal(f1, f2, ctx);
         if (!result)
         {
            flint_printf("FAIL:\n");
@@ -291,8 +291,8 @@ int test_ZZ_pE_to_fq()
         }
         
         fmpz_clear(p);
-        fq_clear(f1);
-        fq_clear(f2);
+        fq_clear(f1, ctx);
+        fq_clear(f2, ctx);
 
         fmpz_mod_poly_clear(fmod);
         fq_ctx_clear(ctx);
@@ -341,8 +341,8 @@ int test_ZZ_pEX_to_fq_poly()
 
         ZZ_pEX zzpex;
 
-        fq_poly_init(f1);
-        fq_poly_init(f2);
+        fq_poly_init(f1, ctx);
+        fq_poly_init(f2, ctx);
 
         length = n_randint(state, 1000);
 
@@ -351,7 +351,7 @@ int test_ZZ_pEX_to_fq_poly()
         fq_poly_get_ZZ_pEX(zzpex, f1);
         fq_poly_set_ZZ_pEX(f2, zzpex, ctx);
           
-        result = fq_poly_equal(f1, f2);
+        result = fq_poly_equal(f1, f2, ctx);
         if (!result)
         {
            flint_printf("FAIL:\n");
@@ -364,8 +364,8 @@ int test_ZZ_pEX_to_fq_poly()
         }
         
         fmpz_clear(p);
-        fq_poly_clear(f1);
-        fq_poly_clear(f2);
+        fq_poly_clear(f1, ctx);
+        fq_poly_clear(f2, ctx);
 
         fmpz_mod_poly_clear(fmod);
         fq_ctx_clear(ctx);
@@ -412,15 +412,15 @@ int test_zz_pE_to_fq()
 
         zz_pE zzpe;
 
-        fq_init(f1);
-        fq_init(f2);
+        fq_init(f1, ctx);
+        fq_init(f2, ctx);
 
         fq_randtest(f1, state, ctx);
 
         fq_get_zz_pE(zzpe, f1);
         fq_set_zz_pE(f2, zzpe, ctx);
           
-        result = fq_equal(f1, f2);
+        result = fq_equal(f1, f2, ctx);
         if (!result)
         {
            flint_printf("FAIL:\n");
@@ -433,8 +433,8 @@ int test_zz_pE_to_fq()
         }
         
         fmpz_clear(p);
-        fq_clear(f1);
-        fq_clear(f2);
+        fq_clear(f1, ctx);
+        fq_clear(f2, ctx);
 
         fmpz_mod_poly_clear(fmod);
         fq_ctx_clear(ctx);
@@ -481,8 +481,8 @@ int test_zz_pEX_to_fq_poly()
 
         zz_pEX zzpex;
 
-        fq_poly_init(f1);
-        fq_poly_init(f2);
+        fq_poly_init(f1, ctx);
+        fq_poly_init(f2, ctx);
 
         length = n_randint(state, 1000);
 
@@ -491,7 +491,7 @@ int test_zz_pEX_to_fq_poly()
         fq_poly_get_zz_pEX(zzpex, f1);
         fq_poly_set_zz_pEX(f2, zzpex, ctx);
           
-        result = fq_poly_equal(f1, f2);
+        result = fq_poly_equal(f1, f2, ctx);
         if (!result)
         {
            flint_printf("FAIL:\n");
@@ -504,8 +504,8 @@ int test_zz_pEX_to_fq_poly()
         }
         
         fmpz_clear(p);
-        fq_poly_clear(f1);
-        fq_poly_clear(f2);
+        fq_poly_clear(f1, ctx);
+        fq_poly_clear(f2, ctx);
 
         fmpz_mod_poly_clear(fmod);
         fq_ctx_clear(ctx);
