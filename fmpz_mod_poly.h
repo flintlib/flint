@@ -109,6 +109,29 @@ fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
                                 flint_rand_t state, slong len);
 
 void
+fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+
+void
+fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
+                                         flint_rand_t state, slong len);
+
+void
+fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+
+int
+fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,
+                                             flint_rand_t state, slong len,
+                                             slong max_attempts);
+
+void
+fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+
+int
+fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t f,
+                                             flint_rand_t state, slong len,
+                                             slong max_attempts);
+
+void
 fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
                                           flint_rand_t state, slong len);
 

@@ -99,7 +99,7 @@ void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len)
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len}.
 
 void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
-					flint_rand_t state, slong len)
+                                        flint_rand_t state, slong len)
 
     Sets the polynomial~$f$ to a random irreducible polynomial of length
     up~\code{len}, assuming \code{len} is positive.
@@ -109,6 +109,64 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len},
     assuming \code{len} is positive.
+
+void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic polynomial with length \code{len}.
+
+void
+fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t poly,
+                                         flint_rand_t state, slong len)
+
+    Generates a random monic irreducible polynomial with length \code{len}.
+
+
+void
+fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly, flint_rand_t state,
+                                 slong len)
+
+    Generates a random monic trinomial of length \code{len}.
+
+int
+fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t poly,
+                                            flint_rand_t state,
+                                            slong len, slong max_attempts)
+
+    Attempts to set \code{poly} to a monic irreducible trinomial of
+    length \code{len}.  It will generate up to \code{max_attempts}
+    trinomials in attempt to find an irreducible one.  If
+    \code{max_attempts} is \code{0}, then it will keep generating
+    trinomials until an irreducible one is found.  Returns $1$ if one
+    is found and $0$ otherwise.
+
+void
+fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly, flint_rand_t state,
+                                 slong len)
+
+    Generates a random monic pentomial of length \code{len}.
+
+int
+fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly,
+                                             flint_rand_t state,
+                                             slong len, slong max_attempts)
+
+    Attempts to set \code{poly} to a monic irreducible pentomial of
+    length \code{len}.  It will generate up to \code{max_attempts}
+    pentomials in attempt to find an irreducible one.  If
+    \code{max_attempts} is \code{0}, then it will keep generating
+    pentomials until an irreducible one is found.  Returns $1$ if one
+    is found and $0$ otherwise.
+
+void
+fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
+                                          flint_rand_t state, slong len)
+
+    Attempts to set \code{poly} to a sparse, monic irreducible polynomial
+    with length \code{len}.  It attempts to find an irreducible
+    trinomial.  If that does not succeed, it attempts to find a
+    irreducible pentomial.  If that fails, then \code{poly} is just
+    set to a random monic irreducible polynomial.
+
 
 *******************************************************************************
 

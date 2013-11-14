@@ -287,9 +287,29 @@ nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len)
         nmod_poly_randtest(poly, state, len);
     } while (nmod_poly_is_zero(poly));
 }
-
+      
 void
 nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
+void
+nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len);
+
+void
+nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
+void
+nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len);
+
+int
+nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+                                         slong len, slong max_attempts);
+
+void
+nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len);
+
+int
+nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+                                         slong len, slong max_attempts);
 
 void
 nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);

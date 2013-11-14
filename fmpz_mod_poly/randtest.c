@@ -123,7 +123,6 @@ fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly, flint_rand_t state, slong
 void
 fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
 {
-    ulong k;
     fmpz_mod_poly_fit_length(poly, len);
     _fmpz_vec_zero(poly->coeffs, len);
     fmpz_randm(poly->coeffs, state, &(poly->p));
