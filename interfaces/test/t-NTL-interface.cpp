@@ -275,7 +275,7 @@ int test_ZZ_pE_to_fq()
 
         fq_randtest(f1, state, ctx);
 
-        fq_get_ZZ_pE(zzpe, f1);
+        fq_get_ZZ_pE(zzpe, f1, ctx);
         fq_set_ZZ_pE(f2, zzpe, ctx);
           
         result = fq_equal(f1, f2, ctx);
@@ -348,7 +348,7 @@ int test_ZZ_pEX_to_fq_poly()
 
         fq_poly_randtest(f1, state, length, ctx);
 
-        fq_poly_get_ZZ_pEX(zzpex, f1);
+        fq_poly_get_ZZ_pEX(zzpex, f1, ctx);
         fq_poly_set_ZZ_pEX(f2, zzpex, ctx);
           
         result = fq_poly_equal(f1, f2, ctx);
@@ -417,7 +417,7 @@ int test_zz_pE_to_fq()
 
         fq_randtest(f1, state, ctx);
 
-        fq_get_zz_pE(zzpe, f1);
+        fq_get_zz_pE(zzpe, f1, ctx);
         fq_set_zz_pE(f2, zzpe, ctx);
           
         result = fq_equal(f1, f2, ctx);
@@ -488,7 +488,7 @@ int test_zz_pEX_to_fq_poly()
 
         fq_poly_randtest(f1, state, length, ctx);
 
-        fq_poly_get_zz_pEX(zzpex, f1);
+        fq_poly_get_zz_pEX(zzpex, f1, ctx);
         fq_poly_set_zz_pEX(f2, zzpex, ctx);
           
         result = fq_poly_equal(f1, f2, ctx);

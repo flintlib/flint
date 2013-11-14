@@ -43,10 +43,6 @@
 #include <NTL/lzz_pEX.h>
 #include <NTL/vec_ZZ.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -56,6 +52,9 @@ extern "C" {
 
 NTL_CLIENT
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* 
    Converts an NTL ZZ to an fmpz_t.
@@ -115,7 +114,7 @@ void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op);
 /*
   Converts an fq_t to an NTL ZZ_pE.
 */
-void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op);
+void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL ZZ_pE to an fq_t.
@@ -126,7 +125,7 @@ void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx);
 /*
   Converts an fq_poly_t to an NTL ZZ_pEX.
 */
-void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op);
+void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL ZZ_pEX to an fq_poly_t.
@@ -146,7 +145,7 @@ void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op);
 /*
   Converts an fq_t to an NTL zz_pE.
 */
-void fq_get_zz_pE(zz_pE& rop, const fq_t op);
+void fq_get_zz_pE(zz_pE& rop, const fq_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL zz_pE to an fq_t.
@@ -157,7 +156,7 @@ void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx);
 /*
   Converts an fq_poly_t to an NTL zz_pEX.
 */
-void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op);
+void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*
   Converts an NTL zz_pEX to an fq_poly_t.

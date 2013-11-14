@@ -268,7 +268,7 @@ void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op)
     }
 }
 
-void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op)
+void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op, const fq_ctx_t ctx)
 {
     ZZ_pX p;
 
@@ -318,7 +318,7 @@ void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx)
 }
 
 
-void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op)
+void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
     const slong len = op->length;
 
@@ -335,12 +335,12 @@ void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op)
 
         for (i = 0, ap = rop.rep.elts(); i < len; i++, ap++)
         {
-            fq_get_ZZ_pE(*ap, op->coeffs + i);
+            fq_get_ZZ_pE(*ap, op->coeffs + i, ctx);
         }
     }
 }
 
-void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, fq_ctx_t ctx)
+void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, const fq_ctx_t ctx)
 {
     const slong len = deg(op) + 1;
 
@@ -365,7 +365,7 @@ void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, fq_ctx_t ctx)
 }
 
 /* ----------------------------------------- */
-void fq_get_zz_pE(zz_pE& rop, const fq_t op)
+void fq_get_zz_pE(zz_pE& rop, const fq_t op, const fq_ctx_t ctx)
 {
     zz_pX p;
 
@@ -415,7 +415,7 @@ void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx)
 }
 
 
-void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op)
+void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
     const slong len = op->length;
 
@@ -432,7 +432,7 @@ void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op)
 
         for (i = 0, ap = rop.rep.elts(); i < len; i++, ap++)
         {
-            fq_get_zz_pE(*ap, op->coeffs + i);
+            fq_get_zz_pE(*ap, op->coeffs + i, ctx);
         }
     }
 }

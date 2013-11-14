@@ -80,20 +80,38 @@ void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op)
 
     Converts an NTL \code{ZZ_pX} to an \code{fmpz_mod_poly_t}.
 
-void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op)
+void fq_get_ZZ_pE(ZZ_pE& rop, const fq_t op, const fq_ctx_t ctx)
 
      Converts an \code{fq_t} to an NTL \code{ZZ_pE}.  Requires that
      \code{ZZ_pE::init()} has already been called.
 
-void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op)
+void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx)
 
      Converts and NTL \code{ZZ_pE} to an \code{fq_t}.
 
-void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op)
+void fq_poly_get_ZZ_pEX(ZZ_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx)
 
      Converts an \code{fq_poly_t} to an NTL \code{ZZ_pEX}.  Requires
      that \code{ZZ_pE::init()} has already been called.
 
-void fq_poly_set_ZZ_pE(fq_poly_t rop, const ZZ_pE& op)
+void fq_poly_set_ZZ_pE(fq_poly_t rop, const ZZ_pE& op, const fq_ctx_t ctx)
 
      Converts and NTL \code{ZZ_pEX} to an \code{fq_poly_t}.
+
+void fq_get_zz_pE(zz_pE& rop, const fq_t op, const fq_ctx_t ctx)
+
+     Converts an \code{fq_t} to an NTL \code{zz_pE}.  Requires that
+     \code{zz_pE::init()} has already been called.
+
+void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx)
+
+     Converts and NTL \code{zz_pE} to an \code{fq_t}.
+
+void fq_poly_get_zz_pEX(zz_pEX& rop, const fq_poly_t op, const fq_ctx_t ctx)
+
+     Converts an \code{fq_poly_t} to an NTL \code{zz_pEX}.  Requires
+     that \code{zz_pE::init()} has already been called.
+
+void fq_poly_set_zz_pE(fq_poly_t rop, const zz_pE& op, const fq_ctx_t ctx)
+
+     Converts and NTL \code{zz_pEX} to an \code{fq_poly_t}.
