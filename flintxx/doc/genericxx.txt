@@ -205,7 +205,7 @@ static some_expression_srcref some_expression_srcref::make(const ctype*)
 
 FLINT_DEFINE_GET2(name, totype, fromtype1, fromtype2, eval)
 
-    Speciallise a getter called \code{name}, which takes arguments \code{e1} of
+    Specialise a getter called \code{name}, which takes arguments \code{e1} of
     type \code{fromtype1} and \code{e2} of type \code{fromtype2}. It returns
     \code{totype} by executing \code{eval}.
 

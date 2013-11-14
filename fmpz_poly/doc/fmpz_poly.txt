@@ -1580,7 +1580,7 @@ void _fmpz_poly_preinvert(fmpz * B_inv, const fmpz * B, slong n)
 
     Given a monic polynomial \code{B} of length \code{n}, compute a precomputed
     inverse \code{B_inv} of length \code{n} for use in the functions below. No 
-    aliasing of B and B_inv is permitted. We assume \code{n} is not zero.
+    aliasing of B and $B_inv$ is permitted. We assume \code{n} is not zero.
 
 void fmpz_poly_preinvert(fmpz_poly_t B_inv, const fmpz_poly_t B)
 

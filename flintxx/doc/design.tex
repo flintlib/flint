@@ -12,10 +12,13 @@
 
 \section*{Introduction}
 
-This note describes the design I plan to implement this summer for a c++
+  This note describes the design I plan to implement this summer for a c++
 wrapper for the FLINT library\footnote{\texttt{www.flintlib.org}}.
 
 Any kinds of comments are appreciated.
+
+\emph{Added after the summer}: this document turned out to be reasonably
+accurate. I updated it slightly to reflect what was actually done.
 
 \paragraph{Overview}
 In first approximation, FLINT implements arithmetic operations on and
@@ -243,6 +246,11 @@ use the highest-priority match.
 This latter technique has the desirable property of being easy to
 understand and use by non-experts.
 
+\section*{Future plans}
+
+The following sections contain deliberations about things which I did not
+manage to work on this summer.
+
 \subsection*{Class structure for (FLINT) generics}
 
 Corresponding to any ring (or sometimes module),
@@ -338,13 +346,7 @@ nmod\_poly\_mat & \texttt{matrix<poly<PIquotient<ulong>>>}
 \label{tab:specialised-types}
 \end{table}
 
-\section*{FLINT examples}
-
-\paragraph{Ternary add for \texttt{fmpz}}
-
-\paragraph{Use of context in \texttt{padic}}
-
-\paragraph{Wrapper class with additional member functions}
+\subsection*{Wrapper class with additional member functions}
 
 The above design already allows for members on every type. But suppose I
 want to add a class \texttt{Tmpz} which behaves much

@@ -223,9 +223,10 @@ public:
 };
 } // detail
 
+// Temporary merging isn't really any use here. On the other hand, it does
+// not seem to hurt. Let's leave this for now. -- Tom Bachmann (15/10/2013)
 #if 0
 namespace traits {
-// Temporary merging isn't really any use here
 template<> struct use_temporary_merging<nmodxx> : mp::false_ { };
 } // traits
 #endif

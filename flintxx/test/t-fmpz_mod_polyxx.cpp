@@ -151,7 +151,6 @@ test_functions()
     fmpz_mod_polyxx g(M), res(M);
 
     g.set_coeff(5, 15);
-    //tassert(g.max_bits() == 4);
 
     g.truncate(3);
     tassert(g.is_zero());
@@ -173,7 +172,6 @@ test_functions()
     g.zero_coeffs(14, 15);
     tassert(g.get_coeff(14) == 0);
 
-    //tassert(g == fmpz_mod_polyxx::bit_unpack(g.bit_pack(5u), 5u, ctx));
 
     // multiplication, division, modulo tested in arithmetic
 
@@ -204,7 +202,6 @@ test_functions()
     lift = "5  1 1 1 1 1";
     res = lift;
     tassert(res.derivative().to<fmpz_polyxx>().to_string() == "4  1 2 3 4");
-    //tassert(g.integral().derivative() == g);
 
     tassert(f.divrem(g) == ltuple(f / g, f % g));
     tassert(f.divrem_basecase(g) == f.divrem(g));
@@ -238,13 +235,6 @@ test_functions()
     tassert(res == R*f + S*g && res == gcd(f, g));
     tassert(f.xgcd(g) == f.xgcd_euclidean(g));
 
-}
-
-// test stuff which we should get automatically - addmul, references etc
-void
-test_extras()
-{
-    // TODO
 }
 
 bool equiv_fac(const fmpz_mod_poly_factorxx& fac1,
@@ -393,7 +383,6 @@ main()
     test_conversion();
     test_arithmetic();
     test_functions();
-    test_extras();
     test_factoring();
     test_randomisation();
     test_radix();

@@ -35,7 +35,6 @@
 
 namespace flint {
 namespace rules {
-// TODO document these
 struct no_op
 {
     template<class U>
