@@ -194,10 +194,10 @@ build/test:
 build/interfaces:
 	mkdir -p build/interfaces
 
-build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
+build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp NTL-interface.h
 	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
+build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
