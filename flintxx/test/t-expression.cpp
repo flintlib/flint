@@ -357,7 +357,7 @@ test_cstyle_io()
     tassert(read(f, d) > 0);
     tassert(d == c);
     d = WORD(0);
-    std::fscanf(f, "\n");
+    tassert(std::fscanf(f, "\n") == 0);
     fclose(f);
     tassert(std::remove("expression_test") == 0);
 #endif
