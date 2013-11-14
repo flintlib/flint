@@ -48,7 +48,7 @@ int parse_fmt(int * floating, const char * fmt)
       args++;
       fmt++; /* skip * */
    } else
-      while (isdigit(fmt[0]))
+      while (isdigit((unsigned char) fmt[0]))
          fmt++; /* skip width */
 
    if (fmt[0] == '.')
@@ -59,7 +59,7 @@ int parse_fmt(int * floating, const char * fmt)
          args++;
          fmt++; /* skip * */
       } else
-         while (isdigit(fmt[0]))
+         while (isdigit((unsigned char) fmt[0]))
             fmt++; /* skip precision */
    } 
 

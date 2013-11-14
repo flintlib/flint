@@ -177,7 +177,7 @@ fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
                             slong len);
 
 void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
-                        const fmpz_poly_mat_t * factors, slong n);
+                        fmpz_poly_mat_t * const factors, slong n);
 
 /* Evaluation ****************************************************************/
 
