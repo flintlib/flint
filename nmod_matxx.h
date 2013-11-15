@@ -544,10 +544,10 @@ FLINT_DEFINE_FOURARY_EXPR_COND4(CRT_op, fmpz_matxx,
         fmpz_mat_CRT_ui(to._mat(), e1._mat(), e2._fmpz(), e3._mat(), e4))
 
 FLINT_DEFINE_BINARY_EXPR2(multi_CRT_op, fmpz_matxx, nmod_mat_vector, bool,
-        fmpz_mat_multi_CRT_ui(to._mat(), e1._data(), e1.size(), e2))
+        fmpz_mat_multi_CRT_ui(to._mat(), (nmod_mat_t * const) e1._data(), e1.size(), e2))
 FLINT_DEFINE_THREEARY_EXPR(multi_CRT_precomp_op, fmpz_matxx,
         nmod_mat_vector, fmpz_combxx, bool,
-        fmpz_mat_multi_CRT_ui_precomp(to._mat(), e1._data(), e1.size(),
+        fmpz_mat_multi_CRT_ui_precomp(to._mat(), (nmod_mat_t * const) e1._data(), e1.size(),
             e2._comb(), e2._temp(), e3))
 } // rules
 } // flint

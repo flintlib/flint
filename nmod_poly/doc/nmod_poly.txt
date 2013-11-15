@@ -1616,6 +1616,8 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
     respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$ 
     and $\len(T) \leq \len(A) - \len(G)$.
 
+    Both $S$ and $T$ must have space for at least $2$ coefficients.
+
     No aliasing of input and output operands is permitted.
 
 void nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,

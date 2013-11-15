@@ -68,25 +68,25 @@ int flint_sscanf(const char * s, const char * str, ...)
          {
             wu = (ulong *) va_arg(ap, ulong *);
             ret += sscanf(s, WORD_FMT "x", wu);
-            s += sprintf(str2, WORD_FMT "x", *wu);
+            s += sprintf(s2, WORD_FMT "x", *wu);
             s += n - 3;
          } else if (str[2] == 'u')
          {
             wu = (ulong *) va_arg(ap, ulong *);
             ret += sscanf(s, WORD_FMT "u", wu);
-            s += sprintf(str2, WORD_FMT "u", *wu);
+            s += sprintf(s2, WORD_FMT "u", *wu);
             s += n - 3;
          } else if (str[2] == 'd')
          {
             w = (slong *) va_arg(ap, slong *);
             ret += sscanf(s, WORD_FMT "d", w);
-            s += sprintf(str2, WORD_FMT "d", *w);
+            s += sprintf(s2, WORD_FMT "d", *w);
             s += n - 3;
          } else
          {
             w = (slong *) va_arg(ap, slong *);
             ret += sscanf(s, WORD_FMT "d", w);
-            s += sprintf(str2, WORD_FMT "d", *w);
+            s += sprintf(s2, WORD_FMT "d", *w);
             s += n - 2;
          }
          break;

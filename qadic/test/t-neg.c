@@ -92,7 +92,7 @@ main(void)
 
         qadic_t a, b, c1, c2;
 
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "a", PADIC_SERIES);

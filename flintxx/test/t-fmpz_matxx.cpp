@@ -54,18 +54,6 @@ test_init()
             tassert(eye.at(i, j) == int(i == j));
 }
 
-void
-test_assignment()
-{
-    // TODO
-}
-
-void
-test_conversion()
-{
-    // TODO
-}
-
 template<class Expr>
 bool has_explicit_temporaries(const Expr&)
 {
@@ -304,8 +292,6 @@ main()
     std::cout << "fmpz_matxx....";
 
     test_init();
-    test_assignment();
-    test_conversion();
     test_arithmetic();
     test_functions();
     test_extras();

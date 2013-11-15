@@ -28,10 +28,12 @@
 // need not match (even for equality) as long as the operations can be performed
 // on underlying types.
 
-// TODO instantiate IGNORED_TYPE somewhere?
-
 #ifndef FLINTXX_LTUPLE_H
 #define FLINTXX_LTUPLE_H
+
+#ifndef FLINT_LTUPLE_PLACEHOLDER_NAME
+#define FLINT_LTUPLE_PLACEHOLDER_NAME _
+#endif
 
 #include "expression.h"
 #include "tuple.h"
@@ -409,6 +411,14 @@ ltupleref(T& t, U& u, V& v, W& w)
             detail::INSTANTIATE_FROM_TUPLE(),
             mp::make_tuple<T&, U&, V&, W&>::make(t, u, v, w));
 }
+
+// static placeholder
+static detail::IGNORED_TYPE FLINT_LTUPLE_PLACEHOLDER_NAME;
+
+namespace detail {
+void remove_compiler_warning(
+        detail::IGNORED_TYPE* = &FLINT_LTUPLE_PLACEHOLDER_NAME);
+} // detail
 } // flint
 
 #endif

@@ -36,19 +36,28 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_t p;
     double beta;
 
+    fmpz_init(p);
+    fmpz_set(p, &poly->p);
+    fmpz_mod_poly_init(v, p);
+
+    fmpz_mod_poly_make_monic(v, poly);
+    
     n = fmpz_mod_poly_degree(poly);
+    if (n == 1)
+    {
+        fmpz_mod_poly_factor_insert (res, v, 1);
+        (*degs)[0]= 1;
+        fmpz_mod_poly_clear (v);
+        return;
+    }
     beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);
 
     /* initialization */
-    fmpz_init(p);
-    fmpz_set(p, &poly->p);
-
     fmpz_mod_poly_init(f, p);
     fmpz_mod_poly_init(g, p);
     fmpz_mod_poly_init(s, p);
-    fmpz_mod_poly_init(v, p);
     fmpz_mod_poly_init(tmp, p);
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct))))
@@ -66,8 +75,6 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
         fmpz_mod_poly_init(H[i], p);
         fmpz_mod_poly_init(I[i], p);
     }
-
-    fmpz_mod_poly_make_monic(v, poly);
 
     /* compute baby steps: h[i]=x^{p^i}mod v */
     fmpz_mod_poly_set_coeff_ui(h[0], 1, 1);

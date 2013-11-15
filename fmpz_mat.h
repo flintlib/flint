@@ -302,10 +302,10 @@ fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
 
 void
 fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
-    const nmod_mat_t * residues, slong nres,
+    nmod_mat_t * const residues, slong nres,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
-void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, const nmod_mat_t * residues,
+void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);
 
 #ifdef __cplusplus
