@@ -24,9 +24,18 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <stdlib.h>
+#include <stdio.h>
+
+#undef ulong
+
 #include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -370,7 +379,7 @@ main(void)
     }
 
     flint_randclear(state);
-
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

@@ -24,7 +24,17 @@
 
 ******************************************************************************/
 
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <math.h>
+
+#undef ulong
+
+#include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "fmpz_mod_poly_factor.h"
 
 void
