@@ -71,8 +71,8 @@ FLINT_DEFINE_BINOP(xgcd_hgcd)
 FLINT_DEFINE_THREEARY(compose_mod)
 FLINT_DEFINE_THREEARY(compose_mod_brent_kung)
 FLINT_DEFINE_THREEARY(compose_mod_horner)
-FLINT_DEFINE_THREEARY(div_newton21_preinv)
-FLINT_DEFINE_THREEARY(divrem_newton21_preinv)
+FLINT_DEFINE_THREEARY(div_newton_n_preinv)
+FLINT_DEFINE_THREEARY(divrem_newton_n_preinv)
 FLINT_DEFINE_THREEARY(exp_series_monomial)
 FLINT_DEFINE_THREEARY(log_series_monomial)
 FLINT_DEFINE_THREEARY(mulmod)
@@ -304,8 +304,8 @@ public:
     FLINTXX_DEFINE_MEMBER_3OP(compose_series_brent_kung)
     FLINTXX_DEFINE_MEMBER_3OP(compose_series_divconquer)
     FLINTXX_DEFINE_MEMBER_3OP(compose_series_horner)
-    FLINTXX_DEFINE_MEMBER_3OP(div_newton21_preinv)
-    FLINTXX_DEFINE_MEMBER_3OP(divrem_newton21_preinv)
+    FLINTXX_DEFINE_MEMBER_3OP(div_newton_n_preinv)
+    FLINTXX_DEFINE_MEMBER_3OP(divrem_newton_n_preinv)
     FLINTXX_DEFINE_MEMBER_3OP(div_series)
     FLINTXX_DEFINE_MEMBER_3OP(mulhigh)
     FLINTXX_DEFINE_MEMBER_3OP(mulhigh_classical)
@@ -610,14 +610,14 @@ FLINT_DEFINE_BINARY_EXPR_COND2(divided_by, nmod_polyxx,
         NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
         nmod_poly_div_divconquer(to._poly(), e1._poly(), e2._poly()))
 
-FLINT_DEFINE_THREEARY_EXPR_COND3(div_newton21_preinv_op, nmod_polyxx,
+FLINT_DEFINE_THREEARY_EXPR_COND3(div_newton_n_preinv_op, nmod_polyxx,
         NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
-        nmod_poly_div_newton21_preinv(to._poly(),
+        nmod_poly_div_newton_n_preinv(to._poly(),
             e1._poly(), e2._poly(), e3._poly()))
-FLINT_DEFINE_THREEARY_EXPR_COND3(divrem_newton21_preinv_op,
+FLINT_DEFINE_THREEARY_EXPR_COND3(divrem_newton_n_preinv_op,
         rdetail::nmod_polyxx_pair,
         NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S, NMOD_POLYXX_COND_S,
-        nmod_poly_divrem_newton21_preinv(to.template get<0>()._poly(),
+        nmod_poly_divrem_newton_n_preinv(to.template get<0>()._poly(),
             to.template get<1>()._poly(), e1._poly(), e2._poly(), e3._poly()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(rem_basecase_op, nmod_polyxx,

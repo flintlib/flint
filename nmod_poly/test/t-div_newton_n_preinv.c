@@ -24,9 +24,18 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <stdlib.h>
+#include <stdio.h>
+
+#undef ulong
+
 #include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -38,7 +47,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    flint_printf("div_newton21_preinv....");
+    flint_printf("div_newton_n_preinv....");
     fflush(stdout);
 
     /* Check result of divrem */
@@ -66,7 +75,7 @@ main(void)
 
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
-        nmod_poly_div_newton21_preinv(q, a, b, binv);
+        nmod_poly_div_newton_n_preinv(q, a, b, binv);
         nmod_poly_divrem (test, r, a, b);
 
         result = (nmod_poly_equal(q, test));
@@ -112,8 +121,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_div_newton21_preinv(q, a, b, binv);
-        nmod_poly_div_newton21_preinv(a, a, b, binv);
+        nmod_poly_div_newton_n_preinv(q, a, b, binv);
+        nmod_poly_div_newton_n_preinv(a, a, b, binv);
 
         result = (nmod_poly_equal(a, q));
         if (!result)
@@ -155,8 +164,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_div_newton21_preinv(q, a, b, binv);
-        nmod_poly_div_newton21_preinv(b, a, b, binv);
+        nmod_poly_div_newton_n_preinv(q, a, b, binv);
+        nmod_poly_div_newton_n_preinv(b, a, b, binv);
 
         result = (nmod_poly_equal(b, q));
         if (!result)
@@ -198,8 +207,8 @@ main(void)
         nmod_poly_reverse (binv, b, b->length);
         nmod_poly_inv_series (binv, binv, b->length);
 
-        nmod_poly_div_newton21_preinv(q, a, b, binv);
-        nmod_poly_div_newton21_preinv(binv, a, b, binv);
+        nmod_poly_div_newton_n_preinv(q, a, b, binv);
+        nmod_poly_div_newton_n_preinv(binv, a, b, binv);
 
         result = (nmod_poly_equal(binv, q));
         if (!result)

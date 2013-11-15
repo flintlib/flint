@@ -37,34 +37,30 @@
 
 #include "nmod_poly.h"
 
-void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong * const *degs)
+int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {
-    nmod_poly_t f, g, s, v, vinv, reducedH0, tmp;
+
+    nmod_poly_t f, s, v, vinv, reducedH0, tmp;
     nmod_poly_t *h, *H, *I;
-    slong i, j, l, m, n, index, d;
-    nmod_mat_t HH, HHH;
+    slong i, j, l, m, n, d;
     double beta;
+    n = nmod_poly_degree(poly);
+
+    if (n < 2)
+        return 1;
+
+    if (!nmod_poly_is_squarefree(poly))
+        return 0;
 
     n = nmod_poly_degree(poly);
-    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
-
-    nmod_poly_make_monic(v, poly);
-    if (n == 1)
-    {
-        nmod_poly_factor_insert (res, v, 1);
-        (*degs)[0]= 1;
-        nmod_poly_clear (v);
-        return;
-    }
     beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow (n, beta));
     m = ceil(0.5 * n / l);
 
     /* initialization */
     nmod_poly_init_preinv(f, poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(g, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(s, poly->mod.n, poly->mod.ninv);
+    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(vinv, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(reducedH0, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(tmp, poly->mod.n, poly->mod.ninv);
@@ -85,54 +81,28 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
         nmod_poly_init_preinv(I[i], poly->mod.n, poly->mod.ninv);
     }
 
+    nmod_poly_make_monic(v, poly);
+
     nmod_poly_reverse(vinv, v, v->length);
     nmod_poly_inv_series(vinv, vinv, v->length);
     /* compute baby steps: h[i]=x^{p^i}mod v */
     nmod_poly_set_coeff_ui(h[0], 1, 1);
-    nmod_poly_powmod_x_ui_preinv (h[1], poly->mod.n, v, vinv);
-    if (FLINT_BIT_COUNT (poly->mod.n) > ((n_sqrt (v->length-1)+1)*3)/4)
-    {
-        nmod_mat_init (HH, n_sqrt (v->length-1) + 1, v->length-1, poly->mod.n);
-        nmod_poly_precompute_matrix (HH, h[1], v, vinv);
-        for (i = 2; i < l + 1; i++)
-            nmod_poly_compose_mod_brent_kung_precomp_preinv(h[i], h[i-1],
-                                                            HH, v, vinv);
-        nmod_mat_clear (HH);
-    }
-    else
-    {
-        for (i = 2; i < l + 1; i++)
-            nmod_poly_powmod_ui_binexp_preinv(h[i], h[i-1], poly->mod.n,
-                                              v, vinv);
-    }
+    for (i = 1; i < l + 1; i++)
+        nmod_poly_powmod_ui_binexp_preinv(h[i], h[i - 1], poly->mod.n, v, vinv); /* may be for large l use compose_mod instead */
 
     /* compute coarse distinct-degree factorisation */
-    index = 0;
     nmod_poly_set(s, v);
     nmod_poly_set(H[0], h[l]);
     nmod_poly_set(reducedH0, H[0]);
-    nmod_mat_init (HH, n_sqrt (v->length-1) + 1, v->length-1, poly->mod.n);
-    nmod_poly_precompute_matrix (HH, reducedH0, s, vinv);
     d= 1;
     for (j = 0; j < m; j++)
     {
         /* compute giant steps: H[j]=x^{p^(lj)}mod s */
         if (j > 0)
         {
-            if (I[j-1]->length > 1)
-            {
-                _nmod_poly_reduce_matrix_mod_poly (HHH, HH, s);
-                nmod_mat_clear (HH);
-                nmod_mat_init_set (HH, HHH);
-                nmod_mat_clear (HHH);
-                nmod_poly_rem (reducedH0, reducedH0, s);
-                nmod_poly_rem (tmp, H[j-1], s);
-                nmod_poly_compose_mod_brent_kung_precomp_preinv(H[j], tmp, HH,
-                                                                s, vinv);
-            }
-            else
-                nmod_poly_compose_mod_brent_kung_precomp_preinv(H[j], H[j-1],
-                                                                HH, s, vinv);
+            nmod_poly_rem (reducedH0, reducedH0, s);
+            nmod_poly_rem (tmp, H[j-1], s);
+            nmod_poly_compose_mod_brent_kung_preinv(H[j], tmp, reducedH0, s, vinv);
         }
         /* compute interval polynomials */
         nmod_poly_set_coeff_ui(I[j], 0, 1);
@@ -148,61 +118,32 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
         nmod_poly_gcd(I[j], s, I[j]);
         if (I[j]->length > 1)
         {
-            nmod_poly_remove(s, I[j]);
-            nmod_poly_reverse (vinv, s, s->length);
-            nmod_poly_inv_series (vinv, vinv, s->length);
-        }
-        if (s->length-1 < 2*d)
-        {
-            break;
-        }
-    }
-    if (s->length > 1)
-    {
-        nmod_poly_factor_insert(res, s, 1);
-        (*degs)[index++] = s->length - 1;
-    }
+            nmod_poly_clear(f);
+            nmod_poly_clear(s);
+            nmod_poly_clear(reducedH0);
+            nmod_poly_clear(v);
+            nmod_poly_clear(vinv);
+            nmod_poly_clear(tmp);
 
-    /* compute fine distinct-degree factorisation */
-    for (j = 0; j < m; j++)
-    {
-        if (I[j]->length-1 > (j+1)*l || j == 0)
-        {
-            nmod_poly_set(g, I[j]);
-            for (i = l - 1; i >= 0 && (g->length > 1); i-- )
+            for (i = 0; i < l + 1; i++)
+                nmod_poly_clear(h[i]);
+            for (i = 0; i < m; i++)
             {
-                /* compute f^{[l*(j+1)-i]} */
-                nmod_poly_sub(tmp, H[j], h[i]);
-                nmod_poly_gcd(f, g, tmp);
-                if (f->length > 1)
-                {
-                    /* insert f^{[l*(j+1)-i]} into res */
-                    nmod_poly_make_monic(f, f);
-                    nmod_poly_factor_insert(res, f, 1);
-                    (*degs)[index++] = l * (j + 1) - i;
-
-                    nmod_poly_remove(g, f);
-                }
+                nmod_poly_clear(H[i]);
+                nmod_poly_clear(I[i]);
             }
-        }
-        else if (I[j]->length > 1)
-        {
-            nmod_poly_make_monic(I[j], I[j]);
-            nmod_poly_factor_insert(res, I[j], 1);
-            (*degs)[index++] = I[j]->length-1;
+            flint_free (h);
+
+            return 0;
         }
     }
 
-    /* cleanup */
     nmod_poly_clear(f);
-    nmod_poly_clear(g);
     nmod_poly_clear(s);
     nmod_poly_clear(reducedH0);
     nmod_poly_clear(v);
     nmod_poly_clear(vinv);
     nmod_poly_clear(tmp);
-
-    nmod_mat_clear (HH);
 
     for (i = 0; i < l + 1; i++)
         nmod_poly_clear(h[i]);
@@ -211,5 +152,7 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
         nmod_poly_clear(H[i]);
         nmod_poly_clear(I[i]);
     }
-    flint_free(h);
+    flint_free (h);
+
+    return 1;
 }

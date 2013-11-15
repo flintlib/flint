@@ -25,32 +25,40 @@
 
 ******************************************************************************/
 
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <stdlib.h>
+
+#undef ulong
+
 #include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
                                      mp_srcptr B, slong lenB, mp_srcptr Binv,
                                      slong lenBinv, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
     mp_ptr Arev;
 
-    Arev = _nmod_vec_init(lenA);
+    Arev = _nmod_vec_init(lenQ);
+    _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
 
-    _nmod_poly_reverse(Arev, A, lenA, lenA);
-
-    _nmod_poly_mullow(Q, Arev, lenA, Binv, lenBinv, lenQ, mod);
+    _nmod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN (lenQ,lenBinv), lenQ, mod);
 
     _nmod_poly_reverse(Q, Q, lenQ, lenQ);
 
     _nmod_vec_clear(Arev);
 }
 
-void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
+void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                     const nmod_poly_t B, const nmod_poly_t Binv)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
@@ -70,6 +78,11 @@ void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
         return;
     }
 
+    if (lenA > 2*lenB-2)
+    {
+        flint_printf ("Exception (nmod_poly_div_newton_preinv).\n");
+    }
+
     if (Q == A || Q == B || Q == Binv)
     {
         q = flint_malloc(lenQ * sizeof(mp_limb_t));
@@ -80,7 +93,7 @@ void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
         q = Q->coeffs;
     }
 
-    _nmod_poly_div_newton21_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
+    _nmod_poly_div_newton_n_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
                                     Binv->coeffs, lenBinv, B->mod);
 
     if (Q == A || Q == B || Q == Binv)
