@@ -800,6 +800,29 @@ fq_nmod_poly_powmod_fmpz_sliding_preinv(fq_nmod_poly_t res,
     zero, then an "optimum" size will be selected automatically base
     on \code{e}.
 
+void
+_fq_nmod_poly_powmod_x_fmpz_preinv(fq_nmod_struct * res, const fmpz_t e,
+                              const fq_nmod_struct * f, slong lenf,
+                              const fq_nmod_struct * finv, slong lenfinv,
+                              const fq_nmod_ctx_t ctx)
+
+    Sets \code{res} to \code{x} raised to the power \code{e} modulo \code{f},
+    using sliding window exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 2}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+fq_nmod_poly_powmod_x_fmpz_preinv(fq_nmod_poly_t res, const fmpz_t e,
+                             const fq_nmod_poly_t f, const fq_nmod_poly_t finv,
+                             const fq_nmod_ctx_t ctx)
+
+    Sets \code{res} to \code{x} raised to the power \code{e}
+    modulo \code{f}, using sliding window exponentiation. We require
+    \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
+    \code{f}.
+
 *******************************************************************************
 
     Shifting

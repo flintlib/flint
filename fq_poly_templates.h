@@ -528,7 +528,18 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, poly_t) res,
                                              const TEMPLATE(T, ctx_t) ctx);
               
 
-                                         
+void
+_TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, struct) * res, const fmpz_t e,
+                                        const TEMPLATE(T, struct) * f, slong lenf,
+                                        const TEMPLATE(T, struct)* finv, slong lenfinv,
+                                        const TEMPLATE(T, ctx_t) ctx);
+                     
+void
+TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, poly_t) res, const fmpz_t e,
+                                       const TEMPLATE(T, poly_t) f,
+                                       const TEMPLATE(T, poly_t) finv,
+                                       const TEMPLATE(T, ctx_t) ctx);
+
 /*  Shifting  ****************************************************************/
 
 void _TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, long n, const TEMPLATE(T, ctx_t) ctx);
