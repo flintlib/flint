@@ -154,7 +154,7 @@ main()
 
     mpfr_free_cache();
     flint_randclear(state);
-
+    flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

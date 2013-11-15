@@ -80,7 +80,7 @@ int main(void)
         _perm_clear(c);
     }
     flint_randclear(state);
-
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

@@ -107,7 +107,7 @@ int main(void)
 
    flint_randclear(state);
    gmp_randclear(st);
-
+   flint_cleanup();
    flint_printf("PASS\n");
    return 0;
 }
