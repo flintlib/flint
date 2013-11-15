@@ -122,14 +122,15 @@ fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
 
     if (lenf == 0)
     {
-        flint_printf("Exception: fmpz_mod_poly_powmod_xp_preinv: divide by zero\n");
+        flint_printf("Exception (fmpz_mod_poly_powmod_x_fmpz_preinv)."
+                     "Divide by zero\n");
         abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception: fmpz_mod_poly_powmod_xp_preinv: "
-               " negative exp not implemented\n");
+        flint_printf("Exception (fmpz_mod_poly_powmod_x_fmpz_preinv)."
+                     "Negative exp not implemented\n");
         abort();
     }
 

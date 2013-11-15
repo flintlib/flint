@@ -97,14 +97,15 @@ fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
 
     if (lenf == 0)
     {
-        flint_printf("Exception: fmpz_mod_poly_powmod_preinv: divide by zero\n");
+        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp_preinv)."
+                     "Divide by zero.\n");
         abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception: fmpz_mod_poly_powmod_preinv: "
-               " negative exp not implemented\n");
+        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp_preinv)."
+                     "Negative exp not implemented\n");
         abort();
     }
 
@@ -126,13 +127,13 @@ fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
 
         if (exp <= 2)
         {
-            if (exp == 0UL)
+            if (exp == UWORD (0))
             {
                 fmpz_mod_poly_fit_length(res, 1);
                 fmpz_one(res->coeffs);
                 _fmpz_mod_poly_set_length(res, 1);
             }
-            else if (exp == 1UL)
+            else if (exp == UWORD (1))
             {
                 fmpz_mod_poly_set(res, poly);
             }
