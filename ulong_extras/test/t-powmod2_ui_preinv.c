@@ -79,7 +79,7 @@ int main(void)
    }
 
    flint_randclear(state);
-
+   flint_cleanup();
    flint_printf("PASS\n");
    return 0;
 }

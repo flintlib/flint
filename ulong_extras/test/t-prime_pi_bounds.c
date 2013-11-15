@@ -77,6 +77,7 @@ int main(void)
     check(UWORD(100000000000000000), UWORD(2623557157654233));
 #endif
 
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

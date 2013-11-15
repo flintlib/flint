@@ -91,8 +91,8 @@ int main(void)
         n_primes_clear(iter);
     }
 
-
     flint_randclear(state);
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

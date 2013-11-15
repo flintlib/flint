@@ -232,7 +232,7 @@ main(void)
     mpz_clear(mn2);
 
     flint_randclear(state);
-    
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

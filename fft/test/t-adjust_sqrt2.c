@@ -60,7 +60,6 @@ void ref_adjust_sqrt2(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t limbs, 
 int
 main(void)
 {
-  /*
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1, * temp;
@@ -132,8 +131,7 @@ main(void)
     mpz_clear(mn1);
 
     flint_randclear(state);
-    
+    flint_cleanup();
     flint_printf("PASS\n");
-  */
     return 0;
 }
