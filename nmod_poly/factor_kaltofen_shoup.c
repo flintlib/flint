@@ -34,16 +34,23 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     slong i, j, k, l, res_num, dist_deg_num;
     slong *degs;
 
+    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
+
+    nmod_poly_make_monic(v, poly);
+    
+    if (poly->length <= 2)
+    {
+        nmod_poly_factor_insert (res, v, 1);
+        nmod_poly_clear (v);        
+        return;        
+    }
+    
     if (!(degs = flint_malloc(nmod_poly_degree(poly) * sizeof(slong))))
     {
         flint_printf("Exception (nmod_poly_factor_kaltofen_shoup): \n");
         flint_printf("Not enough memory.\n");
         abort();
     }
-
-    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
-
-    nmod_poly_make_monic(v, poly);
 
     /* compute squarefree factorisation */
     nmod_poly_factor_init(sq_free);
