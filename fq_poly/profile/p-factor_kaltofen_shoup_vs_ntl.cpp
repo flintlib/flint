@@ -35,7 +35,7 @@
 
 #include <NTL/ZZ_pEXFactoring.h>
 
-#define nalgs 1
+#define nalgs 2
 #define ncases 5
 #define cpumin 2
 
@@ -48,7 +48,7 @@ main(int argc, char** argv)
     fmpz_t p, temp;
     ZZ prime;
     ZZ_pX mod;
-    fq_poly_t f, g;
+    fq_poly_t f;
     fq_ctx_t ctx;
     fmpz_mod_poly_t fmod;
     
@@ -82,7 +82,6 @@ main(int argc, char** argv)
     fq_ctx_init_modulus(ctx, p, ext, fmod, "a");
     
     fq_poly_init(f, ctx);
-    fq_poly_init(g, ctx);
 
     for (c = 0; c < nalgs; c++)
     {
@@ -101,10 +100,7 @@ main(int argc, char** argv)
            Construct random elements of fq
         */
         {
-            fq_poly_randtest_irreducible(f, state, len + 1, ctx);
-            fq_poly_randtest_irreducible(g, state, len + 2, ctx);
-            fq_poly_mul(f, f, g, ctx);
-            fq_poly_make_monic(f, f, ctx);
+            fq_poly_randtest_monic(f, state, len, ctx);
             fq_poly_get_ZZ_pEX(nf, f, ctx);
         }
         
@@ -124,10 +120,10 @@ main(int argc, char** argv)
             abort();
         }
 
-        /*timeit_start(t[1]);
+        timeit_start(t[1]);
         for (l = 0; l < loops; l++)
             v = CanZass(nf);
-            timeit_stop(t[1]);*/
+        timeit_stop(t[1]);
 
         for (c = 0; c < nalgs; c++)
             if (t[c]->cpu <= cpumin)
@@ -149,7 +145,6 @@ main(int argc, char** argv)
     printf("\n");
         
     fq_poly_clear(f, ctx);
-    fq_poly_clear(g, ctx);
     fmpz_mod_poly_clear(fmod);
     fq_ctx_clear(ctx);
     fmpz_clear(p);
