@@ -34,6 +34,7 @@
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64 
 
+/* there's no point using TLS here as GC doesn't support it */
 __mpz_struct ** mpz_free_arr = NULL;
 __mpz_struct ** mpz_arr = NULL;
 ulong mpz_num = 0;
