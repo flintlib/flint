@@ -94,8 +94,8 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
 
     if (len2 == 0)
     {
-        flint_printf("Exception: division by zero in "
-               "fmpz_mod_poly_compose_mod_brent_kung preinv\n");
+        flint_printf("Exception (fmpz_mod_poly_precompute_matrix)."
+                     "Division by zero.\n");
         abort();
     }
 
@@ -209,15 +209,15 @@ fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_printf("Exception: division by zero in "
-               "fmpz_mod_poly_compose_mod_brent_kung_preinv\n");
+        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv)."
+                     "Division by zero\n");
         abort();
     }
 
     if (len1 >= len3)
     {
-        flint_printf("Exception: fmpz_mod_poly_compose_brent_kung_preinv: the degree "
-               " of the first polynomial must be smaller than that of the "
+        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv)."
+               "The degree of the first polynomial must be smaller than that of the "
                " modulus\n");
         abort();
     }

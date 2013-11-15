@@ -72,7 +72,7 @@ _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
         _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
                                               finv, lenfinv, p);
 
-        if (e & (1UL << i))
+        if (e & (UWORD (1) << i))
         {
             _fmpz_mod_poly_mul(T, res, lenf - 1, poly, lenf - 1, p);
             _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f,
@@ -97,7 +97,8 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
 
     if (lenf == 0)
     {
-        flint_printf("Exception: fmpz_mod_poly_powmod: divide by zero\n");
+        flint_printf("Exception (fmpz_mod_poly_powmod_ui_binexp_preinv)."
+                     "Divide by zero\n");
         abort();
     }
 
@@ -115,13 +116,13 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
 
     if (e <= 2)
     {
-        if (e == 0UL)
+        if (e == UWORD (0))
         {
             fmpz_mod_poly_fit_length(res, 1);
             fmpz_one(res->coeffs);
             _fmpz_mod_poly_set_length(res, 1);
         }
-        else if (e == 1UL)
+        else if (e == UWORD (1))
         {
             fmpz_mod_poly_set(res, poly);
         }

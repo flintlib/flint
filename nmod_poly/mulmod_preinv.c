@@ -76,7 +76,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_mulmod_preinv). Divide by zero.\n");
         abort();
     }
 

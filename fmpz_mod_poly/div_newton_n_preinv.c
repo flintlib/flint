@@ -21,6 +21,7 @@
 
     Copyright (C) 2011, 2010 Sebastian Pancratz
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2013 Martin Lee
 
 ******************************************************************************/
 
