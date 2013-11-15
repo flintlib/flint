@@ -34,8 +34,5 @@ void _padic_poly_normalise(padic_poly_t poly)
     FMPZ_VEC_NORM(poly->coeffs, len);
 
     poly->length = len;
-
-    if (len == 0)
-        poly->val = 0;
 }
 

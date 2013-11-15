@@ -38,6 +38,7 @@
 
 #include "flint.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -556,6 +557,24 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res,
                            const nmod_poly_t poly, ulong e,
                            const nmod_poly_t f, const nmod_poly_t finv);
 
+void
+_nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
+                               mp_srcptr finv, slong lenfinv, nmod_t mod);
+
+void
+nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
+                             const nmod_poly_t finv);
+
+void
+_nmod_poly_powmod_mpz_binexp_preinv (mp_ptr res, mp_srcptr poly,
+                                    mpz_srcptr e, mp_srcptr f, slong lenf,
+                                    mp_srcptr finv, slong lenfinv, nmod_t mod);
+
+void
+nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
+                           const nmod_poly_t poly, mpz_srcptr e,
+                           const nmod_poly_t f, const nmod_poly_t finv);
+
 /* Division  *****************************************************************/
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
@@ -662,16 +681,16 @@ void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
                                     const nmod_poly_t A, const nmod_poly_t B);
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
             mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod);
 
-void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
+void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                  const nmod_poly_t B, const nmod_poly_t Binv);
 
-void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
+void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
  slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod);
 
-void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
+void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
             const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv);
 
 mp_limb_t
@@ -804,14 +823,36 @@ void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c);
 /* Modular composition  ******************************************************/
 
 void
-_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf, 
-                            mp_srcptr g,
-                            mp_srcptr h, slong lenh, nmod_t mod);
+_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf,
+                            mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);
 
 void
 nmod_poly_compose_mod_brent_kung(nmod_poly_t res, 
                     const nmod_poly_t f, const nmod_poly_t g,
                     const nmod_poly_t h);
+
+void
+_nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+                          const nmod_poly_t f);
+
+void
+_nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
+               slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod);
+
+void
+nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
+                          const nmod_poly_t poly2, const nmod_poly_t poly2inv);
+
+void
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
+                            slong len1, const nmod_mat_t A, mp_srcptr poly3,
+                            slong len3, mp_srcptr poly3inv, slong len3inv,
+                            nmod_t mod);
+
+void
+nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
+                    const nmod_poly_t poly1, const nmod_mat_t A,
+                    const nmod_poly_t poly3, const nmod_poly_t poly3inv);
 
 void
 _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
@@ -1093,11 +1134,15 @@ int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, slong d);
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, slong **degs);
+                                   const nmod_poly_t poly, slong * const *degs);
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 int nmod_poly_is_irreducible(const nmod_poly_t f);
+
+int nmod_poly_is_irreducible_rabin(const nmod_poly_t f);
+
+int nmod_poly_is_irreducible_ddf(const nmod_poly_t f);
 
 int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod);
 

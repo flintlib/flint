@@ -138,7 +138,7 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-    Assignment and swap
+    Assignment and basic manipulation
 
 *******************************************************************************
 
@@ -159,6 +159,14 @@ void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 
     Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial 
     to zero.
+
+void fmpz_mod_poly_reverse(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, slong n)
+
+    This function considers the polynomial \code{poly} to be of length $n$,
+    notionally truncating and zero padding if required, and reverses
+    the result.  Since the function normalises its result \code{res} may be
+    of length less than $n$.
 
 *******************************************************************************
 
@@ -386,6 +394,30 @@ void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}.
 
+void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
+                    const fmpz * poly2, slong len2, const fmpz * f, slong lenf,
+                    const fmpz* finv, slong lenfinv, const fmpz_t p)
+
+    Sets \code{res, len1 + len2 - 1} to the remainder of the product of
+    \code{poly1} and \code{poly2} upon polynomial division by \code{f}.
+
+    It is required that \code{finv} is the inverse of the reverse of \code{f}
+    mod \code{x^lenf}. It is required that \code{len1 + len2 - lenf > 0},
+    which is equivalent to requiring that the result will actually be reduced.
+    It is required that \code{len1 < lenf} and \code{len2 < lenf}.
+    Otherwise, simply use \code{_fmpz_mod_poly_mul} instead.
+
+    Aliasing of \code{f} or \code{finv} and \code{res} is not permitted.
+
+void fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
+                       const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}. \code{finv} is the
+    inverse of the reverse of \code{f}. It is required that \code{poly1} and
+    \code{poly2} are reduced modulo \code{f}.
+
 *******************************************************************************
 
     Powering
@@ -458,6 +490,29 @@ void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
 
+void
+_fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
+                              ulong e, const fmpz * f, slong lenf,
+                              const fmpz * finv, slong lenfinv, const fmpz_t p)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
+                         const fmpz_mod_poly_t poly, ulong e,
+                         const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
 void _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
 				       const fmpz_t e, const fmpz * f,
 				       slong lenf, const fmpz_t p)
@@ -476,6 +531,49 @@ void fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+
+void _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly,
+                                  const fmpz_t e, const fmpz * f, slong lenf,
+                                  const fmpz* finv, slong lenfinv,
+                                  const fmpz_t p)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, const fmpz_t e,
+                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+void
+_fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
+                                  slong lenf, const fmpz* finv, slong lenfinv,
+                                  const fmpz_t p)
+
+    Sets \code{res} to \code{x} raised to the power \code{e} modulo \code{f},
+    using sliding window exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 2}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
+                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+
+    Sets \code{res} to \code{x} raised to the power \code{e}
+    modulo \code{f}, using sliding window exponentiation. We require
+    \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
+    \code{f}.
 
 *******************************************************************************
 
@@ -506,6 +604,31 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that the leading coefficient of $B$ is invertible 
     modulo $p$.
 
+void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+                            slong lenA, const fmpz* B, slong lenB,
+                            const fmpz* Binv, slong lenBinv, const fmpz_t mod)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
+    \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
+    coefficients. Furthermore, we assume that $Binv$ is the inverse of the
+    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call
+    \code{div_newton_n_preinv()} and then multiply out and compute
+    the remainder.
+
+void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
+    We assume $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to call \code{div_newton_n()} and then multiply out
+    and compute the remainder.
+
 void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
     const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
@@ -524,6 +647,37 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
     $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
+
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
+                                    const fmpz* B, slong lenB, const fmpz* Binv,
+                                    slong lenBinv, const fmpz_t mod)
+
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA}
+    and \code{B} is of length \code{lenB}, but return only $Q$.
+
+    We require that $Q$ have space for \code{lenA - lenB + 1} coefficients
+    and assume that the leading coefficient of $B$ is a unit. Furthermore, we
+    assume that $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv)
+
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R) < \len(B)$, but returns only $Q$.
+
+    We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
+    the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
 
 ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 
@@ -1019,7 +1173,7 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
 void _fmpz_mod_poly_compose_mod(fmpz * res,
 	                           const fmpz * f, slong lenf, const fmpz * g,
-				   const fmpz * h, slong lenh, const fmpz_t p);
+				   const fmpz * h, slong lenh, const fmpz_t p)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1028,14 +1182,14 @@ void _fmpz_mod_poly_compose_mod(fmpz * res,
 
 void
 fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
-		    const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+		    const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero.
 
 void _fmpz_mod_poly_compose_mod_horner(fmpz * res,
 	                                  const fmpz * f, slong lenf, const fmpz * g,
-					  const fmpz * h, slong lenh, const fmpz_t p);
+					  const fmpz * h, slong lenh, const fmpz_t p)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1046,7 +1200,7 @@ void _fmpz_mod_poly_compose_mod_horner(fmpz * res,
 
 void
 fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
-			   const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+			   const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero. The algorithm used is Horner's rule.
@@ -1069,6 +1223,86 @@ void fmpz_mod_poly_compose_mod_brent_kung(
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that $f$ has smaller degree than $h$.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+_fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
+                                   const fmpz_mod_poly_t f)
+
+    Sets the ith row of \code{A} to the reduction of the ith row of $B$ modulo
+    $f$ for $i=1,\ldots,\sqrt{\deg(f)}$. We require $B$ to be at least
+    a $\sqrt{\deg(f)}\times \deg(f)$ matrix and $f$ to be nonzero.
+
+void
+_fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * f,
+                          const fmpz * g, slong leng, const fmpz * ginv,
+                          slong lenginv, const fmpz_t p)
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g} and $g$ to be
+    nonzero.
+
+void
+fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t f,
+                   const fmpz_mod_poly_t g, const fmpz_mod_poly_t ginv)
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g}.
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
+         const fmpz * f, slong lenf, const fmpz_mat_t A, const fmpz * h,
+         slong lenh, const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
+    $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t f, const fmpz_mat_t A,
+                   const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that the
+    ith row of $A$ contains $g^i$ for $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We require that $h$ is nonzero and
+    that $f$ has smaller degree than $h$. Furthermore, we require \code{hinv} to
+    be the inverse of the reverse of \code{h}. This version of Brent-Kung
+    modular composition is particularly useful if one has to perform several
+    modular composition of the form $f(g)$ modulo $h$ for fixed $g$ and $h$.
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * f,
+                 slong lenf, const fmpz * g, const fmpz * h, slong lenh,
+                 const fmpz * hinv, slong lenhinv, const fmpz_t p)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t g,
+                   const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that $f$ has smaller degree than $h$. Furthermore,
+    we require \code{hinv} to be the inverse of the reverse of \code{h}.
     The algorithm used is the Brent-Kung matrix algorithm.
 
 *******************************************************************************

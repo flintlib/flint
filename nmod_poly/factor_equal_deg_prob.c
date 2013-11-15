@@ -34,7 +34,7 @@ int
 nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, slong d)
 {
-    nmod_poly_t a, b, c;
+    nmod_poly_t a, b, c, polinv;
     mpz_t exp;
     int res = 1;
     slong i;
@@ -61,6 +61,10 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     }
 
     nmod_poly_init_preinv(b, pol->mod.n, pol->mod.ninv);
+    nmod_poly_init_preinv(polinv, pol->mod.n, pol->mod.ninv);
+
+    nmod_poly_reverse(polinv, pol, pol->length);
+    nmod_poly_inv_series(polinv, polinv, polinv->length);
 
     mpz_init(exp);
     if (pol->mod.n > 2)
@@ -70,7 +74,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
         mpz_sub_ui(exp, exp, 1);
         mpz_tdiv_q_2exp(exp, exp, 1);
 
-        nmod_poly_powmod_mpz_binexp(b, a, exp, pol);
+        nmod_poly_powmod_mpz_binexp_preinv(b, a, exp, pol, polinv);
     }
     else
     {
@@ -81,7 +85,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
         for (i = 1; i < d; i++)
         {
             /* c = a^{2^i} = (a^{2^{i-1}})^2 */
-            nmod_poly_powmod_ui_binexp(c, c, 2, pol);
+            nmod_poly_powmod_ui_binexp_preinv(c, c, 2, pol, polinv);
             nmod_poly_add(b, b, c);
         }
         nmod_poly_rem(b, b, pol);
@@ -95,6 +99,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
 
     if ((factor->length <= 1) || (factor->length == pol->length)) res = 0;
 
+    nmod_poly_clear(polinv);
     nmod_poly_clear(a);
     nmod_poly_clear(b);
 

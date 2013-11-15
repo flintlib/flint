@@ -46,12 +46,13 @@ main(void)
     int i;
     flint_rand_t state;
     flint_randinit(state);
-    flint_printf("compose_mod_brent_kung_preinv....");
+    flint_printf("compose_mod_brent_kung_precomp_preinv....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d, e;
+        nmod_mat_t B;
         mp_limb_t m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
@@ -68,7 +69,9 @@ main(void)
         nmod_poly_rem(a, a, c);
         nmod_poly_reverse(cinv, c, c->length);
         nmod_poly_inv_series(cinv, cinv, c->length);
-        nmod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv);
+        nmod_mat_init (B, n_sqrt (c->length-1)+1, c->length-1, m);
+        nmod_poly_precompute_matrix (B, b, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(d, a, B, c, cinv);
         nmod_poly_compose(e, a, b);
         nmod_poly_rem(e, e, c);
 
@@ -86,6 +89,7 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+        nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
         nmod_poly_clear(d);
@@ -96,6 +100,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
+        nmod_mat_t B;
         mp_limb_t m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
@@ -111,8 +116,10 @@ main(void)
         nmod_poly_rem(a, a, c);
         nmod_poly_reverse(cinv, c, c->length);
         nmod_poly_inv_series(cinv, cinv, c->length);
-        nmod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv);
-        nmod_poly_compose_mod_brent_kung_preinv(a, a, b, c, cinv);
+        nmod_mat_init (B, n_sqrt (c->length-1)+1, c->length-1, m);
+        nmod_poly_precompute_matrix (B, b, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(d, a, B, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(a, a, B, c, cinv);
 
         if (!nmod_poly_equal(d, a))
         {
@@ -127,46 +134,7 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
-        nmod_poly_clear(c);
-        nmod_poly_clear(cinv);
-        nmod_poly_clear(d);
-    }
-
-    /* Test aliasing of res and b */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
-    {
-        nmod_poly_t a, b, c, cinv, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
-
-        nmod_poly_init(a, m);
-        nmod_poly_init(b, m);
-        nmod_poly_init(c, m);
-        nmod_poly_init(cinv, m);
-        nmod_poly_init(d, m);
-
-        nmod_poly_randtest(a, state, 1+n_randint(state, 20));
-        nmod_poly_randtest(b, state, 1+n_randint(state, 20));
-        nmod_poly_randtest_not_zero(c, state, 1+n_randint(state, 20));
-
-        nmod_poly_rem(a, a, c);
-        nmod_poly_reverse(cinv, c, c->length);
-        nmod_poly_inv_series(cinv, cinv, c->length);
-        nmod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv);
-        nmod_poly_compose_mod_brent_kung_preinv(b, a, b, c, cinv);
-
-        if (!nmod_poly_equal(d, b))
-        {
-            flint_printf("FAIL (aliasing b)\n");
-            nmod_poly_print(a); flint_printf("\n");
-            nmod_poly_print(b); flint_printf("\n");
-            nmod_poly_print(c); flint_printf("\n");
-            nmod_poly_print(cinv); flint_printf("\n");
-            nmod_poly_print(d); flint_printf("\n");
-            abort();
-        }
-
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
+        nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
         nmod_poly_clear(d);
@@ -176,6 +144,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
+        nmod_mat_t B;
         mp_limb_t m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
@@ -191,8 +160,10 @@ main(void)
         nmod_poly_rem(a, a, c);
         nmod_poly_reverse(cinv, c, c->length);
         nmod_poly_inv_series(cinv, cinv, c->length);
-        nmod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv);
-        nmod_poly_compose_mod_brent_kung_preinv(c, a, b, c, cinv);
+        nmod_mat_init (B, n_sqrt (c->length-1)+1, c->length-1, m);
+        nmod_poly_precompute_matrix (B, b, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(d, a, B, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(c, a, B, c, cinv);
 
         if (!nmod_poly_equal(d, c))
         {
@@ -207,6 +178,7 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+        nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
         nmod_poly_clear(d);
@@ -216,6 +188,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, d;
+        nmod_mat_t B;
         mp_limb_t m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
@@ -231,8 +204,10 @@ main(void)
         nmod_poly_rem(a, a, c);
         nmod_poly_reverse(cinv, c, c->length);
         nmod_poly_inv_series(cinv, cinv, c->length);
-        nmod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv);
-        nmod_poly_compose_mod_brent_kung_preinv(cinv, a, b, c, cinv);
+        nmod_mat_init (B, n_sqrt (c->length-1)+1, c->length-1, m);
+        nmod_poly_precompute_matrix (B, b, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(d, a, B, c, cinv);
+        nmod_poly_compose_mod_brent_kung_precomp_preinv(cinv, a, B, c, cinv);
 
         if (!nmod_poly_equal(d, cinv))
         {
@@ -247,6 +222,7 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+        nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
         nmod_poly_clear(d);
