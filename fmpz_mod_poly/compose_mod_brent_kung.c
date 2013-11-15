@@ -33,7 +33,8 @@
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, slong len1,
-                              const fmpz * poly2, const fmpz * poly3, slong len3, const fmpz_t p)
+                              const fmpz * poly2, const fmpz * poly3, slong len3, 
+                                                                    const fmpz_t p)
 {
     fmpz_mat_t A, B, C;
     fmpz * t, * h, * tmp;

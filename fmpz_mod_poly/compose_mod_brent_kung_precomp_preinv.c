@@ -101,7 +101,8 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
 
     if (A->r != m || A->c != len)
     {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung). Wrong dimensions.\n");
+        flint_printf("Exception (fmpz_mod_poly_precompute_matrix)."
+                     " Wrong dimensions.\n");
         abort();
     }
 
@@ -209,7 +210,7 @@ fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
     if (len3 == 0)
     {
         flint_printf("Exception: division by zero in "
-               "fmpz_mod_poly_compose_mod_brent_kung preinv\n");
+               "fmpz_mod_poly_compose_mod_brent_kung_preinv\n");
         abort();
     }
 

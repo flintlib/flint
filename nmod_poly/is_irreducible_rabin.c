@@ -29,7 +29,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-static __inline__ void
+void
 nmod_poly_powpowmod(nmod_poly_t res, const nmod_poly_t pol,
     ulong exp, ulong exp2, const nmod_poly_t f)
 {
@@ -53,7 +53,7 @@ nmod_poly_is_irreducible_rabin(const nmod_poly_t f)
     if (nmod_poly_length(f) > 2)
     {
         const mp_limb_t p = nmod_poly_modulus(f);
-        const slong n      = nmod_poly_degree(f);
+        const slong n     = nmod_poly_degree(f);
         nmod_poly_t a, x, x_p;
 
         nmod_poly_init(a, p);

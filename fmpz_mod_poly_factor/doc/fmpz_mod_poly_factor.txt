@@ -54,7 +54,8 @@ void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong len)
     of the case of repeated calls by always at least
     doubling the number of factors the structure can hold.
 
-void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac)
+void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
+                                              const fmpz_mod_poly_factor_t fac)
 
     Sets \code{res} to the same factorisation as \code{fac}.
 
@@ -164,7 +165,8 @@ void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
-    “baby step/giant step” strategy for the distinct-degree factorization step.
+    ``baby step/giant step''� strategy for the distinct-degree factorization
+    step.
 
 void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
 				     const fmpz_mod_poly_t f)
