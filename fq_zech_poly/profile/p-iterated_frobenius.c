@@ -23,14 +23,14 @@
 
 ******************************************************************************/
 
-#include "fq_poly.h"
+#include "fq_zech_poly.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
+#define T fq_zech
+#define CAP_T FQ_ZECH
 #include "fq_poly_templates/profile/p-iterated_frobenius.c"
 #undef CAP_T
 #undef T
