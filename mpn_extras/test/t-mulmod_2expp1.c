@@ -249,7 +249,7 @@ int main(void)
     }
 
     gmp_randclear(rands);
-
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }
