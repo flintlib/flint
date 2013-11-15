@@ -36,6 +36,16 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     double beta;
 
     n = nmod_poly_degree(poly);
+    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
+
+    nmod_poly_make_monic(v, poly);
+    if (n == 1)
+    {
+        nmod_poly_factor_insert (res, v, 1);
+        (*degs)[0]= 1;
+        nmod_poly_clear (v);
+        return;
+    }
     beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow (n, beta));
     m = ceil(0.5 * n / l);
@@ -44,7 +54,6 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     nmod_poly_init_preinv(f, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(g, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(s, poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(vinv, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(reducedH0, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(tmp, poly->mod.n, poly->mod.ninv);
@@ -64,8 +73,6 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
         nmod_poly_init_preinv(H[i], poly->mod.n, poly->mod.ninv);
         nmod_poly_init_preinv(I[i], poly->mod.n, poly->mod.ninv);
     }
-
-    nmod_poly_make_monic(v, poly);
 
     nmod_poly_reverse(vinv, v, v->length);
     nmod_poly_inv_series(vinv, vinv, v->length);
