@@ -88,6 +88,7 @@ int main(void)
         abort();
     }
 
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }
