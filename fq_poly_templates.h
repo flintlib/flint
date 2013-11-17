@@ -203,6 +203,14 @@ void
 TEMPLATE(T, poly_factor)(TEMPLATE(T, poly_factor_t) result, TEMPLATE(T, t) leading_coeff,
                const TEMPLATE(T, poly_t) input, const TEMPLATE(T, ctx_t) ctx);
 
+
+void
+TEMPLATE(T, poly_iterated_frobenius_preinv)(TEMPLATE(T, poly_t)* rop,
+                                            long n,
+                                            TEMPLATE(T, poly_t) v,
+                                            TEMPLATE(T, poly_t) vinv,
+                                            const TEMPLATE(T, ctx_t) ctx);
+          
 static __inline__ int TEMPLATE(CAP_T, POLY_ITERATED_FROBENIUS_CUTOFF)(const TEMPLATE(T, ctx_t) ctx, slong length)
 {
     if ((TEMPLATE(T, ctx_degree)(ctx) == 2 && length > 10) ||

@@ -80,20 +80,8 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
 
     /* compute baby steps: h[i]=x^{q^i}mod v */
     /*     h[0] = x */
-    /* TODO: Better cutoff */
-    if (TEMPLATE(CAP_T, POLY_ITERATED_FROBENIUS_CUTOFF)(ctx, v->length))
-    {
-        TEMPLATE(T, poly_gen)(h[0], ctx);
-        for (i = 1; i < l + 1; i++)
-            TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(h[i], h[i - 1], q, 0, v, vinv, ctx);
-    }
-    else
-    {
-        TEMPLATE(T, poly_gen)(h[0], ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(h[1], h[0], q, 0, v, vinv, ctx);
-        for (i = 2; i < l + 1; i++)
-            TEMPLATE(T, poly_compose_mod_preinv)(h[i], h[i - 1], h[1], v, vinv, ctx);
-    }
+    
+    TEMPLATE(T, poly_iterated_frobenius_preinv)(h, l + 1, v, vinv, ctx);
 
     /* compute coarse distinct-degree factorisation */
     index = 0;
