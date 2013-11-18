@@ -547,6 +547,7 @@ echo "$CONFIG_POPCNT_INTRINSICS" >> config.h
 echo "$CONFIG_BLAS" >> config.h
 echo "$CONFIG_TLS" >> config.h
 echo "$CONFIG_PTHREAD" >> config.h
+echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
 
 #write out Makefile
 

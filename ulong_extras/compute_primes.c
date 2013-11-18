@@ -36,6 +36,13 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+#if FLINT_REENTRANT && !HAVE_TLS
+#include <pthread.h>
+
+static pthread_once_t primes_initialised = PTHREAD_ONCE_INIT;
+pthread_mutex_t primes_lock;
+#endif
+
 const unsigned int flint_primes_small[] =
 {
     2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,
@@ -56,18 +63,27 @@ FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
 FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
 FLINT_TLS_PREFIX int _flint_primes_used = 0;
 
+
+void n_compute_primes_init()
+{
+   pthread_mutex_init(&primes_lock, NULL);
+}
+
 void
 n_compute_primes(ulong num_primes)
 {
     int i, m;
     ulong num_computed;
 
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_once(&primes_initialised, n_compute_primes_init);
+    pthread_mutex_lock(&primes_lock);
+#endif
+
     m = FLINT_CLOG2(num_primes);
 
     if (_flint_primes_used == 0)
-    {
         flint_register_cleanup_function(n_cleanup_primes);
-    }
 
     if (m >= _flint_primes_used)
     {
@@ -93,5 +109,9 @@ n_compute_primes(ulong num_primes)
         }
         _flint_primes_used = m + 1;
     }
+
+#if WANT_REENTRANT && !HAVE_TLS
+        pthread_mutex_unlock(&primes_lock);
+#endif
 }
 
