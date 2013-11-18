@@ -27,6 +27,13 @@
 #include <stdio.h>
 #include "flint.h"
 
+#if FLINT_REENTRANT && !HAVE_TLS
+#include <pthread.h>
+
+static pthread_once_t register_initialised = PTHREAD_ONCE_INIT;
+pthread_mutex_t register_lock;
+#endif
+
 static void flint_memory_error()
 {
     flint_printf("Exception (FLINT memory_manager). Unable to allocate memory.\n");
@@ -73,14 +80,28 @@ FLINT_TLS_PREFIX size_t flint_num_cleanup_functions = 0;
 
 FLINT_TLS_PREFIX flint_cleanup_function_t * flint_cleanup_functions = NULL;
 
+void register_init()
+{
+   pthread_mutex_init(&register_lock, NULL);
+}
+
 void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 {
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_once(&register_initialised, register_init);
+    pthread_mutex_lock(&register_lock);
+#endif
+
     flint_cleanup_functions = flint_realloc(flint_cleanup_functions,
         (flint_num_cleanup_functions + 1) * sizeof(flint_cleanup_function_t));
 
     flint_cleanup_functions[flint_num_cleanup_functions] = cleanup_function;
 
     flint_num_cleanup_functions++;
+
+    #if WANT_REENTRANT && !HAVE_TLS
+        pthread_mutex_unlock(&register_lock);
+    #endif
 }
 
 void _fmpz_cleanup();
@@ -88,6 +109,10 @@ void _fmpz_cleanup();
 void flint_cleanup()
 {
     size_t i;
+
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_mutex_lock(&register_lock);
+#endif
 
     for (i = 0; i < flint_num_cleanup_functions; i++)
         flint_cleanup_functions[i]();
@@ -98,6 +123,11 @@ void flint_cleanup()
 
     mpfr_free_cache();
     _fmpz_cleanup();
+
+#if WANT_REENTRANT && !HAVE_TLS
+    pthread_mutex_unlock(&register_lock);
+#endif
+
 }
 
 
