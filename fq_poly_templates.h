@@ -210,21 +210,6 @@ TEMPLATE(T, poly_iterated_frobenius_preinv)(TEMPLATE(T, poly_t)* rop,
                                             TEMPLATE(T, poly_t) v,
                                             TEMPLATE(T, poly_t) vinv,
                                             const TEMPLATE(T, ctx_t) ctx);
-          
-static __inline__ int TEMPLATE(CAP_T, POLY_ITERATED_FROBENIUS_CUTOFF)(const TEMPLATE(T, ctx_t) ctx, slong length)
-{
-    if ((TEMPLATE(T, ctx_degree)(ctx) == 2 && length > 10) ||
-        (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0 && 2*length > TEMPLATE(T, ctx_degree)(ctx)) ||
-        (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 3) == 0 && 10*length > TEMPLATE(T, ctx_degree)(ctx)) ||
-        (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 5) == 0 && 15*length > TEMPLATE(T, ctx_degree)(ctx)))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
 
 /*  Assignment and basic manipulation  ***************************************/
 

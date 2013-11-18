@@ -35,6 +35,20 @@
 #define FQ_MULLOW_CLASSICAL_CUTOFF 6
 #define FQ_SQR_CLASSICAL_CUTOFF 6
 
+static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
+{
+    int result;
+    fmpz_t q;
+    fmpz_init(q);
+    fq_ctx_order(q, ctx);
+    if ( fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
+        result = 1;
+    else
+        result = 0;
+    fmpz_clear(q);
+    return result;
+}
+
 #ifdef T
 #undef T
 #endif
