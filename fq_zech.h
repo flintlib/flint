@@ -49,6 +49,7 @@ typedef struct
     double ppre;
     mp_limb_t prime_root;       /* primitive root for prime subfield */
     mp_limb_t *zech_log_table;
+    mp_limb_t *prime_field_table;
     mp_limb_t *eval_table;
 
     fq_nmod_ctx_struct *fq_nmod_ctx;

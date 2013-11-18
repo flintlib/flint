@@ -29,25 +29,20 @@ void
 fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, const mp_limb_t x,
                const fq_zech_ctx_t ctx)
 {
-    mp_limb_t b, e;
-    double pinv, qm1inv;
+    mp_limb_t b;
+
     if (x == 0 || fq_zech_is_zero(op, ctx))
     {
         fq_zech_zero(rop, ctx);
         return;
     }
-    pinv = n_precompute_inverse(ctx->p);
-    qm1inv = n_precompute_inverse(ctx->qm1);
-    b = n_mod2_precomp(x, ctx->p, pinv);
+
+    b = x;
+    if (x >= ctx->p)
+        b = n_mod2_precomp(x, ctx->p, ctx->ppre);
 
     if (b == 0)
-    {
         fq_zech_zero(rop, ctx);
-    }
     else
-    {
-        e = n_discrete_log_bsgs(b, ctx->prime_root, ctx->p);
-        e = n_mulmod_precomp(ctx->qm1opm1, e, ctx->qm1, qm1inv);
-        rop->value = n_addmod(op->value, e, ctx->qm1);
-    }
+        rop->value = n_addmod(op->value, ctx->prime_field_table[b], ctx->qm1);
 }

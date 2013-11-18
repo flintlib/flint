@@ -31,6 +31,7 @@ void
 fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 {
     flint_free(ctx->zech_log_table);
+    flint_free(ctx->prime_field_table);
     flint_free(ctx->eval_table);
 
     if (ctx->owns_fq_nmod_ctx)

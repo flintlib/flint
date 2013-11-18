@@ -98,7 +98,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     fq_nmod_t r, gen;
     long up, q;
     fmpz_t result, order;
-    mp_limb_t j, nz;
+    mp_limb_t j, nz, result_ui;
     mp_limb_t *n_reverse_table;
 
     ctx->fq_nmod_ctx = fq_nmod_ctx;
@@ -134,10 +134,12 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     ctx->prime_root = n_primitive_root_prime(ctx->p);
 
     ctx->zech_log_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
+    ctx->prime_field_table = (mp_limb_t *) flint_malloc(up * sizeof(mp_limb_t));
     n_reverse_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
     ctx->eval_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
 
     ctx->zech_log_table[ctx->qm1] = 0;
+    ctx->prime_field_table[0] = ctx->qm1;
     n_reverse_table[0] = ctx->qm1;
     ctx->eval_table[ctx->qm1] = 0;
 
@@ -151,9 +153,14 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     for (i = 0; i < ctx->qm1; i++)
     {
         nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
+        result_ui = fmpz_get_ui(result);
+        n_reverse_table[result_ui] = i;
+        ctx->eval_table[i] = result_ui;
+        if (r->length == 1)
+        {
+            ctx->prime_field_table[result_ui] = i;
+        }
         fq_nmod_mul(r, r, gen, fq_nmod_ctx);
-        n_reverse_table[fmpz_get_si(result)] = i;
-        ctx->eval_table[i] = fmpz_get_si(result);
     }
 
     i = 1;
