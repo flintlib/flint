@@ -80,10 +80,12 @@ FLINT_TLS_PREFIX size_t flint_num_cleanup_functions = 0;
 
 FLINT_TLS_PREFIX flint_cleanup_function_t * flint_cleanup_functions = NULL;
 
+#if FLINT_REENTRANT && !HAVE_TLS
 void register_init()
 {
    pthread_mutex_init(&register_lock, NULL);
 }
+#endif
 
 void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 {
@@ -99,9 +101,9 @@ void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 
     flint_num_cleanup_functions++;
 
-    #if WANT_REENTRANT && !HAVE_TLS
-        pthread_mutex_unlock(&register_lock);
-    #endif
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_mutex_unlock(&register_lock);
+#endif
 }
 
 void _fmpz_cleanup();
@@ -124,7 +126,7 @@ void flint_cleanup()
     mpfr_free_cache();
     _fmpz_cleanup();
 
-#if WANT_REENTRANT && !HAVE_TLS
+#if FLINT_REENTRANT && !HAVE_TLS
     pthread_mutex_unlock(&register_lock);
 #endif
 
