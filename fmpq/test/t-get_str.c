@@ -78,7 +78,7 @@ main(void)
         }
 
         flint_free(str1);
-        free(str2);
+        flint_free(str2);
 
         fmpq_clear(a);
         mpq_clear(b);

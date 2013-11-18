@@ -73,8 +73,8 @@ main(void)
             abort();
         }
 
-        free(s);
-        free(t);
+        flint_free(s);
+        flint_free(t);
         padic_clear(x);
         fmpq_clear(y);
         padic_ctx_clear(ctx);

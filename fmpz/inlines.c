@@ -33,13 +33,13 @@
 
 fmpz * __new_fmpz()
 {
-    return calloc(sizeof(fmpz), 1);
+    return flint_calloc(sizeof(fmpz), 1);
 }
 
 void __free_fmpz(fmpz * f)
 {
    _fmpz_demote(f);
-   free(f);
+   flint_free(f);
 }   
 
 void __fmpz_set_si(fmpz_t f, slong val)

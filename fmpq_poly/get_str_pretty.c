@@ -47,11 +47,6 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     if (len == 0)  /* Zero polynomial */
     {
         str = flint_malloc(2);
-        if (!str)
-        {
-            flint_printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
-            abort();
-        }
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -87,11 +82,6 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
               + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
         size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
         str   = flint_malloc(size);
-        if (!str)
-        {
-            flint_printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
-            abort();
-        }
 
         if (mpq_cmp_si(a1, 1, 1) == 0)
         {
@@ -155,13 +145,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     
     mpq_init(q);
     str = flint_malloc(size);
-    if (!str)
-    {
-        flint_printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
-        mpz_clear(z);
-        mpq_clear(q);
-        abort();
-    }
+    
     j = 0;
     
     /* Print the leading term */

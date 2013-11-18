@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "memory_manager.h"
 #include "fmpq_poly.h"
 
 #include "fmpqxx.h"
@@ -189,7 +190,7 @@ public:
     {
         char* str = fmpq_poly_get_str_pretty(this->evaluate()._poly(), x);
         std::string res(str);
-        std::free(str);
+        flint_free(str);
         return res;
     }
 

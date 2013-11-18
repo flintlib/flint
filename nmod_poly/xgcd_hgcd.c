@@ -318,19 +318,19 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
 
             if (G == A || G == B)
             {
-                free(G->coeffs);
+                flint_free(G->coeffs);
                 G->coeffs = g;
                 G->alloc  = FLINT_MIN(lenA, lenB);
             }
             if (S == A || S == B)
             {
-                free(S->coeffs);
+                flint_free(S->coeffs);
                 S->coeffs = s;
                 S->alloc  = FLINT_MAX(lenB - 1, 2);
             }
             if (T == A || T == B)
             {
-                free(T->coeffs);
+                flint_free(T->coeffs);
                 T->coeffs = t;
                 T->alloc  = FLINT_MAX(lenA - 1, 2);
             }

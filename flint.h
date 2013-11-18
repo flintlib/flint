@@ -262,12 +262,12 @@ void mpn_tdiv_q(mp_ptr qp,
       (__tpx = alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
        __tmp_root = __tpx, \
-       __tpx->block = malloc(size)) : \
+       __tpx->block = flint_malloc(size)) : \
       alloca(size))
 
 #define TMP_END \
    while (__tmp_root) { \
-      free(__tmp_root->block); \
+      flint_free(__tmp_root->block); \
       __tmp_root = __tmp_root->next; \
    }
 

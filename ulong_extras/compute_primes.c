@@ -30,9 +30,9 @@
 #include <string.h>
 #include <stdio.h>
 #undef ulong
+#include <gmp.h>
 #define ulong mp_limb_t
 
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 

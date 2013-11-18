@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "memory_manager.h"
 #include "fmpz_poly_q.h"
 
 #include "fmpz_polyxx.h"
@@ -117,7 +118,7 @@ public:
     {
         char* str = fmpz_poly_q_get_str_pretty(this->evaluate()._polyq(), x);
         std::string res(str);
-        std::free(str);
+        flint_free(str);
         return res;
     }
     bool is_one() const {return fmpz_poly_q_is_one(this->evaluate()._polyq());}

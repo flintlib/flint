@@ -54,11 +54,6 @@ do {                                                                      \
     if (i == N)                                                           \
     {                                                                     \
         buf = flint_realloc(buf, N = 2*N);                                \
-        if (buf == NULL)                                                  \
-        {                                                                 \
-            flint_printf("Exception (fmpz_poly_fread_pretty). realloc failed.\n"); \
-            abort();                                                      \
-        }                                                                 \
     }                                                                     \
     buf[i++] = c;                                                         \
 } while (0)
@@ -100,12 +95,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     i = 0;
     N = 80;
     buf = flint_malloc(N);
-    if (buf == NULL)
-    {
-        flint_printf("Exception (fmpz_poly_fread_pretty). malloc failed.\n");
-        abort();
-    }
-
+    
     fmpz_init(f_coeff);
     mpz_init(z_coeff);
     mpz_init(z_exp);
@@ -193,11 +183,6 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
         else
         {
             var = flint_malloc(i);
-            if (var == NULL)
-            {
-                flint_printf("Exception (fmpz_poly_fread_pretty). malloc failed.\n");
-                abort();
-            }
             strcpy(var, buf);
         }
 
@@ -289,11 +274,6 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     else
     {
         *x = flint_malloc(1);
-        if (*x == NULL)
-        {
-            flint_printf("Exception (fmpz_poly_fread_pretty). malloc failed.\n");
-            abort();
-        }
         **x = '\0';
     }
 

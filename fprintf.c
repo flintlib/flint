@@ -34,7 +34,7 @@ size_t flint_fprintf(FILE * f, const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
-   char * str2 = malloc(len + 1);
+   char * str2 = flint_malloc(len + 1);
    int w1 = 0, w2 = 0;
    void * w3;
    double d;
@@ -119,7 +119,7 @@ size_t flint_fprintf(FILE * f, const char * str, ...)
    }
 
    va_end(ap);
-   free(str2);
+   flint_free(str2);
 
    return ret;
 }

@@ -130,9 +130,9 @@ int main(void)
     for (i = 0; i <= N; i++)
     {
         fmpz_mod_poly_clear(b[i]);
-        free(b[i]);
+        flint_free(b[i]);
     }
-    free(b);
+    flint_free(b);
 
     flint_randclear(state);
 
