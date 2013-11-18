@@ -42,6 +42,7 @@ main(int argc, char** argv)
     long d, lenf;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, poly_t) f, *h, finv;
+    TEMPLATE(T, mat_t) HH;
     slong i, l;
     double beta;
 
@@ -107,9 +108,13 @@ main(int argc, char** argv)
         for (lo = 0; lo < loops; lo++)
         {
             TEMPLATE(T, poly_gen)(h[0], ctx);
+            TEMPLATE(T, mat_init)(HH, n_sqrt(f->length - 1) + 1, f->length - 1, ctx);
             TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(h[1], h[0], q, 0, f, finv, ctx);
+            TEMPLATE(T, poly_precompute_matrix)(HH, h[1], f, finv, ctx);
             for (i = 2; i < l + 1; i++)
-                TEMPLATE(T, poly_compose_mod_preinv)(h[i], h[i-1], h[1], f, finv, ctx);
+                TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(h[i], h[i - 1],
+                                                                        HH, f, finv, ctx);
+            TEMPLATE(T, mat_clear)(HH, ctx);
         }
         prof_stop();
         t[0] += get_clock(0);
