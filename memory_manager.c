@@ -27,6 +27,10 @@
 #include <stdio.h>
 #include "flint.h"
 
+#if HAVE_GC
+#include "gc.h"
+#endif
+
 #if FLINT_REENTRANT && !HAVE_TLS
 #include <pthread.h>
 
@@ -42,7 +46,13 @@ static void flint_memory_error()
 
 void * flint_malloc(size_t size)
 {
-    void * ptr = malloc(size);
+   void * ptr;
+
+#if HAVE_GC
+   ptr = GC_malloc(size);
+#else
+   ptr = malloc(size);
+#endif
 
     if (ptr == NULL)
         flint_memory_error();
@@ -52,7 +62,13 @@ void * flint_malloc(size_t size)
 
 void * flint_realloc(void * ptr, size_t size)
 {
-    void * ptr2 = realloc(ptr, size);
+    void * ptr2;
+
+#if HAVE_GC
+    ptr2 = GC_realloc(ptr, size);
+#else
+    ptr2 = realloc(ptr, size);
+#endif
 
     if (ptr2 == NULL)
         flint_memory_error();
@@ -62,7 +78,13 @@ void * flint_realloc(void * ptr, size_t size)
 
 void * flint_calloc(size_t num, size_t size)
 {
-    void * ptr = calloc(num, size);
+   void * ptr;
+
+#if HAVE_GC
+    ptr = GC_malloc(num*size);
+#else
+    ptr = calloc(num, size);
+#endif
 
     if (ptr == NULL)
         flint_memory_error();
@@ -72,7 +94,9 @@ void * flint_calloc(size_t num, size_t size)
 
 void flint_free(void * ptr)
 {
+#if !HAVE_GC
     free(ptr);
+#endif
 }
 
 

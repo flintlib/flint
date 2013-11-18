@@ -9,6 +9,7 @@ PREFIX="/usr/local"
 GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 NTL_DIR="/usr/local"
+GC_DIR="/usr/local"
 BLAS_DIR="/usr/local"
 WANT_NTL=0
 WANT_BLAS=0
@@ -18,6 +19,7 @@ TLS=1
 PTHREAD=1
 REENTRANT=0
 WANT_GC=0
+WANT_TLS=0
 BUILD=
 EXTENSIONS=
 EXT_MODS=
@@ -47,7 +49,7 @@ usage()
    echo "     --disable-static     Do not build a static library"
    echo "     --single             Faster [non-reentrant if tls or pthread not used] version of library (default)"
    echo "     --reentrant          Build fully reentrant [with or without tls, with pthread] version of library"
-   echo "     --with-gc            GC safe build"
+   echo "     --with-gc=<path>     GC safe build with path to gc"
    echo "     --enable-pthread     Use pthread (default)"
    echo "     --disable-pthread    Do not use pthread"
    echo "     --enable-tls         Use thread-local storage (default)"
@@ -122,6 +124,9 @@ while [ "$1" != "" ]; do
          ;;
       --with-gc)
 	 WANT_GC=1
+         if [ ! -z "$VALUE" ]; then
+            GC_DIR="$VALUE"
+         fi
          ;;
       --enable-pthread)
          PTHREAD=1
@@ -131,7 +136,7 @@ while [ "$1" != "" ]; do
          ;;
       --enable-tls)
          TLS=1
-         ;;
+         WANT_TLS=1;;
       --disable-tls)
          TLS=0
          ;;
@@ -231,6 +236,20 @@ if [ "$WANT_BLAS" = "1" ]; then
 fi
 CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
 
+if [ "$WANT_GC" = "1" ]; then
+   if [ -d "${GC_DIR}" ]; then
+      GC_LIB_DIR="${GC_DIR}/lib"
+      GC_INC_DIR="${GC_DIR}/include"
+   else
+      echo "Invalid GC directory"
+      exit 1
+   fi
+   EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${GC_INC_DIR}"
+   EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${GC_LIB_DIR}"
+   EXTRA_LIBS="${EXTRA_LIBS} gc"
+fi
+CONFIG_GC="#define HAVE_GC ${WANT_GC}"
+
 # defaults for CC, CXX and AR
 
 if [ -z "$CC" ]; then
@@ -248,6 +267,10 @@ fi
 #handle gc and reentrant flags
 
 if [ "$WANT_GC" = "1" ]; then
+      TLS=0
+      if [ "$WANT_TLS" = "1" ]; then
+          echo "****WARNING**** GC does not support TLS....disabling TLS"
+      fi
       cp fmpz/link/fmpz_gc.c fmpz/fmpz.c
       cp fmpz-conversions-gc.in fmpz-conversions.h
 else
@@ -547,6 +570,7 @@ echo "$CONFIG_POPCNT_INTRINSICS" >> config.h
 echo "$CONFIG_BLAS" >> config.h
 echo "$CONFIG_TLS" >> config.h
 echo "$CONFIG_PTHREAD" >> config.h
+echo "$CONFIG_GC" >> config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
 
 #write out Makefile

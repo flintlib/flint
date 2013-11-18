@@ -58,7 +58,7 @@ void fmpz_lock_init()
 
 __mpz_struct * _fmpz_new_mpz(void)
 {
-    __mpz_struct * z;
+    __mpz_struct * z = NULL;
 
 #if FLINT_REENTRANT
     pthread_once(&fmpz_initialised, fmpz_lock_init);
@@ -69,7 +69,7 @@ __mpz_struct * _fmpz_new_mpz(void)
         z = mpz_free_arr[--mpz_free_num];
     else
     {
-        __mpz_struct * z = flint_malloc(sizeof(__mpz_struct));
+        z = flint_malloc(sizeof(__mpz_struct));
 
         if (mpz_num == mpz_alloc) /* store pointer to prevent gc cleanup */
         {
@@ -122,7 +122,8 @@ void _fmpz_cleanup_mpz_content(void)
         flint_free(mpz_free_arr[i]);
     }
 
-    mpz_num = mpz_alloc = mpz_free_num = mpz_free_alloc = 0;
+    /* TODO: remove selected mpz's from mpz_arr too and compact */
+    mpz_free_num = mpz_free_alloc = 0;
 }
 
 void _fmpz_cleanup(void)
@@ -133,9 +134,7 @@ void _fmpz_cleanup(void)
 
     _fmpz_cleanup_mpz_content();
     flint_free(mpz_free_arr);
-    flint_free(mpz_arr);
     mpz_free_arr = NULL;
-    mpz_arr = NULL;
 
 #if FLINT_REENTRANT
     pthread_mutex_unlock(&fmpz_lock);
