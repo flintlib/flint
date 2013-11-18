@@ -65,7 +65,7 @@ void sample(void * arg, ulong count)
     mpz_t a, b, d, r2;
 
     gmp_randstate_t st;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     mp_ptr dinv;
     mp_bitcnt_t norm;
@@ -76,7 +76,7 @@ void sample(void * arg, ulong count)
     /* don't init r2 */
 
     gmp_randinit_default(st);
-    flint_randinit(state);
+    
 
     for (i = 0; i < count; i++)
     {

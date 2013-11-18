@@ -37,8 +37,8 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("mul_KS2....");
     fflush(stdout);
@@ -163,8 +163,8 @@ main(void)
     }
 #endif
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

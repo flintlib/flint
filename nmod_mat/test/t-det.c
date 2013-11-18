@@ -37,8 +37,8 @@ int
 main(void)
 {
     slong m, mod, rep;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("det....");
     fflush(stdout);

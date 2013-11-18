@@ -34,17 +34,16 @@
 
 int main(void)
 {
-    flint_rand_t state;
     fmpz * b1;
     fmpz * b2;
     slong n, k;
 
     const slong maxn = 400;
 
-    flint_printf("bell_number....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("bell_number....");
+    fflush(stdout);    
 
     b1 = _fmpz_vec_init(maxn);
 

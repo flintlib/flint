@@ -35,12 +35,12 @@ int
 main(void)
 {
     slong m, n, rep;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("add/sub/neg....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -74,8 +74,8 @@ main(void)
         fmpz_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

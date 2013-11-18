@@ -34,12 +34,12 @@ int main(void)
    int i, result;
    ulong bits;
    mp_limb_t d;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
    flint_printf("is_perfect_power235....");
    fflush(stdout);
    
-   flint_randinit(state);
+   
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that square pass the test */
    {
@@ -110,8 +110,8 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

@@ -66,7 +66,7 @@ main(void)
 
 for (l = 0; l < len; l++)
 {
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     slong d = 97, i, n = N[l], r;
     clock_t c0, c1;
     long double cputime;
@@ -75,7 +75,7 @@ for (l = 0; l < len; l++)
     qadic_ctx_t ctx;
     qadic_t a, b, z;
 
-    flint_randinit(state);
+    
 
     fmpz_init_set_ui(p, 17);
 

@@ -37,9 +37,9 @@ int main(void)
    int i, j, result;
    ulong count = UWORD(0);
    gmp_randstate_t st;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    gmp_randinit_default(st);
-   flint_randinit(state);
+   
 
    flint_printf("factor_pp1....");
    fflush(stdout);

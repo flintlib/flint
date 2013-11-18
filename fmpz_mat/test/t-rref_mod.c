@@ -75,14 +75,13 @@ main(void)
 {
     fmpz_mat_t A;
     fmpz_t p;
-    flint_rand_t state;
     slong i, j, k, m, n, b, d, r, rank;
     slong *perm;
 
-    flint_printf("rref_mod....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("rref_mod....");
+    fflush(stdout);    
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
@@ -166,8 +165,8 @@ main(void)
         flint_free(perm);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

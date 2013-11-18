@@ -31,8 +31,8 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("factor_equal_deg_prob....");
     fflush(stdout);
@@ -101,8 +101,8 @@ main(void)
         fmpz_mod_poly_clear(poly2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

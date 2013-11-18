@@ -46,8 +46,8 @@ void sample(void * arg, ulong count)
    slong i, j;
    mp_ptr vec = _nmod_vec_init(length);
    mp_ptr vec2 = _nmod_vec_init(length);
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
     
    for (i = 0; i < count; i++)
    {

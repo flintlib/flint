@@ -37,12 +37,12 @@ int main(void)
     mp_limb_t res1, res2;
     slong i, rep;
     mpz_t mpz_n;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
     flint_printf("nextprime....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     if (n_nextprime(0, 0) != 2)
     {
@@ -83,8 +83,8 @@ int main(void)
 
     mpz_clear(mpz_n); 
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

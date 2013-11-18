@@ -37,9 +37,9 @@ main(void)
     fmpz_t x;
 
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    
 
     flint_printf("get/set_si....");
     fflush(stdout);

@@ -41,8 +41,8 @@ void sample(void * arg, ulong count)
    ulong i;
    mp_limb_t n, d, r, norm;
    double dpre;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    for (i = 0; i < count; i++)
    {

@@ -34,12 +34,12 @@ int
 main(void)
 {
     slong i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("trace....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Test trace(AB) = trace(BA) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -84,8 +84,8 @@ main(void)
         nmod_mat_clear(BA);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

@@ -33,8 +33,8 @@ int main(void)
 {
    int i, result;
    ulong count = UWORD(0);
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    flint_printf("factor_SQUFOF....");
    fflush(stdout);
@@ -74,8 +74,8 @@ int main(void)
       abort();
    }
 
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

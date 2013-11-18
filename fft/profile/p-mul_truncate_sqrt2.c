@@ -42,12 +42,12 @@ main(void)
     mp_size_t iters, j;
     double truncation;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("mul_truncate_sqrt2....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     depth = 13;

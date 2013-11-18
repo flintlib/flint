@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("jacobi....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < 3000 * flint_test_multiplier(); i++)
@@ -86,8 +86,8 @@ main(void)
         mpz_clear(q);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

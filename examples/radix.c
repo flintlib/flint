@@ -42,7 +42,7 @@ int main(void)
     const slong n = 12376;
     const slong N = n / 26;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     clock_t c0, c1;
     double c;
@@ -53,7 +53,7 @@ int main(void)
     fmpz_mod_poly_radix_t S;
     fmpz_mod_poly_struct **b;
 
-    flint_randinit(state);
+    
 
     fmpz_init(a);
     fmpz_init(m);

@@ -37,13 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
     ulong cflags = UWORD(0);
+
+    FLINT_TEST_INIT(state);
 
     flint_printf("scalar_div_fmpz....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -210,8 +209,8 @@ main(void)
         fmpq_poly_clear(rhs);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

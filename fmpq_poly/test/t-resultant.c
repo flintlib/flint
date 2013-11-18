@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("resultant....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check res(f, g) == (-1)^(deg f deg g) res(g, f) */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -180,8 +180,8 @@ main(void)
         fmpq_clear(y);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

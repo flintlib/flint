@@ -43,7 +43,7 @@ int main()
     fmpz_t mprod;
     ulong r2, m2;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("CRT_ui....");
     fflush(stdout);
@@ -53,7 +53,7 @@ int main()
     fmpz_init(r1);
     fmpz_init(m1);
     fmpz_init(mprod);
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

@@ -35,10 +35,11 @@ int main(void)
     int i, result;
     mpz_t a, a2, b, q, r, q2;
     gmp_randstate_t st;
-    flint_rand_t state;
     mp_limb_t d1, d2, inv;
     slong s1, s2;
     
+    FLINT_TEST_INIT(state);
+
     flint_printf("divrem_preinv1....");
     fflush(stdout);
 
@@ -49,8 +50,7 @@ int main(void)
     mpz_init(r);
     
     gmp_randinit_default(st);
-    flint_randinit(state);
-
+    
     for (i = 0; i < 10000; i++)
     {
        do {
@@ -111,8 +111,8 @@ int main(void)
     mpz_clear(r);
     /* don't clear g */
     gmp_randclear(st);
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

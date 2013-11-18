@@ -35,8 +35,8 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("atanh_series....");
     fflush(stdout);
@@ -119,8 +119,8 @@ main(void)
         nmod_poly_clear(B);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

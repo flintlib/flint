@@ -30,12 +30,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("padic_val_fac... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing for padic_val_fac() */
     for (i = 0; i < 1000; i++)
@@ -181,8 +181,8 @@ main(void)
         fmpz_clear(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

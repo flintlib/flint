@@ -40,8 +40,8 @@ main(void)
 
     slong n;
     mpq_t n_mpq;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("get/set_coeff_si....");
     fflush(stdout);

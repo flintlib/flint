@@ -35,12 +35,12 @@ int
 main(void)
 {
     int cflags = 0, i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
     flint_printf("xgcd....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Generic case, where a and b are coprime *******************************/
 
@@ -220,8 +220,8 @@ main(void)
         fmpq_poly_clear(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

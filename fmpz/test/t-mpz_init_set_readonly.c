@@ -33,12 +33,12 @@
 int main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
     flint_printf("mpz_init_set_readonly....");
     fflush(stdout);
     
-    flint_randinit(state);
+    
 
     /* Create some small fmpz integers, clear the mpz_t */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -95,8 +95,8 @@ int main(void)
         flint_mpz_clear_readonly(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

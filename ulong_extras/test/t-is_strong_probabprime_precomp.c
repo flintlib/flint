@@ -33,12 +33,12 @@ int main(void)
 {
    int i, j, result;
    ulong count = UWORD(0);
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
    flint_printf("is_strong_probabprime_precomp....");
    fflush(stdout);
 
-   flint_randinit(state);
+   
 
    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -115,8 +115,8 @@ int main(void)
       abort();
    }
 
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

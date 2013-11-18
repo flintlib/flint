@@ -44,8 +44,8 @@ void sample(void * arg, ulong count)
    int algo = info->algo;
    int scale = 200;
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    fmpz_t a, b, c, r;
    fmpz_preinvn_t inv;

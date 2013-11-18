@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    flint_printf("nullspace....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("nullspace....");
+    fflush(stdout);    
 
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -94,8 +93,8 @@ main(void)
         nmod_poly_mat_clear(AN);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

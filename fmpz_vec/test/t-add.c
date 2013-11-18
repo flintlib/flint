@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("add....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -100,8 +100,8 @@ main(void)
         _fmpz_vec_clear(c, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

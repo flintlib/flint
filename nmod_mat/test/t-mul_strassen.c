@@ -35,8 +35,8 @@ int
 main(void)
 {
     slong i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("mul_strassen....");
     fflush(stdout);
@@ -79,8 +79,8 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

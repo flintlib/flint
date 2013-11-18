@@ -40,8 +40,8 @@ int main()
     mp_limb_t * primes;
     mp_limb_t p;
     fmpz_comb_t comb;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("comb_init/clear....");
     fflush(stdout);
@@ -64,8 +64,8 @@ int main()
         flint_free(primes);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

@@ -36,13 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
     ulong cflags = UWORD(0);
+
+    FLINT_TEST_INIT(state);
 
     flint_printf("make_monic/is_monic....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -95,8 +94,8 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

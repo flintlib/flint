@@ -45,8 +45,8 @@ void sample(void * arg, ulong count)
    int type = info->type;
    mp_size_t j;
    slong i;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    
    n = n_randbits(state, bits);
    if (n == UWORD(0)) n++;

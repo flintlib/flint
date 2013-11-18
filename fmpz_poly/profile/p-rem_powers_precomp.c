@@ -67,8 +67,8 @@ void sample(void * arg, ulong count)
    if (length >= 50) scale = 10;
    if (length >= 500) scale = 4;
    
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    fmpz_poly_t p1, p2, b, q, r;
    fmpz_poly_powers_precomp_t pinv;

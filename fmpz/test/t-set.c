@@ -35,8 +35,8 @@ main(void)
 {
     int i, result;
 
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("set....");
     fflush(stdout);
@@ -80,8 +80,8 @@ main(void)
         mpz_clear(d);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

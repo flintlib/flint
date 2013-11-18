@@ -35,8 +35,8 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("div_2exp....");
     fflush(stdout);

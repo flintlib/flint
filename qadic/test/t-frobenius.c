@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("frobenius... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
@@ -266,8 +266,8 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

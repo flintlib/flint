@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("divisible....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with MPIR:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -138,8 +138,8 @@ main(void)
         fmpz_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -106,17 +106,15 @@ static const ulong testdata[][2] =
 
 int main(void)
 {
-    flint_rand_t state;
-
     fmpz_t p;
     fmpz * v;
 
     slong i;
 
-    flint_printf("number_of_partitions....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("number_of_partitions....");
+    fflush(stdout);    
 
     fmpz_init(p);
     v = _fmpz_vec_init(3000);
@@ -155,8 +153,8 @@ int main(void)
 
     fmpz_clear(p);
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

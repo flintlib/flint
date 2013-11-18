@@ -59,12 +59,12 @@ static int _check(fmpz_mod_poly_struct **B,
 int main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("radix....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 500; i++)
     {
@@ -140,8 +140,8 @@ int main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

@@ -34,16 +34,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     fmpz_t p;
     slong N;
     padic_ctx_t ctx;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("neg... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Aliasing */
     for (i = 0; i < 10000; i++)
@@ -120,8 +119,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

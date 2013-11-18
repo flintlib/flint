@@ -46,19 +46,19 @@ extern FILE * fdopen(int fildes, const char *mode);
 int main(void)
 {
     int i, j, n = 1000, result;
-    flint_rand_t state;
 
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
     fmpz_t two;
+
+    FLINT_TEST_INIT(state);
+
     fmpz_init(two);
     fmpz_set_ui(two,2);
 
     flint_printf("print/ read....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Randomise n polynomials, write to and read from a pipe */
     {
@@ -246,8 +246,8 @@ int main(void)
     }
 
     fmpz_clear(two);
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

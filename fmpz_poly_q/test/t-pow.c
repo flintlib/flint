@@ -9,12 +9,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("pow... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100; i++)
@@ -43,8 +43,8 @@ main(void)
         fmpz_poly_q_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

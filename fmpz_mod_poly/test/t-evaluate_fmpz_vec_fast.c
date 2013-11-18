@@ -37,8 +37,8 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
     
     flint_printf("evaluate_fmpz_vec_fast....");
     fflush(stdout);
@@ -99,8 +99,8 @@ main(void)
         _fmpz_vec_clear(z, npoints);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

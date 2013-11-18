@@ -32,8 +32,8 @@
 int main(void)
 {
    int i, j, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    flint_printf("factor_trial....");
    fflush(stdout);
@@ -62,8 +62,8 @@ int main(void)
       }
    }
    
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

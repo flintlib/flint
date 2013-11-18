@@ -93,15 +93,15 @@ static const slong testdata[][4] =
 
 int main(void)
 {
-    flint_rand_t state;
     fmpz_t hh, kk;
     fmpq_t s1, s2;
     slong i, h, k;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("dedekind_sum....");
     fflush(stdout);
-
-    flint_randinit(state);
+    
     fmpz_init(hh);
     fmpz_init(kk);
     fmpq_init(s1);
@@ -185,8 +185,8 @@ int main(void)
     fmpq_clear(s1);
     fmpq_clear(s2);
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

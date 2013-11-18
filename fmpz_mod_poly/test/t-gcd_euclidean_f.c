@@ -31,12 +31,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("gcd_euclidean_f....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /*
         Compare with the usual GCD function.
@@ -92,8 +92,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

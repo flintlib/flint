@@ -33,16 +33,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    flint_printf("compose_pow... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("compose_pow... ");
+    fflush(stdout);    
 
     /* Aliasing */
     for (i = 0; i < 1000; i++)
@@ -134,8 +133,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

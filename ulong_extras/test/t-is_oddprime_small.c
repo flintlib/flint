@@ -32,12 +32,12 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
    flint_printf("is_oddprime_small....");
    fflush(stdout);
    
-   flint_randinit(state);
+   
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -89,8 +89,8 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

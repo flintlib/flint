@@ -59,12 +59,12 @@ int
 main(void)
 {
     slong iter;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("abs_lbound_ui_2exp....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -95,8 +95,8 @@ main(void)
         fmpz_clear(x);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

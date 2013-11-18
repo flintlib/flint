@@ -43,8 +43,8 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = info->bits;
    ulong type = info->type;
    ulong i;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
       
    mp_ptr arr  = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
    mp_ptr arr2 = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));

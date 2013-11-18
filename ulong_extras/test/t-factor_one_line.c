@@ -33,12 +33,12 @@ int main(void)
 {
    int i, result;
    ulong count = UWORD(0);
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
    flint_printf("factor_one_line....");
    fflush(stdout);
 
-   flint_randinit(state);
+   
 
    for (i = 0; i < 500 * flint_test_multiplier(); i++) /* Test random numbers */
    {
@@ -77,8 +77,8 @@ int main(void)
       abort();
    }
 
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

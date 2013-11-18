@@ -51,8 +51,8 @@ int main(void)
     fmpz_t x;
     ulong p;
     slong i, j, k, l;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("moebius_mu....");
     fflush(stdout);

@@ -38,7 +38,7 @@ int main(void)
     slong i;
     ulong n;
     fmpz_t x, y, z;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("euler_phi....");
     fflush(stdout);
@@ -46,7 +46,7 @@ int main(void)
     fmpz_init(x);
     fmpz_init(y);
     fmpz_init(z);
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100; i++)
     {

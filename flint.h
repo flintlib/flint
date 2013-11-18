@@ -45,6 +45,10 @@
 #include "config.h"
 #undef ulong
 
+#if HAVE_GC
+#include "gc.h"
+#endif
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -125,7 +129,7 @@ typedef flint_rand_s flint_rand_t[1];
 static __inline__
 void flint_randinit(flint_rand_t state)
 {
-    state->gmp_init = 0;
+   state->gmp_init = 0;
 #if FLINT64
     state->__randval = UWORD(13845646450878251009);
     state->__randval2 = UWORD(13142370077570254774);
@@ -151,6 +155,21 @@ void flint_randclear(flint_rand_t state)
     if (state->gmp_init)
         gmp_randclear(state->gmp_state);
 }
+
+#if HAVE_GC
+#define FLINT_GC_INIT() GC_init()
+#else
+#define FLINT_GC_INIT()
+#endif
+
+#define FLINT_TEST_INIT(xxx) \
+   flint_rand_t xxx; \
+   FLINT_GC_INIT(); \
+   flint_randinit(xxx)
+
+#define FLINT_TEST_CLEANUP(xxx) \
+   flint_randclear(xxx); \
+   flint_cleanup();
 
 /*
   We define this here as there is no mpfr.h

@@ -46,7 +46,7 @@
 
 int main(void)
 {
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     fmpz_mod_poly_t f, g;
     fmpz_mod_poly_factor_t res;
     fmpz_t p;
@@ -57,7 +57,7 @@ int main(void)
     const slong degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
     const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
 
-    flint_randinit(state);
+    
 
     mpz_init(pz);
     mpz_init(curr);
@@ -370,8 +370,8 @@ int main(void)
     mpz_clear(pz);
     mpz_clear(curr);
     fmpz_clear(p);
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     return EXIT_SUCCESS;
 }
 

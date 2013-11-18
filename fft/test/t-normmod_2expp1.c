@@ -51,12 +51,12 @@ main(void)
     mp_limb_t * nn;
     mpz_t p, m1, m2;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("normmod_2expp1....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(m1);
@@ -101,8 +101,8 @@ main(void)
     mpz_clear(m1);
     mpz_clear(p);
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }
