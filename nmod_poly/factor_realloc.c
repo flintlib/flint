@@ -55,7 +55,7 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
 
             for (i = fac->alloc; i < alloc; i++)
             {
-                nmod_poly_init_preinv(fac->p + i, 0, 0);
+                nmod_poly_init_preinv(fac->p + i, 1, 0);
                 fac->exp[i] = WORD(0);
             }
             fac->alloc = alloc;
@@ -69,7 +69,7 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
         fac->exp = flint_calloc(alloc, sizeof(slong));
 
         for (i = 0; i < alloc; i++)
-            nmod_poly_init_preinv(fac->p + i, 0, 0);
+            nmod_poly_init_preinv(fac->p + i, 1, 0);
         fac->num   = 0;
         fac->alloc = alloc;
     }

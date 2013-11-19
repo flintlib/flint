@@ -20,6 +20,7 @@ PTHREAD=1
 REENTRANT=0
 WANT_GC=0
 WANT_TLS=0
+ASSERT=0
 BUILD=
 EXTENSIONS=
 EXT_MODS=
@@ -54,6 +55,8 @@ usage()
    echo "     --disable-pthread    Do not use pthread"
    echo "     --enable-tls         Use thread-local storage (default)"
    echo "     --disable-tls        Do not use thread-local storage"
+   echo "     --enable-assert      Enable use of asserts (use for debug builds only)"
+   echo "     --disable-assert     Disable use of asserts (default)"
    echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
    echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
    echo "     AR=<name>            Use the AR library builder with the given name (default: ar)"
@@ -139,6 +142,12 @@ while [ "$1" != "" ]; do
          WANT_TLS=1;;
       --disable-tls)
          TLS=0
+         ;;
+      --enable-assert)
+         ASSERT=1
+         ;;
+      --disable-assert)
+         ASSERT=0
          ;;
       AR)
          AR="$VALUE"
@@ -572,6 +581,7 @@ echo "$CONFIG_TLS" >> config.h
 echo "$CONFIG_PTHREAD" >> config.h
 echo "$CONFIG_GC" >> config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
+echo "#define WANT_ASSERT $ASSERT" >> config.h
 
 #write out Makefile
 

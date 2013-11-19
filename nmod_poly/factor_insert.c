@@ -55,7 +55,7 @@ nmod_poly_factor_insert(nmod_poly_factor_t fac,
         fac->exp = flint_realloc(fac->exp, sizeof(slong) * new_size);
 
         for (i = fac->alloc; i < new_size; i++)
-            nmod_poly_init_preinv(fac->p + i, 0, 0);
+            nmod_poly_init_preinv(fac->p + i, 1, 0);
 
         fac->alloc = new_size;
     }

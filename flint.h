@@ -49,6 +49,10 @@
 #include "gc.h"
 #endif
 
+#if WANT_ASSERT
+#include <assert.h>
+#endif
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -176,7 +180,11 @@ void flint_randclear(flint_rand_t state)
  */
 typedef __mpfr_struct mpfr;
 
+#if WANT_ASSERT
+#define FLINT_ASSERT(param) assert(param)
+#else 
 #define FLINT_ASSERT(param)
+#endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))

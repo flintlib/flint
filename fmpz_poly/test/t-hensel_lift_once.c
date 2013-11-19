@@ -42,8 +42,6 @@ main(void)
 
     flint_printf("hensel_lift_once....");
     fflush(stdout);
-
-    
    
     /* We check that lifting local factors of F yields factors */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -54,7 +52,7 @@ main(void)
         slong bits, nbits, n, exp, j;
 
         bits  = n_randint(state, 200) + 1;
-        nbits = n_randint(state,FLINT_BITS - 6) + 6;
+        nbits = n_randint(state, FLINT_BITS - 6) + 6;
 
         fmpz_poly_init(F);
         fmpz_poly_init(G);

@@ -45,7 +45,8 @@ int main(void)
 
       n = n_randtest(state);
 
-      count_trailing_zeros(count, n);
+      if (n != 0)
+         count_trailing_zeros(count, n);
 
       result = ((n == UWORD(0)) || (((n >> count) & UWORD(1)) && (l_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)

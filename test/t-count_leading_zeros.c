@@ -45,7 +45,8 @@ int main(void)
 
       n = n_randtest(state);
 
-      count_leading_zeros(count, n);
+      if (n != 0)
+         count_leading_zeros(count, n);
 
       result = ((n == UWORD(0)) || (((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)

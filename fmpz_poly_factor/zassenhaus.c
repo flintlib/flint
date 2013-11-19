@@ -124,9 +124,9 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         nmod_poly_factor_t fac;
 
         nmod_poly_factor_init(fac);
-        nmod_poly_init_preinv(t, 0, 0);
-        nmod_poly_init_preinv(d, 0, 0);
-        nmod_poly_init_preinv(g, 0, 0);
+        nmod_poly_init_preinv(t, 1, 0);
+        nmod_poly_init_preinv(d, 1, 0);
+        nmod_poly_init_preinv(g, 1, 0);
 
         for (i = 0; i < 3; i++)
         {

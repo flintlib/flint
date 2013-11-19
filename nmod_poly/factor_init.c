@@ -42,5 +42,5 @@ nmod_poly_factor_init(nmod_poly_factor_t fac)
     fac->exp   = flint_malloc(sizeof(slong) * 5);
 
     for (i = 0; i < 5; i++)
-        nmod_poly_init_preinv(fac->p + i, 0, 0);
+        nmod_poly_init_preinv(fac->p + i, 1, 0);
 }

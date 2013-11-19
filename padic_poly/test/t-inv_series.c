@@ -59,14 +59,14 @@ main(void)
         padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100) + 1, ctx);
-        fmpz_remove(a->coeffs, a->coeffs, p);
         if (fmpz_is_zero(a->coeffs))
         {
             fmpz_randtest_not_zero(a->coeffs, state, 20);
             fmpz_remove(a->coeffs, a->coeffs, p);
             padic_poly_reduce(a, ctx);
-        }
-
+        } else
+            fmpz_remove(a->coeffs, a->coeffs, p);
+        
         padic_poly_set(b, a, ctx);
         n = n_randint(state, 100) + 1;
 
