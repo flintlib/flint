@@ -299,7 +299,7 @@ int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 static __inline__
 int nmod_poly_print(const nmod_poly_t a)
 {
-    int r;
+    size_t r;
     slong i;
 
     r = flint_printf("%wd %wu", a->length, a->mod.n);
@@ -313,7 +313,7 @@ int nmod_poly_print(const nmod_poly_t a)
     for (i = 0; (r > 0) && (i < a->length); i++)
         r = flint_printf(" %wu", a->coeffs[i]);
 
-    return r;
+    return (int) r;
 }
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly);
