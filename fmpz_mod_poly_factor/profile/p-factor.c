@@ -31,7 +31,7 @@
 #include <gmp.h>
 
 #include "flint.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 
 #define NP 20  /* number of moduli */
 #define ND 8   /* number of degrees */

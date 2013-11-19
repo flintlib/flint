@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 
 void
 fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac)

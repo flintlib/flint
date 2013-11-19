@@ -27,7 +27,7 @@
 #define FMPZ_POLY_FACTORXX_H
 
 
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "fmpz_mod_polyxx.h"
 
 namespace flint {

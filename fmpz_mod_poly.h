@@ -779,5 +779,7 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
 }
 #endif
 
+#include "fmpz_mod_poly_factor.h"
+
 #endif
 

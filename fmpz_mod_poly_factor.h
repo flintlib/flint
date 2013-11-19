@@ -36,7 +36,6 @@
 
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_mod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
