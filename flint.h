@@ -58,6 +58,17 @@
 #endif
 
 /*
+   Check mpir and mpfr version numbers
+*/
+#if __GNU_MP_VERSION < 5
+#error GMP 5.0.0 or MPIR 2.6.0 or later are required
+#endif
+
+#if MPFR_VERSION_MAJOR < 3
+#error MPFR 3.0.0 or later is required
+#endif
+
+/*
    We define alternative key words for "asm" and "inline", allowing 
    the code to be compiled with the "-ansi" flag under GCC
  */
