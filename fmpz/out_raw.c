@@ -26,16 +26,17 @@
 
 #include "fmpz.h"
 
-size_t fmpz_out_raw( FILE *fout, const fmpz_t x ) {
-        mpz_t v;
-        size_t size;
+size_t fmpz_out_raw( FILE *fout, const fmpz_t x ) 
+{
+    mpz_t v;
+    size_t size;
 
-        mpz_init( v );
-        fmpz_get_mpz( v, x );
-        size = mpz_out_raw( fout, v );
-        mpz_clear( v );
+    mpz_init( v );
+    fmpz_get_mpz( v, x );
+    size = mpz_out_raw( fout, v );
+    mpz_clear( v );
 
-        return size;
+    return size;
 }
 
 

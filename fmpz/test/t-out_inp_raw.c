@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2013 Qingwen GUAN
 
 ******************************************************************************/
 
@@ -45,16 +46,15 @@ extern FILE * fdopen(int fildes, const char *mode);
 int main(void)
 {
     int i, j, n = 10000, result;
-    flint_rand_t state;
 
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
 
-    printf("out_raw/ inp_raw....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    printf("out_raw/inp_raw....");
+    fflush(stdout);
 
     /* Randomise n integers, write to and read from a pipe */
     {
@@ -156,8 +156,8 @@ int main(void)
     /* Write bad data to a pipe and read it */
     /* Not necessary */
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     printf("PASS\n");
     return EXIT_SUCCESS;
 }
