@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly.h"
 
 void
 fmpz_poly_factor_insert(fmpz_poly_factor_t fac, const fmpz_poly_t p, slong exp)

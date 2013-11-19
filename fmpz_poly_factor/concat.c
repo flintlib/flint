@@ -29,7 +29,7 @@
 
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly.h"
 
 void
 fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)

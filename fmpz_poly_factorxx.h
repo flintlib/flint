@@ -27,7 +27,7 @@
 #define FMPZ_POLY_FACTORXX_H
 
 
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly.h"
 #include "fmpz_polyxx.h"
 #include "nmod_polyxx.h"
 

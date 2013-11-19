@@ -39,7 +39,6 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "nmod_poly.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
  extern "C" {

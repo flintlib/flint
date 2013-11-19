@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 #include "flint.h"
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly.h"
 
 void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
 {

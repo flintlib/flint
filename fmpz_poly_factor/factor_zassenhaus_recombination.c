@@ -26,7 +26,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly.h"
 
 #define TRACE 0
 
