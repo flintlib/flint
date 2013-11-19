@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include "arith.h"
-#include "fmpz_factor.h"
+#include "fmpz.h"
 
 #define FLINT_NUM_TINY_DIVISORS FLINT_BITS
 

@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_factor.h"
+#include "fmpz.h"
 #include "arith.h"
 
 static void

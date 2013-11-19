@@ -672,5 +672,7 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n);
 }
 #endif
 
+#include "fmpz_factor.h"
+
 #endif
 

@@ -27,7 +27,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_factor.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 

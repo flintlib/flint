@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include "arith.h"
-#include "fmpz_factor.h"
+#include "fmpz.h"
 
 /* note: destroys factors! */
 void
