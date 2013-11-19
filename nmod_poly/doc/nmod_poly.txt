@@ -1275,7 +1275,7 @@ void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, const nmod_poly_t poly,
 void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr poly, slong len,
                                     mp_srcptr xs, slong n, nmod_t mod)
 
-    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    Evaluates (\code{poly}, \code{len}) at the \code{n} values
     given in the vector \code{xs}, writing the output values
     to \code{ys}. The values in \code{xs} should be reduced
     modulo the modulus.

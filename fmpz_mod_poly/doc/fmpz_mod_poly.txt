@@ -1087,6 +1087,71 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
 
 *******************************************************************************
 
+    Multipoint evaluation
+
+*******************************************************************************
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, 
+                        slong len, const fmpz * xs, slong n, const fmpz_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs,
+              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, 
+                                                 slong len, const fmpz_t mod)
+    Evaluates (\code{poly}, \code{plen}) at the \code{len} values given
+    by the precomputed subproduct tree \code{tree}.
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
+    const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+    Uses fast multipoint evaluation, building a temporary subproduct tree.
+
+void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+    Uses fast multipoint evaluation, building a temporary subproduct tree.
+
+void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, 
+                        slong len, const fmpz * xs, slong n, const fmpz_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+*******************************************************************************
+
     Composition
 
 *******************************************************************************
@@ -1304,6 +1369,28 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
     $h$ is nonzero and that $f$ has smaller degree than $h$. Furthermore,
     we require \code{hinv} to be the inverse of the reverse of \code{h}.
     The algorithm used is the Brent-Kung matrix algorithm.
+
+*******************************************************************************
+
+    Subproduct trees
+
+*******************************************************************************
+
+fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len)
+
+    Allocates space for a subproduct tree of the given length, having
+    linear factors at the lowest level.
+
+void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len)
+
+    Free the allocated space for the subproduct.
+
+void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, 
+                             const fmpz * roots, slong len, const fmpz_t mod)
+
+    Builds a subproduct tree in the preallocated space from
+    the \code{len} monic linear factors $(x-r_i)$ where $r_i$ are given by
+    \code{roots}. The top level product is not computed.
 
 *******************************************************************************
 
