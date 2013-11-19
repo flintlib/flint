@@ -145,7 +145,8 @@ ifndef MOD
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	$(AT)$(foreach dir, $(MOD), test ! -d $(dir) || mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); test ! -d $(dir) || $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach dir, $(MOD), export MOD_DIR=$(dir); test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; export BUILD_DIR=$(CURDIR)/build/$(dir); test ! -d $(ext)/$(dir) || $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
 endif
 
 install: library
