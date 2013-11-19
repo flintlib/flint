@@ -29,7 +29,7 @@
 #include <cstdlib>
 #include <string>
 
-#include "memory_manager.h"
+#include "flint.h"
 #include "fmpq_poly.h"
 
 #include "fmpqxx.h"

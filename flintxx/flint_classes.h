@@ -27,7 +27,7 @@
 // Contrary to other parts of this library, they are tailored very
 // specifically towards FLINT.
 
-#include "memory_manager.h"
+#include "flint.h"
 #include "mp.h"
 #include "expression.h"
 #include "expression_traits.h"
