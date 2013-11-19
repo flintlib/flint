@@ -78,7 +78,7 @@ TEMPLATE(T, poly_factor_equal_deg_prob)(TEMPLATE(T, poly_t) factor, flint_rand_t
         fmpz_sub_ui(exp, exp, 1);
         fmpz_fdiv_q_2exp(exp, exp, 1);
 
-        TEMPLATE(T, poly_powmod_fmpz_binexp_preinv)(b, a, exp, pol, polinv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(b, a, exp, 0, pol, polinv, ctx);
     }
     else
     {
