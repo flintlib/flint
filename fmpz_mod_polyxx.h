@@ -683,4 +683,6 @@ FLINT_DEFINE_BINARY_EXPR_COND2(radix_op, fmpz_mod_poly_vecxx,
 }
 } // flint
 
+#include "fmpz_mod_poly_factorxx.h"
+
 #endif

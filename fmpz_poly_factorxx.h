@@ -28,7 +28,6 @@
 
 
 #include "fmpz_poly.h"
-#include "fmpz_polyxx.h"
 #include "nmod_polyxx.h"
 
 namespace flint {

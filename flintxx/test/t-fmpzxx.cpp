@@ -27,7 +27,6 @@
 #include <string>
 
 #include "fmpzxx.h"
-#include "fmpz_factorxx.h"
 #include "flintxx/test/helpers.h"
 
 #if !HAVE_FAST_COMPILER

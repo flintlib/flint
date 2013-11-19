@@ -28,7 +28,6 @@
 #include <string>
 
 #include "fmpz_mod_polyxx.h"
-#include "fmpz_mod_poly_factorxx.h"
 
 #include "flintxx/test/helpers.h"
 

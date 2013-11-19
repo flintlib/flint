@@ -794,4 +794,6 @@ FLINT_DEFINE_THREEARY_EXPR(multi_CRT_op, fmpzxx,
 } // rules
 } // flint
 
+#include "fmpz_factorxx.h"
+
 #endif

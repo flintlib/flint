@@ -23,12 +23,11 @@
 
 ******************************************************************************/
 
-#ifndef FMPZ_POLY_FACTORXX_H
-#define FMPZ_POLY_FACTORXX_H
+#ifndef FMPZ_MOD_POLY_FACTORXX_H
+#define FMPZ_MOD_POLY_FACTORXX_H
 
 
 #include "fmpz_mod_poly.h"
-#include "fmpz_mod_polyxx.h"
 
 namespace flint {
 class fmpz_mod_poly_factorxx

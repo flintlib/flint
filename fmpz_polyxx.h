@@ -957,4 +957,6 @@ int read_pretty(FILE* fi, Fmpz_poly& f, char** x,
 
 #include "nmod_polyxx.h" // modular reconstruction code
 
+#include "fmpz_poly_factorxx.h"
+
 #endif
