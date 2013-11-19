@@ -113,9 +113,8 @@ int main(void)
 
     _fmpz_vec_clear(b1, maxn);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
 
-    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }
