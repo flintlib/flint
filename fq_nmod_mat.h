@@ -38,7 +38,7 @@
 
 static __inline__ int FQ_NMOD_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_nmod_ctx_t ctx)
 {
-    if (5 * FLINT_MIN(r, c) > 8 * fq_nmod_ctx_degree(ctx) + 29)
+    if (FLINT_MIN(r, c) > fq_nmod_ctx_degree(ctx) / 20 + 6)
         return 1;
     else
         return 0;
