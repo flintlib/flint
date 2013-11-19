@@ -57,6 +57,16 @@
  extern "C" {
 #endif
 
+/* flint version number */
+
+#define __FLINT_VERSION 2
+#define __FLINT_VERSION_MINOR 4
+#define __FLINT_VERSION_PATCHLEVEL 0
+#define FLINT_VERSION "2.4.0"
+#define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
+                         __FLINT_VERSION_MINOR * 100 + \
+                         __FLINT_VERSION_PATCHLEVEL)
+
 /*
    Check mpir and mpfr version numbers
 */
