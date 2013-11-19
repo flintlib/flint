@@ -2485,17 +2485,16 @@ void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-		const nmod_poly_t poly, slong **degs)
+                                   const nmod_poly_t poly, slong * const *degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
-    of degree n into factors ${f[d]}$ such that for ${1 \leq d \leq n}$
-    ${f[d]}$ is the product of the monic irreducible factors of \code{poly}
-    of degree ${d}$. Factors are stored in \code{res}, assotiated powers
-    of irreducible polynomials are stored in \code{degs} in the same order
-    as factors.
+    of degree n into factors $f[d]$ such that for $1 \leq d \leq n$
+    $f[d]$ is the product of the monic irreducible factors of \code{poly}
+    of degree $d$. Factors $f[d]$ are stored in \code{res}, and the degree $d$
+    of the irreducible factors is stored in \code{degs} in the same order
+    as the factors.
 
-    Requires that \code{degs} have enough space for irreducible polynomials'
-    powers (maximum space required is \code{n * sizeof(slong)}).
+    Requires that \code{degs} has enough space for $(n/2)+1 * sizeof(slong)$.
 
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
                                         const nmod_poly_t f)
