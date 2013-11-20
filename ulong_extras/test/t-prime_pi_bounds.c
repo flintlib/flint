@@ -49,6 +49,7 @@ int main(void)
 {
     int n;
 
+    FLINT_TEST_INIT(state);
     flint_printf("prime_pi_bounds....");
     fflush(stdout);
 
@@ -77,7 +78,7 @@ int main(void)
     check(UWORD(100000000000000000), UWORD(2623557157654233));
 #endif
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

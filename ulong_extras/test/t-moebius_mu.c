@@ -44,6 +44,8 @@ int main(void)
     int n, k, s;
     int * mu;
 
+    FLINT_TEST_INIT(state);
+    
     flint_printf("moebius_mu....");
     fflush(stdout);
 
@@ -88,7 +90,7 @@ int main(void)
         abort();
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

@@ -45,6 +45,8 @@ int main(void)
 
     const slong maxn = 40;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("stirling....");
     fflush(stdout);
 
@@ -207,7 +209,7 @@ int main(void)
 
     fmpz_clear(s);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

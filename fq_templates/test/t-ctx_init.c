@@ -40,12 +40,10 @@ int
 main(void)
 {
     int i, k, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("ctx_init... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 30; i++) {
         fmpz_t p;
@@ -111,9 +109,7 @@ main(void)
 
     }
 
-
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
 
     return EXIT_SUCCESS;

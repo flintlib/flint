@@ -70,6 +70,8 @@ void test_exact(int d)
 
 int main(void)
 {
+    FLINT_TEST_INIT(state);
+
     flint_printf("remove_power....");
     fflush(stdout);
 
@@ -77,7 +79,7 @@ int main(void)
     test_exact(10);
     test_exact(7429);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

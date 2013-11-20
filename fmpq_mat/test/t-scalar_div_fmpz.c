@@ -123,9 +123,9 @@ main(void)
         fmpz_clear(x);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -25,6 +25,7 @@
 
 #ifdef T
 
+#include "flint.h"
 #include "templates.h"
 
 #include <sys/stat.h>
@@ -46,9 +47,8 @@ get_timings(double* s, slong degree, mp_bitcnt_t bits, slong length)
     double beta;
     slong i, l;
     int n, c, reps = 0;
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_init(q);
 
@@ -175,6 +175,9 @@ get_timings(double* s, slong degree, mp_bitcnt_t bits, slong length)
 
 
     flint_free(h);
+
+    FLINT_TEST_CLEANUP(state);
+    
     return s[0] > s[1];
 }
 

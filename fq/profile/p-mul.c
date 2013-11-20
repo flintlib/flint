@@ -22,6 +22,7 @@
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
+#include "flint.h"
 #include "fq.h"
 #include <stdio.h>
 #include "profiler.h"
@@ -33,7 +34,6 @@
 int
 main()
 {
-    flint_rand_t state;
     timeit_t t0;
 
     slong i;
@@ -42,7 +42,8 @@ main()
     fq_ctx_t ctx;
     fq_t a,b,c;
 
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_ui(p, n_randprime(state, 2+ n_randint(state,3),1));
     d = n_randint(state,10)+1;
@@ -57,6 +58,7 @@ main()
 
     flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , cpu , wall );
 
+    FLINT_TEST_CLEANUP(state);
 
     return 0;
 

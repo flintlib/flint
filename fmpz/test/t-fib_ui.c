@@ -37,6 +37,8 @@ main(void)
     slong i, n;
     fmpz_t x, y, z, w;
 
+    FLINT_TEST_INIT(state);
+    
     flint_printf("fib_ui....");
     fflush(stdout);
 
@@ -74,7 +76,7 @@ main(void)
     fmpz_clear(z);
     fmpz_clear(w);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

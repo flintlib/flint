@@ -34,9 +34,8 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("factor_kaltofen_shoup....");
     fflush(stdout);
 
@@ -145,8 +144,7 @@ main(void)
         TEMPLATE(T, poly_factor_clear)(res, ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

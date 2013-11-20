@@ -1098,6 +1098,8 @@ int main(int argc, char *argv[])
     mpz_t mpzzero, mpzone, mpztwo;
     mpq_t mpqzero, mpqone, mpqtwo, mpqtwoinv;
     
+    FLINT_TEST_INIT(state);
+    
     flint_printf("all... ");
     fflush(stdout);
     
@@ -1537,7 +1539,7 @@ int main(int argc, char *argv[])
     test_get_str_pretty("2  1 1/1  2", "(t+1)/2");
     test_get_str_pretty("1  1/1  2", "1/2");
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

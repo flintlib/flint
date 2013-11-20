@@ -36,6 +36,8 @@ main(void)
     slong i;
     fmpq_t r, ans;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("next_minimal....");
     fflush(stdout);
 
@@ -111,7 +113,7 @@ main(void)
     fmpq_clear(r);
     fmpq_clear(ans);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

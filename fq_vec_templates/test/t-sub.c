@@ -35,12 +35,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     printf("sub....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 100; i++)
@@ -150,8 +148,7 @@ main(void)
     }
 
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

@@ -32,6 +32,8 @@ int main(void)
 {
     int n, k, t;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("euler_phi....");
     fflush(stdout);
 
@@ -48,7 +50,7 @@ int main(void)
         }
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

@@ -36,6 +36,8 @@ int main()
     fmpz_t s, t;
     slong n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("bernoulli_number_denom....");
     fflush(stdout);
 
@@ -59,7 +61,7 @@ int main()
     fmpz_clear(s);
     fmpz_clear(t);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

@@ -25,6 +25,7 @@
 
 #ifdef T
 
+#include "flint.h"
 #include "templates.h"
 
 #include <stdio.h>
@@ -46,9 +47,8 @@ main(int argc, char** argv)
 
     double s[nalgs];
     
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -124,6 +124,8 @@ main(int argc, char** argv)
     TEMPLATE(T, ctx_clear)(ctx);
     fmpz_clear(p);
 
+    FLINT_TEST_CLEANUP(state);
+    
     return 0;
 }
 

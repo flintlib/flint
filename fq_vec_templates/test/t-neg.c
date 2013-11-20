@@ -34,12 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     printf("neg....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100; i++)
@@ -103,8 +101,7 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

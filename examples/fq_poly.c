@@ -36,13 +36,11 @@ int main(void)
     fmpz_t p;
     long d, i;
     fq_ctx_t ctx;
-    flint_rand_t state;
     clock_t c0, c1;
     double c;
-
     fq_poly_t f, g, h;
 
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
 
     fq_poly_init(f, ctx);
     fq_poly_init(g, ctx);
@@ -154,7 +152,7 @@ int main(void)
     fq_poly_clear(f, ctx);
     fq_poly_clear(g, ctx);
     fq_poly_clear(h, ctx);
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
 
     return EXIT_SUCCESS;
 }

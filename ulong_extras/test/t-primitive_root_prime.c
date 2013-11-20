@@ -30,13 +30,11 @@
 int main(void)
 {
     int i, j;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("primitive_root_prime....");
     fflush(stdout);
    
-    flint_randinit(state);
-
     for (i = 0; i < 100; i++)
     {
         n_factor_t factors;
@@ -61,8 +59,7 @@ int main(void)
         }
     }
 
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
    flint_printf("PASS\n");
    return 0;
 

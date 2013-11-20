@@ -39,6 +39,8 @@ int main(void)
 
     const slong maxn = 1000;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("bell_number_vec....");
     fflush(stdout);
 
@@ -61,7 +63,7 @@ int main(void)
     _fmpz_vec_clear(b1, maxn);
     _fmpz_vec_clear(b2, maxn);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

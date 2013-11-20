@@ -79,9 +79,9 @@ main(void)
         nmod_poly_clear(M2);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

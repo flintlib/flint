@@ -40,12 +40,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("neg... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing: a = -a */
     for (i = 0; i < 2000; i++)
@@ -121,8 +119,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

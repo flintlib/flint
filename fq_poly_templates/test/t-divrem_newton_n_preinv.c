@@ -34,8 +34,7 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
 
     flint_printf("divrem_newton_n_preinv....");
     fflush(stdout);
@@ -373,8 +372,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }
