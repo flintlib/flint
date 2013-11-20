@@ -53,7 +53,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
         fmpz_t x, y;
-        long j;
+        slong j;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 

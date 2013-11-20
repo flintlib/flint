@@ -36,7 +36,7 @@ main()
     flint_rand_t state;
     timeit_t t0;
 
-    long i, d, cpu, wall;
+    slong i, d, cpu, wall;
     fmpz_t p;
     fq_ctx_t ctx;
     fq_t a,b;

@@ -31,10 +31,10 @@
 
 void
 _TEMPLATE(T, poly_divrem_basecase)(TEMPLATE(T, struct) * Q, TEMPLATE(T, struct) * R,
-                         const TEMPLATE(T, struct) * A, long lenA, const TEMPLATE(T, struct) * B,
-                         long lenB, const TEMPLATE(T, t) invB, const TEMPLATE(T, ctx_t) ctx)
+                         const TEMPLATE(T, struct) * A, slong lenA, const TEMPLATE(T, struct) * B,
+                         slong lenB, const TEMPLATE(T, t) invB, const TEMPLATE(T, ctx_t) ctx)
 {
-    long iQ, iR;
+    slong iQ, iR;
 
     if (R != A)
         _TEMPLATE(T, poly_set)(R, A, lenA, ctx);
@@ -57,7 +57,7 @@ TEMPLATE(T, poly_divrem_basecase)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
                         const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                         const TEMPLATE(T, ctx_t) ctx)
 {
-    const long lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
+    const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     TEMPLATE(T, struct) *q, *r;
     TEMPLATE(T, t) invB;
 

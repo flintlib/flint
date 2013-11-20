@@ -49,7 +49,7 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;

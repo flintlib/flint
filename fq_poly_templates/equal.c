@@ -33,7 +33,7 @@
 int
 TEMPLATE(T, poly_equal)(const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     if (op1 == op2)
         return 1;

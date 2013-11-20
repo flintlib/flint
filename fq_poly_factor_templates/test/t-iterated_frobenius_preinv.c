@@ -41,7 +41,7 @@ main(void)
     {
         int result;
         fmpz_t q;
-        long n;
+        slong n;
         
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) v, vinv, *h1, *h2;

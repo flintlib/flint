@@ -30,7 +30,7 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) rop, const TEMPLATE(T, struct) * op, long len,
+_TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) rop, const TEMPLATE(T, struct) * op, slong len,
                      const TEMPLATE(T, t) a, const TEMPLATE(T, ctx_t) ctx)
 {
     if (len == 0)
@@ -43,7 +43,7 @@ _TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) rop, const TEMPLATE(T, s
     }
     else
     {
-        long i = len - 1;
+        slong i = len - 1;
         TEMPLATE(T, t) t;
 
         TEMPLATE(T, init)(t, ctx);

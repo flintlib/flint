@@ -33,7 +33,7 @@
 
 void
 _TEMPLATE(T, poly_make_monic)(TEMPLATE(T, struct) * rop,
-                    const TEMPLATE(T, struct) * op, long length, const TEMPLATE(T, ctx_t) ctx)
+                    const TEMPLATE(T, struct) * op, slong length, const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, t) inv;
     TEMPLATE(T, init)(inv, ctx);

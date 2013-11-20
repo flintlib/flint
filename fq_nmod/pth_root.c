@@ -28,7 +28,7 @@
 void
 fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
 {
-    long i, d;
+    slong i, d;
     if (fq_nmod_is_zero(op1, ctx) || fq_nmod_is_one(op1, ctx))
     {
         fq_nmod_set(rop, op1, ctx);

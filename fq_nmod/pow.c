@@ -25,10 +25,10 @@
 
 #include "fq_nmod.h"
 
-void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, long len, const fmpz_t e, 
+void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e, 
                   const fq_nmod_ctx_t ctx)
 {
-    const long d = fq_nmod_ctx_degree(ctx);
+    const slong d = fq_nmod_ctx_degree(ctx);
 
     if (fmpz_is_zero(e))
     {
@@ -142,7 +142,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
     }
     else
     {
-        const long d = fq_nmod_ctx_degree(ctx);
+        const slong d = fq_nmod_ctx_degree(ctx);
         mp_limb_t *t;
 
         if (rop == op)

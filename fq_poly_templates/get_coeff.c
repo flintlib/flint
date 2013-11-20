@@ -32,7 +32,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_get_coeff)(TEMPLATE(T, t) x, const TEMPLATE(T, poly_t) poly, long n, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_get_coeff)(TEMPLATE(T, t) x, const TEMPLATE(T, poly_t) poly, slong n, const TEMPLATE(T, ctx_t) ctx)
 {
     if (n < poly->length)
         TEMPLATE(T, set)(x, poly->coeffs + n, ctx);

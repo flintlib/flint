@@ -31,10 +31,10 @@
     When $N = 1$, this computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len, 
+void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len, 
                         const fq_nmod_ctx_t ctx)
 {
-    const long d = fq_nmod_ctx_degree(ctx);
+    const slong d = fq_nmod_ctx_degree(ctx);
 
     mp_limb_t rop;
 
@@ -46,8 +46,8 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len,
     {
         /* Construct an ad hoc matrix M and set rop to det(M) */
         {
-            const long n = d + len - 1;
-            long i, k;
+            const slong n = d + len - 1;
+            slong i, k;
             nmod_mat_t M;
 
             nmod_mat_init(M, n, n, ctx->mod.n);

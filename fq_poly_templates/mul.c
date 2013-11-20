@@ -31,8 +31,8 @@
 
 void
 _TEMPLATE(T, poly_mul)(TEMPLATE(T, struct) * rop,
-             const TEMPLATE(T, struct) * op1, long len1,
-             const TEMPLATE(T, struct) * op2, long len2, const TEMPLATE(T, ctx_t) ctx)
+             const TEMPLATE(T, struct) * op1, slong len1,
+             const TEMPLATE(T, struct) * op2, slong len2, const TEMPLATE(T, ctx_t) ctx)
 {
     if (FLINT_MAX(len1, len2) < TEMPLATE(CAP_T, MUL_CLASSICAL_CUTOFF))
     {
@@ -54,9 +54,9 @@ void
 TEMPLATE(T, poly_mul)(TEMPLATE(T, poly_t) rop,
             const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long rlen = op1->length + op2->length - 1;
+    const slong len1 = op1->length;
+    const slong len2 = op2->length;
+    const slong rlen = op1->length + op2->length - 1;
 
     if (len1 == 0 || len2 == 0)
     {

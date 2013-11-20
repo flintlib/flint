@@ -33,7 +33,7 @@ void
 fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t p;
-    long max_d, d;
+    slong max_d, d;
 
     fq_nmod_ctx_struct * fq_nmod_ctx;
 

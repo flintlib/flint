@@ -47,8 +47,8 @@ typedef struct
     int sparse_modulus;
 
     fmpz *a;
-    long *j;
-    long len;
+    slong *j;
+    slong len;
 
     fmpz_mod_poly_t modulus;
     fmpz_mod_poly_t inv;
@@ -59,21 +59,21 @@ fq_ctx_struct;
 
 typedef fq_ctx_struct fq_ctx_t[1];
 
-void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, long d, const char *var);
+void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var);
+int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var);
+void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
 void fq_ctx_init_modulus(fq_ctx_t ctx,
-                         const fmpz_t p, long d, fmpz_mod_poly_t modulus,
+                         const fmpz_t p, slong d, fmpz_mod_poly_t modulus,
                          const char *var);
 
 void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
 
 void fq_ctx_clear(fq_ctx_t ctx);
 
-static __inline__ long fq_ctx_degree(const fq_ctx_t ctx)
+static __inline__ slong fq_ctx_degree(const fq_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
 }
@@ -139,15 +139,15 @@ static __inline__ void fq_clear(fq_t rop, const fq_ctx_t ctx)
 }
 
 static __inline__ 
-void _fq_sparse_reduce(fmpz *R, long lenR, const fq_ctx_t ctx)
+void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
 {
-    const long d = ctx->j[ctx->len - 1];
+    const slong d = ctx->j[ctx->len - 1];
 
     FMPZ_VEC_NORM(R, lenR);
 
     if (lenR > d)
     {
-        long i, k;
+        slong i, k;
 
         for (i = lenR - 1; i >= d; i--)
         {
@@ -162,7 +162,7 @@ void _fq_sparse_reduce(fmpz *R, long lenR, const fq_ctx_t ctx)
     _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), fq_ctx_prime(ctx));
 }
 
-static __inline__ void _fq_dense_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
+static __inline__ void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
 {
     fmpz  *q, *r;
 
@@ -187,7 +187,7 @@ static __inline__ void _fq_dense_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
 }
 
 
-static __inline__ void _fq_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
+static __inline__ void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
 {
     if (ctx->sparse_modulus)
         _fq_sparse_reduce(R, lenR, ctx);
@@ -216,7 +216,7 @@ void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
 void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
 
-void fq_mul_si(fq_t rop, const fq_t op, long x, const fq_ctx_t ctx);
+void fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx);
 
 void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 
@@ -224,7 +224,7 @@ void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
+void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
              const fq_ctx_t ctx);
 
 void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
@@ -333,16 +333,16 @@ fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-void _fq_trace(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx);
+void _fq_trace(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
 
 void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
-void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
+void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
                    const fq_ctx_t ctx);
 
-void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx);
+void fq_frobenius(fq_t rop, const fq_t op, slong e, const fq_ctx_t ctx);
 
-void _fq_norm(fmpz_t rop, const fmpz *op, long len, const fq_ctx_t ctx);
+void _fq_norm(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
 
 void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 

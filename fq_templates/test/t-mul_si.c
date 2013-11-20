@@ -51,7 +51,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        long x;
+        slong x;
         TEMPLATE(T, t) a, b;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        long x;
+        slong x;
         TEMPLATE(T, t) a, c;
 	fmpz_poly_t b;
 

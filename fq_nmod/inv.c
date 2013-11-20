@@ -25,10 +25,10 @@
 
 #include "fq_nmod.h"
 
-void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, long len, 
-                  const mp_limb_t *a, const long *j, long lena, const fq_nmod_ctx_t ctx)
+void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len, 
+                  const mp_limb_t *a, const slong *j, slong lena, const fq_nmod_ctx_t ctx)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len == 1)
     {
@@ -38,7 +38,7 @@ void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, long len,
     else
     {
         mp_limb_t *f = _nmod_vec_init(d + 1);
-        long k;
+        slong k;
 
         _nmod_vec_zero(f, d + 1);
         for (k = 0; k < lena; k++)
@@ -59,7 +59,7 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
     }
     else
     {
-        const long d = fq_nmod_ctx_degree(ctx);
+        const slong d = fq_nmod_ctx_degree(ctx);
         mp_limb_t *t;
 
         if (rop == op)

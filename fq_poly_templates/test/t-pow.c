@@ -50,7 +50,7 @@ main(void)
     /* Check aliasing  */
     for (i = 0; i < 200; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -89,7 +89,7 @@ main(void)
     /* Compare with repeated multiplications by the base */
     for (i = 0; i < 1000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -112,7 +112,7 @@ main(void)
         }
         else
         {
-            long j;
+            slong j;
 
             TEMPLATE(T, poly_set)(c, b, ctx);
             for (j = 1; j < exp; j++)

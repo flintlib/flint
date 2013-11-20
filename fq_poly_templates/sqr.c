@@ -31,7 +31,7 @@
 
 void
 _TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) * rop,
-             const TEMPLATE(T, struct) * op, long len, const TEMPLATE(T, ctx_t) ctx)
+             const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     if (len < TEMPLATE(CAP_T, SQR_CLASSICAL_CUTOFF))
     {
@@ -52,7 +52,7 @@ _TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) * rop,
 void
 TEMPLATE(T, poly_sqr)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long rlen = 2 * op->length - 1;
+    const slong rlen = 2 * op->length - 1;
 
     if (op->length == 0)
     {

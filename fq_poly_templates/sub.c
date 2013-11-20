@@ -31,11 +31,11 @@
 
 void
 _TEMPLATE(T, poly_sub)(TEMPLATE(T, struct) * res,
-             const TEMPLATE(T, struct) * poly1, long len1,
-             const TEMPLATE(T, struct) * poly2, long len2, const TEMPLATE(T, ctx_t) ctx)
+             const TEMPLATE(T, struct) * poly1, slong len1,
+             const TEMPLATE(T, struct) * poly2, slong len2, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long min = FLINT_MIN(len1, len2);
-    long i;
+    const slong min = FLINT_MIN(len1, len2);
+    slong i;
 
     for (i = 0; i < min; i++)
         TEMPLATE(T, sub)(res + i, poly1 + i, poly2 + i, ctx);
@@ -52,7 +52,7 @@ void
 TEMPLATE(T, poly_sub)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_t) poly1, const TEMPLATE(T, poly_t) poly2,
             const TEMPLATE(T, ctx_t) ctx)
 {
-    const long max = FLINT_MAX(poly1->length, poly2->length);
+    const slong max = FLINT_MAX(poly1->length, poly2->length);
 
     TEMPLATE(T, poly_fit_length)(res, max, ctx);
 

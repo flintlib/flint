@@ -26,7 +26,7 @@
 #include "fq.h"
 
 void
-fq_mul_si(fq_t rop, const fq_t op, long x, const fq_ctx_t ctx)
+fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx)
 {
     fmpz_poly_scalar_mul_si(rop, op, x);
 

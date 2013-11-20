@@ -27,8 +27,8 @@
 
 void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
 {
-    const long d = fq_nmod_ctx_degree(ctx);
-    long i, sparse;
+    const slong d = fq_nmod_ctx_degree(ctx);
+    slong i, sparse;
 
     nmod_poly_fit_length(rop, d);
 
@@ -54,7 +54,7 @@ void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx
 
 void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
 {
-    long i;
+    slong i;
 
     fq_nmod_randtest(rop, state, ctx);
     for (i = 0; fq_nmod_is_zero(rop, ctx) && (i < 10); i++)

@@ -32,8 +32,8 @@
 
 void
 _TEMPLATE(T, poly_mullow)(TEMPLATE(T, struct) * rop,
-                const TEMPLATE(T, struct) * op1, long len1,
-                const TEMPLATE(T, struct) * op2, long len2, long n, const TEMPLATE(T, ctx_t) ctx)
+                const TEMPLATE(T, struct) * op1, slong len1,
+                const TEMPLATE(T, struct) * op2, slong len2, slong n, const TEMPLATE(T, ctx_t) ctx)
 {
     if ( n < TEMPLATE(CAP_T, MULLOW_CLASSICAL_CUTOFF) || FLINT_MAX(len1, len2) < 6)
     {
@@ -47,12 +47,12 @@ _TEMPLATE(T, poly_mullow)(TEMPLATE(T, struct) * rop,
 
 void
 TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop,
-               const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, long n,
+               const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n,
                const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long lenr = op1->length + op2->length - 1;
+    const slong len1 = op1->length;
+    const slong len2 = op2->length;
+    const slong lenr = op1->length + op2->length - 1;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {

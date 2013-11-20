@@ -52,7 +52,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, d;
-        long n;
+        slong n;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 

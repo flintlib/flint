@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fq_nmod_ctx_t ctx;
-        long x;
+        slong x;
         fq_nmod_t a, b;
 
         fq_nmod_ctx_randtest(ctx, state);
@@ -78,7 +78,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fq_nmod_ctx_t ctx;
-        long x;
+        slong x;
         fq_nmod_t a, c;
 	nmod_poly_t b;
 

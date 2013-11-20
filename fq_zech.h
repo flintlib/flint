@@ -59,23 +59,23 @@ typedef struct
 
 typedef fq_zech_ctx_struct fq_zech_ctx_t[1];
 
-void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, long d, const char *var);
+void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
 void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 
-int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, long d, const char *var);
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, long d, const char *var);
+void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
 void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-                              const fmpz_t p, long d, const nmod_poly_t modulus,
+                              const fmpz_t p, slong d, const nmod_poly_t modulus,
                               const char *var);
 
 void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
 
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
-static __inline__ long
+static __inline__ slong
 fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
 {
     return fq_nmod_ctx_degree(ctx->fq_nmod_ctx);
@@ -159,7 +159,7 @@ void fq_zech_mul(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
 void fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
                       const fq_zech_ctx_t ctx);
 
-void fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, long x,
+void fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
                     const fq_zech_ctx_t ctx);
 
 void fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, ulong x,
@@ -169,8 +169,8 @@ void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 void fq_zech_inv(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
-void _fq_zech_pow(fmpz * rop, const fmpz * op, long len, const fmpz_t e,
-                  const fmpz * a, const long *j, long lena, const fmpz_t p);
+void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
+                  const fmpz * a, const slong *j, slong lena, const fmpz_t p);
 
 void fq_zech_pow(fq_zech_t rop, const fq_zech_t op1, const fmpz_t e,
                  const fq_zech_ctx_t ctx);
@@ -299,7 +299,7 @@ fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 void fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, long e,
+void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
                        const fq_zech_ctx_t ctx);
 
 void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);

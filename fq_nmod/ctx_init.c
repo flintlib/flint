@@ -29,7 +29,7 @@
 #include "fq_nmod.h"
 #include "nmod_poly.h"
 
-void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, long d, const char *var)
+void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     flint_rand_t state;
     nmod_poly_t poly;

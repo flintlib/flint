@@ -32,12 +32,12 @@
 #include "fmpz_poly.h"
 
 void
-_TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len,
+_TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len,
                 const TEMPLATE(T, ctx_t) ctx)
 {
-    const long in_len = len;
-    const long d = TEMPLATE(T, ctx_degree)(ctx);
-    long bits, i;
+    const slong in_len = len;
+    const slong d = TEMPLATE(T, ctx_degree)(ctx);
+    slong bits, i;
     fmpz *f, *g;
 
     TEMPLATE(CAP_T, VEC_NORM)(op, len, ctx);
@@ -75,7 +75,7 @@ _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) *
 void
 TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len = 2 * op->length - 1;
+    const slong len = 2 * op->length - 1;
 
     if (op->length == 0)
     {

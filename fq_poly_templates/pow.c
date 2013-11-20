@@ -30,12 +30,12 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len, ulong e,
+_TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len, ulong e,
              const TEMPLATE(T, ctx_t) ctx)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
-    long rlen;
-    long alloc = (long) e * (len - 1) + 1;
+    slong rlen;
+    slong alloc = (long) e * (len - 1) + 1;
     TEMPLATE(T, struct) *v = _TEMPLATE(T, vec_init)(alloc, ctx);
     TEMPLATE(T, struct) *R, *S, *T;
 
@@ -114,7 +114,7 @@ _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op
 void
 TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulong e, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -140,7 +140,7 @@ TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulo
     }
     else
     {
-        const long rlen = (long) e * (len - 1) + 1;
+        const slong rlen = (long) e * (len - 1) + 1;
 
         if (rop != op)
         {

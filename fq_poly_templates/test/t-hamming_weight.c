@@ -50,7 +50,7 @@ main(void)
     /* Check consistency */
         for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 	long w1,w2;
         TEMPLATE(T, poly_t) a, b;
@@ -86,7 +86,7 @@ main(void)
     /* Check that wt(a+b) \leq wt(a) + wt(b) */
         for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 	long w1,w2,wsum;
         TEMPLATE(T, poly_t) a, b, c;

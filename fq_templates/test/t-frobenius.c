@@ -53,7 +53,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, t) a, b, c;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         
@@ -91,7 +91,7 @@ main(void)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         
@@ -136,7 +136,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -190,7 +190,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 

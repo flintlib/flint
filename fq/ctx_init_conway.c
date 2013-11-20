@@ -35,7 +35,7 @@
 #endif
 
 int
-_fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+_fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     char *buf;
     FILE *file;
@@ -73,7 +73,7 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
         if (d == atoi(tmp))
         {
             fmpz_mod_poly_t mod;
-            long i;
+            slong i;
             char *ptr;
 
             fmpz_mod_poly_init(mod, p);
@@ -105,7 +105,7 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 }
 
 void
-fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     int result;
     if (fmpz_cmp_ui(p, 109987) > 0)

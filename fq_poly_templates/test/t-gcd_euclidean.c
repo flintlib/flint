@@ -46,7 +46,7 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,g;
@@ -84,7 +84,7 @@ main(void)
     */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
-        long len,j;
+        slong len,j;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,c,g;
@@ -151,7 +151,7 @@ main(void)
     /* Check aliasing of a and g */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,g;
@@ -189,7 +189,7 @@ main(void)
     /* Check aliasing of b and g */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,g;

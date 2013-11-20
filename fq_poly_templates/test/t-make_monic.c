@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
 
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b;
@@ -77,7 +77,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
 
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a;

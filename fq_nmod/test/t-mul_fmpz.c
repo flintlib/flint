@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d;
+        slong d;
         fq_nmod_ctx_t ctx;
         fmpz_t x;
         fq_nmod_t a, b;
@@ -85,7 +85,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d;
+        slong d;
         fq_nmod_ctx_t ctx;
         fmpz_t x;
         fq_nmod_t a, c;

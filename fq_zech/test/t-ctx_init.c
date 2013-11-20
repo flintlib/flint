@@ -33,10 +33,10 @@
 int
 main(void)
 {
-    long primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
-    long exponents[10] = { 16, 10, 6, 5, 4, 4, 3, 3, 3, 3 };
+    slong primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
+    slong exponents[10] = { 16, 10, 6, 5, 4, 4, 3, 3, 3, 3 };
     int i, j;
-    long d;
+    slong d;
     fmpz_t p, e;
     fq_nmod_ctx_t fq_nmod_ctx;
     fq_nmod_t lhs, rhs, one;
