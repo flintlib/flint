@@ -1,0 +1,168 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 Mike Hansen
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+fq_zech_struct * _fq_zech_vec_init(slong len, const fq_zech_ctx_t ctx)
+
+    Returns an initialised vector of \code{fq_zech}'s of given length.
+
+void _fq_zech_vec_clear(fq_zech * vec, slong len, const fq_zech_ctx_t ctx)
+
+    Clears the entries of \code{(vec, len)} and frees the space allocated
+    for \code{vec}.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void _fq_zech_vec_randtest(fq_zech_struct * f, flint_rand_t state,
+                           slong len, const fq_zech_ctx_t ctx)
+
+    Sets the entries of a vector of the given length to elements of
+    the finite field.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int _fq_zech_vec_fprint(FILE * file, const fq_zech_struct * vec, slong len,
+                        const fq_zech_ctx_t ctx)
+
+    Prints the vector of given length to the stream \code{file}. The
+    format is the length followed by two spaces, then a space separated
+    list of coefficients. If the length is zero, only $0$ is printed.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+int _fq_zech_vec_print(const fq_zech_struct * vec, slong len,
+                       const fq_zech_ctx_t ctx)
+
+    Prints the vector of given length to \code{stdout}.
+
+    For further details, see \code{_fq_zech_vec_fprint()}.
+
+*******************************************************************************
+
+    Assignment and basic manipulation
+
+*******************************************************************************
+
+void _fq_zech_vec_set(fq_zech_struct * vec1, const fq_zech_struct * vec2,
+                      slong len2, const fq_zech_ctx_t ctx)
+
+    Makes a copy of \code{(vec2, len2)} into \code{vec1}.
+
+void _fq_zech_vec_swap(fq_zech_struct * vec1, fq_zech_struct * vec2, slong len2,
+                       const fq_zech_ctx_t ctx)
+
+    Swaps the elements in \code{(vec1, len2)} and \code{(vec2, len2)}.
+
+void _fq_zech_vec_zero(fq_zech_struct * vec, slong len, const fq_zech_ctx_t ctx)
+
+    Zeros the entries of \code{(vec, len)}.
+
+void _fq_zech_vec_neg(fq_zech_struct * vec1, const fq_zech_struct * vec2,
+                      slong len2, const fq_zech_ctx_t ctx)
+
+    Negates \code{(vec2, len2)} and places it into \code{vec1}.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int _fq_zech_vec_equal(const fq_zech_struct * vec1, const fq_zech_struct * vec2,
+                       slong len, const fq_zech_ctx_t ctx)
+
+    Compares two vectors of the given length and returns $1$ if they are
+    equal, otherwise returns $0$.
+
+int _fq_zech_vec_is_zero(const fq_zech_struct * vec, slong len, const ctx_ctx)
+
+    Returns $1$ if \code{(vec, len)} is zero, and $0$ otherwise.
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void _fq_zech_vec_add(fq_zech_struct * res, const fq_zech_struct * vec1,
+                      const fq_zech_struct * vec2, slong len2,
+                      const fq_zech_ctx_t ctx)
+
+    Sets \code{(res, len2)} to the sum of \code{(vec1, len2)}
+    and \code{(vec2, len2)}.
+
+void _fq_zech_vec_sub(fq_zech_struct * res, const fq_zech_struct * vec1,
+                      const fq_zech_struct * vec2, slong len2,
+                      const fq_zech_ctx_t ctx)
+
+    Sets \code{(res, len2)} to \code{(vec1, len2)} minus \code{(vec2, len2)}.
+
+*******************************************************************************
+
+    Scalar multiplication and division
+
+*******************************************************************************
+void _fq_zech_vec_scalar_addmul_fq_zech(fq_zech_struct * vec1,
+                                        const fq_zech_struct * vec2, slong len2,
+                                        const fq_zech_t c,
+                                        const fq_zech_ctx_t ctx)
+
+    Adds \code{(vec2, len2)} times $c$ to \code{(vec1, len2)}, where
+    $c$ is a \code{fq_zech_t}.
+
+void _fq_zech_vec_scalar_submul_fq_zech(fq_zech_struct * vec1,
+                                        const fq_zech_struct * vec2, slong len2,
+                                        const fq_zech_t c,
+                                        const fq_zech_ctx_t ctx)
+
+    Subtracts \code{(vec2, len2)} times $c$ from \code{(vec1, len2)},
+    where $c$ is a \code{fq_zech_t}.
+
+*******************************************************************************
+
+    Dot products
+
+*******************************************************************************
+
+void _fq_zech_vec_dot(fq_zech_t res, const fq_zech_struct * vec1,
+                      const fq_zech_struct * vec2, slong len2,
+                      const fq_zech_ctx_t ctx)
+
+    Sets \code{res} to the dot product of (\code{vec1}, \code{len})
+    and (\code{vec2}, \code{len}).

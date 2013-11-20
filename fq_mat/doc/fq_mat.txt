@@ -1,0 +1,428 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 Mike Hansen
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fq_mat_init(fq_mat_t mat, slong rows, slong cols, const fq_ctx_t ctx)
+
+    Initialises \code{mat} to a \code{rows}-by-\code{cols} matrix with
+    coefficients in $\mathbb{F}_{q}$ given by \code{ctx}. All elements
+    are set to zero.
+
+void fq_mat_init_set(fq_mat_t mat, fq_mat_t src, const fq_ctx_t ctx)
+
+    Initialises \code{mat} and sets its dimensions and elements to
+    those of \code{src}.
+
+void fq_mat_clear(fq_mat_t mat, const fq_ctx_t ctx)
+
+    Clears the matrix and releases any memory it used. The matrix
+    cannot be used again until it is initialised. This function must be
+    called exactly once when finished using an \code{fq_mat_t} object.
+
+void fq_mat_set(fq_mat_t mat, fq_mat_t src, const fq_ctx_t ctx)
+
+    Sets \code{mat} to a copy of \code{src}. It is assumed
+    that \code{mat} and \code{src} have identical dimensions.
+
+*******************************************************************************
+
+    Basic properties and manipulation
+
+*******************************************************************************
+
+fq_struct * fq_mat_entry(fq_mat_t mat, slong i, slong j)
+
+    Directly accesses the entry in \code{mat} in row $i$ and column $j$,
+    indexed from zero. No bounds checking is performed.
+
+fq_struct * fq_mat_entry_set(fq_mat_t mat, slong i, slong j, fq_t x,
+                             const fq_ctx_t ctx)
+
+    Sets the entry in \code{mat} in row $i$ and column $j$ to \code{x}.
+
+slong fq_mat_nrows(fq_mat_t mat, const fq_ctx_t ctx)
+
+    Returns the number of rows in \code{mat}.
+
+slong fq_mat_ncols(fq_mat_t mat, const fq_ctx_t ctx)
+
+    Returns the number of columns in \code{mat}.
+
+void fq_mat_swap(fq_mat_t mat1, fq_mat_t mat2, const fq_ctx_t ctx)
+
+    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2}
+    are allowed to be different.
+
+void fq_mat_zero(fq_mat_t mat, const fq_ctx_t ctx)
+
+    Sets all entries of \code{mat} to 0.
+
+
+*******************************************************************************
+
+    Printing
+
+*******************************************************************************
+
+void fq_mat_print_pretty(const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Pretty-prints \code{mat} to \code{stdout}. A header is printed
+    followed by the rows enclosed in brackets.
+
+int fq_mat_fprint_pretty(FILE * file, const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Pretty-prints \code{mat} to \code{file}. A header is printed
+    followed by the rows enclosed in brackets.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+void fq_mat_print(const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Prints \code{mat} to \code{stdout}. A header is printed followed
+    by the rows enclosed in brackets.
+
+int fq_mat_fprint(FILE * file, const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Prints \code{mat} to \code{file}. A header is printed followed by
+    the rows enclosed in brackets.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+*******************************************************************************
+
+    Window
+
+*******************************************************************************
+
+void fq_mat_window_init(fq_mat_t window, const fq_mat_t mat, slong r1,
+                        slong c1, slong r2, slong c2, const fq_ctx_t ctx)
+
+     Initializes the matrix \code{window} to be an \code{r2 - r1} by
+     \code{c2 - c1} submatrix of \code{mat} whose \code{(0,0)} entry
+     is the \code{(r1, c1)} entry of \code{mat}.  The memory for the
+     elements of \code{window} is shared with \code{mat}.
+
+
+void fq_mat_window_clear(fq_mat_t window, const fq_ctx_t ctx)
+
+     Clears the matrix \code{window} and releases any memory that it
+     uses.  Note that the memory to the underlying matrix that
+     \code{window} points to is not freed.
+
+
+*******************************************************************************
+
+    Random matrix generation
+
+*******************************************************************************
+
+void fq_mat_randtest(fq_mat_t mat, flint_rand_t state, const fq_ctx_t ctx)
+
+    Sets the elements of \code{mat} to random elements of
+    $\mathbb{F}_{q}$, given by \code{ctx}.
+
+int fq_mat_randpermdiag(fq_mat_t mat, fq_struct * diag, slong n,
+                        flint_rand_t state, const fq_ctx_t ctx)
+
+    Sets \code{mat} to a random permutation of the diagonal matrix
+    with $n$ leading entries given by the vector \code{diag}. It is
+    assumed that the main diagonal of \code{mat} has room for at
+    least $n$ entries.
+
+    Returns $0$ or $1$, depending on whether the permutation is even
+    or odd respectively.
+
+void fq_mat_randrank(fq_mat_t mat, slong rank, flint_rand_t state,
+                     const fq_ctx_t ctx)
+
+    Sets \code{mat} to a random sparse matrix with the given rank,
+    having exactly as many non-zero elements as the rank, with the
+    non-zero elements being uniformly random elements of
+    $\mathbb{F}_{q}$.
+
+    The matrix can be transformed into a dense matrix with unchanged
+    rank by subsequently calling \code{fq_mat_randops()}.
+
+void fq_mat_randops(fq_mat_t mat, slong count, flint_rand_t state,
+                    const fq_ctx_t ctx)
+
+    Randomises \code{mat} by performing elementary row or column
+    operations. More precisely, at most \code{count} random additions
+    or subtractions of distinct rows and columns will be performed.
+    This leaves the rank (and for square matrices, determinant)
+    unchanged.
+
+void fq_mat_randtril(fq_mat_t mat, flint_rand_t state, int unit,
+                     const fq_ctx_t ctx)
+
+    Sets \code{mat} to a random lower triangular matrix. If
+    \code{unit} is 1, it will have ones on the main diagonal,
+    otherwise it will have random nonzero entries on the main
+    diagonal.
+
+void fq_mat_randtriu(fq_mat_t mat, flint_rand_t state, int unit,
+                     const fq_ctx_t ctx)
+
+    Sets \code{mat} to a random upper triangular matrix. If
+    \code{unit} is 1, it will have ones on the main diagonal,
+    otherwise it will have random nonzero entries on the main
+    diagonal.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fq_mat_equal(fq_mat_t mat1, fq_mat_t mat2, const fq_ctx_t ctx)
+
+    Returns nonzero if mat1 and mat2 have the same dimensions and elements,
+    and zero otherwise.
+
+int fq_mat_is_zero(const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Returns a non-zero value if all entries \code{mat} are zero, and
+    otherwise returns zero.
+
+int fq_mat_is_empty(const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Returns a non-zero value if the number of rows or the number of
+    columns in \code{mat} is zero, and otherwise returns zero.
+
+int fq_mat_is_square(const fq_mat_t mat, const fq_ctx_t ctx)
+
+    Returns a non-zero value if the number of rows is equal to the
+    number of columns in \code{mat}, and otherwise returns zero.
+
+
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void fq_mat_add(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
+                const fq_ctx_t ctx)
+
+    Computes $C = A + B$. Dimensions must be identical.
+
+void fq_mat_sub(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
+                const fq_ctx_t ctx)
+
+    Computes $C = A - B$. Dimensions must be identical.
+
+void fq_mat_neg(fq_mat_t A, const fq_mat_t B, const fq_ctx_t ctx)
+
+    Sets $B = -A$. Dimensions must be identical.
+
+*******************************************************************************
+
+    Matrix multiplication
+
+*******************************************************************************
+
+void fq_mat_mul(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
+                const fq_ctx_t ctx)
+
+    Sets $C = AB$. Dimensions must be compatible for matrix
+    multiplication.  $C$ is not allowed to be aliased with $A$ or
+    $B$. This function automatically chooses between classical and
+    KS multiplication.
+
+void fq_mat_mul_classical(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
+                          const fq_ctx_t ctx)
+
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. Uses classical
+    matrix multiplication.
+
+void fq_mat_mul_KS(fq_mat_t C, const fq_mat_t A, const fq_mat_t B,
+                   const fq_ctx_t ctx)
+
+    Sets $C = AB$. Dimensions must be compatible for matrix
+    multiplication.  $C$ is not allowed to be aliased with $A$ or
+    $B$. Uses Kronecker substitution to perform the multiplication
+    over the integers.
+
+void fq_mat_submul(fq_mat_t D, const fq_mat_t C, const fq_mat_t A,
+                   const fq_mat_t B, const fq_ctx_t ctx)
+
+    Sets $D = C + AB$. $C$ and $D$ may be aliased with each other but
+    not with $A$ or $B$.
+
+*******************************************************************************
+
+    LU decomposition
+
+*******************************************************************************
+
+slong fq_mat_lu(slong * P, fq_mat_t A, int rank_check, const fq_ctx_t ctx)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$.
+
+    If $A$ is a nonsingular square matrix, it will be overwritten with
+    a unit diagonal lower triangular matrix $L$ and an upper
+    triangular matrix $U$ (the diagonal of $L$ will not be stored
+    explicitly).
+
+    If $A$ is an arbitrary matrix of rank $r$, $U$ will be in row
+    echelon form having $r$ nonzero rows, and $L$ will be lower
+    triangular but truncated to $r$ columns, having implicit ones on
+    the $r$ first entries of the main diagonal. All other entries will
+    be zero.
+
+    If a nonzero value for \code{rank_check} is passed, the function
+    will abandon the output matrix in an undefined state and return 0
+    if $A$ is detected to be rank-deficient.
+
+    This function calls \code{fq_mat_lu_recursive}.
+
+slong fq_mat_lu_classical(slong * P, fq_mat_t A, int rank_check,
+                          const fq_ctx_t ctx)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this
+    function is identical to that of \code{fq_mat_lu}. Uses Gaussian
+    elimination.
+
+slong fq_mat_lu_recursive(slong * P, fq_mat_t A, int rank_check,
+                          const fq_ctx_t ctx)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this
+    function is identical to that of \code{fq_mat_lu}. Uses recursive
+    block decomposition, switching to classical Gaussian elimination
+    for sufficiently small blocks.
+
+*******************************************************************************
+
+    Reduced row echelon form
+
+*******************************************************************************
+
+slong fq_mat_rref(fq_mat_t A, const fq_ctx_t ctx)
+
+    Puts $A$ in reduced row echelon form and returns the rank of $A$.
+
+    The rref is computed by first obtaining an unreduced row echelon
+    form via LU decomposition and then solving an additional
+    triangular system.
+
+*******************************************************************************
+
+    Triangular solving
+
+*******************************************************************************
+
+void fq_mat_solve_tril(fq_mat_t X, const fq_mat_t L, const fq_mat_t B,
+                       int unit, const fq_ctx_t ctx)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular
+    square matrix. If \code{unit} = 1, $L$ is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  $X$
+    and $B$ are allowed to be the same matrix, but no other aliasing
+    is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+void fq_mat_solve_tril_classical(fq_mat_t X, const fq_mat_t L,
+                                 const fq_mat_t B, int unit,
+                                 const fq_ctx_t ctx)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular
+    square matrix. If \code{unit} = 1, $L$ is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  $X$
+    and $B$ are allowed to be the same matrix, but no other aliasing
+    is allowed. Uses forward substitution.
+
+void fq_mat_solve_tril_recursive(fq_mat_t X, const fq_mat_t L,
+                                 const fq_mat_t B, int unit,
+                                 const fq_ctx_t ctx)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular
+    square matrix. If \code{unit} = 1, $L$ is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  $X$
+    and $B$ are allowed to be the same matrix, but no other aliasing
+    is allowed.
+
+    Uses the block inversion formula
+
+    $$
+    \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
+    \begin{pmatrix} X \\ Y \end{pmatrix} =
+    \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+    $$
+
+    to reduce the problem to matrix multiplication and triangular
+    solving of smaller systems.
+
+void fq_mat_solve_triu(fq_mat_t X, const fq_mat_t U, const fq_mat_t B,
+                       int unit, const fq_ctx_t ctx)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular
+    square matrix. If \code{unit} = 1, $U$ is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  $X$
+    and $B$ are allowed to be the same matrix, but no other aliasing
+    is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+void fq_mat_solve_triu_classical(fq_mat_t X, const fq_mat_t U,
+                                 const fq_mat_t B, int unit,
+                                 const fq_ctx_t ctx)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular
+    square matrix. If \code{unit} = 1, $U$ is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  $X$
+    and $B$ are allowed to be the same matrix, but no other aliasing
+    is allowed. Uses forward substitution.
+
+void fq_mat_solve_triu_recursive(fq_mat_t X, const fq_mat_t U,
+                                 const fq_mat_t B, int unit,
+                                 const fq_ctx_t ctx)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular
+    square matrix. If \code{unit} = 1, $U$ is assumed to have ones on
+    its main diagonal, and the main diagonal will not be read.  $X$
+    and $B$ are allowed to be the same matrix, but no other aliasing
+    is allowed.
+
+    Uses the block inversion formula
+
+    $$
+    \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
+    \begin{pmatrix} X \\ Y \end{pmatrix} =
+    \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
+    $$
+
+    to reduce the problem to matrix multiplication and triangular
+    solving of smaller systems.

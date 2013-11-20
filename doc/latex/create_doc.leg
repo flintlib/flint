@@ -18,10 +18,10 @@ subsectiontitle = "    " < linecontent > EOL     {
 function = (macroheader|functionheader) functionfooter? EOL*
 
 functionheader = < funcnametype '(' funcargs ')' modifiers? ';'?
-                      > whitespace? EOL {flint_printfuncheader(yytext, yyleng);}
+                      > whitespace? EOL {printfuncheader(yytext, yyleng);}
 
 macroheader = < 'macro' whitespace linecontent > EOL    {
-    flint_printfuncheader(yytext, yyleng);}
+    printfuncheader(yytext, yyleng);}
 
 funcnametype = !('*'|'+') ('operator()' | (! '(' .))*
 funcargs = (! ')' .)*

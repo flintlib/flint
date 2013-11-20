@@ -274,7 +274,7 @@ YY_ACTION(void) yy_1_macroheader(yycontext *ctx, char *yytext, int yyleng)
 #define yythunkpos ctx->thunkpos
   yyprintf((stderr, "do yy_1_macroheader\n"));
   
-    flint_printfuncheader(yytext, yyleng);;
+    printfuncheader(yytext, yyleng);;
 #undef yythunkpos
 #undef yypos
 #undef yy
@@ -285,7 +285,7 @@ YY_ACTION(void) yy_1_functionheader(yycontext *ctx, char *yytext, int yyleng)
 #define yypos ctx->pos
 #define yythunkpos ctx->thunkpos
   yyprintf((stderr, "do yy_1_functionheader\n"));
-  flint_printfuncheader(yytext, yyleng);;
+  printfuncheader(yytext, yyleng);;
 #undef yythunkpos
 #undef yypos
 #undef yy

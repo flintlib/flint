@@ -146,6 +146,12 @@ void nmod_poly_clear(nmod_poly_t poly);
 void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 
 static __inline__
+void _nmod_poly_set_length(nmod_poly_t poly, slong len)
+{
+    poly->length = len;
+}
+
+static __inline__
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
     while (poly->length && (poly->coeffs[poly->length - 1] == WORD(0)))
@@ -176,6 +182,15 @@ static __inline__
 mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 {
     return _nmod_vec_max_bits(poly->coeffs, poly->length);
+}
+
+static __inline__
+mp_ptr nmod_poly_lead(const nmod_poly_t poly)
+{
+    if (poly->length)
+        return poly->coeffs + (poly->length - 1);
+    else
+        return NULL;
 }
 
 /* Assignment and basic manipulation  ****************************************/
@@ -276,9 +291,32 @@ nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len)
         nmod_poly_randtest(poly, state, len);
     } while (nmod_poly_is_zero(poly));
 }
-
+      
 void
 nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
+void
+nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len);
+
+void
+nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
+void
+nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len);
+
+int
+nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+                                         slong len, slong max_attempts);
+
+void
+nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len);
+
+int
+nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
+                                         slong len, slong max_attempts);
+
+void
+nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
 
 /* Getting and setting coefficients  *****************************************/
 
@@ -505,6 +543,13 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
                         const nmod_poly_t poly2, const nmod_poly_t f,
                         const nmod_poly_t finv);
 
+int _nmod_poly_invmod(mp_limb_t *A, 
+                      const mp_limb_t *B, slong lenB, 
+                      const mp_limb_t *P, slong lenP, const nmod_t mod);
+
+int nmod_poly_invmod(nmod_poly_t A, 
+                     const nmod_poly_t B, const nmod_poly_t P);
+
 /* Powering  *****************************************************************/
 
 void _nmod_poly_pow_binexp(mp_ptr res, 
@@ -710,6 +755,11 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod);
 void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
 
 /* Evaluation  ***************************************************************/
+void
+_nmod_poly_evaluate_fmpz(fmpz_t rop, const mp_srcptr poly, const slong len, const fmpz_t c);
+
+void
+nmod_poly_evaluate_fmpz(fmpz_t rop, const nmod_poly_t poly, const fmpz_t c);
 
 mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, 
                                            slong len, mp_limb_t c, nmod_t mod);
@@ -1005,6 +1055,14 @@ nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
 {
     return nmod_poly_resultant_euclidean(f, g);
 }
+
+slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
+                        const mp_limb_t *A, slong lenA,
+                        const mp_limb_t *B, slong lenB, 
+                        const nmod_t mod);
+
+void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S, 
+                      const nmod_poly_t A, const nmod_poly_t B);
 
 /* Square roots **************************************************************/
 

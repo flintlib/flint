@@ -58,8 +58,13 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     if (!file)
     {
-        flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
-        abort();
+        file = fopen("CPimport.txt", "r");
+
+        if (!file)
+        {
+            flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
+            abort();
+        }
     }
 
     while (fgets(buf, 832, file))

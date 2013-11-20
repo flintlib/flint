@@ -15,14 +15,21 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_mat padic \
    fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly \
    fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve \
-   double_extras padic_poly padic_mat qadic $(EXTRA_BUILD_DIRS)
+   double_extras padic_poly padic_mat qadic  \
+   fq fq_vec fq_mat fq_poly fq_poly_factor\
+   fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor \
+   fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor \
+   $(EXTRA_BUILD_DIRS)
+
+TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
+   fq_poly_factor_templates
 
 export
 
 SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c
-LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))
+LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h profiler.h
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h profiler.h templates.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
@@ -72,9 +79,12 @@ dist:
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile
-	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+ifndef MOD
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/profile; export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) profile || exit $$?;))
+else
+	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
+endif
 
 tune: library $(TUNE_SOURCES) $(EXT_TUNE_SOURCES)
 	mkdir -p build/tune
@@ -186,10 +196,10 @@ build/test:
 build/interfaces:
 	mkdir -p build/interfaces
 
-build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
+build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp NTL-interface.h
 	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
+build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp

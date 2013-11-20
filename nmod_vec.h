@@ -48,6 +48,13 @@ typedef struct
    mp_bitcnt_t norm;
 } nmod_t;
 
+
+#define NMOD_VEC_NORM(vec, i)          \
+do {                                   \
+    while ((i) && vec[(i) - 1] == 0UL)  \
+        (i)--;                         \
+} while (0)
+
 #define NMOD_RED2(r, a_hi, a_lo, mod) \
    do { \
       mp_limb_t q0, q1, r1; \

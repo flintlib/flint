@@ -110,6 +110,33 @@ void
 fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                 flint_rand_t state, slong len);
 
+void
+fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+
+void
+fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
+                                         flint_rand_t state, slong len);
+
+void
+fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+
+int
+fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,
+                                             flint_rand_t state, slong len,
+                                             slong max_attempts);
+
+void
+fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+
+int
+fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t f,
+                                             flint_rand_t state, slong len,
+                                             slong max_attempts);
+
+void
+fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
+                                          flint_rand_t state, slong len);
+
 /*  Attributes ***************************************************************/
 
 #define fmpz_mod_poly_modulus(poly)  (&((poly)->p))
@@ -141,6 +168,10 @@ void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2);
 
 void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1, fmpz_mod_poly_t poly2);
 
+void _fmpz_mod_poly_reverse(fmpz * res, const fmpz * poly, slong len, slong n);
+
+void fmpz_mod_poly_reverse(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n);
+
 static __inline__ 
 void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
 {
@@ -148,25 +179,6 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
 }
 
 void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j);
-
-static __inline__
-void
-fmpz_mod_poly_reverse(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
-{
-    slong len = FLINT_MIN(n, poly->length);
-    if (len == 0)
-    {
-        fmpz_mod_poly_zero(res);
-        return;
-    }
-
-    fmpz_mod_poly_fit_length(res, n);
-
-    _fmpz_poly_reverse(res->coeffs, poly->coeffs, len, n);
-
-    _fmpz_mod_poly_set_length(res, n);
-    _fmpz_mod_poly_normalise(res);
-}
 
 /*  Conversion ***************************************************************/
 
@@ -223,6 +235,25 @@ void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
     else
         fmpz_zero(x);
 }
+
+static __inline__ void fmpz_mod_poly_set_coeff_mpz(fmpz_mod_poly_t poly, slong n,
+    const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_mod_poly_set_coeff_fmpz(poly, n, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_mod_poly_get_coeff_mpz(mpz_t x, const fmpz_mod_poly_t poly, slong n)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_mod_poly_get_coeff_fmpz(t, poly, n);
+    fmpz_get_mpz(x, t);
+    fmpz_clear(t);
+}
+
 
 /*  Shifting *****************************************************************/
 
@@ -475,6 +506,22 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
     fmpz_mod_poly_divrem(Q, R, A, B);
     fmpz_mod_poly_clear(Q);
 }
+
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
+                                         const fmpz* B, slong lenB, const fmpz* Binv,
+                                         slong lenBinv, const fmpz_t p);
+
+void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                                        const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
+
+
+void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+                                            slong lenA, const fmpz* B, slong lenB,
+                                            const fmpz* Binv, slong lenBinv, const fmpz_t p);
+
+void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+                                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                                          const fmpz_mod_poly_t Binv);
 
 /*  Power series inversion ***************************************************/
 
