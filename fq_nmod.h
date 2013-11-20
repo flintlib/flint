@@ -95,7 +95,7 @@ static __inline__ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
     int r;
     long i, k;
 
-    r = fprintf(file, "p = ");
+    r = flint_fprintf(file, "p = ");
     if (r <= 0)
         return r;
 
@@ -103,45 +103,45 @@ static __inline__ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "\nd = %ld\nf(X) = ", ctx->j[ctx->len - 1]);
+    r = flint_fprintf(file, "\nd = %wd\nf(X) = ", ctx->j[ctx->len - 1]);
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "%lu", ctx->a[0]);
+    r = flint_fprintf(file, "%wu", ctx->a[0]);
     if (r <= 0)
         return r;
 
     for (k = 1; k < ctx->len; k++)
     {
         i = ctx->j[k];
-        r = fprintf(file, " + ");
+        r = flint_fprintf(file, " + ");
         if (r <= 0)
             return r;
 
         if (ctx->a[k] == 1UL)
         {
             if (i == 1)
-                r = fprintf(file, "X");
+                r = flint_fprintf(file, "X");
             else
-                r = fprintf(file, "X^%ld", i);
+                r = flint_fprintf(file, "X^%wd", i);
             if (r <= 0)
                 return r;
         }
         else
         {
-            r = fprintf(file, "%lu", ctx->a[k]);
+            r = flint_fprintf(file, "%wu", ctx->a[k]);
             if (r <= 0)
                 return r;
 
             if (i == 1)
-                r = fprintf(file, "*X");
+                r = flint_fprintf(file, "*X");
             else
-                r = fprintf(file, "*X^%ld", i);
+                r = flint_fprintf(file, "*X^%wd", i);
             if (r <= 0)
                 return r;
         }
     }
-    r = fprintf(file, "\n");
+    r = flint_fprintf(file, "\n");
     return r;
 }
 

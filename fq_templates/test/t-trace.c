@@ -87,7 +87,7 @@ main(void)
             for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
             {
                 TEMPLATE(T, frobenius)(c, a, j, ctx);
-                flint_printf("sigma^%ld = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
+                flint_printf("sigma^%wd = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             }
             abort();
         }

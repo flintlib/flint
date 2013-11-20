@@ -68,7 +68,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %lu\n\n", exp);
+            flint_printf("exp: %wu\n\n", exp);
             flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
             flint_printf("res:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");
@@ -114,7 +114,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %lu\n\n", exp);
+            flint_printf("exp: %wu\n\n", exp);
             flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
             flint_printf("res1:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");
@@ -167,7 +167,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %lu\n\n", exp);
+            flint_printf("exp: %wu\n\n", exp);
             flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
             flint_printf("res1:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");

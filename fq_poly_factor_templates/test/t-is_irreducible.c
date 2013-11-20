@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_irreducible....");
+    flint_printf("is_irreducible....");
     fflush(stdout);
 
     for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)

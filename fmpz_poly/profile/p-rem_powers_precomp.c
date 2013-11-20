@@ -124,7 +124,7 @@ int main(void)
    slong k, scale;
 
    printf("fmpz_poly_rem with precomputed powers\n");
-   flint_printf("bits = %ld\n", BITS);
+   flint_printf("bits = %wd\n", BITS);
 
    for (k = 1; k <= 1000; k = (slong) ceil(1.1*k))
    {

@@ -49,7 +49,7 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, long d, const ch
 
         if (!file)
         {
-            printf("Exception (fq_nmod_ctx_init_conway).  File loading.\n");
+            flint_printf("Exception (fq_nmod_ctx_init_conway).  File loading.\n");
             abort();
         }
     }
@@ -109,15 +109,15 @@ void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, long d, const ch
     int result;
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
-        printf("Exception (fq_nmod_ctx_init_conway).  Conway polynomials \n");
-        printf("are only available for primes up to 109987.\n");
+        flint_printf("Exception (fq_nmod_ctx_init_conway).  Conway polynomials \n");
+        flint_printf("are only available for primes up to 109987.\n");
         abort();
     }
 
     result = _fq_nmod_ctx_init_conway(ctx, p, d, var);
     if (!result) {
-        printf("Exception (fq_nmod_ctx_init_conway).  The polynomial for \n(p,d) = (");
-        fmpz_print(p), printf(",%ld) is not present in the database.\n", d);
+        flint_printf("Exception (fq_nmod_ctx_init_conway).  The polynomial for \n(p,d) = (");
+        fmpz_print(p), flint_printf(",%wd) is not present in the database.\n", d);
         abort();
     }
 }

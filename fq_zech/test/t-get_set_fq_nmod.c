@@ -70,7 +70,7 @@ main(void)
                 flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_nmod_print_pretty(c, ctx->fq_nmod_ctx), flint_printf("\n");
-                flint_printf("table = %ld\n", ctx->eval_table[a->value]);
+                flint_printf("table = %wd\n", ctx->eval_table[a->value]);
                 abort();
             }
 

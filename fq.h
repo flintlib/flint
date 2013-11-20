@@ -98,7 +98,7 @@ static __inline__ int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = flint_fprintf(file, "\nd = %ld\n", fq_ctx_degree(ctx));
+    r = flint_fprintf(file, "\nd = %wd\n", fq_ctx_degree(ctx));
     if (r <= 0)
         return r;
 

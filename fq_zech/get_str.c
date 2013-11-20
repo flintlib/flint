@@ -29,6 +29,6 @@ char *
 fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     char *s = flint_malloc(n_clog(op->value, 10) * sizeof(char));
-    sprintf(s, "%ld", op->value);
+    flint_sprintf(s, "%wd", op->value);
     return s;
 }

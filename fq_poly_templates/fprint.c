@@ -38,7 +38,7 @@ _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) * poly, slong l
     int r;
     slong i;
 
-    r = fprintf(file, "%ld ", len);
+    r = flint_fprintf(file, "%wd ", len);
     if (r <= 0)
         return r;
 
@@ -47,7 +47,7 @@ _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) * poly, slong l
 
     for (i = 0; (r > 0) && (i < len); i++)
     {
-        r = fprintf(file, " ");
+        r = flint_fprintf(file, " ");
         if (r <= 0)
             return r;
         r = TEMPLATE(T, fprint)(file, poly + i, ctx);

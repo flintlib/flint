@@ -32,7 +32,7 @@ int main(void)
     int i, j;
     flint_rand_t state;
 
-    printf("primitive_root_prime....");
+    flint_printf("primitive_root_prime....");
     fflush(stdout);
    
     flint_randinit(state);
@@ -54,8 +54,8 @@ int main(void)
         {
             if (n_powmod_precomp(root, (p-1) / factors.p[j], p, pinv) == 1)
             {
-                printf("FAIL:\n");
-                printf("%lu ** (%lu / %lu) == 1 mod %lu\n", root, p-1, factors.p[j], p);
+                flint_printf("FAIL:\n");
+                flint_printf("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
                 abort();
             }
         }
@@ -63,7 +63,7 @@ int main(void)
 
    flint_randclear(state);
 
-   printf("PASS\n");
+   flint_printf("PASS\n");
    return 0;
 
 }

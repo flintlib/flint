@@ -101,7 +101,7 @@ main(void)
 
         if (res->num != num)
         {
-            flint_printf("Error: number of factors incorrect: %ld != %ld\n",
+            flint_printf("Error: number of factors incorrect: %wd != %wd\n",
                          res->num, num);
             abort();
         }

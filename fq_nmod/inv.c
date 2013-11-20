@@ -54,7 +54,7 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     if (fq_nmod_is_zero(op, ctx))
     {
-        printf("Exception (fq_nmod_inv).  Zero is not invertible.\n");
+        flint_printf("Exception (fq_nmod_inv).  Zero is not invertible.\n");
         abort();
     }
     else

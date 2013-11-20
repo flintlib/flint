@@ -55,7 +55,7 @@ main()
     fq_randtest_not_zero(a,state,ctx);
     fq_randtest_not_zero(b,state,ctx);
 
-    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , cpu , wall );
+    flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , cpu , wall );
 
 
     return 0;

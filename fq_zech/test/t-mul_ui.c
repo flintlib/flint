@@ -70,7 +70,7 @@ main(void)
             {
                 flint_printf("FAIL:\n\n");
                 fq_zech_ctx_print(ctx);
-                flint_printf("\nx = %lu\n", x);
+                flint_printf("\nx = %wu\n", x);
                 flint_printf("aa = ");
                 fq_nmod_print_pretty(aa, ctx->fq_nmod_ctx);
                 flint_printf("\nbb = ");

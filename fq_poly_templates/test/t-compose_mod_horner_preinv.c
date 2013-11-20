@@ -34,7 +34,7 @@ main(void)
     int i;
     flint_rand_t state;
     flint_randinit(state);
-    printf("compose_mod_horner_preinv....");
+    flint_printf("compose_mod_horner_preinv....");
     fflush(stdout);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -65,12 +65,12 @@ main(void)
 
         if (!TEMPLATE(T, poly_equal)(d, e, ctx))
         {
-            printf("FAIL (composition):\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); printf("\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); printf("\n");
-            printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); printf("\n");
-            printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); printf("\n");
-            printf("e:\n"); TEMPLATE(T, poly_print)(e, ctx); printf("\n");
+            flint_printf("FAIL (composition):\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); flint_printf("\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); flint_printf("\n");
+            flint_printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); flint_printf("\n");
+            flint_printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); flint_printf("\n");
+            flint_printf("e:\n"); TEMPLATE(T, poly_print)(e, ctx); flint_printf("\n");
             abort();
         }
 
@@ -111,11 +111,11 @@ main(void)
 
         if (!TEMPLATE(T, poly_equal)(d, a, ctx))
         {
-            printf("FAIL (aliasing a):\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); printf("\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); printf("\n");
-            printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); printf("\n");
-            printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); printf("\n");
+            flint_printf("FAIL (aliasing a):\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); flint_printf("\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); flint_printf("\n");
+            flint_printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); flint_printf("\n");
+            flint_printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); flint_printf("\n");
             abort();
         }
 
@@ -155,11 +155,11 @@ main(void)
 
         if (!TEMPLATE(T, poly_equal)(d, b, ctx))
         {
-            printf("FAIL (aliasing b)\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); printf("\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); printf("\n");
-            printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); printf("\n");
-            printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); printf("\n");
+            flint_printf("FAIL (aliasing b)\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); flint_printf("\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); flint_printf("\n");
+            flint_printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); flint_printf("\n");
+            flint_printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); flint_printf("\n");
             abort();
         }
 
@@ -199,11 +199,11 @@ main(void)
 
         if (!TEMPLATE(T, poly_equal)(d, c, ctx))
         {
-            printf("FAIL (aliasing c)\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); printf("\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); printf("\n");
-            printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); printf("\n");
-            printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); printf("\n");
+            flint_printf("FAIL (aliasing c)\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx); flint_printf("\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx); flint_printf("\n");
+            flint_printf("c:\n"); TEMPLATE(T, poly_print)(c, ctx); flint_printf("\n");
+            flint_printf("d:\n"); TEMPLATE(T, poly_print)(d, ctx); flint_printf("\n");
             abort();
         }
 
@@ -218,7 +218,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

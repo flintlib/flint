@@ -97,7 +97,7 @@ main(void)
         {
             flint_printf("FAIL: ");
             TEMPLATE(T, ctx_print)(ctx);
-            flint_printf(" %ld, %d\n", max_exp, v);
+            flint_printf(" %wd, %d\n", max_exp, v);
             TEMPLATE(T, poly_print)(poly, ctx); flint_printf("\n");
             abort();
         }

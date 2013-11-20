@@ -121,7 +121,7 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
         flint_printf
             ("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
         fmpz_print(p);
-        flint_printf(",%ld) is not present in the database.\n", d);
+        flint_printf(",%wd) is not present in the database.\n", d);
         abort();
     }
 }

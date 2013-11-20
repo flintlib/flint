@@ -75,7 +75,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, poly_print_pretty)(c, "X", ctx), flint_printf("\n");
-            flint_printf("exp = %lu\n", exp);
+            flint_printf("exp = %wu\n", exp);
             abort();
         }
 
@@ -126,7 +126,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, poly_print_pretty)(c, "X", ctx), flint_printf("\n");
-            flint_printf("exp = %lu\n", exp);
+            flint_printf("exp = %wu\n", exp);
             TEMPLATE(T, ctx_print)(ctx);
             abort();
         }

@@ -75,11 +75,11 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
 
         {
             if (TEMPLATE(T, is_one)(poly + i, ctx))
-                flint_fprintf(file, "%s^%ld", x, i);
+                flint_fprintf(file, "%s^%wd", x, i);
             else
             {
                 __TEMPLATE(T, print)(file, poly + i, ctx);
-                flint_fprintf(file, "*%s^%ld", x, i);
+                flint_fprintf(file, "*%s^%wd", x, i);
             }
             --i;
         }
@@ -90,12 +90,12 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
                 continue;
 
             if (TEMPLATE(T, is_one)(poly + i, ctx))
-                flint_fprintf(file, "+%s^%ld", x, i);
+                flint_fprintf(file, "+%s^%wd", x, i);
             else
             {
                 fputc('+', file);
                 __TEMPLATE(T, print)(file, poly + i, ctx);
-                flint_fprintf(file, "*%s^%ld", x, i);
+                flint_fprintf(file, "*%s^%wd", x, i);
             }
         }
 

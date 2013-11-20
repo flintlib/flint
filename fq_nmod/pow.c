@@ -124,7 +124,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
 {
     if (fmpz_sgn(e) < 0)
     {
-        printf("Exception (fq_nmod_pow).  e < 0.\n");
+        flint_printf("Exception (fq_nmod_pow).  e < 0.\n");
         abort();
     }
 

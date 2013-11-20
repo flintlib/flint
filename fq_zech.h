@@ -99,7 +99,7 @@ static __inline__ int
 fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
 {
     int r;
-    r = fprintf(file, "Zech Representation:\n");
+    r = flint_fprintf(file, "Zech Representation:\n");
     if (r <= 0)
         return r;
     return fq_nmod_ctx_fprint(file, ctx->fq_nmod_ctx);
@@ -267,7 +267,7 @@ fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 static __inline__ int
 fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    return fprintf(file, "%s^%ld", ctx->fq_nmod_ctx->var, op->value);
+    return flint_fprintf(file, "%s^%wd", ctx->fq_nmod_ctx->var, op->value);
 }
 
 static __inline__ void
@@ -279,7 +279,7 @@ fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 static __inline__ int
 fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    return fprintf(file, "%ld", op->value);
+    return flint_fprintf(file, "%wd", op->value);
 }
 
 static __inline__ void

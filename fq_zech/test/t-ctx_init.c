@@ -92,8 +92,8 @@ main(void)
                 if (!fq_nmod_equal(lhs, rhs, fq_nmod_ctx))
                 {
                     flint_printf("FAIL:\n\n");
-                    flint_printf("K = GF(%ld^%ld)\n", primes[i], d);
-                    flint_printf("Z(%d) = %ld\n", j, ctx->zech_log_table[j]);
+                    flint_printf("K = GF(%wd^%wd)\n", primes[i], d);
+                    flint_printf("Z(%d) = %wd\n", j, ctx->zech_log_table[j]);
                     flint_printf("LHS: ");
                     fq_nmod_print_pretty(lhs, fq_nmod_ctx);
                     flint_printf("\n");
