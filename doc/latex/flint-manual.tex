@@ -362,18 +362,20 @@ which you wish to place the FLINT files when it is installed.
 
 \chapter{TLS, reentrancy and single mode}
 
-If you wish to use FLINT on a single core machine then it will be
-configured by default for single mode. This is slightly faster, but
-is not threadsafe. (This mode can also be explicitly selected by
-passing the \code{--single} option to configure.) If you wish to
-build a threadsafe version of FLINT, you must pass the
-\code{--reentrant} option to configure. This will be slower on
-single core machines, but threadsafe.
+If you wish to use FLINT on a single core machine then it can be
+configured for single mode. This mode can also be explicitly selected
+by passing the \code{--single} option to configure. Single mode is
+slightly faster, but by default uses thread local storage if threads
+are used, and this is not available on some machines. 
 
-By default, FLINT uses thread local storage (\code{--enable-tls}).
+FLINT uses thread local storage by default (\code{--enable-tls}).
 However, if reentrancy is required on systems that do not support
 this, one can pass \code{--disable-tls} and mutexes will be used
 instead (requires POSIX).
+
+If you wish to build a threadsafe version of FLINT which uses a
+less complicated memory model (slower, but still works in the absence
+of TLS) you can pass the \code{--reentrant} option to configure. 
 
 \chapter{ABI and architecture support}
 
@@ -607,7 +609,7 @@ $\bullet$ Martin Lee -- Fast factorisation of polynomials over $\Z/n\Z$,
 faster Brent-Kung modular composition
 
 $\bullet$ David Harvey -- Fast Fourier Transform code, \code{zn_poly} for
-polynomial arithmetic over \code{\Z/n\Z}, \code{mpz_poly}, profiling and
+polynomial arithmetic over $\Z/n\Z$, \code{mpz_poly}, profiling and
 graphing code and many other parts of the FLINT library
 
 $\bullet$ Jan Tuitman -- helped with the $p$-adic interface
@@ -650,7 +652,7 @@ at Imperial College)
 $\bullet$ Tomasz Lechowski -- Contributed some NTL and Pari polynomial
 profiling code and researched algorithms for polynomials over finite fields.
 (Funded by the Nuffield Foundation)
-q
+
 $\bullet$ Daniel Scott -- Researched lazy and relaxed algorithms of Joris van
 der Hoeven. (Funded by Warwick University's Undergraduate Research Scholars
 Scheme)
@@ -671,11 +673,7 @@ $\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
-<<<<<<< HEAD
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
-=======
-$\bullet$ Further patches and bug reports have been made by Michael Abshoff,
->>>>>>> mhansen/fq
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
 Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,

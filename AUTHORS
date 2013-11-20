@@ -5,7 +5,7 @@ of the library was taken over solely by William Hart.
 The authors of FLINT to date:
 
 $\bullet$ William Hart -- integer and polynomial arithmetic, factorisation and
-primality testing, general infrastructure (supported by EPSRC Grant 
+primality testing, general infrastructure (supported by EPSRC Grant
 EP/G004870/1 and DFG Priority programme SPP1489)
 
 $\bullet$ Sebastian Pancratz -- polynomial arithmetic over $\Z$, $\Z/n\Z$ and
@@ -24,14 +24,14 @@ documentation parser (Google Summer of Code 2013)
 
 $\bullet$ Mike Hansen -- Finite fields (small and large $\F_q$),
 polynomials/matrices over $\F_q$, Finite fields with Zech logarithm
-representation, Fast factorisation of polynomials over $\F_q$ (supported by 
+representation, Fast factorisation of polynomials over $\F_q$ (supported by
 Macaulay2 developers NSF Grant 1002171)
 
 $\bullet$ Martin Lee -- Fast factorisation of polynomials over $\Z/n\Z$,
 faster Brent-Kung modular composition
 
 $\bullet$ David Harvey -- Fast Fourier Transform code, \code{zn_poly} for
-polynomial arithmetic over \code{\Z/n\Z}, \code{mpz_poly}, profiling and
+polynomial arithmetic over $\Z/n\Z$, \code{mpz_poly}, profiling and
 graphing code and many other parts of the FLINT library
 
 $\bullet$ Jan Tuitman -- helped with the $p$-adic interface
@@ -91,11 +91,11 @@ $\bullet$ Richard Howell-Peak -- Wrote polynomial factorisation and
 irreducibility testing code for polynomials over $\Z/p\Z$. (Funded by Warwick
 University's Undergraduate Research Scholars Scheme)
 
-$\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve, 
+$\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
-$\bullet$ Further patches and bug reports have been made by Michael Abshoff, 
+$\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
 Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
