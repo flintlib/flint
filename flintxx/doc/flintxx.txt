@@ -1250,14 +1250,14 @@ Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_basecase(
 Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_divconquer(
         Fmpz_poly_expr A, Fmpz_poly_expr B)
 
-    \code{ltupleref(Q, R, d) = pseudo_divrem(A, B)} has the same effect as
+    \code{ltupleref(Q, R, d) = pseudo_divrem(A, B)} has the same effect as\\
     \code{fmpz_poly_pseudo_divrem(q, r, &d, a, b)}, where \code{q, r, a, b} are
     the underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
 
 Ltuple<fmpz_polyxx, fmpz_polyxx>_expr pseudo_divrem_cohen(Fmpz_poly_expr A,
         Fmpz_poly_expr B)
 
-    \code{ltupleref(Q, R) = pseudo_divrem_cohen(A, B)} has the same effect as
+    \code{ltupleref(Q, R) = pseudo_divrem_cohen(A, B)} has the same effect as\\
     \code{fmpz_poly_pseudo_divrem_cohen(q, r, a, b)}, where \code{q, r, a, b}
     are the underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
 
@@ -1884,14 +1884,15 @@ Fmpq_poly_expr::unary operation() const
 Fmpq_poly_expr::binary operation(??) const
 
     The following binary functions are made available as member functions:
-    \code{asinh_series), \code{asin_series}, \code{atanh_series},
+    \code{asinh_series}, \code{asin_series}, \code{atanh_series},
     \code{atan_series}, \code{cosh_series}, \code{cos_series}, \code{divrem},
     \code{exp_series}, \code{gcd}, \code{inv_series}, \code{inv_series_newton},
     \code{lcm}, \code{log_series}, \code{pow}, \code{resultant},
     \code{reverse}, \code{revert_series}, \code{revert_series_lagrange},
     \code{revert_series_lagrange_fast}, \code{revert_series_newton},
     \code{sinh_series}, \code{tanh_series}, \code{tan_series}, \code{xgcd},
-    \code{rescale}, \code{shift_left}, \code{shift_right}.
+    \code{rescale},\\
+    \code{shift_left}, \code{shift_right}.
 
 Fmpq_poly_expr::ternary operation(??, ??) const
 
@@ -2457,7 +2458,7 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr inv(Fmpz_poly_mat_expr)
 
 Ltuple<slong, fmpz_poly_matxx>_expr nullspace(Fmpz_poly_mat_expr A)
 
-    \code{ltupleref(n, B) = nullspace(A)} has the same effect as
+    \code{ltupleref(n, B) = nullspace(A)} has the same effect as\\
     \code{n = fmpz_poly_mat_nullspace(b, a)}, where \code{b, a} are the underlying
     \code{fmpz_poly_mat_t} corresponding to \code{B, A}.
 
@@ -2473,7 +2474,7 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
         const permxx&, Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr FFLU,
         Fmpz_poly_mat_expr X)
 
-    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
+    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as\\
     \code{w = fmpz_poly_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
     underlying C objects corresponding to \code{M, D, B, X}.
     Similarly for the other functions.
@@ -2489,7 +2490,8 @@ Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
     defined in \code{nmod_vecxx.h}.
 
     The C++ equivalent to \code{nmod_t} is \code{nmodxx_ctx}. There is a
-    reference version \code{nmodxx_ctx_srcref}.
+    reference version\\
+    \code{nmodxx_ctx_srcref}.
 
     The C++ equivalent to \code{mp_limb_t} in this context is \code{nmodxx}.
     Immediate \code{nmodxx} expressions store both an \code{mp_limb_t} and an
@@ -2612,24 +2614,24 @@ Nmod_poly_expr::unary operation() const
 
 Nmod_poly_expr::binary operation() const
 
-    The following binary functions are made available as member functions:
-    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},
-    \code{div_divconquer}, \code{div_newton}, \code{divrem},
-    \code{divrem_basecase}, \code{divrem_divconquer},
-    \code{divrem_newton}, \code{div_root}, \code{evaluate_fast},
-    \code{evaluate_iter}, \code{gcd}, \code{gcd_euclidean}, \code{gcd_hgcd},
-    \code{inv_series}, \code{inv_series_basecase}, \code{inv_series_newton},
-    \code{invsqrt_series}, \code{mul_classical}, \code{mul_KS},
-    \code{shift_left}, \code{shift_right}, \code{pow},
-    \code{pow_binexp}, \code{rem_basecase}, \code{resultant},
-    \code{resultant_euclidean}, \code{reverse}, \code{revert_series},
-    \code{revert_series_lagrange}, \code{revert_series_lagrange_fast},
-    \code{revert_series_newton}, \code{sqrt_series}, \code{taylor_shift},
-    \code{taylor_shift_convolution}, \code{taylor_shift_horner}, \code{xgcd},
-    \code{xgcd_euclidean}, \code{xgcd_hgcd}, \code{log_series},
-    \code{exp_series}, \code{exp_series_basecase}, \code{atan_series},
-    \code{atanh_series}, \code{asin_series}, \code{asinh_series},
-    \code{sin_series}, \code{cos_series}, \code{tan_series},
+    The following binary functions are made available as member functions:\\
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},\\
+    \code{div_divconquer}, \code{div_newton}, \code{divrem},\\
+    \code{divrem_basecase}, \code{divrem_divconquer},\\
+    \code{divrem_newton}, \code{div_root}, \code{evaluate_fast},\\
+    \code{evaluate_iter}, \code{gcd}, \code{gcd_euclidean}, \code{gcd_hgcd},\\
+    \code{inv_series}, \code{inv_series_basecase}, \code{inv_series_newton},\\
+    \code{invsqrt_series}, \code{mul_classical}, \code{mul_KS},\\
+    \code{shift_left}, \code{shift_right}, \code{pow},\\
+    \code{pow_binexp}, \code{rem_basecase}, \code{resultant},\\
+    \code{resultant_euclidean}, \code{reverse}, \code{revert_series},\\
+    \code{revert_series_lagrange}, \code{revert_series_lagrange_fast},\\
+    \code{revert_series_newton}, \code{sqrt_series}, \code{taylor_shift},\\
+    \code{taylor_shift_convolution}, \code{taylor_shift_horner}, \code{xgcd},\\
+    \code{xgcd_euclidean}, \code{xgcd_hgcd}, \code{log_series},\\
+    \code{exp_series}, \code{exp_series_basecase}, \code{atan_series},\\
+    \code{atanh_series}, \code{asin_series}, \code{asinh_series},\\
+    \code{sin_series}, \code{cos_series}, \code{tan_series},\\
     \code{sinh_series}, \code{cosh_series}, \code{tanh_series}.
 
 Nmod_poly_expr Nmod_poly_expr::inflate(T:is_unsigned_integer) const
@@ -2642,14 +2644,14 @@ Nmod_poly_expr Nmod_poly_expr::deflate(T:is_unsigned_integer) const
 
 Nmod_poly_expr::ternary operation(??, ??) const
 
-    The following ternary functions are made available as member functions:
-    \code{compose_mod}, \code{compose_mod_horner},
-    \code{compose_series_brent_kung}, \code{compose_series},
-    \code{compose_series_brent_kung}, \code{compose_series_divconquer},
-    \code{compose_series_horner}, \code{div_newton_n_preinv},
-    \code{divrem_newton_n_preinv}, \code{div_series}, \code{mulhigh},
-    \code{mulhigh_classical}, \code{mullow}, \code{mullow_classical},
-    \code{mullow_KS}, \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},
+    The following ternary functions are made available as member functions:\\
+    \code{compose_mod}, \code{compose_mod_horner},\\
+    \code{compose_series_brent_kung}, \code{compose_series},\\
+    \code{compose_series_brent_kung}, \code{compose_series_divconquer},\\
+    \code{compose_series_horner}, \code{div_newton_n_preinv},\\
+    \code{divrem_newton_n_preinv}, \code{div_series}, \code{mulhigh},\\
+    \code{mulhigh_classical}, \code{mullow}, \code{mullow_classical},\\
+    \code{mullow_KS}, \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},\\
     \code{pow_trunc_binexp}.
 
 Nmod_poly_expr::fourary operation(??, ??, ??) const
@@ -3538,22 +3540,22 @@ Fmpz_mod_poly_expr::unary operation() const
 
 Fmpz_mod_poly_expr::binary operation() const
 
-    The following binary functions are made available as member functions:
-    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},
-    \code{div_divconquer}, \code{div_newton}, \code{divrem},
-    \code{divrem_basecase}, \code{divrem_divconquer},
-    \code{divrem}, \code{divrem_f},
-    \code{gcd}, \code{gcd_euclidean}, \code{gcd_euclidean_f}, \code{gcd_f},
-    \code{gcdinv}, \code{invmod}, \code{inv_series_newton},
-    \code{shift_left}, \code{shift_right}, \code{pow},
+    The following binary functions are made available as member functions:\\
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},\\
+    \code{div_divconquer}, \code{div_newton}, \code{divrem},\\
+    \code{divrem_basecase}, \code{divrem_divconquer},\\
+    \code{divrem}, \code{divrem_f},\\
+    \code{gcd}, \code{gcd_euclidean}, \code{gcd_euclidean_f}, \code{gcd_f},\\
+    \code{gcdinv}, \code{invmod}, \code{inv_series_newton},\\
+    \code{shift_left}, \code{shift_right}, \code{pow},\\
     \code{rem_basecase}, \code{xgcd}, \code{xgcd_euclidean}.
 
 Fmpz_mod_poly_expr::ternary operation(??, ??) const
 
-    The following ternary functions are made available as member functions:
-    \code{compose_mod}, \code{compose_mod_horner},
-    \code{compose_series_brent_kung}, \code{mullow},
-    \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},
+    The following ternary functions are made available as member functions:\\
+    \code{compose_mod}, \code{compose_mod_horner},\\
+    \code{compose_series_brent_kung}, \code{mullow},\\
+    \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},\\
     \code{pow_trunc_binexp}.
 
 Fmpz_mod_poly_expr Fmpz_mod_poly_expr::operator()(Fmpz_mod_poly_expr) const
