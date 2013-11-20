@@ -26,12 +26,14 @@
 #ifndef PADIC_H
 #define PADIC_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"
@@ -100,7 +102,7 @@ void padic_ctx_clear(padic_ctx_t ctx);
 static __inline__ 
 int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
-    if (ctx->min <= e && e < ctx->max)
+    if (ctx->min <= (slong) e && (slong) e < ctx->max)
     {
         *rop   = *(ctx->pow + (e - ctx->min));
         return 0;

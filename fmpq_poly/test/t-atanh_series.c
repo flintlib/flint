@@ -38,13 +38,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
     ulong cflags = UWORD(0);
 
-    flint_printf("atanh_series....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("atanh_series....");
+    fflush(stdout);    
 
     /* Check aliasing of a and c */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -125,8 +124,8 @@ main(void)
         fmpq_poly_clear(atanhB);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

@@ -39,8 +39,8 @@ main(void)
     slong i, m, r;
     int solved;
     mp_limb_t mod;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("solve_vec....");
     fflush(stdout);
@@ -121,8 +121,8 @@ main(void)
         nmod_mat_clear(Ax);
     }
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

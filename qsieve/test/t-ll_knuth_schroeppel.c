@@ -33,12 +33,12 @@
 int main(void)
 {
    int i;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
    flint_printf("ll_knuth_schroeppel....");
    fflush(stdout);
  
-   flint_randinit(state);
+   
 
    for (i = 0; i < 10000; i++) /* Test random n */
    {
@@ -59,8 +59,8 @@ int main(void)
       qsieve_ll_clear(qs_inf);
    }
    
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

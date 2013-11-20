@@ -34,8 +34,8 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("dot_bound_limbs....");
     fflush(stdout);
@@ -75,8 +75,8 @@ main(void)
         mpz_clear(t);
     }
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

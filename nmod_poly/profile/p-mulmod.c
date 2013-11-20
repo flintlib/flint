@@ -44,8 +44,8 @@ void sample(void * arg, ulong count)
    slong n = info->n, i, j, s= info->s, alg=info->alg;
    slong scale;
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    nmod_poly_t a, b, c, d, dinv;
    mp_limb_t m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2)); /* modulus */
    if (m == 0) m = 2;

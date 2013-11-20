@@ -182,7 +182,7 @@ test_dedekind()
     k /= gcd(h, k);
     tassert(dedekind_sum_coprime_large(h, k) == dedekind_sum(h, k));
     tassert(dedekind_sum_coprime(h, k) == dedekind_sum(h, k));
-    // TODO dedekind_sum_coprime_d
+    // untested: dedekind_sum_coprime_d
 }
 
 void

@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "padic_poly.h"
@@ -37,16 +37,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    flint_printf("zero....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("zero....");
+    fflush(stdout);    
 
     for (i = 0; i < 10000; i++)
     {
@@ -75,8 +74,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

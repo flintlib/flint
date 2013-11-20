@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -64,7 +64,7 @@ main(void)
 
 for (l = 0; l < len; l++)
 {
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     long n = N[l], r;
     clock_t c0, c1;
     long double cputime;
@@ -73,14 +73,14 @@ for (l = 0; l < len; l++)
     padic_ctx_t ctx;
     padic_t e, z;
 
-    flint_randinit(state);
+    
 
     fmpz_init_set_ui(p, 17);
 
-    padic_ctx_init(ctx, p, n, PADIC_VAL_UNIT);
+    padic_ctx_init(ctx, p, n, n, PADIC_VAL_UNIT);
 
-    padic_init(e, ctx);
-    padic_init(z, ctx);
+    padic_init(e);
+    padic_init(z);
 
     {
         fmpz_t f = {WORD(3)}, pow;
@@ -104,7 +104,7 @@ for (l = 0; l < len; l++)
 
     padic_log_balanced(z, e, ctx);
     padic_exp_balanced(z, z, ctx);
-    if (!_padic_equal(e, z))
+    if (!padic_equal(e, z))
     {
         flint_printf("FAIL:\n");
         flint_printf("e = "), padic_print(e, ctx), flint_printf("\n");
@@ -121,8 +121,8 @@ for (l = 0; l < len; l++)
     flint_printf("%2ld, %4XYXYXYXY, %8ld, %wd\n", 
         l, cputime, runs[l], T[l]);
 
-    padic_clear(e, ctx);
-    padic_clear(z, ctx);
+    padic_clear(e);
+    padic_clear(z);
 
     fmpz_clear(p);
     padic_ctx_clear(ctx);

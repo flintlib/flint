@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_factor.h"
+#include "fmpz.h"
 #include "arith.h"
 
 void arith_euler_phi(fmpz_t res, const fmpz_t n)

@@ -35,8 +35,8 @@ int
 main(void)
 {
     slong m, n, mod, i, j, rep;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("init/clear....");
     fflush(stdout);
@@ -72,8 +72,8 @@ main(void)
         nmod_mat_clear(A);
     }
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

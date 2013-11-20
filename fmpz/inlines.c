@@ -23,9 +23,9 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with stdlib */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
-#define ulong mp_limb_t
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -33,13 +33,13 @@
 
 fmpz * __new_fmpz()
 {
-    return calloc(sizeof(fmpz), 1);
+    return flint_calloc(sizeof(fmpz), 1);
 }
 
 void __free_fmpz(fmpz * f)
 {
    _fmpz_demote(f);
-   free(f);
+   flint_free(f);
 }   
 
 void __fmpz_set_si(fmpz_t f, slong val)

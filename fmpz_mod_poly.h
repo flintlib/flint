@@ -26,15 +26,17 @@
 #ifndef FMPZ_MOD_POLY_H
 #define FMPZ_MOD_POLY_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
-#define ulong mp_limb_t
-
+#undef ulong
 #include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -160,7 +162,7 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
         return NULL;
 }
 
-/*  Assignment and swap ******************************************************/
+/*  Assignment and basic manipulation ****************************************/
 
 void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2);
 
@@ -317,6 +319,15 @@ void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1,
 void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                     const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f);
 
+void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1,
+                    const fmpz * poly2, slong len2, const fmpz * f, slong lenf,
+                    const fmpz* finv, slong lenfinv, const fmpz_t p);
+
+void
+fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                         const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f,
+                         const fmpz_mod_poly_t finv);
+
 /*  Powering *****************************************************************/
 
 void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e, 
@@ -345,6 +356,17 @@ fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, ulong e,
                          const fmpz_mod_poly_t f);
 
+
+void
+_fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
+                              ulong e, const fmpz * f, slong lenf,
+                              const fmpz * finv, slong lenfinv, const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
+                         const fmpz_mod_poly_t poly, ulong e,
+                         const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+
 void
 _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
                                   const fmpz_t e, const fmpz * f,
@@ -354,6 +376,26 @@ void
 fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
                            const fmpz_mod_poly_t poly, const fmpz_t e,
                            const fmpz_mod_poly_t f);
+
+void
+_fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly,
+                                  const fmpz_t e, const fmpz * f, slong lenf,
+                                  const fmpz* finv, slong lenfinv,
+                                  const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, const fmpz_t e,
+                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+
+void
+_fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
+                                    slong lenf, const fmpz* finv, slong lenfinv,
+                                    const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
+                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
 /*  Division *****************************************************************/
 
@@ -370,6 +412,25 @@ void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+void
+_fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
+                                    const fmpz* B, slong lenB, const fmpz* Binv,
+                                    slong lenBinv, const fmpz_t mod);
+
+void
+fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+                           const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
+
+void
+_fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+                            slong lenA, const fmpz* B, slong lenB,
+                            const fmpz* Binv, slong lenBinv, const fmpz_t mod);
+
+void
+fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+                               const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
+                               const fmpz_mod_poly_t Binv);
 
 ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t p);
 
@@ -658,6 +719,39 @@ fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t 
                              const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
 
 void
+_fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
+                                   const fmpz_mod_poly_t f);
+
+void
+_fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * poly1,
+                          const fmpz * poly2, slong len2, const fmpz * poly2inv,
+                          slong len2inv, const fmpz_t p);
+
+void
+fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
+                   const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly2inv);
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
+         const fmpz * poly1, slong len1, const fmpz_mat_t A, const fmpz * poly3,
+         slong len3, const fmpz * poly3inv, slong len3inv, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t poly1, const fmpz_mat_t A,
+                   const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv);
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
+                 slong len1, const fmpz * poly2, const fmpz * poly3, slong len3,
+                 const fmpz * poly3inv, slong len3inv, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
+                   const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
+                   const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv);
+
+void
 _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
                                               const fmpz * h, slong lenh, const fmpz_t p);
 
@@ -731,6 +825,8 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
 #ifdef __cplusplus
 }
 #endif
+
+#include "fmpz_mod_poly_factor.h"
 
 #endif
 

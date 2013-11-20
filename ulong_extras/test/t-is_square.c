@@ -32,12 +32,12 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
    flint_printf("is_square....");
    fflush(stdout);
    
-   flint_randinit(state);
+   
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non-squares pass */
    {
@@ -73,8 +73,8 @@ int main(void)
       }
    }
 
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

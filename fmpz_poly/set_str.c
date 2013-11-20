@@ -39,7 +39,7 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
     char * w;
     slong i, len;
 
-    if (!isdigit(str[0]))
+    if (!isdigit((unsigned char) str[0]))
         return -1;
     len = atol(str);
     if (len < 0)
@@ -92,7 +92,7 @@ fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
     int ans;
     slong len;
 
-    if (!isdigit(str[0]))
+    if (!isdigit((unsigned char) str[0]))
         return -1;
     len = atol(str);
     if (len < 0)

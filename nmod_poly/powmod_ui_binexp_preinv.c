@@ -26,8 +26,17 @@
 
 ******************************************************************************/
 
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <stdlib.h>
-#include <mpir.h>
+
+#undef ulong
+
+#include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -59,13 +68,13 @@ _nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
     for (i = ((int) FLINT_BIT_COUNT(e) - 2); i >= 0; i--)
     {
         _nmod_poly_mul(T, res, lenf - 1, res, lenf - 1, mod);
-        _nmod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f,
+        _nmod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f,
                                           lenf, finv, lenfinv, mod);
 
         if (e & (UWORD(1) << i))
         {
             _nmod_poly_mul(T, res, lenf - 1, poly, lenf - 1, mod);
-            _nmod_poly_divrem_newton21_preinv(Q, res, T, 2 * lenf - 3, f,
+            _nmod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f,
                                               lenf, finv, lenfinv, mod);
         }
     }
@@ -87,7 +96,7 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_powmod). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_powmod_ui_binexp_preinv). Divide by zero.\n");
         abort();
     }
 

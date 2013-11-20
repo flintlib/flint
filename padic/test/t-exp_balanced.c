@@ -30,12 +30,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("exp_balanced... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
 /** p == 2 *******************************************************************/
 
@@ -249,8 +249,8 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

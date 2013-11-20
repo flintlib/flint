@@ -77,6 +77,7 @@ int main(void)
     test_exact(10);
     test_exact(7429);
 
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

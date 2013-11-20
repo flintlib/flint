@@ -30,7 +30,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpz_poly_factor.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -38,12 +37,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("hensel_lift_once....");
     fflush(stdout);
-
-    flint_randinit(state);
    
     /* We check that lifting local factors of F yields factors */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -54,7 +51,7 @@ main(void)
         slong bits, nbits, n, exp, j;
 
         bits  = n_randint(state, 200) + 1;
-        nbits = n_randint(state,FLINT_BITS - 6) + 6;
+        nbits = n_randint(state, FLINT_BITS - 6) + 6;
 
         fmpz_poly_init(F);
         fmpz_poly_init(G);
@@ -127,8 +124,8 @@ main(void)
         fmpz_poly_clear(R);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

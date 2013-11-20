@@ -32,8 +32,6 @@ using namespace flint;
 
 padicxx_ctx ctx(fmpzxx(5), 10, 20, PADIC_TERSE);
 
-detail::IGNORED_TYPE _;
-
 void
 test_init()
 {

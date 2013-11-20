@@ -45,10 +45,10 @@ n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 
 int main(void)
 {
-    flint_rand_t state;
     mp_limb_t n;
     int j;
-    flint_randinit(state);
+
+    FLINT_TEST_INIT(state);    
 
     flint_printf("factorial_fast_mod2_preinv....");
     fflush(stdout);
@@ -73,7 +73,8 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

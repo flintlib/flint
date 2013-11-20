@@ -35,8 +35,8 @@ int main(void)
    ulong B1; 
    mp_limb_t n, p;
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    while(1)
    {

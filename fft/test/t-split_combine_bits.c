@@ -41,12 +41,12 @@ main(void)
     int i;
     mp_size_t j;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("split/combine_bits....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < 10000; i++)
@@ -88,7 +88,7 @@ main(void)
         flint_free(poly);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
     return 0;

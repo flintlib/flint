@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include "flint.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 
 void
 fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,

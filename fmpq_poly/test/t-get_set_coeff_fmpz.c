@@ -36,18 +36,17 @@ int
 main(void)
 {
     int i, j, result;
-    flint_rand_t state;
     ulong cflags = UWORD(0);
 
     mpq_t n1, n2;
+
+    FLINT_TEST_INIT(state);
 
     flint_printf("get/set_coeff_fmpz....");
     fflush(stdout);
 
     mpq_init(n1);
-    mpq_init(n2);
-
-    flint_randinit(state);
+    mpq_init(n2);   
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -92,8 +91,8 @@ main(void)
     mpq_clear(n1);
     mpq_clear(n2);
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

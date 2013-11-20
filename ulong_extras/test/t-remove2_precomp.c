@@ -32,17 +32,16 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
    const mp_limb_t * primes;
    const double * inverses;
+
+   FLINT_TEST_INIT(state);
 
    flint_printf("remove2_precomp....");
    fflush(stdout);
  
    primes = n_primes_arr_readonly(10000);
    inverses = n_prime_inverses_arr_readonly(10000);
-
-   flint_randinit(state);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
@@ -120,8 +119,8 @@ int main(void)
       mpz_clear(d_p);
    }
    
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

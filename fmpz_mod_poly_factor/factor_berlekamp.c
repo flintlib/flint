@@ -28,7 +28,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 #include "profiler.h"

@@ -180,7 +180,7 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                 {
                     slong l;
                     _nmod_vec_swap(S, T, FLINT_MAX(lenS, lenT));
-                    l = lenS;lenS = lenT; lenT = l;
+                    l = lenS; lenS = lenT; lenT = l;
                 }
                 __sub(T, lenT, T, lenT, v, lenv);
 
@@ -292,20 +292,20 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
             }
             if (S == A || S == B)
             {
-                s = _nmod_vec_init(lenB - 1);
+                s = _nmod_vec_init(FLINT_MAX(lenB - 1, 2));
             }
             else
             {
-                nmod_poly_fit_length(S, lenB - 1);
+                nmod_poly_fit_length(S, FLINT_MAX(lenB - 1, 2));
                 s = S->coeffs;
             }
             if (T == A || T == B)
             {
-                t = _nmod_vec_init(lenA - 1);
+                t = _nmod_vec_init(FLINT_MAX(lenA - 1, 2));
             }
             else
             {
-                nmod_poly_fit_length(T, lenA - 1);
+                nmod_poly_fit_length(T, FLINT_MAX(lenA - 1, 2));
                 t = T->coeffs;
             }
 
@@ -318,21 +318,21 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
 
             if (G == A || G == B)
             {
-                free(G->coeffs);
+                flint_free(G->coeffs);
                 G->coeffs = g;
                 G->alloc  = FLINT_MIN(lenA, lenB);
             }
             if (S == A || S == B)
             {
-                free(S->coeffs);
+                flint_free(S->coeffs);
                 S->coeffs = s;
-                S->alloc  = lenB - 1;
+                S->alloc  = FLINT_MAX(lenB - 1, 2);
             }
             if (T == A || T == B)
             {
-                free(T->coeffs);
+                flint_free(T->coeffs);
                 T->coeffs = t;
-                T->alloc  = lenA - 1;
+                T->alloc  = FLINT_MAX(lenA - 1, 2);
             }
 
             G->length = lenG;

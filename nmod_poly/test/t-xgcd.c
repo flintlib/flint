@@ -33,8 +33,8 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("xgcd....");
     fflush(stdout);
@@ -326,8 +326,8 @@ main(void)
         nmod_poly_clear(t);
     }
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

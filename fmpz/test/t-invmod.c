@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("invmod....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -213,8 +213,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

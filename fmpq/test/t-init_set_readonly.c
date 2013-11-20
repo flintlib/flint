@@ -34,12 +34,12 @@
 int main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
     flint_printf("init_set_readonly....");
     fflush(stdout);
     
-    flint_randinit(state);
+    
 
     /* Create some small fmpq rationals, clear the mpq_t */
     for (i = 0; i < 100000; i++)
@@ -118,8 +118,8 @@ int main(void)
         mpq_clear(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

@@ -80,7 +80,7 @@ main(void)
     }
     flint_free(str);
     fmpz_poly_clear(a);
-
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

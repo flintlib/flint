@@ -34,13 +34,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    flint_printf("mullow....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("mullow....");
+    fflush(stdout);    
 
     /* Compare with mul */
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
@@ -172,8 +171,8 @@ main(void)
         fmpz_poly_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

@@ -26,15 +26,56 @@
 #ifndef FLINT_H
 #define FLINT_H
 
+#undef ulong
+#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#include <sys/param.h> /* for BSD define */
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
+#include <stdlib.h> /* for alloca on FreeBSD */
+#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) 
+/* MinGW and FreeBSD have alloca, but not alloca.h */
+#include <alloca.h>
+#endif
+#if defined(__MINGW32__)
+#include <malloc.h> /* for alloca on MinGW */
+#endif
 #include "limits.h"
 #include "longlong.h"
 #include "config.h"
+#undef ulong
+
+#if HAVE_GC
+#include "gc.h"
+#endif
+
+#if WANT_ASSERT
+#include <assert.h>
+#endif
 
 #ifdef __cplusplus
  extern "C" {
+#endif
+
+/* flint version number */
+
+#define __FLINT_VERSION 2
+#define __FLINT_VERSION_MINOR 4
+#define __FLINT_VERSION_PATCHLEVEL 0
+#define FLINT_VERSION "2.4.0"
+#define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
+                         __FLINT_VERSION_MINOR * 100 + \
+                         __FLINT_VERSION_PATCHLEVEL)
+
+/*
+   Check mpir and mpfr version numbers
+*/
+#if __GNU_MP_VERSION < 5
+#error GMP 5.0.0 or MPIR 2.6.0 or later are required
+#endif
+
+#if MPFR_VERSION_MAJOR < 3
+#error MPFR 3.0.0 or later is required
 #endif
 
 /*
@@ -47,8 +88,6 @@
 #endif
 
 extern char version[];
-
-typedef mp_size_t slong;
 
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
@@ -115,7 +154,7 @@ typedef flint_rand_s flint_rand_t[1];
 static __inline__
 void flint_randinit(flint_rand_t state)
 {
-    state->gmp_init = 0;
+   state->gmp_init = 0;
 #if FLINT64
     state->__randval = UWORD(13845646450878251009);
     state->__randval2 = UWORD(13142370077570254774);
@@ -142,12 +181,31 @@ void flint_randclear(flint_rand_t state)
         gmp_randclear(state->gmp_state);
 }
 
+#if HAVE_GC
+#define FLINT_GC_INIT() GC_init()
+#else
+#define FLINT_GC_INIT()
+#endif
+
+#define FLINT_TEST_INIT(xxx) \
+   flint_rand_t xxx; \
+   FLINT_GC_INIT(); \
+   flint_randinit(xxx)
+
+#define FLINT_TEST_CLEANUP(xxx) \
+   flint_randclear(xxx); \
+   flint_cleanup();
+
 /*
   We define this here as there is no mpfr.h
  */
 typedef __mpfr_struct mpfr;
 
+#if WANT_ASSERT
+#define FLINT_ASSERT(param) assert(param)
+#else 
 #define FLINT_ASSERT(param)
+#endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
@@ -168,7 +226,7 @@ typedef __mpfr_struct mpfr;
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
-extern unsigned char __flint_clz_tab[128];
+extern const unsigned char __flint_clz_tab[128];
 #endif
 
 static __inline__
@@ -234,6 +292,32 @@ void mpn_tdiv_q(mp_ptr qp,
     flint_free(_scratch);
     }
 #endif
+
+/* temporary allocation */
+#define TMP_INIT \
+   typedef struct __tmp_struct { \
+      void * block; \
+      struct __tmp_struct * next; \
+   } __tmp_t; \
+   __tmp_t * __tmp_root; \
+   __tmp_t * __tpx
+
+#define TMP_START \
+   __tmp_root = NULL
+
+#define TMP_ALLOC(size) \
+   ((size) > 8192 ? \
+      (__tpx = alloca(sizeof(__tmp_t)), \
+       __tpx->next = __tmp_root, \
+       __tmp_root = __tpx, \
+       __tpx->block = flint_malloc(size)) : \
+      alloca(size))
+
+#define TMP_END \
+   while (__tmp_root) { \
+      flint_free(__tmp_root->block); \
+      __tmp_root = __tmp_root->next; \
+   }
 
 int parse_fmt(int * floating, const char * fmt);
 

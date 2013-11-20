@@ -29,13 +29,13 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_factor.h"
 #include "ulong_extras.h"
 
 void check(fmpz_t n)
 {
     fmpz_factor_t factor;
     fmpz_t m;
+    slong i;
 
     fmpz_factor_init(factor);
     fmpz_init(m);
@@ -62,6 +62,24 @@ void check(fmpz_t n)
         abort();
     }
 
+    for (i = 0; i < factor->num; i++)
+    {
+        if (!fmpz_is_probabprime(factor->p + i))
+        {
+            flint_printf("ERROR: factor is not prime!\n");
+
+            flint_printf("input: ");
+            fmpz_print(n);
+            flint_printf("\n");
+
+            flint_printf("computed factors: ");
+            fmpz_factor_print(factor);
+            flint_printf("\n");
+
+            abort();
+        }
+    }
+
     fmpz_clear(m);
     fmpz_factor_clear(factor);
 }
@@ -71,6 +89,7 @@ int main(void)
     int i, j;
     fmpz_t x;
     mpz_t y;
+    FLINT_TEST_INIT(state);
 
     flint_printf("factor....");
     fflush(stdout);
@@ -128,6 +147,15 @@ int main(void)
         }
     }
 
+    /* Whole limbs */
+    for (i = 0; i < 1000; i++)
+    {
+        fmpz_set_ui(x, n_randtest(state));
+        if (n_randint(state, 2))
+            fmpz_neg(x, x);
+        check(x);
+    }
+
     /* Large negative integers */
     fmpz_set_ui(x, 10);
     fmpz_pow_ui(x, x, 100);
@@ -141,7 +169,8 @@ int main(void)
     fmpz_clear(x);
     mpz_clear(y);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+
     flint_printf("PASS\n");
     return 0;
 }

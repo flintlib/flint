@@ -30,8 +30,10 @@
 #include "padic.h"
 #include "qadic.h"
 
+#define FLINT_SRC_CPIMPORT "../qadic/CPimport.txt"
+
 #ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT "CPimport.txt"
+#define FLINT_CPIMPORT FLINT_SRC_CPIMPORT
 #endif
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
@@ -50,6 +52,9 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     buf  = flint_malloc(832);
     file = fopen(FLINT_CPIMPORT, "r");
+
+    if (!file)
+       file = fopen(FLINT_SRC_CPIMPORT, "r");
 
     if (!file)
     {

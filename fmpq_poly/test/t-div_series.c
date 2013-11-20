@@ -36,13 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
     ulong cflags = UWORD(0);
 
-    flint_printf("div_series....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("div_series....");
+    fflush(stdout);  
 
     /* Check aliasing q and a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -155,8 +154,8 @@ main(void)
         fmpq_poly_clear(q);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

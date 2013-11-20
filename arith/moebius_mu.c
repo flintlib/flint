@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_factor.h"
+#include "fmpz.h"
 #include "arith.h"
 
 int arith_moebius_mu(const fmpz_t n)

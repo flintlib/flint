@@ -23,8 +23,9 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
+#undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"

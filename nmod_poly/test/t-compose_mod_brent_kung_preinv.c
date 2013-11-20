@@ -24,9 +24,18 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <stdlib.h>
-#include <mpir.h>
+#include <stdio.h>
+
+#undef ulong
+
+#include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
@@ -35,8 +44,8 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
     flint_printf("compose_mod_brent_kung_preinv....");
     fflush(stdout);
 
@@ -243,7 +252,8 @@ main(void)
         nmod_poly_clear(d);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

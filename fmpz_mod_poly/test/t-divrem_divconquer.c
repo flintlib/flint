@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("divrem_divconquer....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check q*b + r = a, no aliasing */
     for (i = 0; i < 5000; i++)
@@ -206,8 +206,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

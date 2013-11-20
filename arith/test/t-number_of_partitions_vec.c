@@ -36,17 +36,17 @@
 
 int main(void)
 {
-    flint_rand_t state;
     fmpz * p;
     mp_ptr pmod;
     slong k, n;
 
     const slong maxn = 1000;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("number_of_partitions_vec....");
     fflush(stdout);
-
-    flint_randinit(state);
+    
     p = _fmpz_vec_init(maxn);
     pmod = _nmod_vec_init(maxn);
 
@@ -113,8 +113,8 @@ int main(void)
     _fmpz_vec_clear(p, maxn);
     _nmod_vec_clear(pmod);
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

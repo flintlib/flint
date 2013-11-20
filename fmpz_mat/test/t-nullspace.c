@@ -37,13 +37,12 @@ int
 main(void)
 {
     fmpz_mat_t A, B, ker;
-    flint_rand_t state;
     slong i, m, n, b, d, r, nullity, nulrank;
 
-    flint_printf("nullspace....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("nullspace....");
+    fflush(stdout);    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -102,8 +101,8 @@ main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

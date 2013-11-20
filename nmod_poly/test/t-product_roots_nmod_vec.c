@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("product_roots_nmod_vec....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -85,7 +85,8 @@ main(void)
         _nmod_vec_clear(x);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

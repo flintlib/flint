@@ -71,13 +71,12 @@ int check_rref_form(slong * perm, nmod_mat_t A, slong rank)
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    flint_printf("rref....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("rref....");
+    fflush(stdout);    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -161,7 +160,8 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

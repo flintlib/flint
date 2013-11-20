@@ -26,12 +26,13 @@
 #ifndef QADIC_H
 #define QADIC_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -40,6 +41,8 @@
 #include "ulong_extras.h"
 #include "padic.h"
 #include "padic_poly.h"
+
+#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {

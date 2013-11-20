@@ -60,17 +60,16 @@ void ref_adjust_sqrt2(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t limbs, 
 int
 main(void)
 {
-  /*
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1, * temp;
    
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("adjust_sqrt2....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -131,9 +130,8 @@ main(void)
     mpz_clear(m2b);
     mpz_clear(mn1);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-  */
     return 0;
 }

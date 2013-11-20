@@ -39,8 +39,8 @@ int main(void)
    fmpz_init(n);
    fmpz_init(p);
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    while(1)
    {

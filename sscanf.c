@@ -34,9 +34,9 @@ int flint_sscanf(const char * s, const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
-   char * str2 = malloc(len + 1);
-   char * s2 = malloc(strlen(s) + 1);
-   int * w1, * w2;
+   char * str2 = flint_malloc(len + 1);
+   char * s2 = flint_malloc(strlen(s) + 1);
+   int * w1 = NULL, * w2 = NULL;
    void ** w3;
    double * d;
    ulong * wu;
@@ -68,25 +68,25 @@ int flint_sscanf(const char * s, const char * str, ...)
          {
             wu = (ulong *) va_arg(ap, ulong *);
             ret += sscanf(s, WORD_FMT "x", wu);
-            s += sprintf(str2, WORD_FMT "x", *wu);
+            s += sprintf(s2, WORD_FMT "x", *wu);
             s += n - 3;
          } else if (str[2] == 'u')
          {
             wu = (ulong *) va_arg(ap, ulong *);
             ret += sscanf(s, WORD_FMT "u", wu);
-            s += sprintf(str2, WORD_FMT "u", *wu);
+            s += sprintf(s2, WORD_FMT "u", *wu);
             s += n - 3;
          } else if (str[2] == 'd')
          {
             w = (slong *) va_arg(ap, slong *);
             ret += sscanf(s, WORD_FMT "d", w);
-            s += sprintf(str2, WORD_FMT "d", *w);
+            s += sprintf(s2, WORD_FMT "d", *w);
             s += n - 3;
          } else
          {
             w = (slong *) va_arg(ap, slong *);
             ret += sscanf(s, WORD_FMT "d", w);
-            s += sprintf(str2, WORD_FMT "d", *w);
+            s += sprintf(s2, WORD_FMT "d", *w);
             s += n - 2;
          }
          break;
@@ -145,8 +145,8 @@ int flint_sscanf(const char * s, const char * str, ...)
 
    va_end(ap);
 
-   free(str2);
-   free(s2);
+   flint_free(str2);
+   flint_free(s2);
 
    return ret;
 }

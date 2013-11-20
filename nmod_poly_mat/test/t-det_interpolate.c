@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
+
+    FLINT_TEST_INIT(state);
 
     flint_printf("det_interpolate....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -82,7 +81,8 @@ main(void)
         nmod_poly_mat_clear(A);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

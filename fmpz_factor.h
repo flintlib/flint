@@ -28,7 +28,6 @@
 
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {

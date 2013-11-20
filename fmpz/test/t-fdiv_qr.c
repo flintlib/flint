@@ -34,17 +34,19 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("fdiv_qr....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
+        slong j;
+
 
         fmpz_init(a);
         fmpz_init(b);
@@ -58,13 +60,16 @@ main(void)
         mpz_init(h);
         mpz_init(s);
 
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
+        fmpz_randbits(a, state, 1000);
+        do { 
+           fmpz_randbits(b, state, 500);
+        } while(fmpz_is_zero(b));
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        fmpz_fdiv_qr(c, r, a, b);
+        for (j = 1; j < 100; j++)
+           fmpz_fdiv_qr(c, r, a, b);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, c);
@@ -305,8 +310,8 @@ main(void)
         mpz_clear(s);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

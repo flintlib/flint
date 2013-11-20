@@ -56,12 +56,12 @@ main(void)
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1;
    
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("adjust....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -120,7 +120,7 @@ main(void)
     mpz_clear(m2b);
     mpz_clear(mn1);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
     return 0;

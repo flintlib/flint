@@ -125,7 +125,6 @@ test_traits()
     tassert(is_lazy_expr<immediate_expression>::val == false);
     tassert(is_lazy_expr<immediate_nonexpression>::val == false);
     tassert(is_lazy_expr<lazy_expression>::val == true);
-    //tassert(is_lazy_expr<lazy_expression&>::val == false);
     tassert(is_lazy_expr<const immediate_expression&>::val == false);
 }
 
@@ -358,9 +357,7 @@ test_cstyle_io()
     tassert(read(f, d) > 0);
     tassert(d == c);
     d = WORD(0);
-    std::fscanf(f, "\n");
-    //tassert(read_pretty(f, d) > 0);
-    //tassert(d == c);
+    tassert(std::fscanf(f, "\n") == 0);
     fclose(f);
     tassert(std::remove("expression_test") == 0);
 #endif

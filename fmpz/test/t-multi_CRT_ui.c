@@ -48,12 +48,12 @@ int main()
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("multi_CRT_ui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     mpz_init(num1);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)

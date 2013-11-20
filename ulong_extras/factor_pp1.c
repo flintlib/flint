@@ -23,9 +23,9 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with stdlib */
+#define ulong ulongxx /* prevent clash with stdlib */
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"

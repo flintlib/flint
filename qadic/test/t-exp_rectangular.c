@@ -32,12 +32,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("exp_rectangular... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
@@ -49,7 +49,7 @@ main(void)
         qadic_t a, b, c;
         int ans1, ans2;
 
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = n_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
@@ -94,7 +94,7 @@ main(void)
         qadic_t a, b, c, d, e, f, g;
         int ans1, ans2, ans3;
 
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         deg = n_randint(state, 10) + 1;
         N   = n_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
@@ -143,8 +143,8 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

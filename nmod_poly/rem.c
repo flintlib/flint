@@ -33,16 +33,21 @@
 void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA, 
                               mp_srcptr B, slong lenB, nmod_t mod)
 {
+    TMP_INIT;
+
     if (lenA - lenB == 1)
     {
         _nmod_poly_rem_q1(R, A, lenA, B, lenB, mod);
     }
     else if (lenA < NMOD_DIVREM_DIVCONQUER_CUTOFF)
     {
-        mp_ptr W = _nmod_vec_init(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod));
+        mp_ptr W;
+        
+        TMP_START;
+        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
 
         _nmod_poly_rem_basecase(R, W, A, lenA, B, lenB, mod);
-        _nmod_vec_clear(W);
+        TMP_END;
     }
     else
     {

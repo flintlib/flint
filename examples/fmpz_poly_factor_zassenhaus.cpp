@@ -30,7 +30,6 @@
 
 #include <cstdio>
 #include "fmpz_polyxx.h"
-#include "fmpz_poly_factorxx.h"
 
 using namespace flint;
 using namespace std;

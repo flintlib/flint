@@ -27,7 +27,6 @@
 #include <string>
 
 #include "fmpzxx.h"
-#include "fmpz_factorxx.h"
 #include "flintxx/test/helpers.h"
 
 #if !HAVE_FAST_COMPILER
@@ -162,7 +161,6 @@ test_arithmetic()
     // test composite arithmetic
     fmpzxx a(3), b(7);
     tassert(3*(a + b) - (b + (a - 4u)) + ((-(a - b)) % (b / 2)) == 25);
-    //tassert(a*b + a*a + b*b == 21+9+49); // XXX
 
     // test unary minus
     tassert(-a == -3);

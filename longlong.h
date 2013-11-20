@@ -79,7 +79,7 @@
     mp_limb_t __cbtmp;                                                \
     FLINT_ASSERT ((x) != 0);                                          \
     __asm__ ("bsrq %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));  \
-    (count) = __cbtmp ^ 63;                                           \
+    (count) = __cbtmp ^ (mp_limb_t) 63;                               \
   } while (0)
 
 /* bsfq destination must be a 64-bit register, "%q0" forces this in case
@@ -135,7 +135,7 @@
     mp_limb_t __cbtmp;                                                \
     FLINT_ASSERT ((x) != 0);                                          \
     __asm__ ("bsrl %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));  \
-    (count) = __cbtmp ^ 31;                                           \
+    (count) = __cbtmp ^ (mp_limb_t) 31;                               \
   } while (0)
 
 #define count_trailing_zeros(count, x)                              \

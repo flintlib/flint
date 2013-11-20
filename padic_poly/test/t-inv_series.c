@@ -33,16 +33,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    flint_printf("inv_series... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("inv_series... ");
+    fflush(stdout);    
 
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
@@ -60,14 +59,14 @@ main(void)
         padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100) + 1, ctx);
-        fmpz_remove(a->coeffs, a->coeffs, p);
         if (fmpz_is_zero(a->coeffs))
         {
             fmpz_randtest_not_zero(a->coeffs, state, 20);
             fmpz_remove(a->coeffs, a->coeffs, p);
             padic_poly_reduce(a, ctx);
-        }
-
+        } else
+            fmpz_remove(a->coeffs, a->coeffs, p);
+        
         padic_poly_set(b, a, ctx);
         n = n_randint(state, 100) + 1;
 
@@ -164,8 +163,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

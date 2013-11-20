@@ -38,14 +38,13 @@ main(void)
 {
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
-    flint_rand_t state;
     slong i, m, n, r;
     int success;
 
-    flint_printf("solve....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("solve....");
+    fflush(stdout);    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -125,8 +124,8 @@ main(void)
         fmpz_clear(den);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

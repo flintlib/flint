@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    flint_printf("inv....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("inv....");
+    fflush(stdout);    
 
     /* Test aliasing */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
@@ -157,8 +156,8 @@ main(void)
         fmpz_poly_mat_clear(Iden);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

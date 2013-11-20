@@ -55,8 +55,8 @@ main(void)
     int k, exp;
     fmpz_poly_t f, g;
     
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
    
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g, exphi * (lenhi - 1) + 1);

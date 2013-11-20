@@ -42,8 +42,6 @@ int main(void)
     const slong n = 12376;
     const slong N = n / 26;
 
-    flint_rand_t state;
-
     clock_t c0, c1;
     double c;
 
@@ -53,7 +51,7 @@ int main(void)
     fmpz_mod_poly_radix_t S;
     fmpz_mod_poly_struct **b;
 
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);    
 
     fmpz_init(a);
     fmpz_init(m);
@@ -130,9 +128,9 @@ int main(void)
     for (i = 0; i <= N; i++)
     {
         fmpz_mod_poly_clear(b[i]);
-        free(b[i]);
+        flint_free(b[i]);
     }
-    free(b);
+    flint_free(b);
 
     flint_randclear(state);
 

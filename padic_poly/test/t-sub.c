@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
@@ -37,16 +37,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     fmpz_t p;
     slong N;
     padic_ctx_t ctx;
 
-    flint_printf("sub... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("sub... ");
+    fflush(stdout);    
 
     /* Check a - b = a + neg(b) */
     for (i = 0; i < 10000; i++)
@@ -164,8 +163,8 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

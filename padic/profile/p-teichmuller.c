@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -64,7 +64,7 @@ main(void)
 
 for (l = 0; l < len; l++)
 {
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     long n = N[l], r;
     clock_t c0, c1;
     long double cputime;
@@ -73,14 +73,14 @@ for (l = 0; l < len; l++)
     padic_ctx_t ctx;
     padic_t c, z;
 
-    flint_randinit(state);
+    
 
     fmpz_init_set_ui(p, 17);
 
-    padic_ctx_init(ctx, p, n, PADIC_VAL_UNIT);
+    padic_ctx_init(ctx, p, n, n, PADIC_VAL_UNIT);
 
-    padic_init(c, ctx);
-    padic_init(z, ctx);
+    padic_init(c);
+    padic_init(z);
 
     fmpz_set_ui(padic_unit(c), 3);
 
@@ -99,8 +99,8 @@ for (l = 0; l < len; l++)
     flint_printf("%2ld, %4XYXYXYXY, %7ld, %wd\n", 
         l, cputime, runs[l], T[l]);
 
-    padic_clear(c, ctx);
-    padic_clear(z, ctx);
+    padic_clear(c);
+    padic_clear(z);
 
     fmpz_clear(p);
     padic_ctx_clear(ctx);

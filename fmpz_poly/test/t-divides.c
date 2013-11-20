@@ -33,12 +33,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("divides....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check that b divides a*b and that the quotient is a */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -166,8 +166,8 @@ main(void)
     }
 
     
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

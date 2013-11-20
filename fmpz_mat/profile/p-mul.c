@@ -51,8 +51,8 @@ void sample(void * arg, ulong count)
 
     flint_rand_t rnd;
     fmpz_mat_t A, B, C;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     fmpz_mat_init(A, m, n);
     fmpz_mat_init(B, n, k);

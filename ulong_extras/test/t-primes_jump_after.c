@@ -31,13 +31,12 @@
 
 int main(void)
 {
-    flint_rand_t state;
     slong j, k, l;
+
+    FLINT_TEST_INIT(state);   
 
     flint_printf("primes_jump_after....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (j = 0; j < 10; j++)
     {
@@ -70,7 +69,8 @@ int main(void)
         n_primes_clear(iter);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

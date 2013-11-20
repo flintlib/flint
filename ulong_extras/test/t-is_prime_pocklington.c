@@ -35,8 +35,8 @@ int main(void)
    ulong count = 0;
    mp_limb_t d;
    mpz_t d_m;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    
    flint_printf("is_prime_pocklington....");
    fflush(stdout);
@@ -96,8 +96,8 @@ int main(void)
       abort();
    }
 
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

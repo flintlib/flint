@@ -45,8 +45,8 @@ void sample(void * arg, ulong count)
    mp_ptr vec2 = _nmod_vec_init(1000);
    mp_size_t j;
    slong i;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
     
    for (j = 0; j < 1000; j++)
       vec[j] = n_randlimb(state);

@@ -41,8 +41,8 @@ void sample(void * arg, ulong count)
    slong n = info->n, i, j;
    slong scale;
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    nmod_poly_t a, b, c;
    mp_limb_t m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2));
    if (m == 0) m = 2;
@@ -69,7 +69,7 @@ void sample(void * arg, ulong count)
 	  prof_start();
       for (j = 0; j < scale; j++)
       {
-          nmod_poly_mul_KS(c, a, b);
+          nmod_poly_mul(c, a, b);
       }
 	  prof_stop();
       if (c->coeffs[n - 2] == 123) abort();

@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("rfac_uiui... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check rf(x,a) * rf(x+a,b) = rf(x,a+b) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)

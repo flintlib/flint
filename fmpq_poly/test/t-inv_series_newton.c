@@ -37,13 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
     ulong cflags = UWORD(0);
 
-    flint_printf("inv_series_newton....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("inv_series_newton....");
+    fflush(stdout);   
 
     /* Check aliasing of a and c */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -118,8 +117,8 @@ main(void)
         fmpq_poly_clear(one);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

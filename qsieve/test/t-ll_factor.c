@@ -34,14 +34,13 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
    fmpz_t n, t;
    mp_limb_t fac1, fac2, fac;
 
+   FLINT_TEST_INIT(state);
+
    flint_printf("ll_factor....");
-   fflush(stdout);
- 
-   flint_randinit(state);
+   fflush(stdout);   
 
    fmpz_init(n);
    fmpz_init(t);
@@ -83,8 +82,8 @@ int main(void)
    fmpz_clear(t);
    fmpz_clear(n);
    
-   flint_randclear(state);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

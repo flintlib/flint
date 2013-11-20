@@ -34,8 +34,8 @@ void sample(void * arg, ulong count)
    mp_limb_t a, b, d, r, norm, dinv;
    mp_ptr array = (mp_ptr) flint_malloc(1000*sizeof(mp_limb_t));
    ulong i;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    
    for (i = 0; i < count; i++)
    {

@@ -10,23 +10,26 @@ QUIET_AR  = @echo '   ' AR  ' ' $@;
 
 AT=@
 
-BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
-   fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
-   arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
-   fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_poly_factor \
-   fmpz_factor fmpz_poly_factor fft qsieve double_extras \
-   padic_poly padic_mat qadic fq fq_poly fq_vec fq_mat \
+BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
+   fmpq_poly fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
+   nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_mat padic \
+   fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly \
+   fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve \
+   double_extras padic_poly padic_mat qadic  \
+   fq fq_poly fq_vec fq_mat \
    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly \
-   fq_zech fq_zech_vec fq_zech_mat fq_zech_poly
+   fq_zech fq_zech_vec fq_zech_mat fq_zech_poly \
+   $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates
+
 
 export
 
 SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c thread_support.c
 LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h templates.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h profiler.h templates.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
@@ -95,7 +98,6 @@ examples: library $(EXMP_SOURCES)
 	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
 $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
-	echo $(EXT_OBJS)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
@@ -154,7 +156,8 @@ ifndef MOD
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	$(AT)$(foreach dir, $(MOD), test ! -d $(dir) || mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); test ! -d $(dir) || $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach dir, $(MOD), export MOD_DIR=$(dir); test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; export BUILD_DIR=$(CURDIR)/build/$(dir); test ! -d $(ext)/$(dir) || $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
 endif
 
 install: library

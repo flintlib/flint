@@ -41,7 +41,7 @@ NTL_CLIENT
 int test_ZZ_to_fmpz()
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     mp_bitcnt_t bits, randbits;
     fmpz_t int1, int2;
    
@@ -50,7 +50,7 @@ int test_ZZ_to_fmpz()
     flint_printf("ZZ_to_fmpz....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check conversion */
     for (i = 0; i < 10000; i++)
@@ -87,13 +87,13 @@ int test_ZZX_to_fmpz_poly()
     fmpz_poly_t f_poly1, f_poly2;
     slong length;
     mp_bitcnt_t bits;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     int i, result;
    
     flint_printf("ZZX_to_fmpz_poly....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and c */
     for (i = 0; i < 10000; i++)

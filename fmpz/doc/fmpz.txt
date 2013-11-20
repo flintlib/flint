@@ -298,9 +298,20 @@ int fmpz_fread(FILE * file, fmpz_t f)
     \code{scanf} from the standard library and \code{mpz_inp_str} 
     from MPIR.
 
+size_t fmpz_inp_raw( fmpz_t x, FILE *fin ) 
+
+    Reads a multiprecision integer from the stream \code{file}.  The
+    format is raw binary format write by \code{fmpz_out_raw}. 
+    
+    In case of success, return a posivitive number, indicating number of bytes read.
+    In case of failure 0.
+
+    This function calls the \code{mpz_inp_raw} function in library gmp. So that it 
+    can read the raw data writen by \code{mpz_inp_raw} directly.
+    
 int fmpz_print(fmpz_t x)
 
-    Prints the value $x$ to \code{stdout}, without a carriage return.
+    Prints the value $x$ to \code{stdout}, without a carriage return(CR).
     The value is printed as either~$0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
@@ -314,7 +325,7 @@ int fmpz_print(fmpz_t x)
 
 int fmpz_fprint(FILE * file, fmpz_t x)
 
-    Prints the value $x$ to \code{file}, without a carriage return.
+    Prints the value $x$ to \code{file}, without a carriage return(CR).
     The value is printed as either~$0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
@@ -325,6 +336,23 @@ int fmpz_fprint(FILE * file, fmpz_t x)
     This convention is adopted in light of the return values of 
     \code{flint_printf} from the standard library and \code{mpz_out_str} 
     from MPIR.
+
+size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
+
+    Writes the value $x$ to \code{file}.
+    The value is writen in raw binary format. The integer is written in 
+    portable format, with 4 bytes of size information, and that many bytes
+    of linbs. Both the size and the limbs are written in decreasing 
+    significance order (i.e., in big-endian).
+
+    The output can be read with \code{fmpz_inp_raw}.
+
+    In case of success, return a positive number, indicating number of bytes written.
+    In case of failure, return 0.
+
+    The output of this can also be read by \code{mpz_inp_raw} from GMP >= 2, 
+    Since this function calls the \code{mpz_inp_raw} function in library gmp.
+
 
 *******************************************************************************
 
@@ -669,6 +697,25 @@ ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
     Returns the remainder of $g$ modulo $x$ where $x$ is an 
     \code{ulong}, without changing $g$.  If $x$ is $0$ an
     exception will result.
+
+void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f)
+
+    Compute a precomputed inverse \code{inv} of \code{f} for use in the
+    \code{preinvn} functions listed below.
+
+void fmpz_preinvn_clear(fmpz_preinvn_t inv)
+
+    Clean up the resources used by a precomputed inverse created with the
+    \code{fmpz_preinvn_init} function.
+
+void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 
+                                     const fmpz_t h, const fmpz_preinvn_t hinv)
+
+    As per \code{fmpz_fdiv_qr}, but takes a precomputed inverse \code{hinv}
+    of $h$ constructed using \code{fmpz_preinvn}.
+
+    This function will be faster than \code{fmpz_fdiv_qr_preinvn} when the
+    number of limbs of $h$ is at least \code{PREINVN_CUTOFF}.
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 

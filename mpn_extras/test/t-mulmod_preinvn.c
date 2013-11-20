@@ -36,11 +36,12 @@ int main(void)
     int i, result;
     mpz_t a, b, d, r1, r2;
     gmp_randstate_t st;
-    flint_rand_t state;
     mp_ptr dinv;
     mp_size_t size;
     mp_bitcnt_t norm;
     
+    FLINT_TEST_INIT(state);
+
     flint_printf("mulmod_preinvn....");
     fflush(stdout);
 
@@ -51,11 +52,10 @@ int main(void)
     /* don't init r2 */
 
     gmp_randinit_default(st);
-    flint_randinit(state);
-
+    
     for (i = 0; i < 10000; i++)
     {
-       size = n_randint(state, 200) + 2;
+       size = n_randint(state, 200) + 1;
        
        mpz_rrandomb(a, st, size*FLINT_BITS);
        mpz_rrandomb(b, st, size*FLINT_BITS);
@@ -112,8 +112,8 @@ int main(void)
     /* don't init r2 */
 
     gmp_randclear(st);
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

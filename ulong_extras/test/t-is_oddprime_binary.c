@@ -32,14 +32,13 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
    slong cutoff = 100000;
+
+   FLINT_TEST_INIT(state);
    
    flint_printf("is_oddprime_binary....");
    fflush(stdout);
    
-   flint_randinit(state);
-
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mp_limb_t d;
@@ -93,8 +92,8 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

@@ -205,7 +205,7 @@ static __inline__ void _fq_nmod_dense_reduce(mp_limb_t* R, long lenR, const fq_n
     q = _nmod_vec_init(lenR - ctx->modulus->length + 1);
     r = _nmod_vec_init(ctx->modulus->length - 1);
 
-    _nmod_poly_divrem_newton21_preinv(q, r, R, lenR, 
+    _nmod_poly_divrem_newton_n_preinv(q, r, R, lenR, 
                                       ctx->modulus->coeffs, ctx->modulus->length,
                                       ctx->inv->coeffs, ctx->inv->length,
                                       ctx->mod);

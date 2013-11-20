@@ -49,13 +49,13 @@ int main()
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("multi_CRT_ui_unsigned....");
     fflush(stdout);
 
     mpz_init(num1);
-    flint_randinit(state);
+    
 
     result = 1;
 

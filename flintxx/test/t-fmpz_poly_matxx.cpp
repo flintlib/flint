@@ -50,18 +50,6 @@ test_init()
     tassert(fmpz_poly_matxx::one(3, 3).is_one());
 }
 
-void
-test_assignment()
-{
-    // TODO
-}
-
-void
-test_conversion()
-{
-    // TODO
-}
-
 template<class Expr>
 bool has_explicit_temporaries(const Expr&)
 {
@@ -176,12 +164,6 @@ test_functions()
     C.at(0, 0).set_coeff(0, 1);
     C.at(1, 1).set_coeff(0, 1);
     tassert(rank(C) == 2);
-
-#if 0
-    tassert(B.charpoly().get_coeff(0) == B.det());
-    tassert(charpoly(B).get_coeff(1) == -B.trace());
-    tassert(charpoly(B).lead() == 1);
-#endif
 
     Bp.set_randrank(rand, 1, 10);
     B = fmpz_poly_matxx::from_ground(Bp);
@@ -298,8 +280,6 @@ main()
     std::cout << "fmpz_poly_matxx....";
 
     test_init();
-    test_assignment();
-    test_conversion();
     test_arithmetic();
     test_functions();
     test_extras();

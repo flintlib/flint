@@ -32,8 +32,8 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
  
    flint_printf("count_leading_zeros....");
    fflush(stdout);
@@ -45,7 +45,8 @@ int main(void)
 
       n = n_randtest(state);
 
-      count_leading_zeros(count, n);
+      if (n != 0)
+         count_leading_zeros(count, n);
 
       result = ((n == UWORD(0)) || (((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)
@@ -56,8 +57,8 @@ int main(void)
       }
    }
 
-   flint_randclear(state);
-
+   FLINT_TEST_CLEANUP(state);
+   
    flint_printf("PASS\n");
    return 0;
 }

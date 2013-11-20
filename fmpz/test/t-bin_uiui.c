@@ -37,12 +37,12 @@ main(void)
     ulong n, k;
     fmpz_t x, y;
     mpz_t z;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("bin_uiui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

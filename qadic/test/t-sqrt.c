@@ -37,12 +37,12 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 int main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("sqrt... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
 /* PRIME p = 2 ***************************************************************/
 
@@ -715,8 +715,8 @@ int main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

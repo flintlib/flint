@@ -39,8 +39,8 @@ main(void)
     slong i, m, n, r;
     mp_limb_t mod;
     int solved;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
     flint_printf("solve....");
     fflush(stdout);
@@ -127,8 +127,8 @@ main(void)
         nmod_mat_clear(AX);
     }
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

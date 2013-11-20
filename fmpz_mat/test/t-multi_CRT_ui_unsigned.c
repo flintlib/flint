@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("multi_CRT_ui_unsigned....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -104,8 +104,8 @@ main(void)
         fmpz_clear(mod);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

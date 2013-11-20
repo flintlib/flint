@@ -41,12 +41,12 @@ main(void)
     mp_bitcnt_t depth, w;
     int iters;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("mulmod_2expp1....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     for (iters = 0; iters < 100; iters++)
@@ -141,7 +141,7 @@ main(void)
         }
     }
     
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
     return 0;

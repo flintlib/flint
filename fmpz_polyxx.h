@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "flint.h"
 #include "fmpz_poly.h"
 
 #include "fmpzxx.h"
@@ -295,7 +296,7 @@ public:
     {
         char* str = fmpz_poly_get_str_pretty(this->evaluate()._poly(), x);
         std::string res(str);
-        std::free(str);
+        flint_free(str);
         return res;
     }
 
@@ -955,5 +956,7 @@ int read_pretty(FILE* fi, Fmpz_poly& f, char** x,
 } // flint
 
 #include "nmod_polyxx.h" // modular reconstruction code
+
+#include "fmpz_poly_factorxx.h"
 
 #endif

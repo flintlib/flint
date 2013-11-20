@@ -34,8 +34,8 @@ int flint_scanf(const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
-   char * str2 = malloc(len + 1);
-   int * w1, * w2;
+   char * str2 = flint_malloc(len + 1);
+   int * w1 = NULL, * w2 = NULL;
    void * w3;
    double * d;
    ulong * wu;
@@ -132,7 +132,7 @@ int flint_scanf(const char * str, ...)
    va_end(ap);
 
 cleanup:
-   free(str2);
+   flint_free(str2);
 
    return ret;
 }

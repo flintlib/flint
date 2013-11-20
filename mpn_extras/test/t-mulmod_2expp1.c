@@ -67,8 +67,8 @@ int main(void)
           dn++; /* dp is 2^b+1 */ 
        
        for (c = 0; c < 20; c++) {
-          mpn_rrandom(xp, rands, xn);
-          mpn_rrandom(yp, rands, xn);
+          mpn_random2(xp, xn);
+          mpn_random2(yp, xn);
           xp[xn-1] &= GMP_NUMB_MASK >> k;
           yp[xn-1] &= GMP_NUMB_MASK >> k;
           mpn_mul_n(zp, xp, yp, xn);
@@ -115,7 +115,7 @@ int main(void)
           dn++; /* dp is 2^b+1 */
      
        for (c = 0; c < 20; c++) {
-          mpn_rrandom(xp, rands, xn);
+          mpn_random2(xp, xn);
           mpn_zero(yp, xn); /* set yp to 2^b */
           xp[xn-1] &= GMP_NUMB_MASK >> k;
           yp[xn-1] &= GMP_NUMB_MASK >> k;
@@ -172,7 +172,7 @@ int main(void)
           dn++; /* dp is 2^b+1 */
 
        for (c = 0; c < 20; c++) {
-          mpn_rrandom(xp, rands, xn);
+          mpn_random2(xp, xn);
           mpn_zero(yp, xn); /* set yp to 2^b */
           xp[xn-1] &= GMP_NUMB_MASK >> k;
           yp[xn-1] &= GMP_NUMB_MASK >> k;
@@ -249,7 +249,7 @@ int main(void)
     }
 
     gmp_randclear(rands);
-
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

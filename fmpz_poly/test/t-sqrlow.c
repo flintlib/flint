@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("sqrlow....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -105,8 +105,8 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

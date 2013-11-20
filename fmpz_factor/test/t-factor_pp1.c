@@ -29,7 +29,6 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_factor.h"
 #include "ulong_extras.h"
 
 int main(void)
@@ -37,9 +36,9 @@ int main(void)
    int i, j, result;
    ulong count = UWORD(0);
    gmp_randstate_t st;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    gmp_randinit_default(st);
-   flint_randinit(state);
+   
 
    flint_printf("factor_pp1....");
    fflush(stdout);
@@ -107,7 +106,7 @@ int main(void)
 
    flint_randclear(state);
    gmp_randclear(st);
-
+   flint_cleanup();
    flint_printf("PASS\n");
    return 0;
 }

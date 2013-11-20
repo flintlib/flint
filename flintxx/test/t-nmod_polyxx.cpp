@@ -232,9 +232,9 @@ test_functions()
     f.set_coeff(f.degree(), 12); // unit
     tassert(g.div_newton(f) == g / f);
     tassert(g.divrem_newton(f) == g.divrem(f));
-    tassert(g.divrem(f) == g.divrem_newton21_preinv(f,
+    tassert(g.divrem(f) == g.divrem_newton_n_preinv(f,
                 f.reverse(f.length()).inv_series(f.length())));
-    tassert(g /f == g.div_newton21_preinv(f,
+    tassert(g /f == g.div_newton_n_preinv(f,
                 f.reverse(f.length()).inv_series(f.length())));
 
     res = "2 31  5 1";

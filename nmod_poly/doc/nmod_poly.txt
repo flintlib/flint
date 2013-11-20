@@ -701,6 +701,7 @@ void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
     It is required that \code{finv} is the inverse of the reverse of \code{f}
     mod \code{x^lenf}. It is required that \code{len1 + len2 - lenf > 0},
     which is equivalent to requiring that the result will actually be reduced.
+    It is required that \code{len1 < lenf} and \code{len2 < lenf}.
     Otherwise, simply use \code{_nmod_poly_mul} instead.
 
     Aliasing of \code{f} or \code{finv} and \code{res} is not permitted.
@@ -711,7 +712,8 @@ void nmod_poly_mulmod_preinv(nmod_poly_t res,
 
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}. \code{finv} is the
-    inverse of the reverse of \code{f}.
+    inverse of the reverse of \code{f}. It is required that \code{poly1} and
+    \code{poly2} are reduced modulo \code{f}.
 
 *******************************************************************************
 
@@ -823,7 +825,27 @@ nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res,
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
     We require \code{finv} to be the inverse of the reverse of \code{f}.
 
-void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly,
+void
+_nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf,
+                               mp_srcptr finv, slong lenfinv, nmod_t mod)
+
+    Sets \code{res} to \code{x} raised to the power \code{e} modulo \code{f},
+    using sliding window exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 2}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
+                             const nmod_poly_t finv)
+
+    Sets \code{res} to \code{x} raised to the power \code{e}
+    modulo \code{f}, using sliding window exponentiation. We require
+    \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
+    \code{f}.
+
+void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, 
                                 mpz_srcptr e, mp_srcptr f,
                                 slong lenf, nmod_t mod)
 
@@ -841,6 +863,29 @@ void nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+
+void
+_nmod_poly_powmod_mpz_binexp_preinv (mp_ptr res, mp_srcptr poly,
+                                    mpz_srcptr e, mp_srcptr f, slong lenf,
+                                    mp_srcptr finv, slong lenfinv, nmod_t mod)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
+                           const nmod_poly_t poly, mpz_srcptr e,
+                           const nmod_poly_t f, const nmod_poly_t finv)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
 
 *******************************************************************************
 
@@ -1097,7 +1142,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
             mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
@@ -1111,7 +1156,7 @@ void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
+void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                  const nmod_poly_t B, const nmod_poly_t Binv)
 
     Notionally computes $Q$ and $R$ such that $A = BQ + R$ with
@@ -1120,42 +1165,49 @@ void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
     We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
     the inverse of the reverse of $B$ mod $x^{\len(B)}$.
 
-    The algorithm used is to reverse the polynomials and divide the
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to reverse the polynomials and divide the 
     resulting power series, then reverse the result.
 
-void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong Alen,
+void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong Alen, 
                                         mp_srcptr B, slong Blen, nmod_t mod)
 
-    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
-    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length 
     \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
     coefficients. The algorithm used is to call \code{div_newton()} and then
     multiply out and compute the remainder.
 
-void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
+void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
                              const nmod_poly_t A, const nmod_poly_t B)
 
-    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
-    The algorithm used is to call \code{div_newton()} and then multiply out
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
+    The algorithm used is to call \code{div_newton()} and then multiply out 
     and compute the remainder.
 
-void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
+void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
 slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
     \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
     \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
-    coefficients. Furthermore, we assume that $Binv$ is the inverse of the
-    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call
-    \code{div_newton21_preinv()} and then multiply out and compute
+    coefficients. Furthermore, we assume that $Binv$ is the inverse of the 
+    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call 
+    \code{div_newton_n_preinv()} and then multiply out and compute
     the remainder.
 
-void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
+void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
             const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
     We assume $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
-    The algorithm used is to call \code{div_newton21()} and then multiply out
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to call \code{div_newton_n()} and then multiply out 
     and compute the remainder.
 
 mp_limb_t _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len,
@@ -1276,7 +1328,7 @@ void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, const nmod_poly_t poly,
 void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr poly, slong len,
                                     mp_srcptr xs, slong n, nmod_t mod)
 
-    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    Evaluates (\code{poly}, \code{len}) at the \code{n} values
     given in the vector \code{xs}, writing the output values
     to \code{ys}. The values in \code{xs} should be reduced
     modulo the modulus.
@@ -1531,6 +1583,63 @@ void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
     we require \code{hinv} to be the inverse of the reverse of \code{h}.
     The algorithm used is the Brent-Kung matrix algorithm.
 
+void
+_nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+                          const nmod_poly_t f)
+
+    Sets the ith row of \code{A} to the reduction of the ith row of $B$ modulo
+    $f$ for $i=1,\ldots,\sqrt{\deg(f)}$. We require $B$ to be at least
+    a $\sqrt{\deg(f)}\times \deg(f)$ matrix and $f$ to be nonzero.
+
+void
+_nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr f, mp_srcptr g,
+               slong leng, mp_srcptr ginv, slong lenginv, nmod_t mod)
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g} and $g$ to be
+    nonzero.
+
+void
+nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t f,
+                          const nmod_poly_t g, const nmod_poly_t ginv)
+
+    Sets the ith row of \code{A} to $f^i$ modulo $g$ for
+    $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
+    a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
+    \code{ginv} to be the inverse of the reverse of \code{g}.
+
+
+void
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr f,
+                            slong lenf, const nmod_mat_t A, mp_srcptr h,
+                            slong h, mp_srcptr hinv, slong lenhinv,
+                            nmod_t mod)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
+    $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
+                    const nmod_poly_t f, const nmod_mat_t A,
+                    const nmod_poly_t h, const nmod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that the
+    ith row of $A$ contains $g^i$ for $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
+    $\sqrt{\deg(h)}\times \deg(h)$ matrix. We require that $h$ is nonzero and
+    that $f$ has smaller degree than $h$. Furthermore, we require \code{hinv} to
+    be the inverse of the reverse of \code{h}. This version of Brent-Kung
+    modular composition is particularly useful if one has to perform several
+    modular composition of the form $f(g)$ modulo $h$ for fixed $g$ and $h$.
+
 void _nmod_poly_compose_mod(mp_ptr res,
     mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
 
@@ -1668,6 +1777,8 @@ slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
     $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$,
     respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$
     and $\len(T) \leq \len(A) - \len(G)$.
+
+    Both $S$ and $T$ must have space for at least $2$ coefficients.
 
     No aliasing of input and output operands is permitted.
 
@@ -2315,185 +2426,3 @@ ulong nmod_poly_deflation(const nmod_poly_t input)
     Returns the largest integer by which \code{input} can be deflated.
     As special cases, returns 0 if \code{input} is the zero polynomial
     and 1 of \code{input} is a constant polynomial.
-
-*******************************************************************************
-
-    Factorisation
-
-*******************************************************************************
-
-void nmod_poly_factor_init(nmod_poly_factor_t fac)
-
-    Initialises \code{fac} for use. An \code{nmod_poly_factor_t}
-    represents a polynomial in factorised form as a product of
-    polynomials with associated exponents.
-
-void nmod_poly_factor_clear(nmod_poly_factor_t fac)
-
-    Frees all memory associated with \code{fac}.
-
-void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
-
-    Reallocates the factor structure to provide space for
-    precisely \code{alloc} factors.
-
-void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, slong len)
-
-    Ensures that the factor structure has space for at
-    least \code{len} factors.  This functions takes care
-    of the case of repeated calls by always at least
-    doubling the number of factors the structure can hold.
-
-void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
-
-    Sets \code{res} to the same factorisation as \code{fac}.
-
-void nmod_poly_factor_print(const nmod_poly_factor_t fac)
-
-    Prints the entries of \code{fac} to standard output.
-
-void nmod_poly_factor_insert(nmod_poly_factor_t fac,
-                             const nmod_poly_t poly, slong exp)
-
-    Inserts the factor \code{poly} with multiplicity \code{exp} into
-    the factorisation \code{fac}.
-
-    If \code{fac} already contains \code{poly}, then \code{exp} simply
-    gets added to the exponent of the existing entry.
-
-void nmod_poly_factor_concat(nmod_poly_factor_t res,
-                             const nmod_poly_factor_t fac)
-
-    Concatenates two factorisations.
-
-    This is equivalent to calling \code{nmod_poly_factor_insert()}
-    repeatedly with the individual factors of \code{fac}.
-
-    Does not support aliasing between \code{res} and \code{fac}.
-
-void nmod_poly_factor_pow(nmod_poly_factor_t fac, slong exp)
-
-    Raises \code{fac} to the power \code{exp}.
-
-ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
-
-    Removes the highest possible power of \code{p} from \code{f} and
-    returns the exponent.
-
-int nmod_poly_is_irreducible(const nmod_poly_t f)
-
-    Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
-
-int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod)
-
-    Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a
-    special case, the zero polynomial is not considered squarefree.
-    There are no restrictions on the length.
-
-int nmod_poly_is_squarefree(const nmod_poly_t f)
-
-    Returns 1 if \code{f} is squarefree, and 0 otherwise. As a special
-    case, the zero polynomial is not considered squarefree.
-
-void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
-
-    Sets \code{res} to a square-free factorization of \code{f}.
-
-int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, slong d)
-
-    Probabilistic equal degree factorisation of \code{pol} into
-    irreducible factors of degree \code{d}. If it passes, a factor is
-    placed in factor and 1 is returned, otherwise 0 is returned and
-    the value of factor is undetermined.
-
-    Requires that \code{pol} be monic, non-constant and squarefree.
-
-void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
-                                const nmod_poly_t pol, slong d)
-
-    Assuming \code{pol} is a product of irreducible factors all of
-    degree \code{d}, finds all those factors and places them in factors.
-    Requires that \code{pol} be monic, non-constant and squarefree.
-
-void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-		const nmod_poly_t poly, slong **degs)
-
-    Factorises a monic non-constant squarefree polymnomial \code{poly}
-    of degree n into factors ${f[d]}$ such that for ${1 \leq d \leq n}$
-    ${f[d]}$ is the product of the monic irreducible factors of \code{poly}
-    of degree ${d}$. Factors are stored in \code{res}, assotiated powers
-    of irreducible polynomials are stored in \code{degs} in the same order
-    as factors.
-
-    Requires that \code{degs} have enough space for irreducible polynomials'
-    powers (maximum space required is \code{n * sizeof(slong)}).
-
-void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
-                                        const nmod_poly_t f)
-
-    Factorises a non-constant polynomial \code{f} into monic irreducible
-    factors using the Cantor-Zassenhaus algorithm.
-
-void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
-
-    Factorises a non-constant, squarefree polynomial \code{f} into monic
-    irreducible factors using the Berlekamp algorithm.
-
-void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
-				     const nmod_poly_t poly)
-
-    Factorises a non-constant polynomial \code{f} into monic irreducible
-    factors using the fast version of Cantor-Zassenhaus algorithm proposed by
-    Kaltofen and Shoup (1998). More precisely this algorithm uses a
-    “baby step/giant step” strategy for the distinct-degree factorization
-    step.
-
-mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
-                                          const nmod_poly_t f)
-
-    Factorises a general polynomial \code{f} into monic irreducible factors
-    and returns the leading coefficient of \code{f}, or 0 if \code{f}
-    is the zero polynomial.
-
-    This function first checks for small special cases, deflates \code{f}
-    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
-    square-free factorisation, and finally runs Berlekamp on all the
-    individual square-free factors.
-
-mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res,
-                                                  const nmod_poly_t f)
-
-    Factorises a general polynomial \code{f} into monic irreducible factors
-    and returns the leading coefficient of \code{f}, or 0 if \code{f}
-    is the zero polynomial.
-
-    This function first checks for small special cases, deflates \code{f}
-    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
-    square-free factorisation, and finally runs Cantor-Zassenhaus on all the
-    individual square-free factors.
-
-mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t res,
-					       const nmod_poly_t f)
-
-    Factorises a general polynomial \code{f} into monic irreducible factors
-    and returns the leading coefficient of \code{f}, or 0 if \code{f}
-    is the zero polynomial.
-
-    This function first checks for small special cases, deflates \code{f}
-    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
-    square-free factorisation, and finally runs Kaltofen-Shoup on all the
-    individual square-free factors.
-
-mp_limb_t nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t f)
-
-    Factorises a general polynomial \code{f} into monic irreducible factors
-    and returns the leading coefficient of \code{f}, or 0 if \code{f}
-    is the zero polynomial.
-
-    This function first checks for small special cases, deflates \code{f}
-    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
-    square-free factorisation, and finally runs either Cantor-Zassenhaus
-    or Berlekamp on all the individual square-free factors.
-    Currently Cantor-Zassenhaus is used by default unless the modulus is 2, in
-    which case Berlekamp is used.

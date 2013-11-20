@@ -48,7 +48,7 @@ int parse_fmt(int * floating, const char * fmt)
       args++;
       fmt++; /* skip * */
    } else
-      while (isdigit(fmt[0]))
+      while (isdigit((unsigned char) fmt[0]))
          fmt++; /* skip width */
 
    if (fmt[0] == '.')
@@ -59,7 +59,7 @@ int parse_fmt(int * floating, const char * fmt)
          args++;
          fmt++; /* skip * */
       } else
-         while (isdigit(fmt[0]))
+         while (isdigit((unsigned char) fmt[0]))
             fmt++; /* skip precision */
    } 
 
@@ -78,7 +78,7 @@ size_t flint_printf(const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
-   char * str2 = malloc(len + 1);
+   char * str2 = flint_malloc(len + 1);
    int w1 = 0, w2 = 0;
    void * w3;
    double d;
@@ -163,7 +163,7 @@ size_t flint_printf(const char * str, ...)
    }
 
    va_end(ap);
-   free(str2);
+   flint_free(str2);
 
    return ret;
 }

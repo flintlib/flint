@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    flint_printf("neg....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("neg....");
+    fflush(stdout);    
 
     /* Check evaluation homomorphism */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -124,7 +123,8 @@ main(void)
         nmod_poly_mat_clear(B);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

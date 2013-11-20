@@ -30,7 +30,7 @@
 #include "ulong_extras.h"
 #include "double_extras.h"
 
-#define ONE_OVER_E 0.36787944117144228
+#define ONE_OVER_E ldexp(6627126856707895.0, -54)
 
 int
 main()
@@ -39,12 +39,12 @@ main()
     slong iter, prec = 70;
     mpfr_t xx, ww, wnew, t, u, v, p, q, max_err;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
    
     flint_printf("lambertw....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     mpfr_init2(xx, prec);
     mpfr_init2(ww, prec);
@@ -153,8 +153,8 @@ main()
     mpfr_clear(max_err);
 
     mpfr_free_cache();
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

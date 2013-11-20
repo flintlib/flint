@@ -33,16 +33,15 @@
 
 int main(void)
 {
-    flint_rand_t state;
     mp_ptr b1, b2;
     slong n;
 
     const slong maxn = 3000;
 
-    flint_printf("bell_number_nmod_vec....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("bell_number_nmod_vec....");
+    fflush(stdout);    
 
     b1 = _nmod_vec_init(maxn);
     b2 = _nmod_vec_init(maxn);
@@ -72,8 +71,8 @@ int main(void)
     _nmod_vec_clear(b1);
     _nmod_vec_clear(b2);
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

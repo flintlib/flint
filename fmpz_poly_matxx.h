@@ -400,20 +400,20 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(solve_fflu_precomp_op, fmpz_poly_matxx,
 namespace detail {
 struct fmpz_poly_mat_vector_data
 {
-    long size;
+    slong size;
     fmpz_poly_mat_t* array;
 
-    fmpz_poly_mat_vector_data(long n, slong rows, slong cols)
+    fmpz_poly_mat_vector_data(slong n, slong rows, slong cols)
         : size(n)
     {
         array = new fmpz_poly_mat_t[n];
-        for(long i = 0;i < n;++i)
+        for(slong i = 0; i < n; ++i)
             fmpz_poly_mat_init(array[i], rows, cols);
     }
 
     ~fmpz_poly_mat_vector_data()
     {
-        for(long i = 0;i < size;++i)
+        for(slong i = 0; i < size; ++i)
             fmpz_poly_mat_clear(array[i]);
         delete[] array;
     }
@@ -422,20 +422,20 @@ struct fmpz_poly_mat_vector_data
         : size(o.size)
     {
         array = new fmpz_poly_mat_t[size];
-        for(long i = 0;i < size;++i)
+        for(slong i = 0; i < size; ++i)
             fmpz_poly_mat_init_set(array[i], o.array[i]);
     }
 
-    fmpz_poly_matxx_ref at(long i)
+    fmpz_poly_matxx_ref at(slong i)
         {return fmpz_poly_matxx_ref::make(array[i]);}
-    fmpz_poly_matxx_srcref at(long i) const
+    fmpz_poly_matxx_srcref at(slong i) const
         {return fmpz_poly_matxx_srcref::make(array[i]);}
 
     bool equals(const fmpz_poly_mat_vector_data& o) const
     {
         if(size != o.size)
             return false;
-        for(long i = 0;i < size;++i)
+        for(slong i = 0; i < size; ++i)
             if(!fmpz_poly_mat_equal(array[i], o.array[i]))
                 return false;
         return true;
@@ -445,7 +445,7 @@ struct fmpz_poly_mat_vector_data
 // TODO temporary allocation
 
 typedef vector_expression<
-    detail::wrapped_vector_traits<fmpz_poly_matxx, long,
+    detail::wrapped_vector_traits<fmpz_poly_matxx, slong,
         fmpz_poly_matxx_ref, fmpz_poly_matxx_srcref, fmpz_poly_mat_t>,
     operations::immediate,
     detail::fmpz_poly_mat_vector_data> fmpz_poly_mat_vecxx;
@@ -482,7 +482,7 @@ FLINT_DEFINE_GET(equals, bool, fmpz_poly_mat_vecxx, e1._data().equals(e2._data()
 
 FLINT_DEFINE_UNARY_EXPR_COND(prod_op, fmpz_poly_matxx,
         FMPZ_POLY_MAT_VECXX_COND_S,
-        fmpz_poly_mat_prod(to._mat(), from._array(), from.size()))
+        fmpz_poly_mat_prod(to._mat(), (fmpz_poly_mat_t * const) from._array(), from.size()))
 } // rules
 
 } // flint

@@ -44,7 +44,8 @@
 #if !HAVE_OPTIMIZE_ATTRIBUTE
 #define DO_CODEGEN_CHECKS 0
 #elif defined(__GNUC__)
-// TODO this will need tweaking
+// XXX this will need tweaking - look here if things break
+//     b/c of compiler versions
 #define DO_CODEGEN_CHECKS \
     (__GNUC__ == 4 && __GNUC_MINOR__ == 7 && __GNUC_PATCHLEVEL__ == 3 \
      && __x86_64__)
@@ -203,8 +204,6 @@ bool fuzzy_equals(T v1, T v2, double perc)
 
 using namespace flint;
 using namespace mp;
-
-detail::IGNORED_TYPE _;
 
 typedef make_vector_n<fmpzxx, 10>::type fmpzxx_vector;
 

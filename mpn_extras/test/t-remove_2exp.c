@@ -62,6 +62,7 @@ int main(void)
 
     mpz_clear(a);
     mpz_clear(b);
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

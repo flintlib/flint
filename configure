@@ -9,6 +9,7 @@ PREFIX="/usr/local"
 GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 NTL_DIR="/usr/local"
+GC_DIR="/usr/local"
 BLAS_DIR="/usr/local"
 WANT_NTL=0
 WANT_BLAS=0
@@ -18,9 +19,13 @@ TLS=1
 PTHREAD=1
 REENTRANT=0
 WANT_GC=0
+WANT_TLS=0
+WANT_CXX=0
+ASSERT=0
 BUILD=
 EXTENSIONS=
 EXT_MODS=
+EXTRA_BUILD=
 
 FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
 FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
@@ -47,11 +52,15 @@ usage()
    echo "     --disable-static     Do not build a static library"
    echo "     --single             Faster [non-reentrant if tls or pthread not used] version of library (default)"
    echo "     --reentrant          Build fully reentrant [with or without tls, with pthread] version of library"
-   echo "     --with-gc            GC safe build"
+   echo "     --with-gc=<path>     GC safe build with path to gc"
    echo "     --enable-pthread     Use pthread (default)"
    echo "     --disable-pthread    Do not use pthread"
    echo "     --enable-tls         Use thread-local storage (default)"
    echo "     --disable-tls        Do not use thread-local storage"
+   echo "     --enable-assert      Enable use of asserts (use for debug builds only)"
+   echo "     --disable-assert     Disable use of asserts (default)"
+   echo "     --enable-cxx         Enable C++ wrapper tests"
+   echo "     --disable-cxx        Disable C++ wrapper tests (default)"
    echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
    echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
    echo "     AR=<name>            Use the AR library builder with the given name (default: ar)"
@@ -122,6 +131,9 @@ while [ "$1" != "" ]; do
          ;;
       --with-gc)
 	 WANT_GC=1
+         if [ ! -z "$VALUE" ]; then
+            GC_DIR="$VALUE"
+         fi
          ;;
       --enable-pthread)
          PTHREAD=1
@@ -131,9 +143,21 @@ while [ "$1" != "" ]; do
          ;;
       --enable-tls)
          TLS=1
-         ;;
+         WANT_TLS=1;;
       --disable-tls)
          TLS=0
+         ;;
+      --enable-assert)
+         ASSERT=1
+         ;;
+      --disable-assert)
+         ASSERT=0
+         ;;
+      --enable-cxx)
+         WANT_CXX=1
+         ;;
+      --disable-cxx)
+         WANT_CXX=0
          ;;
       AR)
          AR="$VALUE"
@@ -231,6 +255,20 @@ if [ "$WANT_BLAS" = "1" ]; then
 fi
 CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
 
+if [ "$WANT_GC" = "1" ]; then
+   if [ -d "${GC_DIR}" ]; then
+      GC_LIB_DIR="${GC_DIR}/lib"
+      GC_INC_DIR="${GC_DIR}/include"
+   else
+      echo "Invalid GC directory"
+      exit 1
+   fi
+   EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${GC_INC_DIR}"
+   EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${GC_LIB_DIR}"
+   EXTRA_LIBS="${EXTRA_LIBS} gc"
+fi
+CONFIG_GC="#define HAVE_GC ${WANT_GC}"
+
 # defaults for CC, CXX and AR
 
 if [ -z "$CC" ]; then
@@ -248,6 +286,10 @@ fi
 #handle gc and reentrant flags
 
 if [ "$WANT_GC" = "1" ]; then
+      TLS=0
+      if [ "$WANT_TLS" = "1" ]; then
+          echo "****WARNING**** GC does not support TLS....disabling TLS"
+      fi
       cp fmpz/link/fmpz_gc.c fmpz/fmpz.c
       cp fmpz-conversions-gc.in fmpz-conversions.h
 else
@@ -267,13 +309,22 @@ if [ -z "$BUILD" ]; then
    ARCH=`uname -m`
 
    if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
-      if [ "$ABI" = "32" ]; then
-         OS="MINGW32"
-      else
+      if [ "$ABI" = "64" ]; then
          OS="MINGW64"
+      else
+         OS="MINGW32"
       fi
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
-      OS="CYGWIN"
+      if [ "$ARCH" = "x86_64" ]; then
+         if [ "$ABI" = "32" ]; then
+            OS="CYGWIN32"
+         else
+            OS="CYGWIN64"
+            ABI="64"
+         fi
+      else
+         OS="CYGWIN32"
+      fi
    else
       OS=`uname -s`
    fi
@@ -332,7 +383,7 @@ if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
          FLINT_LIB="libflint.dylib";;
-      CYGWIN | MINGW*)
+      CYGWIN* | MINGW*)
          FLINT_LIB="libflint.dll";;
       *)
          FLINT_LIB="libflint.so";;
@@ -343,7 +394,7 @@ fi
 
 if [ -z "$EXEEXT" ]; then
    case "$OS" in
-      CYGWIN | MINGW*)
+      CYGWIN* | MINGW*)
          EXEEXT=".exe";;
       *)
          EXEEXT="";;
@@ -353,7 +404,7 @@ fi
 #don't build both shared and static lib on MinGW and Cygwin
 
 case "$OS" in
-   CYGWIN | MINGW*)
+   CYGWIN* | MINGW*)
       if [ "$STATIC" = "1" ] && [ "$SHARED" = "1" ]; then
          echo "Building both static and shared versions of MPIR/GMP on $OS is currently"
          echo "unsupported, and so is it for MPFR and FLINT."
@@ -364,7 +415,7 @@ case "$OS" in
       ;;
    *)
       ;;
-esac
+esac 
 
 #select fft_tuning parameters
 
@@ -421,6 +472,8 @@ fi
 if [ -z "$CFLAGS" ]; then
    if [ "$OS" = "MINGW64" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+   elif [ "$OS" = "CYGWIN64" ]; then
+      CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
    else
       CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    fi
@@ -440,7 +493,7 @@ fi
 
 if [ -z "$PIC_FLAG" ]; then
    case "$OS" in
-      CYGWIN | MINGW*)
+      CYGWIN* | MINGW*)
          ;;
       *)
          PIC_FLAG="-fPIC";;
@@ -512,7 +565,7 @@ LIBS="$LLIBS $lLIBS"
 #paths for dynamic linker
 
 case "$OS" in
-   CYGWIN | MINGW*)
+   CYGWIN* | MINGW*)
       DLPATH="PATH";;
    Darwin)
       DLPATH="DYLD_LIBRARY_PATH";;
@@ -529,6 +582,12 @@ for LIB_DIR in ${LIB_DIRS} ${EXTRA_LIB_DIRS}; do
    DLPATH_ADD="${DLPATH_ADD}:${LIB_DIR}"
 done
 
+#cxx
+
+if [ "$WANT_CXX" = "1" ]; then
+   EXTRA_BUILD="$EXTRA_BUILD flintxx"
+fi
+
 #write out config.h
 
 echo "/* This file is autogenerated by ./configure -- do not edit! */" > config.h
@@ -536,6 +595,9 @@ echo "$CONFIG_POPCNT_INTRINSICS" >> config.h
 echo "$CONFIG_BLAS" >> config.h
 echo "$CONFIG_TLS" >> config.h
 echo "$CONFIG_PTHREAD" >> config.h
+echo "$CONFIG_GC" >> config.h
+echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
+echo "#define WANT_ASSERT $ASSERT" >> config.h
 
 #write out Makefile
 
@@ -569,6 +631,7 @@ echo "" >> Makefile
 echo "DLPATH=$DLPATH" >> Makefile
 echo "DLPATH_ADD=$DLPATH_ADD" >> Makefile
 echo "EXTENSIONS=$EXTENSIONS" >> Makefile
+echo "EXTRA_BUILD_DIRS=$EXTRA_BUILD" >> Makefile
 echo "" >> Makefile
 
 cat Makefile.in >> Makefile

@@ -39,6 +39,9 @@
 
 #include "fmpz.h"
 
+#undef clrbit /* no idea where these are coming from */
+#undef setbit
+
 // TODO functions for addmul? inhomogeneous addmul?
 // TODO use evaluate_n in immediate functions?
 // TODO fmpz_abs_ubound_ui_2exp, lbound
@@ -790,5 +793,7 @@ FLINT_DEFINE_THREEARY_EXPR(multi_CRT_op, fmpzxx,
         fmpz_multi_CRT_ui(to._fmpz(), &e1.front(), e2._comb(), e2._temp(), e3))
 } // rules
 } // flint
+
+#include "fmpz_factorxx.h"
 
 #endif

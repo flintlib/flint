@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("sqr_karatsuba....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -134,8 +134,8 @@ main(void)
         fmpz_poly_clear(out2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

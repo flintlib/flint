@@ -32,7 +32,7 @@
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
                        const fmpz * A, const fmpz_t a, slong lenA, 
-                       const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 {
     slong lenQ = lenA - lenB + 1;
     slong lenR = lenB - 1;
@@ -52,7 +52,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
        and thus
            {A, a} = {b * Q, a * lead^d} * {B, b} + {R, a * lead^d}.
      */
-    _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
+    _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB, inv);
     
     /* Determine the actual length of R */
     for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1)); lenR--) ;
@@ -170,7 +170,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     
     _fmpq_poly_divrem(Q->coeffs, Q->den, R->coeffs, R->den, 
                       poly1->coeffs, poly1->den, poly1->length, 
-                      poly2->coeffs, poly2->den, poly2->length);
+                      poly2->coeffs, poly2->den, poly2->length, NULL);
     
     _fmpq_poly_set_length(Q, lenQ);
     _fmpq_poly_set_length(R, lenR);

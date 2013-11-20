@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("inv_series_newton....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 1000; i++)
@@ -96,8 +96,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
+    
     flint_printf("PASS\n");
     return 0;
 }

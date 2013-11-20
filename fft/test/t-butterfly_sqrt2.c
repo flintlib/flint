@@ -77,12 +77,12 @@ main(void)
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
     mp_limb_t * nn1, * nn2, * r1, * r2, * temp;
    
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("fft/ifft_butterfly_sqrt2....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -231,7 +231,7 @@ main(void)
     mpz_clear(mn1);
     mpz_clear(mn2);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
     return 0;
