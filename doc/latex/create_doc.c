@@ -45,7 +45,7 @@ static char * docsin[] = {
     "../../nmod_poly/doc/nmod_poly.txt",
     "../../nmod_poly_factor/doc/nmod_poly_factor.txt",
     "../../nmod_poly_mat/doc/nmod_poly_mat.txt",
-    "../../nmod_poly_factor/doc/nmod_poly_factor.doc",
+    "../../nmod_poly_factor/doc/nmod_poly_factor.txt",
     "../../fmpz_mod_poly/doc/fmpz_mod_poly.txt",
     "../../fmpz_mod_poly_factor/doc/fmpz_mod_poly_factor.txt",
     "../../fq/doc/fq.txt",
