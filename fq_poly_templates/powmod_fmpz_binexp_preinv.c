@@ -55,13 +55,13 @@ _TEMPLATE(T, poly_powmod_fmpz_binexp_preinv)(TEMPLATE(T, struct) * res, const TE
     for (i = fmpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {
         _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                       finv, lenfinv, ctx);
 
         if (fmpz_tstbit(e, i))
         {
             _TEMPLATE(T, poly_mul)(T, res, lenf - 1, poly, lenf - 1, ctx);
-            _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                           finv, lenfinv, ctx);
         }
     }

@@ -31,6 +31,6 @@
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-divrem_newton_preinv.c"
+#include "fq_poly_templates/divrem_newton_n_preinv.c"
 #undef CAP_T
 #undef T

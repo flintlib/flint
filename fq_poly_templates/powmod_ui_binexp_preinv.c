@@ -55,13 +55,13 @@ _TEMPLATE(T, poly_powmod_ui_binexp_preinv)(TEMPLATE(T, struct) * res, const TEMP
     for (i = ((int) FLINT_BIT_COUNT(e) - 2); i >= 0; i--)
     {
         _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                       finv, lenfinv, ctx);
 
         if (e & (1UL << i))
         {
             _TEMPLATE(T, poly_mul)(T, res, lenf - 1, poly, lenf - 1, ctx);
-            _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                           finv, lenfinv, ctx);
         }
     }

@@ -52,7 +52,7 @@ _TEMPLATE(T, poly_mulmod_preinv)(TEMPLATE(T, struct) * res,
     else
         _TEMPLATE(T, poly_mul)(T, poly2, len2, poly1, len1, ctx);
 
-    _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, lenT, f, lenf,
+    _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, lenT, f, lenf,
                                   finv, lenfinv, ctx);
     _TEMPLATE(T, vec_clear)(T, lenT + lenQ, ctx);
 }

@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    flint_printf("divrem_newton_preinv....");
+    flint_printf("divrem_newton_n_preinv....");
     fflush(stdout);
 
     /* Check result of divrem */
@@ -65,7 +65,7 @@ main(void)
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
         TEMPLATE(T, poly_mul)(test, q, b, ctx);
         TEMPLATE(T, poly_add)(test, test, r, ctx);
 
@@ -115,8 +115,8 @@ main(void)
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(a, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(a, r, a, b, binv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(a, q, ctx));
         if (!result)
@@ -162,8 +162,8 @@ main(void)
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(b, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(b, r, a, b, binv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(b, q, ctx));
         if (!result)
@@ -209,8 +209,8 @@ main(void)
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(binv, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(binv, r, a, b, binv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(binv, q, ctx));
         if (!result)
@@ -256,8 +256,8 @@ main(void)
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, a, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, a, a, b, binv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(a, r, ctx));
         if (!result)
@@ -303,8 +303,8 @@ main(void)
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, b, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, b, a, b, binv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(b, r, ctx));
         if (!result)
@@ -350,8 +350,8 @@ main(void)
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_preinv)(q, binv, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, binv, a, b, binv, ctx);
 
         result = (TEMPLATE(T, poly_equal)(binv, r, ctx));
         if (!result)

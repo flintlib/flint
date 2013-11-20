@@ -175,7 +175,7 @@ static __inline__ void _fq_dense_reduce(fmpz* R, long lenR, const fq_ctx_t ctx)
     q = _fmpz_vec_init(lenR - ctx->modulus->length + 1);
     r = _fmpz_vec_init(ctx->modulus->length - 1);
 
-    _fmpz_mod_poly_divrem_newton_preinv(q, r, R, lenR, 
+    _fmpz_mod_poly_divrem_newton_n_preinv(q, r, R, lenR, 
                                         ctx->modulus->coeffs, ctx->modulus->length,
                                         ctx->inv->coeffs, ctx->inv->length,
                                         fq_ctx_prime(ctx));

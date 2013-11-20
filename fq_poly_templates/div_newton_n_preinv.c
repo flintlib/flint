@@ -32,7 +32,7 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_div_newton_preinv)(TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct) * A, slong lenA,
+_TEMPLATE(T, poly_div_newton_n_preinv)(TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct) * A, slong lenA,
                            const TEMPLATE(T, struct) * B, slong lenB,
                            const TEMPLATE(T, struct) * Binv, slong lenBinv,
                            const TEMPLATE(T, ctx_t) ctx)
@@ -52,7 +52,7 @@ _TEMPLATE(T, poly_div_newton_preinv)(TEMPLATE(T, struct) * Q, const TEMPLATE(T, 
 }
 
 void
-TEMPLATE(T, poly_div_newton_preinv)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
+TEMPLATE(T, poly_div_newton_n_preinv)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
                           const TEMPLATE(T, poly_t) B, const TEMPLATE(T, poly_t) Binv,
                           const TEMPLATE(T, ctx_t) ctx)
 {
@@ -83,7 +83,7 @@ TEMPLATE(T, poly_div_newton_preinv)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, pol
         q = Q->coeffs;
     }
 
-    _TEMPLATE(T, poly_div_newton_preinv)(q, A->coeffs, lenA, B->coeffs, lenB,
+    _TEMPLATE(T, poly_div_newton_n_preinv)(q, A->coeffs, lenA, B->coeffs, lenB,
                                Binv->coeffs, lenBinv, ctx);
 
     if (Q == A || Q == B || Q == Binv)

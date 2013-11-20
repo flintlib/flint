@@ -65,7 +65,7 @@ _TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, struct) * res, const fmpz_t 
     if (c == 0)
     {
         _TEMPLATE(T, poly_shift_left)(T, res, lenf - 1, window, ctx);
-        _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, lenf - 1 + window, f,
+        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, lenf - 1 + window, f,
                                                 lenf, finv, lenfinv, ctx);
         c = l + 1;
         window = 0;
@@ -74,7 +74,7 @@ _TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, struct) * res, const fmpz_t 
     for (; i >= 0; i--)
     {
         _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                                 finv, lenfinv, ctx);
 
         c--;
@@ -93,7 +93,7 @@ _TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, struct) * res, const fmpz_t 
         {
             _TEMPLATE(T, poly_shift_left)(T, res, lenf - 1, window, ctx);
             
-            _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, lenf - 1 + window,
+            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, lenf - 1 + window,
                                                     f, lenf, finv, lenfinv, ctx);
             c = l + 1;
             window = 0;

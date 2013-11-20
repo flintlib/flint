@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2013 Martin Lee
     Copyright (C) 2013 Mike Hansen
 
@@ -35,6 +36,6 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_poly_templates/test/t-div_newton_preinv.c"
+#include "fq_poly_templates/div_newton_n_preinv.c"
 #undef CAP_T
 #undef T

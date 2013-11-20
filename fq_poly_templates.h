@@ -673,24 +673,24 @@ _TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, struct) * Qinv, const TEMPLATE(
 void TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, poly_t) Qinv, const TEMPLATE(T, poly_t) Q, slong n,
                                const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_div_newton_preinv) (TEMPLATE(T, struct) *Q, const TEMPLATE(T, struct) *A, slong lenA,
+void _TEMPLATE(T, poly_div_newton_n_preinv) (TEMPLATE(T, struct) *Q, const TEMPLATE(T, struct) *A, slong lenA,
                                  const TEMPLATE(T, struct)* B, slong lenB,
                                  const TEMPLATE(T, struct)* Binv, slong lenBinv,
                                  const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_div_newton_preinv) (TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
+void TEMPLATE(T, poly_div_newton_n_preinv) (TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
                                 const TEMPLATE(T, poly_t) B, const TEMPLATE(T, poly_t) Binv,
                                 const TEMPLATE(T, ctx_t) ctx);
 
 void
-_TEMPLATE(T, poly_divrem_newton_preinv) (TEMPLATE(T, struct)* Q, TEMPLATE(T, struct)* R,
+_TEMPLATE(T, poly_divrem_newton_n_preinv) (TEMPLATE(T, struct)* Q, TEMPLATE(T, struct)* R,
                                const TEMPLATE(T, struct)* A, slong lenA,
                                const TEMPLATE(T, struct)* B, slong lenB,
                                const TEMPLATE(T, struct)* Binv, slong lenBinv, 
                                const TEMPLATE(T, ctx_t) ctx);
 
 void
-TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
+TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
                              const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                              const TEMPLATE(T, poly_t) Binv, const TEMPLATE(T, ctx_t) ctx);
 

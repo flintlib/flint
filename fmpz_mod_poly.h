@@ -507,19 +507,19 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
     fmpz_mod_poly_clear(Q);
 }
 
-void _fmpz_mod_poly_div_newton_preinv (fmpz *Q, const fmpz* A, slong lenA,
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
                                          const fmpz* B, slong lenB, const fmpz* Binv,
                                          slong lenBinv, const fmpz_t p);
 
-void fmpz_mod_poly_div_newton_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
 
 
-void _fmpz_mod_poly_divrem_newton_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                                             slong lenA, const fmpz* B, slong lenB,
                                             const fmpz* Binv, slong lenBinv, const fmpz_t p);
 
-void fmpz_mod_poly_divrem_newton_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                           const fmpz_mod_poly_t Binv);
 

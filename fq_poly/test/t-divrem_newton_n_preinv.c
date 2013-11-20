@@ -19,18 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2013 Martin Lee
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include "fq_nmod_poly.h"
+#include "fq_poly.h"
+
+
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-div_newton_preinv.c"
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-divrem_newton_n_preinv.c"
 #undef CAP_T
 #undef T

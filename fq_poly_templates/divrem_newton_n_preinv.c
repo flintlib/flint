@@ -31,7 +31,7 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, struct) * Q, TEMPLATE(T, struct) * R,
+_TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, struct) * Q, TEMPLATE(T, struct) * R,
                               const TEMPLATE(T, struct) * A, slong lenA,
                               const TEMPLATE(T, struct) * B, slong lenB,
                               const TEMPLATE(T, struct) * Binv, slong lenBinv,
@@ -39,7 +39,7 @@ _TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, struct) * Q, TEMPLATE(T, str
 {
     const slong lenQ = lenA - lenB + 1;
 
-    _TEMPLATE(T, poly_div_newton_preinv)(Q, A, lenA, B, lenB, Binv, lenBinv, ctx);
+    _TEMPLATE(T, poly_div_newton_n_preinv)(Q, A, lenA, B, lenB, Binv, lenBinv, ctx);
 
     if (lenB > 1)
     {
@@ -53,7 +53,7 @@ _TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, struct) * Q, TEMPLATE(T, str
 }
 
 void
-TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
+TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
                              const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                              const TEMPLATE(T, poly_t) Binv, const TEMPLATE(T, ctx_t) ctx)
 {
@@ -63,7 +63,7 @@ TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t
     if (lenB == 0)
     {
         printf
-            ("Exception (fq_poly_divrem_newton_preinv). Division by zero.\n");
+            ("Exception (fq_poly_divrem_newton_n_preinv). Division by zero.\n");
         abort();
     }
 
@@ -76,7 +76,7 @@ TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t
 
     if (lenA > 2 * lenB - 2)
     {
-        printf("Exception (fq_poly_divrem_newton_preinv).\n");
+        printf("Exception (fq_poly_divrem_newton_n_preinv).\n");
     }
 
     if (Q == A || Q == B || Q == Binv)
@@ -98,7 +98,7 @@ TEMPLATE(T, poly_divrem_newton_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t
         r = R->coeffs;
     }
 
-    _TEMPLATE(T, poly_divrem_newton_preinv)(q, r, A->coeffs, lenA,
+    _TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, A->coeffs, lenA,
                                   B->coeffs, lenB, Binv->coeffs, lenBinv, ctx);
 
     if (Q == A || Q == B || Q == Binv)

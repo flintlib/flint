@@ -67,7 +67,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
     {
         TEMPLATE(T, poly_fit_length) (poly_squared, lenf - 1, ctx);
         _TEMPLATE(T, poly_mul)(T, poly, lenf - 1, poly, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_preinv)(Q, poly_squared->coeffs, T, 2 * lenf - 3,
+        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, poly_squared->coeffs, T, 2 * lenf - 3,
                                                 f, lenf, finv, lenfinv, ctx);
     }
     for (i = 1; i < twokm1; i++)
@@ -76,7 +76,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
         TEMPLATE(T, poly_fit_length) (precomp + i, lenf - 1, ctx);
         _TEMPLATE(T, poly_mul)(T, (precomp + i - 1)->coeffs, lenf - 1,
                                poly_squared->coeffs, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_preinv)(Q, (precomp + i)->coeffs, T, 2 * lenf - 3,
+        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, (precomp + i)->coeffs, T, 2 * lenf - 3,
                                                 f, lenf, finv, lenfinv, ctx);
     }
 
@@ -88,7 +88,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
         if (fmpz_tstbit(e, i) == 0)
         {
             _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-            _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                                     finv, lenfinv, ctx);
             i -= 1;
         }
@@ -102,7 +102,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
             for (j = 0; j < i - l + 1; j++)
             {
                 _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-                _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+                _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                                         finv, lenfinv, ctx);
             }
             
@@ -115,7 +115,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
             index = (index - 1) / 2;
                 
             _TEMPLATE(T, poly_mul)(T, res, lenf - 1, (precomp + index)->coeffs, lenf - 1, ctx);
-            _TEMPLATE(T, poly_divrem_newton_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
+            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
                                                     finv, lenfinv, ctx);
             i = l - 1;
         }
