@@ -26,9 +26,6 @@
 #ifndef FQ_ZECH_POLY_FACTOR_H
 #define FQ_ZECH_POLY_FACTOR_H
 
-
-#include "fq_zech_poly.h"
-
 static __inline__ int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length)
 {
     int result;

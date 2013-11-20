@@ -46,4 +46,6 @@
 #undef CAP_T
 #undef T
 
+#include "fq_zech_poly_factor.h"
+
 #endif

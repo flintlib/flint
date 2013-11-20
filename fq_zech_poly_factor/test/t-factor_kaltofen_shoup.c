@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fq_zech_poly_factor.h"
+#include "fq_zech_poly.h"
 
 #ifdef T
 #undef T

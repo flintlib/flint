@@ -48,4 +48,6 @@
 #undef CAP_T
 #undef T
 
+#include "fq_poly_factor.h"
+
 #endif

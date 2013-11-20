@@ -26,8 +26,6 @@
 #ifndef FQ_POLY_FACTOR_H
 #define FQ_POLY_FACTOR_H
 
-#include "fq_poly.h"
-
 static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
 {
     int result;

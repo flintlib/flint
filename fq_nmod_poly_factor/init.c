@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fq_nmod_poly_factor.h"
+#include "fq_nmod_poly.h"
 
 #ifdef T
 #undef T
