@@ -58,7 +58,7 @@ void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, long len,
     }
 
     
-    rop = 0L;
+    rop = WORD(0);
     for (i = 0; i < d; i++)
     {
         rop = n_addmod(rop,

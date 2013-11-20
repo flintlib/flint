@@ -97,7 +97,7 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
             hlen[i] = 1;
         }
     }
-    if ((len1 & 1L))
+    if ((len1 & WORD(1)))
     {
         if (!TEMPLATE(T, is_zero)(op1 + j, ctx))
         {
@@ -132,7 +132,7 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
             _TEMPLATE(T, poly_add)(h[i], h[i], hlen[i], h[2 * i], hlen[2 * i], ctx);
             hlen[i] = FLINT_MAX(hlen[i], hlen[2 * i]);
         }
-        if ((n & 1L))
+        if ((n & WORD(1)))
         {
             _TEMPLATE(T, poly_set)(h[i], h[2 * i], hlen[2 * i], ctx);
             hlen[i] = hlen[2 * i];

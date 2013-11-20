@@ -43,7 +43,7 @@ void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx
 
         for (i = 0; i < d; i++)
             if (n_randint(state, sparse))
-                rop->coeffs[i] = 0L;
+                rop->coeffs[i] = WORD(0);
             else
                 rop->coeffs[i] = n_randint(state, ctx->mod.n);
     }

@@ -63,7 +63,7 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
             for (i = fac->alloc; i < alloc; i++)
             {
                 TEMPLATE(T, poly_init)(fac->poly + i, ctx);
-                fac->exp[i] = 0L;
+                fac->exp[i] = WORD(0);
             }
             fac->alloc = alloc;
         }

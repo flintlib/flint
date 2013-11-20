@@ -116,13 +116,13 @@ TEMPLATE(T, poly_powmod_fmpz_binexp)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, 
 
         if (exp <= 2)
         {
-            if (exp == 0UL)
+            if (exp == UWORD(0))
             {
                 TEMPLATE(T, poly_fit_length)(res, 1, ctx);
                 TEMPLATE(T, one)(res->coeffs, ctx);
                 _TEMPLATE(T, poly_set_length)(res, 1, ctx);
             }
-            else if (exp == 1UL)
+            else if (exp == UWORD(1))
             {
                 TEMPLATE(T, poly_set)(res, poly, ctx);
             }

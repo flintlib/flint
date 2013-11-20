@@ -76,7 +76,7 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len,
             XXX:  This part of the code is currently untested as the Conway 
             polynomials used for the extension Fq/Fp are monic.
          */
-        if (ctx->a[ctx->len - 1] != 1L)
+        if (ctx->a[ctx->len - 1] != WORD(1))
         {
             mp_limb_t f;
             f = n_powmod2_ui_preinv(ctx->a[ctx->len - 1], len - 1, ctx->mod.n, ctx->mod.ninv);

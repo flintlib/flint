@@ -63,7 +63,7 @@ _TEMPLATE(T, poly_powmod_ui_binexp)(TEMPLATE(T, struct) * res, const TEMPLATE(T,
         _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
         _TEMPLATE(T, poly_divrem)(Q, res, T, 2 * lenf - 3, f, lenf, invf, ctx);
 
-        if (e & (1UL << i))
+        if (e & (UWORD(1) << i))
         {
             _TEMPLATE(T, poly_mul)(T, res, lenf - 1, poly, lenf - 1, ctx);
             _TEMPLATE(T, poly_divrem)(Q, res, T, 2 * lenf - 3, f, lenf, invf, ctx);
@@ -105,13 +105,13 @@ TEMPLATE(T, poly_powmod_ui_binexp)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, po
 
     if (e <= 2)
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
         {
             TEMPLATE(T, poly_fit_length)(res, 1, ctx);
             TEMPLATE(T, one)(res->coeffs, ctx);
             _TEMPLATE(T, poly_set_length)(res, 1, ctx);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
         {
             TEMPLATE(T, poly_set)(res, poly, ctx);
         }

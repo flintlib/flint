@@ -32,7 +32,7 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, long len, const fmpz_t e,
 
     if (fmpz_is_zero(e))
     {
-        rop[0] = 1L;
+        rop[0] = WORD(1);
         _nmod_vec_zero(rop + 1, 2 * d - 1 - 1);
     }
     else if (fmpz_is_one(e))

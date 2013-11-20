@@ -118,7 +118,7 @@ static __inline__ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
         if (r <= 0)
             return r;
 
-        if (ctx->a[k] == 1UL)
+        if (ctx->a[k] == UWORD(1))
         {
             if (i == 1)
                 r = flint_fprintf(file, "X");
@@ -187,7 +187,7 @@ void _fq_nmod_sparse_reduce(mp_limb_t *R, long lenR, const fq_nmod_ctx_t ctx)
                                                 n_mulmod2_preinv(R[i], ctx->a[k], ctx->mod.n, ctx->mod.ninv),
                                                 ctx->mod.n);
             }
-            R[i] = 0UL;
+            R[i] = UWORD(0);
         }
     }
 }

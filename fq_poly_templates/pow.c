@@ -33,7 +33,7 @@ void
 _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len, ulong e,
              const TEMPLATE(T, ctx_t) ctx)
 {
-    ulong bit = ~((~0UL) >> 1);
+    ulong bit = ~((~UWORD(0)) >> 1);
     long rlen;
     long alloc = (long) e * (len - 1) + 1;
     TEMPLATE(T, struct) *v = _TEMPLATE(T, vec_init)(alloc, ctx);
@@ -43,7 +43,7 @@ _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
 
-    while ((bit & e) == 0UL)
+    while ((bit & e) == UWORD(0))
         bit >>= 1;
 
     bit >>= 1;
@@ -59,7 +59,7 @@ _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op
         if ((bit2 & e))
             swaps = ~swaps;
         while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
+            if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
 
         if (swaps == 0U)
@@ -118,7 +118,7 @@ TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulo
 
     if ((len < 2) | (e < 3UL))
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
             TEMPLATE(T, poly_one)(rop, ctx);
         else if (len == 0)
             TEMPLATE(T, poly_zero)(rop, ctx);
@@ -133,7 +133,7 @@ TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulo
 
             fmpz_clear(f);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
             TEMPLATE(T, poly_set)(rop, op, ctx);
         else                    /* e == 2UL */
             TEMPLATE(T, poly_sqr)(rop, op, ctx);

@@ -63,7 +63,7 @@ main(void)
         TEMPLATE(T, poly_init)(c, ctx);
 
         TEMPLATE(T, poly_randtest)(a, state, len, ctx);
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
         TEMPLATE(T, poly_set)(b, a, ctx);
         TEMPLATE(T, poly_pow)(c, b, exp, ctx);
         TEMPLATE(T, poly_pow)(b, b, exp, ctx);
@@ -102,7 +102,7 @@ main(void)
         TEMPLATE(T, poly_init)(c, ctx);
 
         TEMPLATE(T, poly_randtest)(b, state, len, ctx);
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
 
         TEMPLATE(T, poly_pow)(a, b, exp, ctx);
 
