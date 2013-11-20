@@ -289,9 +289,11 @@ aim of providing support for multicore and multiprocessor computer
 architectures. To this end, the library is threadsafe, with few exceptions
 noted in the appropriate place.
 
-FLINT is currently maintained by William Hart of Warwick University in 
-the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
-Johansson, Andy Novocin and David Harvey (no longer active).
+FLINT is currently maintained by William Hart of Technishe Universit\"{a}t
+in Kaiserslautern. FLINT was originally designed by William Hart and David
+Harvey. Since then FLINT was rewritten as FLINT 2 by William Hart, Fredrik
+Johansson and Sebastian Pancratz. Many other substantial contributions have
+been made by other authors. (See the Contributors list below for a list.)
 
 FLINT 2 and following should compile on any machine with GCC and a standard 
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
@@ -310,7 +312,7 @@ in an appropriately named test file.  For example, the function
 \code{fmpz_poly_add} located in\\ \code{fmpz_poly/add.c} has test code in the 
 file \code{fmpz_poly/test/t-add.c}.
 
-\chapter{Building and using FLINT}
+\chapter{Configuring FLINT}
 
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
@@ -342,6 +344,9 @@ pass the directories as parameters to FLINT's configure, e.g.\
 If no directories are specified, FLINT assumes it will find the
 libraries it needs in \code{/usr/local}.
 
+If you wish to use GMP, you can pass the configure option 
+\code{--with-gmp} instead of \code{--with-mpir}. 
+
 Note that FLINT builds static and shared libraries by default, except
 on platforms where this is not supported. If you do not require either
 a shared or static library then you may pass \code{--disable-static} 
@@ -353,6 +358,8 @@ you can specify where they should be placed by passing
 under which the \code{lib} and \code{include} directories exist into
 which you wish to place the FLINT files when it is installed.
 
+\chapter{TLS, reentrancy and single mode}
+
 If you wish to use FLINT on a single core machine then it will be
 configured by default for single mode. This is slightly faster, but
 is not threadsafe. (This mode can also be explicitly selected by 
@@ -361,10 +368,21 @@ build a threadsafe version of FLINT, you must pass the
 \code{--reentrant} option to configure. This will be slower on 
 single core machines, but threadsafe.
 
+By default, FLINT uses thread local storage (\code{--enable-tls}).
+However, if reentrancy is required on systems that do not support
+this, one can pass \code{--disable-tls} and mutexes will be used
+instead (requires POSIX).
+
+\chapter{ABI and architecture support}
+
 On some systems, e.g. Sparc and some Macs, more than one ABI is 
 available. FLINT chooses the ABI based on the CPU type available,
 however its default choice can be overridden by passing either
 \code{ABI=64} or \code{ABI=32} to configure.
+
+To build on MinGW64 it is necessary to pass \code{ABI=64} to
+configure, as FLINT is otherwise unable to distinguish it from
+MinGW32.
 
 In some cases, it is necessary to override the entire CPU/OS
 defaults. This can be done by passing \code{--build=cpu-os} to
@@ -372,13 +390,37 @@ configure. The available choices for CPU include \code{x86_64},
 \code{x86}, \code{ia64}, \code{sparc}, \code{sparc64}, \code{ppc},
 \code{ppc64}. Other CPU types are unrecognised and FLINT will
 build with generic code on those machines. The choices for OS
-include \code{Linux}, \code{MINGW32}, \code{CYGWIN}, 
-\code{Darwin}, \code{FreeBSD}, \code{SunOS} and numerous other
-operating systems.
+include \code{Linux}, \code{MINGW32}, \code{MINGW64},
+\code{CYGWIN32}, \code{CYGWIN64}, \code{Darwin}, \code{FreeBSD},
+\code{SunOS} and numerous other operating systems.
  
 It is also possible to override the default CC, AR and CFLAGS used
 by FLINT by passing \code{CC=full_path_to_compiler}, etc., to 
 FLINT's configure.
+
+\chapter{C++ wrapper}
+
+If you wish to run tests for the FLINT C$++$ wrapper \code{flintxx}
+you must pass \code{--enable-cxx} to configure. The C$++$ wrapper
+is always available, but tests will only run if this option is
+selected. It is disabled by default (\code{--disable-cxx} because
+some C$++$ compilers internally segfault when compiling the tests,
+or exhaust memory due to the complexity of the C$++$ code.
+
+\chapter{Garbage collection}
+
+If building FLINT as part of an application that uses the 
+Boehm-Demers-Weiser GC library, you may wish to pass the 
+\code{--with-gc=<path/to/gc/} option to configure. This causes
+FLINT to use \code{GC_malloc} and friends for its memory allocation
+strategy. The user is responsible for calling \code{GC_init}.
+
+The \code{--with-gc} option can be used with the \code{--reentrant}
+option, but not the \code{--enable-tls} option. In fact, configure
+will switch this off automatically and print a warning if it is
+selected in addition to \code{--with-gc}.
+
+\chapter{Building, testing, installing and using FLINT}
 
 Once FLINT is configured, in the main directory of the FLINT directory 
 tree simply type:
@@ -409,6 +451,7 @@ If you have any difficulties with conflicts with system headers on
 your machine, you can do the following in your code:
 
 \begin{lstlisting}[language=C]
+#undef ulong
 #define ulong ulongxx
 #include <stdio.h>
 // other system headers
@@ -437,6 +480,11 @@ also pass a list of module names in inverted commas, e.g:
 make check MOD=ulong_extras
 \end{lstlisting}
 
+FLINT has an assert system. If you want a debug build you can pass
+\code{--enable-assert} to configure. However, this will slow FLINT
+considerably, so asserts should not be enabled (\code{--disable-assert},
+the default) for deployment.
+
 If your system supports parallel builds, FLINT will build in parallel,
 e.g:
 \begin{lstlisting}[language=bash]
@@ -445,6 +493,55 @@ make -j4 check
 
 Note that on some systems, most notably MinGW, parallel make is 
 supported but can be problematic.
+
+\chapter{FLINT extension modules}
+
+Numerous developers have been building libraries on top of FLINT,
+extending its functionality. These projects are known as FLINT
+extension modules.
+
+To build a FLINT extension module as part of FLINT, do the following:
+
+$\bullet$ Download the flint extension module and place it somewhere
+in your file system.
+
+$\bullet$ Pass \code{--extensions=/path/to/extension} to FLINT's
+configure, or if more than one extension is desired use
+\code{--extensions="/path/to/extension1 /path/to/extension2"}, 
+etc.
+
+Now most of the options that are available for FLINT are also
+available for those extension modules.
+
+Some examples of FLINT extension modules include:
+
+$\bullet$ Arb (by Fredrik Johansson) -- Arbitrary precision floating
+point ball arithmetic with rigorous error bounds, over the real and
+complex numbers (including polynomials, matrices, calculus and special
+functions). \url{http://fredrikj.net/arb/}
+
+$\bullet$ ANTIC (by William Hart and Claus Fieker) -- Algebraic Number
+Theory in C. Includes general number field arithmetic and class group
+computation. \url{https://github.com/wbhart/antic}
+
+$\bullet$ Bland (by Fredrik Johansson) -- Generic recursive rings over
+the basic FLINT types. \url{https://github.com/fredrik-johansson/bland}
+
+See the FLINT website \url{http://flintlib.org/} for a full list.
+
+Writing extension modules is trivial. One should include a top level
+directory containing a single directory for each module one wishes to
+supply. FLINT expects to find, in the top level, a \code{.h} file with
+the same name as each module directory.
+
+Inside each module directory there must be at least one \code{.c} file.
+There should also be a \code{test} subdirectory. Test files in the
+\code{test} subdirectories should be of the form \code{t-*.c} or
+\code{t-*.cpp}.
+
+You may optionally add \code{doc}, \code{profile} and \code{tune}
+subdirectories to each module directory. These may be supported by some
+later version of FLINT.
 
 \chapter{Test code}
 
@@ -580,6 +677,8 @@ module.
 \code{fmpq_poly} Gives a very simple example of the \code{fmpq_poly}
 module.
 
+Some of the example programs have associated C$++$ versions.
+
 \chapter{FLINT macros}
 
 The file \code{flint.h} contains various useful macros.
@@ -615,6 +714,12 @@ Derived from this there are the two macros \code{FLINT_FLOG2(x)} and
 \code{FLINT_CLOG2(x)} which, for any $x \geq 1$, compute $\floor{\log_2{x}}$ 
 and $\ceil{\log_2{x}}$.
 
+To determine the current FLINT version a number of macros are available.
+For example, if the current FLINT version is \code{2.4.0} then
+\code{__FLINT_VERSION} will have the value $2$, \code{__FLINT_MINOR}
+will have the value $4$ and \code{__FLINT_PATCHLEVEL} will have the value
+$0$. The \code{FLINT_VERSION} macro will have the value $20400$.
+
 \chapter{Memory management}
 
 The file \code{flint.h} defines functions \code{flint_malloc},
@@ -625,15 +730,84 @@ may perform additional error checking.
 FLINT may cache some data (such as allocated integers
 and tables of prime numbers) to speed up various computations.
 If FLINT is built in threadsafe mode, cached data is kept in thread-local
-storage. Cached data can be freed by calling the \code{flint_cleanup()}
-function. It is recommended to call \code{flint_cleanup()} right before
-exiting a thread, and at the end of the main program.
+storage by default (unless configured otherwise). Cached data can be freed
+by calling the \code{flint_cleanup()} function. It is recommended to call
+\code{flint_cleanup()} right before exiting a thread, and at the end of the
+main program.
 
 The user can register additional cleanup functions to be invoked
 by \code{flint_cleanup()}. This is done by passing a pointer
 to a function with signature \code{void cleanup_function(void)}
 to \code{flint_register_cleanup_function()}.
 
+\chapter{Temporary allocation}
+
+FLINT allows for temporary allocation of memory using \code{alloca}
+to allocate on the stack if the allocation is small enough.
+
+The following program demonstrates how to use this facility to
+allocate two different arrays.
+
+\begin{lstlisting}[language=C]
+#include <gmp.h>
+#include "flint.h"
+
+void myfun(void)
+{
+   /* other variable declarations */
+   mp_ptr a, b;
+   TMP_INIT;
+
+   /* arbitrary code*/
+
+   TMP_START; /* we are about to do some allocation */
+
+   /* arbitrary code */
+
+   a = TMP_ALLOC(32*sizeof(mp_limb_t));
+   b = TMP_ALLOC(64*sizeof(mp_limb_t));
+
+   /* arbitrary code */
+
+   TMP_END; /* cleans up a and b */
+
+   /* arbitrary code */
+}
+\end{lstlisting}
+
+It is very important to note that temporary allocations should not be
+made in recursive functions, as many small allocations on the stack
+can exhaust the stack causing a stack overflow.
+
+\chapter{Platform-safe types, format specifiers and constants}
+
+For platform independence, FLINT provides two types \code{ulong}
+and \code{slong} to replace \code{unsigned long} and \code{long}
+respectively. These are guaranteed to be the same size as GMP's
+\code{mp_limb_t} and \code{mp_limb_signed_t} types, respectively.
+
+A full list of types provided by FLINT is available in
+\code{code_conventions.txt} in the top-level source tree.
+
+As FLINT supports Windows 64 on which the FLINT \code{ulong} and
+\code{slong} types are 64 bits, whilst \code{unsigned long} and
+\code{long} are only 32 bits, it is necessary to have a special
+format specifier which is 64 bits on Windows 64 instead of the usual
+\code{"%lu"} and \code{"%ld"}.
+
+For this purpose FLINT provides its own I/O functions, \code{flint_printf},
+\code{flint_fprintf}, \code{flint_sprintf}, \code{flint_scanf}, 
+\code{flint_fscanf} and \code{flint_sscanf}, which work exactly as the
+usual system versions, but which take the \code{"%wu"} and \code{"%wd"}
+format specifiers, which support FLINT \code{ulong} and \code{slong}
+types respectively.
+
+Also, instead of using constants \code{123UL} and \code{123L}, FLINT
+provides the macros \code{UWORD(123)} and \code{WORD(123)} respectively
+for constants of type \code{ulong} and \code{slong} respectively.
+
+The maximum and minimum values that can be represented by these types
+are given by \code{UWORD_MAX} and \code{WORD_MAX} respectively.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integers                                                                     %
