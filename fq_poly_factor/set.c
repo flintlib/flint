@@ -33,6 +33,6 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_poly_factor_templates/factor_init.c"
+#include "fq_poly_factor_templates/set.c"
 #undef CAP_T
 #undef T

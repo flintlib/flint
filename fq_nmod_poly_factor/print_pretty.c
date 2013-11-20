@@ -23,16 +23,14 @@
 
 ******************************************************************************/
 
-#include "fq_poly_factor.h"
-
-
+#include "fq_nmod_poly_factor.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_factor_templates/factor_clear.c"
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_poly_factor_templates/print_pretty.c"
 #undef CAP_T
 #undef T

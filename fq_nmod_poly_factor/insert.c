@@ -31,6 +31,6 @@
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
-#include "fq_poly_factor_templates/factor_insert.c"
+#include "fq_poly_factor_templates/insert.c"
 #undef CAP_T
 #undef T

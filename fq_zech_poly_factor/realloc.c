@@ -31,6 +31,6 @@
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
-#include "fq_poly_factor_templates/factor_print_pretty.c"
+#include "fq_poly_factor_templates/realloc.c"
 #undef CAP_T
 #undef T

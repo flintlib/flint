@@ -31,6 +31,6 @@
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
-#include "fq_poly_factor_templates/factor_concat.c"
+#include "fq_poly_factor_templates/set.c"
 #undef CAP_T
 #undef T
