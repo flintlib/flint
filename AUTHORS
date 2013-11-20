@@ -6,11 +6,17 @@ The authors of FLINT to date:
 
 * William Hart - integer and polynomial arithmetic, factorisation and primality testing, general infrastructure (supported by EPSRC Grant EP/G004870/1 and DFG Priority programme SPP1489)
 
-* <a href="http://pancratz.org/">Sebastian Pancratz</a> - polynomial arithmetic over Z, Z/nZ and Q, p-adic arithmetic (supported by ERC Grant 204083)
+* <a href="http://pancratz.org/">Sebastian Pancratz</a> - polynomial arithmetic over Z, Z/nZ and Q, p-adic and q-adic arithmetic, including polynomials and matrices (supported by ERC Grant 204083)
 
 * <a href="http://andy.novocin.com/pro/">Andy Novocin</a> - LLL, polynomial factorisation over Z, polynomial composition
 
 * <a href="http://fredrikj.net">Fredrik Johansson</a> - matrices, polynomial and power series arithmetic, special functions (supported by Austrian Science Fund FWF Grant Y464-N18)
+
+* Tom Bachmann - C++ expressions template wrapper, documentation parser (Google Summer of Code 2013)
+
+* Mike Hansen - Finite fields (small and large F_q), polynomials/matrices over F_q, Finite fields with Zech logarithm representation, Fast factorisation of polynomials over F_q (supported by Macaulay2 developers NSF Grant 1002171)
+
+* Martin Lee - Fast factorisation of polynomials over Z/nZ, faster Brent-Kung modular composition
 
 * <a href="http://web.maths.unsw.edu.au/~davidharvey/">David Harvey</a> (past author) - Fast Fourier Transform code, zn_poly for polynomial arithmetic over Z/nZ, mpz_poly, profiling and graphing code
     and many other parts of the FLINT library
@@ -25,9 +31,9 @@ The authors of FLINT to date:
 
 * Tom Boothby - Improved factoring of unsigned longs, detection of perfect powers
 
-* Andres Goens - Fq module and polynomials over Fq
+* Andres Goens - Fq module and polynomials over Fq (supported by DFG Priority program SPP1489)
 
-* Lina Kulakova -  factorisation for polynomials over F_p for large p
+* Lina Kulakova -  factorisation for polynomials over F_p for large p (Google Summer of Code 2012)
 
 * Thomas DuBuisson - logical ops for fmpz module, patches to the build system
 
@@ -62,7 +68,10 @@ tests and a Weiferich prime search. (Funded by the Nuffield Foundation)
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria, Jaap Spies, Kiran
 Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert Bradshaw, Serge Torres, Dan
 Grayson, Martin Lee, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
-Puydt and many others.
+Puydt, Dana Jacobsen, Michael Jacobson Jr., Mike Stillman, Jan Englehardt,
+Jean-Pierre Flori, Jeroen Demeyer, Shi Bai, Qingwen Guan, Frithjof Schulze,
+Robert Baillie, Oleksandr Motsak, Hans Schoenemann, Janko Boehm, Ahmed Soliman
+and many others.
 
 * In addition Michael Abshoff, William Stein and Robert Bradshaw have contributed to the build system of FLINT.
 
@@ -73,10 +82,11 @@ early! He also helped with setting up various pieces of infrastructure for the F
 
 * Numerous people have contributed to wrapping FLINT in Sage and debugging,
 including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
-Martin Albrecht, Sebastian Pancratz, Fredrik Johansson.
+Martin Albrecht, Sebastian Pancratz, Fredrik Johansson, Jeroen Demeyer and
+Lief Lionhardy, amongst others.
 
-Some code (longlong.h and clz_tab.c) has been used from the GMP library, 
-whose main author is Torbjorn Granlund.
+Some code (notably longlong.h and clz_tab.c) has been used from the GMP 
+library, whose main author is Torbjorn Granlund.
 
 FLINT 2 was a complete rewrite from scratch which began in about 2010.
  
