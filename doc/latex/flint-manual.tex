@@ -225,6 +225,7 @@
 \newcommand{\N}{\mathbf{N}}%  Natural numbers
 \newcommand{\Z}{\mathbf{Z}}%  Integers
 \newcommand{\Q}{\mathbf{Q}}%  Rationals
+\newcommand{\F}{\mathbf{F}}%  Finite fields
 
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\ord}{ord}
@@ -572,38 +573,130 @@ must be compiled with gcc version 2.96 or later.
 
 \chapter{Contributors}
 
-FLINT has been developed since 2007 by a large number of people. Initially
+FLINT has been developed since 2007 by a large numnber of people. Initially
 the library was started by David Harvey and William Hart. Later maintenance
 of the library was taken over solely by William Hart.
 
-The main authors of FLINT to date have been William Hart, David Harvey (no
-longer active), Fredrik Johansson, Sebastian Pancratz and Andy Novocin.
+The authors of FLINT to date:
 
-Other significant contributions to FLINT have been made by Jason Papadopoulos,
-Gonzalo Tornaria, David Howden, Burcin Erocal, Tom Boothby, Daniel Woodhouse, 
-Tomasz Lechowski, Richard Howell-Peak, Peter Shrimpton, Andrés Goens, Lina
-Kulakova, Thomas DuBuisson, Jean-Pierre Flori, Frithjof Schulze, Curtis 
-Bright.
+$\bullet$ William Hart -- integer and polynomial arithmetic, factorisation and
+primality testing, general infrastructure (supported by EPSRC Grant 
+EP/G004870/1 and DFG Priority programme SPP1489)
 
-Jan Tuitman contributed to the design of the padics module.
+$\bullet$ Sebastian Pancratz -- polynomial arithmetic over $\Z$, $\Z/n\Z$ and
+$\Q$, $p$-adic and $q$-adic arithmetic, including polynomials and matrices
+(supported by ERC Grant 204083)
 
-Additional research was contributed by Daniel Scott and Daniel Ellam.
+$\bullet$ Andy Novocin -- LLL, polynomial factorisation over $Z$, polynomial
+composition
 
-Further patches and bug reports have been made by Michael Abshoff, Didier 
-Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
-Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan 
-Grayson, Martin Lee, Bob Smith, Antony Vennard, Frédéric Chyzak, Julien
-Puydt and many others.
+$\bullet$ Fredrik Johansson -- matrices, polynomial and power series
+arithmetic, special functions (supported by Austrian Science Fund FWF Grant
+Y464-N18)
 
-Ralf Hemmecke made available an autotools build for FLINT.
+$\bullet$ Tom Bachmann -- \code{C++} expressions template wrapper,
+documentation parser (Google Summer of Code 2013)
 
-Numerous people have contributed to wrapping FLINT in Sage and debugging, 
-including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
-Martin Albrecht, Sebastian Pancratz, Fredrik Johansson,
+$\bullet$ Mike Hansen -- Finite fields (small and large $\F_q$),
+polynomials/matrices over $\F_q$, Finite fields with Zech logarithm
+representation, Fast factorisation of polynomials over $\F_q$ (supported by 
+Macaulay2 developers NSF Grant 1002171)
 
-Some code (\code{longlong.h} and \code{clz_tab.c}) has been used from
-an XYXYXYXYPL v2+ version of the GMP library. The main author of the GMP 
-library is Torbjorn Granlund.
+$\bullet$ Martin Lee -- Fast factorisation of polynomials over $\Z/n\Z$,
+faster Brent-Kung modular composition
+
+$\bullet$ David Harvey -- Fast Fourier Transform code, \code{zn_poly} for
+polynomial arithmetic over \code{\Z/n\Z}, \code{mpz_poly}, profiling and
+graphing code and many other parts of the FLINT library
+
+$\bullet$ Jan Tuitman -- helped with the $p$-adic interface
+
+$\bullet$ Jason Papadopoulos -- Block Lanczos code for quadratic sieve and
+multiprecision complex root finding code for polynomials.
+
+$\bullet$ Gonzalo Tornaria -- Theta function module, Montgomery multiplication
+and significant contributions to the $\Z[x]$ modular multiplication code.
+
+$\bullet$ Burcin Erocal -- wrote the primary FLINT wrapper in the SAGE system
+(Robert Bradshaw also wrote a preliminary version of this and Martin Albrecht
+and others have also contributed to it.)  Burcin also contributed by writing
+grant applications via his Lmonade organisation to Google. (Supported by DFG
+Priority programme SPP1489.)
+
+$\bullet$ Tom Boothby -- Improved factoring of unsigned longs, detection of
+perfect powers
+
+$\bullet$ Andres Goens -- $\F_q$ module and polynomials over $\F_q$ (supported
+by DFG Priority program SPP1489)
+
+$\bullet$ Lina Kulakova --  factorisation for polynomials over $\F_p$ for large
+$p$ (Google Summer of Code 2012)
+
+$\bullet$ Thomas DuBuisson -- logical ops for fmpz module, patches to the build
+system
+
+$\bullet$ Jean-Pierre Flori -- many build system patches and Sage integration
+
+$\bullet$ Frithjof Schulze -- some fmpz functions and various patches
+
+$\bullet$ Curtis Bright -- numerous patches including 32 bit support
+
+$\bullet$ Daniel Woodhouse -- Contributed an implementation of multivariate
+multiplication over $\Z/n\Z$ and used this to implement a fast ``saturation''
+algorithm for Laurent polynomials. (Funded by Alessio Corti and Tom Coates
+at Imperial College)
+
+$\bullet$ Tomasz Lechowski -- Contributed some NTL and Pari polynomial
+profiling code and researched algorithms for polynomials over finite fields.
+(Funded by the Nuffield Foundation)
+
+$\bullet$ Daniel Scott -- Researched lazy and relaxed algorithms of Joris van
+der Hoeven. (Funded by Warwick University's Undergraduate Research Scholars
+Scheme)
+
+$\bullet$ David Howden -- Wrote code for computing Bernoulli numbers mod many
+primes, including fast polynomial multiplication over $\Z/p\Z$ specifically for
+the task. (Funded by Warwick University's Undergraduate Research Scholars
+Scheme)
+
+$\bullet$ Daniel Ellam -- Helped design a module for $p$-adic arithmetic for
+FLINT. (Funded by Warwick University's Undergraduate Research Scholars Scheme)
+
+$\bullet$ Richard Howell-Peak -- Wrote polynomial factorisation and
+irreducibility testing code for polynomials over $\Z/p\Z$. (Funded by Warwick
+University's Undergraduate Research Scholars Scheme)
+
+$\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve, 
+Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
+Weiferich prime search. (Funded by the Nuffield Foundation)
+
+$\bullet$ Further patches and bug reports have been made by Michael Abshoff, 
+Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
+Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
+Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
+Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Dana Jacobsen, Michael Jacobson Jr.,
+Mike Stillman, Jan Englehardt, Jean-Pierre Flori, Jeroen Demeyer, Shi Bai,
+Qingwen Guan, Frithjof Schulze, Robert Baillie, Oleksandr Motsak, Hans
+Schoenemann, Janko Boehm, Ahmed Soliman and others.
+
+$\bullet$ In addition Michael Abshoff, William Stein and Robert Bradshaw have
+contributed to the build system of FLINT.
+
+$\bullet$ Michael Abshoff deserves special recognition for his help in
+resolving a number of difficult build issues which came to light as FLINT was
+incorporated into SAGE and for bringing numerous bugs to the attention of the
+FLINT maintainers. Michael regularly checked FLINT for memory leaks and
+corruption, which directly led to numerous issues being identified early!
+He also helped with setting up various pieces of infrastructure for the FLINT
+project.
+
+$\bullet$ Numerous people have contributed to wrapping FLINT in Sage and
+debugging, including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert
+Bradshaw, Martin Albrecht, Sebastian Pancratz, Fredrik Johansson, Jeroen
+Demeyer and Leif Lionhardy, amongst others.
+
+Some code (notably \code{longlong.h} and \code{clz_tab.c}) has been used from
+the GMP library, whose main author is Torbjorn Granlund.
 
 FLINT 2 was a complete rewrite from scratch which began in about 2010.
  
