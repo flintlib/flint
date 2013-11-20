@@ -27,20 +27,7 @@
 
 *******************************************************************************
 
-    Data structures
-
-    We represent an element of the finite field
-    $\mathbb{F}_{p^n} \cong \mathbb{F}_p[X]/(f(X))$,
-    where $f(X) \in \mathbb{F}_p[X]$ is a monic, irreducible polynomial
-    of degree~$n$, as a polynomial in $\mathbb{F}_p[X]$ of degree less
-    than $n$.
-
-    The default choice for $f(X)$ is the Conway polynomial for the
-    pair $(p,n)$.  Frank Luebeck's data base of Conway polynomials is
-    made available in the file \code{qadic/CPimport.txt}.  If a Conway
-    polynomial is not available, then a random irreducible polynomial
-    will be chosen for $f(X)$.  Additionally, the user is able to
-    supply their own $f(X)$.
+    Context Management
 
 *******************************************************************************
 
