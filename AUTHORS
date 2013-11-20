@@ -27,7 +27,7 @@ The authors of FLINT to date:
 
 * Gonzalo Tornaria - Theta function module, Montgomery multiplication and significant contributions to the Z[x] modular multiplication code.
 
-* Burcin Erocal - wrote the primary FLINT wrapper in the SAGE system (Robert Bradshaw also wrote a preliminary version of this and Martin Albrecht and others have also contributed to it.)
+* Burcin Erocal - wrote the primary FLINT wrapper in the SAGE system (Robert Bradshaw also wrote a preliminary version of this and Martin Albrecht and others have also contributed to it.) Burcin also contributed by writing grant applications via his Lmonade organisation to Google. (Supported by DFG Priority programme SPP1489.)
 
 * Tom Boothby - Improved factoring of unsigned longs, detection of perfect powers
 
@@ -83,7 +83,7 @@ early! He also helped with setting up various pieces of infrastructure for the F
 * Numerous people have contributed to wrapping FLINT in Sage and debugging,
 including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
 Martin Albrecht, Sebastian Pancratz, Fredrik Johansson, Jeroen Demeyer and
-Lief Lionhardy, amongst others.
+Leif Lionhardy, amongst others.
 
 Some code (notably longlong.h and clz_tab.c) has been used from the GMP 
 library, whose main author is Torbjorn Granlund.
