@@ -31,6 +31,6 @@
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-randtest_irreducible.c"
+#include "fq_poly_factor_templates/factor_realloc.c"
 #undef CAP_T
 #undef T

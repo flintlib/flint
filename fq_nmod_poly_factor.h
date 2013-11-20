@@ -23,7 +23,24 @@
 
 ******************************************************************************/
 
-#include "fq_nmod_poly_factor.h"
+#ifndef FQ_NMOD_POLY_FACTOR_H
+#define FQ_NMOD_POLY_FACTOR_H
+
+#include "fq_nmod_poly.h"
+
+static __inline__ int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length)
+{
+    int result;
+    fmpz_t q;
+    fmpz_init(q);
+    fq_nmod_ctx_order(q, ctx);
+    if ( 2 * fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
+        result = 1;
+    else
+        result = 0;
+    fmpz_clear(q);
+    return result;
+}
 
 #ifdef T
 #undef T
@@ -31,6 +48,8 @@
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-randtest_irreducible.c"
+#include "fq_poly_factor_templates.h"
 #undef CAP_T
 #undef T
+
+#endif

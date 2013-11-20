@@ -19,18 +19,24 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2007 David Howden
+    Copyright (C) 2007, 2008, 2009, 2010 William Hart
+    Copyright (C) 2008 Richard Howell-Peak
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include "fq_nmod_poly_factor.h"
+#include "fq_poly_factor.h"
+
+
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-randtest_irreducible.c"
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_factor_templates/factor.c"
 #undef CAP_T
 #undef T
