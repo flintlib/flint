@@ -143,11 +143,11 @@ main(int argc, char** argv)
                  */
                 {
                     fq_randtest_dense(f, state, ctx);
-                    fq_get_ZZ_pE(nf, f);
-                    fq_get_zz_pE(nnf, f);
+                    fq_get_ZZ_pE(nf, f, ctx);
+                    fq_get_zz_pE(nnf, f, ctx);
                     fq_randtest_dense(g, state, ctx);
-                    fq_get_ZZ_pE(ng, g);
-                    fq_get_zz_pE(nng, g);
+                    fq_get_ZZ_pE(ng, g, ctx);
+                    fq_get_zz_pE(nng, g, ctx);
                 }
                 
               loop:

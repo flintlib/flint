@@ -64,7 +64,7 @@ main(int argc, char** argv)
     for (i=0;  i < 1000; i++)
     {
         fmpz_poly_set(a, c);
-        _fq_reduce(a->coeffs, a->length, ctx);
+        _fq_dense_reduce(a->coeffs, a->length, ctx);
     }
     prof_stop();
     
@@ -75,7 +75,7 @@ main(int argc, char** argv)
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_set(b, c);
-        _fq_sparse_reduce(b->coeffs, b->length, ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+        _fq_sparse_reduce(b->coeffs, b->length, ctx);
     }
     prof_stop();
 
