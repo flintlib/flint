@@ -531,7 +531,7 @@ main(void)
 
     if (!r) abort();
 
-    _fmpz_cleanup();
+    flint_cleanup();
     
     return 0;
 }

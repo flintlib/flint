@@ -115,7 +115,7 @@ main(void)
 
     fmpz_clear(p);
     fmpz_clear(e);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
 
     return EXIT_SUCCESS;
