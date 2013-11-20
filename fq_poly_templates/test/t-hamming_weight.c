@@ -50,7 +50,7 @@ main(void)
     /* Check consistency */
         for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 	long w1,w2;
         TEMPLATE(T, poly_t) a, b;
@@ -72,7 +72,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
-	    flint_printf("w1 = %ld \n w2 = %ld \n",w1,w2);
+	    flint_printf("w1 = %wd \n w2 = %wd \n",w1,w2);
             abort();
         }
 
@@ -86,7 +86,7 @@ main(void)
     /* Check that wt(a+b) \leq wt(a) + wt(b) */
         for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 	long w1,w2,wsum;
         TEMPLATE(T, poly_t) a, b, c;
@@ -111,7 +111,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
-	    flint_printf("w1 = %ld \n w2 = %ld \n wsum = %ld",w1,w2,wsum);
+	    flint_printf("w1 = %wd \n w2 = %wd \n wsum = %wd",w1,w2,wsum);
             abort();
         }
 
@@ -124,7 +124,7 @@ main(void)
 	} 
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

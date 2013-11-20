@@ -35,7 +35,7 @@ TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2, const T
 {
     if (op1 != op2)
     {
-        long temp;
+        slong temp;
         TEMPLATE(T, struct) *temp_c;
 
         temp = op1->length;

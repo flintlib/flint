@@ -31,9 +31,9 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, long n, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, slong n, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     TEMPLATE(T, poly_fit_length)(poly, n + 1, ctx);
 

@@ -40,7 +40,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("mulmod....");
+    flint_printf("mulmod....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -68,11 +68,11 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(res, a, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), printf("\n\n");
-            printf("res:\n"); TEMPLATE(T, poly_print)(res, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
+            flint_printf("res:\n"); TEMPLATE(T, poly_print)(res, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -107,11 +107,11 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(res, b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), printf("\n\n");
-            printf("res:\n"); TEMPLATE(T, poly_print)(res, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
+            flint_printf("res:\n"); TEMPLATE(T, poly_print)(res, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -146,11 +146,11 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(res, f, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), printf("\n\n");
-            printf("res:\n"); TEMPLATE(T, poly_print)(res, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
+            flint_printf("res:\n"); TEMPLATE(T, poly_print)(res, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -188,12 +188,12 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(res1, res2, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), printf("\n\n");
-            printf("res1:\n"); TEMPLATE(T, poly_print)(res1, ctx), printf("\n\n");
-            printf("res2:\n"); TEMPLATE(T, poly_print)(res2, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b:\n"); TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
+            flint_printf("res1:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");
+            flint_printf("res2:\n"); TEMPLATE(T, poly_print)(res2, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -208,8 +208,8 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
+    flint_cleanup();
+    flint_printf("PASS\n");
     return 0;
 }
 

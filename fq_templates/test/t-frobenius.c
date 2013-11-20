@@ -53,7 +53,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, t) a, b, c;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         
@@ -75,7 +75,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
-            flint_printf("e = %ld\n", e);
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -91,7 +91,7 @@ main(void)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         
@@ -119,7 +119,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
-            flint_printf("e = %ld\n", e);
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -136,7 +136,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -169,7 +169,7 @@ main(void)
             flint_printf("s2 = "), TEMPLATE(T, print_pretty)(s2, ctx), flint_printf("\n");
             flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx), flint_printf("\n");
-            flint_printf("e = %ld\n", e);
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -190,7 +190,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
-        long e;
+        slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -223,7 +223,7 @@ main(void)
             flint_printf("s2 = "), TEMPLATE(T, print_pretty)(s2, ctx), flint_printf("\n");
             flint_printf("lhs = "), TEMPLATE(T, print_pretty)(lhs, ctx), flint_printf("\n");
             flint_printf("rhs = "), TEMPLATE(T, print_pretty)(rhs, ctx), flint_printf("\n");
-            flint_printf("e = %ld\n", e);
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -239,7 +239,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

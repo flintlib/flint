@@ -32,10 +32,10 @@
 
 void
 _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(TEMPLATE(T, struct) * rop,
-                       const TEMPLATE(T, struct) * op, long len, const TEMPLATE(T, t) x,
+                       const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, t) x,
                        const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
         TEMPLATE(T, mul)(rop + i, op + i, x, ctx);

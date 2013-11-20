@@ -30,7 +30,7 @@
 *******************************************************************************
 
 void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p,
-                      long d, const char *var)
+                      slong d, const char *var)
 
     Initialises the context for prime~$p$ and extension degree~$d$,
     with name \code{var} for the generator.  By default, it will try
@@ -43,7 +43,7 @@ void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p,
     of length at least one.
 
 int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
-                             long d, const char *var)
+                             slong d, const char *var)
 
     Attempts to initialise the context for prime~$p$ and extension
     degree~$d$, with name \code{var} for the generator using a Conway
@@ -60,7 +60,7 @@ int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
 
 
 void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
-                             long d, const char *var)
+                             slong d, const char *var)
 
     Initialises the context for prime~$p$ and extension degree~$d$,
     with name \code{var} for the generator using a Conway polynomial
@@ -72,7 +72,7 @@ void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
     of length at least one.
 
 void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const fmpz_t p,
-                              long d, nmod_poly_t modulus,
+                              slong d, nmod_poly_t modulus,
                               const char *var)
 
     Initialises the context for prime~$p$ and extension degree~$d$,
@@ -144,17 +144,17 @@ void fq_zech_clear(fq_zech_t rop, const fq_zech_ctx_t ctx)
 
     Clears the element \code{rop}.
 
-void _fq_zech_sparse_reduce(mp_ptr R, long lenR, const fq_zech_ctx_t ctx)
+void _fq_zech_sparse_reduce(mp_ptr R, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
     modulus of \code{ctx}.
 
-void _fq_zech_dense_reduce(mp_ptr R, long lenR, const fq_zech_ctx_t ctx)
+void _fq_zech_dense_reduce(mp_ptr R, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
     modulus of \code{ctx} using Newton division.
 
-void _fq_zech_reduce(mp_ptr r, long lenR, const fq_zech_ctx_t ctx)
+void _fq_zech_reduce(mp_ptr r, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
     modulus of \code{ctx}.  Does either sparse or dense reduction
@@ -201,7 +201,7 @@ void fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
     Sets \code{rop} to the product of \code{op} and $x$,
     reducing the output in the given context.
 
-void fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, long x,
+void fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
                     const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the product of \code{op} and $x$,
@@ -218,7 +218,7 @@ void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
     Sets \code{rop} to the square of \code{op},
     reducing the output in the given context.
 
-void _fq_zech_inv(mp_ptr *rop, mp_srcptr *op, long len, const fq_zech_ctx_t ctx)
+void _fq_zech_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_zech_ctx_t ctx)
 
     Sets \code{(rop, d)} to the inverse of the non-zero element
     \code{(op, len)}.
@@ -227,7 +227,7 @@ void fq_zech_inv(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the inverse of the non-zero element \code{op}.
 
-void _fq_zech_pow(mp_ptr *rop, mp_srcptr *op, long len, const fmpz_t e,
+void _fq_zech_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e,
                   const fq_zech_ctx_t ctx)
 
     Sets \code{(rop, 2*d-1)} to \code{(op,len)} raised to the power~$e$,
@@ -435,7 +435,7 @@ void fq_zech_norm(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Algorithm selection is automatic depending on the input.
 
-void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, long e,
+void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
                        const fq_zech_ctx_t ctx)
 
     Evaluates the homomorphism $\Sigma^e$ at \code{op}.

@@ -30,9 +30,9 @@
 #include "templates.h"
 
 long
-_TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) * op, long len, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i, sum = 0;
+    slong i, sum = 0;
     for (i = 0; i < len; i++)
         sum += !TEMPLATE(T, is_zero)(op + i, ctx);
 

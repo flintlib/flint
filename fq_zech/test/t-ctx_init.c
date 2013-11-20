@@ -33,10 +33,10 @@
 int
 main(void)
 {
-    long primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
-    long exponents[10] = { 16, 10, 6, 5, 4, 4, 3, 3, 3, 3 };
+    slong primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
+    slong exponents[10] = { 16, 10, 6, 5, 4, 4, 3, 3, 3, 3 };
     int i, j;
-    long d;
+    slong d;
     fmpz_t p, e;
     fq_nmod_ctx_t fq_nmod_ctx;
     fq_nmod_t lhs, rhs, one;
@@ -92,8 +92,8 @@ main(void)
                 if (!fq_nmod_equal(lhs, rhs, fq_nmod_ctx))
                 {
                     flint_printf("FAIL:\n\n");
-                    flint_printf("K = GF(%ld^%ld)\n", primes[i], d);
-                    flint_printf("Z(%d) = %ld\n", j, ctx->zech_log_table[j]);
+                    flint_printf("K = GF(%wd^%wd)\n", primes[i], d);
+                    flint_printf("Z(%d) = %wd\n", j, ctx->zech_log_table[j]);
                     flint_printf("LHS: ");
                     fq_nmod_print_pretty(lhs, fq_nmod_ctx);
                     flint_printf("\n");
@@ -115,7 +115,7 @@ main(void)
 
     fmpz_clear(p);
     fmpz_clear(e);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
 
     return EXIT_SUCCESS;

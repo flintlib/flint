@@ -31,9 +31,9 @@ main(int argc, char** argv)
 {
     flint_rand_t state;
 
-    long i, result;
+    slong i, result;
     fmpz_t p;
-    long d;
+    slong d;
     fq_ctx_t ctx;
     fq_t a,b,c;
     double dense;

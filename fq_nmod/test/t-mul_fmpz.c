@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("mul_fmpz....");
+    flint_printf("mul_fmpz....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d;
+        slong d;
         fq_nmod_ctx_t ctx;
         fmpz_t x;
         fq_nmod_t a, b;
@@ -67,10 +67,10 @@ main(void)
         result = (fq_nmod_equal(a, b, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-	    printf("x = "), fmpz_print(x), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+	    flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             abort();
         }
 
@@ -85,7 +85,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long d;
+        slong d;
         fq_nmod_ctx_t ctx;
         fmpz_t x;
         fq_nmod_t a, c;
@@ -118,11 +118,11 @@ main(void)
         result = (fq_nmod_equal(c, b, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-	    printf("x = "), fmpz_print(x), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+	    flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             abort();
         }
 
@@ -135,7 +135,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
+    flint_cleanup();
+    flint_printf("PASS\n");
     return 0;
 }

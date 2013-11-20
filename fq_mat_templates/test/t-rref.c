@@ -172,7 +172,7 @@ main(void)
 
         if (!equal)
         {
-            printf("FAIL (rank1 = %ld, rank2 = %ld)!\n", rank1, rank2);
+            flint_printf("FAIL (rank1 = %wd, rank2 = %wd)!\n", rank1, rank2);
             TEMPLATE(T, mat_print_pretty)(A, ctx); printf("\n\n");
             TEMPLATE(T, mat_print_pretty)(B, ctx); printf("\n\n");
             TEMPLATE(T, mat_print_pretty)(D, ctx); printf("\n\n");

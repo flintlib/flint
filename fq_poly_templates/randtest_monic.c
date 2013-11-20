@@ -32,9 +32,9 @@
 
 void
 TEMPLATE(T, poly_randtest_monic)(TEMPLATE(T, poly_t) f, flint_rand_t state,
-                       long len, const TEMPLATE(T, ctx_t) ctx)
+                       slong len, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     TEMPLATE(T, poly_fit_length)(f, len, ctx);
     for (i = 0; i < len - 1; i++)

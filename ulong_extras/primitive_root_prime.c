@@ -60,7 +60,7 @@ mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
             return a;
         }
     }
-    printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
+    flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
     abort();
 }
 

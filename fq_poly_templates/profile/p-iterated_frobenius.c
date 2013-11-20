@@ -39,7 +39,7 @@ main(int argc, char** argv)
 {
     fmpz_t p, q;
     int c, n, reps = 0;
-    long d, lenf;
+    slong d, lenf;
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, poly_t) f, *h, finv;
     TEMPLATE(T, mat_t) HH;

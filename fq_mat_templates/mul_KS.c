@@ -35,7 +35,7 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
                          const TEMPLATE(T, mat_t) B,
                          const TEMPLATE(T, ctx_t) ctx)
 {
-    long bits;
+    slong bits;
     slong ar, bc, br;
     slong i, j;
     fmpz_mat_t fa, fb, fc;

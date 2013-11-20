@@ -32,7 +32,7 @@ fq_zech_inv(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     if (fq_zech_is_zero(op, ctx))
     {
-        printf("Exception (fq_inv).  Zero is not invertible.\n");
+        flint_printf("Exception (fq_inv).  Zero is not invertible.\n");
         abort();
     }
     if (fq_zech_is_one(op, ctx))

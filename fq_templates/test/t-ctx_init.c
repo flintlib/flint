@@ -49,7 +49,7 @@ main(void)
 
     for (i = 0; i < 30; i++) {
         fmpz_t p;
-        long d;
+        slong d;
         TEMPLATE(T, ctx_t) ctx;
         
         fmpz_init(p);
@@ -62,7 +62,7 @@ main(void)
 
     for (i = 0; i < 30; i++) {
         fmpz_t p;
-        long d;
+        slong d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;
 
         TEMPLATE(T, t) a, b, lhs, rhs;
@@ -113,7 +113,7 @@ main(void)
 
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
 
     return EXIT_SUCCESS;

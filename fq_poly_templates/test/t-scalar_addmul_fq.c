@@ -49,7 +49,7 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -92,7 +92,7 @@ main(void)
     /* Check that b += x*a is the same as c = b + x*a */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -134,7 +134,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

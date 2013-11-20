@@ -44,7 +44,7 @@ main(int argc, char** argv)
     slong s[nalgs];
 
     int c, n, len, ext, reps = 0;
-    long j;
+    slong j;
     fmpz_t p, temp;
     fq_zech_poly_t f, g;
     fq_nmod_poly_t fn;

@@ -30,7 +30,7 @@
 #include "fq_poly.h"
 
 void
-fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     flint_rand_t state;
     fmpz_mod_poly_t poly;

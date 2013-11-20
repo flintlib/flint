@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("mul_si....");
+    flint_printf("mul_si....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fq_nmod_ctx_t ctx;
-        long x;
+        slong x;
         fq_nmod_t a, b;
 
         fq_nmod_ctx_randtest(ctx, state);
@@ -61,10 +61,10 @@ main(void)
         result = (fq_nmod_equal(a, b, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-	    printf("x = %ld\n",x);
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+	    flint_printf("x = %wd\n",x);
             abort();
         }
 
@@ -78,7 +78,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fq_nmod_ctx_t ctx;
-        long x;
+        slong x;
         fq_nmod_t a, c;
 	nmod_poly_t b;
 
@@ -104,10 +104,10 @@ main(void)
         result = (fq_nmod_equal(c, b, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-	    printf("x = %ld\n",x);
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+	    flint_printf("x = %wd\n",x);
             abort();
         }
 
@@ -118,7 +118,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
+    flint_cleanup();
+    flint_printf("PASS\n");
     return 0;
 }

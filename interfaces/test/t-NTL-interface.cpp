@@ -284,9 +284,9 @@ int test_ZZ_pE_to_fq()
            flint_printf("FAIL:\n");
            flint_printf("p = "); fmpz_print(p); flint_printf("\n");
            flint_printf("mod = "); fmpz_mod_poly_print_pretty(fmod, "x"); flint_printf("\n");
-           flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %ld", f1->length); flint_printf("\n");
+           flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %wd", f1->length); flint_printf("\n");
            flint_printf("zzpe:"); cout << zzpe; flint_printf("\n");
-           flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %ld", f2->length); flint_printf("\n");
+           flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %wd", f2->length); flint_printf("\n");
            return 0;
         }
         
@@ -426,9 +426,9 @@ int test_zz_pE_to_fq()
            flint_printf("FAIL:\n");
            flint_printf("p = "); fmpz_print(p); flint_printf("\n");
            flint_printf("mod = "); fmpz_mod_poly_print_pretty(fmod, "x"); flint_printf("\n");
-           flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %ld", f1->length); flint_printf("\n");
+           flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %wd", f1->length); flint_printf("\n");
            flint_printf("zzpe:"); cout << zzpe; flint_printf("\n");
-           flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %ld", f2->length); flint_printf("\n");
+           flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %wd", f2->length); flint_printf("\n");
            return 0;
         }
         
@@ -531,7 +531,7 @@ main(void)
 
     if (!r) abort();
 
-    _fmpz_cleanup();
+    flint_cleanup();
     
     return 0;
 }

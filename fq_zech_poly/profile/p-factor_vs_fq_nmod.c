@@ -36,7 +36,7 @@ main(int argc, char** argv)
 {
     fmpz_t p;
     int c, n, reps = 0;
-    long d, len, i;
+    slong d, len, i;
     fq_nmod_ctx_t ctx;
     fq_zech_ctx_t ctx_zech;
     fq_nmod_poly_t f, g;

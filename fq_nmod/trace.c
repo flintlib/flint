@@ -25,10 +25,10 @@
 
 #include "fq_nmod.h"
 
-void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, long len, 
+void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len, 
                     const fq_nmod_ctx_t ctx)
 {
-    const long d = fq_nmod_ctx_degree(ctx);
+    const slong d = fq_nmod_ctx_degree(ctx);
 
     ulong i, l;
     mp_limb_t *t, rop;
@@ -58,7 +58,7 @@ void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, long len,
     }
 
     
-    rop = 0L;
+    rop = WORD(0);
     for (i = 0; i < d; i++)
     {
         rop = n_addmod(rop,

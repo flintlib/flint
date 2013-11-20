@@ -31,10 +31,10 @@
     When $N = 1$, this computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len, 
+void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len, 
                         const fq_nmod_ctx_t ctx)
 {
-    const long d = fq_nmod_ctx_degree(ctx);
+    const slong d = fq_nmod_ctx_degree(ctx);
 
     mp_limb_t rop;
 
@@ -46,8 +46,8 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len,
     {
         /* Construct an ad hoc matrix M and set rop to det(M) */
         {
-            const long n = d + len - 1;
-            long i, k;
+            const slong n = d + len - 1;
+            slong i, k;
             nmod_mat_t M;
 
             nmod_mat_init(M, n, n, ctx->mod.n);
@@ -76,7 +76,7 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, long len,
             XXX:  This part of the code is currently untested as the Conway 
             polynomials used for the extension Fq/Fp are monic.
          */
-        if (ctx->a[ctx->len - 1] != 1L)
+        if (ctx->a[ctx->len - 1] != WORD(1))
         {
             mp_limb_t f;
             f = n_powmod2_ui_preinv(ctx->a[ctx->len - 1], len - 1, ctx->mod.n, ctx->mod.ninv);

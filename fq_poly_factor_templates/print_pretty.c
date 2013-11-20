@@ -38,7 +38,7 @@ TEMPLATE(T, poly_factor_print_pretty)(const TEMPLATE(T, poly_factor_t) fac, cons
     for (i = 0; i < fac->num; i++)
     {
         TEMPLATE(T, poly_print_pretty)(fac->poly + i, var, ctx);
-        flint_printf(" ^ %ld\n", fac->exp[i]);
+        flint_printf(" ^ %wd\n", fac->exp[i]);
     }
 }
 

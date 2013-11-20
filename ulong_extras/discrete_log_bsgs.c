@@ -68,6 +68,6 @@ mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n)
     }
 
     flint_free(table);
-    printf("Exception (n_discrete_log_bsgs).  discrete log not found.\n");
+    flint_printf("Exception (n_discrete_log_bsgs).  discrete log not found.\n");
     abort();
 }

@@ -29,7 +29,7 @@
 void
 fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
-    long len = op->length;
+    slong len = op->length;
 
     fmpz_poly_fit_length(rop, len);
     _fmpz_poly_set_length(rop, len);

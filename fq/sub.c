@@ -29,7 +29,7 @@
 void
 fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
-    long max = FLINT_MAX(op1->length, op2->length);
+    slong max = FLINT_MAX(op1->length, op2->length);
 
     fmpz_poly_fit_length(rop, max);
 

@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -121,7 +121,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

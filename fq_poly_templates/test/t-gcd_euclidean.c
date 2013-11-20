@@ -46,7 +46,7 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,g;
@@ -84,7 +84,7 @@ main(void)
     */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
-        long len,j;
+        slong len,j;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,c,g;
@@ -109,7 +109,7 @@ main(void)
 
         if(!TEMPLATE(T, poly_is_one)(g, ctx)){ 
             flint_printf("FAIL:\n");
-            flint_printf("could not find coprime polynomials after %ld tries\n",j+1);
+            flint_printf("could not find coprime polynomials after %wd tries\n",j+1);
             abort();
         }
 
@@ -118,7 +118,7 @@ main(void)
 
         if(c->length<2){
             flint_printf("FAIL:\n");
-            flint_printf("could not find non-unit polynomial after %ld tries\n",j+1);
+            flint_printf("could not find non-unit polynomial after %wd tries\n",j+1);
             abort();
         }
 
@@ -151,7 +151,7 @@ main(void)
     /* Check aliasing of a and g */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,g;
@@ -189,7 +189,7 @@ main(void)
     /* Check aliasing of b and g */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b,g;

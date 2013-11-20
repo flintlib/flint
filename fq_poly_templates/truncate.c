@@ -31,11 +31,11 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_truncate)(TEMPLATE(T, poly_t) poly, long len, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_truncate)(TEMPLATE(T, poly_t) poly, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     if (poly->length > len)
     {
-        long i;
+        slong i;
 
         for (i = len; i < poly->length; i++)
             TEMPLATE(T, zero)(poly->coeffs + i, ctx);

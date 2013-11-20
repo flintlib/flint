@@ -29,7 +29,7 @@
 #include "fq_zech.h"
 
 void
-fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, long d, const char *var)
+fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
@@ -41,7 +41,7 @@ fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, long d, const char *var)
 }
 
 void
-fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, long d,
+fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
                         const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -54,7 +54,7 @@ fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, long d,
 }
 
 int
-_fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, long d,
+_fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
                          const char *var)
 {
     int result;
@@ -77,7 +77,7 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, long d,
 
 void
 fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-                         const fmpz_t p, long d, const nmod_poly_t modulus,
+                         const fmpz_t p, slong d, const nmod_poly_t modulus,
                          const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -96,7 +96,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
 {
     ulong i, n;
     fq_nmod_t r, gen;
-    long up, q;
+    slong up, q;
     fmpz_t result, order;
     mp_limb_t j, nz, result_ui;
     mp_limb_t *n_reverse_table;
@@ -109,7 +109,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
 
     if (fmpz_bits(order) > FLINT_BITS)
     {
-        printf("Exception (fq_zech_ctx_init). Requires q < 2^FLINT_BITS\n");
+        flint_printf("Exception (fq_zech_ctx_init). Requires q < 2^FLINT_BITS\n");
         abort();
     }
 

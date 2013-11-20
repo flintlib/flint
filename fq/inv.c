@@ -26,10 +26,10 @@
 #include "fq.h"
 
 void
-_fq_inv(fmpz * rop, const fmpz * op, long len,
-        const fmpz * a, const long *j, long lena, const fmpz_t p)
+_fq_inv(fmpz * rop, const fmpz * op, slong len,
+        const fmpz * a, const slong *j, slong lena, const fmpz_t p)
 {
-    const long d = j[lena - 1];
+    const slong d = j[lena - 1];
 
     if (len == 1)
     {
@@ -39,7 +39,7 @@ _fq_inv(fmpz * rop, const fmpz * op, long len,
     else
     {
         fmpz *f = _fmpz_vec_init(d + 1);
-        long k;
+        slong k;
 
         for (k = 0; k < lena; k++)
             fmpz_set(f + j[k], a + k);
@@ -62,7 +62,7 @@ fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
     }
     else
     {
-        const long d = fq_ctx_degree(ctx);
+        const slong d = fq_ctx_degree(ctx);
         fmpz *t;
 
         if (rop == op)

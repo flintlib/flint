@@ -52,7 +52,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, d;
-        long n;
+        slong n;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -89,7 +89,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

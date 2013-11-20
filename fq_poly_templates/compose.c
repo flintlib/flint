@@ -30,8 +30,8 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_compose)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op1, long len1,
-                 const TEMPLATE(T, struct) * op2, long len2, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_compose)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op1, slong len1,
+                 const TEMPLATE(T, struct) * op2, slong len2, const TEMPLATE(T, ctx_t) ctx)
 {
     if (len1 == 1)
         TEMPLATE(T, set)(rop + 0, op1 + 0, ctx);
@@ -47,9 +47,9 @@ void
 TEMPLATE(T, poly_compose)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2,
                 const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long lenr = (len1 - 1) * (len2 - 1) + 1;
+    const slong len1 = op1->length;
+    const slong len2 = op2->length;
+    const slong lenr = (len1 - 1) * (len2 - 1) + 1;
 
     if (len1 == 0)
     {

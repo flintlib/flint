@@ -37,7 +37,7 @@
 #define ncases 2
 
 int
-get_timings(double* s, long degree, mp_bitcnt_t bits, long length)
+get_timings(double* s, slong degree, mp_bitcnt_t bits, slong length)
 {
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, poly_t) f, *h, finv;
@@ -179,7 +179,7 @@ get_timings(double* s, long degree, mp_bitcnt_t bits, long length)
 }
 
 long
-a(fmpz_mat_t array, long i, long j)
+a(fmpz_mat_t array, slong i, slong j)
 {
     return fmpz_get_si(fmpz_mat_entry(array, i, j));
 }
@@ -192,7 +192,7 @@ file_exists(char *filename)
 }
 
 int
-init_array(fmpz_mat_t array, long max_degree, long max_bits, long max_length, char* filename)
+init_array(fmpz_mat_t array, slong max_degree, slong max_bits, slong max_length, char* filename)
 {
     int bigger_length = 0;
     fmpz_mat_t old_array;
@@ -249,7 +249,7 @@ main(int argc, char** argv)
 {
     mp_bitcnt_t bits, max_bits, max_bits_used, max_bits_e;
     int is_hit, bigger_length;
-    long degree, length, max_degree, max_length, imin, imax, imid, diff;
+    slong degree, length, max_degree, max_length, imin, imax, imid, diff;
     fmpz_mat_t array;
     char* filename;
 

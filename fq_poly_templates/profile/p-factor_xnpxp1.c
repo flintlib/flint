@@ -72,7 +72,7 @@ main(int argc, char** argv)
     timeit_stop(t);
     TEMPLATE(T, poly_factor_clear)(res, ctx);
 
-    flint_printf("%ld\n", t->cpu);
+    flint_printf("%wd\n", t->cpu);
 
     TEMPLATE(T, poly_clear)(f, ctx);
     TEMPLATE(T, ctx_clear)(ctx);

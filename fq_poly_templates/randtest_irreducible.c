@@ -30,7 +30,7 @@
 
 void
 TEMPLATE(T, poly_randtest_irreducible)(TEMPLATE(T, poly_t) f, flint_rand_t state,
-                             long len, const TEMPLATE(T, ctx_t) ctx)
+                             slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, poly_t) xq, xqi, x, g_i, finv;
     fmpz_t q;

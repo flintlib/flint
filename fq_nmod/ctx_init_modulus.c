@@ -29,10 +29,10 @@
 #include "fq_nmod.h"
 
 void
-fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const fmpz_t p, long d,
+fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const fmpz_t p, slong d,
                          const nmod_poly_t modulus, const char *var)
 {
-    long nz;
+    slong nz;
     int i, j;
 
     fmpz_init_set(fq_nmod_ctx_prime(ctx), p);

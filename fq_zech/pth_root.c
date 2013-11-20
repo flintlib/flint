@@ -28,7 +28,7 @@
 void
 fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
 {
-    long i, d;
+    slong i, d;
     mp_limb_t e;
     double qm1inv;
 

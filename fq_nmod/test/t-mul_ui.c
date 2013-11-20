@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("mul_ui....");
+    flint_printf("mul_ui....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -61,10 +61,10 @@ main(void)
         result = (fq_nmod_equal(a, b, ctx));
         if (!result)
         {
-            printf("FAIL 1:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-	    printf("x = %lu\n",x);
+            flint_printf("FAIL 1:\n\n");
+            flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+	    flint_printf("x = %wu\n",x);
             abort();
         }
 
@@ -96,11 +96,11 @@ main(void)
         result = (fq_nmod_equal(c, b, ctx));
         if (!result)
         {
-            printf("FAIL 2:\n\n");
-            printf("a = "), fq_nmod_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_nmod_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_nmod_print_pretty(c, ctx), printf("\n");
-	    printf("x = %lu\n",x);
+            flint_printf("FAIL 2:\n\n");
+            flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), fq_nmod_print_pretty(c, ctx), flint_printf("\n");
+	    flint_printf("x = %wu\n",x);
             abort();
         }
 
@@ -111,7 +111,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
+    flint_cleanup();
+    flint_printf("PASS\n");
     return 0;
 }

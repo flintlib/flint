@@ -31,12 +31,12 @@
 
 int
 _TEMPLATE(T, poly_divides)(TEMPLATE(T, struct) * Q,
-                 const TEMPLATE(T, struct) * A, long lenA,
-                 const TEMPLATE(T, struct) * B, long lenB, const TEMPLATE(T, t) invB,
+                 const TEMPLATE(T, struct) * A, slong lenA,
+                 const TEMPLATE(T, struct) * B, slong lenB, const TEMPLATE(T, t) invB,
                  const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, struct) *R;
-    long lenR;
+    slong lenR;
 
     R = _TEMPLATE(T, vec_init)(lenA, ctx);
 
@@ -69,7 +69,7 @@ TEMPLATE(T, poly_divides)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A, co
     }
 
     {
-        const long lenQ = TEMPLATE(T, poly_length)(A, ctx) - TEMPLATE(T, poly_length)(B, ctx) + 1;
+        const slong lenQ = TEMPLATE(T, poly_length)(A, ctx) - TEMPLATE(T, poly_length)(B, ctx) + 1;
         int ans;
         TEMPLATE(T, t) invB;
 

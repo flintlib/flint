@@ -50,7 +50,7 @@ main(void)
     /* Check aliasing: a = a * a */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, c;
@@ -83,7 +83,7 @@ main(void)
     /* Check that a^2 + a^2 == a * (a + a) */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, d;
@@ -125,7 +125,7 @@ main(void)
     /* Compare mul() */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -159,7 +159,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

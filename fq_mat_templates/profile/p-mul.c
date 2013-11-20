@@ -40,7 +40,7 @@ main(int argc, char** argv)
 {
     fmpz_t p;
     int c, n, reps = 0;
-    long d, mat_size;
+    slong d, mat_size;
     fq_ctx_t ctx;
     fq_mat_t f, g, h;
 

@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -51,7 +51,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        long x;
+        slong x;
         TEMPLATE(T, t) a, b;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
@@ -70,7 +70,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-	    flint_printf("x = %ld\n",x);
+	    flint_printf("x = %wd\n",x);
             abort();
         }
 
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        long x;
+        slong x;
         TEMPLATE(T, t) a, c;
 	fmpz_poly_t b;
 
@@ -107,7 +107,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-	    flint_printf("x = %ld\n",x);
+	    flint_printf("x = %wd\n",x);
             abort();
         }
 
@@ -118,7 +118,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

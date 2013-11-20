@@ -34,7 +34,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("divrem_divconquer....");
+    flint_printf("divrem_divconquer....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,12 +63,12 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(a, t, ctx));
         if (!result)
         {
-            printf("FAIL #1:\n");
-            printf("a = "), TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b = "), TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("q = "), TEMPLATE(T, poly_print)(q, ctx), printf("\n\n");
-            printf("r = "), TEMPLATE(T, poly_print)(r, ctx), printf("\n\n");
-            printf("t = "), TEMPLATE(T, poly_print)(t, ctx), printf("\n\n");
+            flint_printf("FAIL #1:\n");
+            flint_printf("a = "), TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("q = "), TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
+            flint_printf("r = "), TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            flint_printf("t = "), TEMPLATE(T, poly_print)(t, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -101,11 +101,11 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(q, a, ctx) && TEMPLATE(T, poly_equal)(r, b, ctx));
         if (!result)
         {
-            printf("FAIL #2:\n");
-            printf("a = "), TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b = "), TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("q = "), TEMPLATE(T, poly_print)(q, ctx), printf("\n\n");
-            printf("r = "), TEMPLATE(T, poly_print)(r, ctx), printf("\n\n");
+            flint_printf("FAIL #2:\n");
+            flint_printf("a = "), TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("q = "), TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
+            flint_printf("r = "), TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -137,11 +137,11 @@ main(void)
         result = (TEMPLATE(T, poly_equal)(q, b, ctx) && TEMPLATE(T, poly_equal)(r, a, ctx));
         if (!result)
         {
-            printf("FAIL #3:\n");
-            printf("a = "), TEMPLATE(T, poly_print)(a, ctx), printf("\n\n");
-            printf("b = "), TEMPLATE(T, poly_print)(b, ctx), printf("\n\n");
-            printf("q = "), TEMPLATE(T, poly_print)(q, ctx), printf("\n\n");
-            printf("r = "), TEMPLATE(T, poly_print)(r, ctx), printf("\n\n");
+            flint_printf("FAIL #3:\n");
+            flint_printf("a = "), TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            flint_printf("q = "), TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
+            flint_printf("r = "), TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -154,7 +154,7 @@ main(void)
 
     flint_randclear(state);
     flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

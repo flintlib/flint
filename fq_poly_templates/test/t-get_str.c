@@ -50,9 +50,9 @@ main(void)
         {
             TEMPLATE(T, poly_randtest)(a, state, len, ctx);
             str = TEMPLATE(T, poly_get_str)(a, ctx);
-            /* printf("\n\n"); */
+            /* flint_printf("\n\n"); */
             /* TEMPLATE(T, poly_print)(a, ctx); */
-            /* printf("\n%s\n", str); */
+            /* flint_printf("\n%s\n", str); */
             flint_free(str);
         }
 

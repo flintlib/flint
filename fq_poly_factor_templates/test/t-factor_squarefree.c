@@ -119,10 +119,10 @@ main(void)
             TEMPLATE(T, ctx_print)(ctx);
             flint_printf("\n");
             for (i = 0; i < res->num; i++)
-                flint_printf("%ld ", res->exp[i]);
+                flint_printf("%wd ", res->exp[i]);
             flint_printf("\n");
             for (i = 0; i < num; i++)
-                flint_printf("%ld ", exp[i]);
+                flint_printf("%wd ", exp[i]);
             flint_printf("\n");
             abort();
         }
@@ -137,7 +137,7 @@ main(void)
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
+    flint_cleanup();
     flint_printf("PASS\n");
     return 0;
 }

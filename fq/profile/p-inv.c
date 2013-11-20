@@ -36,7 +36,7 @@ main()
     flint_rand_t state;
     timeit_t t0;
 
-    long i, d, cpu, wall;
+    slong i, d, cpu, wall;
     fmpz_t p;
     fq_ctx_t ctx;
     fq_t a,b;
@@ -56,7 +56,7 @@ main()
     timeit_start(t0);
     for(i=0;i<REPS;i++) fq_inv(b,a,ctx);
     timeit_stop(t0);
-    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , t0->cpu , t0->wall );
+    flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , t0->cpu , t0->wall );
 
     flint_printf("random inversions: \n");
 
@@ -72,7 +72,7 @@ main()
     wall = wall + t0->wall;
     }
 
-    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , cpu , wall );
+    flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , cpu , wall );
 
 
     return 0;
