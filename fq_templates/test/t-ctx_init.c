@@ -52,7 +52,7 @@ main(void)
         
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 
-                                   FLINT_MAX(FLINT_BIT, 50)), 1));
+                                   FLINT_MAX(FLINT_BITS, 50)), 1));
         d = n_randint(state, 20) + 1;
 
         TEMPLATE(T, ctx_init)(ctx, p, d, "a");
