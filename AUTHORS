@@ -4,7 +4,7 @@ of the library was taken over solely by William Hart.
 
 The authors of FLINT to date:
 
-* William Hart - integer and polynomial arithmetic, factorisation and primality testing, general infrastructure (supported by EPSRC Grant EP/G004870/1)
+* William Hart - integer and polynomial arithmetic, factorisation and primality testing, general infrastructure (supported by EPSRC Grant EP/G004870/1 and DFG Priority programme SPP1489)
 
 * <a href="http://pancratz.org/">Sebastian Pancratz</a> - polynomial arithmetic over Z, Z/nZ and Q, p-adic arithmetic (supported by ERC Grant 204083)
 
