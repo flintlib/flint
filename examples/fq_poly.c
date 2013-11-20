@@ -44,9 +44,9 @@ int main(void)
 
     flint_randinit(state);
 
-    fq_poly_init(f);
-    fq_poly_init(g);
-    fq_poly_init(h);
+    fq_poly_init(f, ctx);
+    fq_poly_init(g, ctx);
+    fq_poly_init(h, ctx);
 
     printf("Polynomial multiplication over GF(q)\n");
     printf("------------------------------------\n");
@@ -151,9 +151,9 @@ int main(void)
         fmpz_clear(p);
     }
 
-    fq_poly_clear(f);
-    fq_poly_clear(g);
-    fq_poly_clear(h);
+    fq_poly_clear(f, ctx);
+    fq_poly_clear(g, ctx);
+    fq_poly_clear(h, ctx);
     flint_randclear(state);
 
     return EXIT_SUCCESS;
