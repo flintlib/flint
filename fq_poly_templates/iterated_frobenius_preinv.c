@@ -31,8 +31,8 @@
 void
 TEMPLATE(T, poly_iterated_frobenius_preinv)(TEMPLATE(T, poly_t)* rop,
                                             long n,
-                                            TEMPLATE(T, poly_t) v,
-                                            TEMPLATE(T, poly_t) vinv,
+                                            const TEMPLATE(T, poly_t) v,
+                                            const TEMPLATE(T, poly_t) vinv,
                                             const TEMPLATE(T, ctx_t) ctx)
 {
     long i;

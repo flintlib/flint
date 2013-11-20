@@ -97,6 +97,11 @@ void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const fmpz_t p,
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
 
+void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
+
+    Initializes the context \code{ctx} to be the Zech representation
+    for the finite field given by \code{ctxn}.
+
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
@@ -114,6 +119,10 @@ fmpz * fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
 void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
 
      Sets $f$ to be the size of the finite field.
+
+mp_limb_t fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
+
+     Returns the size of the finite field.
 
 int fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
 
@@ -376,6 +385,19 @@ void fq_zech_one(fq_zech_t rop, const fq_zech_ctx_t ctx)
 void fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to a multiplicative generator for the finite field.
+
+void fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op,
+                         const fq_zech_ctx_t ctx)
+
+    Sets \code{rop} to the \code{fq_nmod_t} element corresponding to
+    \code{op}.
+
+void fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op,
+                         const fq_zech_ctx_t ctx)
+
+    Sets \code{rop} to the \code{fq_zech_t} element corresponding to
+    \code{op}.
+
 
 *******************************************************************************
 

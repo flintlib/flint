@@ -1801,3 +1801,13 @@ void fq_zech_poly_factor_with_kaltofen_shoup(fq_zech_poly_factor_t res,
     \code{f} if it is of the form $p(x^m)$ for some $m > 1$, then
     performs a square-free factorisation, and finally runs
     Kaltofen-Shoup on all the individual square-free factors.
+
+void fq_zech_poly_iterated_frobenius_preinv(fq_zech_poly_t *rop, long n,
+                                            const fq_zech_poly_t v,
+                                            const fq_zech_poly_t vinv,
+                                            const fq_zech_ctx_t ctx)
+
+    Sets \code{rop[i]} to be $x^{q^i} mod v$ for $0 <= i < n$.
+
+    It is required that \code{vinv} is the inverse of the reverse of
+    \code{v} mod \code{x^lenv}.

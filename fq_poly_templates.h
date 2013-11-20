@@ -207,8 +207,8 @@ TEMPLATE(T, poly_factor)(TEMPLATE(T, poly_factor_t) result, TEMPLATE(T, t) leadi
 void
 TEMPLATE(T, poly_iterated_frobenius_preinv)(TEMPLATE(T, poly_t)* rop,
                                             long n,
-                                            TEMPLATE(T, poly_t) v,
-                                            TEMPLATE(T, poly_t) vinv,
+                                            const TEMPLATE(T, poly_t) v,
+                                            const TEMPLATE(T, poly_t) vinv,
                                             const TEMPLATE(T, ctx_t) ctx);
 
 /*  Assignment and basic manipulation  ***************************************/
