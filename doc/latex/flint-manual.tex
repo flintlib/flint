@@ -335,7 +335,8 @@ In the case that a library is installed in say \code{/usr}
 in the \code{lib} and \code{include} directories as usual, simply
 specify the top level location, e.g. \code{/usr} when
 configuring FLINT. If a library is built in its source tree,
-specify the top level source directory, e.g. \code{/home/user1/mpir/}.
+specify the top level directory, e.g.
+\code{/home/user1/mpir/}.
 
 To specify the directories where the libraries reside, you must
 pass the directories as parameters to FLINT's configure, e.g.\
@@ -361,18 +362,20 @@ which you wish to place the FLINT files when it is installed.
 
 \chapter{TLS, reentrancy and single mode}
 
-If you wish to use FLINT on a single core machine then it will be
-configured by default for single mode. This is slightly faster, but
-is not threadsafe. (This mode can also be explicitly selected by
-passing the \code{--single} option to configure.) If you wish to
-build a threadsafe version of FLINT, you must pass the
-\code{--reentrant} option to configure. This will be slower on
-single core machines, but threadsafe.
+If you wish to use FLINT on a single core machine then it can be
+configured for single mode. This mode can also be explicitly selected
+by passing the \code{--single} option to configure. Single mode is
+slightly faster, but by default uses thread local storage if threads
+are used, and this is not available on some machines. 
 
-By default, FLINT uses thread local storage (\code{--enable-tls}).
+FLINT uses thread local storage by default (\code{--enable-tls}).
 However, if reentrancy is required on systems that do not support
 this, one can pass \code{--disable-tls} and mutexes will be used
 instead (requires POSIX).
+
+If you wish to build a threadsafe version of FLINT which uses a
+less complicated memory model (slower, but still works in the absence
+of TLS) you can pass the \code{--reentrant} option to configure. 
 
 \chapter{ABI and architecture support}
 
@@ -401,12 +404,12 @@ FLINT's configure.
 
 \chapter{C++ wrapper}
 
-If you wish to run tests for the FLINT C$++$ wrapper \code{flintxx}
-you must pass \code{--enable-cxx} to configure. The C$++$ wrapper
-is always available, but tests will only run if this option is
-selected. It is disabled by default (\code{--disable-cxx} because
-some C$++$ compilers internally segfault when compiling the tests,
-or exhaust memory due to the complexity of the C$++$ code.
+If you wish to enable the test functions for the FLINT C$++$ wrapper
+\code{flintxx} you must pass \code{--enable-cxx} to configure. The
+\code{C++} wrapper is always available, but tests will only run if 
+this option is selected. It is disabled by default (\code{--disable-cxx}
+because some \code{C++} compilers internally segfault when compiling the
+tests, or exhaust memory due to the complexity of the \code{C++} code.
 
 \chapter{Garbage collection}
 
@@ -416,10 +419,10 @@ Boehm-Demers-Weiser GC library, you may wish to pass the
 FLINT to use \code{GC_malloc} and friends for its memory allocation
 strategy. The user is responsible for calling \code{GC_init}.
 
-The \code{--with-gc} option can be used with the \code{--reentrant}
-option, but not the \code{--enable-tls} option. In fact, configure
-will switch this off automatically and print a warning if it is
-selected in addition to \code{--with-gc}.
+The \code{--with-gc} option can be used with \code{--reentrant}, but not the
+\code{--enable-tls} option. In fact, configure will switch this off
+automatically and print a warning if it is selected in addition to
+\code{--with-gc}.
 
 \chapter{Building, testing, installing and using FLINT}
 
@@ -573,7 +576,7 @@ must be compiled with gcc version 2.96 or later.
 
 \chapter{Contributors}
 
-FLINT has been developed since 2007 by a large numnber of people. Initially
+FLINT has been developed since 2007 by a large number of people. Initially
 the library was started by David Harvey and William Hart. Later maintenance
 of the library was taken over solely by William Hart.
 
@@ -606,7 +609,7 @@ $\bullet$ Martin Lee -- Fast factorisation of polynomials over $\Z/n\Z$,
 faster Brent-Kung modular composition
 
 $\bullet$ David Harvey -- Fast Fourier Transform code, \code{zn_poly} for
-polynomial arithmetic over \code{\Z/n\Z}, \code{mpz_poly}, profiling and
+polynomial arithmetic over $\Z/n\Z$, \code{mpz_poly}, profiling and
 graphing code and many other parts of the FLINT library
 
 $\bullet$ Jan Tuitman -- helped with the $p$-adic interface
@@ -649,7 +652,7 @@ at Imperial College)
 $\bullet$ Tomasz Lechowski -- Contributed some NTL and Pari polynomial
 profiling code and researched algorithms for polynomials over finite fields.
 (Funded by the Nuffield Foundation)
-q
+
 $\bullet$ Daniel Scott -- Researched lazy and relaxed algorithms of Joris van
 der Hoeven. (Funded by Warwick University's Undergraduate Research Scholars
 Scheme)
@@ -670,7 +673,7 @@ $\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
-$\bullet$ Further patches and bug reports have been made by Michael Abshoff,
+$\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
 Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
@@ -829,7 +832,7 @@ by calling the \code{flint_cleanup()} function. It is recommended to call
 main program.
 
 The user can register additional cleanup functions to be invoked
-by \code{flint_cleanup()}. This is done by passing a pointer
+by \code{flint_cleanup()} by passing a pointer
 to a function with signature \code{void cleanup_function(void)}
 to \code{flint_register_cleanup_function()}.
 
@@ -1003,7 +1006,7 @@ We now describe the functions available in the \code{fmpz} module.
 \chapter{fmpz\_factor}
 \epigraph{Factorisation in $\Z$}{}
 
-The \code{fmpz_factor} module is included automatically when one includes
+The \code{fmpz_factor} module is included automatically with
 \code{fmpz.h}. One should not try to include \code{fmpz_factor.h}
 directly.
 
@@ -1164,7 +1167,7 @@ We now describe the functions available in \code{fmpz_poly}.
 \chapter{fmpz\_poly\_factor}
 \epigraph{Factorisation of polynomials over $\Z$}{}
 
-The \code{fmpz_poly_factor} module is included automatically when one includes
+The \code{fmpz_poly_factor} module is included automatically with
 \code{fmpz_poly.h}. One should not try to include \code{fmpz_poly_factor.h}
 directly.
 
@@ -1517,13 +1520,13 @@ We now describe the functions available in \code{nmod_poly}.
 \input{input/nmod_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Factorisation of olynomials over Z / nZ for word-sized moduli                %
+% Factorisation of polynomials over Z / nZ for word-sized moduli               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{nmod\_poly\_factor}
 \epigraph{Factorisation of polynomials over $\Z / n \Z$ for word-sized moduli}{}
 
-The \code{nmod_poly_factor} module is included automatically when one includes
+The \code{nmod_poly_factor} module is included automatically with
 \code{nmod_poly.h}. One should not try to include \code{nmod_poly_factor.h}
 directly.
 
@@ -1694,8 +1697,13 @@ We now describe the functions available in \code{fmpz_mod_poly}.
 \chapter{fmpz\_mod\_poly\_factor}
 \epigraph{Factorisation of polynomials over $\Z/n\Z$ for general moduli}{}
 
+<<<<<<< HEAD
+The \code{fmpz_mod_poly_factor} module is included automatically with
+\code{fmpz_mod_poly.h}. One should not try to include 
+=======
 The \code{fmpz_mod_poly_factor} module is included automatically when one
 includes \code{fmpz_mod_poly.h}. One should not try to include
+>>>>>>> mhansen/fq
 \code{fmpz_mod_poly_factor.h} directly.
 
 \input{input/fmpz_mod_poly_factor.tex}
@@ -1742,7 +1750,7 @@ own $f(X)$.
 % fq_poly                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{fq\_poly}
-\epigraph{Polynoimals over finite fields of arbitrary characteristic}
+\epigraph{polynomials over finite fields of arbitrary characteristic}
 
 We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
 which includes an array \code{coeffs} with the coefficients, as well
@@ -1762,7 +1770,7 @@ i.e., it assumes that the fields are generated by the same polynomial.
 % fq_poly_factor                                                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{fq\_poly\_factor}
-\epigraph{Factorisation of polynoimals over finite fields of arbitrary
+\epigraph{Factorisation of polynomials over finite fields of arbitrary
   characteristic}
 
 The \code{fq_poly_factor} module is included automatically when one
@@ -1813,7 +1821,7 @@ own $f(X)$.
 % fq_nmod_poly                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{fq\_nmod\_poly}
-\epigraph{Polynoimals over finite fields of word-sized characteristic}
+\epigraph{polynomials over finite fields of word-sized characteristic}
 
 We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
 which includes an array \code{coeffs} with the coefficients, as well
@@ -1835,7 +1843,7 @@ polynomial.
 % fq_nmod_poly_factor                                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{fq\_nmod\_poly\_factor}
-\epigraph{Factorisation of polynoimals over finite fields of
+\epigraph{Factorisation of polynomials over finite fields of
   word-sized characteristic}
 
 The \code{fq_nmod__poly_factor} module is included automatically when
@@ -1886,7 +1894,7 @@ own $f(X)$.
 % fq_zech_poly                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{fq\_zech\_poly}
-\epigraph{Polynoimals over finite fields in Zech logarithm representation}
+\epigraph{Polynomials over finite fields in Zech logarithm representation}
 
 We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
 which includes an array \code{coeffs} with the coefficients, as well
@@ -1907,7 +1915,7 @@ polynomial.
 % fq_zech_poly_factor                                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{fq\_zech\_poly\_factor}
-\epigraph{Factorisation of polynoimals over finite fields in Zech
+\epigraph{Factorisation of polynomials over finite fields in Zech
   logarithm representation}
 
 The \code{fq_zech__poly_factor} module is included automatically when
@@ -2176,9 +2184,9 @@ Excessively long error messages are often indicative of a bug in flintxx.
 \paragraph{Tuples}
 
 Many FLINT functions naturally return two (or more) arguments. A typical example
-is \code{divrem}. The underlying C function is (for example)
+is \code{divrem}. The underlying C function is (for example)\\
 \code{void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)}.
-Mapping this directly to C++ would yield something like
+Mapping this directly to C++ would yield something like\\
 \code{void divrem(fmpz_polyxx& Q, fmpz_polyxx& R, const fmpz_polyxx& A, const fmpz_polyxx& B)}.
 While functional, this is not particularly nice; the syntax
 \code{divrem(Q, R, A, B)}, where the first two arguments are modified, is just
@@ -2191,12 +2199,15 @@ The reason for this name
 is that flintxx internally uses a non-lazy tuple class just
 called \code{tuple}, on which \code{ltuple} in fact is built.}
 In fact, the following is a valid
-flintxx expression: \code{ltupleref(Q, R) = divrem(A, B)}.
+flintxx expression:\\
+\code{ltupleref(Q, R) = divrem(A, B)}.
 
 In generality, the implementation of ltuples is fairly involved template
 metaprogramming. For the purpose of this documentation, ltuple types are denoted
-as follows: \code{Ltuple<Type1, Type2, ..., Typer>}. So \code{divrem} would
-return an object of type \code{Ltuple<fmpz_polyxx, fmpz_polyxx>}. The user
+as follows:\\
+\code{Ltuple<Type1, Type2, ..., Typer>}. So \code{divrem} would
+return an object of type\\
+\code{Ltuple<fmpz_polyxx, fmpz_polyxx>}. The user
 should never try to construct such types by hand; instead use the function
 \code{ltupleref} (and perhaps occasionally \code{ltuple}; both documented
 later).
@@ -2307,7 +2318,7 @@ explicitly.
 
 There are two ways of doing this. The preferred one is using static constructor
 functions. Typical examples are
-\code{fmpz_polyxx::from_ground(fmpzarg)} and
+\code{fmpz_polyxx::from_ground(fmpzarg)} and\\
 \code{nmod_polyxx::reduce(mplimbarg, nmodctxarg)}. The former takes an
 (expression template evaluating to) \code{fmpzxx} and returns an
 \code{fmpz_polyxx} representing the constant polynomial with value the

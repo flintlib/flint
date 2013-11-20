@@ -397,7 +397,7 @@ v 1.6.0 -- 24-Dec-10
 
    * mpfr_vec_scalar_product/norm
 
-2.0 -- 16 Jan 2011
+v 2.0 -- 16 Jan 2011
   N.B: FLINT 2 is  a complete rewrite of flint from scratch
   It includes the following modules:
 
@@ -627,7 +627,7 @@ mpfr_vec: (vectors over mpfr reals)
 mpfr_mat: (matrices over mpfr reals)
   * memory management (init, clear)
 
-2.1 -- 9 Mar 2011
+v 2.1 -- 9 Mar 2011
 
 fmpz
 ----
@@ -691,7 +691,7 @@ documentation
 -------------
   * Large number of corrections
 
-2.2 -- 4 Jun 2011
+v 2.2 -- 4 Jun 2011
 
 fmpq (multiprecision rational numbers)
 --------------------------------------
@@ -787,7 +787,7 @@ build fixes
   * -L use /usr instead of /usr/local by default (reported by Serge Torres)
   * guards for system headers because of flint's use of ulong
 
-2.3 -- 1 Jul 2012
+v 2.3 -- 1 Jul 2012
 
 general
 -------
@@ -1065,4 +1065,25 @@ arith
     representations of an integer
   * renamed functions to have an arith_ prefix
 
+v 2.4 -- 20 Nov 2013
 
+  * C++ expressions template wrapper
+  * Fast factorisation of polynomials over Z/nZ
+  * improved p-adics
+  * polynomials/matrices over p-adics
+  * qadics
+  * Finite fields (small and large F_q), polynomials/matrices over F_q
+  * Finite fields with Zech logarithm representation
+  * Fast factorisation of polynomials over F_q
+  * Faster Brent-Kung modular composition
+  * New prime sieving code
+  * Lambert-W function
+  * Precomputed inverses for polynomials and large integers
+  * Williams' P+1 integer factoring algorithm
+  * Harvey's KS2/KS4 polynomial multiplication  
+  * Faster primality testing up to 64 bits
+  * Support for Cygwin64 and MinGW64
+  * Support for Clang
+  * Support for GMP
+  * Support for Boehm-Demers-Weiser GC
+  * Support for flint extension modules

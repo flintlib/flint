@@ -1637,12 +1637,14 @@ void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv,
 void _fmpz_poly_powers_clear(fmpz ** powers, slong len)
 
     Clean up resources used by precomputed powers which have been computed
-    by \code{_fmpz_poly_powers_precompute}.
+    by\\
+    \code{_fmpz_poly_powers_precompute}.
 
 void fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv)
 
     Clean up resources used by precomputed powers which have been computed
-    by \code{fmpz_poly_powers_precompute}.
+    by\\
+    \code{fmpz_poly_powers_precompute}.
 
 void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
                                  const fmpz * B, slong n, fmpz ** const powers)
