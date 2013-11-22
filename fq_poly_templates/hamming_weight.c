@@ -29,8 +29,9 @@
 
 #include "templates.h"
 
-long
-_TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, ctx_t) ctx)
+slong
+_TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) * op, slong len,
+                                  const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, sum = 0;
     for (i = 0; i < len; i++)
@@ -39,8 +40,9 @@ _TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) * op, slong len, con
     return sum;
 }
 
-long
-TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
+slong
+TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op,
+                                 const TEMPLATE(T, ctx_t) ctx)
 {
 
     return _TEMPLATE(T, poly_hamming_weight)(op->coeffs, op->length, ctx);

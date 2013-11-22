@@ -439,21 +439,21 @@ void TEMPLATE(T, poly_shift_right)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, po
 
 /*  Norms  *******************************************************************/
 
-long _TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, ctx_t) ctx);
+slong _TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, ctx_t) ctx);
 
-long TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
+slong TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Greatest common divisor  *************************************************/
 
 void TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                  const TEMPLATE(T, ctx_t) ctx);
 
-long _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,const TEMPLATE(T, struct)* A, slong lenA, 
+slong _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,const TEMPLATE(T, struct)* A, slong lenA, 
                             const TEMPLATE(T, struct)* B, slong lenB, const TEMPLATE(T, t) invB,
                             const TEMPLATE(T, ctx_t) ctx);
 
 static __inline__
-long _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G, const TEMPLATE(T, struct)* A, slong lenA, 
+slong _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G, const TEMPLATE(T, struct)* A, slong lenA, 
                   const TEMPLATE(T, struct)* B, slong lenB, const TEMPLATE(T, t) invB,
                   const TEMPLATE(T, ctx_t) ctx)
 {
