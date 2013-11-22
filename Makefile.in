@@ -160,7 +160,7 @@ else
 	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach dir, $(MOD), export MOD_DIR=$(dir); test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; export BUILD_DIR=$(CURDIR)/build/$(dir); test ! -d $(ext)/$(dir) || $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
 endif
 
-valgrind:
+valgrind: library
 ifndef MOD
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) valgrind || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) valgrind || exit $$?;))
