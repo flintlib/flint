@@ -1171,5 +1171,7 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
 #include "fmpz_poly_factor.h"
 
+#include "fmpz_poly_special.h"
+
 #endif
 
