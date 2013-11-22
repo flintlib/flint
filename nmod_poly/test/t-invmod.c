@@ -144,7 +144,7 @@ main(void)
         nmod_poly_xgcd(g, s, t, a, b);
 
         result = (((ans) && g->length == 1 
-                        && g->coeffs[0] == 1L && nmod_poly_equal(s, u)) 
+                   && g->coeffs[0] == WORD(1) && nmod_poly_equal(s, u)) 
                  || (!(ans) && g->length > 1));
 
         if (!result)

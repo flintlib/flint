@@ -98,7 +98,7 @@ _fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, slong n, const fmpz_t pN)
            characteristic polynomial of the matrix M.
          */
 
-        if (n % 2L == 0)
+        if (n % WORD(2) == 0)
         {
             fmpz_set(rop, F + (n - 1));
         }

@@ -117,7 +117,7 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
         _nmod_poly_set_length(S, lenB - lenG);
         _nmod_poly_normalise(S);
 
-        if (nmod_poly_lead(G)[0] != 1L)
+        if (nmod_poly_lead(G)[0] != WORD(1))
         {
             mp_limb_t inv;
 
