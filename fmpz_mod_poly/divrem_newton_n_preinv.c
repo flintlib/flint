@@ -62,7 +62,7 @@ void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                               const fmpz_mod_poly_t Binv)
 {
     const slong lenA = A->length, lenB = B->length, lenBinv= Binv->length,
-                       lenQ= lenA - lenB + 1;
+                       lenQ = lenA - lenB + 1;
     fmpz* q, * r;
 
     if (lenB == 0)
@@ -79,7 +79,7 @@ void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         return;
     }
 
-    if (lenA > 2*lenB-2)
+    if (lenA > 2 * lenB - 2)
     {
         flint_printf ("Exception (fmpz_mod_poly_divrem_newton_n_preinv).\n");
     }

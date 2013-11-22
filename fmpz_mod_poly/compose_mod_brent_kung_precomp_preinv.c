@@ -37,27 +37,27 @@ _fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
                                    const fmpz_mod_poly_t f)
 {
     fmpz * tmp1, *tmp2;
-    slong n= f->length-1;
-    slong i, m= n_sqrt (n)+1;
+    slong n = f->length - 1;
+    slong i, m = n_sqrt(n) + 1;
 
     fmpz_t invf;
     fmpz_init(invf);
-    fmpz_invmod(invf, f->coeffs+n, &f->p);
+    fmpz_invmod(invf, f->coeffs + n, &f->p);
 
-    fmpz_mat_init (A, m, n);
+    fmpz_mat_init(A, m, n);
 
-    fmpz_one (A->rows[0]);
-    tmp1= _fmpz_vec_init (2*(B->c) - n);
-    tmp2= tmp1+ (B->c - n);
+    fmpz_one(A->rows[0]);
+    tmp1 = _fmpz_vec_init(2 * (B->c) - n);
+    tmp2 = tmp1 + (B->c - n);
     for (i= 1; i < m; i++)
     {
-        _fmpz_mod_poly_divrem (tmp1, tmp2, B->rows[i], B->c, f->coeffs,
+        _fmpz_mod_poly_divrem(tmp1, tmp2, B->rows[i], B->c, f->coeffs,
                            f->length, invf, &f->p);
-        _fmpz_vec_set (A->rows[i], tmp2, n);
+        _fmpz_vec_set(A->rows[i], tmp2, n);
     }
 
-    _fmpz_vec_clear (tmp1, 2*(B->c) - n);
-    fmpz_clear (invf);
+    _fmpz_vec_clear(tmp1, 2 * (B->c) - n);
+    fmpz_clear(invf);
 }
 
 void
@@ -75,7 +75,7 @@ _fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * poly1,
     fmpz_one(A->rows[0]);
     _fmpz_vec_set(A->rows[1], poly1, n);
     for (i = 2; i < m; i++)
-        _fmpz_mod_poly_mulmod_preinv (A->rows[i], A->rows[i - 1], n, poly1, n,
+        _fmpz_mod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1], n, poly1, n,
                                       poly2, len2, poly2inv, len2inv, p);
 }
 
@@ -87,7 +87,7 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
     slong len2 = poly2->length;
     slong len = len2 - 1;
     slong vec_len = FLINT_MAX(len2 - 1, len1);
-    slong m= n_sqrt (len) + 1;
+    slong m= n_sqrt(len) + 1;
 
     fmpz* ptr;
     fmpz_t inv2;
@@ -108,7 +108,7 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
 
     if (len2 == 1)
     {
-        fmpz_mat_zero (A);
+        fmpz_mat_zero(A);
         return;
     }
 
