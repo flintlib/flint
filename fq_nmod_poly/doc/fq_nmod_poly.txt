@@ -997,7 +997,7 @@ void fq_nmod_poly_divrem_divconquer(fq_nmod_poly_t Q, fq_nmod_poly_t R,
     Assumes that $B$ is non-zero and that the leading coefficient of
     $B$ is invertible.
 
-void _fq_nmod_poly_div_newton_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A, slong lenA,
+void _fq_nmod_poly_div_newton_n_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A, slong lenA,
                                 const fq_nmod_struct* B, slong lenB,
                                 const fq_nmod_struct* Binv, slong lenBinv,
                                 const fq_nmod_struct ctx_t)
@@ -1013,9 +1013,10 @@ void _fq_nmod_poly_div_newton_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A,
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void fq_nmod_poly_div_newton_preinv(fq_nmod_poly_t Q, const fq_nmod_poly_t A,
-                               const fq_nmod_poly_t B, const fq_nmod_poly_t Binv,
-                               const fq_nmod_ctx_t ctx)
+void fq_nmod_poly_div_newton_n_preinv(fq_nmod_poly_t Q, const fq_nmod_poly_t A,
+                                      const fq_nmod_poly_t B,
+                                      const fq_nmod_poly_t Binv,
+                                      const fq_nmod_ctx_t ctx)
 
     Notionally computes $Q$ and $R$ such that $A = BQ + R$ with
     $\len(R) < \len(B)$, but returns only $Q$.
@@ -1023,10 +1024,13 @@ void fq_nmod_poly_div_newton_preinv(fq_nmod_poly_t Q, const fq_nmod_poly_t A,
     We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
     the inverse of the reverse of $B$ mod $x^{\len(B)}$.
 
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void _fq_nmod_poly_divrem_newton_preinv(fq_nmod_struct* Q, fq_nmod_struct* R,
+void _fq_nmod_poly_divrem_newton_n_preinv(fq_nmod_struct* Q, fq_nmod_struct* R,
                                    const fq_nmod_struct* A, slong lenA,
                                    const fq_nmod_struct* B, slong lenB,
                                    const fq_nmod_struct* Binv, slong lenBinv,
@@ -1040,15 +1044,19 @@ void _fq_nmod_poly_divrem_newton_preinv(fq_nmod_struct* Q, fq_nmod_struct* R,
     used is to call \code{div_newton_preinv()} and then multiply out
     and compute the remainder.
 
-void fq_nmod_poly_divrem_newton_preinv(fq_nmod_poly_t Q, fq_nmod_poly_t R,
+void fq_nmod_poly_divrem_newton_n_preinv(fq_nmod_poly_t Q, fq_nmod_poly_t R,
                                   const fq_nmod_poly_t A, const fq_nmod_poly_t B,
                                   const fq_nmod_poly_t Binv, const fq_nmod_ctx_t ctx)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) <
     \len(B)$.  We assume $Binv$ is the inverse of the reverse of $B$
-    mod $x^{\len(B)}$.  The algorithm used is to call
-    \code{div_newton()} and then multiply out and compute the
-    remainder.
+    mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to call \code{div_newton()} and then
+    multiply out and compute the remainder.
 
 void
 _fq_nmod_poly_inv_series_newton(fq_nmod_struct* Qinv, const fq_nmod_struct* Q, slong n,
