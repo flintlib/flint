@@ -110,6 +110,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
 
     fmpz_mod_poly_clear(a);
     fmpz_mod_poly_clear(b);
+    fmpz_mod_poly_clear(polinv);
     fmpz_clear(p);
 
     return res;
