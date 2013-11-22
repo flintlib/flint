@@ -35,7 +35,7 @@ _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op
 {
     ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
-    slong alloc = (long) e * (len - 1) + 1;
+    slong alloc = (slong) e * (len - 1) + 1;
     TEMPLATE(T, struct) *v = _TEMPLATE(T, vec_init)(alloc, ctx);
     TEMPLATE(T, struct) *R, *S, *T;
 
@@ -140,7 +140,7 @@ TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulo
     }
     else
     {
-        const slong rlen = (long) e * (len - 1) + 1;
+        const slong rlen = (slong) e * (len - 1) + 1;
 
         if (rop != op)
         {

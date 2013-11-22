@@ -36,7 +36,7 @@
  */
 
 static fmpz_poly_struct *
-__vec_init(long len)
+__vec_init(slong len)
 {
     slong i;
     fmpz_poly_struct *v;
@@ -48,7 +48,7 @@ __vec_init(long len)
 }
 
 static fmpz_poly_struct *
-__vec_init2(long len, slong n)
+__vec_init2(slong len, slong n)
 {
     slong i;
     fmpz_poly_struct *v;

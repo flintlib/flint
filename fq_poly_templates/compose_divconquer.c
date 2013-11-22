@@ -52,7 +52,7 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
 
     /* Initialisation */
 
-    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (slong *) flint_malloc(((len1 + 1) / 2) * sizeof(slong));
 
     k = FLINT_CLOG2(len1) - 1;
 
