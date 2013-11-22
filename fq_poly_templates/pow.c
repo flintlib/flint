@@ -116,7 +116,7 @@ TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulo
 {
     const slong len = op->length;
 
-    if ((len < 2) | (e < 3UL))
+    if ((len < 2) | (e < UWORD(3)))
     {
         if (e == UWORD(0))
             TEMPLATE(T, poly_one)(rop, ctx);
@@ -135,7 +135,7 @@ TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulo
         }
         else if (e == UWORD(1))
             TEMPLATE(T, poly_set)(rop, op, ctx);
-        else                    /* e == 2UL */
+        else                    /* e == UWORD(2) */
             TEMPLATE(T, poly_sqr)(rop, op, ctx);
     }
     else

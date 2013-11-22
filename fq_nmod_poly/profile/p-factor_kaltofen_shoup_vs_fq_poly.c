@@ -81,7 +81,7 @@ main(int argc, char** argv)
 
     for (c = 0; c < nalgs; c++)
     {
-        s[c] = 0L;
+        s[c] = WORD(0);
     }
        
     for (n = 0; n < ncases; n++)

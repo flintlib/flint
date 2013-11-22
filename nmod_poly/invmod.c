@@ -39,7 +39,7 @@ int _nmod_poly_invmod(mp_limb_t *A,
 
     lenG = _nmod_poly_gcdinv(G, A, B, lenB, P, lenP, mod);
 
-    if (lenG == 1 && G[0] != 1L)
+    if (lenG == 1 && G[0] != WORD(1))
     {
         mp_limb_t invG;
 
