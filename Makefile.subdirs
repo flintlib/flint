@@ -86,4 +86,4 @@ $(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
 %_VALGRIND_RUN: %
 	valgrind --track-origins=yes --leak-check=full --show-reachable=yes --log-file="$*.valgrind" $<
 
-.PHONY: profile tune clean check tests all shared static %_RUN
+.PHONY: profile tune clean check tests all shared static valgrind %_RUN %_VALGRIND_RUN
