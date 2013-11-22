@@ -54,6 +54,8 @@ int main(void)
     fmpz_poly_t a, b;
     slong n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("divisors....");
     fflush(stdout);
 
@@ -78,7 +80,7 @@ int main(void)
     fmpz_poly_clear(a);
     fmpz_poly_clear(b);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

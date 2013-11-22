@@ -40,6 +40,8 @@ int main()
     fmpz_t s, t;
     slong k, n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("euler_number_vec....");
     fflush(stdout);
 
@@ -73,7 +75,7 @@ int main()
         _fmpz_vec_clear(r, n + 1);
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

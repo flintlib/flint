@@ -48,9 +48,8 @@ sample(void *arg, ulong count)
     fq_poly_t a, b, c, d, dinv;
     fq_ctx_t ctx;
 
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fq_ctx_randtest(ctx, state);
 
     fq_poly_init2(a, n, ctx);
@@ -102,7 +101,7 @@ sample(void *arg, ulong count)
     fq_poly_clear(d, ctx);
     fq_poly_clear(dinv, ctx);
     fq_ctx_clear(ctx);
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
 }
 
 int

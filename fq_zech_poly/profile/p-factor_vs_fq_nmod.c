@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include "flint.h"
 #include "fq_nmod_poly.h"
 #include "fq_zech_poly.h"
 #include "profiler.h"
@@ -44,9 +45,8 @@ main(int argc, char** argv)
 
     double s[nalgs];
     
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -139,5 +139,7 @@ main(int argc, char** argv)
     fq_zech_ctx_clear(ctx_zech);
     fmpz_clear(p);
 
+    FLINT_TEST_CLEANUP(state);
+    
     return 0;
 }

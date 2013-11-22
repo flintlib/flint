@@ -41,13 +41,12 @@ main(void)
     fq_nmod_ctx_t fq_nmod_ctx;
     fq_nmod_t lhs, rhs, one;
     fq_zech_ctx_t ctx;
-    flint_rand_t state;
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("ctx_init... ");
 
     fflush(stdout);
-    flint_randinit(state);
-
+    
     fmpz_init(p);
     fmpz_init(e);
 
@@ -115,7 +114,7 @@ main(void)
 
     fmpz_clear(p);
     fmpz_clear(e);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
 
     return EXIT_SUCCESS;

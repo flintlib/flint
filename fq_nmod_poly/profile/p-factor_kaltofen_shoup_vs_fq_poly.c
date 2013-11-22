@@ -52,11 +52,9 @@ main(int argc, char** argv)
     fq_nmod_ctx_t ctxn;
     fmpz_poly_t fpoly;
     nmod_poly_t nmod;
-
     
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -160,7 +158,7 @@ main(int argc, char** argv)
     fmpz_clear(p);
     fmpz_clear(temp);
 
-    flint_randclear(state);
-
+    FLINT_TEST_CLEANUP(state);
+    
     return 0;
 }

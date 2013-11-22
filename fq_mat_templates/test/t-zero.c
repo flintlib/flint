@@ -33,13 +33,11 @@
 int
 main(void)
 {
-    flint_rand_t state;
     int iter;
-
+    FLINT_TEST_INIT(state);
+    
     printf("zero/is_zero....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 100; iter++)
     {
@@ -80,8 +78,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

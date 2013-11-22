@@ -45,6 +45,8 @@ int main()
     fmpz * den3;
     slong i, n, N;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("bernoulli_number_vec....");
     fflush(stdout);
 
@@ -94,7 +96,7 @@ int main()
     _fmpz_vec_clear(den2, N);
     _fmpz_vec_clear(den3, N);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

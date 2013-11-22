@@ -87,8 +87,8 @@ main(void)
         fmpz_clear(r3);
     }
 
-    flint_randclear(state);
+    
     flint_printf("PASS\n");
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     return EXIT_SUCCESS;
 }

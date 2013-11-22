@@ -40,6 +40,8 @@ int main()
 
     slong n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("legendre_polynomial....");
     fflush(stdout);
 
@@ -78,7 +80,7 @@ int main()
     fmpq_poly_clear(Pn2);
     fmpq_poly_clear(R);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

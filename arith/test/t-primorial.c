@@ -36,6 +36,8 @@ int main(void)
     fmpz_t x;
     fmpz_t y;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("primorial....");
     fflush(stdout);
 
@@ -61,7 +63,7 @@ int main(void)
     fmpz_clear(x);
     fmpz_clear(y);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

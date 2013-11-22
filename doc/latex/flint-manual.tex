@@ -814,7 +814,11 @@ To determine the current FLINT version a number of macros are available.
 For example, if the current FLINT version is \code{2.4.0} then
 \code{__FLINT_VERSION} will have the value $2$, \code{__FLINT_MINOR}
 will have the value $4$ and \code{__FLINT_PATCHLEVEL} will have the value
-$0$. The \code{FLINT_VERSION} macro will have the value $20400$.
+$0$. The \code{__FLINT_RELEASE} macro will have the value $20400$.
+
+The \code{FLINT_VERSION} macro is a static text string giving the version
+number, e.g. ``2.4'' or ``2.4.1''. Note that if the final digit is a zero
+it is suppressed.
 
 \chapter{Memory management}
 

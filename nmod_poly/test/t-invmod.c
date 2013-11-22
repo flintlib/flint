@@ -35,12 +35,11 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    
+    FLINT_TEST_INIT(state);
 
     printf("invmod....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test aliasing *************************************************************/
 
@@ -215,8 +214,7 @@ main(void)
         nmod_poly_clear(u);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

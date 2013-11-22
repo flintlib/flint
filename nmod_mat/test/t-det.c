@@ -92,9 +92,9 @@ main(void)
         fmpz_clear(Bdet);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

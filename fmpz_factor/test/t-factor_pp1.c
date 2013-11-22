@@ -104,9 +104,9 @@ int main(void)
       abort();
    }
 
-   flint_randclear(state);
+   
    gmp_randclear(st);
-   flint_cleanup();
+   FLINT_TEST_CLEANUP(state);
    flint_printf("PASS\n");
    return 0;
 }

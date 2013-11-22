@@ -375,6 +375,12 @@ elif [ "$ABI" = "64" ]; then
    fi
 fi
 
+if [ "$MACHINE" = "sparc" ] || [ "$MACHINE" = "sparc64" ]; then
+   if [ "$CC" = "gcc" ]; then
+      CC="gcc -mno-relax"
+   fi
+fi
+
 echo "Configuring...${MACHINE}-${OS}"
 
 #name for FLINT shared library

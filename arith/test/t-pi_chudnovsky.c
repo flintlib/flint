@@ -34,6 +34,8 @@ int main(void)
 {
     slong k;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("pi_chudnovsky....");
     fflush(stdout);
 
@@ -58,7 +60,7 @@ int main(void)
         mpfr_clear(y);
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

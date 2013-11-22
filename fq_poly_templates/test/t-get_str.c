@@ -35,12 +35,10 @@ main(void)
     char *str;
     TEMPLATE(T, poly_t) a;
     TEMPLATE(T, ctx_t) ctx;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("get_str....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     TEMPLATE(T, ctx_randtest)(ctx, state);
     
@@ -59,6 +57,7 @@ main(void)
     TEMPLATE(T, poly_clear)(a, ctx);
     TEMPLATE(T, ctx_clear)(ctx);
 
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

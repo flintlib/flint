@@ -106,13 +106,13 @@ int main(void)
         abort();
     }
 
-    flint_randclear(state);
+    
 
     fmpz_clear(x);
     fmpz_clear(y);
     fmpz_clear(z);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

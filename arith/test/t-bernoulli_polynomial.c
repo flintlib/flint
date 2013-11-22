@@ -42,6 +42,8 @@ int main()
 
     slong k, n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("bernoulli_polynomial....");
     fflush(stdout);
 
@@ -81,7 +83,7 @@ int main()
         fmpq_poly_clear(Q);
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

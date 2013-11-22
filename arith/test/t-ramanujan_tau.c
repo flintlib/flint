@@ -90,6 +90,8 @@ void consistency_check(slong n)
 
 int main(void)
 {
+    FLINT_TEST_INIT(state);
+
     flint_printf("ramanujan_tau....");
     fflush(stdout);
 
@@ -164,7 +166,7 @@ int main(void)
     consistency_check(11);
     consistency_check(100);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

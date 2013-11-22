@@ -125,9 +125,9 @@ int main()
         flint_free(primes);
     }
 
-    flint_randclear(state);
+    
     mpz_clear(num1);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

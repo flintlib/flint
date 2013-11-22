@@ -35,12 +35,10 @@ int
 main(void)
 {
     slong m, n, rep;
-    flint_rand_t state;
-
+    FLINT_TEST_INIT(state);
+    
     printf("add/sub/neg....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (rep = 0; rep < 500; rep++)
     {
@@ -80,8 +78,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }
