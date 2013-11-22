@@ -24,6 +24,8 @@ TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES)) \
 
 TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
 
+VALGRIND_RUN = $(patsubst %, %_VALGRIND_RUN, $(TESTS))
+
 PROFS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
@@ -64,6 +66,8 @@ tests: $(TESTS)
 
 check: tests $(TESTS_RUN)
 
+valgrind: tests $(VALGRIND_RUN)
+
 -include $(patsubst %, %.d, $(TESTS))
 
 ifeq ($(FLINT_SHARED), 0)
@@ -78,5 +82,8 @@ $(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
 
 %_RUN: %
 	@$<
+
+%_VALGRIND_RUN: %
+	valgrind --track-origins=yes --leak-check=full --show-reachable=yes --log-file="$*.valgrind" $<
 
 .PHONY: profile tune clean check tests all shared static %_RUN
