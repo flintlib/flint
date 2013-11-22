@@ -19,55 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2013 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
 #include "fmpz_poly.h"
 
-/* e = 3 :
-
-prod(k>=1, 1-x^k )^3 = sum(n>=0, (-1)^n*(2*n+1)*x^(n*(n+1)/2) ) (jacobi)
-
-Sparse formulas are used when e = 1, 2, 3, 4, 6.
-
-Otherwise the computation is reduced to one of those cases,
-followed by exponentiation.
-
-note: P4 = P1 * P3
-
-products?
-P4 = P2 ^ 2
-P5 = P2 * P3
-P7 = P1 * P6
-P8 = P2 * P6
-P9 = P3 * P6
-P12 = P6 ^ 2
-P24 = P6 ^ 4
-
-
-*/
-
 static void
-_eta_one(fmpz * f, slong len)
+_eta_one(fmpz * c, slong N)
 {
     slong k, n;
+    int s;
 
-    _fmpz_vec_zero(f, len);
-    f[0] = 1;
+    _fmpz_vec_zero(c, N);
 
-    for (n = k = 1; n + 4*k + 2 < len; k += 2)
+    /* P */
+    for (k = 0, n = 0, s = 1; n < N; n += 3 * k + 1, k++, s = -s)
     {
-        f[n] = -1;
-        f[n + k] = -1;
-        f[n + 3*k + 1] = 1;
-        f[n + 4*k + 2] = 1;
-        n += 6*k + 5;
+        c[n] = s;
     }
 
-    if (n < len) f[n] = -1;
-    if (n + k < len) f[n + k] = -1;
-    if (n + 3*k + 1 < len) f[n + 3*k + 1] = 1;
+    /* Q */
+    for (k = 1, n = 2, s = -1; n < N; n += 3 * k + 2, k++, s = -s)
+    {
+        c[n] = s;
+    }
 }
 
 void
@@ -78,82 +54,115 @@ _eta_two(fmpz * c, slong N)
 
     _fmpz_vec_zero(c, N);
 
-#if 0
-    for (k1=0, n1=0, s=1; n1 < N; n1+=3*k1+1, k1++, s=-s)
-        for (k2=0, n2=0, t=s; n1 + n2 < N; n2+=3*k2+1, k2++, t=-t)
-            c[n1 + n2] += t;
-
-    for (k1=1, n1=2, s=-1; n1 < N; n1+=3*k1+2, k1++, s=-s)
-        for (k2=1, n2=2, t=-s; n1 + n2 < N; n2+=3*k2+2, k2++, t=-t)
-            c[n1 + n2] += t;
-#endif
-
-    /* TODO: SIGN ALWAYS -1 AT START OF IT? */
-
     /* P^2 */
-#if 1
-    for (k1=0, n1=0, s=1; 2 * n1 < N; n1+=3*k1+1, k1++)
-        c[2 * n1] += s;
-    for (k1=0, n1=0, s=2; n1 < N; n1+=3*k1+1, k1++, s=-s)
-        for (k2=k1+1, n2=n1+3*k1+1, t=-2; n1 + n2 < N; n2+=3*k2+1, k2++, t=-t)
-            c[n1 + n2] += t;
+    for (k1 = 0, n1 = 0; 2 * n1 < N; n1 += 3 * k1 + 1, k1++)
+    {
+        c[2 * n1] += 1;
+    }
+    for (k1 = 0, n1 = 0; n1 < N; n1 += 3 * k1 + 1, k1++)
+    {
+        for (k2 = k1 + 1, n2 = n1 + 3 * k1 + 1, s = -2;
+                n1 + n2 < N; n2 += 3 * k2 + 1, k2++, s = -s)
+        {
+            c[n1 + n2] += s;
+        }
+    }
 
     /* Q^2 */
-    for (k1=1, n1=2, s=1; 2 * n1 < N; n1+=3*k1+2, k1++)
-        c[2 * n1] += s;
-    for (k1=1, n1=2, s=-2; n1 < N; n1+=3*k1+2, k1++, s=-s)
-        for (k2=k1+1, n2=n1+3*k1+2, t=-2; n1 + n2 < N; n2+=3*k2+2, k2++, t=-t)
-            c[n1 + n2] += t;
-#endif
+    for (k1 = 1, n1 = 2; 2 * n1 < N; n1 += 3 * k1 + 2, k1++)
+    {
+        c[2 * n1] += 1;
+    }
+    for (k1 = 1, n1 = 2; n1 < N; n1 += 3 * k1 + 2, k1++)
+    {
+        for (k2 = k1 + 1, n2 = n1 + 3 * k1 + 2, s = -2;
+                n1 + n2 < N; n2 += 3 * k2 + 2, k2++, s = -s)
+        {
+            c[n1 + n2] += s;
+        }
+    }
 
     /* 2PQ */
-    for (k1=0, n1=0, s=2; n1 < N; n1+=3*k1+1, k1++, s=-s)
-        for (k2=1, n2=2, t=-s; n1 + n2 < N; n2+=3*k2+2, k2++, t=-t)
-            c[n1 + n2] += t;
-}
-
-static void
-_eta_three(fmpz * f, slong len)
-{
-    slong k, n;
-
-    _fmpz_vec_zero(f, len);
-    f[0] = 1;
-
-    for (n = k = 1; k < len; k += n)
+    for (k1 = 0, n1 = 0, s = 2; n1 < N; n1 += 3 * k1 + 1, k1++, s = -s)
     {
-        f[k] = (n % 2) ? (-(2*n+1)) : (2*n+1);
-        n++;
+        for (k2 = 1, n2 = 2, t = -s;
+                n1 + n2 < N; n2 += 3 * k2 + 2, k2++, t = -t)
+        {
+            c[n1 + n2] += t;
+        }
     }
 }
 
-/* TODO: this can be done! (1 * 3 multiplication) */
+/* R */
 static void
-_eta_four(fmpz * f, long slen)
+_eta_three(fmpz * c, slong N)
 {
+    slong k, n;
 
+    _fmpz_vec_zero(c, N);
+
+    for (k = 0, n = 0; n < N; n += k + 1, k++)
+        c[n] = (k % 2) ? -(2 * k + 1) : (2 * k + 1);
 }
 
-/* TODO: use squaring! */
+/* (P + Q) * R */
 static void
-_eta_six(fmpz * f, slong len)
+_eta_four(fmpz * c, long N)
 {
-    slong j, k, jv, kv;
+    slong k1, n1, k2, n2;
+
+    _fmpz_vec_zero(c, N);
+
+    /* P * R */
+    for (k1 = 0, n1 = 0; n1 < N; n1 += 3 * k1 + 1, k1++)
+    {
+        for (k2 = 0, n2 = 0; n1 + n2 < N; n2 += k2 + 1, k2++)
+        {
+            if ((k1 + k2) % 2)
+                fmpz_sub_ui(c + n1 + n2, c + n1 + n2, 2 * k2 + 1);
+            else
+                fmpz_add_ui(c + n1 + n2, c + n1 + n2, 2 * k2 + 1);
+        }
+    }
+
+    /* Q * R */
+    for (k1 = 1, n1 = 2; n1 < N; n1 += 3 * k1 + 2, k1++)
+    {
+        for (k2 = 0, n2 = 0; n1 + n2 < N; n2 += k2 + 1, k2++)
+        {
+            if ((k1 + k2) % 2)
+                fmpz_sub_ui(c + n1 + n2, c + n1 + n2, 2 * k2 + 1);
+            else
+                fmpz_add_ui(c + n1 + n2, c + n1 + n2, 2 * k2 + 1);
+        }
+    }
+}
+
+static void
+_eta_six(fmpz * c, slong N)
+{
+    slong k1, n1, k2, n2;
     fmpz_t tmp;
 
-    _fmpz_vec_zero(f, len);
+    _fmpz_vec_zero(c, N);
     fmpz_init(tmp);
 
-    for (j = jv = 0; jv < len; jv += ++j)
+    /* R^2 */
+    for (k1 = 0, n1 = 0; 2 * n1 < N; n1 += k1 + 1, k1++)
     {
-        fmpz_set_ui(tmp, 2*j + 1);
+        fmpz_set_ui(c + 2 * n1, 2 * k1 + 1);
+        fmpz_mul_ui(c + 2 * n1, c + 2 * n1, 2 * k1 + 1);
+    }
+    for (k1 = 0, n1 = 0; n1 < N; n1 += k1 + 1, k1++)
+    {
+        fmpz_set_ui(tmp, 2 * (2 * k1 + 1));
 
-        for (k = kv = 0; jv + kv < len; kv += ++k)
+        for (k2 = k1 + 1, n2 = n1 + k1 + 1; n1 + n2 < N; n2 += k2 + 1, k2++)
         {
-            if ((j+k) & 1)
-                fmpz_submul_ui(f + jv + kv, tmp, 2*k+1);
+            if ((k1 + k2) % 2)
+                fmpz_submul_ui(c + n1 + n2, tmp, 2 * k2 + 1);
             else
-                fmpz_addmul_ui(f + jv + kv, tmp, 2*k+1);
+                fmpz_addmul_ui(c + n1 + n2, tmp, 2 * k2 + 1);
         }
     }
 
@@ -163,7 +172,16 @@ _eta_six(fmpz * f, slong len)
 void
 _fmpz_poly_eta_qexp(fmpz * f, slong e, slong len)
 {
-    if (e == 1)
+    if (e < 0)
+    {
+        fmpz * t = _fmpz_vec_init(len);
+        _fmpz_poly_eta_qexp(t, -e, len);
+        _fmpz_poly_inv_series(f, t, len);
+        _fmpz_vec_clear(t, len);
+        return;
+    }
+
+    else if (e == 1)
     {
         _eta_one(f, len);
     }
@@ -185,29 +203,26 @@ _fmpz_poly_eta_qexp(fmpz * f, slong e, slong len)
     }
     else
     {
-        fmpz *t, *u;
+        fmpz *t;
 
-        t = u = _fmpz_vec_init(len);
+        t = _fmpz_vec_init(len);
 
-        if (e < 0)
-            t = f;
-
-        else if (e % 6 == 0)
+        if (e % 6 == 0)
         {
             _eta_six(t, len);
             e /= 6;
-        }
-        else if (e % 3 == 0)
-        {
-            _eta_three(t, len);
-            e /= 3;
         }
         else if (e % 4 == 0)
         {
             _eta_four(t, len);
             e /= 4;
         }
-        else if (e % 2 == 0)
+        else if (e % 3 == 0)
+        {
+            _eta_three(t, len);
+            e /= 3;
+        }
+        else if (e % 2 == 0 && 0)
         {
             _eta_two(t, len);
             e /= 2;
@@ -217,12 +232,7 @@ _fmpz_poly_eta_qexp(fmpz * f, slong e, slong len)
             _eta_one(t, len);
         }
 
-        if (e < 0)
-        {
-            _fmpz_poly_pow_trunc(u, t, -e, len);
-            _fmpz_poly_inv_series(f, u, len);
-        }
-        else if (e == 2)
+        if (e == 2)
         {
             _fmpz_poly_sqrlow(f, t, len, len);
         }
@@ -237,7 +247,7 @@ _fmpz_poly_eta_qexp(fmpz * f, slong e, slong len)
             _fmpz_poly_pow_trunc(f, t, e, len);
         }
 
-        _fmpz_vec_clear(u, len);
+        _fmpz_vec_clear(t, len);
     }
 }
 
