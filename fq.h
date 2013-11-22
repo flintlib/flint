@@ -21,7 +21,7 @@
 
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
-    Copyright (C) 2013 Mike hansen
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
