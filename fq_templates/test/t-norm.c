@@ -40,12 +40,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("norm... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Compare with product of Galois conjugates */
     for (i = 0; i < 2000; i++)
@@ -53,7 +51,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
         fmpz_t x, y;
-        long j;
+        slong j;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -89,7 +87,7 @@ main(void)
             for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
             {
                 TEMPLATE(T, frobenius)(c, a, j, ctx);
-                flint_printf("sigma^%ld = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
+                flint_printf("sigma^%wd = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             }
             abort();
         }
@@ -103,8 +101,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

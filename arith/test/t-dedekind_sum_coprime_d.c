@@ -39,6 +39,8 @@ int main(void)
     fmpq_t s2;
     slong h, k;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("dedekind_sum_coprime_d....");
     fflush(stdout);
 
@@ -78,7 +80,7 @@ int main(void)
     fmpz_clear(kk);
     fmpq_clear(s2);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

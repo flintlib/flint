@@ -43,6 +43,8 @@ int main()
     fmpz_t den2;
     slong n, N;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("bernoulli_number....");
     fflush(stdout);
 
@@ -112,7 +114,7 @@ int main()
     fmpz_clear(num2);
     fmpz_clear(den2);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

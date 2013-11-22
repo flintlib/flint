@@ -34,13 +34,11 @@ int
 main(void)
 {
     int j, i, result;
-    flint_rand_t state;
     fq_zech_ctx_t ctx;
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("mul_ui... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (j = 0; j < 50; j++)
     {
@@ -70,7 +68,7 @@ main(void)
             {
                 flint_printf("FAIL:\n\n");
                 fq_zech_ctx_print(ctx);
-                flint_printf("\nx = %lu\n", x);
+                flint_printf("\nx = %wu\n", x);
                 flint_printf("aa = ");
                 fq_nmod_print_pretty(aa, ctx->fq_nmod_ctx);
                 flint_printf("\nbb = ");
@@ -137,8 +135,7 @@ main(void)
     }
 
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

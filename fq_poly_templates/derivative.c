@@ -30,10 +30,10 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_derivative)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len,
+_TEMPLATE(T, poly_derivative)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len,
                     const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     for (i = 1; i < len; i++)
         TEMPLATE(T, mul_ui)(rop + (i - 1), op + i, i, ctx);
@@ -42,7 +42,7 @@ _TEMPLATE(T, poly_derivative)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struc
 void
 TEMPLATE(T, poly_derivative)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if (len < 2)
     {

@@ -30,10 +30,10 @@
 #include "fq_poly.h"
 
 void
-fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
+fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, slong d,
                     fmpz_mod_poly_t modulus, const char *var)
 {
-    long nz;
+    slong nz;
     int i, j;
 
     /* Count number of nonzero coefficients */
@@ -48,7 +48,7 @@ fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, long d,
 
     ctx->len = nz;
     ctx->a = _fmpz_vec_init(ctx->len);
-    ctx->j = flint_malloc(ctx->len * sizeof(long));
+    ctx->j = flint_malloc(ctx->len * sizeof(slong));
 
     /* Copy the polynomial */
     j = 0;

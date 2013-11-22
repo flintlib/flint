@@ -39,17 +39,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("scalar_submul_fq... ");
     fflush(stdout);
 
-    flint_randinit(state);
-
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -92,7 +90,7 @@ main(void)
     /* Check that b += x*a is the same as c = b + x*a */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -133,8 +131,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

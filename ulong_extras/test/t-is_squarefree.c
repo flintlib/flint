@@ -43,6 +43,8 @@ int main(void)
 {
     int s, k;
 
+    FLINT_TEST_INIT(state);
+    
     flint_printf("is_squarefree....");
     fflush(stdout);
 
@@ -78,7 +80,7 @@ int main(void)
         abort();
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

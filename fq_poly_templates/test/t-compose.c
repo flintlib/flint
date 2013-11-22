@@ -39,12 +39,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("compose... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing of the first argument */
     for (i = 0; i < 50; i++)
@@ -122,7 +120,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) f, g, h, s, t;
-        long k;
+        slong k;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         TEMPLATE(T, poly_init)(f, ctx);
@@ -164,8 +162,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

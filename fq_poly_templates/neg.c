@@ -30,10 +30,10 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len,
+_TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len,
              const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
         TEMPLATE(T, neg)(rop + i, op + i, ctx);

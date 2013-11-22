@@ -244,7 +244,7 @@ void fq_poly_factor_with_kaltofen_shoup(fq_poly_factor_t res,
     performs a square-free factorisation, and finally runs
     Kaltofen-Shoup on all the individual square-free factors.
 
-void fq_poly_iterated_frobenius_preinv(fq_poly_t *rop, long n,
+void fq_poly_iterated_frobenius_preinv(fq_poly_t *rop, slong n,
                                        const fq_poly_t v, const fq_poly_t vinv,
                                        const fq_ctx_t ctx)
 

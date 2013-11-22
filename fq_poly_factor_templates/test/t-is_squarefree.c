@@ -38,9 +38,8 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("is_squarefree....");
     fflush(stdout);
 
@@ -97,7 +96,7 @@ main(void)
         {
             flint_printf("FAIL: ");
             TEMPLATE(T, ctx_print)(ctx);
-            flint_printf(" %ld, %d\n", max_exp, v);
+            flint_printf(" %wd, %d\n", max_exp, v);
             TEMPLATE(T, poly_print)(poly, ctx); flint_printf("\n");
             abort();
         }
@@ -110,8 +109,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

@@ -35,7 +35,7 @@
 #endif
 
 int
-_fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+_fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     char *buf;
     FILE *file;
@@ -73,7 +73,7 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
         if (d == atoi(tmp))
         {
             fmpz_mod_poly_t mod;
-            long i;
+            slong i;
             char *ptr;
 
             fmpz_mod_poly_init(mod, p);
@@ -94,6 +94,7 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 
             fq_ctx_init_modulus(ctx, p, d, mod, var);
 
+            fmpz_mod_poly_clear(mod);
             fclose(file);
             flint_free(buf);
             return 1;
@@ -105,7 +106,7 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 }
 
 void
-fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
+fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     int result;
     if (fmpz_cmp_ui(p, 109987) > 0)
@@ -121,7 +122,7 @@ fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
         flint_printf
             ("Exception (fq_ctx_init_conway).  The polynomial for \n(p,d) = (");
         fmpz_print(p);
-        flint_printf(",%ld) is not present in the database.\n", d);
+        flint_printf(",%wd) is not present in the database.\n", d);
         abort();
     }
 }

@@ -32,8 +32,8 @@
 
 void
 _TEMPLATE(T, poly_mullow_classical)(TEMPLATE(T, struct) * rop,
-                          const TEMPLATE(T, struct) * op1, long len1,
-                          const TEMPLATE(T, struct) * op2, long len2, long n,
+                          const TEMPLATE(T, struct) * op1, slong len1,
+                          const TEMPLATE(T, struct) * op2, slong len2, slong n,
                           const TEMPLATE(T, ctx_t) ctx)
 {
     if ((len1 == 1 && len2 == 1) || n == 1)
@@ -42,7 +42,7 @@ _TEMPLATE(T, poly_mullow_classical)(TEMPLATE(T, struct) * rop,
     }
     else
     {
-        long i;
+        slong i;
 
         _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(rop, op1, FLINT_MIN(len1, n), op2, ctx);
 
@@ -59,10 +59,10 @@ _TEMPLATE(T, poly_mullow_classical)(TEMPLATE(T, struct) * rop,
 
 void
 TEMPLATE(T, poly_mullow_classical)(TEMPLATE(T, poly_t) rop,
-                         const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, long n,
+                         const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n,
                          const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len = op1->length + op2->length - 1;
+    const slong len = op1->length + op2->length - 1;
 
     if (op1->length == 0 || op2->length == 0 || n == 0)
     {

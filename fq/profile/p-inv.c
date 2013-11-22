@@ -20,8 +20,10 @@
 /******************************************************************************
 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
+#include "flint.h"
 #include "fq.h"
 #include <stdio.h>
 #include "profiler.h"
@@ -33,15 +35,15 @@
 int
 main()
 {
-    flint_rand_t state;
     timeit_t t0;
 
-    long i, d, cpu, wall;
+    slong i, d, cpu, wall;
     fmpz_t p;
     fq_ctx_t ctx;
     fq_t a,b;
 
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_ui(p, n_randprime(state, 2+ n_randint(state,3),1));
     d = n_randint(state,10)+1;
@@ -56,7 +58,7 @@ main()
     timeit_start(t0);
     for(i=0;i<REPS;i++) fq_inv(b,a,ctx);
     timeit_stop(t0);
-    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , t0->cpu , t0->wall );
+    flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , t0->cpu , t0->wall );
 
     flint_printf("random inversions: \n");
 
@@ -72,9 +74,10 @@ main()
     wall = wall + t0->wall;
     }
 
-    flint_printf ( " cpu = %ld ms, wall = %ld ms \n " , cpu , wall );
+    flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , cpu , wall );
 
-
+    FLINT_TEST_CLEANUP(state);
+    
     return 0;
 
 }

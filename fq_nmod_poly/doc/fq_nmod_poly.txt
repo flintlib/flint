@@ -38,7 +38,7 @@ void fq_nmod_poly_init(fq_nmod_poly_t poly, const fq_nmod_ctx_t ctx)
     must be made after finishing with the \code{fq_nmod_poly_t} to free the
     memory used by the polynomial.
 
-void fq_nmod_poly_init2(fq_nmod_poly_t poly, long alloc,
+void fq_nmod_poly_init2(fq_nmod_poly_t poly, slong alloc,
                         const fq_nmod_ctx_t ctx)
 
     Initialises \code{poly} with space for at least \code{alloc}
@@ -47,7 +47,7 @@ void fq_nmod_poly_init2(fq_nmod_poly_t poly, long alloc,
     \code{fq_nmod_poly_clear()} must be made after finishing with the
     \code{fq_nmod_poly_t} to free the memory used by the polynomial.
 
-void fq_nmod_poly_realloc(fq_nmod_poly_t poly, long alloc,
+void fq_nmod_poly_realloc(fq_nmod_poly_t poly, slong alloc,
                           const fq_nmod_ctx_t ctx)
 
     Reallocates the given polynomial to have space for \code{alloc}
@@ -56,7 +56,7 @@ void fq_nmod_poly_realloc(fq_nmod_poly_t poly, long alloc,
     \code{alloc} the polynomial is first truncated to length
     \code{alloc}.
 
-void fq_nmod_poly_fit_length(fq_nmod_poly_t poly, long len,
+void fq_nmod_poly_fit_length(fq_nmod_poly_t poly, slong len,
                               const fq_nmod_ctx_t ctx)
 
     If \code{len} is greater than the number of coefficients currently
@@ -69,7 +69,7 @@ void fq_nmod_poly_fit_length(fq_nmod_poly_t poly, long len,
     least doubling the number of allocated coefficients when length is
     larger than the number of coefficients currently allocated.
 
-void _fq_nmod_poly_set_length(fq_nmod_poly_t poly, long newlen,
+void _fq_nmod_poly_set_length(fq_nmod_poly_t poly, slong newlen,
                               const fq_nmod_ctx_t ctx)
 
     Sets the coefficients of \code{poly} beyond \code{len} to zero and
@@ -87,7 +87,7 @@ void _fq_nmod_poly_normalise(fq_nmod_poly_t poly, const fq_nmod_ctx_t ctx)
     zero.  This function is mainly used internally, as all functions
     guarantee normalisation.
 
-void _fq_nmod_poly_normalise2(fq_nmod_struct *poly, long *length,
+void _fq_nmod_poly_normalise2(fq_nmod_struct *poly, slong *length,
                                const fq_nmod_ctx_t ctx)
 
     Sets the length \code{length} of \code{(poly,length)} so that the
@@ -95,7 +95,7 @@ void _fq_nmod_poly_normalise2(fq_nmod_struct *poly, long *length,
     length is set to zero. This function is mainly used internally, as
     all functions guarantee normalisation.
 
-void fq_nmod_poly_truncate(fq_nmod_poly_t poly, long newlen,
+void fq_nmod_poly_truncate(fq_nmod_poly_t poly, slong newlen,
                            const fq_nmod_ctx_t ctx)
 
     Truncates the polynomial to length at most~$n$.
@@ -146,25 +146,25 @@ fq_nmod_struct * fq_nmod_poly_lead(const fq_nmod_poly_t poly,
 *******************************************************************************
 
 void fq_nmod_poly_randtest(fq_nmod_poly_t f, flint_rand_t state,
-                           long len, const fq_nmod_ctx_t ctx)
+                           slong len, const fq_nmod_ctx_t ctx)
 
     Sets $f$ to a random polynomial of length at most \code{len}
     with entries in the field described by \code{ctx}.
 
 void fq_nmod_poly_randtest_not_zero(fq_nmod_poly_t f, flint_rand_t state,
-                                    long len, const fq_nmod_ctx_t ctx)
+                                    slong len, const fq_nmod_ctx_t ctx)
 
     Same as \code{fq_nmod_poly_randtest} but guarantees that the polynomial
     is not zero.
 
 void fq_nmod_poly_randtest_monic(fq_nmod_poly_t f, flint_rand_t state,
-                                 long len, const fq_nmod_ctx_t ctx)
+                                 slong len, const fq_nmod_ctx_t ctx)
 
     Sets $f$ to a random monic polynomial of length \code{len} with
     entries in the field described by \code{ctx}.
 
 void fq_nmod_poly_randtest_irreducible(fq_nmod_poly_t f, flint_rand_t state,
-                                       long len, const fq_nmod_ctx_t ctx)
+                                       slong len, const fq_nmod_ctx_t ctx)
 
     Sets $f$ to a random monic, irreducible polynomial of length
     \code{len} with entries in the field described by \code{ctx}.
@@ -175,7 +175,7 @@ void fq_nmod_poly_randtest_irreducible(fq_nmod_poly_t f, flint_rand_t state,
 
 *******************************************************************************
 
-void _fq_nmod_poly_set(fq_nmod_struct *rop, const fq_nmod_struct *op, long len,
+void _fq_nmod_poly_set(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                   const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, len}) to \code{(op, len)}.
@@ -195,7 +195,7 @@ void fq_nmod_poly_swap(fq_nmod_poly_t op1, fq_nmod_poly_t op2,
 
     Swaps the two polynomials \code{op1} and \code{op2}.
 
-void _fq_nmod_poly_zero(fq_nmod_struct *rop, long len, const fq_nmod_ctx_t ctx)
+void _fq_nmod_poly_zero(fq_nmod_struct *rop, slong len, const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, len)} to the zero polynomial.
 
@@ -217,7 +217,7 @@ void fq_nmod_poly_make_monic(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
      Sets \code{rop} to \code{op}, normed to have leading coefficient 1.
 
 void _fq_nmod_poly_make_monic(fq_nmod_struct *rop, const fq_nmod_struct *op,
-                              long length, const fq_nmod_ctx_t ctx)
+                              slong length, const fq_nmod_ctx_t ctx)
 
      Sets \code{rop} to \code{(op,length)}, normed to have leading coefficient 1.
      Assumes that \code{rop} has enough space for the polynomial, assumes that
@@ -229,12 +229,12 @@ void _fq_nmod_poly_make_monic(fq_nmod_struct *rop, const fq_nmod_struct *op,
 
 *******************************************************************************
 
-void fq_nmod_poly_get_coeff(fq_nmod_t x, const fq_nmod_poly_t poly, long n,
+void fq_nmod_poly_get_coeff(fq_nmod_t x, const fq_nmod_poly_t poly, slong n,
                             const fq_nmod_ctx_t ctx)
 
     Sets $x$ to the coefficient of $X^n$ in \code{poly}.
 
-void fq_nmod_poly_set_coeff(fq_nmod_poly_t poly, long n, const fq_nmod_t x,
+void fq_nmod_poly_set_coeff(fq_nmod_poly_t poly, slong n, const fq_nmod_t x,
                             const fq_nmod_ctx_t ctx)
 
     Sets the coefficient of $X^n$ in \code{poly} to $x$.
@@ -290,8 +290,8 @@ int fq_nmod_poly_equal_fq_nmod(const fq_nmod_poly_t poly, const fq_nmod_t c,
 *******************************************************************************
 
 void _fq_nmod_poly_add(fq_nmod_struct *res,
-                  const fq_nmod_struct *poly1, long len1,
-                  const fq_nmod_struct *poly2, long len2,
+                  const fq_nmod_struct *poly1, slong len1,
+                  const fq_nmod_struct *poly2, slong len2,
                   const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to the sum of \code{(poly1,len1)} and \code{(poly2,len2)}.
@@ -302,8 +302,8 @@ void fq_nmod_poly_add(fq_nmod_poly_t res, const fq_nmod_poly_t poly1,
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
 void _fq_nmod_poly_sub(fq_nmod_struct *res,
-                  const fq_nmod_struct *poly1, long len1,
-                  const fq_nmod_struct *poly2, long len2,
+                  const fq_nmod_struct *poly1, slong len1,
+                  const fq_nmod_struct *poly2, slong len2,
                   const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to the difference of \code{(poly1,len1)} and
@@ -314,7 +314,7 @@ void fq_nmod_poly_sub(fq_nmod_poly_t res, const fq_nmod_poly_t poly1,
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
 
-void _fq_nmod_poly_neg(fq_nmod_struct *rop, const fq_nmod_struct *op, long len,
+void _fq_nmod_poly_neg(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                   const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to the additive inverse of \code{(poly,len)}.
@@ -331,7 +331,7 @@ void fq_nmod_poly_neg(fq_nmod_poly_t res, const fq_nmod_poly_t poly,
 *******************************************************************************
 
 void _fq_nmod_poly_scalar_mul_fq_nmod(fq_nmod_struct *rop,
-         const fq_nmod_struct *op, long len, const fq_nmod_t x,
+         const fq_nmod_struct *op, slong len, const fq_nmod_t x,
          const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop,len)} to the product of \code{(op,len)} by the
@@ -344,7 +344,7 @@ void fq_nmod_poly_scalar_mul_fq_nmod(fq_nmod_poly_t rop,
     scalar \code{x}, in the context defined by \code{ctx}.
 
 void _fq_nmod_poly_scalar_addmul_fq_nmod(fq_nmod_struct *rop,
-        const fq_nmod_struct *op, long len, const fq_nmod_t x,
+        const fq_nmod_struct *op, slong len, const fq_nmod_t x,
         const fq_nmod_ctx_t ctx)
 
     Adds to \code{(rop,len)} the product of \code{(op,len)} by the
@@ -360,7 +360,7 @@ void fq_nmod_poly_scalar_addmul_fq_nmod(fq_nmod_poly_t rop,
     scalar \code{x}, in the context defined by \code{ctx}.
 
 void _fq_nmod_poly_scalar_submul_fq_nmod(fq_nmod_struct *rop,
-        const fq_nmod_struct *op, long len, const fq_nmod_t x,
+        const fq_nmod_struct *op, slong len, const fq_nmod_t x,
         const fq_nmod_ctx_t ctx)
 
     Substracts from \code{(rop,len)} the product of \code{(op,len)} by the
@@ -381,8 +381,8 @@ void fq_nmod_poly_scalar_submul_fq_nmod(fq_nmod_poly_t rop,
 *******************************************************************************
 
 void _fq_nmod_poly_mul_classical(fq_nmod_struct *rop,
-                                 const fq_nmod_struct *op1, long len1,
-                                 const fq_nmod_struct *op2, long len2,
+                                 const fq_nmod_struct *op1, slong len1,
+                                 const fq_nmod_struct *op2, slong len2,
                                  const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)}
@@ -401,8 +401,8 @@ void fq_nmod_poly_mul_classical(fq_nmod_poly_t rop,
     using classical polynomial multiplication.
 
 void _fq_nmod_poly_mul_reorder(fq_nmod_struct *rop,
-                                const fq_nmod_struct *op1, long len1,
-                                const fq_nmod_struct *op2, long len2,
+                                const fq_nmod_struct *op1, slong len1,
+                                const fq_nmod_struct *op2, slong len2,
                                 const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)}
@@ -438,7 +438,7 @@ void fq_nmod_poly_mul_reorder(fq_nmod_poly_t rop,
     degree~$n$ is large.
 
 void _fq_nmod_poly_mul_KS(fq_nmod_struct *rop, const fq_nmod_struct *op1,
-                          long len1, const fq_nmod_struct *op2, long len2,
+                          slong len1, const fq_nmod_struct *op2, slong len2,
                           const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)}
@@ -457,8 +457,8 @@ void fq_nmod_poly_mul_KS(fq_nmod_poly_t rop,
     this problem to multiplying two polynomials over the integers.
 
 void _fq_nmod_poly_mul(fq_nmod_struct *rop,
-                       const fq_nmod_struct *op1, long len1,
-                       const fq_nmod_struct *op2, long len2,
+                       const fq_nmod_struct *op1, slong len1,
+                       const fq_nmod_struct *op2, slong len2,
                        const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)}
@@ -473,8 +473,8 @@ void fq_nmod_poly_mul(fq_nmod_poly_t rop,
     choosing an appropriate algorithm.
 
 void _fq_nmod_poly_mullow_classical(fq_nmod_struct *rop,
-                                    const fq_nmod_struct *op1, long len1,
-                                    const fq_nmod_struct *op2, long len2, long n,
+                                    const fq_nmod_struct *op1, slong len1,
+                                    const fq_nmod_struct *op2, slong len2, slong n,
                                     const fq_nmod_ctx_t ctx)
 
     Sets \code{(res, n)} to the first $n$ coefficients of
@@ -484,14 +484,14 @@ void _fq_nmod_poly_mullow_classical(fq_nmod_struct *rop,
     \code{len1} nor \code{len2} is zero.
 
 void fq_nmod_poly_mullow_classical(fq_nmod_poly_t rop,
-    const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, long n, const fq_nmod_ctx_t ctx)
+    const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, slong n, const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2},
     computed using the classical or schoolbook method.
 
 void _fq_nmod_poly_mullow_KS(fq_nmod_struct *rop,
-                             const fq_nmod_struct *op1, long len1,
-                             const fq_nmod_struct *op2, long len2, long n,
+                             const fq_nmod_struct *op1, slong len1,
+                             const fq_nmod_struct *op2, slong len2, slong n,
                              const fq_nmod_ctx_t ctx)
 
     Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
@@ -504,13 +504,13 @@ void _fq_nmod_poly_mullow_KS(fq_nmod_struct *rop,
 
 void fq_nmod_poly_mullow_KS(fq_nmod_poly_t rop,
                             const fq_nmod_poly_t op1, const fq_nmod_poly_t op2,
-                            long n, const fq_nmod_ctx_t ctx)
+                            slong n, const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
 void _fq_nmod_poly_mullow(fq_nmod_struct *rop,
-                          const fq_nmod_struct *op1, long len1,
-                          const fq_nmod_struct *op2, long len2, long n,
+                          const fq_nmod_struct *op1, slong len1,
+                          const fq_nmod_struct *op2, slong len2, slong n,
                           const fq_nmod_ctx_t ctx)
 
     Sets \code{(res, n)} to the lowest $n$ coefficients of the product of
@@ -520,7 +520,7 @@ void _fq_nmod_poly_mullow(fq_nmod_struct *rop,
     the inputs.  Does not support aliasing between the inputs and the output.
 
 void fq_nmod_poly_mullow(fq_nmod_poly_t rop,
-                         const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, long n,
+                         const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, slong n,
                          const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to the lowest $n$ coefficients of the product of
@@ -584,7 +584,7 @@ void fq_nmod_poly_mulmod_preinv(fq_nmod_poly_t res, const fq_nmod_poly_t poly1,
 *******************************************************************************
 
 void _fq_nmod_poly_sqr_classical(fq_nmod_struct *rop,
-                                 const fq_nmod_struct *op, long len,
+                                 const fq_nmod_struct *op, slong len,
                                  const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)},
@@ -602,7 +602,7 @@ void fq_nmod_poly_sqr_classical(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
 
 
 void _fq_nmod_poly_sqr_KS(fq_nmod_struct *rop, const fq_nmod_struct *op,
-                          long len, const fq_nmod_ctx_t ctx)
+                          slong len, const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}.
 
@@ -616,7 +616,7 @@ void fq_nmod_poly_sqr_KS(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
     that is, by encoding each coefficient in $\mathbf{F}_{q}$ as an integer
     and reducing this problem to multiplying two polynomials over the integers.
 
-void _fq_nmod_poly_sqr(fq_nmod_struct *rop, const fq_nmod_struct *op, long len,
+void _fq_nmod_poly_sqr(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                        const fq_nmod_ctx_t ctx)
 
     Sets \code{(rop, 2* len - 1)} to the square of \code{(op, len)},
@@ -637,7 +637,7 @@ void fq_nmod_poly_sqr(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
 
 *******************************************************************************
 
-void _fq_nmod_poly_pow(fq_nmod_struct *rop, const fq_nmod_struct *op, long len,
+void _fq_nmod_poly_pow(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                        ulong e, const fq_nmod_ctx_t ctx)
 
     Sets \code{res = poly^e}, assuming that \code{e, len > 0} and that
@@ -812,7 +812,7 @@ fq_nmod_poly_powmod_x_fmpz_preinv(fq_nmod_poly_t res, const fmpz_t e,
 *******************************************************************************
 
 void _fq_nmod_poly_shift_left(fq_nmod_struct *rop, const fq_nmod_struct *op,
-                              long len, long n, const fq_nmod_ctx_t ctx)
+                              slong len, slong n, const fq_nmod_ctx_t ctx)
 
     Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by
     $n$ coefficients.
@@ -822,14 +822,14 @@ void _fq_nmod_poly_shift_left(fq_nmod_struct *rop, const fq_nmod_struct *op,
     \code{len + n} elements.  Supports aliasing between \code{res} and
     \code{poly}.
 
-void fq_nmod_poly_shift_left(fq_nmod_poly_t rop, const fq_nmod_poly_t op, long n,
+void fq_nmod_poly_shift_left(fq_nmod_poly_t rop, const fq_nmod_poly_t op, slong n,
                              const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero
     coefficients are inserted.
 
 void _fq_nmod_poly_shift_right(fq_nmod_struct *rop, const fq_nmod_struct *op,
-                               long len, long n, const fq_nmod_ctx_t ctx)
+                               slong len, slong n, const fq_nmod_ctx_t ctx)
 
     Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by
     $n$ coefficients.
@@ -840,7 +840,7 @@ void _fq_nmod_poly_shift_right(fq_nmod_struct *rop, const fq_nmod_struct *op,
     the top coefficients of \code{poly} are not set to zero.
 
 void fq_nmod_poly_shift_right(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
-                              long n, const fq_nmod_ctx_t ctx)
+                              slong n, const fq_nmod_ctx_t ctx)
 
     Sets \code{res} to \code{poly} shifted right by $n$ coefficients.
     If $n$ is equal to or greater than the current length of
@@ -852,7 +852,7 @@ void fq_nmod_poly_shift_right(fq_nmod_poly_t rop, const fq_nmod_poly_t op,
 
 *******************************************************************************
 
-long _fq_nmod_poly_hamming_weight(const fq_nmod_poly *op, long len,
+long _fq_nmod_poly_hamming_weight(const fq_nmod_poly *op, slong len,
                                   const fq_nmod_ctx_t ctx)
 
     Returns the number of non-zero entries in \code{(op, len)}.
@@ -869,7 +869,7 @@ long fq_nmod_poly_hamming_weight(const fq_nmod_poly_t op,
 *******************************************************************************
 
 void _fq_nmod_poly_divrem_basecase(fq_nmod_struct *Q, fq_nmod_struct *R,
-        const fq_nmod_struct *A, long lenA, const fq_nmod_struct *B, long lenB,
+        const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB,
         const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that
@@ -894,7 +894,7 @@ void fq_nmod_poly_divrem_basecase(fq_nmod_poly_t Q, fq_nmod_poly_t R,
     $p$ is prime and $f(X)$ is irreducible.
 
 void _fq_nmod_poly_divrem(fq_nmod_struct *Q, fq_nmod_struct *R,
-        const fq_nmod_struct *A, long lenA, const fq_nmod_struct *B, long lenB,
+        const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB,
         const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that
@@ -918,8 +918,8 @@ void fq_nmod_poly_divrem(fq_nmod_poly_t Q, fq_nmod_poly_t R,
     be taken for granted the context is for a finite field, that is, when
     $p$ is prime and $f(X)$ is irreducible.
 
-void _fq_nmod_poly_rem(fq_nmod_struct *R, const fq_nmod_struct *A, long lenA,
-                       const fq_nmod_struct *B, long lenB, const fq_nmod_t invB,
+void _fq_nmod_poly_rem(fq_nmod_struct *R, const fq_nmod_struct *A, slong lenA,
+                       const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB,
                        const fq_nmod_ctx_t ctx)
 
     Sets \code{R} to the remainder of the division of \code{(A,lenA)} by
@@ -997,7 +997,7 @@ void fq_nmod_poly_divrem_divconquer(fq_nmod_poly_t Q, fq_nmod_poly_t R,
     Assumes that $B$ is non-zero and that the leading coefficient of
     $B$ is invertible.
 
-void _fq_nmod_poly_div_newton_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A, slong lenA,
+void _fq_nmod_poly_div_newton_n_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A, slong lenA,
                                 const fq_nmod_struct* B, slong lenB,
                                 const fq_nmod_struct* Binv, slong lenBinv,
                                 const fq_nmod_struct ctx_t)
@@ -1013,9 +1013,10 @@ void _fq_nmod_poly_div_newton_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A,
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void fq_nmod_poly_div_newton_preinv(fq_nmod_poly_t Q, const fq_nmod_poly_t A,
-                               const fq_nmod_poly_t B, const fq_nmod_poly_t Binv,
-                               const fq_nmod_ctx_t ctx)
+void fq_nmod_poly_div_newton_n_preinv(fq_nmod_poly_t Q, const fq_nmod_poly_t A,
+                                      const fq_nmod_poly_t B,
+                                      const fq_nmod_poly_t Binv,
+                                      const fq_nmod_ctx_t ctx)
 
     Notionally computes $Q$ and $R$ such that $A = BQ + R$ with
     $\len(R) < \len(B)$, but returns only $Q$.
@@ -1023,10 +1024,13 @@ void fq_nmod_poly_div_newton_preinv(fq_nmod_poly_t Q, const fq_nmod_poly_t A,
     We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
     the inverse of the reverse of $B$ mod $x^{\len(B)}$.
 
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void _fq_nmod_poly_divrem_newton_preinv(fq_nmod_struct* Q, fq_nmod_struct* R,
+void _fq_nmod_poly_divrem_newton_n_preinv(fq_nmod_struct* Q, fq_nmod_struct* R,
                                    const fq_nmod_struct* A, slong lenA,
                                    const fq_nmod_struct* B, slong lenB,
                                    const fq_nmod_struct* Binv, slong lenBinv,
@@ -1040,15 +1044,19 @@ void _fq_nmod_poly_divrem_newton_preinv(fq_nmod_struct* Q, fq_nmod_struct* R,
     used is to call \code{div_newton_preinv()} and then multiply out
     and compute the remainder.
 
-void fq_nmod_poly_divrem_newton_preinv(fq_nmod_poly_t Q, fq_nmod_poly_t R,
+void fq_nmod_poly_divrem_newton_n_preinv(fq_nmod_poly_t Q, fq_nmod_poly_t R,
                                   const fq_nmod_poly_t A, const fq_nmod_poly_t B,
                                   const fq_nmod_poly_t Binv, const fq_nmod_ctx_t ctx)
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) <
     \len(B)$.  We assume $Binv$ is the inverse of the reverse of $B$
-    mod $x^{\len(B)}$.  The algorithm used is to call
-    \code{div_newton()} and then multiply out and compute the
-    remainder.
+    mod $x^{\len(B)}$.
+
+    It is required that the length of $A$ is less than or equal to
+    2*the length of $B$ - 2.
+
+    The algorithm used is to call \code{div_newton()} and then
+    multiply out and compute the remainder.
 
 void
 _fq_nmod_poly_inv_series_newton(fq_nmod_struct* Qinv, const fq_nmod_struct* Q, slong n,
@@ -1088,8 +1096,8 @@ void fq_nmod_poly_gcd_euclidean(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
     $P$. Except in the case where the GCD is zero, the GCD $G$ is made
     monic.
 
-long _fq_nmod_poly_gcd_euclidean(fq_nmod_struct* G, const fq_nmod_struct* A, long lenA,
-                            const fq_nmod_struct* B, long lenB,
+long _fq_nmod_poly_gcd_euclidean(fq_nmod_struct* G, const fq_nmod_struct* A, slong lenA,
+                            const fq_nmod_struct* B, slong lenB,
                             const fq_nmod_ctx_t ctx)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
@@ -1108,8 +1116,8 @@ void fq_nmod_poly_gcd(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmo
     $P$. Except in the case where the GCD is zero, the GCD $G$ is made
     monic.
 
-long _fq_nmod_poly_gcd(fq_nmod_struct* G,const fq_nmod_struct* A, long lenA,
-                  const fq_nmod_struct* B, long lenB, const fq_nmod_ctx_t ctx)
+long _fq_nmod_poly_gcd(fq_nmod_struct* G,const fq_nmod_struct* A, slong lenA,
+                  const fq_nmod_struct* B, slong lenB, const fq_nmod_ctx_t ctx)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
     \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
@@ -1124,8 +1132,8 @@ long _fq_nmod_poly_gcd(fq_nmod_struct* G,const fq_nmod_struct* A, long lenA,
 *******************************************************************************
 
 int _fq_nmod_poly_divides(fq_nmod_struct *Q,
-                     const fq_nmod_struct *A, long lenA,
-                     const fq_nmod_struct *B, long lenB, const fq_nmod_t invB,
+                     const fq_nmod_struct *A, slong lenA,
+                     const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB,
                      const fq_nmod_ctx_t ctx)
 
     Returns $1$ if \code{(B, lenB)} divides \code{(A, lenA)} exactly and
@@ -1155,7 +1163,7 @@ int fq_nmod_poly_divides(fq_nmod_poly_t Q, const fq_nmod_poly_t A, const fq_nmod
 
 *******************************************************************************
 
-void _fq_nmod_poly_derivative(fq_nmod_struct *rop, const fq_nmod_struct *op, long len,
+void _fq_nmod_poly_derivative(fq_nmod_struct *rop, const fq_nmod_struct *op, slong len,
                                          const fq_nmod_ctx_t ctx)
 
     Sets \code{(rpoly, len - 1)} to the derivative of \code{(poly, len)}.
@@ -1172,7 +1180,7 @@ void fq_nmod_poly_derivative(fq_nmod_poly_t rop, const fq_nmod_poly_t op, const 
 
 *******************************************************************************
 
-void _fq_nmod_poly_evaluate_fq_nmod(fq_nmod_t rop, const fq_nmod_struct *op, long len,
+void _fq_nmod_poly_evaluate_fq_nmod(fq_nmod_t rop, const fq_nmod_struct *op, slong len,
                                     const fq_nmod_t a, const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to \code{(op, len)} evaluated at $a$.
@@ -1195,8 +1203,8 @@ void fq_nmod_poly_evaluate_fq_nmod(fq_nmod_t rop, const fq_nmod_poly_t f, const 
 *******************************************************************************
 
 void _fq_nmod_poly_compose_divconquer(fq_nmod_struct *rop,
-                                 const fq_nmod_struct *op1, long len1,
-                                 const fq_nmod_struct *op2, long len2,
+                                 const fq_nmod_struct *op1, slong len1,
+                                 const fq_nmod_struct *op2, slong len2,
                                  const fq_nmod_ctx_t ctx)
 
     Computes the composition of \code{(op1, len1)} and \code{(op2, len2)}
@@ -1216,8 +1224,8 @@ void fq_nmod_poly_compose_divconquer(fq_nmod_poly_t rop,
     \code{op1}, and \code{op2} by $f$, $g$, and $h$, respectively,
     sets $f(t) = g(h(t))$.
 
-void _fq_nmod_poly_compose_horner(fq_nmod_struct *rop, const fq_nmod_struct *op1, long len1,
-                                             const fq_nmod_struct *op2, long len2,
+void _fq_nmod_poly_compose_horner(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1,
+                                             const fq_nmod_struct *op2, slong len2,
                                              const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to the composition of \code{(op1, len1)} and
@@ -1238,8 +1246,8 @@ void fq_nmod_poly_compose_horner(fq_nmod_poly_t rop,
 
     This implementation uses Horner's method.
 
-void _fq_nmod_poly_compose(fq_nmod_struct *rop, const fq_nmod_struct *op1, long len1,
-                                      const fq_nmod_struct *op2, long len2,
+void _fq_nmod_poly_compose(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1,
+                                      const fq_nmod_struct *op2, slong len2,
                                       const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to the composition of \code{(op1, len1)} and
@@ -1465,7 +1473,7 @@ fq_nmod_poly_compose_mod_brent_kung_precomp_preinv(fq_nmod_poly_t res,
 
 *******************************************************************************
 
-int _fq_nmod_poly_fprint_pretty(FILE *file, const fq_nmod_struct *poly, long len,
+int _fq_nmod_poly_fprint_pretty(FILE *file, const fq_nmod_struct *poly, slong len,
                             const char *x, const fq_nmod_ctx_t ctx)
 
     Prints the pretty representation of \code{(poly, len)} to the stream
@@ -1484,7 +1492,7 @@ int fq_nmod_poly_fprint_pretty(FILE * file, const fq_nmod_poly_t poly, const cha
     returns a non-positive value.
 
 
-int _fq_nmod_poly_print_pretty(const fq_nmod_struct *poly, long len,
+int _fq_nmod_poly_print_pretty(const fq_nmod_struct *poly, slong len,
                           const char *x, const fq_nmod_ctx_t ctx)
 
     Prints the pretty representation of \code{(poly, len)} to \code{stdout},
@@ -1503,7 +1511,7 @@ int fq_nmod_poly_print_pretty(const fq_nmod_poly_t poly, const char *x,
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-int _fq_nmod_poly_fprint(FILE *file, const fq_nmod_struct *poly, long len,
+int _fq_nmod_poly_fprint(FILE *file, const fq_nmod_struct *poly, slong len,
                     const fq_nmod_ctx_t ctx)
 
     Prints the pretty representation of \code{(poly, len)} to the stream
@@ -1521,7 +1529,7 @@ int fq_nmod_poly_fprint(FILE * file, const fq_nmod_poly_t poly, const fq_nmod_ct
     returns a non-positive value.
 
 
-int _fq_nmod_poly_print(const fq_nmod_struct *poly, long len, const fq_nmod_ctx_t ctx)
+int _fq_nmod_poly_print(const fq_nmod_struct *poly, slong len, const fq_nmod_ctx_t ctx)
 
     Prints the pretty representation of \code{(poly, len)} to \code{stdout}.
 

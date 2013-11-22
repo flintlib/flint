@@ -38,9 +38,8 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("factor_squarefree....");
     fflush(stdout);
 
@@ -119,10 +118,10 @@ main(void)
             TEMPLATE(T, ctx_print)(ctx);
             flint_printf("\n");
             for (i = 0; i < res->num; i++)
-                flint_printf("%ld ", res->exp[i]);
+                flint_printf("%wd ", res->exp[i]);
             flint_printf("\n");
             for (i = 0; i < num; i++)
-                flint_printf("%ld ", exp[i]);
+                flint_printf("%wd ", exp[i]);
             flint_printf("\n");
             abort();
         }
@@ -136,8 +135,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

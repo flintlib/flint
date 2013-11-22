@@ -26,6 +26,7 @@
 
 #ifdef T
 
+#include "flint.h"
 #include "templates.h"
 
 #include "profiler.h"
@@ -44,9 +45,8 @@ main(int argc, char** argv)
     TEMPLATE(T, poly_factor_t) res;
     timeit_t t;
     
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -72,7 +72,7 @@ main(int argc, char** argv)
     timeit_stop(t);
     TEMPLATE(T, poly_factor_clear)(res, ctx);
 
-    flint_printf("%ld\n", t->cpu);
+    flint_printf("%wd\n", t->cpu);
 
     TEMPLATE(T, poly_clear)(f, ctx);
     TEMPLATE(T, ctx_clear)(ctx);
@@ -80,7 +80,8 @@ main(int argc, char** argv)
     fmpz_clear(p);
     fmpz_clear(temp);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
+    
     return 0;
 }
 

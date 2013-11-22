@@ -38,10 +38,9 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
-
-    printf("is_irreducible....");
+    FLINT_TEST_INIT(state);
+    
+    flint_printf("is_irreducible....");
     fflush(stdout);
 
     for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
@@ -95,8 +94,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

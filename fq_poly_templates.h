@@ -36,8 +36,8 @@ extern "C" {
 typedef struct
 {
     TEMPLATE(T, struct) *coeffs;
-    long alloc;
-    long length;
+    slong alloc;
+    slong length;
 }
 TEMPLATE(T, poly_struct);
 
@@ -47,25 +47,25 @@ typedef TEMPLATE(T, poly_struct) TEMPLATE(T, poly_t)[1];
 
 void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_init2)(TEMPLATE(T, poly_t) poly, long alloc, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_init2)(TEMPLATE(T, poly_t) poly, slong alloc, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, long alloc, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, slong alloc, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_truncate)(TEMPLATE(T, poly_t) poly, long len, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_truncate)(TEMPLATE(T, poly_t) poly, slong len, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_fit_length)(TEMPLATE(T, poly_t) poly, long len, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_fit_length)(TEMPLATE(T, poly_t) poly, slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_clear)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_normalise)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_normalise2)(TEMPLATE(T, struct) *poly, long *length, const TEMPLATE(T, ctx_t) ctx);
+void _TEMPLATE(T, poly_normalise2)(TEMPLATE(T, struct) *poly, slong *length, const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__ void _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, long len, const TEMPLATE(T, ctx_t) ctx)
+static __inline__ void _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     if (poly->length > len)
     {
-        long i;
+        slong i;
 
         for (i = len; i < poly->length; i++)
             TEMPLATE(T, zero)(poly->coeffs + i, ctx);
@@ -75,12 +75,12 @@ static __inline__ void _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, l
 
 /*  Polynomial parameters  ***************************************************/
 
-static __inline__ long TEMPLATE(T, poly_length)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+static __inline__ slong TEMPLATE(T, poly_length)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length;
 }
 
-static __inline__ long TEMPLATE(T, poly_degree)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+static __inline__ slong TEMPLATE(T, poly_degree)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length - 1;
 }
@@ -93,21 +93,21 @@ static __inline__ TEMPLATE(T, struct) * TEMPLATE(T, poly_lead)(const TEMPLATE(T,
 /*  Randomisation  ***********************************************************/
 
 void TEMPLATE(T, poly_randtest)(TEMPLATE(T, poly_t) f, flint_rand_t state, 
-                      long len, const TEMPLATE(T, ctx_t) ctx);
+                      slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_randtest_not_zero)(TEMPLATE(T, poly_t) f, flint_rand_t state, 
-                               long len, const TEMPLATE(T, ctx_t) ctx);
+                               slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_randtest_monic) (TEMPLATE(T, poly_t) f, flint_rand_t state,
-                             long len, const TEMPLATE(T, ctx_t) ctx);
+                             slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f, flint_rand_t state,
-                                   long len, const TEMPLATE(T, ctx_t) ctx);
+                                   slong len, const TEMPLATE(T, ctx_t) ctx);
 
 
 /*  Assignment and basic manipulation  ***************************************/
 
-void _TEMPLATE(T, poly_set)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, const TEMPLATE(T, ctx_t) ctx);
+void _TEMPLATE(T, poly_set)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_set)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
@@ -115,9 +115,9 @@ void TEMPLATE(T, TEMPLATE(poly_set, T))(TEMPLATE(T, poly_t) poly, const TEMPLATE
 
 void TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2, const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__ void _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, long len, const TEMPLATE(T, ctx_t) ctx)
+static __inline__ void _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
         TEMPLATE(T, zero)(rop + i, ctx);
@@ -132,7 +132,7 @@ void TEMPLATE(T, poly_one)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ct
 
 void TEMPLATE(T, poly_gen)(TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_make_monic)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long length, const TEMPLATE(T, ctx_t) ctx);
+void _TEMPLATE(T, poly_make_monic)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong length, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_make_monic)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
@@ -157,12 +157,12 @@ TEMPLATE(T, poly_inflate)(TEMPLATE(T, poly_t) result, const TEMPLATE(T, poly_t) 
 
 /*  Getting and setting coefficients  ****************************************/
 
-void TEMPLATE(T, poly_get_coeff)(TEMPLATE(T, t) x, const TEMPLATE(T, poly_t) poly, long n, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_get_coeff)(TEMPLATE(T, t) x, const TEMPLATE(T, poly_t) poly, slong n, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, long n, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, slong n, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
 
 static __inline__
-void TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, long n, const fmpz_t x, const TEMPLATE(T, ctx_t) ctx)
+void TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, slong n, const fmpz_t x, const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, poly_fit_length)(poly, n + 1, ctx);
     TEMPLATE(T, set_fmpz)(poly->coeffs + n, x, ctx);
@@ -209,22 +209,22 @@ static __inline__ int TEMPLATE(T, TEMPLATE(poly_equal, T))(const TEMPLATE(T, pol
 /*  Addition and subtraction  ************************************************/
 
 void _TEMPLATE(T, poly_add)(TEMPLATE(T, struct) *res, 
-                  const TEMPLATE(T, struct) *poly1, long len1, 
-                  const TEMPLATE(T, struct) *poly2, long len2, 
+                  const TEMPLATE(T, struct) *poly1, slong len1, 
+                  const TEMPLATE(T, struct) *poly2, slong len2, 
                   const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_add)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                  const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_sub)(TEMPLATE(T, struct) *res, 
-                  const TEMPLATE(T, struct) *poly1, long len1, 
-                  const TEMPLATE(T, struct) *poly2, long len2, 
+                  const TEMPLATE(T, struct) *poly1, slong len1, 
+                  const TEMPLATE(T, struct) *poly2, slong len2, 
                   const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_sub)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                  const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, 
+void _TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, 
                   const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_neg)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
@@ -232,19 +232,19 @@ void TEMPLATE(T, poly_neg)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op
 /*  Scalar multiplication and division  **************************************/
 
 void _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(TEMPLATE(T, struct) *rop, 
-    const TEMPLATE(T, struct) *op, long len, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
+    const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(TEMPLATE(T, poly_t) rop, 
     const TEMPLATE(T, poly_t) op, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, TEMPLATE(poly_scalar_addmul, T))(TEMPLATE(T, struct) *rop, 
-    const TEMPLATE(T, struct) *op, long len, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
+    const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, TEMPLATE(poly_scalar_addmul, T))(TEMPLATE(T, poly_t) rop, 
     const TEMPLATE(T, poly_t) op, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, TEMPLATE(poly_scalar_submul, T))(TEMPLATE(T, struct) *rop, 
-    const TEMPLATE(T, struct) *op, long len, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
+    const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, TEMPLATE(poly_scalar_submul, T))(TEMPLATE(T, poly_t) rop, 
     const TEMPLATE(T, poly_t) op, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx);
@@ -252,8 +252,8 @@ void TEMPLATE(T, TEMPLATE(poly_scalar_submul, T))(TEMPLATE(T, poly_t) rop,
 /*  Multiplication  **********************************************************/
 
 void _TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, struct) *rop, 
-                            const TEMPLATE(T, struct) *op1, long len1, 
-                            const TEMPLATE(T, struct) *op2, long len2, 
+                            const TEMPLATE(T, struct) *op1, slong len1, 
+                            const TEMPLATE(T, struct) *op2, slong len2, 
                             const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, poly_t) rop, 
@@ -261,51 +261,51 @@ void TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, poly_t) rop,
                            const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, struct) *rop, 
-                          const TEMPLATE(T, struct) *op1, long len1, 
-                          const TEMPLATE(T, struct) *op2, long len2, 
+                          const TEMPLATE(T, struct) *op1, slong len1, 
+                          const TEMPLATE(T, struct) *op2, slong len2, 
                           const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2,
                          const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, long len1, 
-                                     const TEMPLATE(T, struct) *op2, long len2, 
+void _TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, slong len1, 
+                                     const TEMPLATE(T, struct) *op2, slong len2, 
                                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                     const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_mul)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, long len1, 
-                                  const TEMPLATE(T, struct) *op2, long len2, 
+void _TEMPLATE(T, poly_mul)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, slong len1, 
+                                  const TEMPLATE(T, struct) *op2, slong len2, 
                                   const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mul)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2,
                  const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_mullow_classical)(TEMPLATE(T, struct) *rop, 
-                               const TEMPLATE(T, struct) *op1, long len1, 
-                               const TEMPLATE(T, struct) *op2, long len2, long n, 
+                               const TEMPLATE(T, struct) *op1, slong len1, 
+                               const TEMPLATE(T, struct) *op2, slong len2, slong n, 
                                const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mullow_classical)(TEMPLATE(T, poly_t) rop, 
-    const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, long n, const TEMPLATE(T, ctx_t) ctx);
+    const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n, const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, struct) *rop, 
-                        const TEMPLATE(T, struct) *op1, long len1, 
-                        const TEMPLATE(T, struct) *op2, long len2, long n, 
+                        const TEMPLATE(T, struct) *op1, slong len1, 
+                        const TEMPLATE(T, struct) *op2, slong len2, slong n, 
                         const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mullow_KS)(TEMPLATE(T, poly_t) rop, 
-                       const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, long n, 
+                       const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n, 
                        const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_mullow)(TEMPLATE(T, struct) *rop, 
-                     const TEMPLATE(T, struct) *op1, long len1, 
-                     const TEMPLATE(T, struct) *op2, long len2, long n, 
+                     const TEMPLATE(T, struct) *op1, slong len1, 
+                     const TEMPLATE(T, struct) *op2, slong len2, slong n, 
                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop, 
-                    const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, long n, 
+                    const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n, 
                     const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_mulmod)(TEMPLATE(T, struct) * res, 
@@ -330,31 +330,31 @@ TEMPLATE(T, poly_mulmod_preinv)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_
 /* Squaring ******************************************************************/
 
 void _TEMPLATE(T, poly_sqr_classical)(TEMPLATE(T, struct) *rop, 
-                            const TEMPLATE(T, struct) *op, long len, 
+                            const TEMPLATE(T, struct) *op, slong len, 
                             const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_sqr_classical)(TEMPLATE(T, poly_t) rop, 
                            const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) *rop, 
-                          const TEMPLATE(T, struct) *op, long len, const TEMPLATE(T, ctx_t) ctx);
+                          const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, poly_t) rop, 
                          const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, 
+void _TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, 
                                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_sqr_KS)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, 
+void _TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, 
                                   const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_sqr)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Powering  ****************************************************************/
 
-void _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, ulong e, 
+void _TEMPLATE(T, poly_pow)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, ulong e, 
                                   const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_pow)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, ulong e, 
@@ -429,32 +429,32 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, poly_t) res, const fmpz_t e,
 
 /*  Shifting  ****************************************************************/
 
-void _TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, long n, const TEMPLATE(T, ctx_t) ctx);
+void _TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, slong n, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_shift_left)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, long n, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_shift_left)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, slong n, const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_shift_right)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, long n, const TEMPLATE(T, ctx_t) ctx);
+void _TEMPLATE(T, poly_shift_right)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, slong n, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, poly_shift_right)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, long n, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_shift_right)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, slong n, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Norms  *******************************************************************/
 
-long _TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) *op, long len, const TEMPLATE(T, ctx_t) ctx);
+slong _TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, struct) *op, slong len, const TEMPLATE(T, ctx_t) ctx);
 
-long TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
+slong TEMPLATE(T, poly_hamming_weight)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Greatest common divisor  *************************************************/
 
 void TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                  const TEMPLATE(T, ctx_t) ctx);
 
-long _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,const TEMPLATE(T, struct)* A, long lenA, 
-                            const TEMPLATE(T, struct)* B, long lenB, const TEMPLATE(T, t) invB,
+slong _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,const TEMPLATE(T, struct)* A, slong lenA, 
+                            const TEMPLATE(T, struct)* B, slong lenB, const TEMPLATE(T, t) invB,
                             const TEMPLATE(T, ctx_t) ctx);
 
 static __inline__
-long _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G, const TEMPLATE(T, struct)* A, long lenA, 
-                  const TEMPLATE(T, struct)* B, long lenB, const TEMPLATE(T, t) invB,
+slong _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G, const TEMPLATE(T, struct)* A, slong lenA, 
+                  const TEMPLATE(T, struct)* B, slong lenB, const TEMPLATE(T, t) invB,
                   const TEMPLATE(T, ctx_t) ctx)
 {
     return _TEMPLATE(T, poly_gcd_euclidean)(G, A, lenA, B, lenB, invB, ctx);
@@ -481,7 +481,7 @@ void TEMPLATE(T, poly_div_basecase)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, pol
                           const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_divrem_basecase)(TEMPLATE(T, struct) *Q, TEMPLATE(T, struct) *R, 
-    const TEMPLATE(T, struct) *A, long lenA, const TEMPLATE(T, struct) *B, long lenB, 
+    const TEMPLATE(T, struct) *A, slong lenA, const TEMPLATE(T, struct) *B, slong lenB, 
     const TEMPLATE(T, t) invB, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_divrem_basecase)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R, 
@@ -510,7 +510,7 @@ TEMPLATE(T, poly_divrem_divconquer)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R
 
 static __inline__ 
 void _TEMPLATE(T, poly_divrem)(TEMPLATE(T, struct) *Q, TEMPLATE(T, struct) *R, 
-    const TEMPLATE(T, struct) *A, long lenA, const TEMPLATE(T, struct) *B, long lenB, 
+    const TEMPLATE(T, struct) *A, slong lenA, const TEMPLATE(T, struct) *B, slong lenB, 
     const TEMPLATE(T, t) invB, const TEMPLATE(T, ctx_t) ctx)
 {
     _TEMPLATE(T, poly_divrem_divconquer)(Q, R, A, lenA, B, lenB, invB, ctx);
@@ -525,8 +525,8 @@ void TEMPLATE(T, poly_divrem)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
 }
 
 static __inline__ 
-void _TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R, const TEMPLATE(T, struct) *A, long lenA,
-                  const TEMPLATE(T, struct) *B, long lenB, const TEMPLATE(T, t) invB,
+void _TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R, const TEMPLATE(T, struct) *A, slong lenA,
+                  const TEMPLATE(T, struct) *B, slong lenB, const TEMPLATE(T, t) invB,
                   const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, struct) *Q = _TEMPLATE(T, vec_init)(lenA - lenB + 1, ctx);
@@ -591,8 +591,8 @@ TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly
 /*  Divisibility testing  ***************************************************/
 
 int _TEMPLATE(T, poly_divides)(TEMPLATE(T, struct) *Q, 
-                     const TEMPLATE(T, struct) *A, long lenA, 
-                     const TEMPLATE(T, struct) *B, long lenB, const TEMPLATE(T, t) invB, 
+                     const TEMPLATE(T, struct) *A, slong lenA, 
+                     const TEMPLATE(T, struct) *B, slong lenB, const TEMPLATE(T, t) invB, 
                      const TEMPLATE(T, ctx_t) ctx);
 
 int TEMPLATE(T, poly_divides)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B, 
@@ -600,14 +600,14 @@ int TEMPLATE(T, poly_divides)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A
 
 /*  Derivative  **************************************************************/
 
-void _TEMPLATE(T, poly_derivative)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, long len, 
+void _TEMPLATE(T, poly_derivative)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, 
                                          const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_derivative)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Evaluation  **************************************************************/
 
-void _TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) rop, const TEMPLATE(T, struct) *op, long len, 
+void _TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) rop, const TEMPLATE(T, struct) *op, slong len, 
                                     const TEMPLATE(T, t) a, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) res, const TEMPLATE(T, poly_t) f, const TEMPLATE(T, t) a, 
@@ -616,24 +616,24 @@ void TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) res, const TEMPLATE(
 /*  Composition  *************************************************************/
 
 void _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) *rop, 
-                                 const TEMPLATE(T, struct) *op1, long len1, 
-                                 const TEMPLATE(T, struct) *op2, long len2, 
+                                 const TEMPLATE(T, struct) *op1, slong len1, 
+                                 const TEMPLATE(T, struct) *op2, slong len2, 
                                  const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, poly_t) rop, 
                                 const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                                 const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_compose_horner)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, long len1, 
-                                             const TEMPLATE(T, struct) *op2, long len2, 
+void _TEMPLATE(T, poly_compose_horner)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, slong len1, 
+                                             const TEMPLATE(T, struct) *op2, slong len2, 
                                              const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_compose_horner)(TEMPLATE(T, poly_t) rop, 
                             const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
                             const TEMPLATE(T, ctx_t) ctx);
 
-void _TEMPLATE(T, poly_compose)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, long len1, 
-                                      const TEMPLATE(T, struct) *op2, long len2, 
+void _TEMPLATE(T, poly_compose)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op1, slong len1, 
+                                      const TEMPLATE(T, struct) *op2, slong len2, 
                                       const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_compose)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, 
@@ -749,13 +749,13 @@ TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(TEMPLATE(T, poly_t) res,
 
 /*  Input and output  ********************************************************/
 
-int _TEMPLATE(T, poly_fprint_pretty)(FILE *file, const TEMPLATE(T, struct) *poly, long len, 
+int _TEMPLATE(T, poly_fprint_pretty)(FILE *file, const TEMPLATE(T, struct) *poly, slong len, 
                             const char *x, const TEMPLATE(T, ctx_t) ctx);
 
 int TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, poly_t) poly, const char *x, 
                           const TEMPLATE(T, ctx_t) ctx);
 
-int _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) *poly, long len, 
+int _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) *poly, slong len, 
                     const TEMPLATE(T, ctx_t) ctx);
 
 int TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, poly_t) poly, 
@@ -775,7 +775,7 @@ int TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ct
 
 
 static __inline__ 
-int _TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, long len, 
+int _TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, slong len, 
                           const char *x, const TEMPLATE(T, ctx_t) ctx)
 {
     return _TEMPLATE(T, poly_fprint_pretty)(stdout, poly, len, x, ctx);

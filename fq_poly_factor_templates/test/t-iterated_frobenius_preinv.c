@@ -32,16 +32,16 @@ int
 main(void)
 {
     int i, j;
-    flint_rand_t state;
-    flint_randinit(state);
-    printf("iterated_frobenius_preinv....");
+    FLINT_TEST_INIT(state);
+    
+    flint_printf("iterated_frobenius_preinv....");
     fflush(stdout);
 
     for (j = 0; j < 20 * flint_test_multiplier(); j++)
     {
         int result;
         fmpz_t q;
-        long n;
+        slong n;
         
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) v, vinv, *h1, *h2;
@@ -62,8 +62,8 @@ main(void)
         n = n_randint(state, 5) + 2;
         if (!(h1 = flint_malloc((2 *n) * sizeof(TEMPLATE(T, poly_struct)))))
         {
-            printf("Exception (t-fq_poly_iterated_frobenius_preinv):\n");
-            printf("Not enough memory.\n");
+            flint_printf("Exception (t-fq_poly_iterated_frobenius_preinv):\n");
+            flint_printf("Not enough memory.\n");
             abort();
         }
         h2 = h1 + n;
@@ -84,8 +84,8 @@ main(void)
         
         if (!result)
         {
-            printf("FAIL (composition):\n");
-            printf("v:\n"); TEMPLATE(T, poly_print)(v, ctx); printf("\n");
+            flint_printf("FAIL (composition):\n");
+            flint_printf("v:\n"); TEMPLATE(T, poly_print)(v, ctx); flint_printf("\n");
             abort();
         }
 
@@ -100,9 +100,8 @@ main(void)
         fmpz_clear(q);
     }
     
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }
 

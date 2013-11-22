@@ -26,11 +26,11 @@
 #include "fq_zech.h"
 
 void
-fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, long e,
+fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
                   const fq_zech_ctx_t ctx)
 {
     double qm1_inv;
-    long d = fq_zech_ctx_degree(ctx);
+    slong d = fq_zech_ctx_degree(ctx);
 
     e = e % d;
     if (e < 0)

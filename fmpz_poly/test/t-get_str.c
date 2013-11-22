@@ -40,6 +40,8 @@ main(void)
     char *str;
     fmpz_poly_t a;
 
+    FLINT_TEST_INIT(state);
+    
     flint_printf("get_str....");
     fflush(stdout);
 
@@ -80,7 +82,7 @@ main(void)
     }
     flint_free(str);
     fmpz_poly_clear(a);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

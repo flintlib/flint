@@ -32,8 +32,7 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
 
     flint_printf("powmod_ui_binexp_preinv....");
     fflush(stdout);
@@ -68,7 +67,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %lu\n\n", exp);
+            flint_printf("exp: %wu\n\n", exp);
             flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
             flint_printf("res:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");
@@ -114,7 +113,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %lu\n\n", exp);
+            flint_printf("exp: %wu\n\n", exp);
             flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
             flint_printf("res1:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");
@@ -167,7 +166,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("exp: %lu\n\n", exp);
+            flint_printf("exp: %wu\n\n", exp);
             flint_printf("a:\n"); TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
             flint_printf("f:\n"); TEMPLATE(T, poly_print)(f, ctx), flint_printf("\n\n");
             flint_printf("res1:\n"); TEMPLATE(T, poly_print)(res1, ctx), flint_printf("\n\n");
@@ -244,8 +243,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

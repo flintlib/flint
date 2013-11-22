@@ -40,20 +40,19 @@ int
 main(void)
 {
     int i, k, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("ctx_init... ");
     fflush(stdout);
 
-    flint_randinit(state);
-
     for (i = 0; i < 30; i++) {
         fmpz_t p;
-        long d;
+        slong d;
         TEMPLATE(T, ctx_t) ctx;
         
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 50), 1));
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 
+                                   FLINT_MIN(FLINT_BITS - 1, 50)), 1));
         d = n_randint(state, 20) + 1;
 
         TEMPLATE(T, ctx_init)(ctx, p, d, "a");
@@ -62,7 +61,7 @@ main(void)
 
     for (i = 0; i < 30; i++) {
         fmpz_t p;
-        long d;
+        slong d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;
 
         TEMPLATE(T, t) a, b, lhs, rhs;
@@ -111,9 +110,7 @@ main(void)
 
     }
 
-
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
 
     return EXIT_SUCCESS;

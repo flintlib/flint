@@ -49,10 +49,10 @@ typedef struct
 } nmod_t;
 
 
-#define NMOD_VEC_NORM(vec, i)          \
-do {                                   \
-    while ((i) && vec[(i) - 1] == 0UL)  \
-        (i)--;                         \
+#define NMOD_VEC_NORM(vec, i)                   \
+do {                                            \
+    while ((i) && vec[(i) - 1] == UWORD(0))     \
+        (i)--;                                  \
 } while (0)
 
 #define NMOD_RED2(r, a_hi, a_lo, mod) \

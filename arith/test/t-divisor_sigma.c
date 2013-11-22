@@ -59,6 +59,8 @@ int main(void)
     fmpz_t m, a, b;
     slong n, k;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("divisor_sigma....");
     fflush(stdout);
 
@@ -86,7 +88,7 @@ int main(void)
     fmpz_clear(b);
     fmpz_clear(m);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

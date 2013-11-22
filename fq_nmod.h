@@ -47,8 +47,8 @@ typedef struct
     int sparse_modulus;
 
     mp_limb_t *a;
-    long *j;
-    long len;
+    slong *j;
+    slong len;
 
     nmod_poly_t modulus;
     nmod_poly_t inv;
@@ -60,23 +60,23 @@ fq_nmod_ctx_struct;
 typedef fq_nmod_ctx_struct fq_nmod_ctx_t[1];
 
 void fq_nmod_ctx_init(fq_nmod_ctx_t ctx,
-                      const fmpz_t p, long d, const char *var);
+                      const fmpz_t p, slong d, const char *var);
 
 int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
-                             const fmpz_t p, long d, const char *var);
+                             const fmpz_t p, slong d, const char *var);
 
 void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
-                             const fmpz_t p, long d, const char *var);
+                             const fmpz_t p, slong d, const char *var);
 
 void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
-                              const fmpz_t p, long d, const nmod_poly_t modulus,
+                              const fmpz_t p, slong d, const nmod_poly_t modulus,
                               const char *var);
 
 void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
 
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
-static __inline__ long fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
+static __inline__ slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
 }
@@ -93,9 +93,9 @@ static __inline__ void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
 static __inline__ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
 {
     int r;
-    long i, k;
+    slong i, k;
 
-    r = fprintf(file, "p = ");
+    r = flint_fprintf(file, "p = ");
     if (r <= 0)
         return r;
 
@@ -103,45 +103,45 @@ static __inline__ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "\nd = %ld\nf(X) = ", ctx->j[ctx->len - 1]);
+    r = flint_fprintf(file, "\nd = %wd\nf(X) = ", ctx->j[ctx->len - 1]);
     if (r <= 0)
         return r;
 
-    r = fprintf(file, "%lu", ctx->a[0]);
+    r = flint_fprintf(file, "%wu", ctx->a[0]);
     if (r <= 0)
         return r;
 
     for (k = 1; k < ctx->len; k++)
     {
         i = ctx->j[k];
-        r = fprintf(file, " + ");
+        r = flint_fprintf(file, " + ");
         if (r <= 0)
             return r;
 
-        if (ctx->a[k] == 1UL)
+        if (ctx->a[k] == UWORD(1))
         {
             if (i == 1)
-                r = fprintf(file, "X");
+                r = flint_fprintf(file, "X");
             else
-                r = fprintf(file, "X^%ld", i);
+                r = flint_fprintf(file, "X^%wd", i);
             if (r <= 0)
                 return r;
         }
         else
         {
-            r = fprintf(file, "%lu", ctx->a[k]);
+            r = flint_fprintf(file, "%wu", ctx->a[k]);
             if (r <= 0)
                 return r;
 
             if (i == 1)
-                r = fprintf(file, "*X");
+                r = flint_fprintf(file, "*X");
             else
-                r = fprintf(file, "*X^%ld", i);
+                r = flint_fprintf(file, "*X^%wd", i);
             if (r <= 0)
                 return r;
         }
     }
-    r = fprintf(file, "\n");
+    r = flint_fprintf(file, "\n");
     return r;
 }
 
@@ -168,15 +168,15 @@ static __inline__ void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 }
 
 static __inline__ 
-void _fq_nmod_sparse_reduce(mp_limb_t *R, long lenR, const fq_nmod_ctx_t ctx)
+void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
 {
-    const long d = ctx->j[ctx->len - 1];
+    const slong d = ctx->j[ctx->len - 1];
 
     NMOD_VEC_NORM(R, lenR);
 
     if (lenR > d)
     {
-        long i, k;
+        slong i, k;
 
         for (i = lenR - 1; i >= d; i--)
         {
@@ -187,12 +187,12 @@ void _fq_nmod_sparse_reduce(mp_limb_t *R, long lenR, const fq_nmod_ctx_t ctx)
                                                 n_mulmod2_preinv(R[i], ctx->a[k], ctx->mod.n, ctx->mod.ninv),
                                                 ctx->mod.n);
             }
-            R[i] = 0UL;
+            R[i] = UWORD(0);
         }
     }
 }
 
-static __inline__ void _fq_nmod_dense_reduce(mp_limb_t* R, long lenR, const fq_nmod_ctx_t ctx)
+static __inline__ void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     mp_limb_t  *q, *r;
 
@@ -216,7 +216,7 @@ static __inline__ void _fq_nmod_dense_reduce(mp_limb_t* R, long lenR, const fq_n
 
 }
 
-static __inline__ void _fq_nmod_reduce(mp_limb_t* R, long lenR, const fq_nmod_ctx_t ctx)
+static __inline__ void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     if (ctx->sparse_modulus)
         _fq_nmod_sparse_reduce(R, lenR, ctx);
@@ -245,7 +245,7 @@ void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const 
 
 void fq_nmod_mul_fmpz(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, long x, const fq_nmod_ctx_t ctx);
+void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx);
 
@@ -253,7 +253,7 @@ void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, long len, const fmpz_t e, const fq_nmod_ctx_t ctx);
+void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1, const fmpz_t e, const fq_nmod_ctx_t ctx);
 
@@ -371,17 +371,17 @@ fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, long len, 
+void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, slong len, 
                     const fq_nmod_ctx_t ctx);
 
 void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, long len, long e, 
+void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e, 
                         const fq_nmod_ctx_t ctx);
 
-void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, long e, const fq_nmod_ctx_t ctx);
+void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, long len, 
+void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, slong len, 
                    const fq_nmod_ctx_t ctx);
 
 void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);

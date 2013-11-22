@@ -108,9 +108,9 @@ int main()
     fmpz_clear(r1);
     fmpz_clear(m1);
     fmpz_clear(mprod);
-    flint_randclear(state);
+    
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");
     return 0;

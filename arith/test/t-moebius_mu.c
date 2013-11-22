@@ -52,7 +52,6 @@ int main(void)
     ulong p;
     slong i, j, k, l;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("moebius_mu....");
     fflush(stdout);
@@ -91,9 +90,9 @@ int main(void)
 
     fmpz_clear(x);
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

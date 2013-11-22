@@ -76,6 +76,8 @@ int main()
     fmpz_poly_t A, B;
     slong n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("cyclotomic_polynomial....");
     fflush(stdout);
 
@@ -137,7 +139,7 @@ int main()
         fmpz_clear(ref);
     }
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

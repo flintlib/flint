@@ -33,10 +33,9 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
 
-    printf("randtest_irreducible....");
+    flint_printf("randtest_irreducible....");
     fflush(stdout);
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
@@ -54,10 +53,10 @@ main(void)
 
         if (!TEMPLATE(T, poly_is_irreducible)(poly, ctx))
         {
-            printf("Error: reducible polynomial created!\n");
-            printf("poly:\n");
+            flint_printf("Error: reducible polynomial created!\n");
+            flint_printf("poly:\n");
             TEMPLATE(T, poly_print_pretty)(poly, "x", ctx);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -66,9 +65,8 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }
 

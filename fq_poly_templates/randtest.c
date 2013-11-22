@@ -31,9 +31,9 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_randtest)(TEMPLATE(T, poly_t) f, flint_rand_t state, long len, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_randtest)(TEMPLATE(T, poly_t) f, flint_rand_t state, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     TEMPLATE(T, poly_fit_length)(f, len, ctx);
     for (i = 0; i < len; i++)
@@ -46,9 +46,9 @@ TEMPLATE(T, poly_randtest)(TEMPLATE(T, poly_t) f, flint_rand_t state, long len, 
 
 void
 TEMPLATE(T, poly_randtest_not_zero)(TEMPLATE(T, poly_t) f, flint_rand_t state,
-                          long len, const TEMPLATE(T, ctx_t) ctx)
+                          slong len, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     if (len == 0)
     {

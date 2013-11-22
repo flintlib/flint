@@ -62,7 +62,7 @@ void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                     const nmod_poly_t B, const nmod_poly_t Binv)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
-               lenBinv= Binv->length;
+               lenBinv = Binv->length;
 
     mp_ptr q;
 
@@ -78,7 +78,7 @@ void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
         return;
     }
 
-    if (lenA > 2*lenB-2)
+    if (lenA > 2 * lenB - 2)
     {
         flint_printf ("Exception (nmod_poly_div_newton_n_preinv).\n");
     }

@@ -32,12 +32,12 @@
 #include "fmpz_poly.h"
 
 void
-_TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op1, long len1,
-                const TEMPLATE(T, struct) * op2, long len2, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op1, slong len1,
+                const TEMPLATE(T, struct) * op2, slong len2, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long in1_len = len1, in2_len = len2;
-    const long d = TEMPLATE(T, ctx_degree)(ctx);
-    long bits, i;
+    const slong in1_len = len1, in2_len = len2;
+    const slong d = TEMPLATE(T, ctx_degree)(ctx);
+    slong bits, i;
     fmpz *f, *g, *h;
 
     TEMPLATE(CAP_T, VEC_NORM)(op1, len1, ctx);
@@ -87,9 +87,9 @@ void
 TEMPLATE(T, poly_mul_KS)(TEMPLATE(T, poly_t) rop,
                const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long rlen = len1 + len2 - 1;
+    const slong len1 = op1->length;
+    const slong len2 = op2->length;
+    const slong rlen = len1 + len2 - 1;
 
     if (len1 == 0 || len2 == 0)
     {

@@ -32,7 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"
@@ -41,12 +41,11 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("mul_ui....");
     fflush(stdout);
 
-    flint_randinit(state);
     /* Check aliasing of a, b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -70,7 +69,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-	    flint_printf("x = %lu\n",x);
+	    flint_printf("x = %wu\n",x);
             abort();
         }
 
@@ -107,7 +106,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-	    flint_printf("x = %lu\n",x);
+	    flint_printf("x = %wu\n",x);
             abort();
         }
 
@@ -117,8 +116,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

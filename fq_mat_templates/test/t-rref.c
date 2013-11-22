@@ -83,13 +83,11 @@ int check_rref_form(slong * perm, TEMPLATE(T, mat_t) A, slong rank, const TEMPLA
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
-
+    FLINT_TEST_INIT(state);
+    
     printf("rref....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 100; i++)
     {
@@ -172,7 +170,7 @@ main(void)
 
         if (!equal)
         {
-            printf("FAIL (rank1 = %ld, rank2 = %ld)!\n", rank1, rank2);
+            flint_printf("FAIL (rank1 = %wd, rank2 = %wd)!\n", rank1, rank2);
             TEMPLATE(T, mat_print_pretty)(A, ctx); printf("\n\n");
             TEMPLATE(T, mat_print_pretty)(B, ctx); printf("\n\n");
             TEMPLATE(T, mat_print_pretty)(D, ctx); printf("\n\n");
@@ -189,7 +187,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

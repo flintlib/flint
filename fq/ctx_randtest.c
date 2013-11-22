@@ -31,7 +31,7 @@ void
 fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t p;
-    long d;
+    slong d;
 
     fmpz_init(p);
     fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));

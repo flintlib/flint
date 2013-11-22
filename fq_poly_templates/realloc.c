@@ -31,9 +31,9 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, long alloc, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, slong alloc, const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     if (alloc == 0)             /* Clear up, reinitialise */
     {

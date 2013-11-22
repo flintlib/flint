@@ -36,9 +36,9 @@
  */
 
 static fmpz_poly_struct *
-__vec_init(long len)
+__vec_init(slong len)
 {
-    long i;
+    slong i;
     fmpz_poly_struct *v;
 
     v = flint_malloc(len * sizeof(fmpz_poly_struct));
@@ -48,9 +48,9 @@ __vec_init(long len)
 }
 
 static fmpz_poly_struct *
-__vec_init2(long len, long n)
+__vec_init2(slong len, slong n)
 {
-    long i;
+    slong i;
     fmpz_poly_struct *v;
 
     v = flint_malloc(len * sizeof(fmpz_poly_struct));
@@ -60,9 +60,9 @@ __vec_init2(long len, long n)
 }
 
 static void
-__vec_clear(fmpz_poly_struct * v, long len)
+__vec_clear(fmpz_poly_struct * v, slong len)
 {
-    long i;
+    slong i;
 
     for (i = 0; i < len; i++)
         fmpz_poly_clear(v + i);
@@ -71,9 +71,9 @@ __vec_clear(fmpz_poly_struct * v, long len)
 
 static void
 __scalar_addmul(fmpz_poly_struct * rop,
-                const fmpz_poly_struct * op, long len, const fmpz_poly_t x)
+                const fmpz_poly_struct * op, slong len, const fmpz_poly_t x)
 {
-    long i;
+    slong i;
 
     if (fmpz_poly_is_zero(x))
     {
@@ -100,9 +100,9 @@ __scalar_addmul(fmpz_poly_struct * rop,
 
 static void
 __scalar_mul(fmpz_poly_struct * rop,
-             const fmpz_poly_struct * op, long len, const fmpz_poly_t x)
+             const fmpz_poly_struct * op, slong len, const fmpz_poly_t x)
 {
-    long i;
+    slong i;
 
     if (fmpz_poly_is_zero(x))
     {
@@ -122,7 +122,7 @@ __scalar_mul(fmpz_poly_struct * rop,
 }
 
 static void
-__sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, long len)
+__sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, slong len)
 {
     if (len == 1)
     {
@@ -130,7 +130,7 @@ __sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, long len)
     }
     else
     {
-        long i;
+        slong i;
         fmpz_poly_t t;
 
         fmpz_poly_init(t);
@@ -156,12 +156,12 @@ __sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, long len)
 
 void
 _TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) * rop,
-                     const TEMPLATE(T, struct) * op, long len, const TEMPLATE(T, ctx_t) ctx)
+                     const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long d = TEMPLATE(T, ctx_degree)(ctx);
+    const slong d = TEMPLATE(T, ctx_degree)(ctx);
 
     fmpz_poly_struct *f, *g;
-    long i, j, k, lenF;
+    slong i, j, k, lenF;
 
     f = __vec_init(2 * d - 1);
     g = __vec_init2(d, len);
@@ -222,7 +222,7 @@ _TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) * rop,
 void
 TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len = 2 * op->length - 1;
+    const slong len = 2 * op->length - 1;
 
     if (op->length == 0)
     {

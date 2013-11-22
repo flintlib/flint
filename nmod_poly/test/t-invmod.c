@@ -35,12 +35,11 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    
+    FLINT_TEST_INIT(state);
 
     printf("invmod....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test aliasing *************************************************************/
 
@@ -145,7 +144,7 @@ main(void)
         nmod_poly_xgcd(g, s, t, a, b);
 
         result = (((ans) && g->length == 1 
-                        && g->coeffs[0] == 1L && nmod_poly_equal(s, u)) 
+                   && g->coeffs[0] == WORD(1) && nmod_poly_equal(s, u)) 
                  || (!(ans) && g->length > 1));
 
         if (!result)
@@ -215,8 +214,7 @@ main(void)
         nmod_poly_clear(u);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

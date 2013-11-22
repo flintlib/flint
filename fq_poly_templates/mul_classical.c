@@ -31,8 +31,8 @@
 
 void
 _TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, struct) * rop,
-                       const TEMPLATE(T, struct) * op1, long len1,
-                       const TEMPLATE(T, struct) * op2, long len2, const TEMPLATE(T, ctx_t) ctx)
+                       const TEMPLATE(T, struct) * op1, slong len1,
+                       const TEMPLATE(T, struct) * op2, slong len2, const TEMPLATE(T, ctx_t) ctx)
 {
     if (len1 == 1 && len2 == 1)
     {
@@ -40,7 +40,7 @@ _TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, struct) * rop,
     }
     else
     {
-        long i;
+        slong i;
 
         /* Set res[i] = poly1[i]*poly2[0] */
         _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(rop, op1, len1, op2, ctx);
@@ -61,7 +61,7 @@ TEMPLATE(T, poly_mul_classical)(TEMPLATE(T, poly_t) rop,
                       const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2,
                       const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len = op1->length + op2->length - 1;
+    const slong len = op1->length + op2->length - 1;
 
     if (op1->length == 0 || op2->length == 0)
     {

@@ -31,10 +31,10 @@
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, long len, long e, 
+void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e, 
                         const fq_nmod_ctx_t ctx)
 {
-    const long d = ctx->j[ctx->len - 1];
+    const slong d = ctx->j[ctx->len - 1];
 
     if (len == 1)  /* op is in Fp, not just Fq */
     {
@@ -52,9 +52,9 @@ void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, long len, long e,
     }
 }
 
-void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, long e, const fq_nmod_ctx_t ctx)
+void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod_ctx_t ctx)
 {
-    const long d = fq_nmod_ctx_degree(ctx);
+    const slong d = fq_nmod_ctx_degree(ctx);
 
     e = e % d;
     if (e < 0)

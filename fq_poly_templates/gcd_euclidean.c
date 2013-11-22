@@ -31,10 +31,13 @@
 #include "templates.h"
 
 #include <stdlib.h>
-long
-_TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct) * G, const TEMPLATE(T, struct) * A, long lenA,
-                       const TEMPLATE(T, struct) * B, long lenB, const TEMPLATE(T, t) invB,
-                       const TEMPLATE(T, ctx_t) ctx)
+
+slong
+_TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct) * G,
+                                 const TEMPLATE(T, struct) * A, slong lenA,
+                                 const TEMPLATE(T, struct) * B, slong lenB,
+                                 const TEMPLATE(T, t) invB,
+                                 const TEMPLATE(T, ctx_t) ctx)
 {
     if (lenB == 1)
     {
@@ -105,7 +108,7 @@ TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, poly_t) G,
     }
     else                        /* lenA >= lenB >= 0 */
     {
-        long lenA = A->length, lenB = B->length, lenG;
+        slong lenA = A->length, lenB = B->length, lenG;
         TEMPLATE(T, t) invB;
         TEMPLATE(T, struct) *g;
 

@@ -21,6 +21,7 @@
 
     Copyright (C) 2011, 2012 Sebastian Pancratz 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -29,8 +30,8 @@
 void
 fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
-    long i, sparse;
+    const slong d = fq_ctx_degree(ctx);
+    slong i, sparse;
 
     fmpz_poly_fit_length(rop, d);
 
@@ -57,8 +58,8 @@ fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 void
 fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
-    long i;
+    const slong d = fq_ctx_degree(ctx);
+    slong i;
 
     fmpz_poly_fit_length(rop, d);
 
@@ -76,7 +77,7 @@ fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 void
 fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
-    long i;
+    slong i;
 
     fq_randtest(rop, state, ctx);
     for (i = 0; fq_is_zero(rop, ctx) && (i < 10); i++)

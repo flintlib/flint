@@ -22,6 +22,7 @@
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
+#include "flint.h"
 #include "fq.h"
 #include <stdio.h>
 #include "profiler.h"
@@ -29,17 +30,15 @@
 int
 main(int argc, char** argv)
 {
-    flint_rand_t state;
-
-    long i, result;
+    slong i, result;
     fmpz_t p;
-    long d;
+    slong d;
     fq_ctx_t ctx;
     fq_t a,b,c;
     double dense;
 
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -55,8 +54,6 @@ main(int argc, char** argv)
     fq_randtest_not_zero(b,state,ctx);
 
     fmpz_poly_mul(c, a, b);
-    
-
 
     init_clock(0);
 
@@ -97,5 +94,7 @@ main(int argc, char** argv)
     fq_clear(c, ctx);
     fq_ctx_clear(ctx);
     fmpz_clear(p);
+    FLINT_TEST_CLEANUP(state);
+
     return 0;
 }

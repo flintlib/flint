@@ -28,7 +28,7 @@
 void
 fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx)
 {
-    long i, d;
+    slong i, d;
     if (fq_is_zero(op1, ctx) || fq_is_one(op1, ctx))
     {
         fq_set(rop, op1, ctx);

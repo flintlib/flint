@@ -39,17 +39,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("evaluate_fq... ");
     fflush(stdout);
 
-    flint_randinit(state);
-
     /* Check aliasing */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) f;
@@ -91,7 +89,7 @@ main(void)
     /* Check (f + g)(a) == f(a) + g(a) */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) f, g, h;
@@ -139,8 +137,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

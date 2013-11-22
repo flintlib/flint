@@ -34,9 +34,8 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("factor_kaltofen_shoup....");
     fflush(stdout);
 
@@ -102,7 +101,7 @@ main(void)
 
         if (res->num != num)
         {
-            flint_printf("Error: number of factors incorrect: %ld != %ld\n",
+            flint_printf("Error: number of factors incorrect: %wd != %wd\n",
                    res->num, num);
             abort();
         }
@@ -145,8 +144,7 @@ main(void)
         TEMPLATE(T, poly_factor_clear)(res, ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

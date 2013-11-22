@@ -40,17 +40,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("pow... ");
     fflush(stdout);
 
-    flint_randinit(state);
-
     /* Check aliasing  */
     for (i = 0; i < 200; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -63,7 +61,7 @@ main(void)
         TEMPLATE(T, poly_init)(c, ctx);
 
         TEMPLATE(T, poly_randtest)(a, state, len, ctx);
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
         TEMPLATE(T, poly_set)(b, a, ctx);
         TEMPLATE(T, poly_pow)(c, b, exp, ctx);
         TEMPLATE(T, poly_pow)(b, b, exp, ctx);
@@ -75,7 +73,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, poly_print_pretty)(c, "X", ctx), flint_printf("\n");
-            flint_printf("exp = %lu\n", exp);
+            flint_printf("exp = %wu\n", exp);
             abort();
         }
 
@@ -89,7 +87,7 @@ main(void)
     /* Compare with repeated multiplications by the base */
     for (i = 0; i < 1000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -102,7 +100,7 @@ main(void)
         TEMPLATE(T, poly_init)(c, ctx);
 
         TEMPLATE(T, poly_randtest)(b, state, len, ctx);
-        exp = n_randtest(state) % 20UL;
+        exp = n_randtest(state) % UWORD(20);
 
         TEMPLATE(T, poly_pow)(a, b, exp, ctx);
 
@@ -112,7 +110,7 @@ main(void)
         }
         else
         {
-            long j;
+            slong j;
 
             TEMPLATE(T, poly_set)(c, b, ctx);
             for (j = 1; j < exp; j++)
@@ -126,7 +124,7 @@ main(void)
             flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, poly_print_pretty)(c, "X", ctx), flint_printf("\n");
-            flint_printf("exp = %lu\n", exp);
+            flint_printf("exp = %wu\n", exp);
             TEMPLATE(T, ctx_print)(ctx);
             abort();
         }
@@ -138,8 +136,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

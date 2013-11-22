@@ -50,6 +50,8 @@ main(void)
     slong i;
     fmpz_t x;
 
+    FLINT_TEST_INIT(state);
+    
     flint_printf("fits_si....");
     fflush(stdout);
 
@@ -93,7 +95,7 @@ main(void)
 
     fmpz_clear(x);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

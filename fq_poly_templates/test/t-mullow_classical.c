@@ -39,12 +39,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("mullow_classical... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Compare with truncated product of a and b */
     for (i = 0; i < 2000; i++)
@@ -52,7 +50,7 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, d;
-        long n;
+        slong n;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -88,8 +86,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

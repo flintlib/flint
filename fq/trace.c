@@ -20,17 +20,18 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
 #include "fq.h"
 
 void
-_fq_trace(fmpz_t rop, const fmpz * op, long len, const fq_ctx_t ctx)
+_fq_trace(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
+    const slong d = fq_ctx_degree(ctx);
 
-    long i, l;
+    slong i, l;
     fmpz *t;
 
     t = _fmpz_vec_init(d);

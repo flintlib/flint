@@ -40,21 +40,19 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("shift_left/right... ");
     fflush(stdout);
 
-    flint_randinit(state);
-
     /* Check aliasing for left shift */
     for (i = 0; i < 2000; i++)
     {
-        long len = n_randint(state, 100);
+        slong len = n_randint(state, 100);
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
-        long shift;
+        slong shift;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         TEMPLATE(T, poly_init)(a, ctx);
@@ -88,11 +86,11 @@ main(void)
     /* Check aliasing for right shift */
     for (i = 0; i < 2000; i++)
     {
-        long len = n_randint(state, 100);
+        slong len = n_randint(state, 100);
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
-        long shift;
+        slong shift;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -127,11 +125,11 @@ main(void)
     /* Check shift left then right does nothing */
     for (i = 0; i < 2000; i++)
     {
-        long len = n_randint(state, 100);
+        slong len = n_randint(state, 100);
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
-        long shift;
+        slong shift;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
         TEMPLATE(T, poly_init)(a, ctx);
@@ -161,8 +159,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

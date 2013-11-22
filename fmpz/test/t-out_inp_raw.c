@@ -24,12 +24,16 @@
 
 ******************************************************************************/
 
-
+#undef ulong
+#define ulong ulongxx /* interferes with standard libraries */
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+
+#undef ulong
+#include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"

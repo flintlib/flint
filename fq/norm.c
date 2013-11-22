@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
@@ -36,7 +37,7 @@
  */
 
 static void
-_fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, long n, const fmpz_t pN)
+_fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, slong n, const fmpz_t pN)
 {
     if (n == 1)
     {
@@ -48,7 +49,7 @@ _fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, long n, const fmpz_t pN)
         fmpz *a;
         fmpz *A;
         fmpz_t s;
-        long t, i, j, p, k;
+        slong t, i, j, p, k;
 
         F = _fmpz_vec_init(n);
         a = _fmpz_vec_init((n - 1) * n);
@@ -97,7 +98,7 @@ _fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, long n, const fmpz_t pN)
            characteristic polynomial of the matrix M.
          */
 
-        if (n % 2L == 0)
+        if (n % WORD(2) == 0)
         {
             fmpz_set(rop, F + (n - 1));
         }
@@ -120,10 +121,10 @@ _fmpz_mod_mat_det(fmpz_t rop, const fmpz * M, long n, const fmpz_t pN)
  */
 
 void
-_fq_norm(fmpz_t rop, const fmpz * op, long len, const fq_ctx_t ctx)
+_fq_norm(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
-    const long N = 1;
+    const slong d = fq_ctx_degree(ctx);
+    const slong N = 1;
 
     fmpz *pN;
     const fmpz *p = fq_ctx_prime(ctx);
@@ -147,8 +148,8 @@ _fq_norm(fmpz_t rop, const fmpz * op, long len, const fq_ctx_t ctx)
     {
         /* Construct an ad hoc matrix M and set rop to det(M) */
         {
-            const long n = d + len - 1;
-            long i, k;
+            const slong n = d + len - 1;
+            slong i, k;
             fmpz *M;
 
             M = flint_calloc(n * n, sizeof(fmpz));

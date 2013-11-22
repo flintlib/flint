@@ -82,10 +82,10 @@ main(void)
         fmpq_poly_clear(a);
     }
 
-    flint_randclear(state);
+    
     mpq_clear(n_mpq);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

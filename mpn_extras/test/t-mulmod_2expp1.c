@@ -41,8 +41,10 @@ int main(void)
     mp_limb_t rp[10000], zp[10000], tp[10000], tb;
     int result = 1;
     
-    gmp_randinit_default(rands);
-    
+    FLINT_TEST_INIT(state);
+
+    gmp_randinit_default(rands);    
+ 
     flint_printf("mulmod_2expp1_basecase....");
     fflush(stdout);
 
@@ -249,7 +251,7 @@ int main(void)
     }
 
     gmp_randclear(rands);
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

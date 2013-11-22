@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include "flint.h"
 #include "fq_poly.h"
 #include "profiler.h"
 
@@ -35,15 +36,14 @@ main(int argc, char** argv)
 {
     fmpz_t p;
     int c, n, reps = 0;
-    long d, lenf, leng, lenh;
+    slong d, lenf, leng, lenh;
     fq_ctx_t ctx;
     fq_poly_t f, g, h, hinv, res;
 
     double s[nalgs];
     
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -126,5 +126,7 @@ main(int argc, char** argv)
     fq_ctx_clear(ctx);
     fmpz_clear(p);
 
+    FLINT_TEST_CLEANUP(state);
+    
     return 0;
 }

@@ -32,7 +32,7 @@
 
 void
 _TEMPLATE(T, TEMPLATE(poly_scalar_submul, T))(TEMPLATE(T, struct) * rop,
-                          const TEMPLATE(T, struct) * op, long len, const TEMPLATE(T, t) x,
+                          const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, t) x,
                           const TEMPLATE(T, ctx_t) ctx)
 {
     if (TEMPLATE(T, is_zero)(x, ctx))
@@ -44,7 +44,7 @@ _TEMPLATE(T, TEMPLATE(poly_scalar_submul, T))(TEMPLATE(T, struct) * rop,
     }
     else
     {
-        long i;
+        slong i;
         TEMPLATE(T, t) t;
 
         TEMPLATE(T, init)(t, ctx);

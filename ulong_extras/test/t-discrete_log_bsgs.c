@@ -30,9 +30,9 @@
 int main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("discrete_log_bsgs....");
+    flint_printf("discrete_log_bsgs....");
     fflush(stdout);
    
     flint_randinit(state);
@@ -52,15 +52,14 @@ int main(void)
 
         if (result != b)
         {
-            printf("FAIL:\n");
-            printf("%lu ** (%lu) == %lu != %lu\n", root, d, result, b);
+            flint_printf("FAIL:\n");
+            flint_printf("%wu ** (%wu) == %wu != %wu\n", root, d, result, b);
             abort();
         }
     }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   flint_printf("PASS\n");
    return 0;
 
 }

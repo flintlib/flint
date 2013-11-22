@@ -36,8 +36,7 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
 
     flint_printf("make_monic....");
     fflush(stdout);
@@ -46,7 +45,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
 
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a,b;
@@ -77,7 +76,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
 
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a;
@@ -101,8 +100,8 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
 
     }
-    flint_randclear(state);
-
+    
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

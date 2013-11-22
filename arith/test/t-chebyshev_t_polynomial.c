@@ -37,6 +37,8 @@ int main()
     fmpz_poly_t T0, T1, T2, t;
     slong n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("chebyshev_t_polynomial....");
     fflush(stdout);
 
@@ -74,7 +76,7 @@ int main()
     fmpz_poly_clear(T2);
     fmpz_poly_clear(t);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

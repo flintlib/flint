@@ -21,6 +21,7 @@
 
     Copyright (C) 2011, 2012 Sebastian Pancratz 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
@@ -28,7 +29,7 @@
 
 void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx)
 {
-    long max = FLINT_MAX(op1->length, op2->length);
+    slong max = FLINT_MAX(op1->length, op2->length);
 
     nmod_poly_fit_length(rop, max);
 

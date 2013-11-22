@@ -34,13 +34,11 @@ int
 main(void)
 {
     int i, j, result;
-    flint_rand_t state;
     fq_zech_ctx_t ctx;
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("get_fq_nmod/set_fq_nmod... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (j = 0; j < 10; j++)
     {
@@ -70,7 +68,7 @@ main(void)
                 flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_nmod_print_pretty(c, ctx->fq_nmod_ctx), flint_printf("\n");
-                flint_printf("table = %ld\n", ctx->eval_table[a->value]);
+                flint_printf("table = %wd\n", ctx->eval_table[a->value]);
                 abort();
             }
 
@@ -82,8 +80,7 @@ main(void)
         fq_zech_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

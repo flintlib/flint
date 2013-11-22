@@ -34,13 +34,11 @@ int
 main(void)
 {
     int j, i, result;
-    flint_rand_t state;
     fq_zech_ctx_t ctx;
-
+    FLINT_TEST_INIT(state);
+    
     flint_printf("sub... ");
     fflush(stdout);
-
-    flint_randinit(state);
 
     for (j = 0; j < 10; j++)
     {
@@ -210,8 +208,7 @@ main(void)
         fq_zech_ctx_clear(ctx); 
    }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

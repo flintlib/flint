@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
@@ -32,9 +33,9 @@
  */
 
 void
-_fq_frobenius(fmpz * rop, const fmpz * op, long len, long e, const fq_ctx_t ctx)
+_fq_frobenius(fmpz * rop, const fmpz * op, slong len, slong e, const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
+    const slong d = fq_ctx_degree(ctx);
 
     if (len == 1)               /* op is in Fp, not just Fq */
     {
@@ -53,9 +54,9 @@ _fq_frobenius(fmpz * rop, const fmpz * op, long len, long e, const fq_ctx_t ctx)
 }
 
 void
-fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
+fq_frobenius(fq_t rop, const fq_t op, slong e, const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
+    const slong d = fq_ctx_degree(ctx);
 
     e = e % d;
     if (e < 0)

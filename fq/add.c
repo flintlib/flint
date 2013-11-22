@@ -21,7 +21,8 @@
 
     Copyright (C) 2011, 2012 Sebastian Pancratz 
     Copyright (C) 2012 Andres Goens
- 
+    Copyright (C) 2013 Mike Hansen
+
 ******************************************************************************/
 
 #include "fq.h"
@@ -29,7 +30,7 @@
 void
 fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
-    long max = FLINT_MAX(op1->length, op2->length);
+    slong max = FLINT_MAX(op1->length, op2->length);
 
     fmpz_poly_fit_length(rop, max);
 

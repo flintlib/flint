@@ -31,10 +31,10 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, long len, long n,
+_TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len, slong n,
                     const TEMPLATE(T, ctx_t) ctx)
 {
-    long i;
+    slong i;
 
     if (rop != op)
     {
@@ -52,7 +52,7 @@ _TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struc
 }
 
 void
-TEMPLATE(T, poly_shift_left)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, long n,
+TEMPLATE(T, poly_shift_left)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, slong n,
                    const TEMPLATE(T, ctx_t) ctx)
 {
     if (n == 0)

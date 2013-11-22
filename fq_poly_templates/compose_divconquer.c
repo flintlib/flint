@@ -31,12 +31,12 @@
 
 void
 _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
-                            const TEMPLATE(T, struct) * op1, long len1,
-                            const TEMPLATE(T, struct) * op2, long len2,
+                            const TEMPLATE(T, struct) * op1, slong len1,
+                            const TEMPLATE(T, struct) * op2, slong len2,
                             const TEMPLATE(T, ctx_t) ctx)
 {
-    long i, j, k, n;
-    long *hlen, alloc, powlen;
+    slong i, j, k, n;
+    slong *hlen, alloc, powlen;
     TEMPLATE(T, struct) *v, **h, *pow, *temp;
 
     if (len1 <= 2 || len2 <= 1)
@@ -52,14 +52,14 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
 
     /* Initialisation */
 
-    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (slong *) flint_malloc(((len1 + 1) / 2) * sizeof(slong));
 
     k = FLINT_CLOG2(len1) - 1;
 
     hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
     {
-        long hi = (len1 + (1 << i) - 1) / (1 << i);
+        slong hi = (len1 + (1 << i) - 1) / (1 << i);
         for (n = (hi + 1) / 2; n < hi; n++)
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
@@ -97,7 +97,7 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
             hlen[i] = 1;
         }
     }
-    if ((len1 & 1L))
+    if ((len1 & WORD(1)))
     {
         if (!TEMPLATE(T, is_zero)(op1 + j, ctx))
         {
@@ -113,7 +113,7 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
     {
         if (hlen[1] > 0)
         {
-            long templen = powlen + hlen[1] - 1;
+            slong templen = powlen + hlen[1] - 1;
             _TEMPLATE(T, poly_mul)(temp, pow, powlen, h[1], hlen[1], ctx);
             _TEMPLATE(T, poly_add)(h[0], temp, templen, h[0], hlen[0], ctx);
             hlen[0] = FLINT_MAX(hlen[0], templen);
@@ -132,7 +132,7 @@ _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) * rop,
             _TEMPLATE(T, poly_add)(h[i], h[i], hlen[i], h[2 * i], hlen[2 * i], ctx);
             hlen[i] = FLINT_MAX(hlen[i], hlen[2 * i]);
         }
-        if ((n & 1L))
+        if ((n & WORD(1)))
         {
             _TEMPLATE(T, poly_set)(h[i], h[2 * i], hlen[2 * i], ctx);
             hlen[i] = hlen[2 * i];
@@ -160,9 +160,9 @@ TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, poly_t) rop,
                            const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2,
                            const TEMPLATE(T, ctx_t) ctx)
 {
-    const long len1 = op1->length;
-    const long len2 = op2->length;
-    const long lenr = (len1 - 1) * (len2 - 1) + 1;
+    const slong len1 = op1->length;
+    const slong len2 = op2->length;
+    const slong lenr = (len1 - 1) * (len2 - 1) + 1;
 
     if (len1 == 0)
     {

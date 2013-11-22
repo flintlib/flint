@@ -99,6 +99,8 @@ int main()
     fmpz_poly_t p;
     slong n;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("cyclotomic_cos_polynomial....");
     fflush(stdout);
 
@@ -121,7 +123,7 @@ int main()
 
     fmpz_poly_clear(p);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

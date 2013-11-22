@@ -32,10 +32,9 @@ int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
-
-    printf("factor_berlekamp....");
+    FLINT_TEST_INIT(state);
+    
+    flint_printf("factor_berlekamp....");
     fflush(stdout);
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
@@ -96,7 +95,7 @@ main(void)
 
         if (res->num != num)
         {
-            printf("Error: number of factors incorrect: %ld != %ld\n",
+            flint_printf("Error: number of factors incorrect: %wd != %wd\n",
                    res->num, num);
             TEMPLATE(T, ctx_print)(ctx); flint_printf("\n");
             TEMPLATE(T, poly_print_pretty)(poly1, "x", ctx);
@@ -116,14 +115,14 @@ main(void)
 
         if (!TEMPLATE(T, poly_equal)(poly1, product, ctx))
         {
-            printf
+            flint_printf
                 ("Error: product of factors does not equal to the original polynomial\n");
-            printf("poly:\n");
+            flint_printf("poly:\n");
             TEMPLATE(T, poly_print)(poly1, ctx);
-            printf("\n");
-            printf("product:\n");
+            flint_printf("\n");
+            flint_printf("product:\n");
             TEMPLATE(T, poly_print)(product, ctx);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -137,9 +136,8 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }
 

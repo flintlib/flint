@@ -40,17 +40,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     flint_printf("mul_classical... ");
     fflush(stdout);
 
-    flint_randinit(state);
-
     /* Check aliasing: a = a * b */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -87,7 +85,7 @@ main(void)
     /* Check aliasing: b = a * b */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
@@ -124,7 +122,7 @@ main(void)
     /* Check aliasing: a = a * a */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, c;
@@ -157,7 +155,7 @@ main(void)
     /* Check that a * b == b * a */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, e;
@@ -197,7 +195,7 @@ main(void)
     /* Check that (b*c)+(b*d) = b*(c+d) */
     for (i = 0; i < 2000; i++)
     {
-        long len;
+        slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a1, a2, b, c, d;
@@ -242,8 +240,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

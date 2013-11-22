@@ -51,6 +51,8 @@ int main(void)
     fmpz_t t;
     slong i, j;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("sum_of_squares....");
     fflush(stdout);
 
@@ -80,7 +82,7 @@ int main(void)
     _fmpz_vec_clear(r, N);
     fmpz_clear(t);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

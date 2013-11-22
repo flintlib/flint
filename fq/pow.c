@@ -20,16 +20,17 @@
 /******************************************************************************
 
     Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
 #include "fq.h"
 
 void
-_fq_pow(fmpz * rop, const fmpz * op, long len, const fmpz_t e,
+_fq_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
         const fq_ctx_t ctx)
 {
-    const long d = fq_ctx_degree(ctx);
+    const slong d = fq_ctx_degree(ctx);
 
     if (fmpz_is_zero(e))
     {
@@ -143,7 +144,7 @@ fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx)
     }
     else
     {
-        const long d = fq_ctx_degree(ctx);
+        const slong d = fq_ctx_degree(ctx);
         fmpz *t;
 
         if (rop == op)

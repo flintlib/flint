@@ -111,10 +111,8 @@ int
 main(void)
 {
     slong i;
-
-    flint_rand_t state;
-    flint_randinit(state);
-
+    FLINT_TEST_INIT(state);
+    
     printf("lu_classical....");
     fflush(stdout);
 
@@ -169,7 +167,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }

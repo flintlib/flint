@@ -41,6 +41,8 @@ int main()
     fmpz_t res;
     slong n, N;
 
+    FLINT_TEST_INIT(state);
+
     flint_printf("euler_number_zeta....");
     fflush(stdout);
 
@@ -66,7 +68,7 @@ int main()
 
     _fmpz_vec_clear(ress, N);
 
-    flint_cleanup();
+    FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }

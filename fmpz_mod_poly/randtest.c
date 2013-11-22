@@ -21,6 +21,7 @@
 
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -112,11 +113,10 @@ fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly, flint_rand_t state, slong
     fmpz_mod_poly_fit_length(poly, len);
     _fmpz_vec_zero(poly->coeffs, len);
     fmpz_randm(poly->coeffs, state, &(poly->p));
-    fmpz_one(poly->coeffs + len - 1);
-    poly->coeffs[len - 1] = 1;
     k = (n_randtest(state) % (len - 2)) + 1;
     fmpz_randm(poly->coeffs + k, state, &(poly->p));
-    poly->length = len;
+    fmpz_one(poly->coeffs + len - 1);
+    _fmpz_mod_poly_set_length(poly, len);
 }
 
 void
@@ -129,7 +129,7 @@ fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly, flint_rand_t state, slong
     fmpz_randm(poly->coeffs + 2, state, &(poly->p));
     fmpz_randm(poly->coeffs + 3, state, &(poly->p));
     fmpz_one(poly->coeffs + len - 1);
-    poly->length = len;
+    _fmpz_mod_poly_set_length(poly, len);
 }
 
 int
@@ -173,7 +173,6 @@ fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly, flint_rand_t 
 void
 fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
 {
-    int result;
     if (len < 3)
     {
         fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);
@@ -181,11 +180,8 @@ fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t sta
     }
 
     /* Try trinomials */
-    result = fmpz_mod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len);
-    if (result)
-    {
+    if (fmpz_mod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len))
         return;
-    }
 
     if (len < 5)
     {
@@ -194,11 +190,8 @@ fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t sta
     }
 
     /* Try pentomials */
-    result = fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len);
-    if (result)
-    {
+    if (fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len))
         return;
-    }
 
     /* Give up */
     fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);

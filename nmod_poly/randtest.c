@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -72,8 +73,8 @@ nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
     poly->coeffs[0] = n_randtest(state) % poly->mod.n;
     poly->coeffs[len - 1] = 1;
     k = (n_randtest(state) % (len - 2)) + 1;
-    poly->coeffs[k] = n_randtest(state) % poly->mod.n;   
-    poly->length = len;
+    poly->coeffs[k] = n_randtest(state) % poly->mod.n;
+    _nmod_poly_set_length(poly, len);
 }
 
 void
@@ -86,7 +87,7 @@ nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
     poly->coeffs[2] = n_randtest(state) % poly->mod.n;
     poly->coeffs[3] = n_randtest(state) % poly->mod.n;
     poly->coeffs[len - 1] = 1;
-    poly->length = len;
+    _nmod_poly_set_length(poly, len);
 }
 
 int
@@ -130,7 +131,6 @@ nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
 void
 nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 {
-    int result;
     if (len < 3)
     {
         nmod_poly_randtest_monic_irreducible(poly, state, len);
@@ -138,11 +138,8 @@ nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slon
     }
 
     /* Try trinomials */
-    result = nmod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len);
-    if (result)
-    {
+    if (nmod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len))
         return;
-    }
 
     if (len < 5)
     {
@@ -151,11 +148,8 @@ nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_rand_t state, slon
     }
 
     /* Try pentomials */
-    result = nmod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len);
-    if (result)
-    {
+    if (nmod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len))
         return;
-    }
 
     /* Give up */
     nmod_poly_randtest_monic_irreducible(poly, state, len);
