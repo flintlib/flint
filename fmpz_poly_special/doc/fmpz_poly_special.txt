@@ -48,16 +48,27 @@ void _fmpz_poly_eta_qexp(fmpz * f, slong r, slong len)
 void fmpz_poly_eta_qexp(fmpz_poly_t f, slong r, slong n)
 
     Sets $f$ to the $q$-expansion to length $n$ of the
-    Dedekind eta function (normalised by removing the leading factor
+    Dedekind eta function (without the leading factor
     $q^{1/24}$) raised to the power $r$, i.e.
-
-    \begin{equation}
-    (q^{-1/24} \eta(q))^r = \prod_{k=1}^{\infty} (1 - q^k)^r.
-    \end{equation}
+    $(q^{-1/24} \eta(q))^r = \prod_{k=1}^{\infty} (1 - q^k)^r$.
 
     In particular, $r = -1$ gives the generating function
     of the partition function $p(k)$, and $r = 24$ gives,
     after multiplication by $q$,
     the modular discriminant $\Delta(q)$ which generates
     the Ramanujan tau function $\tau(k)$.
+
+    This function uses sparse formulas for $r = 1, 2, 3, 4, 6$
+    and otherwise reduces to one of those cases using power series arithmetic.
+
+void _fmpz_poly_theta_qexp(fmpz * f, slong r, slong len)
+
+void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
+
+    Sets $f$ to the $q$-expansion to length $n$ of the
+    Jacobi theta function raised to the power $r$, i.e. $\vartheta(q)^r$
+    where $\vartheta(q) = 1 + \sum_{k=1}^{\infty} q^{k^2}$.
+
+    This function uses sparse formulas for $r = 1, 2$
+    and otherwise reduces to those cases using power series arithmetic.
 

@@ -180,7 +180,12 @@ _fmpz_poly_eta_qexp(fmpz * f, slong e, slong len)
         _fmpz_vec_clear(t, len);
         return;
     }
-
+    else if (e == 0)
+    {
+        _fmpz_vec_zero(f, len);
+        if (len > 0)
+            fmpz_set_ui(f, 1);
+    }
     else if (e == 1)
     {
         _eta_one(f, len);
