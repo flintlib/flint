@@ -217,5 +217,5 @@ build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.
 print-%:
 	@echo '$*=$($*)'
 
-.PHONY: profile library shared static clean examples tune check tests distclean dist install all
+.PHONY: profile library shared static clean examples tune check tests distclean dist install all valgrind
 
