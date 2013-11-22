@@ -94,6 +94,7 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 
             fq_ctx_init_modulus(ctx, p, d, mod, var);
 
+            fmpz_mod_poly_clear(mod);
             fclose(file);
             flint_free(buf);
             return 1;

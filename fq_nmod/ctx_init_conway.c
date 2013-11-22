@@ -91,6 +91,7 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
 
             fq_nmod_ctx_init_modulus(ctx, p, d, mod, var);
 
+            nmod_poly_clear(mod);
             fclose(file);
             flint_free(buf);
             return 1;
