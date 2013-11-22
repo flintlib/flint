@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -72,8 +73,8 @@ nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
     poly->coeffs[0] = n_randtest(state) % poly->mod.n;
     poly->coeffs[len - 1] = 1;
     k = (n_randtest(state) % (len - 2)) + 1;
-    poly->coeffs[k] = n_randtest(state) % poly->mod.n;   
-    poly->length = len;
+    poly->coeffs[k] = n_randtest(state) % poly->mod.n;
+    _nmod_poly_set_length(poly, len);
 }
 
 void
@@ -86,7 +87,7 @@ nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
     poly->coeffs[2] = n_randtest(state) % poly->mod.n;
     poly->coeffs[3] = n_randtest(state) % poly->mod.n;
     poly->coeffs[len - 1] = 1;
-    poly->length = len;
+    _nmod_poly_set_length(poly, len);
 }
 
 int
