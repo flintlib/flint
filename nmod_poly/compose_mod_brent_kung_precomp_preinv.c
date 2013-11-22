@@ -36,13 +36,13 @@ _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
                                    const nmod_poly_t f)
 {
     mp_ptr tmp1;
-    slong n= f->length-1;
-    slong i, m= n_sqrt (n)+1;
+    slong n = f->length - 1;
+    slong i, m = n_sqrt(n) + 1;
 
-    nmod_mat_init (A, m, n, f->mod.n);
+    nmod_mat_init(A, m, n, f->mod.n);
 
     A->rows[0][0] = UWORD(1);
-    tmp1= _nmod_vec_init (B->c - f->length + 1);
+    tmp1 = _nmod_vec_init(B->c - f->length + 1);
     for (i= 1; i < m; i++)
         _nmod_poly_divrem (tmp1, A->rows[i], B->rows[i], B->c, f->coeffs,
                            f->length, f->mod);
@@ -65,7 +65,7 @@ _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
     A->rows[0][0] = UWORD(1);
     _nmod_vec_set(A->rows[1], poly1, n);
     for (i = 2; i < m; i++)
-        _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i-1],
+        _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i - 1],
             n, poly1, n, poly2, len2, poly2inv, len2inv, mod);
 }
 
@@ -76,7 +76,7 @@ nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
     slong len1 = poly1->length;
     slong len2 = poly2->length;
     slong len = len2 - 1;
-    slong m= n_sqrt (len) + 1;
+    slong m = n_sqrt(len) + 1;
 
     mp_ptr ptr1;
 
@@ -94,7 +94,7 @@ nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
 
     if (len2 == 1)
     {
-        nmod_mat_zero (A);
+        nmod_mat_zero(A);
         return;
     }
 
