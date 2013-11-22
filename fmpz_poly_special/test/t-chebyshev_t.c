@@ -23,50 +23,53 @@
 
 ******************************************************************************/
 
-#include "arith.h"
+#include "fmpz_poly.h"
 
-void
-_arith_chebyshev_t_polynomial(fmpz * coeffs, ulong n)
+int main()
 {
-    slong k, i, d, m;
+    fmpz_poly_t T0, T1, T2, t;
+    slong n;
 
-    d = n % 2;
+    FLINT_TEST_INIT(state);
 
-    fmpz_zero(coeffs);
-    fmpz_set_ui(coeffs + d, d ? n : 1);
-    if (n % 4 >= 2)
-        fmpz_neg(coeffs + d, coeffs + d);
+    flint_printf("chebyshev_t....");
+    fflush(stdout);
 
-    m = n / 2;
+    fmpz_poly_init(T0);
+    fmpz_poly_init(T1);
+    fmpz_poly_init(T2);
+    fmpz_poly_init(t);
 
-    for (k = 1; k <= m; k++)
+    fmpz_poly_chebyshev_t(T0, 0);
+    fmpz_poly_chebyshev_t(T1, 1);
+
+    for (n = 2; n <= 500; n++)
     {
-        i = 2 * k + d;
-        fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, 4*(m-k+1), n+k-m-1);
-        fmpz_divexact2_uiui(coeffs + i, coeffs + i, n+2*k-2*m-1, n+2*k-2*m);
-        fmpz_neg(coeffs + i, coeffs + i);
-        fmpz_zero(coeffs + i - 1);
+        fmpz_poly_chebyshev_t(T2, n);
+
+        /* Verify T_{n+1} = 2 x T_n - T_{n-1} */
+        fmpz_poly_scalar_mul_ui(t, T1, UWORD(2));
+        fmpz_poly_shift_left(t, t, 1);
+        fmpz_poly_sub(t, t, T0);
+
+        if (!fmpz_poly_equal(t, T2))
+        {
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("t: "); fmpz_poly_print_pretty(t, "x"); flint_printf("\n");
+            flint_printf("T2: "); fmpz_poly_print_pretty(T2, "x"); flint_printf("\n");
+            abort();
+        }
+
+        fmpz_poly_swap(T0, T1);
+        fmpz_poly_swap(T1, T2);
     }
-}
 
-void
-arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
-{
-    if (n == 0)
-    {
-        fmpz_poly_set_ui(poly, UWORD(1));
-        return;
-    }
+    fmpz_poly_clear(T0);
+    fmpz_poly_clear(T1);
+    fmpz_poly_clear(T2);
+    fmpz_poly_clear(t);
 
-    fmpz_poly_fit_length(poly, n + 1);
-
-    if (n == 1)
-    {
-        fmpz_zero(poly->coeffs);
-        fmpz_one(poly->coeffs + 1);
-    }
-    else
-        _arith_chebyshev_t_polynomial(poly->coeffs, n);
-
-    _fmpz_poly_set_length(poly, n + 1);
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }

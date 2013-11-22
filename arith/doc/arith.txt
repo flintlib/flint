@@ -422,18 +422,6 @@ void arith_legendre_polynomial(fmpq_poly_t poly, ulong n)
     denominator is given by
     $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 
-void arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the Chebyshev polynomial of the first kind $T_n(x)$,
-    defined formally by $T_n(x) = \cos(n \cos^{-1}(x))$. The coefficients are
-    calculated using a hypergeometric recurrence.
-
-void arith_chebyshev_u_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the Chebyshev polynomial of the first kind $U_n(x)$,
-    which satisfies $(n+1) U_n(x) = T'_{n+1}(x)$.
-    The coefficients are calculated using a hypergeometric recurrence.
-
 *******************************************************************************
 
     Multiplicative functions
@@ -506,61 +494,6 @@ void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 
 *******************************************************************************
 
-void _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi)
-
-    Sets \code{a} to the lower half of the cyclotomic polynomial $\Phi_n(x)$,
-    given $n \ge 3$ which must be squarefree.
-
-    A precomputed array containing the prime factors of $n$ must be provided,
-    as well as the value of the Euler totient function $\phi(n)$ as \code{phi}.
-    If $n$ is even, 2 must be the first factor in the list.
-
-    The degree of $\Phi_n(x)$ is exactly $\phi(n)$. Only the low
-    $(\phi(n) + 1) / 2$ coefficients are written; the high coefficients
-    can be obtained afterwards by copying the low coefficients
-    in reverse order, since  $\Phi_n(x)$ is a palindrome for $n \ne 1$.
-
-    We use the sparse power series algorithm described as Algorithm 4
-    \cite{ArnoldMonagan2011}. The algorithm is based on the identity
-
-        $$\Phi_n(x) = \prod_{d|n} (x^d - 1)^{\mu(n/d)}.$$
-
-    Treating the polynomial as a power series, the multiplications and
-    divisions can be done very cheaply using repeated additions and
-    subtractions. The complexity is $O(2^k \phi(n))$ where $k$ is the
-    number of prime factors in $n$.
-
-    To improve efficiency for small $n$, we treat the \code{fmpz}
-    coefficients as machine integers when there is no risk of overflow.
-    The following bounds are given in Table 6 of \cite{ArnoldMonagan2011}:
-
-    For $n < 10163195$, the largest coefficient in any $\Phi_n(x)$
-    has 27 bits, so machine arithmetic is safe on 32 bits.
-
-    For $n < 169828113$, the largest coefficient in any $\Phi_n(x)$
-    has 60 bits, so machine arithmetic is safe on 64 bits.
-
-    Further, the coefficients are always $\pm 1$ or 0 if there are
-    exactly two prime factors, so in this case machine arithmetic can be
-    used as well.
-
-    Finally, we handle two special cases: if there is exactly one prime
-    factor $n = p$, then $\Phi_n(x) = 1 + x + x^2 + \ldots + x^{n-1}$,
-    and if $n = 2m$, we use $\Phi_n(x) = \Phi_m(-x)$ to fall back
-    to the case when $n$ is odd.
-
-void arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the $n$th cyclotomic polynomial, defined as
-
-        $$\Phi_n(x) = \prod_{\omega} (x-\omega)$$
-
-    where $\omega$ runs over all the $n$th primitive roots of unity.
-
-    We factor $n$ into $n = qs$ where $q$ is squarefree,
-    and compute $\Phi_q(x)$. Then $\Phi_n(x) = \Phi_q(x^s)$.
-
 void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
 
     For $n \ge 1$, sets \code{(coeffs, d+1)} to the minimal polynomial
@@ -590,23 +523,6 @@ void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
     degree $\phi(n) / 2$ otherwise.
 
     We allow $n = 0$ and define $\Psi_0 = 1$.
-
-
-*******************************************************************************
-
-    Swinnerton-Dyer polynomials
-
-*******************************************************************************
-
-void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the Swinnerton-Dyer polynomial $S_n$, defined as
-    the integer polynomial
-    $$S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3}
-        \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})$$
-    where $p_n$ denotes the $n$-th prime number and all combinations
-    of signs are taken. This polynomial has degree $2^n$ and is
-    irreducible over the integers.
 
 
 *******************************************************************************

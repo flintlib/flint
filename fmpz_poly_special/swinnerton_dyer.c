@@ -26,8 +26,7 @@
 ******************************************************************************/
 
 #include <math.h>
-#include "arith.h"
-
+#include "fmpz_poly.h"
 
 /* Bound coefficients using (x + u)^(2^n) and the binomial
    coefficients. TODO: this is about 2x too large... */
@@ -50,27 +49,23 @@ static slong __bound_prec(ulong n)
     return u;
 }
 
-void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
+void
+_fmpz_poly_swinnerton_dyer(fmpz * T, ulong n)
 {
-    fmpz *square_roots, *T, *tmp1, *tmp2, *tmp3;
+    fmpz *square_roots, *tmp1, *tmp2, *tmp3;
     fmpz_t one;
     slong i, j, k, N;
     slong prec;
 
     if (n == 0)
     {
-        fmpz_poly_zero(poly);
-        fmpz_poly_set_coeff_ui(poly, 1, UWORD(1));
+        fmpz_zero(T);
+        fmpz_one(T + 1);
         return;
     }
 
     N = WORD(1) << n;
-
     prec = __bound_prec(n);
-    /* flint_printf("prec: %wd\n", prec); */
-
-    fmpz_poly_fit_length(poly, N + 1);
-    T = poly->coeffs;
 
     fmpz_init(one);
     fmpz_one(one);
@@ -128,7 +123,6 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
 
     _fmpz_vec_scalar_fdiv_q_2exp(T, T, N, prec);
     fmpz_one(T + (UWORD(1) << n));
-    _fmpz_poly_set_length(poly, N + 1);
 
     _fmpz_vec_clear(square_roots, n);
     flint_free(tmp1);
@@ -136,3 +130,13 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     _fmpz_vec_clear(tmp3, UWORD(1) << n);
     fmpz_clear(one);
 }
+
+void
+fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
+{
+    slong N = (WORD(1) << n);
+    fmpz_poly_fit_length(poly, N + 1);
+    _fmpz_poly_swinnerton_dyer(poly->coeffs, n);
+    _fmpz_poly_set_length(poly, N + 1);
+}
+

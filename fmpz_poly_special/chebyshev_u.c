@@ -19,39 +19,55 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_POLY_SPECIAL_H
-#define FMPZ_POLY_SPECIAL_H
+#include "fmpz_poly.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+void
+_fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
+{
+    slong k, i, d, m;
 
-void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi);
-void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
+    d = n % 2;
 
-void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
-void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n);
+    fmpz_zero(coeffs);
+    fmpz_set_ui(coeffs + d, d ? n + 1 : 1);
+    if (n % 4 >= 2)
+        fmpz_neg(coeffs + d, coeffs + d);
 
-void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n);
+    m = n / 2;
 
-void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n);
-
-void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
-
-void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
-
-#ifdef __cplusplus
+    for (k = 1; k <= m; k++)
+    {
+        i = 2 * k + d;
+        fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, 4*(m-k+1), n+k-m);
+        fmpz_divexact2_uiui(coeffs + i, coeffs + i, n+2*k-2*m-1, n+2*k-2*m);
+        fmpz_neg(coeffs + i, coeffs + i);
+        fmpz_zero(coeffs + i - 1);
+    }
 }
-#endif
 
-#endif
+void
+fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
+{
+    if (n == 0)
+    {
+        fmpz_poly_one(poly);
+        return;
+    }
+
+    fmpz_poly_fit_length(poly, n + 1);
+
+    if (n == 1)
+    {
+        fmpz_zero(poly->coeffs);
+        fmpz_set_ui(poly->coeffs + 1, 2);
+    }
+    else
+        _fmpz_poly_chebyshev_u(poly->coeffs, n);
+
+    _fmpz_poly_set_length(poly, n + 1);
+}
 

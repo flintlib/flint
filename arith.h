@@ -169,9 +169,8 @@ void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n);
 
 /* Cyclotomic polynomials ****************************************************/
 
-void _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi);
-void arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
+#define _arith_cyclotomic_polynomial _fmpz_poly_cyclotomic
+#define arith_cyclotomic_polynomial fmpz_poly_cyclotomic
 
 void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n);
 void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
@@ -179,12 +178,16 @@ void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
 /* Hypergeometric polynomials ************************************************/
 
 void arith_legendre_polynomial(fmpq_poly_t poly, ulong n);
-void arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n);
-void arith_chebyshev_u_polynomial(fmpz_poly_t poly, ulong n);
+
+#define _arith_chebyshev_t_polynomial _fmpz_poly_chebyshev_t
+#define arith_chebyshev_t_polynomial fmpz_poly_chebyshev_t
+#define _arith_chebyshev_u_polynomial _fmpz_poly_chebyshev_u
+#define arith_chebyshev_u_polynomial fmpz_poly_chebyshev_u
 
 /* Swinnerton-Dyer polynomials ***********************************************/
 
-void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
+#define _arith_swinnerton_dyer_polynomial _fmpz_poly_swinnerton_dyer
+#define arith_swinnerton_dyer_polynomial fmpz_poly_swinnerton_dyer
 
 /* Landau function ***********************************************************/
 

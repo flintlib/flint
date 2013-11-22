@@ -19,39 +19,55 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_POLY_SPECIAL_H
-#define FMPZ_POLY_SPECIAL_H
+#include "fmpz_poly.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+static const mp_limb_t known_values[] =
+{
+    UWORD(2147483629),
+    UWORD(1073742093),
+    UWORD(1342248677),
+    UWORD(3319936736),
+    UWORD(2947821228),
+    UWORD(1019513834),
+    UWORD(3324951530),
+    UWORD(1995039408),
+    UWORD(3505683295),
+    UWORD(3567639420),
+    UWORD(394942914)
+};
 
-void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi);
-void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
+int main()
+{
+    fmpz_poly_t S;
+    mp_limb_t r;
+    slong n;
 
-void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
-void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n);
+    FLINT_TEST_INIT(state);
 
-void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n);
+    flint_printf("swinnerton_dyer....");
+    fflush(stdout);
 
-void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n);
+    for (n = 0; n <= 10; n++)
+    {
+        fmpz_poly_init(S);
+        fmpz_poly_swinnerton_dyer(S, n);
+        r = fmpz_poly_evaluate_mod(S, UWORD(2147483629), UWORD(4294967291));
 
-void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
+        if (r != known_values[n])
+        {
+            flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
+            abort();
+        }
 
-void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
+        fmpz_poly_clear(S);
+    }
 
-#ifdef __cplusplus
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }
-#endif
-
-#endif
 

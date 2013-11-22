@@ -19,39 +19,47 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_POLY_SPECIAL_H
-#define FMPZ_POLY_SPECIAL_H
+#include "fmpz_poly.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+int main()
+{
+    fmpz_poly_t T, U;
 
-void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi);
-void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
+    slong n;
 
-void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
-void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n);
+    FLINT_TEST_INIT(state);
 
-void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n);
+    flint_printf("chebyshev_u....");
+    fflush(stdout);
 
-void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n);
+    fmpz_poly_init(T);
+    fmpz_poly_init(U);
 
-void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
+    for (n = 0; n <= 500; n++)
+    {
+        fmpz_poly_chebyshev_u(U, n);
+        fmpz_poly_chebyshev_t(T, n + 1);
+        fmpz_poly_derivative(T, T);
+        fmpz_poly_scalar_divexact_ui(T, T, n + 1);
 
-void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
+        if (!fmpz_poly_equal(T, U))
+        {
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("T: "); fmpz_poly_print_pretty(T, "x"); flint_printf("\n");
+            flint_printf("U: "); fmpz_poly_print_pretty(U, "x"); flint_printf("\n");
+            abort();
+        }
 
-#ifdef __cplusplus
+    }
+
+    fmpz_poly_clear(T);
+    fmpz_poly_clear(U);
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }
-#endif
-
-#endif
-
