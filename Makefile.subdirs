@@ -66,6 +66,10 @@ check: tests $(TESTS_RUN)
 
 -include $(patsubst %, %.d, $(TESTS))
 
+ifeq ($(FLINT_SHARED), 0)
+$(BUILD_DIR)/test/%$(EXEEXT): $(BUILD_DIR)/../../libflint.a
+endif
+
 $(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
