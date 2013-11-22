@@ -173,7 +173,6 @@ fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t poly, flint_rand_t 
 void
 fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t state, slong len)
 {
-    int result;
     if (len < 3)
     {
         fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);
@@ -181,11 +180,8 @@ fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t sta
     }
 
     /* Try trinomials */
-    result = fmpz_mod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len);
-    if (result)
-    {
+    if (fmpz_mod_poly_randtest_trinomial_irreducible(poly, state, len, 2*len))
         return;
-    }
 
     if (len < 5)
     {
@@ -194,11 +190,8 @@ fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly, flint_rand_t sta
     }
 
     /* Try pentomials */
-    result = fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len);
-    if (result)
-    {
+    if (fmpz_mod_poly_randtest_pentomial_irreducible(poly, state, len, 2*len))
         return;
-    }
 
     /* Give up */
     fmpz_mod_poly_randtest_monic_irreducible(poly, state, len);
