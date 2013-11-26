@@ -34,10 +34,10 @@ namespace flint {
 namespace detail {
 struct fmpz_vector_data
 {
-    long size;
+    slong size;
     fmpz* array;
 
-    fmpz_vector_data(long n)
+    fmpz_vector_data(slong n)
         : size(n), array(_fmpz_vec_init(n)) {}
 
     ~fmpz_vector_data() {_fmpz_vec_clear(array, size);}
@@ -48,13 +48,13 @@ struct fmpz_vector_data
         _fmpz_vec_set(array, o.array, size);
     }
 
-    fmpzxx_ref at(long i) {return fmpzxx_ref::make(array + i);}
-    fmpzxx_srcref at(long i) const {return fmpzxx_srcref::make(array + i);}
+    fmpzxx_ref at(slong i) {return fmpzxx_ref::make(array + i);}
+    fmpzxx_srcref at(slong i) const {return fmpzxx_srcref::make(array + i);}
 };
 } // detail
 
 typedef vector_expression<
-    detail::wrapped_vector_traits<fmpzxx, long, fmpzxx_ref, fmpzxx_srcref, fmpz>,
+    detail::wrapped_vector_traits<fmpzxx, slong, fmpzxx_ref, fmpzxx_srcref, fmpz>,
     operations::immediate,
     detail::fmpz_vector_data> fmpz_vecxx;
 // TODO references
@@ -80,7 +80,7 @@ struct to_string<T, typename mp::enable_if<FMPZ_VECXX_COND_S<T> >::type>
             return o.str();
         }
         o << "  ";
-        for(long i = 0;i < e.size();++i)
+        for(slong i = 0;i < e.size();++i)
         {
             o << e[i].to_string(base);
             if(i != e.size() - 1)

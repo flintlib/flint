@@ -530,15 +530,15 @@ FLINT_DEFINE_THREEARY_EXPR_COND3(compose_mod_brent_kung_op, fmpz_mod_polyxx,
 namespace detail {
 struct fmpz_mod_poly_vector_data
 {
-    long size;
+    slong size;
     fmpz_mod_poly_struct** array;
 
     template<class Fmpz>
-    void init(long n, const Fmpz& f)
+    void init(slong n, const Fmpz& f)
     {
         size = n;
         array = new fmpz_mod_poly_struct*[n];
-        for(long i = 0;i < n;++i)
+        for(slong i = 0;i < n;++i)
         {
             array[i] = new fmpz_mod_poly_struct();
             fmpz_mod_poly_init(array[i], f._fmpz());
@@ -546,7 +546,7 @@ struct fmpz_mod_poly_vector_data
     }
 
     template<class Fmpz>
-    fmpz_mod_poly_vector_data(long n, const Fmpz& f,
+    fmpz_mod_poly_vector_data(slong n, const Fmpz& f,
             typename mp::enable_if<traits::is_fmpzxx<Fmpz> >::type* = 0)
     {
         init(n, f.evaluate());
@@ -554,7 +554,7 @@ struct fmpz_mod_poly_vector_data
 
     ~fmpz_mod_poly_vector_data()
     {
-        for(long i = 0;i < size;++i)
+        for(slong i = 0;i < size;++i)
         {
             fmpz_mod_poly_clear(array[i]);
             delete array[i];
@@ -566,7 +566,7 @@ struct fmpz_mod_poly_vector_data
         : size(o.size)
     {
         array = new fmpz_mod_poly_struct*[size];
-        for(long i = 0;i < size;++i)
+        for(slong i = 0;i < size;++i)
         {
             array[i] = new fmpz_mod_poly_struct();
             fmpz_mod_poly_init(array[i], &o.array[0]->p);
@@ -574,16 +574,16 @@ struct fmpz_mod_poly_vector_data
         }
     }
 
-    fmpz_mod_polyxx_ref at(long i)
+    fmpz_mod_polyxx_ref at(slong i)
         {return fmpz_mod_polyxx_ref::make(array[i]);}
-    fmpz_mod_polyxx_srcref at(long i) const
+    fmpz_mod_polyxx_srcref at(slong i) const
         {return fmpz_mod_polyxx_srcref::make(array[i]);}
 
     bool equals(const fmpz_mod_poly_vector_data& o) const
     {
         if(size != o.size)
             return false;
-        for(long i = 0;i < size;++i)
+        for(slong i = 0;i < size;++i)
             if(!fmpz_mod_poly_equal(array[i], o.array[i]))
                 return false;
         return true;
@@ -601,7 +601,7 @@ fmpzxx_srcref find_fmpz_mod_polyxx_mod(const T& t)
 }
 
 struct fmpz_mod_poly_vector_traits
-    : wrapped_vector_traits<fmpz_mod_polyxx, long, fmpz_mod_polyxx_ref,
+    : wrapped_vector_traits<fmpz_mod_polyxx, slong, fmpz_mod_polyxx_ref,
           fmpz_mod_polyxx_srcref, fmpz_mod_poly_struct*>
 {
     template<class Expr>

@@ -2738,9 +2738,9 @@ void Nmod_poly_target::_normalise()
     Polynomial properties
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-slong Nmod_poly_expr::length() const
-slong Nmod_poly_expr::degree() const
-slong Nmod_poly_expr::max_bits() const
+sslong Nmod_poly_expr::length() const
+sslong Nmod_poly_expr::degree() const
+sslong Nmod_poly_expr::max_bits() const
 mp_limb_t Nmod_poly_expr::modulus() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3021,7 +3021,7 @@ static Nmod_poly_expr fmpz_polyxx::product_roots(Nmod_vec_expr xs)
 Nmod_poly_expr inflate(Nmod_poly_expr, T:is_unsigned_integer)
 Nmod_poly_expr deflate(Nmod_poly_expr, T:is_unsigned_integer)
 
-ulong Nmod_poly_expr::deflation() const
+uslong Nmod_poly_expr::deflation() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Factorisation
@@ -3029,7 +3029,7 @@ ulong Nmod_poly_expr::deflation() const
 
 bool Nmod_poly_expr::is_squarefree() const
 bool Nmod_poly_expr::is_irreducible() const
-slong Nmod_poly_target::remove(Nmod_poly_expr)
+sslong Nmod_poly_target::remove(Nmod_poly_expr)
 
 nmod_poly_factorxx::nmod_poly_factorxx()
 
@@ -3173,8 +3173,8 @@ nmod_matxx::nmod_matxx(slong m, slong n, mp_limb_t modulus)
 
     Unified coefficient access to the matrix entries.
 
-slong Nmod_mat_expr::rows() const
-slong Nmod_mat_expr::cols() const
+sslong Nmod_mat_expr::rows() const
+sslong Nmod_mat_expr::cols() const
 
     Obtain the number of rows/columns in this matrix. These functions never
     cause evaluation (the matrix size is computed from the operations in the
@@ -3413,8 +3413,8 @@ static nmod_poly_matxx nmod_poly_matxx::randtest_sparse(slong rows, slong cols,
     Basic comparison and properties
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-slong Nmod_poly_mat_expr::rows() const
-slong Nmod_poly_mat_expr::cols() const
+sslong Nmod_poly_mat_expr::rows() const
+sslong Nmod_poly_mat_expr::cols() const
 
     Obtain the number of rows/columns in this matrix. These functions never
     cause evaluation (the matrix size is computed from the operations in the
@@ -3430,7 +3430,7 @@ mp_limb_t Nmod_poly_mat_expr::modulus() const
     Norms
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-slong Nmod_poly_mat_expr::max_length() const
+sslong Nmod_poly_mat_expr::max_length() const
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Arithmetic
@@ -3911,7 +3911,7 @@ fmpz_mod_poly_factorxx factor_squarefree(Fmpz_mod_poly_expr)
     Context
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padicxx_ctx::padicxx_ctx(Fmpz_src p, long min, long max, padic_print_mode mode)
+padicxx_ctx::padicxx_ctx(Fmpz_src p, slong min, slong max, padic_print_mode mode)
 
     Initialize a padic context. See \code{padic_ctx_init}.
 
@@ -3953,7 +3953,7 @@ Padic_expr::unary operation() const
 
 Padic_expr Padic_expr::pow(T:fits_into_slong) const
 
-padicxx_srcref Padic_src::toN(slong N) const
+padicxx_srcref Padic_src::toN(sslong N) const
 
     Obtain a new version of the operand, with changed effective precision.
 
@@ -3989,7 +3989,7 @@ padicxx::padicxx(padicxx_ctx_srcref)
 
     Initialize padic number to default precision. See \code{padic_init}.
 
-padicxx::padicxx(padicxx_ctx_srcref c, long N)
+padicxx::padicxx(padicxx_ctx_srcref c, slong N)
 
     Initialize padic number to precision $N$. See \code{padic_init2}.
 
@@ -4025,17 +4025,17 @@ Padic_target Padic_target::operator=(Fmpq_expr)
 padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref)
 padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref)
 padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref)
-padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, slong N)
-padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, slong N)
-padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref, slong N)
+padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, sslong N)
+padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, sslong N)
+padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref, sslong N)
 
 void Padic_target::set_zero()
 void Padic_target::set_one()
 
 padicxx padicxx::zero(padicxx_ctx_srcref)
-padicxx padicxx::zero(padicxx_ctx_srcref, slong N)
+padicxx padicxx::zero(padicxx_ctx_srcref, sslong N)
 padicxx padicxx::one(padicxx_ctx_srcref)
-padicxx padicxx::one(padicxx_ctx_srcref, slong N)
+padicxx padicxx::one(padicxx_ctx_srcref, sslong N)
 
 bool Padic_expr::is_zero() const
 bool Padic_expr::is_one() const
@@ -4135,7 +4135,7 @@ Padic_poly_expr::binary operation() const
     \code{pow}, \code{compose_pow}, \code{inv_series}, \code{shift_left},
     \code{shift_right}.
 
-padic_polyxx_srcref Padic_poly_src::toN(slong N) const
+padic_polyxx_srcref Padic_poly_src::toN(sslong N) const
 
     Obtain a new version of the operand, with changed effective precision.
 
@@ -4202,14 +4202,14 @@ static padic_polyxx padic_polyxx::randtest_not_zero(frandxx& state,
     we provide the following functions.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref, slong N)
-padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, slong N)
-padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, sslong N)
 padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref)
 padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref)
 padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref)
-padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref, slong N)
-padic_polyxx padic_polyxx::from_QQX(Fmpq_poly_expr, padicxx_ctx_srcref, slong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpq_poly_expr, padicxx_ctx_srcref, sslong N)
 padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref)
 padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref)
 padic_polyxx padic_polyxx::from_ground(Padic_expr)
@@ -4224,9 +4224,9 @@ fmpq_polyxx Padic_poly_expr::to<fmpq_polyxx>() const
     See \code{padic_poly_get_fmpq_poly}.
 
 padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&)
-padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&, slong N)
+padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&, sslong N)
 padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&)
-padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&, slong N)
+padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&, sslong N)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Getting and setting coefficients
@@ -4320,7 +4320,7 @@ padicxx_ctx_srcref Padic_mat_expr::estimate_ctx() const
 
     Obtain a reference to a context occurring in a subexpression.
 
-padic_matxx_srcref Padic_mat_src::toN(slong N) const
+padic_matxx_srcref Padic_mat_src::toN(sslong N) const
 
     Obtain a new version of the operand, with changed effective precision.
 
@@ -4371,9 +4371,9 @@ bool Padic_mat_src::is_empty() const
 void Padic_mat_target::set_zero()
 void Padic_mat_target::set_one()
 padic_matxx padic_matxx::zero(padicxx_ctx_srcref)
-padic_matxx padic_matxx::zero(padicxx_ctx_srcref, slong N)
+padic_matxx padic_matxx::zero(padicxx_ctx_srcref, sslong N)
 padic_matxx padic_matxx::one(padicxx_ctx_srcref)
-padic_matxx padic_matxx::one(padicxx_ctx_srcref, slong N)
+padic_matxx padic_matxx::one(padicxx_ctx_srcref, sslong N)
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Conversion
@@ -4444,7 +4444,7 @@ Padic_mat_expr transpose(Padic_mat_expr)
     Context
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-qadicxx_ctx::qadicxx_ctx(Fmpz_src p, slong min, long max,
+qadicxx_ctx::qadicxx_ctx(Fmpz_src p, sslong min, slong max,
         padic_print_mode mode, const char* var = "x")
 
     Initialize a qadic context. See \code{qadic_ctx_init_conway}.
@@ -4490,7 +4490,7 @@ Qadic_expr::unary operation() const
 Qadic_expr Qadic_expr::pow(Fmpz_expr) const
 Qadic_expr Qadic_expr::frobenius(T:fits_into_slong) const
 
-qadicxx_srcref Qadic_src::toN(slong N) const
+qadicxx_srcref Qadic_src::toN(sslong N) const
 
     Obtain a new version of the operand, with changed effective precision.
 
@@ -4520,7 +4520,7 @@ qadicxx::qadicxx(const qadicxx_ctx&)
 
     Initialize qadic number to default precision. See \code{qadic_init}.
 
-qadicxx::qadicxx(const qadicxx_ctx& c, long N)
+qadicxx::qadicxx(const qadicxx_ctx& c, slong N)
 
     Initialize qadic number to precision $N$. See \code{qadic_init2}.
 
@@ -4562,11 +4562,11 @@ void Qadic_target::set_one()
 void Qadic_target::set_gen(const qadicxx_ctx&)
 
 qadicxx qadicxx::zero(const qadicxx_ctx&)
-qadicxx qadicxx::zero(const qadicxx_ctx&, slong N)
+qadicxx qadicxx::zero(const qadicxx_ctx&, sslong N)
 qadicxx qadicxx::one(const qadicxx_ctx&)
-qadicxx qadicxx::one(const qadicxx_ctx&, slong N)
+qadicxx qadicxx::one(const qadicxx_ctx&, sslong N)
 qadicxx qadicxx::gen(const qadicxx_ctx&)
-qadicxx qadicxx::gen(const qadicxx_ctx&, slong N)
+qadicxx qadicxx::gen(const qadicxx_ctx&, sslong N)
 
 bool Qadic_expr::is_zero() const
 bool Qadic_expr::is_one() const

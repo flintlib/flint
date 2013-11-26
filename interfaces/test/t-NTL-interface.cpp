@@ -255,7 +255,7 @@ int test_ZZ_pE_to_fq()
     for (i = 0; i < 10000; i++)
     {
         fmpz_mod_poly_t fmod;
-        long d;
+        slong d;
         ZZ prime;
         ZZ_pX mod;
 
@@ -327,7 +327,7 @@ int test_ZZ_pEX_to_fq_poly()
     for (i = 0; i < 10000; i++)
     {
         fmpz_mod_poly_t fmod;
-        long d;
+        slong d;
         ZZ prime;
         ZZ_pX mod;
 
@@ -401,7 +401,7 @@ int test_zz_pE_to_fq()
     for (i = 0; i < 10000; i++)
     {
         fmpz_mod_poly_t fmod;
-        long d;
+        slong d;
         zz_pX mod;
 
         fmpz_init(p);
@@ -471,7 +471,7 @@ int test_zz_pEX_to_fq_poly()
     for (i = 0; i < 10000; i++)
     {
         fmpz_mod_poly_t fmod;
-        long d;
+        slong d;
         zz_pX mod;
 
         fmpz_init(p);

@@ -342,11 +342,11 @@ FLINT_DEFINE_BINARY_EXPR_COND2(pow_op, nmodxx, NMODXX_COND_S,
 namespace detail {
 struct nmod_vector_data
 {
-    long size;
+    slong size;
     mp_limb_t* array;
     nmodxx_ctx_srcref ctx;
 
-    nmod_vector_data(long n, nmodxx_ctx_srcref c)
+    nmod_vector_data(slong n, nmodxx_ctx_srcref c)
         : size(n), array(_nmod_vec_init(n)), ctx(c) {}
 
     ~nmod_vector_data() {_nmod_vec_clear(array);}
@@ -357,12 +357,12 @@ struct nmod_vector_data
         _nmod_vec_set(array, o.array, size);
     }
 
-    nmodxx_ref at(long i) {return nmodxx_ref::make(array[i], ctx);}
-    nmodxx_srcref at(long i) const {return nmodxx_srcref::make(array[i], ctx);}
+    nmodxx_ref at(slong i) {return nmodxx_ref::make(array[i], ctx);}
+    nmodxx_srcref at(slong i) const {return nmodxx_srcref::make(array[i], ctx);}
 };
 
 struct nmod_vector_traits
-    : wrapped_vector_traits<nmodxx, long, nmodxx_ref, nmodxx_srcref, mp_limb_t>
+    : wrapped_vector_traits<nmodxx, slong, nmodxx_ref, nmodxx_srcref, mp_limb_t>
 {
     template<class Expr>
     static typename Expr::evaluated_t create_temporary(const Expr& e)

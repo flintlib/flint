@@ -419,10 +419,10 @@ namespace flint {
 namespace detail {
 struct fmpq_vector_data
 {
-    long size;
+    slong size;
     fmpq* array;
 
-    fmpq_vector_data(long n)
+    fmpq_vector_data(slong n)
         : size(n), array(_fmpq_vec_init(n)) {}
 
     ~fmpq_vector_data() {_fmpq_vec_clear(array, size);}
@@ -430,17 +430,17 @@ struct fmpq_vector_data
     fmpq_vector_data(const fmpq_vector_data& o)
         : size(o.size), array(_fmpq_vec_init(o.size))
     {
-        for(long i = 0;i < size;++i)
+        for(slong i = 0;i < size;++i)
             fmpq_set(array + i, o.array + i);
     }
 
-    fmpqxx_ref at(long i) {return fmpqxx_ref::make(array + i);}
-    fmpqxx_srcref at(long i) const {return fmpqxx_srcref::make(array + i);}
+    fmpqxx_ref at(slong i) {return fmpqxx_ref::make(array + i);}
+    fmpqxx_srcref at(slong i) const {return fmpqxx_srcref::make(array + i);}
 };
 } // detail
 
 typedef vector_expression<
-    detail::wrapped_vector_traits<fmpqxx, long, fmpqxx_ref, fmpqxx_srcref, fmpq>,
+    detail::wrapped_vector_traits<fmpqxx, slong, fmpqxx_ref, fmpqxx_srcref, fmpq>,
     operations::immediate,
     detail::fmpq_vector_data> fmpq_vecxx;
 

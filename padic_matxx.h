@@ -75,7 +75,7 @@ public:
             slong rows, slong cols)
         {return padic_matxx_expression(ctx, rows, cols);}
     static padic_matxx_expression zero(padicxx_ctx_srcref ctx,
-            slong rows, slong cols, long N)
+            slong rows, slong cols, slong N)
         {return padic_matxx_expression(ctx, rows, cols, N);}
 
     static padic_matxx_expression one(padicxx_ctx_srcref ctx,
@@ -86,7 +86,7 @@ public:
         return res;
     }
     static padic_matxx_expression one(padicxx_ctx_srcref ctx,
-            slong rows, slong cols, long N)
+            slong rows, slong cols, slong N)
     {
         padic_matxx_expression res(ctx, rows, cols, N);
         res.set_one();
