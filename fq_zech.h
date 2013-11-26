@@ -27,6 +27,7 @@
 #define FQ_ZECH_H
 
 #include "fq_nmod.h"
+#include "nmod_mat.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
@@ -40,6 +41,8 @@ typedef struct
 
 typedef fq_zech_struct fq_zech_t[1];
 
+typedef nmod_mat_t fq_zech_ground_mat_t;
+    
 typedef struct
 {
     mp_limb_t qm1;              /* q - 1 */
@@ -47,6 +50,7 @@ typedef struct
     mp_limb_t qm1opm1;          /* (q - 1) / (p - 1) */
     mp_limb_t p;
     double ppre;
+    double qm1inv;
     mp_limb_t prime_root;       /* primitive root for prime subfield */
     mp_limb_t *zech_log_table;
     mp_limb_t *prime_field_table;
@@ -180,6 +184,24 @@ void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op1, const ulong e,
 
 void
 fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+
+void
+fq_zech_pow_pn_init_precomp_matrix(nmod_mat_t A, const fq_zech_ctx_t ctx);
+
+void
+fq_zech_pow_pn_clear_precomp_matrix(nmod_mat_t A, const fq_zech_ctx_t ctx);
+
+void
+fq_zech_pow_pn_precompute_matrix_fq_zech(nmod_mat_t A, const fq_zech_t op,
+                                         const fq_zech_ctx_t ctx);
+
+void
+fq_zech_pow_pn_precompute_matrix_ui(nmod_mat_t A, ulong n,
+                                    const fq_zech_ctx_t ctx);
+
+void
+fq_zech_pow_pn_precomp(fq_zech_t rop, const fq_zech_t op1, const nmod_mat_t A,
+                       const fq_zech_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 

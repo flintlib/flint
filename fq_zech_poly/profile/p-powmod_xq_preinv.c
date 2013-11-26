@@ -20,24 +20,17 @@
 /******************************************************************************
 
     Copyright (C) 2013 Mike Hansen
- 
+
 ******************************************************************************/
 
-#ifndef TEMPLATES_H_
-#define TEMPLATES_H_
+#include "fq_zech_poly.h"
 
-#define CAT(X,Y) X##_##Y
-#define CAT3(X,Y,Z) X##_##Y##_##Z
-#define _CAT(X,Y) _##X##_##Y
-#define _CAT3(X,Y,Z) _##X##_##Y##_##Z
-#define __CAT(X,Y) __##X##_##Y
-#define __CAT3(X,Y,Z) __##X##_##Y##_##Z
-
-#define TEMPLATE(X,Y) CAT(X,Y)
-#define TEMPLATE3(X,Y,Z) CAT3(X,Y,Z)
-#define _TEMPLATE(X,Y) _CAT(X,Y)
-#define _TEMPLATE3(X,Y,Z) _CAT3(X,Y,Z)
-#define __TEMPLATE(X,Y) __CAT(X,Y)
-#define __TEMPLATE3(X,Y,Z) __CAT3(X,Y,Z)
-
+#ifdef T
+#undef T
 #endif
+
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_poly_templates/profile/p-powmod_xq_preinv.c"
+#undef CAP_T
+#undef T

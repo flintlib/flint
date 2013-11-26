@@ -119,6 +119,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     ctx->p = up;
     ctx->ppre = n_precompute_inverse(ctx->p);
     ctx->qm1 = q - 1;
+    ctx->qm1inv = n_precompute_inverse(ctx->qm1);
 
     if (up == 2)
     {
