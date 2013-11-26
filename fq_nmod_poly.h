@@ -38,6 +38,8 @@
 #define FQ_NMOD_SQR_CLASSICAL_CUTOFF 6
 #define FQ_NMOD_MULLOW_CLASSICAL_CUTOFF 6
 
+#define FQ_NMOD_POLY_HGCD_CUTOFF 25
+
 #ifdef T
 #undef T
 #endif

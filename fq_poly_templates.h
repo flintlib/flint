@@ -474,6 +474,15 @@ void TEMPLATE(T, poly_gcd)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op
 }
 
 
+slong
+_TEMPLATE(T, poly_hgcd)(TEMPLATE(T, struct) **M, slong *lenM, 
+                        TEMPLATE(T, struct)* A, slong *lenA,
+                        TEMPLATE(T, struct)* B, slong *lenB, 
+                        const TEMPLATE(T, struct)* a, slong lena,
+                        const TEMPLATE(T, struct)* b, slong lenb, 
+                        const TEMPLATE(T, ctx_t) ctx);
+
+
 /*  Euclidean division  ******************************************************/
 
 ulong TEMPLATE(T, poly_remove)(TEMPLATE(T, poly_t) f, const TEMPLATE(T, poly_t) g, const TEMPLATE(T, ctx_t) ctx);

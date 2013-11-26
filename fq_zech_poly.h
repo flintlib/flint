@@ -36,6 +36,8 @@
 #define FQ_ZECH_MUL_CLASSICAL_CUTOFF 90
 #define FQ_ZECH_MULLOW_CLASSICAL_CUTOFF 90
 
+#define FQ_ZECH_POLY_HGCD_CUTOFF 35
+
 #ifdef T
 #undef T
 #endif
