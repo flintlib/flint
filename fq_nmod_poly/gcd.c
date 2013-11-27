@@ -19,39 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
-    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#ifndef FQ_POLY_H
-#define FQ_POLY_H
-
-#include "fq.h"
-#include "fq_mat.h"
-
-#define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16
-#define FQ_COMPOSE_MOD_LENH_CUTOFF 6
-#define FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
-#define FQ_MUL_CLASSICAL_CUTOFF 6
-#define FQ_MULLOW_CLASSICAL_CUTOFF 6
-#define FQ_SQR_CLASSICAL_CUTOFF 6
-
-#define FQ_POLY_HGCD_CUTOFF 30
-#define FQ_POLY_SMALL_GCD_CUTOFF 80
-#define FQ_POLY_GCD_CUTOFF 90
+#include "fq_nmod_poly.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_templates.h"
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_poly_templates/gcd.c"
 #undef CAP_T
 #undef T
-
-#include "fq_poly_factor.h"
-
-#endif
