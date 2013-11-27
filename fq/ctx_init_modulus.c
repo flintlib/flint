@@ -72,12 +72,12 @@ fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, slong d,
     ctx->var = flint_malloc(strlen(var) + 1);
     strcpy(ctx->var, var);
 
-    /* Precompute the inverse of the modulus */
-    fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
-    fmpz_mod_poly_make_monic(ctx->inv, modulus);
-    fmpz_mod_poly_reverse(ctx->inv, ctx->inv, ctx->inv->length);
-    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->inv->length);
-
+    /* Set the modulus */
     fmpz_mod_poly_init(ctx->modulus, fq_ctx_prime(ctx));
     fmpz_mod_poly_set(ctx->modulus, modulus);
+
+    /* Precompute the inverse of the modulus */
+    fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
+    fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
+    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->inv->length);
 }
