@@ -308,6 +308,30 @@ void TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop,
                     const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n, 
                     const TEMPLATE(T, ctx_t) ctx);
 
+void
+_TEMPLATE(T, poly_mulhigh_classical)(TEMPLATE(T, struct)* rop,
+                                     const TEMPLATE(T, struct)* op1, slong len1,
+                                     const TEMPLATE(T, struct)* op2, slong len2,
+                                     slong start, const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE(T, poly_mulhigh_classical)(TEMPLATE(T, poly_t) rop,
+                                    const TEMPLATE(T, poly_t) op1,
+                                    const TEMPLATE(T, poly_t) op2,
+                                    slong start, const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE(T, poly_mulhigh)(TEMPLATE(T, struct)* res,
+                           const TEMPLATE(T, struct)* poly1, slong len1, 
+                           const TEMPLATE(T, struct)* poly2, slong len2,
+                           slong n, TEMPLATE(T, ctx_t) ctx);
+           
+void
+TEMPLATE(T, poly_mulhigh)(TEMPLATE(T, poly_t) rop,
+                          const TEMPLATE(T, poly_t) op1,
+                          const TEMPLATE(T, poly_t) op2, slong start,
+                          const TEMPLATE(T, ctx_t) ctx);
+
 void _TEMPLATE(T, poly_mulmod)(TEMPLATE(T, struct) * res, 
                      const TEMPLATE(T, struct) * poly1, slong len1,
                      const TEMPLATE(T, struct) * poly2, slong len2, 
