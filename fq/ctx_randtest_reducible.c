@@ -23,25 +23,23 @@
 
 ******************************************************************************/
 
-#ifdef T
-
-#include "templates.h"
+#include "fq.h"
 
 void
-TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
-                    const TEMPLATE(T, t) op,
-                    const TEMPLATE(T, ctx_t) ctx);
+fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state)
+{
+    fmpz_mod_poly_t mod;
+    fmpz_t p;
+    slong d;
 
-int
-TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
-                           const TEMPLATE(T, ctx_t) ctx);
+    fmpz_init(p);
+    fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));
+    d = n_randint(state, 10) + 1;
 
-int
-TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
-                             const TEMPLATE(T, ctx_t) ctx);
+    fmpz_mod_poly_init(mod, p);
+    fmpz_mod_poly_randtest_monic(mod, state, d + 1);
+    fq_ctx_init_modulus(ctx, p, d, mod, "a");
 
-void
-TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
-                 const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
-
-#endif
+    fmpz_mod_poly_clear(mod);
+    fmpz_clear(p);
+}

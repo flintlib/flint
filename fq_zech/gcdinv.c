@@ -23,25 +23,17 @@
 
 ******************************************************************************/
 
-#ifdef T
-
-#include "templates.h"
+#include "fq_zech.h"
 
 void
-TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
-                    const TEMPLATE(T, t) op,
-                    const TEMPLATE(T, ctx_t) ctx);
-
-int
-TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
-                           const TEMPLATE(T, ctx_t) ctx);
-
-int
-TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
-                             const TEMPLATE(T, ctx_t) ctx);
-
-void
-TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
-                 const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
-
-#endif
+fq_zech_gcdinv(fq_zech_t rop, fq_zech_t inv, const fq_zech_t op,
+               const fq_zech_ctx_t ctx)
+{
+    if (fq_zech_is_zero(op, ctx))
+    {
+        fq_zech_zero(rop, ctx);
+        return;
+    }
+    fq_zech_one(rop, ctx);
+    fq_zech_inv(inv, op, ctx);
+}

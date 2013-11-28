@@ -73,6 +73,9 @@ void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
 
 void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
 
+void
+fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
 static __inline__ slong

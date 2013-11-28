@@ -74,6 +74,9 @@ void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
 
 void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
 
+void
+fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
+
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
 static __inline__ slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)

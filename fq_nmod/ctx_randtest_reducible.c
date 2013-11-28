@@ -23,25 +23,21 @@
 
 ******************************************************************************/
 
-#ifdef T
-
-#include "templates.h"
+#include "fq_nmod.h"
 
 void
-TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
-                    const TEMPLATE(T, t) op,
-                    const TEMPLATE(T, ctx_t) ctx);
+fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state)
+{
+    fmpz_t p;
+    slong d;
+    nmod_poly_t mod;
 
-int
-TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
-                           const TEMPLATE(T, ctx_t) ctx);
-
-int
-TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
-                             const TEMPLATE(T, ctx_t) ctx);
-
-void
-TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
-                 const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
-
-#endif
+    fmpz_init(p);
+    fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));
+    d = n_randint(state, 10) + 1;
+    nmod_poly_init(mod, fmpz_get_ui(p));
+    nmod_poly_randtest_monic(mod, state, d + 1);
+    fq_nmod_ctx_init_modulus(ctx, p, d, mod, "a");
+    nmod_poly_clear(mod);
+    fmpz_clear(p);
+}

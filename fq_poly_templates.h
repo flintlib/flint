@@ -476,6 +476,17 @@ slong _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,const TEMPLATE(T, 
                             const TEMPLATE(T, struct)* B, slong lenB, const TEMPLATE(T, t) invB,
                             const TEMPLATE(T, ctx_t) ctx);
 
+slong
+_TEMPLATE(T, poly_gcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, struct)* G, 
+                                   const TEMPLATE(T, struct)* A, slong lenA, 
+                                   const TEMPLATE(T, struct)* B, slong lenB,
+                                   const TEMPLATE(T, ctx_t) ctx);
+
+void 
+TEMPLATE(T, poly_gcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, poly_t) G,
+                                  const TEMPLATE(T, poly_t) A,
+                                  const TEMPLATE(T, poly_t) B,
+                                  const TEMPLATE(T, ctx_t) ctx);
 static __inline__
 slong _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G, const TEMPLATE(T, struct)* A, slong lenA, 
                   const TEMPLATE(T, struct)* B, slong lenB, const TEMPLATE(T, t) invB,
@@ -612,6 +623,21 @@ TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly
                              const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                              const TEMPLATE(T, poly_t) Binv, const TEMPLATE(T, ctx_t) ctx);
 
+
+void
+_TEMPLATE(T, poly_divrem_f)(TEMPLATE(T, t) f,
+                            TEMPLATE(T, struct)* Q, TEMPLATE(T, struct)* R, 
+                            const TEMPLATE(T, struct)* A, slong lenA, 
+                            const TEMPLATE(T, struct)* B, slong lenB,
+                            const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE(T, poly_divrem_f)(TEMPLATE(T, t) f,
+                           TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R, 
+                           const TEMPLATE(T, poly_t) A,
+                           const TEMPLATE(T, poly_t) B,
+                           const TEMPLATE(T, ctx_t) ctx);
+                          
 /*  Divisibility testing  ***************************************************/
 
 int _TEMPLATE(T, poly_divides)(TEMPLATE(T, struct) *Q, 

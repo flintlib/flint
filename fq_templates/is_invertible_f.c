@@ -23,25 +23,20 @@
 
 ******************************************************************************/
 
+
 #ifdef T
 
 #include "templates.h"
 
-void
-TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
-                    const TEMPLATE(T, t) op,
-                    const TEMPLATE(T, ctx_t) ctx);
-
-int
-TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
-                           const TEMPLATE(T, ctx_t) ctx);
-
 int
 TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
-                             const TEMPLATE(T, ctx_t) ctx);
-
-void
-TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
-                 const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
+                             const TEMPLATE(T, ctx_t) ctx)
+{
+    TEMPLATE(T, t) inv;
+    TEMPLATE(T, init)(inv, ctx);
+    TEMPLATE(T, gcdinv)(rop, inv, op, ctx);
+    TEMPLATE(T, clear)(inv, ctx);
+    return TEMPLATE(T, is_one)(rop, ctx);
+}
 
 #endif
