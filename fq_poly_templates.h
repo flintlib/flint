@@ -503,6 +503,44 @@ void TEMPLATE(T, poly_gcd)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op
 }
 
 
+slong
+_TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, struct) *G,
+                                  TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
+                                  const TEMPLATE(T, struct) *A, slong lenA, 
+                                  const TEMPLATE(T, struct) *B, slong lenB, 
+                                  const TEMPLATE(T, t) invB,
+                                  const TEMPLATE(T, ctx_t) ctx);
+void 
+TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, poly_t) G, 
+                                 TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                                 const TEMPLATE(T, poly_t) A,
+                                 const TEMPLATE(T, poly_t) B,
+                                 const TEMPLATE(T, ctx_t) ctx);
+
+static __inline__ slong
+_TEMPLATE(T, poly_xgcd)(TEMPLATE(T, struct) *G,
+                        TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
+                        const TEMPLATE(T, struct) *A, slong lenA, 
+                        const TEMPLATE(T, struct) *B, slong lenB, 
+                        const TEMPLATE(T, t) invB,
+                        const TEMPLATE(T, ctx_t) ctx)
+{
+    return _TEMPLATE(T, poly_xgcd_euclidean)(G, S, T, A, lenA,
+                                             B, lenB, invB, ctx);
+}
+
+
+static __inline__ void
+TEMPLATE(T, poly_xgcd)(TEMPLATE(T, poly_t) G, 
+                       TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                       const TEMPLATE(T, poly_t) A,
+                       const TEMPLATE(T, poly_t) B,
+                       const TEMPLATE(T, ctx_t) ctx)
+{
+    TEMPLATE(T, poly_xgcd_euclidean)(G, S, T, A, B, ctx);
+}
+
+
 /*  Euclidean division  ******************************************************/
 
 ulong TEMPLATE(T, poly_remove)(TEMPLATE(T, poly_t) f, const TEMPLATE(T, poly_t) g, const TEMPLATE(T, ctx_t) ctx);
