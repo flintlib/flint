@@ -357,6 +357,16 @@ void
 fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
               const fq_ctx_t ctx);
 
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_templates.h"
+#undef CAP_T
+#undef T
+
 #ifdef __cplusplus
 }
 #endif

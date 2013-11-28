@@ -396,6 +396,16 @@ void
 fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
 
+#ifdef T
+#undef T
+#endif
+
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_templates.h"
+#undef CAP_T
+#undef T
+
 #ifdef __cplusplus
 }
 #endif

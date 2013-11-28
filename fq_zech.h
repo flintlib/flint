@@ -314,6 +314,16 @@ void
 fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
+#ifdef T
+#undef T
+#endif
+
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_templates.h"
+#undef CAP_T
+#undef T
+    
 #ifdef __cplusplus
 }
 #endif
