@@ -30,7 +30,8 @@
 void
 fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 {
-    fmpz_t p;
+    fmpz_mod_poly_t modulus;
+    fmpz_t p, x;
     slong d;
 
     fmpz_init(p);
@@ -38,4 +39,21 @@ fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
     d = n_randint(state, 10) + 1;
     fq_ctx_init_conway(ctx, p, d, "a");
     fmpz_clear(p);
+
+    /* Test non-monic modulus */
+    if (n_randint(state, 2))
+    {
+        fmpz_init_set(x, p);
+        fmpz_sub_ui(x, x, 1);
+        fmpz_mod_poly_init(modulus, p);
+        fmpz_mod_poly_set(modulus, ctx->modulus);
+        fmpz_randm(x, state, x);
+        fmpz_add_ui(x, x, 1);
+        fmpz_mod_poly_scalar_mul_fmpz(modulus, modulus, x);
+        fq_ctx_clear(ctx);
+        fq_ctx_init_modulus(ctx, p, d, modulus, "a");
+        fmpz_mod_poly_clear(modulus);
+        fmpz_clear(x);
+    }
+
 }
