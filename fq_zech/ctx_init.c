@@ -77,14 +77,14 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
 
 void
 fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-                         const fmpz_t p, slong d, const nmod_poly_t modulus,
+                         const nmod_poly_t modulus,
                          const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
-    fq_nmod_ctx_init_modulus(fq_nmod_ctx, p, d, modulus, var);
+    fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var);
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
 }
@@ -119,6 +119,7 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx,
     ctx->p = up;
     ctx->ppre = n_precompute_inverse(ctx->p);
     ctx->qm1 = q - 1;
+    ctx->qm1inv = n_precompute_inverse(ctx->qm1);
 
     if (up == 2)
     {

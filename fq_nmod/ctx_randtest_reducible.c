@@ -37,7 +37,7 @@ fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state)
     d = n_randint(state, 10) + 1;
     nmod_poly_init(mod, fmpz_get_ui(p));
     nmod_poly_randtest_monic(mod, state, d + 1);
-    fq_nmod_ctx_init_modulus(ctx, p, d, mod, "a");
+    fq_nmod_ctx_init_modulus(ctx, mod, "a");
     nmod_poly_clear(mod);
     fmpz_clear(p);
 }

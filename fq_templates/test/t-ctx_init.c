@@ -71,7 +71,7 @@ main(void)
         d = n_randint(state, 10) + 1;
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
 
-        TEMPLATE(T, ctx_init_modulus)(ctx_mod, p, d, ctx_conway->modulus, "a");
+        TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, "a");
 
         TEMPLATE(T, init)(a, ctx_conway);
         TEMPLATE(T, init)(b, ctx_mod);

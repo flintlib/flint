@@ -45,7 +45,7 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
     fmpz_mod_poly_init2(poly, p, d + 1);
     fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1);
 
-    fq_ctx_init_modulus(ctx, p, d, poly, var);
+    fq_ctx_init_modulus(ctx, poly, var);
 
     fmpz_mod_poly_clear(poly);
     flint_randclear(state);

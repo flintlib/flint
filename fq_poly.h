@@ -38,6 +38,10 @@
 #define FQ_MULLOW_CLASSICAL_CUTOFF 6
 #define FQ_SQR_CLASSICAL_CUTOFF 6
 
+#define FQ_POLY_HGCD_CUTOFF 30
+#define FQ_POLY_SMALL_GCD_CUTOFF 80
+#define FQ_POLY_GCD_CUTOFF 90
+
 #ifdef T
 #undef T
 #endif

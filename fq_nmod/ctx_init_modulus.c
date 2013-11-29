@@ -29,17 +29,19 @@
 #include "fq_nmod.h"
 
 void
-fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const fmpz_t p, slong d,
-                         const nmod_poly_t modulus, const char *var)
+fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
+                         const char *var)
 {
     slong nz;
     int i, j;
     mp_limb_t inv;
 
-    fmpz_init_set(fq_nmod_ctx_prime(ctx), p);
-    ctx->mod.n = fmpz_get_ui(p);
-    ctx->mod.ninv = n_preinvert_limb(ctx->mod.n);
-    count_leading_zeros(ctx->mod.norm, ctx->mod.n);
+    fmpz_init(fq_nmod_ctx_prime(ctx));
+    fmpz_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
+    
+    ctx->mod.n = modulus->mod.n;
+    ctx->mod.ninv = modulus->mod.ninv;
+    ctx->mod.norm = modulus->mod.norm;
 
     /* Count number of nonzero coefficients */
     nz = 0;
