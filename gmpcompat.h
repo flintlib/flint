@@ -128,7 +128,7 @@ void flint_mpz_mul_si(mpz_ptr a, mpz_srcptr b, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
    
-   mpz_sub(a, b, tc);
+   mpz_mul(a, b, tc);
 }
 
 static __inline__
