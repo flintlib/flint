@@ -30,6 +30,19 @@ _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
 {
     slong k, i, d, m;
 
+    if (n == 0)
+    {
+        fmpz_one(coeffs);
+        return;
+    }
+
+    if (n == 1)
+    {
+        fmpz_zero(coeffs);
+        fmpz_set_ui(coeffs + 1, 2);
+        return;
+    }
+
     d = n % 2;
 
     fmpz_zero(coeffs);
@@ -52,22 +65,8 @@ _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
 void
 fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
 {
-    if (n == 0)
-    {
-        fmpz_poly_one(poly);
-        return;
-    }
-
     fmpz_poly_fit_length(poly, n + 1);
-
-    if (n == 1)
-    {
-        fmpz_zero(poly->coeffs);
-        fmpz_set_ui(poly->coeffs + 1, 2);
-    }
-    else
-        _fmpz_poly_chebyshev_u(poly->coeffs, n);
-
+    _fmpz_poly_chebyshev_u(poly->coeffs, n);
     _fmpz_poly_set_length(poly, n + 1);
 }
 
