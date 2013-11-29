@@ -68,7 +68,7 @@ int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const c
 void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
 void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-                              const fmpz_t p, slong d, const nmod_poly_t modulus,
+                              const nmod_poly_t modulus,
                               const char *var);
 
 void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);

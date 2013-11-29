@@ -51,7 +51,7 @@ fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
         fmpz_add_ui(x, x, 1);
         fmpz_mod_poly_scalar_mul_fmpz(modulus, modulus, x);
         fq_ctx_clear(ctx);
-        fq_ctx_init_modulus(ctx, p, d, modulus, "a");
+        fq_ctx_init_modulus(ctx, modulus, "a");
         fmpz_mod_poly_clear(modulus);
         fmpz_clear(x);
     }

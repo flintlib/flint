@@ -49,7 +49,7 @@ fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
         x = n_randint(state, ctx->mod.n - 1) + 1;
         nmod_poly_scalar_mul_nmod(modulus, modulus, x);
         fq_nmod_ctx_clear(ctx);
-        fq_nmod_ctx_init_modulus(ctx, p, d, modulus, "a");
+        fq_nmod_ctx_init_modulus(ctx, modulus, "a");
         nmod_poly_clear(modulus);
     }
 }

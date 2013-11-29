@@ -30,12 +30,14 @@
 #include "fq_poly.h"
 
 void
-fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, slong d,
-                    fmpz_mod_poly_t modulus, const char *var)
+fq_ctx_init_modulus(fq_ctx_t ctx, fmpz_mod_poly_t modulus, const char *var)
 {
     slong nz;
     int i, j;
+    fmpz* p;
     fmpz_t inv;
+
+    p = &(modulus->p);
 
     /* Count number of nonzero coefficients */
     nz = 0;
