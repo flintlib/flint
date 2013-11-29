@@ -57,75 +57,45 @@
 static __inline__
 void flint_mpz_set_si(mpz_ptr r, slong s)
 {
-   if (s == 0)
-      r->_mp_size = 0;
-   else {
-      if (r->_mp_alloc == 0) {
-         r->_mp_d = flint_malloc(sizeof(mp_limb_t));
-         r->_mp_alloc = 1;
-      }
-
-      if (s < 0) {
-         r->_mp_size = -1;
-         r->_mp_d[0] = -s;
-      } else {
-         r->_mp_size = 1;
-         r->_mp_d[0] = s;
-      }
+   if (s < 0) {
+      r->_mp_size = -1;
+      r->_mp_d[0] = -s;
+   } else {
+      r->_mp_size = s != 0;
+      r->_mp_d[0] = s;
    }
 }
 
 static __inline__
 void flint_mpz_set_ui(mpz_ptr r, ulong u)
 {
-   if (u == 0)
-      r->_mp_size = 0;
-   else {
-      if (r->_mp_alloc == 0) {
-         r->_mp_d = flint_malloc(sizeof(mp_limb_t));
-         r->_mp_alloc = 1;
-      }
-
-      r->_mp_size = 1;
-      r->_mp_d[0] = u;
-   }
+   r->_mp_d[0] = u; 
+   r->_mp_size = u != 0;
 }
 
 static __inline__
 void flint_mpz_init_set_si(mpz_ptr r, slong s)
 {
-   if (s == 0) {
-      r->_mp_d = NULL;
-      r->_mp_size = 0;
-      r->_mp_alloc = 0;
+   r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+   r->_mp_alloc = 1;
+
+   if (s < 0) {
+      r->_mp_size = -1;
+      r->_mp_d[0] = -s;
    } else {
-      r->_mp_d = flint_malloc(sizeof(mp_limb_t));
-      r->_mp_alloc = 1;
-      
-      if (s < 0) {
-         r->_mp_size = -1;
-         r->_mp_d[0] = -s;
-      } else {
-         r->_mp_size = 1;
-         r->_mp_d[0] = s;
-      }
+      r->_mp_size = s != 0;
+      r->_mp_d[0] = s;
    }
 }
 
 static __inline__
 void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
 {
-   if (u == 0) {
-      r->_mp_d = NULL;
-      r->_mp_size = 0;
-      r->_mp_alloc = 0;
-   } else {
-      r->_mp_d = flint_malloc(sizeof(mp_limb_t));
-      r->_mp_alloc = 1;
+   r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+   r->_mp_alloc = 1;
 
-      r->_mp_size = 1;
-      r->_mp_d[0] = u;
-   }
+   r->_mp_d[0] = u; 
+   r->_mp_size = u != 0;
 }
 
 static __inline__
