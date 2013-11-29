@@ -91,7 +91,7 @@ main(void)
         {
             fmpz_randtest(x1fmpz, state, 200);
             fmpz_get_mpz(mpq_numref(x1), x1fmpz);
-            mpz_set_si(mpq_denref(x1), 1);
+            flint_mpz_set_si(mpq_denref(x1), 1);
         } while (mpq_equal(x1, x2));
         fmpq_poly_set_coeff_mpq(b, coeff, x1);
 

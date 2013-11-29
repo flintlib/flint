@@ -60,7 +60,7 @@ main(void)
         x = n_randtest_not_zero(state);
 
         r1 = fmpz_mod_ui(b, a, x);
-        r2 = mpz_fdiv_r_ui(e, d, x);
+        r2 = flint_mpz_fdiv_r_ui(e, d, x);
 
         fmpz_get_mpz(f, b);
 
@@ -101,7 +101,7 @@ main(void)
         x = n_randtest_not_zero(state);
 
         r1 = fmpz_mod_ui(a, a, x);
-        r2 = mpz_fdiv_r_ui(e, d, x);
+        r2 = flint_mpz_fdiv_r_ui(e, d, x);
 
         fmpz_get_mpz(f, a);
 

@@ -109,7 +109,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
                 return 0;       /* special case not handled by z_gcd_invert */
             /* reduce g mod h first */
 
-            r = mpz_fdiv_ui(COEFF_TO_PTR(c1), c2);
+            r = flint_mpz_fdiv_ui(COEFF_TO_PTR(c1), c2);
 
             gcd = z_gcdinv(&inv, r, c2);
 

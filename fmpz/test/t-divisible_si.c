@@ -63,7 +63,7 @@ main(void)
         fmpz_get_mpz(d, b);
 
         e = fmpz_divisible_si(b, a);
-        f = mpz_divisible_ui_p(d, a);
+        f = flint_mpz_divisible_ui_p(d, a);
 
         result = (e == f);
         if (!result)
@@ -98,7 +98,7 @@ main(void)
         fmpz_get_mpz(d, b);
 
         e = fmpz_divisible_si(b, a);
-        f = mpz_divisible_ui_p(d, a);
+        f = flint_mpz_divisible_ui_p(d, a);
 
         result = (e == f && e == 1);
         if (!result)

@@ -66,5 +66,5 @@ void fmpz_fib_ui(fmpz_t f, ulong n)
     if (n < NUM_SMALL_FIB)
         fmpz_set_ui(f, small_fib[n]);
     else
-        mpz_fib_ui(_fmpz_promote(f), n);
+        flint_mpz_fib_ui(_fmpz_promote(f), n);
 }

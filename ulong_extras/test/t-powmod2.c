@@ -58,15 +58,15 @@ int main(void)
       
       r1 = n_powmod2(a, exp, d);
 
-      mpz_set_ui(a_m, a);
-      mpz_set_ui(d_m, d);
+      flint_mpz_set_ui(a_m, a);
+      flint_mpz_set_ui(d_m, d);
       if (exp < WORD(0))
       {
-         mpz_powm_ui(r2_m, a_m, -exp, d_m);
+         flint_mpz_powm_ui(r2_m, a_m, -exp, d_m);
          mpz_invert(r2_m, r2_m, d_m);
       } else
-         mpz_powm_ui(r2_m, a_m, exp, d_m);      
-      r2 = mpz_get_ui(r2_m);
+         flint_mpz_powm_ui(r2_m, a_m, exp, d_m);      
+      r2 = flint_mpz_get_ui(r2_m);
       
       result = (r1 == r2);
       if (!result)

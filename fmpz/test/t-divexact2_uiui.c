@@ -66,8 +66,8 @@ main(void)
 
         fmpz_divexact2_uiui(a, c, n, m);
 
-        mpz_divexact_ui(f, e, n);
-        mpz_divexact_ui(f, f, m);
+        flint_mpz_divexact_ui(f, e, n);
+        flint_mpz_divexact_ui(f, f, m);
 
         fmpz_get_mpz(g, a);
 
@@ -110,8 +110,8 @@ main(void)
 
         fmpz_divexact2_uiui(c, c, n, m);
 
-        mpz_divexact_ui(f, d, n);
-        mpz_divexact_ui(f, f, m);
+        flint_mpz_divexact_ui(f, d, n);
+        flint_mpz_divexact_ui(f, f, m);
 
         fmpz_get_mpz(g, c);
 

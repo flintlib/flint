@@ -53,8 +53,8 @@ int main(void)
       
       r1 = n_jacobi(a, d);
 
-      mpz_set_si(a_m, a);
-      mpz_set_ui(d_m, d);
+      flint_mpz_set_si(a_m, a);
+      flint_mpz_set_ui(d_m, d);
       r2 = mpz_jacobi(a_m, d_m);
       
       result = (r1 == r2);

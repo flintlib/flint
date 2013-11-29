@@ -47,7 +47,7 @@ n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
 {
     if (mpz_fits_slong_p(exp))
     {
-        return n_powmod2_preinv(a, mpz_get_si(exp), n, ninv);
+        return n_powmod2_preinv(a, flint_mpz_get_si(exp), n, ninv);
     }
     else
     {
@@ -55,10 +55,10 @@ n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
         mp_limb_t y;
         mpz_init(t);
         mpz_init(m);
-        mpz_set_ui(t, a);
-        mpz_set_ui(m, n);
+        flint_mpz_set_ui(t, a);
+        flint_mpz_set_ui(m, n);
         mpz_powm(t, t, exp, m);
-        y = mpz_get_ui(t);
+        y = flint_mpz_get_ui(t);
         mpz_clear(t);
         mpz_clear(m);
         return y;
@@ -143,7 +143,7 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
 
     if (mpz_fits_ulong_p(e))
     {
-        ulong exp = mpz_get_ui(e);
+        ulong exp = flint_mpz_get_ui(e);
 
         if (exp <= 2)
         {

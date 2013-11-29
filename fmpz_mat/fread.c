@@ -47,7 +47,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
                "Number of rows does not fit into a slong.\n");
         abort();
     }
-    r = mpz_get_si(t);
+    r = flint_mpz_get_si(t);
 
     /* second number in file should be column dimension */
     byte_count = mpz_inp_str(t, file, 10);
@@ -63,7 +63,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
                "Number of columns does not fit into a slong.\n");
         abort();
     }
-    c = mpz_get_si(t);
+    c = flint_mpz_get_si(t);
     mpz_clear(t);
     
     /* if the input is 0 by 0 then set the dimensions to r and c */

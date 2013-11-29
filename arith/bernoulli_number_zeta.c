@@ -56,7 +56,7 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
     mpfr_init2(pi, pi_prec);
 
     /* t = 2 * n! / (2*pi)^n */
-    mpz_fac_ui(r, n);
+    flint_mpz_fac_ui(r, n);
     mpfr_set_z(t, r, GMP_RNDN);
     mpfr_mul_2exp(t, t, 1, GMP_RNDN);
     mpfr_const_pi(pi, GMP_RNDN);

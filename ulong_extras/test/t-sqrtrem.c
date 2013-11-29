@@ -52,10 +52,10 @@ int main(void)
       
       s1 = n_sqrtrem(&r1, a);
 
-      mpz_set_ui(a_m, a);
+      flint_mpz_set_ui(a_m, a);
       mpz_sqrtrem(s2_m, r2_m, a_m);
-      r2 = mpz_get_ui(r2_m);
-      s2 = mpz_get_ui(s2_m);
+      r2 = flint_mpz_get_ui(r2_m);
+      s2 = flint_mpz_get_ui(s2_m);
       
       result = ((r1 == r2) && (s1 == s2));
       if (!result)
@@ -85,10 +85,10 @@ int main(void)
       a += (n_randint(state, 100) - 50);
       s1 = n_sqrtrem(&r1, a);
 
-      mpz_set_ui(a_m, a);
+      flint_mpz_set_ui(a_m, a);
       mpz_sqrtrem(s2_m, r2_m, a_m);
-      r2 = mpz_get_ui(r2_m);
-      s2 = mpz_get_ui(s2_m);
+      r2 = flint_mpz_get_ui(r2_m);
+      s2 = flint_mpz_get_ui(s2_m);
       
       result = ((r1 == r2) && (s1 == s2));
       if (!result)

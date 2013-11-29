@@ -57,7 +57,7 @@ int main()
         for (k = 0; k < n; k++)
         {
             arith_euler_polynomial(P, k);
-            mpz_bin_uiui(t, n, k);
+            flint_mpz_bin_uiui(t, n, k);
             fmpq_poly_scalar_mul_mpz(P, P, t);
             fmpq_poly_add(Q, Q, P);
         }

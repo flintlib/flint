@@ -68,7 +68,7 @@ main(void)
 
         /* Next prime greater than or equal */
         fmpz_get_mpz(tmp, mod);
-        mpz_sub_ui(tmp, tmp, UWORD(1));
+        flint_mpz_sub_ui(tmp, tmp, UWORD(1));
         mpz_nextprime(tmp, tmp);
         fmpz_set_mpz(mod, tmp);
 

@@ -62,8 +62,8 @@ main(void)
         y = n_randtest(state);
 
         fmpz_mul2_uiui(b, a, x, y);
-        mpz_mul_ui(e, d, x);
-        mpz_mul_ui(e, e, y);
+        flint_mpz_mul_ui(e, d, x);
+        flint_mpz_mul_ui(e, e, y);
 
         fmpz_get_mpz(f, b);
 
@@ -104,8 +104,8 @@ main(void)
         y = n_randtest(state);
 
         fmpz_mul2_uiui(a, a, x, y);
-        mpz_mul_ui(e, d, x);
-        mpz_mul_ui(e, e, y);
+        flint_mpz_mul_ui(e, d, x);
+        flint_mpz_mul_ui(e, e, y);
 
         fmpz_get_mpz(f, a);
 

@@ -44,14 +44,14 @@ void test_exact(int d)
         for (j=1; j<100; j++)
         {
             exact = i / j;
-            mpz_set_ui(a, d);
-            mpz_pow_ui(a, a, i);
+            flint_mpz_set_ui(a, d);
+            flint_mpz_pow_ui(a, a, i);
             mpz_set(a2, a);
-            mpz_set_ui(b, d);
-            mpz_pow_ui(b, b, j);
+            flint_mpz_set_ui(b, d);
+            flint_mpz_pow_ui(b, b, j);
             a->_mp_size = flint_mpn_remove_power_ascending(a->_mp_d, a->_mp_size,
                 b->_mp_d, b->_mp_size, &exp);
-            mpz_pow_ui(b, b, exact);
+            flint_mpz_pow_ui(b, b, exact);
             mpz_tdiv_q(c, a2, b);
             if (exp != i/j || mpz_cmp(a, c))
             {

@@ -160,7 +160,7 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
     {
         __mpz_struct * mpz_ptr = _fmpz_new_mpz();
         (*f) = PTR_TO_COEFF(mpz_ptr);
-        mpz_set_si(mpz_ptr, c);
+        flint_mpz_set_si(mpz_ptr, c);
         return mpz_ptr;
     }
     else /* f is large already, just return the pointer */

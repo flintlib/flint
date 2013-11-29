@@ -39,9 +39,9 @@ or implied, of William Hart.
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 {
-   mpz_set_ui(p, 1);
+   flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
-   mpz_add_ui(p, p, 1);
+   flint_mpz_add_ui(p, p, 1);
 }
 
 void ref_butterfly_rshB(mpz_t t, mpz_t u, mpz_t i1, mpz_t i2, 
@@ -52,10 +52,10 @@ void ref_butterfly_rshB(mpz_t t, mpz_t u, mpz_t i1, mpz_t i2,
    mpz_init(mult1);
    mpz_init(mult2);
 
-   mpz_set_ui(mult1, 1);
+   flint_mpz_set_ui(mult1, 1);
    mpz_mul_2exp(mult1, mult1, x*FLINT_BITS);
    mpz_invert(mult1, mult1, p);
-   mpz_set_ui(mult2, 1);
+   flint_mpz_set_ui(mult2, 1);
    mpz_mul_2exp(mult2, mult2, y*FLINT_BITS);
    mpz_invert(mult2, mult2, p);
    mpz_mul(mult1, mult1, i1);

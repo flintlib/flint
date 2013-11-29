@@ -137,7 +137,7 @@ void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
 
    if ((size1 ^ size2) < 0 && r->_mp_size != 0)
    {
-      mpz_sub_ui(q, q, 1);
+      flint_mpz_sub_ui(q, q, 1);
       mpz_add(r, r, d);
    }
 

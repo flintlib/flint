@@ -62,7 +62,7 @@ main(void)
 
         n = n_randtest_prime(state, 0);
         exp = n_randlimb(state);
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
@@ -109,7 +109,7 @@ main(void)
 
         n = n_randtest_prime(state, 0);
         exp = n_randlimb(state);
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
@@ -156,7 +156,7 @@ main(void)
 
         n = n_randtest_prime(state, 0);
         exp = n_randlimb(state);
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
@@ -215,7 +215,7 @@ main(void)
         do {
             nmod_poly_randtest(f, state, n_randint(state, 50));
         } while (nmod_poly_is_zero(f));
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
 
         nmod_poly_reverse(finv, f, f->length);

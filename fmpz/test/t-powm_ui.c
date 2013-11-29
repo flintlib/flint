@@ -67,7 +67,7 @@ main(void)
         x = n_randtest(state);
 
         fmpz_powm_ui(b, a, x, c);
-        mpz_powm_ui(e, d, x, m);
+        flint_mpz_powm_ui(e, d, x, m);
 
         fmpz_get_mpz(f, b);
 

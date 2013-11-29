@@ -77,8 +77,8 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
                 __mpz_struct *ptr = _fmpz_promote(f);
                 mpz_t m3;
 
-                mpz_init_set_ui(m3, m2);
-                mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, m3);
+                flint_mpz_init_set_ui(m3, m2);
+                flint_mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, m3);
                 mpz_clear(m3);
 
                 _fmpz_demote_val(f);
@@ -91,8 +91,8 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
                 __mpz_struct *ptr = _fmpz_promote(f);
                 mpz_t g3;
 
-                mpz_init_set_si(g3, g2);
-                mpz_powm_ui(ptr, g3, e, COEFF_TO_PTR(m2));
+                flint_mpz_init_set_si(g3, g2);
+                flint_mpz_powm_ui(ptr, g3, e, COEFF_TO_PTR(m2));
                 mpz_clear(g3);
 
                 _fmpz_demote_val(f);
@@ -101,7 +101,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
             {
                __mpz_struct *ptr = _fmpz_promote(f);
 
-                mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, COEFF_TO_PTR(m2));
+                flint_mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, COEFF_TO_PTR(m2));
 
                 _fmpz_demote_val(f);
             }

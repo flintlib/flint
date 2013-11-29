@@ -50,9 +50,9 @@ int main(void)
       {
          d = n_randtest_not_zero(state);
          if (d == UWORD(1)) d++;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (mpz_size(d_m) > 1);
 
       do
@@ -80,7 +80,7 @@ int main(void)
       {
          d = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
          if (d < UWORD(2)) d = 2;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       do

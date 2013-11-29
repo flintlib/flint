@@ -50,9 +50,9 @@ int main(void)
       {
          d = n_randint(state, cutoff) | 1;
          if (d == UWORD(1)) d += 16; /* algorithm requires d >= 17 */
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (d > cutoff);
 
       result = n_is_oddprime_binary(d);
@@ -77,7 +77,7 @@ int main(void)
       do
       {
          d = n_randint(state, cutoff) + 16 | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while ((mpz_probab_prime_p(d_m, 12)) || (d > cutoff));
 
       result = !n_is_oddprime_binary(d);

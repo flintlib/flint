@@ -67,10 +67,10 @@ mpq_harmonic_balanced(mpq_t res, slong a, slong b)
 
     if (b - a < 50)
     {
-        mpq_set_ui(res, 0, UWORD(1));
+        flint_mpq_set_ui(res, 0, UWORD(1));
         for (k = a; k <= b; k++)
         {
-            mpq_set_ui(t, UWORD(1), k);
+            flint_mpq_set_ui(t, UWORD(1), k);
             mpq_add(res, res, t);
         }
     }

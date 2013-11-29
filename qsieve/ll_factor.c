@@ -66,9 +66,9 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     {
        mpz_t _n;
        mpz_init(_n);
-       mpz_set_ui(_n, hi);
+       flint_mpz_set_ui(_n, hi);
        mpz_mul_2exp(_n, _n, FLINT_BITS);
-       mpz_add_ui(_n, _n, lo);
+       flint_mpz_add_ui(_n, _n, lo);
        gmp_printf("Factoring %Zd of %wd bits\n", _n, qs_inf->bits);
        mpz_clear(_n);
     }

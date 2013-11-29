@@ -70,7 +70,7 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
     __mpz_struct s;
     s._mp_size = xsize;
     s._mp_d = (mp_ptr) x;
-    return mpz_divisible_ui_p(&s, d);
+    return flint_mpz_divisible_ui_p(&s, d);
 }
 #endif
 

@@ -59,11 +59,11 @@ int main(void)
 
       for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
       {
-         mpz_set_ui(d_n1, n1);
-         mpz_set_ui(d_p, flint_primes_small[j]);
+         flint_mpz_set_ui(d_n1, n1);
+         flint_mpz_set_ui(d_p, flint_primes_small[j]);
          exp1 = n_remove2_precomp(&n1, primes[j], inverses[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
-         n2 = mpz_get_ui(d_n2);
+         n2 = flint_mpz_get_ui(d_n2);
 
          result = ((exp1 == exp2) && (n1 == n2));
          if (!result)
@@ -99,11 +99,11 @@ int main(void)
 
       for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
       {
-         mpz_set_ui(d_n1, n1);
-         mpz_set_ui(d_p, flint_primes_small[j]);
+         flint_mpz_set_ui(d_n1, n1);
+         flint_mpz_set_ui(d_p, flint_primes_small[j]);
          exp1 = n_remove2_precomp(&n1, primes[j], inverses[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
-         n2 = mpz_get_ui(d_n2);
+         n2 = flint_mpz_get_ui(d_n2);
 
          result = ((exp1 == exp2) && (n1 == n2));
          if (!result)

@@ -287,7 +287,7 @@ v 1.5.0 -- 22-Sep-09
    * Fixed a severe bug in the fmpz_poly_pseudo_div function reported by Sebastian Pancratz
    * Added fmpz_comb_temp_init/clear functions
    * Fixed a normalisation buglet in fmpz_poly_pack_bytes
-   * Added F_mpz_pow_ui function (contributed by Andy Novocin)
+   * Added F_flint_mpz_pow_ui function (contributed by Andy Novocin)
    * Fixed a severe bug in the FFT reported by William Stein and Mariah Lennox (fix contributed by David Harvey)
    * Removed some memory leaks from F_mpz test code
    * Fixed bug in zmod_poly_evaluate test code
@@ -300,7 +300,7 @@ v 1.6.0 -- 24-Dec-10
    * Fixed a memory leak in mpz_poly_to_string_pretty
    * Fixed a bug inherited from an old version of fpLLL 
    * Makefile to respect CC and CXX
-   * Fixed bug in F_mpz_set_si
+   * Fixed bug in F_flint_mpz_set_si
    * Fixed bug in F_mpz_equal
    * Most for loops to C90 standard (for easier MSVC porting)
    * Better Cygwin support

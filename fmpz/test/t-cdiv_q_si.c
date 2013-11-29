@@ -59,7 +59,7 @@ main(void)
         b = z_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
-        mpz_set_si(e, b);
+        flint_mpz_set_si(e, b);
 
         fmpz_cdiv_q_si(c, a, b);
         mpz_cdiv_q(f, d, e);
@@ -101,7 +101,7 @@ main(void)
         b = z_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
-        mpz_set_si(e, b);
+        flint_mpz_set_si(e, b);
 
         fmpz_cdiv_q_si(a, a, b);
         mpz_cdiv_q(f, d, e);

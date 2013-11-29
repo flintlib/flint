@@ -53,7 +53,7 @@ void _arith_euler_number_zeta(fmpz_t res, ulong n)
     mpfr_init2(z, prec);
     mpfr_init2(pi, pi_prec);
 
-    mpz_fac_ui(r, n);
+    flint_mpz_fac_ui(r, n);
     mpfr_set_z(t, r, GMP_RNDN);
     mpfr_mul_2exp(t, t, n + 2, GMP_RNDN);
 

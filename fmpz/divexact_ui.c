@@ -49,7 +49,7 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
     {
         __mpz_struct * mpz_ptr = _fmpz_promote(f);
 
-        mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), h);
+        flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), h);
         _fmpz_demote_val(f);  /* division by h may result in small value */
     }
 }

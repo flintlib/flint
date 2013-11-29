@@ -54,6 +54,6 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
     else                        /* c2 is large */
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);   /* ok without val as if aliased both are large */
-        mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
+        flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
     }
 }

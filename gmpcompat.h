@@ -5,7 +5,7 @@
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
 
-#if 1 defined(__MINGW64__)
+#if defined(__MINGW64__)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \

@@ -60,7 +60,7 @@ main(void)
         x = n_randtest(state);
 
         fmpz_mul_ui(b, a, x);
-        mpz_mul_ui(e, d, x);
+        flint_mpz_mul_ui(e, d, x);
 
         fmpz_get_mpz(f, b);
 
@@ -99,7 +99,7 @@ main(void)
         x = n_randtest(state);
 
         fmpz_mul_ui(a, a, x);
-        mpz_mul_ui(e, d, x);
+        flint_mpz_mul_ui(e, d, x);
 
         fmpz_get_mpz(f, a);
 
