@@ -34,7 +34,7 @@
 #define __CAT3(X,Y,Z) __##X##_##Y##_##Z
 
 #define TEMPLATE(X,Y) CAT(X,Y)
-#define TEMPLATE3(X,Y,Z) CAT3(X,Y,Z)
+#define TEMPLATE3(X,Y,Z) CAT(X,Y,Z)
 #define _TEMPLATE(X,Y) _CAT(X,Y)
 #define _TEMPLATE3(X,Y,Z) _CAT3(X,Y,Z)
 #define __TEMPLATE(X,Y) __CAT(X,Y)

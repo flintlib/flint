@@ -30,7 +30,6 @@
 
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
-#include "fmpz_mat.h"
 
 /* Data types and context ****************************************************/
 
@@ -40,8 +39,6 @@ extern "C" {
 
 typedef fmpz_poly_t fq_t;
 typedef fmpz_poly_struct fq_struct;
-
-typedef fmpz_mat_t fq_ground_mat_t;
 
 typedef struct
 {
@@ -242,27 +239,6 @@ void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
 
 void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void
-fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
-
-void
-fq_pow_pn_init_precomp_matrix(fmpz_mat_t A, const fq_ctx_t ctx);
-
-void
-fq_pow_pn_clear_precomp_matrix(fmpz_mat_t A, const fq_ctx_t ctx);
-
-void
-fq_pow_pn_precompute_matrix_fq(fmpz_mat_t A, fq_t op,
-                               const fq_ctx_t ctx);
-
-void
-fq_pow_pn_precompute_matrix_ui(fmpz_mat_t A, ulong n,
-                               const fq_ctx_t ctx);
-
-void
-fq_pow_pn_precomp(fq_t rop, const fq_t op1, const fmpz_mat_t A,
-                  const fq_ctx_t ctx);
-                       
 /* Randomisation *************************************************************/
 
 void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
