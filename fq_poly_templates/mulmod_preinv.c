@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Martin Lee
     Copyright (C) 2013 Mike Hansen
 

@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
@@ -48,8 +49,6 @@ fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op, ctx))
     {
-
-
         flint_printf("Exception (fq_inv).  Zero is not invertible.\n");
         abort();
     }
