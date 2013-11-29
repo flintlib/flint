@@ -176,7 +176,7 @@ void flint_mpz_divexact_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 }
 
 static __inline__
-int flint_mpz_divisible_ui_p(mpz_ptr a, ulong c)
+int flint_mpz_divisible_ui_p(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
    
@@ -184,7 +184,7 @@ int flint_mpz_divisible_ui_p(mpz_ptr a, ulong c)
 }
 
 static __inline__
-int flint_mpz_congruent_ui_p(mpz_ptr a, ulong b, ulong c)
+int flint_mpz_congruent_ui_p(mpz_srcptr a, ulong b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
    {
@@ -195,7 +195,7 @@ int flint_mpz_congruent_ui_p(mpz_ptr a, ulong b, ulong c)
 }
 
 static __inline__
-int flint_mpz_cmp_ui(mpz_ptr a, ulong c)
+int flint_mpz_cmp_ui(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
    
@@ -203,7 +203,7 @@ int flint_mpz_cmp_ui(mpz_ptr a, ulong c)
 }
 
 static __inline__
-int flint_mpz_cmp_si(mpz_ptr a, slong c)
+int flint_mpz_cmp_si(mpz_srcptr a, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
    
@@ -211,7 +211,7 @@ int flint_mpz_cmp_si(mpz_ptr a, slong c)
 }
 
 static __inline__
-int flint_mpq_cmp_si(mpq_ptr a, slong c)
+int flint_mpq_cmp_si(mpq_srcptr a, slong c)
 {
    mpq_t tq;
    int res;
@@ -228,7 +228,7 @@ int flint_mpq_cmp_si(mpq_ptr a, slong c)
 }
 
 static __inline__
-int flint_mpq_cmp_ui(mpq_ptr a, ulong c)
+int flint_mpq_cmp_ui(mpq_srcptr a, ulong c)
 {
    mpq_t tq;
    int res;
