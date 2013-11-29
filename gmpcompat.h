@@ -34,18 +34,19 @@
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
-   if ((yyy) > 0) { \
-      (xxx)->_mp_size = 1; \
+   do { \
       (xxx)->_mp_d = (mp_ptr) &(yyy); \
-   }
+      if ((yyy) > 0) \
+         (xxx)->_mp_size = 1; \
+   }while (0)
 
 #define FLINT_MOCK_MPZ_SI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
-   if ((yyy) != 0) { \
+   do { \
       (xxx)->_mp_d = (mp_ptr) &(yyy); \
-       if ((yyy) > 0) (xxx)->_mp_size = 1; \
-       else (xxx)->_mp_size = -1, (yyy) = -(yyy); \
-   }
+      if ((yyy) < 0) (xxx)->_mp_size = -1, (yyy) = -(yyy); \
+      else (xxx)->_mp_size = (yyy) != 0; \
+   } while (0)
 
 #define flint_mpz_get_si(xxx) \
    ((xxx)->_mp_size == 0 ? (slong) WORD(0) : \
