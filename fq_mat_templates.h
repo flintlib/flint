@@ -235,6 +235,13 @@ TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
 slong
 TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
+slong
+TEMPLATE(T, mat_nullspace)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
+                           const TEMPLATE(T, ctx_t) ctx);
+
+slong
+TEMPLATE(T, mat_rank)(const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
+
 void
 TEMPLATE(T, mat_solve_tril)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) L,
                             const TEMPLATE(T, mat_t) B, int unit,
