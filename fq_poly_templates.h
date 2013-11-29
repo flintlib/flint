@@ -453,9 +453,9 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, poly_t) res, const fmpz_t e,
 
 void
 TEMPLATE(T, poly_powmod_xq_preinv)(TEMPLATE(T, poly_t) rop,
-                                   TEMPLATE(T, poly_t) f,
-                                   TEMPLATE(T, poly_t) finv,
-                                   TEMPLATE(T, ctx_t) ctx);
+                                   const TEMPLATE(T, poly_t) f,
+                                   const TEMPLATE(T, poly_t) finv,
+                                   const TEMPLATE(T, ctx_t) ctx);
 
 /*  Shifting  ****************************************************************/
 

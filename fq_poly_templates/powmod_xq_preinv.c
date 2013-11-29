@@ -25,9 +25,9 @@
 
 void
 TEMPLATE(T, poly_powmod_xq_preinv)(TEMPLATE(T, poly_t) rop,
-                                   TEMPLATE(T, poly_t) f,
-                                   TEMPLATE(T, poly_t) finv,
-                                   TEMPLATE(T, ctx_t) ctx)
+                                   const TEMPLATE(T, poly_t) f,
+                                   const TEMPLATE(T, poly_t) finv,
+                                   const TEMPLATE(T, ctx_t) ctx)
 {
     int i;
     slong j, degree;
