@@ -211,55 +211,67 @@ int flint_mpz_cmp_si(mpz_srcptr a, slong c)
 }
 
 static __inline__
-int flint_mpq_cmp_si(mpq_srcptr a, slong c)
+int flint_mpq_cmp_si(mpq_srcptr a, slong b, ulong c)
 {
    mpq_t tq;
    int res;
-   FLINT_MOCK_MPZ_SI(tc, c);
+   FLINT_MOCK_MPZ_SI(tb, b);
+   {
+      FLINT_MOCK_MPZ_UI(tc, c);
+      mpq_init(tq);
+      mpq_set_num(tq, tb);
+      mpq_set_den(tq, tc);
 
-   mpq_init(tq);
-   mpq_set_num(tq, tc);
+      res = mpq_cmp(a, tq);
 
-   res = mpq_cmp(a, tq);
+      mpq_clear(tq);
 
-   mpq_clear(tq);
-
-   return res;
+      return res;
+   }
 }
 
 static __inline__
-int flint_mpq_cmp_ui(mpq_srcptr a, ulong c)
+int flint_mpq_cmp_ui(mpq_srcptr a, ulong b, ulong c)
 {
    mpq_t tq;
    int res;
-   FLINT_MOCK_MPZ_UI(tc, c);
+   FLINT_MOCK_MPZ_UI(tb, b);
+   {
+      FLINT_MOCK_MPZ_UI(tc, c);
+      mpq_init(tq);
+      mpq_set_num(tq, tb);
+      mpq_set_den(tq, tc);
 
-   mpq_init(tq);
-   mpq_set_num(tq, tc);
+      res = mpq_cmp(a, tq);
 
-   res = mpq_cmp(a, tq);
+      mpq_clear(tq);
 
-   mpq_clear(tq);
-
-   return res;
+      return res;
+   }
 }
 
 static __inline__
-void flint_mpq_set_si(mpq_ptr a, slong c)
+void flint_mpq_set_si(mpq_ptr a, slong b, ulong c)
 {
-   FLINT_MOCK_MPZ_SI(tc, c);
+   FLINT_MOCK_MPZ_SI(tb, b);
+   {
+      FLINT_MOCK_MPZ_UI(tc, c);
 
-   mpq_set_ui(a, 0, 1);
-   mpq_set_num(a, tc);
+      mpq_set_num(a, tb);
+      mpq_set_den(a, tc);
+   }
 }
 
 static __inline__
-void flint_mpq_set_ui(mpq_ptr a, ulong c)
+void flint_mpq_set_ui(mpq_ptr a, ulong b, ulong c)
 {
-   FLINT_MOCK_MPZ_UI(tc, c);
+   FLINT_MOCK_MPZ_UI(tb, b);
+   {
+      FLINT_MOCK_MPZ_UI(tc, c);
 
-   mpq_set_ui(a, 0, 1);
-   mpq_set_num(a, tc);
+      mpq_set_num(a, tb);
+      mpq_set_den(a, tc);
+   }
 }
 
 static __inline__
