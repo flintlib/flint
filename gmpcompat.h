@@ -403,7 +403,7 @@ static __inline__
 void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
    if (exp >= (UWORD(1) << 32)) {
-      printf("Exception (flint_mpz_powm_ui). Power too large.\n");
+      printf("Exception (flint_mpz_pow_ui). Power too large.\n");
       abort();
    }
    
