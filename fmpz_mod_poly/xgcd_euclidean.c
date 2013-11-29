@@ -167,7 +167,7 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
             fmpz_mod_poly_zero(T);
             fmpz_mod_poly_set_fmpz(S, inv);
         }
-        else  /* lenA >= lenB >= 2 */
+        else  /* lenA >= lenB >= 1 */
         {
             fmpz *g, *s, *t;
             slong lenG;

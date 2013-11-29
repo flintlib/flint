@@ -504,6 +504,20 @@ void TEMPLATE(T, poly_gcd)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op
 
 
 slong
+_TEMPLATE(T, poly_xgcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, struct) *G,
+                                    TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
+                                    const TEMPLATE(T, struct) *A, slong lenA, 
+                                    const TEMPLATE(T, struct) *B, slong lenB, 
+                                    const TEMPLATE(T, ctx_t) ctx);
+
+void 
+TEMPLATE(T, poly_xgcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, poly_t) G, 
+                                   TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                                   const TEMPLATE(T, poly_t) A,
+                                   const TEMPLATE(T, poly_t) B,
+                                   const TEMPLATE(T, ctx_t) ctx);
+
+slong
 _TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, struct) *G,
                                   TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
                                   const TEMPLATE(T, struct) *A, slong lenA, 
