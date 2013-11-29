@@ -1,9 +1,11 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
 
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
 
-#if defined(__MINGW64__)
+#if 1 defined(__MINGW64__)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
@@ -389,14 +391,62 @@ ulong flint_mpz_mod_ui(mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-/*
-flint_mpz_powm_ui
-flint_mpz_pow_ui
+static __inline__
+void flint_mpz_powm_ui(mpz_ptr r, mpz_srcptr b, ulong exp, mpz_srcptr mod)
+{
+   FLINT_MOCK_MPZ_UI(texp, exp);
 
-flint_mpz_fac_ui
-flint_mpz_bin_uiui
-flint_mpz_fib_ui
-*/
+   mpz_powm(r, b, texp, mod);
+}
+
+static __inline__
+void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
+{
+   if (exp >= (UWORD(1) << 32)) {
+      printf("Exception (flint_mpz_powm_ui). Power too large.\n");
+      abort();
+   }
+   
+   mpz_pow_ui(r, b, (unsigned long) exp);
+}
+
+static __inline__
+void flint_mpz_fac_ui(mpz_ptr r, ulong n)
+{
+   if (n >= (UWORD(1) << 32)) {
+      printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
+      abort();
+   }
+   
+   mpz_fac_ui(r, (unsigned long) n);
+}
+
+static __inline__
+void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
+{
+   if (n >= (UWORD(1) << 32)) {
+      printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
+      abort();
+   }
+   
+   if (k >= (UWORD(1) << 32)) {
+      printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
+      abort();
+   }
+   
+   mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
+}
+
+static __inline__
+void flint_mpz_fib_ui(mpz_ptr r, ulong n)
+{
+   if (n >= (UWORD(1) << 32)) {
+      printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
+      abort();
+   }
+   
+   mpz_fib_ui(r, (unsigned long) n);
+}
 
 #else
 
