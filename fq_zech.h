@@ -77,6 +77,9 @@ void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
 
 void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
 
+void
+fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
 static __inline__ slong
@@ -336,6 +339,16 @@ void
 fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
+#ifdef T
+#undef T
+#endif
+
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_templates.h"
+#undef CAP_T
+#undef T
+    
 #ifdef __cplusplus
 }
 #endif

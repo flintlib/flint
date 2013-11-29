@@ -19,16 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
 #include "fq_nmod.h"
 
-void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len, 
-                  const mp_limb_t *a, const slong *j, slong lena, const fq_nmod_ctx_t ctx)
+void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len,
+                  const fq_nmod_ctx_t ctx)
 {
-    const slong d = j[lena - 1];
+    const slong d = fq_nmod_ctx_degree(ctx);
 
     if (len == 1)
     {
@@ -37,16 +39,7 @@ void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len,
     }
     else
     {
-        mp_limb_t *f = _nmod_vec_init(d + 1);
-        slong k;
-
-        _nmod_vec_zero(f, d + 1);
-        for (k = 0; k < lena; k++)
-            f[j[k]] = a[k];
-
-        _nmod_poly_invmod(rop, op, len, f, d + 1, ctx->mod);
-
-        _nmod_vec_clear(f);
+        _nmod_poly_invmod(rop, op, len, ctx->modulus->coeffs, d + 1, ctx->mod);
     }
 }
 
@@ -72,8 +65,7 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _fq_nmod_inv(t, op->coeffs, op->length, 
-                     ctx->a, ctx->j, ctx->len, ctx);
+        _fq_nmod_inv(t, op->coeffs, op->length, ctx);
 
         if (rop == op)
         {

@@ -126,6 +126,12 @@ _TEMPLATE(T, TEMPLATE(vec_scalar_submul, T))(TEMPLATE(T, struct) * poly1,
                                              const TEMPLATE(T, t) x,
                                              const TEMPLATE(T, ctx_t) ctx);
 
+void
+_TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * poly1,
+                                  const TEMPLATE(T, struct) * poly2,
+                                  slong len2, const TEMPLATE(T, t) x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+     
 /* ****************************************************************************/
 void
 _TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,

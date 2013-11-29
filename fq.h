@@ -74,6 +74,9 @@ void fq_ctx_init_modulus(fq_ctx_t ctx,
 
 void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
 
+void
+fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
+
 void fq_ctx_clear(fq_ctx_t ctx);
 
 static __inline__ slong fq_ctx_degree(const fq_ctx_t ctx)
@@ -226,6 +229,9 @@ void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+
+void
+fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx);
 
 void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
              const fq_ctx_t ctx);
@@ -380,6 +386,16 @@ fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
 void
 fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
               const fq_ctx_t ctx);
+
+#ifdef T
+#undef T
+#endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_templates.h"
+#undef CAP_T
+#undef T
 
 #ifdef __cplusplus
 }

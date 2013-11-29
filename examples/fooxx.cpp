@@ -37,8 +37,8 @@
 #include <stdio.h>
 
 extern "C" { // usually only #ifdef __cplusplus etc
-typedef long foo;
-typedef long foo_t[1];
+typedef slong foo;
+typedef slong foo_t[1];
 
 static __inline__ void foo_init(foo_t f)
 {
@@ -54,7 +54,7 @@ static __inline__ void foo_set(foo_t to, const foo_t from)
     *to = *from;
 }
 
-static __inline__ void foo_set_si(foo_t f, long e)
+static __inline__ void foo_set_si(foo_t f, slong e)
 {
     *f = e;
 }
@@ -64,7 +64,7 @@ static __inline__ void foo_add(foo_t to, const foo_t e1, const foo_t e2)
     *to = *e1 + *e2;
 }
 
-static __inline__ void foo_add_si(foo_t to, const foo_t e1, long e2)
+static __inline__ void foo_add_si(foo_t to, const foo_t e1, slong e2)
 {
     *to = *e1 + e2;
 }

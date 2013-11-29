@@ -35,6 +35,7 @@ fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, slong d,
 {
     slong nz;
     int i, j;
+    fmpz_t inv;
 
     /* Count number of nonzero coefficients */
     nz = 0;
@@ -50,17 +51,23 @@ fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, slong d,
     ctx->a = _fmpz_vec_init(ctx->len);
     ctx->j = flint_malloc(ctx->len * sizeof(slong));
 
+    fmpz_init(inv);
+    fmpz_invmod(inv, modulus->coeffs + modulus->length - 1, p);
+
     /* Copy the polynomial */
     j = 0;
     for (i = 0; i < modulus->length; i++)
     {
         if (!fmpz_is_zero(modulus->coeffs + i))
         {
-            fmpz_set(ctx->a + j, modulus->coeffs + i);
+            fmpz_mul(ctx->a + j, inv, modulus->coeffs + i);
+            fmpz_mod(ctx->a + j, ctx->a + j, p);
             ctx->j[j] = i;
             j++;
         }
     }
+
+    fmpz_clear(inv);
 
     if (ctx->len < 6)
         ctx->sparse_modulus = 1;
@@ -72,12 +79,12 @@ fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_t p, slong d,
     ctx->var = flint_malloc(strlen(var) + 1);
     strcpy(ctx->var, var);
 
-    /* Precompute the inverse of the modulus */
-    fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
-    fmpz_mod_poly_make_monic(ctx->inv, modulus);
-    fmpz_mod_poly_reverse(ctx->inv, ctx->inv, ctx->inv->length);
-    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->inv->length);
-
+    /* Set the modulus */
     fmpz_mod_poly_init(ctx->modulus, fq_ctx_prime(ctx));
     fmpz_mod_poly_set(ctx->modulus, modulus);
+
+    /* Precompute the inverse of the modulus */
+    fmpz_mod_poly_init(ctx->inv, fq_ctx_prime(ctx));
+    fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length);
+    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->inv->length);
 }

@@ -55,7 +55,7 @@ public:
         {return padicxx_ctx_srcref::make(&ctx->pctx);}
 
     // TODO more constructors? Should we wrap padic_print_mode?
-    qadicxx_ctx(fmpzxx_srcref p, slong d, long min, long max,
+    qadicxx_ctx(fmpzxx_srcref p, slong d, slong min, slong max,
         padic_print_mode mode, const char* var = "x")
     {
         qadic_ctx_init_conway(ctx, p._fmpz(), d, min, max, var, mode);
@@ -126,7 +126,7 @@ public:
     // these only make sense with qadicxx
     static qadicxx_expression zero(const qadicxx_ctx& ctx)
         {return qadicxx_expression(ctx);}
-    static qadicxx_expression zero(const qadicxx_ctx& ctx, long N)
+    static qadicxx_expression zero(const qadicxx_ctx& ctx, slong N)
         {return qadicxx_expression(ctx, N);}
     static qadicxx_expression one(const qadicxx_ctx& ctx)
     {
@@ -134,7 +134,7 @@ public:
         res.set_one();
         return res;
     }
-    static qadicxx_expression one(const qadicxx_ctx& ctx, long N)
+    static qadicxx_expression one(const qadicxx_ctx& ctx, slong N)
     {
         qadicxx_expression res(ctx, N);
         res.set_one();
@@ -146,7 +146,7 @@ public:
         res.set_gen();
         return res;
     }
-    static qadicxx_expression gen(const qadicxx_ctx& ctx, long N)
+    static qadicxx_expression gen(const qadicxx_ctx& ctx, slong N)
     {
         qadicxx_expression res(ctx, N);
         res.set_gen();
@@ -164,7 +164,7 @@ public:
     }
 
     template<class Padic>
-    static qadicxx_expression from_ground(const qadicxx_ctx& ctx, long N,
+    static qadicxx_expression from_ground(const qadicxx_ctx& ctx, slong N,
             const Padic& p,
             typename mp::enable_if<traits::is_padicxx<Padic> >::type* = 0)
     {
@@ -301,7 +301,7 @@ struct qadic_data
         qadic_init(inner);
     }
 
-    qadic_data(const qadicxx_ctx& c, long N)
+    qadic_data(const qadicxx_ctx& c, slong N)
         : ctx(c)
     {
         qadic_init2(inner, N);

@@ -74,7 +74,7 @@ public:
 
     static padic_polyxx_expression zero(padicxx_ctx_srcref ctx)
         {return padic_polyxx_expression(ctx);}
-    static padic_polyxx_expression zero(padicxx_ctx_srcref ctx, long N)
+    static padic_polyxx_expression zero(padicxx_ctx_srcref ctx, slong N)
         {return padic_polyxx_expression(ctx, N);}
     static padic_polyxx_expression one(padicxx_ctx_srcref ctx)
     {
@@ -82,7 +82,7 @@ public:
         res.set_one();
         return res;
     }
-    static padic_polyxx_expression one(padicxx_ctx_srcref ctx, long N)
+    static padic_polyxx_expression one(padicxx_ctx_srcref ctx, slong N)
     {
         padic_polyxx_expression res(ctx, N);
         res.set_one();

@@ -74,7 +74,7 @@ public:
     padic_print_mode& mode() {return _ctx()->mode;}
 
     // TODO more constructors? Should we wrap padic_print_mode?
-    padicxx_ctx(fmpzxx_srcref p, long min, long max, padic_print_mode mode)
+    padicxx_ctx(fmpzxx_srcref p, slong min, slong max, padic_print_mode mode)
     {
         padic_ctx_init(ctx, p._fmpz(), min, max, mode);
     }
@@ -227,7 +227,7 @@ public:
 
     static padicxx_expression zero(padicxx_ctx_srcref ctx)
         {return padicxx_expression(ctx);}
-    static padicxx_expression zero(padicxx_ctx_srcref ctx, long N)
+    static padicxx_expression zero(padicxx_ctx_srcref ctx, slong N)
         {return padicxx_expression(ctx, N);}
     static padicxx_expression one(padicxx_ctx_srcref ctx)
     {
@@ -235,7 +235,7 @@ public:
         res.set_one();
         return res;
     }
-    static padicxx_expression one(padicxx_ctx_srcref ctx, long N)
+    static padicxx_expression one(padicxx_ctx_srcref ctx, slong N)
     {
         padicxx_expression res(ctx, N);
         res.set_one();
@@ -507,7 +507,7 @@ struct padic_data
         padic_init(inner);
     }
 
-    padic_data(padicxx_ctx_srcref c, long N)
+    padic_data(padicxx_ctx_srcref c, slong N)
         : ctx(c)
     {
         padic_init2(inner, N);

@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
@@ -27,27 +28,19 @@
 #include "fq.h"
 
 void
-_fq_inv(fmpz * rop, const fmpz * op, slong len,
-        const fmpz * a, const slong *j, slong lena, const fmpz_t p)
+_fq_inv(fmpz * rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 {
-    const slong d = j[lena - 1];
+    const slong d = fq_ctx_degree(ctx);
 
     if (len == 1)
     {
-        fmpz_invmod(rop, op, p);
+        fmpz_invmod(rop, op, fq_ctx_prime(ctx));
         _fmpz_vec_zero(rop + 1, d - 1);
     }
     else
     {
-        fmpz *f = _fmpz_vec_init(d + 1);
-        slong k;
-
-        for (k = 0; k < lena; k++)
-            fmpz_set(f + j[k], a + k);
-
-        _fmpz_mod_poly_invmod(rop, op, len, f, d + 1, p);
-
-        _fmpz_vec_clear(f, d + 1);
+        _fmpz_mod_poly_invmod(rop, op, len, ctx->modulus->coeffs, d + 1,
+                              fq_ctx_prime(ctx));
     }
 }
 
@@ -56,8 +49,6 @@ fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op, ctx))
     {
-
-
         flint_printf("Exception (fq_inv).  Zero is not invertible.\n");
         abort();
     }
@@ -76,8 +67,7 @@ fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _fq_inv(t, op->coeffs, op->length,
-                ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+        _fq_inv(t, op->coeffs, op->length, ctx);
 
         if (rop == op)
         {

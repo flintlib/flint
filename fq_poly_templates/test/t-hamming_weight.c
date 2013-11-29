@@ -50,7 +50,7 @@ main(void)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
-	long w1,w2;
+	     slong w1,w2;
         TEMPLATE(T, poly_t) a, b;
 
         len = n_randint(state, 15) + 1;
@@ -86,7 +86,7 @@ main(void)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
-	long w1,w2,wsum;
+	     slong w1,w2,wsum;
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;

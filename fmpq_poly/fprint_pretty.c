@@ -48,6 +48,12 @@ do {                               \
     }                              \
 } while (0)
 
+/* checks if x/y == 1, where (x, y) need not be in lowest terms */
+#define __fmpq_is_one(x,y) fmpz_equal((x), (y))
+
+/* checks if x/y == +/- 1, where (x, y) need not be in lowest terms */
+#define __fmpq_is_pm1(x,y) (fmpz_cmpabs((x),(y)) == 0)
+
 int _fmpq_poly_fprint_pretty(FILE * file, 
                              const fmpz *poly, const fmpz_t den, slong len, 
                              const char * x)
@@ -68,11 +74,11 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     }
     else if (len == 2)
     {
-        if (poly[1] == WORD(1))
+        if (__fmpq_is_one(poly + 1, den))
         {
             flint_fprintf(file, "%s", x);
         }
-        else if (poly[1] == WORD(-1))
+        else if (__fmpq_is_pm1(poly + 1, den))
         {
             flint_fprintf(file, "-%s", x);
         }
@@ -96,9 +102,9 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     {
         slong i = len - 1;  /* i >= 2 */
         {
-            if (poly[i] == WORD(1))
+            if (__fmpq_is_one(poly + i, den))
                flint_fprintf(file, "%s^%wd", x, i);
-            else if (poly[i] == WORD(-1))
+            else if (__fmpq_is_pm1(poly + i, den))
                flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
@@ -113,9 +119,9 @@ int _fmpq_poly_fprint_pretty(FILE * file,
             if (poly[i] == 0)
                 continue;
 
-            if (poly[i] == WORD(1))
+            if (__fmpq_is_one(poly + i, den))
                 flint_fprintf(file, "+%s^%wd", x, i);
-            else if (poly[i] == WORD(-1))
+            else if (__fmpq_is_pm1(poly + i, den))
                 flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
@@ -130,12 +136,12 @@ int _fmpq_poly_fprint_pretty(FILE * file,
 
         if (poly[1])
         {
-            if (poly[1] == WORD(1))
+            if (__fmpq_is_one(poly + 1, den))
             {
                 fputc('+', file);
                 fputs(x, file);
             }
-            else if (poly[1] == WORD(-1))
+            else if (__fmpq_is_pm1(poly + 1, den))
             {
                 fputc('-', file);
                 fputs(x, file);

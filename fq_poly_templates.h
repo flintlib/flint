@@ -308,6 +308,30 @@ void TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop,
                     const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n, 
                     const TEMPLATE(T, ctx_t) ctx);
 
+void
+_TEMPLATE(T, poly_mulhigh_classical)(TEMPLATE(T, struct)* rop,
+                                     const TEMPLATE(T, struct)* op1, slong len1,
+                                     const TEMPLATE(T, struct)* op2, slong len2,
+                                     slong start, const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE(T, poly_mulhigh_classical)(TEMPLATE(T, poly_t) rop,
+                                    const TEMPLATE(T, poly_t) op1,
+                                    const TEMPLATE(T, poly_t) op2,
+                                    slong start, const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE(T, poly_mulhigh)(TEMPLATE(T, struct)* res,
+                           const TEMPLATE(T, struct)* poly1, slong len1, 
+                           const TEMPLATE(T, struct)* poly2, slong len2,
+                           slong n, TEMPLATE(T, ctx_t) ctx);
+           
+void
+TEMPLATE(T, poly_mulhigh)(TEMPLATE(T, poly_t) rop,
+                          const TEMPLATE(T, poly_t) op1,
+                          const TEMPLATE(T, poly_t) op2, slong start,
+                          const TEMPLATE(T, ctx_t) ctx);
+
 void _TEMPLATE(T, poly_mulmod)(TEMPLATE(T, struct) * res, 
                      const TEMPLATE(T, struct) * poly1, slong len1,
                      const TEMPLATE(T, struct) * poly2, slong len2, 
@@ -478,6 +502,18 @@ TEMPLATE(T, poly_gcd)(TEMPLATE(T, poly_t) rop,
                       const TEMPLATE(T, ctx_t) ctx);
 
 slong
+_TEMPLATE(T, poly_gcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, struct)* G, 
+                                   const TEMPLATE(T, struct)* A, slong lenA, 
+                                   const TEMPLATE(T, struct)* B, slong lenB,
+                                   const TEMPLATE(T, ctx_t) ctx);
+
+void 
+TEMPLATE(T, poly_gcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, poly_t) G,
+                                  const TEMPLATE(T, poly_t) A,
+                                  const TEMPLATE(T, poly_t) B,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
+slong
 _TEMPLATE(T, poly_hgcd)(TEMPLATE(T, struct) **M, slong *lenM, 
                         TEMPLATE(T, struct)* A, slong *lenA,
                         TEMPLATE(T, struct)* B, slong *lenB, 
@@ -497,6 +533,58 @@ void TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, poly_t) G,
                                 const TEMPLATE(T, poly_t) A,
                                 const TEMPLATE(T, poly_t) B,
                                 const TEMPLATE(T, ctx_t) ctx);
+
+slong
+_TEMPLATE(T, poly_xgcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, struct) *G,
+                                    TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
+                                    const TEMPLATE(T, struct) *A, slong lenA, 
+                                    const TEMPLATE(T, struct) *B, slong lenB, 
+                                    const TEMPLATE(T, ctx_t) ctx);
+
+void 
+TEMPLATE(T, poly_xgcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, poly_t) G, 
+                                   TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                                   const TEMPLATE(T, poly_t) A,
+                                   const TEMPLATE(T, poly_t) B,
+                                   const TEMPLATE(T, ctx_t) ctx);
+
+slong
+_TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, struct) *G,
+                                  TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
+                                  const TEMPLATE(T, struct) *A, slong lenA, 
+                                  const TEMPLATE(T, struct) *B, slong lenB, 
+                                  const TEMPLATE(T, t) invB,
+                                  const TEMPLATE(T, ctx_t) ctx);
+void 
+TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, poly_t) G, 
+                                 TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                                 const TEMPLATE(T, poly_t) A,
+                                 const TEMPLATE(T, poly_t) B,
+                                 const TEMPLATE(T, ctx_t) ctx);
+
+static __inline__ slong
+_TEMPLATE(T, poly_xgcd)(TEMPLATE(T, struct) *G,
+                        TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T, 
+                        const TEMPLATE(T, struct) *A, slong lenA, 
+                        const TEMPLATE(T, struct) *B, slong lenB, 
+                        const TEMPLATE(T, t) invB,
+                        const TEMPLATE(T, ctx_t) ctx)
+{
+    return _TEMPLATE(T, poly_xgcd_euclidean)(G, S, T, A, lenA,
+                                             B, lenB, invB, ctx);
+}
+
+
+static __inline__ void
+TEMPLATE(T, poly_xgcd)(TEMPLATE(T, poly_t) G, 
+                       TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
+                       const TEMPLATE(T, poly_t) A,
+                       const TEMPLATE(T, poly_t) B,
+                       const TEMPLATE(T, ctx_t) ctx)
+{
+    TEMPLATE(T, poly_xgcd_euclidean)(G, S, T, A, B, ctx);
+}
+
 
 /*  Euclidean division  ******************************************************/
 
@@ -618,6 +706,21 @@ TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly
                              const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                              const TEMPLATE(T, poly_t) Binv, const TEMPLATE(T, ctx_t) ctx);
 
+
+void
+_TEMPLATE(T, poly_divrem_f)(TEMPLATE(T, t) f,
+                            TEMPLATE(T, struct)* Q, TEMPLATE(T, struct)* R, 
+                            const TEMPLATE(T, struct)* A, slong lenA, 
+                            const TEMPLATE(T, struct)* B, slong lenB,
+                            const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE(T, poly_divrem_f)(TEMPLATE(T, t) f,
+                           TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R, 
+                           const TEMPLATE(T, poly_t) A,
+                           const TEMPLATE(T, poly_t) B,
+                           const TEMPLATE(T, ctx_t) ctx);
+                          
 /*  Divisibility testing  ***************************************************/
 
 int _TEMPLATE(T, poly_divides)(TEMPLATE(T, struct) *Q, 
