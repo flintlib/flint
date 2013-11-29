@@ -32,12 +32,8 @@
  extern "C" {
 #endif
 
-#ifndef __GMP_BITS_PER_MP_LIMB
-#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
-#endif
-
 /* x86 : 64 bit */
-#if (__GMP_BITS_PER_MP_LIMB == 64 && defined (__amd64__)) 
+#if (GMP_LIMB_BITS == 64 && defined (__amd64__)) 
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
@@ -93,7 +89,7 @@
 #endif /* x86_64 */
 
 /* x86 : 32 bit */
-#if (__GMP_BITS_PER_MP_LIMB == 32 && (defined (__i386__) \
+#if (GMP_LIMB_BITS == 32 && (defined (__i386__) \
    || defined (__i486__) || defined(__amd64__)))
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
@@ -147,7 +143,7 @@
 #endif /* x86 */
 
 /* Itanium */
-#if (__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64))
+#if (GMP_LIMB_BITS == 64 && defined (__ia64))
 
 /* This form encourages gcc (pre-release 3.4 at least) to emit predicated
    "sub r=r,r" and "sub r=r,r,1", giving a 2 cycle latency.  The generic
@@ -183,7 +179,7 @@
 #endif /* Itanium */
 
 /* ARM */
-#if (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+#if (GMP_LIMB_BITS == 32 && defined (__arm__))
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                \
   __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"			 \
@@ -242,15 +238,15 @@
 /* fallback code */
 #if !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
 
-#define __BITS4 (__GMP_BITS_PER_MP_LIMB/4)
-#define __ll_B ((mp_limb_t) 1 << (__GMP_BITS_PER_MP_LIMB / 2))
+#define __BITS4 (GMP_LIMB_BITS/4)
+#define __ll_B ((mp_limb_t) 1 << (GMP_LIMB_BITS / 2))
 #define __ll_lowpart(t) ((mp_limb_t) (t) & (__ll_B - 1))
-#define __ll_highpart(t) ((mp_limb_t) (t) >> (__GMP_BITS_PER_MP_LIMB / 2))
+#define __ll_highpart(t) ((mp_limb_t) (t) >> (GMP_LIMB_BITS / 2))
 #define __highbit (~(mp_limb_t)0 ^ ((~(mp_limb_t)0) >> 1))
 
 #define NEED_CLZ_TAB
 
-#if !(__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+#if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
   do {									          \
@@ -270,8 +266,8 @@
     add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
 
-#if !((__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64)) || \
-      (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__)))
+#if !((GMP_LIMB_BITS == 64 && defined (__ia64)) || \
+      (GMP_LIMB_BITS == 32 && defined (__arm__)))
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
   do {									          \
@@ -303,7 +299,7 @@
       __x3 += __ll_B;		/* yes, add it in the proper pos. */         \
 									                                             \
     (w1) = __x3 + __ll_highpart (__x1);					                  \
-    (w0) = (__x1 << __GMP_BITS_PER_MP_LIMB/2) + __ll_lowpart (__x0);		\
+    (w0) = (__x1 << GMP_LIMB_BITS/2) + __ll_lowpart (__x0);		\
   } while (0)
 
 #endif
@@ -353,7 +349,7 @@
     mp_limb_t __xr = (x);							                \
     mp_limb_t __a;								                   \
 									                                  \
-    if (__GMP_BITS_PER_MP_LIMB == 32)						       \
+    if (GMP_LIMB_BITS == 32)						       \
       {									                            \
 	__a = __xr < ((mp_limb_t) 1 << 2*__BITS4)				       \
 	  ? (__xr < ((mp_limb_t) 1 << __BITS4) ? 1 : __BITS4 + 1) \
@@ -362,16 +358,16 @@
       }									                            \
     else								                               \
       {									                            \
-	for (__a = __GMP_BITS_PER_MP_LIMB - 8; __a > 0; __a -= 8) \
+	for (__a = GMP_LIMB_BITS - 8; __a > 0; __a -= 8) \
 	  if (((__xr >> __a) & 0xff) != 0)				             \
 	    break;							                            \
 	++__a;								                            \
       }									                            \
 									                                  \
-    (count) = __GMP_BITS_PER_MP_LIMB + 1 - __a - __flint_clz_tab[__xr >> __a]; \
+    (count) = GMP_LIMB_BITS + 1 - __a - __flint_clz_tab[__xr >> __a]; \
   } while (0)
 
-#if !(__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64))
+#if !(GMP_LIMB_BITS == 64 && defined (__ia64))
 
 #define count_trailing_zeros(count, x)                 \
   do {									                      \
@@ -379,7 +375,7 @@
     mp_limb_t __ctz_c;							             \
     FLINT_ASSERT (__ctz_x != 0);						       \
     count_leading_zeros (__ctz_c, __ctz_x & -__ctz_x); \
-    (count) = __GMP_BITS_PER_MP_LIMB - 1 - __ctz_c;	 \
+    (count) = GMP_LIMB_BITS - 1 - __ctz_c;	 \
   } while (0)
 
 #endif
@@ -390,7 +386,7 @@
        count_leading_zeros(__norm, (d));             \
        if (__norm)                                   \
        {                                             \
-           udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (__GMP_BITS_PER_MP_LIMB - __norm)), (n0) << __norm, (d) << __norm); \
+           udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (GMP_LIMB_BITS - __norm)), (n0) << __norm, (d) << __norm); \
           (r) = ((mp_limb_t) (r) >> __norm);         \
        } else                                        \
           udiv_qrnnd_int((q), (r), (n1), (n0), (d)); \
@@ -436,7 +432,7 @@
 
 #endif /* non x86 fallback code */
 
-#if !(__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+#if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 
 #define smul_ppmm(w1, w0, u, v)                         \
   do {                                                  \
