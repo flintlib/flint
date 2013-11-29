@@ -349,34 +349,55 @@ ulong flint_mpz_tdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
 static __inline__
 ulong flint_mpz_cdiv_ui(mpz_srcptr n, ulong c)
 {
-   __mpz_struct r[1] = {{ 0, 0, NULL }};
+   mpz_t r;
+   ulong res;
+
+   mpz_init(r);
    FLINT_MOCK_MPZ_UI(tc, c);
 
    mpz_cdiv_r(r, n, tc);
 
-   return flint_mpz_get_ui(r);
+   res = flint_mpz_get_ui(r);
+
+   mpz_clear(r);
+
+   return res;
 }
 
 static __inline__
 ulong flint_mpz_fdiv_ui(mpz_srcptr n, ulong c)
 {
-   __mpz_struct r[1] = {{ 0, 0, NULL }};
+   mpz_t r;
+   ulong res;
+
+   mpz_init(r);
    FLINT_MOCK_MPZ_UI(tc, c);
 
    mpz_fdiv_r(r, n, tc);
 
-   return flint_mpz_get_ui(r);
+   res = flint_mpz_get_ui(r);
+
+   mpz_clear(r);
+
+   return res;
 }
 
 static __inline__
 ulong flint_mpz_tdiv_ui(mpz_srcptr n, ulong c)
 {
-   __mpz_struct r[1] = {{ 0, 0, NULL }};
+   mpz_t r;
+   ulong res;
+
+   mpz_init(r);
    FLINT_MOCK_MPZ_UI(tc, c);
 
    mpz_tdiv_r(r, n, tc);
 
-   return flint_mpz_get_ui(r);
+   res = flint_mpz_get_ui(r);
+
+   mpz_clear(r);
+
+   return res;
 }
 
 static __inline__
