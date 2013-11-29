@@ -22,7 +22,7 @@
     Copyright (C) 2011, 2012 Sebastian Pancratz 
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
- 
+
 ******************************************************************************/
 
 #include "fq.h"
