@@ -77,7 +77,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
 static __inline__
 void flint_mpz_init_set_si(mpz_ptr r, slong s)
 {
-   r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
    if (s < 0) {
@@ -92,7 +92,7 @@ void flint_mpz_init_set_si(mpz_ptr r, slong s)
 static __inline__
 void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
 {
-   r->_mp_d = flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
    r->_mp_d[0] = u; 
