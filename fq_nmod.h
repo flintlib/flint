@@ -72,7 +72,7 @@ void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
                              const fmpz_t p, slong d, const char *var);
 
 void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
-                              const fmpz_t p, slong d, const nmod_poly_t modulus,
+                              const nmod_poly_t modulus,
                               const char *var);
 
 void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);

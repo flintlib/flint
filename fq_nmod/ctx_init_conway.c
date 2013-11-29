@@ -89,7 +89,7 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
 
             nmod_poly_set_coeff_ui(mod, d, 1);
 
-            fq_nmod_ctx_init_modulus(ctx, p, d, mod, var);
+            fq_nmod_ctx_init_modulus(ctx, mod, var);
 
             nmod_poly_clear(mod);
             fclose(file);

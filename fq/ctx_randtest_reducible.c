@@ -38,7 +38,7 @@ fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state)
 
     fmpz_mod_poly_init(mod, p);
     fmpz_mod_poly_randtest_monic(mod, state, d + 1);
-    fq_ctx_init_modulus(ctx, p, d, mod, "a");
+    fq_ctx_init_modulus(ctx, mod, "a");
 
     fmpz_mod_poly_clear(mod);
     fmpz_clear(p);
