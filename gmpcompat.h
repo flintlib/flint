@@ -23,8 +23,8 @@
    }
 
 #define flint_mpz_get_si(xxx) \
-   ((xxx)->_mp_size == 0 ? WORD(0) : \
-   ((xxx)->_mp_size > 0 ? (xxx)->_mp_d[0] : -(xxx)->_mp_d[0]))
+   ((xxx)->_mp_size == 0 ? (slong) WORD(0) : \
+   ((xxx)->_mp_size > 0 ? (slong) (xxx)->_mp_d[0] : (slong) -(xxx)->_mp_d[0]))
 
 #define flint_mpz_get_ui(xxx) \
    ((xxx)->_mp_size == 0 ? WORD(0) : (xxx)->_mp_d[0])
