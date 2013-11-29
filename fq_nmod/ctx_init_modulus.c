@@ -34,6 +34,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const fmpz_t p, slong d,
 {
     slong nz;
     int i, j;
+    mp_limb_t inv;
 
     fmpz_init_set(fq_nmod_ctx_prime(ctx), p);
     ctx->mod.n = fmpz_get_ui(p);
@@ -54,13 +55,16 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const fmpz_t p, slong d,
     ctx->a = _nmod_vec_init(ctx->len);
     ctx->j = flint_malloc(ctx->len * sizeof(mp_limb_t));
 
+    inv = n_invmod(modulus->coeffs[modulus->length - 1], ctx->mod.n);
+
     /* Copy the polynomial */
     j = 0;
     for (i = 0; i < modulus->length; i++)
     {
         if (modulus->coeffs[i] != 0)
         {
-            ctx->a[j] = modulus->coeffs[i];
+            ctx->a[j] = n_mulmod2_preinv(inv, modulus->coeffs[i],
+                                         ctx->mod.n, ctx->mod.ninv);
             ctx->j[j] = i;
             j++;
         }
