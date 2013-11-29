@@ -186,14 +186,12 @@ int flint_mpz_divisible_ui_p(mpz_ptr a, ulong c)
 static __inline__
 int flint_mpz_congruent_ui_p(mpz_ptr a, ulong b, ulong c)
 {
-   __mpz_struct tb[1] = {{ 1, 0, NULL }};
    FLINT_MOCK_MPZ_UI(tc, c);
-   if (b > 0) {
-      tb->_mp_size = 1;
-      tb->_mp_d = (mp_ptr) &b;
-   }
+   {
+      FLINT_MOCK_MPZ_UI(tb, b);
    
-   return mpz_congruent_p(a, tb, tc);
+      return mpz_congruent_p(a, tb, tc);
+   }
 }
 
 static __inline__
