@@ -119,7 +119,7 @@ void flint_cleanup(void);
 #define WORD_MIN LONG_MIN
 #endif
 
-#if __GMP_BITS_PER_MP_LIMB == 64
+#if GMP_LIMB_BITS == 64
     #define FLINT_BITS 64
     #define FLINT_D_BITS 53
     #define FLINT64 1
@@ -328,6 +328,8 @@ size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprin
 int flint_scanf(const char * str, ...); /* flint version of scanf */
 int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+
+#include "gmpcompat.h"
 
 #ifdef __cplusplus
 }
