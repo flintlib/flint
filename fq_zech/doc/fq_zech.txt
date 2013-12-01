@@ -125,6 +125,12 @@ void fq_zech_ctx_randtest(fq_zech_ctx_t ctx)
     Initializes \code{ctx} to a random finite field.  Assumes that
     \code{fq_zech_ctx_init} as not been called on \code{ctx} already.
 
+void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx)
+
+    Since the Zech logarithm representation does not work with a
+    non-irreducible modulus, does the same as
+    \code{fq_zech_ctx_randtest}.
+
 *******************************************************************************
 
     Memory management
@@ -404,6 +410,18 @@ int fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2,
                   const fq_zech_ctx_t ctx)
 
     Returns whether \code{op1} and \code{op2} are equal.
+
+int fq_zech_is_invertible(const fq_zech_t op, const fq_zech_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.
+
+int fq_zech_is_invertible_f(fq_zech_t f, const fq_zech_t op,
+                            const fq_zech_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.  If it is not,
+    then \code{f} is set of a factor of the modulus.  Since the
+    modulus for an \code{fq_zech_ctx_t} is always irreducible, then
+    any non-zero \code{op} will be invertible.
 
 *******************************************************************************
 

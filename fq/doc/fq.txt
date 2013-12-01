@@ -115,6 +115,12 @@ void fq_ctx_randtest(fq_ctx_t ctx)
     Initializes \code{ctx} to a random finite field.  Assumes that
     \code{fq_ctx_init} as not been called on \code{ctx} already.
 
+void fq_ctx_randtest_reducible(fq_ctx_t ctx)
+
+    Initializes \code{ctx} to a random extension of a prime field.
+    The modulus may or may not be irreducible.  Assumes that
+    \code{fq_ctx_init} as not been called on \code{ctx} already.
+
 *******************************************************************************
 
     Memory management
@@ -375,6 +381,15 @@ int fq_is_one(const fq_t op, const fq_ctx_t ctx)
 int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 
     Returns whether \code{op1} and \code{op2} are equal.
+
+int fq_is_invertible(const fq_t op, const fq_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.
+
+int fq_is_invertible_f(fq_t f, const fq_t op, const fq_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.  If it is not,
+    then \code{f} is set of a factor of the modulus.
 
 *******************************************************************************
 

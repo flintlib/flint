@@ -116,6 +116,13 @@ void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx)
     Initializes \code{ctx} to a random finite field.  Assumes that
     \code{fq_nmod_ctx_init} as not been called on \code{ctx} already.
 
+
+void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx)
+
+    Initializes \code{ctx} to a random extension of a word-sized prime
+    field.  The modulus may or may not be irreducible.  Assumes that
+    \code{fq_nmod_ctx_init} as not been called on \code{ctx} already.
+
 *******************************************************************************
 
     Memory management
@@ -203,6 +210,7 @@ void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x,
 
     Sets \code{rop} to the product of \code{op} and $x$,
     reducing the output in the given context.
+
 
 void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
@@ -388,6 +396,16 @@ int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2,
                   const fq_nmod_ctx_t ctx)
 
     Returns whether \code{op1} and \code{op2} are equal.
+
+int fq_nmod_is_invertible(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.
+
+int fq_nmod_is_invertible_f(fq_nmod_t f, const fq_nmod_t op,
+                            const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.  If it is not,
+    then \code{f} is set of a factor of the modulus.
 
 *******************************************************************************
 

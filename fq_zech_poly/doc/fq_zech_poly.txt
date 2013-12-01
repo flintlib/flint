@@ -19,8 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012,2013 Andres Goens
+    Copyright (C) 2009, 2008 William Hart
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012,2013 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
@@ -1084,21 +1086,19 @@ fq_zech_poly_inv_series_newton(fq_zech_poly_t Qinv, const fq_zech_poly_t Q, slon
 
 *******************************************************************************
 
-
-
-void fq_zech_poly_gcd_euclidean(fq_zech_poly_t rop, const fq_zech_poly_t op1,
-                           const fq_zech_poly_t op2, const fq_zech_ctx_t ctx)
+void fq_zech_poly_gcd(fq_zech_poly_t rop, const fq_zech_poly_t op1,
+                      const fq_zech_poly_t op2, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the greatest common divisor of \code{op1} and
-    \code{op2}, using the euclidean algorithm. The GCD of zero
-    polynomials is defined to be zero, whereas the GCD of the zero
-    polynomial and some other polynomial $P$ is defined to be
+    \code{op2}, using the either the Euclidean or HGCD algorithm. The
+    GCD of zero polynomials is defined to be zero, whereas the GCD of
+    the zero polynomial and some other polynomial $P$ is defined to be
     $P$. Except in the case where the GCD is zero, the GCD $G$ is made
     monic.
 
-long _fq_zech_poly_gcd_euclidean(fq_zech_struct* G, const fq_zech_struct* A, slong lenA,
-                            const fq_zech_struct* B, slong lenB,
-                            const fq_zech_ctx_t ctx)
+long _fq_zech_poly_gcd(fq_zech_struct* G,const fq_zech_struct* A, slong lenA,
+                       const fq_zech_struct* B, slong lenB,
+                       const fq_zech_ctx_t ctx)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
     \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
@@ -1106,18 +1106,21 @@ long _fq_zech_poly_gcd_euclidean(fq_zech_struct* G, const fq_zech_struct* A, slo
     made to make the GCD monic. It is required that $G$ have space for
     \code{lenB} coefficients.
 
-void fq_zech_poly_gcd(fq_zech_poly_t rop, const fq_zech_poly_t op1, const fq_zech_poly_t op2,
-                 const fq_zech_ctx_t ctx)
+void fq_zech_poly_gcd_euclidean(fq_zech_poly_t rop, const fq_zech_poly_t op1,
+                                const fq_zech_poly_t op2,
+                                const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the greatest common divisor of \code{op1} and
-    \code{op2}, using the euclidean algorithm at the moment. The GCD
-    of zero polynomials is defined to be zero, whereas the GCD of the
-    zero polynomial and some other polynomial $P$ is defined to be
+    \code{op2}, using the Euclidean algorithm. The GCD of zero
+    polynomials is defined to be zero, whereas the GCD of the zero
+    polynomial and some other polynomial $P$ is defined to be
     $P$. Except in the case where the GCD is zero, the GCD $G$ is made
     monic.
 
-long _fq_zech_poly_gcd(fq_zech_struct* G,const fq_zech_struct* A, slong lenA,
-                  const fq_zech_struct* B, slong lenB, const fq_zech_ctx_t ctx)
+long _fq_zech_poly_gcd_euclidean(fq_zech_struct* G,
+                                 const fq_zech_struct* A, slong lenA,
+                                 const fq_zech_struct* B, slong lenB,
+                                 const fq_zech_ctx_t ctx)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
     \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The

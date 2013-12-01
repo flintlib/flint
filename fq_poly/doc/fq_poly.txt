@@ -19,8 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012,2013 Andres Goens
+    Copyright (C) 2009, 2008 William Hart
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012,2013 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
@@ -965,10 +967,10 @@ void fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R,
     Assumes that $B$ is non-zero and that the leading coefficient of
     $B$ is invertible.
 
-void _fq_poly_div_newton_preinv(fq_struct* Q, const fq_struct* A, slong lenA,
-                                const fq_struct* B, slong lenB,
-                                const fq_struct* Binv, slong lenBinv,
-                                const fq_struct ctx_t)
+void _fq_poly_div_newton_n_preinv(fq_struct* Q, const fq_struct* A, slong lenA,
+                                  const fq_struct* B, slong lenB,
+                                  const fq_struct* Binv, slong lenBinv,
+                                  const fq_struct ctx_t)
 
     Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
     $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA}
@@ -1051,13 +1053,30 @@ fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
 
 *******************************************************************************
 
+void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
+                 const fq_ctx_t ctx)
 
+    Sets \code{rop} to the greatest common divisor of \code{op1} and
+    \code{op2}, using the either the Euclidean or HGCD algorithm. The
+    GCD of zero polynomials is defined to be zero, whereas the GCD of
+    the zero polynomial and some other polynomial $P$ is defined to be
+    $P$. Except in the case where the GCD is zero, the GCD $G$ is made
+    monic.
+
+long _fq_poly_gcd(fq_struct* G,const fq_struct* A, slong lenA,
+                  const fq_struct* B, slong lenB, const fq_ctx_t ctx)
+
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
+    length of the GCD $G$ is returned by the function. No attempt is
+    made to make the GCD monic. It is required that $G$ have space for
+    \code{lenB} coefficients.
 
 void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1,
                            const fq_poly_t op2, const fq_ctx_t ctx)
 
     Sets \code{rop} to the greatest common divisor of \code{op1} and
-    \code{op2}, using the euclidean algorithm. The GCD of zero
+    \code{op2}, using the Euclidean algorithm. The GCD of zero
     polynomials is defined to be zero, whereas the GCD of the zero
     polynomial and some other polynomial $P$ is defined to be
     $P$. Except in the case where the GCD is zero, the GCD $G$ is made
@@ -1066,25 +1085,6 @@ void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1,
 long _fq_poly_gcd_euclidean(fq_struct* G, const fq_struct* A, slong lenA,
                             const fq_struct* B, slong lenB,
                             const fq_ctx_t ctx)
-
-    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
-    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
-    length of the GCD $G$ is returned by the function. No attempt is
-    made to make the GCD monic. It is required that $G$ have space for
-    \code{lenB} coefficients.
-
-void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
-                 const fq_ctx_t ctx)
-
-    Sets \code{rop} to the greatest common divisor of \code{op1} and
-    \code{op2}, using the euclidean algorithm at the moment. The GCD
-    of zero polynomials is defined to be zero, whereas the GCD of the
-    zero polynomial and some other polynomial $P$ is defined to be
-    $P$. Except in the case where the GCD is zero, the GCD $G$ is made
-    monic.
-
-long _fq_poly_gcd(fq_struct* G,const fq_struct* A, slong lenA,
-                  const fq_struct* B, slong lenB, const fq_ctx_t ctx)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
     \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
