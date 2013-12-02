@@ -67,7 +67,7 @@ __nmod_poly_factor(nmod_poly_factor_t result,
             return input->coeffs[0];
     }
 
-    leading_coeff = nmod_poly_get_coeff_ui(input, nmod_poly_degree(input));
+    leading_coeff = *nmod_poly_lead(input);
 
     nmod_poly_init_preinv(monic_input, input->mod.n, input->mod.ninv);
     nmod_poly_make_monic(monic_input, input);

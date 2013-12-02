@@ -34,6 +34,6 @@
 void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k)
 {
     __mpz_struct * t = _fmpz_promote(res);
-    mpz_bin_uiui(t, n, k);
+    flint_mpz_bin_uiui(t, n, k);
     _fmpz_demote_val(res);
 }

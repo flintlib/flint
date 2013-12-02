@@ -61,7 +61,7 @@ main(void)
         fmpz_get_mpz(e, c);
 
         fmpz_divexact_si(a, c, n);
-        mpz_divexact_ui(f, e, FLINT_ABS(n));
+        flint_mpz_divexact_ui(f, e, FLINT_ABS(n));
         if (n < 0)
             mpz_neg(f, f);
 
@@ -102,7 +102,7 @@ main(void)
         fmpz_get_mpz(d, c);
 
         fmpz_divexact_si(c, c, n);
-        mpz_divexact_ui(f, d, FLINT_ABS(n));
+        flint_mpz_divexact_ui(f, d, FLINT_ABS(n));
         if (n < 0)
             mpz_neg(f, f);
 

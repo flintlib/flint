@@ -40,9 +40,9 @@ or implied, of William Hart.
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 {
-   mpz_set_ui(p, 1);
+   flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
-   mpz_add_ui(p, p, 1);
+   flint_mpz_add_ui(p, p, 1);
 }
 
 void ref_adjust_sqrt2(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t limbs, mp_size_t w)

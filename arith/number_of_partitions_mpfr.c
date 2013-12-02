@@ -148,7 +148,7 @@ void
 mpfr_sqrt_z(mpfr_t x, mpz_t z, mpfr_rnd_t rnd)
 {
     if (mpz_fits_ulong_p(z))
-        mpfr_sqrt_ui(x, mpz_get_ui(z), rnd);
+        mpfr_sqrt_ui(x, flint_mpz_get_ui(z), rnd);
     else
     {
         mpfr_set_z(x, z, rnd);
@@ -437,9 +437,9 @@ _arith_number_of_partitions_mpfr(mpfr_t x, ulong n, slong N0, slong N)
     mpfr_set_ui(acc, 0, MPFR_RNDN);
 
     mpz_init(n24);
-    mpz_set_ui(n24, n);
-    mpz_mul_ui(n24, n24, 24);
-    mpz_sub_ui(n24, n24, 1);
+    flint_mpz_set_ui(n24, n);
+    flint_mpz_mul_ui(n24, n24, 24);
+    flint_mpz_sub_ui(n24, n24, 1);
 
 #if VERBOSE
     timeit_start(t0);

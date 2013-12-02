@@ -52,11 +52,11 @@ fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
         if (c2 > 0)
         {
-            mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+            flint_mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
         }
         else
         {
-            mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -(ulong) c2);
+            flint_mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -(ulong) c2);
             mpz_neg(mpz_ptr, mpz_ptr);
         }
         _fmpz_demote_val(f);    /* division by h may result in small value */

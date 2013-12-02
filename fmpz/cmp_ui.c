@@ -41,5 +41,5 @@ fmpz_cmp_ui(const fmpz_t f, ulong g)
             return c < (slong) g ? -1 : c > (slong) g;
     }
     else                     /* f is large */
-        return mpz_cmp_ui(COEFF_TO_PTR(c), g);
+        return flint_mpz_cmp_ui(COEFF_TO_PTR(c), g);
 }

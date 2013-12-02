@@ -135,7 +135,7 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
 
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        mpz_set_ui(ptr, g);
+        flint_mpz_set_ui(ptr, g);
     }
 }
 
@@ -169,7 +169,7 @@ fmpz_set_si(fmpz_t f, slong val)
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_si(mpz_coeff, val);
+        flint_mpz_set_si(mpz_coeff, val);
     }
     else
     {
@@ -184,7 +184,7 @@ fmpz_set_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)        /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_ui(mpz_coeff, val);
+        flint_mpz_set_ui(mpz_coeff, val);
     }
     else
     {
@@ -199,7 +199,7 @@ fmpz_neg_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_ui(mpz_coeff, val);
+        flint_mpz_set_ui(mpz_coeff, val);
         mpz_neg(mpz_coeff, mpz_coeff);
     }
     else

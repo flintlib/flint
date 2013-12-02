@@ -34,7 +34,7 @@ void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n)
 {
     if (n >= poly->length)  /* Coefficient is beyond the end of poly */
     {
-        mpq_set_si(x, 0, 1);
+        flint_mpq_set_si(x, 0, 1);
         return;
     }
     

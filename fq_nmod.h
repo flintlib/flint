@@ -30,7 +30,6 @@
 
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-#include "nmod_mat.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
@@ -39,8 +38,6 @@ extern "C" {
 
 typedef nmod_poly_t fq_nmod_t;
 typedef nmod_poly_struct fq_nmod_struct;
-
-typedef nmod_mat_t fq_nmod_ground_mat_t;
 
 typedef struct
 {
@@ -267,24 +264,6 @@ void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op1, const ulong e, const fq_
 
 void
 fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
-
-void
-fq_nmod_pow_pn_init_precomp_matrix(nmod_mat_t A, const fq_nmod_ctx_t ctx);
-
-void
-fq_nmod_pow_pn_clear_precomp_matrix(nmod_mat_t A, const fq_nmod_ctx_t ctx);
-
-void
-fq_nmod_pow_pn_precompute_matrix_fq_nmod(nmod_mat_t A, const fq_nmod_t op,
-                                         const fq_nmod_ctx_t ctx);
-
-void
-fq_nmod_pow_pn_precompute_matrix_ui(nmod_mat_t A, ulong n,
-                                    const fq_nmod_ctx_t ctx);
-
-void
-fq_nmod_pow_pn_precomp(fq_nmod_t rop, const fq_nmod_t op1, const nmod_mat_t A,
-                       const fq_nmod_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 

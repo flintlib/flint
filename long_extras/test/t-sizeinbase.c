@@ -52,7 +52,7 @@ main(void)
         size_t r1, r2;
 
         a = z_randtest(state);
-        mpz_init_set_si(b, a);
+        flint_mpz_init_set_si(b, a);
         base = (int) (n_randint(state, 61) + 2);
 
         r1 = z_sizeinbase(a, base);

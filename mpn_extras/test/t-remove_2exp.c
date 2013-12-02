@@ -49,7 +49,7 @@ int main(void)
     {
         for (nonzero=0; nonzero<300; nonzero++)
         {
-            mpz_set_ui(a, 1);
+            flint_mpz_set_ui(a, 1);
             mpz_setbit(a, nonzero);
             mpz_set(b, a);
             mpz_mul_2exp(a, a, zero);

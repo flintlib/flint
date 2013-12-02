@@ -451,12 +451,6 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv)(TEMPLATE(T, poly_t) res, const fmpz_t e,
                                        const TEMPLATE(T, poly_t) finv,
                                        const TEMPLATE(T, ctx_t) ctx);
 
-void
-TEMPLATE(T, poly_powmod_xq_preinv)(TEMPLATE(T, poly_t) rop,
-                                   const TEMPLATE(T, poly_t) f,
-                                   const TEMPLATE(T, poly_t) finv,
-                                   const TEMPLATE(T, ctx_t) ctx);
-
 /*  Shifting  ****************************************************************/
 
 void _TEMPLATE(T, poly_shift_left)(TEMPLATE(T, struct) *rop, const TEMPLATE(T, struct) *op, slong len, slong n, const TEMPLATE(T, ctx_t) ctx);

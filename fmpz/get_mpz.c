@@ -32,7 +32,7 @@ void
 fmpz_get_mpz(mpz_t x, const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
-        mpz_set_si(x, *f);      /* set x to small value */
+        flint_mpz_set_si(x, *f);      /* set x to small value */
     else
         mpz_set(x, COEFF_TO_PTR(*f));   /* set x to large value */
 }

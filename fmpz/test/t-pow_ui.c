@@ -60,7 +60,7 @@ main(void)
         x = n_randint(state, 20);
 
         fmpz_pow_ui(b, a, x);
-        mpz_pow_ui(e, d, x);
+        flint_mpz_pow_ui(e, d, x);
 
         fmpz_get_mpz(f, b);
 
@@ -99,7 +99,7 @@ main(void)
         x = n_randint(state, 20);
 
         fmpz_pow_ui(a, a, x);
-        mpz_pow_ui(e, d, x);
+        flint_mpz_pow_ui(e, d, x);
 
         fmpz_get_mpz(f, a);
 

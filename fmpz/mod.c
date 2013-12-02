@@ -68,9 +68,9 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
             if (c2 < WORD(0))
-                fmpz_set_si(f, mpz_fdiv_ui(COEFF_TO_PTR(c1), -c2));
+                fmpz_set_si(f, flint_mpz_fdiv_ui(COEFF_TO_PTR(c1), -c2));
             else
-                fmpz_set_ui(f, mpz_fdiv_ui(COEFF_TO_PTR(c1), c2));
+                fmpz_set_ui(f, flint_mpz_fdiv_ui(COEFF_TO_PTR(c1), c2));
         }
         else                    /* both are large */
         {

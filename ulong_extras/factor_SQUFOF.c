@@ -32,7 +32,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
     mp_limb_t n[2];
 	 mp_limb_t sqrt[2];
 	 mp_limb_t rem[2];
-	 mp_size_t num, sqroot, p, q;
+	 slong num, sqroot, p, q;
 
     mp_limb_t l, l2, iq, pnext;
     mp_limb_t qarr[50];

@@ -110,7 +110,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
         goto s_2;
     if (is_varsymbol0(c))
     {
-        mpz_set_si(z_coeff, 1);
+        flint_mpz_set_si(z_coeff, 1);
         goto s_3;
     }
 
@@ -125,10 +125,10 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     if (is_varsymbol0(c))
     {
         if (i == 1)
-            mpz_set_si(z_coeff, 1);
+            flint_mpz_set_si(z_coeff, 1);
         else  /* i == 2 */
         {
-            mpz_set_si(z_coeff, -1);
+            flint_mpz_set_si(z_coeff, -1);
             buf[0] = c;
             i = 1;
         }
@@ -241,7 +241,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
         {
             goto s_parse_error;
         }
-        exp = mpz_get_si(z_exp);
+        exp = flint_mpz_get_si(z_exp);
         add_coeff();
 
         if (c == '+' || c == '-')

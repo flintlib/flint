@@ -54,7 +54,7 @@ fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
         __mpz_struct *mpz_ptr, *mpz_ptr2;
         mpz_ptr2 = _fmpz_promote(f);    /* g is already large */
         mpz_ptr = COEFF_TO_PTR(c);
-        mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
+        flint_mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
         _fmpz_demote_val(f);    /* cancellation may have occurred */
     }
 }

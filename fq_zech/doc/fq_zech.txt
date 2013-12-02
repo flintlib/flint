@@ -125,6 +125,12 @@ void fq_zech_ctx_randtest(fq_zech_ctx_t ctx)
     Initializes \code{ctx} to a random finite field.  Assumes that
     \code{fq_zech_ctx_init} as not been called on \code{ctx} already.
 
+void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx)
+
+    Since the Zech logarithm representation does not work with a
+    non-irreducible modulus, does the same as
+    \code{fq_zech_ctx_randtest}.
+
 *******************************************************************************
 
     Memory management
@@ -218,6 +224,12 @@ void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
     Sets \code{rop} to the square of \code{op},
     reducing the output in the given context.
 
+void fq_zech_div(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
+                 const fq_zech_ctx_t ctx)
+
+    Sets \code{rop} to the quotient of \code{op1} and \code{op2},
+    reducing the output in the given context.
+
 void _fq_zech_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_zech_ctx_t ctx)
 
     Sets \code{(rop, d)} to the inverse of the non-zero element
@@ -226,6 +238,13 @@ void _fq_zech_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_zech_ctx_t ctx
 void fq_zech_inv(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the inverse of the non-zero element \code{op}.
+
+void fq_zech_gcdinv(fq_zech_t f, fq_zech_t inv, const fq_zech_t op,
+                    const fq_zech_ctx_t ctx)
+
+     Sets \code{inv} to be the inverse of \code{op} modulo the modulus
+     of \code{ctx} and sets \code{f} to one.  Since the modulus for
+     \code{ctx} is always irreducible, \code{op} is always invertible.
 
 void _fq_zech_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e,
                   const fq_zech_ctx_t ctx)
@@ -404,6 +423,18 @@ int fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2,
                   const fq_zech_ctx_t ctx)
 
     Returns whether \code{op1} and \code{op2} are equal.
+
+int fq_zech_is_invertible(const fq_zech_t op, const fq_zech_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.
+
+int fq_zech_is_invertible_f(fq_zech_t f, const fq_zech_t op,
+                            const fq_zech_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.  If it is not,
+    then \code{f} is set of a factor of the modulus.  Since the
+    modulus for an \code{fq_zech_ctx_t} is always irreducible, then
+    any non-zero \code{op} will be invertible.
 
 *******************************************************************************
 

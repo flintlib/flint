@@ -60,7 +60,7 @@ main(void)
         x = z_randtest(state);
 
         fmpz_mul_si(b, a, x);
-        mpz_mul_si(e, d, x);
+        flint_mpz_mul_si(e, d, x);
 
         fmpz_get_mpz(f, b);
 
@@ -99,7 +99,7 @@ main(void)
         x = z_randtest(state);
 
         fmpz_mul_si(a, a, x);
-        mpz_mul_si(e, d, x);
+        flint_mpz_mul_si(e, d, x);
 
         fmpz_get_mpz(f, a);
 

@@ -47,7 +47,7 @@ void __fmpz_set_si(fmpz_t f, slong val)
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_si(mpz_coeff, val);
+        flint_mpz_set_si(mpz_coeff, val);
     }
     else
     {
@@ -61,7 +61,7 @@ void __fmpz_set_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)        /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_ui(mpz_coeff, val);
+        flint_mpz_set_ui(mpz_coeff, val);
     }
     else
     {

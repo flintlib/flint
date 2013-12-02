@@ -19,8 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012,2013 Andres Goens
+    Copyright (C) 2009, 2008 William Hart
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012,2013 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
@@ -526,6 +528,47 @@ void fq_nmod_poly_mullow(fq_nmod_poly_t rop,
     Sets \code{res} to the lowest $n$ coefficients of the product of
     \code{poly1} and \code{poly2}.
 
+void _fq_nmod_poly_mulhigh_classical(fq_nmod_struct *res,
+                                     const fq_nmod_struct *poly1, slong len1,
+                                     const fq_nmod_struct *poly2, slong len2,
+                                     slong start, const fq_nmod_ctx_t ctx)
+
+    Computes the product of \code{(poly1, len1)} and \code{(poly2, len2)}
+    and writes the coefficients from \code{start} onwards into the high
+    coefficients of \code{res}, the remaining coefficients being arbitrary
+    but reduced.  Assumes that \code{len1 >= len2 > 0}. Aliasing of inputs
+    and output is not permitted.  Algorithm is classical multiplication.
+
+void fq_nmod_poly_mulhigh_classical(fq_nmod_poly_t res,
+                                    const fq_nmod_poly_t poly1,
+                                    const fq_nmod_poly_t poly2,
+                                    slong start, const fq_nmod_ctx_t ctx)
+
+    Computes the product of \code{poly1} and \code{poly2} and writes the
+    coefficients from \code{start} onwards into the high coefficients of
+    \code{res}, the remaining coefficients being arbitrary but reduced.
+    Algorithm is classical multiplication.
+
+void _fq_nmod_poly_mulhigh(fq_nmod_struct *res,
+                           const fq_nmod_struct *poly1, slong len1,
+                           const fq_nmod_struct *poly2, slong len2,
+                           slong start, const fq_nmod_ctx_t ctx)
+
+    Computes the product of \code{(poly1, len1)} and \code{(poly2, len2)}
+    and writes the coefficients from \code{start} onwards into the high
+    coefficients of \code{res}, the remaining coefficients being arbitrary
+    but reduced.  Assumes that \code{len1 >= len2 > 0}. Aliasing of inputs
+    and output is not permitted.
+
+void fq_nmod_poly_mulhigh(fq_nmod_poly_t res,
+                          const fq_nmod_poly_t poly1,
+                          const fq_nmod_poly_t poly2,
+                          slong start, const fq_nmod_ctx_t ctx)
+
+    Computes the product of \code{poly1} and \code{poly2} and writes the
+    coefficients from \code{start} onwards into the high coefficients of
+    \code{res}, the remaining coefficients being arbitrary but reduced.
+
 void _fq_nmod_poly_mulmod(fq_nmod_struct* res,
                           const fq_nmod_struct* poly1, slong len1,
                           const fq_nmod_struct* poly2, slong len2,
@@ -918,6 +961,21 @@ void fq_nmod_poly_divrem(fq_nmod_poly_t Q, fq_nmod_poly_t R,
     be taken for granted the context is for a finite field, that is, when
     $p$ is prime and $f(X)$ is irreducible.
 
+void fq_nmod_poly_divrem_f(fq_nmod_t f, fq_nmod_poly_t Q, fq_nmod_poly_t R,
+                           const fq_nmod_poly_t A, const fq_nmod_poly_t B,
+                           const fq_nmod_ctx_t ctx)
+
+    Either finds a non-trivial factor~$f$ of the modulus of
+    \code{ctx}, or computes $Q$, $R$ such that $A = B Q + R$ and
+    $0 \leq \len(R) < \len(B)$.
+
+    If the leading coefficient of $B$ is invertible, the division with
+    remainder operation is carried out, $Q$ and $R$ are computed
+    correctly, and $f$ is set to $1$.  Otherwise, $f$ is set to a
+    non-trivial factor of the modulus and $Q$ and $R$ are not touched.
+
+    Assumes that $B$ is non-zero.
+
 void _fq_nmod_poly_rem(fq_nmod_struct *R, const fq_nmod_struct *A, slong lenA,
                        const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB,
                        const fq_nmod_ctx_t ctx)
@@ -1084,46 +1142,223 @@ fq_nmod_poly_inv_series_newton(fq_nmod_poly_t Qinv, const fq_nmod_poly_t Q, slon
 
 *******************************************************************************
 
-
-
-void fq_nmod_poly_gcd_euclidean(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
-                           const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
+void fq_nmod_poly_gcd(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
+                      const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to the greatest common divisor of \code{op1} and
-    \code{op2}, using the euclidean algorithm. The GCD of zero
+    \code{op2}, using the either the Euclidean or HGCD algorithm. The
+    GCD of zero polynomials is defined to be zero, whereas the GCD of
+    the zero polynomial and some other polynomial $P$ is defined to be
+    $P$. Except in the case where the GCD is zero, the GCD $G$ is made
+    monic.
+
+long _fq_nmod_poly_gcd(fq_nmod_struct* G,const fq_nmod_struct* A, slong lenA,
+                       const fq_nmod_struct* B, slong lenB,
+                       const fq_nmod_ctx_t ctx)
+
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
+    length of the GCD $G$ is returned by the function. No attempt is
+    made to make the GCD monic. It is required that $G$ have space for
+    \code{lenB} coefficients.
+
+void fq_nmod_poly_gcd_euclidean(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
+                                const fq_nmod_poly_t op2,
+                                const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the greatest common divisor of \code{op1} and
+    \code{op2}, using the Euclidean algorithm. The GCD of zero
     polynomials is defined to be zero, whereas the GCD of the zero
     polynomial and some other polynomial $P$ is defined to be
     $P$. Except in the case where the GCD is zero, the GCD $G$ is made
     monic.
 
-long _fq_nmod_poly_gcd_euclidean(fq_nmod_struct* G, const fq_nmod_struct* A, slong lenA,
+long _fq_nmod_poly_gcd_euclidean(fq_nmod_struct* G,
+                                 const fq_nmod_struct* A, slong lenA,
+                                 const fq_nmod_struct* B, slong lenB,
+                                 const fq_nmod_ctx_t ctx)
+
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
+    length of the GCD $G$ is returned by the function. No attempt is
+    made to make the GCD monic. It is required that $G$ have space for
+    \code{lenB} coefficients.
+
+slong _fq_nmod_poly_hgcd(fq_nmod_struct **M, slong *lenM,
+                         fq_nmod_struct *A, slong *lenA,
+                         fq_nmod_struct *B, slong *lenB,
+                         const fq_nmod_struct * a, slong lena,
+                         const fq_nmod_struct *b, slong lenb,
+                         const fq_nmod_ctx_t ctx)
+
+    Computes the HGCD of $a$ and $b$, that is, a matrix~$M$, a sign~$\sigma$
+    and two polynomials $A$ and $B$ such that
+    \begin{equation*}
+    (A,B)^t = \sigma M^{-1} (a,b)^t.
+    \end{equation*}
+
+    Assumes that $\len(a) > \len(b) > 0$.
+
+    Assumes that $A$ and $B$ have space of size at least $\len(a)$
+    and $\len(b)$, respectively.  On exit, \code{*lenA} and \code{*lenB}
+    will contain the correct lengths of $A$ and $B$.
+
+    Assumes that \code{M[0]}, \code{M[1]}, \code{M[2]}, and \code{M[3]}
+    each point to a vector of size at least $\len(a)$.
+
+void fq_nmod_poly_gcd_hgcd(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
+                           const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the greatest common divisor of \code{op1} and
+    \code{op2}, using the HGCD algorithm. The GCD of zero
+    polynomials is defined to be zero, whereas the GCD of the zero
+    polynomial and some other polynomial $P$ is defined to be
+    $P$. Except in the case where the GCD is zero, the GCD $G$ is made
+    monic.
+
+long _fq_nmod_poly_gcd_hgcd(fq_nmod_struct* G,
+                            const fq_nmod_struct* A, slong lenA,
                             const fq_nmod_struct* B, slong lenB,
                             const fq_nmod_ctx_t ctx)
 
     Computes the GCD of $A$ of length \code{lenA} and $B$ of length
-    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
-    length of the GCD $G$ is returned by the function. No attempt is
-    made to make the GCD monic. It is required that $G$ have space for
-    \code{lenB} coefficients.
+    \code{lenB} using the HGCD algorithm, where
+    \code{lenA >= lenB > 0} and sets $G$ to it. The length of the GCD
+    $G$ is returned by the function. No attempt is made to make the
+    GCD monic. It is required that $G$ have space for \code{lenB}
+    coefficients.
 
-void fq_nmod_poly_gcd(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2,
-                 const fq_nmod_ctx_t ctx)
+slong _fq_nmod_poly_gcd_euclidean_f(fq_nmod_t f, fq_nmod_struct *G,
+                                    const fq_nmod_struct *A, slong lenA,
+                                    const fq_nmod_struct *B, slong lenB,
+                                    const fq_nmod_ctx_t ctx)
 
-    Sets \code{rop} to the greatest common divisor of \code{op1} and
-    \code{op2}, using the euclidean algorithm at the moment. The GCD
-    of zero polynomials is defined to be zero, whereas the GCD of the
-    zero polynomial and some other polynomial $P$ is defined to be
-    $P$. Except in the case where the GCD is zero, the GCD $G$ is made
-    monic.
+    Either sets $f = 1$ and $G$ to the greatest common divisor of
+    $(A,\len(A))$ and $(B, \len(B))$ and returns its length, or sets
+    $f$ to a non-trivial factor of the modulus of \code{ctx} and leaves
+    the contents of the vector $(G, lenB)$ undefined.
 
-long _fq_nmod_poly_gcd(fq_nmod_struct* G,const fq_nmod_struct* A, slong lenA,
-                  const fq_nmod_struct* B, slong lenB, const fq_nmod_ctx_t ctx)
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$
+    has space for sufficiently many coefficients.
 
-    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
-    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The
-    length of the GCD $G$ is returned by the function. No attempt is
-    made to make the GCD monic. It is required that $G$ have space for
-    \code{lenB} coefficients.
+void fq_nmod_poly_gcd_euclidean_f(fq_nmod_t f, fq_nmod_poly_t G,
+                                  const fq_nmod_poly_t A, const fq_nmod_poly_t B,
+                                  const fq_nmod_ctx_t ctx)
+
+    Either sets $f = 1$ and $G$ to the greatest common divisor of $A$
+    and $B$ or sets $f$ to a factor of the modulus of \code{ctx}.
+
+slong _fq_nmod_poly_xgcd_euclidean(fq_nmod_struct *G,
+                              fq_nmod_struct *S, fq_nmod_struct *T,
+                              const fq_nmod_struct *A, slong lenA,
+                              const fq_nmod_struct *B, slong lenB,
+                              const fmpz_t invB, const fq_nmod_ctx_t ctx)
+
+    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$
+    such that $S A + T B = G$.  Returns the length of $G$.
+
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and
+    $(\len(A),\len(B)) \neq (1,1)$.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively.
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and
+    $\len(T) \leq \max(\len(A) - \len(G), 1)$.
+
+    No aliasing of input and output operands is permitted.
+
+void fq_nmod_poly_xgcd_euclidean(fq_nmod_poly_t G,
+                                 fq_nmod_poly_t S, fq_nmod_poly_t T,
+                                 const fq_nmod_poly_t A, const fq_nmod_poly_t B,
+                                 const fq_nmod_ctx_t ctx)
+
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
+    Polynomials \code{S} and \code{T} are computed such that
+    \code{S*A + T*B = G}. The length of \code{S} will be at most
+    \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+slong _fq_nmod_poly_xgcd(fq_nmod_struct *G,
+                         fq_nmod_struct *S, fq_nmod_struct *T,
+                         const fq_nmod_struct *A, slong lenA,
+                         const fq_nmod_struct *B, slong lenB,
+                         const fmpz_t invB, const fq_nmod_ctx_t ctx)
+
+    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$
+    such that $S A + T B = G$.  Returns the length of $G$.
+
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and
+    $(\len(A),\len(B)) \neq (1,1)$.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively.
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and
+    $\len(T) \leq \max(\len(A) - \len(G), 1)$.
+
+    No aliasing of input and output operands is permitted.
+
+void fq_nmod_poly_xgcd(fq_nmod_poly_t G, fq_nmod_poly_t S, fq_nmod_poly_t T,
+                       const fq_nmod_poly_t A, const fq_nmod_poly_t B,
+                       const fq_nmod_ctx_t ctx)
+
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
+    Polynomials \code{S} and \code{T} are computed such that
+    \code{S*A + T*B = G}. The length of \code{S} will be at most
+    \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+slong _fq_nmod_poly_xgcd_euclidean_f(fq_nmod_t f, fq_nmod_struct *G,
+                                     fq_nmod_struct *S, fq_nmod_struct *T,
+                                     const fq_nmod_struct *A, slong lenA,
+                                     const fq_nmod_struct *B, slong lenB,
+                                     const fmpz_t invB, const fq_nmod_ctx_t ctx)
+
+    Either sets $f = 1$ and computes the GCD of $A$ and $B$ together
+    with cofactors $S$ and $T$ such that $S A + T B = G$; otherwise,
+    sets $f$ to a non-trivial factor of the modulus of \code{ctx} and
+    leaves $G$, $S$, and $T$ undefined.  Returns the length of $G$.
+
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and
+    $(\len(A),\len(B)) \neq (1,1)$.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively.
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and
+    $\len(T) \leq \max(\len(A) - \len(G), 1)$.
+
+    No aliasing of input and output operands is permitted.
+
+void fq_nmod_poly_xgcd_euclidean_f(fq_nmod_t f, fq_nmod_poly_t G,
+                                   fq_nmod_poly_t S, fq_nmod_poly_t T,
+                                   const fq_nmod_poly_t A,
+                                   const fq_nmod_poly_t B,
+                                   const fq_nmod_ctx_t ctx)
+
+    Either sets $f = 1$ and computes the GCD of $A$ and $B$ or sets
+    $f$ to a non-trivial factor of the modulus of \code{ctx}.
+
+    If the GCD is computed, polynomials \code{S} and \code{T} are
+    computed such that \code{S*A + T*B = G}; otherwise, they are
+    undefined.  The length of \code{S} will be at most \code{lenB} and
+    the length of \code{T} will be at most \code{lenA}.
+
+    The GCD of zero polynomials is defined to be zero, whereas the GCD
+    of the zero polynomial and some other polynomial $P$ is defined to
+    be $P$. Except in the case where the GCD is zero, the GCD $G$ is
+    made monic.
+
 
 *******************************************************************************
 

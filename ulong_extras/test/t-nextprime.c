@@ -62,7 +62,7 @@ int main(void)
     {
         ulong bits = n_randint(state, FLINT_D_BITS-1)+1;
         n = n_randtest(state) % ((UWORD(1)<<bits) - UWORD(1)) + 1; 
-        mpz_set_ui(mpz_n, n);
+        flint_mpz_set_ui(mpz_n, n);
 
         for (i = 0; i < 1; i++)
         {
@@ -71,7 +71,7 @@ int main(void)
         }
 
         res1 = n;
-        res2 = mpz_get_ui(mpz_n);
+        res2 = flint_mpz_get_ui(mpz_n);
 
         if (res1 != res2)
         {

@@ -103,7 +103,7 @@ fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
     else  /* c1 is large */
     {
         __mpz_struct * mpz_ptr = _fmpz_promote_val(f);
-        mpz_addmul_ui(mpz_ptr, COEFF_TO_PTR(c1), x);
+        flint_mpz_addmul_ui(mpz_ptr, COEFF_TO_PTR(c1), x);
         _fmpz_demote_val(f);  /* cancellation may have occurred */
     }
 }

@@ -63,7 +63,7 @@ main(void)
         {
             fmpz_randtest(x1, state, 200);
             fmpz_get_mpz(mpq_numref(n1), x1);
-            mpz_set_si(mpq_denref(n1), 1);
+            flint_mpz_set_si(mpq_denref(n1), 1);
             coeff = (slong) n_randint(state, len);
             fmpq_poly_set_coeff_mpz(a, coeff, mpq_numref(n1));
             fmpq_poly_get_coeff_mpq(n2, a, coeff);

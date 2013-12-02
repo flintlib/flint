@@ -59,12 +59,12 @@ main(void)
         mpz_init(y);
         mpz_init(z);
 
-        mpz_set_ui(x, a);
-        mpz_set_ui(y, b);
+        flint_mpz_set_ui(x, a);
+        flint_mpz_set_ui(y, b);
         mpz_add(z, x, y);
-        mpz_mod_ui(z, z, m);
+        flint_mpz_mod_ui(z, z, m);
 
-        if (mpz_cmp_ui(z, c) != 0)
+        if (flint_mpz_cmp_ui(z, c) != 0)
         {
             flint_printf("FAIL (add):\n");
             flint_printf("m = %wu\n", m);
@@ -95,12 +95,12 @@ main(void)
         mpz_init(y);
         mpz_init(z);
 
-        mpz_set_ui(x, a);
-        mpz_set_ui(y, b);
+        flint_mpz_set_ui(x, a);
+        flint_mpz_set_ui(y, b);
         mpz_sub(z, x, y);
-        mpz_mod_ui(z, z, m);
+        flint_mpz_mod_ui(z, z, m);
 
-        if (mpz_cmp_ui(z, c) != 0)
+        if (flint_mpz_cmp_ui(z, c) != 0)
         {
             flint_printf("FAIL (sub):\n");
             flint_printf("m = %wu\n", m);
@@ -131,12 +131,12 @@ main(void)
         mpz_init(y);
         mpz_init(z);
 
-        mpz_set_ui(x, a);
-        mpz_set_ui(y, b);
+        flint_mpz_set_ui(x, a);
+        flint_mpz_set_ui(y, b);
         mpz_mul(z, x, y);
-        mpz_mod_ui(z, z, m);
+        flint_mpz_mod_ui(z, z, m);
 
-        if (mpz_cmp_ui(z, c) != 0)
+        if (flint_mpz_cmp_ui(z, c) != 0)
         {
             flint_printf("FAIL (mul):\n");
             flint_printf("m = %wu\n", m);
@@ -168,14 +168,14 @@ main(void)
         mpz_init(y);
         mpz_init(z);
 
-        mpz_set_ui(x, a);
-        mpz_set_ui(y, b);
-        mpz_set_ui(z, m);
+        flint_mpz_set_ui(x, a);
+        flint_mpz_set_ui(y, b);
+        flint_mpz_set_ui(z, m);
         mpz_invert(z, y, z);
         mpz_mul(z, x, z);
-        mpz_mod_ui(z, z, m);
+        flint_mpz_mod_ui(z, z, m);
 
-        if (mpz_cmp_ui(z, c) != 0)
+        if (flint_mpz_cmp_ui(z, c) != 0)
         {
             flint_printf("FAIL (div):\n");
             flint_printf("m = %wu\n", m);
@@ -205,11 +205,11 @@ main(void)
         mpz_init(y);
         mpz_init(z);
 
-        mpz_set_ui(y, b);
-        mpz_set_ui(z, m);
+        flint_mpz_set_ui(y, b);
+        flint_mpz_set_ui(z, m);
         mpz_invert(z, y, z);
 
-        if (mpz_cmp_ui(z, c) != 0)
+        if (flint_mpz_cmp_ui(z, c) != 0)
         {
             flint_printf("FAIL (div):\n");
             flint_printf("m = %wu\n", m);
@@ -240,11 +240,11 @@ main(void)
         mpz_init(y);
         mpz_init(z);
 
-        mpz_set_ui(y, b);
-        mpz_set_ui(z, m);
-        mpz_powm_ui(z, y, exp, z);
+        flint_mpz_set_ui(y, b);
+        flint_mpz_set_ui(z, m);
+        flint_mpz_powm_ui(z, y, exp, z);
 
-        if (mpz_cmp_ui(z, c) != 0)
+        if (flint_mpz_cmp_ui(z, c) != 0)
         {
             flint_printf("FAIL (pow):\n");
             flint_printf("m = %wu\n", m);

@@ -70,8 +70,8 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     if (pol->mod.n > 2)
     {
         /* compute a^{(p^d-1)/2} rem pol */
-        mpz_ui_pow_ui(exp, pol->mod.n, d);
-        mpz_sub_ui(exp, exp, 1);
+        flint_mpz_ui_pow_ui(exp, pol->mod.n, d);
+        flint_mpz_sub_ui(exp, exp, 1);
         mpz_tdiv_q_2exp(exp, exp, 1);
 
         nmod_poly_powmod_mpz_binexp_preinv(b, a, exp, pol, polinv);

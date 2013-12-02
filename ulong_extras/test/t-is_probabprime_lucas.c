@@ -48,9 +48,9 @@ int main(void)
       do
       {
          d = n_randtest_not_zero(state);
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (mpz_size(d_m) > 1);
 
       result = n_is_probabprime_lucas(d);
@@ -71,7 +71,7 @@ int main(void)
       do
       {
          d = n_randtest(state);
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       if (n_is_probabprime_lucas(d) == 1) count++;

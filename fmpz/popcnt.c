@@ -36,7 +36,7 @@ mp_bitcnt_t fmpz_popcnt(const fmpz_t c)
         } else
         {
                 __mpz_struct *t = COEFF_TO_PTR(c1);
-		if(mpz_cmp_si(t,0) < 0) return 0;
+		if(flint_mpz_cmp_si(t,0) < 0) return 0;
                 else return mpz_popcount(t);
         }
 }

@@ -56,11 +56,11 @@ fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             if (c2 > 0)         /* h > 0 */
             {
-                mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+                flint_mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
             }
             else
             {
-                mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -c2);
+                flint_mpz_tdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -c2);
                 mpz_neg(mpz_ptr, mpz_ptr);
             }
         }

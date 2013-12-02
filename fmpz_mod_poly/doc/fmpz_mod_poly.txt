@@ -111,7 +111,8 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len},
     assuming \code{len} is positive.
 
-void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
+void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t poly, flint_rand_t state,
+                                  slong len)
 
     Generates a random monic polynomial with length \code{len}.
 
@@ -700,11 +701,11 @@ void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     The algorithm used is to call \code{div_newton_n()} and then multiply out
     and compute the remainder.
 
-void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
-    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
+void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 
-    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with
     $0 \leq \len(R) < \len(B)$ but only sets \code{(Q, lenA - lenB + 1)}.
 
     Requires temporary space \code{(R, lenA)}.  Allows aliasing
@@ -1162,7 +1163,7 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, 
+void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs,
                         slong len, const fmpz * xs, slong n, const fmpz_t mod)
 
     Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
@@ -1182,7 +1183,7 @@ void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
     Uses Horner's method iteratively.
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs,
-              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, 
+              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree,
                                                  slong len, const fmpz_t mod)
     Evaluates (\code{poly}, \code{plen}) at the \code{len} values given
     by the precomputed subproduct tree \code{tree}.
@@ -1206,7 +1207,7 @@ void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
 
     Uses fast multipoint evaluation, building a temporary subproduct tree.
 
-void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, 
+void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
                         slong len, const fmpz * xs, slong n, const fmpz_t mod)
 
     Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
@@ -1398,7 +1399,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
     $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
     $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
     $\sqrt{\deg(h)}\times \deg(h)$ matrix. We also require that
-    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    the length of $f$ is less than the length of $h$. Furthermore, we require
     \code{hinv} to be the inverse of the reverse of \code{h}.
     The output is not allowed to be aliased with any of the inputs.
 
@@ -1456,7 +1457,7 @@ void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len)
 
     Free the allocated space for the subproduct.
 
-void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, 
+void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree,
                              const fmpz * roots, slong len, const fmpz_t mod)
 
     Builds a subproduct tree in the preallocated space from

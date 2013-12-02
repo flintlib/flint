@@ -54,7 +54,7 @@ int main(void)
 
         size1 = n_sizeinbase(n, base);
 
-        mpz_set_ui(t, n);
+        flint_mpz_set_ui(t, n);
 
         mpz_get_str(str, base, t);
         size2 = strlen(str);

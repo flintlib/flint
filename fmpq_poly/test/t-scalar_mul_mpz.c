@@ -135,7 +135,7 @@ main(void)
 
         n = z_randtest(state);
         mpz_init(n1);
-        mpz_set_si(n1, n);
+        flint_mpz_set_si(n1, n);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);

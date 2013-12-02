@@ -967,7 +967,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
     fmpz_poly_q_set_str(op, in);
     
     mpq_init(a);
-    mpq_set_si(a, numa, numb);
+    flint_mpq_set_si(a, numa, numb);
     mpq_init(rop);
     pole = fmpz_poly_q_evaluate(rop, op, a);
     
@@ -1373,14 +1373,14 @@ int main(int argc, char *argv[])
     
     /* Scalar multiplication and devision ************************************/
     
-    mpz_init_set_si(mpzzero, 0);
-    mpz_init_set_si(mpzone, 1);
-    mpz_init_set_si(mpztwo, 2);
+    flint_mpz_init_set_si(mpzzero, 0);
+    flint_mpz_init_set_si(mpzone, 1);
+    flint_mpz_init_set_si(mpztwo, 2);
     
-    mpq_init(mpqzero); mpq_set_si(mpqzero, 0, 1);
-    mpq_init(mpqone); mpq_set_si(mpqone, 1, 1);
-    mpq_init(mpqtwo); mpq_set_si(mpqtwo, 2, 1);
-    mpq_init(mpqtwoinv); mpq_set_si(mpqtwoinv, 1, 2);
+    mpq_init(mpqzero); flint_mpq_set_si(mpqzero, 0, 1);
+    mpq_init(mpqone); flint_mpq_set_si(mpqone, 1, 1);
+    mpq_init(mpqtwo); flint_mpq_set_si(mpqtwo, 2, 1);
+    mpq_init(mpqtwoinv); flint_mpq_set_si(mpqtwoinv, 1, 2);
     
     test_scalar_mul_si("0", 1, "0");
     test_scalar_mul_si("0", 0, "0");

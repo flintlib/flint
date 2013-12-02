@@ -54,6 +54,6 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
     {
         /* Promote without val as if aliased both are large */
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
+        flint_mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
     }
 }

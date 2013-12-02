@@ -54,12 +54,12 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len)
     }
     if (alloc)
     {
-        *len = mpz_get_si(t);
+        *len = flint_mpz_get_si(t);
         *vec = _fmpz_vec_init(*len);
     }
     else
     {
-        if (*len != mpz_get_si(t))
+        if (*len != flint_mpz_get_si(t))
         {
             mpz_clear(t);
             return 0;

@@ -64,8 +64,8 @@ int main(void)
     fmpz_init(p);
 
     flint_printf("Random polynomials\n");
-    mpz_set_ui(pz, 2);
-    mpz_set_ui(curr, 10);
+    flint_mpz_set_ui(pz, 2);
+    flint_mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
@@ -118,15 +118,15 @@ int main(void)
         }
 
         mpz_nextprime(pz, curr);
-        mpz_mul_ui(curr, curr, 10);
+        flint_mpz_mul_ui(curr, curr, 10);
     }
 
     /* This code checks whether fmpz_mod_poly_factor
        made a correct choice between CZ and KS */
 
     flint_printf("Check choice correctness\n");
-    mpz_set_ui(pz, 2);
-    mpz_set_ui(curr, 10);
+    flint_mpz_set_ui(pz, 2);
+    flint_mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
@@ -179,12 +179,12 @@ int main(void)
         }
 
         mpz_nextprime(pz, curr);
-        mpz_mul_ui(curr, curr, 10);
+        flint_mpz_mul_ui(curr, curr, 10);
     }
 
     flint_printf("Irreducible polynomials\n");
-    mpz_set_ui(pz, 2);
-    mpz_set_ui(curr, 10);
+    flint_mpz_set_ui(pz, 2);
+    flint_mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
@@ -237,12 +237,12 @@ int main(void)
         }
 
         mpz_nextprime(pz, curr);
-        mpz_mul_ui(curr, curr, 10);
+        flint_mpz_mul_ui(curr, curr, 10);
     }
 
     flint_printf("Product of two irreducible polynomials\n");
-    mpz_set_ui(pz, 2);
-    mpz_set_ui(curr, 10);
+    flint_mpz_set_ui(pz, 2);
+    flint_mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
@@ -299,12 +299,12 @@ int main(void)
         }
 
         mpz_nextprime(pz, curr);
-        mpz_mul_ui(curr, curr, 10);
+        flint_mpz_mul_ui(curr, curr, 10);
     }
 
     flint_printf("Product of 8 small irreducible polynomials\n");
-    mpz_set_ui(pz, 2);
-    mpz_set_ui(curr, 10);
+    flint_mpz_set_ui(pz, 2);
+    flint_mpz_set_ui(curr, 10);
     for (i = 0; i < NP; i++)
     {
         fmpz_set_mpz(p, pz);
@@ -364,7 +364,7 @@ int main(void)
         }
 
         mpz_nextprime(pz, curr);
-        mpz_mul_ui(curr, curr, 10);
+        flint_mpz_mul_ui(curr, curr, 10);
     }
 
     mpz_clear(pz);

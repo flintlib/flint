@@ -845,7 +845,7 @@ nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
     \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
     \code{f}.
 
-void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, 
+void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly,
                                 mpz_srcptr e, mp_srcptr f,
                                 slong lenf, nmod_t mod)
 
@@ -1168,23 +1168,23 @@ void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A,
     It is required that the length of $A$ is less than or equal to
     2*the length of $B$ - 2.
 
-    The algorithm used is to reverse the polynomials and divide the 
+    The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong Alen, 
+void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong Alen,
                                         mp_srcptr B, slong Blen, nmod_t mod)
 
-    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
-    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
     \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
     coefficients. The algorithm used is to call \code{div_newton()} and then
     multiply out and compute the remainder.
 
-void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
+void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
                              const nmod_poly_t A, const nmod_poly_t B)
 
-    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
-    The algorithm used is to call \code{div_newton()} and then multiply out 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
+    The algorithm used is to call \code{div_newton()} and then multiply out
     and compute the remainder.
 
 void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
@@ -1193,8 +1193,8 @@ slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than
     \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length
     \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
-    coefficients. Furthermore, we assume that $Binv$ is the inverse of the 
-    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call 
+    coefficients. Furthermore, we assume that $Binv$ is the inverse of the
+    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call
     \code{div_newton_n_preinv()} and then multiply out and compute
     the remainder.
 
@@ -1207,7 +1207,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
     It is required that the length of $A$ is less than or equal to
     2*the length of $B$ - 2.
 
-    The algorithm used is to call \code{div_newton_n()} and then multiply out 
+    The algorithm used is to call \code{div_newton_n()} and then multiply out
     and compute the remainder.
 
 mp_limb_t _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len,
@@ -1621,7 +1621,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr f,
     $h$ is nonzero. We require that the ith row of $A$ contains $g^i$ for
     $i=1,\ldots,\sqrt{\deg(h)}$, i.e. $A$ is a
     $\sqrt{\deg(h)}\times \deg(h)$ matrix. We also require that
-    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    the length of $f$ is less than the length of $h$. Furthermore, we require
     \code{hinv} to be the inverse of the reverse of \code{h}.
     The output is not allowed to be aliased with any of the inputs.
 

@@ -48,8 +48,8 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
             mpz_t g2, m2;
             __mpz_struct *mpz_ptr;
 
-            mpz_init_set_ui(g2, g1);
-            mpz_init_set_ui(m2, *m);
+            flint_mpz_init_set_ui(g2, g1);
+            flint_mpz_init_set_ui(m2, *m);
             mpz_ptr = _fmpz_promote(f);
 
             mpz_powm(mpz_ptr, g2, COEFF_TO_PTR(*e), m2);
@@ -65,7 +65,7 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
                 mpz_t g2;
                 __mpz_struct *mpz_ptr;
 
-                mpz_init_set_si(g2, *g);
+                flint_mpz_init_set_si(g2, *g);
                 mpz_ptr = _fmpz_promote(f);
 
                 mpz_powm(mpz_ptr, g2, COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
