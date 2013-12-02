@@ -19,35 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 William Hart
     Copyright (C) 2013 Mike Hansen
- 
+
 ******************************************************************************/
 
-#ifndef TEMPLATES_H_
-#define TEMPLATES_H_
+#include "fq_poly.h"
 
-#define CAT(X,Y) X##_##Y
-#define CAT3(X,Y,Z) X##_##Y##_##Z
-#define CAT4(X,Y,Z,A) X##_##Y##_##Z##_##A
-#define _CAT(X,Y) _##X##_##Y
-#define _CAT3(X,Y,Z) _##X##_##Y##_##Z
-#define _CAT4(X,Y,Z,A) _##X##_##Y##_##Z##_##A
-#define __CAT(X,Y) __##X##_##Y
-#define __CAT3(X,Y,Z) __##X##_##Y##_##Z
-#define __CAT4(X,Y,Z,A) __##X##_##Y##_##Z##_##A
-
-#define TEMPLATE(X,Y) CAT(X,Y)
-#define TEMPLATE3(X,Y,Z) CAT3(X,Y,Z)
-#define TEMPLATE4(X,Y,Z,A) CAT4(X,Y,Z,A)
-#define _TEMPLATE(X,Y) _CAT(X,Y)
-#define _TEMPLATE3(X,Y,Z) _CAT3(X,Y,Z)
-#define _TEMPLATE4(X,Y,Z,A) _CAT4(X,Y,Z,A)
-#define __TEMPLATE(X,Y) __CAT(X,Y)
-#define __TEMPLATE3(X,Y,Z) __CAT3(X,Y,Z)
-#define __TEMPLATE4(X,Y,Z,A) __CAT4(X,Y,Z,A)
-
-#define STR(x)   #x
-#define PRINT_VAR(x) flint_printf("%s", STR(x));
-#define PRINTF_VAR(s, x) flint_printf(s, STR(x));
-
+#ifdef T
+#undef T
 #endif
+
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/evaluate_fq_vec_iter.c"
+#undef CAP_T
+#undef T

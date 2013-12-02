@@ -740,6 +740,62 @@ void _TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) rop, const TEMPLATE
 void TEMPLATE(T, TEMPLATE(poly_evaluate, T))(TEMPLATE(T, t) res, const TEMPLATE(T, poly_t) f, const TEMPLATE(T, t) a, 
                          const TEMPLATE(T, ctx_t) ctx);
 
+void
+_TEMPLATE4(T, poly_evaluate, T, vec)(TEMPLATE(T, struct) * ys,
+                                     const TEMPLATE(T, struct) *coeffs, slong len,
+                                     const TEMPLATE(T, struct) *xs, slong n,
+                                     const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE4(T, poly_evaluate, T, vec)(TEMPLATE(T, struct) * ys,
+                                    const TEMPLATE(T, poly_t) poly,
+                                    const TEMPLATE(T, struct) * xs, slong n,
+                                    const TEMPLATE(T, ctx_t) ctx);
+                                    
+TEMPLATE(T, poly_struct) **
+_TEMPLATE(T, poly_tree_alloc)(slong len, const TEMPLATE(T, ctx_t) ctx);
+ 
+ void
+_TEMPLATE(T, poly_tree_free)(TEMPLATE(T, poly_struct) ** tree, slong len,
+                             const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE(T, poly_tree_build)(TEMPLATE(T, poly_struct) ** tree,
+                              const TEMPLATE(T, struct) * roots,
+                              slong len,
+                              const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)
+    (TEMPLATE(T, struct) * vs,
+     const TEMPLATE(T, struct) * poly, slong plen,
+     TEMPLATE(T, poly_struct) * const * tree, slong len,
+     const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE4(T, poly_evaluate, T, vec_fast)(TEMPLATE(T, struct) * ys,
+                                          const TEMPLATE(T, struct) * poly, slong plen,
+                                          const TEMPLATE(T, struct) * xs, slong n,
+                                          const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE4(T, poly_evaluate, T, vec_fast)(TEMPLATE(T, struct) * ys,
+                                         const TEMPLATE(T, poly_t) poly,
+                                         const TEMPLATE(T, struct) *xs, slong n,
+                                         const TEMPLATE(T, ctx_t) ctx);
+
+void
+_TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys,
+                                          const TEMPLATE(T, struct) * coeffs, slong len,
+                                          const TEMPLATE(T, struct) * xs, slong n,
+                                          const TEMPLATE(T, ctx_t) ctx);
+
+void
+TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys,
+                                         const TEMPLATE(T, poly_t) poly,
+                                         const TEMPLATE(T, struct) * xs, slong n,
+                                         const TEMPLATE(T, ctx_t) ctx);
+
 /*  Composition  *************************************************************/
 
 void _TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, struct) *rop, 
