@@ -63,7 +63,7 @@ main(void)
         exp = n_randint(state, 200);
 
         fmpz_mul_si_tdiv_q_2exp(b, a, x, exp);
-        mpz_mul_si(e, d, x);
+        flint_mpz_mul_si(e, d, x);
         mpz_tdiv_q_2exp(e, e, exp);
 
         fmpz_get_mpz(f, b);
@@ -106,7 +106,7 @@ main(void)
         exp = n_randint(state, 200);
 
         fmpz_mul_si_tdiv_q_2exp(a, a, x, exp);
-        mpz_mul_si(e, d, x);
+        flint_mpz_mul_si(e, d, x);
         mpz_tdiv_q_2exp(e, e, exp);
 
         fmpz_get_mpz(f, a);

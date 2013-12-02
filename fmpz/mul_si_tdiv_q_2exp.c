@@ -92,7 +92,7 @@ nails, stored in prod */
    {
        __mpz_struct *mpz_ptr = _fmpz_promote(f); /* ok without val as
             if aliased both are large */
-       mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
+       flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
        mpz_tdiv_q_2exp(mpz_ptr, mpz_ptr, exp);
        _fmpz_demote_val(f);  /* value may be small */
    }

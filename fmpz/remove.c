@@ -64,15 +64,15 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
         if (!COEFF_IS_MPZ(q))  /* f is small */
         {
-            if (!mpz_divisible_ui_p(z, q))
+            if (!flint_mpz_divisible_ui_p(z, q))
             {
                 return 0;
             }
             else
             {
-                mpz_divexact_ui(z, z, q);
+                flint_mpz_divexact_ui(z, z, q);
 
-                if (!mpz_divisible_ui_p(z, q))
+                if (!flint_mpz_divisible_ui_p(z, q))
                 {
                     _fmpz_demote_val(x);
                     return 1;
@@ -82,8 +82,8 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
                     mpz_t r;
                     slong e;
 
-                    mpz_divexact_ui(z, z, q);
-                    mpz_init_set_ui(r, q);
+                    flint_mpz_divexact_ui(z, z, q);
+                    flint_mpz_init_set_ui(r, q);
                     e = 2 + mpz_remove(z, z, r);
                     mpz_clear(r);
                     _fmpz_demote_val(x);

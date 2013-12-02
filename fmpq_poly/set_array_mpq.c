@@ -35,7 +35,7 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
     slong i;
     mpz_t d, t;
 
-    mpz_init_set_ui(d, 1);
+    flint_mpz_init_set_ui(d, 1);
     mpz_init(t);
     for (i = 0; i < n; i++)
     {

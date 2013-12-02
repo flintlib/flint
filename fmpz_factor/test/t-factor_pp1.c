@@ -57,7 +57,7 @@ int main(void)
 
       do {
          mpz_urandomb(n, st, n_randint(state, 128) + 2); 
-      } while (mpz_cmp_ui(n, 2) < 0);
+      } while (flint_mpz_cmp_ui(n, 2) < 0);
       do {
          mpz_urandomb(m, st, n_randint(state, 50) + 2); 
       } while (!mpz_probab_prime_p(m, 20));

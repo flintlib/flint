@@ -52,9 +52,9 @@ int main(void)
       do
       {
          d = n_randbits(state, bits) | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (FLINT_BIT_COUNT(d) > FLINT_D_BITS);
       if (d == UWORD(2)) d++;
          
@@ -90,7 +90,7 @@ int main(void)
       do
       {
          d = n_randbits(state, bits) | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       for (j = 0; j < 100; j++)

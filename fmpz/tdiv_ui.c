@@ -51,6 +51,6 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
     }
     else                        /* g is large */
     {
-        return mpz_tdiv_ui(COEFF_TO_PTR(c1), h);
+        return flint_mpz_tdiv_ui(COEFF_TO_PTR(c1), h);
     }
 }

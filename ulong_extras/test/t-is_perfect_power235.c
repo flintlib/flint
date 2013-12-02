@@ -96,7 +96,7 @@ int main(void)
       do
       {
          d = n_randtest(state);
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_perfect_power_p(d_m));
 
       result = !n_is_perfect_power235(d);

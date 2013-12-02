@@ -53,7 +53,7 @@ int fmpz_divisible(const fmpz_t x, const fmpz_t p)
     {
         if (!COEFF_IS_MPZ(q))
         {
-            return mpz_divisible_ui_p(COEFF_TO_PTR(y), q);
+            return flint_mpz_divisible_ui_p(COEFF_TO_PTR(y), q);
         }
         else
         {

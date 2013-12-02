@@ -54,7 +54,7 @@ main(void)
         k = n_randint(state, 1000);
 
         fmpz_bin_uiui(x, n, k);
-        mpz_bin_uiui(z, n, k);
+        flint_mpz_bin_uiui(z, n, k);
         fmpz_set_mpz(y, z);
 
         if (!fmpz_equal(x, y))

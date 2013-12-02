@@ -63,8 +63,8 @@ main(void)
             fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 
             cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
-            result = (mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
-                   && mpz_cmp_ui(mpq_numref(n_mpq), n) == 0
+            result = (flint_mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
+                   && flint_mpz_cmp_ui(mpq_numref(n_mpq), n) == 0
                    && !cflags);
             if (!result)
             {

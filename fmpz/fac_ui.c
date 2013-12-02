@@ -52,5 +52,5 @@ void fmpz_fac_ui(fmpz_t f, ulong n)
     if (n < FLINT_NUM_TINY_FACTORIALS)
         fmpz_set_ui(f, flint_tiny_factorials[n]);
     else
-        mpz_fac_ui(_fmpz_promote(f), n);
+        flint_mpz_fac_ui(_fmpz_promote(f), n);
 }

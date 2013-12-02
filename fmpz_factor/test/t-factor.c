@@ -130,7 +130,7 @@ int main(void)
     /* Factorials */
     for (i = 0; i < 1000; i++)
     {
-        mpz_fac_ui(y, i);
+        flint_mpz_fac_ui(y, i);
         fmpz_set_mpz(x, y);
         check(x);
     }
@@ -140,7 +140,7 @@ int main(void)
     {
         for (j = 1; j < 5; j++)
         {
-            mpz_fac_ui(y, i);
+            flint_mpz_fac_ui(y, i);
             fmpz_set_mpz(x, y);
             fmpz_pow_ui(x, x, j);
             check(x);
@@ -161,7 +161,7 @@ int main(void)
     fmpz_pow_ui(x, x, 100);
     fmpz_neg(x, x);
     check(x);
-    mpz_fac_ui(y, 50);
+    flint_mpz_fac_ui(y, 50);
     mpz_neg(y, y);
     fmpz_set_mpz(x, y);
     check(x);

@@ -56,9 +56,9 @@ main(void)
         limbs1 = _nmod_vec_dot_bound_limbs(len, mod);
 
         mpz_init2(t, 4*FLINT_BITS);
-        mpz_set_ui(t, m-1);
+        flint_mpz_set_ui(t, m-1);
         mpz_mul(t, t, t);
-        mpz_mul_ui(t, t, len);
+        flint_mpz_mul_ui(t, t, len);
         limbs2 = mpz_size(t);
 
         if (limbs1 != limbs2)

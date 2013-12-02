@@ -39,11 +39,11 @@ fmpz_set_mpz(fmpz_t f, const mpz_t x)
     }
     else if (size == WORD(1))        /* x is positive and 1 limb */
     {
-        fmpz_set_ui(f, mpz_get_ui(x));
+        fmpz_set_ui(f, flint_mpz_get_ui(x));
     }
     else if (size == WORD(-1))       /* x is negative and 1 limb */
     {
-        ulong uval = mpz_get_ui(x);
+        ulong uval = flint_mpz_get_ui(x);
         if (uval <= COEFF_MAX)  /* x is small */
         {
             _fmpz_demote(f);
@@ -52,7 +52,7 @@ fmpz_set_mpz(fmpz_t f, const mpz_t x)
         else                    /* x is large but one limb */
         {
             __mpz_struct *mpz_ptr = _fmpz_promote(f);
-            mpz_set_ui(mpz_ptr, uval);
+            flint_mpz_set_ui(mpz_ptr, uval);
             mpz_neg(mpz_ptr, mpz_ptr);
         }
     }

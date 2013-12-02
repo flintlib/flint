@@ -61,10 +61,10 @@ int main(void)
       dpre = n_precompute_inverse(d);
       r1 = n_powmod_ui_precomp(a, exp, d, dpre);
 
-      mpz_set_ui(a_m, a);
-      mpz_set_ui(d_m, d);
-      mpz_powm_ui(r2_m, a_m, exp, d_m);      
-      r2 = mpz_get_ui(r2_m);
+      flint_mpz_set_ui(a_m, a);
+      flint_mpz_set_ui(d_m, d);
+      flint_mpz_powm_ui(r2_m, a_m, exp, d_m);      
+      r2 = flint_mpz_get_ui(r2_m);
       
       result = (r1 == r2);
       if (!result)

@@ -59,7 +59,7 @@ main(void)
         b = n_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
-        mpz_set_ui(e, b);
+        flint_mpz_set_ui(e, b);
 
         fmpz_tdiv_q_ui(c, a, b);
         mpz_tdiv_q(f, d, e);
@@ -101,7 +101,7 @@ main(void)
         b = n_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
-        mpz_set_ui(e, b);
+        flint_mpz_set_ui(e, b);
 
         fmpz_tdiv_q_ui(a, a, b);
         mpz_tdiv_q(f, d, e);

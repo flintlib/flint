@@ -83,7 +83,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
         str   = flint_malloc(size);
 
-        if (mpq_cmp_si(a1, 1, 1) == 0)
+        if (flint_mpq_cmp_si(a1, 1, 1) == 0)
         {
             if (mpq_sgn(a0) == 0)
                 gmp_sprintf(str, "%s", var);
@@ -92,7 +92,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             else  /* mpq_sgn(a0) < 0 */
                 gmp_sprintf(str, "%s%Qd", var, a0);
         }
-        else if (mpq_cmp_si(a1, -1, 1) == 0)
+        else if (flint_mpq_cmp_si(a1, -1, 1) == 0)
         {
             if (mpq_sgn(a0) == 0)
                 gmp_sprintf(str, "-%s", var);
@@ -153,9 +153,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     fmpz_get_mpz(mpq_denref(q), den);
     mpq_canonicalize(q);
     
-    if (mpq_cmp_si(q, 1, 1) != 0)
+    if (flint_mpq_cmp_si(q, 1, 1) != 0)
     {
-        if (mpq_cmp_si(q, -1, 1) == 0)
+        if (flint_mpq_cmp_si(q, -1, 1) == 0)
             str[j++] = '-';
         else
         {

@@ -27,7 +27,7 @@
 
 int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 {
-    if (mpz_cmp_si(mpq_denref(a), 1))  /* a is not an integer */
+    if (flint_mpz_cmp_si(mpq_denref(a), 1))  /* a is not an integer */
     {
         mpq_t mpqnum, mpqden;
 

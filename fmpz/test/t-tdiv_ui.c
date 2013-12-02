@@ -56,7 +56,7 @@ main(void)
         x = n_randtest_not_zero(state);
 
         r1 = fmpz_tdiv_ui(a, x);
-        r2 = mpz_tdiv_ui(b, x);
+        r2 = flint_mpz_tdiv_ui(b, x);
 
         result = (r1 == r2);
         if (!result)

@@ -49,9 +49,9 @@ void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
             {
                 __mpz_struct * mpz_ptr = _fmpz_promote(f);
 
-                mpz_set_ui(mpz_ptr, 1);
+                flint_mpz_set_ui(mpz_ptr, 1);
                 mpz_mul_2exp(mpz_ptr, mpz_ptr, exp);
-                mpz_sub_ui(mpz_ptr, mpz_ptr, -d);
+                flint_mpz_sub_ui(mpz_ptr, mpz_ptr, -d);
             }
         }
     }

@@ -35,7 +35,7 @@ void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
     }
     else
     {
-        mpz_init_set_si(z, *f);
+        flint_mpz_init_set_si(z, *f);
     }
 }
 

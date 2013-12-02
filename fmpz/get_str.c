@@ -34,7 +34,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
     {
         mpz_t z;
 
-        mpz_init_set_si(z, *f);
+        flint_mpz_init_set_si(z, *f);
         str = mpz_get_str(str, b, z);
         mpz_clear(z);
     }

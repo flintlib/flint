@@ -70,13 +70,13 @@ main(void)
 
         for (j = 0; j < len; j++)
         {
-            mpz_set_ui(t, x[j]);
-            mpz_addmul_ui(s, t, y[j]);
+            flint_mpz_set_ui(t, x[j]);
+            flint_mpz_addmul_ui(s, t, y[j]);
         }
 
-        mpz_mod_ui(s, s, m);
+        flint_mpz_mod_ui(s, s, m);
 
-        if (mpz_get_ui(s) != res)
+        if (flint_mpz_get_ui(s) != res)
         {
             flint_printf("FAIL:\n");
             flint_printf("m = %wu\n", m);

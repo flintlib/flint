@@ -1087,3 +1087,4 @@ v 2.4 -- 20 Nov 2013
   * Support for GMP
   * Support for Boehm-Demers-Weiser GC
   * Support for flint extension modules
+
