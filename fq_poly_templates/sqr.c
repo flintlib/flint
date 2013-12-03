@@ -30,33 +30,35 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_sqr)(TEMPLATE(T, struct) * rop,
-             const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_sqr) (TEMPLATE(T, struct) * rop,
+                        const TEMPLATE(T, struct) * op, slong len,
+                        const TEMPLATE(T, ctx_t) ctx)
 {
     if (len < TEMPLATE(CAP_T, SQR_CLASSICAL_CUTOFF))
     {
-        _TEMPLATE(T, poly_sqr_classical)(rop, op, len, ctx);
+        _TEMPLATE(T, poly_sqr_classical) (rop, op, len, ctx);
     }
 #ifdef USE_SQR_REORDER
-    else if (TEMPLATE(T, ctx_degree)(ctx) < 4)
+    else if (TEMPLATE(T, ctx_degree) (ctx) < 4)
     {
-        _TEMPLATE(T, poly_sqr_reorder)(rop, op, len, ctx);
+        _TEMPLATE(T, poly_sqr_reorder) (rop, op, len, ctx);
     }
 #endif
     else
     {
-        _TEMPLATE(T, poly_sqr_KS)(rop, op, len, ctx);
+        _TEMPLATE(T, poly_sqr_KS) (rop, op, len, ctx);
     }
 }
 
 void
-TEMPLATE(T, poly_sqr)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_sqr) (TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op,
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     const slong rlen = 2 * op->length - 1;
 
     if (op->length == 0)
     {
-        TEMPLATE(T, poly_zero)(rop, ctx);
+        TEMPLATE(T, poly_zero) (rop, ctx);
         return;
     }
 
@@ -64,18 +66,18 @@ TEMPLATE(T, poly_sqr)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, con
     {
         TEMPLATE(T, poly_t) t;
 
-        TEMPLATE(T, poly_init2)(t, rlen, ctx);
-        _TEMPLATE(T, poly_sqr)(t->coeffs, op->coeffs, op->length, ctx);
-        TEMPLATE(T, poly_swap)(rop, t, ctx);
-        TEMPLATE(T, poly_clear)(t, ctx);
+        TEMPLATE(T, poly_init2) (t, rlen, ctx);
+        _TEMPLATE(T, poly_sqr) (t->coeffs, op->coeffs, op->length, ctx);
+        TEMPLATE(T, poly_swap) (rop, t, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(rop, rlen, ctx);
-        _TEMPLATE(T, poly_sqr)(rop->coeffs, op->coeffs, op->length, ctx);
+        TEMPLATE(T, poly_fit_length) (rop, rlen, ctx);
+        _TEMPLATE(T, poly_sqr) (rop->coeffs, op->coeffs, op->length, ctx);
     }
 
-    _TEMPLATE(T, poly_set_length)(rop, rlen, ctx);
+    _TEMPLATE(T, poly_set_length) (rop, rlen, ctx);
 }
 
 

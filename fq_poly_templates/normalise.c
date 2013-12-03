@@ -31,20 +31,23 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_normalise)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_normalise) (TEMPLATE(T, poly_t) poly,
+                              const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
-    for (i = poly->length - 1; (i >= 0) && TEMPLATE(T, is_zero)(poly->coeffs + i, ctx);
-         i--) ;
+    for (i = poly->length - 1;
+         (i >= 0) && TEMPLATE(T, is_zero) (poly->coeffs + i, ctx); i--) ;
     poly->length = i + 1;
 }
 
 void
-_TEMPLATE(T, poly_normalise2)(TEMPLATE(T, struct) * poly, slong *length, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_normalise2) (TEMPLATE(T, struct) * poly, slong * length,
+                               const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
-    for (i = (*length) - 1; (i >= 0) && TEMPLATE(T, is_zero)(poly + i, ctx); i--) ;
+    for (i = (*length) - 1; (i >= 0) && TEMPLATE(T, is_zero) (poly + i, ctx);
+         i--) ;
     (*length) = i + 1;
 }
 

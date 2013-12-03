@@ -44,25 +44,25 @@ main(void)
         TEMPLATE(T, poly_t) poly;
         slong length;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(poly, ctx);
+        TEMPLATE(T, poly_init) (poly, ctx);
 
         length = n_randint(state, 20) + 2;
-        TEMPLATE(T, poly_randtest_irreducible)(poly, state, length, ctx);
+        TEMPLATE(T, poly_randtest_irreducible) (poly, state, length, ctx);
 
-        if (!TEMPLATE(T, poly_is_irreducible)(poly, ctx))
+        if (!TEMPLATE(T, poly_is_irreducible) (poly, ctx))
         {
             flint_printf("Error: reducible polynomial created!\n");
             flint_printf("poly:\n");
-            TEMPLATE(T, poly_print_pretty)(poly, "x", ctx);
+            TEMPLATE(T, poly_print_pretty) (poly, "x", ctx);
             flint_printf("\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(poly, ctx);
+        TEMPLATE(T, poly_clear) (poly, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

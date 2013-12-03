@@ -30,21 +30,23 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len,
-             const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_neg) (TEMPLATE(T, struct) * rop,
+                        const TEMPLATE(T, struct) * op, slong len,
+                        const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     for (i = 0; i < len; i++)
-        TEMPLATE(T, neg)(rop + i, op + i, ctx);
+        TEMPLATE(T, neg) (rop + i, op + i, ctx);
 }
 
 void
-TEMPLATE(T, poly_neg)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_neg) (TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op,
+                       const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, poly_fit_length)(rop, op->length, ctx);
-    _TEMPLATE(T, poly_neg)(rop->coeffs, op->coeffs, op->length, ctx);
-    _TEMPLATE(T, poly_set_length)(rop, op->length, ctx);
+    TEMPLATE(T, poly_fit_length) (rop, op->length, ctx);
+    _TEMPLATE(T, poly_neg) (rop->coeffs, op->coeffs, op->length, ctx);
+    _TEMPLATE(T, poly_set_length) (rop, op->length, ctx);
 }
 
 

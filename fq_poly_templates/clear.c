@@ -31,11 +31,12 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_clear)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_clear) (TEMPLATE(T, poly_t) poly,
+                         const TEMPLATE(T, ctx_t) ctx)
 {
     if (poly->coeffs)
     {
-        _TEMPLATE(T, vec_clear)(poly->coeffs, poly->alloc, ctx);
+        _TEMPLATE(T, vec_clear) (poly->coeffs, poly->alloc, ctx);
     }
 }
 

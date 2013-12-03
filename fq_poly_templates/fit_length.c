@@ -31,14 +31,15 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_fit_length)(TEMPLATE(T, poly_t) poly, slong len, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_fit_length) (TEMPLATE(T, poly_t) poly, slong len,
+                              const TEMPLATE(T, ctx_t) ctx)
 {
     if (len > poly->alloc)
     {
         /* At least double number of allocated coeffs */
         if (len < 2 * poly->alloc)
             len = 2 * poly->alloc;
-        TEMPLATE(T, poly_realloc)(poly, len, ctx);
+        TEMPLATE(T, poly_realloc) (poly, len, ctx);
     }
 }
 

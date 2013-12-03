@@ -33,8 +33,8 @@
 #include <gmp.h>
 #include "fmpz.h"
 int
-_TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) * poly, slong len,
-                const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, struct) * poly,
+                           slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     int r;
     slong i;
@@ -51,7 +51,7 @@ _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) * poly, slong l
         r = flint_fprintf(file, " ");
         if (r <= 0)
             return r;
-        r = TEMPLATE(T, fprint)(file, poly + i, ctx);
+        r = TEMPLATE(T, fprint) (file, poly + i, ctx);
         if (r <= 0)
             return r;
     }
@@ -60,9 +60,10 @@ _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) * poly, slong l
 }
 
 int
-TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, poly_t) poly,
+                          const TEMPLATE(T, ctx_t) ctx)
 {
-    return _TEMPLATE(T, poly_fprint)(file, poly->coeffs, poly->length, ctx);
+    return _TEMPLATE(T, poly_fprint) (file, poly->coeffs, poly->length, ctx);
 }
 
 

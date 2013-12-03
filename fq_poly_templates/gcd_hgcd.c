@@ -61,18 +61,18 @@ do {                                                                        \
  */
 
 slong
-_TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, struct)* G,
-                            const TEMPLATE(T, struct)* A, slong lenA, 
-                            const TEMPLATE(T, struct)* B, slong lenB,
-                            const TEMPLATE(T, t) invB,
-                            const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_gcd_hgcd) (TEMPLATE(T, struct) * G,
+                             const TEMPLATE(T, struct) * A, slong lenA,
+                             const TEMPLATE(T, struct) * B, slong lenB,
+                             const TEMPLATE(T, t) invB,
+                             const TEMPLATE(T, ctx_t) ctx)
 {
     slong cutoff, lenG, lenJ, lenR;
-    TEMPLATE(T, struct)* J = _TEMPLATE(T, vec_init)(2 * lenB, ctx);
-    TEMPLATE(T, struct)* R = J + lenB;
+    TEMPLATE(T, struct) * J = _TEMPLATE(T, vec_init) (2 * lenB, ctx);
+    TEMPLATE(T, struct) * R = J + lenB;
     TEMPLATE(T, t) inv;
 
-    if (fmpz_bits(TEMPLATE(T, ctx_prime)(ctx)) <= 8)
+    if (fmpz_bits(TEMPLATE(T, ctx_prime) (ctx)) <= 8)
         cutoff = TEMPLATE(CAP_T, POLY_SMALL_GCD_CUTOFF);
     else
         cutoff = TEMPLATE(CAP_T, POLY_GCD_CUTOFF);
@@ -85,13 +85,14 @@ _TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, struct)* G,
     }
     else
     {
-        TEMPLATE(T, init)(inv, ctx);
-    
-        _TEMPLATE(T, poly_hgcd)(NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB, R, lenR, ctx);
+        TEMPLATE(T, init) (inv, ctx);
+
+        _TEMPLATE(T, poly_hgcd) (NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB,
+                                 R, lenR, ctx);
 
         while (lenJ != 0)
         {
-            TEMPLATE(T, inv)(inv, J + lenJ - 1, ctx);
+            TEMPLATE(T, inv) (inv, J + lenJ - 1, ctx);
             __rem(R, lenR, G, lenG, J, lenJ, inv);
 
             if (lenR == 0)
@@ -101,74 +102,77 @@ _TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, struct)* G,
             }
             if (lenJ < cutoff)
             {
-                TEMPLATE(T, inv)(inv, R + lenR - 1, ctx);
-                lenG = _TEMPLATE(T, poly_gcd_euclidean)(G, J, lenJ, R, lenR, inv, ctx);
+                TEMPLATE(T, inv) (inv, R + lenR - 1, ctx);
+                lenG =
+                    _TEMPLATE(T, poly_gcd_euclidean) (G, J, lenJ, R, lenR, inv,
+                                                      ctx);
                 break;
             }
 
-            _TEMPLATE(T, poly_hgcd)(NULL, NULL, G, &(lenG), J, &(lenJ), J, lenJ, R, lenR, ctx);
+            _TEMPLATE(T, poly_hgcd) (NULL, NULL, G, &(lenG), J, &(lenJ), J,
+                                     lenJ, R, lenR, ctx);
         }
-        TEMPLATE(T, clear)(inv, ctx);
+        TEMPLATE(T, clear) (inv, ctx);
     }
-    _TEMPLATE(T, vec_clear)(J, 2 * lenB, ctx);
+    _TEMPLATE(T, vec_clear) (J, 2 * lenB, ctx);
 
     return lenG;
 }
 
-void TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, poly_t) G, 
-                                const TEMPLATE(T, poly_t) A,
-                                const TEMPLATE(T, poly_t) B,
-                                const TEMPLATE(T, ctx_t) ctx)
+void TEMPLATE(T, poly_gcd_hgcd) (TEMPLATE(T, poly_t) G,
+                                 const TEMPLATE(T, poly_t) A,
+                                 const TEMPLATE(T, poly_t) B,
+                                 const TEMPLATE(T, ctx_t) ctx)
 {
     if (A->length < B->length)
     {
-        TEMPLATE(T, poly_gcd_hgcd)(G, B, A, ctx);
+        TEMPLATE(T, poly_gcd_hgcd) (G, B, A, ctx);
     }
-    else /* lenA >= lenB >= 0 */
+    else                        /* lenA >= lenB >= 0 */
     {
         slong lenA = A->length, lenB = B->length, lenG;
         TEMPLATE(T, poly_t) tG;
         TEMPLATE(T, t) invB;
-        TEMPLATE(T, struct)* g;
+        TEMPLATE(T, struct) * g;
 
-        if (lenA == 0) /* lenA = lenB = 0 */
+        if (lenA == 0)          /* lenA = lenB = 0 */
         {
-            TEMPLATE(T, poly_zero)(G, ctx);
-        } 
-        else if (lenB == 0) /* lenA > lenB = 0 */
-        {
-            TEMPLATE(T, poly_make_monic)(G, A, ctx);
+            TEMPLATE(T, poly_zero) (G, ctx);
         }
-        else /* lenA >= lenB >= 1 */
+        else if (lenB == 0)     /* lenA > lenB = 0 */
+        {
+            TEMPLATE(T, poly_make_monic) (G, A, ctx);
+        }
+        else                    /* lenA >= lenB >= 1 */
         {
             if (G == A || G == B)
             {
-                TEMPLATE(T, poly_init2)(tG, FLINT_MIN(lenA, lenB), ctx);
+                TEMPLATE(T, poly_init2) (tG, FLINT_MIN(lenA, lenB), ctx);
                 g = tG->coeffs;
             }
             else
             {
-                TEMPLATE(T, poly_fit_length)(G, FLINT_MIN(lenA, lenB), ctx);
+                TEMPLATE(T, poly_fit_length) (G, FLINT_MIN(lenA, lenB), ctx);
                 g = G->coeffs;
             }
 
-            TEMPLATE(T, init)(invB, ctx);
-            TEMPLATE(T, inv)(invB, B->coeffs + lenB - 1, ctx);
-            
-            lenG = _TEMPLATE(T, poly_gcd_hgcd)(g, A->coeffs, lenA,
-                                               B->coeffs, lenB, invB, ctx);
+            TEMPLATE(T, init) (invB, ctx);
+            TEMPLATE(T, inv) (invB, B->coeffs + lenB - 1, ctx);
+
+            lenG = _TEMPLATE(T, poly_gcd_hgcd) (g, A->coeffs, lenA,
+                                                B->coeffs, lenB, invB, ctx);
 
             if (G == A || G == B)
             {
-                TEMPLATE(T, poly_swap)(tG, G, ctx);
-                TEMPLATE(T, poly_clear)(tG, ctx);
+                TEMPLATE(T, poly_swap) (tG, G, ctx);
+                TEMPLATE(T, poly_clear) (tG, ctx);
             }
             G->length = lenG;
 
             if (G->length == 1)
-                TEMPLATE(T, one)(G->coeffs, ctx);
+                TEMPLATE(T, one) (G->coeffs, ctx);
             else
-                TEMPLATE(T, poly_make_monic)(G, G, ctx);
+                TEMPLATE(T, poly_make_monic) (G, G, ctx);
         }
     }
 }

@@ -31,21 +31,23 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, slong n, const TEMPLATE(T, t) x, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_set_coeff) (TEMPLATE(T, poly_t) poly, slong n,
+                             const TEMPLATE(T, t) x,
+                             const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
-    TEMPLATE(T, poly_fit_length)(poly, n + 1, ctx);
+    TEMPLATE(T, poly_fit_length) (poly, n + 1, ctx);
 
     if (n + 1 > poly->length)   /* Insert zeros if needed */
     {
         for (i = poly->length; i < n; i++)
-            TEMPLATE(T, zero)(poly->coeffs + i, ctx);
+            TEMPLATE(T, zero) (poly->coeffs + i, ctx);
         poly->length = n + 1;
     }
 
-    TEMPLATE(T, set)(poly->coeffs + n, x, ctx);
-    _TEMPLATE(T, poly_normalise)(poly, ctx);
+    TEMPLATE(T, set) (poly->coeffs + n, x, ctx);
+    _TEMPLATE(T, poly_normalise) (poly, ctx);
 }
 
 
