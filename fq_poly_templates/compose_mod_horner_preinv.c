@@ -100,8 +100,8 @@ TEMPLATE(T, poly_compose_mod_horner_preinv)(TEMPLATE(T, poly_t) res,
 
     if (len3 == 0)
     {
-        flint_printf
-            ("Exception: division by zero in fq_poly_compose_mod_horner\n");
+        TEMPLATE_PRINTF
+            ("Exception: division by zero in %s_poly_compose_mod_horner\n", T);
         abort();
     }
 

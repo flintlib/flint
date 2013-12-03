@@ -48,7 +48,7 @@ TEMPLATE(T, poly_is_irreducible_ddf)(const TEMPLATE(T, poly_t) f, const TEMPLATE
 
     if (!(degs = (slong *) flint_malloc(n * sizeof(slong))))
     {
-        flint_printf("Exception (fq_poly_is_irreducible_ddf): \n");
+        TEMPLATE_PRINTF("Exception (%s_poly_is_irreducible_ddf): \n", T);
         flint_printf("Not enough memory.\n");
         abort();
     }

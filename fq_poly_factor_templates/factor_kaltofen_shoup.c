@@ -42,7 +42,7 @@ TEMPLATE(T, poly_factor_kaltofen_shoup)(TEMPLATE(T, poly_factor_t) res, const TE
 
     if (!(degs = flint_malloc(TEMPLATE(T, poly_degree)(poly, ctx) * sizeof(slong))))
     {
-        flint_printf("Exception (fq_poly_factor_kaltofen_shoup): \n");
+        TEMPLATE_PRINTF("Exception (%s_poly_factor_kaltofen_shoup): \n", T);
         flint_printf("Not enough memory.\n");
         abort();
     }

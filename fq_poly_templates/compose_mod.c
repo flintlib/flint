@@ -61,7 +61,7 @@ TEMPLATE(T, poly_compose_mod)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_t)
 
     if (len3 == 0)
     {
-        flint_printf("Exception: division by zero in fq_poly_compose_mod\n");
+        TEMPLATE_PRINTF("Exception: division by zero in %s_poly_compose_mod\n", T);
         abort();
     }
 
