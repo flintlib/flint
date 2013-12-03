@@ -366,7 +366,7 @@ If you wish to use FLINT on a single core machine then it can be
 configured for single mode. This mode can also be explicitly selected
 by passing the \code{--single} option to configure. Single mode is
 slightly faster, but by default uses thread local storage if threads
-are used, and this is not available on some machines. 
+are used, and this is not available on some machines.
 
 FLINT uses thread local storage by default (\code{--enable-tls}).
 However, if reentrancy is required on systems that do not support
@@ -375,7 +375,7 @@ instead (requires POSIX).
 
 If you wish to build a threadsafe version of FLINT which uses a
 less complicated memory model (slower, but still works in the absence
-of TLS) you can pass the \code{--reentrant} option to configure. 
+of TLS) you can pass the \code{--reentrant} option to configure.
 
 \chapter{ABI and architecture support}
 
@@ -406,7 +406,7 @@ FLINT's configure.
 
 If you wish to enable the test functions for the FLINT C$++$ wrapper
 \code{flintxx} you must pass \code{--enable-cxx} to configure. The
-\code{C++} wrapper is always available, but tests will only run if 
+\code{C++} wrapper is always available, but tests will only run if
 this option is selected. It is disabled by default (\code{--disable-cxx}
 because some \code{C++} compilers internally segfault when compiling the
 tests, or exhaust memory due to the complexity of the \code{C++} code.
@@ -673,7 +673,7 @@ $\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
-$\bullet$ Patches and bug reports have been made by Michael Abshoff, 
+$\bullet$ Patches and bug reports have been made by Michael Abshoff,
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
 Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
@@ -1703,7 +1703,7 @@ We now describe the functions available in \code{fmpz_mod_poly}.
 
 <<<<<<< HEAD
 The \code{fmpz_mod_poly_factor} module is included automatically with
-\code{fmpz_mod_poly.h}. One should not try to include 
+\code{fmpz_mod_poly.h}. One should not try to include
 =======
 The \code{fmpz_mod_poly_factor} module is included automatically when one
 includes \code{fmpz_mod_poly.h}. One should not try to include
@@ -1875,6 +1875,10 @@ available in the file \code{qadic/CPimport.txt}.  If a Conway
 polynomial is not available, then a random irreducible polynomial will
 be chosen for $f(X)$.  Additionally, the user is able to supply their
 own $f(X)$.
+
+We required that the order of the field fits inside of an
+\code{mp_limb_t}; however, it is recommended that $p^n < 2^{20}$ due
+to the time and memory needed to compute the Zech logarithm table.
 
 \input{input/fq_zech.tex}
 

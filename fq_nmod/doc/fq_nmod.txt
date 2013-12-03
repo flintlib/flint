@@ -211,12 +211,6 @@ void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x,
     Sets \code{rop} to the product of \code{op} and $x$,
     reducing the output in the given context.
 
-void fq_nmod_div(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2,
-                 const fq_nmod_ctx_t ctx)
-
-    Sets \code{rop} to the quotient of \code{op1} and \code{op2},
-    reducing the output in the given context.
-
 void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to the square of \code{op},

@@ -36,7 +36,7 @@ main(void)
     int i, result = 1;
     FLINT_TEST_INIT(state);
     
-    PRINTF_VAR("evaluate_%s_vec_fast....", T);
+    TEMPLATE_PRINTF("evaluate_%s_vec_fast....", T);
     fflush(stdout);
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
