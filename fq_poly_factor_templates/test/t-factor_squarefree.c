@@ -44,7 +44,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("factor_squarefree....");
     fflush(stdout);
 
@@ -57,28 +57,29 @@ main(void)
         slong exp[5], prod1;
         slong length, i, j, num;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        
-        TEMPLATE(T, poly_init)(pol1, ctx);
-        TEMPLATE(T, poly_init)(poly, ctx);
-        TEMPLATE(T, poly_init)(quot, ctx);
-        TEMPLATE(T, poly_init)(rem, ctx);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_one)(pol1, ctx);
+        TEMPLATE(T, poly_init) (pol1, ctx);
+        TEMPLATE(T, poly_init) (poly, ctx);
+        TEMPLATE(T, poly_init) (quot, ctx);
+        TEMPLATE(T, poly_init) (rem, ctx);
+
+        TEMPLATE(T, poly_one) (pol1, ctx);
 
         length = n_randint(state, 5) + 2;
 
         do
         {
-            TEMPLATE(T, poly_randtest)(poly, state, length, ctx);
-            TEMPLATE(T, poly_make_monic)(poly, poly, ctx);
+            TEMPLATE(T, poly_randtest) (poly, state, length, ctx);
+            TEMPLATE(T, poly_make_monic) (poly, poly, ctx);
         }
-        while ((poly->length != length) || (!TEMPLATE(T, poly_is_irreducible)(poly, ctx)));
+        while ((poly->length != length)
+               || (!TEMPLATE(T, poly_is_irreducible) (poly, ctx)));
         exp[0] = n_randprime(state, 5, 0);
 
         prod1 = exp[0];
         for (i = 0; i < exp[0]; i++)
-            TEMPLATE(T, poly_mul)(pol1, pol1, poly, ctx);
+            TEMPLATE(T, poly_mul) (pol1, pol1, poly, ctx);
 
         num = n_randint(state, 5) + 1;
         for (i = 1; i < num; i++)
@@ -86,14 +87,14 @@ main(void)
             do
             {
                 length = n_randint(state, 7) + 2;
-                TEMPLATE(T, poly_randtest)(poly, state, length, ctx);
+                TEMPLATE(T, poly_randtest) (poly, state, length, ctx);
                 if (poly->length)
                 {
-                    TEMPLATE(T, poly_make_monic)(poly, poly, ctx);
-                    TEMPLATE(T, poly_divrem)(quot, rem, pol1, poly, ctx);
+                    TEMPLATE(T, poly_make_monic) (poly, poly, ctx);
+                    TEMPLATE(T, poly_divrem) (quot, rem, pol1, poly, ctx);
                 }
             }
-            while ((!TEMPLATE(T, poly_is_irreducible)(poly, ctx)) ||
+            while ((!TEMPLATE(T, poly_is_irreducible) (poly, ctx)) ||
                    (poly->length != length) || (rem->length == 0));
 
             do
@@ -102,11 +103,11 @@ main(void)
 
             prod1 *= exp[i];
             for (j = 0; j < exp[i]; j++)
-                TEMPLATE(T, poly_mul)(pol1, pol1, poly, ctx);
+                TEMPLATE(T, poly_mul) (pol1, pol1, poly, ctx);
         }
 
-        TEMPLATE(T, poly_factor_init)(res, ctx);
-        TEMPLATE(T, poly_factor_squarefree)(res, pol1, ctx);
+        TEMPLATE(T, poly_factor_init) (res, ctx);
+        TEMPLATE(T, poly_factor_squarefree) (res, pol1, ctx);
 
         result &= (res->num == num);
         if (result)
@@ -120,7 +121,7 @@ main(void)
         if (!result)
         {
             flint_printf("Error: exp don't match. Ctx = ");
-            TEMPLATE(T, ctx_print)(ctx);
+            TEMPLATE(T, ctx_print) (ctx);
             flint_printf("\n");
             for (i = 0; i < res->num; i++)
                 flint_printf("%wd ", res->exp[i]);
@@ -131,13 +132,13 @@ main(void)
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(quot, ctx);
-        TEMPLATE(T, poly_clear)(rem, ctx);
-        TEMPLATE(T, poly_clear)(pol1, ctx);
-        TEMPLATE(T, poly_clear)(poly, ctx);
-        TEMPLATE(T, poly_factor_clear)(res, ctx);
-        
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (quot, ctx);
+        TEMPLATE(T, poly_clear) (rem, ctx);
+        TEMPLATE(T, poly_clear) (pol1, ctx);
+        TEMPLATE(T, poly_clear) (poly, ctx);
+        TEMPLATE(T, poly_factor_clear) (res, ctx);
+
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

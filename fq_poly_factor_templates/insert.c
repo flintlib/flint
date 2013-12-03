@@ -34,8 +34,9 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_factor_insert)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T, poly_t) poly, slong exp,
-                      const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_insert) (TEMPLATE(T, poly_factor_t) fac,
+                                 const TEMPLATE(T, poly_t) poly, slong exp,
+                                 const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
@@ -44,7 +45,7 @@ TEMPLATE(T, poly_factor_insert)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T
 
     for (i = 0; i < fac->num; i++)
     {
-        if (TEMPLATE(T, poly_equal)(poly, fac->poly + i, ctx))
+        if (TEMPLATE(T, poly_equal) (poly, fac->poly + i, ctx))
         {
             fac->exp[i] += exp;
             return;
@@ -56,16 +57,17 @@ TEMPLATE(T, poly_factor_insert)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T
         slong new_size = 2 * fac->alloc;
 
         fac->poly =
-            flint_realloc(fac->poly, sizeof(TEMPLATE(T, poly_struct)) * new_size);
+            flint_realloc(fac->poly,
+                          sizeof(TEMPLATE(T, poly_struct)) * new_size);
         fac->exp = flint_realloc(fac->exp, sizeof(slong) * new_size);
 
         for (i = fac->alloc; i < new_size; i++)
-            TEMPLATE(T, poly_init)(fac->poly + i, ctx);
+            TEMPLATE(T, poly_init) (fac->poly + i, ctx);
 
         fac->alloc = new_size;
     }
 
-    TEMPLATE(T, poly_set)(fac->poly + fac->num, poly, ctx);
+    TEMPLATE(T, poly_set) (fac->poly + fac->num, poly, ctx);
     fac->exp[fac->num] = exp;
     fac->num++;
 }

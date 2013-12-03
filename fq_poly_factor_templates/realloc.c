@@ -33,12 +33,13 @@
 #include <stdlib.h>
 #include "flint.h"
 void
-TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_realloc) (TEMPLATE(T, poly_factor_t) fac, slong alloc,
+                                  const TEMPLATE(T, ctx_t) ctx)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {
-        TEMPLATE(T, poly_factor_clear)(fac, ctx);
-        TEMPLATE(T, poly_factor_init)(fac, ctx);
+        TEMPLATE(T, poly_factor_clear) (fac, ctx);
+        TEMPLATE(T, poly_factor_init) (fac, ctx);
     }
     else if (fac->alloc)        /* Realloc */
     {
@@ -47,10 +48,11 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
             slong i;
 
             for (i = alloc; i < fac->num; i++)
-                TEMPLATE(T, poly_clear)(fac->poly + i, ctx);
+                TEMPLATE(T, poly_clear) (fac->poly + i, ctx);
 
             fac->poly =
-                flint_realloc(fac->poly, alloc * sizeof(TEMPLATE(T, poly_struct)));
+                flint_realloc(fac->poly,
+                              alloc * sizeof(TEMPLATE(T, poly_struct)));
             fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
             fac->alloc = alloc;
         }
@@ -59,12 +61,13 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
             slong i;
 
             fac->poly =
-                flint_realloc(fac->poly, alloc * sizeof(TEMPLATE(T, poly_struct)));
+                flint_realloc(fac->poly,
+                              alloc * sizeof(TEMPLATE(T, poly_struct)));
             fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
 
             for (i = fac->alloc; i < alloc; i++)
             {
-                TEMPLATE(T, poly_init)(fac->poly + i, ctx);
+                TEMPLATE(T, poly_init) (fac->poly + i, ctx);
                 fac->exp[i] = WORD(0);
             }
             fac->alloc = alloc;
@@ -78,7 +81,7 @@ TEMPLATE(T, poly_factor_realloc)(TEMPLATE(T, poly_factor_t) fac, slong alloc, co
         fac->exp = flint_calloc(alloc, sizeof(slong));
 
         for (i = 0; i < alloc; i++)
-            TEMPLATE(T, poly_init)(fac->poly + i, ctx);
+            TEMPLATE(T, poly_init) (fac->poly + i, ctx);
         fac->num = 0;
         fac->alloc = alloc;
     }

@@ -30,14 +30,15 @@
 
 #include <stdio.h>
 void
-TEMPLATE(T, poly_factor_print_pretty)(const TEMPLATE(T, poly_factor_t) fac, const char *var,
-                            const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_print_pretty) (const TEMPLATE(T, poly_factor_t) fac,
+                                       const char *var,
+                                       const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     for (i = 0; i < fac->num; i++)
     {
-        TEMPLATE(T, poly_print_pretty)(fac->poly + i, var, ctx);
+        TEMPLATE(T, poly_print_pretty) (fac->poly + i, var, ctx);
         flint_printf(" ^ %wd\n", fac->exp[i]);
     }
 }

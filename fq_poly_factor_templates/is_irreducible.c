@@ -34,11 +34,12 @@
 #include "templates.h"
 
 int
-TEMPLATE(T, poly_is_irreducible)(const TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_is_irreducible) (const TEMPLATE(T, poly_t) f,
+                                  const TEMPLATE(T, ctx_t) ctx)
 {
-    if (TEMPLATE(T, poly_length)(f, ctx) > 2)
+    if (TEMPLATE(T, poly_length) (f, ctx) > 2)
     {
-        return TEMPLATE(T, poly_is_irreducible_ddf)(f, ctx);
+        return TEMPLATE(T, poly_is_irreducible_ddf) (f, ctx);
     }
 
     return 1;

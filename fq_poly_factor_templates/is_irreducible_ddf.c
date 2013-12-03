@@ -32,18 +32,19 @@
 
 #include "math.h"
 int
-TEMPLATE(T, poly_is_irreducible_ddf)(const TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_is_irreducible_ddf) (const TEMPLATE(T, poly_t) f,
+                                      const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, n;
     slong *degs;
     TEMPLATE(T, poly_factor_t) dist_deg;
 
-    n = TEMPLATE(T, poly_degree)(f, ctx);
+    n = TEMPLATE(T, poly_degree) (f, ctx);
 
     if (n < 2)
         return 1;
 
-    if (!TEMPLATE(T, poly_is_squarefree)(f, ctx))
+    if (!TEMPLATE(T, poly_is_squarefree) (f, ctx))
         return 0;
 
     if (!(degs = (slong *) flint_malloc(n * sizeof(slong))))
@@ -53,26 +54,26 @@ TEMPLATE(T, poly_is_irreducible_ddf)(const TEMPLATE(T, poly_t) f, const TEMPLATE
         abort();
     }
 
-    TEMPLATE(T, poly_factor_init)(dist_deg, ctx);
-    TEMPLATE(T, poly_factor_distinct_deg)(dist_deg, f, &degs, ctx);
+    TEMPLATE(T, poly_factor_init) (dist_deg, ctx);
+    TEMPLATE(T, poly_factor_distinct_deg) (dist_deg, f, &degs, ctx);
     for (i = 0; i < dist_deg->num; i++)
     {
         if (degs[i] == n)
         {
             flint_free(degs);
-            TEMPLATE(T, poly_factor_clear)(dist_deg, ctx);
+            TEMPLATE(T, poly_factor_clear) (dist_deg, ctx);
             return 1;
         }
         if (degs[i] > 0)
         {
             flint_free(degs);
-            TEMPLATE(T, poly_factor_clear)(dist_deg, ctx);
+            TEMPLATE(T, poly_factor_clear) (dist_deg, ctx);
             return 0;
         }
     }
 
     flint_free(degs);
-    TEMPLATE(T, poly_factor_clear)(dist_deg, ctx);
+    TEMPLATE(T, poly_factor_clear) (dist_deg, ctx);
 
     return 1;
 }

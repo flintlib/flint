@@ -31,29 +31,30 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_factor_set)(TEMPLATE(T, poly_factor_t) res, const TEMPLATE(T, poly_factor_t) fac,
-                   const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_set) (TEMPLATE(T, poly_factor_t) res,
+                              const TEMPLATE(T, poly_factor_t) fac,
+                              const TEMPLATE(T, ctx_t) ctx)
 {
     if (res != fac)
     {
         if (fac->num == 0)
         {
-            TEMPLATE(T, poly_factor_clear)(res, ctx);
-            TEMPLATE(T, poly_factor_init)(res, ctx);
+            TEMPLATE(T, poly_factor_clear) (res, ctx);
+            TEMPLATE(T, poly_factor_init) (res, ctx);
         }
         else
         {
             slong i;
 
-            TEMPLATE(T, poly_factor_fit_length)(res, fac->num, ctx);
+            TEMPLATE(T, poly_factor_fit_length) (res, fac->num, ctx);
             for (i = 0; i < fac->num; i++)
             {
-                TEMPLATE(T, poly_set)(res->poly + i, fac->poly + i, ctx);
+                TEMPLATE(T, poly_set) (res->poly + i, fac->poly + i, ctx);
                 res->exp[i] = fac->exp[i];
             }
             for (; i < res->num; i++)
             {
-                TEMPLATE(T, poly_zero)(res->poly + i, ctx);
+                TEMPLATE(T, poly_zero) (res->poly + i, ctx);
                 res->exp[i] = 0;
             }
             res->num = fac->num;

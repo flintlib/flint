@@ -35,13 +35,14 @@
 
 #include "flint.h"
 void
-TEMPLATE(T, poly_factor_clear)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_clear) (TEMPLATE(T, poly_factor_t) fac,
+                                const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     for (i = 0; i < fac->alloc; i++)
     {
-        TEMPLATE(T, poly_clear)(fac->poly + i, ctx);
+        TEMPLATE(T, poly_clear) (fac->poly + i, ctx);
     }
 
     flint_free(fac->poly);

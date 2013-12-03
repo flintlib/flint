@@ -41,7 +41,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("is_irreducible_ben_or....");
     fflush(stdout);
 
@@ -52,19 +52,20 @@ main(void)
         slong length;
         int i, num;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(poly1, ctx);
-        TEMPLATE(T, poly_init)(poly2, ctx);
+        TEMPLATE(T, poly_init) (poly1, ctx);
+        TEMPLATE(T, poly_init) (poly2, ctx);
 
         length = n_randint(state, 7) + 2;
         do
         {
-            TEMPLATE(T, poly_randtest)(poly1, state, length, ctx);
-            if (!TEMPLATE(T, poly_is_zero)(poly1, ctx))
-                TEMPLATE(T, poly_make_monic)(poly1, poly1, ctx);
+            TEMPLATE(T, poly_randtest) (poly1, state, length, ctx);
+            if (!TEMPLATE(T, poly_is_zero) (poly1, ctx))
+                TEMPLATE(T, poly_make_monic) (poly1, poly1, ctx);
         }
-        while ((!TEMPLATE(T, poly_is_irreducible_ben_or)(poly1, ctx)) || (poly1->length < 2));
+        while ((!TEMPLATE(T, poly_is_irreducible_ben_or) (poly1, ctx))
+               || (poly1->length < 2));
 
         num = n_randint(state, 5) + 1;
 
@@ -72,28 +73,30 @@ main(void)
         {
             do
             {
-                TEMPLATE(T, poly_randtest)(poly2, state, length, ctx);
-                if (!TEMPLATE(T, poly_is_zero)(poly2, ctx))
-                    TEMPLATE(T, poly_make_monic)(poly2, poly2, ctx);
+                TEMPLATE(T, poly_randtest) (poly2, state, length, ctx);
+                if (!TEMPLATE(T, poly_is_zero) (poly2, ctx))
+                    TEMPLATE(T, poly_make_monic) (poly2, poly2, ctx);
             }
-            while ((!TEMPLATE(T, poly_is_irreducible_ben_or)(poly2, ctx)) || (poly2->length < 2));
+            while ((!TEMPLATE(T, poly_is_irreducible_ben_or) (poly2, ctx))
+                   || (poly2->length < 2));
 
-            TEMPLATE(T, poly_mul)(poly1, poly1, poly2, ctx);
+            TEMPLATE(T, poly_mul) (poly1, poly1, poly2, ctx);
         }
 
-        if (TEMPLATE(T, poly_is_irreducible_ben_or)(poly1, ctx))
+        if (TEMPLATE(T, poly_is_irreducible_ben_or) (poly1, ctx))
         {
-            flint_printf("Error: reducible polynomial declared irreducible!\n");
+            flint_printf
+                ("Error: reducible polynomial declared irreducible!\n");
             flint_printf("poly:\n");
-            TEMPLATE(T, poly_print)(poly1, ctx);
+            TEMPLATE(T, poly_print) (poly1, ctx);
             flint_printf("\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(poly1, ctx);
-        TEMPLATE(T, poly_clear)(poly2, ctx);
+        TEMPLATE(T, poly_clear) (poly1, ctx);
+        TEMPLATE(T, poly_clear) (poly2, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -34,13 +34,14 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_factor_concat)(TEMPLATE(T, poly_factor_t) res, const TEMPLATE(T, poly_factor_t) fac,
-                      const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_concat) (TEMPLATE(T, poly_factor_t) res,
+                                 const TEMPLATE(T, poly_factor_t) fac,
+                                 const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     for (i = 0; i < fac->num; i++)
-        TEMPLATE(T, poly_factor_insert)(res, fac->poly + i, fac->exp[i], ctx);
+        TEMPLATE(T, poly_factor_insert) (res, fac->poly + i, fac->exp[i], ctx);
 }
 
 
