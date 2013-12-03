@@ -44,33 +44,44 @@ typedef TEMPLATE(T, mat_struct) TEMPLATE(T, mat_t)[1];
 
 /* Memory management  ********************************************************/
 
-void TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong cols,
-                           const TEMPLATE(T, ctx_t) ctx);
+void
+TEMPLATE(T, mat_init)(TEMPLATE(T, mat_t) mat, slong rows, slong cols,
+                      const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) src,
-                               const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
-                           const TEMPLATE(T, ctx_t) ctx);
-     
-void TEMPLATE(T, mat_set)(TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
+void
+TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) src,
                           const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, mat_clear)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
+void
+TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
+                      const TEMPLATE(T, ctx_t) ctx);
 
-int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
-                           const TEMPLATE(T, ctx_t) ctx);
+void
+TEMPLATE(T, mat_set)(TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
+                     const TEMPLATE(T, ctx_t) ctx);
 
-int TEMPLATE(T, mat_is_zero)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
+void
+TEMPLATE(T, mat_clear)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
+
+int
+TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1,
+                       const TEMPLATE(T, mat_t) mat2,
+                       const TEMPLATE(T, ctx_t) ctx);
+
+int
+TEMPLATE(T, mat_is_zero)(const TEMPLATE(T, mat_t) mat,
+                         const TEMPLATE(T, ctx_t) ctx);
 
 static __inline__ int
-TEMPLATE(T, mat_is_empty)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_is_empty)(const TEMPLATE(T, mat_t) mat,
+                          const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
 static __inline__ int
-TEMPLATE(T, mat_is_square)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_is_square)(const TEMPLATE(T, mat_t) mat,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == mat->c);
 }
@@ -82,20 +93,23 @@ TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
 }
 
 static __inline__ void
-TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j, const TEMPLATE(T, t) x,
+TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
+                           const TEMPLATE(T, t) x,
                            const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, set)(TEMPLATE(T, mat_entry)(mat, i, j), x, ctx);
 }
 
 static __inline__ slong
-TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat , const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat ,
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     return mat->r;
 }
 
 static __inline__ slong
-TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     return mat->c;
 }
@@ -112,7 +126,8 @@ TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
                              const TEMPLATE(T, ctx_t) ctx);
 
 void
-TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window, const TEMPLATE(T, ctx_t) ctx);
+TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window,
+                              const TEMPLATE(T, ctx_t) ctx);
 
 /* Input and output  *********************************************************/
 
@@ -144,8 +159,8 @@ TEMPLATE(T, mat_randtest)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
                           const TEMPLATE(T, ctx_t) ctx);
 
 void
-TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_t state, slong rank,
-                          const TEMPLATE(T, ctx_t) ctx);
+TEMPLATE(T, mat_randrank)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+                          slong rank, const TEMPLATE(T, ctx_t) ctx);
 
 int
 TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
@@ -153,16 +168,16 @@ TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
                               const TEMPLATE(T, ctx_t) ctx);
 
 void
-TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count, flint_rand_t state,
-                         const TEMPLATE(T, ctx_t) ctx);
+TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count,
+                         flint_rand_t state, const TEMPLATE(T, ctx_t) ctx);
 
 void
-TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_t state, int unit,
-                          const TEMPLATE(T, ctx_t) ctx);
+TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+                          int unit, const TEMPLATE(T, ctx_t) ctx);
 
 void
-TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_t state, int unit,
-                          const TEMPLATE(T, ctx_t) ctx);
+TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
+                          int unit, const TEMPLATE(T, ctx_t) ctx);
 
 /* Norms */
 
@@ -203,30 +218,30 @@ TEMPLATE(T, mat_mul)(TEMPLATE(T, mat_t) C,
 void
 TEMPLATE(T, mat_mul_classical)(TEMPLATE(T, mat_t) C,
                                const TEMPLATE(T, mat_t) A,
-                               const TEMPLATE(T, mat_t) B, 
+                               const TEMPLATE(T, mat_t) B,
                                const TEMPLATE(T, ctx_t) ctx);
 
 
 void
 TEMPLATE(T, mat_mul_KS)(TEMPLATE(T, mat_t) C,
                         const TEMPLATE(T, mat_t) A,
-                        const TEMPLATE(T, mat_t) B, 
+                        const TEMPLATE(T, mat_t) B,
                         const TEMPLATE(T, ctx_t) ctx);
 
-slong 
+slong
 TEMPLATE(T, mat_lu)(slong * P,
                     TEMPLATE(T, mat_t) A,
                     int rank_check,
                     const TEMPLATE(T, ctx_t) ctx);
 
-slong 
+slong
 TEMPLATE(T, mat_lu_recursive)(slong * P,
                               TEMPLATE(T, mat_t) A,
                               int rank_check,
                               const TEMPLATE(T, ctx_t) ctx);
 
-slong 
-TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check, 
+slong
+TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
                               const TEMPLATE(T, ctx_t) ctx);
 
 
