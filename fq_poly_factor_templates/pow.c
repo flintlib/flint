@@ -34,7 +34,8 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_factor_pow)(TEMPLATE(T, poly_factor_t) fac, slong exp, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_pow) (TEMPLATE(T, poly_factor_t) fac, slong exp,
+                              const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 

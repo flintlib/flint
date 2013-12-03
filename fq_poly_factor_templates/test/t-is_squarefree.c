@@ -41,7 +41,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("is_squarefree....");
     fflush(stdout);
 
@@ -53,62 +53,65 @@ main(void)
         slong i, num_factors, exp, max_exp;
         int v, result;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(poly, ctx);
-        TEMPLATE(T, poly_init)(t, ctx);
-        TEMPLATE(T, poly_init)(Q, ctx);
-        TEMPLATE(T, poly_init)(R, ctx);
+        TEMPLATE(T, poly_init) (poly, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (Q, ctx);
+        TEMPLATE(T, poly_init) (R, ctx);
 
         fmpz_init(x);
-        fmpz_randtest_mod(x, state, TEMPLATE(T, ctx_prime)(ctx));
+        fmpz_randtest_mod(x, state, TEMPLATE(T, ctx_prime) (ctx));
 
-        TEMPLATE(T, poly_set_coeff_fmpz)(poly, 0, x, ctx);
+        TEMPLATE(T, poly_set_coeff_fmpz) (poly, 0, x, ctx);
         num_factors = n_randint(state, 5);
 
         max_exp = 0;
         for (i = 0; i < num_factors; i++)
         {
-            do {
-                TEMPLATE(T, poly_randtest)(t, state, n_randint(state, 10), ctx);
-            } while (!TEMPLATE(T, poly_is_irreducible)(t, ctx) ||
-                    (TEMPLATE(T, poly_length)(t, ctx) < 2));
+            do
+            {
+                TEMPLATE(T, poly_randtest) (t, state, n_randint(state, 10),
+                                            ctx);
+            } while (!TEMPLATE(T, poly_is_irreducible) (t, ctx)
+                     || (TEMPLATE(T, poly_length) (t, ctx) < 2));
 
             exp = n_randint(state, 4) + 1;
             if (n_randint(state, 2) == 0)
                 exp = 1;
 
-            TEMPLATE(T, poly_divrem)(Q, R, poly, t, ctx);
-            if (!TEMPLATE(T, poly_is_zero)(R, ctx))
+            TEMPLATE(T, poly_divrem) (Q, R, poly, t, ctx);
+            if (!TEMPLATE(T, poly_is_zero) (R, ctx))
             {
-                TEMPLATE(T, poly_pow)(t, t, exp, ctx);
-                TEMPLATE(T, poly_mul)(poly, poly, t, ctx);
+                TEMPLATE(T, poly_pow) (t, t, exp, ctx);
+                TEMPLATE(T, poly_mul) (poly, poly, t, ctx);
                 max_exp = FLINT_MAX(exp, max_exp);
             }
         }
 
-        v = TEMPLATE(T, poly_is_squarefree)(poly, ctx);
+        v = TEMPLATE(T, poly_is_squarefree) (poly, ctx);
 
         if (v == 1)
-            result = (max_exp <= 1 && !TEMPLATE(T, poly_is_zero)(poly, ctx));
+            result = (max_exp <= 1 && !TEMPLATE(T, poly_is_zero) (poly, ctx));
         else
-            result = (max_exp > 1 || TEMPLATE(T, poly_is_zero)(poly, ctx));
+            result = (max_exp > 1 || TEMPLATE(T, poly_is_zero) (poly, ctx));
 
         if (!result)
         {
             flint_printf("FAIL: ");
-            TEMPLATE(T, ctx_print)(ctx);
+            TEMPLATE(T, ctx_print) (ctx);
             flint_printf(" %wd, %d\n", max_exp, v);
-            TEMPLATE(T, poly_print)(poly, ctx); flint_printf("\n");
+            TEMPLATE(T, poly_print) (poly, ctx);
+            flint_printf("\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(poly, ctx);
-        TEMPLATE(T, poly_clear)(t, ctx);
-        TEMPLATE(T, poly_clear)(Q, ctx);
-        TEMPLATE(T, poly_clear)(R, ctx);
+        TEMPLATE(T, poly_clear) (poly, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (Q, ctx);
+        TEMPLATE(T, poly_clear) (R, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

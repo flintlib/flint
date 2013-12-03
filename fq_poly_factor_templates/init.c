@@ -34,7 +34,8 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_factor_init)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_init) (TEMPLATE(T, poly_factor_t) fac,
+                               const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
@@ -44,7 +45,7 @@ TEMPLATE(T, poly_factor_init)(TEMPLATE(T, poly_factor_t) fac, const TEMPLATE(T, 
     fac->exp = flint_malloc(sizeof(slong) * 5);
 
     for (i = 0; i < fac->alloc; i++)
-        TEMPLATE(T, poly_init)(fac->poly + i, ctx);
+        TEMPLATE(T, poly_init) (fac->poly + i, ctx);
 }
 
 

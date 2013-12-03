@@ -32,14 +32,15 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_factor_fit_length)(TEMPLATE(T, poly_factor_t) fac, slong len, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_fit_length) (TEMPLATE(T, poly_factor_t) fac, slong len,
+                                     const TEMPLATE(T, ctx_t) ctx)
 {
     if (len > fac->alloc)
     {
         /* At least double number of allocated coeffs */
         if (len < 2 * fac->alloc)
             len = 2 * fac->alloc;
-        TEMPLATE(T, poly_factor_realloc)(fac, len, ctx);
+        TEMPLATE(T, poly_factor_realloc) (fac, len, ctx);
     }
 }
 
