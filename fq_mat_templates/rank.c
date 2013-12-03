@@ -30,10 +30,11 @@
 #include "templates.h"
 
 slong
-TEMPLATE(T, mat_rank)(const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_rank) (const TEMPLATE(T, mat_t) A,
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     slong m, n, rank;
-    slong * perm;
+    slong *perm;
     TEMPLATE(T, mat_t) tmp;
 
     m = A->r;
@@ -42,13 +43,13 @@ TEMPLATE(T, mat_rank)(const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     if (m == 0 || n == 0)
         return 0;
 
-    TEMPLATE(T, mat_init_set)(tmp, A, ctx);
+    TEMPLATE(T, mat_init_set) (tmp, A, ctx);
     perm = flint_malloc(sizeof(slong) * m);
 
-    rank = TEMPLATE(T, mat_lu)(perm, tmp, 0, ctx);
+    rank = TEMPLATE(T, mat_lu) (perm, tmp, 0, ctx);
 
     flint_free(perm);
-    TEMPLATE(T, mat_clear)(tmp, ctx);
+    TEMPLATE(T, mat_clear) (tmp, ctx);
     return rank;
 }
 

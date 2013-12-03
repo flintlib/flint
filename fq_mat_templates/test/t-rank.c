@@ -45,22 +45,22 @@ main(void)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        for (r = 0; r <= FLINT_MIN(m,n); r++)
+        for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            TEMPLATE(T, mat_init)(A, m, n, ctx);
-            TEMPLATE(T, mat_randrank)(A, state, r, ctx);
-            if (r != TEMPLATE(T, mat_rank)(A, ctx))
+            TEMPLATE(T, mat_init) (A, m, n, ctx);
+            TEMPLATE(T, mat_randrank) (A, state, r, ctx);
+            if (r != TEMPLATE(T, mat_rank) (A, ctx))
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
                 abort();
             }
-            TEMPLATE(T, mat_clear)(A, ctx);
+            TEMPLATE(T, mat_clear) (A, ctx);
         }
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Dense */
@@ -68,27 +68,27 @@ main(void)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        for (r = 0; r <= FLINT_MIN(m,n); r++)
+        for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            d = n_randint(state, 2*m*n + 1);
-            TEMPLATE(T, mat_init)(A, m, n, ctx);
-            TEMPLATE(T, mat_randrank)(A, state, r, ctx);
-            TEMPLATE(T, mat_randops)(A, d, state, ctx);
-            if (r != TEMPLATE(T, mat_rank)(A, ctx))
+            d = n_randint(state, 2 * m * n + 1);
+            TEMPLATE(T, mat_init) (A, m, n, ctx);
+            TEMPLATE(T, mat_randrank) (A, state, r, ctx);
+            TEMPLATE(T, mat_randops) (A, d, state, ctx);
+            if (r != TEMPLATE(T, mat_rank) (A, ctx))
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
                 abort();
             }
-            TEMPLATE(T, mat_clear)(A, ctx);
+            TEMPLATE(T, mat_clear) (A, ctx);
         }
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -37,7 +37,7 @@ main(void)
 {
     slong m, n, rep;
     FLINT_TEST_INIT(state);
-    
+
     printf("add/sub/neg....");
     fflush(stdout);
 
@@ -49,34 +49,34 @@ main(void)
         TEMPLATE(T, mat_t) B;
         TEMPLATE(T, mat_t) C;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        TEMPLATE(T, mat_init)(A, m, n, ctx);
-        TEMPLATE(T, mat_init)(B, m, n, ctx);
-        TEMPLATE(T, mat_init)(C, m, n, ctx);
+        TEMPLATE(T, mat_init) (A, m, n, ctx);
+        TEMPLATE(T, mat_init) (B, m, n, ctx);
+        TEMPLATE(T, mat_init) (C, m, n, ctx);
 
-        TEMPLATE(T, mat_randtest)(A, state, ctx);
-        TEMPLATE(T, mat_randtest)(B, state, ctx);
+        TEMPLATE(T, mat_randtest) (A, state, ctx);
+        TEMPLATE(T, mat_randtest) (B, state, ctx);
 
-        TEMPLATE(T, mat_neg)(C, A, ctx);
-        TEMPLATE(T, mat_add)(A, A, B, ctx);
-        TEMPLATE(T, mat_sub)(A, A, B, ctx);
-        TEMPLATE(T, mat_neg)(A, A, ctx);
+        TEMPLATE(T, mat_neg) (C, A, ctx);
+        TEMPLATE(T, mat_add) (A, A, B, ctx);
+        TEMPLATE(T, mat_sub) (A, A, B, ctx);
+        TEMPLATE(T, mat_neg) (A, A, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(A, C, ctx))
+        if (!TEMPLATE(T, mat_equal) (A, C, ctx))
         {
             printf("FAIL: matrices not equal!\n");
             abort();
         }
 
-        TEMPLATE(T, mat_clear)(A, ctx);
-        TEMPLATE(T, mat_clear)(B, ctx);
-        TEMPLATE(T, mat_clear)(C, ctx);
+        TEMPLATE(T, mat_clear) (A, ctx);
+        TEMPLATE(T, mat_clear) (B, ctx);
+        TEMPLATE(T, mat_clear) (C, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -41,7 +41,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
     printf("equal....");
     fflush(stdout);
 
@@ -52,29 +52,30 @@ main(void)
         TEMPLATE(T, t) x;
         slong m, n, j;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, init)(x, ctx);
+        TEMPLATE(T, init) (x, ctx);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        TEMPLATE(T, mat_init)(A, m, n, ctx);
-        TEMPLATE(T, mat_init)(B, m, n, ctx);
-        TEMPLATE(T, mat_init)(C, m, n, ctx);
-        TEMPLATE(T, mat_init)(D, m+1, n, ctx);
-        TEMPLATE(T, mat_init)(E, m, n+1, ctx);
+        TEMPLATE(T, mat_init) (A, m, n, ctx);
+        TEMPLATE(T, mat_init) (B, m, n, ctx);
+        TEMPLATE(T, mat_init) (C, m, n, ctx);
+        TEMPLATE(T, mat_init) (D, m + 1, n, ctx);
+        TEMPLATE(T, mat_init) (E, m, n + 1, ctx);
 
-        if (TEMPLATE(T, mat_equal)(A, D, ctx) || TEMPLATE(T, mat_equal)(A, E, ctx))
+        if (TEMPLATE(T, mat_equal) (A, D, ctx)
+            || TEMPLATE(T, mat_equal) (A, E, ctx))
         {
             printf("FAIL: different dimensions should not be equal\n");
             abort();
         }
 
-        TEMPLATE(T, mat_randtest)(A, state, ctx);
-        TEMPLATE(T, mat_set)(B, A, ctx);
+        TEMPLATE(T, mat_randtest) (A, state, ctx);
+        TEMPLATE(T, mat_set) (B, A, ctx);
 
-        if (!TEMPLATE(T, mat_equal)(A, B, ctx))
+        if (!TEMPLATE(T, mat_equal) (A, B, ctx))
         {
             printf("FAIL: copied matrices should be equal\n");
             abort();
@@ -82,25 +83,25 @@ main(void)
 
         if (m && n)
         {
-            j = n_randint(state, m*n);
-            TEMPLATE(T, one)(x, ctx);
-            TEMPLATE(T, add)(A->entries + j, A->entries + j, x, ctx);
+            j = n_randint(state, m * n);
+            TEMPLATE(T, one) (x, ctx);
+            TEMPLATE(T, add) (A->entries + j, A->entries + j, x, ctx);
 
-            if (TEMPLATE(T, mat_equal)(A, B, ctx))
+            if (TEMPLATE(T, mat_equal) (A, B, ctx))
             {
                 printf("FAIL: modified matrices should not be equal\n");
                 abort();
             }
         }
 
-        TEMPLATE(T, clear)(x, ctx);
-        TEMPLATE(T, mat_clear)(A, ctx);
-        TEMPLATE(T, mat_clear)(B, ctx);
-        TEMPLATE(T, mat_clear)(C, ctx);
-        TEMPLATE(T, mat_clear)(D, ctx);
-        TEMPLATE(T, mat_clear)(E, ctx);
+        TEMPLATE(T, clear) (x, ctx);
+        TEMPLATE(T, mat_clear) (A, ctx);
+        TEMPLATE(T, mat_clear) (B, ctx);
+        TEMPLATE(T, mat_clear) (C, ctx);
+        TEMPLATE(T, mat_clear) (D, ctx);
+        TEMPLATE(T, mat_clear) (E, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

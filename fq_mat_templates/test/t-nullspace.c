@@ -37,7 +37,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("nullspace....");
-    fflush(stdout);    
+    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -48,28 +48,28 @@ main(void)
         m = n_randint(state, 30);
         n = n_randint(state, 30);
 
-        for (r = 0; r <= FLINT_MIN(m,n); r++)
+        for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            TEMPLATE(T, ctx_randtest)(ctx, state);
-            d = n_randint(state, 2*m*n + 1);
+            TEMPLATE(T, ctx_randtest) (ctx, state);
+            d = n_randint(state, 2 * m * n + 1);
 
-            TEMPLATE(T, mat_init)(A, m, n, ctx);
-            TEMPLATE(T, mat_init)(ker, n, n, ctx);
-            TEMPLATE(T, mat_init)(B, m, n, ctx);
+            TEMPLATE(T, mat_init) (A, m, n, ctx);
+            TEMPLATE(T, mat_init) (ker, n, n, ctx);
+            TEMPLATE(T, mat_init) (B, m, n, ctx);
 
-            TEMPLATE(T, mat_randrank)(A, state, r, ctx);
+            TEMPLATE(T, mat_randrank) (A, state, r, ctx);
             /* Densify */
             if (n_randlimb(state) % 2)
-                TEMPLATE(T, mat_randops)(A, d, state, ctx);
+                TEMPLATE(T, mat_randops) (A, d, state, ctx);
 
-            nullity = TEMPLATE(T, mat_nullspace)(ker, A, ctx);
-            nulrank = TEMPLATE(T, mat_rank)(ker, ctx);
+            nullity = TEMPLATE(T, mat_nullspace) (ker, A, ctx);
+            nulrank = TEMPLATE(T, mat_rank) (ker, ctx);
 
             if (nullity != nulrank)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("rank(ker) != nullity!\n");
-                TEMPLATE(T, mat_print_pretty)(A, ctx);
+                TEMPLATE(T, mat_print_pretty) (A, ctx);
                 flint_printf("\n");
                 abort();
             }
@@ -78,32 +78,32 @@ main(void)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("nullity + rank != n\n");
-                TEMPLATE(T, mat_print_pretty)(A, ctx);
+                TEMPLATE(T, mat_print_pretty) (A, ctx);
                 flint_printf("\n");
                 abort();
             }
 
-            TEMPLATE(T, mat_mul)(B, A, ker, ctx);
+            TEMPLATE(T, mat_mul) (B, A, ker, ctx);
 
-            if (TEMPLATE(T, mat_rank)(B, ctx) != 0)
+            if (TEMPLATE(T, mat_rank) (B, ctx) != 0)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("A * ker != 0\n");
-                TEMPLATE(T, mat_print_pretty)(A, ctx);
+                TEMPLATE(T, mat_print_pretty) (A, ctx);
                 flint_printf("\n");
                 abort();
             }
 
-            TEMPLATE(T, mat_clear)(A, ctx);
-            TEMPLATE(T, mat_clear)(ker, ctx);
-            TEMPLATE(T, mat_clear)(B, ctx);
+            TEMPLATE(T, mat_clear) (A, ctx);
+            TEMPLATE(T, mat_clear) (ker, ctx);
+            TEMPLATE(T, mat_clear) (B, ctx);
 
-            TEMPLATE(T, ctx_clear)(ctx);
+            TEMPLATE(T, ctx_clear) (ctx);
         }
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
