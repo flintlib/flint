@@ -29,12 +29,12 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_gen)(TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_gen) (TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, poly_fit_length)(f, 2, ctx);
-    TEMPLATE(T, zero)(f->coeffs, ctx);
-    TEMPLATE(T, one)(f->coeffs + 1, ctx);
-    _TEMPLATE(T, poly_set_length)(f, 2, ctx);
+    TEMPLATE(T, poly_fit_length) (f, 2, ctx);
+    TEMPLATE(T, zero) (f->coeffs, ctx);
+    TEMPLATE(T, one) (f->coeffs + 1, ctx);
+    _TEMPLATE(T, poly_set_length) (f, 2, ctx);
 }
 
 

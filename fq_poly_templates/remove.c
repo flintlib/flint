@@ -33,28 +33,29 @@
 #include "templates.h"
 
 ulong
-TEMPLATE(T, poly_remove)(TEMPLATE(T, poly_t) f, const TEMPLATE(T, poly_t) g, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_remove) (TEMPLATE(T, poly_t) f, const TEMPLATE(T, poly_t) g,
+                          const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, poly_t) q, r;
     ulong i = 0;
 
-    TEMPLATE(T, poly_init)(q, ctx);
-    TEMPLATE(T, poly_init)(r, ctx);
+    TEMPLATE(T, poly_init) (q, ctx);
+    TEMPLATE(T, poly_init) (r, ctx);
 
     while (1)
     {
         if (f->length < g->length)
             break;
-        TEMPLATE(T, poly_divrem)(q, r, f, g, ctx);
+        TEMPLATE(T, poly_divrem) (q, r, f, g, ctx);
         if (r->length == 0)
-            TEMPLATE(T, poly_swap)(q, f, ctx);
+            TEMPLATE(T, poly_swap) (q, f, ctx);
         else
             break;
         i++;
     }
 
-    TEMPLATE(T, poly_clear)(q, ctx);
-    TEMPLATE(T, poly_clear)(r, ctx);
+    TEMPLATE(T, poly_clear) (q, ctx);
+    TEMPLATE(T, poly_clear) (r, ctx);
 
     return i;
 }

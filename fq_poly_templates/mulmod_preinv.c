@@ -32,39 +32,43 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_mulmod_preinv)(TEMPLATE(T, struct) * res,
-                       const TEMPLATE(T, struct) * poly1, slong len1,
-                       const TEMPLATE(T, struct) * poly2, slong len2,
-                       const TEMPLATE(T, struct) * f, slong lenf,
-                       const TEMPLATE(T, struct) * finv, slong lenfinv,
-                       const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_mulmod_preinv) (
+    TEMPLATE(T, struct) * res,
+    const TEMPLATE(T, struct) * poly1, slong len1,
+    const TEMPLATE(T, struct) * poly2, slong len2,
+    const TEMPLATE(T, struct) * f, slong lenf,
+    const TEMPLATE(T, struct) * finv, slong lenfinv,
+    const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) *T, *Q;
+    TEMPLATE(T, struct) * T, *Q;
     slong lenT, lenQ;
 
     lenT = len1 + len2 - 1;
     lenQ = lenT - lenf + 1;
 
-    T = _TEMPLATE(T, vec_init)(lenT + lenQ, ctx);
+    T = _TEMPLATE(T, vec_init) (lenT + lenQ, ctx);
     Q = T + lenT;
 
     if (len1 >= len2)
-        _TEMPLATE(T, poly_mul)(T, poly1, len1, poly2, len2, ctx);
+        _TEMPLATE(T, poly_mul) (T, poly1, len1, poly2, len2, ctx);
     else
-        _TEMPLATE(T, poly_mul)(T, poly2, len2, poly1, len1, ctx);
+        _TEMPLATE(T, poly_mul) (T, poly2, len2, poly1, len1, ctx);
 
-    _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, lenT, f, lenf,
-                                  finv, lenfinv, ctx);
-    _TEMPLATE(T, vec_clear)(T, lenT + lenQ, ctx);
+    _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, res, T, lenT, f, lenf,
+                                               finv, lenfinv, ctx);
+    _TEMPLATE(T, vec_clear) (T, lenT + lenQ, ctx);
 }
 
 void
-TEMPLATE(T, poly_mulmod_preinv)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_t) poly1,
-                      const TEMPLATE(T, poly_t) poly2, const TEMPLATE(T, poly_t) f,
-                      const TEMPLATE(T, poly_t) finv, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_mulmod_preinv) (TEMPLATE(T, poly_t) res,
+                                 const TEMPLATE(T, poly_t) poly1,
+                                 const TEMPLATE(T, poly_t) poly2,
+                                 const TEMPLATE(T, poly_t) f,
+                                 const TEMPLATE(T, poly_t) finv,
+                                 const TEMPLATE(T, ctx_t) ctx)
 {
     slong len1, len2, lenf;
-    TEMPLATE(T, struct) *fcoeffs;
+    TEMPLATE(T, struct) * fcoeffs;
 
     lenf = f->length;
     len1 = poly1->length;
@@ -72,13 +76,13 @@ TEMPLATE(T, poly_mulmod_preinv)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_
 
     if (lenf == 0)
     {
-        flint_printf("Exception (fq_poly_mulmod). Divide by zero.\n");
+        TEMPLATE_PRINTF("Exception (%s_poly_mulmod). Divide by zero.\n", T);
         abort();
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
     {
-        TEMPLATE(T, poly_zero)(res, ctx);
+        TEMPLATE(T, poly_zero) (res, ctx);
         return;
     }
 
@@ -86,25 +90,26 @@ TEMPLATE(T, poly_mulmod_preinv)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_
     {
         if (f == res)
         {
-            fcoeffs = _TEMPLATE(T, vec_init)(lenf, ctx);
-            _TEMPLATE(T, vec_set)(fcoeffs, f->coeffs, lenf, ctx);
+            fcoeffs = _TEMPLATE(T, vec_init) (lenf, ctx);
+            _TEMPLATE(T, vec_set) (fcoeffs, f->coeffs, lenf, ctx);
         }
         else
             fcoeffs = f->coeffs;
 
-        TEMPLATE(T, poly_fit_length)(res, lenf - 1, ctx);
-        _TEMPLATE(T, poly_mulmod_preinv)(res->coeffs, poly1->coeffs, len1,
-                               poly2->coeffs, len2,
-                               fcoeffs, lenf, finv->coeffs, finv->length, ctx);
+        TEMPLATE(T, poly_fit_length) (res, lenf - 1, ctx);
+        _TEMPLATE(T, poly_mulmod_preinv) (res->coeffs, poly1->coeffs, len1,
+                                          poly2->coeffs, len2,
+                                          fcoeffs, lenf, finv->coeffs,
+                                          finv->length, ctx);
         if (f == res)
-            _TEMPLATE(T, vec_clear)(fcoeffs, lenf, ctx);
+            _TEMPLATE(T, vec_clear) (fcoeffs, lenf, ctx);
 
         res->length = lenf - 1;
-        _TEMPLATE(T, poly_normalise)(res, ctx);
+        _TEMPLATE(T, poly_normalise) (res, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_mul)(res, poly1, poly2, ctx);
+        TEMPLATE(T, poly_mul) (res, poly1, poly2, ctx);
     }
 }
 

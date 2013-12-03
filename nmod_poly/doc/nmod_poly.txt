@@ -1873,6 +1873,51 @@ nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
+slong _nmod_poly_gcdinv(mp_ptr G, mp_ptr S,
+                        mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+                        const nmod_t mod)
+
+    Computes \code{(G, lenA)}, \code{(S, lenB-1)} such that
+    $G \cong S A \pmod{B}$, returning the actual length of $G$.
+
+    Assumes that $0 < \len(A) < \len(B)$.
+
+void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
+                      const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes polynomials $G$ and $S$, both reduced modulo~$B$,
+    such that $G \cong S A \pmod{B}$, where $B$ is assumed to
+    have $\len(B) \geq 2$.
+
+    In the case that $A = 0 \pmod{B}$, returns $G = S = 0$.
+
+int _nmod_poly_invmod(mp_ptr A, mp_srcptr B, slong lenB,
+                      mp_srcptr P, slong lenP, const nmod_t mod)
+
+    Attempts to set \code{(A, lenP-1)} to the inverse of \code{(B, lenB)}
+    modulo the polynomial \code{(P, lenP)}.  Returns $1$ if \code{(B, lenB)}
+    is invertible and $0$ otherwise.
+
+    Assumes that $0 < \len(B) < \len(P)$, and hence also $\len(P) \geq 2$,
+    but supports zero-padding in \code{(B, lenB)}.
+
+    Does not support aliasing.
+
+    Assumes that $mod$ is a prime number.
+
+int nmod_poly_invmod(nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t P)
+
+    Attempts to set $A$ to the inverse of $B$ modulo $P$ in the polynomial
+    ring $(\mathbf{Z}/p\mathbf{Z})[X]$, where we assume that $p$ is a prime
+    number.
+
+    If $\deg(P) < 2$, raises an exception.
+
+    If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and
+    sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value
+    of $A$ on exit is undefined.
+
+
 *******************************************************************************
 
     Power series composition

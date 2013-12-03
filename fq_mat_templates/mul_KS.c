@@ -87,8 +87,7 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
         for (j = 0; j < bc; j++)
         {
             TEMPLATE(T, bit_unpack) (TEMPLATE(T, mat_entry) (C, i, j),
-                                     fmpz_mat_entry(fc, i, j), bits,
-                                     ctx);
+                                     fmpz_mat_entry(fc, i, j), bits, ctx);
         }
     }
 

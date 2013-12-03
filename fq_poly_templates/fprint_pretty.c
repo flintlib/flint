@@ -35,16 +35,18 @@
  */
 
 static void
-__TEMPLATE(T, print)(FILE * file, const TEMPLATE(T, struct) * op, const TEMPLATE(T, ctx_t) ctx)
+__TEMPLATE(T, print) (FILE * file, const TEMPLATE(T, struct) * op,
+                      const TEMPLATE(T, ctx_t) ctx)
 {
     fputc('(', file);
-    TEMPLATE(T, fprint_pretty)(file, op, ctx);
+    TEMPLATE(T, fprint_pretty) (file, op, ctx);
     fputc(')', file);
 }
 
 int
-_TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, slong len,
-                       const char *x, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_fprint_pretty) (FILE * file,
+                                  const TEMPLATE(T, struct) * poly, slong len,
+                                  const char *x, const TEMPLATE(T, ctx_t) ctx)
 {
     if (len == 0)
     {
@@ -52,21 +54,21 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
     }
     else if (len == 1)
     {
-        TEMPLATE(T, fprint_pretty)(file, poly + 0, ctx);
+        TEMPLATE(T, fprint_pretty) (file, poly + 0, ctx);
     }
     else if (len == 2)
     {
-        if (TEMPLATE(T, is_one)(poly + 1, ctx))
+        if (TEMPLATE(T, is_one) (poly + 1, ctx))
             flint_fprintf(file, "%s", x);
         else
         {
-            __TEMPLATE(T, print)(file, poly + 1, ctx);
+            __TEMPLATE(T, print) (file, poly + 1, ctx);
             flint_fprintf(file, "*%s", x);
         }
-        if (!TEMPLATE(T, is_zero)(poly + 0, ctx))
+        if (!TEMPLATE(T, is_zero) (poly + 0, ctx))
         {
             fputc('+', file);
-            __TEMPLATE(T, print)(file, poly + 0, ctx);
+            __TEMPLATE(T, print) (file, poly + 0, ctx);
         }
     }
     else
@@ -74,11 +76,11 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
         slong i = len - 1;
 
         {
-            if (TEMPLATE(T, is_one)(poly + i, ctx))
+            if (TEMPLATE(T, is_one) (poly + i, ctx))
                 flint_fprintf(file, "%s^%wd", x, i);
             else
             {
-                __TEMPLATE(T, print)(file, poly + i, ctx);
+                __TEMPLATE(T, print) (file, poly + i, ctx);
                 flint_fprintf(file, "*%s^%wd", x, i);
             }
             --i;
@@ -86,22 +88,22 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
 
         for (; i > 1; --i)
         {
-            if (TEMPLATE(T, is_zero)(poly + i, ctx))
+            if (TEMPLATE(T, is_zero) (poly + i, ctx))
                 continue;
 
-            if (TEMPLATE(T, is_one)(poly + i, ctx))
+            if (TEMPLATE(T, is_one) (poly + i, ctx))
                 flint_fprintf(file, "+%s^%wd", x, i);
             else
             {
                 fputc('+', file);
-                __TEMPLATE(T, print)(file, poly + i, ctx);
+                __TEMPLATE(T, print) (file, poly + i, ctx);
                 flint_fprintf(file, "*%s^%wd", x, i);
             }
         }
 
-        if (!TEMPLATE(T, is_zero)(poly + 1, ctx))
+        if (!TEMPLATE(T, is_zero) (poly + 1, ctx))
         {
-            if (TEMPLATE(T, is_one)(poly + 1, ctx))
+            if (TEMPLATE(T, is_one) (poly + 1, ctx))
             {
                 fputc('+', file);
                 fputs(x, file);
@@ -109,15 +111,15 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
             else
             {
                 fputc('+', file);
-                __TEMPLATE(T, print)(file, poly + 1, ctx);
+                __TEMPLATE(T, print) (file, poly + 1, ctx);
                 fputc('*', file);
                 fputs(x, file);
             }
         }
-        if (!TEMPLATE(T, is_zero)(poly + 0, ctx))
+        if (!TEMPLATE(T, is_zero) (poly + 0, ctx))
         {
             fputc('+', file);
-            __TEMPLATE(T, print)(file, poly + 0, ctx);
+            __TEMPLATE(T, print) (file, poly + 0, ctx);
         }
     }
 
@@ -125,10 +127,11 @@ _TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, struct) * poly, 
 }
 
 int
-TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, poly_t) poly, const char *x,
-                      const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_fprint_pretty) (FILE * file, const TEMPLATE(T, poly_t) poly,
+                                 const char *x, const TEMPLATE(T, ctx_t) ctx)
 {
-    return _TEMPLATE(T, poly_fprint_pretty)(file, poly->coeffs, poly->length, x, ctx);
+    return _TEMPLATE(T, poly_fprint_pretty) (file, poly->coeffs, poly->length,
+                                             x, ctx);
 }
 
 

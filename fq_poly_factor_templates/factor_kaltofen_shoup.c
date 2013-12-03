@@ -32,52 +32,57 @@
 #include <math.h>
 
 void
-TEMPLATE(T, poly_factor_kaltofen_shoup)(TEMPLATE(T, poly_factor_t) res, const TEMPLATE(T, poly_t) poly,
-                              const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_factor_kaltofen_shoup) (TEMPLATE(T, poly_factor_t) res,
+                                         const TEMPLATE(T, poly_t) poly,
+                                         const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, poly_t) v;
     TEMPLATE(T, poly_factor_t) sq_free, dist_deg;
     slong i, j, k, l, res_num, dist_deg_num;
     slong *degs;
 
-    if (!(degs = flint_malloc(TEMPLATE(T, poly_degree)(poly, ctx) * sizeof(slong))))
+    if (!
+        (degs =
+         flint_malloc(TEMPLATE(T, poly_degree) (poly, ctx) * sizeof(slong))))
     {
-        flint_printf("Exception (fq_poly_factor_kaltofen_shoup): \n");
+        TEMPLATE_PRINTF("Exception (%s_poly_factor_kaltofen_shoup): \n", T);
         flint_printf("Not enough memory.\n");
         abort();
     }
 
-    TEMPLATE(T, poly_init)(v, ctx);
+    TEMPLATE(T, poly_init) (v, ctx);
 
-    TEMPLATE(T, poly_make_monic)(v, poly, ctx);
+    TEMPLATE(T, poly_make_monic) (v, poly, ctx);
 
     /* compute squarefree factorisation */
-    TEMPLATE(T, poly_factor_init)(sq_free, ctx);
-    TEMPLATE(T, poly_factor_squarefree)(sq_free, v, ctx);
+    TEMPLATE(T, poly_factor_init) (sq_free, ctx);
+    TEMPLATE(T, poly_factor_squarefree) (sq_free, v, ctx);
 
     /* compute distinct-degree factorisation */
-    TEMPLATE(T, poly_factor_init)(dist_deg, ctx);
+    TEMPLATE(T, poly_factor_init) (dist_deg, ctx);
     for (i = 0; i < sq_free->num; i++)
     {
         dist_deg_num = dist_deg->num;
 
-        TEMPLATE(T, poly_factor_distinct_deg)(dist_deg, sq_free->poly + i, &degs, ctx);
+        TEMPLATE(T, poly_factor_distinct_deg) (dist_deg, sq_free->poly + i,
+                                               &degs, ctx);
 
         /* compute equal-degree factorisation */
         for (j = dist_deg_num, l = 0; j < dist_deg->num; j++, l++)
         {
             res_num = res->num;
 
-            TEMPLATE(T, poly_factor_equal_deg)(res, dist_deg->poly + j, degs[l], ctx);
+            TEMPLATE(T, poly_factor_equal_deg) (res, dist_deg->poly + j,
+                                                degs[l], ctx);
             for (k = res_num; k < res->num; k++)
-                res->exp[k] = TEMPLATE(T, poly_remove)(v, res->poly + k, ctx);
+                res->exp[k] = TEMPLATE(T, poly_remove) (v, res->poly + k, ctx);
         }
     }
 
     flint_free(degs);
-    TEMPLATE(T, poly_clear)(v, ctx);
-    TEMPLATE(T, poly_factor_clear)(dist_deg, ctx);
-    TEMPLATE(T, poly_factor_clear)(sq_free, ctx);
+    TEMPLATE(T, poly_clear) (v, ctx);
+    TEMPLATE(T, poly_factor_clear) (dist_deg, ctx);
+    TEMPLATE(T, poly_factor_clear) (sq_free, ctx);
 }
 
 

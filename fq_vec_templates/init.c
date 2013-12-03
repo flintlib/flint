@@ -28,8 +28,8 @@
 
 #include "templates.h"
 
-TEMPLATE(T, struct) *_TEMPLATE(T, vec_init) (slong len,
-                                             const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, struct)*
+_TEMPLATE(T, vec_init) (slong len, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
     TEMPLATE(T, struct) * v;

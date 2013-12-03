@@ -32,59 +32,65 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_div_newton_n_preinv)(TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct) * A, slong lenA,
-                           const TEMPLATE(T, struct) * B, slong lenB,
-                           const TEMPLATE(T, struct) * Binv, slong lenBinv,
-                           const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_div_newton_n_preinv) (
+    TEMPLATE(T, struct) *Q,
+    const TEMPLATE(T, struct) *A, slong lenA,
+    const TEMPLATE(T, struct) *B, slong lenB,
+    const TEMPLATE(T, struct) * Binv, slong lenBinv,
+    const TEMPLATE(T, ctx_t) ctx)
 {
     const slong lenQ = lenA - lenB + 1;
-    TEMPLATE(T, struct) *Arev;
+    TEMPLATE(T, struct) * Arev;
 
-    Arev = _TEMPLATE(T, vec_init)(lenQ, ctx);
+    Arev = _TEMPLATE(T, vec_init) (lenQ, ctx);
 
-    _TEMPLATE(T, poly_reverse)(Arev, A + (lenA - lenQ), lenQ, lenQ, ctx);
+    _TEMPLATE(T, poly_reverse) (Arev, A + (lenA - lenQ), lenQ, lenQ, ctx);
 
-    _TEMPLATE(T, poly_mullow)(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
+    _TEMPLATE(T, poly_mullow) (Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv),
+                               lenQ, ctx);
 
-    _TEMPLATE(T, poly_reverse)(Q, Q, lenQ, lenQ, ctx);
+    _TEMPLATE(T, poly_reverse) (Q, Q, lenQ, lenQ, ctx);
 
-    _TEMPLATE(T, vec_clear)(Arev, lenQ, ctx);
+    _TEMPLATE(T, vec_clear) (Arev, lenQ, ctx);
 }
 
 void
-TEMPLATE(T, poly_div_newton_n_preinv)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
-                          const TEMPLATE(T, poly_t) B, const TEMPLATE(T, poly_t) Binv,
-                          const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_div_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
+                                       const TEMPLATE(T, poly_t) A,
+                                       const TEMPLATE(T, poly_t) B,
+                                       const TEMPLATE(T, poly_t) Binv,
+                                       const TEMPLATE(T, ctx_t) ctx)
 {
     const slong lenA = A->length,
         lenB = B->length, lenQ = lenA - lenB + 1, lenBinv = Binv->length;
 
-    TEMPLATE(T, struct) *q;
+    TEMPLATE(T, struct) * q;
 
     if (lenB == 0)
     {
-        flint_printf("Exception (fq_poly_div_newton). Division by zero.\n");
+        TEMPLATE_PRINTF("Exception (%s_poly_div_newton). Division by zero.\n",
+                        T);
         abort();
     }
 
     if (lenA < lenB)
     {
-        TEMPLATE(T, poly_zero)(Q, ctx);
+        TEMPLATE(T, poly_zero) (Q, ctx);
         return;
     }
 
     if (Q == A || Q == B || Q == Binv)
     {
-        q = _TEMPLATE(T, vec_init)(lenQ, ctx);
+        q = _TEMPLATE(T, vec_init) (lenQ, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(Q, lenQ, ctx);
+        TEMPLATE(T, poly_fit_length) (Q, lenQ, ctx);
         q = Q->coeffs;
     }
 
-    _TEMPLATE(T, poly_div_newton_n_preinv)(q, A->coeffs, lenA, B->coeffs, lenB,
-                               Binv->coeffs, lenBinv, ctx);
+    _TEMPLATE(T, poly_div_newton_n_preinv) (q, A->coeffs, lenA, B->coeffs,
+                                            lenB, Binv->coeffs, lenBinv, ctx);
 
     if (Q == A || Q == B || Q == Binv)
     {

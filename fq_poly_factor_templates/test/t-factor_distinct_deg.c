@@ -40,7 +40,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("factor_distinct_deg....");
     fflush(stdout);
 
@@ -52,26 +52,27 @@ main(void)
         slong i, length, num;
         slong *degs;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(poly1, ctx);
-        TEMPLATE(T, poly_init)(poly, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
+        TEMPLATE(T, poly_init) (poly1, ctx);
+        TEMPLATE(T, poly_init) (poly, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
 
-        TEMPLATE(T, poly_zero)(poly1, ctx);
-        TEMPLATE(T, poly_one)(poly1, ctx);
+        TEMPLATE(T, poly_zero) (poly1, ctx);
+        TEMPLATE(T, poly_one) (poly1, ctx);
 
         length = n_randint(state, 7) + 2;
         do
         {
-            TEMPLATE(T, poly_randtest)(poly, state, length, ctx);
+            TEMPLATE(T, poly_randtest) (poly, state, length, ctx);
             if (poly->length)
-                TEMPLATE(T, poly_make_monic)(poly, poly, ctx);
+                TEMPLATE(T, poly_make_monic) (poly, poly, ctx);
         }
-        while ((poly->length < 2) || (!TEMPLATE(T, poly_is_irreducible)(poly, ctx)));
+        while ((poly->length < 2)
+               || (!TEMPLATE(T, poly_is_irreducible) (poly, ctx)));
 
-        TEMPLATE(T, poly_mul)(poly1, poly1, poly, ctx);
+        TEMPLATE(T, poly_mul) (poly1, poly1, poly, ctx);
 
         num = n_randint(state, 5) + 1;
 
@@ -80,17 +81,18 @@ main(void)
             do
             {
                 length = n_randint(state, 7) + 2;
-                TEMPLATE(T, poly_randtest)(poly, state, length, ctx);
+                TEMPLATE(T, poly_randtest) (poly, state, length, ctx);
                 if (poly->length)
                 {
-                    TEMPLATE(T, poly_make_monic)(poly, poly, ctx);
-                    TEMPLATE(T, poly_divrem)(q, r, poly1, poly, ctx);
+                    TEMPLATE(T, poly_make_monic) (poly, poly, ctx);
+                    TEMPLATE(T, poly_divrem) (q, r, poly1, poly, ctx);
                 }
             }
-            while ((poly->length < 2) || (!TEMPLATE(T, poly_is_irreducible)(poly, ctx))
+            while ((poly->length < 2)
+                   || (!TEMPLATE(T, poly_is_irreducible) (poly, ctx))
                    || (r->length == 0));
 
-            TEMPLATE(T, poly_mul)(poly1, poly1, poly, ctx);
+            TEMPLATE(T, poly_mul) (poly1, poly1, poly, ctx);
         }
 
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(slong))))
@@ -98,39 +100,40 @@ main(void)
             flint_printf("Fatal error: not enough memory.");
             abort();
         }
-        TEMPLATE(T, poly_factor_init)(res, ctx);
-        TEMPLATE(T, poly_factor_distinct_deg)(res, poly1, &degs, ctx);
+        TEMPLATE(T, poly_factor_init) (res, ctx);
+        TEMPLATE(T, poly_factor_distinct_deg) (res, poly1, &degs, ctx);
 
-        TEMPLATE(T, poly_init)(product, ctx);
-        TEMPLATE(T, poly_one)(product, ctx);
+        TEMPLATE(T, poly_init) (product, ctx);
+        TEMPLATE(T, poly_one) (product, ctx);
         for (i = 0; i < res->num; i++)
-            TEMPLATE(T, poly_mul)(product, product, res->poly + i, ctx);
+            TEMPLATE(T, poly_mul) (product, product, res->poly + i, ctx);
 
-        TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(product, product,
-                              poly1->coeffs + (poly1->length - 1), ctx);
+        TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (product, product,
+                                                   poly1->coeffs +
+                                                   (poly1->length - 1), ctx);
 
-        if (!TEMPLATE(T, poly_equal)(poly1, product, ctx))
+        if (!TEMPLATE(T, poly_equal) (poly1, product, ctx))
         {
             flint_printf
                 ("Error: product of factors does not equal to the original polynomial\n");
             flint_printf("poly:\n");
-            TEMPLATE(T, poly_print)(poly1, ctx);
+            TEMPLATE(T, poly_print) (poly1, ctx);
             flint_printf("\n");
             flint_printf("product:\n");
-            TEMPLATE(T, poly_print)(product, ctx);
+            TEMPLATE(T, poly_print) (product, ctx);
             flint_printf("\n");
             abort();
         }
 
         flint_free(degs);
-        TEMPLATE(T, poly_clear)(product, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, poly_clear)(poly1, ctx);
-        TEMPLATE(T, poly_clear)(poly, ctx);
-        TEMPLATE(T, poly_factor_clear)(res, ctx);
+        TEMPLATE(T, poly_clear) (product, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, poly_clear) (poly1, ctx);
+        TEMPLATE(T, poly_clear) (poly, ctx);
+        TEMPLATE(T, poly_factor_clear) (res, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

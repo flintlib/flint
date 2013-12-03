@@ -46,8 +46,8 @@
 #define __TEMPLATE3(X,Y,Z) __CAT3(X,Y,Z)
 #define __TEMPLATE4(X,Y,Z,A) __CAT4(X,Y,Z,A)
 
-#define STR(x)   #x
-#define PRINT_VAR(x) flint_printf("%s", STR(x));
-#define PRINTF_VAR(s, x) flint_printf(s, STR(x));
+#define TEMPLATE_STR(x)   #x
+#define TEMPLATE_PRINT(x) flint_printf("%s", TEMPLATE_STR(x));
+#define TEMPLATE_PRINTF(s, x) flint_printf(s, TEMPLATE_STR(x));
 
 #endif

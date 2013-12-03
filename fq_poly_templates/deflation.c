@@ -31,7 +31,8 @@
 #include "templates.h"
 
 ulong
-TEMPLATE(T, poly_deflation)(const TEMPLATE(T, poly_t) input, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
+                             const TEMPLATE(T, ctx_t) ctx)
 {
     ulong deflation;
     slong i, coeff;
@@ -40,7 +41,7 @@ TEMPLATE(T, poly_deflation)(const TEMPLATE(T, poly_t) input, const TEMPLATE(T, c
         return input->length;
 
     coeff = 1;
-    while (TEMPLATE(T, is_zero)(input->coeffs + coeff, ctx))
+    while (TEMPLATE(T, is_zero) (input->coeffs + coeff, ctx))
         coeff++;
 
     deflation = n_gcd_full(input->length - 1, coeff);
@@ -50,7 +51,7 @@ TEMPLATE(T, poly_deflation)(const TEMPLATE(T, poly_t) input, const TEMPLATE(T, c
         for (i = 0; i < deflation - 1; i++)
         {
             coeff++;
-            if (!TEMPLATE(T, is_zero)(input->coeffs + coeff, ctx))
+            if (!TEMPLATE(T, is_zero) (input->coeffs + coeff, ctx))
                 deflation = n_gcd_full(coeff, deflation);
         }
         if (i == deflation - 1)

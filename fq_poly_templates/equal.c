@@ -31,7 +31,9 @@
 #include "templates.h"
 
 int
-TEMPLATE(T, poly_equal)(const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_equal) (const TEMPLATE(T, poly_t) op1,
+                         const TEMPLATE(T, poly_t) op2,
+                         const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
@@ -42,7 +44,7 @@ TEMPLATE(T, poly_equal)(const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t)
         return 0;
 
     for (i = 0; i < op1->length; i++)
-        if (!TEMPLATE(T, equal)(op1->coeffs + i, op2->coeffs + i, ctx))
+        if (!TEMPLATE(T, equal) (op1->coeffs + i, op2->coeffs + i, ctx))
             return 0;
 
     return 1;

@@ -35,19 +35,19 @@
 #include "perm.h"
 
 slong
-TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_rref) (TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, j, k, n, rank;
-    slong * pivots;
-    slong * nonpivots;
-    slong * P;
-
+    slong *pivots;
+    slong *nonpivots;
+    slong *P;
+    TEMPLATE(T, struct) * e;
     TEMPLATE(T, mat_t) U, V;
 
     n = A->c;
 
-    P = _perm_init(TEMPLATE(T, mat_nrows)(A, ctx));
-    rank = TEMPLATE(T, mat_lu)(P, A, 0, ctx);
+    P = _perm_init(TEMPLATE(T, mat_nrows) (A, ctx));
+    rank = TEMPLATE(T, mat_lu) (P, A, 0, ctx);
     _perm_clear(P);
 
     if (rank == 0)
@@ -56,7 +56,7 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     /* Clear L */
     for (i = 0; i < A->r; i++)
         for (j = 0; j < FLINT_MIN(i, rank); j++)
-            TEMPLATE(T, zero)(TEMPLATE(T, mat_entry)(A, i, j), ctx);
+            TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, i, j), ctx);
 
     /* We now reorder U to proper upper triangular form U | V
        with U full-rank triangular, set V = U^(-1) V, and then
@@ -65,15 +65,15 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
        An improvement for some matrices would be to compress V by
        discarding columns containing nothing but zeros. */
 
-    TEMPLATE(T, mat_init)(U, rank, rank, ctx);
-    TEMPLATE(T, mat_init)(V, rank, n - rank, ctx);
+    TEMPLATE(T, mat_init) (U, rank, rank, ctx);
+    TEMPLATE(T, mat_init) (V, rank, n - rank, ctx);
 
     pivots = flint_malloc(sizeof(slong) * rank);
     nonpivots = flint_malloc(sizeof(slong) * (n - rank));
 
     for (i = j = k = 0; i < rank; i++)
     {
-        while (TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(A, i, j), ctx))
+        while (TEMPLATE(T, is_zero) (TEMPLATE(T, mat_entry) (A, i, j), ctx))
         {
             nonpivots[k] = j;
             k++;
@@ -92,16 +92,22 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     for (i = 0; i < rank; i++)
     {
         for (j = 0; j <= i; j++)
-            TEMPLATE(T, mat_entry_set)(U, j, i, TEMPLATE(T, mat_entry)(A, j, pivots[i]), ctx);
+        {
+            e = TEMPLATE(T, mat_entry) (A, j, pivots[i]);
+            TEMPLATE(T, mat_entry_set) (U, j, i, e, ctx);
+        }
     }
 
     for (i = 0; i < n - rank; i++)
     {
         for (j = 0; j < rank; j++)
-            TEMPLATE(T, mat_entry_set)(V, j, i, TEMPLATE(T, mat_entry)(A, j, nonpivots[i]), ctx);
+        {
+            e = TEMPLATE(T, mat_entry) (A, j, nonpivots[i]);
+            TEMPLATE(T, mat_entry_set) (V, j, i, e, ctx);
+        }
     }
 
-    TEMPLATE(T, mat_solve_triu)(V, U, V, 0, ctx);
+    TEMPLATE(T, mat_solve_triu) (V, U, V, 0, ctx);
 
     /* Clear pivot columns */
     for (i = 0; i < rank; i++)
@@ -110,11 +116,13 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
         {
             if (i == j)
             {
-                TEMPLATE(T, one)(TEMPLATE(T, mat_entry)(A, j, pivots[i]) , ctx);
+                TEMPLATE(T, one) (TEMPLATE(T, mat_entry) (A, j, pivots[i]),
+                                  ctx);
             }
             else
             {
-                TEMPLATE(T, zero)(TEMPLATE(T, mat_entry)(A, j, pivots[i]) , ctx);
+                TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, j, pivots[i]),
+                                   ctx);
             }
         }
     }
@@ -123,11 +131,12 @@ TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
     for (i = 0; i < n - rank; i++)
     {
         for (j = 0; j < rank; j++)
-            TEMPLATE(T, mat_entry_set)(A, j, nonpivots[i], TEMPLATE(T, mat_entry)(V, j, i), ctx);
+            TEMPLATE(T, mat_entry_set) (A, j, nonpivots[i],
+                                        TEMPLATE(T, mat_entry) (V, j, i), ctx);
     }
 
-    TEMPLATE(T, mat_clear)(U, ctx);
-    TEMPLATE(T, mat_clear)(V, ctx);
+    TEMPLATE(T, mat_clear) (U, ctx);
+    TEMPLATE(T, mat_clear) (V, ctx);
 
     flint_free(pivots);
     flint_free(nonpivots);

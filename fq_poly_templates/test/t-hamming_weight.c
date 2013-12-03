@@ -46,80 +46,84 @@ main(void)
     fflush(stdout);
 
     /* Check consistency */
-        for (i = 0; i < 2000; i++)
+    for (i = 0; i < 2000; i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
-	     slong w1,w2;
+        slong w1, w2;
         TEMPLATE(T, poly_t) a, b;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
 
-        TEMPLATE(T, poly_randtest)(a, state, len, ctx);
-	TEMPLATE(T, poly_set)(b, a, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, len, ctx);
+        TEMPLATE(T, poly_set) (b, a, ctx);
 
-	w1 = TEMPLATE(T, poly_hamming_weight)(a, ctx);
-	w2 = TEMPLATE(T, poly_hamming_weight)(b, ctx);
+        w1 = TEMPLATE(T, poly_hamming_weight) (a, ctx);
+        w2 = TEMPLATE(T, poly_hamming_weight) (b, ctx);
 
         result = (w1 == w2);
         if (!result)
         {
             flint_printf("FAIL:\n\n");
-            flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
-	    flint_printf("w1 = %wd \n w2 = %wd \n",w1,w2);
+            flint_printf("a = "), TEMPLATE(T, poly_print_pretty) (a, "X", ctx),
+                flint_printf("\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
+                flint_printf("\n");
+            flint_printf("w1 = %wd \n w2 = %wd \n", w1, w2);
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
 
 
-        TEMPLATE(T, ctx_clear)(ctx);
-	}
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
 
     /* Check that wt(a+b) \leq wt(a) + wt(b) */
-        for (i = 0; i < 2000; i++)
+    for (i = 0; i < 2000; i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
-	     slong w1,w2,wsum;
+        slong w1, w2, wsum;
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(c, ctx);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (c, ctx);
 
-        TEMPLATE(T, poly_randtest)(a, state, len, ctx);
-        TEMPLATE(T, poly_randtest)(b, state, len, ctx);
-	TEMPLATE(T, poly_add)(c,a,b,ctx);
-	
-	w1 = TEMPLATE(T, poly_hamming_weight)(a, ctx);
-	w2 = TEMPLATE(T, poly_hamming_weight)(b, ctx);
-	wsum = TEMPLATE(T, poly_hamming_weight)(c, ctx);
-	
-        result = (wsum <= w1+w2);
+        TEMPLATE(T, poly_randtest) (a, state, len, ctx);
+        TEMPLATE(T, poly_randtest) (b, state, len, ctx);
+        TEMPLATE(T, poly_add) (c, a, b, ctx);
+
+        w1 = TEMPLATE(T, poly_hamming_weight) (a, ctx);
+        w2 = TEMPLATE(T, poly_hamming_weight) (b, ctx);
+        wsum = TEMPLATE(T, poly_hamming_weight) (c, ctx);
+
+        result = (wsum <= w1 + w2);
         if (!result)
         {
             flint_printf("FAIL:\n\n");
-            flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
-	    flint_printf("w1 = %wd \n w2 = %wd \n wsum = %wd",w1,w2,wsum);
+            flint_printf("a = "), TEMPLATE(T, poly_print_pretty) (a, "X", ctx),
+                flint_printf("\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
+                flint_printf("\n");
+            flint_printf("w1 = %wd \n w2 = %wd \n wsum = %wd", w1, w2, wsum);
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(c, ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (c, ctx);
 
 
-        TEMPLATE(T, ctx_clear)(ctx);
-	} 
+        TEMPLATE(T, ctx_clear) (ctx);
+    }
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

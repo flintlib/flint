@@ -37,7 +37,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
     printf("is_zero....");
     fflush(stdout);
 
@@ -47,38 +47,38 @@ main(void)
         TEMPLATE(T, mat_t) A;
         TEMPLATE(T, t) x;
         slong j;
-        
+
         slong rows = n_randint(state, 10);
         slong cols = n_randint(state, 10);
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        
-        TEMPLATE(T, mat_init)(A, rows, cols, ctx);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        if (!TEMPLATE(T, mat_is_zero)(A, ctx))
+        TEMPLATE(T, mat_init) (A, rows, cols, ctx);
+
+        if (!TEMPLATE(T, mat_is_zero) (A, ctx))
         {
             printf("FAIL!\n");
             abort();
         }
 
-        TEMPLATE(T, init)(x, ctx);
-        TEMPLATE(T, randtest_not_zero)(x, state, ctx);
-        
+        TEMPLATE(T, init) (x, ctx);
+        TEMPLATE(T, randtest_not_zero) (x, state, ctx);
+
         if (rows && cols)
         {
-            j = n_randint(state, rows*cols);
-            TEMPLATE(T, add)(A->entries + j, A->entries + j, x, ctx);
+            j = n_randint(state, rows * cols);
+            TEMPLATE(T, add) (A->entries + j, A->entries + j, x, ctx);
 
-            if (TEMPLATE(T, mat_is_zero)(A, ctx))
+            if (TEMPLATE(T, mat_is_zero) (A, ctx))
             {
                 printf("FAIL!\n");
                 abort();
             }
         }
 
-        TEMPLATE(T, clear)(x, ctx);
-        TEMPLATE(T, mat_clear)(A, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, clear) (x, ctx);
+        TEMPLATE(T, mat_clear) (A, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -46,47 +46,47 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
-        TEMPLATE(T, poly_init)(test, ctx);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
+        TEMPLATE(T, poly_init) (test, ctx);
 
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_mul)(test, q, b, ctx);
-        TEMPLATE(T, poly_add)(test, test, r, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_mul) (test, q, b, ctx);
+        TEMPLATE(T, poly_add) (test, test, r, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(a, test, ctx));
+        result = (TEMPLATE(T, poly_equal) (a, test, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(test, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (test, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             abort();
         }
-        
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, poly_clear)(test, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, poly_clear) (test, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing of a and q */
@@ -96,44 +96,44 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
-        
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
+
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(a, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (a, r, a, b, binv, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(a, q, ctx));
+        result = (TEMPLATE(T, poly_equal) (a, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing of b and q */
@@ -143,44 +143,44 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
-        
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
+
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(b, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (b, r, a, b, binv, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(b, q, ctx));
+        result = (TEMPLATE(T, poly_equal) (b, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing of binv and q */
@@ -190,45 +190,45 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-        
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
-        
+        TEMPLATE(T, ctx_randtest) (ctx, state);
+
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
+
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(binv, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (binv, r, a, b, binv, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(binv, q, ctx));
+        result = (TEMPLATE(T, poly_equal) (binv, q, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(binv, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (binv, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing of a and r */
@@ -238,43 +238,43 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, a, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, a, a, b, binv, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(a, r, ctx));
+        result = (TEMPLATE(T, poly_equal) (a, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing of b and r */
@@ -284,44 +284,44 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
 
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, b, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, b, a, b, binv, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(b, r, ctx));
+        result = (TEMPLATE(T, poly_equal) (b, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     /* Check aliasing of binv and r */
@@ -331,45 +331,45 @@ main(void)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(binv, ctx);
-        TEMPLATE(T, poly_init)(q, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (binv, ctx);
+        TEMPLATE(T, poly_init) (q, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
 
         do
-            TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 50), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 50), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 50), ctx);
-        if (a->length > 2*(b->length)-3)
-            TEMPLATE(T, poly_truncate) (a, 2*(b->length)-3, ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        if (a->length > 2 * (b->length) - 3)
+            TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
         TEMPLATE(T, poly_reverse) (binv, b, b->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (binv, binv, b->length, ctx);
 
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, r, a, b, binv, ctx);
-        TEMPLATE(T, poly_divrem_newton_n_preinv)(q, binv, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, r, a, b, binv, ctx);
+        TEMPLATE(T, poly_divrem_newton_n_preinv) (q, binv, a, b, binv, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(binv, r, ctx));
+        result = (TEMPLATE(T, poly_equal) (binv, r, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            TEMPLATE(T, poly_print)(a, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(b, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(binv, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(q, ctx), flint_printf("\n\n");
-            TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (binv, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (q, ctx), flint_printf("\n\n");
+            TEMPLATE(T, poly_print) (r, ctx), flint_printf("\n\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(binv, ctx);
-        TEMPLATE(T, poly_clear)(q, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (binv, ctx);
+        TEMPLATE(T, poly_clear) (q, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

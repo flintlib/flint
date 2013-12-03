@@ -143,11 +143,12 @@ __mul(fmpz_poly_struct * rop,
 }
 
 void
-_TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, struct) * rop,
-                     const TEMPLATE(T, struct) * op1, slong len1,
-                     const TEMPLATE(T, struct) * op2, slong len2, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_mul_reorder) (TEMPLATE(T, struct) * rop,
+                                const TEMPLATE(T, struct) * op1, slong len1,
+                                const TEMPLATE(T, struct) * op2, slong len2,
+                                const TEMPLATE(T, ctx_t) ctx)
 {
-    const slong d = TEMPLATE(T, ctx_degree)(ctx);
+    const slong d = TEMPLATE(T, ctx_degree) (ctx);
 
     fmpz_poly_struct *f, *g, *h;
     slong i, j, k, len;
@@ -195,7 +196,7 @@ _TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, struct) * rop,
         }
     }
     for (j = 0; j < FLINT_MIN(d, len); j++)
-        fmpz_poly_scalar_mod_fmpz(f + j, f + j, TEMPLATE(T, ctx_prime)(ctx));
+        fmpz_poly_scalar_mod_fmpz(f + j, f + j, TEMPLATE(T, ctx_prime) (ctx));
 
     /* Convert (f, d) to (rop, len1 + len2 - 1) */
     for (i = 0; i < len1 + len2 - 1; i++)
@@ -218,22 +219,23 @@ _TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, struct) * rop,
 }
 
 void
-TEMPLATE(T, poly_mul_reorder)(TEMPLATE(T, poly_t) rop,
-                    const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2,
-                    const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_mul_reorder) (TEMPLATE(T, poly_t) rop,
+                               const TEMPLATE(T, poly_t) op1,
+                               const TEMPLATE(T, poly_t) op2,
+                               const TEMPLATE(T, ctx_t) ctx)
 {
     const slong len = op1->length + op2->length - 1;
 
     if (op1->length == 0 || op2->length == 0)
     {
-        TEMPLATE(T, poly_zero)(rop, ctx);
+        TEMPLATE(T, poly_zero) (rop, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(rop, len, ctx);
-        _TEMPLATE(T, poly_mul_reorder)(rop->coeffs, op1->coeffs, op1->length,
-                             op2->coeffs, op2->length, ctx);
-        _TEMPLATE(T, poly_set_length)(rop, len, ctx);
+        TEMPLATE(T, poly_fit_length) (rop, len, ctx);
+        _TEMPLATE(T, poly_mul_reorder) (rop->coeffs, op1->coeffs, op1->length,
+                                        op2->coeffs, op2->length, ctx);
+        _TEMPLATE(T, poly_set_length) (rop, len, ctx);
     }
 }
 

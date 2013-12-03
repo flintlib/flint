@@ -31,12 +31,13 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_swap) (TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
+                        const TEMPLATE(T, ctx_t) ctx)
 {
     if (op1 != op2)
     {
         slong temp;
-        TEMPLATE(T, struct) *temp_c;
+        TEMPLATE(T, struct) * temp_c;
 
         temp = op1->length;
         op1->length = op2->length;

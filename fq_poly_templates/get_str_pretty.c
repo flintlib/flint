@@ -32,9 +32,9 @@
 #include <string.h>
 #include <math.h>
 
-char *
-_TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len, const char *x,
-                        const TEMPLATE(T, ctx_t) ctx)
+char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
+                                         slong len, const char *x,
+                                         const TEMPLATE(T, ctx_t) ctx)
 {
     char *str, **coeffstrs;
     size_t off;
@@ -50,17 +50,17 @@ _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len, c
 
     if (len == 1)
     {
-        return TEMPLATE(T, get_str_pretty)(poly, ctx);
+        return TEMPLATE(T, get_str_pretty) (poly, ctx);
     }
 
-    coeffstrs = (char **) flint_malloc(len * sizeof(char *));
+    coeffstrs = (char **)flint_malloc(len * sizeof(char *));
 
     nz = 0;
     bound = 1;
     for (i = 0; i < len; i++)
-        if (!TEMPLATE(T, is_zero)(poly + i, ctx))
+        if (!TEMPLATE(T, is_zero) (poly + i, ctx))
         {
-            coeffstrs[i] = TEMPLATE(T, get_str_pretty)(poly + i, ctx);
+            coeffstrs[i] = TEMPLATE(T, get_str_pretty) (poly + i, ctx);
             bound += strlen(coeffstrs[i]);
             nz++;
         }
@@ -70,7 +70,7 @@ _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len, c
     off = 0;
     i = len - 1;
 
-    if (TEMPLATE(T, is_one)(poly + i, ctx))
+    if (TEMPLATE(T, is_one) (poly + i, ctx))
     {
     }
     else
@@ -83,9 +83,9 @@ _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len, c
 
     for (--i; i > 0; --i)
     {
-        if (TEMPLATE(T, is_zero)(poly + i, ctx))
+        if (TEMPLATE(T, is_zero) (poly + i, ctx))
             continue;
-        if (!TEMPLATE(T, is_one)(poly + i, ctx))
+        if (!TEMPLATE(T, is_one) (poly + i, ctx))
         {
             off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
         }
@@ -99,13 +99,13 @@ _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len, c
             off += flint_sprintf(str + off, "*%s", x);
     }
 
-    if (!TEMPLATE(T, is_zero)(poly + i, ctx))
+    if (!TEMPLATE(T, is_zero) (poly + i, ctx))
     {
         off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
     }
 
     for (i = 0; i < len; i++)
-        if (!TEMPLATE(T, is_zero)(poly + i, ctx))
+        if (!TEMPLATE(T, is_zero) (poly + i, ctx))
         {
             flint_free(coeffstrs[i]);
         }
@@ -115,10 +115,12 @@ _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len, c
     return str;
 }
 
-char *
-TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, poly_t) poly, const char *x, const TEMPLATE(T, ctx_t) ctx)
+char *TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, poly_t) poly,
+                                        const char *x,
+                                        const TEMPLATE(T, ctx_t) ctx)
 {
-    return _TEMPLATE(T, poly_get_str_pretty)(poly->coeffs, poly->length, x, ctx);
+    return _TEMPLATE(T, poly_get_str_pretty) (poly->coeffs, poly->length, x,
+                                              ctx);
 }
 
 

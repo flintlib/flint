@@ -30,28 +30,30 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_t state, int unit,
-                          const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_randtril) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
+                           int unit, const TEMPLATE(T, ctx_t) ctx)
 {
+    TEMPLATE(T, struct) * e;
     slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {
         for (j = 0; j < mat->c; j++)
         {
+            e = TEMPLATE(T, mat_entry) (mat, i, j);
             if (j < i)
             {
-                TEMPLATE(T, randtest)(TEMPLATE(T, mat_entry)(mat, i, j), state, ctx);
+                TEMPLATE(T, randtest) (e, state, ctx);
             }
             else if (i == j)
             {
-                TEMPLATE(T, randtest)(TEMPLATE(T, mat_entry)(mat, i, j), state, ctx);
-                if (unit || TEMPLATE(T, is_zero)(TEMPLATE(T, mat_entry)(mat, i, j), ctx))
-                    TEMPLATE(T, one)(TEMPLATE(T, mat_entry)(mat, i, j), ctx);
+                TEMPLATE(T, randtest) (e, state, ctx);
+                if (unit || TEMPLATE(T, is_zero) (e, ctx))
+                    TEMPLATE(T, one) (e, ctx);
             }
             else
             {
-                TEMPLATE(T, zero)(TEMPLATE(T, mat_entry)(mat, i, j), ctx);
+                TEMPLATE(T, zero) (e, ctx);
             }
         }
     }

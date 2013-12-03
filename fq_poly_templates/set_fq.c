@@ -30,17 +30,19 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, TEMPLATE(poly_set, T))(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, TEMPLATE(poly_set, T)) (TEMPLATE(T, poly_t) poly,
+                                    const TEMPLATE(T, t) c,
+                                    const TEMPLATE(T, ctx_t) ctx)
 {
-    if (TEMPLATE(T, is_zero)(c, ctx))
+    if (TEMPLATE(T, is_zero) (c, ctx))
     {
-        TEMPLATE(T, poly_zero)(poly, ctx);
+        TEMPLATE(T, poly_zero) (poly, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(poly, 1, ctx);
-        TEMPLATE(T, set)(poly->coeffs + 0, c, ctx);
-        _TEMPLATE(T, poly_set_length)(poly, 1, ctx);
+        TEMPLATE(T, poly_fit_length) (poly, 1, ctx);
+        TEMPLATE(T, set) (poly->coeffs + 0, c, ctx);
+        _TEMPLATE(T, poly_set_length) (poly, 1, ctx);
     }
 }
 

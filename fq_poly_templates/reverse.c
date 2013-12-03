@@ -29,8 +29,9 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_reverse)(TEMPLATE(T, struct) * res, const TEMPLATE(T, struct) * poly, slong len, slong n,
-                 const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_reverse) (TEMPLATE(T, struct) * res,
+                            const TEMPLATE(T, struct) * poly, slong len,
+                            slong n, const TEMPLATE(T, ctx_t) ctx)
 {
     if (res == poly)
     {
@@ -44,37 +45,38 @@ _TEMPLATE(T, poly_reverse)(TEMPLATE(T, struct) * res, const TEMPLATE(T, struct) 
         }
 
         for (i = 0; i < n - len; i++)
-            TEMPLATE(T, zero)(res + i, ctx);
+            TEMPLATE(T, zero) (res + i, ctx);
     }
     else
     {
         slong i;
 
         for (i = 0; i < n - len; i++)
-            TEMPLATE(T, zero)(res + i, ctx);
+            TEMPLATE(T, zero) (res + i, ctx);
 
         for (i = 0; i < len; i++)
-            TEMPLATE(T, set)(res + (n - len) + i, poly + (len - 1) - i, ctx);
+            TEMPLATE(T, set) (res + (n - len) + i, poly + (len - 1) - i, ctx);
     }
 }
 
 void
-TEMPLATE(T, poly_reverse)(TEMPLATE(T, poly_t) res, const TEMPLATE(T, poly_t) poly, slong n,
-                const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_reverse) (TEMPLATE(T, poly_t) res,
+                           const TEMPLATE(T, poly_t) poly, slong n,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     slong len = FLINT_MIN(n, poly->length);
     if (len == 0)
     {
-        TEMPLATE(T, poly_zero)(res, ctx);
+        TEMPLATE(T, poly_zero) (res, ctx);
         return;
     }
 
-    TEMPLATE(T, poly_fit_length)(res, n, ctx);
+    TEMPLATE(T, poly_fit_length) (res, n, ctx);
 
-    _TEMPLATE(T, poly_reverse)(res->coeffs, poly->coeffs, len, n, ctx);
+    _TEMPLATE(T, poly_reverse) (res->coeffs, poly->coeffs, len, n, ctx);
 
-    _TEMPLATE(T, poly_set_length)(res, n, ctx);
-    _TEMPLATE(T, poly_normalise)(res, ctx);
+    _TEMPLATE(T, poly_set_length) (res, n, ctx);
+    _TEMPLATE(T, poly_normalise) (res, ctx);
 }
 
 

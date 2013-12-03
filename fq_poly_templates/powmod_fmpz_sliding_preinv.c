@@ -29,14 +29,16 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
-                                              const TEMPLATE(T, struct) * poly,
-                                              const fmpz_t e, ulong k, const TEMPLATE(T, struct) * f,
-                                              slong lenf, const TEMPLATE(T, struct) * finv,
-                                              slong lenfinv, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (
+    TEMPLATE(T, struct) * res,
+    const TEMPLATE(T, struct) * poly,
+    const fmpz_t e, ulong k,
+    const TEMPLATE(T, struct) * f, slong lenf,
+    const TEMPLATE(T, struct) * finv, slong lenfinv,
+    const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) *T, *Q;
-    TEMPLATE(T, poly_struct) *precomp;
+    TEMPLATE(T, struct) * T, *Q;
+    TEMPLATE(T, poly_struct) * precomp;
     TEMPLATE(T, poly_t) poly_squared;
     ulong twokm1;
     slong lenT, lenQ;
@@ -45,14 +47,14 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
 
     if (lenf == 2)
     {
-        TEMPLATE(T, pow)(res, poly, e, ctx);
+        TEMPLATE(T, pow) (res, poly, e, ctx);
         return;
     }
 
     lenT = 2 * lenf - 3;
     lenQ = lenT - lenf + 1;
 
-    T = _TEMPLATE(T, vec_init)(lenT + lenQ, ctx);
+    T = _TEMPLATE(T, vec_init) (lenT + lenQ, ctx);
     Q = T + lenT;
 
     /* Precomputation */
@@ -61,35 +63,38 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
     TEMPLATE(T, poly_init) (precomp, ctx);
     TEMPLATE(T, poly_fit_length) (precomp, lenf - 1, ctx);
     _TEMPLATE(T, vec_set) (precomp->coeffs, poly, lenf - 1, ctx);
-    
+
     TEMPLATE(T, poly_init) (poly_squared, ctx);
     if (k > 1)
     {
         TEMPLATE(T, poly_fit_length) (poly_squared, lenf - 1, ctx);
-        _TEMPLATE(T, poly_mul)(T, poly, lenf - 1, poly, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, poly_squared->coeffs, T, 2 * lenf - 3,
-                                                f, lenf, finv, lenfinv, ctx);
+        _TEMPLATE(T, poly_mul) (T, poly, lenf - 1, poly, lenf - 1, ctx);
+        _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, poly_squared->coeffs, T,
+                                                   2 * lenf - 3, f, lenf, finv,
+                                                   lenfinv, ctx);
     }
     for (i = 1; i < twokm1; i++)
     {
         TEMPLATE(T, poly_init) (precomp + i, ctx);
         TEMPLATE(T, poly_fit_length) (precomp + i, lenf - 1, ctx);
-        _TEMPLATE(T, poly_mul)(T, (precomp + i - 1)->coeffs, lenf - 1,
-                               poly_squared->coeffs, lenf - 1, ctx);
-        _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, (precomp + i)->coeffs, T, 2 * lenf - 3,
-                                                f, lenf, finv, lenfinv, ctx);
+        _TEMPLATE(T, poly_mul) (T, (precomp + i - 1)->coeffs, lenf - 1,
+                                poly_squared->coeffs, lenf - 1, ctx);
+        _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, (precomp + i)->coeffs, T,
+                                                   2 * lenf - 3, f, lenf, finv,
+                                                   lenfinv, ctx);
     }
 
-    _TEMPLATE(T, vec_set)(res, poly, lenf - 1, ctx);
+    _TEMPLATE(T, vec_set) (res, poly, lenf - 1, ctx);
 
     i = fmpz_sizeinbase(e, 2) - 2;
     while (i >= 0)
     {
         if (fmpz_tstbit(e, i) == 0)
         {
-            _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
-                                                    finv, lenfinv, ctx);
+            _TEMPLATE(T, poly_sqr) (T, res, lenf - 1, ctx);
+            _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, res, T, 2 * lenf - 3,
+                                                       f, lenf, finv, lenfinv,
+                                                       ctx);
             i -= 1;
         }
         else
@@ -101,11 +106,13 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
             }
             for (j = 0; j < i - l + 1; j++)
             {
-                _TEMPLATE(T, poly_sqr)(T, res, lenf - 1, ctx);
-                _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
-                                                        finv, lenfinv, ctx);
+                _TEMPLATE(T, poly_sqr) (T, res, lenf - 1, ctx);
+                _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, res, T,
+                                                           2 * lenf - 3, f,
+                                                           lenf, finv, lenfinv,
+                                                           ctx);
             }
-            
+
             index = fmpz_tstbit(e, i);
             for (j = i - 1; j >= l; j--)
             {
@@ -113,10 +120,12 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
                 index += fmpz_tstbit(e, j);
             }
             index = (index - 1) / 2;
-                
-            _TEMPLATE(T, poly_mul)(T, res, lenf - 1, (precomp + index)->coeffs, lenf - 1, ctx);
-            _TEMPLATE(T, poly_divrem_newton_n_preinv)(Q, res, T, 2 * lenf - 3, f, lenf,
-                                                    finv, lenfinv, ctx);
+
+            _TEMPLATE(T, poly_mul) (T, res, lenf - 1,
+                                    (precomp + index)->coeffs, lenf - 1, ctx);
+            _TEMPLATE(T, poly_divrem_newton_n_preinv) (Q, res, T, 2 * lenf - 3,
+                                                       f, lenf, finv, lenfinv,
+                                                       ctx);
             i = l - 1;
         }
     }
@@ -127,19 +136,19 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, struct) * res,
     }
     flint_free(precomp);
     TEMPLATE(T, poly_clear) (poly_squared, ctx);
-    _TEMPLATE(T, vec_clear)(T, lenT + lenQ, ctx);
+    _TEMPLATE(T, vec_clear) (T, lenT + lenQ, ctx);
 }
 
 
 void
-TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, poly_t) res,
-                                             const TEMPLATE(T, poly_t) poly,
-                                             const fmpz_t e, ulong k,
-                                             const TEMPLATE(T, poly_t) f,
-                                             const TEMPLATE(T, poly_t) finv,
-                                             const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (TEMPLATE(T, poly_t) res,
+                                              const TEMPLATE(T, poly_t) poly,
+                                              const fmpz_t e, ulong k,
+                                              const TEMPLATE(T, poly_t) f,
+                                              const TEMPLATE(T, poly_t) finv,
+                                              const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, struct) *q;
+    TEMPLATE(T, struct) * q;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;
@@ -148,27 +157,28 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, poly_t) res,
 
     if (lenf == 0)
     {
-        flint_printf
-            ("Exception: fq_poly_powmod_fmpz_sliding_preinv: divide by zero\n");
+        TEMPLATE_PRINTF("Exception: %s_poly_powmod_fmpz_sliding_preinv", T);
+        flint_printf(": divide by zero\n");
         abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf
-            ("Exception: fq_poly_powmod_fmpz_sliding_preinv: negative exp not implemented\n");
+        TEMPLATE_PRINTF("Exception: %s_poly_powmod_fmpz_sliding_preinv:", T);
+        flint_printf(" negative exp not implemented\n");
         abort();
     }
 
     if (len >= lenf)
     {
         TEMPLATE(T, poly_t) t, r;
-        TEMPLATE(T, poly_init)(t, ctx);
-        TEMPLATE(T, poly_init)(r, ctx);
-        TEMPLATE(T, poly_divrem)(t, r, poly, f, ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res, r, e, k, f, finv, ctx);
-        TEMPLATE(T, poly_clear)(t, ctx);
-        TEMPLATE(T, poly_clear)(r, ctx);
+        TEMPLATE(T, poly_init) (t, ctx);
+        TEMPLATE(T, poly_init) (r, ctx);
+        TEMPLATE(T, poly_divrem) (t, r, poly, f, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (res, r, e, k, f, finv,
+                                                      ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
+        TEMPLATE(T, poly_clear) (r, ctx);
         return;
     }
 
@@ -180,31 +190,32 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, poly_t) res,
         {
             if (exp == UWORD(0))
             {
-                TEMPLATE(T, poly_fit_length)(res, 1, ctx);
-                TEMPLATE(T, one)(res->coeffs, ctx);
-                _TEMPLATE(T, poly_set_length)(res, 1, ctx);
+                TEMPLATE(T, poly_fit_length) (res, 1, ctx);
+                TEMPLATE(T, one) (res->coeffs, ctx);
+                _TEMPLATE(T, poly_set_length) (res, 1, ctx);
             }
             else if (exp == UWORD(1))
             {
-                TEMPLATE(T, poly_set)(res, poly, ctx);
+                TEMPLATE(T, poly_set) (res, poly, ctx);
             }
             else
-                TEMPLATE(T, poly_mulmod_preinv)(res, poly, poly, f, finv, ctx);
+                TEMPLATE(T, poly_mulmod_preinv) (res, poly, poly, f, finv,
+                                                 ctx);
             return;
         }
     }
 
     if (lenf == 1 || len == 0)
     {
-        TEMPLATE(T, poly_zero)(res, ctx);
+        TEMPLATE(T, poly_zero) (res, ctx);
         return;
     }
 
     if (poly->length < trunc)
     {
-        q = _TEMPLATE(T, vec_init)(trunc, ctx);
-        _TEMPLATE(T, vec_set)(q, poly->coeffs, len, ctx);
-        _TEMPLATE(T, vec_zero)(q + len, trunc - len, ctx);
+        q = _TEMPLATE(T, vec_init) (trunc, ctx);
+        _TEMPLATE(T, vec_set) (q, poly->coeffs, len, ctx);
+        _TEMPLATE(T, vec_zero) (q + len, trunc - len, ctx);
         qcopy = 1;
     }
     else
@@ -230,33 +241,33 @@ TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(TEMPLATE(T, poly_t) res,
             k = 6;
         else
             k = 7;
-    }        
-        
+    }
+
     if ((res == poly && !qcopy) || (res == f))
     {
         TEMPLATE(T, poly_t) t;
-        TEMPLATE(T, poly_init2)(t, 2 * lenf - 3, ctx);
-        _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(t->coeffs, q, e, k,
-                                                      f->coeffs, lenf,
-                                                      finv->coeffs, finv->length,
-                                                      ctx);
-        TEMPLATE(T, poly_swap)(res, t, ctx);
-        TEMPLATE(T, poly_clear)(t, ctx);
+        TEMPLATE(T, poly_init2) (t, 2 * lenf - 3, ctx);
+        _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (t->coeffs, q, e, k,
+                                                       f->coeffs, lenf,
+                                                       finv->coeffs,
+                                                       finv->length, ctx);
+        TEMPLATE(T, poly_swap) (res, t, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(res, 2 * lenf - 3, ctx);
-        _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res->coeffs, q, e, k,
-                                                      f->coeffs, lenf,
-                                                      finv->coeffs, finv->length,
-                                                      ctx);
+        TEMPLATE(T, poly_fit_length) (res, 2 * lenf - 3, ctx);
+        _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (res->coeffs, q, e, k,
+                                                       f->coeffs, lenf,
+                                                       finv->coeffs,
+                                                       finv->length, ctx);
     }
 
     if (qcopy)
-        _TEMPLATE(T, vec_clear)(q, trunc, ctx);
+        _TEMPLATE(T, vec_clear) (q, trunc, ctx);
 
-    _TEMPLATE(T, poly_set_length)(res, trunc, ctx);
-    _TEMPLATE(T, poly_normalise)(res, ctx);
+    _TEMPLATE(T, poly_set_length) (res, trunc, ctx);
+    _TEMPLATE(T, poly_normalise) (res, ctx);
 }
 
 
