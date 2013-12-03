@@ -30,8 +30,9 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_deflate)(TEMPLATE(T, poly_t) result, const TEMPLATE(T, poly_t) input, ulong deflation,
-                const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_deflate) (TEMPLATE(T, poly_t) result,
+                           const TEMPLATE(T, poly_t) input, ulong deflation,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     slong res_length, i;
 
@@ -43,14 +44,15 @@ TEMPLATE(T, poly_deflate)(TEMPLATE(T, poly_t) result, const TEMPLATE(T, poly_t) 
 
     if (input->length <= 1 || deflation == 1)
     {
-        TEMPLATE(T, poly_set)(result, input, ctx);
+        TEMPLATE(T, poly_set) (result, input, ctx);
         return;
     }
 
     res_length = (input->length - 1) / deflation + 1;
-    TEMPLATE(T, poly_fit_length)(result, res_length, ctx);
+    TEMPLATE(T, poly_fit_length) (result, res_length, ctx);
     for (i = 0; i < res_length; i++)
-        TEMPLATE(T, set)(result->coeffs + i, input->coeffs + (i * deflation), ctx);
+        TEMPLATE(T, set) (result->coeffs + i, input->coeffs + (i * deflation),
+                          ctx);
 
     result->length = res_length;
 }

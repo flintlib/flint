@@ -31,36 +31,40 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_realloc)(TEMPLATE(T, poly_t) poly, slong alloc, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_realloc) (TEMPLATE(T, poly_t) poly, slong alloc,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     if (alloc == 0)             /* Clear up, reinitialise */
     {
-        TEMPLATE(T, poly_clear)(poly, ctx);
-        TEMPLATE(T, poly_init)(poly, ctx);
+        TEMPLATE(T, poly_clear) (poly, ctx);
+        TEMPLATE(T, poly_init) (poly, ctx);
     }
     else if (poly->alloc)       /* Realloc */
     {
         for (i = alloc; i < poly->alloc; i++)
-            TEMPLATE(T, clear)(poly->coeffs + i, ctx);
+            TEMPLATE(T, clear) (poly->coeffs + i, ctx);
 
         poly->coeffs =
             (TEMPLATE(T, struct) *) flint_realloc(poly->coeffs,
-                                                  alloc * sizeof(TEMPLATE(T, struct)));
+                                                  alloc *
+                                                  sizeof(TEMPLATE(T, struct)));
 
         for (i = poly->alloc; i < alloc; i++)
-            TEMPLATE(T, init)(poly->coeffs + i, ctx);
+            TEMPLATE(T, init) (poly->coeffs + i, ctx);
 
         poly->length = FLINT_MIN(poly->length, alloc);
-        _TEMPLATE(T, poly_normalise)(poly, ctx);
+        _TEMPLATE(T, poly_normalise) (poly, ctx);
     }
     else                        /* Nothing allocated already so do it now */
     {
-        poly->coeffs = (TEMPLATE(T, struct) *) flint_malloc(alloc * sizeof(TEMPLATE(T, struct)));
+        poly->coeffs =
+            (TEMPLATE(T, struct) *) flint_malloc(alloc *
+                                                 sizeof(TEMPLATE(T, struct)));
 
         for (i = 0; i < alloc; i++)
-            TEMPLATE(T, init)(poly->coeffs + i, ctx);
+            TEMPLATE(T, init) (poly->coeffs + i, ctx);
     }
     poly->alloc = alloc;
 }

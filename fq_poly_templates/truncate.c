@@ -31,16 +31,17 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_truncate)(TEMPLATE(T, poly_t) poly, slong len, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_truncate) (TEMPLATE(T, poly_t) poly, slong len,
+                            const TEMPLATE(T, ctx_t) ctx)
 {
     if (poly->length > len)
     {
         slong i;
 
         for (i = len; i < poly->length; i++)
-            TEMPLATE(T, zero)(poly->coeffs + i, ctx);
+            TEMPLATE(T, zero) (poly->coeffs + i, ctx);
         poly->length = len;
-        _TEMPLATE(T, poly_normalise)(poly, ctx);
+        _TEMPLATE(T, poly_normalise) (poly, ctx);
     }
 }
 

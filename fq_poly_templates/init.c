@@ -31,7 +31,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_init) (TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
 {
     poly->coeffs = NULL;
     poly->alloc = 0;
@@ -39,9 +39,10 @@ TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
 }
 
 void
-TEMPLATE(T, poly_init2)(TEMPLATE(T, poly_t) poly, slong alloc, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_init2) (TEMPLATE(T, poly_t) poly, slong alloc,
+                         const TEMPLATE(T, ctx_t) ctx)
 {
-    poly->coeffs = (alloc) ? _TEMPLATE(T, vec_init)(alloc, ctx) : NULL;
+    poly->coeffs = (alloc) ? _TEMPLATE(T, vec_init) (alloc, ctx) : NULL;
     poly->alloc = alloc;
     poly->length = 0;
 }

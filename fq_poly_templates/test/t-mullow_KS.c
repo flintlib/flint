@@ -52,38 +52,42 @@ main(void)
         TEMPLATE(T, poly_t) a, b, c, d;
         slong n;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
-        TEMPLATE(T, poly_init)(a, ctx);
-        TEMPLATE(T, poly_init)(b, ctx);
-        TEMPLATE(T, poly_init)(c, ctx);
-        TEMPLATE(T, poly_init)(d, ctx);
+        TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (b, ctx);
+        TEMPLATE(T, poly_init) (c, ctx);
+        TEMPLATE(T, poly_init) (d, ctx);
 
-        TEMPLATE(T, poly_randtest)(a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest)(b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
         n = n_randint(state, 100);
 
-        TEMPLATE(T, poly_mullow_KS)(c, a, b, n, ctx);
-        TEMPLATE(T, poly_mul)(d, a, b, ctx);
-        TEMPLATE(T, poly_truncate)(d, n, ctx);
+        TEMPLATE(T, poly_mullow_KS) (c, a, b, n, ctx);
+        TEMPLATE(T, poly_mul) (d, a, b, ctx);
+        TEMPLATE(T, poly_truncate) (d, n, ctx);
 
-        result = (TEMPLATE(T, poly_equal)(c, d, ctx));
+        result = (TEMPLATE(T, poly_equal) (c, d, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n\n");
-            flint_printf("a = "), TEMPLATE(T, poly_print_pretty)(a, "X", ctx), flint_printf("\n");
-            flint_printf("b = "), TEMPLATE(T, poly_print_pretty)(b, "X", ctx), flint_printf("\n");
-            flint_printf("c = "), TEMPLATE(T, poly_print_pretty)(c, "X", ctx), flint_printf("\n");
-            flint_printf("d = "), TEMPLATE(T, poly_print_pretty)(d, "X", ctx), flint_printf("\n");
+            flint_printf("a = "), TEMPLATE(T, poly_print_pretty) (a, "X", ctx),
+                flint_printf("\n");
+            flint_printf("b = "), TEMPLATE(T, poly_print_pretty) (b, "X", ctx),
+                flint_printf("\n");
+            flint_printf("c = "), TEMPLATE(T, poly_print_pretty) (c, "X", ctx),
+                flint_printf("\n");
+            flint_printf("d = "), TEMPLATE(T, poly_print_pretty) (d, "X", ctx),
+                flint_printf("\n");
             abort();
         }
 
-        TEMPLATE(T, poly_clear)(a, ctx);
-        TEMPLATE(T, poly_clear)(b, ctx);
-        TEMPLATE(T, poly_clear)(c, ctx);
-        TEMPLATE(T, poly_clear)(d, ctx);
+        TEMPLATE(T, poly_clear) (a, ctx);
+        TEMPLATE(T, poly_clear) (b, ctx);
+        TEMPLATE(T, poly_clear) (c, ctx);
+        TEMPLATE(T, poly_clear) (d, ctx);
 
-        TEMPLATE(T, ctx_clear)(ctx);
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

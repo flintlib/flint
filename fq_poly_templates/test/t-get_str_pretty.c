@@ -40,22 +40,22 @@ main(void)
     flint_printf("get_str_pretty....");
     fflush(stdout);
 
-    TEMPLATE(T, ctx_randtest)(ctx, state);
-    
-    TEMPLATE(T, poly_init)(a, ctx);
+    TEMPLATE(T, ctx_randtest) (ctx, state);
+
+    TEMPLATE(T, poly_init) (a, ctx);
     for (len = 0; len < 100; len++)
         for (i = 0; i < 10; i++)
         {
-            TEMPLATE(T, poly_randtest)(a, state, len, ctx);
-            str = TEMPLATE(T, poly_get_str_pretty)(a, "x", ctx);
+            TEMPLATE(T, poly_randtest) (a, state, len, ctx);
+            str = TEMPLATE(T, poly_get_str_pretty) (a, "x", ctx);
             /* flint_printf("\n\n"); */
             /* TEMPLATE(T, poly_print_pretty)(a, "x", ctx); */
             /* flint_printf("\n%s\n", str); */
             flint_free(str);
         }
 
-    TEMPLATE(T, poly_clear)(a, ctx);
-    TEMPLATE(T, ctx_clear)(ctx);
+    TEMPLATE(T, poly_clear) (a, ctx);
+    TEMPLATE(T, ctx_clear) (ctx);
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

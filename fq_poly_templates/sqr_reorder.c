@@ -155,10 +155,11 @@ __sqr(fmpz_poly_struct * rop, fmpz_poly_struct * op, slong len)
 }
 
 void
-_TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) * rop,
-                     const TEMPLATE(T, struct) * op, slong len, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_sqr_reorder) (TEMPLATE(T, struct) * rop,
+                                const TEMPLATE(T, struct) * op, slong len,
+                                const TEMPLATE(T, ctx_t) ctx)
 {
-    const slong d = TEMPLATE(T, ctx_degree)(ctx);
+    const slong d = TEMPLATE(T, ctx_degree) (ctx);
 
     fmpz_poly_struct *f, *g;
     slong i, j, k, lenF;
@@ -198,7 +199,7 @@ _TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) * rop,
         }
     }
     for (j = 0; j < FLINT_MIN(d, lenF); j++)
-        fmpz_poly_scalar_mod_fmpz(f + j, f + j, TEMPLATE(T, ctx_prime)(ctx));
+        fmpz_poly_scalar_mod_fmpz(f + j, f + j, TEMPLATE(T, ctx_prime) (ctx));
 
     /* Convert (f, d) to (rop, 2 * len - 1) */
     for (i = 0; i < 2 * len - 1; i++)
@@ -220,19 +221,22 @@ _TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, struct) * rop,
 }
 
 void
-TEMPLATE(T, poly_sqr_reorder)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_sqr_reorder) (TEMPLATE(T, poly_t) rop,
+                               const TEMPLATE(T, poly_t) op,
+                               const TEMPLATE(T, ctx_t) ctx)
 {
     const slong len = 2 * op->length - 1;
 
     if (op->length == 0)
     {
-        TEMPLATE(T, poly_zero)(rop, ctx);
+        TEMPLATE(T, poly_zero) (rop, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(rop, len, ctx);
-        _TEMPLATE(T, poly_sqr_reorder)(rop->coeffs, op->coeffs, op->length, ctx);
-        _TEMPLATE(T, poly_set_length)(rop, len, ctx);
+        TEMPLATE(T, poly_fit_length) (rop, len, ctx);
+        _TEMPLATE(T, poly_sqr_reorder) (rop->coeffs, op->coeffs, op->length,
+                                        ctx);
+        _TEMPLATE(T, poly_set_length) (rop, len, ctx);
     }
 }
 

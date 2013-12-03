@@ -31,40 +31,43 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_shift_right)(TEMPLATE(T, struct) * rop, const TEMPLATE(T, struct) * op, slong len, slong n,
-                     const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_shift_right) (TEMPLATE(T, struct) * rop,
+                                const TEMPLATE(T, struct) * op, slong len,
+                                slong n, const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     if (rop != op)
     {
         for (i = 0; i < len - n; i++)
-            TEMPLATE(T, set)(rop + i, op + n + i, ctx);
+            TEMPLATE(T, set) (rop + i, op + n + i, ctx);
     }
     else
     {
         for (i = 0; i < len - n; i++)
-            TEMPLATE(T, swap)(rop + i, rop + n + i, ctx);
+            TEMPLATE(T, swap) (rop + i, rop + n + i, ctx);
     }
 }
 
 void
-TEMPLATE(T, poly_shift_right)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, slong n,
-                    const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_shift_right) (TEMPLATE(T, poly_t) rop,
+                               const TEMPLATE(T, poly_t) op, slong n,
+                               const TEMPLATE(T, ctx_t) ctx)
 {
     if (n == 0)
     {
-        TEMPLATE(T, poly_set)(rop, op, ctx);
+        TEMPLATE(T, poly_set) (rop, op, ctx);
     }
     else if (op->length <= n)
     {
-        TEMPLATE(T, poly_zero)(rop, ctx);
+        TEMPLATE(T, poly_zero) (rop, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(rop, op->length - n, ctx);
-        _TEMPLATE(T, poly_shift_right)(rop->coeffs, op->coeffs, op->length, n, ctx);
-        _TEMPLATE(T, poly_set_length)(rop, op->length - n, ctx);
+        TEMPLATE(T, poly_fit_length) (rop, op->length - n, ctx);
+        _TEMPLATE(T, poly_shift_right) (rop->coeffs, op->coeffs, op->length, n,
+                                        ctx);
+        _TEMPLATE(T, poly_set_length) (rop, op->length - n, ctx);
     }
 }
 

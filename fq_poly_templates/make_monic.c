@@ -32,28 +32,31 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_make_monic)(TEMPLATE(T, struct) * rop,
-                    const TEMPLATE(T, struct) * op, slong length, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_make_monic) (TEMPLATE(T, struct) * rop,
+                               const TEMPLATE(T, struct) * op, slong length,
+                               const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, t) inv;
-    TEMPLATE(T, init)(inv, ctx);
-    TEMPLATE(T, inv)(inv, &op[length - 1], ctx);
-    _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T))(rop, op, length, inv, ctx);
-    TEMPLATE(T, clear)(inv, ctx);
+    TEMPLATE(T, init) (inv, ctx);
+    TEMPLATE(T, inv) (inv, &op[length - 1], ctx);
+    _TEMPLATE(T, TEMPLATE(poly_scalar_mul, T)) (rop, op, length, inv, ctx);
+    TEMPLATE(T, clear) (inv, ctx);
 }
 
 void
-TEMPLATE(T, poly_make_monic)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_make_monic) (TEMPLATE(T, poly_t) rop,
+                              const TEMPLATE(T, poly_t) op,
+                              const TEMPLATE(T, ctx_t) ctx)
 {
     if (op->length == 0)
     {
-        TEMPLATE(T, poly_zero)(rop, ctx);
+        TEMPLATE(T, poly_zero) (rop, ctx);
         return;
     }
 
-    TEMPLATE(T, poly_fit_length)(rop, op->length, ctx);
-    _TEMPLATE(T, poly_make_monic)(rop->coeffs, op->coeffs, op->length, ctx);
-    _TEMPLATE(T, poly_set_length)(rop, op->length, ctx);
+    TEMPLATE(T, poly_fit_length) (rop, op->length, ctx);
+    _TEMPLATE(T, poly_make_monic) (rop->coeffs, op->coeffs, op->length, ctx);
+    _TEMPLATE(T, poly_set_length) (rop, op->length, ctx);
 }
 
 

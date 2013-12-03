@@ -31,24 +31,28 @@
 #include "templates.h"
 
 void
-_TEMPLATE(T, poly_mullow)(TEMPLATE(T, struct) * rop,
-                const TEMPLATE(T, struct) * op1, slong len1,
-                const TEMPLATE(T, struct) * op2, slong len2, slong n, const TEMPLATE(T, ctx_t) ctx)
+_TEMPLATE(T, poly_mullow) (TEMPLATE(T, struct) * rop,
+                           const TEMPLATE(T, struct) * op1, slong len1,
+                           const TEMPLATE(T, struct) * op2, slong len2,
+                           slong n, const TEMPLATE(T, ctx_t) ctx)
 {
-    if ( n < TEMPLATE(CAP_T, MULLOW_CLASSICAL_CUTOFF) || FLINT_MAX(len1, len2) < 6)
+    if (n < TEMPLATE(CAP_T, MULLOW_CLASSICAL_CUTOFF)
+        || FLINT_MAX(len1, len2) < 6)
     {
-        _TEMPLATE(T, poly_mullow_classical)(rop, op1, len1, op2, len2, n, ctx);
+        _TEMPLATE(T, poly_mullow_classical) (rop, op1, len1, op2, len2, n,
+                                             ctx);
     }
     else
     {
-        _TEMPLATE(T, poly_mullow_KS)(rop, op1, len1, op2, len2, n, ctx);
+        _TEMPLATE(T, poly_mullow_KS) (rop, op1, len1, op2, len2, n, ctx);
     }
 }
 
 void
-TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop,
-               const TEMPLATE(T, poly_t) op1, const TEMPLATE(T, poly_t) op2, slong n,
-               const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_mullow) (TEMPLATE(T, poly_t) rop,
+                          const TEMPLATE(T, poly_t) op1,
+                          const TEMPLATE(T, poly_t) op2,
+                          slong n, const TEMPLATE(T, ctx_t) ctx)
 {
     const slong len1 = op1->length;
     const slong len2 = op2->length;
@@ -56,7 +60,7 @@ TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop,
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {
-        TEMPLATE(T, poly_zero)(rop, ctx);
+        TEMPLATE(T, poly_zero) (rop, ctx);
         return;
     }
 
@@ -67,21 +71,21 @@ TEMPLATE(T, poly_mullow)(TEMPLATE(T, poly_t) rop,
     {
         TEMPLATE(T, poly_t) t;
 
-        TEMPLATE(T, poly_init2)(t, n, ctx);
-        _TEMPLATE(T, poly_mullow)(t->coeffs, op1->coeffs, op1->length,
-                        op2->coeffs, op2->length, n, ctx);
-        TEMPLATE(T, poly_swap)(rop, t, ctx);
-        TEMPLATE(T, poly_clear)(t, ctx);
+        TEMPLATE(T, poly_init2) (t, n, ctx);
+        _TEMPLATE(T, poly_mullow) (t->coeffs, op1->coeffs, op1->length,
+                                   op2->coeffs, op2->length, n, ctx);
+        TEMPLATE(T, poly_swap) (rop, t, ctx);
+        TEMPLATE(T, poly_clear) (t, ctx);
     }
     else
     {
-        TEMPLATE(T, poly_fit_length)(rop, n, ctx);
-        _TEMPLATE(T, poly_mullow)(rop->coeffs, op1->coeffs, op1->length,
-                        op2->coeffs, op2->length, n, ctx);
+        TEMPLATE(T, poly_fit_length) (rop, n, ctx);
+        _TEMPLATE(T, poly_mullow) (rop->coeffs, op1->coeffs, op1->length,
+                                   op2->coeffs, op2->length, n, ctx);
     }
 
-    _TEMPLATE(T, poly_set_length)(rop, n, ctx);
-    _TEMPLATE(T, poly_normalise)(rop, ctx);
+    _TEMPLATE(T, poly_set_length) (rop, n, ctx);
+    _TEMPLATE(T, poly_normalise) (rop, ctx);
 }
 
 
