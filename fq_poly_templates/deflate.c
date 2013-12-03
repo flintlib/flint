@@ -37,7 +37,7 @@ TEMPLATE(T, poly_deflate)(TEMPLATE(T, poly_t) result, const TEMPLATE(T, poly_t) 
 
     if (deflation == 0)
     {
-        flint_printf("Exception (fq_poly_deflate). Division by zero.\n");
+        TEMPLATE_PRINTF("Exception (%s_poly_deflate). Division by zero.\n", T);
         abort();
     }
 

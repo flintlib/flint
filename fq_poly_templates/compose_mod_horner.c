@@ -81,9 +81,10 @@ _TEMPLATE(T, poly_compose_mod_horner)(TEMPLATE(T, struct) * res,
 
 void
 TEMPLATE(T, poly_compose_mod_horner)(TEMPLATE(T, poly_t) res,
-                           const TEMPLATE(T, poly_t) poly1,
-                           const TEMPLATE(T, poly_t) poly2,
-                           const TEMPLATE(T, poly_t) poly3, const TEMPLATE(T, ctx_t) ctx)
+                                     const TEMPLATE(T, poly_t) poly1,
+                                     const TEMPLATE(T, poly_t) poly2,
+                                     const TEMPLATE(T, poly_t) poly3,
+                                     const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, t) inv3;
     slong len1 = poly1->length;
@@ -96,8 +97,8 @@ TEMPLATE(T, poly_compose_mod_horner)(TEMPLATE(T, poly_t) res,
 
     if (len3 == 0)
     {
-        flint_printf
-            ("Exception: division by zero in fq_poly_compose_mod_horner\n");
+        TEMPLATE_PRINTF(
+            "Exception: division by zero in %s_poly_compose_mod_horner\n", T);
         abort();
     }
 

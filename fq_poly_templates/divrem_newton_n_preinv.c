@@ -62,8 +62,8 @@ TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly
 
     if (lenB == 0)
     {
-        flint_printf
-            ("Exception (fq_poly_divrem_newton_n_preinv). Division by zero.\n");
+        TEMPLATE_PRINTF
+            ("Exception (%s_poly_divrem_newton_n_preinv). Division by zero.\n", T);
         abort();
     }
 
@@ -76,7 +76,7 @@ TEMPLATE(T, poly_divrem_newton_n_preinv)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly
 
     if (lenA > 2 * lenB - 2)
     {
-        flint_printf("Exception (fq_poly_divrem_newton_n_preinv).\n");
+        TEMPLATE_PRINTF("Exception (%s_poly_divrem_newton_n_preinv).\n", T);
     }
 
     if (Q == A || Q == B || Q == Binv)

@@ -46,7 +46,7 @@ TEMPLATE(T, poly_factor_equal_deg_prob)(TEMPLATE(T, poly_t) factor, flint_rand_t
 
     if (pol->length <= 1)
     {
-        flint_printf("Exception (fq_poly_factor_equal_deg_prob): \n");
+        TEMPLATE_PRINTF("Exception (%s_poly_factor_equal_deg_prob): \n", T);
         flint_printf("Input polynomial is linear.\n");
         abort();
     }
