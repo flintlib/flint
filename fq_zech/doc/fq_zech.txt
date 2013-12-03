@@ -37,7 +37,7 @@ void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p,
     use a Conway polynomial; if one is not available, a random
     irreducible polynomial will be used.
 
-    Assumes that $p$ is a prime.
+    Assumes that $p$ is a prime and $p^d < 2^{FLINT_BITS}$.
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
@@ -53,7 +53,7 @@ int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
     given size and the initialization is successful; otherwise,
     returns $0$.
 
-    Assumes that $p$ is a prime.
+    Assumes that $p$ is a prime and $p^d < 2^{FLINT_BITS}$.
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
@@ -66,7 +66,7 @@ void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p,
     with name \code{var} for the generator using a Conway polynomial
     for the modulus.
 
-    Assumes that $p$ is a prime.
+    Assumes that $p$ is a prime and $p^d < 2^{FLINT_BITS}$.
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
