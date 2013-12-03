@@ -43,7 +43,18 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     double beta;
     TEMPLATE(T, mat_t) HH, HHH;
 
+    TEMPLATE(T, poly_init)(v, ctx);
+    TEMPLATE(T, poly_make_monic)(v, poly, ctx);
+
     n = TEMPLATE(T, poly_degree)(poly, ctx);
+    if (n == 1)
+    {
+        TEMPLATE(T, poly_factor_insert)(res, poly, 1, ctx);
+        (*degs)[0]= 1;
+        TEMPLATE(T, poly_clear)(v, ctx);
+        return;
+    }
+
     beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);
@@ -55,7 +66,6 @@ TEMPLATE(T, poly_factor_distinct_deg)(TEMPLATE(T, poly_factor_t) res, const TEMP
     TEMPLATE(T, poly_init)(g, ctx);
     TEMPLATE(T, poly_init)(s, ctx);
     TEMPLATE(T, poly_init)(reducedH0, ctx);
-    TEMPLATE(T, poly_init)(v, ctx);
     TEMPLATE(T, poly_init)(vinv, ctx);
     TEMPLATE(T, poly_init)(tmp, ctx);
 
