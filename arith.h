@@ -34,6 +34,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "fmpq.h"
+#include "double_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -46,7 +47,7 @@ void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
 
 /* Various arithmetic functions **********************************************/
 
-void arith_primorial(fmpz_t res, slong n);
+#define arith_primorial fmpz_primorial
 
 void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n);
 void arith_harmonic_number(fmpq_t x, slong n);
@@ -195,11 +196,11 @@ void arith_landau_function_vec(fmpz * res, slong len);
 
 /* Dedekind sums *************************************************************/
 
-void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
-double arith_dedekind_sum_coprime_d(double h, double k);
-void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
-void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
-void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+#define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
+#define arith_dedekind_sum_coprime_d d_dedekind_sum_coprime
+#define arith_dedekind_sum_coprime_large fmpq_dedekind_sum_coprime_large
+#define arith_dedekind_sum_coprime fmpq_dedekind_sum_coprime
+#define arith_dedekind_sum fmpq_dedekind_sum
 
 /* Exponential sums **********************************************************/
 

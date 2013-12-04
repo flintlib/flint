@@ -313,4 +313,6 @@ slong fmpq_cfrac_bound(const fmpq_t x);
 }
 #endif
 
+#include "fmpq_special.h"
+
 #endif

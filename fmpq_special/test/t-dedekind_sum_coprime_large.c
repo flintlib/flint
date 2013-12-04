@@ -28,24 +28,23 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "arith.h"
 #include "ulong_extras.h"
 #include "math.h"
 
 int main(void)
 {
-    double s1, s2f;
     fmpz_t hh, kk;
-    fmpq_t s2;
+    fmpq_t s1, s2;
     slong h, k;
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("dedekind_sum_coprime_d....");
+    flint_printf("dedekind_sum_coprime_large....");
     fflush(stdout);
 
     fmpz_init(hh);
     fmpz_init(kk);
+    fmpq_init(s1);
     fmpq_init(s2);
 
     for (k = 0; k < 300; k++)
@@ -57,19 +56,15 @@ int main(void)
                 fmpz_set_si(hh, h);
                 fmpz_set_si(kk, k);
 
-                s1 = arith_dedekind_sum_coprime_d(h, k);
-                arith_dedekind_sum_naive(s2, hh, kk);
+                fmpq_dedekind_sum_coprime_large(s1, hh, kk);
+                fmpq_dedekind_sum_naive(s2, hh, kk);
 
-                s2f = ((double)fmpz_get_si(fmpq_numref(s2))) /
-                        fmpz_get_si(fmpq_denref(s2));
-
-                if (fabs(s1 - s2f) > 1e-10)
+                if (!fmpq_equal(s1, s2))
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("s(%wd,%wd)\n", h, k);
-                    flint_printf("s1: %.20f\n", s1);
-                    flint_printf("s2: %.20f\n", s2f);
-                    flint_printf("Exact: "); fmpq_print(s2); flint_printf("\n");
+                    flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
+                    flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
                     abort();
                 }
             }
@@ -78,6 +73,7 @@ int main(void)
 
     fmpz_clear(hh);
     fmpz_clear(kk);
+    fmpq_clear(s1);
     fmpq_clear(s2);
 
     FLINT_TEST_CLEANUP(state);

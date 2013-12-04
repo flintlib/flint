@@ -23,19 +23,20 @@
 
 ******************************************************************************/
 
-#include "arith.h"
+#include "fmpq.h"
+#include "double_extras.h"
 
 /* Small enough that a numerical computation is safe */
 #define DOUBLE_CUTOFF (UWORD(1) << 21)
 
 void
-arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
+fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
 {
     if (fmpz_cmp_ui(k, DOUBLE_CUTOFF) < 0)
     {
         double t;
 
-        t = arith_dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
+        t = d_dedekind_sum_coprime(*h, *k) * (6 * (*k));
 
         /* Round to nearest after truncation */
         if (t > 0)
@@ -49,6 +50,7 @@ arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
     }
     else
     {
-        arith_dedekind_sum_coprime_large(s, h, k);
+        fmpq_dedekind_sum_coprime_large(s, h, k);
     }
 }
+

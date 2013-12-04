@@ -122,7 +122,7 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
     return len;
 }
 
-void arith_primorial(fmpz_t res, slong n)
+void fmpz_primorial(fmpz_t res, ulong n)
 {
     mp_size_t len, pi;
     ulong bits;
@@ -149,3 +149,4 @@ void arith_primorial(fmpz_t res, slong n)
     len = mpn_prod_limbs(mpz_ptr->_mp_d, primes, pi, bits);
     mpz_ptr->_mp_size = len;
 }
+

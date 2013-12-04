@@ -19,39 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <math.h>
-#include "arith.h"
+#ifndef FMPZ_SPECIAL_H
+#define FMPZ_SPECIAL_H
 
-double
-arith_dedekind_sum_coprime_d(double h, double k)
-{
-    double a, b, t, s, sign;
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
-    if (k <= 2)
-        return 0.0;
+void fmpz_primorial(fmpz_t res, ulong n);
 
-    a = k;
-    b = h;
-    s = 0.0;
-    sign = 1.0;
-
-    while (b > 0)
-    {
-        s += sign * (1.0 + a*a + b*b) / (a * b);
-        t = fmod(a, b);
-        a = b;
-        b = t;
-        sign = -sign;
-    }
-
-    s *= (1./12);
-
-    if (sign < 0)
-        s -= 0.25;
-
-    return s;
+#ifdef __cplusplus
 }
+#endif
+
+#endif
+

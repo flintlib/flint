@@ -19,52 +19,39 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef DOUBLE_EXTRAS_H
-#define DOUBLE_EXTRAS_H
+#include "double_extras.h"
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
-#include <float.h>
-#include <gmp.h>
-#include "flint.h"
-
-#define ulong mp_limb_t
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-#define D_BITS 53
-#define D_EPS 2.2204460492503130808e-16
-#define D_INF HUGE_VAL
-#define D_NAN (HUGE_VAL - HUGE_VAL)
-
-double d_randtest(flint_rand_t state);
-
-static __inline__ double
-d_polyval(const double * poly, int len, double x)
+double
+d_dedekind_sum_coprime(double h, double k)
 {
-    double t;
-    int i;
+    double a, b, t, s, sign;
 
-    for (t = poly[len-1], i = len-2; i >= 0; i--)
-        t = poly[i] + x * t;
+    if (k <= 2)
+        return 0.0;
 
-    return t;
+    a = k;
+    b = h;
+    s = 0.0;
+    sign = 1.0;
+
+    while (b > 0)
+    {
+        s += sign * (1.0 + a*a + b*b) / (a * b);
+        t = fmod(a, b);
+        a = b;
+        b = t;
+        sign = -sign;
+    }
+
+    s *= (1./12);
+
+    if (sign < 0)
+        s -= 0.25;
+
+    return s;
 }
 
-double d_lambertw(double x);
-
-double d_dedekind_sum_coprime(double h, double k);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

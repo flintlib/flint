@@ -19,51 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "arith.h"
-#include "ulong_extras.h"
+#ifndef FMPQ_SPECIAL_H
+#define FMPQ_SPECIAL_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
-int main(void)
-{
-    ulong k;
-    fmpz_t x;
-    fmpz_t y;
+void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
+void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
+void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
+void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("primorial....");
-    fflush(stdout);
-
-    fmpz_init(x);
-    fmpz_init(y);
-    fmpz_set_ui(y, 1);
-
-    for (k = 0; k < 10000; k++)
-    {
-       arith_primorial(x, k);
-       if (n_is_prime(k))
-          fmpz_mul_ui(y, y, k);
-       if (!fmpz_equal(x, y))
-       {
-          flint_printf("FAIL:\n");
-          flint_printf("primorial of %wu disagrees with direct product\n", k); 
-          fmpz_print(x);
-          flint_printf("\n");
-          abort();
-       }
-    }
-
-    fmpz_clear(x);
-    fmpz_clear(y);
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+#ifdef __cplusplus
 }
+#endif
+
+#endif
+
