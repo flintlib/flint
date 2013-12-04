@@ -19,75 +19,65 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpz.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-#include "arith.h"
-
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
-{
-    slong i = 0;
-
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    arith_divisors(p, t);
-
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
-    {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
 
 int main(void)
 {
-    fmpz_t m, a, b;
-    slong n, k;
-
+    slong iter;
     FLINT_TEST_INIT(state);
 
-    flint_printf("divisor_sigma....");
+    flint_printf("chebyshev_u....");
     fflush(stdout);
 
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        for (k = 0; k < 10; k++)
-        {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong value for n=%wd, k=%wd\n", n, k);
-                abort();
-            }
-        }
-    }
+        ulong n;
+        fmpz_t x, y, z;
+        fmpz_poly_t p;
 
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
+        fmpz_init(x);
+        fmpz_init(y);
+        fmpz_init(z);
+        fmpz_poly_init(p);
+
+        n = n_randint(state, 40);
+        fmpz_randtest(x, state, 100);
+
+        fmpz_chebyshev_u(y, n, x);
+
+        fmpz_poly_chebyshev_u(p, n);
+        fmpz_poly_evaluate_fmpz(z, p, x);
+
+        if (!fmpz_equal(y, z))
+        {
+            flint_printf("FAIL: n = %wu\n\n", n);
+            fmpz_print(x); printf("\n\n");
+            fmpz_print(y); printf("\n\n");
+            fmpz_print(z); printf("\n\n");
+            abort();
+        }
+
+        fmpz_chebyshev_u(x, n, x);
+
+        if (!fmpz_equal(x, z))
+        {
+            flint_printf("FAIL (aliasing): n = %wu\n\n", n);
+            fmpz_print(x); printf("\n\n");
+            fmpz_print(z); printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(x);
+        fmpz_clear(y);
+        fmpz_clear(z);
+        fmpz_poly_clear(p);
+    }
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

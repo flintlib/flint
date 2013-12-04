@@ -24,7 +24,6 @@
 ******************************************************************************/
 
 #include "fmpz.h"
-#include "arith.h"
 
 void
 _fmpz_euler_phi(fmpz_t res, const fmpz_factor_t fac)
