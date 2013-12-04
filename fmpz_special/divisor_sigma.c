@@ -24,44 +24,61 @@
 ******************************************************************************/
 
 #include "fmpz.h"
-#include "arith.h"
+#include "fmpz_vec.h"
 
-void arith_euler_phi(fmpz_t res, const fmpz_t n)
+void
+_fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
 {
-    fmpz_factor_t factors;
-    fmpz_t t;
-    ulong exp;
     slong i;
 
-    if (fmpz_sgn(n) <= 0)
+    fmpz_one(res);
+
+    if (fac->num == 0)
+        return;
+
+    if (k == 0)
+    {
+        for (i = 0; i < fac->num; i++)
+            fmpz_mul_ui(res, res, fac->exp[i] + 1);
+    }
+    else
+    {
+        fmpz * p;
+        fmpz_t r;
+
+        p = _fmpz_vec_init(fac->num);
+        fmpz_init(r);
+
+        for (i = 0; i < fac->num; i++)
+        {
+            fmpz_pow_ui(p + i, fac->p + i, k);
+            fmpz_pow_ui(r, p + i, fac->exp[i]  + 1);
+            fmpz_sub_ui(r, r, 1);
+            fmpz_sub_ui(p + i, p + i, 1);
+            fmpz_divexact(p + i, r, p + i);
+        }
+
+        _fmpz_vec_prod(res, p, fac->num);
+
+        _fmpz_vec_clear(p, fac->num);
+        fmpz_clear(r);
+    }
+}
+
+void
+fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+{
+    fmpz_factor_t fac;
+
+    if (fmpz_is_zero(n))
     {
         fmpz_zero(res);
         return;
     }
 
-    if (fmpz_abs_fits_ui(n))
-    {
-        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
-        return;
-    }
-
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
-    fmpz_one(res);
-
-    fmpz_init(t);
-    for (i = 0; i < factors->num; i++)
-    {
-        fmpz_sub_ui(t, factors->p + i, UWORD(1));
-        fmpz_mul(res, res, t);
-        exp = factors->exp[i];
-        if (exp != 1)
-        {
-            fmpz_pow_ui(t, factors->p + i, exp - UWORD(1));
-            fmpz_mul(res, res, t);
-        }
-    }
-
-    fmpz_clear(t);
-    fmpz_factor_clear(factors);
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    _fmpz_divisor_sigma(res, fac, k);
+    fmpz_factor_clear(fac);
 }
+

@@ -26,31 +26,51 @@
 #include "fmpz.h"
 #include "arith.h"
 
-int arith_moebius_mu(const fmpz_t n)
+void
+_fmpz_euler_phi(fmpz_t res, const fmpz_factor_t fac)
 {
-    fmpz_factor_t factors;
+    fmpz_t t;
     slong i;
-    int mu;
 
-    if (fmpz_abs_fits_ui(n))
-        return n_moebius_mu(fmpz_get_ui(n));
+    fmpz_init(t);
 
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
+    fmpz_one(res);
 
-    mu = 1;
-    for (i = 0; i < factors->num; i++)
+    for (i = 0; i < fac->num; i++)
     {
-        if (factors->exp[i] != UWORD(1))
+        fmpz_sub_ui(t, fac->p + i, 1);
+        fmpz_mul(res, res, t);
+
+        if (fac->exp[i] != 1)
         {
-            mu = 0;
-            break;
+            fmpz_pow_ui(t, fac->p + i, fac->exp[i] - 1);
+            fmpz_mul(res, res, t);
         }
     }
 
-    if (factors->num % 2)
-        mu = -mu;
-
-    fmpz_factor_clear(factors);
-    return mu;
+    fmpz_clear(t);
 }
+
+void
+fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+{
+    fmpz_factor_t fac;
+
+    if (fmpz_sgn(n) <= 0)
+    {
+        fmpz_zero(res);
+        return;
+    }
+
+    if (fmpz_abs_fits_ui(n))
+    {
+        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
+        return;
+    }
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    _fmpz_euler_phi(res, fac);
+    fmpz_factor_clear(fac);
+}
+

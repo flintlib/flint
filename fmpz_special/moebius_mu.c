@@ -19,35 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_SPECIAL_H
-#define FMPZ_SPECIAL_H
+#include "fmpz.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+int
+_fmpz_moebius_mu(const fmpz_factor_t fac)
+{
+    slong i;
 
-/* Primorials */
+    for (i = 0; i < fac->num; i++)
+        if (fac->exp[i] != 1)
+            return 0;
 
-void fmpz_primorial(fmpz_t res, ulong n);
-
-/* Multiplicative functions */
-
-void _fmpz_euler_phi(fmpz_t res, const fmpz_factor_t fac);
-void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
-
-int _fmpz_moebius_mu(const fmpz_factor_t fac);
-int fmpz_moebius_mu(const fmpz_t n);
-
-void _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
-void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
-
-#ifdef __cplusplus
+    return (fac->num % 2) ? -1 : 1;
 }
-#endif
 
-#endif
+int
+fmpz_moebius_mu(const fmpz_t n)
+{
+    fmpz_factor_t fac;
+    int mu;
+
+    if (fmpz_abs_fits_ui(n))
+        return n_moebius_mu(fmpz_get_ui(n));
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    mu = _fmpz_moebius_mu(fac);
+    fmpz_factor_clear(fac);
+
+    return mu;
+}
 

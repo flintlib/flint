@@ -56,11 +56,10 @@ void arith_ramanujan_tau(fmpz_t res, const fmpz_t n);
 void arith_ramanujan_tau_series(fmpz_poly_t res, slong n);
 
 void arith_divisors(fmpz_poly_t res, const fmpz_t n);
-void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 
-int arith_moebius_mu(const fmpz_t n);
-
-void arith_euler_phi(fmpz_t res, const fmpz_t n);
+#define arith_divisor_sigma fmpz_divisor_sigma
+#define arith_moebius_mu fmpz_moebius_mu
+#define arith_euler_phi fmpz_euler_phi
 
 /* Stirling numbers **********************************************************/
 

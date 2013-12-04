@@ -28,7 +28,7 @@
 #include <limits.h>
 #include <gmp.h>
 #include "flint.h"
-#include "arith.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 
@@ -37,7 +37,7 @@ void check(fmpz_t n, int expected)
 {
     int mu;
 
-    mu = arith_moebius_mu(n);
+    mu = fmpz_moebius_mu(n);
     if (mu != expected)
     {
         flint_printf("FAIL:");

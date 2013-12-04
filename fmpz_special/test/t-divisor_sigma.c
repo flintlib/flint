@@ -28,7 +28,7 @@
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz.h"
-#include "arith.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
 
 void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
@@ -73,7 +73,7 @@ int main(void)
         for (k = 0; k < 10; k++)
         {
             fmpz_set_ui(m, n);
-            arith_divisor_sigma(a, m, k);
+            fmpz_divisor_sigma(a, m, k);
             fmpz_sigma_naive(b, n, k);
             if (!fmpz_equal(a, b))
             {
@@ -92,3 +92,4 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
+
