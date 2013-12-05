@@ -1947,7 +1947,26 @@ void fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     As expected, aliasing between \code{res} and $a$ is supported.  However, 
     \code{res} may not be aliased with a coefficient of $f$.
 
-void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
+
+void _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden, 
+                                    const fmpz * f, slong len, 
+                                    const fmpz_t anum, const fmpz_t aden)
+
+    Evaluates the polynomial \code{(f, len)} at the rational 
+    \code{(anum, aden)} using a divide and conquer approach, and sets
+    \code{(rnum, rden)} to the result in lowest terms. Assumes that
+    the length of the polynomial is at least one.
+    
+    Aliasing between \code{(rnum, rden)} and \code{(anum, aden)} or any of 
+    the coefficients of $f$ is not supported.
+
+void fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f, 
+                                                                 const fmpq_t a)
+
+    Evaluates the polynomial $f$ at the rational $a$ using a divide
+    and conquer approach, and sets \code{res} to the result.
+
+void _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, slong len, 
                                     const fmpz_t anum, const fmpz_t aden)
 
@@ -1958,13 +1977,13 @@ void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
     Aliasing between \code{(rnum, rden)} and \code{(anum, aden)} or any of 
     the coefficients of $f$ is not supported.
 
-void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
-                                                                 const mpq_t a)
+void fmpz_poly_evaluate_horner_fmpq(fmpq_t res, const fmpz_poly_t f, 
+                                                                 const fmpq_t a)
 
     Evaluates the polynomial $f$ at the rational $a$ using Horner's rule, and 
     sets \code{res} to the result.
 
-void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
                              const fmpz * f, slong len, 
                              const fmpz_t anum, const fmpz_t aden)
 
@@ -1974,6 +1993,11 @@ void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden,
 
     Aliasing between \code{(rnum, rden)} and \code{(anum, aden)} or any of 
     the coefficients of $f$ is not supported.
+
+void fmpz_poly_evaluate_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a)
+
+    Evaluates the polynomial $f$ at the rational $a$, and 
+    sets \code{res} to the result.
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 

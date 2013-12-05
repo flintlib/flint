@@ -19,8 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,46 +27,33 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpq.h"
 
 void
-_fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
-                        const fmpz * poly, const fmpz_t den, slong len, 
-                        const fmpz_t anum, const fmpz_t aden)
+_fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
+                               const fmpz * f, slong len, 
+                               const fmpz_t anum, const fmpz_t aden)
 {
-    fmpz_t d;
-    
-    _fmpz_poly_evaluate_fmpq(rnum, rden, poly, len, anum, aden);
-    fmpz_mul(rden, rden, den);
-    
-    fmpz_init(d);
-    fmpz_gcd(d, rnum, rden);
-    if (!fmpz_is_one(d))
-    {
-        fmpz_divexact(rnum, rnum, d);
-        fmpz_divexact(rden, rden, d);
-    }
-    fmpz_clear(d);
+    if (len < 40 || fmpz_bits(aden) > 0.003 * len * len)
+        _fmpz_poly_evaluate_horner_fmpq(rnum, rden, f, len, anum, aden);
+    else
+        _fmpz_poly_evaluate_divconquer_fmpq(rnum, rden, f, len, anum, aden);
 }
 
-void 
-fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
+void
+fmpz_poly_evaluate_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a)
 {
-    if (res != a)
+    if (res == a)
     {
-        _fmpq_poly_evaluate_fmpq(fmpq_numref(res), fmpq_denref(res),
-            poly->coeffs, poly->den, poly->length, 
-            fmpq_numref(a), fmpq_denref(a));
+        fmpq_t t;
+        fmpq_init(t);
+        fmpz_poly_evaluate_fmpq(t, f, a);
+        fmpq_swap(res, t);
+        fmpq_clear(t);
     }
     else
     {
-        fmpq_t t;
-
-        fmpq_init(t);
-        fmpq_set(t, a);
-        fmpq_poly_evaluate_fmpq(res, poly, t);
-        fmpq_clear(t);
+        _fmpz_poly_evaluate_fmpq(fmpq_numref(res), fmpq_denref(res),
+            f->coeffs, f->length, fmpq_numref(a), fmpq_denref(a));
     }
 }
 
