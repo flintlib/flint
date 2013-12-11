@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -29,29 +30,14 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, const fmpz * f, slong len, 
-                        const fmpz_t anum, const fmpz_t aden)
-{
-    _fmpz_poly_evaluate_horner_mpq(rnum, rden, f, len, anum, aden);
-}
-
-void
 fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 {
-    fmpz_t rnum, rden, anum, aden;
-    fmpz_init(rnum);
-    fmpz_init(rden);
-    fmpz_init(anum);
-    fmpz_init(aden);
-    fmpz_set_mpz(anum, mpq_numref(a));
-    fmpz_set_mpz(aden, mpq_denref(a));
-
-    _fmpz_poly_evaluate_mpq(rnum, rden, f->coeffs, f->length, anum, aden);
-
-    fmpz_get_mpz(mpq_numref(res), rnum);
-    fmpz_get_mpz(mpq_denref(res), rden);
-    fmpz_clear(rnum);
-    fmpz_clear(rden);
-    fmpz_clear(anum);
-    fmpz_clear(aden);
+    fmpq_t r, b;
+    fmpq_init(r);
+    fmpq_init(b);
+    fmpq_set_mpq(b, a);
+    fmpz_poly_evaluate_fmpq(r, f, b);
+    fmpq_get_mpq(res, r);
+    fmpq_clear(r);
+    fmpq_clear(b);
 }

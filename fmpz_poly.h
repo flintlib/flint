@@ -41,7 +41,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "nmod_poly.h"
-
+#include "fmpq.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -826,16 +826,26 @@ void _fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, slong len, const fmpz_
 
 void fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
-void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
+void _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, slong len, 
                                     const fmpz_t anum, const fmpz_t aden);
 
-void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
-                                                                const mpq_t a);
+void fmpz_poly_evaluate_horner_fmpq(fmpq_t res, const fmpz_poly_t f, 
+                                                                const fmpq_t a);
 
-void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden,
-                             const fmpz * f, slong len, 
-                             const fmpz_t anum, const fmpz_t aden);
+void _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden, 
+                                    const fmpz * f, slong len, 
+                                    const fmpz_t anum, const fmpz_t aden);
+
+void fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f, 
+                                                                const fmpq_t a);
+
+void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
+                                    const fmpz * f, slong len, 
+                                    const fmpz_t anum, const fmpz_t aden);
+
+void fmpz_poly_evaluate_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a);
+
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
 

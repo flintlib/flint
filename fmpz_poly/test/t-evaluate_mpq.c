@@ -38,7 +38,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("evaluate_horner_mpq....");
+    flint_printf("evaluate_mpq....");
     fflush(stdout);
 
     
@@ -62,8 +62,8 @@ main(void)
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
 
-        fmpz_poly_evaluate_horner_mpq(y, f, x);
-        fmpz_poly_evaluate_horner_mpq(x, f, x);
+        fmpz_poly_evaluate_mpq(y, f, x);
+        fmpz_poly_evaluate_mpq(x, f, x);
 
         result = (mpq_equal(x, y));
         if (!result)
@@ -104,11 +104,11 @@ main(void)
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
 
-        fmpz_poly_evaluate_horner_mpq(y, f, x);
-        fmpz_poly_evaluate_horner_mpq(z, g, x);
+        fmpz_poly_evaluate_mpq(y, f, x);
+        fmpz_poly_evaluate_mpq(z, g, x);
         mpq_add(y, y, z);
         fmpz_poly_add(f, f, g);
-        fmpz_poly_evaluate_horner_mpq(z, f, x);
+        fmpz_poly_evaluate_mpq(z, f, x);
 
         result = (mpq_equal(y, z));
         if (!result)
@@ -150,11 +150,11 @@ main(void)
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
 
-        fmpz_poly_evaluate_horner_mpq(y, f, x);
-        fmpz_poly_evaluate_horner_mpq(z, g, x);
+        fmpz_poly_evaluate_mpq(y, f, x);
+        fmpz_poly_evaluate_mpq(z, g, x);
         mpq_mul(y, y, z);
         fmpz_poly_mul(f, f, g);
-        fmpz_poly_evaluate_horner_mpq(z, f, x);
+        fmpz_poly_evaluate_mpq(z, f, x);
 
         result = (mpq_equal(y, z));
         if (!result)
