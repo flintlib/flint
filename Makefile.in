@@ -22,7 +22,7 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
-   fq_poly_factor_templates
+   fq_poly_factor_templates fq_templates
 
 export
 
