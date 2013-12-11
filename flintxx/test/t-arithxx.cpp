@@ -213,7 +213,7 @@ test_sum_of_squares()
 int
 main()
 {
-    std::cout << "t-arithxx....";
+    std::cout << "arithxx....";
 
     tassert(primorial(4) == 2*3);
     tassert(harmonic_number(3)
