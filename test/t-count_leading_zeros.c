@@ -41,7 +41,7 @@ int main(void)
    for (i = 0; i < 1000000; i++)
    {
       mp_limb_t n;
-      unsigned int count;
+      unsigned int count = 0;
 
       n = n_randtest(state);
 
