@@ -41,7 +41,9 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
    
    for (i = m - 1; i >= n; i--)
    {
+#pragma GCC diagnostic ignored "-Wunused-variable"
       flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);
+#pragma GCC diagnostic warning "-Wunused-variable"
       a[i] -= mpn_submul_1(a + i - n, b, n, q[i - n]);
 
       if (mpn_cmp(a + i - n, b, n) >= 0 || a[i] != 0)
