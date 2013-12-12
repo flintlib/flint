@@ -182,7 +182,7 @@
 #if (GMP_LIMB_BITS == 32 && defined (__arm__))
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                \
-  __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"			 \
+  __asm__ (".arm\n\tadds\t%1, %4, %5\n\tadc\t%0, %2, %3"			 \
 	   : "=r" (sh), "=&r" (sl)					                \
 	   : "r" (ah), "rI" (bh), "%r" (al), "rI" (bl) : "cc")
 
@@ -191,38 +191,38 @@
     if (__builtin_constant_p (al))					              \
       {									                             \
 	if (__builtin_constant_p (ah))					              \
-	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
+	  __asm__ (".arm\n\trsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
 		   : "=r" (sh), "=&r" (sl)				                    \
 		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
 	else								                                \
-	  __asm__ ("rsbs\t%1, %5, %4\n\tsbc\t%0, %2, %3"		     \
+	  __asm__ (".arm\n\trsbs\t%1, %5, %4\n\tsbc\t%0, %2, %3"		     \
 		   : "=r" (sh), "=&r" (sl)				                    \
 		   : "r" (ah), "rI" (bh), "rI" (al), "r" (bl) : "cc");  \
       }									                             \
     else if (__builtin_constant_p (ah))					        \
       {									                             \
 	if (__builtin_constant_p (bl))					              \
-	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
+	  __asm__ (".arm\n\tsubs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
 		   : "=r" (sh), "=&r" (sl)				                    \
 		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
 	else								                                \
-	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
+	  __asm__ (".arm\n\trsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
 		   : "=r" (sh), "=&r" (sl)				                    \
 		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
       }									                             \
     else if (__builtin_constant_p (bl))					        \
       {									                             \
 	if (__builtin_constant_p (bh))					              \
-	  __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"		     \
+	  __asm__ (".arm\n\tsubs\t%1, %4, %5\n\tsbc\t%0, %2, %3"		     \
 		   : "=r" (sh), "=&r" (sl)				                    \
 		   : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc");  \
 	else								                                \
-	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
+	  __asm__ (".arm\n\tsubs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
 		   : "=r" (sh), "=&r" (sl)				                    \
 		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
       }									                             \
     else /* only bh might be a constant */				        \
-      __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"			  \
+      __asm__ (".arm\n\tsubs\t%1, %4, %5\n\tsbc\t%0, %2, %3"			  \
 	       : "=r" (sh), "=&r" (sl)					              \
 	       : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc"); \
     } while (0)
@@ -230,10 +230,10 @@
 #if defined(__arm_m__) /* only M-series support multiply-long */
 
 #define umul_ppmm(xh, xl, a, b) \
-  __asm__ ("umull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+  __asm__ (".arm\n\tumull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
 
 #define smul_ppmm(xh, xl, a, b) \
-  __asm__ ("smull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+  __asm__ (".arm\n\tsmull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
 
 #endif /* M-series */
 
