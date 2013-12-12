@@ -251,7 +251,7 @@
 #define NEED_CLZ_TAB
 
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__)) || !defined (__arm_m__)
-#if !((GMP_LIMB_BITS == 64 && defined (__ia64))
+#if !(GMP_LIMB_BITS == 64 && defined (__ia64))
 
 #define umul_ppmm(w1, w0, u, v)				 \
   do {									          \
