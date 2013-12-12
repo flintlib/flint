@@ -113,7 +113,7 @@ test_vec()
 {
     nmodxx_ctx c(31);
     nmod_vecxx v1(10, c), v2(10, c);
-    for(unsigned i = 0;i < v1.size();++i)
+    for(slong i = 0;i < (slong) v1.size();++i)
     {
         v1[i] = nmodxx::red(0, c);
         v2[i] = nmodxx::red(0, c);

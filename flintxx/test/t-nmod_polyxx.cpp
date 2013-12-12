@@ -142,6 +142,8 @@ test_arithmetic()
     tassert(((h*g) % h).is_zero());
 
     f.set_randtest(state, 10);
+    g %= f;
+    h %= f;
     tassert(h.mulmod(g, f) == ((h*g) % f));
     tassert(h.mulmod(g, f) == h.mulmod_preinv(g, f,
                 f.reverse(f.length()).inv_series(f.length())));

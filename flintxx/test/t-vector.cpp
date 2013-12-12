@@ -54,7 +54,7 @@ void test(const Vec& original, const char* str = "(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     Vec w(original);
     Vec u(original);
     Vec x(original);
-    for(slong i = 0;i < v.size();++i)
+    for(slong i = 0;i < (slong) v.size();++i)
     {
         v[i] = i;
         w[i] = WORD(0);
