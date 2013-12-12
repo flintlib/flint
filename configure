@@ -437,7 +437,7 @@ esac
 mkdir -p build
 rm -f build/test-popcnt > /dev/null 2>&1
 MSG="Testing __builtin_popcountl..."
-([ -x /bin/echo ] && /bin/echo -n "$MSG") || echo "$MSG"
+printf "%s" "$MSG"
 echo "int main(int argc, char ** argv) { 
 #if defined(_WIN64)
 return __builtin_popcountll(argc) == 100;
@@ -447,21 +447,21 @@ return __builtin_popcountl(argc) == 100;
 }" > build/test-popcnt.c
 $CC build/test-popcnt.c -o ./build/test-popcnt > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   echo "yes"
+   printf "%s\n" "yes"
    CONFIG_POPCNT_INTRINSICS="#define POPCNT_INTRINSICS"
 
    if [ "$MACHINE" = "x86_64" ]; then
       MSG="Testing native popcount..."
-      ([ -x /bin/echo ] && /bin/echo -n "$MSG") || echo "$MSG"
+      printf "%s" "$MSG"
       touch build/test-popcnt.c
       rm build/test-popcnt
       $CC -mpopcnt build/test-popcnt.c -o ./build/test-popcnt > /dev/null 2>&1
       build/test-popcnt > /dev/null 2>&1
       if [ $? -eq 0 ]; then
-         echo "yes"
+         printf "%s\n" "yes"
          POPCNT_FLAG="-mpopcnt"
       else
-         echo "no"
+         printf "%s\n" "no"
       fi
       rm -f build/test-popcnt{,.c}
    #in case -mpopcnt is not available, the test program will use an illegal
@@ -470,7 +470,7 @@ if [ $? -eq 0 ]; then
    fi 2> /dev/null
 else
    rm -f build/test-popcnt.c
-   echo "no"
+   printf "%s\n" "no"
 fi
 
 #defaults for CFLAGS
@@ -514,21 +514,21 @@ if [ "$TLS" = "1" ]; then
    mkdir -p build
    rm -f build/test-tls > /dev/null 2>&1
    MSG="Testing __thread..."
-   ([ -x /bin/echo ] && /bin/echo -n "$MSG") || echo "$MSG"
+   printf "%s" "$MSG"
    echo "__thread int x = 42; int main(int argc, char ** argv) { return x != 42; }" > build/test-tls.c
    $CC build/test-tls.c -o ./build/test-tls > /dev/null 2>&1
    if [ $? -eq 0 ]; then
       build/test-tls > /dev/null 2>&1
       if [ $? -eq 0 ]; then
-         echo "yes"
+         printf "%s\n" "yes"
          CONFIG_TLS="#define HAVE_TLS 1"
       else
-         echo "no"
+         printf "%s\n" "no"
       fi
       rm -f build/test-tls{,.c}
    else
       rm -f build/test-tls.c
-      echo "no"
+      printf "%s\n" "no"
    #build-tls can segfault on systems where tls is not available
    fi 2> /dev/null
 fi
