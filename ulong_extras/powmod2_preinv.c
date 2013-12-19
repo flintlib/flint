@@ -62,12 +62,16 @@ n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
 mp_limb_t
 n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
 {
+    ulong norm;
+    
     if (exp < WORD(0))
     {
         a = n_invmod(a, n);
         exp = -exp;
     }
 
-    return n_powmod2_ui_preinv(a, exp, n, ninv);
+    count_leading_zeros(norm, n);
+
+    return n_powmod_ui_preinv(a<<norm, exp, n<<norm, ninv, norm) >> norm;
 }
 
