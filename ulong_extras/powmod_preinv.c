@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2010, 2012 William Hart
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -28,27 +28,31 @@
 #include "ulong_extras.h"
 
 mp_limb_t
-n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, 
-                                          mp_limb_t ninv, ulong norm)
+n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv, ulong norm)
 {
-    mp_limb_t q0, q1, r, p_hi, p_lo;
+    mp_limb_t x;
 
-    /* renormalise product */
-    a >>= norm;
+    if (n == UWORD(1) || a == 0) return UWORD(0);
 
-    /* multiply */
-    umul_ppmm(p_hi, p_lo, a, b);
-    
-    /* reduce mod n */
+    if (exp)
     {
-        umul_ppmm(q1, q0, ninv, p_hi);
-        add_ssaaaa(q1, q0, q1, q0, p_hi, p_lo);
+       while ((exp & 1) == 0)
+       {
+          a = n_mulmod_preinv(a, a, n, ninv, norm);
+          exp >>= 1;
+       }
 
-        r = (p_lo - (q1 + 1) * n);
+       x = a;
+       
+       while (exp >>= 1)
+       {
+          a = n_mulmod_preinv(a, a, n, ninv, norm);
+          if (exp & 1) x = n_mulmod_preinv(x, a, n, ninv, norm);
+       }
 
-        if (r >= q0)
-            r += n;
-
-        return (r < n ? r : r - n);
-    }
+       return x;
+    } else
+       return (UWORD(1)<<norm);
 }
+
+

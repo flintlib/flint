@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2013 William Hart
 
 ******************************************************************************/
 
@@ -30,17 +30,30 @@
 mp_limb_t
 n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
 {
-    mp_limb_t x, y;
-
-    if (n == UWORD(1)) return UWORD(0);
+    mp_limb_t x;
+   
+    if (n == UWORD(1) || a == 0) return UWORD(0);
 
     x = UWORD(1);
-    y = a;
-    while (exp)
+    
+    if (exp)
     {
-        if (exp & 1) x = n_mulmod2_preinv(x, y, n, ninv);
-        exp >>= 1;
-        if (exp) y = n_mulmod2_preinv(y, y, n, ninv);
+       while ((exp & 1) == 0)
+       {
+          a = n_mulmod2_preinv(a, a, n, ninv);
+          exp >>= 1;
+       }
+
+       if (a >= n)
+          x = n_mod2_preinv(a, n, ninv);
+       else
+          x = a;
+       
+       while (exp >>= 1)
+       {
+          a = n_mulmod2_preinv(a, a, n, ninv);
+          if (exp & 1) x = n_mulmod2_preinv(x, a, n, ninv);
+       }
     }
 
     return x;

@@ -302,6 +302,10 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
     \code{norm} will shift the product right by this many bits before
     reducing it.
 
+    Note, we explicitly assume that the bottom \code{norm} bits of $a$
+    are zero, as will be the case when $a$ and $b$ are left shifted by
+    this many bits on account of the normalisation of $n$.
+
     The algorithm use is that of Granlund and M\"oller~\citep{GraMol2010}.
 
     % Torbjorn Granlund and Niels Moller
@@ -461,6 +465,20 @@ mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
+mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
+                                                    mp_limb_t ninv, ulong norm)
+
+    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
+    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, exp $> 0$ and
+    for $n$ to be normalised.
+
+    If $a$ is shifted to the left as a result of normalising $n$, the number
+    of bits it was shifted should be passed as norm. The return value will
+    then need to be shifted right by this number of bits by the caller.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
+  
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     Returns \code{(a^exp) % n}. We require $0 \leq a < n$, but there are 
