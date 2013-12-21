@@ -30,8 +30,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#define FMPZ_POLY_INV_NEWTON_CUTOFF  32
-
 void 
 _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
 {
@@ -47,7 +45,7 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
 
         W = _fmpz_vec_init(alloc);
 
-        for (i = 1; (1L << i) < n; i++) ;
+        for (i = 1; (WORD(1) << i) < n; i++) ;
 
         a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = n;

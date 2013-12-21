@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("evaluate_divconquer_fmpz....");
+    flint_printf("evaluate_divconquer_fmpz....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -60,9 +60,9 @@ main(void)
         result = (fmpz_equal(a, b));
         if (!result)
         {
-            printf("FAIL (alias):\n");
-            fmpz_print(a), printf("\n\n");
-            fmpz_print(b), printf("\n\n");
+            flint_printf("FAIL (alias):\n");
+            fmpz_print(a), flint_printf("\n\n");
+            fmpz_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -90,10 +90,10 @@ main(void)
         result = (fmpz_equal(b, c));
         if (!result)
         {
-            printf("FAIL (cmp with Horner):\n");
-            fmpz_print(a), printf("\n\n");
-            fmpz_print(b), printf("\n\n");
-            fmpz_print(c), printf("\n\n");
+            flint_printf("FAIL (cmp with Horner):\n");
+            fmpz_print(a), flint_printf("\n\n");
+            fmpz_print(b), flint_printf("\n\n");
+            fmpz_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -103,8 +103,8 @@ main(void)
         fmpz_poly_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

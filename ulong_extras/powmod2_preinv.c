@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2013 William Hart
 
 ******************************************************************************/
 
@@ -30,17 +30,30 @@
 mp_limb_t
 n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
 {
-    mp_limb_t x, y;
+    mp_limb_t x;
+   
+    if (n == UWORD(1) || a == 0) return UWORD(0);
 
-    if (n == 1UL) return 0UL;
-
-    x = 1UL;
-    y = a;
-    while (exp)
+    x = UWORD(1);
+    
+    if (exp)
     {
-        if (exp & 1) x = n_mulmod2_preinv(x, y, n, ninv);
-        exp >>= 1;
-        if (exp) y = n_mulmod2_preinv(y, y, n, ninv);
+       while ((exp & 1) == 0)
+       {
+          a = n_mulmod2_preinv(a, a, n, ninv);
+          exp >>= 1;
+       }
+
+       if (a >= n)
+          x = n_mod2_preinv(a, n, ninv);
+       else
+          x = a;
+       
+       while (exp >>= 1)
+       {
+          a = n_mulmod2_preinv(a, a, n, ninv);
+          if (exp & 1) x = n_mulmod2_preinv(x, a, n, ninv);
+       }
     }
 
     return x;
@@ -49,12 +62,16 @@ n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
 mp_limb_t
 n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
 {
-    if (exp < 0L)
+    ulong norm;
+    
+    if (exp < WORD(0))
     {
         a = n_invmod(a, n);
         exp = -exp;
     }
 
-    return n_powmod2_ui_preinv(a, exp, n, ninv);
+    count_leading_zeros(norm, n);
+
+    return n_powmod_ui_preinv(a<<norm, exp, n<<norm, ninv, norm) >> norm;
 }
 

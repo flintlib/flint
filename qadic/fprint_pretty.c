@@ -75,7 +75,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
 
         if (i < len)
         {
-            printf("ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
+            flint_printf("ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
             abort();
         }
 
@@ -101,7 +101,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
                     fputc('*', file);
                     fmpz_fprint(file, p);
                     if (j + v != 1)
-                        fprintf(file, "^%ld", j + v);
+                        flint_fprintf(file, "^%wd", j + v);
                 }
             }
 
@@ -116,7 +116,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
 
             if (!_fmpz_vec_is_zero(d, len))
             {
-                fprintf(file, " + ");
+                flint_fprintf(file, " + ");
                 fputc('(', file);
                 _fmpz_poly_fprint_pretty(file, d, len, ctx->var);
                 fputc(')', file);
@@ -125,7 +125,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
                     fputc('*', file);
                     fmpz_fprint(file, p);
                     if (j + v != 1)
-                        fprintf(file, "^%ld", j + v);
+                        flint_fprintf(file, "^%wd", j + v);
                 }
             }
         }
@@ -153,12 +153,12 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
             fputc(')', file);
             fputc('*', file);
             fmpz_fprint(file, p);
-            fprintf(file, "^%ld", v);
+            flint_fprintf(file, "^%wd", v);
         }
     }
     else
     {
-        printf("Exception (qadic_fprint_pretty).  Unknown print mode.\n");
+        flint_printf("Exception (qadic_fprint_pretty).  Unknown print mode.\n");
         abort();
     }
 

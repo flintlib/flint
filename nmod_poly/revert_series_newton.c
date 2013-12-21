@@ -38,7 +38,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     slong *a, i, k;
     mp_ptr T, U, V;
 
-    if (n >= 1) Qinv[0] = 0UL;
+    if (n >= 1) Qinv[0] = UWORD(0);
     if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
     if (n <= 2)
         return;
@@ -48,7 +48,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     V = _nmod_vec_init(n);
 
     k = n;
-    for (i = 1; (1L << i) < k; i++);
+    for (i = 1; (WORD(1) << i) < k; i++);
     a = (slong *) flint_malloc(i * sizeof(slong));
     a[i = 0] = k;
     while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
@@ -61,8 +61,8 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     {
         k = a[i];
         _nmod_poly_compose_series(T, Q, k, Qinv, k, k, mod);
-        _nmod_poly_derivative(U, T, k, mod); U[k - 1] = 0UL;
-        T[1] = 0UL;
+        _nmod_poly_derivative(U, T, k, mod); U[k - 1] = UWORD(0);
+        T[1] = UWORD(0);
         _nmod_poly_div_series(V, T, U, k, mod);
         _nmod_poly_derivative(T, Qinv, k, mod);
         _nmod_poly_mullow(U, V, k, T, k, k, mod);
@@ -87,7 +87,7 @@ nmod_poly_revert_series_newton(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("Exception (nmod_poly_revert_series_newton). Input must have \n"
+        flint_printf("Exception (nmod_poly_revert_series_newton). Input must have \n"
                "zero constant and an invertible coefficient of x^1.\n");
         abort();
     }

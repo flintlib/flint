@@ -47,14 +47,14 @@ main(void)
     int len, e;
     fmpz_poly_t f, g[1];
     
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
    
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g[0], ehi * (lenhi - 1) + 1);
     fmpz_poly_init2(g[1], ehi * (lenhi - 1) + 1);
     
-    printf("| len | exp | binomial |\n");
+    flint_printf("| len | exp | binomial |\n");
     
     for (len = lenlo; len <= lenhi; len += lenh)
     {
@@ -65,7 +65,7 @@ main(void)
             slong k;
             for (k = 0; k < len; k++)
                 fmpz_randbits(f->coeffs + k, state, bits);
-            if ((f->coeffs)[len-1] == 0L)
+            if ((f->coeffs)[len-1] == WORD(0))
                 fmpz_randtest_not_zero(f->coeffs + (len-1), state, bits);
             f->length = len;
         }
@@ -92,7 +92,7 @@ main(void)
             s[0] += t[0]->cpu;
             r    += loops;
             
-            printf("%d %d %lf\n", len, e, s[0] / (double) r);
+            flint_printf("%d %d %lf\n", len, e, s[0] / (double) r);
         }
     }
     

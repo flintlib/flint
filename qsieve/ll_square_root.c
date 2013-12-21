@@ -23,10 +23,11 @@
 
 ******************************************************************************/
 
-#undef ulong /* avoid clash with stdlib */
+#define ulong ulongxx /* interferes with system includes */
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
 #define ulong mp_limb_t 
 
 #include <gmp.h>
@@ -84,7 +85,7 @@ void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
 
 #if QS_DEBUG
    for (i = 0; i < num_primes; i++)
-      if ((prime_count[i] %2) != 0) printf("Error %ld, %ld, %ld\n", l, i, prime_count[i]);
+      if ((prime_count[i] %2) != 0) flint_printf("Error %wd, %wd, %wd\n", l, i, prime_count[i]);
 #endif
 
    fmpz_clear(pow);

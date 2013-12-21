@@ -44,7 +44,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
     mp_ptr p;
     int pcopy = 0;
 
-    if (len < 2 || e < 3UL || trunc == 0)
+    if (len < 2 || e < UWORD(3) || trunc == 0)
     {
         if (len == 0 || trunc == 0)
             nmod_poly_zero(res);
@@ -56,18 +56,18 @@ nmod_poly_pow_trunc(nmod_poly_t res,
             res->length = 1;
             _nmod_poly_normalise(res);
         }
-        else if (e == 0UL)
+        else if (e == UWORD(0))
         {
-            nmod_poly_set_coeff_ui(res, 0, 1UL);
+            nmod_poly_set_coeff_ui(res, 0, UWORD(1));
             res->length = 1;
             _nmod_poly_normalise(res);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
         {
             nmod_poly_set(res, poly);
             nmod_poly_truncate(res, trunc);
         }
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             nmod_poly_mullow(res, poly, poly, trunc);
 
         return;

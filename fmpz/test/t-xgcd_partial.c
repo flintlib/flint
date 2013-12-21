@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("xgcd_partial....");
+    flint_printf("xgcd_partial....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Test co2*r1 - co1*r2 = r2_orig */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -71,14 +71,14 @@ main(void)
         result = fmpz_equal(t1, t2);
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("co1 = "), fmpz_print(co1), printf("\n");
-            printf("co2 = "), fmpz_print(co2), printf("\n");
-            printf("f = "), fmpz_print(f), printf("\n");
-            printf("g = "), fmpz_print(g), printf("\n");
-            printf("L = "), fmpz_print(L), printf("\n");
-            printf("t1 = "), fmpz_print(t1), printf("\n");
-            printf("t2 = "), fmpz_print(t2), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("co1 = "), fmpz_print(co1), flint_printf("\n");
+            flint_printf("co2 = "), fmpz_print(co2), flint_printf("\n");
+            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
+            flint_printf("g = "), fmpz_print(g), flint_printf("\n");
+            flint_printf("L = "), fmpz_print(L), flint_printf("\n");
+            flint_printf("t1 = "), fmpz_print(t1), flint_printf("\n");
+            flint_printf("t2 = "), fmpz_print(t2), flint_printf("\n");
             abort();
         }
 
@@ -91,9 +91,9 @@ main(void)
         fmpz_clear(t2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

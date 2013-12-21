@@ -32,12 +32,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("get_str... ");
+    flint_printf("get_str... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000; i++)
     {
@@ -67,23 +67,23 @@ main(void)
         result = strcmp(s, t) == 0;
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("x = "), padic_print(x, ctx), printf("\n");
-            printf("y = "), fmpq_print(y), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("x = "), padic_print(x, ctx), flint_printf("\n");
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n");
             abort();
         }
 
-        free(s);
-        free(t);
+        flint_free(s);
+        flint_free(t);
         padic_clear(x);
         fmpq_clear(y);
         padic_ctx_clear(ctx);
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

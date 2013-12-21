@@ -107,7 +107,7 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
     {
         __mpz_struct * mpz_ptr = _fmpz_new_mpz();
         (*f) = PTR_TO_COEFF(mpz_ptr);
-        mpz_set_si(mpz_ptr, c);
+        flint_mpz_set_si(mpz_ptr, c);
         return mpz_ptr;
     }
     else /* f is large already, just return the pointer */
@@ -141,7 +141,7 @@ void _fmpz_demote_val(fmpz_t f)
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
    __mpz_struct *ptr;
-   *f = 0L;
+   *f = WORD(0);
    ptr = _fmpz_promote(f);
 
    mpz_clear(ptr);

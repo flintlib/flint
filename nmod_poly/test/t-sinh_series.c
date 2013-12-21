@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("sinh_series....");
+    flint_printf("sinh_series....");
     fflush(stdout);
 
     /* Check asinh(sinh(A)) = A */
@@ -57,7 +57,7 @@ main(void)
         nmod_poly_init(B, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_sinh_series(sinhA, A, n);
         nmod_poly_asinh_series(B, sinhA, n);
@@ -68,11 +68,11 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %ld, mod = %lu\n", n, mod);
-            printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("sinh(A): "); nmod_poly_print(sinhA), printf("\n\n");
-            printf("B: "); nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd, mod = %wu\n", n, mod);
+            flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
+            flint_printf("sinh(A): "); nmod_poly_print(sinhA), flint_printf("\n\n");
+            flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -94,7 +94,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_sinh_series(B, A, n);
         nmod_poly_sinh_series(A, A, n);
@@ -102,9 +102,9 @@ main(void)
         result = nmod_poly_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(A), printf("\n\n");
-            nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(A), flint_printf("\n\n");
+            nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -112,8 +112,8 @@ main(void)
         nmod_poly_clear(B);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

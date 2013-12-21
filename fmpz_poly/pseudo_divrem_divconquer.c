@@ -28,13 +28,13 @@
 #include "fmpz_poly.h"
 
 static void 
-__fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                                     const fmpz * A, slong lenA, 
-                                     const fmpz * B, slong lenB)
+__fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 
+                  ulong * d, const fmpz * A, slong lenA, 
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 {
     if (lenB <= 16 || (lenA > 2 * lenB - 1 && lenA < 128))
     {
-        _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, lenA, B, lenB);
+        _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, lenA, B, lenB, inv);
     }
     else
     {
@@ -69,7 +69,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
              */
 
             r1 = R + n1;
-            _fmpz_poly_pseudo_divrem_divconquer(Q, r1, d, p1, lenA - n1, d3, n2);
+            _fmpz_poly_pseudo_divrem_divconquer(Q, r1, d, p1, lenA - n1, d3, n2, inv);
 
             flint_free(p1);
 
@@ -144,7 +144,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                being at most length lenB; r1 is of length at most lenB - 1
              */
 
-            _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, 2 * lenB - 1, B, lenB);
+            _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, 2 * lenB - 1, B, lenB, inv);
 
             flint_free(p1);
 
@@ -166,7 +166,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                since len(t) <= lenA - lenB, and r2 has length at most lenB - 1
              */
 
-            _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenA - lenB, B, lenB);
+            _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenA - lenB, B, lenB, inv);
 
             /*
                Write out Q = L^s2 q1 x^shift + q2, of length at most 
@@ -213,7 +213,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                up being of length at most n1; r1 is of length n1 - 1
              */
 
-            _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, lenA - 2 * n2, d1, n1);
+            _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, lenA - 2 * n2, d1, n1, inv);
 
             flint_free(p1);
 
@@ -250,7 +250,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                lenB + n2 - 1 by lenB division, so q2 is of length at most n2
              */
 
-            _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenB + n2 - 1, B, lenB);
+            _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenB + n2 - 1, B, lenB, inv);
 
             _fmpz_vec_clear(t, n1 + 2 * n2 - 1);
 
@@ -271,13 +271,13 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 }
 
 void 
-_fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                                    const fmpz * A, slong lenA, 
-                                    const fmpz * B, slong lenB)
+_fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 
+                     ulong * d, const fmpz * A, slong lenA, 
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 {
     if (lenA <= 2 * lenB - 1)
     {
-        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, lenA, B, lenB);
+        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, lenA, B, lenB, inv);
     }
     else  /* lenA > 2 * lenB - 1 */
     {
@@ -285,7 +285,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
         _fmpz_vec_set(S, A, lenA);
 
-        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, S, lenA, B, lenB);
+        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, S, lenA, B, lenB, inv);
 
         _fmpz_vec_clear(S, lenA);
     }
@@ -301,12 +301,12 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (B->length == 0)
     {
-        printf("Exception (fmpz_poly_pseudo_divrem_divconquer). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). Division by zero.\n");
         abort();
     }
     if (Q == R)
     {
-        printf("Exception (fmpz_poly_pseudo_divrem_divconquer). \n"
+        flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). \n"
                "Output arguments Q and R may not be aliased.\n");
         abort();
     }
@@ -336,7 +336,7 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     }
     
     _fmpz_poly_pseudo_divrem_divconquer(q, r, d, A->coeffs, A->length, 
-                                                 B->coeffs, B->length);
+                                                 B->coeffs, B->length, NULL);
 
     lenr = B->length - 1;
     FMPZ_VEC_NORM(r, lenr);

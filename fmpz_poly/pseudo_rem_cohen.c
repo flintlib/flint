@@ -74,7 +74,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
     
     if (B->length == 0)
     {
-        printf("Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
+        flint_printf("Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
         abort();
     }
     if (A->length < B->length)
@@ -94,7 +94,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
     
     _fmpz_poly_pseudo_rem_cohen(r, A->coeffs, A->length, B->coeffs, B->length);
     
-    for (lenr = B->length - 1; (lenr >= 0) && (r[lenr] == 0L); lenr--) ;
+    for (lenr = B->length - 1; (lenr >= 0) && (r[lenr] == WORD(0)); lenr--) ;
     lenr++;
     
     if (R == B)

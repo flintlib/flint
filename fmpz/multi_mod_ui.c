@@ -75,7 +75,7 @@ fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb,
             log_comb++;
     }
 
-    num = (1L << (n - log_comb - 1));
+    num = (WORD(1) << (n - log_comb - 1));
 
     /* Set each entry of this level of temp to the input integer */
     for (i = 0; i < num; i++)
@@ -107,7 +107,7 @@ fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb,
     num /= 2;
     log_comb++;
 
-    stride = (1L << (log_comb + 1));
+    stride = (WORD(1) << (log_comb + 1));
     for (i = 0, j = 0; j < num_primes; i++, j += stride)
     {
         fmpz_multi_mod_ui_basecase(out + j, comb_temp[log_comb] + i,

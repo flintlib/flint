@@ -32,10 +32,10 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("factor_lehman....");
+   flint_printf("factor_lehman....");
    fflush(stdout);
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
@@ -45,19 +45,19 @@ int main(void)
       do
       {
          n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
-      } while (n_is_prime(n1) || (n1 < 2UL)
+      } while (n_is_prime(n1) || (n1 < UWORD(2))
 #if FLINT64 /* cannot compute enough primes */
-         || (n1 >= 10000000000000000UL)
+         || (n1 >= UWORD(10000000000000000))
 #endif
          );
 
       n2 = n_factor_lehman(n1);
       
-      result = ((n1%n2) == 0UL && n1 != n2);
+      result = ((n1%n2) == UWORD(0) && n1 != n2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+         flint_printf("FAIL:\n");
+         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
          abort();
       }
    }
@@ -67,9 +67,9 @@ int main(void)
       mp_limb_t n1, n2, n3, n, limit;
 
 #if FLINT64
-      limit = 100000000UL - 100UL;
+      limit = UWORD(100000000) - UWORD(100);
 #else
-      limit = 65535UL;
+      limit = UWORD(65535);
 #endif
 
       n1 = n_randtest(state) % (limit + 1);
@@ -91,17 +91,17 @@ int main(void)
 
       n3 = n_factor_lehman(n);
       
-      result = ((n%n3) == 0UL && n != n3);
+      result = ((n%n3) == UWORD(0) && n != n3);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n = %ld, n3 = %lu\n", n, n3);
+         flint_printf("FAIL:\n");
+         flint_printf("n = %wd, n3 = %wu\n", n, n3);
          abort();
       }
    }
    
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("inv_series_newton....");
+    flint_printf("inv_series_newton....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 1000; i++)
@@ -81,11 +81,11 @@ main(void)
         result = (fmpz_mod_poly_equal(c, one));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
-            printf("c = "), fmpz_mod_poly_print(c), printf("\n\n");
-            printf("p = "), fmpz_print(p), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
             abort();
         }
 
@@ -96,9 +96,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

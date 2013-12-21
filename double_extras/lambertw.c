@@ -100,9 +100,10 @@ halley(double x, double w)
     return t;
 }
 
-/* this should be exactly 6627126856707895 * 2^(-54), which
+/* this should be exactly 6627126856707895 * 2^(-54) ~=
+   0.36787944117144228, which
    is the most negative double in the domain */
-#define ONE_OVER_E 0.36787944117144228
+#define ONE_OVER_E ldexp(6627126856707895.0, -54)
 
 /* difference from -1/e */
 #define CORRECTION 4.3082397558469466e-17

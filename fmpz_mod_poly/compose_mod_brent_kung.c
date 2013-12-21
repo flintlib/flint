@@ -33,7 +33,8 @@
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, slong len1,
-                              const fmpz * poly2, const fmpz * poly3, slong len3, const fmpz_t p)
+                              const fmpz * poly2, const fmpz * poly3, slong len3, 
+                                                                    const fmpz_t p)
 {
     fmpz_mat_t A, B, C;
     fmpz * t, * h, * tmp;
@@ -120,14 +121,14 @@ fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t 
 
     if (len3 == 0)
     {
-        printf("Exception: division by zero in "
-               "fmpz_mod_poly_compose_mod_brent_kung\n");
+        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung)."
+                     "Division by zero in\n");
         abort();
     }
 
     if (len1 >= len3)
     {
-        printf("Exception: fmpz_mod_poly_compose_brent_kung: the degree of the"
+        flint_printf("Exception (fmpz_mod_poly_compose_brent_kung). the degree of the"
                " first polynomial must be smaller than that of the modulus\n");
         abort();
     }

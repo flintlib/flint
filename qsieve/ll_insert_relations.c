@@ -27,9 +27,10 @@
 
 ******************************************************************************/
 
-#undef ulong /* avoid clash with stdlib */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
 #define ulong mp_limb_t 
 
 #include <gmp.h>
@@ -111,34 +112,34 @@ slong qsieve_ll_merge_sort(qs_t qs_inf)
    int comp;
    slong i;
 
-   for (i = columns + num_unmerged - 1L; i >= dups; i--) 
+   for (i = columns + num_unmerged - WORD(1); i >= dups; i--) 
    {
       if (!columns) comp = -1;
       else if (!num_unmerged) comp = 1;
       else 
-         comp = qsieve_ll_relations_cmp2(matrix + columns - 1L, qsort_arr[num_unmerged - 1L]);
+         comp = qsieve_ll_relations_cmp2(matrix + columns - WORD(1), qsort_arr[num_unmerged - WORD(1)]);
       
       switch (comp)
       {
          case -1: 
          {
-            copy_col(matrix + i, qsort_arr[num_unmerged - 1L]);
-            clear_col(qsort_arr[num_unmerged - 1L]);
+            copy_col(matrix + i, qsort_arr[num_unmerged - WORD(1)]);
+            clear_col(qsort_arr[num_unmerged - WORD(1)]);
             num_unmerged--;
             break;
          }
          case 1: 
          {
-            copy_col(matrix + i, matrix + columns - 1L);
+            copy_col(matrix + i, matrix + columns - WORD(1));
             columns--;
             break;
          }
          case 0: 
          {
-            free_col(qsort_arr[num_unmerged - 1L]);
-            clear_col(qsort_arr[num_unmerged - 1L]);
+            free_col(qsort_arr[num_unmerged - WORD(1)]);
+            clear_col(qsort_arr[num_unmerged - WORD(1)]);
             num_unmerged--;
-            copy_col(matrix + i, matrix + columns - 1L);
+            copy_col(matrix + i, matrix + columns - WORD(1));
             columns--;
             dups++;
             break;
@@ -163,7 +164,7 @@ slong qsieve_ll_merge_sort(qs_t qs_inf)
    qs_inf->num_unmerged = 0;
 
 #if (QS_DEBUG & 64)
-   printf("%ld new, %ld dups\n", columns, dups);
+   flint_printf("%wd new, %wd dups\n", columns, dups);
 #endif   
 
    return columns;

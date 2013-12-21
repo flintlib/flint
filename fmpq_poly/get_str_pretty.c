@@ -47,11 +47,6 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     if (len == 0)  /* Zero polynomial */
     {
         str = flint_malloc(2);
-        if (!str)
-        {
-            printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
-            abort();
-        }
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -87,13 +82,8 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
               + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
         size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
         str   = flint_malloc(size);
-        if (!str)
-        {
-            printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
-            abort();
-        }
 
-        if (mpq_cmp_si(a1, 1, 1) == 0)
+        if (flint_mpq_cmp_si(a1, 1, 1) == 0)
         {
             if (mpq_sgn(a0) == 0)
                 gmp_sprintf(str, "%s", var);
@@ -102,7 +92,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             else  /* mpq_sgn(a0) < 0 */
                 gmp_sprintf(str, "%s%Qd", var, a0);
         }
-        else if (mpq_cmp_si(a1, -1, 1) == 0)
+        else if (flint_mpq_cmp_si(a1, -1, 1) == 0)
         {
             if (mpq_sgn(a0) == 0)
                 gmp_sprintf(str, "-%s", var);
@@ -131,7 +121,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     
     /* Copy the denominator into an mpz_t */
     mpz_init(z);
-    if (*den == 1L)
+    if (*den == WORD(1))
     {
         densize = 0;
     }
@@ -155,13 +145,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     
     mpq_init(q);
     str = flint_malloc(size);
-    if (!str)
-    {
-        printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
-        mpz_clear(z);
-        mpq_clear(q);
-        abort();
-    }
+    
     j = 0;
     
     /* Print the leading term */
@@ -169,9 +153,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     fmpz_get_mpz(mpq_denref(q), den);
     mpq_canonicalize(q);
     
-    if (mpq_cmp_si(q, 1, 1) != 0)
+    if (flint_mpq_cmp_si(q, 1, 1) != 0)
     {
-        if (mpq_cmp_si(q, -1, 1) == 0)
+        if (flint_mpq_cmp_si(q, -1, 1) == 0)
             str[j++] = '-';
         else
         {
@@ -180,9 +164,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             str[j++] = '*';
         }
     }
-    j += sprintf(str + j, "%s", var);
+    j += flint_sprintf(str + j, "%s", var);
     str[j++] = '^';
-    j += sprintf(str + j, "%li", len - 1);
+    j += flint_sprintf(str + j, "%li", len - 1);
     
     i = len - 1;
     while (i)
@@ -212,11 +196,11 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         if (i > 0)
         {
             str[j++] = '*';
-            j += sprintf(str + j, "%s", var);
+            j += flint_sprintf(str + j, "%s", var);
             if (i > 1)
             {
                 str[j++] = '^';
-                j += sprintf(str + j, "%li", i);
+                j += flint_sprintf(str + j, "%li", i);
             }
         }
     }

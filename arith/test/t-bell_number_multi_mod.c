@@ -34,13 +34,12 @@
 
 int main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("bell_number_multi_mod....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("bell_number_multi_mod....");
+    fflush(stdout);    
 
     for (i = 0; i < 100; i++)
     {
@@ -57,8 +56,8 @@ int main(void)
 
         if (!fmpz_equal(b1, b2))
         {
-            printf("FAIL:\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -66,8 +65,8 @@ int main(void)
         fmpz_clear(b2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

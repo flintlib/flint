@@ -32,10 +32,10 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("udiv_qrnnd....");
+   flint_printf("udiv_qrnnd....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -51,21 +51,21 @@ int main(void)
 
       udiv_qrnnd(q, r, nh, nl, d);
       umul_ppmm(ph, pl, d, q);
-      add_ssaaaa(ph, pl, ph, pl, 0UL, r);
+      add_ssaaaa(ph, pl, ph, pl, UWORD(0), r);
 
       result = ((ph == nh) && (pl == nl));
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("nh = %lu, nl = %lu, d = %lu\n", nh, nl, d); 
-         printf("ph = %lu, pl = %lu\n", ph, pl);
+         flint_printf("FAIL:\n");
+         flint_printf("nh = %wu, nl = %wu, d = %wu\n", nh, nl, d); 
+         flint_printf("ph = %wu, pl = %wu\n", ph, pl);
          abort();
       }
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

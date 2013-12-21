@@ -41,8 +41,8 @@ void sample(void * arg, ulong count)
    ulong i;
    mp_limb_t n, d, r, norm;
    double dpre;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    for (i = 0; i < count; i++)
    {
@@ -55,7 +55,7 @@ void sample(void * arg, ulong count)
          res &= n_is_probabprime_BPSW(d);
       prof_stop();
       
-      if (!res) printf("Error\n");
+      if (!res) flint_printf("Error\n");
    }
 
    flint_randclear(state);
@@ -67,13 +67,13 @@ int main(void)
    BPSW_t params;
    int i;
 
-   printf("is_probabprime_BPSW:\n");
+   flint_printf("is_probabprime_BPSW:\n");
    
    for (i = 1; i <= 64; i++)
    {
       params.bits = i;
       prof_repeat(&min, &max, sample, &params);
-      printf("bits = %d, min time is %.3f cycles, max time is %.3f cycles\n", 
+      flint_printf("bits = %d, min time is %.3f cycles, max time is %.3f cycles\n", 
            i, (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000000);
    }
 

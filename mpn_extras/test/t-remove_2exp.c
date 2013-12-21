@@ -37,7 +37,9 @@ int main(void)
     mpz_t a;
     mpz_t b;
 
-    printf("remove_2exp....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("remove_2exp....");
     fflush(stdout);
 
     mpz_init(a);
@@ -47,7 +49,7 @@ int main(void)
     {
         for (nonzero=0; nonzero<300; nonzero++)
         {
-            mpz_set_ui(a, 1);
+            flint_mpz_set_ui(a, 1);
             mpz_setbit(a, nonzero);
             mpz_set(b, a);
             mpz_mul_2exp(a, a, zero);
@@ -62,6 +64,7 @@ int main(void)
 
     mpz_clear(a);
     mpz_clear(b);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

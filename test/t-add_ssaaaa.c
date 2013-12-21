@@ -32,10 +32,10 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("add_ssaaaa....");
+   flint_printf("add_ssaaaa....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -57,15 +57,15 @@ int main(void)
       result = ((sh2 == sh1) && (sl2 == sl1));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("ah1 = %lu, al1 = %lu, ah2 = %lu, al1 = %lu\n", ah1, al1, ah2, al1); 
-         printf("sh2 = %lu, sh1 = %lu, sl2 = %lu, sl1 = %lu\n", sh2, sh1, sl2, sl1);
+         flint_printf("FAIL:\n");
+         flint_printf("ah1 = %wu, al1 = %wu, ah2 = %wu, al1 = %wu\n", ah1, al1, ah2, al1); 
+         flint_printf("sh2 = %wu, sh1 = %wu, sl2 = %wu, sl1 = %wu\n", sh2, sh1, sl2, sl1);
          abort();
       }
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

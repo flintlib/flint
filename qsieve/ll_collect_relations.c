@@ -23,10 +23,11 @@
 
 ******************************************************************************/
 
-#undef ulong /* avoid clash with stdlib */
+#define ulong ulongxx /* interferes with system includes */
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
 #define ulong mp_limb_t
 
 #include <gmp.h>
@@ -116,7 +117,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    fmpz_sub_ui(X, X, qs_inf->sieve_size/2); /* X */
      
 #if (QS_DEBUG & 32)
-   printf("i = "); fmpz_print(X); printf("\n");
+   flint_printf("i = "); fmpz_print(X); flint_printf("\n");
 #endif
 
    fmpz_mul_ui(Y, X, A);
@@ -140,7 +141,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    exp = fmpz_remove(res, res, p);
 
 #if (QS_DEBUG & 8)
-   if (exp) printf("2^%ld ", exp);
+   if (exp) flint_printf("2^%wd ", exp);
 #endif
 
    extra_bits += exp;
@@ -154,7 +155,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
       small[0] = exp;
 
 #if (QS_DEBUG & 8)
-      if (exp) printf("%d^%ld ", factor_base[0].p, exp); 
+      if (exp) flint_printf("%d^%wd ", factor_base[0].p, exp); 
 #endif
    } else small[0] = 0;
      
@@ -174,7 +175,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          if (exp) 
          {
              fmpz_print(p);
-             printf("^%ld ", exp); 
+             flint_printf("^%wd ", exp); 
          }
 #endif
       } else small[j] = 0;
@@ -200,7 +201,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
                if (exp) 
                {
                    fmpz_print(p);
-                   printf("^%ld ", exp); 
+                   flint_printf("^%wd ", exp); 
                }
 #endif
                if (exp) 
@@ -221,7 +222,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
             if (exp) 
             {
                 fmpz_print(p);
-                printf("^%ld ", exp); 
+                flint_printf("^%wd ", exp); 
             }
 #endif
          }    
@@ -246,8 +247,8 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
         
          if (qs_inf->num_relations >= qs_inf->buffer_size)
          {
-            printf("Error: too many duplicate relations!\n");
-            printf("s = %ld, bits = %ld\n", qs_inf->s, qs_inf->bits);
+            flint_printf("Error: too many duplicate relations!\n");
+            flint_printf("s = %wd, bits = %wd\n", qs_inf->s, qs_inf->bits);
             abort();
          }
 
@@ -256,7 +257,7 @@ slong qsieve_ll_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    }
 
 #if (QS_DEBUG & 8)
-   printf("\n");
+   flint_printf("\n");
 #endif
   
 cleanup:
@@ -282,16 +283,16 @@ slong qsieve_ll_evaluate_sieve(qs_t qs_inf, char * sieve)
 #endif
 
 #if (QS_DEBUG & 4)
-   printf("%ldX^2+2*%ldX+", qs_inf->A, qs_inf->B);
-   fmpz_print(qs_inf->C); printf("\n");
+   flint_printf("%wdX^2+2*%wdX+", qs_inf->A, qs_inf->B);
+   fmpz_print(qs_inf->C); flint_printf("\n");
 #endif
 
    while (j < qs_inf->sieve_size/sizeof(ulong))
    {
 #if FLINT64
-       while ((sieve2[j] & 0xE0E0E0E0E0E0E0E0UL) == 0) 
+       while ((sieve2[j] & UWORD(0xE0E0E0E0E0E0E0E0)) == 0) 
 #else
-       while ((sieve2[j] & 0xE0E0E0E0UL) == 0) 
+       while ((sieve2[j] & UWORD(0xE0E0E0E0)) == 0) 
 #endif
        {
 #if (QS_DEBUG & 16)
@@ -324,11 +325,11 @@ slong qsieve_ll_evaluate_sieve(qs_t qs_inf, char * sieve)
    for (i = 0; i <= stats_limit; i++)
    {
        if ((i % 16) == 0)
-           printf("|%ld:", i);
-       printf(" %ld", qs_inf->sieve_tally[i]);
+           flint_printf("|%wd:", i);
+       flint_printf(" %wd", qs_inf->sieve_tally[i]);
    }
-   printf("|\n");
-   printf("Total of %ld relations for this sieve interval\n", rels);
+   flint_printf("|\n");
+   flint_printf("Total of %wd relations for this sieve interval\n", rels);
 #endif
  
    return rels;
@@ -370,7 +371,7 @@ slong qsieve_ll_collect_relations(qs_t qs_inf, char * sieve)
    for (poly_index = 1; poly_index < (1<<(s - 1)); poly_index++)
    {
       for (j = 0; j < s; j++)
-         if (((poly_index >> j) & 1UL) != 0UL) break;
+         if (((poly_index >> j) & UWORD(1)) != UWORD(0)) break;
       
       poly_add = ((poly_index >> j) & 2);
       

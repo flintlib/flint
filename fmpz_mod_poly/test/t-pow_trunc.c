@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("pow_trunc....");
+    flint_printf("pow_trunc....");
     fflush(stdout);
 
     /* Check aliasing */
@@ -68,12 +68,12 @@ main(void)
         result = (fmpz_mod_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL aliasing:\n");
-            printf("a->length = %ld, p = %lu, exp = %ld, trunc = %ld\n",
+            flint_printf("FAIL aliasing:\n");
+            flint_printf("a->length = %wd, p = %wu, exp = %wd, trunc = %wd\n",
                 a->length, a->p, e, trunc);
-            printf("a:\n"); fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b:\n"); fmpz_mod_poly_print(b), printf("\n\n");
-            printf("c:\n"); fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c:\n"); fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -109,12 +109,12 @@ main(void)
             || (a->length == 0 && e == 0 && c->length == 1 && c->coeffs[0] == 1));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, p = %lu, exp = %ld, trunc = %ld\n",
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, p = %wu, exp = %wd, trunc = %wd\n",
                 a->length, a->p, e, trunc);
-            printf("a:\n"); fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b:\n"); fmpz_mod_poly_print(b), printf("\n\n");
-            printf("c:\n"); fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c:\n"); fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -124,8 +124,8 @@ main(void)
         fmpz_mod_poly_clear(c);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

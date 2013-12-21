@@ -37,7 +37,7 @@ fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     if (h == 0)
     {
-        printf("Exception (fmpz_cdiv_q_si). Division by zero.\n");
+        flint_printf("Exception (fmpz_cdiv_q_si). Division by zero.\n");
         abort();
     }
 
@@ -46,7 +46,7 @@ fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
         fmpz q = c1 / c2;       /* compute C quotient */
         fmpz r = c1 - c2 * q;   /* compute remainder */
 
-        if (r && ((c1 ^ c2) > 0L))
+        if (r && ((c1 ^ c2) > WORD(0)))
             ++q;
 
         fmpz_set_si(f, q);
@@ -57,11 +57,11 @@ fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
         if (c2 > 0)
         {
-            mpz_cdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+            flint_mpz_cdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
         }
         else
         {
-            mpz_fdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -(ulong) c2);
+            flint_mpz_fdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -(ulong) c2);
             mpz_neg(mpz_ptr, mpz_ptr);
         }
         _fmpz_demote_val(f);    /* division by h may result in small value */

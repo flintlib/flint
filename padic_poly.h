@@ -28,13 +28,18 @@
 
 #include <limits.h>
 
-#include <mpir.h>
+#include <gmp.h>
 #include "fmpz.h"
 #include "fmpq.h"
 #include "padic.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 
 /*  Type definitions  ********************************************************/
 
@@ -66,7 +71,7 @@ static __inline__ slong _fmpz_vec_ord_p(const fmpz *vec, slong len, const fmpz_t
     else
     {
         fmpz_t t;
-        slong i, min = LONG_MAX, v;
+        slong i, min = WORD_MAX, v;
 
         fmpz_init(t);
         for (i = 0; (min > 0) && (i < len); i++)
@@ -78,7 +83,7 @@ static __inline__ slong _fmpz_vec_ord_p(const fmpz *vec, slong len, const fmpz_t
             }
         }
         fmpz_clear(t);
-        return (min < LONG_MAX) ? min : 0;
+        return (min < WORD_MAX) ? min : 0;
     }
 }
 
@@ -343,19 +348,19 @@ void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k,
 
 static __inline__ int padic_poly_debug(const padic_poly_t poly)
 {
-    printf("(alloc = %ld, length = %ld, val = %ld, N = %ld, vec = ", 
+    flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ", 
         poly->alloc, poly->length, poly->val, poly->N);
     if (poly->coeffs)
     {
-        printf("{");
+        flint_printf("{");
         _fmpz_vec_print(poly->coeffs, poly->alloc);
-        printf("}");
+        flint_printf("}");
     }
     else
     {
-        printf("NULL");
+        flint_printf("NULL");
     }
-    printf(")");
+    flint_printf(")");
 
     return 1;
 }
@@ -415,6 +420,10 @@ int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N,
                            const padic_ctx_t ctx);
 
 int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

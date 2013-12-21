@@ -450,7 +450,7 @@ void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1,
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
-    assuming the coefficient is exact for every coefficient.
+    assuming the division is exact for every coefficient.
 
 void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const mpz_t x)
@@ -711,7 +711,9 @@ void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, slong len1,
 
     Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
     and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows 
-    zero-padding of the two input polynomials.
+    zero-padding of the two input polynomials. Does not support aliasing 
+    between the inputs and the output.
+
 
 void fmpz_poly_mul(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -1568,6 +1570,94 @@ void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
     Computes the quotient \code{(Q, len-1)} of \code{(A, len)} upon
     division by $x - c$.
 
+*******************************************************************************
+
+    Division with precomputed inverse
+
+*******************************************************************************
+
+void _fmpz_poly_preinvert(fmpz * B_inv, const fmpz * B, slong n)
+
+    Given a monic polynomial \code{B} of length \code{n}, compute a precomputed
+    inverse \code{B_inv} of length \code{n} for use in the functions below. No 
+    aliasing of B and $B_inv$ is permitted. We assume \code{n} is not zero.
+
+void fmpz_poly_preinvert(fmpz_poly_t B_inv, const fmpz_poly_t B)
+
+    Given a monic polynomial \code{B}, compute a precomputed inverse 
+    \code{B_inv} for use in the functions below. An exception is raised if
+    \code{B} is zero.
+
+void _fmpz_poly_div_preinv(fmpz * Q, const fmpz * A, slong len1, 
+                               const fmpz * B, const fmpz * B_inv, slong len2)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B} of 
+    length \code{len2}, compute the quotient \code{Q} of \code{A} by \code{B}.
+    We assume the length \code{len1} of \code{A} is at least \code{len2}. The
+    polynomial \code{Q} must have space for \code{len1 - len2 + 1} 
+    coefficients. No aliasing of operands is permitted.
+
+void fmpz_poly_div_preinv(fmpz_poly_t Q, const fmpz_poly_t A, 
+                                 const fmpz_poly_t B, const fmpz_poly_t B_inv)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B}, 
+    compute the quotient \code{Q} of \code{A} by \code{B}. Aliasing of \code{B}
+    and \code{B_inv} is not permitted. 
+
+void _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1, 
+                               const fmpz * B, const fmpz * B_inv, slong len2)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B} of 
+    length \code{len2}, compute the quotient \code{Q} of \code{A} by \code{B}.
+    The remainder is then placed in \code{A}. We assume the length \code{len1}
+    of \code{A} is at least \code{len2}. The polynomial \code{Q} must have
+    space for \code{len1 - len2 + 1} coefficients. No aliasing of operands is 
+    permitted.
+
+void fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R, 
+            const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv)
+
+    Given a precomputed inverse \code{B_inv} of the polynomial \code{B}, 
+    compute the quotient \code{Q} of \code{A} by \code{B} and the remainder
+    \code{R}. Aliasing of \code{B} and \code{B_inv} is not permitted. 
+
+fmpz ** _fmpz_poly_powers_precompute(const fmpz * B, slong len)
+
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv,
+                                                              fmpz_poly_t poly)
+
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void _fmpz_poly_powers_clear(fmpz ** powers, slong len)
+
+    Clean up resources used by precomputed powers which have been computed
+    by\\
+    \code{_fmpz_poly_powers_precompute}.
+
+void fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv)
+
+    Clean up resources used by precomputed powers which have been computed
+    by\\
+    \code{fmpz_poly_powers_precompute}.
+
+void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
+                                 const fmpz * B, slong n, fmpz ** const powers)
+
+    Set $A$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{_fmpz_poly_powers_precompute}. No aliasing is allowed.
+
+void fmpz_poly_rem_powers_precomp(fmpz_poly_t R, 
+                             const fmpz_poly_t A, const fmpz_poly_t B, 
+                                        const fmpz_poly_powers_precomp_t B_inv)
+
+    Set $R$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{fmpz_poly_powers_precompute}.
 
 *******************************************************************************
 
@@ -1651,8 +1741,9 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
 
 *******************************************************************************
 
-void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
-                        const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, 
+                     ulong * d, const fmpz * A, slong lenA, 
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     If $\ell$ is the leading coefficient of $B$, then computes $Q$, $R$ such 
     that $\ell^d A = Q B + R$.  This function is used for simulating division 
@@ -1663,6 +1754,10 @@ void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
     coefficients.  Supports aliasing of \code{(R, lenA)} and \code{(A, lenA)}. 
     But other than this,  no aliasing of the inputs and outputs is suppported.
 
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
+
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -1670,8 +1765,9 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     that $\ell^d A = Q B + R$.  This function is used for simulating division 
     over~$\Q$.
 
-void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                        const fmpz * A, slong lenB, const fmpz * B, slong lenB)
+void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, 
+                     ulong * d, const fmpz * A, slong lenB, 
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
     $\ell^d A = B Q + R$, only setting the bottom $\len(B) - 1$ coefficients 
@@ -1680,6 +1776,10 @@ void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
     Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
     \code{(A, lenA)}.  No aliasing of input and output operands is allowed.
+
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
 
 void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
@@ -1733,7 +1833,7 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
     in~\citep[Algorithm~3.1.2]{Coh1996}.
 
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, 
-                                        slong lenA, const fmpz * B, slong lenB)
+              slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     If $\ell$ is the leading coefficient of $B$, then computes 
     \code{(Q, lenA - lenB + 1)}, \code{(R, lenB - 1)} and $d$ such that 
@@ -1748,13 +1848,17 @@ void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A,
     Supports aliasing of \code{(R, lenA)} and \code{(A, lenA)}.  But other 
     than this, no aliasing of the inputs and outputs is suppported.
 
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
+
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes $Q$, $R$, and $d$ such that $\ell^d A = B Q + R$.
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB)
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Pseudo-division, only returning the quotient.
 
@@ -1764,7 +1868,7 @@ void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A,
     Pseudo-division, only returning the quotient.
 
 void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, 
-                                                const fmpz * B, slong lenB)
+                          const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Pseudo-division, only returning the remainder.
 
@@ -1843,7 +1947,26 @@ void fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     As expected, aliasing between \code{res} and $a$ is supported.  However, 
     \code{res} may not be aliased with a coefficient of $f$.
 
-void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
+
+void _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden, 
+                                    const fmpz * f, slong len, 
+                                    const fmpz_t anum, const fmpz_t aden)
+
+    Evaluates the polynomial \code{(f, len)} at the rational 
+    \code{(anum, aden)} using a divide and conquer approach, and sets
+    \code{(rnum, rden)} to the result in lowest terms. Assumes that
+    the length of the polynomial is at least one.
+    
+    Aliasing between \code{(rnum, rden)} and \code{(anum, aden)} or any of 
+    the coefficients of $f$ is not supported.
+
+void fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f, 
+                                                                 const fmpq_t a)
+
+    Evaluates the polynomial $f$ at the rational $a$ using a divide
+    and conquer approach, and sets \code{res} to the result.
+
+void _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, slong len, 
                                     const fmpz_t anum, const fmpz_t aden)
 
@@ -1854,13 +1977,13 @@ void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
     Aliasing between \code{(rnum, rden)} and \code{(anum, aden)} or any of 
     the coefficients of $f$ is not supported.
 
-void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
-                                                                 const mpq_t a)
+void fmpz_poly_evaluate_horner_fmpq(fmpq_t res, const fmpz_poly_t f, 
+                                                                 const fmpq_t a)
 
     Evaluates the polynomial $f$ at the rational $a$ using Horner's rule, and 
     sets \code{res} to the result.
 
-void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
                              const fmpz * f, slong len, 
                              const fmpz_t anum, const fmpz_t aden)
 
@@ -1870,6 +1993,11 @@ void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden,
 
     Aliasing between \code{(rnum, rden)} and \code{(anum, aden)} or any of 
     the coefficients of $f$ is not supported.
+
+void fmpz_poly_evaluate_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a)
+
+    Evaluates the polynomial $f$ at the rational $a$, and 
+    sets \code{res} to the result.
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 

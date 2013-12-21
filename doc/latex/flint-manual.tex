@@ -1,3 +1,4 @@
+% vim: spell spelllang=en textwidth=80
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   This file is part of FLINT.
@@ -21,6 +22,7 @@
 %
 %   Copyright (C) 2007 William Hart, David Harvey
 %   Copyright (C) 2010 Sebastian Pancratz
+%   Copyright (C) 2013 Tom Bachmann
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -77,7 +79,7 @@
 \let\org@hypertarget\hypertarget
 \renewcommand\hypertarget[2]{%
     \Hy@raisedlink{\org@hypertarget{#1}{}}#2%
-} 
+}
 \makeatother
 
 \ifpdf
@@ -125,6 +127,7 @@
 \usepackage{tocloft}
 
 \addtolength{\cftsecnumwidth}{0.8em}
+\addtolength{\cftsubsecnumwidth}{0.8em}
 \addtolength{\cftbeforesecskip}{0.05em}
 
 %%%%%%%%%%%%
@@ -181,7 +184,7 @@
 
 % This should do what we want
 %   \setdefaultenum{(i)}{(a)}{1.}{A}
-% but it does not work for references, dropping the 
+% but it does not work for references, dropping the
 % parentheses.  The following hack does work.
 
 \renewcommand{\theenumi}{(\roman{enumi})}
@@ -222,10 +225,15 @@
 \newcommand{\N}{\mathbf{N}}%  Natural numbers
 \newcommand{\Z}{\mathbf{Z}}%  Integers
 \newcommand{\Q}{\mathbf{Q}}%  Rationals
+\newcommand{\F}{\mathbf{F}}%  Finite fields
 
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\ord}{ord}
 \DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\Gal}{Gal}
+\DeclareMathOperator{\Norm}{N}
+\DeclareMathOperator{\Trace}{Tr}
+\DeclareMathOperator{\Res}{Res}
 
 \allowdisplaybreaks[4]
 %\numberwithin{equation}{section}
@@ -276,88 +284,109 @@
 
 \chapter{Introduction}
 
-FLINT is a C library of functions for doing number theory. It is highly 
-optimised and can be compiled on numerous platforms.  FLINT also has the 
-aim of providing support for multicore and multiprocessor computer 
+FLINT is a C library of functions for doing number theory. It is highly
+optimised and can be compiled on numerous platforms.  FLINT also has the
+aim of providing support for multicore and multiprocessor computer
 architectures. To this end, the library is threadsafe, with few exceptions
 noted in the appropriate place.
 
-FLINT is currently maintained by William Hart of Warwick University in 
-the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
-Johansson, Andy Novocin and David Harvey (no longer active).
+FLINT is currently maintained by William Hart of Technishe Universit\"{a}t
+in Kaiserslautern. FLINT was originally designed by William Hart and David
+Harvey. Since then FLINT was rewritten as FLINT 2 by William Hart, Fredrik
+Johansson and Sebastian Pancratz. Many other substantial contributions have
+been made by other authors. (See the Contributors list below for a list.)
 
-FLINT 2 and following should compile on any machine with GCC and a standard 
+FLINT 2 and following should compile on any machine with GCC and a standard
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
-machines. There is also limited optimisation for ARM and ia64 machines. As 
+machines. There is also limited optimisation for ARM and ia64 machines. As
 of version 2.0, FLINT required GCC version 2.96 or later, either MPIR
 (2.6.0 or later) or GMP (5.1.1 or later), and MPFR 3.0.0 or later.
-It is also required that the platform 
-provide a \code{uint64_t} type if a native 64 bit type is not available. 
+It is also required that the platform
+provide a \code{uint64_t} type if a native 64 bit type is not available.
 Full C99 compliance is \textbf{not} required.
 
-FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc., 
+FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc.,
 each of which can be linked to a C program making use of their functionality.
 
-All of the functions in FLINT have a corresponding test function provided 
-in an appropriately named test file.  For example, the function 
-\code{fmpz_poly_add} located in\\ \code{fmpz_poly/add.c} has test code in the 
+All of the functions in FLINT have a corresponding test function provided
+in an appropriately named test file.  For example, the function
+\code{fmpz_poly_add} located in\\ \code{fmpz_poly/add.c} has test code in the
 file \code{fmpz_poly/test/t-add.c}.
 
-\chapter{Building and using FLINT}
+\chapter{Configuring FLINT}
 
-The easiest way to use FLINT is to build a shared library.  Simply download 
+The easiest way to use FLINT is to build a shared library.  Simply download
 the FLINT tarball and untar it on your system.
 
 FLINT requires either MPIR (version 2.6.0 or later) or GMP
 (version 5.1.1 or later). If MPIR is used, MPIR must be built with
 the \code{--enable-gmpcompat} option. FLINT also requires
 MPFR 3.0.0 or later and a pthread implementation.
-Some of the input/output tests require 
+Some of the input/output tests require
 \code{fork} and \code{pipe}, however these are disabled on MinGW which
 does not provide a posix implementation.
 
 To configure FLINT you must specify where GMP/MPIR and MPFR are on
 your system. FLINT can work with the libraries installed as usual,
 e.g. in \code{/usr/local} or it can work with the libraries built
-from source in their standard source trees. 
+from source in their standard source trees.
 
 In the case that a library is installed in say \code{/usr}
 in the \code{lib} and \code{include} directories as usual, simply
-specify the top level location, e.g. \code{/usr} when 
+specify the top level location, e.g. \code{/usr} when
 configuring FLINT. If a library is built in its source tree,
-specify the top level source directory, e.g. \code{/home/user1/mpir/}.
+specify the top level directory, e.g.
+\code{/home/user1/mpir/}.
 
 To specify the directories where the libraries reside, you must
-pass the directories as parameters to FLINT's configure, e.g.\ 
+pass the directories as parameters to FLINT's configure, e.g.\
 \begin{lstlisting}[language=bash]
 ./configure --with-mpir=/usr --with-mpfr=/home/user1/mpfr/
 \end{lstlisting}
 If no directories are specified, FLINT assumes it will find the
 libraries it needs in \code{/usr/local}.
 
+If you wish to use GMP, you can pass the configure option
+\code{--with-gmp} instead of \code{--with-mpir}.
+
 Note that FLINT builds static and shared libraries by default, except
 on platforms where this is not supported. If you do not require either
-a shared or static library then you may pass \code{--disable-static} 
-or \code{--disable-shared} to \code{configure}. 
+a shared or static library then you may pass \code{--disable-static}
+or \code{--disable-shared} to \code{configure}.
 
-If you intend to install the FLINT library and header files, 
-you can specify where they should be placed by passing 
+If you intend to install the FLINT library and header files,
+you can specify where they should be placed by passing
 \code{--prefix=path} to configure, where \code{path} is the directory
 under which the \code{lib} and \code{include} directories exist into
 which you wish to place the FLINT files when it is installed.
 
-If you wish to use FLINT on a single core machine then it will be
-configured by default for single mode. This is slightly faster, but
-is not threadsafe. (This mode can also be explicitly selected by 
-passing the \code{--single} option to configure.) If you wish to 
-build a threadsafe version of FLINT, you must pass the 
-\code{--reentrant} option to configure. This will be slower on 
-single core machines, but threadsafe.
+\chapter{TLS, reentrancy and single mode}
 
-On some systems, e.g. Sparc and some Macs, more than one ABI is 
+If you wish to use FLINT on a single core machine then it can be
+configured for single mode. This mode can also be explicitly selected
+by passing the \code{--single} option to configure. Single mode is
+slightly faster, but by default uses thread local storage if threads
+are used, and this is not available on some machines.
+
+FLINT uses thread local storage by default (\code{--enable-tls}).
+However, if reentrancy is required on systems that do not support
+this, one can pass \code{--disable-tls} and mutexes will be used
+instead (requires POSIX).
+
+If you wish to build a threadsafe version of FLINT which uses a
+less complicated memory model (slower, but still works in the absence
+of TLS) you can pass the \code{--reentrant} option to configure.
+
+\chapter{ABI and architecture support}
+
+On some systems, e.g. Sparc and some Macs, more than one ABI is
 available. FLINT chooses the ABI based on the CPU type available,
 however its default choice can be overridden by passing either
 \code{ABI=64} or \code{ABI=32} to configure.
+
+To build on MinGW64 it is necessary to pass \code{ABI=64} to
+configure, as FLINT is otherwise unable to distinguish it from
+MinGW32.
 
 In some cases, it is necessary to override the entire CPU/OS
 defaults. This can be done by passing \code{--build=cpu-os} to
@@ -365,23 +394,47 @@ configure. The available choices for CPU include \code{x86_64},
 \code{x86}, \code{ia64}, \code{sparc}, \code{sparc64}, \code{ppc},
 \code{ppc64}. Other CPU types are unrecognised and FLINT will
 build with generic code on those machines. The choices for OS
-include \code{Linux}, \code{MINGW32}, \code{CYGWIN}, 
-\code{Darwin}, \code{FreeBSD}, \code{SunOS} and numerous other
-operating systems.
- 
+include \code{Linux}, \code{MINGW32}, \code{MINGW64},
+\code{CYGWIN32}, \code{CYGWIN64}, \code{Darwin}, \code{FreeBSD},
+\code{SunOS} and numerous other operating systems.
+
 It is also possible to override the default CC, AR and CFLAGS used
-by FLINT by passing \code{CC=full_path_to_compiler}, etc., to 
+by FLINT by passing \code{CC=full_path_to_compiler}, etc., to
 FLINT's configure.
 
-Once FLINT is configured, in the main directory of the FLINT directory 
+\chapter{C++ wrapper}
+
+If you wish to enable the test functions for the FLINT C$++$ wrapper
+\code{flintxx} you must pass \code{--enable-cxx} to configure. The
+\code{C++} wrapper is always available, but tests will only run if
+this option is selected. It is disabled by default (\code{--disable-cxx})
+because some \code{C++} compilers internally segfault when compiling the
+tests, or exhaust memory due to the complexity of the \code{C++} code.
+
+\chapter{Garbage collection}
+
+If building FLINT as part of an application that uses the
+Boehm-Demers-Weiser GC library, you may wish to pass the
+\code{--with-gc=<path/to/gc/} option to configure. This causes
+FLINT to use \code{GC_malloc} and friends for its memory allocation
+strategy. The user is responsible for calling \code{GC_init}.
+
+The \code{--with-gc} option can be used with \code{--reentrant}, but not the
+\code{--enable-tls} option. In fact, configure will switch this off
+automatically and print a warning if it is selected in addition to
+\code{--with-gc}.
+
+\chapter{Building, testing, installing and using FLINT}
+
+Once FLINT is configured, in the main directory of the FLINT directory
 tree simply type:
 \begin{lstlisting}[language=bash]
 make
 make check
 \end{lstlisting}
 
-GNU make is required to build FLINT. This is simply \code{make} on 
-Linux, Darwin, MinGW and Cygwin systems. However, on some unixes the 
+GNU make is required to build FLINT. This is simply \code{make} on
+Linux, Darwin, MinGW and Cygwin systems. However, on some unixes the
 command is \code{gmake}.
 
 If you wish to install FLINT, simply type:
@@ -389,8 +442,8 @@ If you wish to install FLINT, simply type:
 make install
 \end{lstlisting}
 
-Now to use FLINT, simply include the appropriate header files for 
-the FLINT modules you wish to use in your C program.  Then compile 
+Now to use FLINT, simply include the appropriate header files for
+the FLINT modules you wish to use in your C program.  Then compile
 your program, linking against the FLINT library, GMP/MPIR, MPFR and
 pthreads with the options \code{-lflint -lmpfr -lgmp -lpthread}.
 
@@ -403,8 +456,10 @@ your machine, you can do the following in your code:
 
 \begin{lstlisting}[language=C]
 #undef ulong
+#define ulong ulongxx
 #include <stdio.h>
 // other system headers
+#undef ulong
 #define ulong mp_limb_t
 \end{lstlisting}
 
@@ -413,7 +468,7 @@ your system headers.
 
 The FLINT make system responds to the standard commands
 \begin{lstlisting}[language=bash]
-make 
+make
 make library
 make check
 make clean
@@ -422,27 +477,81 @@ make install
 \end{lstlisting}
 
 In addition, if you wish to simply check a single module of FLINT you
-can pass the option \code{MOD=modname} to \code{make check}. You can 
+can pass the option \code{MOD=modname} to \code{make check}. You can
 also pass a list of module names in inverted commas, e.g:
 
 \begin{lstlisting}[language=bash]
 make check MOD=ulong_extras
 \end{lstlisting}
 
+FLINT has an assert system. If you want a debug build you can pass
+\code{--enable-assert} to configure. However, this will slow FLINT
+considerably, so asserts should not be enabled (\code{--disable-assert},
+the default) for deployment.
+
 If your system supports parallel builds, FLINT will build in parallel,
 e.g:
 \begin{lstlisting}[language=bash]
-make -j4 check 
+make -j4 check
 \end{lstlisting}
 
-Note that on some systems, most notably MinGW, parallel make is 
+Note that on some systems, most notably MinGW, parallel make is
 supported but can be problematic.
+
+\chapter{FLINT extension modules}
+
+Numerous developers have been building libraries on top of FLINT,
+extending its functionality. These projects are known as FLINT
+extension modules.
+
+To build a FLINT extension module as part of FLINT, do the following:
+
+$\bullet$ Download the flint extension module and place it somewhere
+in your file system.
+
+$\bullet$ Pass \code{--extensions=/path/to/extension} to FLINT's
+configure, or if more than one extension is desired use
+\code{--extensions="/path/to/extension1 /path/to/extension2"},
+etc.
+
+Now most of the options that are available for FLINT are also
+available for those extension modules.
+
+Some examples of FLINT extension modules include:
+
+$\bullet$ Arb (by Fredrik Johansson) -- Arbitrary precision floating
+point ball arithmetic with rigorous error bounds, over the real and
+complex numbers (including polynomials, matrices, calculus and special
+functions). \url{http://fredrikj.net/arb/}
+
+$\bullet$ ANTIC (by William Hart and Claus Fieker) -- Algebraic Number
+Theory in C. Includes general number field arithmetic and class group
+computation. \url{https://github.com/wbhart/antic}
+
+$\bullet$ Bland (by Fredrik Johansson) -- Generic recursive rings over
+the basic FLINT types. \url{https://github.com/fredrik-johansson/bland}
+
+See the FLINT website \url{http://flintlib.org/} for a full list.
+
+Writing extension modules is trivial. One should include a top level
+directory containing a single directory for each module one wishes to
+supply. FLINT expects to find, in the top level, a \code{.h} file with
+the same name as each module directory.
+
+Inside each module directory there must be at least one \code{.c} file.
+There should also be a \code{test} subdirectory. Test files in the
+\code{test} subdirectories should be of the form \code{t-*.c} or
+\code{t-*.cpp}.
+
+You may optionally add \code{doc}, \code{profile} and \code{tune}
+subdirectories to each module directory. These may be supported by some
+later version of FLINT.
 
 \chapter{Test code}
 
-Each module of FLINT has an extensive associated test module.  We 
-strongly recommend running the test programs before relying on results 
-from FLINT on your system. 
+Each module of FLINT has an extensive associated test module.  We
+strongly recommend running the test programs before relying on results
+from FLINT on your system.
 
 To make and run the test programs, simply type:
 \begin{lstlisting}[language=bash]
@@ -453,17 +562,17 @@ in the main FLINT directory after configuring FLINT.
 
 \chapter{Reporting bugs}
 
-The maintainer wishes to be made aware of any and all bugs.  Please send an 
+The maintainer wishes to be made aware of any and all bugs.  Please send an
 email with your bug report to \url{hart_wb@yahoo.com} or report them on the
 FLINT devel list \url{https://groups.google.com/group/flint-devel?hl=en}.
 
-If possible please include details of your system, the version of GCC, 
-the versions of GMP/MPIR and MPFR as well as precise details of how to 
+If possible please include details of your system, the version of GCC,
+the versions of GMP/MPIR and MPFR as well as precise details of how to
 replicate the bug.
 
 Note that FLINT needs to be linked against version 2.6.0 or later of MPIR
 (or version 5.1.1 or later of GMP), version 3.0.0 or later of MPFR and
-must be compiled with gcc version 2.96 or later.  
+must be compiled with gcc version 2.96 or later.
 
 \chapter{Contributors}
 
@@ -471,54 +580,146 @@ FLINT has been developed since 2007 by a large number of people. Initially
 the library was started by David Harvey and William Hart. Later maintenance
 of the library was taken over solely by William Hart.
 
-The main authors of FLINT to date have been William Hart, David Harvey (no
-longer active), Fredrik Johansson, Sebastian Pancratz and Andy Novocin.
+The authors of FLINT to date:
 
-Other significant contributions to FLINT have been made by Jason Papadopoulos,
-Gonzalo Tornaria, David Howden, Burcin Erocal, Tom Boothby, Daniel Woodhouse, 
-Tomasz Lechowski, Richard Howell-Peak, Peter Shrimpton, Andrés Goens, Lina
-Kulakova, Thomas DuBuisson, Jean-Pierre Flori, Frithjof Schulze, Curtis 
-Bright.
+$\bullet$ William Hart -- integer and polynomial arithmetic, factorisation and
+primality testing, general infrastructure (supported by EPSRC Grant
+EP/G004870/1 and DFG Priority programme SPP1489)
 
-Jan Tuitman contributed to the design of the padics module.
+$\bullet$ Sebastian Pancratz -- polynomial arithmetic over $\Z$, $\Z/n\Z$ and
+$\Q$, $p$-adic and $q$-adic arithmetic, including polynomials and matrices
+(supported by ERC Grant 204083)
 
-Additional research was contributed by Daniel Scott and Daniel Ellam.
+$\bullet$ Andy Novocin -- LLL, polynomial factorisation over $Z$, polynomial
+composition
 
-Further patches and bug reports have been made by Michael Abshoff, Didier 
-Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
-Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan 
-Grayson, Martin Lee, Bob Smith, Antony Vennard, Frédéric Chyzak, Julien
-Puydt and many others.
+$\bullet$ Fredrik Johansson -- matrices, polynomial and power series
+arithmetic, special functions (supported by Austrian Science Fund FWF Grant
+Y464-N18)
 
-Ralf Hemmecke made available an autotools build for FLINT.
+$\bullet$ Tom Bachmann -- \code{C++} expressions template wrapper,
+documentation parser (Google Summer of Code 2013)
 
-Numerous people have contributed to wrapping FLINT in Sage and debugging, 
-including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
-Martin Albrecht, Sebastian Pancratz, Fredrik Johansson,
+$\bullet$ Mike Hansen -- Finite fields (small and large $\F_q$),
+polynomials/matrices over $\F_q$, Finite fields with Zech logarithm
+representation, Fast factorisation of polynomials over $\F_q$ (supported by
+Macaulay2 developers NSF Grant 1002171)
 
-Some code (\code{longlong.h} and \code{clz_tab.c}) has been used from
-an LGPL v2+ version of the GMP library. The main author of the GMP 
-library is Torbjorn Granlund.
+$\bullet$ Martin Lee -- Fast factorisation of polynomials over $\Z/n\Z$,
+faster Brent-Kung modular composition
+
+$\bullet$ David Harvey -- Fast Fourier Transform code, \code{zn_poly} for
+polynomial arithmetic over $\Z/n\Z$, \code{mpz_poly}, profiling and
+graphing code and many other parts of the FLINT library
+
+$\bullet$ Jan Tuitman -- helped with the $p$-adic interface
+
+$\bullet$ Jason Papadopoulos -- Block Lanczos code for quadratic sieve and
+multiprecision complex root finding code for polynomials.
+
+$\bullet$ Gonzalo Tornaria -- Theta function module, Montgomery multiplication
+and significant contributions to the $\Z[x]$ modular multiplication code.
+
+$\bullet$ Burcin Erocal -- wrote the primary FLINT wrapper in the SAGE system
+(Robert Bradshaw also wrote a preliminary version of this and Martin Albrecht
+and others have also contributed to it.)  Burcin also contributed by writing
+grant applications via his Lmonade organisation to Google. (Supported by DFG
+Priority programme SPP1489.)
+
+$\bullet$ Tom Boothby -- Improved factoring of unsigned longs, detection of
+perfect powers
+
+$\bullet$ Andres Goens -- $\F_q$ module and polynomials over $\F_q$ (supported
+by DFG Priority program SPP1489)
+
+$\bullet$ Lina Kulakova --  factorisation for polynomials over $\F_p$ for large
+$p$ (Google Summer of Code 2012)
+
+$\bullet$ Thomas DuBuisson -- logical ops for fmpz module, patches to the build
+system
+
+$\bullet$ Jean-Pierre Flori -- many build system patches and Sage integration
+
+$\bullet$ Frithjof Schulze -- some fmpz functions and various patches
+
+$\bullet$ Curtis Bright -- numerous patches including 32 bit support
+
+$\bullet$ Daniel Woodhouse -- Contributed an implementation of multivariate
+multiplication over $\Z/n\Z$ and used this to implement a fast ``saturation''
+algorithm for Laurent polynomials. (Funded by Alessio Corti and Tom Coates
+at Imperial College)
+
+$\bullet$ Tomasz Lechowski -- Contributed some NTL and Pari polynomial
+profiling code and researched algorithms for polynomials over finite fields.
+(Funded by the Nuffield Foundation)
+
+$\bullet$ Daniel Scott -- Researched lazy and relaxed algorithms of Joris van
+der Hoeven. (Funded by Warwick University's Undergraduate Research Scholars
+Scheme)
+
+$\bullet$ David Howden -- Wrote code for computing Bernoulli numbers mod many
+primes, including fast polynomial multiplication over $\Z/p\Z$ specifically for
+the task. (Funded by Warwick University's Undergraduate Research Scholars
+Scheme)
+
+$\bullet$ Daniel Ellam -- Helped design a module for $p$-adic arithmetic for
+FLINT. (Funded by Warwick University's Undergraduate Research Scholars Scheme)
+
+$\bullet$ Richard Howell-Peak -- Wrote polynomial factorisation and
+irreducibility testing code for polynomials over $\Z/p\Z$. (Funded by Warwick
+University's Undergraduate Research Scholars Scheme)
+
+$\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
+Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
+Weiferich prime search. (Funded by the Nuffield Foundation)
+
+$\bullet$ Patches and bug reports have been made by Michael Abshoff,
+Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
+Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
+Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
+Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Dana Jacobsen, Michael Jacobson Jr.,
+Mike Stillman, Jan Englehardt, Jean-Pierre Flori, Jeroen Demeyer, Shi Bai,
+Qingwen Guan, Frithjof Schulze, Robert Baillie, Oleksandr Motsak, Hans
+Schoenemann, Janko Boehm, Ahmed Soliman and others.
+
+$\bullet$ In addition Michael Abshoff, William Stein and Robert Bradshaw have
+contributed to the build system of FLINT.
+
+$\bullet$ Michael Abshoff deserves special recognition for his help in
+resolving a number of difficult build issues which came to light as FLINT was
+incorporated into SAGE and for bringing numerous bugs to the attention of the
+FLINT maintainers. Michael regularly checked FLINT for memory leaks and
+corruption, which directly led to numerous issues being identified early!
+He also helped with setting up various pieces of infrastructure for the FLINT
+project.
+
+$\bullet$ Numerous people have contributed to wrapping FLINT in Sage and
+debugging, including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert
+Bradshaw, Martin Albrecht, Sebastian Pancratz, Fredrik Johansson, Jeroen
+Demeyer and Leif Lionhardy, amongst others.
+
+Some code (notably \code{longlong.h} and \code{clz_tab.c}) has been used from
+the GMP library, whose main author is Torbjorn Granlund.
 
 FLINT 2 was a complete rewrite from scratch which began in about 2010.
- 
+
 \chapter{Tuning FLINT}
 
-FLINT uses a highly optimised Fast Fourier Transform routine for 
+FLINT uses a highly optimised Fast Fourier Transform routine for
 polynomial multiplication and some integer multiplication routines. This
-can be tuned by first typing \code{make tune} and then running the 
-program \code{build/fft/tune/tune_fft}. 
+can be tuned by first typing \code{make tune} and then running the
+program \code{build/fft/tune/tune_fft}.
 
-The output of the program can be pasted into  \code{fft_tuning64.in} or 
-\code{fft_tuning32.in} depending on the ABI of the current platform. FLINT 
-must then be configured again and a clean build initiated. 
+The output of the program can be pasted into  \code{fft_tuning64.in} or
+\code{fft_tuning32.in} depending on the ABI of the current platform. FLINT
+must then be configured again and a clean build initiated.
 
-Tuning is only necessary if you suspect that very large polynomial and 
+Tuning is only necessary if you suspect that very large polynomial and
 integer operations (millions of bits) are taking longer than they should.
 
 \chapter{Example programs}
 
-FLINT comes with example programs to demonstrate current and future FLINT 
+FLINT comes with example programs to demonstrate current and future FLINT
 features.  To build the example programs, type:
 
 \begin{lstlisting}[language=bash]
@@ -533,20 +734,20 @@ set this.
 The current example programs are:
 
 \code{partitions} Demonstrates the partition counting code, e.g.\\
-\code{build/examples/partitions 1000000000} will compute the number of 
+\code{build/examples/partitions 1000000000} will compute the number of
 partitions of \code{10^9}.
 
-\code{delta_qexp}  Computes the $n$-th term of the delta function, e.g.\\ 
-\code{build/examples/delta_qexp 1000000} will compute the one million-th 
+\code{delta_qexp}  Computes the $n$-th term of the delta function, e.g.\\
+\code{build/examples/delta_qexp 1000000} will compute the one million-th
 term of the $q$-expansion of delta.
 
-\code{crt}  Demonstrates the integer Chinese Remainder code, e.g.\ 
-\code{build/examples/crt 10382788} will build up the given integer from 
+\code{crt}  Demonstrates the integer Chinese Remainder code, e.g.\
+\code{build/examples/crt 10382788} will build up the given integer from
 its value mod various primes.
 
-\code{multi_crt}  Demonstrates the fast tree version of the integer Chinese 
-Remainder code, e.g.\ 
-\code{build/examples/multi_crt 100493287498239 13} will build up the given 
+\code{multi_crt}  Demonstrates the fast tree version of the integer Chinese
+Remainder code, e.g.\
+\code{build/examples/multi_crt 100493287498239 13} will build up the given
 integer from its value mod the given number of primes.
 
 \code{stirling_matrix}  Generates Stirling number matrices of the first
@@ -572,40 +773,52 @@ module.
 \code{fmpq_poly} Gives a very simple example of the \code{fmpq_poly}
 module.
 
+Some of the example programs have associated C$++$ versions.
+
 \chapter{FLINT macros}
 
 The file \code{flint.h} contains various useful macros.
 
-The macro constant \code{FLINT_BITS} is set at compile time to be the 
-number of bits per limb on the machine.  FLINT requires it to be either 
+The macro constant \code{FLINT_BITS} is set at compile time to be the
+number of bits per limb on the machine.  FLINT requires it to be either
 32 or 64 bits.  Other architectures are not currently supported.
 
-The macro constant \code{FLINT_D_BITS} is set at compile time to be the 
-number of bits per double on the machine or one less than the number of 
-bits per limb, whichever is smaller.  This will have the value 53 or 31 
-on currently supported architectures.  Numerous internal functions using 
-precomputed inverses only support operands up to \code{FLINT_D_BITS} bits, 
+The macro constant \code{FLINT_D_BITS} is set at compile time to be the
+number of bits per double on the machine or one less than the number of
+bits per limb, whichever is smaller.  This will have the value 53 or 31
+on currently supported architectures.  Numerous internal functions using
+precomputed inverses only support operands up to \code{FLINT_D_BITS} bits,
 hence the macro.
 
 The macro \code{FLINT_ABS(x)} returns the absolute value of \code{x}
-for primitive signed numerical types.  It might fail for least negative 
-values such as \code{INT_MIN} and \code{LONG_MIN}.
+for primitive signed numerical types.  It might fail for least negative
+values such as \code{INT_MIN} and \code{WORD_MIN}.
 
-The macro \code{FLINT_MIN(x, y)} returns the minimum of \code{x} and 
-\code{y} for primitive signed or unsigned numerical types.  This macro 
-is only safe to use when \code{x} and \code{y} are of the same type, 
+The macro \code{FLINT_MIN(x, y)} returns the minimum of \code{x} and
+\code{y} for primitive signed or unsigned numerical types.  This macro
+is only safe to use when \code{x} and \code{y} are of the same type,
 to avoid problems with integer promotion.
 
-Similar to the previous macro, \code{FLINT_MAX(x, y)} returns the 
+Similar to the previous macro, \code{FLINT_MAX(x, y)} returns the
 maximum of \code{x} and \code{y}.
 
-The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits 
-required to represent an \code{ulong x}.  If \code{x} is zero, 
+The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits
+required to represent an \code{ulong x}.  If \code{x} is zero,
 returns~$0$.
 
-Derived from this there are the two macros \code{FLINT_FLOG2(x)} and 
-\code{FLINT_CLOG2(x)} which, for any $x \geq 1$, compute $\floor{\log_2{x}}$ 
+Derived from this there are the two macros \code{FLINT_FLOG2(x)} and
+\code{FLINT_CLOG2(x)} which, for any $x \geq 1$, compute $\floor{\log_2{x}}$
 and $\ceil{\log_2{x}}$.
+
+To determine the current FLINT version a number of macros are available.
+For example, if the current FLINT version is \code{2.4.0} then
+\code{__FLINT_VERSION} will have the value $2$, \code{__FLINT_MINOR}
+will have the value $4$ and \code{__FLINT_PATCHLEVEL} will have the value
+$0$. The \code{__FLINT_RELEASE} macro will have the value $20400$.
+
+The \code{FLINT_VERSION} macro is a static text string giving the version
+number, e.g. ``2.4'' or ``2.4.1''. Note that if the final digit is a zero
+it is suppressed.
 
 \chapter{Memory management}
 
@@ -617,15 +830,84 @@ may perform additional error checking.
 FLINT may cache some data (such as allocated integers
 and tables of prime numbers) to speed up various computations.
 If FLINT is built in threadsafe mode, cached data is kept in thread-local
-storage. Cached data can be freed by calling the \code{flint_cleanup()}
-function. It is recommended to call \code{flint_cleanup()} right before
-exiting a thread, and at the end of the main program.
+storage by default (unless configured otherwise). Cached data can be freed
+by calling the \code{flint_cleanup()} function. It is recommended to call
+\code{flint_cleanup()} right before exiting a thread, and at the end of the
+main program.
 
 The user can register additional cleanup functions to be invoked
-by \code{flint_cleanup()}. This is done by passing a pointer
+by \code{flint_cleanup()} by passing a pointer
 to a function with signature \code{void cleanup_function(void)}
 to \code{flint_register_cleanup_function()}.
 
+\chapter{Temporary allocation}
+
+FLINT allows for temporary allocation of memory using \code{alloca}
+to allocate on the stack if the allocation is small enough.
+
+The following program demonstrates how to use this facility to
+allocate two different arrays.
+
+\begin{lstlisting}[language=C]
+#include <gmp.h>
+#include "flint.h"
+
+void myfun(void)
+{
+   /* other variable declarations */
+   mp_ptr a, b;
+   TMP_INIT;
+
+   /* arbitrary code*/
+
+   TMP_START; /* we are about to do some allocation */
+
+   /* arbitrary code */
+
+   a = TMP_ALLOC(32*sizeof(mp_limb_t));
+   b = TMP_ALLOC(64*sizeof(mp_limb_t));
+
+   /* arbitrary code */
+
+   TMP_END; /* cleans up a and b */
+
+   /* arbitrary code */
+}
+\end{lstlisting}
+
+It is very important to note that temporary allocations should not be
+made in recursive functions, as many small allocations on the stack
+can exhaust the stack causing a stack overflow.
+
+\chapter{Platform-safe types, format specifiers and constants}
+
+For platform independence, FLINT provides two types \code{ulong}
+and \code{slong} to replace \code{unsigned long} and \code{long}
+respectively. These are guaranteed to be the same size as GMP's
+\code{mp_limb_t} and \code{mp_limb_signed_t} types, respectively.
+
+A full list of types provided by FLINT is available in
+\code{code_conventions.txt} in the top-level source tree.
+
+As FLINT supports Windows 64 on which the FLINT \code{ulong} and
+\code{slong} types are 64 bits, whilst \code{unsigned long} and
+\code{long} are only 32 bits, it is necessary to have a special
+format specifier which is 64 bits on Windows 64 instead of the usual
+\code{"%lu"} and \code{"%ld"}.
+
+For this purpose FLINT provides its own I/O functions, \code{flint_printf},
+\code{flint_fprintf}, \code{flint_sprintf}, \code{flint_scanf},
+\code{flint_fscanf} and \code{flint_sscanf}, which work exactly as the
+usual system versions, but which take the \code{"%wu"} and \code{"%wd"}
+format specifiers, which support FLINT \code{ulong} and \code{slong}
+types respectively.
+
+Also, instead of using constants \code{123UL} and \code{123L}, FLINT
+provides the macros \code{UWORD(123)} and \code{WORD(123)} respectively
+for constants of type \code{ulong} and \code{slong} respectively.
+
+The maximum and minimum values that can be represented by these types
+are given by \code{UWORD_MAX} and \code{WORD_MAX} respectively.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integers                                                                     %
@@ -636,56 +918,56 @@ to \code{flint_register_cleanup_function()}.
 
 \section{Introduction}
 
-By default, an \code{fmpz_t} is implemented as an array of \code{fmpz}'s of 
-length one to allow passing by reference as one can do with GMP/ MPIR's 
-\code{mpz_t} type.  The \code{fmpz_t} type is simply a single limb, though 
-the user does not need to be aware of this except in one specific case 
+By default, an \code{fmpz_t} is implemented as an array of \code{fmpz}'s of
+length one to allow passing by reference as one can do with GMP/ MPIR's
+\code{mpz_t} type.  The \code{fmpz_t} type is simply a single limb, though
+the user does not need to be aware of this except in one specific case
 outlined below.
 
-In all respects, \code{fmpz_t}'s act precisely like GMP/ MPIR's 
-\code{mpz_t}'s, with automatic memory management, however, in the first 
-place only one limb is used to implement them.  Once an \code{fmpz_t} 
-overflows a limb then a multiprecision integer is automatically allocated 
-and instead of storing the actual integer data the \code{slong} which 
-implements the type becomes an index into a FLINT wide array of 
+In all respects, \code{fmpz_t}'s act precisely like GMP/ MPIR's
+\code{mpz_t}'s, with automatic memory management, however, in the first
+place only one limb is used to implement them.  Once an \code{fmpz_t}
+overflows a limb then a multiprecision integer is automatically allocated
+and instead of storing the actual integer data the \code{slong} which
+implements the type becomes an index into a FLINT wide array of
 \code{mpz_t}'s.
 
-These internal implementation details are not important for the user to 
+These internal implementation details are not important for the user to
 understand, except for three important things.
 
-Firstly, \code{fmpz_t}'s will be more efficient than \code{mpz_t}'s for 
-single limb operations, or more precisely for signed quantities whose 
+Firstly, \code{fmpz_t}'s will be more efficient than \code{mpz_t}'s for
+single limb operations, or more precisely for signed quantities whose
 absolute value does not exceed \code{FLINT_BITS - 2} bits.
 
-Secondly, for small integers that fit into \code{FLINT_BITS - 2} bits 
-much less memory will be used than for an \code{mpz_t}.  When very many 
-\code{fmpz_t}'s are used, there can be important cache benefits on 
+Secondly, for small integers that fit into \code{FLINT_BITS - 2} bits
+much less memory will be used than for an \code{mpz_t}.  When very many
+\code{fmpz_t}'s are used, there can be important cache benefits on
 account of this.
 
-Thirdly, it is important to understand how to deal with arrays of 
-\code{fmpz_t}'s.  As for \code{mpz_t}'s, there is an underlying type, 
-an \code{fmpz}, which can be used to create the array, e.g.\ 
+Thirdly, it is important to understand how to deal with arrays of
+\code{fmpz_t}'s.  As for \code{mpz_t}'s, there is an underlying type,
+an \code{fmpz}, which can be used to create the array, e.g.\
 \begin{lstlisting}
 fmpz myarr[100];
 \end{lstlisting}
 Now recall that an \code{fmpz_t} is an array of length one of \code{fmpz}'s.
 Thus, a pointer to an \code{fmpz} can be used in place of an \code{fmpz_t}.
-For example, to find the sign of the third integer in our array we would 
-write 
+For example, to find the sign of the third integer in our array we would
+write
 \begin{lstlisting}
 int sign = fmpz_sgn(myarr + 2);
 \end{lstlisting}
 
-The \code{fmpz} module provides routines for memory management, basic 
+The \code{fmpz} module provides routines for memory management, basic
 manipulation and basic arithmetic.
 
-Unless otherwise specified, all functions in this section permit aliasing 
-between their input arguments and between their input and output 
+Unless otherwise specified, all functions in this section permit aliasing
+between their input arguments and between their input and output
 arguments.
 
 \section{Simple example}
 
-The following example computes the square of the integer $7$ and prints 
+The following example computes the square of the integer $7$ and prints
 the result.
 \begin{lstlisting}[language=c]
 #include "fmpz.h"
@@ -696,9 +978,9 @@ fmpz_init(y);
 fmpz_set_ui(x, 7);
 fmpz_mul(y, x, x);
 fmpz_print(x);
-printf("^2 = ");
+flint_printf("^2 = ");
 fmpz_print(y);
-printf("\n");
+flint_printf("\n");
 fmpz_clear(x);
 fmpz_clear(y);
 \end{lstlisting}
@@ -728,6 +1010,10 @@ We now describe the functions available in the \code{fmpz} module.
 \chapter{fmpz\_factor}
 \epigraph{Factorisation in $\Z$}{}
 
+The \code{fmpz_factor} module is included automatically with
+\code{fmpz.h}. One should not try to include \code{fmpz_factor.h}
+directly.
+
 \input{input/fmpz_factor.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -753,7 +1039,7 @@ index $0,1,\ldots,n-1$. One or both of $m$ and $n$ may be zero.
 
 Elements of a matrix can be read or written using the \code{fmpz_mat_entry}
 macro, which returns a reference to the entry at a given row and column index.
-This reference can be passed as an input or output \code{fmpz_t} variable to 
+This reference can be passed as an input or output \code{fmpz_t} variable to
 any function in the \code{fmpz} module for direct manipulation.
 
 \section{Simple example}
@@ -774,9 +1060,9 @@ for (i = 0; i < 2; i++)
     for (j = 0; j < 2; j++)
         fmpz_set_ui(fmpz_mat_entry(A, i, j), 2*i+j);
 fmpz_mat_mul(B, A, A);
-printf("A = \n");
+flint_printf("A = \n");
 fmpz_mat_print_pretty(A);
-printf("A^2 = \n");
+flint_printf("A^2 = \n");
 fmpz_mat_print_pretty(B);
 fmpz_mat_clear(A);
 fmpz_mat_clear(B);
@@ -784,10 +1070,10 @@ fmpz_mat_clear(B);
 
 The output is:
 \begin{lstlisting}
-A = 
+A =
 [[0 1]
 [2 3]]
-A^2 = 
+A^2 =
 [[2 3]
 [6 11]]
 \end{lstlisting}
@@ -804,19 +1090,19 @@ A^2 =
 
 \section{Introduction}
 
-The \code{fmpz_poly_t} data type represents elements of $\Z[x]$. The 
-\code{fmpz_poly} module provides routines for memory management, basic 
+The \code{fmpz_poly_t} data type represents elements of $\Z[x]$. The
+\code{fmpz_poly} module provides routines for memory management, basic
 arithmetic, and conversions from or to other types.
 
-Each coefficient of an \code{fmpz_poly_t} is an integer of the FLINT 
-\code{fmpz_t} type.  There are two advantages of this model.  Firstly, 
-the \code{fmpz_t} type is memory managed, so the user can manipulate 
-individual coefficients of a polynomial without having to deal with 
-tedious memory management.  Secondly, a coefficient of an 
-\code{fmpz_poly_t} can be changed without changing the size of any 
+Each coefficient of an \code{fmpz_poly_t} is an integer of the FLINT
+\code{fmpz_t} type.  There are two advantages of this model.  Firstly,
+the \code{fmpz_t} type is memory managed, so the user can manipulate
+individual coefficients of a polynomial without having to deal with
+tedious memory management.  Secondly, a coefficient of an
+\code{fmpz_poly_t} can be changed without changing the size of any
 of the other coefficients.
 
-Unless otherwise specified, all functions in this section permit aliasing 
+Unless otherwise specified, all functions in this section permit aliasing
 between their input arguments and between their input and output arguments.
 
 \section{Simple example}
@@ -831,8 +1117,8 @@ fmpz_poly_init(y);
 fmpz_poly_set_coeff_ui(x, 3, 5);
 fmpz_poly_set_coeff_si(x, 0, -1);
 fmpz_poly_mul(y, x, x);
-fmpz_poly_print(x); printf("\n");
-fmpz_poly_print(y); printf("\n");
+fmpz_poly_print(x); flint_printf("\n");
+fmpz_poly_print(y); flint_printf("\n");
 fmpz_poly_clear(x);
 fmpz_poly_clear(y);
 \end{lstlisting}
@@ -845,33 +1131,33 @@ The output is:
 
 \section{Definition of the fmpz\_poly\_t type}
 
-The \code{fmpz_poly_t} type is a typedef for an array of length~1 of 
-\code{fmpz_poly_struct}'s.  This permits passing parameters of type 
-\code{fmpz_poly_t} by reference in a manner similar to the way GMP integers 
-of type \code{mpz_t} can be passed by reference. 
+The \code{fmpz_poly_t} type is a typedef for an array of length~1 of
+\code{fmpz_poly_struct}'s.  This permits passing parameters of type
+\code{fmpz_poly_t} by reference in a manner similar to the way GMP integers
+of type \code{mpz_t} can be passed by reference.
 
-In reality one never deals directly with the \code{struct} and simply deals 
-with objects of type \code{fmpz_poly_t}.  For simplicity we will think of an 
-\code{fmpz_poly_t} as a \code{struct}, though in practice to access fields 
-of this \code{struct}, one needs to dereference first, e.g.\ to access the 
-\code{length} field of an \code{fmpz_poly_t} called \code{poly1} one writes 
-\code{poly1->length}. 
+In reality one never deals directly with the \code{struct} and simply deals
+with objects of type \code{fmpz_poly_t}.  For simplicity we will think of an
+\code{fmpz_poly_t} as a \code{struct}, though in practice to access fields
+of this \code{struct}, one needs to dereference first, e.g.\ to access the
+\code{length} field of an \code{fmpz_poly_t} called \code{poly1} one writes
+\code{poly1->length}.
 
-An \code{fmpz_poly_t} is said to be \emph{normalised} if either 
-\code{length} is zero, or if the leading coefficient of the polynomial is 
-non-zero.  All \code{fmpz_poly} functions expect their inputs to be 
-normalised, and unless otherwise specified they produce output that is 
-normalised. 
+An \code{fmpz_poly_t} is said to be \emph{normalised} if either
+\code{length} is zero, or if the leading coefficient of the polynomial is
+non-zero.  All \code{fmpz_poly} functions expect their inputs to be
+normalised, and unless otherwise specified they produce output that is
+normalised.
 
-It is recommended that users do not access the fields of an 
-\code{fmpz_poly_t} or its coefficient data directly, but make use of the 
+It is recommended that users do not access the fields of an
+\code{fmpz_poly_t} or its coefficient data directly, but make use of the
 functions designed for this purpose, detailed below.
 
-Functions in \code{fmpz_poly} do all the memory management for the user. 
-One does not need to specify the maximum length or number of limbs per 
-coefficient in advance before using a polynomial object.  FLINT reallocates 
-space automatically as the computation proceeds, if more space is required. 
-Each coefficient is also managed separately, being resized as needed, 
+Functions in \code{fmpz_poly} do all the memory management for the user.
+One does not need to specify the maximum length or number of limbs per
+coefficient in advance before using a polynomial object.  FLINT reallocates
+space automatically as the computation proceeds, if more space is required.
+Each coefficient is also managed separately, being resized as needed,
 independently of the other coefficients.
 
 We now describe the functions available in \code{fmpz_poly}.
@@ -884,6 +1170,10 @@ We now describe the functions available in \code{fmpz_poly}.
 
 \chapter{fmpz\_poly\_factor}
 \epigraph{Factorisation of polynomials over $\Z$}{}
+
+The \code{fmpz_poly_factor} module is included automatically with
+\code{fmpz_poly.h}. One should not try to include \code{fmpz_poly_factor.h}
+directly.
 
 \input{input/fmpz_poly_factor.tex}
 
@@ -925,7 +1215,7 @@ on \code{fmpq_t}'s and an underscore version operating
 on \code{fmpz_t} components are provided. The underscore
 functions may perform less error checking,
 and may impose limitations on aliasing between the
-input and output variables, but 
+input and output variables, but
 generally assume that the components are in
 canonical form just like the non-underscore functions.
 
@@ -965,46 +1255,46 @@ functions for conversion between rational and integer matrices are provided.
 
 \section{Introduction}
 
-The \code{fmpq_poly_t} data type represents elements of $\Q[x]$. The 
-\code{fmpq_poly} module provides routines for memory management, basic 
+The \code{fmpq_poly_t} data type represents elements of $\Q[x]$. The
+\code{fmpq_poly} module provides routines for memory management, basic
 arithmetic, and conversions from or to other types.
 
-A rational polynomial is stored as the quotient of an integer polynomial 
-and an integer denominator.  To be more precise, the coefficient vector 
-of the numerator can be accessed with the function \code{fmpq_poly_numref()} 
-and the denominator with \code{fmpq_poly_denref()}.  Although one can 
-construct use cases in which a representation as a list of rational 
-coefficients would be beneficial, the choice made here is typically 
+A rational polynomial is stored as the quotient of an integer polynomial
+and an integer denominator.  To be more precise, the coefficient vector
+of the numerator can be accessed with the function \code{fmpq_poly_numref()}
+and the denominator with \code{fmpq_poly_denref()}.  Although one can
+construct use cases in which a representation as a list of rational
+coefficients would be beneficial, the choice made here is typically
 more efficient.
 
-We can obtain a unique representation based on this choice by enforcing, 
-for non-zero polynomials, that the numerator and denominator are coprime 
-and that the denominator is positive.  The unique representation of the 
+We can obtain a unique representation based on this choice by enforcing,
+for non-zero polynomials, that the numerator and denominator are coprime
+and that the denominator is positive.  The unique representation of the
 zero polynomial is chosen as $0/1$.
 
-Similar to the situation in the \code{fmpz_poly_t} case, an 
-\code{fmpq_poly_t} object also has a \code{length} parameter, which 
-denotes the length of the vector of coefficients of the numerator. 
-We say a polynomial is \emph{normalised} either if this length is zero 
+Similar to the situation in the \code{fmpz_poly_t} case, an
+\code{fmpq_poly_t} object also has a \code{length} parameter, which
+denotes the length of the vector of coefficients of the numerator.
+We say a polynomial is \emph{normalised} either if this length is zero
 or if the leading coefficient is non-zero.
 
-We say a polynomial is in \emph{canonical} form if it is given in the 
+We say a polynomial is in \emph{canonical} form if it is given in the
 unique representation discussed above and normalised.
 
 The functions provided in this module roughly fall into two categories:
 
-On the one hand, there are functions mainly provided for the user, whose 
-names do not begin with an underscore.  These typically operate on 
-polynomials of type \code{fmpq_poly_t} in canonical form and, unless 
-specified otherwise, permit aliasing between their input arguments and 
+On the one hand, there are functions mainly provided for the user, whose
+names do not begin with an underscore.  These typically operate on
+polynomials of type \code{fmpq_poly_t} in canonical form and, unless
+specified otherwise, permit aliasing between their input arguments and
 between their output arguments.
 
-On the other hand, there are versions of these functions whose names are 
-prefixed with a single underscore.  These typically operate on polynomials 
-given in the form of a triple of object of types \code{fmpz *}, 
-\code{fmpz_t}, and \code{slong}, containing the numerator, denominator and 
-length, respectively.  In general, these functions expect their input to 
-be normalised, i.e.\ they do not allow zero padding, and to be in lowest 
+On the other hand, there are versions of these functions whose names are
+prefixed with a single underscore.  These typically operate on polynomials
+given in the form of a triple of object of types \code{fmpz *},
+\code{fmpz_t}, and \code{slong}, containing the numerator, denominator and
+length, respectively.  In general, these functions expect their input to
+be normalised, i.e.\ they do not allow zero padding, and to be in lowest
 terms, and they do not allow their input and output arguments to be aliased.
 
 \input{input/fmpq_poly.tex}
@@ -1018,41 +1308,41 @@ terms, and they do not allow their input and output arguments to be aliased.
 
 \section{Introduction}
 
-The module \code{fmpz_poly_q} provides functions for performing 
-arithmetic on rational functions in $\mathbf{Q}(t)$, represented as 
-quotients of integer polynomials of type \code{fmpz_poly_t}.  These 
+The module \code{fmpz_poly_q} provides functions for performing
+arithmetic on rational functions in $\mathbf{Q}(t)$, represented as
+quotients of integer polynomials of type \code{fmpz_poly_t}.  These
 functions start with the prefix \code{fmpz_poly_q_}.
 
-Rational functions are stored in objects of type \code{fmpz_poly_q_t}, 
-which is an array of \code{fmpz_poly_q_struct}'s of length one.  This 
-permits passing parameters of type \code{fmpz_poly_q_t} by reference.  
+Rational functions are stored in objects of type \code{fmpz_poly_q_t},
+which is an array of \code{fmpz_poly_q_struct}'s of length one.  This
+permits passing parameters of type \code{fmpz_poly_q_t} by reference.
 
-The representation of a rational function as the quotient of two integer 
-polynomials can be made canonical by demanding the numerator and 
-denominator to be coprime (as integer polynomials) and the denominator to 
-have positive leading coefficient.  As the only special case, we represent 
-the zero function as $0/1$.  All arithmetic functions assume that the 
-operands are in this canonical form, and canonicalize their result.  If the 
-numerator or denominator is modified individually, for example using the 
-macros \code{fmpz_poly_q_numref()} and \code{fmpz_poly_q_denref()}, 
-it is the user's responsibility to canonicalise the rational function 
+The representation of a rational function as the quotient of two integer
+polynomials can be made canonical by demanding the numerator and
+denominator to be coprime (as integer polynomials) and the denominator to
+have positive leading coefficient.  As the only special case, we represent
+the zero function as $0/1$.  All arithmetic functions assume that the
+operands are in this canonical form, and canonicalize their result.  If the
+numerator or denominator is modified individually, for example using the
+macros \code{fmpz_poly_q_numref()} and \code{fmpz_poly_q_denref()},
+it is the user's responsibility to canonicalise the rational function
 using the function \code{fmpz_poly_q_canonicalise()} if necessary.
 
-All methods support aliasing of their inputs and outputs \emph{unless} 
-explicitly stated otherwise, subject to the following caveat.  If 
-different rational functions (as objects in memory, not necessarily in the 
-mathematical sense) share some of the underlying integer polynomial 
+All methods support aliasing of their inputs and outputs \emph{unless}
+explicitly stated otherwise, subject to the following caveat.  If
+different rational functions (as objects in memory, not necessarily in the
+mathematical sense) share some of the underlying integer polynomial
 objects, the behaviour is undefined.
 
-The basic arithmetic operations, addition, subtraction and multiplication, 
-are all implemented using adapted versions of Henrici's algorithms, 
-see~\citep{Hen1956}.  Differentiation is implemented in a way slightly 
+The basic arithmetic operations, addition, subtraction and multiplication,
+are all implemented using adapted versions of Henrici's algorithms,
+see~\citep{Hen1956}.  Differentiation is implemented in a way slightly
 improving on the algorithm described in~\citep{Hor1972}.
 
 \section{Simple example}
 
 
-The following example computes the product of two rational functions and 
+The following example computes the product of two rational functions and
 prints the result:
 \begin{lstlisting}[language=c]
 #include "fmpz_poly_q.h"
@@ -1067,7 +1357,7 @@ strf = fmpz_poly_q_get_str_pretty(f, "t");
 strg = fmpz_poly_q_get_str_pretty(g, "t");
 fmpz_poly_q_mul(f, f, g);
 str  = fmpz_poly_q_get_str_pretty(f, "t");
-printf("%s * %s = %s\n", strf, strg, str);
+flint_printf("%s * %s = %s\n", strf, strg, str);
 free(str);
 free(strf);
 free(strg);
@@ -1095,7 +1385,7 @@ entries are integer polynomials.
 The \code{fmpz_poly_mat_t} type is defined as an array of
 \code{fmpz_poly_mat_struct}'s of length one.
 This  permits passing parameters of type \code{fmpz_poly_mat_t}
-by reference.  
+by reference.
 
 An integer polynomial matrix internally consists of a single array
 of \code{fmpz_poly_struct}'s, representing a dense matrix in
@@ -1165,14 +1455,14 @@ x^2-3*x-1
 \section{Introduction}
 
 The \code{nmod_poly_t} data type represents elements of $\Z/n\Z[x]$ for
-a fixed modulus $n$. The \code{nmod_poly} module provides routines for 
+a fixed modulus $n$. The \code{nmod_poly} module provides routines for
 memory management, basic arithmetic and some higher level functions
 such as GCD, etc.
 
 Each coefficient of an \code{nmod_poly_t} is of type \code{mp_limb_t}
-and represents an integer reduced modulo the fixed modulus $n$.  
+and represents an integer reduced modulo the fixed modulus $n$.
 
-Unless otherwise specified, all functions in this section permit aliasing 
+Unless otherwise specified, all functions in this section permit aliasing
 between their input arguments and between their input and output arguments.
 
 \section{Simple example}
@@ -1188,8 +1478,8 @@ nmod_poly_init(y, 7);
 nmod_poly_set_coeff_ui(x, 3, 5);
 nmod_poly_set_coeff_ui(x, 0, 6);
 nmod_poly_mul(y, x, x);
-nmod_poly_print(x); printf("\n");
-nmod_poly_print(y); printf("\n");
+nmod_poly_print(x); flint_printf("\n");
+nmod_poly_print(y); flint_printf("\n");
 nmod_poly_clear(x);
 nmod_poly_clear(y);
 \end{lstlisting}
@@ -1202,36 +1492,49 @@ The output is:
 
 \section{Definition of the nmod\_poly\_t type}
 
-The \code{nmod_poly_t} type is a typedef for an array of length~1 of 
-\code{nmod_poly_struct}'s.  This permits passing parameters of type 
-\code{nmod_poly_t} by reference. 
+The \code{nmod_poly_t} type is a typedef for an array of length~1 of
+\code{nmod_poly_struct}'s.  This permits passing parameters of type
+\code{nmod_poly_t} by reference.
 
-In reality one never deals directly with the \code{struct} and simply deals 
-with objects of type \code{nmod_poly_t}.  For simplicity we will think of an 
-\code{nmod_poly_t} as a \code{struct}, though in practice to access fields 
-of this \code{struct}, one needs to dereference first, e.g.\ to access the 
-\code{length} field of an \code{nmod_poly_t} called \code{poly1} one writes 
-\code{poly1->length}. 
+In reality one never deals directly with the \code{struct} and simply deals
+with objects of type \code{nmod_poly_t}.  For simplicity we will think of an
+\code{nmod_poly_t} as a \code{struct}, though in practice to access fields
+of this \code{struct}, one needs to dereference first, e.g.\ to access the
+\code{length} field of an \code{nmod_poly_t} called \code{poly1} one writes
+\code{poly1->length}.
 
-An \code{nmod_poly_t} is said to be \emph{normalised} if either 
-\code{length} is zero, or if the leading coefficient of the polynomial is 
-non-zero.  All \code{nmod_poly} functions expect their inputs to be 
-normalised and for all coefficients to be reduced modulo $n$, and unless 
-otherwise specified they produce output that is normalised with 
+An \code{nmod_poly_t} is said to be \emph{normalised} if either
+\code{length} is zero, or if the leading coefficient of the polynomial is
+non-zero.  All \code{nmod_poly} functions expect their inputs to be
+normalised and for all coefficients to be reduced modulo $n$, and unless
+otherwise specified they produce output that is normalised with
 coefficients reduced modulo $n$.
 
-It is recommended that users do not access the fields of an 
-\code{nmod_poly_t} or its coefficient data directly, but make use of the 
+It is recommended that users do not access the fields of an
+\code{nmod_poly_t} or its coefficient data directly, but make use of the
 functions designed for this purpose, detailed below.
 
-Functions in \code{nmod_poly} do all the memory management for the user. 
-One does not need to specify the maximum length in advance before using a 
-polynomial object.  FLINT reallocates space automatically as the computation 
-proceeds, if more space is required. 
+Functions in \code{nmod_poly} do all the memory management for the user.
+One does not need to specify the maximum length in advance before using a
+polynomial object.  FLINT reallocates space automatically as the computation
+proceeds, if more space is required.
 
 We now describe the functions available in \code{nmod_poly}.
 
 \input{input/nmod_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Factorisation of polynomials over Z / nZ for word-sized moduli               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{nmod\_poly\_factor}
+\epigraph{Factorisation of polynomials over $\Z / n \Z$ for word-sized moduli}{}
+
+The \code{nmod_poly_factor} module is included automatically with
+\code{nmod_poly.h}. One should not try to include \code{nmod_poly_factor.h}
+directly.
+
+\input{input/nmod_poly_factor.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Matrices over Z / nZ for word-sized moduli                                   %
@@ -1242,7 +1545,7 @@ We now describe the functions available in \code{nmod_poly}.
 
 \section{Introduction}
 
-An \code{nmod_mat_t} represents a matrix of integers modulo $n$, for any 
+An \code{nmod_mat_t} represents a matrix of integers modulo $n$, for any
 non-zero modulus $n$ that fits in a single limb,
 up to $2^{32}-1$ or $2^{64}-1$.
 
@@ -1318,15 +1621,15 @@ whose dimensions are compatible with the given operation.
 \section{Introduction}
 
 The \code{fmpz_mod_poly_t} data type represents elements of $\Z/n\Z[x]$ for
-a fixed modulus $n$. The \code{fmpz_mod_poly} module provides routines for 
+a fixed modulus $n$. The \code{fmpz_mod_poly} module provides routines for
 memory management, basic arithmetic and some higher level functions
 such as GCD, etc.
 
-Each coefficient of an \code{fmpz_mod_poly_t} is of type \code{fmpz} 
-and represents an integer reduced modulo the fixed modulus $n$ in the 
+Each coefficient of an \code{fmpz_mod_poly_t} is of type \code{fmpz}
+and represents an integer reduced modulo the fixed modulus $n$ in the
 range $[0,n)$.
 
-Unless otherwise specified, all functions in this section permit aliasing 
+Unless otherwise specified, all functions in this section permit aliasing
 between their input arguments and between their input and output arguments.
 
 \section{Simple example}
@@ -1345,8 +1648,8 @@ fmpz_mod_poly_init(y, n);
 fmpz_mod_poly_set_coeff_ui(x, 3, 5);
 fmpz_mod_poly_set_coeff_ui(x, 0, 6);
 fmpz_mod_poly_sqr(y, x);
-fmpz_mod_poly_print(x); printf("\n");
-fmpz_mod_poly_print(y); printf("\n");
+fmpz_mod_poly_print(x); flint_printf("\n");
+fmpz_mod_poly_print(y); flint_printf("\n");
 fmpz_mod_poly_clear(x);
 fmpz_mod_poly_clear(y);
 fmpz_clear(n);
@@ -1360,36 +1663,274 @@ The output is:
 
 \section{Definition of the fmpz\_mod\_poly\_t type}
 
-The \code{fmpz_mod_poly_t} type is a typedef for an array of length~1 of\\ 
-\code{fmpz_mod_poly_struct}'s.  This permits passing parameters of type 
-\code{fmpz_mod_poly_t} by reference. 
+The \code{fmpz_mod_poly_t} type is a typedef for an array of length~1 of\\
+\code{fmpz_mod_poly_struct}'s.  This permits passing parameters of type
+\code{fmpz_mod_poly_t} by reference.
 
-In reality one never deals directly with the \code{struct} and simply deals 
-with objects of type \code{fmpz_mod_poly_t}.  For simplicity we will think of an 
-\code{fmpz_mod_poly_t} as a \code{struct}, though in practice to access fields 
-of this \code{struct}, one needs to dereference first, e.g.\ to access the 
-\code{length} field of an \code{fmpz_mod_poly_t} called \code{poly1} one writes 
-\code{poly1->length}. 
+In reality one never deals directly with the \code{struct} and simply deals
+with objects of type \code{fmpz_mod_poly_t}.  For simplicity we will think of an
+\code{fmpz_mod_poly_t} as a \code{struct}, though in practice to access fields
+of this \code{struct}, one needs to dereference first, e.g.\ to access the
+\code{length} field of an \code{fmpz_mod_poly_t} called \code{poly1} one writes
+\code{poly1->length}.
 
-An \code{fmpz_mod_poly_t} is said to be \emph{normalised} if either 
-\code{length} is zero, or if the leading coefficient of the polynomial is 
-non-zero.  All \code{fmpz_mod_poly} functions expect their inputs to be 
-normalised and all coefficients to be reduced modulo~$n$, and unless 
-otherwise specified they produce output that is normalised with coefficients 
+An \code{fmpz_mod_poly_t} is said to be \emph{normalised} if either
+\code{length} is zero, or if the leading coefficient of the polynomial is
+non-zero.  All \code{fmpz_mod_poly} functions expect their inputs to be
+normalised and all coefficients to be reduced modulo~$n$, and unless
+otherwise specified they produce output that is normalised with coefficients
 reduced modulo~$n$.
 
-It is recommended that users do not access the fields of an 
-\code{fmpz_mod_poly_t} or its coefficient data directly, but make use of the 
+It is recommended that users do not access the fields of an
+\code{fmpz_mod_poly_t} or its coefficient data directly, but make use of the
 functions designed for this purpose, detailed below.
 
-Functions in \code{fmpz_mod_poly} do all the memory management for the user. 
-One does not need to specify the maximum length in advance before using a 
-polynomial object.  FLINT reallocates space automatically as the computation 
-proceeds, if more space is required. 
+Functions in \code{fmpz_mod_poly} do all the memory management for the user.
+One does not need to specify the maximum length in advance before using a
+polynomial object.  FLINT reallocates space automatically as the computation
+proceeds, if more space is required.
 
 We now describe the functions available in \code{fmpz_mod_poly}.
 
 \input{input/fmpz_mod_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Polynomial factorisation over Z/nZ                                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_mod\_poly\_factor}
+\epigraph{Factorisation of polynomials over $\Z/n\Z$ for general moduli}{}
+
+<<<<<<< HEAD
+The \code{fmpz_mod_poly_factor} module is included automatically with
+\code{fmpz_mod_poly.h}. One should not try to include
+=======
+The \code{fmpz_mod_poly_factor} module is included automatically when one
+includes \code{fmpz_mod_poly.h}. One should not try to include
+>>>>>>> mhansen/fq
+\code{fmpz_mod_poly_factor.h} directly.
+
+\input{input/fmpz_mod_poly_factor.tex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Finite Fields (fq)                                                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq}
+\epigraph{Finite fields of arbitrary characteristic}
+
+We represent an element of the finite field $\mathbb{F}_{p^n} \cong
+\mathbb{F}_p[X]/(f(X))$, where $f(X) \in \mathbb{F}_p[X]$ is a monic,
+irreducible polynomial of degree~$n$, as a polynomial in
+$\mathbb{F}_p[X]$ of degree less than $n$. The underlying data
+structure is an \code{fmpz_poly_t}.
+
+The default choice for $f(X)$ is the Conway polynomial for the pair
+$(p,n)$.  Frank Luebeck's data base of Conway polynomials is made
+available in the file \code{qadic/CPimport.txt}.  If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for $f(X)$.  Additionally, the user is able to supply their
+own $f(X)$.
+
+\input{input/fq.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_vec                                                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_vec}
+\epigraph{Vectors over finite fields of arbitrary characteristic}
+
+\input{input/fq_vec.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_mat                                                                       %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_mat}
+\epigraph{Matrices over finite fields of arbitrary characteristic}
+
+\input{input/fq_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_poly                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_poly}
+\epigraph{polynomials over finite fields of arbitrary characteristic}
+
+We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
+which includes an array \code{coeffs} with the coefficients, as well
+as the length \code{length} and the number \code{alloc} of
+coefficients for which memory has been allocated.
+
+As a data structure, we call this polynomial \emph{normalised}
+if the top coefficient is non-zero.
+
+Unless otherwise stated here, all functions that deal with polynomials
+assume that the $\mathbf{F}_q$ context of said polynomials are compatible,
+i.e., it assumes that the fields are generated by the same polynomial.
+
+\input{input/fq_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_poly_factor                                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_poly\_factor}
+\epigraph{Factorisation of polynomials over finite fields of arbitrary
+  characteristic}
+
+The \code{fq_poly_factor} module is included automatically when one
+includes \code{fq_poly.h}. One should not try to include
+\code{fq_poly_factor.h} directly.
+
+\input{input/fq_poly_factor.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_nmod                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_nmod}
+\epigraph{Finite fields of word-sized characteristic}
+
+
+We represent an element of the finite field $\mathbb{F}_{p^n} \cong
+\mathbb{F}_p[X]/(f(X))$, where $f(X) \in \mathbb{F}_p[X]$ is a monic,
+irreducible polynomial of degree~$n$, as a polynomial in
+$\mathbb{F}_p[X]$ of degree less than $n$.  The underlying data
+structure is an \code{nmod_poly_t}.
+
+The default choice for $f(X)$ is the Conway polynomial for the pair
+$(p,n)$.  Frank Luebeck's data base of Conway polynomials is made
+available in the file \code{qadic/CPimport.txt}.  If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for $f(X)$.  Additionally, the user is able to supply their
+own $f(X)$.
+
+\input{input/fq_nmod.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_nmod_vec                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_nmod\_vec}
+\epigraph{Vectors over finite fields of word-sized characteristic}
+
+\input{input/fq_nmod_vec.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_nmod_mat                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_nmod\_mat}
+\epigraph{Matrices over finite fields of word-sized characteristic}
+
+\input{input/fq_nmod_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_nmod_poly                                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_nmod\_poly}
+\epigraph{polynomials over finite fields of word-sized characteristic}
+
+We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
+which includes an array \code{coeffs} with the coefficients, as well
+as the length \code{length} and the number \code{alloc} of
+coefficients for which memory has been allocated.
+
+As a data structure, we call this polynomial \emph{normalised} if the
+top coefficient is non-zero.
+
+Unless otherwise stated here, all functions that deal with polynomials
+assume that the $\mathbf{F}_q$ context of said polynomials are
+compatible, i.e., it assumes that the fields are generated by the same
+polynomial.
+
+
+\input{input/fq_nmod_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_nmod_poly_factor                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_nmod\_poly\_factor}
+\epigraph{Factorisation of polynomials over finite fields of
+  word-sized characteristic}
+
+The \code{fq_nmod__poly_factor} module is included automatically when
+one includes \code{fq_nmod_poly.h}. One should not try to include
+\code{fq_nmod_poly_factor.h} directly.
+
+\input{input/fq_nmod_poly_factor.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_zech                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_zech}
+\epigraph{Finite fields in Zech logarithm representation}
+
+We represent an element of the finite field as a power of a generator
+for the multiplicative group of the finite field.  In particular, we
+use a root of $f(x))$, where $f(X) \in \mathbb{F}_p[X]$ is a monic,
+irreducible polynomial of degree~$n$, as a polynomial in
+$\mathbb{F}_p[X]$ of degree less than $n$.  The underlying data
+structure is just an \code{mp_limb_t}.
+
+The default choice for $f(X)$ is the Conway polynomial for the pair
+$(p,n)$.  Frank Luebeck's data base of Conway polynomials is made
+available in the file \code{qadic/CPimport.txt}.  If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for $f(X)$.  Additionally, the user is able to supply their
+own $f(X)$.
+
+We required that the order of the field fits inside of an
+\code{mp_limb_t}; however, it is recommended that $p^n < 2^{20}$ due
+to the time and memory needed to compute the Zech logarithm table.
+
+\input{input/fq_zech.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_zech_vec                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_zech\_vec}
+\epigraph{Vectors over finite fields in Zech logarithm representation}
+
+\input{input/fq_zech_vec.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_zech_mat                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_zech\_mat}
+\epigraph{Matrices over finite fields in Zech logarithm representation}
+
+\input{input/fq_zech_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_zech_poly                                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_zech\_poly}
+\epigraph{Polynomials over finite fields in Zech logarithm representation}
+
+We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
+which includes an array \code{coeffs} with the coefficients, as well
+as the length \code{length} and the number \code{alloc} of
+coefficients for which memory has been allocated.
+
+As a data structure, we call this polynomial \emph{normalised} if the
+top coefficient is non-zero.
+
+Unless otherwise stated here, all functions that deal with polynomials
+assume that the $\mathbf{F}_q$ context of said polynomials are
+compatible, i.e., it assumes that the fields are generated by the same
+polynomial.
+
+\input{input/fq_zech_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% fq_zech_poly_factor                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{fq\_zech\_poly\_factor}
+\epigraph{Factorisation of polynomials over finite fields in Zech
+  logarithm representation}
+
+The \code{fq_zech__poly_factor} module is included automatically when
+one includes \code{fq_zech_poly.h}. One should not try to include
+\code{fq_zech_poly_factor.h} directly.
+
+\input{input/fq_zech_poly_factor.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Padic numbers                                                                %
@@ -1400,26 +1941,47 @@ We now describe the functions available in \code{fmpz_mod_poly}.
 
 \section{Introduction}
 
-The \code{padic_t} data type represents elements of $\mathbf{Q}_p$ to 
-precision~$N$, stored in the form $x = p^v u$ with $u, v \in \mathbf{Z}$. 
-Arithmetic operations can be carried out with respect to a context 
+The \code{padic_t} data type represents elements of $\mathbf{Q}_p$ to
+precision~$N$, stored in the form $x = p^v u$ with $u, v \in \mathbf{Z}$.
+Arithmetic operations can be carried out with respect to a context
 containing the prime number $p$ and various pieces of pre-computed data.
 
-Independent of the context, we consider a $p$-adic number 
-$x = u p^v$ to be in \emph{canonical form} whenever either 
-$p \nmid u$ or $u = v = 0$, and we say it is \emph{reduced} 
+Independent of the context, we consider a $p$-adic number
+$x = u p^v$ to be in \emph{canonical form} whenever either
+$p \nmid u$ or $u = v = 0$, and we say it is \emph{reduced}
 if, in addition, for non-zero~$u$, $u \in (0, p^{N-v})$.
 
 We briefly describe the interface:
 
-The functions in this module expect arguments of type \code{padic_t}, 
-and each variable carries its own precision.  The functions have an 
-interface that is similar to the MPFR functions.  In particular, they 
-have the same semantics, specified as follows:  Compute the requested 
-operation exactly and then reduce the result to the precision of the 
+The functions in this module expect arguments of type \code{padic_t},
+and each variable carries its own precision.  The functions have an
+interface that is similar to the MPFR functions.  In particular, they
+have the same semantics, specified as follows:  Compute the requested
+operation exactly and then reduce the result to the precision of the
 output variable.
 
 \input{input/padic.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matrices of padic numbers                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{padic\_mat}
+\input{input/padic_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Polynomials of padic numbers                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{padic\_poly}
+\input{input/padic_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Finite unramified extensions of the padic numbers                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{qadic}
+\input{input/qadic.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Arithmetic functions                                                         %
@@ -1430,7 +1992,7 @@ output variable.
 
 \section{Introduction}
 
-This module implements arithmetic functions, number-theoretic and 
+This module implements arithmetic functions, number-theoretic and
 combinatorial special number sequences and polynomials.
 
 \input{input/arith.tex}
@@ -1444,26 +2006,26 @@ combinatorial special number sequences and polynomials.
 
 \section{Introduction}
 
-This module implements functions for single limb unsigned integers, 
+This module implements functions for single limb unsigned integers,
 including arithmetic with a precomputed inverse and modular arithmetic.
 
-The module includes functions for square roots, factorisation and 
+The module includes functions for square roots, factorisation and
 primality testing. Almost all the functions in this module are highly
 developed and extremely well optimised.
 
 The basic type is the \code{mp_limb_t} as defined by MPIR. Functions
-which take a precomputed inverse either have the suffix \code{preinv} 
-and take an \code{mp_limb_t} precomputed inverse as computed by 
+which take a precomputed inverse either have the suffix \code{preinv}
+and take an \code{mp_limb_t} precomputed inverse as computed by
 \code{n_preinvert_limb} or have the suffix \code{_precomp} and accept
-a \code{double} precomputed inverse as computed by 
-\code{n_precompute_inverse}. 
+a \code{double} precomputed inverse as computed by
+\code{n_precompute_inverse}.
 
-Sometimes three functions with similar names are provided for the 
+Sometimes three functions with similar names are provided for the
 same task, e.g. \code{n_mod_precomp}, \code{n_mod2_precomp} and
 \code{n_mod2_preinv}. If the part of the name that designates the
-functionality ends in 2 then the function has few if any limitations 
+functionality ends in 2 then the function has few if any limitations
 on its inputs. Otherwise the function may have limitations such as
-being limited to 52 or 53 bits. In practice we found that the 
+being limited to 52 or 53 bits. In practice we found that the
 preinv functions are generally faster anyway, so most times it pays
 to just use the \code{n_blah2_preinv} variants.
 
@@ -1472,7 +2034,7 @@ parameters of two or three limbs respectively.
 
 \section{Simple example}
 
-The following example computes $ab \pmod{n}$ using a precomputed 
+The following example computes $ab \pmod{n}$ using a precomputed
 inverse, where $a = 12345678, b = 87654321$ and $n = 111111111$.
 
 \begin{lstlisting}[language=c]
@@ -1481,14 +2043,14 @@ inverse, where $a = 12345678, b = 87654321$ and $n = 111111111$.
 ...
 mp_limb_t r, a, b, n, ninv;
 
-a = 12345678UL;
-b = 87654321UL;
-n = 111111111UL;
+a = UWORD(12345678);
+b = UWORD(87654321);
+n = UWORD(111111111);
 ninv = n_preinvert_limb(n);
 
 r = n_mulmod2_preinv(a, b, n, ninv);
 
-printf("%lu*%lu mod %lu is %lu\n", a, b, n, r);
+flint_printf("%wu*%wu mod %wu is %wu\n", a, b, n, r);
 \end{lstlisting}
 
 The output is:
@@ -1526,6 +2088,15 @@ The output is:
 \input{input/qsieve.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Permutations                                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{perm}
+\epigraph{Permutations}{}
+
+\input{input/perm.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % longlong.h                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1541,6 +2112,369 @@ The output is:
 \chapter{mpn\_extras}
 
 \input{input/mpn_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% C++ wrapper                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{flintxx}
+\epigraph{C++ wrapper library for FLINT}
+
+\section{Introduction}
+
+FLINT provides fast algorithms for number theoretic computations. For many
+reasons, it is written in C. Nonetheless, some users prefer object oriented
+syntax. FLINT ships with a set of wrapper C++ classes, together termed flintxx,
+which provide such an object oriented syntax.
+
+In this chapter, we describe how to \emph{use} flintxx. The FLINT developer
+wishing to extend the wrapper library should consult
+appendix~\ref{app:genericxx}.
+
+In general, flintxx strives to behave just like the underlying FLINT C
+interface, except that we use classes and C++ operators to make the client code
+look more pleasant. The simple example from the section on \code{fmpz} can be
+transcribed into C++ as follows:
+
+\begin{lstlisting}[language=c++]
+#include "fmpzxx.h"
+...
+using namespace flint;
+fmpzxx x, y;
+x = 7u;
+y = x*x;
+std::cout << x << "^2 = " << y << std::endl;
+\end{lstlisting}
+
+As can be seen here, and in general, if a FLINT C interface is called \code{foo}
+and resides in \code{foo.h}, then the C++ version is called \code{fooxx} and
+resides in \code{fooxx.h}. All flintxx classes live inside
+\code{namespace flint}.
+
+Functions which operate on wrapper classes are usually implemented as overloaded
+stand-alone functions, with the type prefix dropped. So for example a call to
+\code{flint::gcd(f1, f2)} yields an expression template evaluating via
+\code{fmpz_gcd}, provided \code{f1} and \code{f2} are (evaluate to) instances of
+\code{fmpzxx}. Sometimes we felt that dropping the type prefix would yield
+incomprehensible names, as for example in \code{fmpq_next_minimal}, or
+\code{fmpq_reconstruct}. In these cases the type prefix is swapped for the
+flintxx equivalent, so the flintxx version would be called
+\code{fmpqxx_reconstruct}. In this situation, usually the same functionality is
+also exposed as a (possibly static) member function, and this is the preferred
+way of accessing the functionality. Thus one should write
+\code{fmpqxx::reconstruct(a, m)} or \code{fmpqxx(0, 1u).next_minimal()}.
+
+\section{Overview}
+
+\paragraph{Expression templates}
+The implementation of flintxx tries very hard not to incur any overhead over
+using the native C interface. For this reason, we use \emph{expression
+templates} for lazily evaluating expressions. This allows us to avoid creating
+excessively many temporaries, for example. This means that even if \code{x} and
+\code{y} are of type \code{fmpzxx} (say), then \code{x + y} will \emph{not} be
+of type \code{fmpzxx}. Instead it will be an object which for most purposes
+behaves just like \code{fmpzxx}, but really only expresses the fact that it
+represents the sum of \code{x} and \code{y}.
+
+This distinction almost never matters, since expression templates are evaluated
+automatically in most cases. Thus \code{cout << x + y} or \code{x + y == 7} will
+work just as one might expect. There are ways to request explicit evaluation of
+an expression template, most notably \code{(x + y).evaluate()} and
+\code{fmpzxx(x + y)}.
+
+One caveat of the expression template approach is that compiler error messages
+can be long and hard to understand.
+In flintxx we strive to type-check template parameters as early as possible in
+order to keep error messages short and close to the actual user error.
+Excessively long error messages are often indicative of a bug in flintxx.
+%TODO static assert
+
+\paragraph{Tuples}
+
+Many FLINT functions naturally return two (or more) arguments. A typical example
+is \code{divrem}. The underlying C function is (for example)\\
+\code{void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)}.
+Mapping this directly to C++ would yield something like\\
+\code{void divrem(fmpz_polyxx& Q, fmpz_polyxx& R, const fmpz_polyxx& A, const fmpz_polyxx& B)}.
+While functional, this is not particularly nice; the syntax
+\code{divrem(Q, R, A, B)}, where the first two arguments are modified, is just
+very reminiscent of C. We would prefer an expression closer to the
+python analogue \code{(Q, R) = divrem(A, B)}.
+
+This is where \emph{ltuples} enter.\footnote{The `l' in \code{ltuple} stands for
+``lazy'', i.e. the fact that they can be used in expression templates.
+The reason for this name
+is that flintxx internally uses a non-lazy tuple class just
+called \code{tuple}, on which \code{ltuple} in fact is built.}
+In fact, the following is a valid
+flintxx expression:\\
+\code{ltupleref(Q, R) = divrem(A, B)}.
+
+In generality, the implementation of ltuples is fairly involved template
+metaprogramming. For the purpose of this documentation, ltuple types are denoted
+as follows:\\
+\code{Ltuple<Type1, Type2, ..., Typer>}. So \code{divrem} would
+return an object of type\\
+\code{Ltuple<fmpz_polyxx, fmpz_polyxx>}. The user
+should never try to construct such types by hand; instead use the function
+\code{ltupleref} (and perhaps occasionally \code{ltuple}; both documented
+later).
+
+One thing to observe is that ltuples are typed fairly weakly. Thus assignments
+and equality comparisons can be performed as long as both sides have the same
+length, and the operation can be performed on all components (whether or not the
+component types match).
+
+Another interesting feature of ltuples is the type
+\code{flint::detail::IGNORED_TYPE}.
+In an ltuple assignment, where the left hand side contains a reference to this
+type, the relevant entry is just discarded. Since the \code{ltuple.h} header
+automatically creates a static instance \code{_} of this type,
+in the following listing, the
+lines marked \code{(1)} and \code{(2)} have the same effect (but the second is
+potentially more efficient).
+
+\begin{lstlisting}[language=c++]
+#include "fmpz_polyxx.h"
+...
+using namespace flint;
+
+fmpz_polyxx f, g;
+// ...
+fmpz_polyxx R;
+ltupleref(_, R) = divrem(f, g); // (1)
+R = f % g;                      // (2)
+\end{lstlisting}
+
+Note finally that using \code{ltuple} intermediates often results in more copies
+than necessary. For example the expression
+\code{ltupleref(num, _) = divrem(a, b)} assigns the quotient to \code{num},
+creating just a temporary \code{fmpzxx} to hold the remainder. In contrast,
+\code{num = divrem(a, b).get<0>()} creates two temporary instances of
+\code{fmpzxx}.
+
+\paragraph{Reference types}
+
+One subtlety in wrapping a C library is that references do not work as easily as
+one might expect. For example, consider the class \code{fmpqxx}, wrapping
+\code{fmpq_t}, i.e. rational numbers. As such, an instance of \code{fmpqxx} has a
+numerator and denominator. In C, these are accessible via macros
+\code{fmpq_numref} and \code{fmpq_denref}, which yield \code{fmpz*}, which can
+be used essentially interchangeably with \code{fmpz_t}. In particular, any
+library function which operates on \code{fmpz_t} can operate on the numerator or
+denominator of an \code{fmpq_t}. In C++, we would like to have a member function
+\code{den} (and \code{num}) which returns an object of type \code{fmpzxx&} (i.e.
+a reference to \code{fmpzxx}).
+
+However, this is not possible, since \code{fmpqxx} is \emph{not} implemented as
+a pair of \code{fmpzxx}, and instead simply contains an \code{fmpq_t}.
+
+For this reason, for every C interface \code{foo}, flintxx provides two
+additional types, called \code{fooxx_ref} and \code{fooxx_srcref}, acting as
+replacements for \code{fooxx&} and \code{const foox&}, respectively, in
+situations where no underlying C++ object exists. Instances
+of \code{fooxx_ref} or \code{fooxx_srcref} behave exactly like instances
+\code{fooxx}, in fact the user should never notice a difference. Any flintxx
+operation or expression which works on objects of type \code{foo} also works on
+objects of type \code{fooxx_ref} and \code{fooxx_srcref}. Moreover, instances
+of \code{foo} can be converted implicitly to \code{fooxx_ref} or
+\code{fooxx_srcref}, and \code{fooxx_ref} can be converted implicitly to
+\code{fooxx_srcref}. It is also possible to explicitly convert reference types
+\code{fooxx_*ref} to \code{fooxx} (since this entails copying, we provide no
+implicit conversion).
+
+In summary, the class \code{fooxx_ref} behaves like a reference to an object of
+type \code{fooxx}. As such it can be used both as a right hand side and as a
+left hand side, just like \code{fooxx}. The class \code{fooxx_srcref} behaves
+like a reference to a constant object of type \code{fooxx}, and so cannot be
+used as a left hand side. These objects are created by flintxx automatically,
+for example upon calling \code{fmpqxx::num()}.
+
+\paragraph{Unified coefficient access}
+
+Consider again the \code{x.num()} method of \code{fmpqxx}. In various
+situations,
+this can have different return types. Namely, if \code{x} is a writable
+expression, then \code{x.num()} returns an \code{fmpzxx_ref}. In
+particular the return value behaves just like \code{fmpzxx}, no evaluation is
+necessary to obtain it, there are no copies, and it is possible to change the
+return value (and thus change \code{x}). If on the other hand \code{x} is a
+readonly immediate,
+then the return value of \code{x.num()} has type
+\code{fmpzxx_srcref}. This again behaves just like \code{fmpzxx} and no
+evaluations or copies are necessary, but this time it is not possible to change
+the return value (and so it is not possible to change \code{x}, either).
+Finally, if \code{x} is a lazy expression, then
+the return value is actually a lazy expression template. Thus to obtain the
+``actual'' value of \code{x.num()}, evaluations are necessary, and potentially
+so are copies.
+
+Thus in any case the return value behaves just like \code{fmpqxx}, but apart
+from that the behaviour of \code{x.num()} varies quite drastically in the
+different situations. We call this ``unified coefficient access'' (the
+coefficients of a \code{fmpqxx} being \code{num(), den()}), and the same
+behaviour occurs in many other flintxx types, e.g. in
+\code{fmpz_polyxx.coeff()}, etc.
+
+\paragraph{Type conversion}
+
+As a rule, flintxx does not perform automatic type conversions (except when
+related to the promotion to reference types, c/f earlier discussion). In
+expression templates, operands can be automatically promoted if the underlying
+C interface provides this facility. Beyond that, types have to be converted
+explicitly.
+
+There are two ways of doing this. The preferred one is using static constructor
+functions. Typical examples are
+\code{fmpz_polyxx::from_ground(fmpzarg)} and\\
+\code{nmod_polyxx::reduce(mplimbarg, nmodctxarg)}. The former takes an
+(expression template evaluating to) \code{fmpzxx} and returns an
+\code{fmpz_polyxx} representing the constant polynomial with value the
+\code{fmpzxx}. The latter takes an argument of type \code{mp_limb_t} and one of
+type \code{nmodxx_ctx_srcref} (essentially a word-sized modulus) and returns an
+\code{nmod_polyxx} representing the constant polynomial obtained by reducing
+\code{mplimbarg}.
+
+The general format for this is \code{totype::constructorname(arg1, arg2, ...)}.
+We prefer this because it makes explicit the type that is being converted to,
+and the way the arguments are to be interpreted.
+%In comparison, \code{fmpzarg.reduce(ctx)}
+%does not make it clear if the reduction should be to \code{nmodxx},
+%\code{nmod_polyxx} or perhaps \code{fmpz_mod_polyxx}.
+
+This format only works if the target type is part of flintxx. In other cases, we
+use a \code{.to<totype>()} syntax, as in \code{fmpzexpr.to<slong>()}.
+
+\paragraph{Input and output}
+
+In C++ it is customary to provide input and output via iostreams, and
+overloading the operators \code{<<} and \code{>>}. When wrapping a C library
+which works on the \code{FILE} interface, this is rather hard to accomplish. For
+this reason, flintxx only provides streaming output (i.e. \code{<<}), and only
+when there is a \code{to_string} method. Unfortunately this applies to only a
+small subset of the FLINT types.
+
+For output in other cases, and input in all cases, we provide C-like functions.
+Namely, the functions \code{print}, \code{print_pretty}, \code{read} and
+\code{read_pretty} can be used similarly to the C \code{flint_printf} and \code{scanf}.
+For example, \code{print(x)} where \code{x} is an \code{fmpz} has the same
+effect as \code{std::cout << x}.
+
+\paragraph{Extending flintxx}
+
+Explanations on the inner workings of the flintxx expression template library
+and how they pertain to wrapping new C interfaces can be found in
+appendix~\ref{app:genericxx}. Here we just want to remark that the flintxx
+classes are not designed for inheritance. If you want to modify behaviour, you
+should wrap flintxx types into your own classes (extension by aggregation, not
+inheritance). The header \code{flintxx/forwarding.h} was meant to facilitate
+this, but has not been finished.
+
+\section{Notations and conventions for the C++ interface documentation}
+As explained above, the flintxx classes and functions perform quite a number of
+operations which should be invisible to the user. Some template types implement
+methods which only make sense for some template arguments, etc. For example,
+every expression template built from \code{fmpq_polyxx} (polynomials with
+rational coefficients) has a method \code{set_coeff}. However, this method only
+makes sense for objects of type \code{fmpq_polyxx} or \code{fmpq_polyxx_ref}
+(calling it on other types will result in a compilation error),
+and its existence in objects of other types should be considered an
+implementation detail.
+
+In what follows,
+we document a ``virtual'' set of classes and functions, which explain how the
+user should expect its objects to behave, and which we guarantee to maintain.
+Other interfaces should be considered implementation details and subject to
+change.
+
+Consider the interface \code{fmpzxx}, and more concretely an instance \code{a}.
+As in the above discussion, we see that from \code{a} we can build a lot of
+different objects: expression templates like \code{a+a}, constant objects like
+\code{const fmpzxx& b = a;}, reference objects like \code{fmpzxx_ref c(a)}, etc.
+These by nature behave somewhat differently. For our purposes, we classify types
+into ``targets'' (things which can be assigned to), ``sources'' (things which
+contain actual computed data, or references thereto,
+as opposed to lazy expression templates) and
+``expressions'' (sources or expression templates). Note that every target is a
+source, and every source is an expression.
+
+We denote any type which can
+act as a target for \code{fmpzxx} as \code{Fmpz_target} (note the initial
+capital letter!), any \code{fmpzxx} source as \code{Fmpz_source} and any
+\code{fmpzxx} expression as \code{Fmpz_expr}. Such ``made up'' type names
+(always with initial capital letter) are
+referred to as ``virtual types'' in the sequel; these are used for all flint
+classes (e.g. \code{Fmpq_expr} or \code{Fmpz_polyxx_src}). Some examples of
+virtual types for \code{fmpzxx} are given in table
+\ref{tab:virtual-type-examples}.
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{ccc}
+\code|Fmpz_target| & \code|Fmpz_src| & \code|Fmpz_expr| \\
+  \hline
+\code|fmpzxx a;|          & \code|const fmpzxx a;|      & \code|a + b| \\
+\code|fmpzxx& b = a;|     & \code|const fmpzxx& b(a);|  & \code|a * b| \\
+\code|fmpzxx_ref c(a);|   & \code|fmpzxx_srcref c(a);|  & \code|gcd(a, b)| \\
+\end{tabular}
+\end{center}
+\caption{Examples of virtual types for \code{fmpzxx}.}
+\label{tab:virtual-type-examples}
+\end{table}
+
+When using virtual types, we will suppress reference notation. No flintxx types
+are ever copied automatically, unless the documentation explicitly says so.
+This is a general philosophy of flintxx: the library does as many things
+automatically as it can, without introducing additional
+calls to underlying flint C functions. So for example, it is not possible to
+implicitly convert \code{int} to \code{fmpzxx} (since doing so requires a C
+call). Of course explicit conversions (or assignments) work completely fine.
+
+It is also often the case that flintxx functions are conditionally enabled
+templates. A notation such as \code{void foo(T:is_signed_integer)} denotes a
+template function which is enabled whenever the template parameter \code{T}
+satisfies the \emph{type trait} \code{is_signed_integer}. These type traits
+should be self-explanatory, and in any case are documented in TODO.
+
+In what follows, we will never document copy constructors,
+or implicit conversion constructors pertaining to reference types. We will also
+not document assignment operators for expressions of the same type. (Thus if
+\code{x} is an \code{fmpzxx} and \code{y} is an \code{fmpqxx}, then \code{x = x}
+and \code{y = x} are both valid, but only the second assignment operator is
+documented explicitly.)
+
+Most flintxx functions and methods wrap underlying C functions in a way which is
+evident from the signature of the flintxx function/method. If this is the case,
+no further documentation is provided. For example, the function
+\code{double dlog(Fmpz_expr x)} simply wraps
+\code{double fmpz_dlog(const fmpz_t)}.  As is
+evident from the return type, \code{dlog} immediately evaluates its argument,
+and then computes the logarithm. In contrast, a function like
+\code{Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)} returns a lazily evaluated expression
+template (and wraps \code{void fmpz_gcd(fmpz_t, const fmpz_t, const fmpz_t)}).
+
+In case the C function has more than one return value in the form of arguments
+passed in by reference, the C++ wrapper returns an \code{ltuple}. In this case,
+the order of the \code{ltuple} arguments is the same as the order of the
+function arguments; so for example \code{ltupleref(Q, R) = divrem(A, B)} has the
+same effect as \code{fmpz_poly_divrem(q, r, a, b)}, provided \code{Q, R, A, B}
+are \code{fmpz_polyxx} and \code{q, r, a, b} are the underlying
+\code{fmpz_poly_t}. If such a convention is followed, the documentation below
+may not further explain anything. In all other cases, further explanation is
+provided (this applies in particular if the C function has return type different
+from \code{void}).
+
+\paragraph{Global functions or member functions?} Often it is not clear if
+functionality should be exposed as a global function,
+such as \code{gcd(a, b)}, or as a member
+function, such as \code{a.gcd(b)}. In flintxx, we strive to make both available
+when feasible. In the following documentation, the global versions are
+documented in detail (explaining the allowed types etc), whereas the member
+function versions are summarised more briefly under e.g.
+\code{Fmpz_expr::unary operation() const},
+\code{Fmpz_expr::binary operation(??) const} etc.
+
+\input{input/flintxx.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % profiler                                                                     %
@@ -1562,6 +2496,644 @@ The output is:
 In this chapter we provide interfaces to various external packages.
 
 \input{input/interfaces.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% extending the C++ wrapper                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\chapter{Extending the C++ wrapper}
+\label{app:genericxx}
+
+\section{Introduction}
+
+This chapter is geared towards FLINT developers who wish to extend the C++
+wrapper, chiefly by adding new functions operating on existing wrapper classes,
+or by adding altogether new wrapper classes for data types they implemented in
+C. Part of the design effort of flintxx went into trying to make it possible to
+do this kind of extension with only cursory knowledge of the syntax of C++,
+without having to understand in detail things such as partial template
+specialisation.
+
+The easiest way to get started is probably to read \code{examples/fooxx.cpp}.
+As a matter of fact I hope that most day to day work on the wrapper should be
+doable by just copying similar code from other data types, so after reading the
+example you may already know everything you need.
+
+\section{Overview of flintxx}
+
+The flintxx library is composed of a variety of parts. The main expression
+template class \code{expression} resides in \code{flintxx/expression.h}.
+Concrete classes derive from it, and thereby automatically acquire overloaded
+operators etc. to construct and evaluate expression templates. Of course, this
+is only possible after telling the flintxx how to do the evaluation, by
+specialising evaluation rules defined in \code{flintxx/rules.h}. This file also
+provides convenience macros \code{FLINT_DEFINE_GET} etc., which can be used to
+simplify defining common rules. Using only these files it would already be
+possible to interact with flintxx.
+
+In many situations one needs to define rules which work with varying argument
+types, if those types satisfy certain conditions. This can be achieved using the
+so-called \code{enable_if} idioms together with some meta programming
+(implemented in \code{flintxx/mp.h}) and type traits (mainly in
+\code{flintxx/traits.h} and \code{flintxx/expression_traits.h}). These are the
+files a third party developer should use to interact with flintxx.
+
+In writing wrappers for FLINT C types, there are some more common idioms. These
+are usually expressed as macros \code{FLINTXX_???} and are defined in
+\code{flintxx/flint_classes.h}. As illustrated in the example, the
+\code{FLINTXX_???} macros are meant to complement, not supersede, the
+\code{FLINT_???} macros.
+
+The above considerations and examples should explain how to modify any existing
+class, or write a simple new one, like \code{fmpzxx}. The remaining subsections
+deal with particular difficulties that require work beyond what has been
+explained so far.
+
+\subsection{Patterns for implementing unified coefficient access}
+
+Recall that ``unified coefficient access'' refers to automatically adjusting the
+return type of coefficient access methods, depending on the argument. Let's
+focus on the \code{fmpqxx} example, and in particular the \code{num} method.
+Consider the expression \code{x.num()}. There are three cases: if \code{x} is of
+type \code{fmpqxx} or \code{fmpqxx_ref}, this should return \code{fmpzxx_ref}.
+If \code{x} is of type \code{const fmpqxx}, or \code{fmpqxx_srcref}, this should
+return \code{fmpzxx_srcref}. Otherwise (i.e. if \code{x} is a lazy expression
+template), this should return a lazy expression template.
+
+The way this is implemented is using a traits type. First of all, we need a new
+lazy function to obtain the numerator:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_UNOP(fmpqxx_num)
+\end{lstlisting}
+
+We call the function \code{fmpqxx_num} to hide it somewhat, and discourage
+calling \code{num} as a global function (because this won't have the unified
+coefficient access properties). Next (even before the expression template
+definition), we put the generic traits:
+
+\begin{lstlisting}[language=c++]
+template<class Fmpq>
+struct fmpq_traits {
+    typedef FLINT_UNOP_BUILD_RETTYPE(fmpqxx_num, fmpzxx, Fmpq) numreturn_t;
+    typedef numreturn_t cnumreturn_t;
+    static numreturn_t num(const Fmpq& f)
+        {return fmpqxx_num(f);}
+    // ...
+};
+\end{lstlisting}
+
+This has two typedefs \code{numreturn_t} and \code{cnumreturn_t}, which are the
+types the \code{num()} method should return on non-constant and constant
+instances, respectively. As this trait deals with the lazy expression case, we
+should return a lazy expression in both the constant and non-constant case. Thus
+we get by with only one static function, which can be called with a constant or
+non-constant argument, and which creates a new lazy expression involving our new
+function \code{fmpqxx_num}.
+
+The \code{fmpqxx_expression} class can use the traits as follows:
+
+\begin{lstlisting}[language=c++]
+// class fmpqxx_expression
+    typedef detail::fmpq_traits<fmpqxx_expression> traits_t;
+    typename traits_t::numreturn_t num()
+        {return traits_t::num(*this);}
+\end{lstlisting}
+
+After the definition of the expression template classes, we put the following
+specialisations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpq_traits<fmpqxx_srcref>
+{
+    typedef fmpzxx_srcref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<>
+struct fmpq_traits<fmpqxx_ref>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_ref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(T f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+template<> struct fmpq_traits<fmpqxx>
+{
+    typedef fmpzxx_ref numreturn_t;
+    typedef fmpzxx_srcref cnumreturn_t;
+    template<class T>
+    static cnumreturn_t num(const T& f)
+        {return cnumreturn_t::make(fmpq_numref(f._fmpq()));}
+    template<class T>
+    static numreturn_t num(T& f)
+        {return numreturn_t::make(fmpq_numref(f._fmpq()));}
+};
+\end{lstlisting}
+
+Note how we have to take care of quite a few special cases, and there is not
+actually any obvious duplication going on here. The way the code is written,
+calling \code{num()} on a constant instance of \code{fmpqxx_ref} will yield a
+writable object. This makes sense -- given a constant instance, one can just
+make a (non-constant) copy, and write through it -- but is not really mandatory.
+In
+general, flintxx does not support this kind of writing through constant
+instances of reference classes.
+For example, \code{set_zero} will not work on a \code{const fmpqxx_ref}.
+Thus it would be possible to share some code between the ref and
+nonref implementations of the traits classes. This is done for example in
+\code{padicxx}.
+
+Finally, in the \code{rules} namespace, we have to place an implementation of
+\code{fmpqxx_num}:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_UNARY_EXPR_COND(fmpqxx_num_op, fmpzxx,
+    FMPQXX_COND_S,
+    fmpz_set(to._fmpz(), fmpq_numref(from._fmpq())))
+\end{lstlisting}
+
+The example of traits usage we see here illustrates how careful one has to be to
+avoid circular class dependencies. In particular, the traits can only be
+specialised after the expression template class has been defined and the special
+immediate cases have been \code{typedef}d. However, they have to be specialised
+before any of the related templates is instantiated.
+
+Note also how the \code{fmpq_traits<fmpqxx_ref>} functions take their argument
+by value, thus automatically obtaining non-constant versions, while declaring
+the argument type via a template. This again delays instantiation, and breaks
+circular dependencies.
+
+\subsection{Nmod classes}
+
+Another common complication is when the underlying C objects are not ``default
+constructible''. For example, the \code{nmod_*} interfaces (\code{nmod_poly},
+\code{nmod_mat}, etc.) always require a modulus for initialisation. This is
+mainly problematic when evaluating compound expressions which require temporary
+objects. In principle flintxx has an easy workaround for this: the expression
+template class can define a \code{create_temporary()} method which is used to
+instantiate a temporary object of the same type as the return type of the
+current expression. However, this only really shifts the problem: now the
+expression template class has to figure out its own modulus.
+
+To complicate matters further, the moduli are not stored in a single type. The
+structures \code{nmod_mat_t}, \code{nmod_poly_t}, \code{nmod_poly_mat_t} all
+store a modulus. Even an expression built out of (say) \code{nmod_poly_mat} can
+return a (say) \code{nmod_poly} (e.g. the determinant), and so the
+\code{nmod_polyxx} class must be able to instantiate a temporary for an
+expression which does not contain any immediate polynomials!
+
+As a final complication, the C objects do not actually only store the modulus
+$n$, but also extra information computed from $n$. This extra information is
+conveniently wrapped up in \code{nmod_t}, although most of the C interfaces do
+not expose this data structure directly.
+
+These problems are overcome as follows. First of all, we do not allow any mixing
+of moduli in compound expressions. Thus the only task of the
+\code{create_temporary} method is to locate \emph{any} modulus inside a
+subexpression. Next, we require objects with a modulus to be recognisable by
+type.\footnote{This is why we disallow empty matrices over
+$\mathbb{Z}/n\mathbb{Z}[X]$. The \code{nmod_poly_mat_t} does not store a
+modulus, so we have to look at an entry.} With these conventions in place, it is
+a matter of bookkeeping (and searching the subexpression tree) to locate a
+modulus.
+
+Additionally, we have a class \code{nmodxx_ctx_srcref} (which is not an
+expression template) which stores a reference to an \code{nmod_t}. All classes
+which want to provide moduli must implement a \code{_ctx()} method which returns
+such an \code{nmodxx_ctx_srcref} object.
+
+In practice, there is a type trait \code{traits::has_nmodxx_ctx<T>} which should
+be specialised for all (immediate) classes wishing to participate in the modulus
+determination. For example, the following lines enable looking up moduli in
+\code{nmod_poly}:
+
+\begin{lstlisting}[language=c++]
+namespace traits {
+template<> struct has_nmodxx_ctx<nmod_polyxx>
+    : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmod_polyxx_ref>
+    : mp::true_ { };
+template<> struct has_nmodxx_ctx<nmod_polyxx_srcref>
+    : mp::true_ { };
+} // traits
+\end{lstlisting}
+
+In addition to this, as mentioned above, the \code{create_temporary} method has
+to be overridden:
+
+\begin{lstlisting}[language=c++]
+// class nmod_polyxx
+    nmodxx_ctx_srcref estimate_ctx() const
+    {
+        return tools::find_nmodxx_ctx(*this);
+    }
+
+    evaluated_t create_temporary() const
+    {
+        return evaluated_t(estimate_ctx());
+    }
+\end{lstlisting}
+
+The function \code{tools::find_nmodxx_ctx} is implemented in \code{nmod_vec.h}
+and traverses the subexpression tree, searching for objects containing moduli,
+and returning the modulus of the first such object found.
+
+%There is one final complication, which is what to do if there are no
+%immediate subexpressions containing moduli.
+% TODO this is probably not worth explaining here
+
+\subsection{Matrix classes}
+
+A related but subtly different problem is posed by matrix classes. Again, these
+are not default instantiable, but one instead needs to specify their dimension
+(numbers of rows and columns). Two new problems arise. First, it is very common
+to mix matrices of differing dimensions in one expression (consider transposing
+a non-square matrix). Second, FLINT does no resizing of matrices.
+
+The latter is problematic, because flintxx uses a technique we call ``temporary
+merging'' where temporary objects needed in a calculation are only identified by
+type, and allowed to be reused. This reduces memory allocation and deallocation.
+
+In the current design, temporary merging cannot be used with matrix classes. The
+type trait \code{traits::use_temporary_merging<T>} must be used to disable it.
+After that, we can override \code{create_temporary} in the usual way, except
+that the method will now be called more often.\footnote{Actually, additional care
+has to be taken with regard to ltuples. We ignore this here for simplicity.}
+
+However, the \code{create_temporary} method still has to figure out the
+dimensions of the resulting matrix. For this, we use the type trait
+\code{outsize}. There are static functions \code{outsize<operation>::rows(m)}
+and \code{outsize<operation>::cols(m)} which yield the dimensions. Of course,
+the \code{outsize} trait has to be specialised appropriately.
+
+All in all, this is quite a lot of work, much of which is independent of the
+actual coefficient ring. For this reason, we have the helper file
+\code{flintxx/matrix.h}. It contains the following:
+\begin{enumerate}
+  \item The \code{matrix_traits} template.
+  \item Definition of operations for common matrix functions (e.g. transpose).
+  \item The \code{matrices::outsize} and \code{matrices::outsize_generic}
+        templates, and appropriate specialisations for common functions
+        (e.g. transpose, multiplication).
+  \item The templates \code{generic_traits_ref}, \code{generic_traits_srcref}
+        and \code{generic_traits_nonref} to simplify unified coefficient access.
+  \item Some convenience macros.
+\end{enumerate}
+
+To see how these things are used, consider the example of \code{fmpz_matxx}.
+We begin with the generic traits type for unified coefficient access:
+
+\begin{lstlisting}[language=c++]
+namespace detail {
+template<class Mat>
+struct fmpz_matxx_traits
+    : matrices::generic_traits<Mat> { };
+} // detail
+\end{lstlisting}
+
+This defines a traits type, which will be used to implement the
+\code{at(i, j)} method with unified access. The implementation defined above is
+the generic one, which is implemented via a call to the lazy operation
+\code{mat_at}.
+
+Next, inside the
+\code{fmpz_matxx_expression} class, the trait is used as follows:
+
+\begin{lstlisting}[language=c++]
+// class fmpz_matxx_expression
+    typedef detail::fmpz_matxx_traits<fmpz_matxx_expression> traits_t;
+
+    template<class Expr>
+    static evaluated_t create_temporary_rowscols(
+            const Expr&, slong rows, slong cols)
+    {
+        return evaluated_t(rows, cols);
+    }
+
+    FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
+\end{lstlisting}
+
+The macro \code{FLINTXX_DEFINE_MATRIX_METHODS} adds methods \code{at},
+\code{rows}, \code{cols} and \code{create_temporary} for us (the function
+\code{create_temporary_rowscols} is used by the implementation of
+\code{create_temporary}). However, these
+methods cannot work unless we provide more information to the matrix helpers.
+The main thing we have to do is to specialise the \code{matrix_traits} trait:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct matrix_traits<fmpz_matxx>
+{
+    template<class M> static slong rows(const M& m)
+    {
+        return fmpz_mat_nrows(m._mat());
+    }
+    template<class M> static slong cols(const M& m)
+    {
+        return fmpz_mat_ncols(m._mat());
+    }
+
+    template<class M> static fmpzxx_srcref at(const M& m, slong i, slong j)
+    {
+        return fmpzxx_srcref::make(fmpz_mat_entry(m._mat(), i, j));
+    }
+    template<class M> static fmpzxx_ref at(M& m, slong i, slong j)
+    {
+        return fmpzxx_ref::make(fmpz_mat_entry(m._mat(), i, j));
+    }
+};
+\end{lstlisting}
+
+This trait means that the class \code{fmpz_matxx} (and all the classes built
+from it, like reference types and lazy expressions) wants to use the matrix
+helpers framework. It also specifies how to determine the dimension of immediate
+objects, and how to access their coefficients. (The framework will never call
+these trait functions with non-immediates, but we use a template nonetheless so
+the functions also work on reference types.)
+
+Furthermore, we have to specialise some more type traits to disable temporary
+merging. This is done using the following convenience macro:
+
+\begin{lstlisting}[language=c++]
+// temporary instantiation stuff
+FLINTXX_DEFINE_TEMPORARY_RULES(fmpz_matxx)
+\end{lstlisting}
+
+The matrix class is now almost operational. In standard expressions (involving
+transpose, matrix multiplication etc.) temporary objects of the correct dimensions
+will be allocated automatically. What remains to be done is to implement the rest of
+the unified coefficient access, and matrix dimension rules for more esoteric
+functions.
+
+The unified coefficient access implementation can in principle be done precisely
+as described in a previous subsection.
+However, it is essentially the same in all matrix classes,
+which is why we provide default implementations:
+
+\begin{lstlisting}[language=c++]
+template<>
+struct fmpz_matxx_traits<fmpz_matxx_srcref>
+    : matrices::generic_traits_srcref<fmpzxx_srcref> { };
+template<>
+struct fmpz_matxx_traits<fmpz_matxx_ref>
+    : matrices::generic_traits_ref<fmpzxx_ref> { };
+template<> struct fmpz_matxx_traits<fmpz_matxx>
+    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref> { };
+\end{lstlisting}
+
+We still have to provide a \code{mat_at} rule:
+
+\begin{lstlisting}[language=c++]
+FLINT_DEFINE_THREEARY_EXPR_COND3(mat_at_op, fmpzxx,
+        FMPZ_MATXX_COND_S, traits::fits_into_slong, traits::fits_into_slong,
+        fmpz_set(to._fmpz(), fmpz_mat_entry(e1._mat(), e2, e3)))
+\end{lstlisting}
+
+Now all that remains to be done is to inform the matrices framework of dimension
+calculations for functions it is not aware of. For \code{fmpz_matxx}, one
+example is a particular multiplication algorithm. Of course, the rule is just
+the same as for ordinary multiplication, so the specialisation is very simple:
+
+\begin{lstlisting}[language=c++]
+namespace matrices {
+template<>
+struct outsize<operations::mul_multi_mod_op>
+    : outsize<operations::times> { };
+} // matrices
+\end{lstlisting}
+
+In general, if there is no rule, a default case will be used. If the number of
+arguments is not two, this assumes that the first argument is a matrix, and that
+the dimensions of the output will match the dimensions of this first argument.
+If there are two arguments, at least one of which is a matrix, then the
+dimension of one of those is returned (with no guarantee which if there are two
+matrices). This default rule works for matrix addition, matrix-scalar
+multiplication (on either side), and ``elementwise'' operations.
+
+\subsection{Padic classes}
+
+The classes representing padic numbers (\code{padicxx}, \code{padic_polyxx},
+\code{padic_matxx} and \code{qadic}) come with their own difficulties. These are
+twofold.
+
+First of all, padic number data is split into two data structures: the actual
+number data (e.g. \code{padic_t}), and a \emph{context} (\code{padic_ctx_t})
+containing meta data.
+Any operation on padic numbers needs to be passed both the number data and a
+context. In order to facilitate this, all C++ wrappers for padics store a
+reference to a context. We can then use a lookup scheme similar to the
+\code{nmod_*} case to find a context suitable for a whole expression.
+
+One difference is that the context reference has to be stored with every
+immediate object (e.g. in \code{padic_data}). This also includes the reference
+types, and hence requires specialising \code{flint_classes::ref_data} and
+\code{flint_classes::srcref_data}.
+
+Secondly, all padic computations are necessarily just approximations. That is to
+say, like real numbers, padic numbers cannot in general be stored exactly. Thus
+every padic number also stores its own precision. When the C library is asked to
+perform an operations, such as \code{a = b + c}, it will treat \code{b} and
+\code{c} as exact padic numbers (similarly to how we can treat a decimal
+approximation to a real number, such as $3.14$, as the exact real number
+$3.140000\dots$). Then it implements an algorithm which is equivalent to
+performing the computation \code{b + c} exactly and truncating to the precision
+of \code{c} in the end. This gives very well-defined semantics, and very fine
+control over the behaviour, but is unfortunately not very well-suited to
+implementing automatic evaluation of compound expressions. In flintxx, we have
+decided to (notionally) assign a precision to every compound expression. All
+temporaries used will be instantiated with this precision.
+
+The precision of a compound expression is computed as the maximum of the
+precision of all of its (immediate) subexpressions. In order to still be able to
+change this precision, all immediates have a \code{.toN(n)} method which
+(notionally) raises or lowers their precision. This is implemented by extending
+the functionality of the \code{padicxx_srcref} type. Namely, in
+\code{padicxx_srcref}, in addition to a \code{const padic_struct*} and
+\code{padicxx_ctx_srcref}, we also store an additional \code{slong N}
+representing the notional precision. The usual constructors of
+\code{padicxx_srcref} just initialise \code{N} from the underlying
+\code{padic_struct}. But we provide additional constructors which allow setting
+this parameter explicitly. The \code{toN} method makes use of these
+constructors.
+
+We thus see that quite a bit of infrastructure is needed to build a new padic
+class. To facilitate this, \code{padicxx.h} defines some convenience macros. In
+summary, the following steps are necessary:
+
+\begin{enumerate}
+\item Implement a traits type for computing \code{prec()} and \code{val()}.
+  In the general case, \code{prec()} should return
+  \code{tools::padic_output_prec}.
+
+\item In the expression class, typedef \code{traits_t} and invoke the macro
+  \code{PADICXX_DEFINE_STD}.\footnote{This adds context estimation, \code{toN},
+  \code{prec} and \code{val} methods. Alternatively invoke a subset of
+  \code{PADICXX_DEFINE_CTX}, \code{PADICXX_DEFINE_ESTIMATE_CTX},
+  \code{PADICXX_DEFINE_TON}, \code{PADICXX_DEFINE_PREC},
+  \code{PADICXX_DEFINE_VAL}.}
+
+\item Enable the trait \code{has_padicxx_ctx} for your immediate classes.
+
+\item Specialise the traits type. For reference and non-reference immediates,
+  it should return the precision stored with the objects. For srcref, it should
+  return the N field in \code{_data()}.\footnote{\code{val()} can be an ordinary
+  unified access implementation.}
+
+\item Invoke the macro
+  \code{PADICXX_DEFINE_REF_STRUCTS(classname, structname, precname)}.
+  Here \code{classname} is the name of the non-reference immediate (e.g.
+  \code{padicxx}), \code{structname} is the name of the underlying C struct (e.g.
+  \code{padic_struct}) and \code{precname} is the name of the function for
+  accessing the precision (e.g. \code{padic_prec}). This specialises the
+  \code{flint_classes::ref_data} and \code{flint_classes::srcref_data}
+  templates, adding a context reference and \code{toN} support.
+\end{enumerate}
+
+The implementation of \code{qadicxx} is slightly different since it uses a
+larger context. But this contains \code{padic_ctx} as a substruct, and hence it
+is not difficult to incorporate \code{qadicxx} into the context lookup
+infrastructure. See the source for more details.
+
+\subsection{Vector classes}
+
+Vectors do not have very good representation in FLINT. Usually, but not
+universally, a vector of type
+\code{foo_t} is represented as \code{foo_struct*}, with size passed in
+explicitly. Some vector types have support functions in FLINT, typically all
+underscored.
+
+In flintxx we implement some first class vectors, but the interfaces are not
+very well developed and relatively ad-hoc.
+
+\section{Some tidbits and caveats}
+
+One C++ idiom which may initially look staggering is \code{enable_if}. A typical
+usage is as follows:
+
+\begin{lstlisting}[language=c++]
+template<class T>
+void foo(T,
+    typename enable_if<is_signed_integer<T> >::type* = 0)
+{
+    cout << 'a';
+}
+
+template<class T>
+void foo(T,
+    typename enable_if<is_unsigned_integer<T> >::type* = 0)
+{
+    cout << 'b';
+}
+
+...
+foo(4);   // a
+foo(4u);  // b
+foo("x"); // error
+\end{lstlisting}
+
+What happens syntactically here is that we define two functions called
+\code{foo}. In C++ this is allowed, such a function is called \emph{overloaded},
+and depending on the arguments it is called with, the so-called overloading
+algorithm decides which instance to call. Additionally, both functions we define
+are actually \emph{function templates}. Normally, a function template like
+\code{template<class T> void foo(T)} can be called with arbitrary
+arguments, and so overloading makes little sense.\footnote{One may still overload
+e.g. \code{foo(T&)} and \code{foo(const T&)}, and say \code{foo(int)}; the
+overloading algorithm determines a ``best match'', and so this overloading can
+still be useful. However the details of what constitutes a best match are
+complicated, and if there are several equally-good matches (none of which is
+``best'') then an error will be issued.} But of course the point to observe is
+that our overloaded functions have an additional argument, which depends on
+\code{T}. Syntactically, there is an un-named pointer argument, which defaults
+to zero.\footnote{It is not terribly important that this is a pointer type, it
+could be say int, but \code{enable_if<...>::type} is defined to be void, and so
+converting to a pointer is the easiest way to turn this into a function
+argument.} What happens now is that depending on \code{T}, the function
+signature may be syntactically invalid! Indeed, the template
+\code{enable_if<cond>} has a member \code{type} only if \code{cond} is true.
+Otherwise \code{enable_if<cond>} is just completely empty, and the function
+signature makes no sense. But this is fine, according to the
+SFINAE\footnote{``Substitution Failure Is Not An Error''} rule of C++, if
+something like this happens during overload resolution, the algorithm just
+discards this possibility. So in general, what the overload algorithm does it
+looks for all function templates (and functions) which the overloaded call could
+possibly match (this by itself is a complicated procedure, because of so-called
+argument-dependent lookup ...), then tries to instantiate all the function
+templates, discards all which have substitution failures, and then tries to find
+the best match in the remaining list.
+
+Similar rules also apply in resolving partially specialised template types. In
+this case, the pattern usually looks like this:
+
+\begin{lstlisting}[language=c++]
+template<class T, class Enable = void>
+struct foo
+{
+    static const int a = 0;
+};
+
+template<class T>
+struct foo<T,
+    typename enable_if<is_unsigned_integer<T> >::type>
+{
+    static const int a = 1;
+};
+
+template<class T>
+struct foo<T,
+    typename enable_if<is_signed_integer<T> >::type>
+{
+    static const int a = 2;
+};
+
+...
+foo<const char*>::a; // 0
+foo<int>::a;         // 2
+foo<unsigned>::a;    // 1
+\end{lstlisting}
+
+It may seem tempting to enable member functions conditionally on class template
+arguments, like this:
+
+\begin{lstlisting}
+template<class T>
+struct foo
+{
+    void bar(typename enable_if<is_integer<T> >::type* = 0) {...}
+};
+\end{lstlisting}
+
+But this is not possible. The problem is, more or less,
+that when instantiating \code{foo<int>}, after replacing \code{T} by \code{int},
+the entire class signature has to be well-formed, which it just is not.
+Nonetheless it is typically straightforward to workaround this. You just have to
+ensure that the signature of your member function is well-formed for any
+template argument \code{T}. Then in the function body, which is instantiated
+only when the function is actually called, you can add a \code{STATIC_ASSERT} to
+make it plain that this function should only be called with integers, etc.
+
+Another thing to keep in mind is that in C++98, the expressions \code{> >} and
+\code{>>} are very different. The latter is a shift operator, and cannot be used
+to close template argument lists. Thus expressions like
+\code{not_<is_integer<T>>} are invalid in C++98, one has to write
+\code{not_<is_intiger<T> >} instead.
+
+On a similar note, the meaning of an expression involving template arguments can
+in some situations depend on the template parameter, and sometimes this has to
+be made explicit. A typical situation is \code{T::something}, which may refer to
+either a static member value, or a member type of T. If the latter is desired,
+in most situations one needs to write \code{typename T::something}. Similarly if
+\code{T} has a member template (function, say), then one cannot write
+\code{T::something<int>()}, but instead has to write
+\code{T::template something<int>()}. Most modern compilers will suggest the
+alternative syntax when such an error is encountered.
+
+\input{input/genericxx.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %

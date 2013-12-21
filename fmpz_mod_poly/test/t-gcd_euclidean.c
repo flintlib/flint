@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("gcd_euclidean....");
+    flint_printf("gcd_euclidean....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Generic case, most likely co-prime arguments ******************************/
 
@@ -65,10 +65,10 @@ main(void)
         result = (fmpz_mod_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -99,10 +99,10 @@ main(void)
         result = (fmpz_mod_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -153,16 +153,16 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = "), fmpz_print(p), printf("\n\n");
-            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
-            printf("c = "), fmpz_mod_poly_print(c), printf("\n\n");
-            printf("d = "), fmpz_mod_poly_print(d), printf("\n\n");
-            printf("g = "), fmpz_mod_poly_print(g), printf("\n\n");
-            printf("h = "), fmpz_mod_poly_print(h), printf("\n\n");
-            printf("s = "), fmpz_mod_poly_print(s), printf("\n\n");
-            printf("t = "), fmpz_mod_poly_print(t), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
+            flint_printf("d = "), fmpz_mod_poly_print(d), flint_printf("\n\n");
+            flint_printf("g = "), fmpz_mod_poly_print(g), flint_printf("\n\n");
+            flint_printf("h = "), fmpz_mod_poly_print(h), flint_printf("\n\n");
+            flint_printf("s = "), fmpz_mod_poly_print(s), flint_printf("\n\n");
+            flint_printf("t = "), fmpz_mod_poly_print(t), flint_printf("\n\n");
             abort();
         }
 
@@ -204,10 +204,10 @@ main(void)
         result = (fmpz_mod_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -243,10 +243,10 @@ main(void)
         result = (fmpz_mod_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -302,16 +302,16 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = "), fmpz_print(p), printf("\n\n");
-            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
-            printf("c = "), fmpz_mod_poly_print(c), printf("\n\n");
-            printf("d = "), fmpz_mod_poly_print(d), printf("\n\n");
-            printf("g = "), fmpz_mod_poly_print(g), printf("\n\n");
-            printf("h = "), fmpz_mod_poly_print(h), printf("\n\n");
-            printf("s = "), fmpz_mod_poly_print(s), printf("\n\n");
-            printf("t = "), fmpz_mod_poly_print(t), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
+            flint_printf("d = "), fmpz_mod_poly_print(d), flint_printf("\n\n");
+            flint_printf("g = "), fmpz_mod_poly_print(g), flint_printf("\n\n");
+            flint_printf("h = "), fmpz_mod_poly_print(h), flint_printf("\n\n");
+            flint_printf("s = "), fmpz_mod_poly_print(s), flint_printf("\n\n");
+            flint_printf("t = "), fmpz_mod_poly_print(t), flint_printf("\n\n");
             abort();
         }
 
@@ -327,9 +327,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

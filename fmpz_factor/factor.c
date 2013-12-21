@@ -27,7 +27,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_factor.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
@@ -36,11 +35,12 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 {
     ulong exp;
     mp_limb_t p;
-    mpz_t x;
+    __mpz_struct * xsrc;
     mp_ptr xd;
     mp_size_t xsize;
     slong found;
     slong trial_start, trial_stop;
+    TMP_INIT;
 
     if (!COEFF_IS_MPZ(*n))
     {
@@ -50,26 +50,35 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     _fmpz_factor_set_length(factor, 0);
 
-    /* Make an mpz_t copy whose limbs will be mutated */
-    mpz_init(x);
-    fmpz_get_mpz(x, n);
-    if (x->_mp_size < 0)
+    /* Get sign and size */
+    xsrc = COEFF_TO_PTR(*n);
+    if (xsrc->_mp_size < 0)
     {
-        x->_mp_size = -(x->_mp_size);
+        xsize = -(xsrc->_mp_size);
         factor->sign = -1;
     }
     else
     {
+        xsize = xsrc->_mp_size;
         factor->sign = 1;
     }
 
-    xd = x->_mp_d;
-    xsize = x->_mp_size;
+    /* Just a single limb */
+    if (xsize == 1)
+    {
+        _fmpz_factor_extend_factor_ui(factor, xsrc->_mp_d[0]);
+        return;
+    }
+
+    /* Create a temporary copy to be mutated */
+    TMP_START;
+    xd = TMP_ALLOC(xsize * sizeof(mp_limb_t));
+    flint_mpn_copyi(xd, xsrc->_mp_d, xsize);
 
     /* Factor out powers of two */
     xsize = flint_mpn_remove_2exp(xd, xsize, &exp);
     if (exp != 0)
-        _fmpz_factor_append_ui(factor, 2UL, exp);
+        _fmpz_factor_append_ui(factor, UWORD(2), exp);
 
     trial_start = 1;
     trial_stop = 1000;
@@ -102,7 +111,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
             }
 
             _fmpz_factor_append_ui(factor, p, exp);
-            /* printf("added %lu %lu\n", p, exp); */
+            /* flint_printf("added %wu %wu\n", p, exp); */
 
             /* Continue using only trial division whilst it is successful.
                This allows quickly factoring huge highly composite numbers
@@ -124,6 +133,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
     if (xd[0] != 1)
         _fmpz_factor_extend_factor_ui(factor, xd[0]);
 
-    mpz_clear(x);
+    TMP_END;
     return;
 }
+

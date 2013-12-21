@@ -71,7 +71,7 @@ void _qadic_norm(fmpz_t rop, const fmpz *op, slong len,
 
         w = _fmpz_vec_ord_p(y, len, p);
 
-        if (w >= 2 || (*p != 2L && w >= 1))
+        if (w >= 2 || (*p != WORD(2) && w >= 1))
         {
             if (4 * FLINT_FLOG2(N) * FLINT_FLOG2(N) * FLINT_FLOG2(d) < d*d*d)
             {

@@ -37,7 +37,7 @@ n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a,
 
     y = n_powmod2_ui_preinv(a, t, n, ninv);
 
-    if (y == 1UL)
+    if (y == UWORD(1))
         return 1;
     t <<= 1;
 

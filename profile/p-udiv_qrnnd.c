@@ -34,11 +34,11 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t d;
    mp_ptr array = (mp_ptr) flint_malloc(200 * sizeof(mp_limb_t));
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    ulong i;
    int j;
 
-   flint_randinit(state);
+   
 
    d = n_randtest_not_zero(state);
       
@@ -61,7 +61,7 @@ void sample(void * arg, ulong count)
       prof_stop();
 
       for (j = 0; j < 200; j++)
-         if (array[j] == 0) printf("\r");
+         if (array[j] == 0) flint_printf("\r");
    }
 
    flint_randclear(state);
@@ -74,7 +74,7 @@ int main(void)
    
    prof_repeat(&min, &max, sample, NULL);
    
-   printf("udiv_qrnnd min time is %.3f cycles, max time is %.3f cycles\n", 
+   flint_printf("udiv_qrnnd min time is %.3f cycles, max time is %.3f cycles\n", 
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/100, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/100);
 
    return 0;

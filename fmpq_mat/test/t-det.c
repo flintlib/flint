@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("det....");
+    flint_printf("det....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -71,18 +71,18 @@ main(void)
 
         if (!fmpq_equal(ab, c))
         {
-            printf("FAIL!\n");
-            printf("A:\n");
+            flint_printf("FAIL!\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
-            printf("\ndet(A):\n");
+            flint_printf("\ndet(A):\n");
             fmpq_print(a);
-            printf("\ndet(B):\n");
+            flint_printf("\ndet(B):\n");
             fmpq_print(b);
-            printf("\ndet(C):\n");
+            flint_printf("\ndet(C):\n");
             fmpq_print(c);
             abort();
         }
@@ -97,9 +97,9 @@ main(void)
         fmpq_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

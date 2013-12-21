@@ -39,10 +39,10 @@ main(void)
     slong i, j, m, r;
     mp_limb_t mod;
     int result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("inv....");
+    flint_printf("inv....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -56,7 +56,7 @@ main(void)
         nmod_mat_init(I, m, m, mod);
 
         for (j = 0; j < m; j++)
-            I->rows[j][j] = 1UL;
+            I->rows[j][j] = UWORD(1);
 
         /* Verify that A * A^-1 = I for random matrices */
 
@@ -70,15 +70,15 @@ main(void)
 
         if (!nmod_mat_equal(C, I) || !result)
         {
-            printf("FAIL:\n");
-            printf("A * A^-1 != I!\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A * A^-1 != I!\n");
+            flint_printf("A:\n");
             nmod_mat_print_pretty(A);
-            printf("A^-1:\n");
+            flint_printf("A^-1:\n");
             nmod_mat_print_pretty(B);
-            printf("A * A^-1:\n");
+            flint_printf("A * A^-1:\n");
             nmod_mat_print_pretty(C);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -89,8 +89,8 @@ main(void)
 
         if (!nmod_mat_equal(B, I))
         {
-            printf("FAIL:\n");
-            printf("aliasing failed!\n");
+            flint_printf("FAIL:\n");
+            flint_printf("aliasing failed!\n");
             nmod_mat_print_pretty(C);
             abort();
         }
@@ -121,8 +121,8 @@ main(void)
 
         if (result)
         {
-            printf("FAIL:\n");
-            printf("singular matrix reported as invertible\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular matrix reported as invertible\n");
             abort();
         }
 
@@ -130,8 +130,8 @@ main(void)
         result = nmod_mat_inv(A, A);
         if (result)
         {
-            printf("FAIL:\n");
-            printf("singular matrix reported as invertiblen");
+            flint_printf("FAIL:\n");
+            flint_printf("singular matrix reported as invertiblen");
             abort();
         }
 
@@ -139,8 +139,8 @@ main(void)
         nmod_mat_clear(B);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

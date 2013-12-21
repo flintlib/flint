@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("teichmuller... ");
+    flint_printf("teichmuller... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 100; i++)
@@ -68,10 +68,10 @@ main(void)
         result = (qadic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (alias):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL (alias):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -112,13 +112,13 @@ main(void)
         result = (qadic_equal(c, b));
         if (!result)
         {
-            printf("FAIL (x^q == x):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("p = "), fmpz_print(p), printf("\n");
-            printf("d = %ld\n", d);
-            printf("N = %ld\n", N);
+            flint_printf("FAIL (x^q == x):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n");
+            flint_printf("d = %wd\n", d);
+            flint_printf("N = %wd\n", N);
             abort();
         }
 
@@ -131,9 +131,9 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

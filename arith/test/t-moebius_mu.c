@@ -40,9 +40,9 @@ void check(fmpz_t n, int expected)
     mu = arith_moebius_mu(n);
     if (mu != expected)
     {
-        printf("FAIL:");
+        flint_printf("FAIL:");
         fmpz_print(n);
-        printf("\n");
+        flint_printf("\n");
     }
 }
 
@@ -51,10 +51,9 @@ int main(void)
     fmpz_t x;
     ulong p;
     slong i, j, k, l;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
 
-    printf("moebius_mu....");
+    flint_printf("moebius_mu....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -91,9 +90,9 @@ int main(void)
 
     fmpz_clear(x);
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

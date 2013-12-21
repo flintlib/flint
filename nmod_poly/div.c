@@ -34,11 +34,16 @@ void
 _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, 
                                   mp_srcptr B, slong lenB, nmod_t mod)
 {
+    TMP_INIT;
+    
     if (lenB < 15)
     {
-        mp_ptr W = _nmod_vec_init(NMOD_DIV_BC_ITCH(lenA, lenB, mod));
+        mp_ptr W;
+        
+        TMP_START;
+        W = TMP_ALLOC(NMOD_DIV_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
         _nmod_poly_div_basecase(Q, W, A, lenA, B, lenB, mod);
-        _nmod_vec_clear(W);
+        TMP_END;
     }
     else if (lenB < 6000)
         _nmod_poly_div_divconquer(Q, A, lenA, B, lenB, mod);
@@ -58,7 +63,7 @@ nmod_poly_div(nmod_poly_t Q,
     
     if (B_len == 0)
     {
-        printf("Exception (nmod_poly_divrem). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
         abort();
     }
 

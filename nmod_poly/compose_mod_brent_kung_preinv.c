@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -73,7 +73,7 @@ _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, slong len1
     _nmod_vec_set(B->rows[i], poly1 + i*m, len1 % m);
 
     /* Set rows of A to powers of poly2 */
-    A->rows[0][0] = 1UL;
+    A->rows[0][0] = UWORD(1);
     _nmod_vec_set(A->rows[1], poly2, n);
     for (i = 2; i < m; i++)
         _nmod_poly_mulmod_preinv(A->rows[i], A->rows[i-1],
@@ -115,13 +115,13 @@ nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        printf("Exception (nmod_poly_compose_mod_brent_kung). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_preinv). Division by zero.\n");
         abort();
     }
 
     if (len1 >= len3)
     {
-        printf("Exception (nmod_poly_compose_brent_kung). The degree of the \n"
+        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_preinv). The degree of the \n"
                "first polynomial must be smaller than that of the modulus.\n");
         abort();
     }

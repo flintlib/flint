@@ -35,8 +35,8 @@ void sample(void * arg, ulong count)
    double dpre;
    ulong i;
    mp_ptr array = (mp_ptr) flint_malloc(1000*sizeof(mp_limb_t));
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    
    for (i = 0; i < count; i++)
    {
@@ -69,7 +69,7 @@ int main(void)
    
    prof_repeat(&min, &max, sample, NULL);
    
-   printf("mod_precomp min time is %.3f cycles, max time is %.3f cycles\n", 
+   flint_printf("mod_precomp min time is %.3f cycles, max time is %.3f cycles\n", 
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
 
    return 0;

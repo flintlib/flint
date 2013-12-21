@@ -36,12 +36,12 @@ int
 main(void)
 {
     slong i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("trace....");
+    flint_printf("trace....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Test trace(AB) = trace(BA) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -72,13 +72,13 @@ main(void)
 
         if (!fmpz_equal(trab, trba))
         {
-            printf("FAIL:\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            fmpz_mat_print_pretty(B), printf("\n");
-            fmpz_mat_print_pretty(AB), printf("\n");
-            fmpz_mat_print_pretty(BA), printf("\n");
-            printf("tr(AB): "),  fmpz_print(trab),    printf("\n");
-            printf("tr(BA): "),  fmpz_print(trba),    printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
+            fmpz_mat_print_pretty(B), flint_printf("\n");
+            fmpz_mat_print_pretty(AB), flint_printf("\n");
+            fmpz_mat_print_pretty(BA), flint_printf("\n");
+            flint_printf("tr(AB): "),  fmpz_print(trab),    flint_printf("\n");
+            flint_printf("tr(BA): "),  fmpz_print(trba),    flint_printf("\n");
             abort();
         }
 
@@ -90,8 +90,8 @@ main(void)
         fmpz_clear(trba);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

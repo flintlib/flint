@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("content....");
+    flint_printf("content....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check that content(a f) = abs(a) content(f) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -65,9 +65,9 @@ main(void)
         result = (fmpz_equal(c, d));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(c), printf("\n\n");
-            fmpz_print(d), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(c), flint_printf("\n\n");
+            fmpz_print(d), flint_printf("\n\n");
             abort();
         }
 
@@ -77,8 +77,8 @@ main(void)
         fmpz_poly_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

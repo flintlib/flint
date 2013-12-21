@@ -37,12 +37,12 @@ main(void)
     ulong n, k;
     fmpz_t x, y;
     mpz_t z;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("bin_uiui....");
+    flint_printf("bin_uiui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -54,12 +54,12 @@ main(void)
         k = n_randint(state, 1000);
 
         fmpz_bin_uiui(x, n, k);
-        mpz_bin_uiui(z, n, k);
+        flint_mpz_bin_uiui(z, n, k);
         fmpz_set_mpz(y, z);
 
         if (!fmpz_equal(x, y))
         {
-            printf("FAIL: n,k = %lu,%lu\n", n, k);
+            flint_printf("FAIL: n,k = %wu,%wu\n", n, k);
             abort();
         }
 
@@ -68,9 +68,9 @@ main(void)
         mpz_clear(z);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

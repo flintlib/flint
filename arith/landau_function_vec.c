@@ -43,12 +43,12 @@ void arith_landau_function_vec(fmpz * res, slong len)
 
     fmpz_init(a);
 
-    for (p = 2UL; p <= pmax; p = n_nextprime(p, 0))
+    for (p = UWORD(2); p <= pmax; p = n_nextprime(p, 0))
     {
         for (n = len - 1; n >= p; n--)
         {
             pk = p;
-            pkhi = 0UL;
+            pkhi = UWORD(0);
 
             for (k = 1; k <= len; k++)
             {

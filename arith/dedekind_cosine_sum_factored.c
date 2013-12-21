@@ -56,7 +56,7 @@ n_sqrtmod_2exp(mp_limb_t a, int k)
         x += (a - x * x) / 2;
 
     if (k < FLINT_BITS)
-        x &= ((1UL << k) - 1);
+        x &= ((UWORD(1) << k) - 1);
 
     return x;
 }
@@ -212,7 +212,7 @@ solve_n1(mp_limb_t n, mp_limb_t k1, mp_limb_t k2,
     inv = n_preinvert_limb(k1);
 
     umul_ppmm(t[1], t[0], k2, k2);
-    sub_ddmmss(t[1], t[0], t[1], t[0], 0UL, 1UL);
+    sub_ddmmss(t[1], t[0], t[1], t[0], UWORD(0), UWORD(1));
     mpn_divrem_1(t, 0, t, 2, d1);
 
     n1 = n_ll_mod_preinv(t[1], t[0], k1, inv);
@@ -249,7 +249,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
         p = fac.p[i];
 
         /* k = 2 * k1 with k1 odd */
-        if (p == 2UL && fac.exp[i] == 1)
+        if (p == UWORD(2) && fac.exp[i] == 1)
         {
             k2 = k / 2;
             inv = n_preinvert_limb(k2);
@@ -264,7 +264,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
             n = n2;
         }
         /* k = 4 * k1 with k1 odd */
-        else if (p == 2UL && fac.exp[i] == 2)
+        else if (p == UWORD(2) && fac.exp[i] == 2)
         {
             k2 = k / 4;
             inv = n_preinvert_limb(k2);

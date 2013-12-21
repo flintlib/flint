@@ -34,13 +34,12 @@
 
 int main(void)
 {
-    flint_rand_t state;
     slong i, j;
 
-    printf("bell_number_nmod....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("bell_number_nmod....");
+    fflush(stdout);    
 
     for (i = 0; i < 10; i++)
     {
@@ -63,7 +62,7 @@ int main(void)
 
             if (u != b[j])
             {
-                printf("FAIL: p = %lu, i = %ld\n", p, j);
+                flint_printf("FAIL: p = %wu, i = %wd\n", p, j);
                 abort();
             }
         }
@@ -71,8 +70,8 @@ int main(void)
         _nmod_vec_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

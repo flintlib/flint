@@ -34,13 +34,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     int iter;
 
-    printf("one/is_one....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("one/is_one....");
+    fflush(stdout);    
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -57,7 +56,7 @@ main(void)
 
         if (!fmpz_poly_mat_is_one(A))
         {
-            printf("FAIL: expected matrix to be one\n");
+            flint_printf("FAIL: expected matrix to be one\n");
             abort();
         }
 
@@ -76,7 +75,7 @@ main(void)
 
             if (fmpz_poly_mat_is_one(A))
             {
-                printf("FAIL: expected matrix not to be one\n");
+                flint_printf("FAIL: expected matrix not to be one\n");
                 abort();
             }
         }
@@ -84,8 +83,8 @@ main(void)
         fmpz_poly_mat_clear(A);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

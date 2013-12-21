@@ -40,12 +40,12 @@ main(void)
 {
     mp_bitcnt_t depth, w;
     
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("mul_fft_main....");
+    flint_printf("mul_fft_main....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 13; depth++)
@@ -56,7 +56,7 @@ main(void)
             
             for (i = 0; i < iter; i++)
             {
-               mp_size_t n = (1UL<<depth);
+               mp_size_t n = (UWORD(1)<<depth);
                mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
                mp_size_t len1 = 2*n + n_randint(state, 2*n) + 1;
                mp_size_t len2 = 2*n + 2 - len1 + n_randint(state, 2*n);
@@ -99,7 +99,7 @@ main(void)
                {
                    if (r1[j] != r2[j]) 
                    {
-                       printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                       flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                        abort();
                    }
                }
@@ -109,8 +109,8 @@ main(void)
         }
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

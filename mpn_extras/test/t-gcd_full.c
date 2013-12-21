@@ -35,10 +35,11 @@ int main(void)
     int i, result;
     mpz_t a, b, c, g;
     gmp_randstate_t st;
-    flint_rand_t state;
     slong s1, s2;
     
-    printf("gcd_full....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("gcd_full....");
     fflush(stdout);
 
     mpz_init(a);
@@ -46,7 +47,6 @@ int main(void)
     mpz_init(c);
     /* don't init g */
     gmp_randinit_default(st);
-    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -77,7 +77,7 @@ int main(void)
        result = (mpz_cmp(g, c) == 0);
        if (!result)
        {
-          printf("FAIL:\n");
+          flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", g);
           gmp_printf("%Zd\n", c);
           abort();
@@ -91,8 +91,8 @@ int main(void)
     mpz_clear(c);
     /* don't clear g */
     gmp_randclear(st);
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -37,13 +37,13 @@ d_randtest(flint_rand_t state)
 
     if (FLINT_BITS == 64)
     {
-        m1 = n_randlimb(state) | (1UL << (FLINT_BITS - 1));
+        m1 = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));
 
         t = ((double) m1) * EXP_MINUS_64;
     }
     else
     {
-        m1 = n_randlimb(state) | (1UL << (FLINT_BITS - 1));
+        m1 = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));
         m2 = n_randlimb(state);
 
         t = ((double) m1) * EXP_MINUS_32 +

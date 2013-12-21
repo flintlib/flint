@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("mul_tdiv_q_2exp....");
+    flint_printf("mul_tdiv_q_2exp....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -73,8 +73,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, exp = %lu\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, exp = %wu\n",
                 d, e, f, g, exp);
             abort();
         }
@@ -116,8 +116,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, f = %Zd, g = %Zd, exp = %lu\n", d, f, g, exp);
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, f = %Zd, g = %Zd, exp = %wu\n", d, f, g, exp);
             abort();
         }
 
@@ -159,8 +159,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, exp = %lu\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, exp = %wu\n",
                 d, e, f, g, exp);
             abort();
         }
@@ -204,8 +204,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, exp = %lu\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, exp = %wu\n",
                 d, e, f, g, exp);
             abort();
         }
@@ -219,8 +219,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

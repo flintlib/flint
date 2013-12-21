@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("get_set_str....");
+    flint_printf("get_set_str....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -59,9 +59,9 @@ main(void)
         result = (ans == 0 && fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -70,8 +70,8 @@ main(void)
         flint_free(str);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

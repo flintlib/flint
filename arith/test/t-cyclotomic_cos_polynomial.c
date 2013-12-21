@@ -99,7 +99,9 @@ int main()
     fmpz_poly_t p;
     slong n;
 
-    printf("cyclotomic_cos_polynomial....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("cyclotomic_cos_polynomial....");
     fflush(stdout);
 
     fmpz_poly_init(p);
@@ -112,16 +114,16 @@ int main()
 
         if (y != testdata[n])
         {
-            printf("FAIL: n = %ld\n", n);
-            printf("y = %lu\n", y);
-            printf("\n");
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("y = %wu\n", y);
+            flint_printf("\n");
             abort();
         }
     }
 
     fmpz_poly_clear(p);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

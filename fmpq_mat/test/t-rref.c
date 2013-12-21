@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("rref....");
+    flint_printf("rref....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -73,30 +73,30 @@ main(void)
             rank = fmpq_mat_rref_classical(B, A);
             if (r != rank)
             {
-                printf("FAIL:\n");
-                printf("fmpq_mat_rref_classical: wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("fmpq_mat_rref_classical: wrong rank!\n");
                 fmpq_mat_print(A);
-                printf("\nrank: %ld computed: %ld\n", r, rank);
+                flint_printf("\nrank: %wd computed: %wd\n", r, rank);
                 abort();
             }
 
             rank = fmpq_mat_rref_fraction_free(C, A);
             if (r != rank)
             {
-                printf("FAIL:\n");
-                printf("fmpq_mat_rref_fraction_free: wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("fmpq_mat_rref_fraction_free: wrong rank!\n");
                 abort();
             }
 
             if (!fmpq_mat_equal(B, C))
             {
-                printf("FAIL:\n");
-                printf("different results!\n");
-                printf("A:\n");
+                flint_printf("FAIL:\n");
+                flint_printf("different results!\n");
+                flint_printf("A:\n");
                 fmpq_mat_print(A);
-                printf("\nB:\n");
+                flint_printf("\nB:\n");
                 fmpq_mat_print(B);
-                printf("\nC:\n");
+                flint_printf("\nC:\n");
                 fmpq_mat_print(C);
                 abort();
             }
@@ -110,8 +110,8 @@ main(void)
         fmpz_clear(den);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -77,7 +77,7 @@ mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf)
     max = FLINT_MIN(qs_inf->ks_primes, qs_inf->num_primes - 2);
 
 #if QS_DEBUG 
-    printf("Checking %ld Knuth-Schroeppel primes\n", max);
+    flint_printf("Checking %wd Knuth-Schroeppel primes\n", max);
 #endif
 
     p = 3;
@@ -133,7 +133,7 @@ mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf)
     } 
 
 #if QS_DEBUG 
-    printf("Using multiplier %ld\n", qs_inf->k);
+    flint_printf("Using multiplier %wd\n", qs_inf->k);
 #endif
 
     return 0; /* we didn't find any small factors */

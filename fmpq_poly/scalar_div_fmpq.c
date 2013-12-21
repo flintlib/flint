@@ -40,18 +40,18 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden,
     fmpz_init(gcd2);
     fmpz_one(gcd1);
     fmpz_one(gcd2);
-    if (*r != 1L)
+    if (*r != WORD(1))
     {
         _fmpz_vec_content(gcd1, poly, len);
-        if (*gcd1 != 1L)
+        if (*gcd1 != WORD(1))
             fmpz_gcd(gcd1, gcd1, r);
     }
-    if (*den != 1L && *s != 1L)
+    if (*den != WORD(1) && *s != WORD(1))
         fmpz_gcd(gcd2, s, den);
     
-    if (*gcd1 == 1L)
+    if (*gcd1 == WORD(1))
     {
-        if (*gcd2 == 1L)
+        if (*gcd2 == WORD(1))
         {
             _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, s);
             fmpz_mul(rden, den, r);
@@ -72,7 +72,7 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden,
         fmpz_t r2;
         fmpz_init(r2);
         fmpz_divexact(r2, r, gcd1);
-        if (*gcd2 == 1L)
+        if (*gcd2 == WORD(1))
         {
             _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
             _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, s);
@@ -108,7 +108,7 @@ void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq
 {
     if (fmpq_is_zero(c))
     {
-        printf("Exception (fmpq_poly_scalar_div_fmpq). Division by zero.\n");
+        flint_printf("Exception (fmpq_poly_scalar_div_fmpq). Division by zero.\n");
         abort();
     }
 

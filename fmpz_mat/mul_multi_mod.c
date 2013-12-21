@@ -58,7 +58,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
 
     /* Initialize */
     primes = flint_malloc(sizeof(mp_limb_t) * num_primes);
-    primes[0] = n_nextprime(1UL << primes_bits, 0);
+    primes[0] = n_nextprime(UWORD(1) << primes_bits, 0);
     for (i = 1; i < num_primes; i++)
         primes[i] = n_nextprime(primes[i-1], 0);
 

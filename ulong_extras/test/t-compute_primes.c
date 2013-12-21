@@ -33,14 +33,14 @@
 int main()
 {
     slong i, lim = 1000000;
-    flint_rand_t state;
     n_primes_t pg;
     mp_limb_t * ref_primes;
     double * ref_inverses;
+    FLINT_TEST_INIT(state);
 
-    printf("compute_primes....");
+    flint_printf("compute_primes....");
     fflush(stdout);
-    flint_randinit(state);
+    
 
     ref_primes = flint_malloc(sizeof(mp_limb_t) * lim);
     ref_inverses = flint_malloc(sizeof(double) * lim);
@@ -66,9 +66,9 @@ int main()
 
         if (primes[n] != ref_primes[n] || inverses[n] != ref_inverses[n])
         {
-            printf("FAIL!\n");
-            printf("n = %ld, p1 = %lu, p2 = %lu\n", n, primes[n], ref_primes[n]);
-            printf("inv1 = %g, inv2 = %g\n", inverses[n], ref_inverses[n]);
+            flint_printf("FAIL!\n");
+            flint_printf("n = %wd, p1 = %wu, p2 = %wu\n", n, primes[n], ref_primes[n]);
+            flint_printf("inv1 = %g, inv2 = %g\n", inverses[n], ref_inverses[n]);
             abort();
         }
 
@@ -80,9 +80,9 @@ int main()
 
     flint_free(ref_primes);
     flint_free(ref_inverses);
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

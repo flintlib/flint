@@ -37,13 +37,12 @@ int
 main(void)
 {
     fmpz_mat_t A, B, ker;
-    flint_rand_t state;
     slong i, m, n, b, d, r, nullity, nulrank;
 
-    printf("nullspace....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("nullspace....");
+    fflush(stdout);    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -69,19 +68,19 @@ main(void)
 
             if (nullity != nulrank)
             {
-                printf("FAIL:\n");
-                printf("rank(ker) != nullity!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("rank(ker) != nullity!\n");
                 fmpz_mat_print_pretty(A);
-                printf("\n");
+                flint_printf("\n");
                 abort();
             }
 
             if (nullity + r != n)
             {
-                printf("FAIL:\n");
-                printf("nullity + rank != n\n");
+                flint_printf("FAIL:\n");
+                flint_printf("nullity + rank != n\n");
                 fmpz_mat_print_pretty(A);
-                printf("\n");
+                flint_printf("\n");
                 abort();
             }
 
@@ -89,10 +88,10 @@ main(void)
 
             if (fmpz_mat_rank(B) != 0)
             {
-                printf("FAIL:\n");
-                printf("A * ker != 0\n");
+                flint_printf("FAIL:\n");
+                flint_printf("A * ker != 0\n");
                 fmpz_mat_print_pretty(A);
-                printf("\n");
+                flint_printf("\n");
                 abort();
             }
 
@@ -102,8 +101,8 @@ main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

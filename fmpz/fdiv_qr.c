@@ -38,7 +38,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        printf("Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_printf("Exception (fmpz_fdiv_q). Division by zero.\n");
         abort();
     }
 
@@ -49,7 +49,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
             fmpz q = c1 / c2;   /* compute C quotient */
             fmpz r = c1 - c2 * q;   /* compute remainder */
 
-            if ((c2 > 0L && r < 0L) || (c2 < 0L && r > 0L))
+            if ((c2 > WORD(0) && r < WORD(0)) || (c2 < WORD(0) && r > WORD(0)))
             {
                 q--;            /* q cannot overflow as remainder implies |c2| != 1 */
                 r += c2;
@@ -60,12 +60,12 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
         }
         else                    /* h is large and g is small */
         {
-            if (c1 == 0L)
+            if (c1 == WORD(0))
             {
-                fmpz_set_ui(f, 0L); /* g is zero */
+                fmpz_set_ui(f, WORD(0)); /* g is zero */
                 fmpz_set_si(s, c1);
             }
-            else if ((c1 < 0L && fmpz_sgn(h) < 0) || (c1 > 0L && fmpz_sgn(h) > 0))  /* signs are the same */
+            else if ((c1 < WORD(0) && fmpz_sgn(h) < 0) || (c1 > WORD(0) && fmpz_sgn(h) > 0))  /* signs are the same */
             {
                 fmpz_zero(f);   /* quotient is positive, round down to zero */
                 fmpz_set_si(s, c1);
@@ -73,7 +73,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
             else
             {
                 fmpz_add(s, g, h);
-                fmpz_set_si(f, -1L);    /* quotient is negative, round down to minus one */
+                fmpz_set_si(f, WORD(-1));    /* quotient is negative, round down to minus one */
             }
         }
     }
@@ -89,11 +89,11 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
         {
             if (c2 > 0)         /* h > 0 */
             {
-                mpz_fdiv_qr_ui(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(c1), c2);
+                flint_mpz_fdiv_qr_ui(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(c1), c2);
             }
             else
             {
-                mpz_cdiv_qr_ui(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(c1), -c2);
+                flint_mpz_cdiv_qr_ui(mpz_ptr, mpz_ptr2, COEFF_TO_PTR(c1), -c2);
                 mpz_neg(mpz_ptr, mpz_ptr);
             }
         }

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("set/equal....");
+    flint_printf("set/equal....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* equal polynomials */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -57,12 +57,12 @@ main(void)
         result = (fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n");
-            printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
-            printf("equal(a, b) = %d\n", result);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", a->alloc, a->length);
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
+            flint_printf("equal(a, b) = %d\n", result);
             abort();
         }
 
@@ -91,19 +91,19 @@ main(void)
         {
             fmpz_randtest(x1fmpz, state, 200);
             fmpz_get_mpz(mpq_numref(x1), x1fmpz);
-            mpz_set_si(mpq_denref(x1), 1);
+            flint_mpz_set_si(mpq_denref(x1), 1);
         } while (mpq_equal(x1, x2));
         fmpq_poly_set_coeff_mpq(b, coeff, x1);
 
         result = (!fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n");
-            printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
-            printf("!equal(a, b) = %d\n", result);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", a->alloc, a->length);
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
+            flint_printf("!equal(a, b) = %d\n", result);
             abort();
         }
 
@@ -114,8 +114,8 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

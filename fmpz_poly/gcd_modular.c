@@ -125,7 +125,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
 
     /* compute a heuristic bound after which we should begin checking if we're done */
     bits_small = FLINT_MAX(fmpz_bits(eval_GCD), fmpz_bits(g));
-    if (bits_small < 2L) bits_small = 2;
+    if (bits_small < WORD(2)) bits_small = 2;
 
     fmpz_clear(eval_GCD);
     fmpz_clear(eval_A);
@@ -133,7 +133,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
 
     /* set size of first prime */
     pbits = FLINT_BITS - 1;
-    p = (1UL<<pbits);
+    p = (UWORD(1)<<pbits);
 
     fmpz_init(modulus);
     fmpz_init(hc);

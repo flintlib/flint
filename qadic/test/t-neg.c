@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("neg... ");
+    flint_printf("neg... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing: a = -a */
     for (i = 0; i < 2000; i++)
@@ -68,10 +68,10 @@ main(void)
         result = (qadic_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -92,7 +92,7 @@ main(void)
 
         qadic_t a, b, c1, c2;
 
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "a", PADIC_SERIES);
@@ -112,11 +112,11 @@ main(void)
         result = (qadic_equal(c1, c2));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c1 = "), qadic_print_pretty(c1, ctx), printf("\n");
-            printf("c2 = "), qadic_print_pretty(c2, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c1 = "), qadic_print_pretty(c1, ctx), flint_printf("\n");
+            flint_printf("c2 = "), qadic_print_pretty(c2, ctx), flint_printf("\n");
             abort();
         }
 
@@ -129,9 +129,9 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

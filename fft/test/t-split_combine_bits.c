@@ -41,12 +41,12 @@ main(void)
     int i;
     mp_size_t j;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("split/combine_bits....");
+    flint_printf("split/combine_bits....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < 10000; i++)
@@ -73,8 +73,8 @@ main(void)
         {
            if (in[j] != out[j])
            {
-              printf("FAIL:\n");
-              printf("Error in limb %ld, %lu != %lu\n", j, in[j], out[j]);
+              flint_printf("FAIL:\n");
+              flint_printf("Error in limb %wd, %wu != %wu\n", j, in[j], out[j]);
               abort();
            }
         }
@@ -88,8 +88,8 @@ main(void)
         flint_free(poly);
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

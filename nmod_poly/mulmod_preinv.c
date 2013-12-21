@@ -24,8 +24,17 @@
 
 ******************************************************************************/
 
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
+
 #include <stdlib.h>
-#include <mpir.h>
+
+#undef ulong
+
+#include <gmp.h>
+
+#define ulong mp_limb_t
+
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -48,7 +57,7 @@ void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
     else
         _nmod_poly_mul(T, poly2, len2, poly1, len1, mod);
 
-    _nmod_poly_divrem_newton21_preinv(Q, res, T, lenT, f, lenf,
+    _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenT, f, lenf,
                                       finv, lenfinv, mod);
     _nmod_vec_clear(T);
 }
@@ -67,7 +76,13 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
 
     if (lenf == 0)
     {
-        printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_mulmod_preinv). Divide by zero.\n");
+        abort();
+    }
+
+    if (lenf <= len1 || lenf <= len2)
+    {
+        flint_printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
         abort();
     }
 

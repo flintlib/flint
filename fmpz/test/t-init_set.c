@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
-    printf("init_set....");
+    flint_printf("init_set....");
     fflush(stdout);
     
-    flint_randinit(state);
+    
 
     /* Small integers */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -53,9 +53,9 @@ main(void)
         result = fmpz_equal(a, b);
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -75,9 +75,9 @@ main(void)
         result = fmpz_equal(a, b);
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -85,8 +85,8 @@ main(void)
         fmpz_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

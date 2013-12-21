@@ -32,13 +32,13 @@
 int main(void)
 {
    int i, result;
-   ulong count = 0UL;
+   ulong count = UWORD(0);
    mp_limb_t d;
    mpz_t d_m;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("is_probabprime_fibonacci....");
+   flint_printf("is_probabprime_fibonacci....");
    fflush(stdout);
  
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
@@ -48,16 +48,16 @@ int main(void)
       do
       {
          d = n_randtest_not_zero(state);
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (mpz_size(d_m) > 1);
 
       result = n_is_probabprime_fibonacci(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -70,9 +70,9 @@ int main(void)
 
       do
       {
-         d = n_randtest(state) | 1UL;
+         d = n_randtest(state) | UWORD(1);
          if ((d % 5) == 0) d+=2;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       if (n_is_probabprime_fibonacci(d)) count++;
@@ -83,13 +83,13 @@ int main(void)
    result = (count < 20 * flint_test_multiplier());
    if (!result)
    {
-      printf("FAIL:\n");
-      printf("%lu composites declared prime\n", count); 
+      flint_printf("FAIL:\n");
+      flint_printf("%wu composites declared prime\n", count); 
       abort();
    }
  
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

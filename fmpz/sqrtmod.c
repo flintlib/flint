@@ -42,10 +42,10 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
     if (mpz_jacobi(a, p) == -1)
         return 0;
 
-    if (mpz_congruent_ui_p(p, 3, 4))
+    if (flint_mpz_congruent_ui_p(p, 3, 4))
     {
         mpz_init(exp);
-        mpz_add_ui(exp, p, 1);
+        flint_mpz_add_ui(exp, p, 1);
         mpz_tdiv_q_2exp(exp, exp, 2);
         mpz_powm(rop, a, exp, p);
         mpz_clear(exp);
@@ -62,7 +62,7 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
     mpz_init(gpow);
 
     r = 0;
-    mpz_sub_ui(p1, p, 1);
+    flint_mpz_sub_ui(p1, p, 1);
     do {
         mpz_tdiv_q_2exp(p1, p1, 1);
         r++;
@@ -70,18 +70,18 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
 
     mpz_powm(b, a, p1, p);
 
-    for (mpz_set_ui(k, 2); ; mpz_add_ui(k, k, 1))
+    for (flint_mpz_set_ui(k, 2); ; flint_mpz_add_ui(k, k, 1))
     {
         if (mpz_jacobi(k, p) == -1) break;
     }
 
     mpz_powm(g, k, p1, p);
 
-    mpz_add_ui(exp, p1, 1);
+    flint_mpz_add_ui(exp, p1, 1);
     mpz_tdiv_q_2exp(exp, exp, 1);
     mpz_powm(rop, a, exp, p);
 
-    while (mpz_cmp_ui(b, 1))
+    while (flint_mpz_cmp_ui(b, 1))
     {
         mpz_set(bpow, b);
         m = 0;
@@ -90,7 +90,7 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
             mpz_mul(bpow, bpow, bpow);
             mpz_mod(bpow, bpow, p);
             m++;
-        } while (m < r && mpz_cmp_ui(bpow, 1));
+        } while (m < r && flint_mpz_cmp_ui(bpow, 1));
 
         mpz_set(gpow, g);
         for (i = 1; i < r - m; i++)

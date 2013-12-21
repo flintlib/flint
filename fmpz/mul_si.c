@@ -46,7 +46,7 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
         /* unsigned limb by limb multiply (assembly for most CPU's) */
         umul_ppmm(prod[1], prod[0], uc2, ux);
-        if ((c2 ^ x) < 0L)
+        if ((c2 ^ x) < WORD(0))
             fmpz_neg_uiui(f, prod[1], prod[0]);
         else
             fmpz_set_uiui(f, prod[1], prod[0]);
@@ -54,6 +54,6 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
     else                        /* c2 is large */
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);   /* ok without val as if aliased both are large */
-        mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
+        flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c2), x);
     }
 }

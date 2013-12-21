@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("height....");
+    flint_printf("height....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -55,21 +55,21 @@ main(void)
 
         if (!fmpz_bits(h) == b)
         {
-            printf("FAIL!\n");
-            printf("x: ");
+            flint_printf("FAIL!\n");
+            flint_printf("x: ");
             fmpq_print(x);
-            printf("\nh: ");
+            flint_printf("\nh: ");
             fmpz_print(h);
-            printf("\nb: %ld\n", b);
+            flint_printf("\nb: %wd\n", b);
         }
 
         fmpq_clear(x);
         fmpz_clear(h);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

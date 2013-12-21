@@ -103,7 +103,7 @@ _nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, slong len, nmod_t mod)
     for (i = 1; i < height - 1; i++)
     {
         left = len;
-        pow = 1L << i;
+        pow = WORD(1) << i;
         pa = tree[i];
         pb = tree[i + 1];
 

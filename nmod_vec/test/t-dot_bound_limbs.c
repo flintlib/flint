@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("dot_bound_limbs....");
+    flint_printf("dot_bound_limbs....");
     fflush(stdout);
 
     for (i = 0; i < 1000000; i++)
@@ -56,18 +56,18 @@ main(void)
         limbs1 = _nmod_vec_dot_bound_limbs(len, mod);
 
         mpz_init2(t, 4*FLINT_BITS);
-        mpz_set_ui(t, m-1);
+        flint_mpz_set_ui(t, m-1);
         mpz_mul(t, t, t);
-        mpz_mul_ui(t, t, len);
+        flint_mpz_mul_ui(t, t, len);
         limbs2 = mpz_size(t);
 
         if (limbs1 != limbs2)
         {
-            printf("FAIL:\n");
-            printf("m = %lu\n", m);
-            printf("len = %ld\n", len);
-            printf("limbs1 = %d\n", limbs1);
-            printf("limbs2 = %d\n", limbs2);
+            flint_printf("FAIL:\n");
+            flint_printf("m = %wu\n", m);
+            flint_printf("len = %wd\n", len);
+            flint_printf("limbs1 = %d\n", limbs1);
+            flint_printf("limbs2 = %d\n", limbs2);
             gmp_printf("bound: %Zd\n", t);
             abort();
         }
@@ -75,8 +75,8 @@ main(void)
         mpz_clear(t);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

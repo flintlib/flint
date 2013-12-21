@@ -26,9 +26,15 @@
 #ifndef DOUBLE_EXTRAS_H
 #define DOUBLE_EXTRAS_H
 
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
+#undef ulong
 #include <float.h>
+#include <gmp.h>
 #include "flint.h"
+
+#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {

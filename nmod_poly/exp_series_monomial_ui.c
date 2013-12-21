@@ -44,9 +44,9 @@ _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
     if (power > 1)
         _nmod_vec_zero(res, n);
 
-    res[0] = 1UL;
+    res[0] = UWORD(1);
 
-    if (coeff == 1UL)
+    if (coeff == UWORD(1))
     {
         a = rfac;
         for (k = r; k >= 1; k--)
@@ -84,28 +84,28 @@ nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
         return;
     }
 
-    if (coeff == 0UL)
+    if (coeff == UWORD(0))
     {
         nmod_poly_fit_length(res, 1);
-        res->coeffs[0] = 1UL;
+        res->coeffs[0] = UWORD(1);
         res->length = 1;
         return;
     }
 
     if (power == 0)
     {
-        printf("Exception (nmod_poly_exp_series_monomial_ui). \n"
+        flint_printf("Exception (nmod_poly_exp_series_monomial_ui). \n"
                "Constant term != 0.\n");
         abort();
     }
 
-    if (coeff != 1UL)
+    if (coeff != UWORD(1))
         coeff = n_mod2_preinv(coeff, res->mod.n, res->mod.ninv);
 
     if (n == 1 || power >= n)
     {
         nmod_poly_fit_length(res, 1);
-        res->coeffs[0] = 1UL;
+        res->coeffs[0] = UWORD(1);
         res->length = 1;
     }
 

@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 
     if (argc != 2 || N < 1)
     {
-        printf("Syntax: delta_qexp <integer>\n");
-        printf("where <integer> is the (positive) number of terms to compute\n");
+        flint_printf("Syntax: delta_qexp <integer>\n");
+        flint_printf("where <integer> is the (positive) number of terms to compute\n");
         return EXIT_FAILURE;
     }
 
@@ -57,9 +57,9 @@ int main(int argc, char* argv[])
     fmpz_set_si(n, N);
     arith_ramanujan_tau(c, n);
 
-    printf("Coefficient of q^%ld is ", N);
+    flint_printf("Coefficient of q^%wd is ", N);
     fmpz_print(c);
-    printf("\n");
+    flint_printf("\n");
 
     fmpz_clear(c);
     fmpz_clear(n);

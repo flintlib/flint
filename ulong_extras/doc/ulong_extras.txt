@@ -74,7 +74,7 @@ mp_limb_t n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
-    values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased
+    values $0$, $1$, \code{COEFF_MAX} and \code{WORD_MAX} is increased
     as is the probability of a value with sparse binary representation.  
     This random function is mainly used for testing purposes.
     This function is intended for use in test code. 
@@ -302,6 +302,10 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
     \code{norm} will shift the product right by this many bits before
     reducing it.
 
+    Note, we explicitly assume that the bottom \code{norm} bits of $a$
+    are zero, as will be the case when $a$ and $b$ are left shifted by
+    this many bits on account of the normalisation of $n$.
+
     The algorithm use is that of Granlund and M\"oller~\citep{GraMol2010}.
 
     % Torbjorn Granlund and Niels Moller
@@ -461,6 +465,20 @@ mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
+mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
+                                                    mp_limb_t ninv, ulong norm)
+
+    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
+    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, exp $> 0$ and
+    for $n$ to be normalised.
+
+    If $a$ is shifted to the left as a result of normalising $n$, the number
+    of bits it was shifted should be passed as norm. The return value will
+    then need to be shifted right by this number of bits by the caller.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
+  
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     Returns \code{(a^exp) % n}. We require $0 \leq a < n$, but there are 
@@ -697,7 +715,7 @@ int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     $n - 1$ the algorithm can still proceed.
 
     One can also specify a number of iterations if less time 
-    should be taken. Simply set this to \code{~0L} if this is irrelevant.
+    should be taken. Simply set this to \code{~WORD(0)} if this is irrelevant.
     In most cases a greater number of iterations will not 
     significantly affect timings as most of the time is spent 
     factoring.
@@ -1006,7 +1024,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 
     Attempts to split $n$ using the given number of iterations
-    of SQUFOF. Simply set \code{iters} to \code{~0L} for maximum 
+    of SQUFOF. Simply set \code{iters} to \code{~WORD(0)} for maximum 
     persistence.
 
     The version of SQUFOF imlemented here is as described by Gower 
@@ -1181,3 +1199,29 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
     Uses a lookup table for small $n$, otherwise computes the product
     if $n$ is not too large, and calls the fast algorithm for extremely
     large $n$.
+
+*******************************************************************************
+
+    Primitive Roots and Discrete Logarithms
+
+*******************************************************************************
+
+mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
+
+    Returns a primitive root for the multiplicative subgroup of $Z/pZ$
+    where $p$ is prime given the factorisation ($factors$) of $p - 1$.
+
+
+mp_limb_t n_primitive_root_prime(mp_limb_t p)
+
+    Returns a primitive root for the multiplicative subgroup of $Z/pZ$
+    where $p$ is prime.
+
+mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n)
+
+    Returns the discrete logarithm of $b$ with respect to $a$ in the
+    multiplicative subgroup of $Z/nZ$ when $Z/nZ$ is cyclic That is,
+    it returns an number $x$ such that $a^x = b \bmod n$.  The
+    multiplicative subgroup is only cyclic when $n$ is $2$, $4$,
+    $p^k$, or $2p^k$ where $p$ is an odd prime and $k$ is a positive
+    integer.

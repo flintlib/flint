@@ -42,7 +42,7 @@ void fmpz_and(fmpz_t f, const fmpz_t g, const fmpz_t h)
             {
                 mpz_t tmp;
                 __mpz_struct *mpz3 = _fmpz_promote(f);
-                mpz_init_set_si(tmp, c1);
+                flint_mpz_init_set_si(tmp, c1);
                 mpz_and(mpz3, COEFF_TO_PTR(c2), tmp);
                 _fmpz_demote_val(f);
                 mpz_clear(tmp);
@@ -53,7 +53,7 @@ void fmpz_and(fmpz_t f, const fmpz_t g, const fmpz_t h)
             {
                 mpz_t tmp;
                 __mpz_struct *mpz3 = _fmpz_promote(f);
-                mpz_init_set_si(tmp, c2);
+                flint_mpz_init_set_si(tmp, c2);
                 mpz_and(mpz3, COEFF_TO_PTR(c1), tmp);
                 _fmpz_demote_val(f);
                 mpz_clear(tmp);

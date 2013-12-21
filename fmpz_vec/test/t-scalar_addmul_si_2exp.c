@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("scalar_addmul_si_2exp....");
+    flint_printf("scalar_addmul_si_2exp....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with alternative method of computation */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -71,10 +71,10 @@ main(void)
         result = (_fmpz_vec_equal(b, c, len));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("x = %ld, exp = %lu\n", x, exp);
-            _fmpz_vec_print(b, len), printf("\n\n");
-            _fmpz_vec_print(c, len), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("x = %wd, exp = %wu\n", x, exp);
+            _fmpz_vec_print(b, len), flint_printf("\n\n");
+            _fmpz_vec_print(c, len), flint_printf("\n\n");
             abort();
         }
 
@@ -84,8 +84,8 @@ main(void)
         _fmpz_vec_clear(d, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

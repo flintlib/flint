@@ -66,47 +66,47 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char *x)
     off = 0;
     i = len - 1;
 
-    if (poly[i] == 1L)
+    if (poly[i] == WORD(1))
     {
     }
-    else if (poly[i] == -1L)
+    else if (poly[i] == WORD(-1))
         str[off++] = '-';
     else if (!COEFF_IS_MPZ(poly[i]))
-        off += sprintf(str + off, "%ld*", poly[i]);
+        off += flint_sprintf(str + off, "%wd*", poly[i]);
     else
         off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
     if (i > 1)
-        off += sprintf(str + off, "%s^%ld", x, i);
+        off += flint_sprintf(str + off, "%s^%wd", x, i);
     else
-        off += sprintf(str + off, "%s", x);
+        off += flint_sprintf(str + off, "%s", x);
 
     for (--i; i > 0; --i)
     {
-        if (poly[i] == 0L)
+        if (poly[i] == WORD(0))
             continue;
         if (fmpz_sgn(poly + i) > 0)
             str[off++] = '+';
-        if (poly[i] == -1L)
+        if (poly[i] == WORD(-1))
             str[off++] = '-';
-        if (poly[i] != 1L && poly[i] != -1L)
+        if (poly[i] != WORD(1) && poly[i] != WORD(-1))
         {
             if (!COEFF_IS_MPZ(poly[i]))
-                off += sprintf(str + off, "%ld*", poly[i]);
+                off += flint_sprintf(str + off, "%wd*", poly[i]);
             else
                 off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
         }
         if (i > 1)
-            off += sprintf(str + off, "%s^%ld", x, i);
+            off += flint_sprintf(str + off, "%s^%wd", x, i);
         else
-            off += sprintf(str + off, "%s", x);
+            off += flint_sprintf(str + off, "%s", x);
     }
 
-    if (poly[i] != 0L)
+    if (poly[i] != WORD(0))
     {
         if (fmpz_sgn(poly + i) > 0)
             str[off++] = '+';
         if (!COEFF_IS_MPZ(poly[i]))
-            off += sprintf(str + off, "%ld", poly[i]);
+            off += flint_sprintf(str + off, "%wd", poly[i]);
         else
             off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
     }

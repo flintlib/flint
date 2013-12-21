@@ -35,12 +35,12 @@ main(void)
 {
     slong iter;
     int result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("abs_ubound_ui_2exp....");
+    flint_printf("abs_ubound_ui_2exp....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -86,13 +86,13 @@ main(void)
 
         if (FLINT_BIT_COUNT(man) != bits)
         {
-            printf("wrong number of bits!\n");
-            printf("bits = %ld, count = %u\n\n", bits, FLINT_BIT_COUNT(man));
-            printf("x = "); fmpz_print(x); printf("\n\n");
-            printf("bits(x) = %ld\n\n", fmpz_bits(x));
-            printf("y = "); fmpz_print(y); printf("\n\n");
-            printf("yexp = %ld\n\n", yexp);
-            printf("man = %lu, exp = %ld\n", man, exp);
+            flint_printf("wrong number of bits!\n");
+            flint_printf("bits = %wd, count = %u\n\n", bits, FLINT_BIT_COUNT(man));
+            flint_printf("x = "); fmpz_print(x); flint_printf("\n\n");
+            flint_printf("bits(x) = %wd\n\n", fmpz_bits(x));
+            flint_printf("y = "); fmpz_print(y); flint_printf("\n\n");
+            flint_printf("yexp = %wd\n\n", yexp);
+            flint_printf("man = %wu, exp = %wd\n", man, exp);
             abort();
         }
 
@@ -119,12 +119,12 @@ main(void)
 
         if (!result)
         {
-            printf("different from exact ceiling division\n");
-            printf("bits = %ld\n\n", bits);
-            printf("x = "); fmpz_print(x); printf("\n\n");
-            printf("bits(x) = %ld\n\n", fmpz_bits(x));
-            printf("y = "); fmpz_print(y); printf(", yexp = %ld\n\n", yexp);
-            printf("man = %lu, exp = %ld\n", man, exp);
+            flint_printf("different from exact ceiling division\n");
+            flint_printf("bits = %wd\n\n", bits);
+            flint_printf("x = "); fmpz_print(x); flint_printf("\n\n");
+            flint_printf("bits(x) = %wd\n\n", fmpz_bits(x));
+            flint_printf("y = "); fmpz_print(y); flint_printf(", yexp = %wd\n\n", yexp);
+            flint_printf("man = %wu, exp = %wd\n", man, exp);
             abort();
         }
 
@@ -132,8 +132,8 @@ main(void)
         fmpz_clear(y);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

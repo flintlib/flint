@@ -117,19 +117,19 @@ nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
 
             if (G == A || G == B)
             {
-                free(G->coeffs);
+                flint_free(G->coeffs);
                 G->coeffs = g;
                 G->alloc  = FLINT_MIN(lenA, lenB);
             }
             if (S == A || S == B)
             {
-                free(S->coeffs);
+                flint_free(S->coeffs);
                 S->coeffs = s;
                 S->alloc  = lenB - 1;
             }
             if (T == A || T == B)
             {
-                free(T->coeffs);
+                flint_free(T->coeffs);
                 T->coeffs = t;
                 T->alloc  = lenA - 1;
             }

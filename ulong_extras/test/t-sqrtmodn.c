@@ -32,12 +32,12 @@
 int main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("sqrtmodn....");
+    flint_printf("sqrtmodn....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod n */
     {
@@ -73,16 +73,16 @@ int main(void)
         result = btest & (i == num);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %lu\n", n);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
-            printf("num = %ld\n", num);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wu\n", n);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
+            flint_printf("num = %wd\n", num);
             
             if (!btest)
-                printf("Square root not found.\n");
+                flint_printf("Square root not found.\n");
             if (i != num)
-                printf("%lu not a square root of %lu mod %lu\n", sqrt[i], a, n);
+                flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, n);
 
             abort();
         }
@@ -110,8 +110,8 @@ int main(void)
         {
             if (n_mulmod2_preinv(sqrt[0], sqrt[0], n, ninv) != a)
             {
-                printf("FAIL:\n");
-                printf("%lu^2 is not %lu mod %lu\n", sqrt[0], a, n);
+                flint_printf("FAIL:\n");
+                flint_printf("%wu^2 is not %wu mod %wu\n", sqrt[0], a, n);
                 abort();
             }
             
@@ -128,10 +128,10 @@ int main(void)
         result = (b == n);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %lu\n", n);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wu\n", n);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
 
             abort();
         }
@@ -139,8 +139,8 @@ int main(void)
         flint_free(sqrt);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

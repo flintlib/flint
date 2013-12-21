@@ -35,17 +35,16 @@ int
 main(void)
 {
     int i, j, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     ulong n;
     mpq_t n_mpq;
 
-    printf("get/set_coeff_ui....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("get/set_coeff_ui....");
     fflush(stdout);
     
-    flint_randinit(state);
-
     mpq_init(n_mpq);
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -64,17 +63,17 @@ main(void)
             fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 
             cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
-            result = (mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
-                   && mpz_cmp_ui(mpq_numref(n_mpq), n) == 0
+            result = (flint_mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
+                   && flint_mpz_cmp_ui(mpq_numref(n_mpq), n) == 0
                    && !cflags);
             if (!result)
             {
-                printf("FAIL:\n");
-                printf("a      = "), fmpq_poly_debug(a), printf("\n");
-                printf("len    = %ld\n", len);
-                printf("coeff  = %ld\n", coeff);
-                printf("cflags = %lu\n", cflags);
-                printf("n      = %lu\n", n);
+                flint_printf("FAIL:\n");
+                flint_printf("a      = "), fmpq_poly_debug(a), flint_printf("\n");
+                flint_printf("len    = %wd\n", len);
+                flint_printf("coeff  = %wd\n", coeff);
+                flint_printf("cflags = %wu\n", cflags);
+                flint_printf("n      = %wu\n", n);
                 gmp_printf("n_mpq  = %Qd\n", n_mpq);
                 abort();
             }
@@ -84,8 +83,8 @@ main(void)
     }
     mpq_clear(n_mpq);
     
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

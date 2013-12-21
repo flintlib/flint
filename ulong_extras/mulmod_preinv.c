@@ -33,16 +33,12 @@ n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
 {
     mp_limb_t q0, q1, r, p_hi, p_lo;
 
+    /* renormalise product */
+    a >>= norm;
+
     /* multiply */
     umul_ppmm(p_hi, p_lo, a, b);
     
-    /* renormalise product */
-    if (norm)
-    {
-       p_lo = (p_lo >> norm) + (p_hi << (FLINT_BITS - norm));
-       p_hi = (p_hi >> norm);
-    }
-
     /* reduce mod n */
     {
         umul_ppmm(q1, q0, ninv, p_hi);

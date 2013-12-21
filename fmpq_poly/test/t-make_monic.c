@@ -36,13 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("make_monic/is_monic....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("make_monic/is_monic....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -61,10 +60,10 @@ main(void)
         result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(g), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n\n");
+            fmpq_poly_debug(g), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -86,17 +85,17 @@ main(void)
         result = (fmpq_poly_is_monic(f) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(f), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
         fmpq_poly_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

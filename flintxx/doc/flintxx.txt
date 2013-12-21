@@ -1,0 +1,4772 @@
+/*=============================================================================
+vim: spell spelllang=en textwidth=79
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 Tom Bachmann
+
+    TODO: split this file up?
+
+******************************************************************************/
+
+*******************************************************************************
+
+    flint\_exception
+
+    This is the main exception type used by the flintxx library. It derives
+    from \code{std::domain_error}. As such its main method is \code{what()},
+    yielding an English language description of the problem encountered.
+
+*******************************************************************************
+
+*******************************************************************************
+
+    frandxx
+
+    The type \code{frandxx} wraps \code{flint_rand_t} and takes care of
+    initialising and clearing random states. It is defined in
+    \code{flintxx/frandxx.h}. Note that this type is not copyable.
+
+*******************************************************************************
+
+frandxx::frandxx()
+
+    Initialize random state.
+
+flint_rand_t& frandxx::_data()
+const flint_rand_t& frandxx::_data() const
+
+    Obtain a reference to the underlying C random state.
+
+
+*******************************************************************************
+
+    ltuple
+
+    Lazy tuples are implemented in \code{flintxx/ltuple.h}. They are used
+    throughout flintxx to emulate functions with several return values.
+
+    This header automatically creates a static instance of
+    \code{flint::detail::IGNORED_TYPE}. It is accessible in namespace flint,
+    under the name \code{FLINT_LTUPLE_PLACEHOLDER_NAME}, which defaults to
+    \code{_}. See \code{ltupleref} documentation for how to use this.
+
+*******************************************************************************
+
+Ltuple<T1&, ..., Tn&> ltupleref(T1& t1, ..., Tn& tn)
+
+    Construct an ltuple of references, binding to the arguments \code{t1},
+    \dots, \code{tn}. Instances of \code{flint::detail::IGNORED_TYPE} can be
+    used as placeholders.
+    Currently $n \le 4$.
+
+Ltuple<T1, ..., Tn> ltuple(const T1& t1, ..., const Tn& tn)
+
+    Construct an ltuple containing copies of \code{t1}, \dots, \code{tn}.
+    Currently \code{n \le 4}.
+
+Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
+
+    If \code{Tk} is an expression template type, then the \code{get<k>()}
+    method returns a lazy expression evaluating to the kth element of the
+    (potentially lazy) ltuple.
+
+    If \code{Tk} is not an expression template type, this method evaluates the
+    ltuple, and returns the kth entry.
+
+    On ltuple immediates, reference versions are also available, which can
+    be used to manipulate the entries.
+
+*******************************************************************************
+
+    permxx
+
+    Permutations are mostly used by row reduction algorithms. Even though we
+    support limited arithmetic on them (e.g. composition), permutations are not
+    implemented as expression templates.
+
+    \code{permxx} wraps the C interface \code{perm} operating on \code{slong*}.
+
+*******************************************************************************
+
+permxx::permxx(slong n)
+static permxx permxx::one(slong n)
+
+    Initialize an identity permutation on the set $[n] = \{0, 1, \dots, n-1\}$.
+
+static permxx permxx::randtest(slong n)
+
+    Generate a random permutation on $[n]$. See \code{_perm_randtest}.
+
+bool permxx::operator==(const permxx&)
+bool permxx::operator!=(const permxx&)
+
+slong permxx::size() const
+
+    Return the size of the set being permuted ($n$ in the constructors).
+
+slong& operator[](slong i)
+slong operator[](slong i) const
+
+    Return the image of $i$ under the permutation.
+
+permxx permxx::operator*(const permxx&)
+permxx compose(const permxx& p1, const permxx& p2)
+
+    Compute the composition of two permutations. See \code{_perm_compose}.
+
+void permxx::set_inv(const permxx& o)
+
+    Set self to the inverse permutation of \code{o}.
+
+permxx permxx::inv() const
+permxx inv(const permxx&)
+
+    Return the inverse permutation.
+
+int print(const permxx&)
+
+
+
+*******************************************************************************
+
+    fmpzxx
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{sqrt}, \code{abs}.
+
+Fmpz_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{cdiv_q}, \code{divexact}, \code{fdiv_qr}, \code{fdiv_r},
+    \code{fdiv_r_2exp}, \code{gcd}, \code{gcdinv}, \code{invmod}, \code{lcm},
+    \code{negmod}, \code{pow}, \code{rfac}, \code{root}, \code{sqrtmod},
+    \code{tdiv_q}, \code{tdiv_q_2exp}, \code{tdiv_qr}, \code{xgcd}.
+
+Fmpz_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{divexact2}, \code{mul2}, \code{mul_tdiv_q_2exp}, \code{powm}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpzxx::fmpzxx()
+
+    Initialize to zero.
+
+fmpzxx::fmpzxx(const char*)
+fmpzxx::fmpzxx(T:is_integer)
+
+    Initialize from a primitive data type. See \code{fmpz_set_str},
+    \code{fmpz_set_si} and \code{fmpz_set_ui}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpzxx fmpzxx::randbits(frandxx& state)
+
+static fmpzxx fmpzxx::randtest(frandxx& state)
+
+static fmpzxx fmpzxx::randtest_unsigned(frandxx& state)
+
+static fmpzxx fmpzxx::randtest_not_zero(frandxx& state)
+
+static fmpzxx fmpzxx::randm(frandxx& state, Fmpz_expr m)
+
+static fmpzxx fmpzxx::randtest_mod(frandxx& state, Fmpz_expr m)
+
+static fmpzxx fmpzxx::randtest_mod_signed(frandxx& state, Fmpz_expr m)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+std::string Fmpz_expr::to_string(int base = 10) const
+
+    Convert self into a \code{string}. See \code{fmpz_get_str}.
+
+slong Fmpz_expr::to<slong>() const
+
+    Convert self to \code{slong}. See \code{fmpz_get_si}.
+
+slong Fmpz_expr::to<ulong>() const
+
+    Convert self to \code{ulong}. See \code{fmpz_get_si}.
+
+double Fmpz_expr::to<double>() const
+
+    Convert self to \code{double}. See \code{fmpz_get_d}.
+
+double Fmpz_expr::get_d_2exp(long& exp) const
+
+Fmpz_target Fmpz_target::operator=(const char*)
+Fmpz_target Fmpz_target::operator=(T:is_integer)
+
+    See \code{fmpz_set_str}, \code{fmpz_set_ui} and \code{fmpz_set_si}.
+
+void Fmpz_target::set_ui_smod(mp_limb_t x, mv_limb_t m)
+
+void Fmpz_target::set_uiui(mp_limb_t x, mv_limb_t m)
+
+void Fmpz_target::neg_uiui(mp_limb_t x, mv_limb_t m)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Fmpz_expr)
+int print(FILE*, Fmpz_expr)
+int read(Fmpz_target)
+int read(FILE*, Fmpz_target)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+size_t Fmpz_expr::sizeinbase(int) const
+size_t sizeinbase(Fmpz_expr, int)
+mp_bitcnt_t Fmpz_expr::bits() const
+mp_bitcnt_t bits(Fmpz_expr)
+mp_bitcnt_t Fmpz_expr::size() const
+mp_bitcnt_t size(Fmpz_expr)
+mp_bitcnt_t Fmpz_expr::val2() const
+mp_bitcnt_t val2(Fmpz_expr)
+int Fmpz_expr::sign() const
+int sign(Fmpz_expr)
+
+void Fmpz_target::set_zero()
+void Fmpz_target::set_one()
+
+bool Fmpz_expr::abs_fits_ui() const
+bool Fmpz_expr::fits_si() const
+
+void Fmpz_target::setbit(ulong)
+bool Fmpz_expr::tstbit(ulong) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparision
+
+    Relational operators \code{<=}, \code{>}
+    etc are overloaded, where \code{e1} and \code{e2} can be any
+    combination of \code{Fmpz_expr} and
+    \code{T:is_integer}.
+    See \code{fmpz_cmp}, \code{fmpz_cmp_si} and \code{fmpz_cmp_ui}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_expr::is_zero() const
+
+    Return if this expression evaluates to zero.
+
+bool Fmpz_expr::is_one() const
+
+    Return if this expression evaluates to one.
+
+bool Fmpz_expr::is_pm1() const
+
+    Return if this expression evaluates to $\pm 1$.
+
+bool Fmpz_expr::is_even() const
+
+    Return if this expression evaluates to an even integer.
+
+bool Fmpz_expr::is_odd() const
+
+    Return if the expression evaluates to an odd integer.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic arithmetic
+
+    Arithmetic operators \code{+}, \code{-}, \code{*}, \code{/}, \code{%},
+    \code{<<} and \code{>>} are overloaded. See the \code{fmpz} documentation
+    for which argument types are allowed. Symmetric operators with asymmetric
+    type arguments can be used in either order, even if this is not exposed in
+    the C interface.
+
+    The shift operators wrap \code{fmpz_fdiv_q_2exp} and \code{fmpz_mul_2exp}.
+    The division operators use \code{fmpz_fdiv}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr abs(Fmpz_expr)
+
+Fmpz_expr mul2_uiui(Fmpz_expr g, ulong x, ulong y)
+
+Fmpz_expr cdiv_q(Fmpz_expr, Fmpz_expr)
+Fmpz_expr cdiv_q(Fmpz_expr, T:is_integer)
+
+Fmpz_expr tdiv_q(Fmpz_expr, Fmpz_expr)
+Fmpz_expr tdiv_q(Fmpz_expr, T:is_integer)
+
+Fmpz_expr divexact(Fmpz_expr, Fmpz_expr)
+Fmpz_expr divexact(Fmpz_expr, T:is_integer)
+
+Fmpz_expr fdiv_r(Fmpz_expr, Fmpz_expr)
+
+Fmpz_expr tdiv_q_2exp(Fmpz_expr, T:is_unsigned_integer)
+
+Fmpz_expr fdiv_r_2exp(Fmpz_expr, T:is_unsigned_integer)
+
+Fmpz_expr divexact2(Fmpz_expr g, ulong x, ulong y)
+
+Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, Fmpz_expr x, ulong exp)
+Fmpz_expr mul_tdiv_q_2exp(Fmpz_expr g, long x, ulong exp)
+
+Ltuple<fmpzxx, fmpzxx>_expr fdiv_qr(Fmpz_expr g, Fmpz_expr h)
+Ltuple<fmpzxx, fmpzxx>_expr tdiv_qr(Fmpz_expr g, Fmpz_expr h)
+
+bool Fmpz_expr::divisible(Fmpz_expr) const
+bool Fmpz_expr::divisible(T:fits_into_slong) const
+bool divisible(Fmpz_expr n, Fmpz_expr d)
+bool divisible(Fmpz_expr n, T:fits_into_slong d)
+
+    Return if $d$ divides $n$. See \code{fmpz_divisible}.
+
+Fmpz_expr powm(Fmpz_expr g, ulong e, Fmpz_expr m)
+Fmpz_expr powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
+
+Fmpz_expr pow(Fmpz_expr, T:is_unsigned_integer)
+
+long clog(Fmpz_expr x, Fmpz_expr b)
+long clog(Fmpz_expr x, ulong b)
+
+long flog(Fmpz_expr x, Fmpz_expr b)
+long flog(Fmpz_expr x, ulong b)
+
+double dlog(Fmpz_expr x)
+
+long Fmpz_expr::clog(Fmpz_expr) const
+long Fmpz_expr::clog(T:is_unsigned_integer) const
+
+long Fmpz_expr::flog(Fmpz_expr) const
+long Fmpz_expr::flog(T:is_unsigned_integer) const
+
+double Fmpz_expr::dlog() const
+
+Ltuple<bool, fmpzxx>_expr sqrtmod(Fmpz_expr a, Fmpz_expr b)
+
+    \code{ltupleref(b, N) = sqrtmod(A, B)} has the same effect as
+    \code{b = fmpz_sqrtmod(n, a, b)}, where \code{n, a, b} are the underlying
+    \code{fmpz_t} of \code{N, A, B}.
+
+Ltuple<fmpzxx, fmpzxx>_expr sqrtrem(Fmpz_expr g)
+
+Fmpz_expr sqrt(Fmpz_expr)
+
+bool Fmpz_expr::is_square() const
+
+    Return if this expression evaluates to a square integer.
+
+Fmpz_expr root(Fmpz_expr, T:fits_into_slong)
+
+Fmpz_expr rfac(Fmpz_expr, T:is_unsigned_integer)
+
+Fmpz_expr fac(T:is_unsigned_integer)
+
+Fmpz_expr fib(T:is_unsigned_integer)
+
+Fmpz_expr bin(T:is_unsigned_integer, U:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpzxx, fmpzxx>_expr gcdinv(Fmpz_expr f, Fmpz_expr g)
+
+Ltuple<fmpzxx, fmpzxx, fmpzxx>_expr xgcd(Fmpz_expr f, Fmpz_expr g)
+
+Fmpz_expr gcd(Fmpz_expr, Fmpz_expr)
+
+Fmpz_expr lcm(Fmpz_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular arithmetic
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, fmpzxx>_expr remove(Fmpzxx a, Fmpzxx b)
+
+int jacobi(Fmpz_expr a, Fmpz_expr p)
+int Fmpz_expr::jacobi(Fmpz_expr) const
+
+Fmpz_expr invmod(Fmpz_expr, Fmpz_expr)
+
+Fmpz_expr negmod(Fmpz_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit packing and unpacking
+
+    Beware that argument orders are different relative to the C interface, to
+    facilitate default arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Fmpz_expr fmpzxx::bit_unpack(const vector<mp_limb_t>& v,
+            mp_bitcnt_t bits, mp_bitcnt_t shift = 0,
+            int negate = 0, bool borrow = false)
+static Fmpz_expr fmpzxx::bit_unpack_unsigned(const vector<mp_limb_t>& v,
+            mp_bitcnt_t bits, mp_bitcnt_t shift = 0)
+
+    Unpack an \code{fmpzxx} from \code{v}.
+
+bool bit_pack(std::vector<mp_limb_t>& v, mp_bitcnt_t bits, Fmpz_expr,
+            mp_bitcnt_t shift = 0, int negate = 0, bool borrow = false)
+
+    Pack an \code{fmpzxx} to \code{v}. The vector \code{v} is required to be of
+    sufficient size.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Logic operations
+
+    Binary logic operators \code{& | ^} (and, or, xor) are also overloaded
+    (implemented when both arguments are \code{Fmpz_expr}).
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_target::clrbit(ulong i)
+
+void Fmpz_target::combit(ulong i)
+
+int Fmpz_expr::popcnt() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Chinese remaindering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Fmpz_expr::CRT(Fmpz_expr, T:is_unsigned_integer,
+        T:is_unsigned_integer, bool) const
+Fmpz_expr CRT(Fmpz_expr, Fmpz_expr, T:is_unsigned_integer,
+        T:is_unsigned_integer, bool)
+
+    See \code{fmpz_CRT_ui}.
+
+fmpz_combxx::fmpz_combxx(const std::vector<mp_limb_t>& primes)
+
+    The class \code{fmpz_combxx} wraps both \code{fmpz_comb_t} and
+    \code{fmpz_comb_temp_t}. The argument \code{primes} is the vector of moduli
+    to use, and must not be deallocated before the newly constructed
+    \code{fmpz_combxx}. Note that the internal \code{fmpz_comb_temp_t}
+    structure may be modified even on constant instances of \code{fmpz_combxx}.
+
+void multi_mod(std::vector<mp_limb_t>& out, Fmpz_expr in, const fmpz_combxx&
+        comb)
+
+    Reduce \code{in} modulo the primes stored in \code{comb}, and store the
+    results in \code{out}. The vector \code{out} must have sufficient size, and
+    its size will not be changed.
+
+Fmpz_expr multi_CRT(const std::vector<mp_limb_t>& residues, const fmpz_combxx
+        comb, bool sign)
+
+    Reconstruct an integer from its residues. See \code{fmpz_multi_CRT_ui}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Primality testing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_expr::is_probabprime() const
+
+bool Fmpz_expr::is_prime_pseudosquare() const
+
+
+*******************************************************************************
+
+    fmpz\_factorxx
+
+*******************************************************************************
+
+fmpz_factorxx::fmpz_factorxx()
+
+    Initialise an empty factorisation.
+
+fmpz_factorxx::fmpz_factorxx(const fmpz_factorxx& o)
+
+    Copy a factorisation.
+
+bool fmpz_factorxx::operator==(const fmpz_factorxx&)
+
+    Compare two factorisations.
+
+ulong fmpz_factorxx::size() const
+
+    Return the number of stored factors.
+
+ulong fmpz_factorxx::exp(slong i) const
+ulong& fmpz_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+fmpzxx_srcref fmpz_factorxx::p(slong i) const
+fmpzxx_ref fmpz_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+int fmpz_factorxx::sign() const
+int& fmpz_factorxx::sign()
+
+    Obtain the sign of the factored expression.
+
+void fmpz_factorxx::set_factor(Fmpz_expr)
+void fmpz_factorxx::set_factor(T:fits_into_slong)
+bool fmpz_factorxx::set_factor_trial_range(Fmpz_expr, ulong, ulong)
+bool fmpz_factorxx::set_factor_pp1(Fmpz_expr, ulong, ulong, ulong)
+
+    Factorise an integer and store its factors. See \code{fmpz_factor} etc.
+
+Fmpz_expr fmpz_factorxx::expand() const
+Fmpz_expr fmpz_factorxx::expand_iterative() const
+Fmpz_expr fmpz_factorxx::expand_multiexp() const
+
+fmpz_factorxx factor(Fmpz_expr)
+fmpz_factorxx factor(T:fits_into_slong)
+Ltuple<bool, fmpz_factorxx>_expr factor_trial_range(Fmpz_expr)
+fmpz_factorxx factor_pp1(Fmpz_expr)
+
+void print(const fmpz_factorxx&)
+
+
+*******************************************************************************
+
+    fmpz\_matxx
+
+    The class \code{fmpz_matxx} wraps \code{fmpz_mat_t}, and so represents
+    matrices with coefficients in $\mathbb{Z}$.
+
+    Owing to the design of \code{fmpz_mat_t}, the use of \code{fmpz_matxx}
+    has a number of peculiarities.
+    \begin{itemize}
+      \item Matrix assignment does not automatically resize. This also includes
+        assigning (and thus evaluating) a lazy expression to an ordinary
+        matrix. As a consequence, the evaluation code cannot use temporary
+        merging, and may thus create more temporaries than a similar expression
+        involving non-matrices.
+      \item Several functions operating on \code{fmpz_mat_t} do not allow
+        aliasing. The flintxx layer just passes expressions on to the C layer,
+        so it is the responsibility of the user to avoid aliasing where it is
+        disallowed. Note that since no temporary merging is used with matrices,
+        aliases are never introduced by the evaluation code.
+    \end{itemize}
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Not yet split into subsections
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_mat_expr::rank() const
+
+Fmpz_expr Fmpz_mat_expr::det_modular_given_divisor(
+        Fmpz_mat_expr, Fmpz_expr) const
+
+    See \code{fmpz_mat_det_modular_given_divisor}.
+
+Fmpz_mat_target Fmpz_mat_target::operator=(T:fits_into_slong)
+Fmpz_mat_target Fmpz_mat_target::operator=(const char*)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_mat_expr::rows() const
+slong Fmpz_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
+Fmpz_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{sqr}, \code{charpoly}, \code{det},
+    \code{det_bareiss}, \code{det_bound}, \code{det_cofactor},
+    \code{det_divisor}, \code{trace}, \code{transpose}.
+
+Fmpz_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{det_modular}, \code{det_modular_accelerated}, \code{divexact},
+    \code{mul_classical}, \code{mul_multi_mod}, \code{pow}, 
+    code{solve}, \code{solve_bound},
+    \code{solve_cramer}, \code{solve_dixon}, \code{solve_fflu}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_matxx::fmpz_matxx(slong i, slong j)
+
+    Allocate a matrix of size $i \times j$.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Fmpz_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
+void Fmpq_mat_target::set_zero()
+void Fmpq_mat_target::set_one()
+static fmpq_matxx fmpq_matxx::zero(slong rows, slong cols)
+static fmpq_matxx fmpq_matxx::one(slong rows, slong cols)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpz_mat_expr)
+print(FILE*, Fmpz_mat_expr)
+print_pretty(Fmpz_mat_expr)
+print_pretty(FILE*, Fmpz_mat_expr)
+read(Fmpz_mat_target)
+read(FILE*, Fmpz_mat_target)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded operator \code{==} can be used for equality testing.
+    Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_mat_expr::is_zero() const
+bool Fmpz_mat_expr::is_empty() const
+bool Fmpz_mat_expr::is_quare() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpz_matxx fmpz_matxx::lift(Nmod_mat_expr)
+static fmpz_matxx fmpz_matxx::lift_unsigned(Nmod_mat_expr)
+
+    See \code{fmpz_mat_set_nmod_mat} and \code{fmpz_mat_set_nmod_mat_unsigned}.
+
+static fmpz_matxx fmpz_matxx::reduce(Fmpq_mat_expr, Fmz_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_mod_fmpz}.
+
+static fmpz_matxx fmpz_matxx::from_integral_fraction(Fmpq_mat_expr)
+void Fmpz_mat_target::set_integral_fraction(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat}. Raises \code{flint_exception} if the
+    argument has non-integer entries.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_mat_target::set_randbits(frandxx& state, mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randtest(frandxx& state, mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randintrel(frandxx& state, mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randsimdioph(frandxx& state, mp_bitcnt_t bits,
+        mp_bitcount_t bits2)
+void Fmpz_mat_target::set_randtrulike(frandxx& state, mp_bitcnt_t bits,
+        ulong q)
+void Fmpz_mat_target::set_randtrulike2(frandxx& state, mp_bitcnt_t bits,
+        ulong q)
+void Fmpz_mat_target::set_randajtai(frandxx& state, mp_bitcnt_t bits,
+        double alpha)
+void Fmpz_mat_target::set_randrank(frandxx& state, slong rank,
+        mp_bitcnt_t bits)
+void Fmpz_mat_target::set_randdet(frandxx& state, Fmpz_expr d)
+
+    See \code{fmpz_mat_randbits} etc.
+
+static fmpz_matxx fmpz_matxx::randbits(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randtest(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randintrel(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randsimdioph(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, mp_bitcount_t bits2)
+static fmpz_matxx fmpz_matxx::randtrulike(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, ulong q)
+static fmpz_matxx fmpz_matxx::randtrulike2(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, ulong q)
+static fmpz_matxx fmpz_matxx::randajtai(slong r, slong c,
+        frandxx& state, mp_bitcnt_t bits, double alpha)
+static fmpz_matxx fmpz_matxx::randrank(slong r, slong c,
+        frandxx& state, slong rank, mp_bitcnt_t bits)
+static fmpz_matxx fmpz_matxx::randdet(slong r, slong c,
+        frandxx& state, Fmpz_expr d)
+
+    Static versions of the above, where the first two arguments specify the
+    dimensions of the matrix.
+
+int Fmpz_mat_target::set_randpermdiag(frandxx& state, Vec v)
+
+    See \code{fmpz_mat_randpermdiag}. The type \code{vec} must have methods
+    \code{_array()} and \code{size()} similar to \code{fmpz_vecxx}.
+
+void Fmpz_mat_target::apply_randops(frandxx& state, slong count)
+
+    See \code{fmpz_mat_randops}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr transpose(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction and reconstruction
+
+    To reduce a single matrix modulo a word-sized modulus, see
+    \code{nmod_matxx::reduce}.
+
+    We use a special class \code{nmod_mat_vector} to represent a vector of
+    matrices reduced with respect to differing moduli.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr Fmpz_mat_expr::CRT(Fmpz_expr, Nmod_mat_expr, bool)
+Fmpz_mat_expr CRT(Fmpz_mat_expr, Fmpz_expr, Nmod_mat_expr, bool)
+
+    See \code{fmpz_mat_CRT_ui}.
+
+nmod_mat_vector::nmod_mat_vector(slong rows, slong cols,
+        const std::vector<mp_limb_t>& primes)
+
+    Initialize a vector of matrices with dimensions given by \code{rows},
+    \code{cols} and moduli given by \code{primes}.
+
+nmod_matxx_ref nmod_mat_vector::operator[](std::size_t idx)
+nmod_matxx_srcref nmod_mat_vector::operator[](std::size_t idx) const
+
+    Obtain a reference to one of the stored matrices.
+
+std::size_t nmod_mat_vector::size() const
+
+    Obtain the number of stored matrices.
+
+void nmod_mat_vector::set_multi_mod(Fmpz_mat_expr m)
+
+    Reduce \code{m} modulo each of the primes stored in this vector, and store
+    the results. See \code{fmpz_mat_multi_mod_ui}.
+
+void nmod_mat_vector::set_multi_mod_precomp(Fmpz_mat_expr m,
+        const fmpz_combxx& comb)
+
+    Reduce \code{m} modulo each of the primes stored in this vector, and store
+    the results. Use precomputed data in \code{comp}.
+    See \code{fmpz_mat_multi_mod_ui_precomp}.
+
+nmod_mat_vector multi_mod(Fmpz_mat_expr m, const std::vector<mp_limb_t>&
+        primes)
+nmod_mat_vector multi_mod_precomp(Fmpz_mat_expr m,
+        const std::vector<mp_limb_t>& primes, const fmpz_combxx& comb)
+
+    Convenience functions combining the allocation of memory and modular
+    reduction.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - *} can be used for ordinary
+    matrix-matrix and matrix-scalar arithmetic. Additionally, we provide the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr divexact(Fmpz_mat_expr, Fmpz_expr)
+Fmpz_mat_expr divexact(Fmpz_mat_expr, T:is_integer)
+
+Fmpz_mat_expr mul_classical(Fmpz_mat_expr, Fmpz_mat_expr)
+Fmpz_mat_expr mul_multi_mod(Fmpz_mat_expr, Fmpz_mat_expr)
+
+Fmpz_expr sqr(Fmpz_mat_expr)
+Fmpz_mat_expr pow(Fmpz_mat_expr, T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr inv(Fmpz_mat_expr)
+
+    \code{ltupleref(b, M, D) = inv(A)} has the same effect as
+    \code{b = fmpz_mat_inv(m, d, a)}, where \code{m, d, a} are the underlying C
+    objects corresponding to \code{M, D, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr trace(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr det(Fmpz_mat_expr)
+Fmpz_expr det_cofactor(Fmpz_mat_expr)
+Fmpz_expr det_bareiss(Fmpz_mat_expr)
+Fmpz_expr det_divisor(Fmpz_mat_expr)
+Fmpz_expr det_bound(Fmpz_mat_expr)
+Fmpz_expr det_modular(Fmpz_mat_expr, bool proved)
+Fmpz_expr det_modular_accelerated(Fmpz_mat_expr, bool proved)
+Fmpz_expr det_modular_given_divisor(Fmpz_mat_expr, Fmpz_expr, bool proved)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Characteristic polynomial
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr charpoly(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong rank(Fmpz_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Non-singular solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_dixon(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_cramer(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+Ltuple<bool, fmpz_matxx, fmpzxx>_expr solve_fflu(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+
+    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as
+    \code{w = fmpz_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
+    underlying C objects corresponding to \code{M, D, B, X}.
+    Similarly for the other functions.
+
+Ltuple<fmpzxx, fmpzxx>_expr solve_bound(
+        Fmpz_mat_expr B, Fmpz_mat_expr X)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Row reduction
+
+    Beware that compared to the C interface, the flintxx row reduction
+    interface changes some argument orders. This is to facilitate default
+    arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong find_pivot_any(Fmpz_mat_expr, slong, slong, slong)
+
+    See \code{fmpz_mat_find_pivot_any}.
+
+Ltuple<slong, fmpz_matxx, fmpzxx>_expr fflu(Fmpz_mat_expr A, permxx* perm = 0,
+    bool rankcheck = false)
+
+    See \code{fmpz_mat_fflu}.
+
+Ltuple<slong, fmpz_matxx, fmpzxx>_expr rref(Fmpz_mat_expr A)
+
+    See \code{fmpz_mat_rref}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular gaussian elimination
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_mat_target::set_rref_mod(Fmpz_expr n, permxx* perm = 0)
+
+    See \code{fmpz_mat_rref_mod}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, fmpz_matxx>_expr nullspace(Fmpz_mat_expr A)
+
+    \code{ltupleref(n, B) = nullspace(A)} has the same effect as
+    \code{n = fmpz_mat_nullspace(b, a)}, where \code{b, a} are the underlying
+    \code{fmpz_mat_t} corresponding to \code{B, A}.
+
+
+
+*******************************************************************************
+
+    fmpz\_polyxx
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{primitive_part}, \code{sqr}, \code{sqr_classical},
+    \code{sqr_karatsuba}, \code{sqr_KS}, \code{sqrt}, \code{sqrt_classical},
+    \code{content}, \code{height}, \code{bound_roots}, \code{twonorm}.
+
+Fmpz_poly_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},
+    \code{div_divconquer}, \code{divexact}, \code{divrem},
+    \code{divrem_basecase}, \code{divrem_divconquer}, \code{div_root},
+    \code{evaluate_divconquer}, \code{evaluate_horner}, \code{fdiv_2exp},
+    \code{gcd}, \code{gcd_heuristic}, \code{gcd_modular},
+    \code{gcd_subresultant}, \code{inv_series}, \code{inv_series_newton},
+    \code{lcm}, \code{mul_2exp}, \code{mul_classical}, \code{mul_karatsuba},
+    \code{mul_KS}, \code{mulmid_classical}, \code{mul_SS},
+    \code{shift_left}, \code{shift_right}, \code{pow},
+    \code{pow_addchains}, \code{pow_binexp}, \code{pow_binomial},
+    \code{pow_multinomial}, \code{pseudo_div}, \code{pseudo_divrem},
+    \code{pseudo_divrem_basecase}, \code{pseudo_divrem_cohen},
+    \code{pseudo_divrem_divconquer}, \code{pseudo_rem},
+    \code{pseudo_rem_cohen}, \code{resultant}, \code{reverse},
+    \code{revert_series}, \code{revert_series_lagrange},
+    \code{revert_series_lagrange_fast}, \code{revert_series_newton},
+    \code{smod}, \code{sqrlow}, \code{sqrlow_classical},
+    \code{sqrlow_karatsuba_n}, \code{sqrlow_KS}, \code{taylor_shift},
+    \code{taylor_shift_horner}, \code{taylor_shift_divconquer}, \code{tdiv},
+    \code{tdiv_2exp}, \code{xgcd}, \code{xgcd_modular}, \code{divides}.
+
+Fmpz_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{compose_series}, \code{compose_series_brent_kung},
+    \code{compose_horner}, \code{div_series}, \code{mulhigh_classical},
+    \code{mulhigh_karatsuba_n}, \code{mulhigh_n}, \code{mullow},
+    \code{mullow_classical}, \code{mullow_karatsuba_n}, \code{mullow_KS},
+    \code{mullow_SS}, \code{pow_trunc}.
+
+Fmpz_poly_expr Fmpz_poly_expr::operator()(Fmpz_poly_expr) const
+Fmpz_poly_expr Fmpz_poly_expr::operator()(Fmpz_expr) const
+
+    Overloaded \code{operator()} for evaluation or composition.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_polyxx::fmpz_polyxx()
+
+fmpz_polyxx::fmpz_polyxx(slong alloc)
+
+    See \code{fmpz_poly_init2}.
+
+fmpz_polyxx::fmpz_polyxx(const char* str)
+
+    See \code{fmpz_poly_set_str}.
+
+void Fmpz_poly_target realloc(slong alloc)
+void Fmpz_poly_target::fit_length(slong len)
+
+void Fmpz_poly_target::_normalise()
+void Fmpz_poly_target::_set_length(slong len)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial parameters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_poly_expr::length() const
+slong Fmpz_poly_expr::degree() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment and basic manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_target Fmpz_poly_target::operator=(T:is_integer)
+Fmpz_poly_target Fmpz_poly_target::operator=(Fmpz_expr)
+Fmpz_poly_target Fmpz_poly_target::operator=(const char*)
+
+std::string Fmpz_poly_expr::to_string() const
+
+std::string Fmpz_poly_expr::pretty(const char* x) const
+
+    See \code{fmpz_poly_get_str_pretty}.
+
+void Fmpz_poly_target::set_zero()
+void Fmpz_poly_target::set_one()
+static fmpz_polyxx fmpz_polyxx::zero()
+static fmpz_polyxx fmpz_polyxx::one()
+
+void Fmpz_poly_target::zero_coeffs(slong i, slong j)
+
+Fmpz_poly_expr reverse(Fmpz_poly_expr, T:fits_into_slong)
+
+void Fmpz_poly_target::truncate(slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpz_polyxx fmpz_polyxx::randtest(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+static fmpz_polyxx fmpz_polyxx::randtest_unsigned(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+static fmpz_polyxx fmpz_polyxx::randtest_not_zero(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+
+    See \code{fmpz_poly_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Fmpz_poly_expr::get_coeff(slong n)
+
+    Obtain coefficient $n$ of the polynomial. It is valid to call this with $n$
+    greater than the degree, in which case zero is returned.
+
+void Fmpz_poly_target::set_coeff(slong n, Fmpz_expr)
+void Fmpz_poly_target::set_coeff(slong n, T:is_integer)
+
+?? Fmpz_poly_expr::coeff(slong n) const
+
+    Unified coefficient access for coefficient $n$.
+    The result is undefined if $n$ is
+    greater than the degree of the polynomial (or negative).
+
+    If the leading coefficient of the polynomial is set to zero in this way, a
+    call to \code{_normalise} is necessary.
+
+?? Fmpz_poly_expr::lead() const
+
+    Unified coefficient access for the leading coefficient.
+    The result is undefined if
+    the length of the polynomial is zero.
+
+    If this is used to set the leading coefficient to zero,
+    call to \code{_normalise} is necessary.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    As usual, \code{fmpz_polyxx} can be compared using \code{operator==}.
+    Additionally, the following functions are provided.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_poly_expr::is_one() const
+bool Fmpz_poly_expr::is_zero() const
+bool Fmpz_poly_expr::is_unit() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Addition and subtraction
+
+    The overloaded operators \code{+ -} can be used for addition, subtraction
+    and negation.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Scalar multiplication and division
+
+    The overloaded operators \code{* /} can be used for scalar multiplication
+    and division, and the operator \code{\%} for remaindering.
+    For finer control, the following functions are provided.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr mul_2exp(Fmpz_poly_expr, T:is_unsigned_integer)
+Fmpz_poly_expr fdiv_2exp(Fmpz_poly_expr, T:is_unsigned_integer)
+
+Fmpz_poly_expr tdiv(Fmpz_poly_expr, Fmpz_expr)
+Fmpz_poly_expr tdiv(Fmpz_poly_expr, T:is_integer)
+Fmpz_poly_expr divexact(Fmpz_poly_expr, Fmpz_expr)
+Fmpz_poly_expr divexact(Fmpz_poly_expr, T:is_integer)
+
+Fmpz_poly_expr smod(Fmpz_poly_expr, Fmpz_expr)
+
+    See \code{fmpz_poly_scalar_smod_fmpz}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit packing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr bit_pack(Fmpz_poly_expr, T:fits_into_mp_bitcnt_t)
+static Fmpz_poly_expr fmpz_polyxx::bit_unpack(Fmpz_expr, T:fits_into_mp_bitcnt_t)
+static Fmpz_poly_expr fmpz_polyxx::bit_unpack_unsigned(
+        Fmpz_expr, traits::fits_into_mp_bitcnt_t)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplication
+
+    The overloaded operator \code{*} can also be used for poly-poly
+    multiplication. Additionally, the following functions are provided.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr mul_classical(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr mulmid_classical(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr mul_karatsuba(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr mul_SS(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr mul_KS(Fmpz_poly_expr, Fmpz_poly_expr)
+
+Fmpz_poly_expr mullow(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_classical(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_karatsuba_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_KS(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mullow_SS(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+
+Fmpz_poly_expr mulhigh_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mulhigh_classical(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr mulhigh_karatsuba_n(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Squaring
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr sqr(Fmpz_poly_expr)
+Fmpz_poly_expr sqr_KS(Fmpz_poly_expr)
+Fmpz_poly_expr sqr_karatsuba(Fmpz_poly_expr)
+Fmpz_poly_expr sqr_classical(Fmpz_poly_expr)
+
+Fmpz_poly_expr sqrlow(Fmpz_poly_expr, T:fits_into_slong n)
+Fmpz_poly_expr sqrlow_classical(Fmpz_poly_expr, T:fits_into_slong n)
+Fmpz_poly_expr sqrlow_KS(Fmpz_poly_expr, T:fits_into_slong n)
+Fmpz_poly_expr sqrlow_karatsuba_n(Fmpz_poly_expr, T:fits_into_slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr pow(Fmpz_poly_expr, T:is_unsigned_integer)
+Fmpz_poly_expr pow_multinomial(Fmpz_poly_expr, T:is_unsigned_integer)
+Fmpz_poly_expr pow_binomial(Fmpz_poly_expr, T:is_unsigned_integer)
+Fmpz_poly_expr pow_binexp(Fmpz_poly_expr, T:is_unsigned_integer)
+Fmpz_poly_expr pow_addchains(Fmpz_poly_expr, T:is_unsigned_integer)
+Fmpz_poly_expr pow_trunc(Fmpz_poly_expr, ulong e, slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr shift_left(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr shift_right(Fmpz_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit sizes and norms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr height(Fmpz_poly_expr)
+Fmpz_expr twonorm(Fmpz_poly_expr)
+
+ulong Fmpz_poly_expr::max_limbs() const
+slong Fmpz_poly_expr::max_bits() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr gcd(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr gcd_subresultant(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr gcd_heuristic(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr gcd_modular(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr lcm(Fmpz_poly_expr, Fmpz_poly_expr)
+
+Ltuple<fmpzxx, fmpz_polyxx, fmpz_polyxx>_expr xgcd(Fmpz_poly_expr f,
+        Fmpz_poly_expr g)
+Ltuple<fmpzxx, fmpz_polyxx, fmpz_polyxx>_expr xgcd_modular(Fmpz_poly_expr f,
+        Fmpz_poly_expr g)
+
+    \code{ltupleref(N, Q, R) = xgcd(F, G)} has the same effect as
+    \code{fmpz_poly_xgcd(n, q, r, f, g)} where \code{n, q, r, f, g} are the
+    underlying C objects.
+
+Fmpz_expr resultant(Fmpz_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Gaussian content
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr content(Fmpz_poly_expr)
+Fmpz_poly_expr primitive_part(Fmpz_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square-free
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_poly_expr::is_squarefree() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Euclidean division
+
+    The overloaded operators \code{/ %} can be used for euclidean division and
+    remainder. Additionally, the following functions are provided.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr div_basecase(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr div_divconquer(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr rem_basecase(Fmpz_poly_expr, Fmpz_poly_expr)
+
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr divrem(Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr divrem_basecase(Fmpz_poly_expr A,
+        Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr divrem_divconquer(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(Q, R) = divrem(A, B)} has the same effect as
+    \code{fmpz_poly_divrem(q, r, a, b)}, where \code{q, r, a, b} are the
+    underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
+
+Fmpz_poly_expr div_root(Fmpz_poly_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Divisibility testing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_polyxx>_expr divides(Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(d, Q) = divides(A, B)} sets \code{d} to \code{true}
+    and \code{Q} to \code{B/A} if \code{A} divides \code{B}, and else sets
+    \code{d} to \code{false}. See \code{fmpz_poly_divides}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series division
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr inv_series_newton(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr inv_series(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr div_series(Fmpz_poly_expr, Fmpz_poly_expr, slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Pseudo division
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_basecase(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_divconquer(
+        Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(Q, R, d) = pseudo_divrem(A, B)} has the same effect as\\
+    \code{fmpz_poly_pseudo_divrem(q, r, &d, a, b)}, where \code{q, r, a, b} are
+    the underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
+
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr pseudo_divrem_cohen(Fmpz_poly_expr A,
+        Fmpz_poly_expr B)
+
+    \code{ltupleref(Q, R) = pseudo_divrem_cohen(A, B)} has the same effect as\\
+    \code{fmpz_poly_pseudo_divrem_cohen(q, r, a, b)}, where \code{q, r, a, b}
+    are the underlying \code{fmpz_poly_t} corresponding to \code{Q, R, A, B}.
+
+Ltuple<fmpz_polyxx, ulong>_expr pseudo_div(Fmpz_poly_expr A, Fmpz_poly_expr B)
+Ltuple<fmpz_polyxx, ulong>_expr pseudo_rem(Fmpz_poly_expr A, Fmpz_poly_expr B)
+
+    \code{ltupleref(Q, d) = pseudo_div(A, B)} has the same effect as
+    \code{fmpz_poly_pseudo_div(q, &d, a, b)}, where \code{q, a, b} are the
+    underlying \code{fmpz_poly_t} corresponding to \code{Q, A, B}.
+
+Fmpz_poly_expr pseudorem_cohen(Fmpz_poly_expr, Fmpz_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr derivative(Fmpz_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
+
+    The overloaded \code{operator()} can be used for evaluation. Additionally,
+    the following functions are provided.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr evaluate(Fmpz_poly_expr, Fmpz_expr)
+Fmpz_vec_expr evaluate(Fmpz_poly_expr, Fmpz_vec_expr)
+Fmpz_expr evaluate_horner(Fmpz_poly_expr, Fmpz_expr)
+Fmpz_expr evaluate_divconquer(Fmpz_poly_expr, Fmpz_expr)
+
+mp_limb_t evaluate_mod(Fmpz_poly_expr p, mp_limb_t x, mp_limb_t n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Interpolation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Fmpz_poly_expr fmpz_polyxx::interpolate(
+        Fmpz_vec_expr xs, Fmpz_vec_expr ys)
+
+    See \code{fmpz_poly_interpolate_fmpz_vec}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition.
+
+    The overloaded \code{operator()} can be used for composition. Additionally,
+    the following functions are provided.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr compose(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr compose_horner(Fmpz_poly_expr, Fmpz_poly_expr)
+Fmpz_poly_expr compose_divconquer(Fmpz_poly_expr, Fmpz_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Taylor shift
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr taylor_shift(Fmpz_poly_expr, Fmpz_expr)
+Fmpz_poly_expr taylor_shift_horner(Fmpz_poly_expr, Fmpz_expr)
+Fmpz_poly_expr taylor_shift_divconquer(Fmpz_poly_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr compose_series(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr compose_series_horner(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+Fmpz_poly_expr compose_series_brent_kung(Fmpz_poly_expr, Fmpz_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series reversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr revert_series(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr revert_series_newton(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr revert_series_lagrange(Fmpz_poly_expr, T:fits_into_slong)
+Fmpz_poly_expr revert_series_lagrange_fast(Fmpz_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square root
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr sqrt(Fmpz_poly_expr p)
+Fmpz_poly_expr sqrt_classical(Fmpz_poly_expr p)
+
+    Compute the square root of \code{p}, provided \code{p} is a perfect square.
+    Else raise \code{flint_exception}. See \code{fmpz_poly_sqrt}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Signature
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_poly_expr::signature(slong& r1, slong& r2) const
+
+    See \code{fmpz_poly_signature}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Hensel lifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpz_polyxx, fmpz_polyxx, fmpz_polyxx, fmpz_polyxx>_expr hensel_lift(
+        Fmpz_poly_expr f, Fmpz_poly_expr g, Fmpz_poly_expr h,
+        Fmpz_poly_expr a, Fmpz_poly_expr b,
+        Fmpz_expr p, Fmpz_expr p1)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr hensel_lift_without_inverse(
+        Fmpz_poly_expr f, Fmpz_poly_expr g, Fmpz_poly_expr h,
+        Fmpz_poly_expr a, Fmpz_poly_expr b,
+        Fmpz_expr p, Fmpz_expr p1)
+Ltuple<fmpz_polyxx, fmpz_polyxx>_expr hensel_lift_only_inverse(
+        Fmpz_poly_expr G, Fmpz_poly_expr H,
+        Fmpz_poly_expr a, Fmpz_poly_expr b,
+        Fmpz_expr p, Fmpz_expr p1)
+
+    See \code{fmpz_poly_hensel_lift} etc.
+
+fmpz_poly_factorxx::set_hensel_lift_once(Fmpz_poly_expr, const
+        nmod_poly_factorxx&, slong)
+fmpz_poly_factorxx hensel_lift_once(Fmpz_poly_expr,
+        const nmod_poly_factorxx&, slong)
+
+    See \code{fmpz_poly_hensel_lift_once}. Note that these two
+    functions are defined in the \code{fmpz_factorxx} module.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpz_poly_expr)
+print(FILE*, Fmpz_poly_expr)
+print_pretty(Fmpz_poly_expr, const char* var)
+print_pretty(FILE*, Fmpz_poly_expr, const char* var)
+read(Fmpz_poly_target)
+read(FILE*, Fmpz_poly_target)
+read_pretty(Fmpz_poly_target, const char* var)
+read_pretty(FILE*, Fmpz_poly_target, const char* var)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction and reconstruction
+
+    For modular reduction, see \code{nmod_polyxx::reduce}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr Fmpz_poly_expr::CRT(Fmpz_expr, Nmod_poly_expr, bool)
+Fmpz_poly_expr CRT(Fmpz_poly_expr, Fmpz_expr, Nmod_poly_expr, bool)
+
+    See \code{fmpz_poly_CRT_ui}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Products
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Fmpz_poly_expr fmpz_polyxx::product_roots(Fmpz_vec_expr xs)
+
+    See \code{fmpz_poly_product_roots_fmpz_vec}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Roots
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr bound_roots(Fmpz_poly_expr p)
+
+
+*******************************************************************************
+
+    fmpz\_poly\_factorxx
+
+*******************************************************************************
+
+bool fmpz_poly_factorxx::operator==(const fmpz_poly_factorxx&)
+
+    Compare two factorisations.
+
+ulong fmpz_poly_factorxx::size() const
+
+    Return the number of stored factors.
+
+slong fmpz_poly_factorxx::exp(slong i) const
+slong& fmpz_poly_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+fmpz_polyxx_srcref fmpz_poly_factorxx::p(slong i) const
+fmpz_polyxx_ref fmpz_poly_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+fmpzxx_srcref fmpz_poly_factorxx::content() const
+fmpzxx_ref fmpz_poly_factorxx::content()
+
+    Obtain the content of the factorised polynomial.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_poly_factorxx::fmpz_poly_factorxx()
+explicit fmpz_poly_factorxx::fmpz_poly_factorxx(slong alloc)
+
+    Initialise an empty factorisation.
+
+fmpz_poly_factorxx::fmpz_poly_factorxx(const fmpz_poly_factorxx& o)
+
+    Copy a factorisation.
+
+void fmpz_poly_factorxx::realloc(slong a)
+void fmpz_poly_factorxx::fit_length(slong a)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Manipulating factors
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void fmpz_poly_factorxx::insert(Fmpz_poly_expr p, slong e)
+void fmpz_poly_factorxx::concat(const fmpz_poly_factorxx&)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Factoring algorithms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void fmpz_poly_factorxx::set_factor_squarefree(Fmpz_poly_expr p)
+void fmpz_poly_factorxx::set_factor_zassenhaus(Fmpz_poly_expr p)
+void fmpz_poly_factorxx::set_factor_zassenhaus_recombination(
+        const fmpz_poly_factorxx& lifted_fac, Fmpz_poly_expr F,
+        Fmpz_expr P, slong exp)
+
+fmpz_poly_factorxx::factor_squarefree(Fmpz_poly_expr)
+fmpz_poly_factorxx::factor_zassenhaus(Fmpz_poly_expr)
+
+
+
+*******************************************************************************
+
+    fmpqxx
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Fmpq_expr::num() const
+?? Fmpq_expr::den() const
+
+    Unified coefficient access to numerator and denominator. If this is used to
+    modify the object, a call to \code{canonicalise()} may be necessary.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpqxx::fmqxx()
+
+    Initialize to zero.
+
+fmpqxx::fmpqxx(Fmpz_src num, Fmpz_src den)
+fmpqxx::fmpqxx(T:fits_into_slong num, U:is_unsigned_integer den)
+
+    Initialize from numerator \code{num} and denominator \code{den}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Canonicalisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpq_target::canonicalise()
+bool Fmpq_src::is_canonical() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr Fmpq_expr::abs() const
+Fmpq_expr abs(Fmpq_expr)
+
+void Fmpq_target::set_zero()
+void Fmpq_target::set_one()
+static fmpqxx fmpqxx::zero()
+static fmpqxx fmpqxx::one()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded relational operators can be used for comparison.
+    Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_expr::is_zero() const
+bool Fmpq_expr::is_one() const
+int Fmpq_expr::sgn() const
+mp_bitcnt_t Fmpq_expr::height_bits() const
+Fmpz_expr Fmpq_expr::height() const
+
+mp_bitcnt_t height_bits(Fmpq_expr)
+Fmpq_expr height(Fmpq_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
+
+    Conversion can be done using the assignment operator, and through the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpqxx fmpqxx::frac(const T& t, const U& u)
+
+    Same as \code{fmpqxx res;res.set_frac(t, u)}.
+
+static fmpqxx fmpqxx::integer(const T& t)
+
+    Same as \code{fmpqxx res;res.set_integer(t)}.
+
+void Fmpq_target::set_frac(const T& t, const U& u)
+
+    \code{f.set_frac(t, u)} has the same effect as
+    \code{f.num() = t;f.den() = u;f.canonicalise()}.
+
+void Fmpq_target::set_integer(const T& t)
+
+    \code{f.set_integer(t)} has the same effect as
+    \code{f.num() = t;f.den() = 1u};
+
+std::string Fmpq_expr::to_string(int base = 10) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Fmpq_expr)
+int print(FILE*, Fmpq_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random number generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpqxx fmpqxx::randbits(frandxx& state)
+
+static fmpqxx fmpqxx::randtest(frandxx& state)
+
+static fmpqxx fmpqxx::randtest_not_zero(frandxx& state)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - * /} can be used for arithmetic.
+    Additionally, we provide the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr Fmpq_expr::inv() const
+Fmpq_expr Fmpq_expr::pow(T:fits_into_slong) const
+Fmpq_expr inv(Fmpq_expr)
+Fmpq_expr pow(Fmpq_expr, T:fits_into_slong)
+
+Fmpq_expr operator<<(Fmpq_expr, T:is_integer)
+Fmpq_expr operator>>(Fmpq_expr, T:is_integer)
+
+    Shift operators are overloaded. See \code{fmpq_div_2exp} and
+    \code{fmpq_mul_2exp}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction and rational reconstruction
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr operator%(Fmpq_expr, Fmpz_expr)
+
+    See \code{fmpq_mod_fmpz}.
+    The modular reduction operator may raise a \code{flint_exception} if
+    modular inversion is not possible.
+
+static Fmpq_expr fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m, Fmpz_expr N,
+        Fmpz_expr D)
+static Fmpq_expr fmpqxx::reconstruct(Fmpz_expr a, Fmpz_expr m)
+
+    Rational reconstruction. May raise a \code{flint_exception} if
+    reconstruction is not possible. See \code{fmpq_reconstruct_fmpz} and
+    \code{fmpq_reconstruct_fmpz2}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Rational enumeration
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr Fmpq_expr::next_minimal() const
+Fmpq_expr Fmpq_expr::next_signed_minimal() const
+Fmpq_expr Fmpq_expr::next_calkin_wilf() const
+Fmpq_expr Fmpq_expr::next_signed_calkin_wilf() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Continued fractions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpq_expr::cfrac_bound() const
+
+template<class Vec> void Fmpq_target::set_cfrac(const Vec& v, slong n)
+
+    Set value to a partial fraction expansion. The same conventions apply to
+    \code{v} as in the constructor.
+
+template<class Vec> static fmpqxx fmpqxx::from_cfrac(const Vec& v, slong n)
+
+    Initialize from a partial fraction expansion. \code{v} must be an instance
+    of a class which provides a method \code{_array()} that returns (a
+    pointer to) an array of \code{fmpz}. One such class is \code{fmpz_vecxx}.
+    The array must have size (at least) \code{n}.
+
+
+
+*******************************************************************************
+
+    fmpq\_matxx
+
+    The class \code{fmpq_matxx} wraps \code{fmpq_mat_t}.
+    Like \code{fmpz_matxx}, many operations on \code{fmpq_matxx} do not support
+    aliasing. The details can be found in the documentation of
+    \code{fmpq_mat_t}. Since \code{fmpq_matxx} does not use temporary merging,
+    evaluation of subexpressions never creates new aliases.
+
+*******************************************************************************
+
+Fmpq_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{inv}, \code{transpose}, \code{det}, \code{trace},
+    \code{numden_entrywise}, \code{numden_rowwise}, \code{numden_colwise},
+    \code{numden_matwise}, \code{num_rowwise}.
+
+Fmpq_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{solve_dixon}, \code{solve_fraction_free}, \code{mul_cleared},
+    \code{mul_direct}.
+
+Fmpq_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * /} are overloaded when provided by
+    \code{fmpq_mat_t}.
+
+Fmpq_mat_expr operator-(Fmpq_mat_expr)
+
+    The unary negation operator is overloaded.
+
+Fmpq_mat_target Fmpq_mat_target::operator=(Fmpz_mat_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpq_matxx::fmpq_matxx(slong m, slong n)
+
+    See \code{fmpq_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int print(Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Entry access
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Fmpq_mat_expr::at(slong, slong) const
+
+    Unified coefficient access to the entries of the matrix.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr transpose(Fmpq_poly_mat_expr)
+
+void Fmpq_mat_target::set_zero()
+void Fmpq_mat_target::set_one()
+static fmpq_matxx fmpq_matxx::zero(slong rows, slong cols)
+static fmpq_matxx fmpq_matxx::one(slong rows, slong cols)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpq_mat_target::set_randtest(frandxx& state, slong len, mp_bitcnt_t)
+static fmpq_matxx fmpq_matxx::randtest(slong rows, slong cols, frandxx& state,
+        slong len, mp_bitcnt_t)
+void Fmpq_mat_target::set_randtest_unsigned(frandxx& state, slong len,
+        mp_bitcnt_t)
+static fmpq_matxx fmpq_matxx::randtest_unsigned(slong rows, slong cols,
+        frandxx& state, slong len, mp_bitcnt_t)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Special matrices
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpq_target::set_hilbert_matrix()
+
+Fmpq_mat_expr hilbert_matrix(slong m, slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_mat_expr::is_zero() const
+bool Fmpq_mat_expr::is_empty() const
+bool Fmpq_mat_expr::is_square() const
+bool Fmpq_mat_expr::is_integral() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Integer matrix conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpq_matxx fmpq_matxx::frac(Fmpz_mat_expr, Fmpz_expr)
+void Fmpq_mat_target::set_frac(Fmpz_mat_expr, Fmpz_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat_div_fmpz}.
+
+static fmpq_matxx fmpq_matxx::integer_matrix(Fmpz_mat_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat}.
+
+Fmpz_mat_expr num_rowwise(Fmpq_mat_expr)
+
+    This has the effect of calling \code{fmpq_mat_get_fmpz_mat_rowwise} with
+    second argument \code{NULL}.
+
+Ltuple<fmpz_matxx, fmpz_matxx>_expr numden_entrywise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_entrywise}.
+
+Ltuple<fmpz_matxx, fmpzxx>_expr numden_matwise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_matwise}.
+
+Ltuple<fmpz_matxx, fmpz_vecxx>_expr numden_rowwise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_rowwise}.
+
+Ltuple<fmpz_matxx, fmpz_vecxx>_expr numden_colwise(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_get_fmpz_mat_colwise}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular reduction and rational reconstruction
+
+    To reduce an \code{fmpq_matxx} modulo an \code{fmpzxx} to get an
+    \code{fmpz_matxx}, see \code{fmpz_matxx::reduce}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpq_matxx fmpq_matxx::reconstruct(Fmpz_mat_expr, Fmpz_expr)
+
+    See \code{fmpq_mat_set_fmpz_mat_mod_fmpz}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Matrix multiplication
+
+    The overloaded \code{operator*} can be used for matrix multiplication.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr mul_direct(Fmpq_mat_expr, Fmpq_mat_expr)
+Fmpq_mat_expr mul_cleared(Fmpq_mat_expr, Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr trace(Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr det(Fmpq_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nonsingular solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr solve_dixon(Fmpq_mat_expr B, Fmpq_mat_expr X)
+Fmpq_mat_expr solve_fraction_free(Fmpq_mat_expr B, Fmpq_mat_expr X)
+
+    See \code{fmpq_mat_solve_dixon} and \code{fmpq_mat_solve_fraction_free}.
+    Raises \code{flint_exception} if $B$ is singular.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_mat_expr inv(Fmpq_mat_expr A)
+
+    Compute the inverse of the square matrix $A$. Raises \code{flint_exception}
+    if $A$ is singular. The modulus is required to be prime.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Echelon form
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_mat_target::pivot(slong r, slong c, permxx* perm = 0)
+
+    See \code{fmpq_mat_pivot}.
+
+Ltuple<slong, fmpq_matxx>_expr rref(Fmpq_mat_expr)
+Ltuple<slong, fmpq_matxx>_expr rref_classical(Fmpq_mat_expr)
+Ltuple<slong, fmpq_matxx>_expr rref_fraction_free(Fmpq_mat_expr)
+
+    See \code{fmpq_mat_rref} etc.
+
+
+
+*******************************************************************************
+
+    fmpq\_polyxx
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_poly_expr) const
+Fmpq_poly_expr Fmpq_poly_expr::operator()(Fmpq_expr) const
+
+    Overloaded \code{operator()} for evaluation or composition.
+
+Fmpq_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{inv}, \code{make_monic},
+    \code{primitive_part}, \code{content}.
+
+Fmpq_poly_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{asinh_series}, \code{asin_series}, \code{atanh_series},
+    \code{atan_series}, \code{cosh_series}, \code{cos_series}, \code{divrem},
+    \code{exp_series}, \code{gcd}, \code{inv_series}, \code{inv_series_newton},
+    \code{lcm}, \code{log_series}, \code{pow}, \code{resultant},
+    \code{reverse}, \code{revert_series}, \code{revert_series_lagrange},
+    \code{revert_series_lagrange_fast}, \code{revert_series_newton},
+    \code{sinh_series}, \code{tanh_series}, \code{tan_series}, \code{xgcd},
+    \code{rescale},\\
+    \code{shift_left}, \code{shift_right}.
+
+Fmpq_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{compose_series}, \code{compose_series_brent_kung},
+    \code{compose_series_horner}, \code{div_series}, \code{mullow}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpq_polyxx::fmpq_polyxx()
+
+fmpq_polyxx::fmpq_polyxx(slong alloc)
+
+    See \code{fmpq_poly_init2}.
+
+fmpq_polyxx::fmpq_polyxx(const char* str)
+
+    See \code{fmpq_poly_set_str}.
+
+void Fmpq_poly_target realloc(slong alloc)
+void Fmpq_poly_target::fit_length(slong len)
+void Fmpq_poly_target::_normalise()
+void Fmpq_poly_target::_set_length(slong len)
+void Fmpq_poly_target::canonicalise()
+bool Fmpq_poly_src::is_canonical() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial parameters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpq_poly_expr::length() const
+slong Fmpq_poly_expr::degree() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Accessing the numerator and denominator
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmzqxx_ref Fmpq_poly_target::get_coeff_numref(slong n)
+fmzqxx_srcref Fmpq_poly_src::get_coeff_numref(slong n) const
+
+    Obtain a reference to the numerator of coefficient $n$.
+    The result is undefined if $n$ is
+    greater than the degree of the polynomial (or negative).
+    If this is used to modify the object, a call to \code{canonicalise()} may
+    be necessary.
+    (No unified access, see \code{get_coeff}.)
+
+?? Fmpq_poly_expr::den() const
+
+    Unified coefficient access to the denominator of the polynomial.
+    If this is used to modify the object, a call to \code{canonicalise()} may
+    be necessary.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random testing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpq_polyxx fmpq_polyxx::randtest(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+static fmpq_polyxx fmpq_polyxx::randtest_unsigned(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+static fmpq_polyxx fmpq_polyxx::randtest_not_zero(
+        frandxx& state, slong len, mp_bitcnt_t bits)
+
+    See \code{fmpq_poly_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_target Fmpq_poly_target::operator=(T:is_integer)
+Fmpq_poly_target Fmpq_poly_target::operator=(Fmpq_expr)
+Fmpq_poly_target Fmpq_poly_target::operator=(Fmpz_expr)
+Fmpq_poly_target Fmpq_poly_target::operator=(Fmpz_poly_expr)
+Fmpq_poly_target Fmpq_poly_target::operator=(const char*)
+
+void Fmpq_poly_target::set_zero()
+void Fmpq_poly_target::set_one()
+static fmpq_polyxx fmpq_polyxx::zero()
+static fmpq_polyxx fmpq_polyxx::one()
+
+Fmpq_poly_expr inv(Fmpq_poly_expr)
+
+static fmpq_polyxx fmpq_polyxx::get_slice(Fmpq_poly_expr, slong i, slong j)
+void Fmpq_poly_target::truncate(slong)
+
+Fmpq_poly_expr reverse(Fmpq_poly_expr, T:fits_into_slong)
+
+std::string Fmpq_poly_expr::pretty(const char* x) const
+
+    See \code{fmpq_poly_get_str_pretty}.
+
+std::string Fmpq_poly_expr::to_string() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpqxx_expr Fmpq_poly_expr::get_coeff(slong n) const
+
+void Fmpq_poly_target::set_coeff(slong n, Fmpz_expr)
+void Fmpq_poly_target::set_coeff(slong n, Fmpq_expr)
+void Fmpq_poly_target::set_coeff(slong n, T:is_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded operators \code{== != >= >} etc. can be used for comparison.
+    Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_poly_expr::is_one() const
+bool Fmpq_poly_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{* / + -} can be used for both
+    polynomial-polynomial and polynomial-scalar arithmetic. Additionally, we
+    provide the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr mullow(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr pow(Fmpq_poly_expr, T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr shift_left(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr shift_right(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Euclidean division
+
+    The overloaded operators \code{/ %} can be used for euclidean division and
+    remainder. Additionally, we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpq_polyxx, fmpq_polyxx>_expr divrem(Fmpq_poly_expr A, Fmpq_poly_expr B)
+
+    \code{ltupleref(Q, R) = divrem(A, B)} has the same effect as
+    \code{fmpq_poly_divrem(q, r, a, b)} where \code{q, r, a, b} are the
+    underlying \code{fmpq_poly_t} corresponding to \code{Q, R, A, B}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series division
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr inv_series_newton(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr inv_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr div_series(Fmpq_poly_expr, Fmpq_poly_expr, slong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr gcd(Fmpq_poly_expr, Fmpq_poly_expr)
+Fmpq_poly_expr lcm(Fmpq_poly_expr, Fmpq_poly_expr)
+
+Ltuple<fmpq_polyxx, fmpq_polyxx, fmpq_polyxx>_expr xgcd(
+        Fmpq_poly_expr f, Fmpq_poly_expr g)
+
+    \code{ltupleref(G, S, T) = xgcd(A, B)} has the same effect as
+    \code{fmpq_poly_xgcd(g, s, t, a, b)}, where \code{g, s, t, a, b} denote the
+    underlying \code{fmpq_poly_t} corresponding to \code{G, S, T, A, B}.
+
+Fmpq_expr resultant(Fmpq_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative and integral
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr derivative(Fmpq_poly_expr)
+Fmpq_poly_expr integral(Fmpq_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square roots
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr sqrt_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr invsqrt_series(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transcendental functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr exp_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr log_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr atan_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr atanh_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr asin_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr asinh_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr tan_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr sin_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr cos_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr sinh_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr cosh_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr tanh_series(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
+
+    The overloaded \code{operator()} can be used for evaluation. Additionally
+    we have the following.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr evaluate(Fmpq_poly_expr, Fmpq_expr)
+Fmpq_expr evaluate(Fmpq_poly_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Interpolation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Fmpq_poly_expr fmpq_polyxx::interpolate(
+        Fmpz_vec_expr xs, Fmpz_vec_expr ys)
+
+    See \code{fmpq_poly_interpolate_fmpq_vec}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr compose(Fmpq_poly_expr, Fmpq_poly_expr)
+
+Fmpq_poly_expr rescale(Fmpq_poly_expr, Fmpq_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr compose_series(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series_horner(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+Fmpq_poly_expr compose_series_brent_kung(Fmpq_poly_expr, Fmpq_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series reversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr revert_series(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr revert_series_newton(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr revert_series_lagrange(Fmpq_poly_expr, T:fits_into_slong)
+Fmpq_poly_expr revert_series_lagrange_fast(Fmpq_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Gaussian content
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr content(Fmpq_poly_expr)
+Fmpq_poly_expr primitive_part(Fmpq_poly_expr)
+bool Fmpq_poly_expr::is_monic() const
+Fmpq_poly_expr make_monic(Fmpq_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square-free
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpq_poly_expr::is_squarefree() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpq_poly_expr)
+print(FILE*, Fmpq_poly_expr)
+print_pretty(Fmpq_poly_expr, const char* var)
+print_pretty(FILE*, Fmpq_poly_expr, const char* var)
+read(Fmpq_poly_target)
+read(FILE*, Fmpq_poly_target)
+
+
+*******************************************************************************
+
+    fmpz\_poly\_qxx
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_poly_qxx::fmpz_poly_qxx()
+
+fmpz_poly_qxx::fmpz_poly_qxx(const char*)
+
+    See \code{fmpz_poly_q_set_str}.
+
+void Fmpz_poly_q_target::canonicalise()
+bool Fmpz_poly_q_src::is_canonical() const
+
+?? Fmpz_poly_q_expr::num() const
+?? Fmpz_poly_q_expr::den() const
+
+    Unified coefficient access to the numerator or denominator of the rational
+    function. If this is used for modification, a call to \code{canonicalise()}
+    may be necessary.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static fmpz_poly_qxx fmpz_poly_qxx::randtest(frandxx& state,
+        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+static fmpz_poly_qxx fmpz_poly_qxx::randtest_not_zero(frandxx& state,
+        slong len1, mp_bitcnt_t bits1, slong len2, mp_bitcnt_t bits2)
+
+    See \code{fmpz_poly_q_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_target Fmpz_poly_q_target::operator=(T:fits_into_slong)
+
+void Fmpz_poly_q_target::set_zero()
+void Fmpz_poly_q_target::set_one()
+static fmpz_poly_qxx fmpz_poly_qxx::zero()
+static fmpz_poly_qxx fmpz_poly_qxx::one()
+
+Fmpz_poly_q_expr inv(Fmpz_poly_q_expr)
+Fmpz_poly_q_expr Fmpz_poly_q_expr::inv() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded operator \code{==} can be used for comparison. Additionally,
+    we have the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_poly_q_expr::is_one() const
+bool Fmpz_poly_q_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_expr pow(Fmpz_poly_q_expr, T:is_unsigned_integer)
+Fmpz_poly_q_expr Fmpz_poly_q_expr::pow(T:is_unsigned_integer) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_expr Fmpz_poly_q_expr::derivative() const
+Fmpz_poly_q_expr derivative(Fmpz_poly_q_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_q_target Fmpz_poly_q_target::operator=(const char*)
+
+    See \code{fmpz_poly_q_set_str}.
+
+std::string Fmpz_poly_q_expr::to_string() const
+
+    See \code{fmpz_poly_q_get_str}.
+
+std::string Fmpz_poly_q_expr::pretty(const char* x) const
+
+    See \code{fmpz_poly_q_get_str_pretty}.
+
+int print(Fmpz_poly_q_expr)
+int print_pretty(Fmpz_poly_q_expr, const char* var)
+
+
+
+*******************************************************************************
+
+    fmpz\_poly\_matxx
+
+    The class \code{fmpz_poly_matxx} wraps \code{fmpz_poly_mat_t}, and so
+    represents matrices with coefficients in $\mathbb{Z}[X]$. Its usage is
+    similar to \code{fmpz_matxx} in most regards.
+
+*******************************************************************************
+
+Fmpz_poly_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{det}, \code{det_fflu}, \code{det_interpolate}, \code{trace},
+    \code{sqr}, \code{sqr_classical}, \code{sqr_KS},
+    \code{transpose}.
+
+Fmpz_poly_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{solve}, \code{solve_fflu}, \code{mul_classical},
+    \code{mul_interpolate}, \code{mul_KS}, \code{pow}, \code{sqrlow}.
+
+Fmpz_poly_mat_expr::three operation(??) const
+
+    The following threeary functions are made available as member functions:
+    \code{mullow}, \code{pow_trunc}.
+
+Fmpz_mat_expr Fmpz_poly_mat_expr::operator()(Fmpz_expr) const
+
+    \code{operator()} is overloaded for matrix evaluation.
+
+Fmpz_poly_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - *} are overloaded when provided by
+    \code{fmpz_poly_mat_t}.
+
+Fmpz_poly_mat_expr operator-(Fmpz_poly_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print_pretty(Fmpz_poly_mat_expr, const char* x)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_poly_mat_expr::rows() const
+slong Fmpz_poly_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Fmpz_poly_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Standard matrices
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_poly_mat_target::set_zero()
+void Fmpz_poly_mat_target::set_one()
+static fmpz_poly_matxx fmpz_poly_matxx::zero(slong rows, slong cols)
+static fmpz_poly_matxx fmpz_poly_matxx::one(slong rows, slong cols)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_poly_mat_target::set_randtest(frandxx& state, slong len, mp_bitcnt_t)
+void Fmpz_poly_mat_target::set_randtest_unsigned(frandxx& state, slong len,
+        mp_bitcnt_t)
+void Fmpz_poly_mat_target::set_randtest_sparse(frandxx& state, slong len,
+        mp_bitcnt_t, float)
+static fmpz_poly_matxx fmpz_poly_matxx::randtest(slong rows, slong cols,
+        frandxx&, slong len, mp_bitcnt_t)
+static fmpz_poly_matxx fmpz_poly_matxx::randtest_unsigned(slong rows,
+        slong cols, frandxx&, slong len, mp_bitcnt_t)
+static fmpz_poly_matxx fmpz_poly_matxx::randtest_sparse(slong rows, slong cols,
+        frandxx&, slong len, mp_bitcnt_t, float density)
+
+    See \code{fmpz_poly_mat_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic comparison and properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_poly_mat_expr::is_zero() const
+bool Fmpz_poly_mat_expr::is_one() const
+bool Fmpz_poly_mat_expr::is_empty() const
+bool Fmpz_poly_mat_expr::is_square() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Norms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Fmpz_poly_mat_expr::max_length() const
+slong Fmpz_poly_mat_expr::max_bits() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_mat_expr transpose(Fmpz_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    Basic arithmetic is most easily done using the overloaded operators
+    \code{+ * -}. Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mat_expr mul_classical(Fmpz_mat_expr, Fmpz_mat_expr)
+Fmpz_mat_expr mul_KS(Fmpz_mat_expr, Fmpz_mat_expr)
+Fmpz_poly_mat_expr mullow(Fmpz_poly_mat_expr, Fmpz_poly_mat_expr, slong)
+Fmpz_poly_mat_expr sqr(Fmpz_poly_mat_expr)
+Fmpz_poly_mat_expr sqr_KS(Fmpz_poly_mat_expr)
+Fmpz_poly_mat_expr sqr_classical(Fmpz_poly_mat_expr)
+Fmpz_poly_mat_expr sqrlow(Fmpz_poly_mat_expr, T:fits_into_slong n)
+
+Fmpz_poly_mat_expr pow(Fmpz_poly_mat_expr, T:is_unsigned_integer)
+Fmpz_poly_mat_expr pow_trunc(Fmpz_poly_mat_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Fmpz_poly_mat_expr prod(Fmpz_poly_mat_vec_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Row reduction
+
+    Beware that compared to the C interface, the flintxx row reduction
+    interface changes some argument orders. This is to facilitate default
+    arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong find_pivot_any(Fmpz_poly_mat_expr, slong, slong, slong)
+
+    See \code{fmpz_poly_mat_find_pivot_any}.
+
+slong find_pivot_partial(Fmpz_poly_mat_expr, slong, slong, slong)
+
+    See \code{fmpz_poly_mat_find_pivot_partial}.
+
+Ltuple<slong, fmpz_poly_matxx, fmpzxx>_expr fflu(Fmpz_poly_mat_expr A,
+    permxx* perm = 0, bool rankcheck = false)
+
+    See \code{fmpz_poly_mat_fflu}.
+
+Ltuple<slong, fmpz_poly_matxx, fmpzxx>_expr rref(Fmpz_poly_mat_expr A)
+
+    See \code{fmpz_poly_mat_rref}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr trace(Fmpz_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant and rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr det(Fmpz_poly_mat_expr)
+Fmpz_poly_expr det_fflu(Fmpz_poly_mat_expr)
+Fmpz_poly_expr det_interpolate(Fmpz_poly_mat_expr)
+slong rank(Fmpz_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr inv(Fmpz_poly_mat_expr)
+
+    \code{ltupleref(b, M, D) = inv(A)} has the same effect as
+    \code{b = fmpz_poly_mat_inv(m, d, a)}, where \code{m, d, a} are the underlying C
+    objects corresponding to \code{M, D, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, fmpz_poly_matxx>_expr nullspace(Fmpz_poly_mat_expr A)
+
+    \code{ltupleref(n, B) = nullspace(A)} has the same effect as\\
+    \code{n = fmpz_poly_mat_nullspace(b, a)}, where \code{b, a} are the underlying
+    \code{fmpz_poly_mat_t} corresponding to \code{B, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve(
+        Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu(
+        Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
+Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(
+        const permxx&, Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr FFLU,
+        Fmpz_poly_mat_expr X)
+
+    \code{ltupleref(w, M, D) = solve(B, X)} has the same effect as\\
+    \code{w = fmpz_poly_mat_solve(m, d, b, x)}, where \code{m, d, b, x} are the
+    underlying C objects corresponding to \code{M, D, B, X}.
+    Similarly for the other functions.
+
+
+
+*******************************************************************************
+
+    nmodxx
+
+    The class \code{nmodxx} encapsulates the use of \code{mp_limb_t} together
+    with \code{nmod_t} for doing arithmetic modulo a word-sized integer. It is
+    defined in \code{nmod_vecxx.h}.
+
+    The C++ equivalent to \code{nmod_t} is \code{nmodxx_ctx}. There is a
+    reference version\\
+    \code{nmodxx_ctx_srcref}.
+
+    The C++ equivalent to \code{mp_limb_t} in this context is \code{nmodxx}.
+    Immediate \code{nmodxx} expressions store both an \code{mp_limb_t} and an
+    \code{nmodxx_ctx_srcref}.
+
+    The most common ways to construct \code{nmodxx} are using the static member
+    functions \code{nmodxx::red} and \code{nmodxx::make_nored}. For
+    convenience, \code{operator%} is overloaded with right hand side
+    \code{nmodxx_ctx} (or \code{nmodxx_ctx_srcref}) to call \code{nmodxx::red}.
+
+    Just like when \code{mp_limb_t} is passed to \code{nmod_t} operations, the
+    limb stored in \code{nmodxx} is assumed to be reduced, and under this
+    assumption, all computations yield reduced data.
+
+    It is assumed that any expression of \code{nmodxx} involves only one
+    modulus, so that all contexts are interchangeable.
+
+*******************************************************************************
+
+explicit nmodxx_ctx::nmodxx_ctx(mp_limb_t n)
+
+    Initialise a new context for operations modulo $n$.
+
+nmodxx_ctx_srcref::nmodxx_ctx_srcref(const nmodxx_ctx&)
+
+    Initialise a reference to an \code{nmodxx_ctx}.
+
+static nmodxx_ctx_srcref::make(const nmod_t& nm)
+
+    Initialise a reference pointing to an \code{nmod_t}.
+
+const nmod_t& nmodxx_ctx::_nmod() const
+const nmod_t& nmodxx_ctx_srcref::_nmod() const
+
+    Obtain a reference to the underlying \code{nmod_t}.
+
+mp_limb_t nmodxx_ctx::n() const
+mp_limb_t nmodxx_ctx_srcref::n() const
+
+    Obtain the modulus stored in this context.
+
+nmodxx::nmodxx(nmodxx_ctx_srcref ctx)
+
+    Initialise an \code{nmodxx} to zero.
+
+static nmodxx nmodxx::make_nored(mp_limb_t n, nmodxx_ctx_srcref ctx)
+
+    Initialise an \code{nmodxx} to $n$, performing no reductions.
+
+static nmodxx nmodxx::red(mp_limb_t n, nmodxx_ctx_srcref ctx)
+static nmodxx nmodxx::red(Fmpz_expr n, nmodxx_ctx_srcref ctx)
+static nmodxx nmodxx::red(Fmpq_expr n, nmodxx_ctx_srcref ctx)
+
+    Initialise an \code{nmodxx} to the reduction of $n$.
+
+static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
+static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)
+
+    Obtain a flintxx reference object pointing to \code{l}, which is
+    interpreted as a limb reduced modulo \code{c}.
+
+void Nmod_target::reduce()
+
+    Reduce the stored limb.
+
+void Nmod_target::set_nored(mp_limb_t n)
+
+    Set the stored limb to $n$.
+
+std::string Nmod_expr::to_string() const
+
+    Convert self into a string of the form ``a mod b''.
+
+mp_limb_t Nmod_expr::to<mp_limb_t>() const
+
+    Obtain the stored limb.
+
+nmodxx_ctx_srcref Nmod_expr::estimate_ctx() const
+
+    Obtain the context of any immediate subexpression. (By our homogeneity
+    assumptions, the result of this operation does not depend on the
+    subexpression chosen.)
+
+Nmod_expr Nmod_expr::inv() const
+Nmod_expr Nmod_expr::pow(T:is_unsigned_integer) const
+
+Nmod_expr operator??(Nmod_expr, Nmod_expr)
+
+    Arithmetic operators \code{+ - * /} are overloaded for nmod expressions.
+
+Nmod_expr operator-(Nmod_expr)
+Nmod_expr pow(Nmod_expr, T:is_unsigned_integer)
+Nmod_expr inv(Nmod_expr)
+
+
+
+*******************************************************************************
+
+    nmod\_polyxx
+
+    The class \code{nmod_polyxx} wraps \code{nmod_poly_t}. Like \code{nmodxx},
+    instances of \code{nmod_polyxx} always have an associated \code{nmodxx_ctx}
+    storing the operating modulus. No expression may involve more than one
+    modulus at a time.
+
+    In order to reduce convert a \code{fmpz_polyxx} or \code{fmpq_polyxx} to
+    \code{nmod_polyxx}, see the \code{reduce} method of \code{fmpz_polyxx} or
+    \code{fmpq_polyxx}, respectively.
+
+*******************************************************************************
+
+nmodxx_ctx_srcref Nmod_poly_expr::estimate_ctx() const
+
+    Obtain the relevant context. This never causes evaluation.
+
+Nmod_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{make_monic}, \code{sqrt}.
+
+Nmod_poly_expr::binary operation() const
+
+    The following binary functions are made available as member functions:\\
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},\\
+    \code{div_divconquer}, \code{div_newton}, \code{divrem},\\
+    \code{divrem_basecase}, \code{divrem_divconquer},\\
+    \code{divrem_newton}, \code{div_root}, \code{evaluate_fast},\\
+    \code{evaluate_iter}, \code{gcd}, \code{gcd_euclidean}, \code{gcd_hgcd},\\
+    \code{inv_series}, \code{inv_series_basecase}, \code{inv_series_newton},\\
+    \code{invsqrt_series}, \code{mul_classical}, \code{mul_KS},\\
+    \code{shift_left}, \code{shift_right}, \code{pow},\\
+    \code{pow_binexp}, \code{rem_basecase}, \code{resultant},\\
+    \code{resultant_euclidean}, \code{reverse}, \code{revert_series},\\
+    \code{revert_series_lagrange}, \code{revert_series_lagrange_fast},\\
+    \code{revert_series_newton}, \code{sqrt_series}, \code{taylor_shift},\\
+    \code{taylor_shift_convolution}, \code{taylor_shift_horner}, \code{xgcd},\\
+    \code{xgcd_euclidean}, \code{xgcd_hgcd}, \code{log_series},\\
+    \code{exp_series}, \code{exp_series_basecase}, \code{atan_series},\\
+    \code{atanh_series}, \code{asin_series}, \code{asinh_series},\\
+    \code{sin_series}, \code{cos_series}, \code{tan_series},\\
+    \code{sinh_series}, \code{cosh_series}, \code{tanh_series}.
+
+Nmod_poly_expr Nmod_poly_expr::inflate(T:is_unsigned_integer) const
+
+    \code{See inflate}.
+
+Nmod_poly_expr Nmod_poly_expr::deflate(T:is_unsigned_integer) const
+
+    \code{See deflate}.
+
+Nmod_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:\\
+    \code{compose_mod}, \code{compose_mod_horner},\\
+    \code{compose_series_brent_kung}, \code{compose_series},\\
+    \code{compose_series_brent_kung}, \code{compose_series_divconquer},\\
+    \code{compose_series_horner}, \code{div_newton_n_preinv},\\
+    \code{divrem_newton_n_preinv}, \code{div_series}, \code{mulhigh},\\
+    \code{mulhigh_classical}, \code{mullow}, \code{mullow_classical},\\
+    \code{mullow_KS}, \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},\\
+    \code{pow_trunc_binexp}.
+
+Nmod_poly_expr::fourary operation(??, ??, ??) const
+
+    The following functions of four arguments
+    are made available as member functions:
+    \code{compose_mod_brent_kung_preinv}, \code{mulmod_preinv},
+    \code{powmod_binexp_preinv}.
+
+Nmod_poly_expr Nmod_poly_expr::operator()(Nmod_poly_expr) const
+Nmod_expr Nmod_poly_expr::operator()(Nmod_expr) const
+Nmod_vec_expr Nmod_poly_expr::operator()(Nmod_vec_expr) const
+
+    The \code{operator()} is overloaded for evaluation or composition,
+    depending on the argument.
+
+Nmod_poly_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * / %} are overloaded when provided by
+    \code{nmod_poly_t}.
+
+Nmod_poly_expr operator-(Nmod_poly_expr)
+
+    The unary negation operator is overloaded.
+
+Nmod_poly_target Nmod_poly_target::operator=(const char*)
+
+    See \code{nmod_poly_set_str}. Raises \code{flint_exception} if the string
+    is malformed.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, nmodxx_ctx_srcref)
+static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, nmodxx_ctx_srcref)
+static nmod_polyxx nmod_polyxx::reduce(Fmpz_mod_poly_expr, mp_limb_t)
+static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, mp_limb_t)
+
+    See \code{fmpz_poly_get_nmod_poly}.
+
+static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
+static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
+
+    Consider $e \in \mathbb{Z}/n\mathbb{Z}$ as an element of
+    $\mathbb{Z}/n\mathbb{Z}[X]$.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Nmod_poly_expr)
+print(FILE*, Nmod_poly_expr)
+read(Nmod_poly_target)
+read(FILE*, Nmod_poly_target)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+nmod_polyxx::nmod_polyxx(mp_limb_t modulus)
+nmod_polyxx::nmod_polyxx(mp_limb_t modulus, slong alloc)
+nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx)
+nmod_polyxx::nmod_polyxx(nmodxx_ctx_srcref ctx, slong alloc)
+
+    Instantiate \code{nmod_polyxx} relative to some modulus. If the second
+    argument is provided, space is allocated for \code{alloc} coefficients.
+
+nmod_polyxx::nmod_polyxx(const char* str)
+
+    Instantiate \code{nmod_polyxx} from a string representation. The modulus is
+    parsed (second integer in the string) and the polynomial is initialised
+    with this modulus, then \code{nmod_poly_set_str} is called. Raises
+    \code{flint_exception} if the string is malformed.
+
+static nmod_polyxx nmod_polyxx::zero(mp_limb_t n)
+static nmod_polyxx nmod_polyxx::one(mp_limb_t n)
+
+void Nmod_poly_target realloc(slong alloc)
+void Nmod_poly_target::fit_length(slong len)
+void Nmod_poly_target::_normalise()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+sslong Nmod_poly_expr::length() const
+sslong Nmod_poly_expr::degree() const
+sslong Nmod_poly_expr::max_bits() const
+mp_limb_t Nmod_poly_expr::modulus() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment and basic manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_poly_target::truncate(slong)
+void Nmod_poly_target::set_zero()
+void Nmod_poly_target::set_one()
+
+Nmod_poly_expr reverse(Nmod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_target::set_randtest(frandxx& state, slong len)
+void Nmod_target::set_randtest_irreducible(frandxx& state, slong len)
+static nmod_polyxx nmod_polyxx::randtest(mp_limb_t n,
+    frandxx& state, slong len)
+static nmod_polyxx nmod_polyxx::randtest_irreducible(mp_limb_t n,
+    frandxx& state, slong len)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmodxx_expr Nmod_poly_expr::get_coeff(slong n) const
+void Nmod_target::set_coeff(slong i, Nmodxx_expr)
+void Nmod_target::set_coeff(slong i, mp_limb_t)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+std::string Nmod_poly_expr::to_string() const
+
+std::ostream& operator<<(std::ostream&, Nmod_poly_expr)
+
+    Output to streams is done by first converting to string.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Nmod_poly_expr::is_one() const
+bool Nmod_poly_expr::is_zero() const
+
+bool operator==(Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Scalar multiplication and division
+
+    Scalar multiplication is provided via overloaded \code{operator*}.
+    Additionally, the following functions are implemented:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr make_monic(Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bit packing and unpacking
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Nmod_poly_expr::bit_pack(T:fits_into_mp_bitcnt_t) const
+static nmod_polyxx nmod_polyxx::bit_unpack(
+        Fmpz_expr, T:fits_into_mp_bitcnt_t) const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplication
+
+    Basic multiplication is provided via overloaded \code{operator*}. Finer
+    control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr mul_classical(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr mul_KS(Nmod_poly_expr, Nmod_poly_expr)
+
+Nmod_poly_expr mullow(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mullow_classical(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mullow_KS(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mulhigh(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr mulhigh_classical(Nmod_poly_expr, Nmod_poly_expr, slong)
+
+Nmod_poly_expr mulmod(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr mulmod_preinv(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr pow(Nmod_poly_expr, T:is_unsigned_integer)
+Nmod_poly_expr pow_binexp(Nmod_poly_expr, T:is_unsigned_integer)
+Nmod_poly_expr pow_trunc(Nmod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Nmod_poly_expr pow_trunc_binexp(Nmod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Nmod_poly_expr powmod_binexp(Nmod_poly_expr, T:is_unsigned_integer,
+        Nmod_poly_expr)
+Nmod_poly_expr powmod_binexp_preinv(Nmod_poly_expr, T:is_unsigned_integer,
+        Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Division
+
+    Basic division and remainder is provided by overloaded \code{operator/} and
+    \code{operator%}. Finer control can be obtained using the following
+    functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem(Nmod_poly_expr A, Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_basecase(Nmod_poly_expr A,
+        Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_divconquer(
+        Nmod_poly_expr A, Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton(
+        Nmod_poly_expr A, Nmod_poly_expr B)
+Ltuple<nmod_polyxx, nmod_polyxx>_expr divrem_newton_n_preinv(
+        Nmod_poly_expr A, Nmod_poly_expr B)
+
+Nmod_poly_expr div_basecase(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr div_divconquer(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr div_newton(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr div_newton_n_preinv(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+
+Nmod_poly_expr rem_basecase(Nmod_poly_expr, Nmod_poly_expr)
+
+Nmod_poly_expr inv_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr inv_series_basecase(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr inv_series_newton(Nmod_poly_expr, T:fits_into_slong)
+
+Nmod_poly_expr div_series(Nmod_poly_expr, Nmod_poly_expr, slong n)
+
+Nmod_poly_expr div_root(Nmod_poly_expr, Nmod_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative and integral
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr derivative(Nmod_poly_expr)
+Nmod_poly_expr integral(Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
+
+    Basic evaluation and multipoint evaluation can be achieved using the
+    overloaded \code{operator()}. Finer control can be obtained using the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_expr evaluate(Nmod_poly_expr, Nmod_expr)
+Nmod_vec_expr evaluate(Nmod_poly_expr, Nmod_vec_expr)
+Nmod_vec_expr evaluate_fast(Nmod_poly_expr, Nmod_vec_expr)
+Nmod_vec_expr evaluate_iter(Nmod_poly_expr, Nmod_vec_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Interpolation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Nmod_poly_expr fmpz_polyxx::interpolate(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+static Nmod_poly_expr fmpz_polyxx::interpolate_barycentric(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+static Nmod_poly_expr fmpz_polyxx::interpolate_fast(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+static Nmod_poly_expr fmpz_polyxx::interpolate_newton(
+        Nmod_vec_expr xs, Nmod_vec_expr ys)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition
+
+    Basic composition can be achieved with the overloaded \code{operator()}.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr compose(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr compose_horner(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr compose_divconquer(Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Taylor Shift
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr taylor_shift(Nmod_poly_expr, Nmod_expr)
+Nmod_poly_expr taylor_shift_horner(Nmod_poly_expr, Nmod_expr)
+Nmod_poly_expr taylor_shift_convolution(Nmod_poly_expr, Nmod_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr compose_mod(Nmod_poly_expr, Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr compose_mod_horner(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+Nmod_poly_expr compose_mod_divconquer(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+Nmod_poly_expr compose_mod_brent_kung(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr)
+Nmod_poly_expr compose_mod_brent_kung_preinv(Nmod_poly_expr, Nmod_poly_expr,
+        Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr gcd(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr gcd_euclidean(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_poly_expr gcd_hgcd(Nmod_poly_expr, Nmod_poly_expr)
+
+Ltuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>_expr xgcd(
+        Nmod_poly_expr, Nmod_poly_expr)
+Ltuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>_expr xgcd_euclidean(
+        Nmod_poly_expr, Nmod_poly_expr)
+Ltuple<nmod_polyxx, nmod_polyxx, nmod_polyxx>_expr xgcd_hgcd(
+        Nmod_poly_expr, Nmod_poly_expr)
+
+Nmod_expr resultant(Nmod_poly_expr, Nmod_poly_expr)
+Nmod_expr resultant_euclidean(Nmod_poly_expr, Nmod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr compose_series(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr compose_series_horner(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr compose_series_brent_kung(Nmod_poly_expr, Nmod_poly_expr, slong)
+Nmod_poly_expr compose_series_divconquer(Nmod_poly_expr, Nmod_poly_expr, slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series reversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr revert_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr revert_series_newton(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr revert_series_lagrange(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr revert_series_lagrange_fast(Nmod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Square roots
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr sqrt_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr invsqrt_series(Nmod_poly_expr, T:fits_into_slong)
+
+Nmod_poly_expr sqrt_series(Nmod_poly_expr p)
+
+    Compute the square root of $p$. Raises \code{flint_exception} if $p$ is not
+    a perfect square.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transcendental functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr exp_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr log_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr atan_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr atanh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr asin_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr asinh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr tan_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr sin_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr cos_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr sinh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr cosh_series(Nmod_poly_expr, T:fits_into_slong)
+Nmod_poly_expr tanh_series(Nmod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Products
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static Nmod_poly_expr fmpz_polyxx::product_roots(Nmod_vec_expr xs)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inflation and deflation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr inflate(Nmod_poly_expr, T:is_unsigned_integer)
+Nmod_poly_expr deflate(Nmod_poly_expr, T:is_unsigned_integer)
+
+uslong Nmod_poly_expr::deflation() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Factorisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Nmod_poly_expr::is_squarefree() const
+bool Nmod_poly_expr::is_irreducible() const
+sslong Nmod_poly_target::remove(Nmod_poly_expr)
+
+nmod_poly_factorxx::nmod_poly_factorxx()
+
+    Initialise an empty factorisation.
+
+nmod_poly_factorxx::nmod_poly_factorxx(const nmod_poly_factorxx& o)
+
+    Copy a factorisation.
+
+bool nmod_poly_factorxx::operator==(const nmod_poly_factorxx&)
+
+    Compare two factorisations.
+
+ulong nmod_poly_factorxx::size() const
+
+    Return the number of stored factors.
+
+slong nmod_poly_factorxx::exp(slong i) const
+slong& nmod_poly_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+nmod_polyxx_srcref nmod_poly_factorxx::p(slong i) const
+nmod_polyxx_ref nmod_poly_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+void nmod_poly_factorxx::realloc(slong a)
+void nmod_poly_factorxx::fit_length(slong a)
+void nmod_poly_factorxx::insert(Nmod_poly_expr p, slong e)
+void nmod_poly_factorxx::concat(const nmod_poly_factorxx&)
+
+void nmod_poly_factorxx::set_factor(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_cantor_zassenhaus(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_berlekamp(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_kaltofen_shoup(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_with_cantor_zassenhaus(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_with_berlekamp(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_with_kaltofen_shoup(Nmod_poly_expr)
+void nmod_poly_factorxx::set_factor_squarefree(Nmod_poly_expr)
+
+    Factorise a polynomial and store its factors. See \code{nmod_poly_factor} etc.
+
+void nmod_poly_factorxx::set_factor_equal_deg_probab(frandxx&, Nmod_poly_expr,
+        slong)
+void nmod_poly_factorxx::set_factor_equal_deg(Nmod_poly_expr, slong)
+
+    See \code{nmod_poly_factor_equal_deg_prob} and
+    \code{nmod_poly_factor_equal_deg}.
+
+void nmod_poly_factorxx::set_factor_distinct_deg(Nmod_poly_expr p,
+        std::vector<slong>& degs)
+
+    See \code{nmod_poly_factor_distinct_deg}. Note that \code{degs} must have
+    sufficient size to hold all factors. The size of \code{degs} is not
+    modified.
+
+nmod_poly_factorxx factor(Nmod_poly_expr)
+nmod_poly_factorxx factor_cantor_zassenhaus(Nmod_poly_expr)
+nmod_poly_factorxx factor_berlekamp(Nmod_poly_expr)
+nmod_poly_factorxx factor_kaltofen_shoup(Nmod_poly_expr)
+nmod_poly_factorxx factor_with_cantor_zassenhaus(Nmod_poly_expr)
+nmod_poly_factorxx factor_with_berlekamp(Nmod_poly_expr)
+nmod_poly_factorxx factor_with_kaltofen_shoup(Nmod_poly_expr)
+nmod_poly_factorxx factor_squarefree(Nmod_poly_expr)
+
+
+*******************************************************************************
+
+    nmod\_matxx
+
+    The class \code{nmod_matxx} wraps \code{nmod_mat_t}. Like \code{nmodxx},
+    instances of \code{nmod_matxx} always have an associated \code{nmodxx_ctx}
+    storing the operating modulus. No expression may involve more than one
+    modulus at a time.
+
+    Like \code{fmpz_matxx}, many operations on \code{nmod_matxx} do not support
+    aliasing. The details can be found in the documentation of
+    \code{nmod_mat_t}. Since \code{nmod_matxx} does not use temporary merging,
+    evaluation of subexpressions never creates new aliases.
+
+*******************************************************************************
+
+nmodxx_ctx_srcref Nmod_mat_expr::estimate_ctx() const
+
+    Obtain the relevant context. This never causes evaluation.
+
+Nmod_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{inv}, \code{transpose}, \code{trace}, \code{det}.
+
+Nmod_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{solve}, \code{mul_classical}, \code{mul_strassen}.
+
+Nmod_mat_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:
+    \code{solve_tril}, \code{solve_tril_recursive},
+    \code{solve_tril_classical}, \code{solve_triu},
+    \code{solve_triu_recursive}, \code{solve_triu_classical}.
+
+Nmod_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - *} are overloaded when provided by
+    \code{nmod_mat_t}.
+
+Nmod_mat_expr operator-(Nmod_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static nmod_matxx::reduce(Fmpz_mat_expr, mp_limb_t modulus)
+
+    See \code{fmpz_mat_get_nmod_mat}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+nmod_matxx::nmod_matxx(slong m, slong n, mp_limb_t modulus)
+
+    See \code{nmod_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic properties and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Nmod_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
+sslong Nmod_mat_expr::rows() const
+sslong Nmod_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
+bool Nmod_mat_expr::is_zero() const
+bool Nmod_mat_expr::is_empty() const
+bool Nmod_mat_expr::is_square() const
+mp_limb_t Nmod_mat_expr::modulus() const
+
+void Nmod_mat_target::set_zero()
+static nmod_matxx nmod_matxx::zero(slong rows, slong cols, mp_limb_t modulus)
+
+    See \code{nmod_mat_zero}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_mat_target::set_randtest(frandxx&)
+void Nmod_mat_target::set_randfull(frandxx&)
+void Nmod_mat_target::set_randrank(frandxx&, slong rank)
+void Nmod_mat_target::set_randtril(frandxx&, bool unit)
+void Nmod_mat_target::set_randtriu(frandxx&, bool unit)
+
+    See \code{nmod_mat_randtest} etc.
+
+static nmod_matxx nmod_matxx::randtest(slong rows, slong cols, mp_limb_t M,
+        frandxx&)
+static nmod_matxx nmod_matxx::randfull(slong rows, slong cols, mp_limb_t M,
+        frandxx&)
+static nmod_matxx nmod_matxx::randrank(slong rows, slong cols, mp_limb_t M,
+        frandxx&, slong rank)
+static nmod_matxx nmod_matxx::randtril(slong rows, slong cols, mp_limb_t M,
+        frandxx&, bool unit)
+static nmod_matxx nmod_matxx::randtriu(slong rows, slong cols, mp_limb_t M,
+        frandxx&, bool unit)
+
+    Static versions of the above.
+
+int Nmod_mat_target::set_randpermdiag(frandxx&, const Vec& v)
+
+    \code{M.set_randpermdiag(Rand, V)} has the same effect as
+    \code{nmod_mat_randpermdiag(m, rand, V._array(), V.size())}, where \code{m}
+    and \code{rand} are the underlying C structs corresponding to \code{M} and
+    \code{Rand}.
+
+    One possibility for Vec is \code{nmod_vecxx}.
+
+void Nmod_target::apply_randops(frandxx&, slong count)
+
+    See \code{nmod_mat_randops}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr transpose(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Matrix multiplication
+
+    The overloaded \code{operator*} can be used for both matrix-matrix and
+    matrix-scalar multiplication. Finer control can be obtained with the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr mul_classical(Nmod_mat_expr, Nmod_mat_expr)
+Nmod_mat_expr mul_strassen(Nmod_mat_expr, Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_expr trace(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant and rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_expr det(Nmod_mat_expr)
+slong rank(Nmod_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr inv(Nmod_mat_expr A)
+
+    Compute the inverse of the square matrix $A$. Raises \code{flint_exception}
+    if $A$ is singular. The modulus is required to be prime.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Triangular solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr solve_triu(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_triu_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_triu_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_tril(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_tril_classical(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+Nmod_mat_expr solve_tril_recursive(Nmod_mat_expr, Nmod_mat_expr, bool unit)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Non-singular square solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_mat_expr solve(Nmod_mat_expr B, Nmod_mat_expr X)
+Nmod_vec_expr solve(Nmod_mat_expr B, Nmod_vec_expr X)
+
+    See \code{nmod_mat_solve} and \code{nmod_mat_solve_vec}.
+    Raises \code{flint_exception} if $B$ is singular.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    LU decomposition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Tuple<slong, permxx> Nmod_mat_target::set_lu(bool rank_check = false)
+Tuple<slong, permxx> Nmod_mat_target::set_lu_classical(bool rank_check = false)
+Tuple<slong, permxx> Nmod_mat_target::set_lu_recursive(bool rank_check = false)
+
+    See \code{nmod_mat_lu} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Reduced row echelon form
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_mat_target::set_rref()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, nmod_matxx>_expr nullspace(Nmod_mat_expr)
+
+
+
+*******************************************************************************
+
+    nmod\_poly\_matxx
+
+    The class \code{nmod_poly_matxx} wraps \code{nmod_poly_mat_t}.
+    Like \code{nmod_matxx},
+    instances of \code{nmod_poly_matxx} always have an associated
+    \code{nmodxx_ctx} storing the operating modulus.
+    No expression may involve more than one modulus at a time.
+
+    Contrary to \code{nmod_poly_mat_t}, it is \emph{not} valid to use instances
+    of \code{nmod_poly_matxx} with zero rows or columns.
+
+    Like \code{fmpz_matxx}, many operations on \code{nmod_poly_matxx} do not support
+    aliasing. The details can be found in the documentation of
+    \code{nmod_poly_mat_t}. Since \code{nmod_poly_matxx}
+    does not use temporary merging,
+    evaluation of subexpressions never creates new aliases.
+
+*******************************************************************************
+
+nmodxx_ctx_srcref Nmod_poly_mat_expr::estimate_ctx() const
+
+    Obtain the relevant context. This never causes evaluation.
+
+Nmod_poly_mat_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{det}, \code{det_fflu}, \code{det_interpolate}, \code{trace},
+    \code{sqr}, \code{sqr_classical}, \code{sqr_interpolate}, \code{sqr_KS},
+    \code{transpose}.
+
+Nmod_poly_mat_expr::binary operation(??) const
+
+    The following binary functions are made available as member functions:
+    \code{solve}, \code{solve_fflu}, \code{mul_classical},
+    \code{mul_interpolate}, \code{mul_KS}, \code{pow}.
+
+Nmod_mat_expr Nmod_poly_mat_expr::operator()(Nmod_expr) const
+
+    \code{operator()} is overloaded for matrix evaluation.
+
+Nmod_poly_mat_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - *} are overloaded when provided by
+    \code{nmod_poly_mat_t}.
+
+Nmod_poly_mat_expr operator-(Nmod_poly_mat_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print_pretty(Nmod_poly_mat_expr, const char*)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+nmod_poly_matxx::nmod_poly_matxx(slong m, slong n, mp_limb_t modulus)
+
+    See \code{nmod_poly_mat_init}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment and manipulation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Nmod_poly_mat_expr::at(T:fits_into_slong, U:fits_into_slong) const
+
+    Unified coefficient access to the matrix entries.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Standard matrices
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static nmod_poly_matxx nmod_poly_matxx::zero(slong rows, slong cols,
+    mp_limb_t n)
+static nmod_poly_matxx nmod_poly_matxx::one(slong rows, slong cols,
+    mp_limb_t n)
+void Nmod_poly_mat_target::set_zero()
+void Nmod_poly_mat_target::set_one()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Nmod_poly_mat_target::set_randtest(frandxx&, slong)
+void Nmod_poly_mat_target::set_randtest_sparse(frandxx&, slong, float)
+static nmod_poly_matxx nmod_poly_matxx::randtest(slong rows, slong cols,
+        mp_limb_t n, slong len)
+static nmod_poly_matxx nmod_poly_matxx::randtest_sparse(slong rows, slong cols,
+        mp_limb_t n, slong len, float density)
+
+    See \code{nmod_poly_mat_randtest} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic comparison and properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+sslong Nmod_poly_mat_expr::rows() const
+sslong Nmod_poly_mat_expr::cols() const
+
+    Obtain the number of rows/columns in this matrix. These functions never
+    cause evaluation (the matrix size is computed from the operations in the
+    expression template and the size of the input matrices).
+
+bool Nmod_poly_mat_expr::is_zero() const
+bool Nmod_poly_mat_expr::is_one() const
+bool Nmod_poly_mat_expr::is_empty() const
+bool Nmod_poly_mat_expr::is_square() const
+mp_limb_t Nmod_poly_mat_expr::modulus() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Norms
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+sslong Nmod_poly_mat_expr::max_length() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - *}
+    can be used for both matrix-matrix and
+    matrix-scalar multiplication, and matrix-matrix addition/subtraction.
+    Finer control can be obtained with the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_mat_expr mul_classical(Nmod_poly_mat_expr, Nmod_poly_mat_expr)
+Nmod_poly_mat_expr mul_interpolate(Nmod_poly_mat_expr, Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Row reduction
+
+    Beware that compared to the C interface, the flintxx row reduction
+    interface changes some argument orders. This is to facilitate default
+    arguments.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong find_pivot_any(Nmod_poly_mat_expr, slong, slong, slong)
+
+    See \code{nmod_poly_mat_find_pivot_any}.
+
+slong find_pivot_partial(Nmod_poly_mat_expr, slong, slong, slong)
+
+    See \code{nmod_poly_mat_find_pivot_partial}.
+
+Ltuple<slong, nmod_poly_matxx, fmpzxx>_expr fflu(Nmod_poly_mat_expr A,
+    permxx* perm = 0, bool rankcheck = false)
+
+    See \code{nmod_poly_mat_fflu}.
+
+Ltuple<slong, nmod_poly_matxx, fmpzxx>_expr rref(Nmod_poly_mat_expr A)
+
+    See \code{nmod_poly_mat_rref}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_mat_expr transpose(Nmod_poly_mat_expr A)
+
+    Compute the transpose of $A$.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Trace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr trace(Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Determinant and rank
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Nmod_poly_expr det(Nmod_poly_mat_expr)
+Nmod_poly_expr det_fflu(Nmod_poly_mat_expr)
+Nmod_poly_expr det_interpolate(Nmod_poly_mat_expr)
+slong rank(Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Inverse
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr inv(Nmod_poly_mat_expr A)
+
+    \code{ltupleref(worked, M, P) = inv(A)} has the same effect as
+    \code{worked = nmod_poly_mat_inv(m, p, a)}, where \code{m, p, a} are the C
+    structs underlying \code{M, P, A}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Nullspace
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<slong, nmod_poly_matxx>_expr nullspace(Nmod_poly_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Solving
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve(Nmod_poly_mat_expr,
+        Nmod_poly_mat_expr)
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu(Nmod_poly_mat_expr,
+        Nmod_poly_mat_expr)
+Ltuple<bool, nmod_poly_matxx, nmod_polyxx>_expr solve_fflu_precomp(
+        const permxx&, Nmod_poly_mat_expr B, Nmod_poly_mat_expr FFLU,
+        Nmod_poly_mat_expr X)
+
+    \code{ltupleref(worked, M, P) = solve(A, X)} has the same effect as
+    \code{worked = nmod_poly_mat_solve(m, p, a, x)}, where \code{m, p, a, x}
+    are the C structs underlying \code{M, P, A, X}.
+
+
+
+*******************************************************************************
+
+    fmpz\_mod\_polyxx
+
+*******************************************************************************
+
+Fmpz_mod_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}, \code{integral}, \code{make_monic}, \code{sqr}.
+
+Fmpz_mod_poly_expr::binary operation() const
+
+    The following binary functions are made available as member functions:\\
+    \code{compose_divconquer}, \code{compose_horner}, \code{div_basecase},\\
+    \code{div_divconquer}, \code{div_newton}, \code{divrem},\\
+    \code{divrem_basecase}, \code{divrem_divconquer},\\
+    \code{divrem}, \code{divrem_f},\\
+    \code{gcd}, \code{gcd_euclidean}, \code{gcd_euclidean_f}, \code{gcd_f},\\
+    \code{gcdinv}, \code{invmod}, \code{inv_series_newton},\\
+    \code{shift_left}, \code{shift_right}, \code{pow},\\
+    \code{rem_basecase}, \code{xgcd}, \code{xgcd_euclidean}.
+
+Fmpz_mod_poly_expr::ternary operation(??, ??) const
+
+    The following ternary functions are made available as member functions:\\
+    \code{compose_mod}, \code{compose_mod_horner},\\
+    \code{compose_series_brent_kung}, \code{mullow},\\
+    \code{mulmod}, \code{powmod_binexp}, \code{pow_trunc},\\
+    \code{pow_trunc_binexp}.
+
+Fmpz_mod_poly_expr Fmpz_mod_poly_expr::operator()(Fmpz_mod_poly_expr) const
+Fmpz_mod_expr Fmpz_mod_poly_expr::operator()(Fmpz_mod_expr) const
+
+    The \code{operator()} is overloaded for evaluation or composition,
+    depending on the argument.
+
+Fmpz_mod_poly_expr operator?(??, ??)
+
+    Arithmetic operators \code{+ - * %} are overloaded when provided by
+    \code{nmod_poly_t}.
+
+Fmpz_mod_poly_expr operator-(Fmpz_mod_poly_expr)
+
+    The unary negation operator is overloaded.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+print(Fmpz_mod_poly_expr)
+print(FILE*, Fmpz_mod_poly_expr)
+print_pretty(Fmpz_mod_poly_expr, const char* var)
+print_pretty(FILE*, Fmpz_mod_poly_expr, const char* var)
+read(Fmpz_mod_poly_target)
+read(FILE*, Fmpz_mod_poly_target)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n)
+fmpz_mod_polyxx::fmpz_mod_polyxx(Fmpz_expr n, slong alloc)
+
+void Fmpz_mod_poly_target realloc(slong alloc)
+void Fmpz_mod_poly_target::fit_length(slong len)
+void Fmpz_mod_poly_target::_normalise()
+void Fmpz_mod_poly_target::truncate(slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_mod_poly_mat_target::set_randtest(frandxx&, slong)
+void Fmpz_mod_poly_mat_target::set_randtest_irreducible(frandxx&, slong)
+void Fmpz_mod_poly_mat_target::set_randtest_not_zero(frandxx&, slong)
+
+    See \code{fmpz_mod_poly_randtest}, etc.
+
+static fmpz_mod_polyxx fmpz_mod_polyxx::randtest(Fmpz_expr, frandx&, slong)
+static fmpz_mod_polyxx fmpz_mod_polyxx::randtest_not_zero(Fmpz_expr,
+        frandx&, slong)
+static fmpz_mod_polyxx fmpz_mod_polyxx::randtest_irreducible(Fmpz_expr,
+        frandx&, slong)
+
+    Static versions of the above.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Attributes
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpzxx_srcref Fmpz_mod_poly_mat_expr::modulus() const
+
+    Obtain the relevant modulus. This never causes evaluation.
+
+slong Fmpz_mod_poly_expr::length() const
+slong Fmpz_mod_poly_expr::degree() const
+
+?? Fmpz_mod_poly_expr::lead() const
+
+    Unified coefficient access for the leading coefficient.
+    The result is undefined if the length of the polynomial is zero.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment and swap
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Fmpz_mod_poly_target::zero_coeffs(slong i, slong j)
+void Fmpz_mod_poly_target::set_zero()
+
+static fmpz_mod_polyxx fmpz_mod_polyxx::zero(Fmpz_expr m)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_target Fmpz_mod_poly_target::operator=(T:is_unsigned_integer)
+Fmpz_mod_poly_target Fmpz_mod_poly_target::operator=(Fmpz_expr)
+Fmpz_mod_poly_target Fmpz_mod_poly_target::operator=(Fmpz_poly_expr)
+
+    See \code{fmpz_mod_poly_set_ui}, \code{fmpz_mod_poly_set_fmpz} and
+    \code{fmpz_mod_poly_set_fmpz_poly}.
+
+Fmpz_poly_expr Fmpz_mod_poly_expr::to<fmpz_polyxx>() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Fmpz_mod_poly_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Fmpz_mod_poly_expr::get_coeff(slong n) const
+void Fmpz_mod_target::set_coeff(slong i, Fmpz_expr)
+void Fmpz_mod_target::set_coeff(slong i, T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr shift_left(Fmpz_mod_poly_expr, T:fits_into_slong)
+Fmpz_mod_poly_expr shift_right(Fmpz_mod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplication
+
+    The overloaded \code{operator*} can be used for both poly-poly and
+    poly-scalar multiplication. Finer control can be obtained using the
+    following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr mullow(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr, slong)
+Fmpz_mod_poly_expr sqr(Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr mulmod(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr pow(Fmpz_mod_poly_expr, T:is_unsigned_integer)
+Fmpz_mod_poly_expr pow_binexp(Fmpz_mod_poly_expr, T:is_unsigned_integer)
+Fmpz_mod_poly_expr pow_trunc(Fmpz_mod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Fmpz_mod_poly_expr pow_trunc_binexp(Fmpz_mod_poly_expr, T:is_unsigned_integer,
+        T:fits_into_slong)
+Fmpz_mod_poly_expr powmod_binexp(Fmpz_mod_poly_expr, T:is_unsigned_integer,
+        Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr powmod_binexp(Fmpz_mod_poly_expr, Fmpz_expr,
+        Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Division
+
+    The overloaded operators \code{/ %} can be used for division and remainder.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem_basecase(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem_divconquer(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+Ltuple<fmpzxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr divrem_f(
+    Fmpz_mod_poly_expr A, Fmpz_mod_poly_expr B)
+
+Fmpz_mod_poly_expr div_basecase(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr rem_basecase(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr rem(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
+slong Fmpz_mod_poly_target::remove(Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Power series inversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr inv_series_newton(Fmpz_mod_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Greatest common divisor
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr gcd(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr gcd_euclidean(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr xgcd(
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr xgcd_euclidean(
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Ltuple<fmpz_mod_polyxx, fmpz_mod_polyxx, fmpz_mod_polyxx>_expr gcdinv(
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
+Ltuple<fmpzxx, fmpz_mod_polyxx>_expr gcd_f(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+Ltuple<fmpzxx, fmpz_mod_polyxx>_expr gcd_euclidean_f(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+
+Fmpz_mod_poly_expr invmod(Fmpz_mod_poly_expr f, Fmpz_mod_poly_expr g)
+
+    See \code{fmpz_mod_poly_invmod}. Raises \code{flint_exception} if $f$ and
+    $g$ are not coprime.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr derivative(Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_expr evaluate(Fmpz_mod_poly_expr, Fmpz_mod_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Composition
+
+    Basic composition can be achieved with the overloaded \code{operator()}.
+    Finer control can be obtained using the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr compose(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_horner(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_divconquer(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Modular composition
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_mod_poly_expr compose_mod(Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr, Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_mod_horner(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_mod_divconquer(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+Fmpz_mod_poly_expr compose_mod_brent_kung(Fmpz_mod_poly_expr, Fmpz_mod_poly_expr,
+        Fmpz_mod_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Radix conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+fmpz_mod_poly_radixxx::fmpz_mod_poly_radixxx(Fmpz_poly_expr, slong deg)
+
+    Initialise temporary data for radix conversion.
+    See \code{fmpz_mod_poly_radix_init}.
+
+Fmpz_mod_poly_vec_expr Fmpz_mod_poly_expr::radix(const fmpz_mod_poly_radxxx&)
+Fmpz_mod_poly_vec_expr radix(Fmpz_mod_poly_expr F, const fmpz_mod_poly_radxxx&)
+
+    Perform radix conversion. See \code{fmpz_mod_poly_radix}.
+    Note that computing the output vector size requires knowing the degree of
+    \code{F}. In the current implementation, this will result in evaluating
+    \code{F} twice. In order to avoid this, pass in \code{F} in evaluated form,
+    or do not form expressions requiring temporaries.
+
+
+*******************************************************************************
+
+    fmpz\_mod\_poly\_factorxx
+
+*******************************************************************************
+bool Fmpz_mod_poly_expr::is_squarefree() const
+bool Fmpz_mod_poly_expr::is_irreducible() const
+bool Fmpz_mod_poly_expr::is_irreducible_ddf() const
+bool Fmpz_mod_poly_expr::is_irreducible_rabin() const
+slong Fmpz_mod_poly_target::remove(Fmpz_mod_poly_expr)
+
+fmpz_mod_poly_factorxx::nmod_poly_factorxx()
+
+    Initialise an empty factorisation.
+
+fmpz_mod_poly_factorxx::nmod_poly_factorxx(const nmod_poly_factorxx& o)
+
+    Copy a factorisation.
+
+bool fmpz_mod_poly_factorxx::operator==(const nmod_poly_factorxx&)
+
+    Compare two factorisations.
+
+ulong fmpz_mod_poly_factorxx::size() const
+
+    Return the number of stored factors.
+
+slong fmpz_mod_poly_factorxx::exp(slong i) const
+slong& fmpz_mod_poly_factorxx::exp(slong i)
+
+    Obtain the exponent of the ith factor.
+
+fmpz_mod_polyxx_srcref nmod_poly_factorxx::p(slong i) const
+fmpz_mod_polyxx_ref nmod_poly_factorxx::p(slong i)
+
+    Obtain the ith factor.
+
+void fmpz_mod_poly_factorxx::realloc(slong a)
+void fmpz_mod_poly_factorxx::fit_length(slong a)
+void fmpz_mod_poly_factorxx::insert(Fmpz_mod_poly_expr p, slong e)
+void fmpz_mod_poly_factorxx::concat(const nmod_poly_factorxx&)
+
+void fmpz_mod_poly_factorxx::set_factor(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_cantor_zassenhaus(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_berlekamp(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_kaltofen_shoup(Fmpz_mod_poly_expr)
+void fmpz_mod_poly_factorxx::set_factor_squarefree(Fmpz_mod_poly_expr)
+
+    Factorise a polynomial and store its factors. See \code{fmpz_mod_poly_factor} etc.
+
+void fmpz_mod_poly_factorxx::set_factor_equal_deg_probab(frandxx&, Fmpz_mod_poly_expr,
+        slong)
+void fmpz_mod_poly_factorxx::set_factor_equal_deg(Fmpz_mod_poly_expr, slong)
+
+    See \code{fmpz_mod_poly_factor_equal_deg_prob} and
+    \code{fmpz_mod_poly_factor_equal_deg}.
+
+void fmpz_mod_poly_factorxx::set_factor_distinct_deg(Fmpz_mod_poly_expr p,
+        std::vector<slong>& degs)
+
+    See \code{fmpz_mod_poly_factor_distinct_deg}. Note that \code{degs} must have
+    sufficient size to hold all factors. The size of \code{degs} is not
+    modified.
+
+fmpz_mod_poly_factorxx factor(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_cantor_zassenhaus(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_berlekamp(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_kaltofen_shoup(Fmpz_mod_poly_expr)
+fmpz_mod_poly_factorxx factor_squarefree(Fmpz_mod_poly_expr)
+
+
+
+
+
+*******************************************************************************
+
+    padicxx
+
+    The type \code{padicxx} wraps the C interface \code{padic_t}, and the type
+    \code{padicxx_ctx} wraps \code{padic_ctx_t}.
+
+    Evaluating composite expressions requires temporary objects, which must be
+    initialised to a certain precision and with a certain context. The padicxx
+    library employs the following rules:
+
+    \begin{itemize}
+      \item In any compound expression, there must only be one context involved.
+      \item Temporary objects are initialised to the maximum precision of any
+            subexpression.
+    \end{itemize}
+
+    In most use cases, all objects in a compound expression have the same
+    precision, and so temporary expressions are evaluated to this precision. If
+    you need temporary subexpressions to be evaluated to higher precision, the
+    \code{toN} method can be used on immediates to increase their effective
+    precision, thus (potentially) increasing the precision of intermediates.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Context
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx_ctx::padicxx_ctx(Fmpz_src p, slong min, slong max, padic_print_mode mode)
+
+    Initialize a padic context. See \code{padic_ctx_init}.
+
+padic_ctx_t& padicxx_ctx::_ctx() const
+
+    Obtain a reference to the underlying C data structure.
+    Note that this reference is mutable even if the instance of
+    \code{padicxx_ctx} it
+    is obtained from is not. This is because the context contains data which is
+    not user-visible, and the C functions change them.
+
+    If this is called on a constant instance of \code{padicxx_ctx}, you must
+    ensure that no user-visible state is changed.
+
+padic_print_mode& padicxx_ctx::mode()
+padic_print_mode padicxx_ctx::mode() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx_ctx_srcref Padic_src::get_ctx() const
+padic_ctx_t& Padic_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+padicxx_ctx_srcref Padic_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression. As per the
+    first rule in the introduction to this section, all such contexts are the
+    same by definition.
+
+Padic_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{exp}, \code{exp_balanced}, \code{exp_rectangular}, \code{inv},
+    \code{log}, \code{log_balanced}, \code{log_satoh}, \code{sqrt},
+    \code{teichmuller}.
+
+Padic_expr Padic_expr::pow(T:fits_into_slong) const
+
+padicxx_srcref Padic_src::toN(sslong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Padic_expr)
+int print(FILE*, Padic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Data structures
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr Padic_expr::unit() const
+
+    See \code{padic_unit}.
+
+slong Padic_expr::val() const
+slong& Padic_target::val()
+
+slong Padic_expr::prec() const
+slong& Padic_target::prec()
+
+    Obtain the precision of this instance. See \code{padic_prec}.
+    Note that this never requires evaluation.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx::padicxx(padicxx_ctx_srcref)
+
+    Initialize padic number to default precision. See \code{padic_init}.
+
+padicxx::padicxx(padicxx_ctx_srcref c, slong N)
+
+    Initialize padic number to precision $N$. See \code{padic_init2}.
+
+void Padic_target::reduce()
+
+    See \code{padic_reduce}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static padicxx padicxx::randtest(frandxx& state, padicxx_ctx_srcref ctx,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static padicxx padicxx::randtest_int(frandxx& state, padicxx_ctx_srcref ctx,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static padicxx padicxx::randtest_not_zero(frandxx& state,
+        padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
+
+    Obtain a random padic number of precision \code{prec}. See
+    \code{padic_randtest}, \code{padic_randtest_int} and
+    \code{padic_randtest_not_zero}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_target Padic_target::operator=(T:is_integer)
+Padic_target Padic_target::operator=(Fmpz_expr)
+Padic_target Padic_target::operator=(Fmpq_expr)
+
+padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref)
+padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref)
+padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref)
+padicxx padicxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, sslong N)
+padicxx padicxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, sslong N)
+padicxx padicxx::from_QQ(T:is_integer, padicxx_ctx_srcref, sslong N)
+
+void Padic_target::set_zero()
+void Padic_target::set_one()
+
+padicxx padicxx::zero(padicxx_ctx_srcref)
+padicxx padicxx::zero(padicxx_ctx_srcref, sslong N)
+padicxx padicxx::one(padicxx_ctx_srcref)
+padicxx padicxx::one(padicxx_ctx_srcref, sslong N)
+
+bool Padic_expr::is_zero() const
+bool Padic_expr::is_one() const
+
+fmpzxx Padic_expr::to<fmpzxx>() const
+
+    Convert self to \code{fmpzxx}, if possible. See \code{padic_get_fmpz}.
+
+fmpqxx Padic_expr::to<fmpqxx>() const
+
+    Convert self to \code{fmpqxx}. See \code{padic_get_fmpz}.
+
+std::string Fmpz_expr::to_string() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic operations
+
+    The overloaded operators \code{+ - * / << >>} can be used for arithmetic
+    operations, provided these are implemented for \code{padic_t}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr inv(Padic_expr)
+
+Padic_expr sqrt(Padic_expr)
+
+    Compute square root. May raise \code{flint_exception} if no square root
+    exists. See \code{padic_sqrt}.
+
+Padic_expr pow(Padic_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Exponential
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr exp(Padic_expr)
+Padic_expr exp_rectangular(Padic_expr)
+Padic_expr exp_balanced(Padic_expr)
+
+    Compute the exponential function. These may raise \code{flint_exception}s if the
+    series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Logarithm
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr log(Padic_expr)
+Padic_expr log_rectangular(Padic_expr)
+Padic_expr log_balanced(Padic_expr)
+Padic_expr log_satoh(Padic_expr)
+
+    Compute the logarithm function. These may raise \code{flint_exception}s if the
+    series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Special functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr teichmuller(Padic_expr)
+
+Fmpz_expr padic_val_fac(Fmpz_expr, Fmpz_expr)
+ulong padic_val_fac(T:is_unsigned_integer, Fmpz_expr)
+
+
+
+*******************************************************************************
+
+    padic\_polyxx
+
+    The type \code{padic_polyxx} wraps \code{padic_poly}. Like \code{padicxx},
+    every instance of \code{padic_polyxx} contains a reference to a context
+    \code{padicxx_ctx}, and stores its own precision. The same rules regarding
+    temporary expressions apply to \code{padic_polyxx} as to \code{padicxx}.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx_ctx_srcref Padic_poly_src::get_ctx() const
+padic_ctx_t& Padic_poly_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+padicxx_ctx_srcref Padic_poly_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression.
+
+Padic_poly_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{derivative}.
+
+Padic_poly_expr::binary operation() const
+
+    The following binary functions are made available as member functions:
+    \code{pow}, \code{compose_pow}, \code{inv_series}, \code{shift_left},
+    \code{shift_right}.
+
+padic_polyxx_srcref Padic_poly_src::toN(sslong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Padic_expr)
+int print(FILE*, Padic_expr)
+int print_pretty(Padic_expr, const char*)
+int print_pretty(FILE*, Padic_expr, const char*)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_polyxx::padic_polyxx(padicxx_ctx_srcref)
+
+    Initialise to zero. See \code{padic_poly_init}.
+
+padic_polyxx::padic_polyxx(padicxx_ctx_srcref, slong prec, slong alloc = 0)
+
+    See \code{padic_poly_init2}.
+
+void Padic_poly_target realloc(slong alloc)
+void Padic_poly_target::fit_length(slong len)
+void Padic_poly_target::canonicalise()
+void Padic_poly_target::reduce()
+void Padic_poly_target::truncate(slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Polynomial parameters
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Padic_poly_expr::length() const
+slong Padic_poly_expr::degree() const
+
+slong Padic_expr::val() const
+slong& Padic_target::val()
+
+slong Padic_expr::prec() const
+slong& Padic_target::prec()
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static padic_polyxx padic_polyxx::randtest(frandxx& state, padicxx_ctx_srcref ctx,
+        slong len,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static padic_polyxx padic_polyxx::randtest_val(frandxx& state, padicxx_ctx_srcref ctx,
+        slong len, slong val,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static padic_polyxx padic_polyxx::randtest_not_zero(frandxx& state,
+        slong len,
+        padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Assignment an basic manipulation
+
+    The overloaded \code{operator=} can be used for assignments. Additionally,
+    we provide the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQ(T:is_integer, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQ(Fmpz_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQ(Fmpq_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpq_poly_expr, padicxx_ctx_srcref, sslong N)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_QQX(Fmpz_poly_expr, padicxx_ctx_srcref)
+padic_polyxx padic_polyxx::from_ground(Padic_expr)
+
+fmpz_polyxx Padic_poly_expr::to<fmpz_polyxx>() const
+
+    Convert to an integer polynomial. Raises \code{flint_exception} if the
+    polynomial is not p-adically integral. See \code{padic_poly_get_fmpz_poly}.
+
+fmpq_polyxx Padic_poly_expr::to<fmpq_polyxx>() const
+
+    See \code{padic_poly_get_fmpq_poly}.
+
+padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&)
+padic_polyxx padic_polyxx::zero(const padic_polyxx_ctx&, sslong N)
+padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&)
+padic_polyxx padic_polyxx::one(const padic_polyxx_ctx&, sslong N)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Getting and setting coefficients
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr Padic_poly_expr::get_coeff(slong n) const
+void Padic_poly_target::set_coeff(slong i, Padic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    The overloaded \code{operator==} can be used for comparison.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Padic_poly_expr::is_zero() const
+bool Padic_poly_expr::is_one() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    The overloaded operators \code{+ - *} can be used for arithmetic.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Powering
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr pow(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Series inversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr inv_series_newton(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Derivative
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr derivative(Padic_poly_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Shifting
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_poly_expr shift_left(Padic_poly_expr, T:fits_into_slong)
+Padic_poly_expr shift_right(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Evaluation and composition
+
+    The overloaded \code{operator()} can be used for both evaluation and
+    composition.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_expr evaluate(Padic_poly_expr, Padic_expr)
+Padic_poly_expr compose(Padic_poly_expr, Padic_poly_expr)
+Padic_poly_expr compose_pow(Padic_poly_expr, T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Testing
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Padic_poly_src::is_canonical() const
+bool Padic_poly_src::is_reduced() const
+
+
+
+
+*******************************************************************************
+
+    padic\_matxx
+
+    The type \code{padic_matxx} wraps \code{padic_mat}. Like \code{padicxx},
+    every instance of \code{padic_matxx} contains a reference to a context
+    \code{padicxx_ctx}, and stores its own precision. The same rules regarding
+    temporary expressions apply to \code{padic_matxx} as to \code{padicxx}.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx_ctx_srcref Padic_mat_src::get_ctx() const
+padic_ctx_t& Padic_mat_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+padicxx_ctx_srcref Padic_mat_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression.
+
+padic_matxx_srcref Padic_mat_src::toN(sslong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
+slong Padic_mat_expr::rows() const
+slong Padic_mat_expr::cols() const
+
+    Obtain the number of rows/columns of this matrix. This never evaluates.
+
+slong Padic_mat_expr::val() const
+slong& Padic_mat_target::val()
+
+Padic_mat_expr Padic_mat_expr::transpose() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Input and output
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print(Padic_mat_expr)
+int print(FILE*, Padic_mat_expr)
+int print_pretty(Padic_mat_expr)
+int print_pretty(FILE*, Padic_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_matxx::padic_matxx(padicxx_ctx_srcref, slong rows, slong cols)
+
+    See \code{padic_mat_init}.
+
+padic_matxx::padic_matxx(padicxx_ctx_srcref, slong rows, slong cols, slong prec)
+
+    See \code{padic_mat_init2}.
+
+void Padic_mat_target::canonicalise()
+void Padic_mat_target::reduce()
+bool Padic_mat_src::is_canonical() const
+bool Padic_mat_src::is_reduced() const
+bool Padic_mat_src::is_square() const
+bool Padic_mat_src::is_empty() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Basic assignment
+
+    Overloaded \code{operatior=} can be used for assignment.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void Padic_mat_target::set_zero()
+void Padic_mat_target::set_one()
+padic_matxx padic_matxx::zero(padicxx_ctx_srcref)
+padic_matxx padic_matxx::zero(padicxx_ctx_srcref, sslong N)
+padic_matxx padic_matxx::one(padicxx_ctx_srcref)
+padic_matxx padic_matxx::one(padicxx_ctx_srcref, sslong N)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
+
+    Converting from a \code{fmpq_matxx} can be done using \code{operator=}, or
+    the following functions.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padic_matxx padic_matxx::from_QQ(Fmpq_mat_expr, padicxx_ctx_srcref)
+fmpq_matxx Padic_mat_expr::to<fmpq_matxx>() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Entries
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? Padic_mat_expr::at(slong i, slong j)
+
+    Unified coefficient access to the underlying integer matrix. See
+    \code{padic_mat_entry}.
+
+Fmpz_expr Padic_mat_expr::get_entry(slong i, slong j)
+void Padic_mat_target::set_entry(slong i, slong j, Padic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Comparison
+
+    Overloaded \code{operator==} can be used for comparison.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool Padic_mat_expr::is_zero() const
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Random matrix generation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static padic_polyxx padic_polyxx::randtest(slong rows, slong cols,
+        frandxx& state, padicxx_ctx_srcref ctx, slong prec = PADIC_DEFAULT_PREC)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Transpose
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Padic_mat_expr transpose(Padic_mat_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic
+
+    Overloaded operators \code{+ - * /} can be used for arithmetic.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+*******************************************************************************
+
+    qadicxx
+
+    The type \code{qadicxx} wraps the C interface \code{qadic_t}, and the type
+    \code{qadicxx_ctx} wraps \code{qadic_ctx_t}.
+
+    Evaluating composite expressions requires temporary objects, which must be
+    initialised to a certain precision and with a certain context. The same
+    rules apply as for \code{padicxx}.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Context
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+qadicxx_ctx::qadicxx_ctx(Fmpz_src p, sslong min, slong max,
+        padic_print_mode mode, const char* var = "x")
+
+    Initialize a qadic context. See \code{qadic_ctx_init_conway}.
+
+qadic_ctx_t& qadicxx_ctx::_ctx() const
+
+    Obtain a reference to the underlying C data structure.
+    Note that this reference is mutable even if the instance of
+    \code{qadicxx_ctx} it
+    is obtained from is not. This is because the context contains data which is
+    not user-visible, and the C functions change them.
+
+    If this is called on a constant instance of \code{qadicxx_ctx}, you must
+    ensure that no user-visible state is changed.
+
+padicxx_ctx_srcref qadicxx_ctx::pctx() const
+
+    Obtain a reference to the underlying padic context.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    C++ particulars
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+padicxx_ctx_srcref Qadic_src::get_ctx() const
+const qadicxx_ctx& Qadic_src::get_qctx() const
+qadic_ctx_t& Qadic_src::_ctx() const
+
+    Obtain a reference to the context of this instance.
+
+const qadicxx_ctx& Qadic_expr::estimate_ctx() const
+
+    Obtain a reference to a context occurring in a subexpression. As per the
+    first rule in the introduction to this section, all such contexts are the
+    same by definition.
+
+Qadic_expr::unary operation() const
+
+    The following unary functions are made available as member functions:
+    \code{exp}, \code{exp_balanced}, \code{exp_rectangular}, \code{inv},
+    \code{log}, \code{log_balanced}, \code{teichmuller}, \code{trace},
+    \code{norm}, \code{norm_analytic}, \code{norm_resultant}.
+
+Qadic_expr Qadic_expr::pow(Fmpz_expr) const
+Qadic_expr Qadic_expr::frobenius(T:fits_into_slong) const
+
+qadicxx_srcref Qadic_src::toN(sslong N) const
+
+    Obtain a new version of the operand, with changed effective precision.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Data structures
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int print_pretty(Qadic_expr)
+int print_pretty(FILE*, Qadic_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Data structures
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong Qadic_expr::val() const
+
+slong Qadic_expr::prec() const
+
+    Obtain the precision of this instance. See \code{qadic_prec}.
+    Note that this never requires evaluation.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Memory management
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+qadicxx::qadicxx(const qadicxx_ctx&)
+
+    Initialize qadic number to default precision. See \code{qadic_init}.
+
+qadicxx::qadicxx(const qadicxx_ctx& c, slong N)
+
+    Initialize qadic number to precision $N$. See \code{qadic_init2}.
+
+void Qadic_target::reduce()
+
+    See \code{qadic_reduce}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Randomisation
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static qadicxx qadicxx::randtest(frandxx& state, const qadicxx_ctx& ctx,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static qadicxx qadicxx::randtest_int(frandxx& state, slong val,
+        const qadicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+
+static qadicxx qadicxx::randtest_val(frandxx& state, const qadicxx_ctx& ctx,
+        slong prec = PADIC_DEFAULT_PREC)
+
+static qadicxx qadicxx::randtest_not_zero(frandxx& state,
+        const qadicxx_ctx& ctx, slong prec = PADIC_DEFAULT_PREC)
+
+    Obtain a random qadic number of precision \code{prec}. See
+    \code{qadic_randtest}, \code{qadic_randtest_int} and
+    \code{qadic_randtest_not_zero}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Conversion
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_target Qadic_target::operator=(T:is_unsigned_integer)
+Qadic_target Qadic_target::operator=(Padic_expr)
+
+qadicxx qadicxx::from_ground(Padic_expr, const qadicxx_ctx&)
+
+void Qadic_target::set_zero()
+void Qadic_target::set_one()
+void Qadic_target::set_gen(const qadicxx_ctx&)
+
+qadicxx qadicxx::zero(const qadicxx_ctx&)
+qadicxx qadicxx::zero(const qadicxx_ctx&, sslong N)
+qadicxx qadicxx::one(const qadicxx_ctx&)
+qadicxx qadicxx::one(const qadicxx_ctx&, sslong N)
+qadicxx qadicxx::gen(const qadicxx_ctx&)
+qadicxx qadicxx::gen(const qadicxx_ctx&, sslong N)
+
+bool Qadic_expr::is_zero() const
+bool Qadic_expr::is_one() const
+
+padicxx Qadic_expr::to<padicxx>() const
+
+    Convert self to \code{padicxx}, if possible. See \code{qadic_get_padic}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Arithmetic operations
+
+    The overloaded operators \code{+ - * / << >>} can be used for arithmetic
+    operations, provided these are implemented for \code{qadic_t}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr inv(Qadic_expr)
+
+Qadic_expr pow(Qadic_expr, Fmpz_expr)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Exponential
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr exp(Qadic_expr)
+Qadic_expr exp_rectangular(Qadic_expr)
+Qadic_expr exp_balanced(Qadic_expr)
+
+    Compute the exponential function. These may raise \code{flint_exception}s
+    if the series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Logarithm
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr log(Qadic_expr)
+Qadic_expr log_balanced(Qadic_expr)
+
+    Compute the logarithm function. These may raise \code{flint_exception}s
+    if the series do not converge.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Special functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Qadic_expr teichmuller(Qadic_expr)
+Padic_expr trace(Qadic_expr)
+Padic_expr norm(Qadic_expr)
+Padic_expr norm_analytic(Qadic_expr)
+Padic_expr norm_resultant(Qadic_expr)
+
+
+
+
+*******************************************************************************
+
+    arithxx
+
+    The \code{arithxx} module wraps the \code{arith} module, i.e. provides
+    functions for computing number theoretic functions.
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Primorials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr primorial(T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Harmonic numbers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr harmonic_number(T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Stirling numbers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr stirling_number_1u(T:fits_into_slong, T:fits_into_slong)
+Fmpz_expr stirling_number_1(T:fits_into_slong, T:fits_into_slong)
+Fmpz_expr stirling_number_2(T:fits_into_slong, T:fits_into_slong)
+
+Fmpz_vec_expr stirling_number_1u_vec(T:fits_into_slong, T:fits_into_slong)
+Fmpz_vec_expr stirling_number_1_vec(T:fits_into_slong, T:fits_into_slong)
+Fmpz_vec_expr stirling_number_2_vec(T:fits_into_slong, T:fits_into_slong)
+
+Fmpz_vec_expr stirling_number_1u_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
+Fmpz_vec_expr stirling_number_1_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
+Fmpz_vec_expr stirling_number_2_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
+
+    Given the vector $v$ of length $k$, compute the next vector of Stirling
+    numbers. The size of the new vector is $k + 1$ if $k = n$, and else $k$.
+
+    See \code{arith_stirling_number_1u_vec_next} etc.
+
+Fmpz_mat_expr stirling_matrix_1u(T:fits_into_slong m, T:fits_into_slong)
+Fmpz_mat_expr stirling_matrix_1(T:fits_into_slong m, T:fits_into_slong)
+Fmpz_mat_expr stirling_matrix_2(T:fits_into_slong m, T:fits_into_slong)
+
+    Compute an $m \times n$ Stirling matrix.
+
+    See \code{arith_stirling_matrix_1u} etc.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bell numbers
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr bell_number(T:is_unsigned_integer)
+Fmpz_expr bell_number_bsplit(T:is_unsigned_integer)
+Fmpz_expr bell_number_multi_mod(T:is_unsigned_integer)
+Fmpz_vec_expr bell_number_vec(T:is_unsigned_integer)
+Fmpz_vec_expr bell_number_vec_recursive(T:is_unsigned_integer)
+Fmpz_vec_expr bell_number_vec_multi_mod(T:is_unsigned_integer)
+
+Nmod_expr bell_number_nmod(T:is_unsigned_integer, Nmodxx_ctx_src)
+Nmod_vec_expr bell_number_nmod_vec(T:is_unsigned_integer, Nmodxx_ctx_src)
+Nmod_vec_expr bell_number_nmod_vec_recursive(T:is_unsigned_integer,
+    Nmodxx_ctx_src)
+Nmod_vec_expr bell_number_nmod_vec_series(T:is_unsigned_integer, Nmodxx_ctx_src)
+
+double bell_number_size(ulong n)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Bernoulli numbers and polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr bernoulli_number(T:is_unsigned_integer)
+Fmpq_vec_expr bernoulli_number_vec(T:fits_into_slong)
+Fmpz_expr bernoulli_number_denom(T:is_unsigned_integer)
+double bernoulli_number_size(ulong)
+Fmpq_poly_expr bernoulli_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Euler numbers and polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_expr euler_number(T:is_unsigned_integer)
+Fmpq_vec_expr euler_number_vec(T:fits_into_slong)
+double euler_number_size(ulong)
+Fmpq_poly_expr euler_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Legendre polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpq_poly_expr legendre_polynomial(T:is_unsigned_integer)
+Fmpz_poly_expr chebyshev_t_polynomial(T:is_unsigned_integer)
+Fmpz_poly_expr chebyshev_u_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Multiplicative functions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr euler_phi(Fmpz_expr)
+int moebius_mu(Fmpz_expr)
+Fmpz_expr divisor_sigma(Fmpz_expr, ulong)
+Fmpz_poly_expr divisors(Fmpz_expr)
+Fmpz_expr ramanujan_tau(Fmpz_expr)
+Fmpz_poly_expr ramanujan_tau_series(T:fits_into_slong)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Cyclotomic polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr cyclotomic_polynomial(T:is_unsigned_integer)
+Fmpz_poly_expr cos_minpoly(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Swinnerton-Dyer polynomials
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_poly_expr swinnerton_dyer_polynomial(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Landau's function
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_vec_expr landau_function_vec(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Dedekind sums
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr dedekind_sum_naive(Fmpz_expr, Fmpz_expr)
+Fmpz_expr dedekind_sum_coprime_large(Fmpz_expr, Fmpz_expr)
+Fmpz_expr dedekind_sum_coprime(Fmpz_expr, Fmpz_expr)
+Fmpz_expr dedekind_sum(Fmpz_expr, Fmpz_expr)
+double dedekind_sum_d(double, double)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Number of partitions
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_vec_expr number_of_partitions_vec(T:fits_into_slong)
+Nmod_vec_expr number_of_partitions_nmod_vec(T:fits_into_slong)
+Fmpz_expr number_of_partitions(T:is_unsigned_integer)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Sums of squares
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Fmpz_expr sum_of_squares(T:is_unsigned_integer, Fmpz_expr)
+Fmpz_vec_expr sum_of_squares(T:is_unsigned_integer, T:fits_into_slong)

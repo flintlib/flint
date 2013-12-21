@@ -40,12 +40,12 @@ main(void)
 {
     mp_size_t iters;
     
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("mul_fft_main....");
+    flint_printf("mul_fft_main....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     iters = 1;
@@ -55,7 +55,7 @@ main(void)
        mp_size_t j;
        mp_limb_t * i1, *i2, *r1, *r2;
         
-       printf("bits = %ld\n", int_limbs*FLINT_BITS);
+       flint_printf("bits = %wd\n", int_limbs*FLINT_BITS);
        
        i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
        i2 = i1 + int_limbs;
@@ -74,6 +74,6 @@ main(void)
 
     flint_randclear(state);
     
-    printf("done\n");
+    flint_printf("done\n");
     return 0;
 }

@@ -41,21 +41,21 @@ _rising_factorial(fmpz * res, slong a, slong b, slong trunc)
         break;
     case 2:
         fmpz_set_ui(res, a);
-        fmpz_mul_ui(res, res, a + 1UL);
+        fmpz_mul_ui(res, res, a + UWORD(1));
         if (trunc > 1)
         {
-            fmpz_set_ui(res+1, 2*a + 1UL);
+            fmpz_set_ui(res+1, 2*a + UWORD(1));
             if (trunc > 2) fmpz_one(res+2);
         }
         break;
     case 3:
         fmpz_set_ui(res, a);
-        fmpz_mul_ui(res, res, a + 1UL);
-        fmpz_mul_ui(res, res, a + 2UL);
+        fmpz_mul_ui(res, res, a + UWORD(1));
+        fmpz_mul_ui(res, res, a + UWORD(2));
         if (trunc > 1)
         {
             fmpz_set_ui(res+1, 3*a);
-            fmpz_mul_ui(res+1, res+1, a + 2UL);
+            fmpz_mul_ui(res+1, res+1, a + UWORD(2));
             fmpz_add_ui(res+1, res+1, 2);
             if (trunc > 2)
             {

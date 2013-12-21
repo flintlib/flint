@@ -32,12 +32,12 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
-   printf("factor_power235....");
+   flint_printf("factor_power235....");
    fflush(stdout);
  
-   flint_randinit(state);
+   
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares */
    {
@@ -52,8 +52,8 @@ int main(void)
       result = (n1*n1 == n2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("factor = %lu, exp = %lu\n", factor, exp); 
+         flint_printf("FAIL:\n");
+         flint_printf("factor = %wu, exp = %wu\n", factor, exp); 
          abort();
       }
    }
@@ -71,8 +71,8 @@ int main(void)
       result = (n1*n1*n1 == n2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("factor = %lu, exp = %lu\n", factor, exp); 
+         flint_printf("FAIL:\n");
+         flint_printf("factor = %wu, exp = %wu\n", factor, exp); 
          abort();
       }
    }
@@ -90,8 +90,8 @@ int main(void)
       result = (n1*n1*n1*n1*n1 == n2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("factor = %lu, exp = %lu\n", factor, exp); 
+         flint_printf("FAIL:\n");
+         flint_printf("factor = %wu, exp = %wu\n", factor, exp); 
          abort();
       }
    }
@@ -108,14 +108,14 @@ int main(void)
       result = (!n_factor_power235(&exp, n1));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n1 = %lu, exp = %lu\n", n1, exp); 
+         flint_printf("FAIL:\n");
+         flint_printf("n1 = %wu, exp = %wu\n", n1, exp); 
          abort();
       }
    }
    
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

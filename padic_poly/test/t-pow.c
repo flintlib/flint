@@ -34,16 +34,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    printf("pow... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("pow... ");
+    fflush(stdout);
 
     /* Aliasing */
     for (i = 0; i < 1000; i++)
@@ -70,11 +69,11 @@ main(void)
         result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(b, ctx), printf("\n\n");
-            padic_poly_print(c, ctx), printf("\n\n");
-            printf("e = %ld\n\n", e);
+            flint_printf("FAIL:\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(b, ctx), flint_printf("\n\n");
+            padic_poly_print(c, ctx), flint_printf("\n\n");
+            flint_printf("e = %wd\n\n", e);
             abort();
         }
 
@@ -118,10 +117,10 @@ main(void)
             result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
             if (!result)
             {
-                printf("FAIL (cmp with QQ):\n");
-                padic_poly_print(a, ctx), printf("\n\n");
-                padic_poly_print(b, ctx), printf("\n\n");
-                padic_poly_print(c, ctx), printf("\n\n");
+                flint_printf("FAIL (cmp with QQ):\n");
+                padic_poly_print(a, ctx), flint_printf("\n\n");
+                padic_poly_print(b, ctx), flint_printf("\n\n");
+                padic_poly_print(c, ctx), flint_printf("\n\n");
                 abort();
             }
         }
@@ -140,15 +139,15 @@ main(void)
             result = (padic_poly_equal(blo, clo) && padic_poly_is_reduced(blo, ctx));
             if (!result)
             {
-                printf("FAIL (cmp with QQ):\n");
-                printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
-                printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
-                printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
-                printf("blo = "), padic_poly_print(blo, ctx), printf("\n\n");
-                printf("clo = "), padic_poly_print(clo, ctx), printf("\n\n");
-                printf("N = %ld\n\n", N);
-                printf("e = %ld\n\n", e);
-                printf("N + (e - 1) v = %ld\n\n", N + (e - 1) * a->val);
+                flint_printf("FAIL (cmp with QQ):\n");
+                flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
+                flint_printf("b = "), padic_poly_print(b, ctx), flint_printf("\n\n");
+                flint_printf("c = "), padic_poly_print(c, ctx), flint_printf("\n\n");
+                flint_printf("blo = "), padic_poly_print(blo, ctx), flint_printf("\n\n");
+                flint_printf("clo = "), padic_poly_print(clo, ctx), flint_printf("\n\n");
+                flint_printf("N = %wd\n\n", N);
+                flint_printf("e = %wd\n\n", e);
+                flint_printf("N + (e - 1) v = %wd\n\n", N + (e - 1) * a->val);
                 abort();
             }
 
@@ -166,8 +165,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -46,14 +46,14 @@ int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, slong len)
         fmpz_init(c);
         _fmpz_poly_content(c, poly, len);
         fmpz_gcd(c, c, den);
-        ans = (*c == 1L);
+        ans = (*c == WORD(1));
         fmpz_clear(c);
 
         return ans;
     }
     else
     {
-        return (*den == 1L);
+        return (*den == WORD(1));
     }
 }
 

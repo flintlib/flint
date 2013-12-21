@@ -35,10 +35,10 @@ int
 main(void)
 {
     slong m, n, mod, mod2, rep;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("transpose....");
+    flint_printf("transpose....");
     fflush(stdout);
 
     /* Rectangular transpose, same modulus */
@@ -63,7 +63,7 @@ main(void)
 
         if (!nmod_mat_equal(C, A))
         {
-            printf("FAIL: C != A\n");
+            flint_printf("FAIL: C != A\n");
             abort();
         }
 
@@ -99,7 +99,7 @@ main(void)
 
         if (!nmod_mat_equal(BT, AT2))
         {
-            printf("FAIL: AT != BT\n");
+            flint_printf("FAIL: AT != BT\n");
             abort();
         }
 
@@ -129,7 +129,7 @@ main(void)
 
         if (!nmod_mat_equal(B, A))
         {
-            printf("FAIL: B != A\n");
+            flint_printf("FAIL: B != A\n");
             abort();
         }
 
@@ -137,8 +137,8 @@ main(void)
         nmod_mat_clear(B);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

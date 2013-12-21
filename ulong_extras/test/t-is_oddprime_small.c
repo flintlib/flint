@@ -32,12 +32,12 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
-   printf("is_oddprime_small....");
+   flint_printf("is_oddprime_small....");
    fflush(stdout);
    
-   flint_randinit(state);
+   
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -49,16 +49,16 @@ int main(void)
       do
       {
          d = n_randint(state, FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (d > FLINT_ODDPRIME_SMALL_CUTOFF);
 
       result = n_is_oddprime_small(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared composite\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared composite\n", d); 
          abort();
       }
 
@@ -75,22 +75,22 @@ int main(void)
       do
       {
          d = n_randint(state, FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while ((mpz_probab_prime_p(d_m, 12)) || (d > FLINT_ODDPRIME_SMALL_CUTOFF));
 
       result = !n_is_oddprime_small(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared prime\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared prime\n", d); 
          abort();
       }
 
       mpz_clear(d_m);
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

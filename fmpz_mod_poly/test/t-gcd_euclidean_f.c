@@ -31,12 +31,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("gcd_euclidean_f....");
+    flint_printf("gcd_euclidean_f....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /*
         Compare with the usual GCD function.
@@ -74,13 +74,13 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = "), fmpz_print(p), printf("\n\n");
-            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
-            printf("c = "), fmpz_mod_poly_print(c), printf("\n\n");
-            printf("d = "), fmpz_mod_poly_print(d), printf("\n\n");
-            printf("f = "), fmpz_print(f), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_mod_poly_print(c), flint_printf("\n\n");
+            flint_printf("d = "), fmpz_mod_poly_print(d), flint_printf("\n\n");
+            flint_printf("f = "), fmpz_print(f), flint_printf("\n\n");
             abort();
         }
 
@@ -92,9 +92,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

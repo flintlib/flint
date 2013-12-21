@@ -23,35 +23,38 @@
 
 ******************************************************************************/
 
-#undef ulong /* avoid clash with stdlib */
+#define ulong ulongxx /* interferes with system includes */
 #include <string.h>
+#undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_factor.h"
 #include "fmpz_mod_poly.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
 #define DEBUG 0 /* turn on some trace information */
 
+#define pp1_mulmod(rxx, axx, bxx, nnn, nxx, ninv, norm)             \
+   flint_mpn_mulmod_preinvn(rxx, axx, bxx, nnn, nxx, ninv, norm)
+
 #ifdef FLINT64
 static
 ulong pp1_primorial[15] =
 {
-   2UL, 6UL, 30UL, 210UL, 2310UL, 30030UL, 510510UL, 9699690UL,
-   223092870UL, 6469693230UL, 200560490130UL, 7420738134810UL,
-   304250263527210UL, 13082761331670030UL, 614889782588491410UL
+   UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030), UWORD(510510), UWORD(9699690),
+   UWORD(223092870), UWORD(6469693230), UWORD(200560490130), UWORD(7420738134810),
+   UWORD(304250263527210), UWORD(13082761331670030), UWORD(614889782588491410)
 };
 #define num_primorials 15
 #else
 static
 ulong pp1_primorial[9] = 
 {
-   2UL, 6UL, 30UL, 210UL, 2310UL, 30030UL, 510510UL, 9699690UL,
-   223092870UL
+   UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030), UWORD(510510), UWORD(9699690),
+   UWORD(223092870)
 };
 #define num_primorials 9
 #endif
@@ -86,7 +89,7 @@ void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
        mpn_copyi(ty, y, nn);
    }
 
-   printf("["), gmp_printf("%Nd", tx, nn), printf(", "), gmp_printf("%Nd", ty, nn), printf("]");
+   flint_printf("["), gmp_printf("%Nd", tx, nn), flint_printf(", "), gmp_printf("%Nd", ty, nn), flint_printf("]");
 
    flint_free(tx);
    flint_free(ty);
@@ -95,24 +98,24 @@ void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
 void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
             mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
-   flint_mpn_mulmod_preinvn(y, y, x, nn, n, ninv, norm);
+   pp1_mulmod(y, y, x, nn, n, ninv, norm);
    if (mpn_sub_n(y, y, x0, nn))
       mpn_add_n(y, y, n, nn);
 
-   flint_mpn_mulmod_preinvn(x, x, x, nn, n, ninv, norm);
-   if (mpn_sub_1(x, x, nn, 2UL << norm))
+   pp1_mulmod(x, x, x, nn, n, ninv, norm);
+   if (mpn_sub_1(x, x, nn, UWORD(2) << norm))
       mpn_add_n(x, x, n, nn);
 }
 
 void pp1_2kp1(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
               mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
-   flint_mpn_mulmod_preinvn(x, x, y, nn, n, ninv, norm);
+   pp1_mulmod(x, x, y, nn, n, ninv, norm);
    if (mpn_sub_n(x, x, x0, nn))
       mpn_add_n(x, x, n, nn);
 
-   flint_mpn_mulmod_preinvn(y, y, y, nn, n, ninv, norm);
-   if (mpn_sub_1(y, y, nn, 2UL << norm))
+   pp1_mulmod(y, y, y, nn, n, ninv, norm);
+   if (mpn_sub_1(y, y, nn, UWORD(2) << norm))
       mpn_add_n(y, y, n, nn);
 }
 
@@ -121,14 +124,14 @@ void pp1_pow_ui(mp_ptr x, mp_ptr y, mp_size_t nn,
 {
    mp_limb_t t[30];
    mp_ptr x0 = t;
-   ulong bit = ((1UL << FLINT_BIT_COUNT(exp)) >> 2);
+   ulong bit = ((UWORD(1) << FLINT_BIT_COUNT(exp)) >> 2);
 
    if (nn > 30)
       x0 = flint_malloc(nn*sizeof(mp_limb_t));
    mpn_copyi(x0, x, nn);
 
-   flint_mpn_mulmod_preinvn(y, x, x, nn, n, ninv, norm);
-   if (mpn_sub_1(y, y, nn, 2UL << norm))
+   pp1_mulmod(y, x, x, nn, n, ninv, norm);
+   if (mpn_sub_1(y, y, nn, UWORD(2) << norm))
       mpn_add_n(y, y, n, nn);
 
    while (bit)
@@ -211,7 +214,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    }
 
 #if DEBUG
-   printf("starting stage 1\n");
+   flint_printf("starting stage 1\n");
 #endif
 
    n_primes_init(iter);
@@ -320,7 +323,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
 #if DEBUG
       ulong primorial;
-      printf("starting stage 2\n");
+      flint_printf("starting stage 2\n");
 #endif
 
       /* find primorial <= B2sqrt ... */
@@ -338,14 +341,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
 #if DEBUG
       primorial = pp1_primorial[num];
-      printf("found primorial %lu\n", primorial);
+      flint_printf("found primorial %wu\n", primorial);
 #endif
 
       /* adjust B2sqrt to multiple of primorial */
       B2sqrt = (((B2sqrt - 1)/ pp1_primorial[num]) + 1) * pp1_primorial[num];
 
 #if DEBUG
-      printf("adjusted B2sqrt %lu\n", B2sqrt);
+      flint_printf("adjusted B2sqrt %wu\n", B2sqrt);
 #endif
 
       /* compute num roots */
@@ -359,8 +362,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("computed num_roots %lu\n", num_roots);
-      printf("B2 = %lu\n", num_roots * B2sqrt);
+      flint_printf("computed num_roots %wu\n", num_roots);
+      flint_printf("B2 = %wu\n", num_roots * B2sqrt);
 #endif
 
       /* construct roots */
@@ -381,29 +384,29 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       evals = _fmpz_vec_init(num_roots);
 
 #if DEBUG
-      printf("constructed roots\n");
+      flint_printf("constructed roots\n");
 #endif
 
       /* compute differences table v0, ... */
       mpn_zero(diff, nn);
-      diff[0] = (2UL << norm);
+      diff[0] = (UWORD(2) << norm);
 
       /* ... v2, ... */
-      flint_mpn_mulmod_preinvn(diff + nn, x, x, nn, n, ninv, norm);
-      if (mpn_sub_1(diff + nn, diff + nn, nn, 2UL << norm))
+      pp1_mulmod(diff + nn, x, x, nn, n, ninv, norm);
+      if (mpn_sub_1(diff + nn, diff + nn, nn, UWORD(2) << norm))
          mpn_add_n(diff + nn, diff + nn, n, nn);
 
       /* ... the rest ... v_{k+2} = v_k v_2 - v_{k-2} */
       k = 2*nn;
       for (i = 2; i < 16384; i++, k += nn)
       {
-         flint_mpn_mulmod_preinvn(diff + k, diff + k - nn, diff + nn, nn, n, ninv, norm);
+         pp1_mulmod(diff + k, diff + k - nn, diff + nn, nn, n, ninv, norm);
          if (mpn_sub_n(diff + k, diff + k, diff + k - 2*nn, nn))
             mpn_add_n(diff + k, diff + k, n, nn);
       }
 
 #if DEBUG
-      printf("conputed differences table\n");
+      flint_printf("conputed differences table\n");
 #endif
 
       /* initial positions */
@@ -446,7 +449,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
                      ptr_0 = COEFF_TO_PTR(roots[sieve_index[2*j - i]])->_mp_d;
                      ptr_1 = COEFF_TO_PTR(roots[sieve_index[j]])->_mp_d;
                      ptr_k = diff + (i - j)*nn;
-                     flint_mpn_mulmod_preinvn(ptr_2, ptr_1, ptr_k, nn, n, ninv, norm);
+                     pp1_mulmod(ptr_2, ptr_1, ptr_k, nn, n, ninv, norm);
                      if (mpn_sub_n(ptr_2, ptr_2, ptr_0, nn))
                         mpn_add_n(ptr_2, ptr_2, n, nn);
                      break;
@@ -468,7 +471,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("roots computed %ld\n", index);
+      flint_printf("roots computed %wd\n", index);
 #endif
 
       /* v_1 */
@@ -479,8 +482,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
       /* v_2 */
       ptr_1 = COEFF_TO_PTR(roots2[1])->_mp_d;
-      flint_mpn_mulmod_preinvn(ptr_1, ptr_0, ptr_0, nn, n, ninv, norm);
-      if (mpn_sub_1(ptr_1, ptr_1, nn, 2UL << norm))
+      pp1_mulmod(ptr_1, ptr_0, ptr_0, nn, n, ninv, norm);
+      if (mpn_sub_1(ptr_1, ptr_1, nn, UWORD(2) << norm))
          mpn_add_n(ptr_1, ptr_1, n, nn);
      
       for (i = 2; i < num_roots; i++)
@@ -488,7 +491,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
          /* V_{k+n} = V_k V_n - V_{k-n} */
          ptr_2 = COEFF_TO_PTR(roots2[i])->_mp_d;
       
-         flint_mpn_mulmod_preinvn(ptr_2, ptr_1, oldx, nn, n, ninv, norm);
+         pp1_mulmod(ptr_2, ptr_1, oldx, nn, n, ninv, norm);
          if (mpn_sub_n(ptr_2, ptr_2, ptr_0, nn))
              mpn_add_n(ptr_2, ptr_2, n, nn);
                      
@@ -497,7 +500,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("roots2 computed %lu\n", num_roots);
+      flint_printf("roots2 computed %wu\n", num_roots);
 #endif
 
       for (i = 0; i < num_roots; i++)
@@ -525,7 +528,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       }
 
 #if DEBUG
-      printf("normalised roots\n");
+      flint_printf("normalised roots\n");
 #endif
 
       tree = _fmpz_mod_poly_tree_alloc(num_roots);
@@ -537,7 +540,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       fmpz_poly_mul(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)-1], tree2[FLINT_CLOG2(num_roots)-1]+1);
      
 #if DEBUG
-      printf("built trees\n");
+      flint_printf("built trees\n");
 #endif
 
       _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, tree2[FLINT_CLOG2(num_roots)]->coeffs, tree2[FLINT_CLOG2(num_roots)]->length, tree, num_roots, n_in);
@@ -545,7 +548,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       _fmpz_mod_poly_tree_free(tree2, num_roots);
       
 #if DEBUG
-      printf("evaluated at roots\n");
+      flint_printf("evaluated at roots\n");
 #endif
 
       for (i = 0; i < num_roots; i++)
@@ -570,7 +573,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    }
 
 #if DEBUG
-   printf("done stage2\n");
+   flint_printf("done stage2\n");
 #endif
 
 cleanup:

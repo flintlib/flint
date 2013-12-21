@@ -34,13 +34,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("prod....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("prod....");
+    fflush(stdout);    
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -72,11 +71,11 @@ main(void)
 
         if (!fmpz_poly_mat_equal(A, B))
         {
-            printf("FAIL:\n");
-            printf("count = %ld\n", count);
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("count = %wd\n", count);
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
             abort();
         }
@@ -88,8 +87,8 @@ main(void)
         flint_free(V);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

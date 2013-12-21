@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("xgcd....");
+    flint_printf("xgcd....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Generic case, most likely co-prime arguments ******************************/
 
@@ -74,15 +74,15 @@ main(void)
         result = (fmpz_mod_poly_equal(d, g) && fmpz_mod_poly_equal(g, w));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(d), printf("\n\n");
-            fmpz_mod_poly_print(g), printf("\n\n");
-            fmpz_mod_poly_print(s), printf("\n\n");
-            fmpz_mod_poly_print(t), printf("\n\n");
-            fmpz_mod_poly_print(v), printf("\n\n");
-            fmpz_mod_poly_print(w), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(d), flint_printf("\n\n");
+            fmpz_mod_poly_print(g), flint_printf("\n\n");
+            fmpz_mod_poly_print(s), flint_printf("\n\n");
+            fmpz_mod_poly_print(t), flint_printf("\n\n");
+            fmpz_mod_poly_print(v), flint_printf("\n\n");
+            fmpz_mod_poly_print(w), flint_printf("\n\n");
             abort();
         }
 
@@ -133,16 +133,16 @@ main(void)
         result = (fmpz_mod_poly_equal(d, g) && fmpz_mod_poly_equal(g, w));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(d), printf("\n\n");
-            fmpz_mod_poly_print(f), printf("\n\n");
-            fmpz_mod_poly_print(g), printf("\n\n");
-            fmpz_mod_poly_print(s), printf("\n\n");
-            fmpz_mod_poly_print(t), printf("\n\n");
-            fmpz_mod_poly_print(v), printf("\n\n");
-            fmpz_mod_poly_print(w), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(d), flint_printf("\n\n");
+            fmpz_mod_poly_print(f), flint_printf("\n\n");
+            fmpz_mod_poly_print(g), flint_printf("\n\n");
+            fmpz_mod_poly_print(s), flint_printf("\n\n");
+            fmpz_mod_poly_print(t), flint_printf("\n\n");
+            fmpz_mod_poly_print(v), flint_printf("\n\n");
+            fmpz_mod_poly_print(w), flint_printf("\n\n");
             abort();
         }
 
@@ -158,9 +158,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

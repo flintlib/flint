@@ -36,7 +36,7 @@ void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 
         /* Set denominators */
         for (i = 0; i < rows * cols; i++)
-            mat->entries[i].den = 1L;
+            mat->entries[i].den = WORD(1);
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;

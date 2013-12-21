@@ -39,7 +39,7 @@ _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
     
     fmpz_init(d);
     fmpz_gcd(d, rnum, den);
-    if (*d != 1L)
+    if (*d != WORD(1))
     {
         fmpz_divexact(rnum, rnum, d);
         fmpz_divexact(rden, den, d);

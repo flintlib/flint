@@ -36,12 +36,12 @@ int main(void)
 {
     fmpz_mat_t A, B, C, D;
     slong i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("mul_multi_mod....");
+    flint_printf("mul_multi_mod....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -67,7 +67,7 @@ int main(void)
 
         if (!fmpz_mat_equal(C, D))
         {
-            printf("FAIL: results not equal\n");
+            flint_printf("FAIL: results not equal\n");
             abort();
         }
 
@@ -77,8 +77,8 @@ int main(void)
         fmpz_mat_clear(D);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

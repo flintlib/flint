@@ -48,7 +48,7 @@ mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters)
             factor = n_sqrt(mod);
             sqrti -= factor;
             factor = n_gcd_full(orig_n, sqrti);
-            if (factor != 1UL) 
+            if (factor != UWORD(1)) 
             { 
                 return factor;
             }

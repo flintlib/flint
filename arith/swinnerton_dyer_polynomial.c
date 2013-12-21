@@ -36,7 +36,7 @@ static slong __bound_prec(ulong n)
     slong i;
     double u, N;
 
-    N = 1UL << n;
+    N = UWORD(1) << n;
 
     /* u = (sum of square roots)^(2^n) */
     u = 0;
@@ -60,14 +60,14 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     if (n == 0)
     {
         fmpz_poly_zero(poly);
-        fmpz_poly_set_coeff_ui(poly, 1, 1UL);
+        fmpz_poly_set_coeff_ui(poly, 1, UWORD(1));
         return;
     }
 
-    N = 1L << n;
+    N = WORD(1) << n;
 
     prec = __bound_prec(n);
-    /* printf("prec: %ld\n", prec); */
+    /* flint_printf("prec: %wd\n", prec); */
 
     fmpz_poly_fit_length(poly, N + 1);
     T = poly->coeffs;
@@ -104,7 +104,7 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     /* For each level... */
     for (i = 0; i < n; i++)
     {
-        slong stride = 1UL << i;
+        slong stride = UWORD(1) << i;
 
         for (j = 0; j < N; j += 2*stride)
         {
@@ -127,12 +127,12 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
         fmpz_add(T + i, T + i, one);
 
     _fmpz_vec_scalar_fdiv_q_2exp(T, T, N, prec);
-    fmpz_one(T + (1UL << n));
+    fmpz_one(T + (UWORD(1) << n));
     _fmpz_poly_set_length(poly, N + 1);
 
     _fmpz_vec_clear(square_roots, n);
     flint_free(tmp1);
     flint_free(tmp2);
-    _fmpz_vec_clear(tmp3, 1UL << n);
+    _fmpz_vec_clear(tmp3, UWORD(1) << n);
     fmpz_clear(one);
 }

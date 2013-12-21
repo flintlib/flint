@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("cmp....");
+    flint_printf("cmp....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -68,12 +68,12 @@ main(void)
 
         if (c1 != c2)
         {
-            printf("FAIL\n");
-            printf("x = ");
+            flint_printf("FAIL\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\ncmp(x,y) = %d, cmp(X,Y) = %d\n", c1, c2);
+            flint_printf("\ncmp(x,y) = %d, cmp(X,Y) = %d\n", c1, c2);
             abort();
         }
 
@@ -84,10 +84,10 @@ main(void)
         mpq_clear(Y);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }
 

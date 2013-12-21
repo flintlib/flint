@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("scalar_addmul_nmod....");
+    flint_printf("scalar_addmul_nmod....");
     fflush(stdout);
 
     /* Check (a + b*c) == a + (b*c) */
@@ -66,8 +66,8 @@ main(void)
         result = _nmod_vec_equal(vec2, vec3, len);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("len = %ld, n = %ld\n", len, n);
+            flint_printf("FAIL:\n");
+            flint_printf("len = %wd, n = %wd\n", len, n);
             abort();
         }
 
@@ -76,8 +76,8 @@ main(void)
         _nmod_vec_clear(vec3);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

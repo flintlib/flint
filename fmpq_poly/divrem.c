@@ -32,7 +32,7 @@
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
                        const fmpz * A, const fmpz_t a, slong lenA, 
-                       const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 {
     slong lenQ = lenA - lenB + 1;
     slong lenR = lenB - 1;
@@ -52,13 +52,13 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
        and thus
            {A, a} = {b * Q, a * lead^d} * {B, b} + {R, a * lead^d}.
      */
-    _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
+    _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB, inv);
     
     /* Determine the actual length of R */
     for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1)); lenR--) ;
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a}, {R, r} = {R, a} up to sign */
-    if (d == 0UL || *lead == 1L || *lead == -1L)
+    if (d == UWORD(0) || *lead == WORD(1) || *lead == WORD(-1))
     {
         fmpz_one(q);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
@@ -68,7 +68,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
-        if (*lead == -1L && d % 2UL)
+        if (*lead == WORD(-1) && d % UWORD(2))
         {
             _fmpz_vec_neg(Q, Q, lenQ);
             _fmpz_vec_neg(R, R, lenR);
@@ -106,12 +106,12 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception (fmpq_poly_divrem). Division by zero.\n");
+        flint_printf("Exception (fmpq_poly_divrem). Division by zero.\n");
         abort();
     }
     if (Q == R)
     {
-        printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
+        flint_printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
         abort();
     }
     
@@ -170,7 +170,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     
     _fmpq_poly_divrem(Q->coeffs, Q->den, R->coeffs, R->den, 
                       poly1->coeffs, poly1->den, poly1->length, 
-                      poly2->coeffs, poly2->den, poly2->length);
+                      poly2->coeffs, poly2->den, poly2->length, NULL);
     
     _fmpq_poly_set_length(Q, lenQ);
     _fmpq_poly_set_length(R, lenR);

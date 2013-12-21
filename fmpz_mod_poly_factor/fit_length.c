@@ -26,7 +26,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 
 void
 fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong len)

@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("sqrt_series....");
+    flint_printf("sqrt_series....");
     fflush(stdout);
 
     /* Check g^2 = h mod x^m */
@@ -49,7 +49,7 @@ main(void)
 
         mp_limb_t n;
         do n = n_randtest_prime(state, 0);
-        while (n == 2UL);
+        while (n == UWORD(2));
 
         nmod_poly_init(h, n);
         nmod_poly_init(g, n);
@@ -57,7 +57,7 @@ main(void)
 
         do nmod_poly_randtest(h, state, n_randint(state, 1000));
         while (h->length == 0);
-        nmod_poly_set_coeff_ui(h, 0, 1UL);
+        nmod_poly_set_coeff_ui(h, 0, UWORD(1));
 
         m = n_randint(state, h->length) + 1;
 
@@ -68,11 +68,11 @@ main(void)
         result = (nmod_poly_equal(r, h));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(h), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(h), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            nmod_poly_print(r), flint_printf("\n\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
         
@@ -89,13 +89,13 @@ main(void)
 
         mp_limb_t n;
         do n = n_randtest_prime(state, 0);
-        while (n == 2UL);
+        while (n == UWORD(2));
 
         nmod_poly_init(h, n);
         nmod_poly_init(g, n);
         do nmod_poly_randtest(h, state, n_randint(state, 500));
         while (h->length == 0);
-        nmod_poly_set_coeff_ui(h, 0, 1UL);
+        nmod_poly_set_coeff_ui(h, 0, UWORD(1));
 
         m = n_randint(state, h->length) + 1;
 
@@ -105,10 +105,10 @@ main(void)
         result = (nmod_poly_equal(g, h));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(h), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            printf("n = %ld, m = %ld\n", n, m);
+            flint_printf("FAIL:\n");
+            nmod_poly_print(h), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            flint_printf("n = %wd, m = %wd\n", n, m);
             abort();
         }
 
@@ -116,8 +116,8 @@ main(void)
         nmod_poly_clear(h);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

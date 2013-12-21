@@ -36,8 +36,10 @@ main(void)
 {
     int i, result;
     gmp_randstate_t state;
+    
+    FLINT_TEST_INIT(dummy);
 
-    printf("set_mpz_equal....");
+    flint_printf("set_mpz_equal....");
     fflush(stdout);
 
     gmp_randinit_default(state);
@@ -60,10 +62,10 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("n = %Zd\n\n", n);
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -92,11 +94,11 @@ main(void)
         result = (!fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("m = %Zd\n\n", m);
             gmp_printf("n = %Zd\n\n", n);
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -107,7 +109,8 @@ main(void)
     }
 
     gmp_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    
+    FLINT_TEST_CLEANUP(dummy);
+    flint_printf("PASS\n");
     return 0;
 }

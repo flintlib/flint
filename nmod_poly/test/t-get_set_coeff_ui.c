@@ -35,10 +35,10 @@ main(void)
 {
     int i, result;
     ulong j;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("get/set_coeff_ui....");
+    flint_printf("get/set_coeff_ui....");
     fflush(stdout);
 
     /* Check aliasing of a and b */
@@ -59,17 +59,17 @@ main(void)
         result = (c2 == c1 % n);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("j = %lu, c1 = %lu, c2 = %lu, n = %lu\n", j, c1, c2, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("j = %wu, c1 = %wu, c2 = %wu, n = %wu\n", j, c1, c2, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
             abort();
         }
 
         nmod_poly_clear(a);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

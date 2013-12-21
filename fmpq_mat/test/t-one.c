@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("one....");
+    flint_printf("one....");
     fflush(stdout);
 
     /* 1 * A == A * 1 == A */
@@ -65,14 +65,14 @@ main(void)
         result = fmpq_mat_equal(A, B) && fmpq_mat_equal(A, C);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
-            printf("I:\n");
+            flint_printf("I:\n");
             fmpq_mat_print(I);
             abort();
         }
@@ -83,9 +83,9 @@ main(void)
         fmpq_mat_clear(I);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -36,13 +36,13 @@
 static __inline__
 int is_varsymbol0(char c)
 {
-    return isalpha(c);
+    return isalpha((unsigned char) c);
 }
 
 static __inline__
 int is_varsymbol1(char c)
 {
-    return isalnum(c) || (c == '_');
+    return isalnum((unsigned char) c) || (c == '_');
 }
 
 #define next_event()                                                      \
@@ -54,11 +54,6 @@ do {                                                                      \
     if (i == N)                                                           \
     {                                                                     \
         buf = flint_realloc(buf, N = 2*N);                                \
-        if (buf == NULL)                                                  \
-        {                                                                 \
-            printf("Exception (fmpz_poly_fread_pretty). realloc failed.\n"); \
-            abort();                                                      \
-        }                                                                 \
     }                                                                     \
     buf[i++] = c;                                                         \
 } while (0)
@@ -100,12 +95,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     i = 0;
     N = 80;
     buf = flint_malloc(N);
-    if (buf == NULL)
-    {
-        printf("Exception (fmpz_poly_fread_pretty). malloc failed.\n");
-        abort();
-    }
-
+    
     fmpz_init(f_coeff);
     mpz_init(z_coeff);
     mpz_init(z_exp);
@@ -116,11 +106,11 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     if (c == '-')
         goto s_1;
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_2;
     if (is_varsymbol0(c))
     {
-        mpz_set_si(z_coeff, 1);
+        flint_mpz_set_si(z_coeff, 1);
         goto s_3;
     }
 
@@ -130,15 +120,15 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_2;
     if (is_varsymbol0(c))
     {
         if (i == 1)
-            mpz_set_si(z_coeff, 1);
+            flint_mpz_set_si(z_coeff, 1);
         else  /* i == 2 */
         {
-            mpz_set_si(z_coeff, -1);
+            flint_mpz_set_si(z_coeff, -1);
             buf[0] = c;
             i = 1;
         }
@@ -151,7 +141,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_2;
     if (c == '*')
     {
@@ -193,11 +183,6 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
         else
         {
             var = flint_malloc(i);
-            if (var == NULL)
-            {
-                printf("Exception (fmpz_poly_fread_pretty). malloc failed.\n");
-                abort();
-            }
             strcpy(var, buf);
         }
 
@@ -237,7 +222,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_6;
 
     goto s_parse_error;
@@ -246,7 +231,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     next_event();
 
-    if (isdigit(c))
+    if (isdigit((unsigned char) c))
         goto s_6;
 
     {
@@ -256,7 +241,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
         {
             goto s_parse_error;
         }
-        exp = mpz_get_si(z_exp);
+        exp = flint_mpz_get_si(z_exp);
         add_coeff();
 
         if (c == '+' || c == '-')
@@ -289,11 +274,6 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     else
     {
         *x = flint_malloc(1);
-        if (*x == NULL)
-        {
-            printf("Exception (fmpz_poly_fread_pretty). malloc failed.\n");
-            abort();
-        }
         **x = '\0';
     }
 

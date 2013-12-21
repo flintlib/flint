@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("solve_fraction_free....");
+    flint_printf("solve_fraction_free....");
     fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -72,15 +72,15 @@ main(void)
 
         if (!fmpq_mat_equal(AX, B) || !success)
         {
-            printf("FAIL!\n");
-            printf("success: %d\n", success);
-            printf("A:\n");
+            flint_printf("FAIL!\n");
+            flint_printf("success: %d\n", success);
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("X:\n");
+            flint_printf("X:\n");
             fmpq_mat_print(X);
-            printf("AX:\n");
+            flint_printf("AX:\n");
             fmpq_mat_print(AX);
             abort();
         }
@@ -121,10 +121,10 @@ main(void)
 
         if (success != 0)
         {
-            printf("FAIL!\n");
-            printf("Expected success = 0\n");
+            flint_printf("FAIL!\n");
+            flint_printf("Expected success = 0\n");
             fmpq_mat_print(A);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -135,9 +135,9 @@ main(void)
         fmpz_clear(den);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

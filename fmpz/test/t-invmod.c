@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("invmod....");
+    flint_printf("invmod....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -70,7 +70,7 @@ main(void)
         result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, r1 = %d, r2 = %d\n", d,
                  e, f, g, r1, r2);
@@ -113,7 +113,7 @@ main(void)
         result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, f = %Zd, g = %Zd, r1 = %d, r2 = %d\n", d, f,
                        g, r1, r2);
             abort();
@@ -156,7 +156,7 @@ main(void)
         result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -199,7 +199,7 @@ main(void)
         result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -213,8 +213,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

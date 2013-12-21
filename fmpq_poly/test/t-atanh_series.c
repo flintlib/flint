@@ -38,13 +38,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("atanh_series....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("atanh_series....");
+    fflush(stdout);    
 
     /* Check aliasing of a and c */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -56,7 +55,7 @@ main(void)
         fmpq_poly_init(b);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
-        fmpq_poly_set_coeff_ui(a, 0, 0UL);
+        fmpq_poly_set_coeff_ui(a, 0, UWORD(0));
 
         fmpq_poly_canonicalise(a);
 
@@ -68,10 +67,10 @@ main(void)
         result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -91,13 +90,13 @@ main(void)
         fmpq_poly_init(atanhB);
 
         fmpq_poly_randtest_not_zero(A, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(A, 0, 0UL);
+        fmpq_poly_set_coeff_ui(A, 0, UWORD(0));
 
         fmpq_poly_randtest_not_zero(B, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(B, 0, 0UL);
+        fmpq_poly_set_coeff_ui(B, 0, UWORD(0));
 
         fmpq_poly_mullow(B, A, A, n);
-        fmpq_poly_set_coeff_ui(B, 0, 1UL);
+        fmpq_poly_set_coeff_ui(B, 0, UWORD(1));
         fmpq_poly_div_series(B, A, B, n);
         fmpq_poly_add(B, B, B);
 
@@ -110,12 +109,12 @@ main(void)
         result = (fmpq_poly_equal(atanhA, atanhB) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A = "), fmpq_poly_debug(A), printf("\n\n");
-            printf("B = "), fmpq_poly_debug(B), printf("\n\n");
-            printf("2*atanh(A) = "), fmpq_poly_debug(atanhA), printf("\n\n");
-            printf("atanh(B) = "), fmpq_poly_debug(atanhB), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL:\n");
+            flint_printf("A = "), fmpq_poly_debug(A), flint_printf("\n\n");
+            flint_printf("B = "), fmpq_poly_debug(B), flint_printf("\n\n");
+            flint_printf("2*atanh(A) = "), fmpq_poly_debug(atanhA), flint_printf("\n\n");
+            flint_printf("atanh(B) = "), fmpq_poly_debug(atanhB), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -125,8 +124,8 @@ main(void)
         fmpq_poly_clear(atanhB);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

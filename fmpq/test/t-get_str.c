@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("get_str....");
+    flint_printf("get_str....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100000; i++)
     {
@@ -70,23 +70,23 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("b = %Qd\n", b);
-            printf("base = %d\n", base);
-            printf("str1 = %s\n, str2 = %s\n", str1, str2);
+            flint_printf("base = %d\n", base);
+            flint_printf("str1 = %s\n, str2 = %s\n", str1, str2);
             abort();
         }
 
         flint_free(str1);
-        free(str2);
+        flint_free(str2);
 
         fmpq_clear(a);
         mpq_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

@@ -37,13 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("scalar_div_mpz....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("scalar_div_mpz....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -69,10 +68,10 @@ main(void)
         result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (aliasing):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             fmpz_print(n);
             abort();
         }
@@ -92,7 +91,7 @@ main(void)
 
         n = z_randtest_not_zero(state);
         mpz_init(n1);
-        mpz_set_si(n1, n);
+        flint_mpz_set_si(n1, n);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -107,12 +106,12 @@ main(void)
         result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
-            printf("FAIL (comparison with _si):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            printf("%ld", n), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(c), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (comparison with _si):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("%wd", n), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpq_poly_debug(c), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -155,13 +154,13 @@ main(void)
         result = (fmpq_poly_equal(lhs, rhs) && !cflags);
         if (!result)
         {
-            printf("FAIL (a / n1 / n2):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpz_print(n1), printf("\n\n");
-            fmpz_print(n2), printf("\n\n");
-            fmpq_poly_debug(lhs), printf("\n\n");
-            fmpq_poly_debug(rhs), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (a / n1 / n2):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpz_print(n1), flint_printf("\n\n");
+            fmpz_print(n2), flint_printf("\n\n");
+            fmpq_poly_debug(lhs), flint_printf("\n\n");
+            fmpq_poly_debug(rhs), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -206,13 +205,13 @@ main(void)
         result = (fmpq_poly_equal(lhs, rhs) && !cflags);
         if (!result)
         {
-            printf("FAIL ((a + b) / n):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpz_print(n), printf("\n\n");
-            fmpq_poly_debug(lhs), printf("\n\n");
-            fmpq_poly_debug(rhs), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL ((a + b) / n):\n");
+            fmpq_poly_debug(a), flint_printf("\n\n");
+            fmpq_poly_debug(b), flint_printf("\n\n");
+            fmpz_print(n), flint_printf("\n\n");
+            fmpq_poly_debug(lhs), flint_printf("\n\n");
+            fmpq_poly_debug(rhs), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -224,8 +223,8 @@ main(void)
         fmpq_poly_clear(rhs);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

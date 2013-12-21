@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("det_interpolate....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("det_interpolate....");
+    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -63,15 +62,15 @@ main(void)
 
         if (!fmpz_poly_equal(a, b))
         {
-            printf("FAIL:\n");
-            printf("determinants don't agree!\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("determinants don't agree!\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("det(A):\n");
+            flint_printf("det(A):\n");
             fmpz_poly_print_pretty(a, "x");
-            printf("\ndet_interpolate(A):\n");
+            flint_printf("\ndet_interpolate(A):\n");
             fmpz_poly_print_pretty(b, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -81,8 +80,8 @@ main(void)
         fmpz_poly_mat_clear(A);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

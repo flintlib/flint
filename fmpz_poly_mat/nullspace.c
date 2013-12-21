@@ -50,7 +50,7 @@ fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            fmpz_poly_set_ui(res->rows[i] + i, 1UL);
+            fmpz_poly_set_ui(res->rows[i] + i, UWORD(1));
     }
     else if (nullity)
     {

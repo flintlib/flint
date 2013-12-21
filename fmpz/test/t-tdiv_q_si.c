@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("tdiv_q_si....");
+    flint_printf("tdiv_q_si....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -59,7 +59,7 @@ main(void)
         b = z_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
-        mpz_set_si(e, b);
+        flint_mpz_set_si(e, b);
 
         fmpz_tdiv_q_si(c, a, b);
         mpz_tdiv_q(f, d, e);
@@ -69,7 +69,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL (1):\n");
+            flint_printf("FAIL (1):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -101,7 +101,7 @@ main(void)
         b = z_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
-        mpz_set_si(e, b);
+        flint_mpz_set_si(e, b);
 
         fmpz_tdiv_q_si(a, a, b);
         mpz_tdiv_q(f, d, e);
@@ -111,7 +111,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL (2):\n");
+            flint_printf("FAIL (2):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
             abort();
         }
@@ -124,8 +124,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

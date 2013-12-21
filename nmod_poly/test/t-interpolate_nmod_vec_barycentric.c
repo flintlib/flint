@@ -37,10 +37,10 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
     
-    printf("interpolate_nmod_vec_barycentric....");
+    
+    flint_printf("interpolate_nmod_vec_barycentric....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -71,10 +71,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("mod=%lu, n=%ld, npoints=%ld\n\n", mod, n, npoints);
-            nmod_poly_print(P), printf("\n\n");
-            nmod_poly_print(Q), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("mod=%wu, n=%wd, npoints=%wd\n\n", mod, n, npoints);
+            nmod_poly_print(P), flint_printf("\n\n");
+            nmod_poly_print(Q), flint_printf("\n\n");
             abort();
         }
 
@@ -84,8 +84,8 @@ main(void)
         _nmod_vec_clear(y);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

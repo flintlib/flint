@@ -40,68 +40,68 @@
 static const slong testdata[][4] =
 {
     /* h, k,  p/q */
-    {20816815L, 29229L, -10669L, 87687L},
-    {-481962612L, 709105L, -910639L, 141821L},
-    {-70965L, 3384L, 1785L, 752L},
-    {1899905L, 6657L, -43795L, 5706L},
-    {-1893L, 511167L, -3411568L, 170389L},
-    {1417295L, 10180L, 3543L, 4072L},
-    {-1149L, 9350L, 6971L, 9350L},
-    {-15520L, 22977640L, -70331425L, 574441L},
-    {3339L, 9873153L, 270746882L, 1097017L},
-    {470645896L, 71754L, -21713L, 107631L},
-    {1153L, 1332403L, 258755243L, 2664806L},
-    {-501576L, 292801L, 269095L, 292801L},
-    {1861L, 34440L, -723059L, 206640L},
-    {-4278761L, 239321L, 791947L, 239321L},
-    {9414763L, 30776409L, -93285463L, 92329227L},
-    {4872687L, 2199L, 146L, 733L},
-    {-22349505L, 60581653L, 27694241L, 60581653L},
-    {85739724L, 9289L, 961L, 2654L},
-    {-5616L, 124023L, -31447L, 41341L},
-    {99382204L, 1378843L, -2537405L, 2757686L},
-    {1903L, 15842L, 102L, 89L},
-    {-907226L, 5818L, 5608L, 2909L},
-    {-948920L, 4768L, -4815L, 1192L},
-    {-352220914L, 15390287L, -171358081L, 30780574L},
-    {-159206L, 3028284L, 12921745L, 4542426L},
-    {61951448L, 1624L, -341L, 406L},
-    {-49167L, 2092L, -32915L, 4184L},
-    {-20878222L, 586303210L, -530581301L, 293151605L},
-    {-1435637L, 3483L, -4787L, 20898L},
-    {-1129797L, 171620L, 238211L, 68648L},
-    {-177095L, 2914L, 1132L, 1457L},
-    {-343227551L, 1509L, -3289L, 4527L},
-    {57497376L, 1351L, 373L, 2702L},
-    {3350543L, 5771893L, -51196457L, 5771893L},
-    {-44408L, 1670L, 367L, 1670L},
-    {-4139L, 59959L, -286689L, 119918L},
-    {7397588L, 16695L, -41627L, 20034L},
-    {-78900791L, 10792L, -30905L, 21584L},
-    {-1204294L, 10134L, -8945L, 30402L},
-    {27649424L, 57014291L, 731583513L, 114028582L},
-    {3275043L, 436410815L, 2018428417L, 174564326L},
+    {WORD(20816815), WORD(29229), WORD(-10669), WORD(87687)},
+    {WORD(-481962612), WORD(709105), WORD(-910639), WORD(141821)},
+    {WORD(-70965), WORD(3384), WORD(1785), WORD(752)},
+    {WORD(1899905), WORD(6657), WORD(-43795), WORD(5706)},
+    {WORD(-1893), WORD(511167), WORD(-3411568), WORD(170389)},
+    {WORD(1417295), WORD(10180), WORD(3543), WORD(4072)},
+    {WORD(-1149), WORD(9350), WORD(6971), WORD(9350)},
+    {WORD(-15520), WORD(22977640), WORD(-70331425), WORD(574441)},
+    {WORD(3339), WORD(9873153), WORD(270746882), WORD(1097017)},
+    {WORD(470645896), WORD(71754), WORD(-21713), WORD(107631)},
+    {WORD(1153), WORD(1332403), WORD(258755243), WORD(2664806)},
+    {WORD(-501576), WORD(292801), WORD(269095), WORD(292801)},
+    {WORD(1861), WORD(34440), WORD(-723059), WORD(206640)},
+    {WORD(-4278761), WORD(239321), WORD(791947), WORD(239321)},
+    {WORD(9414763), WORD(30776409), WORD(-93285463), WORD(92329227)},
+    {WORD(4872687), WORD(2199), WORD(146), WORD(733)},
+    {WORD(-22349505), WORD(60581653), WORD(27694241), WORD(60581653)},
+    {WORD(85739724), WORD(9289), WORD(961), WORD(2654)},
+    {WORD(-5616), WORD(124023), WORD(-31447), WORD(41341)},
+    {WORD(99382204), WORD(1378843), WORD(-2537405), WORD(2757686)},
+    {WORD(1903), WORD(15842), WORD(102), WORD(89)},
+    {WORD(-907226), WORD(5818), WORD(5608), WORD(2909)},
+    {WORD(-948920), WORD(4768), WORD(-4815), WORD(1192)},
+    {WORD(-352220914), WORD(15390287), WORD(-171358081), WORD(30780574)},
+    {WORD(-159206), WORD(3028284), WORD(12921745), WORD(4542426)},
+    {WORD(61951448), WORD(1624), WORD(-341), WORD(406)},
+    {WORD(-49167), WORD(2092), WORD(-32915), WORD(4184)},
+    {WORD(-20878222), WORD(586303210), WORD(-530581301), WORD(293151605)},
+    {WORD(-1435637), WORD(3483), WORD(-4787), WORD(20898)},
+    {WORD(-1129797), WORD(171620), WORD(238211), WORD(68648)},
+    {WORD(-177095), WORD(2914), WORD(1132), WORD(1457)},
+    {WORD(-343227551), WORD(1509), WORD(-3289), WORD(4527)},
+    {WORD(57497376), WORD(1351), WORD(373), WORD(2702)},
+    {WORD(3350543), WORD(5771893), WORD(-51196457), WORD(5771893)},
+    {WORD(-44408), WORD(1670), WORD(367), WORD(1670)},
+    {WORD(-4139), WORD(59959), WORD(-286689), WORD(119918)},
+    {WORD(7397588), WORD(16695), WORD(-41627), WORD(20034)},
+    {WORD(-78900791), WORD(10792), WORD(-30905), WORD(21584)},
+    {WORD(-1204294), WORD(10134), WORD(-8945), WORD(30402)},
+    {WORD(27649424), WORD(57014291), WORD(731583513), WORD(114028582)},
+    {WORD(3275043), WORD(436410815), WORD(2018428417), WORD(174564326)},
 #if FLINT64  /* skip on 32 bit only because of the literals */
-    {61247L, 81381215L, 3622491319L, 32552486L},
-    {-52118L, 125095621L, -24931204413L, 125095621L},
-    {201446493L, 951783261L, 2467429915L, 634522174L},
-    {176112L, 72187934L, 2692844825L, 72187934L},
-    {1272L, 8722219L, 9972821075L, 17444438L},
+    {WORD(61247), WORD(81381215), WORD(3622491319), WORD(32552486)},
+    {WORD(-52118), WORD(125095621), WORD(-24931204413), WORD(125095621)},
+    {WORD(201446493), WORD(951783261), WORD(2467429915), WORD(634522174)},
+    {WORD(176112), WORD(72187934), WORD(2692844825), WORD(72187934)},
+    {WORD(1272), WORD(8722219), WORD(9972821075), WORD(17444438)},
 #endif
     {0, 0, 0, 0}
 };
 
 int main(void)
 {
-    flint_rand_t state;
     fmpz_t hh, kk;
     fmpq_t s1, s2;
     slong i, h, k;
 
-    printf("dedekind_sum....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("dedekind_sum....");
+    fflush(stdout);
+    
     fmpz_init(hh);
     fmpz_init(kk);
     fmpq_init(s1);
@@ -119,10 +119,10 @@ int main(void)
 
             if (!fmpq_equal(s1, s2))
             {
-                printf("FAIL:\n");
-                printf("s(%ld,%ld)\n", h, k);
-                printf("s1: "); fmpq_print(s1); printf("\n");
-                printf("s2: "); fmpq_print(s2); printf("\n");
+                flint_printf("FAIL:\n");
+                flint_printf("s(%wd,%wd)\n", h, k);
+                flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
+                flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
                 abort();
             }
         }
@@ -144,10 +144,10 @@ int main(void)
 
         if (!fmpq_equal(s1, s2))
         {
-            printf("FAIL:\n");
-            printf("s(%ld,%ld)\n", h, k);
-            printf("s1: "); fmpq_print(s1); printf("\n");
-            printf("s2: "); fmpq_print(s2); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("s(%wd,%wd)\n", h, k);
+            flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
+            flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
             abort();
         }
     }
@@ -164,9 +164,9 @@ int main(void)
     if ((fmpz_fdiv_ui(fmpq_numref(s1), 1000000000) != 906445312) ||
         (fmpz_fdiv_ui(fmpq_denref(s1), 1000000000) != 8416259))
     {
-        printf("Wrong large value:\n");
+        flint_printf("Wrong large value:\n");
         fmpq_print(s1);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -185,8 +185,8 @@ int main(void)
     fmpq_clear(s1);
     fmpq_clear(s2);
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

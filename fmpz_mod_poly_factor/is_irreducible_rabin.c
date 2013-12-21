@@ -31,7 +31,7 @@
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
-static __inline__ void
+void
 fmpz_mod_poly_powpowmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t pol,
                         const fmpz_t exp, ulong exp2, const fmpz_mod_poly_t f)
 {

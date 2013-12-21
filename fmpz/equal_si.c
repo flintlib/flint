@@ -31,5 +31,5 @@ int fmpz_equal_si(const fmpz_t f, slong g)
 {
     fmpz c = *f;
 
-    return !COEFF_IS_MPZ(c) ? (c == g) : !mpz_cmp_si(COEFF_TO_PTR(c), g);
+    return !COEFF_IS_MPZ(c) ? (c == g) : !flint_mpz_cmp_si(COEFF_TO_PTR(c), g);
 }

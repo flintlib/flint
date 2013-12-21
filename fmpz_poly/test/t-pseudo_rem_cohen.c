@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("pseudo_rem_cohen....");
+    flint_printf("pseudo_rem_cohen....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with q*b + r = a, no aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -61,11 +61,11 @@ main(void)
         result = (fmpz_poly_equal(r1, r2));
         if (!result)
         {
-            printf("FAIL (correctness):\n");
-            printf("a  = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b  = "), fmpz_poly_print(b), printf("\n\n");
-            printf("r1 = "), fmpz_poly_print(r1), printf("\n\n");
-            printf("r2 = "), fmpz_poly_print(r2), printf("\n\n");
+            flint_printf("FAIL (correctness):\n");
+            flint_printf("a  = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("b  = "), fmpz_poly_print(b), flint_printf("\n\n");
+            flint_printf("r1 = "), fmpz_poly_print(r1), flint_printf("\n\n");
+            flint_printf("r2 = "), fmpz_poly_print(r2), flint_printf("\n\n");
             abort();
         }
 
@@ -93,9 +93,9 @@ main(void)
         result = (fmpz_poly_equal(a, r));
         if (!result)
         {
-            printf("FAIL (aliasing r, a):\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(r), printf("\n\n");
+            flint_printf("FAIL (aliasing r, a):\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(r), flint_printf("\n\n");
             abort();
         }
 
@@ -121,9 +121,9 @@ main(void)
         result = (fmpz_poly_equal(b, r));
         if (!result)
         {
-            printf("FAIL (aliasing r, b):\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(r), printf("\n\n");
+            flint_printf("FAIL (aliasing r, b):\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(r), flint_printf("\n\n");
             abort();
         }
 
@@ -132,8 +132,8 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

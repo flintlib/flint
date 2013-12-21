@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("resultant_euclidean....");
+    flint_printf("resultant_euclidean....");
     fflush(stdout);
 
     /* Check res(f, g) == (-1)^(deg f deg g) res(g, f) */
@@ -65,12 +65,12 @@ main(void)
         result = (x == y);
         if (!result)
         {
-            printf("FAIL (res(f, g) == (-1)^(deg f deg g) res(g, f)):\n");
-            nmod_poly_print(f), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            printf("x = %lu\n", x);
-            printf("y = %lu\n", y);
-            printf("n = %lu\n", n);
+            flint_printf("FAIL (res(f, g) == (-1)^(deg f deg g) res(g, f)):\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            flint_printf("x = %wu\n", x);
+            flint_printf("y = %wu\n", y);
+            flint_printf("n = %wu\n", n);
             abort();
         }
         
@@ -105,14 +105,14 @@ main(void)
         result = (x == y);
         if (!result)
         {
-            printf("FAIL (res(f h, g) == res(f, g) res(h, g)):\n");
-            nmod_poly_print(f), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
-            nmod_poly_print(h), printf("\n\n");
-            printf("x = %lu\n", x);
-            printf("y = %lu\n", y);
-            printf("z = %ld\n", z);
-            printf("n = %lu\n", n);
+            flint_printf("FAIL (res(f h, g) == res(f, g) res(h, g)):\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            nmod_poly_print(h), flint_printf("\n\n");
+            flint_printf("x = %wu\n", x);
+            flint_printf("y = %wu\n", y);
+            flint_printf("z = %wd\n", z);
+            flint_printf("n = %wu\n", n);
             abort();
         }
         
@@ -121,8 +121,8 @@ main(void)
         nmod_poly_clear(h);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

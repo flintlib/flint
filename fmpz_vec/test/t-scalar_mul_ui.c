@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("scalar_mul_ui....");
+    flint_printf("scalar_mul_ui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -60,9 +60,9 @@ main(void)
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
-            _fmpz_vec_print(b, len), printf("\n\n");
+            flint_printf("FAIL:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
+            _fmpz_vec_print(b, len), flint_printf("\n\n");
             abort();
         }
 
@@ -90,9 +90,9 @@ main(void)
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, len), printf("\n\n");
-            _fmpz_vec_print(b, len), printf("\n\n");
+            flint_printf("FAIL:\n");
+            _fmpz_vec_print(a, len), flint_printf("\n\n");
+            _fmpz_vec_print(b, len), flint_printf("\n\n");
             abort();
         }
 
@@ -101,8 +101,8 @@ main(void)
         fmpz_clear(x);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

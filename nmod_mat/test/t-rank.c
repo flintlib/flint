@@ -38,10 +38,10 @@ main(void)
     nmod_mat_t A;
     slong i, m, n, d, r;
     mp_limb_t mod;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("rank....");
+    flint_printf("rank....");
     fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
@@ -55,12 +55,12 @@ main(void)
         {
             nmod_mat_init(A, m, n, mod);
             nmod_mat_randrank(A, state, r);
-            /* printf("SPARSE %ld\n", r);
+            /* flint_printf("SPARSE %wd\n", r);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
             nmod_mat_clear(A);
@@ -81,20 +81,20 @@ main(void)
             nmod_mat_randrank(A, state, r);
             nmod_mat_randops(A, d, state);
             /*
-            printf("DENSE %ld %ld\n", r, d);
+            flint_printf("DENSE %wd %wd\n", r, d);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
             nmod_mat_clear(A);
         }
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

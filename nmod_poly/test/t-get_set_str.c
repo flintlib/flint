@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result, r1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("get/set_str....");
+    flint_printf("get/set_str....");
     fflush(stdout);
 
     /* Check to and from string */
@@ -57,11 +57,11 @@ main(void)
         result = (r1 && nmod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("r1 = %d, n = %lu\n", r1, a->mod.n);
-            printf("%s\n", str);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("r1 = %d, n = %wu\n", r1, a->mod.n);
+            flint_printf("%s\n", str);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -70,8 +70,8 @@ main(void)
         nmod_poly_clear(b);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

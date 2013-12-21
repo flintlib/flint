@@ -34,7 +34,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     slong len_out = len1 + len2 - 1;
     slong loglen  = FLINT_CLOG2(len_out);
     slong loglen2 = FLINT_CLOG2(len2);
-    slong n = (1L << (loglen - 2));
+    slong n = (WORD(1) << (loglen - 2));
 
     slong output_bits, limbs, size, i;
     mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
@@ -52,7 +52,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 
     limbs = (output_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
     if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* can't be worse than next power of 2 limbs */
-        limbs = (1L << FLINT_CLOG2(limbs));
+        limbs = (WORD(1) << FLINT_CLOG2(limbs));
     size = limbs + 1;
 
     /* allocate space for ffts */
@@ -84,7 +84,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     }
     else bits2 = bits1;
 
-    if (bits1 < 0L || bits2 < 0L) 
+    if (bits1 < WORD(0) || bits2 < WORD(0)) 
     {
         sign = 1;  
         bits1 = FLINT_ABS(bits1);

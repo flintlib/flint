@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("zero_coeffs....");
+    flint_printf("zero_coeffs....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check that zeroing [0,len/2) and [len/2,len) sets a to zero */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -59,16 +59,16 @@ main(void)
         result = (fmpz_poly_length(a) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
             abort();
         }
 
         fmpz_poly_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

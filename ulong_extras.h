@@ -56,13 +56,13 @@ typedef struct {
 
 #define FLINT_FACTOR_TRIAL_PRIMES 3000
 /* nth_prime(FLINT_FACTOR_TRIAL_PRIMES) */
-#define FLINT_FACTOR_TRIAL_PRIMES_PRIME 27449UL
-#define FLINT_FACTOR_TRIAL_CUTOFF (27449UL * 27449UL)
+#define FLINT_FACTOR_TRIAL_PRIMES_PRIME UWORD(27449)
+#define FLINT_FACTOR_TRIAL_CUTOFF (UWORD(27449) * UWORD(27449))
 
 #define FLINT_PRIMES_TAB_DEFAULT_CUTOFF 1000000
 
 #define FLINT_FACTOR_SQUFOF_ITERS 50000
-#define FLINT_FACTOR_ONE_LINE_MAX (1UL<<39)
+#define FLINT_FACTOR_ONE_LINE_MAX (UWORD(1)<<39)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
 
 #define FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF 311
@@ -70,9 +70,9 @@ typedef struct {
 #define FLINT_SIEVE_SIZE 65536
 
 #if FLINT64
-#define ULONG_MAX_PRIME 18446744073709551557UL
+#define UWORD_MAX_PRIME UWORD(18446744073709551557)
 #else
-#define ULONG_MAX_PRIME 4294967291UL
+#define UWORD_MAX_PRIME UWORD(4294967291)
 #endif
 
 typedef struct
@@ -216,6 +216,9 @@ mp_limb_t n_powmod2_preinv(mp_limb_t a,
 mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp,
                                             mp_limb_t n, mp_limb_t ninv);
 
+mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
+                                             mp_limb_t ninv, ulong norm);
+
 static __inline__
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 {
@@ -323,7 +326,7 @@ int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre);
 static __inline__
 void n_factor_init(n_factor_t * factors)
 {
-    factors->num = 0UL;
+    factors->num = UWORD(0);
 }
 
 void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp);
@@ -367,6 +370,12 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved);
 mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
 mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
+
+mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors);
+
+mp_limb_t n_primitive_root_prime(mp_limb_t p);
+
+mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n);
 
 #ifdef __cplusplus
 }

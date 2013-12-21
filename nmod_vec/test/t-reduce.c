@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("reduce....");
+    flint_printf("reduce....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -63,8 +63,8 @@ main(void)
         result = _nmod_vec_equal(vec, vec2, len);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("len = %ld, n = %ld\n", len, n);
+            flint_printf("FAIL:\n");
+            flint_printf("len = %wd, n = %wd\n", len, n);
             abort();
         }
 
@@ -72,8 +72,8 @@ main(void)
         _nmod_vec_clear(vec2);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("exp_series....");
+    flint_printf("exp_series....");
     fflush(stdout);
 
     /* Check exp(A+B) = exp(A) * exp(B) */
@@ -66,9 +66,9 @@ main(void)
         nmod_poly_init(S, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, N));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
         nmod_poly_randtest(B, state, n_randint(state, N));
-        nmod_poly_set_coeff_ui(B, 0, 0UL);
+        nmod_poly_set_coeff_ui(B, 0, UWORD(0));
 
         /* Randomly generate a monomial */
         if (n_randlimb(state) % 100 == 0)
@@ -76,7 +76,7 @@ main(void)
             nmod_poly_zero(A);
             nmod_poly_set_coeff_ui(A, n_randlimb(state) % (n+5), \
                 n_randtest_not_zero(state) % mod);
-            nmod_poly_set_coeff_ui(A, 0, 0UL);
+            nmod_poly_set_coeff_ui(A, 0, UWORD(0));
         }
 
         nmod_poly_exp_series(expA, A, n);
@@ -89,14 +89,14 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %ld, mod = %lu\n", n, mod);
-            printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("B: "); nmod_poly_print(B), printf("\n\n");
-            printf("exp(A): "); nmod_poly_print(expA), printf("\n\n");
-            printf("exp(B): "); nmod_poly_print(expB), printf("\n\n");
-            printf("exp(A+B):       "); nmod_poly_print(expAB), printf("\n\n");
-            printf("exp(A)*exp(B): "); nmod_poly_print(S), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd, mod = %wu\n", n, mod);
+            flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
+            flint_printf("B: "); nmod_poly_print(B), flint_printf("\n\n");
+            flint_printf("exp(A): "); nmod_poly_print(expA), flint_printf("\n\n");
+            flint_printf("exp(B): "); nmod_poly_print(expB), flint_printf("\n\n");
+            flint_printf("exp(A+B):       "); nmod_poly_print(expAB), flint_printf("\n\n");
+            flint_printf("exp(A)*exp(B): "); nmod_poly_print(S), flint_printf("\n\n");
             abort();
         }
 
@@ -122,7 +122,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_exp_series(B, A, n);
         nmod_poly_exp_series(A, A, n);
@@ -130,9 +130,9 @@ main(void)
         result = nmod_poly_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(A), printf("\n\n");
-            nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(A), flint_printf("\n\n");
+            nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -140,8 +140,8 @@ main(void)
         nmod_poly_clear(B);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

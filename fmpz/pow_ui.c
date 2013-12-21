@@ -33,7 +33,7 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
 {
     fmpz c1;
 
-    if (exp == 0L)
+    if (exp == WORD(0))
     {
         fmpz_one(f);
         return;
@@ -53,18 +53,18 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
         {
             __mpz_struct *mpz_ptr = _fmpz_promote_val(f);
 
-            mpz_set_ui(mpz_ptr, u1);
-            mpz_pow_ui(mpz_ptr, mpz_ptr, exp);
+            flint_mpz_set_ui(mpz_ptr, u1);
+            flint_mpz_pow_ui(mpz_ptr, mpz_ptr, exp);
             _fmpz_demote_val(f);    /* may actually fit into a small after all */
         }
 
-        if ((c1 < 0L) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
+        if ((c1 < WORD(0)) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
             fmpz_neg(f, f);
     }
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote_val(f);
-        mpz_pow_ui(mpz_ptr, COEFF_TO_PTR(c1), exp);
+        flint_mpz_pow_ui(mpz_ptr, COEFF_TO_PTR(c1), exp);
         /* no need to demote as it can't get smaller */
     }
 }

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
@@ -36,17 +36,16 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     fmpz_t p;
     slong N;
     padic_ctx_t ctx;
     slong m, n;
 
-    printf("get/ set_entry_padic... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("get/ set_entry_padic... ");
+    fflush(stdout);    
 
     for (i = 0; i < 10000; i++)
     {
@@ -78,10 +77,10 @@ main(void)
         result = (padic_equal(x, y) && padic_mat_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("x = "), padic_print(x, ctx), printf("\n");
-            printf("y = "), padic_print(y, ctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), padic_mat_print(a, ctx), flint_printf("\n");
+            flint_printf("x = "), padic_print(x, ctx), flint_printf("\n");
+            flint_printf("y = "), padic_print(y, ctx), flint_printf("\n");
             abort();
         }
 
@@ -93,9 +92,9 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

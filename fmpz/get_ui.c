@@ -32,7 +32,7 @@ ulong
 fmpz_get_ui(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))      /*value is small */
-        return (*f < 0L ? -*f : *f);
+        return (*f < WORD(0) ? -*f : *f);
     else                        /* value is large */
-        return mpz_get_ui(COEFF_TO_PTR(*f));
+        return flint_mpz_get_ui(COEFF_TO_PTR(*f));
 }

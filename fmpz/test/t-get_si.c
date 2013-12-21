@@ -37,11 +37,11 @@ main(void)
     fmpz_t x;
 
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    
 
-    printf("get/set_si....");
+    flint_printf("get/set_si....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -49,28 +49,28 @@ main(void)
     fmpz_set_si(x, COEFF_MIN);
     if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
     {
-        printf("FAIL: COEFF_MIN");
+        flint_printf("FAIL: COEFF_MIN");
         abort();
     }
 
     fmpz_set_si(x, COEFF_MAX);
     if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
     {
-        printf("FAIL: COEFF_MIN");
+        flint_printf("FAIL: COEFF_MIN");
         abort();
     }
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    fmpz_set_si(x, WORD_MIN);
+    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != WORD_MIN)
     {
-        printf("FAIL: LONG_MIN");
+        flint_printf("FAIL: WORD_MIN");
         abort();
     }
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    fmpz_set_si(x, WORD_MIN);
+    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != WORD_MIN)
     {
-        printf("FAIL: LONG_MAX");
+        flint_printf("FAIL: WORD_MAX");
         abort();
     }
 
@@ -91,17 +91,17 @@ main(void)
         result = (b == c);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
+            flint_printf("FAIL:\n");
+            flint_printf("b = %wd, c = %wd\n", b, c);
             abort();
         }
 
         fmpz_clear(a);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

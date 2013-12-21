@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("tdiv_qr....");
+    flint_printf("tdiv_qr....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -73,7 +73,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
@@ -126,7 +126,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
@@ -179,7 +179,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
@@ -232,7 +232,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
@@ -285,7 +285,7 @@ main(void)
         result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf
                 ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
                  e, f, g, h, s);
@@ -305,8 +305,8 @@ main(void)
         mpz_clear(s);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

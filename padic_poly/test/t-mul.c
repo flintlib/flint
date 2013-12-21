@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "padic_poly.h"
@@ -37,16 +37,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    printf("mul... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("mul... ");
+    fflush(stdout);    
 
     /* Check aliasing of a and b */
     for (i = 0; i < 1000; i++)
@@ -71,9 +70,9 @@ main(void)
         result = (padic_poly_equal(a, b) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL (aliasing a and b):\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(b, ctx), printf("\n\n");
+            flint_printf("FAIL (aliasing a and b):\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(b, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -108,9 +107,9 @@ main(void)
         result = (padic_poly_equal(a, c) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL (aliasing a and c):\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL (aliasing a and c):\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -163,14 +162,14 @@ main(void)
             result = (padic_poly_equal(a1, a2) && padic_poly_is_reduced(a1, ctx));
             if (!result)
             {
-                printf("FAIL (distributivity):\n");
-                printf("p = "), fmpz_print(ctx->p), printf("\n\n");
-                printf("N = %ld\n\n", N);
-                printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
-                printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
-                printf("d = "), padic_poly_print(d, ctx), printf("\n\n");
-                printf("a1 = "), padic_poly_print(a1, ctx), printf("\n\n");
-                printf("a2 = "), padic_poly_print(a2, ctx), printf("\n\n");
+                flint_printf("FAIL (distributivity):\n");
+                flint_printf("p = "), fmpz_print(ctx->p), flint_printf("\n\n");
+                flint_printf("N = %wd\n\n", N);
+                flint_printf("b = "), padic_poly_print(b, ctx), flint_printf("\n\n");
+                flint_printf("c = "), padic_poly_print(c, ctx), flint_printf("\n\n");
+                flint_printf("d = "), padic_poly_print(d, ctx), flint_printf("\n\n");
+                flint_printf("a1 = "), padic_poly_print(a1, ctx), flint_printf("\n\n");
+                flint_printf("a2 = "), padic_poly_print(a2, ctx), flint_printf("\n\n");
                 abort();
             }
 
@@ -220,10 +219,10 @@ main(void)
         result = (padic_poly_equal(a, d) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL (cmp with Q):\n");
-            printf("N = %ld, val(b) = %ld, val(c) = %ld\n", N, b->val, c->val);
-            padic_poly_print(c, ctx), printf("\n\n");
-            padic_poly_print(d, ctx), printf("\n\n");
+            flint_printf("FAIL (cmp with Q):\n");
+            flint_printf("N = %wd, val(b) = %wd, val(c) = %wd\n", N, b->val, c->val);
+            padic_poly_print(c, ctx), flint_printf("\n\n");
+            padic_poly_print(d, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -240,9 +239,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

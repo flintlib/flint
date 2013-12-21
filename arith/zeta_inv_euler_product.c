@@ -39,34 +39,34 @@ void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 
     prec = mpfr_get_prec(res) + 32 + 2*FLINT_BIT_COUNT(s);
 
-    mpz_set_ui(z, 1UL);
+    flint_mpz_set_ui(z, UWORD(1));
     mpz_mul_2exp(z, z, prec);
 
     if (!char_4)
     {
-        mpz_set_ui(r, 1UL);
+        flint_mpz_set_ui(r, UWORD(1));
         mpz_mul_2exp(r, r, prec - s);
         mpz_sub(z, z, r);
     }
 
-    p = 3UL;
+    p = UWORD(3);
 
     while (1)
     {
         slong i;
         powprec = prec - s*log(p)*1.4426950408889634 + 1;
 
-        /* printf("prime %lu, powprec %ld\n", p, powprec); */
+        /* flint_printf("prime %wu, powprec %wd\n", p, powprec); */
 
         if (powprec < 5)
             break;
 
-        mpz_set_ui(x, p);
-        mpz_set_ui(y, 1UL);
+        flint_mpz_set_ui(x, p);
+        flint_mpz_set_ui(y, UWORD(1));
         yexp = 0;
 
-        /* Slow equivalent: mpz_pow_ui(y, x, s) */
-        mpz_set_ui(y, p);
+        /* Slow equivalent: flint_mpz_pow_ui(y, x, s) */
+        flint_mpz_set_ui(y, p);
         for (i = FLINT_BIT_COUNT(s) - 2; i >= 0; i--)
         {
             mpz_mul(y, y, y);
@@ -78,8 +78,8 @@ void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
                 yexp += shift;
             }
 
-            if (s & (1UL<<i))
-                mpz_mul_ui(y, y, p);
+            if (s & (UWORD(1)<<i))
+                flint_mpz_mul_ui(y, y, p);
         }
 
         shift = yexp;

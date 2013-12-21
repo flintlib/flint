@@ -26,16 +26,23 @@
 #ifndef PADIC_MAT_H
 #define PADIC_MAT_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
+#undef ulong
+#include <gmp.h>
 #define ulong mp_limb_t
 
-#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 #include "padic.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 
 typedef struct
 {
@@ -246,6 +253,10 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
 
 void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

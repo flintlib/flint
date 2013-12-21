@@ -25,15 +25,23 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#undef ulong
+#include <gmp.h>
 #define ulong mp_limb_t
 
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+
+#if FLINT_REENTRANT && !HAVE_TLS
+#include <pthread.h>
+
+static pthread_once_t primes_initialised = PTHREAD_ONCE_INIT;
+pthread_mutex_t primes_lock;
+#endif
 
 const unsigned int flint_primes_small[] =
 {
@@ -55,24 +63,34 @@ FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
 FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
 FLINT_TLS_PREFIX int _flint_primes_used = 0;
 
+#if FLINT_REENTRANT && !HAVE_TLS
+void n_compute_primes_init()
+{
+   pthread_mutex_init(&primes_lock, NULL);
+}
+#endif
+
 void
 n_compute_primes(ulong num_primes)
 {
     int i, m;
     ulong num_computed;
 
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_once(&primes_initialised, n_compute_primes_init);
+    pthread_mutex_lock(&primes_lock);
+#endif
+
     m = FLINT_CLOG2(num_primes);
 
     if (_flint_primes_used == 0)
-    {
         flint_register_cleanup_function(n_cleanup_primes);
-    }
 
     if (m >= _flint_primes_used)
     {
         n_primes_t iter;
 
-        num_computed = 1UL << m;
+        num_computed = UWORD(1) << m;
         _flint_primes[m] = flint_malloc(sizeof(mp_limb_t) * num_computed);
         _flint_prime_inverses[m] = flint_malloc(sizeof(double) * num_computed);
 
@@ -92,5 +110,9 @@ n_compute_primes(ulong num_primes)
         }
         _flint_primes_used = m + 1;
     }
+
+#if FLINT_REENTRANT && !HAVE_TLS
+    pthread_mutex_unlock(&primes_lock);
+#endif
 }
 

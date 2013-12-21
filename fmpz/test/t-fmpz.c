@@ -34,18 +34,18 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("fmpz....");
+    flint_printf("fmpz....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
 
-        *a = 0L;
+        *a = WORD(0);
 
         fmpz_randtest(a, state, FLINT_BITS - 2);
 
@@ -58,13 +58,13 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

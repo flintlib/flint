@@ -32,12 +32,12 @@ int
 main(void)
 {
     slong iter;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("fmpz_cleanup....");
+    flint_printf("fmpz_cleanup....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
     {
@@ -63,7 +63,7 @@ main(void)
 
             if (n_randint(state, 10) == 0)
             {
-                flint_cleanup();
+                
             }
         }
 
@@ -71,9 +71,9 @@ main(void)
         _fmpz_vec_clear(B, n);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

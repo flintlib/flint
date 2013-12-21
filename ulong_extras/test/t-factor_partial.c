@@ -32,10 +32,10 @@
 int main(void)
 {
    int i, j, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("factor_partial....");
+   flint_printf("factor_partial....");
    fflush(stdout);
  
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
@@ -58,14 +58,14 @@ int main(void)
       result = ((n1 == n2*prod) && ((prod > limit) || (n1 == 1)));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+         flint_printf("FAIL:\n");
+         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
          abort();
       }
    }
    
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

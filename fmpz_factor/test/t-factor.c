@@ -29,13 +29,13 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_factor.h"
 #include "ulong_extras.h"
 
 void check(fmpz_t n)
 {
     fmpz_factor_t factor;
     fmpz_t m;
+    slong i;
 
     fmpz_factor_init(factor);
     fmpz_init(m);
@@ -45,21 +45,39 @@ void check(fmpz_t n)
 
     if (!fmpz_equal(n, m))
     {
-        printf("ERROR: factors do not unfactor to original number!\n");
+        flint_printf("ERROR: factors do not unfactor to original number!\n");
 
-        printf("input: ");
+        flint_printf("input: ");
         fmpz_print(n);
-        printf("\n");
+        flint_printf("\n");
 
-        printf("computed factors: ");
+        flint_printf("computed factors: ");
         fmpz_factor_print(factor);
-        printf("\n");
+        flint_printf("\n");
 
-        printf("value: ");
+        flint_printf("value: ");
         fmpz_print(m);
-        printf("\n");
+        flint_printf("\n");
 
         abort();
+    }
+
+    for (i = 0; i < factor->num; i++)
+    {
+        if (!fmpz_is_probabprime(factor->p + i))
+        {
+            flint_printf("ERROR: factor is not prime!\n");
+
+            flint_printf("input: ");
+            fmpz_print(n);
+            flint_printf("\n");
+
+            flint_printf("computed factors: ");
+            fmpz_factor_print(factor);
+            flint_printf("\n");
+
+            abort();
+        }
     }
 
     fmpz_clear(m);
@@ -71,19 +89,20 @@ int main(void)
     int i, j;
     fmpz_t x;
     mpz_t y;
+    FLINT_TEST_INIT(state);
 
-    printf("factor....");
+    flint_printf("factor....");
     fflush(stdout);
 
     fmpz_init(x);
     mpz_init(y);
 
     /* Some corner cases */
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_ui(x, UWORD_MAX);
     check(x);
-    fmpz_set_si(x, LONG_MAX);
+    fmpz_set_si(x, WORD_MAX);
     check(x);
-    fmpz_set_si(x, LONG_MIN);
+    fmpz_set_si(x, WORD_MIN);
     check(x);
     fmpz_set_si(x, COEFF_MAX);
     check(x);
@@ -111,7 +130,7 @@ int main(void)
     /* Factorials */
     for (i = 0; i < 1000; i++)
     {
-        mpz_fac_ui(y, i);
+        flint_mpz_fac_ui(y, i);
         fmpz_set_mpz(x, y);
         check(x);
     }
@@ -121,11 +140,20 @@ int main(void)
     {
         for (j = 1; j < 5; j++)
         {
-            mpz_fac_ui(y, i);
+            flint_mpz_fac_ui(y, i);
             fmpz_set_mpz(x, y);
             fmpz_pow_ui(x, x, j);
             check(x);
         }
+    }
+
+    /* Whole limbs */
+    for (i = 0; i < 1000; i++)
+    {
+        fmpz_set_ui(x, n_randtest(state));
+        if (n_randint(state, 2))
+            fmpz_neg(x, x);
+        check(x);
     }
 
     /* Large negative integers */
@@ -133,7 +161,7 @@ int main(void)
     fmpz_pow_ui(x, x, 100);
     fmpz_neg(x, x);
     check(x);
-    mpz_fac_ui(y, 50);
+    flint_mpz_fac_ui(y, 50);
     mpz_neg(y, y);
     fmpz_set_mpz(x, y);
     check(x);
@@ -141,7 +169,8 @@ int main(void)
     fmpz_clear(x);
     mpz_clear(y);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
     return 0;
 }

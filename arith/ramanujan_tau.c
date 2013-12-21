@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_factor.h"
+#include "fmpz.h"
 #include "arith.h"
 
 void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
@@ -58,7 +58,7 @@ void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     slong k, r;
     ulong max_prime;
 
-    max_prime = 1UL;
+    max_prime = UWORD(1);
     for (k = 0; k < factors->num; k++)
     {
         /* TODO: handle overflow properly */

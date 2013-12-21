@@ -98,21 +98,21 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, slong len1,
     
     for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
-        if (poly1[j + 1] != 0L)
+        if (poly1[j + 1] != WORD(0))
         {
             _nmod_vec_scalar_mul_nmod(h[i], poly2, len2, poly1[j + 1], mod);
             h[i][0] = n_addmod(h[i][0], poly1[j], mod.n);
             hlen[i] = len2;
         }
-        else if (poly1[j] != 0L)
+        else if (poly1[j] != WORD(0))
         {
             h[i][0] = poly1[j];
             hlen[i] = 1;
         }
     }
-    if ((len1 & 1L))
+    if ((len1 & WORD(1)))
     {
-        if (poly1[j] != 0L)
+        if (poly1[j] != WORD(0))
         {
             h[i][0] = poly1[j];
             hlen[i] = 1;
@@ -147,7 +147,7 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, slong len1,
             _nmod_poly_add(h[i], h[i], hlen[i], h[2*i], hlen[2*i], mod);
             hlen[i] = FLINT_MAX(hlen[i], hlen[2*i]);
         }
-        if ((n & 1L))
+        if ((n & WORD(1)))
         {
             hlen[i] = FLINT_MIN(N, hlen[2*i]);
             flint_mpn_copyi(h[i], h[2*i], hlen[i]);

@@ -35,16 +35,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    printf("get/set_fmpq_poly... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("get/set_fmpq_poly... ");
+    fflush(stdout);    
 
     /* Qp -> Q -> Qp */
     for (i = 0; i < 10000; i++)
@@ -69,10 +68,10 @@ main(void)
         result = (padic_poly_equal(a, b) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_debug(a), printf("\n\n");
-            printf("b = "), padic_poly_debug(b), printf("\n\n");
-            printf("c = "), fmpq_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_debug(a), flint_printf("\n\n");
+            flint_printf("b = "), padic_poly_debug(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpq_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -84,8 +83,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

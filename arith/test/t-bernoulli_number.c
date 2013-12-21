@@ -43,7 +43,9 @@ int main()
     fmpz_t den2;
     slong n, N;
 
-    printf("bernoulli_number....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("bernoulli_number....");
     fflush(stdout);
 
     N = 4000;
@@ -61,17 +63,17 @@ int main()
 
         if (!fmpz_equal(num1 + n, num2))
         {
-            printf("FAIL: n = %ld, numerator\n", n);
-            printf("vec:    "); fmpz_print(num1 + n); printf("\n");
-            printf("single: "); fmpz_print(num2); printf("\n");
+            flint_printf("FAIL: n = %wd, numerator\n", n);
+            flint_printf("vec:    "); fmpz_print(num1 + n); flint_printf("\n");
+            flint_printf("single: "); fmpz_print(num2); flint_printf("\n");
             abort();
         }
 
         if (!fmpz_equal(den1 + n, den2))
         {
-            printf("FAIL: n = %ld, denominator\n", n);
-            printf("vec:    "); fmpz_print(den1 + n); printf("\n");
-            printf("single: "); fmpz_print(den2); printf("\n");
+            flint_printf("FAIL: n = %wd, denominator\n", n);
+            flint_printf("vec:    "); fmpz_print(den1 + n); flint_printf("\n");
+            flint_printf("single: "); fmpz_print(den2); flint_printf("\n");
             abort();
         }
     }
@@ -95,7 +97,7 @@ int main()
             arith_bernoulli_number(t, n);
             if (!fmpq_equal(x + n, t))
             {
-                printf("FAIL!: n = %ld\n", n);
+                flint_printf("FAIL!: n = %wd\n", n);
                 abort();
             }
         }
@@ -112,7 +114,7 @@ int main()
     fmpz_clear(num2);
     fmpz_clear(den2);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

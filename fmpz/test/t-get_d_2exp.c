@@ -36,15 +36,14 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     double output;
     slong exp;
 
-    printf("get_d_2exp....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("get_d_2exp....");
+    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -58,18 +57,18 @@ main(void)
         result = (fmpz_bits(a) == exp);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("output = %f\n", output);
-            printf("exp = %ld, bits = %lu\n", exp, fmpz_bits(a));
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("output = %f\n", output);
+            flint_printf("exp = %wd, bits = %wu\n", exp, fmpz_bits(a));
             abort();
         }
 
         fmpz_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

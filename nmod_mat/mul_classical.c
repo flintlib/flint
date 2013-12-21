@@ -109,9 +109,9 @@ _nmod_mat_addmul_packed(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
     Kpack = (K + pack - 1) / pack;
 
     if (pack_bits == FLINT_BITS)
-        mask = -1UL;
+        mask = UWORD(-1);
     else
-        mask = (1UL << pack_bits) - 1;
+        mask = (UWORD(1) << pack_bits) - 1;
 
     tmp = _nmod_vec_init(Kpack * N);
 

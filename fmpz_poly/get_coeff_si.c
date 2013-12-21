@@ -32,5 +32,5 @@
 slong
 fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)
 {
-    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : 0L;
+    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : WORD(0);
 }

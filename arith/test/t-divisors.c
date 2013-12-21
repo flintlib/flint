@@ -54,7 +54,9 @@ int main(void)
     fmpz_poly_t a, b;
     slong n;
 
-    printf("divisors....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("divisors....");
     fflush(stdout);
 
     fmpz_init(t);
@@ -68,8 +70,8 @@ int main(void)
         arith_divisors_naive(b, n);
         if (!fmpz_poly_equal(a, b))
         {
-            printf("FAIL:\n");
-            printf("wrong value for n=%ld\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("wrong value for n=%wd\n", n);
             abort();
         }
     }
@@ -78,7 +80,7 @@ int main(void)
     fmpz_poly_clear(a);
     fmpz_poly_clear(b);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

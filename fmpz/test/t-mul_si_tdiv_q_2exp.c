@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("mul_si_tdiv_q_2exp....");
+    flint_printf("mul_si_tdiv_q_2exp....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -63,7 +63,7 @@ main(void)
         exp = n_randint(state, 200);
 
         fmpz_mul_si_tdiv_q_2exp(b, a, x, exp);
-        mpz_mul_si(e, d, x);
+        flint_mpz_mul_si(e, d, x);
         mpz_tdiv_q_2exp(e, e, exp);
 
         fmpz_get_mpz(f, b);
@@ -71,8 +71,8 @@ main(void)
         result = (mpz_cmp(e, f) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %ld, exp = %lu\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %wd, exp = %wu\n",
                 d, e, f, x, exp);
             abort();
         }
@@ -106,7 +106,7 @@ main(void)
         exp = n_randint(state, 200);
 
         fmpz_mul_si_tdiv_q_2exp(a, a, x, exp);
-        mpz_mul_si(e, d, x);
+        flint_mpz_mul_si(e, d, x);
         mpz_tdiv_q_2exp(e, e, exp);
 
         fmpz_get_mpz(f, a);
@@ -114,8 +114,8 @@ main(void)
         result = (mpz_cmp(e, f) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %ld, exp = %lu\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %wd, exp = %wu\n",
                 d, e, f, x, exp);
             abort();
         }
@@ -127,8 +127,8 @@ main(void)
         mpz_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

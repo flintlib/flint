@@ -67,7 +67,7 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
         {
             if (nmod_mat_entry(LU, i, j) != 0)
             {
-                printf("FAIL: wrong shape!\n");
+                flint_printf("FAIL: wrong shape!\n");
                 abort();
             }
         }
@@ -78,7 +78,7 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
         for (j = 0; j < FLINT_MIN(i, n); j++)
             nmod_mat_entry(L, i, j) = nmod_mat_entry(LU, i, j);
         if (i < rank)
-            nmod_mat_entry(L, i, i) = 1UL;
+            nmod_mat_entry(L, i, i) = UWORD(1);
         for (j = i; j < n; j++)
             nmod_mat_entry(U, i, j) = nmod_mat_entry(LU, i, j);
     }
@@ -88,12 +88,12 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
 
     if (!nmod_mat_equal(A, B))
     {
-        printf("FAIL\n");
-        printf("A:\n");
+        flint_printf("FAIL\n");
+        flint_printf("A:\n");
         nmod_mat_print_pretty(A);
-        printf("LU:\n");
+        flint_printf("LU:\n");
         nmod_mat_print_pretty(LU);
-        printf("B:\n");
+        flint_printf("B:\n");
         nmod_mat_print_pretty(B);
         abort();
     }
@@ -110,10 +110,10 @@ main(void)
 {
     slong i;
 
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("lu_recursive....");
+    flint_printf("lu_recursive....");
     fflush(stdout);
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
@@ -145,11 +145,11 @@ main(void)
 
             if (r != rank)
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
-                printf("A:");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
+                flint_printf("A:");
                 nmod_mat_print_pretty(A);
-                printf("LU:");
+                flint_printf("LU:");
                 nmod_mat_print_pretty(LU);
                 abort();
             }
@@ -162,7 +162,8 @@ main(void)
         }
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

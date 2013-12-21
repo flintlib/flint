@@ -25,9 +25,10 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
 #include <stdlib.h>
+#undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
@@ -62,9 +63,9 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
         return n;  
     }
 
-    if (n >= ULONG_MAX_PRIME)
+    if (n >= UWORD_MAX_PRIME)
     {
-        printf("Exception (n_nextprime). No larger single-limb prime exists.\n");
+        flint_printf("Exception (n_nextprime). No larger single-limb prime exists.\n");
         abort();
     }
 

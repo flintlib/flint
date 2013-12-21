@@ -124,22 +124,22 @@ void get_memory_usage(meminfo_t meminfo)
 
         if (strncmp(line, "VmSize:", 7) == 0)
         {
-            sscanf(line, "VmSize: %lu kB\n", &result);
+            flint_sscanf(line, "VmSize: %wu kB\n", &result);
             meminfo->size = result;
         }
         else if (strncmp(line, "VmPeak:", 7) == 0)
         {
-            sscanf(line, "VmPeak: %lu kB\n", &result);
+            flint_sscanf(line, "VmPeak: %wu kB\n", &result);
             meminfo->peak = result;
         }
         else if (strncmp(line, "VmHWM:", 6) == 0)
         {
-            sscanf(line, "VmHWM: %lu kB\n", &result);
+            flint_sscanf(line, "VmHWM: %wu kB\n", &result);
             meminfo->hwm = result;
         }
         else if (strncmp(line, "VmRSS:", 6) == 0)
         {
-            sscanf(line, "VmRSS: %lu kB\n", &result);
+            flint_sscanf(line, "VmRSS: %wu kB\n", &result);
             meminfo->rss = result;
         }
     }

@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("cmp_si....");
+    flint_printf("cmp_si....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with fmpz_cmp */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -63,12 +63,12 @@ main(void)
         result = (lhs < 0) ? (rhs < 0) : ((lhs > 0) ? (rhs > 0) : (rhs == 0));
         if (result == 0)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("n = %ld\n", n);
-            printf("cmp(a, b) = %d\n", fmpz_cmp(a, b));
-            printf("cmp_si(a, n) = %d\n", fmpz_cmp_si(a, n));
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("n = %wd\n", n);
+            flint_printf("cmp(a, b) = %d\n", fmpz_cmp(a, b));
+            flint_printf("cmp_si(a, n) = %d\n", fmpz_cmp_si(a, n));
             abort();
         }
 
@@ -76,8 +76,8 @@ main(void)
         fmpz_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

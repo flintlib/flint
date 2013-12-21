@@ -48,7 +48,7 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         else                    /* result is large */
         {
             __mpz_struct *mpz_ptr = _fmpz_promote(f);   /* g is saved */
-            mpz_set_si(mpz_ptr, d);
+            flint_mpz_set_si(mpz_ptr, d);
             mpz_mul_2exp(mpz_ptr, mpz_ptr, exp);
         }
     }

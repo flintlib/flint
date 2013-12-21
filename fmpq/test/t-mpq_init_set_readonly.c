@@ -34,12 +34,12 @@
 int main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
-    printf("mpq_init_set_readonly....");
+    flint_printf("mpq_init_set_readonly....");
     fflush(stdout);
     
-    flint_randinit(state);
+    
 
     /* Create some small fmpq rationals, clear the mpq_t */
     for (i = 0; i < 100000; i++)
@@ -86,9 +86,9 @@ int main(void)
 
         if (!fmpq_equal(f, g))
         {
-            printf("FAIL:\n\n");
-            printf("f = "), fmpq_print(f), printf("\n");
-            printf("g = "), fmpq_print(g), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("f = "), fmpq_print(f), flint_printf("\n");
+            flint_printf("g = "), fmpq_print(g), flint_printf("\n");
             gmp_printf("z = %Qd\n", z);
         }
 
@@ -97,8 +97,8 @@ int main(void)
         flint_mpq_clear_readonly(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -32,17 +32,16 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
    const mp_limb_t * primes;
    const double * inverses;
 
-   printf("remove2_precomp....");
+   FLINT_TEST_INIT(state);
+
+   flint_printf("remove2_precomp....");
    fflush(stdout);
  
    primes = n_primes_arr_readonly(10000);
    inverses = n_prime_inverses_arr_readonly(10000);
-
-   flint_randinit(state);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
@@ -60,17 +59,17 @@ int main(void)
 
       for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
       {
-         mpz_set_ui(d_n1, n1);
-         mpz_set_ui(d_p, flint_primes_small[j]);
+         flint_mpz_set_ui(d_n1, n1);
+         flint_mpz_set_ui(d_p, flint_primes_small[j]);
          exp1 = n_remove2_precomp(&n1, primes[j], inverses[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
-         n2 = mpz_get_ui(d_n2);
+         n2 = flint_mpz_get_ui(d_n2);
 
          result = ((exp1 == exp2) && (n1 == n2));
          if (!result)
          {
-            printf("FAIL\n");
-            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
+            flint_printf("FAIL\n");
+            flint_printf("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
             abort();
          }
       }
@@ -100,17 +99,17 @@ int main(void)
 
       for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
       {
-         mpz_set_ui(d_n1, n1);
-         mpz_set_ui(d_p, flint_primes_small[j]);
+         flint_mpz_set_ui(d_n1, n1);
+         flint_mpz_set_ui(d_p, flint_primes_small[j]);
          exp1 = n_remove2_precomp(&n1, primes[j], inverses[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
-         n2 = mpz_get_ui(d_n2);
+         n2 = flint_mpz_get_ui(d_n2);
 
          result = ((exp1 == exp2) && (n1 == n2));
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wu, exp1 = %d, exp2 = %d, n1 = %wu, n2 = %wu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
             abort();
          }
       }
@@ -120,8 +119,8 @@ int main(void)
       mpz_clear(d_p);
    }
    
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

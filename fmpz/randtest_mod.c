@@ -39,10 +39,10 @@ fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
     fmpz_randtest_unsigned(t, state, fmpz_bits(m) + 2);
     fmpz_mod(t, t, m);
 
-    if (n_randlimb(state) & 1UL)
+    if (n_randlimb(state) & UWORD(1))
     {
         fmpz_sub(t, m, t);
-        fmpz_sub_ui(t, t, 1UL);
+        fmpz_sub_ui(t, t, UWORD(1));
     }
 
     fmpz_set(f, t);
@@ -55,15 +55,15 @@ fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
     /* Randomly generate m/2 when included in the range */
     if ((n_randlimb(state) % 32 == 1) && (fmpz_fdiv_ui(m, 2) == 0))
     {
-        fmpz_fdiv_q_ui(f, m, 2UL);
+        fmpz_fdiv_q_ui(f, m, UWORD(2));
     }
     else
     {
         fmpz_t t;
         fmpz_init(t);
-        fmpz_tdiv_q_ui(t, m, 2UL);
+        fmpz_tdiv_q_ui(t, m, UWORD(2));
         fmpz_randtest_mod(t, state, t);
-        if (n_randlimb(state) & 1UL)
+        if (n_randlimb(state) & UWORD(1))
         {
             fmpz_neg(t, t);
         }

@@ -45,11 +45,11 @@ _nmod_mat_det(nmod_mat_t A)
     P = flint_malloc(sizeof(slong) * m);
     rank = nmod_mat_lu(P, A, 1);
 
-    det = 0UL;
+    det = UWORD(0);
 
     if (rank == m)
     {
-        det = 1UL;
+        det = UWORD(1);
         for (i = 0; i < m; i++)
             det = n_mulmod2_preinv(det, nmod_mat_entry(A, i, i),
                 A->mod.n, A->mod.ninv);
@@ -71,11 +71,11 @@ nmod_mat_det(const nmod_mat_t A)
 
     if (dim != A->c)
     {
-        printf("Exception (nmod_mat_det). Non-square matrix.\n");
+        flint_printf("Exception (nmod_mat_det). Non-square matrix.\n");
         abort();
     }
 
-    if (dim == 0) return 1UL;
+    if (dim == 0) return UWORD(1);
     if (dim == 1) return nmod_mat_entry(A, 0, 0);
 
     nmod_mat_init_set(tmp, A);

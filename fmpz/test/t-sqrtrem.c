@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("sqrtrem....");
+    flint_printf("sqrtrem....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Comparison with mpz routines */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -69,7 +69,7 @@ main(void)
         result = (mpz_cmp(mf2, mf) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("mf = %Zd, mf2 = %Zd, mr = %Zd, mg = %Zd\n", mf, mf2,
                        mr, mg);
             abort();
@@ -110,7 +110,7 @@ main(void)
         result = (mpz_cmp(mf, mf2) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("ma = %Zd, mf = %Zd, mf2 = %Zd\n", ma, mf, mf2);
             abort();
         }
@@ -148,7 +148,7 @@ main(void)
         result = (mpz_cmp(mf, mf2) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("mr = %Zd, mf = %Zd, mf2 = %Zd\n", mr, mf, mf2);
             abort();
         }
@@ -161,8 +161,8 @@ main(void)
         mpz_clear(mf2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

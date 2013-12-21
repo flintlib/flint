@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("dot_ptr....");
+    flint_printf("dot_ptr....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -73,10 +73,10 @@ main(void)
 
         if (res != res2)
         {
-            printf("FAIL:\n");
-            printf("m = %lu\n", m);
-            printf("len = %ld\n", len);
-            printf("limbs1 = %d\n", limbs1);
+            flint_printf("FAIL:\n");
+            flint_printf("m = %wu\n", m);
+            flint_printf("len = %wd\n", len);
+            flint_printf("limbs1 = %d\n", limbs1);
             abort();
         }
 
@@ -85,8 +85,8 @@ main(void)
         flint_free(z);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

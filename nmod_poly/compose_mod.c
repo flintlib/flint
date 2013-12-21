@@ -53,7 +53,7 @@ nmod_poly_compose_mod(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        printf("Exception (nmod_poly_compose_mod). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_compose_mod). Division by zero.\n");
         abort();
     }
 

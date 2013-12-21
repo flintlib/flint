@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
@@ -43,9 +44,30 @@ static char * docsin[] = {
     "../../nmod_vec/doc/nmod_vec.txt",
     "../../nmod_mat/doc/nmod_mat.txt",
     "../../nmod_poly/doc/nmod_poly.txt",
+    "../../nmod_poly_factor/doc/nmod_poly_factor.txt",
     "../../nmod_poly_mat/doc/nmod_poly_mat.txt",
+    "../../nmod_poly_factor/doc/nmod_poly_factor.txt",
     "../../fmpz_mod_poly/doc/fmpz_mod_poly.txt",
+    "../../fmpz_mod_poly_factor/doc/fmpz_mod_poly_factor.txt",
+    "../../fq/doc/fq.txt",
+    "../../fq_vec/doc/fq_vec.txt",
+    "../../fq_mat/doc/fq_mat.txt",
+    "../../fq_poly/doc/fq_poly.txt",
+    "../../fq_poly_factor/doc/fq_poly_factor.txt",
+    "../../fq_nmod/doc/fq_nmod.txt",
+    "../../fq_nmod_vec/doc/fq_nmod_vec.txt",
+    "../../fq_nmod_mat/doc/fq_nmod_mat.txt",
+    "../../fq_nmod_poly/doc/fq_nmod_poly.txt",
+    "../../fq_nmod_poly_factor/doc/fq_nmod_poly_factor.txt",
+    "../../fq_zech/doc/fq_zech.txt",
+    "../../fq_zech_vec/doc/fq_zech_vec.txt",
+    "../../fq_zech_mat/doc/fq_zech_mat.txt",
+    "../../fq_zech_poly/doc/fq_zech_poly.txt",
+    "../../fq_zech_poly_factor/doc/fq_zech_poly_factor.txt",
     "../../padic/doc/padic.txt", 
+    "../../padic_mat/doc/padic_mat.txt", 
+    "../../padic_poly/doc/padic_poly.txt", 
+    "../../qadic/doc/qadic.txt", 
     "../../arith/doc/arith.txt", 
     "../../ulong_extras/doc/ulong_extras.txt",
     "../../long_extras/doc/long_extras.txt",
@@ -56,6 +78,8 @@ static char * docsin[] = {
     "../../fft/doc/fft.txt",
     "../../qsieve/doc/qsieve.txt",
     "../../perm/doc/perm.txt",
+    "../../flintxx/doc/flintxx.txt",
+    "../../flintxx/doc/genericxx.txt",
 };
 
 static char * docsout[] = {
@@ -73,9 +97,30 @@ static char * docsout[] = {
     "input/nmod_vec.tex",
     "input/nmod_mat.tex",
     "input/nmod_poly.tex",
+    "input/nmod_poly_factor.tex",
     "input/nmod_poly_mat.tex",
+    "input/nmod_poly_factor.tex",
     "input/fmpz_mod_poly.tex",
+    "input/fmpz_mod_poly_factor.tex",
+    "input/fq.tex",
+    "input/fq_vec.tex",
+    "input/fq_mat.tex",
+    "input/fq_poly.tex",
+    "input/fq_poly_factor.tex",
+    "input/fq_nmod.tex",
+    "input/fq_nmod_vec.tex",
+    "input/fq_nmod_mat.tex",
+    "input/fq_nmod_poly.tex",
+    "input/fq_nmod_poly_factor.tex",
+    "input/fq_zech.tex",
+    "input/fq_zech_vec.tex",
+    "input/fq_zech_mat.tex",
+    "input/fq_zech_poly.tex",
+    "input/fq_zech_poly_factor.tex",
     "input/padic.tex", 
+    "input/padic_mat.tex", 
+    "input/padic_poly.tex", 
+    "input/qadic.tex", 
     "input/arith.tex", 
     "input/ulong_extras.tex",
     "input/long_extras.tex",
@@ -86,6 +131,8 @@ static char * docsout[] = {
     "input/fft.tex",
     "input/qsieve.tex",
     "input/perm.tex",
+    "input/flintxx.tex",
+    "input/genericxx.tex",
 };
 
 
@@ -114,7 +161,7 @@ printfuncheader(const char* text, int len)
         else
         {
             int hasspace = text[i - 1] == ' ';
-            while(i < len-1 && text[++i] == ' ');
+            while(i < len-1 && text[++i] == ' ' || text[i] == '\t');
             if(!hasspace)
                 fprintf(out, " ");
         }

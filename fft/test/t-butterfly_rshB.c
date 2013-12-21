@@ -39,9 +39,9 @@ or implied, of William Hart.
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 {
-   mpz_set_ui(p, 1);
+   flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
-   mpz_add_ui(p, p, 1);
+   flint_mpz_add_ui(p, p, 1);
 }
 
 void ref_butterfly_rshB(mpz_t t, mpz_t u, mpz_t i1, mpz_t i2, 
@@ -52,10 +52,10 @@ void ref_butterfly_rshB(mpz_t t, mpz_t u, mpz_t i1, mpz_t i2,
    mpz_init(mult1);
    mpz_init(mult2);
 
-   mpz_set_ui(mult1, 1);
+   flint_mpz_set_ui(mult1, 1);
    mpz_mul_2exp(mult1, mult1, x*FLINT_BITS);
    mpz_invert(mult1, mult1, p);
-   mpz_set_ui(mult2, 1);
+   flint_mpz_set_ui(mult2, 1);
    mpz_mul_2exp(mult2, mult2, y*FLINT_BITS);
    mpz_invert(mult2, mult2, p);
    mpz_mul(mult1, mult1, i1);
@@ -76,12 +76,12 @@ main(void)
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
     mp_limb_t * nn1, * nn2, * r1, * r2;
    
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("butterfly_rshB....");
+    flint_printf("butterfly_rshB....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -130,20 +130,20 @@ main(void)
 
                     if (mpz_cmp(ma, m2a) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("butterfly_rshB error a\n");
-                        printf("x = %ld, y = %ld, limbs = %ld\n", x, y, limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("butterfly_rshB error a\n");
+                        flint_printf("x = %wd, y = %wd, limbs = %wd\n", x, y, limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", ma);
                         gmp_printf("got  %Zx\n", m2a);
                         abort();
                     }
                     if (mpz_cmp(mb, m2b) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("butterfly_rshB error b\n");
-                        printf("x = %ld, y = %ld, limbs = %ld\n", x, y, limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("butterfly_rshB error b\n");
+                        flint_printf("x = %wd, y = %wd, limbs = %wd\n", x, y, limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", mb);
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
@@ -166,8 +166,8 @@ main(void)
     mpz_clear(mn1);
     mpz_clear(mn2);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

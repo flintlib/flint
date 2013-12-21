@@ -34,7 +34,7 @@
 void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e, 
                         const fmpz_t p)
 {
-    ulong bit = ~((~0UL) >> 1);
+    ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
     slong alloc = (slong) e * (len - 1) + 1;
     fmpz *v = _fmpz_vec_init(alloc);
@@ -44,7 +44,7 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
     
-    while ((bit & e) == 0UL)
+    while ((bit & e) == UWORD(0))
         bit >>= 1;
     
     bit >>= 1;
@@ -60,7 +60,7 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
         if ((bit2 & e))
             swaps = ~swaps;
         while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
+            if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
         
         if (swaps == 0U)
@@ -117,9 +117,9 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
     const slong len = op->length;
     slong rlen;
 
-    if ((len < 2) || (e < 3UL))
+    if ((len < 2) || (e < UWORD(3)))
     {
-        if (e == 0UL)
+        if (e == UWORD(0))
             fmpz_mod_poly_set_ui(rop, 1);
         else if (len == 0)
             fmpz_mod_poly_zero(rop);
@@ -130,9 +130,9 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
             _fmpz_mod_poly_set_length(rop, 1);
             _fmpz_mod_poly_normalise(rop);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
             fmpz_mod_poly_set(rop, op);
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             fmpz_mod_poly_sqr(rop, op);
         return;
     }

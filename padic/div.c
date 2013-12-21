@@ -30,7 +30,7 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 {
     if (padic_is_zero(op2))
     {
-        printf("Exception (padic_div).  op2 is zero.\n");
+        flint_printf("Exception (padic_div).  op2 is zero.\n");
         abort();
     }
 

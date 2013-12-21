@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("bit_pack/bit_unpack....");
+    flint_printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 50000 * flint_test_multiplier(); i++)
     {
@@ -64,9 +64,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n");
-            fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n");
+            fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -97,9 +97,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_print(a), printf("\n");
-            fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_print(a), flint_printf("\n");
+            fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -108,8 +108,8 @@ main(void)
         fmpz_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

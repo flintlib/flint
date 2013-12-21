@@ -32,12 +32,12 @@
 int main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("sqrtmod....");
+    flint_printf("sqrtmod....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random integers */
     {
@@ -52,10 +52,10 @@ int main(void)
         result = (b == 0 || n_mulmod2_preinv(b, b, p, pinv) == a);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = %lu\n", p);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
+            flint_printf("FAIL:\n");
+            flint_printf("p = %wu\n", p);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
             abort();
         }
     }
@@ -78,16 +78,16 @@ int main(void)
         result = (n_mulmod2_preinv(b, b, p, pinv) == a);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = %lu\n", p);
-            printf("a = %lu\n", a);
-            printf("b = %lu\n", b);
+            flint_printf("FAIL:\n");
+            flint_printf("p = %wu\n", p);
+            flint_printf("a = %wu\n", a);
+            flint_printf("b = %wu\n", b);
             abort();
         }
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

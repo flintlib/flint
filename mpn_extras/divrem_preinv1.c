@@ -29,6 +29,8 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
 mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
                                  mp_srcptr b, mp_size_t n, mp_limb_t dinv)
 {
@@ -53,3 +55,5 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
 
    return ret;
 }
+
+#pragma GCC diagnostic warning "-Wunused-variable"

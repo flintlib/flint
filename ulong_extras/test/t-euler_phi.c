@@ -32,7 +32,9 @@ int main(void)
 {
     int n, k, t;
 
-    printf("euler_phi....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("euler_phi....");
     fflush(stdout);
 
     for (n = 0; n < 20 * flint_test_multiplier(); n++)
@@ -42,12 +44,13 @@ int main(void)
             t += (n_gcd(n, k) == 1);
         if (t != n_euler_phi(n))
         {
-            printf("FAIL:\n");
-            printf("phi(%d) = %d, got %lu\n", n, t, n_euler_phi(n)); 
+            flint_printf("FAIL:\n");
+            flint_printf("phi(%d) = %d, got %wu\n", n, t, n_euler_phi(n)); 
             abort();
         }
     }
 
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

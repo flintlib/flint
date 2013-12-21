@@ -27,15 +27,18 @@
 #ifndef FMPQ_H
 #define FMPQ_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
 #include <mpfr.h>
+#define ulong mp_limb_t
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+
 
 #ifdef __cplusplus
  extern "C" {
@@ -56,8 +59,8 @@ typedef fmpq fmpq_t[1];
 
 static __inline__ void fmpq_init(fmpq_t x)
 {
-    x->num = 0L;
-    x->den = 1L;
+    x->num = WORD(0);
+    x->den = WORD(1);
 }
 
 static __inline__ void fmpq_clear(fmpq_t x)

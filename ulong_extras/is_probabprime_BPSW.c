@@ -31,12 +31,12 @@
 int
 n_is_probabprime_BPSW(mp_limb_t n)
 {
-    if (n <= 1UL)
+    if (n <= UWORD(1))
         return 0;
 
-    if ((n & 1UL) == 0UL)
+    if ((n & UWORD(1)) == UWORD(0))
     {
-        if (n == 2UL)
+        if (n == UWORD(2))
             return 1;
         return 0;
     }
@@ -52,20 +52,20 @@ n_is_probabprime_BPSW(mp_limb_t n)
     {
         mp_limb_t d;
 
-        d = n - 1UL;
-        while ((d & 1UL) == 0UL)
+        d = n - UWORD(1);
+        while ((d & UWORD(1)) == UWORD(0))
             d >>= 1;
 
         if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
         {
             double npre = n_precompute_inverse(n);
-            if (n_is_strong_probabprime_precomp(n, npre, 2L, d) == 0)
+            if (n_is_strong_probabprime_precomp(n, npre, WORD(2), d) == 0)
                 return 0;
         }
         else
         {
             mp_limb_t ninv = n_preinvert_limb(n);
-            if (n_is_strong_probabprime2_preinv(n, ninv, 2L, d) == 0)
+            if (n_is_strong_probabprime2_preinv(n, ninv, WORD(2), d) == 0)
                 return 0;
         }
 

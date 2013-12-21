@@ -36,7 +36,9 @@ main(void)
     slong i;
     fmpq_t r, ans;
 
-    printf("next_minimal....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("next_minimal....");
     fflush(stdout);
 
     fmpq_init(r);
@@ -49,11 +51,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: enum from 0\n");
+        flint_printf("FAIL: enum from 0\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -64,11 +66,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: signed enum from 0\n");
+        flint_printf("FAIL: signed enum from 0\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -82,11 +84,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: enum from 2^65\n");
+        flint_printf("FAIL: enum from 2^65\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -99,11 +101,11 @@ main(void)
 
     if (!fmpq_equal(r, ans))
     {
-        printf("FAIL: signed enum from 2^65\n");
+        flint_printf("FAIL: signed enum from 2^65\n");
         fmpq_print(r);
-        printf("\n");
+        flint_printf("\n");
         fmpq_print(ans);
-        printf("\n");
+        flint_printf("\n");
         abort();
     }
 
@@ -111,7 +113,7 @@ main(void)
     fmpq_clear(r);
     fmpq_clear(ans);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

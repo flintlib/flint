@@ -45,7 +45,7 @@ fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
-        printf("Exception (fmpz_poly_revert_series). Input must have \n"
+        flint_printf("Exception (fmpz_poly_revert_series). Input must have \n"
                "zero constant term and +1 or -1 as coefficient of x^1\n.");
         abort();
     }

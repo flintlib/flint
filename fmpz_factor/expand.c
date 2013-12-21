@@ -26,7 +26,6 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_factor.h"
 
 void
 fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor)

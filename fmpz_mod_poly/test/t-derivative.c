@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("derivative....");
+    flint_printf("derivative....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -65,10 +65,10 @@ main(void)
         result = (fmpz_mod_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL (alias):\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(c), printf("\n\n");
+            flint_printf("FAIL (alias):\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
+            fmpz_mod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -97,9 +97,9 @@ main(void)
         result = (b->length == 0);
         if (!result)
         {
-            printf("FAIL (da == 0):\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL (da == 0):\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -138,11 +138,11 @@ main(void)
         result = fmpz_mod_poly_equal(lhs, rhs);
         if (!result)
         {
-            printf("FAIL (Leibniz):\n");
-            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
-            printf("(ab)' = "), fmpz_mod_poly_print(lhs), printf("\n\n");
-            printf("a'b + ab' = "), fmpz_mod_poly_print(rhs), printf("\n\n");
+            flint_printf("FAIL (Leibniz):\n");
+            flint_printf("a = "), fmpz_mod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpz_mod_poly_print(b), flint_printf("\n\n");
+            flint_printf("(ab)' = "), fmpz_mod_poly_print(lhs), flint_printf("\n\n");
+            flint_printf("a'b + ab' = "), fmpz_mod_poly_print(rhs), flint_printf("\n\n");
             abort();
         }
 
@@ -155,9 +155,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

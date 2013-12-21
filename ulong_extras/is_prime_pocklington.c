@@ -25,8 +25,9 @@
 ******************************************************************************/
 
 #include <gmp.h>
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
+#undef ulong
 #define ulong mp_limb_t
 #include "flint.h"
 #include "ulong_extras.h"
@@ -40,7 +41,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
     if (n % 2 == 0)
     {
-        return (n == 2UL);
+        return (n == UWORD(2));
     }
 
     n1 = n - 1;
@@ -76,11 +77,11 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
         for (j = 2; j < iterations && pass == 0; j++)
         {
             b = n_powmod2_preinv(j, exp, n, ninv);
-            if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != 1UL)
+            if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1))
                 return 0;
 
-            b = n_submod(b, 1UL, n);
-            if (b != 0UL)
+            b = n_submod(b, UWORD(1), n);
+            if (b != UWORD(0))
             {
                 c = n_mulmod2_preinv(c, b, n, ninv);
                 pass = 1;
@@ -94,5 +95,5 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
             return -1;
     }
 
-    return (n_gcd(n, c) == 1UL);
+    return (n_gcd(n, c) == UWORD(1));
 }

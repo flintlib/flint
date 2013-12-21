@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("init/init2/realloc/clear... ");
+    flint_printf("init/init2/realloc/clear... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000; i++)
     {
@@ -90,9 +90,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

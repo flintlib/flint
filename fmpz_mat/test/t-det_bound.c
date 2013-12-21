@@ -37,15 +37,14 @@ int
 main(void)
 {
     fmpz_mat_t A;
-    flint_rand_t state;
     slong i, m;
 
     fmpz_t det, bound;
 
-    printf("det_bound....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("det_bound....");
+    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -63,11 +62,11 @@ main(void)
 
         if (fmpz_cmp(det, bound) > 0)
         {
-            printf("FAIL:\n");
-            printf("bound too small!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("det: "), fmpz_print(det), printf("\n");
-            printf("bound: "), fmpz_print(bound), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("bound too small!\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("det: "), fmpz_print(det), flint_printf("\n");
+            flint_printf("bound: "), fmpz_print(bound), flint_printf("\n");
             abort();
         }
 
@@ -76,8 +75,8 @@ main(void)
         fmpz_mat_clear(A);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

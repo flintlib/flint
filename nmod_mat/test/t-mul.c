@@ -43,7 +43,7 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     {
         for (j = 0; j < B->c; j++)
         {
-            s0 = s1 = s2 = 0UL;
+            s0 = s1 = s2 = UWORD(0);
 
             for (k = 0; k < A->c; k++)
             {
@@ -62,10 +62,10 @@ int
 main(void)
 {
     slong i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("mul....");
+    flint_printf("mul....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -87,11 +87,11 @@ main(void)
                 mod = n_randtest_not_zero(state);
                 break;
             case 1:
-                mod = ULONG_MAX/2 + 1 - n_randbits(state, 4);
+                mod = UWORD_MAX/2 + 1 - n_randbits(state, 4);
                 break;
             case 2:
             default:
-                mod = ULONG_MAX - n_randbits(state, 4);
+                mod = UWORD_MAX - n_randbits(state, 4);
                 break;
         }
 
@@ -117,7 +117,7 @@ main(void)
 
         if (!nmod_mat_equal(C, D))
         {
-            printf("FAIL: results not equal\n");
+            flint_printf("FAIL: results not equal\n");
             nmod_mat_print_pretty(A);
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
@@ -131,8 +131,8 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

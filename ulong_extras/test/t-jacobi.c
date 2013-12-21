@@ -32,10 +32,10 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("jacobi....");
+   flint_printf("jacobi....");
    fflush(stdout);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
@@ -49,19 +49,19 @@ int main(void)
       mpz_init(d_m);
       
       a = n_randtest(state);
-      d = n_randtest_not_zero(state) | 1L;
+      d = n_randtest_not_zero(state) | WORD(1);
       
       r1 = n_jacobi(a, d);
 
-      mpz_set_si(a_m, a);
-      mpz_set_ui(d_m, d);
+      flint_mpz_set_si(a_m, a);
+      flint_mpz_set_ui(d_m, d);
       r2 = mpz_jacobi(a_m, d_m);
       
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, d = %lu\n", a, d); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, d = %wu\n", a, d); 
          abort();
       }
 
@@ -69,8 +69,8 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

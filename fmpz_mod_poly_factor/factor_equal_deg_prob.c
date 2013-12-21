@@ -35,15 +35,15 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
                                     flint_rand_t state,
                                     const fmpz_mod_poly_t pol, slong d)
 {
-    fmpz_mod_poly_t a, b, c;
+    fmpz_mod_poly_t a, b, c, polinv;
     fmpz_t exp, t, p;
     int res = 1;
     slong i;
 
     if (pol->length <= 1)
     {
-        printf("Exception (fmpz_mod_poly_factor_equal_deg_prob): \n");
-        printf("Input polynomial is linear.\n");
+        flint_printf("Exception (fmpz_mod_poly_factor_equal_deg_prob): \n");
+        flint_printf("Input polynomial is linear.\n");
         abort();
     }
 
@@ -65,6 +65,10 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
     }
 
     fmpz_mod_poly_init(b, p);
+    fmpz_mod_poly_init(polinv, p);
+
+    fmpz_mod_poly_reverse(polinv, pol, pol->length);
+    fmpz_mod_poly_inv_series_newton(polinv, polinv, polinv->length);
 
     fmpz_init(exp);
     if (fmpz_cmp_ui(p, 2) > 0)
@@ -74,7 +78,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
         fmpz_sub_ui(exp, exp, 1);
         fmpz_fdiv_q_2exp(exp, exp, 1);
 
-        fmpz_mod_poly_powmod_fmpz_binexp(b, a, exp, pol);
+        fmpz_mod_poly_powmod_fmpz_binexp_preinv(b, a, exp, pol, polinv);
     }
     else
     {
@@ -85,7 +89,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
         for (i = 1; i < d; i++)
         {
             /* c = a^{2^i} = (a^{2^{i-1}})^2 */
-            fmpz_mod_poly_powmod_ui_binexp(c, c, 2, pol);
+            fmpz_mod_poly_powmod_ui_binexp_preinv(c, c, 2, pol, polinv);
             fmpz_mod_poly_add(b, b, c);
         }
         fmpz_mod_poly_rem(b, b, pol);
@@ -106,6 +110,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
 
     fmpz_mod_poly_clear(a);
     fmpz_mod_poly_clear(b);
+    fmpz_mod_poly_clear(polinv);
     fmpz_clear(p);
 
     return res;

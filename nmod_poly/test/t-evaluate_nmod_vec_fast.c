@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
     
-    printf("evaluate_nmod_vec_fast....");
+    
+    flint_printf("evaluate_nmod_vec_fast....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -70,9 +70,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("mod=%lu, n=%ld, npoints=%ld\n\n", mod, n, npoints);
-            printf("P: "); nmod_poly_print(P); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("mod=%wu, n=%wd, npoints=%wd\n\n", mod, n, npoints);
+            flint_printf("P: "); nmod_poly_print(P); flint_printf("\n\n");
             abort();
         }
 
@@ -83,8 +83,8 @@ main(void)
         _nmod_vec_clear(z);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

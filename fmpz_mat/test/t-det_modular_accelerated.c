@@ -37,15 +37,14 @@ int
 main(void)
 {
     fmpz_mat_t A;
-    flint_rand_t state;
     slong i, m;
 
     fmpz_t det1, det2;
 
-    printf("det_modular_accelerated....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("det_modular_accelerated....");
+    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -64,11 +63,11 @@ main(void)
 
         if (!fmpz_equal(det1, det2))
         {
-            printf("FAIL:\n");
-            printf("different determinants!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("det1: "), fmpz_print(det1), printf("\n");
-            printf("det2: "), fmpz_print(det2), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("different determinants!\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("det1: "), fmpz_print(det1), flint_printf("\n");
+            flint_printf("det2: "), fmpz_print(det2), flint_printf("\n");
             abort();
         }
 
@@ -91,9 +90,9 @@ main(void)
         fmpz_mat_det_modular_accelerated(det2, A, proved);
         if (!fmpz_is_zero(det2))
         {
-            printf("FAIL:\n");
-            printf("expected zero determinant!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("expected zero determinant!\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
             abort();
         }
 
@@ -101,8 +100,8 @@ main(void)
         fmpz_clear(det2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

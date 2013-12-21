@@ -33,8 +33,8 @@ void check(mp_limb_t n, int s1, int s2)
 {
     if (s1 != s2)
     {
-        printf("FAIL:\n");
-        printf("%lu: got %d instead of %d\n", n, s1, s2); 
+        flint_printf("FAIL:\n");
+        flint_printf("%wu: got %d instead of %d\n", n, s1, s2); 
         abort();
     }
 }
@@ -43,7 +43,9 @@ int main(void)
 {
     int s, k;
 
-    printf("is_squarefree....");
+    FLINT_TEST_INIT(state);
+    
+    flint_printf("is_squarefree....");
     fflush(stdout);
 
     check(0, n_is_squarefree(0), 0);
@@ -73,11 +75,12 @@ int main(void)
 
     if (s != 6083)
     {
-        printf("FAIL:\n");
-        printf("expected %d squarefree numbers <= 10000 (got %d)\n", 6083, s);
+        flint_printf("FAIL:\n");
+        flint_printf("expected %d squarefree numbers <= 10000 (got %d)\n", 6083, s);
         abort();
     }
 
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

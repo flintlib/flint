@@ -40,19 +40,19 @@ main(void)
 {
     mp_bitcnt_t depth, w;
     
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("mul_mfa_truncate_sqrt2....");
+    flint_printf("mul_mfa_truncate_sqrt2....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 13; depth++)
     {
         for (w = 1; w <= 3 - (depth >= 12); w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;
@@ -75,7 +75,7 @@ main(void)
             {
                 if (r1[j] != r2[j]) 
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                     abort();
                 }
             }
@@ -89,7 +89,7 @@ main(void)
     {
         for (w = 1; w <= 3 - (depth >= 12); w++)
         {
-            mp_size_t n = (1UL<<depth);
+            mp_size_t n = (UWORD(1)<<depth);
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;
@@ -110,7 +110,7 @@ main(void)
             {
                 if (r1[j] != r2[j]) 
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                     abort();
                 }
             }
@@ -119,8 +119,8 @@ main(void)
         }
     }
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

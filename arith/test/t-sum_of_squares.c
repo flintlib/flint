@@ -51,7 +51,9 @@ int main(void)
     fmpz_t t;
     slong i, j;
 
-    printf("sum_of_squares....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("sum_of_squares....");
     fflush(stdout);
 
     r = _fmpz_vec_init(N);
@@ -68,9 +70,9 @@ int main(void)
 
             if (!fmpz_equal(t, r + j) || !fmpz_equal(t, known[i] + j))
             {
-                printf("FAIL:\n");
-                printf("i, j = %ld, %ld, r[j] = %ld, r(j) = %ld, "
-                    "expected: %ld\n",
+                flint_printf("FAIL:\n");
+                flint_printf("i, j = %wd, %wd, r[j] = %wd, r(j) = %wd, "
+                    "expected: %wd\n",
                     i, j, fmpz_get_si(r + j), fmpz_get_si(t), known[i][j]);
                 abort();
             }
@@ -80,7 +82,7 @@ int main(void)
     _fmpz_vec_clear(r, N);
     fmpz_clear(t);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("mullow....");
+    flint_printf("mullow....");
     fflush(stdout);
 
     /* Compare with truncated product of a and b */
@@ -62,9 +62,9 @@ main(void)
         result = (nmod_poly_equal(a, b));
         if (!result)
         {
-            printf(":\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf(":\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -73,8 +73,8 @@ main(void)
         nmod_poly_clear(c);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

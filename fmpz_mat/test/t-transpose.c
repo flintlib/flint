@@ -35,12 +35,12 @@ int
 main(void)
 {
     slong m, n, rep;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("transpose....");
+    flint_printf("transpose....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Rectangular transpose */
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
@@ -62,7 +62,7 @@ main(void)
 
         if (!fmpz_mat_equal(C, A))
         {
-            printf("FAIL: C != A\n");
+            flint_printf("FAIL: C != A\n");
             abort();
         }
 
@@ -88,7 +88,7 @@ main(void)
 
         if (!fmpz_mat_equal(B, A))
         {
-            printf("FAIL: B != A\n");
+            flint_printf("FAIL: B != A\n");
             abort();
         }
 
@@ -96,8 +96,8 @@ main(void)
         fmpz_mat_clear(B);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

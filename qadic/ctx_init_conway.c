@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
  
 ******************************************************************************/
 
@@ -30,6 +31,12 @@
 #include "padic.h"
 #include "qadic.h"
 
+#define FLINT_SRC_CPIMPORT "../qadic/CPimport.txt"
+
+#ifndef FLINT_CPIMPORT
+#define FLINT_CPIMPORT FLINT_SRC_CPIMPORT
+#endif
+
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode)
@@ -39,8 +46,8 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
-        printf("Exception (qadic_ctx_init_conway).  Conway polynomials \n");
-        printf("are only available for primes up to 109987.\n");
+        flint_printf("Exception (qadic_ctx_init_conway).  Conway polynomials \n");
+        flint_printf("are only available for primes up to 109987.\n");
         abort();
     }
 
@@ -48,16 +55,17 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     file = fopen(FLINT_CPIMPORT, "r");
 
     if (!file)
-    {
-        /* Additional path in case we are in a devel tree
-           and installation was not performed yet. */
-        file = fopen("../qadic/CPimport.txt", "r");
-    }
+       file = fopen(FLINT_SRC_CPIMPORT, "r");
 
     if (!file)
     {
-        printf("Exception (qadic_ctx_init_conway).  File loading.\n");
-        abort();
+        file = fopen("CPimport.txt", "r");
+
+        if (!file)
+        {
+            flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
+            abort();
+        }
     }
 
     while (fgets(buf, 832, file))
@@ -129,8 +137,8 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     fclose(file);
     flint_free(buf);
 
-    printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
-    printf("(p,d) = (%ld,%ld) is not present in the database.\n", *p, d);
+    flint_printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
+    flint_printf("(p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
     abort();
 }
 

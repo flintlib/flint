@@ -36,10 +36,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("init/clear....");
+    flint_printf("init/clear....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -60,7 +60,8 @@ main(void)
         nmod_poly_mat_clear(a);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

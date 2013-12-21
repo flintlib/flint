@@ -44,12 +44,12 @@ _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* tanh(x) = (exp(2x)-1)/(exp(2x)+1) */
-    _fmpq_poly_scalar_mul_ui(t, tden, h, hden, n, 2UL);
+    _fmpq_poly_scalar_mul_ui(t, tden, h, hden, n, UWORD(2));
     _fmpq_poly_exp_series(u, uden, t, tden, n);
     _fmpz_vec_set(t, u, n);
     fmpz_set(tden, uden);
     fmpz_zero(t);               /* t[0] = 0 */
-    fmpz_mul_ui(u, uden, 2UL);  /* u[0] = 2 */
+    fmpz_mul_ui(u, uden, UWORD(2));  /* u[0] = 2 */
     _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
     _fmpq_poly_canonicalise(g, gden, n);
 
@@ -67,7 +67,7 @@ fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 
     if (flen && !fmpz_is_zero(f->coeffs))
     {
-        printf("Exception (fmpq_poly_tanh_series). Constant term != 0.\n");
+        flint_printf("Exception (fmpq_poly_tanh_series). Constant term != 0.\n");
         abort();
     }
 

@@ -36,14 +36,13 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
     int result;
 
-    printf("det_divisor....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("det_divisor....");
+    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -86,10 +85,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("det: ");  fmpz_print(det);    printf("\n");
-            printf("d: "); fmpz_print(d); printf("\n");
+            flint_printf("FAIL:\n");
+            fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("det: ");  fmpz_print(det);    flint_printf("\n");
+            flint_printf("d: "); fmpz_print(d); flint_printf("\n");
             abort();
         }
 
@@ -100,8 +99,8 @@ main(void)
         fmpz_clear(r);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

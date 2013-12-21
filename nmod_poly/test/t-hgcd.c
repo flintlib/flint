@@ -52,10 +52,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("hgcd....");
+    flint_printf("hgcd....");
     fflush(stdout);
 
     /* 
@@ -129,13 +129,13 @@ main(void)
         result = (nmod_poly_equal(c, c1) && nmod_poly_equal(d, d1));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a  = "), nmod_poly_print(a), printf("\n\n");
-            printf("b  = "), nmod_poly_print(b), printf("\n\n");
-            printf("c  = "), nmod_poly_print(c), printf("\n\n");
-            printf("d  = "), nmod_poly_print(d), printf("\n\n");
-            printf("c1 = "), nmod_poly_print(c1), printf("\n\n");
-            printf("d1 = "), nmod_poly_print(d1), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a  = "), nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("b  = "), nmod_poly_print(b), flint_printf("\n\n");
+            flint_printf("c  = "), nmod_poly_print(c), flint_printf("\n\n");
+            flint_printf("d  = "), nmod_poly_print(d), flint_printf("\n\n");
+            flint_printf("c1 = "), nmod_poly_print(c1), flint_printf("\n\n");
+            flint_printf("d1 = "), nmod_poly_print(d1), flint_printf("\n\n");
             abort();
         }
 
@@ -154,9 +154,9 @@ main(void)
         _nmod_vec_clear(M[3]);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

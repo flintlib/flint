@@ -39,10 +39,10 @@ void check_value(slong n, char *ans)
     fmpz_set_str(y, ans, 10);
     if (!fmpz_equal(x,y))
     {
-          printf("FAIL:\n");
-          printf("tau(%ld) gave ", n);
+          flint_printf("FAIL:\n");
+          flint_printf("tau(%wd) gave ", n);
           fmpz_print(x);
-          printf(", expected %s\n", ans); 
+          flint_printf(", expected %s\n", ans); 
           abort();
     }
     fmpz_clear(x);
@@ -62,8 +62,8 @@ void consistency_check(slong n)
     arith_ramanujan_tau_series(p, n);
     if (p->length != n && !(n == 1 && p->length == 0))
     {
-        printf("FAIL:\n");
-        printf("wrong length of polynomial %ld\n", n);
+        flint_printf("FAIL:\n");
+        flint_printf("wrong length of polynomial %wd\n", n);
         abort();
     }
 
@@ -74,12 +74,12 @@ void consistency_check(slong n)
         fmpz_poly_get_coeff_fmpz(y, p, k);
         if (!fmpz_equal(x,y))
         {
-            printf("FAIL:\n");
-            printf("different tau n=%ld, k=%ld\n", n, k);
+            flint_printf("FAIL:\n");
+            flint_printf("different tau n=%wd, k=%wd\n", n, k);
             fmpz_print(x);
-            printf("\n");
+            flint_printf("\n");
             fmpz_print(y);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
     }
@@ -90,7 +90,9 @@ void consistency_check(slong n)
 
 int main(void)
 {
-    printf("ramanujan_tau....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("ramanujan_tau....");
     fflush(stdout);
 
     check_value(0, "0");
@@ -164,7 +166,7 @@ int main(void)
     consistency_check(11);
     consistency_check(100);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

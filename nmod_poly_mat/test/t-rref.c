@@ -76,12 +76,12 @@ int
 main(void)
 {
     slong iter;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("rref....");
+    flint_printf("rref....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
@@ -153,10 +153,10 @@ main(void)
 
         if (!equal)
         {
-            printf("FAIL (rank1 = %ld, rank2 = %ld)!\n", rank1, rank2);
-            nmod_poly_mat_print(A, "x"); printf("\n\n");
-            nmod_poly_mat_print(R, "x"); printf("\n\n");
-            nmod_poly_mat_print(R2, "x"); printf("\n\n");
+            flint_printf("FAIL (rank1 = %wd, rank2 = %wd)!\n", rank1, rank2);
+            nmod_poly_mat_print(A, "x"); flint_printf("\n\n");
+            nmod_poly_mat_print(R, "x"); flint_printf("\n\n");
+            nmod_poly_mat_print(R2, "x"); flint_printf("\n\n");
             abort();
         }
 
@@ -172,8 +172,9 @@ main(void)
         nmod_poly_mat_clear(R2);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

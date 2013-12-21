@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("scalar_mul_fmpz....");
+    flint_printf("scalar_mul_fmpz....");
     fflush(stdout);
 
     /* Aliasing */
@@ -66,9 +66,9 @@ main(void)
         result = fmpq_mat_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A:\n"), fmpq_mat_print(A);
-            printf("B:\n"), fmpq_mat_print(B);
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n"), fmpq_mat_print(A);
+            flint_printf("B:\n"), fmpq_mat_print(B);
             abort();
         }
 
@@ -110,9 +110,9 @@ main(void)
         result = fmpq_mat_equal(C, D);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("A:\n"), fmpq_mat_print(A);
-            printf("B:\n"), fmpq_mat_print(B);
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n"), fmpq_mat_print(A);
+            flint_printf("B:\n"), fmpq_mat_print(B);
             abort();
         }
 
@@ -123,9 +123,9 @@ main(void)
         fmpz_clear(x);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

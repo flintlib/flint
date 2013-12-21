@@ -30,7 +30,7 @@ void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len,
                            const fmpz *a, const slong *j, slong lena, 
                            const fmpz_t p, slong N, const fmpz_t pN)
 {
-    if (N < (1L << 13) / (slong) fmpz_bits(p))
+    if (N < (WORD(1) << 13) / (slong) fmpz_bits(p))
     {
         _qadic_exp_rectangular(rop, op, v, len, a, j, lena, p, N, pN);
     }
@@ -55,7 +55,7 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return 1;
     }
 
-    if ((*p == 2L && v <= 1) || (v <= 0))
+    if ((*p == WORD(2) && v <= 1) || (v <= 0))
     {
         return 0;
     }

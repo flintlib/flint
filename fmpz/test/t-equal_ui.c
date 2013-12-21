@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("equal_ui....");
+    flint_printf("equal_ui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with fmpz_equal, random values */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -62,12 +62,12 @@ main(void)
         result = (lhs == rhs);
         if (result == 0)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("n = %lu\n", n);
-            printf("equal(a, b) = %d\n", fmpz_equal(a, b));
-            printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
+            flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
+            flint_printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
             abort();
         }
 
@@ -95,12 +95,12 @@ main(void)
         result = (lhs == rhs) && (lhs == 1);
         if (result == 0)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("n = %lu\n", n);
-            printf("equal(a, b) = %d\n", fmpz_equal(a, b));
-            printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
+            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
+            flint_printf("n = %wu\n", n);
+            flint_printf("equal(a, b) = %d\n", fmpz_equal(a, b));
+            flint_printf("equal_ui(a, n) = %d\n", fmpz_equal_ui(a, n));
             abort();
         }
 
@@ -108,8 +108,8 @@ main(void)
         fmpz_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

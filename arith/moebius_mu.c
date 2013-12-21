@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_factor.h"
+#include "fmpz.h"
 #include "arith.h"
 
 int arith_moebius_mu(const fmpz_t n)
@@ -41,7 +41,7 @@ int arith_moebius_mu(const fmpz_t n)
     mu = 1;
     for (i = 0; i < factors->num; i++)
     {
-        if (factors->exp[i] != 1UL)
+        if (factors->exp[i] != UWORD(1))
         {
             mu = 0;
             break;

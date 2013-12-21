@@ -64,7 +64,7 @@ nmod_poly_mulmod(nmod_poly_t res,
 
     if (lenf == 0)
     {
-        printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
+        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
         abort();
     }
 

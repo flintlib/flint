@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, j, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("get/set_coeff_ui....");
+    flint_printf("get/set_coeff_ui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -60,7 +60,7 @@ main(void)
             result = (n1 == n2);
             if (!result)
             {
-                printf("FAIL: n1 = %lu, n2 = %lu, coeff = %ld, length = %ld\n",
+                flint_printf("FAIL: n1 = %wu, n2 = %wu, coeff = %wd, length = %wd\n",
                        n1, n2, coeff, len);
                 abort();
             }
@@ -69,8 +69,8 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

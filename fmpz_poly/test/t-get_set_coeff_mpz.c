@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, j, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("get/set_coeff_mpz....");
+    flint_printf("get/set_coeff_mpz....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -68,10 +68,10 @@ main(void)
             result = (fmpz_equal(x1, x2));
             if (!result)
             {
-                printf("FAIL:\n");
-                printf("x1 = "), fmpz_print(x1), printf("\n");
-                printf("x2 = "), fmpz_print(x2), printf("\n");
-                printf("coeff = %ld, length = %ld\n", coeff, len);
+                flint_printf("FAIL:\n");
+                flint_printf("x1 = "), fmpz_print(x1), flint_printf("\n");
+                flint_printf("x2 = "), fmpz_print(x2), flint_printf("\n");
+                flint_printf("coeff = %wd, length = %wd\n", coeff, len);
                 abort();
             }
         }
@@ -83,8 +83,8 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

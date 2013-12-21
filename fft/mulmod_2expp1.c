@@ -58,7 +58,7 @@ void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_s
 void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
                  mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w)
 {
-   mp_size_t n = (1UL<<depth);
+   mp_size_t n = (UWORD(1)<<depth);
    mp_bitcnt_t bits1 = (r_limbs*FLINT_BITS)/(2*n);
    
    mp_size_t limb_add, limbs = (n*w)/FLINT_BITS;
@@ -208,13 +208,13 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
       return;
    }
    
-   while ((1UL<<depth) < bits) depth++;
+   while ((UWORD(1)<<depth) < bits) depth++;
    
    if (depth < 12) off = mulmod_2expp1_table_n[0];
    else off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12];
    depth1 = depth/2 - off;
    
-   w1 = bits/(1UL<<(2*depth1));
+   w1 = bits/(UWORD(1)<<(2*depth1));
 
    _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
 }
@@ -228,7 +228,7 @@ slong fft_adjust_limbs(mp_size_t limbs)
    if (limbs <= FFT_MULMOD_2EXPP1_CUTOFF) return limbs;
          
    depth = FLINT_CLOG2(limbs);
-   limbs2 = (1L<<depth); /* within a factor of 2 of limbs */
+   limbs2 = (WORD(1)<<depth); /* within a factor of 2 of limbs */
    bits2 = limbs2*FLINT_BITS;
 
    depth1 = FLINT_CLOG2(bits1);
@@ -242,10 +242,10 @@ slong fft_adjust_limbs(mp_size_t limbs)
    depth2 = depth2/2 - off2;
    
    depth1 = FLINT_MAX(depth1, depth2);
-   adj = (1L<<(depth1 + 1));
+   adj = (WORD(1)<<(depth1 + 1));
    limbs2 = adj*((limbs + adj - 1)/adj); /* round up number of limbs */
    bits1 = limbs2*FLINT_BITS;
-   bits2 = (1L<<(depth1*2));
+   bits2 = (WORD(1)<<(depth1*2));
    bits1 = bits2*((bits1 + bits2 - 1)/bits2); /* round up bits */
    limbs = bits1/FLINT_BITS;
 

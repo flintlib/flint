@@ -38,12 +38,12 @@ int main(void)
     mpz_t t;
     char * str;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("sizeinbase....");
+    flint_printf("sizeinbase....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     mpz_init(t);
     str = flint_malloc((FLINT_BITS + 1) * sizeof(char));
 
@@ -54,15 +54,15 @@ int main(void)
 
         size1 = n_sizeinbase(n, base);
 
-        mpz_set_ui(t, n);
+        flint_mpz_set_ui(t, n);
 
         mpz_get_str(str, base, t);
         size2 = strlen(str);
 
         if (size1 != size2)
         {
-            printf("FAIL: n = %lu, base = %d\n", n, base);
-            printf("n_sizeinbase: %d, strlen: %d\n", size1, size2);
+            flint_printf("FAIL: n = %wu, base = %d\n", n, base);
+            flint_printf("n_sizeinbase: %d, strlen: %d\n", size1, size2);
             abort();
         }
     }
@@ -70,8 +70,8 @@ int main(void)
     flint_free(str);
     mpz_clear(t);
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

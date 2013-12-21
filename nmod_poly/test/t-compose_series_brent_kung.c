@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("compose_series_brent_kung....");
+    flint_printf("compose_series_brent_kung....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of the first argument */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -65,9 +65,9 @@ main(void)
         result = (nmod_poly_equal(f, g));
         if (!result)
         {
-            printf("FAIL (aliasing 1):\n");
-            nmod_poly_print(f), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
+            flint_printf("FAIL (aliasing 1):\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
             abort();
         }
 
@@ -98,9 +98,9 @@ main(void)
         result = (nmod_poly_equal(f, h));
         if (!result)
         {
-            printf("FAIL (aliasing 2):\n");
-            nmod_poly_print(f), printf("\n\n");
-            nmod_poly_print(h), printf("\n\n");
+            flint_printf("FAIL (aliasing 2):\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            nmod_poly_print(h), flint_printf("\n\n");
             abort();
         }
 
@@ -134,12 +134,12 @@ main(void)
         result = (nmod_poly_equal(f, s));
         if (!result)
         {
-            printf("FAIL (comparison):\n");
-            printf("n = %ld\n", n);
-            printf("g = "), nmod_poly_print(g), printf("\n\n");
-            printf("h = "), nmod_poly_print(h), printf("\n\n");
-            printf("f = "), nmod_poly_print(f), printf("\n\n");
-            printf("s = "), nmod_poly_print(s), printf("\n\n");
+            flint_printf("FAIL (comparison):\n");
+            flint_printf("n = %wd\n", n);
+            flint_printf("g = "), nmod_poly_print(g), flint_printf("\n\n");
+            flint_printf("h = "), nmod_poly_print(h), flint_printf("\n\n");
+            flint_printf("f = "), nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("s = "), nmod_poly_print(s), flint_printf("\n\n");
             abort();
         }
 
@@ -150,7 +150,8 @@ main(void)
         nmod_poly_clear(t);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

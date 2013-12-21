@@ -23,15 +23,16 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int is_prime(mp_limb_t n, int proved)
+static int is_prime(mp_limb_t n, int proved)
 {
     return proved ? n_is_prime(n) : n_is_probabprime(n);
 }
@@ -45,10 +46,10 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
    mp_limb_t cofactor, factor, cutoff;
 
    cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
-   if (cofactor == 1UL) return;
+   if (cofactor == UWORD(1)) return;
    if (is_prime(cofactor, proved)) 
    {
-      n_factor_insert(factors, cofactor, 1UL);
+      n_factor_insert(factors, cofactor, UWORD(1));
       return;
    }
 
@@ -85,7 +86,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
                factors_left++;
 				} else
 				{
-               printf("Exception (n_factor). Failed to factor %ld.\n", n);
+               flint_printf("Exception (n_factor). Failed to factor %wd.\n", n);
                abort();
 				}
          } else

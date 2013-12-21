@@ -36,10 +36,10 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
     
-    printf("integral....");
+    
+    flint_printf("integral....");
     fflush(stdout);
 
     /* Check with derivative */
@@ -63,15 +63,15 @@ main(void)
         c0 = nmod_poly_get_coeff_ui(b, 0);
         nmod_poly_derivative(c, b);
 
-        result = (c0 == 0UL) && nmod_poly_equal(a, c);
+        result = (c0 == UWORD(0)) && nmod_poly_equal(a, c);
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(c), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(c), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -96,10 +96,10 @@ main(void)
         result = nmod_poly_equal(a, b);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -107,8 +107,8 @@ main(void)
         nmod_poly_clear(b);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly_factor.h"
+#include "fmpz_poly.h"
 
 void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
 {
@@ -52,7 +52,7 @@ void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, slong alloc)
         for (i = 0; i < alloc; i++)
         {
             fmpz_poly_init(fac->p + i);
-            fac->exp[i] = 0L;
+            fac->exp[i] = WORD(0);
         }
     }
     else

@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("is_even/odd....");
+    flint_printf("is_even/odd....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -55,8 +55,8 @@ main(void)
         result = (fmpz_is_even(f) == mpz_even_p(g));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f = "), fmpz_print(f), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
             gmp_printf("g = %Zd\n", g);
             abort();
         }
@@ -79,8 +79,8 @@ main(void)
         result = (fmpz_is_odd(f) == mpz_odd_p(g));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f = "), fmpz_print(f), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
             gmp_printf("g = %Zd\n", g);
             abort();
         }
@@ -89,8 +89,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

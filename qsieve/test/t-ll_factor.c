@@ -34,14 +34,13 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
    fmpz_t n, t;
    mp_limb_t fac1, fac2, fac;
 
-   printf("ll_factor....");
-   fflush(stdout);
- 
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+
+   flint_printf("ll_factor....");
+   fflush(stdout);   
 
    fmpz_init(n);
    fmpz_init(t);
@@ -74,8 +73,8 @@ int main(void)
           || fac == fac1 || fac == fac2);
       if (!result)
       {
-          printf("FAIL: "); fmpz_print(n); printf(" = %ld * %ld\n", fac1, fac2);
-          printf("fac = %ld, bits = %ld\n", fac, fmpz_bits(n));
+          flint_printf("FAIL: "); fmpz_print(n); flint_printf(" = %wd * %wd\n", fac1, fac2);
+          flint_printf("fac = %wd, bits = %wd\n", fac, fmpz_bits(n));
           abort();
       }
    }
@@ -83,8 +82,8 @@ int main(void)
    fmpz_clear(t);
    fmpz_clear(n);
    
-   flint_randclear(state);
-   flint_cleanup();
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

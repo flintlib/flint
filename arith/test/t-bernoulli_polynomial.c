@@ -42,7 +42,9 @@ int main()
 
     slong k, n;
 
-    printf("bernoulli_polynomial....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("bernoulli_polynomial....");
     fflush(stdout);
 
     for (n = 0; n <= 100; n++)
@@ -55,7 +57,7 @@ int main()
         for (k = 0; k <= n; k++)
         {
             arith_bernoulli_polynomial(P, k);
-            mpz_bin_uiui(t, n+1, k);
+            flint_mpz_bin_uiui(t, n+1, k);
             fmpq_poly_scalar_mul_mpz(P, P, t);
             fmpq_poly_add(Q, Q, P);
         }
@@ -64,16 +66,16 @@ int main()
         mpz_clear(t);
 
         fmpq_poly_zero(P);
-        fmpq_poly_set_coeff_ui(P, n, 1UL);
+        fmpq_poly_set_coeff_ui(P, n, UWORD(1));
 
         if (!fmpq_poly_equal(P, Q))
         {
-            printf("ERROR: sum up to n = %ld did not add to x^n\n", n);
-            printf("Sum: ");
+            flint_printf("ERROR: sum up to n = %wd did not add to x^n\n", n);
+            flint_printf("Sum: ");
             fmpq_poly_print_pretty(Q, "x");
-            printf("\nExpected: ");
+            flint_printf("\nExpected: ");
             fmpq_poly_print_pretty(P, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -81,7 +83,7 @@ int main()
         fmpq_poly_clear(Q);
     }
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

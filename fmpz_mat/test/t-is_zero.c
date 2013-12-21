@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("is_zero....");
+    flint_printf("is_zero....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -51,7 +51,7 @@ main(void)
 
         if (!fmpz_mat_is_zero(A))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
@@ -60,7 +60,7 @@ main(void)
             fmpz_mat_randrank(A, state, FLINT_MIN(rows, cols), 100);
             if (fmpz_mat_is_zero(A))
             {
-                printf("FAIL!\n");
+                flint_printf("FAIL!\n");
                 abort();
             }
         }
@@ -68,9 +68,9 @@ main(void)
         fmpz_mat_clear(A);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

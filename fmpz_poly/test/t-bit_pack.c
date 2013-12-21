@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("bit_pack/bit_unpack....");
+    flint_printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
@@ -70,9 +70,9 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -105,9 +105,9 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -138,18 +138,18 @@ main(void)
         if (!fmpz_poly_equal(A, B))
         {
             mpz_t zz;
-            printf("FAIL:\n");
-            printf("BITS: %ld (signed)\n", b);
-            printf("INPUT: ");
+            flint_printf("FAIL:\n");
+            flint_printf("BITS: %wd (signed)\n", b);
+            flint_printf("INPUT: ");
             fmpz_poly_print_pretty(A, "x");
-            printf("\n");
+            flint_printf("\n");
             mpz_init(zz); fmpz_get_mpz(zz, f);
-            printf("PACKED: ");
+            flint_printf("PACKED: ");
             mpz_out_str(stdout, 2, zz);
-            printf("\n");
-            printf("OUTPUT: ");
+            flint_printf("\n");
+            flint_printf("OUTPUT: ");
             fmpz_poly_print_pretty(B, "x");
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -179,18 +179,18 @@ main(void)
         if (!fmpz_poly_equal(A, B))
         {
             mpz_t zz;
-            printf("FAIL:\n");
-            printf("BITS: %ld (unsigned)\n", b);
-            printf("INPUT: ");
+            flint_printf("FAIL:\n");
+            flint_printf("BITS: %wd (unsigned)\n", b);
+            flint_printf("INPUT: ");
             fmpz_poly_print_pretty(A, "x");
-            printf("\n");
+            flint_printf("\n");
             mpz_init(zz); fmpz_get_mpz(zz, f);
-            printf("PACKED: ");
+            flint_printf("PACKED: ");
             mpz_out_str(stdout, 2, zz);
-            printf("\n");
-            printf("OUTPUT: ");
+            flint_printf("\n");
+            flint_printf("OUTPUT: ");
             fmpz_poly_print_pretty(B, "x");
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -199,8 +199,8 @@ main(void)
         fmpz_poly_clear(B);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("rfac_uiui... ");
+    flint_printf("rfac_uiui... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check rf(x,a) * rf(x+a,b) = rf(x,a+b) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -71,12 +71,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n\n");
-            printf("x: %lu", x); printf("\n\n");
-            printf("a = %lu, b = %lu\n\n", a, b);
-            printf("rf(x,a): "); fmpz_print(r1); printf("\n\n");
-            printf("rf(x+a,b): "); fmpz_print(r2); printf("\n\n");
-            printf("rf(x,a+b): "); fmpz_print(r3); printf("\n\n");
+            flint_printf("FAIL\n\n");
+            flint_printf("x: %wu", x); flint_printf("\n\n");
+            flint_printf("a = %wu, b = %wu\n\n", a, b);
+            flint_printf("rf(x,a): "); fmpz_print(r1); flint_printf("\n\n");
+            flint_printf("rf(x+a,b): "); fmpz_print(r2); flint_printf("\n\n");
+            flint_printf("rf(x,a+b): "); fmpz_print(r3); flint_printf("\n\n");
             abort();
         }
 
@@ -87,8 +87,8 @@ main(void)
         fmpz_clear(r3);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
-    flint_cleanup();
+    
+    flint_printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
     return EXIT_SUCCESS;
 }

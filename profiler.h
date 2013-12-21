@@ -22,9 +22,13 @@
     Copyright 2007 William Hart and David Harvey
 
 ******************************************************************************/
+#ifndef FLINT_PROFILER_H
+#define FLINT_PROFILER_H
+
 #include "flint.h"
 
-#undef ulong /* interferes with system includes, redefined by flint.h below */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <time.h>
 #include <sys/time.h>
 #if defined (__WIN32) && !defined(__CYGWIN__)
@@ -39,8 +43,8 @@ static __inline__ int gettimeofday(struct timeval * p, void * tz)
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
-    p->tv_usec=(slong)((now.ns100 / 10LL) % 1000000LL );
-    p->tv_sec= (slong)((now.ns100-(116444736000000000LL))/10000000LL);
+    p->tv_usec=(slong)((now.ns100 / WORD(10)L) % WORD(1000000)L );
+    p->tv_sec= (slong)((now.ns100-(WORD(116444736000000000)L))/WORD(10000000)L);
 	
     return 0;
 }
@@ -50,10 +54,8 @@ int gettimeofday(struct timeval * p, void * tz);
 #else
 #include <sys/resource.h>
 #endif
+#undef ulong
 #define ulong mp_limb_t
-
-#ifndef FLINT_PROFILER_H
-#define FLINT_PROFILER_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -188,7 +190,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 ******************************************************************************/
 
 #define TIMEIT_PRINT(__timer, __reps) \
-    printf("cpu/wall(s): %g %g\n", \
+    flint_printf("cpu/wall(s): %g %g\n", \
         __timer->cpu*0.001/__reps, __timer->wall*0.001 / __reps);
 
 #define TIMEIT_REPEAT(__timer, __reps) \
@@ -238,7 +240,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
     do { \
         meminfo_t meminfo; \
         get_memory_usage(meminfo); \
-        printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
+        flint_printf("virt/peak/res/peak(MB): %.2f %.2f %.2f %.2f\n", \
             meminfo->size / 1024.0, meminfo->peak / 1024.0, \
             meminfo->rss / 1024.0, meminfo->hwm / 1024.0); \
     } while (0);

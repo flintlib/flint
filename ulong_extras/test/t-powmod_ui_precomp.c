@@ -32,12 +32,12 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
-   printf("powmod_ui_precomp....");
+   flint_printf("powmod_ui_precomp....");
    fflush(stdout);
 
-   flint_randinit(state);
+   
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
@@ -55,23 +55,23 @@ int main(void)
       do
       {
          a = n_randtest(state) % d;
-      } while (n_gcd(d, a) != 1UL);
+      } while (n_gcd(d, a) != UWORD(1));
       exp = n_randtest(state);
       
       dpre = n_precompute_inverse(d);
       r1 = n_powmod_ui_precomp(a, exp, d, dpre);
 
-      mpz_set_ui(a_m, a);
-      mpz_set_ui(d_m, d);
-      mpz_powm_ui(r2_m, a_m, exp, d_m);      
-      r2 = mpz_get_ui(r2_m);
+      flint_mpz_set_ui(a_m, a);
+      flint_mpz_set_ui(d_m, d);
+      flint_mpz_powm_ui(r2_m, a_m, exp, d_m);      
+      r2 = flint_mpz_get_ui(r2_m);
       
       result = (r1 == r2);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, exp = %ld, d = %lu\n", a, exp, d); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, exp = %wd, d = %wu\n", a, exp, d); 
+         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          abort();
       }
 
@@ -80,8 +80,8 @@ int main(void)
       mpz_clear(r2_m);
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

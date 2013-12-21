@@ -30,7 +30,7 @@
 #include "ulong_extras.h"
 #include "double_extras.h"
 
-#define ONE_OVER_E 0.36787944117144228
+#define ONE_OVER_E ldexp(6627126856707895.0, -54)
 
 int
 main()
@@ -39,12 +39,12 @@ main()
     slong iter, prec = 70;
     mpfr_t xx, ww, wnew, t, u, v, p, q, max_err;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
    
-    printf("lambertw....");
+    flint_printf("lambertw....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     mpfr_init2(xx, prec);
     mpfr_init2(ww, prec);
@@ -124,8 +124,8 @@ main()
 
         if (mpfr_get_d(t, MPFR_RNDA) > tol)
         {
-            printf("FAIL\n");
-            printf("x = %.17g, w = %.17g, error = %g\n", x, w,
+            flint_printf("FAIL\n");
+            flint_printf("x = %.17g, w = %.17g, error = %g\n", x, w,
                 mpfr_get_d(t, MPFR_RNDA));
             abort();
         }
@@ -133,8 +133,8 @@ main()
 #if 0
         if (mpfr_cmp(t, max_err) > 0)
         {
-            printf("new record: ");
-            printf("x=%.20g w=%.20g wnew=%.20g relative error: %g\n",
+            flint_printf("new record: ");
+            flint_printf("x=%.20g w=%.20g wnew=%.20g relative error: %g\n",
                 x, w, mpfr_get_d(wnew, MPFR_RNDN), mpfr_get_d(t, MPFR_RNDN));
             mpfr_set(max_err, t, MPFR_RNDN);
         }
@@ -153,8 +153,8 @@ main()
     mpfr_clear(max_err);
 
     mpfr_free_cache();
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

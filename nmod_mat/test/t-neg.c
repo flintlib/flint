@@ -35,10 +35,10 @@ int
 main(void)
 {
     slong m, n, mod, rep;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("neg....");
+    flint_printf("neg....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -64,7 +64,7 @@ main(void)
 
         if (!nmod_mat_equal(C, D))
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
 
@@ -73,7 +73,7 @@ main(void)
 
         if (!nmod_mat_equal(C, B))
         {
-            printf("FAIL\n");
+            flint_printf("FAIL\n");
             abort();
         }
 
@@ -83,8 +83,8 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

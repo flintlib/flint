@@ -23,8 +23,9 @@
 
 ******************************************************************************/
 
-#undef ulong /* avoid conflict with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
+#undef ulong
 #define ulong mp_limb_t
 
 #include <gmp.h>
@@ -39,7 +40,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     
     if (n == 0)
     {
-        printf("Exception (fmpz_root). Unable to take 0-th root.\n");
+        flint_printf("Exception (fmpz_root). Unable to take 0-th root.\n");
         abort();
     }
 
@@ -53,9 +54,9 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     {
         if (n == 2)
         {
-            if (c < 0L)
+            if (c < WORD(0))
             {
-                printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
+                flint_printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
                 abort();
             }
 
@@ -77,7 +78,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
             cval = FLINT_ABS(c);
             mpz2._mp_d = &cval; /* mock up an mpz */
             mpz2._mp_size = 1;
-            if (c < 0L)
+            if (c < WORD(0))
                 mpz2._mp_size = -1;
             mpz2._mp_alloc = 1;
 

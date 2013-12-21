@@ -23,9 +23,10 @@
 
 ******************************************************************************/
 
-#undef ulong /* prevent clash with standard library */
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
 #define ulong mp_limb_t
 #include "flint.h"
 #include "ulong_extras.h"
@@ -34,7 +35,7 @@ mp_limb_t n_nth_prime(ulong n)
 {
     if (n == 0)
     {
-        printf("Exception (n_nth_prime). n_nth_prime(0) is undefined.\n");
+        flint_printf("Exception (n_nth_prime). n_nth_prime(0) is undefined.\n");
         abort();
     }
 

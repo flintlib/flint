@@ -38,9 +38,9 @@ or implied, of William Hart.
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 {
-   mpz_set_ui(p, 1);
+   flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
-   mpz_add_ui(p, p, 1);
+   flint_mpz_add_ui(p, p, 1);
 }
 
 int
@@ -51,12 +51,12 @@ main(void)
     mp_limb_t * nn, * r;
     mpz_t p, m1, m2, mn1, mn2;
 
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("div_2expmod_2expp1....");
+    flint_printf("div_2expmod_2expp1....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(m1);
@@ -94,8 +94,8 @@ main(void)
                     
                     if (mpz_cmp(m1, m2) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("mpn_div_2expmod_2expp1 error\n");
+                        flint_printf("FAIL:\n");
+                        flint_printf("mpn_div_2expmod_2expp1 error\n");
                         gmp_printf("want %Zx\n\n", m1);
                         gmp_printf("got  %Zx\n", m2);
                         abort();
@@ -114,8 +114,8 @@ main(void)
     mpz_clear(m1);
     mpz_clear(p);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

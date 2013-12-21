@@ -42,8 +42,6 @@ int main(void)
     const slong n = 12376;
     const slong N = n / 26;
 
-    flint_rand_t state;
-
     clock_t c0, c1;
     double c;
 
@@ -53,7 +51,7 @@ int main(void)
     fmpz_mod_poly_radix_t S;
     fmpz_mod_poly_struct **b;
 
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);    
 
     fmpz_init(a);
     fmpz_init(m);
@@ -99,25 +97,25 @@ int main(void)
 
     fmpz_mod_poly_randtest(t, state, n + 1);
 
-    printf("Radix conversion\n");
-    printf("----------------\n");
-    printf("  Degree of the radix:     %ld\n", fmpz_mod_poly_degree(r));
-    printf("  Bit size of the modulus: %ld\n", (slong) fmpz_bits(fmpz_mod_poly_modulus(r)));
-    printf("  Degree of the input:     %ld\n", fmpz_mod_poly_degree(t));
+    flint_printf("Radix conversion\n");
+    flint_printf("----------------\n");
+    flint_printf("  Degree of the radix:     %wd\n", fmpz_mod_poly_degree(r));
+    flint_printf("  Bit size of the modulus: %wd\n", (slong) fmpz_bits(fmpz_mod_poly_modulus(r)));
+    flint_printf("  Degree of the input:     %wd\n", fmpz_mod_poly_degree(t));
 
     c0 = clock();
     fmpz_mod_poly_radix_init(S, r, n + 1);
     c1 = clock();
     c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
 
-    printf("  Precomputation:          %fs\n", c);
+    flint_printf("  Precomputation:          %fs\n", c);
 
     c0 = clock();
     fmpz_mod_poly_radix(b, t, S);
     c1 = clock();
     c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
 
-    printf("  Conversion:              %fs\n", c);
+    flint_printf("  Conversion:              %fs\n", c);
 
     fmpz_clear(a);
     fmpz_clear(m);
@@ -130,9 +128,9 @@ int main(void)
     for (i = 0; i <= N; i++)
     {
         fmpz_mod_poly_clear(b[i]);
-        free(b[i]);
+        flint_free(b[i]);
     }
-    free(b);
+    flint_free(b);
 
     flint_randclear(state);
 

@@ -35,10 +35,10 @@ int
 main(void)
 {
     slong i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("mul_strassen....");
+    flint_printf("mul_strassen....");
     fflush(stdout);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -65,7 +65,7 @@ main(void)
 
         if (!nmod_mat_equal(C, D))
         {
-            printf("FAIL: results not equal\n");
+            flint_printf("FAIL: results not equal\n");
             nmod_mat_print_pretty(A);
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
@@ -79,8 +79,8 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

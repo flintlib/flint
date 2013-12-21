@@ -29,7 +29,7 @@ void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_val(op) < 0)
     {
-        printf("Exception (padic_get_fmpz).  Negative valuation.\n");
+        flint_printf("Exception (padic_get_fmpz).  Negative valuation.\n");
         abort();
     }
 

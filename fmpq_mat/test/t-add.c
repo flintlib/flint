@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("add....");
+    flint_printf("add....");
     fflush(stdout);
 
     /* Aliasing, B = B + C */
@@ -65,12 +65,12 @@ main(void)
         result = fmpq_mat_equal(A, B);
         if (!result)
         {
-            printf("FAIL (B = B + C):\n");
-            printf("A:\n");
+            flint_printf("FAIL (B = B + C):\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
             abort();
         }
@@ -105,12 +105,12 @@ main(void)
         result = fmpq_mat_equal(A, C);
         if (!result)
         {
-            printf("FAIL (C = B + C):\n");
-            printf("A:\n");
+            flint_printf("FAIL (C = B + C):\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
             abort();
         }
@@ -146,14 +146,14 @@ main(void)
         result = fmpq_mat_equal(C, D);
         if (!result)
         {
-            printf("FAIL (A + B == B + A):\n");
-            printf("A:\n");
+            flint_printf("FAIL (A + B == B + A):\n");
+            flint_printf("A:\n");
             fmpq_mat_print(A);
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpq_mat_print(B);
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpq_mat_print(C);
-            printf("D:\n");
+            flint_printf("D:\n");
             fmpq_mat_print(D);
             abort();
         }
@@ -164,8 +164,8 @@ main(void)
         fmpq_mat_clear(D);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

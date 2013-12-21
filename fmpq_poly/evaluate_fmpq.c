@@ -38,12 +38,12 @@ _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 {
     fmpz_t d;
     
-    _fmpz_poly_evaluate_horner_mpq(rnum, rden, poly, len, anum, aden);
+    _fmpz_poly_evaluate_fmpq(rnum, rden, poly, len, anum, aden);
     fmpz_mul(rden, rden, den);
     
     fmpz_init(d);
     fmpz_gcd(d, rnum, rden);
-    if (*d != 1L)
+    if (!fmpz_is_one(d))
     {
         fmpz_divexact(rnum, rnum, d);
         fmpz_divexact(rden, rden, d);

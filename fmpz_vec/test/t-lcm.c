@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("lcm....");
+    flint_printf("lcm....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check that lcm(a f) = abs(a) lcm(f) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -75,8 +75,8 @@ main(void)
 
         if (!result)
         {
-            fmpz_print(c), printf("\n\n");
-            fmpz_print(d), printf("\n\n");
+            fmpz_print(c), flint_printf("\n\n");
+            fmpz_print(d), flint_printf("\n\n");
             abort();
         }
 
@@ -86,8 +86,8 @@ main(void)
         _fmpz_vec_clear(f, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

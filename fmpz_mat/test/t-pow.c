@@ -35,12 +35,12 @@
 int main(void)
 {
     slong i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("pow....");
+    flint_printf("pow....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -69,7 +69,7 @@ int main(void)
 
         if (!fmpz_mat_equal(C, B))
         {
-            printf("FAIL: results not equal\n");
+            flint_printf("FAIL: results not equal\n");
             abort();
         }
 
@@ -77,7 +77,7 @@ int main(void)
 
         if (!fmpz_mat_equal(A, B))
         {
-            printf("FAIL: aliasing failed\n");
+            flint_printf("FAIL: aliasing failed\n");
             abort();
         }
 
@@ -86,8 +86,8 @@ int main(void)
         fmpz_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

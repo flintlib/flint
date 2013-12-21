@@ -34,12 +34,12 @@ int main(void)
    int i, result;
    ulong bits;
    mp_limb_t d;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
-   printf("is_perfect_power235....");
+   flint_printf("is_perfect_power235....");
    fflush(stdout);
    
-   flint_randinit(state);
+   
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that square pass the test */
    {
@@ -49,8 +49,8 @@ int main(void)
       result = n_is_perfect_power235(n_pow(d, 2));
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d^2 = %lu is declared not a perfect power\n", d*d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d^2 = %wu is declared not a perfect power\n", d*d); 
          abort();
       }
 
@@ -65,8 +65,8 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d^3 = %lu is declared not a perfect power\n", d*d*d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d^3 = %wu is declared not a perfect power\n", d*d*d); 
          abort();
       }
 
@@ -81,8 +81,8 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d^5 = %lu is declared not a perfect power\n", d*d*d*d*d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d^5 = %wu is declared not a perfect power\n", d*d*d*d*d); 
          abort();
       }
 
@@ -96,22 +96,22 @@ int main(void)
       do
       {
          d = n_randtest(state);
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_perfect_power_p(d_m));
 
       result = !n_is_perfect_power235(d);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("d = %lu is declared a perfect power\n", d); 
+         flint_printf("FAIL:\n");
+         flint_printf("d = %wu is declared a perfect power\n", d); 
          abort();
       }
 
       mpz_clear(d_m);
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

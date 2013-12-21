@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("sqr_KS....");
+    flint_printf("sqr_KS....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -59,10 +59,10 @@ main(void)
         result = (fmpz_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -87,10 +87,10 @@ main(void)
         result = (fmpz_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -115,10 +115,10 @@ main(void)
         result = (fmpz_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -150,9 +150,9 @@ main(void)
         result = (fmpz_poly_equal(out1, out2));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_poly_print(out1), printf("\n\n");
-            fmpz_poly_print(out2), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(out1), flint_printf("\n\n");
+            fmpz_poly_print(out2), flint_printf("\n\n");
             abort();
         }
 
@@ -161,8 +161,8 @@ main(void)
         fmpz_poly_clear(out2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -37,16 +37,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    printf("truncate... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("truncate... ");
+    fflush(stdout);    
 
     /* Check repeated truncating */
     for (i = 0; i < 10000; i++)
@@ -77,10 +76,10 @@ main(void)
         result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(b, ctx), printf("\n\n");
-            padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(b, ctx), flint_printf("\n\n");
+            padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -120,10 +119,10 @@ main(void)
         result = (fmpq_poly_equal(b, c) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
-            fmpq_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            fmpq_poly_print(b), flint_printf("\n\n");
+            fmpq_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -135,9 +134,9 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

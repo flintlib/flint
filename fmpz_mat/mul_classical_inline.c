@@ -50,9 +50,9 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     {
         for (j = 0; j < bc; j++)
         {
-            mpz_set_ui(t, 0UL);
+            flint_mpz_set_ui(t, UWORD(0));
 
-            pos[2] = pos[1] = pos[0] = neg[2] = neg[1] = neg[0] = 0UL;
+            pos[2] = pos[1] = pos[0] = neg[2] = neg[1] = neg[0] = UWORD(0);
 
             for (k = 0; k < br; k++)
             {
@@ -71,7 +71,7 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
 
                         umul_ppmm(au, bu, au, bu);
 
-                        if ((a ^ b) >= 0L)
+                        if ((a ^ b) >= WORD(0))
                             add_sssaaaaaa(pos[2], pos[1], pos[0],
                                           pos[2], pos[1], pos[0], 0, au, bu);
                         else
@@ -81,17 +81,17 @@ fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
                     else
                     {
                         if (a >= 0)
-                            mpz_addmul_ui(t, COEFF_TO_PTR(b), a);
+                            flint_mpz_addmul_ui(t, COEFF_TO_PTR(b), a);
                         else
-                            mpz_submul_ui(t, COEFF_TO_PTR(b), -a);
+                            flint_mpz_submul_ui(t, COEFF_TO_PTR(b), -a);
                     }
                 }
                 else if (!COEFF_IS_MPZ(b))  /* b is small */
                 {
                     if (b >= 0)
-                        mpz_addmul_ui(t, COEFF_TO_PTR(a), b);
+                        flint_mpz_addmul_ui(t, COEFF_TO_PTR(a), b);
                     else
-                        mpz_submul_ui(t, COEFF_TO_PTR(a), -b);
+                        flint_mpz_submul_ui(t, COEFF_TO_PTR(a), -b);
                 }
                 else
                 {

@@ -38,9 +38,9 @@ or implied, of William Hart.
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 {
-   mpz_set_ui(p, 1);
+   flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
-   mpz_add_ui(p, p, 1);
+   flint_mpz_add_ui(p, p, 1);
 }
 
 void ref_fft_butterfly_twiddle(mpz_t s, mpz_t t, mpz_t i1, mpz_t i2, 
@@ -73,12 +73,12 @@ main(void)
     mp_limb_t * nn1, * nn2, * r1, * r2;
     mp_bitcnt_t b1, b2;
    
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("fft/ifft_butterfly_twiddle....");
+    flint_printf("fft/ifft_butterfly_twiddle....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -125,20 +125,20 @@ main(void)
 
                     if (mpz_cmp(ma, m2a) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("fft_butterfly_twiddle error a\n");
-                        printf("limbs = %ld\n", limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("fft_butterfly_twiddle error a\n");
+                        flint_printf("limbs = %wd\n", limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", ma);
                         gmp_printf("got  %Zx\n", m2a);
                         abort();
                     }
                     if (mpz_cmp(mb, m2b) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("fft_butterfly_twiddle error b\n");
-                        printf("limbs = %ld\n", limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("fft_butterfly_twiddle error b\n");
+                        flint_printf("limbs = %wd\n", limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", mb);
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
@@ -189,20 +189,20 @@ main(void)
 
                     if (mpz_cmp(ma, m2a) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("ifft_butterfly_twiddle error a\n");
-                        printf("limbs = %ld\n", limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("ifft_butterfly_twiddle error a\n");
+                        flint_printf("limbs = %wd\n", limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", ma);
                         gmp_printf("got  %Zx\n", m2a);
                         abort();
                     }
                     if (mpz_cmp(mb, m2b) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("ifft_butterfly_twiddle error b\n");
-                        printf("limbs = %ld\n", limbs);
-                        printf("n = %ld, w = %ld, k = %ld, c = %ld\n", n, w, k, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("ifft_butterfly_twiddle error b\n");
+                        flint_printf("limbs = %wd\n", limbs);
+                        flint_printf("n = %wd, w = %wd, k = %wd, c = %wd\n", n, w, k, c);
                         gmp_printf("want %Zx\n\n", mb);
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
@@ -225,8 +225,8 @@ main(void)
     mpz_clear(mn1);
     mpz_clear(mn2);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

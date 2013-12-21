@@ -39,37 +39,37 @@ int main(void)
    fmpz_init(n);
    fmpz_init(p);
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    while(1)
    {
-      printf("Enter number to be factored: "); fflush(stdout);
+      flint_printf("Enter number to be factored: "); fflush(stdout);
       if (!fmpz_read(n))
       {
-         printf("Read failed\n");
+         flint_printf("Read failed\n");
          abort();
       }
    
-      printf("Enter B1: "); fflush(stdout);
-      if (!scanf("%lu", &B1))
+      flint_printf("Enter B1: "); fflush(stdout);
+      if (!flint_scanf("%wu", &B1))
       {
-         printf("Read failed\n");
+         flint_printf("Read failed\n");
          abort();
       }
     
       do
       {
          c = n_randlimb(state);
-      } while (c <= 2UL);
+      } while (c <= UWORD(2));
 
       if (fmpz_factor_pp1(p, n, B1, B1/100, c))
       {
-         printf("Factor: ");
+         flint_printf("Factor: ");
          fmpz_print(p);
-         printf("\n");
+         flint_printf("\n");
       } else
-         printf("Factor not found!\n");
+         flint_printf("Factor not found!\n");
    } while(1);
    
    flint_randclear(state);

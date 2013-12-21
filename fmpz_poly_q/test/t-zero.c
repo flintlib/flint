@@ -9,12 +9,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("zero... ");
+    flint_printf("zero... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100; i++)
     {
@@ -27,16 +27,16 @@ main(void)
         result = fmpz_poly_q_is_zero(a) && fmpz_poly_q_is_canonical(a);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_poly_q_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpz_poly_q_print(a), flint_printf("\n\n");
             abort();
         }
 
         fmpz_poly_q_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -49,16 +49,16 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 			if ((coeffs_f[i][limbs - 1] >> (FLINT_BITS - 1)) || coeffs_f[i][limbs])
          {
             mpn_neg_n(data, coeffs_f[i], limbs);
-            mpn_add_1(data, data, limbs, 1L); 
+            mpn_add_1(data, data, limbs, WORD(1)); 
             size = limbs;
 			   while ((size) && (data[size - 1] == 0)) size--; /* normalise */
 			   mpz_ptr->_mp_size = -size;
-			   if (size >= -1L) _fmpz_demote_val(coeffs_m); /* coefficient may be small*/
+			   if (size >= WORD(-1)) _fmpz_demote_val(coeffs_m); /* coefficient may be small*/
          } else
          {
             flint_mpn_copyi(data, coeffs_f[i], limbs); 
 			   size = limbs;
-			   while ((size) && (data[size - 1] == 0L)) size--; /* normalise */
+			   while ((size) && (data[size - 1] == WORD(0))) size--; /* normalise */
 			   mpz_ptr->_mp_size = size;
 			   if (size <= 1) _fmpz_demote_val(coeffs_m); /* coefficient may be small */
          }
@@ -74,7 +74,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 			data = mpz_ptr->_mp_d;
 			flint_mpn_copyi(data, coeffs_f[i], limbs); 
 			size = limbs;
-			while ((size) && (data[size - 1] == 0L)) size--; /* normalise */
+			while ((size) && (data[size - 1] == WORD(0))) size--; /* normalise */
 			mpz_ptr->_mp_size = size;
 			if (size <= 1) _fmpz_demote_val(coeffs_m); /* coefficient may be small */
 

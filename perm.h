@@ -26,9 +26,12 @@
 #ifndef PERM_H
 #define PERM_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#undef ulong
+#include <gmp.h>
 #define ulong mp_limb_t
 
 #include "flint.h"
@@ -47,7 +50,7 @@ static __inline__ slong * _perm_init(slong n)
 
     if (!vec)
     {
-        printf("ERROR (_perm_init).\n\n");
+        flint_printf("ERROR (_perm_init).\n\n");
         abort();
     }
 
@@ -102,7 +105,7 @@ static __inline__ void
 
         if (!t)
         {
-            printf("ERROR (_perm_inv).\n\n");
+            flint_printf("ERROR (_perm_inv).\n\n");
             abort();
         }
 
@@ -159,12 +162,12 @@ static __inline__  int _long_vec_print(const slong * vec, slong len)
 {
     slong i;
 
-    printf("%ld", len);
+    flint_printf("%wd", len);
     if (len > 0)
     {
-        printf(" ");
+        flint_printf(" ");
         for (i = 0; i < len; i++)
-            printf(" %ld", vec[i]);
+            flint_printf(" %wd", vec[i]);
     }
 
     return 1;
@@ -174,12 +177,12 @@ static __inline__ int _perm_print(const slong * vec, slong n)
 {
     slong i;
 
-    printf("%ld", n);
+    flint_printf("%wd", n);
     if (n > 0)
     {
-        printf(" ");
+        flint_printf(" ");
         for (i = 0; i < n; i++)
-            printf(" %ld", vec[i]);
+            flint_printf(" %wd", vec[i]);
     }
 
     return 1;

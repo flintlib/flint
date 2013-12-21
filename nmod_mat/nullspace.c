@@ -51,7 +51,7 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            nmod_mat_entry(X, i, i) = 1UL;
+            nmod_mat_entry(X, i, i) = UWORD(1);
     }
     else if (nullity)
     {
@@ -60,7 +60,7 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 
         for (i = j = k = 0; i < rank; i++)
         {
-            while (nmod_mat_entry(tmp, i, j) == 0UL)
+            while (nmod_mat_entry(tmp, i, j) == UWORD(0))
             {
                 nonpivots[k] = j;
                 k++;
@@ -84,7 +84,7 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
                 nmod_mat_entry(X, pivots[j], i) = nmod_neg(c, A->mod);
             }
 
-            nmod_mat_entry(X, nonpivots[i], i) = 1UL;
+            nmod_mat_entry(X, nonpivots[i], i) = UWORD(1);
         }
     }
 

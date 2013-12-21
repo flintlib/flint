@@ -32,11 +32,11 @@
 int main(void)
 {
    int i, j, result;
-   ulong count = 0UL;
-   flint_rand_t state;
-   flint_randinit(state);
+   ulong count = UWORD(0);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("factor_pp1....");
+   flint_printf("factor_pp1....");
    fflush(stdout);
 
    for (i = 0; i < 300 * flint_test_multiplier(); i++) /* Test random numbers */
@@ -46,7 +46,7 @@ int main(void)
       do
       {
          n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
-      } while (n_is_prime(n1) || (n1 < 2UL));
+      } while (n_is_prime(n1) || (n1 < UWORD(2)));
 
       for (j = 0; j < 20; j++)
       {
@@ -57,11 +57,11 @@ int main(void)
       if (n2 > 1)
       {
          count++;
-         result = ((n1%n2) == 0UL);
+         result = ((n1%n2) == UWORD(0));
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            flint_printf("FAIL:\n");
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
             abort();
          }
       }
@@ -69,13 +69,13 @@ int main(void)
    
    if (count < 295 * flint_test_multiplier())
    {
-      printf("FAIL:\n");
-      printf("Only %lu numbers factored\n", count); 
+      flint_printf("FAIL:\n");
+      flint_printf("Only %wu numbers factored\n", count); 
       abort();
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

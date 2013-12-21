@@ -26,12 +26,13 @@
 #ifndef QADIC_H
 #define QADIC_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -40,6 +41,12 @@
 #include "ulong_extras.h"
 #include "padic.h"
 #include "padic_poly.h"
+
+#define ulong mp_limb_t
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* Data types and context ****************************************************/
 
@@ -86,31 +93,31 @@ static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
 {
     slong i, k;
 
-    printf("p    = "), fmpz_print((&ctx->pctx)->p), printf("\n");
-    printf("d    = %ld\n", ctx->j[ctx->len - 1]);
-    printf("f(X) = ");
+    flint_printf("p    = "), fmpz_print((&ctx->pctx)->p), flint_printf("\n");
+    flint_printf("d    = %wd\n", ctx->j[ctx->len - 1]);
+    flint_printf("f(X) = ");
     fmpz_print(ctx->a + 0);
     for (k = 1; k < ctx->len; k++)
     {
         i = ctx->j[k];
-        printf(" + ");
+        flint_printf(" + ");
         if (fmpz_is_one(ctx->a + k))
         {
             if (i == 1)
-                printf("X");
+                flint_printf("X");
             else
-                printf("X^%ld", i);
+                flint_printf("X^%wd", i);
         }
         else
         {
             fmpz_print(ctx->a + k);
             if (i == 1)
-                printf("*X");
+                flint_printf("*X");
             else
-                printf("*X^%ld", i);
+                flint_printf("*X^%wd", i);
         }
     }
-    printf("\n");
+    flint_printf("\n");
 }
 
 /* Memory management *********************************************************/
@@ -271,7 +278,7 @@ static __inline__ void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
     }
     else
     {
-        printf("Exception (qadic_gen).  Extension degree d = 1.\n");
+        flint_printf("Exception (qadic_gen).  Extension degree d = 1.\n");
         abort();
     }
 }
@@ -451,6 +458,10 @@ static __inline__ int qadic_debug(const qadic_t op)
 {
     return padic_poly_debug(op);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

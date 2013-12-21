@@ -29,6 +29,8 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
 void flint_mpn_mulmod_preinv1(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_limb_t dinv, ulong norm)
@@ -61,3 +63,5 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
 
    mpn_copyi(r, t, n);
 }
+
+#pragma GCC diagnostic warning "-Wunused-variable"

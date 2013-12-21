@@ -273,7 +273,7 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         {
             const slong v = _fmpz_vec_ord_p(x, len, p);
 
-            if (v >= 2 || (*p != 2L && v >= 1))
+            if (v >= 2 || (*p != WORD(2) && v >= 1))
             {
                 if (v >= N)
                 {

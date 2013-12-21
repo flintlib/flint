@@ -75,7 +75,7 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
 
         while (fmpz_cmp(rden, rnum) < 0)
         {
-            fmpz_add_ui(rden, rden, 1UL);
+            fmpz_add_ui(rden, rden, UWORD(1));
             fmpz_gcd(t, rden, rnum);
             if (fmpz_is_one(t))
             {
@@ -85,7 +85,7 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
             }
         }
 
-        fmpz_add_ui(rden, rden, 1UL);
+        fmpz_add_ui(rden, rden, UWORD(1));
         fmpz_one(rnum);
         fmpz_clear(t);
     }

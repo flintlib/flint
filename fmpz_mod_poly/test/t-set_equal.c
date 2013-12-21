@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("set/equal....");
+    flint_printf("set/equal....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Equal polynomials */
     for (i = 0; i < 10000; i++)
@@ -62,9 +62,9 @@ main(void)
         result = (fmpz_mod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -99,10 +99,10 @@ main(void)
         result = (!fmpz_mod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("p = "), fmpz_print(p), printf("\n\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
+            fmpz_mod_poly_print(a), flint_printf("\n\n");
+            fmpz_mod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -113,8 +113,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

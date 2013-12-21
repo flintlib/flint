@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("divexact_si....");
+    flint_printf("divexact_si....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -61,7 +61,7 @@ main(void)
         fmpz_get_mpz(e, c);
 
         fmpz_divexact_si(a, c, n);
-        mpz_divexact_ui(f, e, FLINT_ABS(n));
+        flint_mpz_divexact_ui(f, e, FLINT_ABS(n));
         if (n < 0)
             mpz_neg(f, f);
 
@@ -70,8 +70,8 @@ main(void)
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("n = %ld, e = %Zd, f = %Zd, g = %Zd\n", n, e, f, g);
+            flint_printf("FAIL:\n");
+            gmp_printf("n = %wd, e = %Zd, f = %Zd, g = %Zd\n", n, e, f, g);
             abort();
         }
 
@@ -102,7 +102,7 @@ main(void)
         fmpz_get_mpz(d, c);
 
         fmpz_divexact_si(c, c, n);
-        mpz_divexact_ui(f, d, FLINT_ABS(n));
+        flint_mpz_divexact_ui(f, d, FLINT_ABS(n));
         if (n < 0)
             mpz_neg(f, f);
 
@@ -112,8 +112,8 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL;\n");
-            gmp_printf("d = %Zd, n = %ld, f = %Zd, g = %Zd\n", d, n, f, g);
+            flint_printf("FAIL;\n");
+            gmp_printf("d = %Zd, n = %wd, f = %Zd, g = %Zd\n", d, n, f, g);
             abort();
         }
 
@@ -124,8 +124,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -88,7 +88,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
 
     if (fmpz_sgn(f) < 0)
     {
-        printf("Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
+        flint_printf("Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
         abort();
     }
 
@@ -144,7 +144,7 @@ fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 
     if (borrow)
     {
-        fmpz_set_si(poly->coeffs + len, negate ? -1L : 1L);
+        fmpz_set_si(poly->coeffs + len, negate ? WORD(-1) : WORD(1));
         _fmpz_poly_set_length(poly, len + 1);
     }
     else

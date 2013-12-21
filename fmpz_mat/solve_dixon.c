@@ -32,7 +32,7 @@ find_good_prime_and_invert(nmod_mat_t Ainv,
     mp_limb_t p;
     fmpz_t tested;
 
-    p = 1UL << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
     fmpz_init(tested);
     fmpz_one(tested);
 
@@ -77,9 +77,9 @@ mp_limb_t * get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
             if (fmpz_cmpabs(bound, fmpz_mat_entry(A, i, j)) < 0)
                 fmpz_abs(bound, fmpz_mat_entry(A, i, j));
 
-    fmpz_mul_ui(bound, bound, p - 1UL);
+    fmpz_mul_ui(bound, bound, p - UWORD(1));
     fmpz_mul_ui(bound, bound, A->r);
-    fmpz_mul_ui(bound, bound, 2UL);  /* signs */
+    fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
 
     primes = flint_malloc(sizeof(mp_limb_t) * (fmpz_bits(bound) /
                                             (FLINT_BIT_COUNT(p) - 1) + 2));
@@ -136,7 +136,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         fmpz_mul(bound, D, D);
     else
         fmpz_mul(bound, N, N);
-    fmpz_mul_ui(bound, bound, 2UL);  /* signs */
+    fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
 
     crt_primes = get_crt_primes(&num_primes, A, p);
     A_mod = flint_malloc(sizeof(nmod_mat_t) * num_primes);
@@ -146,7 +146,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         fmpz_mat_get_nmod_mat(A_mod[i], A);
     }
 
-    nmod_mat_init(Ay_mod, n, cols, 1UL);
+    nmod_mat_init(Ay_mod, n, cols, UWORD(1));
     nmod_mat_init(d_mod, n, cols, p);
     nmod_mat_init(y_mod, n, cols, p);
 
@@ -227,7 +227,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
     if (!fmpz_mat_is_square(A))
     {
-        printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
+        flint_printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
         abort();
     }
 

@@ -32,12 +32,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("exp... ");
+    flint_printf("exp... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
@@ -67,12 +67,12 @@ main(void)
         result = ((ans1 == ans2) && (!ans1 || qadic_equal(b, c)));
         if (!result)
         {
-            printf("FAIL (alias):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("ans1 = %d\n", ans1);
-            printf("ans2 = %d\n", ans2);
+            flint_printf("FAIL (alias):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("ans1 = %d\n", ans1);
+            flint_printf("ans2 = %d\n", ans2);
             abort();
         }
 
@@ -120,14 +120,14 @@ main(void)
         result = (!ans1 || !ans2 || (ans3 && qadic_equal(f, g)));
         if (!result)
         {
-            printf("FAIL (functional equation):\n\n");
-            printf("a                 = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b                 = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = a + b         = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("d = exp(a)        = "), qadic_print_pretty(d, ctx), printf("\n");
-            printf("e = exp(b)        = "), qadic_print_pretty(e, ctx), printf("\n");
-            printf("f = exp(a) exp(b) = "), qadic_print_pretty(f, ctx), printf("\n");
-            printf("g = exp(a + b)    = "), qadic_print_pretty(g, ctx), printf("\n");
+            flint_printf("FAIL (functional equation):\n\n");
+            flint_printf("a                 = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b                 = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = a + b         = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("d = exp(a)        = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+            flint_printf("e = exp(b)        = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+            flint_printf("f = exp(a) exp(b) = "), qadic_print_pretty(f, ctx), flint_printf("\n");
+            flint_printf("g = exp(a + b)    = "), qadic_print_pretty(g, ctx), flint_printf("\n");
             abort();
         }
 
@@ -143,9 +143,9 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

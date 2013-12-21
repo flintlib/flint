@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("val2....");
+    flint_printf("val2....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -70,16 +70,16 @@ main(void)
         result = ((v1 == v2) == 1);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("v1 = %ld  v2 = %ld\n", v1, v2);
+            flint_printf("FAIL:\n");
+            flint_printf("v1 = %wd  v2 = %wd\n", v1, v2);
             abort();
         }
 
         fmpz_clear(x);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -30,12 +30,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("teichmuller... ");
+    flint_printf("teichmuller... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing (x 1,000) */
     for (i = 0; i < 1000; i++)
@@ -63,10 +63,10 @@ main(void)
         result = (padic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -104,10 +104,10 @@ main(void)
         result = (padic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (x^p == x):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
+            flint_printf("FAIL (x^p == x):\n\n");
+            flint_printf("a = "), padic_print(a, ctx), flint_printf("\n");
+            flint_printf("b = "), padic_print(b, ctx), flint_printf("\n");
+            flint_printf("c = "), padic_print(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -119,9 +119,9 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

@@ -198,7 +198,7 @@ int qadic_exp_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return 1;
     }
 
-    if ((*p == 2L && v <= 1) || (v <= 0))
+    if ((*p == WORD(2) && v <= 1) || (v <= 0))
     {
         return 0;
     }

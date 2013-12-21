@@ -32,12 +32,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("log_balanced... ");
+    flint_printf("log_balanced... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
 /** p == 2 *******************************************************************/
 
@@ -74,9 +74,9 @@ main(void)
         result = (ans1 == ans2) && (!ans1 || qadic_equal(a, b));
         if (!result)
         {
-            printf("FAIL (aliasing):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+            flint_printf("FAIL (aliasing):\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
             abort();
         }
 
@@ -134,14 +134,14 @@ main(void)
         result = (qadic_equal(f, g));
         if (!result)
         {
-            printf("FAIL (functional equation):\n\n");
-            printf("a                   = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b                   = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = a * b           = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("d = log(a)          = "), qadic_print_pretty(d, ctx), printf("\n");
-            printf("e = log(b)          = "), qadic_print_pretty(e, ctx), printf("\n");
-            printf("f = log(a) + log(b) = "), qadic_print_pretty(f, ctx), printf("\n");
-            printf("g = log(a * b)      = "), qadic_print_pretty(g, ctx), printf("\n");
+            flint_printf("FAIL (functional equation):\n\n");
+            flint_printf("a                   = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b                   = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = a * b           = "), qadic_print_pretty(c, ctx), flint_printf("\n");
+            flint_printf("d = log(a)          = "), qadic_print_pretty(d, ctx), flint_printf("\n");
+            flint_printf("e = log(b)          = "), qadic_print_pretty(e, ctx), flint_printf("\n");
+            flint_printf("f = log(a) + log(b) = "), qadic_print_pretty(f, ctx), flint_printf("\n");
+            flint_printf("g = log(a * b)      = "), qadic_print_pretty(g, ctx), flint_printf("\n");
             qadic_ctx_print(ctx);
             abort();
         }
@@ -176,7 +176,7 @@ main(void)
         qadic_init2(b, N);
         qadic_init2(c, N);
 
-        qadic_randtest_val(a, state, (*p == 2L) + 1, ctx);
+        qadic_randtest_val(a, state, (*p == WORD(2)) + 1, ctx);
 
         qadic_exp(b, a, ctx);
         qadic_log_balanced(c, b, ctx);
@@ -184,10 +184,10 @@ main(void)
         result = (qadic_equal(a, c));
         if (!result)
         {
-            printf("FAIL (log(exp(x)) == x):\n\n");
-            printf("a =          "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = exp(a) = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = log(b) = "), qadic_print_pretty(c, ctx), printf("\n");
+            flint_printf("FAIL (log(exp(x)) == x):\n\n");
+            flint_printf("a =          "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = exp(a) = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("c = log(b) = "), qadic_print_pretty(c, ctx), flint_printf("\n");
             abort();
         }
 
@@ -199,9 +199,9 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

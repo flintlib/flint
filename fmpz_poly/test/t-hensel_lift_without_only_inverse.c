@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("hensel_lift_without_only_inverse....");
+    flint_printf("hensel_lift_without_only_inverse....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* We check that lifting local factors of F_poly yields factors */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -168,12 +168,12 @@ main(void)
 
         if (!result) 
         {
-            printf("FAIL:\n");
-            printf("length = %ld, bits = %ld, n = %ld, exp = %ld\n", length, bits, n, exp);
-            fmpz_poly_print(F_poly); printf("\n\n");
-            fmpz_poly_print(F_poly2); printf("\n\n");
-            fmpz_poly_print(F_poly3); printf("\n\n");
-            fmpz_poly_print(Prod_1); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("length = %wd, bits = %wd, n = %wd, exp = %wd\n", length, bits, n, exp);
+            fmpz_poly_print(F_poly); flint_printf("\n\n");
+            fmpz_poly_print(F_poly2); flint_printf("\n\n");
+            fmpz_poly_print(F_poly3); flint_printf("\n\n");
+            fmpz_poly_print(Prod_1); flint_printf("\n\n");
             abort();
         } 
 
@@ -205,8 +205,8 @@ main(void)
         fmpz_poly_clear(F_poly);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

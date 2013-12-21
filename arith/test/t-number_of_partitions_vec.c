@@ -36,17 +36,17 @@
 
 int main(void)
 {
-    flint_rand_t state;
     fmpz * p;
     mp_ptr pmod;
     slong k, n;
 
     const slong maxn = 1000;
 
-    printf("number_of_partitions_vec....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("number_of_partitions_vec....");
+    fflush(stdout);
+    
     p = _fmpz_vec_init(maxn);
     pmod = _nmod_vec_init(maxn);
 
@@ -63,8 +63,8 @@ int main(void)
         {
             if (fmpz_fdiv_ui(p + k, mod.n) != pmod[k])
             {
-                printf("FAIL:\n");
-                printf("n = %ld, k = %ld\n", n, k);
+                flint_printf("FAIL:\n");
+                flint_printf("n = %wd, k = %wd\n", n, k);
                 abort();
             }
         }
@@ -96,12 +96,12 @@ int main(void)
 
             if (!fmpz_equal(s, p + n - 1))
             {
-                printf("FAIL:\n");
-                printf("n = %ld\n", n);
+                flint_printf("FAIL:\n");
+                flint_printf("n = %wd\n", n);
                 fmpz_print(s);
-                printf("\n");
+                flint_printf("\n");
                 fmpz_print(p + n - 1);
-                printf("\n");
+                flint_printf("\n");
                 abort();
             }
 
@@ -113,8 +113,8 @@ int main(void)
     _fmpz_vec_clear(p, maxn);
     _nmod_vec_clear(pmod);
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

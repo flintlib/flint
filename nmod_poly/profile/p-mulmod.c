@@ -44,8 +44,8 @@ void sample(void * arg, ulong count)
    slong n = info->n, i, j, s= info->s, alg=info->alg;
    slong scale;
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
    nmod_poly_t a, b, c, d, dinv;
    mp_limb_t m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2)); /* modulus */
    if (m == 0) m = 2;
@@ -133,7 +133,7 @@ int main(void)
       info.alg= 1;
       prof_repeat(&min, &max, sample, (void *) &info);
          
-      printf("length %ld, modulus degree %ld, min %.3g ms, max %.3g ms, norm %.3g\n", 
+      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
            info.n, info.s, 
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
@@ -144,7 +144,7 @@ int main(void)
       info.alg= 2;
       prof_repeat(&min, &max, sample, (void *) &info);
          
-      printf("length %ld, modulus degree %ld, min %.3g ms, max %.3g ms, norm %.3g\n", 
+      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
            info.n, info.s, 
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,

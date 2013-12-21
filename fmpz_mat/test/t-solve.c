@@ -38,14 +38,13 @@ main(void)
 {
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
-    flint_rand_t state;
     slong i, m, n, r;
     int success;
 
-    printf("solve....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("solve....");
+    fflush(stdout);    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -72,13 +71,13 @@ main(void)
 
         if (!fmpz_mat_equal(AX, B) || !success)
         {
-            printf("FAIL:\n");
-            printf("AX != B!\n");
-            printf("A:\n"),      fmpz_mat_print_pretty(A),  printf("\n");
-            printf("B:\n"),      fmpz_mat_print_pretty(B),  printf("\n");
-            printf("X:\n"),      fmpz_mat_print_pretty(X),  printf("\n");
-            printf("den(X) = "), fmpz_print(den),           printf("\n");
-            printf("AX:\n"),     fmpz_mat_print_pretty(AX), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("AX != B!\n");
+            flint_printf("A:\n"),      fmpz_mat_print_pretty(A),  flint_printf("\n");
+            flint_printf("B:\n"),      fmpz_mat_print_pretty(B),  flint_printf("\n");
+            flint_printf("X:\n"),      fmpz_mat_print_pretty(X),  flint_printf("\n");
+            flint_printf("den(X) = "), fmpz_print(den),           flint_printf("\n");
+            flint_printf("AX:\n"),     fmpz_mat_print_pretty(AX), flint_printf("\n");
             abort();
         }
 
@@ -113,8 +112,8 @@ main(void)
 
         if (!fmpz_is_zero(den) || success)
         {
-            printf("FAIL:\n");
-            printf("singular system gave nonzero determinant\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system gave nonzero determinant\n");
             abort();
         }
 
@@ -125,8 +124,8 @@ main(void)
         fmpz_clear(den);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

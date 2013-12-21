@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <math.h>
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 
 void
 fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,

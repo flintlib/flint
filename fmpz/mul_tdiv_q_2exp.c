@@ -45,7 +45,7 @@ fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
 
     c2 = *h;                    /* save h in case it is aliased with f */
 
-    if (c2 == 0L)               /* special case, h = 0  */
+    if (c2 == WORD(0))               /* special case, h = 0  */
     {
         fmpz_zero(f);
         return;
@@ -54,7 +54,7 @@ fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
     mpz_ptr = _fmpz_promote(f); /* h is saved, g is already large */
 
     if (!COEFF_IS_MPZ(c2))      /* g is large, h is small */
-        mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c1), c2);
+        flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c1), c2);
     else                        /* c1 and c2 are large */
         mpz_mul(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
 

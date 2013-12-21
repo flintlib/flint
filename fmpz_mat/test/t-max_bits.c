@@ -36,12 +36,12 @@ int
 main(void)
 {
     slong m, n, rep, res1, res2;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("max_bits....");
+    flint_printf("max_bits....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
@@ -58,15 +58,15 @@ main(void)
 
         if (res1 != res2)
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
         fmpz_mat_clear(A);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

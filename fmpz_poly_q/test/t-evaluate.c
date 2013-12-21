@@ -9,12 +9,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("evaluate...");
+    flint_printf("evaluate...");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 100; i++)
@@ -43,14 +43,14 @@ main(void)
         result = (ans1 == ans2) && mpq_equal(a, b);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("f = "), fmpz_poly_q_print(f), printf("\n");
-            printf("num = "), fmpz_print(num), printf("\n");
-            printf("den = "), fmpz_print(den), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("f = "), fmpz_poly_q_print(f), flint_printf("\n");
+            flint_printf("num = "), fmpz_print(num), flint_printf("\n");
+            flint_printf("den = "), fmpz_print(den), flint_printf("\n");
             gmp_printf("a = %Qd\n", a);
             gmp_printf("b = %Qd\n", b);
-            printf("ans1 = %d\n", ans1);
-            printf("ans2 = %d\n", ans2);
+            flint_printf("ans1 = %d\n", ans1);
+            flint_printf("ans2 = %d\n", ans2);
             abort();
         }
 
@@ -61,8 +61,8 @@ main(void)
         fmpz_poly_q_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

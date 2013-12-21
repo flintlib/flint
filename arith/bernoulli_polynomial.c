@@ -33,7 +33,7 @@ void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 
     if (n == 0)
     {
-        fmpq_poly_set_ui(poly, 1UL);
+        fmpq_poly_set_ui(poly, UWORD(1));
         return;
     }
 

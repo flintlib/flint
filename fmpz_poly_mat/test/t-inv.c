@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("inv....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("inv....");
+    fflush(stdout);    
 
     /* Test aliasing */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
@@ -76,9 +75,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL (aliasing)!\n");
-            fmpz_poly_mat_print(A, "x"); printf("\n");
-            fmpz_poly_mat_print(Ainv, "x"); printf("\n");
+            flint_printf("FAIL (aliasing)!\n");
+            fmpz_poly_mat_print(A, "x"); flint_printf("\n");
+            fmpz_poly_mat_print(Ainv, "x"); flint_printf("\n");
             abort();
         }
 
@@ -117,7 +116,7 @@ main(void)
         {
             if (nonsingular == 0 || !fmpz_poly_is_one(den))
             {
-                printf("FAIL: expected empty matrix to pass\n");
+                flint_printf("FAIL: expected empty matrix to pass\n");
                 abort();
             }
         }
@@ -126,7 +125,7 @@ main(void)
             if (!fmpz_poly_equal(den, det))
             {
                 fmpz_poly_neg(det, det);
-                printf("FAIL: den != det(A)\n");
+                flint_printf("FAIL: den != det(A)\n");
                 abort();
             }
 
@@ -136,14 +135,14 @@ main(void)
 
             if (!fmpz_poly_mat_equal(B, Iden))
             {
-                printf("FAIL:\n");
-                printf("A:\n");
+                flint_printf("FAIL:\n");
+                flint_printf("A:\n");
                 fmpz_poly_mat_print(A, "x");
-                printf("Ainv:\n");
+                flint_printf("Ainv:\n");
                 fmpz_poly_mat_print(Ainv, "x");
-                printf("B:\n");
+                flint_printf("B:\n");
                 fmpz_poly_mat_print(B, "x");
-                printf("den:\n");
+                flint_printf("den:\n");
                 fmpz_poly_print_pretty(den, "x");
                 abort();
             }
@@ -157,8 +156,8 @@ main(void)
         fmpz_poly_mat_clear(Iden);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

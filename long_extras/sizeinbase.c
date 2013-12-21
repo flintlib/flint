@@ -38,11 +38,11 @@ size_t z_sizeinbase(slong n, int b)
 
     if (n <= 0)
     {
-        if (n > LONG_MIN)
+        if (n > WORD_MIN)
         {
             n = -n;
         }
-        else  /* n == LONG_MIN */
+        else  /* n == WORD_MIN */
         {
             if (n % b)
             {

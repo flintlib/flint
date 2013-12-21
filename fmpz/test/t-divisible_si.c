@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("divisible_si....");
+    flint_printf("divisible_si....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with MPIR:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -55,7 +55,7 @@ main(void)
         mpz_init(d);
 
         a = z_randtest(state);
-        if (a == LONG_MIN)
+        if (a == WORD_MIN)
             a = 1;
         a = FLINT_ABS(a) + 1;
         fmpz_randtest(b, state, 200);
@@ -63,13 +63,13 @@ main(void)
         fmpz_get_mpz(d, b);
 
         e = fmpz_divisible_si(b, a);
-        f = mpz_divisible_ui_p(d, a);
+        f = flint_mpz_divisible_ui_p(d, a);
 
         result = (e == f);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = %ld, b = ", a), fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wd, b = ", a), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -89,7 +89,7 @@ main(void)
         mpz_init(d);
 
         a = z_randtest(state);
-        if (a == LONG_MIN)
+        if (a == WORD_MIN)
             a = 1;
         a = FLINT_ABS(a) + 1;
         fmpz_randtest(b, state, 200);
@@ -98,13 +98,13 @@ main(void)
         fmpz_get_mpz(d, b);
 
         e = fmpz_divisible_si(b, a);
-        f = mpz_divisible_ui_p(d, a);
+        f = flint_mpz_divisible_ui_p(d, a);
 
         result = (e == f && e == 1);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = %ld, b = ", a), fmpz_print(b), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wd, b = ", a), fmpz_print(b), flint_printf("\n");
             abort();
         }
 
@@ -112,9 +112,9 @@ main(void)
         mpz_clear(d);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

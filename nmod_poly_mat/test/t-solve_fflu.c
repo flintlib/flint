@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("solve....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("solve....");
+    fflush(stdout);    
 
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -74,7 +73,7 @@ main(void)
         {
             if (solved == 0)
             {
-                printf("FAIL: expected empty system to pass\n");
+                flint_printf("FAIL: expected empty system to pass\n");
                 abort();
             }
         }
@@ -86,16 +85,16 @@ main(void)
                 if (!nmod_poly_equal(den, det))
                 {
                     nmod_poly_neg(det, det);
-                    printf("FAIL: den != +/- det(A)\n");
-                    printf("den:\n"); nmod_poly_print(den);
-                    printf("\n\n");
-                    printf("det:\n"); nmod_poly_print(det);
-                    printf("\n\n");
-                    printf("A:\n");
+                    flint_printf("FAIL: den != +/- det(A)\n");
+                    flint_printf("den:\n"); nmod_poly_print(den);
+                    flint_printf("\n\n");
+                    flint_printf("det:\n"); nmod_poly_print(det);
+                    flint_printf("\n\n");
+                    flint_printf("A:\n");
                     nmod_poly_mat_print(A, "x");
-                    printf("B:\n");
+                    flint_printf("B:\n");
                     nmod_poly_mat_print(B, "x");
-                    printf("X:\n");
+                    flint_printf("X:\n");
                     nmod_poly_mat_print(X, "x");
                     abort();
                 }
@@ -104,7 +103,7 @@ main(void)
 
         if (solved != !nmod_poly_is_zero(den))
         {
-            printf("FAIL: return value does not match denominator\n");
+            flint_printf("FAIL: return value does not match denominator\n");
             abort();
         }
 
@@ -113,16 +112,16 @@ main(void)
 
         if (!nmod_poly_mat_equal(AX, Bden))
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             nmod_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             nmod_poly_mat_print(B, "x");
-            printf("X:\n");
+            flint_printf("X:\n");
             nmod_poly_mat_print(X, "x");
-            printf("AX:\n");
+            flint_printf("AX:\n");
             nmod_poly_mat_print(AX, "x");
-            printf("Bden:\n");
+            flint_printf("Bden:\n");
             nmod_poly_mat_print(Bden, "x");
             abort();
         }
@@ -136,8 +135,8 @@ main(void)
         nmod_poly_mat_clear(Bden);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("divexact2_uiui....");
+    flint_printf("divexact2_uiui....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -66,16 +66,16 @@ main(void)
 
         fmpz_divexact2_uiui(a, c, n, m);
 
-        mpz_divexact_ui(f, e, n);
-        mpz_divexact_ui(f, f, m);
+        flint_mpz_divexact_ui(f, e, n);
+        flint_mpz_divexact_ui(f, f, m);
 
         fmpz_get_mpz(g, a);
 
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("n = %lu, m = %lu, e = %Zd, f = %Zd, g = %Zd\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("n = %wu, m = %wu, e = %Zd, f = %Zd, g = %Zd\n",
                 n, m, e, f, g);
             abort();
         }
@@ -110,16 +110,16 @@ main(void)
 
         fmpz_divexact2_uiui(c, c, n, m);
 
-        mpz_divexact_ui(f, d, n);
-        mpz_divexact_ui(f, f, m);
+        flint_mpz_divexact_ui(f, d, n);
+        flint_mpz_divexact_ui(f, f, m);
 
         fmpz_get_mpz(g, c);
 
         result = (mpz_cmp(f, g) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, n = %lu, m = %lu, f = %Zd, g = %Zd\n",
+            flint_printf("FAIL:\n");
+            gmp_printf("d = %Zd, n = %wu, m = %wu, f = %Zd, g = %Zd\n",
                 d, n, m, f, g);
             abort();
         }
@@ -131,8 +131,8 @@ main(void)
         mpz_clear(g);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

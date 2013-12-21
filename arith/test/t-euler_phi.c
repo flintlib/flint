@@ -38,15 +38,15 @@ int main(void)
     slong i;
     ulong n;
     fmpz_t x, y, z;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("euler_phi....");
+    flint_printf("euler_phi....");
     fflush(stdout);
 
     fmpz_init(x);
     fmpz_init(y);
     fmpz_init(z);
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100; i++)
     {
@@ -56,7 +56,7 @@ int main(void)
         fmpz_set_ui(z, n_euler_phi(i));
         if (!fmpz_equal(x, y) || !fmpz_equal(x, z))
         {
-            printf("FAIL: %ld\n", i);
+            flint_printf("FAIL: %wd\n", i);
             abort();
         }
     }
@@ -73,9 +73,9 @@ int main(void)
         arith_euler_phi(x, x);
         if (!fmpz_equal(x, y))
         {
-            printf("FAIL: ");
+            flint_printf("FAIL: ");
             fmpz_print(z);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
     }
@@ -92,7 +92,7 @@ int main(void)
         fmpz_mul_ui(y, y, n_nth_prime(i+1)-1);
         if (!fmpz_equal(x, y))
         {
-            printf("FAIL: %lu ^ %lu\n", n_nth_prime(i+1), n);
+            flint_printf("FAIL: %wu ^ %wu\n", n_nth_prime(i+1), n);
         }
     }
 
@@ -102,17 +102,17 @@ int main(void)
     arith_euler_phi(x, x);
     if (!fmpz_equal(x, y))
     {
-        printf("FAIL: special test value\n");
+        flint_printf("FAIL: special test value\n");
         abort();
     }
 
-    flint_randclear(state);
+    
 
     fmpz_clear(x);
     fmpz_clear(y);
     fmpz_clear(z);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

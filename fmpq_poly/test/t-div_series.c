@@ -36,13 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
-    printf("div_series....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("div_series....");
+    fflush(stdout);  
 
     /* Check aliasing q and a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -66,11 +65,11 @@ main(void)
         result = (fmpq_poly_equal(q, a)) && !cflags;
         if (!result)
         {
-            printf("FAIL (alias q and a):\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (alias q and a):\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("q = "), fmpq_poly_debug(q), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -101,11 +100,11 @@ main(void)
         result = (fmpq_poly_equal(q, b)) && !cflags;
         if (!result)
         {
-            printf("FAIL (alias q and b):\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (alias q and b):\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("q = "), fmpq_poly_debug(q), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -140,12 +139,12 @@ main(void)
         result = (fmpq_poly_equal(p, a)) && !cflags;
         if (!result)
         {
-            printf("FAIL (check Q * B = A):\n");
-            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
-            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
-            printf("p = "), fmpq_poly_debug(p), printf("\n\n");
-            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            flint_printf("FAIL (check Q * B = A):\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("p = "), fmpq_poly_debug(p), flint_printf("\n\n");
+            flint_printf("q = "), fmpq_poly_debug(q), flint_printf("\n\n");
+            flint_printf("cflags = %wu\n\n", cflags);
             abort();
         }
 
@@ -155,8 +154,8 @@ main(void)
         fmpq_poly_clear(q);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

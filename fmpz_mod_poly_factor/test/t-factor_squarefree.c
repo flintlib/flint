@@ -32,17 +32,17 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("factor_squarefree....");
+    flint_printf("factor_squarefree....");
     fflush(stdout);
 
     for (iter = 0; iter < 300; iter++)
@@ -117,15 +117,15 @@ main(void)
 
         if (!result)
         {
-            printf("Error: exp don't match. Modulus = ");
+            flint_printf("Error: exp don't match. Modulus = ");
             fmpz_print(modulus);
-            printf("\n");
+            flint_printf("\n");
             for (i = 0; i < res->num; i++)
-                printf("%ld ", res->exp[i]);
-            printf("\n");
+                flint_printf("%wd ", res->exp[i]);
+            flint_printf("\n");
             for (i = 0; i < num; i++)
-                printf("%ld ", exp[i]);
-            printf("\n");
+                flint_printf("%wd ", exp[i]);
+            flint_printf("\n");
             abort();
         }
 
@@ -137,8 +137,8 @@ main(void)
         fmpz_mod_poly_factor_clear(res);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

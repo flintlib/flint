@@ -67,7 +67,7 @@ _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
     _fmpq_poly_mullow(t, tden, u, uden, n, poly, den, n, n);
     _fmpz_vec_neg(t + m, t + m, n - m);
     _fmpz_vec_zero(t, m);
-    fmpz_mul_ui(tden, tden, 2UL);
+    fmpz_mul_ui(tden, tden, UWORD(2));
     _fmpq_poly_canonicalise(t, tden, n);
 
     _fmpq_poly_add(rpoly, rden, rpoly, rden, m, t, tden, n);
@@ -85,7 +85,7 @@ void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (poly->length < 1 || !fmpz_equal(poly->coeffs, poly->den))
     {
-        printf("Exception (fmpq_poly_invsqrt_series). Constant term != 1.\n");
+        flint_printf("Exception (fmpq_poly_invsqrt_series). Constant term != 1.\n");
         abort();
     }
 

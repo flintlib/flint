@@ -37,7 +37,7 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
 
     m = n_randlimb(state);
 
-    if (m & 7UL)
+    if (m & UWORD(7))
     {
         z = n_randbits(state, n_randint(state, FLINT_BITS));
     }
@@ -45,15 +45,15 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
     {
         m >>= 3;
 
-        switch (m % 7UL)
+        switch (m % UWORD(7))
         {
             case 0:  z = 0;         break;
             case 1:  z = 1;         break;
             case 2:  z = -1;        break;
             case 3:  z = COEFF_MAX; break;
             case 4:  z = COEFF_MIN; break;
-            case 5:  z = LONG_MAX;  break;
-            case 6:  z = LONG_MIN;  break;
+            case 5:  z = WORD_MAX;  break;
+            case 6:  z = WORD_MIN;  break;
             default: z = 0;
         }
     }

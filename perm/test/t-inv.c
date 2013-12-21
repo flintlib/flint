@@ -32,10 +32,10 @@
 int main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("inv....");
+    flint_printf("inv....");
     fflush(stdout);
 
     /* check inv(inv(a)) == a */
@@ -56,10 +56,10 @@ int main(void)
 
         if (!_perm_equal(a, c, n))
         {
-            printf("FAIL:\n");
-            printf("a: "); _perm_print(a, n); printf("\n\n");
-            printf("b: "); _perm_print(b, n); printf("\n\n");
-            printf("c: "); _perm_print(c, n); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
+            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
+            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
             abort();
         }
 
@@ -85,9 +85,9 @@ int main(void)
 
         if (!_perm_equal(a, b, n))
         {
-            printf("FAIL:\n");
-            printf("a: "); _perm_print(a, n); printf("\n\n");
-            printf("b: "); _perm_print(b, n); printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
+            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
             abort();
         }
 
@@ -95,8 +95,8 @@ int main(void)
         _perm_clear(b);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -33,13 +33,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("nullspace....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("nullspace....");
+    fflush(stdout);    
 
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -65,19 +64,19 @@ main(void)
 
         if (nullity + rank != n)
         {
-            printf("FAIL: wrong nullity!\n");
-            printf("rank = %ld\n", rank);
-            printf("nullity = %ld\n", nullity);
+            flint_printf("FAIL: wrong nullity!\n");
+            flint_printf("rank = %wd\n", rank);
+            flint_printf("nullity = %wd\n", nullity);
             nmod_poly_mat_print(A, "x");
-            printf("\n");
+            flint_printf("\n");
             nmod_poly_mat_print(N, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
         if (nmod_poly_mat_rank(N) != nullity)
         {
-            printf("FAIL: wrong rank(N) != nullity!\n");
+            flint_printf("FAIL: wrong rank(N) != nullity!\n");
             abort();
         }
 
@@ -85,7 +84,7 @@ main(void)
 
         if (!nmod_poly_mat_is_zero(AN))
         {
-            printf("FAIL: A * N != 0\n");
+            flint_printf("FAIL: A * N != 0\n");
             abort();
         }
 
@@ -94,8 +93,8 @@ main(void)
         nmod_poly_mat_clear(AN);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

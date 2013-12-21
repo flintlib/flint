@@ -24,17 +24,17 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("factor_equal_deg_prob....");
+    flint_printf("factor_equal_deg_prob....");
     fflush(stdout);
 
     for (iter = 0; iter < 200; iter++)
@@ -83,14 +83,14 @@ main(void)
         fmpz_mod_poly_divrem(q, r, poly1, poly2);
         if (!fmpz_mod_poly_is_zero(r))
         {
-            printf("FAIL:\n");
-            printf("Error: factor does not divide original polynomial\n");
-            printf("factor:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Error: factor does not divide original polynomial\n");
+            flint_printf("factor:\n");
             fmpz_mod_poly_print(poly2);
-            printf("\n\n");
-            printf("polynomial:\n");
+            flint_printf("\n\n");
+            flint_printf("polynomial:\n");
             fmpz_mod_poly_print(poly1);
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -101,8 +101,8 @@ main(void)
         fmpz_mod_poly_clear(poly2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

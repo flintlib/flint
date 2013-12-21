@@ -48,12 +48,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("height_index....");
+    flint_printf("height_index....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -72,16 +72,16 @@ main(void)
         result = (p1 == p2);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("bits = %ld, p1 = %ld, p2 = %ld\n", bits, p1, p2);
+            flint_printf("FAIL:\n");
+            flint_printf("bits = %wd, p1 = %wd, p2 = %wd\n", bits, p1, p2);
             abort();
         }
 
         _fmpz_vec_clear(a, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -37,21 +37,21 @@ void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     {
         if (d >= 0)
         {
-            fmpz_set_ui(f, exp < (FLINT_BITS - 2) ? d & ((1L << exp) - 1) : d);
+            fmpz_set_ui(f, exp < (FLINT_BITS - 2) ? d & ((WORD(1) << exp) - 1) : d);
         }
         else
         {
             if (exp <= FLINT_BITS - 2)
             {
-                fmpz_set_ui(f, d & ((1L << exp) - 1));
+                fmpz_set_ui(f, d & ((WORD(1) << exp) - 1));
             }
             else
             {
                 __mpz_struct * mpz_ptr = _fmpz_promote(f);
 
-                mpz_set_ui(mpz_ptr, 1);
+                flint_mpz_set_ui(mpz_ptr, 1);
                 mpz_mul_2exp(mpz_ptr, mpz_ptr, exp);
-                mpz_sub_ui(mpz_ptr, mpz_ptr, -d);
+                flint_mpz_sub_ui(mpz_ptr, mpz_ptr, -d);
             }
         }
     }

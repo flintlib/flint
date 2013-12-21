@@ -34,17 +34,16 @@
 
 int main(void)
 {
-    flint_rand_t state;
     fmpz * b1;
     fmpz * b2;
     slong n, k;
 
     const slong maxn = 400;
 
-    printf("bell_number....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("bell_number....");
+    fflush(stdout);    
 
     b1 = _fmpz_vec_init(maxn);
 
@@ -59,8 +58,8 @@ int main(void)
 
         if (!_fmpz_vec_equal(b1, b2, n))
         {
-            printf("FAIL:\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd\n", n);
             abort();
         }
 
@@ -81,12 +80,12 @@ int main(void)
 
         if (!fmpz_equal(b1, b2))
         {
-            printf("FAIL:\n");
-            printf("n = %ld\n", n);
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd\n", n);
             fmpz_print(b1);
-            printf("\n");
+            flint_printf("\n");
             fmpz_print(b2);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -100,11 +99,11 @@ int main(void)
 
             if (fmpz_fdiv_ui(b1, mod.n) != bb)
             {
-                printf("FAIL:\n");
-                printf("n = %ld\n", n);
+                flint_printf("FAIL:\n");
+                flint_printf("n = %wd\n", n);
                 fmpz_print(b1);
-                printf("\n");
-                printf("should be %lu mod %lu\n", bb, mod.n);
+                flint_printf("\n");
+                flint_printf("should be %wu mod %wu\n", bb, mod.n);
                 abort();
             }
         }
@@ -114,9 +113,8 @@ int main(void)
 
     _fmpz_vec_clear(b1, maxn);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
 
-    flint_cleanup();
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

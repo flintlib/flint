@@ -38,13 +38,12 @@ main(void)
 {
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
-    flint_rand_t state;
     slong i, j, m, r;
 
-    printf("inv....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("inv....");
+    fflush(stdout);    
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -57,7 +56,7 @@ main(void)
         fmpz_init(den);
 
         for (j = 0; j < m; j++)
-            fmpz_set_ui(&I->rows[j][j], 1UL);
+            fmpz_set_ui(&I->rows[j][j], UWORD(1));
 
         /* Verify that A * A^-1 = I for random matrices */
 
@@ -73,12 +72,12 @@ main(void)
 
         if (!fmpz_mat_equal(C, I))
         {
-            printf("FAIL:\n");
-            printf("A * A^-1 != I!\n");
-            printf("A:\n"),         fmpz_mat_print_pretty(A), printf("\n");
-            printf("A^-1:\n"),      fmpz_mat_print_pretty(B), printf("\n");
-            printf("den(A^-1) = "), fmpz_print(den), printf("\n");
-            printf("A * A^-1:\n"),  fmpz_mat_print_pretty(C), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A * A^-1 != I!\n");
+            flint_printf("A:\n"),         fmpz_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("A^-1:\n"),      fmpz_mat_print_pretty(B), flint_printf("\n");
+            flint_printf("den(A^-1) = "), fmpz_print(den), flint_printf("\n");
+            flint_printf("A * A^-1:\n"),  fmpz_mat_print_pretty(C), flint_printf("\n");
             abort();
         }
 
@@ -90,9 +89,9 @@ main(void)
 
         if (!fmpz_mat_equal(B, I))
         {
-            printf("FAIL:\n");
-            printf("aliasing failed!\n");
-            fmpz_mat_print(C); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("aliasing failed!\n");
+            fmpz_mat_print(C); flint_printf("\n");
             abort();
         }
 
@@ -123,8 +122,8 @@ main(void)
         fmpz_mat_inv(B, den, A);
         if (!fmpz_is_zero(den))
         {
-            printf("FAIL:\n");
-            printf("singular system gave nonzero denominator\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system gave nonzero denominator\n");
             abort();
         }
 
@@ -132,8 +131,8 @@ main(void)
         fmpz_mat_inv(A, den, A);
         if (!fmpz_is_zero(den))
         {
-            printf("FAIL:\n");
-            printf("singular system gave nonzero denominator\n");
+            flint_printf("FAIL:\n");
+            flint_printf("singular system gave nonzero denominator\n");
             abort();
         }
 
@@ -142,8 +141,8 @@ main(void)
         fmpz_clear(den);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

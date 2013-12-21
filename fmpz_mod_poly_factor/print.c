@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 
 void
 fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
@@ -40,6 +40,6 @@ fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
     for (i = 0; i < fac->num; i++)
     {
         fmpz_mod_poly_print(fac->poly + i);
-        printf(" ^ %ld\n", fac->exp[i]);
+        flint_printf(" ^ %wd\n", fac->exp[i]);
     }
 }

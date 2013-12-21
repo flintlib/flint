@@ -37,7 +37,7 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
 
     if (h == 0)
     {
-        printf("Exception (fmpz_divexact_si). Division by zero.\n");
+        flint_printf("Exception (fmpz_divexact_si). Division by zero.\n");
         abort();
     }
 
@@ -51,12 +51,12 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
 
         if (h > 0)
         {
-            mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), h);
+            flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), h);
             _fmpz_demote_val(f);  /* division by h may result in small value */
         }
         else
         {
-            mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), -h);
+            flint_mpz_divexact_ui(mpz_ptr, COEFF_TO_PTR(c1), -h);
             _fmpz_demote_val(f);  /* division by h may result in small value */
             fmpz_neg(f, f);
         }

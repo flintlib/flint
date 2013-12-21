@@ -32,12 +32,12 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
+   FLINT_TEST_INIT(state);
    
-   printf("gcd....");
+   flint_printf("gcd....");
    fflush(stdout);
    
-   flint_randinit(state);
+   
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
@@ -51,21 +51,21 @@ int main(void)
       {
          a = n_randtest_bits(state, bits1);
          b = n_randtest_bits(state, bits2);
-      } while ((n_gcd(a, b) != 1UL) || (b > a));
+      } while ((n_gcd(a, b) != UWORD(1)) || (b > a));
 
       c = n_randtest_bits(state, bits3);
 
       result = (n_gcd(a*c, b*c) == c);
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("a = %lu, b = %lu, c = %lu\n", a, b, c); 
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c); 
          abort();
       }
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

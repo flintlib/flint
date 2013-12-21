@@ -36,9 +36,9 @@ int main(void)
     mpz_t a, b, c, g, s;
     mp_ptr temp;
     gmp_randstate_t st;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
     
-    printf("divides....");
+    flint_printf("divides....");
     fflush(stdout);
 
     mpz_init(a);
@@ -47,7 +47,7 @@ int main(void)
     mpz_init(s);
     /* don't init g */
     gmp_randinit_default(st);
-    flint_randinit(state);
+    
 
     /* check if b divides a*b */
     for (i = 0; i < 10000; i++)
@@ -74,7 +74,7 @@ int main(void)
        result &= (mpz_cmp(g, a) == 0);
        if (!result)
        {
-          printf("FAIL:\n");
+          flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", c);
           gmp_printf("%Zd\n", a);
           gmp_printf("%Zd\n", b);
@@ -111,7 +111,7 @@ int main(void)
        
        if (!result)
        {
-          printf("FAIL:\n");
+          flint_printf("FAIL:\n");
           gmp_printf("%Zd\n", c);
           gmp_printf("%Zd\n", a);
           gmp_printf("%Zd\n", b);
@@ -129,8 +129,8 @@ int main(void)
     mpz_clear(s);
     /* don't clear g */
     gmp_randclear(st);
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

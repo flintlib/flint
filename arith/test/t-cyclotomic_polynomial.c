@@ -39,7 +39,7 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 
     fmpz_poly_init(t);
 
-    fmpz_poly_set_ui(poly, 1UL);
+    fmpz_poly_set_ui(poly, UWORD(1));
     for (d = 1; d <= n; d++)
     {
         if (n % d == 0)
@@ -76,7 +76,9 @@ int main()
     fmpz_poly_t A, B;
     slong n;
 
-    printf("cyclotomic_polynomial....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("cyclotomic_polynomial....");
     fflush(stdout);
 
     for (n = 0; n <= 1000; n++)
@@ -89,12 +91,12 @@ int main()
 
         if (!fmpz_poly_equal(A, B))
         {
-            printf("FAIL: wrong value of Phi_%ld(x)\n", n);
-            printf("Computed:\n");
+            flint_printf("FAIL: wrong value of Phi_%wd(x)\n", n);
+            flint_printf("Computed:\n");
             fmpz_poly_print_pretty(A, "x");
-            printf("\n\nExpected:\n");
+            flint_printf("\n\nExpected:\n");
             fmpz_poly_print_pretty(B, "x");
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -109,8 +111,8 @@ int main()
     {
         fmpz_t h, ref;
 
-        const ulong nn = 10163195UL;
-        /* const ulong nn = 169828113UL;  64-bit case */
+        const ulong nn = UWORD(10163195);
+        /* const ulong nn = UWORD(169828113);  64-bit case */
 
         fmpz_init(h);
         fmpz_init(ref);
@@ -118,17 +120,17 @@ int main()
         /* fmpz_set_str(ref, "31484567640915734941", 10);  64-bit case */
 
         fmpz_poly_init(A);
-        arith_cyclotomic_polynomial(A, 10163195UL);
+        arith_cyclotomic_polynomial(A, UWORD(10163195));
         fmpz_poly_height(h, A);
 
         if (!fmpz_equal(h, ref))
         {
-            printf("Bad computation of Phi_%ld(x)\n", nn);
-            printf("Computed height:\n");
+            flint_printf("Bad computation of Phi_%wd(x)\n", nn);
+            flint_printf("Computed height:\n");
             fmpz_print(h);
-            printf("\nExpected height:\n");
+            flint_printf("\nExpected height:\n");
             fmpz_print(ref);
-            printf("\n\n");
+            flint_printf("\n\n");
             abort();
         }
 
@@ -137,7 +139,7 @@ int main()
         fmpz_clear(ref);
     }
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

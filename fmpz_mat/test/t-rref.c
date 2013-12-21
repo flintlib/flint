@@ -78,12 +78,12 @@ int
 main(void)
 {
     slong iter;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("rref....");
+    flint_printf("rref....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -121,8 +121,8 @@ main(void)
 
         if (r != rank1)
         {
-            printf("FAIL:\n");
-            printf("wrong rank!\n");
+            flint_printf("FAIL:\n");
+            flint_printf("wrong rank!\n");
             abort();
         }
 
@@ -165,10 +165,10 @@ main(void)
 
         if (!equal)
         {
-            printf("FAIL (rank1 = %ld, rank2 = %ld)!\n", rank1, rank2);
-            fmpz_mat_print_pretty(A); printf("\n\n");
-            fmpz_mat_print_pretty(R); printf("\n\n");
-            fmpz_mat_print_pretty(R2); printf("\n\n");
+            flint_printf("FAIL (rank1 = %wd, rank2 = %wd)!\n", rank1, rank2);
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(R); flint_printf("\n\n");
+            fmpz_mat_print_pretty(R2); flint_printf("\n\n");
             abort();
         }
 
@@ -184,9 +184,9 @@ main(void)
         fmpz_mat_clear(R2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

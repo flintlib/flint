@@ -47,7 +47,7 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
     {
         if (R1[iR] == 0)
         {
-            ptrQ[iR] = 0L;
+            ptrQ[iR] = WORD(0);
         }
         else 
         {
@@ -90,9 +90,9 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
         mp_limb_t r = 
             n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n, mod.ninv);
 
-        while ((iR + 1 >= lenB) && (r == 0L))
+        while ((iR + 1 >= lenB) && (r == WORD(0)))
         {
-            ptrQ[iR--] = 0L;
+            ptrQ[iR--] = WORD(0);
             if (iR + 1 >= lenB)
                 r = n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n,
                                     mod.ninv);
@@ -143,9 +143,9 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
             n_lll_mod_preinv(R3[3 * iR + 2], R3[3 * iR + 1],
                              R3[3 * iR], mod.n, mod.ninv);
 
-        while ((iR + 1 >= lenB) && (r == 0L))
+        while ((iR + 1 >= lenB) && (r == WORD(0)))
         {
-            ptrQ[iR--] = 0L;
+            ptrQ[iR--] = WORD(0);
             if (iR + 1 >= lenB)
                 r = n_lll_mod_preinv(R3[3 * iR + 2], R3[3 * iR + 1],
                                      R3[3 * iR], mod.n, mod.ninv);
@@ -192,10 +192,11 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     const slong lenA = A->length, lenB = B->length;
     mp_ptr Q_coeffs, R_coeffs, W;
     nmod_poly_t t1, t2;
+    TMP_INIT;
 
     if (lenB == 0)
     {
-        printf("Exception (nmod_poly_divrem). Division by zero.\n");
+        flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
         abort();
     }
 
@@ -228,7 +229,8 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         R_coeffs = R->coeffs;
     }
 
-    W = _nmod_vec_init(NMOD_DIVREM_BC_ITCH(lenA, lenB, A->mod));
+    TMP_START;
+    W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, A->mod)*sizeof(mp_limb_t));
     
     _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, lenA,
                                B->coeffs, lenB, B->mod);
@@ -246,6 +248,6 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;
 
-    _nmod_vec_clear(W);
+    TMP_END;
     _nmod_poly_normalise(R);
 }

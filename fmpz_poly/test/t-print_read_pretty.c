@@ -46,16 +46,15 @@ extern FILE * fdopen(int fildes, const char *mode);
 int main(void)
 {
     int i, j, n = 1000, result;
-    flint_rand_t state;
 
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
 
-    printf("print/ read_pretty....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("print/ read_pretty....");
+    fflush(stdout);   
 
     /* Randomise n polynomials, write to and read from a pipe */
     {
@@ -71,15 +70,15 @@ int main(void)
 
         if (pipe(fd))
         {
-            printf("FAIL:\n");
-            printf("Failed to set-up the pipe.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to set-up the pipe.\n");
             abort();
         }
 
         if((childpid = fork()) == -1)
         {
-            printf("FAIL:\n");
-            printf("Failed to fork the process.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to fork the process.\n");
             abort();
         }
 
@@ -91,8 +90,8 @@ int main(void)
             out = fdopen(fd[1], "w");
             if (out == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open output file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open output file at the pipe.\n");
                 abort();
             }
 
@@ -100,12 +99,12 @@ int main(void)
             {
                 r = fmpz_poly_fprint_pretty(out, a[j], var);
                 if ((j < n - 1) && (r > 0))
-                    r = fprintf(out, "\n");
+                    r = flint_fprintf(out, "\n");
 
                 if (r <= 0)
                 {
-                    printf("FAIL:\n");
-                    printf("Write error.\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("Write error.\n");
                     abort();
                 }
             }
@@ -123,8 +122,8 @@ int main(void)
             in = fdopen(fd[0], "r");
             if (in == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open input file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open input file at the pipe.\n");
                 abort();
             }
 
@@ -136,8 +135,8 @@ int main(void)
                 r = fmpz_poly_fread_pretty(in, t, &rvar);
                 if (r <= 0)
                 {
-                    printf("FAIL:\n");
-                    printf("Read error.\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("Read error.\n");
                     abort();
                 }
 
@@ -145,10 +144,10 @@ int main(void)
                     (t->length <= 1 || (strcmp(var, rvar) == 0));
                 if (!result)
                 {
-                    printf("FAIL:\n");
-                    printf("a[i] = "), fmpz_poly_print_pretty(a[i], var), printf("\n");
-                    printf("t    = "), fmpz_poly_print_pretty(t, rvar), printf("\n");
-                    printf("rvar = %s\n", rvar);
+                    flint_printf("FAIL:\n");
+                    flint_printf("a[i] = "), fmpz_poly_print_pretty(a[i], var), flint_printf("\n");
+                    flint_printf("t    = "), fmpz_poly_print_pretty(t, rvar), flint_printf("\n");
+                    flint_printf("rvar = %s\n", rvar);
                     abort();
                 }
                 flint_free(rvar);
@@ -162,8 +161,8 @@ int main(void)
 
         if (i != n)
         {
-            printf("FAIL:\n");
-            printf("Only %d out of %d objects were processed.\n", i, n);
+            flint_printf("FAIL:\n");
+            flint_printf("Only %d out of %d objects were processed.\n", i, n);
             abort();
         }
 
@@ -178,15 +177,15 @@ int main(void)
 
         if (pipe(fd))
         {
-            printf("FAIL:\n");
-            printf("Failed to set-up the pipe.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to set-up the pipe.\n");
             abort();
         }
 
         if((childpid = fork()) == -1)
         {
-            printf("FAIL:\n");
-            printf("Failed to fork the process.\n");
+            flint_printf("FAIL:\n");
+            flint_printf("Failed to fork the process.\n");
             abort();
         }
 
@@ -198,16 +197,16 @@ int main(void)
             out = fdopen(fd[1], "w");
             if (out == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open output file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open output file at the pipe.\n");
                 abort();
             }
 
             r = fputs(str, out);
             if (r == EOF)
             {
-                printf("FAIL:\n");
-                printf("Write error.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Write error.\n");
                 abort();
             }
 
@@ -224,8 +223,8 @@ int main(void)
             in = fdopen(fd[0], "r");
             if (in == NULL)
             {
-                printf("FAIL:\n");
-                printf("Could not open input file at the pipe.\n");
+                flint_printf("FAIL:\n");
+                flint_printf("Could not open input file at the pipe.\n");
                 abort();
             }
 
@@ -235,15 +234,15 @@ int main(void)
             {
                 r = fmpz_poly_fread_pretty(in, t, &rvar);
                 result = (r > 0) && rvar && (strcmp(str, rvar) == 0) && 
-                         (t->length == 2) && (t->coeffs[0] == 0L) && 
-                         (t->coeffs[1] == 1L);
+                         (t->length == 2) && (t->coeffs[0] == WORD(0)) && 
+                         (t->coeffs[1] == WORD(1));
                 if (!result)
                 {
-                    printf("FAIL:\n");
-                    printf("r    = %d\n", r);
-                    printf("str  = {%s}\n", str);
-                    printf("rvar = {%s}\n", rvar);
-                    printf("t    = "), fmpz_poly_print(t), printf("\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("r    = %d\n", r);
+                    flint_printf("str  = {%s}\n", str);
+                    flint_printf("rvar = {%s}\n", rvar);
+                    flint_printf("t    = "), fmpz_poly_print(t), flint_printf("\n");
                     abort();
                 }
                 if (rvar)
@@ -255,9 +254,9 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 
@@ -265,9 +264,9 @@ int main(void)
 
 int main(void)
 {
-    printf("print/ read....");
+    flint_printf("print/ read....");
     fflush(stdout);
-    printf("SKIPPED\n");
+    flint_printf("SKIPPED\n");
     return EXIT_SUCCESS;
 }
 

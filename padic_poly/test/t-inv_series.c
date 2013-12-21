@@ -33,16 +33,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    printf("inv_series... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("inv_series... ");
+    fflush(stdout);    
 
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
@@ -60,14 +59,14 @@ main(void)
         padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100) + 1, ctx);
-        fmpz_remove(a->coeffs, a->coeffs, p);
         if (fmpz_is_zero(a->coeffs))
         {
             fmpz_randtest_not_zero(a->coeffs, state, 20);
             fmpz_remove(a->coeffs, a->coeffs, p);
             padic_poly_reduce(a, ctx);
-        }
-
+        } else
+            fmpz_remove(a->coeffs, a->coeffs, p);
+        
         padic_poly_set(b, a, ctx);
         n = n_randint(state, 100) + 1;
 
@@ -77,10 +76,10 @@ main(void)
         result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
-            printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
-            printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), padic_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -147,12 +146,12 @@ main(void)
         result = (padic_poly_is_one(c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
-            printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
-            printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
-            printf("N = %ld\n", N);
-            printf("N2 = %ld\n", N2);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), padic_poly_print(a, ctx), flint_printf("\n\n");
+            flint_printf("b = "), padic_poly_print(b, ctx), flint_printf("\n\n");
+            flint_printf("c = "), padic_poly_print(c, ctx), flint_printf("\n\n");
+            flint_printf("N = %wd\n", N);
+            flint_printf("N2 = %wd\n", N2);
             abort();
         }
 
@@ -164,8 +163,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

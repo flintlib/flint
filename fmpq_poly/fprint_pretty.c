@@ -48,6 +48,12 @@ do {                               \
     }                              \
 } while (0)
 
+/* checks if x/y == 1, where (x, y) need not be in lowest terms */
+#define __fmpq_is_one(x,y) fmpz_equal((x), (y))
+
+/* checks if x/y == +/- 1, where (x, y) need not be in lowest terms */
+#define __fmpq_is_pm1(x,y) (fmpz_cmpabs((x),(y)) == 0)
+
 int _fmpq_poly_fprint_pretty(FILE * file, 
                              const fmpz *poly, const fmpz_t den, slong len, 
                              const char * x)
@@ -68,23 +74,23 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     }
     else if (len == 2)
     {
-        if (poly[1] == 1L)
+        if (__fmpq_is_one(poly + 1, den))
         {
-            fprintf(file, "%s", x);
+            flint_fprintf(file, "%s", x);
         }
-        else if (poly[1] == -1L)
+        else if (__fmpq_is_pm1(poly + 1, den))
         {
-            fprintf(file, "-%s", x);
+            flint_fprintf(file, "-%s", x);
         }
         else
         {
             __fmpq_fprint(poly + 1, den);
-            fprintf(file, "*%s", x);
+            flint_fprintf(file, "*%s", x);
         }
         
         if (fmpz_sgn(poly + 0) > 0)
         {
-            fprintf(file, "+");
+            flint_fprintf(file, "+");
             __fmpq_fprint(poly + 0, den);
         }
         else if (fmpz_sgn(poly + 0) < 0)
@@ -96,14 +102,14 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     {
         slong i = len - 1;  /* i >= 2 */
         {
-            if (poly[i] == 1L)
-               fprintf(file, "%s^%ld", x, i);
-            else if (poly[i] == -1L)
-               fprintf(file, "-%s^%ld", x, i);
+            if (__fmpq_is_one(poly + i, den))
+               flint_fprintf(file, "%s^%wd", x, i);
+            else if (__fmpq_is_pm1(poly + i, den))
+               flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
                __fmpq_fprint(poly + i, den);
-               fprintf(file, "*%s^%ld", x, i);
+               flint_fprintf(file, "*%s^%wd", x, i);
             }
             --i;
         }
@@ -113,10 +119,10 @@ int _fmpq_poly_fprint_pretty(FILE * file,
             if (poly[i] == 0)
                 continue;
 
-            if (poly[i] == 1L)
-                fprintf(file, "+%s^%ld", x, i);
-            else if (poly[i] == -1L)
-                fprintf(file, "-%s^%ld", x, i);
+            if (__fmpq_is_one(poly + i, den))
+                flint_fprintf(file, "+%s^%wd", x, i);
+            else if (__fmpq_is_pm1(poly + i, den))
+                flint_fprintf(file, "-%s^%wd", x, i);
             else
             {
                 if (fmpz_sgn(poly + i) > 0)
@@ -124,18 +130,18 @@ int _fmpq_poly_fprint_pretty(FILE * file,
                     fputc('+', file);
                 }
                 __fmpq_fprint(poly + i, den);
-                fprintf(file, "*%s^%ld", x, i);
+                flint_fprintf(file, "*%s^%wd", x, i);
             }
         }
 
         if (poly[1])
         {
-            if (poly[1] == 1L)
+            if (__fmpq_is_one(poly + 1, den))
             {
                 fputc('+', file);
                 fputs(x, file);
             }
-            else if (poly[1] == -1L)
+            else if (__fmpq_is_pm1(poly + 1, den))
             {
                 fputc('-', file);
                 fputs(x, file);

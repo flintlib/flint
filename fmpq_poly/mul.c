@@ -41,16 +41,16 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
     fmpz_one(gcd1);
     fmpz_one(gcd2);
     
-    if (*den2 != 1L)
+    if (*den2 != WORD(1))
     {
         _fmpz_vec_content(gcd1, poly1, len1);
-        if (*gcd1 != 1L)
+        if (*gcd1 != WORD(1))
             fmpz_gcd(gcd1, gcd1, den2);
     }
-    if (*den1 != 1L)
+    if (*den1 != WORD(1))
     {
         _fmpz_vec_content(gcd2, poly2, len2);
-        if (*gcd2 != 1L)
+        if (*gcd2 != WORD(1))
             fmpz_gcd(gcd2, gcd2, den1);
     }
     
@@ -63,7 +63,7 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
     _fmpz_poly_mul(rpoly, poly1, len1, poly2, len2);
     fmpz_mul(rden, den1, den2);
 
-    if ((*gcd1 != 1L) | (*gcd2 != 1L))
+    if ((*gcd1 != WORD(1)) | (*gcd2 != WORD(1)))
     {
         fmpz_t g;
         fmpz_init(g);

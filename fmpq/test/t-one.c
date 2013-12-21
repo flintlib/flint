@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("one....");
+    flint_printf("one....");
     fflush(stdout);
 
     /* x == 1 * x */
@@ -57,10 +57,10 @@ main(void)
         result = fmpq_is_canonical(z) && fmpq_equal(x, z);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("x = "), fmpq_print(x), printf("\n");
-            printf("y = "), fmpq_print(y), printf("\n");
-            printf("z = "), fmpq_print(z), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("x = "), fmpq_print(x), flint_printf("\n");
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n");
+            flint_printf("z = "), fmpq_print(z), flint_printf("\n");
             abort();
         }
 
@@ -85,9 +85,9 @@ main(void)
         result = fmpq_is_canonical(y) && fmpq_is_one(y);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("x = "), fmpq_print(x), printf("\n");
-            printf("y = "), fmpq_print(y), printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("x = "), fmpq_print(x), flint_printf("\n");
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n");
             abort();
         }
 
@@ -95,10 +95,10 @@ main(void)
         fmpq_clear(y);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

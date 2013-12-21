@@ -82,7 +82,7 @@ _nmod_poly_KS2_unpack1(mp_ptr res, mp_srcptr op, slong n, ulong b,
    }
    else
    {
-      ulong mask = (1UL << b) - 1;
+      ulong mask = (UWORD(1) << b) - 1;
 
       for (; n > 0; n--)
       {
@@ -161,7 +161,7 @@ _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
    {
       ulong mask;
       b -= FLINT_BITS;
-      mask = (1UL << b) - 1;
+      mask = (UWORD(1) << b) - 1;
 
       for (; n > 0; n--)
       {
@@ -227,7 +227,7 @@ _nmod_poly_KS2_unpack3(mp_ptr res, mp_srcptr op, slong n, ulong b,
    }
 
    b -= 2 * FLINT_BITS;
-   mask = (1UL << b) - 1;
+   mask = (UWORD(1) << b) - 1;
 
    for (; n > 0; n--)
    {

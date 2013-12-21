@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("is_prime_pseudosquare....");
+    flint_printf("is_prime_pseudosquare....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
@@ -56,17 +56,17 @@ main(void)
         result = (r1 == r2);
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             fmpz_print(p);
-            printf("r1 = %d, r2 = %d\n", r1, r2);
+            flint_printf("r1 = %d, r2 = %d\n", r1, r2);
             abort();
         }
 
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

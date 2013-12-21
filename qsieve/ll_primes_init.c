@@ -181,8 +181,8 @@ mp_limb_t qsieve_ll_primes_init(qs_t qs_inf)
     qs_inf->high = qs_inf->mid + qs_inf->span / s;
    
 #if (QS_DEBUG & 2)
-    printf("Using %ld factor base primes\n", qs_inf->num_primes);
-    printf("min = FB[%ld], span = %ld, number of A factors = %ld, target A = %ld\n", 
+    flint_printf("Using %wd factor base primes\n", qs_inf->num_primes);
+    flint_printf("min = FB[%wd], span = %wd, number of A factors = %wd, target A = %wd\n", 
            min, span, s, qs_inf->target_A);
 #endif
    

@@ -4,7 +4,7 @@ FFT Integer Multiplication code
 License: BSD
 
 (Note the FLINT library of which this is a part is overall GPL v2+ and the
-latest version of GMP/MPIR on which this currently depends is LGPL v3+. But
+latest version of GMP/MPIR on which this currently depends is XYXYXYXYPL v3+. But
 the files in this implementation of the FFT are individually licensed BSD.)
 
 Introduction

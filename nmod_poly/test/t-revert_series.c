@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("revert_series....");
+    flint_printf("revert_series....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -68,9 +68,9 @@ main(void)
         result = (nmod_poly_equal(f, g));
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
-            nmod_poly_print(f), printf("\n\n");
-            nmod_poly_print(g), printf("\n\n");
+            flint_printf("FAIL (aliasing):\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            nmod_poly_print(g), flint_printf("\n\n");
             abort();
         }
 
@@ -104,10 +104,10 @@ main(void)
             (h->length == 2 && h->coeffs[0] == 0 && h->coeffs[1] == 1));
         if (!result)
         {
-            printf("FAIL (comparison):\n");
-            nmod_poly_print(g), printf("\n\n");
-            nmod_poly_print(f), printf("\n\n");
-            nmod_poly_print(h), printf("\n\n");
+            flint_printf("FAIL (comparison):\n");
+            nmod_poly_print(g), flint_printf("\n\n");
+            nmod_poly_print(f), flint_printf("\n\n");
+            nmod_poly_print(h), flint_printf("\n\n");
             abort();
         }
 
@@ -116,7 +116,8 @@ main(void)
         nmod_poly_clear(h);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

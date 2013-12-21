@@ -39,6 +39,6 @@ fmpz_init2(fmpz_t f, ulong limbs)
     }
     else
     {
-        (*f) = 0L;
+        (*f) = WORD(0);
     }
 }

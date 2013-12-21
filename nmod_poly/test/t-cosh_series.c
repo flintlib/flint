@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("cosh_series....");
+    flint_printf("cosh_series....");
     fflush(stdout);
 
     /* Check cosh(A)^2-1 = sinh(A)^2 */
@@ -60,12 +60,12 @@ main(void)
         nmod_poly_init(one, mod);
 
         nmod_poly_randtest(A, state, n_randint(state, 100));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_cosh_series(coshA, A, n);
         nmod_poly_sinh_series(sinhA, A, n);
         nmod_poly_mullow(B, coshA, coshA, n);
-        nmod_poly_set_coeff_ui(one, 0, 1UL);
+        nmod_poly_set_coeff_ui(one, 0, UWORD(1));
         nmod_poly_sub(B, B, one);
         nmod_poly_mullow(C, sinhA, sinhA, n);
 
@@ -73,12 +73,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("n = %ld, mod = %lu\n", n, mod);
-            printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("cosh(A): "); nmod_poly_print(coshA), printf("\n\n");
-            printf("cosh(A)^2-1: "); nmod_poly_print(B), printf("\n\n");
-            printf("sinh(A)^2: "); nmod_poly_print(C), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wd, mod = %wu\n", n, mod);
+            flint_printf("A: "); nmod_poly_print(A), flint_printf("\n\n");
+            flint_printf("cosh(A): "); nmod_poly_print(coshA), flint_printf("\n\n");
+            flint_printf("cosh(A)^2-1: "); nmod_poly_print(B), flint_printf("\n\n");
+            flint_printf("sinh(A)^2: "); nmod_poly_print(C), flint_printf("\n\n");
             abort();
         }
 
@@ -103,7 +103,7 @@ main(void)
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
         nmod_poly_randtest(A, state, n_randint(state, 50));
-        nmod_poly_set_coeff_ui(A, 0, 0UL);
+        nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_cosh_series(B, A, n);
         nmod_poly_cosh_series(A, A, n);
@@ -111,9 +111,9 @@ main(void)
         result = nmod_poly_equal(A, B);
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(A), printf("\n\n");
-            nmod_poly_print(B), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(A), flint_printf("\n\n");
+            nmod_poly_print(B), flint_printf("\n\n");
             abort();
         }
 
@@ -121,8 +121,8 @@ main(void)
         nmod_poly_clear(B);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

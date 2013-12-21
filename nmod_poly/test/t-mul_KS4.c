@@ -37,10 +37,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("mul_KS4....");
+    flint_printf("mul_KS4....");
     fflush(stdout);
 
     /* Check aliasing of a and b */
@@ -61,9 +61,9 @@ main(void)
         result = (nmod_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -90,9 +90,9 @@ main(void)
         result = (nmod_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(c), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
@@ -120,9 +120,9 @@ main(void)
         result = (nmod_poly_equal(a1, a2));
         if (!result)
         {
-            printf("FAIL:\n");
-            nmod_poly_print(a1), printf("\n\n");
-            nmod_poly_print(a2), printf("\n\n");
+            flint_printf("FAIL:\n");
+            nmod_poly_print(a1), flint_printf("\n\n");
+            nmod_poly_print(a2), flint_printf("\n\n");
             abort();
         }
 
@@ -136,7 +136,7 @@ main(void)
 #if FLINT64
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t mod = 2289285083314003039UL;
+        mp_limb_t mod = UWORD(2289285083314003039);
 
         nmod_poly_init(a, mod);
         nmod_poly_init(b, mod);
@@ -152,7 +152,7 @@ main(void)
 
         if (!nmod_poly_equal(c, d))
         {
-            printf("FAIL: NMOD_RED2 bug!\n");
+            flint_printf("FAIL: NMOD_RED2 bug!\n");
             abort();
         }
 
@@ -163,8 +163,8 @@ main(void)
     }
 #endif
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

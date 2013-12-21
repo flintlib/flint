@@ -26,12 +26,14 @@
 #ifndef PADIC_H
 #define PADIC_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"
@@ -43,10 +45,10 @@
  extern "C" {
 #endif
 
-#define PADIC_DEFAULT_PREC 20L
+#define PADIC_DEFAULT_PREC WORD(20)
 
-#define PADIC_TEST_PREC_MIN -100L
-#define PADIC_TEST_PREC_MAX  100L
+#define PADIC_TEST_PREC_MIN WORD(-100)
+#define PADIC_TEST_PREC_MAX  WORD(100)
 
 typedef struct {
     fmpz u;
@@ -100,7 +102,7 @@ void padic_ctx_clear(padic_ctx_t ctx);
 static __inline__ 
 int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
-    if (ctx->min <= e && e < ctx->max)
+    if (ctx->min <= (slong) e && (slong) e < ctx->max)
     {
         *rop   = *(ctx->pow + (e - ctx->min));
         return 0;
@@ -110,9 +112,9 @@ int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
         slong l = (slong) e;
         if (l < 0)
         {
-            printf("WTF??\n");
-            printf("e = %lu\n", e);
-            printf("l = %ld\n", l);
+            flint_printf("WTF??\n");
+            flint_printf("e = %wu\n", e);
+            flint_printf("l = %wd\n", l);
             abort();
         }
 
@@ -328,9 +330,9 @@ static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 static __inline__ void padic_debug(const padic_t op)
 {
-    printf("(");
+    flint_printf("(");
     fmpz_print(padic_unit(op)); 
-    printf(" %ld %ld)", padic_val(op), padic_prec(op));
+    flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
 }
 
 #ifdef __cplusplus

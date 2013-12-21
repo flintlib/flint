@@ -149,7 +149,7 @@ fmpz_t fmpq_poly_denref(fmpq_poly_t poly)
     polynomials suitable for testing.  On an integer level, this 
     means that long strings of zeros and ones in the binary 
     representation are favoured as well as the special absolute 
-    values $0$, $1$, \code{COEFF_MAX}, and \code{LONG_MAX}.  On a 
+    values $0$, $1$, \code{COEFF_MAX}, and \code{WORD_MAX}.  On a 
     polynomial level, the integer numerator has a reasonable chance 
     to have a non-trivial content.
 
@@ -412,10 +412,27 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     but \code{(rpoly, rden)} and \code{(poly2, den2)} may \emph{not} 
     be aliased.
 
+void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can)
+
+    As per \code{_fmpq_poly_add} except that one can specify whether to
+    canonicalise the output or not. This function is intended to be used with
+    weak canonicalisation to prevent explosion in memory usage. It exists for
+    performance reasons.
+
 void fmpq_poly_add(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}, using 
     Henrici's algorithm.
+
+void fmpq_poly_add_can(fmpq_poly_t res, fmpq_poly poly1, 
+                                          fmpq_poly poly2, int can)
+
+    As per \code{fmpq_poly_add} except that one can specify whether to
+    canonicalise the output or not. This function is intended to be used with
+    weak canonicalisation to prevent explosion in memory usage. It exists for
+    performance reasons.
 
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
@@ -432,10 +449,27 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
     but \code{(rpoly, rden)} and \code{(poly2, den2, len2)} may \emph{not} be 
     aliased.
 
+void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, int can)
+
+    As per \code{_fmpq_poly_sub} except that one can specify whether to
+    canonicalise the output or not. This function is intended to be used with
+    weak canonicalisation to prevent explosion in memory usage. It exists for
+    performance reasons.
+
 void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}, 
     using Henrici's algorithm.
+
+void fmpq_poly_sub_can(fmpq_poly_t res, fmpq_poly poly1, 
+                                        fmpq_poly poly2, int can)
+
+    As per \code{_fmpq_poly_sub} except that one can specify whether to
+    canonicalise the output or not. This function is intended to be used with
+    weak canonicalisation to prevent explosion in memory usage. It exists for
+    performance reasons.
 
 *******************************************************************************
 
@@ -675,7 +709,7 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
                        const fmpz * A, const fmpz_t a, slong lenA,
-                       const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 
     Finds the quotient \code{(Q, q)} and remainder \code{(R, r)} of the 
     Euclidean division of \code{(A, a)} by \code{(B, b)}.
@@ -685,6 +719,10 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     carry meaningful data on exit.  Supports no aliasing between the two 
     outputs, or between the inputs and the outputs.
 
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
+
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
@@ -693,13 +731,17 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
 void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
                     const fmpz * A, const fmpz_t a, slong lenA,
-                    const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 
     Finds the quotient \code{(Q, q)} of the Euclidean division 
     of \code{(A, a)} by \code{(B, b)}.
     
     Assumes that \code{lenA >= lenB > 0}.  Supports no aliasing 
     between the inputs and the outputs.
+
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
 
 void fmpq_poly_div(fmpq_poly_t Q, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2)
@@ -709,7 +751,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
 
 void _fmpq_poly_rem(fmpz * R, fmpz_t r, 
                     const fmpz * A, const fmpz_t a, slong lenA,
-                    const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 
     Finds the remainder \code{(R, r)} of the Euclidean division 
     of \code{(A, a)} by \code{(B, b)}.
@@ -717,11 +759,67 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
     Assumes that \code{lenA >= lenB > 0}.  Supports no aliasing between 
     the inputs and the outputs.
 
+    An optional precomputed inverse of the leading coefficient of $B$ from
+    \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
+    \code{NULL}. 
+
 void fmpq_poly_rem(fmpq_poly_t R, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Finds the remainder $R$ of the Euclidean division 
     of \code{poly1} by \code{poly2}.
+
+*******************************************************************************
+
+    Euclidean division
+
+*******************************************************************************
+
+fmpq_poly_struct * _fmpq_poly_powers_precompute(const fmpz * B, 
+                                                  const fmpz_t denB, slong len)
+
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, 
+                                                              fmpq_poly_t poly)
+    Computes \code{2*len - 1} powers of $x$ modulo the polynomial $B$ of
+    the given length. This is used as a kind of precomputed inverse in
+    the remainder routine below.
+
+void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
+
+    Clean up resources used by precomputed powers which have been computed
+    by\\
+    \code{_fmpq_poly_powers_precompute}.
+
+void fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv)
+
+    Clean up resources used by precomputed powers which have been computed
+    by\\
+    \code{fmpq_poly_powers_precompute}.
+
+void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
+                              const fmpz * B, const fmpz_t denB, slong n, 
+                                         const fmpq_poly_struct * const powers)
+
+    Set $A$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{_fmpq_poly_powers_precompute}. No aliasing is allowed.
+
+    This function is only faster if $m \leq 2*n - 1$.
+
+    The output of this function is \emph{not} canonicalised.
+
+void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
+                   const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv)
+
+    Set $R$ to the remainder of $A$ divide $B$ given precomputed powers mod $B$
+    provided by \code{fmpq_poly_powers_precompute}.
+
+    This function is only faster if \code{A->length <= 2*B->length - 1}.
+
+    The output of this function is \emph{not} canonicalised.
 
 *******************************************************************************
 

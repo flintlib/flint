@@ -34,7 +34,7 @@ void
 _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
                                 ulong e, slong trunc, nmod_t mod)
 {
-    ulong bit = ~((~0UL) >> 1);
+    ulong bit = ~((~UWORD(0)) >> 1);
     mp_ptr v = _nmod_vec_init(trunc);
     mp_ptr R, S, T;
 
@@ -42,7 +42,7 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
     
-    while ((bit & e) == 0UL)
+    while ((bit & e) == UWORD(0))
         bit >>= 1;
     
     bit >>= 1;
@@ -58,7 +58,7 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
         if ((bit2 & e))
             swaps = ~swaps;
         while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
+            if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
         
         if (swaps == 0U)
@@ -113,7 +113,7 @@ nmod_poly_pow_trunc_binexp(nmod_poly_t res,
     mp_ptr p;
     int pcopy = 0;
 
-    if (len < 2 || e < 3UL || trunc == 0)
+    if (len < 2 || e < UWORD(3) || trunc == 0)
     {
         if (len == 0 || trunc == 0)
             nmod_poly_zero(res);
@@ -125,18 +125,18 @@ nmod_poly_pow_trunc_binexp(nmod_poly_t res,
             res->length = 1;
             _nmod_poly_normalise(res);
         }
-        else if (e == 0UL)
+        else if (e == UWORD(0))
         {
-            nmod_poly_set_coeff_ui(res, 0, 1UL);
+            nmod_poly_set_coeff_ui(res, 0, UWORD(1));
             res->length = 1;
             _nmod_poly_normalise(res);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
         {
             nmod_poly_set(res, poly);
             nmod_poly_truncate(res, trunc);
         }
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             nmod_poly_mullow(res, poly, poly, trunc);
 
         return;

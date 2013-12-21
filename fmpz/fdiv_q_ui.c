@@ -38,7 +38,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (h == 0)
     {
-        printf("Exception (fmpz_fdiv_q_ui). Division by zero.\n");
+        flint_printf("Exception (fmpz_fdiv_q_ui). Division by zero.\n");
         abort();
     }
 
@@ -63,7 +63,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
 
-        mpz_fdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+        flint_mpz_fdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
         _fmpz_demote_val(f);    /* division by h may result in small value */
     }
 }

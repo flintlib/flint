@@ -38,7 +38,9 @@ int main(void)
     fmpq_t s1, s2;
     slong h, k;
 
-    printf("dedekind_sum_coprime_large....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("dedekind_sum_coprime_large....");
     fflush(stdout);
 
     fmpz_init(hh);
@@ -60,10 +62,10 @@ int main(void)
 
                 if (!fmpq_equal(s1, s2))
                 {
-                    printf("FAIL:\n");
-                    printf("s(%ld,%ld)\n", h, k);
-                    printf("s1: "); fmpq_print(s1); printf("\n");
-                    printf("s2: "); fmpq_print(s2); printf("\n");
+                    flint_printf("FAIL:\n");
+                    flint_printf("s(%wd,%wd)\n", h, k);
+                    flint_printf("s1: "); fmpq_print(s1); flint_printf("\n");
+                    flint_printf("s2: "); fmpq_print(s2); flint_printf("\n");
                     abort();
                 }
             }
@@ -75,7 +77,7 @@ int main(void)
     fmpq_clear(s1);
     fmpq_clear(s2);
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

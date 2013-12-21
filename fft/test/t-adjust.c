@@ -38,9 +38,9 @@ or implied, of William Hart.
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, mp_bitcnt_t w)
 {
-   mpz_set_ui(p, 1);
+   flint_mpz_set_ui(p, 1);
    mpz_mul_2exp(p, p, n*w);
-   mpz_add_ui(p, p, 1);
+   flint_mpz_add_ui(p, p, 1);
 }
 
 void ref_adjust(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t w)
@@ -56,12 +56,12 @@ main(void)
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1;
    
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("adjust....");
+    flint_printf("adjust....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -99,10 +99,10 @@ main(void)
                     
                     if (mpz_cmp(m2a, m2a) != 0)
                     {
-                        printf("FAIL:\n");
-                        printf("adjust error a\n");
-                        printf("limbs = %ld\n", limbs);
-                        printf("n = %ld, w = %ld, c = %ld\n", n, w, c);
+                        flint_printf("FAIL:\n");
+                        flint_printf("adjust error a\n");
+                        flint_printf("limbs = %wd\n", limbs);
+                        flint_printf("n = %wd, w = %wd, c = %wd\n", n, w, c);
                         gmp_printf("want %Zx\n\n", m2a);
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
@@ -120,8 +120,8 @@ main(void)
     mpz_clear(m2b);
     mpz_clear(mn1);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
     
-    printf("PASS\n");
+    flint_printf("PASS\n");
     return 0;
 }

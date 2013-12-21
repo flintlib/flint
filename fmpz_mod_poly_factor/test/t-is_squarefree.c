@@ -29,17 +29,17 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
     int iter;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("is_squarefree....");
+    flint_printf("is_squarefree....");
     fflush(stdout);
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
@@ -91,10 +91,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL: ");
+            flint_printf("FAIL: ");
             fmpz_print(modulus);
-            printf(" %ld, %d\n", max_exp, v);
-            fmpz_mod_poly_print(poly); printf("\n");
+            flint_printf(" %wd, %d\n", max_exp, v);
+            fmpz_mod_poly_print(poly); flint_printf("\n");
             abort();
         }
 
@@ -105,8 +105,8 @@ main(void)
         fmpz_mod_poly_clear(R);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

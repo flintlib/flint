@@ -142,7 +142,7 @@ nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
             r = _nmod_poly_resultant_euclidean(g->coeffs, len2, 
                                                f->coeffs, len1, f->mod);
 
-            if (((len1 | len2) & 1L) == 0L)
+            if (((len1 | len2) & WORD(1)) == WORD(0))
                 r = nmod_neg(r, f->mod);
         }
     }

@@ -49,26 +49,26 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     }
     else if (len == 2)
     {
-        if (*(poly + 1) == 1L)
+        if (*(poly + 1) == WORD(1))
         {
-            r = fprintf(file, "%s", x);
+            r = flint_fprintf(file, "%s", x);
         }
-        else if (*(poly + 1) == -1L)
+        else if (*(poly + 1) == WORD(-1))
         {
-            r = fprintf(file, "-%s", x);
+            r = flint_fprintf(file, "-%s", x);
         }
         else
         {
             r = fmpz_fprint(file, poly + 1);
             if (r > 0)
-                r = fprintf(file, "*%s", x);
+                r = flint_fprintf(file, "*%s", x);
         }
         
         if (r > 0)
         {
             if (fmpz_sgn(poly + 0) > 0)
             {
-                r = fprintf(file, "+");
+                r = flint_fprintf(file, "+");
                 if (r > 0)
                     r = fmpz_fprint(file, poly + 0);
             }
@@ -84,14 +84,14 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     r = 1;
     {
         if (*(poly + i) == 1)
-           r = fprintf(file, "%s^%ld", x, i);
+           r = flint_fprintf(file, "%s^%wd", x, i);
         else if (*(poly + i) == -1)
-           r = fprintf(file, "-%s^%ld", x, i);
+           r = flint_fprintf(file, "-%s^%wd", x, i);
         else
         {
            r = fmpz_fprint(file, poly + i);
            if (r > 0)
-              r = fprintf(file, "*%s^%ld", x, i);
+              r = flint_fprintf(file, "*%s^%wd", x, i);
         }
         --i;
     }
@@ -102,9 +102,9 @@ int _fmpz_poly_fprint_pretty(FILE * file,
             continue;
 
         if (*(poly + i) == 1)
-            r = fprintf(file, "+%s^%ld", x, i);
+            r = flint_fprintf(file, "+%s^%wd", x, i);
         else if (*(poly + i) == -1)
-            r = fprintf(file, "-%s^%ld", x, i);
+            r = flint_fprintf(file, "-%s^%wd", x, i);
         else
         {
             if (fmpz_sgn(poly + i) > 0)
@@ -115,7 +115,7 @@ int _fmpz_poly_fprint_pretty(FILE * file,
             if (r > 0)
                 r = fmpz_fprint(file, poly + i);
             if (r > 0)
-                r = fprintf(file, "*%s^%ld", x, i);
+                r = flint_fprintf(file, "*%s^%wd", x, i);
         }
     }
 

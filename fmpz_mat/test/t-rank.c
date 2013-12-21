@@ -37,13 +37,12 @@ int
 main(void)
 {
     fmpz_mat_t A;
-    flint_rand_t state;
     slong i, m, n, b, d, r;
 
-    printf("rank....");
+    FLINT_TEST_INIT(state);
+ 
+    flint_printf("rank....");
     fflush(stdout);
-
-    flint_randinit(state);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -59,8 +58,8 @@ main(void)
             fmpz_mat_randrank(A, state, r, b);
             if (r != fmpz_mat_rank(A))
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
             fmpz_mat_clear(A);
@@ -82,16 +81,16 @@ main(void)
             fmpz_mat_randops(A, state, d);
             if (r != fmpz_mat_rank(A))
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
             fmpz_mat_clear(A);
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -36,10 +36,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("powmod_mpz_binexp....");
+    flint_printf("powmod_mpz_binexp....");
     fflush(stdout);
 
     /* Aliasing of res and a */
@@ -52,7 +52,7 @@ main(void)
 
         n = n_randtest_prime(state, 0);
         exp = n_randlimb(state);
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
@@ -70,10 +70,10 @@ main(void)
         result = (nmod_poly_equal(res1, a));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
@@ -94,7 +94,7 @@ main(void)
 
         n = n_randtest_prime(state, 0);
         exp = n_randlimb(state);
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
         nmod_poly_init(a, n);
         nmod_poly_init(f, n);
@@ -112,10 +112,10 @@ main(void)
         result = (nmod_poly_equal(res1, f));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
             abort();
         }
 
@@ -147,7 +147,7 @@ main(void)
         do {
             nmod_poly_randtest(f, state, n_randint(state, 50));
         } while (nmod_poly_is_zero(f));
-        mpz_init_set_ui(expz, exp);
+        flint_mpz_init_set_ui(expz, exp);
 
         nmod_poly_powmod_mpz_binexp(res1, a, expz, f);
         nmod_poly_powmod_ui_binexp(res2, a, exp, f);
@@ -155,11 +155,11 @@ main(void)
         result = (nmod_poly_equal(res1, res2));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a:\n"); nmod_poly_print(a), printf("\n\n");
-            printf("f:\n"); nmod_poly_print(f), printf("\n\n");
-            printf("res1:\n"); nmod_poly_print(res1), printf("\n\n");
-            printf("res2:\n"); nmod_poly_print(res2), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a:\n"); nmod_poly_print(a), flint_printf("\n\n");
+            flint_printf("f:\n"); nmod_poly_print(f), flint_printf("\n\n");
+            flint_printf("res1:\n"); nmod_poly_print(res1), flint_printf("\n\n");
+            flint_printf("res2:\n"); nmod_poly_print(res2), flint_printf("\n\n");
             abort();
         }
 
@@ -171,8 +171,8 @@ main(void)
         mpz_clear(expz);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

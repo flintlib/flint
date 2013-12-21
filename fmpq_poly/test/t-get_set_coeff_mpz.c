@@ -36,18 +36,17 @@ int
 main(void)
 {
     int i, j, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    ulong cflags = UWORD(0);
 
     mpq_t n1, n2;
 
-    printf("get/set_coeff_mpz....");
+    FLINT_TEST_INIT(state);
+
+    flint_printf("get/set_coeff_mpz....");
     fflush(stdout);
 
     mpq_init(n1);
     mpq_init(n2);
-
-    flint_randinit(state);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -64,7 +63,7 @@ main(void)
         {
             fmpz_randtest(x1, state, 200);
             fmpz_get_mpz(mpq_numref(n1), x1);
-            mpz_set_si(mpq_denref(n1), 1);
+            flint_mpz_set_si(mpq_denref(n1), 1);
             coeff = (slong) n_randint(state, len);
             fmpq_poly_set_coeff_mpz(a, coeff, mpq_numref(n1));
             fmpq_poly_get_coeff_mpq(n2, a, coeff);
@@ -72,11 +71,11 @@ main(void)
             result = (mpq_equal(n1, n2));
             if (!result)
             {
-                printf("FAIL:\n\n");
-                printf("a     = "), fmpq_poly_debug(a), printf("\n\n");
-                printf("coeff = %ld\n\n", coeff);
-                printf("len   = %ld\n\n", len);
-                printf("cflags = %lu\n\n", cflags);
+                flint_printf("FAIL:\n\n");
+                flint_printf("a     = "), fmpq_poly_debug(a), flint_printf("\n\n");
+                flint_printf("coeff = %wd\n\n", coeff);
+                flint_printf("len   = %wd\n\n", len);
+                flint_printf("cflags = %wu\n\n", cflags);
                 gmp_printf("n1 = %Qd\n\n", n1);
                 gmp_printf("n2 = %Qd\n\n", n2);
                 abort();
@@ -91,8 +90,8 @@ main(void)
     mpq_clear(n1);
     mpq_clear(n2);
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

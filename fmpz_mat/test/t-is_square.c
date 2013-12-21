@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("is_square....");
+    flint_printf("is_square....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -51,15 +51,15 @@ main(void)
 
         if (fmpz_mat_is_square(A) != (rows == cols))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
         fmpz_mat_clear(A);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

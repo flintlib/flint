@@ -40,9 +40,9 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
                               slong limbs, slong trunc, mp_limb_t ** t1, 
                           mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt)
 {
-   slong n = (1L<<depth), j;
+   slong n = (WORD(1)<<depth), j;
    slong w = (limbs*FLINT_BITS)/n;
-   slong sqrt = (1L<<(depth/2));
+   slong sqrt = (WORD(1)<<(depth/2));
    
    if (depth <= 6)
    {

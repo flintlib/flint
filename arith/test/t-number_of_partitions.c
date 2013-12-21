@@ -106,17 +106,15 @@ static const ulong testdata[][2] =
 
 int main(void)
 {
-    flint_rand_t state;
-
     fmpz_t p;
     fmpz * v;
 
     slong i;
 
-    printf("number_of_partitions....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("number_of_partitions....");
+    fflush(stdout);    
 
     fmpz_init(p);
     v = _fmpz_vec_init(3000);
@@ -128,10 +126,10 @@ int main(void)
         arith_number_of_partitions(p, i);
         if (!fmpz_equal(p, v + i))
         {
-            printf("FAIL:\n");
-            printf("p(%ld) does not agree with power series\n", i);
-            printf("Computed p(%ld): ", i); fmpz_print(p); printf("\n");
-            printf("Expected: "); fmpz_print(v + i); printf("\n");
+            flint_printf("FAIL:\n");
+            flint_printf("p(%wd) does not agree with power series\n", i);
+            flint_printf("Computed p(%wd): ", i); fmpz_print(p); flint_printf("\n");
+            flint_printf("Expected: "); fmpz_print(v + i); flint_printf("\n");
             abort();
         }
     }
@@ -144,19 +142,19 @@ int main(void)
 
         if (fmpz_fdiv_ui(p, 1000000000) != testdata[i][1])
         {
-            printf("FAIL:\n");
-            printf("p(%ld) does not agree with known value mod 10^9\n",
+            flint_printf("FAIL:\n");
+            flint_printf("p(%wd) does not agree with known value mod 10^9\n",
                 testdata[i][0]);
-            printf("Computed: %lu\n", fmpz_fdiv_ui(p, 1000000000));
-            printf("Expected: %lu\n", testdata[i][1]);
+            flint_printf("Computed: %wu\n", fmpz_fdiv_ui(p, 1000000000));
+            flint_printf("Expected: %wu\n", testdata[i][1]);
             abort();
         }
     }
 
     fmpz_clear(p);
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

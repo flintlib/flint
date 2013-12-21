@@ -35,10 +35,10 @@ int
 main(void)
 {
     int i, j, result = 1;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
     
-    printf("evaluate_nmod....");
+    
+    flint_printf("evaluate_nmod....");
     fflush(stdout);
 
     /* Check evaluation at 1 gives sum of coeffs */
@@ -60,10 +60,10 @@ main(void)
         result = (sum == eval);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            printf("sum = %lu, eval = %lu\n", sum, eval);
-            nmod_poly_print(a), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            flint_printf("sum = %wu, eval = %wu\n", sum, eval);
+            nmod_poly_print(a), flint_printf("\n\n");
             abort();
         }
 
@@ -94,10 +94,10 @@ main(void)
         result = (eval1 == eval2);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("eval1 = %lu, eval2 = %lu\n", eval1, eval2);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            flint_printf("FAIL:\n");
+            flint_printf("eval1 = %wu, eval2 = %wu\n", eval1, eval2);
+            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
@@ -105,8 +105,8 @@ main(void)
         nmod_poly_clear(b);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

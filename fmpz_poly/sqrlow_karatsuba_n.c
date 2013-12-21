@@ -84,9 +84,9 @@ void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, slong n)
         return;
     }
 
-    while ((1L << loglen) < n)
+    while ((WORD(1) << loglen) < n)
         loglen++;
-    len = (1L << loglen);
+    len = (WORD(1) << loglen);
 
     temp = _fmpz_vec_init(2 * len + 2);
 

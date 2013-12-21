@@ -43,10 +43,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("addmul....");
+    flint_printf("addmul....");
     fflush(stdout);
 
     /* x += y * z */
@@ -74,7 +74,7 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: result not canonical!\n");
+            flint_printf("FAIL: result not canonical!\n");
             abort();
         }
 
@@ -83,14 +83,14 @@ main(void)
 
         if (!mpq_equal(X, Y))
         {
-            printf("FAIL: fmpq_addmul(x,y,z) != mpq_addmul(X,Y,Z)\n");
-            printf("x = ");
+            flint_printf("FAIL: fmpq_addmul(x,y,z) != mpq_addmul(X,Y,Z)\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\nz = ");
+            flint_printf("\nz = ");
             fmpq_print(z);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -124,7 +124,7 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: result not canonical!\n");
+            flint_printf("FAIL: result not canonical!\n");
             abort();
         }
 
@@ -133,12 +133,12 @@ main(void)
 
         if (!mpq_equal(X, Y))
         {
-            printf("FAIL: fmpq_addmul(x,x,y) != mpq_addmul(X,X,Y)\n");
-            printf("x = ");
+            flint_printf("FAIL: fmpq_addmul(x,x,y) != mpq_addmul(X,X,Y)\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -170,7 +170,7 @@ main(void)
 
         if (!fmpq_is_canonical(x))
         {
-            printf("FAIL: result not canonical!\n");
+            flint_printf("FAIL: result not canonical!\n");
             abort();
         }
 
@@ -179,12 +179,12 @@ main(void)
 
         if (!mpq_equal(X, Y))
         {
-            printf("FAIL: fmpq_addmul(x,y,x) != mpq_addmul(X,Y,X)\n");
-            printf("x = ");
+            flint_printf("FAIL: fmpq_addmul(x,y,x) != mpq_addmul(X,Y,X)\n");
+            flint_printf("x = ");
             fmpq_print(x);
-            printf("\ny = ");
+            flint_printf("\ny = ");
             fmpq_print(y);
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -195,9 +195,9 @@ main(void)
         mpq_clear(Y);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

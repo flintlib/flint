@@ -34,13 +34,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     int iter;
 
-    printf("zero/is_zero....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("zero/is_zero....");
+    fflush(stdout);    
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -57,7 +56,7 @@ main(void)
 
         if (!fmpz_poly_mat_is_zero(A))
         {
-            printf("FAIL: expected matrix to be zero\n");
+            flint_printf("FAIL: expected matrix to be zero\n");
             abort();
         }
 
@@ -70,7 +69,7 @@ main(void)
 
             if (fmpz_poly_mat_is_zero(A))
             {
-                printf("FAIL: expected matrix not to be zero\n");
+                flint_printf("FAIL: expected matrix not to be zero\n");
                 abort();
             }
         }
@@ -78,8 +77,8 @@ main(void)
         fmpz_poly_mat_clear(A);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

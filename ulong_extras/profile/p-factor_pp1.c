@@ -35,35 +35,35 @@ int main(void)
    ulong B1; 
    mp_limb_t n, p;
 
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
    while(1)
    {
-      printf("Enter number to be factored: "); fflush(stdout);
-      if (!scanf("%lu", &n))
+      flint_printf("Enter number to be factored: "); fflush(stdout);
+      if (!flint_scanf("%wu", &n))
       {
-         printf("Read failed\n");
+         flint_printf("Read failed\n");
          abort();
       }
    
-      printf("Enter B1: "); fflush(stdout);
-      if (!scanf("%lu", &B1))
+      flint_printf("Enter B1: "); fflush(stdout);
+      if (!flint_scanf("%wu", &B1))
       {
-         printf("Read failed\n");
+         flint_printf("Read failed\n");
          abort();
       }
     
       do
       {
          c = n_randint(state, n);
-      } while (c <= 2UL);
+      } while (c <= UWORD(2));
 
       p = n_factor_pp1(n, B1, c);
       if (p >= 2)
-         printf("Factor: %lu\n", p);
+         flint_printf("Factor: %wu\n", p);
       else
-         printf("Factor not found!\n");
+         flint_printf("Factor not found!\n");
    } while(1);
    
    flint_randclear(state);

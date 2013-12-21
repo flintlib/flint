@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
 
     if (argc != 2)
     {
-        printf("Syntax: crt <integer>\n");
+        flint_printf("Syntax: crt <integer>\n");
         return EXIT_FAILURE;
     }
 
@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
         res = fmpz_fdiv_ui(x, prime);
         fmpz_CRT_ui(y, y, prod, res, prime, 1);
 
-        printf("residue mod %lu = %lu; reconstruction = ", prime, res);
+        flint_printf("residue mod %wu = %wu; reconstruction = ", prime, res);
         fmpz_print(y);
-        printf("\n");
+        flint_printf("\n");
 
         fmpz_mul_ui(prod, prod, prime);
     }

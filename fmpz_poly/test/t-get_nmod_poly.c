@@ -36,10 +36,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("get/set_nmod_poly....");
+    flint_printf("get/set_nmod_poly....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -64,13 +64,13 @@ main(void)
         else
             fmpz_poly_set_nmod_poly_unsigned(A, M);
 
-        fmpz_poly_scalar_mul_ui(A, A, 2UL);
+        fmpz_poly_scalar_mul_ui(A, A, UWORD(2));
         nmod_poly_add(M, M, M);
         fmpz_poly_get_nmod_poly(M2, A);
 
         if (!nmod_poly_equal(M, M2))
         {
-            printf("FAIL!\n");
+            flint_printf("FAIL!\n");
             abort();
         }
 
@@ -79,9 +79,9 @@ main(void)
         nmod_poly_clear(M2);
     }
 
-    flint_randclear(state);
+    
 
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

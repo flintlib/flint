@@ -59,12 +59,12 @@ static int _check(fmpz_mod_poly_struct **B,
 int main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("radix....");
+    flint_printf("radix....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 500; i++)
     {
@@ -115,15 +115,15 @@ int main(void)
         result = _check(b, f, r);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("result = %d\n", result);
-            printf("p = "), fmpz_print(p), printf("\n\n");
-            printf("f = "), fmpz_mod_poly_print(f), printf("\n\n");
-            printf("r = "), fmpz_mod_poly_print(r), printf("\n\n");
-            printf("N = %ld\n\n", N);
+            flint_printf("FAIL:\n");
+            flint_printf("result = %d\n", result);
+            flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
+            flint_printf("f = "), fmpz_mod_poly_print(f), flint_printf("\n\n");
+            flint_printf("r = "), fmpz_mod_poly_print(r), flint_printf("\n\n");
+            flint_printf("N = %wd\n\n", N);
             for (j = 0; j <= N; j++)
             {
-                printf("b[%ld] = ", j), fmpz_mod_poly_print(b[j]), printf("\n\n");
+                flint_printf("b[%wd] = ", j), fmpz_mod_poly_print(b[j]), flint_printf("\n\n");
             }
             abort();
         }
@@ -140,9 +140,9 @@ int main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }
 

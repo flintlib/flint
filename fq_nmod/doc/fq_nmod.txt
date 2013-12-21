@@ -1,0 +1,492 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 Mike Hansen
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Context Management
+
+*******************************************************************************
+
+void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p,
+                      slong d, const char *var)
+
+    Initialises the context for prime~$p$ and extension degree~$d$,
+    with name \code{var} for the generator.  By default, it will try
+    use a Conway polynomial; if one is not available, a random
+    irreducible polynomial will be used.
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the string \code{var} is a null-terminated string
+    of length at least one.
+
+int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p,
+                             slong d, const char *var)
+
+    Attempts to initialise the context for prime~$p$ and extension
+    degree~$d$, with name \code{var} for the generator using a Conway
+    polynomial for the modulus.
+
+    Returns $1$ if the Conway polynomial is in the database for the
+    given size and the initialization is successful; otherwise,
+    returns $0$.
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the string \code{var} is a null-terminated string
+    of length at least one.
+
+
+void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p,
+                             slong d, const char *var)
+
+    Initialises the context for prime~$p$ and extension degree~$d$,
+    with name \code{var} for the generator using a Conway polynomial
+    for the modulus.
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the string \code{var} is a null-terminated string
+    of length at least one.
+
+void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
+                              nmod_poly_t modulus,
+                              const char *var)
+
+    Initialises the context for given \code{modulus} with name
+    \code{var} for the generator.
+
+    Assumes that \code{modulus} is and irreducible polynomial over
+    $\mathbf{F}_{p}$.
+
+    Assumes that the string \code{var} is a null-terminated string
+    of length at least one.
+
+void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx)
+
+    Clears all memory that has been allocated as part of the context.
+
+long fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
+
+    Returns the degree of the field extension
+    $[\mathbf{F}_{q} : \mathbf{F}_{p}]$, which
+    is equal to $\log_{p} q$.
+
+fmpz * fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
+
+    Returns a pointer to the prime $p$ in the context.
+
+void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
+
+     Sets $f$ to be the size of the finite field.
+
+int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
+
+    Prints the context information to {\tt{file}}. Returns 1 for a
+    success and a negative number for an error.
+
+void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
+
+    Prints the context information to {\tt{stdout}}.
+
+void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx)
+
+    Initializes \code{ctx} to a random finite field.  Assumes that
+    \code{fq_nmod_ctx_init} as not been called on \code{ctx} already.
+
+
+void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx)
+
+    Initializes \code{ctx} to a random extension of a word-sized prime
+    field.  The modulus may or may not be irreducible.  Assumes that
+    \code{fq_nmod_ctx_init} as not been called on \code{ctx} already.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Initialises the element \code{rop}, setting its value to~$0$.
+
+void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Initialises \code{poly} with at least enough space for it to be an element
+    of \code{ctx} and sets it to~$0$.
+
+void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Clears the element \code{rop}.
+
+void _fq_nmod_sparse_reduce(mp_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
+
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
+    modulus of \code{ctx}.
+
+void _fq_nmod_dense_reduce(mp_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
+
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
+    modulus of \code{ctx} using Newton division.
+
+void _fq_nmod_reduce(mp_ptr r, slong lenR, const fq_nmod_ctx_t ctx)
+
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given by the
+    modulus of \code{ctx}.  Does either sparse or dense reduction
+    based on \code{ctx->sparse_modulus}.
+
+void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Reduces the polynomial \code{rop} as an element of
+    $\mathbf{F}_p[X] / (f(X))$.
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2,
+                 const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+
+void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2,
+                 const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+
+void fq_nmod_sub_one(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and $1$.
+
+void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the negative of \code{op}.
+
+void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2,
+                 const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2},
+    reducing the output in the given context.
+
+void fq_nmod_mul_fmpz(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t x,
+                      const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $x$,
+    reducing the output in the given context.
+
+void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x,
+                    const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $x$,
+    reducing the output in the given context.
+
+void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x,
+                    const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $x$,
+    reducing the output in the given context.
+
+void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the square of \code{op},
+    reducing the output in the given context.
+
+void _fq_nmod_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_nmod_ctx_t ctx)
+
+    Sets \code{(rop, d)} to the inverse of the non-zero element
+    \code{(op, len)}.
+
+void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the inverse of the non-zero element \code{op}.
+
+void fq_nmod_gcdinv(fq_nmod_t f, fq_nmod_t inv, const fq_nmod_t op,
+                    const fq_nmod_ctx_t ctx)
+
+     Sets \code{inv} to be the inverse of \code{op} modulo the modulus
+     of \code{ctx}.  If \code{op} is not invertible, then \code{f} is
+     set to a factor of the modulus; otherwise, it is set to one.
+
+void _fq_nmod_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e,
+                  const fq_nmod_ctx_t ctx)
+
+    Sets \code{(rop, 2*d-1)} to \code{(op,len)} raised to the power~$e$,
+    reduced modulo $f(X)$, the modulus of \code{ctx}.
+
+    Assumes that $e \geq 0$ and that \code{len} is positive and at most~$d$.
+
+    Although we require that \code{rop} provides space for
+    $2d - 1$ coefficients, the output will be reduced modulo
+    $f(X)$, which is a polynomial of degree~$d$.
+
+    Does not support aliasing.
+
+void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e,
+                 const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} the \code{op} raised to the power~$e$.
+
+    Currently assumes that $e \geq 0$.
+
+    Note that for any input \code{op}, \code{rop} is set to~$1$
+    whenever $e = 0$.
+
+void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op, const ulong e,
+                    const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} the \code{op} raised to the power~$e$.
+
+    Currently assumes that $e \geq 0$.
+
+    Note that for any input \code{op}, \code{rop} is set to~$1$
+    whenever $e = 0$.
+
+*******************************************************************************
+
+    Roots
+
+*******************************************************************************
+
+void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1,
+                      const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to a $p^{th}$ root root of \code{op1}.  Currently,
+    this computes the root by raising \code{op1} to $p^{d-1}$ where
+    $d$ is the degree of the extension.
+
+*******************************************************************************
+
+    Output
+
+*******************************************************************************
+
+int fq_nmod_fprint_pretty(FILE *file, const fq_nmod_t op,
+                          const fq_nmod_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{file}.
+
+    In the current implementation, always returns~$1$.  The return code is
+    part of the function's signature to allow for a later implementation to
+    return the number of characters printed or a non-positive error code.
+
+int fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{stdout}.
+
+    In the current implementation, always returns~$1$.  The return code is
+    part of the function's signature to allow for a later implementation to
+    return the number of characters printed or a non-positive error code.
+
+void fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Prints a representation of \code{op} to \code{file}.
+
+    For further details on the representation used, see
+    \code{nmod_poly_fprint()}.
+
+void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Prints a representation of \code{op} to \code{stdout}.
+
+    For further details on the representation used, see
+    \code{nmod_poly_print()}.
+
+char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns the plain FLINT string representation of the element
+    \code{op}.
+
+char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns a pretty representation of the element~\code{op} using the
+    null-terminated string \code{x} as the variable name.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state,
+                      const fq_nmod_ctx_t ctx)
+
+    Generates a random element of $\mathbb{F}_q$.
+
+void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state,
+                             const fq_nmod_ctx_t ctx)
+
+    Generates a random non-zero element of $\mathbb{F}_q$.
+
+void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_t state,
+                            const fq_nmod_ctx_t ctx)
+
+    Generates a random element of $\mathbb{F}_q$ which has an
+    underlying polynomial with dense coefficients.
+
+*******************************************************************************
+
+    Assignments and conversions
+
+*******************************************************************************
+
+void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to \code{op}.
+
+void fq_nmod_set_ui(fq_nmod_t rop, const ulong x, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to \code{x}, considered as an element of
+    $\mathbb{F}_p$.
+
+void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to \code{x}, considered as an element of
+    $\mathbb{F}_p$.
+
+void fq_nmod_swap(fq_nmod_t op1, fq_nmod_t op2, const fq_nmod_ctx_t ctx)
+
+    Swaps the two elements \code{op1} and \code{op2}.
+
+void fq_nmod_zero(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to zero.
+
+void fq_nmod_one(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to one, reduced in the given context.
+
+void fq_nmod_gen(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to a multiplicative generator for the finite field.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fq_nmod_is_zero(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is equal to zero.
+
+int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is equal to one.
+
+int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2,
+                  const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op1} and \code{op2} are equal.
+
+int fq_nmod_is_invertible(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.
+
+int fq_nmod_is_invertible_f(fq_nmod_t f, const fq_nmod_t op,
+                            const fq_nmod_ctx_t ctx)
+
+    Returns whether \code{op} is an invertible element.  If it is not,
+    then \code{f} is set of a factor of the modulus.
+
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void _fq_nmod_trace(fmpz_t rop, mp_srcptr *op, slong len,
+                    const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the trace of the non-zero element \code{(op, len)}
+    in $\mathbf{F}_{q}$.
+
+void fq_nmod_trace(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the trace of \code{op}.
+
+    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines
+    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the
+    trace of $a$ as the trace of this map.  Equivalently, if $\Sigma$
+    generates $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of
+    $a$ is equal to $\sum_{i=0}^{d-1} \Sigma^i (a)$, where $d =
+    \log_{p} q$.
+
+void _fq_nmod_norm(fmpz_t rop, mp_srcptr *op, slong len, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to the norm of the non-zero element \code{(op, len)}
+    in $\mathbf{F}_{q}$.
+
+void fq_nmod_norm(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+
+    Computes the norm of \code{op}.
+
+    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines
+    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the norm
+    of $a$ as the determinant of this map.  Equivalently, if $\Sigma$ generates
+    $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of $a$ is equal to
+    $\prod_{i=0}^{d-1} \Sigma^i (a)$, where
+    $d = \text{dim}_{\mathbb{F}_p}(\mathbb{F}_q)$.
+
+    Algorithm selection is automatic depending on the input.
+
+void _fq_nmod_frobenius(mp_ptr *rop, mp_srcptr *op, slong len, slong e,
+                        const fq_nmod_ctx_t ctx)
+
+    Sets \code{(rop, 2d-1)} to the image of \code{(op, len)} under the
+    Frobenius operator raised to the e-th power, assuming that neither
+    \code{op} nor \code{e} are zero.
+
+void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e,
+                       const fq_nmod_ctx_t ctx)
+
+    Evaluates the homomorphism $\Sigma^e$ at \code{op}.
+
+    Recall that $\mathbb{F}_q / \mathbb{F}_p$ is Galois with Galois group
+    $\langle \sigma \rangle$, which is also isomorphic to
+    $\mathbf{Z}/d\mathbf{Z}$, where
+    $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element
+    $\sigma \colon x \mapsto x^p$.
+
+*******************************************************************************
+
+    Bit packing
+
+*******************************************************************************
+
+void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
+                      const fq_nmod_ctx_t ctx)
+
+    Packs \code{op} into bitfields of size \code{bit_size}, writing the
+    result to \code{f}.
+
+void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+                        const fq_nmod_ctx_t ctx)
+
+    Unpacks into \code{rop} the element with coefficients packed into
+    fields of size \code{bit_size} as represented by the integer
+    \code{f}.

@@ -33,7 +33,7 @@
 void
 _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod)
 {
-    ulong bit = ~((~0UL) >> 1);
+    ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
     slong alloc = (slong) e * (len - 1) + 1;
     mp_ptr v = _nmod_vec_init(alloc);
@@ -43,7 +43,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
     
-    while ((bit & e) == 0UL)
+    while ((bit & e) == UWORD(0))
         bit >>= 1;
     
     bit >>= 1;
@@ -59,7 +59,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
         if ((bit2 & e))
             swaps = ~swaps;
         while (bit2 >>= 1)
-            if ((bit2 & e) == 0UL)
+            if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
         
         if (swaps == 0U)
@@ -117,7 +117,7 @@ nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
     const slong len = poly->length;
     slong rlen;
 
-    if ((len < 2) | (e < 3UL))
+    if ((len < 2) | (e < UWORD(3)))
     {
         if (len == 0)
             nmod_poly_zero(res);
@@ -129,15 +129,15 @@ nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
             res->length = 1;
             _nmod_poly_normalise(res);
         }
-        else if (e == 0UL)
+        else if (e == UWORD(0))
         {
-            nmod_poly_set_coeff_ui(res, 0, 1UL);
+            nmod_poly_set_coeff_ui(res, 0, UWORD(1));
             res->length = 1;
             _nmod_poly_normalise(res);
         }
-        else if (e == 1UL)
+        else if (e == UWORD(1))
             nmod_poly_set(res, poly);
-        else  /* e == 2UL */
+        else  /* e == UWORD(2) */
             nmod_poly_mul(res, poly, poly);
 
         return;

@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_factor.h"
+#include "fmpz.h"
 #include "arith.h"
 
 void arith_euler_phi(fmpz_t res, const fmpz_t n)
@@ -52,12 +52,12 @@ void arith_euler_phi(fmpz_t res, const fmpz_t n)
     fmpz_init(t);
     for (i = 0; i < factors->num; i++)
     {
-        fmpz_sub_ui(t, factors->p + i, 1UL);
+        fmpz_sub_ui(t, factors->p + i, UWORD(1));
         fmpz_mul(res, res, t);
         exp = factors->exp[i];
         if (exp != 1)
         {
-            fmpz_pow_ui(t, factors->p + i, exp - 1UL);
+            fmpz_pow_ui(t, factors->p + i, exp - UWORD(1));
             fmpz_mul(res, res, t);
         }
     }

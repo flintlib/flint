@@ -36,7 +36,7 @@ _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     slong i;
     mp_ptr R, S, T, tmp;
 
-    if (n >= 1) Qinv[0] = 0UL;
+    if (n >= 1) Qinv[0] = UWORD(0);
     if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
     if (n <= 2)
         return;
@@ -72,7 +72,7 @@ nmod_poly_revert_series_lagrange(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("Exception (nmod_poly_revert_series_lagrange). Input must \n"
+        flint_printf("Exception (nmod_poly_revert_series_lagrange). Input must \n"
                "have zero constant and an invertible coefficient of x^1.\n");
         abort();
     }

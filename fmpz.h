@@ -26,16 +26,19 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong mp_limb_t
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "nmod_vec.h"
 #include "fmpz-conversions.h"
+
 
 #ifdef __cplusplus
  extern "C" {
@@ -49,13 +52,22 @@ typedef gmp_randstate_t fmpz_randstate_t;
 extern __mpz_struct * fmpz_arr;
 extern gmp_randstate_t fmpz_randstate;
 
+typedef struct
+{
+   mp_ptr dinv;
+   slong n;
+   mp_bitcnt_t norm;
+} fmpz_preinvn_struct;
+
+typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
+
 /* maximum positive value a small coefficient can have */
-#define COEFF_MAX ((1L << (FLINT_BITS - 2)) - 1L)
+#define COEFF_MAX ((WORD(1) << (FLINT_BITS - 2)) - WORD(1))
 
 /* minimum negative value a small coefficient can have */
-#define COEFF_MIN (-((1L << (FLINT_BITS - 2)) - 1L))
+#define COEFF_MIN (-((WORD(1) << (FLINT_BITS - 2)) - WORD(1)))
 
-#define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == 1L)  /* is x a pointer not an integer */
+#define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == WORD(1))  /* is x a pointer not an integer */
 
 __mpz_struct * _fmpz_new_mpz(void);
 
@@ -75,7 +87,7 @@ void _fmpz_demote(fmpz_t f)
     if (COEFF_IS_MPZ(*f)) 
     {
         _fmpz_clear_mpz(*f);
-        (*f) = 0L;
+        (*f) = WORD(0);
 	}
 }
 
@@ -88,7 +100,7 @@ void _fmpz_clear_readonly_mpz(mpz_t);
 static __inline__
 void fmpz_init(fmpz_t f)
 {
-	(*f) = 0L;
+	(*f) = WORD(0);
 }
 
 void fmpz_init2(fmpz_t f, ulong limbs);
@@ -123,7 +135,7 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
 
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        mpz_set_ui(ptr, g);
+        flint_mpz_set_ui(ptr, g);
     }
 }
 
@@ -157,7 +169,7 @@ fmpz_set_si(fmpz_t f, slong val)
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_si(mpz_coeff, val);
+        flint_mpz_set_si(mpz_coeff, val);
     }
     else
     {
@@ -172,7 +184,7 @@ fmpz_set_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)        /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_ui(mpz_coeff, val);
+        flint_mpz_set_ui(mpz_coeff, val);
     }
     else
     {
@@ -187,7 +199,7 @@ fmpz_neg_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        mpz_set_ui(mpz_coeff, val);
+        flint_mpz_set_ui(mpz_coeff, val);
         mpz_neg(mpz_coeff, mpz_coeff);
     }
     else
@@ -259,7 +271,7 @@ static __inline__
 void fmpz_zero(fmpz_t f)
 {
    _fmpz_demote(f);	
-   (*f) = 0L;
+   (*f) = WORD(0);
 }
 
 static __inline__ 
@@ -269,7 +281,7 @@ void fmpz_one(fmpz_t f)
     {
         _fmpz_clear_mpz(*f);
 	}
-    *f = 1L;
+    *f = WORD(1);
 }
 
 static __inline__
@@ -302,9 +314,13 @@ int fmpz_read(fmpz_t f);
 
 int fmpz_fread(FILE * file, fmpz_t f);
 
+size_t fmpz_inp_raw( fmpz_t x, FILE *fin );
+
 int fmpz_print(const fmpz_t x);
 
 int fmpz_fprint(FILE * file, const fmpz_t x);
+
+size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
@@ -334,7 +350,7 @@ int fmpz_is_even(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
     {
-        return !((*f) & 1L);
+        return !((*f) & WORD(1));
     }
     else
     {
@@ -347,7 +363,7 @@ int fmpz_is_odd(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
     {
-        return ((*f) & 1L);
+        return ((*f) & WORD(1));
     }
     else
     {
@@ -500,6 +516,9 @@ void fmpz_cdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
+void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 
+                                     const fmpz_t h, const fmpz_preinvn_t inv);
+
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h);
@@ -523,6 +542,10 @@ void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
 ulong fmpz_tdiv_ui(const fmpz_t g, ulong h);
 
 void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+void fmpz_preinvn_init(fmpz_preinvn_t inv, fmpz_t f);
+
+void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 
@@ -648,6 +671,8 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n);
 #ifdef __cplusplus
 }
 #endif
+
+#include "fmpz_factor.h"
 
 #endif
 

@@ -32,10 +32,10 @@
 int main(void)
 {
    int i, result;
-   flint_rand_t state;
-   flint_randinit(state);
+   FLINT_TEST_INIT(state);
+   
 
-   printf("smul_ppmm....");
+   flint_printf("smul_ppmm....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -52,22 +52,22 @@ int main(void)
       m2 = n2;
 
       sign = 1;
-      if ((mp_limb_signed_t) m1 < 0L) 
+      if ((mp_limb_signed_t) m1 < WORD(0)) 
       {
          sign = -1;
          m1 = -m1;
       }
       
-      if ((mp_limb_signed_t) m2 < 0L) 
+      if ((mp_limb_signed_t) m2 < WORD(0)) 
       {
          sign = -sign;
          m2 = -m2;
       }
       
-      pl2old = 0UL;
-      pl2 = 0UL;
-      ph2 = 0UL;
-      bit = 1UL;
+      pl2old = UWORD(0);
+      pl2 = UWORD(0);
+      ph2 = UWORD(0);
+      bit = UWORD(1);
       for (j = 0; j < FLINT_BITS; j++)
       {
          if (m2 & bit)
@@ -87,15 +87,15 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL:\n");
-         printf("m1 = %lu, m2 = %lu\n", n1, n2); 
-         printf("ph2 = %lu, ph1 = %lu, pl2 = %lu, pl1 = %lu\n", ph2, ph1, pl2, pl1);
+         flint_printf("FAIL:\n");
+         flint_printf("m1 = %wu, m2 = %wu\n", n1, n2); 
+         flint_printf("ph2 = %wu, ph1 = %wu, pl2 = %wu, pl1 = %wu\n", ph2, ph1, pl2, pl1);
          abort();
       }
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

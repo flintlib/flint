@@ -34,13 +34,12 @@
 int
 main(void)
 {
-    flint_rand_t state;
     slong i;
 
-    printf("sub....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("sub....");
+    fflush(stdout);    
 
     /* Check evaluation homomorphism */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -79,14 +78,14 @@ main(void)
 
         if (!fmpz_mat_equal(c, d))
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpz_poly_mat_print(C, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -125,14 +124,14 @@ main(void)
 
         if (!fmpz_poly_mat_equal(C, A))
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpz_poly_mat_print(C, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -164,14 +163,14 @@ main(void)
 
         if (!fmpz_poly_mat_equal(C, B))
         {
-            printf("FAIL:\n");
-            printf("A:\n");
+            flint_printf("FAIL:\n");
+            flint_printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
+            flint_printf("B:\n");
             fmpz_poly_mat_print(B, "x");
-            printf("C:\n");
+            flint_printf("C:\n");
             fmpz_poly_mat_print(C, "x");
-            printf("\n");
+            flint_printf("\n");
             abort();
         }
 
@@ -180,8 +179,8 @@ main(void)
         fmpz_poly_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

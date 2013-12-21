@@ -57,36 +57,36 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)
     {
         mcase = m % 6;
 
-        fmpz_mul_ui(num + m, cden, m + 3UL);
-        fmpz_divexact_ui(num + m, num + m, 3UL);
+        fmpz_mul_ui(num + m, cden, m + UWORD(3));
+        fmpz_divexact_ui(num + m, num + m, UWORD(3));
 
         if (mcase == 4)
         {
             fmpz_neg(num + m, num + m);
-            fmpz_divexact_ui(num + m, num + m, 2UL);
+            fmpz_divexact_ui(num + m, num + m, UWORD(2));
         }
 
         /* All factors are strictly smaller than m + 4; choose prodsize such
            that (m + 4)^prodsize fits in an slong. */
         {
 #if FLINT64
-            if      (m < 1444L)       prodsize = 6;
-            else if (m < 2097148L)    prodsize = 3;
-            else if (m < 3037000495L) prodsize = 2;  /* not very likely... */
+            if      (m < WORD(1444))       prodsize = 6;
+            else if (m < WORD(2097148))    prodsize = 3;
+            else if (m < WORD(3037000495)) prodsize = 2;  /* not very likely... */
             else abort();
 #else
-            if      (m < 32L)    prodsize = 6;
-            else if (m < 1286L)  prodsize = 3;
-            else if (m < 46336L) prodsize = 2;
+            if      (m < WORD(32))    prodsize = 6;
+            else if (m < WORD(1286))  prodsize = 3;
+            else if (m < WORD(46336)) prodsize = 2;
             else abort();
 #endif
         }
 
         /* c = t = binomial(m+3, m) */
-        fmpz_set_ui(t, m + 1UL);
-        fmpz_mul_ui(t, t, m + 2UL);
-        fmpz_mul_ui(t, t, m + 3UL);
-        fmpz_divexact_ui(t, t, 6UL);
+        fmpz_set_ui(t, m + UWORD(1));
+        fmpz_mul_ui(t, t, m + UWORD(2));
+        fmpz_mul_ui(t, t, m + UWORD(3));
+        fmpz_divexact_ui(t, t, UWORD(6));
         fmpz_set(c, t);
 
         for (j = 6; j <= m; j += 6)

@@ -40,8 +40,8 @@ void check(ulong n, mp_limb_t ans)
     if (ok && reasonable)
         return;
 
-    printf("FAIL:\n");
-    printf("n = %lu: %lu < %lu < %lu\n", n, lo, ans, hi);
+    flint_printf("FAIL:\n");
+    flint_printf("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi);
     abort();
 }
 
@@ -49,7 +49,9 @@ int main(void)
 {
     int n;
 
-    printf("nth_prime_bounds....");
+    FLINT_TEST_INIT(state);
+    
+    flint_printf("nth_prime_bounds....");
     fflush(stdout);
 
     for (n=6; n<7500 * FLINT_MIN(10, flint_test_multiplier()); n++)
@@ -58,26 +60,27 @@ int main(void)
     }
 
     /* Some known large primes */
-    check(10UL, 29UL);
-    check(100UL, 541UL);
-    check(1000UL, 7919UL);
-    check(10000UL, 104729UL);
-    check(100000UL, 1299709UL);
-    check(1000000UL, 15485863UL);
-    check(10000000UL, 179424673UL);
-    check(100000000UL, 2038074743UL);
+    check(UWORD(10), UWORD(29));
+    check(UWORD(100), UWORD(541));
+    check(UWORD(1000), UWORD(7919));
+    check(UWORD(10000), UWORD(104729));
+    check(UWORD(100000), UWORD(1299709));
+    check(UWORD(1000000), UWORD(15485863));
+    check(UWORD(10000000), UWORD(179424673));
+    check(UWORD(100000000), UWORD(2038074743));
 #if FLINT64
-    check(1000000000UL, 22801763489UL);
-    check(10000000000UL, 252097800623UL);
-    check(100000000000UL, 2760727302517UL);
-    check(1000000000000UL, 29996224275833UL);
-    check(10000000000000UL, 323780508946331UL);
-    check(100000000000000UL, 3475385758524527UL);
-    check(1000000000000000UL, 37124508045065437UL);
-    check(10000000000000000UL, 394906913903735329UL);
-    check(100000000000000000UL, 4185296581467695669UL);
+    check(UWORD(1000000000), UWORD(22801763489));
+    check(UWORD(10000000000), UWORD(252097800623));
+    check(UWORD(100000000000), UWORD(2760727302517));
+    check(UWORD(1000000000000), UWORD(29996224275833));
+    check(UWORD(10000000000000), UWORD(323780508946331));
+    check(UWORD(100000000000000), UWORD(3475385758524527));
+    check(UWORD(1000000000000000), UWORD(37124508045065437));
+    check(UWORD(10000000000000000), UWORD(394906913903735329));
+    check(UWORD(100000000000000000), UWORD(4185296581467695669));
 #endif
 
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
     return 0;
 }

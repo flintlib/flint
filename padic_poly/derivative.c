@@ -36,11 +36,10 @@ void _padic_poly_derivative(fmpz *rop, slong *rval, slong N,
     _fmpz_poly_derivative(rop, op, len);
     *rval = val;
 
-    _padic_poly_canonicalise(rop, rval, len - 1, ctx->p);
-
     alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
     _fmpz_vec_scalar_mod_fmpz(rop, rop, len - 1, pow);
+    _padic_poly_canonicalise(rop, rval, len - 1, ctx->p);
 
     if (alloc)
         fmpz_clear(pow);

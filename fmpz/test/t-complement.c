@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("complement....");
+    flint_printf("complement....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -64,7 +64,7 @@ main(void)
         result = (mpz_cmp(c, d) == 0);
         if (!result)
         {
-            printf("FAIL (no alias):\n");
+            flint_printf("FAIL (no alias):\n");
             gmp_printf("c = %Zd, d = %Zd\n", c, d);
             abort();
         }
@@ -99,7 +99,7 @@ main(void)
         result = (mpz_cmp(c, d) == 0);
         if (!result)
         {
-            printf("FAIL (aliased):\n");
+            flint_printf("FAIL (aliased):\n");
             gmp_printf("c = %Zd, d = %Zd\n", c, d);
             abort();
         }
@@ -110,8 +110,8 @@ main(void)
         mpz_clear(d);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

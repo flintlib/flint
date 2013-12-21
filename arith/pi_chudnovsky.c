@@ -355,10 +355,10 @@ bs_mul(pi_state state, mpz_t r, slong a, slong b)
     slong i, j;
     if (b-a<=32)
     {
-        mpz_set_ui(r, 1);
+        flint_mpz_set_ui(r, 1);
         for (i=a; i<b; i++)
             for (j=0; j<state->fmul[0].pow[i]; j++)
-        mpz_mul_ui(r, r, state->fmul[0].fac[i]);
+        flint_mpz_mul_ui(r, r, state->fmul[0].fac[i]);
     }
     else
     {
@@ -436,19 +436,19 @@ bs(pi_state state, ulong a, ulong b,
           p(b-1,b) = b^3 * C^3 / 24
           q(b-1,b) = (-1)^b*g(b-1,b)*(A+Bb).
         */
-        mpz_set_ui(p1, b);
-        mpz_mul_ui(p1, p1, b);
-        mpz_mul_ui(p1, p1, b);
-        mpz_mul_ui(p1, p1, (C/24)*(C/24));
-        mpz_mul_ui(p1, p1, C*24);
+        flint_mpz_set_ui(p1, b);
+        flint_mpz_mul_ui(p1, p1, b);
+        flint_mpz_mul_ui(p1, p1, b);
+        flint_mpz_mul_ui(p1, p1, (C/24)*(C/24));
+        flint_mpz_mul_ui(p1, p1, C*24);
 
-        mpz_set_ui(g1, 2*b-1);
-        mpz_mul_ui(g1, g1, 6*b-1);
-        mpz_mul_ui(g1, g1, 6*b-5);
+        flint_mpz_set_ui(g1, 2*b-1);
+        flint_mpz_mul_ui(g1, g1, 6*b-1);
+        flint_mpz_mul_ui(g1, g1, 6*b-5);
 
-        mpz_set_ui(q1, b);
-        mpz_mul_ui(q1, q1, B);
-        mpz_add_ui(q1, q1, A);
+        flint_mpz_set_ui(q1, b);
+        flint_mpz_mul_ui(q1, q1, B);
+        flint_mpz_add_ui(q1, q1, A);
         mpz_mul   (q1, q1, g1);
 
         if (b%2)
@@ -549,7 +549,7 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
 
     prec = mpfr_get_prec(res) + 64;
     terms = prec / (BITS_PER_DIGIT * DIGITS_PER_ITER);
-    while ((1L<<depth)<terms)
+    while ((WORD(1)<<depth)<terms)
         depth++;
     depth++;
 
@@ -580,9 +580,9 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
     /* begin binary splitting process */
     if (terms<=0)
     {
-        mpz_set_ui(p2,1);
-        mpz_set_ui(q2,0);
-        mpz_set_ui(g2,1);
+        flint_mpz_set_ui(p2,1);
+        flint_mpz_set_ui(q2,0);
+        flint_mpz_set_ui(g2,1);
     }
     else
     {
@@ -619,8 +619,8 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
         (q+A*p)
       */
 
-    mpz_addmul_ui(q1, p1, A);
-    mpz_mul_ui(p1, p1, C/D);
+    flint_mpz_addmul_ui(q1, p1, A);
+    flint_mpz_mul_ui(p1, p1, C/D);
 
     mpf_init2(pi, prec);
     mpf_set_z(pi, p1);

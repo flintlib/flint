@@ -33,10 +33,10 @@
 int main(void)
 {
     int i, j, result;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("add_sssaaaaaa....");
+    flint_printf("add_sssaaaaaa....");
     fflush(stdout);
 
     for (i = 0; i < 1000000; i++)
@@ -58,17 +58,17 @@ int main(void)
         result = ((s[2] == t[2]) && (s[1] == t[1]) && (s[0] == t[0]));
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a[2] = %lu, a[1] = %lu, a[0] = %lu\n", a[2], a[1], a[0]); 
-            printf("b[2] = %lu, b[1] = %lu, b[0] = %lu\n", b[2], b[1], b[0]); 
-            printf("s[2] = %lu, s[1] = %lu, s[0] = %lu\n", s[2], s[1], s[0]); 
-            printf("t[2] = %lu, t[1] = %lu, t[0] = %lu\n", t[2], t[1], t[0]); 
+            flint_printf("FAIL:\n");
+            flint_printf("a[2] = %wu, a[1] = %wu, a[0] = %wu\n", a[2], a[1], a[0]); 
+            flint_printf("b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[2], b[1], b[0]); 
+            flint_printf("s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[2], s[1], s[0]); 
+            flint_printf("t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[2], t[1], t[0]); 
             abort();
         }
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

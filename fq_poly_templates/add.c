@@ -1,0 +1,71 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2013 Mike Hansen
+
+******************************************************************************/
+
+
+#ifdef T
+
+#include "templates.h"
+
+void
+_TEMPLATE(T, poly_add) (TEMPLATE(T, struct) * res,
+                        const TEMPLATE(T, struct) * poly1, slong len1,
+                        const TEMPLATE(T, struct) * poly2, slong len2,
+                        const TEMPLATE(T, ctx_t) ctx)
+{
+    const slong min = FLINT_MIN(len1, len2);
+    slong i;
+
+    for (i = 0; i < min; i++)
+        TEMPLATE(T, add) (res + i, poly1 + i, poly2 + i, ctx);
+
+    if (poly1 != res)
+        for (i = min; i < len1; i++)
+            TEMPLATE(T, set) (res + i, poly1 + i, ctx);
+
+    if (poly2 != res)
+        for (i = min; i < len2; i++)
+            TEMPLATE(T, set) (res + i, poly2 + i, ctx);
+}
+
+void
+TEMPLATE(T, poly_add) (TEMPLATE(T, poly_t) res,
+                       const TEMPLATE(T, poly_t) poly1,
+                       const TEMPLATE(T, poly_t) poly2,
+                       const TEMPLATE(T, ctx_t) ctx)
+{
+    const slong max = FLINT_MAX(poly1->length, poly2->length);
+
+    TEMPLATE(T, poly_fit_length) (res, max, ctx);
+
+    _TEMPLATE(T, poly_add) (res->coeffs, poly1->coeffs, poly1->length,
+                            poly2->coeffs, poly2->length, ctx);
+
+    _TEMPLATE(T, poly_set_length) (res, max, ctx);
+    _TEMPLATE(T, poly_normalise) (res, ctx);
+}
+
+
+#endif

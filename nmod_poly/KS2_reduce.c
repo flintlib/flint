@@ -62,7 +62,7 @@ _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
                           mp_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
-   ulong mask = (1UL << b) - 1;
+   ulong mask = (UWORD(1) << b) - 1;
 
    /* (x0, x1) and (y0, y1) are two-digit windows into X and Y. */
    ulong x1, x0 = *op1++;
@@ -104,7 +104,7 @@ _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
       The main loop is the same as in _nmod_poly_KS2_recover_reduce1(), but the
       modular reduction step needs to handle two input words.
    */
-   ulong mask = (1UL << b) - 1;
+   ulong mask = (UWORD(1) << b) - 1;
 
    ulong x1, x0 = *op1++;
    ulong y0, y1, borrow, b2;
@@ -187,7 +187,7 @@ _nmod_poly_KS2_recover_reduce3(mp_ptr res, slong s, mp_srcptr op1,
       of each.
    */
 
-   ulong maskH = (1UL << (b - FLINT_BITS)) - 1;
+   ulong maskH = (UWORD(1) << (b - FLINT_BITS)) - 1;
 
    ulong x1L, x0L = *op1++;
    ulong x1H, x0H = *op1++;

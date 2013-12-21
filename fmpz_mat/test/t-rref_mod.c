@@ -50,13 +50,13 @@ check_rref(fmpz_mat_t A)
             {
                 if (prev_row_zero)
                 {
-                    printf("nonzero row after zero row\n");
+                    flint_printf("nonzero row after zero row\n");
                     abort();
                 }
 
                 if (j <= prev_pivot)
                 {
-                    printf("pivot not strictly to the right of previous\n");
+                    flint_printf("pivot not strictly to the right of previous\n");
                     abort();
                 }
 
@@ -75,14 +75,13 @@ main(void)
 {
     fmpz_mat_t A;
     fmpz_t p;
-    flint_rand_t state;
     slong i, j, k, m, n, b, d, r, rank;
     slong *perm;
 
-    printf("rref_mod....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("rref_mod....");
+    fflush(stdout);    
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
@@ -110,8 +109,8 @@ main(void)
 
             if (r < rank)
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
 
@@ -152,8 +151,8 @@ main(void)
 
             if (r < rank)
             {
-                printf("FAIL:\n");
-                printf("wrong rank!\n");
+                flint_printf("FAIL:\n");
+                flint_printf("wrong rank!\n");
                 abort();
             }
 
@@ -166,8 +165,8 @@ main(void)
         flint_free(perm);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -250,7 +250,7 @@ v 1.3.0 -- 09-Jun-09
    * Knocked optimisation level back to -O2 because it miscompiles on sage.math
    * Changed tables to use uint64_t's instead of ulongs which are not 64 bits on a 32 bit machine
    * Only checked MAX_HOLF on 64 bit machine
-   * Changed MAX_SQUFOF to -1L
+   * Changed MAX_SQUFOF to WORD(-1)
    * Check constant 0x3FFFFFFFFUL only on a 64 bit machine
    * Fixed a bug in z_oddprime_lt_4096 on 32 bit machines
    * Fixed some TLS issues with Cygwin
@@ -397,7 +397,7 @@ v 1.6.0 -- 24-Dec-10
 
    * mpfr_vec_scalar_product/norm
 
-2.0 -- 16 Jan 2011
+v 2.0 -- 16 Jan 2011
   N.B: FLINT 2 is  a complete rewrite of flint from scratch
   It includes the following modules:
 
@@ -627,7 +627,7 @@ mpfr_vec: (vectors over mpfr reals)
 mpfr_mat: (matrices over mpfr reals)
   * memory management (init, clear)
 
-2.1 -- 9 Mar 2011
+v 2.1 -- 9 Mar 2011
 
 fmpz
 ----
@@ -691,7 +691,7 @@ documentation
 -------------
   * Large number of corrections
 
-2.2 -- 4 Jun 2011
+v 2.2 -- 4 Jun 2011
 
 fmpq (multiprecision rational numbers)
 --------------------------------------
@@ -787,7 +787,7 @@ build fixes
   * -L use /usr instead of /usr/local by default (reported by Serge Torres)
   * guards for system headers because of flint's use of ulong
 
-2.3 -- 1 Jul 2012
+v 2.3 -- 1 Jul 2012
 
 general
 -------
@@ -807,14 +807,14 @@ general
 ulong_extras
 ------------
   * implemented the improved Lehman algorithm
-  * added n_jacobi_unsigned to allow n > LONG_MAX
-  * fixed n_sqrtmod for n > LONG_MAX
+  * added n_jacobi_unsigned to allow n > WORD_MAX
+  * fixed n_sqrtmod for n > WORD_MAX
   * fixed bug causing n_sqrtmod to hang
   * added sublinear algorithm for computing factorials mod p
   * added n_sqrtmod_primepow, n_sqrtmodn and associated functions for
     computing square roots modulo composite integers
   * fixed bugs in n_is_prime_pocklington
-  * fixed ULONG_MAX case in powmod and powmod2
+  * fixed UWORD_MAX case in powmod and powmod2
   * fixed problems with the random number generators
   * fixed rare bug in n_mod_precomp
   * fixed rare bug in n_is_prime_pseudosquare
@@ -1065,4 +1065,26 @@ arith
     representations of an integer
   * renamed functions to have an arith_ prefix
 
+v 2.4 -- 20 Nov 2013
+
+  * C++ expressions template wrapper
+  * Fast factorisation of polynomials over Z/nZ
+  * improved p-adics
+  * polynomials/matrices over p-adics
+  * qadics
+  * Finite fields (small and large F_q), polynomials/matrices over F_q
+  * Finite fields with Zech logarithm representation
+  * Fast factorisation of polynomials over F_q
+  * Faster Brent-Kung modular composition
+  * New prime sieving code
+  * Lambert-W function
+  * Precomputed inverses for polynomials and large integers
+  * Williams' P+1 integer factoring algorithm
+  * Harvey's KS2/KS4 polynomial multiplication  
+  * Faster primality testing up to 64 bits
+  * Support for Cygwin64 and MinGW64
+  * Support for Clang
+  * Support for GMP
+  * Support for Boehm-Demers-Weiser GC
+  * Support for flint extension modules
 

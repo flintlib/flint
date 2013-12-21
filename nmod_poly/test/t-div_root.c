@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("div_root....");
+    flint_printf("div_root....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with standard divrem */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -64,7 +64,7 @@ main(void)
         rem = nmod_poly_div_root(Q, P, r);
 
         nmod_poly_set_coeff_ui(D, 0, n_negmod(r, mod));
-        nmod_poly_set_coeff_ui(D, 1, 1UL);
+        nmod_poly_set_coeff_ui(D, 1, UWORD(1));
 
         nmod_poly_divrem(DQ, DR, P, D);
 
@@ -73,12 +73,12 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL!\n");
-            printf("P:\n"); nmod_poly_print(P); printf("\n\n");
-            printf("Q:\n"); nmod_poly_print(Q); printf("\n\n");
-            printf("D:\n"); nmod_poly_print(D); printf("\n\n");
-            printf("DQ:\n"); nmod_poly_print(DQ); printf("\n\n");
-            printf("DR:\n"); nmod_poly_print(DR); printf("\n\n");
+            flint_printf("FAIL!\n");
+            flint_printf("P:\n"); nmod_poly_print(P); flint_printf("\n\n");
+            flint_printf("Q:\n"); nmod_poly_print(Q); flint_printf("\n\n");
+            flint_printf("D:\n"); nmod_poly_print(D); flint_printf("\n\n");
+            flint_printf("DQ:\n"); nmod_poly_print(DQ); flint_printf("\n\n");
+            flint_printf("DR:\n"); nmod_poly_print(DR); flint_printf("\n\n");
             abort();
         }
 
@@ -114,10 +114,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL (aliasing)!\n");
-            printf("P:\n"); nmod_poly_print(P); printf("\n\n");
-            printf("Q1:\n"); nmod_poly_print(Q1); printf("\n\n");
-            printf("Q2:\n"); nmod_poly_print(Q2); printf("\n\n");
+            flint_printf("FAIL (aliasing)!\n");
+            flint_printf("P:\n"); nmod_poly_print(P); flint_printf("\n\n");
+            flint_printf("Q1:\n"); nmod_poly_print(Q1); flint_printf("\n\n");
+            flint_printf("Q2:\n"); nmod_poly_print(Q2); flint_printf("\n\n");
             abort();
         }
 
@@ -126,7 +126,8 @@ main(void)
         nmod_poly_clear(Q2);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

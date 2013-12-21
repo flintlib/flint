@@ -57,7 +57,7 @@ _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len,
         }
         fmpz_swap(T + k, t);
     }
-    if (len & 1L)
+    if (len & WORD(1))
     {
         fmpz_set(t, poly + (len - 1));
         count_trailing_zeros(c, len + 1);
@@ -72,14 +72,14 @@ _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len,
 
     for ( ; k < h; k++)
     {
-        if ((len - 1) & (1L << k))
+        if ((len - 1) & (WORD(1) << k))
         {
             fmpz_mul(u, y + k, t);
             fmpz_add(t, T + k, u);
         }
     }
 
-    *y = 0L;
+    *y = WORD(0);
     _fmpz_vec_clear(y, 2 * h + 2);
 }
 

@@ -31,13 +31,13 @@
 
 int main(void)
 {
-    flint_rand_t state;
     slong n;
 
-    printf("primes....");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("primes....");
+    fflush(stdout);
+ 
     _flint_rand_init_gmp(state);
 
     /* compare with n_nextprime */
@@ -55,8 +55,8 @@ int main(void)
 
             if (p != q)
             {
-                printf("FAIL\n");
-                printf("i = %lu, p = %lu, q = %lu\n", i, p, q);
+                flint_printf("FAIL\n");
+                flint_printf("i = %wu, p = %wu, q = %wu\n", i, p, q);
                 abort();
             }
         }
@@ -83,16 +83,16 @@ int main(void)
 
         if (s != primepi[n])
         {
-            printf("FAIL\n");
-            printf("pi(10^%ld) = %u, computed = %lu\n", n, primepi[n], s);
+            flint_printf("FAIL\n");
+            flint_printf("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
             abort();
         }
 
         n_primes_clear(iter);
     }
 
-
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

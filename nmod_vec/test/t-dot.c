@@ -34,10 +34,10 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("dot....");
+    flint_printf("dot....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -70,18 +70,18 @@ main(void)
 
         for (j = 0; j < len; j++)
         {
-            mpz_set_ui(t, x[j]);
-            mpz_addmul_ui(s, t, y[j]);
+            flint_mpz_set_ui(t, x[j]);
+            flint_mpz_addmul_ui(s, t, y[j]);
         }
 
-        mpz_mod_ui(s, s, m);
+        flint_mpz_mod_ui(s, s, m);
 
-        if (mpz_get_ui(s) != res)
+        if (flint_mpz_get_ui(s) != res)
         {
-            printf("FAIL:\n");
-            printf("m = %lu\n", m);
-            printf("len = %ld\n", len);
-            printf("limbs1 = %d\n", limbs1);
+            flint_printf("FAIL:\n");
+            flint_printf("m = %wu\n", m);
+            flint_printf("len = %wd\n", len);
+            flint_printf("limbs1 = %d\n", limbs1);
             abort();
         }
 
@@ -92,8 +92,8 @@ main(void)
         _nmod_vec_clear(y);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

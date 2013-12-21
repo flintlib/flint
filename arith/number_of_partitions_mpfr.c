@@ -90,8 +90,8 @@ partitions_term_bound(double n, double k)
 static mp_limb_t primorial_tab[] = {
     1, 2, 6, 30, 210, 2310, 30030, 510510, 9699690, 223092870,
 #if FLINT64
-    6469693230UL, 200560490130UL, 7420738134810UL, 304250263527210UL,
-    13082761331670030UL, 614889782588491410UL
+    UWORD(6469693230), UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210),
+    UWORD(13082761331670030), UWORD(614889782588491410)
 #endif
 };
 
@@ -148,7 +148,7 @@ void
 mpfr_sqrt_z(mpfr_t x, mpz_t z, mpfr_rnd_t rnd)
 {
     if (mpz_fits_ulong_p(z))
-        mpfr_sqrt_ui(x, mpz_get_ui(z), rnd);
+        mpfr_sqrt_ui(x, flint_mpz_get_ui(z), rnd);
     else
     {
         mpfr_set_z(x, z, rnd);
@@ -339,7 +339,7 @@ eval_trig_prod(mpfr_t sum, trig_prod_t prod)
 
     if (prod->prefactor == 0)
     {
-        mpfr_set_ui(sum, 0UL, MPFR_RNDN);
+        mpfr_set_ui(sum, UWORD(0), MPFR_RNDN);
         return;
     }
 
@@ -437,9 +437,9 @@ _arith_number_of_partitions_mpfr(mpfr_t x, ulong n, slong N0, slong N)
     mpfr_set_ui(acc, 0, MPFR_RNDN);
 
     mpz_init(n24);
-    mpz_set_ui(n24, n);
-    mpz_mul_ui(n24, n24, 24);
-    mpz_sub_ui(n24, n24, 1);
+    flint_mpz_set_ui(n24, n);
+    flint_mpz_mul_ui(n24, n24, 24);
+    flint_mpz_sub_ui(n24, n24, 1);
 
 #if VERBOSE
     timeit_start(t0);
@@ -462,7 +462,7 @@ _arith_number_of_partitions_mpfr(mpfr_t x, ulong n, slong N0, slong N)
 
 #if VERBOSE
     timeit_stop(t0);
-    printf("TERM 1: %ld ms\n", t0->cpu);
+    flint_printf("TERM 1: %wd ms\n", t0->cpu);
 #endif
 
     for (k = N0; k <= N; k++)

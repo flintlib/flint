@@ -35,10 +35,10 @@ int
 main(void)
 {
     slong i;
-    flint_rand_t state;
-    flint_randinit(state);
+    FLINT_TEST_INIT(state);
+    
 
-    printf("submul....");
+    flint_printf("submul....");
     fflush(stdout);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -78,7 +78,7 @@ main(void)
 
         if (!nmod_mat_equal(D, E))
         {
-            printf("FAIL: results not equal\n");
+            flint_printf("FAIL: results not equal\n");
             nmod_mat_print_pretty(A);
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
@@ -92,7 +92,7 @@ main(void)
 
         if (!nmod_mat_equal(C, E))
         {
-            printf("FAIL: results not equal (aliasing)\n");
+            flint_printf("FAIL: results not equal (aliasing)\n");
             nmod_mat_print_pretty(A);
             nmod_mat_print_pretty(B);
             nmod_mat_print_pretty(C);
@@ -109,8 +109,8 @@ main(void)
         nmod_mat_clear(T);
     }
 
-    flint_randclear(state);
-
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

@@ -53,7 +53,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     _fmpz_vec_zero(s, len2);
     _fmpz_vec_zero(t, len1);
 
-    p = (1UL << (FLINT_BITS - 1));
+    p = (UWORD(1) << (FLINT_BITS - 1));
 
     G = _nmod_vec_init(4 * len1 + 5 * len2 - 2);
     S = G + len2;
@@ -79,8 +79,8 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
         R = fmpz_fdiv_ui(r, p);
 
         /* If p divides resultant or either leading coeff, discard p */
-        if ((fmpz_fdiv_ui(poly1 + len1 - 1, p) == 0L) || 
-            (fmpz_fdiv_ui(poly2 + len2 - 1, p) == 0L) || (R == 0))
+        if ((fmpz_fdiv_ui(poly1 + len1 - 1, p) == WORD(0)) || 
+            (fmpz_fdiv_ui(poly2 + len2 - 1, p) == WORD(0)) || (R == 0))
             continue;
 
         nmod_init(&mod, p);

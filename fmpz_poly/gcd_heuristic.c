@@ -72,7 +72,7 @@ int multiplies_out(fmpz * P, slong len, const fmpz * Q, slong qlen,
       _fmpz_poly_mul(temp, Q, qlen, G, glen);
    else
       _fmpz_poly_mul(temp, G, glen, Q, qlen);
-   if (sign < 0L) _fmpz_vec_neg(temp, temp, glen + qlen - 1);
+   if (sign < WORD(0)) _fmpz_vec_neg(temp, temp, glen + qlen - 1);
 
    /* check if quotient really was exact */
    divides = (glen + qlen - 1 == len && _fmpz_vec_equal(temp, P, len));

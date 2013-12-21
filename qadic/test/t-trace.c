@@ -33,12 +33,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("trace... ");
+    flint_printf("trace... ");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Compare with sum of Galois conjugates */
     for (i = 0; i < 2000; i++)
@@ -78,17 +78,17 @@ main(void)
         result = (ans && padic_equal(x, y));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("x = "), padic_print(x, &ctx->pctx), printf("\n");
-            printf("y = "), padic_print(y, &ctx->pctx), printf("\n");
+            flint_printf("FAIL:\n\n");
+            flint_printf("a = "), qadic_print_pretty(a, ctx), flint_printf("\n");
+            flint_printf("b = "), qadic_print_pretty(b, ctx), flint_printf("\n");
+            flint_printf("x = "), padic_print(x, &ctx->pctx), flint_printf("\n");
+            flint_printf("y = "), padic_print(y, &ctx->pctx), flint_printf("\n");
             for (j = 0; j < d; j++)
             {
                 qadic_frobenius(c, a, j, ctx);
-                printf("sigma^%ld = ", j), qadic_print_pretty(c, ctx), printf("\n");
+                flint_printf("sigma^%wd = ", j), qadic_print_pretty(c, ctx), flint_printf("\n");
             }
-            printf("ans = %d\n", ans);
+            flint_printf("ans = %d\n", ans);
             qadic_ctx_print(ctx);
             abort();
         }
@@ -103,9 +103,9 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

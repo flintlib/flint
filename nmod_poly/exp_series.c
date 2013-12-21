@@ -47,9 +47,9 @@ _nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
     hprime = _nmod_vec_init(n);
 
     _nmod_poly_derivative(hprime, h, n, mod);
-    hprime[n-1] = 0UL;
+    hprime[n-1] = UWORD(0);
 
-    for (i = 1; (1L << i) < n; i++);
+    for (i = 1; (WORD(1) << i) < n; i++);
     a[i = 0] = n;
     while (n >= NMOD_POLY_NEWTON_EXP_CUTOFF)
         a[++i] = (n = (n + 1) / 2);
@@ -138,9 +138,9 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n)
     nmod_poly_fit_length(f, n);
     hlen = h->length;
 
-    if (hlen > 0 && h->coeffs[0] != 0UL)
+    if (hlen > 0 && h->coeffs[0] != UWORD(0))
     {
-        printf("Exception (nmod_poly_exp_series). Constant term != 0.\n");
+        flint_printf("Exception (nmod_poly_exp_series). Constant term != 0.\n");
         abort();
     }
 
@@ -152,14 +152,14 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n)
         }
         else
         {
-            f->coeffs[0] = 1UL;
+            f->coeffs[0] = UWORD(1);
             f->length = 1;
         }
         return;
     }
 
     /* Handle monomials */
-    for (k = 0; h->coeffs[k] == 0UL && k < n - 1; k++);
+    for (k = 0; h->coeffs[k] == UWORD(0) && k < n - 1; k++);
     if (k == hlen - 1 || k == n - 1)
     {
         hlen = FLINT_MIN(hlen, n);

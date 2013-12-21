@@ -32,7 +32,7 @@
 
 void _fmpq_poly_rem(fmpz * R, fmpz_t r, 
                     const fmpz * A, const fmpz_t a, slong lenA, 
-                    const fmpz * B, const fmpz_t b, slong lenB)
+          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
 {
     slong lenR;
     ulong d;
@@ -50,20 +50,20 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
        and thus
            {A, a} = {b * Q, a * lead^d} * {B, b} + {R, a * lead^d}.
      */
-    _fmpz_poly_pseudo_rem(R, &d, A, lenA, B, lenB);
+    _fmpz_poly_pseudo_rem(R, &d, A, lenA, B, lenB, inv);
     
     /* Determine the actual length of R */
     for (lenR = lenB - 2; lenR >= 0 && !R[lenR]; lenR--) ;
     lenR++;
     
     /* 1.  lead^d == +-1.  {R, r} = {R, a} up to sign */
-    if (d == 0UL || *lead == 1L || *lead == -1L)
+    if (d == UWORD(0) || *lead == WORD(1) || *lead == WORD(-1))
     {
         fmpz_one(r);
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
-        if (*lead == -1L && d % 2UL)
+        if (*lead == WORD(-1) && d % UWORD(2))
             _fmpz_vec_neg(R, R, lenR);
     }
     /* 2.  lead^d != +-1.  {R, r} = {R, a lead^d} */
@@ -94,7 +94,7 @@ void fmpq_poly_rem(fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception (fmpq_poly_rem). Division by zero.\n");
+        flint_printf("Exception (fmpq_poly_rem). Division by zero.\n");
         abort();
     }
 
@@ -123,7 +123,7 @@ void fmpq_poly_rem(fmpq_poly_t R,
     
     _fmpq_poly_rem(R->coeffs, R->den, 
                    poly1->coeffs, poly1->den, poly1->length, 
-                   poly2->coeffs, poly2->den, poly2->length);
+                   poly2->coeffs, poly2->den, poly2->length, NULL);
     
     _fmpq_poly_set_length(R, lenR);
     _fmpq_poly_normalise(R);

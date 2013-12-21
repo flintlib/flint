@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("sizeinbase....");
+    flint_printf("sizeinbase....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 100000; i++)
     {
@@ -52,7 +52,7 @@ main(void)
         size_t r1, r2;
 
         a = z_randtest(state);
-        mpz_init_set_si(b, a);
+        flint_mpz_init_set_si(b, a);
         base = (int) (n_randint(state, 61) + 2);
 
         r1 = z_sizeinbase(a, base);
@@ -61,18 +61,18 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL:\n");
+            flint_printf("FAIL:\n");
             gmp_printf("b = %Zd\n", b);
-            printf("base = %d\n", base);
-            printf("r1 = %lu\n, r2 = %lu\n", (ulong) r1, (ulong) r2);
+            flint_printf("base = %d\n", base);
+            flint_printf("r1 = %wu\n, r2 = %wu\n", (ulong) r1, (ulong) r2);
             abort();
         }
 
         mpz_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

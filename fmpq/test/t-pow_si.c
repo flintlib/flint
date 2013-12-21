@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("pow_si....");
+    flint_printf("pow_si....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100000; i++)
@@ -64,11 +64,11 @@ main(void)
         result = fmpq_equal(b, c);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_print(a), printf("\n\n");
-            printf("b = "), fmpq_print(b), printf("\n\n");
-            printf("c = "), fmpq_print(c), printf("\n\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpq_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpq_print(c), flint_printf("\n\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -102,11 +102,11 @@ main(void)
         result = fmpq_equal(b, c);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpq_print(a), printf("\n\n");
-            printf("b = "), fmpq_print(b), printf("\n\n");
-            printf("c = "), fmpq_print(c), printf("\n\n");
-            printf("e = %ld\n", e);
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_print(a), flint_printf("\n\n");
+            flint_printf("b = "), fmpq_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpq_print(c), flint_printf("\n\n");
+            flint_printf("e = %wd\n", e);
             abort();
         }
 
@@ -115,8 +115,8 @@ main(void)
         fmpq_clear(c);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

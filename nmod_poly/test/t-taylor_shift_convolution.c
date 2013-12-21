@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
-    printf("taylor_shift_convolution....");
+    flint_printf("taylor_shift_convolution....");
     fflush(stdout);
 
-    flint_randinit(state);
+    
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -64,9 +64,9 @@ main(void)
 
         if (!nmod_poly_equal(g, f))
         {
-            printf("FAIL\n");
-            nmod_poly_print(f); printf("\n");
-            nmod_poly_print(g); printf("\n");
+            flint_printf("FAIL\n");
+            nmod_poly_print(f); flint_printf("\n");
+            nmod_poly_print(g); flint_printf("\n");
             abort();
         }
 
@@ -102,11 +102,11 @@ main(void)
 
         if (!nmod_poly_equal(h1, h2))
         {
-            printf("FAIL\n");
-            nmod_poly_print(f); printf("\n");
-            nmod_poly_print(g); printf("\n");
-            nmod_poly_print(h1); printf("\n");
-            nmod_poly_print(h2); printf("\n");
+            flint_printf("FAIL\n");
+            nmod_poly_print(f); flint_printf("\n");
+            nmod_poly_print(g); flint_printf("\n");
+            nmod_poly_print(h1); flint_printf("\n");
+            nmod_poly_print(h2); flint_printf("\n");
             abort();
         }
 
@@ -116,7 +116,8 @@ main(void)
         nmod_poly_clear(h2);
     }
 
-    flint_randclear(state);
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

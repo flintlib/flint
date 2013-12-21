@@ -29,6 +29,6 @@
 
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit) 
 {
-   if (limit == 0UL) return n_randlimb(state);
+   if (limit == UWORD(0)) return n_randlimb(state);
    else return n_randlimb(state) % limit;
 }

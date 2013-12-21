@@ -33,16 +33,15 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
-    printf("compose_pow... ");
-    fflush(stdout);
+    FLINT_TEST_INIT(state);
 
-    flint_randinit(state);
+    flint_printf("compose_pow... ");
+    fflush(stdout);    
 
     /* Aliasing */
     for (i = 0; i < 1000; i++)
@@ -69,10 +68,10 @@ main(void)
         result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
-            padic_poly_print(a, ctx), printf("\n\n");
-            padic_poly_print(b, ctx), printf("\n\n");
-            padic_poly_print(c, ctx), printf("\n\n");
+            flint_printf("FAIL (aliasing):\n");
+            padic_poly_print(a, ctx), flint_printf("\n\n");
+            padic_poly_print(b, ctx), flint_printf("\n\n");
+            padic_poly_print(c, ctx), flint_printf("\n\n");
             abort();
         }
 
@@ -97,7 +96,7 @@ main(void)
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         padic_poly_init2(f,  0, N);
-        padic_poly_init2(g,  0, LONG_MAX);  /* TODO:  Check this is OK */
+        padic_poly_init2(g,  0, WORD_MAX);  /* TODO:  Check this is OK */
         padic_poly_init2(h1, 0, N);
         padic_poly_init2(h2, 0, N);
 
@@ -115,13 +114,13 @@ main(void)
         result = (padic_poly_equal(h1, h2) && padic_poly_is_reduced(h1, ctx));
         if (!result)
         {
-            printf("FAIL (cmp with composition):\n");
-            printf("f  = "), padic_poly_print(f, ctx), printf("\n\n");
-            printf("g  = "), padic_poly_print(g, ctx), printf("\n\n");
-            printf("h1 = "), padic_poly_print(h1, ctx), printf("\n\n");
-            printf("h2 = "), padic_poly_print(h2, ctx), printf("\n\n");
-            printf("p  = "), fmpz_print(p), printf("\n\n");
-            printf("N  = %ld\n\n", N);
+            flint_printf("FAIL (cmp with composition):\n");
+            flint_printf("f  = "), padic_poly_print(f, ctx), flint_printf("\n\n");
+            flint_printf("g  = "), padic_poly_print(g, ctx), flint_printf("\n\n");
+            flint_printf("h1 = "), padic_poly_print(h1, ctx), flint_printf("\n\n");
+            flint_printf("h2 = "), padic_poly_print(h2, ctx), flint_printf("\n\n");
+            flint_printf("p  = "), fmpz_print(p), flint_printf("\n\n");
+            flint_printf("N  = %wd\n\n", N);
             abort();
         }
 
@@ -134,8 +133,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -32,13 +32,13 @@
 int main(void)
 {
    int i, j, result;
-   ulong count = 0UL;
-   flint_rand_t state;
+   ulong count = UWORD(0);
+   FLINT_TEST_INIT(state);
    
-   printf("is_strong_probabprime_precomp....");
+   flint_printf("is_strong_probabprime_precomp....");
    fflush(stdout);
 
-   flint_randinit(state);
+   
 
    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -52,16 +52,16 @@ int main(void)
       do
       {
          d = n_randbits(state, bits) | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
-         d = mpz_get_ui(d_m);
+         d = flint_mpz_get_ui(d_m);
       } while (FLINT_BIT_COUNT(d) > FLINT_D_BITS);
-      if (d == 2UL) d++;
+      if (d == UWORD(2)) d++;
          
       for (j = 0; j < 100; j++)
       {
          do a = n_randint(state, d);
-         while (a == 0UL);
+         while (a == UWORD(0));
       
          dpre = n_precompute_inverse(d);
          count_trailing_zeros(norm, d - 1);
@@ -69,8 +69,8 @@ int main(void)
 
          if (!result)
          {
-            printf("FAIL:\n");
-            printf("a = %lu, d = %lu\n", a, d); 
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu, d = %wu\n", a, d); 
             abort();
          }
       }
@@ -90,13 +90,13 @@ int main(void)
       do
       {
          d = n_randbits(state, bits) | 1;
-         mpz_set_ui(d_m, d);
+         flint_mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       for (j = 0; j < 100; j++)
       {
          do a = n_randint(state, d);
-         while (a == 0UL);
+         while (a == UWORD(0));
       
          dpre = n_precompute_inverse(d);
          count_trailing_zeros(norm, d - 1);
@@ -110,13 +110,13 @@ int main(void)
 
    if (count > 220 * flint_test_multiplier()) 
    {
-      printf("FAIL:\n");
-      printf("count = %lu\n", count);
+      flint_printf("FAIL:\n");
+      flint_printf("count = %wu\n", count);
       abort();
    }
 
-   flint_randclear(state);
-
-   printf("PASS\n");
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
    return 0;
 }

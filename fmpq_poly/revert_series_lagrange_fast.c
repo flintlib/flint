@@ -167,7 +167,7 @@ fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        printf("Exception (fmpq_poly_revert_series_lagrange_fast). Input must \n"
+        flint_printf("Exception (fmpq_poly_revert_series_lagrange_fast). Input must \n"
                "have zero constant term and nonzero coefficient of x^1.\n");
         abort();
     }

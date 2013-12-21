@@ -27,7 +27,7 @@
 
 ******************************************************************************/
 
-#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 void

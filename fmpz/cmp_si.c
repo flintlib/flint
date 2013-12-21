@@ -37,5 +37,5 @@ fmpz_cmp_si(const fmpz_t f, slong g)
     if (!COEFF_IS_MPZ(c))    /* f is small */
         return c < g ? -1 : c > g;
     else                     /* f is large */
-        return mpz_cmp_si(COEFF_TO_PTR(c), g);
+        return flint_mpz_cmp_si(COEFF_TO_PTR(c), g);
 }

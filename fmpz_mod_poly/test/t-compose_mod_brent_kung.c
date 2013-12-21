@@ -35,9 +35,9 @@ int
 main(void)
 {
     int i;
-    flint_rand_t state;
-    flint_randinit(state);
-    printf("compose_mod_brent_kung....");
+    FLINT_TEST_INIT(state);
+    
+    flint_printf("compose_mod_brent_kung....");
     fflush(stdout);
 
     for (i = 0; i < 2000; i++)
@@ -65,12 +65,12 @@ main(void)
 
         if (!fmpz_mod_poly_equal(d, e))
         {
-            printf("FAIL (composition):\n");
-            printf("a:\n"); fmpz_mod_poly_print(a); printf("\n");
-            printf("b:\n"); fmpz_mod_poly_print(b); printf("\n");
-            printf("c:\n"); fmpz_mod_poly_print(c); printf("\n");
-            printf("d:\n"); fmpz_mod_poly_print(d); printf("\n");
-            printf("e:\n"); fmpz_mod_poly_print(e); printf("\n");
+            flint_printf("FAIL (composition):\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
+            flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+            flint_printf("d:\n"); fmpz_mod_poly_print(d); flint_printf("\n");
+            flint_printf("e:\n"); fmpz_mod_poly_print(e); flint_printf("\n");
             abort();
         }
 
@@ -106,11 +106,11 @@ main(void)
 
         if (!fmpz_mod_poly_equal(d, a))
         {
-            printf("FAIL (aliasing a):\n");
-            printf("a:\n"); fmpz_mod_poly_print(a); printf("\n");
-            printf("b:\n"); fmpz_mod_poly_print(b); printf("\n");
-            printf("c:\n"); fmpz_mod_poly_print(c); printf("\n");
-            printf("d:\n"); fmpz_mod_poly_print(d); printf("\n");
+            flint_printf("FAIL (aliasing a):\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
+            flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+            flint_printf("d:\n"); fmpz_mod_poly_print(d); flint_printf("\n");
             abort();
         }
 
@@ -145,11 +145,11 @@ main(void)
 
         if (!fmpz_mod_poly_equal(d, b))
         {
-            printf("FAIL (aliasing b)\n");
-            printf("a:\n"); fmpz_mod_poly_print(a); printf("\n");
-            printf("b:\n"); fmpz_mod_poly_print(b); printf("\n");
-            printf("c:\n"); fmpz_mod_poly_print(c); printf("\n");
-            printf("d:\n"); fmpz_mod_poly_print(d); printf("\n");
+            flint_printf("FAIL (aliasing b)\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
+            flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+            flint_printf("d:\n"); fmpz_mod_poly_print(d); flint_printf("\n");
             abort();
         }
 
@@ -184,11 +184,11 @@ main(void)
 
         if (!fmpz_mod_poly_equal(d, c))
         {
-            printf("FAIL (aliasing c)\n");
-            printf("a:\n"); fmpz_mod_poly_print(a); printf("\n");
-            printf("b:\n"); fmpz_mod_poly_print(b); printf("\n");
-            printf("c:\n"); fmpz_mod_poly_print(c); printf("\n");
-            printf("d:\n"); fmpz_mod_poly_print(d); printf("\n");
+            flint_printf("FAIL (aliasing c)\n");
+            flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
+            flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
+            flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+            flint_printf("d:\n"); fmpz_mod_poly_print(d); flint_printf("\n");
             abort();
         }
 
@@ -199,8 +199,8 @@ main(void)
         fmpz_mod_poly_clear(d);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    printf("PASS\n");
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
     return 0;
 }

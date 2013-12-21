@@ -45,7 +45,7 @@
 
 int main(void)
 {
-    flint_rand_t state;
+    FLINT_TEST_INIT(state);
 
     mp_limb_t p[] = {17ul, 2147483659ul, 9223372036854775837ul};
     const slong degs[]      = {   20,   40,  60,  80, 100, 120, 140, 160, 180, 200, 
@@ -75,11 +75,11 @@ int main(void)
 
     nmod_poly_t A, B, C, G;
 
-    flint_randinit(state);
+    
 
     for (i = 0; i < 3; i++)
     {
-        printf("---[Modulus %lu]---\n", p[i]), fflush(stdout);
+        flint_printf("---[Modulus %wu]---\n", p[i]), fflush(stdout);
 
         for (k = 0; k < N; k++)
         {
@@ -121,7 +121,7 @@ int main(void)
             cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) (100*r);
             cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) (100*r);
 
-            printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
+            flint_printf("%4ld %10.WORD(8)f %10.WORD(8)f\n", A->length, cpu[i][0][k], cpu[i][1][k]);
             fflush(stdout);
 
             nmod_poly_clear(A);
@@ -130,19 +130,19 @@ int main(void)
         }
     }
 
-    printf("cpu = [");
+    flint_printf("cpu = [");
     for (i = 0; i < 3; i++)
     {
-        printf("[[");
+        flint_printf("[[");
         for (k = 0; k < N; k++)
-            printf("%.8Lf,", cpu[i][0][k]);
-        printf("],");
-        printf("[");
+            flint_printf("%.WORD(8)f,", cpu[i][0][k]);
+        flint_printf("],");
+        flint_printf("[");
         for (k = 0; k < N; k++)
-            printf("%.8Lf,", cpu[i][1][k]);
-        printf("]],");
+            flint_printf("%.WORD(8)f,", cpu[i][1][k]);
+        flint_printf("]],");
     }
-    printf("]\n");
+    flint_printf("]\n");
 
     flint_randclear(state);
     return EXIT_SUCCESS;
