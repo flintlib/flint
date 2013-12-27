@@ -32,7 +32,7 @@ n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv, ulon
 {
     mp_limb_t x;
 
-    if (n == UWORD(1) || a == 0) return UWORD(0);
+    if (n == (UWORD(1)<<norm) || a == 0) return UWORD(0);
 
     if (exp)
     {
