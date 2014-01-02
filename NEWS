@@ -1088,3 +1088,7 @@ v 2.4 -- 20 Nov 2013
   * Support for Boehm-Demers-Weiser GC
   * Support for flint extension modules
 
+v 2.4.1 -- 2 Jan 2014
+
+  * Fixed a bug in the NTL interface tests (reported by Francois Bissey)
+
