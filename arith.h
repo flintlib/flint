@@ -43,7 +43,6 @@
 /* MPFR extras ***************************************************************/
 
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
-void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
 
 /* Various arithmetic functions **********************************************/
 

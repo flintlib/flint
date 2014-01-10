@@ -775,18 +775,3 @@ void arith_sum_of_squares_vec(fmpz * r, ulong k, slong n)
 
     $$\vartheta_3^k(q) = \left( \sum_{i=-\infty}^{\infty} q^{i^2} \right)^k.$$
 
-
-*******************************************************************************
-
-    MPFR extras
-
-*******************************************************************************
-
-void mpfr_pi_chudnovsky(mpfr_t x, mpfr_rnd_t rnd)
-
-    Sets \code{x} to $\pi$, rounded in the direction \code{rnd}.
-
-    Uses the Chudnovsky algorithm, which typically is about four times
-    faster than the MPFR default function. As currently implemented, the
-    value is not cached for repeated use.
-
