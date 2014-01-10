@@ -35,6 +35,9 @@ void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
 void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
 void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
+void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
+void fmpq_harmonic_ui(fmpq_t x, ulong n);
+
 #ifdef __cplusplus
 }
 #endif

@@ -181,11 +181,6 @@ do {                                                         \
 
 
 
-void
-flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
-                          mp_ptr v, mp_size_t * vsize,
-                          slong a, slong b, slong n, int d);
-
 mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
 mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
