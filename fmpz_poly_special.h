@@ -34,6 +34,9 @@ void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
                                         slong num_factors, ulong phi);
 void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
 
+void _fmpz_poly_cos_minpoly(fmpz * f, ulong n);
+void fmpz_poly_cos_minpoly(fmpz_poly_t f, ulong n);
+
 void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
 void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n);
 

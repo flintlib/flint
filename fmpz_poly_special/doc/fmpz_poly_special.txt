@@ -84,6 +84,23 @@ void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
     We factor $n$ into $n = qs$ where $q$ is squarefree,
     and compute $\Phi_q(x)$. Then $\Phi_n(x) = \Phi_q(x^s)$.
 
+void _fmpz_poly_cos_minpoly(fmpz * coeffs, ulong n)
+
+void fmpz_poly_cos_minpoly(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the minimal polynomial of $2 \cos(2 \pi / n)$.
+    For suitable choice of $n$, this gives the minimal polynomial
+    of $2 \cos(a \pi)$ or $2 \sin(a \pi)$ for any rational $a$.
+
+    The cosine is multiplied by a factor two since this gives
+    a monic polynomial with integer coefficients. One can obtain
+    the minimal polynomial for $\cos(2 \pi / n)$ by making
+    the substitution $x \to x / 2$.
+
+    For $n > 2$, the degree of the polynomial is $\varphi(n) / 2$.
+    For $n = 1, 2$, the degree is 1. For $n = 0$, we define
+    the output to be the constant polynomial 1.
+
 void _fmpz_poly_swinnerton_dyer(fmpz * coeffs, ulong n)
 
 void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
