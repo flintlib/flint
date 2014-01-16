@@ -34,6 +34,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "fmpq.h"
+#include "double_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -42,11 +43,10 @@
 /* MPFR extras ***************************************************************/
 
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
-void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
 
 /* Various arithmetic functions **********************************************/
 
-void arith_primorial(fmpz_t res, slong n);
+#define arith_primorial fmpz_primorial
 
 void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n);
 void arith_harmonic_number(fmpq_t x, slong n);
@@ -55,11 +55,10 @@ void arith_ramanujan_tau(fmpz_t res, const fmpz_t n);
 void arith_ramanujan_tau_series(fmpz_poly_t res, slong n);
 
 void arith_divisors(fmpz_poly_t res, const fmpz_t n);
-void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 
-int arith_moebius_mu(const fmpz_t n);
-
-void arith_euler_phi(fmpz_t res, const fmpz_t n);
+#define arith_divisor_sigma fmpz_divisor_sigma
+#define arith_moebius_mu fmpz_moebius_mu
+#define arith_euler_phi fmpz_euler_phi
 
 /* Stirling numbers **********************************************************/
 
@@ -169,9 +168,8 @@ void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n);
 
 /* Cyclotomic polynomials ****************************************************/
 
-void _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi);
-void arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
+#define _arith_cyclotomic_polynomial _fmpz_poly_cyclotomic
+#define arith_cyclotomic_polynomial fmpz_poly_cyclotomic
 
 void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n);
 void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
@@ -179,12 +177,16 @@ void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
 /* Hypergeometric polynomials ************************************************/
 
 void arith_legendre_polynomial(fmpq_poly_t poly, ulong n);
-void arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n);
-void arith_chebyshev_u_polynomial(fmpz_poly_t poly, ulong n);
+
+#define _arith_chebyshev_t_polynomial _fmpz_poly_chebyshev_t
+#define arith_chebyshev_t_polynomial fmpz_poly_chebyshev_t
+#define _arith_chebyshev_u_polynomial _fmpz_poly_chebyshev_u
+#define arith_chebyshev_u_polynomial fmpz_poly_chebyshev_u
 
 /* Swinnerton-Dyer polynomials ***********************************************/
 
-void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
+#define _arith_swinnerton_dyer_polynomial _fmpz_poly_swinnerton_dyer
+#define arith_swinnerton_dyer_polynomial fmpz_poly_swinnerton_dyer
 
 /* Landau function ***********************************************************/
 
@@ -192,11 +194,11 @@ void arith_landau_function_vec(fmpz * res, slong len);
 
 /* Dedekind sums *************************************************************/
 
-void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
-double arith_dedekind_sum_coprime_d(double h, double k);
-void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
-void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
-void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+#define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
+#define arith_dedekind_sum_coprime_d d_dedekind_sum_coprime
+#define arith_dedekind_sum_coprime_large fmpq_dedekind_sum_coprime_large
+#define arith_dedekind_sum_coprime fmpq_dedekind_sum_coprime
+#define arith_dedekind_sum fmpq_dedekind_sum
 
 /* Exponential sums **********************************************************/
 

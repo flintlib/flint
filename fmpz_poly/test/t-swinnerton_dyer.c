@@ -19,27 +19,55 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "arith.h"
-#include "fmpq.h"
+#include "fmpz_poly.h"
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
+static const mp_limb_t known_values[] =
 {
-    if (n <= 0)
+    UWORD(2147483629),
+    UWORD(1073742093),
+    UWORD(1342248677),
+    UWORD(3319936736),
+    UWORD(2947821228),
+    UWORD(1019513834),
+    UWORD(3324951530),
+    UWORD(1995039408),
+    UWORD(3505683295),
+    UWORD(3567639420),
+    UWORD(394942914)
+};
+
+int main()
+{
+    fmpz_poly_t S;
+    mp_limb_t r;
+    slong n;
+
+    FLINT_TEST_INIT(state);
+
+    flint_printf("swinnerton_dyer....");
+    fflush(stdout);
+
+    for (n = 0; n <= 10; n++)
     {
-        fmpz_zero(num);
-        fmpz_one(den);
+        fmpz_poly_init(S);
+        fmpz_poly_swinnerton_dyer(S, n);
+        r = fmpz_poly_evaluate_mod(S, UWORD(2147483629), UWORD(4294967291));
+
+        if (r != known_values[n])
+        {
+            flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
+            abort();
+        }
+
+        fmpz_poly_clear(S);
     }
-    else
-    {
-        _fmpq_harmonic_ui(num, den, n);
-    }
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }
 
-void arith_harmonic_number(fmpq_t x, slong n)
-{
-    _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
-}

@@ -19,48 +19,65 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
-#include "arith.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
-
-int main(void)
+int
+main(void)
 {
-    slong k;
-
+    int i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pi_chudnovsky....");
+    flint_printf("eta_qexp....");
     fflush(stdout);
 
-    for (k = 2; k < 20; k++)
+    for (i = 0; i < 2000; i++)
     {
-        mpfr_t x, y;
+        fmpz_poly_t a, b;
+        slong e, n;
 
-        mpfr_init2(x, WORD(1) << k);
-        mpfr_init2(y, WORD(1) << k);
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
 
-        mpfr_const_pi(x, MPFR_RNDN);
-        mpfr_pi_chudnovsky(y, MPFR_RNDN);
+        e = n_randint(state, 100) - 50;
+        n = n_randint(state, 250);
 
-        if (!mpfr_equal_p(x, y))
+        fmpz_poly_randtest(a, state, n_randint(state, 250),
+            1 + n_randint(state, 100));
+
+        fmpz_poly_eta_qexp(a, e, n);
+
+        fmpz_poly_eta_qexp(b, 1, n + n_randint(state, 10));
+        if (e >= 0)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("Wrong value at prec = %wd\n", WORD(1) << k);
+            fmpz_poly_pow_trunc(b, b, e, n);
+        }
+        else
+        {
+            fmpz_poly_inv_series(b, b, n);
+            fmpz_poly_pow_trunc(b, b, -e, n);
+        }
+
+        if (!fmpz_poly_equal(a, b))
+        {
+            flint_printf("FAIL (powering):\n");
+            flint_printf("e = %wd, n = %wd\n\n", e, n);
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(b), flint_printf("\n\n");
             abort();
         }
 
-        mpfr_clear(x);
-        mpfr_clear(y);
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
     }
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }
+

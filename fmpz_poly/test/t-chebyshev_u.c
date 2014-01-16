@@ -19,27 +19,47 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "arith.h"
-#include "fmpq.h"
+#include "fmpz_poly.h"
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
+int main()
 {
-    if (n <= 0)
-    {
-        fmpz_zero(num);
-        fmpz_one(den);
-    }
-    else
-    {
-        _fmpq_harmonic_ui(num, den, n);
-    }
-}
+    fmpz_poly_t T, U;
 
-void arith_harmonic_number(fmpq_t x, slong n)
-{
-    _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
+    slong n;
+
+    FLINT_TEST_INIT(state);
+
+    flint_printf("chebyshev_u....");
+    fflush(stdout);
+
+    fmpz_poly_init(T);
+    fmpz_poly_init(U);
+
+    for (n = 0; n <= 500; n++)
+    {
+        fmpz_poly_chebyshev_u(U, n);
+        fmpz_poly_chebyshev_t(T, n + 1);
+        fmpz_poly_derivative(T, T);
+        fmpz_poly_scalar_divexact_ui(T, T, n + 1);
+
+        if (!fmpz_poly_equal(T, U))
+        {
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("T: "); fmpz_poly_print_pretty(T, "x"); flint_printf("\n");
+            flint_printf("U: "); fmpz_poly_print_pretty(U, "x"); flint_printf("\n");
+            abort();
+        }
+
+    }
+
+    fmpz_poly_clear(T);
+    fmpz_poly_clear(U);
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }

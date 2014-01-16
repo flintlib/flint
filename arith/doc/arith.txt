@@ -42,19 +42,9 @@ void arith_primorial(fmpz_t res, slong n)
 
 void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
 
-    Sets \code{(num, den)} to the reduced numerator and denominator of
-    the $n$-th harmonic number $H_n = 1 + 1/2 + 1/3 + \dotsb + 1/n$. The
-    result is zero if $n \leq 0$.
-
-    Table lookup is used for $H_n$ whose numerator and denominator 
-    fit in single limb. For larger $n$, the function
-    \code{flint_mpn_harmonic_odd_balanced()} is used.
-
 void arith_harmonic_number(fmpq_t x, slong n)
 
-    Sets \code{x} to the $n$-th harmonic number. This function is
-    equivalent to \code{_arith_harmonic_number} apart from the output
-    being a single \code{fmpq_t} variable.
+    These are aliases for the functions in the fmpq module.
 
 *******************************************************************************
 
@@ -422,18 +412,6 @@ void arith_legendre_polynomial(fmpq_poly_t poly, ulong n)
     denominator is given by
     $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 
-void arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the Chebyshev polynomial of the first kind $T_n(x)$,
-    defined formally by $T_n(x) = \cos(n \cos^{-1}(x))$. The coefficients are
-    calculated using a hypergeometric recurrence.
-
-void arith_chebyshev_u_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the Chebyshev polynomial of the first kind $U_n(x)$,
-    which satisfies $(n+1) U_n(x) = T'_{n+1}(x)$.
-    The coefficients are calculated using a hypergeometric recurrence.
-
 *******************************************************************************
 
     Multiplicative functions
@@ -442,22 +420,11 @@ void arith_chebyshev_u_polynomial(fmpz_poly_t poly, ulong n)
 
 void arith_euler_phi(fmpz_t res, const fmpz_t n)
 
-    Sets \code{res} to the Euler totient function $\phi(n)$, counting the 
-    number of positive integers less than or equal to $n$ that are coprime 
-    to $n$.
-
 int arith_moebius_mu(const fmpz_t n)
-
-    Computes the Moebius function $\mu(n)$, which is defined as $\mu(n) = 0$ 
-    if $n$ has a prime factor of multiplicity greater than $1$, $\mu(n) = -1$ 
-    if $n$ has an odd number of distinct prime factors, and $\mu(n) = 1$ if 
-    $n$ has an even number of distinct prime factors.  By convention, 
-    $\mu(0) = 0$.
 
 void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
-    Sets \code{res} to $\sigma_k(n)$, the sum of $k$th powers of all 
-    divisors of $n$.
+    These are aliases for the functions in the fmpz module.
 
 void arith_divisors(fmpz_poly_t res, const fmpz_t n)
 
@@ -506,61 +473,6 @@ void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 
 *******************************************************************************
 
-void _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi)
-
-    Sets \code{a} to the lower half of the cyclotomic polynomial $\Phi_n(x)$,
-    given $n \ge 3$ which must be squarefree.
-
-    A precomputed array containing the prime factors of $n$ must be provided,
-    as well as the value of the Euler totient function $\phi(n)$ as \code{phi}.
-    If $n$ is even, 2 must be the first factor in the list.
-
-    The degree of $\Phi_n(x)$ is exactly $\phi(n)$. Only the low
-    $(\phi(n) + 1) / 2$ coefficients are written; the high coefficients
-    can be obtained afterwards by copying the low coefficients
-    in reverse order, since  $\Phi_n(x)$ is a palindrome for $n \ne 1$.
-
-    We use the sparse power series algorithm described as Algorithm 4
-    \cite{ArnoldMonagan2011}. The algorithm is based on the identity
-
-        $$\Phi_n(x) = \prod_{d|n} (x^d - 1)^{\mu(n/d)}.$$
-
-    Treating the polynomial as a power series, the multiplications and
-    divisions can be done very cheaply using repeated additions and
-    subtractions. The complexity is $O(2^k \phi(n))$ where $k$ is the
-    number of prime factors in $n$.
-
-    To improve efficiency for small $n$, we treat the \code{fmpz}
-    coefficients as machine integers when there is no risk of overflow.
-    The following bounds are given in Table 6 of \cite{ArnoldMonagan2011}:
-
-    For $n < 10163195$, the largest coefficient in any $\Phi_n(x)$
-    has 27 bits, so machine arithmetic is safe on 32 bits.
-
-    For $n < 169828113$, the largest coefficient in any $\Phi_n(x)$
-    has 60 bits, so machine arithmetic is safe on 64 bits.
-
-    Further, the coefficients are always $\pm 1$ or 0 if there are
-    exactly two prime factors, so in this case machine arithmetic can be
-    used as well.
-
-    Finally, we handle two special cases: if there is exactly one prime
-    factor $n = p$, then $\Phi_n(x) = 1 + x + x^2 + \ldots + x^{n-1}$,
-    and if $n = 2m$, we use $\Phi_n(x) = \Phi_m(-x)$ to fall back
-    to the case when $n$ is odd.
-
-void arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the $n$th cyclotomic polynomial, defined as
-
-        $$\Phi_n(x) = \prod_{\omega} (x-\omega)$$
-
-    where $\omega$ runs over all the $n$th primitive roots of unity.
-
-    We factor $n$ into $n = qs$ where $q$ is squarefree,
-    and compute $\Phi_q(x)$. Then $\Phi_n(x) = \Phi_q(x^s)$.
-
 void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
 
     For $n \ge 1$, sets \code{(coeffs, d+1)} to the minimal polynomial
@@ -594,23 +506,6 @@ void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
 
 *******************************************************************************
 
-    Swinnerton-Dyer polynomials
-
-*******************************************************************************
-
-void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
-
-    Sets \code{poly} to the Swinnerton-Dyer polynomial $S_n$, defined as
-    the integer polynomial
-    $$S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3}
-        \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})$$
-    where $p_n$ denotes the $n$-th prime number and all combinations
-    of signs are taken. This polynomial has degree $2^n$ and is
-    irreducible over the integers.
-
-
-*******************************************************************************
-
     Landau's function
 
 *******************************************************************************
@@ -630,102 +525,19 @@ void arith_landau_function_vec(fmpz * res, slong len)
 
     Dedekind sums
 
-    Most of the definitions and relations used in the following section
-    are given by Apostol \cite{Apostol1997}. The Dedekind sum $s(h,k)$ is
-    defined for all integers $h$ and $k$ as
-
-        $$s(h,k) = \sum_{i=1}^{k-1} \left(\left(\frac{i}{k}\right)\right)
-                                    \left(\left(\frac{hi}{k}\right)\right)$$
-
-    where 
-
-        $$((x))=\begin{cases}
-            x-\lfloor x\rfloor-1/2 &\mbox{if }
-                x\in\mathbb{Q}\setminus\mathbb{Z}\\
-            0 &\mbox{if }x\in\mathbb{Z}.
-            \end{cases}$$
-
-    If $0 < h < k$ and $(h,k) = 1$, this reduces to
-
-        $$s(h,k) = \sum_{i=1}^{k-1} \frac{i}{k}
-            \left(\frac{hi}{k}-\left\lfloor\frac{hi}{k}\right\rfloor
-            -\frac{1}{2}\right).$$
-
-    The main formula for evaluating the series above is the following.
-    Letting $r_0 = k$, $r_1 = h$, $r_2, r_3, \ldots, r_n, r_{n+1} = 1$
-    be the remainder sequence in the Euclidean algorithm for
-    computing GCD of $h$ and $k$, 
-
-        $$s(h,k) = \frac{1-(-1)^n}{8} - \frac{1}{12} \sum_{i=1}^{n+1}
-            (-1)^i \left(\frac{1+r_i^2+r_{i-1}^2}{r_i r_{i-1}}\right).$$
-
-    Writing $s(h,k) = p/q$, some useful properties employed are
-    $|s| < k / 12$, $q | 6k$ and $2|p| < k^2$.
-
 *******************************************************************************
 
 void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes $s(h,k)$ for arbitrary $h$ and $k$ using a straightforward
-    implementation of the defining sum using \code{fmpz} arithmetic.
-    This function is slow except for very small $k$ and is mainly
-    intended to be used for testing purposes.
-
 double arith_dedekind_sum_coprime_d(double h, double k)
-
-    Returns an approximation of $s(h,k)$ computed by evaluating the
-    remainder sequence sum using double-precision arithmetic.
-    Assumes that $0 < h < k$ and $(h,k) = 1$, and that $h$, $k$ and
-    their remainders can be represented exactly as doubles, e.g.
-    $k < 2^{53}$.
-
-    We give a rough error analysis with IEEE double precision arithmetic,
-    assuming $2 k^2 < 2^{53}$. By assumption, the terms in the sum evaluate
-    exactly apart from the division. Thus each term is bounded in magnitude
-    by $2k$ and its absolute error is bounded by $k 2^{-52}$.
-    By worst-case analysis of the Euclidean algorithm, we also know that
-    no more than 40 terms will be added.
-
-    It follows that the absolute error is at most $C k 2^{-53}$ for
-    some constant $C$. If we multiply the output by $6 k$ in order
-    to obtain an integer numerator, the order of magnitude of the error
-    is around $6 C k^2 2^{-53}$, so rounding to the nearest integer gives
-    a correct numerator whenever $k < 2^{26-d}$ for some small number of
-    guard bits $d$. A computation has shown that $d = 5$ is sufficient,
-    i.e. this function can be used for exact computation when
-    $k < 2^{21} \approx 2 \times 10^6$. This bound can likely be improved.
 
 void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes $s(h,k)$ for $h$ and $k$ satisfying $0 \le h \le k$ and
-    $(h,k) = 1$. This function effectively evaluates the remainder
-    sequence sum using \code{fmpz} arithmetic, without optimising for
-    any special cases. To avoid rational arithmetic, we use
-    the integer algorithm of Knuth \cite{Knuth1977}.
-
 void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-    Computes $s(h,k)$ for $h$ and $k$ satisfying $0 \le h \le k$
-    and $(h,k) = 1$.
-
-    This function calls \code{arith_dedekind_sum_coprime_d} if $k$ is small
-    enough for a double-precision estimate of the sum to yield a correct
-    numerator upon multiplication by $6k$ and rounding to the nearest integer.
-    Otherwise, it calls \code{arith_dedekind_sum_coprime_large}.
 
 void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes $s(h,k)$ for arbitrary $h$ and $k$. If the caller
-    can guarantee $0 < h < k$ and $(h,k) = 1$ ahead of time, it is always
-    cheaper to call \code{arith_dedekind_sum_coprime}.
-
-    This function uses the following identities to reduce the general
-    case to the situation where $0 < h < k$ and $(h,k) = 1$:
-    If $k \le 2$ or $h = 0$, $s(h,k) = 0$.
-    If $h < 0$, $s(h,k) = -s(-h,k)$.
-    For any $q > 0$, $s(qh,qk) = s(h,k)$.
-    If $0 < k < h$ and $(h,k) = 1$,
-    $s(h,k) = (1+h(h-3k)+k^2) / (12hk) - t(k,h).$
+    These are aliases for the functions in the fmpq module.
 
 *******************************************************************************
 
@@ -858,19 +670,4 @@ void arith_sum_of_squares_vec(fmpz * r, ulong k, slong n)
     raised to the $k$th power, i.e.
 
     $$\vartheta_3^k(q) = \left( \sum_{i=-\infty}^{\infty} q^{i^2} \right)^k.$$
-
-
-*******************************************************************************
-
-    MPFR extras
-
-*******************************************************************************
-
-void mpfr_pi_chudnovsky(mpfr_t x, mpfr_rnd_t rnd)
-
-    Sets \code{x} to $\pi$, rounded in the direction \code{rnd}.
-
-    Uses the Chudnovsky algorithm, which typically is about four times
-    faster than the MPFR default function. As currently implemented, the
-    value is not cached for repeated use.
 

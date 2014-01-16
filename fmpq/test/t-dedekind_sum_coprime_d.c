@@ -25,12 +25,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "arith.h"
 #include "ulong_extras.h"
-#include "math.h"
+#include "fmpq.h"
 
 int main(void)
 {
@@ -57,8 +57,8 @@ int main(void)
                 fmpz_set_si(hh, h);
                 fmpz_set_si(kk, k);
 
-                s1 = arith_dedekind_sum_coprime_d(h, k);
-                arith_dedekind_sum_naive(s2, hh, kk);
+                s1 = fmpq_dedekind_sum_coprime_d(h, k);
+                fmpq_dedekind_sum_naive(s2, hh, kk);
 
                 s2f = ((double)fmpz_get_si(fmpq_numref(s2))) /
                         fmpz_get_si(fmpq_denref(s2));

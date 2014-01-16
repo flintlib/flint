@@ -23,47 +23,34 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "arith.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
 
-
-int main(void)
+int
+fmpz_factor_moebius_mu(const fmpz_factor_t fac)
 {
-    ulong k;
-    fmpz_t x;
-    fmpz_t y;
+    slong i;
 
-    FLINT_TEST_INIT(state);
+    for (i = 0; i < fac->num; i++)
+        if (fac->exp[i] != 1)
+            return 0;
 
-    flint_printf("primorial....");
-    fflush(stdout);
-
-    fmpz_init(x);
-    fmpz_init(y);
-    fmpz_set_ui(y, 1);
-
-    for (k = 0; k < 10000; k++)
-    {
-       arith_primorial(x, k);
-       if (n_is_prime(k))
-          fmpz_mul_ui(y, y, k);
-       if (!fmpz_equal(x, y))
-       {
-          flint_printf("FAIL:\n");
-          flint_printf("primorial of %wu disagrees with direct product\n", k); 
-          fmpz_print(x);
-          flint_printf("\n");
-          abort();
-       }
-    }
-
-    fmpz_clear(x);
-    fmpz_clear(y);
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    return (fac->num % 2) ? -1 : 1;
 }
+
+int
+fmpz_moebius_mu(const fmpz_t n)
+{
+    fmpz_factor_t fac;
+    int mu;
+
+    if (fmpz_abs_fits_ui(n))
+        return n_moebius_mu(fmpz_get_ui(n));
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    mu = fmpz_factor_moebius_mu(fac);
+    fmpz_factor_clear(fac);
+
+    return mu;
+}
+
