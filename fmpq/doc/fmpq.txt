@@ -688,16 +688,16 @@ void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
     Computes $s(h,k)$ for $h$ and $k$ satisfying $0 \le h \le k$
     and $(h,k) = 1$.
 
-    This function calls \code{arith_dedekind_sum_coprime_d} if $k$ is small
+    This function calls \code{fmpq_dedekind_sum_coprime_d} if $k$ is small
     enough for a double-precision estimate of the sum to yield a correct
     numerator upon multiplication by $6k$ and rounding to the nearest integer.
-    Otherwise, it calls \code{arith_dedekind_sum_coprime_large}.
+    Otherwise, it calls \code{fmpq_dedekind_sum_coprime_large}.
 
 void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
     Computes $s(h,k)$ for arbitrary $h$ and $k$. If the caller
     can guarantee $0 < h < k$ and $(h,k) = 1$ ahead of time, it is always
-    cheaper to call \code{arith_dedekind_sum_coprime}.
+    cheaper to call \code{fmpq_dedekind_sum_coprime}.
 
     This function uses the following identities to reduce the general
     case to the situation where $0 < h < k$ and $(h,k) = 1$:
