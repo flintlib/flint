@@ -309,10 +309,22 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n);
 
 slong fmpq_cfrac_bound(const fmpq_t x);
 
+void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+double fmpq_dedekind_sum_coprime_d(double h, double k);
+
+void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
+
+void fmpq_harmonic_ui(fmpq_t x, ulong n);
+
 #ifdef __cplusplus
 }
 #endif
-
-#include "fmpq_special.h"
 
 #endif

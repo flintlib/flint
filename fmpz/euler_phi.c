@@ -19,38 +19,57 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "fmpq.h"
-#include "double_extras.h"
-
-/* Small enough that a numerical computation is safe */
-#define DOUBLE_CUTOFF (UWORD(1) << 21)
+#include "fmpz.h"
 
 void
-fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
+fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac)
 {
-    if (fmpz_cmp_ui(k, DOUBLE_CUTOFF) < 0)
+    fmpz_t t;
+    slong i;
+
+    fmpz_init(t);
+
+    fmpz_one(res);
+
+    for (i = 0; i < fac->num; i++)
     {
-        double t;
+        fmpz_sub_ui(t, fac->p + i, 1);
+        fmpz_mul(res, res, t);
 
-        t = d_dedekind_sum_coprime(*h, *k) * (6 * (*k));
-
-        /* Round to nearest after truncation */
-        if (t > 0)
-            t += 0.5;
-        else
-            t -= 0.5;
-
-        fmpz_set_d(fmpq_numref(s), t);
-        fmpz_set_ui(fmpq_denref(s), UWORD(6) * (*k));
-        fmpq_canonicalise(s);
+        if (fac->exp[i] != 1)
+        {
+            fmpz_pow_ui(t, fac->p + i, fac->exp[i] - 1);
+            fmpz_mul(res, res, t);
+        }
     }
-    else
+
+    fmpz_clear(t);
+}
+
+void
+fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+{
+    fmpz_factor_t fac;
+
+    if (fmpz_sgn(n) <= 0)
     {
-        fmpq_dedekind_sum_coprime_large(s, h, k);
+        fmpz_zero(res);
+        return;
     }
+
+    if (fmpz_abs_fits_ui(n))
+    {
+        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
+        return;
+    }
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    fmpz_factor_euler_phi(res, fac);
+    fmpz_factor_clear(fac);
 }
 

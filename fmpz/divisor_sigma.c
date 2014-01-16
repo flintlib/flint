@@ -27,7 +27,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
+fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
 {
     slong i;
 
@@ -78,7 +78,7 @@ fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     fmpz_factor_init(fac);
     fmpz_factor(fac, n);
-    _fmpz_divisor_sigma(res, fac, k);
+    fmpz_factor_divisor_sigma(res, fac, k);
     fmpz_factor_clear(fac);
 }
 

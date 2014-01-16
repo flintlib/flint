@@ -19,42 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_POLY_SPECIAL_H
-#define FMPZ_POLY_SPECIAL_H
+#include "fmpz.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+int
+fmpz_factor_moebius_mu(const fmpz_factor_t fac)
+{
+    slong i;
 
-void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
-                                        slong num_factors, ulong phi);
-void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
+    for (i = 0; i < fac->num; i++)
+        if (fac->exp[i] != 1)
+            return 0;
 
-void _fmpz_poly_cos_minpoly(fmpz * f, ulong n);
-void fmpz_poly_cos_minpoly(fmpz_poly_t f, ulong n);
-
-void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
-void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n);
-
-void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n);
-
-void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n);
-void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n);
-
-void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
-
-void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
-void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
-
-#ifdef __cplusplus
+    return (fac->num % 2) ? -1 : 1;
 }
-#endif
 
-#endif
+int
+fmpz_moebius_mu(const fmpz_t n)
+{
+    fmpz_factor_t fac;
+    int mu;
+
+    if (fmpz_abs_fits_ui(n))
+        return n_moebius_mu(fmpz_get_ui(n));
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    mu = fmpz_factor_moebius_mu(fac);
+    fmpz_factor_clear(fac);
+
+    return mu;
+}
 

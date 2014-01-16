@@ -19,57 +19,40 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "fmpz.h"
+#include <math.h>
+#include "fmpq.h"
 
-void
-_fmpz_euler_phi(fmpz_t res, const fmpz_factor_t fac)
+double
+fmpq_dedekind_sum_coprime_d(double h, double k)
 {
-    fmpz_t t;
-    slong i;
+    double a, b, t, s, sign;
 
-    fmpz_init(t);
+    if (k <= 2)
+        return 0.0;
 
-    fmpz_one(res);
+    a = k;
+    b = h;
+    s = 0.0;
+    sign = 1.0;
 
-    for (i = 0; i < fac->num; i++)
+    while (b > 0)
     {
-        fmpz_sub_ui(t, fac->p + i, 1);
-        fmpz_mul(res, res, t);
-
-        if (fac->exp[i] != 1)
-        {
-            fmpz_pow_ui(t, fac->p + i, fac->exp[i] - 1);
-            fmpz_mul(res, res, t);
-        }
+        s += sign * (1.0 + a*a + b*b) / (a * b);
+        t = fmod(a, b);
+        a = b;
+        b = t;
+        sign = -sign;
     }
 
-    fmpz_clear(t);
-}
+    s *= (1./12);
 
-void
-fmpz_euler_phi(fmpz_t res, const fmpz_t n)
-{
-    fmpz_factor_t fac;
+    if (sign < 0)
+        s -= 0.25;
 
-    if (fmpz_sgn(n) <= 0)
-    {
-        fmpz_zero(res);
-        return;
-    }
-
-    if (fmpz_abs_fits_ui(n))
-    {
-        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
-        return;
-    }
-
-    fmpz_factor_init(fac);
-    fmpz_factor(fac, n);
-    _fmpz_euler_phi(res, fac);
-    fmpz_factor_clear(fac);
+    return s;
 }
 

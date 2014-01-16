@@ -2846,3 +2846,151 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 
     where the coefficients of the polynomial are $a_0, \ldots, a_n$.
 
+*******************************************************************************
+
+    Minimal polynomials
+
+*******************************************************************************
+
+void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
+                                        slong num_factors, ulong phi)
+
+    Sets \code{a} to the lower half of the cyclotomic polynomial $\Phi_n(x)$,
+    given $n \ge 3$ which must be squarefree.
+
+    A precomputed array containing the prime factors of $n$ must be provided,
+    as well as the value of the Euler totient function $\phi(n)$ as \code{phi}.
+    If $n$ is even, 2 must be the first factor in the list.
+
+    The degree of $\Phi_n(x)$ is exactly $\phi(n)$. Only the low
+    $(\phi(n) + 1) / 2$ coefficients are written; the high coefficients
+    can be obtained afterwards by copying the low coefficients
+    in reverse order, since  $\Phi_n(x)$ is a palindrome for $n \ne 1$.
+
+    We use the sparse power series algorithm described as Algorithm 4
+    \cite{ArnoldMonagan2011}. The algorithm is based on the identity
+
+        $$\Phi_n(x) = \prod_{d|n} (x^d - 1)^{\mu(n/d)}.$$
+
+    Treating the polynomial as a power series, the multiplications and
+    divisions can be done very cheaply using repeated additions and
+    subtractions. The complexity is $O(2^k \phi(n))$ where $k$ is the
+    number of prime factors in $n$.
+
+    To improve efficiency for small $n$, we treat the \code{fmpz}
+    coefficients as machine integers when there is no risk of overflow.
+    The following bounds are given in Table 6 of \cite{ArnoldMonagan2011}:
+
+    For $n < 10163195$, the largest coefficient in any $\Phi_n(x)$
+    has 27 bits, so machine arithmetic is safe on 32 bits.
+
+    For $n < 169828113$, the largest coefficient in any $\Phi_n(x)$
+    has 60 bits, so machine arithmetic is safe on 64 bits.
+
+    Further, the coefficients are always $\pm 1$ or 0 if there are
+    exactly two prime factors, so in this case machine arithmetic can be
+    used as well.
+
+    Finally, we handle two special cases: if there is exactly one prime
+    factor $n = p$, then $\Phi_n(x) = 1 + x + x^2 + \ldots + x^{n-1}$,
+    and if $n = 2m$, we use $\Phi_n(x) = \Phi_m(-x)$ to fall back
+    to the case when $n$ is odd.
+
+void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the $n$th cyclotomic polynomial, defined as
+
+        $$\Phi_n(x) = \prod_{\omega} (x-\omega)$$
+
+    where $\omega$ runs over all the $n$th primitive roots of unity.
+
+    We factor $n$ into $n = qs$ where $q$ is squarefree,
+    and compute $\Phi_q(x)$. Then $\Phi_n(x) = \Phi_q(x^s)$.
+
+void _fmpz_poly_cos_minpoly(fmpz * coeffs, ulong n)
+
+void fmpz_poly_cos_minpoly(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the minimal polynomial of $2 \cos(2 \pi / n)$.
+    For suitable choice of $n$, this gives the minimal polynomial
+    of $2 \cos(a \pi)$ or $2 \sin(a \pi)$ for any rational $a$.
+
+    The cosine is multiplied by a factor two since this gives
+    a monic polynomial with integer coefficients. One can obtain
+    the minimal polynomial for $\cos(2 \pi / n)$ by making
+    the substitution $x \to x / 2$.
+
+    For $n > 2$, the degree of the polynomial is $\varphi(n) / 2$.
+    For $n = 1, 2$, the degree is 1. For $n = 0$, we define
+    the output to be the constant polynomial 1.
+
+void _fmpz_poly_swinnerton_dyer(fmpz * coeffs, ulong n)
+
+void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Swinnerton-Dyer polynomial $S_n$, defined as
+    the integer polynomial
+    $$S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3}
+        \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})$$
+    where $p_n$ denotes the $n$-th prime number and all combinations
+    of signs are taken. This polynomial has degree $2^n$ and is
+    irreducible over the integers (it is the minimal polynomial
+    of $\sqrt{2} + \ldots + \sqrt{p_n}$).
+
+*******************************************************************************
+
+    Orthogonal polynomials
+
+*******************************************************************************
+
+void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n)
+
+void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Chebyshev polynomial of the first kind $T_n(x)$,
+    defined by $T_n(x) = \cos(n \cos^{-1}(x))$. The coefficients are
+    calculated using a hypergeometric recurrence.
+
+void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
+
+void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Chebyshev polynomial of the first kind $U_n(x)$,
+    defined by $(n+1) U_n(x) = T'_{n+1}(x)$.
+    The coefficients are calculated using a hypergeometric recurrence.
+
+*******************************************************************************
+
+    Modular forms and q-series
+
+*******************************************************************************
+
+void _fmpz_poly_eta_qexp(fmpz * f, slong r, slong len)
+
+void fmpz_poly_eta_qexp(fmpz_poly_t f, slong r, slong n)
+
+    Sets $f$ to the $q$-expansion to length $n$ of the
+    Dedekind eta function (without the leading factor
+    $q^{1/24}$) raised to the power $r$, i.e.
+    $(q^{-1/24} \eta(q))^r = \prod_{k=1}^{\infty} (1 - q^k)^r$.
+
+    In particular, $r = -1$ gives the generating function
+    of the partition function $p(k)$, and $r = 24$ gives,
+    after multiplication by $q$,
+    the modular discriminant $\Delta(q)$ which generates
+    the Ramanujan tau function $\tau(k)$.
+
+    This function uses sparse formulas for $r = 1, 2, 3, 4, 6$
+    and otherwise reduces to one of those cases using power series arithmetic.
+
+void _fmpz_poly_theta_qexp(fmpz * f, slong r, slong len)
+
+void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
+
+    Sets $f$ to the $q$-expansion to length $n$ of the
+    Jacobi theta function raised to the power $r$, i.e. $\vartheta(q)^r$
+    where $\vartheta(q) = 1 + \sum_{k=1}^{\infty} q^{k^2}$.
+
+    This function uses sparse formulas for $r = 1, 2$
+    and otherwise reduces to those cases using power series arithmetic.
+

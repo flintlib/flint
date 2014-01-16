@@ -25,11 +25,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
 #include "ulong_extras.h"
-#include "double_extras.h"
+#include "fmpq.h"
 
 int main(void)
 {
@@ -40,7 +41,7 @@ int main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("dedekind_sum_coprime....");
+    flint_printf("dedekind_sum_coprime_d....");
     fflush(stdout);
 
     fmpz_init(hh);
@@ -56,7 +57,7 @@ int main(void)
                 fmpz_set_si(hh, h);
                 fmpz_set_si(kk, k);
 
-                s1 = d_dedekind_sum_coprime(h, k);
+                s1 = fmpq_dedekind_sum_coprime_d(h, k);
                 fmpq_dedekind_sum_naive(s2, hh, kk);
 
                 s2f = ((double)fmpz_get_si(fmpq_numref(s2))) /

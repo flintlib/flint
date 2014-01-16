@@ -19,40 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_SPECIAL_H
-#define FMPZ_SPECIAL_H
+#include "fmpq.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+/* Small enough that a numerical computation is safe */
+#define DOUBLE_CUTOFF (UWORD(1) << 21)
 
-/* Primorials */
+void
+fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
+{
+    if (fmpz_cmp_ui(k, DOUBLE_CUTOFF) < 0)
+    {
+        double t;
 
-void fmpz_primorial(fmpz_t res, ulong n);
+        t = fmpq_dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
 
-/* Multiplicative functions */
+        /* Round to nearest after truncation */
+        if (t > 0)
+            t += 0.5;
+        else
+            t -= 0.5;
 
-void _fmpz_euler_phi(fmpz_t res, const fmpz_factor_t fac);
-void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
-
-int _fmpz_moebius_mu(const fmpz_factor_t fac);
-int fmpz_moebius_mu(const fmpz_t n);
-
-void _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
-void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
-
-/* Orthogonal polynomials */
-
-void fmpz_chebyshev_t(fmpz_t y, ulong n, const fmpz_t x);
-void fmpz_chebyshev_u(fmpz_t y, ulong n, const fmpz_t x);
-
-#ifdef __cplusplus
+        fmpz_set_d(fmpq_numref(s), t);
+        fmpz_set_ui(fmpq_denref(s), UWORD(6) * (*k));
+        fmpq_canonicalise(s);
+    }
+    else
+    {
+        fmpq_dedekind_sum_coprime_large(s, h, k);
+    }
 }
-#endif
 
-#endif
 

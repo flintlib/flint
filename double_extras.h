@@ -61,8 +61,6 @@ d_polyval(const double * poly, int len, double x)
 
 double d_lambertw(double x);
 
-double d_dedekind_sum_coprime(double h, double k);
-
 #ifdef __cplusplus
 }
 #endif
