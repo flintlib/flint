@@ -25,7 +25,6 @@
 
 #include "fmpq.h"
 
-/* FIXME: memory leak! */
 void
 _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
                         const fmpz_t num, const fmpz_t den)
