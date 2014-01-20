@@ -179,6 +179,7 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
         for (k = a; k < b; k += 2)
         {
             umul_ppmm(t, u, p, k);
+            v = 0;
 
             if (t == 0)
             {
