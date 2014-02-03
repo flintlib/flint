@@ -178,7 +178,7 @@ install: library
 		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
 	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/flint
-	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
+	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
 		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint; \
 	fi
 	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
