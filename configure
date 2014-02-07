@@ -537,9 +537,6 @@ fi
 
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
-if [ "$PTHREAD" = "1" ]; then
-   LIBS="${LIBS} pthread"
-fi
 
 #pocess external modules
 
@@ -560,6 +557,11 @@ for LIB_DIR in ${LIB_DIRS} ${EXTRA_LIB_DIRS}; do
 done
 
 #linker params
+
+if [ "$PTHREAD" = "1" ]; then
+   lLIBS2="-lpthread ${lLIBS2}"
+fi
+
 
 for LIB in ${EXTRA_LIBS} ${LIBS}; do
    lLIBS2="-l${LIB} ${lLIBS2}"
