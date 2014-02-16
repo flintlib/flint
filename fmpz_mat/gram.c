@@ -26,12 +26,6 @@
 #include "fmpz_mat.h"
 
 void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
-/*
- *  Sets B to the Gram matrix of the m-dimensional lattice L in 
-	n-dimensional Euclidean space R^n spanned by the rows of
-	the m × n matrix A 
- *  Requires B to be a m x m matrix, else an exception raised
-*/
 {
 	slong i, j, k;
 	
