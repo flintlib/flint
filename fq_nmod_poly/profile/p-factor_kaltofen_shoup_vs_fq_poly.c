@@ -73,7 +73,7 @@ main(int argc, char** argv)
     fmpz_mod_poly_get_fmpz_poly(fpoly, ctx->modulus);
     fmpz_poly_get_nmod_poly(nmod, fpoly);
     
-    fq_nmod_ctx_init_modulus(ctxn, p, ext, nmod, "a");
+    fq_nmod_ctx_init_modulus(ctxn, nmod, "a");
     
     fq_poly_init(f, ctx);
     fq_poly_init(g, ctx);
