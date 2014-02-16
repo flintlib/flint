@@ -871,3 +871,4 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
     the $m$ × $n$ matrix \code{A}. Dimensions must be compatible.
     \code{A} and \code{B} are allowed to be the same object if \code{A} is a 
     square matrix.
+    
