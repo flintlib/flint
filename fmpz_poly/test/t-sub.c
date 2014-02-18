@@ -58,7 +58,7 @@ main(void)
         fmpz_poly_neg(b, b);
         fmpz_poly_add(d, a, b);
 
-        result = (fmpz_poly_equal(d, d));
+        result = (fmpz_poly_equal(c, d));
         if (!result)
         {
             flint_printf("FAIL:\n");
