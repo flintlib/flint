@@ -53,14 +53,22 @@ main(void)
         fmpz_poly_eta_qexp(a, e, n);
 
         fmpz_poly_eta_qexp(b, 1, n + n_randint(state, 10));
-        if (e >= 0)
+
+        if (n == 0)
         {
-            fmpz_poly_pow_trunc(b, b, e, n);
+            fmpz_poly_zero(b);
         }
         else
         {
-            fmpz_poly_inv_series(b, b, n);
-            fmpz_poly_pow_trunc(b, b, -e, n);
+            if (e >= 0)
+            {
+                fmpz_poly_pow_trunc(b, b, e, n);
+            }
+            else
+            {
+                fmpz_poly_inv_series(b, b, n);
+                fmpz_poly_pow_trunc(b, b, -e, n);
+            }
         }
 
         if (!fmpz_poly_equal(a, b))
