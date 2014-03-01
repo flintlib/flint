@@ -73,6 +73,8 @@ _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
 void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n);
 void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 void nmod_mat_clear(nmod_mat_t mat);
+void nmod_mat_setiden(nmod_mat_t mat);
+void nmod_mat_copy(nmod_mat_t mat,nmod_mat_t src);
 
 void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 void nmod_mat_window_clear(nmod_mat_t window);
@@ -137,6 +139,10 @@ void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
 
 void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
+
+/* Exponent */
+
+void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat,slong pow);
 
 /* Trace */
 
