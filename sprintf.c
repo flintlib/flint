@@ -34,7 +34,7 @@ size_t flint_sprintf(char * s, const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
-   char * str2 = (char *)flint_malloc(len + 1);
+   char * str2 = flint_malloc(len + 1);
    int w1 = 0, w2 = 0;
    void * w3;
    double d;

@@ -326,7 +326,7 @@ size_t flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprin
 size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
 int flint_scanf(const char * str, ...); /* flint version of scanf */
-	int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
 
 #include "gmpcompat.h"
