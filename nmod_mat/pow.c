@@ -32,26 +32,55 @@
 /*Function to implement matrix exponent
 It assumes that both the matrices are square matrices and have same dimensions and mod values
 It calculates the exponent by squaring each time reducing the number of multiplications to log(pow)
-instead of a naive method that uses pow multiplications*/
-void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat,slong pow)
+instead of a naive method that uses pow multiplications. */
+void
+nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
 {
-    nmod_mat_t y,temp;
-    nmod_mat_init_set(y,mat);
-    nmod_mat_init_set(temp,mat);
-    slong i,j;
+    if (pow == 0)
+    {
+        nmod_mat_one(dest);
+        return;
+    }
+    if (pow == 1)
+    {
+        nmod_mat_set(dest, mat);
+        return;
+    }
+    else if (pow == 2)
+    {
+        nmod_mat_mul(dest, mat, mat);
+        return;
+    }
 
-    /*Make the dest matrix as an Identity matrix*/
-    nmod_mat_setiden(dest);
+    nmod_mat_t temp1;
+    nmod_mat_init_set(temp1, mat);
+    if(pow == 3)
+    {
+        nmod_mat_mul(temp1, mat, mat);
+        nmod_mat_mul(dest, temp1, mat);
+        nmod_mat_clear(temp1);
+        return;
+    }
+    nmod_mat_t temp2;
+    nmod_mat_t temp3;
+    nmod_mat_init_set(temp2, mat);
+    nmod_mat_init_set(temp3, mat);
+    nmod_mat_one(temp3);
 
-    while(pow>0)
+    while(pow > 0)
     {
         if(pow%2 == 1)
         {
-            nmod_mat_mul(temp,dest,y);
-            nmod_mat_copy(dest,temp);
+            nmod_mat_mul(temp2, temp3, temp1);
+            nmod_mat_set(temp3, temp2);
         }
-        nmod_mat_mul(temp,y,y);
-        nmod_mat_copy(y,temp);
+        nmod_mat_mul(temp2, temp1, temp1);
+        nmod_mat_set(temp1, temp2);
         pow /= 2;
     }
+    nmod_mat_set(dest, temp3);
+
+    nmod_mat_clear(temp1);
+    nmod_mat_clear(temp2);
+    nmod_mat_clear(temp3);
 }
