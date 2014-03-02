@@ -141,7 +141,7 @@ void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
 
 /* Exponent */
 
-void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat,slong pow);
+void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow);
 
 /* Trace */
 
@@ -184,6 +184,10 @@ int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 /* Reduced row echelon form */
 
 slong nmod_mat_rref(nmod_mat_t A);
+
+/* Evaluate Polynomial */
+
+void nmod_mat_evaluate_poly(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c);
 
 /* Nullspace */
 
