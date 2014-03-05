@@ -81,7 +81,7 @@ void nmod_mat_window_clear(nmod_mat_t window);
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
-int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, 
+int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  mp_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state);
@@ -141,7 +141,7 @@ void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
 
 /* Exponent */
 
-void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow);
+void nmod_mat_pow(nmod_mat_t dest,const nmod_mat_t mat, ulong pow);
 
 /* Trace */
 
@@ -184,10 +184,6 @@ int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 /* Reduced row echelon form */
 
 slong nmod_mat_rref(nmod_mat_t A);
-
-/* Evaluate Polynomial */
-
-void nmod_mat_evaluate_poly(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c);
 
 /* Nullspace */
 

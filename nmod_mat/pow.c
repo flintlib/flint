@@ -29,13 +29,15 @@
 #include "flint.h"
 #include "nmod_mat.h"
 
-/*Function to implement matrix exponent
-It assumes that both the matrices are square matrices and have same dimensions and mod values
-It calculates the exponent by squaring each time reducing the number of multiplications to log(pow)
-instead of a naive method that uses pow multiplications. */
 void
-nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
+nmod_mat_pow(nmod_mat_t dest,const nmod_mat_t mat,ulong pow)
 {
+    nmod_mat_t temp1, temp2, st, A;
+    int isalias = 0;
+    if (mat->r == 0)
+    {
+        return;
+    }
     if (pow == 0)
     {
         nmod_mat_one(dest);
@@ -46,41 +48,63 @@ nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
         nmod_mat_set(dest, mat);
         return;
     }
-    else if (pow == 2)
+
+    if(dest == mat)
     {
-        nmod_mat_mul(dest, mat, mat);
+        nmod_mat_init_set(A, mat);
+        isalias = 1;
+    }
+    else
+    {
+        *A = *mat;
+    }
+
+    if (pow == 2)
+    {
+        nmod_mat_mul(dest, A, A);
+        if (isalias)
+        {
+            nmod_mat_clear(A);
+        }
         return;
     }
 
-    nmod_mat_t temp1;
-    nmod_mat_init_set(temp1, mat);
+    nmod_mat_init(temp1, mat->r, mat->c, mat->mod.n);
+
     if(pow == 3)
     {
-        nmod_mat_mul(temp1, mat, mat);
-        nmod_mat_mul(dest, temp1, mat);
+        nmod_mat_mul(temp1, A, A);
+        nmod_mat_mul(dest, temp1, A);
         nmod_mat_clear(temp1);
+        if(isalias)
+        {
+            nmod_mat_clear(A);
+        }
         return;
     }
-    nmod_mat_t temp2;
-    nmod_mat_t temp3;
-    nmod_mat_init_set(temp2, mat);
-    nmod_mat_init_set(temp3, mat);
-    nmod_mat_one(temp3);
+
+    nmod_mat_one(dest);
+    nmod_mat_init_set(temp2, A);
 
     while(pow > 0)
     {
         if(pow%2 == 1)
         {
-            nmod_mat_mul(temp2, temp3, temp1);
-            nmod_mat_set(temp3, temp2);
+            nmod_mat_mul(temp1, dest, temp2);
+            *st = *temp1;
+            *temp1 = *dest;
+            *dest = *st;
         }
-        nmod_mat_mul(temp2, temp1, temp1);
-        nmod_mat_set(temp1, temp2);
+        nmod_mat_mul(temp1, temp2, temp2);
+        *st = *temp1;
+        *temp1 = *temp2;
+        *temp2 = *st;
         pow /= 2;
     }
-    nmod_mat_set(dest, temp3);
-
     nmod_mat_clear(temp1);
     nmod_mat_clear(temp2);
-    nmod_mat_clear(temp3);
+    if(isalias)
+    {
+        nmod_mat_clear(A);
+    }
 }

@@ -31,47 +31,78 @@
 #include "flint.h"
 #include "nmod_mat.h"
 
-/*Function to evaluate a polynomial with Matrix as an argument. It assumes that the dest and c matrix has same
-    dimensions. dest and c cannot be aliased*/
 void
-_nmod_mat_evaluate_poly(nmod_mat_t dest,const mp_srcptr poly, slong len, const nmod_mat_t c, nmod_t mod)
+nmod_mat_one_addmul(nmod_mat_t dest, nmod_mat_t mat, mp_limb_t c)
 {
-    if (len == 0)
+    slong i, j;
+
+    if(dest == mat)
     {
-        nmod_mat_zero(dest);
+        for(i = 0; i < mat->r ; i++)
+        {
+            nmod_mat_entry(mat, i, i) = n_addmod(nmod_mat_entry(mat, i, i),  c, mat->mod.n);
+        }
         return;
     }
-
-    slong m = len-1;
-    nmod_mat_t IDENTITY;
-    nmod_mat_init_set(IDENTITY, c);
-    nmod_mat_one(IDENTITY);
-    nmod_mat_scalar_mul(dest, IDENTITY, poly[m]);
-
-    if (len == 1 || nmod_mat_is_zero(c))
-    {
-        nmod_mat_clear(IDENTITY);
-        return;
-    }
-
-    nmod_mat_print_pretty(dest);
-    nmod_mat_t temp;
-    nmod_mat_init_set(temp, c);
-
-    for( m-- ; m >= 0 ; m--)
-    {
-        nmod_mat_scalar_mul(temp, IDENTITY, poly[m]);
-        nmod_mat_addmul(temp, temp, dest, c);
-        nmod_mat_set(dest, temp);
-        nmod_mat_print_pretty(dest);
-    }
-
-    nmod_mat_clear(IDENTITY);
-    nmod_mat_clear(temp);
+    for(i = 0; i < mat->r ; i++)
+        for(j = 0; j < mat->c ; j++)
+        {
+            nmod_mat_entry(dest, i, j) = nmod_mat_entry(mat, i, j);
+            if(i == j)
+            {
+                nmod_mat_entry(dest, i, i) = n_addmod(nmod_mat_entry(dest, i, i),  c, mat->mod.n);
+            }
+        }
 }
 
 void
-nmod_mat_evaluate_poly(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
+_nmod_poly_evaluate_mat(nmod_mat_t dest, const mp_srcptr poly, slong len, const nmod_mat_t c)
 {
-    return _nmod_mat_evaluate_poly(dest, poly->coeffs, poly->length, c, poly->mod);
+    slong m = len-1;
+    nmod_mat_t temp, point;
+    int isalias = 0;
+
+    if(dest==c)
+    {
+        nmod_mat_init_set(point, c);
+        isalias = 1;
+    }
+    else
+    {
+        *point=*c;
+    }
+
+    nmod_mat_zero(dest);
+
+    if (len == 0)
+    {
+        return;
+    }
+
+    if (len == 1 || nmod_mat_is_zero(point))
+    {
+        nmod_mat_one_addmul(dest, dest, poly[0]);
+        return;
+    }
+
+    nmod_mat_one_addmul(dest, dest, poly[m]);
+    nmod_mat_init_set(temp, point);
+
+    for( m-- ; m >= 0 ; m--)
+    {
+        nmod_mat_mul(temp, dest, point);
+        nmod_mat_one_addmul(dest, temp, poly[m]);
+    }
+
+    nmod_mat_clear(temp);
+    if (isalias)
+    {
+        nmod_mat_clear(point);
+    }
+}
+
+void
+nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
+{
+    _nmod_poly_evaluate_mat(dest, poly->coeffs, poly->length, c);
 }
