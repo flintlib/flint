@@ -52,9 +52,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_randtest(a, state, n_randint(state, 50));
 
-        do{
-        m = n_randint(state, 10);
-        } while(m == 0);
+        m = n_randint(state, 20);
 
         nmod_mat_init(A, m, m, n);
         nmod_mat_init(B, m, m, n);
@@ -66,7 +64,7 @@ main(void)
            sum = n_addmod(sum, nmod_poly_get_coeff_ui(a, j), n);
 
         for(k = 0; k < m; k++)
-            nmod_mat_entry(A, k, k) = (nmod_mat_entry(A, k, k) * sum) % n;
+            nmod_mat_entry(A, k, k) = nmod_mul(nmod_mat_entry(A, k, k), sum, A->mod);
 
         if (!nmod_mat_equal(A, B))
         {
@@ -97,9 +95,8 @@ main(void)
         nmod_poly_randtest(a, state, n_randint(state, 50));
         nmod_poly_randtest(b, state, n_randint(state, 50));
 
-        do{
-        m = n_randint(state, 10);
-        } while(m == 0);
+        m = n_randint(state, 20);
+
         nmod_mat_init(A, m, m, n);
         nmod_mat_init(B, m, m, n);
         nmod_mat_init(C, m, m, n);

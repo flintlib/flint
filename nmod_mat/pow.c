@@ -30,10 +30,9 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_pow(nmod_mat_t dest,const nmod_mat_t mat,ulong pow)
+_nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 {
-    nmod_mat_t temp1, temp2, st, A;
-    int isalias = 0;
+    nmod_mat_t temp1, temp2;
     if (mat->r == 0)
     {
         return;
@@ -48,24 +47,9 @@ nmod_mat_pow(nmod_mat_t dest,const nmod_mat_t mat,ulong pow)
         nmod_mat_set(dest, mat);
         return;
     }
-
-    if(dest == mat)
-    {
-        nmod_mat_init_set(A, mat);
-        isalias = 1;
-    }
-    else
-    {
-        *A = *mat;
-    }
-
     if (pow == 2)
     {
-        nmod_mat_mul(dest, A, A);
-        if (isalias)
-        {
-            nmod_mat_clear(A);
-        }
+        nmod_mat_mul(dest, mat, mat);
         return;
     }
 
@@ -73,41 +57,43 @@ nmod_mat_pow(nmod_mat_t dest,const nmod_mat_t mat,ulong pow)
 
     if(pow == 3)
     {
-        nmod_mat_mul(temp1, A, A);
-        nmod_mat_mul(dest, temp1, A);
+        nmod_mat_mul(temp1, mat, mat);
+        nmod_mat_mul(dest, temp1, mat);
         nmod_mat_clear(temp1);
-        if(isalias)
-        {
-            nmod_mat_clear(A);
-        }
         return;
     }
 
     nmod_mat_one(dest);
-    nmod_mat_init_set(temp2, A);
-
+    nmod_mat_init_set(temp2, mat);
     while(pow > 0)
     {
         if(pow%2 == 1)
         {
             nmod_mat_mul(temp1, dest, temp2);
-            *st = *temp1;
-            *temp1 = *dest;
-            *dest = *st;
+            nmod_mat_swap(temp1, dest);
         }
-        if(pow > 1)
+        if (pow > 1)
         {
             nmod_mat_mul(temp1, temp2, temp2);
-            *st = *temp1;
-            *temp1 = *temp2;
-            *temp2 = *st;
+            nmod_mat_swap(temp1, temp2);
         }
         pow /= 2;
     }
     nmod_mat_clear(temp1);
     nmod_mat_clear(temp2);
-    if(isalias)
+}
+void
+nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
+{
+    nmod_mat_t temp;
+    if (mat == dest)
     {
-        nmod_mat_clear(A);
+        nmod_mat_init_set(temp, mat);
+        _nmod_mat_pow(dest, temp, pow);
+        nmod_mat_clear(temp);
+    }
+    else
+    {
+        _nmod_mat_pow(dest, mat, pow);
     }
 }

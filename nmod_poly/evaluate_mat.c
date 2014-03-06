@@ -32,7 +32,7 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_one_addmul(nmod_mat_t dest, nmod_mat_t mat, mp_limb_t c)
+nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
 {
     slong i, j;
 
@@ -40,7 +40,7 @@ nmod_mat_one_addmul(nmod_mat_t dest, nmod_mat_t mat, mp_limb_t c)
     {
         for(i = 0; i < mat->r ; i++)
         {
-            nmod_mat_entry(mat, i, i) = n_addmod(nmod_mat_entry(mat, i, i),  c, mat->mod.n);
+            nmod_mat_entry(dest, i, i) = n_addmod(nmod_mat_entry(mat, i, i),  c, mat->mod.n);
         }
         return;
     }
@@ -56,21 +56,10 @@ nmod_mat_one_addmul(nmod_mat_t dest, nmod_mat_t mat, mp_limb_t c)
 }
 
 void
-_nmod_poly_evaluate_mat(nmod_mat_t dest, const mp_srcptr poly, slong len, const nmod_mat_t c)
+_nmod_poly_evaluate_mat(nmod_mat_t dest,const mp_srcptr poly, slong len, const nmod_mat_t c)
 {
     slong m = len-1;
-    nmod_mat_t temp, point;
-    int isalias = 0;
-
-    if(dest==c)
-    {
-        nmod_mat_init_set(point, c);
-        isalias = 1;
-    }
-    else
-    {
-        *point=*c;
-    }
+    nmod_mat_t temp;
 
     nmod_mat_zero(dest);
 
@@ -79,30 +68,35 @@ _nmod_poly_evaluate_mat(nmod_mat_t dest, const mp_srcptr poly, slong len, const 
         return;
     }
 
-    if (len == 1 || nmod_mat_is_zero(point))
+    if (len == 1 || nmod_mat_is_zero(c))
     {
         nmod_mat_one_addmul(dest, dest, poly[0]);
         return;
     }
 
+    nmod_mat_init_set(temp, c);
     nmod_mat_one_addmul(dest, dest, poly[m]);
-    nmod_mat_init_set(temp, point);
 
     for( m-- ; m >= 0 ; m--)
     {
-        nmod_mat_mul(temp, dest, point);
+        nmod_mat_mul(temp, dest, c);
         nmod_mat_one_addmul(dest, temp, poly[m]);
     }
-
     nmod_mat_clear(temp);
-    if (isalias)
-    {
-        nmod_mat_clear(point);
-    }
 }
 
 void
 nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 {
-    _nmod_poly_evaluate_mat(dest, poly->coeffs, poly->length, c);
+    nmod_mat_t temp;
+    if (dest == c)
+    {
+        nmod_mat_init_set(temp, c);
+        _nmod_poly_evaluate_mat(dest, poly->coeffs, poly->length, temp);
+        nmod_mat_clear(temp);
+    }
+    else
+    {
+        _nmod_poly_evaluate_mat(dest, poly->coeffs, poly->length, c);
+    }
 }

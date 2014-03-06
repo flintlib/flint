@@ -42,31 +42,31 @@ main()
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        nmod_mat_t A, B, C, D, temp;
+        nmod_mat_t A, B, C, D;
         mp_limb_t mod;
         slong m, j;
+        ulong exp;
 
-        do{
+        mod = n_randtest_not_zero(state);
         m = n_randint(state, 20);
-        mod=n_randint(state, 0);
-        } while(m == 0 || mod == 0);
+        exp = n_randint(state, 50);
 
         nmod_mat_init(A, m, m, mod);
         nmod_mat_init(B, m, m, mod);
+        nmod_mat_init(C, m, m, mod);
         nmod_mat_init(D, m, m, mod);
         nmod_mat_randtest(A, state);
-        nmod_mat_init_set(C, A);
 
-        nmod_mat_pow(B, A, 15);
-        for(j = 1; j < 15 ; j++)
+        nmod_mat_pow(B, A, exp);
+        nmod_mat_one(C);
+        for(j = 1; j <= exp; j++)
         {
             nmod_mat_mul(D, C, A);
-            *temp = *C;
-            *C = *D;
-            *D = *temp;
+            nmod_mat_swap(D, C);
         }
+        nmod_mat_pow(A, A, exp);
 
-        if(!nmod_mat_equal(C, B))
+        if (!(nmod_mat_equal(C, B) && nmod_mat_equal(C, A)))
         {
             flint_printf("FAIL: results not equal\n");fflush(stdout);
             nmod_mat_print_pretty(A);
