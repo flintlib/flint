@@ -95,10 +95,13 @@ nmod_mat_pow(nmod_mat_t dest,const nmod_mat_t mat,ulong pow)
             *temp1 = *dest;
             *dest = *st;
         }
-        nmod_mat_mul(temp1, temp2, temp2);
-        *st = *temp1;
-        *temp1 = *temp2;
-        *temp2 = *st;
+        if(pow > 1)
+        {
+            nmod_mat_mul(temp1, temp2, temp2);
+            *st = *temp1;
+            *temp1 = *temp2;
+            *temp2 = *st;
+        }
         pow /= 2;
     }
     nmod_mat_clear(temp1);
