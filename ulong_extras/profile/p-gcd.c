@@ -72,7 +72,7 @@ int main(void)
    double min, max;
    gcd_t params;
    FLINT_TEST_INIT(state);
-   int i, j;
+   int i;
    
 
    params.rnums1 = flint_malloc(1024*sizeof(ulong));
@@ -84,12 +84,10 @@ int main(void)
    {
       fill_array(params.rnums1, i, state);
       params.bits1 = i;
-      for(j = i + 1; j <= 64; j++) {
-		  fill_array(params.rnums2, j, state);
+		  fill_array(params.rnums2, i, state);
 		  prof_repeat(&min, &max, sample, &params);
 		  flint_printf("bits1 = %d, bits2 = %d, time is %.3f us\n", 
-						i, j, max/(double)ITERS);
-	  }
+						i, i, max/(double)ITERS);
 	}
 
    flint_randclear(state);
