@@ -20,12 +20,47 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+
+#if (defined (__amd64__) || defined (__i386__) || defined (__i486__))	 
+
+mp_limb_t
+n_gcd(mp_limb_t x, mp_limb_t y)
+{
+	if (x == 0) return y;
+	if (y == 0) return x;
+	register unsigned s0, s1;
+	count_trailing_zeros(s0, x);
+	count_trailing_zeros(s1, y);
+	register const unsigned f = FLINT_MIN(s0, s1);
+	x >>= s0;
+	y >>= s1;
+
+	while (x != y)
+	{
+		if (x < y)
+		{
+			y -= x;
+			count_trailing_zeros(s1, y);
+			y >>= s1;
+		}
+		else
+		{
+			x -= y;
+			count_trailing_zeros(s0, x);
+			x >>= s0;
+		}
+	}
+	return x << f;
+}
+
+#else
 
 mp_limb_t
 n_gcd(mp_limb_t x, mp_limb_t y)
@@ -73,3 +108,5 @@ n_gcd(mp_limb_t x, mp_limb_t y)
 
     return u3;
 }
+
+#endif
