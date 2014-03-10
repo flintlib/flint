@@ -23,6 +23,7 @@
     Copyright (C) 2010, 2011 William Hart
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 

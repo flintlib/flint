@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
