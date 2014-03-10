@@ -22,6 +22,7 @@
     Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
@@ -1273,6 +1274,22 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
     Evaluates \code{poly} at the value~\code{c} and reduces modulo the
     modulus of \code{poly}. The value~\code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
+
+_nmod_poly_evaluate_mat(nmod_mat_t dest, const mp_srcptr poly, slong len,
+						const nmod_mat_t c)
+
+    Evaluates \code{poly} with matrix as an argument at the value \code{c}
+    and reduces modulus of \code{c}.\code{dest} and \code{c} should have
+    same dimension and modulus. \code{dest} and \code{c} cannot be aliased.
+    The algorithm used is Horner's method.
+
+nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
+						const nmod_mat_t c)
+
+    Evaluates \code{poly} with matrix as an argument at the value \code{c}
+    and reduces modulus of \code{c}. \code{dest} and \code{c} should have
+    same dimension and modulus. \code{dest} and \code{c} may be aliased.
+    The algorithm used is Horner's method.
 
 *******************************************************************************
 
