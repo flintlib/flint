@@ -1088,3 +1088,7 @@ v 2.4 -- 20 Nov 2013
   * Support for Boehm-Demers-Weiser GC
   * Support for flint extension modules
 
+v 2.4.2 -- 11 Mar 2014
+
+  * Fix bug in ARM assembly
+
