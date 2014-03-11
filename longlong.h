@@ -233,7 +233,7 @@
 #else
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl)                    \
-  do {
+  do {                                                         \
      __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"                     \
               : "=r" (sh), "=&r" (sl)                                   \
               : "r" (ah), "r" (bh), "r" (al), "r" (bl) : "cc");       \
