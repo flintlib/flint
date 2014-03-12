@@ -62,7 +62,7 @@
 #define __FLINT_VERSION 2
 #define __FLINT_VERSION_MINOR 4
 #define __FLINT_VERSION_PATCHLEVEL 2 
-#define FLINT_VERSION "2.4"
+#define FLINT_VERSION "2.4.2"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
