@@ -308,6 +308,10 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);
 
+/* HNF **********************************************************************/
+
+void fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A);
+
 #ifdef __cplusplus
 }
 #endif
