@@ -310,7 +310,7 @@ void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
 
 /* HNF **********************************************************************/
 
-void fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A);
+void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }

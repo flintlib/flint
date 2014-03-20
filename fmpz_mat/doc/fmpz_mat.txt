@@ -860,15 +860,15 @@ slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den,
 
 *******************************************************************************
 
-    Gram matrix
+    Hermite normal form
 
 *******************************************************************************
 
-void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
+void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 
-    Sets \code{B} to the Gram matrix of the $m$-dimensional lattice \code{L} in 
-    $n$-dimensional Euclidean space $R^n$ spanned by the rows of
-    the $m$ × $n$ matrix \code{A}. Dimensions must be compatible.
-    \code{A} and \code{B} are allowed to be the same object if \code{A} is a 
-    square matrix.
-    
+    Computes an integer matrix \code{H} such that \code{H} is the unique Hermite
+    normal form of \code{A}, this uses the conventions and first algorithm
+    described for computing Hermite normal forms given in \cite{Coh1996}.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
