@@ -33,36 +33,54 @@
 /* checks that the input matrix is in Hermite normal form */
 int in_hnf(const fmpz_mat_t A)
 {
-    slong i, j, prev_index;
+    slong i, j, prev_f;
     fmpz_t zero;
 
     fmpz_init(zero);
     fmpz_zero(zero);
-    prev_index = -1;
 
-    for (i = 0; i < A->r; i++)
+    for (j = 0; j < A->c; j++)
     {
-        fmpz_t first_nonzero;
-        fmpz_init(first_nonzero);
-        for (j = 0; j < A->c; j++)
+        for (i = 0; i < A->r; i++)
         {
             if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
             {
-                /* index of first non-zero element should be increasing */
-                if (j <= prev_index)
-                    return 0;
-                if (fmpz_cmp(fmpz_mat_entry(A, i, j), zero) < 0)
-                    return 0;
-
-                prev_index = j;
-                fmpz_set(first_nonzero, fmpz_mat_entry(A, i, j));
                 break;
             }
         }
-        j++;
-        for (; j < A->c; j++)
+        if (i < A->r)
         {
-            if (fmpz_cmp(first_nonzero, fmpz_mat_entry(A, i, j)) >= 0)
+            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
+            {
+                break;
+            }
+        }
+    }
+
+    prev_f = -1;
+    for (; j < A->c; j++)
+    {
+        fmpz_t last_nonzero;
+        fmpz_init(last_nonzero);
+        for (i = A->r - 1; i >= prev_f + 1; i--)
+        {
+            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
+            {
+                if (fmpz_cmp(fmpz_mat_entry(A, i, j), zero) < 0)
+                    return 0;
+                fmpz_set(last_nonzero, fmpz_mat_entry(A, i, j));
+                break;
+            }
+        }
+        if (i == prev_f)
+        {
+            return 0;
+        }
+        prev_f = i;
+        i--;
+        for (; i >= 0; i--)
+        {
+            if (fmpz_cmp(fmpz_mat_entry(A, i, j), last_nonzero) >= 0)
                 return 0;
             if (fmpz_cmp(fmpz_mat_entry(A, i, j), zero) < 0)
                 return 0;
@@ -140,7 +158,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
