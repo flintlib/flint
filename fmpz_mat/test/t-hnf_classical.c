@@ -60,6 +60,7 @@ int in_hnf(const fmpz_mat_t A)
     prev_f = -1;
     for (; j < A->c; j++)
     {
+        slong j2;
         fmpz_t last_nonzero;
         fmpz_init(last_nonzero);
         for (i = A->r - 1; i >= prev_f + 1; i--)
@@ -77,12 +78,11 @@ int in_hnf(const fmpz_mat_t A)
             return 0;
         }
         prev_f = i;
-        i--;
-        for (; i >= 0; i--)
+        for (j2 = j + 1; j2 < A->c; j2++)
         {
-            if (fmpz_cmp(fmpz_mat_entry(A, i, j), last_nonzero) >= 0)
+            if (fmpz_cmp(fmpz_mat_entry(A, i, j2), last_nonzero) >= 0)
                 return 0;
-            if (fmpz_cmp(fmpz_mat_entry(A, i, j), zero) < 0)
+            if (fmpz_cmp(fmpz_mat_entry(A, i, j2), zero) < 0)
                 return 0;
         }
     }
