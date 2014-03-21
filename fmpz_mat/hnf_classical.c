@@ -50,6 +50,8 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
             if (fmpz_is_zero(fmpz_mat_entry(H, i, k)))
             {
                 k++;
+                if (l > 0)
+                    l--;
             }
             else
             {
