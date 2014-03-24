@@ -28,7 +28,7 @@
 #include <limits.h>
 #include <gmp.h>
 #include "flint.h"
-#include "arith.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 
@@ -51,8 +51,8 @@ int main(void)
     for (i = 0; i < 100; i++)
     {
         fmpz_set_ui(x, i);
-        arith_euler_phi(y, x);
-        arith_euler_phi(x, x);
+        fmpz_euler_phi(y, x);
+        fmpz_euler_phi(x, x);
         fmpz_set_ui(z, n_euler_phi(i));
         if (!fmpz_equal(x, y) || !fmpz_equal(x, z))
         {
@@ -69,8 +69,8 @@ int main(void)
         fmpz_pow_ui(y, y, n_randtest(state) % 100);
         fmpz_mul(x, x, y);
         fmpz_set(z, x);
-        arith_euler_phi(y, x);
-        arith_euler_phi(x, x);
+        fmpz_euler_phi(y, x);
+        fmpz_euler_phi(x, x);
         if (!fmpz_equal(x, y))
         {
             flint_printf("FAIL: ");
@@ -86,7 +86,7 @@ int main(void)
         n = (n_randtest(state) % 100) + 1;
         fmpz_set_ui(x, n_nth_prime(i+1));
         fmpz_pow_ui(x, x, n);
-        arith_euler_phi(x, x);
+        fmpz_euler_phi(x, x);
         fmpz_set_ui(y, n_nth_prime(i+1));
         fmpz_pow_ui(y, y, n-1);
         fmpz_mul_ui(y, y, n_nth_prime(i+1)-1);
@@ -99,7 +99,7 @@ int main(void)
     /* Something nontrivial */
     fmpz_set_str(x, "10426024348053113487152988625265848110501553295256578345594388516660144", 10);
     fmpz_set_str(y, "2265085829098571747262267425315881590169106756213617459200000000000000", 10);
-    arith_euler_phi(x, x);
+    fmpz_euler_phi(x, x);
     if (!fmpz_equal(x, y))
     {
         flint_printf("FAIL: special test value\n");

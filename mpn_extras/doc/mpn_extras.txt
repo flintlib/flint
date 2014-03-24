@@ -217,28 +217,6 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
 
 *******************************************************************************
 
-    Special numbers
-
-*******************************************************************************
-
-void flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
-                               mp_ptr v, mp_size_t * vsize,
-                               slong a, slong b, slong n, int d)
-
-    Computes \code{(t,tsize)} and \code{(v,vsize)} such that 
-    $t/v = H_n = 1 + 1/2 + \dotsb + 1/n$.
-    The computation is performed using recursive balanced summation
-    over the odd terms. The resulting fraction will not generally be
-    normalized. At the top level, this function should be called with
-    $n > 0$, $a = 1$, $b = n$, and $d = 1$.
-
-    Enough space should be allocated for $t$ and $v$ to fit the entire sum
-    $1 + 1/2 + \dotsb + 1/n$ computed without normalization; i.e.\ $t$ and $v$
-    should have room to fit $n!$ plus one extra limb.
-
-
-*******************************************************************************
-
     Random Number Generation
 
 *******************************************************************************

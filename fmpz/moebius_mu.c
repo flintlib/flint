@@ -19,39 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <math.h>
-#include "arith.h"
+#include "fmpz.h"
 
-double
-arith_dedekind_sum_coprime_d(double h, double k)
+int
+fmpz_factor_moebius_mu(const fmpz_factor_t fac)
 {
-    double a, b, t, s, sign;
+    slong i;
 
-    if (k <= 2)
-        return 0.0;
+    for (i = 0; i < fac->num; i++)
+        if (fac->exp[i] != 1)
+            return 0;
 
-    a = k;
-    b = h;
-    s = 0.0;
-    sign = 1.0;
-
-    while (b > 0)
-    {
-        s += sign * (1.0 + a*a + b*b) / (a * b);
-        t = fmod(a, b);
-        a = b;
-        b = t;
-        sign = -sign;
-    }
-
-    s *= (1./12);
-
-    if (sign < 0)
-        s -= 0.25;
-
-    return s;
+    return (fac->num % 2) ? -1 : 1;
 }
+
+int
+fmpz_moebius_mu(const fmpz_t n)
+{
+    fmpz_factor_t fac;
+    int mu;
+
+    if (fmpz_abs_fits_ui(n))
+        return n_moebius_mu(fmpz_get_ui(n));
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    mu = fmpz_factor_moebius_mu(fac);
+    fmpz_factor_clear(fac);
+
+    return mu;
+}
+

@@ -19,54 +19,51 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "arith.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "ulong_extras.h"
 
-void
-_arith_chebyshev_t_polynomial(fmpz * coeffs, ulong n)
+
+int main(void)
 {
-    slong k, i, d, m;
+    ulong k;
+    fmpz_t x;
+    fmpz_t y;
 
-    d = n % 2;
+    FLINT_TEST_INIT(state);
 
-    fmpz_zero(coeffs);
-    fmpz_set_ui(coeffs + d, d ? n : 1);
-    if (n % 4 >= 2)
-        fmpz_neg(coeffs + d, coeffs + d);
+    flint_printf("primorial....");
+    fflush(stdout);
 
-    m = n / 2;
+    fmpz_init(x);
+    fmpz_init(y);
+    fmpz_set_ui(y, 1);
 
-    for (k = 1; k <= m; k++)
+    for (k = 0; k < 10000; k++)
     {
-        i = 2 * k + d;
-        fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, 4*(m-k+1), n+k-m-1);
-        fmpz_divexact2_uiui(coeffs + i, coeffs + i, n+2*k-2*m-1, n+2*k-2*m);
-        fmpz_neg(coeffs + i, coeffs + i);
-        fmpz_zero(coeffs + i - 1);
-    }
-}
-
-void
-arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
-{
-    if (n == 0)
-    {
-        fmpz_poly_set_ui(poly, UWORD(1));
-        return;
+       fmpz_primorial(x, k);
+       if (n_is_prime(k))
+          fmpz_mul_ui(y, y, k);
+       if (!fmpz_equal(x, y))
+       {
+          flint_printf("FAIL:\n");
+          flint_printf("primorial of %wu disagrees with direct product\n", k); 
+          fmpz_print(x);
+          flint_printf("\n");
+          abort();
+       }
     }
 
-    fmpz_poly_fit_length(poly, n + 1);
+    fmpz_clear(x);
+    fmpz_clear(y);
 
-    if (n == 1)
-    {
-        fmpz_zero(poly->coeffs);
-        fmpz_one(poly->coeffs + 1);
-    }
-    else
-        _arith_chebyshev_t_polynomial(poly->coeffs, n);
-
-    _fmpz_poly_set_length(poly, n + 1);
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }
