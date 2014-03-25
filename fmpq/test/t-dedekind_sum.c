@@ -28,7 +28,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "arith.h"
 #include "ulong_extras.h"
 #include "math.h"
 
@@ -114,8 +113,8 @@ int main(void)
             fmpz_set_si(hh, h);
             fmpz_set_si(kk, k);
 
-            arith_dedekind_sum(s1, hh, kk);
-            arith_dedekind_sum_naive(s2, hh, kk);
+            fmpq_dedekind_sum(s1, hh, kk);
+            fmpq_dedekind_sum_naive(s2, hh, kk);
 
             if (!fmpq_equal(s1, s2))
             {
@@ -137,7 +136,7 @@ int main(void)
         fmpz_set_si(hh, h);
         fmpz_set_si(kk, k);
 
-        arith_dedekind_sum(s1, hh, kk);
+        fmpq_dedekind_sum(s1, hh, kk);
 
         fmpz_set_si(fmpq_numref(s2), testdata[i][2]);
         fmpz_set_si(fmpq_denref(s2), testdata[i][3]);
@@ -160,7 +159,7 @@ int main(void)
     fmpz_mul_2exp(kk, kk, 1001);
     fmpz_add_ui(kk, kk, 1);
 
-    arith_dedekind_sum(s1, hh, kk);
+    fmpq_dedekind_sum(s1, hh, kk);
     if ((fmpz_fdiv_ui(fmpq_numref(s1), 1000000000) != 906445312) ||
         (fmpz_fdiv_ui(fmpq_denref(s1), 1000000000) != 8416259))
     {
@@ -177,7 +176,7 @@ int main(void)
         fmpz_randtest(hh, state, 300);
         fmpz_randtest(kk, state, 300);
 
-        arith_dedekind_sum(s1, hh, kk);
+        fmpq_dedekind_sum(s1, hh, kk);
     }
 
     fmpz_clear(hh);

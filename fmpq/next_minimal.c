@@ -38,8 +38,8 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
     {
         if (p < q && p)
         {
-            *rnum = q;
-            *rden = p;
+            fmpz_set_ui(rnum, q);
+            fmpz_set_ui(rden, p);
             return;
         }
 
@@ -48,13 +48,13 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
             q++;
             if (n_gcd(p, q) == 1)
             {
-                *rnum = q;
-                *rden = p;
+                fmpz_set_ui(rnum, q);
+                fmpz_set_ui(rden, p);
                 return;
             }
         }
 
-        *rnum = 1;
+        fmpz_one(rnum);
         fmpz_set_ui(rden, p + 1);
     }
     else
@@ -75,7 +75,7 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
 
         while (fmpz_cmp(rden, rnum) < 0)
         {
-            fmpz_add_ui(rden, rden, UWORD(1));
+            fmpz_add_ui(rden, rden, 1);
             fmpz_gcd(t, rden, rnum);
             if (fmpz_is_one(t))
             {
@@ -85,7 +85,7 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
             }
         }
 
-        fmpz_add_ui(rden, rden, UWORD(1));
+        fmpz_add_ui(rden, rden, 1);
         fmpz_one(rnum);
         fmpz_clear(t);
     }

@@ -23,6 +23,7 @@
     Copyright (C) 2010, 2011 William Hart
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
@@ -790,6 +791,12 @@ void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr coeffs, slong len,
 
 void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys,
         const nmod_poly_t poly, mp_srcptr xs, slong n);
+
+void _nmod_poly_evaluate_mat(nmod_mat_t dest,
+	const mp_srcptr poly, slong len, const nmod_mat_t c);
+
+void nmod_poly_evaluate_mat(nmod_mat_t dest,
+	const nmod_poly_t poly, const nmod_mat_t c);
 
 /* Subproduct tree  **********************************************************/
 

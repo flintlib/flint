@@ -668,6 +668,24 @@ int fmpz_is_probabprime(const fmpz_t p);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
 
+/* Primorials */
+
+void fmpz_primorial(fmpz_t res, ulong n);
+
+/* Multiplicative functions */
+
+void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
+
+int fmpz_moebius_mu(const fmpz_t n);
+
+void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
+
+/* Orthogonal polynomials */
+
+void fmpz_chebyshev_t(fmpz_t y, ulong n, const fmpz_t x);
+
+void fmpz_chebyshev_u(fmpz_t y, ulong n, const fmpz_t x);
+
 #ifdef __cplusplus
 }
 #endif

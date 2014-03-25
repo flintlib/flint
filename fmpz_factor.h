@@ -81,6 +81,14 @@ void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
 
 void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
 
+/* Multiplicative functions **************************************************/
+
+void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac);
+
+int fmpz_factor_moebius_mu(const fmpz_factor_t fac);
+
+void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
+
 #ifdef __cplusplus
 }
 #endif

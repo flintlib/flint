@@ -19,48 +19,70 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <gmp.h>
 #include "flint.h"
-#include "arith.h"
+#include "nmod_mat.h"
 #include "ulong_extras.h"
 
-
-int main(void)
+int
+main()
 {
-    slong k;
-
+    slong i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("pi_chudnovsky....");
+    flint_printf("pow....");
     fflush(stdout);
 
-    for (k = 2; k < 20; k++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mpfr_t x, y;
+        nmod_mat_t A, B, C, D;
+        mp_limb_t mod;
+        slong m, j;
+        ulong exp;
 
-        mpfr_init2(x, WORD(1) << k);
-        mpfr_init2(y, WORD(1) << k);
+        mod = n_randtest_not_zero(state);
+        m = n_randint(state, 20);
+        exp = n_randint(state, 50);
 
-        mpfr_const_pi(x, MPFR_RNDN);
-        mpfr_pi_chudnovsky(y, MPFR_RNDN);
+        nmod_mat_init(A, m, m, mod);
+        nmod_mat_init(B, m, m, mod);
+        nmod_mat_init(C, m, m, mod);
+        nmod_mat_init(D, m, m, mod);
+        nmod_mat_randtest(A, state);
 
-        if (!mpfr_equal_p(x, y))
+        nmod_mat_pow(B, A, exp);
+        nmod_mat_one(C);
+        for(j = 1; j <= exp; j++)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("Wrong value at prec = %wd\n", WORD(1) << k);
+            nmod_mat_mul(D, C, A);
+            nmod_mat_swap(D, C);
+        }
+        nmod_mat_pow(A, A, exp);
+
+        if (!(nmod_mat_equal(C, B) && nmod_mat_equal(C, A)))
+        {
+            flint_printf("FAIL: results not equal\n");fflush(stdout);
+            nmod_mat_print_pretty(A);
+            nmod_mat_print_pretty(B);
+            nmod_mat_print_pretty(C);
             abort();
         }
 
-        mpfr_clear(x);
-        mpfr_clear(y);
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+        nmod_mat_clear(D);
     }
 
     FLINT_TEST_CLEANUP(state);
+
     flint_printf("PASS\n");
     return 0;
 }

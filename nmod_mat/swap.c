@@ -19,27 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
-#include "arith.h"
-#include "fmpq.h"
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
+#include "nmod_mat.h"
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
+void
+nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2)
 {
-    if (n <= 0)
-    {
-        fmpz_zero(num);
-        fmpz_one(den);
-    }
-    else
-    {
-        _fmpq_harmonic_ui(num, den, n);
-    }
-}
-
-void arith_harmonic_number(fmpq_t x, slong n)
-{
-    _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
+    nmod_mat_t temp;
+    *temp = *mat1;
+    *mat1 = *mat2;
+    *mat2 = *temp;
 }

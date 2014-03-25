@@ -23,23 +23,47 @@
 
 ******************************************************************************/
 
-#include "arith.h"
-#include "fmpq.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "ulong_extras.h"
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n)
-{
-    if (n <= 0)
-    {
-        fmpz_zero(num);
-        fmpz_one(den);
-    }
-    else
-    {
-        _fmpq_harmonic_ui(num, den, n);
-    }
-}
 
-void arith_harmonic_number(fmpq_t x, slong n)
+int main(void)
 {
-    _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
+    ulong k;
+    fmpz_t x;
+    fmpz_t y;
+
+    FLINT_TEST_INIT(state);
+
+    flint_printf("primorial....");
+    fflush(stdout);
+
+    fmpz_init(x);
+    fmpz_init(y);
+    fmpz_set_ui(y, 1);
+
+    for (k = 0; k < 10000; k++)
+    {
+       fmpz_primorial(x, k);
+       if (n_is_prime(k))
+          fmpz_mul_ui(y, y, k);
+       if (!fmpz_equal(x, y))
+       {
+          flint_printf("FAIL:\n");
+          flint_printf("primorial of %wu disagrees with direct product\n", k); 
+          fmpz_print(x);
+          flint_printf("\n");
+          abort();
+       }
+    }
+
+    fmpz_clear(x);
+    fmpz_clear(y);
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }

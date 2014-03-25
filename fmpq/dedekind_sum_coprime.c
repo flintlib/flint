@@ -19,50 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005-2009 Damien Stehle
-    Copyright (C) 2007 David Cade
-    Copyright (C) 2010 William Hart
-   
+    Copyright (C) 2011 Fredrik Johansson
+
 ******************************************************************************/
 
-#include <math.h>
-#include "fmpz_mat.h"
+#include "fmpq.h"
+
+/* Small enough that a numerical computation is safe */
+#define DOUBLE_CUTOFF (UWORD(1) << 21)
 
 void
-fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
+fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
 {
-    const slong c = mat->c, r = mat->r, d = r;
-
-    slong i, j;
-    fmpz_t tmp;
-
-    if (c != r)
+    if (fmpz_cmp_ui(k, DOUBLE_CUTOFF) < 0)
     {
-        flint_printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
-        abort();
+        double t;
+
+        t = fmpq_dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
+
+        /* Round to nearest after truncation */
+        if (t > 0)
+            t += 0.5;
+        else
+            t -= 0.5;
+
+        fmpz_set_d(fmpq_numref(s), t);
+        fmpz_set_ui(fmpq_denref(s), UWORD(6) * (*k));
+        fmpq_canonicalise(s);
     }
-
-    fmpz_init(tmp);
-
-    for (i = 0; i < d; i++)
+    else
     {
-        mp_bitcnt_t bits = (mp_bitcnt_t) pow((double) (2 * d - i), alpha);
-
-        fmpz_one(tmp);
-        fmpz_mul_2exp(tmp, tmp, bits);
-        fmpz_sub_ui(tmp, tmp, 1);
-        fmpz_randm(mat->rows[i] + i, state, tmp);
-        fmpz_add_ui(mat->rows[i] + i, mat->rows[i] + i, 2);
-        fmpz_fdiv_q_2exp(mat->rows[i] + i, mat->rows[i] + i, 1);
-
-        for (j = i + 1; j < d; j++)
-        {
-            fmpz_randm(mat->rows[j] + i, state, tmp);
-            if (n_randint(state, 2))
-                fmpz_neg(mat->rows[j] + i, mat->rows[j] + i);
-            fmpz_zero(mat->rows[i] + j);
-        }
+        fmpq_dedekind_sum_coprime_large(s, h, k);
     }
-
-    fmpz_clear(tmp);
 }
+
+

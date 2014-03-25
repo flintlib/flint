@@ -19,49 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
-#include "fmpz.h"
-#include "arith.h"
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
+#include "nmod_mat.h"
 
-void arith_euler_phi(fmpz_t res, const fmpz_t n)
+/*Function to convert a square matrix to an identity matrix
+    The matrix is assumed to be a square one*/
+void
+nmod_mat_one(nmod_mat_t mat)
 {
-    fmpz_factor_t factors;
-    fmpz_t t;
-    ulong exp;
-    slong i;
-
-    if (fmpz_sgn(n) <= 0)
-    {
-        fmpz_zero(res);
-        return;
-    }
-
-    if (fmpz_abs_fits_ui(n))
-    {
-        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
-        return;
-    }
-
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
-    fmpz_one(res);
-
-    fmpz_init(t);
-    for (i = 0; i < factors->num; i++)
-    {
-        fmpz_sub_ui(t, factors->p + i, UWORD(1));
-        fmpz_mul(res, res, t);
-        exp = factors->exp[i];
-        if (exp != 1)
-        {
-            fmpz_pow_ui(t, factors->p + i, exp - UWORD(1));
-            fmpz_mul(res, res, t);
-        }
-    }
-
-    fmpz_clear(t);
-    fmpz_factor_clear(factors);
+    slong i,j;
+    for(i = 0; i < mat->r; i++)
+        for(j = 0; j < mat->c; j++)
+            if(i==j) nmod_mat_entry(mat, i, j) = 1;
+            else nmod_mat_entry(mat, i, j) = 0;
 }

@@ -33,13 +33,17 @@
 mp_limb_t
 n_gcd(mp_limb_t x, mp_limb_t y)
 {
-	if (x == 0) return y;
+	register ulong s0, s1, f;
+        
+        if (x == 0) return y;
 	if (y == 0) return x;
-	register unsigned s0, s1;
-	count_trailing_zeros(s0, x);
+	
+        count_trailing_zeros(s0, x);
 	count_trailing_zeros(s1, y);
-	register const unsigned f = FLINT_MIN(s0, s1);
-	x >>= s0;
+	
+        f = FLINT_MIN(s0, s1);
+	
+        x >>= s0;
 	y >>= s1;
 
 	while (x != y)
@@ -57,6 +61,7 @@ n_gcd(mp_limb_t x, mp_limb_t y)
 			x >>= s0;
 		}
 	}
+
 	return x << f;
 }
 

@@ -23,35 +23,50 @@
 
 ******************************************************************************/
 
-#include <math.h>
-#include "arith.h"
+#include "fmpz_poly.h"
 
-double
-arith_dedekind_sum_coprime_d(double h, double k)
+void
+_fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n)
 {
-    double a, b, t, s, sign;
+    slong k, i, d, m;
 
-    if (k <= 2)
-        return 0.0;
-
-    a = k;
-    b = h;
-    s = 0.0;
-    sign = 1.0;
-
-    while (b > 0)
+    if (n == 0)
     {
-        s += sign * (1.0 + a*a + b*b) / (a * b);
-        t = fmod(a, b);
-        a = b;
-        b = t;
-        sign = -sign;
+        fmpz_one(coeffs);
+        return;
     }
 
-    s *= (1./12);
+    if (n == 1)
+    {
+        fmpz_zero(coeffs);
+        fmpz_set_ui(coeffs + 1, 2);
+        return;
+    }
 
-    if (sign < 0)
-        s -= 0.25;
+    d = n % 2;
 
-    return s;
+    fmpz_zero(coeffs);
+    fmpz_set_ui(coeffs + d, d ? n + 1 : 1);
+    if (n % 4 >= 2)
+        fmpz_neg(coeffs + d, coeffs + d);
+
+    m = n / 2;
+
+    for (k = 1; k <= m; k++)
+    {
+        i = 2 * k + d;
+        fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, 4*(m-k+1), n+k-m);
+        fmpz_divexact2_uiui(coeffs + i, coeffs + i, n+2*k-2*m-1, n+2*k-2*m);
+        fmpz_neg(coeffs + i, coeffs + i);
+        fmpz_zero(coeffs + i - 1);
+    }
 }
+
+void
+fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n)
+{
+    fmpz_poly_fit_length(poly, n + 1);
+    _fmpz_poly_chebyshev_u(poly->coeffs, n);
+    _fmpz_poly_set_length(poly, n + 1);
+}
+

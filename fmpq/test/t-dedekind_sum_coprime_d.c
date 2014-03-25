@@ -19,74 +19,66 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "flint.h"
-#include "fmpz_poly.h"
 #include "fmpz.h"
-#include "arith.h"
+#include "fmpq.h"
 #include "ulong_extras.h"
-
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
-{
-    slong i = 0;
-
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    arith_divisors(p, t);
-
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
-    {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
+#include "fmpq.h"
 
 int main(void)
 {
-    fmpz_t m, a, b;
-    slong n, k;
+    double s1, s2f;
+    fmpz_t hh, kk;
+    fmpq_t s2;
+    slong h, k;
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("divisor_sigma....");
+    flint_printf("dedekind_sum_coprime_d....");
     fflush(stdout);
 
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
+    fmpz_init(hh);
+    fmpz_init(kk);
+    fmpq_init(s2);
 
-    for (n = 0; n < 5000; n++)
+    for (k = 0; k < 300; k++)
     {
-        for (k = 0; k < 10; k++)
+        for (h = 0; h <= k; h++)
         {
-            fmpz_set_ui(m, n);
-            arith_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
+            if (n_gcd(k, h) == 1)
             {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong value for n=%wd, k=%wd\n", n, k);
-                abort();
+                fmpz_set_si(hh, h);
+                fmpz_set_si(kk, k);
+
+                s1 = fmpq_dedekind_sum_coprime_d(h, k);
+                fmpq_dedekind_sum_naive(s2, hh, kk);
+
+                s2f = ((double)fmpz_get_si(fmpq_numref(s2))) /
+                        fmpz_get_si(fmpq_denref(s2));
+
+                if (fabs(s1 - s2f) > 1e-10)
+                {
+                    flint_printf("FAIL:\n");
+                    flint_printf("s(%wd,%wd)\n", h, k);
+                    flint_printf("s1: %.20f\n", s1);
+                    flint_printf("s2: %.20f\n", s2f);
+                    flint_printf("Exact: "); fmpq_print(s2); flint_printf("\n");
+                    abort();
+                }
             }
         }
     }
 
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
+    fmpz_clear(hh);
+    fmpz_clear(kk);
+    fmpq_clear(s2);
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
