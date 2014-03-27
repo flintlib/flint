@@ -15,7 +15,7 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_vec fmpq_mat padic \
    fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly \
    fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve \
-   double_extras d_vec padic_poly padic_mat qadic  \
+   double_extras d_vec d_mat padic_poly padic_mat qadic  \
    fq fq_vec fq_mat fq_poly fq_poly_factor\
    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor \
    fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor \
@@ -75,7 +75,7 @@ distclean: clean
 	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
-	git archive --format tar --prefix flint-2.4.2/ flint-2.4 > ../flint-2.4.2.tar; gzip ../flint-2.4.2.tar
+	git archive --format tar --prefix flint-2.4/ flint-2.4 > ../flint-2.4.tar; gzip ../flint-2.4.tar
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile
