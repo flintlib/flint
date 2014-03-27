@@ -31,7 +31,7 @@
 #include "d_mat.h"
 #include "ulong_extras.h"
 
-#define D_MAT_MUL_EPS (1e-12)
+#define D_MAT_MUL_EPS (1e-11)
 
 int
 main(void)
