@@ -65,9 +65,9 @@ void _d_vec_add(double * res, const double * vec1, const double * vec2, slong le
 
 void _d_vec_sub(double * res, const double * vec1, const double * vec2, slong len2);
 
-/*  Scalar product and norm  **************************************/
+/*  Dot product and norm  **************************************/
 
-double _d_vec_scalar_product(const double * vec1, const double * vec2, slong len2);
+double _d_vec_dot(const double * vec1, const double * vec2, slong len2);
 
 double _d_vec_norm(const double * vec, slong len);
 

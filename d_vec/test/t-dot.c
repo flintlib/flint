@@ -19,22 +19,60 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "d_vec.h"
+#include "ulong_extras.h"
 
-double
-_d_vec_scalar_product(const double *vec1, const double *vec2, slong len2)
+#define D_VEC_SP_EPS (1e-14)
+
+int
+main(void)
 {
-    double sum = 0;
-    slong i;
+    int i, result;
+    FLINT_TEST_INIT(state);
 
-    for (i = 0; i < len2; i++)
-        sum += vec1[i] * vec2[i];
+    flint_printf("dot....");
+    fflush(stdout);
 
-    return sum;
+
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        double *a, *b;
+        double res1, res2, res3;
+        slong len = n_randint(state, 100);
+        if (!len)
+            continue;
+
+        a = _d_vec_init(len);
+        b = _d_vec_init(len);
+        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(b, state, len);
+
+        res1 = _d_vec_dot(a, b, len - 1);
+        res2 = _d_vec_dot(a + len - 1, b + len - 1, 1);
+        res3 = _d_vec_dot(a, b, len);
+
+        result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS;
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            printf("%g\n", fabs(res1 + res2 - res3));
+            abort();
+        }
+
+        _d_vec_clear(a);
+        _d_vec_clear(b);
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }
