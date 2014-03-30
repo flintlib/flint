@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    int i, result;
+    int i;
     FLINT_TEST_INIT(state);
 
     flint_printf("zero....");
@@ -46,6 +46,7 @@ main(void)
     /* Check it's zero */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
+        int result;
         double *a;
         slong len = n_randint(state, 100);
 

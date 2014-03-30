@@ -41,7 +41,7 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        double dot, norm;
+        double dot;
         int j, k, l;
         d_mat_t A, Q, R, B;
 
@@ -78,7 +78,7 @@ main(void)
 
         for (j = 0; j < n; j++)
         {
-            norm = 0;
+            double norm = 0;
             for (l = 0; l < m; l++)
             {
                 norm += d_mat_entry(Q, l, j) * d_mat_entry(Q, l, j);
