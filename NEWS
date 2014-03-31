@@ -1096,3 +1096,7 @@ v 2.4.2 -- 11 Mar 2014
 
   * Fix bug in ARM assembly
 
+v 2.4.3 -- 01 Apr 2014
+
+  * Fix a linker issue on Mac OSX.
+
