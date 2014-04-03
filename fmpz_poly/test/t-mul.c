@@ -99,6 +99,36 @@ main(void)
         fmpz_poly_clear(c);
     }
 
+    /* Check aliasing of b and c */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, b, c, d;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(d);
+        fmpz_poly_randtest(b, state, n_randint(state, 50), 500);
+        fmpz_poly_set(c, b);
+
+        fmpz_poly_mul(a, b, c);
+        fmpz_poly_mul(d, b, b);
+
+        result = (fmpz_poly_equal(a, d));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            fmpz_poly_print(a), flint_printf("\n\n");
+            fmpz_poly_print(d), flint_printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
+    }
+
     /* Check (b*c)+(b*d) = b*(c+d) */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {

@@ -37,6 +37,12 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
 {
     mp_size_t limbs1, limbs2;
 
+    if (poly1 == poly2 && FLINT_MIN(len1, n) == FLINT_MIN(len2, n))
+    {
+        _fmpz_poly_sqrlow(res, poly1, len1, n);
+        return;
+    }
+
     if (len2 < 7 || n < 7)
     {
         _fmpz_poly_mullow_classical(res, poly1, len1, poly2, len2, n);

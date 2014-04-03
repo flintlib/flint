@@ -35,6 +35,12 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1, slong len1,
 {
     mp_size_t limbs1, limbs2;
 
+    if (poly1 == poly2 && len1 == len2)
+    {
+        _fmpz_poly_sqr(res, poly1, len1);
+        return;
+    }
+
     if (len2 < 7)
     {
         _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
