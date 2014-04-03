@@ -36,6 +36,14 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
 {
     fmpz_t gcd1;  /* GCD( poly1, den2 ) */
     fmpz_t gcd2;  /* GCD( poly2, den1 ) */
+
+    if (poly1 == poly2 && len1 == len2)
+    {
+        _fmpz_poly_sqr(rpoly, poly1, len1);
+        fmpz_mul(rden, den1, den2);
+        return;
+    }
+
     fmpz_init(gcd1);
     fmpz_init(gcd2);
     fmpz_one(gcd1);
