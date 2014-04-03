@@ -108,14 +108,10 @@ void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1,
     
     if (poly1 == poly2)  /* Set res = 2 * poly1 */
     {
-        fmpz_t rem;
-        fmpz_init(rem);
-        fmpz_mod_ui(rem, poly1->den, 2);
-        
         fmpq_poly_fit_length(res, len1);
         _fmpq_poly_set_length(res, len1);
-        
-        if (*rem == UWORD(0))
+
+        if (fmpz_is_even(poly1->den))
         {
             _fmpz_vec_set(res->coeffs, poly1->coeffs, len1);
             fmpz_fdiv_q_2exp(res->den, poly1->den, 1);
@@ -125,7 +121,6 @@ void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1,
             _fmpz_vec_scalar_mul_2exp(res->coeffs, poly1->coeffs, len1, 1);
             fmpz_set(res->den, poly1->den);
         }
-        fmpz_clear(rem);
         return;
     }
     
