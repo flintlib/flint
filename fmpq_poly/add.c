@@ -35,14 +35,46 @@ void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
 {
     slong max = FLINT_MAX(len1, len2);
     slong min = FLINT_MIN(len1, len2);
-    
+
     fmpz_t d;
+
+    if (fmpz_equal(den1, den2))
+    {
+        _fmpz_poly_add(rpoly, poly1, len1, poly2, len2);
+
+        if (fmpz_is_one(den1))
+            fmpz_one(rden);
+        else if (can)
+        {
+            fmpz_init(d);
+
+            _fmpz_vec_content(d, rpoly, max);
+
+            if (!fmpz_is_one(d))
+                fmpz_gcd(d, d, den1);
+
+            if (fmpz_is_one(d))
+                  fmpz_set(rden, den1);
+            else
+            {
+                _fmpz_vec_scalar_divexact_fmpz(rpoly, rpoly, max, d);
+                fmpz_divexact(rden, den1, d);
+            }
+
+            fmpz_clear(d);
+        }
+        else
+            fmpz_set(rden, den1);
+
+        return;
+    }
+
     fmpz_init(d);
     fmpz_one(d);
-    if (*den1 != WORD(1) && *den2 != WORD(1))
+    if (!fmpz_is_one(den1) && !fmpz_is_one(den2))
         fmpz_gcd(d, den1, den2);
-    
-    if (*d == WORD(1))
+
+    if (fmpz_is_one(d))
     {
         _fmpz_vec_scalar_mul_fmpz(rpoly, poly1, len1, den2);
         _fmpz_vec_scalar_addmul_fmpz(rpoly, poly2, min, den1);
@@ -73,10 +105,10 @@ void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
                fmpz_t e;
                fmpz_init(e);
                _fmpz_vec_content(e, rpoly, max);
-               if (*e != WORD(1))
+               if (!fmpz_is_one(e))
                   fmpz_gcd(e, e, d);
             
-               if (*e == WORD(1))
+               if (fmpz_is_one(e))
                   fmpz_mul(rden, den1, den22);
                else
                {
