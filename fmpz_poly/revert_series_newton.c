@@ -65,7 +65,7 @@ _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
             _fmpz_poly_compose_series(T, Q, k, Qinv, k, k);
             _fmpz_poly_derivative(U, T, k); fmpz_zero(U + k - 1);
             fmpz_zero(T + 1);
-            _fmpz_poly_div_series(V, T, U, k);
+            _fmpz_poly_div_series(V, T, k, U, k, k);
             _fmpz_poly_derivative(T, Qinv, k);
             _fmpz_poly_mullow(U, V, k, T, k, k);
             _fmpz_vec_sub(Qinv, Qinv, U, k);

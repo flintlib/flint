@@ -1694,7 +1694,8 @@ int fmpz_poly_divides(fmpz_poly_t Q,
 
 *******************************************************************************
 
-void _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
+void _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q,
+        slong Qlen, slong n)
 
     Computes the first $n$ terms of the inverse power series of
     \code{(Q, lenQ)} using a recurrence.
@@ -1702,7 +1703,8 @@ void _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slo
     Assumes that $n \geq 1$ and that $Q$ has constant term~$\pm 1$.
     Does not support aliasing.
 
-void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
+void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv,
+        const fmpz_poly_t Q, slong n)
 
     Computes the first $n$ terms of the inverse power series of $Q$ 
     using a recurrence, assuming that $Q$ has constant term~$\pm 1$ 
@@ -1716,7 +1718,8 @@ void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
     Assumes that $n \geq 1$ and that $Q$ has constant term~$\pm 1$.
     Does not support aliasing.
 
-void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong Qlen, slong n)
+void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q,
+        slong Qlen, slong n)
 
     Computes the first $n$ terms of the inverse power series of $Q$ using
     Newton iteration, assuming $Q$ has constant term~$\pm 1$ and $n \geq 1$.
@@ -1734,10 +1737,11 @@ void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
     Computes the first $n$ terms of the inverse power series of $Q$, 
     assuming $Q$ has constant term~$\pm 1$ and $n \geq 1$.
 
-void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B)
+void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+        const fmpz * B, slong Blen, slong n)
 
-    Divides \code{(A, n)} by \code{(B, n)} as power series over $\Z$, 
-    assuming $B$ has constant term~$1$ and $n \geq 1$.
+    Divides \code{(A, Alen)} by \code{(B, Blen)} as power series over $\Z$, 
+    assuming $B$ has constant term~$\pm 1$ and $n \geq 1$.
 
     Only supports aliasing of \code{(Q, n)} and \code{(B, n)}.
 
@@ -1747,7 +1751,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     Performs power series division in $\Z[[x]] / (x^n)$.  The function 
     considers the polynomials $A$ and $B$ as power series of length $n$ 
     starting with the constant terms.  The function assumes that $B$ has 
-    constant term~$1$ and $n \geq 1$.
+    constant term~$\pm 1$ and $n \geq 1$.
 
 *******************************************************************************
 
