@@ -47,7 +47,7 @@
  extern "C" {
 #endif
 
-#define FMPZ_POLY_INV_NEWTON_CUTOFF  32
+#define FMPZ_POLY_INV_NEWTON_CUTOFF 32
 
 /*  Type definitions *********************************************************/
 
@@ -717,21 +717,17 @@ _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c);
 
 /*  Power series division  ***************************************************/
 
-void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n);
+void _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
+
+void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
+
+void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
 void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
-static __inline__ void 
-_fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n)
-{
-    _fmpz_poly_inv_series_newton(Qinv, Q, n);
-}
+void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
-static __inline__ void 
-fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-{
-    fmpz_poly_inv_series_newton(Qinv, Q, n);
-}
+void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
 void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, slong n);
 

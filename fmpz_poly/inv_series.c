@@ -19,39 +19,49 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2014 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "arith.h"
+#include "fmpz_poly.h"
 
 void
-arith_number_of_partitions_vec(fmpz * res, slong len)
+_fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 {
-    fmpz * tmp;
-    slong k, n;
+    if (Qlen <= 8 || n <= 24)
+        _fmpz_poly_inv_series_basecase(Qinv, Q, Qlen, n);
+    else
+        _fmpz_poly_inv_series_newton(Qinv, Q, Qlen, n);
+}
 
-    if (len < 1)
-        return;
+void
+fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
+{
+    slong Qlen = Q->length;
 
-    tmp = _fmpz_vec_init(len);
+    Qlen = FLINT_MIN(Qlen, n);
 
-    tmp[0] = WORD(1);
-
-    for (n = k = 1; n + 4*k + 2 < len; k += 2)
+    if (Qlen == 0)
     {
-        tmp[n] = WORD(-1);
-        tmp[n + k] = WORD(-1);
-        tmp[n + 3*k + 1] = WORD(1);
-        tmp[n + 4*k + 2] = WORD(1);
-        n += 6*k + 5;
+        flint_printf("Exception (fmpz_poly_inv_series). Division by zero.\n");
+        abort();
     }
 
-    if (n < len) tmp[n] = WORD(-1);
-    if (n + k < len) tmp[n + k] = WORD(-1);
-    if (n + 3*k + 1 < len) tmp[n + 3*k + 1] = WORD(1);
+    if (Qinv != Q)
+    {
+        fmpz_poly_fit_length(Qinv, n);
+        _fmpz_poly_inv_series(Qinv->coeffs, Q->coeffs, Qlen, n);
+    }
+    else
+    {
+        fmpz_poly_t t;
+        fmpz_poly_init2(t, n);
+        _fmpz_poly_inv_series(t->coeffs, Q->coeffs, Qlen, n);
+        fmpz_poly_swap(Qinv, t);
+        fmpz_poly_clear(t);
+    }
 
-    _fmpz_poly_inv_series(res, tmp, len, len);
-
-    _fmpz_vec_clear(tmp, len);
+    _fmpz_poly_set_length(Qinv, n);
+    _fmpz_poly_normalise(Qinv);
 }
+

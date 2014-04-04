@@ -64,7 +64,7 @@ _fmpz_poly_theta_qexp(fmpz * f, slong k, slong n)
     {
         fmpz * t = _fmpz_vec_init(n);
         _fmpz_poly_theta_qexp(t, -k, n);
-        _fmpz_poly_inv_series(f, t, n);
+        _fmpz_poly_inv_series(f, t, n, n);
         _fmpz_vec_clear(t, n);
         return;
     }

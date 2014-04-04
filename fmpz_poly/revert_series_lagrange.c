@@ -49,7 +49,7 @@ _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong n)
     fmpz_zero(Qinv);
     fmpz_set(Qinv + 1, Q + 1);
 
-    _fmpz_poly_inv_series(R, Q + 1, n - 1);
+    _fmpz_poly_inv_series(R, Q + 1, n - 1, n - 1);
     _fmpz_vec_set(S, R, n - 1);
 
     for (i = 2; i < n; i++)

@@ -41,7 +41,7 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, slong n)
     {
         fmpz * Binv = _fmpz_vec_init(n);
 
-        _fmpz_poly_inv_series(Binv, B, n);
+        _fmpz_poly_inv_series(Binv, B, n, n);
         _fmpz_poly_mullow(Q, A, n, Binv, n, n);
 
         _fmpz_vec_clear(Binv, n);

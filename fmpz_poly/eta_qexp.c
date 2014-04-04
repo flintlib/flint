@@ -176,7 +176,7 @@ _fmpz_poly_eta_qexp(fmpz * f, slong e, slong len)
     {
         fmpz * t = _fmpz_vec_init(len);
         _fmpz_poly_eta_qexp(t, -e, len);
-        _fmpz_poly_inv_series(f, t, len);
+        _fmpz_poly_inv_series(f, t, len, len);
         _fmpz_vec_clear(t, len);
         return;
     }
