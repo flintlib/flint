@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2014 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -29,15 +30,75 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+static __inline__ int
+can_mul_tiny(const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+{
+    slong i;
+    mp_bitcnt_t bits;
+    fmpz c;
+    ulong max1, max2;
+
+    max1 = max2 = 0;
+
+    for (i = 0; i < len1; i++)
+    {
+        c = poly1[i];
+        if (COEFF_IS_MPZ(c))
+            return 0;
+        max1 |= FLINT_ABS(c);
+    }
+
+    for (i = 0; i < len2; i++)
+    {
+        c = poly2[i];
+        if (COEFF_IS_MPZ(c))
+            return 0;
+        max2 |= FLINT_ABS(c);
+    }
+
+    bits = FLINT_BIT_COUNT(max1) + FLINT_BIT_COUNT(max2) + FLINT_BIT_COUNT(len2);
+
+    if (bits <= FLINT_BITS - 2)
+        return 1;
+    else
+        return 0;
+}
+
 void
-_fmpz_poly_mul(fmpz * res, const fmpz * poly1, slong len1,
-               const fmpz * poly2, slong len2)
+_fmpz_poly_mul(fmpz * res, const fmpz * poly1,
+                         slong len1, const fmpz * poly2, slong len2)
 {
     mp_size_t limbs1, limbs2;
+
+    if (len2 == 1)
+    {
+        _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
+        return;
+    }
 
     if (poly1 == poly2 && len1 == len2)
     {
         _fmpz_poly_sqr(res, poly1, len1);
+        return;
+    }
+
+    if (len2 < 50 && can_mul_tiny(poly1, len1, poly2, len2))
+    {
+        slong i, j, c;
+
+        _fmpz_vec_zero(res, len1 + len2 - 1);
+
+        for (i = 0; i < len1; i++)
+        {
+            c = poly1[i];
+
+            if (c != 0)
+            {
+                for (j = 0; j < len2; j++)
+                    res[i + j] += c * poly2[j];
+            }
+        }
+
         return;
     }
 
