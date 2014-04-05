@@ -2270,12 +2270,13 @@ void fmpz_poly_compose_series(fmpz_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q,
+        slong Qlen, slong n)
 
-    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
-    as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    Sets \code{Qinv} to the compositional inverse or reversion of
+    \code{(Q, Qlen)} as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses the Lagrange inversion formula.
@@ -2291,12 +2292,13 @@ void fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     This implementation uses the Lagrange inversion formula.
 
 void _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv,
-        const fmpz * Q, slong n)
+        const fmpz * Q, slong Qlen, slong n)
 
-    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    Sets \code{Qinv} to the compositional inverse or reversion of
+    \code{(Q, Qlen)}
     as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses a reduced-complexity implementation
@@ -2313,12 +2315,13 @@ void fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
     This implementation uses a reduced-complexity implementation
     of the Lagrange inversion formula.
 
-void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q,
+        slong Qlen, slong n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
@@ -2333,12 +2336,12 @@ void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv,
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
-void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation defaults to the fast version of

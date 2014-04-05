@@ -20,112 +20,79 @@
 /******************************************************************************
 
    Copyright (C) 2010 Sebastian Pancratz
-   Copyright (C) 2011 Fredrik Johansson
+   Copyright (C) 2011-2014 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
-
 
 #define FLINT_REVERSE_NEWTON_CUTOFF 10
 
 void
-_fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+_fmpz_poly_revert_series_newton(fmpz * Qinv,
+    const fmpz * Q, slong Qlen, slong n)
 {
+    fmpz *T, *U, *V;
+    slong alloc = 3 * n;
+
     if (n <= 2)
     {
         _fmpz_vec_set(Qinv, Q, n);
         return;
     }
-    else
-    {
-        slong *a, i, k;
-        fmpz *T, *U, *V;
 
-        T = _fmpz_vec_init(n);
-        U = _fmpz_vec_init(n);
-        V = _fmpz_vec_init(n);
+    T = _fmpz_vec_init(alloc);
+    U = T + n;
+    V = U + n;
 
-        k = n;
-        for (i = 1; (WORD(1) << i) < k; i++);
-        a = (slong *) flint_malloc(i * sizeof(slong));
-        a[i = 0] = k;
-        while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
-            a[++i] = (k = (k + 1) / 2);
+    FLINT_NEWTON_INIT(FLINT_REVERSE_NEWTON_CUTOFF, n)
 
-        _fmpz_poly_revert_series_lagrange(Qinv, Q, k);
-        _fmpz_vec_zero(Qinv + k, n - k);
+    FLINT_NEWTON_BASECASE(k)
+    _fmpz_poly_revert_series_lagrange(Qinv, Q, Qlen, k);
+    _fmpz_vec_zero(Qinv + k, n - k);
+    FLINT_NEWTON_END_BASECASE
 
-        for (i--; i >= 0; i--)
-        {
-            k = a[i];
-            _fmpz_poly_compose_series(T, Q, k, Qinv, k, k);
-            _fmpz_poly_derivative(U, T, k); fmpz_zero(U + k - 1);
-            fmpz_zero(T + 1);
-            _fmpz_poly_div_series(V, T, k, U, k, k);
-            _fmpz_poly_derivative(T, Qinv, k);
-            _fmpz_poly_mullow(U, V, k, T, k, k);
-            _fmpz_vec_sub(Qinv, Qinv, U, k);
-        }
+    FLINT_NEWTON_LOOP(k0, k)
+    _fmpz_poly_compose_series(T, Q, FLINT_MIN(Qlen, k), Qinv, k, k);
+    _fmpz_poly_derivative(U, T, k); fmpz_zero(U + k - 1);
+    fmpz_zero(T + 1);
+    _fmpz_poly_div_series(V, T, k, U, k, k);
+    _fmpz_poly_derivative(T, Qinv, k);
+    _fmpz_poly_mullow(U, V, k, T, k, k);
+    _fmpz_vec_sub(Qinv, Qinv, U, k);
+    FLINT_NEWTON_END_LOOP
 
-        flint_free(a);
-        _fmpz_vec_clear(T, n);
-        _fmpz_vec_clear(U, n);
-        _fmpz_vec_clear(V, n);
-    }
+    FLINT_NEWTON_END
+
+    _fmpz_vec_clear(T, alloc);
 }
 
 void
 fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 {
-    fmpz *Qcopy;
-    int Qalloc;
     slong Qlen = Q->length;
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
         flint_printf("Exception (fmpz_poly_revert_series_newton). Input must have \n"
-               "zero constant term and +1 or -1 as coefficient of x^1.\n");
+               "zero constant term and +1 or -1 as coefficient of x^1\n.");
         abort();
-    }
-
-    if (Qlen >= n)
-    {
-        Qcopy = Q->coeffs;
-        Qalloc = 0;
-    }
-    else
-    {
-        slong i;
-        Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < Qlen; i++)
-            Qcopy[i] = Q->coeffs[i];
-        for ( ; i < n; i++)
-            Qcopy[i] = 0;
-        Qalloc = 1;
     }
 
     if (Qinv != Q)
     {
         fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_revert_series_newton(Qinv->coeffs, Qcopy, n);
+        _fmpz_poly_revert_series_newton(Qinv->coeffs, Q->coeffs, Qlen, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_revert_series_newton(t->coeffs, Qcopy, n);
+        _fmpz_poly_revert_series_newton(t->coeffs, Q->coeffs, Qlen, n);
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }
-
+    
     _fmpz_poly_set_length(Qinv, n);
     _fmpz_poly_normalise(Qinv);
-
-    if (Qalloc)
-        flint_free(Qcopy);
 }
-
