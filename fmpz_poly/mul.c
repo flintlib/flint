@@ -31,7 +31,8 @@
 #include "fmpz_poly.h"
 
 static __inline__ int
-can_mul_tiny(const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+_fmpz_poly_mul_tiny_case(const fmpz * poly1, slong len1,
+                         const fmpz * poly2, slong len2)
 {
     slong i;
     mp_bitcnt_t bits;
@@ -60,8 +61,87 @@ can_mul_tiny(const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     if (bits <= FLINT_BITS - 2)
         return 1;
+    else if (bits <= 2 * FLINT_BITS - 1)
+        return 2;
     else
         return 0;
+}
+
+void
+_fmpz_poly_mul_tiny1(fmpz * res, const fmpz * poly1,
+                         slong len1, const fmpz * poly2, slong len2)
+{
+    slong i, j, c;
+
+    _fmpz_vec_zero(res, len1 + len2 - 1);
+
+    for (i = 0; i < len1; i++)
+    {
+        c = poly1[i];
+
+        if (c != 0)
+        {
+            for (j = 0; j < len2; j++)
+                res[i + j] += c * poly2[j];
+        }
+    }
+}
+
+void
+_fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
+                         slong len1, const fmpz * poly2, slong len2)
+{
+    slong i, j, k, c, d;
+    mp_limb_t hi, lo;
+    mp_ptr tmp;
+    TMP_INIT;
+
+    TMP_START;
+
+    tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(mp_limb_t));
+
+    flint_mpn_zero(tmp, 2 * (len1 + len2 - 1));
+
+    for (i = 0; i < len1; i++)
+    {
+        c = poly1[i];
+
+        if (c != 0)
+        {
+            for (j = 0; j < len2; j++)
+            {
+                k = i + j;
+
+                d = poly2[j];
+
+                if (d != 0)
+                {
+                    smul_ppmm(hi, lo, c, d);
+                    add_ssaaaa(tmp[2 * k + 1], tmp[2 * k],
+                               tmp[2 * k + 1], tmp[2 * k], hi, lo);
+                }
+            }
+        }
+    }
+
+    for (i = 0; i < len1 + len2 - 1; i++)
+    {
+        lo = tmp[2 * i];
+        hi = tmp[2 * i + 1];
+
+        if (((mp_limb_signed_t) hi) >= 0)
+        {
+            fmpz_set_uiui(res + i, hi, lo);
+        }
+        else
+        {
+            sub_ddmmss(hi, lo, 0, 0, hi, lo);
+            fmpz_neg_uiui(res + i, hi, lo);
+        }
+    }
+
+    TMP_END;
+    return;
 }
 
 void
@@ -82,24 +162,21 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
         return;
     }
 
-    if (len2 < 50 && can_mul_tiny(poly1, len1, poly2, len2))
+    if (len2 < 90)
     {
-        slong i, j, c;
+        int tiny_case = _fmpz_poly_mul_tiny_case(poly1, len1, poly2, len2);
 
-        _fmpz_vec_zero(res, len1 + len2 - 1);
-
-        for (i = 0; i < len1; i++)
+        if (len2 < 50 && tiny_case == 1)
         {
-            c = poly1[i];
-
-            if (c != 0)
-            {
-                for (j = 0; j < len2; j++)
-                    res[i + j] += c * poly2[j];
-            }
+            _fmpz_poly_mul_tiny1(res, poly1, len1, poly2, len2);
+            return;
         }
 
-        return;
+        if (tiny_case == 2)
+        {
+            _fmpz_poly_mul_tiny2(res, poly1, len1, poly2, len2);
+            return;
+        }
     }
 
     if (len2 < 7)
