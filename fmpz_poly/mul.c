@@ -30,43 +30,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-static __inline__ int
-_fmpz_poly_mul_tiny_case(const fmpz * poly1, slong len1,
-                         const fmpz * poly2, slong len2)
-{
-    slong i;
-    mp_bitcnt_t bits;
-    fmpz c;
-    ulong max1, max2;
-
-    max1 = max2 = 0;
-
-    for (i = 0; i < len1; i++)
-    {
-        c = poly1[i];
-        if (COEFF_IS_MPZ(c))
-            return 0;
-        max1 |= FLINT_ABS(c);
-    }
-
-    for (i = 0; i < len2; i++)
-    {
-        c = poly2[i];
-        if (COEFF_IS_MPZ(c))
-            return 0;
-        max2 |= FLINT_ABS(c);
-    }
-
-    bits = FLINT_BIT_COUNT(max1) + FLINT_BIT_COUNT(max2) + FLINT_BIT_COUNT(len2);
-
-    if (bits <= FLINT_BITS - 2)
-        return 1;
-    else if (bits <= 2 * FLINT_BITS - 1)
-        return 2;
-    else
-        return 0;
-}
-
 void
 _fmpz_poly_mul_tiny1(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
@@ -149,6 +112,7 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
     mp_size_t limbs1, limbs2;
+    slong bits1, bits2, rbits;
 
     if (len2 == 1)
     {
@@ -162,17 +126,21 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
         return;
     }
 
-    if (len2 < 90)
-    {
-        int tiny_case = _fmpz_poly_mul_tiny_case(poly1, len1, poly2, len2);
+    bits1 = _fmpz_vec_max_bits(poly1, len1);
+    bits2 = _fmpz_vec_max_bits(poly2, len2);
+    bits1 = FLINT_ABS(bits1);
+    bits2 = FLINT_ABS(bits2);
 
-        if (len2 < 50 && tiny_case == 1)
+    if (bits1 <= FLINT_BITS - 2 && bits2 <= FLINT_BITS - 2 && len2 < 90)
+    {
+        rbits = bits1 + bits2 + FLINT_BIT_COUNT(len2);
+
+        if (rbits <= FLINT_BITS - 2 && len2 < 50)
         {
             _fmpz_poly_mul_tiny1(res, poly1, len1, poly2, len2);
             return;
         }
-
-        if (tiny_case == 2)
+        else if (rbits <= 2 * FLINT_BITS - 1)
         {
             _fmpz_poly_mul_tiny2(res, poly1, len1, poly2, len2);
             return;
@@ -185,8 +153,8 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
         return;
     }
 
-    limbs1 = _fmpz_vec_max_limbs(poly1, len1);
-    limbs2 = _fmpz_vec_max_limbs(poly2, len2);
+    limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
+    limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
 
     if (len1 < 16 && (limbs1 > 12 || limbs2 > 12))
         _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
