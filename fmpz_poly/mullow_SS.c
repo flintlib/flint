@@ -41,12 +41,6 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     len1 = FLINT_MIN(len1, trunc);
     len2 = FLINT_MIN(len2, trunc);
 
-    if (len2 <= 2)
-    {
-        _fmpz_poly_mullow_classical(output, input1, len1, input2, len2, trunc);
-        return;
-    }
-
     len_out = len1 + len2 - 1;
     loglen  = FLINT_CLOG2(len_out);
     loglen2 = FLINT_CLOG2(len2);
@@ -133,12 +127,13 @@ fmpz_poly_mullow_SS(fmpz_poly_t res,
         return;
     }
 
-    if (len1 == 1 || len2 == 1)
+    if (len1 <= 2 || len2 <= 2 || n <= 2)
     {
         fmpz_poly_mullow_classical(res, poly1, poly2, n);
         return;
     }
 
+    n = FLINT_MIN(n, len1 + len2 - 1);
     fmpz_poly_fit_length(res, n);
 
     if (len1 >= len2)

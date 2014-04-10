@@ -102,6 +102,7 @@ void fmpz_poly_sqrlow_KS(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
         return;
     }
 
+    n = FLINT_MIN(n, 2 * len - 1);
     fmpz_poly_fit_length(res, n);
     _fmpz_poly_sqrlow_KS(res->coeffs, poly->coeffs, len, n);
     _fmpz_poly_set_length(res, n);
