@@ -131,11 +131,12 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
     bits1 = FLINT_ABS(bits1);
     bits2 = FLINT_ABS(bits2);
 
-    if (bits1 <= FLINT_BITS - 2 && bits2 <= FLINT_BITS - 2 && len2 < 90)
+    if (bits1 <= FLINT_BITS - 2 && bits2 <= FLINT_BITS - 2 &&
+        (len2 < 40 + (bits1 + bits2) / 2 || len1 < 70 + (bits1 + bits2) / 2))
     {
         rbits = bits1 + bits2 + FLINT_BIT_COUNT(len2);
 
-        if (rbits <= FLINT_BITS - 2 && len2 < 50)
+        if (rbits <= FLINT_BITS - 2)
         {
             _fmpz_poly_mul_tiny1(res, poly1, len1, poly2, len2);
             return;
