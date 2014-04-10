@@ -132,6 +132,7 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     }
     else
     {
+        n = FLINT_MIN(n, len1 + len2 - 1);
         fmpz_poly_fit_length(res, n);
 
         if (len1 >= len2)

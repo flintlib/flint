@@ -35,6 +35,8 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     mp_size_t limbs;
 
+    len = FLINT_MIN(len, n);
+
     if (n < 7)
     {
         _fmpz_poly_sqrlow_classical(res, poly, len, n);
