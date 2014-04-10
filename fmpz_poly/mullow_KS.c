@@ -41,6 +41,9 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, slong len1,
     mp_limb_t *arr1, *arr2, *arr3;
     slong sign = 0;
 
+    len1 = FLINT_MIN(len1, n);
+    len2 = FLINT_MIN(len2, n);
+
     FMPZ_VEC_NORM(poly1, len1);
     FMPZ_VEC_NORM(poly2, len2);
 

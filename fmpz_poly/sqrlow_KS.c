@@ -37,6 +37,8 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
     slong bits, limbs, loglen, sign = 0;
     mp_limb_t *arr_in, *arr_out;
 
+    len = FLINT_MIN(len, n);
+
     FMPZ_VEC_NORM(poly, len);
 
     if (len == 0)
