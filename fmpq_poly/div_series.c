@@ -38,7 +38,7 @@ _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ,
     fmpz * C = _fmpz_vec_init(n + 1);
     fmpz * denC = C + n;
 
-    _fmpq_poly_inv_series(C, denC, B, denB, n);
+    _fmpq_poly_inv_series(C, denC, B, denB, n, n);
     _fmpq_poly_mullow(Q, denQ, A, denA, n, C, denC, n, n);
 
     _fmpz_vec_clear(C, n + 1);

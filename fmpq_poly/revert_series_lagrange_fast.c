@@ -98,7 +98,7 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
     fmpz_zero(Qinv);
     fmpz_one(dens);
 
-    _fmpq_poly_inv_series(Ri(1), Rdeni(1), Q + 1, Qden, n - 1);
+    _fmpq_poly_inv_series(Ri(1), Rdeni(1), Q + 1, Qden, n - 1, n - 1);
     _fmpq_poly_canonicalise(Ri(1), Rdeni(1), n - 1);
 
     for (i = 2; i <= m; i++)

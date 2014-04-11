@@ -43,7 +43,7 @@ void _fmpq_poly_log_series(fmpz * g, fmpz_t gden,
     fmpz_init(f_inv_den);
 
     _fmpq_poly_derivative(f_diff, f_diff_den, f, fden, n);
-    _fmpq_poly_inv_series(f_inv, f_inv_den, f, fden, n);
+    _fmpq_poly_inv_series(f_inv, f_inv_den, f, fden, n, n);
     _fmpq_poly_mullow(g, gden, f_diff, f_diff_den, n - 1, f_inv, f_inv_den, n - 1, n - 1);
     _fmpq_poly_integral(g, gden, g, gden, n);
 

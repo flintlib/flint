@@ -410,15 +410,15 @@ void fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A,
 /*  Power series division  ***************************************************/
 
 void _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
-                           const fmpz * Q, const fmpz_t Qden, slong n);
+                           const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n);
 
 void fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n);
 
 static __inline__ void 
 _fmpq_poly_inv_series(fmpz * Qinv, fmpz_t Qinvden, 
-                      const fmpz * Q, const fmpz_t Qden, slong n)
+                      const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
-    _fmpq_poly_inv_series_newton(Qinv, Qinvden, Q, Qden, n);
+    _fmpq_poly_inv_series_newton(Qinv, Qinvden, Q, Qden, Qlen, n);
 }
 
 static __inline__ void 

@@ -90,7 +90,7 @@ _fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,
         fmpz_set(Qinv + 1, Qden);
         fmpz_set(dens + 1, Q + 1);
 
-        _fmpq_poly_inv_series(R, Rden, Q + 1, Qden, n - 1);
+        _fmpq_poly_inv_series(R, Rden, Q + 1, Qden, n - 1, n - 1);
         _fmpq_poly_canonicalise(R, Rden, n - 1);
 
         _fmpz_vec_set(S, R, n - 1);
