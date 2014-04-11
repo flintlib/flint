@@ -32,19 +32,15 @@
 
 void
 _fmpq_poly_revert_series(fmpz * Qinv, fmpz_t den,
-        const fmpz * Q, const fmpz_t Qden, slong n)
+        const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
-    _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, n);
+    _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, Qlen, n);
 }
-
 
 void
 fmpq_poly_revert_series(fmpq_poly_t res,
             const fmpq_poly_t poly, slong n)
 {
-    fmpz *copy;
-    int alloc;
-
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
@@ -59,41 +55,22 @@ fmpq_poly_revert_series(fmpq_poly_t res,
         return;
     }
 
-    if (poly->length >= n)
-    {
-        copy = poly->coeffs;
-        alloc = 0;
-    }
-    else
-    {
-        slong i;
-        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly->length; i++)
-            copy[i] = poly->coeffs[i];
-        for ( ; i < n; i++)
-            copy[i] = 0;
-        alloc = 1;
-    }
-
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
         _fmpq_poly_revert_series(res->coeffs,
-                res->den, copy, poly->den, n);
+                res->den, poly->coeffs, poly->den, poly->length, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
         _fmpq_poly_revert_series(t->coeffs,
-                t->den, copy, poly->den, n);
+                t->den, poly->coeffs, poly->den, poly->length, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
-
-    if (alloc)
-        flint_free(copy);
 }

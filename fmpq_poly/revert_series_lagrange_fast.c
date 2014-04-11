@@ -59,7 +59,7 @@ _set_vec(fmpz * rnum, fmpz_t den,
 
 void
 _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
-                                    const fmpz * Q, const fmpz_t Qden, slong n)
+                        const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
     slong i, j, k, m;
     fmpz *R, *Rden, *S, *T, *dens, *tmp;
@@ -67,20 +67,23 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
 
     if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
     {
-        _fmpz_poly_revert_series(Qinv, Q, n, n);
+        _fmpz_poly_revert_series(Qinv, Q, Qlen, n);
         fmpz_one(den);
         return;
     }
 
-    if (n <= 2)
+    if (Qlen <= 2)
     {
         fmpz_zero(Qinv);
-        if (n == 2)
+
+        if (Qlen == 2)
         {
             fmpz_set(Qinv + 1, Qden);
             fmpz_set(den, Q + 1);
             _fmpq_poly_canonicalise(Qinv, den, 2);
         }
+
+        _fmpz_vec_zero(Qinv + 2, n - 2);
         return;
     }
 
@@ -98,7 +101,7 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
     fmpz_zero(Qinv);
     fmpz_one(dens);
 
-    _fmpq_poly_inv_series(Ri(1), Rdeni(1), Q + 1, Qden, n - 1, n - 1);
+    _fmpq_poly_inv_series(Ri(1), Rdeni(1), Q + 1, Qden, Qlen - 1, n - 1);
     _fmpq_poly_canonicalise(Ri(1), Rdeni(1), n - 1);
 
     for (i = 2; i <= m; i++)
@@ -161,9 +164,6 @@ void
 fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res,
             const fmpq_poly_t poly, slong n)
 {
-    fmpz *copy;
-    int alloc;
-
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
@@ -178,41 +178,22 @@ fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res,
         return;
     }
 
-    if (poly->length >= n)
-    {
-        copy = poly->coeffs;
-        alloc = 0;
-    }
-    else
-    {
-        slong i;
-        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly->length; i++)
-            copy[i] = poly->coeffs[i];
-        for ( ; i < n; i++)
-            copy[i] = 0;
-        alloc = 1;
-    }
-
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
         _fmpq_poly_revert_series_lagrange_fast(res->coeffs,
-                res->den, copy, poly->den, n);
+                res->den, poly->coeffs, poly->den, poly->length, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
         _fmpq_poly_revert_series_lagrange_fast(t->coeffs,
-                t->den, copy, poly->den, n);
+                t->den, poly->coeffs, poly->den, poly->length, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
-
-    if (alloc)
-        flint_free(copy);
 }

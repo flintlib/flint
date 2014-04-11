@@ -1417,11 +1417,10 @@ void fmpq_poly_compose_series(fmpq_poly_t res,
 *******************************************************************************
 
 void _fmpq_poly_revert_series_lagrange(fmpz * res, fmpz_t den,
-    const fmpz * poly1, const fmpz_t den1, slong n)
+    const fmpz * poly1, const fmpz_t den1, slong len1, slong n)
 
     Sets \code{(res, den)} to the power series reversion of
-    \code{(poly1, den1)} modulo $x^n$, where the input has
-    length $n$ (possibly being zero-padded).
+    \code{(poly1, den1, len1)} modulo $x^n$.
 
     The constant term of \code{poly2} is required to be zero and
     the linear term is required to be nonzero. Assumes that $n > 0$.
@@ -1443,11 +1442,10 @@ void fmpq_poly_revert_series_lagrange(fmpq_poly_t res,
     used when the reversion can be performed over the integers.
 
 void _fmpq_poly_revert_series_lagrange_fast(fmpz * res, fmpz_t den,
-        const fmpz * poly1, const fmpz_t den1, slong n)
+        const fmpz * poly1, const fmpz_t den1, slong len1, slong n)
 
     Sets \code{(res, den)} to the power series reversion of
-    \code{(poly1, den1)} modulo $x^n$, where the input has
-    length $n$ (possibly being zero-padded).
+    \code{(poly1, den1, len1)} modulo $x^n$.
 
     The constant term of \code{poly2} is required to be zero and
     the linear term is required to be nonzero. Assumes that $n > 0$.
@@ -1471,11 +1469,10 @@ void fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res,
     used when the reversion can be performed over the integers.
 
 void _fmpq_poly_revert_series_newton(fmpz * res, fmpz_t den,
-        const fmpz * poly1, const fmpz_t den1, slong n)
+        const fmpz * poly1, const fmpz_t den1, slong len1, slong n)
 
     Sets \code{(res, den)} to the power series reversion of
-    \code{(poly1, den1)} modulo $x^n$, where the input has
-    length $n$ (possibly being zero-padded).
+    \code{(poly1, den1, len1)} modulo $x^n$.
 
     The constant term of \code{poly2} is required to be zero and
     the linear term is required to be nonzero. Assumes that $n > 0$.
@@ -1497,11 +1494,10 @@ void fmpq_poly_revert_series_newton(fmpq_poly_t res,
     used when the reversion can be performed over the integers.
 
 void _fmpq_poly_revert_series(fmpz * res, fmpz_t den,
-        const fmpz * poly1, const fmpz_t den1, slong n)
+        const fmpz * poly1, const fmpz_t den1, slong len1, slong n)
 
     Sets \code{(res, den)} to the power series reversion of
-    \code{(poly1, den1)} modulo $x^n$, where the input has
-    length $n$ (possibly being zero-padded).
+    \code{(poly1, den1, len1)} modulo $x^n$.
 
     The constant term of \code{poly2} is required to be zero and
     the linear term is required to be nonzero. Assumes that $n > 0$.
