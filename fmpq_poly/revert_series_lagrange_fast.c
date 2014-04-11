@@ -65,13 +65,6 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
     fmpz *R, *Rden, *S, *T, *dens, *tmp;
     fmpz_t Sden, Tden, t;
 
-    if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
-    {
-        _fmpz_poly_revert_series(Qinv, Q, Qlen, n);
-        fmpz_one(den);
-        return;
-    }
-
     if (Qlen <= 2)
     {
         fmpz_zero(Qinv);

@@ -62,12 +62,7 @@ _fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,
 
     Qlen = FLINT_MIN(Qlen, n);
 
-    if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
-    {
-        _fmpz_poly_revert_series(Qinv, Q, Qlen, n);
-        fmpz_one(den);
-    }
-    else if (Qlen <= 2)
+    if (Qlen <= 2)
     {
         fmpz_zero(Qinv);
 

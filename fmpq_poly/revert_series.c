@@ -34,6 +34,13 @@ void
 _fmpq_poly_revert_series(fmpz * Qinv, fmpz_t den,
         const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
+    if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
+    {
+        _fmpz_poly_revert_series(Qinv, Q, Qlen, n);
+        fmpz_one(den);
+        return;
+    }
+
     _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, Qlen, n);
 }
 
