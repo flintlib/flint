@@ -48,7 +48,7 @@ _fmpq_poly_atanh_series(fmpz * g, fmpz_t gden,
     _fmpz_vec_neg(u, u, n);
     fmpz_set(u, uden);  /* u += 1 */
     _fmpq_poly_derivative(t, tden, h, hden, n);
-    _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
+    _fmpq_poly_div_series(g, gden, t, tden, n, u, uden, n, n);
     _fmpq_poly_integral(g, gden, g, gden, n);
 
     _fmpz_vec_clear(t, n);

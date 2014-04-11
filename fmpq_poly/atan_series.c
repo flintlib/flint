@@ -47,7 +47,7 @@ _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
     _fmpq_poly_mullow(u, uden, h, hden, n, h, hden, n, n);
     fmpz_set(u, uden);  /* u += 1 */
     _fmpq_poly_derivative(t, tden, h, hden, n);
-    _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
+    _fmpq_poly_div_series(g, gden, t, tden, n, u, uden, n, n);
     _fmpq_poly_integral(g, gden, g, gden, n);
 
     _fmpz_vec_clear(t, n);

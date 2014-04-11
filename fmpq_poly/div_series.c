@@ -31,26 +31,39 @@
 #include "fmpq_poly.h"
 
 void 
-_fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
-                      const fmpz * A, const fmpz_t denA, 
-                      const fmpz * B, const fmpz_t denB, slong n)
+_fmpq_poly_div_series(fmpz * Q, fmpz_t Qden, 
+                      const fmpz * A, const fmpz_t Aden, slong Alen,
+                      const fmpz * B, const fmpz_t Bden, slong Blen, slong n)
 {
-    fmpz * C = _fmpz_vec_init(n + 1);
-    fmpz * denC = C + n;
+    fmpz * C;
+    fmpz_t Cden;
 
-    _fmpq_poly_inv_series(C, denC, B, denB, n, n);
-    _fmpq_poly_mullow(Q, denQ, A, denA, n, C, denC, n, n);
+    C = _fmpz_vec_init(n);
+    fmpz_init(Cden);
 
-    _fmpz_vec_clear(C, n + 1);
+    _fmpq_poly_inv_series(C, Cden, B, Bden, Blen, n);
+    _fmpq_poly_mullow(Q, Qden, A, Aden, Alen, C, Cden, n, n);
+
+    _fmpz_vec_clear(C, n);
+    fmpz_clear(Cden);
 }
 
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, slong n)
 {
-    fmpz *a, *b;
-    ulong flags = UWORD(0);  /* 2^0 for a, 2^1 for b */
+    if (A->length == 0)
+    {
+        fmpq_poly_zero(Q);
+        return;
+    }
 
-    if (Q == A)
+    if (B->length == 0)
+    {
+        flint_printf("Exception (fmpq_poly_div_series). Division by zero.\n");
+        abort();
+    }
+
+    if (Q == A || Q == B)
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
@@ -61,43 +74,10 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
     }
 
     fmpq_poly_fit_length(Q, n);
-
-    if (A->length >= n)
-    {
-        a = A->coeffs;
-    }
-    else
-    {
-        slong i;
-        a = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < A->length; i++)
-            a[i] = A->coeffs[i];
-        flint_mpn_zero((mp_ptr) a + A->length, n - A->length);
-        flags |= UWORD(1);
-    }
-
-    if (B->length >= n)
-    {
-        b = B->coeffs;
-    }
-    else
-    {
-        slong i;
-        b = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < B->length; i++)
-            b[i] = B->coeffs[i];
-        flint_mpn_zero((mp_ptr) b + B->length, n - B->length);
-        flags |= UWORD(2);
-    }
-
-    _fmpq_poly_div_series(Q->coeffs, Q->den, a, A->den, b, B->den, n);
+    _fmpq_poly_div_series(Q->coeffs, Q->den, A->coeffs, A->den, A->length,
+                            B->coeffs, B->den, B->length, n);
 
     _fmpq_poly_set_length(Q, n);
     fmpq_poly_canonicalise(Q);
-
-    if ((flags & UWORD(1)))
-        flint_free(a);
-    if ((flags & UWORD(2)))
-        flint_free(b);
 }
 

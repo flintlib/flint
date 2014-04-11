@@ -54,7 +54,7 @@ _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
     fmpz_set(t, tden);
     fmpz_set(u, uden);
 
-    _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
+    _fmpq_poly_div_series(g, gden, t, tden, n, u, uden, n, n);
     _fmpq_poly_canonicalise(g, gden, n);
 
     _fmpz_vec_clear(t, n);

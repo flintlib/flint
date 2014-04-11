@@ -50,7 +50,7 @@ _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden,
     fmpz_set(tden, uden);
     fmpz_zero(t);               /* t[0] = 0 */
     fmpz_mul_ui(u, uden, UWORD(2));  /* u[0] = 2 */
-    _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
+    _fmpq_poly_div_series(g, gden, t, tden, n, u, uden, n, n);
     _fmpq_poly_canonicalise(g, gden, n);
 
     _fmpz_vec_clear(t, n);

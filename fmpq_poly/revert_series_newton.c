@@ -81,7 +81,7 @@ _fmpq_poly_revert_series_newton(fmpz * Qinv, fmpz_t den,
             _fmpq_poly_compose_series(T, Tden, Q, Qden, k, Qinv, den, k, k);
             _fmpq_poly_derivative(U, Uden, T, Tden, k); fmpz_zero(U + k - 1);
             fmpz_zero(T + 1);
-            _fmpq_poly_div_series(V, Vden, T, Tden, U, Uden, k);
+            _fmpq_poly_div_series(V, Vden, T, Tden, k, U, Uden, k, k);
             _fmpq_poly_canonicalise(V, Vden, k);
             _fmpq_poly_derivative(T, Tden, Qinv, den, k);
             _fmpq_poly_mullow(U, Uden, V, Vden, k, T, Tden, k, k);

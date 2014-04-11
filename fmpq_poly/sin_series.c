@@ -51,7 +51,7 @@ _fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
     fmpz_set(u, uden);
     _fmpq_poly_canonicalise(u, uden, n);
 
-    _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
+    _fmpq_poly_div_series(g, gden, t, tden, n, u, uden, n, n);
     _fmpq_poly_scalar_mul_ui(g, gden, g, gden, n, UWORD(2));
     _fmpq_poly_canonicalise(g, gden, n);
 

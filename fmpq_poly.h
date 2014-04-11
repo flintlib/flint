@@ -428,8 +428,8 @@ fmpq_poly_inv_series(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
 }
 
 void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
-                           const fmpz * A, const fmpz_t denA, 
-                           const fmpz * B, const fmpz_t denB, slong n);
+        const fmpz * A, const fmpz_t denA, slong lenA,
+        const fmpz * B, const fmpz_t denB, slong lenB, slong n);
 
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, slong n);

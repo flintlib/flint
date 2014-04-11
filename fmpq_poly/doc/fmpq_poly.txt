@@ -856,23 +856,22 @@ void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden,
     Assumes that $n \geq 1$ and that \code{poly} has non-zero constant term.
     Does not support aliasing.
 
-
 void fmpq_poly_inv_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     Computes the first $n$ terms of the inverse power series of \code{poly}, 
     assuming that \code{poly} has non-zero constant term and $n \geq 1$.
 
 void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
-                           const fmpz * A, const fmpz_t denA, 
-                           const fmpz * B, const fmpz_t denB, slong n)
+                       const fmpz * A, const fmpz_t denA, slong lenA,
+                       const fmpz * B, const fmpz_t denB, slong lenB, slong n)
 
-    Divides \code{(A, denA, n)} by \code{(B, denB, n)} as power series 
-    over $\Q$, assuming $B$ has non-zero constant term and $n \geq 1$.
+    Divides \code{(A, denA, lenA)} by \code{(B, denB, lenB)} as power series 
+    over $\Q$, assuming $B$ has non-zero constant term and that
+    all lengths are positive.
 
-    Supports no aliasing other than that of \code{(Q, denQ, n)} 
-    and \code{(B, denB, n)}.
+    Aliasing is not supported.
 
-    This function does not ensure that the numerator and denominator 
+    This function ensures that the numerator and denominator 
     are coprime on exit.
 
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
