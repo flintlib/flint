@@ -493,7 +493,7 @@ void _fmpq_poly_log_series(fmpz * g, fmpz_t gden,
 void fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, slong n);
 
 void _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
-                            const fmpz * h, const fmpz_t hden, slong n);
+                        const fmpz * h, const fmpz_t hden, slong hlen, slong n);
 
 void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 

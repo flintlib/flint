@@ -45,7 +45,7 @@ _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden,
 
     /* tanh(x) = (exp(2x)-1)/(exp(2x)+1) */
     _fmpq_poly_scalar_mul_ui(t, tden, h, hden, n, UWORD(2));
-    _fmpq_poly_exp_series(u, uden, t, tden, n);
+    _fmpq_poly_exp_series(u, uden, t, tden, n, n);
     _fmpz_vec_set(t, u, n);
     fmpz_set(tden, uden);
     fmpz_zero(t);               /* t[0] = 0 */

@@ -40,7 +40,7 @@ _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden,
     fmpz_init(tden);
 
     /* cosh(x) = (exp(x)+exp(-x))/2 */
-    _fmpq_poly_exp_series(g, gden, h, hden, n);
+    _fmpq_poly_exp_series(g, gden, h, hden, n, n);
     _fmpq_poly_inv_series(t, tden, g, gden, n, n);
     _fmpq_poly_add(g, gden, g, gden, n, t, tden, n);
     _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, UWORD(2));
