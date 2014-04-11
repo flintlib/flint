@@ -31,7 +31,7 @@
 
 void
 _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, slong n)
+                       const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     fmpz * t;
     fmpz_t tden;
@@ -40,7 +40,7 @@ _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden,
     fmpz_init(tden);
 
     /* cosh(x) = (exp(x)+exp(-x))/2 */
-    _fmpq_poly_exp_series(g, gden, h, hden, n, n);
+    _fmpq_poly_exp_series(g, gden, h, hden, hlen, n);
     _fmpq_poly_inv_series(t, tden, g, gden, n, n);
     _fmpq_poly_add(g, gden, g, gden, n, t, tden, n);
     _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, UWORD(2));
@@ -52,61 +52,40 @@ _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden,
 
 void fmpq_poly_cosh_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
-    fmpz *copy;
-    int alloc;
-
-    if (poly->length == 0)
+    if (n == 0)
     {
-        fmpq_poly_set_ui(res, UWORD(1));
+        fmpq_poly_zero(res);
+        return;
+    }
+
+    if (poly->length == 0 || n == 1)
+    {
+        fmpq_poly_one(res);
         return;
     }
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_cosh_series): Constant term != 0.\n");
+        flint_printf("Exception (fmpq_poly_cosh_series). Constant term != 0.\n");
         abort();
-    }
-
-    if (n < 2)
-    {
-        if (n == 0) fmpq_poly_zero(res);
-        if (n == 1) fmpq_poly_set_ui(res, UWORD(1));
-        return;
-    }
-
-    if (poly->length >= n)
-    {
-        copy = poly->coeffs;
-        alloc = 0;
-    }
-    else
-    {
-        slong i;
-        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly->length; i++)
-            copy[i] = poly->coeffs[i];
-        for ( ; i < n; i++)
-            copy[i] = 0;
-        alloc = 1;
     }
 
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_cosh_series(res->coeffs, res->den, copy, poly->den, n);
+        _fmpq_poly_cosh_series(res->coeffs, res->den,
+            poly->coeffs, poly->den, poly->length, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_cosh_series(t->coeffs, t->den, copy, poly->den, n);
+        _fmpq_poly_cosh_series(t->coeffs, t->den,
+            poly->coeffs, poly->den, poly->length, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
-
-    if (alloc)
-        flint_free(copy);
 }

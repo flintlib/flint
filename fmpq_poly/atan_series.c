@@ -31,12 +31,21 @@
 
 void
 _fmpq_poly_atan_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, slong n)
+                       const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     fmpz * t;
     fmpz * u;
     fmpz_t tden;
     fmpz_t uden;
+
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        _fmpz_vec_zero(g, n);
+        fmpz_one(gden);
+        return;
+    }
 
     t = _fmpz_vec_init(n);
     u = _fmpz_vec_init(n);
@@ -44,10 +53,10 @@ _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* atan(h(x)) = integral(h'(x)/(1+h(x)^2)) */
-    _fmpq_poly_mullow(u, uden, h, hden, n, h, hden, n, n);
+    _fmpq_poly_mullow(u, uden, h, hden, hlen, h, hden, hlen, n);
     fmpz_set(u, uden);  /* u += 1 */
-    _fmpq_poly_derivative(t, tden, h, hden, n);
-    _fmpq_poly_div_series(g, gden, t, tden, n, u, uden, n, n);
+    _fmpq_poly_derivative(t, tden, h, hden, hlen);
+    _fmpq_poly_div_series(g, gden, t, tden, hlen - 1, u, uden, n, n);
     _fmpq_poly_integral(g, gden, g, gden, n);
 
     _fmpz_vec_clear(t, n);
@@ -56,42 +65,34 @@ _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
     fmpz_clear(uden);
 }
 
-
-void
-fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
+void fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
-    fmpz * f_coeffs;
-    slong flen = f->length;
-
-    if (flen && !fmpz_is_zero(f->coeffs))
+    if (poly->length && !fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_atan_series): Constant term != 0.\n");
+        flint_printf("Exception (fmpq_poly_atan_series). Constant term != 0.\n");
         abort();
     }
 
-    if (flen == 0 || n < 2)
+    if (poly->length == 0 || n < 2)
     {
         fmpq_poly_zero(res);
         return;
     }
 
-    fmpq_poly_fit_length(res, n);
-
-    if (flen < n)
+    if (res != poly)
     {
-        f_coeffs = _fmpz_vec_init(n);
-        _fmpz_vec_set(f_coeffs, f->coeffs, flen);
+        fmpq_poly_fit_length(res, n);
+        _fmpq_poly_atan_series(res->coeffs, res->den,
+            poly->coeffs, poly->den, poly->length, n);
     }
     else
     {
-        f_coeffs = f->coeffs;
-    }
-
-    _fmpq_poly_atan_series(res->coeffs, res->den, f_coeffs, f->den, n);
-
-    if (flen < n)
-    {
-        _fmpz_vec_clear(f_coeffs, n);
+        fmpq_poly_t t;
+        fmpq_poly_init2(t, n);
+        _fmpq_poly_atan_series(t->coeffs, t->den,
+            poly->coeffs, poly->den, poly->length, n);
+        fmpq_poly_swap(res, t);
+        fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(res, n);
