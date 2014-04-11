@@ -55,7 +55,7 @@ _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
     fmpz_init(tden);
     fmpz_init(uden);
 
-    _fmpq_poly_log_series(t, tden, g, gden, n);
+    _fmpq_poly_log_series(t, tden, g, gden, n, n);
     _fmpq_poly_sub(t, tden, t, tden, n, h, hden, n);
     /* TODO: half of product is redundant! */
     _fmpq_poly_mullow(u, uden, g, gden, n, t, tden, n, n);

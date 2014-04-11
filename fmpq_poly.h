@@ -488,7 +488,7 @@ void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 /*  Transcendental functions  ************************************************/
 
 void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * f, const fmpz_t fden, slong n);
+                       const fmpz * f, const fmpz_t fden, slong flen, slong n);
 
 void fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, slong n);
 
