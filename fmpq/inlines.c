@@ -21,6 +21,7 @@
 
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2017 Daniel Fabian
 
 ******************************************************************************/
 
