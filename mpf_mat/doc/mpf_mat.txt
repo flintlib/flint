@@ -1,0 +1,161 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Andy Novocin
+    Copyright (C) 2014 Abhinav Baid
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec)
+
+    Initialises a matrix with the given number of rows and columns and the
+    given precision for use. The precision is at least the precision of the
+    entries.
+
+void mpf_mat_clear(mpf_mat_t mat)
+ 
+    Clears the given matrix.
+
+*******************************************************************************
+
+    Basic assignment and manipulation
+
+*******************************************************************************
+
+void mpf_mat_set(mpf_mat_t mat1, const mpf_mat_t mat2)
+
+    Sets \code{mat1} to a copy of \code{mat2}. The dimensions of 
+    \code{mat1} and \code{mat2} must be the same.
+
+void mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2)
+
+    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2} 
+    are allowed to be different.
+
+double mpf_mat_entry(mpf_mat_t mat, slong i, slong j)
+
+    Returns the entry of \code{mat} at row $i$ and column $j$.
+    Both $i$ and $j$ must not exceed the dimensions of the matrix.
+    This function is implemented as a macro.
+
+void mpf_mat_zero(mpf_mat_t mat)
+
+    Sets all entries of \code{mat} to 0.
+
+void mpf_mat_one(mpf_mat_t mat)
+
+    Sets \code{mat} to the unit matrix, having ones on the main diagonal
+    and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
+    truncation of a unit matrix.
+
+*******************************************************************************
+
+    Random matrix generation
+
+*******************************************************************************
+
+void mpf_mat_randtest(mpf_mat_t mat, flint_ranmpf_t state, mp_bitcnt_t bits)
+
+    Sets the entries of \code{mat} to random numbers in the 
+    interval $[0, 1)$ with \code{bits} significant bits in the mantissa or less if
+    their precision is smaller.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+void mpf_mat_print(const mpf_mat_t mat)
+
+    Prints the given matrix to the stream \code{stdout}.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int mpf_mat_equal(const mpf_mat_t mat1, const mpf_mat_t mat2)
+
+    Returns a non-zero value if \code{mat1} and \code{mat2} have 
+    the same dimensions and entries, and zero otherwise.
+    
+int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, mp_bitcnt_t bits)
+
+    Returns a non-zero value if \code{mat1} and \code{mat2} have 
+    the same dimensions and the first \code{bits} bits of their entries
+    are equal, and zero otherwise.
+
+int mpf_mat_is_zero(const mpf_mat_t mat)
+
+    Returns a non-zero value if all entries \code{mat} are zero, and
+    otherwise returns zero.
+
+int mpf_mat_is_empty(const mpf_mat_t mat)
+
+    Returns a non-zero value if the number of rows or the number of
+    columns in \code{mat} is zero, and otherwise returns
+    zero.
+
+int mpf_mat_is_square(const mpf_mat_t mat)
+
+    Returns a non-zero value if the number of rows is equal to the
+    number of columns in \code{mat}, and otherwise returns zero.
+
+*******************************************************************************
+
+    Matrix multiplication
+
+*******************************************************************************
+
+void mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B)
+
+    Sets \code{C} to the matrix product $C = A B$. The matrices must have
+    compatible dimensions for matrix multiplication (an exception is raised
+    otherwise). Aliasing is allowed.
+
+*******************************************************************************
+
+    Gram-Schmidt Orthogonalisation and QR Decomposition
+
+*******************************************************************************
+
+void mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
+
+    Takes a subset of $R^m$ $S = {a_1, a_2, \ldots ,a_n}$ (as the columns of
+    a $m x n$ matrix \code{A}) and generates an orthonormal set
+    $S^' = {b_1, b_2, \ldots ,b_n}$ (as the columns of the $m x n$ matrix 
+    \code{B}) that spans the same subspace of $R^m$ as $S$.
+    
+void mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
+
+    Computes the $QR$ decomposition of a matrix \code{A} using the Gram–Schmidt
+    process. (Sets \code{Q} and \code{R} such that $A = QR$ where \code{R} is
+    an upper triangular matrix and \code{Q} is an orthogonal matrix.)
+

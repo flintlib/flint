@@ -24,10 +24,10 @@
 
 ******************************************************************************/
 
-#include "d_mat.h"
+#include "mpf_mat.h"
 
 void
-d_mat_print(const d_mat_t mat)
+mpf_mat_print(const mpf_mat_t mat)
 {
     long i, j;
 
@@ -37,7 +37,7 @@ d_mat_print(const d_mat_t mat)
         flint_printf("[");
         for (j = 0; j < mat->c; j++)
         {
-            flint_printf("%E", d_mat_entry(mat, i, j));
+            mpf_out_str(stdout, 10, 0, mpf_mat_entry(mat, i, j));
             if (j < mat->c - 1)
                 flint_printf(" ");
         }
