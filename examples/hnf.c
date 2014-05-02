@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
         for (j = 0; j < 2; j++)
             fmpz_set_ui(fmpz_mat_entry(A, i, j), (i+1)*(i + j));
 
-    fmpz_mat_hnf(B,A);
+    fmpz_mat_hnf_classical(B,A);
 
     fmpz_mat_print_pretty(A);
     flint_printf("\n");
