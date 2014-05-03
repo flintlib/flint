@@ -38,21 +38,77 @@ static pthread_once_t register_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t register_lock;
 #endif
 
+static __inline__ void * __default_flint_malloc(size_t size)
+{
+#if HAVE_GC
+    return GC_malloc(size);
+#else
+    return malloc(size);
+#endif
+}
+
+static __inline__ void * __default_flint_calloc(size_t num, size_t size)
+{
+#if HAVE_GC
+    return GC_malloc(num*size);
+#else
+    return calloc(num, size);
+#endif
+}
+
+static __inline__ void * __default_flint_realloc(void * ptr, size_t size)
+{
+#if HAVE_GC
+    return GC_realloc(ptr, size);
+#else
+    return realloc(ptr, size);
+#endif
+}
+
+static __inline__ void __default_flint_free(void * ptr)
+{
+#if !HAVE_GC
+    free(ptr);
+#endif
+}
+
+static void * (*__flint_malloc) (size_t size) = __default_flint_malloc;
+static void * (*__flint_realloc) (void * ptr, size_t size) = __default_flint_realloc;
+static void * (*__flint_calloc) (size_t num, size_t size) = __default_flint_calloc;
+static void (*__flint_free) (void * ptr) = __default_flint_free;
+
 static void flint_memory_error()
 {
     flint_printf("Exception (FLINT memory_manager). Unable to allocate memory.\n");
     abort();
 }
 
+void flint_set_memory_functions (
+    void * (*flint_malloc) (size_t size),
+    void * (*flint_realloc) (void * ptr, size_t size),
+    void * (*flint_calloc) (size_t num, size_t size),
+    void (*flint_free) (void * ptr))
+{
+  if (flint_malloc == 0)
+    flint_malloc = __default_flint_malloc;
+  if (flint_realloc == 0)
+    flint_realloc = __default_flint_realloc;
+  if (flint_calloc == 0)
+    flint_calloc = __default_flint_calloc;
+  if (flint_free == 0)
+    flint_free = __default_flint_free;
+
+  __flint_malloc = flint_malloc;
+  __flint_realloc = flint_realloc;
+  __flint_calloc = flint_calloc;
+  __flint_free = flint_free;
+}
+
 void * flint_malloc(size_t size)
 {
-   void * ptr;
+    void * ptr;
 
-#if HAVE_GC
-   ptr = GC_malloc(size);
-#else
-   ptr = malloc(size);
-#endif
+    ptr = __flint_malloc(size);
 
     if (ptr == NULL)
         flint_memory_error();
@@ -64,11 +120,7 @@ void * flint_realloc(void * ptr, size_t size)
 {
     void * ptr2;
 
-#if HAVE_GC
-    ptr2 = GC_realloc(ptr, size);
-#else
-    ptr2 = realloc(ptr, size);
-#endif
+    ptr2 = __flint_realloc(ptr, size);
 
     if (ptr2 == NULL)
         flint_memory_error();
@@ -78,13 +130,9 @@ void * flint_realloc(void * ptr, size_t size)
 
 void * flint_calloc(size_t num, size_t size)
 {
-   void * ptr;
+    void * ptr;
 
-#if HAVE_GC
-    ptr = GC_malloc(num*size);
-#else
-    ptr = calloc(num, size);
-#endif
+    ptr = __flint_calloc(num, size);
 
     if (ptr == NULL)
         flint_memory_error();
@@ -94,9 +142,7 @@ void * flint_calloc(size_t num, size_t size)
 
 void flint_free(void * ptr)
 {
-#if !HAVE_GC
-    free(ptr);
-#endif
+    __flint_free(ptr);
 }
 
 
