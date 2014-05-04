@@ -840,6 +840,11 @@ by \code{flint_cleanup()} by passing a pointer
 to a function with signature \code{void cleanup_function(void)}
 to \code{flint_register_cleanup_function()}.
 
+Additionally, one can register custom allocation and freeing functions, by calling the
+\code{flint_set_memory_functions} function. This function takes 4 function pointers to 
+\code{flint_malloc}, \code{flint_realloc}, \code{flint_calloc} and \code{flint_free}, respectively.
+ If a null pointer is passed in, the default function is called.
+
 \chapter{Temporary allocation}
 
 FLINT allows for temporary allocation of memory using \code{alloca}
