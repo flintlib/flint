@@ -434,7 +434,7 @@ slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
 void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
 
-    Takes a subset of $Q^m$ $S = {a_1, a_2, \ldots ,a_n}$ (as the columns of
+    Takes a subset of $Q^m$ $S = \{a_1, a_2, \ldots, a_n\}$ (as the columns of
     a $m x n$ matrix \code{A}) and generates an orthogonal set
-    $S^' = {b_1, b_2, \ldots ,b_n}$ (as the columns of the $m x n$ matrix 
+    $S^{'} = \{b_1, b_2, \ldots, b_n\}$ (as the columns of the $m x n$ matrix 
     \code{B}) that spans the same subspace of $Q^m$ as $S$.

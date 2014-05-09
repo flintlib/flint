@@ -30,7 +30,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-
+ 
 fmpz * __new_fmpz()
 {
     return flint_calloc(sizeof(fmpz), 1);
@@ -70,4 +70,28 @@ void __fmpz_set_ui(fmpz_t f, ulong val)
     }
 }
 
+void __fmpz_init(fmpz_t f)
+{
+	(*f) = WORD(0);
+}
 
+void __fmpz_init_set_ui(fmpz_t f, ulong g)
+{
+    if (g <= COEFF_MAX)
+    {
+        *f = g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        flint_mpz_set_ui(ptr, g);
+    }
+}
+
+void __fmpz_clear(fmpz_t f)
+{
+	_fmpz_demote(f);
+}
