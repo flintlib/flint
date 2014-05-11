@@ -19,70 +19,78 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2007, 2008 William Hart
-    Copyright (C) 2008 Peter Shrimpton
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
+#include "fmpz_poly.h"
+#include "fmpz.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
+#include "arith.h"
+
+void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+{
+    slong i = 0;
+
+    fmpz_t t;
+    fmpz_poly_t p;
+    fmpz_init(t);
+    fmpz_poly_init(p);
+    fmpz_set_ui(t, n);
+    arith_divisors(p, t);
+
+    fmpz_zero(x);
+    for (i = 0; i < p->length; i++)
+    {
+        fmpz_poly_get_coeff_fmpz(t, p, i);
+        fmpz_pow_ui(t, t, k);
+        fmpz_add(x, x, t);
+    }
+
+    fmpz_clear(t);
+    fmpz_poly_clear(p);
+}
 
 int main(void)
 {
-    mp_limb_t n;
-    mp_limb_t res1, res2;
-    slong i, rep;
-    mpz_t mpz_n;
+    fmpz_t m, a, b;
+    slong n, k;
+
     FLINT_TEST_INIT(state);
-    
-    flint_printf("nextprime....");
+
+    flint_printf("divisor_sigma....");
     fflush(stdout);
 
-    
+    fmpz_init(a);
+    fmpz_init(b);
+    fmpz_init(m);
 
-    if (n_nextprime(0, 0) != 2)
+    for (n = 0; n < 5000; n++)
     {
-        flint_printf("FAIL: expected n_nextprime(0) = 2");
-        abort();
-    }
-
-    if (n_nextprime(UWORD_MAX_PRIME - 1, 0) != UWORD_MAX_PRIME)
-    {
-        flint_printf("FAIL: expected n_nextprime(UWORD_MAX_PRIME-1) = UWORD_MAX_PRIME");
-        abort();
-    }
-
-    mpz_init(mpz_n);
-
-    for (rep = 0; rep < 10000 * flint_test_multiplier(); rep++)
-    {
-        ulong bits = n_randint(state, FLINT_D_BITS-1)+1;
-        n = n_randtest(state) % ((UWORD(1)<<bits) - UWORD(1)) + 1; 
-        
-        flint_mpz_set_ui(mpz_n, n);
-
-        mpz_nextprime(mpz_n, mpz_n);
-        n = n_nextprime(n, 0);
-
-        res1 = n;
-        res2 = flint_mpz_get_ui(mpz_n);
-
-        if (res1 != res2)
+        for (k = 0; k < 10; k++)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("%wu, %wu\n", res1, res2); 
-            abort();
+            fmpz_set_ui(m, n);
+            fmpz_divisor_sigma(a, m, k);
+            fmpz_sigma_naive(b, n, k);
+            if (!fmpz_equal(a, b))
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("wrong value for n=%wd, k=%wd\n", n, k);
+                abort();
+            }
         }
     }
 
-    mpz_clear(mpz_n); 
+    fmpz_clear(a);
+    fmpz_clear(b);
+    fmpz_clear(m);
 
     FLINT_TEST_CLEANUP(state);
-    
     flint_printf("PASS\n");
     return 0;
 }
+

@@ -19,50 +19,55 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005-2009 Damien Stehle
-    Copyright (C) 2007 David Cade
-    Copyright (C) 2010 William Hart
-   
+    Copyright (C) 2011 Fredrik Johansson
+
 ******************************************************************************/
 
-#include <math.h>
-#include "fmpz_mat.h"
+#include "fmpz_poly.h"
 
-void
-fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
+static const mp_limb_t known_values[] =
 {
-    const slong c = mat->c, r = mat->r, d = r;
+    UWORD(2147483629),
+    UWORD(1073742093),
+    UWORD(1342248677),
+    UWORD(3319936736),
+    UWORD(2947821228),
+    UWORD(1019513834),
+    UWORD(3324951530),
+    UWORD(1995039408),
+    UWORD(3505683295),
+    UWORD(3567639420),
+    UWORD(394942914)
+};
 
-    slong i, j;
-    fmpz_t tmp;
+int main()
+{
+    fmpz_poly_t S;
+    mp_limb_t r;
+    slong n;
 
-    if (c != r)
+    FLINT_TEST_INIT(state);
+
+    flint_printf("swinnerton_dyer....");
+    fflush(stdout);
+
+    for (n = 0; n <= 10; n++)
     {
-        flint_printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
-        abort();
-    }
+        fmpz_poly_init(S);
+        fmpz_poly_swinnerton_dyer(S, n);
+        r = fmpz_poly_evaluate_mod(S, UWORD(2147483629), UWORD(4294967291));
 
-    fmpz_init(tmp);
-
-    for (i = 0; i < d; i++)
-    {
-        mp_bitcnt_t bits = (mp_bitcnt_t) pow((double) (2 * d - i), alpha);
-
-        fmpz_one(tmp);
-        fmpz_mul_2exp(tmp, tmp, bits);
-        fmpz_sub_ui(tmp, tmp, 1);
-        fmpz_randm(mat->rows[i] + i, state, tmp);
-        fmpz_add_ui(mat->rows[i] + i, mat->rows[i] + i, 2);
-        fmpz_fdiv_q_2exp(mat->rows[i] + i, mat->rows[i] + i, 1);
-
-        for (j = i + 1; j < d; j++)
+        if (r != known_values[n])
         {
-            fmpz_randm(mat->rows[j] + i, state, tmp);
-            if (n_randint(state, 2))
-                fmpz_neg(mat->rows[j] + i, mat->rows[j] + i);
-            fmpz_zero(mat->rows[i] + j);
+            flint_printf("ERROR: wrong evaluation of S_%wd\n", n);
+            abort();
         }
+
+        fmpz_poly_clear(S);
     }
 
-    fmpz_clear(tmp);
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }
+

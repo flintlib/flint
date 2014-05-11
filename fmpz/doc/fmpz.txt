@@ -1153,3 +1153,42 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
 
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void fmpz_primorial(fmpz_t res, ulong n)
+
+    Sets \code{res} to ``$n$ primorial'' or $n \#$, the product of all prime 
+    numbers less than or equal to $n$.
+
+void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac)
+
+void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+
+    Sets \code{res} to the Euler totient function $\phi(n)$, counting the 
+    number of positive integers less than or equal to $n$ that are coprime 
+    to $n$. The factor version takes a precomputed
+    factorisation of $n$.
+
+int fmpz_factor_moebius_mu(const fmpz_factor_t fac)
+
+int fmpz_moebius_mu(const fmpz_t n)
+
+    Computes the Moebius function $\mu(n)$, which is defined as $\mu(n) = 0$ 
+    if $n$ has a prime factor of multiplicity greater than $1$, $\mu(n) = -1$ 
+    if $n$ has an odd number of distinct prime factors, and $\mu(n) = 1$ if 
+    $n$ has an even number of distinct prime factors.  By convention, 
+    $\mu(0) = 0$. The factor version takes a precomputed
+    factorisation of $n$.
+
+void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
+
+void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+
+    Sets \code{res} to $\sigma_k(n)$, the sum of $k$th powers of all 
+    divisors of $n$. The factor version takes a precomputed
+    factorisation of $n$.
+

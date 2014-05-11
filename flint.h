@@ -61,8 +61,8 @@
 
 #define __FLINT_VERSION 2
 #define __FLINT_VERSION_MINOR 4
-#define __FLINT_VERSION_PATCHLEVEL 2 
-#define FLINT_VERSION "2.4"
+#define __FLINT_VERSION_PATCHLEVEL 3 
+#define FLINT_VERSION "2.4.3"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -131,7 +131,11 @@ void flint_cleanup(void);
 #define mp_bitcnt_t ulong
 
 #if HAVE_TLS
+#ifdef _MSC_VER
+#define FLINT_TLS_PREFIX __declspec(thread)
+#else
 #define FLINT_TLS_PREFIX __thread
+#endif
 #else
 #define FLINT_TLS_PREFIX
 #endif

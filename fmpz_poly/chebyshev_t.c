@@ -23,32 +23,50 @@
 
 ******************************************************************************/
 
-#include "arith.h"
-
-/* Small enough that a numerical computation is safe */
-#define DOUBLE_CUTOFF (UWORD(1) << 21)
+#include "fmpz_poly.h"
 
 void
-arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
+_fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n)
 {
-    if (fmpz_cmp_ui(k, DOUBLE_CUTOFF) < 0)
+    slong k, i, d, m;
+
+    if (n == 0)
     {
-        double t;
-
-        t = arith_dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
-
-        /* Round to nearest after truncation */
-        if (t > 0)
-            t += 0.5;
-        else
-            t -= 0.5;
-
-        fmpz_set_d(fmpq_numref(s), t);
-        fmpz_set_ui(fmpq_denref(s), UWORD(6) * (*k));
-        fmpq_canonicalise(s);
+        fmpz_one(coeffs);
+        return;
     }
-    else
+
+    if (n == 1)
     {
-        arith_dedekind_sum_coprime_large(s, h, k);
+        fmpz_zero(coeffs);
+        fmpz_one(coeffs + 1);
+        return;
+    }
+
+    d = n % 2;
+
+    fmpz_zero(coeffs);
+    fmpz_set_ui(coeffs + d, d ? n : 1);
+    if (n % 4 >= 2)
+        fmpz_neg(coeffs + d, coeffs + d);
+
+    m = n / 2;
+
+    for (k = 1; k <= m; k++)
+    {
+        i = 2 * k + d;
+        fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, 4*(m-k+1), n+k-m-1);
+        fmpz_divexact2_uiui(coeffs + i, coeffs + i, n+2*k-2*m-1, n+2*k-2*m);
+        fmpz_neg(coeffs + i, coeffs + i);
+        fmpz_zero(coeffs + i - 1);
     }
 }
+
+void
+fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n)
+{
+    fmpz_poly_fit_length(poly, n + 1);
+    _fmpz_poly_chebyshev_t(poly->coeffs, n);
+    _fmpz_poly_set_length(poly, n + 1);
+}
+

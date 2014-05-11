@@ -1175,6 +1175,36 @@ void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len);
 
 void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
+/* Special polynomials */
+
+void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
+                                        slong num_factors, ulong phi);
+void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
+
+void _fmpz_poly_cos_minpoly(fmpz * f, ulong n);
+
+void fmpz_poly_cos_minpoly(fmpz_poly_t f, ulong n);
+
+void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
+
+void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n);
+
+void _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n);
+
+void fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n);
+
+void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n);
+
+void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n);
+
+void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
+
+void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
+
+void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
+
+void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
+
 #ifdef __cplusplus
 }
 #endif

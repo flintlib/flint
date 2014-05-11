@@ -19,50 +19,47 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005-2009 Damien Stehle
-    Copyright (C) 2007 David Cade
-    Copyright (C) 2010 William Hart
-   
+    Copyright (C) 2011 Fredrik Johansson
+
 ******************************************************************************/
 
-#include <math.h>
-#include "fmpz_mat.h"
+#include "fmpz_poly.h"
 
-void
-fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
+int main()
 {
-    const slong c = mat->c, r = mat->r, d = r;
+    fmpz_poly_t T, U;
 
-    slong i, j;
-    fmpz_t tmp;
+    slong n;
 
-    if (c != r)
+    FLINT_TEST_INIT(state);
+
+    flint_printf("chebyshev_u....");
+    fflush(stdout);
+
+    fmpz_poly_init(T);
+    fmpz_poly_init(U);
+
+    for (n = 0; n <= 500; n++)
     {
-        flint_printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
-        abort();
-    }
+        fmpz_poly_chebyshev_u(U, n);
+        fmpz_poly_chebyshev_t(T, n + 1);
+        fmpz_poly_derivative(T, T);
+        fmpz_poly_scalar_divexact_ui(T, T, n + 1);
 
-    fmpz_init(tmp);
-
-    for (i = 0; i < d; i++)
-    {
-        mp_bitcnt_t bits = (mp_bitcnt_t) pow((double) (2 * d - i), alpha);
-
-        fmpz_one(tmp);
-        fmpz_mul_2exp(tmp, tmp, bits);
-        fmpz_sub_ui(tmp, tmp, 1);
-        fmpz_randm(mat->rows[i] + i, state, tmp);
-        fmpz_add_ui(mat->rows[i] + i, mat->rows[i] + i, 2);
-        fmpz_fdiv_q_2exp(mat->rows[i] + i, mat->rows[i] + i, 1);
-
-        for (j = i + 1; j < d; j++)
+        if (!fmpz_poly_equal(T, U))
         {
-            fmpz_randm(mat->rows[j] + i, state, tmp);
-            if (n_randint(state, 2))
-                fmpz_neg(mat->rows[j] + i, mat->rows[j] + i);
-            fmpz_zero(mat->rows[i] + j);
+            flint_printf("FAIL: n = %wd\n", n);
+            flint_printf("T: "); fmpz_poly_print_pretty(T, "x"); flint_printf("\n");
+            flint_printf("U: "); fmpz_poly_print_pretty(U, "x"); flint_printf("\n");
+            abort();
         }
+
     }
 
-    fmpz_clear(tmp);
+    fmpz_poly_clear(T);
+    fmpz_poly_clear(U);
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }

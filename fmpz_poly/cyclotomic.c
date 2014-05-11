@@ -23,10 +23,10 @@
 
 ******************************************************************************/
 
-#include "arith.h"
+#include "fmpz_poly.h"
 
 void
-_arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
+_fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
                                         slong num_factors, ulong phi)
 {
     slong i, k;
@@ -44,10 +44,9 @@ _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
     }
 
     /* Phi_{2n}(x) = Phi_n(-x)*/
-    if (factors[0] == UWORD(2))
+    if (factors[0] == 2)
     {
-        _arith_cyclotomic_polynomial(a, n / 2, factors + 1,
-            num_factors - 1, phi);
+        _fmpz_poly_cyclotomic(a, n / 2, factors + 1, num_factors - 1, phi);
         for (i = 1; i <= D; i += 2)
             fmpz_neg(a + i, a + i);
         return;
@@ -59,8 +58,8 @@ _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
 
     /* Coefficients are guaranteed not to overflow an fmpz */
     small = (num_factors == 2) ||                  /* Always +1/0/-1*/
-            (n < WORD(10163195)) ||                     /* At most 27 bits */
-            (FLINT_BITS == 64 && n < WORD(169828113));  /* At most 60 bits */
+            (n < 10163195) ||                     /* At most 27 bits */
+            (FLINT_BITS == 64 && n < 169828113);  /* At most 60 bits */
 
     /* Iterate over all divisors of n */
     for (k = 0; k < (WORD(1) << num_factors); k++)
@@ -98,7 +97,7 @@ _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
 }
 
 void
-arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
+fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
 {
     n_factor_t factors;
     slong i, j;
@@ -108,13 +107,13 @@ arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
     {
         if (n == 0)
         {
-            fmpz_poly_set_ui(poly, UWORD(1));
+            fmpz_poly_one(poly);
         }
         else
         {
             fmpz_poly_fit_length(poly, 2);
-            fmpz_set_si(poly->coeffs, (n == 1) ? WORD(-1) : WORD(1));
-            fmpz_set_si(poly->coeffs + 1, WORD(1));
+            fmpz_set_si(poly->coeffs, (n == 1) ? -1 : 1);
+            fmpz_set_si(poly->coeffs + 1, 1);
             _fmpz_poly_set_length(poly, 2);
         }
         return;
@@ -124,7 +123,7 @@ arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
       and compute phi(s) which determines the degree of the polynomial. */
     n_factor_init(&factors);
     n_factor(&factors, n, 1);
-    s = phi = UWORD(1);
+    s = phi = 1;
     for (i = 0; i < factors.num; i++)
     {
         phi *= factors.p[i] - 1;
@@ -138,8 +137,7 @@ arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
     fmpz_poly_fit_length(poly, phi * s + 1);
 
     /* Evaluate lower half of Phi_s(x) */
-    _arith_cyclotomic_polynomial(poly->coeffs, n / s,
-        factors.p, factors.num, phi);
+    _fmpz_poly_cyclotomic(poly->coeffs, n / s, factors.p, factors.num, phi);
 
     /* Palindromic extension */
     for (i = 0; i < (phi + 1) / 2; i++)
@@ -158,3 +156,4 @@ arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
 
     _fmpz_poly_set_length(poly, phi * s + 1);
 }
+

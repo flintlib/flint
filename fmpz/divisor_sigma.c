@@ -23,56 +23,52 @@
 
 ******************************************************************************/
 
-#include "arith.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
-/* note: destroys factors! */
 void
-_arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
+fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k)
 {
     slong i;
-    fmpz * p;
-    fmpz_t r;
 
     fmpz_one(res);
 
-    if (factors->num == 0)
+    if (fac->num == 0)
         return;
-
-    fmpz_init(r);
 
     if (k == 0)
     {
-        for (i = 0; i < factors->num; i++)
-        {
-            fmpz_set_ui(r, factors->exp[i] + UWORD(1));
-            fmpz_mul(res, res, r);
-        }
-        return;
+        for (i = 0; i < fac->num; i++)
+            fmpz_mul_ui(res, res, fac->exp[i] + 1);
     }
     else
     {
-        for (i = 0; i < factors->num; i++)
+        fmpz * p;
+        fmpz_t r;
+
+        p = _fmpz_vec_init(fac->num);
+        fmpz_init(r);
+
+        for (i = 0; i < fac->num; i++)
         {
-            p = factors->p + i;
-            fmpz_set(p, factors->p + i);
-            fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, factors->exp[i]  + UWORD(1));
-            fmpz_sub_ui(r, r, UWORD(1));
-            fmpz_sub_ui(p, p, UWORD(1));
-            fmpz_divexact(p, r, p);
+            fmpz_pow_ui(p + i, fac->p + i, k);
+            fmpz_pow_ui(r, p + i, fac->exp[i]  + 1);
+            fmpz_sub_ui(r, r, 1);
+            fmpz_sub_ui(p + i, p + i, 1);
+            fmpz_divexact(p + i, r, p + i);
         }
 
-        _fmpz_vec_prod(res, factors->p, factors->num);
-    }
+        _fmpz_vec_prod(res, p, fac->num);
 
-    fmpz_clear(r);
+        _fmpz_vec_clear(p, fac->num);
+        fmpz_clear(r);
+    }
 }
 
 void
-arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 {
-    fmpz_factor_t factors;
+    fmpz_factor_t fac;
 
     if (fmpz_is_zero(n))
     {
@@ -80,8 +76,9 @@ arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
         return;
     }
 
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
-    _arith_divisor_sigma(res, factors, k);
-    fmpz_factor_clear(factors);
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, n);
+    fmpz_factor_divisor_sigma(res, fac, k);
+    fmpz_factor_clear(fac);
 }
+
