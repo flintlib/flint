@@ -171,23 +171,23 @@ else
 endif
 
 install: library
-	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR)
-	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
+	mkdir -p "$(DESTDIR)$(PREFIX)/$(LIBDIR)"
+	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/$(LIBDIR); \
+		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(DESTDIR)$(PREFIX)/$(LIBDIR); \
+		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
-	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/flint
+	cp $(HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
-		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint; \
+		cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
 	fi
-	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
-	cp qadic/CPimport.txt $(DESTDIR)$(FLINT_CPIMPORT_DIR)
-	mkdir -p $(DESTDIR)$(PREFIX)/include/flint/flintxx
-	cp flintxx/*.h $(DESTDIR)$(PREFIX)/include/flint/flintxx
-	cp *xx.h $(DESTDIR)$(PREFIX)/include/flint
+	mkdir -p "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
+	cp qadic/CPimport.txt "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
+	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
+	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
+	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 
 build:
 	mkdir -p build
