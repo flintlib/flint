@@ -4,6 +4,8 @@ else
   $(DLPATH):=$(DLPATH_ADD)
 endif
 
+LIBDIR=lib
+
 QUIET_CC  = @echo '   ' CC  ' ' $@;
 QUIET_CXX = @echo '   ' CXX ' ' $@;
 QUIET_AR  = @echo '   ' AR  ' ' $@;
@@ -169,13 +171,13 @@ else
 endif
 
 install: library
-	mkdir -p $(DESTDIR)$(PREFIX)/lib
+	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBDIR)
 	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/lib; \
+		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/$(LIBDIR); \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
+		cp libflint.a $(DESTDIR)$(PREFIX)/$(LIBDIR); \
 	fi
 	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/flint
 	$(AT)if [ ! -z $(EXT_HEADERS) ]; then \
