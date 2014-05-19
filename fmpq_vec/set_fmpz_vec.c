@@ -19,36 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#ifndef FMPQ_VEC_H
-#define FMPQ_VEC_H
+#include "fmpq_vec.h"
 
-#include <gmp.h>
-#include "fmpq.h"
-#include "flint.h"
+void
+_fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len)
+{
+    slong i;
+    fmpz_t one;
+    fmpz_init_set_ui(one, 1);
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+    for (i = 0; i < len; i++)
+        fmpq_set_fmpz_frac(res + i, vec + i, one);
 
-/*  Randomisation  ***********************************************************/
-
-void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
-                        slong len, mp_bitcnt_t bits);
-
-/*  Conversions  *************************************************************/
-
-void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len);
-
-/*  Dot product  **************************************************/
-
-void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len);
-
-#ifdef __cplusplus
+    fmpz_clear(one);
 }
-#endif
-
-#endif

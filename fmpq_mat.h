@@ -186,6 +186,10 @@ slong fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
 
 slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
+/* Classical LLL *************************************************************/
+
+void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha);
+
 #ifdef __cplusplus
 }
 #endif
