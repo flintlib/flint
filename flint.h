@@ -131,7 +131,11 @@ void flint_cleanup(void);
 #define mp_bitcnt_t ulong
 
 #if HAVE_TLS
+#ifdef _MSC_VER
+#define FLINT_TLS_PREFIX __declspec(thread)
+#else
 #define FLINT_TLS_PREFIX __thread
+#endif
 #else
 #define FLINT_TLS_PREFIX
 #endif
