@@ -111,6 +111,8 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
                                const mp_ptr * coeffs_f, slong limbs, slong sign);
 
+slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2);
