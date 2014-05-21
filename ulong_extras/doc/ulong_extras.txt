@@ -322,9 +322,12 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$. 
-    We require $x \geq y$.
+    No assumptions are made about $x$ and $y$.
 
-    The algorithm is a slight embelishment of the Euclidean algorithm
+    On systems where a fast count-trailing-zeros intrinsic is available,
+    a version of the binary GCD algorithm is used.
+
+    The fallback algorithm is a slight embelishment of the Euclidean algorithm
     which uses some branches to avoid most divisions.
 
     One wishes to compute the quotient and remainder of $u_3 / v_3$ without 
@@ -340,7 +343,7 @@ mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
 mp_limb_t n_gcd_full(mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$.
-    No assumptions are made about $x$ and $y$.
+    This is an obsolete alias for \code{n_gcd}.
 
 mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
 

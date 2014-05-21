@@ -31,18 +31,23 @@
 void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1, 
                const fmpz * input2, slong len2, slong trunc)
 {
-    slong len_out = len1 + len2 - 1;
-    slong loglen  = FLINT_CLOG2(len_out);
-    slong loglen2 = FLINT_CLOG2(len2);
-    slong n = (WORD(1) << (loglen - 2));
-
+    slong len_out, loglen, loglen2, n;
     slong output_bits, limbs, size, i;
     mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
     slong bits1, bits2;
+    ulong size1, size2;
     int sign = 0;
 
-    ulong size1 = _fmpz_vec_max_limbs(input1, len1); 
-    ulong size2 = _fmpz_vec_max_limbs(input2, len2);
+    len1 = FLINT_MIN(len1, trunc);
+    len2 = FLINT_MIN(len2, trunc);
+
+    len_out = len1 + len2 - 1;
+    loglen  = FLINT_CLOG2(len_out);
+    loglen2 = FLINT_CLOG2(len2);
+    n = (WORD(1) << (loglen - 2));
+
+    size1 = _fmpz_vec_max_limbs(input1, len1); 
+    size2 = _fmpz_vec_max_limbs(input2, len2);
 
     /* Start with an upper bound on the number of bits needed */
     output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1; 
@@ -122,12 +127,13 @@ fmpz_poly_mullow_SS(fmpz_poly_t res,
         return;
     }
 
-    if (len1 == 1 || len2 == 1)
+    if (len1 <= 2 || len2 <= 2 || n <= 2)
     {
         fmpz_poly_mullow_classical(res, poly1, poly2, n);
         return;
     }
 
+    n = FLINT_MIN(n, len1 + len2 - 1);
     fmpz_poly_fit_length(res, n);
 
     if (len1 >= len2)
