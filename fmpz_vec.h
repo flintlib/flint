@@ -227,6 +227,10 @@ void _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len);
 
 void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len);
 
+/*  Dot product  *************************************************************/
+
+void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2);
+
 #ifdef __cplusplus
 }
 #endif
