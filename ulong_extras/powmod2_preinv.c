@@ -31,8 +31,8 @@ mp_limb_t
 n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
 {
     mp_limb_t x, y;
-   
-    if (n == UWORD(1) || (a == 0 && exp != 0)) return UWORD(0);
+
+    if (n == UWORD(1)) return UWORD(0);
 
     x = UWORD(1);
     y = a;
