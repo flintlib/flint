@@ -30,11 +30,11 @@
 double
 d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)
 {
-    double min, max, d, t;
-    min = ldexp(0.5, minexp);
-    max = ldexp(1, maxexp);
-    d = (double) rand() / ((double) RAND_MAX + 1);
-    t = min + d * (max - min);
+    double d, t;
+    slong exp;
+    d = d_randtest(state);
+    exp = minexp + n_randint(state, maxexp - minexp + 1);
+    t = ldexp(d, exp);
     if (n_randint(state, 3) == 2)
         return t;
     else if (n_randint(state, 3) == 1)

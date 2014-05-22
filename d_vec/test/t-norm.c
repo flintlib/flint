@@ -52,7 +52,7 @@ main(void)
             continue;
 
         a = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
 
         res1 = _d_vec_norm(a, len - 1);
         res2 = _d_vec_norm(a + len - 1, 1);

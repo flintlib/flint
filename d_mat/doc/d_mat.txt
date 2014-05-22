@@ -79,10 +79,11 @@ void d_mat_one(d_mat_t mat)
 
 *******************************************************************************
 
-void d_mat_randtest(d_mat_t mat, flint_rand_t state)
+void d_mat_randtest(d_mat_t mat, flint_rand_t state, slong minexp,
+                    slong maxexp)
 
-    Sets the entries of \code{mat} to random signed numbers with absolute
-    values in the interval $[0.5, 1)$ or zero.
+    Sets the entries of \code{mat} to random signed numbers with exponents
+    between \code{minexp} and \code{maxexp} or zero.
 
 *******************************************************************************
 

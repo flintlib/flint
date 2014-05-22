@@ -58,7 +58,7 @@ main(void)
         d_mat_init(R, n, n);
         d_mat_init(B, m, n);
 
-        d_mat_randtest(A, state);
+        d_mat_randtest(A, state, 0, 0);
         d_mat_zero(R);
 
         d_mat_qr(Q, R, A);

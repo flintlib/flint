@@ -53,8 +53,8 @@ main(void)
 
         a = _d_vec_init(len);
         b = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
-        _d_vec_randtest(b, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
+        _d_vec_randtest(b, state, len, 0, 0);
 
         res1 = _d_vec_dot(a, b, len - 1);
         res2 = _d_vec_dot(a + len - 1, b + len - 1, 1);

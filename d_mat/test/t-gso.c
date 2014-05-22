@@ -53,7 +53,7 @@ main(void)
 
         d_mat_init(A, m, n);
 
-        d_mat_randtest(A, state);
+        d_mat_randtest(A, state, 0, 0);
 
         d_mat_gso(A, A);
 

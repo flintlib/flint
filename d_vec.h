@@ -43,7 +43,7 @@ void _d_vec_clear(double * vec);
 /*  Randomisation  ***********************************************************/
 
 void _d_vec_randtest(double * f, flint_rand_t state, 
-                        slong len);
+                        slong len, slong minexp, slong maxexp);
 
 /*  Assignment and basic manipulation  ***************************************/
 

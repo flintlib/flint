@@ -63,7 +63,7 @@ main(void)
             abort();
         }
 
-        d_mat_randtest(A, state);
+        d_mat_randtest(A, state, 0, 0);
         d_mat_set(B, A);
 
         if (!d_mat_equal(A, B))

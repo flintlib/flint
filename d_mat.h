@@ -88,7 +88,8 @@ void d_mat_print(const d_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-void d_mat_randtest(d_mat_t mat, flint_rand_t state);
+void d_mat_randtest(d_mat_t mat, flint_rand_t state, slong minexp,
+                    slong maxexp);
 
 /* Multiplication */
 

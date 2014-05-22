@@ -51,8 +51,8 @@ main(void)
         a = _d_vec_init(len);
         b = _d_vec_init(len);
         c = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
-        _d_vec_randtest(b, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
+        _d_vec_randtest(b, state, len, 0, 0);
 
         _d_vec_sub(c, a, b, len);
         _d_vec_sub(a, a, b, len);
@@ -78,8 +78,8 @@ main(void)
         a = _d_vec_init(len);
         b = _d_vec_init(len);
         c = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
-        _d_vec_randtest(b, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
+        _d_vec_randtest(b, state, len, 0, 0);
 
         _d_vec_sub(c, a, b, len);
         _d_vec_sub(b, a, b, len);
@@ -106,8 +106,8 @@ main(void)
         b = _d_vec_init(len);
         c = _d_vec_init(len);
         d = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
-        _d_vec_randtest(b, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
+        _d_vec_randtest(b, state, len, 0, 0);
 
         _d_vec_add(c, a, b, len);
         _d_vec_sub(d, c, b, len);
