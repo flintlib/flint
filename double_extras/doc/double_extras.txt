@@ -33,6 +33,16 @@ double d_randtest(flint_rand_t state)
 
     Returns a random number in the interval $[0.5, 1)$.
 
+double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)
+
+    Returns a random signed number with exponent between \code{minexp} and
+    \code{maxexp} or zero.
+
+double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp)
+
+    Returns a random signed number with exponent between \code{minexp} and
+    \code{maxexp}, zero, \code{D_NAN} or \pm\code{D_INF}.
+
 
 *******************************************************************************
 

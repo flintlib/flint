@@ -19,57 +19,26 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+   Copyright (C) 2012 Fredrik Johansson
+   Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "d_mat.h"
+#include "double_extras.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+double
+d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)
 {
-    slong m, n, i, j, rep;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("zero....");
-    fflush(stdout);
-
-    /* check it's zero */
-    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
-    {
-        d_mat_t A;
-
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
-
-        d_mat_init(A, m, n);
-
-        d_mat_randtest(A, state);
-        d_mat_zero(A);
-
-        for (i = 0; i < m; i++)
-        {
-            for (j = 0; j < n; j++)
-            {
-                if (d_mat_entry(A, i, j) != 0)
-                {
-                    flint_printf("FAIL: nonzero entry\n");
-                    abort();
-                }
-            }
-        }
-
-        d_mat_clear(A);
-    }
-
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    double min, max, d, t;
+    min = ldexp(0.5, minexp);
+    max = ldexp(1, maxexp);
+    d = (double) rand() / ((double) RAND_MAX + 1);
+    t = min + d * (max - min);
+    if (n_randint(state, 3) == 2)
+        return t;
+    else if (n_randint(state, 3) == 1)
+        return -t;
+    else
+        return 0;
 }

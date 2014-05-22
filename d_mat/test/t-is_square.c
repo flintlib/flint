@@ -41,6 +41,7 @@ main(void)
     flint_printf("is_square....");
     fflush(stdout);
 
+    /* check if a non-zero value is returned for non-square matrices */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         d_mat_t A;

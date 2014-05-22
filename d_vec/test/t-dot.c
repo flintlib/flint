@@ -41,7 +41,8 @@ main(void)
     flint_printf("dot....");
     fflush(stdout);
 
-
+    /* check sum of scalar products of parts of vectors is equal to the
+       scalar product of vectors */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         double *a, *b;

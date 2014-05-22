@@ -40,8 +40,9 @@ main(void)
     flint_printf("equal....");
     fflush(stdout);
 
-
-
+    /* check A != B if A, B have different dimensions
+     * set A = B and check A == B
+     * compare matrices with different entries */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         d_mat_t A, B, C, D, E;

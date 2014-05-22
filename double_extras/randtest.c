@@ -32,22 +32,23 @@
 double
 d_randtest(flint_rand_t state)
 {
-    mp_limb_t m1, m2;
+    mp_limb_t m1, m2, bits;
     double t;
+
+    bits = n_randint(state, FLINT_BITS);
 
     if (FLINT_BITS == 64)
     {
-        m1 = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));
+        m1 = n_randtest_bits(state, bits) | (UWORD(1) << (FLINT_BITS - 1));
 
         t = ((double) m1) * EXP_MINUS_64;
     }
     else
     {
-        m1 = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));
-        m2 = n_randlimb(state);
+        m1 = n_randtest_bits(state, bits) | (UWORD(1) << (FLINT_BITS - 1));
+        m2 = n_randtest_bits(state, bits);
 
-        t = ((double) m1) * EXP_MINUS_32 +
-            ((double) m2) * EXP_MINUS_64;
+        t = ((double) m1) * EXP_MINUS_32 + ((double) m2) * EXP_MINUS_64;
     }
 
     return t;

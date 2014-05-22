@@ -47,6 +47,10 @@
 
 double d_randtest(flint_rand_t state);
 
+double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
+
+double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
+
 static __inline__ double
 d_polyval(const double * poly, int len, double x)
 {

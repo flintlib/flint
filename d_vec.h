@@ -59,6 +59,8 @@ int _d_vec_approx_equal(const double * vec1, const double * vec2, slong len, dou
 
 int _d_vec_is_zero(const double * vec, slong len);
 
+int _d_vec_is_approx_zero(const double * vec, slong len, double eps);
+
 /*  Addition  ****************************************************************/
 
 void _d_vec_add(double * res, const double * vec1, const double * vec2, slong len2);

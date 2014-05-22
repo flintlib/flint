@@ -36,5 +36,5 @@ d_mat_randtest(d_mat_t mat, flint_rand_t state)
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            d_mat_entry(mat, i, j) = d_randtest(state);
+            d_mat_entry(mat, i, j) = d_randtest_signed(state, 0, 0);
 }

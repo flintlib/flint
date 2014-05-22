@@ -31,5 +31,5 @@ _d_vec_randtest(double *f, flint_rand_t state, slong len)
     slong i;
 
     for (i = 0; i < len; i++)
-        f[i] = d_randtest(state);
+        f[i] = d_randtest_signed(state, 0, 0);
 }

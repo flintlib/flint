@@ -81,8 +81,8 @@ void d_mat_one(d_mat_t mat)
 
 void d_mat_randtest(d_mat_t mat, flint_rand_t state)
 
-    Sets the entries of \code{mat} to random numbers in the 
-    interval $[0.5, 1)$.
+    Sets the entries of \code{mat} to random signed numbers with absolute
+    values in the interval $[0.5, 1)$ or zero.
 
 *******************************************************************************
 
@@ -116,6 +116,11 @@ int d_mat_is_zero(const d_mat_t mat)
     Returns a non-zero value if all entries \code{mat} are zero, and
     otherwise returns zero.
 
+int d_mat_is_approx_zero(const d_mat_t mat, double eps)
+
+    Returns a non-zero value if all entries \code{mat} are zero to within
+    \code{eps} and otherwise returns zero.
+
 int d_mat_is_empty(const d_mat_t mat)
 
     Returns a non-zero value if the number of rows or the number of
@@ -147,9 +152,9 @@ void d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
 
 void d_mat_gso(d_mat_t B, const d_mat_t A)
 
-    Takes a subset of $R^m$ $S = {a_1, a_2, \ldots ,a_n}$ (as the columns of
+    Takes a subset of $R^m$ $S = {a_1, a_2, \ldots, a_n}$ (as the columns of
     a $m x n$ matrix \code{A}) and generates an orthonormal set
-    $S^' = {b_1, b_2, \ldots ,b_n}$ (as the columns of the $m x n$ matrix 
+    $S^' = {b_1, b_2, \ldots, b_n}$ (as the columns of the $m x n$ matrix
     \code{B}) that spans the same subspace of $R^m$ as $S$.
     
 void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)

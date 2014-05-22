@@ -41,7 +41,8 @@ main(void)
     flint_printf("norm....");
     fflush(stdout);
 
-
+    /* check sum of norms of parts of a vector is equal to the
+       norm of the vector */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         double *a;

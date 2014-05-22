@@ -42,6 +42,8 @@ main(void)
     flint_printf("entry....");
     fflush(stdout);
 
+    /* check if entries are accessed correctly by setting their values
+       and then comparing them */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         d_mat_t A;
@@ -65,7 +67,7 @@ main(void)
             {
                 if (d_mat_entry(A, j, k) != 3 * j + 7 * k)
                 {
-                    flint_printf("FAIL: get/set entry %wd,%wd\n", j, k);
+                    flint_printf("FAIL: get/set entry %wd, %wd\n", j, k);
                     abort();
                 }
             }
