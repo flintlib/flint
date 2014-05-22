@@ -54,15 +54,15 @@
 
 /* The various Babai's  ******************************************************/
 
-double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong len2, 
+double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong len2,
        const fmpz_mat_t B, slong k, slong j, slong exp_adj);
 
 int fmpz_lll_check_babai (int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s, 
-       d_mat_t appB, int *expo, d_mat_t appSP, 
+       d_mat_t appB, int *expo, d_mat_t appSP,
        int a, int zeros, int kappamax, int n, double delta, double eta);
 
-int fmpz_lll_check_babai_heuristic_d (int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s, 
-       d_mat_t appB, int *expo, d_mat_t appSP, 
+int fmpz_lll_check_babai_heuristic_d (int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
+       d_mat_t appB, int *expo, d_mat_t appSP,
        int a, int zeros, int kappamax, int n, double delta, double eta);
 
 
