@@ -49,5 +49,8 @@ d_randtest(flint_rand_t state)
         t = ((double) m1) * EXP_MINUS_32 + ((double) m2) * EXP_MINUS_64;
     }
 
-    return t;
+    if (t == 1)
+        return 0.5;
+    else
+        return t;
 }
