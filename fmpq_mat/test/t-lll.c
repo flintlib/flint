@@ -31,28 +31,32 @@
 #include "fmpq_mat.h"
 #include "fmpq_vec.h"
 
-int main(void)
+int
+main(void)
 {
-	int i, result;
+    int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("lll....");
     fflush(stdout);
 
+    /* check rref and |det| of LLL reduced matrix are equal to those of
+       original matrix (ranrank used) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C;
         fmpq_mat_t Bq, Cq;
         fmpq_t alpha, onefourth, one;
-        fmpz_t temp;
+        fmpz_t temp1, temp2;
 
         slong m, n, bits;
 
-		do {
-			m = n_randint(state, 10);
-			n = n_randint(state, 10);
-		} while (m > n);
+        do
+        {
+            m = n_randint(state, 10);
+            n = n_randint(state, 10);
+        } while (m > n);
 
         bits = 1 + n_randint(state, 100);
 
@@ -64,34 +68,43 @@ int main(void)
         fmpq_init(alpha);
         fmpq_init(onefourth);
         fmpq_init(one);
-        fmpz_init(temp);
-		
-		fmpz_mat_randrank(A, state, m, bits);
-		fmpq_set_si(onefourth, 1, 4);
-		fmpq_one(one);
-		do {
-			fmpq_randtest(alpha, state, bits);
-		} while (fmpq_cmp(alpha, onefourth) <= 0 || fmpq_cmp(alpha, one) >= 0);
-        
-        fmpz_mat_rref(B, temp, A);
-        fmpq_mat_set_fmpz_mat_div_fmpz(Bq, B, temp);
-        
+        fmpz_init(temp1);
+        fmpz_init(temp2);
+
+        fmpz_mat_randrank(A, state, m, bits);
+        fmpq_set_si(onefourth, 1, 4);
+        fmpq_one(one);
+        do
+        {
+            fmpq_randtest(alpha, state, bits);
+        } while (fmpq_cmp(alpha, onefourth) <= 0 || fmpq_cmp(alpha, one) >= 0);
+
+        fmpz_mat_rref(B, temp1, A);
+        fmpq_mat_set_fmpz_mat_div_fmpz(Bq, B, temp1);
+        fmpz_abs(temp1, temp1);
+
         fmpz_mat_lll(A, A, alpha);
-        
-		fmpz_mat_rref(C, temp, A);
-		fmpq_mat_set_fmpz_mat_div_fmpz(Cq, C, temp);
-        
-        result = fmpq_mat_equal(Bq, Cq);
-        
-        if(!result) {
-			flint_printf("FAIL:\n");
-			flint_printf("B:\n");
-			fmpz_mat_print_pretty(B);
-			flint_printf("C:\n");
-			fmpz_mat_print_pretty(C);
-			abort();
-		}
-		
+
+        fmpz_mat_rref(C, temp2, A);
+        fmpq_mat_set_fmpz_mat_div_fmpz(Cq, C, temp2);
+        fmpz_abs(temp2, temp2);
+
+        result = fmpq_mat_equal(Bq, Cq) && fmpz_equal(temp1, temp2);
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("B:\n");
+            fmpz_mat_print_pretty(B);
+            flint_printf("C:\n");
+            fmpz_mat_print_pretty(C);
+            fmpz_print(temp1);
+            flint_printf("\n");
+            fmpz_print(temp2);
+            flint_printf("\n");
+            abort();
+        }
+
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
@@ -100,11 +113,12 @@ int main(void)
         fmpq_clear(alpha);
         fmpq_clear(onefourth);
         fmpq_clear(one);
-        fmpz_clear(temp);
+        fmpz_clear(temp1);
+        fmpz_clear(temp2);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

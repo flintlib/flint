@@ -434,7 +434,21 @@ slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
 void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
 
-    Takes a subset of $Q^m$ $S = {a_1, a_2, \ldots ,a_n}$ (as the columns of
+    Takes a subset of $Q^m$ $S = {a_1, a_2, \ldots, a_n}$ (as the columns of
     a $m x n$ matrix \code{A}) and generates an orthogonal set
-    $S^' = {b_1, b_2, \ldots ,b_n}$ (as the columns of the $m x n$ matrix 
+    $S^' = {b_1, b_2, \ldots, b_n}$ (as the columns of the $m x n$ matrix 
     \code{B}) that spans the same subspace of $Q^m$ as $S$.
+
+*******************************************************************************
+
+    Classical LLL
+
+*******************************************************************************
+
+void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
+
+    Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset Q^n$ (as
+    the rows of a $m x n$ matrix \code{A}), and a reduction parameter
+    \code{alpha} \in $Q$ in the range 1/4 < \code{alpha} < 1. The output is
+    an \code{alpha}-reduced basis $y_1, y_2, \ldots, y_m$ of the lattice $L$
+    (as the rows of a $m x n$ matrix \code{B}).
