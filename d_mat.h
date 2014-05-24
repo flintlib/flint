@@ -91,6 +91,10 @@ void d_mat_print(const d_mat_t mat);
 void d_mat_randtest(d_mat_t mat, flint_rand_t state, slong minexp,
                     slong maxexp);
 
+/* Transpose */
+
+void d_mat_transpose(d_mat_t B, const d_mat_t A);
+
 /* Multiplication */
 
 void d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B);
