@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
@@ -28,67 +28,81 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
+#include "fmpz.h"
 #include "d_mat.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
-    int i;
+    slong m, n, rep;
     FLINT_TEST_INIT(state);
 
-    flint_printf("equal....");
+    flint_printf("transpose....");
     fflush(stdout);
 
-    /* check A != B if A, B have different dimensions
-     * set A = B and check A == B
-     * compare matrices with different entries */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+
+
+    /* Rectangular transpose */
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
-        d_mat_t A, B, C, D, E;
-        slong m, n, j;
+        d_mat_t A, B, C;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
         d_mat_init(A, m, n);
-        d_mat_init(B, m, n);
+        d_mat_init(B, n, m);
         d_mat_init(C, m, n);
-        d_mat_init(D, m + 1, n);
-        d_mat_init(E, m, n + 1);
 
-        if (d_mat_equal(A, D) || d_mat_equal(A, E))
+        d_mat_randtest(A, state, n_randint(state, 100), n_randint(state, 100));
+        d_mat_randtest(B, state, n_randint(state, 100), n_randint(state, 100));
+
+        d_mat_transpose(B, A);
+        d_mat_transpose(C, B);
+
+        if (!d_mat_equal(C, A))
         {
-            flint_printf("FAIL: different dimensions should not be equal\n");
+            flint_printf("FAIL: C != A\n");
+            flint_printf("C:\n");
+            d_mat_print(C);
+            flint_printf("A:\n");
+            d_mat_print(A);
             abort();
-        }
-
-        d_mat_randtest(A, state, 0, 0);
-        d_mat_set(B, A);
-
-        if (!d_mat_equal(A, B))
-        {
-            flint_printf("FAIL: copied matrices should be equal\n");
-            abort();
-        }
-
-        if (m && n)
-        {
-            j = n_randint(state, m * n);
-            A->entries[j] += 1;
-
-            if (d_mat_equal(A, B))
-            {
-                flint_printf("FAIL: modified matrices should not be equal\n");
-                abort();
-            }
         }
 
         d_mat_clear(A);
         d_mat_clear(B);
         d_mat_clear(C);
-        d_mat_clear(D);
-        d_mat_clear(E);
+    }
+
+    /* Self-transpose */
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
+    {
+        d_mat_t A, B;
+
+        m = n_randint(state, 20);
+
+        d_mat_init(A, m, m);
+        d_mat_init(B, m, m);
+
+        d_mat_randtest(A, state, n_randint(state, 100), n_randint(state, 100));
+        d_mat_set(B, A);
+        d_mat_transpose(B, B);
+        d_mat_transpose(B, B);
+
+        if (!d_mat_equal(B, A))
+        {
+            flint_printf("FAIL: B != A\n");
+            flint_printf("B:\n");
+            d_mat_print(B);
+            flint_printf("A:\n");
+            d_mat_print(A);
+            abort();
+        }
+
+        d_mat_clear(A);
+        d_mat_clear(B);
     }
 
     FLINT_TEST_CLEANUP(state);

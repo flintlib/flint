@@ -51,7 +51,7 @@ main(void)
         slong len = n_randint(state, 100);
 
         a = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
 
         _d_vec_zero(a, len);
 

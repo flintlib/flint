@@ -20,28 +20,37 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "d_mat.h"
+#include "d_vec.h"
 
-void
-d_mat_print(const d_mat_t mat)
+double
+_d_vec_dot_heuristic(const double *vec1, const double *vec2, slong len2,
+                     double *err)
 {
-    long i, j;
+    double psum = 0, nsum = 0, p, n, d;
+    ulong *ps, *ns;
+    slong i;
 
-    flint_printf("[");
-    for (i = 0; i < mat->r; i++)
+    for (i = 0; i < len2; i++)
     {
-        flint_printf("[");
-        for (j = 0; j < mat->c; j++)
-        {
-            flint_printf("%E", d_mat_entry(mat, i, j));
-            if (j < mat->c - 1)
-                flint_printf(" ");
-        }
-        flint_printf("]\n");
+        if (vec1[i] * vec2[i] >= 0)
+            psum += vec1[i] * vec2[i];
+        else
+            nsum += -vec1[i] * vec2[i];
     }
-    flint_printf("]\n");
+
+    p = psum;
+    n = nsum;
+    ps = (ulong *) & psum;
+    ns = (ulong *) & nsum;
+    *ps += 1;
+    *ns += 1;
+    d = FLINT_MAX(psum - p, nsum - n);
+    *err = 2 * len2 * d;
+
+    return psum - nsum;
 }

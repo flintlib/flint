@@ -19,29 +19,26 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2014 Abhinav Baid
+   Copyright (C) 2012 Fredrik Johansson
+   Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "d_mat.h"
+#include "double_extras.h"
+#include "ulong_extras.h"
 
-void
-d_mat_print(const d_mat_t mat)
+double
+d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)
 {
-    long i, j;
-
-    flint_printf("[");
-    for (i = 0; i < mat->r; i++)
-    {
-        flint_printf("[");
-        for (j = 0; j < mat->c; j++)
-        {
-            flint_printf("%E", d_mat_entry(mat, i, j));
-            if (j < mat->c - 1)
-                flint_printf(" ");
-        }
-        flint_printf("]\n");
-    }
-    flint_printf("]\n");
+    double d, t;
+    slong exp;
+    d = d_randtest(state);
+    exp = minexp + n_randint(state, maxexp - minexp + 1);
+    t = ldexp(d, exp);
+    if (n_randint(state, 3) == 2)
+        return t;
+    else if (n_randint(state, 3) == 1)
+        return -t;
+    else
+        return 0;
 }

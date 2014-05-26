@@ -43,8 +43,7 @@ main(void)
     flint_printf("mul....");
     fflush(stdout);
 
-
-
+    /* check associative law */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong m, n, k, l;
@@ -62,9 +61,9 @@ main(void)
         d_mat_init(F, m, l);
         d_mat_init(G, m, l);
 
-        d_mat_randtest(A, state);
-        d_mat_randtest(B, state);
-        d_mat_randtest(C, state);
+        d_mat_randtest(A, state, 0, 0);
+        d_mat_randtest(B, state, 0, 0);
+        d_mat_randtest(C, state, 0, 0);
 
         d_mat_mul(D, B, C);
         d_mat_mul(E, A, B);

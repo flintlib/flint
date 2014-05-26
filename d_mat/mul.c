@@ -30,11 +30,14 @@ void
 d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
 {
     slong ar, bc, br;
-    slong i, j, k;
+    slong jj, kk, i, j, k, blocksize;
+    double temp;
+    d_mat_t Bt;
 
     ar = A->r;
     br = B->r;
     bc = B->c;
+    blocksize = 64 / sizeof(double);
 
     if (C == A || C == B)
     {
@@ -58,17 +61,28 @@ d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
         return;
     }
 
-    for (i = 0; i < ar; i++)
-    {
-        for (j = 0; j < bc; j++)
-        {
-            d_mat_entry(C, i, j) = d_mat_entry(A, i, 0) * d_mat_entry(B, 0, j);
+    d_mat_init(Bt, bc, br);
+    d_mat_transpose(Bt, B);
+    d_mat_zero(C);
 
-            for (k = 1; k < br; k++)
+    for (jj = 0; jj < bc; jj += blocksize)
+    {
+        for (kk = 0; kk < br; kk += blocksize)
+        {
+            for (i = 0; i < ar; i++)
             {
-                d_mat_entry(C, i, j) += d_mat_entry(A, i, k)
-                    * d_mat_entry(B, k, j);
+                for (j = jj; j < FLINT_MIN(jj + blocksize, bc); j++)
+                {
+                    temp = 0;
+
+                    for (k = kk; k < FLINT_MIN(kk + blocksize, br); k++)
+                    {
+                        temp += d_mat_entry(A, i, k) * d_mat_entry(Bt, j, k);
+                    }
+                    d_mat_entry(C, i, j) += temp;
+                }
             }
         }
     }
+    d_mat_clear(Bt);
 }

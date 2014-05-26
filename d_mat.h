@@ -64,6 +64,7 @@ void d_mat_clear(d_mat_t mat);
 int d_mat_equal(const d_mat_t mat1, const d_mat_t mat2);
 int d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps);
 int d_mat_is_zero(const d_mat_t mat);
+int d_mat_is_approx_zero(const d_mat_t mat, double eps);
 
 static __inline__ int
 d_mat_is_empty(const d_mat_t mat)
@@ -87,7 +88,12 @@ void d_mat_print(const d_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-void d_mat_randtest(d_mat_t mat, flint_rand_t state);
+void d_mat_randtest(d_mat_t mat, flint_rand_t state, slong minexp,
+                    slong maxexp);
+
+/* Transpose */
+
+void d_mat_transpose(d_mat_t B, const d_mat_t A);
 
 /* Multiplication */
 

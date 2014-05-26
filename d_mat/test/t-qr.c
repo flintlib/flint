@@ -39,6 +39,9 @@ main(void)
     flint_printf("qr....");
     fflush(stdout);
 
+    /* check QR = A
+     * check norm(column(Q)) = 1 or 0
+     * check dot product of columns of Q is zero */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         double dot;
@@ -55,7 +58,7 @@ main(void)
         d_mat_init(R, n, n);
         d_mat_init(B, m, n);
 
-        d_mat_randtest(A, state);
+        d_mat_randtest(A, state, 0, 0);
         d_mat_zero(R);
 
         d_mat_qr(Q, R, A);

@@ -40,8 +40,8 @@ main(void)
     flint_printf("one....");
     fflush(stdout);
 
-
-
+    /* check if diagonal elements are one and off diagonal elements are
+       zero */
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         d_mat_t A;
@@ -51,7 +51,7 @@ main(void)
 
         d_mat_init(A, m, n);
 
-        d_mat_randtest(A, state);
+        d_mat_randtest(A, state, 0, 0);
         d_mat_one(A);
 
         for (i = 0; i < m; i++)
@@ -61,6 +61,11 @@ main(void)
                 if (i == j && d_mat_entry(A, i, j) != 1)
                 {
                     flint_printf("FAIL: entry not one\n");
+                    abort();
+                }
+                else if (i != j && d_mat_entry(A, i, j) != 0)
+                {
+                    flint_printf("FAIL: entry not zero\n");
                     abort();
                 }
             }

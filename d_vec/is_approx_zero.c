@@ -19,29 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "d_mat.h"
+#include "d_vec.h"
 
-void
-d_mat_print(const d_mat_t mat)
+int
+_d_vec_is_approx_zero(const double *vec, slong len, double eps)
 {
-    long i, j;
-
-    flint_printf("[");
-    for (i = 0; i < mat->r; i++)
-    {
-        flint_printf("[");
-        for (j = 0; j < mat->c; j++)
-        {
-            flint_printf("%E", d_mat_entry(mat, i, j));
-            if (j < mat->c - 1)
-                flint_printf(" ");
-        }
-        flint_printf("]\n");
-    }
-    flint_printf("]\n");
+    slong i;
+    for (i = 0; i < len; i++)
+        if (fabs(vec[i]) > eps)
+            return 0;
+    return 1;
 }

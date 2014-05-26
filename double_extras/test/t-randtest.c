@@ -19,29 +19,42 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2014 Abhinav Baid
+   Copyright (C) 2012 Fredrik Johansson
+   Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "d_mat.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <float.h>
+#include "ulong_extras.h"
+#include "double_extras.h"
 
-void
-d_mat_print(const d_mat_t mat)
+int
+main(void)
 {
-    long i, j;
+    double x;
+    slong iter;
 
-    flint_printf("[");
-    for (i = 0; i < mat->r; i++)
+    FLINT_TEST_INIT(state);
+
+    flint_printf("randtest....");
+    fflush(stdout);
+
+    /* check that values lie in [0.5, 1) */
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
-        flint_printf("[");
-        for (j = 0; j < mat->c; j++)
+        x = d_randtest(state);
+        if (x < 0.5 || x >= 1)
         {
-            flint_printf("%E", d_mat_entry(mat, i, j));
-            if (j < mat->c - 1)
-                flint_printf(" ");
+            flint_printf("FAIL\n");
+            flint_printf("x = %.17g\n", x);
+            abort();
         }
-        flint_printf("]\n");
     }
-    flint_printf("]\n");
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return EXIT_SUCCESS;
 }

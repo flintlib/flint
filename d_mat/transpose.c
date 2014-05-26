@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
@@ -27,21 +27,32 @@
 #include "d_mat.h"
 
 void
-d_mat_print(const d_mat_t mat)
+d_mat_transpose(d_mat_t B, const d_mat_t A)
 {
-    long i, j;
+    slong ii, jj, i, j, blocksize;
+    blocksize = 64 / sizeof(double);
 
-    flint_printf("[");
-    for (i = 0; i < mat->r; i++)
+    if (B->r != A->c || B->c != A->r)
     {
-        flint_printf("[");
-        for (j = 0; j < mat->c; j++)
-        {
-            flint_printf("%E", d_mat_entry(mat, i, j));
-            if (j < mat->c - 1)
-                flint_printf(" ");
-        }
-        flint_printf("]\n");
+        flint_printf
+            ("Exception (d_mat_transpose). Incompatible dimensions.\n");
+        abort();
     }
-    flint_printf("]\n");
+
+    if (B == A)
+    {
+        d_mat_t t;
+        d_mat_init(t, A->r, A->c);
+        d_mat_transpose(t, A);
+        d_mat_swap(B, t);
+        d_mat_clear(t);
+        return;
+    }
+
+    for (ii = 0; ii < B->r; ii += blocksize)
+        for (jj = 0; jj < B->c; jj += blocksize)
+            for (i = ii; i < FLINT_MIN(ii + blocksize, B->r); i++)
+                for (j = jj; j < FLINT_MIN(jj + blocksize, B->c); j++)
+                    d_mat_entry(B, i, j) = d_mat_entry(A, j, i);
+
 }

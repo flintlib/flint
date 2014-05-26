@@ -388,7 +388,8 @@ echo "Configuring...${MACHINE}-${OS}"
 if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
-         FLINT_LIB="libflint.dylib";;
+         FLINT_LIB="libflint.dylib"
+         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB";;
       CYGWIN* | MINGW*)
          FLINT_LIB="libflint.dll";;
       *)
@@ -635,6 +636,7 @@ echo "" >> Makefile
 echo "CFLAGS=$CFLAGS" >> Makefile
 echo "ABI_FLAG=$ABI_FLAG" >> Makefile
 echo "PIC_FLAG=$PIC_FLAG" >> Makefile
+echo "EXTRA_SHARED_FLAGS=$EXTRA_SHARED_FLAGS" >> Makefile
 echo "" >> Makefile
 echo "DLPATH=$DLPATH" >> Makefile
 echo "DLPATH_ADD=$DLPATH_ADD" >> Makefile

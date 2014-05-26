@@ -49,7 +49,7 @@ main(void)
         slong len = n_randint(state, 100);
 
         a = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
 
         _d_vec_set(a, a, len);
 
@@ -71,7 +71,7 @@ main(void)
 
         a = _d_vec_init(len);
         b = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
 
         _d_vec_set(b, a, len);
 
@@ -95,7 +95,7 @@ main(void)
 
         a = _d_vec_init(len);
         b = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
 
         _d_vec_set(b, a, len);
         coeff = n_randint(state, len);

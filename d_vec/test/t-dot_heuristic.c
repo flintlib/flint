@@ -19,7 +19,6 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2010 William Hart
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
@@ -31,100 +30,48 @@
 #include "d_vec.h"
 #include "ulong_extras.h"
 
+#define D_VEC_SP_EPS (1e-14)
+
 int
 main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("sub....");
+    flint_printf("dot_heuristic....");
     fflush(stdout);
 
-
-
-    /* Check aliasing of a and c */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    /* check sum of scalar products of parts of vectors is equal to the
+       scalar product of vectors */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        double *a, *b, *c;
+        double *a, *b;
+        double res1, res2, res3, err1, err2, err3;
         slong len = n_randint(state, 100);
+        if (!len)
+            continue;
 
         a = _d_vec_init(len);
         b = _d_vec_init(len);
-        c = _d_vec_init(len);
         _d_vec_randtest(a, state, len, 0, 0);
         _d_vec_randtest(b, state, len, 0, 0);
 
-        _d_vec_sub(c, a, b, len);
-        _d_vec_sub(a, a, b, len);
+        res1 = _d_vec_dot_heuristic(a, b, len - 1, &err1);
+        res2 = _d_vec_dot_heuristic(a + len - 1, b + len - 1, 1, &err2);
+        res3 = _d_vec_dot_heuristic(a, b, len, &err3);
 
-        result = (_d_vec_equal(a, c, len));
+        result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS
+            && err3 >= err1 + err2;
         if (!result)
         {
             flint_printf("FAIL:\n");
+            printf("%g\n", fabs(res1 + res2 - res3));
             abort();
         }
 
         _d_vec_clear(a);
         _d_vec_clear(b);
-        _d_vec_clear(c);
     }
-
-    /* Check aliasing of b and c */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        double *a, *b, *c;
-        slong len = n_randint(state, 100);
-
-        a = _d_vec_init(len);
-        b = _d_vec_init(len);
-        c = _d_vec_init(len);
-        _d_vec_randtest(a, state, len, 0, 0);
-        _d_vec_randtest(b, state, len, 0, 0);
-
-        _d_vec_sub(c, a, b, len);
-        _d_vec_sub(b, a, b, len);
-
-        result = (_d_vec_equal(b, c, len));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            abort();
-        }
-
-        _d_vec_clear(a);
-        _d_vec_clear(b);
-        _d_vec_clear(c);
-    }
-
-    /* Check a + b - b = a */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        double *a, *b, *c, *d;
-        slong len = n_randint(state, 100);
-
-        a = _d_vec_init(len);
-        b = _d_vec_init(len);
-        c = _d_vec_init(len);
-        d = _d_vec_init(len);
-        _d_vec_randtest(a, state, len, 0, 0);
-        _d_vec_randtest(b, state, len, 0, 0);
-
-        _d_vec_add(c, a, b, len);
-        _d_vec_sub(d, c, b, len);
-
-        result = (_d_vec_approx_equal(d, a, len, D_EPS));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            abort();
-        }
-
-        _d_vec_clear(a);
-        _d_vec_clear(b);
-        _d_vec_clear(c);
-        _d_vec_clear(d);
-    }
-
 
     FLINT_TEST_CLEANUP(state);
 

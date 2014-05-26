@@ -41,7 +41,8 @@ main(void)
     flint_printf("norm....");
     fflush(stdout);
 
-
+    /* check sum of norms of parts of a vector is equal to the
+       norm of the vector */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         double *a;
@@ -51,7 +52,7 @@ main(void)
             continue;
 
         a = _d_vec_init(len);
-        _d_vec_randtest(a, state, len);
+        _d_vec_randtest(a, state, len, 0, 0);
 
         res1 = _d_vec_norm(a, len - 1);
         res2 = _d_vec_norm(a + len - 1, 1);

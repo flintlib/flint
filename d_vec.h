@@ -43,7 +43,7 @@ void _d_vec_clear(double * vec);
 /*  Randomisation  ***********************************************************/
 
 void _d_vec_randtest(double * f, flint_rand_t state, 
-                        slong len);
+                        slong len, slong minexp, slong maxexp);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -59,6 +59,8 @@ int _d_vec_approx_equal(const double * vec1, const double * vec2, slong len, dou
 
 int _d_vec_is_zero(const double * vec, slong len);
 
+int _d_vec_is_approx_zero(const double * vec, slong len, double eps);
+
 /*  Addition  ****************************************************************/
 
 void _d_vec_add(double * res, const double * vec1, const double * vec2, slong len2);
@@ -70,6 +72,8 @@ void _d_vec_sub(double * res, const double * vec1, const double * vec2, slong le
 double _d_vec_dot(const double * vec1, const double * vec2, slong len2);
 
 double _d_vec_norm(const double * vec, slong len);
+
+double _d_vec_dot_heuristic(const double * vec1, const double * vec2, slong len2, double * err);
 
 #ifdef __cplusplus
 }

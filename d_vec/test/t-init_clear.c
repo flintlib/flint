@@ -40,8 +40,7 @@ main(void)
     flint_printf("init/clear....");
     fflush(stdout);
 
-
-
+    /* check if memory management works properly */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         double *a;
