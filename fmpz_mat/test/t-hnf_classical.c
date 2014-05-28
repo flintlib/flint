@@ -72,14 +72,7 @@ int in_hnf(const fmpz_mat_t A)
         for (i2 = 0; i2 < i; i2++)
         {
             if (fmpz_cmp(fmpz_mat_entry(A, i2, j), fmpz_mat_entry(A, i, j)) >= 0)
-            {
-                flint_printf("A_i2,j:");
-                fmpz_print(fmpz_mat_entry(A, i2, j));
-                flint_printf("\nA_i,j:");
-                fmpz_print(fmpz_mat_entry(A, i, j));
-                flint_printf("\ncomp: %i\n", fmpz_cmp(fmpz_mat_entry(A, i2, j), fmpz_mat_entry(A, i, j)));
                 return 0;
-            }
             if (fmpz_cmp(fmpz_mat_entry(A, i2, j), zero) < 0)
                 return 0;
         }
@@ -105,8 +98,8 @@ main(void)
         slong m, n, b, d, r;
         int equal;
 
-        m = n_randint(state, 6);
-        n = n_randint(state, 6);
+        m = n_randint(state, 8);
+        n = n_randint(state, 8);
         r = n_randint(state, FLINT_MIN(m, n) + 1);
 
         fmpz_mat_init(A, m, n);
