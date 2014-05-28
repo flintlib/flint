@@ -46,7 +46,19 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     if ((p & UWORD(3)) == 3)
     {
-        return n_powmod2_ui_preinv(a, (p + 1) / 4, p, pinv);
+        return n_powmod2_ui_preinv(a, (p + 1)/4, p, pinv); /* p == 2^B - 1 isn't prime */
+    }
+
+    if ((p & UWORD(7)) == 5)
+    {
+       b = n_powmod2_ui_preinv(a, (p + 3)/8, p, pinv); /* p == 2^B - 3 isn't prime */
+       g = n_mulmod2_preinv(b, b, p, pinv);
+
+       if (g == a)
+          return b;
+
+       g = n_powmod2_ui_preinv(2, (p - 1)/4, p, pinv);
+       return n_mulmod2_preinv(g, b, p, pinv);
     }
 
     r = 0;
