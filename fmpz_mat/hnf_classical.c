@@ -27,45 +27,46 @@
 
 void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 {
-    slong i, i2, j, k, l;
+    slong j, j2, i, k, l;
+
     fmpz_mat_set(H, A);
 
-    for (i = A->r - 1, k = A->c - 1, l = (i - k)*(i > k); i + 1 != l; i--, k--)
+    for (j = 0, k = 0, l = (A->c - A->r)*(A->c > A->r); A->c - j != l; j++, k++)
     {
-        int row_finished = 1;
-        for (j = 0; (j < k) && row_finished; j++)
+        int col_finished = 1;
+        for (i = k + 1; (i < A->r) && col_finished; i++)
         {
-            row_finished = fmpz_is_zero(fmpz_mat_entry(H, i, j));
+            col_finished = fmpz_is_zero(fmpz_mat_entry(H, i, j));
         }
-        if (row_finished)
+        if (col_finished)
         {
-            if (fmpz_sgn(fmpz_mat_entry(H, i, k)) < 0)
+            if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
             {
-                for (i2 = 0; i2 < A->r; i2++)
+                for (j2 = 0; j2 < A->c; j2++)
                 {
-                    fmpz_neg(fmpz_mat_entry(H, i2, k),
-                            fmpz_mat_entry(H, i2, k));
+                    fmpz_neg(fmpz_mat_entry(H, k, j2),
+                            fmpz_mat_entry(H, k, j2));
                 }
             }
-            if (fmpz_is_zero(fmpz_mat_entry(H, i, k)))
+            if (fmpz_is_zero(fmpz_mat_entry(H, k, j)))
             {
-                k++;
+                k--;
                 if (l > 0)
                     l--;
             }
             else
             {
-                /* reduce trailing entries of row i with column k */
-                for (j = k + 1; j < A->c; j++)
+                /* reduce first entries of column j with row k */
+                for (i = 0; i < k; i++)
                 {
                     fmpz_t q;
                     fmpz_init(q);
                     fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
-                            fmpz_mat_entry(H, i, k));
-                    for (i2 = 0; i2 < A->r; i2++)
+                            fmpz_mat_entry(H, k, j));
+                    for (j2 = 0; j2 < A->c; j2++)
                     {
-                        fmpz_submul(fmpz_mat_entry(H, i2, j), q,
-                                fmpz_mat_entry(H, i2, k));
+                        fmpz_submul(fmpz_mat_entry(H, i, j2), q,
+                                fmpz_mat_entry(H, k, j2));
                     }
                     fmpz_clear(q);
                 }
@@ -73,54 +74,57 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
         }
         else
         {
-            slong j0 = 0;
+            slong i0 = 0;
             fmpz_t min;
+
             fmpz_init(min);
-            /* locate non-zero entry on row i with lowest absolute value */
-            for (j = 0; j <= k; j++)
+            /* locate non-zero entry in column j below k with lowest absolute value */
+            for (i = k + 1; i < A->r; i++)
             {
                 if (fmpz_is_zero(fmpz_mat_entry(H, i, j)))
                     continue;
-                if (fmpz_is_zero(min) || 
+                if (fmpz_is_zero(min) ||
                         fmpz_cmpabs(fmpz_mat_entry(H, i, j), min) < 0)
                 {
-                    j0 = j;
+                    i0 = i;
                     fmpz_abs(min, fmpz_mat_entry(H, i, j));
                 }
             }
             fmpz_clear(min);
-            /* move the column found to column k */
-            if (j0 < k)
+            /* move the row found to row k */
+            if (i0 > k)
             {
-                for (i2 = 0; i2 < A->r; i2++)
+                for (j2 = 0; j2 < A->c; j2++)
                 {
-                    fmpz_swap(fmpz_mat_entry(H, i2, j0),
-                            fmpz_mat_entry(H, i2, k));
+                    fmpz_swap(fmpz_mat_entry(H, i0, j2),
+                            fmpz_mat_entry(H, k, j2));
                 }
             }
-            if (fmpz_sgn(fmpz_mat_entry(H, i, k)) < 0)
+            if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
             {
-                for (i2 = 0; i2 < A->r; i2++)
+                for (j2 = 0; j2 < A->c; j2++)
                 {
-                    fmpz_neg(fmpz_mat_entry(H, i2, k),
-                            fmpz_mat_entry(H, i2, k));
+                    fmpz_neg(fmpz_mat_entry(H, k, j2),
+                            fmpz_mat_entry(H, k, j2));
                 }
             }
-            /* reduce leading entries of row i with column k */
-            for (j = 0; j <= k - 1; j++)
+            /* reduce lower entries of column j with row k */
+            for (i = k + 1; i < A->r; i++)
             {
                 fmpz_t q;
+                fmpz_init(q);
                 fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
-                        fmpz_mat_entry(H, i, k));
-                for (i2 = 0; i2 < A->r; i2++)
+                        fmpz_mat_entry(H, k, j));
+                for (j2 = 0; j2 < A->c; j2++)
                 {
-                    fmpz_submul(fmpz_mat_entry(H, i2, j), q,
-                            fmpz_mat_entry(H, i2, k));
+                    fmpz_submul(fmpz_mat_entry(H, i, j2), q,
+                            fmpz_mat_entry(H, k, j2));
                 }
+                fmpz_clear(q);
             }
-            /* don't move to the next row yet */
-            i++;
-            k++;
+            /* don't move to the next column yet */
+            j--;
+            k--;
         }
     }
 }

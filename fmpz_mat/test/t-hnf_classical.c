@@ -33,59 +33,59 @@
 /* checks that the input matrix is in Hermite normal form */
 int in_hnf(const fmpz_mat_t A)
 {
-    slong i, j, prev_f;
+    slong i, last_i, j, prev_j;
     fmpz_t zero;
 
     fmpz_init(zero);
     fmpz_zero(zero);
 
-    for (j = 0; j < A->c; j++)
+    /* find last non-zero row */
+    for (last_i = A->r - 1; last_i >= 0; last_i--)
     {
-        for (i = 0; i < A->r; i++)
+        for (j = 0; j < A->c; j++)
         {
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
-            {
+            if (!fmpz_is_zero(fmpz_mat_entry(A, last_i, j)))
                 break;
-            }
         }
-        if (i < A->r)
-        {
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
-            {
-                break;
-            }
-        }
+        if (j < A->c)
+            break;
     }
 
-    prev_f = -1;
-    for (; j < A->c; j++)
+    /* hermite form structure */
+    prev_j = -1;
+    for (i = 0; i <= last_i; i++)
     {
-        slong j2;
-        fmpz_t last_nonzero;
-        fmpz_init(last_nonzero);
-        for (i = A->r - 1; i >= prev_f + 1; i--)
+        slong i2;
+
+        for (j = 0; j < A->c; j++)
         {
             if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
             {
                 if (fmpz_cmp(fmpz_mat_entry(A, i, j), zero) < 0)
                     return 0;
-                fmpz_set(last_nonzero, fmpz_mat_entry(A, i, j));
                 break;
             }
         }
-        if (i == prev_f)
-        {
+        if (j == A->c || j <= prev_j)
             return 0;
-        }
-        prev_f = i;
-        for (j2 = j + 1; j2 < A->c; j2++)
+        prev_j = j;
+        for (i2 = 0; i2 < i; i2++)
         {
-            if (fmpz_cmp(fmpz_mat_entry(A, i, j2), last_nonzero) >= 0)
+            if (fmpz_cmp(fmpz_mat_entry(A, i2, j), fmpz_mat_entry(A, i, j)) >= 0)
+            {
+                flint_printf("A_i2,j:");
+                fmpz_print(fmpz_mat_entry(A, i2, j));
+                flint_printf("\nA_i,j:");
+                fmpz_print(fmpz_mat_entry(A, i, j));
+                flint_printf("\ncomp: %i\n", fmpz_cmp(fmpz_mat_entry(A, i2, j), fmpz_mat_entry(A, i, j)));
                 return 0;
-            if (fmpz_cmp(fmpz_mat_entry(A, i, j2), zero) < 0)
+            }
+            if (fmpz_cmp(fmpz_mat_entry(A, i2, j), zero) < 0)
                 return 0;
         }
     }
+
+    fmpz_clear(zero);
 
     return 1;
 }
@@ -102,19 +102,16 @@ main(void)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, H, H2;
-        fmpz_t c;
         slong m, n, b, d, r;
         int equal;
 
-        m = n_randint(state, 7);
-        n = n_randint(state, 7);
+        m = n_randint(state, 6);
+        n = n_randint(state, 6);
         r = n_randint(state, FLINT_MIN(m, n) + 1);
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(H, m, n);
         fmpz_mat_init(H2, m, n);
-
-        fmpz_init(c);
 
         /* sparse */
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
@@ -136,25 +133,22 @@ main(void)
             abort();
         }
 
-        fmpz_randtest_not_zero(c, state, 5);
-
         fmpz_mat_hnf_classical(H2, H);
-        equal = fmpz_mat_equal(H,H2);
+        equal = fmpz_mat_equal(H, H2);
 
         if (!equal)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnf of a matrix in hnf should be the same!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             fmpz_mat_print_pretty(H2); flint_printf("\n\n");
             abort();
         }
 
-        fmpz_clear(c);
-
-        fmpz_mat_clear(A);
-        fmpz_mat_clear(H);
         fmpz_mat_clear(H2);
+        fmpz_mat_clear(H);
+        fmpz_mat_clear(A);
     }
 
     FLINT_TEST_CLEANUP(state);
