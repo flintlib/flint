@@ -39,6 +39,28 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
         return a;
     }
 
+    /* just do a brute force search */
+    if (p < 600)
+    {
+        mp_limb_t t, t2;
+
+        if (p > 50 && n_jacobi_unsigned(a, p) == -1)
+            return 0;
+
+        t = t2 = 1;
+
+        while (t <= (p - 1) / 2)
+        {
+            if (t2 == a)
+                return t;
+
+            t2 = n_addmod(t2, 2*t + 1, p);
+            t++;
+        }
+
+        return 0;
+    }
+
     pinv = n_preinvert_limb(p);
 
     if (n_jacobi_unsigned(a, p) == -1)
