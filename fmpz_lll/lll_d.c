@@ -47,7 +47,7 @@ fmpz_lll_d(fmpz_mat_t B, double delta, double eta)
 
     ctt = (4 * delta + 1) / 5;
 
-    shift = fmpz_lll_getShift(B);
+    shift = fmpz_lll_shift(B);
 
     alpha = (int *) malloc(d * sizeof(int));
     expo = (int *) malloc(d * sizeof(int));

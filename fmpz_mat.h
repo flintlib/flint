@@ -37,6 +37,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "nmod_mat.h"
+#include "d_mat.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
@@ -307,6 +308,14 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);
+
+/* Conversions **************************************************************/
+
+void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
+
+/* QR Decomposition *********************************************************/
+
+void fmpz_mat_qr(d_mat_t Q, d_mat_t R, const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }

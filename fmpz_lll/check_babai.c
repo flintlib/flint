@@ -173,11 +173,11 @@ fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                         xx = (slong) tmp;
                         exponent += expo[kappa] - expo[j] - CPU_SIZE_1;
 
-                        /* This case is extremely rare: never happened for me. Check this */
+                        /* This case is extremely rare: never happened for me. Check this: done */
                         if (exponent <= 0)
                         {
-                            printf("rare case kappa = %d, j = %d ******\n",
-                                   kappa, j);
+                            /* flint_printf("rare case kappa = %d, j = %d ******\n",
+                               kappa, j); */
                             xx = xx << -exponent;
                             exponent = 0;
 

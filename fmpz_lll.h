@@ -65,7 +65,7 @@ int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_
        d_mat_t appB, int *expo, d_mat_t appSP,
        int a, int zeros, int kappamax, int n, double delta, double eta);
 
-int fmpz_lll_getShift(fmpz_mat_t B);
+int fmpz_lll_shift(const fmpz_mat_t B);
 
 int fmpz_lll_d(fmpz_mat_t B, double delta, double eta);
 
