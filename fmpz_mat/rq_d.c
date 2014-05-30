@@ -19,32 +19,46 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
-    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "fmpz_lll.h"
+#include "fmpz_mat.h"
 
-int
-fmpz_lll_getShift(fmpz_mat_t B)
+void
+fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
 {
-    int i, n = B->c;
-    int shift = 0;
-    for (i = 0; i < B->r; i++)
+    slong i, k, j, r = A->r, c = A->c;
+
+    if (Q->r != A->r || Q->c != A->c || R->r != A->r || R->c != A->r)
     {
-        int j;
-        for (j = n - 1;
-             j >= i + shift + 1 && fmpz_size(fmpz_mat_entry(B, i, j)) == 0L;
-             j--) ;
-
-        if (shift < j - i)
-            shift = j - i;
-
+        flint_printf("Exception (fmpz_mat_rq_d). Incompatible dimensions.\n");
+        abort();
     }
 
-    return shift;
+    if (A->r == 0)
+    {
+        return;
+    }
+
+    fmpz_mat_get_d_mat(Q, A);
+
+    for (k = 0; k < r; k++)
+    {
+        d_mat_entry(R, k, k) = _d_vec_norm(Q->rows[k], c);
+        d_mat_entry(R, k, k) = sqrt(d_mat_entry(R, k, k));
+        for (i = 0; i < c; i++)
+            if (d_mat_entry(R, k, k) != 0)
+                d_mat_entry(Q, k, i) =
+                    d_mat_entry(Q, k, i) / d_mat_entry(R, k, k);
+        for (j = k + 1; j < r; j++)
+        {
+            d_mat_entry(R, j, k) = _d_vec_dot(Q->rows[k], Q->rows[j], c);
+            for (i = 0; i < c; i++)
+            {
+                d_mat_entry(Q, j, i) -=
+                    d_mat_entry(R, j, k) * d_mat_entry(Q, k, i);
+            }
+        }
+    }
 }

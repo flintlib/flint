@@ -87,7 +87,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr_d(Q, R, mat);
+        fmpz_mat_rq_d(R, Q, mat);
 
         result = d_mat_reduced(R, delta, eta);
 
@@ -151,7 +151,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr_d(Q, R, mat);
+        fmpz_mat_rq_d(R, Q, mat);
 
         result = d_mat_reduced(R, delta, eta);
 
@@ -182,8 +182,6 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
 
-        bits = n_randint(state, 200) + 1;
-
         fmpz_mat_randajtai(mat, state, 0.5);
 
         randd = d_randtest(state);
@@ -210,7 +208,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr_d(Q, R, mat);
+        fmpz_mat_rq_d(R, Q, mat);
 
         result = d_mat_reduced(R, delta, eta);
 
@@ -221,7 +219,7 @@ main(void)
         {
             flint_printf("FAIL (randajtai):\n");
             fmpz_mat_print_pretty(mat);
-            flint_printf("bits = %ld, i = %ld\n", bits, i);
+            flint_printf("i = %ld\n", i);
             flint_printf("delta = %g, eta = %g\n", delta, eta);
             abort();
         }
@@ -271,7 +269,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr_d(Q, R, mat);
+        fmpz_mat_rq_d(R, Q, mat);
 
         result = d_mat_reduced(R, delta, eta);
 

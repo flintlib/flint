@@ -84,3 +84,14 @@ int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu,
     Same as \code{fmpz_lll_check_babai()} but using the heuristic inner product
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
+
+*******************************************************************************
+
+    Shift
+
+*******************************************************************************
+
+int fmpz_lll_shift(const fmpz_mat_t B)
+
+    Computes the largest number of non-zero entries after the diagonal in
+    \code{B}.

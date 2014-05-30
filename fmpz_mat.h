@@ -309,13 +309,17 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);
 
+/* Gram matrix **************************************************************/
+
+void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A);
+
 /* Conversions **************************************************************/
 
 void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
 
-/* QR Decomposition *********************************************************/
+/* RQ Decomposition *********************************************************/
 
-void fmpz_mat_qr_d(d_mat_t Q, d_mat_t R, const fmpz_mat_t A);
+void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }

@@ -872,3 +872,27 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
     \code{A} and \code{B} are allowed to be the same object if \code{A} is a 
     square matrix.
     
+*******************************************************************************
+
+    Conversions
+
+*******************************************************************************
+
+void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
+
+    Sets the entries of \code{B} as doubles corresponding to the entries of
+    \code{A}, rounding down towards zero if the latter cannot be represented
+    exactly. An entry of \code{B} is undefined if the corresponding entry of
+    \code{A} is too large to fit in the normal range of a double.
+
+*******************************************************************************
+
+    RQ Decomposition
+
+*******************************************************************************
+
+void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
+
+    Computes the $RQ$ decomposition of a matrix \code{A} using the Gram–Schmidt
+    process. (Sets \code{R} and \code{Q} such that $A = RQ$ where \code{R} is
+    an upper triangular matrix and \code{Q} is an orthogonal matrix.)
