@@ -87,7 +87,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr(Q, R, mat);
+        fmpz_mat_qr_d(Q, R, mat);
 
         result = d_mat_reduced(R, delta, eta);
 
@@ -151,7 +151,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr(Q, R, mat);
+        fmpz_mat_qr_d(Q, R, mat);
 
         result = d_mat_reduced(R, delta, eta);
 
@@ -210,7 +210,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr(Q, R, mat);
+        fmpz_mat_qr_d(Q, R, mat);
 
         result = d_mat_reduced(R, delta, eta);
 
@@ -271,7 +271,7 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_qr(Q, R, mat);
+        fmpz_mat_qr_d(Q, R, mat);
 
         result = d_mat_reduced(R, delta, eta);
 

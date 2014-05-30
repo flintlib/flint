@@ -315,7 +315,7 @@ void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
 
 /* QR Decomposition *********************************************************/
 
-void fmpz_mat_qr(d_mat_t Q, d_mat_t R, const fmpz_mat_t A);
+void fmpz_mat_qr_d(d_mat_t Q, d_mat_t R, const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }
