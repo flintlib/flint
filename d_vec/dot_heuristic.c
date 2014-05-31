@@ -31,25 +31,25 @@ double
 _d_vec_dot_heuristic(const double *vec1, const double *vec2, slong len2,
                      double *err)
 {
-    double psum = 0, nsum = 0, p, n, d;
-    ulong *ps, *ns;
+    double psum = 0, nsum = 0, p, n, d, t;
+    int pexp, nexp;
     slong i;
 
     for (i = 0; i < len2; i++)
     {
-        if (vec1[i] * vec2[i] >= 0)
-            psum += vec1[i] * vec2[i];
+        t = vec1[i] * vec2[i];
+        if (t >= 0)
+            psum += t;
         else
-            nsum += -vec1[i] * vec2[i];
+            nsum += t;
     }
+    nsum = -nsum;
 
-    p = psum;
-    n = nsum;
-    ps = (ulong *) & psum;
-    ns = (ulong *) & nsum;
-    *ps += 1;
-    *ns += 1;
-    d = FLINT_MAX(psum - p, nsum - n);
+    p = frexp(psum, &pexp);
+    n = frexp(nsum, &nexp);
+    p = ldexp(1.0, pexp - D_BITS);
+    n = ldexp(1.0, nexp - D_BITS);
+    d = FLINT_MAX(p, n);
     *err = 2 * len2 * d;
 
     return psum - nsum;

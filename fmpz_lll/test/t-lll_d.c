@@ -36,6 +36,7 @@ main(void)
 {
     int i, result = 1;
     fmpz_mat_t mat;
+    fmpz_lll_t fl;
     mp_bitcnt_t bits;
     FLINT_TEST_INIT(state);
 
@@ -47,13 +48,13 @@ main(void)
     {
         ulong q;
         slong r, c;
-        double randd, delta, eta;
         d_mat_t Q, R;
 
         r = 2 * (n_randint(state, 50) + 1);
         c = r;
 
         fmpz_mat_init(mat, r, c);
+        fmpz_lll_randtest(fl, state);
 
         bits = n_randint(state, 20) + 1;
         q = n_randint(state, 200) + 1;
@@ -63,25 +64,7 @@ main(void)
         else
             fmpz_mat_randntrulike2(mat, state, bits, q);
 
-        randd = d_randtest(state);
-        if (randd > 0.5 && n_randint(state, 1))
-        {
-            delta = 0.25 + (randd - 0.5) * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-        else
-        {
-            delta = 0.25 + randd * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-
-        fmpz_lll_d(mat, delta, eta);
+        fmpz_lll_d(mat, fl);
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
@@ -89,7 +72,7 @@ main(void)
 
         fmpz_mat_rq_d(R, Q, mat);
 
-        result = d_mat_reduced(R, delta, eta);
+        result = d_mat_reduced(R, fl->delta, fl->eta);
 
         d_mat_clear(Q);
         d_mat_clear(R);
@@ -99,7 +82,7 @@ main(void)
             flint_printf("FAIL (randntrulike):\n");
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
-            flint_printf("delta = %g, eta = %g\n", delta, eta);
+            flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             abort();
         }
 
@@ -110,37 +93,19 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
-        double randd, delta, eta;
         d_mat_t Q, R;
 
         r = n_randint(state, 20) + 1;
         c = r + 1;
 
         fmpz_mat_init(mat, r, c);
+        fmpz_lll_randtest(fl, state);
 
         bits = n_randint(state, 200) + 1;
 
         fmpz_mat_randintrel(mat, state, bits);
 
-        randd = d_randtest(state);
-        if (randd > 0.5 && n_randint(state, 1))
-        {
-            delta = 0.25 + (randd - 0.5) * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-        else
-        {
-            delta = 0.25 + randd * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-
-        result = fmpz_lll_d(mat, delta, eta);
+        result = fmpz_lll_d(mat, fl);
         if (result == -1)
         {
             fmpz_mat_clear(mat);
@@ -153,7 +118,7 @@ main(void)
 
         fmpz_mat_rq_d(R, Q, mat);
 
-        result = d_mat_reduced(R, delta, eta);
+        result = d_mat_reduced(R, fl->delta, fl->eta);
 
         d_mat_clear(Q);
         d_mat_clear(R);
@@ -163,7 +128,7 @@ main(void)
             flint_printf("FAIL (randintrel):\n");
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
-            flint_printf("delta = %g, eta = %g\n", delta, eta);
+            flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             abort();
         }
 
@@ -174,35 +139,17 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
-        double randd, delta, eta;
         d_mat_t Q, R;
 
         r = n_randint(state, 10) + 1;
         c = r;
 
         fmpz_mat_init(mat, r, c);
+        fmpz_lll_randtest(fl, state);
 
         fmpz_mat_randajtai(mat, state, 0.5);
 
-        randd = d_randtest(state);
-        if (randd > 0.5 && n_randint(state, 1))
-        {
-            delta = 0.25 + (randd - 0.5) * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-        else
-        {
-            delta = 0.25 + randd * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-
-        fmpz_lll_d(mat, delta, eta);
+        fmpz_lll_d(mat, fl);
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
@@ -210,7 +157,7 @@ main(void)
 
         fmpz_mat_rq_d(R, Q, mat);
 
-        result = d_mat_reduced(R, delta, eta);
+        result = d_mat_reduced(R, fl->delta, fl->eta);
 
         d_mat_clear(Q);
         d_mat_clear(R);
@@ -220,7 +167,7 @@ main(void)
             flint_printf("FAIL (randajtai):\n");
             fmpz_mat_print_pretty(mat);
             flint_printf("i = %ld\n", i);
-            flint_printf("delta = %g, eta = %g\n", delta, eta);
+            flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             abort();
         }
 
@@ -232,38 +179,20 @@ main(void)
     {
         mp_bitcnt_t bits2;
         slong r, c;
-        double randd, delta, eta;
         d_mat_t Q, R;
 
         r = n_randint(state, 200) + 1;
         c = r;
 
         fmpz_mat_init(mat, r, c);
+        fmpz_lll_randtest(fl, state);
 
         bits = n_randint(state, 200) + 1;
         bits2 = n_randint(state, 5) + 1;
 
         fmpz_mat_randsimdioph(mat, state, bits, bits2);
 
-        randd = d_randtest(state);
-        if (randd > 0.5 && n_randint(state, 1))
-        {
-            delta = 0.25 + (randd - 0.5) * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-        else
-        {
-            delta = 0.25 + randd * 0.75;
-            if (n_randint(state, 1))
-                eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
-            else
-                eta = 0.5 + randd * (sqrt(delta) - 0.5);
-        }
-
-        fmpz_lll_d(mat, delta, eta);
+        fmpz_lll_d(mat, fl);
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
@@ -271,7 +200,7 @@ main(void)
 
         fmpz_mat_rq_d(R, Q, mat);
 
-        result = d_mat_reduced(R, delta, eta);
+        result = d_mat_reduced(R, fl->delta, fl->eta);
 
         d_mat_clear(Q);
         d_mat_clear(R);
@@ -281,7 +210,7 @@ main(void)
             flint_printf("FAIL (randsimdioph):\n");
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
-            flint_printf("delta = %g, eta = %g\n", delta, eta);
+            flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             abort();
         }
 

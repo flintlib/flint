@@ -29,6 +29,33 @@
 
 *******************************************************************************
 
+    Parameter manipulation
+
+*******************************************************************************
+
+void fmpz_lll_default_params(fmpz_lll_t fl)
+
+    Sets \code{fl->delta} and \code{fl->eta} to their default values, 0.75 and
+    0.81 respectively.
+
+void fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta)
+
+    Sets \code{fl->delta} and \code{fl->eta} to \code{delta} and \code{eta}
+    (given as input) respectively.
+
+*******************************************************************************
+
+    Random parameter generation
+
+*******************************************************************************
+
+void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
+
+    Sets \code{fl->delta} and \code{fl->eta} to random values in the interval
+    $(0.25, 1)$ and (0.5, \sqrt{\code{delta}}) respectively.
+
+*******************************************************************************
+
     Heuristic dot product
 
 *******************************************************************************
@@ -58,7 +85,7 @@ double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2,
 
 int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r,
                       double *s, d_mat_t appB, int *expo, d_mat_t appSP, int a,
-                      int zeros, int kappamax, int n, double delta, double eta)
+                      int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Performs floating point size reductions of the \code{kappa}-th row of
     \code{B} by all of the previous rows, uses d_mats \code{mu} and \code{r}
@@ -71,15 +98,15 @@ int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r,
     smallest row index which will be reduced from the \code{kappa}-th row.
     Index \code{zeros} is the number of zero rows in the matrix.
     \code{kappamax} is the highest index which has been size-reduced so far,
-    and \code{n} is the number of columns you want to consider. \code{delta}
-    and \code{eta} are the LLL (L^2) parameters. The output is the value -1 if
+    and \code{n} is the number of columns you want to consider. \code{fl} is an
+    LLL (L^2) context object. The output is the value -1 if
     the process fails (usually due to insufficient precision) or 0 if
     everything was successful. These descriptions will be true for the future
     Babai procedures as well.
 
 int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu,
                d_mat_t r, double *s, d_mat_t appB, int *expo, d_mat_t appSP,
-               int a, int zeros, int kappamax, int n, double delta, double eta)
+               int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_check_babai()} but using the heuristic inner product
     rather than a purely floating point inner product. The heuristic will
@@ -95,3 +122,19 @@ int fmpz_lll_shift(const fmpz_mat_t B)
 
     Computes the largest number of non-zero entries after the diagonal in
     \code{B}.
+
+*******************************************************************************
+
+    Varities of LLL
+
+*******************************************************************************
+
+int fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
+
+    This is a mildly greedy version of floating point LLL using doubles only.
+    It tries the fast version of the Babai algorithm
+    (\code{fmpz_lll_check_babai()}). If that fails, then it switches to the
+    heuristic version (\code{fmpz_lll_check_babai_heuristic_d()}) for only one
+    loop and switches right back to the fast version. It reduces \code{B} in
+    place. \code{fl} is the context object containing information containing
+    the LLL parameters \delta and \eta.

@@ -60,12 +60,18 @@ main(void)
         res2 = _d_vec_dot_heuristic(a + len - 1, b + len - 1, 1, &err2);
         res3 = _d_vec_dot_heuristic(a, b, len, &err3);
 
-        result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS
-            && err3 >= err1 + err2;
+        result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS;
+
         if (!result)
         {
             flint_printf("FAIL:\n");
-            printf("%g\n", fabs(res1 + res2 - res3));
+            flint_printf("%g\n", fabs(res1 + res2 - res3));
+            flint_printf("%g\n", res1);
+            flint_printf("%g\n", res2);
+            flint_printf("%g\n", res3);
+            flint_printf("%g\n", err1);
+            flint_printf("%g\n", err2);
+            flint_printf("%g\n", err3);
             abort();
         }
 

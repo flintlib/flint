@@ -79,3 +79,8 @@ double d_lambertw(double x)
     about 10 times \code{DBL_EPSILON} close to $-1/e$.
     However, accuracy may be worse depending on compiler flags and
     the accuracy of the system libm functions.
+
+int d_is_nan(double x)
+
+    Returns a nonzero integral value if \code{x} is \code{D_NAN}, and otherwise
+    returns 0.

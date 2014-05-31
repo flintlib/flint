@@ -19,56 +19,37 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2005, 2006 Damien Stehlé
+    Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010 Andy Novocin
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#ifndef DOUBLE_EXTRAS_H
-#define DOUBLE_EXTRAS_H
+#include "fmpz_lll.h"
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
-#include <float.h>
-#include <gmp.h>
-#include "flint.h"
-
-#define ulong mp_limb_t
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-#define D_BITS 53
-#define D_EPS 2.2204460492503130808e-16
-#define D_INF HUGE_VAL
-#define D_NAN (HUGE_VAL - HUGE_VAL)
-
-double d_randtest(flint_rand_t state);
-
-double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
-
-double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
-
-static __inline__ double
-d_polyval(const double * poly, int len, double x)
+void
+fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
 {
-    double t;
-    int i;
+    double randd, delta, eta;
 
-    for (t = poly[len-1], i = len-2; i >= 0; i--)
-        t = poly[i] + x * t;
-
-    return t;
+    randd = d_randtest(state);
+    if (randd > 0.5 && n_randint(state, 1))
+    {
+        delta = 0.25 + (randd - 0.5) * 0.75;
+        if (n_randint(state, 1))
+            eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
+        else
+            eta = 0.5 + randd * (sqrt(delta) - 0.5);
+    }
+    else
+    {
+        delta = 0.25 + randd * 0.75;
+        if (n_randint(state, 1))
+            eta = 0.5 + (randd - 0.5) * (sqrt(delta) - 0.5);
+        else
+            eta = 0.5 + randd * (sqrt(delta) - 0.5);
+    }
+    fmpz_lll_set_params(fl, delta, eta);
 }
-
-double d_lambertw(double x);
-
-int d_is_nan(double x);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

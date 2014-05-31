@@ -30,7 +30,7 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_d(fmpz_mat_t B, double delta, double eta)
+fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
 {
     int kappa, kappa2, d, n, i, j, zeros, kappamax, shift;
     int num_failed_fast = 0;
@@ -45,7 +45,7 @@ fmpz_lll_d(fmpz_mat_t B, double delta, double eta)
     n = B->c;
     d = B->r;
 
-    ctt = (4 * delta + 1) / 5;
+    ctt = (4 * fl->delta + 1) / 5;
 
     shift = fmpz_lll_shift(B);
 
@@ -105,8 +105,7 @@ fmpz_lll_d(fmpz_mat_t B, double delta, double eta)
             babai_ok =
                 fmpz_lll_check_babai(kappa, B, mu, r, s, appB, expo, appSP,
                                      alpha[kappa], zeros, kappamax,
-                                     FLINT_MIN(kappamax + 1 + shift, n), delta,
-                                     eta);
+                                     FLINT_MIN(kappamax + 1 + shift, n), fl);
         }
         else
         {
@@ -121,8 +120,7 @@ fmpz_lll_d(fmpz_mat_t B, double delta, double eta)
                                                  expo, appSP, alpha[kappa],
                                                  zeros, kappamax,
                                                  FLINT_MIN(kappamax + 1 +
-                                                           shift, n), delta,
-                                                 eta);
+                                                           shift, n), fl);
         }
 
         if (heuristic_fail == -1)

@@ -52,6 +52,24 @@
 #define MAX_LONG 9007199254740991
 #endif
 
+typedef struct
+{
+    double delta;
+    double eta;
+} fmpz_lll_struct;
+
+typedef fmpz_lll_struct fmpz_lll_t[1];
+
+/* Parameter manipulation  ***************************************************/
+
+void fmpz_lll_default_params(fmpz_lll_t fl);
+
+void fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta);
+
+/* Random parameter generation  **********************************************/
+
+void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state);
+
 /* The various Babai's  ******************************************************/
 
 double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong len2,
@@ -59,15 +77,15 @@ double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong le
 
 int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
        d_mat_t appB, int *expo, d_mat_t appSP,
-       int a, int zeros, int kappamax, int n, double delta, double eta);
+       int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
 int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
        d_mat_t appB, int *expo, d_mat_t appSP,
-       int a, int zeros, int kappamax, int n, double delta, double eta);
+       int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
 int fmpz_lll_shift(const fmpz_mat_t B);
 
-int fmpz_lll_d(fmpz_mat_t B, double delta, double eta);
+int fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl);
 
 
 /* double heuristic_scalar_product(double * vec1, double * vec2, ulong n, 
