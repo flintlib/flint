@@ -38,13 +38,14 @@ main(void)
     fmpz_mat_t mat;
     fmpz_lll_t fl;
     mp_bitcnt_t bits;
+
     FLINT_TEST_INIT(state);
 
     flint_printf("lll_d....");
     fflush(stdout);
 
     /* test using NTRU like matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong q;
         slong r, c;
@@ -55,6 +56,7 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
+        fmpz_lll_set_is_gram(fl, 0);
 
         bits = n_randint(state, 20) + 1;
         q = n_randint(state, 200) + 1;
@@ -64,7 +66,12 @@ main(void)
         else
             fmpz_mat_randntrulike2(mat, state, bits, q);
 
-        fmpz_lll_d(mat, fl);
+        result = fmpz_lll_d(mat, fl);
+        if (result == -1 && fl->gram_type == 1)
+        {
+            fmpz_mat_clear(mat);
+            continue;
+        }
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
@@ -83,6 +90,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("gram_type = %d\n", fl->gram_type);
             abort();
         }
 
@@ -90,7 +98,7 @@ main(void)
     }
 
     /* test using integer relations matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong r, c;
         d_mat_t Q, R;
@@ -100,6 +108,7 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
+        fmpz_lll_set_is_gram(fl, 0);
 
         bits = n_randint(state, 200) + 1;
 
@@ -129,6 +138,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("gram_type = %d\n", fl->gram_type);
             abort();
         }
 
@@ -136,7 +146,7 @@ main(void)
     }
 
     /* test using ajtai matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong r, c;
         d_mat_t Q, R;
@@ -146,6 +156,7 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
+        fmpz_lll_set_is_gram(fl, 0);
 
         fmpz_mat_randajtai(mat, state, 0.5);
 
@@ -168,6 +179,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("i = %ld\n", i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("gram_type = %d\n", fl->gram_type);
             abort();
         }
 
@@ -175,7 +187,7 @@ main(void)
     }
 
     /* test using simultaneous diophantine matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         mp_bitcnt_t bits2;
         slong r, c;
@@ -186,13 +198,19 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
+        fmpz_lll_set_is_gram(fl, 0);
 
         bits = n_randint(state, 200) + 1;
         bits2 = n_randint(state, 5) + 1;
 
         fmpz_mat_randsimdioph(mat, state, bits, bits2);
 
-        fmpz_lll_d(mat, fl);
+        result = fmpz_lll_d(mat, fl);
+        if (result == -1)
+        {
+            fmpz_mat_clear(mat);
+            continue;
+        }
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
@@ -211,6 +229,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("gram_type = %d\n", fl->gram_type);
             abort();
         }
 

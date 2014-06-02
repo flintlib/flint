@@ -34,4 +34,6 @@ fmpz_lll_default_params(fmpz_lll_t fl)
 {
     fl->delta = 0.75;
     fl->eta = 0.81;
+    fl->is_gram = 0;
+    fl->gram_type = 0;
 }

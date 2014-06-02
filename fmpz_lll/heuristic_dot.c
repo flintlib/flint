@@ -35,7 +35,7 @@ fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,
     double tmp = _d_vec_norm(vec1, len2);
     double tmp2 = _d_vec_norm(vec2, len2);
 
-    tmp = ldexp(tmp * tmp2, -70);
+    tmp = ldexp(tmp * tmp2, -2 * D_BITS);
     tmp2 = sum * sum;
 
     if (tmp2 <= tmp)

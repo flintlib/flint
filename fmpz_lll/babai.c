@@ -33,213 +33,482 @@
 
 int
 FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
-          d_mat_t appB, int *expo, d_mat_t appSP,
+          d_mat_t appB, int *expo, fmpz_gram_t A,
           int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 {
-    int i, j, k, test, aa, exponent;
-    slong xx;
-    double tmp, rtmp, halfplus, onedothalfplus;
-    ulong loops;
-
-    aa = (a > zeros) ? a : zeros + 1;
-
-    halfplus = (4 * fl->eta + .5) / 5;
-    onedothalfplus = 1.0 + halfplus;
-
-    loops = 0;
-
-    do
+    if (fl->is_gram == 0)
     {
-        test = 0;
-
-        loops++;
-        if (loops > 2)
+        if (fl->gram_type == 0)
         {
-            return -1;
-        }
+            int i, j, k, test, aa, exponent;
+            slong xx;
+            double tmp, rtmp, halfplus, onedothalfplus;
+            ulong loops;
 
-        /* ************************************** */
-        /* Step2: compute the GSO for stage kappa */
-        /* ************************************** */
+            aa = (a > zeros) ? a : zeros + 1;
 
-        for (j = aa; j < kappa; j++)
-        {
-            if (d_is_nan(d_mat_entry(appSP, kappa, j)))
+            halfplus = (4 * fl->eta + .5) / 5;
+            onedothalfplus = 1.0 + halfplus;
+
+            loops = 0;
+
+            do
             {
-                COMPUTE(appSP, kappa, j, n);
-            }
+                test = 0;
 
-            if (j > zeros + 2)
-            {
-                tmp =
-                    d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r, kappa,
-                                                                zeros + 1);
-                rtmp = d_mat_entry(appSP, kappa, j) - tmp;
-
-                for (k = zeros + 2; k < j - 1; k++)
+                loops++;
+                if (loops > 2)
                 {
-                    tmp = d_mat_entry(mu, j, k) * d_mat_entry(r, kappa, k);
-                    rtmp = rtmp - tmp;
+                    return -1;
                 }
 
-                tmp = d_mat_entry(mu, j, j - 1) * d_mat_entry(r, kappa, j - 1);
-                d_mat_entry(r, kappa, j) = rtmp - tmp;
-            }
-            else if (j == zeros + 2)
-            {
-                tmp =
-                    d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r, kappa,
-                                                                zeros + 1);
-                d_mat_entry(r, kappa, j) = d_mat_entry(appSP, kappa, j) - tmp;
-            }
-            else
-                d_mat_entry(r, kappa, j) = d_mat_entry(appSP, kappa, j);
+                /* ************************************** */
+                /* Step2: compute the GSO for stage kappa */
+                /* ************************************** */
 
-            d_mat_entry(mu, kappa, j) =
-                d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
-        }
-
-        /* **************************** */
-        /* Step3--5: compute the X_j's  */
-        /* **************************** */
-
-        for (j = kappa - 1; j > zeros; j--)
-        {
-
-            /* test of the relaxed size-reduction condition */
-            tmp = fabs(d_mat_entry(mu, kappa, j));
-            tmp = ldexp(tmp, expo[kappa] - expo[j]);
-
-            if (tmp > halfplus)
-            {
-                test = 1;
-                exponent = expo[j] - expo[kappa];
-
-                /* we consider separately the cases X = +-1 */
-                if (tmp <= onedothalfplus)
+                for (j = aa; j < kappa; j++)
                 {
-                    if (d_mat_entry(mu, kappa, j) >= 0) /* in this case, X is 1 */
+                    if (d_is_nan(d_mat_entry(A->appSP, kappa, j)))
                     {
-                        for (k = zeros + 1; k < j; k++)
-                        {
-                            tmp = ldexp(d_mat_entry(mu, j, k), exponent);
-                            d_mat_entry(mu, kappa, k) =
-                                d_mat_entry(mu, kappa, k) - tmp;
-                        }
-                        _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
-                                      B->rows[j], n);
+                        COMPUTE(A->appSP, kappa, j, n);
                     }
-                    else        /* otherwise X is -1 */
+
+                    if (j > zeros + 2)
                     {
-                        for (k = zeros + 1; k < j; k++)
+                        tmp =
+                            d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
+                                                                        kappa,
+                                                                        zeros +
+                                                                        1);
+                        rtmp = d_mat_entry(A->appSP, kappa, j) - tmp;
+
+                        for (k = zeros + 2; k < j - 1; k++)
                         {
-                            tmp = ldexp(d_mat_entry(mu, j, k), exponent);
-                            d_mat_entry(mu, kappa, k) =
-                                d_mat_entry(mu, kappa, k) + tmp;
+                            tmp =
+                                d_mat_entry(mu, j, k) * d_mat_entry(r, kappa,
+                                                                    k);
+                            rtmp = rtmp - tmp;
                         }
-                        _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
-                                      B->rows[j], n);
+
+                        tmp =
+                            d_mat_entry(mu, j, j - 1) * d_mat_entry(r, kappa,
+                                                                    j - 1);
+                        d_mat_entry(r, kappa, j) = rtmp - tmp;
                     }
-                }
-                else            /* we must have |X| >= 2 */
-                {
-                    tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
-                    if ((tmp < (double) MAX_LONG)
-                        && (tmp > (double) -MAX_LONG))
+                    else if (j == zeros + 2)
                     {
-                        if (tmp < 0)
-                            tmp = ceil(tmp - 0.5);
-                        else
-                            tmp = floor(tmp + 0.5);
-
-                        for (k = zeros + 1; k < j; k++)
-                        {
-                            rtmp = tmp * d_mat_entry(mu, j, k);
-                            rtmp = ldexp(rtmp, exponent);
-                            d_mat_entry(mu, kappa, k) =
-                                d_mat_entry(mu, kappa, k) - rtmp;
-                        }
-
-                        xx = (slong) tmp;
-                        _fmpz_vec_scalar_submul_si(B->rows[kappa], B->rows[j],
-                                                   n, xx);
-
+                        tmp =
+                            d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
+                                                                        kappa,
+                                                                        zeros +
+                                                                        1);
+                        d_mat_entry(r, kappa, j) =
+                            d_mat_entry(A->appSP, kappa, j) - tmp;
                     }
                     else
+                        d_mat_entry(r, kappa, j) =
+                            d_mat_entry(A->appSP, kappa, j);
+
+                    d_mat_entry(mu, kappa, j) =
+                        d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
+                }
+
+                /* **************************** */
+                /* Step3--5: compute the X_j's  */
+                /* **************************** */
+
+                for (j = kappa - 1; j > zeros; j--)
+                {
+                    /* test of the relaxed size-reduction condition */
+                    tmp = fabs(d_mat_entry(mu, kappa, j));
+                    tmp = ldexp(tmp, expo[kappa] - expo[j]);
+
+                    if (tmp > halfplus)
                     {
-                        tmp = frexp(d_mat_entry(mu, kappa, j), &exponent);
+                        test = 1;
+                        exponent = expo[j] - expo[kappa];
 
-                        tmp = tmp * MAX_LONG;
-                        xx = (slong) tmp;
-                        exponent += expo[kappa] - expo[j] - CPU_SIZE_1;
-
-                        /* This case is extremely rare: never happened for me. Check this: done */
-                        if (exponent <= 0)
+                        /* we consider separately the cases X = +-1 */
+                        if (tmp <= onedothalfplus)
                         {
-                            /* flint_printf("rare case kappa = %d, j = %d ******\n",
-                               kappa, j); */
-                            xx = xx << -exponent;
-                            exponent = 0;
-
-                            _fmpz_vec_scalar_submul_si(B->rows[kappa],
-                                                       B->rows[j], n, xx);
-
-                            for (k = zeros + 1; k < j; k++)
+                            if (d_mat_entry(mu, kappa, j) >= 0) /* in this case, X is 1 */
                             {
-                                rtmp = ((double) xx) * d_mat_entry(mu, j, k);
-                                rtmp = ldexp(rtmp, expo[j] - expo[kappa]);
-                                d_mat_entry(mu, kappa, k) =
-                                    d_mat_entry(mu, kappa, k) - rtmp;
+                                for (k = zeros + 1; k < j; k++)
+                                {
+                                    tmp =
+                                        ldexp(d_mat_entry(mu, j, k), exponent);
+                                    d_mat_entry(mu, kappa, k) =
+                                        d_mat_entry(mu, kappa, k) - tmp;
+                                }
+                                _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
+                                              B->rows[j], n);
+                            }
+                            else    /* otherwise X is -1 */
+                            {
+                                for (k = zeros + 1; k < j; k++)
+                                {
+                                    tmp =
+                                        ldexp(d_mat_entry(mu, j, k), exponent);
+                                    d_mat_entry(mu, kappa, k) =
+                                        d_mat_entry(mu, kappa, k) + tmp;
+                                }
+                                _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
+                                              B->rows[j], n);
                             }
                         }
-                        else
+                        else    /* we must have |X| >= 2 */
                         {
-                            _fmpz_vec_scalar_submul_si_2exp(B->rows[kappa],
-                                                            B->rows[j], n, xx,
-                                                            exponent);
-
-                            for (k = zeros + 1; k < j; k++)
+                            tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
+                            if ((tmp < (double) MAX_LONG)
+                                && (tmp > (double) -MAX_LONG))
                             {
-                                rtmp = ((double) xx) * d_mat_entry(mu, j, k);
-                                rtmp =
-                                    ldexp(rtmp,
-                                          exponent + expo[j] - expo[kappa]);
-                                d_mat_entry(mu, kappa, k) =
-                                    d_mat_entry(mu, kappa, k) - rtmp;
+                                if (tmp < 0)
+                                    tmp = ceil(tmp - 0.5);
+                                else
+                                    tmp = floor(tmp + 0.5);
+
+                                for (k = zeros + 1; k < j; k++)
+                                {
+                                    rtmp = tmp * d_mat_entry(mu, j, k);
+                                    rtmp = ldexp(rtmp, exponent);
+                                    d_mat_entry(mu, kappa, k) =
+                                        d_mat_entry(mu, kappa, k) - rtmp;
+                                }
+
+                                xx = (slong) tmp;
+                                _fmpz_vec_scalar_submul_si(B->rows[kappa],
+                                                           B->rows[j], n, xx);
+
+                            }
+                            else
+                            {
+                                tmp =
+                                    frexp(d_mat_entry(mu, kappa, j),
+                                          &exponent);
+
+                                tmp = tmp * MAX_LONG;
+                                xx = (slong) tmp;
+                                exponent += expo[kappa] - expo[j] - CPU_SIZE_1;
+
+                                /* This case is extremely rare: never happened for me. Check this: done */
+                                if (exponent <= 0)
+                                {
+                                    /* flint_printf("rare case kappa = %d, j = %d ******\n",
+                                       kappa, j); */
+                                    xx = xx << -exponent;
+                                    exponent = 0;
+
+                                    _fmpz_vec_scalar_submul_si(B->rows[kappa],
+                                                               B->rows[j], n,
+                                                               xx);
+
+                                    for (k = zeros + 1; k < j; k++)
+                                    {
+                                        rtmp =
+                                            ((double) xx) * d_mat_entry(mu, j,
+                                                                        k);
+                                        rtmp =
+                                            ldexp(rtmp, expo[j] - expo[kappa]);
+                                        d_mat_entry(mu, kappa, k) =
+                                            d_mat_entry(mu, kappa, k) - rtmp;
+                                    }
+                                }
+                                else
+                                {
+                                    _fmpz_vec_scalar_submul_si_2exp(B->rows
+                                                                    [kappa],
+                                                                    B->rows[j],
+                                                                    n, xx,
+                                                                    exponent);
+
+                                    for (k = zeros + 1; k < j; k++)
+                                    {
+                                        rtmp =
+                                            ((double) xx) * d_mat_entry(mu, j,
+                                                                        k);
+                                        rtmp =
+                                            ldexp(rtmp,
+                                                  exponent + expo[j] -
+                                                  expo[kappa]);
+                                        d_mat_entry(mu, kappa, k) =
+                                            d_mat_entry(mu, kappa, k) - rtmp;
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
+                if (test)       /* Anything happened? */
+                {
+                    expo[kappa] =
+                        _fmpz_vec_get_d_vec_2exp(appB->rows[kappa],
+                                                 B->rows[kappa], n);
+                    aa = zeros + 1;
+
+                    for (i = zeros + 1; i <= kappa; i++)
+                        d_mat_entry(A->appSP, kappa, i) = NAN;
+
+                    for (i = kappa + 1; i <= kappamax; i++)
+                        d_mat_entry(A->appSP, i, kappa) = NAN;
+                }
+            } while (test);
+
+            if (d_is_nan(d_mat_entry(A->appSP, kappa, kappa)))
+            {
+                COMPUTE(A->appSP, kappa, kappa, n);
+            }
+
+            s[zeros + 1] = d_mat_entry(A->appSP, kappa, kappa);
+
+            for (k = zeros + 1; k < kappa - 1; k++)
+            {
+                tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
+                s[k + 1] = s[k] - tmp;
             }
         }
-
-        if (test)               /* Anything happened? */
+        else
         {
-            expo[kappa] =
-                _fmpz_vec_get_d_vec_2exp(appB->rows[kappa], B->rows[kappa], n);
-            aa = zeros + 1;
+            int j, k, test, aa, exponent;
+            slong xx;
+            double tmp, rtmp, halfplus, onedothalfplus;
+            ulong loops;
 
-            for (i = zeros + 1; i <= kappa; i++)
-                d_mat_entry(appSP, kappa, i) = NAN;
+            aa = (a > zeros) ? a : zeros + 1;
 
-            for (i = kappa + 1; i <= kappamax; i++)
-                d_mat_entry(appSP, i, kappa) = NAN;
+            halfplus = (4 * fl->eta + .5) / 5;
+            onedothalfplus = 1.0 + halfplus;
+
+            loops = 0;
+
+            do
+            {
+                test = 0;
+
+                loops++;
+                if (loops > 2)
+                {
+                    return -1;
+                }
+
+                /* ************************************** */
+                /* Step2: compute the GSO for stage kappa */
+                /* ************************************** */
+
+                for (j = aa; j < kappa; j++)
+                {
+                    if (j > zeros + 2)
+                    {
+                        tmp =
+                            d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
+                                                                        kappa,
+                                                                        zeros +
+                                                                        1);
+                        rtmp =
+                            fmpz_get_d(fmpz_mat_entry
+                                       (A->exactSP, kappa, j)) / ldexp(1,
+                                                                       (expo
+                                                                        [kappa]
+                                                                        +
+                                                                        expo
+                                                                        [j])) -
+                            tmp;
+
+                        for (k = zeros + 2; k < j - 1; k++)
+                        {
+                            tmp =
+                                d_mat_entry(mu, j, k) * d_mat_entry(r, kappa,
+                                                                    k);
+                            rtmp = rtmp - tmp;
+                        }
+
+                        tmp =
+                            d_mat_entry(mu, j, j - 1) * d_mat_entry(r, kappa,
+                                                                    j - 1);
+                        d_mat_entry(r, kappa, j) = rtmp - tmp;
+                    }
+                    else if (j == zeros + 2)
+                    {
+                        tmp =
+                            d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
+                                                                        kappa,
+                                                                        zeros +
+                                                                        1);
+                        d_mat_entry(r, kappa, j) =
+                            fmpz_get_d(fmpz_mat_entry
+                                       (A->exactSP, kappa, j)) / ldexp(1,
+                                                                       (expo
+                                                                        [kappa]
+                                                                        +
+                                                                        expo
+                                                                        [j])) -
+                            tmp;
+                    }
+                    else
+                        d_mat_entry(r, kappa, j) =
+                            fmpz_get_d(fmpz_mat_entry
+                                       (A->exactSP, kappa, j)) / ldexp(1,
+                                                                       (expo
+                                                                        [kappa]
+                                                                        +
+                                                                        expo
+                                                                        [j]));;
+
+                    d_mat_entry(mu, kappa, j) =
+                        d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
+                }
+
+                /* **************************** */
+                /* Step3--5: compute the X_j's  */
+                /* **************************** */
+
+                for (j = kappa - 1; j > zeros; j--)
+                {
+                    /* test of the relaxed size-reduction condition */
+                    tmp = fabs(d_mat_entry(mu, kappa, j));
+                    tmp = ldexp(tmp, expo[kappa] - expo[j]);
+
+                    if (tmp > halfplus)
+                    {
+                        test = 1;
+                        exponent = expo[j] - expo[kappa];
+
+                        /* we consider separately the cases X = +-1 */
+                        if (tmp <= onedothalfplus)
+                        {
+                            if (d_mat_entry(mu, kappa, j) >= 0) /* in this case, X is 1 */
+                            {
+                                for (k = zeros + 1; k < j; k++)
+                                {
+                                    tmp =
+                                        ldexp(d_mat_entry(mu, j, k), exponent);
+                                    d_mat_entry(mu, kappa, k) =
+                                        d_mat_entry(mu, kappa, k) - tmp;
+                                }
+                                _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
+                                              B->rows[j], n);
+                            }
+                            else    /* otherwise X is -1 */
+                            {
+                                for (k = zeros + 1; k < j; k++)
+                                {
+                                    tmp =
+                                        ldexp(d_mat_entry(mu, j, k), exponent);
+                                    d_mat_entry(mu, kappa, k) =
+                                        d_mat_entry(mu, kappa, k) + tmp;
+                                }
+                                _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
+                                              B->rows[j], n);
+                            }
+                        }
+                        else    /* we must have |X| >= 2 */
+                        {
+                            tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
+                            if ((tmp < (double) MAX_LONG)
+                                && (tmp > (double) -MAX_LONG))
+                            {
+                                if (tmp < 0)
+                                    tmp = ceil(tmp - 0.5);
+                                else
+                                    tmp = floor(tmp + 0.5);
+
+                                for (k = zeros + 1; k < j; k++)
+                                {
+                                    rtmp = tmp * d_mat_entry(mu, j, k);
+                                    rtmp = ldexp(rtmp, exponent);
+                                    d_mat_entry(mu, kappa, k) =
+                                        d_mat_entry(mu, kappa, k) - rtmp;
+                                }
+
+                                xx = (slong) tmp;
+                                _fmpz_vec_scalar_submul_si(B->rows[kappa],
+                                                           B->rows[j], n, xx);
+
+                            }
+                            else
+                            {
+                                tmp =
+                                    frexp(d_mat_entry(mu, kappa, j),
+                                          &exponent);
+
+                                tmp = tmp * MAX_LONG;
+                                xx = (slong) tmp;
+                                exponent += expo[kappa] - expo[j] - CPU_SIZE_1;
+
+                                /* This case is extremely rare: never happened for me. Check this: done */
+                                if (exponent <= 0)
+                                {
+                                    /* flint_printf("rare case kappa = %d, j = %d ******\n",
+                                       kappa, j); */
+                                    xx = xx << -exponent;
+                                    exponent = 0;
+
+                                    _fmpz_vec_scalar_submul_si(B->rows[kappa],
+                                                               B->rows[j], n,
+                                                               xx);
+
+                                    for (k = zeros + 1; k < j; k++)
+                                    {
+                                        rtmp =
+                                            ((double) xx) * d_mat_entry(mu, j,
+                                                                        k);
+                                        rtmp =
+                                            ldexp(rtmp, expo[j] - expo[kappa]);
+                                        d_mat_entry(mu, kappa, k) =
+                                            d_mat_entry(mu, kappa, k) - rtmp;
+                                    }
+                                }
+                                else
+                                {
+                                    _fmpz_vec_scalar_submul_si_2exp(B->rows
+                                                                    [kappa],
+                                                                    B->rows[j],
+                                                                    n, xx,
+                                                                    exponent);
+
+                                    for (k = zeros + 1; k < j; k++)
+                                    {
+                                        rtmp =
+                                            ((double) xx) * d_mat_entry(mu, j,
+                                                                        k);
+                                        rtmp =
+                                            ldexp(rtmp,
+                                                  exponent + expo[j] -
+                                                  expo[kappa]);
+                                        d_mat_entry(mu, kappa, k) =
+                                            d_mat_entry(mu, kappa, k) - rtmp;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (test)       /* Anything happened? */
+                {
+                    expo[kappa] =
+                        _fmpz_vec_get_d_vec_2exp(appB->rows[kappa],
+                                                 B->rows[kappa], n);
+                    aa = zeros + 1;
+
+                    fmpz_mat_gram(A->exactSP, B);
+                }
+            } while (test);
+
+            s[zeros + 1] =
+                fmpz_get_d(fmpz_mat_entry(A->exactSP, kappa, kappa)) / ldexp(1,
+                                                                             2
+                                                                             *
+                                                                             expo
+                                                                             [kappa]);
+
+            for (k = zeros + 1; k < kappa - 1; k++)
+            {
+                tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
+                s[k + 1] = s[k] - tmp;
+            }
         }
-    } while (test);
-
-    if (d_is_nan(d_mat_entry(appSP, kappa, kappa)))
-    {
-        COMPUTE(appSP, kappa, kappa, n);
     }
-
-    s[zeros + 1] = d_mat_entry(appSP, kappa, kappa);
-
-    for (k = zeros + 1; k < kappa - 1; k++)
-    {
-        tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
-        s[k + 1] = s[k] - tmp;
-    }
-
     return 0;
 }
 

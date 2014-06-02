@@ -56,15 +56,34 @@ typedef struct
 {
     double delta;
     double eta;
+    int is_gram;
+    int gram_type;
 } fmpz_lll_struct;
 
 typedef fmpz_lll_struct fmpz_lll_t[1];
+
+typedef union
+{
+    d_mat_t appSP;
+    fmpz_mat_t exactSP;
+} fmpz_gram_union;
+
+typedef fmpz_gram_union fmpz_gram_t[1];
 
 /* Parameter manipulation  ***************************************************/
 
 void fmpz_lll_default_params(fmpz_lll_t fl);
 
-void fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta);
+void fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta, int is_gram,
+                         int gram_type);
+
+void fmpz_lll_set_delta(fmpz_lll_t fl, double delta);
+
+void fmpz_lll_set_eta(fmpz_lll_t fl, double eta);
+
+void fmpz_lll_set_is_gram(fmpz_lll_t fl, int is_gram);
+
+void fmpz_lll_set_gram_type(fmpz_lll_t fl, int gram_type);
 
 /* Random parameter generation  **********************************************/
 
@@ -76,11 +95,11 @@ double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong le
        const fmpz_mat_t B, slong k, slong j, slong exp_adj);
 
 int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
-       d_mat_t appB, int *expo, d_mat_t appSP,
+       d_mat_t appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
 int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
-       d_mat_t appB, int *expo, d_mat_t appSP,
+       d_mat_t appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
 
 int fmpz_lll_shift(const fmpz_mat_t B);

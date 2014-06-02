@@ -33,6 +33,7 @@ void
 fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
 {
     double randd, delta, eta;
+    int is_gram, gram_type;
 
     randd = d_randtest(state);
     if (randd > 0.5 && n_randint(state, 1))
@@ -51,5 +52,7 @@ fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
         else
             eta = 0.5 + randd * (sqrt(delta) - 0.5);
     }
-    fmpz_lll_set_params(fl, delta, eta);
+    is_gram = n_randint(state, 2);
+    gram_type = n_randint(state, 2);
+    fmpz_lll_set_params(fl, delta, eta, is_gram, gram_type);
 }

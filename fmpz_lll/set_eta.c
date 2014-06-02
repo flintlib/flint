@@ -30,11 +30,7 @@
 #include "fmpz_lll.h"
 
 void
-fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta, int is_gram,
-                    int gram_type)
+fmpz_lll_set_eta(fmpz_lll_t fl, double eta)
 {
-    fl->delta = delta;
     fl->eta = eta;
-    fl->is_gram = is_gram;
-    fl->gram_type = gram_type;
 }
