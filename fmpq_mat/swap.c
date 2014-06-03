@@ -19,18 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "fmpz_lll.h"
+#include "fmpq_mat.h"
 
 void
-fmpz_lll_set_delta(fmpz_lll_t fl, double delta)
+fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
 {
-    fl->delta = delta;
+    if (mat1 != mat2)
+    {
+        fmpq_mat_struct tmp;
+
+        tmp = *mat1;
+        *mat1 = *mat2;
+        *mat2 = tmp;
+    }
 }

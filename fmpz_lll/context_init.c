@@ -19,9 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
@@ -30,7 +28,11 @@
 #include "fmpz_lll.h"
 
 void
-fmpz_lll_set_eta(fmpz_lll_t fl, double eta)
+fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta, rep_type rt,
+                      gram_type gt)
 {
+    fl->delta = delta;
     fl->eta = eta;
+    fl->rt = rt;
+    fl->gt = gt;
 }

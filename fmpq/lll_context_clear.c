@@ -19,18 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "fmpz_lll.h"
+#include "fmpq.h"
 
 void
-fmpz_lll_set_is_gram(fmpz_lll_t fl, int is_gram)
+fmpq_lll_context_clear(fmpq_lll_t fl)
 {
-    fl->is_gram = is_gram;
+    fmpq_clear(fl->delta);
+    fmpq_clear(fl->eta);
 }

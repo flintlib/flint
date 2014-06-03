@@ -57,6 +57,8 @@ void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
 
 void fmpq_mat_clear(fmpq_mat_t mat);
 
+void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2);
+
 
 void fmpq_mat_print(const fmpq_mat_t mat);
 
@@ -186,9 +188,13 @@ slong fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
 
 slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
+/* Gram-Schmidt Orthogonalisation  *******************************************/
+
+void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A);
+
 /* Classical LLL *************************************************************/
 
-void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha);
+void fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl);
 
 #ifdef __cplusplus
 }

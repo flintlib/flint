@@ -19,22 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "fmpz_lll.h"
+#include "fmpq.h"
 
 void
-fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta, int is_gram,
-                    int gram_type)
+fmpq_lll_context_init(fmpq_lll_t fl, slong delta_num, slong delta_den,
+                      slong eta_num, slong eta_den)
 {
-    fl->delta = delta;
-    fl->eta = eta;
-    fl->is_gram = is_gram;
-    fl->gram_type = gram_type;
+    fmpq_init(fl->delta);
+    fmpq_init(fl->eta);
+    fmpq_set_si(fl->delta, delta_num, delta_den);
+    fmpq_set_si(fl->eta, eta_num, eta_den);
 }

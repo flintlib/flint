@@ -27,9 +27,10 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
-#include "fmpq_vec.h"
+#include "d_vec.h"
+#include "ulong_extras.h"
+
+#define D_VEC_SP_EPS (1e-14)
 
 int
 main(void)
@@ -37,77 +38,49 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-
-    flint_printf("gso....");
+    flint_printf("dot_thrice....");
     fflush(stdout);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    /* check sum of scalar products of parts of vectors is equal to the
+       scalar product of vectors */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        fmpq_mat_t A, B, C;
-        fmpq_t dot;
-        int j, k;
+        double *a, *b;
+        double res1, res2, res3, err1, err2, err3;
+        slong len = n_randint(state, 100);
+        if (!len)
+            continue;
 
-        slong m, n, bits;
+        a = _d_vec_init(len);
+        b = _d_vec_init(len);
+        _d_vec_randtest(a, state, len, 0, 0);
+        _d_vec_randtest(b, state, len, 0, 0);
 
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        res1 = _d_vec_dot_thrice(a, b, len - 1, &err1);
+        res2 = _d_vec_dot_thrice(a + len - 1, b + len - 1, 1, &err2);
+        res3 = _d_vec_dot_thrice(a, b, len, &err3);
 
-        bits = 1 + n_randint(state, 100);
-
-        fmpq_mat_init(A, m, n);
-        fmpq_mat_init(B, n, m);
-        fmpq_mat_init(C, n, m);
-
-        fmpq_mat_randtest(A, state, bits);
-
-        fmpq_mat_transpose(B, A);
-        fmpq_mat_rref(B, B);
-
-        fmpq_mat_gso(A, A);
-
-        fmpq_mat_transpose(C, A);
-
-        fmpq_init(dot);
-
-        for (j = 0; j < n; j++)
-        {
-            for (k = j + 1; k < n; k++)
-            {
-
-                _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
-
-                if (!fmpq_is_zero(dot))
-                {
-                    flint_printf("FAIL:\n");
-                    flint_printf("A:\n");
-                    fmpq_mat_print(A);
-                    abort();
-                }
-            }
-        }
-
-        fmpq_mat_rref(C, C);
-
-        result = fmpq_mat_equal(B, C);
+        result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS;
 
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("B:\n");
-            fmpq_mat_print(B);
-            flint_printf("C:\n");
-            fmpq_mat_print(C);
+            flint_printf("%g\n", fabs(res1 + res2 - res3));
+            flint_printf("%g\n", res1);
+            flint_printf("%g\n", res2);
+            flint_printf("%g\n", res3);
+            flint_printf("%g\n", err1);
+            flint_printf("%g\n", err2);
+            flint_printf("%g\n", err3);
             abort();
         }
 
-        fmpq_mat_clear(A);
-        fmpq_mat_clear(B);
-        fmpq_mat_clear(C);
-        fmpq_clear(dot);
+        _d_vec_clear(a);
+        _d_vec_clear(b);
     }
 
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

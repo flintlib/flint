@@ -19,9 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
@@ -30,7 +28,10 @@
 #include "fmpz_lll.h"
 
 void
-fmpz_lll_set_gram_type(fmpz_lll_t fl, int gram_type)
+fmpz_lll_context_init_default(fmpz_lll_t fl)
 {
-    fl->gram_type = gram_type;
+    fl->delta = 0.75;
+    fl->eta = 0.81;
+    fl->rt = Z_BASIS;
+    fl->gt = APPROX;
 }

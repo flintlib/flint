@@ -19,10 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
     Copyright (C) 2009, 2010 William Hart
     Copyright (C) 2009, 2010 Andy Novocin
-    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
@@ -36,9 +34,9 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
           d_mat_t appB, int *expo, fmpz_gram_t A,
           int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 {
-    if (fl->is_gram == 0)
+    if (fl->rt == Z_BASIS)
     {
-        if (fl->gram_type == 0)
+        if (fl->gt == APPROX)
         {
             int i, j, k, test, aa, exponent;
             slong xx;
@@ -352,7 +350,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                                         [kappa]
                                                                         +
                                                                         expo
-                                                                        [j]));;
+                                                                        [j]));
 
                     d_mat_entry(mu, kappa, j) =
                         d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);

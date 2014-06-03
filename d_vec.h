@@ -75,6 +75,8 @@ double _d_vec_norm(const double * vec, slong len);
 
 double _d_vec_dot_heuristic(const double * vec1, const double * vec2, slong len2, double * err);
 
+double _d_vec_dot_thrice(const double * vec1, const double * vec2, slong len2, double * err);
+
 #ifdef __cplusplus
 }
 #endif

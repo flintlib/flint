@@ -39,6 +39,11 @@ void fmpq_mat_clear(fmpq_mat_t mat)
     Frees all memory associated with the matrix. The matrix must be
     reinitialised if it is to be used again.
 
+void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
+
+    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2}
+    are allowed to be different.
+
 *******************************************************************************
 
     Entry access
@@ -445,10 +450,10 @@ void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
 
 *******************************************************************************
 
-void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
+void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
 
     Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
-    the rows of a $m x n$ matrix \code{A}), and a reduction parameter
-    \code{alpha} \in $Q$ in the range 1/4 < \code{alpha} < 1. The output is
-    an \code{alpha}-reduced basis $y_1, y_2, \ldots, y_m$ of the lattice $L$
-    (as the rows of a $m x n$ matrix \code{B}).
+    the rows of a $m x n$ matrix \code{A}), and an LLL context object
+    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
+    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of a $m x n$
+    matrix \code{B}).

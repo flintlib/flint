@@ -19,9 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
@@ -33,7 +31,8 @@ void
 fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
 {
     double randd, delta, eta;
-    int is_gram, gram_type;
+    rep_type rt;
+    gram_type gt;
 
     randd = d_randtest(state);
     if (randd > 0.5 && n_randint(state, 1))
@@ -52,7 +51,7 @@ fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
         else
             eta = 0.5 + randd * (sqrt(delta) - 0.5);
     }
-    is_gram = n_randint(state, 2);
-    gram_type = n_randint(state, 2);
-    fmpz_lll_set_params(fl, delta, eta, is_gram, gram_type);
+    rt = n_randint(state, 2);
+    gt = n_randint(state, 2);
+    fmpz_lll_context_init(fl, delta, eta, rt, gt);
 }

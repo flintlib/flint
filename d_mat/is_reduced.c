@@ -26,7 +26,7 @@
 #include "d_mat.h"
 
 int
-d_mat_reduced(const d_mat_t R, double delta, double eta)
+d_mat_is_reduced(const d_mat_t R, double delta, double eta)
 {
     double tmp1, tmp2;
     int reduced = 1;

@@ -19,10 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2005, 2006 Damien Stehlé
     Copyright (C) 2009, 2010 William Hart
     Copyright (C) 2009, 2010 Andy Novocin
-    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
@@ -32,9 +30,9 @@
 int
 fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
 {
-    if (fl->is_gram == 0)
+    if (fl->rt == Z_BASIS)
     {
-        if (fl->gram_type == 0)
+        if (fl->gt == APPROX)
         {
             int kappa, kappa2, d, n, i, j, zeros, kappamax, shift;
             int num_failed_fast = 0;

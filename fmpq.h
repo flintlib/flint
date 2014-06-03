@@ -53,6 +53,14 @@ fmpq;
 
 typedef fmpq fmpq_t[1];
 
+typedef struct
+{
+    fmpq_t delta;
+    fmpq_t eta;
+} fmpq_lll_struct;
+
+typedef fmpq_lll_struct fmpq_lll_t[1];
+
 #define fmpq_numref(__x) (&(__x)->num)
 #define fmpq_denref(__y) (&(__y)->den)
 
@@ -322,6 +330,10 @@ void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
 void fmpq_harmonic_ui(fmpq_t x, ulong n);
+
+void fmpq_lll_context_init(fmpq_lll_t fl, slong delta_num, slong delta_den, slong eta_num, slong eta_den);
+
+void fmpq_lll_context_clear(fmpq_lll_t fl);
 
 #ifdef __cplusplus
 }

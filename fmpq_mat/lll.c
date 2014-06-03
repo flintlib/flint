@@ -27,7 +27,7 @@
 #include "fmpq_mat.h"
 
 void
-fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
+fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
 {
     slong i, j, k, l, m, n;
     fmpz_t r, one;
@@ -37,7 +37,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
 
     if (B->r != A->r || B->c != A->c)
     {
-        flint_printf("Exception (fmpz_mat_lll). Incompatible dimensions.\n");
+        flint_printf("Exception (fmpq_mat_lll). Incompatible dimensions.\n");
         abort();
     }
 
@@ -45,7 +45,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
     {
         fmpz_mat_t t;
         fmpz_mat_init(t, B->r, B->c);
-        fmpz_mat_lll(t, A, alpha);
+        fmpq_mat_lll(t, A, fl);
         fmpz_mat_swap(B, t);
         fmpz_mat_clear(t);
         return;
@@ -101,7 +101,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
     {
         /* size reduce row k against row k - 1 */
         fmpq_abs(rat, fmpq_mat_entry(mu, k, k - 1));
-        if (fmpq_cmp(rat, half) > 0)
+        if (fmpq_cmp(rat, fl->eta) > 0)
         {
             /* determine reduction coefficient */
             fmpq_set(rat, fmpq_mat_entry(mu, k, k - 1));
@@ -120,7 +120,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
                      fmpq_mat_entry(mu, k, k - 1), rat);
         }
         /* check exchange condition */
-        fmpq_set(rat, alpha);
+        fmpq_set(rat, fl->delta);
         fmpq_submul(rat, fmpq_mat_entry(mu, k, k - 1),
                     fmpq_mat_entry(mu, k, k - 1));
         fmpq_mul(rat, rat, gstar + k - 1);
@@ -130,7 +130,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_t alpha)
             {
                 /* size reduce row k against row l */
                 fmpq_abs(rat, fmpq_mat_entry(mu, k, l));
-                if (fmpq_cmp(rat, half) > 0)
+                if (fmpq_cmp(rat, fl->eta) > 0)
                 {
                     fmpq_set(rat, fmpq_mat_entry(mu, k, l));
                     fmpq_sub(rat, rat, half);

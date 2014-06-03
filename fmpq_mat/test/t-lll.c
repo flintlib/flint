@@ -42,48 +42,34 @@ main(void)
     fflush(stdout);
 
     /* check rref and |det| of LLL reduced matrix are equal to those of
-       original matrix (ranrank used) */
+       original matrix (randajtai used) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C;
         fmpq_mat_t Bq, Cq;
-        fmpq_t alpha, onefourth, one;
+        fmpq_lll_t fl;
         fmpz_t temp1, temp2;
 
-        slong m, n, bits;
+        slong m;
 
-        do
-        {
-            m = n_randint(state, 10);
-            n = n_randint(state, 10);
-        } while (m > n);
+        m = n_randint(state, 10);
 
-        bits = 1 + n_randint(state, 100);
-
-        fmpz_mat_init(A, m, n);
-        fmpz_mat_init(B, m, n);
-        fmpz_mat_init(C, m, n);
-        fmpq_mat_init(Bq, m, n);
-        fmpq_mat_init(Cq, m, n);
-        fmpq_init(alpha);
-        fmpq_init(onefourth);
-        fmpq_init(one);
+        fmpz_mat_init(A, m, m);
+        fmpz_mat_init(B, m, m);
+        fmpz_mat_init(C, m, m);
+        fmpq_mat_init(Bq, m, m);
+        fmpq_mat_init(Cq, m, m);
+        fmpq_lll_context_init(fl, 3, 4, 1, 2);
         fmpz_init(temp1);
         fmpz_init(temp2);
 
-        fmpz_mat_randrank(A, state, m, bits);
-        fmpq_set_si(onefourth, 1, 4);
-        fmpq_one(one);
-        do
-        {
-            fmpq_randtest(alpha, state, bits);
-        } while (fmpq_cmp(alpha, onefourth) <= 0 || fmpq_cmp(alpha, one) >= 0);
+        fmpz_mat_randajtai(A, state, 0.5);
 
         fmpz_mat_rref(B, temp1, A);
         fmpq_mat_set_fmpz_mat_div_fmpz(Bq, B, temp1);
         fmpz_abs(temp1, temp1);
 
-        fmpz_mat_lll(A, A, alpha);
+        fmpq_mat_lll(A, A, fl);
 
         fmpz_mat_rref(C, temp2, A);
         fmpq_mat_set_fmpz_mat_div_fmpz(Cq, C, temp2);
@@ -110,9 +96,7 @@ main(void)
         fmpz_mat_clear(C);
         fmpq_mat_clear(Bq);
         fmpq_mat_clear(Cq);
-        fmpq_clear(alpha);
-        fmpq_clear(onefourth);
-        fmpq_clear(one);
+        fmpq_lll_context_clear(fl);
         fmpz_clear(temp1);
         fmpz_clear(temp2);
     }
