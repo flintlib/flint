@@ -321,6 +321,10 @@ void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
 
 void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A);
 
+/* Cholesky Decomposition ****************************************************/
+
+void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
+
 #ifdef __cplusplus
 }
 #endif

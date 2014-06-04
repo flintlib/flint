@@ -38,11 +38,51 @@ main(void)
     fmpz_mat_t mat;
     fmpz_lll_t fl;
     mp_bitcnt_t bits;
+    fmpz_mat_t A;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("lll_d....");
     fflush(stdout);
+
+	fmpz_mat_init(A, 5, 5);
+	
+	fmpz_set_si(fmpz_mat_entry(A, 0, 0), 1196);
+	fmpz_set_si(fmpz_mat_entry(A, 0, 1), 0);
+	fmpz_set_si(fmpz_mat_entry(A, 0, 2), 0);
+	fmpz_set_si(fmpz_mat_entry(A, 0, 3), 0);
+	fmpz_set_si(fmpz_mat_entry(A, 0, 4), 0);
+	
+	fmpz_set_si(fmpz_mat_entry(A, 1, 0), 2385);
+	fmpz_set_si(fmpz_mat_entry(A, 1, 1), 38);
+	fmpz_set_si(fmpz_mat_entry(A, 1, 2), 0);
+	fmpz_set_si(fmpz_mat_entry(A, 1, 3), 0);
+	fmpz_set_si(fmpz_mat_entry(A, 1, 4), 0);
+	
+	fmpz_set_si(fmpz_mat_entry(A, 2, 0), -1532);
+	fmpz_set_si(fmpz_mat_entry(A, 2, 1), -223);
+	fmpz_set_si(fmpz_mat_entry(A, 2, 2), 193);
+	fmpz_set_si(fmpz_mat_entry(A, 2, 3), 0);
+	fmpz_set_si(fmpz_mat_entry(A, 2, 4), 0);
+	
+	fmpz_set_si(fmpz_mat_entry(A, 3, 0), -3911);
+	fmpz_set_si(fmpz_mat_entry(A, 3, 1), 242);
+	fmpz_set_si(fmpz_mat_entry(A, 3, 2), 85);
+	fmpz_set_si(fmpz_mat_entry(A, 3, 3), 122);
+	fmpz_set_si(fmpz_mat_entry(A, 3, 4), 0);
+	
+	fmpz_set_si(fmpz_mat_entry(A, 4, 0), 3722);
+	fmpz_set_si(fmpz_mat_entry(A, 4, 1), -1163);
+	fmpz_set_si(fmpz_mat_entry(A, 4, 2), 283);
+	fmpz_set_si(fmpz_mat_entry(A, 4, 3), -240);
+	fmpz_set_si(fmpz_mat_entry(A, 4, 4), 5); 
+	
+	fmpz_mat_gram(A, A);
+	fmpz_lll_context_init(fl, 0.75, 0.501, GRAM, EXACT);
+	fmpz_lll_d(A, fl);
+	fmpz_mat_print_pretty(A);
+	
+	fmpz_mat_clear(A);
 
     /* test using NTRU like matrices */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)

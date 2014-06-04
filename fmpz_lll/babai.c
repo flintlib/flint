@@ -303,14 +303,8 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                                         zeros +
                                                                         1);
                         rtmp =
-                            fmpz_get_d(fmpz_mat_entry
-                                       (A->exactSP, kappa, j)) / ldexp(1,
-                                                                       (expo
-                                                                        [kappa]
-                                                                        +
-                                                                        expo
-                                                                        [j])) -
-                            tmp;
+                            fmpz_get_d(fmpz_mat_entry(A->exactSP, kappa, j)) /
+                            ldexp(1, (expo[kappa] + expo[j])) - tmp;
 
                         for (k = zeros + 2; k < j - 1; k++)
                         {
@@ -333,14 +327,8 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                                         zeros +
                                                                         1);
                         d_mat_entry(r, kappa, j) =
-                            fmpz_get_d(fmpz_mat_entry
-                                       (A->exactSP, kappa, j)) / ldexp(1,
-                                                                       (expo
-                                                                        [kappa]
-                                                                        +
-                                                                        expo
-                                                                        [j])) -
-                            tmp;
+                            fmpz_get_d(fmpz_mat_entry(A->exactSP, kappa, j)) /
+                            ldexp(1, (expo[kappa] + expo[j])) - tmp;
                     }
                     else
                         d_mat_entry(r, kappa, j) =
