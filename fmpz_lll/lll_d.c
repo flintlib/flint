@@ -579,7 +579,7 @@ fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
         int *alpha;
         double deltap, etam;
         fmpz_t t;
-        /*ulong loops; */
+        ulong loops;
 
         d = B->r;
 
@@ -612,7 +612,7 @@ fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
         for (i = zeros + 1; i < d; i++)
             alpha[i] = 0;
 
-        /*loops = 0; */
+        loops = 0;
         while (kappa < d)
         {
             int aa;
@@ -623,15 +623,16 @@ fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
             {
                 test = 0;
 
-                /*loops++;
-                   if (loops > 2)
-                   {
-                   d_mat_clear(mu);
-                   d_mat_clear(r);
-                   _d_vec_clear(s);
-                   fmpz_clear(t);
-                   return -1;
-                   } */
+                loops++;
+                if (loops > 275)
+                {
+                    free(alpha);
+                    d_mat_clear(mu);
+                    d_mat_clear(r);
+                    _d_vec_clear(s);
+                    fmpz_clear(t);
+                    return -1;
+                }
 
                 for (j = aa; j < kappa; j++)    /* orthogonalization */
                 {

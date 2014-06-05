@@ -38,51 +38,11 @@ main(void)
     fmpz_mat_t mat;
     fmpz_lll_t fl;
     mp_bitcnt_t bits;
-    fmpz_mat_t A;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("lll_d....");
     fflush(stdout);
-
-	fmpz_mat_init(A, 5, 5);
-	
-	fmpz_set_si(fmpz_mat_entry(A, 0, 0), 1196);
-	fmpz_set_si(fmpz_mat_entry(A, 0, 1), 0);
-	fmpz_set_si(fmpz_mat_entry(A, 0, 2), 0);
-	fmpz_set_si(fmpz_mat_entry(A, 0, 3), 0);
-	fmpz_set_si(fmpz_mat_entry(A, 0, 4), 0);
-	
-	fmpz_set_si(fmpz_mat_entry(A, 1, 0), 2385);
-	fmpz_set_si(fmpz_mat_entry(A, 1, 1), 38);
-	fmpz_set_si(fmpz_mat_entry(A, 1, 2), 0);
-	fmpz_set_si(fmpz_mat_entry(A, 1, 3), 0);
-	fmpz_set_si(fmpz_mat_entry(A, 1, 4), 0);
-	
-	fmpz_set_si(fmpz_mat_entry(A, 2, 0), -1532);
-	fmpz_set_si(fmpz_mat_entry(A, 2, 1), -223);
-	fmpz_set_si(fmpz_mat_entry(A, 2, 2), 193);
-	fmpz_set_si(fmpz_mat_entry(A, 2, 3), 0);
-	fmpz_set_si(fmpz_mat_entry(A, 2, 4), 0);
-	
-	fmpz_set_si(fmpz_mat_entry(A, 3, 0), -3911);
-	fmpz_set_si(fmpz_mat_entry(A, 3, 1), 242);
-	fmpz_set_si(fmpz_mat_entry(A, 3, 2), 85);
-	fmpz_set_si(fmpz_mat_entry(A, 3, 3), 122);
-	fmpz_set_si(fmpz_mat_entry(A, 3, 4), 0);
-	
-	fmpz_set_si(fmpz_mat_entry(A, 4, 0), 3722);
-	fmpz_set_si(fmpz_mat_entry(A, 4, 1), -1163);
-	fmpz_set_si(fmpz_mat_entry(A, 4, 2), 283);
-	fmpz_set_si(fmpz_mat_entry(A, 4, 3), -240);
-	fmpz_set_si(fmpz_mat_entry(A, 4, 4), 5); 
-	
-	fmpz_mat_gram(A, A);
-	fmpz_lll_context_init(fl, 0.75, 0.501, GRAM, EXACT);
-	fmpz_lll_d(A, fl);
-	fmpz_mat_print_pretty(A);
-	
-	fmpz_mat_clear(A);
 
     /* test using NTRU like matrices */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -96,7 +56,6 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         bits = n_randint(state, 20) + 1;
         q = n_randint(state, 200) + 1;
@@ -106,8 +65,13 @@ main(void)
         else
             fmpz_mat_randntrulike2(mat, state, bits, q);
 
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_gram(mat, mat);
+        }
+
         result = fmpz_lll_d(mat, fl);
-        if (result == -1 && fl->gt == EXACT)
+        if (result == -1 && (fl->gt == EXACT || fl->rt == GRAM))
         {
             fmpz_mat_clear(mat);
             continue;
@@ -117,7 +81,10 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_rq_d(R, Q, mat);
+        if (fl->rt == Z_BASIS)
+            fmpz_mat_rq_d(R, Q, mat);
+        else
+            fmpz_mat_chol_d(R, mat);
 
         result = d_mat_is_reduced(R, fl->delta, fl->eta);
 
@@ -130,6 +97,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
             abort();
         }
@@ -142,30 +110,51 @@ main(void)
     {
         slong r, c;
         d_mat_t Q, R;
+        fmpz_mat_t gmat;
 
         r = n_randint(state, 20) + 1;
         c = r + 1;
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_init(gmat, r, r);
+        }
 
         bits = n_randint(state, 200) + 1;
 
         fmpz_mat_randintrel(mat, state, bits);
 
-        result = fmpz_lll_d(mat, fl);
-        if (result == -1)
+        if (fl->rt == GRAM)
         {
-            fmpz_mat_clear(mat);
-            continue;
+            fmpz_mat_gram(gmat, mat);
+            result = fmpz_lll_d(gmat, fl);
+            if (result == -1)
+            {
+                fmpz_mat_clear(mat);
+                fmpz_mat_clear(gmat);
+                continue;
+            }
+        }
+        else
+        {
+            result = fmpz_lll_d(mat, fl);
+            if (result == -1)
+            {
+                fmpz_mat_clear(mat);
+                continue;
+            }
         }
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_rq_d(R, Q, mat);
+        if (fl->rt == Z_BASIS)
+            fmpz_mat_rq_d(R, Q, mat);
+        else
+            fmpz_mat_chol_d(R, gmat);
 
         result = d_mat_is_reduced(R, fl->delta, fl->eta);
 
@@ -178,11 +167,16 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
             abort();
         }
 
         fmpz_mat_clear(mat);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_clear(gmat);
+        }
     }
 
     /* test using ajtai matrices */
@@ -196,17 +190,29 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         fmpz_mat_randajtai(mat, state, 0.5);
 
-        fmpz_lll_d(mat, fl);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_gram(mat, mat);
+        }
+
+        result = fmpz_lll_d(mat, fl);
+        if (result == -1 && fl->rt == GRAM)
+        {
+            fmpz_mat_clear(mat);
+            continue;
+        }
 
         d_mat_init(Q, r, c);
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_rq_d(R, Q, mat);
+        if (fl->rt == Z_BASIS)
+            fmpz_mat_rq_d(R, Q, mat);
+        else
+            fmpz_mat_chol_d(R, mat);
 
         result = d_mat_is_reduced(R, fl->delta, fl->eta);
 
@@ -219,6 +225,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("i = %ld\n", i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
             abort();
         }
@@ -238,15 +245,19 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         bits = n_randint(state, 200) + 1;
         bits2 = n_randint(state, 5) + 1;
 
         fmpz_mat_randsimdioph(mat, state, bits, bits2);
 
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_gram(mat, mat);
+        }
+
         result = fmpz_lll_d(mat, fl);
-        if (result == -1)
+        if (result == -1 && (fl->gt == EXACT || fl->rt == GRAM))
         {
             fmpz_mat_clear(mat);
             continue;
@@ -256,7 +267,10 @@ main(void)
         d_mat_init(R, r, r);
         d_mat_zero(R);
 
-        fmpz_mat_rq_d(R, Q, mat);
+        if (fl->rt == Z_BASIS)
+            fmpz_mat_rq_d(R, Q, mat);
+        else
+            fmpz_mat_chol_d(R, mat);
 
         result = d_mat_is_reduced(R, fl->delta, fl->eta);
 
@@ -269,6 +283,7 @@ main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
+            flint_printf("rep_type = %d\n", fl->rt);
             flint_printf("gram_type = %d\n", fl->gt);
             abort();
         }
