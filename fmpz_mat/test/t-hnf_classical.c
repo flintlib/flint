@@ -98,8 +98,8 @@ main(void)
         slong m, n, b, d, r;
         int equal;
 
-        m = n_randint(state, 8);
-        n = n_randint(state, 8);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
         r = n_randint(state, FLINT_MIN(m, n) + 1);
 
         fmpz_mat_init(A, m, n);
