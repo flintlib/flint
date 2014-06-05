@@ -1244,8 +1244,7 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
                                                const fmpz * poly2, slong len2)
 
     Sets \code{res} to the resultant of \code{(poly1, len1)} and 
-    \code{(poly2, len2)}, assuming that \code{len1 >= len2}. Uses Collins'
-    modular algorithm.
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}. 
 
 void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
                                                       const fmpz_poly_t poly2)
@@ -1263,6 +1262,29 @@ void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
 
     This function uses the modular algorithm described 
     in~\citep{Col1971}.
+
+void _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
+                                      const fmpz * poly2, slong len2)
+
+    Sets \code{res} to the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}.
+
+void fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1, 
+                                     const fmpz_poly_t poly2)
+
+    Computes the resultant of \code{poly1} and \code{poly2}.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.3.7]{Coh1996}.
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
                                       const fmpz * poly2, slong len2)
@@ -1283,9 +1305,6 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     \end{equation*}
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
-
-    This function uses the algorithm described 
-    in~\citep[Algorithm~3.3.7]{Coh1996}.
 
 *******************************************************************************
 

@@ -578,16 +578,22 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1,
 void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
-void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
+void _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1, 
                                                const fmpz * poly2, slong len2);
 
-void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
+void fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
 void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
                                                const fmpz * poly2, slong len2);
 
 void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
+                                                      const fmpz_poly_t poly2);
+
+void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
+                                               const fmpz * poly2, slong len2);
+
+void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
                                                       const fmpz_poly_t poly2);
 
 void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 

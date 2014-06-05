@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 William Hart
+    Copyright (C) 2014 William Hart
    
 ******************************************************************************/
 
@@ -43,14 +43,6 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     mp_ptr a, b, rarr, parr;
     mp_limb_t p;
     nmod_t mod;
-    
-    /* special case, one of the polys is zero */
-    if (len2 == 0) /* if len1 == 1 then so does len2 */
-    {
-       fmpz_zero(res);
-
-       return;
-    }
     
     /* special case, one of the polys is a constant */
     if (len2 == 1) /* if len1 == 1 then so does len2 */
@@ -143,11 +135,18 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     _nmod_vec_clear(rarr);
     
     /* finally multiply by powers of content */
-    fmpz_pow_ui(l, ac, len2 - 1);
-    fmpz_mul(res, res, l);
-    fmpz_pow_ui(l, bc, len1 - 1);
-    fmpz_mul(res, res, l);
+    if (!fmpz_is_one(ac))
+    {
+       fmpz_pow_ui(l, ac, len2 - 1);
+       fmpz_mul(res, res, l);
+    }
     
+    if (!fmpz_is_one(bc))
+    {
+       fmpz_pow_ui(l, bc, len1 - 1);
+       fmpz_mul(res, res, l);
+    }
+
     fmpz_clear(l); 
     
     _fmpz_vec_clear(A, len1);
@@ -161,16 +160,18 @@ void
 fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
               const fmpz_poly_t poly2)
 {
-    if (poly1->length < poly2->length)
-    {
-        fmpz_poly_resultant_modular(res, poly2, poly1);
-        if ((poly1->length & 1) == 0 && (poly2->length & 1) == 0)
-           fmpz_neg(res, res);
-    }
-    else /* len1 >= len2 >= 0 */
-    {
-        _fmpz_poly_resultant_modular(res, poly1->coeffs, poly1->length, 
-           poly2->coeffs, poly2->length);
-    }
+   slong len1 = poly1->length;
+   slong len2 = poly2->length;
+   
+   if (len1 == 0 || len2 == 0)
+     fmpz_zero(res);
+   else if (len1 >= len2)
+        _fmpz_poly_resultant_modular(res, poly1->coeffs, len1, poly2->coeffs, len2);
+   else
+   {
+        _fmpz_poly_resultant_modular(res, poly2->coeffs, len2, poly1->coeffs, len1);  
+        if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
+            fmpz_neg(res, res);
+   }
 }
 
