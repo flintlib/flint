@@ -268,6 +268,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
         else
         {
             int j, k, test, aa, exponent;
+            slong exp;
             slong xx;
             double tmp, rtmp, halfplus, onedothalfplus;
             ulong loops;
@@ -303,8 +304,11 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                                         zeros +
                                                                         1);
                         rtmp =
-                            fmpz_get_d(fmpz_mat_entry(A->exactSP, kappa, j)) /
-                            ldexp(1, (expo[kappa] + expo[j])) - tmp;
+                            fmpz_get_d_2exp(&exp,
+                                            fmpz_mat_entry(A->exactSP, kappa,
+                                                           j));
+                        rtmp =
+                            ldexp(rtmp, exp - (expo[kappa] + expo[j])) - tmp;
 
                         for (k = zeros + 2; k < j - 1; k++)
                         {
@@ -327,18 +331,22 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                                         zeros +
                                                                         1);
                         d_mat_entry(r, kappa, j) =
-                            fmpz_get_d(fmpz_mat_entry(A->exactSP, kappa, j)) /
-                            ldexp(1, (expo[kappa] + expo[j])) - tmp;
+                            fmpz_get_d_2exp(&exp,
+                                            fmpz_mat_entry(A->exactSP, kappa,
+                                                           j));
+                        d_mat_entry(r, kappa, j) =
+                            ldexp(d_mat_entry(r, kappa, j),
+                                  exp - (expo[kappa] + expo[j])) - tmp;
                     }
                     else
+                    {
                         d_mat_entry(r, kappa, j) =
-                            fmpz_get_d(fmpz_mat_entry
-                                       (A->exactSP, kappa, j)) / ldexp(1,
-                                                                       (expo
-                                                                        [kappa]
-                                                                        +
-                                                                        expo
-                                                                        [j]));
+                            fmpz_get_d_2exp(&exp, fmpz_mat_entry
+                                            (A->exactSP, kappa, j));
+                        d_mat_entry(r, kappa, j) =
+                            ldexp(d_mat_entry(r, kappa, j),
+                                  exp - (expo[kappa] + expo[j]));
+                    }
 
                     d_mat_entry(mu, kappa, j) =
                         d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
@@ -482,11 +490,9 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
             } while (test);
 
             s[zeros + 1] =
-                fmpz_get_d(fmpz_mat_entry(A->exactSP, kappa, kappa)) / ldexp(1,
-                                                                             2
-                                                                             *
-                                                                             expo
-                                                                             [kappa]);
+                fmpz_get_d_2exp(&exp,
+                                fmpz_mat_entry(A->exactSP, kappa, kappa));
+            s[zeros + 1] = ldexp(s[zeros + 1], exp - 2 * expo[kappa]);
 
             for (k = zeros + 1; k < kappa - 1; k++)
             {
