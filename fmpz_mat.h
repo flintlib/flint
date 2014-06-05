@@ -200,7 +200,7 @@ fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u; 
+        mat->rows[r] = u;
     }
 }
 
@@ -294,7 +294,7 @@ void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
 void
-fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
+fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres,
     const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
 void
@@ -311,6 +311,7 @@ void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
 /* HNF **********************************************************************/
 
 void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
+void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }
