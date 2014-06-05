@@ -567,28 +567,34 @@ void fmpz_poly_gcd_modular(fmpz_poly_t res,
                            const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1, 
-                                              const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                                    const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
 
 void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1, 
-                                              const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                                    const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
-                                              const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
-                                                    const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
+
+void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
+                                               const fmpz * poly2, slong len2);
+
+void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
+                                                      const fmpz_poly_t poly2);
 
 void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
                const fmpz * poly1, slong len1, const fmpz * poly2, slong len2);
 
 void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
-                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+                             const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 static __inline__
 void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t, 
