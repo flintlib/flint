@@ -34,11 +34,14 @@
 void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)
 {
-    mp_bitcnt_t bits1, bits2, bound, pbits, curr_bits = 0;   
+    mp_bitcnt_t bits1, bits2, bound, pbits, curr_bits = 0; 
+    slong i, num_primes;
+    fmpz_comb_t comb;
+    fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus;
     fmpz * A, * B, * lead_A, * lead_B;
-    mp_ptr a, b;
-    mp_limb_t p, r;
+    mp_ptr a, b, rarr, parr;
+    mp_limb_t p;
     nmod_t mod;
     
     /* special case, one of the polys is zero */
@@ -91,6 +94,11 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     /* Upper bound Hadamard bound */
     bound += (len1 - 1)*bits2 + (len2 - 1)*bits1;
     
+    num_primes = (bound + pbits - 1)/pbits;
+
+    parr = _nmod_vec_init(num_primes);
+    rarr = _nmod_vec_init(num_primes);
+
     fmpz_init(modulus);
     fmpz_set_ui(modulus, 1);
     fmpz_zero(res);
@@ -99,7 +107,7 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     a = _nmod_vec_init(len1);
     b = _nmod_vec_init(len2);
     
-    while (curr_bits < bound)
+    for (i = 0; curr_bits < bound; )
     {
         /* get new prime and initialise modulus */
         p = n_nextprime(p, 0);
@@ -115,16 +123,24 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
         _fmpz_vec_get_nmod_vec(b, B, len2, mod);
 
         /* compute resultant over Z/pZ */
-        r = _nmod_poly_resultant(a, len1, b, len2, mod);
-
-        fmpz_CRT_ui(res, res, modulus, r, mod.n, 1);
-        fmpz_mul_ui(modulus, modulus, mod.n);
+        parr[i] = p;
+        rarr[i++] = _nmod_poly_resultant(a, len1, b, len2, mod);
     }
 
-    fmpz_clear(modulus);
+    fmpz_comb_init(comb, parr, num_primes);
+    fmpz_comb_temp_init(comb_temp, comb);
     
+    fmpz_multi_CRT_ui(res, rarr, comb, comb_temp, 1);
+        
+    fmpz_clear(modulus);
+    fmpz_comb_temp_clear(comb_temp);
+    fmpz_comb_clear(comb);
+        
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);
+
+    _nmod_vec_clear(parr);
+    _nmod_vec_clear(rarr);
     
     /* finally multiply by powers of content */
     fmpz_pow_ui(l, ac, len2 - 1);
