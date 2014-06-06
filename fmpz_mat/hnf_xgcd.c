@@ -34,32 +34,38 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
     {
         for (i = k + 1; i != A->r; i++)
         {
-            fmpz_t id, kd, b, u, v, d;
-            if (fmpz_is_zero(fmpz_mat_entry(H, i, j)))
+            /* reduce row i - 1 with row i */
+            fmpz_t r1d, r2d, b, u, v, d;
+            if (fmpz_is_zero(fmpz_mat_entry(H, i - 1, j)))
                 continue;
-            fmpz_init(id);
-            fmpz_init(kd);
+            fmpz_init(r1d);
+            fmpz_init(r2d);
             fmpz_init(b);
             fmpz_init(u);
             fmpz_init(v);
             fmpz_init(d);
-            fmpz_xgcd(d, u, v, fmpz_mat_entry(H, k, j), fmpz_mat_entry(H, i, j));
-            fmpz_divexact(id, fmpz_mat_entry(H, i, j), d);
-            fmpz_divexact(kd, fmpz_mat_entry(H, k, j), d);
+            fmpz_xgcd(d, u, v, fmpz_mat_entry(H, i, j), fmpz_mat_entry(H, i - 1, j));
+            fmpz_divexact(r2d, fmpz_mat_entry(H, i - 1, j), d);
+            fmpz_divexact(r1d, fmpz_mat_entry(H, i, j), d);
             for (j2 = 0; j2 < A->c; j2++)
             {
-                fmpz_mul(b, u, fmpz_mat_entry(H, k, j2));
-                fmpz_addmul(b, v, fmpz_mat_entry(H, i, j2));
-                fmpz_mul(fmpz_mat_entry(H, i, j2), kd, fmpz_mat_entry(H, i, j2));
-                fmpz_submul(fmpz_mat_entry(H, i, j2), id, fmpz_mat_entry(H, k, j2));
-                fmpz_set(fmpz_mat_entry(H, k, j2), b);
+                fmpz_mul(b, u, fmpz_mat_entry(H, i, j2));
+                fmpz_addmul(b, v, fmpz_mat_entry(H, i - 1, j2));
+                fmpz_mul(fmpz_mat_entry(H, i - 1, j2), r1d, fmpz_mat_entry(H, i - 1, j2));
+                fmpz_submul(fmpz_mat_entry(H, i - 1, j2), r2d, fmpz_mat_entry(H, i, j2));
+                fmpz_set(fmpz_mat_entry(H, i, j2), b);
             }
-            fmpz_clear(id);
-            fmpz_clear(kd);
+            fmpz_clear(r2d);
+            fmpz_clear(r1d);
             fmpz_clear(b);
             fmpz_clear(u);
             fmpz_clear(v);
             fmpz_clear(d);
+        }
+        for (j2 = 0; j2 < A->c; j2++)
+        {
+            fmpz_swap(fmpz_mat_entry(H, A->r - 1, j2),
+                    fmpz_mat_entry(H, k, j2));
         }
         if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
         {
