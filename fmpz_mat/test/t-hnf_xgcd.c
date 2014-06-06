@@ -89,7 +89,7 @@ main(void)
     slong iter;
     FLINT_TEST_INIT(state);
 
-    flint_printf("hnf....");
+    flint_printf("hnf xgcd....");
     fflush(stdout);
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
