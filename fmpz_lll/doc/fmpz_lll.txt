@@ -32,15 +32,17 @@
 
 *******************************************************************************
 
-void fmpz_lll_default_params(fmpz_lll_t fl)
+void fmpz_lll_context_init_default(fmpz_lll_t fl)
 
-    Sets \code{fl->delta} and \code{fl->eta} to their default values, 0.75 and
-    0.81 respectively.
+    Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt} and \code{fl->gt} to
+    their default values, 0.75, 0.81, $Z_BASIS$ and $APPROX$ respectively.
 
-void fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta)
+void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta,
+                           rep_type rt, gram_type gt)
 
-    Sets \code{fl->delta} and \code{fl->eta} to \code{delta} and \code{eta}
-    (given as input) respectively.
+    Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt} and \code{fl->gt} to
+    \code{delta}, \code{eta}, \code{rt} and \code{gt} (given as input)
+    respectively.
 
 *******************************************************************************
 
@@ -51,7 +53,9 @@ void fmpz_lll_set_params(fmpz_lll_t fl, double delta, double eta)
 void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
 
     Sets \code{fl->delta} and \code{fl->eta} to random values in the interval
-    $(0.25, 1)$ and (0.5, \sqrt{\code{delta}}) respectively.
+    $(0.25, 1)$ and (0.5, \sqrt{\code{delta}}) respectively. \code{fl->rt} is
+    set to $GRAM$ or $Z_BASIS$ and \code{fl->gt} is set to $APPROX$ or $EXACT$
+    in a pseudo random way.
 
 *******************************************************************************
 
@@ -83,7 +87,7 @@ double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2,
 *******************************************************************************
 
 int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r,
-                      double *s, d_mat_t appB, int *expo, d_mat_t appSP, int a,
+                      double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a,
                       int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Performs floating point size reductions of the \code{kappa}-th row of
@@ -92,9 +96,11 @@ int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r,
     size of the \code{kappa}-th row if it were moved into position $i$. The
     d_mat \code{appB} is an approximation of \code{B} with each row receiving
     an exponent stored in \code{expo} which gets populated only when needed.
-    The d_mat \code{appSP} is an approximation of the Gram matrix whose entries
-    are scalar products of the rows of \code{B}. The index \code{a} is the
-    smallest row index which will be reduced from the \code{kappa}-th row.
+    The d_mat \code{A->appSP} is an approximation of the Gram matrix whose
+    entries are scalar products of the rows of \code{B} and is used when
+    \code{fl->gt} == $APPROX$. When \code{fl->gt} == $EXACT$ the fmpz_mat
+    \code{A->exactSP} (the exact Gram matrix) is used. The index \code{a} is
+    the smallest row index which will be reduced from the \code{kappa}-th row.
     Index \code{zeros} is the number of zero rows in the matrix.
     \code{kappamax} is the highest index which has been size-reduced so far,
     and \code{n} is the number of columns you want to consider. \code{fl} is an
@@ -104,7 +110,7 @@ int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r,
     Babai procedures as well.
 
 int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu,
-               d_mat_t r, double *s, d_mat_t appB, int *expo, d_mat_t appSP,
+               d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
                int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_check_babai()} but using the heuristic inner product
@@ -136,4 +142,15 @@ int fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
     heuristic version (\code{fmpz_lll_check_babai_heuristic_d()}) for only one
     loop and switches right back to the fast version. It reduces \code{B} in
     place. \code{fl} is the context object containing information containing
-    the LLL parameters \delta and \eta.
+    the LLL parameters \delta and \eta. The function can perform reduction on
+    both the lattice basis as well as its Gram matrix. The type of lattice
+    representation can be specified via the parameter \code{fl->rt}. The type
+    of Gram matrix to be used in computation (approximate or exact) can also be
+    specified through the variable \code{fl->gt} (applies only if
+    \code{fl->rt} == $Z_BASIS$).
+
+int fmpz_lll_d_heuristic(fmpz_mat_t B, const fmpz_lll_t fl)
+
+    This LLL reduces \code{B} in place using doubles only. It is similar to
+    \code{fmpz_lll_d()} but only uses the heuristic inner products which
+    attempt to detect cancellations.

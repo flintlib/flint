@@ -39,14 +39,15 @@
 #undef CALL_BABAI
 #endif
 
-#define FUNC_NAME fmpz_lll_d
-#define COMPUTE(G, I, C)                                               \
-do {                                                                   \
-    d_mat_entry(G, I, I) = _d_vec_norm(appB->rows[I], C);              \
+#define FUNC_NAME fmpz_lll_d_heuristic
+#define COMPUTE(G, I, C)                                                \
+do {                                                                    \
+    d_mat_entry(G, I, I) =                                              \
+        _d_vec_dot_heuristic(appB->rows[I], appB->rows[I], C, &tmp);    \
 } while (0)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
-    if (NFF < 50)                                                      \
+    if (NFF)                                                           \
     {                                                                  \
         BO =                                                           \
             fmpz_lll_check_babai(kappa, B, mu, r, s, appB, expo, A,    \
@@ -60,7 +61,6 @@ do {                                                                   \
     }                                                                  \
     if (BO == -1)                                                      \
     {                                                                  \
-        NFF++;                                                         \
         HF =                                                           \
             fmpz_lll_check_babai_heuristic_d(kappa, B, mu, r, s,       \
                                              appB, expo, A,            \

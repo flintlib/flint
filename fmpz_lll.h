@@ -108,6 +108,8 @@ int fmpz_lll_shift(const fmpz_mat_t B);
 
 int fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl);
 
+int fmpz_lll_d_heuristic(fmpz_mat_t B, const fmpz_lll_t fl);
+
 
 /* double heuristic_scalar_product(double * vec1, double * vec2, ulong n, 
 								F_mpz_mat_t B, ulong k, ulong j, long exp_adj);

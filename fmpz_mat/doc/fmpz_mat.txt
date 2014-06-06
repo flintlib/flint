@@ -895,4 +895,16 @@ void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
 
     Computes the $RQ$ decomposition of a matrix \code{A} using the Gram–Schmidt
     process. (Sets \code{R} and \code{Q} such that $A = RQ$ where \code{R} is
-    an upper triangular matrix and \code{Q} is an orthogonal matrix.)
+    a lower triangular matrix.)
+
+*******************************************************************************
+
+    Cholesky Decomposition
+
+*******************************************************************************
+
+void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
+
+    Computes \code{R}, the Cholesky factor of a symmetric, positive definite
+    matrix \code{A} using the Cholesky decomposition process. (Sets \code{R}
+    such that $A = RR^{T}$ where \code{R} is a lower triangular matrix.)
