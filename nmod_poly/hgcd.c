@@ -465,9 +465,9 @@ slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM,
         {
             slong k = 2 * m - lenb2 + 1;
 
-            if (res) /* ensure something happened */
+            if (res) 
             {
-               if (lenb2 < lenb)
+               if (lenb2 < lenb) /* ensure something happened */
                {
                   if (lenb2 >= 1)
                   {
