@@ -21,6 +21,7 @@
 
     Copyright (C) 2011 William Hart
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2014 William Hart
 
 ******************************************************************************/
 
