@@ -108,6 +108,17 @@ typedef struct
 
 typedef nmod_poly_struct nmod_poly_t[1];
 
+typedef struct
+{
+   mp_limb_t res;
+   mp_limb_t lc;
+   slong len0;
+   slong len1;
+   slong off;
+} nmod_poly_res_struct;
+
+typedef nmod_poly_res_struct nmod_poly_res_t[1];
+
 /* zn_poly helper functions  ************************************************
 
 Copyright (C) 2007, 2008 David Harvey
@@ -1009,6 +1020,11 @@ slong _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+slong _nmod_poly_hgcd_recursive(mp_ptr *M, slong *lenM, 
+    mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, 
+    mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
+    mp_ptr P, nmod_t mod, int flag, nmod_poly_res_t res);
+
 slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM, 
                      mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, 
                      mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
@@ -1050,17 +1066,34 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
 mp_limb_t 
 nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g);
 
+mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA, 
+                         mp_srcptr B, slong lenB, nmod_t mod);
+
+mp_limb_t nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B);
+
 static __inline__ mp_limb_t 
 _nmod_poly_resultant(mp_srcptr poly1, slong len1, 
                      mp_srcptr poly2, slong len2, nmod_t mod)
 {
-    return _nmod_poly_resultant_euclidean(poly1, len1, poly2, len2, mod);
+    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+
+    if (len1 < cutoff)
+        return _nmod_poly_resultant_euclidean(poly1, len1, poly2, len2, mod);
+    else
+        return _nmod_poly_resultant_hgcd(poly1, len1, poly2, len2, mod);
 }
 
 static __inline__ mp_limb_t 
 nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
 {
-    return nmod_poly_resultant_euclidean(f, g);
+    const slong cutoff = FLINT_BIT_COUNT(f->mod.n) <= 8 ? 
+                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+
+    if (FLINT_MAX(f->length, g->length) < cutoff)
+       return nmod_poly_resultant_euclidean(f, g);
+    else
+       return nmod_poly_resultant_hgcd(f, g);
 }
 
 slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
