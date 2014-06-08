@@ -38,12 +38,14 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
 
     if (!COEFF_IS_MPZ(*g))  /* g is small, hence f is small */
     {
-        if (COEFF_IS_MPZ(*d))
-            _fmpz_demote_val(d);
-        if (COEFF_IS_MPZ(*a))
-            _fmpz_demote_val(a);
+        fmpz ff, gg;
+        ff = *f;
+        gg = *g;
 
-        *d = n_gcdinv((mp_limb_t *) a, *f, *g);
+        _fmpz_demote(d);
+        _fmpz_demote(a);
+
+        *d = n_gcdinv((mp_limb_t *) a, ff, gg);
     }
     else  /* g is large */
     {
