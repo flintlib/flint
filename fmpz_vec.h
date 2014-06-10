@@ -30,6 +30,7 @@
 #include <gmp.h>
 #include "fmpz.h"
 #include "flint.h"
+#include "mpf_vec.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -112,6 +113,8 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
                                const mp_ptr * coeffs_f, slong limbs, slong sign);
 
 slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len);
+
+void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len);
 
 /*  Assignment and basic manipulation  ***************************************/
 

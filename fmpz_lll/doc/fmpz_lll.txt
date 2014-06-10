@@ -117,6 +117,15 @@ int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu,
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
 
+int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
+          mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros,
+          int kappamax, int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec,
+          const fmpz_lll_t fl)
+
+    This function is like the \code{mpf} version of
+    \code{fmpz_lll_check_babai_heuristic_d()}. However, it also inherits some
+    temporary \code{mpf_t} variables \code{tmp} and \code{rtmp}.
+
 *******************************************************************************
 
     Shift

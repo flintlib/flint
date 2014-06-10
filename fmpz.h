@@ -253,6 +253,10 @@ double fmpz_get_d(const fmpz_t f);
 
 void fmpz_set_d(fmpz_t f, double c);
 
+void fmpz_get_mpf(mpf_t x, const fmpz_t f);
+
+void fmpz_set_mpf(fmpz_t f, const mpf_t x);
+
 int fmpz_set_str(fmpz_t f, const char * str, int b);
 
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);

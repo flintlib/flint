@@ -27,7 +27,7 @@
 
 #include "fmpz_lll.h"
 
-#if defined(FUNC_NAME) && defined(COMPUTE) && defined(CALL_BABAI)
+#if defined(FUNC_NAME) && defined(CALL_BABAI)
 
 int
 FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
@@ -54,8 +54,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
 
             shift = fmpz_lll_shift(B);
 
-            alpha = (int *) malloc(d * sizeof(int));
-            expo = (int *) malloc(d * sizeof(int));
+            alpha = (int *) flint_malloc(d * sizeof(int));
+            expo = (int *) flint_malloc(d * sizeof(int));
 
             d_mat_init(mu, d, d);
             d_mat_init(r, d, d);
@@ -90,7 +90,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
 
             do
             {
-                COMPUTE(A->appSP, i, n);
+                d_mat_entry(A->appSP, i, i) = _d_vec_norm(appB->rows[i], n);
             } while ((d_mat_entry(A->appSP, i, i) <= 0.0) && (++i < d));    /* Check if this should be D_EPS and not 0.0: done */
 
             zeros = i - 1;      /* all vectors B[i] with i <= zeros are zero vectors */
@@ -118,8 +118,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
 
                 if (heuristic_fail == -1)
                 {
-                    free(alpha);
-                    free(expo);
+                    flint_free(alpha);
+                    flint_free(expo);
                     d_mat_clear(mu);
                     d_mat_clear(r);
                     d_mat_clear(appB);
@@ -254,7 +254,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                     {
                         zeros++;
                         kappa++;
-                        COMPUTE(A->appSP, kappa, n);
+                        d_mat_entry(A->appSP, kappa, kappa) =
+                            _d_vec_norm(appB->rows[kappa], n);
                         d_mat_entry(r, kappa, kappa) =
                             d_mat_entry(A->appSP, kappa, kappa);
                     }
@@ -263,8 +264,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 }
             }
 
-            free(alpha);
-            free(expo);
+            flint_free(alpha);
+            flint_free(expo);
             d_mat_clear(mu);
             d_mat_clear(r);
             d_mat_clear(appB);
@@ -294,8 +295,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
 
             shift = fmpz_lll_shift(B);
 
-            alpha = (int *) malloc(d * sizeof(int));
-            expo = (int *) malloc(d * sizeof(int));
+            alpha = (int *) flint_malloc(d * sizeof(int));
+            expo = (int *) flint_malloc(d * sizeof(int));
 
             d_mat_init(mu, d, d);
             d_mat_init(r, d, d);
@@ -305,7 +306,13 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
             s = _d_vec_init(d);
             exactSPtmp = _fmpz_vec_init(d);
 
-            fmpz_mat_gram(A->exactSP, B);
+            for (i = 0; i < d; i++)
+            {
+                for (j = 0; j < d; j++)
+                {
+                    fmpz_set_si(fmpz_mat_entry(A->exactSP, i, j), LONG_MIN);
+                }
+            }
 
             /* ************************** */
             /* Step1: Initialization Step */
@@ -323,7 +330,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
             i = 0;
 
             do
-                ;
+                _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, i, i), B->rows[i],
+                              B->rows[i], n);
             while ((fmpz_cmp_ui(fmpz_mat_entry(A->exactSP, i, i), 0) <= 0)
                    && (++i < d));
 
@@ -381,8 +389,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
 
                 if (heuristic_fail == -1)
                 {
-                    free(alpha);
-                    free(expo);
+                    flint_free(alpha);
+                    flint_free(expo);
                     d_mat_clear(mu);
                     d_mat_clear(r);
                     d_mat_clear(appB);
@@ -537,8 +545,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 }
             }
 
-            free(alpha);
-            free(expo);
+            flint_free(alpha);
+            flint_free(expo);
             d_mat_clear(mu);
             d_mat_clear(r);
             d_mat_clear(appB);
@@ -549,12 +557,10 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
     }
     else
     {
-        int kappa, d, i, j, test, zeros, kappamax;
+        int kappa, d, i, j, test;
         d_mat_t mu, r;
         double *s;
         fmpz *x;
-        int *alpha;
-        double deltap, etam;
         fmpz_t t, dmax;
         ulong loops;
 
@@ -564,50 +570,32 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
         d_mat_init(r, d, d);
 
         s = _d_vec_init(d);
-        alpha = (int *) malloc(d * sizeof(int));
 
         fmpz_init(t);
         fmpz_init(dmax);
         fmpz_set_d(dmax, DBL_MAX);
 
-        etam = (fl->eta + 0.5) / 2;
-        deltap = (fl->delta + 1) / 2;
-
-        kappamax = i = 0;
+        i = 0;
         do
             ;
         while ((fmpz_cmp_ui(fmpz_mat_entry(B, i, i), 0) <= 0) && (++i < d));
 
-
-        zeros = i - 1;
         kappa = i + 1;
-        kappamax = kappa;
 
-        if (zeros < d - 1)
+        if (fmpz_cmpabs(fmpz_mat_entry(B, i, i), dmax) > 0)
         {
-            if (fmpz_cmpabs(fmpz_mat_entry(B, i, i), dmax) > 0)
-            {
-                free(alpha);
-                d_mat_clear(mu);
-                d_mat_clear(r);
-                _d_vec_clear(s);
-                fmpz_clear(t);
-                fmpz_clear(dmax);
-                return -1;
-            }
-            d_mat_entry(r, i, i) = fmpz_get_d(fmpz_mat_entry(B, i, i));
+            d_mat_clear(mu);
+            d_mat_clear(r);
+            _d_vec_clear(s);
+            fmpz_clear(t);
+            fmpz_clear(dmax);
+            return -1;
         }
-
-        for (i = zeros + 1; i < d; i++)
-            alpha[i] = 0;
+        d_mat_entry(r, i, i) = fmpz_get_d(fmpz_mat_entry(B, i, i));
 
         loops = 0;
         while (kappa < d)
         {
-            int aa;
-            if (kappa > kappamax)
-                kappamax = kappa;
-            aa = (alpha[kappa] > zeros) ? alpha[kappa] : zeros + 1;
             do
             {
                 test = 0;
@@ -615,7 +603,6 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 loops++;
                 if (loops > 1000)
                 {
-                    free(alpha);
                     d_mat_clear(mu);
                     d_mat_clear(r);
                     _d_vec_clear(s);
@@ -624,11 +611,10 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                     return -1;
                 }
 
-                for (j = aa; j < kappa; j++)    /* orthogonalization */
+                for (j = 0; j < kappa; j++) /* orthogonalization */
                 {
                     if (fmpz_cmpabs(fmpz_mat_entry(B, kappa, j), dmax) > 0)
                     {
-                        free(alpha);
                         d_mat_clear(mu);
                         d_mat_clear(r);
                         _d_vec_clear(s);
@@ -638,7 +624,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                     }
                     d_mat_entry(r, kappa, j) =
                         fmpz_get_d(fmpz_mat_entry(B, kappa, j));
-                    for (i = zeros + 1; i < j; i++)
+                    for (i = 0; i < j; i++)
                     {
                         d_mat_entry(r, kappa, j) -=
                             d_mat_entry(r, kappa, i) * d_mat_entry(mu, j, i);
@@ -648,7 +634,6 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 }
                 if (fmpz_cmpabs(fmpz_mat_entry(B, kappa, kappa), dmax) > 0)
                 {
-                    free(alpha);
                     d_mat_clear(mu);
                     d_mat_clear(r);
                     _d_vec_clear(s);
@@ -656,8 +641,8 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                     fmpz_clear(dmax);
                     return -1;
                 }
-                s[zeros + 1] = fmpz_get_d(fmpz_mat_entry(B, kappa, kappa));
-                for (j = zeros + 2; j <= kappa; j++)
+                s[0] = fmpz_get_d(fmpz_mat_entry(B, kappa, kappa));
+                for (j = 1; j <= kappa; j++)
                 {
                     s[j] =
                         s[j - 1] - d_mat_entry(mu, kappa,
@@ -666,10 +651,10 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 }
                 d_mat_entry(r, kappa, kappa) = s[kappa];
 
-                x = _fmpz_vec_init(kappa - 1 - zeros);
-                for (j = kappa - 1; j > zeros; j--) /* size-reduction */
+                x = _fmpz_vec_init(kappa);
+                for (j = kappa - 1; j >= 0; j--)    /* size-reduction */
                 {
-                    if (fabs(d_mat_entry(mu, kappa, j)) > etam)
+                    if (fabs(d_mat_entry(mu, kappa, j)) > fl->eta)
                     {
                         double tmp;
                         test = 1;
@@ -679,7 +664,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                         else
                             tmp = floor(tmp + 0.5);
                         fmpz_set_d(x + j, tmp);
-                        for (i = zeros + 1; i < j; i++) /* update μ matrix */
+                        for (i = 0; i < j; i++) /* update μ matrix */
                         {
                             d_mat_entry(mu, kappa, i) -=
                                 tmp * d_mat_entry(mu, j, i);
@@ -689,9 +674,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
 
                 if (test)
                 {
-                    aa = zeros + 1;
-
-                    for (j = zeros + 1; j < kappa; j++)
+                    for (j = 0; j < kappa; j++)
                     {
                         fmpz_pow_ui(t, x + j, 2);
                         fmpz_addmul(fmpz_mat_entry(B, kappa, kappa), t,
@@ -702,7 +685,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                         fmpz_sub(fmpz_mat_entry(B, kappa, kappa),
                                  fmpz_mat_entry(B, kappa, kappa), t);
 
-                        for (i = zeros + 1; i < j; i++)
+                        for (i = 0; i < j; i++)
                         {
                             fmpz_mul(t, x + i, x + j);
                             fmpz_mul(t, t, fmpz_mat_entry(B, j, i));
@@ -711,11 +694,11 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                                      fmpz_mat_entry(B, kappa, kappa), t);
                         }
                     }
-                    for (i = zeros + 1; i < d; i++)
+                    for (i = 0; i < d; i++)
                     {
                         if (i < kappa)
                         {
-                            for (j = zeros + 1; j <= i; j++)
+                            for (j = 0; j <= i; j++)
                                 fmpz_submul(fmpz_mat_entry(B, kappa, i), x + j,
                                             fmpz_mat_entry(B, i, j));
                             for (j = i + 1; j < kappa; j++)
@@ -724,19 +707,18 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                         }
                         else if (i > kappa)
                         {
-                            for (j = zeros + 1; j < kappa; j++)
+                            for (j = 0; j < kappa; j++)
                                 fmpz_submul(fmpz_mat_entry(B, i, kappa), x + j,
                                             fmpz_mat_entry(B, i, j));
                         }
                     }
                 }
 
-                _fmpz_vec_clear(x, kappa - 1 - zeros);
+                _fmpz_vec_clear(x, kappa);
             } while (test);
 
-            if (deltap * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1])  /* check LLL condition */
+            if (fl->delta * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1])   /* check LLL condition */
             {
-                alpha[kappa] = kappa;
                 d_mat_entry(r, kappa, kappa) =
                     s[kappa - 1] - d_mat_entry(mu, kappa,
                                                kappa - 1) * d_mat_entry(r,
@@ -752,22 +734,9 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 do
                 {
                     kappa--;
-                } while ((kappa > zeros + 1)
-                         && (deltap * d_mat_entry(r, kappa - 1, kappa - 1) >
+                } while ((kappa > 0)
+                         && (fl->delta * d_mat_entry(r, kappa - 1, kappa - 1) >
                              s[kappa - 1]));
-
-                for (i = kappa; i < kappa2; i++)
-                    if (kappa <= alpha[i])
-                        alpha[i] = kappa;
-
-                for (i = kappa2; i > kappa; i--)
-                    alpha[i] = alpha[i - 1];
-
-                for (i = kappa2 + 1; i <= kappamax; i++)
-                    if (kappa < alpha[i])
-                        alpha[i] = kappa;
-
-                alpha[kappa] = kappa;
 
                 for (j = 0; j < kappa; j++)
                 {
@@ -806,7 +775,6 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
             }
         }
 
-        free(alpha);
         d_mat_clear(mu);
         d_mat_clear(r);
         _d_vec_clear(s);

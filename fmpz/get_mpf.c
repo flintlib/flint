@@ -19,43 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2009 William Hart
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "mpf_vec.h"
+#include <gmp.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 
-int
-_mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
-              mp_bitcnt_t prec)
+void
+fmpz_get_mpf(mpf_t x, const fmpz_t f)
 {
-    slong i;
-    int r;
-    mpf_t tmp, tmp2;
-    mpf_init2(tmp, prec);
-    mpf_init2(tmp2, prec);
-
-    mpf_set_ui(res, 0);
-    for (i = 0; i < len2; i++)
-    {
-        mpf_mul(tmp, vec1 + i, vec2 + i);
-        mpf_add(res, res, tmp);
-    }
-
-    _mpf_vec_norm(tmp, vec1, len2);
-    _mpf_vec_norm(tmp2, vec2, len2);
-    mpf_mul(tmp, tmp, tmp2);
-    mpf_div_2exp(tmp, tmp, prec);
-    mpf_mul(tmp2, res, res);
-
-    if (mpf_cmp(tmp2, tmp) <= 0)
-        r = 0;
+    if (!COEFF_IS_MPZ(*f))
+        mpf_set_si(x, *f);      /* set x to small value */
     else
-        r = 1;
-
-    mpf_clear(tmp);
-    mpf_clear(tmp2);
-
-    return r;
+        mpf_set_z(x, COEFF_TO_PTR(*f)); /* set x to large value */
 }

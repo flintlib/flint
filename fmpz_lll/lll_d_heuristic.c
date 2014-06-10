@@ -31,20 +31,11 @@
 #undef FUNC_NAME
 #endif
 
-#ifdef COMPUTE
-#undef COMPUTE
-#endif
-
 #ifdef CALL_BABAI
 #undef CALL_BABAI
 #endif
 
 #define FUNC_NAME fmpz_lll_d_heuristic
-#define COMPUTE(G, I, C)                                                \
-do {                                                                    \
-    d_mat_entry(G, I, I) =                                              \
-        _d_vec_dot_heuristic(appB->rows[I], appB->rows[I], C, &tmp);    \
-} while (0)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
     if (NFF)                                                           \
@@ -73,5 +64,4 @@ do {                                                                   \
 } while (0)
 #include "d_lll.c"
 #undef FUNC_NAME
-#undef COMPUTE
 #undef CALL_BABAI

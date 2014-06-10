@@ -19,43 +19,36 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "mpf_vec.h"
+#include <gmp.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 
-int
-_mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
-              mp_bitcnt_t prec)
+void
+fmpz_set_mpf(fmpz_t f, const mpf_t x)
 {
-    slong i;
-    int r;
-    mpf_t tmp, tmp2;
-    mpf_init2(tmp, prec);
-    mpf_init2(tmp2, prec);
-
-    mpf_set_ui(res, 0);
-    for (i = 0; i < len2; i++)
+    if (!COEFF_IS_MPZ(*f))
     {
-        mpf_mul(tmp, vec1 + i, vec2 + i);
-        mpf_add(res, res, tmp);
+        if (mpf_fits_slong_p(x))
+        {
+            slong cx = mpf_get_si(x);
+            fmpz_set_si(f, cx);
+        }
+        else
+        {
+            __mpz_struct *z = _fmpz_promote(f);
+            mpz_set_f(z, x);
+        }
     }
-
-    _mpf_vec_norm(tmp, vec1, len2);
-    _mpf_vec_norm(tmp2, vec2, len2);
-    mpf_mul(tmp, tmp, tmp2);
-    mpf_div_2exp(tmp, tmp, prec);
-    mpf_mul(tmp2, res, res);
-
-    if (mpf_cmp(tmp2, tmp) <= 0)
-        r = 0;
     else
-        r = 1;
-
-    mpf_clear(tmp);
-    mpf_clear(tmp2);
-
-    return r;
+    {
+        __mpz_struct *z = _fmpz_promote(f);
+        mpz_set_f(z, x);
+        _fmpz_demote_val(f);
+    }
 }

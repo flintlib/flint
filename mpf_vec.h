@@ -78,7 +78,7 @@ void _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2);
 
 void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
 
-void _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, mp_bitcnt_t prec);
+int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, mp_bitcnt_t prec);
 
 void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, mp_bitcnt_t prec);
 
@@ -87,9 +87,4 @@ void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, mp_bitcnt_t prec);
 #endif
 
 #endif
-
-
-
-
-
 

@@ -71,7 +71,7 @@ main(void)
         }
 
         result = fmpz_lll_d(mat, fl);
-        if (result == -1 && (fl->gt == EXACT || fl->rt == GRAM))
+        if (result == -1 && fl->rt == GRAM)
         {
             fmpz_mat_clear(mat);
             continue;
@@ -106,7 +106,7 @@ main(void)
     }
 
     /* test using integer relations matrices */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
         d_mat_t Q, R;
@@ -139,12 +139,7 @@ main(void)
         }
         else
         {
-            result = fmpz_lll_d(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_d(mat, fl);
         }
 
         d_mat_init(Q, r, c);
@@ -165,6 +160,10 @@ main(void)
         {
             flint_printf("FAIL (randintrel):\n");
             fmpz_mat_print_pretty(mat);
+            if (fl->rt == GRAM)
+            {
+                fmpz_mat_print_pretty(gmat);
+            }
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             flint_printf("rep_type = %d\n", fl->rt);
@@ -180,7 +179,7 @@ main(void)
     }
 
     /* test using ajtai matrices */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
         d_mat_t Q, R;
@@ -257,7 +256,7 @@ main(void)
         }
 
         result = fmpz_lll_d(mat, fl);
-        if (result == -1 && (fl->gt == EXACT || fl->rt == GRAM))
+        if (result == -1 && fl->rt == GRAM)
         {
             fmpz_mat_clear(mat);
             continue;

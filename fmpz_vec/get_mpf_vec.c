@@ -19,43 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "mpf_vec.h"
+#include "fmpz_vec.h"
 
-int
-_mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
-              mp_bitcnt_t prec)
+void
+_fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
 {
     slong i;
-    int r;
-    mpf_t tmp, tmp2;
-    mpf_init2(tmp, prec);
-    mpf_init2(tmp2, prec);
 
-    mpf_set_ui(res, 0);
-    for (i = 0; i < len2; i++)
+    for (i = 0; i < len; i++)
     {
-        mpf_mul(tmp, vec1 + i, vec2 + i);
-        mpf_add(res, res, tmp);
+        fmpz_get_mpf(appv + i, vec + i);
     }
-
-    _mpf_vec_norm(tmp, vec1, len2);
-    _mpf_vec_norm(tmp2, vec2, len2);
-    mpf_mul(tmp, tmp, tmp2);
-    mpf_div_2exp(tmp, tmp, prec);
-    mpf_mul(tmp2, res, res);
-
-    if (mpf_cmp(tmp2, tmp) <= 0)
-        r = 0;
-    else
-        r = 1;
-
-    mpf_clear(tmp);
-    mpf_clear(tmp2);
-
-    return r;
 }

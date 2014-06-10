@@ -55,7 +55,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 test = 0;
 
                 loops++;
-                if (loops > 2)
+                if (loops > 8)
                 {
                     return -1;
                 }
@@ -267,7 +267,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
         }
         else
         {
-            int j, k, test, aa, exponent;
+            int i, j, k, test, aa, exponent;
             slong exp;
             slong xx;
             double tmp, rtmp, halfplus, onedothalfplus;
@@ -285,7 +285,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 test = 0;
 
                 loops++;
-                if (loops > 2)
+                if (loops > 8)
                 {
                     return -1;
                 }
@@ -296,6 +296,13 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
 
                 for (j = aa; j < kappa; j++)
                 {
+                    if (fmpz_cmp_si
+                        (fmpz_mat_entry(A->exactSP, kappa, j), LONG_MIN) == 0)
+                    {
+                        _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, j),
+                                      B->rows[kappa], B->rows[j], n);
+                    }
+
                     if (j > zeros + 2)
                     {
                         tmp =
@@ -485,9 +492,26 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                  B->rows[kappa], n);
                     aa = zeros + 1;
 
-                    fmpz_mat_gram(A->exactSP, B);
+                    for (i = zeros + 1; i <= kappa; i++)
+                    {
+                        fmpz_set_si(fmpz_mat_entry(A->exactSP, kappa, i),
+                                    LONG_MIN);
+                    }
+
+                    for (i = kappa + 1; i <= kappamax; i++)
+                    {
+                        fmpz_set_si(fmpz_mat_entry(A->exactSP, i, kappa),
+                                    LONG_MIN);
+                    }
                 }
             } while (test);
+
+            if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), LONG_MIN)
+                == 0)
+            {
+                _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, kappa),
+                              B->rows[kappa], B->rows[kappa], n);
+            }
 
             s[zeros + 1] =
                 fmpz_get_d_2exp(&exp,
