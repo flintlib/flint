@@ -126,6 +126,19 @@ main(void)
             abort();
         }
 
+        fmpz_mat_hnf_classical(H2, A);
+        equal = fmpz_mat_equal(H, H2);
+
+        if (!equal)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("hnfs produced by different methods should be the same!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H2); flint_printf("\n\n");
+            abort();
+        }
+
         fmpz_mat_hnf_xgcd(H2, H);
         equal = fmpz_mat_equal(H, H2);
 
