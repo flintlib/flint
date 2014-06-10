@@ -47,7 +47,7 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
             fmpz_xgcd(d, u, v, fmpz_mat_entry(H, i, j), fmpz_mat_entry(H, i - 1, j));
             fmpz_divexact(r2d, fmpz_mat_entry(H, i - 1, j), d);
             fmpz_divexact(r1d, fmpz_mat_entry(H, i, j), d);
-            for (j2 = 0; j2 < A->c; j2++)
+            for (j2 = j; j2 < A->c; j2++)
             {
                 fmpz_mul(b, u, fmpz_mat_entry(H, i, j2));
                 fmpz_addmul(b, v, fmpz_mat_entry(H, i - 1, j2));
@@ -62,14 +62,14 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
             fmpz_clear(v);
             fmpz_clear(d);
         }
-        for (j2 = 0; j2 < A->c; j2++)
+        for (j2 = j; j2 < A->c; j2++)
         {
             fmpz_swap(fmpz_mat_entry(H, A->r - 1, j2),
                     fmpz_mat_entry(H, k, j2));
         }
         if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
         {
-            for (j2 = 0; j2 < A->c; j2++)
+            for (j2 = j; j2 < A->c; j2++)
             {
                 fmpz_neg(fmpz_mat_entry(H, k, j2),
                         fmpz_mat_entry(H, k, j2));
@@ -90,7 +90,7 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
                 fmpz_init(q);
                 fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
                         fmpz_mat_entry(H, k, j));
-                for (j2 = 0; j2 < A->c; j2++)
+                for (j2 = j; j2 < A->c; j2++)
                 {
                     fmpz_submul(fmpz_mat_entry(H, i, j2), q,
                             fmpz_mat_entry(H, k, j2));
