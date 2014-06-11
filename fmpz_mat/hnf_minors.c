@@ -75,7 +75,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
             fmpz_xgcd(d, u, v, fmpz_mat_entry(H, j, j), fmpz_mat_entry(H, k, j));
             fmpz_divexact(r1d, fmpz_mat_entry(H, j, j), d);
             fmpz_divexact(r2d, fmpz_mat_entry(H, k, j), d);
-            for (j2 = 0; j2 < A->c; j2++)
+            for (j2 = j; j2 < A->c; j2++)
             {
                 fmpz_mul(b, u, fmpz_mat_entry(H, j, j2));
                 fmpz_addmul(b, v, fmpz_mat_entry(H, k, j2));
@@ -86,20 +86,23 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
             /* ensure H_j,j is positive */
             if (fmpz_sgn(fmpz_mat_entry(H, j, j)) < 0)
             {
-                for (j2 = 0; j2 < A->c; j2++)
+                for (j2 = j; j2 < A->c; j2++)
                 {
                     fmpz_neg(fmpz_mat_entry(H, j, j2),
                             fmpz_mat_entry(H, j, j2));
                 }
             }
-            /* reduce elements of column j */
-            for (i2 = j - 1; i2 >= 0; i2--)
+        }
+        /* reduce above diagonal elements of each row i */
+        for (i = k - 1; i >= 0; i--)
+        {
+            for (j = i + 1; j <= k; j++)
             {
-                fmpz_fdiv_q(q, fmpz_mat_entry(H, i2, j),
+                fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
                         fmpz_mat_entry(H, j, j));
-                for (j2 = 0; j2 < A->c; j2++)
+                for (j2 = j; j2 < A->c; j2++)
                 {
-                    fmpz_submul(fmpz_mat_entry(H, i2, j2), q,
+                    fmpz_submul(fmpz_mat_entry(H, i, j2), q,
                             fmpz_mat_entry(H, j, j2));
                 }
             }
@@ -107,7 +110,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
         /* ensure H_k,k is positive */
         if (fmpz_sgn(fmpz_mat_entry(H, k, k)) < 0)
         {
-            for (j = 0; j < A->c; j++)
+            for (j = k; j < A->c; j++)
             {
                 fmpz_neg(fmpz_mat_entry(H, k, j),
                         fmpz_mat_entry(H, k, j));
@@ -118,7 +121,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
         {
             fmpz_fdiv_q(q, fmpz_mat_entry(H, i, k),
                     fmpz_mat_entry(H, k, k));
-            for (j = 0; j < A->c; j++)
+            for (j = k; j < A->c; j++)
             {
                 fmpz_submul(fmpz_mat_entry(H, i, j), q,
                         fmpz_mat_entry(H, k, j));
