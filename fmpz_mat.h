@@ -316,6 +316,8 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
 
 void fmpz_mat_hnf_mod_D(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
 
+void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
+
 #ifdef __cplusplus
 }
 #endif
