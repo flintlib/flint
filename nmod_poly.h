@@ -1104,6 +1104,12 @@ slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S,
 void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S, 
                       const nmod_poly_t A, const nmod_poly_t B);
 
+/* Discriminant **************************************************************/
+
+mp_limb_t _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod);
+
+mp_limb_t nmod_poly_discriminant(const nmod_poly_t f);
+
 /* Square roots **************************************************************/
 
 void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);

@@ -1995,6 +1995,26 @@ int nmod_poly_invmod(nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t P)
 
 *******************************************************************************
 
+mp_limb_t _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
+
+    Return the discriminant of \code{(poly, len)}. Assumes \code{len > 1}.
+
+mp_limb_t nmod_poly_discriminant(const nmod_poly_t f)
+
+    Return the discriminant of $f$. We normalise the discriminant so that 
+    \code{disc(f) = (-1)^(n(n-1)/2) res(f, f')/lc(f)^(n - m - 2)}, where
+    \code{n = len(f)} and \code{m = len(f')}. Thus 
+    \code{disc(f) = lc(f)^(2n - 2) prod_{i < j} (r_i - r_j)^2}, where
+    \code{lc(f)} is the leading coefficient of $f$ and $r_i$ are the roots 
+    of $f$.
+
+
+*******************************************************************************
+
+    Power series composition
+
+*******************************************************************************
+
 void _nmod_poly_compose_series_horner(mp_ptr res,
         mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong n)
 
