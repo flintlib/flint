@@ -27,9 +27,12 @@
 
 void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 {
-    slong j, j2, i, k, l;
+    slong i, i0, j, j2, k, l;
+    fmpz_t min, q;
 
     fmpz_mat_set(H, A);
+    fmpz_init(q);
+    fmpz_init(min);
 
     for (j = 0, k = 0, l = (A->c - A->r)*(A->c > A->r); A->c - j != l; j++, k++)
     {
@@ -59,8 +62,6 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
                 /* reduce first entries of column j with row k */
                 for (i = 0; i < k; i++)
                 {
-                    fmpz_t q;
-                    fmpz_init(q);
                     fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
                             fmpz_mat_entry(H, k, j));
                     for (j2 = 0; j2 < A->c; j2++)
@@ -68,16 +69,12 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
                         fmpz_submul(fmpz_mat_entry(H, i, j2), q,
                                 fmpz_mat_entry(H, k, j2));
                     }
-                    fmpz_clear(q);
                 }
             }
         }
         else
         {
-            slong i0 = 0;
-            fmpz_t min;
-
-            fmpz_init(min);
+            i0 = 0;
             /* locate non-zero entry in column j below k with lowest absolute value */
             for (i = k + 1; i < A->r; i++)
             {
@@ -90,7 +87,6 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
                     fmpz_abs(min, fmpz_mat_entry(H, i, j));
                 }
             }
-            fmpz_clear(min);
             /* move the row found to row k */
             if (i0 > k)
             {
@@ -111,8 +107,6 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
             /* reduce lower entries of column j with row k */
             for (i = k + 1; i < A->r; i++)
             {
-                fmpz_t q;
-                fmpz_init(q);
                 fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
                         fmpz_mat_entry(H, k, j));
                 for (j2 = 0; j2 < A->c; j2++)
@@ -120,11 +114,12 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
                     fmpz_submul(fmpz_mat_entry(H, i, j2), q,
                             fmpz_mat_entry(H, k, j2));
                 }
-                fmpz_clear(q);
             }
             /* don't move to the next column yet */
             j--;
             k--;
         }
     }
+    fmpz_clear(min);
+    fmpz_clear(q);
 }
