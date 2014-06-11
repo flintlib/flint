@@ -75,6 +75,7 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
         else
         {
             i0 = 0;
+            fmpz_zero(min);
             /* locate non-zero entry in column j below k with lowest absolute value */
             for (i = k + 1; i < A->r; i++)
             {
