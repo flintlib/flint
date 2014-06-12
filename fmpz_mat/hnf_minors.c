@@ -27,16 +27,17 @@
 
 void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 {
-    slong j, j2, i, i2, k, n;
+    slong j, j2, i, i2, k, l, n;
     fmpz_t det, u, v, d, r2d, r1d, q, b;
     fmpz_mat_t M;
 
     n = A->r;
+    fmpz_mat_set(H, A);
+    /* old preprocessing step TODO remove when completely sure nothing is broken
     fmpz_init(det);
     fmpz_mat_init(M, n, n);
     fmpz_mat_one(M);
-    fmpz_mat_set(H, A);
-    /* ensure all principal minors are non-singular */
+    ensure all principal minors are non-singular
     for (i = 0; i < n; i++)
     {
         for (i2 = 0; i2 < i; i2++)
@@ -59,7 +60,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
             fmpz_swap(fmpz_mat_entry(H, i2, j), fmpz_mat_entry(H, i, j));
     }
     fmpz_clear(det);
-    fmpz_mat_clear(M);
+    fmpz_mat_clear(M); */
     fmpz_init(u);
     fmpz_init(v);
     fmpz_init(d);
@@ -68,7 +69,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
     fmpz_init(q);
     fmpz_init(b);
     /* put the kth principal minor in HNF */
-    for (k = 0; k < n; k++)
+    for (k = 0, l = n - 1; k < n; k++)
     {
         for (j = 0; j < k; j++)
         {
@@ -83,7 +84,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                 fmpz_submul(fmpz_mat_entry(H, k, j2), r2d, fmpz_mat_entry(H, j, j2));
                 fmpz_set(fmpz_mat_entry(H, j, j2), b);
             }
-            /* ensure H_j,j is positive */
+            /* ensure H_j,j is positive
             if (fmpz_sgn(fmpz_mat_entry(H, j, j)) < 0)
             {
                 for (j2 = j; j2 < A->c; j2++)
@@ -91,6 +92,27 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                     fmpz_neg(fmpz_mat_entry(H, j, j2),
                             fmpz_mat_entry(H, j, j2));
                 }
+            } */
+        }
+        /* if H_k,k is zero we swap row k for some other row (starting with the last) */
+        if (fmpz_is_zero(fmpz_mat_entry(H, k, k)))
+        {
+            for (j = 0; j < A->c; j++)
+            {
+                fmpz_swap(fmpz_mat_entry(H, k, j),
+                        fmpz_mat_entry(H, l, j));
+            }
+            l--;
+            k--;
+            continue;
+        }
+        /* ensure H_k,k is positive */
+        if (fmpz_sgn(fmpz_mat_entry(H, k, k)) < 0)
+        {
+            for (j = k; j < A->c; j++)
+            {
+                fmpz_neg(fmpz_mat_entry(H, k, j),
+                        fmpz_mat_entry(H, k, j));
             }
         }
         /* reduce above diagonal elements of each row i */
@@ -107,15 +129,6 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                 }
             }
         }
-        /* ensure H_k,k is positive */
-        if (fmpz_sgn(fmpz_mat_entry(H, k, k)) < 0)
-        {
-            for (j = k; j < A->c; j++)
-            {
-                fmpz_neg(fmpz_mat_entry(H, k, j),
-                        fmpz_mat_entry(H, k, j));
-            }
-        }
         /* reduce elements of column k */
         for (i = k - 1; i >= 0; i--)
         {
@@ -127,6 +140,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                         fmpz_mat_entry(H, k, j));
             }
         }
+        l = n - 1;
     }
     fmpz_clear(b);
     fmpz_clear(q);
@@ -135,73 +149,4 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
     fmpz_clear(d);
     fmpz_clear(v);
     fmpz_clear(u);
-    /* for (j = 0, k = 0, l = (A->c - A->r)*(A->c > A->r); A->c - j != l; j++, k++)
-    {
-        for (i = k + 1; i != A->r; i++)
-        {*/
-            /* reduce row i - 1 with row i */
-            /*fmpz_t r1d, r2d, b, u, v, d;
-            if (fmpz_is_zero(fmpz_mat_entry(H, i - 1, j)))
-                continue;
-            fmpz_init(r1d);
-            fmpz_init(r2d);
-            fmpz_init(b);
-            fmpz_init(u);
-            fmpz_init(v);
-            fmpz_init(d);
-            fmpz_xgcd(d, u, v, fmpz_mat_entry(H, i, j), fmpz_mat_entry(H, i - 1, j));
-            fmpz_divexact(r2d, fmpz_mat_entry(H, i - 1, j), d);
-            fmpz_divexact(r1d, fmpz_mat_entry(H, i, j), d);
-            for (j2 = j; j2 < A->c; j2++)
-            {
-                fmpz_mul(b, u, fmpz_mat_entry(H, i, j2));
-                fmpz_addmul(b, v, fmpz_mat_entry(H, i - 1, j2));
-                fmpz_mul(fmpz_mat_entry(H, i - 1, j2), r1d, fmpz_mat_entry(H, i - 1, j2));
-                fmpz_submul(fmpz_mat_entry(H, i - 1, j2), r2d, fmpz_mat_entry(H, i, j2));
-                fmpz_set(fmpz_mat_entry(H, i, j2), b);
-            }
-            fmpz_clear(r2d);
-            fmpz_clear(r1d);
-            fmpz_clear(b);
-            fmpz_clear(u);
-            fmpz_clear(v);
-            fmpz_clear(d);
-        }
-        for (j2 = j; j2 < A->c; j2++)
-        {
-            fmpz_swap(fmpz_mat_entry(H, A->r - 1, j2),
-                    fmpz_mat_entry(H, k, j2));
-        }
-        if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
-        {
-            for (j2 = j; j2 < A->c; j2++)
-            {
-                fmpz_neg(fmpz_mat_entry(H, k, j2),
-                        fmpz_mat_entry(H, k, j2));
-            }
-        }
-        if (fmpz_is_zero(fmpz_mat_entry(H, k, j)))
-        {
-            k--;
-            if (l > 0)
-                l--;
-        }
-        else
-        {*/
-            /* reduce higher entries of column j with row k */
-           /* for (i = k - 1; i >= 0; i--)
-            {
-                fmpz_t q;
-                fmpz_init(q);
-                fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
-                        fmpz_mat_entry(H, k, j));
-                for (j2 = j; j2 < A->c; j2++)
-                {
-                    fmpz_submul(fmpz_mat_entry(H, i, j2), q,
-                            fmpz_mat_entry(H, k, j2));
-                }
-                fmpz_clear(q);
-            }
-        }
-    }*/
 }
