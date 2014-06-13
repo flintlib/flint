@@ -56,8 +56,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
             flint_printf("Exception (fmpz_mat_hnf_minors). Input matrix was singular.\n");
             abort();
         }
-        for (j = 0; j < n; j++)
-            fmpz_swap(fmpz_mat_entry(H, i2, j), fmpz_mat_entry(H, i, j));
+        fmpz_mat_swap_rows(H, NULL, i2, i);
     }
     fmpz_clear(det);
     fmpz_mat_clear(M); */
@@ -97,11 +96,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
         /* if H_k,k is zero we swap row k for some other row (starting with the last) */
         if (fmpz_is_zero(fmpz_mat_entry(H, k, k)))
         {
-            for (j = 0; j < A->c; j++)
-            {
-                fmpz_swap(fmpz_mat_entry(H, k, j),
-                        fmpz_mat_entry(H, l, j));
-            }
+            fmpz_mat_swap_rows(H, NULL, k, l);
             l--;
             k--;
             continue;

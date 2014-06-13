@@ -91,11 +91,7 @@ void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
             /* move the row found to row k */
             if (i0 > k)
             {
-                for (j2 = 0; j2 < A->c; j2++)
-                {
-                    fmpz_swap(fmpz_mat_entry(H, i0, j2),
-                            fmpz_mat_entry(H, k, j2));
-                }
+                fmpz_mat_swap_rows(H, NULL, i0, k);
             }
             if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
             {

@@ -57,11 +57,7 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
                 fmpz_set(fmpz_mat_entry(H, i, j2), b);
             }
         }
-        for (j2 = j; j2 < A->c; j2++)
-        {
-            fmpz_swap(fmpz_mat_entry(H, A->r - 1, j2),
-                    fmpz_mat_entry(H, k, j2));
-        }
+        fmpz_mat_swap_rows(H, NULL, A->r - 1, k);
         if (fmpz_sgn(fmpz_mat_entry(H, k, j)) < 0)
         {
             for (j2 = j; j2 < A->c; j2++)
