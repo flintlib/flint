@@ -34,10 +34,6 @@
 int in_hnf(const fmpz_mat_t A)
 {
     slong i, last_i, j, prev_j;
-    fmpz_t zero;
-
-    fmpz_init(zero);
-    fmpz_zero(zero);
 
     /* find last non-zero row */
     for (last_i = A->r - 1; last_i >= 0; last_i--)
@@ -61,7 +57,7 @@ int in_hnf(const fmpz_mat_t A)
         {
             if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
             {
-                if (fmpz_cmp(fmpz_mat_entry(A, i, j), zero) < 0)
+                if (fmpz_sgn(fmpz_mat_entry(A, i, j)) < 0)
                     return 0;
                 break;
             }
@@ -73,12 +69,10 @@ int in_hnf(const fmpz_mat_t A)
         {
             if (fmpz_cmp(fmpz_mat_entry(A, i2, j), fmpz_mat_entry(A, i, j)) >= 0)
                 return 0;
-            if (fmpz_cmp(fmpz_mat_entry(A, i2, j), zero) < 0)
+            if (fmpz_sgn(fmpz_mat_entry(A, i2, j)) < 0)
                 return 0;
         }
     }
-
-    fmpz_clear(zero);
 
     return 1;
 }
