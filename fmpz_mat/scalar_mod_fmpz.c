@@ -29,12 +29,8 @@ void
 fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m)
 {
     slong i, j;
-    fmpz_t t;
-    fmpz_init(t);
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)
-            fmpz_fdiv_qr(t, fmpz_mat_entry(B,i,j), fmpz_mat_entry(A,i,j), m);
-
-    fmpz_clear(t);
+            fmpz_mod(fmpz_mat_entry(B, i, j), fmpz_mat_entry(A, i, j), m);
 }
