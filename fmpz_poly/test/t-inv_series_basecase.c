@@ -37,7 +37,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("inv_series_newton....");
+    flint_printf("inv_series_basecase....");
     fflush(stdout);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
@@ -56,7 +56,7 @@ main(void)
 
         fmpz_poly_set_ui(one, 1);
 
-        fmpz_poly_inv_series_newton(b, a, n);
+        fmpz_poly_inv_series_basecase(b, a, n);
         fmpz_poly_mullow(c, a, b, n);
 
         result = (fmpz_poly_equal(c, one));
@@ -88,7 +88,7 @@ main(void)
         fmpz_poly_set_si(a, -1);
         fmpz_poly_set_ui(one, 1);
 
-        fmpz_poly_inv_series_newton(b, a, n);
+        fmpz_poly_inv_series_basecase(b, a, n);
         fmpz_poly_mullow(c, a, b, n);
 
         result = (fmpz_poly_equal(c, one));

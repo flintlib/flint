@@ -40,8 +40,6 @@ main(void)
     flint_printf("div_series....");
     fflush(stdout);
 
-    
-
     /* Check aliasing q and a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -52,9 +50,9 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
-        fmpz_poly_set_coeff_ui(b, 0, 1);
+        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
         fmpz_poly_div_series(q, a, b, n);
         fmpz_poly_div_series(a, a, b, n);
@@ -84,9 +82,9 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
-        fmpz_poly_set_coeff_ui(b, 0, 1);
+        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
         fmpz_poly_div_series(q, a, b, n);
         fmpz_poly_div_series(b, a, b, n);
@@ -117,9 +115,9 @@ main(void)
         fmpz_poly_init(p);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
-        fmpz_poly_set_coeff_ui(b, 0, 1);
+        fmpz_poly_randtest(a, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 2 + n_randint(state, 100));
+        fmpz_poly_set_coeff_si(b, 0, n_randint(state, 2) ? 1 : -1);
 
         fmpz_poly_div_series(q, a, b, n);
         fmpz_poly_mullow(p, q, b, n);
