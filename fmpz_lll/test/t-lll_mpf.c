@@ -41,7 +41,7 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("lll_d_heuristic....");
+    flint_printf("lll_mpf....");
     fflush(stdout);
 
     /* test using NTRU like matrices */
@@ -67,17 +67,12 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
-            result = fmpz_lll_d_heuristic(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 
@@ -115,18 +110,12 @@ main(void)
         {
             fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
-            result = fmpz_lll_d_heuristic(gmat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                fmpz_mat_clear(gmat);
-                continue;
-            }
+            fmpz_lll_mpf(gmat, fl);
             result = fmpz_mat_is_reduced_gram(gmat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 
@@ -168,17 +157,12 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
-            result = fmpz_lll_d_heuristic(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 
@@ -216,17 +200,12 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
-            result = fmpz_lll_d_heuristic(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            fmpz_lll_mpf(mat, fl);
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 

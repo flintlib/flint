@@ -28,11 +28,11 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_check_babai_heurstic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
-                              mpf_mat_t r, mpf * s, mpf_mat_t appB,
-                              fmpz_gram_t A, int a, int zeros, int kappamax,
-                              int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec,
-                              const fmpz_lll_t fl)
+fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
+                               mpf_mat_t r, mpf * s, mpf_mat_t appB,
+                               fmpz_gram_t A, int a, int zeros, int kappamax,
+                               int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec,
+                               const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS)
     {
@@ -262,7 +262,7 @@ fmpz_lll_check_babai_heurstic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                 for (j = aa; j < kappa; j++)
                 {
                     if (fmpz_cmp_si
-                        (fmpz_mat_entry(A->exactSP, kappa, j), LONG_MIN) == 0)
+                        (fmpz_mat_entry(A->exactSP, kappa, j), WORD_MIN) == 0)
                     {
                         _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, j),
                                       B->rows[kappa], B->rows[j], n);
@@ -394,18 +394,18 @@ fmpz_lll_check_babai_heurstic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                     for (i = zeros + 1; i <= kappa; i++)
                     {
                         fmpz_set_si(fmpz_mat_entry(A->exactSP, kappa, i),
-                                    LONG_MIN);
+                                    WORD_MIN);
                     }
 
                     for (i = kappa + 1; i <= kappamax; i++)
                     {
                         fmpz_set_si(fmpz_mat_entry(A->exactSP, i, kappa),
-                                    LONG_MIN);
+                                    WORD_MIN);
                     }
                 }
             } while (test);
 
-            if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), LONG_MIN)
+            if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), WORD_MIN)
                 == 0)
             {
                 _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, kappa),

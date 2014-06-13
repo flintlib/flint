@@ -55,7 +55,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 test = 0;
 
                 loops++;
-                if (loops > 8)
+                if (loops > 20)
                 {
                     return -1;
                 }
@@ -285,7 +285,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 test = 0;
 
                 loops++;
-                if (loops > 8)
+                if (loops > 20)
                 {
                     return -1;
                 }
@@ -297,7 +297,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 for (j = aa; j < kappa; j++)
                 {
                     if (fmpz_cmp_si
-                        (fmpz_mat_entry(A->exactSP, kappa, j), LONG_MIN) == 0)
+                        (fmpz_mat_entry(A->exactSP, kappa, j), WORD_MIN) == 0)
                     {
                         _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, j),
                                       B->rows[kappa], B->rows[j], n);
@@ -495,18 +495,18 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                     for (i = zeros + 1; i <= kappa; i++)
                     {
                         fmpz_set_si(fmpz_mat_entry(A->exactSP, kappa, i),
-                                    LONG_MIN);
+                                    WORD_MIN);
                     }
 
                     for (i = kappa + 1; i <= kappamax; i++)
                     {
                         fmpz_set_si(fmpz_mat_entry(A->exactSP, i, kappa),
-                                    LONG_MIN);
+                                    WORD_MIN);
                     }
                 }
             } while (test);
 
-            if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), LONG_MIN)
+            if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), WORD_MIN)
                 == 0)
             {
                 _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, kappa),

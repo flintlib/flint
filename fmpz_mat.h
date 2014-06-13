@@ -325,6 +325,12 @@ void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A);
 
 void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
 
+/* LLL ***********************************************************************/
+
+int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta);
+
+int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta);
+
 #ifdef __cplusplus
 }
 #endif

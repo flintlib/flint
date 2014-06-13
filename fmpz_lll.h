@@ -115,6 +115,10 @@ int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu, mpf_ma
        mpf_mat_t appB, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec, const fmpz_lll_t fl);
 
+int fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl);
+
+int fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl);
+
 
 /* double heuristic_scalar_product(double * vec1, double * vec2, ulong n, 
 								F_mpz_mat_t B, ulong k, ulong j, long exp_adj);

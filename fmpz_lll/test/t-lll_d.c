@@ -49,7 +49,6 @@ main(void)
     {
         ulong q;
         slong r, c;
-        d_mat_t Q, R;
 
         r = 2 * (n_randint(state, 50) + 1);
         c = r;
@@ -68,28 +67,19 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
+            result = fmpz_lll_d(mat, fl);
+            if (result == -1)
+            {
+                fmpz_mat_clear(mat);
+                continue;
+            }
+            result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
-
-        result = fmpz_lll_d(mat, fl);
-        if (result == -1 && fl->rt == GRAM)
-        {
-            fmpz_mat_clear(mat);
-            continue;
-        }
-
-        d_mat_init(Q, r, c);
-        d_mat_init(R, r, r);
-        d_mat_zero(R);
-
-        if (fl->rt == Z_BASIS)
-            fmpz_mat_rq_d(R, Q, mat);
         else
-            fmpz_mat_chol_d(R, mat);
-
-        result = d_mat_is_reduced(R, fl->delta, fl->eta);
-
-        d_mat_clear(Q);
-        d_mat_clear(R);
+        {
+            fmpz_lll_d(mat, fl);
+            result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
+        }
 
         if (!result)
         {
@@ -109,7 +99,6 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
-        d_mat_t Q, R;
         fmpz_mat_t gmat;
 
         r = n_randint(state, 20) + 1;
@@ -117,10 +106,6 @@ main(void)
 
         fmpz_mat_init(mat, r, c);
         fmpz_lll_randtest(fl, state);
-        if (fl->rt == GRAM)
-        {
-            fmpz_mat_init(gmat, r, r);
-        }
 
         bits = n_randint(state, 200) + 1;
 
@@ -128,6 +113,7 @@ main(void)
 
         if (fl->rt == GRAM)
         {
+            fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
             result = fmpz_lll_d(gmat, fl);
             if (result == -1)
@@ -136,25 +122,13 @@ main(void)
                 fmpz_mat_clear(gmat);
                 continue;
             }
+            result = fmpz_mat_is_reduced_gram(gmat, fl->delta, fl->eta);
         }
         else
         {
             fmpz_lll_d(mat, fl);
+            result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
-
-        d_mat_init(Q, r, c);
-        d_mat_init(R, r, r);
-        d_mat_zero(R);
-
-        if (fl->rt == Z_BASIS)
-            fmpz_mat_rq_d(R, Q, mat);
-        else
-            fmpz_mat_chol_d(R, gmat);
-
-        result = d_mat_is_reduced(R, fl->delta, fl->eta);
-
-        d_mat_clear(Q);
-        d_mat_clear(R);
 
         if (!result)
         {
@@ -182,7 +156,6 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
-        d_mat_t Q, R;
 
         r = n_randint(state, 10) + 1;
         c = r;
@@ -195,28 +168,19 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
+            result = fmpz_lll_d(mat, fl);
+            if (result == -1)
+            {
+                fmpz_mat_clear(mat);
+                continue;
+            }
+            result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
-
-        result = fmpz_lll_d(mat, fl);
-        if (result == -1 && fl->rt == GRAM)
-        {
-            fmpz_mat_clear(mat);
-            continue;
-        }
-
-        d_mat_init(Q, r, c);
-        d_mat_init(R, r, r);
-        d_mat_zero(R);
-
-        if (fl->rt == Z_BASIS)
-            fmpz_mat_rq_d(R, Q, mat);
         else
-            fmpz_mat_chol_d(R, mat);
-
-        result = d_mat_is_reduced(R, fl->delta, fl->eta);
-
-        d_mat_clear(Q);
-        d_mat_clear(R);
+        {
+            fmpz_lll_d(mat, fl);
+            result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
+        }
 
         if (!result)
         {
@@ -237,7 +201,6 @@ main(void)
     {
         mp_bitcnt_t bits2;
         slong r, c;
-        d_mat_t Q, R;
 
         r = n_randint(state, 200) + 1;
         c = r;
@@ -253,28 +216,19 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
+            result = fmpz_lll_d(mat, fl);
+            if (result == -1)
+            {
+                fmpz_mat_clear(mat);
+                continue;
+            }
+            result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
-
-        result = fmpz_lll_d(mat, fl);
-        if (result == -1 && fl->rt == GRAM)
-        {
-            fmpz_mat_clear(mat);
-            continue;
-        }
-
-        d_mat_init(Q, r, c);
-        d_mat_init(R, r, r);
-        d_mat_zero(R);
-
-        if (fl->rt == Z_BASIS)
-            fmpz_mat_rq_d(R, Q, mat);
         else
-            fmpz_mat_chol_d(R, mat);
-
-        result = d_mat_is_reduced(R, fl->delta, fl->eta);
-
-        d_mat_clear(Q);
-        d_mat_clear(R);
+        {
+            fmpz_lll_d(mat, fl);
+            result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
+        }
 
         if (!result)
         {

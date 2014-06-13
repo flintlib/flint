@@ -30,9 +30,6 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
 {
     slong i, j, k;
     fmpq_t num, den, mu;
-    fmpq_init(num);
-    fmpq_init(den);
-    fmpq_init(mu);
 
     if (B->r != A->r || B->c != A->c)
     {
@@ -54,6 +51,10 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
     {
         return;
     }
+
+    fmpq_init(num);
+    fmpq_init(den);
+    fmpq_init(mu);
 
     for (i = 0; i < A->c; i++)
     {

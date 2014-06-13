@@ -35,7 +35,7 @@
 void fmpz_lll_context_init_default(fmpz_lll_t fl)
 
     Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt} and \code{fl->gt} to
-    their default values, 0.75, 0.81, $Z_BASIS$ and $APPROX$ respectively.
+    their default values, 0.99, 0.51, $Z_BASIS$ and $APPROX$ respectively.
 
 void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta,
                            rep_type rt, gram_type gt)
@@ -163,3 +163,10 @@ int fmpz_lll_d_heuristic(fmpz_mat_t B, const fmpz_lll_t fl)
     This LLL reduces \code{B} in place using doubles only. It is similar to
     \code{fmpz_lll_d()} but only uses the heuristic inner products which
     attempt to detect cancellations.
+
+int fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
+
+    This is LLL using \code{mpf} with the given precision, \code{prec} for the
+    underlying GSO. It reduces \code{B} in place like the other LLL functions.
+    The $mpf2$ in the function name refers to the way the \code{mpf_t}'s are
+    initialised.

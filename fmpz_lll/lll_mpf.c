@@ -19,19 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010 Andy Novocin
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
 #include "fmpz_lll.h"
 
-void
-fmpz_lll_context_init_default(fmpz_lll_t fl)
+int
+fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl)
 {
-    fl->delta = 0.99;
-    fl->eta = 0.51;
-    fl->rt = Z_BASIS;
-    fl->gt = APPROX;
+    mp_bitcnt_t prec = 0;
+    int result, num_loops = 0;
+
+    do
+    {
+        if (num_loops < 20)
+            prec += 53;
+        else
+            prec *= 2;
+
+        result = fmpz_lll_mpf2(B, prec, fl);
+
+        num_loops++;
+    } while ((result == -1) && (prec < UWORD_MAX));
+
+    return result;
 }
