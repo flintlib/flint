@@ -43,7 +43,7 @@ main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpq_mat_t A, B, C;
+        fmpq_mat_t A, B, C, mu;
         fmpq_t dot;
         int j, k;
 
@@ -55,26 +55,21 @@ main(void)
         bits = 1 + n_randint(state, 100);
 
         fmpq_mat_init(A, m, n);
-        fmpq_mat_init(B, n, m);
-        fmpq_mat_init(C, n, m);
+        fmpq_mat_init(B, m, n);
+        fmpq_mat_init(C, m, n);
+        fmpq_mat_init(mu, m, m);
 
         fmpq_mat_randtest(A, state, bits);
 
-        fmpq_mat_transpose(B, A);
-        fmpq_mat_rref(B, B);
-
-        fmpq_mat_gso(A, A);
-
-        fmpq_mat_transpose(C, A);
+        fmpq_mat_rref(B, A);
+        fmpq_mat_gso(A, mu, A);
 
         fmpq_init(dot);
-
-        for (j = 0; j < n; j++)
+        for (j = 0; j < m; j++)
         {
-            for (k = j + 1; k < n; k++)
+            for (k = j + 1; k < m; k++)
             {
-
-                _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
+                _fmpq_vec_dot(dot, C->rows[j], C->rows[k], n);
 
                 if (!fmpq_is_zero(dot))
                 {
@@ -86,10 +81,8 @@ main(void)
             }
         }
 
-        fmpq_mat_rref(C, C);
-
+        fmpq_mat_rref(C, A);
         result = fmpq_mat_equal(B, C);
-
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -103,6 +96,7 @@ main(void)
         fmpq_mat_clear(A);
         fmpq_mat_clear(B);
         fmpq_mat_clear(C);
+        fmpq_mat_clear(mu);
         fmpq_clear(dot);
     }
 

@@ -31,62 +31,82 @@ int
 fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
 {
     slong i, j, d = A->r, n = A->c;
-    fmpz_mat_t B;
-    fmpq_mat_t Bq, Aq;
-    mpq_t cx;
-    fmpq_t c, p, q, r;
+    fmpq_mat_t Aq, Bq, mu;
+    mpq_t deltax, etax;
+    fmpq_t deltaq, etaq, tmp, rtmp;
+    fmpq *vec;
 
     if (d == 1)
         return 1;
 
-    fmpz_mat_init(B, n, d);
-    fmpq_mat_init(Bq, n, d);
     fmpq_mat_init(Aq, d, n);
-    mpq_init(cx);
-    fmpq_init(c);
-    fmpq_init(p);
-    fmpq_init(q);
-    fmpq_init(r);
+    fmpq_mat_init(Bq, d, n);
+    fmpq_mat_init(mu, d, d);
 
-    fmpz_mat_transpose(B, A);
-    fmpq_mat_set_fmpz_mat(Bq, B);
-    fmpq_mat_gso(Bq, Bq);
-    fmpq_mat_transpose(Aq, Bq);
+    mpq_init(deltax);
+    mpq_init(etax);
 
-    mpq_set_d(cx, delta - eta * eta);
-    fmpq_set_mpq(c, cx);
+    fmpq_init(deltaq);
+    fmpq_init(etaq);
+    fmpq_init(tmp);
+    fmpq_init(rtmp);
 
-    for (i = 0; i < d; i++)
+    vec = _fmpq_vec_init(n);
+
+    fmpq_mat_set_fmpz_mat(Aq, A);
+    fmpq_mat_gso(Bq, mu, Aq);
+    fmpq_mat_clear(Aq);
+
+    mpq_set_d(deltax, delta);
+    mpq_set_d(etax, eta);
+    fmpq_set_mpq(deltaq, deltax);
+    fmpq_set_mpq(etaq, etax);
+    mpq_clears(deltax, etax, '\0');
+
+    for (i = 1; i < d; i++)
     {
-        _fmpq_vec_dot(p, Aq->rows[i], Aq->rows[i], n);
         for (j = 0; j < i; j++)
         {
-            _fmpq_vec_dot(q, Aq->rows[j], Aq->rows[j], n);
-            fmpq_pow_si(r, c, j - i);
-            fmpq_mul(r, r, p);
-            if (fmpq_cmp(q, r) > 0)
+            fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
+            if (fmpq_cmp(tmp, etaq) > 0)
             {
-                fmpz_mat_clear(B);
                 fmpq_mat_clear(Bq);
-                fmpq_mat_clear(Aq);
-                mpq_clear(cx);
-                fmpq_clear(c);
-                fmpq_clear(p);
-                fmpq_clear(q);
-                fmpq_clear(r);
+                fmpq_mat_clear(mu);
+                fmpq_clear(deltaq);
+                fmpq_clear(etaq);
+                fmpq_clear(tmp);
+                fmpq_clear(rtmp);
+                _fmpq_vec_clear(vec, n);
                 return 0;
             }
         }
+        _fmpq_vec_dot(tmp, Bq->rows[i - 1], Bq->rows[i - 1], n);
+        fmpq_mul(tmp, deltaq, tmp);
+        for (j = 0; j < n; j++)
+        {
+            fmpq_set(vec + j, fmpq_mat_entry(Bq, i, j));
+            fmpq_addmul(vec + j, fmpq_mat_entry(mu, i, i - 1),
+                        fmpq_mat_entry(Bq, i - 1, j));
+        }
+        _fmpq_vec_dot(rtmp, vec, vec, n);
+        if (fmpq_cmp(tmp, rtmp) > 0)
+        {
+            fmpq_mat_clear(Bq);
+            fmpq_mat_clear(mu);
+            fmpq_clear(deltaq);
+            fmpq_clear(etaq);
+            fmpq_clear(tmp);
+            fmpq_clear(rtmp);
+            _fmpq_vec_clear(vec, n);
+            return 0;
+        }
     }
-
-    fmpz_mat_clear(B);
     fmpq_mat_clear(Bq);
-    fmpq_mat_clear(Aq);
-    mpq_clear(cx);
-    fmpq_clear(c);
-    fmpq_clear(p);
-    fmpq_clear(q);
-    fmpq_clear(r);
-
+    fmpq_mat_clear(mu);
+    fmpq_clear(deltaq);
+    fmpq_clear(etaq);
+    fmpq_clear(tmp);
+    fmpq_clear(rtmp);
+    _fmpq_vec_clear(vec, n);
     return 1;
 }

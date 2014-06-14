@@ -23,15 +23,16 @@
 
 ******************************************************************************/
 
+#include "fmpq_vec.h"
 #include "fmpq_mat.h"
 
 void
-fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
+fmpq_mat_gso(fmpq_mat_t B, fmpq_mat_t mu, const fmpq_mat_t A)
 {
-    slong i, j, k;
-    fmpq_t num, den, mu;
+    slong i, j, k, d = A->r, n = A->c;
+    fmpq_t num, den;
 
-    if (B->r != A->r || B->c != A->c)
+    if (B->r != A->r || B->c != A->c || mu->r != A->r || mu->c != A->r)
     {
         flint_printf("Exception (fmpq_mat_gso). Incompatible dimensions.\n");
         abort();
@@ -40,55 +41,44 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
     if (B == A)
     {
         fmpq_mat_t t;
-        fmpq_mat_init(t, B->r, B->c);
-        fmpq_mat_gso(t, A);
+        fmpq_mat_init(t, d, n);
+        fmpq_mat_gso(t, mu, A);
         fmpq_mat_swap(B, t);
         fmpq_mat_clear(t);
         return;
     }
 
-    if (A->r == 0)
+    if (n == 0)
     {
+        fmpq_mat_one(mu);
         return;
     }
 
     fmpq_init(num);
     fmpq_init(den);
-    fmpq_init(mu);
 
-    for (i = 0; i < A->c; i++)
+    fmpq_mat_one(mu);
+    for (i = 0; i < d; i++)
     {
-        for (j = 0; j < A->r; j++)
+        for (j = 0; j < n; j++)
         {
-            fmpq_set(fmpq_mat_entry(B, j, i), fmpq_mat_entry(A, j, i));
+            fmpq_set(fmpq_mat_entry(B, i, j), fmpq_mat_entry(A, i, j));
         }
 
         for (j = 0; j < i; j++)
         {
-            fmpq_mul(num, fmpq_mat_entry(A, 0, i), fmpq_mat_entry(B, 0, j));
-
-            for (k = 1; k < A->r; k++)
-            {
-                fmpq_addmul(num,
-                            fmpq_mat_entry(A, k, i), fmpq_mat_entry(B, k, j));
-            }
-
-            fmpq_mul(den, fmpq_mat_entry(B, 0, j), fmpq_mat_entry(B, 0, j));
-
-            for (k = 1; k < A->r; k++)
-            {
-                fmpq_addmul(den,
-                            fmpq_mat_entry(B, k, j), fmpq_mat_entry(B, k, j));
-            }
+            _fmpq_vec_dot(num, A->rows[i], B->rows[j], n);
+            _fmpq_vec_dot(den, B->rows[j], B->rows[j], n);
 
             if (fmpq_is_zero(den) == 0)
             {
-                fmpq_div(mu, num, den);
+                fmpq_div(fmpq_mat_entry(mu, i, j), num, den);
 
-                for (k = 0; k < A->r; k++)
+                for (k = 0; k < A->c; k++)
                 {
-                    fmpq_submul(fmpq_mat_entry(B, k, i),
-                                mu, fmpq_mat_entry(B, k, j));
+                    fmpq_submul(fmpq_mat_entry(B, i, k),
+                                fmpq_mat_entry(mu, i, j), fmpq_mat_entry(B, j,
+                                                                         k));
                 }
             }
         }
@@ -96,5 +86,4 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
 
     fmpq_clear(num);
     fmpq_clear(den);
-    fmpq_clear(mu);
 }
