@@ -48,7 +48,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + .5) / 5;
+            halfplus = (4 * fl->eta + 0.5) / 5;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
@@ -220,7 +220,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
 
             mpf_set(s + zeros + 1, mpf_mat_entry(A->appSP2, kappa, kappa));
 
-            for (k = zeros + 1; k < kappa - 1; k++)
+            for (k = zeros + 1; k < kappa; k++)
             {
                 mpf_mul(tmp, mpf_mat_entry(mu, kappa, k),
                         mpf_mat_entry(r, kappa, k));
@@ -240,7 +240,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + .5) / 5;
+            halfplus = (4 * fl->eta + 0.5) / 5;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
@@ -415,7 +415,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
             fmpz_get_mpf(s + zeros + 1,
                          fmpz_mat_entry(A->exactSP, kappa, kappa));
 
-            for (k = zeros + 1; k < kappa - 1; k++)
+            for (k = zeros + 1; k < kappa; k++)
             {
                 mpf_mul(tmp, mpf_mat_entry(mu, kappa, k),
                         mpf_mat_entry(r, kappa, k));

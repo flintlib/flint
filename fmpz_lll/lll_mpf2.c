@@ -520,6 +520,7 @@ fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
         int kappa, d, i, j, test;
         mpf_mat_t mu, r;
         mpf *s;
+        double ctt, halfplus, onedothalfplus;
         mpf_t tmp, rtmp;
         fmpz *x;
         fmpz_t t;
@@ -531,6 +532,10 @@ fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
         mpf_mat_init(r, d, d, prec);
 
         s = _mpf_vec_init(d, prec);
+
+        ctt = (4 * fl->delta + 1) / 5;
+        halfplus = (4 * fl->eta + 0.5) / 5;
+        onedothalfplus = 1.0 + halfplus;
 
         mpf_init2(tmp, prec);
         mpf_init2(rtmp, prec);
@@ -591,20 +596,34 @@ fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
                 for (j = kappa - 1; j >= 0; j--)    /* size-reduction */
                 {
                     mpf_abs(tmp, mpf_mat_entry(mu, kappa, j));
-                    if (mpf_cmp_d(tmp, fl->eta) > 0)
+                    if (mpf_cmp_d(tmp, halfplus) > 0)
                     {
                         test = 1;
-                        mpf_set_d(rtmp, 0.5);
-                        if (mpf_sgn(mpf_mat_entry(mu, kappa, j)) < 0)
+                        if (mpf_cmp_d(tmp, onedothalfplus) <= 0)
                         {
-                            mpf_neg(tmp, tmp);
-                            mpf_sub(tmp, tmp, rtmp);
-                            mpf_ceil(tmp, tmp);
+                            if (mpf_sgn(mpf_mat_entry(mu, kappa, j)) >= 0)
+                            {
+                                mpf_set_si(tmp, 1);
+                            }
+                            else
+                            {
+                                mpf_set_si(tmp, -1);
+                            }
                         }
                         else
                         {
-                            mpf_add(tmp, tmp, rtmp);
-                            mpf_floor(tmp, tmp);
+                            mpf_set_d(rtmp, 0.5);
+                            if (mpf_sgn(mpf_mat_entry(mu, kappa, j)) < 0)
+                            {
+                                mpf_neg(tmp, tmp);
+                                mpf_sub(tmp, tmp, rtmp);
+                                mpf_ceil(tmp, tmp);
+                            }
+                            else
+                            {
+                                mpf_add(tmp, tmp, rtmp);
+                                mpf_floor(tmp, tmp);
+                            }
                         }
                         fmpz_set_mpf(x + j, tmp);
                         for (i = 0; i < j; i++) /* update μ matrix */
@@ -661,7 +680,7 @@ fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
                 _fmpz_vec_clear(x, kappa);
             } while (test);
 
-            mpf_set_d(rtmp, fl->delta);
+            mpf_set_d(rtmp, ctt);
             mpf_mul(tmp, rtmp, mpf_mat_entry(r, kappa - 1, kappa - 1));
             if (mpf_cmp(tmp, s + kappa - 1) <= 0)   /* check LLL condition */
             {

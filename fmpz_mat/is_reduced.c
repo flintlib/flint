@@ -65,7 +65,7 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
 
     for (i = 1; i < d; i++)
     {
-        for (j = 0; j < i; j++)
+        for (j = 0; j < i; j++) /* check size reduction */
         {
             fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
             if (fmpq_cmp(tmp, etaq) > 0)
@@ -89,7 +89,7 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
                         fmpq_mat_entry(Bq, i - 1, j));
         }
         _fmpq_vec_dot(rtmp, vec, vec, n);
-        if (fmpq_cmp(tmp, rtmp) > 0)
+        if (fmpq_cmp(tmp, rtmp) > 0)    /* check Lovasz condition */
         {
             fmpq_mat_clear(Bq);
             fmpq_mat_clear(mu);

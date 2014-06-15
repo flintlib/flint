@@ -560,6 +560,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
         int kappa, d, i, j, test;
         d_mat_t mu, r;
         double *s;
+        double ctt, halfplus, onedothalfplus;
         fmpz *x;
         fmpz_t t, dmax;
         ulong loops;
@@ -570,6 +571,10 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
         d_mat_init(r, d, d);
 
         s = _d_vec_init(d);
+
+        ctt = (4 * fl->delta + 1) / 5;
+        halfplus = (4 * fl->eta + 0.5) / 5;
+        onedothalfplus = 1.0 + halfplus;
 
         fmpz_init(t);
         fmpz_init(dmax);
@@ -654,15 +659,29 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 x = _fmpz_vec_init(kappa);
                 for (j = kappa - 1; j >= 0; j--)    /* size-reduction */
                 {
-                    if (fabs(d_mat_entry(mu, kappa, j)) > fl->eta)
+                    double tmp = fabs(d_mat_entry(mu, kappa, j));
+                    if (tmp > halfplus)
                     {
-                        double tmp;
                         test = 1;
-                        tmp = d_mat_entry(mu, kappa, j);
-                        if (tmp < 0)
-                            tmp = ceil(tmp - 0.5);
+                        if (tmp <= onedothalfplus)
+                        {
+                            if (d_mat_entry(mu, kappa, j) >= 0)
+                            {
+                                tmp = 1;
+                            }
+                            else
+                            {
+                                tmp = -1;
+                            }
+                        }
                         else
-                            tmp = floor(tmp + 0.5);
+                        {
+                            tmp = d_mat_entry(mu, kappa, j);
+                            if (tmp < 0)
+                                tmp = ceil(tmp - 0.5);
+                            else
+                                tmp = floor(tmp + 0.5);
+                        }
                         fmpz_set_d(x + j, tmp);
                         for (i = 0; i < j; i++) /* update μ matrix */
                         {
@@ -717,7 +736,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 _fmpz_vec_clear(x, kappa);
             } while (test);
 
-            if (fl->delta * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1])   /* check LLL condition */
+            if (ctt * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1]) /* check LLL condition */
             {
                 d_mat_entry(r, kappa, kappa) =
                     s[kappa - 1] - d_mat_entry(mu, kappa,
@@ -735,7 +754,7 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                 {
                     kappa--;
                 } while ((kappa > 0)
-                         && (fl->delta * d_mat_entry(r, kappa - 1, kappa - 1) >
+                         && (ctt * d_mat_entry(r, kappa - 1, kappa - 1) >
                              s[kappa - 1]));
 
                 for (j = 0; j < kappa; j++)

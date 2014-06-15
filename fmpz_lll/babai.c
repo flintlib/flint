@@ -45,7 +45,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + .5) / 5;
+            halfplus = (4 * fl->eta + 0.5) / 5;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
@@ -259,7 +259,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
 
             s[zeros + 1] = d_mat_entry(A->appSP, kappa, kappa);
 
-            for (k = zeros + 1; k < kappa - 1; k++)
+            for (k = zeros + 1; k < kappa; k++)
             {
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
@@ -275,7 +275,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + .5) / 5;
+            halfplus = (4 * fl->eta + 0.5) / 5;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
@@ -518,7 +518,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                 fmpz_mat_entry(A->exactSP, kappa, kappa));
             s[zeros + 1] = ldexp(s[zeros + 1], exp - 2 * expo[kappa]);
 
-            for (k = zeros + 1; k < kappa - 1; k++)
+            for (k = zeros + 1; k < kappa; k++)
             {
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
