@@ -30,7 +30,7 @@ int
 fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
 {
     slong i, j, k, d = A->r;
-    fmpq_mat_t r, mu;
+    fmpq_mat_t r;
     fmpq *s;
     mpq_t deltax, etax;
     fmpq_t deltaq, etaq, tmp;
@@ -40,7 +40,6 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
         return 1;
 
     fmpq_mat_init(r, d, d);
-    fmpq_mat_init(mu, d, d);
 
     s = _fmpq_vec_init(d);
 
@@ -68,16 +67,16 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
                                fmpz_mat_entry(A, i, j), one);
             for (k = 0; k <= j - 1; k++)
             {
-                fmpq_submul(fmpq_mat_entry(r, i, j), fmpq_mat_entry(mu, j, k),
-                            fmpq_mat_entry(r, i, k));
+                fmpq_div(tmp, fmpq_mat_entry(r, j, k), fmpq_mat_entry(r, k, k));
+                fmpq_submul(fmpq_mat_entry(r, i, j), tmp, fmpq_mat_entry(r, i, k));
             }
-            fmpq_div(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(r, i, j),
-                     fmpq_mat_entry(r, j, j));
-            fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
+            fmpq_div(tmp, fmpq_mat_entry(r, i, j), fmpq_mat_entry(r, j, j));
+            fmpq_set(s + j + 1, s + j);
+            fmpq_submul(s + j + 1, tmp, fmpq_mat_entry(r, i, j));
+            fmpq_abs(tmp, tmp);
             if (fmpq_cmp(tmp, etaq) > 0)    /* check size reduction */
             {
                 fmpq_mat_clear(r);
-                fmpq_mat_clear(mu);
                 fmpq_clear(deltaq);
                 fmpq_clear(etaq);
                 fmpq_clear(tmp);
@@ -85,9 +84,6 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
                 fmpz_clear(one);
                 return 0;
             }
-            fmpq_set(s + j + 1, s + j);
-            fmpq_submul(s + j + 1, fmpq_mat_entry(mu, i, j),
-                        fmpq_mat_entry(r, i, j));
         }
         fmpq_set(fmpq_mat_entry(r, i, i), s + i);
         if (i > 0)
@@ -96,7 +92,6 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
             if (fmpq_cmp(tmp, s + i - 1) > 0)   /* check Lovasz condition */
             {
                 fmpq_mat_clear(r);
-                fmpq_mat_clear(mu);
                 fmpq_clear(deltaq);
                 fmpq_clear(etaq);
                 fmpq_clear(tmp);
@@ -107,7 +102,6 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
         }
     }
     fmpq_mat_clear(r);
-    fmpq_mat_clear(mu);
     fmpq_clear(deltaq);
     fmpq_clear(etaq);
     fmpq_clear(tmp);
