@@ -61,6 +61,7 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
 
     for (i = 0; i < d; i++)
     {
+        fmpq_set_fmpz_frac(s, fmpz_mat_entry(A, i, i), one);
         for (j = 0; j <= i - 1; j++)
         {
             fmpq_set_fmpz_frac(fmpq_mat_entry(r, i, j),
@@ -84,13 +85,9 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
                 fmpz_clear(one);
                 return 0;
             }
-        }
-        fmpq_set_fmpz_frac(s, fmpz_mat_entry(A, i, i), one);
-        for (j = 1; j <= i; j++)
-        {
-            fmpq_set(s + j, s + j - 1);
-            fmpq_submul(s + j, fmpq_mat_entry(mu, i, j - 1),
-                        fmpq_mat_entry(r, i, j - 1));
+            fmpq_set(s + j + 1, s + j);
+            fmpq_submul(s + j + 1, fmpq_mat_entry(mu, i, j),
+                        fmpq_mat_entry(r, i, j));
         }
         fmpq_set(fmpq_mat_entry(r, i, i), s + i);
         if (i > 0)
