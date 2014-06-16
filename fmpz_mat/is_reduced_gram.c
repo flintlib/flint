@@ -72,19 +72,8 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
             }
             fmpq_div(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(r, i, j),
                      fmpq_mat_entry(r, j, j));
-        }
-        fmpq_set_fmpz_frac(s, fmpz_mat_entry(A, i, i), one);
-        for (j = 1; j <= i; j++)
-        {
-            fmpq_set(s + j, s + j - 1);
-            fmpq_submul(s + j, fmpq_mat_entry(mu, i, j - 1),
-                        fmpq_mat_entry(r, i, j - 1));
-        }
-        fmpq_set(fmpq_mat_entry(r, i, i), s + i);
-        for (j = 0; j < i; j++) /* check size reduction */
-        {
             fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
-            if (fmpq_cmp(tmp, etaq) > 0)
+            if (fmpq_cmp(tmp, etaq) > 0)    /* check size reduction */
             {
                 fmpq_mat_clear(r);
                 fmpq_mat_clear(mu);
@@ -96,6 +85,14 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
                 return 0;
             }
         }
+        fmpq_set_fmpz_frac(s, fmpz_mat_entry(A, i, i), one);
+        for (j = 1; j <= i; j++)
+        {
+            fmpq_set(s + j, s + j - 1);
+            fmpq_submul(s + j, fmpq_mat_entry(mu, i, j - 1),
+                        fmpq_mat_entry(r, i, j - 1));
+        }
+        fmpq_set(fmpq_mat_entry(r, i, i), s + i);
         if (i > 0)
         {
             fmpq_mul(tmp, deltaq, fmpq_mat_entry(r, i - 1, i - 1));
