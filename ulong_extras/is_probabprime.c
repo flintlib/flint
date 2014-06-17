@@ -40,7 +40,11 @@ int n_is_probabprime(mp_limb_t n)
     mp_limb_t d;
     unsigned int norm;
     int isprime;
+#if FLINT64
     double npre;
+#else
+    mp_limb_t ninv;
+#endif
 
     if (n <= UWORD(1)) return 0;
     if (n == UWORD(2)) return 1;
@@ -61,24 +65,27 @@ int n_is_probabprime(mp_limb_t n)
     d = n - 1;
     count_trailing_zeros(norm, d);
     d >>= norm;
-    npre = n_precompute_inverse(n);
 
 #if !FLINT64
 
     /* For 32-bit, just the 2-base or 3-base Miller-Rabin is enough */
+    /* The preinv functions are faster on 32-bit, and work up to
+       2^32 (precomp only works up to 2^31) */
+    ninv = n_preinvert_limb(n);
+
     if (n < UWORD(9080191))
     {
-        isprime = n_is_strong_probabprime_precomp(n, npre, UWORD(31), d)
-               && n_is_strong_probabprime_precomp(n, npre, UWORD(73), d);
+        isprime = n_is_strong_probabprime2_preinv(n, ninv, UWORD(31), d)
+               && n_is_strong_probabprime2_preinv(n, ninv, UWORD(73), d);
     }
     else
     {
-        isprime = n_is_strong_probabprime_precomp(n, npre, UWORD(2), d)
-               && n_is_strong_probabprime_precomp(n, npre, UWORD(7), d)
-               && n_is_strong_probabprime_precomp(n, npre, UWORD(61), d);
+        isprime = n_is_strong_probabprime2_preinv(n, ninv, UWORD(2), d)
+               && n_is_strong_probabprime2_preinv(n, ninv, UWORD(7), d)
+               && n_is_strong_probabprime2_preinv(n, ninv, UWORD(61), d);
     }
-
 #else
+    npre = n_precompute_inverse(n);
 
     /* For 64-bit, BPSW seems to be a little bit faster than 3 bases. */
     if (n < UWORD(341531))
