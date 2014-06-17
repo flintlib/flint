@@ -23,11 +23,12 @@
 
 ******************************************************************************/
 
+#include "fmpz_mat.h"
 #include "fmpq_vec.h"
 #include "fmpq_mat.h"
 
 void
-fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
+fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
 {
     slong i, j, k, l, m, n;
     fmpz_t r, one;
@@ -37,7 +38,7 @@ fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
 
     if (B->r != A->r || B->c != A->c)
     {
-        flint_printf("Exception (fmpq_mat_lll). Incompatible dimensions.\n");
+        flint_printf("Exception (fmpz_mat_lll). Incompatible dimensions.\n");
         abort();
     }
 
@@ -45,13 +46,13 @@ fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     {
         fmpz_mat_t t;
         fmpz_mat_init(t, B->r, B->c);
-        fmpq_mat_lll(t, A, fl);
+        fmpz_mat_lll(t, A, fl);
         fmpz_mat_swap(B, t);
         fmpz_mat_clear(t);
         return;
     }
 
-    if (!A->r)
+    if (A->r == 0)
     {
         return;
     }

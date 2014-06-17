@@ -119,6 +119,8 @@ int fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl);
 
 int fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl);
 
+int fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl);
+
 
 /* double heuristic_scalar_product(double * vec1, double * vec2, ulong n, 
 								F_mpz_mat_t B, ulong k, ulong j, long exp_adj);

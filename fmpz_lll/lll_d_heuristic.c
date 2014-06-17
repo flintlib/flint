@@ -38,13 +38,16 @@
 #define FUNC_NAME fmpz_lll_d_heuristic
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
-    if (NFF)                                                           \
+    if (NFF < 50)                                                      \
     {                                                                  \
         BO =                                                           \
-            fmpz_lll_check_babai(kappa, B, mu, r, s, appB, expo, A,    \
-                                 alpha[kappa], zeros, kappamax,        \
-                                 FLINT_MIN(kappamax + 1 + shift,       \
-                                           n), fl);                    \
+            fmpz_lll_check_babai_heuristic_d(kappa, B, mu, r, s,       \
+                                             appB, expo, A,            \
+                                             alpha[kappa], zeros,      \
+                                             kappamax,                 \
+                                             FLINT_MIN(kappamax +      \
+                                                       1 + shift,      \
+                                                       n), fl);        \
     }                                                                  \
     else                                                               \
     {                                                                  \
@@ -52,6 +55,7 @@ do {                                                                   \
     }                                                                  \
     if (BO == -1)                                                      \
     {                                                                  \
+        NFF++;                                                         \
         HF =                                                           \
             fmpz_lll_check_babai_heuristic_d(kappa, B, mu, r, s,       \
                                              appB, expo, A,            \

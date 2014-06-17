@@ -27,11 +27,19 @@
 #include "fmpq.h"
 
 void
-fmpq_lll_context_init(fmpq_lll_t fl, slong delta_num, slong delta_den,
-                      slong eta_num, slong eta_den)
+fmpq_lll_context_init(fmpq_lll_t fl, double delta, double eta)
 {
+    mpq_t deltax, etax;
+
+    mpq_init(deltax);
+    mpq_init(etax);
+
     fmpq_init(fl->delta);
     fmpq_init(fl->eta);
-    fmpq_set_si(fl->delta, delta_num, delta_den);
-    fmpq_set_si(fl->eta, eta_num, eta_den);
+
+    mpq_set_d(deltax, delta);
+    mpq_set_d(etax, eta);
+    fmpq_set_mpq(fl->delta, deltax);
+    fmpq_set_mpq(fl->eta, etax);
+    mpq_clears(deltax, etax, '\0');
 }

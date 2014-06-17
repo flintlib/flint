@@ -908,3 +908,37 @@ void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
     Computes \code{R}, the Cholesky factor of a symmetric, positive definite
     matrix \code{A} using the Cholesky decomposition process. (Sets \code{R}
     such that $A = RR^{T}$ where \code{R} is a lower triangular matrix.)
+
+*******************************************************************************
+
+    LLL
+
+*******************************************************************************
+
+int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
+
+    Returns a non-zero value if the basis \code{A} is LLL-reduced with factor
+    (\code{delta}, \code{eta}), and otherwise returns zero. The function is
+    mainly intended to be used for testing purposes in the \code{fmpz_lll}
+    module.
+
+int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
+
+    Returns a non-zero value if the basis with Gram matrix \code{A} is
+    LLL-reduced with factor (\code{delta}, \code{eta}), and otherwise returns
+    zero. The function is mainly intended to be used for testing purposes in
+    the \code{fmpz_lll} module.
+
+*******************************************************************************
+
+    Classical LLL
+
+*******************************************************************************
+
+void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
+
+    Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
+    the rows of a $m x n$ matrix \code{A}), and an LLL context object
+    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
+    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of a $m x n$
+    matrix \code{B}).

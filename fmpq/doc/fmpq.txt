@@ -707,3 +707,18 @@ void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
     If $0 < k < h$ and $(h,k) = 1$,
     $s(h,k) = (1+h(h-3k)+k^2) / (12hk) - t(k,h).$
 
+*******************************************************************************
+
+    LLL parameter manipulation
+
+*******************************************************************************
+
+void fmpq_lll_context_init(fmpq_lll_t fl, double delta, double eta)
+
+    Sets \code{fl->delta} and \code{fl->eta} to the exact rational
+    representations of \code{delta} and \code{eta} (given as input)
+    respectively.
+
+void fmpq_lll_context_clear(fmpq_lll_t fl)
+
+    Free the space occupied by the rational LLL context object \code{fl}.

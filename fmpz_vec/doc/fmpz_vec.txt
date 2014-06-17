@@ -191,6 +191,11 @@ slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len)
     entries so that all the doubles in \code{appv} have a maximum absolute
     value of 1.0.
 
+void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
+
+    Export the array of \code{len} entries starting at the pointer \code{vec}
+    to an array of mpfs \code{appv}.
+
 *******************************************************************************
 
     Assignment and basic manipulation

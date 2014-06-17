@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
+#include "fmpz_mat.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 #include "fmpq_vec.h"
@@ -34,76 +35,43 @@
 int
 main(void)
 {
-    int i, result;
+    int i;
     FLINT_TEST_INIT(state);
 
 
-    flint_printf("gso....");
+    flint_printf("lll....");
     fflush(stdout);
 
+    /* check output basis is LLL reduced (randajtai used) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpq_mat_t A, B, C;
-        fmpq_t dot;
-        int j, k;
+        int result;
+        fmpz_mat_t A;
+        fmpq_lll_t fl;
 
-        slong m, n, bits;
+        slong m;
 
         m = n_randint(state, 10);
-        n = n_randint(state, 10);
 
-        bits = 1 + n_randint(state, 100);
+        fmpz_mat_init(A, m, m);
+        fmpq_lll_context_init(fl, 0.75, 0.5);
 
-        fmpq_mat_init(A, m, n);
-        fmpq_mat_init(B, n, m);
-        fmpq_mat_init(C, n, m);
+        fmpz_mat_randajtai(A, state, 0.5);
 
-        fmpq_mat_randtest(A, state, bits);
+        fmpz_mat_lll(A, A, fl);
 
-        fmpq_mat_transpose(B, A);
-        fmpq_mat_rref(B, B);
-
-        fmpq_mat_gso(A, A);
-
-        fmpq_mat_transpose(C, A);
-
-        fmpq_init(dot);
-
-        for (j = 0; j < n; j++)
-        {
-            for (k = j + 1; k < n; k++)
-            {
-
-                _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
-
-                if (!fmpq_is_zero(dot))
-                {
-                    flint_printf("FAIL:\n");
-                    flint_printf("A:\n");
-                    fmpq_mat_print(A);
-                    abort();
-                }
-            }
-        }
-
-        fmpq_mat_rref(C, C);
-
-        result = fmpq_mat_equal(B, C);
+        result = fmpz_mat_is_reduced(A, 0.75, 0.5);
 
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("B:\n");
-            fmpq_mat_print(B);
-            flint_printf("C:\n");
-            fmpq_mat_print(C);
+            flint_printf("A:\n");
+            fmpz_mat_print_pretty(A);
             abort();
         }
 
-        fmpq_mat_clear(A);
-        fmpq_mat_clear(B);
-        fmpq_mat_clear(C);
-        fmpq_clear(dot);
+        fmpz_mat_clear(A);
+        fmpq_lll_context_clear(fl);
     }
 
     FLINT_TEST_CLEANUP(state);

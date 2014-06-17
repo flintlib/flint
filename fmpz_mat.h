@@ -331,6 +331,10 @@ int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta);
 
 int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta);
 
+/* Classical LLL *************************************************************/
+
+void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl);
+
 #ifdef __cplusplus
 }
 #endif

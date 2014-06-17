@@ -331,7 +331,7 @@ void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
 void fmpq_harmonic_ui(fmpq_t x, ulong n);
 
-void fmpq_lll_context_init(fmpq_lll_t fl, slong delta_num, slong delta_den, slong eta_num, slong eta_den);
+void fmpq_lll_context_init(fmpq_lll_t fl, double delta, double eta);
 
 void fmpq_lll_context_clear(fmpq_lll_t fl);
 

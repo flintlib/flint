@@ -19,62 +19,27 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010 Andy Novocin
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
-#include "fmpq_vec.h"
+#include "fmpz_lll.h"
 
 int
-main(void)
+fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl)
 {
-    int i;
-    FLINT_TEST_INIT(state);
+    int res = fmpz_lll_d(B, fl);
 
-
-    flint_printf("lll....");
-    fflush(stdout);
-
-    /* check output basis is LLL reduced (randajtai used) */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    if (res == -1)
     {
-        int result;
-        fmpz_mat_t A;
-        fmpq_lll_t fl;
-
-        slong m;
-
-        m = n_randint(state, 10);
-
-        fmpz_mat_init(A, m, m);
-        fmpq_lll_context_init(fl, 3, 4, 1, 2);
-
-        fmpz_mat_randajtai(A, state, 0.5);
-
-        fmpq_mat_lll(A, A, fl);
-
-        result = fmpz_mat_is_reduced(A, 0.75, 0.5);
-
-        if (!result)
+        res = fmpz_lll_d_heuristic(B, fl);
+        if (res == -1)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("A:\n");
-            fmpz_mat_print_pretty(A);
-            abort();
+            res = fmpz_lll_mpf(B, fl);
         }
-
-        fmpz_mat_clear(A);
-        fmpq_lll_context_clear(fl);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return res;
 }

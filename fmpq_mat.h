@@ -190,11 +190,7 @@ slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
 /* Gram-Schmidt Orthogonalisation  *******************************************/
 
-void fmpq_mat_gso(fmpq_mat_t B, fmpq_mat_t mu, const fmpq_mat_t A);
-
-/* Classical LLL *************************************************************/
-
-void fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl);
+void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A);
 
 #ifdef __cplusplus
 }

@@ -443,17 +443,3 @@ void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
     a $m x n$ matrix \code{A}) and generates an orthogonal set
     $S^{'} = \{b_1, b_2, \ldots, b_n\}$ (as the columns of the $m x n$ matrix 
     \code{B}) that spans the same subspace of $Q^m$ as $S$.
-
-*******************************************************************************
-
-    Classical LLL
-
-*******************************************************************************
-
-void fmpq_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
-
-    Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
-    the rows of a $m x n$ matrix \code{A}), and an LLL context object
-    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
-    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of a $m x n$
-    matrix \code{B}).
