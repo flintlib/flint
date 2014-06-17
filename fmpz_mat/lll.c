@@ -33,8 +33,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     slong i, j, k, l, m, n;
     fmpz_t r, one;
     fmpq_t delta, nu, xi, half, rat;
-    fmpq *gstar, *temp;
-    fmpq_mat_t Bstar, mu;
+    fmpq_mat_t Aq, mu;
 
     if (B->r != A->r || B->c != A->c)
     {
@@ -60,10 +59,8 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpz_mat_set(B, A);
     m = B->r;
     n = B->c;
-    fmpq_mat_init(Bstar, m, n);
     fmpq_mat_init(mu, m, m);
-    gstar = _fmpq_vec_init(m);
-    temp = _fmpq_vec_init(n);
+    fmpq_mat_init(Aq, m, n);
     fmpz_init(r);
     fmpz_init_set_ui(one, 1);
     fmpq_init(delta);
@@ -73,27 +70,28 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_init(rat);
     fmpq_set_si(half, 1, 2);
 
+    fmpq_mat_set_fmpz_mat(Aq, A);
+
     for (i = 0; i < m; i++)
     {
-        for (k = 0; k < n; k++)
-        {
-            fmpq_set_fmpz_frac(fmpq_mat_entry(Bstar, i, k),
-                               fmpz_mat_entry(B, i, k), one);
-        }
+        _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), Aq->rows[i], Aq->rows[i], n);
         for (j = 0; j <= i - 1; j++)
         {
-            _fmpq_vec_set_fmpz_vec(temp, B->rows[i], n);
-            _fmpq_vec_dot(fmpq_mat_entry(mu, i, j), temp, Bstar->rows[j], n);
-            fmpq_div(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(mu, i, j),
-                     gstar + j);
-            for (k = 0; k < n; k++)
+            _fmpq_vec_dot(fmpq_mat_entry(mu, i, j), Aq->rows[i], Aq->rows[j],
+                          n);
+            for (k = 0; k <= j - 1; k++)
             {
-                fmpq_submul(fmpq_mat_entry(Bstar, i, k),
-                            fmpq_mat_entry(Bstar, j, k), fmpq_mat_entry(mu, i,
-                                                                        j));
+                fmpq_mul(rat, fmpq_mat_entry(mu, i, k),
+                         fmpq_mat_entry(mu, k, k));
+                fmpq_submul(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(mu, j, k),
+                            rat);
             }
+            fmpq_set(rat, fmpq_mat_entry(mu, i, j));
+            fmpq_div(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(mu, i, j),
+                     fmpq_mat_entry(mu, j, j));
+            fmpq_submul(fmpq_mat_entry(mu, i, i), fmpq_mat_entry(mu, i, j),
+                        rat);
         }
-        _fmpq_vec_dot(gstar + i, Bstar->rows[i], Bstar->rows[i], n);
     }
 
     /* index k counts the current number of LLL-reduced rows */
@@ -124,8 +122,8 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
         fmpq_set(rat, fl->delta);
         fmpq_submul(rat, fmpq_mat_entry(mu, k, k - 1),
                     fmpq_mat_entry(mu, k, k - 1));
-        fmpq_mul(rat, rat, gstar + k - 1);
-        if (fmpq_cmp(gstar + k, rat) >= 0)
+        fmpq_mul(rat, rat, fmpq_mat_entry(mu, k - 1, k - 1));
+        if (fmpq_cmp(fmpq_mat_entry(mu, k, k), rat) >= 0)
         {
             for (l = k - 2; l >= 0; l--)
             {
@@ -153,18 +151,21 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
         else
         {
             fmpq_set(nu, fmpq_mat_entry(mu, k, k - 1));
-            fmpq_set(delta, gstar + k - 1);
+            fmpq_set(delta, fmpq_mat_entry(mu, k - 1, k - 1));
             fmpq_mul(delta, delta, nu);
             fmpq_mul(delta, delta, nu);
-            fmpq_add(delta, delta, gstar + k);
+            fmpq_add(delta, delta, fmpq_mat_entry(mu, k, k));
             fmpq_set(fmpq_mat_entry(mu, k, k - 1), nu);
             fmpq_mul(fmpq_mat_entry(mu, k, k - 1),
-                     fmpq_mat_entry(mu, k, k - 1), gstar + k - 1);
+                     fmpq_mat_entry(mu, k, k - 1), fmpq_mat_entry(mu, k - 1,
+                                                                  k - 1));
             fmpq_div(fmpq_mat_entry(mu, k, k - 1),
                      fmpq_mat_entry(mu, k, k - 1), delta);
-            fmpq_mul(gstar + k, gstar + k, gstar + k - 1);
-            fmpq_div(gstar + k, gstar + k, delta);
-            fmpq_set(gstar + k - 1, delta);
+            fmpq_mul(fmpq_mat_entry(mu, k, k), fmpq_mat_entry(mu, k, k),
+                     fmpq_mat_entry(mu, k - 1, k - 1));
+            fmpq_div(fmpq_mat_entry(mu, k, k), fmpq_mat_entry(mu, k, k),
+                     delta);
+            fmpq_set(fmpq_mat_entry(mu, k - 1, k - 1), delta);
             /* swap row k - 1 and row k */
             fmpz_mat_swap_rows(B, 0, k - 1, k);
             /* update mu */
@@ -198,8 +199,6 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_clear(xi);
     fmpq_clear(half);
     fmpq_clear(rat);
-    _fmpq_vec_clear(gstar, m);
-    _fmpq_vec_clear(temp, n);
-    fmpq_mat_clear(Bstar);
+    fmpq_mat_clear(Aq);
     fmpq_mat_clear(mu);
 }
