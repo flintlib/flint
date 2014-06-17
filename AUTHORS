@@ -95,6 +95,10 @@ $\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
+$\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against
+Feitma's tables and sped up and corrected \code{n_is_prime} and
+\code{n_is_probabprime}.
+
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
