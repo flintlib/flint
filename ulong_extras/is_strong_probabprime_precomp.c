@@ -35,6 +35,10 @@ n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a,
     mp_limb_t t = d;
     mp_limb_t y;
 
+    /* Map large base to range 2 .. n-1 */
+    if (a >= n)  a %= n;
+    if ( (a <= 1) || (a == n-1) )  return 1;
+
     y = n_powmod_ui_precomp(a, t, n, npre);
 
     if (y == UWORD(1))

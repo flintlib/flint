@@ -34,12 +34,16 @@ int n_is_prime(mp_limb_t n)
        [1]  http://www.janfeitsma.nl/math/psp2/database
     */
 
-#if !FLINT64
+    if (n < 11) {
+        if (n == 2 || n == 3 || n == 5 || n == 7)   return 1;
+        else                                        return 0;
+    }
+    if (!(n%2) || !(n%3) || !(n%5) || !(n%7))       return 0;
+    if (n <  121) /* 11*11 */                       return 1;
+    if (!(n%11) || !(n%13) || !(n%17) || !(n%19) ||
+        !(n%23) || !(n%29) || !(n%31) || !(n%37) ||
+        !(n%41) || !(n%43) || !(n%47) || !(n%53))   return 0;
+    if (n < 3481) /* 59*59 */                       return 1;
+
     return n_is_probabprime(n);
-#else
-    if (n < UWORD(10000000000000000))
-        return n_is_probabprime(n);
-    else 
-        return n_is_probabprime_BPSW(n);
-#endif
 }
