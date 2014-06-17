@@ -36,7 +36,7 @@ n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a,
     mp_limb_t t = d;
     mp_limb_t y;
 
-    /* Map large base to range 2 ... n-1 */
+    /* Map large base to range 2 ... n - 1 */
     if (a >= n)  
        a = n_mod2_preinv(a, n, ninv);
 
