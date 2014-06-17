@@ -34,13 +34,16 @@ int main(void)
    int i, result;
    mp_limb_t d;
    mpz_t d_m;
+   slong pow;
+   ulong bits;
 
    FLINT_TEST_INIT(state);
 
    flint_printf("is_prime....");
    fflush(stdout);   
   
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
+   /* Test that primes pass the test */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
       mpz_init(d_m);
 
@@ -63,7 +66,8 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that composites do not pass */
+   /* Test that composites do not pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
       mpz_init(d_m);
 
@@ -83,6 +87,25 @@ int main(void)
       }
 
       mpz_clear(d_m);
+   }
+
+   /* Test that powers do not pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+   {
+      pow = n_randint(state, 6) + 2;
+      bits = n_randint(state, FLINT_BITS) + 1;
+      bits /= pow;
+
+      d = n_randbits(state, bits);
+      d = n_pow(d, pow);
+
+      result = !n_is_prime(d);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Perfect poweer d = %wu is declared prime\n", d); 
+         abort();
+      }
    }
 
    FLINT_TEST_CLEANUP(state);
