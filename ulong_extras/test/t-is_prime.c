@@ -103,7 +103,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("Perfect poweer d = %wu is declared prime\n", d); 
+         flint_printf("Perfect power d = %wu is declared prime\n", d); 
          abort();
       }
    }
