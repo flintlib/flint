@@ -160,7 +160,7 @@ int main(void)
    {
       d = composites[i];
 
-      result = !n_is_probabprime(d);
+      result = !n_is_prime(d);
       if (!result)
       {
          flint_printf("FAIL:\n");
