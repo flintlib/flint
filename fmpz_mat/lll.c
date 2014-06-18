@@ -24,7 +24,6 @@
 ******************************************************************************/
 
 #include "fmpz_mat.h"
-#include "fmpq_vec.h"
 #include "fmpq_mat.h"
 
 void
@@ -33,7 +32,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     slong i, j, k, l, m, n;
     fmpz_t r, one;
     fmpq_t delta, nu, xi, half, rat;
-    fmpq_mat_t Aq, mu;
+    fmpq_mat_t mu;
 
     if (B->r != A->r || B->c != A->c)
     {
@@ -60,7 +59,6 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     m = B->r;
     n = B->c;
     fmpq_mat_init(mu, m, m);
-    fmpq_mat_init(Aq, m, n);
     fmpz_init(r);
     fmpz_init_set_ui(one, 1);
     fmpq_init(delta);
@@ -70,14 +68,12 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_init(rat);
     fmpq_set_si(half, 1, 2);
 
-    fmpq_mat_set_fmpz_mat(Aq, A);
-
     for (i = 0; i < m; i++)
     {
-        _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), Aq->rows[i], Aq->rows[i], n);
+        _fmpz_vec_dot(fmpq_mat_entry_num(mu, i, i), A->rows[i], A->rows[i], n);
         for (j = 0; j <= i - 1; j++)
         {
-            _fmpq_vec_dot(fmpq_mat_entry(mu, i, j), Aq->rows[i], Aq->rows[j],
+            _fmpz_vec_dot(fmpq_mat_entry_num(mu, i, j), A->rows[i], A->rows[j],
                           n);
             for (k = 0; k <= j - 1; k++)
             {
@@ -103,8 +99,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
         if (fmpq_cmp(rat, fl->eta) > 0)
         {
             /* determine reduction coefficient */
-            fmpq_set(rat, fmpq_mat_entry(mu, k, k - 1));
-            fmpq_sub(rat, rat, half);
+            fmpq_sub(rat, fmpq_mat_entry(mu, k, k - 1), half);
             fmpz_cdiv_q(r, fmpq_numref(rat), fmpq_denref(rat));
             /* perform reduction */
             for (i = 0; i < n; i++)
@@ -131,8 +126,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
                 fmpq_abs(rat, fmpq_mat_entry(mu, k, l));
                 if (fmpq_cmp(rat, fl->eta) > 0)
                 {
-                    fmpq_set(rat, fmpq_mat_entry(mu, k, l));
-                    fmpq_sub(rat, rat, half);
+                    fmpq_sub(rat, fmpq_mat_entry(mu, k, l), half);
                     fmpz_cdiv_q(r, fmpq_numref(rat), fmpq_denref(rat));
                     for (i = 0; i < n; i++)
                         fmpz_submul(fmpz_mat_entry(B, k, i), r,
@@ -151,11 +145,9 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
         else
         {
             fmpq_set(nu, fmpq_mat_entry(mu, k, k - 1));
-            fmpq_set(delta, fmpq_mat_entry(mu, k - 1, k - 1));
-            fmpq_mul(delta, delta, nu);
+            fmpq_mul(delta, fmpq_mat_entry(mu, k - 1, k - 1), nu);
             fmpq_mul(delta, delta, nu);
             fmpq_add(delta, delta, fmpq_mat_entry(mu, k, k));
-            fmpq_set(fmpq_mat_entry(mu, k, k - 1), nu);
             fmpq_mul(fmpq_mat_entry(mu, k, k - 1),
                      fmpq_mat_entry(mu, k, k - 1), fmpq_mat_entry(mu, k - 1,
                                                                   k - 1));
@@ -199,6 +191,5 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_clear(xi);
     fmpq_clear(half);
     fmpq_clear(rat);
-    fmpq_mat_clear(Aq);
     fmpq_mat_clear(mu);
 }
