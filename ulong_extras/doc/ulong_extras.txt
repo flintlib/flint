@@ -748,8 +748,10 @@ int n_is_prime(mp_limb_t n)
 
     Tests if $n$ is a prime. This first sieves for small prime factors,
     then simply calls \code{n_is_probabprime()}. This has been checked
-    against the tables of Feitma and Galway and thus constitutes a
-    check for primality (rather than just pseudoprimality) up to $2^64$.
+    against the tables of Feitsma and Galway 
+    \url{http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html} and thus 
+    constitutes a check for primality (rather than just pseudoprimality) 
+    up to $2^64$.
 
     In future, this test may produce and check a certificate of 
     primality. This is likely to be significantly slower for prime
@@ -836,7 +838,7 @@ int n_is_probabprime(mp_limb_t n)
 
     Beyond that point the BPSW probabilistic primality test is used, by 
     calling the function \code{n_is_probabprime_BPSW()}. There are no known 
-    counterexamples, and it has been checked against the tables of Feitma
+    counterexamples, and it has been checked against the tables of Feitsma
     and Galway and up to the accuracy of those tables, this is an exhaustive
     check up to $2^64$, i.e. there are no counterexamples.
 
