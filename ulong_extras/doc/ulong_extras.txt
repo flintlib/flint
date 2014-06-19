@@ -825,7 +825,7 @@ int n_is_probabprime_lucas(mp_limb_t n)
 
     For details on Lucas pseudoprimes, see~\citep[pp.~143]{CraPom2005}.
 
-    We implement a variant of the Lucas pseudoprime test as
+    We implement a variant of the Lucas pseudoprime test similar to that
     described by Baillie and Wagstaff~\citep{BaiWag1980}.
 
 int n_is_probabprime(mp_limb_t n)
