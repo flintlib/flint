@@ -302,10 +302,6 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
     \code{norm} will shift the product right by this many bits before
     reducing it.
 
-    Note, we explicitly assume that the bottom \code{norm} bits of $a$
-    are zero, as will be the case when $a$ and $b$ are left shifted by
-    this many bits on account of the normalisation of $n$.
-
     The algorithm use is that of Granlund and M\"oller~\citep{GraMol2010}.
 
     % Torbjorn Granlund and Niels Moller
@@ -322,12 +318,9 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$. 
-    No assumptions are made about $x$ and $y$.
+    We require $x \geq y$.
 
-    On systems where a fast count-trailing-zeros intrinsic is available,
-    a version of the binary GCD algorithm is used.
-
-    The fallback algorithm is a slight embelishment of the Euclidean algorithm
+    The algorithm is a slight embelishment of the Euclidean algorithm
     which uses some branches to avoid most divisions.
 
     One wishes to compute the quotient and remainder of $u_3 / v_3$ without 
@@ -343,7 +336,7 @@ mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
 mp_limb_t n_gcd_full(mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$.
-    This is an obsolete alias for \code{n_gcd}.
+    No assumptions are made about $x$ and $y$.
 
 mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
 
@@ -468,20 +461,6 @@ mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
-mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
-                                                    mp_limb_t ninv, ulong norm)
-
-    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
-    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, exp $> 0$ and
-    for $n$ to be normalised.
-
-    If $a$ is shifted to the left as a result of normalising $n$, the number
-    of bits it was shifted should be passed as norm. The return value will
-    then need to be shifted right by this number of bits by the caller.
-
-    This is implemented as a standard binary powering algorithm using
-    repeated squaring and reducing modulo $n$ at each step.
-  
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     Returns \code{(a^exp) % n}. We require $0 \leq a < n$, but there are 
@@ -831,10 +810,16 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
 int n_is_probabprime_BPSW(mp_limb_t n)
 
-    Implements the Baillie--Pomerance--Selfridge--Wagstaff probable primality
-    test. There are no known counterexamples to this being a primality test.
-    For further details, see~\citep{CraPom2005}. Up to $2^64$ this has been 
-    checked.
+    Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
+    test. This is a variant of the usual BPSW test (which only uses Fermat
+    and Lucas tests, see Baillie and Wagstaff~\citep{BaiWag1980}) making use 
+    of the comment on page 143 of~\citep{CraPom2005} regarding Fibonacci
+    pseudoprimes.
+
+    There are no known counterexamples to this being a primality test.
+
+    Up to $2^64$ the test we use has been checked against tables of 
+    pseudoprimes. Thus it is a primality test up to this limit.
 
 int n_is_probabprime_lucas(mp_limb_t n)
 
