@@ -810,10 +810,16 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
 int n_is_probabprime_BPSW(mp_limb_t n)
 
-    Implements the Baillie--Pomerance--Selfridge--Wagstaff probable primality
-    test. There are no known counterexamples to this being a primality test.
-    For further details, see~\citep{CraPom2005}. Up to $2^64$ this has been 
-    checked.
+    Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
+    test. This is a variant of the usual BPSW test (which only uses Fermat
+    and Lucas tests, see Baillie and Wagstaff~\citep{BaiWag1980}) making use 
+    of the comment on page 143 of~\citep{CraPom2005} regarding Fibonacci
+    pseudoprimes.
+
+    There are no known counterexamples to this being a primality test.
+
+    Up to $2^64$ the test we use has been checked against tables of 
+    pseudoprimes. Thus it is a primality test up to this limit.
 
 int n_is_probabprime_lucas(mp_limb_t n)
 
