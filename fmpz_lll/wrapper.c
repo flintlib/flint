@@ -34,8 +34,15 @@ fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl)
 
     if (res == -1)
     {
-        res = fmpz_lll_d_heuristic(B, fl);
-        if (res == -1)
+        if (fl->rt == Z_BASIS && fl->gt == APPROX)
+        {
+            res = fmpz_lll_d_heuristic(B, fl);
+            if (res == -1)
+            {
+                res = fmpz_lll_mpf(B, fl);
+            }
+        }
+        else
         {
             res = fmpz_lll_mpf(B, fl);
         }

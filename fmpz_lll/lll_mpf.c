@@ -36,7 +36,7 @@ fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl)
     do
     {
         if (num_loops < 20)
-            prec += 53;
+            prec += D_BITS;
         else
             prec *= 2;
 

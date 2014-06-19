@@ -568,6 +568,7 @@ fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
                     return -1;
                 }
 
+                fmpz_get_mpf(s, fmpz_mat_entry(B, kappa, kappa));
                 for (j = 0; j < kappa; j++) /* orthogonalization */
                 {
                     fmpz_get_mpf(mpf_mat_entry(r, kappa, j),
@@ -582,13 +583,9 @@ fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
                     mpf_div(mpf_mat_entry(mu, kappa, j),
                             mpf_mat_entry(r, kappa, j), mpf_mat_entry(r, j,
                                                                       j));
-                }
-                fmpz_get_mpf(s, fmpz_mat_entry(B, kappa, kappa));
-                for (j = 1; j <= kappa; j++)
-                {
-                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, j - 1),
-                            mpf_mat_entry(r, kappa, j - 1));
-                    mpf_sub(s + j, s + j - 1, tmp);
+                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, j),
+                            mpf_mat_entry(r, kappa, j));
+                    mpf_sub(s + j + 1, s + j, tmp);
                 }
                 mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
 

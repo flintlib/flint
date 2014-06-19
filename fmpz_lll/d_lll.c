@@ -616,6 +616,16 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                     return -1;
                 }
 
+                if (fmpz_cmpabs(fmpz_mat_entry(B, kappa, kappa), dmax) > 0)
+                {
+                    d_mat_clear(mu);
+                    d_mat_clear(r);
+                    _d_vec_clear(s);
+                    fmpz_clear(t);
+                    fmpz_clear(dmax);
+                    return -1;
+                }
+                s[0] = fmpz_get_d(fmpz_mat_entry(B, kappa, kappa));
                 for (j = 0; j < kappa; j++) /* orthogonalization */
                 {
                     if (fmpz_cmpabs(fmpz_mat_entry(B, kappa, j), dmax) > 0)
@@ -636,23 +646,10 @@ FUNC_NAME(fmpz_mat_t B, const fmpz_lll_t fl)
                     }
                     d_mat_entry(mu, kappa, j) =
                         d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
-                }
-                if (fmpz_cmpabs(fmpz_mat_entry(B, kappa, kappa), dmax) > 0)
-                {
-                    d_mat_clear(mu);
-                    d_mat_clear(r);
-                    _d_vec_clear(s);
-                    fmpz_clear(t);
-                    fmpz_clear(dmax);
-                    return -1;
-                }
-                s[0] = fmpz_get_d(fmpz_mat_entry(B, kappa, kappa));
-                for (j = 1; j <= kappa; j++)
-                {
-                    s[j] =
-                        s[j - 1] - d_mat_entry(mu, kappa,
-                                               j - 1) * d_mat_entry(r, kappa,
-                                                                    j - 1);
+                    s[j + 1] =
+                        s[j] - d_mat_entry(mu, kappa, j) * d_mat_entry(r,
+                                                                       kappa,
+                                                                       j);
                 }
                 d_mat_entry(r, kappa, kappa) = s[kappa];
 

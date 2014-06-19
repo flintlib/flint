@@ -32,7 +32,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     slong i, j, k, l, m, n;
     fmpz_t r, one;
     fmpq_t delta, nu, xi, half, rat;
-    fmpq_mat_t mu;
+    fmpq_mat_t R, mu;
 
     if (B->r != A->r || B->c != A->c)
     {
@@ -58,6 +58,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpz_mat_set(B, A);
     m = B->r;
     n = B->c;
+    fmpq_mat_init(R, m, m);
     fmpq_mat_init(mu, m, m);
     fmpz_init(r);
     fmpz_init_set_ui(one, 1);
@@ -68,25 +69,23 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_init(rat);
     fmpq_set_si(half, 1, 2);
 
+    /* compute the rational GSO */
     for (i = 0; i < m; i++)
     {
         _fmpz_vec_dot(fmpq_mat_entry_num(mu, i, i), A->rows[i], A->rows[i], n);
         for (j = 0; j <= i - 1; j++)
         {
-            _fmpz_vec_dot(fmpq_mat_entry_num(mu, i, j), A->rows[i], A->rows[j],
+            _fmpz_vec_dot(fmpq_mat_entry_num(R, i, j), A->rows[i], A->rows[j],
                           n);
             for (k = 0; k <= j - 1; k++)
             {
-                fmpq_mul(rat, fmpq_mat_entry(mu, i, k),
-                         fmpq_mat_entry(mu, k, k));
-                fmpq_submul(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(mu, j, k),
-                            rat);
+                fmpq_submul(fmpq_mat_entry(R, i, j), fmpq_mat_entry(mu, j, k),
+                            fmpq_mat_entry(R, i, k));
             }
-            fmpq_set(rat, fmpq_mat_entry(mu, i, j));
-            fmpq_div(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(mu, i, j),
+            fmpq_div(fmpq_mat_entry(mu, i, j), fmpq_mat_entry(R, i, j),
                      fmpq_mat_entry(mu, j, j));
             fmpq_submul(fmpq_mat_entry(mu, i, i), fmpq_mat_entry(mu, i, j),
-                        rat);
+                        fmpq_mat_entry(R, i, j));
         }
     }
 
@@ -191,5 +190,6 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_clear(xi);
     fmpq_clear(half);
     fmpq_clear(rat);
+    fmpq_mat_clear(R);
     fmpq_mat_clear(mu);
 }
