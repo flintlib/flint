@@ -54,10 +54,10 @@
  */
 
 #define lenlo    1
-#define lenhi    1000
+#define lenhi    10000
 #define lenr     1.2
 #define bitslo   16
-#define bitshi   6000
+#define bitshi   640
 #define bitsr    1.2
 #define cols     (slong) (ceil(log((double)(lenhi/lenlo))/log((double)lenr)))
 #define rows     (slong) (ceil(log((double)(bitshi/bitslo))/log((double)bitsr)))
