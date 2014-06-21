@@ -1079,6 +1079,37 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
+slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, 
+               const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                                                              const fmpz_t mod)
+
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$,
+    together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns
+    the length of $G$.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes
+    $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$,
+    respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$
+    and $\len(T) \leq \len(A) - \len(G)$.
+
+    Both $S$ and $T$ must have space for at least $2$ coefficients.
+
+    No aliasing of input and output operands is permitted.
+
+void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+           fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
+    Polynomials \code{S} and \code{T} are computed such that
+    \code{S*A + T*B = G}. The length of \code{S} will be at most
+    \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
 slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
                          const fmpz *A, slong lenA,
                          const fmpz *B, slong lenB,
