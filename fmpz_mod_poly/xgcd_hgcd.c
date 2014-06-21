@@ -97,10 +97,10 @@ do {                                                                          \
 do {                                                                          \
     if ((lenA) >= (lenB))                                                     \
     {                                                                         \
-        fmpz * __t = _fmpz_vec_init(lenA);                                    \
+        fmpz * __t = _fmpz_vec_init(lenB - 1);                                \
         fmpz_invmod(invB, B + lenB - 1, mod);                                 \
         _fmpz_mod_poly_divrem((Q), __t, (A), (lenA), (B), (lenB), invB, mod); \
-        _fmpz_vec_clear(__t, lenA);                                           \
+        _fmpz_vec_clear(__t, lenB - 1);                                       \
         (lenQ) = (lenA) - (lenB) + 1;                                         \
     }                                                                         \
     else                                                                      \
@@ -125,7 +125,7 @@ slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T,
     }
     else
     {
-        slong lenq, lenr, len1 = 2*lenA;
+        slong lenq, lenr, len1 = lenA + lenB;
 
         fmpz *q = _fmpz_vec_init(len1);
         fmpz *r = q + lenA;

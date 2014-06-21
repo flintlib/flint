@@ -96,33 +96,41 @@ void _fmpz_mod_poly_divrem_divconquer(fmpz *Q, fmpz *R,
 {
     if (lenA <= 2 * lenB - 1)
     {
-        __fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
+        fmpz * W = _fmpz_vec_init(lenA);
+        
+        __fmpz_mod_poly_divrem_divconquer(Q, W, A, lenA, B, lenB, invB, p);
+
+        _fmpz_vec_set(R, W, lenB - 1);
+        _fmpz_vec_clear(W, lenA);
     }
     else  /* lenA > 2 * lenB - 1 */
     {
-        slong shift, n = 2 * lenB - 1;
-        fmpz *QB, *W;
+        slong shift, n = 2 * lenB - 1, len1;
+        fmpz *QB, *W, *S;
 
-        _fmpz_vec_set(R, A, lenA);
-        W = _fmpz_vec_init(2 * n);
+        len1 = 2 * n + lenA;
+        W = _fmpz_vec_init(len1);
+        S = W + 2*n;
+        _fmpz_vec_set(S, A, lenA);
         QB = W + n;
 
         while (lenA >= n)
         {
             shift = lenA - n;
             _fmpz_mod_poly_divrem_divconquer_recursive(Q + shift, QB,
-                W, R + shift, B, lenB, invB, p);
-            _fmpz_mod_poly_sub(R + shift, R + shift, n, QB, n, p);
+                W, S + shift, B, lenB, invB, p);
+            _fmpz_mod_poly_sub(S + shift, S + shift, n, QB, n, p);
             lenA -= lenB;
         }
 
         if (lenA >= lenB)
         {
-            __fmpz_mod_poly_divrem_divconquer(Q, W, R, lenA, B, lenB, invB, p);
-            _fmpz_vec_swap(W, R, lenA);
+            __fmpz_mod_poly_divrem_divconquer(Q, W, S, lenA, B, lenB, invB, p);
+            _fmpz_vec_swap(W, S, lenA);
         }
 
-        _fmpz_vec_clear(W, 2 * n);
+        _fmpz_vec_set(R, S, lenB - 1);
+        _fmpz_vec_clear(W, len1);
     }
 }
 
@@ -159,11 +167,11 @@ fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 
     if (R == A || R == B)
     {
-        r = _fmpz_vec_init(lenA);
+        r = _fmpz_vec_init(lenB - 1);
     }
     else
     {
-        fmpz_mod_poly_fit_length(R, lenA);
+        fmpz_mod_poly_fit_length(R, lenB - 1);
         r = R->coeffs;
     }
 
@@ -186,9 +194,10 @@ fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
-        R->alloc  = lenA;
-        R->length = lenA;
+        R->alloc  = lenB - 1;
+        R->length = lenB - 1;
     }
+
     _fmpz_mod_poly_set_length(R, lenB - 1);
     _fmpz_mod_poly_normalise(R);
 

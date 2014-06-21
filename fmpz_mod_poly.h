@@ -678,6 +678,33 @@ void _fmpz_mod_poly_resultant_euclidean(fmpz_t res,
 void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f, 
                                                       const fmpz_mod_poly_t g);
 
+void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA, 
+                                  const fmpz *B, slong lenB, const fmpz_t mod);
+
+void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A, 
+                                                      const fmpz_mod_poly_t B);
+
+static __inline__ void 
+_fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1, 
+                     const fmpz *poly2, slong len2, const fmpz_t mod)
+{
+    if (len1 < FMPZ_MOD_POLY_GCD_CUTOFF)
+        _fmpz_mod_poly_resultant_euclidean(res, poly1, len1, poly2, len2, mod);
+    else
+        _fmpz_mod_poly_resultant_hgcd(res, poly1, len1, poly2, len2, mod);
+}
+
+static __inline__ void 
+fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, 
+                                                       const fmpz_mod_poly_t g)
+{
+    if (FLINT_MAX(f->length, g->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
+       fmpz_mod_poly_resultant_euclidean(res, f, g);
+    else
+       fmpz_mod_poly_resultant_hgcd(res, f, g);
+}
+
+
 /*  Derivative  **************************************************************/
 
 void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, 
