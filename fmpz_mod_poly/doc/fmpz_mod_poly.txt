@@ -1299,6 +1299,26 @@ void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f,
 
 *******************************************************************************
 
+    Discriminant
+
+*******************************************************************************
+
+void _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, 
+                                                   slong len, const fmpz_t mod)
+
+    Set $d$ to the discriminant of \code{(poly, len)}. Assumes \code{len > 1}.
+
+void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f)
+
+    Set $d$ to the discriminant of $f$. We normalise the discriminant so that 
+    \code{disc(f) = (-1)^(n(n-1)/2) res(f, f')/lc(f)^(n - m - 2)}, where
+    \code{n = len(f)} and \code{m = len(f')}. Thus 
+    \code{disc(f) = lc(f)^(2n - 2) prod_{i < j} (r_i - r_j)^2}, where
+    \code{lc(f)} is the leading coefficient of $f$ and $r_i$ are the roots 
+    of $f$.
+
+*******************************************************************************
+
     Derivative
 
 *******************************************************************************

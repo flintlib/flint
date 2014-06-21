@@ -704,6 +704,12 @@ fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f,
        fmpz_mod_poly_resultant_hgcd(res, f, g);
 }
 
+/*  Discriminant  ************************************************************/
+
+void _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, 
+                                                  slong len, const fmpz_t mod);
+
+void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f);
 
 /*  Derivative  **************************************************************/
 
