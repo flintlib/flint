@@ -669,6 +669,15 @@ int _fmpz_mod_poly_invmod(fmpz *A,
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, 
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
 
+/*  Resultant  ***************************************************************/
+
+void _fmpz_mod_poly_resultant_euclidean(fmpz_t res, 
+                                    const fmpz *poly1, slong len1, 
+                              const fmpz *poly2, slong len2, const fmpz_t mod);
+
+void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f, 
+                                                      const fmpz_mod_poly_t g);
+
 /*  Derivative  **************************************************************/
 
 void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, 
