@@ -186,3 +186,11 @@ int fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl)
     products only (\code{fmpz_lll_d_heuristic()}) if $fl->rt == Z_BASIS$ and
     $fl->gt == APPROX$, and finally to the mpf version (\code{fmpz_lll_mpf()})
     if needed. \code{B} and \code{fl} are passed unchanged.
+
+int fmpz_lll_d_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+                            const fmpz_lll_t fl)
+
+    Same as \code{fmpz_lll_d()} but with a removal bound, \code{gs_B}. The
+    return value is the new dimension of \code{B} if removals are desired. The
+    function only works if the input matrix is a lattice basis, that is
+    \code{fl->rt} == $Z_BASIS$.
