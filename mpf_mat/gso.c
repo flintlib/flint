@@ -110,4 +110,5 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
             mpf_mul(mpf_mat_entry(B, j, k), mpf_mat_entry(B, j, k), s);
         }
     }
+    mpf_clears(t, s, tmp, eps, '\0');
 }

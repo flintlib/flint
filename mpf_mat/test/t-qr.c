@@ -125,6 +125,7 @@ main(void)
         mpf_mat_clear(Q);
         mpf_mat_clear(R);
         mpf_mat_clear(B);
+        mpf_clears(dot, tmp, '\0');
     }
 
     FLINT_TEST_CLEANUP(state);
