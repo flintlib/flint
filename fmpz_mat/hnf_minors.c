@@ -27,11 +27,9 @@
 
 void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 {
-    slong j, j2, i, i2, k, l, n;
-    fmpz_t det, u, v, d, r2d, r1d, q, b;
-    fmpz_mat_t M;
+    slong j, j2, i, k, l;
+    fmpz_t u, v, d, r2d, r1d, q, b;
 
-    n = A->r;
     fmpz_mat_set(H, A);
     /* old preprocessing step TODO remove when completely sure nothing is broken
     fmpz_init(det);
@@ -68,7 +66,7 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
     fmpz_init(q);
     fmpz_init(b);
     /* put the kth principal minor in HNF */
-    for (k = 0, l = n - 1; k < n; k++)
+    for (k = 0, l = A->r - 1; k < A->c; k++)
     {
         for (j = 0; j < k; j++)
         {
@@ -124,18 +122,39 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
                 }
             }
         }
-        /* reduce elements of column k */
-        for (i = k - 1; i >= 0; i--)
+        l = A->r - 1;
+    }
+    /* reduce final rows */
+    for (k = A->c; k < A->r; k++)
+    {
+        for (j = 0; j < A->c; j++)
         {
-            fmpz_fdiv_q(q, fmpz_mat_entry(H, i, k),
-                    fmpz_mat_entry(H, k, k));
-            for (j = k; j < A->c; j++)
+            fmpz_xgcd(d, u, v, fmpz_mat_entry(H, j, j), fmpz_mat_entry(H, k, j));
+            fmpz_divexact(r1d, fmpz_mat_entry(H, j, j), d);
+            fmpz_divexact(r2d, fmpz_mat_entry(H, k, j), d);
+            for (j2 = j; j2 < A->c; j2++)
             {
-                fmpz_submul(fmpz_mat_entry(H, i, j), q,
-                        fmpz_mat_entry(H, k, j));
+                fmpz_mul(b, u, fmpz_mat_entry(H, j, j2));
+                fmpz_addmul(b, v, fmpz_mat_entry(H, k, j2));
+                fmpz_mul(fmpz_mat_entry(H, k, j2), r1d, fmpz_mat_entry(H, k, j2));
+                fmpz_submul(fmpz_mat_entry(H, k, j2), r2d, fmpz_mat_entry(H, j, j2));
+                fmpz_set(fmpz_mat_entry(H, j, j2), b);
             }
         }
-        l = n - 1;
+        /* reduce above diagonal elements of each row i */
+        for (i = A->c - 1; i >= 0; i--)
+        {
+            for (j = i + 1; j < A->c; j++)
+            {
+                fmpz_fdiv_q(q, fmpz_mat_entry(H, i, j),
+                        fmpz_mat_entry(H, j, j));
+                for (j2 = j; j2 < A->c; j2++)
+                {
+                    fmpz_submul(fmpz_mat_entry(H, i, j2), q,
+                            fmpz_mat_entry(H, j, j2));
+                }
+            }
+        }
     }
     fmpz_clear(b);
     fmpz_clear(q);
