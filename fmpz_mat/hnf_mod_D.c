@@ -43,7 +43,7 @@ void fmpz_mat_hnf_mod_D(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D)
     fmpz_init(q);
     for (j = 0, k = 0; j != A->c; j++, k++)
     {
-        fmpz_cdiv_q_ui(R2, R, 2);
+        fmpz_fdiv_q_2exp(R2, R, 1);
 
         if (fmpz_is_zero(fmpz_mat_entry(H, k, j)))
             fmpz_set(fmpz_mat_entry(H, k, j), R);
