@@ -194,3 +194,11 @@ int fmpz_lll_d_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
     return value is the new dimension of \code{B} if removals are desired. The
     function only works if the input matrix is a lattice basis, that is
     \code{fl->rt} == $Z_BASIS$.
+
+int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+                                      const fmpz_lll_t fl)
+
+    Same as \code{fmpz_lll_d_heuristic()} but with a removal bound,
+    \code{gs_B}. The return value is the new dimension of \code{B} if removals
+    are desired. The function only works if the input matrix is a lattice
+    basis, that is \code{fl->rt} == $Z_BASIS$.
