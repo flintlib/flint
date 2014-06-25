@@ -177,7 +177,8 @@ int fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl)
     $prec == D_BITS$, then for the first 20 loops, increases the precision one
     limb at a time. After 20 loops, it doubles the precision each time. There
     is a proof that this will eventually work. \code{B} and \code{fl} are
-    passed unchanged.
+    passed unchanged. The return value of this function is 0 if the LLL is
+    successful or -1 if the precision maxes out before \code{B} is LLL-reduced.
 
 int fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl)
 
@@ -202,3 +203,20 @@ int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
     \code{gs_B}. The return value is the new dimension of \code{B} if removals
     are desired. The function only works if the input matrix is a lattice
     basis, that is \code{fl->rt} == $Z_BASIS$.
+
+int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+                               const fmpz_lll_t fl)
+
+    Same as \code{fmpz_lll_mpf2()} but with a removal bound, \code{gs_B}. The
+    return value is the new dimension of \code{B} if removals are desired. The
+    function only works if the input matrix is a lattice basis, that is
+    \code{fl->rt} == $Z_BASIS$.
+
+int fmpz_lll_mpf_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+                              const fmpz_lll_t fl)
+
+    Same as \code{fmpz_lll_mpf()} but with a removal bound, \code{gs_B}. The
+    return value is the new dimension of \code{B} if removals are desired or -1
+    if the precision maxes out before \code{B} is LLL-reduced. The function
+    only works if the input matrix is a lattice basis, that is
+    \code{fl->rt} == $Z_BASIS$.
