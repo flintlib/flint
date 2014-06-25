@@ -68,7 +68,7 @@ void add_column(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
 
 void add_row(fmpz_mat_t H, const fmpz_mat_t A, const fmpz * row)
 {
-    slong i, i2, j, j2, num_pivots;
+    slong i, i2, j, j2, num_pivots, new_row;
     slong * pivots;
     fmpz_t b, d, u, v, r1d, r2d, q;
 
@@ -87,6 +87,7 @@ void add_row(fmpz_mat_t H, const fmpz_mat_t A, const fmpz * row)
     for (j = 0; j < A->c; j++)
         fmpz_set(fmpz_mat_entry(H, i, j), &row[j]);
 
+    /* find the pivots of A */
     for (i = j = 0; i < A->r; i++, j++)
     {
         for (; j < A->c && fmpz_is_zero(fmpz_mat_entry(A, i, j)); j++);
@@ -112,7 +113,7 @@ void add_row(fmpz_mat_t H, const fmpz_mat_t A, const fmpz * row)
         fmpz_xgcd(d, u, v, fmpz_mat_entry(H, i, j), fmpz_mat_entry(H, A->r, j));
         fmpz_divexact(r1d, fmpz_mat_entry(H, i, j), d);
         fmpz_divexact(r2d, fmpz_mat_entry(H, A->r, j), d);
-        for (j2 = 0; j2 < A->c; j2++)
+        for (j2 = j; j2 < A->c; j2++)
         {
             fmpz_mul(b, u, fmpz_mat_entry(H, i, j2));
             fmpz_addmul(b, v, fmpz_mat_entry(H, A->r, j2));
@@ -121,26 +122,25 @@ void add_row(fmpz_mat_t H, const fmpz_mat_t A, const fmpz * row)
             fmpz_set(fmpz_mat_entry(H, i, j2), b);
         }
     }
-    flint_free(pivots);
     /* find first non-zero entry of the added row */
     for (j = 0; j < A->c && fmpz_is_zero(fmpz_mat_entry(H, A->r, j)); j++);
-    i = A->r;
+    new_row = A->r;
     if (j != A->c) /* last row non-zero, move to correct position */
     {
-        if (fmpz_sgn(fmpz_mat_entry(H, i, j)) < 0)
+        if (fmpz_sgn(fmpz_mat_entry(H, A->r, j)) < 0)
         {
-            for (j2 = 0; j2 < A->c; j2++)
+            for (j2 = j; j2 < A->c; j2++)
             {
-                fmpz_neg(fmpz_mat_entry(H, i, j2),
-                        fmpz_mat_entry(H, i, j2));
+                fmpz_neg(fmpz_mat_entry(H, A->r, j2),
+                        fmpz_mat_entry(H, A->r, j2));
             }
         }
         do
         {
-            if (i < A->r)
-                fmpz_mat_swap_rows(H, NULL, i, i + 1);
-            i--;
-            for (j2 = 0; j2 < A->c && fmpz_is_zero(fmpz_mat_entry(H, i, j2)); j2++);
+            if (new_row < A->r)
+                fmpz_mat_swap_rows(H, NULL, new_row, new_row + 1);
+            new_row--;
+            for (j2 = 0; j2 < A->c && fmpz_is_zero(fmpz_mat_entry(H, new_row, j2)); j2++);
         }
         while (j2 > j);
     }
@@ -152,8 +152,8 @@ void add_row(fmpz_mat_t H, const fmpz_mat_t A, const fmpz * row)
             break;
         num_pivots = i + 1;
     }
-    pivots = flint_calloc(num_pivots, sizeof(slong));
-    for (i = j = 0; i < H->r; i++, j++)
+    pivots = flint_realloc(pivots, num_pivots * sizeof(slong));
+    for (i = new_row, j = 0; i < H->r; i++, j++)
     {
         for (; j < H->c && fmpz_is_zero(fmpz_mat_entry(H, i, j)); j++);
         if (j == H->c)
@@ -167,7 +167,7 @@ void add_row(fmpz_mat_t H, const fmpz_mat_t A, const fmpz * row)
         {
             fmpz_fdiv_q(q, fmpz_mat_entry(H, i2, pivots[i]),
                     fmpz_mat_entry(H, i, pivots[i]));
-            for (j2 = 0; j2 < A->c; j2++)
+            for (j2 = pivots[i]; j2 < A->c; j2++)
             {
                 fmpz_submul(fmpz_mat_entry(H, i2, j2), q,
                         fmpz_mat_entry(H, i, j2));
