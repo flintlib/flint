@@ -866,9 +866,52 @@ slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den,
 
 void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 
-    Computes an integer matrix \code{H} such that \code{H} is the unique Hermite
-    normal form of \code{A}, this uses the conventions and first algorithm
-    described for computing Hermite normal forms given in \cite{Coh1996}.
+    Computes an integer matrix \code{H} such that \code{H} is the unique (row)
+    Hermite normal form of \code{A}. The algorithm used is straightforward and
+    is described, for example, in \cite[Algorithm 2.4.4]{Coh1996}.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
+
+    Computes an integer matrix \code{H} such that \code{H} is the unique (row)
+    Hermite normal form of \code{A}. The algorithm used is an improvement on the
+    basic algorithm and uses extended gcds to speed up computation this method
+    is described, for example, in \cite[Algorithm 2.4.5]{Coh1996}.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_hnf_mod_D(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D)
+
+    Computes an integer matrix \code{H} such that \code{H} is the unique (row)
+    Hermite normal form of the $m\times n$ matrix \code{A}, where \code{A} is
+    assumed to be of rank $n$ and \code{D} is known to be a multiple of the
+    determinant of the non-zero rows of \code{H}. The algorithm used here is due
+    to Domich, Kannan and Trotter \cite{DomKanTro1987} and is also described in
+    \cite[Algorithm 2.4.8]{Coh1996}.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
+
+    Computes an integer matrix \code{H} such that \code{H} is the unique (row)
+    Hermite normal form of the $m\times n$ matrix \code{A}, where \code{A} is
+    assumed to be of rank $n$. The algorithm used here is due to Kannan and
+    Bachem \cite{KanBac1979} and takes the principal minors to Hermite normal
+    form in turn.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
+
+    Computes an integer matrix \code{H} such that \code{H} is the unique (row)
+    Hermite normal form of the $n\times n$ matrix \code{A}, where \code{A} is
+    assumed to be of rank $n$. The algorithm used here is due to Pernet and
+    Stein \cite{PernetStein2010}.
 
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
