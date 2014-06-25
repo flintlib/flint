@@ -195,7 +195,7 @@ void arith_landau_function_vec(fmpz * res, slong len);
 /* Dedekind sums *************************************************************/
 
 #define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
-#define arith_dedekind_sum_coprime_d d_dedekind_sum_coprime
+#define arith_dedekind_sum_coprime_d fmpq_dedekind_sum_coprime_d
 #define arith_dedekind_sum_coprime_large fmpq_dedekind_sum_coprime_large
 #define arith_dedekind_sum_coprime fmpq_dedekind_sum_coprime
 #define arith_dedekind_sum fmpq_dedekind_sum
