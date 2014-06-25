@@ -89,17 +89,19 @@ main(void)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         fmpz_t det;
-        fmpz_mat_t A, H, H2;
-        slong m, n, b, c, d, i, j;
+        fmpz_mat_t A, B, H, H2;
+        slong m, n, b, d, i, j;
         int equal;
 
         n = n_randint(state, 10);
+        m = n + n_randint(state, 10);
 
         fmpz_init(det);
 
         fmpz_mat_init(A, n, n);
-        fmpz_mat_init(H, n, n);
-        fmpz_mat_init(H2, n, n);
+        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(H, m, n);
+        fmpz_mat_init(H2, m, n);
 
         /* sparse */
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
@@ -108,12 +110,16 @@ main(void)
         fmpz_mat_det(det, A);
         fmpz_abs(det, det);
 
-        /* dense */
-        d = n_randint(state, 2*n*n + 1);
-        if (n_randint(state, 2))
-            fmpz_mat_randops(A, state, d);
+        for (i = 0; i < n; i++)
+            for (j = 0; j < n; j++)
+                fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(A, i, j));
 
-        fmpz_mat_hnf_minors(H, A);
+        /* dense */
+        d = n_randint(state, 2*m*n + 1);
+        if (n_randint(state, 2))
+            fmpz_mat_randops(B, state, d);
+
+        fmpz_mat_hnf_minors(H, B);
 
         if (!in_hnf(H))
         {
@@ -124,7 +130,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_mod_D(H2, A, det);
+        fmpz_mat_hnf_mod_D(H2, B, det);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)
@@ -153,6 +159,7 @@ main(void)
 
         fmpz_mat_clear(H2);
         fmpz_mat_clear(H);
+        fmpz_mat_clear(B);
         fmpz_mat_clear(A);
         fmpz_clear(det);
     }
