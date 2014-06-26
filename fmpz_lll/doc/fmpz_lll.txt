@@ -204,8 +204,8 @@ int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
     are desired. The function only works if the input matrix is a lattice
     basis, that is \code{fl->rt} == $Z_BASIS$.
 
-int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
-                               const fmpz_lll_t fl)
+int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, mp_bitcnt_t prec,
+                               const fmpz_t gs_B, const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_mpf2()} but with a removal bound, \code{gs_B}. The
     return value is the new dimension of \code{B} if removals are desired. The
@@ -215,8 +215,21 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
 int fmpz_lll_mpf_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
                               const fmpz_lll_t fl)
 
-    Same as \code{fmpz_lll_mpf()} but with a removal bound, \code{gs_B}. The
-    return value is the new dimension of \code{B} if removals are desired or -1
-    if the precision maxes out before \code{B} is LLL-reduced. The function
-    only works if the input matrix is a lattice basis, that is
-    \code{fl->rt} == $Z_BASIS$.
+    A wrapper of \code{fmpz_lll_mpf2_with_removal()}. This currently begins
+    with $prec == D_BITS$, then for the first 20 loops, increases the precision
+    one limb at a time. After 20 loops, it doubles the precision each time.
+    There is a proof that this will eventually work. \code{B}, \code{gs_B} and
+    \code{fl} are passed unchanged. The return value of this function is the
+    new dimension of \code{B} if removals are desired or -1 if the precision
+    maxes out before \code{B} is LLL-reduced.
+
+int fmpz_lll_wrapper_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+                                  const fmpz_lll_t fl)
+
+    A wrapper of the procedures implementing the base case LLL with the
+    addition of the removal boundary. It begins with the greediest version
+    (\code{fmpz_lll_d_with_removal()}), then adapts to the version using
+    heuristic inner products only (\code{fmpz_lll_d_heuristic_with_removal()})
+    if $fl->gt == APPROX$, and finally to the mpf version
+    (\code{fmpz_lll_mpf_with_removal()}) if needed. \code{B}, \code{gs_B} and
+    \code{fl} are passed unchanged.
