@@ -68,6 +68,15 @@ typedef struct
 
 typedef fmpz_mod_poly_res_struct fmpz_mod_poly_res_t[1];
 
+typedef struct
+{
+   fmpz ** powers;
+   slong len;
+} fmpz_mod_poly_powers_precomp_struct;
+
+typedef fmpz_mod_poly_powers_precomp_struct fmpz_mod_poly_powers_precomp_t[1];
+
+
 /*  Initialisation and memory management *************************************/
 
 void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p);
@@ -536,6 +545,23 @@ void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
 void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                           const fmpz_mod_poly_t Binv);
+
+fmpz ** _fmpz_mod_poly_powers_precompute(const fmpz * B, 
+                                                  slong len, const fmpz_t mod);
+
+void fmpz_mod_poly_powers_precompute(fmpz_mod_poly_powers_precomp_t pinv, 
+                                                         fmpz_mod_poly_t poly);
+
+void _fmpz_mod_poly_powers_clear(fmpz ** powers, slong len);
+
+void fmpz_mod_poly_powers_clear(fmpz_mod_poly_powers_precomp_t pinv);
+
+void _fmpz_mod_poly_rem_powers_precomp(fmpz * A, slong m, 
+              const fmpz * B, slong n, fmpz ** const powers, const fmpz_t mod);
+
+void 
+fmpz_mod_poly_rem_powers_precomp(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, 
+          const fmpz_mod_poly_t B, const fmpz_mod_poly_powers_precomp_t B_inv);
 
 /*  Power series inversion ***************************************************/
 
