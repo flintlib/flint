@@ -33,7 +33,7 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
     slong i, j, k, d = A->r, n = A->c;
     fmpq_mat_t Aq, Bq, mu;
     mpq_t deltax, etax;
-    fmpq_t deltaq, etaq, tmp, rtmp;
+    fmpq_t deltaq, etaq, tmp;
 
     if (d == 0 || d == 1)
         return 1;
@@ -48,7 +48,6 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
     fmpq_init(deltaq);
     fmpq_init(etaq);
     fmpq_init(tmp);
-    fmpq_init(rtmp);
 
     fmpq_mat_set_fmpz_mat(Aq, A);
 
@@ -62,6 +61,8 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
     {
         fmpq_set(fmpq_mat_entry(Bq, 0, j), fmpq_mat_entry(Aq, 0, j));
     }
+    /* diagonal of mu stores the squared GS norms */
+    _fmpq_vec_dot(fmpq_mat_entry(mu, 0, 0), Bq->rows[0], Bq->rows[0], n);
 
     for (i = 1; i < d; i++)
     {
@@ -73,9 +74,8 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
         for (j = 0; j < i; j++)
         {
             _fmpq_vec_dot(tmp, Aq->rows[i], Bq->rows[j], n);
-            _fmpq_vec_dot(rtmp, Bq->rows[j], Bq->rows[j], n);
 
-            fmpq_div(fmpq_mat_entry(mu, i, j), tmp, rtmp);
+            fmpq_div(fmpq_mat_entry(mu, i, j), tmp, fmpq_mat_entry(mu, j, j));
 
             for (k = 0; k < n; k++)
             {
@@ -92,16 +92,15 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
                 fmpq_clear(deltaq);
                 fmpq_clear(etaq);
                 fmpq_clear(tmp);
-                fmpq_clear(rtmp);
                 return 0;
             }
         }
         fmpq_set(tmp, deltaq);
         fmpq_submul(tmp, fmpq_mat_entry(mu, i, i - 1),
                     fmpq_mat_entry(mu, i, i - 1));
-        fmpq_mul(tmp, tmp, rtmp);
-        _fmpq_vec_dot(rtmp, Bq->rows[i], Bq->rows[i], n);
-        if (fmpq_cmp(tmp, rtmp) > 0)    /* check Lovasz condition */
+        fmpq_mul(tmp, tmp, fmpq_mat_entry(mu, i - 1, i - 1));
+        _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), Bq->rows[i], Bq->rows[i], n);
+        if (fmpq_cmp(tmp, fmpq_mat_entry(mu, i, i)) > 0)    /* check Lovasz condition */
         {
             fmpq_mat_clear(Aq);
             fmpq_mat_clear(Bq);
@@ -109,7 +108,6 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
             fmpq_clear(deltaq);
             fmpq_clear(etaq);
             fmpq_clear(tmp);
-            fmpq_clear(rtmp);
             return 0;
         }
     }
@@ -119,6 +117,5 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
     fmpq_clear(deltaq);
     fmpq_clear(etaq);
     fmpq_clear(tmp);
-    fmpq_clear(rtmp);
     return 1;
 }
