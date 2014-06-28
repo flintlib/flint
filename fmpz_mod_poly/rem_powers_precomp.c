@@ -31,7 +31,7 @@
 void _fmpz_mod_poly_rem_powers_precomp(fmpz * A, slong m, 
                const fmpz * B, slong n, fmpz ** const powers, const fmpz_t mod)
 {
-   slong i, j;
+   slong i;
    fmpz * prod;
 
    if (m >= 2*n)

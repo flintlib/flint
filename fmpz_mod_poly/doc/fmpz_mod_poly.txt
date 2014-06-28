@@ -626,6 +626,30 @@ void fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
     We require \code{finv} to be the inverse of the reverse of \code{f}.
 
+void _fmpz_mod_poly_powmod_fmpz_binexp_powers_precomp(fmpz * res, 
+               const fmpz * poly, const fmpz_t e, const fmpz * f, slong lenf,
+                                  fmpz** powers const,
+                                  const fmpz_t p)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{powers} to be a precomputed inverse of \code{f}
+    computed with \code{_fmpz_mod_poly_powers_precompute}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void fmpz_mod_poly_powmod_fmpz_binexp_powers_precomp(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, const fmpz_t e,
+            const fmpz_mod_poly_t f, const fmpz_mod_poly_powers_precomp_t finv)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+    We require \code{finv} to be a precomputed inverse of \code{f} supplied by 
+    \code{fmpz_mod_poly_powers_precompute}.
+
 void
 _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
                                   slong lenf, const fmpz* finv, slong lenfinv,
@@ -646,6 +670,28 @@ fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
     modulo \code{f}, using sliding window exponentiation. We require
     \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
     \code{f}.
+
+void
+_fmpz_mod_poly_powmod_x_fmpz_powers_precomp(fmpz * res, const fmpz_t e, 
+                   const fmpz * f, slong lenf, fmpz ** const powers,
+                                  const fmpz_t p)
+
+    Sets \code{res} to \code{x} raised to the power \code{e} modulo \code{f},
+    using sliding window exponentiation. We require \code{e > 0}.
+    We require \code{powers} to be a precomputed inverse of \code{f}
+    computed with \code{_fmpz_mod_poly_powers_precompute}.
+
+    We require \code{lenf > 2}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+fmpz_mod_poly_powmod_x_fmpz_powers_precomp(fmpz_mod_poly_t res, const fmpz_t e,
+            const fmpz_mod_poly_t f, const fmpz_mod_poly_powers_precomp_t finv)
+
+    Sets \code{res} to \code{x} raised to the power \code{e}
+    modulo \code{f}, using sliding window exponentiation. We require
+    \code{e >= 0}. We require \code{finv} to be a precomputed inverse of 
+    \code{f} supplied by \code{fmpz_mod_poly_powers_precompute}.
 
 *******************************************************************************
 

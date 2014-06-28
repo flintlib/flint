@@ -31,7 +31,7 @@
 fmpz ** 
 _fmpz_mod_poly_powers_precompute(const fmpz * B, slong len, const fmpz_t mod)
 {
-   slong i, j;
+   slong i;
    fmpz ** powers = flint_malloc(sizeof(fmpz *)*(2*len - 1));
    fmpz_mod_poly_t pow, p;
    fmpz_t c, inv;
