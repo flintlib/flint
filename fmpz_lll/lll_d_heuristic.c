@@ -27,15 +27,19 @@
 
 #include "fmpz_lll.h"
 
-#ifdef FUNC_NAME
-#undef FUNC_NAME
+#ifdef FUNC_HEAD
+#undef FUNC_HEAD
 #endif
 
 #ifdef CALL_BABAI
 #undef CALL_BABAI
 #endif
 
-#define FUNC_NAME fmpz_lll_d_heuristic
+#ifdef USE_NEWD
+#undef USE_NEWD
+#endif
+
+#define FUNC_HEAD int fmpz_lll_d_heuristic(fmpz_mat_t B, const fmpz_lll_t fl)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
     if (NFF < 50)                                                      \
@@ -66,6 +70,15 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
+#define USE_NEWD(ND, FLAG, GSN, RT)                                    \
+do {                                                                   \
+    if (!FLAG)                                                         \
+    {                                                                  \
+        fmpz_init(GSN);                                                \
+        fmpz_clear(GSN);                                               \
+    }                                                                  \
+} while (0)
 #include "d_lll.c"
-#undef FUNC_NAME
+#undef FUNC_HEAD
 #undef CALL_BABAI
+#undef USE_NEWD

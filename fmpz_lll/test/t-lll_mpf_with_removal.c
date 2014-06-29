@@ -57,7 +57,6 @@ main(void)
         fmpz_mat_init(mat, r, c);
         fmpz_init(bound);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         bits = n_randint(state, 20) + 1;
         q = n_randint(state, 200) + 1;
@@ -68,10 +67,21 @@ main(void)
             fmpz_mat_randntrulike2(mat, state, bits, q);
 
         fmpz_randtest(bound, state, bits);
-        newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
-        result =
-            fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta, bound,
-                                             newd);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_gram(mat, mat);
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
+                                                      bound, newd);
+        }
+        else
+        {
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
+                                                 bound, newd);
+        }
 
         if (!result)
         {
@@ -92,6 +102,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
+        fmpz_mat_t gmat;
 
         r = n_randint(state, 20) + 1;
         c = r + 1;
@@ -99,22 +110,37 @@ main(void)
         fmpz_mat_init(mat, r, c);
         fmpz_init(bound);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         bits = n_randint(state, 200) + 1;
 
         fmpz_mat_randintrel(mat, state, bits);
 
         fmpz_randtest(bound, state, bits);
-        newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
-        result =
-            fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta, bound,
-                                             newd);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_init(gmat, r, r);
+            fmpz_mat_gram(gmat, mat);
+            newd = fmpz_lll_mpf_with_removal(gmat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_gram_with_removal(gmat, fl->delta, fl->eta,
+                                                      bound, newd);
+        }
+        else
+        {
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
+                                                 bound, newd);
+        }
 
         if (!result)
         {
             flint_printf("FAIL (randintrel):\n");
             fmpz_mat_print_pretty(mat);
+            if (fl->rt == GRAM)
+            {
+                fmpz_mat_print_pretty(gmat);
+            }
             flint_printf("bits = %ld, i = %ld\n", bits, i);
             flint_printf("delta = %g, eta = %g\n", fl->delta, fl->eta);
             flint_printf("rep_type = %d\n", fl->rt);
@@ -123,6 +149,10 @@ main(void)
         }
 
         fmpz_mat_clear(mat);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_clear(gmat);
+        }
         fmpz_clear(bound);
     }
 
@@ -137,15 +167,25 @@ main(void)
         fmpz_mat_init(mat, r, c);
         fmpz_init(bound);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         fmpz_mat_randajtai(mat, state, 0.5);
 
         fmpz_randtest(bound, state, n_randint(state, 200));
-        newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
-        result =
-            fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta, bound,
-                                             newd);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_gram(mat, mat);
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
+                                                      bound, newd);
+        }
+        else
+        {
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
+                                                 bound, newd);
+        }
 
         if (!result)
         {
@@ -174,7 +214,6 @@ main(void)
         fmpz_mat_init(mat, r, c);
         fmpz_init(bound);
         fmpz_lll_randtest(fl, state);
-        fl->rt = Z_BASIS;
 
         bits = n_randint(state, 200) + 1;
         bits2 = n_randint(state, 5) + 1;
@@ -182,10 +221,21 @@ main(void)
         fmpz_mat_randsimdioph(mat, state, bits, bits2);
 
         fmpz_randtest(bound, state, bits);
-        newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
-        result =
-            fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta, bound,
-                                             newd);
+        if (fl->rt == GRAM)
+        {
+            fmpz_mat_gram(mat, mat);
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
+                                                      bound, newd);
+        }
+        else
+        {
+            newd = fmpz_lll_mpf_with_removal(mat, bound, fl);
+            result =
+                fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
+                                                 bound, newd);
+        }
 
         if (!result)
         {

@@ -27,15 +27,26 @@
 
 #include "fmpz_lll.h"
 
-#ifdef FUNC_NAME
-#undef FUNC_NAME
+#ifdef FUNC_HEAD
+#undef FUNC_HEAD
+#endif
+
+#ifdef LIMIT
+#undef LIMIT
 #endif
 
 #ifdef COMPUTE
 #undef COMPUTE
 #endif
 
-#define FUNC_NAME fmpz_lll_check_babai
+#ifdef TYPE
+#undef TYPE
+#endif
+
+#define FUNC_HEAD int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s, \
+       d_mat_t appB, int *expo, fmpz_gram_t A, \
+       int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+#define LIMIT kappa
 #define COMPUTE(G, I, J, C)                                         \
 do {                                                                \
     if (I != J)                                                     \
@@ -44,6 +55,9 @@ do {                                                                \
     else                                                            \
         d_mat_entry(G, I, J) = _d_vec_norm(appB->rows[I], C);       \
 } while (0)
+#define TYPE 1
 #include "babai.c"
-#undef FUNC_NAME
+#undef FUNC_HEAD
+#undef LIMIT
 #undef COMPUTE
+#undef TYPE

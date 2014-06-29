@@ -27,15 +27,19 @@
 
 #include "fmpz_lll.h"
 
-#ifdef FUNC_NAME
-#undef FUNC_NAME
+#ifdef FUNC_HEAD
+#undef FUNC_HEAD
 #endif
 
 #ifdef CALL_BABAI
 #undef CALL_BABAI
 #endif
 
-#define FUNC_NAME fmpz_lll_d_with_removal
+#ifdef USE_NEWD
+#undef USE_NEWD
+#endif
+
+#define FUNC_HEAD int fmpz_lll_d_with_removal(fmpz_mat_t B, const fmpz_t gs_B, const fmpz_lll_t fl)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
     if (NFF < 50)                                                      \
@@ -63,6 +67,35 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#include "d_lll_with_removal.c"
-#undef FUNC_NAME
+#define USE_NEWD(ND, FLAG, GSN, RT)                                    \
+do {                                                                   \
+    ND = B->r;                                                         \
+    fmpz_init(GSN);                                                    \
+    if (RT == Z_BASIS)                                                 \
+    {                                                                  \
+        for (i = d - 1; (i >= 0) && (FLAG > 0); i--)                   \
+        {                                                              \
+            fmpz_set_d(GSN, ldexp(d_mat_entry(r, i, i), 2 * expo[i])); \
+            if ((FLAG = fmpz_cmp(GSN, gs_B)) > 0)                      \
+            {                                                          \
+                ND--;                                                  \
+            }                                                          \
+        }                                                              \
+    }                                                                  \
+    else                                                               \
+    {                                                                  \
+        for (i = d - 1; (i >= 0) && (FLAG > 0); i--)                   \
+        {                                                              \
+            fmpz_set_d(GSN, d_mat_entry(r, i, i));                     \
+            if ((FLAG = fmpz_cmp(GSN, gs_B)) > 0)                      \
+            {                                                          \
+                ND--;                                                  \
+            }                                                          \
+        }                                                              \
+    }                                                                  \
+    fmpz_clear(GSN);                                                   \
+} while (0)
+#include "d_lll.c"
+#undef FUNC_HEAD
 #undef CALL_BABAI
+#undef USE_NEWD

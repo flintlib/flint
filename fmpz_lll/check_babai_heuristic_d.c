@@ -27,21 +27,35 @@
 
 #include "fmpz_lll.h"
 
-#ifdef FUNC_NAME
-#undef FUNC_NAME
+#ifdef FUNC_HEAD
+#undef FUNC_HEAD
+#endif
+
+#ifdef LIMIT
+#undef LIMIT
 #endif
 
 #ifdef COMPUTE
 #undef COMPUTE
 #endif
 
-#define FUNC_NAME fmpz_lll_check_babai_heuristic_d
+#ifdef TYPE
+#undef TYPE
+#endif
+
+#define FUNC_HEAD int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s, \
+       d_mat_t appB, int *expo, fmpz_gram_t A, \
+       int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+#define LIMIT kappa
 #define COMPUTE(G, I, J, C)                                         \
 do {                                                                \
     d_mat_entry(G, I, J) =                                          \
             fmpz_lll_heuristic_dot(appB->rows[I], appB->rows[J], C, \
                                    B, I, J, expo[I] + expo[J]);     \
 } while (0)
+#define TYPE 1
 #include "babai.c"
-#undef FUNC_NAME
+#undef FUNC_HEAD
+#undef LIMIT
 #undef COMPUTE
+#undef TYPE

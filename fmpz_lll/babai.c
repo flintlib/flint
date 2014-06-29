@@ -27,12 +27,9 @@
 
 #include "fmpz_lll.h"
 
-#if defined(FUNC_NAME) && defined(COMPUTE)
+#if defined(FUNC_HEAD) && defined(LIMIT) && defined(COMPUTE) && defined(TYPE)
 
-int
-FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
-          d_mat_t appB, int *expo, fmpz_gram_t A,
-          int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+FUNC_HEAD
 {
     if (fl->rt == Z_BASIS)
     {
@@ -64,7 +61,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 /* Step2: compute the GSO for stage kappa */
                 /* ************************************** */
 
-                for (j = aa; j < kappa; j++)
+                for (j = aa; j < LIMIT; j++)
                 {
                     if (d_is_nan(d_mat_entry(A->appSP, kappa, j)))
                     {
@@ -115,7 +112,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 /* Step3--5: compute the X_j's  */
                 /* **************************** */
 
-                for (j = kappa - 1; j > zeros; j--)
+                for (j = LIMIT - 1; j > zeros; j--)
                 {
                     /* test of the relaxed size-reduction condition */
                     tmp = fabs(d_mat_entry(mu, kappa, j));
@@ -244,14 +241,22 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                  B->rows[kappa], n);
                     aa = zeros + 1;
 
-                    for (i = zeros + 1; i <= kappa; i++)
+                    for (i = zeros + 1; i <= LIMIT; i++)
                         d_mat_entry(A->appSP, kappa, i) = NAN;
 
-                    for (i = kappa + 1; i <= kappamax; i++)
+                    for (i = LIMIT + 1; i <= kappamax; i++)
                         d_mat_entry(A->appSP, i, kappa) = NAN;
+                }
+                else
+                {
+#if TYPE == 2
+                    for (i = zeros + 1; i <= LIMIT; i++)
+                        d_mat_entry(A->appSP, kappa, i) = NAN;
+#endif
                 }
             } while (test);
 
+#if TYPE == 1
             if (d_is_nan(d_mat_entry(A->appSP, kappa, kappa)))
             {
                 COMPUTE(A->appSP, kappa, kappa, n);
@@ -264,6 +269,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
             }
+#endif
         }
         else
         {
@@ -294,7 +300,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 /* Step2: compute the GSO for stage kappa */
                 /* ************************************** */
 
-                for (j = aa; j < kappa; j++)
+                for (j = aa; j < LIMIT; j++)
                 {
                     if (fmpz_cmp_si
                         (fmpz_mat_entry(A->exactSP, kappa, j), WORD_MIN) == 0)
@@ -363,7 +369,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 /* Step3--5: compute the X_j's  */
                 /* **************************** */
 
-                for (j = kappa - 1; j > zeros; j--)
+                for (j = LIMIT - 1; j > zeros; j--)
                 {
                     /* test of the relaxed size-reduction condition */
                     tmp = fabs(d_mat_entry(mu, kappa, j));
@@ -492,20 +498,31 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                                                  B->rows[kappa], n);
                     aa = zeros + 1;
 
-                    for (i = zeros + 1; i <= kappa; i++)
+                    for (i = zeros + 1; i <= LIMIT; i++)
                     {
                         fmpz_set_si(fmpz_mat_entry(A->exactSP, kappa, i),
                                     WORD_MIN);
                     }
 
-                    for (i = kappa + 1; i <= kappamax; i++)
+                    for (i = LIMIT + 1; i <= kappamax; i++)
                     {
                         fmpz_set_si(fmpz_mat_entry(A->exactSP, i, kappa),
                                     WORD_MIN);
                     }
                 }
+                else
+                {
+#if TYPE == 2
+                    for (i = zeros + 1; i <= LIMIT; i++)
+                    {
+                        fmpz_set_si(fmpz_mat_entry(A->exactSP, kappa, i),
+                                    WORD_MIN);
+                    }
+#endif
+                }
             } while (test);
 
+#if TYPE == 1
             if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), WORD_MIN)
                 == 0)
             {
@@ -523,6 +540,7 @@ FUNC_NAME(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r, double *s,
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
             }
+#endif
         }
     }
     return 0;

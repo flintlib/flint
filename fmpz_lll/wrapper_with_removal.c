@@ -35,7 +35,7 @@ fmpz_lll_wrapper_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
 
     if (res == -1)
     {
-        if (fl->gt == APPROX)
+        if (fl->rt == Z_BASIS && fl->gt == APPROX)
         {
             res = fmpz_lll_d_heuristic_with_removal(B, gs_B, fl);
             if (res == -1)
