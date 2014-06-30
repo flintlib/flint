@@ -646,7 +646,7 @@ FUNC_HEAD
                 test = 0;
 
                 loops++;
-                if (loops > 2000)
+                if (loops > 10000)
                 {
                     d_mat_clear(mu);
                     d_mat_clear(r);

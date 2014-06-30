@@ -71,12 +71,6 @@ main(void)
         {
             fmpz_mat_gram(mat, mat);
             newd = fmpz_lll_d_heuristic_with_removal(mat, bound, fl);
-            if (newd == -1)
-            {
-                fmpz_mat_clear(mat);
-                fmpz_clear(bound);
-                continue;
-            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
                                                       bound, newd);
@@ -127,13 +121,6 @@ main(void)
             fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
             newd = fmpz_lll_d_heuristic_with_removal(gmat, bound, fl);
-            if (newd == -1)
-            {
-                fmpz_mat_clear(mat);
-                fmpz_mat_clear(gmat);
-                fmpz_clear(bound);
-                continue;
-            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(gmat, fl->delta, fl->eta,
                                                       bound, newd);
@@ -188,12 +175,6 @@ main(void)
         {
             fmpz_mat_gram(mat, mat);
             newd = fmpz_lll_d_heuristic_with_removal(mat, bound, fl);
-            if (newd == -1)
-            {
-                fmpz_mat_clear(mat);
-                fmpz_clear(bound);
-                continue;
-            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
                                                       bound, newd);
@@ -244,12 +225,6 @@ main(void)
         {
             fmpz_mat_gram(mat, mat);
             newd = fmpz_lll_d_heuristic_with_removal(mat, bound, fl);
-            if (newd == -1)
-            {
-                fmpz_mat_clear(mat);
-                fmpz_clear(bound);
-                continue;
-            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
                                                       bound, newd);

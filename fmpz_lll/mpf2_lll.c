@@ -567,7 +567,7 @@ FUNC_HEAD
                 test = 0;
 
                 loops++;
-                if (loops > 2000)
+                if (loops > 10000)
                 {
                     mpf_mat_clear(mu);
                     mpf_mat_clear(r);

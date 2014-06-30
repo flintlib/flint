@@ -67,12 +67,7 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
-            result = fmpz_lll_d_heuristic(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_d_heuristic(mat, fl);
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
@@ -115,13 +110,7 @@ main(void)
         {
             fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
-            result = fmpz_lll_d_heuristic(gmat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                fmpz_mat_clear(gmat);
-                continue;
-            }
+            fmpz_lll_d_heuristic(gmat, fl);
             result = fmpz_mat_is_reduced_gram(gmat, fl->delta, fl->eta);
         }
         else
@@ -168,12 +157,7 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
-            result = fmpz_lll_d_heuristic(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_d_heuristic(mat, fl);
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
@@ -216,12 +200,7 @@ main(void)
         if (fl->rt == GRAM)
         {
             fmpz_mat_gram(mat, mat);
-            result = fmpz_lll_d_heuristic(mat, fl);
-            if (result == -1)
-            {
-                fmpz_mat_clear(mat);
-                continue;
-            }
+            fmpz_lll_d_heuristic(mat, fl);
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
