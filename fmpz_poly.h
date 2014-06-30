@@ -910,6 +910,10 @@ void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong n);
 void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
     const fmpz_t c);
 
+void _fmpz_poly_taylor_shift_multi_mod(fmpz * poly, const fmpz_t c, slong n);
+
+void fmpz_poly_taylor_shift_multi_mod(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c);
+
 void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, slong n);
 
 void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c);
