@@ -39,6 +39,28 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
         return a;
     }
 
+    /* just do a brute force search */
+    if (p < 600)
+    {
+        mp_limb_t t, t2;
+
+        if (p > 50 && n_jacobi_unsigned(a, p) == -1)
+            return 0;
+
+        t = t2 = 1;
+
+        while (t <= (p - 1) / 2)
+        {
+            if (t2 == a)
+                return t;
+
+            t2 = n_addmod(t2, 2*t + 1, p);
+            t++;
+        }
+
+        return 0;
+    }
+
     pinv = n_preinvert_limb(p);
 
     if (n_jacobi_unsigned(a, p) == -1)
@@ -46,7 +68,19 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     if ((p & UWORD(3)) == 3)
     {
-        return n_powmod2_ui_preinv(a, (p + 1) / 4, p, pinv);
+        return n_powmod2_ui_preinv(a, (p + 1)/4, p, pinv); /* p == 2^B - 1 isn't prime */
+    }
+
+    if ((p & UWORD(7)) == 5)
+    {
+       b = n_powmod2_ui_preinv(a, (p + 3)/8, p, pinv); /* p == 2^B - 3 isn't prime */
+       g = n_mulmod2_preinv(b, b, p, pinv);
+
+       if (g == a)
+          return b;
+
+       g = n_powmod2_ui_preinv(2, (p - 1)/4, p, pinv);
+       return n_mulmod2_preinv(g, b, p, pinv);
     }
 
     r = 0;
@@ -59,7 +93,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     b = n_powmod2_ui_preinv(a, p1, p, pinv);
 
-    for (k = 2; ; k++)
+    for (k = 3; ; k+=2) /* 2 is a quadratic residue mod p = 8k + 1 */
     {
         if (n_jacobi_unsigned(k, p) == -1) break;
     }

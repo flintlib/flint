@@ -1240,6 +1240,52 @@ void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
     \end{equation*}
     holds up to sign.
 
+void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
+                                               const fmpz * poly2, slong len2)
+
+    Sets \code{res} to the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}. 
+
+void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
+                                                      const fmpz_poly_t poly2)
+
+    Computes the resultant of \code{poly1} and \code{poly2}.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    This function uses the modular algorithm described 
+    in~\citep{Col1971}.
+
+void _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
+                                      const fmpz * poly2, slong len2)
+
+    Sets \code{res} to the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}.
+
+void fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1, 
+                                     const fmpz_poly_t poly2)
+
+    Computes the resultant of \code{poly1} and \code{poly2}.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.3.7]{Coh1996}.
+
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
                                       const fmpz * poly2, slong len2)
 
@@ -1260,8 +1306,24 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
 
-    This function uses the algorithm described 
-    in~\citep[Algorithm~3.3.7]{Coh1996}.
+*******************************************************************************
+
+    Discriminant
+
+*******************************************************************************
+
+void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len)
+
+    Set \code{res} to the discriminant of \code{(poly, len)}. Assumes
+    \code{len > 1}.
+
+void fmpz_poly_discriminant(fmpz_t res, const fmpz_poly_t poly)
+
+    Set \code{res} to the disciminant of \code{res}. We normalise the
+    discriminant so that \code{disc(f) = (-1)^(n(n-1)/2) res(f, f')/lc(f)},
+    thus \code{disc(f) = lc(f)^(2n - 2) prod_{i < j} (r_i - r_j)^2}, where
+    \code{lc(f)} is the leading coefficient of $f$, $n$ is the degree of
+    $f$ and $r_i$ are the roots of $f$.
 
 *******************************************************************************
 
@@ -1694,38 +1756,55 @@ int fmpz_poly_divides(fmpz_poly_t Q,
 
 *******************************************************************************
 
-void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q,
+        slong Qlen, slong n)
 
-    Computes the first $n$ terms of the inverse power series of $Q$ using 
-    Newton iteration.
+    Computes the first $n$ terms of the inverse power series of
+    \code{(Q, lenQ)} using a recurrence.
 
-    Assumes that $n \geq 1$, that $Q$ has length at least $n$ and constant 
-    term~$\pm 1$.  Does not support aliasing.
+    Assumes that $n \geq 1$ and that $Q$ has constant term~$\pm 1$.
+    Does not support aliasing.
 
-id fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
+void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv,
+        const fmpz_poly_t Q, slong n)
 
     Computes the first $n$ terms of the inverse power series of $Q$ 
-    using Newton iteration, assuming that $Q$ has constant term~$\pm 1$ 
+    using a recurrence, assuming that $Q$ has constant term~$\pm 1$ 
     and $n \geq 1$.
+
+void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+
+    Computes the first $n$ terms of the inverse power series of
+    \code{(Q, lenQ)} using Newton iteration.
+
+    Assumes that $n \geq 1$ and that $Q$ has constant term~$\pm 1$.
+    Does not support aliasing.
+
+void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q,
+        slong Qlen, slong n)
+
+    Computes the first $n$ terms of the inverse power series of $Q$ using
+    Newton iteration, assuming $Q$ has constant term~$\pm 1$ and $n \geq 1$.
 
 void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n)
 
-    Computes the first $n$ terms of the inverse power series of $Q$.
+    Computes the first $n$ terms of the inverse power series of
+    \code{(Q, lenQ)}.
 
-    Assumes that $n \geq 1$, that $Q$ has length at least $n$ and constant 
-    term~$1$.  Does not support aliasing.
+    Assumes that $n \geq 1$ and that $Q$ has constant term~$\pm 1$.
+    Does not support aliasing.
 
 void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first $n$ terms of the inverse power series of $Q$, 
-    assuming $Q$ has constant term~$1$ and $n \geq 1$.
+    assuming $Q$ has constant term~$\pm 1$ and $n \geq 1$.
 
-void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B)
+void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+        const fmpz * B, slong Blen, slong n)
 
-    Divides \code{(A, n)} by \code{(B, n)} as power series over $\Z$, 
-    assuming $B$ has constant term~$1$ and $n \geq 1$.
-
-    Only supports aliasing of \code{(Q, n)} and \code{(B, n)}.
+    Divides \code{(A, Alen)} by \code{(B, Blen)} as power series over $\Z$, 
+    assuming $B$ has constant term~$\pm 1$ and $n \geq 1$.
+    Aliasing is not supported.
 
 void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
                                          const fmpz_poly_t B, slong n)
@@ -1733,7 +1812,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     Performs power series division in $\Z[[x]] / (x^n)$.  The function 
     considers the polynomials $A$ and $B$ as power series of length $n$ 
     starting with the constant terms.  The function assumes that $B$ has 
-    constant term~$1$ and $n \geq 1$.
+    constant term~$\pm 1$ and $n \geq 1$.
 
 *******************************************************************************
 
@@ -2252,12 +2331,13 @@ void fmpz_poly_compose_series(fmpz_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q,
+        slong Qlen, slong n)
 
-    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
-    as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    Sets \code{Qinv} to the compositional inverse or reversion of
+    \code{(Q, Qlen)} as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses the Lagrange inversion formula.
@@ -2273,12 +2353,13 @@ void fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     This implementation uses the Lagrange inversion formula.
 
 void _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv,
-        const fmpz * Q, slong n)
+        const fmpz * Q, slong Qlen, slong n)
 
-    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    Sets \code{Qinv} to the compositional inverse or reversion of
+    \code{(Q, Qlen)}
     as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses a reduced-complexity implementation
@@ -2295,12 +2376,13 @@ void fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
     This implementation uses a reduced-complexity implementation
     of the Lagrange inversion formula.
 
-void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q,
+        slong Qlen, slong n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
@@ -2315,12 +2397,12 @@ void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv,
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
-void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong n)
+void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
-    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
-    both have length \code{n} and may not be aliased.
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments may not be
+    aliased, and \code{Qlen} must be at least 2.
     It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation defaults to the fast version of

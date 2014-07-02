@@ -40,8 +40,6 @@ main(void)
     flint_printf("inv_series_newton....");
     fflush(stdout);
 
-    
-
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {

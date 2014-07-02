@@ -1866,6 +1866,60 @@ nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
     of the two polynomials is zero.
 
 mp_limb_t
+_nmod_poly_resultant_hgcd(mp_srcptr poly1, slong len1,
+                               mp_srcptr poly2, slong len2, nmod_t mod)
+
+    Returns the resultant of \code{(poly1, len1)} and
+    \code{(poly2, len2)} using the half-gcd algorithm.
+
+    This algorithm computes the half-gcd as per \code{_nmod_poly_gcd_hgcd()}
+    but additionally updates the resultant every time a division occurs. The
+    half-gcd algorithm computes the GCD recursively. Given inputs $a$ and $b$
+    it lets \code{m = len(a)/2} and (recursively) performs all quotients in
+    the Euclidean algorithm which do not require the low $m$ coefficients of
+    $a$ and $b$.
+
+    This performs quotients in exactly the same order as the ordinary 
+    Euclidean algorithm except that the low $m$ coefficients of the polynomials
+    in the remainder sequence are not computed. A correction step after hgcd 
+    has been called computes these low $m$ coefficients (by matrix 
+    multiplication by a transformation matrix also computed by hgcd).
+
+    This means that from the point of view of the resultant, all but the last
+    quotient performed by a recursive call to hgcd is an ordinary quotient as
+    per the usual Euclidean algorithm. However, the final quotient may give
+    a remainder of less than $m + 1$ coefficients, which won't be corrected
+    until the hgcd correction step is performed afterwards.
+
+    To compute the adjustments to the resultant coming from this corrected
+    quotient, we save the relevant information in an \code{nmod_poly_res_t}
+    struct at the time the quotient is performed so that when the correction 
+    step is performed later, the adjustments to the resultant can be computed 
+    at that time also.
+
+    The only time an adjustment to the resultant is not required after a
+    call to hgcd is if hgcd does nothing (the remainder may already have had
+    less than $m + 1$ coefficients when hgcd was called).
+
+    Assumes that \code{len1 >= len2 > 0}.
+
+    Asumes that the modulus is prime.
+
+mp_limb_t
+nmod_poly_resultant_hgcd(const nmod_poly_t f, const nmod_poly_t g)
+
+    Computes the resultant of $f$ and $g$ using the half-gcd algorithm.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant
+    is defined to be
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either
+    of the two polynomials is zero.
+
+mp_limb_t
 _nmod_poly_resultant(mp_srcptr poly1, slong len1,
                      mp_srcptr poly2, slong len2, nmod_t mod)
 
@@ -1933,6 +1987,26 @@ int nmod_poly_invmod(nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t P)
     If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and
     sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value
     of $A$ on exit is undefined.
+
+
+*******************************************************************************
+
+    Power series composition
+
+*******************************************************************************
+
+mp_limb_t _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
+
+    Return the discriminant of \code{(poly, len)}. Assumes \code{len > 1}.
+
+mp_limb_t nmod_poly_discriminant(const nmod_poly_t f)
+
+    Return the discriminant of $f$. We normalise the discriminant so that 
+    \code{disc(f) = (-1)^(n(n-1)/2) res(f, f')/lc(f)^(n - m - 2)}, where
+    \code{n = len(f)} and \code{m = len(f')}. Thus 
+    \code{disc(f) = lc(f)^(2n - 2) prod_{i < j} (r_i - r_j)^2}, where
+    \code{lc(f)} is the leading coefficient of $f$ and $r_i$ are the roots 
+    of $f$.
 
 
 *******************************************************************************

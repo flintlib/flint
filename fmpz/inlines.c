@@ -95,3 +95,49 @@ void __fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);
 }
+
+int __fmpz_lt(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) < 0;
+}
+
+int __fmpz_gt(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) > 0;
+}
+
+int __fmpz_lte(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) <= 0;
+}
+
+int __fmpz_gte(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) >= 0;
+}
+
+int __fmpz_eq(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) == 0;
+}
+
+int __fmpz_neq(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) != 0;
+}
+
+void __fmpz_init_set(fmpz_t f, const fmpz_t g)
+{
+    if (!COEFF_IS_MPZ(*g))
+    {
+        *f = *g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        mpz_set(ptr, COEFF_TO_PTR(*g));
+    }
+}

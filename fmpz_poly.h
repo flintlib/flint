@@ -47,7 +47,7 @@
  extern "C" {
 #endif
 
-#define FMPZ_POLY_INV_NEWTON_CUTOFF  32
+#define FMPZ_POLY_INV_NEWTON_CUTOFF 32
 
 /*  Type definitions *********************************************************/
 
@@ -567,28 +567,40 @@ void fmpz_poly_gcd_modular(fmpz_poly_t res,
                            const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1, 
-                                              const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                                    const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
 
 void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1, 
-                                              const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                                    const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
+
+void _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1, 
+                                               const fmpz * poly2, slong len2);
+
+void fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1, 
+                                                      const fmpz_poly_t poly2);
+
+void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
+                                               const fmpz * poly2, slong len2);
+
+void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
+                                                      const fmpz_poly_t poly2);
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
-                                              const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
-void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
-                                                    const fmpz_poly_t poly2);
+void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
+                                                      const fmpz_poly_t poly2);
 
 void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
                const fmpz * poly1, slong len1, const fmpz * poly2, slong len2);
 
 void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
-                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+                             const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 static __inline__
 void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t, 
@@ -603,6 +615,12 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
 {
     fmpz_poly_xgcd_modular(r, s, t, poly1, poly2);
 }
+
+/*  Discriminant  ********************************************************/
+
+void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len);
+
+void fmpz_poly_discriminant(fmpz_t res, const fmpz_poly_t poly);
 
 /*  Gaussian content  ********************************************************/
 
@@ -717,23 +735,20 @@ _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c);
 
 /*  Power series division  ***************************************************/
 
-void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n);
+void _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
+
+void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
+
+void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
 void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
-static __inline__ void 
-_fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n)
-{
-    _fmpz_poly_inv_series_newton(Qinv, Q, n);
-}
+void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
-static __inline__ void 
-fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-{
-    fmpz_poly_inv_series_newton(Qinv, Q, n);
-}
+void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
-void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, slong n);
+void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+    const fmpz * B, slong Blen, slong n);
 
 void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
                                          const fmpz_poly_t B, slong n);
@@ -926,26 +941,26 @@ fmpz_poly_compose_series(fmpz_poly_t res,
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
 
 void
-_fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong n);
+_fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
 void
 fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
 void
-_fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong n);
+_fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
 void
 fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
     const fmpz_poly_t Q, slong n);
 
 void
-_fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n);
+_fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
 void
 fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
 void
-_fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong n);
+_fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
 void
 fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);

@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2014 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -31,117 +32,128 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-#define FMPQ_POLY_INV_NEWTON_CUTOFF  32
+#define FMPQ_POLY_INV_NEWTON_CUTOFF 24
+
+/* Requires 2*min(Qlen,n) + n - 1 < 3n coefficients of scratch space in W */
+static void
+_fmpq_poly_inv_series_basecase_rev(fmpz * Qinv, fmpz_t Qinvden,
+    fmpz * W, fmpz_t Wden,
+    const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
+{
+    slong Wlen;
+    fmpz *Qrev;
+
+    Qlen = FLINT_MIN(Qlen, n);
+    Wlen = n + Qlen - 1;
+    Qrev = W + Wlen;
+
+    _fmpz_poly_reverse(Qrev, Q, Qlen, Qlen);
+    _fmpz_vec_zero(W, Wlen - 1);
+    fmpz_one(W + Wlen - 1);
+    fmpz_one(Wden);
+
+    _fmpq_poly_div(Qinv, Qinvden, W, Wden, Wlen, Qrev, Qden, Qlen, NULL);
+
+    _fmpq_poly_canonicalise(Qinv, Qinvden, n);
+    _fmpz_poly_reverse(Qinv, Qinv, n, n);
+}
+
+
+#define MULLOW(z, x, xn, y, yn, nn) \
+    if ((xn) >= (yn)) \
+        _fmpz_poly_mullow(z, x, xn, y, yn, nn); \
+    else \
+        _fmpz_poly_mullow(z, y, yn, x, xn, nn); \
 
 void 
 _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
-                             const fmpz * Q, const fmpz_t Qden, slong n)
+                     const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
-    if (n == 1)
+    if (fmpz_is_pm1(Q) && fmpz_is_one(Qden))
     {
-        if (fmpz_sgn(Q) > 0)
-        {
-            fmpz_set(Qinv, Qden);
-            fmpz_set(Qinvden, Q);
-        }
-        else
-        {
-            fmpz_neg(Qinv, Qden);
-            fmpz_neg(Qinvden, Q);
-        }
+        _fmpz_poly_inv_series(Qinv, Q, Qlen, n);
+        fmpz_one(Qinvden);
+        return;
+    }
+
+    Qlen = FLINT_MIN(Qlen, n);
+
+    if (Qlen == 1)
+    {
+        fmpz_set(Qinv, Qden);
+        fmpz_set(Qinvden, Q);
+        _fmpq_canonicalise(Qinv, Qinvden);
+        _fmpz_vec_zero(Qinv + 1, n - 1);
     }
     else
     {
-        const slong alloc = FLINT_MAX(n, 3 * FMPQ_POLY_INV_NEWTON_CUTOFF);
-        slong *a, i, m;
-        fmpz *W, *Wden;
+        slong alloc, Qnlen, Wlen, W2len;
+        fmpz * W;
+        fmpz_t Wden;
 
-        W = _fmpz_vec_init(alloc + 1);
-        Wden = W + alloc;
+        alloc = FLINT_MAX(n, 3 * FMPQ_POLY_INV_NEWTON_CUTOFF);
+        W = _fmpz_vec_init(alloc);
+        fmpz_init(Wden);
 
-        for (i = 1; (WORD(1) << i) < n; i++) ;
+        FLINT_NEWTON_INIT(FMPQ_POLY_INV_NEWTON_CUTOFF, n)
 
-        a = (slong *) flint_malloc(i * sizeof(slong));
-        a[i = 0] = n;
-        while (n >= FMPQ_POLY_INV_NEWTON_CUTOFF)
-            a[++i] = (n = (n + 1) / 2);
+        FLINT_NEWTON_BASECASE(n)
+        _fmpq_poly_inv_series_basecase_rev(Qinv, Qinvden, W, Wden, Q, Qden, Qlen, n);
+        FLINT_NEWTON_END_BASECASE
 
-        /* Base case */
-        {
-            fmpz *rev = W + 2 * FMPQ_POLY_INV_NEWTON_CUTOFF;
+        FLINT_NEWTON_LOOP(m, n)
 
-            _fmpz_poly_reverse(rev, Q, n, n);
-            _fmpz_vec_zero(W, 2*n - 2);
-            fmpz_one(W + (2*n - 2));
-            fmpz_one(Wden);
+        Qnlen = FLINT_MIN(Qlen, n);
+        Wlen = FLINT_MIN(Qnlen + m - 1, n);
+        W2len = Wlen - m;
 
-            _fmpq_poly_div(Qinv, Qinvden, W, Wden, 2*n - 1, rev, Qden, n, NULL);
-            _fmpq_poly_canonicalise(Qinv, Qinvden, n);
+        MULLOW(W, Q, Qnlen, Qinv, m, Wlen);
+        fmpz_mul(Wden, Qden, Qinvden);
 
-            _fmpz_poly_reverse(Qinv, Qinv, n, n);
-        }
+        MULLOW(Qinv + m, Qinv, m, W + m, W2len, n - m);
+        fmpz_mul(Qinvden, Qinvden, Wden);
 
-        for (i--; i >= 0; i--)
-        {
-            m = n;
-            n = a[i];
+        _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);
+        _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
+        _fmpq_poly_canonicalise(Qinv, Qinvden, n);
 
-            _fmpz_poly_mullow(W, Q, n, Qinv, m, n);
-            fmpz_mul(Wden, Qden, Qinvden);
+        FLINT_NEWTON_END_LOOP
 
-            _fmpz_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m);
-            fmpz_mul(Qinvden, Qinvden, Wden);
-            _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);
+        FLINT_NEWTON_END
 
-            _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
-
-            _fmpq_poly_canonicalise(Qinv, Qinvden, n);
-        }
-
-        _fmpz_vec_clear(W, alloc + 1);
-        flint_free(a);
+        _fmpz_vec_clear(W, alloc);
+        fmpz_clear(Wden);
     }
 }
 
-void fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
+void
+fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
 {
-    fmpz *copy;
-    int alloc;
+    slong Qlen = Q->length;
 
-    if (Q->length >= n)
+    Qlen = FLINT_MIN(Qlen, n);
+
+    if (Qlen == 0)
     {
-        copy = Q->coeffs;
-        alloc = 0;
-    }
-    else
-    {
-        slong i;
-        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < Q->length; i++)
-            copy[i] = Q->coeffs[i];
-        for ( ; i < n; i++)
-            copy[i] = 0;
-        alloc = 1;
+        flint_printf("Exception (fmpq_poly_inv_series_newton). Division by zero.\n");
+        abort();
     }
 
     if (Qinv != Q)
     {
         fmpq_poly_fit_length(Qinv, n);
-        _fmpq_poly_inv_series_newton(Qinv->coeffs, Qinv->den, copy, Q->den, n);
+        _fmpq_poly_inv_series_newton(Qinv->coeffs, Qinv->den, Q->coeffs, Q->den, Qlen, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_inv_series_newton(t->coeffs, t->den, copy, Q->den, n);
+        _fmpq_poly_inv_series_newton(t->coeffs, t->den, Q->coeffs, Q->den, Qlen, n);
         fmpq_poly_swap(Qinv, t);
         fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(Qinv, n);
-    fmpq_poly_canonicalise(Qinv);
-
-    if (alloc)
-        flint_free(copy);
+    _fmpq_poly_normalise(Qinv);
 }
 

@@ -74,7 +74,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
            short product via Karatsuba
          */
 
-        _fmpz_poly_mul_KS(t, q1, n1, B, n2);
+        _fmpz_poly_mul(t, q1, n1, B, n2);
 
         /*
            If lenB is odd, set {h, n2} to {r1, n2} - {h, n2}, otherwise, to 

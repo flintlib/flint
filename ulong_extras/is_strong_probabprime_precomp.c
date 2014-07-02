@@ -19,8 +19,9 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, Peter Shrimpton
+    Copyright (C) 2008 Peter Shrimpton
     Copyright (C) 2009 William Hart
+    Copyright (C) 2014 Dana Jacobsen
 
 ******************************************************************************/
 
@@ -34,6 +35,12 @@ n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a,
 {
     mp_limb_t t = d;
     mp_limb_t y;
+
+    /* Map large base to range 2 ... n - 1 */
+    if (a >= n)  
+       a = n_mod2_precomp(a, n, npre);
+
+    if ((a <= 1) || (a == n-1))  return 1;
 
     y = n_powmod_ui_precomp(a, t, n, npre);
 
