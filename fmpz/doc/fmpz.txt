@@ -1173,6 +1173,18 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
 
     Requires $n$ to be odd.
 
+int fmpz_is_prime(const fmpz_t n)
+
+    Attempts to prove $n$ prime. 
+
+    If $n$ is proven prime, the function returns $1$. If $n$ is definitely
+    composite, the function returns $0$. Otherwise the function returns
+    $-1$.
+
+    The function assumes that $n$ is very likely prime, i.e. it is not very
+    efficient if $n$ is composite. A strong probable prime test should be
+    run first to ensure that $n$ is probably prime.
+
 *******************************************************************************
 
     Special functions

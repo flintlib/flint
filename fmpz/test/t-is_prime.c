@@ -33,13 +33,14 @@
 int
 main(void)
 {
-    int i, result;
+    int i, result, r1;
     FLINT_TEST_INIT(state);
 
-    flint_printf("is_prime_pocklington....");
+    flint_printf("is_prime....");
     fflush(stdout);
 
-    for (i = 0; i < 30 * flint_test_multiplier(); i++)
+    /* test primes always pass */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p, F;
 
@@ -51,7 +52,9 @@ main(void)
            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
-        result = fmpz_is_prime_pocklington(F, p, 1000000);
+        r1 = fmpz_is_prime(p);
+
+        result = (r1 == 1 || r1 == -1);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -60,6 +63,39 @@ main(void)
         }
 
         fmpz_clear(p);
+        fmpz_clear(F);
+    }
+
+    /* test composites never pass */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fmpz_t p, a, F;
+
+        fmpz_init(p);
+        fmpz_init(a);
+        fmpz_init(F);
+
+        do {
+           fmpz_randbits(p, state, n_randint(state, 100) + 2);
+        } while (fmpz_cmp_ui(p, 2) < 0);
+        do {
+           fmpz_randbits(a, state, n_randint(state, 100) + 2);
+        } while (fmpz_cmp_ui(a, 2) < 0);
+        
+        fmpz_mul(p, p, a);
+
+        r1 = fmpz_is_prime(p);
+
+        result = (r1 == 0 || r1 == -1);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            fmpz_print(p); printf("\n");
+            abort();
+        }
+
+        fmpz_clear(p);
+        fmpz_clear(a);
         fmpz_clear(F);
     }
 
