@@ -1161,7 +1161,7 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
     The function then returns either $0$ if $n$ is definitely composite
     or it returns $1$ is all factors of $n$ are $1 \pmod{F}$.
 
-    N.B: a return value of $1$ only proves $n$ prime if $F > \sqrt{n}$.
+    N.B: a return value of $1$ only proves $n$ prime if $F >= \sqrt{n}$.
 
     There is a balance between the amount of time spent looking for
     factors of $n - 1$ (as specified by \code{limit}) and the usefulness
