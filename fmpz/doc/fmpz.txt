@@ -1153,6 +1153,26 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
 
+int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
+
+    Applies the Pocklington primality test. The test computes a product
+    $F$ of primes up to \code{limit} which divide $n - 1$. 
+
+    The function then returns either $0$ if $n$ is definitely composite
+    or it returns $1$ is all factors of $n$ are $1 \pmod{F}$.
+
+    N.B: a return value of $1$ only proves $n$ prime if $F > \sqrt{n}$.
+
+    There is a balance between the amount of time spent looking for
+    factors of $n - 1$ (as specified by \code{limit}) and the usefulness
+    of the output ($F$ may be as low as $2$ in some cases).
+
+    A reasonable heuristic seems to be to choose \code{limit} to be some
+    small multiple of $\log^3(n)/10$ (e.g. $1, 2, 5$ or $10$) depending
+    on how long one is prepared to wait.
+
+    Requires $n$ to be odd.
+
 *******************************************************************************
 
     Special functions

@@ -668,6 +668,8 @@ int fmpz_is_probabprime(const fmpz_t p);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
 
+int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit);
+
 /* Primorials */
 
 void fmpz_primorial(fmpz_t res, ulong n);
