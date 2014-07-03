@@ -49,10 +49,11 @@ int fmpz_is_prime(const fmpz_t n)
       double logd = log(fmpz_get_d(n));
       ulong limit = (ulong) (logd*logd*logd/10.0) + 2;
 
-      fmpz_t F, F2;
+      fmpz_t F, F2, F3;
 
       fmpz_init(F);
       fmpz_init(F2);
+      fmpz_init(F3);
 
       res = fmpz_is_prime_pocklington(F, n, limit);
 
@@ -60,11 +61,40 @@ int fmpz_is_prime(const fmpz_t n)
       {
          fmpz_mul(F2, F, F);
          if (fmpz_cmp(F2, n) < 0)
-            res = -1;
+         {
+            fmpz_mul(F3, F2, F);
+            if (fmpz_cmp(F3, n) < 0)
+               res = -1;
+            else /* Brillhart, Lehmer, Selfridge test */
+            {
+               fmpz_t n1, c2, c1;
+
+               fmpz_init(n1);
+               fmpz_init(c2);
+               fmpz_init(c1);
+
+               fmpz_sub_ui(n1, n, 1); /* n is 1 mod F */
+               fmpz_tdiv_q(n1, n1, F);
+
+               fmpz_tdiv_qr(c2, c1, n1, F); /* Let n = c2*F^2 + c1*F + 1 */
+
+               fmpz_mul(c1, c1, c1); /* check if c1^2 - 4*c2 is a square */
+               fmpz_submul_ui(c1, c2, 4);
+
+               if (fmpz_is_square(c1))
+                  res = 0;
+               /* else n is prime (res == 1) */
+
+               fmpz_clear(n1);
+               fmpz_clear(c2);
+               fmpz_clear(c1);
+            }
+         }
       }
 
       fmpz_clear(F);
       fmpz_clear(F2);
+      fmpz_clear(F3);
    }
 
    return res;
