@@ -93,7 +93,7 @@ main(void)
         slong m, n, b, d, i, j;
         int equal;
 
-        n = 4 + n_randint(state, 6);
+        n = 3 + n_randint(state, 10);
         m = n;/* + n_randint(state, 10);*/
 
         fmpz_init(det);
@@ -125,7 +125,6 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in hnf!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(B); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             abort();
@@ -138,7 +137,6 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnfs produced by different methods should be the same!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(B); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             fmpz_mat_print_pretty(H2); flint_printf("\n\n");
@@ -153,7 +151,6 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnf of a matrix in hnf should be the same!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(B); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             fmpz_mat_print_pretty(H2); flint_printf("\n\n");
