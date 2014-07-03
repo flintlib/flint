@@ -28,18 +28,18 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
-                               mpf_mat_t r, mpf * s, mpf_mat_t appB,
-                               fmpz_gram_t A, int a, int zeros, int kappamax,
-                               int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec,
-                               const fmpz_lll_t fl)
+fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+                               mpf_mat_t mu, mpf_mat_t r, mpf * s,
+                               mpf_mat_t appB, fmpz_gram_t A, int a, int zeros,
+                               int kappamax, int n, mpf_t tmp, mpf_t rtmp,
+                               mp_bitcnt_t prec, const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS)
     {
         if (fl->gt == APPROX)
         {
             int i, j, k, test, aa;
-            slong xx, exponent;
+            slong xx, exponent, max_expo = WORD_MAX;
             fmpz_t ztmp;
             double halfplus, onedothalfplus;
             ulong loops;
@@ -56,12 +56,6 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
             do
             {
                 test = 0;
-
-                loops++;
-                if (loops > 20)
-                {
-                    return -1;
-                }
 
                 /* ************************************** */
                 /* Step2: compute the GSO for stage kappa */
@@ -117,6 +111,22 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                                                       j));
                 }
 
+                if (loops >= 20)
+                {
+                    slong new_max_expo = WORD_MIN;
+                    for (j = 0; j < kappa; j++)
+                    {
+                        slong expo2;
+                        mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                        new_max_expo = FLINT_MAX(new_max_expo, expo2);
+                    }
+                    if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
+                    {
+                        return -1;
+                    }
+                    max_expo = new_max_expo;
+                }
+
                 /* **************************** */
                 /* Step3--5: compute the X_j's  */
                 /* **************************** */
@@ -144,6 +154,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 }
                                 _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_sub(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                             else    /* otherwise X is -1 */
                             {
@@ -155,6 +171,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 }
                                 _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_add(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                         }
                         else    /* we must have |X| >= 2 */
@@ -185,6 +207,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 xx = mpf_get_si(tmp);
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_scalar_submul_si(U->rows[kappa],
+                                                               U->rows[j],
+                                                               B->r, xx);
+                                }
                             }
                             else
                             {
@@ -192,6 +220,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
                                                              B->rows[j], n,
                                                              ztmp);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_scalar_submul_fmpz(U->rows
+                                                                 [kappa],
+                                                                 U->rows[j],
+                                                                 B->r, ztmp);
+                                }
                             }
                         }
                     }
@@ -209,6 +244,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                     for (i = kappa + 1; i <= kappamax; i++)
                         mpf_set_d(mpf_mat_entry(A->appSP2, i, kappa), DBL_MIN);
                 }
+                loops++;
             } while (test);
 
             if (mpf_cmp_d(mpf_mat_entry(A->appSP2, kappa, kappa), DBL_MIN) ==
@@ -231,7 +267,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
         else
         {
             int i, j, k, test, aa;
-            slong xx, exponent;
+            slong xx, exponent, max_expo = WORD_MAX;
             fmpz_t ztmp;
             double halfplus, onedothalfplus;
             ulong loops;
@@ -248,12 +284,6 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
             do
             {
                 test = 0;
-
-                loops++;
-                if (loops > 20)
-                {
-                    return -1;
-                }
 
                 /* ************************************** */
                 /* Step2: compute the GSO for stage kappa */
@@ -305,6 +335,22 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                                                       j));
                 }
 
+                if (loops >= 20)
+                {
+                    slong new_max_expo = WORD_MIN;
+                    for (j = 0; j < kappa; j++)
+                    {
+                        slong expo2;
+                        mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                        new_max_expo = FLINT_MAX(new_max_expo, expo2);
+                    }
+                    if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
+                    {
+                        return -1;
+                    }
+                    max_expo = new_max_expo;
+                }
+
                 /* **************************** */
                 /* Step3--5: compute the X_j's  */
                 /* **************************** */
@@ -332,6 +378,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 }
                                 _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_sub(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                             else    /* otherwise X is -1 */
                             {
@@ -343,6 +395,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 }
                                 _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_add(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                         }
                         else    /* we must have |X| >= 2 */
@@ -373,6 +431,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 xx = mpf_get_si(tmp);
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_scalar_submul_si(U->rows[kappa],
+                                                               U->rows[j],
+                                                               B->r, xx);
+                                }
                             }
                             else
                             {
@@ -380,6 +444,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                 _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
                                                              B->rows[j], n,
                                                              ztmp);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_scalar_submul_fmpz(U->rows
+                                                                 [kappa],
+                                                                 U->rows[j],
+                                                                 B->r, ztmp);
+                                }
                             }
                         }
                     }
@@ -403,6 +474,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
                                     WORD_MIN);
                     }
                 }
+                loops++;
             } while (test);
 
             if (fmpz_cmp_si(fmpz_mat_entry(A->exactSP, kappa, kappa), WORD_MIN)

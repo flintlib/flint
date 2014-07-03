@@ -60,6 +60,11 @@ FUNC_HEAD
             mpf_mat_init(appB, d, n, prec);
             mpf_mat_init(A->appSP2, d, d, prec);
 
+            if (fl->store_trans)
+            {
+                fmpz_mat_one(U);
+            }
+
             s = _mpf_vec_init(d, prec);
             appSPtmp = _mpf_vec_init(d, prec);
 
@@ -116,8 +121,8 @@ FUNC_HEAD
                 /* Step3: Call to the Babai algorithm */
                 /* ********************************** */
                 babai_ok =
-                    fmpz_lll_check_babai_heuristic(kappa, B, mu, r, s, appB, A,
-                                                   alpha[kappa], zeros,
+                    fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, appB,
+                                                   A, alpha[kappa], zeros,
                                                    kappamax, n, tmp, rtmp,
                                                    prec, fl);
 
@@ -208,6 +213,16 @@ FUNC_HEAD
                     for (i = kappa2; i > kappa; i--)
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
+
+                    Btmp = _fmpz_vec_init(d);
+                    if (fl->store_trans)
+                    {
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                        for (i = kappa2; i > kappa; i--)
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                    }
+                    _fmpz_vec_clear(Btmp, d);
 
                     appBtmp = appB->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -308,6 +323,11 @@ FUNC_HEAD
             s = _mpf_vec_init(d, prec);
             exactSPtmp = _fmpz_vec_init(d);
 
+            if (fl->store_trans)
+            {
+                fmpz_mat_one(U);
+            }
+
             for (i = 0; i < d; i++)
             {
                 for (j = 0; j < d; j++)
@@ -360,8 +380,8 @@ FUNC_HEAD
                 /* Step3: Call to the Babai algorithm */
                 /* ********************************** */
                 babai_ok =
-                    fmpz_lll_check_babai_heuristic(kappa, B, mu, r, s, appB, A,
-                                                   alpha[kappa], zeros,
+                    fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, appB,
+                                                   A, alpha[kappa], zeros,
                                                    kappamax, n, tmp, rtmp,
                                                    prec, fl);
 
@@ -453,6 +473,16 @@ FUNC_HEAD
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
+                    Btmp = _fmpz_vec_init(d);
+                    if (fl->store_trans)
+                    {
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                        for (i = kappa2; i > kappa; i--)
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                    }
+                    _fmpz_vec_clear(Btmp, d);
+
                     appBtmp = appB->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
                         appB->rows[i] = appB->rows[i - 1];
@@ -527,6 +557,7 @@ FUNC_HEAD
     else
     {
         int kappa, d, i, j, test;
+        slong max_expo = WORD_MAX;
         mpf_mat_t mu, r;
         mpf *s;
         double ctt, halfplus, onedothalfplus;
@@ -550,6 +581,11 @@ FUNC_HEAD
         mpf_init2(rtmp, prec);
         fmpz_init(t);
 
+        if (fl->store_trans)
+        {
+            fmpz_mat_one(U);
+        }
+
         i = 0;
         do
             ;
@@ -559,25 +595,13 @@ FUNC_HEAD
 
         fmpz_get_mpf(mpf_mat_entry(r, i, i), fmpz_mat_entry(B, i, i));
 
-        loops = 0;
         while (kappa < d)
         {
+            loops = 0;
             do
             {
                 test = 0;
 
-                loops++;
-                if (loops > 10000)
-                {
-                    mpf_mat_clear(mu);
-                    mpf_mat_clear(r);
-                    _mpf_vec_clear(s, d);
-                    mpf_clears(tmp, rtmp, '\0');
-                    fmpz_clear(t);
-                    return -1;
-                }
-
-                fmpz_get_mpf(s, fmpz_mat_entry(B, kappa, kappa));
                 for (j = 0; j < kappa; j++) /* orthogonalization */
                 {
                     fmpz_get_mpf(mpf_mat_entry(r, kappa, j),
@@ -592,11 +616,28 @@ FUNC_HEAD
                     mpf_div(mpf_mat_entry(mu, kappa, j),
                             mpf_mat_entry(r, kappa, j), mpf_mat_entry(r, j,
                                                                       j));
-                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, j),
-                            mpf_mat_entry(r, kappa, j));
-                    mpf_sub(s + j + 1, s + j, tmp);
                 }
-                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+
+                if (loops >= 20)
+                {
+                    slong new_max_expo = WORD_MIN;
+                    for (j = 0; j < kappa; j++)
+                    {
+                        slong expo2;
+                        mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                        new_max_expo = FLINT_MAX(new_max_expo, expo2);
+                    }
+                    if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
+                    {
+                        mpf_mat_clear(mu);
+                        mpf_mat_clear(r);
+                        _mpf_vec_clear(s, d);
+                        mpf_clears(tmp, rtmp, '\0');
+                        fmpz_clear(t);
+                        return -1;
+                    }
+                    max_expo = new_max_expo;
+                }
 
                 x = _fmpz_vec_init(kappa);
                 for (j = kappa - 1; j >= 0; j--)    /* size-reduction */
@@ -637,6 +678,11 @@ FUNC_HEAD
                             mpf_mul(rtmp, tmp, mpf_mat_entry(mu, j, i));
                             mpf_sub(mpf_mat_entry(mu, kappa, i),
                                     mpf_mat_entry(mu, kappa, i), rtmp);
+                        }
+                        if (fl->store_trans)
+                        {
+                            _fmpz_vec_scalar_submul_fmpz(U->rows[kappa],
+                                                         U->rows[j], d, x + j);
                         }
                     }
                 }
@@ -684,7 +730,16 @@ FUNC_HEAD
                 }
 
                 _fmpz_vec_clear(x, kappa);
+                loops++;
             } while (test);
+
+            fmpz_get_mpf(s, fmpz_mat_entry(B, kappa, kappa));
+            for (j = 0; j < kappa; j++)
+            {
+                mpf_mul(tmp, mpf_mat_entry(mu, kappa, j),
+                        mpf_mat_entry(r, kappa, j));
+                mpf_sub(s + j + 1, s + j, tmp);
+            }
 
             mpf_set_d(rtmp, ctt);
             mpf_mul(tmp, rtmp, mpf_mat_entry(r, kappa - 1, kappa - 1));
@@ -717,6 +772,16 @@ FUNC_HEAD
                             mpf_mat_entry(r, kappa2, j));
                 }
                 mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+
+                x = _fmpz_vec_init(d);
+                if (fl->store_trans)
+                {
+                    _fmpz_vec_set(x, U->rows[kappa2], d);
+                    for (i = kappa2; i > kappa; i--)
+                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
+                    _fmpz_vec_set(U->rows[kappa], x, d);
+                }
+                _fmpz_vec_clear(x, d);
 
                 for (j = kappa2; j > kappa; j--)
                 {

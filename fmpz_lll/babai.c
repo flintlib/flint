@@ -35,7 +35,7 @@ FUNC_HEAD
     {
         if (fl->gt == APPROX)
         {
-            int i, j, k, test, aa, exponent;
+            int i, j, k, test, aa, exponent, max_expo = INT_MAX;
             slong xx;
             double tmp, rtmp, halfplus, onedothalfplus;
             ulong loops;
@@ -50,12 +50,6 @@ FUNC_HEAD
             do
             {
                 test = 0;
-
-                loops++;
-                if (loops > 20)
-                {
-                    return -1;
-                }
 
                 /* ************************************** */
                 /* Step2: compute the GSO for stage kappa */
@@ -108,6 +102,24 @@ FUNC_HEAD
                         d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
                 }
 
+                if (loops >= 20)
+                {
+                    int new_max_expo = INT_MIN;
+                    for (j = 0; j < kappa; j++)
+                    {
+                        int expo2;
+                        frexp(d_mat_entry(mu, kappa, j), &expo2);
+                        new_max_expo =
+                            FLINT_MAX(new_max_expo,
+                                      expo[kappa] - expo[j] + expo2);
+                    }
+                    if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
+                    {
+                        return -1;
+                    }
+                    max_expo = new_max_expo;
+                }
+
                 /* **************************** */
                 /* Step3--5: compute the X_j's  */
                 /* **************************** */
@@ -137,6 +149,12 @@ FUNC_HEAD
                                 }
                                 _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_sub(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                             else    /* otherwise X is -1 */
                             {
@@ -149,6 +167,12 @@ FUNC_HEAD
                                 }
                                 _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_add(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                         }
                         else    /* we must have |X| >= 2 */
@@ -173,7 +197,12 @@ FUNC_HEAD
                                 xx = (slong) tmp;
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
-
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_scalar_submul_si(U->rows[kappa],
+                                                               U->rows[j],
+                                                               B->r, xx);
+                                }
                             }
                             else
                             {
@@ -196,6 +225,13 @@ FUNC_HEAD
                                     _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                                B->rows[j], n,
                                                                xx);
+                                    if (fl->store_trans)
+                                    {
+                                        _fmpz_vec_scalar_submul_si(U->rows
+                                                                   [kappa],
+                                                                   U->rows[j],
+                                                                   B->r, xx);
+                                    }
 
                                     for (k = zeros + 1; k < j; k++)
                                     {
@@ -215,6 +251,16 @@ FUNC_HEAD
                                                                     B->rows[j],
                                                                     n, xx,
                                                                     exponent);
+                                    if (fl->store_trans)
+                                    {
+                                        _fmpz_vec_scalar_submul_si_2exp(U->rows
+                                                                        [kappa],
+                                                                        U->rows
+                                                                        [j],
+                                                                        B->r,
+                                                                        xx,
+                                                                        exponent);
+                                    }
 
                                     for (k = zeros + 1; k < j; k++)
                                     {
@@ -254,6 +300,7 @@ FUNC_HEAD
                         d_mat_entry(A->appSP, kappa, i) = NAN;
 #endif
                 }
+                loops++;
             } while (test);
 
 #if TYPE == 1
@@ -273,7 +320,7 @@ FUNC_HEAD
         }
         else
         {
-            int i, j, k, test, aa, exponent;
+            int i, j, k, test, aa, exponent, max_expo = INT_MAX;
             slong exp;
             slong xx;
             double tmp, rtmp, halfplus, onedothalfplus;
@@ -289,12 +336,6 @@ FUNC_HEAD
             do
             {
                 test = 0;
-
-                loops++;
-                if (loops > 20)
-                {
-                    return -1;
-                }
 
                 /* ************************************** */
                 /* Step2: compute the GSO for stage kappa */
@@ -365,6 +406,24 @@ FUNC_HEAD
                         d_mat_entry(r, kappa, j) / d_mat_entry(r, j, j);
                 }
 
+                if (loops >= 20)
+                {
+                    int new_max_expo = INT_MIN;
+                    for (j = 0; j < kappa; j++)
+                    {
+                        int expo2;
+                        frexp(d_mat_entry(mu, kappa, j), &expo2);
+                        new_max_expo =
+                            FLINT_MAX(new_max_expo,
+                                      expo[kappa] - expo[j] + expo2);
+                    }
+                    if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
+                    {
+                        return -1;
+                    }
+                    max_expo = new_max_expo;
+                }
+
                 /* **************************** */
                 /* Step3--5: compute the X_j's  */
                 /* **************************** */
@@ -394,6 +453,12 @@ FUNC_HEAD
                                 }
                                 _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_sub(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                             else    /* otherwise X is -1 */
                             {
@@ -406,6 +471,12 @@ FUNC_HEAD
                                 }
                                 _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_add(U->rows[kappa],
+                                                  U->rows[kappa], U->rows[j],
+                                                  B->r);
+                                }
                             }
                         }
                         else    /* we must have |X| >= 2 */
@@ -430,7 +501,12 @@ FUNC_HEAD
                                 xx = (slong) tmp;
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
-
+                                if (fl->store_trans)
+                                {
+                                    _fmpz_vec_scalar_submul_si(U->rows[kappa],
+                                                               U->rows[j],
+                                                               B->r, xx);
+                                }
                             }
                             else
                             {
@@ -453,6 +529,13 @@ FUNC_HEAD
                                     _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                                B->rows[j], n,
                                                                xx);
+                                    if (fl->store_trans)
+                                    {
+                                        _fmpz_vec_scalar_submul_si(U->rows
+                                                                   [kappa],
+                                                                   U->rows[j],
+                                                                   B->r, xx);
+                                    }
 
                                     for (k = zeros + 1; k < j; k++)
                                     {
@@ -472,6 +555,16 @@ FUNC_HEAD
                                                                     B->rows[j],
                                                                     n, xx,
                                                                     exponent);
+                                    if (fl->store_trans)
+                                    {
+                                        _fmpz_vec_scalar_submul_si_2exp(U->rows
+                                                                        [kappa],
+                                                                        U->rows
+                                                                        [j],
+                                                                        B->r,
+                                                                        xx,
+                                                                        exponent);
+                                    }
 
                                     for (k = zeros + 1; k < j; k++)
                                     {
@@ -520,6 +613,7 @@ FUNC_HEAD
                     }
 #endif
                 }
+                loops++;
             } while (test);
 
 #if TYPE == 1

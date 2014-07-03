@@ -28,23 +28,23 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl)
+fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 {
-    int res = fmpz_lll_d(B, fl);
+    int res = fmpz_lll_d(B, U, fl);
 
     if (res == -1)
     {
         if (fl->rt == Z_BASIS && fl->gt == APPROX)
         {
-            res = fmpz_lll_d_heuristic(B, fl);
+            res = fmpz_lll_d_heuristic(B, U, fl);
             if (res == -1)
             {
-                res = fmpz_lll_mpf(B, fl);
+                res = fmpz_lll_mpf(B, U, fl);
             }
         }
         else
         {
-            res = fmpz_lll_mpf(B, fl);
+            res = fmpz_lll_mpf(B, U, fl);
         }
     }
 

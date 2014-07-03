@@ -35,7 +35,7 @@ int
 main(void)
 {
     int i, result = 1;
-    fmpz_mat_t mat;
+    fmpz_mat_t mat, mat2, U;
     fmpz_lll_t fl;
     mp_bitcnt_t bits;
 
@@ -59,20 +59,66 @@ main(void)
         bits = n_randint(state, 20) + 1;
         q = n_randint(state, 200) + 1;
 
-        if (n_randint(state, 1))
+        if (n_randint(state, 2))
             fmpz_mat_randntrulike(mat, state, bits, q);
         else
             fmpz_mat_randntrulike2(mat, state, bits, q);
 
         if (fl->rt == GRAM)
         {
-            fmpz_mat_gram(mat, mat);
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_mat_gram(mat, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                fmpz_mat_gram(mat2, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randntrulike): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_mat_gram(mat, mat);
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randntrulike): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 
@@ -94,7 +140,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
-        fmpz_mat_t gmat;
+        fmpz_mat_t gmat, gmat2;
 
         r = n_randint(state, 20) + 1;
         c = r + 1;
@@ -110,12 +156,58 @@ main(void)
         {
             fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
-            fmpz_lll_d_heuristic(gmat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_init(gmat2, r, r);
+                fmpz_lll_d_heuristic(gmat, U, fl);
+                fmpz_mat_mul(mat2, U, mat);
+                fmpz_mat_gram(gmat2, mat2);
+                result = fmpz_mat_equal(gmat, gmat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randintrel): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(gmat);
+                    fmpz_mat_print_pretty(gmat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+                fmpz_mat_clear(gmat2);
+            }
+            else
+            {
+                fmpz_lll_d_heuristic(gmat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced_gram(gmat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randintrel): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 
@@ -156,13 +248,59 @@ main(void)
 
         if (fl->rt == GRAM)
         {
-            fmpz_mat_gram(mat, mat);
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_mat_gram(mat, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                fmpz_mat_gram(mat2, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randajtai): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_mat_gram(mat, mat);
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randajtai): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 
@@ -199,13 +337,59 @@ main(void)
 
         if (fl->rt == GRAM)
         {
-            fmpz_mat_gram(mat, mat);
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_mat_gram(mat, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                fmpz_mat_gram(mat2, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randsimdioph): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_mat_gram(mat, mat);
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced_gram(mat, fl->delta, fl->eta);
         }
         else
         {
-            fmpz_lll_d_heuristic(mat, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_lll_d_heuristic(mat, U, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randsimdioph): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_lll_d_heuristic(mat, NULL, fl);
+            }
             result = fmpz_mat_is_reduced(mat, fl->delta, fl->eta);
         }
 

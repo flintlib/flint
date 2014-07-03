@@ -39,13 +39,13 @@
 #undef USE_NEWD
 #endif
 
-#define FUNC_HEAD int fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
+#define FUNC_HEAD int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
     if (NFF < 50)                                                      \
     {                                                                  \
         BO =                                                           \
-            fmpz_lll_check_babai(kappa, B, mu, r, s, appB, expo, A,    \
+            fmpz_lll_check_babai(kappa, B, U, mu, r, s, appB, expo, A, \
                                  alpha[kappa], zeros, kappamax,        \
                                  FLINT_MIN(kappamax + 1 + shift,       \
                                            n), fl);                    \
@@ -58,7 +58,7 @@ do {                                                                   \
     {                                                                  \
         NFF++;                                                         \
         HF =                                                           \
-            fmpz_lll_check_babai_heuristic_d(kappa, B, mu, r, s,       \
+            fmpz_lll_check_babai_heuristic_d(kappa, B, U, mu, r, s,    \
                                              appB, expo, A,            \
                                              alpha[kappa], zeros,      \
                                              kappamax,                 \

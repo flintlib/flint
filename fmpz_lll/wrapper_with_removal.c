@@ -28,24 +28,24 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_wrapper_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+fmpz_lll_wrapper_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                               const fmpz_lll_t fl)
 {
-    int res = fmpz_lll_d_with_removal(B, gs_B, fl);
+    int res = fmpz_lll_d_with_removal(B, U, gs_B, fl);
 
     if (res == -1)
     {
         if (fl->rt == Z_BASIS && fl->gt == APPROX)
         {
-            res = fmpz_lll_d_heuristic_with_removal(B, gs_B, fl);
+            res = fmpz_lll_d_heuristic_with_removal(B, U, gs_B, fl);
             if (res == -1)
             {
-                res = fmpz_lll_mpf_with_removal(B, gs_B, fl);
+                res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
             }
         }
         else
         {
-            res = fmpz_lll_mpf_with_removal(B, gs_B, fl);
+            res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
         }
     }
 

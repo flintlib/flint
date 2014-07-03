@@ -28,7 +28,7 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl)
+fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 {
     mp_bitcnt_t prec = 0;
     int result, num_loops = 0;
@@ -40,7 +40,7 @@ fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl)
         else
             prec *= 2;
 
-        result = fmpz_lll_mpf2(B, prec, fl);
+        result = fmpz_lll_mpf2(B, U, prec, fl);
 
         num_loops++;
     } while ((result == -1) && (prec < UWORD_MAX));

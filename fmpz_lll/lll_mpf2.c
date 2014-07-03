@@ -35,7 +35,7 @@
 #undef USE_NEWD
 #endif
 
-#define FUNC_HEAD int fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
+#define FUNC_HEAD int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_lll_t fl)
 #define USE_NEWD(ND, FLAG, GSN)                                        \
 do {                                                                   \
     if (!FLAG)                                                         \

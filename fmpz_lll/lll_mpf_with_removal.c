@@ -28,7 +28,8 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_mpf_with_removal(fmpz_mat_t B, const fmpz_t gs_B, const fmpz_lll_t fl)
+fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
+                          const fmpz_lll_t fl)
 {
     mp_bitcnt_t prec = 0;
     int result, num_loops = 0;
@@ -40,7 +41,7 @@ fmpz_lll_mpf_with_removal(fmpz_mat_t B, const fmpz_t gs_B, const fmpz_lll_t fl)
         else
             prec *= 2;
 
-        result = fmpz_lll_mpf2_with_removal(B, prec, gs_B, fl);
+        result = fmpz_lll_mpf2_with_removal(B, U, prec, gs_B, fl);
 
         num_loops++;
     } while ((result == -1) && (prec < UWORD_MAX));

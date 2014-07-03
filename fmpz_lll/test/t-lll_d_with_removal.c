@@ -35,7 +35,7 @@ int
 main(void)
 {
     int i, result = 1, newd;
-    fmpz_mat_t mat;
+    fmpz_mat_t mat, mat2, U;
     fmpz_t bound;
     fmpz_lll_t fl;
     mp_bitcnt_t bits;
@@ -61,23 +61,69 @@ main(void)
         bits = n_randint(state, 20) + 1;
         q = n_randint(state, 200) + 1;
 
-        if (n_randint(state, 1))
+        if (n_randint(state, 2))
             fmpz_mat_randntrulike(mat, state, bits, q);
         else
             fmpz_mat_randntrulike2(mat, state, bits, q);
-
         fmpz_randtest(bound, state, bits);
+
         if (fl->rt == GRAM)
         {
-            fmpz_mat_gram(mat, mat);
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_mat_gram(mat, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                fmpz_mat_gram(mat2, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randntrulike): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_mat_gram(mat, mat);
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
                                                       bound, newd);
         }
         else
         {
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randntrulike): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
                                                  bound, newd);
@@ -102,7 +148,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r, c;
-        fmpz_mat_t gmat;
+        fmpz_mat_t gmat, gmat2;
 
         r = n_randint(state, 20) + 1;
         c = r + 1;
@@ -114,20 +160,66 @@ main(void)
         bits = n_randint(state, 200) + 1;
 
         fmpz_mat_randintrel(mat, state, bits);
-
         fmpz_randtest(bound, state, bits);
+
         if (fl->rt == GRAM)
         {
             fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
-            newd = fmpz_lll_d_with_removal(gmat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_init(gmat2, r, r);
+                newd = fmpz_lll_d_with_removal(gmat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat);
+                fmpz_mat_gram(gmat2, mat2);
+                result = fmpz_mat_equal(gmat, gmat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randintrel): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(gmat);
+                    fmpz_mat_print_pretty(gmat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+                fmpz_mat_clear(gmat2);
+            }
+            else
+            {
+                newd = fmpz_lll_d_with_removal(gmat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(gmat, fl->delta, fl->eta,
                                                       bound, newd);
         }
         else
         {
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randintrel): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
                                                  bound, newd);
@@ -169,19 +261,65 @@ main(void)
         fmpz_lll_randtest(fl, state);
 
         fmpz_mat_randajtai(mat, state, 0.5);
-
         fmpz_randtest(bound, state, n_randint(state, 200));
+
         if (fl->rt == GRAM)
         {
-            fmpz_mat_gram(mat, mat);
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_mat_gram(mat, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                fmpz_mat_gram(mat2, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randajtai): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_mat_gram(mat, mat);
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
                                                       bound, newd);
         }
         else
         {
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randajtai): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
                                                  bound, newd);
@@ -219,19 +357,65 @@ main(void)
         bits2 = n_randint(state, 5) + 1;
 
         fmpz_mat_randsimdioph(mat, state, bits, bits2);
-
         fmpz_randtest(bound, state, bits);
+
         if (fl->rt == GRAM)
         {
-            fmpz_mat_gram(mat, mat);
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                fmpz_mat_gram(mat, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                fmpz_mat_gram(mat2, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randsimdioph): gram matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                fmpz_mat_gram(mat, mat);
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_gram_with_removal(mat, fl->delta, fl->eta,
                                                       bound, newd);
         }
         else
         {
-            newd = fmpz_lll_d_with_removal(mat, bound, fl);
+            if (fl->store_trans)
+            {
+                fmpz_mat_init(U, r, r);
+                fmpz_mat_init(mat2, r, c);
+                fmpz_mat_set(mat2, mat);
+                newd = fmpz_lll_d_with_removal(mat, U, bound, fl);
+                fmpz_mat_mul(mat2, U, mat2);
+                result = fmpz_mat_equal(mat, mat2);
+                if (!result)
+                {
+                    flint_printf
+                        ("FAIL (randsimdioph): basis matrices not equal!\n");
+                    fmpz_mat_print_pretty(mat);
+                    fmpz_mat_print_pretty(mat2);
+                    abort();
+                }
+                fmpz_mat_clear(U);
+                fmpz_mat_clear(mat2);
+            }
+            else
+            {
+                newd = fmpz_lll_d_with_removal(mat, NULL, bound, fl);
+            }
             result =
                 fmpz_mat_is_reduced_with_removal(mat, fl->delta, fl->eta,
                                                  bound, newd);
