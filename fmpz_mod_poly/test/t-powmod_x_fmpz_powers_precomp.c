@@ -50,17 +50,16 @@ main(void)
     FLINT_TEST_INIT(state);
     
 
-    flint_printf("powmod_x_fmpz_powers_precomp....");
+    flint_printf("powmod_x_fmpz_preinv....");
     fflush(stdout);
 
     /* No aliasing */
     for (i = 0; i < 500; i++)
     {
-        fmpz_mod_poly_t a, res1, res2, f;
+        fmpz_mod_poly_t a, res1, res2, f, finv;
         fmpz_t p;
         ulong exp;
         fmpz_t expz;
-        fmpz_mod_poly_powers_precomp_t pre;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
@@ -68,17 +67,20 @@ main(void)
 
 
         fmpz_mod_poly_init(f, p);
+        fmpz_mod_poly_init(finv, p);
         fmpz_mod_poly_init(res1, p);
         fmpz_mod_poly_init(res2, p);
 
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
         fmpz_init_set_ui(expz, exp);
 
+        fmpz_mod_poly_reverse (finv, f, f->length);
+        fmpz_mod_poly_inv_series_newton (finv, finv, f->length);
+
         fmpz_mod_poly_init2(a, p, f->length-1);
         fmpz_mod_poly_set_coeff_ui (a, 1, 1);
-        fmpz_mod_poly_powers_precompute(pre, f);
-        fmpz_mod_poly_powmod_x_fmpz_powers_precomp(res1, expz, f, pre);
-        fmpz_mod_poly_powmod_fmpz_binexp_powers_precomp(res2, a, expz, f, pre);
+        fmpz_mod_poly_powmod_x_fmpz_preinv(res1, expz, f, finv);
+        fmpz_mod_poly_powmod_fmpz_binexp_preinv(res2, a, expz, f, finv);
 
         result = (fmpz_mod_poly_equal(res1, res2));
         if (!result)
@@ -87,6 +89,7 @@ main(void)
             flint_printf("expz:\n"); fmpz_print(expz), flint_printf("\n\n");
             flint_printf("a:\n"); fmpz_mod_poly_print(a), flint_printf("\n\n");
             flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
+            flint_printf("finv:\n"); fmpz_mod_poly_print(finv), flint_printf("\n\n");
             flint_printf("res1:\n"); fmpz_mod_poly_print(res1), flint_printf("\n\n");
             flint_printf("res2:\n"); fmpz_mod_poly_print(res2), flint_printf("\n\n");
             abort();
@@ -97,18 +100,17 @@ main(void)
         fmpz_mod_poly_clear(f);
         fmpz_mod_poly_clear(res1);
         fmpz_mod_poly_clear(res2);
-        fmpz_mod_poly_powers_clear(pre);
+        fmpz_mod_poly_clear(finv);
         fmpz_clear(expz);
     }
 
     /* Aliasing of res and f */
     for (i = 0; i < 250; i++)
     {
-        fmpz_mod_poly_t res, f;
+        fmpz_mod_poly_t res, f, finv;
         fmpz_t p;
         ulong exp;
         fmpz_t expz;
-        fmpz_mod_poly_powers_precomp_t pre;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
@@ -116,19 +118,23 @@ main(void)
         fmpz_init_set_ui(expz, exp);
 
         fmpz_mod_poly_init(f, p);
+        fmpz_mod_poly_init(finv, p);
         fmpz_mod_poly_init(res, p);
 
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
 
-        fmpz_mod_poly_powers_precompute(pre, f);
-        fmpz_mod_poly_powmod_x_fmpz_powers_precomp(res, expz, f, pre);
-        fmpz_mod_poly_powmod_x_fmpz_powers_precomp(f, expz, f, pre);
+        fmpz_mod_poly_reverse (finv, f, f->length);
+        fmpz_mod_poly_inv_series_newton (finv, finv, f->length);
+
+        fmpz_mod_poly_powmod_x_fmpz_preinv(res, expz, f, finv);
+        fmpz_mod_poly_powmod_x_fmpz_preinv(f, expz, f, finv);
 
         result = (fmpz_mod_poly_equal(res, f));
         if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
+            flint_printf("finv:\n"); fmpz_mod_poly_print(finv), flint_printf("\n\n");
             flint_printf("expz:\n"); fmpz_print(expz), flint_printf("\n\n");
             flint_printf("res:\n"); fmpz_mod_poly_print(res), flint_printf("\n\n");
             abort();
@@ -136,7 +142,51 @@ main(void)
 
         fmpz_clear(p);
         fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_powers_clear(pre);
+        fmpz_mod_poly_clear(finv);
+        fmpz_mod_poly_clear(res);
+        fmpz_clear(expz);
+    }
+
+    /* Aliasing of res and finv */
+    for (i = 0; i < 250; i++)
+    {
+        fmpz_mod_poly_t res, f, finv;
+        fmpz_t p;
+        ulong exp;
+        fmpz_t expz;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randtest_prime(state, 0));
+        exp = n_randint(state, 50);
+        fmpz_init_set_ui(expz, exp);
+
+        fmpz_mod_poly_init(f, p);
+        fmpz_mod_poly_init(finv, p);
+        fmpz_mod_poly_init(res, p);
+
+        fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
+
+
+        fmpz_mod_poly_reverse (finv, f, f->length);
+        fmpz_mod_poly_inv_series_newton (finv, finv, f->length);
+
+        fmpz_mod_poly_powmod_x_fmpz_preinv(res, expz, f, finv);
+        fmpz_mod_poly_powmod_x_fmpz_preinv(finv, expz, f, finv);
+
+        result = (fmpz_mod_poly_equal(res, finv));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("f:\n"); fmpz_mod_poly_print(f), flint_printf("\n\n");
+            flint_printf("expz:\n"); fmpz_print(expz), flint_printf("\n\n");
+            flint_printf("finv:\n"); fmpz_mod_poly_print(finv), flint_printf("\n\n");
+            flint_printf("res:\n"); fmpz_mod_poly_print(res), flint_printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(p);
+        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_clear(finv);
         fmpz_mod_poly_clear(res);
         fmpz_clear(expz);
     }
@@ -144,10 +194,9 @@ main(void)
     /* Check that x^(b+c) = x^b * x^c */
     for (i = 0; i < 500; i++)
     {
-        fmpz_mod_poly_t res1, res2, res3, res4, f;
+        fmpz_mod_poly_t res1, res2, res3, res4, f, finv;
         fmpz_t p;
         fmpz_t exp1, exp2, exp3;
-        fmpz_mod_poly_powers_precomp_t pre;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
@@ -160,6 +209,7 @@ main(void)
         if (fmpz_sgn(exp2) == -1) fmpz_neg(exp2, exp2);
 
         fmpz_mod_poly_init(f, p);
+        fmpz_mod_poly_init(finv, p);
         fmpz_mod_poly_init(res1, p);
         fmpz_mod_poly_init(res2, p);
         fmpz_mod_poly_init(res3, p);
@@ -167,13 +217,15 @@ main(void)
 
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1);
 
-        fmpz_mod_poly_powers_precompute(pre, f);
-        fmpz_mod_poly_powmod_x_fmpz_powers_precomp(res1, exp1, f, pre);
-        fmpz_mod_poly_powmod_x_fmpz_powers_precomp(res2, exp2, f, pre);
+        fmpz_mod_poly_reverse (finv, f, f->length);
+        fmpz_mod_poly_inv_series_newton (finv, finv, f->length);
+
+        fmpz_mod_poly_powmod_x_fmpz_preinv(res1, exp1, f, finv);
+        fmpz_mod_poly_powmod_x_fmpz_preinv(res2, exp2, f, finv);
         fmpz_mod_poly_mulmod(res4, res1, res2, f);
         fmpz_init(exp3);
         fmpz_add(exp3, exp1, exp2);
-        fmpz_mod_poly_powmod_x_fmpz_powers_precomp(res3, exp3, f, pre);
+        fmpz_mod_poly_powmod_x_fmpz_preinv(res3, exp3, f, finv);
 
         result = (fmpz_mod_poly_equal(res4, res3));
         if (!result)
@@ -187,7 +239,7 @@ main(void)
 
         fmpz_clear(p);
         fmpz_mod_poly_clear(f);
-        fmpz_mod_poly_powers_clear(pre);
+        fmpz_mod_poly_clear(finv);
         fmpz_mod_poly_clear(res1);
         fmpz_mod_poly_clear(res2);
         fmpz_mod_poly_clear(res3);
