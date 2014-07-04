@@ -66,7 +66,7 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
    fmpz_sub_ui(nm1, n, 1);
    fmpz_factor_init(fac);
 
-   while (p < limit)
+   while (p < limit && !fmpz_is_one(nm1))
    {
       /* get next batch of primes */
       for (count = 0; count < num && p < limit; count++)
@@ -106,9 +106,12 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
       {
          for (i = 0; i < count; i++)
          {
+            slong d;
+            
             if (fmpz_equal(g, vec + i))
             {
-               _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), 1);
+               d = fmpz_remove(nm1, nm1, vec + i);
+               _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), d);
                break;
             }
 
@@ -117,7 +120,8 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
             if (fmpz_is_zero(r))
             {
                fmpz_set(g, q);
-               _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), 1);
+               d = fmpz_remove(nm1, nm1, vec + i);
+               _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), d);
             }
          }
       }
@@ -126,14 +130,21 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
    /* compute product F of found primes */
    fmpz_set_ui(F, 1);
    for (i = 0; i < fac->num; i++)
-      fmpz_mul(F, F, fac->p + i);
+   {
+      if (fac->exp[i] == 1)
+         fmpz_mul(F, F, fac->p + i);
+      else
+      {
+         fmpz_pow_ui(pow, fac->p + i, fac->exp[i]);
+         fmpz_mul(F, F, pow);
+      }
+   }
    
    for (a = 2; ; a++)
    {
       /* compute a^((n-1)/F) mod n */
-      fmpz_tdiv_q(ex, nm1, F);
       fmpz_set_ui(pow, a);
-      fmpz_powm(pow, pow, ex, n);
+      fmpz_powm(pow, pow, nm1, n);
       
       /* check a^(n-1) = 1 mod n */
       fmpz_powm(pow2, pow, F, n);
