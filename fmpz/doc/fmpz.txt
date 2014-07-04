@@ -1113,6 +1113,17 @@ int fmpz_is_probabprime_lucas(const fmpz_t n)
     Return $1$ if $n$ is a Lucas probable prime, otherwise return $0$. This
     function declares some composites probably prime, but no primes composite.
 
+int fmpz_is_probabprime_BPSW(const fmpz_t n)
+
+    Perform a Baillie-PSW probable prime test with parameters chosen by 
+    Baillie's method $A$ as per~\citep{BaiWag1980}.
+
+    Return $1$ if $n$ is a Lucas probable prime, otherwise return $0$. 
+
+    There are no known composites passed as prime by this test, though
+    infinitely many probably exist. The test will declare no primes
+    composite.
+
 int fmpz_is_probabprime(const fmpz_t p)
 
     Performs some trial division and then some probabilistic primality tests.
