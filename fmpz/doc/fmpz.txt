@@ -1100,6 +1100,11 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 
 *******************************************************************************
 
+int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t a)
+
+    Returns $1$ if n is a strong probable prime to base $a$, otherwise it
+    returns $0$.
+
 int fmpz_is_probabprime_lucas(const fmpz_t n)
 
     Performs a Lucas probable prime test with parameters chosen by Baillie's

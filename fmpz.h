@@ -669,6 +669,8 @@ void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A,
 
 int fmpz_is_probabprime_lucas(const fmpz_t n);
 
+int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t a);
+
 int fmpz_is_probabprime(const fmpz_t p);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
