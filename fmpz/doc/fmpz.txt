@@ -1100,6 +1100,14 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 
 *******************************************************************************
 
+int fmpz_is_probabprime_lucas(const fmpz_t n)
+
+    Performs a Lucas probable prime test with parameters chosen by Baillie's
+    method $A$ as per~\citep{BaiWag1980}.
+
+    Return $1$ if $n$ is a Lucas probable prime, otherwise return $0$. This
+    function declares some composites probably prime, but no primes composite.
+
 int fmpz_is_probabprime(const fmpz_t p)
 
     Performs some trial division and then some probabilistic primality tests.
@@ -1184,6 +1192,17 @@ int fmpz_is_prime(const fmpz_t n)
     The function assumes that $n$ is very likely prime, i.e. it is not very
     efficient if $n$ is composite. A strong probable prime test should be
     run first to ensure that $n$ is probably prime.
+
+void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
+                                                const fmpz_t m, const fmpz_t n)
+
+    Given $V_0 = 2$, $V_1 = A$ compute $V_m$ and $V_{m + 1}$ from the
+    recurrences $V_j = AV_{j - 1} - V_{j - 2} \pmod{n}$.
+
+    This is computed efficiently using $V_{2j} = V_j^2 - 2 \pmod{n}$ and
+    $V_{2j + 1} = V_jV_{j + 1} - A \pmod{n}$.
+
+    No aliasing is permitted.
 
 *******************************************************************************
 

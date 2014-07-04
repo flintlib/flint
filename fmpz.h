@@ -664,11 +664,18 @@ mp_limb_t fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 
 mp_limb_t fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 
+void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
+                                               const fmpz_t m, const fmpz_t n);
+
+int fmpz_is_probabprime_lucas(const fmpz_t n);
+
 int fmpz_is_probabprime(const fmpz_t p);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
 
 int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit);
+
+int fmpz_is_prime(const fmpz_t p);
 
 /* Primorials */
 
