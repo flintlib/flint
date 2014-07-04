@@ -127,7 +127,7 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
       }
    }
 
-   if (fmpz_is_probabprime_lucas(nm1)) /* fast test first */
+   if (fmpz_is_probabprime_BPSW(nm1)) /* fast test first */
    {
       if (fmpz_is_prime(nm1) == 1)
       {
