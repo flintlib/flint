@@ -127,6 +127,15 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
       }
    }
 
+   if (fmpz_is_probabprime_lucas(nm1)) /* fast test first */
+   {
+      if (fmpz_is_prime(nm1) == 1)
+      {
+         _fmpz_factor_append(fac, nm1, 1);
+         fmpz_set_ui(nm1, 1);
+      }
+   }
+
    /* compute product F of found primes */
    fmpz_set_ui(F, 1);
    for (i = 0; i < fac->num; i++)
