@@ -45,6 +45,9 @@ int fmpz_is_prime(const fmpz_t n)
    if (fmpz_is_even(n))
       return (fmpz_cmp_ui(n, 2) == 0);
 
+   if (fmpz_is_square(n))
+      return 0;
+
    {
       double logd = log(fmpz_get_d(n));
       ulong limit = (ulong) (logd*logd*logd/10.0) + 2;
@@ -63,9 +66,7 @@ int fmpz_is_prime(const fmpz_t n)
          if (fmpz_cmp(F2, n) < 0)
          {
             fmpz_mul(F3, F2, F);
-            if (fmpz_cmp(F3, n) < 0)
-               res = -1;
-            else /* Brillhart, Lehmer, Selfridge test */
+            if (fmpz_cmp(F3, n) >= 0) /* Brillhart, Lehmer, Selfridge test */
             {
                fmpz_t n1, c2, c1;
 
@@ -88,9 +89,26 @@ int fmpz_is_prime(const fmpz_t n)
                fmpz_clear(n1);
                fmpz_clear(c2);
                fmpz_clear(c1);
+            } else /* p + 1 test */
+            {
+               fmpz_t FF;
+         
+               fmpz_init(FF);
+         
+               res = fmpz_is_prime_morrison(FF, n, limit);
+
+               if (res == 1)
+               {
+                  fmpz_sub_ui(FF, FF, 1); /* need F - 1 > sqrt(n) */
+                  fmpz_mul(F2, FF, FF);
+                  if (fmpz_cmp(F2, n) <= 0)
+                     res = -1;
+               }
+
+               fmpz_clear(FF);
             }
          }
-      }
+      } 
 
       fmpz_clear(F);
       fmpz_clear(F2);

@@ -701,6 +701,8 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n);
 
 int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit);
 
+int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit);
+
 int fmpz_is_prime(const fmpz_t p);
 
 /* Primorials */

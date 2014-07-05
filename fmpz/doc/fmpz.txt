@@ -1216,7 +1216,7 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
     small multiple of $\log^3(n)/10$ (e.g. $1, 2, 5$ or $10$) depending
     on how long one is prepared to wait.
 
-    Requires $n$ to be odd.
+    Requires $n$ to be odd and non-square.
 
 int fmpz_is_prime(const fmpz_t n)
 
