@@ -1197,13 +1197,14 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
 
     Requires $n$ to be odd.
 
-int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
+int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit)
 
     Applies the Morrison $p + 1$ primality test. The test computes a 
     product $F$ of primes up to \code{limit} which divide $n + 1$. 
 
     The function then returns either $0$ if $n$ is definitely composite
-    or it returns $1$ if all factors of $n$ are $\pm 1 \pmod{F}$.
+    or it returns $1$ if all factors of $n$ are $\pm 1 \pmod{F}$. Also in
+    that case, $R$ is set to $(n + 1)/F$.
 
     N.B: a return value of $1$ only proves $n$ prime if 
     $F > \sqrt{n} + 1$.

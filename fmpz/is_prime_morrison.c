@@ -34,13 +34,12 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
+int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit)
 {
    n_primes_t iter;
    slong num, i, count, num2;
    mp_limb_t p = 0, a, b;
    fmpz * vec, * vec2;
-   fmpz_t np1; /* n + 1 */
    fmpz_t g, q, r, ex, c, D, Dinv, A, B, Ukm, Ukm1, Um, Um1, Vm, Vm1;
    fmpz_factor_t fac;
    int res = 0;
@@ -64,7 +63,6 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
    fmpz_init(g);
    fmpz_init(c);
    fmpz_init(ex);
-   fmpz_init(np1);
    fmpz_init(Um);
    fmpz_init(Um1);
    fmpz_init(Ukm);
@@ -73,9 +71,9 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
    fmpz_init(Vm1);
    fmpz_factor_init(fac);
 
-   fmpz_add_ui(np1, n, 1);
+   fmpz_add_ui(R, n, 1); /* start at n + 1 */
    
-   while (p < limit && !fmpz_is_one(np1))
+   while (p < limit && !fmpz_is_one(R))
    {
       /* get next batch of primes */
       for (count = 0; count < num && p < limit; count++)
@@ -109,7 +107,7 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
       }
 
       /* gcd product with n - 1 */
-      fmpz_gcd(g, np1, vec2 + 0);
+      fmpz_gcd(g, R, vec2 + 0);
 
       if (!fmpz_is_one(g)) /* we have some factors */
       {
@@ -119,7 +117,7 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
             
             if (fmpz_equal(g, vec + i))
             {
-               d = fmpz_remove(np1, np1, vec + i);
+               d = fmpz_remove(R, R, vec + i);
                _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), d);
                break;
             }
@@ -129,19 +127,19 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
             if (fmpz_is_zero(r))
             {
                fmpz_set(g, q);
-               d = fmpz_remove(np1, np1, vec + i);
+               d = fmpz_remove(R, R, vec + i);
                _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), d);
             }
          }
       }
    }
 
-   if (fmpz_is_probabprime_BPSW(np1)) /* fast test first */
+   if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
    {
-      if (fmpz_is_prime(np1) == 1)
+      if (fmpz_is_prime(R) == 1)
       {
-         _fmpz_factor_append(fac, np1, 1);
-         fmpz_set_ui(np1, 1);
+         _fmpz_factor_append(fac, R, 1);
+         fmpz_set_ui(R, 1);
       }
    }
 
@@ -174,7 +172,7 @@ int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
       fmpz_invmod(Dinv, D, n);
 
       /* compute U((n+1)/F) mod n */
-      fmpz_lucas_chain_full(Vm, Vm1, A, B, np1, n);
+      fmpz_lucas_chain_full(Vm, Vm1, A, B, R, n);
       fmpz_lucas_chain_VtoU(Um, Um1, Vm, Vm1, A, B, Dinv, n);
 
       /* check U(n+1) = 0 mod n */
@@ -221,7 +219,6 @@ cleanup:
    fmpz_clear(q);
    fmpz_clear(r);
    fmpz_clear(g);
-   fmpz_clear(np1);
    fmpz_clear(Um);
    fmpz_clear(Um1);
    fmpz_clear(Ukm);

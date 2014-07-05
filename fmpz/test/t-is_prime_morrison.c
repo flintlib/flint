@@ -41,17 +41,18 @@ main(void)
 
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
-        fmpz_t p, F;
+        fmpz_t p, F, R;
 
         fmpz_init(p);
         fmpz_init(F);
+        fmpz_init(R);
 
         do {
            fmpz_randbits(p, state, n_randint(state, 330) + 2);
            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
-        result = fmpz_is_prime_morrison(F, p, 1000000);
+        result = fmpz_is_prime_morrison(F, R, p, 1000000);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -61,6 +62,7 @@ main(void)
 
         fmpz_clear(p);
         fmpz_clear(F);
+        fmpz_clear(R);
     }
 
     FLINT_TEST_CLEANUP(state);
