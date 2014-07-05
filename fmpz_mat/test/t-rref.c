@@ -126,7 +126,13 @@ main(void)
             abort();
         }
 
-        check_rref(R, den, rank1);
+        if (!check_rref(R, den, rank1))
+        {
+            flint_printf("FAIL matrix not in rref!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(R); flint_printf("\n\n");
+            abort();
+        }
 
         /* Concatenate the original matrix with the rref, scramble the rows,
             and check that the rref is the same */
