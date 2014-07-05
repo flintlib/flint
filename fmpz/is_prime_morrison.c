@@ -159,6 +159,18 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit)
    /* Want D = A^2 - 4B where A = a, B = b, such that (D/n) = -1 */
    for (b = 1; ; b++)
    {
+      fmpz_set_si(B, b);
+      fmpz_gcd(g, B, n);
+
+      if (fmpz_equal(g, n)) /* need gcd(n, b) = 1 */
+         continue;
+
+      if (!fmpz_is_one(g)) /* found a factor of n */
+      {
+         res = 0;
+         goto cleanup;
+      }
+
       a = 2;
       do {
          a++;
@@ -166,8 +178,6 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit)
          fmpz_mul_ui(D, A, a);
          fmpz_sub_ui(D, D, 4*b);
       } while (fmpz_jacobi(D, n) != -1);
-
-      fmpz_set_si(B, b);
 
       fmpz_invmod(Dinv, D, n);
 
