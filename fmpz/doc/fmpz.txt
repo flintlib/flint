@@ -1183,12 +1183,33 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit)
     $F$ of primes up to \code{limit} which divide $n - 1$. 
 
     The function then returns either $0$ if $n$ is definitely composite
-    or it returns $1$ is all factors of $n$ are $1 \pmod{F}$.
+    or it returns $1$ if all factors of $n$ are $1 \pmod{F}$.
 
     N.B: a return value of $1$ only proves $n$ prime if $F >= \sqrt{n}$.
 
     There is a balance between the amount of time spent looking for
     factors of $n - 1$ (as specified by \code{limit}) and the usefulness
+    of the output ($F$ may be as low as $2$ in some cases).
+
+    A reasonable heuristic seems to be to choose \code{limit} to be some
+    small multiple of $\log^3(n)/10$ (e.g. $1, 2, 5$ or $10$) depending
+    on how long one is prepared to wait.
+
+    Requires $n$ to be odd.
+
+int fmpz_is_prime_morrison(fmpz_t F, const fmpz_t n, ulong limit)
+
+    Applies the Morrison $p + 1$ primality test. The test computes a 
+    product $F$ of primes up to \code{limit} which divide $n + 1$. 
+
+    The function then returns either $0$ if $n$ is definitely composite
+    or it returns $1$ if all factors of $n$ are $\pm 1 \pmod{F}$.
+
+    N.B: a return value of $1$ only proves $n$ prime if 
+    $F > \sqrt{n} + 1$.
+
+    There is a balance between the amount of time spent looking for
+    factors of $n + 1$ (as specified by \code{limit}) and the usefulness
     of the output ($F$ may be as low as $2$ in some cases).
 
     A reasonable heuristic seems to be to choose \code{limit} to be some
@@ -1212,13 +1233,62 @@ int fmpz_is_prime(const fmpz_t n)
 void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
                                                 const fmpz_t m, const fmpz_t n)
 
-    Given $V_0 = 2$, $V_1 = A$ compute $V_m$ and $V_{m + 1}$ from the
+    Given $V_0 = 2$, $V_1 = A$ compute $V_m, V_{m + 1} \pmod{n}$ from the
     recurrences $V_j = AV_{j - 1} - V_{j - 2} \pmod{n}$.
 
     This is computed efficiently using $V_{2j} = V_j^2 - 2 \pmod{n}$ and
     $V_{2j + 1} = V_jV_{j + 1} - A \pmod{n}$.
 
     No aliasing is permitted.
+
+void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
+                                const fmpz_t B, const fmpz_t m, const fmpz_t n)
+
+    Given $V_0 = 2$, $V_1 = A$ compute $V_m, V_{m + 1} \pmod{n}$ from the
+    recurrences $V_j = AV_{j - 1} - BV_{j - 2} \pmod{n}$.
+
+    This is computed efficiently using double and add formulas.
+
+    No aliasing is permitted.
+
+void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um, 
+                                         const fmpz_t Um1, const fmpz_t A, 
+                                                const fmpz_t B, const fmpz_t n)
+
+    Given $U_m, U_{m + 1} \pmod{n}$ compute $U_{2m}, U_{2m + 1} \pmod{n}$.
+
+    Aliasing of $U_{2m}$ and $U_m$ and aliasing of $U_{2m + 1}$ and $U_{m + 1}$
+    is permitted. No other aliasing is allowed. 
+
+void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um, 
+                                     const fmpz_t Um1, const fmpz_t Un, 
+                                          const fmpz_t Un1, const fmpz_t A, 
+                                                const fmpz_t B, const fmpz_t n)
+
+    Given $U_m, U_{m + 1} \pmod{n}$ and $U_n, U_{n + 1} \pmod{n}$ compute 
+    $U_{m + n}, U_{m + n + 1} \pmod{n}$.
+
+    Aliasing of $U_{m + n}$ with $U_m$ or $U_n$ and aliasing of $U_{m + n + 1}$ 
+    with $U_{m + 1}$ or $U_{n + 1}$ is permitted. No other aliasing is allowed. 
+
+void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1,
+                               const fmpz_t Um, const fmpz_t Um1,
+                           const fmpz_t A, const fmpz_t B, const fmpz_t k, 
+                                                                const fmpz_t n)
+    Given $U_m, U_{m + 1} \pmod{n}$ compute $U_{km}, U_{km + 1} \pmod{n}$.
+
+    Aliasing of $U_{km}$ and $U_m$ and aliasing of $U_{km + 1}$ and $U_{m + 1}$
+    is permitted. No other aliasing is allowed. 
+  
+void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1, 
+                            const fmpz_t Vm, const fmpz_t Vm1,
+                      const fmpz_t A, const fmpz_t B, const fmpz_t Dinv, 
+                                                                const fmpz_t n)
+
+    Given $V_m, V_{m + 1} \pmod{n}$ compute $U_m, U_{m + 1} \pmod{n}$.
+
+    Aliasing of $V_m$ and $U_m$ and aliasing of $V_{m + 1}$ and $U_{m + 1}$
+    is permitted. No other aliasing is allowed. 
 
 *******************************************************************************
 
