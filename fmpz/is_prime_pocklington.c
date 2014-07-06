@@ -80,11 +80,10 @@ void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong 
    }
 }
 
-int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, mp_ptr pm1, slong num_pm1)
+int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, slong num_pm1)
 {
    slong i, d;
    ulong a;
-   fmpz_t nm1; /* n - 1 */
    fmpz_t g, q, r, pow, pow2, ex, c, p;
    fmpz_factor_t fac;
    int res = 0;
@@ -97,24 +96,23 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, mp_ptr pm1, slong num_pm
    fmpz_init(pow2);
    fmpz_init(c);
    fmpz_init(ex);
-   fmpz_init(nm1);
    fmpz_factor_init(fac);
 
-   fmpz_sub_ui(nm1, n, 1); /* start with n - 1 */
+   fmpz_sub_ui(R, n, 1); /* start with n - 1 */
 
    for (i = 0; i < num_pm1; i++)
    {
       fmpz_set_ui(p, pm1[i]);
-      d = fmpz_remove(nm1, nm1, p);
+      d = fmpz_remove(R, R, p);
       _fmpz_factor_append_ui(fac, pm1[i], d);
    }
 
-   if (fmpz_is_probabprime_BPSW(nm1)) /* fast test first */
+   if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
    {
-      if (fmpz_is_prime(nm1) == 1)
+      if (fmpz_is_prime(R) == 1)
       {
-         _fmpz_factor_append(fac, nm1, 1);
-         fmpz_set_ui(nm1, 1);
+         _fmpz_factor_append(fac, R, 1);
+         fmpz_set_ui(R, 1);
       }
    }
 
@@ -135,7 +133,7 @@ int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, mp_ptr pm1, slong num_pm
    {
       /* compute a^((n-1)/F) mod n */
       fmpz_set_ui(pow, a);
-      fmpz_powm(pow, pow, nm1, n);
+      fmpz_powm(pow, pow, R, n);
       
       /* check a^(n-1) = 1 mod n */
       fmpz_powm(pow2, pow, F, n);
@@ -183,7 +181,6 @@ cleanup:
    fmpz_clear(q);
    fmpz_clear(r);
    fmpz_clear(g);
-   fmpz_clear(nm1);
 
    return res;
 }

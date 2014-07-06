@@ -56,9 +56,10 @@ int fmpz_is_prime(const fmpz_t n)
       const ulong * primes; 
       const double * pinv;
 
-      fmpz_t F1, Fsqr, Fcub;
+      fmpz_t F1, Fsqr, Fcub, R;
 
       fmpz_init(F1);
+      fmpz_init(R);
       fmpz_init(Fsqr);
       fmpz_init(Fcub);
 
@@ -103,7 +104,7 @@ int fmpz_is_prime(const fmpz_t n)
          pinv += num;
       }
 
-      res = fmpz_is_prime_pocklington(F1, n, pm1, num_pm1);
+      res = fmpz_is_prime_pocklington(F1, R, n, pm1, num_pm1);
 
       if (res == 1)
       {
@@ -136,12 +137,11 @@ int fmpz_is_prime(const fmpz_t n)
                fmpz_clear(c1);
             } else /* p + 1 test */
             {
-               fmpz_t F2, Fm1, R;
+               fmpz_t F2, Fm1;
          
                fmpz_init(F2);
                fmpz_init(Fm1);
-               fmpz_init(R);
-         
+               
                res = fmpz_is_prime_morrison(F2, R, n, pp1, num_pp1);
 
                if (res == 1)
@@ -223,7 +223,6 @@ int fmpz_is_prime(const fmpz_t n)
 
                fmpz_clear(F2);
                fmpz_clear(Fm1);
-               fmpz_clear(R);
             }
          }
       } 
@@ -232,6 +231,7 @@ int fmpz_is_prime(const fmpz_t n)
       _nmod_vec_clear(pp1);
 
       fmpz_clear(F1);
+      fmpz_clear(R);
       fmpz_clear(Fsqr);
       fmpz_clear(Fcub);
    }

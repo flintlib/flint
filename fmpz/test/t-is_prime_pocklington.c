@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
-        fmpz_t p, F;
+        fmpz_t p, F, R;
         mp_ptr pm1;
         slong num_pm1;
         ulong limit;
@@ -50,6 +50,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_init(F);
+        fmpz_init(R);
 
         do {
            fmpz_randbits(p, state, n_randint(state, 330) + 2);
@@ -62,7 +63,7 @@ main(void)
         pm1 = _nmod_vec_init((ulong) logd + 2);
         _fmpz_nm1_trial_factors(p, pm1, &num_pm1, limit);
 
-        result = fmpz_is_prime_pocklington(F, p, pm1, num_pm1);
+        result = fmpz_is_prime_pocklington(F, R, p, pm1, num_pm1);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -74,6 +75,7 @@ main(void)
 
         fmpz_clear(p);
         fmpz_clear(F);
+        fmpz_clear(R);
     }
 
     FLINT_TEST_CLEANUP(state);

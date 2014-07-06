@@ -1177,14 +1177,16 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
 
-int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, 
+int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, 
                                                      mp_ptr pm1, slong num_pm1)
 
     Applies the Pocklington primality test. The test computes a product
     $F$ of prime powers which divide $n - 1$.
 
     The function then returns either $0$ if $n$ is definitely composite
-    or it returns $1$ if all factors of $n$ are $1 \pmod{F}$.
+    or it returns $1$ if all factors of $n$ are $1 \pmod{F}$. Also in
+    that case, $R$ is set to $(n - 1)/F$.
+
 
     N.B: a return value of $1$ only proves $n$ prime if $F >= \sqrt{n}$.
 
