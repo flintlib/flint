@@ -713,7 +713,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R,
 
 int fmpz_is_prime(const fmpz_t p);
 
-int fmpz_divisor_in_residue_class(fmpz_t fac, const fmpz_t n, 
+int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, 
                                                const fmpz_t r, const fmpz_t s);
 
 

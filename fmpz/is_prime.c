@@ -213,8 +213,30 @@ int fmpz_is_prime(const fmpz_t n)
 
                             fmpz_clear(nmodF);
                         } else
-                           res = -1;
-                        
+                        {
+                           fmpz_mul(Fcub, Fsqr, F);
+                           
+                           if (fmpz_cmp(Fcub, n) > 0) /* Lenstra's divisors in residue class */
+                           {
+                              fmpz_t d, r;
+
+                              fmpz_init(d);
+                              fmpz_init(r);
+                              
+                              fmpz_set_ui(r, 1);
+                              if (fmpz_divisor_in_residue_class_lenstra(d, n, r, F))
+                                 res = 0;
+
+                              fmpz_mod(r, n, F);
+                              if (fmpz_divisor_in_residue_class_lenstra(d, n, r, F))
+                                 res = 0;
+
+                              fmpz_clear(r);
+                              fmpz_clear(d);
+                           } else
+                              res = -1;
+                        }
+
                         fmpz_clear(F);
                      }
                   }

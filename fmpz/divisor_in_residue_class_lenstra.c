@@ -34,7 +34,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int fmpz_divisor_in_residue_class(fmpz_t fac, const fmpz_t n, const fmpz_t r, const fmpz_t s)
+int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz_t r, const fmpz_t s)
 {
    fmpz_t r1, r2, a0, a1, b0, b1, c0, c1, q, d, d1, s1, s2, ns2;
    slong i;
@@ -78,7 +78,7 @@ int fmpz_divisor_in_residue_class(fmpz_t fac, const fmpz_t n, const fmpz_t r, co
    fmpz_mod(c1, c1, s);
 
    /* deal with a0, b0, c0 */
-   if (fmpz_divisible(n, r))
+   if (!fmpz_is_one(r) && fmpz_divisible(n, r))
    {
       fmpz_set(fac, r);
       res = 1;
@@ -122,19 +122,44 @@ int fmpz_divisor_in_residue_class(fmpz_t fac, const fmpz_t n, const fmpz_t r, co
             fmpz_add(d, d, d1);
             fmpz_tdiv_q_2exp(d, d, 1);
 
-            /* either d/a1 or d/b1 is a divisor of n */
-            fmpz_tdiv_q(fac, d, a1);
-            if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+            if (fmpz_is_zero(a1))
             {
-               res = 1;
-               break;
-            }
+               fmpz_tdiv_q(fac, s1, b1); /* y*b1 = s1 */
+               fmpz_mul(fac, fac, s); /* check if ys + r2 is factor */
+               fmpz_add(fac, fac, r2);
 
-            fmpz_tdiv_q(fac, d, b1);
-            if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               {
+                  res = 1;
+                  break;
+               }
+            } else if (fmpz_is_zero(b1))
             {
-               res = 1;
-               break;
+               fmpz_tdiv_q(fac, s1, a1); /* x*a1 = s1 */
+               fmpz_mul(fac, fac, s); /* check if xs + r is factor */
+               fmpz_add(fac, fac, r);
+
+               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               {
+                  res = 1;
+                  break;
+               }
+            } else
+            {
+               /* either d/a1 or d/b1 is a divisor of n */
+               fmpz_tdiv_q(fac, d, a1);
+               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               {
+                  res = 1;
+                  break;
+               }
+
+               fmpz_tdiv_q(fac, d, b1);
+               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               {
+                  res = 1;
+                  break;
+               }
             }
          }
 

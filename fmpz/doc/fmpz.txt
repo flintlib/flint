@@ -1332,7 +1332,7 @@ void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1,
     Aliasing of $V_m$ and $U_m$ and aliasing of $V_{m + 1}$ and $U_{m + 1}$
     is permitted. No other aliasing is allowed. 
 
-int fmpz_divisor_in_residue_class(fmpz_t fac, const fmpz_t n, 
+int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, 
                                                 const fmpz_t r, const fmpz_t s)
 
     If there exists a proper divisor of $n$ which is $r \pmod{s}$ for 
