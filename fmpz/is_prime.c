@@ -52,20 +52,20 @@ int fmpz_is_prime(const fmpz_t n)
       double logd = log(fmpz_get_d(n));
       ulong limit = (ulong) (logd*logd*logd/10.0) + 2;
 
-      fmpz_t F, Fsqr, Fcub;
+      fmpz_t F1, Fsqr, Fcub;
 
-      fmpz_init(F);
+      fmpz_init(F1);
       fmpz_init(Fsqr);
       fmpz_init(Fcub);
 
-      res = fmpz_is_prime_pocklington(F, n, limit);
+      res = fmpz_is_prime_pocklington(F1, n, limit);
 
       if (res == 1)
       {
-         fmpz_mul(Fsqr, F, F);
+         fmpz_mul(Fsqr, F1, F1);
          if (fmpz_cmp(Fsqr, n) < 0)
          {
-            fmpz_mul(Fcub, Fsqr, F);
+            fmpz_mul(Fcub, Fsqr, F1);
             if (fmpz_cmp(Fcub, n) >= 0) /* Brillhart, Lehmer, Selfridge test */
             {
                fmpz_t n1, c2, c1;
@@ -74,10 +74,10 @@ int fmpz_is_prime(const fmpz_t n)
                fmpz_init(c2);
                fmpz_init(c1);
 
-               fmpz_sub_ui(n1, n, 1); /* n is 1 mod F */
-               fmpz_tdiv_q(n1, n1, F);
+               fmpz_sub_ui(n1, n, 1); /* n is 1 mod F1 */
+               fmpz_tdiv_q(n1, n1, F1);
 
-               fmpz_tdiv_qr(c2, c1, n1, F); /* Let n = c2*F^2 + c1*F + 1 */
+               fmpz_tdiv_qr(c2, c1, n1, F1); /* Let n = c2*F^2 + c1*F + 1 */
 
                fmpz_mul(c1, c1, c1); /* check if c1^2 - 4*c2 is a square */
                fmpz_submul_ui(c1, c2, 4);
@@ -101,7 +101,7 @@ int fmpz_is_prime(const fmpz_t n)
 
                if (res == 1)
                {
-                  fmpz_sub_ui(Fm1, F2, 1); /* need F - 1 > sqrt(n) */
+                  fmpz_sub_ui(Fm1, F2, 1); /* need F2 - 1 > sqrt(n) */
                   fmpz_mul(Fsqr, Fm1, Fm1);
 
                   if (fmpz_cmp(Fsqr, n) <= 0)
@@ -118,7 +118,7 @@ int fmpz_is_prime(const fmpz_t n)
                         fmpz_init(r);
                         fmpz_init(t);
 
-                        fmpz_tdiv_qr(r1, r0, R, F); /* R = r1*F + r0 */
+                        fmpz_tdiv_qr(r1, r0, R, F2); /* R = r1*F2 + r0 */
 
                         /* check if x^2 + r0*x - r1 has positive integral root */
                         fmpz_mul(t, r0, r0); /* b = sqrt(r0^2 - 4(-r1)) */
@@ -128,11 +128,11 @@ int fmpz_is_prime(const fmpz_t n)
                         if (fmpz_is_zero(r) && fmpz_cmp(b, r0) > 0) /* if so, composite */
                            res = 0;
 
-                        /* check if x^2 + (r0 - F)*x - r1 - 1 has positive integral root */
-                        fmpz_sub(r0, r0, F);
+                        /* check if x^2 + (r0 - F2)*x - r1 - 1 has positive integral root */
+                        fmpz_sub(r0, r0, F2);
                         fmpz_add_ui(r1, r1, 1);
                         
-                        fmpz_mul(t, r0, r0); /* b = sqrt((r0 - F)^2 - 4(-r1 - 1)) */
+                        fmpz_mul(t, r0, r0); /* b = sqrt((r0 - F2)^2 - 4(-r1 - 1)) */
                         fmpz_addmul_ui(t, r1, 4);
                         fmpz_sqrtrem(b, r, t);
 
@@ -144,8 +144,10 @@ int fmpz_is_prime(const fmpz_t n)
                         fmpz_clear(r);
                         fmpz_clear(r1);
                         fmpz_clear(r0);
-                     } else
+                     } else 
+                     {
                         res = -1;
+                     }
                   }
                   /* else n is prime, i.e. res = 1 */
                }
@@ -157,7 +159,7 @@ int fmpz_is_prime(const fmpz_t n)
          }
       } 
 
-      fmpz_clear(F);
+      fmpz_clear(F1);
       fmpz_clear(Fsqr);
       fmpz_clear(Fcub);
    }
