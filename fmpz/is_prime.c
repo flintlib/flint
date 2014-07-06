@@ -50,7 +50,7 @@ int fmpz_is_prime(const fmpz_t n)
 
    {
       double logd = log(fmpz_get_d(n));
-      ulong limit = (ulong) (logd*logd*logd/10.0) + 2;
+      ulong limit = (ulong) (logd*logd*logd) + 2;
 
       fmpz_t F1, Fsqr, Fcub;
 
@@ -144,9 +144,33 @@ int fmpz_is_prime(const fmpz_t n)
                         fmpz_clear(r);
                         fmpz_clear(r1);
                         fmpz_clear(r0);
-                     } else 
+                     } else /* Brillhart, Lehmer, Selfridge combined p-1, p+1 test */
                      {
-                        res = -1;
+                        fmpz_t F, nmodF;
+                        
+                        fmpz_init(F);
+                        
+                        fmpz_mul(F, F1, F2); /* F = lcm(F1, F2), F1 | n - 1, F2 | n + 1 */
+                        if (fmpz_is_even(F1) && fmpz_is_even(F2))
+                           fmpz_tdiv_q_2exp(F, F, 1);
+
+                        fmpz_mul(Fsqr, F, F);
+
+                        if (fmpz_cmp(Fsqr, n) > 0) /* lcm(F1, F2) > sqrt(n) */
+                        {
+                            fmpz_init(nmodF);
+                          
+                            fmpz_mod(nmodF, n, F); /* check n mod F not factor of n */
+                            
+                            if (!fmpz_equal(nmodF, n) && !fmpz_is_one(nmodF) 
+                              && fmpz_divisible(n, nmodF))
+                               res = 0;
+
+                            fmpz_clear(nmodF);
+                        } else
+                           res = -1;
+                        
+                        fmpz_clear(F);
                      }
                   }
                   /* else n is prime, i.e. res = 1 */
