@@ -50,7 +50,11 @@ int fmpz_is_prime(const fmpz_t n)
 
    {
       double logd = log(fmpz_get_d(n));
-      ulong limit = (ulong) (logd*logd*logd) + 2;
+      ulong p, ppi, limit = (ulong) (logd*logd*logd/10.0) + 2;
+      ulong * pp1, * pm1;
+      slong i, num, num_pp1 = 0, num_pm1 = 0;
+      const ulong * primes; 
+      const double * pinv;
 
       fmpz_t F1, Fsqr, Fcub;
 
@@ -58,7 +62,48 @@ int fmpz_is_prime(const fmpz_t n)
       fmpz_init(Fsqr);
       fmpz_init(Fcub);
 
-      res = fmpz_is_prime_pocklington(F1, n, limit);
+      /* number of primes multiplied that will fit in a word */
+      num = FLINT_BITS/FLINT_BIT_COUNT(limit);
+
+      /* compute remainders of n mod p for primes p up to limit (approx.) */
+
+      n_prime_pi_bounds(&ppi, &ppi, limit); /* precompute primes */
+      primes = n_primes_arr_readonly(ppi + FLINT_BITS);
+      pinv = n_prime_inverses_arr_readonly(ppi + FLINT_BITS);
+   
+      pm1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n - 1 */
+      pp1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n + 1 */
+
+      while (primes[0] < limit)
+      {
+         /* multiply batch of primes */
+      
+         p = primes[0];
+         for (i = 1; i < num; i++)
+            p *= primes[i];
+
+         /* multi-modular reduction */
+
+         p = fmpz_tdiv_ui(n, p);
+
+         /* check for factors */
+         for (i = 0; i < num; i++)
+         {
+            ulong r = n_mod2_precomp(p, primes[i], pinv[i]);
+
+            if (r == 1) /* n - 1 = 0 mod p */
+               pm1[num_pm1++] = primes[i];
+
+            if (r == primes[i] - 1) /* n + 1 = 0 mod p */
+               pp1[num_pp1++] = primes[i];
+         }
+
+         /* get next batch of primes */
+         primes += num;
+         pinv += num;
+      }
+
+      res = fmpz_is_prime_pocklington(F1, n, pm1, num_pm1);
 
       if (res == 1)
       {
@@ -97,7 +142,7 @@ int fmpz_is_prime(const fmpz_t n)
                fmpz_init(Fm1);
                fmpz_init(R);
          
-               res = fmpz_is_prime_morrison(F2, R, n, limit);
+               res = fmpz_is_prime_morrison(F2, R, n, pp1, num_pp1);
 
                if (res == 1)
                {
@@ -182,6 +227,9 @@ int fmpz_is_prime(const fmpz_t n)
             }
          }
       } 
+
+      _nmod_vec_clear(pm1);
+      _nmod_vec_clear(pp1);
 
       fmpz_clear(F1);
       fmpz_clear(Fsqr);

@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -42,6 +43,10 @@ main(void)
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p, F, R;
+        mp_ptr pp1;
+        slong num_pp1;
+        double logd;
+        ulong limit;
 
         fmpz_init(p);
         fmpz_init(F);
@@ -52,13 +57,21 @@ main(void)
            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
-        result = fmpz_is_prime_morrison(F, R, p, 1000000);
+        logd = log(fmpz_get_d(p));
+        limit = (ulong) (logd*logd*logd/10.0) + 2;
+
+        pp1 = _nmod_vec_init((ulong) logd + 2);
+        _fmpz_np1_trial_factors(p, pp1, &num_pp1, limit);
+
+        result = fmpz_is_prime_morrison(F, R, p, pp1, num_pp1);
         if (!result)
         {
             flint_printf("FAIL:\n");
             fmpz_print(p); printf("\n");
             abort();
         }
+
+        _nmod_vec_clear(pp1);
 
         fmpz_clear(p);
         fmpz_clear(F);

@@ -34,30 +34,65 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit)
+void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit)
 {
-   n_primes_t iter;
-   slong num, i, count, num2;
-   mp_limb_t p = 0, a, b;
-   fmpz * vec, * vec2;
-   fmpz_t g, q, r, ex, c, D, Dinv, A, B, Ukm, Ukm1, Um, Um1, Vm, Vm1;
+   slong i, num;
+   ulong ppi, p;
+   const ulong * primes;
+   const double * pinv;
+   
+   *num_pp1 = 0;
+
+   /* number of primes multiplied that will fit in a word */
+  
+   num = FLINT_BITS/FLINT_BIT_COUNT(limit);
+
+   /* compute remainders of n mod p for primes p up to limit (approx.) */
+
+   n_prime_pi_bounds(&ppi, &ppi, limit); /* precompute primes */
+   primes = n_primes_arr_readonly(ppi + FLINT_BITS);
+   pinv = n_prime_inverses_arr_readonly(ppi + FLINT_BITS);
+   
+   while (primes[0] < limit)
+   {
+      /* multiply batch of primes */
+      
+      p = primes[0];
+      for (i = 1; i < num; i++)
+         p *= primes[i];
+
+      /* multi-modular reduction */
+
+      p = fmpz_tdiv_ui(n, p);
+
+      /* check for factors */
+      for (i = 0; i < num; i++)
+      {
+         ulong r = n_mod2_precomp(p, primes[i], pinv[i]);
+
+         if (r == primes[i] - 1) /* n + 1 = 0 mod p */
+            pp1[(*num_pp1)++] = primes[i];
+      }
+
+      /* get next batch of primes */
+      primes += num;
+      pinv += num;
+   }
+}
+
+int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong num_pp1)
+{
+   slong i, d;
+   mp_limb_t a, b;
+   fmpz_t g, q, r, ex, c, D, Dinv, A, B, Ukm, Ukm1, Um, Um1, Vm, Vm1, p;
    fmpz_factor_t fac;
    int res = 0;
-
-   /* number of primes multiplied that's about the same size as n */
-   num = fmpz_bits(n)/FLINT_BIT_COUNT(limit) + 1;
-   /* round down to power of 2 */
-   num = WORD(1) << (FLINT_BIT_COUNT(num) - 1);
-
-   vec = _fmpz_vec_init(num + (num + 1)/2);
-   vec2 = vec + num;
-
-   n_primes_init(iter);
 
    fmpz_init(D);
    fmpz_init(Dinv);
    fmpz_init(A);
    fmpz_init(B);
+   fmpz_init(p);
    fmpz_init(q);
    fmpz_init(r);
    fmpz_init(g);
@@ -73,65 +108,11 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit)
 
    fmpz_add_ui(R, n, 1); /* start at n + 1 */
    
-   while (p < limit && !fmpz_is_one(R))
+   for (i = 0; i < num_pp1; i++)
    {
-      /* get next batch of primes */
-      for (count = 0; count < num && p < limit; count++)
-      {
-         p = n_primes_next(iter);
-         fmpz_set_ui(vec + count, p);
-      }
- 
-      /* multiply batch */
-      num2 = count;
-      if (num2 > 1) /* vec -> vec2, preserve vec */
-      {
-         for (i = 0; i < num2/2; i++)
-            fmpz_mul(vec2 + i, vec + 2*i, vec + 2*i + 1);
-         
-         if (num2 & 1)
-            fmpz_set(vec2 + i, vec + 2*i);
-
-         num2 = (num2 + 1)/2;
-      }
-
-      while (num2 > 1) /* vec2 -> vec2 */
-      {
-         for (i = 0; i < num2/2; i++)
-            fmpz_mul(vec2 + i, vec2 + 2*i, vec2 + 2*i + 1);
-         
-         if (num2 & 1)
-            fmpz_set(vec2 + i, vec2 + 2*i);
-
-         num2 = (num2 + 1)/2;
-      }
-
-      /* gcd product with n - 1 */
-      fmpz_gcd(g, R, vec2 + 0);
-
-      if (!fmpz_is_one(g)) /* we have some factors */
-      {
-         for (i = 0; i < count; i++)
-         {
-            slong d;
-            
-            if (fmpz_equal(g, vec + i))
-            {
-               d = fmpz_remove(R, R, vec + i);
-               _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), d);
-               break;
-            }
-
-            fmpz_tdiv_qr(q, r, g, vec + i);
-
-            if (fmpz_is_zero(r))
-            {
-               fmpz_set(g, q);
-               d = fmpz_remove(R, R, vec + i);
-               _fmpz_factor_append_ui(fac, fmpz_get_ui(vec + i), d);
-            }
-         }
-      }
+      fmpz_set_ui(p, pp1[i]);
+      d = fmpz_remove(R, R, p);
+      _fmpz_factor_append_ui(fac, pp1[i], d);
    }
 
    if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
@@ -226,6 +207,7 @@ cleanup:
    fmpz_clear(B);
    fmpz_clear(c);
    fmpz_clear(ex);
+   fmpz_clear(p);
    fmpz_clear(q);
    fmpz_clear(r);
    fmpz_clear(g);
@@ -235,8 +217,6 @@ cleanup:
    fmpz_clear(Ukm1);
    fmpz_clear(Vm);
    fmpz_clear(Vm1);
-   _fmpz_vec_clear(vec, num + (num + 1)/2);
-   n_primes_clear(iter);
 
    return res;
 }

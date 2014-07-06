@@ -699,9 +699,13 @@ int fmpz_is_probabprime(const fmpz_t p);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
 
-int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, ulong limit);
+void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong limit);
 
-int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, ulong limit);
+int fmpz_is_prime_pocklington(fmpz_t F, const fmpz_t n, mp_ptr pm1, slong num_pm1);
+
+void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit);
+
+int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, slong num_pm1);
 
 int fmpz_is_prime(const fmpz_t p);
 
