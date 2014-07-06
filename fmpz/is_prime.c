@@ -91,22 +91,67 @@ int fmpz_is_prime(const fmpz_t n)
                fmpz_clear(c1);
             } else /* p + 1 test */
             {
-               fmpz_t F2, R;
+               fmpz_t F2, Fm1, R;
          
                fmpz_init(F2);
+               fmpz_init(Fm1);
                fmpz_init(R);
          
                res = fmpz_is_prime_morrison(F2, R, n, limit);
 
                if (res == 1)
                {
-                  fmpz_sub_ui(F2, F2, 1); /* need F - 1 > sqrt(n) */
-                  fmpz_mul(Fsqr, F2, F2);
+                  fmpz_sub_ui(Fm1, F2, 1); /* need F - 1 > sqrt(n) */
+                  fmpz_mul(Fsqr, Fm1, Fm1);
+
                   if (fmpz_cmp(Fsqr, n) <= 0)
-                     res = -1;
+                  {
+                     fmpz_mul(Fcub, Fsqr, Fm1);
+
+                     if (fmpz_cmp(Fcub, n) > 0) /* Improved n + 1 test */
+                     {
+                        fmpz_t r1, r0, b, r, t;
+
+                        fmpz_init(r1);
+                        fmpz_init(r0);
+                        fmpz_init(b);
+                        fmpz_init(r);
+                        fmpz_init(t);
+
+                        fmpz_tdiv_qr(r1, r0, R, F); /* R = r1*F + r0 */
+
+                        /* check if x^2 + r0*x - r1 has positive integral root */
+                        fmpz_mul(t, r0, r0); /* b = sqrt(r0^2 - 4(-r1)) */
+                        fmpz_addmul_ui(t, r1, 4);
+                        fmpz_sqrtrem(b, r, t);
+
+                        if (fmpz_is_zero(r) && fmpz_cmp(b, r0) > 0) /* if so, composite */
+                           res = 0;
+
+                        /* check if x^2 + (r0 - F)*x - r1 - 1 has positive integral root */
+                        fmpz_sub(r0, r0, F);
+                        fmpz_add_ui(r1, r1, 1);
+                        
+                        fmpz_mul(t, r0, r0); /* b = sqrt((r0 - F)^2 - 4(-r1 - 1)) */
+                        fmpz_addmul_ui(t, r1, 4);
+                        fmpz_sqrtrem(b, r, t);
+
+                        if (fmpz_is_zero(r) && fmpz_cmp(b, r0) > 0) /* if so, composite */
+                           res = 0;
+
+                        fmpz_clear(t);
+                        fmpz_clear(b);
+                        fmpz_clear(r);
+                        fmpz_clear(r1);
+                        fmpz_clear(r0);
+                     } else
+                        res = -1;
+                  }
+                  /* else n is prime, i.e. res = 1 */
                }
 
                fmpz_clear(F2);
+               fmpz_clear(Fm1);
                fmpz_clear(R);
             }
          }
