@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    int i, result, r1, pass = 0;
+    int i, result, r1;
     FLINT_TEST_INIT(state);
 
     flint_printf("is_prime....");
@@ -48,14 +48,11 @@ main(void)
         fmpz_init(F);
 
         do {
-           fmpz_randbits(p, state, 300);
+           fmpz_randbits(p, state, n_randint(state, 330) + 2);
            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
         r1 = fmpz_is_prime(p);
-
-        if (r1 == 1)
-           pass++;
 
         result = (r1 == 1 || r1 == -1);
         if (!result)
@@ -68,8 +65,6 @@ main(void)
         fmpz_clear(p);
         fmpz_clear(F);
     }
-
-    printf("%lf\n", 100.0 *(double) pass / (double) (100 * flint_test_multiplier()));
 
     /* test composites never pass */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
