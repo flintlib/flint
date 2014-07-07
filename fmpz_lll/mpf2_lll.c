@@ -27,7 +27,7 @@
 
 #include "fmpz_lll.h"
 
-#if defined(FUNC_HEAD) && defined(USE_NEWD)
+#if defined(FUNC_HEAD) && defined(TYPE)
 
 FUNC_HEAD
 {
@@ -140,6 +140,34 @@ FUNC_HEAD
                     return -1;
                 }
 
+#if TYPE
+                /* Use the newd stuff here... */
+                ok = 1;
+                if (kappa == d - 1)
+                {
+                    mpf_div_ui(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), 2);
+                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), tmp) >= 0)
+                    {
+                        fmpz_init(rii);
+                        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+                        {
+                            /* rii is the squared G-S length of ith vector */
+                            fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                            {
+                                d--;
+                            }
+                        }
+                        fmpz_clear(rii);
+                    }
+                }
+                newd = d;
+                if (kappa >= d)
+                {
+                    break;
+                }
+#endif
+
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
                 /* ************************************ */
@@ -149,10 +177,6 @@ FUNC_HEAD
                 if (mpf_cmp(tmp, s + kappa - 1) <= 0)
                 {
                     alpha[kappa] = kappa;
-                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                            mpf_mat_entry(r, kappa, kappa - 1));
-                    mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1,
-                            tmp);
                     kappa++;
                 }
                 else
@@ -282,9 +306,6 @@ FUNC_HEAD
                 }
             }
 
-            /* Use the newd stuff here... */
-            USE_NEWD(newd, ok, rii);    /* rii is the squared G-S length of ith vector */
-
             flint_free(alpha);
             mpf_clears(ctt, tmp, rtmp, '\0');
             mpf_mat_clear(mu);
@@ -399,6 +420,34 @@ FUNC_HEAD
                     return -1;
                 }
 
+#if TYPE
+                /* Use the newd stuff here... */
+                ok = 1;
+                if (kappa == d - 1)
+                {
+                    mpf_div_ui(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), 2);
+                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), tmp) >= 0)
+                    {
+                        fmpz_init(rii);
+                        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+                        {
+                            /* rii is the squared G-S length of ith vector */
+                            fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                            {
+                                d--;
+                            }
+                        }
+                        fmpz_clear(rii);
+                    }
+                }
+                newd = d;
+                if (kappa >= d)
+                {
+                    break;
+                }
+#endif
+
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
                 /* ************************************ */
@@ -408,10 +457,6 @@ FUNC_HEAD
                 if (mpf_cmp(tmp, s + kappa - 1) <= 0)
                 {
                     alpha[kappa] = kappa;
-                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                            mpf_mat_entry(r, kappa, kappa - 1));
-                    mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1,
-                            tmp);
                     kappa++;
                 }
                 else
@@ -540,9 +585,6 @@ FUNC_HEAD
                     kappa++;
                 }
             }
-
-            /* Use the newd stuff here... */
-            USE_NEWD(newd, ok, rii);    /* rii is the squared G-S length of ith vector */
 
             flint_free(alpha);
             mpf_clears(ctt, tmp, rtmp, '\0');
@@ -740,14 +782,46 @@ FUNC_HEAD
                         mpf_mat_entry(r, kappa, j));
                 mpf_sub(s + j + 1, s + j, tmp);
             }
+            mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+
+#if TYPE
+            /* Use the newd stuff here... */
+            ok = 1;
+            if (kappa == d - 1)
+            {
+                mpf_div_ui(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), 2);
+                if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), tmp) >= 0)
+                {
+                    fmpz_init(rii);
+                    for (i = d - 1; (i >= 0) && (ok > 0); i--)
+                    {
+                        /* rii is the squared G-S length of ith vector */
+                        fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                        if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                        {
+                            d--;
+                        }
+                    }
+                    fmpz_clear(rii);
+                }
+            }
+            newd = d;
+            if (kappa >= d)
+            {
+                break;
+            }
+#else
+            if (!ok)
+            {
+                fmpz_init(rii);
+                fmpz_clear(rii);
+            }
+#endif
 
             mpf_set_d(rtmp, ctt);
             mpf_mul(tmp, rtmp, mpf_mat_entry(r, kappa - 1, kappa - 1));
             if (mpf_cmp(tmp, s + kappa - 1) <= 0)   /* check LLL condition */
             {
-                mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                        mpf_mat_entry(r, kappa, kappa - 1));
-                mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1, tmp);
                 kappa++;
             }
             else
@@ -805,16 +879,13 @@ FUNC_HEAD
             }
         }
 
-        for (i = 0; i < d - 1; i++)
+        for (i = 0; i < B->r - 1; i++)
         {
-            for (j = i + 1; j < d; j++)
+            for (j = i + 1; j < B->r; j++)
             {
                 fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(B, j, i));
             }
         }
-
-        /* Use the newd stuff here... */
-        USE_NEWD(newd, ok, rii);    /* rii is the squared G-S length of ith vector */
 
         mpf_mat_clear(mu);
         mpf_mat_clear(r);

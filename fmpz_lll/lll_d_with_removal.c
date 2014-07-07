@@ -35,8 +35,8 @@
 #undef CALL_BABAI
 #endif
 
-#ifdef USE_NEWD
-#undef USE_NEWD
+#ifdef TYPE
+#undef TYPE
 #endif
 
 #define FUNC_HEAD int fmpz_lll_d_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
@@ -67,35 +67,8 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#define USE_NEWD(ND, FLAG, GSN, RT)                                    \
-do {                                                                   \
-    ND = B->r;                                                         \
-    fmpz_init(GSN);                                                    \
-    if (RT == Z_BASIS)                                                 \
-    {                                                                  \
-        for (i = d - 1; (i >= 0) && (FLAG > 0); i--)                   \
-        {                                                              \
-            fmpz_set_d(GSN, ldexp(d_mat_entry(r, i, i), 2 * expo[i])); \
-            if ((FLAG = fmpz_cmp(GSN, gs_B)) > 0)                      \
-            {                                                          \
-                ND--;                                                  \
-            }                                                          \
-        }                                                              \
-    }                                                                  \
-    else                                                               \
-    {                                                                  \
-        for (i = d - 1; (i >= 0) && (FLAG > 0); i--)                   \
-        {                                                              \
-            fmpz_set_d(GSN, d_mat_entry(r, i, i));                     \
-            if ((FLAG = fmpz_cmp(GSN, gs_B)) > 0)                      \
-            {                                                          \
-                ND--;                                                  \
-            }                                                          \
-        }                                                              \
-    }                                                                  \
-    fmpz_clear(GSN);                                                   \
-} while (0)
+#define TYPE 1
 #include "d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI
-#undef USE_NEWD
+#undef TYPE

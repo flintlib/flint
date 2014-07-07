@@ -35,8 +35,8 @@
 #undef CALL_BABAI
 #endif
 
-#ifdef USE_NEWD
-#undef USE_NEWD
+#ifdef TYPE
+#undef TYPE
 #endif
 
 #define FUNC_HEAD int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
@@ -70,15 +70,8 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#define USE_NEWD(ND, FLAG, GSN, RT)                                    \
-do {                                                                   \
-    if (!FLAG)                                                         \
-    {                                                                  \
-        fmpz_init(GSN);                                                \
-        fmpz_clear(GSN);                                               \
-    }                                                                  \
-} while (0)
+#define TYPE 0
 #include "d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI
-#undef USE_NEWD
+#undef TYPE

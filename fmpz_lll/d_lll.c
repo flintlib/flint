@@ -27,7 +27,7 @@
 
 #include "fmpz_lll.h"
 
-#if defined(FUNC_HEAD) && defined(CALL_BABAI) && defined(USE_NEWD)
+#if defined(FUNC_HEAD) && defined(CALL_BABAI) && defined(TYPE)
 
 FUNC_HEAD
 {
@@ -38,7 +38,7 @@ FUNC_HEAD
     {
         if (fl->gt == APPROX)
         {
-            int kappa, kappa2, d, n, i, j, zeros, kappamax, shift;
+            int kappa, kappa2, d, n, i, j, zeros, kappamax, shift, new_kappa;
             int num_failed_fast = 0;
             int babai_ok = 0;
             int heuristic_fail = 0;
@@ -48,7 +48,7 @@ FUNC_HEAD
             double ctt, tmp = 0.0;
             int *alpha;
             fmpz *Btmp;
-            ulong max_exp, iter, max_iter;
+            ulong max_exp, iter, max_iter, newvec, newvec_max;
 
             n = B->c;
             d = B->r;
@@ -119,6 +119,8 @@ FUNC_HEAD
             for (i = zeros + 1; i < d; i++)
                 alpha[i] = 0;
 
+            newvec = 0;
+            newvec_max = 1;
             iter = 0;
             while (kappa < d)
             {
@@ -128,8 +130,20 @@ FUNC_HEAD
                 }
                 iter++;
 
+                new_kappa = 0;
                 if (kappa > kappamax)
+                {
+                    /* In the first time we hit a new kappa we're going to size-reduce in advance (for knapsack)... */
                     kappamax = kappa;
+                    newvec++;
+
+                    if (newvec > newvec_max)
+                    {
+                        newvec_max *= 2;
+                        newvec = 0;
+                        new_kappa = 1;
+                    }
+                }
 
                 /* ********************************** */
                 /* Step3: Call to the Babai algorithm */
@@ -150,6 +164,70 @@ FUNC_HEAD
                     return -1;
                 }
 
+                /* End of the real Babai part... */
+                if (new_kappa == 1)
+                {
+#if TYPE == 2
+                    /* running ahead to kappa = d, without upsetting LLL... */
+                    for (kappa2 = d - 1; kappa2 > kappa; kappa2--)
+                    {
+                        babai_ok =
+                            fmpz_lll_advance_check_babai(kappa, kappa2, B, U,
+                                                         mu, r, s, appB, expo,
+                                                         A, alpha[kappa2],
+                                                         zeros, kappa + 1,
+                                                         n, fl);
+                        if (babai_ok == -1)
+                        {
+                            heuristic_fail =
+                                fmpz_lll_advance_check_babai_heuristic_d(kappa,
+                                                                         kappa2,
+                                                                         B, U,
+                                                                         mu, r,
+                                                                         s,
+                                                                         appB,
+                                                                         expo,
+                                                                         A,
+                                                                         alpha
+                                                                         [kappa2],
+                                                                         zeros,
+                                                                         kappa
+                                                                         + 1,
+                                                                         n,
+                                                                         fl);
+                        }
+                    }
+#endif
+                }
+
+#if TYPE
+                /* Use the newd stuff here... */
+                ok = 1;
+                if (kappa == d - 1
+                    && ldexp(d_mat_entry(r, kappa, kappa),
+                             2 * (expo[kappa] - expo[kappa - 1])) >=
+                    d_mat_entry(r, kappa - 1, kappa - 1) / 2.0)
+                {
+                    fmpz_init(rii);
+                    for (i = d - 1; (i >= 0) && (ok > 0); i--)
+                    {
+                        /* rii is the squared G-S length of ith vector */
+                        fmpz_set_d(rii,
+                                   ldexp(d_mat_entry(r, i, i), 2 * expo[i]));
+                        if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                        {
+                            d--;
+                        }
+                    }
+                    fmpz_clear(rii);
+                }
+                newd = d;
+                if (kappa >= d)
+                {
+                    break;
+                }
+#endif
+
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
                 /* ************************************ */
@@ -160,12 +238,6 @@ FUNC_HEAD
                 if (tmp <= s[kappa - 1])
                 {
                     alpha[kappa] = kappa;
-                    tmp =
-                        d_mat_entry(mu, kappa, kappa - 1) * d_mat_entry(r,
-                                                                        kappa,
-                                                                        kappa -
-                                                                        1);
-                    d_mat_entry(r, kappa, kappa) = s[kappa - 1] - tmp;
                     kappa++;
                 }
                 else
@@ -294,9 +366,6 @@ FUNC_HEAD
                 }
             }
 
-            /* Use the newd stuff here... */
-            USE_NEWD(newd, ok, rii, fl->rt);    /* rii is the squared G-S length of ith vector */
-
             flint_free(alpha);
             flint_free(expo);
             d_mat_clear(mu);
@@ -311,7 +380,7 @@ FUNC_HEAD
         }
         else
         {
-            int kappa, kappa2, d, n, i, j, zeros, kappamax, shift;
+            int kappa, kappa2, d, n, i, j, zeros, kappamax, shift, new_kappa;
             slong exp;
             int num_failed_fast = 0;
             int babai_ok = 0;
@@ -323,7 +392,7 @@ FUNC_HEAD
             double ctt;
             int *alpha;
             fmpz *Btmp;
-            ulong max_exp, iter, max_iter;
+            ulong max_exp, iter, max_iter, newvec, newvec_max;
 
             n = B->c;
             d = B->r;
@@ -399,6 +468,8 @@ FUNC_HEAD
             for (i = zeros + 1; i < d; i++)
                 alpha[i] = 0;
 
+            newvec = 0;
+            newvec_max = 1;
             iter = 0;
             while (kappa < d)
             {
@@ -409,8 +480,20 @@ FUNC_HEAD
                 }
                 iter++;
 
+                new_kappa = 0;
                 if (kappa > kappamax)
+                {
+                    /* In the first time we hit a new kappa we're going to size-reduce in advance (for knapsack)... */
                     kappamax = kappa;
+                    newvec++;
+
+                    if (newvec > newvec_max)
+                    {
+                        newvec_max *= 2;
+                        newvec = 0;
+                        new_kappa = 1;
+                    }
+                }
 
                 /* ********************************** */
                 /* Step3: Call to the Babai algorithm */
@@ -455,6 +538,76 @@ FUNC_HEAD
                     return -1;
                 }
 
+                /* End of the real Babai part... */
+                if (new_kappa == 1)
+                {
+#if TYPE == 2
+                    /* running ahead to kappa = d, without upsetting LLL... */
+                    for (kappa2 = d - 1; kappa2 > kappa; kappa2--)
+                    {
+                        babai_ok =
+                            fmpz_lll_advance_check_babai(kappa, kappa2, B, U,
+                                                         mu, r, s, appB, expo,
+                                                         A, alpha[kappa2],
+                                                         zeros, kappa + 1,
+                                                         FLINT_MIN(kappamax +
+                                                                   1 + shift,
+                                                                   n), fl);
+                        if (babai_ok == -1)
+                        {
+                            heuristic_fail =
+                                fmpz_lll_advance_check_babai_heuristic_d(kappa,
+                                                                         kappa2,
+                                                                         B, U,
+                                                                         mu, r,
+                                                                         s,
+                                                                         appB,
+                                                                         expo,
+                                                                         A,
+                                                                         alpha
+                                                                         [kappa2],
+                                                                         zeros,
+                                                                         kappa
+                                                                         + 1,
+                                                                         FLINT_MIN
+                                                                         (kappamax
+                                                                          + 1 +
+                                                                          shift,
+                                                                          n),
+                                                                         fl);
+                        }
+                    }
+#endif
+                }
+
+#if TYPE
+                /* Use the newd stuff here... */
+                ok = 1;
+                if (kappa == d - 1
+                    && ldexp(d_mat_entry(r, kappa, kappa),
+                             2 * (expo[kappa] - expo[kappa - 1])) >=
+                    d_mat_entry(r, kappa - 1, kappa - 1) / 2.0)
+                {
+                    fmpz_init(rii);
+                    for (i = d - 1; (i >= 0) && (ok > 0); i--)
+                    {
+                        /* rii is the squared G-S length of ith vector */
+                        fmpz_set_d(rii,
+                                   ldexp(d_mat_entry(r, i, i), 2 * expo[i]));
+                        if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                        {
+                            d--;
+                        }
+                    }
+                    fmpz_clear(rii);
+                }
+                newd = d;
+                if (kappa >= d)
+                {
+                    break;
+                }
+#endif
+
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
                 /* ************************************ */
@@ -465,12 +618,6 @@ FUNC_HEAD
                 if (tmp <= s[kappa - 1])
                 {
                     alpha[kappa] = kappa;
-                    tmp =
-                        d_mat_entry(mu, kappa, kappa - 1) * d_mat_entry(r,
-                                                                        kappa,
-                                                                        kappa -
-                                                                        1);
-                    d_mat_entry(r, kappa, kappa) = s[kappa - 1] - tmp;
                     kappa++;
                 }
                 else
@@ -608,9 +755,6 @@ FUNC_HEAD
                     kappa++;
                 }
             }
-
-            /* Use the newd stuff here... */
-            USE_NEWD(newd, ok, rii, fl->rt);    /* rii is the squared G-S length of ith vector */
 
             flint_free(alpha);
             flint_free(expo);
@@ -825,15 +969,43 @@ FUNC_HEAD
                     s[j] - d_mat_entry(mu, kappa, j) * d_mat_entry(r,
                                                                    kappa, j);
             }
+            d_mat_entry(r, kappa, kappa) = s[kappa];
+
+#if TYPE
+            /* Use the newd stuff here... */
+            ok = 1;
+            if (kappa == d - 1
+                && d_mat_entry(r, kappa, kappa) >= d_mat_entry(r, kappa - 1,
+                                                               kappa -
+                                                               1) / 2.0)
+            {
+                fmpz_init(rii);
+                for (i = d - 1; (i >= 0) && (ok > 0); i--)
+                {
+                    /* rii is the squared G-S length of ith vector */
+                    fmpz_set_d(rii, d_mat_entry(r, i, i));
+                    if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                    {
+                        d--;
+                    }
+                }
+                fmpz_clear(rii);
+            }
+            newd = d;
+            if (kappa >= d)
+            {
+                break;
+            }
+#else
+            if (!ok)
+            {
+                fmpz_init(rii);
+                fmpz_clear(rii);
+            }
+#endif
 
             if (ctt * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1]) /* check LLL condition */
             {
-                d_mat_entry(r, kappa, kappa) =
-                    s[kappa - 1] - d_mat_entry(mu, kappa,
-                                               kappa - 1) * d_mat_entry(r,
-                                                                        kappa,
-                                                                        kappa -
-                                                                        1);
                 kappa++;
             }
             else
@@ -886,16 +1058,13 @@ FUNC_HEAD
             }
         }
 
-        for (i = 0; i < d - 1; i++)
+        for (i = 0; i < B->r - 1; i++)
         {
-            for (j = i + 1; j < d; j++)
+            for (j = i + 1; j < B->r; j++)
             {
                 fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(B, j, i));
             }
         }
-
-        /* Use the newd stuff here... */
-        USE_NEWD(newd, ok, rii, fl->rt);    /* rii is the squared G-S length of ith vector */
 
         d_mat_clear(mu);
         d_mat_clear(r);

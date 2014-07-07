@@ -31,25 +31,12 @@
 #undef FUNC_HEAD
 #endif
 
-#ifdef USE_NEWD
-#undef USE_NEWD
+#ifdef TYPE
+#undef TYPE
 #endif
 
 #define FUNC_HEAD int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
-#define USE_NEWD(ND, FLAG, GSN)                                        \
-do {                                                                   \
-    ND = B->r;                                                         \
-    fmpz_init(GSN);                                                    \
-    for (i = d - 1; (i >= 0) && (FLAG > 0); i--)                       \
-    {                                                                  \
-        fmpz_set_mpf(GSN, mpf_mat_entry(r, i, i));                     \
-        if ((FLAG = fmpz_cmp(GSN, gs_B)) > 0)                          \
-        {                                                              \
-            ND--;                                                      \
-        }                                                              \
-    }                                                                  \
-    fmpz_clear(GSN);                                                   \
-} while (0)
+#define TYPE 1
 #include "mpf2_lll.c"
 #undef FUNC_HEAD
-#undef USE_NEWD
+#undef TYPE

@@ -316,6 +316,7 @@ FUNC_HEAD
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
             }
+            d_mat_entry(r, kappa, kappa) = s[kappa];
 #endif
         }
         else
@@ -634,6 +635,7 @@ FUNC_HEAD
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
             }
+            d_mat_entry(r, kappa, kappa) = s[kappa];
 #endif
         }
     }

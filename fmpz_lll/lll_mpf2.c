@@ -31,19 +31,12 @@
 #undef FUNC_HEAD
 #endif
 
-#ifdef USE_NEWD
-#undef USE_NEWD
+#ifdef TYPE
+#undef TYPE
 #endif
 
 #define FUNC_HEAD int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec, const fmpz_lll_t fl)
-#define USE_NEWD(ND, FLAG, GSN)                                        \
-do {                                                                   \
-    if (!FLAG)                                                         \
-    {                                                                  \
-        fmpz_init(GSN);                                                \
-        fmpz_clear(GSN);                                               \
-    }                                                                  \
-} while (0)
+#define TYPE 0
 #include "mpf2_lll.c"
 #undef FUNC_HEAD
-#undef USE_NEWD
+#undef TYPE

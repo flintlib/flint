@@ -39,7 +39,7 @@
 #undef TYPE
 #endif
 
-#define FUNC_HEAD int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
+#define FUNC_HEAD int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
 #define CALL_BABAI(NFF, BO, HF)                                        \
 do {                                                                   \
     if (NFF < 50)                                                      \
@@ -67,7 +67,7 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#define TYPE 0
+#define TYPE 2
 #include "d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI
