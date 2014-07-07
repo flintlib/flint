@@ -1107,7 +1107,7 @@ int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t a)
 
 int fmpz_is_probabprime_lucas(const fmpz_t n)
 
-    Performs a Lucas probable prime test with parameters chosen by Baillie's
+    Performs a Lucas probable prime test with parameters chosen by Selfridge's
     method $A$ as per~\citep{BaiWag1980}.
 
     Return $1$ if $n$ is a Lucas probable prime, otherwise return $0$. This
@@ -1116,7 +1116,7 @@ int fmpz_is_probabprime_lucas(const fmpz_t n)
 int fmpz_is_probabprime_BPSW(const fmpz_t n)
 
     Perform a Baillie-PSW probable prime test with parameters chosen by 
-    Baillie's method $A$ as per~\citep{BaiWag1980}.
+    Selfridge's method $A$ as per~\citep{BaiWag1980}.
 
     Return $1$ if $n$ is a Lucas probable prime, otherwise return $0$. 
 
