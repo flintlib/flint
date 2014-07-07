@@ -1340,6 +1340,8 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n,
     divisor. Otherwise the function returns $0$ and the value of \code{fac} is
     undefined.
 
+    This is efficient if $s^3 > n$.
+
 *******************************************************************************
 
     Special functions
