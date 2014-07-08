@@ -608,11 +608,6 @@ void fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
     the quotient down towards minus infinity. If $h$ is $0$ an exception 
     is raised.
 
-void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
-
-    Sets $f$ to $g$ divided by \code{2^exp}, rounding down towards
-    minus infinity.
-
 void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to the remainder of $g$ upon division by \code{2^exp}, 
