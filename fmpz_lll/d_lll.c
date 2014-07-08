@@ -31,7 +31,7 @@
 
 FUNC_HEAD
 {
-    int newd = 0, ok = 1;
+    int newd = 0;
     fmpz_t rii;
     int *expo = NULL;
     if (fl->rt == Z_BASIS)
@@ -52,6 +52,9 @@ FUNC_HEAD
 
             n = B->c;
             d = B->r;
+#if TYPE
+            newd = d;
+#endif
 
             ctt = (4 * fl->delta + 1) / 5;
 
@@ -200,7 +203,7 @@ FUNC_HEAD
 #endif
                 }
 
-#if TYPE
+#if 0
                 /* Use the newd stuff here... */
                 ok = 1;
                 if (kappa == d - 1
@@ -249,6 +252,19 @@ FUNC_HEAD
                     /* ******************************************* */
 
                     kappa2 = kappa;
+#if TYPE
+                    if (kappa == d - 1)
+                    {
+                        fmpz_init(rii);
+                        fmpz_set_d(rii, ldexp(s[kappa - 1], 2 * expo[kappa]));
+                        if (fmpz_cmp(rii, gs_B) > 0)
+                        {
+                            d--;
+                            newd--;
+                        }
+                        fmpz_clear(rii);
+                    }
+#endif
                     do
                     {
                         kappa--;
@@ -299,15 +315,15 @@ FUNC_HEAD
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
-                    Btmp = _fmpz_vec_init(d);
+                    Btmp = _fmpz_vec_init(B->r);
                     if (fl->store_trans)
                     {
-                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], B->r);
                         for (i = kappa2; i > kappa; i--)
-                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, B->r);
                     }
-                    _fmpz_vec_clear(Btmp, d);
+                    _fmpz_vec_clear(Btmp, B->r);
 
                     appBtmp = appB->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -385,7 +401,7 @@ FUNC_HEAD
             int num_failed_fast = 0;
             int babai_ok = 0;
             int heuristic_fail = 0;
-            d_mat_t mu, r, appB;
+            d_mat_t mu, r;
             fmpz_gram_t A;
             double *s, *mutmp, *appBtmp;
             fmpz *exactSPtmp;
@@ -396,6 +412,9 @@ FUNC_HEAD
 
             n = B->c;
             d = B->r;
+#if TYPE
+            newd = d;
+#endif
 
             ctt = (4 * fl->delta + 1) / 5;
 
@@ -406,10 +425,10 @@ FUNC_HEAD
 
             d_mat_init(mu, d, d);
             d_mat_init(r, d, d);
-            d_mat_init(appB, d, n);
             fmpz_mat_init(A->exactSP, d, d);
 
             s = _d_vec_init(d);
+            appBtmp = _d_vec_init(n);
             exactSPtmp = _fmpz_vec_init(d);
 
             if (fl->store_trans)
@@ -432,8 +451,7 @@ FUNC_HEAD
             max_exp = 0;
             for (i = 0; i < d; i++)
             {
-                expo[i] =
-                    _fmpz_vec_get_d_vec_2exp(appB->rows[i], B->rows[i], n);
+                expo[i] = _fmpz_vec_get_d_vec_2exp(appBtmp, B->rows[i], n);
                 max_exp = FLINT_MAX(max_exp, expo[i]);
             }
             max_iter =
@@ -501,7 +519,7 @@ FUNC_HEAD
                 if (num_failed_fast < 50)
                 {
                     babai_ok =
-                        fmpz_lll_check_babai(kappa, B, U, mu, r, s, appB, expo,
+                        fmpz_lll_check_babai(kappa, B, U, mu, r, s, NULL, expo,
                                              A, alpha[kappa], zeros, kappamax,
                                              FLINT_MIN(kappamax + 1 + shift,
                                                        n), fl);
@@ -516,7 +534,7 @@ FUNC_HEAD
                     num_failed_fast++;
                     heuristic_fail =
                         fmpz_lll_check_babai_heuristic_d(kappa, B, U, mu, r, s,
-                                                         appB, expo, A,
+                                                         NULL, expo, A,
                                                          alpha[kappa], zeros,
                                                          kappamax,
                                                          FLINT_MIN(kappamax +
@@ -530,10 +548,10 @@ FUNC_HEAD
                     flint_free(expo);
                     d_mat_clear(mu);
                     d_mat_clear(r);
-                    d_mat_clear(appB);
                     fmpz_mat_clear(A->exactSP);
                     _d_vec_clear(s);
-                    _fmpz_vec_clear(exactSPtmp, d);
+                    _d_vec_clear(appBtmp);
+                    _fmpz_vec_clear(exactSPtmp, B->r);
                     /* Need to switch to mpf / arb */
                     return -1;
                 }
@@ -547,12 +565,10 @@ FUNC_HEAD
                     {
                         babai_ok =
                             fmpz_lll_advance_check_babai(kappa, kappa2, B, U,
-                                                         mu, r, s, appB, expo,
+                                                         mu, r, s, NULL, expo,
                                                          A, alpha[kappa2],
                                                          zeros, kappa + 1,
-                                                         FLINT_MIN(kappamax +
-                                                                   1 + shift,
-                                                                   n), fl);
+                                                         n, fl);
                         if (babai_ok == -1)
                         {
                             heuristic_fail =
@@ -561,7 +577,7 @@ FUNC_HEAD
                                                                          B, U,
                                                                          mu, r,
                                                                          s,
-                                                                         appB,
+                                                                         NULL,
                                                                          expo,
                                                                          A,
                                                                          alpha
@@ -569,18 +585,14 @@ FUNC_HEAD
                                                                          zeros,
                                                                          kappa
                                                                          + 1,
-                                                                         FLINT_MIN
-                                                                         (kappamax
-                                                                          + 1 +
-                                                                          shift,
-                                                                          n),
+                                                                         n,
                                                                          fl);
                         }
                     }
 #endif
                 }
 
-#if TYPE
+#if 0
                 /* Use the newd stuff here... */
                 ok = 1;
                 if (kappa == d - 1
@@ -629,6 +641,19 @@ FUNC_HEAD
                     /* ******************************************* */
 
                     kappa2 = kappa;
+#if TYPE
+                    if (kappa == d - 1)
+                    {
+                        fmpz_init(rii);
+                        fmpz_set_d(rii, ldexp(s[kappa - 1], 2 * expo[kappa]));
+                        if (fmpz_cmp(rii, gs_B) > 0)
+                        {
+                            d--;
+                            newd--;
+                        }
+                        fmpz_clear(rii);
+                    }
+#endif
                     do
                     {
                         kappa--;
@@ -670,29 +695,24 @@ FUNC_HEAD
 
                     d_mat_entry(r, kappa, kappa) = s[kappa];
 
-                    /* ************************ */
-                    /* Step7: Update B and appB */
-                    /* ************************ */
+                    /* *************** */
+                    /* Step7: Update B */
+                    /* *************** */
 
                     Btmp = B->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
-                    Btmp = _fmpz_vec_init(d);
+                    Btmp = _fmpz_vec_init(B->r);
                     if (fl->store_trans)
                     {
-                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], B->r);
                         for (i = kappa2; i > kappa; i--)
-                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, B->r);
                     }
-                    _fmpz_vec_clear(Btmp, d);
-
-                    appBtmp = appB->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        appB->rows[i] = appB->rows[i - 1];
-                    appB->rows[kappa] = appBtmp;
+                    _fmpz_vec_clear(Btmp, B->r);
 
                     j = expo[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -760,9 +780,9 @@ FUNC_HEAD
             flint_free(expo);
             d_mat_clear(mu);
             d_mat_clear(r);
-            d_mat_clear(appB);
             fmpz_mat_clear(A->exactSP);
             _d_vec_clear(s);
+            _d_vec_clear(appBtmp);
             _fmpz_vec_clear(exactSPtmp, d);
 
             if (kappa < d)
@@ -780,6 +800,9 @@ FUNC_HEAD
         ulong loops;
 
         d = B->r;
+#if TYPE
+        newd = d;
+#endif
 
         d_mat_init(mu, d, d);
         d_mat_init(r, d, d);
@@ -902,7 +925,7 @@ FUNC_HEAD
                         if (fl->store_trans)
                         {
                             _fmpz_vec_scalar_submul_fmpz(U->rows[kappa],
-                                                         U->rows[j], d, x + j);
+                                                         U->rows[j], B->r, x + j);
                         }
                     }
                 }
@@ -929,7 +952,7 @@ FUNC_HEAD
                                      fmpz_mat_entry(B, kappa, kappa), t);
                         }
                     }
-                    for (i = 0; i < d; i++)
+                    for (i = 0; i < B->r; i++)
                     {
                         if (i < kappa)
                         {
@@ -971,39 +994,6 @@ FUNC_HEAD
             }
             d_mat_entry(r, kappa, kappa) = s[kappa];
 
-#if TYPE
-            /* Use the newd stuff here... */
-            ok = 1;
-            if (kappa == d - 1
-                && d_mat_entry(r, kappa, kappa) >= d_mat_entry(r, kappa - 1,
-                                                               kappa -
-                                                               1) / 2.0)
-            {
-                fmpz_init(rii);
-                for (i = d - 1; (i >= 0) && (ok > 0); i--)
-                {
-                    /* rii is the squared G-S length of ith vector */
-                    fmpz_set_d(rii, d_mat_entry(r, i, i));
-                    if ((ok = fmpz_cmp(rii, gs_B)) > 0)
-                    {
-                        d--;
-                    }
-                }
-                fmpz_clear(rii);
-            }
-            newd = d;
-            if (kappa >= d)
-            {
-                break;
-            }
-#else
-            if (!ok)
-            {
-                fmpz_init(rii);
-                fmpz_clear(rii);
-            }
-#endif
-
             if (ctt * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1]) /* check LLL condition */
             {
                 kappa++;
@@ -1012,6 +1002,25 @@ FUNC_HEAD
             {
                 int kappa2;
                 kappa2 = kappa;
+#if TYPE
+                if (kappa == d - 1)
+                {
+                    fmpz_init(rii);
+                    fmpz_set_d(rii, s[kappa - 1]);
+                    if (fmpz_cmp(rii, gs_B) > 0)
+                    {
+                        d--;
+                        newd--;
+                    }
+                    fmpz_clear(rii);
+                }
+#else
+                if (0)
+                {
+                    fmpz_init(rii);
+                    fmpz_clear(rii);
+                }
+#endif
                 do
                 {
                     kappa--;
@@ -1026,19 +1035,19 @@ FUNC_HEAD
                 }
                 d_mat_entry(r, kappa, kappa) = s[kappa];
 
-                x = _fmpz_vec_init(d);
+                x = _fmpz_vec_init(B->r);
                 if (fl->store_trans)
                 {
-                    _fmpz_vec_set(x, U->rows[kappa2], d);
+                    _fmpz_vec_set(x, U->rows[kappa2], B->r);
                     for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                    _fmpz_vec_set(U->rows[kappa], x, d);
+                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
+                    _fmpz_vec_set(U->rows[kappa], x, B->r);
                 }
-                _fmpz_vec_clear(x, d);
+                _fmpz_vec_clear(x, B->r);
 
                 for (j = kappa2; j > kappa; j--)
                 {
-                    for (i = kappa2; i < d; i++)
+                    for (i = kappa2; i < B->r; i++)
                         fmpz_swap(fmpz_mat_entry(B, i, j),
                                   fmpz_mat_entry(B, i, j - 1));
                     for (i = 0; i < kappa; i++)

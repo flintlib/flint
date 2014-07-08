@@ -324,10 +324,13 @@ FUNC_HEAD
             int i, j, k, test, aa, exponent, max_expo = INT_MAX;
             slong exp;
             slong xx;
+            double *appBtmp;
             double tmp, rtmp, halfplus, onedothalfplus;
             ulong loops;
 
             aa = (a > zeros) ? a : zeros + 1;
+
+            appBtmp = _d_vec_init(n);
 
             halfplus = (4 * fl->eta + 0.5) / 5;
             onedothalfplus = 1.0 + halfplus;
@@ -420,6 +423,7 @@ FUNC_HEAD
                     }
                     if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
                     {
+                        _d_vec_clear(appBtmp);
                         return -1;
                     }
                     max_expo = new_max_expo;
@@ -588,8 +592,7 @@ FUNC_HEAD
                 if (test)       /* Anything happened? */
                 {
                     expo[kappa] =
-                        _fmpz_vec_get_d_vec_2exp(appB->rows[kappa],
-                                                 B->rows[kappa], n);
+                        _fmpz_vec_get_d_vec_2exp(appBtmp, B->rows[kappa], n);
                     aa = zeros + 1;
 
                     for (i = zeros + 1; i <= LIMIT; i++)
@@ -637,6 +640,7 @@ FUNC_HEAD
             }
             d_mat_entry(r, kappa, kappa) = s[kappa];
 #endif
+            _d_vec_clear(appBtmp);
         }
     }
     return 0;

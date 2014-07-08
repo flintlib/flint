@@ -318,9 +318,9 @@ FUNC_HEAD
         else
         {
             int kappa, kappa2, d, n, i, j, zeros, kappamax;
-            mpf_mat_t mu, r, appB;
+            mpf_mat_t mu, r;
             fmpz_gram_t A;
-            mpf *s, *mutmp, *appBtmp;
+            mpf *s, *mutmp;
             fmpz *exactSPtmp;
             mpf_t ctt, tmp, rtmp;
             int *alpha;
@@ -338,7 +338,6 @@ FUNC_HEAD
 
             mpf_mat_init(mu, d, d, prec);
             mpf_mat_init(r, d, d, prec);
-            mpf_mat_init(appB, d, n, prec);
             fmpz_mat_init(A->exactSP, d, d);
 
             s = _mpf_vec_init(d, prec);
@@ -356,13 +355,6 @@ FUNC_HEAD
                     fmpz_set_si(fmpz_mat_entry(A->exactSP, i, j), WORD_MIN);
                 }
             }
-
-            /* ************************** */
-            /* Step1: Initialization Step */
-            /* ************************** */
-
-            for (i = 0; i < d; i++)
-                _fmpz_vec_get_mpf_vec(appB->rows[i], B->rows[i], n);
 
             /* ********************************* */
             /* Step2: Initializing the main loop */
@@ -401,7 +393,7 @@ FUNC_HEAD
                 /* Step3: Call to the Babai algorithm */
                 /* ********************************** */
                 babai_ok =
-                    fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, appB,
+                    fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, NULL,
                                                    A, alpha[kappa], zeros,
                                                    kappamax, n, tmp, rtmp,
                                                    prec, fl);
@@ -412,7 +404,6 @@ FUNC_HEAD
                     mpf_clears(ctt, tmp, rtmp, '\0');
                     mpf_mat_clear(mu);
                     mpf_mat_clear(r);
-                    mpf_mat_clear(appB);
                     fmpz_mat_clear(A->exactSP);
                     _mpf_vec_clear(s, d);
                     _fmpz_vec_clear(exactSPtmp, d);
@@ -509,9 +500,9 @@ FUNC_HEAD
 
                     mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
 
-                    /* ************************ */
-                    /* Step7: Update B and appB */
-                    /* ************************ */
+                    /* *************** */
+                    /* Step7: Update B */
+                    /* *************** */
 
                     Btmp = B->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -527,11 +518,6 @@ FUNC_HEAD
                         _fmpz_vec_set(U->rows[kappa], Btmp, d);
                     }
                     _fmpz_vec_clear(Btmp, d);
-
-                    appBtmp = appB->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        appB->rows[i] = appB->rows[i - 1];
-                    appB->rows[kappa] = appBtmp;
 
                     /* ********************* */
                     /* Step8: Update exactSP */
@@ -590,7 +576,6 @@ FUNC_HEAD
             mpf_clears(ctt, tmp, rtmp, '\0');
             mpf_mat_clear(mu);
             mpf_mat_clear(r);
-            mpf_mat_clear(appB);
             fmpz_mat_clear(A->exactSP);
             _mpf_vec_clear(s, d);
             _fmpz_vec_clear(exactSPtmp, d);
