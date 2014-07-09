@@ -128,6 +128,26 @@ int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
     \code{fmpz_lll_check_babai_heuristic_d()}. However, it also inherits some
     temporary \code{mpf_t} variables \code{tmp} and \code{rtmp}.
 
+int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B,
+                  fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB,
+                  int *expo, fmpz_gram_t A, int a, int zeros, int kappamax,
+                  int n, const fmpz_lll_t fl)
+
+    This is a Babai procedure which is used when size reducing a vector beyond
+    an index which LLL has reached. \code{cur_kappa} is the index behind which
+    we can assume \code{B} is LLL reduced, while \code{kappa} is the vector to
+    be reduced. This procedure only size reduces the \code{kappa}-th row by
+    vectors upto \code{cur_kappa}, \textbf{not} \code{kappa - 1}.
+
+int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa,
+                  fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
+                  d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros,
+                  int kappamax, int n, const fmpz_lll_t fl)
+
+    Same as \code{fmpz_lll_advance_check_babai()} but using the heuristic inner
+    product rather than a purely floating point inner product. The heuristic
+    will compute at full precision when there is cancellation.
+
 *******************************************************************************
 
     Shift
@@ -228,5 +248,24 @@ int fmpz_lll_wrapper_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
     addition of the removal boundary. It begins with the greediest version
     (\code{fmpz_lll_d_with_removal()}), then adapts to the version using
     heuristic inner products only (\code{fmpz_lll_d_heuristic_with_removal()})
-    if $fl->gt == APPROX$, and finally to the mpf version
+    if $fl->rt == Z_BASIS$ and $fl->gt == APPROX$, and finally to the mpf
+    version (\code{fmpz_lll_mpf_with_removal()}) if needed.
+
+int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U,
+                                     const fmpz_t gs_B, const fmpz_lll_t fl)
+
+    This is floating point LLL specialized to knapsack-type lattices. It
+    performs early size reductions occasionally which makes things faster in
+    the knapsack case. Otherwise, it is similar to
+    \code{fmpz_lll_d_with_removal}.
+
+int fmpz_lll_wrapper_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U,
+                                        const fmpz_t gs_B, const fmpz_lll_t fl)
+
+    A wrapper of the procedures implementing the LLL specialized to
+    knapsack-type lattices. It begins with the greediest version and the engine
+    of this version, (\code{fmpz_lll_d_with_removal_knapsack()}), then adapts
+    to the version using heuristic inner products only
+    (\code{fmpz_lll_d_heuristic_with_removal()}) if $fl->rt == Z_BASIS$ and
+    $fl->gt == APPROX$, and finally to the mpf version
     (\code{fmpz_lll_mpf_with_removal()}) if needed.
