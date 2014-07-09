@@ -1038,6 +1038,20 @@ void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2,
     If sign = 0, it is assumed that $0 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
     Otherwise, it is assumed that $-m_1 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
 
+void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+                                                fmpz_t r2, fmpz_t m2, int sign)
+
+    Use the Chinese Remainder Theorem to set \code{out} to the unique value
+    $0 \le x < M$ (if sign = 0) or $-M/2 < x \le M/2$ (if sign = 1)
+    congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
+    where where $M = m_1 \times m_2$.
+
+    It is assumed that $m_1$ and $m_2$ are positive integers greater
+    than $1$ and coprime.
+
+    If sign = 0, it is assumed that $0 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
+    Otherwise, it is assumed that $-m_1 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
+
 void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
@@ -1341,6 +1355,19 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n,
     undefined.
 
     This is efficient if $s^3 > n$.
+
+int fmpz_is_prime_lenstra3(fmpz_t F, fmpz * res, const fmpz_t n, 
+                                                     mp_ptr pk1, slong num_pk1)
+
+    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
+    $n^3 - 1$, this function performs the Lenstra finite fields primality test.
+    It returns $0$ if $n$ is shown to be composite. Otherwise it returns $1$,
+    which means that all factors of $n$ are congruent to one of the $k$ 
+    residues written to \code{res} modulo $F$.
+
+    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
+
+    Assumes \code{num_pk1} is not $0$.
 
 *******************************************************************************
 

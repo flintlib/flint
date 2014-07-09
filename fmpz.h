@@ -652,6 +652,9 @@ void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
 void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
+void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+                                                fmpz_t r2, fmpz_t m2, int sign);
+
 static __inline__ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 {
     if (x <= m / 2)
@@ -716,7 +719,8 @@ int fmpz_is_prime(const fmpz_t p);
 int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, 
                                                const fmpz_t r, const fmpz_t s);
 
-
+int fmpz_is_prime_lenstra3(fmpz_t F, fmpz * res, const fmpz_t n, 
+                                                    mp_ptr pk1, slong num_pk1);
 /* Primorials */
 
 void fmpz_primorial(fmpz_t res, ulong n);
