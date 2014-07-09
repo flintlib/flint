@@ -626,9 +626,8 @@ void fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
     We require \code{finv} to be the inverse of the reverse of \code{f}.
 
-void
-_fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
-                                  slong lenf, const fmpz* finv, slong lenfinv,
+void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, 
+                  const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv,
                                   const fmpz_t p)
 
     Sets \code{res} to \code{x} raised to the power \code{e} modulo \code{f},
@@ -638,14 +637,40 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
     We require \code{lenf > 2}. The output \code{res} must have room for
     \code{lenf - 1} coefficients.
 
-void
-fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
-                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
+void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, 
+           const fmpz_t e, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv)
 
     Sets \code{res} to \code{x} raised to the power \code{e}
     modulo \code{f}, using sliding window exponentiation. We require
     \code{e >= 0}. We require \code{finv} to be the inverse of the reverse of
     \code{f}.
+
+void 
+fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+
+    If \code{p = f->p}, compute $x^(p^1)$, $x^(p^2)$, $x^(p^4)$, ..., 
+    $x^(p^(2^l)) \pmod{f}$ where $2^l$ is the greatest power of $2$ less than 
+    or equal to $m$.
+
+    Allows construction of $x^(p^k)$ for $k = 0$, $1$, ..., $x^(p^m) \pmod{f}$
+    using \code{fmpz_mod_poly_frobenius_power()}.
+
+    Requires precomputed inverse of $f$, i.e. newton inverse.
+
+void 
+fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow)
+
+    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_t} struct.
+
+void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
+                             fmpz_mod_poly_frobenius_powers_t pow, 
+                                              const fmpz_mod_poly_t f, ulong m)
+
+    If \code{p = f->p}, compute $x^(p^m) \pmod{f}$.
+
+    Requires precomputed frobenius powers supplied by
+    \code{fmpz_mod_poly_frobenius_powers_precomp}.
 
 *******************************************************************************
 
