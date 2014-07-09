@@ -35,6 +35,51 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
+#define NUM_POLYS 3 /* x^3 - 1, x^4 - 1, x^6 - 1 */
+
+static slong pol_degrees[3] = { 3, 4, 6 };
+
+slong __primes_remove(ulong * arr1, slong len1, ulong * arr2, slong len2)
+{
+   slong i, j, k;
+
+   for (i = 0, j = 0, k = 0; i < len1; )
+   {
+      if (k >= len2 || arr1[i] < arr2[k])
+         arr1[j++] = arr1[i++];
+      else if (arr1[i] == arr2[k])
+         i++, k++;
+      else
+         k++;
+   }
+
+   return j;
+}
+
+void __print_list(ulong * arr, slong len)
+{
+   slong i;
+   
+   printf("[");
+   for (i = 0; i < len - 1; i++)
+      printf("%ld, ", arr[i]);
+   if (len)
+      printf("%ld", arr[i]);
+   printf("]\n");
+}
+
+void __combine_residues(fmpz * r, fmpz * r1, fmpz_t F1, slong r1n, 
+                                  fmpz * r2, fmpz_t F2, slong r2n)
+{
+   slong i, j;
+
+   for (i = 0; i < r1n; i++)
+   {
+      for (j = 0; j < r2n; j++)
+         fmpz_CRT(r + i*r2n + j, r1 + i, F1, r2 + j, F2, 0);
+   }
+}
+
 int fmpz_is_prime(const fmpz_t n)
 {
    int res = 0;
@@ -51,8 +96,8 @@ int fmpz_is_prime(const fmpz_t n)
    {
       double logd = log(fmpz_get_d(n));
       ulong p, ppi, limit = (ulong) (logd*logd*logd/10.0) + 2;
-      ulong * pp1, * pm1;
-      slong i, num, num_pp1 = 0, num_pm1 = 0;
+      ulong * pp1, * pm1, ** pk1, * pk1n;
+      slong i, j, num, num_pp1 = 0, num_pm1 = 0;
       const ulong * primes; 
       const double * pinv;
 
@@ -75,6 +120,16 @@ int fmpz_is_prime(const fmpz_t n)
       pm1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n - 1 */
       pp1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n + 1 */
 
+      /* allocate space for prime arrays */
+      pk1 = flint_malloc(NUM_POLYS*sizeof(ulong *));
+      pk1n = flint_malloc(NUM_POLYS*sizeof(ulong));
+      
+      for (j = 0; j < NUM_POLYS; j++)
+      {
+         pk1[j] = _nmod_vec_init(pol_degrees[j] * (ulong) logd);
+         pk1n[j] = 0;
+      }
+
       while (primes[0] < limit)
       {
          /* multiply batch of primes */
@@ -90,13 +145,32 @@ int fmpz_is_prime(const fmpz_t n)
          /* check for factors */
          for (i = 0; i < num; i++)
          {
-            ulong r = n_mod2_precomp(p, primes[i], pinv[i]);
+            ulong rk, r2, r = n_mod2_precomp(p, primes[i], pinv[i]);
 
             if (r == 1) /* n - 1 = 0 mod p */
                pm1[num_pm1++] = primes[i];
 
             if (r == primes[i] - 1) /* n + 1 = 0 mod p */
                pp1[num_pp1++] = primes[i];
+
+            /* n^2 mod p */
+            r2 = n_mulmod_precomp(r, r, primes[i], pinv[i]);
+               
+            /* check for n^2 + n + 1 = 0 mod p */
+            rk = n_addmod(r2, r, primes[i]);
+
+            if (rk == primes[i] - 1) /* n^2 + n + 1 = 0 mod p */
+               pk1[0][pk1n[0]++] = primes[i];
+
+            /* check for n^2 + 1 = 0 mod p */
+            if (r2 == primes[i] - 1) /* n^2 + 1 = 0 mod p */
+               pk1[1][pk1n[1]++] = primes[i];
+
+            /* check for n^2 - n + 1 = 0 mod p */
+            rk = n_submod(r2, r, primes[i]);
+            
+            if (rk == primes[i] - 1) /* n^2 - n + 1 = 0 mod p */
+               pk1[2][pk1n[2]++] = primes[i];            
          }
 
          /* get next batch of primes */
@@ -104,6 +178,17 @@ int fmpz_is_prime(const fmpz_t n)
          pinv += num;
       }
 
+      /* remove primes already dealt with at each size k */      
+      for (j = 0; j < NUM_POLYS; j++)
+      {
+          pk1n[j] = __primes_remove(pk1[j], pk1n[j], pm1, num_pm1);
+          pk1n[j] = __primes_remove(pk1[j], pk1n[j], pp1, num_pp1);
+
+          for (i = 0; i < j; i++)
+             pk1n[j] = __primes_remove(pk1[j], pk1n[j], pk1[i], pk1n[i]);
+      }
+
+      /* p - 1 test */
       res = fmpz_is_prime_pocklington(F1, R, n, pm1, num_pm1);
 
       if (res == 1)
@@ -214,13 +299,16 @@ int fmpz_is_prime(const fmpz_t n)
                             fmpz_clear(nmodF);
                         } else
                         {
+                           fmpz_t d;
+                           
+                           fmpz_init(d);
+                              
                            fmpz_mul(Fcub, Fsqr, F);
                            
                            if (fmpz_cmp(Fcub, n) > 0) /* Lenstra's divisors in residue class */
                            {
-                              fmpz_t d, r;
+                              fmpz_t r;
 
-                              fmpz_init(d);
                               fmpz_init(r);
                               
                               fmpz_set_ui(r, 1);
@@ -232,9 +320,66 @@ int fmpz_is_prime(const fmpz_t n)
                                  res = 0;
 
                               fmpz_clear(r);
-                              fmpz_clear(d);
                            } else
-                              res = -1;
+                           {
+                              fmpz_t Fk;
+                              fmpz * r2, * r3;
+                              slong r2n, r3n;
+
+                              fmpz_init(Fk);
+                              
+                              r2 = _fmpz_vec_init(2);
+                              r3 = _fmpz_vec_init(pol_degrees[NUM_POLYS - 1]);
+
+                              fmpz_set_ui(r2 + 0, 1);
+                              fmpz_mod(r2 + 1, n, F);
+                              r2n = fmpz_is_one(r2 + 1) ? 1 : 2;
+
+                              if (pk1n[0] != 0)
+                              {
+                                 fmpz * r = _fmpz_vec_init(3*r2n);
+                                 
+                                 res = fmpz_is_prime_lenstra3(Fk, r3, n, pk1[0], pk1n[0]);
+                                 r3n = 3;
+
+                                 __combine_residues(r, r3, Fk, r3n, r2, F, r2n);
+
+                                 fmpz_mul(F, F, Fk);
+                                 fmpz_mul(Fsqr, F, F);
+
+                                 if (fmpz_cmp(Fsqr, n) >= 0) 
+                                 {
+                                    for (i = 0; i < r3n*r2n; i++)
+                                    {
+                                       if (!fmpz_is_one(r + i) && !fmpz_equal(r + i, n) 
+                                         && fmpz_divisible(n, r + i))
+                                         res = 0;
+                                    }
+                                 } else
+                                 {
+                                    fmpz_mul(Fcub, Fsqr, F);
+                                    
+                                    if (fmpz_cmp(Fcub, n) >= 0)
+                                    {
+                                       for (i = 0; i < r3n*r2n; i++)
+                                       {
+                                          if (fmpz_divisor_in_residue_class_lenstra(d, n, r + i, F))
+                                             res = 0;
+                                       }
+                                    } else
+                                       res = -1;
+                                 }
+
+                                 _fmpz_vec_clear(r, 3*r2n);
+                              } else
+                                 res = -1;
+
+                              _fmpz_vec_clear(r3, pol_degrees[NUM_POLYS - 1]);
+
+                              fmpz_clear(Fk);
+                           }
+
+                           fmpz_clear(d);
                         }
 
                         fmpz_clear(F);
@@ -249,6 +394,13 @@ int fmpz_is_prime(const fmpz_t n)
          }
       } 
 
+      /* deallocate prime arrays */
+      for (j = 0; j < NUM_POLYS; j++)
+         _nmod_vec_clear(pk1[j]);
+
+      flint_free(pk1);
+      flint_free(pk1n);
+
       _nmod_vec_clear(pm1);
       _nmod_vec_clear(pp1);
 
@@ -261,3 +413,5 @@ int fmpz_is_prime(const fmpz_t n)
    return res;
       
 }
+
+#undef NUM_POLYS

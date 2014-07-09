@@ -267,6 +267,10 @@ int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 
     Returns non-zero if the polynomial is zero.
 
+int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly)
+
+    Returns non-zero if the polynomial is the constant $1$.
+
 *******************************************************************************
 
     Getting and setting coefficients

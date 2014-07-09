@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2014 William Hart
 
 ******************************************************************************/
 
@@ -67,6 +68,14 @@ typedef struct
 } fmpz_mod_poly_res_struct;
 
 typedef fmpz_mod_poly_res_struct fmpz_mod_poly_res_t[1];
+
+typedef struct
+{
+   fmpz_mod_poly_struct * pow;
+   slong len;
+} fmpz_mod_poly_frobenius_powers_struct;
+
+typedef fmpz_mod_poly_frobenius_powers_struct fmpz_mod_poly_frobenius_powers_t[1];
 
 /*  Initialisation and memory management *************************************/
 
@@ -174,6 +183,12 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
         return poly->coeffs + (poly->length - 1);
     else
         return NULL;
+}
+
+static __inline__
+int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly)
+{
+   return poly->length == 1 && fmpz_is_one(poly->coeffs + 0);
 }
 
 /*  Assignment and basic manipulation ****************************************/
@@ -399,17 +414,29 @@ _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly,
 
 void
 fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
-                           const fmpz_mod_poly_t poly, const fmpz_t e,
-                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+                          const fmpz_mod_poly_t poly, const fmpz_t e,
+                          const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
 void
 _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
-                                    slong lenf, const fmpz* finv, slong lenfinv,
-                                    const fmpz_t p);
+                                   slong lenf, const fmpz* finv, slong lenfinv,
+                                   const fmpz_t p);
 
 void
 fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
-                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+                          const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+
+void
+fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+                 const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
+
+void
+fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
+
+void
+fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
+                            fmpz_mod_poly_frobenius_powers_t pow, 
+                                             const fmpz_mod_poly_t f, ulong m);
 
 /*  Division *****************************************************************/
 
