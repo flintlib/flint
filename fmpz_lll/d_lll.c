@@ -31,7 +31,7 @@
 
 FUNC_HEAD
 {
-    int newd = 0;
+    int newd = 0, ok = 1;
     fmpz_t rii;
     int *expo = NULL;
     if (fl->rt == Z_BASIS)
@@ -52,9 +52,6 @@ FUNC_HEAD
 
             n = B->c;
             d = B->r;
-#if TYPE
-            newd = d;
-#endif
 
             ctt = (4 * fl->delta + 1) / 5;
 
@@ -203,34 +200,6 @@ FUNC_HEAD
 #endif
                 }
 
-#if 0
-                /* Use the newd stuff here... */
-                ok = 1;
-                if (kappa == d - 1
-                    && ldexp(d_mat_entry(r, kappa, kappa),
-                             2 * (expo[kappa] - expo[kappa - 1])) >=
-                    d_mat_entry(r, kappa - 1, kappa - 1) / 2.0)
-                {
-                    fmpz_init(rii);
-                    for (i = d - 1; (i >= 0) && (ok > 0); i--)
-                    {
-                        /* rii is the squared G-S length of ith vector */
-                        fmpz_set_d(rii,
-                                   ldexp(d_mat_entry(r, i, i), 2 * expo[i]));
-                        if ((ok = fmpz_cmp(rii, gs_B)) > 0)
-                        {
-                            d--;
-                        }
-                    }
-                    fmpz_clear(rii);
-                }
-                newd = d;
-                if (kappa >= d)
-                {
-                    break;
-                }
-#endif
-
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
                 /* ************************************ */
@@ -253,14 +222,13 @@ FUNC_HEAD
 
                     kappa2 = kappa;
 #if TYPE
-                    if (kappa == d - 1)
+                    if (kappa == d - 1 && kappa > zeros + 2)
                     {
                         fmpz_init(rii);
                         fmpz_set_d(rii, ldexp(s[kappa - 1], 2 * expo[kappa]));
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
-                            newd--;
                         }
                         fmpz_clear(rii);
                     }
@@ -382,6 +350,20 @@ FUNC_HEAD
                 }
             }
 
+#if TYPE
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
+            {
+                fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), 2 * expo[i]));
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
+            }
+            fmpz_clear(rii);
+#endif
+
             flint_free(alpha);
             flint_free(expo);
             d_mat_clear(mu);
@@ -412,9 +394,6 @@ FUNC_HEAD
 
             n = B->c;
             d = B->r;
-#if TYPE
-            newd = d;
-#endif
 
             ctt = (4 * fl->delta + 1) / 5;
 
@@ -592,34 +571,6 @@ FUNC_HEAD
 #endif
                 }
 
-#if 0
-                /* Use the newd stuff here... */
-                ok = 1;
-                if (kappa == d - 1
-                    && ldexp(d_mat_entry(r, kappa, kappa),
-                             2 * (expo[kappa] - expo[kappa - 1])) >=
-                    d_mat_entry(r, kappa - 1, kappa - 1) / 2.0)
-                {
-                    fmpz_init(rii);
-                    for (i = d - 1; (i >= 0) && (ok > 0); i--)
-                    {
-                        /* rii is the squared G-S length of ith vector */
-                        fmpz_set_d(rii,
-                                   ldexp(d_mat_entry(r, i, i), 2 * expo[i]));
-                        if ((ok = fmpz_cmp(rii, gs_B)) > 0)
-                        {
-                            d--;
-                        }
-                    }
-                    fmpz_clear(rii);
-                }
-                newd = d;
-                if (kappa >= d)
-                {
-                    break;
-                }
-#endif
-
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
                 /* ************************************ */
@@ -642,14 +593,13 @@ FUNC_HEAD
 
                     kappa2 = kappa;
 #if TYPE
-                    if (kappa == d - 1)
+                    if (kappa == d - 1 && kappa > zeros + 2)
                     {
                         fmpz_init(rii);
                         fmpz_set_d(rii, ldexp(s[kappa - 1], 2 * expo[kappa]));
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
-                            newd--;
                         }
                         fmpz_clear(rii);
                     }
@@ -776,6 +726,20 @@ FUNC_HEAD
                 }
             }
 
+#if TYPE
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
+            {
+                fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), 2 * expo[i]));
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
+            }
+            fmpz_clear(rii);
+#endif
+
             flint_free(alpha);
             flint_free(expo);
             d_mat_clear(mu);
@@ -800,9 +764,6 @@ FUNC_HEAD
         ulong loops;
 
         d = B->r;
-#if TYPE
-        newd = d;
-#endif
 
         d_mat_init(mu, d, d);
         d_mat_init(r, d, d);
@@ -925,7 +886,8 @@ FUNC_HEAD
                         if (fl->store_trans)
                         {
                             _fmpz_vec_scalar_submul_fmpz(U->rows[kappa],
-                                                         U->rows[j], B->r, x + j);
+                                                         U->rows[j], B->r,
+                                                         x + j);
                         }
                     }
                 }
@@ -1003,19 +965,18 @@ FUNC_HEAD
                 int kappa2;
                 kappa2 = kappa;
 #if TYPE
-                if (kappa == d - 1)
+                if (kappa == d - 1 && kappa > 1)
                 {
                     fmpz_init(rii);
                     fmpz_set_d(rii, s[kappa - 1]);
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
-                        newd--;
                     }
                     fmpz_clear(rii);
                 }
 #else
-                if (0)
+                if (!ok)
                 {
                     fmpz_init(rii);
                     fmpz_clear(rii);
@@ -1074,6 +1035,20 @@ FUNC_HEAD
                 fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(B, j, i));
             }
         }
+
+#if TYPE
+        newd = d;
+        fmpz_init(rii);
+        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+        {
+            fmpz_set_d(rii, d_mat_entry(r, i, i));
+            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+            {
+                newd--;
+            }
+        }
+        fmpz_clear(rii);
+#endif
 
         d_mat_clear(mu);
         d_mat_clear(r);

@@ -34,15 +34,16 @@
 
 void fmpz_lll_context_init_default(fmpz_lll_t fl)
 
-    Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt} and \code{fl->gt} to
-    their default values, 0.99, 0.51, $Z_BASIS$ and $APPROX$ respectively.
+    Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt}, \code{fl->gt} and
+    \code{fl->store_trans} to their default values, 0.99, 0.51, $Z_BASIS$,
+    $APPROX$ and 0 respectively.
 
 void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta,
-                           rep_type rt, gram_type gt)
+                           rep_type rt, gram_type gt, int store_trans)
 
-    Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt} and \code{fl->gt} to
-    \code{delta}, \code{eta}, \code{rt} and \code{gt} (given as input)
-    respectively.
+    Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt}, \code{fl->gt} and
+    \code{fl->store_trans} to \code{delta}, \code{eta}, \code{rt}, \code{gt}
+    and \code{store_trans} (given as input) respectively.
 
 *******************************************************************************
 
@@ -55,7 +56,7 @@ void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
     Sets \code{fl->delta} and \code{fl->eta} to random values in the interval
     $(0.25, 1)$ and (0.5, \sqrt{\code{delta}}) respectively. \code{fl->rt} is
     set to $GRAM$ or $Z_BASIS$ and \code{fl->gt} is set to $APPROX$ or $EXACT$
-    in a pseudo random way.
+    in a pseudo random way. Similarly, \code{fl->store_trans} is set to 0 or 1.
 
 *******************************************************************************
 
@@ -86,41 +87,42 @@ double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2,
 
 *******************************************************************************
 
-int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, d_mat_t mu, d_mat_t r,
-                      double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a,
-                      int zeros, int kappamax, int n, const fmpz_lll_t fl)
+int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu,
+                  d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+                  int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Performs floating point size reductions of the \code{kappa}-th row of
     \code{B} by all of the previous rows, uses d_mats \code{mu} and \code{r}
-    for storing the GSO data. The \code{double} array \code{s} will contain the
-    size of the \code{kappa}-th row if it were moved into position $i$. The
-    d_mat \code{appB} is an approximation of \code{B} with each row receiving
-    an exponent stored in \code{expo} which gets populated only when needed.
-    The d_mat \code{A->appSP} is an approximation of the Gram matrix whose
-    entries are scalar products of the rows of \code{B} and is used when
-    \code{fl->gt} == $APPROX$. When \code{fl->gt} == $EXACT$ the fmpz_mat
-    \code{A->exactSP} (the exact Gram matrix) is used. The index \code{a} is
-    the smallest row index which will be reduced from the \code{kappa}-th row.
-    Index \code{zeros} is the number of zero rows in the matrix.
-    \code{kappamax} is the highest index which has been size-reduced so far,
-    and \code{n} is the number of columns you want to consider. \code{fl} is an
-    LLL (L^2) context object. The output is the value -1 if
-    the process fails (usually due to insufficient precision) or 0 if
+    for storing the GSO data. \code{U} is used to store the unimodular
+    transformations if \code{fl->store_trans} is non-zero. The \code{double}
+    array \code{s} will contain the size of the \code{kappa}-th row if it were
+    moved into position $i$. The d_mat \code{appB} is an approximation of
+    \code{B} with each row receiving an exponent stored in \code{expo} which
+    gets populated only when needed. The d_mat \code{A->appSP} is an
+    approximation of the Gram matrix whose entries are scalar products of the
+    rows of \code{B} and is used when \code{fl->gt} == $APPROX$. When
+    \code{fl->gt} == $EXACT$ the fmpz_mat \code{A->exactSP} (the exact Gram
+    matrix) is used. The index \code{a} is the smallest row index which will be
+    reduced from the \code{kappa}-th row. Index \code{zeros} is the number of
+    zero rows in the matrix. \code{kappamax} is the highest index which has
+    been size-reduced so far, and \code{n} is the number of columns you want to
+    consider. \code{fl} is an LLL (L^2) context object. The output is the value
+    -1 if the process fails (usually due to insufficient precision) or 0 if
     everything was successful. These descriptions will be true for the future
     Babai procedures as well.
 
-int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, d_mat_t mu,
-               d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
-               int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+      d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+      int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_check_babai()} but using the heuristic inner product
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
 
-int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, mpf_mat_t mu,
-          mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros,
-          int kappamax, int n, mpf_t tmp, mpf_t rtmp, mp_bitcnt_t prec,
-          const fmpz_lll_t fl)
+int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+              mpf_mat_t mu, mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A,
+              int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp,
+              mp_bitcnt_t prec, const fmpz_lll_t fl)
 
     This function is like the \code{mpf} version of
     \code{fmpz_lll_check_babai_heuristic_d()}. However, it also inherits some
@@ -143,87 +145,83 @@ int fmpz_lll_shift(const fmpz_mat_t B)
 
 *******************************************************************************
 
-int fmpz_lll_d(fmpz_mat_t B, const fmpz_lll_t fl)
+int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     This is a mildly greedy version of floating point LLL using doubles only.
     It tries the fast version of the Babai algorithm
     (\code{fmpz_lll_check_babai()}). If that fails, then it switches to the
     heuristic version (\code{fmpz_lll_check_babai_heuristic_d()}) for only one
     loop and switches right back to the fast version. It reduces \code{B} in
-    place. \code{fl} is the context object containing information containing
-    the LLL parameters \delta and \eta. The function can perform reduction on
-    both the lattice basis as well as its Gram matrix. The type of lattice
-    representation can be specified via the parameter \code{fl->rt}. The type
-    of Gram matrix to be used in computation (approximate or exact) can also be
-    specified through the variable \code{fl->gt} (applies only if
-    \code{fl->rt} == $Z_BASIS$).
+    place. \code{U} is the matrix used to store the unimodular transformations
+    if \code{fl->store_trans} is set to a non-zero value. \code{fl} is the
+    context object containing information containing the LLL parameters \delta
+    and \eta. The function can perform reduction on both the lattice basis as
+    well as its Gram matrix. The type of lattice representation can be
+    specified via the parameter \code{fl->rt}. The type of Gram matrix to be
+    used in computation (approximate or exact) can also be specified through
+    the variable \code{fl->gt} (applies only if \code{fl->rt} == $Z_BASIS$).
 
-int fmpz_lll_d_heuristic(fmpz_mat_t B, const fmpz_lll_t fl)
+int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     This LLL reduces \code{B} in place using doubles only. It is similar to
     \code{fmpz_lll_d()} but only uses the heuristic inner products which
     attempt to detect cancellations.
 
-int fmpz_lll_mpf2(fmpz_mat_t B, mp_bitcnt_t prec, const fmpz_lll_t fl)
+int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec,
+                  const fmpz_lll_t fl)
 
     This is LLL using \code{mpf} with the given precision, \code{prec} for the
     underlying GSO. It reduces \code{B} in place like the other LLL functions.
     The $mpf2$ in the function name refers to the way the \code{mpf_t}'s are
     initialised.
 
-int fmpz_lll_mpf(fmpz_mat_t B, const fmpz_lll_t fl)
+int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     A wrapper of \code{fmpz_lll_mpf2()}. This currently begins with
     $prec == D_BITS$, then for the first 20 loops, increases the precision one
     limb at a time. After 20 loops, it doubles the precision each time. There
-    is a proof that this will eventually work. \code{B} and \code{fl} are
-    passed unchanged. The return value of this function is 0 if the LLL is
-    successful or -1 if the precision maxes out before \code{B} is LLL-reduced.
+    is a proof that this will eventually work. The return value of this
+    function is 0 if the LLL is successful or -1 if the precision maxes out
+    before \code{B} is LLL-reduced.
 
-int fmpz_lll_wrapper(fmpz_mat_t B, const fmpz_lll_t fl)
+int fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     A wrapper of the above procedures. It begins with the greediest version
     (\code{fmpz_lll_d()}), then adapts to the version using heuristic inner
     products only (\code{fmpz_lll_d_heuristic()}) if $fl->rt == Z_BASIS$ and
     $fl->gt == APPROX$, and finally to the mpf version (\code{fmpz_lll_mpf()})
-    if needed. \code{B} and \code{fl} are passed unchanged.
+    if needed.
 
-int fmpz_lll_d_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+int fmpz_lll_d_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                             const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_d()} but with a removal bound, \code{gs_B}. The
-    return value is the new dimension of \code{B} if removals are desired. The
-    function only works if the input matrix is a lattice basis, that is
-    \code{fl->rt} == $Z_BASIS$.
+    return value is the new dimension of \code{B} if removals are desired.
 
-int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
-                                      const fmpz_lll_t fl)
+int fmpz_lll_d_heuristic_with_removal(fmpz_mat_t B, fmpz_mat_t U,
+                                      const fmpz_t gs_B, const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_d_heuristic()} but with a removal bound,
     \code{gs_B}. The return value is the new dimension of \code{B} if removals
-    are desired. The function only works if the input matrix is a lattice
-    basis, that is \code{fl->rt} == $Z_BASIS$.
+    are desired.
 
-int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, mp_bitcnt_t prec,
+int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, mp_bitcnt_t prec,
                                const fmpz_t gs_B, const fmpz_lll_t fl)
 
     Same as \code{fmpz_lll_mpf2()} but with a removal bound, \code{gs_B}. The
-    return value is the new dimension of \code{B} if removals are desired. The
-    function only works if the input matrix is a lattice basis, that is
-    \code{fl->rt} == $Z_BASIS$.
+    return value is the new dimension of \code{B} if removals are desired.
 
-int fmpz_lll_mpf_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+int fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                               const fmpz_lll_t fl)
 
     A wrapper of \code{fmpz_lll_mpf2_with_removal()}. This currently begins
     with $prec == D_BITS$, then for the first 20 loops, increases the precision
     one limb at a time. After 20 loops, it doubles the precision each time.
-    There is a proof that this will eventually work. \code{B}, \code{gs_B} and
-    \code{fl} are passed unchanged. The return value of this function is the
-    new dimension of \code{B} if removals are desired or -1 if the precision
-    maxes out before \code{B} is LLL-reduced.
+    There is a proof that this will eventually work. The return value of this
+    function is the new dimension of \code{B} if removals are desired or -1 if
+    the precision maxes out before \code{B} is LLL-reduced.
 
-int fmpz_lll_wrapper_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
+int fmpz_lll_wrapper_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                                   const fmpz_lll_t fl)
 
     A wrapper of the procedures implementing the base case LLL with the
@@ -231,5 +229,4 @@ int fmpz_lll_wrapper_with_removal(fmpz_mat_t B, const fmpz_t gs_B,
     (\code{fmpz_lll_d_with_removal()}), then adapts to the version using
     heuristic inner products only (\code{fmpz_lll_d_heuristic_with_removal()})
     if $fl->gt == APPROX$, and finally to the mpf version
-    (\code{fmpz_lll_mpf_with_removal()}) if needed. \code{B}, \code{gs_B} and
-    \code{fl} are passed unchanged.
+    (\code{fmpz_lll_mpf_with_removal()}) if needed.

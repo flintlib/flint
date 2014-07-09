@@ -134,39 +134,11 @@ FUNC_HEAD
                     mpf_mat_clear(r);
                     mpf_mat_clear(appB);
                     mpf_mat_clear(A->appSP2);
-                    _mpf_vec_clear(s, d);
-                    _mpf_vec_clear(appSPtmp, d);
+                    _mpf_vec_clear(s, B->r);
+                    _mpf_vec_clear(appSPtmp, B->r);
                     /* Need to switch to mpf / arb */
                     return -1;
                 }
-
-#if TYPE
-                /* Use the newd stuff here... */
-                ok = 1;
-                if (kappa == d - 1)
-                {
-                    mpf_div_ui(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), 2);
-                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), tmp) >= 0)
-                    {
-                        fmpz_init(rii);
-                        for (i = d - 1; (i >= 0) && (ok > 0); i--)
-                        {
-                            /* rii is the squared G-S length of ith vector */
-                            fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
-                            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
-                            {
-                                d--;
-                            }
-                        }
-                        fmpz_clear(rii);
-                    }
-                }
-                newd = d;
-                if (kappa >= d)
-                {
-                    break;
-                }
-#endif
 
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
@@ -188,6 +160,18 @@ FUNC_HEAD
                     /* ******************************************* */
 
                     kappa2 = kappa;
+#if TYPE
+                    if (kappa == d - 1 && kappa > zeros + 2)
+                    {
+                        fmpz_init(rii);
+                        fmpz_set_mpf(rii, s + kappa - 1);
+                        if (fmpz_cmp(rii, gs_B) > 0)
+                        {
+                            d--;
+                        }
+                        fmpz_clear(rii);
+                    }
+#endif
                     do
                     {
                         kappa--;
@@ -238,15 +222,15 @@ FUNC_HEAD
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
-                    Btmp = _fmpz_vec_init(d);
+                    Btmp = _fmpz_vec_init(B->r);
                     if (fl->store_trans)
                     {
-                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], B->r);
                         for (i = kappa2; i > kappa; i--)
-                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, B->r);
                     }
-                    _fmpz_vec_clear(Btmp, d);
+                    _fmpz_vec_clear(Btmp, B->r);
 
                     appBtmp = appB->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -306,14 +290,28 @@ FUNC_HEAD
                 }
             }
 
+#if TYPE
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
+            {
+                fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
+            }
+            fmpz_clear(rii);
+#endif
+
             flint_free(alpha);
             mpf_clears(ctt, tmp, rtmp, '\0');
             mpf_mat_clear(mu);
             mpf_mat_clear(r);
             mpf_mat_clear(appB);
             mpf_mat_clear(A->appSP2);
-            _mpf_vec_clear(s, d);
-            _mpf_vec_clear(appSPtmp, d);
+            _mpf_vec_clear(s, B->r);
+            _mpf_vec_clear(appSPtmp, B->r);
         }
         else
         {
@@ -405,39 +403,11 @@ FUNC_HEAD
                     mpf_mat_clear(mu);
                     mpf_mat_clear(r);
                     fmpz_mat_clear(A->exactSP);
-                    _mpf_vec_clear(s, d);
-                    _fmpz_vec_clear(exactSPtmp, d);
+                    _mpf_vec_clear(s, B->r);
+                    _fmpz_vec_clear(exactSPtmp, B->r);
                     /* Need to switch to mpf / arb */
                     return -1;
                 }
-
-#if TYPE
-                /* Use the newd stuff here... */
-                ok = 1;
-                if (kappa == d - 1)
-                {
-                    mpf_div_ui(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), 2);
-                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), tmp) >= 0)
-                    {
-                        fmpz_init(rii);
-                        for (i = d - 1; (i >= 0) && (ok > 0); i--)
-                        {
-                            /* rii is the squared G-S length of ith vector */
-                            fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
-                            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
-                            {
-                                d--;
-                            }
-                        }
-                        fmpz_clear(rii);
-                    }
-                }
-                newd = d;
-                if (kappa >= d)
-                {
-                    break;
-                }
-#endif
 
                 /* ************************************ */
                 /* Step4: Success of Lovasz's condition */
@@ -459,6 +429,18 @@ FUNC_HEAD
                     /* ******************************************* */
 
                     kappa2 = kappa;
+#if TYPE
+                    if (kappa == d - 1 && kappa > zeros + 2)
+                    {
+                        fmpz_init(rii);
+                        fmpz_set_mpf(rii, s + kappa - 1);
+                        if (fmpz_cmp(rii, gs_B) > 0)
+                        {
+                            d--;
+                        }
+                        fmpz_clear(rii);
+                    }
+#endif
                     do
                     {
                         kappa--;
@@ -509,15 +491,15 @@ FUNC_HEAD
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
-                    Btmp = _fmpz_vec_init(d);
+                    Btmp = _fmpz_vec_init(B->r);
                     if (fl->store_trans)
                     {
-                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], B->r);
                         for (i = kappa2; i > kappa; i--)
-                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, B->r);
                     }
-                    _fmpz_vec_clear(Btmp, d);
+                    _fmpz_vec_clear(Btmp, B->r);
 
                     /* ********************* */
                     /* Step8: Update exactSP */
@@ -572,13 +554,27 @@ FUNC_HEAD
                 }
             }
 
+#if TYPE
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
+            {
+                fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
+            }
+            fmpz_clear(rii);
+#endif
+
             flint_free(alpha);
             mpf_clears(ctt, tmp, rtmp, '\0');
             mpf_mat_clear(mu);
             mpf_mat_clear(r);
             fmpz_mat_clear(A->exactSP);
-            _mpf_vec_clear(s, d);
-            _fmpz_vec_clear(exactSPtmp, d);
+            _mpf_vec_clear(s, B->r);
+            _fmpz_vec_clear(exactSPtmp, B->r);
         }
     }
     else
@@ -658,7 +654,7 @@ FUNC_HEAD
                     {
                         mpf_mat_clear(mu);
                         mpf_mat_clear(r);
-                        _mpf_vec_clear(s, d);
+                        _mpf_vec_clear(s, B->r);
                         mpf_clears(tmp, rtmp, '\0');
                         fmpz_clear(t);
                         return -1;
@@ -709,7 +705,8 @@ FUNC_HEAD
                         if (fl->store_trans)
                         {
                             _fmpz_vec_scalar_submul_fmpz(U->rows[kappa],
-                                                         U->rows[j], d, x + j);
+                                                         U->rows[j], B->r,
+                                                         x + j);
                         }
                     }
                 }
@@ -736,7 +733,7 @@ FUNC_HEAD
                                      fmpz_mat_entry(B, kappa, kappa), t);
                         }
                     }
-                    for (i = 0; i < d; i++)
+                    for (i = 0; i < B->r; i++)
                     {
                         if (i < kappa)
                         {
@@ -769,40 +766,6 @@ FUNC_HEAD
             }
             mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
 
-#if TYPE
-            /* Use the newd stuff here... */
-            ok = 1;
-            if (kappa == d - 1)
-            {
-                mpf_div_ui(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), 2);
-                if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), tmp) >= 0)
-                {
-                    fmpz_init(rii);
-                    for (i = d - 1; (i >= 0) && (ok > 0); i--)
-                    {
-                        /* rii is the squared G-S length of ith vector */
-                        fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
-                        if ((ok = fmpz_cmp(rii, gs_B)) > 0)
-                        {
-                            d--;
-                        }
-                    }
-                    fmpz_clear(rii);
-                }
-            }
-            newd = d;
-            if (kappa >= d)
-            {
-                break;
-            }
-#else
-            if (!ok)
-            {
-                fmpz_init(rii);
-                fmpz_clear(rii);
-            }
-#endif
-
             mpf_set_d(rtmp, ctt);
             mpf_mul(tmp, rtmp, mpf_mat_entry(r, kappa - 1, kappa - 1));
             if (mpf_cmp(tmp, s + kappa - 1) <= 0)   /* check LLL condition */
@@ -812,6 +775,24 @@ FUNC_HEAD
             else
             {
                 int kappa2;
+#if TYPE
+                if (kappa == d - 1 && kappa > 1)
+                {
+                    fmpz_init(rii);
+                    fmpz_set_mpf(rii, s + kappa - 1);
+                    if (fmpz_cmp(rii, gs_B) > 0)
+                    {
+                        d--;
+                    }
+                    fmpz_clear(rii);
+                }
+#else
+                if (!ok)
+                {
+                    fmpz_init(rii);
+                    fmpz_clear(rii);
+                }
+#endif
                 kappa2 = kappa;
                 do
                 {
@@ -832,19 +813,19 @@ FUNC_HEAD
                 }
                 mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
 
-                x = _fmpz_vec_init(d);
+                x = _fmpz_vec_init(B->r);
                 if (fl->store_trans)
                 {
-                    _fmpz_vec_set(x, U->rows[kappa2], d);
+                    _fmpz_vec_set(x, U->rows[kappa2], B->r);
                     for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                    _fmpz_vec_set(U->rows[kappa], x, d);
+                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
+                    _fmpz_vec_set(U->rows[kappa], x, B->r);
                 }
-                _fmpz_vec_clear(x, d);
+                _fmpz_vec_clear(x, B->r);
 
                 for (j = kappa2; j > kappa; j--)
                 {
-                    for (i = kappa2; i < d; i++)
+                    for (i = kappa2; i < B->r; i++)
                         fmpz_swap(fmpz_mat_entry(B, i, j),
                                   fmpz_mat_entry(B, i, j - 1));
                     for (i = 0; i < kappa; i++)
@@ -872,9 +853,23 @@ FUNC_HEAD
             }
         }
 
+#if TYPE
+        newd = d;
+        fmpz_init(rii);
+        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+        {
+            fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+            {
+                newd--;
+            }
+        }
+        fmpz_clear(rii);
+#endif
+
         mpf_mat_clear(mu);
         mpf_mat_clear(r);
-        _mpf_vec_clear(s, d);
+        _mpf_vec_clear(s, B->r);
         mpf_clears(tmp, rtmp, '\0');
         fmpz_clear(t);
     }
