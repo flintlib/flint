@@ -80,6 +80,14 @@ void __combine_residues(fmpz * r, fmpz * r1, fmpz_t F1, slong r1n,
    }
 }
 
+void __set_residues(fmpz * r, fmpz * r1, slong r1n)
+{
+   slong i;
+
+   for (i = 0; i < r1n; i++)
+      fmpz_set(r + i, r1 + i);
+}
+
 int fmpz_is_prime(const fmpz_t n)
 {
    int res = 0;
@@ -320,61 +328,133 @@ int fmpz_is_prime(const fmpz_t n)
                                  res = 0;
 
                               fmpz_clear(r);
-                           } else
+                           } else /* Lenstra finite fields primality test */
                            {
                               fmpz_t Fk;
-                              fmpz * r2, * r3;
-                              slong r2n, r3n;
+                              fmpz * r2, * r3, * r4, * r23, * r234;
+                              slong r2n, r3n, r4n, r23n, r234n;
 
                               fmpz_init(Fk);
                               
                               r2 = _fmpz_vec_init(2);
-                              r3 = _fmpz_vec_init(pol_degrees[NUM_POLYS - 1]);
-
+                              r3 = _fmpz_vec_init(3);
+                              r4 = _fmpz_vec_init(4);
+                              
                               fmpz_set_ui(r2 + 0, 1);
                               fmpz_mod(r2 + 1, n, F);
                               r2n = fmpz_is_one(r2 + 1) ? 1 : 2;
 
+                              r23 = _fmpz_vec_init(3*r2n);
+                                 
+                              res = -1;
+                              
+                              /* p^2 + p + 1 test */
                               if (pk1n[0] != 0)
                               {
-                                 fmpz * r = _fmpz_vec_init(3*r2n);
+                                 res = 1;
                                  
+                                 r23n = 3*r2n;
+
                                  res = fmpz_is_prime_lenstra3(Fk, r3, n, pk1[0], pk1n[0]);
                                  r3n = 3;
 
-                                 __combine_residues(r, r3, Fk, r3n, r2, F, r2n);
-
-                                 fmpz_mul(F, F, Fk);
-                                 fmpz_mul(Fsqr, F, F);
-
-                                 if (fmpz_cmp(Fsqr, n) >= 0) 
+                                 if (!fmpz_is_one(Fk))
                                  {
-                                    for (i = 0; i < r3n*r2n; i++)
+                                    __combine_residues(r23, r3, Fk, r3n, r2, F, r2n);
+
+                                    fmpz_mul(F, F, Fk);
+                                    fmpz_mul(Fsqr, F, F);
+
+                                    if (fmpz_cmp(Fsqr, n) >= 0) 
                                     {
-                                       if (!fmpz_is_one(r + i) && !fmpz_equal(r + i, n) 
-                                         && fmpz_divisible(n, r + i))
-                                         res = 0;
+                                       for (i = 0; i < r23n; i++)
+                                       {
+                                          if (!fmpz_is_one(r23 + i) && !fmpz_equal(r23 + i, n) 
+                                            && fmpz_divisible(n, r23 + i))
+                                            res = 0;
+                                       }
+                                    } else
+                                    {
+                                       fmpz_mul(Fcub, Fsqr, F);
+                                    
+                                       if (fmpz_cmp(Fcub, n) >= 0)
+                                       {
+                                          for (i = 0; i < r23n; i++)
+                                          {
+                                             if (fmpz_divisor_in_residue_class_lenstra(d, n, r23 + i, F))
+                                                res = 0;
+                                          }
+                                       } else
+                                          res = -1;
                                     }
                                  } else
                                  {
-                                    fmpz_mul(Fcub, Fsqr, F);
-                                    
-                                    if (fmpz_cmp(Fcub, n) >= 0)
+                                    __set_residues(r23, r2, r2n);
+                                    r23n = r2n;
+                                 }
+                              } else
+                              {
+                                 __set_residues(r23, r2, r2n);
+                                 r23n = r2n;
+                              }
+
+                              r234 = _fmpz_vec_init(4*r23n);
+
+                              /* p^2 + 1 test */
+                              if (res == -1 && pk1n[1] != 0)
+                              {
+                                 res = 1;
+                                 
+                                 r234n = 4*r23n;
+
+                                 res = fmpz_is_prime_lenstra4(Fk, r4, n, pk1[1], pk1n[1]);
+                                 r4n = 4;
+
+                                 if (!fmpz_is_one(Fk))
+                                 {
+                                    __combine_residues(r234, r4, Fk, r4n, r23, F, r23n);
+
+                                    fmpz_mul(F, F, Fk);
+                                    fmpz_mul(Fsqr, F, F);
+
+                                    if (fmpz_cmp(Fsqr, n) >= 0) 
                                     {
-                                       for (i = 0; i < r3n*r2n; i++)
+                                       for (i = 0; i < r234n; i++)
                                        {
-                                          if (fmpz_divisor_in_residue_class_lenstra(d, n, r + i, F))
-                                             res = 0;
+                                          if (!fmpz_is_one(r234 + i) && !fmpz_equal(r234 + i, n) 
+                                            && fmpz_divisible(n, r234 + i))
+                                            res = 0;
                                        }
                                     } else
-                                       res = -1;
+                                    {
+                                       fmpz_mul(Fcub, Fsqr, F);
+                                    
+                                       if (fmpz_cmp(Fcub, n) >= 0)
+                                       {
+                                          for (i = 0; i < r234n; i++)
+                                          {
+                                             if (fmpz_divisor_in_residue_class_lenstra(d, n, r234 + i, F))
+                                                res = 0;
+                                          }
+                                       } else
+                                          res = -1;
+                                    }
+                                 } else
+                                 {
+                                    __set_residues(r234, r23, r23n);
+                                    r234n = r23n;
                                  }
-
-                                 _fmpz_vec_clear(r, 3*r2n);
                               } else
-                                 res = -1;
+                              {
+                                 __set_residues(r234, r23, r23n);
+                                 r234n = r23n;
+                              }
 
-                              _fmpz_vec_clear(r3, pol_degrees[NUM_POLYS - 1]);
+                              _fmpz_vec_clear(r23, 3*r2n);
+                              _fmpz_vec_clear(r234, 4*r23n);
+
+                              _fmpz_vec_clear(r3, 3);
+                              _fmpz_vec_clear(r4, 4);
 
                               fmpz_clear(Fk);
                            }

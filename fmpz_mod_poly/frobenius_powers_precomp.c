@@ -43,7 +43,9 @@ fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow,
     }
 
     l = FLINT_CLOG2(m);
-    
+    if ((WORD(1) << l) == m)
+       l++;
+
     pow->pow = (fmpz_mod_poly_struct *) flint_malloc(l*sizeof(fmpz_mod_poly_struct));
 
     for (i = 0; i < l; i++)
