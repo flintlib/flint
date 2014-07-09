@@ -68,15 +68,6 @@ typedef struct
 
 typedef fmpz_mod_poly_res_struct fmpz_mod_poly_res_t[1];
 
-typedef struct
-{
-   fmpz ** powers;
-   slong len;
-} fmpz_mod_poly_powers_precomp_struct;
-
-typedef fmpz_mod_poly_powers_precomp_struct fmpz_mod_poly_powers_precomp_t[1];
-
-
 /*  Initialisation and memory management *************************************/
 
 void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p);
