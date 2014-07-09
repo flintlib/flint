@@ -411,21 +411,6 @@ void
 fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
                            const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
-void _fmpz_mod_poly_powmod_x_fmpz_powers_precomp(fmpz * res, const fmpz_t e, 
-             const fmpz * f, slong lenf, fmpz ** const powers, const fmpz_t p);
-
-void fmpz_mod_poly_powmod_x_fmpz_powers_precomp(fmpz_mod_poly_t res, 
-                                 const fmpz_t e, const fmpz_mod_poly_t f, 
-                                    const fmpz_mod_poly_powers_precomp_t finv);
-
-void _fmpz_mod_poly_powmod_fmpz_binexp_powers_precomp(fmpz * res, 
-                      const fmpz * poly, const fmpz_t e, const fmpz * f,
-                             slong lenf, fmpz ** const powers, const fmpz_t p);
-
-void fmpz_mod_poly_powmod_fmpz_binexp_powers_precomp(fmpz_mod_poly_t res,
-                                 const fmpz_mod_poly_t poly, const fmpz_t e,
-           const fmpz_mod_poly_t f, const fmpz_mod_poly_powers_precomp_t finv);
-
 /*  Division *****************************************************************/
 
 void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
@@ -551,23 +536,6 @@ void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
 void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                           const fmpz_mod_poly_t Binv);
-
-fmpz ** _fmpz_mod_poly_powers_precompute(const fmpz * B, 
-                                                  slong len, const fmpz_t mod);
-
-void fmpz_mod_poly_powers_precompute(fmpz_mod_poly_powers_precomp_t pinv, 
-                                                         fmpz_mod_poly_t poly);
-
-void _fmpz_mod_poly_powers_clear(fmpz ** powers, slong len);
-
-void fmpz_mod_poly_powers_clear(fmpz_mod_poly_powers_precomp_t pinv);
-
-void _fmpz_mod_poly_rem_powers_precomp(fmpz * A, slong m, 
-              const fmpz * B, slong n, fmpz ** const powers, const fmpz_t mod);
-
-void 
-fmpz_mod_poly_rem_powers_precomp(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, 
-          const fmpz_mod_poly_t B, const fmpz_mod_poly_powers_precomp_t B_inv);
 
 /*  Power series inversion ***************************************************/
 
