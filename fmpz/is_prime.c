@@ -35,9 +35,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-#define NUM_POLYS 3 /* x^3 - 1, x^4 - 1, x^6 - 1 */
+#define NUM_POLYS 4 /* x^3 - 1, x^4 - 1, x^6 - 1, x^5 - 1 */
 
-static slong pol_degrees[3] = { 3, 4, 6 };
+static slong pol_degrees[4] = { 3, 4, 6, 5 };
 
 slong __primes_remove(ulong * arr1, slong len1, ulong * arr2, slong len2)
 {
@@ -153,7 +153,7 @@ int fmpz_is_prime(const fmpz_t n)
          /* check for factors */
          for (i = 0; i < num; i++)
          {
-            ulong rk, r2, r = n_mod2_precomp(p, primes[i], pinv[i]);
+            ulong rk, r2, r4, r = n_mod2_precomp(p, primes[i], pinv[i]);
 
             if (r == 1) /* n - 1 = 0 mod p */
                pm1[num_pm1++] = primes[i];
@@ -178,7 +178,13 @@ int fmpz_is_prime(const fmpz_t n)
             rk = n_submod(r2, r, primes[i]);
             
             if (rk == primes[i] - 1) /* n^2 - n + 1 = 0 mod p */
-               pk1[2][pk1n[2]++] = primes[i];            
+               pk1[2][pk1n[2]++] = primes[i];  
+
+            /* check for n^4 + 1 = 0 mod p */
+            r4 = n_mulmod_precomp(r2, r2, primes[i], pinv[i]);
+
+            if (r4 == primes[i] - 1) /* n^4 + 1 = 0 mod p */
+               pk1[3][pk1n[3]++] = primes[i];  
          }
 
          /* get next batch of primes */
@@ -331,8 +337,8 @@ int fmpz_is_prime(const fmpz_t n)
                            } else /* Lenstra finite fields primality test */
                            {
                               fmpz_t Fk;
-                              fmpz * r2, * r3, * r4, * r6, * r23, * r234, * r2346;
-                              slong r2n, r3n, r4n, r6n, r23n, r234n, r2346n;
+                              fmpz * r2, * r3, * r4, * r6, * r5, * r23, * r234, * r2346, * r23465;
+                              slong r2n, r3n, r4n, r6n, r5n, r23n, r234n, r2346n, r23465n;
 
                               fmpz_init(Fk);
                               
@@ -340,6 +346,7 @@ int fmpz_is_prime(const fmpz_t n)
                               r3 = _fmpz_vec_init(3);
                               r4 = _fmpz_vec_init(4);
                               r6 = _fmpz_vec_init(6);
+                              r5 = _fmpz_vec_init(5);
                               
                               fmpz_set_ui(r2 + 0, 1);
                               fmpz_mod(r2 + 1, n, F);
@@ -503,13 +510,67 @@ int fmpz_is_prime(const fmpz_t n)
                                  r2346n = r234n;
                               }
 
+                              /* p^4 + 1 test */
+                              r23465 = _fmpz_vec_init(5*r2346n);
+
+                              if (res == -1 && pk1n[2] != 0)
+                              {
+                                 res = 1;
+                                 
+                                 r23465n = 5*r2346n;
+
+                                 res = fmpz_is_prime_lenstra5(Fk, r5, n, pk1[3], pk1n[3]);
+                                 r5n = 5;
+
+                                 if (!fmpz_is_one(Fk))
+                                 {
+                                    __combine_residues(r23465, r5, Fk, r5n, r2346, F, r2346n);
+
+                                    fmpz_mul(F, F, Fk);
+                                    fmpz_mul(Fsqr, F, F);
+
+                                    if (fmpz_cmp(Fsqr, n) >= 0) 
+                                    {
+                                       for (i = 0; i < r23465n; i++)
+                                       {
+                                          if (!fmpz_is_one(r23465 + i) && !fmpz_equal(r23465 + i, n) 
+                                            && fmpz_divisible(n, r23465 + i))
+                                            res = 0;
+                                       }
+                                    } else
+                                    {
+                                       fmpz_mul(Fcub, Fsqr, F);
+                                    
+                                       if (fmpz_cmp(Fcub, n) >= 0)
+                                       {
+                                          for (i = 0; i < r23465n; i++)
+                                          {
+                                             if (fmpz_divisor_in_residue_class_lenstra(d, n, r23465 + i, F))
+                                                res = 0;
+                                          }
+                                       } else
+                                          res = -1;
+                                    }
+                                 } else
+                                 {
+                                    __set_residues(r23465, r2346, r2346n);
+                                    r23465n = r2346n;
+                                 }
+                              } else
+                              {
+                                 __set_residues(r23465, r2346, r2346n);
+                                 r23465n = r2346n;
+                              }
+
                               _fmpz_vec_clear(r23, 3*r2n);
                               _fmpz_vec_clear(r234, 4*r23n);
                               _fmpz_vec_clear(r2346, 6*r234n);
+                              _fmpz_vec_clear(r23465, 5*r2346n);
 
                               _fmpz_vec_clear(r3, 3);
                               _fmpz_vec_clear(r4, 4);
                               _fmpz_vec_clear(r6, 6);
+                              _fmpz_vec_clear(r5, 5);
 
                               fmpz_clear(Fk);
                            }
