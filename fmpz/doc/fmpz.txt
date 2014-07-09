@@ -1360,9 +1360,35 @@ int fmpz_is_prime_lenstra3(fmpz_t F, fmpz * res, const fmpz_t n,
                                                      mp_ptr pk1, slong num_pk1)
 
     Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^3 - 1$, this function performs the Lenstra finite fields primality test.
+    $n^2 + n + 1$, this function performs the Lenstra finite fields primality 
+    test. It returns $0$ if $n$ is shown to be composite. Otherwise it returns 
+    $1$, which means that all factors of $n$ are congruent to one of the $k$ 
+    residues written to \code{res} modulo $F$.
+
+    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
+
+    Assumes \code{num_pk1} is not $0$.
+
+int fmpz_is_prime_lenstra4(fmpz_t F, fmpz * res, const fmpz_t n, 
+                                                     mp_ptr pk1, slong num_pk1)
+
+    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
+    $n^2 + 1$, this function performs the Lenstra finite fields primality test.
     It returns $0$ if $n$ is shown to be composite. Otherwise it returns $1$,
     which means that all factors of $n$ are congruent to one of the $k$ 
+    residues written to \code{res} modulo $F$.
+
+    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
+
+    Assumes \code{num_pk1} is not $0$.
+
+int fmpz_is_prime_lenstra6(fmpz_t F, fmpz * res, const fmpz_t n, 
+                                                     mp_ptr pk1, slong num_pk1)
+
+    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
+    $n^2 - n + 1$, this function performs the Lenstra finite fields primality
+    test. It returns $0$ if $n$ is shown to be composite. Otherwise it returns 
+    $1$, which means that all factors of $n$ are congruent to one of the $k$ 
     residues written to \code{res} modulo $F$.
 
     ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
