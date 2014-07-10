@@ -31,8 +31,11 @@
 
 FUNC_HEAD
 {
-    int newd = 0, ok = 1;
+    int newd = 0;
+#if TYPE
+    int ok = 1;
     fmpz_t rii;
+#endif
     if (fl->rt == Z_BASIS)
     {
         if (fl->gt == APPROX)
@@ -784,12 +787,6 @@ FUNC_HEAD
                     {
                         d--;
                     }
-                    fmpz_clear(rii);
-                }
-#else
-                if (!ok)
-                {
-                    fmpz_init(rii);
                     fmpz_clear(rii);
                 }
 #endif
