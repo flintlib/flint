@@ -167,7 +167,8 @@ FUNC_HEAD
                     if (kappa == d - 1 && kappa > zeros + 2)
                     {
                         fmpz_init(rii);
-                        fmpz_set_mpf(rii, s + kappa - 1);
+                        mpf_div_ui(tmp, s + kappa - 1, 2);
+                        fmpz_set_mpf(rii, tmp);
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
@@ -298,7 +299,8 @@ FUNC_HEAD
             fmpz_init(rii);
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                mpf_div_ui(tmp, mpf_mat_entry(r, i, i), 2);
+                fmpz_set_mpf(rii, tmp);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
                     newd--;
@@ -436,7 +438,8 @@ FUNC_HEAD
                     if (kappa == d - 1 && kappa > zeros + 2)
                     {
                         fmpz_init(rii);
-                        fmpz_set_mpf(rii, s + kappa - 1);
+                        mpf_div_ui(tmp, s + kappa - 1, 2);
+                        fmpz_set_mpf(rii, tmp);
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
@@ -562,7 +565,8 @@ FUNC_HEAD
             fmpz_init(rii);
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+                mpf_div_ui(tmp, mpf_mat_entry(r, i, i), 2);
+                fmpz_set_mpf(rii, tmp);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
                     newd--;
@@ -782,7 +786,8 @@ FUNC_HEAD
                 if (kappa == d - 1 && kappa > 1)
                 {
                     fmpz_init(rii);
-                    fmpz_set_mpf(rii, s + kappa - 1);
+                    mpf_div_ui(tmp, s + kappa - 1, 2);
+                    fmpz_set_mpf(rii, tmp);
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
@@ -855,7 +860,8 @@ FUNC_HEAD
         fmpz_init(rii);
         for (i = d - 1; (i >= 0) && (ok > 0); i--)
         {
-            fmpz_set_mpf(rii, mpf_mat_entry(r, i, i));
+            mpf_div_ui(tmp, mpf_mat_entry(r, i, i), 2);
+            fmpz_set_mpf(rii, tmp);
             if ((ok = fmpz_cmp(rii, gs_B)) > 0)
             {
                 newd--;
