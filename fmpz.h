@@ -731,6 +731,15 @@ int fmpz_is_prime_lenstra6(fmpz_t F, fmpz * r, const fmpz_t n,
 int fmpz_is_prime_lenstra5(fmpz_t F, fmpz * r, const fmpz_t n, 
                                                     mp_ptr pk1, slong num_pk1);
 
+int fmpz_is_prime_lenstra8(fmpz_t F, fmpz * r, const fmpz_t n, 
+                                                    mp_ptr pk1, slong num_pk1);
+
+int fmpz_is_prime_lenstra12(fmpz_t F, fmpz * r, const fmpz_t n, 
+                                                    mp_ptr pk1, slong num_pk1);
+
+int fmpz_is_prime_lenstra10(fmpz_t F, fmpz * r, const fmpz_t n, 
+                                                    mp_ptr pk1, slong num_pk1);
+
 /* Primorials */
 
 void fmpz_primorial(fmpz_t res, ulong n);
