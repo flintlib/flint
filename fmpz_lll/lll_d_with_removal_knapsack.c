@@ -67,7 +67,7 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#define TYPE 2
+#define TYPE 2                  /* indicates early size reductions and removals are desired */
 #include "d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI

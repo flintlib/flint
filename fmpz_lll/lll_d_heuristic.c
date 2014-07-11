@@ -70,7 +70,7 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#define TYPE 0
+#define TYPE 0                  /* indicates removals aren't desired */
 #include "d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI

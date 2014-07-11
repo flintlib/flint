@@ -67,7 +67,7 @@ do {                                                                   \
                                                        n), fl);        \
     }                                                                  \
 } while (0)
-#define TYPE 1
+#define TYPE 1                  /* indicates removals are desired */
 #include "d_lll.c"
 #undef FUNC_HEAD
 #undef CALL_BABAI
