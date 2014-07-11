@@ -225,16 +225,21 @@ FUNC_HEAD
 
                     kappa2 = kappa;
 #if TYPE
-                    if (kappa == d - 1 && kappa > zeros + 2)
+                    if (kappa == d - 1)
                     {
                         fmpz_init(rii);
                         fmpz_set_d(rii,
-                                   ldexp(s[kappa - 1], 2 * expo[kappa] - 1));
+                                   ldexp(d_mat_entry(r, kappa, kappa),
+                                         2 * expo[kappa] - 1));
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
                         }
                         fmpz_clear(rii);
+                        if (kappa >= d)
+                        {
+                            break;
+                        }
                     }
 #endif
                     do
@@ -597,16 +602,21 @@ FUNC_HEAD
 
                     kappa2 = kappa;
 #if TYPE
-                    if (kappa == d - 1 && kappa > zeros + 2)
+                    if (kappa == d - 1)
                     {
                         fmpz_init(rii);
                         fmpz_set_d(rii,
-                                   ldexp(s[kappa - 1], 2 * expo[kappa] - 1));
+                                   ldexp(d_mat_entry(r, kappa, kappa),
+                                         2 * expo[kappa] - 1));
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
                         }
                         fmpz_clear(rii);
+                        if (kappa >= d)
+                        {
+                            break;
+                        }
                     }
 #endif
                     do
@@ -970,15 +980,19 @@ FUNC_HEAD
                 int kappa2;
                 kappa2 = kappa;
 #if TYPE
-                if (kappa == d - 1 && kappa > 1)
+                if (kappa == d - 1)
                 {
                     fmpz_init(rii);
-                    fmpz_set_d(rii, s[kappa - 1] / 2);
+                    fmpz_set_d(rii, d_mat_entry(r, kappa, kappa) / 2);
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
                     }
                     fmpz_clear(rii);
+                    if (kappa >= d)
+                    {
+                        break;
+                    }
                 }
 #endif
                 do
