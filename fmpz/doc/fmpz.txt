@@ -1286,6 +1286,10 @@ int fmpz_is_prime(const fmpz_t n)
     efficient if $n$ is composite. A strong probable prime test should be
     run first to ensure that $n$ is probably prime.
 
+    N.B: this function currently assumes that Stephen Cohen's operator Q
+    still produces an irreducible polynomial when $n$ is composite. This fact
+    has not yet been proven!
+
 void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
                                                 const fmpz_t m, const fmpz_t n)
 
@@ -1356,86 +1360,21 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n,
 
     This is efficient if $s^3 > n$.
 
-int fmpz_is_prime_lenstra3(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
+int fmpz_is_prime_lenstra(fmpz_t F, fmpz * res, const fmpz_t n, 
+                                            mp_ptr pk1, slong num_pk1, slong k)
 
     Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^2 + n + 1$, this function performs the Lenstra finite fields primality 
-    test. It returns $0$ if $n$ is shown to be composite. Otherwise it returns 
-    $1$, which means that all factors of $n$ are congruent to one of the $k$ 
-    residues written to \code{res} modulo $F$.
+    $n^2 + n + 1$ for $k = 3$, $n^2 + 1$ for $k = 4$, $n^2 - n + 1$ for 
+    $k = 6$, $n^4 + n^3 + n^2 + n + 1$ for $k = 5$, $n^4 + 1$ for $k = 8$, 
+    $n^4 - n^2 + 1$ for $k = 12$ or $n^4 - n^3 + n^2 - n + 1$ for $k = 10$, 
+    this function performs the Lenstra finite fields primality test. It returns
+    $0$ if $n$ is shown to be composite. Otherwise it returns $1$, which means 
+    that all factors of $n$ are congruent to one of the $k$ residues written to 
+    \code{res} modulo $F$.
 
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-int fmpz_is_prime_lenstra4(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^2 + 1$, this function performs the Lenstra finite fields primality test.
-    It returns $0$ if $n$ is shown to be composite. Otherwise it returns $1$,
-    which means that all factors of $n$ are congruent to one of the $k$ 
-    residues written to \code{res} modulo $F$.
-
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-int fmpz_is_prime_lenstra6(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^2 - n + 1$, this function performs the Lenstra finite fields primality
-    test. It returns $0$ if $n$ is shown to be composite. Otherwise it returns 
-    $1$, which means that all factors of $n$ are congruent to one of the $k$ 
-    residues written to \code{res} modulo $F$.
-
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-int fmpz_is_prime_lenstra5(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^4 + n^3 + n^2 + n + 1$, this function performs the Lenstra finite fields
-    primality test. It returns $0$ if $n$ is shown to be composite. Otherwise
-    it returns $1$, which means that all factors of $n$ are congruent to one of
-    the $k$ residues written to \code{res} modulo $F$.
-
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-    Assumes \code{num_pk1} is not $0$.
-
-int fmpz_is_prime_lenstra8(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^4 + 1$, this function performs the Lenstra finite fields 
-    primality test. It returns $0$ if $n$ is shown to be composite. Otherwise
-    it returns $1$, which means that all factors of $n$ are congruent to one of
-    the $k$ residues written to \code{res} modulo $F$.
-
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-    Assumes \code{num_pk1} is not $0$.
-
-int fmpz_is_prime_lenstra12(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^4 - n^2 + 1$, this function performs the Lenstra finite fields 
-    primality test. It returns $0$ if $n$ is shown to be composite. Otherwise
-    it returns $1$, which means that all factors of $n$ are congruent to one of
-    the $k$ residues written to \code{res} modulo $F$.
-
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-    Assumes \code{num_pk1} is not $0$.
-
-int fmpz_is_prime_lenstra10(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                                     mp_ptr pk1, slong num_pk1)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^4 - n^3 + n^2 - n + 1$, this function performs the Lenstra finite fields 
-    primality test. It returns $0$ if $n$ is shown to be composite. Otherwise
-    it returns $1$, which means that all factors of $n$ are congruent to one of
-    the $k$ residues written to \code{res} modulo $F$.
+    Note that this function currently assumes that Stephen Cohen's operator Q
+    still produces an irreducible polynomial when $n$ is composite. This fact
+    has not yet been proven.
 
     ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
 

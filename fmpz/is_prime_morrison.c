@@ -26,6 +26,7 @@
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
@@ -82,11 +83,11 @@ void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong 
 
 int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong num_pp1)
 {
-   slong i, d;
+   slong i, d, bits;
    mp_limb_t a, b;
    fmpz_t g, q, r, ex, c, D, Dinv, A, B, Ukm, Ukm1, Um, Um1, Vm, Vm1, p;
    fmpz_factor_t fac;
-   int res = 0;
+   int res = 0, fac_found;
 
    fmpz_init(D);
    fmpz_init(Dinv);
@@ -106,14 +107,28 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
    fmpz_init(Vm1);
    fmpz_factor_init(fac);
 
-   fmpz_add_ui(R, n, 1); /* start at n + 1 */
+   fmpz_add_ui(R, n, 1); /* start with n + 1 */
    
+   bits = fmpz_bits(R);
+
    for (i = 0; i < num_pp1; i++)
    {
       fmpz_set_ui(p, pp1[i]);
       d = fmpz_remove(R, R, p);
       _fmpz_factor_append_ui(fac, pp1[i], d);
    }
+
+   srand(time(NULL));
+
+   do
+   {
+      if ((fac_found = fmpz_factor_pp1(p, R, bits*2 + 10, bits/10 + 10, rand()%100 + 3)
+                    && fmpz_is_prime(p)))
+      {
+         d = fmpz_remove(R, R, p);
+         _fmpz_factor_append(fac, p, d);
+      }
+   } while (fac_found);
 
    if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
    {
@@ -122,7 +137,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
          _fmpz_factor_append(fac, R, 1);
          fmpz_set_ui(R, 1);
       }
-   }
+   } 
 
    /* compute product F of found primes */
    fmpz_set_ui(F, 1);

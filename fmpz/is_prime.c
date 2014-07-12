@@ -228,7 +228,7 @@ int fmpz_is_prime(const fmpz_t n)
             if (rk == primes[i] - 1) /* n^2 - n + 1 = 0 mod p */
                pk1[2][pk1n[2]++] = primes[i];  
 
-            if (num_polys >= 5)
+            if (num_polys > 3)
             {
                /* check for n^4 + n^3 + n^2 + n + 1 = 0 mod p */
                r4 = n_mulmod_precomp(r2, r2, primes[i], pinv[i]);
@@ -246,7 +246,7 @@ int fmpz_is_prime(const fmpz_t n)
                   pk1[4][pk1n[4]++] = primes[i];
             }
 
-            if (num_polys >= 7)
+            if (num_polys > 5)
             {
                /* check for n^4 - n^2 + 1 = 0 mod p */
                rk = n_submod(r4, r2, primes[i]);
@@ -414,9 +414,9 @@ int fmpz_is_prime(const fmpz_t n)
                            } else /* Lenstra finite fields primality test */
                            {
                               fmpz * Fk;
-                              fmpz * rk[num_polys + 1];
-                              fmpz * racc[num_polys + 1];
-                              slong rkn[num_polys + 1];
+                              fmpz ** rk = (fmpz **) flint_malloc((num_polys + 1)*sizeof(fmpz *));
+                              fmpz ** racc = (fmpz **) flint_malloc((num_polys + 1)*sizeof(fmpz *));
+                              slong * rkn = (slong *) flint_malloc((num_polys + 1)*sizeof(slong));
                               slong num_residues;
                               
                               Fk = _fmpz_vec_init(num_polys + 1);
@@ -454,30 +454,7 @@ int fmpz_is_prime(const fmpz_t n)
                               
                                  res = 1;
                                  
-                                 switch (j)
-                                 {
-                                 case 0: /* p^2 + p + 1 test */
-                                    res = fmpz_is_prime_lenstra3(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 case 1: /* p^2 + 1 test */
-                                    res = fmpz_is_prime_lenstra4(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 case 2: /* p^2 - p + 1 test */
-                                    res = fmpz_is_prime_lenstra6(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 case 3:  /* p^4 + p^3 + p^2 + p + 1 test */
-                                    res = fmpz_is_prime_lenstra5(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 case 4:  /* p^4 + 1 test */
-                                    res = fmpz_is_prime_lenstra8(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 case 5:  /* p^4 - p^2 + 1 test */
-                                    res = fmpz_is_prime_lenstra12(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 case 6:  /* p^4 - p^3 + p^2 - p + 1 test */
-                                    res = fmpz_is_prime_lenstra10(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j]);
-                                    break;
-                                 }
+                                 res = fmpz_is_prime_lenstra(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j], pol_degrees[j]);
 
                                  if ((pol_degrees[j] % 2) == 0)
                                  {
@@ -553,6 +530,10 @@ int fmpz_is_prime(const fmpz_t n)
                                  _fmpz_vec_clear(rk[i + 1], pol_degrees[i]);
                               
                               _fmpz_vec_clear(Fk, num_polys + 1);
+
+                              flint_free(rk);
+                              flint_free(racc);
+                              flint_free(rkn);
                            }
 
                            fmpz_clear(d);
