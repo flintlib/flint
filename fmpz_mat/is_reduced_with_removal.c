@@ -60,16 +60,6 @@ fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
     }
     /* diagonal of mu stores the squared GS norms */
     _fmpq_vec_dot(fmpq_mat_entry(mu, 0, 0), Bq->rows[0], Bq->rows[0], n);
-    if (newd == 0 && fmpq_cmp(fmpq_mat_entry(mu, 0, 0), gs_Bq) < 0)
-    {
-        fmpq_mat_clear(Aq);
-        fmpq_mat_clear(Bq);
-        fmpq_mat_clear(mu);
-        fmpq_lll_context_clear(fl);
-        fmpq_clear(tmp);
-        fmpq_clear(gs_Bq);
-        return 0;
-    }
 
     for (i = 1; i < newd; i++)
     {
@@ -103,7 +93,11 @@ fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
             }
         }
         _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), Bq->rows[i], Bq->rows[i], n);
-        if (i >= newd && fmpq_cmp(fmpq_mat_entry(mu, i, i), gs_Bq) < 0) /* check removals */
+        fmpq_set(tmp, fl->delta);
+        fmpq_submul(tmp, fmpq_mat_entry(mu, i, i - 1),
+                    fmpq_mat_entry(mu, i, i - 1));
+        fmpq_mul(tmp, tmp, fmpq_mat_entry(mu, i - 1, i - 1));
+        if (fmpq_cmp(tmp, fmpq_mat_entry(mu, i, i)) > 0)    /* check Lovasz condition */
         {
             fmpq_mat_clear(Aq);
             fmpq_mat_clear(Bq);
@@ -113,10 +107,6 @@ fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
             fmpq_clear(gs_Bq);
             return 0;
         }
-        fmpq_set(tmp, fl->delta);
-        fmpq_submul(tmp, fmpq_mat_entry(mu, i, i - 1),
-                    fmpq_mat_entry(mu, i, i - 1));
-        fmpq_mul(tmp, tmp, fmpq_mat_entry(mu, i - 1, i - 1));
     }
 
     fmpz_mat_init(Atmp, d, n);

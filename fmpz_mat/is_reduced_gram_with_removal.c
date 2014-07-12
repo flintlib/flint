@@ -56,16 +56,6 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
     fmpz_one(fmpq_denref(gs_Bq));
 
     fmpz_set(fmpq_mat_entry_num(r, 0, 0), fmpz_mat_entry(A, 0, 0));
-    if (newd == 0 && fmpz_cmp(fmpz_mat_entry(A, 0, 0), gs_B) < 0)
-    {
-        fmpq_mat_clear(r);
-        fmpq_mat_clear(mu);
-        fmpq_lll_context_clear(fl);
-        fmpq_clear(tmp);
-        fmpq_clear(gs_Bq);
-        _fmpq_vec_clear(s, d);
-        return 0;
-    }
 
     for (i = 1; i < newd; i++)
     {
@@ -97,16 +87,6 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
                         fmpq_mat_entry(r, i, j));
         }
         fmpq_set(fmpq_mat_entry(r, i, i), s + i);
-        if (i >= newd && fmpq_cmp(fmpq_mat_entry(r, i, i), gs_Bq) < 0)  /* check removals */
-        {
-            fmpq_mat_clear(r);
-            fmpq_mat_clear(mu);
-            fmpq_lll_context_clear(fl);
-            fmpq_clear(tmp);
-            fmpq_clear(gs_Bq);
-            _fmpq_vec_clear(s, d);
-            return 0;
-        }
         fmpq_mul(tmp, fl->delta, fmpq_mat_entry(r, i - 1, i - 1));
         if (fmpq_cmp(tmp, s + i - 1) > 0)   /* check Lovasz condition */
         {
