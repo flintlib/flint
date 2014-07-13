@@ -167,7 +167,7 @@ FUNC_HEAD
                     if (kappa == d - 1)
                     {
                         fmpz_init(rii);
-                        mpf_div_ui(tmp, mpf_mat_entry(r, kappa, kappa), 2);
+                        mpf_div_2exp(tmp, mpf_mat_entry(r, kappa, kappa), 1);
                         fmpz_set_mpf(rii, tmp);
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
@@ -303,7 +303,7 @@ FUNC_HEAD
             fmpz_init(rii);
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                mpf_div_ui(tmp, mpf_mat_entry(r, i, i), 2);
+                mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
                 fmpz_set_mpf(rii, tmp);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
@@ -442,7 +442,7 @@ FUNC_HEAD
                     if (kappa == d - 1)
                     {
                         fmpz_init(rii);
-                        mpf_div_ui(tmp, mpf_mat_entry(r, kappa, kappa), 2);
+                        mpf_div_2exp(tmp, mpf_mat_entry(r, kappa, kappa), 1);
                         fmpz_set_mpf(rii, tmp);
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
@@ -573,7 +573,7 @@ FUNC_HEAD
             fmpz_init(rii);
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                mpf_div_ui(tmp, mpf_mat_entry(r, i, i), 2);
+                mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
                 fmpz_set_mpf(rii, tmp);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
@@ -795,7 +795,7 @@ FUNC_HEAD
                 if (kappa == d - 1)
                 {
                     fmpz_init(rii);
-                    mpf_div_ui(tmp, mpf_mat_entry(r, kappa, kappa), 2);
+                    mpf_div_2exp(tmp, mpf_mat_entry(r, kappa, kappa), 1);
                     fmpz_set_mpf(rii, tmp);
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
@@ -872,7 +872,7 @@ FUNC_HEAD
         fmpz_init(rii);
         for (i = d - 1; (i >= 0) && (ok > 0); i--)
         {
-            mpf_div_ui(tmp, mpf_mat_entry(r, i, i), 2);
+            mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
             fmpz_set_mpf(rii, tmp);
             if ((ok = fmpz_cmp(rii, gs_B)) > 0)
             {
