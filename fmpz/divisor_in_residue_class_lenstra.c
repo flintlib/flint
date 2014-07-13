@@ -128,7 +128,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
                fmpz_mul(fac, fac, s); /* check if ys + r2 is factor */
                fmpz_add(fac, fac, r2);
 
-               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
                   res = 1;
                   break;
@@ -139,7 +139,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
                fmpz_mul(fac, fac, s); /* check if xs + r is factor */
                fmpz_add(fac, fac, r);
 
-               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
                   res = 1;
                   break;
@@ -148,14 +148,14 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
             {
                /* either d/a1 or d/b1 is a divisor of n */
                fmpz_tdiv_q(fac, d, a1);
-               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
                   res = 1;
                   break;
                }
 
                fmpz_tdiv_q(fac, d, b1);
-               if (!fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
+               if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
                   res = 1;
                   break;
