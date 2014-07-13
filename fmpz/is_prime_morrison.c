@@ -120,17 +120,24 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
 
    srand(time(NULL));
 
-   do
+   if (!fmpz_is_probabprime_BPSW(R))  
    {
-      if ((fac_found = fmpz_factor_pp1(p, R, bits*2 + 10, bits/10 + 10, rand()%100 + 3)
+      if (bits > 150 && (fac_found = fmpz_factor_pp1(p, R, bits + 1000, bits/20 + 1000, rand()%100 + 3)
                     && fmpz_is_prime(p)))
       {
          d = fmpz_remove(R, R, p);
          _fmpz_factor_append(fac, p, d);
-      }
-   } while (fac_found);
 
-   if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
+         if (fmpz_is_probabprime_BPSW(R)) /* fast test first */
+         {
+            if (fmpz_is_prime(R) == 1)
+            {
+               _fmpz_factor_append(fac, R, 1);
+               fmpz_set_ui(R, 1);
+            }
+         } 
+      }
+   } else
    {
       if (fmpz_is_prime(R) == 1)
       {
