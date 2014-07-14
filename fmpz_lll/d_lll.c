@@ -924,7 +924,7 @@ FUNC_HEAD
                                     fmpz_mat_entry(B, j, j));
 
                         fmpz_mul(t, x + j, fmpz_mat_entry(B, kappa, j));
-                        fmpz_mul_ui(t, t, 2);
+                        fmpz_mul_2exp(t, t, 1);
                         fmpz_sub(fmpz_mat_entry(B, kappa, kappa),
                                  fmpz_mat_entry(B, kappa, kappa), t);
 
@@ -932,7 +932,7 @@ FUNC_HEAD
                         {
                             fmpz_mul(t, x + i, x + j);
                             fmpz_mul(t, t, fmpz_mat_entry(B, j, i));
-                            fmpz_mul_ui(t, t, 2);
+                            fmpz_mul_2exp(t, t, 1);
                             fmpz_add(fmpz_mat_entry(B, kappa, kappa),
                                      fmpz_mat_entry(B, kappa, kappa), t);
                         }
