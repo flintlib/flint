@@ -316,7 +316,14 @@ FUNC_HEAD
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
             }
-            d_mat_entry(r, kappa, kappa) = s[kappa];
+            if (loops > 2)
+            {
+                d_mat_entry(r, kappa, kappa) = s[kappa];
+            }
+            else
+            {
+                d_mat_entry(r, kappa, kappa) = 0;
+            }
 #endif
         }
         else
@@ -638,7 +645,14 @@ FUNC_HEAD
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
             }
-            d_mat_entry(r, kappa, kappa) = s[kappa];
+            if (loops > 2)
+            {
+                d_mat_entry(r, kappa, kappa) = s[kappa];
+            }
+            else
+            {
+                d_mat_entry(r, kappa, kappa) = 0;
+            }
 #endif
             _d_vec_clear(appBtmp);
         }

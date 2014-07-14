@@ -28,6 +28,7 @@
 #ifndef FMPZ_LLL_H
 #define FMPZ_LLL_H
 
+#include <stdio.h>
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz_mat.h"

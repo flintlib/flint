@@ -262,7 +262,14 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         mpf_mat_entry(r, kappa, k));
                 mpf_sub(s + k + 1, s + k, tmp);
             }
-            mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+            if (loops > 2)
+            {
+                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+            }
+            else
+            {
+                mpf_set_ui(mpf_mat_entry(r, kappa, kappa), 0);
+            }
             fmpz_clear(ztmp);
         }
         else
@@ -492,7 +499,14 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         mpf_mat_entry(r, kappa, k));
                 mpf_sub(s + k + 1, s + k, tmp);
             }
-            mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+            if (loops > 2)
+            {
+                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+            }
+            else
+            {
+                mpf_set_ui(mpf_mat_entry(r, kappa, kappa), 0);
+            }
             fmpz_clear(ztmp);
         }
     }

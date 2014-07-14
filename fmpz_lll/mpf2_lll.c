@@ -152,6 +152,11 @@ FUNC_HEAD
                 if (mpf_cmp(tmp, s + kappa - 1) <= 0)
                 {
                     alpha[kappa] = kappa;
+                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), s + kappa) !=
+                        0)
+                    {
+                        mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+                    }
                     kappa++;
                 }
                 else
@@ -427,6 +432,11 @@ FUNC_HEAD
                 if (mpf_cmp(tmp, s + kappa - 1) <= 0)
                 {
                     alpha[kappa] = kappa;
+                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), s + kappa) !=
+                        0)
+                    {
+                        mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+                    }
                     kappa++;
                 }
                 else
@@ -779,12 +789,23 @@ FUNC_HEAD
                         mpf_mat_entry(r, kappa, j));
                 mpf_sub(s + j + 1, s + j, tmp);
             }
-            mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+            if (loops > 3)
+            {
+                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+            }
+            else
+            {
+                mpf_set_ui(mpf_mat_entry(r, kappa, kappa), 0);
+            }
 
             mpf_set_d(rtmp, ctt);
             mpf_mul(tmp, rtmp, mpf_mat_entry(r, kappa - 1, kappa - 1));
             if (mpf_cmp(tmp, s + kappa - 1) <= 0)   /* check LLL condition */
             {
+                if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), s + kappa) != 0)
+                {
+                    mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+                }
                 kappa++;
             }
             else

@@ -213,6 +213,10 @@ FUNC_HEAD
                 if (tmp <= s[kappa - 1])
                 {
                     alpha[kappa] = kappa;
+                    if (d_mat_entry(r, kappa, kappa) != s[kappa])
+                    {
+                        d_mat_entry(r, kappa, kappa) = s[kappa];
+                    }
                     kappa++;
                 }
                 else
@@ -590,6 +594,10 @@ FUNC_HEAD
                 if (tmp <= s[kappa - 1])
                 {
                     alpha[kappa] = kappa;
+                    if (d_mat_entry(r, kappa, kappa) != s[kappa])
+                    {
+                        d_mat_entry(r, kappa, kappa) = s[kappa];
+                    }
                     kappa++;
                 }
                 else
@@ -969,10 +977,21 @@ FUNC_HEAD
                     s[j] - d_mat_entry(mu, kappa, j) * d_mat_entry(r,
                                                                    kappa, j);
             }
-            d_mat_entry(r, kappa, kappa) = s[kappa];
+            if (loops > 3)
+            {
+                d_mat_entry(r, kappa, kappa) = s[kappa];
+            }
+            else
+            {
+                d_mat_entry(r, kappa, kappa) = 0;
+            }
 
             if (ctt * d_mat_entry(r, kappa - 1, kappa - 1) <= s[kappa - 1]) /* check LLL condition */
             {
+                if (d_mat_entry(r, kappa, kappa) != s[kappa])
+                {
+                    d_mat_entry(r, kappa, kappa) = s[kappa];
+                }
                 kappa++;
             }
             else
