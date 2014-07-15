@@ -48,7 +48,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + 0.5) / 5;
+            halfplus = (fl->eta + 0.5) / 2;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
@@ -284,7 +284,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + 0.5) / 5;
+            halfplus = (fl->eta + 0.5) / 2;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;

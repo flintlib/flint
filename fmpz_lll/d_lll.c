@@ -56,7 +56,7 @@ FUNC_HEAD
             n = B->c;
             d = B->r;
 
-            ctt = (4 * fl->delta + 1) / 5;
+            ctt = (fl->delta + 1) / 2;
 
             shift = fmpz_lll_shift(B);
 
@@ -408,7 +408,7 @@ FUNC_HEAD
             n = B->c;
             d = B->r;
 
-            ctt = (4 * fl->delta + 1) / 5;
+            ctt = (fl->delta + 1) / 2;
 
             shift = fmpz_lll_shift(B);
 
@@ -793,8 +793,8 @@ FUNC_HEAD
 
         s = _d_vec_init(d);
 
-        ctt = (4 * fl->delta + 1) / 5;
-        halfplus = (4 * fl->eta + 0.5) / 5;
+        ctt = (fl->delta + 1) / 2;
+        halfplus = (fl->eta + 0.5) / 2;
         onedothalfplus = 1.0 + halfplus;
 
         fmpz_init(t);

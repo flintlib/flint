@@ -42,7 +42,7 @@ FUNC_HEAD
 
             aa = (a > zeros) ? a : zeros + 1;
 
-            halfplus = (4 * fl->eta + 0.5) / 5;
+            halfplus = (fl->eta + 0.5) / 2;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
@@ -339,7 +339,7 @@ FUNC_HEAD
 
             appBtmp = _d_vec_init(n);
 
-            halfplus = (4 * fl->eta + 0.5) / 5;
+            halfplus = (fl->eta + 0.5) / 2;
             onedothalfplus = 1.0 + halfplus;
 
             loops = 0;
