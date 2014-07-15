@@ -162,38 +162,45 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       fmpz_init(a2);
       fmpz_init(b);
 
-      do {
-         for (i = 0; i < k/2; i++)
-            fmpz_randm(g->coeffs + i, state, n);
-         fmpz_set_ui(b, 2);
-         fmpz_mod_poly_evaluate_fmpz(a1, g, b);
-         fmpz_sub_ui(b, n, 2);
-         fmpz_mod_poly_evaluate_fmpz(a2, g, b);
-         fmpz_mul(a1, a1, a2);
-         fmpz_mod(a1, a1, n);
-      } while (fmpz_jacobi(a1, n) != -1 || !fmpz_mod_poly_is_irreducible(g));
+      /* 
+         TODO: prove Operator Q plays nice with Z/nZ[x] with n composite
+         so that there is no need to check irreducibility of the polynomial
+         it produces
+      */
+      do{
+         do {
+            for (i = 0; i < k/2; i++)
+               fmpz_randm(g->coeffs + i, state, n);
+            fmpz_set_ui(b, 2);
+            fmpz_mod_poly_evaluate_fmpz(a1, g, b);
+            fmpz_sub_ui(b, n, 2);
+            fmpz_mod_poly_evaluate_fmpz(a2, g, b);
+            fmpz_mul(a1, a1, a2);
+            fmpz_mod(a1, a1, n);
+         } while (fmpz_jacobi(a1, n) != -1 || !fmpz_mod_poly_is_irreducible(g));
+
+         /* apply Q operator f(x) = x^k/2 g(x + 1/x) */
+
+         fmpz_mod_poly_set_coeff_fmpz(f, k/2, g->coeffs + 0);
+
+         fmpz_mod_poly_set_coeff_ui(h, 2, 1); /* x^2 + 1 */
+         fmpz_mod_poly_set_coeff_ui(h, 0, 1);
+
+         fmpz_mod_poly_set(h1, h);
+
+         for (i = 1; i <= k/2; i++)
+         {
+            fmpz_mod_poly_shift_left(h2, h1, k/2 - i);
+            fmpz_mod_poly_scalar_mul_fmpz(h2, h2, g->coeffs + i);
+            fmpz_mod_poly_add(f, f, h2);
+            if (i != k/2)
+               fmpz_mod_poly_mul(h1, h1, h);
+         }
+      } while (!fmpz_mod_poly_is_irreducible_rabin(f));
 
       fmpz_clear(a1);
       fmpz_clear(a2);
       fmpz_clear(b);
-
-      /* apply Q operator f(x) = x^k/2 g(x + 1/x) */
-
-      fmpz_mod_poly_set_coeff_fmpz(f, k/2, g->coeffs + 0);
-
-      fmpz_mod_poly_set_coeff_ui(h, 2, 1); /* x^2 + 1 */
-      fmpz_mod_poly_set_coeff_ui(h, 0, 1);
-
-      fmpz_mod_poly_set(h1, h);
-
-      for (i = 1; i <= k/2; i++)
-      {
-         fmpz_mod_poly_shift_left(h2, h1, k/2 - i);
-         fmpz_mod_poly_scalar_mul_fmpz(h2, h2, g->coeffs + i);
-         fmpz_mod_poly_add(f, f, h2);
-         if (i != k/2)
-            fmpz_mod_poly_mul(h1, h1, h);
-      }
    } else /* k is odd */
    {
       fmpz_mod_poly_set_coeff_ui(f, k, 1);
@@ -201,7 +208,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       do {
          for (i = 0; i < k; i++)
             fmpz_randm(f->coeffs + i, state, n);
-      } while (!fmpz_mod_poly_is_irreducible(f));
+      } while (!fmpz_mod_poly_is_irreducible_rabin(f));
    }
 
    /* compute random poly g of length k */

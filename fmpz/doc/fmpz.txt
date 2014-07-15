@@ -1286,10 +1286,6 @@ int fmpz_is_prime(const fmpz_t n)
     efficient if $n$ is composite. A strong probable prime test should be
     run first to ensure that $n$ is probably prime.
 
-    N.B: this function currently assumes that Stephen Cohen's operator Q
-    still produces an irreducible polynomial when $n$ is composite. This fact
-    has not yet been proven!
-
 void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
                                                 const fmpz_t m, const fmpz_t n)
 
@@ -1371,10 +1367,6 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * res, const fmpz_t n,
     $0$ if $n$ is shown to be composite. Otherwise it returns $1$, which means 
     that all factors of $n$ are congruent to one of the $k$ residues written to 
     \code{res} modulo $F$.
-
-    Note that this function currently assumes that Stephen Cohen's operator Q
-    still produces an irreducible polynomial when $n$ is composite. This fact
-    has not yet been proven.
 
     ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
 
