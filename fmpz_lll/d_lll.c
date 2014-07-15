@@ -296,15 +296,15 @@ FUNC_HEAD
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
-                    Btmp = _fmpz_vec_init(B->r);
                     if (fl->store_trans)
                     {
-                        _fmpz_vec_set(Btmp, U->rows[kappa2], B->r);
+                        Btmp = _fmpz_vec_init(d);
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
                         for (i = kappa2; i > kappa; i--)
-                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
-                        _fmpz_vec_set(U->rows[kappa], Btmp, B->r);
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                        _fmpz_vec_clear(Btmp, d);
                     }
-                    _fmpz_vec_clear(Btmp, B->r);
 
                     appBtmp = appB->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -462,7 +462,6 @@ FUNC_HEAD
             while ((fmpz_cmp_ui(fmpz_mat_entry(A->exactSP, i, i), 0) <= 0)
                    && (++i < d));
 
-
             zeros = i - 1;      /* all vectors B[i] with i <= zeros are zero vectors */
             kappa = i + 1;
             kappamax = kappa;
@@ -543,7 +542,7 @@ FUNC_HEAD
                     fmpz_mat_clear(A->exactSP);
                     _d_vec_clear(s);
                     _d_vec_clear(appBtmp);
-                    _fmpz_vec_clear(exactSPtmp, B->r);
+                    _fmpz_vec_clear(exactSPtmp, d);
                     /* Need to switch to mpf / arb */
                     return -1;
                 }
@@ -677,15 +676,15 @@ FUNC_HEAD
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
 
-                    Btmp = _fmpz_vec_init(B->r);
                     if (fl->store_trans)
                     {
-                        _fmpz_vec_set(Btmp, U->rows[kappa2], B->r);
+                        Btmp = _fmpz_vec_init(d);
+                        _fmpz_vec_set(Btmp, U->rows[kappa2], d);
                         for (i = kappa2; i > kappa; i--)
-                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
-                        _fmpz_vec_set(U->rows[kappa], Btmp, B->r);
+                            _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
+                        _fmpz_vec_set(U->rows[kappa], Btmp, d);
+                        _fmpz_vec_clear(Btmp, d);
                     }
-                    _fmpz_vec_clear(Btmp, B->r);
 
                     j = expo[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -770,7 +769,7 @@ FUNC_HEAD
             fmpz_mat_clear(A->exactSP);
             _d_vec_clear(s);
             _d_vec_clear(appBtmp);
-            _fmpz_vec_clear(exactSPtmp, d);
+            _fmpz_vec_clear(exactSPtmp, B->r);
 
             if (kappa < d)
                 return -1;
@@ -909,7 +908,7 @@ FUNC_HEAD
                         if (fl->store_trans)
                         {
                             _fmpz_vec_scalar_submul_fmpz(U->rows[kappa],
-                                                         U->rows[j], B->r,
+                                                         U->rows[j], d,
                                                          x + j);
                         }
                     }
@@ -937,7 +936,7 @@ FUNC_HEAD
                                      fmpz_mat_entry(B, kappa, kappa), t);
                         }
                     }
-                    for (i = 0; i < B->r; i++)
+                    for (i = 0; i < d; i++)
                     {
                         if (i < kappa)
                         {
@@ -1028,19 +1027,19 @@ FUNC_HEAD
                 }
                 d_mat_entry(r, kappa, kappa) = s[kappa];
 
-                x = _fmpz_vec_init(B->r);
                 if (fl->store_trans)
                 {
-                    _fmpz_vec_set(x, U->rows[kappa2], B->r);
+                    x = _fmpz_vec_init(d);
+                    _fmpz_vec_set(x, U->rows[kappa2], d);
                     for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], B->r);
-                    _fmpz_vec_set(U->rows[kappa], x, B->r);
+                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
+                    _fmpz_vec_set(U->rows[kappa], x, d);
+                    _fmpz_vec_clear(x, d);
                 }
-                _fmpz_vec_clear(x, B->r);
 
                 for (j = kappa2; j > kappa; j--)
                 {
-                    for (i = kappa2; i < B->r; i++)
+                    for (i = kappa2; i < d; i++)
                         fmpz_swap(fmpz_mat_entry(B, i, j),
                                   fmpz_mat_entry(B, i, j - 1));
                     for (i = 0; i < kappa; i++)
