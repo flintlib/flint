@@ -177,7 +177,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
             fmpz_mod_poly_evaluate_fmpz(a2, g, b);
             fmpz_mul(a1, a1, a2);
             fmpz_mod(a1, a1, n);
-         } while (fmpz_jacobi(a1, n) != -1 || !fmpz_mod_poly_is_irreducible(g));
+         } while (fmpz_jacobi(a1, n) != -1 || !fmpz_mod_poly_is_irreducible_rabin(g));
 
          /* apply Q operator f(x) = x^k/2 g(x + 1/x) */
 
