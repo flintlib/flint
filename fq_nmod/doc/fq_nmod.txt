@@ -358,6 +358,11 @@ void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to \code{op}.
 
+void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx)
+
+    Sets \code{rop} to \code{x}, considered as an element of
+    $\mathbf{F}_p$.
+
 void fq_nmod_set_ui(fq_nmod_t rop, const ulong x, const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to \code{x}, considered as an element of

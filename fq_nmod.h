@@ -309,6 +309,17 @@ static __inline__ void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_
     fmpz_clear(rx);
 }
 
+static __inline__ void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx)
+{
+    mp_limb_t rx = x < 0 ? -x : x;
+    rx =  n_mod2_preinv(rx, ctx->mod.n, ctx->mod.ninv);
+    if (x < 0)
+        rx = ctx->mod.n - rx;
+
+    nmod_poly_zero(rop);
+    nmod_poly_set_coeff_ui(rop, 0, rx);
+}
+
 static __inline__ void fq_nmod_set_ui(fq_nmod_t rop, const ulong x, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_zero(rop);

@@ -224,6 +224,15 @@ void
 fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
 
 static __inline__ void
+fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx)
+{
+    fmpz_t xx;
+    fmpz_init_set_si(xx, x);
+    fq_zech_set_fmpz(rop, xx, ctx);
+    fmpz_clear(xx);
+}
+
+static __inline__ void
 fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx)
 {
     fmpz_t xx;
