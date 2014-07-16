@@ -19,58 +19,46 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Fredrik Johansson
+   Copyright (C) 2012 Fredrik Johansson
+   Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#ifndef DOUBLE_EXTRAS_H
-#define DOUBLE_EXTRAS_H
-
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
+#include <stdio.h>
+#include <stdlib.h>
 #include <float.h>
-#include <gmp.h>
-#include "flint.h"
+#include "ulong_extras.h"
+#include "double_extras.h"
 
-#define ulong mp_limb_t
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-#define D_BITS 53
-#define D_EPS 2.2204460492503130808e-16
-#define D_INF HUGE_VAL
-#define D_NAN (HUGE_VAL - HUGE_VAL)
-
-double d_randtest(flint_rand_t state);
-
-double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
-
-double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
-
-static __inline__ double
-d_polyval(const double * poly, int len, double x)
+int
+main(void)
 {
-    double t;
-    int i;
+    double x, res1, res2;
+    slong iter;
 
-    for (t = poly[len-1], i = len-2; i >= 0; i--)
-        t = poly[i] + x * t;
+    FLINT_TEST_INIT(state);
 
-    return t;
+    flint_printf("log2....");
+    fflush(stdout);
+
+    /* check change of base identity */
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    {
+        x = d_randtest(state);
+        res1 = d_log2(x) * log(2);
+        res2 = log(x);
+        if (fabs(res1 - res2) > D_EPS)
+        {
+            flint_printf("FAIL\n");
+            flint_printf("x = %.20g\n", x);
+            flint_printf("res1 = %.20g\n", res1);
+            flint_printf("res2 = %.20g\n", res2);
+            abort();
+        }
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return EXIT_SUCCESS;
 }
-
-double d_lambertw(double x);
-
-int d_is_nan(double x);
-
-double d_log2(double x);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
