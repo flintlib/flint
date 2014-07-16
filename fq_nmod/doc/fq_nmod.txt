@@ -382,7 +382,9 @@ void fq_nmod_one(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
 void fq_nmod_gen(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 
-    Sets \code{rop} to a multiplicative generator for the finite field.
+    Sets \code{rop} to a generator for the finite field.
+    There is no guarantee this is a multiplicative generator of
+    the finite field.
 
 *******************************************************************************
 
