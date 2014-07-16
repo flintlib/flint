@@ -1372,8 +1372,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * res, const fmpz_t n,
 
     ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
 
-    Assumes \code{num_pk1} is not $0$.
-
+    Assumes $n$ is odd.
 
 *******************************************************************************
 
