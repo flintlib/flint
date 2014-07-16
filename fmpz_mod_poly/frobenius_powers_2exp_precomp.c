@@ -30,12 +30,31 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow)
+fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
+                      const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 {
-    slong i;
+    slong i, l = 0;
 
-    for (i = 0; i < pow->len; i++)
-       fmpz_mod_poly_clear(pow->pow + i);
+    if (m == 0)
+    {
+       pow->len = 0;
 
-    flint_free(pow->pow);
+       return;
+    }
+
+    l = FLINT_CLOG2(m);
+    if ((WORD(1) << l) == m)
+       l++;
+
+    pow->pow = (fmpz_mod_poly_struct *) flint_malloc(l*sizeof(fmpz_mod_poly_struct));
+
+    for (i = 0; i < l; i++)
+       fmpz_mod_poly_init(pow->pow + i, &f->p);
+
+    pow->len = l;
+
+    fmpz_mod_poly_powmod_x_fmpz_preinv(pow->pow + 0, &f->p, f, finv);
+
+    for (i = 1; i < l; i++)
+       fmpz_mod_poly_compose_mod(pow->pow + i, pow->pow + i - 1, pow->pow + i - 1, f);
 }

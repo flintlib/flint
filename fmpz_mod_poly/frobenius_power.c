@@ -31,7 +31,7 @@
 
 void
 fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
-                            fmpz_mod_poly_frobenius_powers_t pow, 
+                            fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                                               const fmpz_mod_poly_t f, ulong m)
 {
     slong i = 0;

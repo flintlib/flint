@@ -43,7 +43,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    slong i, bits = fmpz_bits(n);
    flint_rand_t state;
    fmpz_mod_poly_t f, g, h, h1, h2, h3, finv;
-   fmpz_mod_poly_frobenius_powers_t pow;
+   fmpz_mod_poly_frobenius_powers_2exp_t pow;
    fmpz_t exp, exp2, Ft, a1, a2, b, p, R;
    fmpz_factor_t fac;
    int res = 1, fac_found, d;
@@ -224,7 +224,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    fmpz_mod_poly_reverse(finv, f, f->length);
    fmpz_mod_poly_inv_series_newton(finv, finv, f->length);
 
-   fmpz_mod_poly_frobenius_powers_precomp(pow, f, finv, k);
+   fmpz_mod_poly_frobenius_powers_2exp_precomp(pow, f, finv, k);
 
    /* test g^(n^k - 1) = 1 mod f */
    fmpz_mod_poly_frobenius_power(h, pow, f, k);
@@ -308,7 +308,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
 
 cleanup:
 
-   fmpz_mod_poly_frobenius_powers_clear(pow);
+   fmpz_mod_poly_frobenius_powers_2exp_clear(pow);
 
    fmpz_factor_clear(fac);
 

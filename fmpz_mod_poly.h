@@ -73,9 +73,9 @@ typedef struct
 {
    fmpz_mod_poly_struct * pow;
    slong len;
-} fmpz_mod_poly_frobenius_powers_struct;
+} fmpz_mod_poly_frobenius_powers_2exp_struct;
 
-typedef fmpz_mod_poly_frobenius_powers_struct fmpz_mod_poly_frobenius_powers_t[1];
+typedef fmpz_mod_poly_frobenius_powers_2exp_struct fmpz_mod_poly_frobenius_powers_2exp_t[1];
 
 /*  Initialisation and memory management *************************************/
 
@@ -427,15 +427,15 @@ fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
 void
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
 
 void
-fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
+fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t pow);
 
 void
 fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
-                            fmpz_mod_poly_frobenius_powers_t pow, 
+                            fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                                              const fmpz_mod_poly_t f, ulong m);
 
 /*  Division *****************************************************************/
