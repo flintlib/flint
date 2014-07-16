@@ -36,6 +36,8 @@ fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
 {
     slong i = 0;
     ulong bit;
+    fmpz_mod_poly_struct * r;
+    fmpz_mod_poly_t tr;
 
     /* res = x^(p^0) = x */
     if (m == 0)
@@ -43,16 +45,25 @@ fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
        fmpz_mod_poly_set_coeff_ui(res, 1, 1);
        fmpz_mod_poly_set_coeff_ui(res, 0, 0);
        _fmpz_mod_poly_set_length(res, 2);
+       if (f->length == 1)
+          fmpz_mod_poly_rem(res, res, f);
 
        return;
     }
+
+    if (res == f)
+    {
+       fmpz_mod_poly_init(tr, &f->p);
+       r = tr;
+    } else
+       r = res;
 
     /* first nonzero bit */
     while ((m & (WORD(1) << i)) == 0)
        i++;
 
     /* res = f^(p^(2^i)) */
-    fmpz_mod_poly_set(res, pow->pow + i);
+    fmpz_mod_poly_set(r, pow->pow + i);
     m ^= (WORD(1) << i);
 
     while (m != 0)
@@ -62,8 +73,14 @@ fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
        bit = (WORD(1) << i);
        if ((bit & m) != 0)
        {
-          fmpz_mod_poly_compose_mod(res, pow->pow + i, res, f);
+          fmpz_mod_poly_compose_mod(r, pow->pow + i, r, f);
           m ^= bit;
        }
+    }
+
+    if (res == f)
+    {
+       fmpz_mod_poly_swap(res, r);
+       fmpz_mod_poly_clear(tr);
     }
 }

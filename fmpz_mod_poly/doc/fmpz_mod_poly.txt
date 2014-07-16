@@ -679,6 +679,21 @@ void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
     Requires precomputed frobenius powers supplied by
     \code{fmpz_mod_poly_frobenius_powers_2exp_precomp}.
 
+void
+fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+
+    If \code{p = f->p}, compute $x^(p^0)$, $x^(p^1)$, $x^(p^2)$, $x^(p^3)$, 
+    ..., $x^(p^m) \pmod{f}$.
+
+    Requires precomputed inverse of $f$, i.e. newton inverse.
+
+void
+fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
+
+    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_t} 
+    struct.
+
 *******************************************************************************
 
     Division

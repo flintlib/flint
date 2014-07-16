@@ -30,13 +30,12 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t pow)
+fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow)
 {
     slong i;
 
-    for (i = 0; i < pow->len; i++)
+    for (i = 0; i <= pow->len; i++)
        fmpz_mod_poly_clear(pow->pow + i);
 
-    if (pow->len)
-       flint_free(pow->pow);
+    flint_free(pow->pow);
 }
