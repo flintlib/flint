@@ -650,7 +650,8 @@ void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res,
     \code{f}.
 
 void 
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+fmpz_mod_poly_frobenius_powers_2exp_precomp(
+                   fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
 
     If \code{p = f->p}, compute $x^(p^1)$, $x^(p^2)$, $x^(p^4)$, ..., 
@@ -663,18 +664,20 @@ fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow,
     Requires precomputed inverse of $f$, i.e. newton inverse.
 
 void 
-fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow)
+fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t
+                                          pow)
 
-    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_t} struct.
+    Clear resources used by the \code{fmpz_mod_poly_frobenius_powers_2exp_t} 
+    struct.
 
 void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
-                             fmpz_mod_poly_frobenius_powers_t pow, 
+                             fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                                               const fmpz_mod_poly_t f, ulong m)
 
     If \code{p = f->p}, compute $x^(p^m) \pmod{f}$.
 
     Requires precomputed frobenius powers supplied by
-    \code{fmpz_mod_poly_frobenius_powers_precomp}.
+    \code{fmpz_mod_poly_frobenius_powers_2exp_precomp}.
 
 *******************************************************************************
 
