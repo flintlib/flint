@@ -55,24 +55,39 @@ fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
     if (fmpz_mod_poly_length(f) > 2)
     {
         const slong n = fmpz_mod_poly_degree(f);
-        fmpz_mod_poly_t a, x, x_p;
+        fmpz_mod_poly_t a, x, x_p, finv;
+        fmpz_mod_poly_frobenius_powers_2exp_t pow;
+        fmpz_t pk;
+
+        fmpz_init(pk);
 
         fmpz_mod_poly_init(a, &f->p);
         fmpz_mod_poly_init(x, &f->p);
         fmpz_mod_poly_init(x_p, &f->p);
+        fmpz_mod_poly_init(finv, &f->p);
+
         fmpz_mod_poly_set_coeff_ui(x, 1, 1);
 
         /* Compute x^q mod f */
-        fmpz_mod_poly_powpowmod(x_p, x, &f->p, n, f);
+        fmpz_mod_poly_reverse (finv, f, f->length);
+        fmpz_mod_poly_inv_series_newton (finv, finv, f->length);
+        
+        fmpz_mod_poly_frobenius_powers_2exp_precomp(pow, f, finv, n);
+        
+        fmpz_mod_poly_frobenius_power(x_p, pow, f, n);
+
         if (!fmpz_mod_poly_is_zero(x_p))
             fmpz_mod_poly_make_monic(x_p, x_p);
 
         /* Now do the irreducibility test */
         if (!fmpz_mod_poly_equal(x_p, x))
         {
+            fmpz_mod_poly_frobenius_powers_2exp_clear(pow);
+            fmpz_mod_poly_clear(finv);
             fmpz_mod_poly_clear(a);
             fmpz_mod_poly_clear(x);
             fmpz_mod_poly_clear(x_p);
+            fmpz_clear(pk);
             return 0;
         }
         else
@@ -85,7 +100,8 @@ fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
 
             for (i = 0; i < factors.num; i++)
             {
-                fmpz_mod_poly_powpowmod(a, x, &f->p, n / factors.p[i], f);
+                fmpz_mod_poly_frobenius_power(a, pow, f, n / factors.p[i]);
+
                 fmpz_mod_poly_sub(a, a, x);
 
                 if (!fmpz_mod_poly_is_zero(a))
@@ -95,6 +111,8 @@ fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
 
                 if (a->length != 1)
                 {
+                    fmpz_clear(pk);
+                    fmpz_mod_poly_clear(finv);
                     fmpz_mod_poly_clear(a);
                     fmpz_mod_poly_clear(x);
                     fmpz_mod_poly_clear(x_p);
@@ -103,6 +121,9 @@ fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
             }
         }
 
+        fmpz_clear(pk);
+        fmpz_mod_poly_frobenius_powers_2exp_clear(pow);
+        fmpz_mod_poly_clear(finv);
         fmpz_mod_poly_clear(a);
         fmpz_mod_poly_clear(x);
         fmpz_mod_poly_clear(x_p);

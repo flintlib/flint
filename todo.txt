@@ -55,6 +55,10 @@ ulong_extras
 * [enhancement] Implement a quadratic sieve and use it in n_factor once things
   get too large for SQUFOF
 
+* Claus Fieker suggested that in BPSW we should do Miller-Rabin rather than Fermat
+  test. The advantage is it will throw out more composites before the Fibonacci or
+  Lucas tests are run, but still ensures you have a base-2 probable prime. This
+  should speed the test up.
 
 long_extras
 -----------

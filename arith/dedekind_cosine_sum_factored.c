@@ -67,7 +67,8 @@ n_sqrtmod_ppow(mp_limb_t a, mp_limb_t p, int k, mp_limb_t pk, mp_limb_t pkinv)
     mp_limb_t r, t;
     int i;
 
-    r = n_sqrtmod(a, p);
+    /* n_sqrtmod assumes that a is reduced */
+    r = n_sqrtmod(a % p, p);
     if (r == 0)
         return r;
 

@@ -858,3 +858,17 @@ slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den,
     submatrix of) $A$, but is not guaranteed to be minimal or canonical in
     any other sense.
 
+*******************************************************************************
+
+    Gram matrix
+
+*******************************************************************************
+
+void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
+
+    Sets \code{B} to the Gram matrix of the $m$-dimensional lattice \code{L} in 
+    $n$-dimensional Euclidean space $R^n$ spanned by the rows of
+    the $m$ × $n$ matrix \code{A}. Dimensions must be compatible.
+    \code{A} and \code{B} are allowed to be the same object if \code{A} is a 
+    square matrix.
+    

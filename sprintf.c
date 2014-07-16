@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2013 William Hart
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
@@ -58,7 +59,7 @@ size_t flint_sprintf(char * s, const char * str, ...)
       n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
       strncpy(str2, str, n);
       str2[n] = '\0';
-   
+
       switch (str[1])
       {
       case 'w':
@@ -84,9 +85,12 @@ size_t flint_sprintf(char * s, const char * str, ...)
             ret += sprintf(s + ret, "%s", str2 + 2);
          }
          break;
+      case '%': /*Special Case to handle %%*/
+        ret += sprintf(s+ret,"%s",str2+1);
+        break;
       default: /* pass to sprintf */
          args = parse_fmt(&floating, str2);
-         if (args) 
+         if (args)
          {
             if (args == 3)
                w1 = va_arg(ap, int);

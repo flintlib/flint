@@ -32,17 +32,30 @@
 
 void
 _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
-                        const fmpz * h, const fmpz_t hden, slong n)
+                    const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     slong m;
     fmpz * t, * u, * v;
     fmpz_t tden, uden, vden;
 
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        fmpz_zero(g);
+        fmpz_one(gden);
+        _fmpz_vec_zero(g + hlen, n - hlen);
+        return;
+    }
+
     if (n <= 3)
     {
-        if (n >= 1) fmpz_set(g + 0, h + 0);
-        if (n >= 2) fmpz_set(g + 1, h + 1);
-        if (n == 3) fmpz_set(g + 2, h + 2);
+        fmpz_zero(g);
+        fmpz_set(g + 1, h + 1);
+        if (hlen == 3)
+            fmpz_set(g + 2, h + 2);
+        else
+            fmpz_zero(g + 2);
         fmpz_set(gden, hden);
         _fmpq_poly_canonicalise(g, gden, n);
         return;
@@ -50,7 +63,7 @@ _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
 
     m = (n + 1) / 2;
 
-    _fmpq_poly_tan_series(g, gden, h, hden, m);
+    _fmpq_poly_tan_series(g, gden, h, hden, hlen, m);
     _fmpz_vec_zero(g + m, n - m);
 
     t = _fmpz_vec_init(n);
@@ -65,8 +78,8 @@ _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
     if (2*m - 1 < n)
         fmpz_zero(u + n - 1);
 
-    _fmpq_poly_atan_series(t, tden, g, gden, n);
-    _fmpq_poly_sub(t, tden, t, tden, n, h, hden, n);
+    _fmpq_poly_atan_series(t, tden, g, gden, n, n);
+    _fmpq_poly_sub(t, tden, t, tden, n, h, hden, hlen);
     _fmpq_poly_mullow(v + m, vden, u, uden, n, t + m, tden, n - m, n - m);
     _fmpq_poly_sub(g, gden, g, gden, m, v, vden, n);
     _fmpq_poly_canonicalise(g, gden, n);
@@ -81,61 +94,34 @@ _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
 
 void fmpq_poly_tan_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
-    fmpz *copy;
-    int alloc;
-
-    if (poly->length == 0)
-    {
-        fmpq_poly_zero(res);
-        return;
-    }
-
-    if (!fmpz_is_zero(poly->coeffs))
+    if (poly->length && !fmpz_is_zero(poly->coeffs))
     {
         flint_printf("Exception (fmpq_poly_tan_series). Constant term != 0.\n");
         abort();
     }
 
-    if (n < 2)
+    if (poly->length == 0 || n < 2)
     {
         fmpq_poly_zero(res);
         return;
     }
 
-    if (poly->length >= n)
-    {
-        copy = poly->coeffs;
-        alloc = 0;
-    }
-    else
-    {
-        slong i;
-        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly->length; i++)
-            copy[i] = poly->coeffs[i];
-        for ( ; i < n; i++)
-            copy[i] = 0;
-        alloc = 1;
-    }
-
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_tan_series(res->coeffs, res->den, copy, poly->den, n);
+        _fmpq_poly_tan_series(res->coeffs, res->den,
+            poly->coeffs, poly->den, poly->length, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_tan_series(t->coeffs, t->den, copy, poly->den, n);
+        _fmpq_poly_tan_series(t->coeffs, t->den,
+            poly->coeffs, poly->den, poly->length, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(res, n);
     _fmpq_poly_normalise(res);
-
-    if (alloc)
-        flint_free(copy);
 }
-

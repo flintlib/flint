@@ -273,7 +273,7 @@ int test_ZZ_pE_to_fq()
         fmpz_mod_poly_init(fmod, p);
         fmpz_mod_poly_set_ZZ_pX(fmod, mod);
 
-        fq_ctx_init_modulus(ctx, p, d, fmod, "a");
+        fq_ctx_init_modulus(ctx, fmod, "a");
 
         ZZ_pE zzpe;
 
@@ -345,7 +345,7 @@ int test_ZZ_pEX_to_fq_poly()
         fmpz_mod_poly_init(fmod, p);
         fmpz_mod_poly_set_ZZ_pX(fmod, mod);
 
-        fq_ctx_init_modulus(ctx, p, d, fmod, "a");
+        fq_ctx_init_modulus(ctx, fmod, "a");
 
         ZZ_pEX zzpex;
 
@@ -417,7 +417,7 @@ int test_zz_pE_to_fq()
         fmpz_mod_poly_init(fmod, p);
         fmpz_mod_poly_set_zz_pX(fmod, mod);
 
-        fq_ctx_init_modulus(ctx, p, d, fmod, "a");
+        fq_ctx_init_modulus(ctx, fmod, "a");
 
         zz_pE zzpe;
 
@@ -487,7 +487,7 @@ int test_zz_pEX_to_fq_poly()
         fmpz_mod_poly_init(fmod, p);
         fmpz_mod_poly_set_zz_pX(fmod, mod);
 
-        fq_ctx_init_modulus(ctx, p, d, fmod, "a");
+        fq_ctx_init_modulus(ctx, fmod, "a");
 
         zz_pEX zzpex;
 

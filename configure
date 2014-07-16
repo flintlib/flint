@@ -388,7 +388,8 @@ echo "Configuring...${MACHINE}-${OS}"
 if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
-         FLINT_LIB="libflint.dylib";;
+         FLINT_LIB="libflint.dylib"
+         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB";;
       CYGWIN* | MINGW*)
          FLINT_LIB="libflint.dll";;
       *)
@@ -537,9 +538,6 @@ fi
 
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
-if [ "$PTHREAD" = "1" ]; then
-   LIBS="${LIBS} pthread"
-fi
 
 #pocess external modules
 
@@ -560,6 +558,11 @@ for LIB_DIR in ${LIB_DIRS} ${EXTRA_LIB_DIRS}; do
 done
 
 #linker params
+
+if [ "$PTHREAD" = "1" ]; then
+   lLIBS2="-lpthread ${lLIBS2}"
+fi
+
 
 for LIB in ${EXTRA_LIBS} ${LIBS}; do
    lLIBS2="-l${LIB} ${lLIBS2}"
@@ -633,6 +636,7 @@ echo "" >> Makefile
 echo "CFLAGS=$CFLAGS" >> Makefile
 echo "ABI_FLAG=$ABI_FLAG" >> Makefile
 echo "PIC_FLAG=$PIC_FLAG" >> Makefile
+echo "EXTRA_SHARED_FLAGS=$EXTRA_SHARED_FLAGS" >> Makefile
 echo "" >> Makefile
 echo "DLPATH=$DLPATH" >> Makefile
 echo "DLPATH_ADD=$DLPATH_ADD" >> Makefile

@@ -34,6 +34,8 @@ int main(void)
    int i, result;
    mp_limb_t d;
    mpz_t d_m;
+   slong pow;
+   ulong bits;
    FLINT_TEST_INIT(state);
    
 
@@ -84,6 +86,40 @@ int main(void)
 
       mpz_clear(d_m);
    }
+
+   /* Test that powers do not pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+   {
+      pow = n_randint(state, 6) + 2;
+      bits = n_randint(state, FLINT_BITS) + 1;
+      bits /= pow;
+
+      d = n_randbits(state, bits);
+      d = n_pow(d, pow);
+
+      result = !n_is_probabprime(d);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Perfect power d = %wu is declared prime\n", d); 
+         abort();
+      }
+   }
+
+   /* Regression test, check certain composites do not pass */
+#if FLINT64
+   {
+      d = UWORD(2007193456621);
+      
+      result = !n_is_probabprime(d);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Known composite d = %wu is declared prime\n", d); 
+         abort();
+      }
+   }
+#endif
 
    FLINT_TEST_CLEANUP(state);
    

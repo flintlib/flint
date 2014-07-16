@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
@@ -27,14 +28,61 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+#if (defined (__amd64__) || defined (__i386__) || defined (__i486__))	 
+
+mp_limb_t
+n_gcd(mp_limb_t x, mp_limb_t y)
+{
+    register mp_limb_t s0, s1, f;
+
+    if (x == 0) return y;
+    if (y == 0) return x;
+
+    count_trailing_zeros(s0, x);
+    count_trailing_zeros(s1, y);
+
+    f = FLINT_MIN(s0, s1);
+
+    x >>= s0;
+    y >>= s1;
+
+    while (x != y)
+    {
+        if (x < y)
+        {
+            y -= x;
+            count_trailing_zeros(s1, y);
+            y >>= s1;
+        }
+        else
+        {
+            x -= y;
+            count_trailing_zeros(s0, x);
+            x >>= s0;
+        }
+    }
+
+    return x << f;
+}
+
+#else
+
 mp_limb_t
 n_gcd(mp_limb_t x, mp_limb_t y)
 {
     mp_limb_t u3, v3;
     mp_limb_t quot, rem;
 
-    u3 = x;
-    v3 = y;
+    if (x >= y)
+    {
+        u3 = x;
+        v3 = y;
+    }
+    else
+    {
+        u3 = y;
+        v3 = x;
+    }
 
     if ((mp_limb_signed_t) (x & y) < WORD(0))  /* x and y both have top bit set */
     {
@@ -73,3 +121,5 @@ n_gcd(mp_limb_t x, mp_limb_t y)
 
     return u3;
 }
+
+#endif

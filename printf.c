@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2013 William Hart
+    Copyright (C) 2014 Ashish Kedia
 
 ******************************************************************************/
 
@@ -34,16 +35,16 @@
 int parse_fmt(int * floating, const char * fmt)
 {
    int args = 1;
-   
+
    fmt++; /* skip % */
-   
+
    if (fmt[0] == '%')
       return 0; /* special case, print % */
 
    if (fmt[0] == ' ' || fmt[0] == '+' || fmt[0] == '-')
       fmt++; /* skip flag */
 
-   if (fmt[0] == '*') 
+   if (fmt[0] == '*')
    {
       args++;
       fmt++; /* skip * */
@@ -61,14 +62,14 @@ int parse_fmt(int * floating, const char * fmt)
       } else
          while (isdigit((unsigned char) fmt[0]))
             fmt++; /* skip precision */
-   } 
+   }
 
    if (fmt[0] == 'h' || fmt[0] == 'l' || fmt[0] == 'L')
       fmt++; /* skip length */
 
    if (fmt[0] == 'e' || fmt[0] == 'E' || fmt[0] == 'f' || fmt[0] == 'g' || fmt[0] == 'G')
       (*floating) = 1;
-   else 
+   else
       (*floating) = 0;
 
    return args;
@@ -102,7 +103,7 @@ size_t flint_printf(const char * str, ...)
       n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
       strncpy(str2, str, n);
       str2[n] = '\0';
-   
+
       switch (str[1])
       {
       case 'w':
@@ -128,9 +129,12 @@ size_t flint_printf(const char * str, ...)
             ret += printf("%s", str2 + 2);
          }
          break;
+      case '%': /*Special Case to handle %%*/
+        ret += printf("%s",str2+1);
+        break;
       default: /* pass to printf */
          args = parse_fmt(&floating, str2);
-         if (args) 
+         if (args)
          {
             if (args == 3)
                w1 = va_arg(ap, int);

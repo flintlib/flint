@@ -37,6 +37,9 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
     slong limbs1, limbs2;
     mp_ptr mpn1, mpn2, res;
 
+    len1 = FLINT_MIN(len1, n);
+    len2 = FLINT_MIN(len2, n);
+
     if (bits == 0)
     {
         mp_bitcnt_t bits1, bits2, loglen;
@@ -77,7 +80,7 @@ nmod_poly_mullow_KS(nmod_poly_t res,
 {
     slong len_out;
 
-    if ((poly1->length == 0) || (poly2->length == 0))
+    if ((poly1->length == 0) || (poly2->length == 0) || n == 0)
     {
         nmod_poly_zero(res);
         return;

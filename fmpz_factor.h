@@ -57,6 +57,8 @@ void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
 
 void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp);
 
+void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp);
+
 void _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen);
 
 /* Factoring *****************************************************************/
@@ -80,6 +82,14 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
 void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
 
 void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
+
+/* Multiplicative functions **************************************************/
+
+void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac);
+
+int fmpz_factor_moebius_mu(const fmpz_factor_t fac);
+
+void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
 
 #ifdef __cplusplus
 }

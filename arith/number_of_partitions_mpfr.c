@@ -36,10 +36,6 @@
 #define HRR_C (2.5650996603237281911 + 1e-12)  /* pi*sqrt(2/3) */
 #define HRR_D (1.2424533248940001551 + 1e-12)  /* log(2) + log(3)/2 */
 
-
-#define PI_USE_CHUDNOVSKY 1
-#define PI_CHUDNOVSKY_CUTOFF 1000000
-
 #define VERBOSE 0
 
 
@@ -446,12 +442,7 @@ _arith_number_of_partitions_mpfr(mpfr_t x, ulong n, slong N0, slong N)
 #endif
 
     /* C = (pi/6)*sqrt(24*n-1) */
-
-    if (PI_USE_CHUDNOVSKY && prec > PI_CHUDNOVSKY_CUTOFF)
-        mpfr_pi_chudnovsky(t1, MPFR_RNDN);
-    else
-        mpfr_const_pi(t1, MPFR_RNDN);
-
+    mpfr_const_pi(t1, MPFR_RNDN);
     mpfr_sqrt_z(t2, n24, MPFR_RNDN);
     mpfr_mul(t1, t1, t2, MPFR_RNDN);
     mpfr_div_ui(C, t1, 6, MPFR_RNDN);

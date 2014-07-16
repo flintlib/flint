@@ -30,7 +30,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-
+ 
 fmpz * __new_fmpz()
 {
     return flint_calloc(sizeof(fmpz), 1);
@@ -70,4 +70,74 @@ void __fmpz_set_ui(fmpz_t f, ulong val)
     }
 }
 
+void __fmpz_init(fmpz_t f)
+{
+	(*f) = WORD(0);
+}
 
+void __fmpz_init_set_ui(fmpz_t f, ulong g)
+{
+    if (g <= COEFF_MAX)
+    {
+        *f = g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        flint_mpz_set_ui(ptr, g);
+    }
+}
+
+void __fmpz_clear(fmpz_t f)
+{
+	_fmpz_demote(f);
+}
+
+int __fmpz_lt(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) < 0;
+}
+
+int __fmpz_gt(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) > 0;
+}
+
+int __fmpz_lte(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) <= 0;
+}
+
+int __fmpz_gte(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) >= 0;
+}
+
+int __fmpz_eq(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) == 0;
+}
+
+int __fmpz_neq(fmpz_t f, fmpz_t g)
+{
+   return fmpz_cmp(f, g) != 0;
+}
+
+void __fmpz_init_set(fmpz_t f, const fmpz_t g)
+{
+    if (!COEFF_IS_MPZ(*g))
+    {
+        *f = *g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        mpz_set(ptr, COEFF_TO_PTR(*g));
+    }
+}

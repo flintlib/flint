@@ -34,23 +34,35 @@ void _fmpz_mod_poly_rem_basecase(fmpz *R,
 {
     fmpz_t q;
     slong iR;
+    fmpz * W;
 
     fmpz_init(q);
 
     if (R != A)
-        _fmpz_vec_set(R, A, lenA);
+    {
+       W = _fmpz_vec_init(lenA);
+       _fmpz_vec_set(W, A, lenA);
+    } else
+       W = R;
 
     for (iR = lenA - 1; iR >= lenB - 1; iR--)
     {
-        if (!fmpz_is_zero(R + iR))
+        if (!fmpz_is_zero(W + iR))
         {
-            fmpz_mul(q, R + iR, invB);
+            fmpz_mul(q, W + iR, invB);
             fmpz_mod(q, q, p);
 
-            _fmpz_vec_scalar_submul_fmpz(R + (iR - lenB + 1), B, lenB, q);
-            _fmpz_vec_scalar_mod_fmpz(R + (iR - lenB + 1), R + (iR - lenB + 1), lenB, p);
+            _fmpz_vec_scalar_submul_fmpz(W + (iR - lenB + 1), B, lenB, q);
+            _fmpz_vec_scalar_mod_fmpz(W + (iR - lenB + 1), W + (iR - lenB + 1), lenB, p);
         }
     }
+
+    if (R != A)
+    {
+       _fmpz_vec_set(R, W, lenB - 1);
+       _fmpz_vec_clear(W, lenA);
+    }
+
     fmpz_clear(q);
 }
 
@@ -72,11 +84,11 @@ void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R,
 
     if (R == B)
     {
-        r = _fmpz_vec_init(lenA);
+        r = _fmpz_vec_init(lenB - 1);
     }
     else
     {
-        fmpz_mod_poly_fit_length(R, lenA);
+        fmpz_mod_poly_fit_length(R, lenB - 1);
         r = R->coeffs;
     }
 
@@ -87,9 +99,10 @@ void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R,
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
-        R->alloc  = lenA;
-        R->length = lenA;
+        R->alloc  = lenB - 1;
+        R->length = lenB - 1;
     }
+
     _fmpz_mod_poly_set_length(R, lenB - 1);
     _fmpz_mod_poly_normalise(R);
 

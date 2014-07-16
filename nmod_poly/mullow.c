@@ -33,7 +33,10 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
                              mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     slong bits, bits2;
-    
+
+    len1 = FLINT_MIN(len1, n);
+    len2 = FLINT_MIN(len2, n);
+
     if (len1 + len2 <= 6 || n <= 6)
     {
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);

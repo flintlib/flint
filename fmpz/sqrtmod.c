@@ -53,6 +53,34 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
         return 1;
     }
 
+    if (flint_mpz_congruent_ui_p(p, 5, 8))
+    {
+        mpz_init(exp);
+        mpz_init(g);
+        mpz_init(k);
+        flint_mpz_add_ui(exp, p, 3);
+        mpz_tdiv_q_2exp(exp, exp, 3);
+        mpz_powm(rop, a, exp, p);
+        mpz_set_ui(k, 2);
+        mpz_powm(g, rop, k, p);
+        if (mpz_cmp(g, a) == 0)
+        {
+           mpz_clear(exp);
+           mpz_clear(g);
+           mpz_clear(k);
+           return 1;
+        }
+        flint_mpz_sub_ui(exp, p, 1);
+        mpz_tdiv_q_2exp(exp, exp, 2);
+        mpz_powm(g, k, exp, p);
+        mpz_mul(rop, rop, g);
+        mpz_mod(rop, rop, p);
+        mpz_clear(exp);
+        mpz_clear(g);
+        mpz_clear(k);
+        return 1;
+    }
+
     mpz_init(p1);
     mpz_init(k);
     mpz_init(exp);
@@ -70,7 +98,7 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
 
     mpz_powm(b, a, p1, p);
 
-    for (flint_mpz_set_ui(k, 2); ; flint_mpz_add_ui(k, k, 1))
+    for (flint_mpz_set_ui(k, 3); ; flint_mpz_add_ui(k, k, 2)) /* 2 is a quadratic residue mod p = 8k + 1 */
     {
         if (mpz_jacobi(k, p) == -1) break;
     }
