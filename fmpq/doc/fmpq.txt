@@ -200,7 +200,7 @@ char * fmpq_get_str(char * str, int b, const fmpq_t x)
 
 void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f)
 
-    Sets the unitialised \code{mpq_t} $z$ to the value of the 
+    Sets the uninitialised \code{mpq_t} $z$ to the value of the 
     readonly \code{fmpq_t} $f$.
 
     Note that it is assumed that $f$ does not change during 

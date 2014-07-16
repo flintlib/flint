@@ -196,7 +196,7 @@ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 
-    Sets the unitialised \code{mpz_t} $z$ to the value of the 
+    Sets the uninitialised \code{mpz_t} $z$ to the value of the 
     readonly \code{fmpz_t} $f$.
 
     Note that it is assumed that $f$ does not change during 
