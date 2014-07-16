@@ -50,7 +50,7 @@ main(void)
         do {
            fmpz_randbits(p, state, n_randint(state, 160) + 2);
            fmpz_abs(p, p);
-        } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
+        } while (!fmpz_is_probabprime(p));
 
         r1 = fmpz_is_prime(p);
 
