@@ -373,7 +373,9 @@ void fq_one(fq_t rop, const fq_ctx_t ctx)
 
 void fq_gen(fq_t rop, const fq_ctx_t ctx)
 
-    Sets \code{rop} to a multiplicative generator for the finite field.
+    Sets \code{rop} to a generator for the finite field.
+    There is no guarentee this is a multiplicative generator of
+    the finite field.
 
 *******************************************************************************
 
