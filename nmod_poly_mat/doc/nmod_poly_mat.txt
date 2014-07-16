@@ -384,7 +384,7 @@ void nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
     of each coefficient matrix, and forming the interpolating polynomial.
 
     If the coefficient ring does not contain $n$ distinct points (that is,
-    if working over $\mathbb{Z}/p\mathbb{Z}$ where $p < n$),
+    if working over $\mathbf{Z}/p\mathbf{Z}$ where $p < n$),
     this function automatically falls back to \code{nmod_poly_mat_det_fflu}.
 
 slong nmod_poly_mat_rank(const nmod_poly_mat_t A)

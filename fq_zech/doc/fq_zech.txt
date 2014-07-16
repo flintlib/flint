@@ -343,17 +343,17 @@ char * fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 void fq_zech_randtest(fq_zech_t rop, flint_rand_t state,
                       const fq_zech_ctx_t ctx)
 
-    Generates a random element of $\mathbb{F}_q$.
+    Generates a random element of $\mathbf{F}_q$.
 
 void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_t state,
                              const fq_zech_ctx_t ctx)
 
-    Generates a random non-zero element of $\mathbb{F}_q$.
+    Generates a random non-zero element of $\mathbf{F}_q$.
 
 void fq_zech_randtest_dense(fq_zech_t rop, flint_rand_t state,
                             const fq_zech_ctx_t ctx)
 
-    Generates a random element of $\mathbb{F}_q$ which has an
+    Generates a random element of $\mathbf{F}_q$ which has an
     underlying polynomial with dense coefficients.
 
 *******************************************************************************
@@ -369,12 +369,12 @@ void fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 void fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to \code{x}, considered as an element of
-    $\mathbb{F}_p$.
+    $\mathbf{F}_p$.
 
 void fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to \code{x}, considered as an element of
-    $\mathbb{F}_p$.
+    $\mathbf{F}_p$.
 
 void fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t ctx)
 
@@ -448,10 +448,10 @@ void fq_zech_trace(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the trace of \code{op}.
 
-    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines
-    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the
+    For an element $a \in \mathbf{F}_q$, multiplication by $a$ defines
+    a $\mathbf{F}_p$-linear map on $\mathbf{F}_q$.  We define the
     trace of $a$ as the trace of this map.  Equivalently, if $\Sigma$
-    generates $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of
+    generates $\Gal(\mathbf{F}_q / \mathbf{F}_p)$ then the trace of
     $a$ is equal to $\sum_{i=0}^{d-1} \Sigma^i (a)$, where $d =
     \log_{p} q$.
 
@@ -459,12 +459,12 @@ void fq_zech_norm(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Computes the norm of \code{op}.
 
-    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines
-    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the norm
+    For an element $a \in \mathbf{F}_q$, multiplication by $a$ defines
+    a $\mathbf{F}_p$-linear map on $\mathbf{F}_q$.  We define the norm
     of $a$ as the determinant of this map.  Equivalently, if $\Sigma$ generates
-    $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of $a$ is equal to
+    $\Gal(\mathbf{F}_q / \mathbf{F}_p)$ then the trace of $a$ is equal to
     $\prod_{i=0}^{d-1} \Sigma^i (a)$, where
-    $d = \text{dim}_{\mathbb{F}_p}(\mathbb{F}_q)$.
+    $d = \text{dim}_{\mathbf{F}_p}(\mathbf{F}_q)$.
 
     Algorithm selection is automatic depending on the input.
 
@@ -473,7 +473,7 @@ void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
 
     Evaluates the homomorphism $\Sigma^e$ at \code{op}.
 
-    Recall that $\mathbb{F}_q / \mathbb{F}_p$ is Galois with Galois group
+    Recall that $\mathbf{F}_q / \mathbf{F}_p$ is Galois with Galois group
     $\langle \sigma \rangle$, which is also isomorphic to
     $\mathbf{Z}/d\mathbf{Z}$, where
     $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element

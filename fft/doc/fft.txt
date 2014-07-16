@@ -227,7 +227,7 @@ void fft_radix2(mp_limb_t ** ii,
          arrays
 
     $\bullet$ $w$ is such that $2^w$ is an $2n$-th root of unity
-         in the ring $\mathbb{Z}/p\mathbb{Z}$ that we are working in,
+         in the ring $\mathbf{Z}/p\mathbf{Z}$ that we are working in,
          i.e. $p = 2^{wn} + 1$ (here $n$ is divisible by
          \code{GMP_LIMB_BITS})
 
@@ -287,7 +287,7 @@ void ifft_radix2(mp_limb_t ** ii,
         arrays
 
     $\bullet$ $w$ is such that $2^w$ is an $2n$-th root of unity
-        in the ring $\mathbb{Z}/p\mathbb{Z}$ that we are working in,
+        in the ring $\mathbf{Z}/p\mathbf{Z}$ that we are working in,
         i.e. $p = 2^{wn} + 1$ (here $n$ is divisible by
         \code{GMP_LIMB_BITS})
 

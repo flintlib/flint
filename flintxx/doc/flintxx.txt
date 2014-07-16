@@ -553,7 +553,7 @@ void print(const fmpz_factorxx&)
     fmpz\_matxx
 
     The class \code{fmpz_matxx} wraps \code{fmpz_mat_t}, and so represents
-    matrices with coefficients in $\mathbb{Z}$.
+    matrices with coefficients in $\mathbf{Z}$.
 
     Owing to the design of \code{fmpz_mat_t}, the use of \code{fmpz_matxx}
     has a number of peculiarities.
@@ -2272,7 +2272,7 @@ int print_pretty(Fmpz_poly_q_expr, const char* var)
     fmpz\_poly\_matxx
 
     The class \code{fmpz_poly_matxx} wraps \code{fmpz_poly_mat_t}, and so
-    represents matrices with coefficients in $\mathbb{Z}[X]$. Its usage is
+    represents matrices with coefficients in $\mathbf{Z}[X]$. Its usage is
     similar to \code{fmpz_matxx} in most regards.
 
 *******************************************************************************
@@ -2696,8 +2696,8 @@ static nmod_polyxx nmod_polyxx::reduce(Fmpq_mod_poly_expr, mp_limb_t)
 static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
 static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
 
-    Consider $e \in \mathbb{Z}/n\mathbb{Z}$ as an element of
-    $\mathbb{Z}/n\mathbb{Z}[X]$.
+    Consider $e \in \mathbf{Z}/n\mathbf{Z}$ as an element of
+    $\mathbf{Z}/n\mathbf{Z}[X]$.
 
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Input and output

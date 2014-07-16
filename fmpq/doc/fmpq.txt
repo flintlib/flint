@@ -621,8 +621,8 @@ void fmpq_harmonic_ui(fmpq_t x, ulong n)
 
         $$((x))=\begin{cases}
             x-\lfloor x\rfloor-1/2 &\mbox{if }
-                x\in\mathbb{Q}\setminus\mathbb{Z}\\
-            0 &\mbox{if }x\in\mathbb{Z}.
+                x\in\mathbf{Q}\setminus\mathbf{Z}\\
+            0 &\mbox{if }x\in\mathbf{Z}.
             \end{cases}$$
 
     If $0 < h < k$ and $(h,k) = 1$, this reduces to
