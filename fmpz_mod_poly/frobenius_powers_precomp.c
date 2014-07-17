@@ -46,7 +46,7 @@ fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow,
     fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 1, 1);
     fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 0, 0);
     _fmpz_mod_poly_set_length(pow->pow + 0, 2);
-    if (f->length == 1)
+    if (f->length <= 2)
        fmpz_mod_poly_rem(pow->pow + 0, pow->pow + 0, f);
 
     if (m >= 1)
