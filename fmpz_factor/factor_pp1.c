@@ -565,8 +565,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       _fmpz_vec_clear(roots, num_roots);
       _fmpz_vec_clear(roots2, num_roots);
       flint_free(sieve);
+      flint_free(sieve_index);
       flint_free(diff);
-
 
       if (i < num_roots)
          goto cleanup2;
@@ -595,7 +595,8 @@ cleanup2:
    flint_free(oldy);
    flint_free(n);
    flint_free(ninv);
-   
+   flint_free(factor);
+
    n_primes_clear(iter);
 
    return ret;
