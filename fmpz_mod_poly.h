@@ -46,6 +46,8 @@
 #define FMPZ_MOD_POLY_HGCD_CUTOFF  128      /* HGCD: Basecase -> Recursion      */
 #define FMPZ_MOD_POLY_GCD_CUTOFF  256       /* GCD:  Euclidean -> HGCD          */
 
+#define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64 /* Inv series newton: Basecase -> Newton */
+
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -587,6 +589,9 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
                                  const fmpz_t cinv, const fmpz_t p);
 
 void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n);
+
+void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
     const fmpz_mod_poly_t Q, slong n);
 
 /*  Greatest common divisor **************************************************/

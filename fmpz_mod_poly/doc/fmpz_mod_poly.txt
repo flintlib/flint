@@ -943,6 +943,13 @@ void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
     where $n \geq 1$, assuming that the bottom coefficient of
     $Q$ is a unit.
 
+void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
+
+    Either sets $f$ to a nontrivial factor of $p$ with the value of
+    \code{Qinv} undefined, or sets \code{Qinv} to the inverse of \code{Q}
+    modulo $x^n$, where $n \geq 1$.
+
 *******************************************************************************
 
     Greatest common divisor
