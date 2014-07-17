@@ -100,6 +100,16 @@ int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
     Uses Rabin irreducibility test.
 
+int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t f, const fmpz_mod_poly_t f)
+
+    Either sets $f$ to $1$ and return 1 if the polynomial \code{f} is 
+    irreducible or $0$ otherwise, or set $f$ to a nontrivial factor of
+    $p$.
+
+    This algorithm correctly determines whether $f$ to is irreducible over 
+    $\mathbb{Z}/p\mathbb{Z}$, even for composite $f$, or it finds a factor
+    of $p$.
+
 int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
 
     Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a

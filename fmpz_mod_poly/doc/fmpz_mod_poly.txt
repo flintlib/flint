@@ -968,6 +968,13 @@ void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     Otherwise, if \code{poly} is zero, sets \code{res} to zero.
 
+void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, 
+                                                    const fmpz_mod_poly_t poly)
+
+    Either set $f$ to $1$ and \code{res} to \code{poly} divided by its leading 
+    coefficient or set $f$ to a nontrivial factor of $p$ and leave \code{res}
+    undefined.
+
 slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
                                            const fmpz *B, slong lenB,
                                            const fmpz_t invB, const fmpz_t p)

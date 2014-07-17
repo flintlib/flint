@@ -44,7 +44,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    flint_rand_t state;
    fmpz_mod_poly_t f, g, h, h1, h2, h3, finv;
    fmpz_mod_poly_frobenius_powers_2exp_t pow;
-   fmpz_t exp, exp2, Ft, a1, a2, b, p, R;
+   fmpz_t exp, exp2, Ft, a1, a2, b, p, R, nfac, base;
    fmpz_factor_t fac;
    int res = 1, fac_found, d;
 
@@ -60,6 +60,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    fmpz_init(exp2);
    fmpz_init(R);
    fmpz_init(p);
+   fmpz_init(nfac);
 
    switch (k)
    {
@@ -149,6 +150,9 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    fmpz_mod_poly_init(h2, n);
    fmpz_mod_poly_init2(g, n, k);
 
+   fmpz_set_ui(nfac, 1);
+   fmpz_init_set_ui(base, 1);
+      
    if ((k % 2) == 0)
    {
       /* 
@@ -162,13 +166,22 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       fmpz_init(a2);
       fmpz_init(b);
 
-      /* 
-         TODO: prove Operator Q plays nice with Z/nZ[x] with n composite
-         so that there is no need to check irreducibility of the polynomial
-         it produces
-      */
-      do{
+      do {  
          do {
+            /* prevent very long loop for composite n */
+            fmpz_add_ui(base, base, 1);
+            if (!fmpz_is_strong_probabprime(n, base))
+            {
+               fmpz_clear(base);
+               fmpz_clear(a1);
+               fmpz_clear(a2);
+               fmpz_clear(b);
+
+               res = 0;
+
+               goto cleanup1;
+            }
+
             for (i = 0; i < k/2; i++)
                fmpz_randm(g->coeffs + i, state, n);
             fmpz_set_ui(b, 2);
@@ -177,7 +190,11 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
             fmpz_mod_poly_evaluate_fmpz(a2, g, b);
             fmpz_mul(a1, a1, a2);
             fmpz_mod(a1, a1, n);
-         } while (fmpz_jacobi(a1, n) != -1 || !fmpz_mod_poly_is_irreducible_rabin(g));
+         } while (fmpz_jacobi(a1, n) != -1 
+              || (!fmpz_mod_poly_is_irreducible_rabin_f(nfac, g) && fmpz_is_one(nfac)));
+
+         if (!fmpz_is_one(nfac)) /* factor of n found */
+            break;
 
          /* apply Q operator f(x) = x^k/2 g(x + 1/x) */
 
@@ -196,7 +213,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
             if (i != k/2)
                fmpz_mod_poly_mul(h1, h1, h);
          }
-      } while (!fmpz_mod_poly_is_irreducible_rabin(f));
+      } while (!fmpz_mod_poly_is_irreducible_rabin_f(nfac, f) && fmpz_is_one(nfac));
 
       fmpz_clear(a1);
       fmpz_clear(a2);
@@ -206,9 +223,31 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       fmpz_mod_poly_set_coeff_ui(f, k, 1);
 
       do {
+         fmpz_add_ui(base, base, 1);
+         if (!fmpz_is_strong_probabprime(n, base))
+         {
+            fmpz_clear(base);
+            fmpz_clear(a1);
+            fmpz_clear(a2);
+            fmpz_clear(b);
+
+            res = 0;
+
+            goto cleanup1;
+         }
+            
          for (i = 0; i < k; i++)
             fmpz_randm(f->coeffs + i, state, n);
-      } while (!fmpz_mod_poly_is_irreducible_rabin(f));
+      } while (!fmpz_mod_poly_is_irreducible_rabin_f(nfac, f) && fmpz_is_one(nfac));
+   }
+      
+   fmpz_clear(base);
+
+   if (!fmpz_is_one(nfac)) /* factor of n found */
+   {
+      res = 0;
+
+      goto cleanup1;
    }
 
    /* compute random poly g of length k */
@@ -223,7 +262,14 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    fmpz_mod_poly_init(finv, n);
 
    fmpz_mod_poly_reverse(finv, f, f->length);
-   fmpz_mod_poly_inv_series_newton(finv, finv, f->length);
+   fmpz_mod_poly_inv_series_newton_f(nfac, finv, finv, f->length);
+
+   if (!fmpz_is_one(nfac))
+   {
+      res = 0;
+
+      goto cleanup2;
+   }
 
    fmpz_mod_poly_frobenius_powers_2exp_precomp(pow, f, finv, k);
 
@@ -235,11 +281,6 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    {
       res = 0;
 
-      printf("f = "); fmpz_mod_poly_print(f); printf("\n");
-      printf("g = "); fmpz_mod_poly_print(g); printf("\n");
-      printf("h = "); fmpz_mod_poly_print(h); printf("\n");
-
-      printf("here\n");
       goto cleanup;
    }
 
@@ -308,26 +349,31 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       }
    }
 
-   fmpz_mod_poly_clear(h1);
-   fmpz_mod_poly_clear(h2);
    fmpz_mod_poly_clear(h3);
 
 cleanup:
-
    fmpz_mod_poly_frobenius_powers_2exp_clear(pow);
+
+cleanup2:
+
+   fmpz_mod_poly_clear(finv);
+
+cleanup1:
 
    fmpz_factor_clear(fac);
 
-   fmpz_mod_poly_clear(finv);
    fmpz_mod_poly_clear(f);
    fmpz_mod_poly_clear(g);
    fmpz_mod_poly_clear(h);
+   fmpz_mod_poly_clear(h1);
+   fmpz_mod_poly_clear(h2);
 
    fmpz_clear(p);
    fmpz_clear(Ft);
    fmpz_clear(exp);
    fmpz_clear(exp2);
    fmpz_clear(R);
+   fmpz_clear(nfac);
 
    flint_randclear(state);
 

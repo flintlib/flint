@@ -598,6 +598,9 @@ void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
 
 void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
 
+void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, 
+                                                   const fmpz_mod_poly_t poly);
+
 slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, 
                                            const fmpz *B, slong lenB, 
                                            const fmpz_t invB, const fmpz_t p);
