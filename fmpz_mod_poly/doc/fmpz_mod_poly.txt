@@ -1047,7 +1047,7 @@ void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Either sets $f = 1$ and $G$ to the greatest common divisor
-    of $A$ and $B$, or $ \in (1,p)$ to a non-trivial factor of $p$.
+    of $A$ and $B$, or $f \in (1,p)$ to a non-trivial factor of $p$.
 
     In general, the greatest common divisor is defined in the polynomial
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
