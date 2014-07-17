@@ -1041,7 +1041,7 @@ slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA,
     space for sufficiently many coefficients.
 
     Does not support aliasing of any of the input arguments
-    with any of the output argument.
+    with any of the output arguments.
 
 void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
