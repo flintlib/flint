@@ -391,7 +391,7 @@ FUNC_HEAD
         }
         else
         {
-            int kappa, kappa2, d, n, i, j, zeros, kappamax, shift, new_kappa;
+            int kappa, kappa2, d, n, i, j, zeros, kappamax, shift;
             slong exp;
             int num_failed_fast = 0;
             int babai_ok = 0;
@@ -399,11 +399,10 @@ FUNC_HEAD
             d_mat_t mu, r;
             fmpz_gram_t A;
             double *s, *mutmp, *appBtmp;
-            fmpz *exactSPtmp;
             double ctt;
             int *alpha;
             fmpz *Btmp;
-            ulong max_exp, iter, max_iter, newvec, newvec_max;
+            ulong max_exp, iter, max_iter;
 
             n = B->c;
             d = B->r;
@@ -421,20 +420,13 @@ FUNC_HEAD
 
             s = _d_vec_init(d);
             appBtmp = _d_vec_init(n);
-            exactSPtmp = _fmpz_vec_init(d);
 
             if (fl->store_trans)
             {
                 fmpz_mat_one(U);
             }
 
-            for (i = 0; i < d; i++)
-            {
-                for (j = 0; j < d; j++)
-                {
-                    fmpz_set_si(fmpz_mat_entry(A->exactSP, i, j), WORD_MIN);
-                }
-            }
+            fmpz_mat_gram(A->exactSP, B);
 
             /* ************************** */
             /* Step1: Initialization Step */
@@ -457,8 +449,7 @@ FUNC_HEAD
             i = 0;
 
             do
-                _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, i, i), B->rows[i],
-                              B->rows[i], n);
+                ;
             while ((fmpz_cmp_ui(fmpz_mat_entry(A->exactSP, i, i), 0) <= 0)
                    && (++i < d));
 
@@ -477,8 +468,6 @@ FUNC_HEAD
             for (i = zeros + 1; i < d; i++)
                 alpha[i] = 0;
 
-            newvec = 0;
-            newvec_max = 1;
             iter = 0;
             while (kappa < d)
             {
@@ -489,19 +478,9 @@ FUNC_HEAD
                 }
                 iter++;
 
-                new_kappa = 0;
                 if (kappa > kappamax)
                 {
-                    /* In the first time we hit a new kappa we're going to size-reduce in advance (for knapsack)... */
                     kappamax = kappa;
-                    newvec++;
-
-                    if (newvec > newvec_max)
-                    {
-                        newvec_max *= 2;
-                        newvec = 0;
-                        new_kappa = 1;
-                    }
                 }
 
                 /* ********************************** */
@@ -542,45 +521,8 @@ FUNC_HEAD
                     fmpz_mat_clear(A->exactSP);
                     _d_vec_clear(s);
                     _d_vec_clear(appBtmp);
-                    _fmpz_vec_clear(exactSPtmp, d);
                     /* Need to switch to mpf / arb */
                     return -1;
-                }
-
-                /* End of the real Babai part... */
-                if (new_kappa == 1)
-                {
-#if TYPE == 2
-                    /* running ahead to kappa = d, without upsetting LLL... */
-                    for (kappa2 = d - 1; kappa2 > kappa; kappa2--)
-                    {
-                        babai_ok =
-                            fmpz_lll_advance_check_babai(kappa, kappa2, B, U,
-                                                         mu, r, s, NULL, expo,
-                                                         A, alpha[kappa2],
-                                                         zeros, kappa + 1,
-                                                         n, fl);
-                        if (babai_ok == -1)
-                        {
-                            heuristic_fail =
-                                fmpz_lll_advance_check_babai_heuristic_d(kappa,
-                                                                         kappa2,
-                                                                         B, U,
-                                                                         mu, r,
-                                                                         s,
-                                                                         NULL,
-                                                                         expo,
-                                                                         A,
-                                                                         alpha
-                                                                         [kappa2],
-                                                                         zeros,
-                                                                         kappa
-                                                                         + 1,
-                                                                         n,
-                                                                         fl);
-                        }
-                    }
-#endif
                 }
 
                 /* ************************************ */
@@ -671,11 +613,6 @@ FUNC_HEAD
                     /* Step7: Update B */
                     /* *************** */
 
-                    Btmp = B->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        B->rows[i] = B->rows[i - 1];
-                    B->rows[kappa] = Btmp;
-
                     if (fl->store_trans)
                     {
                         Btmp = _fmpz_vec_init(d);
@@ -684,6 +621,13 @@ FUNC_HEAD
                             _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
                         _fmpz_vec_set(U->rows[kappa], Btmp, d);
                         _fmpz_vec_clear(Btmp, d);
+                    }
+                    else
+                    {
+                        Btmp = B->rows[kappa2];
+                        for (i = kappa2; i > kappa; i--)
+                            B->rows[i] = B->rows[i - 1];
+                        B->rows[kappa] = Btmp;
                     }
 
                     j = expo[kappa2];
@@ -695,47 +639,31 @@ FUNC_HEAD
                     /* Step8: Update exactSP */
                     /* ********************* */
 
-                    for (i = 0; i <= kappa2; i++)
-                        fmpz_set(exactSPtmp + i,
-                                 fmpz_mat_entry(A->exactSP, kappa2, i));
-
-                    for (i = kappa2 + 1; i <= kappamax; i++)
-                        fmpz_set(exactSPtmp + i,
-                                 fmpz_mat_entry(A->exactSP, i, kappa2));
-
-                    for (i = kappa2; i > kappa; i--)
+                    for (j = kappa2; j > kappa; j--)
                     {
-                        for (j = 0; j < kappa; j++)
-                            fmpz_set(fmpz_mat_entry(A->exactSP, i, j),
-                                     fmpz_mat_entry(A->exactSP, i - 1, j));
-                        fmpz_set(fmpz_mat_entry(A->exactSP, i, kappa),
-                                 exactSPtmp + (i - 1));
-
-                        for (j = kappa + 1; j <= i; j++)
-                            fmpz_set(fmpz_mat_entry(A->exactSP, i, j),
-                                     fmpz_mat_entry(A->exactSP, i - 1, j - 1));
-
-                        for (j = kappa2 + 1; j <= kappamax; j++)
-                            fmpz_set(fmpz_mat_entry(A->exactSP, j, i),
-                                     fmpz_mat_entry(A->exactSP, j, i - 1));
+                        for (i = kappa2; i < d; i++)
+                            fmpz_swap(fmpz_mat_entry(A->exactSP, i, j),
+                                      fmpz_mat_entry(A->exactSP, i, j - 1));
+                        for (i = 0; i < kappa; i++)
+                            fmpz_swap(fmpz_mat_entry(A->exactSP, j, i),
+                                      fmpz_mat_entry(A->exactSP, j - 1, i));
                     }
-
-                    for (i = 0; i < kappa; i++)
-                        fmpz_set(fmpz_mat_entry(A->exactSP, kappa, i),
-                                 exactSPtmp + i);
-                    fmpz_set(fmpz_mat_entry(A->exactSP, kappa, kappa),
-                             exactSPtmp + kappa2);
-
-                    for (i = kappa2 + 1; i <= kappamax; i++)
-                        fmpz_set(fmpz_mat_entry(A->exactSP, i, kappa),
-                                 exactSPtmp + i);
+                    for (j = kappa2; j > kappa; j--)
+                    {
+                        for (i = j; i > kappa; i--)
+                            fmpz_swap(fmpz_mat_entry(A->exactSP, j, i),
+                                      fmpz_mat_entry(A->exactSP, j - 1,
+                                                     i - 1));
+                    }
+                    for (j = 0; 2 * j < kappa2 - kappa; j++)
+                        fmpz_swap(fmpz_mat_entry(A->exactSP, kappa + j, kappa),
+                                  fmpz_mat_entry(A->exactSP, kappa2 - j,
+                                                 kappa));
 
                     if (d_mat_entry(r, kappa, kappa) <= 0.0)
                     {
                         zeros++;
                         kappa++;
-                        _fmpz_vec_dot(fmpz_mat_entry(A->exactSP, kappa, kappa),
-                                      B->rows[kappa], B->rows[kappa], n);
                         d_mat_entry(r, kappa, kappa) =
                             fmpz_get_d_2exp(&exp, fmpz_mat_entry
                                             (A->exactSP, kappa, kappa));
@@ -746,6 +674,11 @@ FUNC_HEAD
 
                     kappa++;
                 }
+            }
+
+            if (fl->store_trans)
+            {
+                fmpz_mat_mul(B, U, B);
             }
 
 #if TYPE
@@ -769,7 +702,6 @@ FUNC_HEAD
             fmpz_mat_clear(A->exactSP);
             _d_vec_clear(s);
             _d_vec_clear(appBtmp);
-            _fmpz_vec_clear(exactSPtmp, B->r);
 
             if (kappa < d)
                 return -1;

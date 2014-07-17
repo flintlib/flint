@@ -730,8 +730,7 @@ FUNC_HEAD
                         if (fl->store_trans)
                         {
                             _fmpz_vec_scalar_submul_fmpz(U->rows[kappa],
-                                                         U->rows[j], d,
-                                                         x + j);
+                                                         U->rows[j], d, x + j);
                         }
                     }
                 }
