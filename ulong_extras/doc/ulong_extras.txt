@@ -31,14 +31,6 @@
 
 *******************************************************************************
 
-void n_randinit(flint_rand_t state)
-
-    Initialise a random state for use in random functions. 
-
-void n_randclear(flint_rand_t state)
-
-    Release any memory used by a random state. 
-
 mp_limb_t n_randlimb(flint_rand_t state)
 
     Returns a uniformly pseudo random limb. 
