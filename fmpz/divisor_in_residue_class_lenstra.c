@@ -67,29 +67,33 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
    fmpz_set(a0, s); /* a0 = s */
    fmpz_mul(a1, r1, r2); /* a1 = r1*r2 mod s */
    fmpz_mod(a1, a1, s);
+   if (fmpz_is_zero(a1))
+      fmpz_add(a1, a1, s); /* 0 < a1 <= s */
    
    fmpz_zero(b0);
    fmpz_one(b1);
    
    fmpz_zero(c0);
-   fmpz_mul(c1, n, r1); /* c1 = (n*r1 - r*a1)/s mod s */
-   fmpz_submul(c1, r, a1);
+   fmpz_mul(c1, r, r2); /* c1 = (n - r*r2)/s * r1 mod s */
+   fmpz_sub(c1, n, c1);
    fmpz_divexact(c1, c1, s);
+   fmpz_mul(c1, c1, r1);
    fmpz_mod(c1, c1, s);
 
+
    /* deal with a0, b0, c0 */
-   if (!fmpz_is_one(r) && fmpz_divisible(n, r))
+   if (!fmpz_is_one(r) && !fmpz_equal(n, r) && fmpz_divisible(n, r))
    {
       fmpz_set(fac, r);
       res = 1;
       goto cleanup;
    }
 
-   for (i = 0; ; i++)
+   for (i = 1; ; i++)
    {
       if ((i & 1) == 0)
       {
-         fmpz_set(s1, c1);
+         fmpz_mod(s1, c1, s);
          fmpz_neg(s2, s); 
       } else
       {
@@ -97,12 +101,13 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
          fmpz_add(s1, s2, ns2); /* s1 = a1*b1 + n/s^2 */
 
          fmpz_mod(q, s1, s); /* s1 largest integer < a1*b1 + n/s^2 congruent to c1 mod s */
-         if (fmpz_cmp(q, c1) <= 0)
+         if (fmpz_cmp(q, c1) < 0)
             fmpz_sub(s1, s1, s);
          fmpz_sub(s1, s1, q);
          fmpz_add(s1, s1, c1);
 
-         fmpz_add(s2, s2, s2); /* s2 = 2*a1*b1 */
+         fmpz_add(s2, s2, s2); /* s2 = 2*a1*b1 - 1 */
+         fmpz_sub_ui(s2, s2, 1);
       }
 
       while (fmpz_cmp(s1, s2) > 0) /* for each value s1 in range */
@@ -127,6 +132,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
                fmpz_tdiv_q(fac, s1, b1); /* y*b1 = s1 */
                fmpz_mul(fac, fac, s); /* check if ys + r2 is factor */
                fmpz_add(fac, fac, r2);
+               fmpz_abs(fac, fac);
 
                if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
@@ -138,6 +144,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
                fmpz_tdiv_q(fac, s1, a1); /* x*a1 = s1 */
                fmpz_mul(fac, fac, s); /* check if xs + r is factor */
                fmpz_add(fac, fac, r);
+               fmpz_abs(fac, fac);
 
                if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
@@ -148,6 +155,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
             {
                /* either d/a1 or d/b1 is a divisor of n */
                fmpz_tdiv_q(fac, d, a1);
+               fmpz_abs(fac, fac);
                if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
                   res = 1;
@@ -155,6 +163,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
                }
 
                fmpz_tdiv_q(fac, d, b1);
+               fmpz_abs(fac, fac);
                if (!fmpz_is_zero(fac) && !fmpz_is_one(fac) && !fmpz_equal(fac, n) && fmpz_divisible(n, fac))
                {
                   res = 1;
@@ -165,7 +174,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
 
          fmpz_sub(s1, s1, s);
       }
-
+      
       if (fmpz_is_zero(a1) || res == 1) /* Euclidean chain has terminated */
          break;
       
@@ -177,7 +186,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
          and 0 < a1 <= a0 for i odd
       */
       fmpz_tdiv_qr(q, a0, a0, a1);
-      if ((i & 1) == 1 && fmpz_is_zero(a0))
+      if ((i & 1) == 0 && fmpz_is_zero(a0))
       {
          fmpz_sub_ui(q, q, 1);
          fmpz_add(a0, a0, a1);
@@ -188,9 +197,10 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
       fmpz_submul(b0, q, b1);
       fmpz_swap(b0, b1);
 
-      /* c1, c0 = c0 - q*c1, c1 */
-      fmpz_submul(b0, q, b1);
-      fmpz_swap(b0, b1);
+      /* c1, c0 = c0 - q*c1, c1 mod s */
+      fmpz_submul(c0, q, c1);
+      fmpz_mod(c0, c0, s);
+      fmpz_swap(c0, c1);
    }
 
 cleanup:

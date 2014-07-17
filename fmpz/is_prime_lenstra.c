@@ -217,6 +217,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       fmpz_randm(g->coeffs + i, state, n);
    
    _fmpz_mod_poly_set_length(g, k);
+   _fmpz_mod_poly_normalise(g);
 
    /* precompute frobenius powers for use up to x^(n^k) */
    fmpz_mod_poly_init(finv, n);
@@ -234,6 +235,11 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    {
       res = 0;
 
+      printf("f = "); fmpz_mod_poly_print(f); printf("\n");
+      printf("g = "); fmpz_mod_poly_print(g); printf("\n");
+      printf("h = "); fmpz_mod_poly_print(h); printf("\n");
+
+      printf("here\n");
       goto cleanup;
    }
 
