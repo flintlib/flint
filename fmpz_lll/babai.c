@@ -311,18 +311,10 @@ FUNC_HEAD
 
             s[zeros + 1] = d_mat_entry(A->appSP, kappa, kappa);
 
-            for (k = zeros + 1; k < kappa; k++)
+            for (k = zeros + 1; k < kappa - 1; k++)
             {
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
-            }
-            if (loops > 2)
-            {
-                d_mat_entry(r, kappa, kappa) = s[kappa];
-            }
-            else
-            {
-                d_mat_entry(r, kappa, kappa) = 0;
             }
 #endif
         }
@@ -680,18 +672,10 @@ FUNC_HEAD
                                 fmpz_mat_entry(A->exactSP, kappa, kappa));
             s[zeros + 1] = ldexp(s[zeros + 1], exp - 2 * expo[kappa]);
 
-            for (k = zeros + 1; k < kappa; k++)
+            for (k = zeros + 1; k < kappa - 1; k++)
             {
                 tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
                 s[k + 1] = s[k] - tmp;
-            }
-            if (loops > 2)
-            {
-                d_mat_entry(r, kappa, kappa) = s[kappa];
-            }
-            else
-            {
-                d_mat_entry(r, kappa, kappa) = 0;
             }
 
             _d_vec_clear(appBtmp);

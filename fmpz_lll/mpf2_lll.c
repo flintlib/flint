@@ -152,11 +152,10 @@ FUNC_HEAD
                 if (mpf_cmp(tmp, s + kappa - 1) <= 0)
                 {
                     alpha[kappa] = kappa;
-                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), s + kappa) !=
-                        0)
-                    {
-                        mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
-                    }
+                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
+                            mpf_mat_entry(r, kappa, kappa - 1));
+                    mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1,
+                            tmp);
                     kappa++;
                 }
                 else
@@ -172,8 +171,11 @@ FUNC_HEAD
                     if (kappa == d - 1)
                     {
                         fmpz_init(rii);
-                        mpf_div_2exp(tmp, mpf_mat_entry(r, kappa, kappa), 1);
-                        fmpz_set_mpf(rii, tmp);
+                        mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
+                                mpf_mat_entry(r, kappa, kappa - 1));
+                        mpf_mul_2exp(tmp, tmp, 1);
+                        mpf_sub(tmp, s + kappa - 1, tmp);
+                        fmpz_set_mpf(rii, tmp); /* using a heuristic lower bound on the final GS norm */
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
@@ -309,6 +311,7 @@ FUNC_HEAD
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
                 mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+                /* rii is the G-S length of ith vector divided by 2 */
                 fmpz_set_mpf(rii, tmp);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
@@ -432,11 +435,10 @@ FUNC_HEAD
                 if (mpf_cmp(tmp, s + kappa - 1) <= 0)
                 {
                     alpha[kappa] = kappa;
-                    if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), s + kappa) !=
-                        0)
-                    {
-                        mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
-                    }
+                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
+                            mpf_mat_entry(r, kappa, kappa - 1));
+                    mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1,
+                            tmp);
                     kappa++;
                 }
                 else
@@ -452,8 +454,11 @@ FUNC_HEAD
                     if (kappa == d - 1)
                     {
                         fmpz_init(rii);
-                        mpf_div_2exp(tmp, mpf_mat_entry(r, kappa, kappa), 1);
-                        fmpz_set_mpf(rii, tmp);
+                        mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
+                                mpf_mat_entry(r, kappa, kappa - 1));
+                        mpf_mul_2exp(tmp, tmp, 1);
+                        mpf_sub(tmp, s + kappa - 1, tmp);
+                        fmpz_set_mpf(rii, tmp); /* using a heuristic lower bound on the final GS norm */
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
@@ -584,6 +589,7 @@ FUNC_HEAD
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
                 mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+                /* rii is the G-S length of ith vector divided by 2 */
                 fmpz_set_mpf(rii, tmp);
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
@@ -782,29 +788,20 @@ FUNC_HEAD
             } while (test);
 
             fmpz_get_mpf(s, fmpz_mat_entry(B, kappa, kappa));
-            for (j = 0; j < kappa; j++)
+            for (j = 0; j < kappa - 1; j++)
             {
                 mpf_mul(tmp, mpf_mat_entry(mu, kappa, j),
                         mpf_mat_entry(r, kappa, j));
                 mpf_sub(s + j + 1, s + j, tmp);
-            }
-            if (loops > 3)
-            {
-                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
-            }
-            else
-            {
-                mpf_set_ui(mpf_mat_entry(r, kappa, kappa), 0);
             }
 
             mpf_set_d(rtmp, ctt);
             mpf_mul(tmp, rtmp, mpf_mat_entry(r, kappa - 1, kappa - 1));
             if (mpf_cmp(tmp, s + kappa - 1) <= 0)   /* check LLL condition */
             {
-                if (mpf_cmp(mpf_mat_entry(r, kappa, kappa), s + kappa) != 0)
-                {
-                    mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
-                }
+                mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
+                        mpf_mat_entry(r, kappa, kappa - 1));
+                mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1, tmp);
                 kappa++;
             }
             else
@@ -815,8 +812,11 @@ FUNC_HEAD
                 if (kappa == d - 1)
                 {
                     fmpz_init(rii);
-                    mpf_div_2exp(tmp, mpf_mat_entry(r, kappa, kappa), 1);
-                    fmpz_set_mpf(rii, tmp);
+                    mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
+                            mpf_mat_entry(r, kappa, kappa - 1));
+                    mpf_mul_2exp(tmp, tmp, 1);
+                    mpf_sub(tmp, s + kappa - 1, tmp);
+                    fmpz_set_mpf(rii, tmp); /* using a heuristic lower bound on the final GS norm */
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
@@ -893,6 +893,7 @@ FUNC_HEAD
         for (i = d - 1; (i >= 0) && (ok > 0); i--)
         {
             mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+            /* rii is the G-S length of ith vector divided by 2 */
             fmpz_set_mpf(rii, tmp);
             if ((ok = fmpz_cmp(rii, gs_B)) > 0)
             {

@@ -256,19 +256,11 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             mpf_set(s + zeros + 1, mpf_mat_entry(A->appSP2, kappa, kappa));
 
-            for (k = zeros + 1; k < kappa; k++)
+            for (k = zeros + 1; k < kappa - 1; k++)
             {
                 mpf_mul(tmp, mpf_mat_entry(mu, kappa, k),
                         mpf_mat_entry(r, kappa, k));
                 mpf_sub(s + k + 1, s + k, tmp);
-            }
-            if (loops > 2)
-            {
-                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
-            }
-            else
-            {
-                mpf_set_ui(mpf_mat_entry(r, kappa, kappa), 0);
             }
             fmpz_clear(ztmp);
         }
@@ -493,19 +485,11 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             fmpz_get_mpf(s + zeros + 1,
                          fmpz_mat_entry(A->exactSP, kappa, kappa));
 
-            for (k = zeros + 1; k < kappa; k++)
+            for (k = zeros + 1; k < kappa - 1; k++)
             {
                 mpf_mul(tmp, mpf_mat_entry(mu, kappa, k),
                         mpf_mat_entry(r, kappa, k));
                 mpf_sub(s + k + 1, s + k, tmp);
-            }
-            if (loops > 2)
-            {
-                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
-            }
-            else
-            {
-                mpf_set_ui(mpf_mat_entry(r, kappa, kappa), 0);
             }
             fmpz_clear(ztmp);
         }
