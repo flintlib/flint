@@ -191,6 +191,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
             fmpz_mul(a1, a1, a2);
             fmpz_mod(a1, a1, n);
          } while (fmpz_jacobi(a1, n) != -1 
+              || (!fmpz_mod_poly_is_squarefree_f(nfac, g) && fmpz_is_one(nfac))
               || (!fmpz_mod_poly_is_irreducible_rabin_f(nfac, g) && fmpz_is_one(nfac)));
 
          if (!fmpz_is_one(nfac)) /* factor of n found */
@@ -213,7 +214,8 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
             if (i != k/2)
                fmpz_mod_poly_mul(h1, h1, h);
          }
-      } while (!fmpz_mod_poly_is_irreducible_rabin_f(nfac, f) && fmpz_is_one(nfac));
+      } while ((!fmpz_mod_poly_is_squarefree_f(nfac, f) && fmpz_is_one(nfac))
+            || (!fmpz_mod_poly_is_irreducible_rabin_f(nfac, f) && fmpz_is_one(nfac)));
 
       fmpz_clear(a1);
       fmpz_clear(a2);
