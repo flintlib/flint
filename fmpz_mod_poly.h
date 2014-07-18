@@ -710,9 +710,9 @@ fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
     if (FLINT_MIN(A->length, B->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
-       fmpz_mod_poly_xgcd_hgcd(G, S, T, A, B);
-    else
        fmpz_mod_poly_xgcd_euclidean(G, S, T, A, B);
+    else
+       fmpz_mod_poly_xgcd_hgcd(G, S, T, A, B);
 }
 
 static __inline__ void 
