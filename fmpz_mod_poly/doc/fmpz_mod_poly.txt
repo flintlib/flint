@@ -1131,6 +1131,15 @@ slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
 
     No aliasing of input and output operands is permitted.
 
+slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
+                                   const fmpz_t invB, const fmpz_t p)
+
+    If $f$ returns with the value $1$ then the function operates as per
+    \code{_fmpz_mod_poly_xgcd_euclidean}, otherwise $f$ is set to a nontrivial
+    factor of $p$.
+ 
 void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
                              fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
@@ -1143,6 +1152,14 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     Polynomials \code{S} and \code{T} are computed such that
     \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
+                             fmpz_mod_poly_t S, fmpz_mod_poly_t T,
+                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with the value $1$ then the function operates as per
+    \code{fmpz_mod_poly_xgcd_euclidean}, otherwise $f$ is set to a nontrivial
+    factor of $p$.
 
 slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, 
                const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
@@ -1207,6 +1224,14 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
     Polynomials \code{S} and \code{T} are computed such that
     \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+void fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz_mod_poly_t G,
+                        fmpz_mod_poly_t S, fmpz_mod_poly_t T,
+                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with the value $1$ then the function operates as per
+    \code{fmpz_mod_poly_xgcd}, otherwise $f$ is set to a nontrivial
+    factor of $p$.
 
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
                          const fmpz *A, slong lenA, const fmpz *B, slong lenB,
