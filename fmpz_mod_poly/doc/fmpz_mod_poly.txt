@@ -917,6 +917,14 @@ void _fmpz_mod_poly_rem(fmpz *R,
     \code{(A, lenA)}.  No aliasing of input and output operands is
     allowed.
 
+void _fmpz_mod_poly_rem_f(fmpz_t f, fmpz *R,
+                        const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                        const fmpz_t invB, const fmpz_t p)
+
+    If $f$ returns with the value $1$ then the function operates as
+    \code{_fmpz_mod_poly_rem}, otherwise $f$ will be set to a nontrivial 
+    factor of $p$.
+
 void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
@@ -1242,6 +1250,14 @@ slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
 
     Assumes that $0 < \len(A) < \len(B)$.
 
+slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S,
+                         const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                         const fmpz_t p)
+
+    If $f$ returns with value $1$ then the function operates as per
+    \code{_fmpz_mod_poly_gcdinv}, otherwise $f$ will be set to a nontrivial
+    factor of $p$.
+
 void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
@@ -1250,6 +1266,13 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     have $\len(B) \geq 2$.
 
     In the case that $A = 0 \pmod{B}$, returns $G = S = 0$.
+
+void fmpz_mod_poly_gcdinv_f(fmpz_t fmpz_mod_poly_t G, fmpz_mod_poly_t S,
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with value $1$ then the function operates as per
+    \code{fmpz_mod_poly_gcdinv}, otherwise $f$ will be set to a nontrivial
+    factor of $p$.
 
 int _fmpz_mod_poly_invmod(fmpz *A,
                           const fmpz *B, slong lenB,
@@ -1266,6 +1289,14 @@ int _fmpz_mod_poly_invmod(fmpz *A,
 
     Assumes that $p$ is a prime number.
 
+int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A,
+                          const fmpz *B, slong lenB,
+                          const fmpz *P, slong lenP, const fmpz_t p)
+
+    If $f$ returns with the value $1$, then the function operates as per
+    \code{_fmpz_mod_poly_invmod}. Otherwise $f$ is set to a nontrivial
+    factor of $p$.
+    
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
 
@@ -1278,6 +1309,13 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
     If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and
     sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value
     of $A$ on exit is undefined.
+
+int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
+                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
+
+    If $f$ returns with the value $1$, then the function operates as per
+    \code{fmpz_mod_poly_invmod}. Otherwise $f$ is set to a nontrivial
+    factor of $p$.
 
 *******************************************************************************
 

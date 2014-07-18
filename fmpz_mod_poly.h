@@ -566,6 +566,17 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
     fmpz_mod_poly_clear(Q);
 }
 
+static __inline__ 
+void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_t Q;
+
+    fmpz_mod_poly_init(Q, &(A->p));
+    fmpz_mod_poly_divrem_f(f, Q, R, A, B);
+    fmpz_mod_poly_clear(Q);
+}
+
 void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
                                          const fmpz* B, slong lenB, const fmpz* Binv,
                                          slong lenBinv, const fmpz_t p);
@@ -705,6 +716,14 @@ _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
        return _fmpz_mod_poly_xgcd_euclidean(G, S, T, A, lenA, B, lenB, invB, p);
 }
 
+static __inline__ slong 
+_fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, 
+                    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                    const fmpz_t invB, const fmpz_t p)
+{
+    return _fmpz_mod_poly_xgcd_euclidean_f(f, G, S, T, A, lenA, B, lenB, invB, p);
+}
+
 static __inline__ void 
 fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
@@ -729,11 +748,25 @@ slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
 void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S, 
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                           const fmpz_t p);
+
+void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 int _fmpz_mod_poly_invmod(fmpz *A, 
                           const fmpz *B, slong lenB, 
                           const fmpz *P, slong lenP, const fmpz_t p);
 
+int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A, 
+                          const fmpz *B, slong lenB, 
+                          const fmpz *P, slong lenP, const fmpz_t p);
+
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, 
+                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
+
+int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A, 
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
 
 /*  Resultant  ***************************************************************/
