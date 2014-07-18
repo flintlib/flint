@@ -1769,6 +1769,42 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
     we require \code{hinv} to be the inverse of the reverse of \code{h}.
     The algorithm used is the Brent-Kung matrix algorithm.
 
+void
+_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res,
+                 const fmpz_mod_poly_struct * polys, slong len1, slong l,
+                 const fmpz * h, slong lenh, const fmpz * hinv,
+                 slong lenhinv, const fmpz_t p)
+
+    Sets \code{res} to the composition $f_i(g)$ modulo $h$ for $1\leq i \leq l$,
+    where $f_i$ are the first \code{l} elements of \code{polys} and $g$ is the
+    last element of \code{polys}. We require that $h$ is nonzero and that the
+    length of $g$ is less than the length of $h$. We also require that the
+    length of $f_i$ is less than the length of $h$. We require \code{res} to
+    have enough memory allocated to hold \code{l} \code{fmpz_mod_poly_struct}.
+    The entries of \code{res} need to be initialised and \code{l} needs to be
+    less than \code{len1} Furthermore, we require \code{hinv} to be the inverse
+    of the reverse of \code{h}. The output is not allowed to be aliased with any
+    of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
+                    const fmpz_mod_poly_struct * polys, slong len1, slong n,
+                    const fmpz_mod_poly_t h, const fmpz_mod_poly_t hinv)
+
+    Sets \code{res} to the composition $f_i(g)$ modulo $h$ for $1\leq i \leq n$
+    where $f_i$ are the first \code{n} elements of \code{polys} and $g$ is the
+    last element of \code{polys}. We require \code{res} to have enough memory
+    allocated to hold \code{n} \code{fmpz_mod_poly_struct}. The entries of
+    \code{res} need to be uninitialised and \code{n} needs to be less than
+    \code{len1}. We require that $h$ is nonzero and that $f_i$ and $g$ have
+    smaller degree than $h$. Furthermore, we require \code{hinv} to be the
+    inverse of the reverse of \code{h}. No aliasing of \code{res} and
+    \code{polys} is allowed.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
 *******************************************************************************
 
     Subproduct trees
