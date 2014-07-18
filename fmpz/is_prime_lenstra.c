@@ -300,7 +300,9 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       fmpz_mod_poly_set_coeff_ui(h1, 1, 1);
       fmpz_mod_poly_set_coeff_ui(h1, 0, 0);
       _fmpz_mod_poly_set_length(h1, 2);
-      fmpz_mod_poly_invmod(h1, h1, f);
+      fmpz_mod_poly_invmod_f(nfac, h1, h1, f);
+      if (!fmpz_is_one(nfac))
+         goto cleanup;
       fmpz_mod_poly_mulmod_preinv(h, h, h1, f, finv);
       break;
    case 6:
@@ -311,7 +313,9 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       fmpz_mod_poly_set_coeff_ui(h1, 1, 1);
       fmpz_mod_poly_set_coeff_ui(h1, 0, 0);
       _fmpz_mod_poly_set_length(h1, 2);
-      fmpz_mod_poly_invmod(h1, h1, f);
+      fmpz_mod_poly_invmod_f(nfac, h1, h1, f);
+      if (!fmpz_is_one(nfac))
+         goto cleanup;
       fmpz_mod_poly_mulmod_preinv(h, h, h1, f, finv);
    
       /* compute x^(n + 1) or x^(n^2 + 1) */
