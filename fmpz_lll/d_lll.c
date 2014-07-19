@@ -444,7 +444,7 @@ FUNC_HEAD
         max_iter =
             (ulong) ((d - 1) +
                      (d - 1) * d * (max_exp +
-                                    d_log2(d)) / d_log2(8 / (ctt + 7)));
+                                    d_log2(d)) / d_log2(8 / (fl->delta + 7)));
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
