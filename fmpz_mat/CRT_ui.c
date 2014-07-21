@@ -33,7 +33,7 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
     mp_limb_t c;
     mp_limb_t m2 = mat2->mod.n;
     mp_limb_t m2inv = mat2->mod.ninv;
-    fmpz_t m1m2;
+    fmpz_t m1m2, halfm1m2;
 
     c = fmpz_fdiv_ui(m1, m2);
     c = n_invmod(c, m2);
@@ -46,13 +46,29 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
     fmpz_init(m1m2);
     fmpz_mul_ui(m1m2, m1, m2);
-
-    for (i = 0; i < mat1->r; i++)
+    if (sign)
     {
-        for (j = 0; j < mat1->c; j++)
-            _fmpz_CRT_ui_precomp(fmpz_mat_entry(res, i, j),
-                                 fmpz_mat_entry(mat1, i, j), m1,
-                    nmod_mat_entry(mat2, i, j), m2, m2inv, m1m2, c, sign);
+        fmpz_init(halfm1m2);
+        fmpz_fdiv_q_2exp(halfm1m2, m1m2, 1);
+        for (i = 0; i < mat1->r; i++)
+        {
+            for (j = 0; j < mat1->c; j++)
+                _fmpz_CRT_ui_signed_precomp(fmpz_mat_entry(res, i, j),
+                        fmpz_mat_entry(mat1, i, j), m1,
+                        nmod_mat_entry(mat2, i, j), m2, m2inv, m1m2,
+                        halfm1m2, c);
+        }
+        fmpz_clear(halfm1m2);
+    }
+    else
+    {
+        for (i = 0; i < mat1->r; i++)
+        {
+            for (j = 0; j < mat1->c; j++)
+                _fmpz_CRT_ui_precomp(fmpz_mat_entry(res, i, j),
+                        fmpz_mat_entry(mat1, i, j), m1,
+                        nmod_mat_entry(mat2, i, j), m2, m2inv, m1m2, c, 0);
+        }
     }
 
     fmpz_clear(m1m2);
