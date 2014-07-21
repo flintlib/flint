@@ -219,6 +219,8 @@ slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 slong
 fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
 
+slong fmpz_mat_rref_multi_mod(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+
 /* Trace ********************************************************************/
 
 void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat);
@@ -278,6 +280,8 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
 slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
 
+slong fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat);
+
 /* Inverse ******************************************************************/
 
 int fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
@@ -308,21 +312,21 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);
 
-/* HNF **********************************************************************/
+/* HNF and SNF **************************************************************/
 
 void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
-
 void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
-
-void fmpz_mat_hnf_xgcd_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A);
-
-void fmpz_mat_hnf_mod_D(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
-
+void fmpz_mat_hnf_xgcd_transform(fmpz_mat_t H, fmpz_mat_t U,
+        const fmpz_mat_t A);
+void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
 void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
-
-void fmpz_mat_hnf_multimodular(fmpz_mat_t H, const fmpz_mat_t A, const mp_limb_t * factorisation, slong num_factors);
-
+/*void fmpz_mat_hnf_multimodular(fmpz_mat_t H, const fmpz_mat_t A,
+        const mp_limb_t * factorisation, slong num_factors);*/
 void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A);
+
+void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A);
+void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A);
+void fmpz_mat_snf_saunders_wan(fmpz_mat_t S, const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }
