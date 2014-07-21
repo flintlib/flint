@@ -159,7 +159,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             {
                                 _fmpz_vec_sub(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
-                                              B->r);
+                                              U->c);
                             }
                         }
                         else    /* otherwise X is -1 */
@@ -176,7 +176,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             {
                                 _fmpz_vec_add(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
-                                              B->r);
+                                              U->c);
                             }
                         }
                     }
@@ -212,7 +212,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             {
                                 _fmpz_vec_scalar_submul_si(U->rows[kappa],
                                                            U->rows[j],
-                                                           B->r, xx);
+                                                           U->c, xx);
                             }
                         }
                         else
@@ -225,7 +225,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                 _fmpz_vec_scalar_submul_fmpz(U->rows
                                                              [kappa],
                                                              U->rows[j],
-                                                             B->r, ztmp);
+                                                             U->c, ztmp);
                             }
                         }
                     }
@@ -370,16 +370,16 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                         mpf_mat_entry(mu, kappa, k),
                                         mpf_mat_entry(mu, j, k));
                             }
+                            if (fl->rt == Z_BASIS)
+                            {
+                                _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
+                                              B->rows[j], n);
+                            }
                             if (fl->store_trans)
                             {
                                 _fmpz_vec_sub(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
-                                              B->r);
-                            }
-                            else if (fl->rt == Z_BASIS)
-                            {
-                                _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
-                                              B->rows[j], n);
+                                              U->c);
                             }
                         }
                         else    /* otherwise X is -1 */
@@ -391,16 +391,16 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                         mpf_mat_entry(mu, kappa, k),
                                         mpf_mat_entry(mu, j, k));
                             }
+                            if (fl->rt == Z_BASIS)
+                            {
+                                _fmpz_vec_add(B->rows[kappa],
+                                              B->rows[kappa], B->rows[j], n);
+                            }
                             if (fl->store_trans)
                             {
                                 _fmpz_vec_add(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
-                                              B->r);
-                            }
-                            else if (fl->rt == Z_BASIS)
-                            {
-                                _fmpz_vec_add(B->rows[kappa],
-                                              B->rows[kappa], B->rows[j], n);
+                                              U->c);
                             }
                         }
                     }
@@ -431,33 +431,33 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             /* X is stored in an slong */
                             xx = mpf_get_si(tmp);
                             fmpz_set_si(x + j, xx);
+                            if (fl->rt == Z_BASIS)
+                            {
+                                _fmpz_vec_scalar_submul_si(B->rows[kappa],
+                                                           B->rows[j], n, xx);
+                            }
                             if (fl->store_trans)
                             {
                                 _fmpz_vec_scalar_submul_si(U->rows[kappa],
                                                            U->rows[j],
-                                                           B->r, xx);
-                            }
-                            else if (fl->rt == Z_BASIS)
-                            {
-                                _fmpz_vec_scalar_submul_si(B->rows[kappa],
-                                                           B->rows[j], n, xx);
+                                                           U->c, xx);
                             }
                         }
                         else
                         {
                             fmpz_set_mpf(x + j, tmp);
+                            if (fl->rt == Z_BASIS)
+                            {
+                                _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
+                                                             B->rows[j], n,
+                                                             x + j);
+                            }
                             if (fl->store_trans)
                             {
                                 _fmpz_vec_scalar_submul_fmpz(U->rows
                                                              [kappa],
                                                              U->rows[j],
-                                                             B->r, x + j);
-                            }
-                            else if (fl->rt == Z_BASIS)
-                            {
-                                _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
-                                                             B->rows[j], n,
-                                                             x + j);
+                                                             U->c, x + j);
                             }
                         }
                     }

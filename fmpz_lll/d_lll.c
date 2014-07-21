@@ -75,7 +75,12 @@ FUNC_HEAD
 
         if (fl->store_trans)
         {
-            fmpz_mat_one(U);
+            if (U->r != d)
+            {
+                flint_printf
+                    ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
+                abort();
+            }
         }
 
         for (i = 0; i < d; i++)
@@ -300,12 +305,12 @@ FUNC_HEAD
 
                 if (fl->store_trans)
                 {
-                    Btmp = _fmpz_vec_init(d);
-                    _fmpz_vec_set(Btmp, U->rows[kappa2], d);
+                    Btmp = _fmpz_vec_init(U->c);
+                    _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
                     for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                    _fmpz_vec_set(U->rows[kappa], Btmp, d);
-                    _fmpz_vec_clear(Btmp, d);
+                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], U->c);
+                    _fmpz_vec_set(U->rows[kappa], Btmp, U->c);
+                    _fmpz_vec_clear(Btmp, U->c);
                 }
 
                 appBtmp = appB->rows[kappa2];
@@ -426,7 +431,12 @@ FUNC_HEAD
 
         if (fl->store_trans)
         {
-            fmpz_mat_one(U);
+            if (U->r != d)
+            {
+                flint_printf
+                    ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
+                abort();
+            }
         }
 
         if (fl->rt == Z_BASIS)
@@ -623,21 +633,22 @@ FUNC_HEAD
                 /* Step7: Update B */
                 /* *************** */
 
-                if (fl->store_trans)
-                {
-                    Btmp = _fmpz_vec_init(d);
-                    _fmpz_vec_set(Btmp, U->rows[kappa2], d);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], d);
-                    _fmpz_vec_set(U->rows[kappa], Btmp, d);
-                    _fmpz_vec_clear(Btmp, d);
-                }
-                else if (fl->rt == Z_BASIS)
+                if (fl->rt == Z_BASIS)
                 {
                     Btmp = B->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
+                }
+
+                if (fl->store_trans)
+                {
+                    Btmp = _fmpz_vec_init(U->c);
+                    _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
+                    for (i = kappa2; i > kappa; i--)
+                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], U->c);
+                    _fmpz_vec_set(U->rows[kappa], Btmp, U->c);
+                    _fmpz_vec_clear(Btmp, U->c);
                 }
 
                 j = expo[kappa2];
@@ -683,11 +694,7 @@ FUNC_HEAD
             }
         }
 
-        if (fl->store_trans && fl->rt == Z_BASIS)
-        {
-            fmpz_mat_mul(B, U, B);
-        }
-        else if (fl->rt == GRAM)
+        if (fl->rt == GRAM)
         {
             for (i = 0; i < B->r - 1; i++)
             {

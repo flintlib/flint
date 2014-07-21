@@ -72,6 +72,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 fmpz_mat_gram(mat, mat);
@@ -107,6 +108,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 newd =
@@ -175,6 +177,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_init(gmat2, r, r);
                 newd =
@@ -209,6 +212,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 newd =
@@ -280,6 +284,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 fmpz_mat_gram(mat, mat);
@@ -315,6 +320,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 newd =
@@ -382,6 +388,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 fmpz_mat_gram(mat, mat);
@@ -417,6 +424,7 @@ main(void)
             if (fl->store_trans)
             {
                 fmpz_mat_init(U, r, r);
+                fmpz_mat_one(U);
                 fmpz_mat_init(mat2, r, c);
                 fmpz_mat_set(mat2, mat);
                 newd =
