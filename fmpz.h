@@ -140,6 +140,23 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
 }
 
 static __inline__
+void fmpz_init_set_si(fmpz_t f, slong g)
+{
+    if (COEFF_MIN <= g && g <= COEFF_MAX)
+    {
+        *f = g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        flint_mpz_set_si(ptr, g);
+    }
+}
+
+static __inline__
 void fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);
