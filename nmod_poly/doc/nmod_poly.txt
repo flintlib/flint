@@ -257,6 +257,15 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
     described for \code{nmod_poly_print()}. The string must be freed by the
     user when finished. For this it is sufficient to call \code{flint_free()}.
 
+char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
+
+    Writes \code{poly} to a pretty string representation. The format is as
+    described for \code{nmod_poly_print_pretty()}. The string must be freed
+    by the user when finished. For this it is sufficient to call
+    \code{flint_free()}.
+
+    It is assumed that the top coefficient is non-zero.
+
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 
     Reads \code{poly} from a string \code{s}. The format is as described
@@ -275,6 +284,16 @@ int nmod_poly_print(const nmod_poly_t a)
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
+int nmod_poly_print_pretty(const nmod_poly_t a, const char * x)
+
+    Prints the polynomial to \code{stdout} using the string \code{x} to
+    represent the indeterminate.
+
+    It is assumed that the top coefficient is non-zero.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
     Reads \code{poly} from the file stream \code{f}. If this is a file
@@ -287,10 +306,22 @@ int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
     Writes a polynomial to the file stream \code{f}. If this is a file
     then the file should be closed and reopened before being read.
-    The format is as described for \code{nmod_poly_print()}. If a
-    polynomial in the correct format is read, a positive value is returned,
-    otherwise a non-positive value is returned. If an error occurs
-    whilst writing to the file, an error message is printed.
+    The format is as described for \code{nmod_poly_print()}. If the
+    polynomial is written correctly, a positive value is returned,
+    otherwise a non-positive value is returned.
+
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
+
+int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t poly, const char * x)
+
+    Writes a polynomial to the file stream \code{f}. If this is a file
+    then the file should be closed and reopened before being read.
+    The format is as described for \code{nmod_poly_print_pretty()}. If the
+    polynomial is written correctly, a positive value is returned,
+    otherwise a non-positive value is returned.
+
+    It is assumed that the top coefficient is non-zero.
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.

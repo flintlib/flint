@@ -290,17 +290,15 @@ int fq_nmod_fprint_pretty(FILE *file, const fq_nmod_t op,
 
     Prints a pretty representation of \code{op} to \code{file}.
 
-    In the current implementation, always returns~$1$.  The return code is
-    part of the function's signature to allow for a later implementation to
-    return the number of characters printed or a non-positive error code.
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
 
 int fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Prints a pretty representation of \code{op} to \code{stdout}.
 
-    In the current implementation, always returns~$1$.  The return code is
-    part of the function's signature to allow for a later implementation to
-    return the number of characters printed or a non-positive error code.
+    In case of success, returns a positive value.  In case of failure,
+    returns a non-positive value.
 
 void fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
