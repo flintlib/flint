@@ -83,7 +83,7 @@ main(void)
     slong iter;
     FLINT_TEST_INIT(state);
 
-    flint_printf("hnf mod D....");
+    flint_printf("hnf_modular....");
     fflush(stdout);
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
@@ -121,7 +121,7 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(B, state, d);
 
-        fmpz_mat_hnf_mod_D(H, B, det);
+        fmpz_mat_hnf_modular(H, B, det);
 
         if (!in_hnf(H))
         {
@@ -148,7 +148,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_mod_D(H2, H, det);
+        fmpz_mat_hnf_modular(H2, H, det);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)

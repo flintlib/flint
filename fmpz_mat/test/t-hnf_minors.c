@@ -130,7 +130,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_mod_D(H2, B, det);
+        fmpz_mat_hnf_modular(H2, B, det);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)

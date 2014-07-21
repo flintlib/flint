@@ -541,7 +541,7 @@ void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
         }
         else /* use modulo determinant algorithm to compute HNF of C */
         {
-            fmpz_mat_hnf_mod_D(H1, C, g);
+            fmpz_mat_hnf_modular(H1, C, g);
         }
         fmpz_mat_clear(B);
         fmpz_mat_init(B, A->r - 1, A->c);
