@@ -96,7 +96,10 @@ FUNC_HEAD
             expo[i] = _fmpz_vec_get_d_vec_2exp(appB->rows[i], B->rows[i], n);
             max_exp = FLINT_MAX(max_exp, expo[i]);
         }
-        max_iter = (ulong) (d - 2 * d * (d + 1) * ((max_exp + 3) / log(ctt)));
+        max_iter =
+            (ulong) ((d - 1) +
+                     (d - 1) * d * (2 * max_exp +
+                                    d_log2(d)) / d_log2(8 / (fl->delta + 7)));
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
@@ -443,8 +446,8 @@ FUNC_HEAD
         }
         max_iter =
             (ulong) ((d - 1) +
-                     (d - 1) * d * (max_exp +
-                                    d_log2(d)) / d_log2(8 / (fl->delta + 7)));
+                     (d -
+                      1) * d * d_log2(max_exp) / d_log2(8 / (fl->delta + 7)));
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
