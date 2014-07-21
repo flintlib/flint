@@ -363,18 +363,16 @@ void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
     nmod_poly_print(op);
 }
 
-/* TODO: Make nmod_poly_fprint_pretty */
 static __inline__ 
 int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
-    return nmod_poly_fprint(file, op);
+    return nmod_poly_fprint_pretty(file, op, ctx->var);
 }
 
-/* TODO: Make nmod_poly_print_pretty */
 static __inline__ 
 void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
-    nmod_poly_print(op);
+    nmod_poly_print_pretty(op, ctx->var);
 }
 
 char *
