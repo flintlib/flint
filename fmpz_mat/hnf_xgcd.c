@@ -45,15 +45,18 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
             /* reduce row i - 1 with row i */
             if (fmpz_is_zero(fmpz_mat_entry(H, i - 1, j)))
                 continue;
-            fmpz_xgcd(d, u, v, fmpz_mat_entry(H, i, j), fmpz_mat_entry(H, i - 1, j));
+            fmpz_xgcd(d, u, v, fmpz_mat_entry(H, i, j),
+                    fmpz_mat_entry(H, i - 1, j));
             fmpz_divexact(r2d, fmpz_mat_entry(H, i - 1, j), d);
             fmpz_divexact(r1d, fmpz_mat_entry(H, i, j), d);
             for (j2 = j; j2 < A->c; j2++)
             {
                 fmpz_mul(b, u, fmpz_mat_entry(H, i, j2));
                 fmpz_addmul(b, v, fmpz_mat_entry(H, i - 1, j2));
-                fmpz_mul(fmpz_mat_entry(H, i - 1, j2), r1d, fmpz_mat_entry(H, i - 1, j2));
-                fmpz_submul(fmpz_mat_entry(H, i - 1, j2), r2d, fmpz_mat_entry(H, i, j2));
+                fmpz_mul(fmpz_mat_entry(H, i - 1, j2), r1d,
+                        fmpz_mat_entry(H, i - 1, j2));
+                fmpz_submul(fmpz_mat_entry(H, i - 1, j2), r2d,
+                        fmpz_mat_entry(H, i, j2));
                 fmpz_set(fmpz_mat_entry(H, i, j2), b);
             }
         }
