@@ -40,7 +40,7 @@ main(void)
     flint_printf("canonicalise....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t x;
         fmpz_t mult;
