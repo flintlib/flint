@@ -30,7 +30,7 @@
 #include "perm.h"
 
 slong
-nmod_mat_rref(nmod_mat_t A)
+_nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots)
 {
     slong i, j, k, n, rank;
     slong * pivots;
@@ -63,8 +63,8 @@ nmod_mat_rref(nmod_mat_t A)
     nmod_mat_init(U, rank, rank, A->mod.n);
     nmod_mat_init(V, rank, n - rank, A->mod.n);
 
-    pivots = flint_malloc(sizeof(slong) * rank);
-    nonpivots = flint_malloc(sizeof(slong) * (n - rank));
+    pivots = pivots_nonpivots;
+    nonpivots = pivots_nonpivots + rank;
 
     for (i = j = k = 0; i < rank; i++)
     {
@@ -115,8 +115,18 @@ nmod_mat_rref(nmod_mat_t A)
     nmod_mat_clear(U);
     nmod_mat_clear(V);
 
-    flint_free(pivots);
-    flint_free(nonpivots);
+    return rank;
+}
+
+slong
+nmod_mat_rref(nmod_mat_t A)
+{
+    slong rank;
+    slong * pivots_nonpivots = flint_malloc(sizeof(slong) * A->c);
+
+    rank = _nmod_mat_rref(A, pivots_nonpivots);
+
+    flint_free(pivots_nonpivots);
 
     return rank;
 }
