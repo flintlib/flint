@@ -267,7 +267,6 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
     {
         int i, j, k, test, aa;
         slong xx, exponent, max_expo = WORD_MAX;
-        fmpz *x;
         fmpz_t ztmp;
         double halfplus, onedothalfplus;
         ulong loops;
@@ -283,6 +282,8 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
         do
         {
+            fmpz *x;
+
             test = 0;
 
             /* ************************************** */

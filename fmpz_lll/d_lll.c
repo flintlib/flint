@@ -43,14 +43,14 @@ FUNC_HEAD
     int *expo = NULL;
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {
-        int kappa, kappa2, d, n, i, j, zeros, kappamax, shift, new_kappa;
+        int kappa, kappa2, d, n, i, j, zeros, kappamax, shift;
         int num_failed_fast = 0;
         int babai_ok = 0;
         int heuristic_fail = 0;
         d_mat_t mu, r, appB;
         fmpz_gram_t A;
         double *s, *mutmp, *appBtmp, *appSPtmp;
-        double ctt, tmp = 0.0;
+        double ctt;
         int *alpha;
         fmpz *Btmp;
         ulong max_exp, iter, max_iter, newvec, newvec_max;
@@ -135,6 +135,9 @@ FUNC_HEAD
         iter = 0;
         while (kappa < d)
         {
+            int new_kappa;
+            double tmp = 0.0;
+
             if (iter >= max_iter)
             {
                 break;

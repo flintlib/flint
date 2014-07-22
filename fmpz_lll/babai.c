@@ -312,7 +312,6 @@ FUNC_HEAD
         slong exp;
         slong xx;
         double tmp, rtmp, halfplus, onedothalfplus;
-        fmpz *x;
         fmpz_t t;
         ulong loops;
 
@@ -327,6 +326,8 @@ FUNC_HEAD
 
         do
         {
+            fmpz *x;
+
             test = 0;
 
             /* ************************************** */
