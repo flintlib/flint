@@ -19,39 +19,34 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <gmp.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
-                      const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 {
-    slong i;
+    const slong len = poly->length;
+    fmpz_t inv;
 
-    pow->pow = (fmpz_mod_poly_struct *) flint_malloc((m + 1)*sizeof(fmpz_mod_poly_struct));
+    if (len == 0)
+    {
+        fmpz_mod_poly_zero(res);
+        return;
+    }
 
-    for (i = 0; i <= m; i++)
-       fmpz_mod_poly_init(pow->pow + i, &f->p);
+    fmpz_init(inv);
+    fmpz_gcdinv(f, inv, fmpz_mod_poly_lead(poly), &(poly->p));
 
-    pow->len = m;
+    fmpz_mod_poly_fit_length(res, len);
+    _fmpz_mod_poly_set_length(res, len);
 
-    /* x mod f */
-    fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 1, 1);
-    fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 0, 0);
-    _fmpz_mod_poly_set_length(pow->pow + 0, 2);
-    if (f->length <= 2)
-       fmpz_mod_poly_rem(pow->pow + 0, pow->pow + 0, f);
+    _fmpz_mod_poly_scalar_mul_fmpz(res->coeffs, 
+                                   poly->coeffs, len, inv, &(poly->p));
 
-    if (m >= 1)
-       fmpz_mod_poly_powmod_x_fmpz_preinv(pow->pow + 1, &f->p, f, finv);
-
-    for (i = 2; i <= m; i++)
-       fmpz_mod_poly_compose_mod(pow->pow + i, pow->pow + i - 1, pow->pow + 1, f);
+    fmpz_clear(inv);
 }
+

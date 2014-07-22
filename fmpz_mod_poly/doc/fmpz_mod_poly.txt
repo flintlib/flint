@@ -679,6 +679,10 @@ void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
     Requires precomputed frobenius powers supplied by
     \code{fmpz_mod_poly_frobenius_powers_2exp_precomp}.
 
+    If $m == 0$ and $f$ has degree $0$ or $1$, this performs a division. 
+    However an impossible inverse by the leading coefficient of $f$ will have
+    been caught by \code{fmpz_mod_poly_frobenius_powers_2exp_precomp}.
+
 void
 fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
@@ -913,6 +917,14 @@ void _fmpz_mod_poly_rem(fmpz *R,
     \code{(A, lenA)}.  No aliasing of input and output operands is
     allowed.
 
+void _fmpz_mod_poly_rem_f(fmpz_t f, fmpz *R,
+                        const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                        const fmpz_t invB, const fmpz_t p)
+
+    If $f$ returns with the value $1$ then the function operates as
+    \code{_fmpz_mod_poly_rem}, otherwise $f$ will be set to a nontrivial 
+    factor of $p$.
+
 void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
@@ -943,6 +955,13 @@ void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
     where $n \geq 1$, assuming that the bottom coefficient of
     $Q$ is a unit.
 
+void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
+
+    Either sets $f$ to a nontrivial factor of $p$ with the value of
+    \code{Qinv} undefined, or sets \code{Qinv} to the inverse of \code{Q}
+    modulo $x^n$, where $n \geq 1$.
+
 *******************************************************************************
 
     Greatest common divisor
@@ -956,6 +975,13 @@ void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
     of \code{poly} is invertible modulo $p$.
 
     Otherwise, if \code{poly} is zero, sets \code{res} to zero.
+
+void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, 
+                                                    const fmpz_mod_poly_t poly)
+
+    Either set $f$ to $1$ and \code{res} to \code{poly} divided by its leading 
+    coefficient or set $f$ to a nontrivial factor of $p$ and leave \code{res}
+    undefined.
 
 slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
                                            const fmpz *B, slong lenB,
@@ -1041,13 +1067,13 @@ slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA,
     space for sufficiently many coefficients.
 
     Does not support aliasing of any of the input arguments
-    with any of the output argument.
+    with any of the output arguments.
 
 void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Either sets $f = 1$ and $G$ to the greatest common divisor
-    of $A$ and $B$, or $ \in (1,p)$ to a non-trivial factor of $p$.
+    of $A$ and $B$, or $f \in (1,p)$ to a non-trivial factor of $p$.
 
     In general, the greatest common divisor is defined in the polynomial
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime
@@ -1113,6 +1139,15 @@ slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
 
     No aliasing of input and output operands is permitted.
 
+slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
+                                   const fmpz_t invB, const fmpz_t p)
+
+    If $f$ returns with the value $1$ then the function operates as per
+    \code{_fmpz_mod_poly_xgcd_euclidean}, otherwise $f$ is set to a nontrivial
+    factor of $p$.
+ 
 void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
                              fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
@@ -1125,6 +1160,14 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     Polynomials \code{S} and \code{T} are computed such that
     \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
+                             fmpz_mod_poly_t S, fmpz_mod_poly_t T,
+                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with the value $1$ then the function operates as per
+    \code{fmpz_mod_poly_xgcd_euclidean}, otherwise $f$ is set to a nontrivial
+    factor of $p$.
 
 slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, 
                const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
@@ -1190,6 +1233,14 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
     \code{S*A + T*B = G}. The length of \code{S} will be at most
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
+void fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz_mod_poly_t G,
+                        fmpz_mod_poly_t S, fmpz_mod_poly_t T,
+                        const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with the value $1$ then the function operates as per
+    \code{fmpz_mod_poly_xgcd}, otherwise $f$ is set to a nontrivial
+    factor of $p$.
+
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
                          const fmpz *A, slong lenA, const fmpz *B, slong lenB,
                          const fmpz_t p)
@@ -1199,6 +1250,14 @@ slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
 
     Assumes that $0 < \len(A) < \len(B)$.
 
+slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S,
+                         const fmpz *A, slong lenA, const fmpz *B, slong lenB,
+                         const fmpz_t p)
+
+    If $f$ returns with value $1$ then the function operates as per
+    \code{_fmpz_mod_poly_gcdinv}, otherwise $f$ will be set to a nontrivial
+    factor of $p$.
+
 void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
@@ -1207,6 +1266,13 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     have $\len(B) \geq 2$.
 
     In the case that $A = 0 \pmod{B}$, returns $G = S = 0$.
+
+void fmpz_mod_poly_gcdinv_f(fmpz_t fmpz_mod_poly_t G, fmpz_mod_poly_t S,
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    If $f$ returns with value $1$ then the function operates as per
+    \code{fmpz_mod_poly_gcdinv}, otherwise $f$ will be set to a nontrivial
+    factor of $p$.
 
 int _fmpz_mod_poly_invmod(fmpz *A,
                           const fmpz *B, slong lenB,
@@ -1223,6 +1289,14 @@ int _fmpz_mod_poly_invmod(fmpz *A,
 
     Assumes that $p$ is a prime number.
 
+int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A,
+                          const fmpz *B, slong lenB,
+                          const fmpz *P, slong lenP, const fmpz_t p)
+
+    If $f$ returns with the value $1$, then the function operates as per
+    \code{_fmpz_mod_poly_invmod}. Otherwise $f$ is set to a nontrivial
+    factor of $p$.
+    
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
 
@@ -1235,6 +1309,13 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
     If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and
     sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value
     of $A$ on exit is undefined.
+
+int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
+                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t P)
+
+    If $f$ returns with the value $1$, then the function operates as per
+    \code{fmpz_mod_poly_invmod}. Otherwise $f$ is set to a nontrivial
+    factor of $p$.
 
 *******************************************************************************
 

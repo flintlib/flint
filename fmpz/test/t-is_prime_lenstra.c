@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result, r1;
+    slong num = 0;
     FLINT_TEST_INIT(state);
 
     flint_printf("is_prime_lenstra....");
@@ -85,7 +86,7 @@ main(void)
 
            r1 = fmpz_is_prime_lenstra(F, r, n, pk1, num_pk1, k);
 
-           result = ((r1 == 1 || r1 == -1) && fmpz_divisible(nk1, F));
+           result = (r1 == 1 && fmpz_divisible(nk1, F));
            if (!result)
            {
                flint_printf("FAIL:\n");
@@ -107,8 +108,6 @@ main(void)
     }
 
     /* test composites never pass n^k - 1 for k = 3, 4, 5, 6, 8, 10, 12 */
-
-    /* DISABLED UNTIL WE CATCH IMPOSSIBLE INVERSES 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         double logd;
@@ -154,13 +153,16 @@ main(void)
 
            r = _fmpz_vec_init(k);
 
-           printf("n = "); fmpz_print(n); printf("\n");
            r1 = fmpz_is_prime_lenstra(F, r, n, pk1, num_pk1, k);
 
-           result = (r1 == 0 || r1 == -1);
+           if (r1 == 1)
+              num++;
+
+           result = num < 3; /* almost infinitesimally few pseudoprimes in practice */
            if (!result)
            {
                flint_printf("FAIL:\n");
+               printf("Too many pseudoprimes\n");
                printf("k = %ld\n", k);
                printf("n = "); fmpz_print(n); printf("\n");
                printf("F = "); fmpz_print(F); printf("\n");
@@ -170,7 +172,6 @@ main(void)
            _fmpz_vec_clear(r, k);
            n_primes_clear(iter);
            _nmod_vec_clear(pk1);
-
         }
 
         fmpz_clear(n);
@@ -178,7 +179,6 @@ main(void)
         fmpz_clear(nk1);
         fmpz_clear(F);
     }
-    */
 
     FLINT_TEST_CLEANUP(state);
     

@@ -19,39 +19,50 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Lina Kulakova
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_mod_poly.h"
+#include "fmpz_vec.h"
+#include "ulong_extras.h"
 
-void
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
-                      const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+#include <string.h>
+
+int
+_fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_t p)
 {
-    slong i;
+    fmpz * fd, * g;
+    fmpz_t invd;
+    slong dlen;
+    int res = 0;
 
-    pow->pow = (fmpz_mod_poly_struct *) flint_malloc((m + 1)*sizeof(fmpz_mod_poly_struct));
+    if (len <= 2)
+        return len != 0;
 
-    for (i = 0; i <= m; i++)
-       fmpz_mod_poly_init(pow->pow + i, &f->p);
+    fd = _fmpz_vec_init(2 * (len - 1));
+    g = fd + len - 1;
 
-    pow->len = m;
+    _fmpz_mod_poly_derivative(fd, f, len, p);
+    dlen = len - 1;
+    FMPZ_VEC_NORM(fd, dlen);
 
-    /* x mod f */
-    fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 1, 1);
-    fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 0, 0);
-    _fmpz_mod_poly_set_length(pow->pow + 0, 2);
-    if (f->length <= 2)
-       fmpz_mod_poly_rem(pow->pow + 0, pow->pow + 0, f);
+    if (dlen)
+    {
+        fmpz_init(invd);
+        fmpz_gcdinv(fac, invd, fd + dlen - 1, p);
+        if (fmpz_is_one(fac))
+           res = (_fmpz_mod_poly_gcd_euclidean_f(fac, g, f, len, fd, dlen, p) == 1);
+        fmpz_clear(invd);
+    }
+    /* else gcd(f, 0) = f, and len(f) > 2 */
 
-    if (m >= 1)
-       fmpz_mod_poly_powmod_x_fmpz_preinv(pow->pow + 1, &f->p, f, finv);
+    _fmpz_vec_clear(fd, 2 * (len - 1));
+    return res;
+}
 
-    for (i = 2; i <= m; i++)
-       fmpz_mod_poly_compose_mod(pow->pow + i, pow->pow + i - 1, pow->pow + 1, f);
+int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f)
+{
+    return _fmpz_mod_poly_is_squarefree_f(fac, f->coeffs, f->length, &f->p);
 }

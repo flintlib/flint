@@ -19,39 +19,62 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_poly.h"
 
-void
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
-                      const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m)
+int __fmpz_poly_print(const fmpz_poly_t poly)
 {
-    slong i;
+    size_t len = fmpz_poly_fprint(stdout, poly);
 
-    pow->pow = (fmpz_mod_poly_struct *) flint_malloc((m + 1)*sizeof(fmpz_mod_poly_struct));
+    return len;
+}
 
-    for (i = 0; i <= m; i++)
-       fmpz_mod_poly_init(pow->pow + i, &f->p);
+int __fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+{
+    return fmpz_poly_fprint_pretty(stdout, poly, x);
+}
 
-    pow->len = m;
+void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c)
+{
+   if (poly->length == 0)
+      fmpz_poly_set_si(res, c);
+   else
+   {
+      fmpz_poly_set(res, poly);
 
-    /* x mod f */
-    fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 1, 1);
-    fmpz_mod_poly_set_coeff_ui(pow->pow + 0, 0, 0);
-    _fmpz_mod_poly_set_length(pow->pow + 0, 2);
-    if (f->length <= 2)
-       fmpz_mod_poly_rem(pow->pow + 0, pow->pow + 0, f);
+      if (c < 0)
+         fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, -c);
+      else
+         fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, c);
 
-    if (m >= 1)
-       fmpz_mod_poly_powmod_x_fmpz_preinv(pow->pow + 1, &f->p, f, finv);
+      _fmpz_poly_normalise(res);
+   }
+}
 
-    for (i = 2; i <= m; i++)
-       fmpz_mod_poly_compose_mod(pow->pow + i, pow->pow + i - 1, pow->pow + 1, f);
+void fmpz_poly_sub_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c)
+{
+   if (poly->length == 0)
+      fmpz_poly_set_si(res, -c);
+   else
+   {
+      fmpz_poly_set(res, poly);
+
+      if (c < 0)
+         fmpz_add_ui(res->coeffs + 0, res->coeffs + 0, -c);
+      else
+         fmpz_sub_ui(res->coeffs + 0, res->coeffs + 0, c);
+
+      _fmpz_poly_normalise(res);
+   }
 }
