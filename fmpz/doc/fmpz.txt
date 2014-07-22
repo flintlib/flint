@@ -1282,9 +1282,15 @@ int fmpz_is_prime(const fmpz_t n)
     composite, the function returns $0$. Otherwise the function returns
     $-1$.
 
-    The function assumes that $n$ is very likely prime, i.e. it is not very
+    The function assumes that $n$ is likely prime, i.e. it is not very
     efficient if $n$ is composite. A strong probable prime test should be
     run first to ensure that $n$ is probably prime.
+
+    Currently this code relies on the use of frobenius powers in 
+    \code{is_irreducible_rabin} via \code{is_prime_lenstra}. This trick only
+    works when $n$ is prime. It may prove to not matter for that algorithm when
+    $n$ is not prime, but this has not been proved.
+
 
 void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
                                                 const fmpz_t m, const fmpz_t n)
@@ -1371,6 +1377,11 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * res, const fmpz_t n,
     \code{res} modulo $F$.
 
     ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
+
+    Currently this code relies on the use of frobenius powers in 
+    \code{is_irreducible_rabin}. This trick only works when $n$ is prime. It
+    may prove to not matter for that algorithm when $n$ is not prime, but this
+    has not been proved.
 
     Assumes $n$ is odd.
 
