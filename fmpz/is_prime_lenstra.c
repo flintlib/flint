@@ -42,8 +42,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
 {
    slong i, bits = fmpz_bits(n);
    flint_rand_t state;
-   fmpz_mod_poly_t f, g, h, h1, h2, h3, finv;
-   fmpz_mod_poly_frobenius_powers_2exp_t pow;
+   fmpz_mod_poly_t f, g, h, h1, h2, finv;
    fmpz_t exp, exp2, Ft, a1, a2, b, p, R, nfac, base;
    fmpz_factor_t fac;
    int res = 1, fac_found, d;
@@ -62,6 +61,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    fmpz_init(p);
    fmpz_init(nfac);
 
+   /* n^k - 1 */
    switch (k)
    {
    case 3:
@@ -118,6 +118,10 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       d = fmpz_remove(R, R, p);
       _fmpz_factor_append(fac, p, d);
    }
+
+   /* n^k - 1 */
+   fmpz_pow_ui(exp, n, k);
+   fmpz_sub_ui(exp, exp, 1);
 
    srand(time(NULL));
 
@@ -260,7 +264,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    _fmpz_mod_poly_set_length(g, k);
    _fmpz_mod_poly_normalise(g);
 
-   /* precompute frobenius powers for use up to x^(n^k) */
+   /* precompute newton inverse of f */
    fmpz_mod_poly_init(finv, n);
 
    fmpz_mod_poly_reverse(finv, f, f->length);
@@ -273,17 +277,18 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       goto cleanup2;
    }
 
-   fmpz_mod_poly_frobenius_powers_2exp_precomp(pow, f, finv, k);
+   /* compute g^((n^k - 1)/Ft) */
+   fmpz_tdiv_q(exp, exp, Ft);
+   fmpz_mod_poly_powmod_fmpz_binexp_preinv(h2, g, exp, f, finv);
 
    /* test g^(n^k - 1) = 1 mod f */
-   fmpz_mod_poly_frobenius_power(h, pow, f, k);
-   fmpz_mod_poly_compose_mod(h, h, g, f);
-
-   if (!fmpz_mod_poly_equal(h, g))
+   fmpz_mod_poly_powmod_fmpz_binexp_preinv(h, h2, Ft, f, finv);
+   
+   if (!fmpz_mod_poly_is_one(h))
    {
       res = 0;
 
-      goto cleanup;
+      goto cleanup2;
    }
 
    /* 
@@ -291,62 +296,12 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
       These are q such that g^((n^k - 1)/q) != 1 mod f 
    */
 
-   switch (k)
-   {
-   case 3:
-   case 4:
-   case 5:
-   case 8:
-      /* compute x^(n - 1) if k is odd, else x^(n^2 - 1) or x^(n^4 - 1) */
-      fmpz_mod_poly_frobenius_power(h, pow, f, 1 + ((k % 2) == 0) + 2*(k == 8));
-      fmpz_mod_poly_set_coeff_ui(h1, 1, 1);
-      fmpz_mod_poly_set_coeff_ui(h1, 0, 0);
-      _fmpz_mod_poly_set_length(h1, 2);
-      fmpz_mod_poly_invmod_f(nfac, h1, h1, f);
-      if (!fmpz_is_one(nfac))
-         goto cleanup;
-      fmpz_mod_poly_mulmod_preinv(h, h, h1, f, finv);
-      break;
-   case 6:
-   case 12:
-   case 10:
-      /* compute x^(n^(k/2) - 1) */
-      fmpz_mod_poly_frobenius_power(h, pow, f, k/2);
-      fmpz_mod_poly_set_coeff_ui(h1, 1, 1);
-      fmpz_mod_poly_set_coeff_ui(h1, 0, 0);
-      _fmpz_mod_poly_set_length(h1, 2);
-      fmpz_mod_poly_invmod_f(nfac, h1, h1, f);
-      if (!fmpz_is_one(nfac))
-         goto cleanup;
-      fmpz_mod_poly_mulmod_preinv(h, h, h1, f, finv);
-   
-      /* compute x^(n + 1) or x^(n^2 + 1) */
-      fmpz_mod_poly_frobenius_power(h2, pow, f, 1 + ((k % 4) == 0));
-      fmpz_mod_poly_set_coeff_ui(h1, 1, 1);
-      fmpz_mod_poly_set_coeff_ui(h1, 0, 0);
-      _fmpz_mod_poly_set_length(h1, 2);
-      fmpz_mod_poly_mulmod_preinv(h2, h2, h1, f, finv);
-   
-      /* compose x^(n^(k/2) - 1) with x^(n + 1) or x^(n^2 + 1) */
-      fmpz_mod_poly_compose_mod(h, h, h2, f);
-      break;
-   }
-
-   /* compute x^(pol(n)/Ft) */
-   fmpz_mod_poly_init(h3, n);
-
-   fmpz_tdiv_q(exp, exp, Ft);
-   fmpz_mod_poly_powmod_x_fmpz_preinv(h3, exp, f, finv);
-       
-   /* raise to powers Ft/q and compose with g to get g^(pol(n)/q) */
+   /* raise to powers Ft/q and compose to get g^((n^k - 1)/q) */
    for (i = 0; i < fac->num; i++)
    {
       fmpz_divexact(exp2, Ft, fac->p + i);
 
-      fmpz_mod_poly_powmod_x_fmpz_preinv(h2, exp2, f, finv);
-      fmpz_mod_poly_compose_mod(h2, h2, h3, f);
-      fmpz_mod_poly_compose_mod(h1, h, h2, f);
-      fmpz_mod_poly_compose_mod(h1, h1, g, f);
+      fmpz_mod_poly_powmod_fmpz_binexp_preinv(h, h2, exp2, f, finv);
 
       if (!fmpz_mod_poly_is_one(h1))
       {
@@ -354,11 +309,6 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
          fmpz_mul(F, F, p);
       }
    }
-
-   fmpz_mod_poly_clear(h3);
-
-cleanup:
-   fmpz_mod_poly_frobenius_powers_2exp_clear(pow);
 
 cleanup2:
 
