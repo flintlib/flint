@@ -267,6 +267,11 @@ int fmpz_mat_is_zero(const fmpz_mat_t mat)
     Returns a non-zero value if all entries \code{mat} are zero, and
     otherwise returns zero.
 
+int fmpz_mat_is_one(const fmpz_mat_t mat)
+
+    Returns a non-zero value if \code{mat} is the unit matrix or the truncation
+    of a unit matrix, and otherwise returns zero.
+
 int fmpz_mat_is_empty(const fmpz_mat_t mat)
 
     Returns a non-zero value if the number of rows or the number of
