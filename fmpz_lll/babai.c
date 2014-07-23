@@ -144,7 +144,7 @@ FUNC_HEAD
                             }
                             _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                           B->rows[j], n);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_sub(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -161,7 +161,7 @@ FUNC_HEAD
                             }
                             _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
                                           B->rows[j], n);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_add(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -191,7 +191,7 @@ FUNC_HEAD
                             xx = (slong) tmp;
                             _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                        B->rows[j], n, xx);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(U->rows[kappa],
                                                            U->rows[j],
@@ -216,7 +216,7 @@ FUNC_HEAD
 
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
-                                if (fl->store_trans)
+                                if (U != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si(U->rows
                                                                [kappa],
@@ -240,7 +240,7 @@ FUNC_HEAD
                                                                 B->rows[j],
                                                                 n, xx,
                                                                 exponent);
-                                if (fl->store_trans)
+                                if (U != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si_2exp(U->rows
                                                                     [kappa],
@@ -434,12 +434,12 @@ FUNC_HEAD
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) - tmp;
                             }
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_sub(B->rows[kappa],
                                               B->rows[kappa], B->rows[j], n);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_sub(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -455,12 +455,12 @@ FUNC_HEAD
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) + tmp;
                             }
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_add(B->rows[kappa],
                                               B->rows[kappa], B->rows[j], n);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_add(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -489,12 +489,12 @@ FUNC_HEAD
 
                             xx = (slong) tmp;
                             fmpz_set_si(x + j, xx);
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(U->rows[kappa],
                                                            U->rows[j],
@@ -518,14 +518,14 @@ FUNC_HEAD
                                 exponent = 0;
 
                                 fmpz_set_si(x + j, xx);
-                                if (fl->rt == Z_BASIS)
+                                if (fl->rt == Z_BASIS && B != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si(B->rows
                                                                [kappa],
                                                                B->rows[j],
                                                                n, xx);
                                 }
-                                if (fl->store_trans)
+                                if (U != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si(U->rows
                                                                [kappa],
@@ -546,7 +546,7 @@ FUNC_HEAD
                             {
                                 fmpz_set_si(x + j, xx);
                                 fmpz_mul_2exp(x + j, x + j, exponent);
-                                if (fl->rt == Z_BASIS)
+                                if (fl->rt == Z_BASIS && B != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si_2exp(B->rows
                                                                     [kappa],
@@ -555,7 +555,7 @@ FUNC_HEAD
                                                                     xx,
                                                                     exponent);
                                 }
-                                if (fl->store_trans)
+                                if (U != NULL)
                                 {
                                     _fmpz_vec_scalar_submul_si_2exp(U->rows
                                                                     [kappa],
@@ -621,7 +621,7 @@ FUNC_HEAD
                                     x + j, fmpz_mat_entry(GM, j, i));
                 }
 
-                for (i = kappa + 1; i < B->r; i++)
+                for (i = kappa + 1; i < GM->r; i++)
                 {
                     for (j = zeros + 1; j < kappa; j++)
                         fmpz_submul(fmpz_mat_entry(GM, i, kappa),

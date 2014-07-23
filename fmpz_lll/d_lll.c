@@ -73,7 +73,7 @@ FUNC_HEAD
         s = _d_vec_init(d);
         appSPtmp = _d_vec_init(d);
 
-        if (fl->store_trans)
+        if (U != NULL)
         {
             if (U->r != d)
             {
@@ -306,7 +306,7 @@ FUNC_HEAD
                     B->rows[i] = B->rows[i - 1];
                 B->rows[kappa] = Btmp;
 
-                if (fl->store_trans)
+                if (U != NULL)
                 {
                     Btmp = _fmpz_vec_init(U->c);
                     _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
@@ -402,7 +402,7 @@ FUNC_HEAD
     }
     else
     {
-        int kappa, kappa2, d, n, i, j, zeros, kappamax;
+        int kappa, kappa2, d, n, i, j, zeros, kappamax, update_b = 1;
         slong exp;
         int num_failed_fast = 0;
         int babai_ok = 0;
@@ -432,13 +432,17 @@ FUNC_HEAD
 
         s = _d_vec_init(d);
 
-        if (fl->store_trans)
+        if (U != NULL)
         {
             if (U->r != d)
             {
                 flint_printf
                     ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
                 abort();
+            }
+            else if (U->c == d && n > d && fmpz_mat_is_one(U))
+            {
+                update_b = 0;
             }
         }
 
@@ -508,9 +512,9 @@ FUNC_HEAD
             if (num_failed_fast < 50)
             {
                 babai_ok =
-                    fmpz_lll_check_babai(kappa, B, U, mu, r, s, NULL, expo,
-                                         A, alpha[kappa], zeros, kappamax,
-                                         n, fl);
+                    fmpz_lll_check_babai(kappa, (update_b ? B : NULL), U, mu,
+                                         r, s, NULL, expo, A, alpha[kappa],
+                                         zeros, kappamax, n, fl);
             }
             else
             {
@@ -521,8 +525,9 @@ FUNC_HEAD
             {
                 num_failed_fast++;
                 heuristic_fail =
-                    fmpz_lll_check_babai_heuristic_d(kappa, B, U, mu, r, s,
-                                                     NULL, expo, A,
+                    fmpz_lll_check_babai_heuristic_d(kappa,
+                                                     (update_b ? B : NULL), U,
+                                                     mu, r, s, NULL, expo, A,
                                                      alpha[kappa], zeros,
                                                      kappamax, n, fl);
             }
@@ -636,7 +641,7 @@ FUNC_HEAD
                 /* Step7: Update B */
                 /* *************** */
 
-                if (fl->rt == Z_BASIS)
+                if (fl->rt == Z_BASIS && update_b)
                 {
                     Btmp = B->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -644,7 +649,7 @@ FUNC_HEAD
                     B->rows[kappa] = Btmp;
                 }
 
-                if (fl->store_trans)
+                if (U != NULL)
                 {
                     Btmp = _fmpz_vec_init(U->c);
                     _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
@@ -706,6 +711,10 @@ FUNC_HEAD
                     fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(B, j, i));
                 }
             }
+        }
+        else if (!update_b)
+        {
+            fmpz_mat_mul(B, U, B);
         }
 
 #if TYPE

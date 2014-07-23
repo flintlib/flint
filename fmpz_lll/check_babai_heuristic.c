@@ -155,7 +155,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             }
                             _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                           B->rows[j], n);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_sub(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -172,7 +172,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             }
                             _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
                                           B->rows[j], n);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_add(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -208,7 +208,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             xx = mpf_get_si(tmp);
                             _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                        B->rows[j], n, xx);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(U->rows[kappa],
                                                            U->rows[j],
@@ -220,7 +220,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             fmpz_set_mpf(ztmp, tmp);
                             _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
                                                          B->rows[j], n, ztmp);
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_scalar_submul_fmpz(U->rows
                                                              [kappa],
@@ -371,12 +371,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                         mpf_mat_entry(mu, kappa, k),
                                         mpf_mat_entry(mu, j, k));
                             }
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
                                               B->rows[j], n);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_sub(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -392,12 +392,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                         mpf_mat_entry(mu, kappa, k),
                                         mpf_mat_entry(mu, j, k));
                             }
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_add(B->rows[kappa],
                                               B->rows[kappa], B->rows[j], n);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_add(U->rows[kappa],
                                               U->rows[kappa], U->rows[j],
@@ -432,12 +432,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             /* X is stored in an slong */
                             xx = mpf_get_si(tmp);
                             fmpz_set_si(x + j, xx);
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                            B->rows[j], n, xx);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_scalar_submul_si(U->rows[kappa],
                                                            U->rows[j],
@@ -447,13 +447,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         else
                         {
                             fmpz_set_mpf(x + j, tmp);
-                            if (fl->rt == Z_BASIS)
+                            if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
                                                              B->rows[j], n,
                                                              x + j);
                             }
-                            if (fl->store_trans)
+                            if (U != NULL)
                             {
                                 _fmpz_vec_scalar_submul_fmpz(U->rows
                                                              [kappa],
@@ -500,7 +500,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                     x + j, fmpz_mat_entry(GM, j, i));
                 }
 
-                for (i = kappa + 1; i < B->r; i++)
+                for (i = kappa + 1; i < GM->r; i++)
                 {
                     for (j = zeros + 1; j < kappa; j++)
                         fmpz_submul(fmpz_mat_entry(GM, i, kappa),

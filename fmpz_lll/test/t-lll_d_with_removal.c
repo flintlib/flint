@@ -69,7 +69,7 @@ main(void)
 
         if (fl->rt == GRAM)
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -102,7 +102,7 @@ main(void)
         }
         else
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -168,7 +168,7 @@ main(void)
         {
             fmpz_mat_init(gmat, r, r);
             fmpz_mat_gram(gmat, mat);
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -200,7 +200,7 @@ main(void)
         }
         else
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -269,7 +269,7 @@ main(void)
 
         if (fl->rt == GRAM)
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -302,7 +302,7 @@ main(void)
         }
         else
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -367,7 +367,7 @@ main(void)
 
         if (fl->rt == GRAM)
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);
@@ -400,7 +400,7 @@ main(void)
         }
         else
         {
-            if (fl->store_trans)
+            if (n_randint(state, 2))
             {
                 fmpz_mat_init(U, r, r);
                 fmpz_mat_one(U);

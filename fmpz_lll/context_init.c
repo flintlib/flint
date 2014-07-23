@@ -29,11 +29,10 @@
 
 void
 fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta, rep_type rt,
-                      gram_type gt, int store_trans)
+                      gram_type gt)
 {
     fl->delta = delta;
     fl->eta = eta;
     fl->rt = rt;
     fl->gt = gt;
-    fl->store_trans = store_trans;
 }

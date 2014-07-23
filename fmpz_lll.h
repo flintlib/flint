@@ -71,7 +71,6 @@ typedef struct
     double eta;
     rep_type rt;
     gram_type gt;
-    int store_trans;
 } fmpz_lll_struct;
 
 typedef fmpz_lll_struct fmpz_lll_t[1];
@@ -90,7 +89,7 @@ typedef fmpz_gram_union fmpz_gram_t[1];
 void fmpz_lll_context_init_default(fmpz_lll_t fl);
 
 void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta,
-                           rep_type rt, gram_type gt, int store_trans);
+                           rep_type rt, gram_type gt);
 
 /* Random parameter generation  **********************************************/
 

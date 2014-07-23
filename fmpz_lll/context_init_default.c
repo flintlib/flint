@@ -34,5 +34,4 @@ fmpz_lll_context_init_default(fmpz_lll_t fl)
     fl->eta = 0.51;
     fl->rt = Z_BASIS;
     fl->gt = APPROX;
-    fl->store_trans = 0;
 }

@@ -65,7 +65,7 @@ FUNC_HEAD
         mpf_mat_init(appB, d, n, prec);
         mpf_mat_init(A->appSP2, d, d, prec);
 
-        if (fl->store_trans)
+        if (U != NULL)
         {
             if (U->r != d)
             {
@@ -241,7 +241,7 @@ FUNC_HEAD
                     B->rows[i] = B->rows[i - 1];
                 B->rows[kappa] = Btmp;
 
-                if (fl->store_trans)
+                if (U != NULL)
                 {
                     Btmp = _fmpz_vec_init(U->c);
                     _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
@@ -332,7 +332,7 @@ FUNC_HEAD
     }
     else
     {
-        int kappa, kappa2, d, n, i, j, zeros, kappamax;
+        int kappa, kappa2, d, n, i, j, zeros, kappamax, update_b = 1;
         mpf_mat_t mu, r;
         fmpz_gram_t A;
         mpf *s, *mutmp;
@@ -359,13 +359,17 @@ FUNC_HEAD
 
         s = _mpf_vec_init(d, prec);
 
-        if (fl->store_trans)
+        if (U != NULL)
         {
             if (U->r != d)
             {
                 flint_printf
                     ("Exception (fmpz_lll_mpf*). Incompatible dimensions of capturing matrix.\n");
                 abort();
+            }
+            else if (U->c == d && n > d && fmpz_mat_is_one(U))
+            {
+                update_b = 0;
             }
         }
 
@@ -408,9 +412,9 @@ FUNC_HEAD
             /* Step3: Call to the Babai algorithm */
             /* ********************************** */
             babai_ok =
-                fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, NULL,
-                                               A, alpha[kappa], zeros,
-                                               kappamax, n, tmp, rtmp,
+                fmpz_lll_check_babai_heuristic(kappa, (update_b ? B : NULL), U,
+                                               mu, r, s, NULL, A, alpha[kappa],
+                                               zeros, kappamax, n, tmp, rtmp,
                                                prec, fl);
 
             if (babai_ok == -1)
@@ -515,7 +519,7 @@ FUNC_HEAD
                 /* Step7: Update B */
                 /* *************** */
 
-                if (fl->rt == Z_BASIS)
+                if (fl->rt == Z_BASIS && update_b)
                 {
                     Btmp = B->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
@@ -523,7 +527,7 @@ FUNC_HEAD
                     B->rows[kappa] = Btmp;
                 }
 
-                if (fl->store_trans)
+                if (U != NULL)
                 {
                     Btmp = _fmpz_vec_init(U->c);
                     _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
@@ -577,6 +581,10 @@ FUNC_HEAD
                     fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(B, j, i));
                 }
             }
+        }
+        else if (!update_b)
+        {
+            fmpz_mat_mul(B, U, B);
         }
 
 #if TYPE

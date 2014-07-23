@@ -33,7 +33,6 @@ fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
     double randd, delta, eta;
     rep_type rt;
     gram_type gt;
-    int store_trans;
 
     randd = d_randtest(state);
     if (randd > 0.5 && n_randint(state, 1))
@@ -54,6 +53,5 @@ fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
     }
     rt = n_randint(state, 2);
     gt = n_randint(state, 2);
-    store_trans = n_randint(state, 2);
-    fmpz_lll_context_init(fl, delta, eta, rt, gt, store_trans);
+    fmpz_lll_context_init(fl, delta, eta, rt, gt);
 }
