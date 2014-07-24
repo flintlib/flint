@@ -441,6 +441,16 @@ void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A,
     or \code{fmpz_t}, which is assumed to divide all elements of
     \code{B} exactly.
 
+void fmpz_mat_scalar_mul_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
+
+    Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
+    multiplied by $2^{exp}$.
+
+void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
+
+    Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
+    divided by $2^{exp}$, rounding down towards zero.
+
 
 *******************************************************************************
 
