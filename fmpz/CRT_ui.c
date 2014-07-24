@@ -101,13 +101,15 @@ _fmpz_CRT_ui_signed_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     s = n_submod(r2, r1mod, m2);
     s = n_mulmod2_preinv(s, c, m2, m2inv);
     fmpz_mul_ui(tmp, m1, s);
-    fmpz_add(out, tmp, r1normal);
+    fmpz_add(tmp, tmp, r1normal);
 
     if (fmpz_sgn(r1) < 0)
         fmpz_clear(r1normal);
 
-    if (fmpz_cmpabs(out, halfm1m2) > 0)
-        fmpz_sub(out, out, m1m2);
+    if (fmpz_cmpabs(tmp, halfm1m2) > 0)
+        fmpz_sub(out, tmp, m1m2);
+    else
+        fmpz_set(out, tmp);
 
     fmpz_clear(tmp);
 }
