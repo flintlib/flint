@@ -173,7 +173,7 @@ FUNC_HEAD
 
                 kappa2 = kappa;
 #if TYPE
-                if (kappa == d - 1)
+                if (kappa == d - 1 && gs_B != NULL)
                 {
                     fmpz_init(rii);
                     mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
@@ -306,19 +306,22 @@ FUNC_HEAD
         }
 
 #if TYPE
-        newd = d;
-        fmpz_init(rii);
-        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+        if (gs_B != NULL)
         {
-            mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
-            /* rii is the G-S length of ith vector divided by 2 */
-            fmpz_set_mpf(rii, tmp);
-            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                newd--;
+                mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+                /* rii is the G-S length of ith vector divided by 2 */
+                fmpz_set_mpf(rii, tmp);
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
             }
+            fmpz_clear(rii);
         }
-        fmpz_clear(rii);
 #endif
 
         flint_free(alpha);
@@ -456,7 +459,7 @@ FUNC_HEAD
 
                 kappa2 = kappa;
 #if TYPE
-                if (kappa == d - 1)
+                if (kappa == d - 1 && gs_B != NULL)
                 {
                     fmpz_init(rii);
                     mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
@@ -588,19 +591,22 @@ FUNC_HEAD
         }
 
 #if TYPE
-        newd = d;
-        fmpz_init(rii);
-        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+        if (gs_B != NULL)
         {
-            mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
-            /* rii is the G-S length of ith vector divided by 2 */
-            fmpz_set_mpf(rii, tmp);
-            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                newd--;
+                mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+                /* rii is the G-S length of ith vector divided by 2 */
+                fmpz_set_mpf(rii, tmp);
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
             }
+            fmpz_clear(rii);
         }
-        fmpz_clear(rii);
 #endif
 
         flint_free(alpha);

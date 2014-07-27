@@ -55,7 +55,7 @@ main(void)
         c = r;
 
         fmpz_mat_init(mat, r, c);
-        fmpz_init(bound);
+        fmpz_init_set_ui(bound, 2);
         fmpz_lll_randtest(fl, state);
 
         bits = n_randint(state, 20) + 1;
@@ -65,7 +65,7 @@ main(void)
             fmpz_mat_randntrulike(mat, state, bits, q);
         else
             fmpz_mat_randntrulike2(mat, state, bits, q);
-        fmpz_randtest(bound, state, bits);
+        fmpz_mul_2exp(bound, bound, bits);
 
         if (fl->rt == GRAM)
         {
@@ -156,13 +156,13 @@ main(void)
         c = r + 1;
 
         fmpz_mat_init(mat, r, c);
-        fmpz_init(bound);
+        fmpz_init_set_ui(bound, 2);
         fmpz_lll_randtest(fl, state);
 
         bits = n_randint(state, 200) + 1;
 
         fmpz_mat_randintrel(mat, state, bits);
-        fmpz_randtest(bound, state, bits);
+        fmpz_mul_2exp(bound, bound, bits);
 
         if (fl->rt == GRAM)
         {
@@ -262,11 +262,10 @@ main(void)
         c = r;
 
         fmpz_mat_init(mat, r, c);
-        fmpz_init(bound);
+        fmpz_init_set_ui(bound, 4 * r);
         fmpz_lll_randtest(fl, state);
 
         fmpz_mat_randajtai(mat, state, 0.5);
-        fmpz_randtest(bound, state, n_randint(state, 200));
 
         if (fl->rt == GRAM)
         {
@@ -357,14 +356,14 @@ main(void)
         c = r;
 
         fmpz_mat_init(mat, r, c);
-        fmpz_init(bound);
+        fmpz_init_set_ui(bound, 2);
         fmpz_lll_randtest(fl, state);
 
         bits = n_randint(state, 200) + 1;
         bits2 = n_randint(state, 5) + 1;
 
         fmpz_mat_randsimdioph(mat, state, bits, bits2);
-        fmpz_randtest(bound, state, bits);
+        fmpz_mul_2exp(bound, bound, bits2);
 
         if (fl->rt == GRAM)
         {

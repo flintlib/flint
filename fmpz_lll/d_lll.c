@@ -239,7 +239,7 @@ FUNC_HEAD
 
                 kappa2 = kappa;
 #if TYPE
-                if (kappa == d - 1)
+                if (kappa == d - 1 && gs_B != NULL)
                 {
                     fmpz_init(rii);
                     tmp =
@@ -374,18 +374,21 @@ FUNC_HEAD
         }
 
 #if TYPE
-        newd = d;
-        fmpz_init(rii);
-        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+        if (gs_B != NULL)
         {
-            /* rii is the G-S length of ith vector divided by 2 */
-            fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), 2 * expo[i] - 1));
-            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                newd--;
+                /* rii is the G-S length of ith vector divided by 2 */
+                fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), 2 * expo[i] - 1));
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
             }
+            fmpz_clear(rii);
         }
-        fmpz_clear(rii);
 #endif
 
         flint_free(alpha);
@@ -576,7 +579,7 @@ FUNC_HEAD
 
                 kappa2 = kappa;
 #if TYPE
-                if (kappa == d - 1)
+                if (kappa == d - 1 && gs_B != NULL)
                 {
                     fmpz_init(rii);
                     tmp =
@@ -718,18 +721,21 @@ FUNC_HEAD
         }
 
 #if TYPE
-        newd = d;
-        fmpz_init(rii);
-        for (i = d - 1; (i >= 0) && (ok > 0); i--)
+        if (gs_B != NULL)
         {
-            /* rii is the G-S length of ith vector divided by 2 */
-            fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), expo[i] - 1));
-            if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+            newd = d;
+            fmpz_init(rii);
+            for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
-                newd--;
+                /* rii is the G-S length of ith vector divided by 2 */
+                fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), expo[i] - 1));
+                if ((ok = fmpz_cmp(rii, gs_B)) > 0)
+                {
+                    newd--;
+                }
             }
+            fmpz_clear(rii);
         }
-        fmpz_clear(rii);
 #endif
 
         flint_free(alpha);
