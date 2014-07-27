@@ -28,6 +28,5 @@
 char *
 fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
-    /* TODO: Implement nmod_poly_get_str_pretty */
-    return nmod_poly_get_str(op);
+    return nmod_poly_get_str_pretty(op, ctx->var);
 }

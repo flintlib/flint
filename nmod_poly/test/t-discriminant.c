@@ -37,7 +37,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("resultant....");
+    flint_printf("discriminant....");
     fflush(stdout);
 
     /* Check disc(fg) == disc(f) * disc(g) * res(f, g)^2 */

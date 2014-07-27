@@ -31,14 +31,6 @@
 
 *******************************************************************************
 
-void n_randinit(flint_rand_t state)
-
-    Initialise a random state for use in random functions. 
-
-void n_randclear(flint_rand_t state)
-
-    Release any memory used by a random state. 
-
 mp_limb_t n_randlimb(flint_rand_t state)
 
     Returns a uniformly pseudo random limb. 
@@ -302,10 +294,6 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
     \code{norm} will shift the product right by this many bits before
     reducing it.
 
-    Note, we explicitly assume that the bottom \code{norm} bits of $a$
-    are zero, as will be the case when $a$ and $b$ are left shifted by
-    this many bits on account of the normalisation of $n$.
-
     The algorithm use is that of Granlund and M\"oller~\citep{GraMol2010}.
 
     % Torbjorn Granlund and Niels Moller
@@ -322,12 +310,9 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$. 
-    No assumptions are made about $x$ and $y$.
+    We require $x \geq y$.
 
-    On systems where a fast count-trailing-zeros intrinsic is available,
-    a version of the binary GCD algorithm is used.
-
-    The fallback algorithm is a slight embelishment of the Euclidean algorithm
+    The algorithm is a slight embelishment of the Euclidean algorithm
     which uses some branches to avoid most divisions.
 
     One wishes to compute the quotient and remainder of $u_3 / v_3$ without 
@@ -343,7 +328,7 @@ mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
 mp_limb_t n_gcd_full(mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$.
-    This is an obsolete alias for \code{n_gcd}.
+    No assumptions are made about $x$ and $y$.
 
 mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
 
@@ -468,20 +453,6 @@ mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
-mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
-                                                    mp_limb_t ninv, ulong norm)
-
-    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
-    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, exp $> 0$ and
-    for $n$ to be normalised.
-
-    If $a$ is shifted to the left as a result of normalising $n$, the number
-    of bits it was shifted should be passed as norm. The return value will
-    then need to be shifted right by this number of bits by the caller.
-
-    This is implemented as a standard binary powering algorithm using
-    repeated squaring and reducing modulo $n$ at each step.
-  
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     Returns \code{(a^exp) % n}. We require $0 \leq a < n$, but there are 
@@ -767,13 +738,16 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 
 int n_is_prime(mp_limb_t n)
 
-    Tests if $n$ is a prime. Up to $10^{16}$ this simply calls 
-    \code{n_is_probabprime()} which is a primality test up to that limit. 
-    Beyond that point it calls \code{n_is_probabprime()} and returns $0$ 
-    if $n$ is composite, then it calls \code{n_is_prime_pocklington()} 
-    which proves the primality of $n$ in most cases. As a fallback, 
-    \code{n_is_prime_pseudosquare()} is called, which will unconditionally 
-    prove the primality of $n$.
+    Tests if $n$ is a prime. This first sieves for small prime factors,
+    then simply calls \code{n_is_probabprime()}. This has been checked
+    against the tables of Feitsma and Galway 
+    \url{http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html} and thus 
+    constitutes a check for primality (rather than just pseudoprimality) 
+    up to $2^64$.
+
+    In future, this test may produce and check a certificate of 
+    primality. This is likely to be significantly slower for prime
+    inputs.
 
 int n_is_strong_probabprime_precomp(mp_limb_t n, double npre, 
                                                       mp_limb_t a, mp_limb_t d)
@@ -828,32 +802,47 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
 int n_is_probabprime_BPSW(mp_limb_t n)
 
-    Implements the Baillie--Pomerance--Selfridge--Wagstaff probable primality
-    test. There are no known counterexamples to this being a primality test.
-    For further details, see~\citep{CraPom2005}.
+    Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
+    test. This is a variant of the usual BPSW test (which only uses strong
+    base-2 probable prime and Lucas-Selfridge tests, see Baillie and
+    Wagstaff~\citep{BaiWag1980}).
+
+    This implementation makes use of a weakening of the usual Baillie-PSW
+    test given in ~\citep{Chen2003}, namely replacing the Lucas test with a
+    Fibonacci test when $n \equiv 2, 3 \pmod{5}$, (see also the comment on 
+    page 143 of~\citep{CraPom2005}) regarding Fibonacci pseudoprimes.
+
+    There are no known counterexamples to this being a primality test.
+
+    Up to $2^64$ the test we use has been checked against tables of 
+    pseudoprimes. Thus it is a primality test up to this limit.
 
 int n_is_probabprime_lucas(mp_limb_t n)
 
     For details on Lucas pseudoprimes, see~\citep[pp.~143]{CraPom2005}.
 
-    We implement a variant of the Lucas pseudoprime test as
+    We implement a variant of the Lucas pseudoprime test similar to that
     described by Baillie and Wagstaff~\citep{BaiWag1980}.
 
 int n_is_probabprime(mp_limb_t n)
 
     Tests if $n$ is a probable prime. Up to \code{FLINT_ODDPRIME_SMALL_CUTOFF} 
     this algorithm uses \code{n_is_oddprime_small()} which uses a lookup table.
+
     Next it calls \code{n_compute_primes()} with the maximum table size and 
     uses this table to perform a binary search for $n$ up to the table limit.
-    Then up to $10^{16}$ it uses a number of strong probable prime tests,
-    \code{n_is_strong_probabprime_precomp()}, etc., for various bases. The 
+
+    Then up to $1050535501$ it uses a number of strong probable prime tests,
+    \code{n_is_strong_probabprime_preinv()}, etc., for various bases. The 
     output of the algorithm is guaranteed to be correct up to this bound due 
     to exhaustive tables, described at 
     \url{http://uucode.com/obf/dalbec/alg.html}.
 
     Beyond that point the BPSW probabilistic primality test is used, by 
     calling the function \code{n_is_probabprime_BPSW()}. There are no known 
-    counterexamples, but it may well declare some composites to be prime.
+    counterexamples, and it has been checked against the tables of Feitsma
+    and Galway and up to the accuracy of those tables, this is an exhaustive
+    check up to $2^64$, i.e. there are no counterexamples.
 
 *******************************************************************************
 
@@ -1051,10 +1040,14 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
 
     Factors $n$ with no restrictions on $n$. If the prime factors are 
-    required to be certified prime, one may set \code{proved} to $1$, 
-    otherwise set it to $0$, and they will only be probable primes
-    (with no known counterexamples to the conjecture that they are
-    in fact all prime).
+    required to be checked with a primality test, one may set 
+    \code{proved} to $1$, otherwise set it to $0$, and they will only be 
+    probable primes. N.B: at the present there is no difference because 
+    the probable prime tests have been exhaustively tested up to $2^64$.
+
+    However, in future, this flag may produce and separately check
+    a primality certificate. This may be quite slow (and probably no
+    less reliable in practice).
 
     For details on the \code{n_factor_t} structure, see 
     \code{n_factor_trial()}.

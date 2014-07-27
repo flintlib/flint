@@ -45,6 +45,16 @@ void fmpz_factor_clear(fmpz_factor_t factor)
 
     Clears an \code{fmpz_factor_t} structure.
 
+void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp)
+
+    Append a factor $p$ to the given exponent to the 
+    \code{fmpz_factor_t} structure \code{factor}.
+
+void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp)
+
+    Append a factor $p$ to the given exponent to the 
+    \code{fmpz_factor_t} structure \code{factor}.
+
 void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     Factors $n$ into prime numbers. If $n$ is zero or negative, the

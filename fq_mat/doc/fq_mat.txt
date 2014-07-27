@@ -32,7 +32,7 @@
 void fq_mat_init(fq_mat_t mat, slong rows, slong cols, const fq_ctx_t ctx)
 
     Initialises \code{mat} to a \code{rows}-by-\code{cols} matrix with
-    coefficients in $\mathbb{F}_{q}$ given by \code{ctx}. All elements
+    coefficients in $\mathbf{F}_{q}$ given by \code{ctx}. All elements
     are set to zero.
 
 void fq_mat_init_set(fq_mat_t mat, fq_mat_t src, const fq_ctx_t ctx)
@@ -148,7 +148,7 @@ void fq_mat_window_clear(fq_mat_t window, const fq_ctx_t ctx)
 void fq_mat_randtest(fq_mat_t mat, flint_rand_t state, const fq_ctx_t ctx)
 
     Sets the elements of \code{mat} to random elements of
-    $\mathbb{F}_{q}$, given by \code{ctx}.
+    $\mathbf{F}_{q}$, given by \code{ctx}.
 
 int fq_mat_randpermdiag(fq_mat_t mat, fq_struct * diag, slong n,
                         flint_rand_t state, const fq_ctx_t ctx)
@@ -167,7 +167,7 @@ void fq_mat_randrank(fq_mat_t mat, slong rank, flint_rand_t state,
     Sets \code{mat} to a random sparse matrix with the given rank,
     having exactly as many non-zero elements as the rank, with the
     non-zero elements being uniformly random elements of
-    $\mathbb{F}_{q}$.
+    $\mathbf{F}_{q}$.
 
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling \code{fq_mat_randops()}.

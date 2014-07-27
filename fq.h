@@ -283,6 +283,12 @@ static __inline__ void fq_set_ui(fq_t rop, const ulong x, const fq_ctx_t ctx)
     fq_reduce(rop, ctx);
 }
 
+static __inline__ void fq_set_si(fq_t rop, const slong x, const fq_ctx_t ctx)
+{
+    fmpz_poly_set_si(rop, x);
+    fq_reduce(rop, ctx);
+}
+
 static __inline__ void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t ctx)
 {
     fmpz_poly_swap(op1, op2);

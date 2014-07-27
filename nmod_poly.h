@@ -344,7 +344,26 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c);
 
 char * nmod_poly_get_str(const nmod_poly_t poly);
 
+char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x);
+
 int nmod_poly_set_str(nmod_poly_t poly, const char * s);
+
+int nmod_poly_fread(FILE * f, nmod_poly_t poly);
+
+static __inline__
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+{
+    char *s;
+    int r;
+
+    s = nmod_poly_get_str(poly);
+    r = fputs(s, f);
+    flint_free(s);
+
+    return (r < 0) ? r : 1;
+}
+
+int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x);
 
 static __inline__
 int nmod_poly_print(const nmod_poly_t a)
@@ -366,19 +385,10 @@ int nmod_poly_print(const nmod_poly_t a)
     return (int) r;
 }
 
-int nmod_poly_fread(FILE * f, nmod_poly_t poly);
-
 static __inline__
-int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+int nmod_poly_print_pretty(const nmod_poly_t a, const char * x)
 {
-    char *s;
-    int r;
-
-    s = nmod_poly_get_str(poly);
-    r = fputs(s, f);
-    flint_free(s);
-
-    return (r < 0) ? r : 1;
+    return nmod_poly_fprint_pretty(stdout, a, x);
 }
 
 static __inline__

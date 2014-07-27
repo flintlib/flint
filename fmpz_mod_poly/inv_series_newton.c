@@ -31,8 +31,6 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-#define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64
-
 void 
 _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
                                  const fmpz_t cinv, const fmpz_t p)

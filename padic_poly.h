@@ -26,9 +26,14 @@
 #ifndef PADIC_POLY_H
 #define PADIC_POLY_H
 
+#undef ulong
+#define ulong ulongxx/* interferes with system includes */
 #include <limits.h>
+#undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
+
 #include "fmpz.h"
 #include "fmpq.h"
 #include "padic.h"
