@@ -200,6 +200,10 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
     is truncated to have the given length.  Discarded coefficients are not 
     necessarily set to zero.
 
+void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+
+    Sets \code{res} to a copy of \code{poly}, truncated to length \code{n}.
+
 *******************************************************************************
 
     Randomisation

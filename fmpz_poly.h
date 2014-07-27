@@ -175,6 +175,8 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
     }  
 }
 
+void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
+
 /*  Randomisation  ***********************************************************/
 
 void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
