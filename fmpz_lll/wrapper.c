@@ -32,12 +32,12 @@ fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 {
     int res = fmpz_lll_d(B, U, fl);
 
-    if (res == -1)
+    if ((res == -1) || (!fmpz_lll_is_reduced(B, fl, D_BITS)))
     {
         if (fl->rt == Z_BASIS && fl->gt == APPROX)
         {
             res = fmpz_lll_d_heuristic(B, U, fl);
-            if (res == -1)
+            if ((res == -1) || (!fmpz_lll_is_reduced(B, fl, D_BITS)))
             {
                 res = fmpz_lll_mpf(B, U, fl);
             }

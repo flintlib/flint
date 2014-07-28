@@ -148,6 +148,24 @@ int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs
 
 int fmpz_lll_wrapper_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl);
 
+/* ULLL  *********************************************************************/
+
+int fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size, const fmpz_t gs_B, const fmpz_lll_t fl);
+
+/* LLL-reducedness ***********************************************************/
+
+int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl);
+
+int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd);
+
+int fmpz_lll_is_reduced_mpf(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec);
+
+int fmpz_lll_is_reduced_mpf_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec);
+
+int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec);
+
+int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec);
+
 
 /* double heuristic_scalar_product(double * vec1, double * vec2, ulong n, 
 								F_mpz_mat_t B, ulong k, ulong j, long exp_adj);

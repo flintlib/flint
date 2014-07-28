@@ -38,6 +38,7 @@
 #include "fmpz.h"
 #include "nmod_mat.h"
 #include "d_mat.h"
+#include "mpf_mat.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
@@ -319,7 +320,9 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A);
 
 /* Conversions **************************************************************/
 
-void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
+int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
+
+void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
 
 /* RQ Decomposition *********************************************************/
 

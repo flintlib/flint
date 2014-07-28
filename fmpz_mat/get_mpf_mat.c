@@ -19,38 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2010 William Hart
-    Copyright (C) 2009, 2010 Andy Novocin
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#include "fmpz_lll.h"
+#include "fmpz_mat.h"
 
-int
-fmpz_lll_wrapper_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
-                              const fmpz_lll_t fl)
+void
+fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
 {
-    int res = fmpz_lll_d_with_removal(B, U, gs_B, fl);
+    slong i;
 
-    if ((res == -1)
-        || (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res, D_BITS)))
+    for (i = 0; i < A->r; i++)
     {
-        if (fl->rt == Z_BASIS && fl->gt == APPROX)
-        {
-            res = fmpz_lll_d_heuristic_with_removal(B, U, gs_B, fl);
-            if ((res == -1)
-                ||
-                (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res, D_BITS)))
-            {
-                res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
-            }
-        }
-        else
-        {
-            res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
-        }
+        _fmpz_vec_get_mpf_vec(B->rows[i], A->rows[i], A->c);
     }
-
-    return res;
 }

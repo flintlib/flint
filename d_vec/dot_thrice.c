@@ -87,10 +87,14 @@ _d_vec_dot_thrice(const double *vec1, const double *vec2, slong len2,
     }
     res = res + r[2 * len2 - 1];
 
-    g = (4 * len2 - 2) * D_EPS / (1 - (4 * len2 - 2) * D_EPS);
-    a1 = _d_vec_norm(vec1, len2);
-    a2 = _d_vec_norm(vec2, len2);
-    *err = (D_EPS + 2 * g * g) * fabs(res) + g * g * g * sqrt(a1) * sqrt(a2);
+    if (err != NULL)
+    {
+        g = (4 * len2 - 2) * D_EPS / (1 - (4 * len2 - 2) * D_EPS);
+        a1 = _d_vec_norm(vec1, len2);
+        a2 = _d_vec_norm(vec2, len2);
+        *err =
+            (D_EPS + 2 * g * g) * fabs(res) + g * g * g * sqrt(a1) * sqrt(a2);
+    }
 
     _d_vec_clear(r);
 

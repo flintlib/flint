@@ -44,7 +44,10 @@ fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
         result = fmpz_lll_mpf2_with_removal(B, U, prec, gs_B, fl);
 
         num_loops++;
-    } while ((result == -1) && (prec < UWORD_MAX));
+    } while (((result == -1)
+              ||
+              (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, result, prec)))
+             && (prec < UWORD_MAX));
 
     return result;
 }

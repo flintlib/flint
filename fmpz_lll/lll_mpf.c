@@ -43,7 +43,8 @@ fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
         result = fmpz_lll_mpf2(B, U, prec, fl);
 
         num_loops++;
-    } while ((result == -1) && (prec < UWORD_MAX));
+    } while (((result == -1) || (!fmpz_lll_is_reduced(B, fl, prec)))
+             && (prec < UWORD_MAX));
 
     return result;
 }

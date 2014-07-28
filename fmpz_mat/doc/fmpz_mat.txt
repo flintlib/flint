@@ -893,12 +893,17 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-void fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
+int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
 
     Sets the entries of \code{B} as doubles corresponding to the entries of
     \code{A}, rounding down towards zero if the latter cannot be represented
-    exactly. An entry of \code{B} is undefined if the corresponding entry of
-    \code{A} is too large to fit in the normal range of a double.
+    exactly. The return value is -1 if any entry of \code{A} is too large to
+    fit in the normal range of a double, and 0 otherwise.
+
+void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
+
+    Sets the entries of \code{B} as mpfs corresponding to the entries of
+    \code{A}.
 
 *******************************************************************************
 

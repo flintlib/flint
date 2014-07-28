@@ -28,29 +28,13 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_wrapper_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
-                              const fmpz_lll_t fl)
+fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec)
 {
-    int res = fmpz_lll_d_with_removal(B, U, gs_B, fl);
-
-    if ((res == -1)
-        || (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res, D_BITS)))
-    {
-        if (fl->rt == Z_BASIS && fl->gt == APPROX)
-        {
-            res = fmpz_lll_d_heuristic_with_removal(B, U, gs_B, fl);
-            if ((res == -1)
-                ||
-                (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res, D_BITS)))
-            {
-                res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
-            }
-        }
-        else
-        {
-            res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
-        }
-    }
-
-    return res;
+    return ((fmpz_lll_is_reduced_d(B, fl)
+             || fmpz_lll_is_reduced_mpf(B, fl, prec))
+            || ((fl->rt == Z_BASIS) ?
+                fmpz_mat_is_reduced(B, fl->delta,
+                                    fl->eta) : fmpz_mat_is_reduced_gram(B,
+                                                                        fl->delta,
+                                                                        fl->eta)));
 }
