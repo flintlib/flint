@@ -330,6 +330,11 @@ int fmpz_poly_is_unit(const fmpz_poly_t poly)
     Returns $1$ is the polynomial is the constant polynomial $\pm 1$, 
     and $0$ otherwise.
 
+int fmpz_poly_is_x(const fmpz_poly_t poly)
+
+    Returns $1$ if the polynomial is the degree $1$ polynomial $x$, and $0$ 
+    otherwise.
+
 *******************************************************************************
 
     Addition and subtraction
