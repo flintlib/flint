@@ -241,6 +241,12 @@ int fmpz_poly_is_unit(const fmpz_poly_t op)
 }
 
 FMPZ_POLY_INLINE
+int fmpz_poly_is_x(const fmpz_poly_t op)
+{
+    return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0));
+}
+
+FMPZ_POLY_INLINE
 int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
 {
 	return ((poly->length == 0) && fmpz_is_zero(c)) ||

@@ -141,19 +141,3 @@ void fmpz_poly_fmpz_sub(fmpz_poly_t res, fmpz_t c, const fmpz_poly_t poly)
       _fmpz_poly_normalise(res);
    }
 }
-
-int __fmpz_poly_is_one(const fmpz_poly_t op)
-{
-    return (op->length) == 1 && (*(op->coeffs) == WORD(1));
-}
-
-int __fmpz_poly_is_zero(const fmpz_poly_t op)
-{
-   return op->length == 0;
-}
-
-int __fmpz_poly_is_x(const fmpz_poly_t op)
-{
-    return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0));
-}
-
