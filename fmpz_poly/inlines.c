@@ -35,18 +35,6 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int __fmpz_poly_print(const fmpz_poly_t poly)
-{
-    size_t len = fmpz_poly_fprint(stdout, poly);
-
-    return len;
-}
-
-int __fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
-{
-    return fmpz_poly_fprint_pretty(stdout, poly, x);
-}
-
 void fmpz_poly_add_si(fmpz_poly_t res, const fmpz_poly_t poly, slong c)
 {
    if (poly->length == 0)
