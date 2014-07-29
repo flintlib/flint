@@ -83,7 +83,7 @@ main(void)
     slong iter;
     FLINT_TEST_INIT(state);
 
-    flint_printf("hnf classical....");
+    flint_printf("hnf_classical....");
     fflush(stdout);
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
