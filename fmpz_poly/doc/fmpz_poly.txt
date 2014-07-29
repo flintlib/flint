@@ -3112,7 +3112,7 @@ void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
 
     Sets $f$ to the $q$-expansion to length $n$ of the
     Jacobi theta function raised to the power $r$, i.e. $\vartheta(q)^r$
-    where $\vartheta(q) = 1 + \sum_{k=1}^{\infty} q^{k^2}$.
+    where $\vartheta(q) = 1 + 2 \sum_{k=1}^{\infty} q^{k^2}$.
 
     This function uses sparse formulas for $r = 1, 2$
     and otherwise reduces to those cases using power series arithmetic.
