@@ -30,6 +30,119 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS)
     {
+#if 0
+        slong i, j, k, m, n;
+        fmpz_mat_t Btrans;
+        d_mat_t A;
+        double *d;
+        double s, fak, alpha, up, deltap, etap, thetap;
+        double c1, c2, c3, c4, c5, c6, c7;
+
+        alpha = 1 / sqrt(fl->delta - (fl->eta * fl->eta));
+
+        if (B->r == 0 || B->r == 1)
+            return 1;
+
+        fmpz_mat_init(Btrans, B->c, B->r);
+        fmpz_mat_transpose(Btrans, B);
+        m = Btrans->r;
+        n = Btrans->c;
+
+        c1 = (sqrt(6) + sqrt(3)) * m * sqrt(n - 1);
+        c2 = 2 * sqrt(1 + (n - 2) * fl->eta * fl->eta) / (1 + fl->eta);
+        c3 = (fabs(1 - fl->eta) * alpha +
+              1) * m * sqrt(n) / (((1 + fl->eta) * alpha - 1) * (sqrt(1.5) -
+                                                                 1));
+        c4 = FLINT_MAX(c3, sqrt(2) * c1 * c2);
+        c5 = 4 * (6 * m + 63);
+        c6 = 0.5 * n * c5;
+        c7 = c4 * c6;
+        up = c7 * pow((1 + fl->eta), n) * pow(alpha, n) * D_EPS;
+        if (up >= 1)
+        {
+            fmpz_mat_clear(Btrans);
+            return 0;
+        }
+
+        d_mat_init(A, m, n);
+
+        d = _d_vec_init(n);
+
+        if (fmpz_mat_get_d_mat(A, Btrans) == -1)
+        {
+            fmpz_mat_clear(Btrans);
+            d_mat_clear(A);
+            _d_vec_clear(d);
+            return 0;
+        }
+        fmpz_mat_clear(Btrans);
+
+        for (j = 0; j < n; j++)
+        {
+            s = 0.0;
+            for (i = j; i < m; i++)
+            {
+                s += d_mat_entry(A, i, j) * d_mat_entry(A, i, j);
+            }
+            s = sqrt(s);
+            d[j] = (d_mat_entry(A, j, j) > 0) ? (-s) : s;
+            fak = sqrt(s * (s + fabs(d_mat_entry(A, j, j))));
+            d_mat_entry(A, j, j) -= d[j];
+            if (fak != 0.0)
+            {
+                for (k = j; k < m; k++)
+                {
+                    d_mat_entry(A, k, j) /= fak;
+                }
+                for (i = j + 1; i < n; i++)
+                {
+                    s = 0.0;
+                    for (k = j; k < m; k++)
+                    {
+                        s += d_mat_entry(A, k, j) * d_mat_entry(A, k, i);
+                    }
+                    for (k = j; k < m; k++)
+                    {
+                        d_mat_entry(A, k, i) -= d_mat_entry(A, k, j) * s;
+                    }
+                }
+            }
+        }
+
+        deltap =
+            fl->delta * (1 - up) * (1 -
+                                    up) / ((1 + up) * (1 + up) * (1 +
+                                                                  2 * up *
+                                                                  fl->eta *
+                                                                  alpha));
+        etap = fl->eta / (1 - up);
+        thetap = up / (1 - up);
+
+        for (i = 0; i < n - 1; i++)
+        {
+            for (j = i + 1; j < n; j++)
+            {
+                if (fabs(d_mat_entry(A, i, j)) >
+                    (etap * fabs(d[i]) + thetap * fabs(d[j])))
+                {
+                    d_mat_clear(A);
+                    _d_vec_clear(d);
+                    return 0;
+                }
+            }
+            if (deltap * d[i] * d[i] >
+                (d_mat_entry(A, i, i + 1) * d_mat_entry(A, i, i + 1) +
+                 d[i + 1] * d[i + 1]))
+            {
+                d_mat_clear(A);
+                _d_vec_clear(d);
+                return 0;
+            }
+        }
+
+        d_mat_clear(A);
+        _d_vec_clear(d);
+#endif
         slong i, j, k, d = B->r, n = B->c;
         d_mat_t appB, Q, mu;
 

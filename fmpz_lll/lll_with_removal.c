@@ -28,19 +28,8 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
-                                 const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
+fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
+                      const fmpz_lll_t fl)
 {
-    return (gs_B !=
-            NULL) ? ((fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd)
-                      || fmpz_lll_is_reduced_mpf_with_removal(B, fl, gs_B,
-                                                              newd, prec))
-                     || ((fl->rt == Z_BASIS) ?
-                         fmpz_mat_is_reduced_with_removal(B, fl->delta,
-                                                          fl->eta, gs_B,
-                                                          newd) :
-                         fmpz_mat_is_reduced_gram_with_removal(B, fl->delta,
-                                                               fl->eta, gs_B,
-                                                               newd))) :
-        fmpz_lll_is_reduced(B, fl, prec);
+    return fmpz_lll_with_removal_ulll(B, U, WORD(250), gs_B, fl);
 }
