@@ -86,6 +86,12 @@ fmpz_mat_is_square(const fmpz_mat_t mat)
 void fmpz_mat_zero(fmpz_mat_t mat);
 void fmpz_mat_one(fmpz_mat_t mat);
 
+/* Windows */
+
+void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
+    slong c1, slong r2, slong c2);
+
+void fmpz_mat_window_clear(fmpz_mat_t window);
 
 /* Input and output  *********************************************************/
 

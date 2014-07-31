@@ -81,6 +81,25 @@ void fmpz_mat_one(fmpz_mat_t mat)
     and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
     truncation of a unit matrix.
 
+*******************************************************************************
+
+    Window
+
+*******************************************************************************
+
+void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
+                          slong c1, slong r2, slong c2)
+
+    Initializes the matrix \code{window} to be an \code{r2 - r1} by
+    \code{c2 - c1} submatrix of \code{mat} whose \code{(0,0)} entry
+    is the \code{(r1, c1)} entry of \code{mat}. The memory for the
+    elements of \code{window} is shared with \code{mat}.
+
+void fmpz_mat_window_clear(fmpz_mat_t window)
+
+    Clears the matrix \code{window} and releases any memory that it
+    uses. Note that the memory to the underlying matrix that
+    \code{window} points to is not freed.
 
 *******************************************************************************
 
