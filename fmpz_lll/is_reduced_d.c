@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <fenv.h>
 #include "fmpz_lll.h"
 
 int
@@ -30,6 +31,430 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS)
     {
+        slong i, j, k, m, n;
+        d_mat_t A, Q, R, V, Wu, Wd, bound, bound2, bound3, boundt, mm, rm, mn,
+            rn, absR;
+        double *du, *dd;
+        double s, norm = 0, ti, tj;
+
+        if (B->r == 0 || B->r == 1)
+            return 1;
+
+        m = B->c;
+        n = B->r;
+
+        d_mat_init(A, m, n);
+        d_mat_init(Q, m, n);
+        d_mat_init(R, n, n);
+        d_mat_init(V, n, n);
+        d_mat_zero(R);
+        d_mat_zero(V);
+
+        if (fmpz_mat_get_d_mat_transpose(A, B) == -1)
+        {
+            d_mat_clear(A);
+            d_mat_clear(Q);
+            d_mat_clear(R);
+            d_mat_clear(V);
+            return 0;
+        }
+
+        for (k = 0; k < n; k++)
+        {
+            for (j = 0; j < m; j++)
+            {
+                d_mat_entry(Q, j, k) = d_mat_entry(A, j, k);
+            }
+            for (i = 0; i < k; i++)
+            {
+                s = 0;
+                for (j = 0; j < m; j++)
+                {
+                    s += d_mat_entry(Q, j, i) * d_mat_entry(Q, j, k);
+                }
+                d_mat_entry(R, i, k) = s;
+                for (j = 0; j < m; j++)
+                {
+                    d_mat_entry(Q, j, k) -= s * d_mat_entry(Q, j, i);
+                }
+            }
+            s = 0;
+            for (j = 0; j < m; j++)
+            {
+                s += d_mat_entry(Q, j, k) * d_mat_entry(Q, j, k);
+            }
+            d_mat_entry(R, k, k) = s = sqrt(s);
+            if (s != 0)
+            {
+                s = 1 / s;
+                for (j = 0; j < m; j++)
+                {
+                    d_mat_entry(Q, j, k) *= s;
+                }
+            }
+        }
+        d_mat_clear(Q);
+
+        for (j = n - 1; j >= 0; j--)
+        {
+            d_mat_entry(V, j, j) = 1.0 / d_mat_entry(R, j, j);
+            for (i = j + 1; i < n; i++)
+            {
+                for (k = j + 1; k < n; k++)
+                {
+                    d_mat_entry(V, j, i) +=
+                        d_mat_entry(V, k, i) * d_mat_entry(R, j, k);
+                }
+                d_mat_entry(V, j, i) *= -d_mat_entry(V, j, j);
+            }
+        }
+
+        d_mat_init(Wu, n, n);
+        d_mat_init(Wd, n, n);
+        du = _d_vec_init(n);
+        dd = _d_vec_init(n);
+
+        fesetround(FE_DOWNWARD);
+        d_mat_mul(Wd, R, V);
+        for (i = 0; i < n; i++)
+        {
+            dd[i] = d_mat_entry(Wd, i, i) - 1;
+        }
+        fesetround(FE_UPWARD);
+        d_mat_mul(Wu, R, V);
+        for (i = 0; i < n; i++)
+        {
+            du[i] = d_mat_entry(Wu, i, i) - 1;
+        }
+        for (i = 0; i < n; i++)
+        {
+            s = 0;
+            for (j = 0; j < n; j++)
+            {
+                if (i != j)
+                    s += FLINT_MAX(fabs(d_mat_entry(Wd, i, j)),
+                                   fabs(d_mat_entry(Wu, i, j)));
+                else
+                    s += FLINT_MAX(fabs(dd[i]), fabs(du[i]));
+            }
+            norm = FLINT_MAX(norm, s);
+        }
+        if (norm >= 1)
+        {
+            d_mat_clear(A);
+            d_mat_clear(R);
+            d_mat_clear(V);
+            d_mat_clear(Wu);
+            d_mat_clear(Wd);
+            _d_vec_clear(du);
+            _d_vec_clear(dd);
+            return 0;
+        }
+
+        d_mat_init(bound, n, n);
+
+        fesetround(FE_DOWNWARD);
+        for (i = 0; i < n; i++)
+        {
+            dd[i] = d_mat_entry(Wd, i, i) - 2;
+        }
+        fesetround(FE_UPWARD);
+        for (i = 0; i < n; i++)
+        {
+            du[i] = d_mat_entry(Wu, i, i) - 2;
+        }
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                if (j > i)
+                {
+                    d_mat_entry(bound, i, j) =
+                        FLINT_MAX(fabs(d_mat_entry(Wd, i, j)),
+                                  fabs(d_mat_entry(Wu, i, j))) +
+                        norm * norm / (1.0 - norm);
+                }
+                else if (j < i)
+                {
+                    d_mat_entry(bound, i, j) =
+                        FLINT_MAX(fabs(d_mat_entry(Wd, i, j)),
+                                  fabs(d_mat_entry(Wu, i, j)));
+                }
+                else
+                {
+                    d_mat_entry(bound, i, j) =
+                        FLINT_MAX(fabs(dd[i]),
+                                  fabs(du[i])) + norm * norm / (1.0 - norm);
+                }
+            }
+        }
+        _d_vec_clear(dd);
+        _d_vec_clear(du);
+
+        d_mat_init(mm, n, n);
+        d_mat_init(rm, n, n);
+        d_mat_init(mn, n, n);
+        d_mat_init(rn, n, n);
+        d_mat_init(bound2, n, n);
+
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(mm, j, i) =
+                    (d_mat_entry(Wu, i, j) + d_mat_entry(Wd, i, j)) / 2;
+                d_mat_entry(rm, j, i) =
+                    d_mat_entry(mm, j, i) - d_mat_entry(Wd, i, j);
+                d_mat_entry(mn, i, j) =
+                    (d_mat_entry(Wu, i, j) + d_mat_entry(Wd, i, j)) / 2;
+                d_mat_entry(rn, i, j) =
+                    d_mat_entry(mn, i, j) - d_mat_entry(Wd, i, j);
+            }
+        }
+        fesetround(FE_DOWNWARD);
+        d_mat_mul(Wd, mm, mn);
+        for (i = 0; i < n; i++)
+        {
+            d_mat_entry(Wd, i, i) -= 1;
+        }
+        fesetround(FE_UPWARD);
+        d_mat_mul(Wu, mm, mn);
+        for (i = 0; i < n; i++)
+        {
+            d_mat_entry(Wu, i, i) -= 1;
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(Wu, i, j) =
+                    FLINT_MAX(fabs(d_mat_entry(Wd, i, j)),
+                              fabs(d_mat_entry(Wu, i, j)));
+                d_mat_entry(mm, i, j) = fabs(d_mat_entry(mm, i, j));
+                d_mat_entry(mn, i, j) = fabs(d_mat_entry(mn, i, j));
+            }
+        }
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(bound2, i, j) =
+                    d_mat_entry(mn, i, j) + d_mat_entry(rn, i, j);
+            }
+        }
+        d_mat_mul(bound2, rm, bound2);
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(bound2, i, j) += d_mat_entry(Wu, i, j);
+            }
+        }
+        d_mat_mul(Wu, mm, rn);
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(bound2, i, j) += d_mat_entry(Wu, i, j);
+            }
+        }
+
+        d_mat_clear(Wu);
+        d_mat_clear(Wd);
+        d_mat_clear(mm);
+        d_mat_clear(mn);
+        d_mat_clear(rm);
+        d_mat_clear(rn);
+
+        d_mat_init(Wu, m, n);
+        d_mat_init(Wd, m, n);
+        d_mat_init(mm, n, m);
+        d_mat_init(mn, m, n);
+        d_mat_init(rm, n, m);
+        d_mat_init(rn, m, n);
+
+        fesetround(FE_DOWNWARD);
+        d_mat_mul(Wd, A, V);
+        fesetround(FE_UPWARD);
+        d_mat_mul(Wu, A, V);
+
+        d_mat_clear(A);
+        d_mat_clear(V);
+
+        d_mat_init(bound3, n, n);
+
+        for (i = 0; i < m; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(mm, j, i) =
+                    (d_mat_entry(Wu, i, j) + d_mat_entry(Wd, i, j)) / 2;
+                d_mat_entry(rm, j, i) =
+                    d_mat_entry(mm, j, i) - d_mat_entry(Wd, i, j);
+                d_mat_entry(mn, i, j) =
+                    (d_mat_entry(Wu, i, j) + d_mat_entry(Wd, i, j)) / 2;
+                d_mat_entry(rn, i, j) =
+                    d_mat_entry(mn, i, j) - d_mat_entry(Wd, i, j);
+            }
+        }
+
+        d_mat_clear(Wd);
+        d_mat_clear(Wu);
+
+        d_mat_init(Wd, n, n);
+        d_mat_init(Wu, n, n);
+
+        fesetround(FE_DOWNWARD);
+        d_mat_mul(Wd, mm, mn);
+        for (i = 0; i < n; i++)
+        {
+            d_mat_entry(Wd, i, i) -= 1;
+        }
+        fesetround(FE_UPWARD);
+        d_mat_mul(Wu, mm, mn);
+        for (i = 0; i < n; i++)
+        {
+            d_mat_entry(Wu, i, i) -= 1;
+            for (j = 0; j < m; j++)
+            {
+                if (j < n)
+                {
+                    d_mat_entry(Wu, i, j) =
+                        FLINT_MAX(fabs(d_mat_entry(Wd, i, j)),
+                                  fabs(d_mat_entry(Wu, i, j)));
+                }
+                d_mat_entry(mm, i, j) = fabs(d_mat_entry(mm, i, j));
+            }
+        }
+
+        d_mat_clear(Wd);
+        d_mat_init(Wd, m, n);
+
+        for (i = 0; i < m; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(Wd, i, j) =
+                    fabs(d_mat_entry(mn, i, j)) + d_mat_entry(rn, i, j);
+            }
+        }
+        d_mat_mul(bound3, rm, Wd);
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(bound3, i, j) += d_mat_entry(Wu, i, j);
+            }
+        }
+        d_mat_mul(Wu, mm, rn);
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(bound3, i, j) += d_mat_entry(Wu, i, j);
+            }
+        }
+
+        d_mat_clear(Wu);
+        d_mat_clear(Wd);
+        d_mat_clear(mm);
+        d_mat_clear(mn);
+        d_mat_clear(rm);
+        d_mat_clear(rn);
+
+        d_mat_init(boundt, n, n);
+
+        d_mat_transpose(boundt, bound);
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                d_mat_entry(bound2, i, j) =
+                    fabs(d_mat_entry(bound2, i, j)) +
+                    fabs(d_mat_entry(bound3, i, j));
+            }
+        }
+        d_mat_mul(bound, bound2, bound);
+        d_mat_mul(bound, boundt, bound);
+
+        d_mat_clear(bound2);
+        d_mat_clear(bound3);
+        d_mat_clear(boundt);
+
+        norm = 0;
+        for (i = 0; i < n; i++)
+        {
+            s = 0;
+            for (j = 0; j < n; j++)
+            {
+                s += fabs(d_mat_entry(bound, i, j));
+            }
+            norm = FLINT_MAX(norm, s);
+        }
+        if (norm >= 1)
+        {
+            d_mat_clear(R);
+            d_mat_clear(bound);
+            return 0;
+        }
+
+        d_mat_init(absR, n, n);
+        for (i = 0; i < n; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                if (j >= i)
+                {
+                    d_mat_entry(bound, i, j) += norm * norm / (1.0 - norm);
+                }
+                else
+                {
+                    d_mat_entry(bound, i, j) = 0;
+                }
+                d_mat_entry(absR, i, j) = fabs(d_mat_entry(R, i, j));
+            }
+        }
+        d_mat_mul(bound, bound, absR);
+
+        d_mat_clear(absR);
+
+        for (i = 0; i < n - 1; i++)
+        {
+            fesetround(FE_DOWNWARD);
+            ti = (d_mat_entry(R, i, i) - d_mat_entry(bound, i, i)) * fl->eta;
+            fesetround(FE_UPWARD);
+            for (j = i + 1; j < n; j++)
+            {
+                tj = fabs(d_mat_entry(R, i, j)) + d_mat_entry(bound, i, j);
+                if (tj > ti)
+                {
+                    d_mat_clear(R);
+                    d_mat_clear(bound);
+                    return 0;
+                }
+            }
+            ti = d_mat_entry(R, i, i) + d_mat_entry(bound, i, i);
+            fesetround(FE_DOWNWARD);
+            tj = d_mat_entry(R, i + 1, i + 1) - d_mat_entry(bound, i + 1,
+                                                            i + 1);
+            s = ((fabs(d_mat_entry(R, i, i + 1)) -
+                  d_mat_entry(bound, i,
+                              i + 1)) / ti) * ((fabs(d_mat_entry(R, i,
+                                                                 i + 1)) -
+                                                d_mat_entry(bound, i,
+                                                            i + 1)) / ti) -
+                fl->delta;
+            s = -s;
+            fesetround(FE_UPWARD);
+            s = sqrt(s) * ti;
+            if (s > tj)
+            {
+                d_mat_clear(R);
+                d_mat_clear(bound);
+                return 0;
+            }
+        }
+
+        d_mat_clear(R);
+        d_mat_clear(bound);
+
 #if 0
         slong i, j, k, m, n;
         fmpz_mat_t Btrans;
@@ -38,7 +463,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         double s, fak, alpha, up, deltap, etap, thetap;
         double c1, c2, c3, c4, c5, c6, c7;
 
-        alpha = 1 / sqrt(fl->delta - (fl->eta * fl->eta));
+        alpha = 1 / sqrt(fl->deltsa - (fl->eta * fl->eta));
 
         if (B->r == 0 || B->r == 1)
             return 1;
@@ -142,7 +567,8 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 
         d_mat_clear(A);
         _d_vec_clear(d);
-#endif
+
+
         slong i, j, k, d = B->r, n = B->c;
         d_mat_t appB, Q, mu;
 
@@ -208,6 +634,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         d_mat_clear(appB);
         d_mat_clear(Q);
         d_mat_clear(mu);
+#endif
     }
     else
     {
