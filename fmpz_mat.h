@@ -328,6 +328,8 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A);
 
 int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
 
+int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
+
 void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
 
 /* RQ Decomposition *********************************************************/
