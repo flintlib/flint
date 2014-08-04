@@ -23,52 +23,7 @@
 
 ******************************************************************************/
 
-/* Rounding modes */
-#define FE_TONEAREST 0x0000
-#define FE_DOWNWARD 0x0400
-#define FE_UPWARD 0x0800
-#define FE_TOWARDZERO 0x0c00
-#define _ROUND_MASK (FE_TONEAREST | FE_DOWNWARD | \
-FE_UPWARD | FE_TOWARDZERO)
-
-#ifndef __GNUC__
-#define __asm__ asm
-#define __inline__ inline
-#endif
-
-static __inline__ int
-fegetround(void)
-{
-    int cw;
-
-    /* Store control word */
-    __asm__ volatile ("fnstcw %0":"=m" (cw));
-
-    return (cw & _ROUND_MASK);
-}
-
-static __inline__ int
-fesetround(int __rounding_direction)
-{
-    int cw;
-
-    /* Check whether requested rounding direction is supported */
-    if (__rounding_direction & ~_ROUND_MASK)
-        return -1;
-
-    /* Store control word */
-    __asm__ volatile ("fnstcw %0":"=m" (cw));
-
-    /* Set the rounding direction */
-    cw &= ~_ROUND_MASK;
-    cw |= __rounding_direction;
-
-    /* Load control word */
-    __asm__ volatile ("fldcw %0"::"m" (cw));
-
-    return 0;
-}
-
+#include <fenv.h>
 #include "fmpz_lll.h"
 
 int
