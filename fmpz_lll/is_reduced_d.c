@@ -23,7 +23,52 @@
 
 ******************************************************************************/
 
-#include <fenv.h>
+/* Rounding modes */
+#define FE_TONEAREST 0x0000
+#define FE_DOWNWARD 0x0400
+#define FE_UPWARD 0x0800
+#define FE_TOWARDZERO 0x0c00
+#define _ROUND_MASK (FE_TONEAREST | FE_DOWNWARD | \
+FE_UPWARD | FE_TOWARDZERO)
+
+#ifndef __GNUC__
+#define __asm__ asm
+#define __inline__ inline
+#endif
+
+static __inline__ int
+fegetround(void)
+{
+    int cw;
+
+    /* Store control word */
+    __asm__ volatile ("fnstcw %0":"=m" (cw));
+
+    return (cw & _ROUND_MASK);
+}
+
+static __inline__ int
+fesetround(int __rounding_direction)
+{
+    int cw;
+
+    /* Check whether requested rounding direction is supported */
+    if (__rounding_direction & ~_ROUND_MASK)
+        return -1;
+
+    /* Store control word */
+    __asm__ volatile ("fnstcw %0":"=m" (cw));
+
+    /* Set the rounding direction */
+    cw &= ~_ROUND_MASK;
+    cw |= __rounding_direction;
+
+    /* Load control word */
+    __asm__ volatile ("fldcw %0"::"m" (cw));
+
+    return 0;
+}
+
 #include "fmpz_lll.h"
 
 int
@@ -36,6 +81,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             rn, absR;
         double *du, *dd;
         double s, norm = 0, ti, tj;
+        int rounding_direction = fegetround();
 
         if (B->r == 0 || B->r == 1)
             return 1;
@@ -148,6 +194,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             d_mat_clear(Wd);
             _d_vec_clear(du);
             _d_vec_clear(dd);
+            fesetround(rounding_direction);
             return 0;
         }
 
@@ -392,6 +439,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         {
             d_mat_clear(R);
             d_mat_clear(bound);
+            fesetround(rounding_direction);
             return 0;
         }
 
@@ -454,6 +502,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 
         d_mat_clear(R);
         d_mat_clear(bound);
+        fesetround(rounding_direction);
 
 #if 0
         slong i, j, k, m, n;
