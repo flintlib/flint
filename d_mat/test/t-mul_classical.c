@@ -31,7 +31,7 @@
 #include "d_mat.h"
 #include "ulong_extras.h"
 
-#define D_MAT_MUL_EPS (1e-11)
+#define D_MAT_MUL_CLASSICAL_EPS (1e-11)
 
 int
 main(void)
@@ -65,12 +65,12 @@ main(void)
         d_mat_randtest(B, state, 0, 0);
         d_mat_randtest(C, state, 0, 0);
 
-        d_mat_mul(D, B, C);
-        d_mat_mul(E, A, B);
-        d_mat_mul(F, A, D);
-        d_mat_mul(G, E, C);
+        d_mat_mul_classical(D, B, C);
+        d_mat_mul_classical(E, A, B);
+        d_mat_mul_classical(F, A, D);
+        d_mat_mul_classical(G, E, C);
 
-        if (!d_mat_approx_equal(F, G, D_MAT_MUL_EPS))
+        if (!d_mat_approx_equal(F, G, D_MAT_MUL_CLASSICAL_EPS))
         {
             flint_printf("FAIL: results not equal\n");
             d_mat_print(F);
@@ -78,7 +78,7 @@ main(void)
             abort();
         }
 
-        d_mat_mul(A, A, B);
+        d_mat_mul_classical(A, A, B);
 
         if (!d_mat_equal(A, E))
         {

@@ -27,7 +27,7 @@
 #include "d_mat.h"
 
 void
-d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
+d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B)
 {
     slong ar, bc, br;
     slong jj, kk, i, j, k, blocksize;
@@ -43,7 +43,7 @@ d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
     {
         d_mat_t t;
         d_mat_init(t, ar, bc);
-        d_mat_mul(t, A, B);
+        d_mat_mul_classical(t, A, B);
         d_mat_swap(C, t);
         d_mat_clear(t);
         return;
@@ -51,7 +51,8 @@ d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
 
     if (C->r != ar || C->c != bc)
     {
-        flint_printf("Exception (d_mat_mul). Incompatible dimensions.\n");
+        flint_printf
+            ("Exception (d_mat_mul_classical). Incompatible dimensions.\n");
         abort();
     }
 

@@ -97,7 +97,7 @@ void d_mat_transpose(d_mat_t B, const d_mat_t A);
 
 /* Multiplication */
 
-void d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B);
+void d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B);
 
 /* Permutations */
 

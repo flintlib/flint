@@ -62,7 +62,7 @@ main(void)
         fmpz_mat_chol_d(R, A);
         d_mat_transpose(Rt, R);
 
-        d_mat_mul(Btmp, R, Rt);
+        d_mat_mul_classical(Btmp, R, Rt);
 
         if (!d_mat_approx_equal(Atmp, Btmp, FMPZ_MAT_CHOL_EPS))
         {

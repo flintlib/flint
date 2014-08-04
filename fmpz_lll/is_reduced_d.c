@@ -31,6 +31,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS)
     {
+        /* NOTE: this algorithm should *not* be changed */
         slong i, j, k, m, n;
         d_mat_t A, Q, R, V, Wu, Wd, bound, bound2, bound3, boundt, mm, rm, mn,
             rn, absR;
@@ -116,13 +117,13 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         dd = _d_vec_init(n);
 
         fesetround(FE_DOWNWARD);
-        d_mat_mul(Wd, R, V);
+        d_mat_mul_classical(Wd, R, V);
         for (i = 0; i < n; i++)
         {
             dd[i] = d_mat_entry(Wd, i, i) - 1;
         }
         fesetround(FE_UPWARD);
-        d_mat_mul(Wu, R, V);
+        d_mat_mul_classical(Wu, R, V);
         for (i = 0; i < n; i++)
         {
             du[i] = d_mat_entry(Wu, i, i) - 1;
@@ -214,13 +215,13 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
             }
         }
         fesetround(FE_DOWNWARD);
-        d_mat_mul(Wd, mm, mn);
+        d_mat_mul_classical(Wd, mm, mn);
         for (i = 0; i < n; i++)
         {
             d_mat_entry(Wd, i, i) -= 1;
         }
         fesetround(FE_UPWARD);
-        d_mat_mul(Wu, mm, mn);
+        d_mat_mul_classical(Wu, mm, mn);
         for (i = 0; i < n; i++)
         {
             d_mat_entry(Wu, i, i) -= 1;
@@ -241,7 +242,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                     d_mat_entry(mn, i, j) + d_mat_entry(rn, i, j);
             }
         }
-        d_mat_mul(bound2, rm, bound2);
+        d_mat_mul_classical(bound2, rm, bound2);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
@@ -249,7 +250,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                 d_mat_entry(bound2, i, j) += d_mat_entry(Wu, i, j);
             }
         }
-        d_mat_mul(Wu, mm, rn);
+        d_mat_mul_classical(Wu, mm, rn);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
@@ -273,9 +274,9 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         d_mat_init(rn, m, n);
 
         fesetround(FE_DOWNWARD);
-        d_mat_mul(Wd, A, V);
+        d_mat_mul_classical(Wd, A, V);
         fesetround(FE_UPWARD);
-        d_mat_mul(Wu, A, V);
+        d_mat_mul_classical(Wu, A, V);
 
         d_mat_clear(A);
         d_mat_clear(V);
@@ -304,13 +305,13 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
         d_mat_init(Wu, n, n);
 
         fesetround(FE_DOWNWARD);
-        d_mat_mul(Wd, mm, mn);
+        d_mat_mul_classical(Wd, mm, mn);
         for (i = 0; i < n; i++)
         {
             d_mat_entry(Wd, i, i) -= 1;
         }
         fesetround(FE_UPWARD);
-        d_mat_mul(Wu, mm, mn);
+        d_mat_mul_classical(Wu, mm, mn);
         for (i = 0; i < n; i++)
         {
             d_mat_entry(Wu, i, i) -= 1;
@@ -337,7 +338,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                     fabs(d_mat_entry(mn, i, j)) + d_mat_entry(rn, i, j);
             }
         }
-        d_mat_mul(bound3, rm, Wd);
+        d_mat_mul_classical(bound3, rm, Wd);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
@@ -345,7 +346,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                 d_mat_entry(bound3, i, j) += d_mat_entry(Wu, i, j);
             }
         }
-        d_mat_mul(Wu, mm, rn);
+        d_mat_mul_classical(Wu, mm, rn);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
@@ -373,8 +374,8 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                     fabs(d_mat_entry(bound3, i, j));
             }
         }
-        d_mat_mul(bound, bound2, bound);
-        d_mat_mul(bound, boundt, bound);
+        d_mat_mul_classical(bound, bound2, bound);
+        d_mat_mul_classical(bound, boundt, bound);
 
         d_mat_clear(bound2);
         d_mat_clear(bound3);
@@ -414,7 +415,7 @@ fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
                 d_mat_entry(absR, i, j) = fabs(d_mat_entry(R, i, j));
             }
         }
-        d_mat_mul(bound, bound, absR);
+        d_mat_mul_classical(bound, bound, absR);
 
         d_mat_clear(absR);
 

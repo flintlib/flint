@@ -61,7 +61,7 @@ main(void)
 
         fmpz_mat_rq_d(R, Q, A);
 
-        d_mat_mul(Btmp, R, Q);
+        d_mat_mul_classical(Btmp, R, Q);
 
         if (!d_mat_approx_equal(Atmp, Btmp, FMPZ_MAT_RQ_EPS))
         {

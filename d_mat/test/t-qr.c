@@ -63,7 +63,7 @@ main(void)
 
         d_mat_qr(Q, R, A);
 
-        d_mat_mul(B, Q, R);
+        d_mat_mul_classical(B, Q, R);
 
         if (!d_mat_approx_equal(A, B, D_MAT_QR_EQ_EPS))
         {

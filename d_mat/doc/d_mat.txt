@@ -150,7 +150,7 @@ void d_mat_transpose(d_mat_t B, const d_mat_t A)
 
 *******************************************************************************
 
-void d_mat_mul(d_mat_t C, const d_mat_t A, const d_mat_t B)
+void d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B)
 
     Sets \code{C} to the matrix product $C = A B$. The matrices must have
     compatible dimensions for matrix multiplication (an exception is raised
