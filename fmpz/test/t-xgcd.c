@@ -42,7 +42,7 @@ main(void)
     
 
     /* Test aliasing of d and f, a and g */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, b, c, f, g, F, G;
 
@@ -249,7 +249,7 @@ main(void)
         fmpz_clear(G);
     }
 
-    /* Test a f  + b g == d */
+    /* Test a f  + b g == d and d >= 0 */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, b, f, g, t1, t2;
@@ -274,7 +274,7 @@ main(void)
         fmpz_mul(t2, b, g);
         fmpz_add(t1, t1, t2);
 
-        result = fmpz_equal(t1, d);
+        result = fmpz_equal(t1, d) && fmpz_sgn(d) >= 0;
         if (!result)
         {
             flint_printf("FAIL:\n\n");
