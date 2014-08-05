@@ -29,7 +29,7 @@ void
 _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     mp_bitcnt_t bits)
 {
-    slong i, j;
+    slong i, j, k;
 
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
@@ -78,19 +78,21 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     fmpz_comb_temp_init(comb_temp, comb);
 
     /* Calculate residues of A */
-    for (i = 0; i < A->r * A->c; i++)
-    {
-        fmpz_multi_mod_ui(residues, &A->entries[i], comb, comb_temp);
-        for (j = 0; j < num_primes; j++)
-            mod_A[j]->entries[i] = residues[j];
+    for (i = 0; i < A->r; i++)
+    {   for (j = 0; j < A->c; j++)
+        {   fmpz_multi_mod_ui(residues, &(A->rows[i][j]), comb, comb_temp);
+            for (k = 0; k < num_primes; k++)
+                mod_A[k]->rows[i][j] = residues[k];
+        }
     }
 
     /* Calculate residues of B */
-    for (i = 0; i < B->r * B->c; i++)
-    {
-        fmpz_multi_mod_ui(residues, &B->entries[i], comb, comb_temp);
-        for (j = 0; j < num_primes; j++)
-            mod_B[j]->entries[i] = residues[j];
+    for (i = 0; i < B->r; i++)
+    {   for (j = 0; j < B->c; j++)
+        {   fmpz_multi_mod_ui(residues, &B->rows[i][j], comb, comb_temp);
+            for (k = 0; k < num_primes; k++)
+                mod_B[k]->rows[i][j] = residues[k];
+        }
     }
 
     /* Multiply */
@@ -100,11 +102,12 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     }
 
     /* Chinese remaindering */
-    for (i = 0; i < C->r * C->c; i++)
-    {
-        for (j = 0; j < num_primes; j++)
-            residues[j] = mod_C[j]->entries[i];
-        fmpz_multi_CRT_ui(&C->entries[i], residues, comb, comb_temp, 1);
+    for (i = 0; i < C->r; i++)
+    {   for (j = 0; j < C->c; j++)
+        {   for (k = 0; k < num_primes; k++)
+                residues[k] = mod_C[k]->rows[i][j];
+            fmpz_multi_CRT_ui(&C->rows[i][j], residues, comb, comb_temp, 1);
+        }
     }
 
     /* Cleanup */
