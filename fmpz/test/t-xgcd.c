@@ -42,7 +42,7 @@ main(void)
     
 
     /* Test aliasing of d and f, a and g */
-    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, b, c, f, g, F, G;
 
