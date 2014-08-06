@@ -472,6 +472,8 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
 static __inline__ void
 fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
 {
