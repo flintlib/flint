@@ -618,7 +618,7 @@ void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
 *******************************************************************************
 
-    Charactersitic polynomial
+    Characteristic polynomial
 
 *******************************************************************************
 
