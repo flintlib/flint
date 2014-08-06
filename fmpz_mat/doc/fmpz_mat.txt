@@ -863,6 +863,15 @@ slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den,
     Hermite normal form
 
 *******************************************************************************
+void fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
+
+    Computes an integer matrix \code{H} such that \code{H} is the unique (row)
+    Hermite normal form of \code{A}. The algorithm used is selected from the
+    implementations in FLINT to be the one most likely to be optimal, based on
+    the characteristics of the input matrix.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
 
 void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
 
@@ -877,7 +886,7 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix \code{H} such that \code{H} is the unique (row)
     Hermite normal form of \code{A}. The algorithm used is an improvement on the
-    basic algorithm and uses extended gcds to speed up computation this method
+    basic algorithm and uses extended gcds to speed up computation, this method
     is described, for example, in \cite[Algorithm 2.4.5]{Coh1996}.
 
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
@@ -912,6 +921,51 @@ void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
     Hermite normal form of the $n\times n$ matrix \code{A}, where \code{A} is
     assumed to be of rank $n$. The algorithm used here is due to Pernet and
     Stein \cite{PernetStein2010}.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+*******************************************************************************
+
+    Smith normal form
+
+*******************************************************************************
+
+void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
+
+    Computes an integer matrix \code{S} such that \code{S} is the unique Smith
+    normal form of \code{A}. The algorithm used is selected from the
+    implementations in FLINT to be the one most likely to be optimal, based on
+    the characteristics of the input matrix.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A)
+
+    Computes an integer matrix \code{S} such that \code{S} is the unique Smith
+    normal form of the diagonal matrix \code{A}. The algorithm used simply takes
+    gcds of pairs on the diagonal in turn until the Smith form is obtained.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
+
+    % TODO
+    Computes an integer matrix \code{S} such that \code{S} is the unique Smith
+    normal form of the diagonal matrix \code{A}. The algorithm used simply takes
+    gcds of pairs on the diagonal in turn until the Smith form is obtained.
+
+    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
+
+    % TODO
+    Computes an integer matrix \code{S} such that \code{S} is the unique Smith
+    normal form of the diagonal matrix \code{A}. The algorithm used simply takes
+    gcds of pairs on the diagonal in turn until the Smith form is obtained.
 
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
