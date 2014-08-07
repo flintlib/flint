@@ -974,7 +974,7 @@ fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly
                          const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
 
 void
-_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res,
+_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                  const fmpz_mod_poly_struct * polys, slong len1, slong l,
                  const fmpz * poly, slong len, const fmpz * polyinv,
                  slong leninv, const fmpz_t p);
@@ -983,6 +983,13 @@ void
 fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                     const fmpz_mod_poly_struct * polys, slong len1, slong n,
                     const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * res,
+                                                const fmpz_mod_poly_struct *
+                                                polys, slong len1, slong n,
+                                                const fmpz_mod_poly_t poly,
+                                                const fmpz_mod_poly_t polyinv);
 
 /*  Radix conversion *********************************************************/
 
