@@ -33,12 +33,11 @@
 
 void
 _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                                             const nmod_poly_struct *
-                                                 polys, slong lenpolys,
-                                                 slong l, mp_srcptr poly,
-                                                 slong len,
-                                                 mp_srcptr polyinv,
-                                                 slong leninv, nmod_t mod)
+                                             const nmod_poly_struct * polys,
+                                             slong lenpolys, slong l,
+                                             mp_srcptr poly, slong len,
+                                             mp_srcptr polyinv, slong leninv,
+                                             nmod_t mod)
 {
     nmod_mat_t A, B, C;
     mp_ptr t, h;
@@ -151,8 +150,8 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     {
         for (i = 0; i < n; i++)
         {
-            nmod_poly_init_preinv (res + i, poly->mod.n, poly->mod.ninv);
-            nmod_poly_set (res + i, polys + i);
+            nmod_poly_init_preinv(res + i, poly->mod.n, poly->mod.ninv);
+            nmod_poly_set(res + i, polys + i);
         }
         return;
     }
