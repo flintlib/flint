@@ -28,7 +28,7 @@
 #include "fmpz_lll.h"
 
 void
-fmpz_lll_mod_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
+fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
 {
     if (fl->rt == Z_BASIS)
     {
@@ -74,11 +74,11 @@ fmpz_lll_mod_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
         {
             if (full_prec == 0)
             {
-                fmpz_mat_lll_mod(big_td, qfl);
+                fmpz_mat_lll_storjohann(big_td, qfl);
             }
             else
             {
-                fmpz_mat_lll_mod(FM, qfl);
+                fmpz_mat_lll_storjohann(FM, qfl);
             }
 
             if (full_prec == 1)

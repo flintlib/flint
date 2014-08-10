@@ -174,7 +174,7 @@ int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const f
 
 /* Modified ULLL  ************************************************************/
 
-void fmpz_lll_mod_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl);
+void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl);
 
 
 /* double heuristic_scalar_product(double * vec1, double * vec2, ulong n, 

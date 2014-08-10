@@ -26,7 +26,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_lll_mod(fmpz_mat_t A, const fmpq_lll_t fl)
+fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
 {
     slong n, np, i, j, k;
     double e;
