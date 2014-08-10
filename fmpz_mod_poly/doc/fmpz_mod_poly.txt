@@ -89,6 +89,12 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len)
     is truncated to have the given length.  Discarded coefficients are
     not necessarily set to zero.
 
+void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, 
+                                           const fmpz_mod_poly_t poly, slong n)
+
+    Notionally truncate \code{poly} to length $n$ and set \code{res} to the
+    result. The result is normalised.
+
 *******************************************************************************
 
     Randomisation
@@ -271,6 +277,10 @@ int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly)
 
     Returns non-zero if the polynomial is the constant $1$.
 
+int fmpz_mod_poly_is_x(const fmpz_mod_poly_t poly)
+
+    Returns non-zero if the polynomial is the degree $1$ polynomial $x$.
+
 *******************************************************************************
 
     Getting and setting coefficients
@@ -405,6 +415,25 @@ void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res,
     const fmpz_mod_poly_t poly, const fmpz_t x)
 
     Sets \code{res} to \code{poly} multiplied by $x$.
+
+*******************************************************************************
+
+    Scalar division
+
+*******************************************************************************
+
+void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, 
+                                                const fmpz_t x, const fmpz_t p)
+
+    Sets \code{(res, len}) to \code{(poly, len)} divided by $x$ (i.e. 
+    multiplied by the inverse of $x \pmod{p}$). The result is reduced modulo
+    $p$.
+
+void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res, 
+                                    const fmpz_mod_poly_t poly, const fmpz_t x)
+
+    Sets \code{res} to \code{poly} divided by $x$, (i.e. multiplied by the 
+    inverse of $x \pmod{p}$). The result is reduced modulo $p$.
 
 *******************************************************************************
 

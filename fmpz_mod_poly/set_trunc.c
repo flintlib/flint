@@ -27,13 +27,14 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
 void
-fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
 {
     if (poly == res)
     {
-        fmpz_poly_truncate(res, n);
+        fmpz_mod_poly_truncate(res, n);
     }
     else
     {
@@ -43,9 +44,9 @@ fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
         while (rlen > 0 && fmpz_is_zero(poly->coeffs + rlen - 1))
             rlen--;
 
-        fmpz_poly_fit_length(res, rlen);
+        fmpz_mod_poly_fit_length(res, rlen);
         _fmpz_vec_set(res->coeffs, poly->coeffs, rlen);
-        _fmpz_poly_set_length(res, rlen);
+        _fmpz_mod_poly_set_length(res, rlen);
     }
 }
 
