@@ -163,6 +163,12 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
 
     Requires that \code{degs} has enough space for $(n/2)+1 * sizeof(slong)$.
 
+void
+fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res,
+                               const fmpz_mod_poly_t poly, slong * const *degs)
+
+    Multithreaded version of \code{fmpz_mod_poly_factor_distinct_deg}.
+
 void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                                        const fmpz_mod_poly_t f)
 
@@ -195,3 +201,12 @@ void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
 
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the Berlekamp algorithm.
+
+void *
+_fmpz_mod_poly_interval_poly_worker(void* arg_ptr)
+
+    Worker function to compute interval polynomials in distinct degree
+    factorisation. Input/output is stored in \code{interval_poly_arg_t}.
+
+
+
