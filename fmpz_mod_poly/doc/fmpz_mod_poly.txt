@@ -1730,7 +1730,7 @@ void *
 _fmpz_mod_poly_precompute_matrix_worker(void * arg_ptr)
 
     Worker function version of \code{_fmpz_mod_poly_precompute_matrix}.
-    Input/output is stored in \code{matrix_precompute_arg_t}.
+    Input/output is stored in \code{fmpz_mod_poly_matrix_precompute_arg_t}.
 
 void
 _fmpz_mod_poly_precompute_matrix (fmpz_mat_t A, const fmpz * f,
@@ -1758,7 +1758,8 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     Worker function version of
     \code{_fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv}.
-    Input/output is stored in \code{compose_mod_precomp_preinv_arg_t}.
+    Input/output is stored in
+    \code{fmpz_mod_poly_compose_mod_precomp_preinv_arg_t}.
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,

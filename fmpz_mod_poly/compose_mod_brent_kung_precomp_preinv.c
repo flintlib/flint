@@ -63,7 +63,8 @@ _fmpz_mod_poly_reduce_matrix_mod_poly (fmpz_mat_t A, const fmpz_mat_t B,
 void *
 _fmpz_mod_poly_precompute_matrix_worker (void * arg_ptr)
 {
-    matrix_precompute_arg_t arg = *((matrix_precompute_arg_t *) arg_ptr);
+    fmpz_mod_poly_matrix_precompute_arg_t arg =
+                           *((fmpz_mod_poly_matrix_precompute_arg_t *) arg_ptr);
     /* Set rows of A to powers of poly1 */
     slong i, n, m;
 
@@ -159,8 +160,8 @@ fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz_mod_poly_t poly1,
 void *
 _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 {
-    compose_mod_precomp_preinv_arg_t arg=
-                                 *((compose_mod_precomp_preinv_arg_t*) arg_ptr);
+    fmpz_mod_poly_compose_mod_precomp_preinv_arg_t arg=
+                   *((fmpz_mod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
     fmpz_mat_t B, C;
     fmpz * t, * h;
     slong i, j, n, m;

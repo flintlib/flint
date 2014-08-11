@@ -57,14 +57,15 @@ main(void)
         fmpz_mod_poly_t a, b, c, cinv, d, *e, * tmp;
         fmpz_t p;
         slong j, num_threads = flint_get_num_threads(), l;
-        interval_poly_arg_t * args1;
+        fmpz_mod_poly_interval_poly_arg_t * args1;
         pthread_t *threads;
 
         l = n_randint(state, 20) + 1;
         threads = flint_malloc(sizeof(pthread_t) * num_threads);
         e = flint_malloc(sizeof(fmpz_mod_poly_struct) * num_threads);
         tmp = flint_malloc(sizeof(fmpz_mod_poly_struct) * l);
-        args1 = flint_malloc(sizeof(interval_poly_arg_t) * num_threads);
+        args1 = flint_malloc(num_threads *
+                             sizeof(fmpz_mod_poly_interval_poly_arg_t));
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));

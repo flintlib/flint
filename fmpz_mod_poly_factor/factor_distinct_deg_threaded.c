@@ -41,7 +41,8 @@
 void *
 _fmpz_mod_poly_interval_poly_worker(void* arg_ptr)
 {
-    interval_poly_arg_t arg = *((interval_poly_arg_t *) arg_ptr);
+    fmpz_mod_poly_interval_poly_arg_t arg =
+                               *((fmpz_mod_poly_interval_poly_arg_t *) arg_ptr);
     slong k;
     fmpz * tmp;
     fmpz_t invV;
@@ -89,9 +90,9 @@ fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res,
     fmpz_mat_t * HH;
     double beta;
     pthread_t *threads;
-    matrix_precompute_arg_t * args1;
-    compose_mod_precomp_preinv_arg_t * args2;
-    interval_poly_arg_t * args3;
+    fmpz_mod_poly_matrix_precompute_arg_t * args1;
+    fmpz_mod_poly_compose_mod_precomp_preinv_arg_t * args2;
+    fmpz_mod_poly_interval_poly_arg_t * args3;
 
     fmpz_init(p);
     fmpz_set(p, &poly->p);
@@ -140,10 +141,12 @@ fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res,
 
     HH      = flint_malloc(sizeof(fmpz_mat_t) * (num_threads + 1));
     threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args1   = flint_malloc(sizeof(matrix_precompute_arg_t) * num_threads);
-    args2   = flint_malloc(sizeof(compose_mod_precomp_preinv_arg_t)
-                           * num_threads);
-    args3   = flint_malloc(sizeof(interval_poly_arg_t) * num_threads);
+    args1   = flint_malloc(num_threads *
+                           sizeof(fmpz_mod_poly_matrix_precompute_arg_t));
+    args2   = flint_malloc(num_threads *
+                        sizeof(fmpz_mod_poly_compose_mod_precomp_preinv_arg_t));
+    args3   = flint_malloc(num_threads *
+                           sizeof(fmpz_mod_poly_interval_poly_arg_t));
 
     fmpz_mod_poly_reverse(vinv, v, v->length);
     fmpz_mod_poly_inv_series_newton(vinv, vinv, v->length);

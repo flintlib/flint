@@ -62,7 +62,7 @@ typedef struct
     fmpz_mod_poly_struct vinv;
     slong m;
 }
-interval_poly_arg_t;
+fmpz_mod_poly_interval_poly_arg_t;
 
 void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac);
 

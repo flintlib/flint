@@ -60,7 +60,7 @@ main(void)
         fmpz_t p;
         fmpz_mat_t B, *C;
         slong j, num_threads= flint_get_num_threads();
-        matrix_precompute_arg_t * args1;
+        fmpz_mod_poly_matrix_precompute_arg_t * args1;
         pthread_t *threads;
 
         threads = flint_malloc(sizeof(pthread_t) * num_threads);
@@ -89,7 +89,8 @@ main(void)
         fmpz_mat_init(B, n_sqrt(c->length-1)+1, c->length-1);
         fmpz_mod_poly_precompute_matrix(B, b, c, cinv);
 
-        args1 = flint_malloc(sizeof(matrix_precompute_arg_t) * num_threads);
+        args1 = flint_malloc(sizeof(fmpz_mod_poly_matrix_precompute_arg_t)
+                             * num_threads);
         C = flint_malloc(sizeof(fmpz_mat_t) * num_threads);
 
         for (j = 0; j < num_threads; j++)
@@ -153,7 +154,7 @@ main(void)
         fmpz_t p;
         fmpz_mat_t B;
         slong j, num_threads= flint_get_num_threads();
-        compose_mod_precomp_preinv_arg_t * args1;
+        fmpz_mod_poly_compose_mod_precomp_preinv_arg_t * args1;
         pthread_t *threads;
 
         threads = flint_malloc(sizeof(pthread_t) * num_threads);
@@ -186,7 +187,8 @@ main(void)
         fmpz_mod_poly_rem(a, a, c);
         fmpz_mod_poly_compose_mod(d, a, b, c);
 
-        args1 = flint_malloc(sizeof(compose_mod_precomp_preinv_arg_t) * num_threads);
+        args1 = flint_malloc(num_threads *
+                        sizeof(fmpz_mod_poly_compose_mod_precomp_preinv_arg_t));
 
         for (j = 0; j < num_threads; j++)
         {

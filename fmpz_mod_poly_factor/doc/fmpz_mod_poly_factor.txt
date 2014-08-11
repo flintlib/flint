@@ -206,7 +206,8 @@ void *
 _fmpz_mod_poly_interval_poly_worker(void* arg_ptr)
 
     Worker function to compute interval polynomials in distinct degree
-    factorisation. Input/output is stored in \code{interval_poly_arg_t}.
+    factorisation. Input/output is stored in
+    \code{fmpz_mod_poly_interval_poly_arg_t}.
 
 
 
