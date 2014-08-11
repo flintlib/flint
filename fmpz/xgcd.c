@@ -48,8 +48,16 @@ fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
     }
     else if (fmpz_cmp(f, g) == 0)
     {
-        fmpz_set(d, f);
-        fmpz_set_ui(a, 1);
+        if (fmpz_sgn(f) > 0)
+        {
+            fmpz_set(d, f);
+            fmpz_set_ui(a, 1);
+        }
+        else
+        {
+            fmpz_neg(d, f);
+            fmpz_set_si(a, -1);
+        }
         fmpz_set_si(b, 0);
     }
     else
