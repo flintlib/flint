@@ -352,7 +352,7 @@ int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta, doub
 
 /* Classical LLL *************************************************************/
 
-void fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl);
+void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl);
 
 /* Modified LLL **************************************************************/
 

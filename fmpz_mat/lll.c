@@ -27,37 +27,20 @@
 #include "fmpq_mat.h"
 
 void
-fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
+fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
 {
     slong i, j, k, l, m, n;
     fmpz_t r, one;
     fmpq_t delta, nu, xi, half, rat;
     fmpq_mat_t R, mu;
 
-    if (B->r != A->r || B->c != A->c)
-    {
-        flint_printf("Exception (fmpz_mat_lll). Incompatible dimensions.\n");
-        abort();
-    }
-
-    if (B == A)
-    {
-        fmpz_mat_t t;
-        fmpz_mat_init(t, B->r, B->c);
-        fmpz_mat_lll(t, A, fl);
-        fmpz_mat_swap(B, t);
-        fmpz_mat_clear(t);
-        return;
-    }
-
     if (A->r == 0)
     {
         return;
     }
 
-    fmpz_mat_set(B, A);
-    m = B->r;
-    n = B->c;
+    m = A->r;
+    n = A->c;
     fmpq_mat_init(R, m, m);
     fmpq_mat_init(mu, m, m);
     fmpz_init(r);
@@ -102,8 +85,8 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
             fmpz_cdiv_q(r, fmpq_numref(rat), fmpq_denref(rat));
             /* perform reduction */
             for (i = 0; i < n; i++)
-                fmpz_submul(fmpz_mat_entry(B, k, i), r,
-                            fmpz_mat_entry(B, k - 1, i));
+                fmpz_submul(fmpz_mat_entry(A, k, i), r,
+                            fmpz_mat_entry(A, k - 1, i));
             /* update mu */
             fmpq_set_fmpz_frac(rat, r, one);
             for (j = 0; j <= k - 2; j++)
@@ -128,8 +111,8 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
                     fmpq_sub(rat, fmpq_mat_entry(mu, k, l), half);
                     fmpz_cdiv_q(r, fmpq_numref(rat), fmpq_denref(rat));
                     for (i = 0; i < n; i++)
-                        fmpz_submul(fmpz_mat_entry(B, k, i), r,
-                                    fmpz_mat_entry(B, l, i));
+                        fmpz_submul(fmpz_mat_entry(A, k, i), r,
+                                    fmpz_mat_entry(A, l, i));
                     fmpq_set_fmpz_frac(rat, r, one);
                     for (j = 0; j <= l - 1; j++)
                         fmpq_submul(fmpq_mat_entry(mu, k, j), rat,
@@ -158,7 +141,7 @@ fmpz_mat_lll(fmpz_mat_t B, const fmpz_mat_t A, const fmpq_lll_t fl)
                      delta);
             fmpq_set(fmpq_mat_entry(mu, k - 1, k - 1), delta);
             /* swap row k - 1 and row k */
-            fmpz_mat_swap_rows(B, 0, k - 1, k);
+            fmpz_mat_swap_rows(A, NULL, k - 1, k);
             /* update mu */
             for (j = 0; j <= k - 2; j++)
             {

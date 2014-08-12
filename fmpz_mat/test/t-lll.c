@@ -58,7 +58,7 @@ main(void)
 
         fmpz_mat_randajtai(A, state, 0.5);
 
-        fmpz_mat_lll(A, A, fl);
+        fmpz_mat_lll(A, fl);
 
         result = fmpz_mat_is_reduced(A, 0.75, 0.5);
 
