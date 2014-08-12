@@ -273,3 +273,51 @@ int fmpz_lll_wrapper_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U,
     (\code{fmpz_lll_d_heuristic_with_removal()}) if $fl->rt == Z_BASIS$ and
     $fl->gt == APPROX$, and finally to the mpf version
     (\code{fmpz_lll_mpf_with_removal()}) if needed.
+
+*******************************************************************************
+
+    ULLL
+
+*******************************************************************************
+
+int fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size,
+                               const fmpz_t gs_B, const fmpz_lll_t fl)
+
+    ULLL is a new style of LLL which does adjoins an identity matrix to the
+    input lattice \code{FM}, then scales the lattice down to \code{new_size}
+    bits and reduces this augmented lattice. This tends to be more stable
+    numerically than traditional LLL which means higher dimensions can be
+    attacked using doubles. In each iteration a new identity matrix is adjoined
+    to the truncated lattice. \code{UM} is used to capture the unimodular
+    transformations, while \code{gs_B} and \code{fl} have the same role as in
+    the previous routines. The function is optimised for factoring polynomials.
+
+*******************************************************************************
+
+    Default functions
+
+*******************************************************************************
+
+void fmpz_lll(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
+
+    Reduces \code{B} in place according to the parameters specified by the
+    LLL context object \code{fl}.
+
+int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
+                          const fmpz_lll_t fl)
+
+    Reduces \code{B} in place according to the parameters specified by the
+    LLL context object \code{fl} and removes vectors whose squared Gram-Schmidt
+    length is greater than the bound \code{gs_B}. The return value is the new
+    dimension of \code{B} to be considered for further computation.
+
+*******************************************************************************
+
+    Modified ULLL
+
+*******************************************************************************
+
+void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size,
+                              const fmpz_lll_t fl)
+
+    Performs ULLL using \code{fmpz_mat_lll_storjohann()} as the LLL function.

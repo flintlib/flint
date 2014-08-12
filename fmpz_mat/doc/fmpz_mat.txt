@@ -997,3 +997,18 @@ void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
     \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
     basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of the same
     $m x n$ matrix \code{A}).
+
+*******************************************************************************
+
+    Modified LLL
+
+*******************************************************************************
+
+void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
+
+    Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
+    the rows of a $m x n$ matrix \code{A}), and an LLL context object
+    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
+    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of the same
+    $m x n$ matrix \code{A}). Uses a modified version of LLL, which has better
+    complexity in terms of the lattice dimension, introduced by Storjohann.
