@@ -33,15 +33,13 @@ fmpz_lll_wrapper_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
 {
     int res = fmpz_lll_d_with_removal(B, U, gs_B, fl);
 
-    if ((res == -1)
-        || (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res, D_BITS)))
+    if ((res == -1) || (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res)))
     {
         if (fl->rt == Z_BASIS && fl->gt == APPROX)
         {
             res = fmpz_lll_d_heuristic_with_removal(B, U, gs_B, fl);
             if ((res == -1)
-                ||
-                (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res, D_BITS)))
+                || (!fmpz_lll_is_reduced_with_removal(B, fl, gs_B, res)))
             {
                 res = fmpz_lll_mpf_with_removal(B, U, gs_B, fl);
             }

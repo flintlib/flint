@@ -158,13 +158,9 @@ int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl);
 
 int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd);
 
-int fmpz_lll_is_reduced_mpf(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec);
+int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl);
 
-int fmpz_lll_is_reduced_mpf_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec);
-
-int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec);
-
-int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec);
+int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd);
 
 /* Default functions *********************************************************/
 
