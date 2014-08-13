@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30626.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{07C40D11-4423-47E9-B533-458A112B73F9}") = "dll_flint", "dll_flint\dll_flint.vcxproj", "{00F6123F-C63E-41A0-A334-86A3F8C584DF}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "flint_config", "flint_config\flint_config.pyproj", "{47FC571F-818D-402A-AD42-510E25F5A305}"
+EndProject
+Project("{53665228-8007-4EA9-8E8F-631A91D13846}") = "lib_flint", "lib_flint\lib_flint.vcxproj", "{C3D517DC-99DB-4312-BAD8-5D8DAD02D83D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal
