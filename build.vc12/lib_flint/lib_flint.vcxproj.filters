@@ -66,6 +66,9 @@
     <ClInclude Include="..\..\arith.h">
     <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\build.vc12\config.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\build.vc12\gettimeofday.h">
     <Filter>Header Files</Filter>
     </ClInclude>

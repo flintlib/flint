@@ -26,7 +26,7 @@
 #include "fq_zech.h"
 
 void
-fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, const slong x,
+fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
                const fq_zech_ctx_t ctx)
 {
     mp_limb_t y;

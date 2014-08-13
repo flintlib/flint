@@ -30,7 +30,11 @@
 #include "fmpz_vec.h"
 
 #ifndef __compar_fn_t
-typedef int (*__compar_fn_t) (__const void *, __const void *);
+#if defined(_MSC_VER)
+typedef int(*__compar_fn_t) (const void *, const void *);
+#else
+typedef int(*__compar_fn_t) (__const void *, __const void *);
+#endif
 #endif
 
 void _fmpz_vec_sort(fmpz * vec, slong len)

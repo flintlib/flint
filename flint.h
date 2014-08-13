@@ -28,12 +28,14 @@
 
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#if !defined(_MSC_VER)
 #include <sys/param.h> /* for BSD define */
+#endif
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
 #include <stdlib.h> /* for alloca on FreeBSD */
-#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) 
+#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)
 /* MinGW and FreeBSD have alloca, but not alloca.h */
 #include <alloca.h>
 #endif

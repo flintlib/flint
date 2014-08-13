@@ -7,7 +7,8 @@ Copyright (C) 2011, 2012, 2013, 2014 Brian Gladman
 from __future__ import print_function
 from operator import itemgetter
 from os import listdir, walk, unlink, makedirs
-from os.path import split, splitext, isdir, relpath, join, exists, dirname
+from os.path import split, splitext, isdir, relpath, join, exists
+from os.path import dirname, normpath
 from copy import deepcopy
 from sys import argv, exit
 from filecmp import cmp
@@ -20,8 +21,8 @@ from time import sleep
 # for script debugging
 debug = False
 # what to build
-build_lib = False
-build_dll = False
+build_lib = True
+build_dll = True
 build_tests = False
 build_profiles = False
 
@@ -101,19 +102,20 @@ def filter_folders(cf_list, outf):
   f3 = r'''  </ItemGroup>
 '''
   c_dirs = set(i[0] for i in cf_list)
-  outf.write(f1)
-  for d in sorted(c_dirs):
-    if d:
-      outf.write(f2.format(d))
-  outf.write(f3)
+  if c_dirs:
+    outf.write(f1)
+    for d in sorted(c_dirs):
+      if d:
+        outf.write(f2.format(d))
+    outf.write(f3)
 
 filter_hdr_item = r'    <ClInclude Include="..\..\{}">\n      <Filter>Header Files</Filter>\n    </ClInclude>\n'
 
-def filter_headers(hdr_list, outf):
+def filter_headers(hdr_list, relp, outf):
 
   f1 = r'''  <ItemGroup>
 '''
-  f2 = r'''    <ClInclude Include="..\..\{}">
+  f2 = r'''    <ClInclude Include="{}{}">
     <Filter>Header Files</Filter>
     </ClInclude>
 '''
@@ -121,18 +123,18 @@ def filter_headers(hdr_list, outf):
 '''
   outf.write(f1)
   for h in hdr_list:
-    outf.write(f2.format(h))
+    outf.write(f2.format(relp, h))
   outf.write(f3)
 
-def filter_csrc(cf_list, outf):
+def filter_csrc(cf_list, relp, outf):
 
   f1 = r'''  <ItemGroup>
 '''
-  f2 = r'''  <ClCompile Include="..\..\{}">
+  f2 = r'''  <ClCompile Include="{}{}">
     <Filter>Source Files</Filter>
     </ClCompile>
 '''
-  f3 = r'''  <ClCompile Include="..\..\{}">
+  f3 = r'''  <ClCompile Include="{}{}">
     <Filter>Source Files\{}</Filter>
     </ClCompile>
 '''
@@ -141,9 +143,9 @@ def filter_csrc(cf_list, outf):
   outf.write(f1)
   for i in cf_list:
     if not i[0]:
-      outf.write(f2.format(i[1]))
+      outf.write(f2.format(relp, i[1]))
     else:
-      outf.write(f3.format(i[1], i[0]))
+      outf.write(f3.format(relp, i[1], i[0]))
   outf.write(f4)
 
 def gen_filter(name, hf_list, cf_list):
@@ -154,8 +156,8 @@ def gen_filter(name, hf_list, cf_list):
   f2 = r'''
 </Project>
 '''
-
-  fn = join(project_dir, name)
+  fn = normpath(join(project_dir, name))
+  relp = split(relpath(flint_dir, fn))[0] + '\\'
   try:
     makedirs(split(fn)[0])
   except IOError:
@@ -164,8 +166,9 @@ def gen_filter(name, hf_list, cf_list):
 
     outf.write(f1)
     filter_folders(cf_list, outf)
-    filter_headers(hf_list, outf)
-    filter_csrc(cf_list, outf)
+    if hf_list:
+      filter_headers(hf_list, relp, outf)
+    filter_csrc(cf_list, relp, outf)
     outf.write(f2)
 
 # generate vcxproj file
@@ -311,26 +314,26 @@ def vcx_tool_options(plat, is_dll, postbuild, inc_dirs, link_libs, outf):
         vcx_post_build(outf)
       outf.write(f2)
 
-def vcx_hdr_items(hdr_list, outf):
+def vcx_hdr_items(hdr_list, relp, outf):
 
   f1 = r'''  <ItemGroup>
 '''
-  f2 = r'''    <ClInclude Include="..\..\{0:s}" />
+  f2 = r'''    <ClInclude Include="{}{}" />
 '''
   f3 = r'''  </ItemGroup>
 '''
   outf.write(f1)
   for i in hdr_list:
-    outf.write(f2.format(i))
+    outf.write(f2.format(relp, i))
   outf.write(f3)
 
-def vcx_c_items(cf_list, plat, outf):
+def vcx_c_items(cf_list, plat, relp, outf):
 
   f1 = r'''  <ItemGroup>
 '''
-  f2 = r'''    <ClCompile Include="..\..\{}" />
+  f2 = r'''    <ClCompile Include="{}{}" />
 '''
-  f3 = r'''    <ClCompile Include="..\..\{}">
+  f3 = r'''    <ClCompile Include="{}{}">
 '''
   f4 = r'''        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='{0:s}|{1:s}'">$(IntDir){2:s}\</ObjectFileName>
 '''
@@ -344,9 +347,9 @@ def vcx_c_items(cf_list, plat, outf):
   outf.write(f1)
   for nxd in cf_list:
     if nxd[0] in ('', build_vc):
-      outf.write(f2.format(nxd[1]))
+      outf.write(f2.format(relp, nxd[1]))
     else:
-      outf.write(f3.format(nxd[1]))
+      outf.write(f3.format(relp, nxd[1]))
       for cf in ('Release', 'Debug'):
         for pl in plat:
           outf.write(f4.format(cf, pl, nxd[0]))
@@ -372,7 +375,9 @@ def gen_vcxproj(proj_name, file_name, guid, plat, is_dll, postbuild, hf_list, cf
 </Project>
 '''
 
-  with open(join(project_dir, file_name), 'w') as outf:
+  fn = normpath(join(project_dir, file_name))
+  relp = split(relpath(flint_dir, fn))[0] + '\\'
+  with open(fn, 'w') as outf:
     outf.write(f1)
     vcx_proj_cfg(plat, outf)
     vcx_globals(proj_name, guid, outf)
@@ -383,8 +388,9 @@ def gen_vcxproj(proj_name, file_name, guid, plat, is_dll, postbuild, hf_list, cf
     outf.write(f2)
     vcx_target_name_and_dirs(proj_name, plat, is_dll, outf)
     vcx_tool_options(plat, is_dll, postbuild, inc_dirs, link_libs, outf)
-    vcx_hdr_items(hf_list, outf)
-    vcx_c_items(cf_list, plat, outf)
+    if hf_list:
+      vcx_hdr_items(hf_list, relp, outf)
+    vcx_c_items(cf_list, plat, relp, outf)
     outf.write(f3)
 
 # add project files to the solution
@@ -496,10 +502,52 @@ if build_dll:
   vcx_path = 'dll_flint\\dll_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
   mode = ('win32', 'x64')
-  inc_dirs = r'.\;..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads'
-  link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\lib\pthreads.lib'
+  inc_dirs = r'.\;..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads;'
+  link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\lib\pthreads.lib;'
   gen_vcxproj(proj_name, vcx_path, guid, mode, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
+
+def gen_test(sln_name, test_name, c_file):
+  # set up LIB build
+  guid = '{' + str(uuid4()).upper() + '}'
+  proj_name = test_name 
+  vcx_path = r'flint-tests\\' + test_name + '\\' + test_name + '.vcxproj'
+  gen_filter(vcx_path + '.filters', [], [('', c_file)])
+  mode = ('win32', 'x64')
+  inc_dirs = r'.\;..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads;'
+  link_libs = r'..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\lib\pthreads.lib;'
+  gen_vcxproj(proj_name, vcx_path, guid, mode, False, False, [], [('', c_file)], inc_dirs, link_libs)
+  return vcx_path, guid
+
+#   ('', 'test\\t-udiv_qrnnd_preinv.c')
+#   ('', 'test\\t-umul_ppmm.c')
+#   ('arith', 'arith\\test\\t-bell_number.c')
+#   ('arith', 'arith\\test\\t-bell_number_multi_mod.c')
+
+def gen_tests(sln_name, c_files):
+  fd, pd, p2f = read_solution_file(sln_name)
+  
+  for name, fpath in c_files:
+    if name:
+      if name in fd:
+        guid1, guid2 = fd[name]
+      else:
+        guid1, guid2 = '{' + str(uuid4()).upper() + '}', '{' + str(uuid4()).upper() + '}'
+        fd[name] = (guid1, guid2)
+    _, t = split(fpath)
+    if t[:2] not in ('t-', 'p-'):
+      continue
+    t = t[2:].replace('.c', '')
+    p_name = (name + '_' + t) if name else t
+    vcx_name, guid = gen_test(sln_name, p_name, fpath)
+    pd[p_name] = ('{' + str(uuid4()).upper() + '}', vcx_name, guid)
+    if name:
+      p2f[guid] = guid2
+
+  write_solution_file(sln_name, fd, pd, p2f)
+
+if build_tests:
+  gen_tests('flint-tests2.sln', t[:10])
 
 if debug:
   print('\nC++ files')
