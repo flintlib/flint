@@ -37,9 +37,13 @@ mpfr * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
 
 void _mpfr_vec_clear(mpfr * vec, slong length);
 
+void _mpfr_vec_randtest(mpfr * f, flint_rand_t state, slong len);
+
 void _mpfr_vec_zero(mpfr * vec, slong length);
 
 void _mpfr_vec_set(mpfr * vec1, const mpfr * vec2, slong length);
+
+int _mpfr_vec_equal(const mpfr * vec1, const mpfr * vec2, slong len);
 
 void _mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong length);
 

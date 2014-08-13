@@ -20,56 +20,24 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2014 Abhinav Baid
 
 ******************************************************************************/
 
-#ifndef MFPR_MAT_H
-#define MPFR_MAT_H
+#include "flint.h"
+#include "mpfr_mat.h"
 
-#include <gmp.h>
-#include <mpfr.h> 
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-typedef struct
+void
+mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state)
 {
-    __mpfr_struct * entries;
-    slong r;
-    slong c;
-    mp_bitcnt_t prec;
-    __mpfr_struct ** rows;
-} mpfr_mat_struct;
+    slong r, c, i, j;
 
-/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
-typedef mpfr_mat_struct mpfr_mat_t[1];
+    r = mat->r;
+    c = mat->c;
 
-#define mpfr_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+    _flint_rand_init_gmp(state);
 
-void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec);
-
-void mpfr_mat_swap(mpfr_mat_t mat1, mpfr_mat_t mat2);
-
-void mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2);
-
-void mpfr_mat_clear(mpfr_mat_t mat);
-
-int mpfr_mat_equal(const mpfr_mat_t mat1, const mpfr_mat_t mat2);
-
-void mpfr_mat_zero(mpfr_mat_t mat);
-
-/* Random matrix generation  *************************************************/
-
-void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state);
-
-/* Multiplication */
-
-void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B, mpfr_rnd_t rnd);
-
-#ifdef __cplusplus
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            mpfr_urandomb(mpfr_mat_entry(mat, i, j), state->gmp_state);
 }
-#endif
-
-#endif
-
