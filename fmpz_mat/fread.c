@@ -72,7 +72,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
         fmpz_mat_clear(mat);
         fmpz_mat_init(mat,r,c);
     }
-    else if (mat->r == 0 && mat->c == 0)
+    else if (mat->r != r || mat->c != c)
     {
         flint_printf("Exception (fmpz_mat_fread). \n"
                "Dimensions are non-zero and do not match input dimensions.\n");
