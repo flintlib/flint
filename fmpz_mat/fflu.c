@@ -32,7 +32,6 @@ slong
 fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check)
 {
-    fmpz_t t;
     slong m, n, j, k, rank, r, pivot_row, pivot_col;
 
     if (fmpz_mat_is_empty(A))
@@ -45,8 +44,6 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
     m = B->r;
     n = B->c;
     rank = pivot_row = pivot_col = 0;
-
-    fmpz_init(t);
 
     while (pivot_row < m && pivot_col < n)
     {
@@ -72,10 +69,8 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
         {
             for (k = pivot_col + 1; k < n; k++)
             {
-                /* todo: use submul */
                 fmpz_mul(E(j, k), E(j, k), E(pivot_row, pivot_col));
-                fmpz_mul(t, E(j, pivot_col), E(pivot_row, k));
-                fmpz_sub(E(j, k), E(j, k), t);
+                fmpz_submul(E(j, k), E(j, pivot_col), E(pivot_row, k));
 
                 if (pivot_row > 0)
                     fmpz_divexact(E(j, k), E(j, k), den);
@@ -87,6 +82,5 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
         pivot_col++;
     }
 
-    fmpz_clear(t);
     return rank;
 }
