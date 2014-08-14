@@ -133,7 +133,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_xgcd(H2, B);
+        fmpz_mat_hnf_classical(H2, B);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)
