@@ -249,7 +249,7 @@ void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c);
 void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                const fmpz_t q, const fmpz_t r);
 
-void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
 void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
