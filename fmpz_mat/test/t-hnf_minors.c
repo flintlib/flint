@@ -83,23 +83,19 @@ main(void)
     slong iter;
     FLINT_TEST_INIT(state);
 
-    flint_printf("hnf minors....");
+    flint_printf("hnf_minors....");
     fflush(stdout);
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        fmpz_t det;
-        fmpz_mat_t A, B, H, H2;
-        slong m, n, b, d, i, j;
+        fmpz_mat_t A, H, H2;
+        slong m, n, b, d;
         int equal;
 
         n = n_randint(state, 10);
         m = n + n_randint(state, 10);
 
-        fmpz_init(det);
-
-        fmpz_mat_init(A, n, n);
-        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(A, m, n);
         fmpz_mat_init(H, m, n);
         fmpz_mat_init(H2, m, n);
 
@@ -107,19 +103,12 @@ main(void)
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
         fmpz_mat_randrank(A, state, n, b);
 
-        fmpz_mat_det(det, A);
-        fmpz_abs(det, det);
-
-        for (i = 0; i < n; i++)
-            for (j = 0; j < n; j++)
-                fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(A, i, j));
-
         /* dense */
         d = n_randint(state, 2*m*n + 1);
         if (n_randint(state, 2))
-            fmpz_mat_randops(B, state, d);
+            fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_hnf_minors(H, B);
+        fmpz_mat_hnf_minors(H, A);
 
         if (!in_hnf(H))
         {
@@ -130,7 +119,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_modular(H2, B, det);
+        fmpz_mat_hnf_classical(H2, A);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)
@@ -140,7 +129,6 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             fmpz_mat_print_pretty(H2); flint_printf("\n\n");
-            fmpz_print(det); flint_printf("\n\n");
             abort();
         }
 
@@ -159,9 +147,7 @@ main(void)
 
         fmpz_mat_clear(H2);
         fmpz_mat_clear(H);
-        fmpz_mat_clear(B);
         fmpz_mat_clear(A);
-        fmpz_clear(det);
     }
 
     FLINT_TEST_CLEANUP(state);
