@@ -146,6 +146,11 @@ void fmpz_get_mpf(mpf_t x, const fmpz_t f)
 
     Sets the value of \code{x} from \code{f}.
 
+void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
+
+    Sets the value of \code{x} from \code{f}, rounded toward the given
+    direction \code{rnd}.
+
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns $f$ as a normalized \code{double} along with a $2$-exponent 
