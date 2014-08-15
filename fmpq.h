@@ -297,8 +297,14 @@ FMPQ_INLINE void
 _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
             const fmpz_t r, const fmpz_t s)
 {
-   fmpz_gcd(rnum, p, r);
-   fmpz_gcd(rden, q, s);
+   fmpz_t a, b;
+   fmpz_init(a); fmpz_init(b);
+   fmpz_mul(a, p, s);
+   fmpz_mul(b, q, r);
+   fmpz_gcd(rnum, a, b);
+   fmpz_mul(rden, q, s);
+   _fmpq_canonicalise(rnum, rden);
+   fmpz_clear(a); fmpz_clear(b);
 }
 
 FMPQ_INLINE void 
