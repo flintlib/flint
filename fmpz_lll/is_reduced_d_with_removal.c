@@ -752,6 +752,7 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
 
         d_mat_clear(Wd);
         d_mat_clear(Wu);
+        d_mat_clear(V);
 
         for (i = 0; i < n; i++)
         {

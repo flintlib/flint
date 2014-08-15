@@ -826,6 +826,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
 
         mpfr_mat_clear(Wd);
         mpfr_mat_clear(Wu);
+        mpfr_mat_clear(V);
 
         for (i = 0; i < n; i++)
         {
