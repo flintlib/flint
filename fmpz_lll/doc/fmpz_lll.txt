@@ -294,6 +294,68 @@ int fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size,
 
 *******************************************************************************
 
+    LLL-reducedness
+
+*******************************************************************************
+
+int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
+
+    Returns a non-zero value if the matrix \code{B} is LLL-reduced with factor
+    (\code{fl->delta}, \code{fl->eta}), and otherwise returns zero. The
+    function is mainly intended to be used for testing purposes. It will not
+    always work, but if it does the result is guaranteed.
+
+int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
+                             mp_bitcnt_t prec)
+
+    Returns a non-zero value if the matrix \code{B} is LLL-reduced with factor
+    (\code{fl->delta}, \code{fl->eta}), and otherwise returns zero. The
+    \code{mpfr} variables used have their precision set to be exactly
+    \code{prec} bits. The function is mainly intended to be used for testing
+    purposes. It will not always work, but if it does the result is guaranteed.
+
+int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl,
+                        mp_bitcnt_t prec)
+
+    Returns a non-zero value if the matrix \code{B} is LLL-reduced with factor
+    (\code{fl->delta}, \code{fl->eta}), and otherwise returns zero. The
+    \code{mpfr} variables used, if any, have their precision set to be exactly
+    \code{prec} bits. The function is mainly intended to be used for testing
+    purposes.
+
+int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
+                                       const fmpz_t gs_B, int newd)
+
+    Returns a non-zero value if the matrix \code{B} is LLL-reduced with factor
+    (\code{fl->delta}, \code{fl->eta}) and the squared Gram-Schmidt length of
+    each $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B},
+    and otherwise returns zero. The function is mainly intended to be used for
+    testing purposes. It will not always work, but if it does the result is
+    guaranteed.
+
+int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B,
+            const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
+
+    Returns a non-zero value if the matrix \code{B} is LLL-reduced with factor
+    (\code{fl->delta}, \code{fl->eta}) and the squared Gram-Schmidt length of
+    each $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B},
+    and otherwise returns zero. The \code{mpfr} variables used have their
+    precision set to be exactly \code{prec} bits. The function is mainly
+    intended to be used for testing purposes. It will not always work, but if
+    it does the result is guaranteed.
+
+int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
+                                 const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
+
+    Returns a non-zero value if the matrix \code{B} is LLL-reduced with factor
+    (\code{fl->delta}, \code{fl->eta}) and the squared Gram-Schmidt length of
+    each $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B},
+    and otherwise returns zero. The \code{mpfr} variables used, if any, have
+    their precision set to be exactly \code{prec} bits. The function is mainly
+    intended to be used for testing purposes.
+
+*******************************************************************************
+
     Default functions
 
 *******************************************************************************

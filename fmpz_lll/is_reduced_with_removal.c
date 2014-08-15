@@ -29,10 +29,12 @@
 
 int
 fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
-                                 const fmpz_t gs_B, int newd)
+                                 const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
 {
     return (gs_B !=
-            NULL) ? ((fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd))
+            NULL) ? ((fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd)
+                      || fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B,
+                                                               newd, prec))
                      || ((fl->rt == Z_BASIS) ?
                          fmpz_mat_is_reduced_with_removal(B, fl->delta,
                                                           fl->eta, gs_B,
@@ -40,5 +42,5 @@ fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                          fmpz_mat_is_reduced_gram_with_removal(B, fl->delta,
                                                                fl->eta, gs_B,
                                                                newd))) :
-        fmpz_lll_is_reduced(B, fl);
+        fmpz_lll_is_reduced(B, fl, prec);
 }

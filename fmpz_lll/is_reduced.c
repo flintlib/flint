@@ -28,9 +28,10 @@
 #include "fmpz_lll.h"
 
 int
-fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl)
+fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, mp_bitcnt_t prec)
 {
-    return ((fmpz_lll_is_reduced_d(B, fl))
+    return ((fmpz_lll_is_reduced_d(B, fl)
+             || fmpz_lll_is_reduced_mpfr(B, fl, prec))
             || ((fl->rt == Z_BASIS) ?
                 fmpz_mat_is_reduced(B, fl->delta,
                                     fl->eta) : fmpz_mat_is_reduced_gram(B,
