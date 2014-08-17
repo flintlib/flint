@@ -65,7 +65,7 @@ main(void)
     flint_printf("snf_kannan_bachem....");
     fflush(stdout);
 
-    for (iter = 0; iter < 100000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S, S2;
         slong m, n, b, d, r;
