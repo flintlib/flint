@@ -1,12 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30626.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "flint_config", "flint_config\flint_config.pyproj", "{47FC571F-818D-402A-AD42-510E25F5A305}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_flint", "lib_flint\lib_flint.vcxproj", "{BDB34855-0077-4DDD-B9CC-3042ECB5738B}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "run_tests", "run_tests\run_tests.pyproj", "{A75EE66A-FA00-4D7B-ACCB-3445674C3175}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_flint", "dll_flint\dll_flint.vcxproj", "{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lib_flint", "lib_flint\lib_flint.vcxproj", "{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_flint", "dll_flint\dll_flint.vcxproj", "{00371A90-5988-4FC0-B6D2-131CCF8FE566}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,22 +22,26 @@ Global
 		{47FC571F-818D-402A-AD42-510E25F5A305}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{47FC571F-818D-402A-AD42-510E25F5A305}.Release|Win32.ActiveCfg = Release|Any CPU
 		{47FC571F-818D-402A-AD42-510E25F5A305}.Release|x64.ActiveCfg = Release|Any CPU
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Debug|Win32.ActiveCfg = Debug|win32
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Debug|Win32.Build.0 = Debug|win32
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Debug|x64.ActiveCfg = Debug|x64
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Debug|x64.Build.0 = Debug|x64
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Release|Win32.ActiveCfg = Release|win32
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Release|Win32.Build.0 = Release|win32
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Release|x64.ActiveCfg = Release|x64
-		{BDB34855-0077-4DDD-B9CC-3042ECB5738B}.Release|x64.Build.0 = Release|x64
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Debug|Win32.ActiveCfg = Debug|win32
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Debug|Win32.Build.0 = Debug|win32
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Debug|x64.ActiveCfg = Debug|x64
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Debug|x64.Build.0 = Debug|x64
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Release|Win32.ActiveCfg = Release|win32
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Release|Win32.Build.0 = Release|win32
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Release|x64.ActiveCfg = Release|x64
-		{A084E5AA-FC49-4911-88F0-6CD4207A0E4B}.Release|x64.Build.0 = Release|x64
+		{A75EE66A-FA00-4D7B-ACCB-3445674C3175}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{A75EE66A-FA00-4D7B-ACCB-3445674C3175}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A75EE66A-FA00-4D7B-ACCB-3445674C3175}.Release|Win32.ActiveCfg = Release|Any CPU
+		{A75EE66A-FA00-4D7B-ACCB-3445674C3175}.Release|x64.ActiveCfg = Release|Any CPU
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Debug|Win32.ActiveCfg = Debug|win32
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Debug|Win32.Build.0 = Debug|win32
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Debug|x64.ActiveCfg = Debug|x64
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Debug|x64.Build.0 = Debug|x64
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Release|Win32.ActiveCfg = Release|win32
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Release|Win32.Build.0 = Release|win32
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Release|x64.ActiveCfg = Release|x64
+		{CE771B3E-89CD-4C0E-8C6F-78991821AF8E}.Release|x64.Build.0 = Release|x64
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Debug|Win32.ActiveCfg = Debug|win32
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Debug|Win32.Build.0 = Debug|win32
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Debug|x64.ActiveCfg = Debug|x64
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Debug|x64.Build.0 = Debug|x64
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Release|Win32.ActiveCfg = Release|win32
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Release|Win32.Build.0 = Release|win32
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Release|x64.ActiveCfg = Release|x64
+		{00371A90-5988-4FC0-B6D2-131CCF8FE566}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

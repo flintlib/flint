@@ -21,8 +21,8 @@ from time import sleep
 # for script debugging
 debug = False
 # what to build
-build_lib = False
-build_dll = False
+build_lib = True
+build_dll = True
 build_tests = True
 build_profiles = False
 
@@ -30,11 +30,11 @@ build_profiles = False
 flib_type = 'reentrant' # ('gc', 'rentrant', 'single')
 
 # The path to flint, solution and project directories
+script_dir = dirname(__file__)
 project_name = 'flint'
 build_vc = 'build.vc12'
-flint_dir = '../../'
-solution_dir = join(flint_dir, build_vc)
-project_dir = join(flint_dir, build_vc)
+flint_dir = normpath(join(script_dir, '../../'))
+solution_dir = normpath(join(flint_dir, build_vc))
 
 try:
   input = raw_input
@@ -56,18 +56,31 @@ def write_f(ipath, opath):
         return
     copy(ipath, opath)
 
-ignore_dirs = ( '.git', 'doc', 'examples')
+ignore_dirs = ( '.git', 'doc', 'examples', 'lib', 'exe', 'dll', 'win_hdrs')
 
 def find_src(path):
-  c, h, cx, hx, t, tx, p = [], [], [], [], [], [], [] 
+
+  c, h, cx, hx, t, tx, p = [], [], [], [], [], [], []
   for root, dirs, files in walk(path):
-    for di in dirs:
+    if 'template' in root:
+      continue
+    _, _t = split(root)
+    if _t in ignore_dirs:
+      continue
+    if root.endswith(build_vc):
+      for di in list(dirs):
+        dirs.remove(di)
+    for di in list(dirs):
       if di in ignore_dirs:
+        dirs.remove(di)
+      if 'template' in di:
         dirs.remove(di)
     relp = relpath(root, flint_dir)
     if relp == '.':
       relp = ''
     for f in files:
+      if 'template' in f:
+        continue
       n, x = splitext(f)
       pth, leaf = split(root)
       fp = join(relp, f)
@@ -75,7 +88,7 @@ def find_src(path):
         continue
       if leaf == 'test':
         p2, l2 = split(pth)
-        l2 = '' if l2 == '..' else l2
+        l2 = '' if l2 == 'flint2' else l2
         if 'flintxx' in pth:
           tx += [(l2, fp)]
         else:
@@ -94,6 +107,101 @@ def find_src(path):
   for x in (c, h, cx, hx, t, tx, p):
     x.sort()
   return (c, h, cx, hx, t, tx, p)
+
+s_sym = r'([_a-zA-Z][_a-zA-Z0-9]*)'
+dec = '^(?:' + s_sym + '\s+)?' + s_sym + '\('
+re_dec = compile(dec)
+re_end = compile('\s*\);\s*$')
+
+def strip_static_inline(lines, pos, lth):
+  p0 = pos
+  m = re_end.search(lines[pos])
+  pos += 1
+  if m:
+    return pos
+  level = 0
+  while pos < lth:
+    line = (lines[pos].replace('\n', ' ')).strip()
+    m = re_end.search(lines[pos])
+    if not level and (m or not line or pos > p0 + 5) or pos >= lth:
+      return pos + 1
+    level += line.count('{') - line.count('}')
+    pos += 1
+  return pos
+
+def parse_hdrs(h):
+  d = defaultdict(list)
+  for hf in h:
+    lines = open(join(flint_dir, hf), 'r').readlines()
+    pos, n_lines = 0, len(lines)
+    line_buf = ''
+    in_dec = 0
+    while pos < n_lines:
+      if in_dec == 0:
+        line_buf = ''
+      line = (lines[pos].replace('\n', ' ')).strip()
+      if not line:
+        pos += 1
+        continue
+      if line.startswith('#define'):
+        while line.endswith('\\') and pos < n_lines:
+          pos += 1
+          line = (lines[pos].replace('\n', ' ')).strip()
+        pos += 1
+        continue
+      if 'INLINE' in line.upper():
+        pos = strip_static_inline(lines, pos, n_lines)
+        in_dec = 0
+        continue
+      if not in_dec:
+        m = re_dec.search(line)
+        if m:
+          line_buf += line + ' '
+          mm = re_end.search(line)
+          if mm:
+            pos += 1
+            print(m.group(2))
+            d[hf] += [(pos, m.group(2), line_buf)]
+            in_dec = 0
+            continue
+          in_dec += 1
+      else:
+        line_buf += line
+        mm = re_end.search(line)
+        if mm:
+          if in_dec < 5:
+            d[hf] += [(pos - in_dec + 1, m.group(2), line_buf)]
+          in_dec = 0
+        else:
+          in_dec += 1
+      pos += 1
+  return d
+
+def write_hdrs(h):
+  d = parse_hdrs(h)
+  hdr_dir = join(flint_dir, 'win_hdrs')
+  if not exists(hdr_dir):
+    makedirs(hdr_dir)
+
+  for hf in sorted(d.keys()):
+    out_name = hf.replace('build.vc12\\', '')
+    inf = open(join(flint_dir, hf), 'r')
+    outf = open(join(flint_dir, join(hdr_dir, out_name)), 'w')
+    lines = inf.readlines()
+    for n, _p, _d in d[hf]:
+      lines[n - 1] = 'F_ ' + lines[n - 1]
+    outf.writelines(lines)
+    inf.close()
+    outf.close()
+
+def write_def_file(name, h):
+  d = parse_hdrs(h)
+  lines = ['LIBRARY ' + name + '\n', 'EXPORTS' + '\n']
+  for hf in sorted(d.keys()):
+    for _n, sym, _d in d[hf]:
+      lines += ['    ' + sym + '\n']
+  with open(join(solution_dir, name + '.def'), 'w') as outf:
+    outf.writelines(lines)
 
 def filter_folders(cf_list, outf):
 
@@ -158,7 +266,7 @@ def gen_filter(name, hf_list, cf_list):
   f2 = r'''
 </Project>
 '''
-  fn = normpath(join(project_dir, name))
+  fn = normpath(join(solution_dir, name))
   relp = split(relpath(flint_dir, fn))[0] + '\\'
   try:
     makedirs(split(fn)[0])
@@ -235,21 +343,21 @@ def vcx_user_props(plat, outf):
     for conf in ('Release', 'Debug'):
       outf.write(f1.format(pl, conf))
 
-def vcx_target_name_and_dirs(name, plat, proj_type, outf):
+def vcx_target_name_and_dirs(name, plat, outf):
 
   f1 = r'''  <PropertyGroup>
     <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
 '''
   f2 = r'''    <TargetName Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">{2:s}</TargetName>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(Platform)\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(SolutionDir)..\{3:s}\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
 '''
   f3 = r'''  </PropertyGroup>
 '''
   outf.write(f1)
   for pl in plat:
     for conf in ('Release', 'Debug'):
-      outf.write(f2.format(pl, conf, name, app_ext[proj_type]))
+      outf.write(f2.format(pl, conf, name))
   outf.write(f3)
 
 def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
@@ -266,13 +374,13 @@ def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
 '''
 
   if proj_type == app_type:
-    s1 = 'DEBUG;WIN32;_CONSOLE'
+    s1 = 'DEBUG;WIN32;_CONSOLE;PTW32_STATIC_LIB;'
     s2 = ''
   if proj_type == dll_type:
-    s1 = 'DEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;'
+    s1 = 'DEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;'
     s2 = 'DLL'
   elif proj_type == lib_type:
-    s1 = 'DEBUG;WIN32;_LIB;HAVE_CONFIG_H;'
+    s1 = 'DEBUG;WIN32;_LIB;HAVE_CONFIG_H;PTW32_STATIC_LIB;'
     s2 = ''
   else:
     pass
@@ -284,28 +392,39 @@ def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
     opt, defines, crt = 'Full', 'N' + s1, s2
   outf.write(f1.format(opt, inc_dirs, defines, crt))
 
-def linker_options(link_libs, outf):
+def linker_options(name, link_libs, proj_type, debug_info, outf):
 
   f1 = r'''    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <LargeAddressAware>true</LargeAddressAware>
-      <AdditionalDependencies>{}%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
 '''
-  outf.write(f1.format(link_libs))
+  f2 = r'''      <GenerateDebugInformation>true</GenerateDebugInformation>
+'''
+  f3 = r'''      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>{}%(AdditionalDependencies)</AdditionalDependencies>
+'''
+  f4 = '''      <ModuleDefinitionFile>$(SolutionDir){}.def</ModuleDefinitionFile>
+'''
+  f5 = '''    </Link>
+'''
+  outf.write(f1)
+  if debug_info:
+    outf.write(f2)
+  outf.write(f3.format(link_libs))
+  if proj_type == dll_type:
+    outf.write(f4.format(name))
+  outf.write(f5)
 
-def vcx_post_build(outf):
+def vcx_post_build(outf, proj_type):
 
   f1 = r'''
   <PostBuildEvent>
-      <Command>postbuild $(TargetPath)
+      <Command>postbuild $(IntDir) {}
       </Command>
   </PostBuildEvent>
 '''
 
-  outf.write(f1)
+  outf.write(f1.format((app_ext[proj_type][1:]).upper()))
 
-def vcx_tool_options(plat, proj_type, postbuild, inc_dirs, link_libs, outf):
+def vcx_tool_options(name, plat, proj_type, postbuild, inc_dirs, link_libs, debug_info, outf):
 
   f1 = r'''  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">
 '''
@@ -316,9 +435,9 @@ def vcx_tool_options(plat, proj_type, postbuild, inc_dirs, link_libs, outf):
       outf.write(f1.format(pl, 'Debug' if is_debug else 'Release'))
       compiler_options(pl, proj_type, is_debug, inc_dirs, outf)
       if proj_type != lib_type:
-        linker_options(link_libs, outf)
+        linker_options(name, link_libs, proj_type, debug_info, outf)
       if postbuild:
-        vcx_post_build(outf)
+        vcx_post_build(outf, proj_type)
       outf.write(f2)
 
 def vcx_hdr_items(hdr_list, relp, outf):
@@ -371,7 +490,7 @@ def vcx_c_items(cf_list, plat, relp, outf):
       outf.write(f6)
   outf.write(f7)
 
-def gen_vcxproj(proj_name, file_name, guid, plat, proj_type, postbuild, hf_list, cf_list, inc_dirs, link_libs):
+def gen_vcxproj(proj_name, file_name, guid, plat, proj_type, postbuild, debug_info, hf_list, cf_list, inc_dirs, link_libs):
 
   f1 = r'''<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -382,7 +501,7 @@ def gen_vcxproj(proj_name, file_name, guid, plat, proj_type, postbuild, hf_list,
 </Project>
 '''
 
-  fn = normpath(join(project_dir, file_name))
+  fn = normpath(join(solution_dir, file_name))
   relp = split(relpath(flint_dir, fn))[0] + '\\'
   with open(fn, 'w') as outf:
     outf.write(f1)
@@ -393,8 +512,8 @@ def gen_vcxproj(proj_name, file_name, guid, plat, proj_type, postbuild, hf_list,
     vcx_cpp_props(outf)
     vcx_user_props(plat, outf)
     outf.write(f2)
-    vcx_target_name_and_dirs(proj_name, plat, proj_type, outf)
-    vcx_tool_options(plat, proj_type, postbuild, inc_dirs, link_libs, outf)
+    vcx_target_name_and_dirs(proj_name, plat, outf)
+    vcx_tool_options(proj_name, plat, proj_type, postbuild, inc_dirs, link_libs, debug_info, outf)
     if hf_list:
       vcx_hdr_items(hf_list, relp, outf)
     vcx_c_items(cf_list, plat, relp, outf)
@@ -408,7 +527,7 @@ vcxproject_guid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
 s_guid = r'\s*(\{\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\})\s*'
 s_name = r'\s*\"([a-zA-Z][-.\\_a-zA-Z0-9]*\s*)\"\s*'
 re_guid = compile(r'\s*\"\s*' + s_guid + r'\"\s*')
-re_proj = compile(r'Project\s*\(\s*\"' + s_guid + r'\"\)\s*=\s*' 
+re_proj = compile(r'Project\s*\(\s*\"' + s_guid + r'\"\)\s*=\s*'
                   + s_name + r'\s*,\s*' + s_name + r'\s*,\s*\"' + s_guid + r'\"')
 re_fmap = compile(r'\s*' + s_guid + r'\s*=\s*' + s_guid)
 
@@ -419,10 +538,10 @@ def read_solution_file(soln_name):
     lines = open(solution_path).readlines()
     for i, ln in enumerate(lines):
       m = re_proj.search(ln)
-      if m: 
+      if m:
         if m.group(1) == folder_guid and m.group(2) == m.group(3):
           fd[m.group(2)] = m.group(4)
-        elif m.group(3).endswith('.vcxproj') or m.group(3).endswith('.pyproj'): 
+        elif m.group(3).endswith('.vcxproj') or m.group(3).endswith('.pyproj'):
           pd[m.group(2)] = (m.group(1), m.group(3), m.group(4))
       m = re_fmap.search(ln)
       if m:
@@ -482,17 +601,19 @@ def add_proj_to_sln(soln_name, soln_folder, proj_name, file_name, guid):
   pd[proj_name] = (vcxproject_guid, file_name, guid)
   if soln_folder:
     p2f[guid] = f_guid
-     
+
   write_solution_file(soln_name, fd, pd, p2f)
 
 c, h, cx, hx, t, tx, p = find_src(flint_dir)
 
-fn = join(flint_dir, 'fmpz-conversions-{}.in'.format(flib_type))
-copy(fn , join(flint_dir, 'fmpz-conversions.h')) 
-# fn = join(flint_dir, 'fft_tuning32.in')
-fn = join(flint_dir, 'fft_tuning64.in')
-copy(fn , join(flint_dir, 'fft_tuning.h')) 
-sln_name = project_name + '.sln' 
+if not debug:
+  fn = join(flint_dir, 'fmpz-conversions-{}.in'.format(flib_type))
+  copy(fn , join(flint_dir, 'fmpz-conversions.h'))
+  # fn = join(flint_dir, 'fft_tuning32.in')
+  fn = join(flint_dir, 'fft_tuning64.in')
+  copy(fn , join(flint_dir, 'fft_tuning.h'))
+  sln_name = project_name + '.sln'
+  # write_hdrs(h)
 
 if build_lib:
   # set up LIB build
@@ -501,33 +622,35 @@ if build_lib:
   vcx_path = 'lib_flint\\lib_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
   mode = ('win32', 'x64')
-  inc_dirs = r'.\;..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads'
-  link_libs = r'..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\lib\pthreads.lib'
-  gen_vcxproj(proj_name, vcx_path, guid, mode, lib_type, True, h, c, inc_dirs, link_libs)
+  inc_dirs = r'..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads'
+  link_libs = r'..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib'
+  gen_vcxproj(proj_name, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
 
+
 if build_dll:
+  write_def_file('dll_flint', h)
   # set up DLL build
   guid = '{' + str(uuid4()).upper() + '}'
   proj_name = 'dll_flint'
   vcx_path = 'dll_flint\\dll_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
   mode = ('win32', 'x64')
-  inc_dirs = r'.\;..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads;'
-  link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\lib\pthreads.lib;'
-  gen_vcxproj(proj_name, vcx_path, guid, mode, dll_type, True, h, c, inc_dirs, link_libs)
+  inc_dirs = r'..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads;'
+  link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
+  gen_vcxproj(proj_name, vcx_path, guid, mode, dll_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
 
 def gen_test(sln_name, test_name, c_file):
   # set up LIB build
   guid = '{' + str(uuid4()).upper() + '}'
-  proj_name = test_name 
+  proj_name = test_name
   vcx_path = r'flint-tests\\' + test_name + '\\' + test_name + '.vcxproj'
   gen_filter(vcx_path + '.filters', [], [('', c_file)])
   mode = ('win32', 'x64')
-  inc_dirs = r'.\;..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads;'
-  link_libs = r'..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\lib\pthreads.lib;'
-  gen_vcxproj(proj_name, vcx_path, guid, mode, app_type, False, [], [('', c_file)], inc_dirs, link_libs)
+  inc_dirs = r'..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads;'
+  link_libs = r'..\..\..\lib\$(IntDir)lib_flint.lib;..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
+  gen_vcxproj(proj_name, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
   return vcx_path, guid
 
 #   ('', 'test\\t-udiv_qrnnd_preinv.c')
@@ -536,9 +659,13 @@ def gen_test(sln_name, test_name, c_file):
 #   ('arith', 'arith\\test\\t-bell_number_multi_mod.c')
 
 def gen_tests(sln_name, c_files):
-  fd, pd, p2f = read_solution_file(sln_name)
-  
+
+  sn = sln_name[:sln_name.rfind('.')]
+  cnt = 0
+  soln = sn + str(cnt // 100 + 1) + '.sln'
   for name, fpath in c_files:
+    if cnt % 100 == 0:
+      fd, pd, p2f = read_solution_file(soln)
     if name:
       if name in fd:
         f_guid = fd[name]
@@ -554,13 +681,23 @@ def gen_tests(sln_name, c_files):
     pd[p_name] = (vcxproject_guid, vcx_name, guid)
     if name:
       p2f[guid] = f_guid
-
-  write_solution_file(sln_name, fd, pd, p2f)
+    cnt += 1
+    if cnt % 100 == 0:
+      write_solution_file(soln, fd, pd, p2f)
+      soln = sn + str(cnt // 100 + 1) + '.sln'
+  if cnt % 100:
+    write_solution_file(soln, fd, pd, p2f)
 
 if build_tests:
-  gen_tests('flint-tests.sln', tx)
+  gen_tests('flint-tests.sln', t)
 
 if debug:
+  print('\nC files')
+  for d in c:
+    print('  ', d)
+  print('\nC header files')
+  for d in h:
+    print('  ', d)
   print('\nC++ files')
   for d in cx:
     print('  ', d)

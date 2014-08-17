@@ -1,20 +1,51 @@
 @echo off
-rem input is the output directory
 
-set outdir=%1
-if "%outdir%" EQU "" (set outdir=..\..\lib\x64\release)
-
-call :copy_rename ..\..\flint.h %outdir% 
-
-for %%i in ("..\..\*.h") do (call :copy_rename %%i %outdir% %%~nxi)
-
-rem for %%i in ("..\..\flintxx\*.h") do (call :copy_rename %%i %outdir% %%~nxi)
-
-call :copy_rename ..\..\qadic\CPimport.txt %outdir%
-
+if /i %2 EQU LIB (set two=lib)
+if /i %2 EQU DLL (set two=dll)
+call :copy_files %1 ..\..\%two%\%1 %two%
 exit /b 0
 
-rem copy rename 'in_file_name directory out_file_name''
+:copy_files
+call :copy_rename ..\..\flint.h %2 > nul 2>&1
+
+rem copy C/C++ header files
+for %%i in ("..\..\*.h") do (call :copy_rename %%i %2 %%~nxi > nul 2>&1)
+
+rem copy C++ headers in flintxx
+rem for %%i in ("..\..\flintxx\*.h") do (call :copy_rename %%i %2 %%~nxi > nul 2>&1)
+
+rem copy conway polynomial text file
+call :copy_rename ..\..\qadic\CPimport.txt %2 > nul 2>&1
+
+rem copy the FLINT static library and related files
+if /i %3 EQU LIB (
+    if exist ..\%1\lib_flint.lib (
+        echo ..\%1\lib_flint.lib
+        call :copy_rename ..\%1\lib_flint.lib %2 > nul 2>&1  	
+        if exist ..\%1\lib_flint.pdb (
+            call :copy_rename ..\%1\lib_flint.pdb %2 > nul 2>&1
+            )
+        )
+)
+
+rem copy the FLINT dynamic library and related files
+if /i %3 EQU DLL (
+    if exist ..\%1\dll_flint.dll (
+        call :copy_rename ..\%1\dll_flint.dll %2 > nul 2>&1
+        if exist ..\%1\dll_flint.pdb (
+            call :copy_rename ..\%1\dll_flint.pdb %2 > nul 2>&1
+            )
+        if exist ..\%1\dll_flint.lib (
+            call :copy_rename ..\%1\dll_flint.lib %2 > nul 2>&1
+            )
+        if exist ..\%1\dll_flint.exp (
+            call :copy_rename ..\%1\dll_flint.exp %2 > nul 2>&1
+            )
+        )
+)
+exit /b 0
+
+rem copy rename 'in_file_name directory out_file_name'
 :copy_rename
 @echo off
 if not exist %1 goto cr_nofile

@@ -124,7 +124,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
 {
    slong i, j;
    mp_limb_t factor = 0;
-   mp_limb_t x, y, oldx, oldy, ninv;
+   mp_limb_t x, y = 0, oldx, oldy, ninv;
    ulong pr, oldpr, sqrt, bits0, norm;
    n_primes_t iter;
 
