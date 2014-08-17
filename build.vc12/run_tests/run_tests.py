@@ -13,7 +13,7 @@ import re
 
 script_dir = dirname(__file__)
 chdir(script_dir)
-exe_dir = normpath(join(script_dir, '..\\x64\\Release'))
+exe_dir = normpath(join(script_dir, '..\\tests\\x64\\Release'))
 vcx_dir = normpath(join(script_dir, '..\\flint-tests'))
 
 def split_pnx(p):
@@ -82,7 +82,7 @@ for i in vcd:
     else:
       run_ok += 1
     if output:
-      print(output.decode())
+      print(output.decode().replace('\n', ''))
     else:
       print()
   else:

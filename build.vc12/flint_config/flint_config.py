@@ -24,7 +24,7 @@ debug = False
 build_lib = True
 build_dll = True
 build_tests = True
-build_profiles = False
+build_profiles = True
 
 # add user choice
 flib_type = 'reentrant' # ('gc', 'rentrant', 'single')
@@ -94,7 +94,9 @@ def find_src(path):
         else:
           t += [(l2, fp)]
       elif leaf == 'profile':
-        p += [fp]
+        p2, l2 = split(pth)
+        l2 = '' if l2 == 'flint2' else l2
+        p += [(l2, fp)]
       elif leaf == 'flintxx':
         cx += [fp]
       elif x == '.c':
@@ -343,21 +345,26 @@ def vcx_user_props(plat, outf):
     for conf in ('Release', 'Debug'):
       outf.write(f1.format(pl, conf))
 
-def vcx_target_name_and_dirs(name, plat, outf):
+def vcx_target_name_and_dirs(proj_name, proj_dir, plat, outf):
 
   f1 = r'''  <PropertyGroup>
     <_ProjectFileVersion>10.0.21006.1</_ProjectFileVersion>
 '''
   f2 = r'''    <TargetName Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">{2:s}</TargetName>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(Platform)\$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(SolutionDir){3:s}$(Platform)\$(Configuration)\</OutDir>
 '''
   f3 = r'''  </PropertyGroup>
 '''
+  if not proj_dir:
+    proj_dir = ''
+  elif not (proj_dir.endswith('\\') or proj_dir.endswith('/')):
+    proj_dir += '\\'
+
   outf.write(f1)
   for pl in plat:
     for conf in ('Release', 'Debug'):
-      outf.write(f2.format(pl, conf, name))
+      outf.write(f2.format(pl, conf, proj_name, proj_dir))
   outf.write(f3)
 
 def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
@@ -490,7 +497,7 @@ def vcx_c_items(cf_list, plat, relp, outf):
       outf.write(f6)
   outf.write(f7)
 
-def gen_vcxproj(proj_name, file_name, guid, plat, proj_type, postbuild, debug_info, hf_list, cf_list, inc_dirs, link_libs):
+def gen_vcxproj(proj_name, project_dir, file_name, guid, plat, proj_type, postbuild, debug_info, hf_list, cf_list, inc_dirs, link_libs):
 
   f1 = r'''<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -512,7 +519,7 @@ def gen_vcxproj(proj_name, file_name, guid, plat, proj_type, postbuild, debug_in
     vcx_cpp_props(outf)
     vcx_user_props(plat, outf)
     outf.write(f2)
-    vcx_target_name_and_dirs(proj_name, plat, outf)
+    vcx_target_name_and_dirs(proj_name, project_dir, plat, outf)
     vcx_tool_options(proj_name, plat, proj_type, postbuild, inc_dirs, link_libs, debug_info, outf)
     if hf_list:
       vcx_hdr_items(hf_list, relp, outf)
@@ -624,7 +631,7 @@ if build_lib:
   mode = ('win32', 'x64')
   inc_dirs = r'..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads'
   link_libs = r'..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib'
-  gen_vcxproj(proj_name, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
+  gen_vcxproj(proj_name, None, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
 
 
@@ -638,27 +645,22 @@ if build_dll:
   mode = ('win32', 'x64')
   inc_dirs = r'..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads;'
   link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
-  gen_vcxproj(proj_name, vcx_path, guid, mode, dll_type, True, True, h, c, inc_dirs, link_libs)
+  gen_vcxproj(proj_name, None, vcx_path, guid, mode, dll_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
 
-def gen_test(sln_name, test_name, c_file):
+def gen_test(sln_name, test_name, directory, proj_dir, c_file):
   # set up LIB build
   guid = '{' + str(uuid4()).upper() + '}'
   proj_name = test_name
-  vcx_path = r'flint-tests\\' + test_name + '\\' + test_name + '.vcxproj'
+  vcx_path = directory + '\\' + test_name + '\\' + test_name + '.vcxproj'
   gen_filter(vcx_path + '.filters', [], [('', c_file)])
   mode = ('win32', 'x64')
   inc_dirs = r'..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads;'
   link_libs = r'..\..\..\lib\$(IntDir)lib_flint.lib;..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
-  gen_vcxproj(proj_name, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
+  gen_vcxproj(proj_name, proj_dir, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
   return vcx_path, guid
 
-#   ('', 'test\\t-udiv_qrnnd_preinv.c')
-#   ('', 'test\\t-umul_ppmm.c')
-#   ('arith', 'arith\\test\\t-bell_number.c')
-#   ('arith', 'arith\\test\\t-bell_number_multi_mod.c')
-
-def gen_tests(sln_name, c_files):
+def gen_tests(sln_name, directory, proj_dir, c_files):
 
   sn = sln_name[:sln_name.rfind('.')]
   cnt = 0
@@ -677,7 +679,7 @@ def gen_tests(sln_name, c_files):
       continue
     t = t[2:].replace('.c', '')
     p_name = (name + '_' + t) if name else t
-    vcx_name, guid = gen_test(sln_name, p_name, fpath)
+    vcx_name, guid = gen_test(sln_name, p_name, directory, proj_dir, fpath)
     pd[p_name] = (vcxproject_guid, vcx_name, guid)
     if name:
       p2f[guid] = f_guid
@@ -689,7 +691,10 @@ def gen_tests(sln_name, c_files):
     write_solution_file(soln, fd, pd, p2f)
 
 if build_tests:
-  gen_tests('flint-tests.sln', t)
+  gen_tests('flint-tests.sln', 'flint-tests', 'tests', t)
+
+if build_profiles:
+  gen_tests('flint-profiles.sln', 'flint-profiles', 'profiles', p)
 
 if debug:
   print('\nC files')
