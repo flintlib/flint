@@ -31,11 +31,11 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
     slong m = A->r, b = fmpz_mat_max_bits(A), cutoff = 3;
 
     if (b <= 2)
-        cutoff = 65;
+        cutoff = 69;
     else if (b <= 4)
-        cutoff = 40;
+        cutoff = 49;
     else if (b <= 8)
-        cutoff = 31;
+        cutoff = 34;
     else if (b <= 16)
         cutoff = 19;
     else if (b <= 32)
