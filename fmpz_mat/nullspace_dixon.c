@@ -26,16 +26,13 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-int
+slong
 _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
-        ulong randbits)
+        ulong randbits, slong start_prec)
 {
-    int success;
-    /* TODO work out/tune for best initial prec */
-    slong i, j, k, n, m, rank, nullity, prec = 4;
-    slong * pivnonpiv;
-    slong * pivots;
-    slong * nonpivots;
+    int increments;
+    slong i, j, k, n, m, rank, nullity, prec = start_prec;
+    slong * pivnonpiv, * pivots, * nonpivots;
     mp_limb_t p;
     nmod_mat_t matmod, bmod, T, Tb;
     fmpz_mat_t y, maty, b;
@@ -43,7 +40,6 @@ _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
     fmpz_t den, M, t;
     flint_rand_t state;
 
-    success = 1;
     m = mat->r;
     n = mat->c;
     flint_randinit(state);
@@ -69,13 +65,14 @@ _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
         for (i = 0; i < m; i++)
         {
             for (j = 0; j < n; j++)
-                matmod->rows[i][j] = fmpz_fdiv_ui(fmpz_mat_entry(mat, i, j), p);
+                nmod_mat_entry(matmod, i, j)
+                    = fmpz_fdiv_ui(fmpz_mat_entry(mat, i, j), p);
             for (j = n; j < n + m; j++)
             {
                 if (j == n + i)
-                    matmod->rows[i][j] = UWORD(1);
+                    nmod_mat_entry(matmod, i, j) = UWORD(1);
                 else
-                    matmod->rows[i][j] = UWORD(0);
+                    nmod_mat_entry(matmod, i, j) = UWORD(0);
             }
         }
 
@@ -92,10 +89,7 @@ _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
         nullity = n - rank;
 
         if (nullity == 0)
-        {
-            success = 0;
             break;
-        }
 
         pivots = pivnonpiv;            /* length = rank */
         nonpivots = pivnonpiv + rank;  /* length = nullity */
@@ -124,6 +118,7 @@ _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
         fmpz_mat_zero(x);
         fmpz_mat_zero(b);
 
+        increments = 0;
         for (k = 0; k < prec; k++)
         {
             fmpz_mat_get_nmod_mat(bmod, b);
@@ -150,38 +145,53 @@ _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
 
             fmpz_mat_scalar_addmul_fmpz(x, y, M);
             fmpz_mul_ui(M, M, p);
-        }
-
-        for (i = 0; i < n; i++)
-            fmpz_mod(fmpz_mat_entry(x, i, 0), fmpz_mat_entry(x, i, 0), M);
-
-        nmod_mat_window_clear(T);
-        /* lift into place */
-        if (fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, M))
-        {
-            fmpz_one(den);
-            for (i = 0; i < n; i++)
-                fmpz_lcm(den, den, fmpq_mat_entry_den(x_q, i, 0));
-            if (fmpz_is_one(den))
+            if (k == prec - 1) /* about to finish */
             {
+                /* TODO is this necessary? */
                 for (i = 0; i < n; i++)
-                    fmpz_set(fmpz_mat_entry(x, i, 0),
-                            fmpq_mat_entry_num(x_q, i, 0));
-            }
-            else
-            {
-                for (i = 0; i < n; i++)
+                    fmpz_mod(fmpz_mat_entry(x, i, 0),
+                            fmpz_mat_entry(x, i, 0), M);
+
+                /* lift into place */
+                if (fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, M))
                 {
-                    fmpz_divexact(t, den, fmpq_mat_entry_den(x_q, i, 0));
-                    fmpz_mul(fmpz_mat_entry(x, i, 0),
-                            fmpq_mat_entry_num(x_q, i, 0), t);
+                    fmpz_one(den);
+                    for (i = 0; i < n; i++)
+                        fmpz_lcm(den, den, fmpq_mat_entry_den(x_q, i, 0));
+                    if (fmpz_is_one(den))
+                    {
+                        for (i = 0; i < n; i++)
+                            fmpz_set(fmpz_mat_entry(x, i, 0),
+                                    fmpq_mat_entry_num(x_q, i, 0));
+                    }
+                    else
+                    {
+                        for (i = 0; i < n; i++)
+                        {
+                            fmpz_divexact(t, den,
+                                    fmpq_mat_entry_den(x_q, i, 0));
+                            fmpz_mul(fmpz_mat_entry(x, i, 0),
+                                    fmpq_mat_entry_num(x_q, i, 0), t);
+                        }
+                    }
+                    fmpz_mat_mul(b, mat, x);
+                    /* found a nullspace vector */
+                    if (fmpz_mat_is_zero(b))
+                        break;
+                }
+                /* try a higher precision */
+                if (increments < 4)
+                {
+                    increments++;
+                    prec += FLINT_MAX(1, start_prec / 4);
                 }
             }
-            fmpz_mat_mul(b, mat, x);
-            if (fmpz_mat_is_zero(b))
-                break;
         }
-        prec++;
+        nmod_mat_window_clear(T);
+        /* if we found an element above we are done */
+        if (k != prec)
+            break;
+        /* next time try a larger prime unless we are at the optimum size */
         if (randbits < NMOD_MAT_OPTIMAL_MODULUS_BITS)
             randbits++;
     }
@@ -199,14 +209,15 @@ _fmpz_mat_nullspace_element(fmpz_mat_t x, const fmpz_mat_t mat,
     fmpz_clear(t);
     fmpz_clear(den);
 
-    return success;
+    return nullity;
 }
 
 slong
-fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat)
+_fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat, ulong randbits,
+        slong prec)
 {
+    int finished = 0;
     slong i, j, n, m, nullity;
-    ulong randbits = 6; /*NMOD_MAT_OPTIMAL_MODULUS_BITS;*/
     fmpz_mat_t tmp, x;
 
     m = mat->r;
@@ -221,9 +232,15 @@ fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat)
         for (i = m; i < m + n; i++)
             fmpz_zero(fmpz_mat_entry(tmp, i, j));
     }
-    nullity = 0;
-    while (_fmpz_mat_nullspace_element(x, tmp, randbits))
+    for (nullity = 0; !finished; nullity++)
     {
+        slong out = _fmpz_mat_nullspace_element(x, tmp, randbits, prec);
+        if (out == 0)
+            break;
+        /* the remaining nullspace is one dimensional, so we have found the
+           last vector */
+        if (out == 1)
+            finished = 1;
         /* add to output and ensure this vector won't be found again */
         for (j = 0; j < n; j++)
         {
@@ -232,10 +249,22 @@ fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat)
             fmpz_set(fmpz_mat_entry(res, j, nullity),
                     fmpz_mat_entry(x, j, 0));
         }
-        nullity++;
     }
     fmpz_mat_clear(x);
     fmpz_mat_clear(tmp);
 
     return nullity;
+}
+
+slong
+fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat)
+{
+    slong prec, n, bits;
+    n = FLINT_MAX(mat->r, mat->c);
+    bits = fmpz_mat_max_bits(mat);
+    prec = (slong) (-n*n*0.0001462 + bits*n*0.03176 + bits*bits*0.001583
+            + n*0.008566 - bits*0.2457 + 18.66);
+    prec = FLINT_MAX(prec, 4);
+    return _fmpz_mat_nullspace_dixon(res, mat,
+            NMOD_MAT_OPTIMAL_MODULUS_BITS, prec);
 }
