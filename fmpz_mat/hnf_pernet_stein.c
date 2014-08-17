@@ -60,6 +60,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
             fmpz_set(fmpz_mat_entry(B1, i, j), fmpz_mat_entry(B, i, j));
         }
     }
+
     /* find kernel basis vector */
     if (fmpz_mat_nullspace(k, B1) != 1)
     {
@@ -72,7 +73,6 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     if (bits < 0)
         bits = -bits;
 
-    fmpq_mat_set_fmpz_mat(H1_q, H1);
     fmpz_init(tmp);
 
     /* set the last row of Bu to be random, such that Bu is nonsingular */
@@ -159,6 +159,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     fmpq_clear(alpha);
 
     /* set cols = H1*x and place in position in H */
+    fmpq_mat_set_fmpz_mat(H1_q, H1);
     fmpq_mat_mul(cols_q, H1_q, x_q);
     fmpq_mat_get_fmpz_mat(cols, cols_q);
     for (i = 0; i < n; i++)
