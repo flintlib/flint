@@ -30,6 +30,13 @@
 
     Parameter manipulation
 
+    These functions are used to initialise LLL context objects which are of the
+    type \code{fmpz_lll_t}. These objects contain all information about the
+    options governing the reduction using this module's functions including the
+    LLL parameters \delta and \eta, the representation type of the input matrix
+    (whether it is a lattice basis or a Gram matrix), and the type of Gram
+    matrix to be used during L^2 (approximate or exact).
+
 *******************************************************************************
 
 void fmpz_lll_context_init_default(fmpz_lll_t fl)
@@ -42,12 +49,13 @@ void fmpz_lll_context_init(fmpz_lll_t fl, double delta, double eta,
 
     Sets \code{fl->delta}, \code{fl->eta}, \code{fl->rt} and \code{fl->gt} to
     \code{delta}, \code{eta}, \code{rt} and \code{gt} (given as input)
-    respectively. \code{delta} and \code{eta} are the L^2 parameters. The
-    representation type is input using \code{rt} and can have the values
-    $Z_BASIS$ for a lattice basis and $GRAM$ for a Gram matrix. The Gram type
-    to be used during computation can be specified using \code{gt} which can
-    assume the values $APPROX$ and $EXACT$. Note that \code{gt} has meaning
-    only when \code{rt} is $Z_BASIS$.
+    respectively. \code{delta} and \code{eta} are the L^2 parameters.
+    \code{delta} and \code{eta} must lie in the intervals $(0.25, 1)$ and
+    (0.5, \sqrt{\code{delta}}) respectively. The representation type is input
+    using \code{rt} and can have the values $Z_BASIS$ for a lattice basis and
+    $GRAM$ for a Gram matrix. The Gram type to be used during computation can
+    be specified using \code{gt} which can assume the values $APPROX$ and
+    $EXACT$. Note that \code{gt} has meaning only when \code{rt} is $Z_BASIS$.
 
 *******************************************************************************
 
@@ -165,6 +173,8 @@ int fmpz_lll_shift(const fmpz_mat_t B)
 *******************************************************************************
 
     Varities of LLL
+
+    These programs implement ideas from the book chapter \citep{Stehle2010}.
 
 *******************************************************************************
 
@@ -296,6 +306,8 @@ int fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size,
 
     LLL-reducedness
 
+    These programs implement ideas from the paper \citep{Villard2007}.
+
 *******************************************************************************
 
 int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
@@ -321,7 +333,12 @@ int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl,
     (\code{fl->delta}, \code{fl->eta}), and otherwise returns zero. The
     \code{mpfr} variables used, if any, have their precision set to be exactly
     \code{prec} bits. The function is mainly intended to be used for testing
-    purposes.
+    purposes. It first tests for LLL reducedness using
+    \code{fmpz_lll_is_reduced_d()}, followed by
+    \code{fmpz_lll_is_reduced_mpfr()} and finally calls
+    \code{fmpz_mat_is_reduced()} or \code{fmpz_mat_is_reduced_gram()}
+    (depending on the type of input as determined by \code{fl->rt}), if
+    required.
 
 int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                        const fmpz_t gs_B, int newd)
@@ -352,7 +369,12 @@ int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
     each $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B},
     and otherwise returns zero. The \code{mpfr} variables used, if any, have
     their precision set to be exactly \code{prec} bits. The function is mainly
-    intended to be used for testing purposes.
+    intended to be used for testing purposes. It first tests for LLL
+    reducedness using \code{fmpz_lll_is_reduced_d_with_removal()}, followed by
+    \code{fmpz_lll_is_reduced_mpfr_with_removal()} and finally calls
+    \code{fmpz_mat_is_reduced_with_removal()} or
+    \code{fmpz_mat_is_reduced_gram_with_removal()} (depending on the type of
+    input as determined by \code{fl->rt}), if required.
 
 *******************************************************************************
 

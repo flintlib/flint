@@ -711,6 +711,12 @@ void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
     LLL parameter manipulation
 
+    These functions handle memory management for the LLL context objects which
+    are of the type \code{fmpq_lll_t}. These objects contain information about
+    the options governing the strength of reduction using the LLL reduction
+    functions in the \code{fmpz_mat} module in the form of the LLL parameters
+    \delta and \eta.
+
 *******************************************************************************
 
 void fmpq_lll_context_init(fmpq_lll_t fl, double delta, double eta)
