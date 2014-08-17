@@ -52,11 +52,31 @@ void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
                 /* reduce row i - 1 with row i */
                 if (fmpz_is_zero(fmpz_mat_entry(S, i - 1, k)))
                     continue;
+                if (fmpz_cmpabs(fmpz_mat_entry(S, i, k),
+                            fmpz_mat_entry(S, i - 1, k)) == 0)
+                {
+                    if (fmpz_equal(fmpz_mat_entry(S, i, k),
+                            fmpz_mat_entry(S, i - 1, k)))
+                    {
+                        for (j = k; j != n; j++)
+                            fmpz_sub(fmpz_mat_entry(S, i - 1, j),
+                                    fmpz_mat_entry(S, i - 1, j),
+                                    fmpz_mat_entry(S, i, j));
+                    }
+                    else
+                    {
+                        for (j = k; j != n; j++)
+                            fmpz_add(fmpz_mat_entry(S, i - 1, j),
+                                    fmpz_mat_entry(S, i - 1, j),
+                                    fmpz_mat_entry(S, i, j));
+                    }
+                    continue;
+                }
                 fmpz_xgcd(g, u, v, fmpz_mat_entry(S, i, k),
                         fmpz_mat_entry(S, i - 1, k));
                 fmpz_divexact(r2g, fmpz_mat_entry(S, i - 1, k), g);
                 fmpz_divexact(r1g, fmpz_mat_entry(S, i, k), g);
-                for (j = 0; j != n; j++)
+                for (j = k; j != n; j++)
                 {
                     fmpz_mul(b, u, fmpz_mat_entry(S, i, j));
                     fmpz_addmul(b, v, fmpz_mat_entry(S, i - 1, j));
@@ -75,11 +95,31 @@ void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
                 /* reduce col j with col k */
                 if (fmpz_is_zero(fmpz_mat_entry(S, k, j)))
                     continue;
+                if (fmpz_cmpabs(fmpz_mat_entry(S, k, k),
+                            fmpz_mat_entry(S, k, j)) == 0)
+                {
+                    if (fmpz_equal(fmpz_mat_entry(S, k, k),
+                            fmpz_mat_entry(S, k, j)))
+                    {
+                        for (i = k; i != m; i++)
+                            fmpz_sub(fmpz_mat_entry(S, i, j),
+                                    fmpz_mat_entry(S, i, j),
+                                    fmpz_mat_entry(S, i, k));
+                    }
+                    else
+                    {
+                        for (i = k; i != m; i++)
+                            fmpz_add(fmpz_mat_entry(S, i, j),
+                                    fmpz_mat_entry(S, i, j),
+                                    fmpz_mat_entry(S, i, k));
+                    }
+                    continue;
+                }
                 fmpz_xgcd(g, u, v, fmpz_mat_entry(S, k, k),
                         fmpz_mat_entry(S, k, j));
                 fmpz_divexact(r2g, fmpz_mat_entry(S, k, j), g);
                 fmpz_divexact(r1g, fmpz_mat_entry(S, k, k), g);
-                for (i = 0; i != m; i++)
+                for (i = k; i != m; i++)
                 {
                     fmpz_mul(b, u, fmpz_mat_entry(S, i, k));
                     fmpz_addmul(b, v, fmpz_mat_entry(S, i, j));
@@ -92,9 +132,7 @@ void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
             }
             col_done = 1;
             for (i = 0; i != m; i++)
-            {
                 col_done &= (i == k) || fmpz_is_zero(fmpz_mat_entry(S, i, k));
-            }
         }
         while (!col_done);
 
