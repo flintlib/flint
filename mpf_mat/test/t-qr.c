@@ -60,7 +60,7 @@ main(void)
 
         mpf_mat_qr(Q, R, A);
 
-        mpf_mat_mul_classical(B, Q, R, MPF_RNDZ);
+        mpf_mat_mul(B, Q, R);
 
         if (!mpf_mat_approx_equal(A, B, MPF_MAT_QR_EQ_BITS))
         {

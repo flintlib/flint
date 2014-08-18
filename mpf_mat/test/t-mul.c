@@ -40,7 +40,7 @@ main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("mul_classical....");
+    flint_printf("mul....");
     fflush(stdout);
 
 
@@ -66,10 +66,10 @@ main(void)
         mpf_mat_randtest(B, state, 200);
         mpf_mat_randtest(C, state, 200);
 
-        mpf_mat_mul_classical(D, B, C, MPF_RNDZ);
-        mpf_mat_mul_classical(E, A, B, MPF_RNDZ);
-        mpf_mat_mul_classical(F, A, D, MPF_RNDZ);
-        mpf_mat_mul_classical(G, E, C, MPF_RNDZ);
+        mpf_mat_mul(D, B, C);
+        mpf_mat_mul(E, A, B);
+        mpf_mat_mul(F, A, D);
+        mpf_mat_mul(G, E, C);
 
         if (!mpf_mat_approx_equal(F, G, MPF_MAT_MUL_BITS))
         {
@@ -79,7 +79,7 @@ main(void)
             abort();
         }
 
-        mpf_mat_mul_classical(A, A, B, MPF_RNDZ);
+        mpf_mat_mul(A, A, B);
 
         if (!mpf_mat_equal(A, E))
         {

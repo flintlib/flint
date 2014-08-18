@@ -48,13 +48,6 @@ typedef mpf_mat_struct mpf_mat_t[1];
 
 #define mpf_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
 
-typedef enum
-{
-    MPF_RNDZ,    /* round toward zero */
-    MPF_RNDU,    /* round toward +Inf */
-    MPF_RNDD     /* round toward -Inf */
-} mpf_rnd_t;
-
 /* Memory management  ********************************************************/
 
 void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec);
@@ -92,7 +85,7 @@ void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 
 /* Multiplication */
 
-void mpf_mat_mul_classical(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B, mpf_rnd_t rnd);
+void mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B);
 
 /* Permutations */
 
