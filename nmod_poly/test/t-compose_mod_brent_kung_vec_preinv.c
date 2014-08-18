@@ -20,8 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2012 Lina Kulakova
-    Copyright (C) 2014 Martin Lee
+    Copyright (C) 2013, 2014 Martin Lee
 
 ******************************************************************************/
 
@@ -38,7 +37,7 @@
 #define ulong mp_limb_t
 
 #include "flint.h"
-#include "fmpz_mod_poly.h"
+#include "nmod_poly.h"
 #include "ulong_extras.h"
 
 int
@@ -50,71 +49,68 @@ main(void)
     flint_printf("compose_mod_brent_kung_vec_preinv....");
     fflush(stdout);
 
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpz_mod_poly_t a, ainv, b, c;
-        fmpz_t p;
-        slong l, j, k;
-        fmpz_mod_poly_struct * pow, * res;
+        nmod_poly_t a, ainv, b, c;
+        mp_limb_t m = n_randtest_prime(state, 0);
+        slong j, k, l;
+        nmod_poly_struct * pow, * res;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randtest_prime(state, 0));
+        nmod_poly_init(a, m);
+        nmod_poly_init(b, m);
+        nmod_poly_init(c, m);
+        nmod_poly_init(ainv, m);
 
-        fmpz_mod_poly_init(a, p);
-        fmpz_mod_poly_init(ainv, p);
-        fmpz_mod_poly_init(b, p);
-        fmpz_mod_poly_init(c, p);
-
-        fmpz_mod_poly_randtest(b, state, n_randint(state, 20) + 1);
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1);
+        nmod_poly_randtest(b, state, 1+n_randint(state, 20));
+        nmod_poly_randtest_not_zero(a, state, 1+n_randint(state, 20));
         l= n_randint(state, 20) + 1;
         k= n_randint(state, l ) + 1;
 
-        fmpz_mod_poly_reverse(ainv, a, a->length);
-        fmpz_mod_poly_inv_series_newton(ainv, ainv, a->length);
-        pow = (fmpz_mod_poly_struct *) flint_malloc((l + k)*sizeof(fmpz_mod_poly_struct));
+        nmod_poly_rem(b, b, a);
+        nmod_poly_reverse(ainv, a, a->length);
+        nmod_poly_inv_series(ainv, ainv, a->length);
+        pow = (nmod_poly_struct *) flint_malloc((l + k)*sizeof(nmod_poly_struct));
         res = pow + l;
 
-        fmpz_mod_poly_rem(b, b, a);
         for (j = 0; j < l - 1; j++)
         {
-            fmpz_mod_poly_init(pow + j, p);
-            fmpz_mod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
-            fmpz_mod_poly_rem(pow + j, pow + j, a);
+            nmod_poly_init(pow + j, m);
+            nmod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
+            nmod_poly_rem(pow + j, pow + j, a);
         }
 
-        fmpz_mod_poly_init(pow + l - 1, p);
-        fmpz_mod_poly_set(pow + l - 1, b);
+        nmod_poly_init(pow + l - 1, m);
+        nmod_poly_set(pow + l - 1, b);
 
-        fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, a, ainv);
+        nmod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, a, ainv);
 
         for (j = 0; j < k; j++)
         {
-            fmpz_mod_poly_compose_mod(c, pow + j, b, a);
-            if (!fmpz_mod_poly_equal(res + j, c))
+            nmod_poly_compose_mod(c, pow + j, b, a);
+            if (!nmod_poly_equal(res + j, c))
             {
                 flint_printf("FAIL (composition):\n");
-                flint_printf("a:\n"); fmpz_mod_poly_print(a); flint_printf("\n");
-                flint_printf("res:\n"); fmpz_mod_poly_print(res + j); flint_printf("\n");
-                flint_printf("pow:\n"); fmpz_mod_poly_print(pow + j); flint_printf("\n");
-                flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
-                flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
+                flint_printf("a:\n"); nmod_poly_print(a); flint_printf("\n");
+                flint_printf("res:\n"); nmod_poly_print(res + j); flint_printf("\n");
+                flint_printf("pow:\n"); nmod_poly_print(pow + j); flint_printf("\n");
+                flint_printf("b:\n"); nmod_poly_print(b); flint_printf("\n");
+                flint_printf("c:\n"); nmod_poly_print(c); flint_printf("\n");
                 flint_printf("j: %wd\n", j);
                 abort();
             }
         }
 
-        fmpz_clear(p);
-        fmpz_mod_poly_clear(a);
-        fmpz_mod_poly_clear(ainv);
-        fmpz_mod_poly_clear(b);
-        fmpz_mod_poly_clear(c);
+        nmod_poly_clear(a);
+        nmod_poly_clear(ainv);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
         for (j = 0; j < l; j++)
-            fmpz_mod_poly_clear(pow + j);
+            nmod_poly_clear(pow + j);
         for (j = 0; j < k; j++)
-            fmpz_mod_poly_clear(res + j);
+            nmod_poly_clear(res + j);
         flint_free(pow);
     }
+
 
     FLINT_TEST_CLEANUP(state);
     

@@ -19,33 +19,51 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 Fredrik Johansson
- 
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2014 William Hart
+
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpq.h"
 
 void
-fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+_fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
+            slong r)
 {
-    if (poly == res)
-    {
-        fmpz_poly_truncate(res, n);
-    }
-    else
-    {
-        slong rlen;
+    fmpz_t u;
 
-        rlen = FLINT_MIN(n, poly->length);
-        while (rlen > 0 && fmpz_is_zero(poly->coeffs + rlen - 1))
-            rlen--;
+    /* both are integers */
+    if (fmpz_is_one(q))
+    {
+        if (r >= 0)
+           fmpz_add_ui(rnum, p, r);
+        else
+           fmpz_sub_ui(rnum, p, -r);
 
-        fmpz_poly_fit_length(res, rlen);
-        _fmpz_vec_set(res->coeffs, poly->coeffs, rlen);
-        _fmpz_poly_set_length(res, rlen);
+        fmpz_set(rden, q);
+        
+        return;
     }
+
+    /*
+    We want to compute p/q + r/1 where the inputs are already
+    in canonical form.
+
+    Note (p + q*r, q) is in canonical form.
+
+    */
+    
+    fmpz_init(u);
+
+    fmpz_mul_si(u, q, r);
+    fmpz_add(rnum, p, u);
+    fmpz_set(rden, q);
+
+    fmpz_clear(u);
 }
 
+void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c)
+{
+    _fmpq_add_si(fmpq_numref(res), fmpq_denref(res),
+              fmpq_numref(op1), fmpq_denref(op1), c);
+}

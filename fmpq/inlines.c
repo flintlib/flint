@@ -19,33 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 Fredrik Johansson
- 
+    Copyright (C) 2009 William Hart
+
 ******************************************************************************/
 
+#define FMPQ_INLINES_C
+
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpq.h"
 
-void
-fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+void fmpq_numerator(fmpz_t n, const fmpq_t q)
 {
-    if (poly == res)
-    {
-        fmpz_poly_truncate(res, n);
-    }
-    else
-    {
-        slong rlen;
+   fmpz_set(n, fmpq_numref(q));
+}
 
-        rlen = FLINT_MIN(n, poly->length);
-        while (rlen > 0 && fmpz_is_zero(poly->coeffs + rlen - 1))
-            rlen--;
+void fmpq_denominator(fmpz_t n, const fmpq_t q)
+{
+   fmpz_set(n, fmpq_denref(q));
+}
 
-        fmpz_poly_fit_length(res, rlen);
-        _fmpz_vec_set(res->coeffs, poly->coeffs, rlen);
-        _fmpz_poly_set_length(res, rlen);
-    }
+int fmpq_equal_si(fmpq_t q, slong n)
+{
+   return q->num == n && q->den == WORD(1);
+}
+
+int fmpq_equal_fmpz(fmpq_t q, fmpz_t n)
+{
+   return fmpz_equal(fmpq_numref(q), n) && q->den == WORD(1);
 }
 

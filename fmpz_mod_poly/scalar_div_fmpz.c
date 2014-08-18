@@ -19,33 +19,52 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 Fredrik Johansson
- 
+    Copyright (C) 2011 Sebastian Pancratz
+
 ******************************************************************************/
 
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
-void
-fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, 
+                                    const fmpz_t x, const fmpz_t p)
 {
-    if (poly == res)
-    {
-        fmpz_poly_truncate(res, n);
-    }
-    else
-    {
-        slong rlen;
+    fmpz_t g, xinv;
 
-        rlen = FLINT_MIN(n, poly->length);
-        while (rlen > 0 && fmpz_is_zero(poly->coeffs + rlen - 1))
-            rlen--;
+    fmpz_init(g);
+    fmpz_init(xinv);
 
-        fmpz_poly_fit_length(res, rlen);
-        _fmpz_vec_set(res->coeffs, poly->coeffs, rlen);
-        _fmpz_poly_set_length(res, rlen);
+    if (fmpz_sgn(x) < 0 || fmpz_cmp(x, p) >= 0)
+    {
+       fmpz_mod(xinv, x, p);
+       fmpz_gcdinv(g, xinv, xinv, p);
+    } else
+       fmpz_gcdinv(g, xinv, x, p);
+
+    if (!fmpz_is_one(g))
+    {
+        flint_printf("Exception (_fmpz_mod_poly_scalar_div_fmpz). Impossible inverse.\n");
+        abort();
     }
+
+    _fmpz_vec_scalar_mul_fmpz(res, poly, len, xinv);
+    _fmpz_vec_scalar_mod_fmpz(res, res, len, p);
+
+    fmpz_clear(xinv);
+    fmpz_clear(g);
+}
+
+void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res, 
+                                   const fmpz_mod_poly_t poly, const fmpz_t x)
+{
+    fmpz_mod_poly_fit_length(res, poly->length);
+    _fmpz_mod_poly_scalar_div_fmpz(res->coeffs, 
+                                   poly->coeffs, poly->length, x, &(poly->p));
+
+    _fmpz_mod_poly_set_length(res, poly->length);
+    _fmpz_mod_poly_normalise(res);
 }
 

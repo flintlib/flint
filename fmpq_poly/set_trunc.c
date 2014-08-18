@@ -26,14 +26,14 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 
 void
-fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+fmpq_poly_set_trunc(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (poly == res)
     {
-        fmpz_poly_truncate(res, n);
+        fmpq_poly_truncate(res, n);
     }
     else
     {
@@ -43,9 +43,11 @@ fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
         while (rlen > 0 && fmpz_is_zero(poly->coeffs + rlen - 1))
             rlen--;
 
-        fmpz_poly_fit_length(res, rlen);
+        fmpq_poly_fit_length(res, rlen);
         _fmpz_vec_set(res->coeffs, poly->coeffs, rlen);
-        _fmpz_poly_set_length(res, rlen);
+        fmpz_set(res->den, poly->den);
+        _fmpq_poly_set_length(res, rlen);
+        fmpq_poly_canonicalise(res);
     }
 }
 
