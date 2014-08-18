@@ -134,11 +134,13 @@ int mpf_mat_is_square(const mpf_mat_t mat)
 
 *******************************************************************************
 
-void mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B)
+void mpf_mat_mul_classical(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B,
+                           mpf_rnd_t rnd)
 
-    Sets \code{C} to the matrix product $C = A B$. The matrices must have
-    compatible dimensions for matrix multiplication (an exception is raised
-    otherwise). Aliasing is allowed.
+    Sets \code{C} to the matrix product $C = A B$, where each entry of \code{C}
+    is rounded in the direction \code{rnd}. The matrices must have compatible
+    dimensions for matrix multiplication (an exception is raised otherwise).
+    Aliasing is allowed.
 
 *******************************************************************************
 
