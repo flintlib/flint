@@ -949,7 +949,7 @@ void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
     implementations in FLINT to be the one most likely to be optimal, based on
     the characteristics of the input matrix.
 
-    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    Aliasing of \code{S} and \code{A} is allowed. The size of \code{S} must be
     the same as that of \code{A}.
 
 void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A)
@@ -958,25 +958,23 @@ void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A)
     normal form of the diagonal matrix \code{A}. The algorithm used simply takes
     gcds of pairs on the diagonal in turn until the Smith form is obtained.
 
-    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
-    the same as that of \code{A}.
-
-void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
-
-    % TODO
-    Computes an integer matrix \code{S} such that \code{S} is the unique Smith
-    normal form of the diagonal matrix \code{A}. The algorithm used simply takes
-    gcds of pairs on the diagonal in turn until the Smith form is obtained.
-
-    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    Aliasing of \code{S} and \code{A} is allowed. The size of \code{S} must be
     the same as that of \code{A}.
 
 void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
 
-    % TODO
     Computes an integer matrix \code{S} such that \code{S} is the unique Smith
-    normal form of the diagonal matrix \code{A}. The algorithm used simply takes
-    gcds of pairs on the diagonal in turn until the Smith form is obtained.
+    normal form of the diagonal matrix \code{A}. The algorithm used here is due
+    to Kannan and Bachem \cite{KanBac1979} 
 
-    Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
+    Aliasing of \code{S} and \code{A} is allowed. The size of \code{S} must be
+    the same as that of \code{A}.
+
+void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
+
+    Computes an integer matrix \code{S} such that \code{S} is the unique Smith
+    normal form of the nonsingular $n\times n$ matrix \code{A}. The algorithm
+    used is due to Iliopoulos \cite{Iliopoulos1989}.
+
+    Aliasing of \code{S} and \code{A} is allowed. The size of \code{S} must be
     the same as that of \code{A}.
