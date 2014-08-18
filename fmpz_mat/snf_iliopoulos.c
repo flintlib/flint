@@ -65,8 +65,6 @@ void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)
             fmpz_set(fmpz_mat_entry(S, i + 1, j), b);
         }
 
-        /* TODO? reduce entries of mat mod mod */
-
         fmpz_clear(v);
     }
 
@@ -92,8 +90,6 @@ void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)
     }
 
     _fmpz_vec_clear(t, m - i - 1);
-
-    /*fmpz_gcd(fmpz_mat_entry(S, i, i), fmpz_mat_entry(S, i, i), mod);*/
 
     /* reduce each row k with row i */
     if (!fmpz_is_zero(g)) /* if g = 0 then don't need to reduce */
@@ -148,15 +144,6 @@ void _eliminate_row(fmpz_mat_t S, slong i, const fmpz_t mod)
     {
         fmpz_init(v);
 
-        /*fmpz_mod(fmpz_mat_entry(S, i, i + 1), fmpz_mat_entry(S, i, i + 1), mod);
-        if (fmpz_cmp(fmpz_mat_entry(S, i, i + 1), halfmod) > 0)
-            fmpz_sub(fmpz_mat_entry(S, i, i + 1),
-                    fmpz_mat_entry(S, i, i + 1), mod);
-        fmpz_mod(fmpz_mat_entry(S, i, i), fmpz_mat_entry(S, i, i), mod);
-        if (fmpz_cmp(fmpz_mat_entry(S, i, i), halfmod) > 0)
-            fmpz_sub(fmpz_mat_entry(S, i, i),
-                    fmpz_mat_entry(S, i, i), mod);*/
-
         fmpz_xgcd(g, u, v, fmpz_mat_entry(S, i, i + 1),
                 fmpz_mat_entry(S, i, i));
         fmpz_divexact(r1g, fmpz_mat_entry(S, i, i + 1), g);
@@ -171,8 +158,6 @@ void _eliminate_row(fmpz_mat_t S, slong i, const fmpz_t mod)
                     fmpz_mat_entry(S, j, i + 1));
             fmpz_set(fmpz_mat_entry(S, j, i + 1), b);
         }
-
-        /* TODO? reduce entries of mat mod mod */
 
         fmpz_clear(v);
     }

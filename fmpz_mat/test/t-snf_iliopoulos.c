@@ -69,12 +69,11 @@ main(void)
     {
         fmpz_mat_t A, S, S2;
         fmpz_t mod;
-        slong m, n, b, d, r;
+        slong m, n, b, d;
         int equal;
 
         m = n_randint(state, 10);
-        n = m; /*n_randint(state, 10);*/
-        r = n_randint(state, FLINT_MIN(m, n) + 1);
+        n = m;
 
         fmpz_init(mod);
         fmpz_mat_init(A, m, n);
