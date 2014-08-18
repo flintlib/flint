@@ -147,20 +147,6 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_xgcd_transform(H, U, A);
-        fmpz_mat_mul(H2, U, A);
-        equal = fmpz_mat_equal(H, H2);
-
-        if (!equal)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("multiplying by the transformation matrix should give the same HNF!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(U); flint_printf("\n\n");
-            fmpz_mat_print_pretty(H); flint_printf("\n\n");
-            abort();
-        }
-
         fmpz_mat_clear(U);
         fmpz_mat_clear(H2);
         fmpz_mat_clear(H);
