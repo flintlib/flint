@@ -19,12 +19,12 @@ from uuid import uuid4
 from time import sleep
 
 # for script debugging
-debug = False
+debug = True
 # what to build
-build_lib = True
-build_dll = True
-build_tests = True
-build_profiles = True
+build_lib = False
+build_dll = False
+build_tests = False
+build_profiles = False
 
 # add user choice
 flib_type = 'reentrant' # ('gc', 'rentrant', 'single')
@@ -191,7 +191,7 @@ def write_hdrs(h):
     outf = open(join(flint_dir, join(hdr_dir, out_name)), 'w')
     lines = inf.readlines()
     for n, _p, _d in d[hf]:
-      lines[n - 1] = 'F_ ' + lines[n - 1]
+      lines[n - 1] = 'FLINT_DLL ' + lines[n - 1]
     outf.writelines(lines)
     inf.close()
     outf.close()
@@ -612,6 +612,8 @@ def add_proj_to_sln(soln_name, soln_folder, proj_name, file_name, guid):
   write_solution_file(soln_name, fd, pd, p2f)
 
 c, h, cx, hx, t, tx, p = find_src(flint_dir)
+
+write_hdrs(h)
 
 if not debug:
   fn = join(flint_dir, 'fmpz-conversions-{}.in'.format(flib_type))
