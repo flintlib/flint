@@ -119,7 +119,7 @@ void fq_ctx_randtest_reducible(fq_ctx_t ctx)
 
     Initializes \code{ctx} to a random extension of a prime field.
     The modulus may or may not be irreducible.  Assumes that
-    \code{fq_ctx_init} as not been called on \code{ctx} already.
+    \code{fq_ctx_init} has not been called on \code{ctx} already.
 
 *******************************************************************************
 
