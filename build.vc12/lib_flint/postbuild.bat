@@ -2,11 +2,14 @@
 
 if /i %2 EQU LIB (set two=lib)
 if /i %2 EQU DLL (set two=dll)
+
+if not exist ..\..\%two% (md ..\..\%two%)
 call :copy_files %1 ..\..\%two%\%1 %two%
 exit /b 0
 
 :copy_files
 call :copy_rename ..\..\flint.h %2 > nul 2>&1
+call :copy_rename ..\config.h %2 > nul 2>&1
 
 rem copy C/C++ header files
 for %%i in ("..\..\*.h") do (call :copy_rename %%i %2 %%~nxi > nul 2>&1)
