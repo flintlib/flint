@@ -27,6 +27,12 @@
 #ifndef FMPQ_H
 #define FMPQ_H
 
+#ifdef FMPQ_INLINES_C
+#define FMPQ_INLINE
+#else
+#define FMPQ_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
@@ -57,19 +63,19 @@ typedef fmpq fmpq_t[1];
 #define fmpq_denref(__y) (&(__y)->den)
 
 
-static __inline__ void fmpq_init(fmpq_t x)
+FMPQ_INLINE void fmpq_init(fmpq_t x)
 {
     x->num = WORD(0);
     x->den = WORD(1);
 }
 
-static __inline__ void fmpq_clear(fmpq_t x)
+FMPQ_INLINE void fmpq_clear(fmpq_t x)
 {
     fmpz_clear(fmpq_numref(x));
     fmpz_clear(fmpq_denref(x));
 }
 
-static __inline__ fmpq * _fmpq_vec_init(slong n)
+FMPQ_INLINE fmpq * _fmpq_vec_init(slong n)
 {
     fmpq * v = (fmpq *) flint_malloc(sizeof(fmpq) * n);
     slong i;
@@ -80,63 +86,63 @@ static __inline__ fmpq * _fmpq_vec_init(slong n)
     return v;
 }
 
-static __inline__ void _fmpq_vec_clear(fmpq * vec, slong n)
+FMPQ_INLINE void _fmpq_vec_clear(fmpq * vec, slong n)
 {
     _fmpz_vec_clear((fmpz *) vec, 2 * n);
 }
 
-static __inline__ void fmpq_zero(fmpq_t res)
+FMPQ_INLINE void fmpq_zero(fmpq_t res)
 {
     fmpz_zero(fmpq_numref(res));
     fmpz_one(fmpq_denref(res));
 }
 
-static __inline__ void fmpq_one(fmpq_t res)
+FMPQ_INLINE void fmpq_one(fmpq_t res)
 {
     fmpz_one(fmpq_numref(res));
     fmpz_one(fmpq_denref(res));
 }
 
-static __inline__ int fmpq_equal(const fmpq_t x, const fmpq_t y)
+FMPQ_INLINE int fmpq_equal(const fmpq_t x, const fmpq_t y)
 {
     return fmpz_equal(fmpq_numref(x), fmpq_numref(y)) &&
            fmpz_equal(fmpq_denref(x), fmpq_denref(y));
 }
 
-static __inline__ int fmpq_sgn(const fmpq_t x)
+FMPQ_INLINE int fmpq_sgn(const fmpq_t x)
 {
     return fmpz_sgn(fmpq_numref(x));
 }
 
-static __inline__ int fmpq_is_zero(const fmpq_t x)
+FMPQ_INLINE int fmpq_is_zero(const fmpq_t x)
 {
     return fmpz_is_zero(fmpq_numref(x));
 }
 
-static __inline__ int fmpq_is_one(const fmpq_t x)
+FMPQ_INLINE int fmpq_is_one(const fmpq_t x)
 {
     return fmpz_is_one(fmpq_numref(x)) && fmpz_is_one(fmpq_denref(x));
 }
 
-static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
+FMPQ_INLINE void fmpq_set(fmpq_t dest, const fmpq_t src)
 {
     fmpz_set(fmpq_numref(dest), fmpq_numref(src));
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
-static __inline__ void fmpq_swap(fmpq_t op1, fmpq_t op2)
+FMPQ_INLINE void fmpq_swap(fmpq_t op1, fmpq_t op2)
 {
     fmpz_swap(fmpq_numref(op1), fmpq_numref(op2));
     fmpz_swap(fmpq_denref(op1), fmpq_denref(op2));
 }
 
-static __inline__ void fmpq_neg(fmpq_t dest, const fmpq_t src)
+FMPQ_INLINE void fmpq_neg(fmpq_t dest, const fmpq_t src)
 {
     fmpz_neg(fmpq_numref(dest), fmpq_numref(src));
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
-static __inline__ void fmpq_abs(fmpq_t dest, const fmpq_t src)
+FMPQ_INLINE void fmpq_abs(fmpq_t dest, const fmpq_t src)
 {
     fmpz_abs(fmpq_numref(dest), fmpq_numref(src));
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
@@ -163,13 +169,13 @@ FLINT_DLL void fmpq_set_si(fmpq_t res, slong p, ulong q);
 FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
 
-static __inline__ void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
+FMPQ_INLINE void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 {
     fmpz_set_mpz(fmpq_numref(dest), mpq_numref(src));
     fmpz_set_mpz(fmpq_denref(dest), mpq_denref(src));
 }
 
-static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
+FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 {
     fmpz_get_mpz(mpq_numref(dest), fmpq_numref(src));
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
@@ -185,20 +191,20 @@ FLINT_DLL void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
 
 FLINT_DLL void fmpq_clear_readonly(fmpq_t f);
 
-char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
+FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 
-char * fmpq_get_str(char * str, int b, const fmpq_t x);
+FLINT_DLL char * fmpq_get_str(char * str, int b, const fmpq_t x);
 
 FLINT_DLL void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
 FLINT_DLL void fmpq_fprint(FILE * file, const fmpq_t x);
 
-static __inline__ void _fmpq_print(const fmpz_t num, const fmpz_t den)
+FMPQ_INLINE void _fmpq_print(const fmpz_t num, const fmpz_t den)
 {
     _fmpq_fprint(stdout, num, den);
 }
 
-static __inline__ void fmpq_print(const fmpq_t x)
+FMPQ_INLINE void fmpq_print(const fmpq_t x)
 {
     fmpq_fprint(stdout, x);
 }
@@ -220,12 +226,30 @@ FLINT_DLL void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 
 FLINT_DLL void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
+FLINT_DLL void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                                      const fmpz_t q, slong r);
+
+FLINT_DLL void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c);
+
+FLINT_DLL void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                               const fmpz_t q, const fmpz_t r);
+
+FLINT_DLL void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
 FLINT_DLL void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
 FLINT_DLL void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
+FLINT_DLL void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                                      const fmpz_t q, slong r);
+
+FLINT_DLL void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c);
+
+FLINT_DLL void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                               const fmpz_t q, const fmpz_t r);
+
+FLINT_DLL void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
 FLINT_DLL void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
@@ -268,6 +292,27 @@ FLINT_DLL void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
 FLINT_DLL int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod);
 
 FLINT_DLL int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod);
+
+FMPQ_INLINE void
+_fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
+            const fmpz_t r, const fmpz_t s)
+{
+   fmpz_t a, b;
+   fmpz_init(a); fmpz_init(b);
+   fmpz_mul(a, p, s);
+   fmpz_mul(b, q, r);
+   fmpz_gcd(rnum, a, b);
+   fmpz_mul(rden, q, s);
+   _fmpq_canonicalise(rnum, rden);
+   fmpz_clear(a); fmpz_clear(b);
+}
+
+FMPQ_INLINE void 
+fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+{
+    _fmpq_gcd(fmpq_numref(res), fmpq_denref(res), fmpq_numref(op1), 
+              fmpq_denref(op1), fmpq_numref(op2), fmpq_denref(op2));
+}
 
 FLINT_DLL int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t m);
 

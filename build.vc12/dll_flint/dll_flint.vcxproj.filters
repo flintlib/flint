@@ -493,6 +493,12 @@
   <ClCompile Include="..\..\fmpq\add.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq\add_fmpz.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq\add_si.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq\addmul.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
@@ -556,6 +562,9 @@
   <ClCompile Include="..\..\fmpq\init_set_readonly.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq\inlines.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq\inv.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
@@ -614,6 +623,12 @@
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq\sub.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq\sub_fmpz.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq\sub_si.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq\submul.c">
@@ -856,6 +871,9 @@
   <ClCompile Include="..\..\fmpq_poly\init.c">
     <Filter>Source Files\fmpq_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq_poly\inlines.c">
+    <Filter>Source Files\fmpq_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq_poly\integral.c">
     <Filter>Source Files\fmpq_poly</Filter>
     </ClCompile>
@@ -1028,6 +1046,9 @@
     <Filter>Source Files\fmpq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_poly\set_str.c">
+    <Filter>Source Files\fmpq_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq_poly\set_trunc.c">
     <Filter>Source Files\fmpq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_poly\set_ui.c">
@@ -3107,6 +3128,9 @@
     <Filter>Source Files\fq</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq\get_str_pretty.c">
+    <Filter>Source Files\fq</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq\inlines.c">
     <Filter>Source Files\fq</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq\inv.c">

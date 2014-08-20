@@ -191,7 +191,7 @@ int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, sl
    /* check for factors of n */
    fmpz_gcd(g, n, c);
    res = fmpz_is_one(g);
-
+   
 cleanup:
 
    fmpz_factor_clear(fac);

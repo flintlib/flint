@@ -24,7 +24,7 @@ debug = False
 build_lib = True
 build_dll = True
 build_tests = True
-build_profiles = False
+build_profiles = True
 
 # add user choice
 flib_type = 'reentrant' # ('gc', 'rentrant', 'single')
@@ -638,7 +638,7 @@ if build_lib:
   vcx_path = 'lib_flint\\lib_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
   mode = ('win32', 'x64')
-  inc_dirs = r'..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads'
+  inc_dirs = r'..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads\lib\$(IntDir)'
   link_libs = r'..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib'
   gen_vcxproj(proj_name, None, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
@@ -654,8 +654,8 @@ if build_dll:
   vcx_path = 'dll_flint\\dll_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
   mode = ('win32', 'x64')
-  inc_dirs = r'..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads;'
-  link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
+  inc_dirs = r'..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);'
+  link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\pthreads\dll\$(IntDir)pthreads.lib;'
   gen_vcxproj(proj_name, None, vcx_path, guid, mode, dll_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
 
@@ -666,7 +666,7 @@ def gen_test(sln_name, test_name, directory, proj_dir, c_file):
   vcx_path = directory + '\\' + test_name + '\\' + test_name + '.vcxproj'
   gen_filter(vcx_path + '.filters', [], [('', c_file)])
   mode = ('win32', 'x64')
-  inc_dirs = r'..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads;'
+  inc_dirs = r'..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads\lib\$(IntDir);'
   link_libs = r'..\..\..\lib\$(IntDir)lib_flint.lib;..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
   gen_vcxproj(proj_name, proj_dir, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
   return vcx_path, guid
@@ -698,7 +698,6 @@ def gen_tests(sln_name, directory, proj_dir, c_files):
     if cnt % 100 == 0:
       write_solution_file(soln, fd, pd, p2f)
       soln = sn + str(cnt // 100 + 1) + '.sln'
-      break
   if cnt % 100:
     write_solution_file(soln, fd, pd, p2f)
 
