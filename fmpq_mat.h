@@ -53,52 +53,52 @@ typedef fmpq_mat_struct fmpq_mat_t[1];
 #define fmpq_mat_nrows(mat) ((mat)->r)
 #define fmpq_mat_ncols(mat) ((mat)->c)
 
-void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
+FLINT_DLL void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
 
-void fmpq_mat_clear(fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_clear(fmpq_mat_t mat);
 
 
-void fmpq_mat_print(const fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_print(const fmpq_mat_t mat);
 
 /* Random matrix generation **************************************************/
 
-void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 
 /* Special matrices **********************************************************/
 
-void fmpq_mat_hilbert_matrix(fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_hilbert_matrix(fmpq_mat_t mat);
 
 /* Basic assignment **********************************************************/
 
-void fmpq_mat_set(fmpq_mat_t dest, const fmpq_mat_t src);
+FLINT_DLL void fmpq_mat_set(fmpq_mat_t dest, const fmpq_mat_t src);
 
-void fmpq_mat_zero(fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_zero(fmpq_mat_t mat);
 
-void fmpq_mat_one(fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_one(fmpq_mat_t mat);
 
-void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op);
+FLINT_DLL void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op);
 
 /* Addition, scalar multiplication  ******************************************/
 
-void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
+FLINT_DLL void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
 
-void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
+FLINT_DLL void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
 
-void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op);
+FLINT_DLL void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op);
 
-void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
+FLINT_DLL void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
 
-void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
+FLINT_DLL void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
 
 /* Basic comparison and properties *******************************************/
 
-int fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2);
+FLINT_DLL int fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2);
 
-int fmpq_mat_is_integral(const fmpq_mat_t mat);
+FLINT_DLL int fmpq_mat_is_integral(const fmpq_mat_t mat);
 
-int fmpq_mat_is_zero(const fmpq_mat_t mat);
+FLINT_DLL int fmpq_mat_is_zero(const fmpq_mat_t mat);
 
 static __inline__ int
 fmpq_mat_is_empty(const fmpq_mat_t mat)
@@ -114,77 +114,77 @@ fmpq_mat_is_square(const fmpq_mat_t mat)
 
 /* Integer matrix conversion *************************************************/
 
-int fmpq_mat_get_fmpz_mat(fmpz_mat_t dest, const fmpq_mat_t mat);
+FLINT_DLL int fmpq_mat_get_fmpz_mat(fmpz_mat_t dest, const fmpq_mat_t mat);
 
-void fmpq_mat_get_fmpz_mat_entrywise(fmpz_mat_t num, fmpz_mat_t den,
+FLINT_DLL void fmpq_mat_get_fmpz_mat_entrywise(fmpz_mat_t num, fmpz_mat_t den,
     const fmpq_mat_t mat);
 
-void fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den,
+FLINT_DLL void fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den,
     const fmpq_mat_t mat);
 
-void fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den,
+FLINT_DLL void fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den,
     const fmpq_mat_t mat);
 
-void fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den,
+FLINT_DLL void fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den,
     const fmpq_mat_t mat);
 
-void fmpq_mat_get_fmpz_mat_rowwise_2(fmpz_mat_t num, fmpz_mat_t num2,
+FLINT_DLL void fmpq_mat_get_fmpz_mat_rowwise_2(fmpz_mat_t num, fmpz_mat_t num2,
         fmpz * den, const fmpq_mat_t mat, const fmpq_mat_t mat2);
 
-void fmpq_mat_get_fmpz_mat_mod_fmpz(fmpz_mat_t dest, const fmpq_mat_t mat,
+FLINT_DLL void fmpq_mat_get_fmpz_mat_mod_fmpz(fmpz_mat_t dest, const fmpq_mat_t mat,
     const fmpz_t mod);
 
-void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src);
+FLINT_DLL void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src);
 
-void fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod,
+FLINT_DLL void fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod,
     const fmpz_t div);
 
-int fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod,
+FLINT_DLL int fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod,
     const fmpz_t mod);
 
 /* Matrix multiplication *****************************************************/
 
-void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
+FLINT_DLL void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 
-void fmpq_mat_mul_cleared(fmpq_mat_t C, const fmpq_mat_t A,
+FLINT_DLL void fmpq_mat_mul_cleared(fmpq_mat_t C, const fmpq_mat_t A,
     const fmpq_mat_t B);
 
-void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
+FLINT_DLL void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 
-void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A,
+FLINT_DLL void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A,
     const fmpz_mat_t B);
 
-void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
+FLINT_DLL void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
     const fmpq_mat_t B);
 
 /* Trace *********************************************************************/
 
-void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat);
 
 /* Determinant ***************************************************************/
 
-void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat);
+FLINT_DLL void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat);
 
 /* Nonsingular solving *******************************************************/
 
-int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
+FLINT_DLL int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     const fmpq_mat_t B);
 
-int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+FLINT_DLL int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
 /* Inverse *******************************************************************/
 
-int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
+FLINT_DLL int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
 
 /* Echelon form **************************************************************/
 
-int fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c);
+FLINT_DLL int fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c);
 
-slong fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A);
+FLINT_DLL slong fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A);
 
-slong fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
+FLINT_DLL slong fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
 
-slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
+FLINT_DLL slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
 #ifdef __cplusplus
 }

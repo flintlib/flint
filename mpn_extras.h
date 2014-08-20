@@ -95,24 +95,24 @@ mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
     return xsize;
 }
 
-void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
+FLINT_DLL void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
-mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
+FLINT_DLL mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
 
-mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
+FLINT_DLL mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                      mp_ptr p, mp_size_t psize, ulong *exp);
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop);
+FLINT_DLL int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop);
 
-int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
+FLINT_DLL int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
 
-mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
+FLINT_DLL mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
           mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2);
 
-mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
+FLINT_DLL mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
-mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
+FLINT_DLL mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
            mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
 
 #define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
@@ -124,23 +124,23 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)
 
-void flint_mpn_mulmod_preinv1(mp_ptr r, 
+FLINT_DLL void flint_mpn_mulmod_preinv1(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_limb_t dinv, ulong norm);
 
-void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
+FLINT_DLL void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
-void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
+FLINT_DLL void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, 
+FLINT_DLL mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, 
                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-void flint_mpn_mulmod_preinvn(mp_ptr r, 
+FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
-int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
+FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
     int c, mp_bitcnt_t b, mp_ptr tp);
 
 static __inline__

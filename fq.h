@@ -59,22 +59,22 @@ fq_ctx_struct;
 
 typedef fq_ctx_struct fq_ctx_t[1];
 
-void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_ctx_init_modulus(fq_ctx_t ctx,
+FLINT_DLL void fq_ctx_init_modulus(fq_ctx_t ctx,
                          fmpz_mod_poly_t modulus,
                          const char *var);
 
-void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
 
 void
-fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
+FLINT_DLL fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
 
-void fq_ctx_clear(fq_ctx_t ctx);
+FLINT_DLL void fq_ctx_clear(fq_ctx_t ctx);
 
 static __inline__ slong fq_ctx_degree(const fq_ctx_t ctx)
 {
@@ -207,45 +207,45 @@ static __inline__ void fq_reduce(fq_t rop, const fq_ctx_t ctx)
 
 /* Basic arithmetic **********************************************************/
 
-void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
-void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
-void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+FLINT_DLL void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+FLINT_DLL void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
-void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
 
-void fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul_si(fq_t rop, const fq_t op, slong x, const fq_ctx_t ctx);
 
-void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
+FLINT_DLL void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 
-void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
-void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+FLINT_DLL void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 void
-fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx);
 
-void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
+FLINT_DLL void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
              const fq_ctx_t ctx);
 
-void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
+FLINT_DLL void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
 
-void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
+FLINT_DLL void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
 
-void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+FLINT_DLL void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
-void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_randtest_dense(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
-void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
+FLINT_DLL void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
 /* Comparison ****************************************************************/
 
@@ -337,36 +337,34 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
     return fmpz_poly_print_pretty(op, ctx->var);
 }
 
-char *
-fq_get_str(const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL char * fq_get_str(const fq_t op, const fq_ctx_t ctx);
 
-char *
-fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL char * fq_get_str_pretty(const fq_t op, const fq_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-void _fq_trace(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
+FLINT_DLL void _fq_trace(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
 
-void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
-void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+FLINT_DLL void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
                    const fq_ctx_t ctx);
 
-void fq_frobenius(fq_t rop, const fq_t op, slong e, const fq_ctx_t ctx);
+FLINT_DLL void fq_frobenius(fq_t rop, const fq_t op, slong e, const fq_ctx_t ctx);
 
-void _fq_norm(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
+FLINT_DLL void _fq_norm(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
 
-void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
+FLINT_DLL void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
 
 /* Bit packing ******************************************************/
 
 void
-fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
+FLINT_DLL fq_bit_pack(fmpz_t f, const fq_t op, mp_bitcnt_t bit_size,
             const fq_ctx_t ctx);
 
 void
-fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL fq_bit_unpack(fq_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
               const fq_ctx_t ctx);
 
 #ifdef T

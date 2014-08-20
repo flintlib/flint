@@ -45,7 +45,7 @@
 #define D_INF HUGE_VAL
 #define D_NAN (HUGE_VAL - HUGE_VAL)
 
-double d_randtest(flint_rand_t state);
+FLINT_DLL double d_randtest(flint_rand_t state);
 
 static __inline__ double
 d_polyval(const double * poly, int len, double x)
@@ -59,7 +59,7 @@ d_polyval(const double * poly, int len, double x)
     return t;
 }
 
-double d_lambertw(double x);
+FLINT_DLL double d_lambertw(double x);
 
 #ifdef __cplusplus
 }

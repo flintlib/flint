@@ -39,7 +39,7 @@
 #endif
 #if defined (__WIN32) && !defined(__CYGWIN__)
 #ifdef __cplusplus
-void  GetSystemTimeAsFileTime(FILETIME*);
+FLINT_DLL void  GetSystemTimeAsFileTime(FILETIME*);
 
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
@@ -55,7 +55,7 @@ static __inline__ int gettimeofday(struct timeval * p, void * tz)
     return 0;
 }
 #else
-int gettimeofday(struct timeval * p, void * tz);
+FLINT_DLL int gettimeofday(struct timeval * p, void * tz);
 #endif
 #elif !defined(_MSC_VER)
 #include <sys/resource.h>
@@ -75,7 +75,7 @@ typedef struct
     ulong rss;
 } meminfo_t[1];
 
-void get_memory_usage(meminfo_t meminfo);
+FLINT_DLL void get_memory_usage(meminfo_t meminfo);
 
 typedef struct
 {
@@ -187,7 +187,7 @@ void prof_stop()
 
 typedef void (*profile_target_t)(void* arg, ulong count);
 
-void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
+FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 
 #define DURATION_THRESHOLD 5000.0
 

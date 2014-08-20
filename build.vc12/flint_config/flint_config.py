@@ -19,11 +19,11 @@ from uuid import uuid4
 from time import sleep
 
 # for script debugging
-debug = True
+debug = False
 # what to build
-build_lib = False
-build_dll = False
-build_tests = False
+build_lib = True
+build_dll = True
+build_tests = True
 build_profiles = False
 
 # add user choice
@@ -115,6 +115,10 @@ dec = '^(?:' + s_sym + '\s+)?' + s_sym + '\('
 re_dec = compile(dec)
 re_end = compile('\s*\);\s*$')
 
+# crude parser to detect function declarations in
+# FLINT header files (no longer needed but left in
+# place in case this changes).
+
 def strip_static_inline(lines, pos, lth):
   p0 = pos
   m = re_end.search(lines[pos])
@@ -204,6 +208,8 @@ def write_def_file(name, h):
       lines += ['    ' + sym + '\n']
   with open(join(solution_dir, name + '.def'), 'w') as outf:
     outf.writelines(lines)
+
+# end of parser code
 
 def filter_folders(cf_list, outf):
 
@@ -416,8 +422,9 @@ def linker_options(name, link_libs, proj_type, debug_info, outf):
   if debug_info:
     outf.write(f2)
   outf.write(f3.format(link_libs))
-  if proj_type == dll_type:
-    outf.write(f4.format(name))
+  # no longer needed as we are using the declspec approach
+  #  if proj_type == dll_type:
+  #    outf.write(f4.format(name))
   outf.write(f5)
 
 def vcx_post_build(outf, proj_type):
@@ -613,7 +620,7 @@ def add_proj_to_sln(soln_name, soln_folder, proj_name, file_name, guid):
 
 c, h, cx, hx, t, tx, p = find_src(flint_dir)
 
-write_hdrs(h)
+# write_hdrs(h)
 
 if not debug:
   fn = join(flint_dir, 'fmpz-conversions-{}.in'.format(flib_type))
@@ -636,10 +643,12 @@ if build_lib:
   gen_vcxproj(proj_name, None, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
 
-
 if build_dll:
-  write_def_file('dll_flint', h)
   # set up DLL build
+
+  # no longer needed
+  # write_def_file('dll_flint', h)
+
   guid = '{' + str(uuid4()).upper() + '}'
   proj_name = 'dll_flint'
   vcx_path = 'dll_flint\\dll_flint.vcxproj'
@@ -689,6 +698,7 @@ def gen_tests(sln_name, directory, proj_dir, c_files):
     if cnt % 100 == 0:
       write_solution_file(soln, fd, pd, p2f)
       soln = sn + str(cnt // 100 + 1) + '.sln'
+      break
   if cnt % 100:
     write_solution_file(soln, fd, pd, p2f)
 
