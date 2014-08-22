@@ -26,6 +26,12 @@
 #ifndef FQ_ZECH_H
 #define FQ_ZECH_H
 
+#ifdef FQ_ZECH_INLINES_C
+#define FQ_ZECH_INLINE
+#else
+#define FQ_ZECH_INLINE static __inline__
+#endif
+
 #include "fq_nmod.h"
 
 /* Data types and context ****************************************************/
@@ -78,19 +84,19 @@ fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
 
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
-static __inline__ slong
+FQ_ZECH_INLINE slong
 fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
 {
     return fq_nmod_ctx_degree(ctx->fq_nmod_ctx);
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
 {
     fq_nmod_ctx_order(f, ctx->fq_nmod_ctx);
 }
 
-static __inline__ mp_limb_t
+FQ_ZECH_INLINE mp_limb_t
 fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
     return ctx->qm1 + 1;
@@ -98,7 +104,7 @@ fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 
 #define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
 
-static __inline__ int
+FQ_ZECH_INLINE int
 fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
 {
     int r;
@@ -108,7 +114,7 @@ fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
     return fq_nmod_ctx_fprint(file, ctx->fq_nmod_ctx);
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 {
     fq_zech_ctx_fprint(stdout, ctx);
@@ -116,24 +122,24 @@ fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 
 /* Memory managment  *********************************************************/
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_init(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = ctx->qm1;
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_init2(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = ctx->qm1;
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_clear(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_reduce(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     mp_limb_t order = fq_zech_ctx_order_ui(ctx);
@@ -194,19 +200,19 @@ void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_t state,
 
 /* Comparison ****************************************************************/
 
-static __inline__ int
+FQ_ZECH_INLINE int
 fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2, const fq_zech_ctx_t ctx)
 {
     return op1->value == op2->value;
 }
 
-static __inline__ int
+FQ_ZECH_INLINE int
 fq_zech_is_zero(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     return op->value == ctx->qm1;
 }
 
-static __inline__ int
+FQ_ZECH_INLINE int
 fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     return op->value == 0;
@@ -214,7 +220,7 @@ fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
 /* Assignments and conversions ***********************************************/
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     rop->value = op->value;
@@ -223,7 +229,7 @@ fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 void
 fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx)
 {
     fmpz_t xx;
@@ -232,7 +238,7 @@ fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx)
     fmpz_clear(xx);
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx)
 {
     fmpz_t xx;
@@ -241,7 +247,7 @@ fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx)
     fmpz_clear(xx);
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t ctx)
 {
     slong temp;
@@ -250,19 +256,19 @@ fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t ctx)
     op1->value = temp;
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_zero(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = ctx->qm1;
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_one(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = 0;
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = 1;
@@ -276,25 +282,25 @@ fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 
 /* Output ********************************************************************/
-static __inline__ int
+FQ_ZECH_INLINE int
 fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     return flint_fprintf(file, "%s^%wd", ctx->fq_nmod_ctx->var, op->value);
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     fq_zech_fprint_pretty(stdout, op, ctx);
 }
 
-static __inline__ int
+FQ_ZECH_INLINE int
 fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     return flint_fprintf(file, "%wd", op->value);
 }
 
-static __inline__ void
+FQ_ZECH_INLINE void
 fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     fq_zech_fprint(stdout, op, ctx);

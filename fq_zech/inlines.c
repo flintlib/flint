@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#define FQ_INLINES_C
+#define FQ_ZECH_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -34,9 +34,9 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fq.h"
+#include "fq_zech.h"
 
-void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx)
+void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx)
 {
-   fmpz_set(p, fq_ctx_prime(ctx));
+   fmpz_set(p, fq_zech_ctx_prime(ctx));
 }

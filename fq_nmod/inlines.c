@@ -19,11 +19,11 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
-#define FQ_INLINES_C
+#define FQ_NMOD_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -34,9 +34,9 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fq.h"
+#include "fq_nmod.h"
 
-void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx)
+void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx)
 {
-   fmpz_set(p, fq_ctx_prime(ctx));
+   fmpz_set(p, fq_nmod_ctx_prime(ctx));
 }
