@@ -3334,6 +3334,9 @@
   <ClCompile Include="..\..\fq_nmod\get_str_pretty.c">
     <Filter>Source Files\fq_nmod</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod\inlines.c">
+    <Filter>Source Files\fq_nmod</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod\inv.c">
     <Filter>Source Files\fq_nmod</Filter>
     </ClCompile>
@@ -4298,6 +4301,9 @@
     <Filter>Source Files\fq_zech</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech\get_str_pretty.c">
+    <Filter>Source Files\fq_zech</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech\inlines.c">
     <Filter>Source Files\fq_zech</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech\inv.c">

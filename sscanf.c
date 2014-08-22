@@ -42,7 +42,7 @@ int flint_sscanf(const char * s, const char * str, ...)
    int ret;
    char *str2, *s2;
    size_t len = strlen(str);
-   if(!len)
+   if(!strlen(s))
        return 0;
    str2 = flint_malloc(len + 1);
    s2 = flint_malloc(strlen(s) + 1);

@@ -21,8 +21,8 @@ from time import sleep
 # for script debugging
 debug = False
 # what to build
-build_lib = True
-build_dll = True
+build_lib = False
+build_dll = False
 build_tests = True
 build_profiles = True
 

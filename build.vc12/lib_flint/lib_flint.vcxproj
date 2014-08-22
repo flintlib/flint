@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <RootNamespace>lib_flint</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{E05643CD-3007-4564-8549-5641EF9C9408}</ProjectGuid>
+    <ProjectGuid>{A642622B-881C-4922-A0DF-B29D815FF365}</ProjectGuid>
     </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'" Label="Configuration">
@@ -6378,6 +6378,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_nmod\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_nmod\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fq_nmod\inlines.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_nmod\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_nmod\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_nmod\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_nmod\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fq_nmod\inv.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_nmod\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_nmod\</ObjectFileName>
@@ -8305,6 +8311,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_zech\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fq_zech\get_str_pretty.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_zech\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_zech\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_zech\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_zech\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fq_zech\inlines.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_zech\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_zech\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_zech\</ObjectFileName>

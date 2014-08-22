@@ -683,13 +683,13 @@ FLINT_DLL int fmpq_poly_debug(const fmpq_poly_t poly);
 FLINT_DLL int _fmpq_poly_fprint(FILE * file, 
                       const fmpz * poly, const fmpz_t den, slong len);
 
-FLINT_DLL int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly);
+int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly);
 
 FLINT_DLL int _fmpq_poly_fprint_pretty(FILE * file, 
                              const fmpz *poly, const fmpz_t den, slong len, 
                              const char * x);
 
-FLINT_DLL int fmpq_poly_fprint_pretty(FILE * file, 
+int fmpq_poly_fprint_pretty(FILE * file, 
                             const fmpq_poly_t poly, const char * var);
 
 FMPQ_POLY_INLINE
@@ -730,3 +730,4 @@ int fmpq_poly_read(fmpq_poly_t poly)
 #endif
 
 #endif
+
