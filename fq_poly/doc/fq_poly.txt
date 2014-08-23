@@ -96,6 +96,11 @@ void fq_poly_truncate(fq_poly_t poly, slong newlen, const fq_ctx_t ctx)
 
     Truncates the polynomial to length at most~$n$.
 
+void fq_poly_set_trunc(fq_poly_t poly1, fq_poly_t poly2, 
+                                           slong newlen, const fq_ctx_t ctx)
+
+    Sets \code{poly1} to \code{poly2} truncated to length~$n$.
+
 void _fq_poly_reverse(fq_struct* output, const fq_struct* input, slong len,
                       slong m, const fq_ctx_t ctx)
 
