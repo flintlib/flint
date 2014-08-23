@@ -22,42 +22,34 @@
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
-
+   
 ******************************************************************************/
 
-#ifndef FQ_POLY_H
-#define FQ_POLY_H
-
-#ifdef FQ_POLY_INLINES_C
-#define FQ_POLY_INLINE
-#else
-#define FQ_POLY_INLINE static __inline__
-#endif
-
-#include "fq.h"
-#include "fq_mat.h"
-
-#define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16
-#define FQ_COMPOSE_MOD_LENH_CUTOFF 6
-#define FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
-#define FQ_MUL_CLASSICAL_CUTOFF 6
-#define FQ_MULLOW_CLASSICAL_CUTOFF 6
-#define FQ_SQR_CLASSICAL_CUTOFF 6
-
-#define FQ_POLY_HGCD_CUTOFF 30
-#define FQ_POLY_SMALL_GCD_CUTOFF 80
-#define FQ_POLY_GCD_CUTOFF 90
 
 #ifdef T
-#undef T
-#endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_templates.h"
-#undef CAP_T
-#undef T
+#include "templates.h"
 
-#include "fq_poly_factor.h"
+void
+TEMPLATE(T, poly_set_trunc) (TEMPLATE(T, poly_t) poly1, TEMPLATE(T, poly_t) poly2, slong len,
+                            const TEMPLATE(T, ctx_t) ctx)
+{
+    if (poly1 == poly2)
+        TEMPLATE(T, poly_truncate) (poly1, len, ctx);
+    else if (len >= poly2->length)
+        TEMPLATE(T, poly_set) (poly1, poly2, ctx);
+    else
+    {
+        slong i;
+
+        TEMPLATE(T, poly_fit_length) (poly1, len, ctx);
+
+        for (i = 0; i < len; i++)
+            TEMPLATE(T, set) (poly1->coeffs + i, poly2->coeffs + i, ctx);
+        _TEMPLATE(T, poly_set_length) (poly1, len, ctx);
+        _TEMPLATE(T, poly_normalise) (poly1, ctx);
+    }
+}
+
 
 #endif

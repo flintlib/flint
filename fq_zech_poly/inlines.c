@@ -19,45 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
-    Copyright (C) 2012 Sebastian Pancratz
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2014 William Hart
 
 ******************************************************************************/
 
-#ifndef FQ_POLY_H
-#define FQ_POLY_H
+#define FQ_POLY_INLINES_C
 
-#ifdef FQ_POLY_INLINES_C
-#define FQ_POLY_INLINE
-#else
-#define FQ_POLY_INLINE static __inline__
-#endif
-
-#include "fq.h"
-#include "fq_mat.h"
-
-#define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16
-#define FQ_COMPOSE_MOD_LENH_CUTOFF 6
-#define FQ_COMPOSE_MOD_PREINV_LENH_CUTOFF 6
-#define FQ_MUL_CLASSICAL_CUTOFF 6
-#define FQ_MULLOW_CLASSICAL_CUTOFF 6
-#define FQ_SQR_CLASSICAL_CUTOFF 6
-
-#define FQ_POLY_HGCD_CUTOFF 30
-#define FQ_POLY_SMALL_GCD_CUTOFF 80
-#define FQ_POLY_GCD_CUTOFF 90
-
-#ifdef T
-#undef T
-#endif
-
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_templates.h"
-#undef CAP_T
-#undef T
-
-#include "fq_poly_factor.h"
-
-#endif
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
+#include <gmp.h>
+#include "flint.h"
+#include "fq_zech_poly.h"
