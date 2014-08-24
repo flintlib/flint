@@ -187,7 +187,11 @@ int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 /* Reduced row echelon form */
 
 slong nmod_mat_rref(nmod_mat_t A);
-slong _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots);
+slong _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots, slong * P);
+slong nmod_mat_rref_classical(nmod_mat_t A);
+slong _nmod_mat_rref_classical(nmod_mat_t A, slong * pivots_nonpivots);
+slong nmod_mat_rref_storjohann(nmod_mat_t A);
+slong _nmod_mat_rref_storjohann(nmod_mat_t A, slong * pivots_nonpivots);
 
 /* Nullspace */
 
