@@ -76,7 +76,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
     nmod_mat_t Amod;
     mp_limb_t p;
     slong i, j, m, n, rank, * pivs, * P;
-    fmpz_mat_t B, C, D, E, F, FD;
+    fmpz_mat_t B, C, D, E, E2, F, FD;
 
     m = fmpz_mat_nrows(A);
     n = fmpz_mat_ncols(A);
@@ -96,22 +96,23 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         nmod_mat_clear(Amod);
 
         fmpz_mat_init(B, rank, rank);
-        fmpz_mat_init(C, rank, n);
-        fmpz_mat_init(E, rank, n);
+        fmpz_mat_init(C, rank, n - rank);
 
         for (i = 0; i < rank; i++)
         {
             for (j = 0; j < rank; j++)
                 fmpz_set(fmpz_mat_entry(B, i, j),
                         fmpz_mat_entry(A, P[i], pivs[j]));
-            for (j = 0; j < n; j++)
+            for (j = 0; j < n - rank; j++)
                 fmpz_set(fmpz_mat_entry(C, i, j),
-                        fmpz_mat_entry(A, P[i], j));
+                        fmpz_mat_entry(A, P[i], pivs[rank + j]));
         }
-        /* solve B*E = C */
+
+        /* solve B*E2 = C */
+        fmpz_mat_init(E2, rank, n - rank);
         if (n < 25)                 /* small matrices use solve */
         {
-            if (!fmpz_mat_solve(E, den, B, C))
+            if (!fmpz_mat_solve(E2, den, B, C))
             {
                 flint_printf("Exception (fmpz_mat_rref_mul). "
                              "Singular input matrix for solve.");
@@ -120,20 +121,30 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         }
         else                        /* larger matrices use dixon */
         {
-            fmpq_mat_t E_q;
-            if (!fmpz_mat_solve_dixon(E, den, B, C))
+            fmpq_mat_t E2_q;
+            if (!fmpz_mat_solve_dixon(E2, den, B, C))
             {
                 flint_printf("Exception (fmpz_mat_rref_mul). "
                              "Singular input matrix for solve.");
                 abort();
             }
-            fmpq_mat_init(E_q, rank, n);
-            fmpq_mat_set_fmpz_mat_mod_fmpz(E_q, E, den);
-            fmpq_mat_get_fmpz_mat_matwise(E, den, E_q);
-            fmpq_mat_clear(E_q);
+            fmpq_mat_init(E2_q, rank, n - rank);
+            fmpq_mat_set_fmpz_mat_mod_fmpz(E2_q, E2, den);
+            fmpq_mat_get_fmpz_mat_matwise(E2, den, E2_q);
+            fmpq_mat_clear(E2_q);
         }
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
+        fmpz_mat_init(E, rank, n);
+
+        for (i = 0; i < rank; i++)
+        {
+            fmpz_set(fmpz_mat_entry(E, i, pivs[i]), den);
+            for (j = 0; j < n - rank; j++)
+                fmpz_set(fmpz_mat_entry(E, i, pivs[rank + j]),
+                        fmpz_mat_entry(E2, i, j));
+        }
+        fmpz_mat_clear(E2);
 
         if (!in_rref(E, den, rank))
         {
@@ -141,6 +152,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
             continue;
         }
 
+        /* set D to be the nullspace basis vector for E */
         fmpz_mat_init(D, n, n - rank);
 
         for (j = 0; j < n - rank; j++)
@@ -166,7 +178,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         if (fmpz_mat_is_zero(FD))
             break;
 
-        fmpz_mat_clear(C);
+        fmpz_mat_clear(E);
         fmpz_mat_clear(FD);
     }
 
