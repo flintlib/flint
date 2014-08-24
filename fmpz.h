@@ -26,6 +26,12 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
+#ifdef FMPZ_INLINES_C
+#define FMPZ_INLINE
+#else
+#define FMPZ_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx/* interferes with system includes */
 #include <stdlib.h>
@@ -81,7 +87,7 @@ __mpz_struct * _fmpz_promote(fmpz_t f);
 
 __mpz_struct * _fmpz_promote_val(fmpz_t f);
 
-static __inline__
+FMPZ_INLINE
 void _fmpz_demote(fmpz_t f)
 {
     if (COEFF_IS_MPZ(*f)) 
@@ -97,7 +103,7 @@ void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z);
 
 void _fmpz_clear_readonly_mpz(mpz_t);
 
-static __inline__
+FMPZ_INLINE
 void fmpz_init(fmpz_t f)
 {
 	(*f) = WORD(0);
@@ -105,7 +111,7 @@ void fmpz_init(fmpz_t f)
 
 void fmpz_init2(fmpz_t f, ulong limbs);
 
-static __inline__
+FMPZ_INLINE
 void fmpz_init_set(fmpz_t f, const fmpz_t g)
 {
     if (!COEFF_IS_MPZ(*g))
@@ -122,7 +128,7 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
     }
 }
 
-static __inline__
+FMPZ_INLINE
 void fmpz_init_set_ui(fmpz_t f, ulong g)
 {
     if (g <= COEFF_MAX)
@@ -139,7 +145,24 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
     }
 }
 
-static __inline__
+FMPZ_INLINE
+void fmpz_init_set_si(fmpz_t f, slong g)
+{
+    if (COEFF_MIN <= g && g <= COEFF_MAX)
+    {
+        *f = g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        flint_mpz_set_si(ptr, g);
+    }
+}
+
+FMPZ_INLINE
 void fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);
@@ -163,7 +186,7 @@ slong fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_set_si(fmpz_t f, slong val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
@@ -178,7 +201,7 @@ fmpz_set_si(fmpz_t f, slong val)
     }
 }
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_set_ui(fmpz_t f, ulong val)
 {
     if (val > COEFF_MAX)        /* val is large */
@@ -193,7 +216,7 @@ fmpz_set_ui(fmpz_t f, ulong val)
     }
 }
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_neg_ui(fmpz_t f, ulong val)
 {
     if (val > COEFF_MAX)
@@ -209,7 +232,7 @@ fmpz_neg_ui(fmpz_t f, ulong val)
     }
 }
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
 {
     if (hi == 0)
@@ -227,7 +250,7 @@ fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
     }
 }
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
 {
     if (hi == 0)
@@ -273,14 +296,14 @@ int fmpz_abs_fits_ui(const fmpz_t f);
 
 int fmpz_fits_si(const fmpz_t f);
 
-static __inline__
+FMPZ_INLINE
 void fmpz_zero(fmpz_t f)
 {
    _fmpz_demote(f);	
    (*f) = WORD(0);
 }
 
-static __inline__ 
+FMPZ_INLINE 
 void fmpz_one(fmpz_t f)
 {
     if (COEFF_IS_MPZ(*f)) 
@@ -290,19 +313,19 @@ void fmpz_one(fmpz_t f)
     *f = WORD(1);
 }
 
-static __inline__
+FMPZ_INLINE
 int fmpz_is_zero(const fmpz_t f)
 {
    return (*f == 0);
 }
 
-static __inline__
+FMPZ_INLINE
 int fmpz_is_one(const fmpz_t f)
 {
    return (*f == 1);
 }
 
-static __inline__
+FMPZ_INLINE
 int fmpz_is_pm1(const fmpz_t f)
 {
    return (*f == 1 || *f == -1);
@@ -332,7 +355,7 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f);
 
-static __inline__
+FMPZ_INLINE
 void fmpz_swap(fmpz_t f, fmpz_t g)
 {
     if (f != g)  /* swapping required */
@@ -351,7 +374,7 @@ int fmpz_cmp_si(const fmpz_t f, slong g);
 
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
-static __inline__
+FMPZ_INLINE
 int fmpz_is_even(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
@@ -364,7 +387,7 @@ int fmpz_is_even(const fmpz_t f)
     }
 }
 
-static __inline__
+FMPZ_INLINE
 int fmpz_is_odd(const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
@@ -385,7 +408,7 @@ mp_bitcnt_t fmpz_bits(const fmpz_t f);
 
 mp_bitcnt_t fmpz_val2(const fmpz_t x);
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_neg(fmpz_t f1, const fmpz_t f2)
 {
     if (!COEFF_IS_MPZ(*f2))     /* coeff is small */
@@ -476,7 +499,7 @@ void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
 {
    if (fmpz_is_zero(a))
@@ -557,7 +580,7 @@ void fmpz_preinvn_clear(fmpz_preinvn_t inv);
 
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
 {
     mp_limb_t hi, lo;
@@ -574,7 +597,7 @@ fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
     }
 }
 
-static __inline__ void
+FMPZ_INLINE void
 fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
 {
     mp_limb_t hi, lo;
@@ -660,7 +683,10 @@ void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
 void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
-static __inline__ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
+void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+                                                fmpz_t r2, fmpz_t m2, int sign);
+
+FMPZ_INLINE void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 {
     if (x <= m / 2)
         fmpz_set_ui(f, x);
@@ -672,9 +698,60 @@ mp_limb_t fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 
 mp_limb_t fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 
+void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
+                                               const fmpz_t m, const fmpz_t n);
+
+void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B, 
+                                         const fmpz_t m, const fmpz_t n);
+
+void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um, 
+                             const fmpz_t Um1, const fmpz_t A, 
+                             const fmpz_t B, const fmpz_t n);
+
+void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um, 
+                             const fmpz_t Um1, const fmpz_t Un, 
+                             const fmpz_t Un1, const fmpz_t A, 
+                             const fmpz_t B, const fmpz_t n);
+
+void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1,
+                               const fmpz_t Um, const fmpz_t Um1,
+                               const fmpz_t A, const fmpz_t B, const fmpz_t k, 
+                               const fmpz_t n);
+
+void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1, 
+                            const fmpz_t Vm, const fmpz_t Vm1,
+                            const fmpz_t A, const fmpz_t B, const fmpz_t Dinv, 
+                            const fmpz_t n);
+
+int fmpz_is_probabprime_lucas(const fmpz_t n);
+
+int fmpz_is_probabprime_BPSW(const fmpz_t n);
+
+int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t a);
+
 int fmpz_is_probabprime(const fmpz_t p);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
+
+void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, 
+                                                 slong * num_pm1, ulong limit);
+
+int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, 
+                                    const fmpz_t n, mp_ptr pm1, slong num_pm1);
+
+void _fmpz_np1_trial_factors(const fmpz_t n, 
+                                     mp_ptr pp1, slong * num_pp1, ulong limit);
+
+int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, 
+                                    const fmpz_t n, mp_ptr pm1, slong num_pm1);
+
+int fmpz_is_prime(const fmpz_t p);
+
+int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, 
+                                               const fmpz_t r, const fmpz_t s);
+
+int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n, 
+                                                    mp_ptr pk1, slong num_pk1, slong k);
 
 /* Primorials */
 

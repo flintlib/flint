@@ -21,6 +21,7 @@
 
     Copyright (C) 2008, Peter Shrimpton
     Copyright (C) 2009 William Hart
+    Copyright (C) 2014 Dana Jacobsen
 
 ******************************************************************************/
 
@@ -34,6 +35,12 @@ n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a,
 {
     mp_limb_t t = d;
     mp_limb_t y;
+
+    /* Map large base to range 2 ... n - 1 */
+    if (a >= n)  
+       a = n_mod2_preinv(a, n, ninv);
+
+    if ((a <= 1) || (a == n - 1))  return 1;
 
     y = n_powmod2_ui_preinv(a, t, n, ninv);
 

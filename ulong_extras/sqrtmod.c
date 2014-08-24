@@ -93,7 +93,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     b = n_powmod2_ui_preinv(a, p1, p, pinv);
 
-    for (k = 2; ; k++)
+    for (k = 3; ; k+=2) /* 2 is a quadratic residue mod p = 8k + 1 */
     {
         if (n_jacobi_unsigned(k, p) == -1) break;
     }

@@ -673,11 +673,15 @@ $\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
+$\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against 
+Feitma's tables and sped up and corrected \code{n_is_prime} and 
+\code{n_is_probabprime}.
+
 $\bullet$ Patches and bug reports have been made by Michael Abshoff,
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
 Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
-Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Dana Jacobsen, Michael Jacobson Jr.,
+Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Michael Jacobson Jr.,
 Mike Stillman, Jan Englehardt, Jean-Pierre Flori, Jeroen Demeyer, Shi Bai,
 Qingwen Guan, Frithjof Schulze, Robert Baillie, Oleksandr Motsak, Hans
 Schoenemann, Janko Boehm, Ahmed Soliman and others.
@@ -1719,10 +1723,10 @@ includes \code{fmpz_mod_poly.h}. One should not try to include
 \chapter{fq}
 \epigraph{Finite fields of arbitrary characteristic}
 
-We represent an element of the finite field $\mathbb{F}_{p^n} \cong
-\mathbb{F}_p[X]/(f(X))$, where $f(X) \in \mathbb{F}_p[X]$ is a monic,
+We represent an element of the finite field $\mathbf{F}_{p^n} \cong
+\mathbf{F}_p[X]/(f(X))$, where $f(X) \in \mathbf{F}_p[X]$ is a monic,
 irreducible polynomial of degree~$n$, as a polynomial in
-$\mathbb{F}_p[X]$ of degree less than $n$. The underlying data
+$\mathbf{F}_p[X]$ of degree less than $n$. The underlying data
 structure is an \code{fmpz_poly_t}.
 
 The default choice for $f(X)$ is the Conway polynomial for the pair
@@ -1790,10 +1794,10 @@ includes \code{fq_poly.h}. One should not try to include
 \epigraph{Finite fields of word-sized characteristic}
 
 
-We represent an element of the finite field $\mathbb{F}_{p^n} \cong
-\mathbb{F}_p[X]/(f(X))$, where $f(X) \in \mathbb{F}_p[X]$ is a monic,
+We represent an element of the finite field $\mathbf{F}_{p^n} \cong
+\mathbf{F}_p[X]/(f(X))$, where $f(X) \in \mathbf{F}_p[X]$ is a monic,
 irreducible polynomial of degree~$n$, as a polynomial in
-$\mathbb{F}_p[X]$ of degree less than $n$.  The underlying data
+$\mathbf{F}_p[X]$ of degree less than $n$.  The underlying data
 structure is an \code{nmod_poly_t}.
 
 The default choice for $f(X)$ is the Conway polynomial for the pair
@@ -1864,9 +1868,9 @@ one includes \code{fq_nmod_poly.h}. One should not try to include
 
 We represent an element of the finite field as a power of a generator
 for the multiplicative group of the finite field.  In particular, we
-use a root of $f(x))$, where $f(X) \in \mathbb{F}_p[X]$ is a monic,
+use a root of $f(x))$, where $f(X) \in \mathbf{F}_p[X]$ is a monic,
 irreducible polynomial of degree~$n$, as a polynomial in
-$\mathbb{F}_p[X]$ of degree less than $n$.  The underlying data
+$\mathbf{F}_p[X]$ of degree less than $n$.  The underlying data
 structure is just an \code{mp_limb_t}.
 
 The default choice for $f(X)$ is the Conway polynomial for the pair
@@ -2697,7 +2701,7 @@ of moduli in compound expressions. Thus the only task of the
 \code{create_temporary} method is to locate \emph{any} modulus inside a
 subexpression. Next, we require objects with a modulus to be recognisable by
 type.\footnote{This is why we disallow empty matrices over
-$\mathbb{Z}/n\mathbb{Z}[X]$. The \code{nmod_poly_mat_t} does not store a
+$\mathbf{Z}/n\mathbf{Z}[X]$. The \code{nmod_poly_mat_t} does not store a
 modulus, so we have to look at an entry.} With these conventions in place, it is
 a matter of bookkeeping (and searching the subexpression tree) to locate a
 modulus.

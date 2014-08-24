@@ -39,8 +39,9 @@
 
 int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
 {
-    fmpz_mod_poly_t f, v, vinv, reducedH0, tmp;
+    fmpz_mod_poly_t f, v, vinv, tmp;
     fmpz_mod_poly_t *h, *H, *I;
+    fmpz_mat_t HH;
     slong i, j, l, m, n, d;
     fmpz_t p;
     double beta;
@@ -65,7 +66,6 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
     fmpz_mod_poly_init(f, p);
     fmpz_mod_poly_init(v, p);
     fmpz_mod_poly_init(vinv, p);
-    fmpz_mod_poly_init(reducedH0, p);
     fmpz_mod_poly_init(tmp, p);
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct))))
@@ -90,23 +90,34 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
     fmpz_mod_poly_inv_series_newton (vinv, vinv, v->length);
     /* compute baby steps: h[i]=x^{p^i}mod v */
     fmpz_mod_poly_set_coeff_ui(h[0], 1, 1);
-    for (i = 1; i < l + 1; i++)
-        fmpz_mod_poly_powmod_fmpz_binexp_preinv(h[i], h[i - 1], p, v, vinv);
+    fmpz_mod_poly_powmod_x_fmpz_preinv(h[1], p, v, vinv);
+    if (fmpz_sizeinbase(p, 2) > ((n_sqrt (v->length - 1) + 1) * 3) / 4)
+    {
+        fmpz_mat_init(HH, n_sqrt (v->length - 1) + 1, v->length - 1);
+        fmpz_mod_poly_precompute_matrix(HH, h[1], v, vinv);
+        for (i = 2; i < l + 1; i++)
+            fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(h[i], h[i - 1],
+                                                            HH, v, vinv);
+        fmpz_mat_clear(HH);
+    }
+    else
+    {
+        for (i = 2; i < l + 1; i++)
+            fmpz_mod_poly_powmod_fmpz_binexp_preinv(h[i], h[i - 1], p,
+                                              v, vinv);
+    }
 
     /* compute coarse distinct-degree factorisation */
     fmpz_mod_poly_set(H[0], h[l]);
-    fmpz_mod_poly_set(reducedH0, H[0]);
+    fmpz_mat_init(HH, n_sqrt (v->length - 1) + 1, v->length - 1);
+    fmpz_mod_poly_precompute_matrix(HH, H[0], v, vinv);
     d = 1;
     for (j = 0; j < m; j++)
     {
         /* compute giant steps: H[i]=x^{p^(li)}mod v */
         if (j > 0)
-        {
-            fmpz_mod_poly_rem (reducedH0, reducedH0, v);
-            fmpz_mod_poly_rem (tmp, H[j-1], v);
-            fmpz_mod_poly_compose_mod_brent_kung_preinv(H[j], tmp, reducedH0,
-                                                        v, vinv);
-        }
+            fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(H[j],
+                                                        H[j - 1], HH, v, vinv);
         /* compute interval polynomials */
         fmpz_mod_poly_set_coeff_ui(I[j], 0, 1);
         for (i = l - 1; (i >= 0) && (2*d <= v->length - 1); i--, d++)
@@ -128,10 +139,11 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
 
     fmpz_clear(p);
     fmpz_mod_poly_clear(f);
-    fmpz_mod_poly_clear(reducedH0);
     fmpz_mod_poly_clear(v);
     fmpz_mod_poly_clear(vinv);
     fmpz_mod_poly_clear(tmp);
+
+    fmpz_mat_clear(HH);
 
     for (i = 0; i < l + 1; i++)
         fmpz_mod_poly_clear(h[i]);

@@ -200,6 +200,10 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
     is truncated to have the given length.  Discarded coefficients are not 
     necessarily set to zero.
 
+void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+
+    Sets \code{res} to a copy of \code{poly}, truncated to length \code{n}.
+
 *******************************************************************************
 
     Randomisation
@@ -325,6 +329,11 @@ int fmpz_poly_is_unit(const fmpz_poly_t poly)
 
     Returns $1$ is the polynomial is the constant polynomial $\pm 1$, 
     and $0$ otherwise.
+
+int fmpz_poly_is_x(const fmpz_poly_t poly)
+
+    Returns $1$ if the polynomial is the degree $1$ polynomial $x$, and $0$ 
+    otherwise.
 
 *******************************************************************************
 
@@ -1240,6 +1249,52 @@ void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
     \end{equation*}
     holds up to sign.
 
+void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
+                                               const fmpz * poly2, slong len2)
+
+    Sets \code{res} to the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}. 
+
+void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
+                                                      const fmpz_poly_t poly2)
+
+    Computes the resultant of \code{poly1} and \code{poly2}.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    This function uses the modular algorithm described 
+    in~\citep{Col1971}.
+
+void _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
+                                      const fmpz * poly2, slong len2)
+
+    Sets \code{res} to the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}.
+
+void fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1, 
+                                     const fmpz_poly_t poly2)
+
+    Computes the resultant of \code{poly1} and \code{poly2}.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.3.7]{Coh1996}.
+
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, 
                                       const fmpz * poly2, slong len2)
 
@@ -1260,8 +1315,24 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
 
-    This function uses the algorithm described 
-    in~\citep[Algorithm~3.3.7]{Coh1996}.
+*******************************************************************************
+
+    Discriminant
+
+*******************************************************************************
+
+void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len)
+
+    Set \code{res} to the discriminant of \code{(poly, len)}. Assumes
+    \code{len > 1}.
+
+void fmpz_poly_discriminant(fmpz_t res, const fmpz_poly_t poly)
+
+    Set \code{res} to the disciminant of \code{res}. We normalise the
+    discriminant so that \code{disc(f) = (-1)^(n(n-1)/2) res(f, f')/lc(f)},
+    thus \code{disc(f) = lc(f)^(2n - 2) prod_{i < j} (r_i - r_j)^2}, where
+    \code{lc(f)} is the leading coefficient of $f$, $n$ is the degree of
+    $f$ and $r_i$ are the roots of $f$.
 
 *******************************************************************************
 
@@ -2178,6 +2249,19 @@ void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
     Performs the Taylor shift composing \code{f} by $x+c$.
     Uses the divide-and-conquer polynomial composition algorithm.
 
+void _fmpz_poly_taylor_shift_multi_mod(fmpz * poly, const fmpz_t c, slong n)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+    Uses a multimodular algorithm, distributing the computation
+    across \code{flint_get_num_threads()} threads.
+
+void fmpz_poly_taylor_shift_multi_mod(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
+    Uses a multimodular algorithm, distributing the computation
+    across \code{flint_get_num_threads()} threads.
+
 void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, slong n)
 
     Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
@@ -3033,7 +3117,7 @@ void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n)
 
     Sets $f$ to the $q$-expansion to length $n$ of the
     Jacobi theta function raised to the power $r$, i.e. $\vartheta(q)^r$
-    where $\vartheta(q) = 1 + \sum_{k=1}^{\infty} q^{k^2}$.
+    where $\vartheta(q) = 1 + 2 \sum_{k=1}^{\infty} q^{k^2}$.
 
     This function uses sparse formulas for $r = 1, 2$
     and otherwise reduces to those cases using power series arithmetic.

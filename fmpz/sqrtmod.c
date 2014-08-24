@@ -98,7 +98,7 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
 
     mpz_powm(b, a, p1, p);
 
-    for (flint_mpz_set_ui(k, 2); ; flint_mpz_add_ui(k, k, 1))
+    for (flint_mpz_set_ui(k, 3); ; flint_mpz_add_ui(k, k, 2)) /* 2 is a quadratic residue mod p = 8k + 1 */
     {
         if (mpz_jacobi(k, p) == -1) break;
     }

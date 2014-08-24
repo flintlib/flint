@@ -617,7 +617,7 @@ void _fq_poly_sqr_reorder(fq_struct *rop,
 
     Sets \code{(rop, 2*len- 1)} to the square of \code{(op, len)},
     assuming that \code{len} is not zero reordering the two indeterminates
-    $X$ and $Y$ when viewing the polynomials as elements of $\mathbb{F}_p[X,Y]$.
+    $X$ and $Y$ when viewing the polynomials as elements of $\mathbf{F}_p[X,Y]$.
 
     Permits zero padding.  Supports aliasing.
 
@@ -626,7 +626,7 @@ void fq_poly_sqr_reorder(fq_poly_t rop,
 
     Sets \code{rop} to the square of \code{op},
     assuming that \code{len} is not zero reordering the two indeterminates
-    $X$ and $Y$ when viewing the polynomials as elements of $\mathbb{F}_p[X,Y]$.
+    $X$ and $Y$ when viewing the polynomials as elements of $\mathbf{F}_p[X,Y]$.
     See \code{fq_poly_mul_reorder}.
 
 

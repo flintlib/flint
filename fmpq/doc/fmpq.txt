@@ -200,7 +200,7 @@ char * fmpq_get_str(char * str, int b, const fmpq_t x)
 
 void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f)
 
-    Sets the unitialised \code{mpq_t} $z$ to the value of the 
+    Sets the uninitialised \code{mpq_t} $z$ to the value of the 
     readonly \code{fmpq_t} $f$.
 
     Note that it is assumed that $f$ does not change during 
@@ -621,8 +621,8 @@ void fmpq_harmonic_ui(fmpq_t x, ulong n)
 
         $$((x))=\begin{cases}
             x-\lfloor x\rfloor-1/2 &\mbox{if }
-                x\in\mathbb{Q}\setminus\mathbb{Z}\\
-            0 &\mbox{if }x\in\mathbb{Z}.
+                x\in\mathbf{Q}\setminus\mathbf{Z}\\
+            0 &\mbox{if }x\in\mathbf{Z}.
             \end{cases}$$
 
     If $0 < h < k$ and $(h,k) = 1$, this reduces to

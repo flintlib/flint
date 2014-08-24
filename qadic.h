@@ -33,6 +33,7 @@
 #undef ulong
 
 #include <gmp.h>
+#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"
@@ -41,8 +42,6 @@
 #include "ulong_extras.h"
 #include "padic.h"
 #include "padic_poly.h"
-
-#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {
@@ -412,6 +411,10 @@ void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len,
                 const fmpz_t p, slong N, const fmpz_t pN);
 
 int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+
+void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+                  const fmpz *a, const slong *j, slong lena, 
+                  const fmpz_t p, slong N);
 
 void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t ctx);
 

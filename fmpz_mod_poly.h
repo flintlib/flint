@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2014 William Hart
 
 ******************************************************************************/
 
@@ -42,6 +43,11 @@
  extern "C" {
 #endif
 
+#define FMPZ_MOD_POLY_HGCD_CUTOFF  128      /* HGCD: Basecase -> Recursion      */
+#define FMPZ_MOD_POLY_GCD_CUTOFF  256       /* GCD:  Euclidean -> HGCD          */
+
+#define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64 /* Inv series newton: Basecase -> Newton */
+
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -53,6 +59,33 @@ typedef struct
 } fmpz_mod_poly_struct;
 
 typedef fmpz_mod_poly_struct fmpz_mod_poly_t[1];
+
+typedef struct
+{
+   fmpz_t res;
+   fmpz_t lc;
+   slong len0;
+   slong len1;
+   slong off;
+} fmpz_mod_poly_res_struct;
+
+typedef fmpz_mod_poly_res_struct fmpz_mod_poly_res_t[1];
+
+typedef struct
+{
+   fmpz_mod_poly_struct * pow;
+   slong len;
+} fmpz_mod_poly_frobenius_powers_2exp_struct;
+
+typedef fmpz_mod_poly_frobenius_powers_2exp_struct fmpz_mod_poly_frobenius_powers_2exp_t[1];
+
+typedef struct
+{
+   fmpz_mod_poly_struct * pow;
+   slong len;
+} fmpz_mod_poly_frobenius_powers_struct;
+
+typedef fmpz_mod_poly_frobenius_powers_struct fmpz_mod_poly_frobenius_powers_t[1];
 
 /*  Initialisation and memory management *************************************/
 
@@ -160,6 +193,12 @@ fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
         return poly->coeffs + (poly->length - 1);
     else
         return NULL;
+}
+
+static __inline__
+int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly)
+{
+   return poly->length == 1 && fmpz_is_one(poly->coeffs + 0);
 }
 
 /*  Assignment and basic manipulation ****************************************/
@@ -385,17 +424,37 @@ _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly,
 
 void
 fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
-                           const fmpz_mod_poly_t poly, const fmpz_t e,
-                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+                          const fmpz_mod_poly_t poly, const fmpz_t e,
+                          const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
 void
 _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
-                                    slong lenf, const fmpz* finv, slong lenfinv,
-                                    const fmpz_t p);
+                                   slong lenf, const fmpz* finv, slong lenfinv,
+                                   const fmpz_t p);
 
 void
 fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
-                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+                          const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
+
+void
+fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
+                 const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
+
+
+void
+fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t pow);
+
+void
+fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
+                            fmpz_mod_poly_frobenius_powers_2exp_t pow, 
+                                             const fmpz_mod_poly_t f, ulong m);
+
+void
+fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
+
+void
+fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
 
 /*  Division *****************************************************************/
 
@@ -507,6 +566,17 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
     fmpz_mod_poly_clear(Q);
 }
 
+static __inline__ 
+void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_t Q;
+
+    fmpz_mod_poly_init(Q, &(A->p));
+    fmpz_mod_poly_divrem_f(f, Q, R, A, B);
+    fmpz_mod_poly_clear(Q);
+}
+
 void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
                                          const fmpz* B, slong lenB, const fmpz* Binv,
                                          slong lenBinv, const fmpz_t p);
@@ -532,9 +602,15 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
 void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
     const fmpz_mod_poly_t Q, slong n);
 
+void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n);
+
 /*  Greatest common divisor **************************************************/
 
 void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
+
+void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res, 
+                                                   const fmpz_mod_poly_t poly);
 
 slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, 
                                            const fmpz *B, slong lenB, 
@@ -543,21 +619,6 @@ slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA,
 void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, 
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B);
-
-static __inline__ 
-slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
-                                 const fmpz *B, slong lenB, 
-                                 const fmpz_t invB, const fmpz_t p)
-{
-    return _fmpz_mod_poly_gcd_euclidean(G, A, lenA, B, lenB, invB, p);
-}
-
-static __inline__ 
-void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, 
-                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
-{
-    fmpz_mod_poly_gcd_euclidean(G, A, B);
-}
 
 slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
                                     const fmpz *A, slong lenA, 
@@ -582,7 +643,49 @@ void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
     fmpz_mod_poly_gcd_euclidean_f(f, G, A, B);
 }
 
+slong _fmpz_mod_poly_hgcd_recursive(fmpz **M, slong *lenM, 
+    fmpz *A, slong *lenA, fmpz *B, slong *lenB, 
+    const fmpz *a, slong lena, const fmpz *b, slong lenb, 
+    fmpz *P, const fmpz_t mod, int flag, fmpz_mod_poly_res_t res);
+
+slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM, 
+                     fmpz *A, slong *lenA, fmpz *B, slong *lenB, 
+                     const fmpz *a, slong lena, const fmpz *b, slong lenb, 
+                     const fmpz_t mod);
+
+slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA, 
+                                  const fmpz *B, slong lenB, const fmpz_t mod);
+
+void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, 
+                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+static __inline__ 
+slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
+                                 const fmpz *B, slong lenB, 
+                                 const fmpz_t invB, const fmpz_t p)
+{
+    if (FLINT_MIN(lenA, lenB) < FMPZ_MOD_POLY_GCD_CUTOFF)
+       return _fmpz_mod_poly_gcd_euclidean(G, A, lenA, B, lenB, invB, p);
+    else
+       return _fmpz_mod_poly_gcd_hgcd(G, A, lenA, B, lenB, p);
+}
+
+static __inline__ 
+void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    if (FLINT_MIN(A->length, B->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
+       fmpz_mod_poly_gcd_euclidean(G, A, B);
+    else
+       fmpz_mod_poly_gcd_hgcd(G, A, B);
+}
+
 slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
+                                   const fmpz *A, slong lenA, 
+                                   const fmpz *B, slong lenB, 
+                                   const fmpz_t invB, const fmpz_t p);
+
+slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, 
                                    const fmpz *A, slong lenA, 
                                    const fmpz *B, slong lenB, 
                                    const fmpz_t invB, const fmpz_t p);
@@ -591,19 +694,51 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
                              fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
+                             fmpz_mod_poly_t S, fmpz_mod_poly_t T,
+                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, 
+                          const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                          const fmpz_t mod);
+
+void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+          fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 static __inline__ slong 
 _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, 
                     const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
                     const fmpz_t invB, const fmpz_t p)
 {
-    return _fmpz_mod_poly_xgcd_euclidean(G, S, T, A, lenA, B, lenB, invB, p);
+    if (FLINT_MIN(lenA, lenB) < FMPZ_MOD_POLY_GCD_CUTOFF)
+       return _fmpz_mod_poly_xgcd_hgcd(G, S, T, A, lenA, B, lenB, p);
+    else
+       return _fmpz_mod_poly_xgcd_euclidean(G, S, T, A, lenA, B, lenB, invB, p);
+}
+
+static __inline__ slong 
+_fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, 
+                    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                    const fmpz_t invB, const fmpz_t p)
+{
+    return _fmpz_mod_poly_xgcd_euclidean_f(f, G, S, T, A, lenA, B, lenB, invB, p);
 }
 
 static __inline__ void 
 fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T,
                    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
-    fmpz_mod_poly_xgcd_euclidean(G, S, T, A, B);
+    if (FLINT_MIN(A->length, B->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
+       fmpz_mod_poly_xgcd_euclidean(G, S, T, A, B);
+    else
+       fmpz_mod_poly_xgcd_hgcd(G, S, T, A, B);
+}
+
+static __inline__ void 
+fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T,
+                   const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_xgcd_euclidean_f(f, G, S, T, A, B);
 }
 
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
@@ -613,12 +748,68 @@ slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
 void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S, 
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+                           const fmpz_t p);
+
+void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 int _fmpz_mod_poly_invmod(fmpz *A, 
+                          const fmpz *B, slong lenB, 
+                          const fmpz *P, slong lenP, const fmpz_t p);
+
+int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A, 
                           const fmpz *B, slong lenB, 
                           const fmpz *P, slong lenP, const fmpz_t p);
 
 int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, 
                          const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
+
+int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A, 
+                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
+
+/*  Resultant  ***************************************************************/
+
+void _fmpz_mod_poly_resultant_euclidean(fmpz_t res, 
+                                    const fmpz *poly1, slong len1, 
+                              const fmpz *poly2, slong len2, const fmpz_t mod);
+
+void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f, 
+                                                      const fmpz_mod_poly_t g);
+
+void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA, 
+                                  const fmpz *B, slong lenB, const fmpz_t mod);
+
+void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A, 
+                                                      const fmpz_mod_poly_t B);
+
+static __inline__ void 
+_fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1, 
+                     const fmpz *poly2, slong len2, const fmpz_t mod)
+{
+    if (len1 < FMPZ_MOD_POLY_GCD_CUTOFF)
+        _fmpz_mod_poly_resultant_euclidean(res, poly1, len1, poly2, len2, mod);
+    else
+        _fmpz_mod_poly_resultant_hgcd(res, poly1, len1, poly2, len2, mod);
+}
+
+static __inline__ void 
+fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, 
+                                                       const fmpz_mod_poly_t g)
+{
+    if (FLINT_MAX(f->length, g->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
+       fmpz_mod_poly_resultant_euclidean(res, f, g);
+    else
+       fmpz_mod_poly_resultant_hgcd(res, f, g);
+}
+
+/*  Discriminant  ************************************************************/
+
+void _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, 
+                                                  slong len, const fmpz_t mod);
+
+void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f);
 
 /*  Derivative  **************************************************************/
 
@@ -758,6 +949,17 @@ _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const 
 void
 fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                          const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (fmpz_mod_poly_struct * res,
+                 const fmpz_mod_poly_struct * polys, slong len1, slong l,
+                 const fmpz * poly, slong len, const fmpz * polyinv,
+                 slong leninv, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
+                    const fmpz_mod_poly_struct * polys, slong len1, slong n,
+                    const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv);
 
 /*  Radix conversion *********************************************************/
 

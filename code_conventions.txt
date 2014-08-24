@@ -40,6 +40,27 @@ The typical definitions of these in terms of primitive types are:
     | slong         | long or long long                                    |
     | ulong         | ulong or ulong long                                  |
 
+Constant integers
+-----------------
+
+Because the ulong/slong types can be (unsigned) long on Linux and (unsigned)
+long long on Windows, we cannot use the usual 123456789UL to declare them.
+
+Instead, we provide two macros:
+
+  WORD(123456789) /* slong constant */
+  UWORD(123456789) /* ulong constant */
+
+Format specifiers
+-----------------
+
+Again, because a ulong/slong use different types on Windows and Linux, we cannot
+use the format specifers %lu/%ld in printf. For this purpose we provide the
+flint_printf functions, which is the same as printf, except that it supports:
+
+   flint_printf("%wu", d); /* print ulong */
+   flint_printf("%wd", d); /* print slong */
+
 Use of const
 ------------
 
