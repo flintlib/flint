@@ -27,7 +27,7 @@
 #define FQ_ZECH_H
 
 #ifdef FQ_ZECH_INLINES_C
-#define FQ_ZECH_INLINE
+#define FQ_ZECH_INLINE FLINT_DLL
 #else
 #define FQ_ZECH_INLINE static __inline__
 #endif

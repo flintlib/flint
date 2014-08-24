@@ -3622,6 +3622,9 @@
   <ClCompile Include="..\..\fq_nmod_poly\init.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly\inlines.c">
+    <Filter>Source Files\fq_nmod_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\inv_series_newton.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
@@ -3722,6 +3725,9 @@
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\set_fq.c">
+    <Filter>Source Files\fq_nmod_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly\set_trunc.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\shift_left.c">
@@ -4003,6 +4009,9 @@
   <ClCompile Include="..\..\fq_poly\init.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_poly\inlines.c">
+    <Filter>Source Files\fq_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_poly\inv_series_newton.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
@@ -4106,6 +4115,9 @@
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\set_fq.c">
+    <Filter>Source Files\fq_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_poly\set_trunc.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\shift_left.c">
@@ -4597,6 +4609,9 @@
   <ClCompile Include="..\..\fq_zech_poly\init.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly\inlines.c">
+    <Filter>Source Files\fq_zech_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\inv_series_newton.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
@@ -4697,6 +4712,9 @@
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\set_fq.c">
+    <Filter>Source Files\fq_zech_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly\set_trunc.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\shift_left.c">

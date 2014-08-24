@@ -23,7 +23,7 @@ debug = False
 # what to build
 build_lib = True
 build_dll = True
-build_tests = True
+build_tests = False
 build_profiles = True
 
 # add user choice

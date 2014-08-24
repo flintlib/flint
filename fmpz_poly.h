@@ -30,7 +30,7 @@
 #define FMPZ_POLY_H
 
 #ifdef FMPZ_POLY_INLINES_C
-#define FMPZ_POLY_INLINE
+#define FMPZ_POLY_INLINE FLINT_DLL
 #else
 #define FMPZ_POLY_INLINE static __inline__
 #endif

@@ -27,7 +27,7 @@
 #define FMPZ_H
 
 #ifdef FMPZ_INLINES_C
-#define FMPZ_INLINE
+#define FMPZ_INLINE FLINT_DLL
 #else
 #define FMPZ_INLINE static __inline__
 #endif

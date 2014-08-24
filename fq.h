@@ -29,7 +29,7 @@
 #define FQ_H
 
 #ifdef FQ_INLINES_C
-#define FQ_INLINE
+#define FQ_INLINE FLINT_DLL
 #else
 #define FQ_INLINE static __inline__
 #endif

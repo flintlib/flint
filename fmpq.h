@@ -28,7 +28,7 @@
 #define FMPQ_H
 
 #ifdef FMPQ_INLINES_C
-#define FMPQ_INLINE
+#define FMPQ_INLINE FLINT_DLL
 #else
 #define FMPQ_INLINE static __inline__
 #endif

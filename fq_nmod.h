@@ -29,7 +29,7 @@
 #define FQ_NMOD_H
 
 #ifdef FQ_NMOD_INLINES_C
-#define FQ_NMOD_INLINE
+#define FQ_NMOD_INLINE FLINT_DLL
 #else
 #define FQ_NMOD_INLINE static __inline__
 #endif

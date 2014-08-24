@@ -29,7 +29,7 @@
 #define FMPQ_POLY_H
 
 #ifdef FMPQ_POLY_INLINES_C
-#define FMPQ_POLY_INLINE
+#define FMPQ_POLY_INLINE FLINT_DLL
 #else
 #define FMPQ_POLY_INLINE static __inline__
 #endif
