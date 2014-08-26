@@ -98,6 +98,8 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_init(B, rank, rank);
         fmpz_mat_init(C, rank, n - rank);
 
+        /* set B to be the pivot columns and rows and C to be the non-pivot
+           columns in the pivot rows */
         for (i = 0; i < rank; i++)
         {
             for (j = 0; j < rank; j++)
@@ -108,7 +110,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
                         fmpz_mat_entry(A, P[i], pivs[rank + j]));
         }
 
-        /* solve B*E2 = C */
+        /* solve B*E2 = den*C */
         fmpz_mat_init(E2, rank, n - rank);
         if (n < 25)                 /* small matrices use solve */
         {
@@ -137,6 +139,8 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_clear(C);
         fmpz_mat_init(E, rank, n);
 
+        /* move columns of E2 and identity matrix into E so that it should be
+           in rref */
         for (i = 0; i < rank; i++)
         {
             fmpz_set(fmpz_mat_entry(E, i, pivs[i]), den);
@@ -175,6 +179,8 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_clear(F);
         fmpz_mat_clear(D);
 
+        /* if FD = 0 we have computed the right so stop, otherwise try a
+           different p in the next iteration */
         if (fmpz_mat_is_zero(FD))
             break;
 
@@ -182,6 +188,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_clear(FD);
     }
 
+    /* write the entries of E  into R and zeroes at the bottom */
     for (i = 0; i < rank; i++)
         for (j = 0; j < n; j++)
             fmpz_set(fmpz_mat_entry(R, i, j), fmpz_mat_entry(E, i, j));
