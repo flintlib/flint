@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010-2012 Fredrik Johansson
+    Copyright (C) 2014 Alex J. Best
 
 ******************************************************************************/
 
@@ -83,7 +84,7 @@ main(void)
     flint_printf("rref_multi_mod....");
     fflush(stdout);
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, R, B, R2, R3;
         fmpz_t den, c, den2;
@@ -91,8 +92,8 @@ main(void)
         slong * perm;
         int equal;
 
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = 1 + n_randint(state, 10);
+        n = 1 + n_randint(state, 10);
         r = n_randint(state, FLINT_MIN(m, n) + 1);
 
         fmpz_mat_init(A, m, n);
@@ -118,7 +119,6 @@ main(void)
 
         rank1 = fmpz_mat_rref_multi_mod(R, den, A);
 
-        /*
         if (r != rank1)
         {
             flint_printf("FAIL wrong rank! (r = %wd, rank1 = %wd)!\n", r, rank1);
@@ -133,12 +133,12 @@ main(void)
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             abort();
-        }*/
+        }
 
         /* check rref is the same as when computed classically */
 
-        /*rank2 = fmpz_mat_rref(R2, den2, A);
-        equal = (rank1 == rank1);
+        rank2 = fmpz_mat_rref(R2, den2, A);
+        equal = (rank1 == rank2);
 
         if (equal)
         {
@@ -149,6 +149,9 @@ main(void)
                 for (k = 0; k < n; k++)
                     equal = equal && fmpz_equal(fmpz_mat_entry(R, j, k),
                             fmpz_mat_entry(R2, j, k));
+
+            if (!fmpz_is_zero(den2)) /* TODO should den2 be able to be? */
+                fmpz_mat_scalar_divexact_fmpz(R, R, den2);
         }
 
         if (!equal)
@@ -158,11 +161,11 @@ main(void)
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R2); flint_printf("\n\n");
             abort();
-        }*/
+        }
 
         /* Concatenate the original matrix with the rref, scramble the rows,
             and check that the rref is the same */
-        /*_perm_randtest(perm, 2 * m, state);
+        _perm_randtest(perm, 2 * m, state);
 
         for (j = 0; j < m; j++)
         {
@@ -202,7 +205,7 @@ main(void)
             fmpz_mat_print_pretty(R); flint_printf("\n\n");
             fmpz_mat_print_pretty(R3); flint_printf("\n\n");
             abort();
-        }*/
+        }
 
         fmpz_clear(c);
         fmpz_clear(den);
@@ -222,4 +225,3 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
