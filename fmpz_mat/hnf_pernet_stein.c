@@ -499,13 +499,7 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
     nmod_mat_init(Amod, m, n, p);
 
     fmpz_mat_get_nmod_mat(Amod, A);
-    r = nmod_mat_lu(P, Amod, 0);
-
-    if (r != n)                 /* A must have some nonpivot columns */
-    {
-        fmpz_mat_get_nmod_mat(Amod, A);
-        _nmod_mat_rref(Amod, pivots);
-    }
+    r = _nmod_mat_rref(Amod, pivots, P);
 
     flint_randclear(state);
     nmod_mat_clear(Amod);
