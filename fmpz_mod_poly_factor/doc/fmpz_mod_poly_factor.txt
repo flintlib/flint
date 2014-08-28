@@ -194,7 +194,8 @@ void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
     baby step/giant step strategy for the distinct-degree factorization
-    step.
+    step. If \code{flint_get_num_threads()} is greater than one
+    \code{fmpz_mod_poly_factor_distinct_deg_threaded} is used.
 
 void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                                                    const fmpz_mod_poly_t f)
