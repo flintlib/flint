@@ -54,6 +54,17 @@ typedef struct
     slong alloc;
 } nmod_poly_factor_struct;
 
+typedef struct
+{
+    nmod_poly_struct * baby;
+    nmod_poly_struct res;
+    nmod_poly_struct H;
+    nmod_poly_struct v;
+    nmod_poly_struct vinv;
+    slong m;
+}
+nmod_poly_interval_poly_arg_t;
+
 /* Factoring  ****************************************************************/
 
 typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
@@ -85,6 +96,9 @@ int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, slong d);
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
+                                   const nmod_poly_t poly, slong * const *degs);
+
+void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs);
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
@@ -121,6 +135,9 @@ mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
 
 mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
+
+void *
+_nmod_poly_interval_poly_worker(void* arg_ptr);
 
 #ifdef __cplusplus
     }
