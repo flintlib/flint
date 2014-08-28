@@ -220,6 +220,11 @@ void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, slong n, const mpq_t x);
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, 
+                           const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
 
 FMPQ_POLY_INLINE

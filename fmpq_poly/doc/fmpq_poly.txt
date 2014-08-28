@@ -368,6 +368,18 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
     Returns $1$ if \code{poly1} is equal to \code{poly2}, 
     otherwise returns~$0$.
 
+int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, 
+       const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+    Return $1$ if \code{poly1} and \code{poly2} notionally truncated to length
+    $n$ are equal, otherwise returns~$0$.
+
+int fmpq_poly_equal_trunc(const fmpq_poly_t poly1,
+                          const fmpq_poly_t poly2, slong n);
+
+    Return $1$ if \code{poly1} and \code{poly2} notionally truncated to length
+    $n$ are equal, otherwise returns~$0$.
+
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
                         const fmpz * rpoly, const fmpz_t rden, slong len)
 
