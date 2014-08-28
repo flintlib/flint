@@ -50,8 +50,6 @@ main(void)
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
     fflush(stdout);
 
-    flint_set_num_threads(1);
-
     for (i = 0; i < 2000; i++)
     {
         fmpz_mod_poly_t a, ainv, b, c;
@@ -61,6 +59,8 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
+
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         fmpz_mod_poly_init(a, p);
         fmpz_mod_poly_init(ainv, p);

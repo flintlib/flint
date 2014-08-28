@@ -49,14 +49,14 @@ main(void)
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
     fflush(stdout);
 
-    flint_set_num_threads(1);
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, ainv, b, c;
         mp_limb_t m = n_randtest_prime(state, 0);
         slong j, k, l;
         nmod_poly_struct * pow, * res;
+
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);

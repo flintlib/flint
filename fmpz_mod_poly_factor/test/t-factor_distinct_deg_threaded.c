@@ -37,7 +37,6 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    flint_set_num_threads(1);
 
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
@@ -52,6 +51,8 @@ main(void)
 
         fmpz_init(modulus);
         fmpz_set_ui(modulus, n_randtest_prime(state, 0));
+
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         fmpz_mod_poly_init(poly1, modulus);
         fmpz_mod_poly_init(poly, modulus);

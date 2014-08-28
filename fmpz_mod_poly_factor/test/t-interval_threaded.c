@@ -49,16 +49,18 @@ main(void)
     flint_printf("interval_threaded....");
     fflush(stdout);
 
-    flint_set_num_threads(1);
-
     /* no aliasing */
     for (i = 0; i < 2000; i++)
     {
         fmpz_mod_poly_t a, b, c, cinv, d, *e, * tmp;
         fmpz_t p;
-        slong j, num_threads = flint_get_num_threads(), l;
+        slong j, num_threads, l;
         fmpz_mod_poly_interval_poly_arg_t * args1;
         pthread_t *threads;
+
+        flint_set_num_threads(1 + n_randint(state, 3));
+
+        num_threads = flint_get_num_threads();
 
         l = n_randint(state, 20) + 1;
         threads = flint_malloc(sizeof(pthread_t) * num_threads);

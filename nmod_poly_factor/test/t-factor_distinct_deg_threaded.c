@@ -42,8 +42,6 @@ main(void)
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
 
-    flint_set_num_threads(1);
-
     for (iter = 0; iter < 200; iter++)
     {
         nmod_poly_t poly1, poly, q, r, product;
@@ -53,6 +51,8 @@ main(void)
         slong *degs;
 
         modulus = n_randtest_prime(state, 0);
+
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         nmod_poly_init(poly1, modulus);
         nmod_poly_init(poly, modulus);

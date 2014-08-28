@@ -50,17 +50,19 @@ main(void)
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
-    flint_set_num_threads(1);
-
     /* check precomputation */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, cinv, *tmp;
         nmod_mat_t B, *C;
         mp_limb_t m = n_randtest_prime(state, 0);
-        slong j, num_threads= flint_get_num_threads();
+        slong j, num_threads;
         nmod_poly_matrix_precompute_arg_t * args1;
         pthread_t *threads;
+
+        flint_set_num_threads(1 + n_randint(state, 3));
+
+        num_threads = flint_get_num_threads();
 
         threads = flint_malloc(sizeof(pthread_t) * num_threads);
         tmp = flint_malloc(sizeof(nmod_poly_t) * num_threads);
@@ -148,9 +150,13 @@ main(void)
         nmod_poly_t a, b, c, cinv, d, *res;
         nmod_mat_t B;
         mp_limb_t m = n_randtest_prime(state, 0);
-        slong j, num_threads= flint_get_num_threads();
+        slong j, num_threads;
         nmod_poly_compose_mod_precomp_preinv_arg_t * args1;
         pthread_t *threads;
+
+        flint_set_num_threads(1 + n_randint(state, 3));
+
+        num_threads = flint_get_num_threads();
 
         threads = flint_malloc(sizeof(pthread_t) * num_threads);
         res = flint_malloc(sizeof(nmod_poly_t) * num_threads);
