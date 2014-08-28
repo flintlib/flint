@@ -979,6 +979,14 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_t poly, const nmod_poly_t polyinv);
 
 void
+_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                             const nmod_poly_struct * polys,
+                                             slong lenpolys, slong l,
+                                             mp_srcptr poly, slong len,
+                                             mp_srcptr polyinv, slong leninv,
+                                             nmod_t mod);
+
+void
 nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
                                             slong len1, slong n,
