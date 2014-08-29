@@ -73,6 +73,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     if (bits < 0)
         bits = -bits;
 
+    fmpz_mat_clear(B1);
+
     fmpz_init(tmp);
 
     /* set the last row of Bu to be random, such that Bu is nonsingular */
@@ -177,7 +179,6 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     fmpz_mat_clear(k);
     fmpz_mat_clear(cols);
     fmpz_mat_clear(Bu);
-    fmpz_mat_clear(B1);
 }
 
 /* takes input matrix H with rows 0 to start_row - 1 in HNF to a HNF matrix */
@@ -511,6 +512,28 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
         _perm_clear(P);
         _perm_clear(pivots);
         return;
+    }
+    /* if A has full column rank we might wish to use minors based hnf */
+    if (r == n && n < 52)
+    {
+        slong b = fmpz_mat_max_bits(A), cutoff = 52;
+        if (b < 0)
+            b = -b;
+
+        if (b <= 8)
+            cutoff = 35;
+        else if (b <= 32)
+            cutoff = 44;
+        else if (b <= 256)
+            cutoff = 48;
+
+        if (n < cutoff)
+        {
+            fmpz_mat_hnf_minors(H, A);
+            _perm_clear(P);
+            _perm_clear(pivots);
+            return;
+        }
     }
 
     fmpz_mat_init(c, 1, r - 1);
