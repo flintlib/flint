@@ -32,9 +32,7 @@
 #include <NTL/ZZ.h>
 #include <NTL/ZZX.h>
 #include <NTL/mat_ZZ.h>
-#include <NTL/lip.h>
 #include <NTL/ctools.h>
-#include <NTL/g_lip.h>
 #include <gmp.h>
 
 #include "flint.h"
