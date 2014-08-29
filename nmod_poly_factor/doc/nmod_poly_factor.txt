@@ -147,6 +147,11 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
 
     Requires that \code{degs} has enough space for $(n/2)+1 * sizeof(slong)$.
 
+void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
+                                   const nmod_poly_t poly, slong * const *degs)
+
+    Multithreaded version of \code{nmod_poly_factor_distinct_deg}.
+
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
                                         const nmod_poly_t f)
 
@@ -165,7 +170,8 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
     “baby step/giant step” strategy for the distinct-degree factorization
-    step.
+    step. If \code{flint_get_num_threads()} is greater than one
+    \code{nmod_poly_factor_distinct_deg_threaded} is used.
 
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
                                           const nmod_poly_t f)
@@ -215,4 +221,11 @@ mp_limb_t nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t f)
     or Berlekamp on all the individual square-free factors.
     Currently Cantor-Zassenhaus is used by default unless the modulus is 2, in
     which case Berlekamp is used.
+
+void *
+_nmod_poly_interval_poly_worker(void* arg_ptr)
+
+    Worker function to compute interval polynomials in distinct degree
+    factorisation. Input/output is stored in
+    \code{nmod_poly_interval_poly_arg_t}.
 

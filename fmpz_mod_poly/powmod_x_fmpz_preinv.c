@@ -58,8 +58,9 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
     T = _fmpz_vec_init(lenT + lenQ);
     Q = T + lenT;
 
-    fmpz_one (res);
-    l = z_sizeinbase (lenf - 1, 2) - 2;
+    fmpz_one(res);
+    _fmpz_vec_zero(res + 1, lenf - 2);
+    l = z_sizeinbase(lenf - 1, 2) - 2;
     window = WORD(0);
     window = (WORD(1) << l);
     c = l;

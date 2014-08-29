@@ -119,6 +119,25 @@ typedef struct
 
 typedef nmod_poly_res_struct nmod_poly_res_t[1];
 
+typedef struct
+{
+    nmod_mat_struct A;
+    nmod_poly_struct poly1;
+    nmod_poly_struct poly2;
+    nmod_poly_struct poly2inv;
+}
+nmod_poly_matrix_precompute_arg_t;
+
+typedef struct
+{
+    nmod_mat_struct A;
+    nmod_poly_struct res;
+    nmod_poly_struct poly1;
+    nmod_poly_struct poly3;
+    nmod_poly_struct poly3inv;
+}
+nmod_poly_compose_mod_precomp_preinv_arg_t;
+
 /* zn_poly helper functions  ************************************************
 
 Copyright (C) 2007, 2008 David Harvey
@@ -917,6 +936,9 @@ void
 _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
                slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod);
 
+void *
+_nmod_poly_precompute_matrix_worker (void * arg_ptr);
+
 void
 nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
                           const nmod_poly_t poly2, const nmod_poly_t poly2inv);
@@ -926,6 +948,9 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
                             slong len1, const nmod_mat_t A, mp_srcptr poly3,
                             slong len3, mp_srcptr poly3inv, slong len3inv,
                             nmod_t mod);
+
+void *
+_nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
 
 void
 nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
@@ -952,6 +977,21 @@ void
 nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_struct * polys, slong len1, slong n,
                     const nmod_poly_t poly, const nmod_poly_t polyinv);
+
+void
+_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                             const nmod_poly_struct * polys,
+                                             slong lenpolys, slong l,
+                                             mp_srcptr poly, slong len,
+                                             mp_srcptr polyinv, slong leninv,
+                                             nmod_t mod);
+
+void
+nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                            const nmod_poly_struct * polys,
+                                            slong len1, slong n,
+                                            const nmod_poly_t poly,
+                                            const nmod_poly_t polyinv);
 
 void
 _nmod_poly_compose_mod_horner(mp_ptr res,
