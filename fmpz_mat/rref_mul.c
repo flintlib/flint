@@ -112,7 +112,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 
         /* solve B*E2 = den*C */
         fmpz_mat_init(E2, rank, n - rank);
-        if (n < 25)                 /* small matrices use solve */
+        if (rank < 25)                 /* small matrices use solve */
         {
             if (!fmpz_mat_solve(E2, den, B, C))
             {
