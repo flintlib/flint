@@ -218,6 +218,9 @@ void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, slong n);
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+int fmpz_poly_equal_trunc(const fmpz_poly_t poly1, 
+                                             const fmpz_poly_t poly2, slong n);
+
 #define fmpz_poly_is_zero(poly) \
     ((poly)->length == 0)
 

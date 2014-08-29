@@ -315,6 +315,12 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
     Returns $1$ if \code{poly1} is equal to \code{poly2}, otherwise 
     returns $0$.  The polynomials are assumed to be normalised.
 
+int fmpz_poly_equal_trunc(const fmpz_poly_t poly1, 
+                                              const fmpz_poly_t poly2, slong n)
+
+    Return $1$ if \code{poly1} and \code{poly2}, notionally truncated to
+    length $n$ are equal, otherwise return $0$.
+
 int fmpz_poly_is_zero(const fmpz_poly_t poly)
 
     Returns $1$ if the polynomial is zero and $0$ otherwise.
