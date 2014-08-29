@@ -353,6 +353,12 @@ void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
+void fmpz_poly_add_series(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                              const fmpz_poly_t poly2, ulong n)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length $n$ and then
+    set \code{res} to the sum.
+
 void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, slong len1, 
                                                 const fmpz * poly2, slong len2)
 
@@ -364,6 +370,12 @@ void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1,
                                                        const fmpz_poly_t poly2)
 
     Sets \code{res} to \code{poly1} minus \code{poly2}.
+
+void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                              const fmpz_poly_t poly2, ulong n)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length $n$ and then
+    set \code{res} to the sum.
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
