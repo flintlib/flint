@@ -349,11 +349,17 @@ void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
 void fmpz_mod_poly_add(fmpz_mod_poly_t res, 
                        const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2);
 
+void fmpz_mod_poly_add_series(fmpz_mod_poly_t res, 
+               const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n);
+
 void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1, 
                                    const fmpz *poly2, slong len2, const fmpz_t p);
 
 void fmpz_mod_poly_sub(fmpz_mod_poly_t res, 
                        const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2);
+
+void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, 
+               const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n);
 
 void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p);
 

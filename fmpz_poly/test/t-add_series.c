@@ -104,7 +104,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    /* Check trunc(a + b, n) = add_series(a, b, n) */
+    /* Check truncate(a + b, n) = add_series(a, b, n) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
@@ -118,7 +118,7 @@ main(void)
         fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
         n = n_randint(state, 100);
 
-        fmpz_poly_add_series(c, a, b, n);
+        fmpz_poly_add(c, a, b);
         fmpz_poly_truncate(c, n);
         fmpz_poly_add_series(d, a, b, n);
 
