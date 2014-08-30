@@ -64,6 +64,16 @@ main(void)
             fmpz_mat_randops(A, state, d);
 
         fmpz_mat_hnf_transform(H, U, A);
+
+        if (!fmpz_mat_is_in_hnf(H))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("matrix not in hnf!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H); flint_printf("\n\n");
+            abort();
+        }
+
         fmpz_mat_mul(H2, U, A);
         equal = fmpz_mat_equal(H, H2);
 
