@@ -275,28 +275,6 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
          (xxx)[ixxx] = yyy; \
    } while (0)
 
-/* compatibility between gmp and mpir */
-#ifndef mpn_com_n
-#define mpn_com_n mpn_com
-#endif
-
-#ifndef mpn_neg_n
-#define mpn_neg_n mpn_neg
-#endif
-
-#ifndef mpn_tdiv_q
-/* substitute for mpir's mpn_tdiv_q */
-static __inline__
-void mpn_tdiv_q(mp_ptr qp,
-	   mp_srcptr np, mp_size_t nn,
-	   mp_srcptr dp, mp_size_t dn)
-    {
-    mp_ptr _scratch = (mp_ptr) flint_malloc(dn * sizeof(mp_limb_t));
-    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
-    flint_free(_scratch);
-    }
-#endif
-
 /* temporary allocation */
 #define TMP_INIT \
    typedef struct __tmp_struct { \
@@ -322,6 +300,29 @@ void mpn_tdiv_q(mp_ptr qp,
       flint_free(__tmp_root->block); \
       __tmp_root = __tmp_root->next; \
    }
+
+/* compatibility between gmp and mpir */
+#ifndef mpn_com_n
+#define mpn_com_n mpn_com
+#endif
+
+#ifndef mpn_neg_n
+#define mpn_neg_n mpn_neg
+#endif
+
+#ifndef mpn_tdiv_q
+/* substitute for mpir's mpn_tdiv_q */
+static __inline__ void
+mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
+{
+    mp_ptr _scratch;
+    TMP_INIT;
+    TMP_START;
+    _scratch = (mp_ptr) TMP_ALLOC(dn * sizeof(mp_limb_t));
+    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    TMP_END;
+}
+#endif
 
 /* Newton iteration macros */
 #define FLINT_NEWTON_INIT(from, to) \
