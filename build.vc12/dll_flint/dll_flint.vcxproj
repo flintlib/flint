@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <RootNamespace>dll_flint</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{3C7DB152-98BB-4907-801E-8B8E522F58A7}</ProjectGuid>
+    <ProjectGuid>{924C2D75-0756-44E7-B37A-AFD309EA44EA}</ProjectGuid>
     </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'" Label="Configuration">
@@ -3445,6 +3445,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpz_mod_poly\div_newton_n_preinv.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpz_mod_poly\div_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>

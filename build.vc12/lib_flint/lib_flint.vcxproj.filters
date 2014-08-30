@@ -1855,6 +1855,9 @@
   <ClCompile Include="..\..\fmpz_mod_poly\div_newton_n_preinv.c">
     <Filter>Source Files\fmpz_mod_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mod_poly\div_series.c">
+    <Filter>Source Files\fmpz_mod_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mod_poly\divrem_basecase.c">
     <Filter>Source Files\fmpz_mod_poly</Filter>
     </ClCompile>
