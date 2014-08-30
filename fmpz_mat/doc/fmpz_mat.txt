@@ -809,6 +809,11 @@ slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     the reduced row echelon form of the whole of \code{A}. This procedure is
     described in \cite{Stein2007}.
 
+int fmpz_mat_is_in_rref(const fmpz_mat_t A, const fmpz_t den)
+
+    Checks that the matrix $A/den$ is in reduced row echelon form, returns 1 if
+    so and 0 otherwise.
+
 *******************************************************************************
 
     Modular gaussian elimination
@@ -948,6 +953,11 @@ void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
 
+int fmpz_mat_is_in_hnf(const fmpz_mat_t A)
+
+    Checks that the given matrix is in Hermite normal form, returns 1 if so and
+    0 otherwise.
+
 *******************************************************************************
 
     Smith normal form
@@ -990,3 +1000,8 @@ void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
 
     Aliasing of \code{S} and \code{A} is allowed. The size of \code{S} must be
     the same as that of \code{A}.
+
+int fmpz_mat_is_in_snf(const fmpz_mat_t A)
+
+    Checks that the given matrix is in Smith normal form, returns 1 if so and 0
+    otherwise.

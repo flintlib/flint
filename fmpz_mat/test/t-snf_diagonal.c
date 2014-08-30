@@ -30,32 +30,6 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-/* checks that the input matrix is in Smith normal form */
-int in_snf(const fmpz_mat_t A)
-{
-    slong i, j;
-    int snf = 1;
-    for (i = 0; i < A->r && snf; i++)
-    {
-        for (j = 0; j < A->c && snf; j++)
-        {
-            if (i == j)
-            {
-                snf = (fmpz_sgn(fmpz_mat_entry(A, i, i)) >= 0);
-                if (i > 0)
-                    snf &= fmpz_divisible(fmpz_mat_entry(A, i, i),
-                            fmpz_mat_entry(A, i - 1, i - 1));
-            }
-            else
-            {
-                snf = fmpz_is_zero(fmpz_mat_entry(A, i, j));
-            }
-        }
-    }
-
-    return snf;
-}
-
 int
 main(void)
 {
@@ -86,7 +60,7 @@ main(void)
 
         fmpz_mat_snf_diagonal(S, A);
 
-        if (!in_snf(S))
+        if (!fmpz_mat_is_in_snf(S))
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in snf!\n");

@@ -213,13 +213,15 @@ slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check);
 
 slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+slong fmpz_mat_rref_fflu(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den,
+        slong rank);
 
 /* Modular gaussian elimination *********************************************/
 
 slong
 fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
-
-slong fmpz_mat_rref_multi_mod(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 
 /* Trace ********************************************************************/
 
@@ -323,12 +325,14 @@ void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
 void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
 void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
 void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A);
+int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
 
 void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A,
         const fmpz_t mod);
+int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }

@@ -30,53 +30,6 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-/* checks that the input matrix is in Hermite normal form */
-int in_hnf(const fmpz_mat_t A)
-{
-    slong i, last_i, j, prev_j;
-
-    /* find last non-zero row */
-    for (last_i = A->r - 1; last_i >= 0; last_i--)
-    {
-        for (j = 0; j < A->c; j++)
-        {
-            if (!fmpz_is_zero(fmpz_mat_entry(A, last_i, j)))
-                break;
-        }
-        if (j < A->c)
-            break;
-    }
-
-    /* hermite form structure */
-    prev_j = -1;
-    for (i = 0; i <= last_i; i++)
-    {
-        slong i2;
-
-        for (j = 0; j < A->c; j++)
-        {
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
-            {
-                if (fmpz_sgn(fmpz_mat_entry(A, i, j)) < 0)
-                    return 0;
-                break;
-            }
-        }
-        if (j == A->c || j <= prev_j)
-            return 0;
-        prev_j = j;
-        for (i2 = 0; i2 < i; i2++)
-        {
-            if (fmpz_cmp(fmpz_mat_entry(A, i2, j), fmpz_mat_entry(A, i, j)) >= 0)
-                return 0;
-            if (fmpz_sgn(fmpz_mat_entry(A, i2, j)) < 0)
-                return 0;
-        }
-    }
-
-    return 1;
-}
-
 int
 main(void)
 {
@@ -113,7 +66,7 @@ main(void)
 
         fmpz_mat_hnf(H, A);
 
-        if (!in_hnf(H))
+        if (!fmpz_mat_is_in_hnf(H))
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in hnf!\n");
@@ -174,7 +127,7 @@ main(void)
 
         fmpz_mat_hnf(H, A);
 
-        if (!in_hnf(H))
+        if (!fmpz_mat_is_in_hnf(H))
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in hnf!\n");
