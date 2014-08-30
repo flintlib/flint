@@ -28,27 +28,27 @@
 void
 fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
 {
-    slong m = A->r, b = fmpz_mat_max_bits(A), cutoff = 3;
+    slong m = A->r, b = fmpz_mat_max_bits(A), cutoff = 2;
 
     if (b < 0)
         b = -b;
 
     if (b <= 2)
-        cutoff = 69;
+        cutoff = 52;
     else if (b <= 4)
-        cutoff = 49;
+        cutoff = 38;
     else if (b <= 8)
-        cutoff = 34;
+        cutoff = 30;
     else if (b <= 16)
-        cutoff = 19;
+        cutoff = 11;
     else if (b <= 32)
         cutoff = 11;
     else if (b <= 64)
-        cutoff = 9;
-    else if (b <= 128)
-        cutoff = 7;
-    else if (b <= 256)
         cutoff = 5;
+    else if (b <= 128)
+        cutoff = 4;
+    else if (b <= 512)
+        cutoff = 3;
 
     if (m < cutoff)
         fmpz_mat_hnf_classical(H, A);
