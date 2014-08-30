@@ -39,10 +39,7 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
     fmpz_mat_init_set(tmp, mat);
     fmpz_init(den);
 
-    if (n <= 25)
-        rank = fmpz_mat_rref(tmp, den, mat);
-    else
-        rank = fmpz_mat_rref_mul(tmp, den, mat);
+    rank = fmpz_mat_rref(tmp, den, mat);
     nullity = n - rank;
 
     fmpz_mat_zero(res);
