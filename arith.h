@@ -125,7 +125,7 @@ static const mp_limb_t euler_number_small[] = {
 #endif
 };
 
-double arith_euler_number_size(ulong n);
+FLINT_DLL double arith_euler_number_size(ulong n);
 
 FLINT_DLL void arith_euler_number_vec(fmpz * res, slong n);
 
@@ -150,7 +150,7 @@ static const slong _bernoulli_numer_small[] = {
 #endif
 };
 
-void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
+FLINT_DLL void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
 FLINT_DLL void arith_bernoulli_number(fmpq_t x, ulong n);
 
 FLINT_DLL void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n);

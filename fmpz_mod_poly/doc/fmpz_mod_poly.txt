@@ -1011,6 +1011,47 @@ void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
     \code{Qinv} undefined, or sets \code{Qinv} to the inverse of \code{Q}
     modulo $x^n$, where $n \geq 1$.
 
+void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n,
+                                      const fmpz_t cinv, const fmpz_t p)
+
+    Sets \code{(Qinv, n)} to the inverse of \code{(Q, n)} modulo $x^n$,
+    where $n \geq 1$, assuming that the bottom coefficient of $Q$ is
+    invertible modulo $p$ and that its inverse is \code{cinv}.
+
+void fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv,
+                                       const fmpz_mod_poly_t Q, slong n)
+
+    Sets \code{Qinv} to the inverse of \code{Q} modulo $x^n$,
+    where $n \geq 1$, assuming that the bottom coefficient of
+    $Q$ is a unit.
+
+void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
+
+    Either sets $f$ to a nontrivial factor of $p$ with the value of
+    \code{Qinv} undefined, or sets \code{Qinv} to the inverse of \code{Q}
+    modulo $x^n$, where $n \geq 1$.
+
+*******************************************************************************
+
+    Power series division
+
+*******************************************************************************
+
+void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+                           const fmpz * B, slong Blen, const fmpz_t p, slong n)
+
+    Set \code{(Q, n)} to the quotient of the series \code{(A, Alen}) and
+    \code{(B, Blen)} assuming \code{Alen, Blen <= n}. We assume the bottom
+    coefficient of \code{B} is invertible modulo $p$.
+
+void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+                                              const fmpz_mod_poly_t B, slong n)
+
+    Set $Q$ to the quotient of the series $A$ by $B$, thinking of the series as
+    though they were of length $n$. We assume that the bottom coefficient of
+    $B$ is a unit.
+
 *******************************************************************************
 
     Greatest common divisor
