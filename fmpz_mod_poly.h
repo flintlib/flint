@@ -290,6 +290,14 @@ int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1,
 }
 
 FMPZ_MOD_POLY_INLINE 
+int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1, 
+                        const fmpz_mod_poly_t poly2, slong n)
+{
+    return fmpz_poly_equal_trunc((fmpz_poly_struct *) poly1, 
+                           (fmpz_poly_struct *) poly2, n);
+}
+
+FMPZ_MOD_POLY_INLINE 
 int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 {
     return (poly->length == 0);

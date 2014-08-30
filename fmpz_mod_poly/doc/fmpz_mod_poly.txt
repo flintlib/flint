@@ -267,7 +267,13 @@ void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
 int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1,
                         const fmpz_mod_poly_t poly2)
 
-    Returns non-zero if the two polynomials are equal.
+    Returns non-zero if the two polynomials are equal, otherwise returns zero.
+
+int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1,
+                        const fmpz_mod_poly_t poly2, slong n)
+
+    Notionally truncates the two polynomials to length $n$ and returns non-zero
+    if the two polynomials are equal, otherwise returns zero.
 
 int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 
