@@ -55,6 +55,17 @@ typedef fmpz_mod_poly_factor_struct fmpz_mod_poly_factor_t[1];
 
 FLINT_DLL void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac);
 
+typedef struct
+{
+    fmpz_mod_poly_struct * baby;
+    fmpz_mod_poly_struct res;
+    fmpz_mod_poly_struct H;
+    fmpz_mod_poly_struct v;
+    fmpz_mod_poly_struct vinv;
+    slong m;
+}
+fmpz_mod_poly_interval_poly_arg_t;
+
 FLINT_DLL void fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac);
 
 FLINT_DLL void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, slong alloc);
@@ -107,6 +118,12 @@ FLINT_DLL void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
 FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
 
+FLINT_DLL void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res,
+                               const fmpz_mod_poly_t poly, slong * const *degs);
+
+FLINT_DLL void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
+                                      const fmpz_mod_poly_t f);
+
 FLINT_DLL void fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
                           const fmpz_mod_poly_t f);
 
@@ -118,6 +135,8 @@ FLINT_DLL void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
 
 FLINT_DLL void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                                      const fmpz_mod_poly_t f);
+
+FLINT_DLL void * _fmpz_mod_poly_interval_poly_worker(void* arg_ptr);
 
 #ifdef __cplusplus
 }

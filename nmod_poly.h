@@ -119,6 +119,25 @@ typedef struct
 
 typedef nmod_poly_res_struct nmod_poly_res_t[1];
 
+typedef struct
+{
+    nmod_mat_struct A;
+    nmod_poly_struct poly1;
+    nmod_poly_struct poly2;
+    nmod_poly_struct poly2inv;
+}
+nmod_poly_matrix_precompute_arg_t;
+
+typedef struct
+{
+    nmod_mat_struct A;
+    nmod_poly_struct res;
+    nmod_poly_struct poly1;
+    nmod_poly_struct poly3;
+    nmod_poly_struct poly3inv;
+}
+nmod_poly_compose_mod_precomp_preinv_arg_t;
+
 /* zn_poly helper functions  ************************************************
 
 Copyright (C) 2007, 2008 David Harvey
@@ -900,61 +919,69 @@ FLINT_DLL void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_lim
 
 /* Modular composition  ******************************************************/
 
-void
-FLINT_DLL _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf,
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, slong lenf,
                             mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);
 
-void
-FLINT_DLL nmod_poly_compose_mod_brent_kung(nmod_poly_t res, 
+FLINT_DLL void nmod_poly_compose_mod_brent_kung(nmod_poly_t res, 
                     const nmod_poly_t f, const nmod_poly_t g,
                     const nmod_poly_t h);
 
-void
-_nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
+FLINT_DLL void _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
                           const nmod_poly_t f);
 
-void
-_nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
+FLINT_DLL void _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
                slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod);
 
-void
-nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
+FLINT_DLL void * _nmod_poly_precompute_matrix_worker (void * arg_ptr);
+
+FLINT_DLL void nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t poly1,
                           const nmod_poly_t poly2, const nmod_poly_t poly2inv);
 
-void
-FLINT_DLL _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
                             slong len1, const nmod_mat_t A, mp_srcptr poly3,
                             slong len3, mp_srcptr poly3inv, slong len3inv,
                             nmod_t mod);
 
-void
-FLINT_DLL nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
+FLINT_DLL void * _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr);
+
+FLINT_DLL void nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_mat_t A,
                     const nmod_poly_t poly3, const nmod_poly_t poly3inv);
 
-void
-FLINT_DLL _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
                             mp_srcptr poly2, mp_srcptr poly3, slong len3,
                             mp_srcptr poly3inv, slong len3inv, nmod_t mod);
 
-void
-FLINT_DLL nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
+FLINT_DLL void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3, const nmod_poly_t poly3inv);
 
-void
-_nmod_poly_compose_mod_brent_kung_vec_preinv (nmod_poly_struct * res,
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv (nmod_poly_struct * res,
                  const nmod_poly_struct * polys, slong len1, slong l,
                  mp_srcptr poly, slong len, mp_srcptr polyinv,
                  slong leninv, nmod_t mod);
 
-void
-FLINT_DLL nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
+FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_struct * polys, slong len1, slong n,
                     const nmod_poly_t poly, const nmod_poly_t polyinv);
 
-void
-FLINT_DLL _nmod_poly_compose_mod_horner(mp_ptr res,
+FLINT_DLL void _nmod_poly_compose_mod_horner(mp_ptr res,
+    mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);
+
+FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                             const nmod_poly_struct * polys,
+                                             slong lenpolys, slong l,
+                                             mp_srcptr poly, slong len,
+                                             mp_srcptr polyinv, slong leninv,
+                                             nmod_t mod);
+
+FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                            const nmod_poly_struct * polys,
+                                            slong len1, slong n,
+                                            const nmod_poly_t poly,
+                                            const nmod_poly_t polyinv);
+
+FLINT_DLL void _nmod_poly_compose_mod_horner(mp_ptr res,
     mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);
 
 void

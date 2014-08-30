@@ -49,6 +49,7 @@ _TEMPLATE(T, poly_powmod_x_fmpz_preinv) (
     Q = T + lenT;
 
     TEMPLATE(T, one) (res, ctx);
+    _TEMPLATE(T, vec_zero) (res + 1, lenf - 2, ctx);
 
     l = z_sizeinbase(lenf - 1, 2) - 2;
     window = 0;

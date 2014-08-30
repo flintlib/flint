@@ -274,6 +274,8 @@ FQ_INLINE int fq_is_one(const fq_t op, const fq_ctx_t ctx)
     return fmpz_poly_is_one(op);
 }
 
+FLINT_DLL int fq_is_invertible(const fq_t op, const fq_ctx_t ctx);
+
 /* Assignments and conversions ***********************************************/
 
 FQ_INLINE void fq_set(fq_t rop, const fq_t op, const fq_ctx_t ctx)

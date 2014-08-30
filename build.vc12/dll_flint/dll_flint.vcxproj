@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <RootNamespace>dll_flint</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{B238B233-CD1B-4BF3-A450-A3D96C9E2407}</ProjectGuid>
+    <ProjectGuid>{3C7DB152-98BB-4907-801E-8B8E522F58A7}</ProjectGuid>
     </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'" Label="Configuration">
@@ -162,13 +162,11 @@
     <ClInclude Include="..\..\build.vc12\unistd.h" />
     <ClInclude Include="..\..\double_extras.h" />
     <ClInclude Include="..\..\fft.h" />
-    <ClInclude Include="..\..\fft_tuning.h" />
     <ClInclude Include="..\..\flint.h" />
     <ClInclude Include="..\..\fmpq.h" />
     <ClInclude Include="..\..\fmpq_mat.h" />
     <ClInclude Include="..\..\fmpq_poly.h" />
     <ClInclude Include="..\..\fmpq_vec.h" />
-    <ClInclude Include="..\..\fmpz-conversions.h" />
     <ClInclude Include="..\..\fmpz.h" />
     <ClInclude Include="..\..\fmpz_factor.h" />
     <ClInclude Include="..\..\fmpz_mat.h" />
@@ -1256,6 +1254,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fmpq_poly\add_series.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fmpq_poly\asin_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
@@ -1371,6 +1375,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpq_poly\equal.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpq_poly\equal_trunc.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
@@ -1869,6 +1879,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpq_poly\sub.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpq_poly\sub_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpq_poly\</ObjectFileName>
@@ -3344,6 +3360,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fmpz_mod_poly\add_series.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fmpz_mod_poly\clear.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
@@ -3387,6 +3409,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpz_mod_poly\compose_mod_brent_kung_vec_preinv.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpz_mod_poly\compose_mod_brent_kung_vec_preinv_threaded.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
@@ -3818,6 +3846,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fmpz_mod_poly\sub_series.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fmpz_mod_poly\swap.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly\</ObjectFileName>
@@ -3885,6 +3919,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpz_mod_poly_factor\factor_distinct_deg.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpz_mod_poly_factor\factor_distinct_deg_threaded.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_mod_poly_factor\</ObjectFileName>
@@ -4011,6 +4051,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpz_poly\add.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpz_poly\add_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
@@ -4203,6 +4249,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpz_poly\equal.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpz_poly\equal_trunc.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
@@ -5007,6 +5059,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fmpz_poly\sub.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fmpz_poly\sub_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fmpz_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fmpz_poly\</ObjectFileName>
@@ -7154,6 +7212,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fq_nmod_poly\scalar_div_fq.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fq_nmod_poly\scalar_mul_fq.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
@@ -7929,6 +7993,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fq_poly\scalar_addmul_fq.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fq_poly\scalar_div_fq.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_poly\</ObjectFileName>
@@ -9128,6 +9198,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fq_zech_poly\scalar_div_fq.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fq_zech_poly\scalar_mul_fq.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
@@ -10048,6 +10124,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)nmod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)nmod_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\nmod_poly\compose_mod_brent_kung_vec_preinv_threaded.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)nmod_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\nmod_poly\compose_mod_horner.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)nmod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)nmod_poly\</ObjectFileName>
@@ -10775,6 +10857,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)nmod_poly_factor\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\nmod_poly_factor\factor_distinct_deg.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)nmod_poly_factor\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)nmod_poly_factor\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)nmod_poly_factor\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)nmod_poly_factor\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\nmod_poly_factor\factor_distinct_deg_threaded.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)nmod_poly_factor\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)nmod_poly_factor\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)nmod_poly_factor\</ObjectFileName>

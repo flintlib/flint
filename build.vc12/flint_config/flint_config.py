@@ -21,10 +21,10 @@ from time import sleep
 # for script debugging
 debug = False
 # what to build
-build_lib = True
-build_dll = True
+build_lib = False
+build_dll = False
 build_tests = False
-build_profiles = True
+build_profiles = False
 
 # add user choice
 flib_type = 'reentrant' # ('gc', 'rentrant', 'single')
