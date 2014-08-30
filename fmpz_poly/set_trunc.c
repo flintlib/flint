@@ -37,7 +37,7 @@ fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
     }
     else
     {
-        slong i, rlen;
+        slong rlen;
 
         rlen = FLINT_MIN(n, poly->length);
         while (rlen > 0 && fmpz_is_zero(poly->coeffs + rlen - 1))

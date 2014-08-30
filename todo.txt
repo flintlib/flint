@@ -175,6 +175,9 @@ fmpq_poly
 
 * Add pow_trunc
 
+* Add gcdinv
+
+* Add discriminant
 
 fmpz_mod_poly
 -------------

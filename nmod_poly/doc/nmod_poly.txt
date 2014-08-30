@@ -1639,6 +1639,12 @@ _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B,
     $f$ for $i=1,\ldots,\sqrt{\deg(f)}$. We require $B$ to be at least
     a $\sqrt{\deg(f)}\times \deg(f)$ matrix and $f$ to be nonzero.
 
+void *
+_nmod_poly_precompute_matrix_worker (void * arg_ptr)
+
+    Worker function version of \code{_nmod_poly_precompute_matrix}.
+    Input/output is stored in \code{nmod_poly_matrix_precompute_arg_t}.
+
 void
 _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr f, mp_srcptr g,
                slong leng, mp_srcptr ginv, slong lenginv, nmod_t mod)
@@ -1647,7 +1653,8 @@ _nmod_poly_precompute_matrix (nmod_mat_t A, mp_srcptr f, mp_srcptr g,
     $i=1,\ldots,\sqrt{\deg(g)}$. We require $A$ to be
     a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
     \code{ginv} to be the inverse of the reverse of \code{g} and $g$ to be
-    nonzero.
+    nonzero. \code{f} has to be reduced modulo \code{g} and of length one less
+    than \code{leng} (possibly with zero padding).
 
 void
 nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t f,
@@ -1658,11 +1665,18 @@ nmod_poly_precompute_matrix (nmod_mat_t A, const nmod_poly_t f,
     a $\sqrt{\deg(g)}\times \deg(g)$ matrix. We require
     \code{ginv} to be the inverse of the reverse of \code{g}.
 
+void *
+_nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
+
+    Worker function version of
+    \code{_nmod_poly_compose_mod_brent_kung_precomp_preinv}.
+    Input/output is stored in
+    \code{nmod_poly_compose_mod_precomp_preinv_arg_t}.
 
 void
 _nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr f,
                             slong lenf, const nmod_mat_t A, mp_srcptr h,
-                            slong h, mp_srcptr hinv, slong lenhinv,
+                            slong lenh, mp_srcptr hinv, slong lenhinv,
                             nmod_t mod)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
@@ -1687,6 +1701,64 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     be the inverse of the reverse of \code{h}. This version of Brent-Kung
     modular composition is particularly useful if one has to perform several
     modular composition of the form $f(g)$ modulo $h$ for fixed $g$ and $h$.
+
+void
+_nmod_poly_compose_mod_brent_kung_vec_preinv (nmod_poly_struct * res,
+                 const nmod_poly_struct * polys, slong len1, slong l,
+                 mp_srcptr h, slong lenh, mp_srcptr hinv,
+                 slong lenhinv, nmod_t mod)
+
+    Sets \code{res} to the composition $f_i(g)$ modulo $h$ for $1\leq i \leq l$,
+    where $f_i$ are the first \code{l} elements of \code{polys} and $g$ is the
+    last element of \code{polys}. We require that $h$ is nonzero and that the
+    length of $g$ is less than the length of $h$. We also require that the
+    length of $f_i$ is less than the length of $h$. We require \code{res} to
+    have enough memory allocated to hold \code{l} \code{nmod_poly_struct}.
+    The entries of \code{res} need to be initialised and \code{l} needs to be
+    less than \code{len1} Furthermore, we require \code{hinv} to be the inverse
+    of the reverse of \code{h}. The output is not allowed to be aliased with any
+    of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
+                    const nmod_poly_struct * polys, slong len1, slong n,
+                    const nmod_poly_t h, const nmod_poly_t hinv)
+
+    Sets \code{res} to the composition $f_i(g)$ modulo $h$ for $1\leq i \leq n$
+    where $f_i$ are the first \code{n} elements of \code{polys} and $g$ is the
+    last element of \code{polys}. We require \code{res} to have enough memory
+    allocated to hold \code{n} \code{nmod_poly_struct}. The entries of
+    \code{res} need to be uninitialised and \code{n} needs to be less than
+    \code{len1}. We require that $h$ is nonzero and that $f_i$ and $g$ have
+    smaller degree than $h$. Furthermore, we require \code{hinv} to be the
+    inverse of the reverse of \code{h}. No aliasing of \code{res} and
+    \code{polys} is allowed.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                             const nmod_poly_struct * polys,
+                                             slong lenpolys, slong l,
+                                             mp_srcptr poly, slong len,
+                                             mp_srcptr polyinv, slong leninv,
+                                             nmod_t mod)
+
+    Multithreaded version of
+    \code{_nmod_poly_compose_mod_brent_kung_vec_preinv}. Distributing the
+    Horner evaluations across \code{flint_get_num_threads()} threads.
+
+void
+nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
+                                            const nmod_poly_struct * polys,
+                                            slong len1, slong n,
+                                            const nmod_poly_t poly,
+                                            const nmod_poly_t polyinv)
+
+    Multithreaded version of
+    \code{nmod_poly_compose_mod_brent_kung_vec_preinv}. Distributing the
+    Horner evaluations across \code{flint_get_num_threads()} threads.
 
 void _nmod_poly_compose_mod(mp_ptr res,
     mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)

@@ -137,7 +137,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    do
    {
       if ((fac_found = fmpz_factor_pp1(p, R, bits*2 + 10, bits/10 + 10, rand()%100 + 3)
-                    && fmpz_is_prime(p)))
+                    && fmpz_is_prime(p) && fmpz_cmp_ui(p, 5) > 0))
       {
          d = fmpz_remove(R, R, p);
          _fmpz_factor_append(fac, p, d);
@@ -233,10 +233,6 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
          if (!fmpz_is_strong_probabprime(n, base))
          {
             fmpz_clear(base);
-            fmpz_clear(a1);
-            fmpz_clear(a2);
-            fmpz_clear(b);
-
             res = 0;
 
             goto cleanup1;
@@ -301,7 +297,7 @@ int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n,
    {
       fmpz_divexact(exp2, Ft, fac->p + i);
 
-      fmpz_mod_poly_powmod_fmpz_binexp_preinv(h, h2, exp2, f, finv);
+      fmpz_mod_poly_powmod_fmpz_binexp_preinv(h1, h2, exp2, f, finv);
 
       if (!fmpz_mod_poly_is_one(h1))
       {

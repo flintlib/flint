@@ -1,0 +1,129 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
+
+******************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpq_poly.h"
+#include "ulong_extras.h"
+
+int
+main(void)
+{
+    int i, result;
+    FLINT_TEST_INIT(state);
+
+    flint_printf("equal_trunc....");
+    fflush(stdout);
+
+    /* equal polynomials */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpq_poly_t a, b;
+        fmpq_t c;
+        slong n, j;
+
+        fmpq_init(c);
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpq_poly_randtest(b, state, n_randint(state, 100), 200);
+        n = n_randint(state, 100);
+
+        for (j = 0; j < n; j++)
+        {
+           fmpq_poly_get_coeff_fmpq(c, a, j);
+           fmpq_poly_set_coeff_fmpq(b, j, c);
+        }
+      
+        result = (fmpq_poly_equal_trunc(a, b, n));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", a->alloc, a->length);
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
+            flint_printf("equal(a, b) = %d\n", result);
+            flint_printf("n = %wd\n", n);
+            abort();
+        }
+
+        fmpq_clear(c);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+    }
+
+    /* unequal polynomials */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpq_poly_t a, b;
+        fmpq_t c;
+        slong n, m, j;
+
+        fmpq_init(c);
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpq_poly_randtest(b, state, n_randint(state, 100), 200);
+        n = n_randint(state, 100) + 1;
+
+        for (j = 0; j < n; j++)
+        {
+           fmpq_poly_get_coeff_fmpq(c, a, j);
+           fmpq_poly_set_coeff_fmpq(b, j, c);
+        }
+      
+        m = n_randint(state, n);
+        fmpq_poly_get_coeff_fmpq(c, a, m);
+        fmpq_add_si(c, c, 1);
+        fmpq_poly_set_coeff_fmpq(b, m, c);
+
+        result = (!fmpq_poly_equal_trunc(a, b, n));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = "), fmpq_poly_debug(a), flint_printf("\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", a->alloc, a->length);
+            flint_printf("b = "), fmpq_poly_debug(b), flint_printf("\n\n");
+            flint_printf("alloc = %wd\nlength = %wd\n\n", b->alloc, b->length);
+            flint_printf("equal(a, b) = %d\n", result);
+            flint_printf("n = %wd, m = %wd\n", n, m);
+            abort();
+        }
+
+        fmpq_clear(c);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+    }
+
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
+    return 0;
+}

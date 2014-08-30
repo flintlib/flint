@@ -301,6 +301,10 @@ void fmpq_poly_truncate(fmpq_poly_t poly, slong n)
     truncated to the given length.  Discarded coefficients are demoted, 
     but they are not necessarily set to zero.
 
+void fmpz_poly_set_trunc(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+
+    Sets \code{res} to a copy of \code{poly}, truncated to length \code{n}.
+
 void fmpq_poly_get_slice(fmpq_poly_t rop, 
                          const fmpq_poly_t op, slong i, slong j)
 
@@ -363,6 +367,18 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Returns $1$ if \code{poly1} is equal to \code{poly2}, 
     otherwise returns~$0$.
+
+int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, 
+       const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+    Return $1$ if \code{poly1} and \code{poly2} notionally truncated to length
+    $n$ are equal, otherwise returns~$0$.
+
+int fmpq_poly_equal_trunc(const fmpq_poly_t poly1,
+                          const fmpq_poly_t poly2, slong n);
+
+    Return $1$ if \code{poly1} and \code{poly2} notionally truncated to length
+    $n$ are equal, otherwise returns~$0$.
 
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
                         const fmpz * rpoly, const fmpz_t rden, slong len)
@@ -434,6 +450,34 @@ void fmpq_poly_add_can(fmpq_poly_t res, fmpq_poly poly1,
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
+void _fmpq_poly_series_add(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+
+    As per \code{_fmpq_poly_add} but the inputs are first notionally truncated
+    to length $n$. If $n$ is less than \code{len1} or \code{len2} then the
+    output only needs space for $n$ coefficients. We require $n \geq 0$.
+
+void _fmpq_poly_add_series_can(fmpz * rpoly, fmpz_t rden, 
+           const fmpz * poly1, const fmpz_t den1, slong len1,
+           const fmpz * poly2, const fmpz_t den2, slong len2, slong n, int can)
+
+    As per \code{_fmpq_poly_add_can} but the inputs are first notionally
+    truncated to length $n$. If $n$ is less than \code{len1} or \code{len2}
+    then the output only needs space for $n$ coefficients. We require 
+    $n \geq 0$.
+
+void fmpq_poly_add_series(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, slong n)
+
+    As per \code{fmpq_poly_add} but the inputs are first notionally
+    truncated to length $n$. 
+
+void fmpq_poly_add_series_can(fmpq_poly_t res, fmpq_poly poly1, 
+                                          fmpq_poly poly2, slong n, int can)
+
+    As per \code{fmpq_poly_add_can} but the inputs are first notionally
+    truncated to length $n$. 
+
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
                     const fmpz * poly2, const fmpz_t den2, slong len2)
@@ -470,6 +514,34 @@ void fmpq_poly_sub_can(fmpq_poly_t res, fmpq_poly poly1,
     canonicalise the output or not. This function is intended to be used with
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
+
+void _fmpq_poly_series_sub(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+
+    As per \code{_fmpq_poly_sub} but the inputs are first notionally truncated
+    to length $n$. If $n$ is less than \code{len1} or \code{len2} then the
+    output only needs space for $n$ coefficients. We require $n \geq 0$.
+
+void _fmpq_poly_sub_series_can(fmpz * rpoly, fmpz_t rden, 
+           const fmpz * poly1, const fmpz_t den1, slong len1,
+           const fmpz * poly2, const fmpz_t den2, slong len2, slong n, int can)
+
+    As per \code{_fmpq_poly_sub_can} but the inputs are first notionally
+    truncated to length $n$. If $n$ is less than \code{len1} or \code{len2}
+    then the output only needs space for $n$ coefficients. We require 
+    $n \geq 0$.
+
+void fmpq_poly_sub_series(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, slong n)
+
+    As per \code{fmpq_poly_sub} but the inputs are first notionally
+    truncated to length $n$. 
+
+void fmpq_poly_sub_series_can(fmpq_poly_t res, fmpq_poly poly1, 
+                                          fmpq_poly poly2, slong n, int can)
+
+    As per \code{fmpq_poly_sub_can} but the inputs are first notionally
+    truncated to length $n$. 
 
 *******************************************************************************
 

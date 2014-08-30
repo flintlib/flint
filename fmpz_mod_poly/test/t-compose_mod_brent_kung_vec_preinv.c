@@ -70,25 +70,25 @@ main(void)
         l= n_randint(state, 20) + 1;
         k= n_randint(state, l ) + 1;
 
-        fmpz_mod_poly_reverse (ainv, a, a->length);
-        fmpz_mod_poly_inv_series_newton (ainv, ainv, a->length);
-        pow= (fmpz_mod_poly_struct *) flint_malloc((l + k)*sizeof(fmpz_mod_poly_struct));
-        res= pow + l;
+        fmpz_mod_poly_reverse(ainv, a, a->length);
+        fmpz_mod_poly_inv_series_newton(ainv, ainv, a->length);
+        pow = (fmpz_mod_poly_struct *) flint_malloc((l + k)*sizeof(fmpz_mod_poly_struct));
+        res = pow + l;
 
         fmpz_mod_poly_rem(b, b, a);
-        for (j= 0; j < l - 1; j++)
+        for (j = 0; j < l - 1; j++)
         {
-            fmpz_mod_poly_init (pow + j, p);
+            fmpz_mod_poly_init(pow + j, p);
             fmpz_mod_poly_randtest(pow + j, state, n_randint(state, 20) + 1);
             fmpz_mod_poly_rem(pow + j, pow + j, a);
         }
 
-        fmpz_mod_poly_init (pow + l - 1, p);
-        fmpz_mod_poly_set (pow + l - 1, b);
+        fmpz_mod_poly_init(pow + l - 1, p);
+        fmpz_mod_poly_set(pow + l - 1, b);
 
-        fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (res, pow, l, k, a, ainv);
+        fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(res, pow, l, k, a, ainv);
 
-        for (j= 0; j < k; j++)
+        for (j = 0; j < k; j++)
         {
             fmpz_mod_poly_compose_mod(c, pow + j, b, a);
             if (!fmpz_mod_poly_equal(res + j, c))
@@ -99,7 +99,7 @@ main(void)
                 flint_printf("pow:\n"); fmpz_mod_poly_print(pow + j); flint_printf("\n");
                 flint_printf("b:\n"); fmpz_mod_poly_print(b); flint_printf("\n");
                 flint_printf("c:\n"); fmpz_mod_poly_print(c); flint_printf("\n");
-                flint_printf("j= %wd\n", j);
+                flint_printf("j: %wd\n", j);
                 abort();
             }
         }
@@ -109,11 +109,11 @@ main(void)
         fmpz_mod_poly_clear(ainv);
         fmpz_mod_poly_clear(b);
         fmpz_mod_poly_clear(c);
-        for (j= 0; j < l; j++)
-          fmpz_mod_poly_clear (pow + j);
-        for (j= 0; j < k; j++)
-          fmpz_mod_poly_clear (res + j);
-        flint_free (pow);
+        for (j = 0; j < l; j++)
+            fmpz_mod_poly_clear(pow + j);
+        for (j = 0; j < k; j++)
+            fmpz_mod_poly_clear(res + j);
+        flint_free(pow);
     }
 
     FLINT_TEST_CLEANUP(state);

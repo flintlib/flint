@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Lina Kulakova
-    Copyright (C) 2013 Martin Lee
+    Copyright (C) 2013, 2014 Martin Lee
 
 ******************************************************************************/
 
@@ -76,8 +76,8 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
     }
     H = h + (l + 1);
     I = H + m;
-    for (i = 0; i < l + 1; i++)
-        fmpz_mod_poly_init(h[i], p);
+    fmpz_mod_poly_init(h[0], p);
+    fmpz_mod_poly_init(h[1], p);
     for (i = 0; i < m; i++)
     {
         fmpz_mod_poly_init(H[i], p);
@@ -91,25 +91,35 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly)
     /* compute baby steps: h[i]=x^{p^i}mod v */
     fmpz_mod_poly_set_coeff_ui(h[0], 1, 1);
     fmpz_mod_poly_powmod_x_fmpz_preinv(h[1], p, v, vinv);
-    if (fmpz_sizeinbase(p, 2) > ((n_sqrt (v->length - 1) + 1) * 3) / 4)
+    if (fmpz_sizeinbase(p, 2) > ((n_sqrt(v->length - 1) + 1) * 3) / 4)
     {
-        fmpz_mat_init(HH, n_sqrt (v->length - 1) + 1, v->length - 1);
-        fmpz_mod_poly_precompute_matrix(HH, h[1], v, vinv);
-        for (i = 2; i < l + 1; i++)
-            fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(h[i], h[i - 1],
-                                                            HH, v, vinv);
-        fmpz_mat_clear(HH);
+        for (i= 1; i < FLINT_BIT_COUNT (l); i++)
+            fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (*(h + 1 +
+                                                             (1 << (i - 1))),
+                                                             *(h + 1),
+                                                             (1 << (i - 1)),
+                                                             (1 << (i - 1)), v,
+                                                             vinv);
+        fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (*(h + 1 +
+                                                         (1 << (i - 1))),
+                                                         *(h + 1),
+                                                         (1 << (i - 1)),
+                                                         l - (1 << (i - 1)), v,
+                                                         vinv);
     }
     else
     {
         for (i = 2; i < l + 1; i++)
+        {
+            fmpz_mod_poly_init(h[i], p);
             fmpz_mod_poly_powmod_fmpz_binexp_preinv(h[i], h[i - 1], p,
                                               v, vinv);
+        }
     }
 
     /* compute coarse distinct-degree factorisation */
     fmpz_mod_poly_set(H[0], h[l]);
-    fmpz_mat_init(HH, n_sqrt (v->length - 1) + 1, v->length - 1);
+    fmpz_mat_init(HH, n_sqrt(v->length - 1) + 1, v->length - 1);
     fmpz_mod_poly_precompute_matrix(HH, H[0], v, vinv);
     d = 1;
     for (j = 0; j < m; j++)

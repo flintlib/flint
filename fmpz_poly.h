@@ -218,6 +218,9 @@ void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, slong n);
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+int fmpz_poly_equal_trunc(const fmpz_poly_t poly1, 
+                                             const fmpz_poly_t poly2, slong n);
+
 #define fmpz_poly_is_zero(poly) \
     ((poly)->length == 0)
 
@@ -256,16 +259,23 @@ int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
 /*  Addition and subtraction  ************************************************/
 
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, slong len1, 
-                                             const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                                   const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
+
+void fmpz_poly_add_series(fmpz_poly_t res, const fmpz_poly_t poly1,
+                                             const fmpz_poly_t poly2, slong n);
 
 void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, slong len1, 
-                                             const fmpz * poly2, slong len2);
+                                               const fmpz * poly2, slong len2);
 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                                   const fmpz_poly_t poly2);
+                                                      const fmpz_poly_t poly2);
+
+void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1,
+                                             const fmpz_poly_t poly2, slong n);
+
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
 

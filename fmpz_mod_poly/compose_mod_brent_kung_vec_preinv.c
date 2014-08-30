@@ -155,8 +155,8 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
     {
         for (i = 0; i < n; i++)
         {
-            fmpz_mod_poly_init (res + i, &poly->p);
-            fmpz_mod_poly_set (res + i, polys + i);
+            fmpz_mod_poly_init(res + i, &poly->p);
+            fmpz_mod_poly_set(res + i, polys + i);
         }
         return;
     }

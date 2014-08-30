@@ -74,7 +74,7 @@ char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
     {
     }
     else
-        off += flint_sprintf(str + off, "*(%s)", coeffstrs[i]);
+        off += flint_sprintf(str + off, "(%s)*", coeffstrs[i]);
 
     if (i > 1)
         off += flint_sprintf(str + off, "%s^%wd", x, i);

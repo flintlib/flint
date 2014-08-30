@@ -28,6 +28,12 @@
 #ifndef FQ_NMOD_POLY_H
 #define FQ_NMOD_POLY_H
 
+#ifdef FQ_POLY_INLINES_C
+#define FQ_POLY_INLINE
+#else
+#define FQ_POLY_INLINE static __inline__
+#endif
+
 #include "fq_nmod.h"
 #include "fq_nmod_mat.h"
 

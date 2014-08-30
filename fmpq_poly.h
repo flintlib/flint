@@ -28,6 +28,12 @@
 #ifndef FMPQ_POLY_H
 #define FMPQ_POLY_H
 
+#ifdef FMPQ_POLY_INLINES_C
+#define FMPQ_POLY_INLINE
+#else
+#define FMPQ_POLY_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "fmpz.h"
 #include "fmpq.h"
@@ -83,7 +89,7 @@ void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 #define fmpq_poly_denref(poly)  ((poly)->den)
 
-static __inline__ void
+FMPQ_POLY_INLINE void
 fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
 {
     fmpz_poly_fit_length(res, poly->length);
@@ -103,13 +109,13 @@ int fmpq_poly_is_canonical(const fmpq_poly_t poly);
 
 /*  Polynomial parameters  ***************************************************/
 
-static __inline__
+FMPQ_POLY_INLINE
 slong fmpq_poly_degree(const fmpq_poly_t poly)
 {
     return poly->length - 1;
 }
 
-static __inline__
+FMPQ_POLY_INLINE
 slong fmpq_poly_length(const fmpq_poly_t poly)
 {
     return poly->length;
@@ -158,7 +164,7 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var);
 
 void fmpq_poly_zero(fmpq_poly_t poly);
 
-static __inline__ void fmpq_poly_one(fmpq_poly_t poly)
+FMPQ_POLY_INLINE void fmpq_poly_one(fmpq_poly_t poly)
 {
     fmpq_poly_fit_length(poly, 1);
     _fmpq_poly_set_length(poly, 1);
@@ -172,7 +178,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2);
 
-static __inline__ 
+FMPQ_POLY_INLINE 
 void fmpq_poly_truncate(fmpq_poly_t poly, slong n)
 {
     if (poly->length > n)
@@ -184,6 +190,8 @@ void fmpq_poly_truncate(fmpq_poly_t poly, slong n)
         fmpq_poly_canonicalise(poly);
     }
 }
+
+void fmpq_poly_set_trunc(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
 void fmpq_poly_get_slice(fmpq_poly_t rop, 
                          const fmpq_poly_t op, slong i, slong j);
@@ -212,18 +220,29 @@ void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, slong n, const mpq_t x);
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, 
+                           const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
 
-static __inline__
+FMPQ_POLY_INLINE
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 {
     return poly->length == WORD(0);
 }
 
-static __inline__
+FMPQ_POLY_INLINE
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 {
     return (poly->length == WORD(1)) && (fmpz_equal(poly->coeffs, poly->den));
+}
+
+FMPQ_POLY_INLINE
+int fmpq_poly_is_x(const fmpq_poly_t op)
+{
+    return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0)) && (*(op->den) == WORD(1));
 }
 
 /*  Addition and subtraction  ************************************************/
@@ -242,6 +261,20 @@ void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_add_can(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
 
+void _fmpq_poly_add_series(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+void fmpq_poly_add_series(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+
+void _fmpq_poly_add_series_can(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, slong n, int can);
+
+void fmpq_poly_add_series_can(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n, int can);
+
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, slong len1,
                     const fmpz * poly2, const fmpz_t den2, slong len2);
@@ -255,6 +288,20 @@ void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_sub_can(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
+
+void _fmpq_poly_sub_series(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+void fmpq_poly_sub_series(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+
+void _fmpq_poly_sub_series_can(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
+                    const fmpz * poly2, const fmpz_t den2, slong len2, slong n, int can);
+
+void fmpq_poly_sub_series_can(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n, int can);
 
 /*  Scalar multiplication and division  **************************************/
 
@@ -330,7 +377,7 @@ void _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_mullow(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
 
-static __inline__ 
+FMPQ_POLY_INLINE 
 void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, const fmpq_poly_t op2)
 {
     fmpq_poly_t t;
@@ -341,7 +388,7 @@ void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, const fmpq_poly_t 
     fmpq_poly_clear(t);
 }
 
-static __inline__ 
+FMPQ_POLY_INLINE 
 void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, const fmpq_poly_t op2)
 {
     fmpq_poly_t t;
@@ -414,14 +461,14 @@ void _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
 
 void fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n);
 
-static __inline__ void 
+FMPQ_POLY_INLINE void 
 _fmpq_poly_inv_series(fmpz * Qinv, fmpz_t Qinvden, 
                       const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
     _fmpq_poly_inv_series_newton(Qinv, Qinvden, Q, Qden, Qlen, n);
 }
 
-static __inline__ void 
+FMPQ_POLY_INLINE void 
 fmpq_poly_inv_series(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
 {
     fmpq_poly_inv_series_newton(Qinv, Q, n);
@@ -696,26 +743,26 @@ int _fmpq_poly_fprint_pretty(FILE * file,
 int fmpq_poly_fprint_pretty(FILE * file, 
                             const fmpq_poly_t poly, const char * var);
 
-static __inline__
+FMPQ_POLY_INLINE
 int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, slong len)
 {
     return _fmpq_poly_fprint(stdout, poly, den, len);
 }
 
-static __inline__
+FMPQ_POLY_INLINE
 int fmpq_poly_print(const fmpq_poly_t poly)
 {
     return fmpq_poly_fprint(stdout, poly);
 }
 
-static __inline__ 
+FMPQ_POLY_INLINE 
 int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, 
                             const char * x)
 {
     return _fmpq_poly_fprint_pretty(stdout, poly, den, len, x);
 }
 
-static __inline__ 
+FMPQ_POLY_INLINE 
 int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 {
     return fmpq_poly_fprint_pretty(stdout, poly, var);
@@ -723,7 +770,7 @@ int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly);
 
-static __inline__
+FMPQ_POLY_INLINE
 int fmpq_poly_read(fmpq_poly_t poly)
 {
     return fmpq_poly_fread(stdin, poly);
