@@ -128,7 +128,7 @@ main(void)
         n = n_randint(state, 200);
 
         fmpq_poly_add_series(d, a, b, n);
-        fmpq_poly_add(e, d, c);
+        fmpq_poly_add(e, a, b);
         fmpq_poly_truncate(e, n);
         
         cflags |= fmpq_poly_is_canonical(d) ? 0 : 1;
