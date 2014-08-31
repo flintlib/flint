@@ -3580,6 +3580,9 @@
   <ClCompile Include="..\..\fq_nmod_poly\div_newton_n_preinv.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly\div_series.c">
+    <Filter>Source Files\fq_nmod_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\divides.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
@@ -3977,6 +3980,9 @@
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\div_newton_n_preinv.c">
+    <Filter>Source Files\fq_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_poly\div_series.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\divides.c">
@@ -4589,6 +4595,9 @@
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\div_newton_n_preinv.c">
+    <Filter>Source Files\fq_zech_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly\div_series.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\divides.c">

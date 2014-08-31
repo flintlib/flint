@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <RootNamespace>dll_flint</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{388E8E0F-2C85-4822-BA7F-68601E2B3927}</ProjectGuid>
+    <ProjectGuid>{8A9556B0-CA02-479D-99DF-D1CFC3DAE355}</ProjectGuid>
     </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'" Label="Configuration">
@@ -6890,6 +6890,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\fq_nmod_poly\div_series.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\fq_nmod_poly\divides.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_nmod_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_nmod_poly\</ObjectFileName>
@@ -7683,6 +7689,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fq_poly\div_newton_n_preinv.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fq_poly\div_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_poly\</ObjectFileName>
@@ -8907,6 +8919,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\fq_zech_poly\div_newton_n_preinv.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\fq_zech_poly\div_series.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)fq_zech_poly\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)fq_zech_poly\</ObjectFileName>
