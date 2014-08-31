@@ -219,8 +219,12 @@ TEMPLATE(T, poly_is_gen)(const TEMPLATE(T, poly_t) poly,
 /*  Comparison  **************************************************************/
 
 FLINT_DLL int TEMPLATE(T, poly_equal)(const TEMPLATE(T, poly_t) poly1,
-                            const TEMPLATE(T, poly_t) poly2,
-                            const TEMPLATE(T, ctx_t) ctx);
+    const TEMPLATE(T, poly_t) poly2,
+    const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL int TEMPLATE(T, poly_equal_trunc)(const TEMPLATE(T, poly_t) poly1,
+    const TEMPLATE(T, poly_t) poly2,
+    slong n, const TEMPLATE(T, ctx_t) ctx);
 
 FQ_POLY_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
@@ -263,6 +267,10 @@ FLINT_DLL void TEMPLATE(T, poly_add)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, 
                       const TEMPLATE(T, poly_t) op2,
                       const TEMPLATE(T, ctx_t) ctx);
 
+FLINT_DLL void TEMPLATE(T, poly_add_series)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1,
+                      const TEMPLATE(T, poly_t) op2,
+                      slong n, const TEMPLATE(T, ctx_t) ctx);
+
 FLINT_DLL void _TEMPLATE(T, poly_sub)(TEMPLATE(T, struct) *res,
                        const TEMPLATE(T, struct) *poly1, slong len1,
                        const TEMPLATE(T, struct) *poly2, slong len2,
@@ -272,6 +280,11 @@ FLINT_DLL void TEMPLATE(T, poly_sub)(TEMPLATE(T, poly_t) rop,
                       const TEMPLATE(T, poly_t) op1,
                       const TEMPLATE(T, poly_t) op2,
                       const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, poly_sub_series)(TEMPLATE(T, poly_t) rop,
+                      const TEMPLATE(T, poly_t) op1,
+                      const TEMPLATE(T, poly_t) op2,
+                      slong n, const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL void _TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) *rop,
                        const TEMPLATE(T, struct) *op, slong len,
