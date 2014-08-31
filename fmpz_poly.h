@@ -140,13 +140,13 @@ FLINT_DLL int _fmpz_poly_set_str(fmpz * poly, const char * str);
 
 FLINT_DLL int fmpz_poly_set_str(fmpz_poly_t poly, const char * str);
 
-char * _fmpz_poly_get_str(const fmpz * poly, slong len);
+FLINT_DLL char * _fmpz_poly_get_str(const fmpz * poly, slong len);
 
-char * fmpz_poly_get_str(const fmpz_poly_t poly);
+FLINT_DLL char * fmpz_poly_get_str(const fmpz_poly_t poly);
 
-char * _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char * x);
+FLINT_DLL char * _fmpz_poly_get_str_pretty(const fmpz * poly, slong len, const char * x);
 
-char * fmpz_poly_get_str_pretty(const fmpz_poly_t poly, const char * x);
+FLINT_DLL char * fmpz_poly_get_str_pretty(const fmpz_poly_t poly, const char * x);
 
 FMPZ_POLY_INLINE
 void fmpz_poly_zero(fmpz_poly_t poly)
@@ -723,7 +723,7 @@ FLINT_DLL void _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1,
 FLINT_DLL void fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R, 
             const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv);
 
-fmpz ** _fmpz_poly_powers_precompute(const fmpz * B, slong len);
+FLINT_DLL fmpz ** _fmpz_poly_powers_precompute(const fmpz * B, slong len);
 
 FLINT_DLL void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv, 
                                                              fmpz_poly_t poly);
@@ -750,11 +750,9 @@ FLINT_DLL void _fmpz_poly_rem(fmpz * R, const fmpz * A, slong lenA,
 
 FLINT_DLL void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B);
 
-void
-FLINT_DLL fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c);
+FLINT_DLL void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c);
 
-void
-FLINT_DLL _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c);
+FLINT_DLL void _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c);
 
 /*  Power series division  ***************************************************/
 
@@ -893,12 +891,10 @@ FLINT_DLL mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_lim
 FLINT_DLL mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
                                  mp_limb_t n);
 
-void 
-FLINT_DLL _fmpz_poly_evaluate_divconquer(fmpz * res, const fmpz * poly, slong len, 
+FLINT_DLL void _fmpz_poly_evaluate_divconquer(fmpz * res, const fmpz * poly, slong len, 
                                const fmpz_t x);
 
-void 
-FLINT_DLL fmpz_poly_evaluate_divconquer(fmpz_t res, 
+FLINT_DLL void fmpz_poly_evaluate_divconquer(fmpz_t res, 
                               const fmpz_poly_t poly, const fmpz_t x);
 
 /*  Composition  *************************************************************/
@@ -943,54 +939,40 @@ FLINT_DLL void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const 
 
 /*  Power series composition and compositional inverse  **********************/
 
-void
-FLINT_DLL _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, slong len1, 
+FLINT_DLL void _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, slong len1, 
                                       const fmpz * poly2, slong len2, slong n);
 
-void
-FLINT_DLL fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
+FLINT_DLL void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
 
-void
-FLINT_DLL _fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, slong len1, 
+FLINT_DLL void _fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, slong len1, 
                                       const fmpz * poly2, slong len2, slong n);
 
-void
-FLINT_DLL fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+FLINT_DLL void fmpz_poly_compose_series_horner(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
 
-void
-FLINT_DLL _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, slong len1, 
+FLINT_DLL void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, slong len1, 
                                       const fmpz * poly2, slong len2, slong n);
 
-void
-FLINT_DLL fmpz_poly_compose_series(fmpz_poly_t res, 
+FLINT_DLL void fmpz_poly_compose_series(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
 
-void
-FLINT_DLL _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
+FLINT_DLL void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
-void
-FLINT_DLL fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
+FLINT_DLL void fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
-void
-FLINT_DLL _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
+FLINT_DLL void _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
-void
-FLINT_DLL fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
+FLINT_DLL void fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
     const fmpz_poly_t Q, slong n);
 
-void
-FLINT_DLL _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
+FLINT_DLL void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
-void
-FLINT_DLL fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
+FLINT_DLL void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
-void
-FLINT_DLL _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
+FLINT_DLL void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n);
 
-void
-FLINT_DLL fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
+FLINT_DLL void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n);
 
 /*  Square root  *************************************************************/
 
@@ -1104,12 +1086,10 @@ FLINT_DLL void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, sl
 
 /* Multipoint evaluation and interpolation *********************************/
 
-void
-FLINT_DLL fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
+FLINT_DLL void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
                                 const fmpz * a, slong n);
 
-void
-FLINT_DLL fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
+FLINT_DLL void fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, slong n);
 
 /* Hensel lifting ************************************************************/

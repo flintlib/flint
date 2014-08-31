@@ -172,8 +172,7 @@ FLINT_DLL void fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, 
 
 FLINT_DLL void fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp);
 
-void
-FLINT_DLL fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
+FLINT_DLL void fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
                             slong len);
 
 FLINT_DLL void fmpz_poly_mat_prod(fmpz_poly_mat_t res,

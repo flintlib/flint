@@ -80,8 +80,7 @@ FLINT_DLL void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
 
 FLINT_DLL void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
 
-void
-FLINT_DLL fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
 
 FLINT_DLL void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
@@ -268,8 +267,7 @@ FLINT_DLL void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1, const fmpz_t e, c
 
 FLINT_DLL void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op1, const ulong e, const fq_nmod_ctx_t ctx);
 
-void
-FLINT_DLL fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+FLINT_DLL void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
@@ -404,12 +402,10 @@ FLINT_DLL void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t 
 
 /* Bit packing ******************************************************/
 
-void
-FLINT_DLL fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, mp_bitcnt_t bit_size,
                  const fq_nmod_ctx_t ctx);
 
-void
-FLINT_DLL fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
 
 #ifdef T

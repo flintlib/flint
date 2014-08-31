@@ -33,7 +33,7 @@
  extern "C" {
 #endif
 
-mpfr * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
+FLINT_DLL mpfr * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
 
 FLINT_DLL void _mpfr_vec_clear(mpfr * vec, slong length);
 
