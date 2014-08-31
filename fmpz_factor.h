@@ -47,49 +47,49 @@ typedef fmpz_factor_struct fmpz_factor_t[1];
 
 /* Utility functions *********************************************************/
 
-void fmpz_factor_init(fmpz_factor_t factor);
+FLINT_DLL void fmpz_factor_init(fmpz_factor_t factor);
 
-void fmpz_factor_clear(fmpz_factor_t factor);
+FLINT_DLL void fmpz_factor_clear(fmpz_factor_t factor);
 
-void fmpz_factor_print(const fmpz_factor_t factor);
+FLINT_DLL void fmpz_factor_print(const fmpz_factor_t factor);
 
-void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
+FLINT_DLL void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
 
-void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp);
+FLINT_DLL void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp);
 
-void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp);
+FLINT_DLL void _fmpz_factor_append(fmpz_factor_t factor, fmpz_t p, ulong exp);
 
-void _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen);
+FLINT_DLL void _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen);
 
 /* Factoring *****************************************************************/
 
-void _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n);
+FLINT_DLL void _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n);
 
-int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
+FLINT_DLL int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
                                        ulong start, ulong num_primes);
 
-void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
+FLINT_DLL void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
-void fmpz_factor_si(fmpz_factor_t factor, slong n);
+FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
+FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
                                        ulong B1, ulong B2_sqrt, ulong c);
 
 /* Expansion *****************************************************************/
 
-void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
+FLINT_DLL void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
 
-void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
+FLINT_DLL void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
 
-void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
+FLINT_DLL void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
 
 /* Multiplicative functions **************************************************/
 
-void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac);
+FLINT_DLL void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac);
 
-int fmpz_factor_moebius_mu(const fmpz_factor_t fac);
+FLINT_DLL int fmpz_factor_moebius_mu(const fmpz_factor_t fac);
 
-void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
+FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
 
 #ifdef __cplusplus
 }

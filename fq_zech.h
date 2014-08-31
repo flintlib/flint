@@ -27,7 +27,7 @@
 #define FQ_ZECH_H
 
 #ifdef FQ_ZECH_INLINES_C
-#define FQ_ZECH_INLINE
+#define FQ_ZECH_INLINE FLINT_DLL
 #else
 #define FQ_ZECH_INLINE static __inline__
 #endif
@@ -65,24 +65,24 @@ typedef struct
 
 typedef fq_zech_ctx_struct fq_zech_ctx_t[1];
 
-void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
+FLINT_DLL void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 
-int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+FLINT_DLL void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
-void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
+FLINT_DLL void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
                               const nmod_poly_t modulus,
                               const char *var);
 
-void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
 
 void
-fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+FLINT_DLL fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
 
-void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE slong
 fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
@@ -151,51 +151,51 @@ fq_zech_reduce(fq_zech_t rop, const fq_zech_ctx_t ctx)
 
 /* Basic arithmetic **********************************************************/
 
-void fq_zech_add(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
+FLINT_DLL void fq_zech_add(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
                  const fq_zech_ctx_t ctx);
 
-void fq_zech_sub(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
+FLINT_DLL void fq_zech_sub(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
                  const fq_zech_ctx_t ctx);
 
-void fq_zech_sub_one(fq_zech_t rop, const fq_zech_t op1,
+FLINT_DLL void fq_zech_sub_one(fq_zech_t rop, const fq_zech_t op1,
                      const fq_zech_ctx_t ctx);
 
-void fq_zech_neg(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_neg(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
-void fq_zech_mul(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
+FLINT_DLL void fq_zech_mul(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
                  const fq_zech_ctx_t ctx);
 
-void fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
+FLINT_DLL void fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
                       const fq_zech_ctx_t ctx);
 
-void fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
+FLINT_DLL void fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
                     const fq_zech_ctx_t ctx);
 
-void fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, ulong x,
+FLINT_DLL void fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, ulong x,
                     const fq_zech_ctx_t ctx);
 
-void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-void fq_zech_inv(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_inv(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
-void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
+FLINT_DLL void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
                   const fmpz * a, const slong *j, slong lena, const fmpz_t p);
 
-void fq_zech_pow(fq_zech_t rop, const fq_zech_t op1, const fmpz_t e,
+FLINT_DLL void fq_zech_pow(fq_zech_t rop, const fq_zech_t op1, const fmpz_t e,
                  const fq_zech_ctx_t ctx);
 
-void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op1, const ulong e,
+FLINT_DLL void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op1, const ulong e,
                     const fq_zech_ctx_t ctx);
 
 void
-fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+FLINT_DLL fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-void fq_zech_randtest(fq_zech_t rop, flint_rand_t state,
+FLINT_DLL void fq_zech_randtest(fq_zech_t rop, flint_rand_t state,
                       const fq_zech_ctx_t ctx);
 
-void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_t state,
+FLINT_DLL void fq_zech_randtest_not_zero(fq_zech_t rop, flint_rand_t state,
                                const fq_zech_ctx_t ctx);
 
 /* Comparison ****************************************************************/
@@ -227,7 +227,7 @@ fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 }
 
 void
-fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
+FLINT_DLL fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE void
 fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx)
@@ -275,10 +275,10 @@ fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
 }
 
 void
-fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op, const fq_zech_ctx_t ctx);
 
 void
-fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 
 /* Output ********************************************************************/
@@ -306,30 +306,28 @@ fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx)
     fq_zech_fprint(stdout, op, ctx);
 }
 
-char *
-fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-char *
-fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL char * fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 
 /* Special functions *********************************************************/
 
-void fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
+FLINT_DLL void fq_zech_frobenius(fq_zech_t rop, const fq_zech_t op, slong e,
                        const fq_zech_ctx_t ctx);
 
-void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 /* Bit packing ******************************************************/
 
 void
-fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size,
+FLINT_DLL fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size,
                  const fq_zech_ctx_t ctx);
 
 void
-fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
 #ifdef T

@@ -28,12 +28,14 @@
 
 #undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
+#if !defined(_MSC_VER)
 #include <sys/param.h> /* for BSD define */
+#endif
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
 #include <stdlib.h> /* for alloca on FreeBSD */
-#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) 
+#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)
 /* MinGW and FreeBSD have alloca, but not alloca.h */
 #include <alloca.h>
 #endif
@@ -95,11 +97,11 @@ extern char version[];
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);
 void * flint_calloc(size_t num, size_t size);
-void flint_free(void * ptr);
+FLINT_DLL void flint_free(void * ptr);
 
 typedef void (*flint_cleanup_function_t)(void);
-void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
-void flint_cleanup(void);
+FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
+FLINT_DLL void flint_cleanup(void);
 
 #if defined(_WIN64)
 #define WORD_FMT "%ll"
@@ -140,10 +142,10 @@ void flint_cleanup(void);
 #define FLINT_TLS_PREFIX
 #endif
 
-int flint_get_num_threads(void);
-void flint_set_num_threads(int num_threads);
+FLINT_DLL int flint_get_num_threads(void);
+FLINT_DLL void flint_set_num_threads(int num_threads);
 
-int flint_test_multiplier(void);
+FLINT_DLL int flint_test_multiplier(void);
 
 typedef struct
 {
@@ -230,7 +232,7 @@ typedef __mpfr_struct mpfr;
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
-extern const unsigned char __flint_clz_tab[128];
+FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 #endif
 
 static __inline__
@@ -348,15 +350,15 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 
 #define FLINT_NEWTON_END }
 
-int parse_fmt(int * floating, const char * fmt);
+FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
-size_t flint_printf(const char * str, ...); /* flint version of printf */
-size_t flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
-size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
+FLINT_DLL size_t flint_printf(const char * str, ...); /* flint version of printf */
+FLINT_DLL size_t flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+FLINT_DLL size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
-int flint_scanf(const char * str, ...); /* flint version of scanf */
-int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
-int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
+FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
 
 #include "gmpcompat.h"
 

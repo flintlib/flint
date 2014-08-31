@@ -28,7 +28,7 @@
 #define FMPQ_H
 
 #ifdef FMPQ_INLINES_C
-#define FMPQ_INLINE
+#define FMPQ_INLINE FLINT_DLL
 #else
 #define FMPQ_INLINE static __inline__
 #endif
@@ -148,25 +148,25 @@ FMPQ_INLINE void fmpq_abs(fmpq_t dest, const fmpq_t src)
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
-int _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
+FLINT_DLL int _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
 
-int fmpq_cmp(const fmpq_t x, const fmpq_t y);
+FLINT_DLL int fmpq_cmp(const fmpq_t x, const fmpq_t y);
 
-void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
+FLINT_DLL void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
-void fmpq_canonicalise(fmpq_t res);
+FLINT_DLL void fmpq_canonicalise(fmpq_t res);
 
-int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
+FLINT_DLL int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
 
-int fmpq_is_canonical(const fmpq_t x);
-
-
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
-
-void fmpq_set_si(fmpq_t res, slong p, ulong q);
+FLINT_DLL int fmpq_is_canonical(const fmpq_t x);
 
 
-void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
+FLINT_DLL void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
+
+FLINT_DLL void fmpq_set_si(fmpq_t res, slong p, ulong q);
+
+
+FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
 
 FMPQ_INLINE void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
@@ -181,23 +181,23 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
-int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
+FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 
-void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
+FLINT_DLL void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
 
-void flint_mpq_clear_readonly(mpq_t z);
+FLINT_DLL void flint_mpq_clear_readonly(mpq_t z);
 
-void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
+FLINT_DLL void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
 
-void fmpq_clear_readonly(fmpq_t f);
+FLINT_DLL void fmpq_clear_readonly(fmpq_t f);
 
-char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
+FLINT_DLL char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 
-char * fmpq_get_str(char * str, int b, const fmpq_t x);
+FLINT_DLL char * fmpq_get_str(char * str, int b, const fmpq_t x);
 
-void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
+FLINT_DLL void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
-void fmpq_fprint(FILE * file, const fmpq_t x);
+FLINT_DLL void fmpq_fprint(FILE * file, const fmpq_t x);
 
 FMPQ_INLINE void _fmpq_print(const fmpz_t num, const fmpz_t den)
 {
@@ -209,89 +209,89 @@ FMPQ_INLINE void fmpq_print(const fmpq_t x)
     fmpq_fprint(stdout, x);
 }
 
-void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
-void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
+FLINT_DLL void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
 
 
-void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+FLINT_DLL void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
-void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
+FLINT_DLL void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+FLINT_DLL void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                       const fmpz_t q, slong r);
 
-void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c);
+FLINT_DLL void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c);
 
-void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+FLINT_DLL void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                const fmpz_t q, const fmpz_t r);
 
-void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+FLINT_DLL void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
-void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+FLINT_DLL void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
-void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
+FLINT_DLL void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+FLINT_DLL void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                       const fmpz_t q, slong r);
 
-void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c);
+FLINT_DLL void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c);
 
-void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+FLINT_DLL void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
                                                const fmpz_t q, const fmpz_t r);
 
-void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+FLINT_DLL void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
 
-void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+FLINT_DLL void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
-void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
+FLINT_DLL void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 
-void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
+FLINT_DLL void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
-void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
+FLINT_DLL void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
                   const fmpz_t opnum, const fmpz_t opden, slong e);
 
-void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e);
+FLINT_DLL void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e);
 
 
-void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+FLINT_DLL void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
-void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
+FLINT_DLL void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 
-void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+FLINT_DLL void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
-void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
+FLINT_DLL void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 
-void fmpq_inv(fmpq_t dest, const fmpq_t src);
+FLINT_DLL void fmpq_inv(fmpq_t dest, const fmpq_t src);
 
-void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
+FLINT_DLL void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
-
-
-void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
-
-void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
+FLINT_DLL void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
 
-int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod);
+FLINT_DLL void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
 
-int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod);
+FLINT_DLL void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
+
+
+FLINT_DLL int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod);
+
+FLINT_DLL int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod);
 
 FMPQ_INLINE void
 _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
@@ -314,59 +314,59 @@ fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               fmpq_denref(op1), fmpq_numref(op2), fmpq_denref(op2));
 }
 
-int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t m);
+FLINT_DLL int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t m);
 
-int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);
+FLINT_DLL int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);
 
-int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
+FLINT_DLL int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
     const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D);
 
-int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
+FLINT_DLL int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
                                         const fmpz_t N, const fmpz_t D);
 
-mp_bitcnt_t fmpq_height_bits(const fmpq_t x);
+FLINT_DLL mp_bitcnt_t fmpq_height_bits(const fmpq_t x);
 
-void fmpq_height(fmpz_t height, const fmpq_t x);
+FLINT_DLL void fmpq_height(fmpz_t height, const fmpq_t x);
 
-void _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
+FLINT_DLL void _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
     const fmpz_t num, const fmpz_t den);
 
-void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x);
+FLINT_DLL void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x);
 
-void _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
+FLINT_DLL void _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
     const fmpz_t num, const fmpz_t den);
 
-void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x);
+FLINT_DLL void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x);
 
-void _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
+FLINT_DLL void _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
     const fmpz_t num, const fmpz_t den);
 
-void fmpq_next_minimal(fmpq_t res, const fmpq_t x);
+FLINT_DLL void fmpq_next_minimal(fmpq_t res, const fmpq_t x);
 
-void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
+FLINT_DLL void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
     const fmpz_t num, const fmpz_t den);
 
-void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
+FLINT_DLL void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
 
-slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
+FLINT_DLL slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
 
-void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n);
+FLINT_DLL void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n);
 
-slong fmpq_cfrac_bound(const fmpq_t x);
+FLINT_DLL slong fmpq_cfrac_bound(const fmpq_t x);
 
-void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
+FLINT_DLL void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
+FLINT_DLL void fmpq_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-double fmpq_dedekind_sum_coprime_d(double h, double k);
+FLINT_DLL double fmpq_dedekind_sum_coprime_d(double h, double k);
 
-void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
+FLINT_DLL void fmpq_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+FLINT_DLL void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
+FLINT_DLL void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
-void fmpq_harmonic_ui(fmpq_t x, ulong n);
+FLINT_DLL void fmpq_harmonic_ui(fmpq_t x, ulong n);
 
 #ifdef __cplusplus
 }

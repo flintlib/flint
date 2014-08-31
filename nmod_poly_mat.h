@@ -54,15 +54,15 @@ typedef nmod_poly_mat_struct nmod_poly_mat_t[1];
 
 /* Memory management *********************************************************/
 
-void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n);
+FLINT_DLL void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n);
 
-void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
+FLINT_DLL void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
 
-void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
+FLINT_DLL void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
 
-void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
+FLINT_DLL void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 
-void nmod_poly_mat_clear(nmod_poly_mat_t mat);
+FLINT_DLL void nmod_poly_mat_clear(nmod_poly_mat_t mat);
 
 /* Basic properties **********************************************************/
 
@@ -86,12 +86,12 @@ nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 
 /* Comparison ****************************************************************/
 
-int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
+FLINT_DLL int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
                         const nmod_poly_mat_t mat2);
 
-int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
+FLINT_DLL int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
 
-int nmod_poly_mat_is_one(const nmod_poly_mat_t mat);
+FLINT_DLL int nmod_poly_mat_is_one(const nmod_poly_mat_t mat);
 
 static __inline__ int
 nmod_poly_mat_is_empty(const nmod_poly_mat_t mat)
@@ -107,116 +107,116 @@ nmod_poly_mat_is_square(const nmod_poly_mat_t mat)
 
 /* Standard matrices *********************************************************/
 
-void nmod_poly_mat_zero(nmod_poly_mat_t mat);
+FLINT_DLL void nmod_poly_mat_zero(nmod_poly_mat_t mat);
 
-void nmod_poly_mat_one(nmod_poly_mat_t mat);
+FLINT_DLL void nmod_poly_mat_one(nmod_poly_mat_t mat);
 
 /* Random matrices ***********************************************************/
 
-void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state,
+FLINT_DLL void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state,
                                 slong len);
 
-void nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state,
+FLINT_DLL void nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state,
                         slong len, float density);
 
 /* Input and output **********************************************************/
 
-void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x);
+FLINT_DLL void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x);
 
 /* Norms *********************************************************************/
 
-slong nmod_poly_mat_max_length(const nmod_poly_mat_t A);
+FLINT_DLL slong nmod_poly_mat_max_length(const nmod_poly_mat_t A);
 
 /* Scalar arithmetic *********************************************************/
 
-void nmod_poly_mat_scalar_mul_nmod_poly(nmod_poly_mat_t B,
+FLINT_DLL void nmod_poly_mat_scalar_mul_nmod_poly(nmod_poly_mat_t B,
                     const nmod_poly_mat_t A, const nmod_poly_t c);
 
-void nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B,
+FLINT_DLL void nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B,
                     const nmod_poly_mat_t A, mp_limb_t c);
 
 /* Matrix arithmetic *********************************************************/
 
-void nmod_poly_mat_add(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+FLINT_DLL void nmod_poly_mat_add(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
 
-void nmod_poly_mat_sub(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+FLINT_DLL void nmod_poly_mat_sub(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
 
-void nmod_poly_mat_neg(nmod_poly_mat_t B, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_neg(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+FLINT_DLL void nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
 
-void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+FLINT_DLL void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B);
 
-void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+FLINT_DLL void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
 
-void nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+FLINT_DLL void nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B);
 
-void nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t B, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp);
+FLINT_DLL void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp);
 
 /* Evaluation ****************************************************************/
 
-void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, mp_limb_t x);
+FLINT_DLL void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, mp_limb_t x);
 
 /* Row reduction *************************************************************/
 
-slong nmod_poly_mat_find_pivot_any(const nmod_poly_mat_t mat,
+FLINT_DLL slong nmod_poly_mat_find_pivot_any(const nmod_poly_mat_t mat,
                                     slong start_row, slong end_row, slong c);
 
-slong nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
+FLINT_DLL slong nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
                                     slong start_row, slong end_row, slong c);
 
-slong nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
+FLINT_DLL slong nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
                             const nmod_poly_mat_t A, int rank_check);
 
-slong nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den,
+FLINT_DLL slong nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den,
                             const nmod_poly_mat_t A);
 
 /* Trace *********************************************************************/
 
-void nmod_poly_mat_trace(nmod_poly_t trace, const nmod_poly_mat_t mat);
+FLINT_DLL void nmod_poly_mat_trace(nmod_poly_t trace, const nmod_poly_mat_t mat);
 
 /* Determinant and rank ******************************************************/
 
-void nmod_poly_mat_det(nmod_poly_t det, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_det(nmod_poly_t det, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_det_fflu(nmod_poly_t det, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_det_fflu(nmod_poly_t det, const nmod_poly_mat_t A);
 
-void nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A);
+FLINT_DLL void nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A);
 
-slong nmod_poly_mat_rank(const nmod_poly_mat_t A);
+FLINT_DLL slong nmod_poly_mat_rank(const nmod_poly_mat_t A);
 
 /* Inverse *******************************************************************/
 
-int nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
+FLINT_DLL int nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
     const nmod_poly_mat_t A);
 
 /* Nullspace *****************************************************************/
 
-slong nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat);
+FLINT_DLL slong nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat);
 
 /* Solving *******************************************************************/
 
-int nmod_poly_mat_solve(nmod_poly_mat_t X, nmod_poly_t den,
+FLINT_DLL int nmod_poly_mat_solve(nmod_poly_mat_t X, nmod_poly_t den,
                     const nmod_poly_mat_t A, const nmod_poly_mat_t B);
 
-int nmod_poly_mat_solve_fflu(nmod_poly_mat_t X, nmod_poly_t den,
+FLINT_DLL int nmod_poly_mat_solve_fflu(nmod_poly_mat_t X, nmod_poly_t den,
                             const nmod_poly_mat_t A, const nmod_poly_mat_t B);
 
-void nmod_poly_mat_solve_fflu_precomp(nmod_poly_mat_t X,
+FLINT_DLL void nmod_poly_mat_solve_fflu_precomp(nmod_poly_mat_t X,
                     const slong * perm,
                     const nmod_poly_mat_t FFLU, const nmod_poly_mat_t B);
 

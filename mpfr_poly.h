@@ -49,15 +49,15 @@ extern gmp_randstate_t mpfr_poly_randstate;
 
 #define MUL_INPLACE_CUTOFF 1000
 
-void mpfr_poly_init(mpfr_poly_t poly, mpfr_prec_t prec);
+FLINT_DLL void mpfr_poly_init(mpfr_poly_t poly, mpfr_prec_t prec);
 
-void mpfr_poly_init2(mpfr_poly_t poly, slong alloc, mpfr_prec_t prec);
+FLINT_DLL void mpfr_poly_init2(mpfr_poly_t poly, slong alloc, mpfr_prec_t prec);
 
-void mpfr_poly_realloc(mpfr_poly_t poly, slong alloc);
+FLINT_DLL void mpfr_poly_realloc(mpfr_poly_t poly, slong alloc);
 
-void mpfr_poly_fit_length(mpfr_poly_t poly, slong length);
+FLINT_DLL void mpfr_poly_fit_length(mpfr_poly_t poly, slong length);
 
-void mpfr_poly_clear(mpfr_poly_t poly);
+FLINT_DLL void mpfr_poly_clear(mpfr_poly_t poly);
 
 static __inline__
 void _mpfr_poly_set_length(mpfr_poly_t poly, slong length)
@@ -74,11 +74,11 @@ void mpfr_poly_set_prec(mpfr_poly_t poly, mpfr_prec_t prec)
     poly->prec = prec;
 }
 
-void mpfr_poly_randinit(void);
+FLINT_DLL void mpfr_poly_randinit(void);
 
-void mpfr_poly_randclear(void);
+FLINT_DLL void mpfr_poly_randclear(void);
 
-void mpfr_poly_randtest(mpfr_poly_t poly, slong length);
+FLINT_DLL void mpfr_poly_randtest(mpfr_poly_t poly, slong length);
 
 static __inline__
 void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
@@ -104,31 +104,31 @@ void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
     poly2->prec = tp;
 }
 
-void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, slong len1,
+FLINT_DLL void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, slong len1,
                               mpfr * in2, slong len2, mpfr_prec_t prec);
 
-void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, 
+FLINT_DLL void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, 
                                                     mpfr_poly_t poly2);
 
-void _mpfr_poly_FHT(mpfr * coeffs, slong n, mpfr_prec_t prec);
+FLINT_DLL void _mpfr_poly_FHT(mpfr * coeffs, slong n, mpfr_prec_t prec);
 
-void _mpfr_poly_convolution_trans(mpfr * coeffs1, 
+FLINT_DLL void _mpfr_poly_convolution_trans(mpfr * coeffs1, 
                              mpfr * coeffs2, slong n, mpfr_prec_t prec);
 
-void _mpfr_poly_revbin(mpfr * coeffs, slong n);
+FLINT_DLL void _mpfr_poly_revbin(mpfr * coeffs, slong n);
 
-void _mpfr_poly_scale(mpfr * coeffs, slong n);
+FLINT_DLL void _mpfr_poly_scale(mpfr * coeffs, slong n);
 
-void _mpfr_poly_convolution_FHT(mpfr * coeffs1, 
+FLINT_DLL void _mpfr_poly_convolution_FHT(mpfr * coeffs1, 
                              mpfr * coeffs2, slong n, mpfr_prec_t prec);
 
-void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
+FLINT_DLL void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
                                                     mpfr_poly_t poly2);
 
-int _mpfr_poly_bound_newton(double * inter, double * slope, 
+FLINT_DLL int _mpfr_poly_bound_newton(double * inter, double * slope, 
                               mpfr * poly, slong len, mpfr_prec_t prec);
 
-void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
+FLINT_DLL void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
                                     mpfr_poly_t poly2, mpfr_prec_t fb);
 
 #ifdef __cplusplus

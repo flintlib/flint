@@ -35,19 +35,19 @@
 
 mpfr * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
 
-void _mpfr_vec_clear(mpfr * vec, slong length);
+FLINT_DLL void _mpfr_vec_clear(mpfr * vec, slong length);
 
-void _mpfr_vec_zero(mpfr * vec, slong length);
+FLINT_DLL void _mpfr_vec_zero(mpfr * vec, slong length);
 
-void _mpfr_vec_set(mpfr * vec1, const mpfr * vec2, slong length);
+FLINT_DLL void _mpfr_vec_set(mpfr * vec1, const mpfr * vec2, slong length);
 
-void _mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong length);
+FLINT_DLL void _mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong length);
 
-void _mpfr_vec_scalar_mul_2exp(mpfr * res, const mpfr * vec, slong length, mp_bitcnt_t exp);
+FLINT_DLL void _mpfr_vec_scalar_mul_2exp(mpfr * res, const mpfr * vec, slong length, mp_bitcnt_t exp);
 
-void _mpfr_vec_scalar_mul_mpfr(mpfr * res, const mpfr * vec, slong length, mpfr_t c);
+FLINT_DLL void _mpfr_vec_scalar_mul_mpfr(mpfr * res, const mpfr * vec, slong length, mpfr_t c);
 
-void _mpfr_vec_scalar_product(mpfr_t res, const mpfr * vec1, const mpfr * vec2, slong length);
+FLINT_DLL void _mpfr_vec_scalar_product(mpfr_t res, const mpfr * vec1, const mpfr * vec2, slong length);
 
 #ifdef __cplusplus
 }
