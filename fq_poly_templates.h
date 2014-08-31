@@ -292,6 +292,11 @@ TEMPLATE(T, poly_add)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1,
                       const TEMPLATE(T, ctx_t) ctx);
 
 void
+TEMPLATE(T, poly_add_series)(TEMPLATE(T, poly_t) rop, const TEMPLATE(T, poly_t) op1,
+                      const TEMPLATE(T, poly_t) op2,
+                      slong n, const TEMPLATE(T, ctx_t) ctx);
+
+void
 _TEMPLATE(T, poly_sub)(TEMPLATE(T, struct) *res,
                        const TEMPLATE(T, struct) *poly1, slong len1,
                        const TEMPLATE(T, struct) *poly2, slong len2,
@@ -302,6 +307,12 @@ TEMPLATE(T, poly_sub)(TEMPLATE(T, poly_t) rop,
                       const TEMPLATE(T, poly_t) op1,
                       const TEMPLATE(T, poly_t) op2,
                       const TEMPLATE(T, ctx_t) ctx);
+
+void 
+TEMPLATE(T, poly_sub_series)(TEMPLATE(T, poly_t) rop,
+                      const TEMPLATE(T, poly_t) op1,
+                      const TEMPLATE(T, poly_t) op2,
+                      slong n, const TEMPLATE(T, ctx_t) ctx);
 
 void
 _TEMPLATE(T, poly_neg)(TEMPLATE(T, struct) *rop,

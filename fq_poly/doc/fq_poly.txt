@@ -293,6 +293,12 @@ void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
+void fq_poly_add_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
+                 slong n, const fq_ctx_t ctx)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length \code{n} and set
+    \code{res} to the sum.
+
 void _fq_poly_sub(fq_struct *res,
                   const fq_struct *poly1, slong len1,
                   const fq_struct *poly2, slong len2,
@@ -304,6 +310,12 @@ void fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
                  const fq_ctx_t ctx)
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
+
+void fq_poly_sub_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
+                 slong n, const fq_ctx_t ctx)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length \code{n} and set
+    \code{res} to the difference.
 
 void _fq_poly_neg(fq_struct *rop, const fq_struct *op, slong len,
                   const fq_ctx_t ctx)
