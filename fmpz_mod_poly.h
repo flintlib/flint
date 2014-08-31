@@ -639,15 +639,15 @@ void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R,
     fmpz_mod_poly_clear(Q);
 }
 
-void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
+FLINT_DLL void _fmpz_mod_poly_div_newton_n_preinv (fmpz *Q, const fmpz* A, slong lenA,
                                          const fmpz* B, slong lenB, const fmpz* Binv,
                                          slong lenBinv, const fmpz_t p);
 
-void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+FLINT_DLL void fmpz_mod_poly_div_newton_n_preinv (fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
 
 
-void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+FLINT_DLL void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                                             slong lenA, const fmpz* B, slong lenB,
                                             const fmpz* Binv, slong lenBinv, const fmpz_t p);
 
@@ -656,9 +656,8 @@ FLINT_DLL void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_
                                           const fmpz_mod_poly_t Binv);
 
 /*  Power series inversion ***************************************************/
-
-void 
-FLINT_DLL _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
+ 
+FLINT_DLL void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
                                  const fmpz_t cinv, const fmpz_t p);
 
 FLINT_DLL void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
@@ -666,6 +665,35 @@ FLINT_DLL void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
 
 FLINT_DLL void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
     const fmpz_mod_poly_t Q, slong n);
+
+FMPZ_MOD_POLY_INLINE void 
+_fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n, 
+                                 const fmpz_t cinv, const fmpz_t p)
+{
+   _fmpz_mod_poly_inv_series_newton(Qinv, Q, n, cinv, p);
+}
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
+{
+   fmpz_mod_poly_inv_series_newton(Qinv, Q, n);
+}
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
+{
+   fmpz_mod_poly_inv_series_newton_f(f, Qinv, Q, n);
+}
+
+/*  Power series division ***************************************************/
+
+FLINT_DLL void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+                      const fmpz * B, slong Blen, const fmpz_t p, slong n);
+
+FLINT_DLL void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+                                         const fmpz_mod_poly_t B, slong n);
 
 /*  Greatest common divisor **************************************************/
 

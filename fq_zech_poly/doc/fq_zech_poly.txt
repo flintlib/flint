@@ -1177,6 +1177,20 @@ fq_zech_poly_inv_series(fq_zech_poly_t Qinv, const fq_zech_poly_t Q, slong n,
     be invertible modulo the modulus of \code{Q}. An exception is
     raised if this is not the case or if \code{n = 0}.
 
+void _fq_zech_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+                             const fmpz * B, slong Blen, slong n, fq_ctx_t ctx)
+
+    Set \code{(Q, n)} to the quotient of the series \code{(A, Alen}) and
+    \code{(B, Blen)} assuming \code{Alen, Blen <= n}. We assume the bottom
+    coefficient of \code{B} is invertible.
+
+void fq_zech_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+                                const fmpz_mod_poly_t B, slong n, fq_ctx_t ctx)
+
+    Set $Q$ to the quotient of the series $A$ by $B$, thinking of the series as
+    though they were of length $n$. We assume that the bottom coefficient of
+    $B$ is invertible.
+
 *******************************************************************************
 
     Greatest common divisor
