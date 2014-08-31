@@ -28,47 +28,6 @@
 #include "fmpq_mat.h"
 #include "perm.h"
 
-/* checks matrix is in rref TODO are all these necessary here? */
-int in_rref(const fmpz_mat_t A, const fmpz_t den, slong rank)
-{
-    slong i, j, k, prev_pivot;
-
-    /* bottom should be zero */
-    for (i = rank; i < A->r; i++)
-        for (j = 0; j < A->c; j++)
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
-                return 0;
-
-    prev_pivot = -1;
-
-    for (i = 0; i < rank; i++)
-    {
-        for (j = 0; j < A->c; j++)
-        {
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
-            {
-                /* pivot should have a higher column index than previous */
-                if (j <= prev_pivot)
-                    return 0;
-
-                /* column should be 0 ... 0 1 0 ... 0 */
-                for (k = 0; k < rank; k++)
-                {
-                    if (i == k && !fmpz_equal(fmpz_mat_entry(A, k, j), den))
-                        return 0;
-                    if (i != k && !fmpz_is_zero(fmpz_mat_entry(A, k, j)))
-                        return 0;
-                }
-
-                prev_pivot = j;
-                break;
-            }
-        }
-    }
-
-    return 1;
-}
-
 slong
 fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
@@ -150,7 +109,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         }
         fmpz_mat_clear(E2);
 
-        if (!in_rref(E, den, rank))
+        if (!fmpz_mat_is_in_rref_with_rank(E, den, rank))
         {
             fmpz_mat_clear(E);
             continue;
