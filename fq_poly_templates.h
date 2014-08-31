@@ -248,6 +248,10 @@ int TEMPLATE(T, poly_equal)(const TEMPLATE(T, poly_t) poly1,
                             const TEMPLATE(T, poly_t) poly2,
                             const TEMPLATE(T, ctx_t) ctx);
 
+int TEMPLATE(T, poly_equal_trunc)(const TEMPLATE(T, poly_t) poly1,
+                            const TEMPLATE(T, poly_t) poly2,
+                            slong n, const TEMPLATE(T, ctx_t) ctx);
+
 FQ_POLY_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
                           const TEMPLATE(T, ctx_t) ctx)
