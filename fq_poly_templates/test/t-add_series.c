@@ -47,7 +47,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing: a = a + b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000; i++)
     {
         slong len, n;
         TEMPLATE(T, ctx_t) ctx;
@@ -88,7 +88,7 @@ main(void)
     }
 
     /* Check aliasing: b = a + b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000; i++)
     {
         slong n, len;
         TEMPLATE(T, ctx_t) ctx;
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check aliasing: a = a + a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000; i++)
     {
         slong n, len;
         TEMPLATE(T, ctx_t) ctx;
@@ -165,7 +165,7 @@ main(void)
     }
 
     /* Check that truncate(a + b, n) = add_series(a, b, n) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000; i++)
     {
         slong n, len;
         TEMPLATE(T, ctx_t) ctx;

@@ -607,6 +607,7 @@ echo "$CONFIG_PTHREAD" >> config.h
 echo "$CONFIG_GC" >> config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
 echo "#define WANT_ASSERT $ASSERT" >> config.h
+echo "#define FLINT_DLL" >> config.h
 
 #write out Makefile
 

@@ -41,14 +41,16 @@ int flint_sscanf(const char * s, const char * str, ...)
    int args, floating;
    int ret;
    char *str2, *s2;
-   size_t len = strlen(str);
+   size_t n, len = strlen(str);
+   
    if(!strlen(s))
        return 0;
+
    str2 = flint_malloc(len + 1);
    s2 = flint_malloc(strlen(s) + 1);
    
    /* deal with first substring */
-   size_t n = strcspn(str, "%");
+   n = strcspn(str, "%");
    strncpy(str2, s, n);
    str2[n] = '\0';
    ret = 0;

@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* test aliasing */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
 
         slong len;
@@ -75,7 +75,7 @@ main(void)
 
 
     /* Check new leading coeff = 1 */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
 
         slong len;

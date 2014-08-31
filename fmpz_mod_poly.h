@@ -635,28 +635,35 @@ FLINT_DLL void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
 FLINT_DLL void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
     const fmpz_mod_poly_t Q, slong n);
 
-FMPZ_MOD_POLY_INLINE 
-void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n, 
-                                             const fmpz_t cinv, const fmpz_t p)
+FMPZ_MOD_POLY_INLINE void 
+_fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n, 
+                                 const fmpz_t cinv, const fmpz_t p)
 {
    _fmpz_mod_poly_inv_series_newton(Qinv, Q, n, cinv, p);
 }
-FMPZ_MOD_POLY_INLINE 
-void fmpz_mod_poly_inv_series(fmpz_mod_poly_t Ainv, 
-                                              const fmpz_mod_poly_t A, slong n)
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
 {
-   fmpz_mod_poly_inv_series_newton(Ainv, A, n);
+   fmpz_mod_poly_inv_series_newton(Qinv, Q, n);
 }
-FMPZ_MOD_POLY_INLINE 
-void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Ainv, 
-                                              const fmpz_mod_poly_t A, slong n)
+
+FMPZ_MOD_POLY_INLINE void 
+fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, slong n)
 {
-   fmpz_mod_poly_inv_series_newton_f(f, Ainv, A, n);
+   fmpz_mod_poly_inv_series_newton_f(f, Qinv, Q, n);
 }
+
+/*  Power series division ***************************************************/
+
 FLINT_DLL void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
-                          const fmpz * B, slong Blen, const fmpz_t p, slong n);
+                      const fmpz * B, slong Blen, const fmpz_t p, slong n);
+
 FLINT_DLL void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
-                                             const fmpz_mod_poly_t B, slong n);
+                                         const fmpz_mod_poly_t B, slong n);
+
 /*  Greatest common divisor **************************************************/
 
 FLINT_DLL void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);

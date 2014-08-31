@@ -219,12 +219,12 @@ TEMPLATE(T, poly_is_gen)(const TEMPLATE(T, poly_t) poly,
 /*  Comparison  **************************************************************/
 
 FLINT_DLL int TEMPLATE(T, poly_equal)(const TEMPLATE(T, poly_t) poly1,
-    const TEMPLATE(T, poly_t) poly2,
-    const TEMPLATE(T, ctx_t) ctx);
+                            const TEMPLATE(T, poly_t) poly2,
+                            const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL int TEMPLATE(T, poly_equal_trunc)(const TEMPLATE(T, poly_t) poly1,
-    const TEMPLATE(T, poly_t) poly2,
-    slong n, const TEMPLATE(T, ctx_t) ctx);
+                            const TEMPLATE(T, poly_t) poly2,
+                            slong n, const TEMPLATE(T, ctx_t) ctx);
 
 FQ_POLY_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
@@ -845,6 +845,32 @@ FLINT_DLL void _TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, struct) * Qinv,
 FLINT_DLL void TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, poly_t) Qinv,
                                     const TEMPLATE(T, poly_t) Q, slong n,
                                     const TEMPLATE(T, ctx_t) ctx);
+
+FQ_POLY_INLINE void
+_TEMPLATE(T, poly_inv_series)(TEMPLATE(T, struct) * Qinv,
+                                     const TEMPLATE(T, struct) * Q, slong n,
+                                     const TEMPLATE(T, t) cinv,
+                                     const TEMPLATE(T, ctx_t) ctx)
+{
+   _TEMPLATE(T, poly_inv_series_newton) (Qinv, Q, n, cinv, ctx);
+}
+
+FQ_POLY_INLINE void
+TEMPLATE(T, poly_inv_series)(TEMPLATE(T, poly_t) Qinv,
+                                    const TEMPLATE(T, poly_t) Q, slong n,
+                                    const TEMPLATE(T, ctx_t) ctx)
+{
+   TEMPLATE(T, poly_inv_series_newton) (Qinv, Q, n, ctx);
+}
+
+FLINT_DLL void _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, 
+                          const TEMPLATE(T, struct) * A, slong Alen,
+                          const TEMPLATE(T, struct) * B, slong Blen, 
+                          slong n, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q, 
+               const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B, 
+                                        slong n, const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL void _TEMPLATE(T, poly_div_newton_n_preinv) (
     TEMPLATE(T, struct) *Q,
