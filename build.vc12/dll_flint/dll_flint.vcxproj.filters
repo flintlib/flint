@@ -80,6 +80,9 @@
     <ClInclude Include="..\..\fft.h">
     <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\fft_tuning.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\flint.h">
     <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,6 +96,9 @@
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\fmpq_vec.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\fmpz-conversions.h">
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\fmpz.h">
@@ -3523,6 +3529,9 @@
   <ClCompile Include="..\..\fq_nmod_poly\add.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly\add_series.c">
+    <Filter>Source Files\fq_nmod_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\clear.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
@@ -3590,6 +3599,9 @@
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\equal.c">
+    <Filter>Source Files\fq_nmod_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly\equal_trunc.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\evaluate_fq.c">
@@ -3778,6 +3790,9 @@
   <ClCompile Include="..\..\fq_nmod_poly\sub.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly\sub_series.c">
+    <Filter>Source Files\fq_nmod_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly\swap.c">
     <Filter>Source Files\fq_nmod_poly</Filter>
     </ClCompile>
@@ -3913,6 +3928,9 @@
   <ClCompile Include="..\..\fq_poly\add.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_poly\add_series.c">
+    <Filter>Source Files\fq_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_poly\clear.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
@@ -3980,6 +3998,9 @@
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\equal.c">
+    <Filter>Source Files\fq_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_poly\equal_trunc.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\evaluate_fq.c">
@@ -4172,6 +4193,9 @@
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\sub.c">
+    <Filter>Source Files\fq_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_poly\sub_series.c">
     <Filter>Source Files\fq_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_poly\swap.c">
@@ -4516,6 +4540,9 @@
   <ClCompile Include="..\..\fq_zech_poly\add.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly\add_series.c">
+    <Filter>Source Files\fq_zech_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\clear.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
@@ -4583,6 +4610,9 @@
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\equal.c">
+    <Filter>Source Files\fq_zech_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly\equal_trunc.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\evaluate_fq.c">
@@ -4769,6 +4799,9 @@
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\sub.c">
+    <Filter>Source Files\fq_zech_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly\sub_series.c">
     <Filter>Source Files\fq_zech_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly\swap.c">
