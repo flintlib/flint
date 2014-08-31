@@ -846,6 +846,23 @@ FLINT_DLL void TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, poly_t) Qinv,
                                     const TEMPLATE(T, poly_t) Q, slong n,
                                     const TEMPLATE(T, ctx_t) ctx);
 
+FQ_POLY_INLINE void
+_TEMPLATE(T, poly_inv_series)(TEMPLATE(T, struct) * Qinv,
+                                     const TEMPLATE(T, struct) * Q, slong n,
+                                     const TEMPLATE(T, t) cinv,
+                                     const TEMPLATE(T, ctx_t) ctx)
+{
+   _TEMPLATE(T, poly_inv_series_newton) (Qinv, Q, n, cinv, ctx);
+}
+
+FQ_POLY_INLINE void
+TEMPLATE(T, poly_inv_series)(TEMPLATE(T, poly_t) Qinv,
+                                    const TEMPLATE(T, poly_t) Q, slong n,
+                                    const TEMPLATE(T, ctx_t) ctx)
+{
+   TEMPLATE(T, poly_inv_series_newton) (Qinv, Q, n, ctx);
+}
+
 FLINT_DLL void _TEMPLATE(T, poly_div_newton_n_preinv) (
     TEMPLATE(T, struct) *Q,
     const TEMPLATE(T, struct) *A, slong lenA,
