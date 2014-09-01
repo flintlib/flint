@@ -105,7 +105,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
            B2 = _fmpz_vec_init(n);
            _fmpz_vec_set(B2, B, Blen);
         } else
-           B2 = B;
+           B2 = (fmpz *) B;
 
         _fmpz_mod_poly_inv_series(Binv, B2, n, u, p);
         _fmpz_mod_poly_mullow(Q, Binv, n, A, Alen, p, n);

@@ -84,7 +84,7 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,
     behaviour is undefined if $p$ is a composite number.
 
     Assumes that \code{min} and \code{max} are non-negative and that 
-    \code{min} is at most \code{max}, raising and \code{abort} signal 
+    \code{min} is at most \code{max}, raising an \code{abort} signal 
     otherwise.
 
     Assumes that the printing mode is one of \code{PADIC_TERSE}, 
