@@ -5857,6 +5857,9 @@
   <ClCompile Include="..\..\padic\init.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\padic\inlines.c">
+    <Filter>Source Files\padic</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\padic\inv.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>

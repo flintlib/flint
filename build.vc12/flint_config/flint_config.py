@@ -23,11 +23,11 @@ debug = False
 # what to build
 build_lib = True
 build_dll = True
-build_tests = True
-build_profiles = True
+build_tests = False
+build_profiles = False
 
 # add user choice
-flib_type = 'reentrant' # ('gc', 'rentrant', 'single')
+flib_type = 'single' # ('gc', 'reentrant', 'single')
 
 # The path to flint, solution and project directories
 script_dir = dirname(__file__)
@@ -395,6 +395,12 @@ def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
   elif proj_type == lib_type:
     s1 = 'DEBUG;WIN32;_LIB;HAVE_CONFIG_H;PTW32_STATIC_LIB;'
     s2 = ''
+  else:
+    pass
+  if flib_type == 'single':
+    s1 += 'FLINT_REENTRANT=0;HAVE_TLS=1;'
+  elif flib_type == 'reentrant':
+    s1 += 'FLINT_REENTRANT=1;'
   else:
     pass
   if plat == 'x64':

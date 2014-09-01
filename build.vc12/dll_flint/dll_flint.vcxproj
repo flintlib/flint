@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <RootNamespace>dll_flint</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{8A9556B0-CA02-479D-99DF-D1CFC3DAE355}</ProjectGuid>
+    <ProjectGuid>{74CEC7A3-BFD9-4CF5-8087-311972159889}</ProjectGuid>
     </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'" Label="Configuration">
@@ -74,7 +74,7 @@
     <Optimization>Full</Optimization>
     <IntrinsicFunctions>true</IntrinsicFunctions>
     <AdditionalIncludeDirectories>..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);</AdditionalIncludeDirectories>
-    <PreprocessorDefinitions>NDEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    <PreprocessorDefinitions>NDEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;FLINT_REENTRANT=0;HAVE_TLS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -95,7 +95,7 @@
     <Optimization>Disabled</Optimization>
     <IntrinsicFunctions>true</IntrinsicFunctions>
     <AdditionalIncludeDirectories>..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);</AdditionalIncludeDirectories>
-    <PreprocessorDefinitions>_DEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    <PreprocessorDefinitions>_DEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;FLINT_REENTRANT=0;HAVE_TLS=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -116,7 +116,7 @@
     <Optimization>Full</Optimization>
     <IntrinsicFunctions>true</IntrinsicFunctions>
     <AdditionalIncludeDirectories>..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);</AdditionalIncludeDirectories>
-    <PreprocessorDefinitions>NDEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    <PreprocessorDefinitions>NDEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;FLINT_REENTRANT=0;HAVE_TLS=1;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -137,7 +137,7 @@
     <Optimization>Disabled</Optimization>
     <IntrinsicFunctions>true</IntrinsicFunctions>
     <AdditionalIncludeDirectories>..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);</AdditionalIncludeDirectories>
-    <PreprocessorDefinitions>_DEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    <PreprocessorDefinitions>_DEBUG;WIN32;HAVE_CONFIG_H;MSC_BUILD_DLL;PTW32_BUILD;FLINT_REENTRANT=0;HAVE_TLS=1;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -9635,16 +9635,16 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)link\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)link\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)link\</ObjectFileName>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\fmpz\link\fmpz_single.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)link\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)link\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)link\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)link\</ObjectFileName>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\long_extras\randint.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)long_extras\</ObjectFileName>
@@ -11447,6 +11447,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\padic\init.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\padic\inlines.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
