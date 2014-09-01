@@ -293,15 +293,13 @@ FLINT_DLL void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
-void
-FLINT_DLL fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
+FLINT_DLL void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
     const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void
-FLINT_DLL fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
+FLINT_DLL void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
 
-void
-FLINT_DLL fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
+
+FLINT_DLL void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
     nmod_mat_t * const residues, slong nres,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 

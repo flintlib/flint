@@ -79,8 +79,7 @@ FLINT_DLL void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
 
 FLINT_DLL void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
 
-void
-FLINT_DLL fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+FLINT_DLL void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
 
 FLINT_DLL void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
@@ -187,8 +186,7 @@ FLINT_DLL void fq_zech_pow(fq_zech_t rop, const fq_zech_t op1, const fmpz_t e,
 FLINT_DLL void fq_zech_pow_ui(fq_zech_t rop, const fq_zech_t op1, const ulong e,
                     const fq_zech_ctx_t ctx);
 
-void
-FLINT_DLL fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
@@ -226,8 +224,7 @@ fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
     rop->value = op->value;
 }
 
-void
-FLINT_DLL fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE void
 fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx)
@@ -274,11 +271,9 @@ fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
     rop->value = 1;
 }
 
-void
-FLINT_DLL fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_set_fq_nmod(fq_zech_t rop, const fq_nmod_t op, const fq_zech_ctx_t ctx);
 
-void
-FLINT_DLL fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
+FLINT_DLL void fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 
 /* Output ********************************************************************/
@@ -322,12 +317,10 @@ FLINT_DLL void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t 
 
 /* Bit packing ******************************************************/
 
-void
-FLINT_DLL fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, mp_bitcnt_t bit_size,
                  const fq_zech_ctx_t ctx);
 
-void
-FLINT_DLL fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
+FLINT_DLL void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, mp_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
 #ifdef T

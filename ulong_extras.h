@@ -130,8 +130,8 @@ FLINT_DLL void n_compute_primes(ulong num_primes);
 
 FLINT_DLL void n_cleanup_primes(void);
 
-const mp_limb_t * n_primes_arr_readonly(ulong n);
-const double * n_prime_inverses_arr_readonly(ulong n);
+FLINT_DLL const mp_limb_t * n_primes_arr_readonly(ulong n);
+FLINT_DLL const double * n_prime_inverses_arr_readonly(ulong n);
 
 FLINT_DLL mp_limb_t n_randlimb(flint_rand_t state);
 
@@ -196,8 +196,7 @@ FLINT_DLL mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b,
 FLINT_DLL mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, 
                             mp_limb_t n, mp_limb_t ninv, ulong norm);
 
-mp_limb_t
-FLINT_DLL n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre);
+FLINT_DLL mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre);
 
 FLINT_DLL mp_limb_t n_powmod_precomp(mp_limb_t a, 
                      mp_limb_signed_t exp, mp_limb_t n, double npre);
