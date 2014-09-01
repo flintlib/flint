@@ -93,23 +93,19 @@ FLINT_DLL int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f);
 FLINT_DLL int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac, 
                                                    const fmpz_mod_poly_t f);
 
-int
-FLINT_DLL _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p);
+FLINT_DLL int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p);
 
-int
-FLINT_DLL _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, 
+FLINT_DLL int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, 
                                     const fmpz * f, slong len, const fmpz_t p);
 
 FLINT_DLL int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f);
 
 FLINT_DLL int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f);
 
-int
-FLINT_DLL fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
+FLINT_DLL int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
           flint_rand_t state, const fmpz_mod_poly_t pol, slong d);
 
-void
-FLINT_DLL fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
+FLINT_DLL void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
                                const fmpz_mod_poly_t pol, slong d);
 
 FLINT_DLL void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
