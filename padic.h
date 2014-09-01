@@ -26,6 +26,12 @@
 #ifndef PADIC_H
 #define PADIC_H
 
+#ifdef PADIC_INLINES_C
+#define PADIC_INLINE FLINT_DLL
+#else
+#define PADIC_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -99,7 +105,7 @@ FLINT_DLL void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong 
 
 FLINT_DLL void padic_ctx_clear(padic_ctx_t ctx);
 
-static __inline__ 
+PADIC_INLINE 
 int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
     if (ctx->min <= (slong) e && (slong) e < ctx->max)
@@ -132,7 +138,7 @@ FLINT_DLL void padic_init2(padic_t rop, slong N);
 
 FLINT_DLL void padic_clear(padic_t rop);
 
-static __inline__ void _padic_canonicalise(padic_t rop, const padic_ctx_t ctx)
+PADIC_INLINE void _padic_canonicalise(padic_t rop, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(padic_unit(rop)))
     {
@@ -182,7 +188,7 @@ FLINT_DLL void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
 FLINT_DLL void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
-static __inline__ void padic_swap(padic_t op1, padic_t op2)
+PADIC_INLINE void padic_swap(padic_t op1, padic_t op2)
 {
     slong t;
 
@@ -197,13 +203,13 @@ static __inline__ void padic_swap(padic_t op1, padic_t op2)
     padic_prec(op2) = t;
 }
 
-static __inline__ void padic_zero(padic_t rop)
+PADIC_INLINE void padic_zero(padic_t rop)
 {
     fmpz_zero(padic_unit(rop));
     padic_val(rop) = 0;
 }
 
-static __inline__ void padic_one(padic_t rop)
+PADIC_INLINE void padic_one(padic_t rop)
 {
     if (padic_prec(rop) > 0)
     {
@@ -218,17 +224,17 @@ static __inline__ void padic_one(padic_t rop)
 
 /* Comparison ****************************************************************/
 
-static __inline__ int padic_is_zero(const padic_t op)
+PADIC_INLINE int padic_is_zero(const padic_t op)
 {
     return fmpz_is_zero(padic_unit(op));
 }
 
-static __inline__ int padic_is_one(const padic_t op)
+PADIC_INLINE int padic_is_one(const padic_t op)
 {
     return fmpz_is_one(padic_unit(op)) && (padic_val(op) == 0);
 }
 
-static __inline__ int padic_equal(const padic_t op1, const padic_t op2)
+PADIC_INLINE int padic_equal(const padic_t op1, const padic_t op2)
 {
     return (padic_val(op1) == padic_val(op2)) && 
            (fmpz_equal(padic_unit(op1), padic_unit(op2)));
@@ -311,24 +317,24 @@ FLINT_DLL void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 /* Input and output **********************************************************/
 
-FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
+char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
 FLINT_DLL int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
 
 FLINT_DLL int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
-static __inline__ 
+PADIC_INLINE 
 int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx)
 {
     return _padic_fprint(stdout, u, v, ctx);
 }
 
-static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)
+PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
 {
     return padic_fprint(stdout, op, ctx);
 }
 
-static __inline__ void padic_debug(const padic_t op)
+PADIC_INLINE void padic_debug(const padic_t op)
 {
     flint_printf("(");
     fmpz_print(padic_unit(op)); 
