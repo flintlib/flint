@@ -156,47 +156,36 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len)
     }  
 }
 
-void
-FLINT_DLL fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n);
+FLINT_DLL void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n);
 
 /*  Randomisation ************************************************************/
 
-void
-FLINT_DLL fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+FLINT_DLL void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
+FLINT_DLL void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
                                    flint_rand_t state, slong len);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
+FLINT_DLL void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                 flint_rand_t state, slong len);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+FLINT_DLL void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
+FLINT_DLL void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
                                          flint_rand_t state, slong len);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+FLINT_DLL void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
 
-int
-FLINT_DLL fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,
+FLINT_DLL int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,
                                              flint_rand_t state, slong len,
                                              slong max_attempts);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
+FLINT_DLL void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_t state, slong len);
 
-int
-FLINT_DLL fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t f,
+FLINT_DLL int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t f,
                                              flint_rand_t state, slong len,
                                              slong max_attempts);
 
-void
-FLINT_DLL fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
+FLINT_DLL void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
                                           flint_rand_t state, slong len);
 
 /*  Attributes ***************************************************************/
@@ -424,8 +413,7 @@ FLINT_DLL void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slon
                     const fmpz * poly2, slong len2, const fmpz * f, slong lenf,
                     const fmpz* finv, slong lenfinv, const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+FLINT_DLL void fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                          const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f,
                          const fmpz_mod_poly_t finv);
 
@@ -448,75 +436,59 @@ FLINT_DLL void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
 FLINT_DLL void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
                               const fmpz_mod_poly_t poly, ulong e, slong trunc);
 
-void
-FLINT_DLL _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
+FLINT_DLL void _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
                                 ulong e, const fmpz * f, slong lenf, const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
+FLINT_DLL void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, ulong e,
                          const fmpz_mod_poly_t f);
 
-
-void
-FLINT_DLL _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
+FLINT_DLL void _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
                               ulong e, const fmpz * f, slong lenf,
                               const fmpz * finv, slong lenfinv, const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
+FLINT_DLL void fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, ulong e,
                          const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
-void
-FLINT_DLL _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
+FLINT_DLL void _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
                                   const fmpz_t e, const fmpz * f,
                                   slong lenf, const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
+FLINT_DLL void fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
                            const fmpz_mod_poly_t poly, const fmpz_t e,
                            const fmpz_mod_poly_t f);
 
-void
-FLINT_DLL _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly,
+FLINT_DLL void _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly,
                                   const fmpz_t e, const fmpz * f, slong lenf,
                                   const fmpz* finv, slong lenfinv,
                                   const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
+FLINT_DLL void fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz_mod_poly_t res,
                           const fmpz_mod_poly_t poly, const fmpz_t e,
                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
-void
-FLINT_DLL _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
+FLINT_DLL void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
                                    slong lenf, const fmpz* finv, slong lenfinv,
                                    const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
+FLINT_DLL void fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
                           const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv);
 
-void
-FLINT_DLL fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
+FLINT_DLL void fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
 
 
-void
-FLINT_DLL fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t pow);
+FLINT_DLL void fmpz_mod_poly_frobenius_powers_2exp_clear(fmpz_mod_poly_frobenius_powers_2exp_t pow);
 
-void
-FLINT_DLL fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
+FLINT_DLL void fmpz_mod_poly_frobenius_power(fmpz_mod_poly_t res,
                             fmpz_mod_poly_frobenius_powers_2exp_t pow, 
                                              const fmpz_mod_poly_t f, ulong m);
 
-void
-FLINT_DLL fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+FLINT_DLL void fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
                   const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m);
 
-void
-FLINT_DLL fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
+FLINT_DLL void fmpz_mod_poly_frobenius_powers_clear(fmpz_mod_poly_frobenius_powers_t pow);
 
 /*  Division *****************************************************************/
 
@@ -534,22 +506,18 @@ FLINT_DLL void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 FLINT_DLL void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
-void
-_fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
+FLINT_DLL void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
                                     const fmpz* B, slong lenB, const fmpz* Binv,
                                     slong lenBinv, const fmpz_t mod);
 
-void
-FLINT_DLL fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
+FLINT_DLL void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                            const fmpz_mod_poly_t B, const fmpz_mod_poly_t Binv);
 
-void
-_fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
+FLINT_DLL void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A,
                             slong lenA, const fmpz* B, slong lenB,
                             const fmpz* Binv, slong lenBinv, const fmpz_t mod);
 
-void
-FLINT_DLL fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
+FLINT_DLL void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                                const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                const fmpz_mod_poly_t Binv);
 
@@ -916,7 +884,7 @@ FLINT_DLL void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong 
 FLINT_DLL void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
                                  const fmpz_mod_poly_t poly, const fmpz_t a);
 
-fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len);
+FLINT_DLL fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len);
 
 FLINT_DLL void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len);
 
@@ -1021,8 +989,7 @@ FLINT_DLL void _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fm
                  slong len1, const fmpz * poly2, const fmpz * poly3, slong len3,
                  const fmpz * poly3inv, slong len3inv, const fmpz_t p);
 
-void
-FLINT_DLL fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
+FLINT_DLL void fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
                    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                    const fmpz_mod_poly_t poly3, const fmpz_mod_poly_t poly3inv);
 
