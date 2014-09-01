@@ -443,7 +443,6 @@ FLINT_DLL void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, ulong e,
                          const fmpz_mod_poly_t f);
 
-
 FLINT_DLL void _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
                               ulong e, const fmpz * f, slong lenf,
                               const fmpz * finv, slong lenfinv, const fmpz_t p);
