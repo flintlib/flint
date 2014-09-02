@@ -311,6 +311,8 @@ FLINT_DLL void padic_shift(padic_t rop, const padic_t op, slong v, const padic_c
 FLINT_DLL void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
+FLINT_DLL int padic_div_exact(padic_t rop, const padic_t op1, const padic_t op2);
+
 FLINT_DLL void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, slong N);
 
 FLINT_DLL void _padic_inv_clear(padic_inv_t S);
