@@ -90,15 +90,3 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    flint_printf("print/ read....");
-    fflush(stdout);
-    flint_printf("SKIPPED\n");
-    return EXIT_SUCCESS;
-}
-
-#endif
