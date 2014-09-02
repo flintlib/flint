@@ -321,6 +321,18 @@ FLINT_DLL void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N);
 
 FLINT_DLL void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+PADIC_INLINE
+int padic_inv_exact(padic_t rop, const padic_t op)
+{
+   if (!fmpz_is_one(padic_unit(op)))
+      return 0;
+
+   fmpz_one(padic_unit(rop));
+   padic_val(rop) = -padic_val(op);
+
+   return 1;
+}
+
 FLINT_DLL int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_pow_si(padic_t rop, const padic_t op, slong e, 
