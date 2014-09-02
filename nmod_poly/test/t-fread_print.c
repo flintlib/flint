@@ -30,8 +30,6 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-#if !defined (__WIN32) && !defined (__CYGWIN__)
-
 int
 main(void)
 {
@@ -78,13 +76,14 @@ main(void)
         }
 
         fclose(f);
-        if (remove("nmod_poly_test"))
-        {
-            flint_printf("Error, unable to delete file nmod_poly_test\n");
-            abort();
-        }
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+    }
+
+    if(remove("nmod_poly_test"))
+    {
+        flint_printf("Error, unable to delete file nmod_poly_test\n");
+        abort();
     }
 
     FLINT_TEST_CLEANUP(state);
@@ -92,15 +91,3 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-#else
-
-int main(void)
-{
-    flint_printf("print/ read....");
-    fflush(stdout);
-    flint_printf("SKIPPED\n");
-    return EXIT_SUCCESS;
-}
-
-#endif
