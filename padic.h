@@ -342,6 +342,8 @@ FLINT_DLL int padic_sqrt_exact(padic_t rop, const padic_t op);
 FLINT_DLL void padic_pow_si(padic_t rop, const padic_t op, slong e, 
                   const padic_ctx_t ctx);
 
+FLINT_DLL int padic_pow_exact_si(padic_t rop, const padic_t op, slong e);
+
 /* Exponential ***************************************************************/
 
 FLINT_DLL slong _padic_exp_bound(slong v, slong N, const fmpz_t p);
