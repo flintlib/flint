@@ -5815,6 +5815,9 @@
   <ClCompile Include="..\..\padic\add.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\padic\add_exact.c">
+    <Filter>Source Files\padic</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\padic\clear.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
@@ -5825,6 +5828,9 @@
     <Filter>Source Files\padic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic\div.c">
+    <Filter>Source Files\padic</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\padic\div_exact.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic\exp.c">
@@ -5881,6 +5887,9 @@
   <ClCompile Include="..\..\padic\mul.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\padic\mul_exact.c">
+    <Filter>Source Files\padic</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\padic\neg.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
@@ -5920,7 +5929,13 @@
   <ClCompile Include="..\..\padic\sqrt.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\padic\sqrt_exact.c">
+    <Filter>Source Files\padic</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\padic\sub.c">
+    <Filter>Source Files\padic</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\padic\sub_exact.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic\teichmuller.c">

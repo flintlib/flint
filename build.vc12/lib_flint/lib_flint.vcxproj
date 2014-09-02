@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <RootNamespace>lib_flint</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0E3C5748-A534-4AAA-97FC-F7F24A096314}</ProjectGuid>
+    <ProjectGuid>{51729286-FB49-425B-B94C-C315825F0BC5}</ProjectGuid>
     </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'" Label="Configuration">
@@ -11348,6 +11348,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\padic\add_exact.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\padic\clear.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
@@ -11367,6 +11373,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
     </ClCompile>
     <ClCompile Include="..\..\padic\div.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\padic\div_exact.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
@@ -11480,6 +11492,12 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\padic\mul_exact.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\padic\neg.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
@@ -11558,7 +11576,19 @@
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\padic\sqrt_exact.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\..\padic\sub.c">
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
+        <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)padic\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\..\padic\sub_exact.c">
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)padic\</ObjectFileName>
         <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">$(IntDir)padic\</ObjectFileName>
