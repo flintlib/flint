@@ -337,6 +337,8 @@ int padic_inv_exact(padic_t rop, const padic_t op)
 
 FLINT_DLL int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+FLINT_DLL int padic_sqrt_exact(padic_t rop, const padic_t op);
+
 FLINT_DLL void padic_pow_si(padic_t rop, const padic_t op, slong e, 
                   const padic_ctx_t ctx);
 
