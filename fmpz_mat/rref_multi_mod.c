@@ -29,7 +29,7 @@
 
 /* returns a negative value if the list of pivots p1 is less optimal than the
    list p1, 0 if they are equal and a positive value otherwise */
-int compare_pivots(const slong * p1, slong len1, const slong * p2, slong len2)
+static int compare_pivots(const slong * p1, slong len1, const slong * p2, slong len2)
 {
     slong i;
 

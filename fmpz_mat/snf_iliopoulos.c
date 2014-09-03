@@ -25,7 +25,7 @@
 
 #include "fmpz_mat.h"
 
-void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)
+static void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)
 {
     slong j, k, m, n;
     fmpz * t;
@@ -117,7 +117,7 @@ void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)
     fmpz_clear(r2g);
 }
 
-void _eliminate_row(fmpz_mat_t S, slong i, const fmpz_t mod)
+static void _eliminate_row(fmpz_mat_t S, slong i, const fmpz_t mod)
 {
     slong j, k, m, n;
     fmpz * t;

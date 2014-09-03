@@ -26,7 +26,7 @@
 #include "fmpz_mat.h"
 
 /* sets a to gcd(a,b) and b to lcm(a,b) using temporary fmpz_t t */
-void _gcdlcm(fmpz_t t, fmpz_t a, fmpz_t b)
+static void _gcdlcm(fmpz_t t, fmpz_t a, fmpz_t b)
 {
     if (fmpz_equal(a, b)) return;
     fmpz_gcd(t, a, b);

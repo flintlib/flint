@@ -26,7 +26,7 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
+static int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
        slong k, slong e, int bonus)
 {
     int success;
@@ -183,7 +183,7 @@ int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
     return success;
 }
 
-void _ith_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A, slong i,
+static void _ith_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A, slong i,
        slong k, slong e)
 {
     int bonus;
@@ -260,7 +260,7 @@ void _ith_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A, slong i,
     fmpz_mat_clear(LAR);
 }
 
-void _invariants_in_range(fmpz * invariants, const fmpz_mat_t A, slong start,
+static void _invariants_in_range(fmpz * invariants, const fmpz_mat_t A, slong start,
         slong end, const fmpz_t preceding, slong k, slong e)
 {
     slong i, n;

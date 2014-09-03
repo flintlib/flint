@@ -27,7 +27,7 @@
 #include "fmpq_mat.h"
 #include "perm.h"
 
-void
+static void
 add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
 {
     int neg;
@@ -182,7 +182,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
 }
 
 /* takes input matrix H with rows 0 to start_row - 1 in HNF to a HNF matrix */
-void
+static void
 add_rows(fmpz_mat_t H, slong start_row)
 {
     slong i, i2, j, j2, num_pivots, new_row, row;
@@ -291,7 +291,7 @@ add_rows(fmpz_mat_t H, slong start_row)
     flint_free(pivots);
 }
 
-void
+static void
 double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
            const fmpz_mat_t d)
 {
