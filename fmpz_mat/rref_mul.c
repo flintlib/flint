@@ -44,9 +44,11 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
     pivs = (slong *) flint_malloc(n * sizeof(slong));
     P = _perm_init(m);
 
+    p = 1 << 16;
+
     while (1)
     {
-        p = n_randprime(state, NMOD_MAT_OPTIMAL_MODULUS_BITS, 1);
+        p = n_nextprime(p, 1);
         nmod_mat_init(Amod, m, n, p);
         fmpz_mat_get_nmod_mat(Amod, A);
 
