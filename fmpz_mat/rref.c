@@ -31,10 +31,10 @@ fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
     slong rank;
 
-    if (A->c <= 25)
+    if (FLINT_MIN(A->c, A->r) <= 12)
         rank = fmpz_mat_rref_fflu(R, den, A);
     else
-        rank = fmpz_mat_rref_multi_mod(R, den, A);
+        rank = fmpz_mat_rref_mul(R, den, A);
 
     return rank;
 }
