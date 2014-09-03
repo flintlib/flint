@@ -28,24 +28,28 @@
 int fmpz_mat_is_in_snf(const fmpz_mat_t A)
 {
     slong i, j;
-    int snf = 1;
-    for (i = 0; i < A->r && snf; i++)
+    for (i = 0; i < A->r; i++)
     {
-        for (j = 0; j < A->c && snf; j++)
+        for (j = 0; j < A->c; j++)
         {
             if (i == j)
             {
-                snf = (fmpz_sgn(fmpz_mat_entry(A, i, i)) >= 0);
+                if (fmpz_sgn(fmpz_mat_entry(A, i, i)) < 0)
+                    return 0;
                 if (i > 0)
-                    snf &= fmpz_divisible(fmpz_mat_entry(A, i, i),
-                            fmpz_mat_entry(A, i - 1, i - 1));
+                {
+                    if (!fmpz_is_zero(fmpz_mat_entry(A, i, i)) &&
+                            fmpz_is_zero(fmpz_mat_entry(A, i - 1, i - 1)))
+                        return 0;
+                    if (!fmpz_divisible(fmpz_mat_entry(A, i, i),
+                            fmpz_mat_entry(A, i - 1, i - 1)))
+                        return 0;
+                }
             }
-            else
-            {
-                snf = fmpz_is_zero(fmpz_mat_entry(A, i, j));
-            }
+            else if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
+                return 0;
         }
     }
 
-    return snf;
+    return 1;
 }
