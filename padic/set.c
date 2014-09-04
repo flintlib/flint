@@ -30,9 +30,6 @@ void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     fmpz_set(padic_unit(rop), padic_unit(op));
     padic_val(rop) = padic_val(op);
 
-    if (padic_prec(rop) < padic_prec(op))
-    {
-        _padic_reduce(rop, ctx);
-    }
+    _padic_reduce(rop, ctx);
 }
 

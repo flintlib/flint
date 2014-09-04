@@ -105,15 +105,7 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
 
             alloc = _padic_ctx_pow_ui(pow, padic_prec(rop) - padic_val(rop), ctx);
 
-            if (padic_prec(rop) >= FLINT_MAX(padic_prec(op1), padic_prec(op2)))
-            {
-                if (fmpz_sgn(padic_unit(rop)) < 0)
-                    fmpz_add(padic_unit(rop), padic_unit(rop), pow);
-            }
-            else
-            {
-                fmpz_mod(padic_unit(rop), padic_unit(rop), pow);
-            }
+            fmpz_mod(padic_unit(rop), padic_unit(rop), pow);
 
             if (fmpz_is_zero(padic_unit(rop)))
                 padic_val(rop) = 0;

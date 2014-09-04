@@ -43,10 +43,7 @@ void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         if (alloc)
             fmpz_clear(pow);
 
-        if (padic_prec(rop) < padic_prec(op))
-        {
-            _padic_reduce(rop, ctx);
-        }
+        _padic_reduce(rop, ctx);
     }
 }
 
