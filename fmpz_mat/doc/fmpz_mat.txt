@@ -871,4 +871,30 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
     the $m$ × $n$ matrix \code{A}. Dimensions must be compatible.
     \code{A} and \code{B} are allowed to be the same object if \code{A} is a 
     square matrix.
-    
+
+*******************************************************************************
+
+    Special matrices
+
+*******************************************************************************
+
+int fmpz_mat_is_hadamard(const fmpz_mat_t H)
+
+    Returns nonzero iff $H$ is a Hadamard matrix, meaning
+    that it is a square matrix, only has entries that are $\pm 1$,
+    and satisfies $H^T = n H^{-1}$ where $n$ is the matrix size.
+
+int fmpz_mat_hadamard(fmpz_mat_t H)
+
+    Attempts to set the matrix $H$ to a Hadamard matrix, returning 1 if
+    successful and 0 if unsuccessful.
+
+    A Hadamard matrix of size $n$ can only exist if $n$ is 1, 2,
+    or a multiple of 4. It is not known whether a
+    Hadamard matrix exists for every size that is a multiple of 4.
+    This function uses the Paley construction, which
+    succeeds for all $n$ of the form $n = 2^e$ or $n = 2^e (q + 1)$ where
+    $q$ is an odd prime power. Orders $n$ for which Hadamard matrices are
+    known to exist but for which this construction fails are
+    92, 116, 156, ... (OEIS A046116).
+

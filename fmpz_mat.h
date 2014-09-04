@@ -306,6 +306,12 @@ FLINT_DLL void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 FLINT_DLL void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     slong nres, int sign);
 
+/* Special matrices **********************************************************/
+
+FLINT_DLL int fmpz_mat_is_hadamard(const fmpz_mat_t A);
+
+FLINT_DLL int fmpz_mat_hadamard(fmpz_mat_t A);
+
 #ifdef __cplusplus
 }
 #endif
