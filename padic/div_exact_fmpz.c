@@ -25,33 +25,40 @@
 
 #include "padic.h"
 
-int padic_div_exact(padic_t rop, const padic_t op1, const padic_t op2)
+int padic_div_exact_fmpz(padic_t rop, const padic_t op1, const fmpz_t op2,
+                                   const padic_ctx_t ctx)
 {
     int res = 1;
 
-    if (padic_is_zero(op2))
+    if (fmpz_is_zero(op2))
     {
-        flint_printf("Exception (padic_div_exact).  op2 is zero.\n");
+        flint_printf("Exception (padic_div_exact_fmpz).  op2 is zero.\n");
         abort();
     }
+
+    if (fmpz_sgn(op2) < 0)
+       return 0;
 
     if (padic_is_zero(op1))
     {
         padic_zero(rop);
     }
-    else
+    else if (!fmpz_is_one(op2))
     {
         fmpz_t r;
-   
+        slong val;
+
         fmpz_init(r);
        
-        fmpz_tdiv_qr(padic_unit(rop), r, padic_unit(op1), padic_unit(op2));
+        val = fmpz_remove(r, op2, ctx->p);
+
+        fmpz_tdiv_qr(padic_unit(rop), r, padic_unit(op1), r);
 
         res = fmpz_is_zero(r);
 
         fmpz_clear(r);
 
-        padic_val(rop) = padic_val(op1) - padic_val(op2);
+        padic_val(rop) = padic_val(op1) - val;
     }
 
     return res;

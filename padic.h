@@ -303,8 +303,11 @@ FLINT_DLL void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 FLINT_DLL void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
-void padic_mul_exact(padic_t rop, const padic_t op1, const padic_t op2, 
+FLINT_DLL void padic_mul_exact(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
+
+FLINT_DLL int padic_div_exact_fmpz(padic_t rop, const padic_t op1, const fmpz_t op2,
+                                   const padic_ctx_t ctx);
 
 FLINT_DLL void padic_shift(padic_t rop, const padic_t op, slong v, const padic_ctx_t ctx);
 
