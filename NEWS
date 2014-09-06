@@ -1100,3 +1100,5 @@ v 2.4.3 -- 01 Apr 2014
 
   * Fix a linker issue on Mac OSX.
 
+v 2.4.4 -- fixed a severe bug in flint's primality code (n_is_prime() affecting n_factor())
+
