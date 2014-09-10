@@ -391,7 +391,8 @@ if [ -z "$FLINT_LIB" ]; then
          FLINT_LIB="libflint.dylib"
          EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB";;
       CYGWIN* | MINGW*)
-         FLINT_LIB="libflint.dll";;
+         FLINT_LIB="libflint.dll"
+         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols";;
       *)
          FLINT_LIB="libflint.so";;
    esac
@@ -560,7 +561,12 @@ done
 #linker params
 
 if [ "$PTHREAD" = "1" ]; then
-   lLIBS2="-lpthread ${lLIBS2}"
+   case "$OS" in
+      CYGWIN* | MINGW*)
+         lLIBS2="-static -lpthread ${lLIBS2}";;
+      *)
+         lLIBS2="-lpthread ${lLIBS2}";;
+   esac
 fi
 
 
