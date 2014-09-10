@@ -315,6 +315,12 @@ if [ -z "$BUILD" ]; then
       else
          OS="MINGW32"
       fi
+   elif [ "$(uname | cut -d_ -f1)" = "MSYS" ]; then
+      if [ "$ABI" = "64" ]; then
+         OS="MINGW64"
+      else
+         OS="MINGW32"
+      fi
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
       if [ "$ARCH" = "x86_64" ]; then
          if [ "$ABI" = "32" ]; then
