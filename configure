@@ -396,13 +396,14 @@ if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
          FLINT_LIB="libflint.dylib"
-         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB";;
+         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
       CYGWIN* | MINGW*)
          FLINT_LIB="libflint.dll"
-         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols"
+         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
          FLINT_DLL=1;;
       *)
-         FLINT_LIB="libflint.so";;
+         FLINT_LIB="libflint.so"
+         EXTRA_SHARED_FLAGS="-Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
    esac
 fi
 
@@ -569,7 +570,7 @@ done
 #linker params
 
 if [ "$PTHREAD" = "1" ]; then
-   lLIBS2="-lpthread ${lLIBS2}";;
+   lLIBS2="-lpthread ${lLIBS2}"
 fi
 
 
