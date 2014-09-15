@@ -42,6 +42,8 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
     pivs = (slong *) flint_malloc(n * sizeof(slong));
     P = _perm_init(m);
 
+    /* use 16 bit primes to ensure it is unlikely we hit a bad one and so that
+       the modular computations are not too long */
     p = 1 << 16;
 
     while (1)
@@ -115,7 +117,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
             continue;
         }
 
-        /* set D to be the nullspace basis vector for E */
+        /* set D to be the nullspace basis matrix for E */
         fmpz_mat_init(D, n, n - rank);
 
         for (j = 0; j < n - rank; j++)
