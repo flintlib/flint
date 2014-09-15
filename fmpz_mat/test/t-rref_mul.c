@@ -96,7 +96,7 @@ main(void)
 
         /* check rref is the same as when computed classically */
 
-        rank2 = fmpz_mat_rref(R2, den2, A);
+        rank2 = fmpz_mat_rref_fflu(R2, den2, A);
         equal = (rank1 == rank2);
 
         if (equal)
