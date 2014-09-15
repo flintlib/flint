@@ -380,6 +380,16 @@ int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
     Returns nonzero if \code{X} is nonsingular or if the right hand side
     is empty, and zero otherwise.
 
+int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A,
+    const fmpz_mat_t B)
+
+    Solves \code{AX = B} for integer matrices \code{A} and \code{B} with
+    \code{A} nonsingular by choosing between \code{fmpz_mat_solve} and
+    \code{fmpz_mat_solve_dixon} and restoring the solution \code{X} from the
+    output of these functions.
+    Returns nonzero if \code{X} is nonsingular or if the right hand side
+    is empty, and zero otherwise.
+
 *******************************************************************************
 
     Inverse
