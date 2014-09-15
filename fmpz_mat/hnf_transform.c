@@ -42,7 +42,7 @@ fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
     {
         for (j = 0; j < n; j++)
             fmpz_set(fmpz_mat_entry(A2, i, j), fmpz_mat_entry(A, i, j));
-        fmpz_set_ui(fmpz_mat_entry(A2, i, n + i), UWORD(1));
+        fmpz_one(fmpz_mat_entry(A2, i, n + i));
     }
 
     fmpz_mat_hnf(H2, A2);
