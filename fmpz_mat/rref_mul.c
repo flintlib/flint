@@ -56,6 +56,18 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 
         nmod_mat_clear(Amod);
 
+        /* stop early if the rank is the number of columns */
+        if (rank == n)
+        {
+            fmpz_mat_one(R);
+            fmpz_one(den);
+
+            flint_free(pivs);
+            _perm_clear(P);
+
+            return rank;
+        }
+
         fmpz_mat_init(B, rank, rank);
         fmpz_mat_init(C, rank, n - rank);
 
@@ -149,7 +161,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_clear(FD);
     }
 
-    /* write the entries of E  into R and zeroes at the bottom */
+    /* write the entries of E into R and zeroes at the bottom */
     for (i = 0; i < rank; i++)
         for (j = 0; j < n; j++)
             fmpz_set(fmpz_mat_entry(R, i, j), fmpz_mat_entry(E, i, j));
