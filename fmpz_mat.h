@@ -168,7 +168,7 @@ FLINT_DLL void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
 FLINT_DLL void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
-void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
+FLINT_DLL void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 FLINT_DLL void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
@@ -220,8 +220,7 @@ FLINT_DLL int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den
 
 /* Modular gaussian elimination *********************************************/
 
-slong
-FLINT_DLL fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
+FLINT_DLL slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
 
 /* Trace ********************************************************************/
 
