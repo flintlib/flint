@@ -96,6 +96,11 @@ void fq_poly_truncate(fq_poly_t poly, slong newlen, const fq_ctx_t ctx)
 
     Truncates the polynomial to length at most~$n$.
 
+void fq_poly_set_trunc(fq_poly_t poly1, fq_poly_t poly2, 
+                                           slong newlen, const fq_ctx_t ctx)
+
+    Sets \code{poly1} to \code{poly2} truncated to length~$n$.
+
 void _fq_poly_reverse(fq_struct* output, const fq_struct* input, slong len,
                       slong m, const fq_ctx_t ctx)
 
@@ -241,10 +246,17 @@ fq_poly_set_coeff_fmpz(fq_poly_t poly, slong n, const fmpz_t x,
 
 *******************************************************************************
 
-int fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2, const fq_ctx_t ctx)
+int fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2, 
+                                                            const fq_ctx_t ctx)
 
-    Returns whether the two polynomials \code{poly1} and \code{poly2}
-    are equal.
+    Returns nonzero if the two polynomials \code{poly1} and \code{poly2}
+    are equal, otherwise returns zero.
+
+int fq_poly_equal_trunc(const fq_poly_t poly1, const fq_poly_t poly2, slong n,
+                                                            const fq_ctx_t ctx)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length $n$ and
+    return nonzero if they are equal, otherwise return zero.
 
 int fq_poly_is_zero(const fq_poly_t poly, const fq_ctx_t ctx)
 
@@ -288,6 +300,12 @@ void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
+void fq_poly_add_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
+                 slong n, const fq_ctx_t ctx)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length \code{n} and set
+    \code{res} to the sum.
+
 void _fq_poly_sub(fq_struct *res,
                   const fq_struct *poly1, slong len1,
                   const fq_struct *poly2, slong len2,
@@ -299,6 +317,12 @@ void fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
                  const fq_ctx_t ctx)
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
+
+void fq_poly_sub_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
+                 slong n, const fq_ctx_t ctx)
+
+    Notionally truncate \code{poly1} and \code{poly2} to length \code{n} and set
+    \code{res} to the difference.
 
 void _fq_poly_neg(fq_struct *rop, const fq_struct *op, slong len,
                   const fq_ctx_t ctx)
@@ -617,7 +641,7 @@ void _fq_poly_sqr_reorder(fq_struct *rop,
 
     Sets \code{(rop, 2*len- 1)} to the square of \code{(op, len)},
     assuming that \code{len} is not zero reordering the two indeterminates
-    $X$ and $Y$ when viewing the polynomials as elements of $\mathbb{F}_p[X,Y]$.
+    $X$ and $Y$ when viewing the polynomials as elements of $\mathbf{F}_p[X,Y]$.
 
     Permits zero padding.  Supports aliasing.
 
@@ -626,7 +650,7 @@ void fq_poly_sqr_reorder(fq_poly_t rop,
 
     Sets \code{rop} to the square of \code{op},
     assuming that \code{len} is not zero reordering the two indeterminates
-    $X$ and $Y$ when viewing the polynomials as elements of $\mathbb{F}_p[X,Y]$.
+    $X$ and $Y$ when viewing the polynomials as elements of $\mathbf{F}_p[X,Y]$.
     See \code{fq_poly_mul_reorder}.
 
 
@@ -1102,6 +1126,38 @@ fq_poly_inv_series_newton(fq_poly_t Qinv, const fq_poly_t Q, slong n,
     be invertible modulo the modulus of \code{Q}. An exception is
     raised if this is not the case or if \code{n = 0}. This function
     can be viewed as inverting a power series via Newton iteration.
+
+void
+_fq_poly_inv_series(fq_struct* Qinv, const fq_struct* Q, slong n,
+                           const fq_ctx_t ctx)
+
+    Given \code{Q} of length \code{n} whose constant coefficient is
+    invertible modulo the given modulus, find a polynomial \code{Qinv}
+    of length \code{n} such that \code{Q * Qinv} is \code{1} modulo
+    $x^n$. Requires \code{n > 0}.
+
+void
+fq_poly_inv_series(fq_poly_t Qinv, const fq_poly_t Q, slong n,
+                          const fq_ctx_t ctx)
+
+    Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is
+    \code{1} modulo $x^n$. The constant coefficient of \code{Q} must
+    be invertible modulo the modulus of \code{Q}. An exception is
+    raised if this is not the case or if \code{n = 0}. 
+
+void _fq_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
+                             const fmpz * B, slong Blen, slong n, fq_ctx_t ctx)
+
+    Set \code{(Q, n)} to the quotient of the series \code{(A, Alen}) and
+    \code{(B, Blen)} assuming \code{Alen, Blen <= n}. We assume the bottom
+    coefficient of \code{B} is invertible.
+
+void fq_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+                                const fmpz_mod_poly_t B, slong n, fq_ctx_t ctx)
+
+    Set $Q$ to the quotient of the series $A$ by $B$, thinking of the series as
+    though they were of length $n$. We assume that the bottom coefficient of
+    $B$ is invertible.
 
 *******************************************************************************
 

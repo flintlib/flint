@@ -150,11 +150,11 @@ _perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 
 /* Randomisation *************************************************************/
 
-int _perm_randtest(slong * vec, slong n, flint_rand_t state);
+FLINT_DLL int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 
 /* Parity ********************************************************************/
 
-int _perm_parity(const slong * vec, slong n);
+FLINT_DLL int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 

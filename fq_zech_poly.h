@@ -27,6 +27,12 @@
 #ifndef FQ_ZECH_POLY_H
 #define FQ_ZECH_POLY_H
 
+#ifdef FQ_POLY_INLINES_C
+#define FQ_POLY_INLINE FLINT_DLL
+#else
+#define FQ_POLY_INLINE static __inline__
+#endif
+
 #include "fq_zech_mat.h"
 
 #define FQ_ZECH_POLY_DIVREM_DIVCONQUER_CUTOFF  16

@@ -89,10 +89,7 @@ main(void)
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, 80);
         fmpz_randtest_not_zero(a->coeffs, state, 80);
         fmpq_poly_canonicalise(a);
-
-        fmpq_poly_fit_length(one, 1);
-        fmpz_set_ui(one->coeffs, 1);
-        one->length = 1;
+        fmpq_poly_one(one);
 
         fmpq_poly_inv_series_newton(b, a, n);
         fmpq_poly_mul(c, a, b);

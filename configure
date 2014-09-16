@@ -26,6 +26,7 @@ BUILD=
 EXTENSIONS=
 EXT_MODS=
 EXTRA_BUILD=
+FLINT_DLL=0
 
 FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
 FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
@@ -314,6 +315,18 @@ if [ -z "$BUILD" ]; then
       else
          OS="MINGW32"
       fi
+   elif [ "$(uname | cut -d_ -f1)" = "MINGW64" ]; then
+      if [ "$ABI" = "64" ]; then
+         OS="MINGW64"
+      else
+         OS="MINGW32"
+      fi
+   elif [ "$(uname | cut -d_ -f1)" = "MSYS" ]; then
+      if [ "$ABI" = "64" ]; then
+         OS="MINGW64"
+      else
+         OS="MINGW32"
+      fi
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
       if [ "$ARCH" = "x86_64" ]; then
          if [ "$ABI" = "32" ]; then
@@ -383,17 +396,20 @@ fi
 
 echo "Configuring...${MACHINE}-${OS}"
 
-#name for FLINT shared library
+#FLINT shared library
 
 if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
          FLINT_LIB="libflint.dylib"
-         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB";;
+         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
       CYGWIN* | MINGW*)
-         FLINT_LIB="libflint.dll";;
+         FLINT_LIB="libflint.dll"
+         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
+         FLINT_DLL=1;;
       *)
-         FLINT_LIB="libflint.so";;
+         FLINT_LIB="libflint.so"
+         EXTRA_SHARED_FLAGS="-Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
    esac
 fi
 
@@ -539,7 +555,7 @@ fi
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
 
-#pocess external modules
+#external modules
 
 EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${EXTENSIONS}"
 
@@ -607,6 +623,15 @@ echo "$CONFIG_PTHREAD" >> config.h
 echo "$CONFIG_GC" >> config.h
 echo "#define FLINT_REENTRANT $REENTRANT" >> config.h
 echo "#define WANT_ASSERT $ASSERT" >> config.h
+if [ "$FLINT_DLL" = "1" ]; then
+   echo "#ifdef FLINT_USE_DLL" >> config.h
+   echo "#define FLINT_DLL __declspec(dllimport)" >> config.h
+   echo "#else" >> config.h
+   echo "#define FLINT_DLL __declspec(dllexport)" >> config.h
+   echo "#endif" >> config.h
+else
+   echo "#define FLINT_DLL" >> config.h
+fi
 
 #write out Makefile
 

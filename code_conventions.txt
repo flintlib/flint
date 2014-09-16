@@ -40,6 +40,27 @@ The typical definitions of these in terms of primitive types are:
     | slong         | long or long long                                    |
     | ulong         | ulong or ulong long                                  |
 
+Constant integers
+-----------------
+
+Because the ulong/slong types can be (unsigned) long on Linux and (unsigned)
+long long on Windows, we cannot use the usual 123456789UL to declare them.
+
+Instead, we provide two macros:
+
+  WORD(123456789) /* slong constant */
+  UWORD(123456789) /* ulong constant */
+
+Format specifiers
+-----------------
+
+Again, because a ulong/slong use different types on Windows and Linux, we cannot
+use the format specifers %lu/%ld in printf. For this purpose we provide the
+flint_printf functions, which is the same as printf, except that it supports:
+
+   flint_printf("%wu", d); /* print ulong */
+   flint_printf("%wd", d); /* print slong */
+
 Use of const
 ------------
 
@@ -73,6 +94,22 @@ the convention module1_get_module2 and module1_set_module2, where module1 is
 notionally the more complex of the two modules. E.g. fmpz_poly_get_nmod_poly.
 The set function should set an object of module1 to the value of an object of
 module2, and the get function should do the opposite.
+
+Function prototypes
+-------------------
+
+All function prototypes in .h files in FLINT require a FLINT_DLL declaration in
+front of them. Please keep the initial part of the prototype all on a single
+line, rather than placing the FLINT_DLL and/or return type on a different
+line, e.g. prototypes should look like this:
+
+FLINT_DLL void myfunc(blah, ....
+      ...., blah, blah)
+
+Note that dll import/export is handled differently for inlines. Please don't
+add FLINT_DLL to inline functions. Rather, add a single FLINT_DLL to the
+non-inline branch inside the relevant BLAH_INLINES_C #define at the top of the
+.h file.
 
 Code formatting
 ---------------

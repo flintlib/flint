@@ -217,33 +217,33 @@ static const mp_limb_t qsieve_ll_tune[][5] =
 
 #define BITS_ADJUST 10 /* no. bits less than f(X) to qualify for trial division */
 
-void qsieve_ll_init(qs_t qs_inf, mp_limb_t hi, mp_limb_t lo);
+FLINT_DLL void qsieve_ll_init(qs_t qs_inf, mp_limb_t hi, mp_limb_t lo);
 
-void qsieve_ll_clear(qs_t qs_inf);
+FLINT_DLL void qsieve_ll_clear(qs_t qs_inf);
 
-mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf);
+FLINT_DLL mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf);
 
-mp_limb_t qsieve_ll_primes_init(qs_t qs_inf);
+FLINT_DLL mp_limb_t qsieve_ll_primes_init(qs_t qs_inf);
 
-mp_limb_t qsieve_ll_poly_init(qs_t qs_inf);
+FLINT_DLL mp_limb_t qsieve_ll_poly_init(qs_t qs_inf);
 
-void qsieve_ll_linalg_init(qs_t qs_inf);
+FLINT_DLL void qsieve_ll_linalg_init(qs_t qs_inf);
 
-void qsieve_ll_compute_poly_data(qs_t qs_inf);
+FLINT_DLL void qsieve_ll_compute_poly_data(qs_t qs_inf);
 
-void qsieve_ll_compute_A_factor_offsets(qs_t qs_inf);
+FLINT_DLL void qsieve_ll_compute_A_factor_offsets(qs_t qs_inf);
 
-void qsieve_ll_compute_C(qs_t qs_inf);
+FLINT_DLL void qsieve_ll_compute_C(qs_t qs_inf);
 
-slong qsieve_ll_collect_relations(qs_t qs_inf, char * sieve);
+FLINT_DLL slong qsieve_ll_collect_relations(qs_t qs_inf, char * sieve);
 
-slong qsieve_ll_merge_sort(qs_t qs_inf);
+FLINT_DLL slong qsieve_ll_merge_sort(qs_t qs_inf);
       
-slong qsieve_ll_merge_relations(qs_t qs_inf);
+FLINT_DLL slong qsieve_ll_merge_relations(qs_t qs_inf);
 
-slong qsieve_ll_insert_relation(qs_t qs_inf, fmpz_t Y);
+FLINT_DLL slong qsieve_ll_insert_relation(qs_t qs_inf, fmpz_t Y);
 
-mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo);
+FLINT_DLL mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo);
 
 static __inline__ void insert_col_entry(la_col_t * col, slong entry)
 {
@@ -292,14 +292,14 @@ static __inline__ void free_col(la_col_t * col)
    if (col->weight) flint_free(col->data);
 }
 
-uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
+FLINT_DLL uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
 
-void reduce_matrix(qs_t qs_inf, slong * nrows, slong * ncols, la_col_t * cols);
+FLINT_DLL void reduce_matrix(qs_t qs_inf, slong * nrows, slong * ncols, la_col_t * cols);
 
 uint64_t * block_lanczos(flint_rand_t state, slong nrows, slong dense_rows, 
                                                        slong ncols, la_col_t *B);
 
-void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
+FLINT_DLL void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
                              uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
 
 #ifdef __cplusplus

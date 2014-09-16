@@ -23,8 +23,8 @@ accurate. I updated it slightly to reflect what was actually done.
 \paragraph{Overview}
 In first approximation, FLINT implements arithmetic operations on and
 representations of elements of specific rings, \emph{with unlimited
-precision}. The implemented rings include $\mathbb{Z}, \mathbb{Q},
-\mathbb{Z}[X], \mathbb{Z}[X_{ij}], \mathbb{F}_q[X], \mathbb{Z}/n\mathbb{Z}$
+precision}. The implemented rings include $\mathbf{Z}, \mathbf{Q},
+\mathbf{Z}[X], \mathbf{Z}[X_{ij}], \mathbf{F}_q[X], \mathbf{Z}/n\mathbf{Z}$
 and similar ones. FLINT is written in C, so arithmetic operations look like
 \texttt{fmpz\_add(target, source1, source2)}. In crude terms, this note
 describes how to write a C++ wrapper, allowing us to turn the above
@@ -257,23 +257,23 @@ Corresponding to any ring (or sometimes module),
 there will be two classes: the \emph{context}
 representing the ring itself, and the \emph{element} representing elements
 of the ring. Contexts are immutable, but elements are usually not. Often
-the context will be essentially empty (e.g. for $\mathbb{Z}$), but
+the context will be essentially empty (e.g. for $\mathbf{Z}$), but
 sometimes it may hold data common to all elements, e.g. the modulus $n$ of
-$\mathbb{Z}/n\mathbb{Z}.$ Every element instance holds a reference to a
+$\mathbf{Z}/n\mathbf{Z}.$ Every element instance holds a reference to a
 context. In general arithmetic operations are only supported if the
 contexts agree, but this is not usually checked.
 
 We also differentiate between \emph{primitive
 types}, \emph{compound types} and \emph{specialised types}. The primitive
-types such as $\mathbb{Z}, \mathbb{Q}_p$
+types such as $\mathbf{Z}, \mathbf{Q}_p$
 are the building blocks and are atomic from the point of view of this
 wrapper. Compound types such as $A[T]$ (for any ring $A$) or $Frac(A)$ (for
 domains $A$) are built from primitive and compound types. They have
 implementations of arithmetic operations in terms of operations in $A,$ and
 so are generic. Finally the specialised types are versions of compound
 types with particular arithmetic implementations tailored to the particular
-type, e.g. $\mathbb{Z}[T]$ (where multiplication can be implemented using
-polynomial reconstruction and multiplication in $\mathbb{Z}$).
+type, e.g. $\mathbf{Z}[T]$ (where multiplication can be implemented using
+polynomial reconstruction and multiplication in $\mathbf{Z}$).
 
 For the initial implementation, the generic types will not come with
 arithmetic implementations. Instead I will focus on wrapping all the
@@ -288,9 +288,9 @@ types of the FLINT wrapper.
 \begin{tabular}{cc}
 FLINT name & representing \\
 \hline
-fmpz & $\mathbb{Z}$ \\
-padic & $\mathbb{Q}_p$ (to fixed accuracy) \\
-ulong & $\mathbb{Z}/2^{s}\mathbb{Z}$ (where $s$ is the machine wordsize) \\
+fmpz & $\mathbf{Z}$ \\
+padic & $\mathbf{Q}_p$ (to fixed accuracy) \\
+ulong & $\mathbf{Z}/2^{s}\mathbf{Z}$ (where $s$ is the machine wordsize) \\
 \end{tabular}
 \end{center}
 \caption{Primitive types for the FLINT wrapper.}

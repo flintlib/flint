@@ -62,7 +62,12 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     {
         dist_deg_num = dist_deg->num;
 
-        nmod_poly_factor_distinct_deg(dist_deg, sq_free->p + i, &degs);
+        if ((flint_get_num_threads() > 1) &&
+            ((sq_free->p + i)->length > (1024*flint_get_num_threads())/4))
+            nmod_poly_factor_distinct_deg_threaded(dist_deg, sq_free->p + i,
+                                                   &degs);
+        else
+            nmod_poly_factor_distinct_deg(dist_deg, sq_free->p + i, &degs);
 
         /* compute equal-degree factorisation */
         for (j = dist_deg_num, l = 0; j < dist_deg->num; j++, l++)

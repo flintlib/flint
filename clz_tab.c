@@ -24,12 +24,12 @@ Inc.
    N.B: This file has been adapted from code found in GMP 4.2.1.
 */
 
+#include "flint.h"
 #include "longlong.h"
 
 #ifdef NEED_CLZ_TAB
 
-const
-unsigned char __flint_clz_tab[128] =
+const unsigned char __flint_clz_tab[128] =
 {
   1,2,3,3,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,

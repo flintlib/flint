@@ -33,7 +33,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-#if !defined (__WIN32) || defined(__CYGWIN__)
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 
 /*
     The function fdopen is declared in stdio.h.  It is POSIX.1 compliant, 

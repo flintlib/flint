@@ -30,10 +30,16 @@
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <time.h>
+#if defined( _MSC_VER )
+#include <intrin.h>
+#include "gettimeofday.h"
+#pragma intrinsic( __rdtsc )
+#else
 #include <sys/time.h>
+#endif
 #if defined (__WIN32) && !defined(__CYGWIN__)
 #ifdef __cplusplus
-void  GetSystemTimeAsFileTime(FILETIME*);
+FLINT_DLL void  GetSystemTimeAsFileTime(FILETIME*);
 
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
@@ -49,9 +55,9 @@ static __inline__ int gettimeofday(struct timeval * p, void * tz)
     return 0;
 }
 #else
-int gettimeofday(struct timeval * p, void * tz);
+FLINT_DLL int gettimeofday(struct timeval * p, void * tz);
 #endif
-#else
+#elif !defined(_MSC_VER)
 #include <sys/resource.h>
 #endif
 #undef ulong
@@ -69,7 +75,7 @@ typedef struct
     ulong rss;
 } meminfo_t[1];
 
-void get_memory_usage(meminfo_t meminfo);
+FLINT_DLL void get_memory_usage(meminfo_t meminfo);
 
 typedef struct
 {
@@ -111,7 +117,10 @@ extern double clock_accum[FLINT_NUM_CLOCKS];
 static __inline__ 
 double get_cycle_counter()
 {
-   unsigned int hi;
+#if defined( _MSC_VER )
+    return (double)__rdtsc();
+#else
+    unsigned int hi;
    unsigned int lo;
 
    __asm("rdtsc; movl %%edx,%0; movl %%eax,%1" 
@@ -120,6 +129,7 @@ double get_cycle_counter()
        : "%edx", "%eax");
 
    return (double) hi * (1 << 30) * 4 + lo;
+#endif
 }
 
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
@@ -177,7 +187,7 @@ void prof_stop()
 
 typedef void (*profile_target_t)(void* arg, ulong count);
 
-void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
+FLINT_DLL void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 
 #define DURATION_THRESHOLD 5000.0
 

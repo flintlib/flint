@@ -40,11 +40,12 @@
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {
 
-    nmod_poly_t f, v, vinv, reducedH0, tmp;
+    nmod_poly_t f, v, vinv, tmp;
     nmod_poly_t *h, *H, *I;
+    nmod_mat_t HH;
     slong i, j, l, m, n, d;
     double beta;
-    int result= 1;
+    int result = 1;
     n = nmod_poly_degree(poly);
 
     if (n < 2)
@@ -61,7 +62,6 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     nmod_poly_init_preinv(f, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(v, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(vinv, poly->mod.n, poly->mod.ninv);
-    nmod_poly_init_preinv(reducedH0, poly->mod.n, poly->mod.ninv);
     nmod_poly_init_preinv(tmp, poly->mod.n, poly->mod.ninv);
 
     if (!(h = flint_malloc((2 * m + l + 1) * sizeof(nmod_poly_struct))))
@@ -72,8 +72,8 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     }
     H = h + (l + 1);
     I = H + m;
-    for (i = 0; i < l + 1; i++)
-        nmod_poly_init_preinv(h[i], poly->mod.n, poly->mod.ninv);
+    nmod_poly_init_preinv(h[0], poly->mod.n, poly->mod.ninv);
+    nmod_poly_init_preinv(h[1], poly->mod.n, poly->mod.ninv);
     for (i = 0; i < m; i++)
     {
         nmod_poly_init_preinv(H[i], poly->mod.n, poly->mod.ninv);
@@ -86,22 +86,42 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     nmod_poly_inv_series(vinv, vinv, v->length);
     /* compute baby steps: h[i]=x^{p^i}mod v */
     nmod_poly_set_coeff_ui(h[0], 1, 1);
-    for (i = 1; i < l + 1; i++)
-        nmod_poly_powmod_ui_binexp_preinv(h[i], h[i - 1], poly->mod.n, v, vinv); /* may be for large l use compose_mod instead */
+    nmod_poly_powmod_x_ui_preinv(h[1], poly->mod.n, v, vinv);
+    if (FLINT_BIT_COUNT(poly->mod.n) > ((n_sqrt(v->length - 1) + 1) * 3) / 4)
+    {
+        for (i= 1; i < FLINT_BIT_COUNT (l); i++)
+            nmod_poly_compose_mod_brent_kung_vec_preinv(*(h + 1 +
+                                                        (1 << (i - 1))),
+                                                        *(h + 1),
+                                                        (1 << (i - 1)),
+                                                        (1 << (i - 1)), v,
+                                                        vinv);
+        nmod_poly_compose_mod_brent_kung_vec_preinv(*(h + 1 + (1 << (i - 1))),
+                                                    *(h + 1), (1 << (i - 1)),
+                                                    l - (1 << (i - 1)), v,
+                                                    vinv);
+    }
+    else
+    {
+        for (i = 2; i < l + 1; i++)
+        {
+            nmod_poly_init_preinv(h[i], poly->mod.n, poly->mod.ninv);
+            nmod_poly_powmod_ui_binexp_preinv(h[i], h[i - 1], poly->mod.n,
+                                              v, vinv);
+        }
+    }
 
     /* compute coarse distinct-degree factorisation */
     nmod_poly_set(H[0], h[l]);
-    nmod_poly_set(reducedH0, H[0]);
-    d= 1;
+    nmod_mat_init(HH, n_sqrt(v->length - 1) + 1, v->length - 1, poly->mod.n);
+    nmod_poly_precompute_matrix(HH, H[0], v, vinv);
+    d = 1;
     for (j = 0; j < m; j++)
     {
         /* compute giant steps: H[j]=x^{p^(lj)}mod s */
         if (j > 0)
-        {
-            nmod_poly_rem (reducedH0, reducedH0, v);
-            nmod_poly_rem (tmp, H[j - 1], v);
-            nmod_poly_compose_mod_brent_kung_preinv(H[j], tmp, reducedH0, v, vinv);
-        }
+            nmod_poly_compose_mod_brent_kung_precomp_preinv(H[j], H[j - 1], HH,
+                                                            v, vinv);
         /* compute interval polynomials */
         nmod_poly_set_coeff_ui(I[j], 0, 1);
         for (i = l - 1; (i >= 0) && (2 * d <= v->length - 1); i--, d++)
@@ -122,10 +142,11 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
     }
 
     nmod_poly_clear(f);
-    nmod_poly_clear(reducedH0);
     nmod_poly_clear(v);
     nmod_poly_clear(vinv);
     nmod_poly_clear(tmp);
+
+    nmod_mat_clear (HH);
 
     for (i = 0; i < l + 1; i++)
         nmod_poly_clear(h[i]);

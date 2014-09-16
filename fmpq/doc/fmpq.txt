@@ -200,7 +200,7 @@ char * fmpq_get_str(char * str, int b, const fmpq_t x)
 
 void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f)
 
-    Sets the unitialised \code{mpq_t} $z$ to the value of the 
+    Sets the uninitialised \code{mpq_t} $z$ to the value of the 
     readonly \code{fmpq_t} $f$.
 
     Note that it is assumed that $f$ does not change during 
@@ -365,6 +365,33 @@ void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     Aliasing between any combination of the variables is allowed,
     whilst no numerator is aliased with a denominator.
 
+void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                                       const fmpz_t q, slong r)
+
+void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                                       const fmpz_t q, slong r)
+    
+void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                                const fmpz_t q, const fmpz_t r)
+
+void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+                                                const fmpz_t q, const fmpz_t r)
+
+    Sets \code{(rnum, rden)} to the canonical form of the sum or difference
+    respectively of the fractions represented by \code{(p, q)} and
+    \code{(r, 1)}. Numerators may not be aliased with denominators.
+
+void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c)
+
+void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
+
+void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+
+void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
+
+   Sets \code{res} to the sum or difference respectively, of the fraction 
+   \code{op1} and the integer $c$.
+
 void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
 void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
@@ -416,6 +443,21 @@ void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
 void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
 
     Sets \code{res} to \code{x} divided by \code{2^exp}.
+
+_fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
+                                                const fmpz_t r, const fmpz_t s)
+
+    Set \code{(rnum, rden)} to the gcd of \code{(p, q}} and \code{(r, s)}
+    which we define to be the canonicalisation of gcd$(ps, qr)/(qs)$. (This is
+    apparently Euclid's original definition and is stable under scaling of
+    numerator and denominator. It also agrees with the gcd on the integers.
+    Note that it does not agree with gcd as defined in \code{fmpq_poly}.)
+    This definition agrees with the result as output by Sage and Pari/GP.
+
+fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+
+    Set \code{res} to the gcd of \code{op1} and \code{op2}. See the low
+    level function \code{_fmpq_gcd} for our definition of gcd.
 
 *******************************************************************************
 
@@ -621,8 +663,8 @@ void fmpq_harmonic_ui(fmpq_t x, ulong n)
 
         $$((x))=\begin{cases}
             x-\lfloor x\rfloor-1/2 &\mbox{if }
-                x\in\mathbb{Q}\setminus\mathbb{Z}\\
-            0 &\mbox{if }x\in\mathbb{Z}.
+                x\in\mathbf{Q}\setminus\mathbf{Z}\\
+            0 &\mbox{if }x\in\mathbf{Z}.
             \end{cases}$$
 
     If $0 < h < k$ and $(h,k) = 1$, this reduces to

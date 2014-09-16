@@ -65,17 +65,17 @@ typedef padic_mat_struct padic_mat_t[1];
 
 /* Memory management  ********************************************************/
 
-void padic_mat_init(padic_mat_t A, slong r, slong c);
+FLINT_DLL void padic_mat_init(padic_mat_t A, slong r, slong c);
 
-void padic_mat_init2(padic_mat_t A, slong r, slong c, slong prec);
+FLINT_DLL void padic_mat_init2(padic_mat_t A, slong r, slong c, slong prec);
 
-void padic_mat_clear(padic_mat_t A);
+FLINT_DLL void padic_mat_clear(padic_mat_t A);
 
-void _padic_mat_canonicalise(padic_mat_t A, const padic_ctx_t ctx);
+FLINT_DLL void _padic_mat_canonicalise(padic_mat_t A, const padic_ctx_t ctx);
 
-void _padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
+FLINT_DLL void _padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
 
-void padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
+FLINT_DLL void padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
 
 static __inline__ int
 padic_mat_is_empty(const padic_mat_t A)
@@ -154,43 +154,43 @@ padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
 
 /* Basic assignment **********************************************************/
 
-void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
+FLINT_DLL void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
 
-void padic_mat_swap(padic_mat_t A, padic_mat_t B);
+FLINT_DLL void padic_mat_swap(padic_mat_t A, padic_mat_t B);
 
-void padic_mat_zero(padic_mat_t A);
+FLINT_DLL void padic_mat_zero(padic_mat_t A);
 
-void padic_mat_one(padic_mat_t A);
+FLINT_DLL void padic_mat_one(padic_mat_t A);
 
 /* Conversions ***************************************************************/
 
-void padic_mat_set_fmpq_mat(padic_mat_t B, 
+FLINT_DLL void padic_mat_set_fmpq_mat(padic_mat_t B, 
                             const fmpq_mat_t A, const padic_ctx_t ctx);
 
-void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
+FLINT_DLL void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
                             const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Entries *******************************************************************/
 
-void padic_mat_get_entry_padic(padic_t rop, 
+FLINT_DLL void padic_mat_get_entry_padic(padic_t rop, 
                                const padic_mat_t op, slong i, slong j, 
                                const padic_ctx_t ctx);
 
-void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
+FLINT_DLL void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
                                const padic_t op, const padic_ctx_t ctx);
 
 /* Comparison ****************************************************************/
 
-int padic_mat_equal(const padic_mat_t A, const padic_mat_t B);
+FLINT_DLL int padic_mat_equal(const padic_mat_t A, const padic_mat_t B);
 
-int padic_mat_is_zero(const padic_mat_t A);
+FLINT_DLL int padic_mat_is_zero(const padic_mat_t A);
 
 /* Input and output  *********************************************************/
 
-int padic_mat_fprint(FILE * file, 
+FLINT_DLL int padic_mat_fprint(FILE * file, 
                      const padic_mat_t A, const padic_ctx_t ctx);
 
-int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, 
+FLINT_DLL int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, 
                                          const padic_ctx_t ctx);
 
 static __inline__
@@ -207,51 +207,51 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 
 /* Random matrix generation  *************************************************/
 
-void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, 
+FLINT_DLL void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, 
                         const padic_ctx_t ctx);
 
 /* Transpose *****************************************************************/
 
-void padic_mat_transpose(padic_mat_t B, const padic_mat_t A);
+FLINT_DLL void padic_mat_transpose(padic_mat_t B, const padic_mat_t A);
 
 /* Addition and subtraction **************************************************/
 
-void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+FLINT_DLL void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                    const padic_ctx_t ctx);
-void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+FLINT_DLL void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx);
 
-void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+FLINT_DLL void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                    const padic_ctx_t ctx);
-void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+FLINT_DLL void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx);
 
-void _padic_mat_neg(padic_mat_t B, const padic_mat_t A);
-void padic_mat_neg(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
+FLINT_DLL void _padic_mat_neg(padic_mat_t B, const padic_mat_t A);
+FLINT_DLL void padic_mat_neg(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Scalar operations *********************************************************/
 
-void _padic_mat_scalar_mul_padic(padic_mat_t B, 
+FLINT_DLL void _padic_mat_scalar_mul_padic(padic_mat_t B, 
                                  const padic_mat_t A, const padic_t c, 
                                  const padic_ctx_t ctx);
-void padic_mat_scalar_mul_padic(padic_mat_t B, 
+FLINT_DLL void padic_mat_scalar_mul_padic(padic_mat_t B, 
                                 const padic_mat_t A, const padic_t c, 
                                 const padic_ctx_t ctx);
 
-void _padic_mat_scalar_mul_fmpz(padic_mat_t B, 
+FLINT_DLL void _padic_mat_scalar_mul_fmpz(padic_mat_t B, 
                                 const padic_mat_t A, const fmpz_t c, 
                                 const padic_ctx_t ctx);
-void padic_mat_scalar_mul_fmpz(padic_mat_t B, 
+FLINT_DLL void padic_mat_scalar_mul_fmpz(padic_mat_t B, 
                                const padic_mat_t A, const fmpz_t c, 
                                const padic_ctx_t ctx);
 
-void padic_mat_scalar_div_fmpz(padic_mat_t B, 
+FLINT_DLL void padic_mat_scalar_div_fmpz(padic_mat_t B, 
                                const padic_mat_t A, const fmpz_t c, 
                                const padic_ctx_t ctx);
 
 /* Multiplication ************************************************************/
 
-void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+FLINT_DLL void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx);
 
 #ifdef __cplusplus
