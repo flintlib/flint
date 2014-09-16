@@ -282,9 +282,9 @@ FLINT_DLL int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
 FLINT_DLL slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
 
-slong fmpz_mat_nullspace_multimodular(fmpz_mat_t res, const fmpz_mat_t mat);
+FLINT_DLL slong fmpz_mat_nullspace_multimodular(fmpz_mat_t res, const fmpz_mat_t mat);
 
-slong fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat);
+FLINT_DLL slong fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat);
 
 /* Inverse ******************************************************************/
 
@@ -316,21 +316,21 @@ FLINT_DLL void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues
 
 /* HNF and SNF **************************************************************/
 
-void fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A);
-void fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A);
-void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
-void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
-void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
-void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
-void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A);
-int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
+FLINT_DLL void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A);
+FLINT_DLL int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
 
-void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);
-void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A);
-void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A);
-void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A,
+FLINT_DLL void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A);
+FLINT_DLL void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A,
         const fmpz_t mod);
-int fmpz_mat_is_in_snf(const fmpz_mat_t A);
+FLINT_DLL int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
 #ifdef __cplusplus
 }
