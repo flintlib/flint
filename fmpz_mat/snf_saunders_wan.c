@@ -32,23 +32,21 @@ static int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
     int success;
     slong i, j, n;
     flint_rand_t state;
-    fmpz_t M, tmp, t1, t2, u;
-    fmpz_mat_t b, x, x1x2;
-    fmpq_mat_t x_q;
+    fmpz_t M, t1, t2, u;
+    fmpz_mat_t b, x1x2;
+    fmpq_mat_t x;
 
     n = A->r;
 
     flint_randinit(state);
     fmpz_init(M);
     fmpz_init(u);
-    fmpz_init(tmp);
     fmpz_init(t1);
     fmpz_init(t2);
     fmpz_mat_init(b, n, 1);
-    fmpz_mat_init(x, n, 1);
     if (bonus)
         fmpz_mat_init(x1x2, n, 2);
-    fmpq_mat_init(x_q, n, 1);
+    fmpq_mat_init(x, n, 1);
 
     success = 1;
 
@@ -71,63 +69,37 @@ static int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
         for (j = 0; j < n; j++)
             fmpz_randm(fmpz_mat_entry(b, j, 0), state, M);
         /* solve Ax = b */
-        if (n < 25) /* small matrices use solve */
+        if (!fmpq_mat_solve_fmpz_mat(x, A, b))
         {
-            if (!fmpz_mat_solve(x, tmp, A, b))
-            {
-                success = 0;
-                break;
-            }
-            fmpq_mat_set_fmpz_mat_div_fmpz(x_q, x, tmp);
-        }
-        else /* larger matrices use dixon */
-        {
-            if (!fmpz_mat_solve_dixon(x, tmp, A, b))
-            {
-                success = 0;
-                break;
-            }
-            fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, tmp);
+            success = 0;
+            break;
         }
 
         fmpz_one(t1);
         for (j = 0; j < n; j++)
-            fmpz_lcm(t1, t1, fmpq_mat_entry_den(x_q, j, 0));
+            fmpz_lcm(t1, t1, fmpq_mat_entry_den(x, j, 0));
 
         for (j = 0; bonus && j < n; j++)
         {
             fmpz_mul(fmpz_mat_entry(x1x2, j, 0),
-                    fmpq_mat_entry_num(x_q, j, 0), t1);
+                    fmpq_mat_entry_num(x, j, 0), t1);
             fmpz_divexact(fmpz_mat_entry(x1x2, j, 0),
-                    fmpz_mat_entry(x1x2, j, 0), fmpq_mat_entry_den(x_q, j, 0));
+                    fmpz_mat_entry(x1x2, j, 0), fmpq_mat_entry_den(x, j, 0));
         }
 
         /* set b to be random with entries in 0,..., M-1 */
         for (j = 0; j < n; j++)
             fmpz_randm(fmpz_mat_entry(b, j, 0), state, M);
         /* solve Ax = b */
-        if (n < 25) /* small matrices use solve */
+        if (!fmpq_mat_solve_fmpz_mat(x, A, b))
         {
-            if (!fmpz_mat_solve(x, tmp, A, b))
-            {
-                success = 0;
-                break;
-            }
-            fmpq_mat_set_fmpz_mat_div_fmpz(x_q, x, tmp);
-        }
-        else /* larger matrices use dixon */
-        {
-            if (!fmpz_mat_solve_dixon(x, tmp, A, b))
-            {
-                success = 0;
-                break;
-            }
-            fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, tmp);
+            success = 0;
+            break;
         }
 
         fmpz_one(t2);
         for (j = 0; j < n; j++)
-            fmpz_lcm(t2, t2, fmpq_mat_entry_den(x_q, j, 0));
+            fmpz_lcm(t2, t2, fmpq_mat_entry_den(x, j, 0));
         flint_printf("t1t2:\n");
         fmpz_print(t1); flint_printf("\n");
         fmpz_print(t2); flint_printf("\nu:");
@@ -136,10 +108,10 @@ static int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
             for (j = 0; j < n; j++)
             {
                 fmpz_mul(fmpz_mat_entry(x1x2, j, 1),
-                        fmpq_mat_entry_num(x_q, j, 0), t2);
+                        fmpq_mat_entry_num(x, j, 0), t2);
                 fmpz_divexact(fmpz_mat_entry(x1x2, j, 1),
                         fmpz_mat_entry(x1x2, j, 1),
-                        fmpq_mat_entry_den(x_q, j, 0));
+                        fmpq_mat_entry_den(x, j, 0));
             }
             fmpz_mat_print_pretty(x1x2);
 
@@ -171,14 +143,12 @@ static int _largest_invariant_factors(fmpz_t s1, fmpz_t s2, const fmpz_mat_t A,
     flint_randclear(state);
     fmpz_clear(M);
     fmpz_clear(u);
-    fmpz_clear(tmp);
     fmpz_clear(t1);
     fmpz_clear(t2);
     fmpz_mat_clear(b);
-    fmpz_mat_clear(x);
     if (bonus)
         fmpz_mat_clear(x1x2);
-    fmpq_mat_clear(x_q);
+    fmpq_mat_clear(x);
 
     return success;
 }
