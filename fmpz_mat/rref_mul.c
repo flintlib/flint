@@ -104,6 +104,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
                 abort();
             }
             fmpq_mat_init(E2_q, rank, n - rank);
+            /* TODO can be changed to one step */
             fmpq_mat_set_fmpz_mat_mod_fmpz(E2_q, E2, den);
             fmpq_mat_get_fmpz_mat_matwise(E2, den, E2_q);
             fmpq_mat_clear(E2_q);
@@ -152,7 +153,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_clear(F);
         fmpz_mat_clear(D);
 
-        /* if FD = 0 we have computed the right so stop, otherwise try a
+        /* if FD = 0 we have computed the rref right so stop, otherwise try a
            different p in the next iteration */
         if (fmpz_mat_is_zero(FD))
             break;
