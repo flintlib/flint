@@ -34,8 +34,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     slong i, j, n, bits;
     fmpz_t den, tmp, one;
     fmpq_t num, alpha;
-    fmpz_mat_t Bu, B1, cols, x, k;
-    fmpq_mat_t H1_q, cols_q, x_q;
+    fmpz_mat_t Bu, B1, cols, k;
+    fmpq_mat_t H1_q, cols_q, x;
     flint_rand_t state;
 
     n = B->r;
@@ -43,9 +43,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     fmpz_mat_init(Bu, n, n);
     fmpz_mat_init(B1, n - 1, n);
     fmpz_mat_init(cols, n, B->c - n);
-    fmpz_mat_init(x, n, B->c - n);
     fmpz_mat_init(k, n, 1);
-    fmpq_mat_init(x_q, n, B->c - n);
+    fmpq_mat_init(x, n, B->c - n);
     fmpq_mat_init(cols_q, n, B->c - n);
     fmpq_mat_init(H1_q, n, n);
 
@@ -89,29 +88,15 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
                         fmpz_mat_entry(k, j, 0));
     }
     flint_randclear(state);
+    fmpz_clear(tmp);
 
     /* solve Bu*x = cols */
-    if (n < 25)                 /* small matrices use solve */
+    if (!fmpq_mat_solve_fmpz_mat(x, Bu, cols))
     {
-        if (!fmpz_mat_solve(x, tmp, Bu, cols))
-        {
-            flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
-                         "Singular input matrix for solve.");
-            abort();
-        }
-        fmpq_mat_set_fmpz_mat_div_fmpz(x_q, x, tmp);
+        flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
+                "Singular input matrix for solve.");
+        abort();
     }
-    else                        /* larger matrices use dixon */
-    {
-        if (!fmpz_mat_solve_dixon(x, tmp, Bu, cols))
-        {
-            flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
-                         "Singular input matrix for solve.");
-            abort();
-        }
-        fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, tmp);
-    }
-    fmpz_clear(tmp);
 
     /* fix final row */
     fmpq_init(num);
@@ -134,8 +119,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
         {
             _fmpq_addmul(fmpq_numref(num), fmpq_denref(num),
                          fmpz_mat_entry(B, n - 1, i), one,
-                         fmpq_mat_entry_num(x_q, i, j),
-                         fmpq_mat_entry_den(x_q, i, j));
+                         fmpq_mat_entry_num(x, i, j),
+                         fmpq_mat_entry_den(x, i, j));
         }
         _fmpq_sub(fmpq_numref(alpha), fmpq_denref(alpha),
                   fmpz_mat_entry(B, n - 1, n + j), one,
@@ -149,8 +134,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
         /* x_i += alpha*k */
         for (i = 0; i < n; i++)
         {
-            _fmpq_addmul(fmpq_mat_entry_num(x_q, i, j),
-                         fmpq_mat_entry_den(x_q, i, j), fmpq_numref(alpha),
+            _fmpq_addmul(fmpq_mat_entry_num(x, i, j),
+                         fmpq_mat_entry_den(x, i, j), fmpq_numref(alpha),
                          fmpq_denref(alpha), fmpz_mat_entry(k, i, 0), one);
         }
     }
@@ -162,7 +147,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
 
     /* set cols = H1*x and place in position in H */
     fmpq_mat_set_fmpz_mat(H1_q, H1);
-    fmpq_mat_mul(cols_q, H1_q, x_q);
+    fmpq_mat_mul(cols_q, H1_q, x);
     fmpq_mat_get_fmpz_mat(cols, cols_q);
     for (i = 0; i < n; i++)
     {
@@ -173,9 +158,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1)
     }
 
     fmpq_mat_clear(H1_q);
-    fmpq_mat_clear(x_q);
+    fmpq_mat_clear(x);
     fmpq_mat_clear(cols_q);
-    fmpz_mat_clear(x);
     fmpz_mat_clear(k);
     fmpz_mat_clear(cols);
     fmpz_mat_clear(Bu);
@@ -298,18 +282,17 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
     slong i, j, n;
     slong *P;
     mp_limb_t p, u1mod, u2mod, v1mod, v2mod;
-    fmpz_t bound, tmp, prod, s1, s2, t, u1, u2, v1, v2;
-    fmpz_mat_t dt, Bt, x;
+    fmpz_t bound, prod, s1, s2, t, u1, u2, v1, v2;
+    fmpz_mat_t dt, Bt;
     fmpq_t tmpq;
-    fmpq_mat_t x_q;
+    fmpq_mat_t x;
     nmod_mat_t Btmod;
 
     n = B->c;
 
     fmpz_mat_init(dt, n, 1);
     fmpz_mat_init(Bt, n, n);
-    fmpz_mat_init(x, n, 1);
-    fmpq_mat_init(x_q, n, 1);
+    fmpq_mat_init(x, n, 1);
 
     for (i = 0; i < n; i++)
     {
@@ -320,20 +303,9 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
 
     /* solve B^Tx = d^T */
     fmpz_mat_transpose(dt, d);
-    fmpz_init(tmp);
-    if (n < 25)                 /* small matrices use solve */
-    {
-        if (fmpz_mat_solve(x, tmp, Bt, dt))
-            fmpq_mat_set_fmpz_mat_div_fmpz(x_q, x, tmp);
-    }
-    else                        /* larger matrices use dixon */
-    {
-        if (fmpz_mat_solve_dixon(x, tmp, Bt, dt))
-            fmpq_mat_set_fmpz_mat_mod_fmpz(x_q, x, tmp);
-    }
-    fmpz_clear(tmp);
+    fmpq_mat_solve_fmpz_mat(x, Bt, dt);
 
-    if (!fmpq_is_zero(fmpq_mat_entry(x_q, n - 1, 0)))
+    if (!fmpq_is_zero(fmpq_mat_entry(x, n - 1, 0)))
     {
         fmpz_init(bound);
         fmpz_init(prod);
@@ -351,13 +323,13 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
         fmpz_one(u2);
         for (i = 0; i < n - 1; i++)
         {
-            fmpz_lcm(u1, u1, fmpq_mat_entry_den(x_q, i, 0));
-            fmpq_div(tmpq, fmpq_mat_entry(x_q, i, 0),
-                     fmpq_mat_entry(x_q, n - 1, 0));
+            fmpz_lcm(u1, u1, fmpq_mat_entry_den(x, i, 0));
+            fmpq_div(tmpq, fmpq_mat_entry(x, i, 0),
+                     fmpq_mat_entry(x, n - 1, 0));
             fmpz_lcm(u2, u2, fmpq_denref(tmpq));
         }
-        fmpz_lcm(u1, u1, fmpq_mat_entry_den(x_q, n - 1, 0));
-        fmpq_inv(tmpq, fmpq_mat_entry(x_q, n - 1, 0));
+        fmpz_lcm(u1, u1, fmpq_mat_entry_den(x, n - 1, 0));
+        fmpq_inv(tmpq, fmpq_mat_entry(x, n - 1, 0));
         fmpz_lcm(u2, u2, fmpq_denref(tmpq));
         fmpq_clear(tmpq);
 
@@ -476,8 +448,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
 
     fmpz_mat_clear(dt);
     fmpz_mat_clear(Bt);
-    fmpz_mat_clear(x);
-    fmpq_mat_clear(x_q);
+    fmpq_mat_clear(x);
 }
 
 void
