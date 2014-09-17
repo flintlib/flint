@@ -1101,7 +1101,7 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 
 int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t a)
 
-    Returns $1$ if n is a strong probable prime to base $a$, otherwise it
+    Returns $1$ if $n$ is a strong probable prime to base $a$, otherwise it
     returns $0$.
 
 int fmpz_is_probabprime_lucas(const fmpz_t n)
@@ -1187,7 +1187,7 @@ int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n,
     that case, $R$ is set to $(n - 1)/F$.
 
 
-    N.B: a return value of $1$ only proves $n$ prime if $F >= \sqrt{n}$.
+    N.B: a return value of $1$ only proves $n$ prime if $F \ge \sqrt{n}$.
 
     The function does not compute which primes divide $n - 1$. Instead,
     these must be supplied as an array \code{pm1} of length \code{num_pm1}.
@@ -1210,7 +1210,7 @@ void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1,
 
     
     Trial factors $n - 1$ up to the given limit (approximately) and stores
-    the factors in an array \code{pm1}$ whose length is written out to
+    the factors in an array \code{pm1} whose length is written out to
     \code{num_pm1}.
 
     One can use $\log(n) + 2$ as a bound on the number of factors which might
@@ -1233,7 +1233,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n,
     The function does not compute which primes divide $n + 1$. Instead,
     these must be supplied as an array \code{pp1} of length \code{num_pp1}.
     It does not matter how many prime factors are supplied, but the more
-    that are supplied, the larger F will be.
+    that are supplied, the larger $F$ will be.
 
     There is a balance between the amount of time spent looking for
     factors of $n + 1$ and the usefulness of the output ($F$ may be as low 
@@ -1252,7 +1252,7 @@ void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1,
 
     
     Trial factors $n + 1$ up to the given limit (approximately) and stores
-    the factors in an array \code{pp1}$ whose length is written out to
+    the factors in an array \code{pp1} whose length is written out to
     \code{num_pp1}.
 
     One can use $\log(n) + 2$ as a bound on the number of factors which might

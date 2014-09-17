@@ -1346,11 +1346,12 @@ void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len)
 
 void fmpz_poly_discriminant(fmpz_t res, const fmpz_poly_t poly)
 
-    Set \code{res} to the disciminant of \code{res}. We normalise the
-    discriminant so that \code{disc(f) = (-1)^(n(n-1)/2) res(f, f')/lc(f)},
-    thus \code{disc(f) = lc(f)^(2n - 2) prod_{i < j} (r_i - r_j)^2}, where
-    \code{lc(f)} is the leading coefficient of $f$, $n$ is the degree of
-    $f$ and $r_i$ are the roots of $f$.
+    Set \code{res} to the discriminant of \code{poly}. We normalise the
+    discriminant so that $\operatorname{disc}(f) = (-1)^(n(n-1)/2)
+    \operatorname{res}(f, f')/\operatorname{lc}(f)$, thus
+    $\operatorname{disc}(f) = \operatorname{lc}(f)^(2n - 2) \prod_{i < j} (r_i
+    - r_j)^2$, where $\operatorname{lc}(f)$ is the leading coefficient of $f$,
+    $n$ is the degree of $f$ and $r_i$ are the roots of $f$.
 
 *******************************************************************************
 
@@ -1858,7 +1859,7 @@ void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R,
     Assumes that $\len(A) \geq \len(B) > 0$.  Assumes that $Q$ can fit 
     $\len(A) - \len(B) + 1$ coefficients, and that $R$ can fit $\len(A)$ 
     coefficients.  Supports aliasing of \code{(R, lenA)} and \code{(A, lenA)}. 
-    But other than this,  no aliasing of the inputs and outputs is suppported.
+    But other than this,  no aliasing of the inputs and outputs is supported.
 
     An optional precomputed inverse of the leading coefficient of $B$ from
     \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
@@ -1952,7 +1953,7 @@ void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A,
     will carry meaningful data.
 
     Supports aliasing of \code{(R, lenA)} and \code{(A, lenA)}.  But other 
-    than this, no aliasing of the inputs and outputs is suppported.
+    than this, no aliasing of the inputs and outputs is supported.
 
     An optional precomputed inverse of the leading coefficient of $B$ from
     \code{fmpz_preinvn_init} can be supplied. Otherwise \code{inv} should be
@@ -2728,7 +2729,7 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
     one of highest degree.  Each term starts with a coefficient, prepended 
     with a sign, followed by the character \code{*}, followed by a variable 
     name, which must be passed as a string parameter to the function, 
-    followed by a carot \code{^} followed by a non-negative exponent.
+    followed by a caret \code{^} followed by a non-negative exponent.
 
     If the sign of the leading coefficient is positive, it is omitted. Also 
     the exponents of the degree $1$ and $0$ terms are omitted, as is the 
@@ -2858,7 +2859,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
                  '+', '-'     1
     \end{verbatim}
     Here, {\tt D} refers to any digit, {\tt V0} to any character which 
-    is allowed as the first character in the variable name (an alphetic 
+    is allowed as the first character in the variable name (an alphabetic 
     character), and {\tt V} to any character which is allowed in the 
     remaining part of the variable name (an alphanumeric character or 
     underscore).

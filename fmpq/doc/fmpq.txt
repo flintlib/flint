@@ -447,7 +447,7 @@ void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
 _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
                                                 const fmpz_t r, const fmpz_t s)
 
-    Set \code{(rnum, rden)} to the gcd of \code{(p, q}} and \code{(r, s)}
+    Set \code{(rnum, rden)} to the gcd of \code{(p, q)} and \code{(r, s)}
     which we define to be the canonicalisation of gcd$(ps, qr)/(qs)$. (This is
     apparently Euclid's original definition and is stable under scaling of
     numerator and denominator. It also agrees with the gcd on the integers.
