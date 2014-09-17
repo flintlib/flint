@@ -281,10 +281,6 @@ FLINT_DLL int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
 FLINT_DLL slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
 
-FLINT_DLL slong fmpz_mat_nullspace_multimodular(fmpz_mat_t res, const fmpz_mat_t mat);
-
-FLINT_DLL slong fmpz_mat_nullspace_dixon(fmpz_mat_t res, const fmpz_mat_t mat);
-
 /* Inverse ******************************************************************/
 
 FLINT_DLL int fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
