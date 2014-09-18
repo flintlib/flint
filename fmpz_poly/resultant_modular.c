@@ -73,7 +73,7 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     fmpz_mul(l, lead_A, lead_B);
 
     /* set size of first prime */
-    pbits = 10;/*FLINT_BITS - 1;*/
+    pbits = FLINT_BITS - 1;
     p = (UWORD(1)<<pbits);
 
     /* get bound on size of resultant */
