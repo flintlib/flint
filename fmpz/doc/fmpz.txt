@@ -899,7 +899,8 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the inverse of $g$ modulo $h$.  The value of $h$ may 
     not be $0$ otherwise an exception results.  If the inverse exists 
     the return value will be non-zero, otherwise the return value will
-    be $0$ and the value of $f$ undefined. 
+    be $0$ and the value of $f$ undefined. As a special case, we
+    consider any number invertible modulo $h = \pm 1$, with inverse 0.
 
 void fmpz_negmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

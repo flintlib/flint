@@ -30,6 +30,19 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+/* Use the definiton of GMP versions >= 6.0 */
+int
+mpz_invert2(mpz_t a, const mpz_t b, const mpz_t c)
+{
+    if (mpz_cmpabs_ui(c, 1) == 0)
+    {
+        mpz_set_ui(a, 0);
+        return 1;
+    }
+    else
+        return mpz_invert(a, b, c);
+}
+
 int
 main(void)
 {
@@ -63,7 +76,7 @@ main(void)
         fmpz_get_mpz(e, b);
 
         r1 = fmpz_invmod(c, a, b);
-        r2 = mpz_invert(f, d, e);
+        r2 = mpz_invert2(f, d, e);
 
         fmpz_get_mpz(g, c);
 
@@ -106,7 +119,7 @@ main(void)
         fmpz_get_mpz(d, a);
 
         r1 = fmpz_invmod(c, a, a);
-        r2 = mpz_invert(f, d, d);
+        r2 = mpz_invert2(f, d, d);
 
         fmpz_get_mpz(g, c);
 
@@ -149,7 +162,7 @@ main(void)
         fmpz_get_mpz(e, b);
 
         r1 = fmpz_invmod(a, a, b);
-        r2 = mpz_invert(f, d, e);
+        r2 = mpz_invert2(f, d, e);
 
         fmpz_get_mpz(g, a);
 
@@ -192,7 +205,7 @@ main(void)
         fmpz_get_mpz(e, b);
 
         r1 = fmpz_invmod(b, a, b);
-        r2 = mpz_invert(f, d, e);
+        r2 = mpz_invert2(f, d, e);
 
         fmpz_get_mpz(g, b);
 
