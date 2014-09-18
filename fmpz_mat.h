@@ -327,6 +327,12 @@ FLINT_DLL void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A,
         const fmpz_t mod);
 FLINT_DLL int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
+/* Special matrices **********************************************************/
+
+FLINT_DLL int fmpz_mat_is_hadamard(const fmpz_mat_t A);
+
+FLINT_DLL int fmpz_mat_hadamard(fmpz_mat_t A);
+
 #ifdef __cplusplus
 }
 #endif
