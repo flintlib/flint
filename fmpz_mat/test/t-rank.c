@@ -45,10 +45,10 @@ main(void)
     fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = n_randint(state, 35);
+        n = n_randint(state, 35);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -67,10 +67,10 @@ main(void)
     }
 
     /* Dense */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = n_randint(state, 35);
+        n = n_randint(state, 35);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {

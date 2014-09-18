@@ -38,7 +38,10 @@ fmpz_mat_rank(const fmpz_mat_t A)
     fmpz_mat_init_set(tmp, A);
     fmpz_init(den);
 
-    rank = fmpz_mat_fflu(tmp, den, NULL, tmp, 0);
+    if (FLINT_MIN(A->r, A->c) < 25)
+        rank = fmpz_mat_fflu(tmp, den, NULL, tmp, 0);
+    else
+        rank = fmpz_mat_rref(tmp, den, tmp);
 
     fmpz_mat_clear(tmp);
     fmpz_clear(den);
