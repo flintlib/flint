@@ -66,8 +66,10 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             ulong inv, gcd;
             if (c2 < WORD(0))
                 c2 = -c2;
+#if __GNU_MP_VERSION < 6
             if (c2 == WORD(1))
                 return 0;       /* special case not handled by n_invmod */
+#endif
             gcd = z_gcdinv(&inv, c1, c2);
 
             return (gcd == UWORD(1) ? fmpz_set_si(f, inv), 1 : 0);
@@ -105,8 +107,10 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             ulong gcd, inv, r;
             if (c2 < WORD(0))
                 c2 = -c2;
+#if __GNU_MP_VERSION < 6
             if (c2 == WORD(1))
                 return 0;       /* special case not handled by z_gcd_invert */
+#endif
             /* reduce g mod h first */
 
             r = flint_mpz_fdiv_ui(COEFF_TO_PTR(c1), c2);
