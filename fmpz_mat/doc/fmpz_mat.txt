@@ -782,6 +782,15 @@ slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     and returns the rank of \code{A}. Aliasing of \code{A} and \code{B}
     is allowed.
 
+    The algorithm used chooses between \code{fmpz_mat_rref_fflu} and
+    \code{fmpz_mat_rref_mul} based on the dimensions of the input matrix.
+
+slong fmpz_mat_rref_fflu(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
+
+    Sets (\code{B}, \code{den}) to the reduced row echelon form of \code{A}
+    and returns the rank of \code{A}. Aliasing of \code{A} and \code{B}
+    is allowed.
+
     The algorithm proceeds by first computing a row echelon form using
     \code{fmpz_mat_fflu}. Letting the upper part of this matrix be
     $(U | V) P$ where $U$ is full rank upper triangular and $P$ is a
@@ -809,10 +818,11 @@ slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     the reduced row echelon form of the whole of \code{A}. This procedure is
     described in \cite{Stein2007}.
 
-int fmpz_mat_is_in_rref(const fmpz_mat_t A, const fmpz_t den)
+int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den,
+                                   slong rank)
 
-    Checks that the matrix $A/den$ is in reduced row echelon form, returns 1 if
-    so and 0 otherwise.
+    Checks that the matrix $A/den$ is in reduced row echelon form of rank 
+    \code{rank}, returns 1 if so and 0 otherwise.
 
 *******************************************************************************
 
