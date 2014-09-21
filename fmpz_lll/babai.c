@@ -172,8 +172,8 @@ FUNC_HEAD
                     else        /* we must have |X| >= 2 */
                     {
                         tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
-                        if ((tmp < (double) MAX_LONG)
-                            && (tmp > (double) -MAX_LONG))
+                        if ((tmp < (double) FMPZ_LLL_MAX_LONG)
+                            && (tmp > (double) -FMPZ_LLL_MAX_LONG))
                         {
                             if (tmp < 0)
                                 tmp = ceil(tmp - 0.5);
@@ -202,7 +202,7 @@ FUNC_HEAD
                         {
                             tmp = frexp(d_mat_entry(mu, kappa, j), &exponent);
 
-                            tmp = tmp * MAX_LONG;
+                            tmp = tmp * FMPZ_LLL_MAX_LONG;
                             xx = (slong) tmp;
                             exponent += expo[kappa] - expo[j] - CPU_SIZE_1;
 
@@ -276,16 +276,16 @@ FUNC_HEAD
                 aa = zeros + 1;
 
                 for (i = zeros + 1; i <= LIMIT; i++)
-                    d_mat_entry(A->appSP, kappa, i) = NAN;
+                    d_mat_entry(A->appSP, kappa, i) = D_NAN;
 
                 for (i = LIMIT + 1; i <= kappamax; i++)
-                    d_mat_entry(A->appSP, i, kappa) = NAN;
+                    d_mat_entry(A->appSP, i, kappa) = D_NAN;
             }
             else
             {
 #if TYPE == 2
                 for (i = zeros + 1; i <= LIMIT; i++)
-                    d_mat_entry(A->appSP, kappa, i) = NAN;
+                    d_mat_entry(A->appSP, kappa, i) = D_NAN;
 #endif
             }
             loops++;
@@ -471,8 +471,8 @@ FUNC_HEAD
                     else        /* we must have |X| >= 2 */
                     {
                         tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
-                        if ((tmp < (double) MAX_LONG)
-                            && (tmp > (double) -MAX_LONG))
+                        if ((tmp < (double) FMPZ_LLL_MAX_LONG)
+                            && (tmp > (double) -FMPZ_LLL_MAX_LONG))
                         {
                             if (tmp < 0)
                                 tmp = ceil(tmp - 0.5);
@@ -505,7 +505,7 @@ FUNC_HEAD
                         {
                             tmp = frexp(d_mat_entry(mu, kappa, j), &exponent);
 
-                            tmp = tmp * MAX_LONG;
+                            tmp = tmp * FMPZ_LLL_MAX_LONG;
                             xx = (slong) tmp;
                             exponent += expo[kappa] - expo[j] - CPU_SIZE_1;
 
