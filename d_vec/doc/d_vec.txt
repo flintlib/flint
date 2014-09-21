@@ -130,12 +130,17 @@ double _d_vec_dot_heuristic(const double * vec1, const double * vec2,
     Returns the dot product of \code{(vec1, len2)}
     and \code{(vec2, len2)} by adding up the positive and negative products,
     and doing a single subtraction of the two sums at the end. \code{err} is a
-    pointer to an error bound for the operation.
+    pointer to a double in which an error bound for the operation will be
+    stored.
 
 double _d_vec_dot_thrice(const double * vec1, const double * vec2,
                                 slong len2, double * err)
 
     Returns the dot product of \code{(vec1, len2)}
     and \code{(vec2, len2)} using error-free floating point sums and products
-    to compute the dot product with three times the working precision.
-    \code{err} is a pointer to an error bound for the operation.
+    to compute the dot product with three times (thrice) the working precision.
+    \code{err} is a pointer to a double in which an error bound for the
+    operation will be stored.
+
+    This implements the algorithm of Ogita-Rump-Oishi. See
+    \url{http://www.ti3.tuhh.de/paper/rump/OgRuOi05.pdf}.
