@@ -372,3 +372,11 @@ padic
 
 * Implement padic_val_fac for generic inputs
 
+mpf_vec/mat
+-----------
+
+* _mpf_vec_approx_equal uses the bizarre mpf notion of equal; it should
+  be either renamed equal_bits or the absolute value of the difference
+  should be compared with zero
+
+
