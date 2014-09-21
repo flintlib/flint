@@ -26,10 +26,6 @@
 #include "mpf_mat.h"
 #include "ulong_extras.h"
 
-#define MPF_MAT_QR_EQ_BITS (42)
-#define MPF_MAT_QR_NORM_EPS (2e-16)
-#define MPF_MAT_QR_ORTHO_EPS (2e-20)
-
 int
 main(void)
 {
@@ -44,56 +40,75 @@ main(void)
         mpf_t dot, tmp;
         int j, k, l;
         mpf_mat_t A, Q, R, B;
+        mp_bitcnt_t prec;
 
         slong m, n;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
+        prec = n_randint(state, 200) + 3;
 
-        mpf_mat_init(A, m, n, 200);
-        mpf_mat_init(Q, m, n, 200);
-        mpf_mat_init(R, n, n, 200);
-        mpf_mat_init(B, m, n, 200);
-        mpf_inits(dot, tmp, '\0');
+        mpf_mat_init(A, m, n, prec);
+        mpf_mat_init(Q, m, n, prec);
+        mpf_mat_init(R, n, n, prec);
+        mpf_mat_init(B, m, n, prec);
+        mpf_init2(dot, prec);
+        mpf_init2(tmp, prec);
 
-        mpf_mat_randtest(A, state, 200);
+        mpf_mat_randtest(A, state, prec);
 
         mpf_mat_qr(Q, R, A);
 
         mpf_mat_mul(B, Q, R);
 
-        if (!mpf_mat_approx_equal(A, B, MPF_MAT_QR_EQ_BITS))
+        mpf_set_ui(tmp, 1);
+        mpf_div_2exp(tmp, tmp, prec - 2);
+        for (j = 0; j < m; j++)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("A:\n");
-            mpf_mat_print(A);
-            flint_printf("Q:\n");
-            mpf_mat_print(Q);
-            flint_printf("R:\n");
-            mpf_mat_print(R);
-            flint_printf("B:\n");
-            mpf_mat_print(B);
-            abort();
+            for (k = 0; k < n; k++)
+            {
+                mpf_sub(dot, mpf_mat_entry(A, j, k), mpf_mat_entry(B, j, k));
+                mpf_abs(dot, dot);
+                if (mpf_cmp(dot, tmp) > 0)
+                {
+                    flint_printf("FAIL:\n");
+                    flint_printf("A:\n");
+                    mpf_mat_print(A);
+                    flint_printf("Q:\n");
+                    mpf_mat_print(Q);
+                    flint_printf("R:\n");
+                    mpf_mat_print(R);
+                    flint_printf("B:\n");
+                    mpf_mat_print(B);
+                    mpf_out_str(stdout, 10, 0, dot);
+                    flint_printf("\n");
+                    flint_printf("%d\n", prec);
+                    abort();
+                }
+            }
         }
 
         for (j = 0; j < n; j++)
         {
-            double d;
             mpf_t norm;
-            mpf_init_set_ui(norm, 0);
+            mpf_init2(norm, prec);
             for (l = 0; l < m; l++)
             {
                 mpf_mul(tmp, mpf_mat_entry(Q, l, j), mpf_mat_entry(Q, l, j));
                 mpf_add(norm, norm, tmp);
             }
 
-            d = mpf_get_d(norm);
-            if (mpf_cmp_ui(norm, 0) != 0 && fabs(d - 1) > MPF_MAT_QR_NORM_EPS)
+            mpf_sub_ui(dot, norm, 1);
+            mpf_abs(dot, dot);
+            mpf_set_ui(tmp, 1);
+            mpf_div_2exp(tmp, tmp, prec - 3);
+            if (mpf_cmp_ui(norm, 0) != 0 && mpf_cmp(dot, tmp) > 0)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("Q:\n");
                 mpf_mat_print(Q);
-                flint_printf("%g\n", norm);
+                mpf_out_str(stdout, 10, 0, norm);
+                flint_printf("\n");
                 flint_printf("%d\n", j);
                 abort();
             }
@@ -108,13 +123,16 @@ main(void)
                     mpf_add(dot, dot, tmp);
                 }
 
-                d = mpf_get_d(dot);
-                if (fabs(d) > MPF_MAT_QR_ORTHO_EPS)
+                mpf_set_ui(tmp, 1);
+                mpf_div_2exp(tmp, tmp, prec);
+                mpf_abs(dot, dot);
+                if (mpf_cmp(dot, tmp) > 0)
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("Q:\n");
                     mpf_mat_print(Q);
-                    flint_printf("%g\n", dot);
+                    mpf_out_str(stdout, 10, 0, dot);
+                    flint_printf("\n");
                     flint_printf("%d %d\n", j, k);
                     abort();
                 }

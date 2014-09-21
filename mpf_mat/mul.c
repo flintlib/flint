@@ -59,7 +59,7 @@ mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B)
         return;
     }
 
-    mpf_init(tmp);
+    mpf_init2(tmp, C->prec);
 
     for (i = 0; i < ar; i++)
     {
