@@ -415,4 +415,4 @@ int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
 
     This is the main LLL with removals function which should be called by
     the user. Like \code{fmpz_lll} it calls ULLL, but it also sets the
-    Gram-schmidt bound to that supplied and does removals.
+    Gram-Schmidt bound to that supplied and does removals.
