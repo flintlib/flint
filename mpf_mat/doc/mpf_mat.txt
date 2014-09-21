@@ -152,6 +152,9 @@ void mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
     a $m x n$ matrix \code{A}) and generates an orthonormal set
     $S^' = {b_1, b_2, \ldots ,b_n}$ (as the columns of the $m x n$ matrix 
     \code{B}) that spans the same subspace of $R^m$ as $S$.
+
+    This uses an algorithm of Schwarz-Rutishauser. See 
+    \url{http://www.inf.ethz.ch/personal/gander/papers/qrneu.pdf}.
     
 void mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
 
