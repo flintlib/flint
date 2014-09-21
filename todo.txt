@@ -384,4 +384,4 @@ mpf_vec/mat
   of 200 bits). A couple of the comparisons don't seem to match those listed in
   a recent paper (cited in the docs) on the subject.
 
-
+* similar comments apply to mpf_mat_qr, which uses a similar algorithm.
