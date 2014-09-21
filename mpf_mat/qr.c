@@ -40,11 +40,11 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
 
     if (Q == A)
     {
-        mpf_mat_t t;
-        mpf_mat_init(t, A->r, A->c, Q->prec);
-        mpf_mat_qr(t, R, A);
-        mpf_mat_swap(Q, t);
-        mpf_mat_clear(t);
+        mpf_mat_t T;
+        mpf_mat_init(T, A->r, A->c, Q->prec);
+        mpf_mat_qr(T, R, A);
+        mpf_mat_swap(Q, T);
+        mpf_mat_clear(T);
         return;
     }
 
@@ -53,7 +53,10 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
         return;
     }
 
-    mpf_inits(t, s, tmp, eps, '\0');
+    mpf_init2(t, Q->prec);
+    mpf_init2(s, Q->prec);
+    mpf_init2(tmp, Q->prec);
+    mpf_init2(eps, Q->prec);
     exp = ceil((A->prec) / 64.0) * 64;
     mpf_set_ui(eps, 1);
     mpf_div_2exp(eps, eps, exp);
