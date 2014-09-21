@@ -379,13 +379,6 @@ mpf_vec/mat
   be either renamed equal_bits or the absolute value of the difference
   should be compared with zero
 
-* mpf_mat_gso test doesn't check the implementation for different input
-  precisions, and seems to not be very accurate (16 bits for an input precision
-  of 200 bits). A couple of the comparisons don't seem to match those listed in
-  a recent paper (cited in the docs) on the subject.
-
-* similar comments apply to mpf_mat_qr, which uses a similar algorithm.
-
 d_mat
 -----
 
