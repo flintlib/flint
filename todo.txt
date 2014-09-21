@@ -385,3 +385,11 @@ mpf_vec/mat
   a recent paper (cited in the docs) on the subject.
 
 * similar comments apply to mpf_mat_qr, which uses a similar algorithm.
+
+d_mat
+-----
+
+* d_mat_transpose tries to be clever with the cache, but it could use L1 sized
+blocks and optimise for sequential reading/writing. It could also handle 
+in-place much more efficiently.
+
