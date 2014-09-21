@@ -391,3 +391,5 @@ d_mat
 blocks and optimise for sequential reading/writing. It could also handle 
 in-place much more efficiently.
 
+* d_mat_is_reduced doesn't seem to make any guarantees about reducedness, just approximately checks the Lovasz conditions in double arithmetic. I think this is superceded now and can be removed. It is not used anywhere.
+
