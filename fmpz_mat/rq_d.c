@@ -41,6 +41,12 @@ fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
         return;
     }
 
+    if (A->c == 0)
+    {
+        d_mat_one(R);
+        return;
+    }
+
     fmpz_mat_get_d_mat(Q, A);
 
     for (k = 0; k < r; k++)
