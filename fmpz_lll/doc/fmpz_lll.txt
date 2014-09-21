@@ -172,7 +172,7 @@ int fmpz_lll_shift(const fmpz_mat_t B)
 
 *******************************************************************************
 
-    Varities of LLL
+    Varieties of LLL
 
     These programs implement ideas from the book chapter \citep{Stehle2010}.
 
