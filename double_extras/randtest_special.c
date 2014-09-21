@@ -31,15 +31,16 @@ double
 d_randtest_special(flint_rand_t state, slong minexp, slong maxexp)
 {
     double d, t;
-    slong exp;
+    slong exp, kind;
     d = d_randtest(state);
     exp = minexp + n_randint(state, maxexp - minexp + 1);
     t = ldexp(d, exp);
-    if (n_randint(state, 4) == 3)
+    kind = n_randint(state, 4);
+	if (kind == 3)
         return t;
-    else if (n_randint(state, 4) == 2)
+    else if (kind == 2)
         return -t;
-    else if (n_randint(state, 4) == 1)
+    else if (kind == 1)
         return 0;
     else
     {
