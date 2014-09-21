@@ -379,6 +379,11 @@ mpf_vec/mat
   be either renamed equal_bits or the absolute value of the difference
   should be compared with zero
 
+* The conditions used in mpf_mat_qr/gso (similarly for d_mat module) work, but
+  don't match those used in the algorithm in the paper referenced in the docs.
+  This is possibly because mpf doesn't do exact rounding. The tests could
+  probably be improved.
+
 d_mat
 -----
 
