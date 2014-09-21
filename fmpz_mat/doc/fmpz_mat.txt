@@ -1111,18 +1111,6 @@ void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-    RQ Decomposition
-
-*******************************************************************************
-
-void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
-
-    Computes the $RQ$ decomposition of a matrix \code{A} using the Gram–Schmidt
-    process. (Sets \code{R} and \code{Q} such that $A = RQ$ where \code{R} is
-    a lower triangular matrix.)
-
-*******************************************************************************
-
     Cholesky Decomposition
 
 *******************************************************************************

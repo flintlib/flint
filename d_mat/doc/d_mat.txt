@@ -171,7 +171,7 @@ void d_mat_gso(d_mat_t B, const d_mat_t A)
     
 void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
 
-    Computes the $QR$ decomposition of a matrix \code{A} using the Gram–Schmidt
+    Computes the $QR$ decomposition of a matrix \code{A} using the Gram-Schmidt
     process. (Sets \code{Q} and \code{R} such that $A = QR$ where \code{R} is
     an upper triangular matrix and \code{Q} is an orthogonal matrix.)
 

@@ -357,10 +357,6 @@ FLINT_DLL int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
 
-/* RQ Decomposition *********************************************************/
-
-FLINT_DLL void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A);
-
 /* Cholesky Decomposition ****************************************************/
 
 FLINT_DLL void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
