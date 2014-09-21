@@ -183,8 +183,7 @@ void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
 
 int d_mat_is_reduced(const d_mat_t R, double delta, double eta)
 
-    Returns a non-zero value if the basis $B = RQ$ (\code{R} is the matrix
-    generated when $B$ is passed to \code{fmpz_mat_rq_d()}) is LLL-reduced with
-    factor (\code{delta}, \code{eta}), and otherwise returns zero. The function
-    is mainly intended to be used for testing purposes in the \code{fmpz_lll}
-    module.
+    Returns a non-zero value if the basis $B = RQ$ (where \code{R} is a lower
+    triangular matrix) is LLL-reduced with factor (\code{delta}, \code{eta}),
+    and otherwise returns zero. The function is mainly intended to be used for
+    testing purposes in the \code{fmpz_lll} module.
