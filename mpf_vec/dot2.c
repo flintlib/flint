@@ -31,7 +31,7 @@ _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
               mp_bitcnt_t prec)
 {
     slong i;
-    int r;
+    int r = 0;
     mpf_t tmp, tmp2;
     mpf_init2(tmp, prec);
     mpf_init2(tmp2, prec);
@@ -49,9 +49,7 @@ _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2,
     mpf_div_2exp(tmp, tmp, prec);
     mpf_mul(tmp2, res, res);
 
-    if (mpf_cmp(tmp2, tmp) <= 0)
-        r = 0;
-    else
+    if (mpf_cmp(tmp2, tmp) > 0)
         r = 1;
 
     mpf_clear(tmp);
