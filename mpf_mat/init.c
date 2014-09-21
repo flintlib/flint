@@ -45,7 +45,10 @@ mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec)
             mat->rows[i] = mat->entries + i * cols;
     }
     else
-        mat->entries = NULL;
+    {
+       mat->entries = NULL;
+       mat->rows = NULL;
+	}
 
     mat->r = rows;
     mat->c = cols;
