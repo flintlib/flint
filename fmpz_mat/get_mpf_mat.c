@@ -31,8 +31,7 @@ fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
 {
     slong i;
 
-    for (i = 0; i < A->r; i++)
-    {
-        _fmpz_vec_get_mpf_vec(B->rows[i], A->rows[i], A->c);
-    }
+    if (A->c != 0)
+        for (i = 0; i < A->r; i++)
+            _fmpz_vec_get_mpf_vec(B->rows[i], A->rows[i], A->c);
 }
