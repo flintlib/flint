@@ -39,6 +39,10 @@
 FLINT_DLL void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
                         slong len, mp_bitcnt_t bits);
 
+/*  Conversions  *************************************************************/
+
+FLINT_DLL void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len);
+
 /*  Dot product  **************************************************/
 
 FLINT_DLL void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len);

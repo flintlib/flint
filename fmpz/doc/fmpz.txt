@@ -137,6 +137,20 @@ double fmpz_get_d(const fmpz_t f)
     \code{f} cannot be represented exactly. The outcome is undefined
     if \code{f} is too large to fit in the normal range of a double.
 
+void fmpz_set_mpf(fmpz_t f, const mpf_t x)
+
+    Sets $f$ to the \code{mpf_t} $x$, rounding down towards zero if
+    the value of $x$ is fractional.
+
+void fmpz_get_mpf(mpf_t x, const fmpz_t f)
+
+    Sets the value of \code{x} from \code{f}.
+
+void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
+
+    Sets the value of \code{x} from \code{f}, rounded toward the given
+    direction \code{rnd}.
+
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns $f$ as a normalized \code{double} along with a $2$-exponent 
@@ -686,6 +700,11 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
     \code{ulong}.  If $x$ is $0$ an exception will result.
+
+void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+    Sets $f$ to the signed remainder $y \equiv g \bmod h$ satisfying
+    $-\abs{h}/2 < y \leq \abs{h}/2$.
 
 ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
 

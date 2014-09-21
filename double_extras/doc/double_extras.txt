@@ -33,6 +33,16 @@ double d_randtest(flint_rand_t state)
 
     Returns a random number in the interval $[0.5, 1)$.
 
+double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)
+
+    Returns a random signed number with exponent between \code{minexp} and
+    \code{maxexp} or zero.
+
+double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp)
+
+    Returns a random signed number with exponent between \code{minexp} and
+    \code{maxexp}, zero, \code{D_NAN} or \pm\code{D_INF}.
+
 
 *******************************************************************************
 
@@ -69,3 +79,13 @@ double d_lambertw(double x)
     about 10 times \code{DBL_EPSILON} close to $-1/e$.
     However, accuracy may be worse depending on compiler flags and
     the accuracy of the system libm functions.
+
+int d_is_nan(double x)
+
+    Returns a nonzero integral value if \code{x} is \code{D_NAN}, and otherwise
+    returns 0.
+
+double d_log2(double x)
+
+    Returns the base 2 logarithm of \code{x} provided \code{x} is positive. If
+    a domain or pole error occurs, the appropriate error value is returned.

@@ -33,10 +33,9 @@ _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len)
 {
     slong i;
     fmpq_zero(res);
-    
-    for(i = 0; i < len; i++) {
-		fmpq_addmul(res,
-					vec1 + i,
-					vec2 + i);
-	}
+
+    for (i = 0; i < len; i++)
+    {
+        fmpq_addmul(res, vec1 + i, vec2 + i);
+    }
 }

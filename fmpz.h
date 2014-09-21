@@ -276,7 +276,17 @@ FLINT_DLL double fmpz_get_d(const fmpz_t f);
 
 FLINT_DLL void fmpz_set_d(fmpz_t f, double c);
 
+<<<<<<< HEAD
 FLINT_DLL int fmpz_set_str(fmpz_t f, const char * str, int b);
+=======
+void fmpz_get_mpf(mpf_t x, const fmpz_t f);
+
+void fmpz_set_mpf(fmpz_t f, const mpf_t x);
+
+void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
+
+int fmpz_set_str(fmpz_t f, const char * str, int b);
+>>>>>>> abhinav/lll
 
 FLINT_DLL void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
 
@@ -490,6 +500,8 @@ FLINT_DLL ulong fmpz_fdiv_ui(const fmpz_t g, ulong h);
 FLINT_DLL ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FMPZ_INLINE void
 fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)

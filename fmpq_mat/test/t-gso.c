@@ -31,11 +31,12 @@
 #include "fmpq_mat.h"
 #include "fmpq_vec.h"
 
-int main(void)
+int
+main(void)
 {
-	int i, result;
+    int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("gso....");
     fflush(stdout);
@@ -58,44 +59,47 @@ int main(void)
         fmpq_mat_init(C, n, m);
 
         fmpq_mat_randtest(A, state, bits);
-        
+
         fmpq_mat_transpose(B, A);
         fmpq_mat_rref(B, B);
-        
+
         fmpq_mat_gso(A, A);
-                
+
         fmpq_mat_transpose(C, A);
-        		
+
         fmpq_init(dot);
-        
-        for(j = 0; j < n; j++) {
-			for(k = j + 1; k < n; k++) {
-				
-				_fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
-				
-				if (!fmpq_is_zero(dot))
-				{
-					flint_printf("FAIL:\n");
-					flint_printf("A:\n");
-					fmpq_mat_print(A);
-					abort();
-				}	
-			}
-		}
-		
-		fmpq_mat_rref(C, C);
-        
+
+        for (j = 0; j < n; j++)
+        {
+            for (k = j + 1; k < n; k++)
+            {
+
+                _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
+
+                if (!fmpq_is_zero(dot))
+                {
+                    flint_printf("FAIL:\n");
+                    flint_printf("A:\n");
+                    fmpq_mat_print(A);
+                    abort();
+                }
+            }
+        }
+
+        fmpq_mat_rref(C, C);
+
         result = fmpq_mat_equal(B, C);
-        
-        if(!result) {
-			flint_printf("FAIL:\n");
-			flint_printf("B:\n");
-			fmpq_mat_print(B);
-			flint_printf("C:\n");
-			fmpq_mat_print(C);
-			abort();
-		}
-		
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("B:\n");
+            fmpq_mat_print(B);
+            flint_printf("C:\n");
+            fmpq_mat_print(C);
+            abort();
+        }
+
         fmpq_mat_clear(A);
         fmpq_mat_clear(B);
         fmpq_mat_clear(C);
@@ -103,7 +107,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

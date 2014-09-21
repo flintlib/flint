@@ -37,6 +37,8 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "nmod_mat.h"
+#include "d_mat.h"
+#include "mpf_mat.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
@@ -67,6 +69,7 @@ FLINT_DLL void fmpz_mat_clear(fmpz_mat_t mat);
 
 FLINT_DLL int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2);
 FLINT_DLL int fmpz_mat_is_zero(const fmpz_mat_t mat);
+FLINT_DLL int fmpz_mat_is_one(const fmpz_mat_t mat);
 
 static __inline__ int
 fmpz_mat_is_empty(const fmpz_mat_t mat)
@@ -83,6 +86,12 @@ fmpz_mat_is_square(const fmpz_mat_t mat)
 FLINT_DLL void fmpz_mat_zero(fmpz_mat_t mat);
 FLINT_DLL void fmpz_mat_one(fmpz_mat_t mat);
 
+/* Windows */
+
+FLINT_DLL void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
+    slong c1, slong r2, slong c2);
+
+FLINT_DLL void fmpz_mat_window_clear(fmpz_mat_t window);
 
 /* Input and output  *********************************************************/
 
@@ -158,6 +167,9 @@ FLINT_DLL void fmpz_mat_scalar_addmul_nmod_mat_ui(fmpz_mat_t B, const nmod_mat_t
 FLINT_DLL void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
 FLINT_DLL void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 FLINT_DLL void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
+
+FLINT_DLL void fmpz_mat_scalar_mul_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
+FLINT_DLL void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 
 FLINT_DLL void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);
 
@@ -332,6 +344,44 @@ FLINT_DLL int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 FLINT_DLL int fmpz_mat_is_hadamard(const fmpz_mat_t A);
 
 FLINT_DLL int fmpz_mat_hadamard(fmpz_mat_t A);
+
+/* Gram matrix **************************************************************/
+
+FLINT_DLL void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A);
+
+/* Conversions **************************************************************/
+
+FLINT_DLL int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
+
+FLINT_DLL int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
+
+FLINT_DLL void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
+
+/* RQ Decomposition *********************************************************/
+
+FLINT_DLL void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A);
+
+/* Cholesky Decomposition ****************************************************/
+
+FLINT_DLL void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
+
+/* LLL ***********************************************************************/
+
+FLINT_DLL int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta);
+
+FLINT_DLL int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta);
+
+FLINT_DLL int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd);
+
+FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta, double eta, const fmpz_t gs_B, int newd);
+
+/* Classical LLL *************************************************************/
+
+FLINT_DLL void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl);
+
+/* Modified LLL **************************************************************/
+
+FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl);
 
 #ifdef __cplusplus
 }

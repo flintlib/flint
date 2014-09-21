@@ -37,9 +37,13 @@ FLINT_DLL mpfr * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
 
 FLINT_DLL void _mpfr_vec_clear(mpfr * vec, slong length);
 
+FLINT_DLL void _mpfr_vec_randtest(mpfr * f, flint_rand_t state, slong len);
+
 FLINT_DLL void _mpfr_vec_zero(mpfr * vec, slong length);
 
 FLINT_DLL void _mpfr_vec_set(mpfr * vec1, const mpfr * vec2, slong length);
+
+FLINT_DLL int _mpfr_vec_equal(const mpfr * vec1, const mpfr * vec2, slong len);
 
 FLINT_DLL void _mpfr_vec_add(mpfr * res, const mpfr * vec1, const mpfr * vec2, slong length);
 
