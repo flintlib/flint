@@ -46,12 +46,12 @@ main(void)
     fflush(stdout);
 
     /* test using NTRU like matrices */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         ulong q;
         slong r, c;
 
-        r = 2 * (n_randint(state, 50) + 1);
+        r = 2 * (n_randint(state, 25) + 1);
         c = r;
 
         fmpz_mat_init(mat, r, c);
@@ -147,7 +147,7 @@ main(void)
     }
 
     /* test using integer relations matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong r, c;
         fmpz_mat_t gmat, gmat2;
@@ -253,7 +253,7 @@ main(void)
     }
 
     /* test using ajtai matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong r, c;
 
@@ -346,12 +346,12 @@ main(void)
     }
 
     /* test using simultaneous diophantine matrices */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         mp_bitcnt_t bits2;
         slong r, c;
 
-        r = n_randint(state, 200) + 1;
+        r = n_randint(state, 50) + 1;
         c = r;
 
         fmpz_mat_init(mat, r, c);
