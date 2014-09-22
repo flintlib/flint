@@ -35,7 +35,8 @@ fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
         slong r, c, mbits, prev_mbits, i, j;
         int full_prec = 1, done = 0, is_U_I;
         fmpz_mat_t U, big_td, trunc_data;
-        fmpq_lll_t qfl;
+        mpq_t deltax, etax;
+        fmpq_t delta, eta;
 
         r = FM->r;
         c = FM->c;
@@ -45,7 +46,17 @@ fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
         fmpz_mat_init(big_td, r, c + r);
         fmpz_mat_init(trunc_data, r, c);
 
-        fmpq_lll_context_init(qfl, fl->delta, fl->eta);
+        mpq_init(deltax);
+        mpq_init(etax);
+
+        fmpq_init(delta);
+        fmpq_init(eta);
+
+        mpq_set_d(deltax, fl->delta);
+        mpq_set_d(etax, fl->eta);
+        fmpq_set_mpq(delta, deltax);
+        fmpq_set_mpq(eta, etax);
+        mpq_clears(deltax, etax, '\0');
 
         if (mbits > new_size)
         {
@@ -74,11 +85,11 @@ fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
         {
             if (full_prec == 0)
             {
-                fmpz_mat_lll_storjohann(big_td, qfl);
+                fmpz_mat_lll_storjohann(big_td, delta, eta);
             }
             else
             {
-                fmpz_mat_lll_storjohann(FM, qfl);
+                fmpz_mat_lll_storjohann(FM, delta, eta);
             }
 
             if (full_prec == 1)
@@ -133,7 +144,8 @@ fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
 
         fmpz_mat_clear(trunc_data);
         fmpz_mat_clear(big_td);
-        fmpq_lll_context_clear(qfl);
+        fmpq_clear(delta);
+        fmpq_clear(eta);
     }
     else
     {

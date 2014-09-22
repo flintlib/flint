@@ -27,11 +27,11 @@
 #include "fmpq_mat.h"
 
 void
-fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
+fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
 {
     slong i, j, k, l, m, n;
     fmpz_t r, one;
-    fmpq_t delta, nu, xi, half, rat;
+    fmpq_t chi, nu, xi, half, rat;
     fmpq_mat_t R, mu;
 
     if (A->r == 0)
@@ -45,7 +45,7 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
     fmpq_mat_init(mu, m, m);
     fmpz_init(r);
     fmpz_init_set_ui(one, 1);
-    fmpq_init(delta);
+    fmpq_init(chi);
     fmpq_init(nu);
     fmpq_init(xi);
     fmpq_init(half);
@@ -78,7 +78,7 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
     {
         /* size reduce row k against row k - 1 */
         fmpq_abs(rat, fmpq_mat_entry(mu, k, k - 1));
-        if (fmpq_cmp(rat, fl->eta) > 0)
+        if (fmpq_cmp(rat, eta) > 0)
         {
             /* determine reduction coefficient */
             fmpq_sub(rat, fmpq_mat_entry(mu, k, k - 1), half);
@@ -96,7 +96,7 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
                      fmpq_mat_entry(mu, k, k - 1), rat);
         }
         /* check exchange condition */
-        fmpq_set(rat, fl->delta);
+        fmpq_set(rat, delta);
         fmpq_submul(rat, fmpq_mat_entry(mu, k, k - 1),
                     fmpq_mat_entry(mu, k, k - 1));
         fmpq_mul(rat, rat, fmpq_mat_entry(mu, k - 1, k - 1));
@@ -106,7 +106,7 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
             {
                 /* size reduce row k against row l */
                 fmpq_abs(rat, fmpq_mat_entry(mu, k, l));
-                if (fmpq_cmp(rat, fl->eta) > 0)
+                if (fmpq_cmp(rat, eta) > 0)
                 {
                     fmpq_sub(rat, fmpq_mat_entry(mu, k, l), half);
                     fmpz_cdiv_q(r, fmpq_numref(rat), fmpq_denref(rat));
@@ -127,19 +127,18 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
         else
         {
             fmpq_set(nu, fmpq_mat_entry(mu, k, k - 1));
-            fmpq_mul(delta, fmpq_mat_entry(mu, k - 1, k - 1), nu);
-            fmpq_mul(delta, delta, nu);
-            fmpq_add(delta, delta, fmpq_mat_entry(mu, k, k));
+            fmpq_mul(chi, fmpq_mat_entry(mu, k - 1, k - 1), nu);
+            fmpq_mul(chi, chi, nu);
+            fmpq_add(chi, chi, fmpq_mat_entry(mu, k, k));
             fmpq_mul(fmpq_mat_entry(mu, k, k - 1),
                      fmpq_mat_entry(mu, k, k - 1), fmpq_mat_entry(mu, k - 1,
                                                                   k - 1));
             fmpq_div(fmpq_mat_entry(mu, k, k - 1),
-                     fmpq_mat_entry(mu, k, k - 1), delta);
+                     fmpq_mat_entry(mu, k, k - 1), chi);
             fmpq_mul(fmpq_mat_entry(mu, k, k), fmpq_mat_entry(mu, k, k),
                      fmpq_mat_entry(mu, k - 1, k - 1));
-            fmpq_div(fmpq_mat_entry(mu, k, k), fmpq_mat_entry(mu, k, k),
-                     delta);
-            fmpq_set(fmpq_mat_entry(mu, k - 1, k - 1), delta);
+            fmpq_div(fmpq_mat_entry(mu, k, k), fmpq_mat_entry(mu, k, k), chi);
+            fmpq_set(fmpq_mat_entry(mu, k - 1, k - 1), chi);
             /* swap row k - 1 and row k */
             fmpz_mat_swap_rows(A, NULL, k - 1, k);
             /* update mu */
@@ -168,7 +167,7 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
 
     fmpz_clear(r);
     fmpz_clear(one);
-    fmpq_clear(delta);
+    fmpq_clear(chi);
     fmpq_clear(nu);
     fmpq_clear(xi);
     fmpq_clear(half);

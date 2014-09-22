@@ -47,18 +47,22 @@ main(void)
     {
         int result;
         fmpz_mat_t A;
-        fmpq_lll_t fl;
+        fmpq_t delta, eta;
 
         slong m;
 
         m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
-        fmpq_lll_context_init(fl, 0.75, 0.5);
+        fmpq_init(delta);
+        fmpq_init(eta);
+
+        fmpq_set_si(delta, 3, 4);
+        fmpq_set_si(eta, 1, 2);
 
         fmpz_mat_randajtai(A, state, 0.5);
 
-        fmpz_mat_lll_original(A, fl);
+        fmpz_mat_lll_original(A, delta, eta);
 
         result = fmpz_mat_is_reduced(A, 0.75, 0.5);
 
@@ -71,7 +75,8 @@ main(void)
         }
 
         fmpz_mat_clear(A);
-        fmpq_lll_context_clear(fl);
+        fmpq_clear(delta);
+        fmpq_clear(eta);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -33,8 +33,8 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
     slong i, j, k, d = A->r;
     fmpq_mat_t r, mu;
     fmpq *s;
-    fmpq_lll_t fl;
-    fmpq_t tmp, gs_Bq;
+    mpq_t deltax, etax;
+    fmpq_t deltaq, etaq, tmp, gs_Bq;
 
     if (d == 0 || d == 1)
         return 1;
@@ -44,17 +44,27 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
 
     s = _fmpq_vec_init(d);
 
-    fmpq_lll_context_init(fl, delta, eta);
+    mpq_init(deltax);
+    mpq_init(etax);
 
+    fmpq_init(deltaq);
+    fmpq_init(etaq);
     fmpq_init(tmp);
     fmpq_init(gs_Bq);
+
+    mpq_set_d(deltax, delta);
+    mpq_set_d(etax, eta);
+    fmpq_set_mpq(deltaq, deltax);
+    fmpq_set_mpq(etaq, etax);
+    mpq_clears(deltax, etax, '\0');
 
     fmpz_set(fmpq_mat_entry_num(r, 0, 0), fmpz_mat_entry(A, 0, 0));
     if (newd == 0 && fmpz_cmp(fmpz_mat_entry(A, 0, 0), gs_B) < 0)
     {
         fmpq_mat_clear(r);
         fmpq_mat_clear(mu);
-        fmpq_lll_context_clear(fl);
+        fmpq_clear(deltaq);
+        fmpq_clear(etaq);
         fmpq_clear(tmp);
         fmpq_clear(gs_Bq);
         _fmpq_vec_clear(s, d);
@@ -80,11 +90,12 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
             if (i < newd)
             {
                 fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
-                if (fmpq_cmp(tmp, fl->eta) > 0) /* check size reduction */
+                if (fmpq_cmp(tmp, etaq) > 0)    /* check size reduction */
                 {
                     fmpq_mat_clear(r);
                     fmpq_mat_clear(mu);
-                    fmpq_lll_context_clear(fl);
+                    fmpq_clear(deltaq);
+                    fmpq_clear(etaq);
                     fmpq_clear(tmp);
                     fmpq_clear(gs_Bq);
                     _fmpq_vec_clear(s, d);
@@ -100,7 +111,8 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
         {
             fmpq_mat_clear(r);
             fmpq_mat_clear(mu);
-            fmpq_lll_context_clear(fl);
+            fmpq_clear(deltaq);
+            fmpq_clear(etaq);
             fmpq_clear(tmp);
             fmpq_clear(gs_Bq);
             _fmpq_vec_clear(s, d);
@@ -108,12 +120,13 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
         }
         if (i < newd)
         {
-            fmpq_mul(tmp, fl->delta, fmpq_mat_entry(r, i - 1, i - 1));
+            fmpq_mul(tmp, deltaq, fmpq_mat_entry(r, i - 1, i - 1));
             if (fmpq_cmp(tmp, s + i - 1) > 0)   /* check Lovasz condition */
             {
                 fmpq_mat_clear(r);
                 fmpq_mat_clear(mu);
-                fmpq_lll_context_clear(fl);
+                fmpq_clear(deltaq);
+                fmpq_clear(etaq);
                 fmpq_clear(tmp);
                 fmpq_clear(gs_Bq);
                 _fmpq_vec_clear(s, d);
@@ -124,7 +137,8 @@ fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double delta,
 
     fmpq_mat_clear(r);
     fmpq_mat_clear(mu);
-    fmpq_lll_context_clear(fl);
+    fmpq_clear(deltaq);
+    fmpq_clear(etaq);
     fmpq_clear(tmp);
     fmpq_clear(gs_Bq);
     _fmpq_vec_clear(s, d);

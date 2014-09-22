@@ -46,7 +46,7 @@ sample(void *arg, ulong count)
     mat_lll_t *params = (mat_lll_t *) arg;
     slong i, dim = params->dim;
     int algorithm = params->algorithm;
-    fmpq_lll_t qfl;
+    fmpq_t delta, eta;
     fmpz_lll_t fl;
 
     flint_rand_t rnd;
@@ -55,7 +55,11 @@ sample(void *arg, ulong count)
 
 
     fmpz_mat_init(A, dim, dim);
-    fmpq_lll_context_init(qfl, 0.75, 0.81);
+    fmpq_init(delta);
+    fmpq_init(eta);
+
+    fmpq_set_si(delta, 3, 4);
+    fmpq_set_si(eta, 81, 100);
     fmpz_lll_context_init(fl, 0.75, 0.81, 1, 0);
 
     fmpz_mat_randajtai(A, state, 0.5);
@@ -68,12 +72,12 @@ sample(void *arg, ulong count)
     if (algorithm == 0)
         for (i = 0; i < count; i++)
         {
-            fmpz_mat_lll_original(A, qfl);
+            fmpz_mat_lll_original(A, delta, eta);
         }
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
         {
-            fmpz_mat_lll_storjohann(B, qfl);
+            fmpz_mat_lll_storjohann(B, delta, eta);
         }
     else if (algorithm == 2)
         for (i = 0; i < count; i++)
@@ -92,7 +96,8 @@ sample(void *arg, ulong count)
     fmpz_mat_clear(B);
     fmpz_mat_clear(C);
     fmpz_mat_clear(D);
-    fmpq_lll_context_clear(qfl);
+    fmpq_clear(delta);
+    fmpq_clear(eta);
     flint_randclear(state);
 }
 
