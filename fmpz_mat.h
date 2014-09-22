@@ -373,7 +373,7 @@ FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double d
 
 /* Classical LLL *************************************************************/
 
-FLINT_DLL void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl);
+FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl);
 
 /* Modified LLL **************************************************************/
 

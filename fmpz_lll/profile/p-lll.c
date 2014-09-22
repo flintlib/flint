@@ -68,7 +68,7 @@ sample(void *arg, ulong count)
     if (algorithm == 0)
         for (i = 0; i < count; i++)
         {
-            fmpz_mat_lll(A, qfl);
+            fmpz_mat_lll_original(A, qfl);
         }
     else if (algorithm == 1)
         for (i = 0; i < count; i++)

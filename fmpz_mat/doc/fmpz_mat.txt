@@ -1156,7 +1156,7 @@ int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta,
 
 *******************************************************************************
 
-void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
+void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
 
     Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
     the rows of a $m x n$ matrix \code{A}), and an LLL context object

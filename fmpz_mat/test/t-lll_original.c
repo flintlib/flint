@@ -39,7 +39,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
 
-    flint_printf("lll....");
+    flint_printf("lll_original....");
     fflush(stdout);
 
     /* check output basis is LLL reduced (randajtai used) */
@@ -58,7 +58,7 @@ main(void)
 
         fmpz_mat_randajtai(A, state, 0.5);
 
-        fmpz_mat_lll(A, fl);
+        fmpz_mat_lll_original(A, fl);
 
         result = fmpz_mat_is_reduced(A, 0.75, 0.5);
 

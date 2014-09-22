@@ -27,7 +27,7 @@
 #include "fmpq_mat.h"
 
 void
-fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
+fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_lll_t fl)
 {
     slong i, j, k, l, m, n;
     fmpz_t r, one;
