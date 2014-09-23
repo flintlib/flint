@@ -37,6 +37,8 @@
 #define FLINT_CPIMPORT FLINT_SRC_CPIMPORT
 #endif
 
+extern char * flint_cpimport;
+
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode)
@@ -58,8 +60,12 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
        file = fopen(FLINT_SRC_CPIMPORT, "r");
 
     if (!file)
+       file = fopen("CPimport.txt", "r");
+
+    if (!file)
     {
-        file = fopen("CPimport.txt", "r");
+        if (flint_cpimport != NULL)
+		   file = fopen(flint_cpimport, "r");
 
         if (!file)
         {
