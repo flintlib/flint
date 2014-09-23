@@ -1178,3 +1178,7 @@ void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta,
     the rows of the same $m x n$ matrix \code{A}). Uses a modified version of
     LLL, which has better complexity in terms of the lattice dimension,
     introduced by Storjohann.
+
+    See ``Faster Algorithms for Integer Lattice Basis Reduction.'' Technical 
+    Report 249. Zurich, Switzerland: Department Informatik, ETH. July 30, 
+    1996.
