@@ -317,6 +317,8 @@ int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
     function is mainly intended to be used for testing purposes. It will not
     always work, but if it does the result is guaranteed.
 
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+
 int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                              mp_bitcnt_t prec)
 
@@ -325,6 +327,8 @@ int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
     \code{mpfr} variables used have their precision set to be exactly
     \code{prec} bits. The function is mainly intended to be used for testing
     purposes. It will not always work, but if it does the result is guaranteed.
+
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
 int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl,
                         mp_bitcnt_t prec)
@@ -350,6 +354,8 @@ int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
     testing purposes. It will not always work, but if it does the result is
     guaranteed.
 
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+
 int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B,
             const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
 
@@ -360,6 +366,8 @@ int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B,
     precision set to be exactly \code{prec} bits. The function is mainly
     intended to be used for testing purposes. It will not always work, but if
     it does the result is guaranteed.
+
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
 int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                  const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
