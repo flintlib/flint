@@ -4,6 +4,8 @@ else
   $(DLPATH):=$(DLPATH_ADD)
 endif
 
+LIBDIR=lib
+
 QUIET_CC  = @echo '   ' CC  ' ' $@;
 QUIET_CXX = @echo '   ' CXX ' ' $@;
 QUIET_AR  = @echo '   ' AR  ' ' $@;
@@ -102,10 +104,10 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
 	  $(MAKE) build/interfaces/NTL-interface.lo; \
-	  $(CXX) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	  $(CXX) $(CXXFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
 	fi
 	$(AT)if [ "$(WANT_NTL)" -ne "1" ]; then \
-	  $(CC) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
 	fi
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
@@ -169,23 +171,23 @@ else
 endif
 
 install: library
-	mkdir -p $(DESTDIR)$(PREFIX)/lib
-	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
+	mkdir -p "$(DESTDIR)$(PREFIX)/$(LIBDIR)"
+	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/lib; \
+		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
+		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
-	cp $(HEADERS) $(DESTDIR)$(PREFIX)/include/flint
+	cp $(HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
-		cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint; \
+		cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
 	fi
-	mkdir -p $(DESTDIR)$(FLINT_CPIMPORT_DIR)
-	cp qadic/CPimport.txt $(DESTDIR)$(FLINT_CPIMPORT_DIR)
-	mkdir -p $(DESTDIR)$(PREFIX)/include/flint/flintxx
-	cp flintxx/*.h $(DESTDIR)$(PREFIX)/include/flint/flintxx
-	cp *xx.h $(DESTDIR)$(PREFIX)/include/flint
+	mkdir -p "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
+	cp qadic/CPimport.txt "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
+	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
+	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
+	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 
 build:
 	mkdir -p build
@@ -212,7 +214,7 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
+	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.lo -o $@ $(LIBS);
 
 print-%:
 	@echo '$*=$($*)'
