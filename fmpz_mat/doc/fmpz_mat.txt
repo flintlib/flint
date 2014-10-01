@@ -1146,7 +1146,7 @@ int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta,
 
     Returns a non-zero value if the basis \code{A} is LLL-reduced with factor
     (\code{delta}, \code{eta}) and the squared Gram-Schmidt length of each
-    $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B}, and
+    $i$-th vector (where $i \ge$ \code{newd}) is greater than \code{gs_B}, and
     otherwise returns zero. The function is mainly intended to be used for
     testing purposes in the \code{fmpz_lll} module.
 
