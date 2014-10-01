@@ -759,7 +759,7 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
     More precisely, this function computes an integer $M$ and an integer
     matrix $X$ such that $AX = B \bmod M$ and such that all the reduced
     numerators and denominators of the elements $x = p/q$ in the full
-    solution satisfy $2|p|q < B$. As such, the explicit rational solution
+    solution satisfy $2|p|q < M$. As such, the explicit rational solution
     matrix can be recovered uniquely by passing the output of this
     function to \code{fmpq_mat_set_fmpz_mat_mod}.
 
