@@ -57,6 +57,8 @@ FLINT_DLL void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
 
 FLINT_DLL void fmpq_mat_clear(fmpq_mat_t mat);
 
+FLINT_DLL void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2);
+
 
 FLINT_DLL void fmpq_mat_print(const fmpq_mat_t mat);
 
@@ -188,6 +190,10 @@ FLINT_DLL slong fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A);
 FLINT_DLL slong fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
 
 FLINT_DLL slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
+
+/* Gram-Schmidt Orthogonalisation  *******************************************/
+
+FLINT_DLL void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A);
 
 #ifdef __cplusplus
 }

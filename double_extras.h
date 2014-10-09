@@ -47,6 +47,10 @@
 
 FLINT_DLL double d_randtest(flint_rand_t state);
 
+FLINT_DLL double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
+
+FLINT_DLL double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
+
 static __inline__ double
 d_polyval(const double * poly, int len, double x)
 {
@@ -60,6 +64,10 @@ d_polyval(const double * poly, int len, double x)
 }
 
 FLINT_DLL double d_lambertw(double x);
+
+FLINT_DLL int d_is_nan(double x);
+
+FLINT_DLL double d_log2(double x);
 
 #ifdef __cplusplus
 }

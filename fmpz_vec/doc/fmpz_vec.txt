@@ -182,6 +182,20 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
     output coefficients are to be signed then set \code{sign}, 
     otherwise clear it. 
 
+slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len)
+
+    Export the array of \code{len} entries starting at the pointer \code{vec}
+    to an array of doubles \code{appv}, each entry of which is notionally
+    multiplied by a single returned exponent to give the original entry. The
+    returned exponent is set to be the maximum exponent of all the original
+    entries so that all the doubles in \code{appv} have a maximum absolute
+    value of 1.0.
+
+void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
+
+    Export the array of \code{len} entries starting at the pointer \code{vec}
+    to an array of mpfs \code{appv}.
+
 *******************************************************************************
 
     Assignment and basic manipulation
@@ -436,3 +450,14 @@ void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len)
     the vector is zero. The least common multiple of a length zero vector is
     defined to be one.
 
+*******************************************************************************
+
+    Dot product
+
+*******************************************************************************
+
+void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2,
+                   slong len2)
+
+    Sets \code{res} to the dot product of \code{(vec1, len2)} and
+    \code{(vec2, len2)}.

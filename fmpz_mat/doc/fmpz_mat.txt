@@ -81,6 +81,25 @@ void fmpz_mat_one(fmpz_mat_t mat)
     and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
     truncation of a unit matrix.
 
+*******************************************************************************
+
+    Window
+
+*******************************************************************************
+
+void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
+                          slong c1, slong r2, slong c2)
+
+    Initializes the matrix \code{window} to be an \code{r2 - r1} by
+    \code{c2 - c1} submatrix of \code{mat} whose \code{(0,0)} entry
+    is the \code{(r1, c1)} entry of \code{mat}. The memory for the
+    elements of \code{window} is shared with \code{mat}.
+
+void fmpz_mat_window_clear(fmpz_mat_t window)
+
+    Clears the matrix \code{window} and releases any memory that it
+    uses. Note that the memory to the underlying matrix that
+    \code{window} points to is not freed.
 
 *******************************************************************************
 
@@ -267,6 +286,11 @@ int fmpz_mat_is_zero(const fmpz_mat_t mat)
     Returns a non-zero value if all entries \code{mat} are zero, and
     otherwise returns zero.
 
+int fmpz_mat_is_one(const fmpz_mat_t mat)
+
+    Returns a non-zero value if \code{mat} is the unit matrix or the truncation
+    of a unit matrix, and otherwise returns zero.
+
 int fmpz_mat_is_empty(const fmpz_mat_t mat)
 
     Returns a non-zero value if the number of rows or the number of
@@ -435,6 +459,16 @@ void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A,
     is a scalar respectively of type \code{slong}, \code{ulong},
     or \code{fmpz_t}, which is assumed to divide all elements of
     \code{B} exactly.
+
+void fmpz_mat_scalar_mul_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
+
+    Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
+    multiplied by $2^{exp}$.
+
+void fmpz_mat_scalar_tdiv_q_2exp(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
+
+    Set the matrix \code{B} to the matrix \code{A}, of the same dimensions,
+    divided by $2^{exp}$, rounding down towards zero.
 
 
 *******************************************************************************
@@ -1049,4 +1083,110 @@ int fmpz_mat_hadamard(fmpz_mat_t H)
     $q$ is an odd prime power. Orders $n$ for which Hadamard matrices are
     known to exist but for which this construction fails are
     92, 116, 156, ... (OEIS A046116).
+    
+*******************************************************************************
 
+    Conversions
+
+*******************************************************************************
+
+int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
+
+    Sets the entries of \code{B} as doubles corresponding to the entries of
+    \code{A}, rounding down towards zero if the latter cannot be represented
+    exactly. The return value is -1 if any entry of \code{A} is too large to
+    fit in the normal range of a double, and 0 otherwise.
+
+int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
+
+    Sets the entries of \code{B} as doubles corresponding to the entries of
+    the transpose of \code{A}, rounding down towards zero if the latter cannot
+    be represented exactly. The return value is -1 if any entry of \code{A} is
+    too large to fit in the normal range of a double, and 0 otherwise.
+
+void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
+
+    Sets the entries of \code{B} as mpfs corresponding to the entries of
+    \code{A}.
+
+*******************************************************************************
+
+    RQ Decomposition
+
+*******************************************************************************
+
+void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
+
+    Computes the $RQ$ decomposition of a matrix \code{A} using the Gram–Schmidt
+    process. (Sets \code{R} and \code{Q} such that $A = RQ$ where \code{R} is
+    a lower triangular matrix.)
+
+*******************************************************************************
+
+    Cholesky Decomposition
+
+*******************************************************************************
+
+void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
+
+    Computes \code{R}, the Cholesky factor of a symmetric, positive definite
+    matrix \code{A} using the Cholesky decomposition process. (Sets \code{R}
+    such that $A = RR^{T}$ where \code{R} is a lower triangular matrix.)
+
+*******************************************************************************
+
+    LLL
+
+*******************************************************************************
+
+int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
+
+    Returns a non-zero value if the basis \code{A} is LLL-reduced with factor
+    (\code{delta}, \code{eta}), and otherwise returns zero. The function is
+    mainly intended to be used for testing purposes in the \code{fmpz_lll}
+    module.
+
+int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
+
+    Returns a non-zero value if the basis with Gram matrix \code{A} is
+    LLL-reduced with factor (\code{delta}, \code{eta}), and otherwise returns
+    zero. The function is mainly intended to be used for testing purposes in
+    the \code{fmpz_lll} module.
+
+int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta,
+                                     double eta, const fmpz_t gs_B, int newd)
+
+    Returns a non-zero value if the basis \code{A} is LLL-reduced with factor
+    (\code{delta}, \code{eta}) and the squared Gram-Schmidt length of each
+    $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B}, and
+    otherwise returns zero. The function is mainly intended to be used for
+    testing purposes in the \code{fmpz_lll} module.
+
+*******************************************************************************
+
+    Classical LLL
+
+*******************************************************************************
+
+void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
+
+    Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
+    the rows of a $m x n$ matrix \code{A}), and an LLL context object
+    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
+    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of the same
+    $m x n$ matrix \code{A}).
+
+*******************************************************************************
+
+    Modified LLL
+
+*******************************************************************************
+
+void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
+
+    Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
+    the rows of a $m x n$ matrix \code{A}), and an LLL context object
+    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
+    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of the same
+    $m x n$ matrix \code{A}). Uses a modified version of LLL, which has better
+    complexity in terms of the lattice dimension, introduced by Storjohann.

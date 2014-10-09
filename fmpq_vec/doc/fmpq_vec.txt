@@ -37,6 +37,16 @@ void _fmpq_vec_randtest(fmpq * f, flint_rand_t state,
 
 *******************************************************************************
 
+    Conversions
+
+*******************************************************************************
+
+void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len)
+
+    Sets \code{(res, len)} to \code{(vec, len)}.
+
+*******************************************************************************
+
     Dot product
 
 *******************************************************************************
@@ -45,5 +55,3 @@ void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len)
 
     Sets \code{res} to the dot product of the vectors \code{(vec1, len)} and 
     \code{(vec2, len)}.
-    
-

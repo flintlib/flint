@@ -39,6 +39,11 @@ void fmpq_mat_clear(fmpq_mat_t mat)
     Frees all memory associated with the matrix. The matrix must be
     reinitialised if it is to be used again.
 
+void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
+
+    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2}
+    are allowed to be different.
+
 *******************************************************************************
 
     Entry access

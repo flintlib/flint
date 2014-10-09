@@ -59,6 +59,14 @@ fmpq;
 
 typedef fmpq fmpq_t[1];
 
+typedef struct
+{
+    fmpq_t delta;
+    fmpq_t eta;
+} fmpq_lll_struct;
+
+typedef fmpq_lll_struct fmpq_lll_t[1];
+
 #define fmpq_numref(__x) (&(__x)->num)
 #define fmpq_denref(__y) (&(__y)->den)
 
@@ -219,8 +227,6 @@ FLINT_DLL void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bit
 
 FLINT_DLL void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
-
-
 FLINT_DLL void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den);
 
@@ -367,6 +373,10 @@ FLINT_DLL void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 FLINT_DLL void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 
 FLINT_DLL void fmpq_harmonic_ui(fmpq_t x, ulong n);
+
+FLINT_DLL void fmpq_lll_context_init(fmpq_lll_t fl, double delta, double eta);
+
+FLINT_DLL void fmpq_lll_context_clear(fmpq_lll_t fl);
 
 #ifdef __cplusplus
 }

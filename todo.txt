@@ -291,6 +291,16 @@ fmpz_mat
 * Maybe simplify the interface for row reduction by guaranteeing
   that the denominator is the determinant.
 
+fmpz_lll
+--------
+
+* Improve the wrapper strategy, if possible.
+
+* Add an mpf version of is_reduced functions so that the dependency on MPFR
+  can be removed.
+
+* Componentize the is_reduced code so that the R computed during LLL can be
+  reused.
 
 nmod_mat
 --------
@@ -361,4 +371,25 @@ padic
   perhaps in the form of examples?
 
 * Implement padic_val_fac for generic inputs
+
+mpf_vec/mat
+-----------
+
+* _mpf_vec_approx_equal uses the bizarre mpf notion of equal; it should
+  be either renamed equal_bits or the absolute value of the difference
+  should be compared with zero
+
+* mpf_mat_gso test doesn't check the implementation for different input
+  precisions, and seems to not be very accurate (16 bits for an input precision
+  of 200 bits). A couple of the comparisons don't seem to match those listed in
+  a recent paper (cited in the docs) on the subject.
+
+* similar comments apply to mpf_mat_qr, which uses a similar algorithm.
+
+d_mat
+-----
+
+* d_mat_transpose tries to be clever with the cache, but it could use L1 sized
+blocks and optimise for sequential reading/writing. It could also handle 
+in-place much more efficiently.
 
