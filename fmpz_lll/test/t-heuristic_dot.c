@@ -43,7 +43,7 @@ main(void)
     flint_printf("heuristic_dot....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         int result, expo1, expo2;
         double *v1, *v2;

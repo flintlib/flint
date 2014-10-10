@@ -30,6 +30,8 @@
 
 #include "fq_nmod.h"
 
+extern char * flint_cpimport;
+
 int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
     char *buf;
@@ -44,8 +46,12 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
     file = fopen(FLINT_CPIMPORT, "r");
 
     if (!file)
-    {
         file = fopen("../qadic/CPimport.txt", "r");
+
+    if (!file)
+    {
+        if (flint_cpimport != NULL)
+		   file = fopen(flint_cpimport, "r");
 
         if (!file)
         {

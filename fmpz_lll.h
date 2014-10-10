@@ -39,16 +39,12 @@
  extern "C" {
 #endif
 
-#ifndef NAN
-#define NAN (0.0/0.0)
-#endif
-
 #if FLINT_BITS == 32
 #define CPU_SIZE_1 31
-#define MAX_LONG 2147483647
+#define FMPZ_LLL_MAX_LONG 2147483647
 #else
 #define CPU_SIZE_1 53
-#define MAX_LONG 9007199254740991
+#define FMPZ_LLL_MAX_LONG 9007199254740991
 #endif
 
 #define SIZE_RED_FAILURE_THRESH 5

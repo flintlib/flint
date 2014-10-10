@@ -127,10 +127,6 @@ FLINT_DLL void d_mat_gso(d_mat_t B, const d_mat_t A);
 
 FLINT_DLL void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A);
 
-/* Floating point LLL  *******************************************************/
-
-FLINT_DLL int d_mat_is_reduced(const d_mat_t R, double delta, double eta);
-
 #ifdef __cplusplus
 }
 #endif

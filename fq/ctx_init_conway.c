@@ -34,6 +34,8 @@
 #define FLINT_CPIMPORT "../qadic/CPimport.txt"
 #endif
 
+extern char * flint_cpimport;
+
 int
 _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
@@ -49,8 +51,12 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
     file = fopen(FLINT_CPIMPORT, "r");
 
     if (!file)
-    {
         file = fopen("../qadic/CPimport.txt", "r");
+
+    if (!file)
+    {
+        if (flint_cpimport != NULL)
+		   file = fopen(flint_cpimport, "r");
 
         if (!file)
         {

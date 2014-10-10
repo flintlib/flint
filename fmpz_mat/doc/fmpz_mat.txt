@@ -759,7 +759,7 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
     More precisely, this function computes an integer $M$ and an integer
     matrix $X$ such that $AX = B \bmod M$ and such that all the reduced
     numerators and denominators of the elements $x = p/q$ in the full
-    solution satisfy $2|p|q < B$. As such, the explicit rational solution
+    solution satisfy $2|p|q < M$. As such, the explicit rational solution
     matrix can be recovered uniquely by passing the output of this
     function to \code{fmpq_mat_set_fmpz_mat_mod}.
 
@@ -1111,18 +1111,6 @@ void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-    RQ Decomposition
-
-*******************************************************************************
-
-void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A)
-
-    Computes the $RQ$ decomposition of a matrix \code{A} using the Gram–Schmidt
-    process. (Sets \code{R} and \code{Q} such that $A = RQ$ where \code{R} is
-    a lower triangular matrix.)
-
-*******************************************************************************
-
     Cholesky Decomposition
 
 *******************************************************************************
@@ -1158,7 +1146,7 @@ int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta,
 
     Returns a non-zero value if the basis \code{A} is LLL-reduced with factor
     (\code{delta}, \code{eta}) and the squared Gram-Schmidt length of each
-    $i$th vector (where $i$ \ge \code{newd}) is greater than \code{gs_B}, and
+    $i$-th vector (where $i \ge$ \code{newd}) is greater than \code{gs_B}, and
     otherwise returns zero. The function is mainly intended to be used for
     testing purposes in the \code{fmpz_lll} module.
 
@@ -1168,13 +1156,12 @@ int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta,
 
 *******************************************************************************
 
-void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
+void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
 
     Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
-    the rows of a $m x n$ matrix \code{A}), and an LLL context object
-    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
-    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of the same
-    $m x n$ matrix \code{A}).
+    the rows of a $m x n$ matrix \code{A}). The output is an (\code{delta},
+    \code{eta})-reduced basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as
+    the rows of the same $m x n$ matrix \code{A}).
 
 *******************************************************************************
 
@@ -1182,11 +1169,16 @@ void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl)
 
 *******************************************************************************
 
-void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
+void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta,
+                             const fmpq_t eta)
 
     Takes a basis $x_1, x_2, \ldots, x_m$ of the lattice $L \subset R^n$ (as
-    the rows of a $m x n$ matrix \code{A}), and an LLL context object
-    \code{fl}. The output is an (\code{fl->delta}, \code{fl->eta})-reduced
-    basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as the rows of the same
-    $m x n$ matrix \code{A}). Uses a modified version of LLL, which has better
-    complexity in terms of the lattice dimension, introduced by Storjohann.
+    the rows of a $m x n$ matrix \code{A}). The output is an (\code{delta},
+    \code{eta})-reduced basis $y_1, y_2, \ldots, y_m$ of the lattice $L$ (as
+    the rows of the same $m x n$ matrix \code{A}). Uses a modified version of
+    LLL, which has better complexity in terms of the lattice dimension,
+    introduced by Storjohann.
+
+    See ``Faster Algorithms for Integer Lattice Basis Reduction.'' Technical 
+    Report 249. Zurich, Switzerland: Department Informatik, ETH. July 30, 
+    1996.

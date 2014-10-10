@@ -31,13 +31,14 @@ double
 d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)
 {
     double d, t;
-    slong exp;
+    slong exp, kind;
     d = d_randtest(state);
     exp = minexp + n_randint(state, maxexp - minexp + 1);
     t = ldexp(d, exp);
-    if (n_randint(state, 3) == 2)
+    kind = n_randint(state, 3);
+	if (kind == 2)
         return t;
-    else if (n_randint(state, 3) == 1)
+    else if (kind == 1)
         return -t;
     else
         return 0;

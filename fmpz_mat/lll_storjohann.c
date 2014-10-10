@@ -26,7 +26,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
+fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
 {
     slong n, np, i, j, k;
     double e;
@@ -104,7 +104,7 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
         fmpq_set_fmpz_frac(max, fmpz_mat_entry(T, k - 1, k),
                            fmpz_mat_entry(T, k - 1, k - 1));
         fmpq_abs(gsn, max);
-        if (fmpq_cmp(gsn, fl->eta) > 0)
+        if (fmpq_cmp(gsn, eta) > 0)
         {
             fmpq_sub(max, max, half);
             fmpz_cdiv_q(lhs, fmpq_numref(max), fmpq_denref(max));
@@ -136,7 +136,7 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
         {
             fmpq_mul_fmpz(max, max, fmpz_mat_entry(T, k - 2, k - 2));
         }
-        fmpq_set(gsn, fl->delta);
+        fmpq_set(gsn, delta);
         _fmpq_submul(fmpq_numref(gsn), fmpq_denref(gsn),
                      fmpz_mat_entry(T, k - 1, k), fmpz_mat_entry(T, k - 1,
                                                                  k - 1),
@@ -213,7 +213,7 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl)
             fmpq_set_fmpz_frac(max, fmpz_mat_entry(T, j, k),
                                fmpz_mat_entry(T, j, j));
             fmpq_abs(gsn, max);
-            if (fmpq_cmp(gsn, fl->eta) > 0)
+            if (fmpq_cmp(gsn, eta) > 0)
             {
                 fmpq_sub(max, max, half);
                 fmpz_cdiv_q(lhs, fmpq_numref(max), fmpq_denref(max));

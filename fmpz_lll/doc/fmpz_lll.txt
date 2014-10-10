@@ -172,7 +172,7 @@ int fmpz_lll_shift(const fmpz_mat_t B)
 
 *******************************************************************************
 
-    Varities of LLL
+    Varieties of LLL
 
     These programs implement ideas from the book chapter \citep{Stehle2010}.
 
@@ -317,6 +317,8 @@ int fmpz_lll_is_reduced_d(const fmpz_mat_t B, const fmpz_lll_t fl)
     function is mainly intended to be used for testing purposes. It will not
     always work, but if it does the result is guaranteed.
 
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+
 int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                              mp_bitcnt_t prec)
 
@@ -325,6 +327,8 @@ int fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
     \code{mpfr} variables used have their precision set to be exactly
     \code{prec} bits. The function is mainly intended to be used for testing
     purposes. It will not always work, but if it does the result is guaranteed.
+
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
 int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl,
                         mp_bitcnt_t prec)
@@ -350,6 +354,8 @@ int fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
     testing purposes. It will not always work, but if it does the result is
     guaranteed.
 
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
+
 int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B,
             const fmpz_lll_t fl, const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
 
@@ -360,6 +366,8 @@ int fmpz_lll_is_reduced_mpfr_with_removal(const fmpz_mat_t B,
     precision set to be exactly \code{prec} bits. The function is mainly
     intended to be used for testing purposes. It will not always work, but if
     it does the result is guaranteed.
+
+    Uses the algorithm of Villard (see \url{http://arxiv.org/abs/cs/0701183}).
 
 int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                  const fmpz_t gs_B, int newd, mp_bitcnt_t prec)
@@ -378,7 +386,18 @@ int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
 
 *******************************************************************************
 
-    Default functions
+    Modified ULLL
+
+*******************************************************************************
+
+void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size,
+                              const fmpz_lll_t fl)
+
+    Performs ULLL using \code{fmpz_mat_lll_storjohann()} as the LLL function.
+
+*******************************************************************************
+
+    Main LLL functions
 
 *******************************************************************************
 
@@ -386,6 +405,13 @@ void fmpz_lll(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     Reduces \code{B} in place according to the parameters specified by the
     LLL context object \code{fl}.
+
+    This is the main LLL function which should be called by the user. It
+    currently calls the ULLL algorithm (without removals). The ULLL function
+    in turn calls a LLL wrapper which tries to choose an optimal LLL algorithm,
+    starting with a version using just doubles (ULLL tries to maximise usage
+    of this), then a heuristic LLL a full precision floating point LLL if
+    required.
 
 int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                           const fmpz_lll_t fl)
@@ -395,13 +421,6 @@ int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
     length is greater than the bound \code{gs_B}. The return value is the new
     dimension of \code{B} to be considered for further computation.
 
-*******************************************************************************
-
-    Modified ULLL
-
-*******************************************************************************
-
-void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size,
-                              const fmpz_lll_t fl)
-
-    Performs ULLL using \code{fmpz_mat_lll_storjohann()} as the LLL function.
+    This is the main LLL with removals function which should be called by
+    the user. Like \code{fmpz_lll} it calls ULLL, but it also sets the
+    Gram-Schmidt bound to that supplied and does removals.

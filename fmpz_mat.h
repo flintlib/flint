@@ -357,10 +357,6 @@ FLINT_DLL int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
 
-/* RQ Decomposition *********************************************************/
-
-FLINT_DLL void fmpz_mat_rq_d(d_mat_t R, d_mat_t Q, const fmpz_mat_t A);
-
 /* Cholesky Decomposition ****************************************************/
 
 FLINT_DLL void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
@@ -377,11 +373,11 @@ FLINT_DLL int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A, double d
 
 /* Classical LLL *************************************************************/
 
-FLINT_DLL void fmpz_mat_lll(fmpz_mat_t A, const fmpq_lll_t fl);
+FLINT_DLL void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
 
 /* Modified LLL **************************************************************/
 
-FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_lll_t fl);
+FLINT_DLL void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
 
 #ifdef __cplusplus
 }

@@ -87,7 +87,7 @@ FUNC_HEAD
         {
             for (j = 0; j < d; j++)
             {
-                d_mat_entry(A->appSP, i, j) = NAN;
+                d_mat_entry(A->appSP, i, j) = D_NAN;
             }
         }
 
