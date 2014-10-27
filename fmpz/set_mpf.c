@@ -29,12 +29,19 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+#if defined( _WIN64) && defined( _MSC_MPIR_VERSION ) && __MPIR_RELEASE >= 20700
+#  if defined( _MSC_VER ) && _MSC_VER >= 1600
+#    undef  mpf_fits_slong_p
+#    define mpf_fits_slong_p mpf_fits_si_p
+#  endif
+#endif
+
 void
 fmpz_set_mpf(fmpz_t f, const mpf_t x)
 {
     if (!COEFF_IS_MPZ(*f))
     {
-        if (mpf_fits_slong_p(x))
+        if(mpf_fits_slong_p(x))
         {
             slong cx = mpf_get_si(x);
             fmpz_set_si(f, cx);
