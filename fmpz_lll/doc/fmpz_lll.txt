@@ -226,6 +226,17 @@ int fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
     $fl->gt == APPROX$, and finally to the mpf version (\code{fmpz_lll_mpf()})
     if needed.
 
+    \code{U} is the matrix used to capture the unimodular
+    transformations if it is not $NULL$. An exception is raised if $U != NULL$
+    and $U->r != d$, where $d$ is the lattice dimension. \code{fl} is the
+    context object containing information containing the LLL parameters \delta
+    and \eta. The function can perform reduction on both the lattice basis as
+    well as its Gram matrix. The type of lattice representation can be
+    specified via the parameter \code{fl->rt}. The type of Gram matrix to be
+    used in computation (approximate or exact) can also be specified through
+    the variable \code{fl->gt} (applies only if \code{fl->rt} == $Z_BASIS$).
+
+
 int fmpz_lll_d_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                             const fmpz_lll_t fl)
 
@@ -412,6 +423,17 @@ void fmpz_lll(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
     starting with a version using just doubles (ULLL tries to maximise usage
     of this), then a heuristic LLL a full precision floating point LLL if
     required.
+
+    \code{U} is the matrix used to capture the unimodular
+    transformations if it is not $NULL$. An exception is raised if $U != NULL$
+    and $U->r != d$, where $d$ is the lattice dimension. \code{fl} is the
+    context object containing information containing the LLL parameters \delta
+    and \eta. The function can perform reduction on both the lattice basis as
+    well as its Gram matrix. The type of lattice representation can be
+    specified via the parameter \code{fl->rt}. The type of Gram matrix to be
+    used in computation (approximate or exact) can also be specified through
+    the variable \code{fl->gt} (applies only if \code{fl->rt} == $Z_BASIS$).
+
 
 int fmpz_lll_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
                           const fmpz_lll_t fl)
