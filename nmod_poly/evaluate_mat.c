@@ -37,48 +37,55 @@ nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
 {
     slong i, j;
 
-    if(dest == mat)
+    if (dest == mat)
     {
-        for(i = 0; i < mat->r ; i++)
+        for (i = 0; i < mat->r; i++)
         {
-            nmod_mat_entry(dest, i, i) = n_addmod(nmod_mat_entry(mat, i, i),  c, mat->mod.n);
+            nmod_mat_entry(dest, i, i) =
+                n_addmod(nmod_mat_entry(mat, i, i), c, mat->mod.n);
         }
         return;
     }
-    for(i = 0; i < mat->r ; i++)
-        for(j = 0; j < mat->c ; j++)
+    for (i = 0; i < mat->r; i++)
+        for (j = 0; j < mat->c; j++)
         {
             nmod_mat_entry(dest, i, j) = nmod_mat_entry(mat, i, j);
-            if(i == j)
+            if (i == j)
             {
-                nmod_mat_entry(dest, i, i) = n_addmod(nmod_mat_entry(dest, i, i),  c, mat->mod.n);
+                nmod_mat_entry(dest, i, i) =
+                    n_addmod(nmod_mat_entry(dest, i, i), c, mat->mod.n);
             }
         }
 }
 
 void
-nmod_mat_scaler_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b, const nmod_mat_t Y)
+nmod_mat_scaler_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b,
+                        const nmod_mat_t Y)
 {
     slong i, j;
 
-    if(b == UWORD(0))
+    if (b == UWORD(0))
     {
-        if(dest != X)
+        if (dest != X)
             nmod_mat_set(dest, X);
         return;
     }
 
-    for(i = 0; i < X->r; i++)
+    for (i = 0; i < X->r; i++)
     {
-        for(j = 0; j < X->c; j++)
+        for (j = 0; j < X->c; j++)
         {
-            nmod_mat_entry(dest, i, j) = n_addmod(nmod_mat_entry(X, i, j), n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n, Y->mod.ninv), X->mod.n);
+            nmod_mat_entry(dest, i, j) =
+                n_addmod(nmod_mat_entry(X, i, j),
+                         n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n,
+                                          Y->mod.ninv), X->mod.n);
         }
     }
 }
 
 void
-nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
+nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
+                       const nmod_mat_t c)
 {
     slong lim = sqrt(poly->length), i, j, rem, quo, curr;
     nmod_mat_t tmat, *temp;
@@ -101,32 +108,35 @@ nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t
     nmod_mat_one(temp[0]);
     nmod_mat_init(tmat, c->r, c->c, c->mod.n);
 
-    for( i = 1; i <= lim; i++)
+    for (i = 1; i <= lim; i++)
     {
         nmod_mat_init(temp[i], c->r, c->c, c->mod.n);
-        nmod_mat_mul(temp[i], temp[i-1], c);
+        nmod_mat_mul(temp[i], temp[i - 1], c);
     }
 
     rem = (poly->length % lim);
     quo = poly->length / lim;
     curr = poly->length - rem - 1;
 
-    for(i = 0; i < rem; i++)
+    for (i = 0; i < rem; i++)
     {
-        nmod_mat_scaler_mul_add(dest, dest, poly->coeffs[poly->length - rem + i], temp[i]);
+        nmod_mat_scaler_mul_add(dest, dest,
+                                poly->coeffs[poly->length - rem + i], temp[i]);
     }
 
-    for(i = 0; i < quo; i++)
+    for (i = 0; i < quo; i++)
     {
         nmod_mat_mul(tmat, dest, temp[lim]);
-        nmod_mat_scaler_mul_add(dest, tmat, poly->coeffs[curr--], temp[lim-1]);
-        for(j = 1; j < lim ; j++)
+        nmod_mat_scaler_mul_add(dest, tmat, poly->coeffs[curr--],
+                                temp[lim - 1]);
+        for (j = 1; j < lim; j++)
         {
-            nmod_mat_scaler_mul_add(dest, dest, poly->coeffs[curr--], temp[lim-1-j]);
+            nmod_mat_scaler_mul_add(dest, dest, poly->coeffs[curr--],
+                                    temp[lim - 1 - j]);
         }
     }
 
-    for(i = 0; i <= lim; i++)
+    for (i = 0; i <= lim; i++)
     {
         nmod_mat_clear(temp[i]);
     }
