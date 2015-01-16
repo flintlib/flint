@@ -29,6 +29,6 @@
 
 void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
 {
-   flint_mpz_get_fmpz(a, fmpq_numref(c))
-   flint_mpz_set_fmpz(b, fmpq_denref(c))
+   flint_get_mpz(a, fmpq_numref(c))
+   flint_get_mpz(b, fmpq_denref(c))
 }
