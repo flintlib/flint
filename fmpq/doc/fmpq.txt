@@ -181,12 +181,12 @@ void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
     Sets the value of \code{dest} to that of the \code{mpq_t} variable
     \code{src}.
 
-void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpq_t f)
+void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t p, const mpz_t q)
 
     Assuming \code{z} is an \code{fmpz_t} which will not be cleaned up,
-    this temporarily copies the numerator and denominator of \code{f}
-    into \code{z} for read only operations only. The user must not run
-    \code{fmpq_clear} on \code{z}.
+    this temporarily copies \code{p} and \code{q} into the numerator and
+    denominator of \code{z} for read only operations only. The user must not
+    run \code{fmpq_clear} on \code{z}.
 
 void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 

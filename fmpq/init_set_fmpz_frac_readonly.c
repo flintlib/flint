@@ -27,8 +27,8 @@
 #include "gmp.h"
 #include "fmpq.h"
 
-void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpq_t f)
+void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den)
 {
-    fmpz_init_set_readonly(fmpq_numref(z), mpq_numref(f));
-    fmpz_init_set_readonly(fmpq_denref(z), mpq_denref(f));
+    fmpz_init_set_readonly(fmpq_numref(z), num);
+    fmpz_init_set_readonly(fmpq_denref(z), den);
 }
