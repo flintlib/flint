@@ -42,7 +42,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     n_factor_t factors;
 
     if (n == 1)
-        return 1;
+        return 0;
 
     if (n % 2 == 0)
     {
