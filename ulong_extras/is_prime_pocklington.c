@@ -24,8 +24,15 @@
 
 ******************************************************************************/
 
+
+
+/* Points:
+    1. fmpz_tdiv_qr() not in ulong_extras(used 302 fmpz/is_prime.c)
+    2. Need to think of a way to implement cube root, not in ulong_extras.
+*/
 #include <gmp.h>
 #define ulong ulongxx /* interferes with system includes */
+#include <math.h>
 #include <stdlib.h>
 #undef ulong
 #define ulong mp_limb_t
@@ -36,23 +43,29 @@ int
 n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
     int i, j, pass;
-    mp_limb_t n1, cofactor, b, c = 0, ninv, limit;
+    mp_limb_t n1, cofactor, b, c = 0, ninv,limit,F,det;
+    mp_limb_t c1,c2;
     n_factor_t factors;
+
+    if (n == 1)
+        return 1;
 
     if (n % 2 == 0)
     {
         return (n == UWORD(2));
     }
 
+
     n1 = n - 1;
 
     n_factor_init(&factors);
 
-    limit = n_sqrt(n1);
+    limit = (mp_limb_t) cbrt((double) n1);
     cofactor = n_factor_partial(&factors, n1, limit, 1);
 
     if (cofactor != 1) /* check that cofactor is coprime to factors found */
     {
+
         for (i = 0; i < factors.num; i++)
         {
             if (factors.p[i] > FLINT_FACTOR_TRIAL_PRIMES_PRIME)
@@ -65,35 +78,87 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
             }
         }
     }
+    
+    F = n1/cofactor;        /* n1 = F*cofactor */
 
-    ninv = n_preinvert_limb(n);
+    if (F < n_sqrt(n))    /* cube root method applicable only if n^1/3 <= F < n^1/2 */
+    {   
+        /* expressing n as c2*F^2 + c1*F + 1  */
 
-    c = 1;
-    for (i = factors.num - 1; i >= 0; i--)
-    {
-        mp_limb_t exp = n1 / factors.p[i];
-        pass = 0;
+        c2 = n1/n_pow(F,2);     
+        c1 = (n1 - c2*n_pow(F,2))/F;
 
-        for (j = 2; j < iterations && pass == 0; j++)
+        det = c1*c1 - 4*c2; 
+
+        if (n_is_square(det))       /* Pocklington's test for (n^1/3 <= F < n^1/2) */
+            return 0;
+        else
         {
-            b = n_powmod2_preinv(j, exp, n, ninv);
-            if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1))
-                return 0;
 
-            b = n_submod(b, UWORD(1), n);
-            if (b != UWORD(0))
+            ninv = n_preinvert_limb(n);
+
+            c = 1;
+            for (i = factors.num - 1; i >= 0; i--)
             {
-                c = n_mulmod2_preinv(c, b, n, ninv);
-                pass = 1;
+                mp_limb_t exp = n1 / factors.p[i];
+                pass = 0;
+
+                for (j = 2; j < iterations && pass == 0; j++)
+                {
+                    b = n_powmod2_preinv(j, exp, n, ninv);
+                    if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1)) /*checks j^(n-1) = 1 (MOD n) */
+                        return 0;
+    
+                    b = n_submod(b, UWORD(1), n);
+                    if (b != UWORD(0))
+                    {
+                        c = n_mulmod2_preinv(c, b, n, ninv);
+                        pass = 1;
+                    }
+    
+                    if (c == 0)
+                        return 0;
+                }
+    
+                if (j == iterations)
+                    return -1;
             }
 
-            if (c == 0)
-                return 0;
+        return (n_gcd(n, c) == UWORD(1));
+        }
+    }
+    else    /* F > n^1/2 */
+    {
+
+        ninv = n_preinvert_limb(n);
+        c = 1;
+        for (i = factors.num - 1; i >= 0; i--)
+        {
+            mp_limb_t exp = n1 / factors.p[i];
+            pass = 0;
+
+            for (j = 2; j < iterations && pass == 0; j++)
+            {
+                b = n_powmod2_preinv(j, exp, n, ninv);
+                if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1))
+                    return 0;
+
+                b = n_submod(b, UWORD(1), n);
+                if (b != UWORD(0))
+                {
+                    c = n_mulmod2_preinv(c, b, n, ninv);
+                    pass = 1;
+                }
+
+                if (c == 0)
+                    return 0;
+            }
+
+            if (j == iterations)
+                return -1;
         }
 
-        if (j == iterations)
-            return -1;
+        return (n_gcd(n, c) == UWORD(1));
     }
-
-    return (n_gcd(n, c) == UWORD(1));
+    
 }
