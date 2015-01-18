@@ -24,12 +24,6 @@
 
 ******************************************************************************/
 
-
-
-/* Points:
-    1. fmpz_tdiv_qr() not in ulong_extras(used 302 fmpz/is_prime.c)
-    2. Need to think of a way to implement cube root, not in ulong_extras.
-*/
 #include <gmp.h>
 #define ulong ulongxx /* interferes with system includes */
 #include <math.h>
