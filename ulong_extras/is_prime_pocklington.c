@@ -37,29 +37,22 @@ int
 n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
     int i, j, pass;
-    mp_limb_t n1, cofactor, b, c = 0, ninv,limit,F,det;
-    mp_limb_t c1,c2;
+    mp_limb_t n1, cofactor, b, c = 0, ninv,limit, F, det;
+    mp_limb_t c1, c2;
     n_factor_t factors;
 
     if (n == 1)
         return 0;
 
     if (n % 2 == 0)
-    {
         return (n == UWORD(2));
-    }
-
 
     n1 = n - 1;
-
     n_factor_init(&factors);
-
     limit = (mp_limb_t) cbrt((double) n1);
     cofactor = n_factor_partial(&factors, n1, limit, 1);
-
-    if (cofactor != 1) /* check that cofactor is coprime to factors found */
+    if (cofactor != 1)                      /* check that cofactor is coprime to factors found */
     {
-
         for (i = 0; i < factors.num; i++)
         {
             if (factors.p[i] > FLINT_FACTOR_TRIAL_PRIMES_PRIME)
@@ -72,35 +65,28 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
             }
         }
     }
-    
-    F = n1/cofactor;        /* n1 = F*cofactor */
-
-    if (F < n_sqrt(n))    /* cube root method applicable only if n^1/3 <= F < n^1/2 */
+    F = n1/cofactor;                        /* n1 = F*cofactor */
+    if (F < n_sqrt(n))                      /* cube root method applicable only if n^1/3 <= F < n^1/2 */
     {   
-        /* expressing n as c2*F^2 + c1*F + 1  */
-
-        c2 = n1/n_pow(F,2);     
-        c1 = (n1 - c2*n_pow(F,2))/F;
-
+        c2 = n1/F*F;                        /* expressing n as c2*F^2 + c1*F + 1  */
+        c1 = (n1 - c2*F*F )/F;
         det = c1*c1 - 4*c2; 
-
-        if (n_is_square(det))       /* Pocklington's test for (n^1/3 <= F < n^1/2) */
-            return 0;
-        else
+        
+        if (n_is_square(det))               /* Pocklington's test for (n^1/3 <= F < n^1/2) */
         {
-
+            return 0;
+        } else
+        {
             ninv = n_preinvert_limb(n);
-
             c = 1;
             for (i = factors.num - 1; i >= 0; i--)
             {
                 mp_limb_t exp = n1 / factors.p[i];
                 pass = 0;
-
                 for (j = 2; j < iterations && pass == 0; j++)
                 {
                     b = n_powmod2_preinv(j, exp, n, ninv);
-                    if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1)) /*checks j^(n-1) = 1 (MOD n) */
+                    if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1))
                         return 0;
     
                     b = n_submod(b, UWORD(1), n);
@@ -109,21 +95,16 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
                         c = n_mulmod2_preinv(c, b, n, ninv);
                         pass = 1;
                     }
-    
                     if (c == 0)
                         return 0;
                 }
-    
                 if (j == iterations)
                     return -1;
             }
-
         return (n_gcd(n, c) == UWORD(1));
         }
-    }
-    else    /* F > n^1/2 */
+    } else                                     /* F > n^1/2 */
     {
-
         ninv = n_preinvert_limb(n);
         c = 1;
         for (i = factors.num - 1; i >= 0; i--)
@@ -143,16 +124,12 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
                     c = n_mulmod2_preinv(c, b, n, ninv);
                     pass = 1;
                 }
-
                 if (c == 0)
                     return 0;
             }
-
             if (j == iterations)
                 return -1;
         }
-
         return (n_gcd(n, c) == UWORD(1));
-    }
-    
+    }   
 }
