@@ -21,6 +21,7 @@
 
     Copyright (C) 2008 Peter Shrimpton
     Copyright (C) 2009 William Hart
+    Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
