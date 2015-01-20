@@ -150,9 +150,11 @@ FLINT_DLL void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
 
 FLINT_DLL void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op);
 
-FLINT_DLL void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n);
+FLINT_DLL void _fmpq_poly_set_array_mpq(fmpz * poly, 
+                                         fmpz_t den, const mpq_t * a, slong n);
 
-FLINT_DLL void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n);
+FLINT_DLL void fmpq_poly_set_array_mpq(fmpq_poly_t poly, 
+                                                     const mpq_t * a, slong n);
 
 FLINT_DLL int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str);
 
@@ -160,8 +162,12 @@ FLINT_DLL int fmpq_poly_set_str(fmpq_poly_t poly, const char * str);
 
 FLINT_DLL char * fmpq_poly_get_str(const fmpq_poly_t poly);
 
-FLINT_DLL char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var);
+FLINT_DLL char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, 
+                                                             const char * var);
 
+FLINT_DLL char * _fmpq_poly_get_str_pretty(const fmpz *poly, 
+                                 const fmpz_t den, slong len, const char *var);
+								 
 FLINT_DLL void fmpq_poly_zero(fmpq_poly_t poly);
 
 FMPQ_POLY_INLINE void fmpq_poly_one(fmpq_poly_t poly)
@@ -246,6 +252,26 @@ int fmpq_poly_is_x(const fmpq_poly_t op)
 {
     return (op->length) == 2 && (*(op->coeffs + 1) == WORD(1)) && (*(op->coeffs + 0) == WORD(0)) && (*(op->den) == WORD(1));
 }
+
+/*  Inlines, see inlines.c  ************************************************/
+
+FLINT_DLL void fmpq_poly_add_si(fmpq_poly_t res, const fmpq_poly_t poly, slong c);
+
+FLINT_DLL void fmpq_poly_sub_si(fmpq_poly_t res, const fmpq_poly_t poly, slong c);
+
+FLINT_DLL void fmpq_poly_si_sub(fmpq_poly_t res, slong c, const fmpq_poly_t poly);
+
+FLINT_DLL void fmpq_poly_add_fmpz(fmpq_poly_t res, const fmpq_poly_t poly, fmpz_t c);
+
+FLINT_DLL void fmpq_poly_sub_fmpz(fmpq_poly_t res, const fmpq_poly_t poly, fmpz_t c);
+
+FLINT_DLL void fmpq_poly_fmpz_sub(fmpq_poly_t res, fmpz_t c, const fmpq_poly_t poly);
+
+FLINT_DLL void fmpq_poly_add_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, fmpq_t c);
+
+FLINT_DLL void fmpq_poly_sub_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, fmpq_t c);
+
+FLINT_DLL void fmpq_poly_fmpq_sub(fmpq_poly_t res, fmpq_t c, const fmpq_poly_t poly);
 
 /*  Addition and subtraction  ************************************************/
 

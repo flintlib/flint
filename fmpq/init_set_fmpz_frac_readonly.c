@@ -19,21 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011-2012 Fredrik Johansson
-    Copyright (C) 2014 Alex J. Best
+    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
-#include "fmpz_mat.h"
+#include "fmpz.h"
+#include "gmp.h"
+#include "fmpq.h"
 
-slong
-fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
+void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den)
 {
-    if (FLINT_MIN(A->c, A->r) <= 20)
-        return fmpz_mat_rref_fflu(R, den, A);
-    else if (A->r <= 105 && A->c >= 1.4 * A->r)
-        return fmpz_mat_rref_fflu(R, den, A);
-    else
-        return fmpz_mat_rref_mul(R, den, A);
+    fmpz_init_set_readonly(fmpq_numref(z), num);
+    fmpz_init_set_readonly(fmpq_denref(z), den);
 }
-

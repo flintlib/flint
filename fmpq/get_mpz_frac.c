@@ -1,4 +1,4 @@
-/*=============================================================================
+/*============================================================================
 
     This file is part of FLINT.
 
@@ -19,21 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011-2012 Fredrik Johansson
-    Copyright (C) 2014 Alex J. Best
+    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
-#include "fmpz_mat.h"
+#include "fmpz.h"
+#include "gmp.h"
+#include "fmpq.h"
 
-slong
-fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
+void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
 {
-    if (FLINT_MIN(A->c, A->r) <= 20)
-        return fmpz_mat_rref_fflu(R, den, A);
-    else if (A->r <= 105 && A->c >= 1.4 * A->r)
-        return fmpz_mat_rref_fflu(R, den, A);
-    else
-        return fmpz_mat_rref_mul(R, den, A);
+   fmpz_get_mpz(a, fmpq_numref(c));
+   fmpz_get_mpz(b, fmpq_denref(c));
 }
-
