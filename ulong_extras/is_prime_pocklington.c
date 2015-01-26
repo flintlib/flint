@@ -8,7 +8,7 @@
 #include "ulong_extras.h"
 
 int
-n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
     int i, j, pass;
     mp_limb_t n1, cofactor, b, c = 0, ninv, limit, F, Fsq, det, rootn;
@@ -22,13 +22,15 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
         return (n == UWORD(2));
 
     rootn = n_sqrt(n);                      /* floor(sqrt(n)) */
-
     if (n == rootn*rootn)
         return 0;
 
     n1 = n - 1;
     n_factor_init(&factors);
     limit = (mp_limb_t) cbrt((double) n1);
+
+    if (n>9007199254740992)                /*checking if n>2^53 */     
+        limit+=1;
 
     cofactor = n_factor_partial(&factors, n1, limit, 1);
     if (cofactor != 1)                      /* check that cofactor is coprime to factors found */
@@ -48,17 +50,17 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     F = n1/cofactor;                        /* n1 = F*cofactor */
     Fsq = F*F;
 
-    if (F <= rootn)                         /* cube root method applicable only if n^1/3 <= F < n^1/2 */
+    if (F < limit)                          /* if F < n^1/3 , tests cannot be used hence undetermined */
+        return -1;
+
+    if (F <= rootn && F > limit)            /* cube root method applicable only if n^1/3 <= F < n^1/2 */
     {   
         c2 = n1/(Fsq);                      /* expressing n as c2*F^2 + c1*F + 1  */
         c1 = (n1 - c2*Fsq )/F;
         det = c1*c1 - 4*c2; 
         if (n_is_square(det))               /* BSL's test for (n^1/3 <= F < n^1/2) */
-        {
             return 0;
-        }
     }
-
     ninv = n_preinvert_limb(n);
     c = 1;
     for (i = factors.num - 1; i >= 0; i--)
