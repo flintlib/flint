@@ -8,7 +8,7 @@
 #include "ulong_extras.h"
 
 int
-is_prime_pocklington(mp_limb_t n, ulong iterations)
+n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
     int i, j, pass;
     mp_limb_t n1, cofactor, b, c = 0, ninv, limit, F, Fsq, det, rootn;
