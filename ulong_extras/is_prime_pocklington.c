@@ -50,9 +50,6 @@ is_prime_pocklington(mp_limb_t n, ulong iterations)
     F = n1/cofactor;                        /* n1 = F*cofactor */
     Fsq = F*F;
 
-    if (F < limit)                          /* if F < n^1/3 , tests cannot be used hence undetermined */
-        return -1;
-
     if (F <= rootn && F > limit)            /* cube root method applicable only if n^1/3 <= F < n^1/2 */
     {   
         c2 = n1/(Fsq);                      /* expressing n as c2*F^2 + c1*F + 1  */
