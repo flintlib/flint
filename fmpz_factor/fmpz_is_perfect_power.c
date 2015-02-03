@@ -49,20 +49,20 @@ fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
 	fmpz_init(a_upper_limit);	
 	fmpz_init(power);
 
-	fmpz_sqrt(a_upper_limit, n);									/* Set upper limit on a = n^1/2 */
-	long power_upper_limit = fmpz_flog_ui(n, 2) + 1;				/* Set upper limit on b */
+	fmpz_sqrt(a_upper_limit, n);				/* Set upper limit on a = n^1/2 */
+	long power_upper_limit = fmpz_flog_ui(n, 2) + 1;	/* Set upper limit on b */
 	fmpz_init_set_ui(b, power_upper_limit);
 		
 	/* checking whether an a exists for a given b */
 
-	while (fmpz_cmp_ui(b, 1) != 0)									/* loop b from log2(a) to 2 */ 					
+	while (fmpz_cmp_ui(b, 1) != 0)				/* loop b from log2(a) to 2 */ 					
 	{
 		fmpz_set_ui(lower, 2);
 		*upper = *a_upper_limit;
 		currpower = fmpz_get_ui(b);
-		while (fmpz_cmp(lower, upper) <= 0)							/* implementing binary serch */	
+		while (fmpz_cmp(lower, upper) <= 0)		/* implementing binary serch */	
 		{
-			fmpz_add(middle, lower, upper);							/* find middle */
+			fmpz_add(middle, lower, upper);		/* find middle */
 			fmpz_fdiv_q_ui(middle, middle, 2);
 			fmpz_pow_ui(power, middle, currpower);				
 			
@@ -77,7 +77,7 @@ fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
 			else
 				fmpz_sub_ui(upper, middle, 1);	
 		}
-		fmpz_sub_ui(b, b, 1);										/* decrement b */
+		fmpz_sub_ui(b, b, 1);				/* decrement b */
 	}
 	fmpz_clear(b);
 	fmpz_clear(a);
