@@ -20,16 +20,13 @@
 
 
 #define ulong ulongxx /* interferes with system includes */
-#define small_float 2.2204460492503131e-15
 #include <string.h>
-#include <time.h>
 #include <math.h>
 #undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-
 
 int
 fmpz_rootrem_bsearch(fmpz_t remainder, fmpz_t base, fmpz_t n, fmpz_t root) /* root >= 2 */
@@ -86,100 +83,4 @@ fmpz_rootrem_bsearch(fmpz_t remainder, fmpz_t base, fmpz_t n, fmpz_t root) /* ro
     fmpz_clear(sum);
 
     return 1;
-}
-
-inline double absolute(double x) { return x >= 0 ? x : -x; }
-
-int
-fmpz_rootrem_newton_iteration(fmpz_t remainder, fmpz_t base, fmpz_t n, fmpz_t root)
-{
-    if (fmpz_cmp_ui(n, 1)<=0)
-        return 0;
-
-    if (fmpz_cmp_ui(root, 1)<=0)
-        return 0;
-
-    double d, x, a, r;
-    d = 0;
-    x = 1;
-    a = *n;
-    r = *root;
-
-    if (r == 2)
-    {
-        do {
-            d = ((a / x) - x) / 2;
-            x += d;
-        } while (absolute(d)>=(absolute(x)*(small_float)));
-
-    }
-    else
-    {
-        do {
-            d = (a / pow(x, r-1) - x) / r;
-            x += d;
-        } while (absolute(d)>=(absolute(x)*(small_float)));
-    }
-
-    *remainder = x;
-    fmpz_set(base, remainder);
-
-    fmpz_pow_ui(remainder, remainder, fmpz_get_ui(root));
-    fmpz_sub(remainder, n, remainder);
-    return 1;
-}
-
-int main()
-{
-    clock_t begin, end;
-    double time_spent = 0;
-    int a;
-    fmpz_t one, two, three, four;
-    fmpz_init(one);
-    fmpz_set_ui(one, 100);
-    fmpz_init(two);
-    fmpz_set_ui(two, 3);
-    fmpz_init(three);
-    fmpz_init(four);
-    unsigned long int i = 1;
-    unsigned long int j = 1;
-
-    begin = clock();
-
-    for (i = 100000;i<100500;i++)
-    {
-        printf("%ld\n",i);
-        for (j = 1;j<100;j++)
-        {
-            fmpz_set_ui(one, i);
-            fmpz_set_ui(two, j);
-
-            fmpz_rootrem_newton_iteration(three, one, two);
-        }
-    }
-
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("done 1 %lf\n",time_spent );
-    begin = clock();
-
-    for (i = 100000;i<100500;i++)
-    {
-        printf("%ld\n",i);
-        for (j = 1;j<100;j++)
-        {
-            fmpz_set_ui(one, i);
-            fmpz_set_ui(two, j);
-
-            fmpz_rootrem_bsearch(three, one, two);
-        }
-    }
-
-    end = clock();
-    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("done 2 %lf\n",time_spent );
-
-
-    printf("done\n");
-    return 0;
 }
