@@ -21,7 +21,6 @@
 
 #define ulong ulongxx /* interferes with system includes */
 #include <string.h>
-#include <time.h>
 #undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
@@ -32,8 +31,12 @@
 int
 fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
 {
-	if (fmpz_cmp_ui(n,1)<=0)
+	if (fmpz_cmp_ui(n, 1)<=0)
+	{
+		fmpz_set_ui(base, -1);
+		fmpz_set_ui(exponent, -1);
 		return 0;
+	}
 
 	fmpz_t a, b, upper, lower, middle, a_upper_limit, power;
 	unsigned long currpower = 0;
@@ -46,34 +49,35 @@ fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
 	fmpz_init(a_upper_limit);	
 	fmpz_init(power);
 
-	fmpz_sqrt(a_upper_limit,n);										/* Set upper limit on a = n^1/2 */
-	long power_upper_limit = fmpz_flog_ui(n,2) + 1;					/* Set upper limit on b */
-	fmpz_init_set_ui(b,power_upper_limit);
+	fmpz_sqrt(a_upper_limit, n);				/* Set upper limit on a = n^1/2 */
+	long power_upper_limit = fmpz_flog_ui(n, 2) + 1;	/* Set upper limit on b */
+	fmpz_init_set_ui(b, power_upper_limit);
 		
 	/* checking whether an a exists for a given b */
-	while (fmpz_cmp_ui(b,1) != 0)									/* loop b from log2(a) to 2 */ 					
+
+	while (fmpz_cmp_ui(b, 1) != 0)				/* loop b from log2(a) to 2 */ 					
 	{
-		fmpz_set_ui(lower,2);
+		fmpz_set_ui(lower, 2);
 		*upper = *a_upper_limit;
 		currpower = fmpz_get_ui(b);
-		while (fmpz_cmp(lower,upper) <= 0)							/* implementing binary serch */	
+		while (fmpz_cmp(lower, upper) <= 0)		/* implementing binary serch */	
 		{
-			fmpz_add(middle,lower,upper);							/* find middle */
-			fmpz_fdiv_q_ui(middle,middle,2);
-			fmpz_pow_ui(power,middle, currpower);				
+			fmpz_add(middle, lower, upper);		/* find middle */
+			fmpz_fdiv_q_ui(middle, middle, 2);
+			fmpz_pow_ui(power, middle, currpower);				
 			
-			if (!fmpz_cmp(power,n))
+			if (!fmpz_cmp(power, n))
 			{
 				*exponent = *b;
 				*base = *middle;
 				return 1;
 			}	
-			else if (fmpz_cmp(power,n)<0)
-				fmpz_add_ui(lower,middle,1);
+			else if (fmpz_cmp(power, n)<0)
+				fmpz_add_ui(lower, middle, 1);
 			else
-				fmpz_sub_ui(upper,middle,1);	
+				fmpz_sub_ui(upper, middle, 1);	
 		}
-		fmpz_sub_ui(b,b,1);											/* decrement b */
+		fmpz_sub_ui(b, b, 1);				/* decrement b */
 	}
 	fmpz_clear(b);
 	fmpz_clear(a);
@@ -82,9 +86,8 @@ fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
 	fmpz_clear(lower);
 	fmpz_clear(a_upper_limit);
 	fmpz_clear(power);
-	
+
 	fmpz_set_ui(base, -1);
 	fmpz_set_ui(exponent, -1);
 	return 0;
-
 }
