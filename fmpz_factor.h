@@ -91,6 +91,16 @@ FLINT_DLL int fmpz_factor_moebius_mu(const fmpz_factor_t fac);
 
 FLINT_DLL void fmpz_factor_divisor_sigma(fmpz_t res, const fmpz_factor_t fac, ulong k);
 
+/* Perfect power testing and nth root functions  **************************************************/
+
+FLINT_DLL int fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent);
+
+FLINT_DLL int fmpz_rootrem_bsearch(fmpz_t remainder, fmpz_t base, fmpz_t n, fmpz_t root);
+
+FLINT_DLL int fmpz_rootrem_newton_iteration(fmpz_t remainder, fmpz_t base, fmpz_t n, fmpz_t root);
+
+FLINT_DLL int n_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent);
+
 #ifdef __cplusplus
 }
 #endif

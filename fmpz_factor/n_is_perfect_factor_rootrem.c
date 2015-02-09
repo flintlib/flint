@@ -17,54 +17,43 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
+
 #define ulong ulongxx /* interferes with system includes */
-#define small_float 2.2204460492503131e-15
 #include <string.h>
-#include <math.h>
-#include <time.h>
 #undef ulong
 #define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 
-double absolute(double x) { return x >= 0 ? x : -x; }
 
 int
-fmpz_rootrem_newton_iteration(fmpz_t remainder, fmpz_t base, fmpz_t n, fmpz_t root)
+n_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
 {
-    if (fmpz_cmp_ui(n, 1)<=0)
-        return 0;
+    fmpz_t upper_power_limit, root, remainder, currbase;
+    fmpz_init_set_ui(upper_power_limit, fmpz_flog_ui(n, 2) + 1);   /* upper limit on root */
+    fmpz_init(root);
+    fmpz_init(remainder);
+    fmpz_init(currbase);
+    fmpz_set(root, upper_power_limit);
 
-    if (fmpz_cmp_ui(root, 1)<=0)
-        return 0;
-
-    double d, x, a, r;
-    d = 0;
-    x = 1;
-    a = *n;
-    r = *root;
-
-    if (r == 2)
+    while (fmpz_cmp_ui(root, 1))    /*root from log2n to 2 */
     {
-        do {
-            d = ((a / x) - x) / 2;
-            x += d;
-        } while (absolute(d)>=(absolute(x)*(small_float)));
-
-    }
-    else
-    {
-        do {
-            d = (a / pow(x, r-1) - x) / r;
-            x += d;
-        } while (absolute(d)>=(absolute(x)*(small_float)));
+        int i = fmpz_rootrem_bsearch(remainder, currbase, n, root); /*checking if root rem = 1 */
+        if (!fmpz_cmp_ui(remainder, 0)) 
+        {
+            fmpz_set(base, currbase);
+            fmpz_set(exponent, root);
+            return 1;
+        }
+        fmpz_sub_ui(root, root, 1);
     }
 
-    *remainder = x;
-    fmpz_set(base, remainder);
+    fmpz_clear(upper_power_limit);
+    fmpz_clear(root);
+    fmpz_clear(remainder);
+    fmpz_clear(currbase);
 
-    fmpz_pow_ui(remainder, remainder, fmpz_get_ui(root));
-    fmpz_sub(remainder, n, remainder);
-    return 1;
+    return 0;
+
 }
