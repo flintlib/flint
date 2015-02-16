@@ -54,7 +54,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
     n1 = n - 1;
     n_factor_init(&factors);
-    limit = (mp_limb_t) cbrt((double) n1);
+    limit = (mp_limb_t) pow((double)n1, 1.0/3);
 
     if (n>9007199254740992)                 /* if n exceeds 2^53, limit is increased by 1 as */    
         limit+=1;                           /* the mantissa of n will be smaller than the actual value */
