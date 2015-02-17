@@ -1102,3 +1102,6 @@ v 2.4.3 -- 01 Apr 2014
 
 v 2.4.4 -- fixed a severe bug in flint's primality code (n_is_prime() affecting n_factor())
 
+v 2.4.5 -- fixed a severe bug in flint's fmpz_poly_gcd_heuristic, reported by
+    Anton Mellit.
+
