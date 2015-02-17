@@ -241,7 +241,8 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 
 		if (divides) /* quotient really was exact */
 		{
-         flint_mpn_zero(q, qlimbs);
+                   divides = 0;
+                   flint_mpn_zero(q, qlimbs);
           
          if (flint_mpn_divides(q, array2, limbs2, arrayg, limbsg, temp)) 
 	      {

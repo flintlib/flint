@@ -201,6 +201,61 @@ main(void)
         fmpz_poly_clear(r);
     }
 
+    /* 
+	   Check that gcd(f, ga) divides f and ga for small generic f, g
+	   and a small linear factor a. Exercises a bug found by Anton Mellit.
+	*/
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, d, f, g, q, r;
+        slong c;
+		
+        fmpz_poly_init(d);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_poly_init(q);
+        fmpz_poly_init(r);
+        fmpz_poly_init(a);
+        fmpz_poly_randtest(f, state, n_randint(state, 5), 8);
+        fmpz_poly_randtest(g, state, n_randint(state, 5), 8);
+
+		/* multiply by small linear factor */
+		fmpz_poly_set_coeff_si(a, 0, n_randint(state, 2) ? 1 : -1);
+		fmpz_poly_set_coeff_si(a, 1, 1);
+		fmpz_poly_mul(g, g, a);
+		
+        d1 = fmpz_poly_gcd_heuristic(d, f, g);
+		
+        if (d1)
+        {
+           if (fmpz_poly_is_zero(d))
+		      result = fmpz_poly_is_zero(f) && fmpz_poly_is_zero(g);
+		   else
+		   {
+		      fmpz_poly_divrem_divconquer(q, r, f, d);
+              result = fmpz_poly_is_zero(r);
+              fmpz_poly_divrem_divconquer(q, r, g, d);
+              result &= fmpz_poly_is_zero(r);
+		   }
+		   
+           if (!result)
+           {
+              flint_printf("FAIL (gcd(f, g) | f and g):\n");
+              flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
+              flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
+              flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
+              abort();
+           }
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(d);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_poly_clear(q);
+        fmpz_poly_clear(r);
+    }
+
     /* Sebastian's test case */
     {
        fmpz_poly_t a, b, d;
