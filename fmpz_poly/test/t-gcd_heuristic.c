@@ -208,16 +208,15 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, d, f, g, q, r;
-        slong c;
-		
-        fmpz_poly_init(d);
+        
+		fmpz_poly_init(d);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(a);
-        fmpz_poly_randtest(f, state, n_randint(state, 5), 8);
-        fmpz_poly_randtest(g, state, n_randint(state, 5), 8);
+        fmpz_poly_randtest(f, state, n_randint(state, 10), 8);
+        fmpz_poly_randtest(g, state, n_randint(state, 10), 4);
 
 		/* multiply by small linear factor */
 		fmpz_poly_set_coeff_si(a, 0, n_randint(state, 2) ? 1 : -1);
