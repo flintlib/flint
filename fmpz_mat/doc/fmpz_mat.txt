@@ -935,7 +935,7 @@ void fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
 
-void fmpz_mat_hnf_transform(fmpz_mat_t H, const fmpz_mat_t A)
+void fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
 
     Computes an integer matrix \code{H} such that \code{H} is the unique (row)
     Hermite normal form of \code{A} along with the transformation matrix
