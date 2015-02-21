@@ -55,7 +55,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
     n1 = n - 1;
     n_factor_init(&factors);
-    limit = (mp_limb_t) pow((double)n1, 1.0/3);
+    limit = (mp_limb_t) pow((double)n1, 1.0/3) + 1;
 
     val = n_pow(limit, 3);
     while ( (val < n1) && (limit < 2642246))    /* ensuring that limit >= n1^(1/3) */
