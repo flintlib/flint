@@ -103,13 +103,3 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
     of finding a factor which has been missed (if $p+1$ or $p-1$ is not
     smooth for any prime factors $p$ of $n$ then the function will
     not ever succeed).
-
-int fmpz_is_perfect_power(fmpz_t n, fmpz_t base, fmpz_t exponent)
-
-    Checks whether an integer is a perfect power. Checks whether n can be
-    expressed as $a$^$b$ where $a$ and $b$ are greater than 1. 
-
-    Returns 1 if n can be expressed in form of $a$^$b$, otherwise returns 0.
-    In case it can be expressed, base is set to the value of $a$ and
-    exponent is set as $b$. Otherwise both are set as -1.
-
