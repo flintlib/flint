@@ -37,9 +37,10 @@ int
 n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
     int i, j, pass;
-    mp_limb_t n1, cofactor, b, c = 0, ninv, limit, F, Fsq, det, rootn;
+    mp_limb_t n1, cofactor, b, c, ninv, limit, F, Fsq, det, rootn, val;
     mp_limb_t c1, c2;
     n_factor_t factors;
+    c = 0;
 
     if (n == 1)
         return 0;
@@ -56,9 +57,12 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     n_factor_init(&factors);
     limit = (mp_limb_t) pow((double)n1, 1.0/3);
 
-    if (n>9007199254740992)                 /* if n exceeds 2^53, limit is increased by 1 as */    
-        limit+=1;                           /* the mantissa of n will be smaller than the actual value */
-                                            /* as double used in cbrt has only 53 bits of mantissa */
+    val = n_pow(limit, 3);
+    while ( (val < n1) && (limit < 2642246))    /* ensuring that limit >= n1^(1/3) */
+    {                                           /* 2642246^3 is approximately 2^64 */
+        limit+=1;
+        val = n_pow(limit, 3);
+    }
 
     cofactor = n_factor_partial(&factors, n1, limit, 1);
 
