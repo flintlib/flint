@@ -58,9 +58,9 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     limit = (mp_limb_t) pow((double)n1, 1.0/3);
 
     val = n_pow(limit, 3);
-    while ( (val < n1) && (limit < 2642246))    /* ensuring that limit >= n1^(1/3) */
-    {                                           /* 2642246^3 is approximately 2^64 */
-        limit+=1;
+    while ((val < n1) && (limit < 2642246))    /* ensuring that limit >= n1^(1/3) */
+    {                                          /* 2642246^3 is approximately 2^64 */
+        limit++;
         val = n_pow(limit, 3);
     }
 
