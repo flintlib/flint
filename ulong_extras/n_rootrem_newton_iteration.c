@@ -17,11 +17,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-/******************************************************************************
 
-    Copyright (C) 2015 Kushagra Singh
-
-******************************************************************************/
 
 #include <gmp.h>
 #define ulong ulongxx /* interferes with system includes */
@@ -30,11 +26,20 @@
 #define ulong mp_limb_t
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 int
-mp_limb_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
+n_rootrem_newton_iteration(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 {
-    mp_limb_t a, u, t, s, q, max_pow;
+    mp_limb_t max_pow;
+    double x, dx, a, b, small_float;
+
+    if (root > 10)
+        small_float = 0.001;
+    else if (root >= 7)
+        small_float = 0.00001;
+    else 
+        small_float = 0.000001;
 
     if (n<1 || root<1)
         return 0;
@@ -44,8 +49,7 @@ mp_limb_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t ro
         *base = n;
         *remainder = 0;
         return 1;
-    }
-        
+    }   
     if (n <= root)
     {
         *base = 1;
@@ -85,25 +89,30 @@ mp_limb_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t ro
         return 1;
     }
 
+    /* Newton iteration begins */
 
-    u = n_sqrt(n) + 1;           /* u can be any value greater than n^1/k, we know k > 2 */
-    s = n;
+    x = n/root;                 
 
-    do{
-        s = u;
-        t = (root-1)*s;
+    dx = 0;
+    a = root;
+    b = root - 1;
 
-        q = n_clog(n, s);
-        if (q > (root-1))               /* to prevent overflow in case of large root */
-            t+= (n/n_pow(s, root-1));   /* if q < root-1, floor(s ^ root -1) will be 0 */
-       
-        u = t/root;
-    } while(u<s);
+    while (1)
+    {
+        dx = (n / pow(x, b));   // dx = n / x^n-1
+        dx = dx - x;            // dx = ((n / x^n-1) - x)
+        dx = dx / n;            // dx = ((n / x^n-1) - x) / n
 
-    *base = s;
+        x = x + dx;
 
-    a = n_pow(s, root);
-    *remainder = n - a;
+        if (absolute(dx) < absolute(x)*(small_float))
+            break;
+    }
+
+    *remainder = x;
+    *base = *remainder;
+    *remainder = pow(*remainder, root);
+    *remainder = n - *remainder;
 
     return 1;
 }
