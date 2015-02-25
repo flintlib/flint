@@ -97,6 +97,12 @@ fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
     _fmpz_poly_set_length(res, poly->length);
 }
 
+FMPQ_POLY_INLINE void
+fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
+{
+   fmpz_set(den, fmpq_poly_denref(poly));
+}
+
 /*  Canonicalisation  *************************************/
 
 FLINT_DLL void _fmpq_poly_canonicalise(fmpz * rpoly, fmpz_t den, slong len);
