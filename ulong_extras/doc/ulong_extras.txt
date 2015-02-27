@@ -864,15 +864,15 @@ mp_limb_t n_sqrt(mp_limb_t a)
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
 
-    Computes the integer truncation of the square root of $a$. The integer
-    itself can be represented exactly as a double and its square root is 
-    computed to the nearest place. If $a$ is one below a square, the 
-    rounding may be up, whereas if it is one above a square, the rounding 
-    will be down. Thus the square root may be one too large in some 
-    instances. We also have to be careful when the square of this too 
-    large value causes an overflow. The same assumptions hold for a 
-    single precision float provided the square root itself can be 
-    represented in a single float, i.e. for \
+    Returns the integer truncation of the square root of $a$. r is set
+    as the remainder. The integer itself can be represented exactly as a 
+    double and its square root is computed to the nearest place. 
+    If $a$ is one below a square, the rounding may be up, whereas if 
+    it is one above a square, the rounding will be down. Thus the square 
+    root may be one too large in some instances. We also have to be 
+    careful when the square of this too large value causes an overflow. 
+    The same assumptions hold for a single precision float provided the 
+    square root itself can be represented in a single float, i.e. for \
     $a < 281474976710656 = 2^{46}$. The remainder is computed by 
     subtracting the square of the computed square root from $a$.
 
@@ -900,6 +900,18 @@ int n_is_perfect_power235(mp_limb_t n)
     square root test is performed. Similarly a cube root or fifth 
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
+
+int n_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
+
+    This function uses a Newton's method to calculate the nth root of
+    a number. Assumes that n > 0 and root > 0.
+
+    Base gets assigned to the integer part of n ^ 1/root. Remainder is
+    set as n - base^root. 
+
+    Returns 1 if successfully calculated the nth root. In case n < 1 or
+    root < 1, 0 is returned.   
+
 
 *******************************************************************************
 
