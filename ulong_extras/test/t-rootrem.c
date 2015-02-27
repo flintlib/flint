@@ -55,7 +55,7 @@ int main(void)
       d = n_randint(state, 0);   /*root */
       flint_mpz_set_ui(h, d);
 
-      res = mp_limb_rootrem(&a, &b, c, d);
+      res = n_rootrem(&a, &b, c, d);
 
       mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
       
