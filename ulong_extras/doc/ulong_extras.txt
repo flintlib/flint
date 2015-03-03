@@ -903,7 +903,7 @@ int n_is_perfect_power235(mp_limb_t n)
 
 int n_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 
-    This function uses a Newton's method to calculate the nth root of
+    This function uses the Newton iteration method to calculate the nth root of
     a number. Assumes that n > 0 and root > 0.
 
     Base gets assigned to the integer part of n ^ 1/root. Remainder is
@@ -912,6 +912,10 @@ int n_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root
     Returns 1 if successfully calculated the nth root. In case n < 1 or
     root < 1, 0 is returned.   
 
+mp_limb_t n_cbrt(mp_limb_t n)
+    
+    This function returns the integer truncation of the cube root of $n$.
+    It makes use of the newton iteration method. Assumes n is not negative.
 
 *******************************************************************************
 
