@@ -122,12 +122,23 @@ n_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 
     *base = x;
 
-    while (n_pow(*base, root) <= n)
-        (*base) += 1;
+    currval = n_pow(*base, root);
+    if (currval == n)
+      goto final;
 
-    while (n_pow(*base, root) > n)
-        (*base) -= 1;
+    while (currval<= n)
+    {
+      (*base) += 1;
+      currval = n_pow(*base, root);
+    }
 
+    while (currval > n)
+    {
+      (*base) -= 1;
+      currval = n_pow(*base, root);
+    }
+
+    final:
     *remainder = *base;
     *remainder = n_pow(*remainder, root);
     *remainder = n - *remainder;

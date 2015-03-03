@@ -50,7 +50,7 @@ n_cbrt_failsafe(mp_limb_t n)
     mp_limb_t val, upper_limit;
     upper_limit = 1626 + 1;     /* 1626 < (2^32)^(1/3) */
 
-#ifdef FLINT64
+#if FLINT64
     upper_limit = 2642245 + 1;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
@@ -75,7 +75,7 @@ n_cbrt(mp_limb_t n)
     
     upper_limit = 1626 + 1;     /* 1626 < (2^32)^(1/3) */
 
-#ifdef FLINT64
+#if FLINT64
     upper_limit = 2642245 + 1;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
