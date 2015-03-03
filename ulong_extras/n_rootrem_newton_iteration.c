@@ -109,14 +109,14 @@ n_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
         return 1;
     }
 
-    x =  floor(nth_root_estimate((double)n, root));
+    x =  (mp_limb_t)floor(nth_root_estimate((double)n, root));
 
     /* one round of newton iteration */
 
     currval = n_pow(x, root-1);
     dx = n / currval;
     dx-= x;
-    dx*= inv_table[root-1];
+    dx*= inv_table[root];
     dx = floor(dx);
     x += dx;
 
