@@ -852,7 +852,7 @@ int n_is_probabprime(mp_limb_t n)
 
 mp_limb_t n_sqrt(mp_limb_t a)
 
-    Computes the integer truncation of the square root of $a$. The integer
+    Returns the integer truncation of the square root of $a$. The integer
     itself can be represented exactly as a double and its square root is 
     computed to the nearest place. If $a$ is one below a square, the 
     rounding may be up, whereas if it is one above a square, the rounding 
