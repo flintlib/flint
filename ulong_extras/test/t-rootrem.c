@@ -49,164 +49,151 @@ int main(void)
    upper_limit = 2642245;
 #endif
 
-   for (j = 0; j<maxbits;j++)
-      max += n_pow(2, j);
+    for (j = 0; j<maxbits;j++)
+        max += n_pow(2, j);
 
-   /* random n and root */
+    /* random n and root */
 
-   for (i = 0; i < 10000 * 100; i++)
-   {
-      mp_limb_t a, b, c, d, i, j;
-      mpz_t e, f, g, h;
-      int res;
+    for (i = 0; i < 10000 * 100; i++)
+    {
+        mp_limb_t a, b, c, d, i, j;
+        mpz_t e, f, g, h;
+        int res;
 
-      mpz_init(e);
-      mpz_init(f);
-      mpz_init(g);
-      mpz_init(h);
+        mpz_init(e);
+        mpz_init(f);
+        mpz_init(g);
+        mpz_init(h);
       
-      c = n_randint(state, 0);    /*number */
-      flint_mpz_set_ui(g, c);
+        c = n_randint(state, 0);    /*number */
+        flint_mpz_set_ui(g, c);
 
 
-      d = n_randint(state, 0);   /*root */
-      flint_mpz_set_ui(h, d);
+        d = n_randint(state, 0);   /*root */
+        flint_mpz_set_ui(h, d);
 
-      res = n_rootrem(&a, &b, c, d);
+        res = n_rootrem(&a, &b, c, d);
 
-      mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
+        mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
       
-      i = flint_mpz_get_ui(e);
-      j = flint_mpz_get_ui(f);
+        i = flint_mpz_get_ui(e);
+        j = flint_mpz_get_ui(f);
 
-      result = (res && (a == i) && (b == j));
+        result = (res && (a == i) && (b == j));
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-         flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-         flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
-         abort();
-      }
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
+            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
+            flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
+            abort();
+        }
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
+        mpz_clear(h);
+    }
 
+    /* n of type a^b */
 
-      mpz_clear(e);
-      mpz_clear(f);
-      mpz_clear(g);
-      mpz_clear(h);
-   }
+    for (i = 0; i < 10000 * 100; i++)
+    {
+        mp_limb_t a, b, c, d, max_pow, base;
+        int res;
 
-   /* n of type a^b */
-
-   for (i = 0; i < 10000 * 100; i++)
-   {
-      mp_limb_t a, b, c, d, max_pow, base;
-      int res;
-
-      base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
-      max_pow = n_flog(max, base);    
-      d = n_randint(state, max_pow);       /* root */
-      if (!d)
-        d+=1;
-      c = n_pow(base, d);                  /* number */
-
-      res = n_rootrem(&a, &b, c, d);
+        base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
+        max_pow = n_flog(max, base);    
+        d = n_randint(state, max_pow);       /* root */
+        if (!d)
+            d+=1;
       
+        c = n_pow(base, d);                  /* number */
+        res = n_rootrem(&a, &b, c, d);
+        result = (res && (a == base) && (b == 0));
 
-      result = (res && (a == base) && (b == 0));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
+            printf("\n");
+            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
+            printf("\n");
+            flint_printf("Expected answer : base = %wu remainder = 0", base);
+            abort();
+        }
+    }
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-         printf("\n");
-         flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-         printf("\n");
-         flint_printf("Expected answer : base = %wu remainder = 0", base);
-         abort();
-      }
-
-   }
-
-   /* n of type a^b + 1 */
+    /* n of type a^b + 1 */
    
-   for (i = 0; i < 10000 * 100; i++)
-   {
-      mp_limb_t a, b, c, d, max_pow, base;
-      int res;
+    for (i = 0; i < 10000 * 100; i++)
+    {
+        mp_limb_t a, b, c, d, max_pow, base;
+        int res;
 
-      base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
-      max_pow = n_flog(max, base);    
-      d = n_randint(state, max_pow);       
-      if (d < 2)                                /* root between 2 to max_pow */
-        d = 2;
+        base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
+        max_pow = n_flog(max, base);    
+        d = n_randint(state, max_pow);       
+        if (d < 2)                                /* root between 2 to max_pow */
+            d = 2;
 
-      c = n_pow(base, d) + 1;                   /* number */
+        c = n_pow(base, d) + 1;                   /* number */
+        res = n_rootrem(&a, &b, c, d);
+        result = (res && (a == base) && (b == 1));
 
-      res = n_rootrem(&a, &b, c, d);
-      
-
-      result = (res && (a == base) && (b == 1));
-
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-         printf("\n");
-         flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-         printf("\n");
-         flint_printf("Expected answer : base = %wu remainder = 1", base);
-         abort();
-      }
-
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
+            printf("\n");
+            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
+            printf("\n");
+            flint_printf("Expected answer : base = %wu remainder = 1", base);
+            abort();
+        }
    }
 
-   /* n of type a^b - 1 */
+    /* n of type a^b - 1 */
    
-   for (i = 0; i < 10000 * 100; i++)
-   {
-      mp_limb_t a, b, c, d, i, j, max_pow, base;
-      mpz_t e, f, g, h;
-      int res;
+    for (i = 0; i < 10000 * 100; i++)
+    {
+        mp_limb_t a, b, c, d, i, j, max_pow, base;
+        mpz_t e, f, g, h;
+        int res;
 
-      mpz_init(e);
-      mpz_init(f);
-      mpz_init(g);
-      mpz_init(h);
+        mpz_init(e);
+        mpz_init(f);
+        mpz_init(g);
+        mpz_init(h);
  
-      base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
-      max_pow = n_flog(max, base);    
-      d = n_randint(state, max_pow);       
-      if (d < 2)                                /* root between 2 to max_pow */
-        d = 2;
-      flint_mpz_set_ui(h, d);
+        base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
+        max_pow = n_flog(max, base);    
+        d = n_randint(state, max_pow);       
+        if (d < 2)                                /* root between 2 to max_pow */
+            d = 2;
 
-      c = n_pow(base, d) - 1;                   /* number */
-      flint_mpz_set_ui(g, c);
-
-      res = n_rootrem(&a, &b, c, d);
+        flint_mpz_set_ui(h, d);
+        c = n_pow(base, d) - 1;                   /* number */
+        flint_mpz_set_ui(g, c);
+        res = n_rootrem(&a, &b, c, d);
+        mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
       
-      mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
-      
-      i = flint_mpz_get_ui(e);
-      j = flint_mpz_get_ui(f);
+        i = flint_mpz_get_ui(e);
+        j = flint_mpz_get_ui(f);
 
-      result = (res && (a == i) && (b == j));
+        result = (res && (a == i) && (b == j));
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-         flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-         flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
-         abort();
-      }
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
+            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
+            flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
+            abort();
+        }
+    }
 
-   }
-
-   FLINT_TEST_CLEANUP(state);
-   
-   flint_printf("PASS\n");
-   return 0;
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }
