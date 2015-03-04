@@ -72,32 +72,38 @@ n_cbrt(mp_limb_t n)
 {
     mp_limb_t ret, upper_limit;
     double val, x, dx, xsq;
-    
-    upper_limit = 1626 + 1;     /* 1626 < (2^32)^(1/3) */
+    int iter;
+    iter = 2;
+    val = (double)n;
 
+    upper_limit = 1626 + 1;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
     upper_limit = 2642245 + 1;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
     x = cbrt_estimate((double)n);
 
-    /* one round of newton itertion */
+    /* newton iteration */
 
-    val = (double)n;
-    xsq = x*x;
-    dx = val / xsq;
-    dx -= x;
-    dx*= 0.333333333333333;     /* dx = dx * (1/3) */
-    ret = x + dx;
-
-    if (ret>= upper_limit)      
-        ret = n_cbrt_failsafe(n);
-    else
+    while (iter--)
     {
-        while (n_pow(ret, 3) <= n)
-            (ret) += 1;
-        while (n_pow(ret, 3) > n)
-            (ret) -= 1;
+        xsq = x*x;
+        dx = val / xsq;
+        dx -= x;
+        dx*= 0.333333333333333;     /* dx = dx * (1/3) */     
+        x+=dx;
     }
+    ret = x;
+    if (ret>= upper_limit)      
+    {
+        ret = n_cbrt_failsafe(n);
+        return ret;
+    }
+
+    while (ret*ret*ret <= n)
+        (ret) += 1;
+    while (ret*ret*ret > n)
+        (ret) -= 1;
+
     return ret;
 }
