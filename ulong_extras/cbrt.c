@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2015 William Hart
+    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
@@ -65,39 +66,65 @@ n_cbrt_failsafe(mp_limb_t n)
 }
 
 /* fast cube root function. If value returned calculated after cbrt_estimate
-    and one round of newton iteration causes overflow, n_cbrt_failsafe is called */
+    and two iterations causes overflow, n_cbrt_failsafe is called */
 
 mp_limb_t
 n_cbrt(mp_limb_t n)
 {
-    mp_limb_t ret, upper_limit;
-    double val, x, dx, xsq;
-    int iter;
-    iter = 2;
-    val = (double)n;
+    int iter, bits;
+    double val, x, xcub, num, den;
+    mp_limb_t ret, upper_limit, low, high, mid, p;
 
-    upper_limit = 1626 + 1;     /* 1626 < (2^32)^(1/3) */
+    val = (double)n;
+    bits = FLINT_BIT_COUNT(n); 
+    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
-    upper_limit = 2642245 + 1;  /* 2642245 < (2^64)^(1/3) */
+    upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
-    x = cbrt_estimate((double)n);
-
-    /* newton iteration */
-
-    while (iter--)
+    if (bits < 8)           /* binary search in case of small n */
     {
-        xsq = x*x;
-        dx = val / xsq;
-        dx -= x;
-        dx*= 0.333333333333333;     /* dx = dx * (1/3) */     
-        x+=dx;
+        low = 0;
+        high = UWORD(1) << ((FLINT_BIT_COUNT(n) + 2) / 3);
+        while (low < high)
+        {
+            mid = low + (high - low) / 2;
+            p = mid + 1;
+            p = p*p*p;
+
+            if (p == n)
+                return mid + 1;
+            else if (p > n)
+                high = mid;
+            else
+                low = mid + 1;
+        }
+        return low;
     }
+    if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
+        iter = 1;
+    else
+        iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
+    
+    x = cbrt_estimate((double)n);   /* initial estimate */
+   
+    /* Kahan's iterations to get cube root */
+
+    val = (double)n;
+    while(iter--)
+    {
+        xcub = x*x*x;
+        num = (xcub - val)*x;
+        den = (xcub + xcub + val);
+        x -= (num/den);
+    }
+
     ret = x;
     if (ret>= upper_limit)      
     {
-        ret = n_cbrt_failsafe(n);
-        return ret;
+        if (ret == upper_limit)
+            return ret;
+        return n_cbrt_failsafe(n);
     }
 
     while (ret*ret*ret <= n)

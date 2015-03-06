@@ -915,7 +915,10 @@ int n_rootrem(mp_limb_t* base, mp_limb_t* remainder, mp_limb_t n, mp_limb_t root
 mp_limb_t n_cbrt(mp_limb_t n)
     
     This function returns the integer truncation of the cube root of $n$.
-    It makes use of the newton iteration method. Assumes n is not negative.
+    It makes use of the iteration, x = x - (x*x*x - a)*x/(2*x*x*x + a)
+    for getting a good estimate, as mentioned in the paper by W. Kahan 
+    source : http://www.cims.nyu.edu/~dbindel/class/cs279/qbrt.pdf
+    Assumes n is not negative.
 
 *******************************************************************************
 
