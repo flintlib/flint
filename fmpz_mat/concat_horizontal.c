@@ -31,7 +31,7 @@
 void
 fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    slong i,j;
+    slong i, j;
     slong r1 = mat1->r;
     slong c1 = mat1->c;
     slong r2 = mat2->r;
