@@ -9,10 +9,6 @@ fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t
     slong r2 = mat2->r;
     slong c2 = mat2->c;
     
-    if(c1 != c2)
-        return;
-
-
     for(i = 0; i < r1; i++)
     {
         for(j = 0; j < c1; j++)
@@ -20,7 +16,6 @@ fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t
             fmpz_set(fmpz_mat_entry(res, i, j), fmpz_mat_entry(mat1, i, j));
         }
     }
-
 
     for(i = 0; i < r2; i++)
     {
