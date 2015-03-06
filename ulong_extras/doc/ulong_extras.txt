@@ -920,6 +920,20 @@ mp_limb_t n_cbrt(mp_limb_t n)
     source : http://www.cims.nyu.edu/~dbindel/class/cs279/qbrt.pdf
     Assumes n is not negative.
 
+mp_limb_t n_cbrt_newton_iteration(mp_limb_t n)
+
+    This function returns the integer truncation of the cube root of $n$.
+    Makes use of Newton iterations to get a close value, and then adjusts the
+    estimate so as to get the correct value. In case of overflow, makes a 
+    call to libm pow().
+    Assumes n is not negative.
+
+mp_limb_t n_cbrt_binary_search(mp_limb_t n)
+
+    This function returns the integer truncation of the cube root of $n$.
+    Uses binary search to get the correct value. Assumes n is not negative.
+
+
 *******************************************************************************
 
     Factorisation

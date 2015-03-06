@@ -32,10 +32,8 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* function to get a good estimate of the cube root */
-
 double
-cbrt_estimate(double a)
+estimate(double a)
 { 
    slong i = *((slong *) &a);
    const slong s = (1 << 10) - 1;
@@ -44,54 +42,36 @@ cbrt_estimate(double a)
 }
 
 mp_limb_t
-n_cbrt(mp_limb_t n)
+n_cbrt_newton_iteration(mp_limb_t n)
 {
     int iter, bits;
-    double val, x, xcub, num, den;
-    mp_limb_t ret, upper_limit, low, high, mid, p;
-
+    mp_limb_t ret, upper_limit;
+    double val, x, xsq, dx;
     val = (double)n;
     bits = FLINT_BIT_COUNT(n); 
+
     upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
-    if (bits < 8)           /* binary search in case of small n */
-    {
-        low = 0;
-        high = UWORD(1) << ((FLINT_BIT_COUNT(n) + 2) / 3);
-        while (low < high)
-        {
-            mid = low + (high - low) / 2;
-            p = mid + 1;
-            p = p*p*p;
-
-            if (p == n)
-                return mid + 1;
-            else if (p > n)
-                high = mid;
-            else
-                low = mid + 1;
-        }
-        return low;
-    }
     if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
         iter = 1;
     else
         iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
     
-    x = cbrt_estimate((double)n);   /* initial estimate */
-   
-    /* Kahan's iterations to get cube root */
+    x = estimate((double)n);   /* initial estimate */
+
+    /* Newton's iterations to get cube root */
 
     val = (double)n;
     while(iter--)
     {
-        xcub = x*x*x;
-        num = (xcub - val)*x;
-        den = (xcub + xcub + val);
-        x -= (num/den);
+        xsq = x*x;
+        dx = val / xsq;
+        dx -= x;
+        dx*= 0.333333333333333;     /* dx = dx * (1/3) */     
+        x+=dx;
     }
 
     ret = x;
@@ -101,11 +81,9 @@ n_cbrt(mp_limb_t n)
             return upper_limit;
         ret = upper_limit - 1;
     }
-
     while (ret*ret*ret <= n)
         (ret) += 1;
     while (ret*ret*ret > n)
         (ret) -= 1;
-
     return ret;
 }

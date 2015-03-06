@@ -277,6 +277,10 @@ FLINT_DLL int n_is_square(mp_limb_t x);
 
 FLINT_DLL mp_limb_t n_cbrt(mp_limb_t a);
 
+FLINT_DLL mp_limb_t n_cbrt_binary_search(mp_limb_t x);
+
+FLINT_DLL mp_limb_t n_cbrt_newton_iteration(mp_limb_t n);
+
 FLINT_DLL int n_is_perfect_power235(mp_limb_t n);
 
 FLINT_DLL int n_is_oddprime_small(mp_limb_t n);
