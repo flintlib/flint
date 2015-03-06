@@ -571,6 +571,7 @@ int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A)
     and otherwise solves for the identity matrix using
     fraction-free LU decomposition.
 
+
 *******************************************************************************
 
     Trace
