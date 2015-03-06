@@ -109,6 +109,9 @@ $\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against
 Feitma's tables and sped up and corrected \code{n_is_prime} and
 \code{n_is_probabprime}.
 
+$\bullet$ Anubhav Srivastava contributed horizontal and vertical concatenation
+of matrices over $\mathbb{Z}$.
+
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
