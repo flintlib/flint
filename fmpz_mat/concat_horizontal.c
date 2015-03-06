@@ -39,7 +39,7 @@ fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat
     
     for (i = 0; i < r1; i++)
     {
-        for (j = 0;j < c1; j++)
+        for (j = 0; j < c1; j++)
         {
             fmpz_set(fmpz_mat_entry(res, i, j), fmpz_mat_entry(mat1, i, j));
         }
@@ -47,7 +47,7 @@ fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat
 
     for (i = 0; i < r2; i++)
     {
-        for (j = 0;j < c2; j++)
+        for (j = 0; j < c2; j++)
         {
             fmpz_set(fmpz_mat_entry(res, i, j + c1), fmpz_mat_entry(mat2, i, j));
         }
