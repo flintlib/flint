@@ -325,17 +325,17 @@ void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_
     Sets \code{res} to the resultant matrix from the vertical concatenation of 
     (\code{mat1}, \code{mat2}) in that order.
     Matrix dimensions :
-    \code{mat1} : m * n
-    \code{mat2} : k * n
-    \code{res} : (m + k) * n
+    \code{mat1} : m x n
+    \code{mat2} : k x n
+    \code{res} : (m + k) x n
 
 void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
    Sets \code{res} to the resultant matrix from the horizontal concatenation of 
     (\code{mat1}, \code{mat2}) in that order.
    Matrix dimensions :
-    \code{mat1} : m * n
-    \code{mat2} : m * k
-    \code{res}  : m * (n + k)
+    \code{mat1} : m x n
+    \code{mat2} : m x k
+    \code{res}  : m x (n + k)
 
 
 *******************************************************************************
