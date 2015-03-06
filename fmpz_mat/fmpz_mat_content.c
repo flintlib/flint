@@ -5,23 +5,24 @@ void
 fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
 {
     slong i, j, k;
-    fmpz_t t;
+    int cmp;
     
     k = 0;
-    
-    if(A->r == 0 && A->c == 0)
-	fmpz_set_si(ret, k);
-    else
+    fmpz_set_si(ret, k);
+
+    if (A->r != 0 && A->c != 0)
     {
-	ret = fmpz_mat_entry(A, 0, 0);
-    
-	for(i = 0; i < A->r; i++)
+	for (i = 0; i < A->r; i++)
 	{
-	    for(j = 0; j < A->c; j++)
+	    for (j = 0; j < A->c; j++)
 	    {
-		t = ret;
-		fmpz_gcd(ret, t, fmpz_mat_entry(A, i, j)); 
+		fmpz_gcd(ret, ret, fmpz_mat_entry(A, i, j));
+		cmp = fmpz_is_one(ret);
+		if (cmp == 1)
+		    break;
 	    }
+	    if (cmp == 1)
+		break;
 	}
     }
     
