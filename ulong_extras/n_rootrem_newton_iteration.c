@@ -63,6 +63,11 @@ double inv_table[] = { 0.000000000000000, 1.000000000000000, 0.500000000000000,
 
                        /* this table consists 65 values */
 
+/* function to get a good approximation of the cube root */
+/* Algorithm for this approximation is mentioned in this article */
+/* http://en.wikipedia.org/wiki/Fast_inverse_square_root */
+/* Intead of the inverse square root, we calculate the nth root */
+
 double nth_root_estimate(double a, int n)
 { 
    slong i = *((slong *) &a);

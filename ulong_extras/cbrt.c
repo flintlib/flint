@@ -32,7 +32,10 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* function to get a good estimate of the cube root */
+/* function to get a good approximation of the cube root */
+/* Algorithm for this approximation is mentioned in this article */
+/* http://en.wikipedia.org/wiki/Fast_inverse_square_root */
+/* Intead of the inverse square root, we calculate the cube root */
 
 double
 cbrt_estimate(double a)
@@ -48,37 +51,29 @@ n_cbrt(mp_limb_t n)
 {
     int iter, bits;
     double val, x, xcub, num, den;
-    mp_limb_t ret, upper_limit, low, high, mid, p;
+    mp_limb_t ret, upper_limit;
+
+    /* Taking care of smaller roots */
+
+    if (n < 125)
+        return (n >= 1) + (n >= 8) + (n >= 27) + (n >= 64);
+    if (n < 1331)
+        return 5 + (n >= 216) + (n >= 343) + (n >= 512) + (n >= 729) + (n >= 1000);
+    if (n < 4913)
+        return 11 + (n >= 1728) + (n >= 2197) + (n >= 2744) + (n >= 3375) + (n >= 4096);
 
     val = (double)n;
     bits = FLINT_BIT_COUNT(n); 
+
+    /* upper_limit is the max cube root possible for one word */
+
     upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
-    if (bits < 8)           /* binary search in case of small n */
-    {
-        low = 0;
-        high = UWORD(1) << ((FLINT_BIT_COUNT(n) + 2) / 3);
-        while (low < high)
-        {
-            mid = low + (high - low) / 2;
-            p = mid + 1;
-            p = p*p*p;
-
-            if (p == n)
-                return mid + 1;
-            else if (p > n)
-                high = mid;
-            else
-                low = mid + 1;
-        }
-        return low;
-    }
-    if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
-        iter = 1;
-    else
+    iter = 1;           /* one iteration seems to be sufficient for n < 2^46 */
+    if (bits < 46)      
         iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
     
     x = cbrt_estimate((double)n);   /* initial estimate */
@@ -93,8 +88,10 @@ n_cbrt(mp_limb_t n)
         den = (xcub + xcub + val);
         x -= (num/den);
     }
-
     ret = x;
+
+    /* In case ret^3 or (ret+1)^3 will cause overflow */
+
     if (ret>= upper_limit)      
     {
         if (n >= upper_limit*upper_limit*upper_limit)

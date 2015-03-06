@@ -37,6 +37,8 @@ n_cbrt_binary_search(mp_limb_t x)
 {
     mp_limb_t low, high, mid, p, upper_limit;
 
+    /* upper_limit is the max cube root possible for one word */
+
     upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
@@ -45,9 +47,11 @@ n_cbrt_binary_search(mp_limb_t x)
     low = 0;
     high = UWORD(1) << ((FLINT_BIT_COUNT(x) + 2) / 3);
 
-    if (high > upper_limit)
+    if (high > upper_limit) /* cube cannot be greater than upper_limit */
         high = upper_limit;
 
+    /* binary search for cube root */
+        
     while (low < high)
     {
         mid = (high + low) / 2;

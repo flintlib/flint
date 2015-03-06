@@ -50,6 +50,8 @@ n_cbrt_newton_iteration(mp_limb_t n)
     val = (double)n;
     bits = FLINT_BIT_COUNT(n); 
 
+    /* upper_limit is the max cube root possible for one word */
+
     upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
@@ -73,6 +75,8 @@ n_cbrt_newton_iteration(mp_limb_t n)
         dx*= 0.333333333333333;     /* dx = dx * (1/3) */     
         x+=dx;
     }
+    
+    /* In case ret^3 or (ret+1)^3 will cause overflow */
 
     ret = x;
     if (ret>= upper_limit)      
