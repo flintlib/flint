@@ -316,6 +316,23 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
+    Concatenate
+
+*******************************************************************************
+
+
+void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
+    Sets \code{res} to the resultant matrix from the vertical concatenation of 
+    (\code{mat1}, \code{mat2}) in that order.
+
+void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
+   Sets \code{res} to the resultant matrix from the horizontal concatenation of 
+    (\code{mat1}, \code{mat2}) in that order.
+
+
+
+*******************************************************************************
+
     Modular reduction and reconstruction
 
 *******************************************************************************
@@ -546,7 +563,6 @@ int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A)
     This function uses a direct formula for matrices of size two or less,
     and otherwise solves for the identity matrix using
     fraction-free LU decomposition.
-
 
 *******************************************************************************
 
