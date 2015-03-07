@@ -71,7 +71,7 @@ mp_limb_t
 n_cbrt_chevyshef_poly(mp_limb_t n)
 {
     int expo, rem, i, mul;
-    double val, factor, root, dec, dec2, dec4;
+    double val, factor, root, dec;
     double* table;
     mp_limb_t ret, upper_limit;
     
