@@ -49,7 +49,7 @@ cbrt_estimate(double a)
 mp_limb_t
 n_cbrt(mp_limb_t n)
 {
-    int iter, bits;
+    int bits;
     double val, x, xcub, num, den;
     mp_limb_t ret, upper_limit;
 
@@ -65,6 +65,9 @@ n_cbrt(mp_limb_t n)
     val = (double)n;
     bits = FLINT_BIT_COUNT(n); 
 
+    if (bits>46)    /* for larger numbers chebyshev approximation method is faster */
+        return n_cbrt_chevyshef_poly(n);
+
     /* upper_limit is the max cube root possible for one word */
 
     upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
@@ -72,22 +75,14 @@ n_cbrt(mp_limb_t n)
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #endif
 
-    iter = 1;           /* one iteration seems to be sufficient for n < 2^46 */
-    if (bits < 46)      
-        iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
-    
     x = cbrt_estimate((double)n);   /* initial estimate */
    
     /* Kahan's iterations to get cube root */
 
-    val = (double)n;
-    while(iter--)
-    {
-        xcub = x*x*x;
-        num = (xcub - val)*x;
-        den = (xcub + xcub + val);
-        x -= (num/den);
-    }
+    xcub = x*x*x;
+    num = (xcub - val)*x;
+    den = (xcub + xcub + val);
+    x -= (num/den);
     ret = x;
 
     /* In case ret^3 or (ret+1)^3 will cause overflow */
@@ -98,11 +93,15 @@ n_cbrt(mp_limb_t n)
             return upper_limit;
         ret = upper_limit - 1;
     }
-
     while (ret*ret*ret <= n)
+    {
         (ret) += 1;
+        if (ret == upper_limit)
+            break;
+    }
     while (ret*ret*ret > n)
         (ret) -= 1;
 
     return ret;
 }
+

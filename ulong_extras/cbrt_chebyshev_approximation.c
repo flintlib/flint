@@ -35,7 +35,7 @@
 /* Values of coefficient Chebyshev's approximation polynomial calculated
    from the python mpmath module : http://mpmath.org/   */
 
-/* Coefficients of Chebyshev's approximation polynomial (deg 4) [c0, c1, c2, c3, c4, c5] 
+/* Coefficients of Chebyshev's approximation polynomial (deg 4) {c0, c1, c2, c3, c4, c5}
    splitting 0.5 to 1 into 8 equal intervals */
 
 float poly1[] = { 0.366434535, 1.381445155, -1.561722404, 1.225528386, -0.4194725256}; /* range : [0.5000, 0.5625] */
@@ -48,8 +48,7 @@ float poly7[] = { 0.437984966, 0.967050791, -0.640465903, 0.294520591, -0.059090
 float poly8[] = { 0.447840465, 0.924961634, -0.573045133, 0.246510218, -0.0462671851}; /* range : [0.9375, 1.0000] */
 
 float* poly_table[] = { poly1, poly2, poly3, poly4, poly5, poly6, poly7, poly8};
-
-float factor_table[] = {1.000000, 1.259921, 1.587401};
+float factor_table[] = {1.000000, 1.259921, 1.587401};  /* {1^(1/3), 2^(1/3), 4^(1/3)} */
 
 mp_limb_t
 n_cbrt_chevyshef_poly(mp_limb_t n)
