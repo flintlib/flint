@@ -91,6 +91,8 @@ FLINT_DLL int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2);
 FLINT_DLL int fmpz_mat_is_zero(const fmpz_mat_t mat);
 FLINT_DLL int fmpz_mat_is_one(const fmpz_mat_t mat);
 
+FLINT_DLL void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A);
+
 FMPZ_MAT_INLINE
 int fmpz_mat_is_empty(const fmpz_mat_t mat)
 {
