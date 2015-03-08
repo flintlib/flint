@@ -62,7 +62,7 @@ int main(void)
 
         flint_printf("bits = %wd :\n", params.bits);
 
-        for (dim = 1; dim <= 450; dim = (slong) ((double) dim * 3) + 1)
+        for (dim = 1; dim <= 200; dim = (slong) ((double) dim * 3) + 1)
         {
             params.n = dim;
             params.m = dim;
@@ -74,7 +74,7 @@ int main(void)
             prof_repeat(&min_classical, &max, sample, &params);
 
             flint_printf("dim = %wd Classical : %.2f Bodrato : %.2f        ", dim, min_default, min_classical);
-            if (min_default < 0.8*min_classical)
+            if (min_default < 0.6*min_classical)
                 flint_printf("BAD! \n");
             else if(min_default <= min_classical)
                 flint_printf("OK! \n");
