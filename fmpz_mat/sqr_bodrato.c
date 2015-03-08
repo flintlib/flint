@@ -64,9 +64,8 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_clear(u);
     }
     else
-    {
-	 
-        if(n%2==0)
+    { 
+        if (n%2 == 0)
         {
             fmpz_mat_t window11, window12, window21, window22;
             fmpz_mat_t s1, s2, s3, s4;
@@ -123,33 +122,33 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             fmpz_mat_sub(p3, s2, p7);
             fmpz_mat_add(s4, p2, s2);
             
-            for(i=0;i<n/2;++i)
+            for (i = 0; i < n/2; ++i)
             {
-                for(j=0;j<n/2;++j)
+                for (j = 0; j < n/2; ++j)
                 {
                     fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(p1, i, j));
                 }
             }
 
-            for(i=n/2;i<n;++i)
+            for (i = n/2; i < n; ++i)
             {
-                for(j=0;j<n/2;++j)
+                for (j = 0; j < n/2; ++j)
                 {
                     fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(p3, i-n/2, j));
                 }
             }
 
-            for(i=0;i<n/2;++i)
+            for (i = 0; i < n/2; ++i)
             {
-                for(j=n/2;j<n;++j)
+                for (j = n/2; j < n; ++j)
                 {
                     fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(s1, i, j-n/2));
                 }
             }
 
-            for(i=n/2;i<n;++i)
+            for (i = n/2; i < n; ++i)
             {
-                for(j=n/2;j<n;++j)
+                for (j = n/2; j < n; ++j)
                 {
                     fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(s4, i-n/2, j-n/2));
                 }
@@ -174,6 +173,61 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
         }
         else
-            fmpz_mat_mul(B, A, A);
+        {
+            fmpz_mat_t window_A;
+            fmpz_mat_window_init(window_A, A, 0, 0, n-1, n-1);
+            
+            slong x;
+    
+            fmpz_t sum, val;
+            
+            fmpz_mat_sqr_bodrato(B, window_A); 
+            
+            
+            /* Matrix Peeling */
+            for (i = 0; i < n; ++i)
+            {
+                fmpz_init(sum);
+                for (x = 0; x < n; ++x)
+                {
+                    fmpz_init(val);
+                    fmpz_mul(val, fmpz_mat_entry(A, n-1, x), fmpz_mat_entry(A, x, i));    
+                    fmpz_add(sum, sum, val); 
+                    fmpz_clear(val);
+                }
+                fmpz_set(fmpz_mat_entry(B, n-1, i), sum);
+                fmpz_clear(sum);
+            }
+
+            for (i = 0; i < n; ++i)
+            {
+                fmpz_init(sum);
+                for (x = 0; x < n; ++x)
+                {
+                    fmpz_init(val);
+                    fmpz_mul(val, fmpz_mat_entry(A, x, n-1), fmpz_mat_entry(A, i, x));    
+                    fmpz_add(sum, sum, val);
+                    fmpz_clear(val);
+                }
+                fmpz_set(fmpz_mat_entry(B, i, n-1), sum);
+                fmpz_clear(sum);
+            }
+
+            fmpz_mat_window_clear(window_A);
+           
+            /*
+            fmpz_mat_t C;
+            fmpz_mat_init(C, n, n);
+            fmpz_mat_mul(C, A, A);
+            flint_printf("\nA:\n");
+            fmpz_mat_print_pretty(A);
+            flint_printf("\nB:\n");
+            fmpz_mat_print_pretty(B);
+            flint_printf("\nC:\n");
+            fmpz_mat_print_pretty(C);
+            flint_printf("\n");
+            fmpz_mat_clear(C);*/
+
+        }
     }
 }
