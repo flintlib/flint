@@ -8,7 +8,7 @@
 
 int n_is_perfect_power(mp_limb_t * root, mp_limb_t n)
 {
-    int i, j, k;
+    int i, k;
     mp_limb_t a;
 
     if (n_is_prime(n))
@@ -73,11 +73,12 @@ mp_limb_t n_primitive_root(mp_limb_t n)
         else if (n % 4 == 0)
         {
             flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
-            return;
+            return 0;
         }
         else
         {
             mp_limb_t a, m, root, phi;
+            int p;
             n_factor_t factors;
             n_factor_init(&factors);
             if (n % 2 == 0)
@@ -89,11 +90,11 @@ mp_limb_t n_primitive_root(mp_limb_t n)
             {
                 m = 1;
             }
-            int p = n_is_perfect_power(&root, n);
+            p = n_is_perfect_power(&root, n);
             if (p == 0 || n_is_prime(root) != 1)
             {
                 flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
-                return;
+                return 0;
             }
             else
             {
@@ -101,10 +102,11 @@ mp_limb_t n_primitive_root(mp_limb_t n)
                 phi = (phi / root) * (root - 1);                      /* calculating  phi(n), using formula */
                 n_factor(&factors, root - 1, 1);                      /* factoring (root - 1), which is a factor of phi(n) */
                 n *= m;
-                if(p > 1)                                             /* adding extra factor if exist */
+                if (p > 1)                                             /* adding extra factor if exist */
                 {
                     factors.num++;
-                    factors.p[factors.num] = root;                       /* we don't need to update exp*/
+                    factors.p[factors.num] = root;
+                    factors.p[factors.num] = 1;
                 }
                 a = n_primitive_root_prefactor(n, &factors, &phi);
                 return a;
