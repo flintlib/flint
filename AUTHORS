@@ -112,7 +112,8 @@ Feitma's tables and sped up and corrected \code{n_is_prime} and
 $\bullet$ Anubhav Srivastava contributed horizontal and vertical concatenation
 of matrices over $\mathbb{Z}$.
 
-$\bullet$ Prabhdeep Singh Walia contributed matrix content.
+$\bullet$ Dharak Kharod and Prabhdeep Singh Walia both independently 
+contributed matrix content.
 
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
