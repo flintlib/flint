@@ -109,6 +109,9 @@ $\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against
 Feitma's tables and sped up and corrected \code{n_is_prime} and
 \code{n_is_probabprime}.
 
+$\bullet$ Anubhav Srivastava contributed horizontal and vertical concatenation
+of matrices over $\mathbb{Z}$.
+
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
@@ -116,7 +119,8 @@ Bradshaw, Serge Torres, Dan Grayson, Martin Lee, Bob Smith, Antony Vennard,
 Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Dana Jacobsen, Michael Jacobson Jr.,
 Mike Stillman, Jan Englehardt, Jean-Pierre Flori, Jeroen Demeyer, Shi Bai,
 Qingwen Guan, Frithjof Schulze, Robert Baillie, Oleksandr Motsak, Hans
-Schoenemann, Janko Boehm, Ahmed Soliman and others.
+Schoenemann, Janko Boehm, Ahmed Soliman, Francois Bissey, Anton Mellit and
+others.
 
 $\bullet$ In addition Michael Abshoff, William Stein and Robert Bradshaw have
 contributed to the build system of FLINT.

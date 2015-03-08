@@ -201,6 +201,60 @@ main(void)
         fmpz_poly_clear(r);
     }
 
+    /* 
+	   Check that gcd(f, ga) divides f and ga for small generic f, g
+	   and a small linear factor a. Exercises a bug found by Anton Mellit.
+	*/
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t a, d, f, g, q, r;
+        
+		fmpz_poly_init(d);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_poly_init(q);
+        fmpz_poly_init(r);
+        fmpz_poly_init(a);
+        fmpz_poly_randtest(f, state, n_randint(state, 10), 8);
+        fmpz_poly_randtest(g, state, n_randint(state, 10), 4);
+
+		/* multiply by small linear factor */
+		fmpz_poly_set_coeff_si(a, 0, n_randint(state, 2) ? 1 : -1);
+		fmpz_poly_set_coeff_si(a, 1, 1);
+		fmpz_poly_mul(g, g, a);
+		
+        d1 = fmpz_poly_gcd_heuristic(d, f, g);
+		
+        if (d1)
+        {
+           if (fmpz_poly_is_zero(d))
+		      result = fmpz_poly_is_zero(f) && fmpz_poly_is_zero(g);
+		   else
+		   {
+		      fmpz_poly_divrem_divconquer(q, r, f, d);
+              result = fmpz_poly_is_zero(r);
+              fmpz_poly_divrem_divconquer(q, r, g, d);
+              result &= fmpz_poly_is_zero(r);
+		   }
+		   
+           if (!result)
+           {
+              flint_printf("FAIL (gcd(f, g) | f and g):\n");
+              flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
+              flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
+              flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
+              abort();
+           }
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(d);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_poly_clear(q);
+        fmpz_poly_clear(r);
+    }
+
     /* Sebastian's test case */
     {
        fmpz_poly_t a, b, d;
@@ -219,6 +273,38 @@ main(void)
        if (!result)
        {
           flint_printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
+          fmpz_poly_print(d); flint_printf("\n"); 
+          abort();
+       }
+
+       fmpz_poly_clear(a);
+       fmpz_poly_clear(b);
+       fmpz_poly_clear(d);
+    }
+
+    /* Anton Mellit's test case */
+    {
+       fmpz_poly_t a, b, d;
+       int heuristic;
+	   
+       fmpz_poly_init(a);
+       fmpz_poly_init(b);
+       fmpz_poly_init(d);
+
+	   /* 
+	       b = 3*q^12 - 8*q^11 - 24*q^10 - 48*q^9 - 84*q^8 - 92*q^7 - 92*q^6 - 
+               70*q^5 - 50*q^4 - 27*q^3 - 13*q^2 - 4*q - 1
+		   a = q^13 - 2*q^12 + 2*q^10 - q^9
+	   */
+       fmpz_poly_set_str(b, "13  -1 -4 -13 -27 -50 -70 -92 -92 -84 -48 -24 -8 3");
+	   fmpz_poly_set_str(a, "14  0 0 0 0 0 0 0 0 0 -1 2 0 -2 1");
+	   
+       heuristic = fmpz_poly_gcd_heuristic(d, a, b);
+
+       result = (heuristic == 0 || (d->length == 1 && fmpz_is_one(d->coeffs)));
+       if (!result)
+       {
+          flint_printf("FAIL Mellit test case:\n");
           fmpz_poly_print(d); flint_printf("\n"); 
           abort();
        }

@@ -40,10 +40,11 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     mp_limb_t n1, cofactor, b, c, ninv, limit, F, Fsq, det, rootn, val, c1, c2, upper_limit;
     n_factor_t factors;
     c = 0;
-    upper_limit = 1626;                     /* 1626^3 is approximately 2^32 */
 
 #if FLINT64
     upper_limit = 2642246;                  /* 2642246^3 is approximately 2^64 */
+#else
+    upper_limit = 1626;                     /* 1626^3 is approximately 2^32 */
 #endif
 
     if (n == 1)
@@ -63,9 +64,9 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
     val = n_pow(limit, 3);
 
-    while ( (val < n1) && (limit < upper_limit))    /* ensuring that limit >= n1^(1/3) */
+    while (val < n1 && limit < upper_limit)    /* ensuring that limit >= n1^(1/3) */
     {                                               
-        limit+=1;                                   
+        limit++;                                   
         val = n_pow(limit, 3);
     }
 
