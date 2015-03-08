@@ -81,11 +81,6 @@ void fmpz_mat_one(fmpz_mat_t mat)
     and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
     truncation of a unit matrix.
 
-void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
-
-    Sets \code{ret} equal to the gcd of all the elements of \code{A}.
-
-
 *******************************************************************************
 
     Window
@@ -318,6 +313,15 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
     Sets $B$ to $A^T$, the transpose of $A$. Dimensions must be compatible.
     $A$ and $B$ are allowed to be the same object if $A$ is a square matrix.
 
+*******************************************************************************
+
+    GCD
+
+*******************************************************************************
+
+void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
+
+    Sets \code{ret} equal to the gcd of the elements of \code{A}.
 
 *******************************************************************************
 
