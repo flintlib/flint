@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <flint.h>
+#include <ulong_extras.h>
+
+
+/* program computes primitive root for the 2, 4, p,  p ^ k, 2 * (p ^ k), where p is an odd-prime & k >= 1 */
+
+int n_is_perfect_power(mp_limb_t * root, mp_limb_t n)
+{
+    int i, j, k;
+    mp_limb_t a;
+
+    if (n_is_prime(n))
+    {
+        *root = n;
+        return 1;
+    }
+
+    for (i = 3; i <= sqrt(n); i+= 2)
+    {
+        a = i;
+        for (k = 1; a < n; k++) a *= i;
+        if (a == n)
+        {
+            *root = i;
+            return k;
+        }
+    }
+    return -1;
+}
+
+mp_limb_t n_primitive_root_prefactor(mp_limb_t n, n_factor_t * factors, mp_limb_t * phi)
+{
+    slong i;
+    int found;
+    mp_limb_t result, a, pm1;
+    double pinv;
+
+    pm1 = *phi;
+    pinv = n_precompute_inverse(n);
+
+    for (a = 2; a < n; a++)
+    {
+        if (n_gcd(n, a) == 1)
+        {
+            found = 1;
+            for (i = 0; i < factors->num; i++)
+            {
+                result = n_powmod_precomp(a, pm1 / factors->p[i], n, pinv);
+                if (result == 1)
+                {
+                    found = 0;
+                    break;
+                }
+            }
+            if (found)
+            {
+                return a;
+            }
+        }
+    }
+    flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
+    abort();
+}
+
+mp_limb_t n_primitive_root(mp_limb_t n)
+{
+    if (n_is_prime(n)) return n_primitive_root_prime(n);
+    else
+    {
+        if (n == 4) return 3;
+        else if (n % 4 == 0)
+        {
+            flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
+            return;
+        }
+        else
+        {
+            mp_limb_t a, m, root, phi;
+            n_factor_t factors;
+            n_factor_init(&factors);
+            if (n % 2 == 0)
+            {
+                m = 2;
+                n /= 2;
+            }
+            else
+            {
+                m = 1;
+            }
+            int p = n_is_perfect_power(&root, n);
+            if (p == -1 || n_is_prime(root) != 1)
+            {
+                flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
+                return;
+            }
+            else
+            {
+                phi = n;
+                phi = (phi / root) * (root - 1);
+                n_factor(&factors, root - 1, 1);
+                n *= m;
+                a = n_primitive_root_prefactor(n, &factors, &phi);
+                return a;
+            }
+        }
+    }
+}
