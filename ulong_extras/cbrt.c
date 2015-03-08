@@ -65,7 +65,7 @@ n_cbrt(mp_limb_t n)
     val = (double)n;
     bits = FLINT_BIT_COUNT(n); 
 
-    if (bits>46)    /* for larger numbers chebyshev approximation method is faster */
+    if (bits > 46)    /* for larger numbers chebyshev approximation method is faster */
         return n_cbrt_chevyshef_poly(n);
 
     /* upper_limit is the max cube root possible for one word */
@@ -87,7 +87,7 @@ n_cbrt(mp_limb_t n)
 
     /* In case ret^3 or (ret+1)^3 will cause overflow */
 
-    if (ret>= upper_limit)      
+    if (ret >= upper_limit)      
     {
         if (n >= upper_limit*upper_limit*upper_limit)
             return upper_limit;

@@ -54,11 +54,10 @@ int main(void)
 
     /* random n and root */
 
-    for (i = 0; i < 10000 * 100; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, b, c, d, i, j;
         mpz_t e, f, g, h;
-        int res;
 
         mpz_init(e);
         mpz_init(f);
@@ -72,14 +71,14 @@ int main(void)
         d = n_randint(state, 0);   /*root */
         flint_mpz_set_ui(h, d);
 
-        res = n_rootrem(&a, &b, c, d);
+        a = n_rootrem(&b, c, d);
 
         mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
       
         i = flint_mpz_get_ui(e);
         j = flint_mpz_get_ui(f);
 
-        result = (res && (a == i) && (b == j));
+        result = ((a == i) && (b == j));
 
         if (!result)
         {
@@ -97,10 +96,9 @@ int main(void)
 
     /* n of type a^b */
 
-    for (i = 0; i < 10000 * 100; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, b, c, d, max_pow, base;
-        int res;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
         max_pow = n_flog(max, base);    
@@ -109,8 +107,8 @@ int main(void)
             d+=1;
       
         c = n_pow(base, d);                  /* number */
-        res = n_rootrem(&a, &b, c, d);
-        result = (res && (a == base) && (b == 0));
+        a = n_rootrem(&b, c, d);
+        result = ((a == base) && (b == 0));
 
         if (!result)
         {
@@ -126,7 +124,7 @@ int main(void)
 
     /* n of type a^b + 1 */
    
-    for (i = 0; i < 10000 * 100; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, b, c, d, max_pow, base;
         int res;
@@ -138,8 +136,8 @@ int main(void)
             d = 2;
 
         c = n_pow(base, d) + 1;                   /* number */
-        res = n_rootrem(&a, &b, c, d);
-        result = (res && (a == base) && (b == 1));
+        a = n_rootrem(&b, c, d);
+        result = ((a == base) && (b == 1));
 
         if (!result)
         {
@@ -155,11 +153,10 @@ int main(void)
 
     /* n of type a^b - 1 */
    
-    for (i = 0; i < 10000 * 100; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, b, c, d, i, j, max_pow, base;
         mpz_t e, f, g, h;
-        int res;
 
         mpz_init(e);
         mpz_init(f);
@@ -175,13 +172,13 @@ int main(void)
         flint_mpz_set_ui(h, d);
         c = n_pow(base, d) - 1;                   /* number */
         flint_mpz_set_ui(g, c);
-        res = n_rootrem(&a, &b, c, d);
+        a = n_rootrem(&b, c, d);
         mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
       
         i = flint_mpz_get_ui(e);
         j = flint_mpz_get_ui(f);
 
-        result = (res && (a == i) && (b == j));
+        result = ((a == i) && (b == j));
 
         if (!result)
         {
