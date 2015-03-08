@@ -81,6 +81,11 @@ void fmpz_mat_one(fmpz_mat_t mat)
     and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
     truncation of a unit matrix.
 
+void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
+
+    Sets \code{ret} equal to the gcd of all the elements of \code{A}.
+
+
 *******************************************************************************
 
     Window
