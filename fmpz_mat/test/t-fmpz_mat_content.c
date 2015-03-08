@@ -32,7 +32,7 @@ int main()
 {
 	int i;
 	fmpz_mat_t A,B;
-	fmpz_t scalar, gcd_mat, temp, *val;
+	fmpz_t scalar, gcd_mat, temp;
 	FLINT_TEST_INIT(state);
 
 	flint_printf("fmpz_mat_content....");
@@ -40,7 +40,7 @@ int main()
 
 	for (i = 0; i < 100 * flint_test_multiplier(); i++)
 	{
-		slong r, c, j, k;
+		slong r, c;
 
 		r = n_randint(state, 50);
 		c = n_randint(state, 50);
@@ -54,21 +54,6 @@ int main()
 		
 
 		fmpz_mat_randtest(B, state, 100);
-
-
-		for (k = 0; k < r; k++ )
-		{
-			for (j = 0; j < c; j++)
-			{				
-				val = fmpz_mat_entry(B, k, j);
-
-				if (fmpz_is_zero(*val))
-				{
-					fmpz_one(*val);
-				}
-			}
-		}
-
 		
 		fmpz_mat_content(gcd_mat, B);
 

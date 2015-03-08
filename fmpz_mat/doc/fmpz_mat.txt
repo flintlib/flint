@@ -556,7 +556,7 @@ int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A)
 
 void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
 
-    sets \code{mat_gcd} as the resultant gcd of all the elements of the matrix \code{A}.
+    Sets \code{mat_gcd} as the gcd of all the elements of the matrix \code{A}.
     Returns 0 if the matrix is empty. 
     
 
