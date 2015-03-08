@@ -106,7 +106,7 @@ mp_limb_t n_primitive_root(mp_limb_t n)
                 {
                     factors.num++;
                     factors.p[factors.num] = root;
-                    factors.p[factors.num] = 1;
+                    factors.exp[factors.num] = 1;
                 }
                 a = n_primitive_root_prefactor(n, &factors, &phi);
                 return a;
