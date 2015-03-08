@@ -30,40 +30,29 @@
 void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    slong n = A->r;
+        slong n = A->r;
+        slong dim = n;
 
-    if (n == 0)
-    {
-        return;
-    }
-    else if (n == 1)
-    {
-        fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-    }
-    else if (n == 2)
-    {
-        fmpz_t t, u;
+        slong ab, bits;
 
-        fmpz_init(t);
-        fmpz_init(u);
+        ab = fmpz_mat_max_bits(A);
+        ab = FLINT_ABS(ab);
+        bits = ab + FLINT_BIT_COUNT(n) + 1;
 
-        fmpz_add(t, E(A, 0, 0), E(A, 1, 1));
-        fmpz_mul(u, E(A, 0, 1), E(A, 1, 0));
-
-        fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-        fmpz_add(E(B, 0, 0), E(B, 0, 0), u);
-
-        fmpz_mul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
-        fmpz_add(E(B, 1, 1), E(B, 1, 1), u);
-
-        fmpz_mul(E(B, 0, 1), E(A, 0, 1), t);
-        fmpz_mul(E(B, 1, 0), E(A, 1, 0), t);
-
-        fmpz_clear(t);
-        fmpz_clear(u);
-    }
-    else
-    {
-        fmpz_mat_mul(B, A, A);
-    }
+        if (bits < 100)
+            fmpz_mat_sqr_classical(B, A);
+        else if (bits >= 100 && bits < 800)
+        {
+            if(dim < 15 || dim > 125)
+                fmpz_mat_sqr_classical(B, A);
+            else
+                fmpz_mat_sqr_bodrato(B, A);
+        }
+        else
+        {
+            if(dim < 125)
+                fmpz_mat_sqr_bodrato(B, A);
+            else
+                fmpz_mat_sqr_classical(B, A);
+        }
 }
