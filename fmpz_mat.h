@@ -106,12 +106,18 @@ int fmpz_mat_is_square(const fmpz_mat_t mat)
 FLINT_DLL void fmpz_mat_zero(fmpz_mat_t mat);
 FLINT_DLL void fmpz_mat_one(fmpz_mat_t mat);
 
-/* Windows */
+/* Windows and concatenation */
 
 FLINT_DLL void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
     slong c1, slong r2, slong c2);
 
 FLINT_DLL void fmpz_mat_window_clear(fmpz_mat_t window);
+
+FLINT_DLL void fmpz_mat_concat_horizontal(fmpz_mat_t res,
+                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
+
+FLINT_DLL void fmpz_mat_concat_vertical(fmpz_mat_t res,
+                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
 
 /* Input and output  *********************************************************/
 
