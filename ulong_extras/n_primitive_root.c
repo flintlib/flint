@@ -100,8 +100,8 @@ mp_limb_t n_primitive_root(mp_limb_t n)
                 phi = n;
                 phi = (phi / root) * (root - 1);                      /* calculating  phi(n), using formula */
                 n_factor(&factors, root - 1, 1);                      /* factoring (root - 1), which is a factor of phi(n) */
-                n *= m;                                               /* adding extra factor if it exist */
-                if(p > 1)
+                n *= m;
+                if(p > 1)                                             /* adding extra factor if exist */
                 {
                     factors.num++;
                     factors.p[factors.num] = root;                       /* we don't need to update exp*/
