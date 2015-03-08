@@ -38,42 +38,27 @@
 /* Coefficients of Chebyshev's approximation polynomial (deg 4) [c0, c1, c2, c3, c4, c5] 
    splitting 0.5 to 1 into 8 equal intervals */
 
-double poly1[] = { 0.366434, 1.381445, -1.561725, 1.225528, -0.419472}; /* range : [0.5000, 0.5625] */
-double poly2[] = { 0.380314, 1.282490, -1.296988, 0.910552, -0.278851}; /* range : [0.5625, 0.6250] */
-double poly3[] = { 0.393245, 1.199557, -1.097430, 0.697022, -0.193126}; /* range : [0.6250, 0.6875] */
-double poly4[] = { 0.405375, 1.128860, -0.942848, 0.546736, -0.138312}; /* range : [0.6875, 0.7500] */
-double poly5[] = { 0.416818, 1.067743, -0.820391, 0.437649, -0.101857}; /* range : [0.7500, 0.8125] */
-double poly6[] = { 0.427663, 1.014282, -0.721542, 0.356392, -0.076801}; /* range : [0.8125, 0.8750] */
-double poly7[] = { 0.437984, 0.967050, -0.640465, 0.294520, -0.059090}; /* range : [0.8750, 0.9375] */
-double poly8[] = { 0.447840, 0.924961, -0.573045, 0.246510, -0.046267}; /* range : [0.9375, 1.0000] */
+float poly1[] = { 0.36643453, 1.38144515, -1.56172240, 1.22552838, -0.41947252}; /* range : [0.5000, 0.5625] */
+float poly2[] = { 0.38031415, 1.28249006, -1.29698844, 0.91055277, -0.27885102}; /* range : [0.5625, 0.6250] */
+float poly3[] = { 0.38031415, 1.28249006, -1.29698844, 0.91055277, -0.27885102}; /* range : [0.6250, 0.6875] */
+float poly4[] = { 0.40537531, 1.12886076, -0.94284858, 0.54673681, -0.13831223}; /* range : [0.6875, 0.7500] */
+float poly5[] = { 0.41681825, 1.06774310, -0.82039142, 0.43764908, -0.10185740}; /* range : [0.7500, 0.8125] */
+float poly6[] = { 0.42766399, 1.01428265, -0.72154266, 0.35639206, -0.07680121}; /* range : [0.8125, 0.8750] */
+float poly7[] = { 0.43798496, 0.96705079, -0.64046590, 0.29452059, -0.05909072}; /* range : [0.8750, 0.9375] */
+float poly8[] = { 0.44784046, 0.92496163, -0.57304513, 0.24651021, -0.04626718}; /* range : [0.9375, 1.0000] */
 
-/* Coefficients of Chebyshev's approximation polynomial (deg 2) {c0, c1, c2} 
-   splitting 0.5 to 1 into 8 equal intervals 
+float* poly_table[] = { poly1, poly2, poly3, poly4, poly5, poly6, poly7, poly8};
 
-   double poly1[] = {-0.319161, 0.847528, 0.449730}; range : [0.5000, 0.5625] 
-   double poly2[] = {-0.265106, 0.786851, 0.466761}; range : [0.5625, 0.6250] 
-   double poly3[] = {-0.224345, 0.735992, 0.482629}; range : [0.6250, 0.6875] 
-   double poly4[] = {-0.192763, 0.692631, 0.497515}; range : [0.6875, 0.7500] 
-   double poly5[] = {-0.167739, 0.655143, 0.511557}; range : [0.7500, 0.8125] 
-   double poly6[] = {-0.147537, 0.622349, 0.524867}; range : [0.8125, 0.8750] 
-   double poly7[] = {-0.130965, 0.593375, 0.537533}; range : [0.8750, 0.9375] 
-   double poly8[] = {-0.117183, 0.567555, 0.549628}; range : [0.9375, 1.0000] */
-
-/* Coefficients of Chebyshev's approximation polynomial (deg 4) [c0, c1, c2, c3, c4, c5] 
-   splitting 0.5 to 1 into 4 equal intervals 
-
-   double poly1[] = { 0.372988, 1.332826, -1.42658, 1.058728, -0.342333}; range : [0.500, 0.625]
-   double poly2[] = { 0.399034, 1.164711, -1.01881, 0.618246, -0.163540}; range : [0.625, 0.750]
-   double poly3[] = { 0.422032, 1.041334, -0.77025, 0.395358, -0.088486}; range : [0.750, 0.875]
-   double poly4[] = { 0.442748, 0.946225, -0.60633, 0.269664, -0.052305}; range : [0.875, 1.000] */
+float factor_table[] = {1.000000, 1.259921, 1.587401};
 
 mp_limb_t
 n_cbrt_chevyshef_poly(mp_limb_t n)
 {
-    int expo, rem, i, mul;
-    double val, factor, root, dec;
-    double* table;
-    mp_limb_t ret, upper_limit;
+    int rem, mul;
+    double val, factor, root, dec, dec2, dec4;
+    float* table;
+    mp_limb_t ret, upper_limit, expo, table_index;
+    mp_limb_t* n_ptr;
     
     /* upper_limit is the max cube root possible for one word */
 
@@ -83,47 +68,40 @@ n_cbrt_chevyshef_poly(mp_limb_t n)
 #endif
 
     val = (double)n;
-    dec = frexp(val, &expo);    /* val = dec * 2^expo */
-    rem = expo%3;
-    expo/=3;                    /* cube root of 2^expo */
 
-    factor = 1;
-    if (rem == 1)
-        factor = 1.259921;  /* 2^(1/3) */
-    if (rem == 2)
-        factor = 1.587401;  /* 4^(1/3) */
-
-    /* Selecting correct polynomial based on value of dec */
-
-    table = poly8;
-
-    if (dec < 0.75)
-        if (dec < 0.5625)
-            table = poly1;
-        else if (dec < 0.625)
-            table = poly2;
-        else if (dec < 0.6875)
-            table = poly3;
-        else
-            table = poly4;
-    else 
-        if (dec < 0.8125)
-            table = poly5;
-        else if (dec < 0.8750)
-            table = poly6;
-        else if (dec < 0.9375)
-            table = poly7;
+    /* aliasing val as an mp_limb_t to get binary representation of double */
+    n_ptr = (mp_limb_t*)&val;
+    expo = *n_ptr & 0x7FF0000000000000; /* extracting exponent */
+    expo>>=52;
+    expo-=1022;     /* Subtracting bias */
     
+    /* extracting first 3 bits of mantissa, this will help select correct poly */
+    /* note mantissa of 0.5 is 0x0000000000000 not 0x1000000000000 */
+    table_index = *n_ptr & 0x000F000000000000;  
+    table_index>>=49;
+
+    /* extracting decimal part, 0.5 <= dec <= 1 */
+    ret = (*(mp_limb_t*)&val) & 0x000FFFFFFFFFFFFF;
+    ret |= 0x3FE0000000000000;
+    dec = *(double*)&ret;
+
+    rem = expo%3;
+    expo/=3;                            /* cube root of 2^expo */
+    factor = factor_table[rem];         /* select factor */
+    table = poly_table[table_index];    /* select poly */
+
     /* Calculating cube root of dec using chebyshev approximation polynomial */
-    /* Evaluating approx polynomial at (dec) by Horner's method */
+    /* Evaluating approx polynomial at (dec) by Estrin's scheme */
+    
+    dec2 = dec*dec;
+    dec4 = dec2*dec2;
+    root = (table[0] + table[1]*dec);
+    root+= ((table[2] + table[3]*dec)*dec2);
+    root+= (table[4]*dec4);
 
-    root = table[4];
-    for (i = 3; i > -1; i--)
-        root = root * dec + table[i];
-
-    mul = UWORD(1)<<expo;
-    root*=mul;           /* dec^(1/3) * 2^(expo/3) */
-    root*=factor;        /* root*= (expo%3)^(1/3) */
+    mul = UWORD(1)<<expo;   /* mul = 2^expo */
+    root*=mul;              /* dec^(1/3) * 2^(expo/3) */
+    root*=factor;           /* root*= (expo%3)^(1/3) */
     ret = root;
 
     /* In case ret^3 or (ret+1)^3 will cause overflow */
