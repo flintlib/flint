@@ -63,10 +63,10 @@ void sample(void * arg, ulong count)
 
     if (algorithm == 0)
         for (i = 0; i < count; i++)
-            fmpz_mat_sqr(C, A);
+            fmpz_mat_sqr_classical(C, A);
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
-            fmpz_mat_sqr_bodrato(C, A);
+            fmpz_mat_sqr(C, A);
     
     prof_stop();
 
@@ -88,7 +88,7 @@ int main(void)
 
         flint_printf("bits = %wd :\n", params.bits);
 
-        for (dim = 1; dim <= 150; dim = (slong) ((double) dim * 3) + 1)
+        for (dim = 1; dim <= 450; dim = (slong) ((double) dim * 3) + 1)
         {
             params.n = dim;
             params.m = dim;
@@ -99,7 +99,14 @@ int main(void)
             params.algorithm = 1;
             prof_repeat(&min_classical, &max, sample, &params);
 
-            flint_printf("dim = %wd Classic : %.2f Bodrato : %.2f \n", dim, min_default, min_classical);
+            flint_printf("dim = %wd Classical : %.2f Bodrato : %.2f        ", dim, min_default, min_classical);
+            if (min_default < 0.8*min_classical)
+                flint_printf("BAD! \n");
+            else if(min_default <= min_classical)
+                flint_printf("OK! \n");
+            else if (min_default > min_classical)
+                flint_printf("GREAT! \n");
+
         }
     }
 
