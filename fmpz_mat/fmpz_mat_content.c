@@ -30,9 +30,8 @@
 void
 fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
 {
-    slong i, j, k;
-    k = 0;
-    fmpz_set_si(ret, k);
+    slong i, j;
+    fmpz_set_si(ret, 0);
     
     for (i = 0; i < A->r; i++)
     {
@@ -40,7 +39,7 @@ fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A)
       {
 	  fmpz_gcd(ret, ret, fmpz_mat_entry(A, i, j));
 	  if (fmpz_is_one(ret))
-	      break;
+	      return;
       }
     }
 }
