@@ -60,42 +60,59 @@ static const float coeff[16][3] = {{0.445434042, 0.864136635, -0.335205926},    
                                    {0.540672371, 0.586548233, -0.127254189},    /* [0.90625, 0.93750]  */
                                    {0.546715310, 0.573654340, -0.120376066},    /* [0.93750, 0.96875]  */
                                    {0.552627494, 0.561446514, -0.114074068}};   /* [0.96875, 1.00000]  */
-
 mp_limb_t
 n_cbrt_chebyshef_approx(mp_limb_t n)
 {
     typedef union { 
         mp_limb_t  uword_val;
+#if FLINT64
         double     double_val;
+#else
+        float      double_val;
+#endif
     } uni;
 
-    int rem, mul;
+    int rem, mul, mantissa_bits, bias;
     double factor, root, dec, dec2;
-    mp_limb_t ret, upper_limit, expo, table_index;
+    mp_limb_t ret, upper_limit, expo, table_index, expo_mask, mantissa_mask, table_mask, bias_hex;
     uni alias;
 
     /* upper_limit is the max cube root possible for one word */
 
-    upper_limit = 1626;         /* 1626 < (2^32)^(1/3) */
 #if FLINT64
-    upper_limit = 2642245;      /* 2642245 < (2^64)^(1/3) */
+    upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
+    expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
+    mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
+    table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
+    mantissa_bits = 52;
+    bias_hex = 0x3FE0000000000000;      
+    bias = 1022;
+    alias.double_val = (double)n;
+#else
+    upper_limit = 1626;         /* 1626 < (2^32)^(1/3) */
+    expo_mask = 0x7F800000;     /* exponent bits in float */
+    mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
+    table_mask = 0x00780000;    /* first 4 bits of mantissa */
+    mantissa_bits = 23;
+    bias_hex = 0x3F000000;      
+    bias = 126;
+    alias.double_val = (float)n;
 #endif
 
-    alias.double_val = (double)n;
 
-    expo = alias.uword_val & 0x7FF0000000000000;  /* extracting exponent */
-    expo >>= 52;
-    expo -= 1022;                                 /* Subtracting bias */
+    expo = alias.uword_val & expo_mask;  /* extracting exponent */
+    expo >>= mantissa_bits;
+    expo -= bias;                        /* Subtracting bias */
 
     /* extracting first 4 bits of mantissa, this will help select correct poly */
     /* note mantissa of 0.5 is 0x0000000000000 not 0x1000000000000 */
 
-    table_index = alias.uword_val & 0x000F000000000000;
-    table_index >>= 48;
+    table_index = alias.uword_val & table_mask;
+    table_index >>= (mantissa_bits - 4);
 
     /* extracting decimal part, 0.5 <= dec <= 1 */
-    ret = alias.uword_val & 0x000FFFFFFFFFFFFF;
-    ret |= 0x3FE0000000000000;
+    ret = alias.uword_val & mantissa_mask;
+    ret |= bias_hex;
     alias.uword_val = ret;
     dec = alias.double_val;
 
