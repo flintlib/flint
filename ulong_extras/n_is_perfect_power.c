@@ -78,8 +78,9 @@ mp_limb_t n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
     double qinv;
     mp_limb_t root;
 
-    for (i = 0; i < 18 && p[i] <= b; i++)
+    for (i = 18; i > 0; i--)
     {
+        if (p[i] > b) continue;
         qinv = n_precompute_inverse(q[i]);
         if (n_powmod_precomp(x, (q[i] - 1) / p[i], q[i], qinv) <= 1)
         {
