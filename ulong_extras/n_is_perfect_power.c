@@ -69,32 +69,47 @@ mp_limb_t n_rootrem(mp_limb_t * r, mp_limb_t x, unsigned int k)       /* taken f
     return a;
 }
 
-mp_limb_t n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
+int n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
 {
     int p[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61};                       /* prime less than 64 */
     int q[] = {3, 7, 11, 29, 23, 53, 103, 191, 277, 349, 373, 593, 739, 947, 1129, 1697, 1889, 1831};     /* prime such that, q[i] % p[i] = 1 */
-    int i, b = FLINT_BIT_COUNT(x), power = 1, raise = 1;                                                  /* if x = y ^ p[i] for some y => (y ^ (q[i] - 1)) % q[i] = 1 or 0 */
+    int z[] = {1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1};                            /* if x = y ^ p[i] for some y => (y ^ (q[i] - 1)) % q[i] = 1 or 0 */
+    int v[] = {0, 1, 2, 3, 2, 5, 6, 7, 8, 3, 10, 11, 12, 13, 14, 15, 2, 17, 18, 19, 20};                  /* v[i] is root of i and z[i] is it's power */
+    int i, power = 1,  j = 1;
     double qinv;
-    mp_limb_t root;
+    mp_limb_t root, prev;
 
-    for (i = 0; i < 18 && p[i] < b; i++)
+    for (i = 0; i < 18; i++)
     {
+        if (x <= 20)
+        {
+            power *= z[x];
+            x = v[x];
+            break;
+        }
+
         qinv = n_precompute_inverse(q[i]);
         if (n_powmod_precomp(x, (q[i] - 1) / p[i], q[i], qinv) <= 1)
         {
-            root = n_rootrem(r, x, p[i]);
+            prev = x;
+            x = n_rootrem(r, x, p[i]);
             if (*r == 0)
             {
-                raise = 1;                                                    /* hold subsequent power of p[i] */
+                j = 1;                                                       /* hold subsequent power of p[i] */
                 while (*r == 0)
-                {
-                    power = power * p[i];                                    /* store product of all power that satisfy test*/
-                    raise = raise * p[i];
-                    root =  n_rootrem(r, x, p[i] * raise);                   /* test for subsequent power of prime p */
+                {                                                            /* store product of all power that satisfy test */
+                    j = j * p[i];
+                    prev = x;
+                    x =  n_rootrem(r, x, p[i]);                              /* test for subsequent power of prime p[i] */
                 }
+                power *= j;
+                x = prev;
             }
+            else x = prev;
         }
     }
-    root = n_rootrem(r, x, power);
-    return root;
+    *r = x;                                                             /* store root in  r */
+    return power;                                                       /* return power */
 }
+
+
