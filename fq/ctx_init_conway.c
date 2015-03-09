@@ -30,70 +30,38 @@
 
 #include "fq.h"
 
-#ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT "../qadic/CPimport.txt"
-#endif
-
-extern char * flint_cpimport;
+/* from qadic/ctx_init_conway.c */
+extern int flint_conway_polynomials [];
 
 int
 _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
 {
-    char *buf;
-    FILE *file;
+    unsigned int position;
 
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
         return 0;
     }
 
-    buf = flint_malloc(832);
-    file = fopen(FLINT_CPIMPORT, "r");
-
-    if (!file)
-        file = fopen("../qadic/CPimport.txt", "r");
-
-    if (!file)
+    for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
     {
-        if (flint_cpimport != NULL)
-		   file = fopen(flint_cpimport, "r");
-
-        if (!file)
-        {
-            flint_printf("Exception (fq_ctx_init_conway).  File loading.\n");
-            abort();
-        }
-    }
-
-    while (fgets(buf, 832, file))
-    {
-        char *tmp = buf;
-
         /* Different prime? */
-        if (fmpz_cmp_ui(p, atoi(tmp)))
+        if (fmpz_cmp_ui(p, flint_conway_polynomials[position]))
             continue;
 
-        while (*tmp++ != ' ') ;
-
         /* Same degree? */
-        if (d == atoi(tmp))
+        if (d == flint_conway_polynomials[position+1])
         {
             fmpz_mod_poly_t mod;
             slong i;
-            char *ptr;
 
             fmpz_mod_poly_init(mod, p);
 
             /* Copy the polynomial */
-            ptr = tmp;
 
             for (i = 0; i < d; i++)
             {
-                int coeff;
-
-                while (*ptr++ != ' ') ;
-
-                coeff = atoi(ptr);
+                int coeff = flint_conway_polynomials[position+2+i];
                 fmpz_mod_poly_set_coeff_ui(mod, i, coeff);
             }
             fmpz_mod_poly_set_coeff_ui(mod, d, 1);
@@ -101,13 +69,9 @@ _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
             fq_ctx_init_modulus(ctx, mod, var);
 
             fmpz_mod_poly_clear(mod);
-            fclose(file);
-            flint_free(buf);
             return 1;
         }
     }
-    fclose(file);
-    flint_free(buf);
     return 0;
 }
 

@@ -87,19 +87,6 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     arithmetic in $\mathbf{Q}_p / (p^N)$ such as powers of $p$ close 
     to $p^N$.
 
-    The path to the Conway polynomial data is set using 
-    \code{flint_set_cpimport()}.
-
-void flint_set_cpimport(char * path)
-
-    Set the path for the Conway polynomial data file 
-    CPimport.txt at runtime. This should include a full path including
-    the filename. 
-
-    The user is responsible for cleaning up the string, however this
-    should not be done until no further use will be made of the Conway
-    polynomials by the qadic or fq* modules.
-
 void qadic_ctx_clear(qadic_ctx_t ctx);
 
     Clears all memory that has been allocated as part of the context.
