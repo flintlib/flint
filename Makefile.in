@@ -146,6 +146,35 @@ tests: library test_helpers.o $(TESTS)
 		$(MAKE) build/interfaces/test/t-NTL-interface; \
 	fi
 
+define test_mod
+	$(eval vl := $(subst :, ,$(1)))
+	$(eval dir := $(firstword $(vl)))
+	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
+	$(eval
+ifdef uset_tests
+	USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests)
+else
+	USER_SET_TESTS_VAR :=
+endif
+	)
+	$(AT)test ! -d $(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir)  || $(MAKE) $(USER_SET_TESTS_VAR) -f ../Makefile.subdirs -C $(dir) check
+endef
+
+define test_mod_ext
+	$(eval vl := $(subst :, ,$(1)))
+	$(eval ext := $(2))
+	$(eval dir := $(firstword $(vl)))
+	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
+	$(eval
+ifdef uset_tests
+	USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests)
+else
+	USER_SET_TESTS_VAR :=
+endif
+	)
+	$(AT)MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) $(USER_SET_TESTS_VAR) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check
+endef
+
 check: library test_helpers.o
 ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
@@ -158,8 +187,8 @@ ifndef MOD
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(AT)$(foreach dir, $(MOD), test ! -d $(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir) || $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach dir, $(MOD), MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
+	$(AT)$(foreach mod, $(MOD), $(call test_mod,$(mod)) || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
 endif
 
 valgrind: library
