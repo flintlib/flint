@@ -37,11 +37,12 @@ void sample(void * arg, ulong count)
 
     if (algorithm == 0)
         for (i = 0; i < count; i++)
-            fmpz_mat_sqr_classical(C, A);
+            fmpz_mat_mul(C, A, A);
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
             fmpz_mat_sqr(C, A);
     
+
     prof_stop();
 
     fmpz_mat_clear(A);
@@ -52,17 +53,17 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-    double min_default, min_classical, min_inline, min_multi_mod, max;
+    double min_default, min_classical, max;
     mat_mul_t params;
     slong bits, dim;
 
-    for (bits = 1; bits <= 2000; bits = (slong) ((double) bits) + 100)
+    for (bits = 1; bits <=2000; bits = (slong) ((double) bits) + 100)
     {
         params.bits = bits;
 
         flint_printf("bits = %wd :\n", params.bits);
 
-        for (dim = 1; dim <= 200; dim = (slong) ((double) dim * 3) + 1)
+        for (dim = 1; dim <= 312; dim = (slong) ((double) dim * 2.3) + 2)
         {
             params.n = dim;
             params.m = dim;
@@ -73,7 +74,8 @@ int main(void)
             params.algorithm = 1;
             prof_repeat(&min_classical, &max, sample, &params);
 
-            flint_printf("dim = %wd Classical : %.2f Bodrato : %.2f        ", dim, min_default, min_classical);
+
+            flint_printf("dim = %wd fmpz_mat_mul : %.2f fmpz_mat_sqr : %.2f         ", dim, min_default, min_classical);
             if (min_default < 0.6*min_classical)
                 flint_printf("BAD! \n");
             else if(min_default <= min_classical)
