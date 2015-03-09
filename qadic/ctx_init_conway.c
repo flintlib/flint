@@ -31,20 +31,16 @@
 #include "padic.h"
 #include "qadic.h"
 
-#define FLINT_SRC_CPIMPORT "../qadic/CPimport.txt"
-
-#ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT FLINT_SRC_CPIMPORT
-#endif
-
-extern char * flint_cpimport;
+int flint_conway_polynomials [] = {
+#include "../build/CPimport.h"
+  0
+};
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode)
 {
-    char *buf;
-    FILE *file;
+    unsigned int position;
 
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
@@ -53,52 +49,23 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
         abort();
     }
 
-    buf  = flint_malloc(832);
-    file = fopen(FLINT_CPIMPORT, "r");
-
-    if (!file)
-       file = fopen(FLINT_SRC_CPIMPORT, "r");
-
-    if (!file)
-       file = fopen("CPimport.txt", "r");
-
-    if (!file)
+    for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
     {
-        if (flint_cpimport != NULL)
-		   file = fopen(flint_cpimport, "r");
-
-        if (!file)
-        {
-            flint_printf("Exception (qadic_ctx_init_conway).  File loading.\n");
-            abort();
-        }
-    }
-
-    while (fgets(buf, 832, file))
-    {
-        char *tmp = buf;
-
         /* Different prime? */
-        if (fmpz_cmp_ui(p, atoi(tmp)))
+        if (fmpz_cmp_ui(p, flint_conway_polynomials[position]))
             continue;
 
-        while (*tmp++ != ' ') ;
-
         /* Same degree? */
-        if (d == atoi(tmp))
+        if (d == flint_conway_polynomials[position+1])
         {
             slong i, j;
-            char *ptr;
 
             /* Find number of non-zero coefficients */
             ctx->len = 1;
-            ptr = tmp;
 
             for (i = 0; i < d; i++)
             {
-                while (*ptr++ != ' ') ;
-
-                if (atoi(ptr))
+                if (flint_conway_polynomials[position+2+i])
                     ctx->len ++;
             }
 
@@ -107,15 +74,10 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
             /* Copy the polynomial */
             j = 0;
-            ptr = tmp;
 
             for (i = 0; i < d; i++)
             {
-                int coeff;
-
-                while (*ptr++ != ' ') ;
-
-                coeff = atoi(ptr);
+                int coeff = flint_conway_polynomials[position+2+i];
 
                 if (coeff)
                 {
@@ -134,14 +96,9 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             ctx->var = flint_malloc(strlen(var) + 1);
             strcpy(ctx->var, var);
 
-            fclose(file);
-            flint_free(buf);
             return;
         }
     }
-
-    fclose(file);
-    flint_free(buf);
 
     flint_printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
     flint_printf("(p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
