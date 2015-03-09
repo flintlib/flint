@@ -80,7 +80,7 @@ double nth_root_estimate(double a, int n)
 mp_limb_t
 n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 {
-    mp_limb_t maxpow, x, currval, base; 
+    mp_limb_t x, currval, base; 
     double dx;
 
     if (n < 1 || root < 1)
@@ -95,18 +95,10 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
         return n;
     }
 
-    maxpow = n_flog(n, 2);  /* max possible power, if greter then base is 1 */
-
-    if (root > maxpow)
+    if (root >= FLINT_BITS || (UWORD(1) << root) > n)
     {
         *remainder = n - 1;
         return 1;
-    }
-
-    if (root == maxpow)
-    {
-        *remainder = n - n_pow(2, root);
-        return 2;
     }
 
     x =  (mp_limb_t)floor(nth_root_estimate((double)n, root));
