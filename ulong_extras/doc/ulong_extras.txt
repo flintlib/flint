@@ -943,7 +943,7 @@ mp_limb_t n_cbrt_binary_search(mp_limb_t n)
     This function returns the integer truncation of the cube root of $n$.
     Uses binary search to get the correct value. Assumes n is not negative.
 
-mp_limb_t n_cbrt_chevyshef_poly(mp_limb_t n)
+mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n)
     
     This function returns the integer truncation of the cube root of $n$.
     The number is first expressed in the form x * 2^exp. This ensures x is

@@ -281,7 +281,7 @@ FLINT_DLL mp_limb_t n_cbrt_binary_search(mp_limb_t x);
 
 FLINT_DLL mp_limb_t n_cbrt_newton_iteration(mp_limb_t n);
 
-FLINT_DLL mp_limb_t n_cbrt_chebyshef_poly(mp_limb_t n);
+FLINT_DLL mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n);
 
 FLINT_DLL int n_is_perfect_power235(mp_limb_t n);
 
