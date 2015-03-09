@@ -64,6 +64,6 @@ fmpz_mat_sqr_classical(fmpz_mat_t B, const fmpz_mat_t A)
     }
     else
     {
-        fmpz_mat_mul_classical(B, A, A);
+        fmpz_mat_mul(B, A, A);
     }
 }
