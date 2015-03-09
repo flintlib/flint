@@ -74,7 +74,7 @@ mp_limb_t n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
 {
     int p[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61};                       /* prime less than 64 */
     int q[] = {3, 7, 11, 29, 23, 53, 103, 191, 277, 349, 373, 593, 739, 947, 1129, 1697, 1889, 1831};     /* prime such that, q[i] % p[i] = 1 */
-    int i, b = FLINT_BIT_COUNT(x);                                                                                                /* if x = y ^ p[i] for some y => (y ^ (q[i] - 1)) % q[i] = 1 or 0 */
+    int i, b = FLINT_BIT_COUNT(x);                                                                        /* if x = y ^ p[i] for some y => (y ^ (q[i] - 1)) % q[i] = 1 or 0 */
     double qinv;
     mp_limb_t root;
 
