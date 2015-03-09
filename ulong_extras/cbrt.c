@@ -79,27 +79,27 @@ n_cbrt(mp_limb_t n)
    
     /* Kahan's iterations to get cube root */
 
-    xcub = x*x*x;
-    num = (xcub - val)*x;
+    xcub = x * x * x;
+    num = (xcub - val) * x;
     den = (xcub + xcub + val);
-    x -= (num/den);
+    x -= (num / den);
     ret = x;
 
     /* In case ret^3 or (ret+1)^3 will cause overflow */
 
     if (ret >= upper_limit)      
     {
-        if (n >= upper_limit*upper_limit*upper_limit)
+        if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;
         ret = upper_limit - 1;
     }
-    while (ret*ret*ret <= n)
+    while (ret * ret * ret <= n)
     {
         (ret) += 1;
         if (ret == upper_limit)
             break;
     }
-    while (ret*ret*ret > n)
+    while (ret * ret * ret > n)
         (ret) -= 1;
 
     return ret;

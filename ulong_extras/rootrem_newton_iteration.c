@@ -115,8 +115,8 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 
     currval = n_pow(x, root-1);
     dx = n / currval;
-    dx-= x;
-    dx*= inv_table[root];
+    dx -= x;
+    dx *= inv_table[root];
     dx = floor(dx);
     x += dx;
 

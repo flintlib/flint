@@ -69,11 +69,11 @@ n_cbrt_newton_iteration(mp_limb_t n)
     val = (double)n;
     while(iter--)
     {
-        xsq = x*x;
+        xsq = x * x;
         dx = val / xsq;
         dx -= x;
-        dx*= 0.333333333333333;     /* dx = dx * (1/3) */     
-        x+=dx;
+        dx *= 0.333333333333333;     /* dx = dx * (1/3) */     
+        x += dx;
     }
     
     /* In case ret^3 or (ret+1)^3 will cause overflow */
@@ -81,13 +81,13 @@ n_cbrt_newton_iteration(mp_limb_t n)
     ret = x;
     if (ret >= upper_limit)      
     {
-        if (n >= upper_limit*upper_limit*upper_limit)
+        if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;
         ret = upper_limit - 1;
     }
-    while (ret*ret*ret <= n)
+    while (ret * ret * ret <= n)
         (ret) += 1;
-    while (ret*ret*ret > n)
+    while (ret * ret * ret > n)
         (ret) -= 1;
     return ret;
 }

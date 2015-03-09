@@ -56,7 +56,7 @@ n_cbrt_binary_search(mp_limb_t x)
     {
         mid = (high + low) / 2;
         p = mid + 1;
-        p = p*p*p;
+        p = p * p * p;
         if (p == x)
             return mid + 1;
         else if (p > x)
