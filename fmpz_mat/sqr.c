@@ -11,23 +11,22 @@ fmpz_mat_sqr(fmpz_mat_t C, const fmpz_mat_t A)
 
     if (dim <= 12)
     {
-        fmpz_mat_sqr_classical(C, A);    
+        fmpz_mat_mul(C, A, A);    
     }
     else
     {
-        slong ab, bits;
+        slong ab;
 
         ab = fmpz_mat_max_bits(A);
         ab = FLINT_ABS(ab);
 
-        bits = 2*ab + FLINT_BIT_COUNT(n) + 1;
         if (5*(ab + ab) > dim * dim )
         {
             fmpz_mat_sqr_bodrato(C, A);
         }
         else
         {
-            fmpz_mat_sqr_classical(C, A);
+            fmpz_mat_mul(C, A, A);
         }
 
     }
