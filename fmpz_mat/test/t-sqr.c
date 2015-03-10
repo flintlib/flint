@@ -66,8 +66,8 @@ int main(void)
         {
             flint_printf("FAIL: results not equal\n");
             abort();
-        } 
-        
+        }
+
         fmpz_mat_sqr(A, A);
 
         if (!fmpz_mat_equal(A, B))
