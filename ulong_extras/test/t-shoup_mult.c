@@ -24,40 +24,37 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* Computes the W' = [w * b / p] (b = mp_limb_t power) */
-mp_limb_t
-w_prep(mp_limb_t w, mp_limb_t p)
+int main(void)
 {
-   mp_limb_t q, r;
-   udiv_qrnnd(q, r, w, UWORD(0), p);
-   return q;
-}
+   mp_limb_t w, t, p, w_pr, correct_w_prep;
+   FLINT_TEST_INIT(state);
+   
+   flint_printf("shoup_mult....");
+   fflush(stdout);  
 
-/* Computes the w * t mod p.
-   w, t < p; p < (mp_limb_t power) / 2. 
-*/
-mp_limb_t
-shoup_mult(mp_limb_t w, mp_limb_t t, mp_limb_t w_prep, mp_limb_t p)
-{
-   mp_limb_t q, r, p_hi, p_lo;
-
-   umul_ppmm(p_hi, p_lo, w_prep, t);
-   q = p_hi;
-
-   umul_ppmm(p_hi, p_lo, w, t);
-   r = p_lo;
-   umul_ppmm(p_hi, p_lo, q, p);
-   r -= p_lo;
-
-   if (r >= p)
+   w = 1000;
+   t = 14;
+   p = 1301;
+   correct_w_prep = (mp_limb_t) 14178896290322483947;
+   
+   w_pr = w_prep(w, p);
+   if (w_pr != correct_w_prep)
    {
-      r -= p;
+      flint_printf("FAIL:\n");
+      flint_printf("w = %wu, t = %wu, p = %wu\n", w, t, p);
+      flint_printf("w' = %wu, should be %wu\n", w_pr, correct_w_prep);
+      abort();
    }
 
-    return r;
+   FLINT_TEST_CLEANUP(state);
+   
+   flint_printf("PASS\n");
+   return 0;
 }
 
