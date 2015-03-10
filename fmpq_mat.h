@@ -59,6 +59,20 @@ FLINT_DLL void fmpq_mat_clear(fmpq_mat_t mat);
 
 FLINT_DLL void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2);
 
+/* Windows and concatenation */
+
+FLINT_DLL void fmpq_mat_window_init(fmpq_mat_t window, const fmpq_mat_t mat, slong r1,
+    slong c1, slong r2, slong c2);
+
+FLINT_DLL void fmpq_mat_window_clear(fmpq_mat_t window);
+
+FLINT_DLL void fmpq_mat_concat_horizontal(fmpq_mat_t res,
+                           const fmpq_mat_t mat1,  const fmpq_mat_t mat2);
+
+FLINT_DLL void fmpq_mat_concat_vertical(fmpq_mat_t res,
+                           const fmpq_mat_t mat1,  const fmpq_mat_t mat2);
+
+/* Input and output  */
 
 FLINT_DLL void fmpq_mat_print(const fmpq_mat_t mat);
 
