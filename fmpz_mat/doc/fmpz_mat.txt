@@ -546,12 +546,6 @@ void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
     Sets \code{B} to the square of the matrix \code{A}, which must be
     a square matrix. Aliasing is allowed.
 
-void fmpz_mat_sqr_classical(fmpz_mat_t B, const fmpz_mat_t A)
-
-    Sets \code{B} to the square of the matrix \code{A}, which must be
-    a square matrix. Aliasing is allowed.
-    This function is faster to use for matrices with smaller valued elements.
-
 void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets \code{B} to the square of the matrix \code{A}, which must be
