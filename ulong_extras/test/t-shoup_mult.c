@@ -41,7 +41,7 @@ int main(void)
    w = 1000;
    t = 14;
    p = 1301;
-   correct_w_prep = (mp_limb_t) 14178896290322483947;
+   correct_w_prep = 14178896290322483947;
    
    w_pr = w_prep(w, p);
    if (w_pr != correct_w_prep)
