@@ -482,6 +482,16 @@ also pass a list of module names in inverted commas, e.g:
 
 \begin{lstlisting}[language=bash]
 make check MOD=ulong_extras
+make check MOD="fft fmpz_mat"
+\end{lstlisting}
+
+To specify an individual test(s) for any module you can add it 
+(or comma separated test list)
+after chosen module name followed by the colon, e.g.:
+
+\begin{lstlisting}[language=bash]
+make check MOD=ulong_extras:clog,factor,is_prime
+make check MOD="fft fmpz_mat:add_sub,charpoly fq_vec:add"
 \end{lstlisting}
 
 FLINT has an assert system. If you want a debug build you can pass
