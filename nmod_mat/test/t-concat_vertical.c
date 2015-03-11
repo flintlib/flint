@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
@@ -41,10 +38,9 @@ int main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
+
     flint_printf("concat_vertical....");
     fflush(stdout);
-
-    
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -69,13 +65,17 @@ int main(void)
         nmod_mat_window_init(window1, C, 0, 0, r1, c1);
         nmod_mat_window_init(window2, C, r1, 0, (r1+r2), c1);
 
-
         if (!(nmod_mat_equal(window1, A) && nmod_mat_equal(window2, B)))
         {
+            flint_printf("A = \n");
+            nmod_mat_print_pretty(A);
+            flint_printf("B = \n");
+            nmod_mat_print_pretty(B);
+            flint_printf("A concat_vertical B = \n");
+            nmod_mat_print_pretty(C);
             flint_printf("FAIL: results not equal\n");
             abort();
         }
-
         
         nmod_mat_clear(A);
         nmod_mat_clear(B);
@@ -84,6 +84,7 @@ int main(void)
         nmod_mat_window_clear(window1);
         nmod_mat_window_clear(window2);
     }
+
 
     FLINT_TEST_CLEANUP(state);
     

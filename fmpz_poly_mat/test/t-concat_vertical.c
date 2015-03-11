@@ -58,7 +58,7 @@ int main(void)
 
         fmpz_poly_mat_init(A, r1, c1);
         fmpz_poly_mat_init(B, r2, c1);
-        fmpz_poly_mat_init(C, (r1+r2), c1);
+        fmpz_poly_mat_init(C, (r1 + r2), c1);
 
         fmpz_poly_mat_randtest(A, state, n_randint(state, 200) + 1, bits);
         fmpz_poly_mat_randtest(B, state, n_randint(state, 200) + 1, bits);
@@ -68,7 +68,7 @@ int main(void)
         fmpz_poly_mat_concat_vertical(C, A, B);
         
         fmpz_poly_mat_window_init(window1, C, 0, 0, r1, c1);
-        fmpz_poly_mat_window_init(window2, C, r1, 0, (r1+r2), c1);
+        fmpz_poly_mat_window_init(window2, C, r1, 0, (r1 + r2), c1);
 
 
         if (!(fmpz_poly_mat_equal(window1, A) && fmpz_poly_mat_equal(window2, B)))
@@ -76,7 +76,6 @@ int main(void)
             flint_printf("FAIL: results not equal\n");
             abort();
         }
-
         
         fmpz_poly_mat_clear(A);
         fmpz_poly_mat_clear(B);

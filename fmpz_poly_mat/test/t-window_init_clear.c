@@ -75,8 +75,6 @@ main(void)
         fmpz_poly_mat_clear(a);
     }
 
-
-
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
