@@ -30,7 +30,7 @@
 
 /* Computes the W' = [w * b / p] (b = mp_limb_t power) */
 mp_limb_t
-n_shoup_precomp(mp_limb_t w, mp_limb_t p)
+n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
 {
    mp_limb_t q, r;
    udiv_qrnnd(q, r, w, UWORD(0), p);
@@ -41,17 +41,16 @@ n_shoup_precomp(mp_limb_t w, mp_limb_t p)
    w, t < p; p < (mp_limb_t power) / 2. 
 */
 mp_limb_t
-n_shoup_mult(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
 {
    mp_limb_t q, r, p_hi, p_lo;
 
    umul_ppmm(p_hi, p_lo, w_precomp, t);
    q = p_hi;
 
-   umul_ppmm(p_hi, p_lo, w, t);
-   r = p_lo;
-   umul_ppmm(p_hi, p_lo, q, p);
-   r -= p_lo;
+   
+   r = w * t;
+   r -= q * p;
 
    if (r >= p)
    {
@@ -60,4 +59,3 @@ n_shoup_mult(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
 
     return r;
 }
-

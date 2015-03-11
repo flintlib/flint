@@ -36,7 +36,7 @@ int main(void)
    int i, result;
    FLINT_TEST_INIT(state);
    
-   flint_printf("shoup_mult....");
+   flint_printf("mulmod_shoup....");
    fflush(stdout);
 
    
@@ -49,9 +49,9 @@ int main(void)
       a = n_randtest(state) % d;
       b = n_randtest(state) % d;
       
-      w_pr = n_shoup_precomp(a, d);
+      w_pr = n_mulmod_precomp_shoup(a, d);
 
-      r1 = n_shoup_mult(a, b, w_pr, d);
+      r1 = n_mulmod_shoup(a, b, w_pr, d);
 
       umul_ppmm(p1, p2, a, b);
       p1 %= d;
