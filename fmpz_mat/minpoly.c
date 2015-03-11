@@ -2,7 +2,7 @@
 
 /*
    Assumes that \code{mat} is an $n \times n$ matrix and sets \code{cp}
-   to its minimal polynomial (which has at most $n+1$ terms.
+   to its minimal polynomial (which has at most $n+1$ terms).
    */
 
 void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
@@ -93,7 +93,7 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 			}
 		}
 
-		// todo: set coefficients of cp from the first row of qu
+		// todo: set coefficients of cp from the first column of qu
 		
 	}
 }
