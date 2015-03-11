@@ -126,7 +126,7 @@ libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | bu
 	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;))
 
-library:
+library: build/CPimport.h
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(MAKE) shared; \
 	fi
@@ -183,14 +183,15 @@ install: library
 	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
 		cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
 	fi
-	mkdir -p "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
-	cp qadic/CPimport.txt "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 
 build:
 	mkdir -p build
+
+build/CPimport.h: qadic/CPimport.txt
+	sed "s/ /,/g;s/.*/&,/g" $< > $@
 
 build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
