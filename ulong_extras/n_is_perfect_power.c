@@ -2,92 +2,109 @@
 #include <flint.h>
 #include <ulong_extras.h>
 
+/*
+check for the bit size of mp_limb_t, which is equal to FLINT_BITS,
+q[i] - 1 congruent class modulo q[i] (about q[i] line no. 72)
+are stored as follows:
 
-mp_limb_t n_rootrem(mp_limb_t * r, mp_limb_t x, unsigned int k)       /* taken from the link, you gave */
-{
-    mp_limb_t a, b, m, p, hi, lo;
-    unsigned int bc;
-    int i;
+table(32/64)[i][j]th word contain FLINT_BITS Number of bit and
+kth bit (from LSB To MSB) represents the,
+(say y = FLINT_BITS * max(j - 1, 0) + k), y mod q[i] congruent
+class of q[i] and it is set to 1 if y satisfy the property mentioned
+in the line no. 8 otherwise it is set to 0.
 
-    if (k <= 1 || x <= 1)
-    {
-        *r = 0;
-        return x;
-    }
+for total q[i] congruent class modulo q[i],
+    q[i] / FLINT_BITS + (q[i] % FLINT_BITS) ? 0 : 1;
+    word are used, i.e. the size of table(32/64)[i]th row.
+*/
 
-    if (k == 2)
-    {
-        return n_sqrtrem(r, x);
-    }
+#if FLINT_BITS == 32
+    mp_limb_t table32[18][25] = {{ 0x3 }, { 0x43 }, { 0x403 }, { 0x10021003 }
+                               , { 0x400003 },{ 0x40800002 , 0x100001 },
+                               { 0x2 , 0x300c000 , 0x0 , 0x41 },
+                               { 0x82 , 0x20080 , 0x40000 , 0x2000 ,
+                               0x1004000 , 0x41000001 },
+                               { 0x2 , 0x4001 }, { 0x2 , 0x4000001 },
+                               { 0x42 , 0x100010 , UWORD(0x80000000) , 0x0
+                               , 0x0 , 0x0 , 0x1000000 , 0x0 , 0x80008 ,
+                               0x420001 }, { 0x2 , 0x1000 , 0x0 , 0x200 ,
+                               0x100001 }, { 0x2 , 0x0 , 0x40001 },
+                               { 0x2 , 0x0 , 0x20010000 , 0x0 , 0x0 ,
+                               0x1001 }, { 0x2 , 0x3000 , 0x0 , 0x0 , 0x0 ,
+                               0x0 , 0x0 , 0xc000 , 0x4000001 },
+                               { 0x2 , 0x0 , 0x0 , 0x401 }, { 0x2 , 0x0 ,
+                               0x8000001 , 0x0 , 0x0 , 0x8000000 , 0x0 ,
+                               0x18 , 0x0 , 0x0 , 0x0 , 0x0 , 0x0 , 0x0 ,
+                               0x0 , 0x6 , 0x400 , 0x0 , 0x0 , 0x420 , 0x0
+                               , 0x0 , 0x11 }, { 0x2 , 0x0 , 0x180000 ,
+                               0x0 , 0x0 , 0x0 , 0x0 , 0x0 , 0x18000000 ,
+                               0x0 , 0x0 , 0x4001 }
+                              };
+#else
+    mp_limb_t table64[18][15] = { { 0x3 }, { 0x43 }, { 0x403 },
+                                  { 0x10021003 } , { 0x400003 },
+                                  { UWORD(0x10000040800003) },
+                                  { UWORD(0x300c00000000002) ,
+                                  UWORD(0x4000000001) },
+                                  { UWORD(0x2008000000082) ,
+                                  UWORD(0x200000040000) ,
+                                  UWORD(0x4100000001004001) },
+                                  { UWORD(0x400000000003) },
+                                  { UWORD(0x400000000000003) },
+                                  { UWORD(0x10001000000042)
+                                  , UWORD(0x80000000) , 0x0 , 0x1000000 ,
+                                  UWORD(0x42000000080009) },
+                                  { UWORD(0x100000000002) ,
+                                  UWORD(0x20000000000) , 0x100001 },{ 0x2 ,
+                                  0x40001 }, { 0x2 , 0x20010000 ,
+                                  UWORD(0x100000000001) }, {
+                                  UWORD(0x300000000002) , 0x0 ,
+                                  0x0 , UWORD(0xc00000000000) , 0x4000001 },
+                                  { 0x2 , UWORD(0x40000000001) }, { 0x2 ,
+                                  UWORD(0x108000000) ,
+                                  UWORD(0x800000000000000) ,
+                                  UWORD(0x1800000000) , 0x0 , 0x0 , 0x0 ,
+                                  UWORD(0x600000000) , 0x400 ,
+                                  UWORD(0x42000000000) ,
+                                  0x0 , 0x11 },  { 0x2 , 0x180000 , 0x0 ,
+                                  0x0 , 0x18000000 , UWORD(0x400000000001) }
+                                };
+#endif
 
-    if (k >= FLINT_BITS || (UWORD(1) << k) > x)
-    {
-        *r = x - 1;
-        return 1;
-    }
-
-    a = 2;
-    b = UWORD(1) << ((FLINT_BIT_COUNT(x) + k - 1) / k);
-
-    while (a < b)
-    {
-        m = a + (b - a) / 2;
-
-        p = m + 1;
-
-        for (i = 1; i < k; i++)
-        {
-            umul_ppmm(hi, lo, p, m + 1);
-
-            if (hi != 0)
-                goto too_large;
-            else
-                p = lo;
-        }
-
-        if (p == x)
-        {
-            *r = 0;
-            return m + 1;
-        }
-        else if (p > x)
-        {
-            too_large:
-            b = m;
-        }
-        else
-        {
-            a = m + 1;
-        }
-    }
-
-    p = a;
-    for (i = 1; i < k; i++)
-        p *= a;
-
-    *r = x - p;
-    return a;
-}
+#if FLINT_BITS == 32
+#define table table32
+#else
+#define table table64
+#endif
 
 int n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
 {
-    int p[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61};                       /* prime less than 64 */
-    int q[] = {3, 7, 11, 29, 23, 53, 103, 191, 47, 59, 311, 149, 83, 173, 283, 107, 709, 367};     /* prime such that, q[i] % p[i] = 1 */
-    int z[] = {1, 1, 1, 1, 2, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1};                            /* if x = y ^ p[i] for some y => (y ^ (q[i] - 1)) % q[i] = 1 or 0 */
-    int v[] = {0, 1, 2, 3, 2, 5, 6, 7, 2, 3, 10, 11, 12, 13, 14, 15, 2, 17, 18, 19, 20};                  /* v[i] is root of i and z[i] is it's power */
-    mp_limb_t qmodulo[18][25] = { { 3 }, { 67 }, { 1027 }, { 268570627 }, { 4194307 }, { 1082130434 , 1048577 },
-                            { 2 , 50380800 , 0 , 65 }, { 130 , 131200 , 262144 , 8192 , 16793600 , 1090519041 },
-                            { 2 , 16385 }, { 2 , 67108865 }, { 66 , 1048592 , 2147483648 , 0 , 0 , 0 , 16777216 , 0 , 524296 , 4325377 },
-                            { 2 , 4096 , 0 , 512 , 1048577 }, { 2 , 0 , 262145 }, { 2 , 0 , 536936448 , 0 , 0 , 4097 },
-                            { 2 , 12288 , 0 , 0 , 0 , 0 , 0 , 49152 , 67108865 }, { 2 , 0 , 0 , 1025 },
-                            { 2 , 0 , 134217729 , 0 , 0 , 134217728 , 0 , 24 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 6 , 1024 , 0 , 0 , 1056 , 0 , 0 , 17 },
-                            { 2 , 0 , 1572864 , 0 , 0 , 0 , 0 , 0 , 402653184 , 0 , 0 , 16385 }
+    /*
+       p[i], is prime less than 64.
+       q[i], is prime such that q[i] mod p[i] = 1.
+       if x = y ^ p[i] , for some y than,
+       x ^ ((q[i] - 1) / p[i]) mod q[i] <= 1.
 
-                          };             /* kth bit of qmodulo[i][j] is 1 if  y = 32 * (j - 1) + k, y ^ ((p[i] - 1) / q[i])  % q[i] is <= 1,  else 0 */
-                                        /* i.e q[i][0]th elements bits from (LSB to MSB )represent 0.1.2....31, q[i][1]th represent 32.33....64 residue class modulo i and so on */
+       see this following link for info:
 
-    int i, power = 1,  j = 1, pos, k;
-    mp_limb_t root, prev;
+       ("http://citeseerx.ist.psu.edu/viewdoc/
+         download?doi=10.1.1.108.458&rep=rep1&type=pdf")
+
+       z[i] = maximum k such that i = j ^ k for some positive integer j.
+       v[i] = minimum j such that i = j ^ k for some positive integer k.
+    */
+
+    int p[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29,
+               31, 37, 41, 43, 47, 53, 59, 61};
+    int q[] = {3, 7, 11, 29, 23, 53, 103, 191, 47, 59,
+               311, 149, 83, 173, 283, 107, 709, 367};
+    int z[] = {1, 1, 1, 1, 2, 1, 1, 1, 3, 2,
+               1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1};
+    int v[] = {0, 1, 2, 3, 2, 5, 6, 7, 2, 3,
+               10, 11, 12, 13, 14, 15, 2, 17, 18, 19, 20};
+
+    int i, power = 1, pos, k;
+    mp_limb_t prev;
 
     for (i = 0; i < 18; i++)
     {
@@ -98,32 +115,32 @@ int n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
             break;
         }
 
-        k = x % q[i];                                     /* class of x congruent modulo q[i] */
-        pos = k / 32 + (k % 32 == 0) ? 0 : 1;            /* position of correponding class of q[i] in qmodulo table */
+        /* k is congruent class of x mod q[i] */
+        k = x % q[i];
+        /* pos is the position of above class, in the table*/
+        pos = k / FLINT_BITS + (k % FLINT_BITS) ? 0 : 1;
 
-        if (pos == 0) pos = 1;                           /* in case q[i] divides x */
-
-        if ((qmodulo[i][pos - 1] & (1 << (k % 32))))     /* check if bit corresponding to k is set*/
+        if (pos == 0) pos = 1; /* in case q[i] divides x */
+        /* check if bit corresponding to above position is set */
+        if ((table[i][pos - 1] & (1 << (k % FLINT_BITS))))
         {
             prev = x;
-            x = n_rootrem(r, x, p[i]);
+            x = n_rootrem(r, x, p[i]);  /* test if x is p[i]th power */
             if (*r == 0)
             {
-                j = 1;                                                       /* hold subsequent power of p[i] */
-                while (*r == 0)
-                {                                                            /* store product of all power that satisfy test */
-                    j = j * p[i];
+                while (*r == 0)    /* test also for subsequent power of p[i] */
+                {
+                    power = power * p[i];
                     prev = x;
-                    x =  n_rootrem(r, x, p[i]);                              /* test for subsequent power of prime p[i] */
+                    x =  n_rootrem(r, x, p[i]);
                 }
-                power *= j;
                 x = prev;
             }
             else x = prev;
         }
     }
 
-    *r = x;                                                             /* store root in  r */
-    return power;                                                       /* return power */
+    *r = x;       /* store root in r */
+    return power;  /* return power */
 }
 
