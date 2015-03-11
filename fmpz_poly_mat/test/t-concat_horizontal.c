@@ -51,7 +51,7 @@ int main(void)
         c1 = n_randint(state, 50);
         c2 = n_randint(state, 50);
         r1 = n_randint(state, 50);
-        bits = 1 + n_randint(state, 100);
+        bits = 1 + n_randint(state, 20);
 
         fmpz_poly_mat_init(A, r1, c1);
         fmpz_poly_mat_init(B, r1, c2);

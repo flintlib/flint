@@ -29,6 +29,6 @@
 void
 fmpz_poly_mat_window_clear(fmpz_poly_mat_t window)
 {
-    if (window->r)
+    if (window->entries)
         flint_free(window->rows);
 }

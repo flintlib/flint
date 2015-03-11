@@ -43,7 +43,7 @@ main(void)
     flint_printf("window_init/clear....");
     fflush(stdout);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t a, w;
         slong j, k, r1, r2, c1, c2, bits;
