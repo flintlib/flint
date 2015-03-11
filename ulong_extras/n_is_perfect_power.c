@@ -1,25 +1,117 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2015 Nitin Kumar
+
+******************************************************************************/
 #include <stdlib.h>
 #include <flint.h>
 #include <ulong_extras.h>
 
+
+/* taken from, https://github.com/wbhart/flint2/pull/119 */
+
+mp_limb_t n_rootrem(mp_limb_t * r, mp_limb_t x, unsigned int k)
+{
+    mp_limb_t a, b, m, p, hi, lo;
+    int i;
+
+    if (k <= 1 || x <= 1)
+    {
+        *r = 0;
+        return x;
+    }
+
+    if (k == 2)
+    {
+        return n_sqrtrem(r, x);
+    }
+
+    if (k >= FLINT_BITS || (UWORD(1) << k) > x)
+    {
+        *r = x - 1;
+        return 1;
+    }
+
+    a = 2;
+    b = UWORD(1) << ((FLINT_BIT_COUNT(x) + k - 1) / k);
+
+    while (a < b)
+    {
+        m = a + (b - a) / 2;
+
+        p = m + 1;
+
+        for (i = 1; i < k; i++)
+        {
+            umul_ppmm(hi, lo, p, m + 1);
+
+            if (hi != 0)
+                goto too_large;
+            else
+                p = lo;
+        }
+
+        if (p == x)
+        {
+            *r = 0;
+            return m + 1;
+        }
+        else if (p > x)
+        {
+            too_large:
+            b = m;
+        }
+        else
+        {
+            a = m + 1;
+        }
+    }
+
+    p = a;
+    for (i = 1; i < k; i++)
+        p *= a;
+
+    *r = x - p;
+    return a;
+}
+
 /*
 check for the bit size of mp_limb_t, which is equal to FLINT_BITS,
-q[i] - 1 congruent class modulo q[i] (about q[i] line no. 72)
+q[i] - 1 congruent class modulo q[i] (about q[i] line no. 171)
 are stored as follows:
 
-table(32/64)[i][j]th word contain FLINT_BITS Number of bit and
+qclass[i][j]th word contain FLINT_BITS Number of bit and
 kth bit (from LSB To MSB) represents the,
 (say y = FLINT_BITS * max(j - 1, 0) + k), y mod q[i] congruent
 class of q[i] and it is set to 1 if y satisfy the property mentioned
-in the line no. 8 otherwise it is set to 0.
+in the line no. 172 otherwise it is set to 0.
 
 for total q[i] congruent class modulo q[i],
     q[i] / FLINT_BITS + (q[i] % FLINT_BITS) ? 0 : 1;
-    word are used, i.e. the size of table(32/64)[i]th row.
+    word are used, i.e. the size of qclass[i]th row.
 */
 
 #if FLINT_BITS == 32
-    mp_limb_t table32[18][25] = {{ 0x3 }, { 0x43 }, { 0x403 }, { 0x10021003 }
+    mp_limb_t qclass[18][25] = {{ 0x3 }, { 0x43 }, { 0x403 }, { 0x10021003 }
                                , { 0x400003 },{ 0x40800002 , 0x100001 },
                                { 0x2 , 0x300c000 , 0x0 , 0x41 },
                                { 0x82 , 0x20080 , 0x40000 , 0x2000 ,
@@ -41,7 +133,7 @@ for total q[i] congruent class modulo q[i],
                                0x0 , 0x0 , 0x4001 }
                               };
 #else
-    mp_limb_t table64[18][15] = { { 0x3 }, { 0x43 }, { 0x403 },
+    mp_limb_t qclass[18][15] = { { 0x3 }, { 0x43 }, { 0x403 },
                                   { 0x10021003 } , { 0x400003 },
                                   { UWORD(0x10000040800003) },
                                   { UWORD(0x300c00000000002) ,
@@ -71,11 +163,6 @@ for total q[i] congruent class modulo q[i],
                                 };
 #endif
 
-#if FLINT_BITS == 32
-#define table table32
-#else
-#define table table64
-#endif
 
 int n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
 {
@@ -122,7 +209,7 @@ int n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
 
         if (pos == 0) pos = 1; /* in case q[i] divides x */
         /* check if bit corresponding to above position is set */
-        if ((table[i][pos - 1] & (1 << (k % FLINT_BITS))))
+        if ((qclass[i][pos - 1] & (1 << (k % FLINT_BITS))))
         {
             prev = x;
             x = n_rootrem(r, x, p[i]);  /* test if x is p[i]th power */

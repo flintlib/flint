@@ -908,6 +908,11 @@ int n_is_perfect_power235(mp_limb_t n)
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
 
+int n_is_perfect_power(mp_limb_t *r, mp_limb_t x)
+
+    Returns maximum $k$, where $k >= 1$, such that $x = y^{k}$, for some
+    positive integer $y$. $r$ contains the value of $y$.
+
 *******************************************************************************
 
     Factorisation
@@ -1219,6 +1224,13 @@ mp_limb_t n_primitive_root_prime(mp_limb_t p)
 
     Returns a primitive root for the multiplicative subgroup of $\Z/p\Z$
     where $p$ is prime.
+
+
+mp_limb_t n_primitive_root(mp_limb_t n)
+
+    Returns a primitive root modulo $n$ (if exist), where $n$ is a positive 
+    integer.
+
 
 mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n)
 

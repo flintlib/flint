@@ -1,34 +1,34 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2015 Nitin Kumar
+
+******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <flint.h>
 #include <ulong_extras.h>
 
-
-/* program computes primitive root for the 2, 4, p,  p ^ k, 2 * (p ^ k), where p is an odd-prime & k >= 1 */
-
-int n_is_perfect_power(mp_limb_t * root, mp_limb_t n)
-{
-    int i, k;
-    mp_limb_t a;
-
-    if (n_is_prime(n))
-    {
-        *root = n;                                  /* check if n is a prime*/
-        return 1;
-    }
-
-    for (i = 3; i <= sqrt(n); i+= 2)               /*iterating through possible roots*/
-    {
-        a = i;
-        for (k = 2; a < n; k++) a *= i;
-        if (a == n)
-        {
-            *root = i;
-            return k;
-        }
-    }
-    return 0;
-}
+/* computes primitive root for modulo n where n has following form
+   2, 4, p ^ k, 2 * (p ^ k), p is an odd prime*/
 
 mp_limb_t n_primitive_root_prefactor(mp_limb_t n, n_factor_t * factors, mp_limb_t * phi)
 {
@@ -99,14 +99,17 @@ mp_limb_t n_primitive_root(mp_limb_t n)
             else
             {
                 phi = n;
-                phi = (phi / root) * (root - 1);                      /* calculating  phi(n), using formula */
-                n_factor(&factors, root - 1, 1);                      /* factoring (root - 1), which is a factor of phi(n) */
+                /* calculating  phi(n), using formula */
+                phi = (phi / root) * (root - 1);
+                /* factoring (root - 1), which is a factor of phi(n) */
+                n_factor(&factors, root - 1, 1);
                 n *= m;
-                if (k > 1)                                             /* adding extra factor if exist */
+                /* adding extra factor if exist */
+                if (k > 1)
                 {
-                    factors.num++;
                     factors.p[factors.num] = root;
                     factors.exp[factors.num] = 1;
+                    factors.num++;
                 }
                 a = n_primitive_root_prefactor(n, &factors, &phi);
                 return a;
