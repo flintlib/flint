@@ -369,6 +369,10 @@ FLINT_DLL mp_limb_t n_primitive_root_prime(mp_limb_t p);
 
 FLINT_DLL mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n);
 
+FLINT_DLL mp_limb_t n_shoup_precomp(mp_limb_t w, mp_limb_t p);
+
+FLINT_DLL mp_limb_t n_shoup_mult(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p);
+
 #ifdef __cplusplus
 }
 #endif

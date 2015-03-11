@@ -30,26 +30,41 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+
 int main(void)
 {
-   mp_limb_t w, t, p, w_pr, correct_w_prep;
+   int i, result;
    FLINT_TEST_INIT(state);
    
    flint_printf("shoup_mult....");
-   fflush(stdout);  
+   fflush(stdout);
 
-   w = 1000;
-   t = 14;
-   p = 1301;
-   correct_w_prep = 14178896290322483947;
    
-   w_pr = w_prep(w, p);
-   if (w_pr != correct_w_prep)
+
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
-      flint_printf("FAIL:\n");
-      flint_printf("w = %wu, t = %wu, p = %wu\n", w, t, p);
-      flint_printf("w' = %wu, should be %wu\n", w_pr, correct_w_prep);
-      abort();
+      mp_limb_t a, b, d, r1, r2, q, p1, p2, w_pr;
+      
+      d = n_randtest_not_zero(state) / 2 + 1;
+      a = n_randtest(state) % d;
+      b = n_randtest(state) % d;
+      
+      w_pr = n_shoup_precomp(a, d);
+
+      r1 = n_shoup_mult(a, b, w_pr, d);
+
+      umul_ppmm(p1, p2, a, b);
+      p1 %= d;
+      udiv_qrnnd(q, r2, p1, p2, d);
+      
+      result = (r1 == r2);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("a = %wu, b = %wu, d = %wu, w_pr = %wu\n", a, b, d, w_pr); 
+         flint_printf("q = %wu, r1 = %wu, r2 = %wu\n", q, r1, r2);
+         abort();
+      }
    }
 
    FLINT_TEST_CLEANUP(state);
