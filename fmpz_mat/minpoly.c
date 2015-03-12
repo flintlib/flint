@@ -5,8 +5,17 @@
    to its minimal polynomial (which has at most $n+1$ terms).
    */
 
-void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
+void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
+	if (mat->r != mat->c)
+	{
+		flint_printf("Exception (fmpz_mat_minpoly). Non-square matrix.\n");
+		abort();
+	}
+
+	fmpz_poly_fit_length(cp, mat->r + 1);
+	_fmpz_poly_set_length(cp, mat->r + 1);
+	
 	const slong n = mat->c;
 	
 	slong n_square = n * n;
@@ -21,7 +30,7 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 		slong idx = 1;
 
 		fmpz_mat_t tmp;
-		fmpz_mat_init(tmp, n_square, n_square);
+		fmpz_mat_init(tmp, n + 1, n_square);
 		fmpz_mat_zero(tmp);
 
 		fmpz_mat_t power_matrix;
@@ -34,7 +43,7 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 		}
 
 		fmpz_mat_t qu;
-		fmpz_mat_init(qu, n_square, n_square);
+		fmpz_mat_init(qu, n + 1, n + 1);
 		fmpz_mat_zero(qu);
 		
 		fmpz_t gcd;
@@ -54,10 +63,11 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 					fmpz_set_si(fmpz_mat_entry(tmp, idx, i * n + j), *val); 
 				}
 			}
+			
 			idx++;
 
 			fmpz_mat_t transpose;
-			fmpz_mat_init(transpose, n_square, n_square);
+			fmpz_mat_init(transpose, n_square, n + 1);
 			fmpz_mat_transpose(transpose, tmp);
 
 			slong nullity = fmpz_mat_nullspace(qu, transpose);
@@ -73,7 +83,7 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 				fmpz_gcd(gcd, gcd, s);
 			}
 
-			if (idx == n + 1 || nullity == 1)
+			if (idx == n + 1)
 			{
 				terminate = 1;
 			}
@@ -81,7 +91,7 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 
 		if (!fmpz_is_zero(gcd))
 		{
-			for (i = 0; i < n_square; i++)
+			for (i = 0; i < n + 1; i++)
 			{
 				fmpz * tmp = fmpz_mat_entry(qu, i, 0);
 
@@ -93,21 +103,10 @@ void _fmpz_mat_minpoly(fmpz *cp, const fmpz_mat_t mat)
 			}
 		}
 
-		// todo: set coefficients of cp from the first column of qu
-		
+		for (i = 0; i < qu->r; i++)
+		{
+			fmpz * tmp = fmpz_mat_entry(qu, i, 0);
+			fmpz_set_si((cp->coeffs) + i, *tmp);
+		}
 	}
-}
-
-void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
-{
-	if (mat->r != mat->c)
-	{
-		flint_printf("Exception (fmpz_mat_minpoly). Non-square matrix.\n");
-		abort();
-	}
-
-	fmpz_poly_fit_length(cp, mat->r + 1);
-	fmpz_poly_set_length(cp, mat->r + 1);
-
-	_fmpz_mat_minpoly(cp->coeffs, mat);
 }
