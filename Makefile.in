@@ -150,13 +150,7 @@ define test_mod
 	$(eval vl := $(subst :, ,$(1)))
 	$(eval dir := $(firstword $(vl)))
 	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
-	$(eval
-ifdef uset_tests
-	USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests)
-else
-	USER_SET_TESTS_VAR :=
-endif
-	)
+	$(eval USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests))
 	$(AT)test ! -d $(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir)  || $(MAKE) $(USER_SET_TESTS_VAR) -f ../Makefile.subdirs -C $(dir) check
 endef
 
@@ -165,13 +159,7 @@ define test_mod_ext
 	$(eval ext := $(2))
 	$(eval dir := $(firstword $(vl)))
 	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
-	$(eval
-ifdef uset_tests
-	USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests)
-else
-	USER_SET_TESTS_VAR :=
-endif
-	)
+	$(eval USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests))
 	$(AT)MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) $(USER_SET_TESTS_VAR) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check
 endef
 
