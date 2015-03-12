@@ -38,7 +38,6 @@ nmod_mat_sqr_bodrato(nmod_mat_t B, const nmod_mat_t A)
     }
     else
     {
-        nmod_mat_mul(B, A, A);
     
         nmod_mat_t window_A, window11, window12, window21, window22;
         nmod_mat_t s1, s2, s3, s4;
@@ -130,6 +129,7 @@ nmod_mat_sqr_bodrato(nmod_mat_t B, const nmod_mat_t A)
         }
         else
         {
+            
             nmod_mat_t temp_A, cache_A;
             
             nmod_mat_init(temp_A, n, n, A->mod.n);
@@ -200,7 +200,6 @@ nmod_mat_sqr_bodrato(nmod_mat_t B, const nmod_mat_t A)
 
             nmod_mat_clear(temp_A);
             nmod_mat_clear(cache_A);
-
         }
 
         nmod_mat_window_clear(window_A);
