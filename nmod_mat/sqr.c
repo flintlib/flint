@@ -34,6 +34,8 @@ nmod_mat_sqr(nmod_mat_t B, const nmod_mat_t A)
 {
     slong n;
     n = A->r;
-
-    nmod_mat_sqr_bodrato(B, A);
+    if(n < NMOD_MAT_MUL_STRASSEN_CUTOFF )
+        nmod_mat_mul(B, A, A);
+    else
+        nmod_mat_sqr_bodrato(B, A);
 }
