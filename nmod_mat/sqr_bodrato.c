@@ -85,29 +85,9 @@ nmod_mat_sqr_bodrato(nmod_mat_t B, const nmod_mat_t A)
         nmod_mat_mul(p6, s4, window12);
         nmod_mat_mul(p7, window21, s4);
 
-        nmod_mat_clear(s1);
-        nmod_mat_clear(s2);
-        nmod_mat_clear(s3);
-
-        nmod_mat_init(s1, m/2, m/2, A->mod.n);
-        nmod_mat_init(s2, m/2, m/2, A->mod.n);
-        nmod_mat_init(s3, m/2, m/2, A->mod.n);
-    
-
         nmod_mat_add(s1, p3, p5);
         nmod_mat_sub(s2, p1, s1);
         nmod_mat_sub(s3, s1, p2);
-
-        nmod_mat_clear(s1);
-        nmod_mat_clear(p1);
-        nmod_mat_clear(p3);
-        nmod_mat_clear(s4);
-
-        nmod_mat_init(s1, m/2, m/2, A->mod.n);
-        nmod_mat_init(p1, m/2, m/2, A->mod.n);
-        nmod_mat_init(p3, m/2, m/2, A->mod.n);
-        nmod_mat_init(s4, m/2, m/2, A->mod.n);
-    
 
         nmod_mat_add(p1, p4, p5);
         nmod_mat_sub(s1, s3, p6);
