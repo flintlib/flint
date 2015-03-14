@@ -66,7 +66,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
     }
     else
     {
-        fmpz_mat_t window_A, window11, window12, window21, window22;
+        fmpz_mat_t window11, window12, window21, window22;
         fmpz_mat_t s1, s2, s3, s4;
         fmpz_mat_t p1, p2, p3, p4, p5, p6, p7;
         fmpz_t sum, val;
@@ -82,51 +82,47 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_mat_init(s1, m/2, m/2);
         fmpz_mat_init(s2, m/2, m/2);
         fmpz_mat_init(s3, m/2, m/2);
-        fmpz_mat_init(s4, m/2, m/2);
         fmpz_mat_init(p1, m/2, m/2);
         fmpz_mat_init(p2, m/2, m/2);
         fmpz_mat_init(p3, m/2, m/2);
-        fmpz_mat_init(p4, m/2, m/2);
         fmpz_mat_init(p5, m/2, m/2);
         fmpz_mat_init(p6, m/2, m/2);
-        fmpz_mat_init(p7, m/2, m/2);
 
-        fmpz_mat_window_init(window_A, A, 0, 0, m, m);
-        fmpz_mat_window_init(window11, window_A, 0, 0, m/2, m/2);
-        fmpz_mat_window_init(window12, window_A, 0, m/2, m/2, m);
-        fmpz_mat_window_init(window21, window_A, m/2, 0, m, m/2);
-        fmpz_mat_window_init(window22, window_A, m/2, m/2, m, m);
+        fmpz_mat_window_init(window11, A, 0, 0, m/2, m/2);
+        fmpz_mat_window_init(window12, A, 0, m/2, m/2, m);
+        fmpz_mat_window_init(window21, A, m/2, 0, m, m/2);
+        fmpz_mat_window_init(window22, A, m/2, m/2, m, m);
 
         fmpz_mat_add(s1, window22, window12);
-        fmpz_mat_sub(s2, window22, window21);
-        fmpz_mat_add(s3, s2, window12);
-        fmpz_mat_sub(s4, s3, window11);
-
         fmpz_mat_sqr(p1, s1);
+        
+        fmpz_mat_sub(s2, window22, window21);
         fmpz_mat_sqr(p2, s2);
+        
+        fmpz_mat_add(s3, s2, window12);
         fmpz_mat_sqr(p3, s3);    
-        fmpz_mat_sqr(p4, window11);
+     
+        fmpz_mat_sub(s1, s3, window11);
+        fmpz_mat_mul(p6, s1, window12);
+        fmpz_mat_mul(s3, window21, s1);
+        
+        
         fmpz_mat_mul(p5, window12, window21);
-        fmpz_mat_mul(p6, s4, window12);
-        fmpz_mat_mul(p7, window21, s4);
-
-        fmpz_mat_zero(s1);
-        fmpz_mat_zero(s2);
-        fmpz_mat_zero(s3);
+        
+        
 
         fmpz_mat_add(s1, p3, p5);
         fmpz_mat_sub(s2, p1, s1);
+        
+        fmpz_mat_sub(p3, s2, s3);
+        
         fmpz_mat_sub(s3, s1, p2);
+        
+        fmpz_mat_sqr(s1, window11);
 
-        fmpz_mat_zero(s1);
-        fmpz_mat_zero(p1);
-        fmpz_mat_zero(p3);
-        fmpz_mat_zero(s4);
-
-        fmpz_mat_add(p1, p4, p5);
-        fmpz_mat_sub(s1, s3, p6);
-        fmpz_mat_sub(p3, s2, p7);
-        fmpz_mat_add(s4, p2, s2);
+        fmpz_mat_add(p1, s1, p5);
+        fmpz_mat_add(p5, p2, s2);
+        fmpz_mat_sub(p2, s3, p6);
 
         if (iseven == 1)
         {
@@ -150,7 +146,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             {
                 for (j = n/2; j < n; ++j)
                 {
-                    fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(s1, i, j - n/2));
+                    fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(p2, i, j - n/2));
                 }
             }
 
@@ -158,7 +154,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             {
                 for (j = n/2; j < n; ++j)
                 {
-                    fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(s4, i - n/2, j - n/2));
+                    fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(p5, i - n/2, j - n/2));
                 }
             }
         }
@@ -223,14 +219,14 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             {
                 for (j = m/2; j < m; ++j)
                 {
-                    fmpz_add(fmpz_mat_entry(B, i, j), fmpz_mat_entry(s1, i, j - m/2), fmpz_mat_entry(cache_A, i, j));
+                    fmpz_add(fmpz_mat_entry(B, i, j), fmpz_mat_entry(p2, i, j - m/2), fmpz_mat_entry(cache_A, i, j));
                 }
             }
             for (i = m/2; i < m; ++i)
             {
                 for (j = m/2; j < m; ++j)
                 {
-                    fmpz_add(fmpz_mat_entry(B, i, j), fmpz_mat_entry(s4, i - m/2, j - m/2), fmpz_mat_entry(cache_A, i, j));
+                    fmpz_add(fmpz_mat_entry(B, i, j), fmpz_mat_entry(p5, i - m/2, j - m/2), fmpz_mat_entry(cache_A, i, j));
                 }
             }
 
@@ -242,7 +238,6 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
         }
 
-        fmpz_mat_window_clear(window_A);
         fmpz_mat_window_clear(window11);
         fmpz_mat_window_clear(window12);
         fmpz_mat_window_clear(window21);
@@ -250,13 +245,10 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_mat_clear(s1);
         fmpz_mat_clear(s2);
         fmpz_mat_clear(s3);
-        fmpz_mat_clear(s4);
         fmpz_mat_clear(p1);
         fmpz_mat_clear(p2);
         fmpz_mat_clear(p3);
-        fmpz_mat_clear(p4);
         fmpz_mat_clear(p5);
         fmpz_mat_clear(p6);
-        fmpz_mat_clear(p7);
     }
 }
