@@ -67,8 +67,8 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
     else
     {
         fmpz_mat_t window11, window12, window21, window22;
-        fmpz_mat_t s1, s2, s3, s4;
-        fmpz_mat_t p1, p2, p3, p4, p5, p6, p7;
+        fmpz_mat_t s1, s2, s3;
+        fmpz_mat_t p1, p2, p3, p5, p6;
         fmpz_t sum, val;
 
         slong m = n, x, iseven = 1; 
