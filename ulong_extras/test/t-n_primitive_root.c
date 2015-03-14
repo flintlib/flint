@@ -40,7 +40,7 @@ int main()
 
    /* check for p ^ k, where p is and odd prime */
 
-   for(i = 0; i < 100; i++)
+   for (i = 0; i < 100; i++)
    {
        p = n_randtest_prime(state, 1);
 
@@ -73,7 +73,7 @@ int main()
    }
 
    /* check for 2 * (p ^ k), where p is an odd prime*/
-   for(i = 0; i < 100; i++)
+   for (i = 0; i < 100; i++)
    {
        p = n_randtest_prime(state, 1);
 
