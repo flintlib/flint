@@ -106,18 +106,12 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_mat_mul(p6, s1, window12);
         fmpz_mat_mul(s3, window21, s1);
         
-        
         fmpz_mat_mul(p5, window12, window21);
-        
-        
-
         fmpz_mat_add(s1, p3, p5);
         fmpz_mat_sub(s2, p1, s1);
         
         fmpz_mat_sub(p3, s2, s3);
-        
         fmpz_mat_sub(s3, s1, p2);
-        
         fmpz_mat_sqr(s1, window11);
 
         fmpz_mat_add(p1, s1, p5);
