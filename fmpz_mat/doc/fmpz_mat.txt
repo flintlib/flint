@@ -545,6 +545,8 @@ void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets \code{B} to the square of the matrix \code{A}, which must be
     a square matrix. Aliasing is allowed.
+    The function calls fmpz_mat_mul for dimensions less than 12 and 
+    calls fmpz_mat_sqr_bodrato for cases in which the latter is faster.
 
 void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
