@@ -283,6 +283,8 @@ FLINT_DLL mp_limb_t n_cbrt_newton_iteration(mp_limb_t n);
 
 FLINT_DLL mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n);
 
+FLINT_DLL mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n);
+
 FLINT_DLL int n_is_perfect_power235(mp_limb_t n);
 
 FLINT_DLL int n_is_oddprime_small(mp_limb_t n);
@@ -378,6 +380,8 @@ FLINT_DLL mp_limb_t n_primitive_root_prime(mp_limb_t p);
 FLINT_DLL mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n);
 
 FLINT_DLL mp_limb_t n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root);
+
+FLINT_DLL mp_limb_t n_root(mp_limb_t n, mp_limb_t root);
 
 #ifdef __cplusplus
 }

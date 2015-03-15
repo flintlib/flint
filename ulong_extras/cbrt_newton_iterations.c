@@ -35,26 +35,53 @@
 double
 estimate(double a)
 { 
-   slong i = *((slong *) &a);
-   const slong s = (1 << 10) - 1;
-   i = (i - (s << 52)) * 0.333333333333333 + (s << 52); /* 0.333333333333333 = 1/3*/
-   return *((double *) &i);
+    typedef union { 
+        slong      uword_val;
+#if FLINT64
+        double     double_val;
+#else
+        float      double_val;
+#endif
+    } uni;
+
+    uni alias;
+    ulong n, hi, lo, ret;
+
+#ifdef FLINT64
+    const mp_limb_t mul_factor = 6148914691236517205;
+    slong s = ((1 << 10) - 1);
+    s <<= 52;
+#else
+    const mp_limb_t mul_factor = 1431655765;
+    slong s = ((1 << 7) - 1);
+    s <<= 23;
+#endif
+
+    alias.double_val = a;
+    n = alias.uword_val;
+    n -= s;
+    umul_ppmm(hi, lo, n, mul_factor);
+    n = hi;
+    n += s;
+    alias.uword_val = n;
+    return alias.double_val;
 }
 
 mp_limb_t
 n_cbrt_newton_iteration(mp_limb_t n)
 {
     int iter, bits;
-    mp_limb_t ret, upper_limit;
+    mp_limb_t ret;
     double val, x, xsq, dx;
     val = (double)n;
     bits = FLINT_BIT_COUNT(n); 
 
     /* upper_limit is the max cube root possible for one word */
 
-    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
-    upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
+    const mp_limb_t upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
+#else
+    const mp_limb_t  upper_limit = 1626;    /* 1626 < (2^32)^(1/3) */
 #endif
 
     if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
@@ -62,10 +89,9 @@ n_cbrt_newton_iteration(mp_limb_t n)
     else
         iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
     
-    x = estimate((double)n);   /* initial estimate */
+    x = estimate((double)n);         /* initial estimate */
 
     /* Newton's iterations to get cube root */
-
     val = (double)n;
     while(iter--)
     {
@@ -75,7 +101,6 @@ n_cbrt_newton_iteration(mp_limb_t n)
         dx *= 0.333333333333333;     /* dx = dx * (1/3) */     
         x += dx;
     }
-    
     /* In case ret^3 or (ret+1)^3 will cause overflow */
 
     ret = x;
@@ -86,7 +111,11 @@ n_cbrt_newton_iteration(mp_limb_t n)
         ret = upper_limit - 1;
     }
     while (ret * ret * ret <= n)
+    {
         (ret) += 1;
+        if (ret == upper_limit)
+            break;
+    }
     while (ret * ret * ret > n)
         (ret) -= 1;
     return ret;

@@ -130,8 +130,8 @@ static const mp_limb_t mul_factor[] = {
 /* http://en.wikipedia.org/wiki/Fast_inverse_square_root */
 /* Intead of the inverse square root, we calculate the nth root */
 
-double 
-nth_root_estimate(double a, int n)
+double
+root_estimate(double a, int n)
 { 
     typedef union { 
         slong      uword_val;
@@ -164,7 +164,7 @@ nth_root_estimate(double a, int n)
 }
 
 mp_limb_t
-n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
+n_root(mp_limb_t n, mp_limb_t root)
 {
     mp_limb_t x, currval, base; 
     double dx;
@@ -173,26 +173,20 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
         return 0;
 
     if (root == 1)
-    {
-        *remainder = 0;
         return n;
-    }
 
     if (root == 2)
-        return n_sqrtrem(remainder, n);
+        return n_sqrt(n);
 
     if (root == 3)
-        return n_cbrtrem(remainder, n);
+        return n_cbrt(n);
 
     if (root >= FLINT_BITS || (UWORD(1) << root) > n)
-    {
-        *remainder = n - 1;
         return 1;
-    }
 
     const mp_limb_t upper_limit = max_base[root];      /* n <= upper_limit^root */
 
-    x =  (mp_limb_t) nth_root_estimate((double)n, root);
+    x =  (mp_limb_t) root_estimate((double)n, root);
 
     /* one round of newton iteration */
 
@@ -227,8 +221,5 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
     }
 
     final:
-    *remainder = base;
-    *remainder = n_pow(*remainder, root);
-    *remainder = n - *remainder;
     return base;
 }

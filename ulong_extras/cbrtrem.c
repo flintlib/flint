@@ -33,37 +33,17 @@
 #include "ulong_extras.h"
 
 mp_limb_t
-n_cbrt_binary_search(mp_limb_t x)
+n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
 {
-    mp_limb_t low, high, mid, p, upper_limit;
-
-    /* upper_limit is the max cube root possible for one word */
-
-#if FLINT64
-    upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
-#else
-    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
-#endif
-
-    low = 0;
-    high = UWORD(1) << ((FLINT_BIT_COUNT(x) + 2) / 3);
-
-    if (high > upper_limit) /* cube cannot be greater than upper_limit */
-        high = upper_limit;
-
-    /* binary search for cube root */
-        
-    while (low < high)
+    mp_limb_t base;
+    
+    if (!n)
     {
-        mid = (high + low) / 2;
-        p = mid + 1;
-        p = p * p * p;
-        if (p == x)
-            return mid + 1;
-        else if (p > x)
-            high = mid;
-        else
-            low = mid + 1;
+        *remainder = 0;
+        return 0;
     }
-    return low;
+
+    base = n_cbrt(n);
+    *remainder = n - base * base * base;
+    return base;
 }

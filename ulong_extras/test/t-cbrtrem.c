@@ -19,51 +19,59 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_cbrt_binary_search(mp_limb_t x)
+int main(void)
 {
-    mp_limb_t low, high, mid, p, upper_limit;
+   int i, result;
 
-    /* upper_limit is the max cube root possible for one word */
+   FLINT_TEST_INIT(state);
+   
+   flint_printf("cbrtrem....");
+   fflush(stdout);
 
-#if FLINT64
-    upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
-#else
-    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
-#endif
-
-    low = 0;
-    high = UWORD(1) << ((FLINT_BIT_COUNT(x) + 2) / 3);
-
-    if (high > upper_limit) /* cube cannot be greater than upper_limit */
-        high = upper_limit;
-
-    /* binary search for cube root */
-        
-    while (low < high)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mid = (high + low) / 2;
-        p = mid + 1;
-        p = p * p * p;
-        if (p == x)
-            return mid + 1;
-        else if (p > x)
-            high = mid;
-        else
-            low = mid + 1;
+        mp_limb_t a, b, c, i, j;
+        mpz_t e, f, g;
+
+        mpz_init(e);
+        mpz_init(f);
+        mpz_init(g);
+      
+        c = n_randint(state, 0);    /*number */
+        flint_mpz_set_ui(g, c);
+
+        a = n_cbrtrem(&b, c);
+        mpz_rootrem(e, f, g, 3);
+      
+        i = flint_mpz_get_ui(e);
+        j = flint_mpz_get_ui(f);
+
+        result = ((a == i) && (b == j));
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("Passed Parameters : n = %wu", c);
+            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
+            flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
+            abort();
+        }
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
     }
-    return low;
+
+    FLINT_TEST_CLEANUP(state);
+    flint_printf("PASS\n");
+    return 0;
 }

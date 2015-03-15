@@ -32,19 +32,41 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* function to get a good approximation of the cube root */
-/* Algorithm for this approximation is mentioned in this article */
-/* http://en.wikipedia.org/wiki/Fast_inverse_square_root */
-/* Intead of the inverse square root, we calculate the cube root */
 
 double
-cbrt_estimate(double a)
+n_cbrt_estimate(double a)
 { 
-   slong i = *((slong *) &a);
-   const slong s = (1 << 10) - 1;
-   i = (i - (s << 52)) * 0.333333333333333 + (s << 52); /* 0.333333333333333 = 1/3*/
-   return *((double *) &i);
-}
+    typedef union { 
+        slong      uword_val;
+#if FLINT64
+        double     double_val;
+#else
+        float      double_val;
+#endif
+    } uni;
+
+    uni alias;
+    ulong n, hi, lo;
+
+#ifdef FLINT64
+    const mp_limb_t mul_factor = 6148914691236517205;
+    slong s = ((1 << 10) - 1);
+    s <<= 52;
+#else
+    const mp_limb_t mul_factor = 1431655765;
+    slong s = ((1 << 7) - 1);
+    s <<= 23;
+#endif
+
+    alias.double_val = a;
+    n = alias.uword_val;
+    n -= s;
+    umul_ppmm(hi, lo, n, mul_factor);
+    n = hi;
+    n += s;
+    alias.uword_val = n;
+    return alias.double_val;
+}    
 
 mp_limb_t
 n_cbrt(mp_limb_t n)
@@ -70,12 +92,13 @@ n_cbrt(mp_limb_t n)
 
     /* upper_limit is the max cube root possible for one word */
 
-    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #if FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
+#else
+    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
 #endif
 
-    x = cbrt_estimate((double)n);   /* initial estimate */
+    x = n_cbrt_estimate((double)n);   /* initial estimate */
    
     /* Kahan's iterations to get cube root */
 

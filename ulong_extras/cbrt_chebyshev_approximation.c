@@ -72,30 +72,30 @@ n_cbrt_chebyshef_approx(mp_limb_t n)
 #endif
     } uni;
 
-    int rem, mul, mantissa_bits, bias;
+    int rem, mul;
     double factor, root, dec, dec2;
-    mp_limb_t ret, upper_limit, expo, table_index, expo_mask, mantissa_mask, table_mask, bias_hex;
+    mp_limb_t ret, expo, table_index;
     uni alias;
 
     /* upper_limit is the max cube root possible for one word */
 
 #if FLINT64
-    upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
-    expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
-    mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
-    table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
-    mantissa_bits = 52;
-    bias_hex = 0x3FE0000000000000;      
-    bias = 1022;
+    const mp_limb_t upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
+    const mp_limb_t expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
+    const mp_limb_t mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
+    const mp_limb_t table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
+    const int mantissa_bits = 52;
+    const mp_limb_t bias_hex = 0x3FE0000000000000;      
+    const int bias = 1022;
     alias.double_val = (double)n;
 #else
-    upper_limit = 1626;         /* 1626 < (2^32)^(1/3) */
-    expo_mask = 0x7F800000;     /* exponent bits in float */
-    mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
-    table_mask = 0x00780000;    /* first 4 bits of mantissa */
-    mantissa_bits = 23;
-    bias_hex = 0x3F000000;      
-    bias = 126;
+    const mp_limb_t upper_limit = 1626;         /* 1626 < (2^32)^(1/3) */
+    const mp_limb_t expo_mask = 0x7F800000;     /* exponent bits in float */
+    const mp_limb_t mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
+    const mp_limb_t table_mask = 0x00780000;    /* first 4 bits of mantissa */
+    const int mantissa_bits = 23;
+    const mp_limb_t bias_hex = 0x3F000000;      
+    const int bias = 126;
     alias.double_val = (float)n;
 #endif
 
