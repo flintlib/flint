@@ -119,6 +119,19 @@ FLINT_DLL void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state,
 FLINT_DLL void nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state,
                         slong len, float density);
 
+/* Windows and concatenation */
+
+FLINT_DLL void nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat, slong r1,
+    slong c1, slong r2, slong c2);
+
+FLINT_DLL void nmod_poly_mat_window_clear(nmod_poly_mat_t window);
+
+FLINT_DLL void nmod_poly_mat_concat_horizontal(nmod_poly_mat_t res,
+                           const nmod_poly_mat_t mat1,  const nmod_poly_mat_t mat2);
+
+FLINT_DLL void nmod_poly_mat_concat_vertical(nmod_poly_mat_t res,
+                           const nmod_poly_mat_t mat1,  const nmod_poly_mat_t mat2);
+
 /* Input and output **********************************************************/
 
 FLINT_DLL void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x);

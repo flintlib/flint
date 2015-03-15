@@ -77,8 +77,15 @@ FLINT_DLL void nmod_mat_clear(nmod_mat_t mat);
 FLINT_DLL void nmod_mat_one(nmod_mat_t mat);
 FLINT_DLL void nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2);
 
+/* Windows and concatenation */
+
 FLINT_DLL void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 FLINT_DLL void nmod_mat_window_clear(nmod_mat_t window);
+
+FLINT_DLL void nmod_mat_concat_horizontal(nmod_mat_t res,
+                           const nmod_mat_t mat1,  const nmod_mat_t mat2);
+FLINT_DLL void nmod_mat_concat_vertical(nmod_mat_t res,
+                           const nmod_mat_t mat1,  const nmod_mat_t mat2);
 
 /* Random matrix generation */
 FLINT_DLL void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
