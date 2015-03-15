@@ -551,8 +551,8 @@ void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
     Sets \code{B} to the square of the matrix \code{A}, which must be
     a square matrix. Aliasing is allowed.
     The bodrato algorithm is described in \cite{Bodrato2010}.
-    It is highly efficient for squaring matrices with large elements and also
-    dimensions less than 150.
+    It is highly efficient for squaring matrices which satisfy both the 
+    following conditions  : (a) large elements  (b) dimensions less than 150.
 
 
 void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong e)
