@@ -76,12 +76,7 @@ int main(void)
 
 
             flint_printf("dim = %wd fmpz_mat_mul : %.2f fmpz_mat_sqr : %.2f         ", dim, min_default, min_classical);
-            if (min_default < 0.6*min_classical)
-                flint_printf("BAD! \n");
-            else if(min_default <= min_classical)
-                flint_printf("OK! \n");
-            else if (min_default > min_classical)
-                flint_printf("GREAT! \n");
+            flint_printf("Ratio : %0.2f \n",min_default/min_classical);
 
         }
     }
