@@ -147,8 +147,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             fmpz_zero(sum);
             for (x = 0; x < n; ++x)
             {
-                fmpz_mul(val, fmpz_mat_entry(temp_A, n - 1, x), fmpz_mat_entry(temp_A, x, i));
-                fmpz_add(sum, sum, val);
+                fmpz_addmul(sum, fmpz_mat_entry(temp_A, n - 1, x), fmpz_mat_entry(temp_A, x, i));
             }
             fmpz_set(fmpz_mat_entry(B, n - 1, i), sum);
         }
@@ -158,8 +157,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             fmpz_zero(sum);
             for (x = 0; x < n; ++x)
             {
-                fmpz_mul(val, fmpz_mat_entry(temp_A, x, n - 1), fmpz_mat_entry(temp_A, i, x));
-                fmpz_add(sum, sum, val);
+                fmpz_addmul(sum, fmpz_mat_entry(temp_A, x, n - 1), fmpz_mat_entry(temp_A, i, x));
             }
             fmpz_set(fmpz_mat_entry(B, i, n - 1), sum);
         }
