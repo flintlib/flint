@@ -65,7 +65,7 @@ n_cbrt_chebyshef_approx(mp_limb_t n)
 {
     typedef union { 
         mp_limb_t  uword_val;
-#if FLINT64
+#ifdef FLINT64
         double     double_val;
 #else
         float      double_val;
@@ -79,7 +79,7 @@ n_cbrt_chebyshef_approx(mp_limb_t n)
 
     /* upper_limit is the max cube root possible for one word */
 
-#if FLINT64
+#ifdef FLINT64
     const mp_limb_t upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
     const mp_limb_t expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
     const mp_limb_t mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */

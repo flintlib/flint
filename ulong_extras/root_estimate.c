@@ -106,18 +106,18 @@ n_root_estimate(double a, int n)
     } uni;
 
     uni alias;
-    ulong i, hi, lo, ret;
+    ulong i, hi, lo, s;
     alias.double_val = a;
-    i = alias.uword_val;
 
 #ifdef FLINT64
-    slong s = ((1 << 10) - 1);
+    s = ((1 << 10) - 1);
     s <<= 52;
 #else
-    slong s = ((1 << 7) - 1);
+    s = ((1 << 7) - 1);
     s <<= 23;
 #endif
 
+    i = alias.uword_val;
     i -= s;
     umul_ppmm(hi, lo, i, mul_factor[n]);
     i = hi;

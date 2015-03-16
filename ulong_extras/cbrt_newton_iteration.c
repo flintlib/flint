@@ -38,17 +38,17 @@ n_cbrt_newton_iteration(mp_limb_t n)
     int iter, bits;
     mp_limb_t ret;
     double val, x, xsq, dx;
-    val = (double)n;
-    bits = FLINT_BIT_COUNT(n); 
 
     /* upper_limit is the max cube root possible for one word */
 
-#if FLINT64
+#ifdef FLINT64
     const mp_limb_t upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #else
     const mp_limb_t  upper_limit = 1626;    /* 1626 < (2^32)^(1/3) */
 #endif
-
+    
+    val = (double)n;
+    bits = FLINT_BIT_COUNT(n); 
     if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
         iter = 1;
     else

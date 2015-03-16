@@ -36,7 +36,7 @@ int main(void)
 
    FLINT_TEST_INIT(state);
    
-   flint_printf("rootrem....");
+   flint_printf("n_rootrem....");
    fflush(stdout);
 
 #if FLINT64

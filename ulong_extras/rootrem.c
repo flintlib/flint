@@ -70,7 +70,7 @@ static const double inv_table[] = {
    max_base[0] is set to 0, although it will never be called */
 
 static const mp_limb_t max_base[] = { 
-#if FLINT64
+#ifdef FLINT64
                         0, UWORD_MAX, 4294967296, 2642245 ,65536,
                         7131, 1625, 565, 256, 138, 84, 56, 40, 30,
                         23, 19, 16, 13, 11, 10, 9, 8, 7, 6, 6, 5,
@@ -90,7 +90,7 @@ static const mp_limb_t max_base[] = {
 mp_limb_t
 n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 {
-    mp_limb_t x, currval, base; 
+    mp_limb_t x, currval, base, upper_limit; 
     double dx;
 
     if (!n || !root)
@@ -114,7 +114,7 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
         return 1;
     }
 
-    const mp_limb_t upper_limit = max_base[root];      /* n <= upper_limit^root */
+    upper_limit = max_base[root];      /* n <= upper_limit^root */
 
     x = n_root_estimate((double)n, root);
 
