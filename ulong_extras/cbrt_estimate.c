@@ -28,12 +28,14 @@
 #include <gmp.h>
 #define ulong ulongxx /* interferes with system includes */
 #include <math.h>
+#include <float.h>
 #undef ulong
 #include "flint.h"
 #include "ulong_extras.h"
+#include "longlong.h"
 
 double
-estimate(double a)
+n_cbrt_estimate(double a)
 { 
     typedef union { 
         slong      uword_val;
@@ -45,14 +47,14 @@ estimate(double a)
     } uni;
 
     uni alias;
-    ulong n, hi, lo, ret;
+    ulong n, hi, lo;
 
 #ifdef FLINT64
-    const mp_limb_t mul_factor = 6148914691236517205;
+    const mp_limb_t mul_factor = UWORD(6148914691236517205);
     slong s = ((1 << 10) - 1);
     s <<= 52;
 #else
-    const mp_limb_t mul_factor = 1431655765;
+    const mp_limb_t mul_factor = UWORD(1431655765);
     slong s = ((1 << 7) - 1);
     s <<= 23;
 #endif
@@ -65,58 +67,4 @@ estimate(double a)
     n += s;
     alias.uword_val = n;
     return alias.double_val;
-}
-
-mp_limb_t
-n_cbrt_newton_iteration(mp_limb_t n)
-{
-    int iter, bits;
-    mp_limb_t ret;
-    double val, x, xsq, dx;
-    val = (double)n;
-    bits = FLINT_BIT_COUNT(n); 
-
-    /* upper_limit is the max cube root possible for one word */
-
-#if FLINT64
-    const mp_limb_t upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
-#else
-    const mp_limb_t  upper_limit = 1626;    /* 1626 < (2^32)^(1/3) */
-#endif
-
-    if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
-        iter = 1;
-    else
-        iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
-    
-    x = estimate((double)n);         /* initial estimate */
-
-    /* Newton's iterations to get cube root */
-    val = (double)n;
-    while(iter--)
-    {
-        xsq = x * x;
-        dx = val / xsq;
-        dx -= x;
-        dx *= 0.333333333333333;     /* dx = dx * (1/3) */     
-        x += dx;
-    }
-    /* In case ret^3 or (ret+1)^3 will cause overflow */
-
-    ret = x;
-    if (ret >= upper_limit)      
-    {
-        if (n >= upper_limit * upper_limit * upper_limit)
-            return upper_limit;
-        ret = upper_limit - 1;
-    }
-    while (ret * ret * ret <= n)
-    {
-        (ret) += 1;
-        if (ret == upper_limit)
-            break;
-    }
-    while (ret * ret * ret > n)
-        (ret) -= 1;
-    return ret;
 }
