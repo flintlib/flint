@@ -38,9 +38,16 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
     
     dim = n;
 
-    if (dim <= 12)
+    if (dim <=12)
     {
-        fmpz_mat_mul(B, A, A);    
+        if (dim < 3)
+        {   
+            fmpz_mat_sqr_bodrato(B, A);
+        }
+        else
+        {
+            fmpz_mat_mul(B, A, A);    
+        }
     }
     else
     {
