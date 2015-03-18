@@ -19,38 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 William Hart
+    Copyright (C) 2015 Vladimir Glazachev
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
+#include "ulong_extras.h"
 
-void
-nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
+/* Computes the W' = [w * b / p] (b = mp_limb_t power) */
+mp_limb_t
+n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
 {
-    if ((poly1->length == 0) || (c == 0))
-    {
-        nmod_poly_zero(res);
-        return;
-    }
-
-    nmod_poly_fit_length(res, poly1->length);
-
-    if (c < UWORD_MAX / 2 && poly1->mod.n < UWORD_MAX / 2)
-    {
-        _nmod_vec_scalar_mul_nmod_shoup(res->coeffs, poly1->coeffs, poly1->length,
-                             c, poly1->mod);
-    }
-    else
-    {
-        _nmod_vec_scalar_mul_nmod(res->coeffs, poly1->coeffs, poly1->length,
-                             c, poly1->mod);
-    }
-
-    res->length = poly1->length;
-    _nmod_poly_normalise(res);  /* there may have been cancellation */
+   mp_limb_t q, r;
+   udiv_qrnnd(q, r, w, UWORD(0), p);
+   return q;
 }
+
+/* Computes the w * t mod p.
+   w, t < p; p < (mp_limb_t power) / 2. 
+*/
+

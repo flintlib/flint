@@ -44,6 +44,16 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
     {
         nmod_mat_neg(B, A);
     }
+    else if (c < UWORD_MAX / 2 && A->mod.n < UWORD_MAX / 2)
+    {
+        slong i, j;
+        mp_limb_t w_pr = n_mulmod_precomp_shoup(c, A->mod.n);
+
+        for (i = 0; i < A->r; i++)
+            for (j = 0; j < A->c; j++)
+                nmod_mat_entry(B, i, j) = n_mulmod_shoup(
+                    c, nmod_mat_entry(A, i, j), w_pr, A->mod.n);
+    }
     else
     {
         slong i, j;

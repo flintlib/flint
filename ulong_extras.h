@@ -371,7 +371,26 @@ FLINT_DLL mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n);
 
 FLINT_DLL mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
 
-FLINT_DLL mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p);
+static __inline__
+mp_limb_t
+n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+{
+   mp_limb_t q, r, p_hi, p_lo;
+
+   umul_ppmm(p_hi, p_lo, w_precomp, t);
+   q = p_hi;
+
+   
+   r = w * t;
+   r -= q * p;
+
+   if (r >= p)
+   {
+      r -= p;
+   }
+
+    return r;
+}
 
 #ifdef __cplusplus
 }
