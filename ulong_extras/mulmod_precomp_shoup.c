@@ -37,7 +37,3 @@ n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
    return q;
 }
 
-/* Computes the w * t mod p.
-   w, t < p; p < (mp_limb_t power) / 2. 
-*/
-
