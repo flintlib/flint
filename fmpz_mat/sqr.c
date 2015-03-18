@@ -32,15 +32,21 @@
 void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    slong dim, n;
-
-    n = A->r;
+    slong n = A->r, ab;
     
-    dim = n;
-
-    if (dim <=12)
+    if (B == A)
     {
-        if (dim <=3)
+        fmpz_mat_t t;
+        fmpz_mat_init(t, n, n);
+        fmpz_mat_sqr(t, A);
+        fmpz_mat_swap(B, t);
+        fmpz_mat_clear(t);
+        return;
+    }
+
+    if (n <= 12)
+    {
+        if (n <= 3)
         {   
             fmpz_mat_sqr_bodrato(B, A);
         }
@@ -51,12 +57,10 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
     }
     else
     {
-        slong ab;
-
         ab = fmpz_mat_max_bits(A);
         ab = FLINT_ABS(ab);
 
-        if (5*(ab + ab) > dim * dim )
+        if (5*(ab + ab) > n * n )
         {
             fmpz_mat_sqr_bodrato(B, A);
         }
