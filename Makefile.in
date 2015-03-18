@@ -207,8 +207,8 @@ install: library
 build:
 	mkdir -p build
 
-build/CPimport.h: qadic/CPimport.txt
-	sed "s/ /,/g;s/.*/&,/g" $< > $@
+build/CPimport.h: qadic/CPimport.txt build
+	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
 
 build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
