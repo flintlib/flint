@@ -40,7 +40,7 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 
     if (dim <=12)
     {
-        if (dim < 3)
+        if (dim <=3)
         {   
             fmpz_mat_sqr_bodrato(B, A);
         }

@@ -61,7 +61,75 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
         fmpz_clear(t);
         fmpz_clear(u);
-    } 
+    }
+    else if (n == 3)
+    {
+        fmpz_t temp13, temp12, temp23, t, u;
+        
+        fmpz_mat_t temp_A;
+        fmpz_mat_init(temp_A, n, n);
+        fmpz_mat_set(temp_A, A);
+            
+
+        fmpz_init(temp13);
+        fmpz_init(temp12);
+        fmpz_init(temp23);
+       
+        fmpz_init(t);
+        fmpz_init(u);
+
+        fmpz_mul(temp13, E(temp_A, 0, 2), E(temp_A, 2, 0));
+        fmpz_mul(temp12, E(temp_A, 0, 1), E(temp_A, 1, 0));
+        fmpz_mul(temp23, E(temp_A, 1, 2), E(temp_A, 2, 1));
+
+        fmpz_add(E(B, 0, 0), temp13, temp12);
+        fmpz_addmul(E(B, 0, 0), E(temp_A, 0, 0), E(temp_A, 0, 0));
+       
+        fmpz_add(E(B, 1, 1), temp23, temp12);
+        fmpz_addmul(E(B, 1, 1), E(temp_A, 1, 1), E(temp_A, 1, 1));
+        
+        fmpz_add(E(B, 2, 2), temp13, temp23);
+        fmpz_addmul(E(B, 2, 2), E(temp_A, 2, 2), E(temp_A, 2, 2));
+       
+        fmpz_add(t, E(temp_A, 0, 0), E(temp_A, 1, 1));
+        fmpz_mul(u, E(temp_A, 0, 2), E(temp_A, 2, 1));
+        fmpz_mul(t, t, E(temp_A, 0, 1));
+        fmpz_add(E(B, 0, 1), t, u);
+             
+        fmpz_add(t, E(temp_A, 0, 0), E(temp_A, 2, 2));
+        fmpz_mul(u, E(temp_A, 0, 1), E(temp_A, 1, 2));
+        fmpz_mul(t, t, E(temp_A, 0, 2));
+        fmpz_add(E(B, 0, 2), t, u);
+
+        fmpz_add(t, E(temp_A, 0, 0), E(temp_A, 1, 1));
+        fmpz_mul(u, E(temp_A, 1, 2), E(temp_A, 2, 0));
+        fmpz_mul(t, t, E(temp_A, 1, 0));
+        fmpz_add(E(B, 1, 0), t, u);
+
+        fmpz_add(t, E(temp_A, 1, 1), E(temp_A, 2, 2));
+        fmpz_mul(u, E(temp_A, 1, 0), E(temp_A, 0, 2));
+        fmpz_mul(t, t, E(temp_A, 1, 2));
+        fmpz_add(E(B, 1, 2), t, u);
+
+        fmpz_add(t, E(temp_A, 0, 0), E(temp_A, 2, 2));
+        fmpz_mul(u, E(temp_A, 2, 1), E(temp_A, 1, 0));
+        fmpz_mul(t, t, E(temp_A, 2, 0));
+        fmpz_add(E(B, 2, 0), t, u);
+
+        fmpz_add(t, E(temp_A, 2, 2), E(temp_A, 1, 1));
+        fmpz_mul(u, E(temp_A, 2, 0), E(temp_A, 0, 1));
+        fmpz_mul(t, t, E(temp_A, 2, 1));
+        fmpz_add(E(B, 2, 1), t, u);
+
+        fmpz_clear(temp13);
+        fmpz_clear(temp13);
+        fmpz_clear(temp13);
+        fmpz_clear(t);
+        fmpz_clear(u);
+        fmpz_mat_clear(temp_A);
+
+        
+    }
     else
     {
 
@@ -151,15 +219,17 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         else
         {
 
-            fmpz_mat_t temp_A, cache_A;
-
+            fmpz_mat_t cache_A;
+            
+            fmpz_mat_t temp_A;
             fmpz_mat_init(temp_A, n, n);
+            fmpz_mat_set(temp_A, A);
+            
             fmpz_mat_init(cache_A, n, n);
 
             fmpz_init(sum);
             fmpz_init(val);
 
-            fmpz_mat_set(temp_A, A);
 
 
             for (i = 0; i < n; ++i)
