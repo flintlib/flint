@@ -121,6 +121,8 @@ FLINT_DLL void flint_cleanup(void);
 #define WORD_MIN LONG_MIN
 #endif
 
+#define UWORD_HALF (UWORD_MAX / 2 + 1)
+
 #if GMP_LIMB_BITS == 64
     #define FLINT_BITS 64
     #define FLINT_D_BITS 53
