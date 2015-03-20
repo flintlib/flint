@@ -31,7 +31,7 @@
 
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, slong len, nmod_t mod)
 {
-   slong i;
-   for (i = 0 ; i < len; i++)
-	  NMOD_RED(res[i], vec[i], mod);
+    slong i;
+    for (i = 0 ; i < len; i++)
+        NMOD_RED(res[i], vec[i], mod);
 }
