@@ -75,6 +75,8 @@ typedef struct {
 #define UWORD_MAX_PRIME UWORD(4294967291)
 #endif
 
+#define UWORD_HALF (UWORD_MAX / 2 + 1)
+
 typedef struct
 {
     slong small_i;
