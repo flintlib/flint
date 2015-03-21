@@ -45,7 +45,7 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
     {
         nmod_mat_neg(B, A);
     }
-    else if (A->r * A->c > 10 && c < UWORD_HALF && A->mod.n < UWORD_HALF)
+    else if (A->r * A->c > 10 && A->mod.n < UWORD_HALF)
     {
         slong i, j;
         mp_limb_t w_pr = n_mulmod_precomp_shoup(c, A->mod.n);

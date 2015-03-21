@@ -32,7 +32,7 @@
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
                                slong len, mp_limb_t c, nmod_t mod)
 {
-    if (len > 10 && mod.n < UWORD_HALF && c < UWORD_HALF)
+    if (len > 10 && mod.n < UWORD_HALF)
     {
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
         return;
