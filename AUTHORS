@@ -110,7 +110,8 @@ Feitma's tables and sped up and corrected \code{n_is_prime} and
 \code{n_is_probabprime}.
 
 $\bullet$ Anubhav Srivastava contributed horizontal and vertical concatenation
-of matrices over $\mathbb{Z}$.
+of matrices over $\mathbb{Z}$ and an implementation of the Bodrato matrix 
+squaring algorithm.
 
 $\bullet$ Dharak Kharod and Prabhdeep Singh Walia both independently 
 contributed matrix content.
