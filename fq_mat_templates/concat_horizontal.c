@@ -19,55 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2015 Anubhav Srivastava
+    Copyright (C) 2015 Elena Sergeicheva
 
 ******************************************************************************/
 
 
-#include "fmpz_mat.h"
+#ifdef T
 
-#define E fmpz_mat_entry
+#include "templates.h"
 
 void
-fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
+TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
+		                            const TEMPLATE(T, mat_t) mat1,
+		                            const TEMPLATE(T, mat_t) mat2,
+		                            const TEMPLATE(T, ctx_t) ctx)
 {
-    slong n = A->r, ab;
-    
-    if (B == A)
-    {
-        fmpz_mat_t t;
-        fmpz_mat_init(t, n, n);
-        fmpz_mat_sqr(t, A);
-        fmpz_mat_swap(B, t);
-        fmpz_mat_clear(t);
-        return;
-    }
+    slong i, j;
+    slong r1 = mat1->r;
+    slong c1 = mat1->c;
+    slong c2 = mat2->c;
 
-    if (n <= 12)
-    {
-        if (n <= 3)
-        {   
-            fmpz_mat_sqr_bodrato(B, A);
-        }
-        else
-        {
-            fmpz_mat_mul(B, A, A);    
-        }
-    }
-    else
-    {
-        ab = fmpz_mat_max_bits(A);
-        ab = FLINT_ABS(ab);
-
-        if (5*(ab + ab) > n * n )
-        {
-            fmpz_mat_sqr_bodrato(B, A);
-        }
-        else
-        {
-            fmpz_mat_mul(B, A, A);
-        }
-
-    }
+   for (i = 0; i < r1; i++) {
+       _TEMPLATE(T, vec_set) (res->rows[i], mat1->rows[i], c1, ctx);
+       _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
+   }
 }
+
+
+#endif

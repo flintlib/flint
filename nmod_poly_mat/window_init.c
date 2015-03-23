@@ -19,55 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2015 Anubhav Srivastava
+    Copyright (C) 2015 Elena Sergeicheva
 
 ******************************************************************************/
 
-
-#include "fmpz_mat.h"
-
-#define E fmpz_mat_entry
+#include "nmod_poly_mat.h"
 
 void
-fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
+nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat, slong r1,
+                     slong c1, slong r2, slong c2)
 {
-    slong n = A->r, ab;
-    
-    if (B == A)
-    {
-        fmpz_mat_t t;
-        fmpz_mat_init(t, n, n);
-        fmpz_mat_sqr(t, A);
-        fmpz_mat_swap(B, t);
-        fmpz_mat_clear(t);
-        return;
-    }
+    slong i;
+    window->entries = NULL;
 
-    if (n <= 12)
-    {
-        if (n <= 3)
-        {   
-            fmpz_mat_sqr_bodrato(B, A);
-        }
-        else
-        {
-            fmpz_mat_mul(B, A, A);    
-        }
-    }
-    else
-    {
-        ab = fmpz_mat_max_bits(A);
-        ab = FLINT_ABS(ab);
+    if (r2 - r1)
+        window->rows = flint_malloc((r2 - r1) * sizeof(nmod_poly_t));
 
-        if (5*(ab + ab) > n * n )
-        {
-            fmpz_mat_sqr_bodrato(B, A);
-        }
-        else
-        {
-            fmpz_mat_mul(B, A, A);
-        }
+    for (i = 0; i < r2 - r1; i++)
+        window->rows[i] = mat->rows[r1 + i] + c1;
 
-    }
+    window->r = r2 - r1;
+    window->c = c2 - c1;
 }
