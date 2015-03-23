@@ -283,11 +283,15 @@ FLINT_DLL int n_is_oddprime_binary(mp_limb_t n);
 
 FLINT_DLL int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i);
 
+FLINT_DLL int n_is_probabprime_miller_rabin(mp_limb_t n, mp_limb_t i);
+
 FLINT_DLL int n_is_probabprime_fibonacci(mp_limb_t n);
 
 FLINT_DLL int n_is_probabprime_lucas(mp_limb_t n);
 
 FLINT_DLL int n_is_probabprime_BPSW(mp_limb_t n);
+
+FLINT_DLL int n_is_probabprime_BPSW_mr(mp_limb_t n);
 
 FLINT_DLL int n_is_strong_probabprime_precomp(mp_limb_t n, 
                               double npre, mp_limb_t a, mp_limb_t d);
