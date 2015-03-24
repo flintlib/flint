@@ -33,7 +33,6 @@ int n_is_perfect_power(ulong * root, ulong n)
     
     int i = 17;
     while(i + 1){
-	printf("%d %d %d %d\n",t,1 << i, n, primes[i]);
     	if(t & (1 << i) ){
     		n_rootrem(&rem, n, primes[i]);
     		if(!(rem) ){

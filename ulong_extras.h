@@ -289,6 +289,8 @@ FLINT_DLL mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n);
 
 FLINT_DLL int n_is_perfect_power235(mp_limb_t n);
 
+FLINT_DLL int n_is_perfect_power(ulong * root, ulong n);
+
 FLINT_DLL int n_is_oddprime_small(mp_limb_t n);
 
 FLINT_DLL int n_is_oddprime_binary(mp_limb_t n);
