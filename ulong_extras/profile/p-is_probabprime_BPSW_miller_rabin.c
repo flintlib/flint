@@ -52,7 +52,7 @@ void sample(void * arg, ulong count)
 
       prof_start();
       for (j = 0; j < 1000000; j++)
-         res &= n_is_probabprime_BPSW_mr(d);
+         res &= n_is_probabprime_BPSW_miller_rabin(d);
       prof_stop();
       
       if (!res) flint_printf("Error\n");
@@ -67,7 +67,7 @@ int main(void)
    BPSW_t params;
    int i;
 
-   flint_printf("is_probabprime_BPSW_mr:\n");
+   flint_printf("is_probabprime_BPSW_miller_rabin:\n");
    
    for (i = 1; i <= 64; i++)
    {

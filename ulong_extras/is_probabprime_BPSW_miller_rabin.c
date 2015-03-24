@@ -30,7 +30,7 @@
 #include "ulong_extras.h"
 
 int
-n_is_probabprime_BPSW_mr(mp_limb_t n)
+n_is_probabprime_BPSW_miller_rabin(mp_limb_t n)
 {
 	mp_limb_t lb;
 
@@ -44,7 +44,7 @@ n_is_probabprime_BPSW_mr(mp_limb_t n)
     }
 
     lb = n%10;
-    if ((lb != UWORD(9)))
+    if (lb != UWORD(9))
     {
         if (n_is_probabprime_miller_rabin(n, 2) == 0)
             return 0;

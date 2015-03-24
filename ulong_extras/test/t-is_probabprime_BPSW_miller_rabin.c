@@ -37,7 +37,7 @@ int main(void)
    FLINT_TEST_INIT(state);
    
 
-   flint_printf("is_probabprime_BPSW_mr....");
+   flint_printf("is_probabprime_BPSW_miller_rabin....");
    fflush(stdout);
  
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
@@ -51,7 +51,7 @@ int main(void)
          d = flint_mpz_get_ui(d_m);
       } while (mpz_size(d_m) > 1);
 
-      result = n_is_probabprime_BPSW_mr(d);
+      result = n_is_probabprime_BPSW_miller_rabin(d);
       if (!result)
       {
          flint_printf("FAIL:\n");
@@ -72,7 +72,7 @@ int main(void)
          flint_mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
-      result = (n_is_probabprime_BPSW_mr(d) == 0);
+      result = (n_is_probabprime_BPSW_miller_rabin(d) == 0);
       if (!result)
       {
          flint_printf("FAIL:\n");

@@ -68,7 +68,9 @@ n_is_probabprime_miller_rabin(mp_limb_t n, mp_limb_t i)
 			rem = n_powmod(rem, 2, n);
 			if (rem == n_1)	return 1;
 		}
-    } else {
+    }
+    else
+    {
 
     	/* calc b^q mod n; n is prime (or probabprime) in the case of 1 or n-1 */
     	rem = n_powmod2(i, q, n);
