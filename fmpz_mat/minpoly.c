@@ -1,4 +1,7 @@
-#include <fmpz_mat.h>
+#include "flint.h"
+#include "fmpz_mat.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
 /*
    Assumes that \code{mat} is an $n \times n$ matrix and sets \code{cp}
@@ -71,6 +74,8 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 			fmpz_mat_transpose(transpose, tmp);
 
 			slong nullity = fmpz_mat_nullspace(qu, transpose);
+			
+			fmpz_mat_clear(transpose);
 
 			for (i = 0; i < n; i++)
 			{
@@ -108,5 +113,9 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 			fmpz * tmp = fmpz_mat_entry(qu, i, 0);
 			fmpz_set_si((cp->coeffs) + i, *tmp);
 		}
+		
+		fmpz_mat_clear(tmp);
+		fmpz_mat_clear(power_matrix);
+		fmpz_mat_clear(qu);
 	}
 }
