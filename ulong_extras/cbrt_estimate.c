@@ -51,12 +51,10 @@ n_cbrt_estimate(double a)
 
 #ifdef FLINT64
     const mp_limb_t mul_factor = UWORD(6148914691236517205);
-    slong s = ((1 << 10) - 1);
-    s <<= 52;
+    slong s = 4607182418800017408;      // ((1 << 10) - 1) << 52
 #else
     const mp_limb_t mul_factor = UWORD(1431655765);
-    slong s = ((1 << 7) - 1);
-    s <<= 23;
+    slong s = 1065353216;               // ((1 << 7) - 1 << 23)
 #endif
 
     alias.double_val = a;
