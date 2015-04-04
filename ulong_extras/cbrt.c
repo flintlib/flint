@@ -52,7 +52,7 @@ n_cbrt(mp_limb_t n)
     bits = FLINT_BIT_COUNT(n); 
 
     if (bits > 46)    /* for larger numbers chebyshev approximation method is faster */
-        return n_cbrt_chebyshef_approx(n);
+        return n_cbrt_chebyshev_approx(n);
 
     /* upper_limit is the max cube root possible for one word */
 
