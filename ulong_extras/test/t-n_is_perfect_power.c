@@ -80,14 +80,14 @@ int main()
 
        i = FLINT_BIT_COUNT(d);
 
-       for (k = 1; k < FLINT_BITS / i; k++)
+       for (k = 2; k < FLINT_BITS / i; k++)
        {
            t = n_pow(d, k);
            result = n_is_perfect_power(&r, t);
-           if (result && n_pow(r, result) != t)
+           if (result != k)
            {
                flint_printf("FAIL:\n");
-               flint_printf("%wu ** %wu != %wu\n", r, result, d);
+               flint_printf("%wu ** %wu == %wu\n", r, result, d);
                abort();
            }
        }
