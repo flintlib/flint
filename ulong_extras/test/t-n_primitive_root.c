@@ -49,7 +49,7 @@ int main()
 
        b = FLINT_BIT_COUNT(p);
 
-       for (j = 2; j < FLINT_BITS / b; j++)
+       for (j = 2; j <= FLINT_BITS / b; j++)
        {
            n = n_pow(p, j);
            phi = (n / p) * (p - 1);
@@ -60,6 +60,7 @@ int main()
            factors.p[factors.num] = p;
            factors.exp[factors.num] = 1;
            factors.num++;
+
            for (k = 0; k < factors.num; k++)
            {
                if (n_powmod_precomp(root, phi / factors.p[k], n, ninv) == 1)
@@ -82,7 +83,7 @@ int main()
 
        b = FLINT_BIT_COUNT(p);
 
-       for (j = 1; j < (FLINT_BITS - 2) / b; j++)
+       for (j = 1; j <= (FLINT_BITS - 2) / b; j++)
        {
            n = 2 * n_pow(p, j);
            phi = (n / p) * (p - 1);
@@ -90,6 +91,7 @@ int main()
            root = n_primitive_root(n);
            ninv = n_precompute_inverse(n);
            n_factor_init(&factors);
+
            if (j > 1)
            {
                n_factor(&factors, p - 1, 1);
@@ -97,6 +99,7 @@ int main()
                factors.exp[factors.num] = 1;
                factors.num++;
            }
+
            for (k = 0; k < factors.num; k++)
            {
                if (n_powmod_precomp(root, phi / factors.p[k], n, ninv) == 1)

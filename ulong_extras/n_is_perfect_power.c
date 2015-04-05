@@ -27,16 +27,17 @@
 #include <flint.h>
 #include <ulong_extras.h>
 
+
 /*
 check for the bit size of mp_limb_t, which is equal to FLINT_BITS,
-q[i] - 1 congruent class modulo q[i] (about q[i] line no. 171)
+q[i] - 1 congruent class modulo q[i] (about q[i] line no. 105)
 are stored as follows:
 
 qclass[i][j]th word contain FLINT_BITS Number of bit and
 kth bit (from LSB To MSB) represents the,
 (say y = FLINT_BITS * max(j - 1, 0) + k), y mod q[i] congruent
 class of q[i] and it is set to 1 if y satisfy the property mentioned
-in the line no. 172 otherwise it is set to 0.
+in the line no. 106 otherwise it is set to 0.
 
 for total q[i] congruent class modulo q[i],
     q[i] / FLINT_BITS + (q[i] % FLINT_BITS) ? 0 : 1;
