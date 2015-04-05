@@ -50,44 +50,28 @@ int main()
        }
    }
 
-   /* check for possible power of random numbers
-      containing i bits*/
+   /* check for possible power of random numbers, which are not
+      perfect powers.
+   */
 
-   for (i = 1; i <= FLINT_BITS; i++)
+   for (j = 0; j < 100000; j++)
    {
-       for (j = 1; j <= 100000; j++)
-       {
-           d = n_randtest_bits(state, i);
-           for (k = 1; k < FLINT_BITS / i; k++)
-           {
-               t = n_pow(d, k);
-               result = n_is_perfect_power(&r, t);
-               if (result && n_pow(r, result) != t)
-               {
-                   flint_printf("FAIL:\n");
-                   flint_printf("%wu ** %wu != %wu\n", r, result, d);
-                   abort();
-               }
-           }
-       }
-   }
+       d = n_randtest_not_zero(state);
 
-   for (j = 1; j <= 100000; j++)
-   {
-       d = n_randlimb(state);
+       if (d == 1) continue;
 
        while (d < UWORD_MAX && n_is_perfect_power(&r, d) != 0) d += 1;
 
        i = FLINT_BIT_COUNT(d);
 
-       for (k = 2; k < FLINT_BITS / i; k++)
+       for (k = 2; k <= FLINT_BITS / i; k++)
        {
            t = n_pow(d, k);
            result = n_is_perfect_power(&r, t);
            if (result != k)
            {
                flint_printf("FAIL:\n");
-               flint_printf("%wu ** %wu == %wu\n", r, result, d);
+               flint_printf("%wu ** %wu != %wu ( = %wu ** %wu)\n", r, result, t, d, k);
                abort();
            }
        }
@@ -98,3 +82,5 @@ int main()
    flint_printf("PASS\n");
    return 0;
 }
+
+

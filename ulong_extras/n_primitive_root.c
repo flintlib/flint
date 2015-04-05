@@ -28,6 +28,7 @@
 #include <flint.h>
 #include <ulong_extras.h>
 
+
 /* computes primitive root for modulo n where n has following form
    2, 4, p ^ k, 2 * (p ^ k), p is an odd prime*/
 
@@ -37,10 +38,10 @@ n_primitive_root_prefactor(mp_limb_t n, n_factor_t * factors, mp_limb_t * phi)
     slong i;
     int found;
     mp_limb_t result, a, pm1;
-    double pinv;
+    double ninv;
 
     pm1 = *phi;
-    pinv = n_precompute_inverse(n);
+    ninv = n_precompute_inverse(n);
 
     for (a = 2; a < n; a++)
     {
@@ -49,7 +50,7 @@ n_primitive_root_prefactor(mp_limb_t n, n_factor_t * factors, mp_limb_t * phi)
             found = 1;
             for (i = 0; i < factors->num; i++)
             {
-                result = n_powmod_precomp(a, pm1 / factors->p[i], n, pinv);
+                result = n_powmod_precomp(a, pm1 / factors->p[i], n, ninv);
                 if (result == 1)
                 {
                     found = 0;

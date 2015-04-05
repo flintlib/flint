@@ -910,8 +910,9 @@ int n_is_perfect_power235(mp_limb_t n)
 
 int n_is_perfect_power(mp_limb_t *r, mp_limb_t x)
 
-    Returns maximum $k$, where $k >= 1$, such that $x = y^{k}$, for some
-    positive integer $y$. $r$ contains the value of $y$.
+    Returns maximum $k$, where $k > 1$, such that $x = y^k$, for some
+    positive integer $y$. $r$ contains the value of $y$. if no such $k$ exist,
+    $0$ is returned.
 
 *******************************************************************************
 
