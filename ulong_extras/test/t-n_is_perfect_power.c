@@ -22,6 +22,7 @@
     Copyright (C) 2015 Nitin Kumar
 
 ******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <flint.h>
@@ -30,11 +31,10 @@
 int main()
 {
    int i, result, j, k;
-   ulong bits;
    mp_limb_t d, r, t;
    FLINT_TEST_INIT(state);
 
-   flint_printf("is_perfect_power....");
+   flint_printf("n_is_perfect_power....");
    fflush(stdout);
 
    /* check for random number */
@@ -42,15 +42,17 @@ int main()
    {
        d = n_randlimb(state);
        result = n_is_perfect_power(&r, d);
-       if (n_pow(r, result) != d)
+       if (result && n_pow(r, result) != d)
        {
          flint_printf("FAIL:\n");
+         flint_printf("%wu ** %wu != %wu\n", r, result, d);
          abort();
        }
    }
 
    /* check for possible power of random numbers
       containing i bits*/
+
    for (i = 1; i <= FLINT_BITS; i++)
    {
        for (j = 1; j <= 100000; j++)
@@ -60,14 +62,37 @@ int main()
            {
                t = n_pow(d, k);
                result = n_is_perfect_power(&r, t);
-               if (n_pow(r, result) != t)
+               if (result && n_pow(r, result) != t)
                {
                    flint_printf("FAIL:\n");
+                   flint_printf("%wu ** %wu != %wu\n", r, result, d);
                    abort();
                }
            }
        }
    }
+
+   for (j = 1; j <= 100000; j++)
+   {
+       d = n_randlimb(state);
+
+       while (d < UWORD_MAX && n_is_perfect_power(&r, d) != 0) d += 1;
+
+       i = FLINT_BIT_COUNT(d);
+
+       for (k = 1; k < FLINT_BITS / i; k++)
+       {
+           t = n_pow(d, k);
+           result = n_is_perfect_power(&r, t);
+           if (result && n_pow(r, result) != t)
+           {
+               flint_printf("FAIL:\n");
+               flint_printf("%wu ** %wu != %wu\n", r, result, d);
+               abort();
+           }
+       }
+   }
+
    FLINT_TEST_CLEANUP(state);
 
    flint_printf("PASS\n");
