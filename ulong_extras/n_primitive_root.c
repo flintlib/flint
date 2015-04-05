@@ -30,7 +30,8 @@
 /* computes primitive root for modulo n where n has following form
    2, 4, p ^ k, 2 * (p ^ k), p is an odd prime*/
 
-mp_limb_t n_primitive_root_prefactor(mp_limb_t n, n_factor_t * factors, mp_limb_t * phi)
+mp_limb_t
+n_primitive_root_prefactor(mp_limb_t n, n_factor_t * factors, mp_limb_t * phi)
 {
     slong i;
     int found;
@@ -91,7 +92,7 @@ mp_limb_t n_primitive_root(mp_limb_t n)
                 m = 1;
             }
             k = n_is_perfect_power(&root, n);
-            if (k == 0 || n_is_prime(root) != 1)
+            if (n_is_prime(root) != 1)
             {
                 flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
                 return 0;

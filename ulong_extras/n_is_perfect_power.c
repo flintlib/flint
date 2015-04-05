@@ -22,77 +22,10 @@
     Copyright (C) 2015 Nitin Kumar
 
 ******************************************************************************/
+
 #include <stdlib.h>
 #include <flint.h>
 #include <ulong_extras.h>
-
-
-/* taken from, https://github.com/wbhart/flint2/pull/119 */
-
-mp_limb_t n_rootrem(mp_limb_t * r, mp_limb_t x, unsigned int k)
-{
-    mp_limb_t a, b, m, p, hi, lo;
-    int i;
-
-    if (k <= 1 || x <= 1)
-    {
-        *r = 0;
-        return x;
-    }
-
-    if (k == 2)
-    {
-        return n_sqrtrem(r, x);
-    }
-
-    if (k >= FLINT_BITS || (UWORD(1) << k) > x)
-    {
-        *r = x - 1;
-        return 1;
-    }
-
-    a = 2;
-    b = UWORD(1) << ((FLINT_BIT_COUNT(x) + k - 1) / k);
-
-    while (a < b)
-    {
-        m = a + (b - a) / 2;
-
-        p = m + 1;
-
-        for (i = 1; i < k; i++)
-        {
-            umul_ppmm(hi, lo, p, m + 1);
-
-            if (hi != 0)
-                goto too_large;
-            else
-                p = lo;
-        }
-
-        if (p == x)
-        {
-            *r = 0;
-            return m + 1;
-        }
-        else if (p > x)
-        {
-            too_large:
-            b = m;
-        }
-        else
-        {
-            a = m + 1;
-        }
-    }
-
-    p = a;
-    for (i = 1; i < k; i++)
-        p *= a;
-
-    *r = x - p;
-    return a;
-}
 
 /*
 check for the bit size of mp_limb_t, which is equal to FLINT_BITS,
@@ -228,6 +161,5 @@ int n_is_perfect_power(mp_limb_t * r, mp_limb_t x)
     }
 
     *r = x;       /* store root in r */
-    return power;  /* return power */
+    return (power == 1 ? 0 : power);  /* return power */
 }
-
