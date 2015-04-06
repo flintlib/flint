@@ -19,29 +19,30 @@ int n_is_perfect_power(ulong * root, ulong n)
     							262140, 0, 262141, 262140, 0, 262141, 262142 };
    
 							
-    *root = n;
     /* if we can't find any other answer we just return that n = n ^ 1 */
     
-    int t;
-    t = mod32[n%32];
-    if (!t) return 1;
+    int t = mod32[n%32];
+    if (!t) return 0;
 
     t &= mod27[n%27];
-    if (!t) return 1;
+    if (!t) return 0;
     
     ulong rem;
     
-    int i = 17;
-    while(i + 1){
-    	if(t & (1 << i) ){
+    int i, pivot = 1, power = 1;
+    for (i = 0; i < 18; i++, pivot = pivot << 1)
+    { 
+    	if (t & pivot ){
     		n_rootrem(&rem, n, primes[i]);
-    		if(!(rem) ){
-    			*root = pow((double) n, 1.0 / ((double) primes[i]) );
-    			return primes[i];
+    		while (rem == 0 ){
+    			n = pow((double) n, 1.0 / ((double) primes[i]) );
+    			power *= primes[i];
+			n_rootrem(&rem, n, primes[i]);
     		}	
     	}
-    	--i;
     }
     
-    return 1;
+    root = n;
+    if( power != 0) return power;
+    return 0;
 }
