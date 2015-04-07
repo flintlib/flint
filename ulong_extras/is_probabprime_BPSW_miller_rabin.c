@@ -32,8 +32,6 @@
 int
 n_is_probabprime_BPSW_miller_rabin(mp_limb_t n)
 {
-	mp_limb_t lb;
-
     if (n <= UWORD(1))
         return 0;
 
@@ -43,8 +41,7 @@ n_is_probabprime_BPSW_miller_rabin(mp_limb_t n)
         return 0;
     }
 
-    lb = n%10;
-    if (lb != UWORD(9))
+    if (((n % 10) == 3) || ((n % 10) == 7))
     {
         if (n_is_probabprime_miller_rabin(n, 2) == 0)
             return 0;

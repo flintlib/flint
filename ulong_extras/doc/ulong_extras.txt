@@ -789,6 +789,19 @@ int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
     By Fermat's Little Theorem if $i^{n-1}$ is not congruent to $1$ 
     then $n$ is not prime.
 
+int n_is_probabprime_miller_rabin(mp_limb_t n, mp_limb_t i)
+
+    Returns $1$ if $n$ is a base $i$ Miller-Rabin probable prime. Requires 
+    $1 < i < n$.
+
+    Miller-Rabin test is based on the next statement:
+    if $p>2$ is prime then $\forall i$ from $Z/pZ$ one of the following 
+    conditions is true (let $p-1=2^sd$ where $d$ is odd):
+
+    1. $i^d \equiv 1 \pmod p$
+
+    2. $\exists r, 0 \le r < s: i^{2^rd} \equiv -1 \pmod p $
+
 int n_is_probabprime_fibonacci(mp_limb_t n)
 
     Let $F_j$ be the $j$th element of the Fibonacci sequence 
@@ -814,7 +827,25 @@ int n_is_probabprime_BPSW(mp_limb_t n)
 
     There are no known counterexamples to this being a primality test.
 
-    Up to $2^64$ the test we use has been checked against tables of 
+    Up to $2^{64}$ the test we use has been checked against tables of 
+    pseudoprimes. Thus it is a primality test up to this limit.
+
+int n_is_probabprime_BPSW_miller_rabin(mp_limb_t n)
+
+    Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
+    test. This is a variant of the usual BPSW test (which only uses strong
+    base-2 probable prime and Lucas-Selfridge tests, see Baillie and
+    Wagstaff~\citep{BaiWag1980}).
+
+    This implementation makes use of a weakening of the usual Baillie-PSW
+    test given in ~\citep{Chen2003}, namely replacing the Lucas test with a
+    Fibonacci test when $n \equiv 2, 3 \pmod{5}$, (see also the comment on 
+    page 143 of~\citep{CraPom2005}) regarding Fibonacci pseudoprimes.
+    Uses Miller-Rabin instead of Fermat test before Fibonacci test is run.
+
+    There are no known counterexamples to this being a primality test.
+
+    Up to $2^{64}$ the test we use has been checked against tables of 
     pseudoprimes. Thus it is a primality test up to this limit.
 
 int n_is_probabprime_lucas(mp_limb_t n)

@@ -30,7 +30,8 @@
 int
 n_is_probabprime_miller_rabin(mp_limb_t n, mp_limb_t i)
 {
-	mp_limb_t g, j, rem, tmp, n_1, p, q, p_res;
+	mp_limb_t g, j, rem, tmp, n_1, p, q, p_res, ninv;
+	double npre;
 
 	/* trivial */
 	if (n == UWORD(2))
@@ -38,18 +39,19 @@ n_is_probabprime_miller_rabin(mp_limb_t n, mp_limb_t i)
 	if (n < UWORD(2) || (n & UWORD(1)) == 0 )
 		return 0;
 
-	/* check gcd(n, b) == 1 */
+	/* check gcd(n, i) == 1 */
 	if (i < 2) i = 2;
-	for (; (g = n_gcd (n, i)) != 1; ++i)
-		if (n > g) return 0;
+	else if (i > 2)
+	    for (; (g = n_gcd(n, i)) != 1; i++)
+	        if (n > g) return 0;
 
 	/* factor n-1 = q*2^p */
 	n_1 = n-1;
 	p_res = 0;
 	tmp = n_1;
-	while ((tmp & UWORD(1))==0)
+	while ((tmp & UWORD(1)) == 0)
 	{
-	  ++p_res;
+	  p_res++;
 	  tmp >>= 1; /* bisect */
 	}
 	p = p_res;
@@ -57,31 +59,35 @@ n_is_probabprime_miller_rabin(mp_limb_t n, mp_limb_t i)
 
     if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
     {
-    	/* calc b^q mod n; n is prime (or probabprime) in the case of 1 or n-1 */
-	    rem = n_powmod(i, q, n);
+        npre = n_precompute_inverse(n);
+        /* calc i^q mod n; n is prime (or probabprime) in the case of 1 or n-1 */
+        rem = n_powmod_precomp(i, q, n, npre);
 		if (rem == 1 || rem == n_1)	return 1;
 
-    	/* calc b^2q, b^4q, ... , b^((n-1)/2) mod n
-    	   if any of them equals n-1, than n is prime (or probabprime) */
-		for (j = 1; j < p; j++)
+        /* calc i^2q, i^4q, ... , i^((n-1)/2) mod n
+           if any of them equals n-1, than n is prime (or probabprime) */
+        for (j = 1; j < p; j++)
 		{
-			rem = n_powmod(rem, 2, n);
+			rem = n_powmod_precomp(rem, 2, n, npre);
+			if (rem == 1) return 0;
 			if (rem == n_1)	return 1;
 		}
     }
     else
     {
+        ninv = n_preinvert_limb(n);
+        /* calc i^q mod n; n is prime (or probabprime) in the case of 1 or n-1 */
 
-    	/* calc b^q mod n; n is prime (or probabprime) in the case of 1 or n-1 */
-    	rem = n_powmod2(i, q, n);
-    	if (rem == 1 || rem == n_1)	return 1;
+        rem = n_powmod2_preinv(i, q, n, ninv);
+        if (rem == 1 || rem == n_1)	return 1;
 
-    	/* calc b^2q, b^4q, ... , b^((n-1)/2) mod n
-    	   if any of them equals n-1, than n is prime (or probabprime) */
-    	for (j = 1; j < p; j++)
-    	{
-    		rem = n_powmod2(rem, 2, n);
-    		if (rem == n_1) return 1;
+        /* calc i^2q, i^4q, ... , i^((n-1)/2) mod n
+           if any of them equals n-1, than n is prime (or probabprime) */
+        for (j = 1; j < p; j++)
+        {
+            rem = n_powmod2_preinv(rem, 2, n, ninv);
+	        if (rem == 1) return 0;
+            if (rem == n_1) return 1;
     	}
 
     }
