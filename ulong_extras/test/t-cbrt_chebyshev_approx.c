@@ -35,7 +35,7 @@ int main(void)
     int i, result;
     FLINT_TEST_INIT(state);
    
-    flint_printf("cbrt_chebyshef_approx....");
+    flint_printf("cbrt_chebyshev_approx....");
     fflush(stdout);
 
     /* random n */
@@ -49,7 +49,7 @@ int main(void)
         mpz_init(mpz_val);
       
         n = n_randtest(state);
-        val = n_cbrt_chebyshef_approx(n);
+        val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
@@ -79,7 +79,7 @@ int main(void)
         n = n_randtest_bits(state, bits);
         n = n*n*n;
         n += (n_randint(state, 100) - 50);
-        val = n_cbrt_chebyshef_approx(n);
+        val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
@@ -110,7 +110,7 @@ int main(void)
         n = n_randtest_bits(state, bits);
         n = n*n*n;
         n += 1;
-        val = n_cbrt_chebyshef_approx(n);
+        val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
@@ -141,7 +141,7 @@ int main(void)
         n = n_randtest_bits(state, bits);
         n = n*n*n;
         n -= 1;
-        val = n_cbrt_chebyshef_approx(n);
+        val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);

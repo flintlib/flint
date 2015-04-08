@@ -61,7 +61,7 @@ static const float coeff[16][3] = {{0.445434042, 0.864136635, -0.335205926},    
                                    {0.546715310, 0.573654340, -0.120376066},    /* [0.93750, 0.96875]  */
                                    {0.552627494, 0.561446514, -0.114074068}};   /* [0.96875, 1.00000]  */
 mp_limb_t
-n_cbrt_chebyshef_approx(mp_limb_t n)
+n_cbrt_chebyshev_approx(mp_limb_t n)
 {
     typedef union { 
         mp_limb_t  uword_val;

@@ -283,7 +283,7 @@ FLINT_DLL mp_limb_t n_cbrt_binary_search(mp_limb_t x);
 
 FLINT_DLL mp_limb_t n_cbrt_newton_iteration(mp_limb_t n);
 
-FLINT_DLL mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n);
+FLINT_DLL mp_limb_t n_cbrt_chebyshev_approx(mp_limb_t n);
 
 FLINT_DLL mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n);
 
