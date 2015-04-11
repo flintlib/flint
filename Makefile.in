@@ -12,7 +12,7 @@ QUIET_AR  = @echo '   ' AR  ' ' $@;
 
 AT=@
 
-BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
+BUILD_DIRS = aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly \
    fmpq_poly fmpz_mat fmpz_lll mpfr_vec mpfr_mat mpf_vec mpf_mat nmod_vec nmod_poly \
    nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_vec fmpq_mat padic \
    fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly \
