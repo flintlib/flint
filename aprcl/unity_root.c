@@ -67,3 +67,23 @@ void unity_roots_mul(unity_root res, const unity_root element1, const unity_root
     res->power = element1->power;
 }
 
+void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_root element2)
+{
+    int i, power;
+    fmpz_poly_mul_classical(res->poly, element1->poly, element2->poly);
+
+    power = element1->power;
+    for (i = res->poly->length - 1; i > power; i--)
+    {
+        slong coeff = fmpz_get_si(res->poly->coeffs + i);
+        if (coeff != 0)
+        {
+            slong old_coeff = fmpz_get_si(res->poly->coeffs + i - power);
+            old_coeff += coeff;
+            fmpz_set_si(res->poly->coeffs + i, 0);
+            fmpz_set_si(res->poly->coeffs + i - power, old_coeff);
+        }
+    }
+    _fmpz_poly_normalise(res->poly);
+}
+

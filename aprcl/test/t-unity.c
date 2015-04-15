@@ -62,6 +62,10 @@ int main(void)
 
     unity_print(u3);
 
+    unity_roots_mul_sub(u3, u2, u1);
+
+    unity_print(u3);
+
     unity_clear(u1);
     unity_clear(u2);
     unity_clear(u3);

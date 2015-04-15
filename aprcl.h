@@ -48,6 +48,7 @@ void unity_print(unity_root element);
 void unity_nth_root(unity_root element, ulong n);
 void unity_roots_add(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_mul(unity_root res, const unity_root element1, const unity_root element2);
+void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_root element2);
 
 mp_ptr f_table(const ulong q);
 
