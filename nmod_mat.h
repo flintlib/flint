@@ -28,6 +28,12 @@
 #ifndef NMOD_MAT_H
 #define NMOD_MAT_H
 
+#ifdef NMOD_MAT_INLINES_C
+#define NMOD_MAT_INLINE FLINT_DLL
+#else
+#define NMOD_MAT_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
