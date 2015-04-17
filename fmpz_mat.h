@@ -297,6 +297,10 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 FLINT_DLL void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat);
 FLINT_DLL void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat);
 
+/* Minimal polynomial *******************************************************/
+
+FLINT_DLL void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat);
+
 /* Rank *********************************************************************/
 
 FLINT_DLL slong fmpz_mat_rank(const fmpz_mat_t A);
