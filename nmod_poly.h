@@ -30,6 +30,12 @@
 #ifndef NMOD_POLY_H
 #define NMOD_POLY_H
 
+#ifdef NMOD_POLY_INLINES_C
+#define NMOD_POLY_INLINE FLINT_DLL
+#else
+#define NMOD_POLY_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
@@ -54,7 +60,7 @@
 #define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
 #define NMOD_POLY_SMALL_GCD_CUTOFF 200  /* GCD (small n): Euclidean -> HGCD */
 
-static __inline__
+NMOD_POLY_INLINE
 slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
     const mp_bitcnt_t bits = 
@@ -68,7 +74,7 @@ slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
         return 3*(lenA + lenB - 1);
 }
 
-static __inline__
+NMOD_POLY_INLINE
 slong NMOD_DIV_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
     const mp_bitcnt_t bits = 
@@ -82,7 +88,7 @@ slong NMOD_DIV_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
         return 3*lenA;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 slong NMOD_DIVREM_DC_ITCH(slong lenB, nmod_t mod)
 {
     slong i = 0;
@@ -144,7 +150,7 @@ Copyright (C) 2007, 2008 David Harvey
 
 */
 
-static __inline__
+NMOD_POLY_INLINE
 int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n)
 {
    if (mpn_cmp(op1, op2, n) >= 0)
@@ -176,13 +182,13 @@ FLINT_DLL void nmod_poly_clear(nmod_poly_t poly);
 
 FLINT_DLL void nmod_poly_fit_length(nmod_poly_t poly, slong alloc);
 
-static __inline__
+NMOD_POLY_INLINE
 void _nmod_poly_set_length(nmod_poly_t poly, slong len)
 {
     poly->length = len;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
     while (poly->length && (poly->coeffs[poly->length - 1] == WORD(0)))
@@ -191,31 +197,31 @@ void _nmod_poly_normalise(nmod_poly_t poly)
 
 /* Polynomial parameters  ****************************************************/
 
-static __inline__
+NMOD_POLY_INLINE
 slong nmod_poly_length(const nmod_poly_t poly)
 {
     return poly->length;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 slong nmod_poly_degree(const nmod_poly_t poly)
 {
     return poly->length - 1;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
 {
     return poly->mod.n;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 {
     return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
 
-static __inline__
+NMOD_POLY_INLINE
 mp_ptr nmod_poly_lead(const nmod_poly_t poly)
 {
     if (poly->length)
@@ -226,7 +232,7 @@ mp_ptr nmod_poly_lead(const nmod_poly_t poly)
 
 /* Assignment and basic manipulation  ****************************************/
 
-static __inline__
+NMOD_POLY_INLINE
 void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
 {
     if (a != b)
@@ -237,7 +243,7 @@ void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
     }
 }
 
-static __inline__
+NMOD_POLY_INLINE
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {
     slong t;
@@ -256,13 +262,13 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
     poly2->coeffs = tp;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 void nmod_poly_zero(nmod_poly_t res)
 {
     res->length = 0;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 void nmod_poly_one(nmod_poly_t res)
 {
     nmod_poly_fit_length(res, 1);
@@ -270,7 +276,7 @@ void nmod_poly_one(nmod_poly_t res)
     res->coeffs[0] = 1;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 void nmod_poly_truncate(nmod_poly_t poly, slong len)
 {
     if (poly->length > len)
@@ -286,7 +292,7 @@ FLINT_DLL void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, sl
 
 /* Comparison  ***************************************************************/
 
-static __inline__
+NMOD_POLY_INLINE
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 {
     if (a->length != b->length)
@@ -299,14 +305,14 @@ int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
    return 1;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 int nmod_poly_is_zero(const nmod_poly_t poly)
 {
     return (poly->length == 0);
 }
 
-static __inline__ int
-nmod_poly_is_one(const nmod_poly_t poly)
+NMOD_POLY_INLINE
+int nmod_poly_is_one(const nmod_poly_t poly)
 {
     return (poly->length == 1) && (poly->coeffs[0] == 1);
 }
@@ -315,8 +321,8 @@ nmod_poly_is_one(const nmod_poly_t poly)
 
 FLINT_DLL void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len);
 
-static __inline__ void
-nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len)
+NMOD_POLY_INLINE
+void nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len)
 {
     do {
         nmod_poly_randtest(poly, state, len);
@@ -343,7 +349,7 @@ FLINT_DLL void nmod_poly_randtest_sparse_irreducible(nmod_poly_t poly, flint_ran
 
 /* Getting and setting coefficients  *****************************************/
 
-static __inline__
+NMOD_POLY_INLINE
 ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, slong j)
 {
     return (j >= poly->length) ? 0 : poly->coeffs[j];
@@ -361,7 +367,7 @@ FLINT_DLL int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
 FLINT_DLL int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 
-static __inline__
+NMOD_POLY_INLINE
 int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 {
     char *s;
@@ -376,7 +382,7 @@ int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
 FLINT_DLL int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x);
 
-static __inline__
+NMOD_POLY_INLINE
 int nmod_poly_print(const nmod_poly_t a)
 {
     size_t r;
@@ -396,13 +402,13 @@ int nmod_poly_print(const nmod_poly_t a)
     return (int) r;
 }
 
-static __inline__
+NMOD_POLY_INLINE
 int nmod_poly_print_pretty(const nmod_poly_t a, const char * x)
 {
     return nmod_poly_fprint_pretty(stdout, a, x);
 }
 
-static __inline__
+NMOD_POLY_INLINE
 int nmod_poly_read(nmod_poly_t poly)
 {
     return nmod_poly_fread(stdin, poly);
@@ -716,13 +722,13 @@ FLINT_DLL void _nmod_poly_inv_series_newton(mp_ptr Qinv,
 FLINT_DLL void nmod_poly_inv_series_newton(nmod_poly_t Qinv, 
                                                   const nmod_poly_t Q, slong n);
 
-static __inline__
+NMOD_POLY_INLINE
 void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
 {
     _nmod_poly_inv_series_newton(Qinv, Q, n, mod);
 }
 
-static __inline__
+NMOD_POLY_INLINE
 void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 {
     nmod_poly_inv_series_newton(Qinv, Q, n);
@@ -1074,8 +1080,8 @@ FLINT_DLL mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA,
 
 FLINT_DLL mp_limb_t nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B);
 
-static __inline__ mp_limb_t 
-_nmod_poly_resultant(mp_srcptr poly1, slong len1, 
+NMOD_POLY_INLINE
+mp_limb_t _nmod_poly_resultant(mp_srcptr poly1, slong len1, 
                      mp_srcptr poly2, slong len2, nmod_t mod)
 {
     const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
@@ -1087,8 +1093,8 @@ _nmod_poly_resultant(mp_srcptr poly1, slong len1,
         return _nmod_poly_resultant_hgcd(poly1, len1, poly2, len2, mod);
 }
 
-static __inline__ mp_limb_t 
-nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
+NMOD_POLY_INLINE
+mp_limb_t nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
 {
     const slong cutoff = FLINT_BIT_COUNT(f->mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;

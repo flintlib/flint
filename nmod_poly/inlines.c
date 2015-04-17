@@ -19,48 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
-#define FMPQ_INLINES_C
+#define NMOD_POLY_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
+#include <stdio.h>
 #undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpq.h"
-
-void fmpq_numerator(fmpz_t n, const fmpq_t q)
-{
-   fmpz_set(n, fmpq_numref(q));
-}
-
-void fmpq_denominator(fmpz_t n, const fmpq_t q)
-{
-   fmpz_set(n, fmpq_denref(q));
-}
-
-fmpz * fmpq_numerator_ptr(fmpq_t q)
-{
-   return fmpq_numref(q);
-}
-
-fmpz * fmpq_denominator_ptr(fmpq_t q)
-{
-   return fmpq_denref(q);
-}
-
-int fmpq_equal_si(fmpq_t q, slong n)
-{
-   return q->num == n && q->den == WORD(1);
-}
-
-int fmpq_equal_fmpz(fmpq_t q, fmpz_t n)
-{
-   return fmpz_equal(fmpq_numref(q), n) && q->den == WORD(1);
-}
+#include "nmod_poly.h"
 
