@@ -37,9 +37,9 @@ int main(void)
     fflush(stdout);
 
     int i;
-    mp_ptr table = f_table(13);
+    mp_ptr table = f_table(7);
     flint_printf("\n");
-    for (i = 0; i < 11; i++)
+    for (i = 0; i < 5; i++)
     {
         flint_printf("%wu ", table[i]);
     }

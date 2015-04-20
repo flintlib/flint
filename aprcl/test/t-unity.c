@@ -70,8 +70,21 @@ int main(void)
     unity_clear(u2);
     unity_clear(u3);
 
-   FLINT_TEST_CLEANUP(state);
+    unity_init(u3, 9);
+    unity_nth_root(u3, 6);
+    unity_nth_root(u3, 3);
+    unity_nth_root(u3, 1);
+    unity_print(u3);
+    unity_roots_add(u3, u3, u3);
+    unity_print(u3);
+    unity_nth_root_inc(u3, 3);
+    unity_print(u3);
+    unity_roots_reduce_cyclotomic(u3, 3);
+    unity_print(u3);
+
+    FLINT_TEST_CLEANUP(state);
    
-   flint_printf("PASS\n");
-   return 0;
+    flint_printf("PASS\n");
+    return 0;
 }
+

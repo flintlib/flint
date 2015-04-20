@@ -37,10 +37,21 @@ int main(void)
     fflush(stdout);
 
     unity_root sum;
-    jacobi_pq(sum, 13, 3);
+    jacobi_pq(sum, 7, 3);
+    flint_printf("%w\n", sum->power);
+    unity_roots_reduce_cyclotomic(sum, 3); 
     flint_printf("\n");
     unity_print(sum);
     unity_clear(sum);
+
+    unity_root sum2;
+    jacobi_pq_not2(sum2, 7, 3);
+    unity_print(sum2);
+    unity_clear(sum2);
+
+    jacobi_2q_one(sum2, 7);
+    unity_print(sum2);
+    unity_clear(sum2);
 
     FLINT_TEST_CLEANUP(state);
     

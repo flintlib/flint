@@ -29,7 +29,8 @@
 void unity_init(unity_root element, ulong n)
 {
     element->power = n;
-    fmpz_poly_init(element->poly);
+    fmpz_poly_init2(element->poly, n);
+    element->poly->length = n;
 }
 
 void unity_clear(unity_root element)
@@ -45,6 +46,16 @@ void unity_print(unity_root element)
 void unity_nth_root(unity_root element, ulong n)
 {
     fmpz_poly_set_coeff_ui(element->poly, n, 1);
+}
+
+void unity_nth_root_inc(unity_root element, ulong n)
+{
+    fmpz_add_ui(element->poly->coeffs + n, element->poly->coeffs + n, 1);
+}
+
+void unity_nth_root_dec(unity_root element, ulong n)
+{
+    fmpz_sub_ui(element->poly->coeffs + n, element->poly->coeffs + n, 1);
 }
 
 void unity_roots_add(unity_root res, const unity_root element1, const unity_root element2)
@@ -85,5 +96,20 @@ void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_
         }
     }
     _fmpz_poly_normalise(res->poly);
+}
+
+void unity_roots_reduce_cyclotomic(unity_root res, ulong p)
+{
+    int i;
+    ulong power;
+    fmpz_poly_t divider;
+    fmpz_poly_init(divider);
+
+    power = res->power / p;
+    for (i = 0; i < p; i++)
+        fmpz_poly_set_coeff_ui(divider, i * power, 1);
+
+    fmpz_poly_rem(res->poly, res->poly, divider);
+    fmpz_poly_clear(divider);
 }
 

@@ -46,12 +46,20 @@ void unity_init(unity_root element, ulong n);
 void unity_clear(unity_root element);
 void unity_print(unity_root element);
 void unity_nth_root(unity_root element, ulong n);
+void unity_nth_root_inc(unity_root element, ulong n);
+void unity_nth_root_dec(unity_root element, ulong n);
 void unity_roots_add(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_mul(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_root element2);
+void unity_roots_reduce_cyclotomic(unity_root res, ulong p);
 
 mp_ptr f_table(const ulong q);
 
-#endif
+void jacobi_pq(unity_root result, ulong q, ulong p);
+void jacobi_pq_general(unity_root result, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
+void jacobi_pq_not2(unity_root result, ulong q, ulong p);
+void jacobi_2q_one(unity_root result, ulong q);
+void jacobi_2q_two(unity_root result, ulong q);
 
+#endif
 
