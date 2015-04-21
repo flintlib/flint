@@ -200,26 +200,6 @@ FLINT_DLL void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
 FLINT_DLL void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
 
-PADIC_INLINE 
-int padic_set_exact_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
-{
-   if (fmpz_sgn(op) < 0)
-      return 0;
-   
-   if (fmpz_sgn(op) == 0)
-   {
-      fmpz_zero(padic_unit(rop));
-      padic_val(rop) = 0;
-   } else
-   {
-      padic_val(rop) = 0;
-      fmpz_set(padic_unit(rop), op);
-      padic_val(rop) += _fmpz_remove(padic_unit(rop), ctx->p, ctx->pinv);
-   }
-
-   return 1;
-}
-
 FLINT_DLL void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx);
@@ -289,13 +269,7 @@ FLINT_DLL void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_
 FLINT_DLL void padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
-FLINT_DLL void padic_add_exact(padic_t rop, const padic_t op1, const padic_t op2, 
-               const padic_ctx_t ctx);
-
 FLINT_DLL void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
-               const padic_ctx_t ctx);
-
-FLINT_DLL int padic_sub_exact(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
 FLINT_DLL void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx);
@@ -303,18 +277,10 @@ FLINT_DLL void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 FLINT_DLL void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
-FLINT_DLL void padic_mul_exact(padic_t rop, const padic_t op1, const padic_t op2, 
-               const padic_ctx_t ctx);
-
-FLINT_DLL int padic_div_exact_fmpz(padic_t rop, const padic_t op1, const fmpz_t op2,
-                                   const padic_ctx_t ctx);
-
 FLINT_DLL void padic_shift(padic_t rop, const padic_t op, slong v, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
-
-FLINT_DLL int padic_div_exact(padic_t rop, const padic_t op1, const padic_t op2);
 
 FLINT_DLL void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, slong N);
 
@@ -326,26 +292,10 @@ FLINT_DLL void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N);
 
 FLINT_DLL void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-PADIC_INLINE
-int padic_inv_exact(padic_t rop, const padic_t op)
-{
-   if (!fmpz_is_one(padic_unit(op)))
-      return 0;
-
-   fmpz_one(padic_unit(rop));
-   padic_val(rop) = -padic_val(op);
-
-   return 1;
-}
-
 FLINT_DLL int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
-
-FLINT_DLL int padic_sqrt_exact(padic_t rop, const padic_t op);
 
 FLINT_DLL void padic_pow_si(padic_t rop, const padic_t op, slong e, 
                   const padic_ctx_t ctx);
-
-FLINT_DLL int padic_pow_exact_si(padic_t rop, const padic_t op, slong e);
 
 /* Exponential ***************************************************************/
 
