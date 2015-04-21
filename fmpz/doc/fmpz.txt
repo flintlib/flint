@@ -1206,7 +1206,6 @@ int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n,
     or it returns $1$ if all factors of $n$ are $1 \pmod{F}$. Also in
     that case, $R$ is set to $(n - 1)/F$.
 
-
     N.B: a return value of $1$ only proves $n$ prime if $F \ge \sqrt{n}$.
 
     The function does not compute which primes divide $n - 1$. Instead,
@@ -1291,11 +1290,8 @@ int fmpz_is_prime(const fmpz_t n)
     efficient if $n$ is composite. A strong probable prime test should be
     run first to ensure that $n$ is probably prime.
 
-    Currently this code relies on the use of frobenius powers in 
-    \code{is_irreducible_rabin} via \code{is_prime_lenstra}. This trick only
-    works when $n$ is prime. It may prove to not matter for that algorithm when
-    $n$ is not prime, but this has not been proved.
-
+    Currently due to the lack of an APR-CL or ECPP implementation, this
+    function does not succeed often.
 
 void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
                                                 const fmpz_t m, const fmpz_t n)
@@ -1368,27 +1364,6 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n,
     We require $\gcd(r, s) = 1$.
 
     This is efficient if $s^3 > n$.
-
-int fmpz_is_prime_lenstra(fmpz_t F, fmpz * res, const fmpz_t n, 
-                                            mp_ptr pk1, slong num_pk1, slong k)
-
-    Given a list \code{pk1} of length \code{num_pk1} of primes dividing 
-    $n^2 + n + 1$ for $k = 3$, $n^2 + 1$ for $k = 4$, $n^2 - n + 1$ for 
-    $k = 6$, $n^4 + n^3 + n^2 + n + 1$ for $k = 5$, $n^4 + 1$ for $k = 8$, 
-    $n^4 - n^2 + 1$ for $k = 12$ or $n^4 - n^3 + n^2 - n + 1$ for $k = 10$, 
-    this function performs the Lenstra finite fields primality test. It returns
-    $0$ if $n$ is shown to be composite. Otherwise it returns $1$, which means 
-    that all factors of $n$ are congruent to one of the $k$ residues written to 
-    \code{res} modulo $F$.
-
-    ($F$ will be a product of some or all of the primes passed in \code{pk1}.)
-
-    Currently this code relies on the use of frobenius powers in 
-    \code{is_irreducible_rabin}. This trick only works when $n$ is prime. It
-    may prove to not matter for that algorithm when $n$ is not prime, but this
-    has not been proved.
-
-    Assumes $n$ is odd.
 
 *******************************************************************************
 
