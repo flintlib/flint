@@ -322,7 +322,7 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
 
 void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
-    Sets \code{res} to the resultant matrix from the vertical concatenation of 
+    Sets \code{res} to the resultant matrix from the vertical concatenation of
     (\code{mat1}, \code{mat2}) in that order.
     Matrix dimensions :
     \code{mat1} : $m \times n$, 
@@ -330,9 +330,9 @@ void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_
     \code{res} : $(m + k) \times n$.
 
 void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
-   Sets \code{res} to the resultant matrix from the horizontal concatenation of 
+    Sets \code{res} to the resultant matrix from the horizontal concatenation of
     (\code{mat1}, \code{mat2}) in that order.
-   Matrix dimensions :
+    Matrix dimensions :
     \code{mat1} : $m \times n$, 
     \code{mat2} : $m \times k$, 
     \code{res}  : $m \times (n + k)$.
@@ -545,8 +545,8 @@ void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets \code{B} to the square of the matrix \code{A}, which must be
     a square matrix. Aliasing is allowed.
-    The function calls fmpz_mat_mul for dimensions less than 12 and 
-    calls fmpz_mat_sqr_bodrato for cases in which the latter is faster.
+    The function calls \code{fmpz_mat_mul} for dimensions less than 12 and
+    calls \code{fmpz_mat_sqr_bodrato} for cases in which the latter is faster.
 
 void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
