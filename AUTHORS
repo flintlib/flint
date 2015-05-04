@@ -120,6 +120,10 @@ $\bullet$ Alena Sergeicheva contributed a patch to the build system for
 individual file testing and also contributed numerous matrix concatenation 
 functions.
 
+$\bullet$ Kushagra Singh contributed fast cube root and nth root code for word
+sized integers, including magic number, Newton iteration, Kahan iteration and
+Chebyshev approximation code.
+
 $\bullet$ Patches and bug reports have been made by Michael Abshoff, 
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,
 Jaap Spies, Kiran Kedlaya, William Stein, Kate Minola, Didier Deshommes, Robert
