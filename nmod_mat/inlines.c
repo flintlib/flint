@@ -19,41 +19,29 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2015 Tommy Hofmann
 
 ******************************************************************************/
 
-#ifndef FQ_POLY_FACTOR_H
-#define FQ_POLY_FACTOR_H
+#define NMOD_MAT_INLINES_C
 
-#ifdef FQ_POLY_FACTOR__MAT_INLINES_C
-#define FQ_POLY_FACTOR_INLINE FLINT_DLL
-#else
-#define FQ_POLY_FACTOR_INLINE static __inline__
-#endif
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#undef ulong
+#include <gmp.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "nmod_mat.h"
 
-static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
+mp_limb_t _nmod_mat_get_entry(nmod_mat_t mat, slong i, slong j)
 {
-    int result;
-    fmpz_t q;
-    fmpz_init(q);
-    fq_ctx_order(q, ctx);
-    if ( fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
-        result = 1;
-    else
-        result = 0;
-    fmpz_clear(q);
-    return result;
+  mp_limb_t x;
+  x = nmod_mat_entry(mat, i, j);
+  return x;
 }
 
-#ifdef T
-#undef T
-#endif
-
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_factor_templates.h"
-#undef CAP_T
-#undef T
-
-#endif
+void _nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
+{
+  nmod_mat_entry(mat, i, j) = x;
+}

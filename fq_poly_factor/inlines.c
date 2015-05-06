@@ -19,41 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2015 Tommy Hofmann
 
 ******************************************************************************/
 
-#ifndef FQ_POLY_FACTOR_H
-#define FQ_POLY_FACTOR_H
+#define FQ_POLY_FACTOR_INLINES_C
 
-#ifdef FQ_POLY_FACTOR__MAT_INLINES_C
-#define FQ_POLY_FACTOR_INLINE FLINT_DLL
-#else
-#define FQ_POLY_FACTOR_INLINE static __inline__
-#endif
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
+#include <gmp.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fq.h"
+#include "fq_poly.h"
 
-static __inline__ int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
+void __fq_poly_factor_get_poly(fq_poly_t z, fq_poly_factor_t fac, slong i, fq_ctx_t ctx)
 {
-    int result;
-    fmpz_t q;
-    fmpz_init(q);
-    fq_ctx_order(q, ctx);
-    if ( fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
-        result = 1;
-    else
-        result = 0;
-    fmpz_clear(q);
-    return result;
+    fq_poly_set(z, fac->poly + i, ctx);
 }
-
-#ifdef T
-#undef T
-#endif
-
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_factor_templates.h"
-#undef CAP_T
-#undef T
-
-#endif
