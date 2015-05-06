@@ -34,14 +34,14 @@
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
-mp_limb_t _nmod_mat_get_entry(nmod_mat_t mat, slong i, slong j)
+mp_limb_t nmod_mat_get_entry(nmod_mat_t mat, slong i, slong j)
 {
   mp_limb_t x;
   x = nmod_mat_entry(mat, i, j);
   return x;
 }
 
-void _nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
+void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
 {
   nmod_mat_entry(mat, i, j) = x;
 }
