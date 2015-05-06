@@ -103,7 +103,7 @@ typedef void (*flint_cleanup_function_t)(void);
 FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 FLINT_DLL void flint_cleanup(void);
 
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(__mips64)
 #define WORD_FMT "%ll"
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
