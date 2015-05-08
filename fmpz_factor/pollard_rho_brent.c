@@ -73,14 +73,14 @@ fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
         k = 0;
         do {
             fmpz_set_ui(minval, iter - k);   /* minval = min(m, iter - k) */
+            
             if (fmpz_cmp(m, minval) < 0)
                 fmpz_set(minval, m);
-
-                fmpz_set(ys, y);
-
+            
+            fmpz_set(ys, y);
+            
             for (i = 0; i < fmpz_get_ui(minval); i++)
             {
-
                 sq_and_add_a(y, y, a, n);
                 fmpz_sub(subval, x, y);
                 fmpz_abs(subval, subval);
@@ -95,13 +95,11 @@ fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
 
     if (!fmpz_cmp(gcdval, n))
     {
-        do
-        {
+        do {
             sq_and_add_a(ys, ys, a, n);
             fmpz_sub(subval, x, ys);
             fmpz_abs(subval, subval);
             fmpz_gcd(gcdval, subval, n);
-
         } while (!fmpz_cmp_ui(gcdval, 1));
     }
 
