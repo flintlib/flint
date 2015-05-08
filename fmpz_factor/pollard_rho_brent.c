@@ -38,10 +38,10 @@ sq_and_add_a(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t n)
 }
 
 int
-fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
+n_factor_pollard_rho(fmpz_t n, fmpz_t p_factor)
 {
 
-    fmpz_t x, y, a, m, q, gcdval, ys, subval, minval;
+    fmpz_t x, y, a, m, q, gcdval, ys, subval, minval, maxval;
     mp_limb_t iter, i, k;
     int ret;
 
@@ -54,13 +54,15 @@ fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
     fmpz_init(m);
     fmpz_init(subval);
     fmpz_init(minval);
+    fmpz_init(maxval);
     fmpz_init_set_ui(q, 1);
     fmpz_init_set_ui(gcdval, 1);
 
-    fmpz_randm(a, state, n - 3);
-    fmpz_randm(y, state, n - 1);
-    fmpz_randm(m, state, n - 1);
-
+    fmpz_sub_ui(maxval, n, 3);
+    fmpz_randm(a, state, maxval);
+    fmpz_sub_ui(maxval, n, 1);
+    fmpz_randm(y, state, maxval);
+    fmpz_set_ui(m, 100);
     iter = 1;
     i = 0;
 
@@ -73,14 +75,14 @@ fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
         k = 0;
         do {
             fmpz_set_ui(minval, iter - k);   /* minval = min(m, iter - k) */
-            
             if (fmpz_cmp(m, minval) < 0)
                 fmpz_set(minval, m);
-            
-            fmpz_set(ys, y);
-            
+
+                fmpz_set(ys, y);
+
             for (i = 0; i < fmpz_get_ui(minval); i++)
             {
+
                 sq_and_add_a(y, y, a, n);
                 fmpz_sub(subval, x, y);
                 fmpz_abs(subval, subval);
@@ -95,21 +97,22 @@ fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
 
     if (!fmpz_cmp(gcdval, n))
     {
-        do {
+        do
+        {
             sq_and_add_a(ys, ys, a, n);
             fmpz_sub(subval, x, ys);
             fmpz_abs(subval, subval);
             fmpz_gcd(gcdval, subval, n);
+
         } while (!fmpz_cmp_ui(gcdval, 1));
     }
 
     if (!fmpz_cmp(gcdval, n))
         ret = 0;
     else
-    {
         ret = 1;
-        fmpz_set(p_factor, gcdval);
-    }
+    
+    fmpz_set(p_factor, gcdval);
 
     fmpz_clear(x);
     fmpz_clear(y);
@@ -118,6 +121,7 @@ fmpz_factor_pollard_rho_brent(fmpz_t n, fmpz_t p_factor)
     fmpz_clear(m);
     fmpz_clear(subval);
     fmpz_clear(minval);
+    fmpz_clear(maxval);
     fmpz_clear(q);
     fmpz_clear(gcdval);
 
