@@ -38,79 +38,84 @@ sq_and_add_a(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t n)
 }
 
 int
-n_factor_pollard_rho(fmpz_t n, fmpz_t p_factor)
+fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n, mp_limb_t max_tries)
 {
-
-    fmpz_t x, y, a, m, q, gcdval, ys, subval, minval, maxval;
-    mp_limb_t iter, i, k;
-    int ret;
-
-    FLINT_TEST_INIT(state);
+    fmpz_t x, y, a, q, gcdval, ys, subval, maxval;
+    mp_limb_t iter, i, k, j, minval, m;
+    int ret, tries;
 
     fmpz_init(x);
     fmpz_init(y);
     fmpz_init(ys);
     fmpz_init(a);
-    fmpz_init(m);
+    fmpz_init(q);
     fmpz_init(subval);
-    fmpz_init(minval);
     fmpz_init(maxval);
-    fmpz_init_set_ui(q, 1);
-    fmpz_init_set_ui(gcdval, 1);
+    fmpz_init(gcdval);
 
-    fmpz_sub_ui(maxval, n, 3);
-    fmpz_randm(a, state, maxval);
-    fmpz_sub_ui(maxval, n, 1);
-    fmpz_randm(y, state, maxval);
-    fmpz_set_ui(m, 100);
-    iter = 1;
-    i = 0;
+    if (max_tries)
+        tries = max_tries;
+    else
+        tries = 1;
 
-    do {
-        fmpz_set(x, y);
+    while(tries--)
+    {
+        fmpz_set_ui(q, 1);
+        fmpz_set_ui(gcdval, 1);
+        fmpz_sub_ui(maxval, n, 3);
+        fmpz_randm(a, state, maxval);
+        fmpz_randm(y, state, maxval);
+        
+        m = 100;
+        iter = 1;
+        i = 0;
 
-        for (i = 0; i < iter; i++)
-            sq_and_add_a(y, y, a, n);
-
-        k = 0;
         do {
-            fmpz_set_ui(minval, iter - k);   /* minval = min(m, iter - k) */
-            if (fmpz_cmp(m, minval) < 0)
-                fmpz_set(minval, m);
+            fmpz_set(x, y);
+
+            for (i = 0; i < iter; i++)
+                sq_and_add_a(y, y, a, n);
+
+            k = 0;
+            do {
+                minval = iter - k;  /* minval = min(m, iter - k) */
+                if (m < minval)
+                    minval = m;
 
                 fmpz_set(ys, y);
 
-            for (i = 0; i < fmpz_get_ui(minval); i++)
-            {
+                for (i = 0; i < minval; i++)
+                {
+                    sq_and_add_a(y, y, a, n);
+                    fmpz_sub(subval, x, y);
+                    fmpz_mul(q, q, subval);
+                    fmpz_mod(q, q, n);
+                }
+                fmpz_gcd(gcdval, q, n);
+                k += m;
+                j = fmpz_is_one(gcdval);
+            } while ((k < iter) && j);
+            iter *= 2;
+        } while(j);        /* while gcdval == 1 */
 
-                sq_and_add_a(y, y, a, n);
-                fmpz_sub(subval, x, y);
-                fmpz_abs(subval, subval);
-                fmpz_mul(q, q, subval);
-                fmpz_mod(q, q, n);
-            }
-            fmpz_gcd(gcdval, q, n);
-            k += fmpz_get_ui(m);
-        } while ((k < iter) && !fmpz_cmp_ui(gcdval, 1));
-        iter *= 2;
-    } while(!fmpz_cmp_ui(gcdval, 1));   /* while gcdval == 1 */
-
-    if (!fmpz_cmp(gcdval, n))
-    {
-        do
+        if (fmpz_equal(gcdval, n))
         {
-            sq_and_add_a(ys, ys, a, n);
-            fmpz_sub(subval, x, ys);
-            fmpz_abs(subval, subval);
-            fmpz_gcd(gcdval, subval, n);
+            do
+            {
+                sq_and_add_a(ys, ys, a, n);
+                fmpz_sub(subval, x, ys);
+                fmpz_gcd(gcdval, subval, n);
+            } while (fmpz_is_one(gcdval));
+        }
 
-        } while (!fmpz_cmp_ui(gcdval, 1));
+        if (!fmpz_cmp(gcdval, n))
+            ret = 0;
+        else
+        {
+            ret = 1;
+            break;
+        }
     }
-
-    if (!fmpz_cmp(gcdval, n))
-        ret = 0;
-    else
-        ret = 1;
     
     fmpz_set(p_factor, gcdval);
 
@@ -118,9 +123,7 @@ n_factor_pollard_rho(fmpz_t n, fmpz_t p_factor)
     fmpz_clear(y);
     fmpz_clear(ys);
     fmpz_clear(a);
-    fmpz_clear(m);
     fmpz_clear(subval);
-    fmpz_clear(minval);
     fmpz_clear(maxval);
     fmpz_clear(q);
     fmpz_clear(gcdval);
