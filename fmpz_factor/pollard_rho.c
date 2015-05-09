@@ -30,7 +30,7 @@
 /* Sets f to (x^2 + a) % n */
 
 void
-sq_and_add_a(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t n)
+sqr_and_add_a(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t n)
 {
     fmpz_powm_ui(f, x, 2, n);
     fmpz_add(f, f, a);
@@ -54,11 +54,8 @@ fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n,
     fmpz_init(maxval);
     fmpz_init(gcdval);
 
-    if (max_tries)      /* number of times pollard rho tries to factor */
-        tries = max_tries;
-    else
-        tries = 1;
-
+    tries = max_tries;  /* number of times pollard rho tries to factor */
+        
     while (tries--)
     {
         fmpz_set_ui(q, 1);
