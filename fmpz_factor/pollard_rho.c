@@ -45,27 +45,30 @@ fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n,
     mp_limb_t iter, i, k, j, minval, m;
     int ret, tries;
 
-    fmpz_init(x);
-    fmpz_init(y);
-    fmpz_init(ys);
-    fmpz_init(a);
-    fmpz_init(q);
+    fmpz_init(x);       /* Initial values, set as random */
+    fmpz_init(y);       
+    fmpz_init(ys);      /* Used for backtracking */
+    fmpz_init(a);       /* constant in polynomial (x^2 + a) */
+    fmpz_init(q);       /* stores product of gcd values */
     fmpz_init(subval);
     fmpz_init(maxval);
     fmpz_init(gcdval);
 
-    if (max_tries)
+    if (max_tries)      /* number of times pollard rho tries to factor */
         tries = max_tries;
     else
         tries = 1;
 
-    while(tries--)
+    while (tries--)
     {
         fmpz_set_ui(q, 1);
         fmpz_set_ui(gcdval, 1);
         fmpz_sub_ui(maxval, n, 3);
         fmpz_randm(a, state, maxval);
+        fmpz_add_ui(a, a, 1);
+        fmpz_sub_ui(maxval, n, 1);
         fmpz_randm(y, state, maxval);
+        fmpz_add_ui(y, y, 1);
         
         m = 100;
         iter = 1;
@@ -76,7 +79,7 @@ fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n,
             k = 0;
 
             for (i = 0; i < iter; i++)
-                sq_and_add_a(y, y, a, n);
+                sqr_and_add_a(y, a, n);
 
             do {
                 minval = iter - k;  /* minval = min(m, iter - k) */
@@ -87,7 +90,7 @@ fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n,
 
                 for (i = 0; i < minval; i++)
                 {
-                    sq_and_add_a(y, y, a, n);
+                    sqr_and_add_a(y, a, n);
                     fmpz_sub(subval, x, y);
                     fmpz_mul(q, q, subval);
                     fmpz_mod(q, q, n);
@@ -97,12 +100,12 @@ fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n,
                 j = fmpz_is_one(gcdval);
             } while ((k < iter) && j);
             iter *= 2;
-        } while(j);                 /* while gcdval == 1 */
+        } while (j);                /* while gcdval == 1 */
 
         if (fmpz_equal(gcdval, n))
         {
             do {
-                sq_and_add_a(ys, ys, a, n);
+                sqr_and_add_a( ys, a, n);
                 fmpz_sub(subval, x, ys);
                 fmpz_gcd(gcdval, subval, n);
             } while (fmpz_is_one(gcdval));
