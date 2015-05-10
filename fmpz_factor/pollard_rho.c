@@ -27,106 +27,37 @@
 #include "flint.h"
 #include "fmpz.h"
 
-/* Sets f to (x^2 + a) % n */
-
-void
-sqr_and_add_a(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t n)
-{
-    fmpz_powm_ui(f, x, 2, n);
-    fmpz_add(f, f, a);
-    fmpz_mod(f, f, n);
-}
-
 int
 fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, const fmpz_t n, 
-                        mp_limb_t max_tries)
+                        mp_limb_t max_tries, mp_limb_t max_iters)
 {
-    fmpz_t x, y, a, q, gcdval, ys, subval, maxval;
-    mp_limb_t iter, i, k, j, minval, m;
-    int ret, tries;
 
-    fmpz_init(x);       /* Initial values, set as random */
-    fmpz_init(y);       
-    fmpz_init(ys);      /* Used for backtracking */
-    fmpz_init(a);       /* constant in polynomial (x^2 + a) */
-    fmpz_init(q);       /* stores product of gcd values */
-    fmpz_init(subval);
+    fmpz_t a, x, maxval;
+    int ret;
+
+    fmpz_init(a);
+    fmpz_init(x);
     fmpz_init(maxval);
-    fmpz_init(gcdval);
+    ret = 0;
 
-    tries = max_tries;  /* number of times pollard rho tries to factor */
-        
-    while (tries--)
+    fmpz_sub_ui(maxval, n, 3);
+    fmpz_randm(a, state, maxval);
+    fmpz_add_ui(a, a, 1);
+    fmpz_sub_ui(maxval, n, 1);
+    fmpz_randm(x, state, maxval);
+    fmpz_add_ui(x, x, 1);
+
+    while (max_tries--)
     {
-        fmpz_set_ui(q, 1);
-        fmpz_set_ui(gcdval, 1);
-        fmpz_sub_ui(maxval, n, 3);
-        fmpz_randm(a, state, maxval);
-        fmpz_add_ui(a, a, 1);
-        fmpz_sub_ui(maxval, n, 1);
-        fmpz_randm(y, state, maxval);
-        fmpz_add_ui(y, y, 1);
-        
-        m = 100;
-        iter = 1;
-        i = 0;
+        ret = fmpz_factor_pollard_rho_ac(p_factor, n, a, x, max_iters);
 
-        do {
-            fmpz_set(x, y);
-            k = 0;
-
-            for (i = 0; i < iter; i++)
-                sqr_and_add_a(y, a, n);
-
-            do {
-                minval = iter - k;  /* minval = min(m, iter - k) */
-                if (m < minval)
-                    minval = m;
-
-                fmpz_set(ys, y);
-
-                for (i = 0; i < minval; i++)
-                {
-                    sqr_and_add_a(y, a, n);
-                    fmpz_sub(subval, x, y);
-                    fmpz_mul(q, q, subval);
-                    fmpz_mod(q, q, n);
-                }
-                fmpz_gcd(gcdval, q, n);
-                k += m;
-                j = fmpz_is_one(gcdval);
-            } while ((k < iter) && j);
-            iter *= 2;
-        } while (j);                /* while gcdval == 1 */
-
-        if (fmpz_equal(gcdval, n))
-        {
-            do {
-                sqr_and_add_a( ys, a, n);
-                fmpz_sub(subval, x, ys);
-                fmpz_gcd(gcdval, subval, n);
-            } while (fmpz_is_one(gcdval));
-        }
-
-        if (!fmpz_cmp(gcdval, n))
-            ret = 0;
-        else
-        {
-            ret = 1;
+        if (ret == 1)
             break;
-        }
     }
-    
-    fmpz_set(p_factor, gcdval);
 
-    fmpz_clear(x);
-    fmpz_clear(y);
-    fmpz_clear(ys);
     fmpz_clear(a);
-    fmpz_clear(subval);
+    fmpz_clear(x);
     fmpz_clear(maxval);
-    fmpz_clear(q);
-    fmpz_clear(gcdval);
 
     return ret;
 }

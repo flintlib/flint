@@ -103,3 +103,34 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
     of finding a factor which has been missed (if $p+1$ or $p-1$ is not
     smooth for any prime factors $p$ of $n$ then the function will
     not ever succeed).
+
+int fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai, 
+                               const fmpz_t xi, mp_limb_t max_iters)
+
+    Pollard Rho algorithm for integer factorization. Assumes that the $n$ is
+    not prime. $factor$ is set as the factor if found. It is not assured that the 
+    factor found will be prime. Does not compute the complete factorization, 
+    just one factor. Returns 1 if factorization is successfull (non trivial factor
+    is found), else returns 0.
+
+    $ai$ is the constant of the polynomial used, xi is the initial value. 
+    $max_iters$ is the number of iterations tried in process of finding the 
+    cycle.
+
+    The algorithm used is a modification of the original Pollard Rho algorithm,
+    suggested by Richard Brent in the paper availible at
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
+
+int fmpz_factor_pollard_rho(fmpz_t factor, flint_rand_t state, const fmpz_t n, 
+                            mp_limb_t max_tries, mp_limb_t max_iters)
+
+    Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to \code{fmpz_factor_pollard_rho}. The input parameters ai and xi for
+    \code{fmpz_factor_pollard_rho} are selected at random. 
+
+    If the algorithm fails to find a non trivial factor in one call, it tries again 
+    (this time with a different set of random values). This process is repeated a 
+    maximum of $max_tries$ times. 
+
+    Assumes $n$ is not prime. $factor$ is set as the factor found, if factorization
+    is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
+    discovered is not necessarily prime.

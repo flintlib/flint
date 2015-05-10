@@ -75,6 +75,14 @@ FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
                                        ulong B1, ulong B2_sqrt, ulong c);
 
+FLINT_DLL int fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, 
+                                         const fmpz_t ai, const fmpz_t xi, 
+                                         mp_limb_t max_iters);
+
+FLINT_DLL int fmpz_factor_pollard_rho(fmpz_t p_factor, flint_rand_t state, 
+                                      const fmpz_t n, mp_limb_t max_tries, 
+                                      mp_limb_t max_iters);
+
 /* Expansion *****************************************************************/
 
 FLINT_DLL void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
