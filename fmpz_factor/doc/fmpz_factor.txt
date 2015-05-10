@@ -104,8 +104,9 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
     smooth for any prime factors $p$ of $n$ then the function will
     not ever succeed).
 
-int fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai, 
-                               const fmpz_t xi, mp_limb_t max_iters)
+int fmpz_factor_pollard_brent_single(fmpz_t p_factor, const fmpz_t n, 
+                                     const fmpz_t ai, const fmpz_t xi, 
+                                     mp_limb_t max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the $n$ is
     not prime. $factor$ is set as the factor if found. It is not assured that the 
@@ -121,10 +122,11 @@ int fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai,
     suggested by Richard Brent in the paper availible at
     http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
-int fmpz_factor_pollard_rho(fmpz_t factor, flint_rand_t state, const fmpz_t n, 
-                            mp_limb_t max_tries, mp_limb_t max_iters)
+int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, const fmpz_t n, 
+                              mp_limb_t max_tries, mp_limb_t max_iters)
 
-    Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to \code{fmpz_factor_pollard_rho}. The input parameters ai and xi for
+    Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to 
+    \code{fmpz_factor_pollard_rho}. The input parameters ai and xi for
     \code{fmpz_factor_pollard_rho} are selected at random. 
 
     If the algorithm fails to find a non trivial factor in one call, it tries again 

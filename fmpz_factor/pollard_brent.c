@@ -39,7 +39,7 @@ sqr_and_add_a(fmpz_t x, fmpz_t a, const fmpz_t n)
 }
 
 int
-fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai, 
+fmpz_factor_pollard_brent_single(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai, 
                            const fmpz_t xi, mp_limb_t max_iters)
 {
     fmpz_t x, y, a, q, gcdval, ys, subval;
@@ -98,7 +98,7 @@ fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai,
     if (fmpz_equal(gcdval, n))
     {
         do {
-            sqr_and_add_a( ys, a, n);
+            sqr_and_add_a(ys, a, n);
             fmpz_sub(subval, x, ys);
             fmpz_gcd(gcdval, subval, n);
         } while (fmpz_is_one(gcdval));
@@ -118,6 +118,44 @@ fmpz_factor_pollard_rho_ac(fmpz_t p_factor, const fmpz_t n, const fmpz_t ai,
     fmpz_clear(subval);
     fmpz_clear(q);
     fmpz_clear(gcdval);
+
+    return ret;
+}
+
+int
+fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, const fmpz_t n, 
+                        mp_limb_t max_tries, mp_limb_t max_iters)
+{
+
+    fmpz_t a, x, maxa, maxx;
+    int ret;
+
+    fmpz_init(a);
+    fmpz_init(x);
+    fmpz_init(maxa);
+    fmpz_init(maxx);
+    ret = 0;
+
+    fmpz_sub_ui(maxa, n, 3);
+    fmpz_add_ui(a, a, 1);
+    fmpz_sub_ui(maxx, n, 1);
+    fmpz_add_ui(x, x, 1);
+
+    while (max_tries--)
+    {
+        fmpz_randm(a, state, maxa);  
+        fmpz_randm(x, state, maxx);
+
+        ret = fmpz_factor_pollard_brent_single(p_factor, n, a, x, max_iters);
+
+        if (ret == 1)
+            break;
+    }
+
+    fmpz_clear(a);
+    fmpz_clear(x);
+    fmpz_clear(maxa);
+    fmpz_clear(maxx);
 
     return ret;
 }

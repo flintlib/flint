@@ -44,7 +44,7 @@ int main(void)
 
     fails = 0;
 
-    flint_printf("pollard_rho....");
+    flint_printf("pollard_brent....");
     fflush(stdout);
 
 
@@ -61,7 +61,7 @@ int main(void)
             fmpz_mul(prime3, prime3, prime4);
             fmpz_mul(primeprod, prime1, prime3);
 
-            k = fmpz_factor_pollard_rho(fac, state, primeprod, 5, 2500);
+            k = fmpz_factor_pollard_brent(fac, state, primeprod, 5, 2500);
 
             if (k == 0)
                 fails += 1;
