@@ -28,12 +28,12 @@
 #include <math.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "longlong.h"
+#include "fmpz.h"
 #include "qsieve.h"
 
 /* Array of possible Knuth-Schroeppel multipliers */
-static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15, 
-                                      17, 19, 21, 22, 23, 26, 29, 30, 31, 
+static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,
+                                      17, 19, 21, 22, 23, 26, 29, 30, 31,
                                       33, 34, 35, 37, 38, 41, 42, 43, 47};
 
 /* Number of possible Knuth-Schroeppel multipliers */
@@ -48,35 +48,35 @@ mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf)
 {
     float weights[KS_MULTIPLIERS]; /* array of Knuth-Schroeppel weights */
     float best_weight = -10.0f; /* best weight so far */
-    
+
     ulong i;
-    ulong num_primes, max; 
+    ulong num_primes, max;
     float logpdivp;
     mp_limb_t nmod8, mod8, p, nmod, pinv, mult;
     int kron, jac;
 
-    if ((qs_inf->lo & 1) == 0) /* check 2 is not a factor */
-        return 2; 
+    if (fmpz_val2(qs_inf->n) == 0) /* check 2 is not a factor */
+        return 2;
 
     /* initialise weights for each multiplier k depending on kn mod 8 */
-    nmod8 = qs_inf->lo % 8; /* n modulo 8 */
-    
+    nmod8 = fmpz_fdiv_ui(qs_inf->n, 8); /* n modulo 8 */
+
     for (i = 0; i < KS_MULTIPLIERS; i++)
     {
        mod8 = ((nmod8*multipliers[i]) % 8); /* kn modulo 8 */
        weights[i] = 0.34657359; /* ln2/2 */
-       if (mod8 == 1) weights[i] *= 4.0;   
-       if (mod8 == 5) weights[i] *= 2.0;   
+       if (mod8 == 1) weights[i] *= 4.0;
+       if (mod8 == 5) weights[i] *= 2.0;
        weights[i] -= (log((float) multipliers[i]) / 2.0);
     }
-    
-    /* 
-        maximum number of primes to try 
+
+    /*
+        maximum number of primes to try
         may not exceed number of factor base primes (recall k and 2 are factor base primes)
     */
     max = FLINT_MIN(qs_inf->ks_primes, qs_inf->num_primes - 2);
 
-#if QS_DEBUG 
+#if QS_DEBUG
     flint_printf("Checking %wd Knuth-Schroeppel primes\n", max);
 #endif
 
@@ -87,22 +87,22 @@ mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf)
 
         logpdivp = log((float) p) / (float) p; /* log p / p */
 
-        nmod = n_ll_mod_preinv(qs_inf->hi, qs_inf->lo, p, pinv); 
+        nmod = fmpz_fdiv_ui(qs_inf->n, p);
         if (nmod == 0) return p; /* we found a small factor */
 
         kron = 1; /* n mod p is even, not handled by n_jacobi */
-        while ((nmod % 2) == 0) 
+        while ((nmod % 2) == 0)
         {
             if ((p % 8) == 3 || (p % 8) == 5) kron *= -1;
             nmod /= 2;
         }
-        
-        kron *= n_jacobi(nmod, p); 
+
+        kron *= n_jacobi(nmod, p);
         for (i = 0; i < KS_MULTIPLIERS; i++)
         {
             mult = multipliers[i];
             if (mult >= p)
-                mult = n_mod2_preinv(mult, p, pinv); /* k mod p */    
+                mult = n_mod2_preinv(mult, p, pinv); /* k mod p */
 
             if (mult == 0) weights[i] += logpdivp; /* kn == 0 mod p */
             else
@@ -113,26 +113,26 @@ mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf)
                     if ((p % 8) == 3 || (p % 8) == 5) jac *= -1;
                     mult /= 2;
                 }
-                
+
                 if (kron*jac*n_jacobi(mult, p) == 1) /* kn is a square mod p */
                    weights[i] += 2.0*logpdivp;
             }
         }
-          
+
         p = n_nextprime(p, 0);
     }
-    
+
     /* search for the multiplier with the best weight and set qs_inf->k */
     for (i = 0; i < KS_MULTIPLIERS; i++)
     {
         if (weights[i] > best_weight)
-        { 
+        {
             best_weight = weights[i];
             qs_inf->k = multipliers[i];
         }
-    } 
+    }
 
-#if QS_DEBUG 
+#if QS_DEBUG
     flint_printf("Using multiplier %wd\n", qs_inf->k);
 #endif
 
