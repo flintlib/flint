@@ -38,9 +38,18 @@ typedef struct
 {
     fmpz_poly_t poly;
     ulong power;
-} unnnnn;
+} _unity_root;
 
-typedef unnnnn unity_root[1];
+typedef _unity_root unity_root[1];
+
+typedef enum
+{
+    UNKNOWN,
+    COMPOSITE,
+    PRIME,
+    FAIL_LUCAS,
+    FAIL_ADDITIONAL
+} return_status_aprcl;
 
 void unity_init(unity_root element, ulong n);
 void unity_clear(unity_root element);
@@ -60,6 +69,9 @@ void jacobi_pq_general(unity_root result, const mp_ptr table, ulong p, ulong q, 
 void jacobi_pq_not2(unity_root result, ulong q, ulong p);
 void jacobi_2q_one(unity_root result, ulong q);
 void jacobi_2q_two(unity_root result, ulong q);
+
+int is_prime_aprcl(const fmpz_t n);
+return_status_aprcl _is_prime_aprcl(const fmpz_t n);
 
 #endif
 
