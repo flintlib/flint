@@ -36,7 +36,7 @@ fmpz_set_mpf(fmpz_t f, const mpf_t x)
     {
         if (mpf_fits_slong_p(x))
         {
-            slong cx = mpf_get_si(x);
+            slong cx = flint_mpf_get_si(x);
             fmpz_set_si(f, cx);
         }
         else
