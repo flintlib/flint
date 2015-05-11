@@ -31,19 +31,40 @@
 
 int main(void)
 {
+    int i, j;
     FLINT_TEST_INIT(state);
    
     flint_printf("f_table....");
     fflush(stdout);
 
-    int i;
-    mp_ptr table = f_table(7);
-    flint_printf("\n");
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 100; i++)
     {
-        flint_printf("%wu ", table[i]);
+        ulong len, q, p, g;
+        mp_ptr table;
+
+        len = n_randint(state, 16);
+        while (len < 2)
+            len = n_randint(state, 16);
+
+        q = n_randprime(state, len, 1);
+        g = n_primitive_root_prime(q);
+        p = q - 2;
+        table = f_table(q);
+
+        for (j = 1; j <= p; j++)
+        {
+            ulong g_powx, g_powfx;
+            g_powx = n_powmod(g, j, q);
+            g_powfx = n_powmod(g, table[j - 1], q);
+            
+            if (n_submod(1, g_powx, q) != g_powfx)
+            {
+                flint_printf("FAIL:\n");
+                flint_printf("1 - %wu != %wu mod %wu\n", g_powx, g_powfx, q);
+                abort();
+            }
+        }
     }
-    flint_printf("\n");
 
     FLINT_TEST_CLEANUP(state);
     
