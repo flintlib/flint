@@ -48,12 +48,12 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, const fmpz_t n, const fmpz_t a
 
     fmpz_init(x);       /* Initial values, set as random */
     fmpz_init(y);       
+    fmpz_init(a);       
     fmpz_init(ys);      /* Used for backtracking */
     fmpz_init(q);       /* stores product of gcd values */
     fmpz_init(subval);
     fmpz_init(gcdval);
         
-    fmpz_set(x, xi);
     fmpz_set(y, xi);
     fmpz_set(a, ai);
     fmpz_set_ui(q, 1);
@@ -61,7 +61,6 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, const fmpz_t n, const fmpz_t a
 
     m = 100;
     iter = 1;
-    i = 0;
 
     do {
         fmpz_set(x, y);
@@ -83,6 +82,11 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, const fmpz_t n, const fmpz_t a
                 fmpz_sub(subval, x, y);
                 fmpz_mul(q, q, subval);
                 fmpz_mod(q, q, n);
+            }
+            if (!fmpz_cmp_ui(q, 0))
+            {
+                ret = 0;
+                goto cleanup;
             }
             fmpz_gcd(gcdval, q, n);
             k += m;
@@ -111,6 +115,8 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, const fmpz_t n, const fmpz_t a
     
     fmpz_set(p_factor, gcdval);
 
+    cleanup:
+
     fmpz_clear(x);
     fmpz_clear(y);
     fmpz_clear(ys);
@@ -137,14 +143,14 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, const fmpz_t n,
     ret = 0;
 
     fmpz_sub_ui(maxa, n, 3);
-    fmpz_add_ui(a, a, 1);
     fmpz_sub_ui(maxx, n, 1);
-    fmpz_add_ui(x, x, 1);
 
     while (max_tries--)
     {
         fmpz_randm(a, state, maxa);  
+        fmpz_add_ui(a, a, 1);
         fmpz_randm(x, state, maxx);
+        fmpz_add_ui(x, x, 1);
 
         ret = fmpz_factor_pollard_brent_single(p_factor, n, a, x, max_iters);
 
