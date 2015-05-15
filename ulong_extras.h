@@ -155,7 +155,7 @@ FLINT_DLL mp_limb_t n_flog(mp_limb_t n, mp_limb_t b);
 
 FLINT_DLL mp_limb_t n_clog(mp_limb_t n, mp_limb_t b);
 
-static __inline__ 
+static __inline__
 double n_precompute_inverse(mp_limb_t n)
 {
    return (double) 1 / (double) n;
@@ -176,29 +176,29 @@ FLINT_DLL mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv);
 
 FLINT_DLL mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv);
 
-FLINT_DLL mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, 
+FLINT_DLL mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a,
                                            mp_limb_t n, double npre);
 
 FLINT_DLL mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv);
 
-FLINT_DLL mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
+FLINT_DLL mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo,
                                         mp_limb_t n, mp_limb_t ninv);
 
-FLINT_DLL mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, 
+FLINT_DLL mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi,
                         mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv);
 
-FLINT_DLL mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, 
+FLINT_DLL mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b,
                                            mp_limb_t n, double ninv);
 
-FLINT_DLL mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
+FLINT_DLL mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b,
                                         mp_limb_t n, mp_limb_t ninv);
 
-FLINT_DLL mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, 
+FLINT_DLL mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b,
                             mp_limb_t n, mp_limb_t ninv, ulong norm);
 
 FLINT_DLL mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre);
 
-FLINT_DLL mp_limb_t n_powmod_precomp(mp_limb_t a, 
+FLINT_DLL mp_limb_t n_powmod_precomp(mp_limb_t a,
                      mp_limb_signed_t exp, mp_limb_t n, double npre);
 
 static __inline__
@@ -209,13 +209,13 @@ mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
    return n_powmod_precomp(a, exp, n, npre);
 }
 
-FLINT_DLL mp_limb_t n_powmod2_preinv(mp_limb_t a, 
+FLINT_DLL mp_limb_t n_powmod2_preinv(mp_limb_t a,
                   mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv);
 
 FLINT_DLL mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp,
                                             mp_limb_t n, mp_limb_t ninv);
 
-FLINT_DLL mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
+FLINT_DLL mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n,
                                              mp_limb_t ninv, ulong norm);
 
 static __inline__
@@ -246,9 +246,9 @@ mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 
 FLINT_DLL mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p);
 
-FLINT_DLL slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp); 
+FLINT_DLL slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp);
 
-FLINT_DLL slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
+FLINT_DLL slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a,
                                               mp_limb_t p, slong exp);
 
 FLINT_DLL slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
@@ -289,6 +289,8 @@ FLINT_DLL mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n);
 
 FLINT_DLL int n_is_perfect_power235(mp_limb_t n);
 
+FLINT_DLL int n_is_perfect_power(mp_limb_t * r, mp_limb_t x);
+
 FLINT_DLL int n_is_oddprime_small(mp_limb_t n);
 
 FLINT_DLL int n_is_oddprime_binary(mp_limb_t n);
@@ -301,10 +303,10 @@ FLINT_DLL int n_is_probabprime_lucas(mp_limb_t n);
 
 FLINT_DLL int n_is_probabprime_BPSW(mp_limb_t n);
 
-FLINT_DLL int n_is_strong_probabprime_precomp(mp_limb_t n, 
+FLINT_DLL int n_is_strong_probabprime_precomp(mp_limb_t n,
                               double npre, mp_limb_t a, mp_limb_t d);
 
-FLINT_DLL int n_is_strong_probabprime2_preinv(mp_limb_t n, 
+FLINT_DLL int n_is_strong_probabprime2_preinv(mp_limb_t n,
                            mp_limb_t ninv, mp_limb_t a, mp_limb_t d);
 
 FLINT_DLL int n_is_probabprime(mp_limb_t n);
@@ -335,16 +337,16 @@ void n_factor_init(n_factor_t * factors)
 
 FLINT_DLL void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp);
 
-FLINT_DLL mp_limb_t n_factor_trial_range(n_factor_t * factors, 
+FLINT_DLL mp_limb_t n_factor_trial_range(n_factor_t * factors,
                          mp_limb_t n, ulong start, ulong num_primes);
 
-FLINT_DLL mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, 
+FLINT_DLL mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n,
                 mp_limb_t * prod, ulong num_primes, mp_limb_t limit);
 
-FLINT_DLL mp_limb_t n_factor_trial(n_factor_t * factors, 
+FLINT_DLL mp_limb_t n_factor_trial(n_factor_t * factors,
                                   mp_limb_t n, ulong num_primes);
 
-FLINT_DLL mp_limb_t n_factor_partial(n_factor_t * factors, 
+FLINT_DLL mp_limb_t n_factor_partial(n_factor_t * factors,
                            mp_limb_t n, mp_limb_t limit, int proved);
 
 FLINT_DLL mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n);
