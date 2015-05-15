@@ -187,17 +187,16 @@ flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
                         mp_limb_t max_tries, mp_limb_t max_iters)
 {
     fmpz_t fa, fx, maxa, maxx;
-    mp_ptr a, x, n, ninv, temp;
+    mp_ptr a, x, n, ninv, temp, tempa, tempx;
     mp_limb_t n_size, normbits;
     int ret;
-    clock_t start, end;
 
     n_size = fmpz_size(n_in);
 
-    fmpz_init2(fa, n_size);
-    fmpz_init2(fx, n_size);
-    fmpz_init2(maxa, n_size);
-    fmpz_init2(maxx, n_size);
+    fmpz_init(fa);
+    fmpz_init(fx);
+    fmpz_init(maxa);
+    fmpz_init(maxx);
     fmpz_init(p_factor);
 
     ret = 0;
@@ -251,10 +250,29 @@ flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
         {
             if (normbits)
             {
-                temp = COEFF_TO_PTR(*fx)->_mp_d;
-                mpn_lshift(x, temp, n_size, normbits);
-                temp = COEFF_TO_PTR(*fx)->_mp_d;
-                mpn_lshift(a, temp, n_size, normbits);
+                if (fmpz_size(fx) == 1)
+                {
+                    x[0] = fmpz_get_ui(fx);
+                    x[1] = UWORD(0);
+                    mpn_lshift(x, x, n_size, normbits);
+                }
+                else
+                {
+                    tempx = COEFF_TO_PTR(*fx)->_mp_d;
+                    mpn_lshift(x, tempx, n_size, normbits);
+                }
+
+                if (fmpz_size(fa) == 1)
+                {
+                    a[0] = fmpz_get_ui(fa);
+                    a[1] = UWORD(0);
+                    mpn_lshift(a, a, n_size, normbits);
+                }
+                else
+                {
+                    tempa = COEFF_TO_PTR(*fa)->_mp_d;
+                    mpn_lshift(a, tempa, n_size, normbits);
+                }
             }
             else
             {
