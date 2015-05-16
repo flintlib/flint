@@ -499,6 +499,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+static __inline__
 void flint_mpf_set_si (mpf_ptr dest, slong val)
 {
   mp_size_t size;
@@ -537,6 +538,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+static __inline__
 slong flint_mpf_get_si (mpf_srcptr f)
 {
   mp_exp_t exp;
