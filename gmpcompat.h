@@ -544,9 +544,9 @@ slong flint_mpf_get_si (mpf_srcptr f)
   mp_srcptr fp;
   mp_limb_t fl;
 
-  exp = EXP (f);
-  size = SIZ (f);
-  fp = PTR (f);
+  exp = f->_mp_exp;
+  size = f->_mp_size;
+  fp = f->_mp_d;
 
   /* fraction alone truncates to zero
      this also covers zero, since we have exp==0 for zero */
@@ -556,7 +556,7 @@ slong flint_mpf_get_si (mpf_srcptr f)
   /* there are some limbs above the radix point */
 
   fl = 0;
-  abs_size = ABS (size);
+  abs_size = FLINT_ABS(size);
   if (abs_size >= exp)
     fl = fp[abs_size-exp];
 
