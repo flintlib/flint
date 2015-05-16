@@ -29,6 +29,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -41,6 +42,16 @@ typedef struct
 } _unity_root;
 
 typedef _unity_root unity_root[1];
+
+typedef struct
+{
+    fmpz_mod_poly_t poly;
+    ulong power;
+    ulong p;
+    ulong exp;
+} _unity_root_mod;
+
+typedef _unity_root_mod unity_root_mod[1];
 
 typedef enum
 {
@@ -61,6 +72,7 @@ void unity_roots_add(unity_root res, const unity_root element1, const unity_root
 void unity_roots_mul(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_reduce_cyclotomic(unity_root res, ulong p);
+void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b);
 
 mp_ptr f_table(const ulong q);
 
