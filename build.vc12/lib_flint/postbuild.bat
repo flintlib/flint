@@ -17,9 +17,6 @@ for %%i in ("..\..\*.h") do (call :copy_rename %%i %2 %%~nxi > nul 2>&1)
 rem copy C++ headers in flintxx
 rem for %%i in ("..\..\flintxx\*.h") do (call :copy_rename %%i %2 %%~nxi > nul 2>&1)
 
-rem copy conway polynomial text file
-call :copy_rename ..\..\qadic\CPimport.txt %2 > nul 2>&1
-
 rem copy the FLINT static library and related files
 if /i %3 EQU LIB (
     if exist ..\%1\lib_flint.lib (

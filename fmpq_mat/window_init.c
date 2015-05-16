@@ -19,41 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
- 
+    Copyright (C) 2015 Elena Sergeicheva
+
 ******************************************************************************/
 
-#include "padic.h"
+#include "fmpq_mat.h"
 
-int padic_div_exact(padic_t rop, const padic_t op1, const padic_t op2)
+void
+fmpq_mat_window_init(fmpq_mat_t window, const fmpq_mat_t mat, slong r1,
+                     slong c1, slong r2, slong c2)
 {
-    int res = 1;
+    slong i;
+    window->entries = NULL;
 
-    if (padic_is_zero(op2))
-    {
-        flint_printf("Exception (padic_div_exact).  op2 is zero.\n");
-        abort();
-    }
+    if (r2 - r1)
+        window->rows = flint_malloc((r2 - r1) * sizeof(fmpq *));
 
-    if (padic_is_zero(op1))
-    {
-        padic_zero(rop);
-    }
-    else
-    {
-        fmpz_t r;
-   
-        fmpz_init(r);
-       
-        fmpz_tdiv_qr(padic_unit(rop), r, padic_unit(op1), padic_unit(op2));
+    for (i = 0; i < r2 - r1; i++)
+        window->rows[i] = mat->rows[r1 + i] + c1;
 
-        res = fmpz_is_zero(r);
-
-        fmpz_clear(r);
-
-        padic_val(rop) = padic_val(op1) - padic_val(op2);
-    }
-
-    return res;
+    window->r = r2 - r1;
+    window->c = c2 - c1;
 }
-

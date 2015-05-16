@@ -85,7 +85,7 @@ int
 _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)
 {
-	ulong bits1, bits2, max_bits, pack_bits, bound_bits, bits_G, bits_Q;
+   long bits1, bits2, max_bits, pack_bits, bound_bits, bits_G, bits_Q;
    ulong limbs1, limbs2, limbsg, pack_limbs, qlimbs;
    ulong log_glen, log_length;
    slong sign1, sign2, glen, qlen;
@@ -154,9 +154,17 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       http://arxiv.org/abs/cs/0206032v1
    */
    bits1 = FLINT_ABS(_fmpz_vec_max_bits(A, len1));
-	bits2 = FLINT_ABS(_fmpz_vec_max_bits(B, len2));
-	max_bits = FLINT_MAX(bits1, bits2);
+   bits2 = FLINT_ABS(_fmpz_vec_max_bits(B, len2));
+   /* 
+      always extra bit for signs whether polys are signed or not, since we don't
+      know if any purported gcds/quotients will be signed
+   */
+   max_bits = FLINT_MAX(bits1, bits2) + 1; 
    			
+	/* 
+	   the +6 is chosen heuristically for performance; the theorem
+	   is satisfied with +3 (including a bit for signs)
+	*/
 	bound_bits = FLINT_MIN(bits1, bits2) + 6; 
 	pack_bits = FLINT_MAX(bound_bits, max_bits); /* need to pack original polys */
    pack_limbs = (pack_bits - 1)/FLINT_BITS + 1;
@@ -224,24 +232,26 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       t = _fmpz_vec_init(len1 + glen);
       _fmpz_poly_bit_unpack(Q, qlen, q, pack_bits, 0);
       while (Q[qlen - 1] == 0) qlen--;
-      
+            
       /* divide by content */
       _fmpz_vec_scalar_divexact_fmpz(G, G, glen, gc);
 		
       /* check if we really need to multiply out to check for exact quotient */
       bits_G = FLINT_ABS(_fmpz_vec_max_bits(G, glen));
-		bits_Q = FLINT_ABS(_fmpz_vec_max_bits(Q, qlen));
-		log_glen = FLINT_BIT_COUNT(glen);
-		log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen));
+	  bits_Q = FLINT_ABS(_fmpz_vec_max_bits(Q, qlen));
+	  log_glen = FLINT_BIT_COUNT(glen);
+	  log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen));
        
-	   divides = (bits_G + bits_Q + log_length < pack_bits);
+	  /* allow one bit for signs */
+	  divides = (bits_G + bits_Q + log_length < pack_bits);
      
       if (!divides) /* need to multiply out to check exact quotient */
          divides = multiplies_out(A, len1, Q, qlen, G, glen, sign1, t);
 
 		if (divides) /* quotient really was exact */
 		{
-         flint_mpn_zero(q, qlimbs);
+           divides = 0;
+           flint_mpn_zero(q, qlimbs);
           
          if (flint_mpn_divides(q, array2, limbs2, arrayg, limbsg, temp)) 
 	      {
@@ -250,13 +260,14 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
             qlen = FLINT_MIN(len2, (qlimbs*FLINT_BITS - 1)/pack_bits + 1);
             _fmpz_poly_bit_unpack(Q, qlen, q, pack_bits, 0);
             while (Q[qlen - 1] == 0) qlen--;
-            
-            /* check if we really need to multiply out to check for exact quotient */
+			
+			/* check if we really need to multiply out to check for exact quotient */
             bits_Q = FLINT_ABS(_fmpz_vec_max_bits(Q, qlen));
-				log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen));
+		    log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen));
 
-				divides = (bits_G + bits_Q + log_length < pack_bits);
-		      
+			/* allow one bit for signs */
+			divides = (bits_G + bits_Q + log_length < pack_bits);
+       
             if (!divides) /* we need to multiply out */
                divides = multiplies_out(B, len2, Q, qlen, G, glen, sign1, t);
 			} 

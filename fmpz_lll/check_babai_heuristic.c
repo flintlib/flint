@@ -205,7 +205,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         if (exponent < CPU_SIZE_1 - 2)
                         {
                             /* X is stored in an slong */
-                            xx = mpf_get_si(tmp);
+                            xx = flint_mpf_get_si(tmp);
                             _fmpz_vec_scalar_submul_si(B->rows[kappa],
                                                        B->rows[j], n, xx);
                             if (U != NULL)
@@ -430,7 +430,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         if (exponent < CPU_SIZE_1 - 2)
                         {
                             /* X is stored in an slong */
-                            xx = mpf_get_si(tmp);
+                            xx = flint_mpf_get_si(tmp);
                             fmpz_set_si(x + j, xx);
                             if (fl->rt == Z_BASIS && B != NULL)
                             {

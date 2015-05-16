@@ -19,40 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2015 Elena Sergeicheva
 
 ******************************************************************************/
 
-#include "padic.h"
 
-int padic_pow_exact_si(padic_t rop, const padic_t op, slong e)
+#ifdef T
+
+#include "templates.h"
+
+void
+TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
+		                            const TEMPLATE(T, mat_t) mat1,
+		                            const TEMPLATE(T, mat_t) mat2,
+		                            const TEMPLATE(T, ctx_t) ctx)
 {
-    if (e == 0)
-    {
-        padic_one(rop);
-    }
-    else if (padic_is_zero(op))
-    {
-        padic_zero(rop);
-    }
-    else
-    {
-        if (e > 0)
-        {
-            fmpz_pow_ui(padic_unit(rop), padic_unit(op), e);
-        }
-        else  /* e < 0 */
-        {
-            if (fmpz_is_one(padic_unit(op)))
-               fmpz_one(padic_unit(rop));
-            else
-               return 0;
-        }
+    slong i, j;
+    slong r1 = mat1->r;
+    slong c1 = mat1->c;
+    slong c2 = mat2->c;
 
-        padic_val(rop) = e * padic_val(op);
-    }
-
-    return 1;
+   for (i = 0; i < r1; i++) {
+       _TEMPLATE(T, vec_set) (res->rows[i], mat1->rows[i], c1, ctx);
+       _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
+   }
 }
 
+
+#endif

@@ -19,39 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Jan Tuitman
-    Copyright (C) 2011, 2012 Sebastian Pancratz
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2015 Elena Sergeicheva
 
 ******************************************************************************/
 
-#include "padic.h"
+#include "fq_mat.h"
 
-int padic_sqrt_exact(padic_t rop, const padic_t op)
-{
-    fmpz_t r;
-    int res = 1;
+#ifdef T
+#undef T
+#endif
 
-    if (padic_is_zero(op))
-    {
-        padic_zero(rop);
-        return 1;
-    }
-    if (padic_val(op) & WORD(1))
-    {
-        return 0;
-    }
-
-    padic_val(rop) = padic_val(op) / 2;
-
-    fmpz_init(r);
-
-    fmpz_sqrtrem(padic_unit(rop), r, padic_unit(op));
-
-    res = fmpz_is_zero(r);
-
-    fmpz_clear(r);
-
-    return res;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_mat_templates/concat_vertical.c"
+#undef CAP_T
+#undef T

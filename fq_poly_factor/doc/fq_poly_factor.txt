@@ -177,11 +177,13 @@ void fq_poly_factor_squarefree(fq_poly_factor_t res, const fq_poly_t f,
 
     Sets \code{res} to a squarefree factorization of \code{f}.
 
-void fq_poly_factor(fq_poly_factor_t res, const fq_poly_t f, const fq_ctx_t ctx)
+void fq_poly_factor(fq_poly_factor_t res, fq_t lead,
+                                        const fq_poly_t f, const fq_ctx_t ctx)
 
     Factorises a non-constant polynomial \code{f} into monic
     irreducible factors choosing the best algorithm for given modulo
-    and degree.  Choise is based on heuristic measurments.
+    and degree.  The output \code{lead} is set to the leading coefficient of $f$
+    upon return. Choice of algorithm is based on heuristic measurments.
 
 void fq_poly_factor_cantor_zassenhaus(fq_poly_factor_t res, const fq_poly_t f,
                                       const fq_ctx_t ctx)

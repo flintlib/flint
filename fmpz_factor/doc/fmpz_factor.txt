@@ -103,4 +103,3 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
     of finding a factor which has been missed (if $p+1$ or $p-1$ is not
     smooth for any prime factors $p$ of $n$ then the function will
     not ever succeed).
-

@@ -111,7 +111,8 @@ TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
 
 FLINT_DLL void TEMPLATE(T, mat_zero)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
-/* Windows */
+/* Windows and concatenation */
+
 FLINT_DLL void TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
                              const TEMPLATE(T, mat_t) mat,
                              slong r1, slong c1, slong r2, slong c2,
@@ -119,6 +120,15 @@ FLINT_DLL void TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
 
 FLINT_DLL void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window,
                               const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_concat_horizontal)(TEMPLATE(T, mat_t) res,
+                           const TEMPLATE(T, mat_t) mat1,  const TEMPLATE(T, mat_t) mat2,
+                           const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_DLL void TEMPLATE(T, mat_concat_vertical)(TEMPLATE(T, mat_t) res,
+                           const TEMPLATE(T, mat_t) mat1,  const TEMPLATE(T, mat_t) mat2,
+                           const TEMPLATE(T, ctx_t) ctx);
+
 
 /* Input and output  *********************************************************/
 

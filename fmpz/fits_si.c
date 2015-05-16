@@ -23,7 +23,7 @@ MA 02110-1301, USA. */
 #include "flint.h"
 #include "fmpz.h"
 
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(__mips64)
 
 #define FLINT_UI_MAX          ((mp_limb_t)(~(mp_limb_t)0))
 #define FLINT_UI_HIBIT        (FLINT_UI_MAX ^ (FLINT_UI_MAX >> 1))
@@ -82,7 +82,7 @@ int fmpz_fits_si(const fmpz_t f)
     }
     else
     {
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(__mips64)
        return flint_mpz_fits_si_p(COEFF_TO_PTR(*f));
 #else
        return mpz_fits_slong_p(COEFF_TO_PTR(*f));

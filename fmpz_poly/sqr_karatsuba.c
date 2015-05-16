@@ -84,7 +84,7 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, slong len)
         loglen++;
     length = (WORD(1) << loglen);
 
-    rev  = flint_calloc(3 * length, sizeof(fmpz *));
+    rev  = flint_calloc(3 * length, sizeof(fmpz));
     out  = rev + length;
     temp = _fmpz_vec_init(2 * length);
 

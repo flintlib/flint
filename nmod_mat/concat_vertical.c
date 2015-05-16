@@ -19,24 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
-    Copyright (C) 2014 William Hart
- 
+    Copyright (C) 2015 Elena Sergeicheva
+
 ******************************************************************************/
 
-#include "padic.h"
 
-void padic_mul_exact(padic_t rop, const padic_t op1, const padic_t op2, 
-               const padic_ctx_t ctx)
+#include "nmod_mat.h"
+
+void
+nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 {
-    if (padic_is_zero(op1) || padic_is_zero(op2))
-    {
-        padic_zero(rop);
-    }
-    else
-    {
-        fmpz_mul(padic_unit(rop), padic_unit(op1), padic_unit(op2));
-        padic_val(rop) = padic_val(op1) + padic_val(op2);
-    }
-}
+    slong i;
+    slong r1 = mat1->r;
+    slong c1 = mat1->c;
+    slong r2 = mat2->r;
 
+    for (i = 0; i < r1; i++)
+    	flint_mpn_copyi(res->rows[i], mat1->rows[i], c1);
+
+    for (i = 0; i < r2; i++)
+    	flint_mpn_copyi(res->rows[i + r1], mat2->rows[i], c1);
+
+}

@@ -55,7 +55,7 @@ main(void)
         {
             for (k = 0; k < cols; k++)
             {
-                mpf_set_si(mpf_mat_entry(A, j, k), 3 * j + 7 * k);
+                flint_mpf_set_si(mpf_mat_entry(A, j, k), 3 * j + 7 * k);
             }
         }
 

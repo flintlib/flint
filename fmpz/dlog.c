@@ -39,13 +39,14 @@ fmpz_dlog(const fmpz_t x)
     else
     {
         double s;
-        slong e;
 
 #if defined(__MPIR_VERSION)
-        s = mpz_get_d_2exp(&e, COEFF_TO_PTR(*x));
+        slong e;
 #else
-        s = mpz_get_d_2exp((long *) &e, COEFF_TO_PTR(*x));
+        long e;
 #endif        
+
+        s = mpz_get_d_2exp(&e, COEFF_TO_PTR(*x));
        
         return log(s) + e * 0.69314718055994530942;
     }
