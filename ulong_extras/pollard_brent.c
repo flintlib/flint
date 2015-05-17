@@ -25,14 +25,8 @@
 
 
 #include <gmp.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "mpn_extras.h"
-#include <time.h>
-
-#define printf flint_printf
+#include "ulong_extras.h"
 
 mp_limb_t
 sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
