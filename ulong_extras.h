@@ -359,6 +359,15 @@ FLINT_DLL void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
 
 FLINT_DLL mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c);
 
+FLINT_DLL int n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, 
+                                            mp_limb_t ninv, mp_limb_t ai, 
+                                            mp_limb_t xi, mp_limb_t normbits,
+                                            mp_limb_t max_iters);
+
+FLINT_DLL int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, 
+                                     mp_limb_t n_in, mp_limb_t max_tries, 
+                                     mp_limb_t max_iters);
+
 FLINT_DLL int n_is_squarefree(mp_limb_t n);
 
 FLINT_DLL int n_moebius_mu(mp_limb_t n);

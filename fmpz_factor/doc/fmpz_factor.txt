@@ -126,8 +126,8 @@ int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, const fmpz_t n,
                               mp_limb_t max_tries, mp_limb_t max_iters)
 
     Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to 
-    \code{fmpz_factor_pollard_rho}. The input parameters ai and xi for
-    \code{fmpz_factor_pollard_rho} are selected at random. 
+    \code{fmpz_factor_pollard_brent_single}. The input parameters ai and xi for
+    \code{fmpz_factor_pollard_brent_single} are selected at random. 
 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). This process is repeated a 

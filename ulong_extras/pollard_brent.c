@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 
 mp_limb_t
-sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
+n_sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
               mp_limb_t normbits)
 {
     mp_limb_t hi, lo;
@@ -51,9 +51,9 @@ sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
 }
 
 int
-flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t ninv, 
-                                      mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits,
-                                      mp_limb_t max_iters)
+n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, 
+                              mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits,
+                              mp_limb_t max_iters)
 {
     mp_limb_t iter, i, k, j, minval, m, one_shift_norm, x, y, a, q, ys, subval;
     int ret;
@@ -61,7 +61,7 @@ flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t 
     /* one shifted by normbits, used for comparisions */
     one_shift_norm = UWORD(1) << normbits;
     q = one_shift_norm;
-    (*gcdval) = one_shift_norm;
+    (*factor) = one_shift_norm;
 
     y = xi;
     a = ai;
@@ -73,7 +73,7 @@ flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t 
         k = 0;
 
         for (i = 0; i < iter; i++)
-            y = sqr_and_add_a(y, a, n, ninv, normbits);
+            y = n_sqr_and_add_a(y, a, n, ninv, normbits);
 
         do {
             minval = iter - k;
@@ -84,7 +84,7 @@ flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t 
 
             for (i = 0; i < minval; i++)
             {
-                y = sqr_and_add_a(y, a, n, ninv, normbits);
+                y = n_sqr_and_add_a(y, a, n, ninv, normbits);
                 if (x > y)
                     subval = x - y;
                 else
@@ -96,9 +96,9 @@ flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t 
             if (q == 0)
                 return 0;
 
-            (*gcdval) = n_gcd(q, n);
+            (*factor) = n_gcd(q, n);
             k += m;
-            j = ((*gcdval) == one_shift_norm);
+            j = ((*factor) == one_shift_norm);
         } while ((k < iter) && (j));
 
         if (iter > max_iters)
@@ -107,10 +107,10 @@ flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t 
         iter *= 2;
     }  while (j);
 
-    if ((*gcdval) == n)
+    if ((*factor) == n)
     {
         do {
-            ys = sqr_and_add_a(ys, a, n, ninv, normbits);
+            ys = n_sqr_and_add_a(ys, a, n, ninv, normbits);
             if (x > ys)
                 subval = x - ys;
             else
@@ -119,28 +119,28 @@ flint_mpn_factor_pollard_brent_single(mp_limb_t *gcdval, mp_limb_t n, mp_limb_t 
             if (subval == 0)
                 return 0;
 
-            (*gcdval) = n_gcd(subval, n);
-        } while ((*gcdval) == one_shift_norm);   /* gcd == 1 */
+            (*factor) = n_gcd(subval, n);
+        } while ((*factor) == one_shift_norm);   /* gcd == 1 */
     }
 
     ret = 1;
 
-    if ((*gcdval) == one_shift_norm) /* gcd == 1 */
+    if ((*factor) == one_shift_norm) /* gcd == 1 */
         ret = 0;
-    else if ((*gcdval) == n) /* gcd == n*/
+    else if ((*factor) == n) /* gcd == n*/
         ret = 0;
 
     if (ret)
     {
         if (normbits)
-            (*gcdval) >>= normbits;
+            (*factor) >>= normbits;
     }
 
     return ret;
 }
 
 int
-flint_mpn_factor_pollard_brent(mp_limb_t *p_factor, flint_rand_t state, mp_limb_t n_in, 
+n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, 
                         mp_limb_t max_tries, mp_limb_t max_iters)
 {
     mp_limb_t normbits, a, x, n, ninv, max;
@@ -166,7 +166,7 @@ flint_mpn_factor_pollard_brent(mp_limb_t *p_factor, flint_rand_t state, mp_limb_
         a <<= normbits;
         x <<= normbits;
 
-        ret = flint_mpn_factor_pollard_brent_single(p_factor, n, ninv, a, x, normbits, max_iters);
+        ret = n_factor_pollard_brent_single(factor, n, ninv, a, x, normbits, max_iters);
         if (ret == 1)
             return 1; 
     }
