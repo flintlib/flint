@@ -50,8 +50,7 @@ int
 flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a, 
                                  mp_ptr y, mp_limb_t n_size, mp_limb_t normbits, 
                                  mp_limb_t max_iters)
-{
-        
+{       
     mp_ptr x, q, ys, subval;
     mp_limb_t iter, i, k, j, minval, m, one_shift_norm, gcdlimbs;
     int ret;
@@ -68,7 +67,6 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
     q[0] = one_shift_norm;
     mpn_zero(gcdval, n_size);
     gcdval[0] = one_shift_norm;
-
 
     m = 100;
     iter = 1;
@@ -111,7 +109,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
             break;
 
         iter *= 2;
-    }  while (j);
+    } while (j);
 
     if ((gcdlimbs == n_size) && !mpn_cmp(gcdval, n, n_size))
     {
@@ -148,6 +146,10 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
             else
                 mpn_rshift(gcdval, gcdval, gcdlimbs, normbits);
         }
+
+        i = n_size - 1;
+        for (i; i >= gcdlimbs; i--)
+            gcdval[i] = UWORD(0);    
     }
 
     cleanup:
@@ -156,9 +158,6 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
     flint_free(q);
     flint_free(ys);
     flint_free(subval);
-
-    for (i = n_size-1; i >= gcdlimbs; i-- )
-        gcdval[i] = UWORD(0);
 
     return ret;
 }
@@ -260,7 +259,6 @@ flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
                 temp = COEFF_TO_PTR(*fa)->_mp_d;
                 mpn_copyi(a, temp, n_size);
             }
-
         }
 
         ret = flint_mpn_factor_pollard_brent_single(fac->_mp_d, n, ninv, a, x, n_size, normbits, max_iters);

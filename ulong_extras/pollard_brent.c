@@ -46,8 +46,7 @@ n_sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
     else
         sub_ddmmss(hi, y, hi, lo, 0, n);
 
-    hi = y;
-    return hi;
+    return y;
 }
 
 int
@@ -89,7 +88,6 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
                     subval = x - y;
                 else
                     subval = y - x;
-
                 q = n_mulmod_preinv(q, subval, n, ninv, normbits);
             }
 
@@ -103,7 +101,6 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
 
         if (iter > max_iters)
             break;
-
         iter *= 2;
     }  while (j);
 
@@ -118,7 +115,6 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
 
             if (subval == 0)
                 return 0;
-
             (*factor) = n_gcd(subval, n);
         } while ((*factor) == one_shift_norm);   /* gcd == 1 */
     }
@@ -147,7 +143,6 @@ n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
     int ret;
 
     ret = 0;
-
     max = n_in -3;    /* 1 <= a <= n - 3 */
 
     count_leading_zeros(normbits, n_in);
