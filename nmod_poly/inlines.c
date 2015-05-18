@@ -35,23 +35,6 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-/* copy of nmod_poly_get_coeff_ui inline function */
-
-slong _nmod_poly_length(const nmod_poly_t poly)
-{
-    return poly->length;
-}
-
-slong _nmod_poly_degree(const nmod_poly_t poly)
-{
-    return poly->length - 1;
-}
-
-ulong _nmod_poly_get_coeff_ui(const nmod_poly_t poly, slong j)
-{
-    return (j >= poly->length) ? 0 : poly->coeffs[j];
-}
-
 void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 {
    
@@ -105,3 +88,4 @@ void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 
    }
 }
+
