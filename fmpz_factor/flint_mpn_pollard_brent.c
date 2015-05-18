@@ -31,52 +31,33 @@
 void
 mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr ninv, mp_limb_t normbits)
 {
-    mp_ptr temp, tempn;
-    mp_limb_t new_size, cy;
+    mp_limb_t cy;
 
-    new_size = n_size + 1;
+    flint_mpn_mulmod_preinvn(y, y, y, n_size, n, ninv, normbits);   /* y^2 mod n */
+    cy = mpn_add_n(y, y, a, n_size);
 
-    temp = flint_malloc((new_size) * sizeof(mp_limb_t));
-    tempn = flint_malloc((new_size) * sizeof(mp_limb_t));
-
-    mpn_copyi(tempn, n, n_size);
-    tempn[n_size] = UWORD(0);
-
-    flint_mpn_mulmod_preinvn(y, y, y, n_size, n, ninv, normbits);
-    cy = mpn_add_n(temp, y, a, n_size);
+    /* Since carry cannot be greater than 1, if carry
+       then simply subtract for modulo (a < n, y < n, a + y < 2n).
+       If no carry, then check if y > n before subtracting. */
 
     if (cy)
-    {
-        temp[n_size] = cy;        
-        mpn_sub_n(temp, temp, tempn, new_size);
-        mpn_copyi(y, temp, n_size);
-    }
-    else
-    {
-        if (mpn_cmp(temp, n, n_size) > 0)
-            mpn_sub_n(y, temp, n, n_size);
-        else
-            mpn_copyi(y, temp, n_size);
-    }
-
-    flint_free(temp);
-    flint_free(tempn);
+        mpn_sub_n(y, y, n, n_size);
+    else if (mpn_cmp(y, n, n_size) > 0)
+            mpn_sub_n(y, y, n, n_size);
 }
 
 int
-flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr ai, 
-                                 mp_ptr xi, mp_limb_t n_size, mp_limb_t normbits, 
+flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a, 
+                                 mp_ptr y, mp_limb_t n_size, mp_limb_t normbits, 
                                  mp_limb_t max_iters)
 {
-
-    mp_ptr x, y, a, q, ys, subval;
+        
+    mp_ptr x, q, ys, subval;
     mp_limb_t iter, i, k, j, minval, m, one_shift_norm, gcdlimbs;
     int ret;
 
-    x      = flint_malloc(n_size * sizeof(mp_limb_t));
-    y      = flint_malloc(n_size * sizeof(mp_limb_t));
-    a      = flint_malloc(n_size * sizeof(mp_limb_t));
-    q      = flint_malloc(n_size * sizeof(mp_limb_t));
+    x      = flint_malloc(n_size * sizeof(mp_limb_t));  /* initial value to evaluate f(x) */
+    q      = flint_malloc(n_size * sizeof(mp_limb_t));  /* product of gcd's */
     ys     = flint_malloc(n_size * sizeof(mp_limb_t));
     subval = flint_malloc(n_size * sizeof(mp_limb_t));
 
@@ -84,13 +65,10 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
     one_shift_norm = UWORD(1) << normbits;
 
     mpn_zero(q, n_size);
-    mpn_zero(gcdval, n_size);
-
     q[0] = one_shift_norm;
+    mpn_zero(gcdval, n_size);
     gcdval[0] = one_shift_norm;
 
-    mpn_copyi(y, xi, n_size);
-    mpn_copyi(a, ai, n_size);
 
     m = 100;
     iter = 1;
@@ -123,12 +101,10 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
                 ret = 0;
                 goto cleanup;
             }
+
             gcdlimbs = flint_mpn_gcd_full(gcdval, q, n_size, n, n_size);
-
             k += m;
-
-            j = ((gcdlimbs == 1) && gcdval[0] == one_shift_norm);
-
+            j = ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm));   /* gcd == 1 */
         } while ((k < iter) && j);
 
         if (iter > max_iters)
@@ -137,11 +113,14 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
         iter *= 2;
     }  while (j);
 
-    if (gcdlimbs == n_size && !mpn_cmp(gcdval, n, n_size))
+    if ((gcdlimbs == n_size) && !mpn_cmp(gcdval, n, n_size))
     {
         do {
             mpn_sqr_and_add_a(ys, a, n, n_size, ninv, normbits);
-            mpn_sub_n(subval, x, ys, n_size);
+            if (mpn_cmp(x, ys, n_size) > 0)
+                mpn_sub_n(subval, x, ys, n_size);
+            else
+                mpn_sub_n(subval, ys, x, n_size); 
 
             if (flint_mpn_zero_p(subval, n_size))
             {
@@ -150,13 +129,14 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
             }
 
             gcdlimbs = flint_mpn_gcd_full(gcdval, subval, n_size, n, n_size);
-        } while ((gcdlimbs == 1) && gcdval[0] == one_shift_norm);
+            j = ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm));
+        } while (j);   /* gcd == 1 */
     }
     ret = 1;
 
-    if ((gcdlimbs == 1 && gcdval[0] == one_shift_norm))
+    if ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm)) /* gcd == 1 */
         ret = 0;
-    else if ((gcdlimbs == n_size && !mpn_cmp(gcdval, n, n_size)))
+    else if ((gcdlimbs == n_size && !mpn_cmp(gcdval, n, n_size))) /* gcd == n*/
         ret = 0;
 
     if (ret)
@@ -173,11 +153,12 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
     cleanup:
 
     flint_free(x);
-    flint_free(y);
-    flint_free(a);
     flint_free(q);
     flint_free(ys);
     flint_free(subval);
+
+    for (i = n_size-1; i >= gcdlimbs; i-- )
+        gcdval[i] = UWORD(0);
 
     return ret;
 }
@@ -186,24 +167,20 @@ int
 flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in, 
                         mp_limb_t max_tries, mp_limb_t max_iters)
 {
-    fmpz_t fa, fx, maxa, maxx;
-    mp_ptr a, x, n, ninv, temp, tempa, tempx;
+    fmpz_t fa, fx, maxa;
+    mp_ptr a, x, n, ninv, temp;
     mp_limb_t n_size, normbits;
-    int ret;
+    int ret, i;
 
     n_size = fmpz_size(n_in);
 
-    fmpz_init(fa);
-    fmpz_init(fx);
-    fmpz_init(maxa);
-    fmpz_init(maxx);
-    fmpz_init(p_factor);
+    fmpz_init2(fa, n_size);
+    fmpz_init2(fx, n_size);
+    fmpz_init2(maxa, n_size);
 
     ret = 0;
 
-    fmpz_sub_ui(maxa, n_in, 3);
-    fmpz_sub_ui(maxx, n_in, 1);
-
+    fmpz_sub_ui(maxa, n_in, 3);     /* 1 <= a <= n - 3 */
 
     a = flint_malloc(n_size * sizeof(mp_limb_t));
     x = flint_malloc(n_size * sizeof(mp_limb_t));
@@ -232,12 +209,16 @@ flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     __mpz_struct *fac = _fmpz_promote(p_factor);
     mpz_realloc2(fac, n_size * FLINT_BITS);
     fac->_mp_size = n_size;
+
     while (max_tries--)
     {
         fmpz_randm(fa, state, maxa);  
         fmpz_add_ui(fa, fa, 1);
-        fmpz_randm(fx, state, maxx);
+        fmpz_randm(fx, state, n_in);
         fmpz_add_ui(fx, fx, 1);
+
+        mpn_zero(a, n_size);
+        mpn_zero(x, n_size);
 
         if (n_size == 1)
         {
@@ -250,28 +231,26 @@ flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
         {
             if (normbits)
             {
-                if (fmpz_size(fx) == 1)
+                if ((!COEFF_IS_MPZ(*fx)))
                 {
                     x[0] = fmpz_get_ui(fx);
-                    x[1] = UWORD(0);
                     mpn_lshift(x, x, n_size, normbits);
                 }
                 else
                 {
-                    tempx = COEFF_TO_PTR(*fx)->_mp_d;
-                    mpn_lshift(x, tempx, n_size, normbits);
+                    temp = COEFF_TO_PTR(*fx)->_mp_d;
+                    mpn_lshift(x, temp, n_size, normbits);
                 }
 
-                if (fmpz_size(fa) == 1)
+                if ((!COEFF_IS_MPZ(*fa)))
                 {
                     a[0] = fmpz_get_ui(fa);
-                    a[1] = UWORD(0);
                     mpn_lshift(a, a, n_size, normbits);
                 }
                 else
                 {
-                    tempa = COEFF_TO_PTR(*fa)->_mp_d;
-                    mpn_lshift(a, tempa, n_size, normbits);
+                    temp = COEFF_TO_PTR(*fa)->_mp_d;
+                    mpn_lshift(a, temp, n_size, normbits);
                 }
             }
             else
@@ -281,18 +260,26 @@ flint_mpn_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
                 temp = COEFF_TO_PTR(*fa)->_mp_d;
                 mpn_copyi(a, temp, n_size);
             }
+
         }
 
-        ret = flint_mpn_factor_pollard_brent_single(p_factor, n, ninv, a, x, n_size, normbits, max_iters);
+        ret = flint_mpn_factor_pollard_brent_single(fac->_mp_d, n, ninv, a, x, n_size, normbits, max_iters);
 
         if (ret == 1)
+        {
+            i = n_size - 1;
+            while ((fac->_mp_d[i] == 0) && (i >= 0))   
+                i -= 1;  
+            i += 1;
+            fac->_mp_size = i;
+            _fmpz_demote_val(p_factor);    
             break; 
+        }
     }
 
     fmpz_clear(fa);
     fmpz_clear(fx);
     fmpz_clear(maxa);
-    fmpz_clear(maxx);
 
     flint_free(a);
     flint_free(x);
