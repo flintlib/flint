@@ -2085,7 +2085,7 @@ int nmod_poly_invmod(nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t P)
     ring $(\mathbf{Z}/p\mathbf{Z})[X]$, where we assume that $p$ is a prime
     number.
 
-    If $\deg(P) < 2$, raises an exception.
+    If $\len(P) < 2$, raises an exception.
 
     If the greatest common divisor of $B$ and $P$ is~$1$, returns~$1$ and
     sets $A$ to the inverse of $B$.  Otherwise, returns~$0$ and the value

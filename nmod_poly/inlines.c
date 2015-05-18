@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2015 Tommy Hofmann
     Copyright (C) 2015 William Hart
 
 ******************************************************************************/
@@ -34,3 +35,73 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
+/* copy of nmod_poly_get_coeff_ui inline function */
+
+slong _nmod_poly_length(const nmod_poly_t poly)
+{
+    return poly->length;
+}
+
+slong _nmod_poly_degree(const nmod_poly_t poly)
+{
+    return poly->length - 1;
+}
+
+ulong _nmod_poly_get_coeff_ui(const nmod_poly_t poly, slong j)
+{
+    return (j >= poly->length) ? 0 : poly->coeffs[j];
+}
+
+void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
+{
+   
+    if (poly->length == 0)
+    {
+        if (c == 0)
+            nmod_poly_zero(res);
+        else
+        {
+            nmod_poly_fit_length(res, 1);
+            nmod_poly_set_coeff_ui(res, 0, c);
+            _nmod_poly_set_length(res, 1);
+        }
+    }
+    else
+    {
+        if (c >= poly->mod.n)
+            NMOD_RED(c, c, poly->mod);
+
+        nmod_poly_set(res, poly);
+
+        nmod_poly_set_coeff_ui(res, 0, nmod_add(res->coeffs[0], c, poly->mod));
+
+        _nmod_poly_normalise(res);
+   }
+}
+
+void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
+{
+    if (c >= poly->mod.n)
+        NMOD_RED(c, c, poly->mod);
+
+    if (poly->length == 0)
+    {
+        if (c == 0)
+            nmod_poly_zero(res);
+        else
+        {
+            nmod_poly_fit_length(res, 1);
+            nmod_poly_set_coeff_ui(res, 0, c);
+            _nmod_poly_set_length(res, 1);
+        }
+    }
+    else
+    {
+        nmod_poly_set(res, poly);
+
+        nmod_poly_set_coeff_ui(res, 0, nmod_sub(res->coeffs[0], c, poly->mod));
+
+        _nmod_poly_normalise(res);
+
+   }
+}
