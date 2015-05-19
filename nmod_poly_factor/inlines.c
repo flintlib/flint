@@ -34,7 +34,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i)
+void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i)
 {
     nmod_poly_set(z, fac->p + i);
 }
