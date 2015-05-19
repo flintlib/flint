@@ -26,6 +26,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
 /* Sets x to (x^2 + a) % n */
 
