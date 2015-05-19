@@ -77,7 +77,7 @@ fmpz_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
         k = 0;
 
         for (i = 0; i < iter; i++)
-            mpn_sqr_and_add_a(y, a, n, n_size, ninv, normbits);
+            sqr_and_add_a(y, a, n, n_size, ninv, normbits);
 
         do {
             minval = iter - k;
@@ -88,7 +88,7 @@ fmpz_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
 
             for (i = 0; i < minval; i++)
             {
-                mpn_sqr_and_add_a(y, a, n, n_size, ninv, normbits);
+                sqr_and_add_a(y, a, n, n_size, ninv, normbits);
                 if (mpn_cmp(x, y, n_size) > 0)
                     mpn_sub_n(subval, x, y, n_size);
                 else
@@ -116,7 +116,7 @@ fmpz_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
     if ((gcdlimbs == n_size) && !mpn_cmp(gcdval, n, n_size))
     {
         do {
-            mpn_sqr_and_add_a(ys, a, n, n_size, ninv, normbits);
+            sqr_and_add_a(ys, a, n, n_size, ninv, normbits);
             if (mpn_cmp(x, ys, n_size) > 0)
                 mpn_sub_n(subval, x, ys, n_size);
             else
