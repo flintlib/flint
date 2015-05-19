@@ -20,11 +20,10 @@
 /******************************************************************************
 
     Copyright (C) 2015 Tommy Hofmann
-    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
-#define NMOD_POLY_INLINES_C
+#define NMOD_POLY_FACTOR_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -35,57 +34,8 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
+void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i)
 {
-   
-    if (poly->length == 0)
-    {
-        if (c == 0)
-            nmod_poly_zero(res);
-        else
-        {
-            nmod_poly_fit_length(res, 1);
-            nmod_poly_set_coeff_ui(res, 0, c);
-            _nmod_poly_set_length(res, 1);
-        }
-    }
-    else
-    {
-        if (c >= poly->mod.n)
-            NMOD_RED(c, c, poly->mod);
-
-        nmod_poly_set(res, poly);
-
-        nmod_poly_set_coeff_ui(res, 0, nmod_add(res->coeffs[0], c, poly->mod));
-
-        _nmod_poly_normalise(res);
-   }
-}
-
-void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
-{
-    if (c >= poly->mod.n)
-        NMOD_RED(c, c, poly->mod);
-
-    if (poly->length == 0)
-    {
-        if (c == 0)
-            nmod_poly_zero(res);
-        else
-        {
-            nmod_poly_fit_length(res, 1);
-            nmod_poly_set_coeff_ui(res, 0, c);
-            _nmod_poly_set_length(res, 1);
-        }
-    }
-    else
-    {
-        nmod_poly_set(res, poly);
-
-        nmod_poly_set_coeff_ui(res, 0, nmod_sub(res->coeffs[0], c, poly->mod));
-
-        _nmod_poly_normalise(res);
-
-   }
+    nmod_poly_set(z, fac->p + i);
 }
 
