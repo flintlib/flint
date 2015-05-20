@@ -54,13 +54,16 @@ fmpz_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
                                  mp_limb_t max_iters)
 {       
     mp_ptr x, q, ys, subval;
-    mp_limb_t iter, i, k, j, minval, m, one_shift_norm, gcdlimbs;
-    int ret;
+    mp_limb_t iter, i, k, minval, m, one_shift_norm, gcdlimbs;
+    int ret, j;
 
-    x      = flint_malloc(n_size * sizeof(mp_limb_t));  /* initial value to evaluate f(x) */
-    q      = flint_malloc(n_size * sizeof(mp_limb_t));  /* product of gcd's */
-    ys     = flint_malloc(n_size * sizeof(mp_limb_t));
-    subval = flint_malloc(n_size * sizeof(mp_limb_t));
+    TMP_INIT;
+    TMP_START;
+
+    x      = TMP_ALLOC(n_size * sizeof(mp_limb_t));  /* initial value to evaluate f(x) */
+    q      = TMP_ALLOC(n_size * sizeof(mp_limb_t));  /* product of gcd's */
+    ys     = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    subval = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     /* one shifted by normbits, used for comparisions */
     one_shift_norm = UWORD(1) << normbits;
@@ -132,7 +135,7 @@ fmpz_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
             j = ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm));
         } while (j);   /* gcd == 1 */
     }
-    ret = 1;
+    ret = gcdlimbs;
 
     if ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm)) /* gcd == 1 */
         ret = 0;
@@ -144,17 +147,14 @@ fmpz_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
         if (normbits)
             mpn_rshift(gcdval, gcdval, gcdlimbs, normbits);
 
-        i = n_size - 1;
-        for (i; i >= gcdlimbs; i--)
-            gcdval[i] = UWORD(0);    
+        // i = n_size - 1;
+        // for (i; i >= gcdlimbs; i--)
+        //     gcdval[i] = UWORD(0);    
     }
 
     cleanup:
 
-    flint_free(x);
-    flint_free(q);
-    flint_free(ys);
-    flint_free(subval);
+    TMP_END;
 
     return ret;
 }
@@ -165,8 +165,11 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
 {
     fmpz_t fa, fx, maxa;
     mp_ptr a, x, n, ninv, temp;
-    mp_limb_t n_size, normbits, ans, val;
+    mp_limb_t n_size, normbits, ans, val, size, cy;
+    __mpz_struct *fac, *mpz_ptr;
     int ret, i;
+
+    TMP_INIT;
 
     if (fmpz_is_even(n_in))
     {
@@ -192,10 +195,11 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
 
     fmpz_sub_ui(maxa, n_in, 3);     /* 1 <= a <= n - 3 */
 
-    a = flint_malloc(n_size * sizeof(mp_limb_t));
-    x = flint_malloc(n_size * sizeof(mp_limb_t));
-    n = flint_malloc(n_size * sizeof(mp_limb_t));
-    ninv = flint_malloc(n_size * sizeof(mp_limb_t));
+    TMP_START;
+    a = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    x = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    n = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    ninv = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     /* copying n_in onto n, and normalizing */
 
@@ -208,7 +212,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
 
     flint_mpn_preinvn(ninv, n, n_size);
 
-    __mpz_struct *fac = _fmpz_promote(p_factor);
+    fac = _fmpz_promote(p_factor);
     mpz_realloc2(fac, n_size * FLINT_BITS);
     fac->_mp_size = n_size;
 
@@ -227,22 +231,34 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
             if ((!COEFF_IS_MPZ(*fx)))
             {
                 x[0] = fmpz_get_ui(fx);
-                mpn_lshift(x, x, n_size, normbits);
+                cy = mpn_lshift(x, x, 1, normbits);
+                if (cy)
+                    x[1] = cy;
             }
             else
             {
-                temp = COEFF_TO_PTR(*fx)->_mp_d;
-                mpn_lshift(x, temp, n_size, normbits);
+                mpz_ptr = COEFF_TO_PTR(*fx);
+                temp = mpz_ptr->_mp_d;
+                size = mpz_ptr->_mp_size;
+                cy = mpn_lshift(x, temp, size, normbits);
+                if (cy)
+                    x[size] = cy;
             }
             if ((!COEFF_IS_MPZ(*fa)))
             {
                 a[0] = fmpz_get_ui(fa);
-                mpn_lshift(a, a, n_size, normbits);
+                cy = mpn_lshift(a, a, 1, normbits);
+                if (cy)
+                    a[1] = cy;
             }
             else
             {
-                temp = COEFF_TO_PTR(*fa)->_mp_d;
-                mpn_lshift(a, temp, n_size, normbits);
+                mpz_ptr = COEFF_TO_PTR(*fa);
+                temp = mpz_ptr->_mp_d;
+                size = mpz_ptr->_mp_size;
+                cy = mpn_lshift(a, temp, size, normbits);
+                if (cy)
+                    a[size] = cy;
             }
         }
         else
@@ -255,7 +271,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
 
         ret = fmpz_factor_pollard_brent_single(fac->_mp_d, n, ninv, a, x, n_size, normbits, max_iters);
 
-        if (ret == 1)
+        if (ret)
         {
             i = n_size - 1;
             while ((fac->_mp_d[i] == 0) && (i >= 0))   
@@ -271,10 +287,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_clear(fx);
     fmpz_clear(maxa);
 
-    flint_free(a);
-    flint_free(x);
-    flint_free(n);
-    flint_free(ninv);
-
+    TMP_END;
+    
     return ret;    
 }
