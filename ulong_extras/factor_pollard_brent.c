@@ -92,9 +92,10 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
             }
 
             if (q == 0)
-                return 0;
-
-            (*factor) = n_gcd(q, n);
+                (*factor) = n;
+            else
+                (*factor) = n_gcd(q, n);
+            
             k += m;
             j = ((*factor) == one_shift_norm);
         } while ((k < iter) && (j));
@@ -113,8 +114,11 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
             else
                 subval = ys - x;
 
-            if (subval == 0)
-                return 0;
+            if (q == 0)
+                (*factor) = n;
+            else
+                (*factor) = n_gcd(q, n);
+            
             (*factor) = n_gcd(subval, n);
         } while ((*factor) == one_shift_norm);   /* gcd == 1 */
     }

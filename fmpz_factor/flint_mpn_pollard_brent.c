@@ -52,15 +52,18 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
                                  mp_limb_t max_iters)
 {       
     mp_ptr x, q, ys, subval;
-    mp_limb_t iter, i, k, j, minval, m, one_shift_norm, gcdlimbs;
-    int ret;
+    mp_limb_t iter, i, k, minval, m, one_shift_norm, gcdlimbs;
+    int ret, j;
 
-    x      = flint_malloc(n_size * sizeof(mp_limb_t));  /* initial value to evaluate f(x) */
-    q      = flint_malloc(n_size * sizeof(mp_limb_t));  /* product of gcd's */
-    ys     = flint_malloc(n_size * sizeof(mp_limb_t));
-    subval = flint_malloc(n_size * sizeof(mp_limb_t));
+    TMP_INIT;
+    TMP_START;
 
-    /* one shifted by normbits, used for comparisions */
+    x      = TMP_ALLOC(n_size * sizeof(mp_limb_t));  /* initial value to evaluate f(x) */
+    q      = TMP_ALLOC(n_size * sizeof(mp_limb_t));  /* product of gcd's */
+    ys     = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    subval = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+
+    /* one shifted by normbits, used for comparisons */
     one_shift_norm = UWORD(1) << normbits;
 
     mpn_zero(q, n_size);
@@ -154,10 +157,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_p
 
     cleanup:
 
-    flint_free(x);
-    flint_free(q);
-    flint_free(ys);
-    flint_free(subval);
+    TMP_END;
 
     return ret;
 }
