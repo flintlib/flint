@@ -23,16 +23,21 @@
 
 ******************************************************************************/
 
+/* This is an implementation of the pollard rho algorithm, with a more efficient
+   cycle finding algorithm, as proposed by Richard Brent. Details can be found 
+   in the paper http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode 
+   is available on page 182 of the same paper */
+
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 
-/* Sets x to (x^2 + a) % n */
-
+/* Sets y to (y^2 + a) % n */
 void
-sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr ninv, mp_limb_t normbits)
+sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr ninv, 
+              mp_limb_t normbits)
 {
     mp_limb_t cy;
 
@@ -50,10 +55,12 @@ sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr ninv, mp_li
 }
 
 int
-pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a, 
-                                 mp_ptr y, mp_limb_t n_size, mp_limb_t normbits, 
-                                 mp_limb_t max_iters)
-{       
+pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a, mp_ptr y,
+                     mp_limb_t n_size, mp_limb_t normbits, mp_limb_t max_iters)
+{     
+    /* n_size >= 2, one limb fmpz_t's are passed on to 
+       n_factor_pollard_brent in outer funtion      */
+
     mp_ptr x, q, ys, subval;
     mp_limb_t iter, i, k, minval, m, one_shift_norm, gcdlimbs;
     int ret, j;
@@ -69,9 +76,10 @@ pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
     /* one shifted by normbits, used for comparisons */
     one_shift_norm = UWORD(1) << normbits;
 
-    mpn_zero(q, n_size);
-    q[0] = one_shift_norm;
+    /* set gcdval and q to one (shifted) */
+    mpn_zero(q, n_size);        
     mpn_zero(gcdval, n_size);
+    q[0] = one_shift_norm;
     gcdval[0] = one_shift_norm;
 
     m = 100;
@@ -100,6 +108,8 @@ pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
                 flint_mpn_mulmod_preinvn(q, q, subval, n_size, n, ninv, normbits);  
             }
 
+            /* if q is 0, then gcdval is n (gcd(0, a) = a). Not passing through
+               flint_mpn_gcd_full due to input paramete restrictions. */
             if (flint_mpn_zero_p(q, n_size) == 0)
                 gcdlimbs = flint_mpn_gcd_full(gcdval, q, n_size, n, n_size);
             else
@@ -110,15 +120,19 @@ pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
 
             k += m;
             j = ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm));   /* gcd == 1 */
-        } while ((k < iter) && j);
+        } while ((k < iter) && j); 
 
-        if (iter > max_iters)
+        if (iter > max_iters)   /* max iterations crossed */
             break;
 
         iter *= 2;
     } while (j);
 
-    if ((gcdlimbs == n_size) && (mpn_cmp(gcdval, n, n_size) == 0))
+    /* if gcd == n, could be possible q has all factors of n, start 
+       backtracing. if gcd != 1 after backtracing, then at least one 
+       factor has been found (can be n) */
+
+    if ((gcdlimbs == n_size) && (mpn_cmp(gcdval, n, n_size) == 0))  
     {
         do {
             sqr_and_add_a(ys, a, n, n_size, ninv, normbits);
@@ -140,6 +154,8 @@ pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
     }
     ret = gcdlimbs;
 
+    /* if gcd == 1 or gcd == n, trivial factor found. return 0 */
+
     if ((gcdlimbs == 1) && (gcdval[0] == one_shift_norm)) /* gcd == 1 */
         ret = 0;
     else if ((gcdlimbs == n_size && (mpn_cmp(gcdval, n, n_size) == 0))) /* gcd == n*/
@@ -147,6 +163,8 @@ pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
 
     if (ret)
     {
+        /* If in case after shifting, "actual" factor has lesser limbs
+           than gcdlimbs, then decrease ret by 1. */
         j = n_sizeinbase(gcdval[gcdlimbs - 1], 2);
         if (normbits >= j)
             ret -= 1;
@@ -155,22 +173,19 @@ pollard_brent_single(mp_ptr gcdval, mp_ptr n, mp_ptr ninv, mp_ptr a,
             mpn_rshift(gcdval, gcdval, gcdlimbs, normbits);  
     }
 
-    cleanup:
-
     TMP_END;
-
     return ret;
 }
 
 int
 fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in, 
-                        mp_limb_t max_tries, mp_limb_t max_iters)
+                          mp_limb_t max_tries, mp_limb_t max_iters)
 {
     fmpz_t fa, fx, maxa;
     mp_ptr a, x, n, ninv, temp;
     mp_limb_t n_size, normbits, ans, val, size, cy;
     __mpz_struct *fac, *mpz_ptr;
-    int ret, i;
+    int ret;
 
     TMP_INIT;
 
@@ -244,6 +259,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
                 if (cy)
                     x[size] = cy;
             }
+
             if ((!COEFF_IS_MPZ(*fa)))
             {
                 a[0] = fmpz_get_ui(fa);
@@ -273,7 +289,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
 
         if (ret)
         {
-            fac->_mp_size = ret;
+            fac->_mp_size = ret;        /* ret is number of limbs of factor found */
             _fmpz_demote_val(p_factor);    
             break; 
         }
