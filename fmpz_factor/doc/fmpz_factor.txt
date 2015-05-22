@@ -104,6 +104,20 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
     smooth for any prime factors $p$ of $n$ then the function will
     not ever succeed).
 
+int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi, 
+                                     fmpz_t ai, mp_limb_t max_iters)
+
+    Pollard Rho algorithm for integer factorization. Assumes that the $n$ is
+    not prime. $factor$ is set as the factor if found. Takes as input the initial
+    value $y$, to start polynomial evaluation and $a$, the constant of the polynomial
+    used. It is not assured that the factor found will be prime. Does not compute 
+    the complete factorization, just one factor. Returns the number of limbs of 
+    factor if factorization is successfull (non trivial factor is found), else returns 0. 
+
+    $max_iters$ is the number of iterations tried in process of finding the cycle. 
+    If the algorithm fails to find a non trivial factor in one call, it tries again 
+    (this time with a different set of random values). 
+    
 int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n, 
                               mp_limb_t max_tries, mp_limb_t max_iters)
 
@@ -118,10 +132,8 @@ int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n,
     (this time with a different set of random values). This process is repeated a 
     maximum of $max_tries$ times. 
 
-    Assumes $n$ is not prime. $factor$ is set as the factor found, if factorization
-    is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
-    discovered is not necessarily prime.
-
     The algorithm used is a modification of the original Pollard Rho algorithm,
-    suggested by Richard Brent in the paper availible at
-    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf    
+    suggested by Richard Brent. It can be found in the paper availible at
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
+
+      

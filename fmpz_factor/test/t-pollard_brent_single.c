@@ -30,7 +30,7 @@
 
 int main(void)
 {
-    fmpz_t prime1, prime2, prime3, prime4, primeprod, fac, modval, maxa, a, y;
+    fmpz_t prime1, prime2, prime3, prime4, primeprod, fac, modval, maxa, maxy, a, y;
     int i, j, k, fails;
 
     fmpz_init(prime1);
@@ -42,6 +42,8 @@ int main(void)
     fmpz_init(modval);
     fmpz_init(a);
     fmpz_init(y);
+    fmpz_init(maxa);
+    fmpz_init(maxy);
     FLINT_TEST_INIT(state);
 
     fails = 0;
@@ -62,11 +64,14 @@ int main(void)
             fmpz_mul(prime1, prime1, prime2);
             fmpz_mul(prime3, prime3, prime4);
             fmpz_mul(primeprod, prime1, prime3);
-            fmpz_sub_ui(maxa, primeprod, 3);
+
+            /* Assigning random values of y and a */
+            fmpz_sub_ui(maxa, primeprod, 3);    
             fmpz_randm(a, state, maxa);  
-            fmpz_add_ui(a, a, 1);
+            fmpz_add_ui(a, a, 1);               /* 1 <= a <= n - 3 */
+            fmpz_sub_ui(maxa, primeprod, 1);               
             fmpz_randm(y, state, primeprod);
-            fmpz_add_ui(y, y, 1);            
+            fmpz_add_ui(y, y, 1);               /* 1 <= y <= n - 1 */
 
             k = fmpz_factor_pollard_brent_single(fac, primeprod, y, a, UWORD(1) << i);
 
