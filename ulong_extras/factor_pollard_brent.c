@@ -133,12 +133,6 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
     else if ((*factor) == n) /* gcd == n*/
         ret = 0;
 
-    if (ret)
-    {
-        if (normbits)
-            (*factor) >>= normbits;
-    }
-
     return ret;
 }
 
@@ -169,8 +163,13 @@ n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
         x <<= normbits;
 
         ret = n_factor_pollard_brent_single(factor, n, ninv, a, x, normbits, max_iters);
+
         if (ret == 1)
+        {
+            if (normbits)
+                (*factor) >>= normbits;
             return 1; 
+        }
     }
 
     return ret;    

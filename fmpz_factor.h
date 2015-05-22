@@ -75,6 +75,10 @@ FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
                                        ulong B1, ulong B2_sqrt, ulong c);
 
+FLINT_DLL int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, 
+                                               fmpz_t yi, fmpz_t ai, 
+                                               mp_limb_t max_iters);
+
 FLINT_DLL int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state,
                                         fmpz_t n, mp_limb_t max_tries, 
                                         mp_limb_t max_iters);
