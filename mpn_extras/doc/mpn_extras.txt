@@ -237,31 +237,3 @@ void flint_mpn_urandomb(mp_limb_t *rp,
 
     Generates a uniform random number \code{n} bits and stores 
     it on \code{rp}.
-
-*******************************************************************************
-
-    Factorization
-
-*******************************************************************************
-
-int flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, 
-                                          mp_ptr a, mp_ptr y, mp_limb_t n_size, 
-                                          mp_limb_t normbits, mp_limb_t max_iters)
-
-    Pollard Rho algorithm for integer factorization. Assumes that the $n$ is
-    not prime. $factor$ is set as the factor if $n$ if found. It is not assured 
-    that the factor found will be prime. Does not compute the complete factorization, 
-    just one factor. Returns the number of limbs of factor if factorization is 
-    successfull (non trivial factor is found), else returns 0. 
-
-    $max_iters$ is the number of iterations tried in process of finding the cycle. 
-    Takes as input a precomputed inverse of $n$ computed by \code{flint_mpn_preinvn()}, 
-    and initial value $y$, to start polynomial evaluation and $a$, the constant 
-    of the polynomial used.
-
-    The algorithm used is a modification of the original Pollard Rho algorithm,
-    suggested by Richard Brent. It can be found in the paper availible at
-    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
-
-    Assumes that $n$ is normalized and that $a$ and $y$ are shifted left by normbits,
-    where normbits are the number of bits n was shifted to normalized it. 

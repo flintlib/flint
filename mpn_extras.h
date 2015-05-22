@@ -143,12 +143,6 @@ FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r,
 FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
     int c, mp_bitcnt_t b, mp_ptr tp);
 
-FLINT_DLL void flint_mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr ninv, 
-              mp_limb_t normbits);
-
-FLINT_DLL int flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, 
-                                                    mp_ptr a, mp_ptr y, mp_limb_t n_size, 
-                                                    mp_limb_t normbits, mp_limb_t max_iters);
 static __inline__
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 {
