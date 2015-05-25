@@ -29,7 +29,12 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "qsieve.h"
+
+/****************************IGNORE******************************************/
+
+#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
+
+/****************************************************************************/
 
 /* Array of possible Knuth-Schroeppel multipliers */
 static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,
@@ -80,7 +85,12 @@ mp_limb_t qsieve_fmpz_knuth_schroeppel(qs_t qs_inf)
     flint_printf("Checking %wd Knuth-Schroeppel primes\n", max);
 #endif
 
-    p = 3;
+    n_primes_t iter;
+    n_primes_init(iter);
+    n_primes_next(iter);
+
+    p = n_primes_next(iter);
+
     for (num_primes = 0; num_primes < max; num_primes++)
     {
         pinv = n_preinvert_limb(p); /* compute precomputed inverse */
@@ -119,7 +129,7 @@ mp_limb_t qsieve_fmpz_knuth_schroeppel(qs_t qs_inf)
             }
         }
 
-        p = n_nextprime(p, 0);
+        p = n_primes_next(iter);
     }
 
     /* search for the multiplier with the best weight and set qs_inf->k */
