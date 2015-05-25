@@ -29,7 +29,7 @@
 
 /*****************************IGNORE*****************************************/
 
-#include "#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
+#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
 
 /****************************************************************************/
 
