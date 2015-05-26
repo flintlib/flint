@@ -101,7 +101,7 @@ typedef qs_s qs_t[1];
      * small_primes is the number of small primes to not factor with (including k and 2)
      * sieve_size is the size of the sieve to use
 */
-static const mp_limb_t qsieve_fmpz_tune[][5] =
+static const mp_limb_t qsieve_tune[][5] =
 {
     {0, 50, 80, 2, 14000 },
     {30, 50, 80, 2, 16000 },
@@ -118,7 +118,7 @@ static const mp_limb_t qsieve_fmpz_tune[][5] =
 };
 
 /* number of entries in the tuning table */
-#define QS_FMPZ_TUNE_SIZE (sizeof(qsieve_fmpz_tune)/(5*sizeof(mp_limb_t)))
+#define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
 
 #ifdef __cplusplus
 }

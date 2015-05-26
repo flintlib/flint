@@ -49,7 +49,7 @@ static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,
    which are quadratic residues modulo kn. If a small weight of n is found
    during this process it is returned.
 */
-mp_limb_t qsieve_fmpz_knuth_schroeppel(qs_t qs_inf)
+mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
 {
     float weights[KS_MULTIPLIERS]; /* array of Knuth-Schroeppel weights */
     float best_weight = -10.0f; /* best weight so far */

@@ -111,7 +111,7 @@ prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_p
     return factor_base;
 }
 
-mp_limb_t qsieve_fmpz_primes_init(qs_t qs_inf)
+mp_limb_t qsieve_primes_init(qs_t qs_inf)
 {
     slong num_primes;
     slong i;

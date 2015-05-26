@@ -33,9 +33,9 @@
 /******************************IGNORE*****************************************/
 
 #include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\fmpz_clear.c"
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\fmpz_init.c"
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\fmpz_knuth_schroeppel.c"
+#include "C:\Users\measure\Documents\GitHub\flint2\siqs\clear.c"
+#include "C:\Users\measure\Documents\GitHub\flint2\siqs\init.c"
+#include "C:\Users\measure\Documents\GitHub\flint2\siqs\knuth_schroeppel.c"
 
 /******************************************************************************/
 
@@ -59,9 +59,9 @@ int main(void)
 
       if (fmpz_is_zero(n)) continue;
 
-      qsieve_fmpz_init(qs_inf, n);
-      qsieve_fmpz_knuth_schroeppel(qs_inf);
-      qsieve_fmpz_clear(qs_inf);
+      qsieve_init(qs_inf, n);
+      qsieve_knuth_schroeppel(qs_inf);
+      qsieve_clear(qs_inf);
    }
 
    FLINT_TEST_CLEANUP(state);

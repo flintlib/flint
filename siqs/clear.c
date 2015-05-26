@@ -34,7 +34,7 @@
 
 /****************************************************************************/
 
-void qsieve_fmpz_clear(qs_t qs_inf)
+void qsieve_clear(qs_t qs_inf)
 {
     slong i;
 

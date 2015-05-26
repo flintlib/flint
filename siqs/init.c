@@ -35,7 +35,7 @@
 /****************************************************************************/
 
 
-void qsieve_fmpz_init(qs_t qs_inf, fmpz_t n)
+void qsieve_init(qs_t qs_inf, fmpz_t n)
 {
     ulong i;
 
@@ -46,15 +46,15 @@ void qsieve_fmpz_init(qs_t qs_inf, fmpz_t n)
     qs_inf->bits =  fmpz_bits(n);
 
     /* determine which index in the tuning table n corresponds to */
-    for (i = 1; i < QS_FMPZ_TUNE_SIZE; i++)
+    for (i = 1; i < QS_TUNE_SIZE; i++)
     {
-        if (qsieve_fmpz_tune[i][0] > qs_inf->bits)
+        if (qsieve_tune[i][0] > qs_inf->bits)
             break;
     }
     i--;
 
-    qs_inf->ks_primes  = qsieve_fmpz_tune[i][1]; /* number of Knuth-Schroeppel primes */
-    qs_inf->num_primes = qsieve_fmpz_tune[i][2]; /* number of factor base primes */
+    qs_inf->ks_primes  = qsieve_tune[i][1]; /* number of Knuth-Schroeppel primes */
+    qs_inf->num_primes = qsieve_tune[i][2]; /* number of factor base primes */
 
     fmpz_init(qs_inf->kn); /* initialise kn */
 
