@@ -121,14 +121,14 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     prime_t * factor_base;
 
     /* determine which index in the tuning table n corresponds to */
-    for (i = 1; i < QS_FMPZ_TUNE_SIZE; i++)
+    for (i = 1; i < QS_TUNE_SIZE; i++)
     {
-        if (qsieve_fmpz_tune[i][0] > qs_inf->bits)
+        if (qsieve_tune[i][0] > qs_inf->bits)
             break;
     }
     i--;
 
-    num_primes = qsieve_fmpz_tune[i][2]; /* number of factor base primes */
+    num_primes = qsieve_tune[i][2]; /* number of factor base primes */
 
     qs_inf->num_primes = 0; /* start with 0 primes */
     factor_base = compute_factor_base(&small_factor, qs_inf, num_primes); /* build up FB */
