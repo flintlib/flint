@@ -35,6 +35,15 @@
  extern "C" {
 #endif
 
+typedef struct
+{
+    ulong R;
+    fmpz_t s;
+    fmpz_factor_t qs;
+} _aprcl_config;
+
+typedef _aprcl_config aprcl_config[1];
+
 typedef struct 
 {
     fmpz_poly_t poly;
@@ -84,6 +93,12 @@ void jacobi_2q_two(unity_root result, ulong q);
 
 int is_prime_aprcl(const fmpz_t n);
 return_status_aprcl _is_prime_aprcl(const fmpz_t n);
+
+
+void aprcl_setup_init(aprcl_config conf, const fmpz_t n);
+void aprcl_setup_clear(aprcl_config conf);
+void aprcl_setup_update(aprcl_config conf);
+
 
 #endif
 
