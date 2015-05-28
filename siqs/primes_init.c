@@ -161,9 +161,9 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     return 0;
 }
 
-/* function to call for incrementing factor base prime by 'delta' */
+/* function to call for incrementing number of factor base prime by 'delta' */
 
-mp_limb_t qsieve_primes_increament(qs_t qs_inf, mp_limb_t delta)
+mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta)
 {
     slong num_primes = qs_inf->num_primes + delta;
     mp_limb_t small_factor = 0;
