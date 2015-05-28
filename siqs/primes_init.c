@@ -33,9 +33,10 @@
 
 /****************************************************************************/
 
-prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
+prime_t *
+compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
 {
-    mp_limb_t p, nmod, nmod2;
+    mp_limb_t p, nmod, nmod2, mask, norm;
     mp_limb_t pinv;
     mp_limb_t k = qs_inf->k;
     slong num = qs_inf->num_primes;
@@ -71,11 +72,16 @@ prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_p
 
     n_primes_t iter;
     n_primes_jump_after(iter, p);
+    p = n_primes_next(iter);
+
+    count_leading_zeros(norm, p);
+
+    mask = UWORD_MAX ^ (UWORD_MAX >> norm);
 
     for (fb_prime = num; fb_prime < num_primes; ) /* leave space for k and 2 */
     {
-        p = n_primes_next(iter);
-        pinv = n_preinvert_limb(p);
+
+        pinv = n_preinvert_limb(p << norm);
         nmod = fmpz_fdiv_ui(qs_inf->n, p); /* n mod p */
         if (nmod == 0)
         {
@@ -83,7 +89,7 @@ prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_p
             return factor_base;
         }
 
-        nmod2 = n_mulmod2_preinv(nmod, k, p, pinv); /* kn mod p */
+        nmod2 = n_mulmod2_preinv(nmod << norm, k << norm, p, pinv) >> norm; /* kn mod p */
         if (nmod2 == 0) /* don't sieve with factors of multiplier */
             continue;
 
@@ -105,7 +111,17 @@ prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_p
             sqrts[fb_prime] = n_sqrtmod(nmod, p);
             fb_prime++;
         }
+
+        p = n_nextprime(iter);
+
+        if (mask & p)
+        {
+            count_leading_zeros(norm, p);
+            mask = UWORD_MAX ^ (UWORD_MAX >> norm);
+        }
     }
+
+    n_primes_clear(iter);
 
     *small_factor = 0;
     return factor_base;
@@ -141,6 +157,22 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     factor_base[0].size = FLINT_BIT_COUNT(k);
     factor_base[1].p = 2;
     factor_base[0].size = 2;
+
+    return 0;
+}
+
+/* function to call for incrementing factor base prime by 'delta' */
+
+mp_limb_t qsieve_primes_increament(qs_t qs_inf, mp_limb_t delta)
+{
+    slong num_primes = qs_inf->num_primes + delta;
+    mp_limb_t small_factor = 0;
+    prime_t * factor_base;
+
+    factor_base = compute_factor_base(&small_factor, qs_inf, num_primes);
+
+    if(small_factor)
+        return small_factor;
 
     return 0;
 }

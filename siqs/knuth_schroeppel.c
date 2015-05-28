@@ -132,6 +132,8 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         p = n_primes_next(iter);
     }
 
+    n_primes_clear(iter);
+
     /* search for the multiplier with the best weight and set qs_inf->k */
     for (i = 0; i < KS_MULTIPLIERS; i++)
     {
