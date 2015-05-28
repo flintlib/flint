@@ -24,7 +24,6 @@
 ******************************************************************************/
 
 #include "aprcl.h"
-#include "fmpz_poly.h"
 
 void unity_init(unity_root element, ulong n)
 {

@@ -34,37 +34,10 @@ int main(void)
     int i, j;
     FLINT_TEST_INIT(state);
    
-    flint_printf("setup....");
+    flint_printf("is_prime_gauss....");
     fflush(stdout);
-
-    for (i = 0; i < 100; i++)
-    {
-        fmpz_t n, s2;
-
-        fmpz_init(n);
-        fmpz_randtest_unsigned(n, state, 200);
-
-        aprcl_config conf;
-        aprcl_setup_init(conf, n);
-
-        fmpz_mul(s2, conf->s, conf->s);
-        if (fmpz_cmp(s2, n) <= 0)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("s^2 = ");
-            fmpz_print(s2);
-            flint_printf(" <= ");
-            fmpz_print(n);
-            abort();
-        }
-
-        aprcl_setup_clear(conf);
-        fmpz_clear(n);
-    }
-
-    FLINT_TEST_CLEANUP(state);
     
-    flint_printf("PASS\n");
+    flint_printf("NO TEST\n");
     return 0;
 }
 

@@ -20,52 +20,24 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-void aprcl_setup_update(aprcl_config conf)
+int main(void)
 {
-    ulong prime = 2;
-
-    fmpz_set_ui(conf->s, 1);
-    fmpz_factor_clear(conf->qs);
-    fmpz_factor_init(conf->qs);
-    conf->qs->sign = 1;
-
-    while (2 * (prime - 1) <= conf->R)
-    {
-        if ((conf->R % (prime - 1)) == 0)
-        {
-            _fmpz_factor_append_ui(conf->qs, prime, 1);
-            fmpz_mul_ui(conf->s, conf->s, prime);
-        }
-        prime = n_nextprime(prime, 1);
-    }
+    int i, j;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zpq....");
+    fflush(stdout);
+    
+    flint_printf("NO TEST\n");
+    return 0;
 }
-
-void aprcl_setup_init(aprcl_config conf, const fmpz_t n)
-{
-    fmpz_t s2;
-
-    fmpz_init_set_ui(s2, 0);
-    fmpz_init(conf->s);
-    fmpz_factor_init(conf->qs);
-    conf->R = 1;
-
-    while (fmpz_cmp(s2, n) <= 0)
-    {
-        conf->R += 1;
-        aprcl_setup_update(conf);
-        fmpz_mul(s2, conf->s, conf->s);
-    }
-}
-
-void aprcl_setup_clear(aprcl_config conf)
-{
-    fmpz_clear(conf->s);
-    fmpz_factor_clear(conf->qs);
-}
-
 

@@ -62,6 +62,15 @@ typedef struct
 
 typedef _unity_root_mod unity_root_mod[1];
 
+typedef struct
+{
+    fmpz_mod_poly_t *polys;
+    ulong p;
+    ulong q;
+} _unity_zpq;
+
+typedef _unity_zpq unity_zpq[1];
+
 typedef enum
 {
     UNKNOWN,
@@ -71,6 +80,12 @@ typedef enum
     FAIL_ADDITIONAL
 } return_status_aprcl;
 
+int is_prime_gauss(const fmpz_t n);
+int is_prime_aprcl(const fmpz_t n);
+
+return_status_aprcl _is_prime_aprcl(const fmpz_t n);
+
+/* Z[unity_root] operations. */
 void unity_init(unity_root element, ulong n);
 void unity_clear(unity_root element);
 void unity_print(unity_root element);
@@ -81,24 +96,28 @@ void unity_roots_add(unity_root res, const unity_root element1, const unity_root
 void unity_roots_mul(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_root element2);
 void unity_roots_reduce_cyclotomic(unity_root res, ulong p);
+
 void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b);
 
-mp_ptr f_table(const ulong q);
+/* Z[unity_root_q, unity_root_p] operations. */
+void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n);
+void unity_zpq_clear(unity_zpq value);
+void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right);
+void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right);
 
+/* Jacobi sum computation. */
 void jacobi_pq(unity_root result, ulong q, ulong p);
 void jacobi_pq_general(unity_root result, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
 void jacobi_pq_not2(unity_root result, ulong q, ulong p);
 void jacobi_2q_one(unity_root result, ulong q);
 void jacobi_2q_two(unity_root result, ulong q);
 
-int is_prime_aprcl(const fmpz_t n);
-return_status_aprcl _is_prime_aprcl(const fmpz_t n);
+/* Initial step functions. */
+void aprcl_config_init(aprcl_config conf, const fmpz_t n);
+void aprcl_config_clear(aprcl_config conf);
+void aprcl_config_update(aprcl_config conf);
 
-
-void aprcl_setup_init(aprcl_config conf, const fmpz_t n);
-void aprcl_setup_clear(aprcl_config conf);
-void aprcl_setup_update(aprcl_config conf);
-
+mp_ptr f_table(const ulong q);
 
 #endif
 
