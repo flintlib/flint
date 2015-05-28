@@ -57,10 +57,10 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
     ulong i;
     ulong num_primes, max;
     float logpdivp;
-    mp_limb_t nmod8, mod8, p, nmod, pinv, mult;
+    mp_limb_t nmod8, mod8, p, nmod, pinv, mult, norm, mask;
     int kron, jac;
 
-    if (fmpz_val2(qs_inf->n) >= 0) /* check 2 is not a factor */
+    if (fmpz_is_even(qs_inf->n)) /* check 2 is not a factor */
         return 2;
 
     /* initialise weights for each multiplier k depending on kn mod 8 */
@@ -90,10 +90,13 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
     n_primes_next(iter);
 
     p = n_primes_next(iter);
+    count_leading_zeros(norm, p);
+
+    mask = UWORD_MAX ^ (UWORD_MAX >> norm);
 
     for (num_primes = 0; num_primes < max; num_primes++)
     {
-        pinv = n_preinvert_limb(p); /* compute precomputed inverse */
+        pinv = n_preinvert_limb(p << norm); /* compute precomputed inverse */
 
         logpdivp = log((float) p) / (float) p; /* log p / p */
 
@@ -112,7 +115,7 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         {
             mult = multipliers[i];
             if (mult >= p)
-                mult = n_mod2_preinv(mult, p, pinv); /* k mod p */
+                mult = n_mod2_preinv(mult << norm, p, pinv) >> norm; /* k mod p */
 
             if (mult == 0) weights[i] += logpdivp; /* kn == 0 mod p */
             else
@@ -130,6 +133,12 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         }
 
         p = n_primes_next(iter);
+
+        if(mask & p)
+        {
+            count_leading_zeros(norm, p);
+            mask = UWORD_MAX ^ (UWORD_MAX >> norm);
+        }
     }
 
     n_primes_clear(iter);

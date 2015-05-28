@@ -42,9 +42,10 @@
 int main(void)
 {
    int i;
+   mp_limb_t small_factor;
    FLINT_TEST_INIT(state);
 
-   flint_printf("fmpz_knuth_schroeppel....");
+   flint_printf("knuth_schroeppel....");
    fflush(stdout);
 
 
@@ -60,7 +61,16 @@ int main(void)
       if (fmpz_is_zero(n)) continue;
 
       qsieve_init(qs_inf, n);
-      qsieve_knuth_schroeppel(qs_inf);
+      small_factor = qsieve_knuth_schroeppel(qs_inf);
+
+      if (small_factor)
+      {
+          if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+          {
+              abort();    /*exception to add*/
+          }
+      }
+
       qsieve_clear(qs_inf);
    }
 

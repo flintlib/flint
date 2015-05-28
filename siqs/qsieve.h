@@ -65,12 +65,6 @@ typedef struct prime_t
    char size;
 } prime_t;
 
-typedef struct fac_t /* struct for factors of relations */
-{
-   slong ind;
-   slong exp;
-} fac_t;
-
 typedef struct qs_s
 {
    fmpz_t n; /* Number to factor */

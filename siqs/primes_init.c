@@ -71,6 +71,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
         p = factor_base[num - 1].p;
 
     n_primes_t iter;
+    n_primes_init(iter);
     n_primes_jump_after(iter, p);
     p = n_primes_next(iter);
 
@@ -112,7 +113,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
             fb_prime++;
         }
 
-        p = n_nextprime(iter);
+        p = n_primes_next(iter);
 
         if (mask & p)
         {
