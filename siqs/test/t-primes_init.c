@@ -56,19 +56,19 @@ int main(void)
    flint_printf("primes_init....");
    fflush(stdout);
 
-   for (i = 0; i < 10; i++)
+   for (i = 0; i < 100000; i++)
    {
 
-       fmpz_randtest_unsigned(n, state, 32);
+       fmpz_randtest_unsigned(n, state, 130);
 
-       if (fmpz_is_zero(n)) continue;
+       if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;
 
        qsieve_init(qs_inf, n);
        small_factor = qsieve_knuth_schroeppel(qs_inf);
 
        if (small_factor) continue;
 
-       fmpz_mul_ui(qs_inf->kn, n, qs_inf->k); /*haven't calculated earlier*/
+       fmpz_mul_ui(qs_inf->kn, n, qs_inf->k);                      /*haven't calculated earlier*/
        small_factor = qsieve_primes_init(qs_inf);
 
        if (small_factor)
@@ -78,7 +78,7 @@ int main(void)
 
            if (fmpz_fdiv_ui(n, small_factor))
            {
-               abort();  /*exception to add*/
+               abort();                                       /*exception to add*/
            }
            else continue;
        }
@@ -91,10 +91,11 @@ int main(void)
            fmpz_set_si(x, qs_inf->sqrts[j]);
            fmpz_mul(y, x, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
+           fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
 
-           if (fmpz_cmp(x, qs_inf->kn) != 0)
+           if (fmpz_cmp(x, y) != 0)
            {
-               abort();        /*exception to add*/
+               abort();                                                    /*exception to add*/
            }
 
            /* check if inverse of factor base primes are correct*/
@@ -107,32 +108,39 @@ int main(void)
 
            if (fmpz_get_ui(y) != pmod)
            {
-               abort(); /*exception to add*/
+               abort();                                                    /*exception to add*/
            }
        }
 
+       /* add next 50 primes to factor base */
+
        k = qs_inf->num_primes;
 
-       small_factor = qsieve_primes_increment(qs_inf, 100); /* need to increase by different amount*/
+       small_factor = qsieve_primes_increment(qs_inf, 50);
 
-       /* repeat the above for loop for new primes which
-          are added in factor base */
-
-       for (j = k; j < k + 100; j++)
+       if (small_factor)
        {
-           /* check if square root of kn modulo
-               factor base prime p are correct   */
+           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+           {
+               abort();                                                   /* exception to add */
+           }
+           else continue;
+       }
+
+
+       for (j = k; j < qs_inf->num_primes; j++)
+       {
 
            fmpz_set_si(x, qs_inf->sqrts[j]);
            fmpz_mul(y, x, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
+           fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
 
-           if (fmpz_cmp(x, qs_inf->kn) != 0)
+           if (fmpz_cmp(x, y) != 0)
            {
-               abort();        /*exception to add*/
+               abort();
            }
 
-           /* check if inverse of factor base primes are correct*/
 
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
            fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
@@ -142,9 +150,95 @@ int main(void)
 
            if (fmpz_get_ui(y) != pmod)
            {
-               abort(); /*exception to add*/
+               abort();
            }
        }
+
+       /* add next 30 primes to factor base */
+
+       k = qs_inf->num_primes;
+
+       small_factor = qsieve_primes_increment(qs_inf, 30);
+
+       if (small_factor)
+       {
+           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+           {
+               abort();                                         /* exception to add */
+           }
+           else continue;
+       }
+
+
+       for (j = k; j < qs_inf->num_primes; j++)
+       {
+
+           fmpz_set_si(x, qs_inf->sqrts[j]);
+           fmpz_mul(y, x, x);
+           fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
+           fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
+
+           if (fmpz_cmp(x, y) != 0)
+           {
+               abort();
+           }
+
+
+           fmpz_randtest_unsigned(x, state, FLINT_BITS);
+           fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
+
+           pmod = n_mod2_preinv(fmpz_get_ui(x),
+                        qs_inf->factor_base[j].p, qs_inf->factor_base[j].pinv);
+
+           if (fmpz_get_ui(y) != pmod)
+           {
+               abort();
+           }
+       }
+
+
+       /* add next 10 primes to factor base*/
+
+       k = qs_inf->num_primes;
+
+       small_factor = qsieve_primes_increment(qs_inf, 10);
+
+       if (small_factor)
+       {
+           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
+           {
+               abort();                                         /* exception to add */
+           }
+           else continue;
+       }
+
+
+       for (j = k; j < qs_inf->num_primes; j++)
+       {
+
+           fmpz_set_si(x, qs_inf->sqrts[j]);
+           fmpz_mul(y, x, x);
+           fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
+           fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
+
+           if (fmpz_cmp(x, y) != 0)
+           {
+               abort();
+           }
+
+
+           fmpz_randtest_unsigned(x, state, FLINT_BITS);
+           fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
+
+           pmod = n_mod2_preinv(fmpz_get_ui(x),
+                        qs_inf->factor_base[j].p, qs_inf->factor_base[j].pinv);
+
+           if (fmpz_get_ui(y) != pmod)
+           {
+               abort();
+           }
+       }
+
 
 
        qsieve_clear(qs_inf);
