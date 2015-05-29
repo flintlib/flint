@@ -29,6 +29,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "C:\Users\measure\Documents\GitHub\flint2\test_helpers.c"
 
 #ifdef __cplusplus
  extern "C" {
