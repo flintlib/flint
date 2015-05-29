@@ -36,7 +36,7 @@
 prime_t *
 compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
 {
-    mp_limb_t p, nmod, nmod2, mask, norm;
+    mp_limb_t p, nmod, nmod2;
     mp_limb_t pinv;
     mp_limb_t k = qs_inf->k;
     slong num = qs_inf->num_primes;
@@ -67,36 +67,34 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     {
         p = 2;
         num = 2;
-    } else
-        p = factor_base[num - 1].p;
+    }
+    else p = factor_base[num - 1].p;
 
     n_primes_t iter;
     n_primes_init(iter);
     n_primes_jump_after(iter, p);
-    p = n_primes_next(iter);
-
-    count_leading_zeros(norm, p);
-
-    mask = UWORD_MAX ^ (UWORD_MAX >> norm);
 
     for (fb_prime = num; fb_prime < num_primes; ) /* leave space for k and 2 */
     {
 
-        pinv = n_preinvert_limb(p << norm);
+        p = n_primes_next(iter);
+        pinv = n_preinvert_limb(p);
         nmod = fmpz_fdiv_ui(qs_inf->n, p); /* n mod p */
+
         if (nmod == 0)
         {
             *small_factor = p;
             return factor_base;
         }
 
-        nmod2 = n_mulmod2_preinv(nmod << norm, k << norm, p, pinv) >> norm; /* kn mod p */
+        nmod2 = n_mulmod2_preinv(nmod, k, p, pinv); /* kn mod p */
+
         if (nmod2 == 0) /* don't sieve with factors of multiplier */
             continue;
 
         nmod = nmod2; /* save nmod2 */
-
         kron = 1; /* n mod p is even, not handled by n_jacobi */
+
         while ((nmod2 % 2) == 0)
         {
             if ((p % 8) == 3 || (p % 8) == 5) kron *= -1;
@@ -104,6 +102,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
         }
 
         kron *= n_jacobi(nmod2, p);
+
         if (kron == 1) /* kn is a quadratic residue mod p (and hence a FB prime) */
         {
             factor_base[fb_prime].p = p;
@@ -111,14 +110,6 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
             factor_base[fb_prime].size = FLINT_BIT_COUNT(p);
             sqrts[fb_prime] = n_sqrtmod(nmod, p);
             fb_prime++;
-        }
-
-        p = n_primes_next(iter);
-
-        if (mask & p)
-        {
-            count_leading_zeros(norm, p);
-            mask = UWORD_MAX ^ (UWORD_MAX >> norm);
         }
     }
 

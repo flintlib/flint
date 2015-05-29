@@ -88,19 +88,16 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
     n_primes_t iter;
     n_primes_init(iter);
     n_primes_next(iter);
-
     p = n_primes_next(iter);
-    count_leading_zeros(norm, p);
-
-    mask = UWORD_MAX ^ (UWORD_MAX >> norm);
 
     for (num_primes = 0; num_primes < max; num_primes++)
     {
-        pinv = n_preinvert_limb(p << norm); /* compute precomputed inverse */
+        pinv = n_preinvert_limb(p); /* compute precomputed inverse */
 
         logpdivp = log((float) p) / (float) p; /* log p / p */
 
         nmod = fmpz_fdiv_ui(qs_inf->n, p);
+
         if (nmod == 0) return p; /* we found a small factor */
 
         kron = 1; /* n mod p is even, not handled by n_jacobi */
@@ -115,7 +112,7 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         {
             mult = multipliers[i];
             if (mult >= p)
-                mult = n_mod2_preinv(mult << norm, p, pinv) >> norm; /* k mod p */
+                mult = n_mod2_preinv(mult, p, pinv); /* k mod p */
 
             if (mult == 0) weights[i] += logpdivp; /* kn == 0 mod p */
             else
@@ -134,11 +131,6 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
 
         p = n_primes_next(iter);
 
-        if(mask & p)
-        {
-            count_leading_zeros(norm, p);
-            mask = UWORD_MAX ^ (UWORD_MAX >> norm);
-        }
     }
 
     n_primes_clear(iter);

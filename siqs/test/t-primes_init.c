@@ -56,7 +56,7 @@ int main(void)
    flint_printf("primes_init....");
    fflush(stdout);
 
-   for (i = 0; i < 100000; i++)
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
 
        fmpz_randtest_unsigned(n, state, 130);
@@ -78,7 +78,10 @@ int main(void)
 
            if (fmpz_fdiv_ui(n, small_factor))
            {
-               abort();                                       /*exception to add*/
+               flint_printf("%wd is not a factor of ", small_factor);
+               fmpz_print(n);
+               flint_printf("\n");
+               abort();
            }
            else continue;
        }
@@ -95,7 +98,10 @@ int main(void)
 
            if (fmpz_cmp(x, y) != 0)
            {
-               abort();                                                    /*exception to add*/
+               flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
+               abort();
            }
 
            /* check if inverse of factor base primes are correct*/
@@ -108,7 +114,9 @@ int main(void)
 
            if (fmpz_get_ui(y) != pmod)
            {
-               abort();                                                    /*exception to add*/
+               flint_printf("%wd is not an inverse of %wd\n",
+                        qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
+               abort();
            }
        }
 
@@ -122,7 +130,10 @@ int main(void)
        {
            if (fmpz_fdiv_ui(qs_inf->n, small_factor))
            {
-               abort();                                                   /* exception to add */
+               flint_printf("%wd is not a factor of ", small_factor);
+               fmpz_print(n);
+               flint_printf("\n");
+               abort();
            }
            else continue;
        }
@@ -138,6 +149,9 @@ int main(void)
 
            if (fmpz_cmp(x, y) != 0)
            {
+               flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
                abort();
            }
 
@@ -150,6 +164,8 @@ int main(void)
 
            if (fmpz_get_ui(y) != pmod)
            {
+               flint_printf("%wd is not an inverse of %wd\n",
+                        qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
                abort();
            }
        }
@@ -164,7 +180,10 @@ int main(void)
        {
            if (fmpz_fdiv_ui(qs_inf->n, small_factor))
            {
-               abort();                                         /* exception to add */
+               flint_printf("%wd is not a factor of ", small_factor);
+               fmpz_print(n);
+               flint_printf("\n");
+               abort();
            }
            else continue;
        }
@@ -180,6 +199,9 @@ int main(void)
 
            if (fmpz_cmp(x, y) != 0)
            {
+               flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
                abort();
            }
 
@@ -192,6 +214,8 @@ int main(void)
 
            if (fmpz_get_ui(y) != pmod)
            {
+               flint_printf("%wd is not an inverse of %wd\n",
+                        qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
                abort();
            }
        }
@@ -207,7 +231,10 @@ int main(void)
        {
            if (fmpz_fdiv_ui(qs_inf->n, small_factor))
            {
-               abort();                                         /* exception to add */
+               flint_printf("%wd is not a factor of ", small_factor);
+               fmpz_print(n);
+               flint_printf("\n");
+               abort();
            }
            else continue;
        }
@@ -223,6 +250,9 @@ int main(void)
 
            if (fmpz_cmp(x, y) != 0)
            {
+               flint_printf("%d is not a square root of ", qs_inf->sqrts[j]);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %d\n", qs_inf->factor_base[j].p);
                abort();
            }
 
@@ -235,13 +265,16 @@ int main(void)
 
            if (fmpz_get_ui(y) != pmod)
            {
+               flint_printf("%wd is not an inverse of %wd\n",
+                        qs_inf->factor_base[j].pinv, qs_inf->factor_base[j].p);
                abort();
            }
        }
 
-
-
        qsieve_clear(qs_inf);
+       fmpz_clear(n);
+       fmpz_clear(x);
+       fmpz_clear(y);
    }
 
    FLINT_TEST_CLEANUP(state);

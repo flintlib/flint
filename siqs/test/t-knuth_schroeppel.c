@@ -50,7 +50,7 @@ int main(void)
 
 
 
-   for (i = 0; i < 10000; i++) /* Test random n */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random n */
    {
       fmpz_t n;
       fmpz_init(n);
@@ -58,7 +58,7 @@ int main(void)
 
       fmpz_randtest_unsigned(n, state, 130);
 
-      if (fmpz_is_zero(n)) continue;
+      if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;
 
       qsieve_init(qs_inf, n);
       small_factor = qsieve_knuth_schroeppel(qs_inf);
@@ -67,7 +67,10 @@ int main(void)
       {
           if (fmpz_fdiv_ui(qs_inf->n, small_factor))
           {
-              abort();    /*exception to add*/
+              flint_printf("%wd is not a factor of ", small_factor);
+              fmpz_print(qs_inf->n);
+              flint_printf("\n");
+              abort();
           }
       }
 
