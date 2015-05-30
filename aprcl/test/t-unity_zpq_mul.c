@@ -92,6 +92,7 @@ int main(void)
         unity_zpq_clear(res);
         unity_zpq_clear(left);
         unity_zpq_clear(right);
+        unity_zpq_clear(temp);
     }
 
     flint_printf("PASS\n");

@@ -35,6 +35,42 @@ mp_ptr f_table(const ulong q)
     defined by $1 - g^x \equiv  gf(x) \bmod q$, 
     there $g$ is a primitive root modulo $q$. f_table[x - 1] = f(x).
 
+
 *******************************************************************************
 
+    Operations in $\mathbb{Z}[\zeta_q, \zeta_p] / (n)$.
+
+*******************************************************************************
+
+void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
+
+    Initialized \code{unity_zpq} element of $\mathbb{Z}[\zeta_q, \zeta_p] / (n)$.
+    \code{unity_zpq} is an array of fmpz_mod_poly_t elements.
+
+void unity_zpq_clear(unity_zpq value)
+
+    Clears the given \code{unity_zpq} element. It must be reinitialised in
+    order to be used again.
+
+void unity_zpq_set(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+
+    Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
+    \code{i} must be less then {q} and \code{j} must be less then {p}.
+
+void unity_zpq_set_ui(unity_zpq value, ulong i, ulong j, ulong x)
+
+    Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
+    \code{i} must be less then {q} and \code{j} must be less then {p}.
+
+void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right)
+
+    Sets the \code{result} to the \code{left}+\code{right}.
+    \code{result}, \code{left} and \code{right} must be initialized with same
+    \code{q}, \code{p} and \code{n}.
+
+void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right)
+
+    Sets the \code{result} to the \code{left}*\code{right}.
+    \code{result}, \code{left} and \code{right} must be initialized with same
+    \code{q}, \code{p} and \code{n}.
 
