@@ -34,10 +34,23 @@ int main(void)
     int i, j;
     FLINT_TEST_INIT(state);
    
-    flint_printf("unity_zpq_mul....");
+    flint_printf("unity_zpq_set....");
     fflush(stdout);
+
+    for (i = 0; i < 100; i++)
+    {
+        ulong p, q;
+        fmpz_t n;
+        unity_zpq res, let, right, test;
+
+
+        p = n_randprime(state, 2 + n_randint(state, 6), 0);
+        q = n_randprime(state, 2 + n_randint(state, 6), 0);
+
+    }
     
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
+
 

@@ -34,10 +34,54 @@ int main(void)
     int i, j;
     FLINT_TEST_INIT(state);
    
-    flint_printf("unity_zpq_mul....");
+    flint_printf("unity_zpq_equal....");
     fflush(stdout);
+
+    for (i = 0; i < 100; i++)
+    {
+        ulong p, q;
+        fmpz_t n;
+        unity_zpq f, g;
+
+        p = n_randprime(state, 2 + n_randint(state, 6), 0);
+        q = n_randprime(state, 2 + n_randint(state, 6), 0);
+
+        fmpz_init(n);
+        fmpz_randtest_not_zero(n, state, 200);
+        unity_zpq_init(f, q, p, n);
+        unity_zpq_init(g, q, p, n);
+
+        for (j = 0; j < 100; j++)
+        {
+            
+            ulong x, y;
+            fmpz_t val;
+
+            fmpz_init(val);
+
+            x = n_randint(state, p);
+            y = n_randint(state, q);
+            fmpz_randtest_not_zero(val, state, 221);
+            unity_zpq_set(f, y, x, val);
+            unity_zpq_set(g, y, x, val);
+
+            fmpz_clear(val);
+        }
+
+
+
+        if (unity_zpq_equal(f, g) == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
+
+        fmpz_clear(n);
+        unity_zpq_clear(f);
+        unity_zpq_clear(g);
+    }
     
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

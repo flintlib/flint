@@ -28,6 +28,7 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
@@ -103,6 +104,12 @@ void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b);
 /* Z[unity_root_q, unity_root_p] operations. */
 void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n);
 void unity_zpq_clear(unity_zpq value);
+
+void unity_zpq_set(unity_zpq value, ulong i, ulong j, const fmpz_t x);
+void unity_zpq_set_ui(unity_zpq value, ulong i, ulong j, ulong x);
+
+int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
+
 void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right);
 void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right);
 
@@ -116,7 +123,7 @@ void jacobi_2q_two(unity_root result, ulong q);
 /* Initial step functions. */
 void aprcl_config_init(aprcl_config conf, const fmpz_t n);
 void aprcl_config_clear(aprcl_config conf);
-void aprcl_config_update(aprcl_config conf);
+void _aprcl_config_update(aprcl_config conf);
 
 mp_ptr f_table(const ulong q);
 

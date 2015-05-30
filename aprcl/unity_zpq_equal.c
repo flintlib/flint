@@ -20,24 +20,26 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 {
-    int i, j;
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("unity_zpq_mul....");
-    fflush(stdout);
-    
-    flint_printf("NO TEST\n");
-    return 0;
+    ulong i;
+
+    if (f->p != g->p)
+        return 0;
+    if (f->q != g->q)
+        return 0;
+    if (fmpz_equal(f->n, g->n) == 0)
+        return 0;
+
+    for (i = 0; i < f->p; i++)
+        if (fmpz_mod_poly_equal(f->polys[i], g->polys[i]) == 0)
+            return 0;
+
+    return 1;
 }
 

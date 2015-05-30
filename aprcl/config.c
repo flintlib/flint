@@ -25,7 +25,7 @@
 
 #include "aprcl.h"
 
-void aprcl_config_update(aprcl_config conf)
+void _aprcl_config_update(aprcl_config conf)
 {
     ulong prime = 2;
 
@@ -57,7 +57,7 @@ void aprcl_config_init(aprcl_config conf, const fmpz_t n)
     while (fmpz_cmp(s2, n) <= 0)
     {
         conf->R += 1;
-        aprcl_config_update(conf);
+        _aprcl_config_update(conf);
         fmpz_mul(s2, conf->s, conf->s);
     }
 }

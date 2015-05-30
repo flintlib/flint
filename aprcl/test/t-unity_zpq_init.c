@@ -31,13 +31,32 @@
 
 int main(void)
 {
-    int i, j;
+    int i;
     FLINT_TEST_INIT(state);
    
     flint_printf("unity_zpq_init....");
     fflush(stdout);
+
+    for (i = 0; i < 100; i++)
+    {
+        ulong p, q;
+        fmpz_t n;
+        unity_zpq value;
+
+        fmpz_init(n);
+
+        p = n_randprime(state, 2 + n_randint(state, 16), 0);
+        q = n_randprime(state, 2 + n_randint(state, 16), 0);
+
+        fmpz_randtest_not_zero(n, state, 200);
+
+        unity_zpq_init(value, q, p, n);
+        unity_zpq_clear(value);
+
+        fmpz_clear(n);
+    }
     
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

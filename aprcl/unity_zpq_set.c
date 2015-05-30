@@ -20,24 +20,18 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+void unity_zpq_set(unity_zpq value, ulong q, ulong p, const fmpz_t x)
 {
-    int i, j;
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("unity_zpq_mul....");
-    fflush(stdout);
-    
-    flint_printf("NO TEST\n");
-    return 0;
+    fmpz_mod_poly_set_coeff_fmpz(value->polys[p], q, x);
+}
+
+void unity_zpq_set_ui(unity_zpq value, ulong q, ulong p, ulong x)
+{
+    fmpz_mod_poly_set_coeff_ui(value->polys[p], q, x);
 }
 
