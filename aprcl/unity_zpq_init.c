@@ -20,19 +20,36 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
 #include "aprcl.h"
 
-int is_prime_gauss(const fmpz_t n)
+void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
 {
-    aprcl_config conf;
-    aprcl_config_init(conf, n);
+    int i;
 
+    value->p = p;
+    value->q = q;
+    fmpz_init_set(value->n, n);
+    value->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
+    for (i = 0; i < p; i++)
+    {
+        fmpz_mod_poly_init(value->polys[i], n);
+    }
+}
+
+void unity_zpq_clear(unity_zpq value)
+{
+    int i;
     
-
-    aprcl_config_clear(conf);
-    return 0;
+    for (i = 0; i < value->p; i++)
+    {
+        fmpz_mod_poly_clear(value->polys[i]);
+    }
+    value->p = 0;
+    value->q = 0;
+    fmpz_clear(value->n);
+    flint_free(value->polys);
 }
 

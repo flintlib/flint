@@ -67,6 +67,7 @@ typedef struct
     fmpz_mod_poly_t *polys;
     ulong p;
     ulong q;
+    fmpz_t n;
 } _unity_zpq;
 
 typedef _unity_zpq unity_zpq[1];

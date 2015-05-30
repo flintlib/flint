@@ -20,28 +20,18 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
 #include "aprcl.h"
 
-void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
-{
-
-}
-
-void unity_zpq_clear(unity_zpq value)
-{
-
-}
-
 void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right)
 {
+    ulong i;
 
-}
-
-void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right)
-{
-
+    for (i = 0; i < result->p; i++)
+    {
+        fmpz_mod_poly_add(result->polys[i], left->polys[i], right->polys[i]);
+    }
 }
 

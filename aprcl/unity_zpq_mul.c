@@ -20,24 +20,43 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+void unity_zpq_mul(unity_zpq result
+        , const unity_zpq left, const unity_zpq right)
 {
-    int i, j;
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("unity_zpq....");
-    fflush(stdout);
-    
-    flint_printf("NO TEST\n");
-    return 0;
+    ulong i, j, k, p, pinv, q;
+    fmpz_t n;
+    fmpz_mod_poly_t temp;
+
+    q = result->q;
+    p = result->p;
+    pinv = n_preinvert_limb(p);
+    fmpz_mod_poly_init(temp, result->n);
+
+    for (i = 0; i < p; i++)
+    {
+        for (j = 0; j < p; j++)
+        {
+            ulong qpow;
+
+            qpow = n_mulmod2_preinv(i, j, p, pinv);
+            fmpz_mod_poly_mul(temp, left->polys[i], right->polys[j]);
+
+            for (k = temp->length - 1; k > q; k--)
+            {
+                fmpz_add(temp->coeffs + k - q
+                    , temp->coeffs + k - q, temp->coeffs + k);
+                fmpz_set_ui(temp->coeffs + k, 0);
+                fmpz_mod(temp->coeffs + k - q, temp->coeffs + k - q, n);
+            }
+            _fmpz_mod_poly_normalise(temp);
+
+            fmpz_mod_poly_add(result->polys[qpow], result->polys[qpow], temp);
+        }
+    }
 }
 

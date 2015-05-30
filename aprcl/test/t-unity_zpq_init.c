@@ -20,19 +20,24 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-int is_prime_gauss(const fmpz_t n)
+int main(void)
 {
-    aprcl_config conf;
-    aprcl_config_init(conf, n);
-
+    int i, j;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zpq_init....");
+    fflush(stdout);
     
-
-    aprcl_config_clear(conf);
+    flint_printf("NO TEST\n");
     return 0;
 }
 

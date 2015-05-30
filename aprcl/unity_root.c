@@ -85,14 +85,8 @@ void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_
     power = element1->power;
     for (i = res->poly->length - 1; i > power; i--)
     {
-        slong coeff = fmpz_get_si(res->poly->coeffs + i);
-        if (coeff != 0)
-        {
-            slong old_coeff = fmpz_get_si(res->poly->coeffs + i - power);
-            old_coeff += coeff;
-            fmpz_set_si(res->poly->coeffs + i, 0);
-            fmpz_set_si(res->poly->coeffs + i - power, old_coeff);
-        }
+        fmpz_add(res->poly->coeffs + i - power, res->poly->coeffs + i - power, res->poly->coeffs + i);
+        fmpz_set_ui(res->poly->coeffs + i, 0);
     }
     _fmpz_poly_normalise(res->poly);
 }
