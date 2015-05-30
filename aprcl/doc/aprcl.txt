@@ -52,12 +52,12 @@ void unity_zpq_clear(unity_zpq value)
     Clears the given \code{unity_zpq} element. It must be reinitialised in
     order to be used again.
 
-void unity_zpq_set(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
     \code{i} must be less then {q} and \code{j} must be less then {p}.
 
-void unity_zpq_set_ui(unity_zpq value, ulong i, ulong j, ulong x)
+void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
     \code{i} must be less then {q} and \code{j} must be less then {p}.

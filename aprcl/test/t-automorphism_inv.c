@@ -35,6 +35,8 @@ int main(void)
    
     flint_printf("automorphism_inv....");
     fflush(stdout);
+
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("NO TEST\n");
     return 0;

@@ -25,14 +25,72 @@
 
 #include "aprcl.h"
 
+int is_condition_one()
+{
+    /* condition one of theorem 4.2 */
+    return 0;
+}
+
+int is_condition_two()
+{
+    /* condition two of theorem 4.2 */
+    return 0;
+}
+
 int is_prime_gauss(const fmpz_t n)
 {
+    ulong i, j, k;
     aprcl_config conf;
     aprcl_config_init(conf, n);
 
-    
+    for (i = 0; i < conf->qs->num; i++)
+    {
+        ulong q, r;
+        n_factor_t q_factors;
+
+        q = conf->qs->p[i];
+        n_factor_init(&q_factors);
+        n_factor(&q_factors, q, 1);
+
+        for (j = 0; j <= q_factors.num; j++)
+        {
+            for (k = 1; k <= q_factors.exp[j]; k++)
+            {
+                unity_zpq gauss;
+                fmpz_t qr, gcd;
+
+                fmpz_init(qr);
+                fmpz_init(gcd);
+                r = n_pow(q_factors.p[j], k);
+                fmpz_set_ui(qr, q * r);
+
+
+                fmpz_gcd(gcd, n, qr);
+                if (fmpz_cmp_ui(gcd, 1) == 1)
+                {
+                    return 0;
+                }
+
+                if (is_condition_one() == 0)
+                {
+                    return 0;
+                }
+                
+                unity_zpq_init(gauss, q, r, n);
+                unity_zpq_gauss_sum(gauss, q, r);
+                if (is_condition_two() == 0)
+                {
+                    return 0;
+                }
+
+                unity_zpq_clear(gauss);
+                fmpz_clear(qr);
+                fmpz_clear(gcd);
+            }
+        }
+    }
 
     aprcl_config_clear(conf);
-    return 0;
+    return 1;
 }
 

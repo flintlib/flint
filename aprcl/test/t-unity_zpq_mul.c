@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zpq_mul....");
     fflush(stdout);
     
-    for (i = 0; i < 1; i++)
+    for (i = 0; i < 100; i++)
     {
         ulong p, q;
         fmpz_t n;
@@ -71,8 +71,8 @@ int main(void)
             fmpz_randtest_not_zero(val1, state, 200);
             fmpz_randtest_not_zero(val2, state, 200);
 
-            unity_zpq_set(left, y, x, val1);
-            unity_zpq_set(right, y, x, val2);
+            unity_zpq_coeff_set_fmpz(left, y, x, val1);
+            unity_zpq_coeff_set_fmpz(right, y, x, val2);
 
             fmpz_clear(val1);
             fmpz_clear(val2);
@@ -92,8 +92,10 @@ int main(void)
         unity_zpq_clear(res);
         unity_zpq_clear(left);
         unity_zpq_clear(right);
-        unity_zpq_clear(temp);
+        unity_zpq_clear(test);
     }
+
+    FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");
     return 0;

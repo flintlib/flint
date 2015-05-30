@@ -23,27 +23,24 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
 {
-    int i, j;
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("is_prime_gauss....");
-    fflush(stdout);
+    ulong i, qinv, qpow, ppow, g;
+    unity_zpq temp;
+    mp_ptr character_table;
 
-    fmpz_t n;
-    fmpz_init_set_ui(n, 42);
-    is_prime_gauss(n);
-    
-    FLINT_TEST_CLEANUP(state);
+    g = n_primitive_root_prime(q);
+    qinv = n_preinvert_limb(q);
+    qpow = 1;
+    ppow = 0;
 
-    flint_printf("NO TEST\n");
-    return 0;
+    for (i = 1; i < q; i++)
+    {
+        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
+        ppow = n_addmod(ppow, 1, p);
+        unity_zpq_coeff_add(value, qpow, ppow, 1);
+    }
 }
 

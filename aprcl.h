@@ -82,7 +82,10 @@ typedef enum
     FAIL_ADDITIONAL
 } return_status_aprcl;
 
+int is_condition_one();
+int is_condition_two();
 int is_prime_gauss(const fmpz_t n);
+
 int is_prime_aprcl(const fmpz_t n);
 
 return_status_aprcl _is_prime_aprcl(const fmpz_t n);
@@ -105,13 +108,17 @@ void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b);
 void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n);
 void unity_zpq_clear(unity_zpq value);
 
-void unity_zpq_set(unity_zpq value, ulong i, ulong j, const fmpz_t x);
-void unity_zpq_set_ui(unity_zpq value, ulong i, ulong j, ulong x);
+void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x);
+void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x);
+
+void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x);
 
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
 void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right);
 void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right);
+
+void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p);
 
 /* Jacobi sum computation. */
 void jacobi_pq(unity_root result, ulong q, ulong p);

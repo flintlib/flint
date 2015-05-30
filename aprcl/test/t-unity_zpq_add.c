@@ -71,11 +71,11 @@ int main(void)
             fmpz_randtest_not_zero(val1, state, 200);
             fmpz_randtest_not_zero(val2, state, 200);
 
-            unity_zpq_set(left, y, x, val1);
-            unity_zpq_set(right, y, x, val2);
+            unity_zpq_coeff_set_fmpz(left, y, x, val1);
+            unity_zpq_coeff_set_fmpz(right, y, x, val2);
 
             fmpz_add(val1, val1, val2);
-            unity_zpq_set(test, y, x, val1);
+            unity_zpq_coeff_set_fmpz(test, y, x, val1);
 
             fmpz_clear(val1);
             fmpz_clear(val2);
@@ -96,6 +96,8 @@ int main(void)
         unity_zpq_clear(right);
         unity_zpq_clear(test);
     }
+
+    FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
     return 0;

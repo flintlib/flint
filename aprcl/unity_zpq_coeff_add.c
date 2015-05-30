@@ -20,30 +20,14 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 {
-    int i, j;
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("is_prime_gauss....");
-    fflush(stdout);
-
-    fmpz_t n;
-    fmpz_init_set_ui(n, 42);
-    is_prime_gauss(n);
-    
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("NO TEST\n");
-    return 0;
+    fmpz_add(value->polys[j] + i, value->polys[j] + i, x);
+    fmpz_mod(value->polys[j] + i, value->polys[j] + i, value->n);
 }
 
