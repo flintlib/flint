@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zpq_add....");
     fflush(stdout);
 
-    /*
+    
     for (i = 0; i < 100; i++)
     {
         ulong p, q;
@@ -49,9 +49,12 @@ int main(void)
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
         q = n_randprime(state, 2 + n_randint(state, 6), 0);
 
-        fmpz_randtest_not_zero(n, state, 200);
+        fmpz_randtest_unsigned(n, state, 200);
+        while (fmpz_equal_ui(n, 0) != 0)
+            fmpz_randtest_unsigned(n, state, 200);
 
         unity_zpq_init(res, q, p, n);
+        unity_zpq_init(test, q, p, n);
         unity_zpq_init(left, q, p, n);
         unity_zpq_init(right, q, p, n);
 
@@ -65,14 +68,15 @@ int main(void)
 
             x = n_randint(state, p);
             y = n_randint(state, q);
-
+            
             fmpz_randtest_not_zero(val1, state, 200);
             fmpz_randtest_not_zero(val2, state, 200);
-            unity_zpq_set(left, x, y, val1);
-            unity_zpq_set(right, x, y, val2);
+
+            unity_zpq_set(left, y, x, val1);
+            unity_zpq_set(right, y, x, val2);
 
             fmpz_add(val1, val1, val2);
-            unity_zpq_set(test, x, y, val1);
+            unity_zpq_set(test, y, x, val1);
 
             fmpz_clear(val1);
             fmpz_clear(val2);
@@ -84,12 +88,14 @@ int main(void)
         {
             
             flint_printf("FAIL\n");
+            abort();
         }
     
+        fmpz_clear(n);
         unity_zpq_clear(res);
         unity_zpq_clear(left);
         unity_zpq_clear(right);
-    } */
+    }
     
     flint_printf("PASS\n");
     return 0;
