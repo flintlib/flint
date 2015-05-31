@@ -20,42 +20,49 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
 #include "aprcl.h"
 
-void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
+void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 {
-    int i;
+    unity_zpq value;
+    fmpz_t power, rem;
 
-    value->p = p;
-    value->q = q;
-    fmpz_init_set(value->n, n);
-    value->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
-    for (i = 0; i < p; i++)
+    unity_zpq_init(value, f->q, f->p, f->n);
+    fmpz_init_set(power, pow);
+    fmpz_init(rem);
+
+    unity_zpq_coeff_set_ui(f, 0, 0, 1);
+
+    while (fmpz_is_zero(power) == 0)
     {
-        fmpz_mod_poly_init(value->polys[i], n);
-    }
-}
+        unity_zpq temp_pow;
 
-void unity_zpq_init_mul1(unity_zpq value, ulong q, ulong p, const fmpz_t n)
-{
-    unity_zpq_init(value, q, p, n);
-    unity_zpq_coeff_set_ui(value, 0, 0, 1);
-}
+        fmpz_fdiv_r_2exp(rem, power, 1);
+        if (fmpz_is_zero(rem) != 0)
+        {
+            unity_zpq temp;
+            unity_zpq_init(temp, f->q, f->p, f->n);
 
-void unity_zpq_clear(unity_zpq value)
-{
-    int i;
-    
-    for (i = 0; i < value->p; i++)
-    {
-        fmpz_mod_poly_clear(value->polys[i]);
+            unity_zpq_mul(temp, f, value);
+            unity_zpq_swap(f, temp);
+
+            unity_zpq_clear(temp);
+        }
+
+        unity_zpq_init(temp_pow, f->q, f->p, f->n);
+        unity_zpq_mul(temp_pow, value, value);
+        unity_zpq_swap(value, temp_pow);
+        fmpz_fdiv_q_2exp(power, power, 1);
+
+        unity_zpq_clear(temp_pow);
     }
-    value->p = 0;
-    value->q = 0;
-    fmpz_clear(value->n);
-    flint_free(value->polys);
+
+
+    fmpz_clear(power);
+    fmpz_clear(rem);
+    fmpz_clear(value);
 }
 
