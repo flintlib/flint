@@ -29,7 +29,6 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "C:\Users\measure\Documents\GitHub\flint2\test_helpers.c"
 
 #ifdef __cplusplus
  extern "C" {
@@ -42,22 +41,6 @@
 #else
    #include <stdint.h>
 #endif
-
-/*
-    Debug verbosity (bits are as follows):
-     >0   - print headings for each phase of the sieve and some
-            simple data about the number of FB primes used, etc.
-      2   - print poly A coeffs
-      4   - print polynomials used
-      8   - print relations
-      16  - print statistics for sieve contents
-      32  - print X values for each sieve entry that passes initial sieve test
-      64  - print information about the number of duplicate relations
-      128 - print lanczos information and errors
-*/
-#define QS_DEBUG 0
-
-#define CACHE_SIZE 65536 /* size of L1 cache */
 
 typedef struct prime_t
 {
@@ -114,6 +97,17 @@ static const mp_limb_t qsieve_tune[][5] =
 
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
+
+/******************************IGNORE*****************************************/
+
+#include "test_helpers.c"
+#include "clear.c"
+#include "init.c"
+#include "knuth_schroeppel.c"
+#include "primes_init.c"
+
+/******************************************************************************/
+
 
 #ifdef __cplusplus
 }

@@ -29,15 +29,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-
-/******************************IGNORE*****************************************/
-
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\clear.c"
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\init.c"
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\knuth_schroeppel.c"
-
-/******************************************************************************/
+#include "qsieve.h"
 
 int main(void)
 {

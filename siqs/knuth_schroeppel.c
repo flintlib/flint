@@ -29,12 +29,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-
-/****************************IGNORE******************************************/
-
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
-
-/****************************************************************************/
+#include "qsieve.h"
 
 /* Array of possible Knuth-Schroeppel multipliers */
 static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,
@@ -80,10 +75,6 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
         may not exceed number of factor base primes (recall k and 2 are factor base primes)
     */
     max = FLINT_MIN(qs_inf->ks_primes, qs_inf->num_primes - 2);
-
-#if QS_DEBUG
-    flint_printf("Checking %wd Knuth-Schroeppel primes\n", max);
-#endif
 
     n_primes_t iter;
     n_primes_init(iter);
@@ -144,10 +135,6 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
             qs_inf->k = multipliers[i];
         }
     }
-
-#if QS_DEBUG
-    flint_printf("Using multiplier %wd\n", qs_inf->k);
-#endif
 
     return 0; /* we didn't find any small factors */
 }

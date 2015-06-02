@@ -27,12 +27,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-
-/****************************IGNORE******************************************/
-
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
-
-/****************************************************************************/
+#include "qsieve.h"
 
 void qsieve_clear(qs_t qs_inf)
 {

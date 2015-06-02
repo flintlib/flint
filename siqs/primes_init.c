@@ -26,12 +26,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-
-/*****************************IGNORE*****************************************/
-
-#include "C:\Users\measure\Documents\GitHub\flint2\siqs\qsieve.h"
-
-/****************************************************************************/
+#include "qsieve.h"
 
 prime_t *
 compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
