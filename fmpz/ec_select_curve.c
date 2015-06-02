@@ -28,19 +28,22 @@
 #include "fmpz.h"
 
 /* Select Montgomery Elliptic Curve given a sigma
-   (Suyama's parameterization) */
+   (Suyama's parameterization) 
+   Returns 1 in case factor is found while selecting
+   the curev. */
 
 void
-fmpz_ec_select_curve(fmpz_t x, fmpz_t a, fmpz_t sig, fmpz_t n)
+fmpz_ec_select_curve(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t sig, fmpz_t n)
 {
-    fmpz_t u, v, w, y, z, f;
+    fmpz_t u, v, w, y, z;
+    int ret;
+    ret = 0;
 
     fmpz_init_set(u, sig);
     fmpz_init(v);
     fmpz_init(w);
     fmpz_init(y);
     fmpz_init(z);
-    fmpz_init(f);
 
     fmpz_mul_2exp(v, u, 2);     /* v = sig * 4 */
     fmpz_mod(v, v, n);
@@ -82,10 +85,8 @@ fmpz_ec_select_curve(fmpz_t x, fmpz_t a, fmpz_t sig, fmpz_t n)
 
     if (fmpz_is_one(f) == 0)
     {
-        printf("factor found\n");
-        fmpz_print(f);
-        /* TODO : factor found, code the rest */
-        return;
+        ret = 1;
+        goto cleanup;
     }
 
     fmpz_mul(v, u, y);
@@ -100,11 +101,14 @@ fmpz_ec_select_curve(fmpz_t x, fmpz_t a, fmpz_t sig, fmpz_t n)
     fmpz_sub_ui(a, w, 2);
 
 
+    cleanup:
 
     fmpz_clear(u);
     fmpz_clear(v);
     fmpz_clear(w);   
     fmpz_clear(y);   
-    fmpz_clear(z);   
-    fmpz_clear(f);
+    fmpz_clear(z); 
+
+    return ret; 
+
 }
