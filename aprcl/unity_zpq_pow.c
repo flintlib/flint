@@ -66,3 +66,12 @@ void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
     fmpz_clear(value);
 }
 
+void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)
+{
+    fmpz_t p;
+    fmpz_init_set_ui(p, pow);
+    unity_zpq_pow(f, g, p);
+    fmpz_clear(p);
+}
+
+
