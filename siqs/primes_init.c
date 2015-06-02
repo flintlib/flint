@@ -62,7 +62,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
 
     qs_inf->num_primes = num_primes;
 
-    /* compute the two limbs of kn */
+    /* compute the last prime in factor base & current number of prime */
     if (num == 0)
     {
         p = 2;
@@ -74,7 +74,8 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     n_primes_init(iter);
     n_primes_jump_after(iter, p);
 
-    for (fb_prime = num; fb_prime < num_primes; ) /* leave space for k and 2 */
+    /* factor base already contain 'num' number of prime */
+    for (fb_prime = num; fb_prime < num_primes; )
     {
 
         p = n_primes_next(iter);

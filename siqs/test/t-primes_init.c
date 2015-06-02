@@ -58,7 +58,6 @@ int main(void)
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
-
        fmpz_randtest_unsigned(n, state, 130);
 
        if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;
@@ -68,18 +67,17 @@ int main(void)
 
        if (small_factor) continue;
 
-       fmpz_mul_ui(qs_inf->kn, n, qs_inf->k);                      /*haven't calculated earlier*/
+       fmpz_mul_ui(qs_inf->kn, n, qs_inf->k);                      /* haven't calculated earlier */
        small_factor = qsieve_primes_init(qs_inf);
 
        if (small_factor)
        {
            /* check if factor, if returned by factor base function
               is actually a factor of n */
-
            if (fmpz_fdiv_ui(n, small_factor))
            {
                flint_printf("%wd is not a factor of ", small_factor);
-               fmpz_print(n);
+               fmpz_print(qs_inf->n);
                flint_printf("\n");
                abort();
            }
@@ -90,7 +88,6 @@ int main(void)
        {
            /* check if square root of kn modulo
                factor base prime p are correct   */
-
            fmpz_set_si(x, qs_inf->sqrts[j]);
            fmpz_mul(y, x, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
@@ -105,10 +102,8 @@ int main(void)
            }
 
            /* check if inverse of factor base primes are correct*/
-
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
            fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
-
            pmod = n_mod2_preinv(fmpz_get_ui(x),
                         qs_inf->factor_base[j].p, qs_inf->factor_base[j].pinv);
 
@@ -121,9 +116,7 @@ int main(void)
        }
 
        /* add next 50 primes to factor base */
-
        k = qs_inf->num_primes;
-
        small_factor = qsieve_primes_increment(qs_inf, 50);
 
        if (small_factor)
@@ -131,17 +124,15 @@ int main(void)
            if (fmpz_fdiv_ui(qs_inf->n, small_factor))
            {
                flint_printf("%wd is not a factor of ", small_factor);
-               fmpz_print(n);
+               fmpz_print(qs_inf->n);
                flint_printf("\n");
                abort();
            }
            else continue;
        }
 
-
        for (j = k; j < qs_inf->num_primes; j++)
        {
-
            fmpz_set_si(x, qs_inf->sqrts[j]);
            fmpz_mul(y, x, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
@@ -155,10 +146,8 @@ int main(void)
                abort();
            }
 
-
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
            fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
-
            pmod = n_mod2_preinv(fmpz_get_ui(x),
                         qs_inf->factor_base[j].p, qs_inf->factor_base[j].pinv);
 
@@ -171,9 +160,7 @@ int main(void)
        }
 
        /* add next 30 primes to factor base */
-
        k = qs_inf->num_primes;
-
        small_factor = qsieve_primes_increment(qs_inf, 30);
 
        if (small_factor)
@@ -188,10 +175,8 @@ int main(void)
            else continue;
        }
 
-
        for (j = k; j < qs_inf->num_primes; j++)
        {
-
            fmpz_set_si(x, qs_inf->sqrts[j]);
            fmpz_mul(y, x, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
@@ -205,10 +190,8 @@ int main(void)
                abort();
            }
 
-
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
            fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
-
            pmod = n_mod2_preinv(fmpz_get_ui(x),
                         qs_inf->factor_base[j].p, qs_inf->factor_base[j].pinv);
 
@@ -220,11 +203,8 @@ int main(void)
            }
        }
 
-
        /* add next 10 primes to factor base*/
-
        k = qs_inf->num_primes;
-
        small_factor = qsieve_primes_increment(qs_inf, 10);
 
        if (small_factor)
@@ -239,10 +219,8 @@ int main(void)
            else continue;
        }
 
-
        for (j = k; j < qs_inf->num_primes; j++)
        {
-
            fmpz_set_si(x, qs_inf->sqrts[j]);
            fmpz_mul(y, x, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
@@ -256,10 +234,8 @@ int main(void)
                abort();
            }
 
-
            fmpz_randtest_unsigned(x, state, FLINT_BITS);
            fmpz_mod_ui(y, x, qs_inf->factor_base[j].p);
-
            pmod = n_mod2_preinv(fmpz_get_ui(x),
                         qs_inf->factor_base[j].p, qs_inf->factor_base[j].pinv);
 

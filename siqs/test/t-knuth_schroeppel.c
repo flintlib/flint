@@ -43,6 +43,9 @@ int main(void)
 {
    int i;
    mp_limb_t small_factor;
+   fmpz_t n;
+   qs_t qs_inf;
+   fmpz_init(n);
    FLINT_TEST_INIT(state);
 
    flint_printf("knuth_schroeppel....");
@@ -52,10 +55,6 @@ int main(void)
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random n */
    {
-      fmpz_t n;
-      fmpz_init(n);
-      qs_t qs_inf;
-
       fmpz_randtest_unsigned(n, state, 130);
 
       if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;
@@ -75,6 +74,7 @@ int main(void)
       }
 
       qsieve_clear(qs_inf);
+      fmpz_clear(n);
    }
 
    FLINT_TEST_CLEANUP(state);
