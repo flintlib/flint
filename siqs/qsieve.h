@@ -98,7 +98,9 @@ static const mp_limb_t qsieve_tune[][5] =
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
 
-/******************************IGNORE*****************************************/
+/* need to replace with function prototype */
+
+/******************************************************************************/
 
 #include "test_helpers.c"
 #include "clear.c"
