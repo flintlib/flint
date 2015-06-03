@@ -39,17 +39,13 @@
    Assumes n is not prime and not a perfect power.
 */
 
-mp_limb_t qsieve_factor(fmpz_t n)
+mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 {
     qs_t qs_inf;
-    mp_limb_t factor = 0, t;
-    slong rels_found = 0;
-    char * sieve;
-    slong ncols, nrows, i, count;
-    uint64_t * nullrows;
-    uint64_t mask;
-    flint_rand_t state;
-    fmpz_t X, Y;
+    mp_limb_t small_factor;
+    ulong exp = 0;
+    fmpz x;
+    fmpz_init(x);
 
     /************************************************************************
         INITIALISATION:
@@ -67,27 +63,26 @@ mp_limb_t qsieve_factor(fmpz_t n)
         during this process it is returned.
     ************************************************************************/
 
-    factor = qsieve_knuth_schroeppel(qs_inf);
+    small_factor = qsieve_knuth_schroeppel(qs_inf);
 
-    if (factor)
+    if (small_factor)
 	{
-	    qsieve_clear(qs_inf);
-        return factor;
+	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+	    {
+	        fmpz_divexact_ui(x, qs_inf->n, small_factor)
+	        fmpz_init_set(qs_inf->n, x);
+	        exp++;
+	    }
+
+	    _fmpz_factor_append_ui(factors, small_factors, exp);
+	    exp = 0;
 	}
 
     /* compute kn */
-    fmpz_set_ui(qs_inf->kn, hi);
-    fmpz_mul_2exp(qs_inf->kn, qs_inf->kn, FLINT_BITS);
-    fmpz_add_ui(qs_inf->kn, qs_inf->kn, lo);
-    fmpz_mul_ui(qs_inf->kn, qs_inf->kn, qs_inf->k);
+    fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k);
 
     /* refine qs_inf->bits */
     qs_inf->bits = fmpz_bits(qs_inf->kn);
-    if (qs_inf->bits > 2*FLINT_BITS)
-    {
-		qsieve_ll_clear(qs_inf);
-        return 0; /* kn is too large to factor */
-    }
 
     /************************************************************************
         COMPUTE FACTOR BASE:
@@ -98,12 +93,41 @@ mp_limb_t qsieve_factor(fmpz_t n)
     ************************************************************************/
 
     /* compute factor base primes and associated data*/
-    factor = qsieve_ll_primes_init(qs_inf);
-	if (factor)
+    small_factor = qsieve_primes_init(qs_inf);
+
+	if (small_factor)
     {
-        qsieve_ll_clear(qs_inf);
-        return factor;
+	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+	    {
+	        fmpz_divexact_ui(x, qs_inf->n, small_factor)
+	        fmpz_init_set(qs_inf->n, x);
+	        exp++;
+	    }
+
+	    _fmpz_factor_append_ui(factors, small_factors, exp);
+	    exp = 0;
 	}
 
-    return factor;
+	if (factors->num) return 0;
+
+	while (small_factor == 0)
+        small_factor = qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
+
+	if (small_factor)
+    {
+	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+	    {
+	        fmpz_divexact_ui(x, qs_inf->n, small_factor)
+	        fmpz_init_set(qs_inf->n, x);
+	        exp++;
+	    }
+
+	    _fmpz_factor_append_ui(factors, small_factors, exp);
+	    exp = 0;
+	}
+
+	fmpz_clear(x);
+    qsieve_clear(qs_inf);
+
+    return 0;
 }
