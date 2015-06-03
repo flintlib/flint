@@ -66,9 +66,9 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     small_factor = qsieve_knuth_schroeppel(qs_inf);
 
     if (small_factor)
-	{
-	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
-	    {
+    {
+        while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+        {
 	        fmpz_divexact_ui(x, qs_inf->n, small_factor);
 	        fmpz_init_set(qs_inf->n, x);
 	        exp++;
@@ -95,7 +95,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     /* compute factor base primes and associated data*/
     small_factor = qsieve_primes_init(qs_inf);
 
-	if (small_factor)
+    if (small_factor)
     {
 	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
 	    {
@@ -113,7 +113,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 	while (small_factor == 0)
         small_factor = qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
 
-	if (small_factor)
+    if (small_factor)
     {
 	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
 	    {
