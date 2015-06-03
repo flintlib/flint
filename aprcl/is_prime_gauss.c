@@ -27,14 +27,12 @@
 
 int is_condition_one()
 {
-    /* condition one of theorem 4.2 */
     return 0;
 }
 
-int is_condition_two()
+int is_condition_two(const unity_zpq f, const unity_zpq g)
 {
-    /* condition two of theorem 4.2 */
-    return 0;
+    /* if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; otherwise return 0 */
 }
 
 int is_prime_gauss(const fmpz_t n)
@@ -70,25 +68,26 @@ int is_prime_gauss(const fmpz_t n)
                 {
                     return 0;
                 }
-
+/*
                 if (is_condition_one() == 0)
                 {
                     return 0;
                 }
-                
-                unity_zpq_init(gauss, q, r, n);
+*/                
+/*                unity_zpq_init(gauss, q, r, n);
                 unity_zpq_gauss_sum(gauss, q, r);
                 if (is_condition_two() == 0)
                 {
                     return 0;
                 }
-
+*/
                 unity_zpq_clear(gauss);
                 fmpz_clear(qr);
                 fmpz_clear(gcd);
             }
         }
     }
+
 
     aprcl_config_clear(conf);
     return 1;

@@ -83,7 +83,7 @@ typedef enum
 } return_status_aprcl;
 
 int is_condition_one();
-int is_condition_two();
+int is_condition_two(const unity_zpq f, const unity_zpq g);
 int is_prime_gauss(const fmpz_t n);
 
 int is_prime_aprcl(const fmpz_t n);

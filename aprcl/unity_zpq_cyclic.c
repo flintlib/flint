@@ -30,7 +30,7 @@ ulong unity_zpq_p_unity(const unity_zpq f)
     ulong i, is_punity;
     fmpz_t coeff;
     fmpz_init(coeff);
-    is_punity = 0;
+    is_punity = f->p;
     for (i = 1; i < f->p; i++)
     {
         fmpz_mod_poly_get_coeff_fmpz(coeff, f->polys[i], 0);
@@ -47,7 +47,7 @@ ulong unity_zpq_p_unity(const unity_zpq f)
 
 int unity_zpq_is_p_unity(const unity_zpq f)
 {
-    if (unity_zpq_p_unity(f) != 0)
+    if (unity_zpq_p_unity(f) != f->p)
         return 1;
     return 0;
 }
@@ -55,7 +55,7 @@ int unity_zpq_is_p_unity(const unity_zpq f)
 int unity_zpq_is_p_unity_generator(const unity_zpq f)
 {
     ulong upow = unity_zpq_p_unity(f);
-    if (upow != 0)
+    if (upow != f->p)
         if (n_gcd(upow, f->p) == 1)
             return 1;
     return 0;
