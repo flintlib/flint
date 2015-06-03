@@ -66,6 +66,12 @@ typedef struct qs_s
 
    int * sqrts; /* square roots of kn mod factor base primes */
 
+   /* Polynomial data */
+
+   mp_limb_t A;
+   mp_limb_t B;
+
+
 } qs_s;
 
 typedef qs_s qs_t[1];
@@ -107,6 +113,7 @@ static const mp_limb_t qsieve_tune[][5] =
 #include "init.c"
 #include "knuth_schroeppel.c"
 #include "primes_init.c"
+#include "factor.c"
 
 /******************************************************************************/
 

@@ -44,7 +44,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     qs_t qs_inf;
     mp_limb_t small_factor;
     ulong exp = 0;
-    fmpz x;
+    fmpz_t x;
     fmpz_init(x);
 
     /************************************************************************
@@ -69,12 +69,12 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 	{
 	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
 	    {
-	        fmpz_divexact_ui(x, qs_inf->n, small_factor)
+	        fmpz_divexact_ui(x, qs_inf->n, small_factor);
 	        fmpz_init_set(qs_inf->n, x);
 	        exp++;
 	    }
 
-	    _fmpz_factor_append_ui(factors, small_factors, exp);
+	    _fmpz_factor_append_ui(factors, small_factor, exp);
 	    exp = 0;
 	}
 
@@ -99,12 +99,12 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     {
 	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
 	    {
-	        fmpz_divexact_ui(x, qs_inf->n, small_factor)
+	        fmpz_divexact_ui(x, qs_inf->n, small_factor);
 	        fmpz_init_set(qs_inf->n, x);
 	        exp++;
 	    }
 
-	    _fmpz_factor_append_ui(factors, small_factors, exp);
+	    _fmpz_factor_append_ui(factors, small_factor, exp);
 	    exp = 0;
 	}
 
@@ -117,12 +117,12 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     {
 	    while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
 	    {
-	        fmpz_divexact_ui(x, qs_inf->n, small_factor)
+	        fmpz_divexact_ui(x, qs_inf->n, small_factor);
 	        fmpz_init_set(qs_inf->n, x);
 	        exp++;
 	    }
 
-	    _fmpz_factor_append_ui(factors, small_factors, exp);
+	    _fmpz_factor_append_ui(factors, small_factor, exp);
 	    exp = 0;
 	}
 
