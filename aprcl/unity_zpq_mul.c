@@ -37,6 +37,11 @@ void unity_zpq_mul(unity_zpq result
 
     for (i = 0; i < p; i++)
     {
+        fmpz_mod_poly_zero(result->polys[i]);
+    }
+
+    for (i = 0; i < p; i++)
+    {
         for (j = 0; j < p; j++)
         {
             ulong qpow;
