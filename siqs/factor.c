@@ -75,7 +75,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         }
 
         _fmpz_factor_append_ui(factors, small_factor, exp);
-	    exp = 0;
+        exp = 0;
     }
 
     /* compute kn */
@@ -105,7 +105,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         }
 
         _fmpz_factor_append_ui(factors, small_factor, exp);
-	    exp = 0;
+        exp = 0;
     }
 
     if (factors->num) return 0;
@@ -123,7 +123,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         }
 
         _fmpz_factor_append_ui(factors, small_factor, exp);
-	    exp = 0;
+        exp = 0;
     }
 
     fmpz_clear(x);
