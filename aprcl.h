@@ -126,6 +126,10 @@ void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow);
 
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p);
 
+ulong unity_zpq_punity(const unity_zpq f);
+int unity_zpq_is_punity(const unity_zpq f);
+int unity_zpq_is_punity_generator(const unity_zpq f);
+
 /* Jacobi sum computation. */
 void jacobi_pq(unity_root result, ulong q, ulong p);
 void jacobi_pq_general(unity_root result, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
