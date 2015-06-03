@@ -76,7 +76,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
 	    _fmpz_factor_append_ui(factors, small_factor, exp);
 	    exp = 0;
-	}
+    }
 
     /* compute kn */
     fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k);
@@ -106,11 +106,11 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
 	    _fmpz_factor_append_ui(factors, small_factor, exp);
 	    exp = 0;
-	}
+    }
 
-	if (factors->num) return 0;
+    if (factors->num) return 0;
 
-	while (small_factor == 0)
+    while (small_factor == 0)
         small_factor = qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
 
     if (small_factor)
@@ -124,9 +124,9 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
 	    _fmpz_factor_append_ui(factors, small_factor, exp);
 	    exp = 0;
-	}
+    }
 
-	fmpz_clear(x);
+    fmpz_clear(x);
     qsieve_clear(qs_inf);
 
     return 0;
