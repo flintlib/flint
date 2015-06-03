@@ -37,18 +37,18 @@ int main(void)
     flint_printf("unity_zpq_pow....");
     fflush(stdout);
 
-    for (i = 0; i < 1; i++)
+    for (i = 0; i < 100; i++)
     {
-                    flint_printf("%i ", i);
-            fflush(stdout);
-        ulong p, q;
+        ulong p, q, pow;
         fmpz_t n;
         unity_zpq res, left, right, test;
 
         fmpz_init_set_ui(n, 100);
 
-        p = 3;
-        q = 5;
+        p = n_randprime(state, 2 + n_randint(state, 6), 0);
+        q = n_randprime(state, 2 + n_randint(state, 6), 0);
+
+        pow =  n_randint(state, 100);        
 
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
@@ -61,35 +61,39 @@ int main(void)
         for (j = 0; j < 100; j++)
         {
             ulong x, y;
-            fmpz_t val1, val2;
+            fmpz_t val;
 
-            fmpz_init(val1);
-            fmpz_init(val2);
+            fmpz_init(val);
 
             x = n_randint(state, p);
             y = n_randint(state, q);
             
-            fmpz_randtest_not_zero(val1, state, 200);
-            fmpz_randtest_not_zero(val2, state, 200);
+            fmpz_randtest_not_zero(val, state, 200);
 
-            unity_zpq_coeff_set_fmpz(left, y, x, val1);
+            unity_zpq_coeff_set_fmpz(left, y, x, val);
 
-            fmpz_clear(val1);
-            fmpz_clear(val2);
+            fmpz_clear(val);
         }
 
-        unity_zpq_coeff_set_ui(right, 0, 0, 1);
+        unity_zpq_copy(right, left);
 
-        unity_zpq_pow_ui(res, left, 10);
-        for (j = 0; j < 10; j++)
+        unity_zpq_pow_ui(res, right, pow);
+        if (pow == 0)
         {
-            unity_zpq_mul(test, left, right);
-            flint_printf("%i ", j);
-            fflush(stdout);
-            unity_zpq_copy(right, test);
+            unity_zpq_coeff_set_ui(test, 0, 0, 1);
+        } else {
+            for (j = 0; j < pow; j++)
+            {
+                unity_zpq_mul(test, left, right);
+                unity_zpq_swap(right, test);
+            }
         }
 
-        flint_printf("\nresult %i\n", unity_zpq_equal(res, test)); 
+        if (unity_zpq_equal(res, test) == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
 
         fmpz_clear(n);
         unity_zpq_clear(res);
@@ -103,3 +107,4 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
+

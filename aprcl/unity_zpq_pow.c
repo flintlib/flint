@@ -27,6 +27,7 @@
 
 void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 {
+    ulong j;
     unity_zpq value;
     fmpz_t power, rem;
 
@@ -36,12 +37,13 @@ void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 
     unity_zpq_coeff_set_ui(f, 0, 0, 1);
 
+    unity_zpq_copy(value, g);
+
     while (fmpz_is_zero(power) == 0)
     {
         unity_zpq temp_pow;
-
         fmpz_fdiv_r_2exp(rem, power, 1);
-        if (fmpz_is_zero(rem) != 0)
+        if (fmpz_is_zero(rem) == 0)
         {
             unity_zpq temp;
             unity_zpq_init(temp, f->q, f->p, f->n);
