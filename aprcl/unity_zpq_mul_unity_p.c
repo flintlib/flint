@@ -25,10 +25,18 @@
 
 #include "aprcl.h"
 
-void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+void _unity_zpq_mul_unity_p(unity_zpq f)
 {
-    fmpz_add(value->polys[j] + i, value->polys[j] + i, x);
-    if (fmpz_cmp(value->polys[j] + i, value->n) >= 0)
-        fmpz_sub(value->polys[j] + i, value->polys[j] + i, value->n);
+    ulong i;
+    for (i = f->p - 1; i > 0; i--)
+        fmpz_mod_poly_swap(f->polys[i], f->polys[i - 1]);
+}
+
+void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
+{
+    ulong i;
+    unity_zpq_copy(f, g);
+    for (i = 0; i < k; i++)
+        _unity_zpq_mul_unity_p(f);
 }
 

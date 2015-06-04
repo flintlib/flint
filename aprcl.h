@@ -123,7 +123,11 @@ void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right
 void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t p);
 void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow);
 
+void _unity_zpq_mul_unity_p(unity_zpq f);
+void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong p);
+
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p);
+void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p);
 
 ulong unity_zpq_p_unity(const unity_zpq f);
 int unity_zpq_is_p_unity(const unity_zpq f);

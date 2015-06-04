@@ -25,6 +25,27 @@
 
 #include "aprcl.h"
 
+void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
+{
+    ulong i, qinv, pinv, qpow, ppow, g, n;
+    unity_zpq temp;
+    mp_ptr character_table;
+
+    g = n_primitive_root_prime(q);
+    qinv = n_preinvert_limb(q);
+    pinv = n_preinvert_limb(p);
+    n = fmpz_fdiv_ui(value->n, p);
+    qpow = 1;
+    ppow = 0;
+
+    for (i = 1; i < q; i++)
+    {
+        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
+        ppow = n_mulmod2_preinv(i, n, p, pinv);             
+        unity_zpq_coeff_add(value, qpow, ppow, 1);
+    }
+}
+
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
 {
     ulong i, qinv, qpow, ppow, g;

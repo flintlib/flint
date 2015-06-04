@@ -88,7 +88,7 @@ void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x)
 
 void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 
-    Sets $a$ in $a*\zeta_p^i*\zeta_q^j$ to $a + x$.
+    Sets $a$ in $a*\zeta_p^i*\zeta_q^j$ to $a + x$. $x$ must be less then $n$.
 
 void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right)
 
@@ -102,6 +102,14 @@ void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right
     \code{result}, \code{left} and \code{right} must be initialized with same
     \code{q}, \code{p} and \code{n}.
 
+void _unity_zpq_mul_unity_p(unity_zpq f)
+
+    Sets $f = f * \zeta_p$.
+
+void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
+
+    Sets $f$ to $g * \zeta_p^k$.
+
 void unity_zpq_pow(unity_zpq f, unity_zpq g, const fmpz_t p)
 
     Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
@@ -112,5 +120,9 @@ void unity_zpq_pow_ui(unity_zpq f, unity_zpq g, ulong p)
 
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
 
-    Sets $value = \tau(\chi_{p, q}).
+    Sets $value = \tau(\chi_{p, q})$.
+
+void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
+
+    Sets $value = \tau^{\sigma_n}(\chi_{p, q})$.
 
