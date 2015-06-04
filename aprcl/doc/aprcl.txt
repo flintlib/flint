@@ -64,6 +64,18 @@ int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 
     Returns non zero value if $f == g$.
 
+ulong unity_zpq_p_unity(const unity_zpq f)
+
+    If $f = \zeta_p^x$ returns $x in [0, p - 1]$; otherwise returns $f->p$. 
+
+int unity_zpq_is_p_unity(const unity_zpq f)
+
+    Returns non zero value if $f = \zeta_p^x$.
+
+int unity_zpq_is_p_unity_generator(const unity_zpq f)
+
+    Returns non zero value if $f$ is a generator of $<\zeta_p>$ cyclic group.
+
 void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
@@ -98,5 +110,7 @@ void unity_zpq_pow_ui(unity_zpq f, unity_zpq g, ulong p)
 
     Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
 
+void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
 
+    Sets $value = \tau(\chi_{p, q}).
 
