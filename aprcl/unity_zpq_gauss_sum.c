@@ -29,7 +29,6 @@ void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
 {
     ulong i, qinv, pinv, qpow, ppow, g, n;
     unity_zpq temp;
-    mp_ptr character_table;
 
     g = n_primitive_root_prime(q);
     qinv = n_preinvert_limb(q);
@@ -41,8 +40,8 @@ void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
     for (i = 1; i < q; i++)
     {
         qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_mulmod2_preinv(i, n, p, pinv);             
-        unity_zpq_coeff_add(value, qpow, ppow, 1);
+        ppow = n_mulmod2_preinv(i, n, p, pinv);
+        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
     }
 }
 
@@ -61,7 +60,7 @@ void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
     {
         qpow = n_mulmod2_preinv(qpow, g, q, qinv);
         ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add(value, qpow, ppow, 1);
+        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
     }
 }
 

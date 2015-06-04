@@ -115,6 +115,7 @@ void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x);
 
 void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x);
+void unity_zpq_coeff_add_ui(unity_zpq value, ulong i, ulong j, ulong x);
 
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 

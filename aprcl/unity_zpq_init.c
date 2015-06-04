@@ -35,7 +35,7 @@ void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
     value->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
     for (i = 0; i < p; i++)
     {
-        fmpz_mod_poly_init(value->polys[i], n);
+        fmpz_mod_poly_init2(value->polys[i], n, q);
     }
 }
 

@@ -20,22 +20,45 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+int main(void)
 {
-    fmpz_add(value->polys[j] + i, value->polys[j] + i, x);           
-    if (fmpz_cmp(value->polys[j] + i, value->n) >= 0)
-        fmpz_sub(value->polys[j] + i, value->polys[j] + i, value->n);
-}
+    int i, j;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zpq_mul_gauss_sum....");
+    fflush(stdout);
+    
+    for (i = 0; i < 1; i++)
+    {
+        ulong p, q;
+        fmpz_t n;
+        unity_zpq res, test;
 
-void unity_zpq_coeff_add_ui(unity_zpq value, ulong i, ulong j, ulong x)
-{
-    fmpz_add_ui(value->polys[j] + i, value->polys[j] + i, x);          
-    if (fmpz_cmp(value->polys[j] + i, value->n) >= 0)
-        fmpz_sub(value->polys[j] + i, value->polys[j] + i, value->n);
+        p = 3;
+        q = 5;
+
+        fmpz_init_set_ui(n, 7);
+
+        unity_zpq_init(res, q, p, n);
+        unity_zpq_init(test, q, p, n);
+
+        
+        unity_zpq_gauss_sum(test, q, p);
+
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }
 
