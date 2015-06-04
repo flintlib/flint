@@ -106,7 +106,6 @@ void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b);
 
 /* Z[unity_root_q, unity_root_p] operations. */
 void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n);
-void unity_zpq_init_mul1(unity_zpq value, ulong q, ulong p, const fmpz_t n);
 void unity_zpq_clear(unity_zpq value);
 
 void unity_zpq_copy(unity_zpq f, const unity_zpq g);

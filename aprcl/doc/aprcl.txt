@@ -52,6 +52,18 @@ void unity_zpq_clear(unity_zpq value)
     Clears the given \code{unity_zpq} element. It must be reinitialised in
     order to be used again.
 
+void unity_zpq_copy(unity_zpq f, const unity_zpq g)
+
+    Sets $f$ to $g$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
+
+void unity_zpq_swap(unity_zpq f, unity_zpq q)
+
+    Swaps $f$ and $g$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
+
+int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
+
+    Returns non zero value if $f == g$.
+
 void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
@@ -61,6 +73,10 @@ void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
     \code{i} must be less then {q} and \code{j} must be less then {p}.
+
+void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+
+    Sets $a$ in $a*\zeta_p^i*\zeta_q^j$ to $a + x$.
 
 void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right)
 
@@ -73,4 +89,14 @@ void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right
     Sets the \code{result} to the \code{left}*\code{right}.
     \code{result}, \code{left} and \code{right} must be initialized with same
     \code{q}, \code{p} and \code{n}.
+
+void unity_zpq_pow(unity_zpq f, unity_zpq g, const fmpz_t p)
+
+    Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
+
+void unity_zpq_pow_ui(unity_zpq f, unity_zpq g, ulong p)
+
+    Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
+
+
 

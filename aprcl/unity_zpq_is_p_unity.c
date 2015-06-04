@@ -28,20 +28,16 @@
 ulong unity_zpq_p_unity(const unity_zpq f)
 {
     ulong i, is_punity;
-    fmpz_t coeff;
-    fmpz_init(coeff);
     is_punity = f->p;
     for (i = 1; i < f->p; i++)
     {
-        fmpz_mod_poly_get_coeff_fmpz(coeff, f->polys[i], 0);
-        if (fmpz_equal_ui(coeff, 1) == 1)
+        if (fmpz_equal_ui(f->polys[i]->coeffs + i, 1) == 1)
         {
             if (is_punity != 0)
                 return 0;
             is_punity = i;
         }
     }
-    fmpz_clear(coeff);
     return is_punity;
 }
 
