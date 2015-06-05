@@ -36,19 +36,22 @@
 #include "fmpz.h"
 
 
-/*
+/***
+   New field added to qs_t struct,
+
    qs_inf->q0 : factor of A, immediately following largest factor-base prime
    qs_inf->A0 : value of coeff A excluding non-factor-base prime
    qs_inf->A_divp : store (A0 / p), for factor p of A0
    qs_inf->B0_terms : B0_terms[i] = (kn^(1 / 2) * (A0 / p)^(-1)) mod p
-*/
+
+***/
 
 void qsieve_compute_A(qs_t qs_inf)
 {
     n_primes_t iter;
     n_primes_init(iter);
     n_primes_jump_after(iter, qs_inf->factor_base[qs_inf->num_primes - 1]);
-    qs_inf->A0 = try_compute_A();     /* calculate A0 */
+    qs_inf->A0 = qsieve_compute_A0();     /* calculate A0, to add */
 
     qsieve_compute_pre_data(qs_inf);     /* pre-compute data for A0 which will be fixed */
 
@@ -58,7 +61,7 @@ void qsieve_compute_A(qs_t qs_inf)
         qsieve_init_poly_first(qs_inf);
         qsieve_init_poly_next(qs_inf);
 
-    }while(); /* we have required number of relation */
+    }while(); /* we have required number of relation, condition to put */
 
     n_primes_clear(iter);
 }
