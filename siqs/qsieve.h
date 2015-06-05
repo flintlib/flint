@@ -69,19 +69,25 @@ typedef struct qs_s
    /* Polynomial data */
 
    mp_limb_t A;
-   mp_limb_t A0;
+   mp_limb_t A0;  /* value of coeff A excluding the non-factor-base prime */
+   mp_limb_t q0;   /* primes immediately following largest factor-base prime */
    mp_limb_t B;
    fmpz_t C;
 
-   mp_limb_t * A_ind; /* indices of factor base primes dividing A */
-   mp_limb_t * A_modp; /* (A / p) mod p for each prime dividing A */
+   mp_limb_t * A_ind;   /* indices of factor base primes dividing A */
+   mp_limb_t * A_modp;  /* (A / p) mod p for each prime dividing A */
+   mp_limb_t * A0_divp;  /* (A0 / p) for each prime dividing A0 */
    mp_limb_t * B_terms;
 
-   mp_limb_t * A_inv; /* A^(-1) mod p */
-   mp_limb_t ** A_inv2B; /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
+   mp_limb_t * B0_terms;  /* similar to B_terms for A0 */
 
-   mp_limb_t * soln1 /* first root of poly */
-   mp_limb_t * soln2 /* second root of poly */
+   mp_limb_t * A_inv;      /* A^(-1) mod p */
+   mp_limb_t ** A_inv2B;   /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
+
+   mp_limb_t * soln1;     /* first root of poly */
+   mp_limb_t * soln2;     /* second root of poly */
+
+   mp_limb target_A;  /* approximate target value for A coeff of poly */
 
    slong s;
 
@@ -117,6 +123,10 @@ static const mp_limb_t qsieve_tune[][5] =
 
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
+
+#define P_GOODNESS 100
+
+#define P_GOODNESS 200
 
 /* need to replace with function prototype */
 

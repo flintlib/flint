@@ -40,7 +40,7 @@
    qs_inf->q0 : factor of A, immediately following largest factor-base prime
    qs_inf->A0 : value of coeff A excluding non-factor-base prime
    qs_inf->A_divp : store (A0 / p), for factor p of A0
-   q_ing->B0_terms : B0_terms[i] = (kn^(1 / 2) * (A0 / p)^(-1)) mod p
+   qs_inf->B0_terms : B0_terms[i] = (kn^(1 / 2) * (A0 / p)^(-1)) mod p
 */
 
 void qsieve_compute_A(qs_t qs_inf)
@@ -50,7 +50,7 @@ void qsieve_compute_A(qs_t qs_inf)
     n_primes_jump_after(iter, qs_inf->factor_base[qs_inf->num_primes - 1]);
     qs_inf->A0 = try_compute_A();     /* calculate A0 */
 
-    qsieve_compute_pre_data(qs_inf);
+    qsieve_compute_pre_data(qs_inf);     /* pre-compute data for A0 which will be fixed */
 
     do
     {
