@@ -121,6 +121,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     slong i;
     mp_limb_t k = qs_inf->k;
     mp_limb_t small_factor = 0;
+    fmpz_t temp;
 
     prime_t * factor_base;
 
@@ -133,11 +134,24 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     i--;
 
     num_primes = qsieve_tune[i][2]; /* number of factor base primes */
+    qs_inf->sieve_size = qsieve_tune[i][4]; /* size of sieve to use */
+    qs_inf->small_primes = qsieve_tune[i][3]; /* number of primes to not sieve with */
 
     qs_inf->num_primes = 0; /* start with 0 primes */
     factor_base = compute_factor_base(&small_factor, qs_inf, num_primes); /* build up FB */
     if (small_factor)
         return small_factor;
+
+
+    /* calculating parameter related to hypercube */
+    fmpz_init(temp);
+    fmpz_mul_2exp(temp, qs_inf->kn, 1);
+    fmpz_sqrt(temp, temp);
+    fmpz_tdiv_q_ui(temp, temp, qs_inf->sieve_size);
+    qs_inf->target_A = fmpz_get_ui(temp);        /* optimal value for hypercube */
+
+    fmpz_clear(temp);
+
 
     /* consider k and 2 as factor base primes */
     factor_base[0].p = k;

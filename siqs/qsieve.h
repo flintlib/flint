@@ -66,7 +66,12 @@ typedef struct qs_s
 
    int * sqrts; /* square roots of kn mod factor base primes */
 
-   /* Polynomial data */
+   slong small_primes; /* number of primes to not sieve with */
+   slong sieve_size; /* size of sieve to use */
+
+   /***************************************************************************
+                       POLYNOMIAL DATA
+    **************************************************************************/
 
    mp_limb_t A;
    mp_limb_t A0;  /* value of coeff A excluding the non-factor-base prime */
@@ -87,7 +92,7 @@ typedef struct qs_s
    mp_limb_t * soln1;     /* first root of poly */
    mp_limb_t * soln2;     /* second root of poly */
 
-   mp_limb target_A;  /* approximate target value for A coeff of poly */
+   mp_limb_t target_A;  /* approximate target value for A coeff of poly */
 
    slong s;
 
@@ -124,9 +129,9 @@ static const mp_limb_t qsieve_tune[][5] =
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(5*sizeof(mp_limb_t)))
 
-#define P_GOODNESS 100
+#define P_GOODNESS 5
 
-#define P_GOODNESS 200
+#define P_GOODNESS2 200
 
 /* need to replace with function prototype */
 
@@ -138,6 +143,7 @@ static const mp_limb_t qsieve_tune[][5] =
 #include "knuth_schroeppel.c"
 #include "primes_init.c"
 #include "factor.c"
+#include "compute_poly_data.c"
 
 /******************************************************************************/
 

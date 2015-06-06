@@ -46,12 +46,29 @@
 
 ***/
 
+void qsieve_compute_A0(qs_t qs_inf)
+{
+    slong i;
+    mp_limb_t prod = 1;
+    prime_t * factor_base = qs_inf->factor_base;
+    slong small_primes = qs_inf->small_primes;
+
+    for (i = small_primes; i < qs_inf->num_primes; i++)
+    {
+        prod *= factor_base[i].p;
+
+        if (prod >= qs_inf->target_A / P_GOODNESS) break;
+    }
+
+    qs_inf->A0 = prod;
+}
+
 void qsieve_compute_A(qs_t qs_inf)
 {
     n_primes_t iter;
     n_primes_init(iter);
-    n_primes_jump_after(iter, qs_inf->factor_base[qs_inf->num_primes - 1]);
-    qs_inf->A0 = qsieve_compute_A0();     /* calculate A0, to add */
+    n_primes_jump_after(iter, qs_inf->factor_base[qs_inf->num_primes - 1].p);
+    qsieve_compute_A0(qs_inf);     /* calculate A0, to add */
 
     qsieve_compute_pre_data(qs_inf);     /* pre-compute data for A0 which will be fixed */
 
@@ -61,7 +78,7 @@ void qsieve_compute_A(qs_t qs_inf)
         qsieve_init_poly_first(qs_inf);
         qsieve_init_poly_next(qs_inf);
 
-    }while(); /* we have required number of relation, condition to put */
+    }while(1); /* we have required number of relation, condition to put */
 
     n_primes_clear(iter);
 }
@@ -101,9 +118,12 @@ void qsieve_init_poly_first(qs_t qs_inf)        /* initialize value for first po
     mp_limb_t * A_inv = qs_inf->A_inv;
     mp_limb_t * B_terms = qs_inf->B_terms;
     mp_limb_t * B0_terms = qs_inf->B0_terms;
-    mp_limb_t * A0_modp = qs_inf->A0_modp;
+    mp_limb_t * A0_divp = qs_inf->A0_divp;
+    mp_limb_t * A_modp = qs_inf->A_modp;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     prime_t * factor_base = qs_inf->factor_base;
+    mp_limb_t * soln1 = qs_inf->soln1;
+    mp_limb_t * soln2 = qs_inf->soln2;
     int * sqrts = qs_inf->sqrts;
     mp_limb_t p, pinv, temp, temp2, B = 0;
 
@@ -161,13 +181,15 @@ void qsieve_init_poly_next(qs_t qs_inf)
     slong s = qs_inf->s;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     prime_t * factor_base = qs_inf->factor_base;
+    mp_limb_t * soln1 = qs_inf->soln1;
+    mp_limb_t * soln2 = qs_inf->soln2;
     mp_limb_t sign, p, pinv;
 
     for (i = 1; i < (1 << (s - 1)); i++)              /* iterate through all the possible polynomial */
     {
         for (v = 0; v < s; v++)
         {
-            if (((i >> v) & 1) break;
+            if (((i >> v) & 1)) break;
         }
 
         sign = (i >> v) & 2;
@@ -195,7 +217,7 @@ void qsieve_init_poly_next(qs_t qs_inf)
             if (soln2[i] >= p) soln2[i] -= p;
         }
 
-        qsieve_compute_C(qs_inf);
+        //qsieve_compute_C(qs_inf);
 
         /* call for sieving */
 
