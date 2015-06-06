@@ -27,6 +27,16 @@
 
 void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 {
+    fmpz_t coeff;
+    fmpz_init(coeff);
+    fmpz_mod_poly_get_coeff_fmpz(coeff, value->polys[j], i);
+    if (fmpz_is_zero(coeff))
+    {
+        fmpz_clear(coeff);
+        fmpz_mod_poly_set_coeff_fmpz(value->polys[j], i, x);
+        return;
+    }
+    fmpz_clear(coeff);
     fmpz_add(value->polys[j] + i, value->polys[j] + i, x);           
     if (fmpz_cmp(value->polys[j] + i, value->n) >= 0)
         fmpz_sub(value->polys[j] + i, value->polys[j] + i, value->n);
@@ -34,6 +44,16 @@ void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
 
 void unity_zpq_coeff_add_ui(unity_zpq value, ulong i, ulong j, ulong x)
 {
+    fmpz_t coeff;
+    fmpz_init(coeff);
+    fmpz_mod_poly_get_coeff_fmpz(coeff, value->polys[j], i);
+    if (fmpz_is_zero(coeff))
+    {
+        fmpz_clear(coeff);
+        fmpz_mod_poly_set_coeff_ui(value->polys[j], i, x);
+        return;
+    }
+    fmpz_clear(coeff);
     fmpz_add_ui(value->polys[j] + i, value->polys[j] + i, x);          
     if (fmpz_cmp(value->polys[j] + i, value->n) >= 0)
         fmpz_sub(value->polys[j] + i, value->polys[j] + i, value->n);

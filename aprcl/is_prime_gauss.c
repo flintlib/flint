@@ -30,9 +30,27 @@ int is_condition_one()
     return 0;
 }
 
+/* if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; otherwise return 0 */
 int is_condition_two(const unity_zpq f, const unity_zpq g)
 {
-    /* if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; otherwise return 0 */
+    int result;
+    ulong i;
+    unity_zpq temp;
+    unity_zpq_init(temp, f->q, f->p, f->n);
+
+    result = 0;
+    for (i = 0; i < f->p; i++)
+    {
+        unity_zpq_mul_unity_p_pow(temp, g, i);
+        if (unity_zpq_equal(f, g))
+        { 
+            result = 1;
+            break;
+        }
+    }
+
+    unity_zpq_clear(temp);
+    return result;
 }
 
 int is_prime_gauss(const fmpz_t n)
