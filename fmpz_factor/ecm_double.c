@@ -39,8 +39,15 @@
 /* a24 = (a + 2) / 4 mod n */
 
 void
-fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, fmpz_t a24)
+fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t a24, fmpz_t n)
 {
+    if (fmpz_cmp_ui(z0, 0) == 0)    /* If point is 0, return [0 :: 0] */
+    {
+        fmpz_set(x, x0);
+        fmpz_set(z, z0);
+        return;
+    }
+
     fmpz_t u, v, w;
 
     fmpz_init(u);
@@ -74,5 +81,4 @@ fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, fmpz_
     fmpz_clear(v);
     fmpz_clear(w);
 }
-
 

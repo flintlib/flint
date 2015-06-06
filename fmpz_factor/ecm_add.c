@@ -57,7 +57,7 @@ fmpz_factor_ecm_add(fmpz_t x, fmpz_t z, fmpz_t x1, fmpz_t z1, fmpz_t x2, fmpz_t 
 
     if (fmpz_cmp_ui(z0, 0) == 0)    /* If P1 = P2 (difference is 0), return double(P1) */
     {
-        fmpz_ec_double(x, z, x1, z1, n, a24);
+        fmpz_ec_double(x, z, x1, z1, a24, n);
         return;
     }
 
