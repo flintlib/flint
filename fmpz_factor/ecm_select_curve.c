@@ -32,7 +32,7 @@
    Returns 1 in case factor is found while selecting
    the curev. */
 
-void
+int
 fmpz_factor_ecm_select_curve(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t sig, fmpz_t n)
 {
     fmpz_t u, v, w, y, z;
