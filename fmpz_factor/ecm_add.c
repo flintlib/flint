@@ -38,8 +38,28 @@
 
 void 
 fmpz_factor_ecm_add(fmpz_t x, fmpz_t z, fmpz_t x1, fmpz_t z1, fmpz_t x2, fmpz_t z2,
-       fmpz_t x0, fmpz_t z0, fmpz_t n)
+                    fmpz_t x0, fmpz_t z0, fmpz_t a24, fmpz_t n)
 {
+    if (fmpz_cmp_ui(z1, 0) == 0)    /* If P1 is 0, return P2 */
+    {
+        fmpz_set(x, x2);
+        fmpz_set(z, z2);
+        return;
+    }
+
+    if (fmpz_cmp_ui(z2, 0) == 0)    /* If P2 is 0, return P1 */
+    {
+
+        fmpz_set(x, x1);
+        fmpz_set(z, z1);
+        return;
+    }
+
+    if (fmpz_cmp_ui(z0, 0) == 0)    /* If P1 = P2 (difference is 0), return double(P1) */
+    {
+        fmpz_ec_double(x, z, x1, z1, n, a24);
+        return;
+    }
 
     fmpz_t u, v, w;
 
@@ -68,7 +88,7 @@ fmpz_factor_ecm_add(fmpz_t x, fmpz_t z, fmpz_t x1, fmpz_t z1, fmpz_t x2, fmpz_t 
     if (fmpz_cmp(w, n) > 0)
         fmpz_sub(w, w, n);
 
-    fmpz_sub(v, u, v);      /* v = 2 * (x2 * z1 - x1 * z2) */
+    fmpz_sub(v, v, u);      /* v = 2 * (x2 * z1 - x1 * z2) */
 
     fmpz_mul(w, w, w);      /* w = 4 * (x1 * x2 - z1 * z2)^2 */
     fmpz_mod(w, w, n);
