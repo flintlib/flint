@@ -40,6 +40,7 @@ int main(void)
     fmpz_t n;
     fmpz_init_set_ui(n, 42);
     is_prime_gauss(n);
+    fmpz_clear(n);
     
     FLINT_TEST_CLEANUP(state);
 
