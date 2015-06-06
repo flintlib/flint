@@ -39,7 +39,7 @@
 /* a24 = (a + 2) / 4 mod n */
 
 void
-fmpz_ec_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, fmpz_t a24)
+fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, fmpz_t a24)
 {
     fmpz_t u, v, w;
 

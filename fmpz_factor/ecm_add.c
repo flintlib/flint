@@ -37,7 +37,7 @@
 */
 
 void 
-fmpz_ec_add(fmpz_t x, fmpz_t z, fmpz_t x1, fmpz_t z1, fmpz_t x2, fmpz_t z2,
+fmpz_factor_ecm_add(fmpz_t x, fmpz_t z, fmpz_t x1, fmpz_t z1, fmpz_t x2, fmpz_t z2,
        fmpz_t x0, fmpz_t z0, fmpz_t n)
 {
 

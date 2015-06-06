@@ -27,51 +27,60 @@
 #include "flint.h"
 #include "fmpz.h"
 
-/* P (x0 : z0) <- kP using Montgomery ladder algorithm */
+/* Implementation of the stage I of ECM */
 
-void
-fmpz_ec_mul_montgomery_ladder(fmpz_t x0, fmpz_t z0, fmpz_t k, fmpz_t a24, fmpz_t n)
+int
+fmpz_factor_ecm_stage_I(fmpz_t f, flint_rand_t state, fmpz_t x, fmpz_t z, int curves, 
+                    const mp_limb_t *prime_array, mp_limb_t num, fmpz_t B1, fmpz_t n)
 {
-    mp_limb_t i;
-    fmpz_t x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
+    int i, j, ret;
+    
+    fmpz_t a, a24, sig;
+    fmpz_init(a);
+    fmpz_init(a24);
+    fmpz_init(sig);
 
-    if (fmpz_is_one(k))
-        return;
+    ret = 0;
 
-    fmpz_init_set(x1, x0);        /* Q <- P0 */
-    fmpz_init_set(z1, z0);
-    fmpz_init(x2);
-    fmpz_init(z2);
-
-    fmpz_ec_double(x2, z2, x0, z0, n, a24); /* P <- 2P0 */
-
-    i = fmpz_sizeinbase(k, 2) - 2;
-
-    while (1)
+    for (j = 0; j < curves; j++)
     {
-        if (fmpz_tstbit(k, i) == 1)   /* ith bit is 1 */
-        {
-            fmpz_ec_add(x1, z1, x1, z1, x2, z2, x0, z0, n); /* Q <- P + Q */
-            fmpz_ec_double(x2, z2, x2, z2, n, a24);         /* P <- 2 * P */
-        }
-        else
-        {   
-            fmpz_ec_add(x2, z2, x1, z1, x2, z2, x0, z0, n); /* P <- P + Q */
-            fmpz_ec_double(x1, z1, x1, z1, n, a24);         /* Q <- 2 * Q */
-        }
+        fmpz_set_ui(z, 1);
+        fmpz_randm(sig, state, n);
+        fmpz_add_ui(sig, sig, 7);
 
-        if (i == 0)
-            break;
-        else
-            i -= 1;
+        fmpz_ec_select_curve(x, a, sig, n);
+
+        fmpz_add_ui(a24, a, 2);
+        fmpz_mul_2exp(a24, a24, 2);
+
+
+        int i = 0;
+
+        for (i = 0; i < num; i++)
+        {
+            mp_limb_t p = n_flog(fmpz_get_ui(B1), prime_array[i]);
+
+            fmpz_t tim;
+            fmpz_init_set_ui(tim, prime_array[i]);
+
+            mp_limb_t ok = 0;
+            for (ok = 1; ok <= p; ok ++)
+                fmpz_ec_mul_montgomery_ladder(x, z, tim, a24, n);
+
+            fmpz_gcd(f, z, n);
+            if (!fmpz_is_one(f) && fmpz_cmp(f, n))
+            {
+                ret = 1;
+                goto cleanup;
+            }
+        }
     }
 
-    fmpz_set(x0, x1);
-    fmpz_set(z0, z1);
+    cleanup:
 
-    fmpz_clear(x1);
-    fmpz_clear(z1);
-    fmpz_clear(x2);
-    fmpz_clear(z2);
+    fmpz_clear(a);
+    fmpz_clear(a24);
+    fmpz_clear(sig);
+
+    return ret;
 }
-
