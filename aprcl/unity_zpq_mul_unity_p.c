@@ -32,6 +32,9 @@ void _unity_zpq_mul_unity_p(unity_zpq f)
         fmpz_mod_poly_swap(f->polys[i], f->polys[i - 1]);
 }
 
+/*
+    Computes unity_zpq * \zeta_p by swapping poly coeffs.
+*/
 void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
 {
     ulong i;

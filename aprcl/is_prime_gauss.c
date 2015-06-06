@@ -30,7 +30,10 @@ int is_condition_one()
     return 0;
 }
 
-/* if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; otherwise return 0 */
+/*  
+    if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; 
+    otherwise return 0 
+*/
 int is_condition_two(const unity_zpq f, const unity_zpq g)
 {
     int result;
@@ -53,6 +56,10 @@ int is_condition_two(const unity_zpq f, const unity_zpq g)
     return result;
 }
 
+/*  
+    if for some a = n^k mod s, where k from 1 to r - 1 we have that 
+    a | n returns 0; otherwise returns 1.
+*/
 int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 {
     int result = 0;
