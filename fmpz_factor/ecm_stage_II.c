@@ -33,7 +33,7 @@ int
 fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t B2, fmpz_t a24, fmpz_t n)
 {
 
-    fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, x, z, a, b;
+    fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
     mp_limb_t D = 70, mmin, mmax, maxj, mdiff, prod;
     int i, j, ret;
 
@@ -55,21 +55,12 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
     fmpz_init(b);
 
     fmpz_init_set_ui(g, 1);
-    fmpz_init_set(x, x0);
-    fmpz_init_set(z, z0);
 
     for (j = 1; j <= maxj; j++)
     {
         fmpz_init(arrx[j]);
         fmpz_init(arrz[j]);
     }
-
-    /* arr[1] = Q0 */
-    fmpz_set(arrx[1], x0);  
-    fmpz_set(arrz[1], z0);
-
-    /* arr[2] = 2Q0 */
-    fmpz_factor_ecm_double(arrx[2], arrz[2], arrx[1], arrz[1], a24, n);
 
     ret = 0;
 
@@ -112,13 +103,23 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
     /* We are adding 2Q0 every time. Need to calculate all j's 
        as (j - 2)Q0 is required for (j + 2)Q0 */
 
-    for (j = 3; j <= maxj; j += 2)
-    {
-        /* jQ0 = (j - 2)Q0 + 2Q0 */
+    /* arr[1] = Q0 */
+    fmpz_set(arrx[1], x0);  
+    fmpz_set(arrz[1], z0);
 
-        fmpz_factor_ecm_add(x, z, x, z, arrx[2], arrz[2], arrx[j - 2], arrz[j - 2], a24, n);
-        fmpz_set(arrx[j], x);
-        fmpz_set(arrz[j], z);
+    /* arr[2] = 2Q0 */
+    fmpz_factor_ecm_double(arrx[2], arrz[2], arrx[1], arrz[1], a24, n);
+
+    /* arr[3] = 3Q0 */
+    fmpz_factor_ecm_add(arrx[3], arrz[3], arrx[2], arrz[2], arrx[1], arrz[1], arrx[1], arrz[1], a24, n);
+
+
+    for (j = 5; j <= maxj; j += 2)
+    {
+        /* jQ0 = (j - 2)Q0 + 2Q0 
+           Differnce is (j - 4)Q0 */
+
+        fmpz_factor_ecm_add(arrx[j], arrz[j], arrx[j - 2], arrz[j - 2], arrx[2], arrz[2], arrx[j - 4], arrz[j - 4], a24, n);
     }
 
 
@@ -156,7 +157,7 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
 
         /* R = R + Q    
            difference is stored in Qd, initially (Mmin - 1)Q */
-        
+
         fmpz_factor_ecm_add(Rx, Rz, Rx, Rz, Qx, Qz, Qdx, Qdz, a24, n);
 
         fmpz_set(Qdx, a);
@@ -177,8 +178,6 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
     fmpz_clear(a);
     fmpz_clear(b);
     fmpz_clear(g);
-    fmpz_clear(x);
-    fmpz_clear(z);
 
     for (j = 1; j <= maxj; j++)
     {
