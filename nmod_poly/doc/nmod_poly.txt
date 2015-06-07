@@ -1312,7 +1312,7 @@ void nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
     Evaluates \code{poly} with matrix as an argument at the value \code{c}
     and reduces modulus of \code{c}. \code{dest} and \code{c} should have
     same dimension and modulus. \code{dest} and \code{c} may be aliased.
-    The algorithm used is Patterson-Stockmeyer method.
+    The algorithm used is Paterson-Stockmeyer method.
 
 *******************************************************************************
 

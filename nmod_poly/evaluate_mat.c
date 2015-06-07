@@ -25,7 +25,6 @@
 
 #include <gmp.h>
 #include <stdlib.h>
-#include <math.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
@@ -59,7 +58,7 @@ nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
 }
 
 void
-nmod_mat_scaler_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b,
+nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b,
                         const nmod_mat_t Y)
 {
     slong i, j;
@@ -87,7 +86,7 @@ void
 nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
                        const nmod_mat_t c)
 {
-    slong lim = sqrt(poly->length), i, j, rem, quo, curr;
+    slong lim = n_sqrt(poly->length), i, j, rem, quo, curr;
     nmod_mat_t tmat, *temp;
 
     nmod_mat_zero(dest);
@@ -106,9 +105,11 @@ nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
     temp = malloc((lim + 1) * sizeof(nmod_mat_t));
     nmod_mat_init(temp[0], c->r, c->c, c->mod.n);
     nmod_mat_one(temp[0]);
+    nmod_mat_init(temp[1], c->r, c->c, c->mod.n);
+    nmod_mat_set(temp[1], c);
     nmod_mat_init(tmat, c->r, c->c, c->mod.n);
 
-    for (i = 1; i <= lim; i++)
+    for (i = 2; i <= lim; i++)
     {
         nmod_mat_init(temp[i], c->r, c->c, c->mod.n);
         nmod_mat_mul(temp[i], temp[i - 1], c);
@@ -120,18 +121,18 @@ nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
 
     for (i = 0; i < rem; i++)
     {
-        nmod_mat_scaler_mul_add(dest, dest,
+        nmod_mat_scalar_mul_add(dest, dest,
                                 poly->coeffs[poly->length - rem + i], temp[i]);
     }
 
     for (i = 0; i < quo; i++)
     {
         nmod_mat_mul(tmat, dest, temp[lim]);
-        nmod_mat_scaler_mul_add(dest, tmat, poly->coeffs[curr--],
+        nmod_mat_scalar_mul_add(dest, tmat, poly->coeffs[curr--],
                                 temp[lim - 1]);
         for (j = 1; j < lim; j++)
         {
-            nmod_mat_scaler_mul_add(dest, dest, poly->coeffs[curr--],
+            nmod_mat_scalar_mul_add(dest, dest, poly->coeffs[curr--],
                                     temp[lim - 1 - j]);
         }
     }
@@ -141,4 +142,5 @@ nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
         nmod_mat_clear(temp[i]);
     }
     nmod_mat_clear(tmat);
+    free(temp);
 }
