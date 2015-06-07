@@ -46,11 +46,14 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, flint_rand_t state, fmpz_t n)
     fmpz_sub_ui(nm8, n, 8);
     ret = 0;
 
+    /* STAGE I PRECOMPUTATIONS */
+
     num = n_prime_pi(B1);   /* number of primes under B1 */
 
-    /* compute list of primes under B1 */
+    /* compute list of primes under B1 for stage I */
     const mp_limb_t *prime_array = flint_malloc(num * sizeof(mp_limb_t));
     prime_array = n_primes_arr_readonly(num);   
+
 
     for (j = 0; j < curves; j++)
     {
