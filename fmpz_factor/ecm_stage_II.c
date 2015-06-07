@@ -30,7 +30,8 @@
 /* Implementation of the stage II of ECM */
 
 int
-fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t B2, fmpz_t a24, fmpz_t n)
+fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1,
+                         mp_limb_t B2, fmpz_t a24, fmpz_t n)
 {
 
     fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
@@ -53,6 +54,7 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
     fmpz_init(Rz);
     fmpz_init(a);
     fmpz_init(b);
+    fmpz_init(init);
 
     fmpz_init_set_ui(g, 1);
 
@@ -111,7 +113,8 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
     fmpz_factor_ecm_double(arrx[2], arrz[2], arrx[1], arrz[1], a24, n);
 
     /* arr[3] = 3Q0 */
-    fmpz_factor_ecm_add(arrx[3], arrz[3], arrx[2], arrz[2], arrx[1], arrz[1], arrx[1], arrz[1], a24, n);
+    fmpz_factor_ecm_add(arrx[3], arrz[3], arrx[2], arrz[2], arrx[1], arrz[1], 
+                        arrx[1], arrz[1], a24, n);
 
 
     for (j = 5; j <= maxj; j += 2)
@@ -119,18 +122,23 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1, mp_limb_t
         /* jQ0 = (j - 2)Q0 + 2Q0 
            Differnce is (j - 4)Q0 */
 
-        fmpz_factor_ecm_add(arrx[j], arrz[j], arrx[j - 2], arrz[j - 2], arrx[2], arrz[2], arrx[j - 4], arrz[j - 4], a24, n);
+        fmpz_factor_ecm_add(arrx[j], arrz[j], arrx[j - 2], arrz[j - 2], 
+                            arrx[2], arrz[2], arrx[j - 4], arrz[j - 4], 
+                            a24, n);
     }
 
 
-    fmpz_init_set_ui(tim, D);
-    fmpz_factor_ecm_mul_montgomery_ladder(Qx, Qz, x0, z0, tim, a24, n);    /* Q = D * Q_0 */
+    /* Q = D * Q_0 */
+    fmpz_set_ui(tim, D);
+    fmpz_factor_ecm_mul_montgomery_ladder(Qx, Qz, x0, z0, tim, a24, n);
     
+    /* R = mmin * Q */
     fmpz_set_ui(tim, mmin);
-    fmpz_factor_ecm_mul_montgomery_ladder(Rx, Rz, Qx, Qz, tim, a24, n);    /* R = mmin * Q */
+    fmpz_factor_ecm_mul_montgomery_ladder(Rx, Rz, Qx, Qz, tim, a24, n);
 
+    /* Qd = (mmin - 1) * Q */
     fmpz_set_ui(tim, mmin - 1);
-    fmpz_factor_ecm_mul_montgomery_ladder(Qdx, Qdz, Qx, Qz, tim, a24, n);    /* Qd = (mmin - 1) * Q */
+    fmpz_factor_ecm_mul_montgomery_ladder(Qdx, Qdz, Qx, Qz, tim, a24, n);
                 
     /* main stage II step */
 
