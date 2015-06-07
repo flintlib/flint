@@ -36,54 +36,102 @@
 #include "fmpz.h"
 
 
-/***
-   New field added to qs_t struct,
+/*
 
-   qs_inf->q0 : factor of A, immediately following largest factor-base prime
-   qs_inf->A0 : value of coeff A excluding non-factor-base prime
-   qs_inf->A_divp : store (A0 / p), for factor p of A0
-   qs_inf->B0_terms : B0_terms[i] = (kn^(1 / 2) * (A0 / p)^(-1)) mod p
+    New field added to qs_t struct,
 
-***/
+    mp_limb_t q0         : factor of A, immediately following largest factor-base prime
+    mp_limb_t A0         : value of coefficient A excluding non-factor-base prime
+    mp_limb_t * A_divp   : store (A0 / p), for factor p of A0
+    mp_limb_t * B0_terms : B0_terms[i] = (kn^(1 / 2) * (A0 / p)^(-1)) mod p
+                           where root and inverse are taken modulo p
+
+*/
+
+
+/*
+    try to compute A0, which will remain fixed, for A = q0 * A0
+    goal is to make sure that,
+    (i) A is close to it's ideal value which is, sqrt(2 * kn) / M,
+        where kn is the number to be factored and M is the size of sieve
+   (ii) A should not contain too many small primes factor,
+        it will decrease number of relation
+  (iii) A should not contain too large primes factor for reason (i)
+   (iv) A should have as many factor as possible, to obtain large number of
+        polynomial
+*/
 
 void qsieve_compute_A0(qs_t qs_inf)
 {
-    slong i;
-    mp_limb_t prod = 1;
+    slong i, s = 0, j = 0, k;
+    mp_limb_t prod = 1, p, q, temp, temp2;
     prime_t * factor_base = qs_inf->factor_base;
     slong small_primes = qs_inf->small_primes;
+    mp_limb_t * A_ind = qs_inf->A_ind;
+    prod = qs_inf->q0;
 
     for (i = small_primes; i < qs_inf->num_primes; i++)
     {
-        prod *= factor_base[i].p;
+        p = factor_base[i].p;
+        temp = p * prod;
 
-        if (prod >= qs_inf->target_A / P_GOODNESS) break;
+        if (temp <= qs_inf->target_A / 2 || temp <= qs_inf->target_A * 2)
+        {
+            prod = temp;
+            s++;
+            A_ind[j++] = i;
+        }
+        else
+        {
+            for (k = j - 1; k >= 0; k--)
+            {
+                q = factor_base[A_ind[k]].p;
+                temp2 = temp / q;
+                if (temp2 <= qs_inf->target_A * 2)
+                {
+                    A_ind[k] = i;
+                    prod = temp2;
+                    break;
+                }
+            }
+        }
     }
 
     qs_inf->A0 = prod;
+    qs_inf->s = s;
 }
 
+/*
+    calculate A = q0 * A0, where q0 are primes immediately following
+    prime bound
+*/
 void qsieve_compute_A(qs_t qs_inf)
 {
     n_primes_t iter;
     n_primes_init(iter);
     n_primes_jump_after(iter, qs_inf->factor_base[qs_inf->num_primes - 1].p);
-    qsieve_compute_A0(qs_inf);     /* calculate A0, to add */
+    qs_inf->q0 = n_primes_next(iter);
+    qsieve_compute_A0(qs_inf);
+    qsieve_compute_pre_data(qs_inf);
+    qs_inf->A = qs_inf->q0 * qs_inf->A0;
 
-    qsieve_compute_pre_data(qs_inf);     /* pre-compute data for A0 which will be fixed */
-
-    do
+    while (qs_inf->A >= qs_inf->target_A / 2 && qs_inf <= 2 * qs_inf->target_A)
     {
-        qs_inf->q0 = n_primes_next(iter);         /* iterate through primes immediately following largest factor base primes */
-        qsieve_init_poly_first(qs_inf);
-        qsieve_init_poly_next(qs_inf);
-
-    }while(1); /* we have required number of relation, condition to put */
+       qsieve_init_poly_first(qs_inf);
+       qsieve_init_poly_next(qs_inf);
+       qs_inf->q0 = n_primes_next(iter);
+       qs_inf->A = qs_inf->q0 * qs_inf->A0;
+    }
 
     n_primes_clear(iter);
 }
 
-void qsieve_compute_pre_data(qs_t qs_inf)   /* pre-computes all the data associated with A0 */
+/*
+  precompute data associated with A0 which will remain fixed
+
+*/
+
+void qsieve_compute_pre_data(qs_t qs_inf)
 {
     slong i, j;
     slong s = qs_inf->s;
@@ -107,8 +155,15 @@ void qsieve_compute_pre_data(qs_t qs_inf)   /* pre-computes all the data associa
 
 }
 
-void qsieve_init_poly_first(qs_t qs_inf)        /* initialize value for first polynomial and */
-{                                               /* precompute data for subsequent polynomial */
+/*
+   initialized the data for first polynomial after, A = q0 * A0
+   (q0 are immediate primes following prime bound) are calculated
+   and also precompute data to be used for initialization of
+   subsequent polynomial
+*/
+
+void qsieve_init_poly_first(qs_t qs_inf)
+{
     slong i, j;
     slong s = qs_inf->s;
     mp_limb_t A0 = qs_inf->A0;
@@ -175,9 +230,13 @@ void qsieve_init_poly_first(qs_t qs_inf)        /* initialize value for first po
     /* call for sieving */
 }
 
+/*
+    iterate through possible values of coefficient 'B', using
+    gray-code formula
+*/
 void qsieve_init_poly_next(qs_t qs_inf)
 {
-    slong i, v;
+    slong i, j, v;
     slong s = qs_inf->s;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     prime_t * factor_base = qs_inf->factor_base;
@@ -185,7 +244,7 @@ void qsieve_init_poly_next(qs_t qs_inf)
     mp_limb_t * soln2 = qs_inf->soln2;
     mp_limb_t sign, p, pinv;
 
-    for (i = 1; i < (1 << (s - 1)); i++)              /* iterate through all the possible polynomial */
+    for (i = 1; i < (1 << (s - 1)); i++)
     {
         for (v = 0; v < s; v++)
         {
@@ -197,29 +256,46 @@ void qsieve_init_poly_next(qs_t qs_inf)
         if (sign) qs_inf->B += (2 * qs_inf->B_terms[v]);
         else qs_inf->B -= (2 * qs_inf->B_terms[v]);
 
-        for (i = 0; i < qs_inf->num_primes; i++)
+        for (j = 0; j < qs_inf->num_primes; j++)
         {
-            p = factor_base[i].p;
-            pinv = factor_base[i].pinv;
+            p = factor_base[j].p;
+            pinv = factor_base[j].pinv;
 
             if (sign)
             {
-                soln1[i] += A_inv2B[v][i];
-                soln2[i] += A_inv2B[v][i];
+                soln1[j] += A_inv2B[v][j];
+                soln2[j] += A_inv2B[v][j];
             }
             else
             {
-                soln1[i] += (p - A_inv2B[v][i]);
-                soln2[i] += (p - A_inv2B[v][i]);
+                soln1[j] += (p - A_inv2B[v][j]);
+                soln2[j] += (p - A_inv2B[v][j]);
             }
 
-            if (soln1[i] >= p) soln1[i] -= p;
-            if (soln2[i] >= p) soln2[i] -= p;
+            if (soln1[j] >= p) soln1[j] -= p;
+            if (soln2[j] >= p) soln2[j] -= p;
         }
 
-        //qsieve_compute_C(qs_inf);
+        qsieve_compute_C(qs_inf);
 
         /* call for sieving */
 
     }
+}
+
+/*
+     calculate coefficient 'C', once we have coefficient
+     'A' and 'B'
+*/
+
+void qsieve_compute_C(qs_t qs_inf)
+{
+   mp_limb_t A = qs_inf->A;
+   mp_limb_t B = qs_inf->B;
+
+   if ((mp_limb_signed_t) B < WORD(0)) B = -B;
+   fmpz_set_ui(qs_inf->C, B);
+   fmpz_mul_ui(qs_inf->C, qs_inf->C, B);
+   fmpz_sub(qs_inf->C, qs_inf->C, qs_inf->kn);
+   fmpz_divexact_ui(qs_inf->C, qs_inf->C, A);
 }

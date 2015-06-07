@@ -143,6 +143,7 @@ static const mp_limb_t qsieve_tune[][5] =
 #include "knuth_schroeppel.c"
 #include "primes_init.c"
 #include "factor.c"
+#include "poly_init.c"
 #include "compute_poly_data.c"
 
 /******************************************************************************/
