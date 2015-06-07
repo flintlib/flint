@@ -40,6 +40,7 @@ typedef struct
 {
     ulong R;
     fmpz_t s;
+    n_factor_t rs;
     fmpz_factor_t qs;
 } _aprcl_config;
 
@@ -86,6 +87,9 @@ int is_condition_one();
 int is_condition_two(const unity_zpq f, const unity_zpq g);
 int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 int is_prime_gauss(const fmpz_t n);
+int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
+int _is_gausspower_2q_equal_second(ulong q, ulong p, const fmpz_t n);
+int _p_ind(const aprcl_config conf, ulong p);
 
 int is_prime_aprcl(const fmpz_t n);
 

@@ -60,6 +60,8 @@ void aprcl_config_init(aprcl_config conf, const fmpz_t n)
         _aprcl_config_update(conf);
         fmpz_mul(s2, conf->s, conf->s);
     }
+    n_factor_init(&conf->rs);
+    n_factor(&conf->rs, conf->R, 1);
 }
 
 void aprcl_config_clear(aprcl_config conf)

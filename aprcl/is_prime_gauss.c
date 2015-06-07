@@ -25,6 +25,74 @@
 
 #include "aprcl.h"
 
+int _p_ind(const aprcl_config conf, ulong p)
+{
+    int i;
+    for (i = 0; i < conf->rs.num; i++)
+        if (p == conf->rs.p[i])
+            return i;
+    return -1;
+}
+
+/*
+    Returns 1 if \tau^{\sigma_n-n}(\chi)=-1; otherwise returns 0.
+*/
+int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
+{
+    int result;
+
+    unity_zpq gausssigma, gauss, gausspower;
+
+    unity_zpq_init(gausssigma, q, 2, n);
+    unity_zpq_init(gauss, q, 2, n);
+    unity_zpq_init(gausspower, q, 2, n);
+
+    unity_zpq_gauss_sum(gauss, q, 2); 
+    unity_zpq_gauss_sum_sigma_pow(gausssigma, q, 2);
+    unity_zpq_pow(gausspower, gauss, n);
+
+    result = 0;
+    if (fmpz_mod_poly_equal(gausssigma->polys[0], gausspower->polys[1])
+            && fmpz_mod_poly_equal(gausssigma->polys[1], gausspower->polys[0]))
+        result = 1;
+
+    unity_zpq_clear(gausssigma);
+    unity_zpq_clear(gauss);
+    unity_zpq_clear(gausspower);
+
+    return result;
+}
+
+/*
+    Returns 1 if \tau^{\sigma_n-n}(\chi^{p / 2}) = -1; otherwise returns 0.
+*/
+int _is_gausspower_2q_equal_second(ulong q, ulong p, const fmpz_t n)
+{
+    int result;
+
+    unity_zpq gausssigma, gauss, gausspower;
+
+    unity_zpq_init(gausssigma, q, 2, n);
+    unity_zpq_init(gauss, q, 2, n);
+    unity_zpq_init(gausspower, q, 2, n);
+
+    /*
+        Here computes \tau^{\sigma_n-n}(\chi^{p / 2})
+        ...
+    */
+
+    result = 0;
+    if (fmpz_mod_poly_equal(gausssigma->polys[0], gausspower->polys[1])
+            && fmpz_mod_poly_equal(gausssigma->polys[1], gausspower->polys[0]))
+        result = 1;
+
+    unity_zpq_clear(gausssigma);
+    unity_zpq_clear(gauss);
+    unity_zpq_clear(gausspower);
+
+    return result;
+}
+
 int is_condition_one()
 {
     return 0;
@@ -93,10 +161,57 @@ int is_prime_gauss(const fmpz_t n)
 {
     int result;
     ulong i, j, k;
+    ulong nmod4;
     aprcl_config conf;
     aprcl_config_init(conf, n);
 
+    int *lambdas = (int *)malloc(sizeof(int) * conf->rs.num);
+    for (i = 0; i < conf->rs.num; i++)
+        lambdas[i] = 0;
+
     result = 1;
+
+    /* nmod4 = N % 4 */
+    nmod4 = fmpz_tdiv_ui(n, 4);
+
+    flint_printf("\nR = %wu\n", conf->R);
+
+    for (i = 0; i < conf->qs->num; i++)
+    {
+        int state;
+        n_factor_t q_factors;
+        ulong q = conf->qs->p[i];
+
+        n_factor_init(&q_factors);
+        n_factor(&q_factors, q - 1, 1);
+
+        for (j = 0; j < q_factors.num; j++)
+        {
+            int pind;
+            ulong p = q_factors.p[j];
+
+            flint_printf("q = %wu; p = %wu\n", q, p);
+
+            pind = _p_ind(conf, p);
+            state = lambdas[pind];
+            flint_printf("state = %wu\n", state);
+
+            if (state == 0 && nmod4 == 1)
+            {
+                state = _is_gausspower_2q_equal(q, n);
+                lambdas[pind] = state;
+            }
+
+        }
+
+
+    }
+
+    for (i = 0; i < conf->rs.num; i++)
+        flint_printf("%i ", lambdas[i]);
+    flint_printf("\n");
+
+/*
     for (i = 0; i < conf->qs->num; i++)
     {
         ulong q, r;
@@ -143,12 +258,12 @@ int is_prime_gauss(const fmpz_t n)
                     nmod4 = fmpz_tdiv_ui(n, 4);
                     if (nmod4 == 1)
                     {
-                        /* \tau = -1  */
+                        /* \tau = -1 
                     }
 
                     if (nmod4 == 3)
                     {
-                        /* \tau generator  and \tau(r/2) = -1 */
+                        /* \tau generator  and \tau(r/2) = -1
                     }
                 }
                 else
@@ -178,7 +293,9 @@ int is_prime_gauss(const fmpz_t n)
             }
         }
     }
+    */
 
+    free(lambdas);
     result = is_prime_gauss_final_division(n, conf->s, conf->R);
     aprcl_config_clear(conf);
     return result;
