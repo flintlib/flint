@@ -31,19 +31,19 @@
 
 int
 fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1,
-                         mp_limb_t B2, fmpz_t a24, fmpz_t n)
+                         mp_limb_t B2, mp_limb_t D, fmpz_t a24, fmpz_t n)
 {
 
     fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
-    mp_limb_t D = 70, mmin, mmax, maxj, mdiff, prod;
+    mp_limb_t mmin, mmax, maxj, mdiff, prod;
     int i, j, ret;
 
     mmin = (B1 + (D/2)) / D;
     mmax = ((B2 - D/2) + D - 1)/D;      /* ceil */
-    maxj = (D + 1)/2;
+    maxj = (D + 1)/2; 
     mdiff = mmax - mmin + 1;
 
-    int GCD_table[maxj + 1], prime_table[mdiff][maxj + 1];
+    uint8_t GCD_table[maxj + 1], prime_table[mdiff][maxj + 1];
     fmpz_t arrx[maxj + 1], arrz[maxj + 1];
 
     fmpz_init(Qx);

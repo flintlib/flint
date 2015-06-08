@@ -26,13 +26,20 @@
 /* Outer wrapper for ECM 
    makes calls to stage I and stage II */
 
+static
+ulong ecm_primorial[15] =
+{
+   UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030), UWORD(510510), UWORD(9699690),
+   UWORD(223092870), UWORD(6469693230), UWORD(200560490130), UWORD(7420738134810),
+   UWORD(304250263527210), UWORD(13082761331670030), UWORD(614889782588491410)
+};
+
 int
 fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, fmpz_t n)
 {
-    mp_limb_t num;
-    int j, ret;
-    mp_limb_t D = 210, mmin, mmax, maxj, mdiff, prod;
     fmpz_t x, z, a, sig, nm8, a24;
+    mp_limb_t D, num, maxD;
+    int j, ret;
 
     fmpz_init(x);
     fmpz_init(z);
@@ -41,7 +48,16 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_ra
     fmpz_init(nm8);
     fmpz_init(a24);
     fmpz_sub_ui(nm8, n, 8);
+    
     ret = 0;
+    j = 1;
+    maxD = n_sqrt(B2);
+
+    /* Selecting primorial */
+
+    while ((j < 15) && (ecm_primorial[j] < maxD))
+        j += 1;
+    D = ecm_primorial[j - 1];
 
     /* STAGE I PRECOMPUTATIONS */
 
@@ -75,7 +91,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_ra
             goto cleanup;
         }
 
-        if(fmpz_factor_ecm_stage_II(f, x, z, B1, B2, a24, n))
+        if(fmpz_factor_ecm_stage_II(f, x, z, B1, B2, D, a24, n))
         {
             /* Found factor after stage II */
             ret = 1;
