@@ -66,9 +66,11 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 /*
     Returns 1 if \tau^{\sigma_n-n}(\chi^{p / 2}) = -1; otherwise returns 0.
 */
-int _is_gausspower_2q_equal_second(ulong q, ulong p, const fmpz_t n)
+int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
 {
+    ulong i;
     int result;
+    ulong pow;
 
     unity_zpq gausssigma, gauss, gausspower;
 
@@ -76,14 +78,13 @@ int _is_gausspower_2q_equal_second(ulong q, ulong p, const fmpz_t n)
     unity_zpq_init(gauss, q, 2, n);
     unity_zpq_init(gausspower, q, 2, n);
 
-    /*
-        Here computes \tau^{\sigma_n-n}(\chi^{p / 2})
-        ...
-    */
+    unity_zpq_gauss_sum_character_pow(gausssigma, q, 2, 0);
+    unity_zpq_copy(gauss, gausssigma);
+
+    unity_zpq_pow(gausspower, gauss, n);
 
     result = 0;
-    if (fmpz_mod_poly_equal(gausssigma->polys[0], gausspower->polys[1])
-            && fmpz_mod_poly_equal(gausssigma->polys[1], gausspower->polys[0]))
+    if (unity_zpq_equal(gausssigma, gausspower))
         result = 1;
 
     unity_zpq_clear(gausssigma);
@@ -175,19 +176,19 @@ int is_prime_gauss(const fmpz_t n)
     nmod4 = fmpz_tdiv_ui(n, 4);
 
     flint_printf("\nR = %wu\n", conf->R);
+    flint_printf("\nNMOD4 = %we\n", nmod4);
 
     for (i = 0; i < conf->qs->num; i++)
     {
-        int state;
         n_factor_t q_factors;
-        ulong q = conf->qs->p[i];
+        ulong q = fmpz_get_ui(conf->qs->p + i);
 
         n_factor_init(&q_factors);
         n_factor(&q_factors, q - 1, 1);
 
         for (j = 0; j < q_factors.num; j++)
         {
-            int pind;
+            int state, pind;
             ulong p = q_factors.p[j];
 
             flint_printf("q = %wu; p = %wu\n", q, p);
@@ -197,8 +198,16 @@ int is_prime_gauss(const fmpz_t n)
             flint_printf("state = %wu\n", state);
 
             if (state == 0 && nmod4 == 1)
+            {   
+                flint_printf("nmod4 = 1\n");
+                state = _is_gausspower_2q_equal_first(q, n);
+                lambdas[pind] = state;
+            }
+
+            if (state == 0 && nmod4 == 3)
             {
-                state = _is_gausspower_2q_equal(q, n);
+                flint_printf("nmod4 = 3\n");
+                state = _is_gausspower_2q_equal_second(q, n);
                 lambdas[pind] = state;
             }
 

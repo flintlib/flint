@@ -25,25 +25,17 @@
 
 #include "aprcl.h"
 
-/*
-    Computes gauss sum for character \chi corresponding (q, p).
-*/
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+void unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s)
 {
-    ulong i, qinv, qpow, ppow, g;
-    unity_zpq temp;
-    mp_ptr character_table;
+    ulong i;
+    for (i = 0; i < f->p; i++)
+        fmpz_mod_poly_scalar_mul_ui(f->polys[i], g->polys[i], s);
+}
 
-    g = n_primitive_root_prime(q);
-    qinv = n_preinvert_limb(q);
-    qpow = 1;
-    ppow = 0;
-
-    for (i = 1; i < q; i++)
-    {
-        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
-    }
+void unity_zpq_scalar_mul_fmpz(unity_zpq f, const unity_zpq g, const fmpz_t s)
+{
+    ulong i;
+    for (i = 0; i < f->p; i++)
+        fmpz_mod_poly_scalar_mul_fmpz(f->polys[i], g->polys[i], s);
 }
 

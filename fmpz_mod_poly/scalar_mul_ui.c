@@ -23,27 +23,27 @@
 
 ******************************************************************************/
 
-#include "aprcl.h"
+#include <gmp.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
-/*
-    Computes gauss sum for character \chi corresponding (q, p).
-*/
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len, 
+                                    ulong x, const fmpz_t p)
 {
-    ulong i, qinv, qpow, ppow, g;
-    unity_zpq temp;
-    mp_ptr character_table;
+    _fmpz_vec_scalar_mul_ui(res, poly, len, x);
+    _fmpz_vec_scalar_mod_fmpz(res, res, len, p);
+}
 
-    g = n_primitive_root_prime(q);
-    qinv = n_preinvert_limb(q);
-    qpow = 1;
-    ppow = 0;
+void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, 
+                                   const fmpz_mod_poly_t poly, ulong x)
+{
+    fmpz_mod_poly_fit_length(res, poly->length);
+    _fmpz_mod_poly_scalar_mul_ui(res->coeffs, 
+                                   poly->coeffs, poly->length, x, &(poly->p));
 
-    for (i = 1; i < q; i++)
-    {
-        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
-    }
+    _fmpz_mod_poly_set_length(res, poly->length);
+    _fmpz_mod_poly_normalise(res);
 }
 

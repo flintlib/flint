@@ -88,7 +88,7 @@ int is_condition_two(const unity_zpq f, const unity_zpq g);
 int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 int is_prime_gauss(const fmpz_t n);
 int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
-int _is_gausspower_2q_equal_second(ulong q, ulong p, const fmpz_t n);
+int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
 int _p_ind(const aprcl_config conf, ulong p);
 
 int is_prime_aprcl(const fmpz_t n);
@@ -132,7 +132,10 @@ void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow);
 void _unity_zpq_mul_unity_p(unity_zpq f);
 void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong p);
 
+void unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s);
+
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p);
+void unity_zpq_gauss_sum_character_pow(unity_zpq value, ulong q, ulong p, ulong pow);
 void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p);
 
 ulong unity_zpq_p_unity(const unity_zpq f);

@@ -375,6 +375,12 @@ FLINT_DLL void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong
 FLINT_DLL void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, 
     const fmpz_mod_poly_t poly, const fmpz_t x);
 
+FLINT_DLL void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len, 
+                                    ulong x, const fmpz_t p);
+
+FLINT_DLL void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, 
+    const fmpz_mod_poly_t poly, ulong x);
+
 /*  Scalar division ****************************************************/
 
 FLINT_DLL void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len, 
