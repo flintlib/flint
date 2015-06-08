@@ -83,8 +83,8 @@ typedef enum
     FAIL_ADDITIONAL
 } return_status_aprcl;
 
-int is_condition_one();
-int is_condition_two(const unity_zpq f, const unity_zpq g);
+int _is_coprime(ulong q, ulong r, const fmpz_t n);
+int is_condition_two(ulong q, ulong r, const fmpz_t n);
 int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 int is_prime_gauss(const fmpz_t n);
 int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);

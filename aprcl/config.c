@@ -52,7 +52,7 @@ void aprcl_config_init(aprcl_config conf, const fmpz_t n)
     fmpz_init_set_ui(s2, 0);
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
-    conf->R = 1;
+    conf->R = 179;
 
     while (fmpz_cmp(s2, n) <= 0)
     {

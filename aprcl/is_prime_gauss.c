@@ -25,6 +25,26 @@
 
 #include "aprcl.h"
 
+int _is_coprime(ulong q, ulong r, const fmpz_t n)
+{
+    int result;
+    fmpz_t qr, gcd;
+
+    fmpz_init_set_ui(qr, q);
+    fmpz_mul_ui(qr, qr, r);
+    fmpz_init(gcd);
+    fmpz_gcd(gcd, n, qr);
+
+    result = 1;
+    if (fmpz_cmp_ui(gcd, 1) == 1)
+        result = 0;
+
+    fmpz_clear(qr);
+    fmpz_clear(gcd);
+
+    return result;
+}
+
 int _p_ind(const aprcl_config conf, ulong p)
 {
     int i;
@@ -95,34 +115,42 @@ int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
     return result;
 }
 
-int is_condition_one()
-{
-    return 0;
-}
-
 /*  
     if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; 
     otherwise return 0 
 */
-int is_condition_two(const unity_zpq f, const unity_zpq g)
+int is_condition_two(ulong q, ulong r, const fmpz_t n)
 {
     int result;
     ulong i;
-    unity_zpq temp;
-    unity_zpq_init(temp, f->q, f->p, f->n);
+    unity_zpq temp, gauss, gausspow, gausssigma;
 
-    result = 0;
-    for (i = 0; i < f->p; i++)
+    unity_zpq_init(gauss, q, r, n);
+    unity_zpq_init(gausssigma, q, r, n);
+    unity_zpq_init(gausspow, q, r, n);
+    unity_zpq_init(temp, q, r, n);
+
+    unity_zpq_gauss_sum(gauss, q, r); 
+    unity_zpq_gauss_sum_sigma_pow(gausssigma, q, r);
+
+    unity_zpq_pow(gausspow, gauss, n);
+
+    result = -1;
+    for (i = 0; i < r; i++)
     {
-        unity_zpq_mul_unity_p_pow(temp, g, i);
-        if (unity_zpq_equal(f, g))
+        unity_zpq_mul_unity_p_pow(temp, gausspow, i);
+        if (unity_zpq_equal(gausssigma, temp))
         { 
-            result = 1;
+            result = i;
             break;
         }
     }
 
+    unity_zpq_clear(gauss);
+    unity_zpq_clear(gausssigma);
+    unity_zpq_clear(gausspow);
     unity_zpq_clear(temp);
+
     return result;
 }
 
@@ -144,7 +172,7 @@ int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r)
     for (i = 1; i < r; i++)
     {
         fmpz_mod(rem, n, npow);
-        if (fmpz_is_zero(rem))
+        if (fmpz_is_zero(rem) && (fmpz_equal(n, npow) == 0) && (fmpz_equal_ui(npow, 1) == 0))
         {
             result = 0;
             break;
@@ -176,11 +204,10 @@ int is_prime_gauss(const fmpz_t n)
     /* nmod4 = N % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
 
-    flint_printf("\nR = %wu\n", conf->R);
-    flint_printf("\nNMOD4 = %we\n", nmod4);
-
     for (i = 0; i < conf->qs->num; i++)
     {
+        if (result == 0) break;
+
         n_factor_t q_factors;
         ulong q = fmpz_get_ui(conf->qs->p + i);
 
@@ -189,124 +216,82 @@ int is_prime_gauss(const fmpz_t n)
 
         for (j = 0; j < q_factors.num; j++)
         {
+            if (result == 0) break;
+
             int state, pind;
             ulong p = q_factors.p[j];
 
-            flint_printf("q = %wu; p = %wu\n", q, p);
-
             pind = _p_ind(conf, p);
             state = lambdas[pind];
-            flint_printf("state = %wu\n", state);
 
-            if (state == 0 && nmod4 == 1)
-            {   
-                flint_printf("nmod4 = 1\n");
-                state = _is_gausspower_2q_equal_first(q, n);
-                lambdas[pind] = state;
-            }
-
-            if (state == 0 && nmod4 == 3)
+            if (p == 2 && state == 0 && nmod4 == 1)
             {
-                flint_printf("nmod4 = 3\n");
-                state = _is_gausspower_2q_equal_second(q, n);
-                lambdas[pind] = state;
+                if (_is_gausspower_2q_equal_first(q, n) == 1)
+                {
+                    state = 3;
+                    lambdas[pind] = state;
+                }
             }
 
+            if (p == 2 && (state == 0 || state == 2) && nmod4 == 3)
+            {
+                if (_is_gausspower_2q_equal_second(q, n) == 1)
+                {
+                    if (state == 2)
+                        state = 3;
+                    else
+                        state = 1;
+                    lambdas[pind] = state;
+                }
+            }
+
+            for (k = 1; k <= q_factors.exp[j]; k++)
+            {
+                int unity_power;
+                ulong r;
+
+                r = n_pow(p, k);
+
+                if (_is_coprime(q, r, n) == 0)
+                {
+                    result = 0; break;
+                }
+
+                unity_power = is_condition_two(q, r, n);
+                if (unity_power < 0)
+                {
+                    result = 0; break;
+                }
+
+                if (p > 2 && state == 0 && unity_power > 0)
+                {
+                    ulong upow = unity_power;
+                    if (n_gcd(r, upow) == 1)
+                    {
+                        state = 3;
+                        lambdas[pind] = state;
+                    }
+                }
+
+                if (p == 2 && unity_power > 0 && (state == 0 || state == 1) && nmod4 == 3)
+                {
+                    ulong upow = unity_power;
+                    if (n_gcd(r, upow) == 1)
+                    {
+                        if (state == 0) { state = 2; lambdas[pind] = state; }
+                        if (state == 1) { state = 3; lambdas[pind] = state; }
+                    }
+                }
+            }
         }
-
-
     }
 
     for (i = 0; i < conf->rs.num; i++)
-        flint_printf("%i ", lambdas[i]);
-    flint_printf("\n");
-
-/*
-    for (i = 0; i < conf->qs->num; i++)
-    {
-        ulong q, r;
-        n_factor_t q_factors;
-
-        q = conf->qs->p[i];
-        n_factor_init(&q_factors);
-        n_factor(&q_factors, q, 1);
-
-        for (j = 0; j <= q_factors.num; j++)
-        {
-            if (result == 0)
-                break;
-
-            ulong l = q_factors.p[j];
-            for (k = 1; k <= q_factors.exp[j]; k++)
-            {
-                unity_zpq gauss, gausssigma, gausspow;
-                fmpz_t qr, gcd;
-                ulong nmod4;
-
-                fmpz_init(qr);
-                fmpz_init(gcd);
-                r = n_pow(l, k);
-                fmpz_set_ui(qr, q * r);
-
-                fmpz_gcd(gcd, n, qr);
-                if (fmpz_cmp_ui(gcd, 1) == 1)
-                {
-                    return 0;
-                }
-
-                unity_zpq_init(gauss, q, r, n);
-                unity_zpq_init(gausssigma, q, r, n);
-                unity_zpq_init(gausspow, q, r, n);
-
-                unity_zpq_gauss_sum(gauss, q, r); 
-                unity_zpq_gauss_sum_sigma_pow(gausssigma, q, r);
-
-                unity_zpq_pow(gausspow, gauss, n);
-
-                if (q_factors.p[j] == 2)
-                {
-                    nmod4 = fmpz_tdiv_ui(n, 4);
-                    if (nmod4 == 1)
-                    {
-                        /* \tau = -1 
-                    }
-
-                    if (nmod4 == 3)
-                    {
-                        /* \tau generator  and \tau(r/2) = -1
-                    }
-                }
-                else
-                {
-                    fmpz_t npow, lsquare;
-                    fmpz_init(npow);
-                    fmpz_init_set_ui(lsquare, l * l);
-                    fmpz_powm_ui(npow, n, l - 1, lsquare);
-                    if (fmpz_cmp_ui(npow, 1))
-                    {
-                        result = 0;
-                    }
-                    fmpz_clear(npow);
-                    fmpz_clear(lsquare);
-                }
-              
-
-                if (result != 0)
-                    if (is_condition_two(gausssigma, gausspow) == 0)
-                        result = 0;
-
-                unity_zpq_clear(gauss);
-                unity_zpq_clear(gausssigma);
-                unity_zpq_clear(gausspow);
-                fmpz_clear(qr);
-                fmpz_clear(gcd);
-            }
-        }
-    }
-    */
+        if (lambdas[i] != 3) result = 0;
 
     free(lambdas);
-    result = is_prime_gauss_final_division(n, conf->s, conf->R);
+    if (result != 0)
+        result = is_prime_gauss_final_division(n, conf->s, conf->R);
     aprcl_config_clear(conf);
     return result;
 }
