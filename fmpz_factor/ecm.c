@@ -27,18 +27,15 @@
    makes calls to stage I and stage II */
 
 int
-fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, flint_rand_t state, fmpz_t n)
+fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, fmpz_t n)
 {
-    mp_limb_t B1, B2, num;
+    mp_limb_t num;
     int j, ret;
-
-    B1 = 1000;
-
+    mp_limb_t D = 210, mmin, mmax, maxj, mdiff, prod;
     fmpz_t x, z, a, sig, nm8, a24;
+
     fmpz_init(x);
     fmpz_init(z);
-
-
     fmpz_init(a);
     fmpz_init(sig);
     fmpz_init(nm8);
@@ -53,7 +50,6 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, flint_rand_t state, fmpz_t n)
     /* compute list of primes under B1 for stage I */
     const mp_limb_t *prime_array = flint_malloc(num * sizeof(mp_limb_t));
     prime_array = n_primes_arr_readonly(num);   
-
 
     for (j = 0; j < curves; j++)
     {
@@ -79,16 +75,18 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, flint_rand_t state, fmpz_t n)
             goto cleanup;
         }
 
-        if(fmpz_factor_ecm_stage_II(f, x, z, B1, 100*B1, a24, n))
+        if(fmpz_factor_ecm_stage_II(f, x, z, B1, B2, a24, n))
         {
             /* Found factor after stage II */
             ret = 1;
             goto cleanup;
-        }             
+        }        
     }
 
     cleanup:
 
+    fmpz_clear(x);
+    fmpz_clear(z);
     fmpz_clear(a);
     fmpz_clear(sig);
     fmpz_clear(nm8);
