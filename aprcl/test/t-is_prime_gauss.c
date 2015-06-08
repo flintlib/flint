@@ -45,7 +45,7 @@ int main(void)
     ulong q = 11;
 
     fmpz_t n;
-    fmpz_init_set_ui(n, 85333);
+    fmpz_init_set_ui(n, 38463);
 /*
     unity_zpq_init(gausssigma, q, p, n);
     unity_zpq_init(gauss, q, p, n);

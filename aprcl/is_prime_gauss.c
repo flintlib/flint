@@ -41,24 +41,28 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 {
     int result;
 
-    unity_zpq gausssigma, gauss, gausspower;
+    fmpz_t npow, nval, ncmp;
+    fmpz_init_set_ui(nval, q);
+    fmpz_init_set(ncmp, n);
+    fmpz_sub_ui(ncmp, ncmp, 1);
+    if ((q - 1) % 2 == 1)
+    {
+        fmpz_neg(nval, nval);
+        fmpz_add(nval, nval, n);
+    }
 
-    unity_zpq_init(gausssigma, q, 2, n);
-    unity_zpq_init(gauss, q, 2, n);
-    unity_zpq_init(gausspower, q, 2, n);
-
-    unity_zpq_gauss_sum(gauss, q, 2); 
-    unity_zpq_gauss_sum_sigma_pow(gausssigma, q, 2);
-    unity_zpq_pow(gausspower, gauss, n);
-
+    fmpz_init_set(npow, n);
+    fmpz_sub_ui(npow, npow, 1);
+    fmpz_fdiv_q_2exp(npow, npow, 1);
+    fmpz_powm(nval, nval, npow, n);    
+    
     result = 0;
-    if (fmpz_mod_poly_equal(gausssigma->polys[0], gausspower->polys[1])
-            && fmpz_mod_poly_equal(gausssigma->polys[1], gausspower->polys[0]))
+    if (fmpz_equal(nval, ncmp))
         result = 1;
 
-    unity_zpq_clear(gausssigma);
-    unity_zpq_clear(gauss);
-    unity_zpq_clear(gausspower);
+    fmpz_clear(npow);
+    fmpz_clear(nval);
+    fmpz_clear(ncmp);
 
     return result;
 }
@@ -68,28 +72,25 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 */
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
 {
-    ulong i;
     int result;
-    ulong pow;
 
-    unity_zpq gausssigma, gauss, gausspower;
+    fmpz_t npow, nval, ncmp;
+    fmpz_init_set_ui(nval, q);
+    fmpz_init_set(ncmp, n);
+    fmpz_sub_ui(ncmp, ncmp, 1);
 
-    unity_zpq_init(gausssigma, q, 2, n);
-    unity_zpq_init(gauss, q, 2, n);
-    unity_zpq_init(gausspower, q, 2, n);
-
-    unity_zpq_gauss_sum_character_pow(gausssigma, q, 2, 0);
-    unity_zpq_copy(gauss, gausssigma);
-
-    unity_zpq_pow(gausspower, gauss, n);
-
+    fmpz_init_set(npow, n);
+    fmpz_sub_ui(npow, npow, 1);
+    fmpz_fdiv_q_2exp(npow, npow, 1);
+    fmpz_powm(nval, nval, npow, n);    
+    
     result = 0;
-    if (unity_zpq_equal(gausssigma, gausspower))
+    if (fmpz_equal(nval, ncmp))
         result = 1;
 
-    unity_zpq_clear(gausssigma);
-    unity_zpq_clear(gauss);
-    unity_zpq_clear(gausspower);
+    fmpz_clear(npow);
+    fmpz_clear(nval);
+    fmpz_clear(ncmp);
 
     return result;
 }
