@@ -29,31 +29,71 @@
 #include "flint.h"
 #include "aprcl.h"
 
+#include <time.h>
+
 int main(void)
 {
-    int i, j;
+    int i;
     FLINT_TEST_INIT(state);
    
     flint_printf("is_prime_gauss....");
     fflush(stdout);
 
-    unity_zpq gauss;
-    unity_zpq gausspower;
-    unity_zpq gausssigma;
+    for (i = 0; i < 100; i++)
+    {
+        int pbprime, cycloprime;
+        fmpz_t n;
+        fmpz_init(n);
 
-    ulong p = 2;
-    ulong q = 11;
+        fmpz_randtest_unsigned(n, state, 30);
+        while (fmpz_cmp_ui(n, 100) <= 0)
+            fmpz_randtest_unsigned(n, state, 30);
 
-    fmpz_t n;
-    fmpz_init_set_ui(n, 1026018272686390600);
+        pbprime = fmpz_is_probabprime(n);
+        cycloprime = is_prime_gauss(n);
+        
+        if (pbprime != cycloprime)
+        {
+            flint_printf("FAIL\n");
+            flint_printf("Testing number = ");
+            fmpz_print(n);
+            flint_printf("\nis_probabprime = %i, is_prime_gauss = %i\n", pbprime, cycloprime);
+            abort();
+        }
 
-    flint_printf("RESULT = %i\n", is_prime_gauss(n));
+        fmpz_clear(n);
+    }
 
-    fmpz_clear(n);
+    {
+        int result;
+        fmpz_t n;
+        fmpz_init(n);
+        result = 1;
+
+        fmpz_set_str(n, "40206835204840513073", 10);
+        if (is_prime_gauss(n) == 0)
+            result = 0;
+
+        fmpz_set_str(n, "521419622856657689423872613771", 10);
+        if (is_prime_gauss(n) == 0)
+            result = 0;
+
+        fmpz_set_str(n, "5991810554633396517767024967580894321153", 10);
+        if (is_prime_gauss(n) == 0)
+            result = 0;
+
+        if (result == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
+
+        fmpz_clear(n);
+    }
 
     FLINT_TEST_CLEANUP(state);
 
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

@@ -31,7 +31,6 @@
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
 {
     ulong i, qinv, qpow, ppow, g;
-    unity_zpq temp;
     mp_ptr character_table;
 
     g = n_primitive_root_prime(q);

@@ -43,13 +43,12 @@ int main(void)
         fmpz_t n;
         unity_zpq res, left, right, test;
 
-        fmpz_init_set_ui(n, 100);
-
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
         q = n_randprime(state, 2 + n_randint(state, 6), 0);
 
         pow =  n_randint(state, 100);        
 
+        fmpz_randtest_unsigned(n, state, 200);
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 

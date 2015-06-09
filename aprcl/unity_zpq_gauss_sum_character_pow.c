@@ -31,7 +31,6 @@
 void unity_zpq_gauss_sum_character_pow(unity_zpq value, ulong q, ulong p, ulong pow)
 {
     ulong i, qinv, pinv, qpow, ppow, g, n;
-    unity_zpq temp;
 
     g = n_primitive_root_prime(q);
     qinv = n_preinvert_limb(q);
