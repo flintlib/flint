@@ -25,18 +25,22 @@
 
 #include "aprcl.h"
 
+
+/*
+    Returns 1 if gcd(q * r, n) == 1 or gcd(q * r, n) == n
+*/
 int _is_coprime(ulong q, ulong r, const fmpz_t n)
 {
     int result;
     fmpz_t qr, gcd;
 
-    fmpz_init_set_ui(qr, q);
-    fmpz_mul_ui(qr, qr, r);
     fmpz_init(gcd);
+    fmpz_init_set_ui(qr, q);
+
+    fmpz_mul_ui(qr, qr, r);
     fmpz_gcd(gcd, n, qr);
 
     result = 1;
-
     if (fmpz_equal_ui(gcd, 1) == 0 && fmpz_equal(gcd, n) == 0)
         result = 0;
 
@@ -46,6 +50,9 @@ int _is_coprime(ulong q, ulong r, const fmpz_t n)
     return result;
 }
 
+/*
+    Returns the index of divisor p on R factors list.
+*/
 int _p_ind(const aprcl_config conf, ulong p)
 {
     int i;
@@ -57,25 +64,34 @@ int _p_ind(const aprcl_config conf, ulong p)
 
 /*
     Returns 1 if \tau^{\sigma_n-n}(\chi)=-1; otherwise returns 0.
+    It is equal to check: 
+        (\chi(-1) * q)^((n - 1) / 2) congruent -1 mod n
 */
 int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 {
     int result;
-
     fmpz_t npow, nval, ncmp;
+
+    fmpz_init_set(npow, n);
     fmpz_init_set_ui(nval, q);
     fmpz_init_set(ncmp, n);
-    fmpz_sub_ui(ncmp, ncmp, 1);
-    if ((q - 1) % 2 == 1)
+
+    /* ncmp = -1 mod n */
+    fmpz_sub_ui(ncmp, ncmp, 1); 
+
+    /* nval = (\chi(-1) * q) = ((-1)^((q - 1) / 2) * q) */
+    if ((q - 1) % 2 == 1)       
     {
         fmpz_neg(nval, nval);
         fmpz_add(nval, nval, n);
     }
 
-    fmpz_init_set(npow, n);
+    /* npow = (n - 1) / 2 */
     fmpz_sub_ui(npow, npow, 1);
-    fmpz_fdiv_q_2exp(npow, npow, 1);
-    fmpz_powm(nval, nval, npow, n);    
+    fmpz_fdiv_q_2exp(npow, npow, 1); 
+
+    /* nval = (\chi(-1) * q)^((n - 1) / 2) mod n */
+    fmpz_powm(nval, nval, npow, n);
     
     result = 0;
     if (fmpz_equal(nval, ncmp))
@@ -90,17 +106,22 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 
 /*
     Returns 1 if \tau^{\sigma_n-n}(\chi^{p / 2}) = -1; otherwise returns 0.
+    It is equal to check:
+        q^((n - 1) / 2) congruent -1 mod n
 */
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
 {
     int result;
-
     fmpz_t npow, nval, ncmp;
-    fmpz_init_set_ui(nval, q);
-    fmpz_init_set(ncmp, n);
-    fmpz_sub_ui(ncmp, ncmp, 1);
 
     fmpz_init_set(npow, n);
+    fmpz_init_set_ui(nval, q);
+    fmpz_init_set(ncmp, n);
+
+    /* ncmp = -1 mod n */
+    fmpz_sub_ui(ncmp, ncmp, 1);
+
+    /* nval = q^((n - 1) / 2) mod n */
     fmpz_sub_ui(npow, npow, 1);
     fmpz_fdiv_q_2exp(npow, npow, 1);
     fmpz_powm(nval, nval, npow, n);    
@@ -117,13 +138,15 @@ int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
 }
 
 /*  
-    if for some i from 0 to p-1 \tau(\chi^n) == \tau^n(\chi)*\zeta_p^i return 1; 
-    otherwise return 0 
+    Returns non-negative value if \tau(\chi)^(\sigma_n - n) from <\zeta_p> 
+    cyclic group. It is equal to check that for some i from 0 to p - 1 
+    \tau(\chi^n) == \zeta_p^i * \tau^n(\chi). If such i exists returns i.
+    Otherwise returns -1.
 */
-int is_condition_two(ulong q, ulong r, const fmpz_t n)
+int _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 {
     int result;
-    ulong i, j;
+    ulong i;
     unity_zpq temp, gauss, gausspow, gausssigma;
 
     unity_zpq_init(gauss, q, r, n);
@@ -131,14 +154,17 @@ int is_condition_two(ulong q, ulong r, const fmpz_t n)
     unity_zpq_init(gausspow, q, r, n);
     unity_zpq_init(temp, q, r, n);
 
+    /* gauss = \tau(\chi) */
     unity_zpq_gauss_sum(gauss, q, r); 
+    /* gausssigma = \tau(\chi^n) */
     unity_zpq_gauss_sum_sigma_pow(gausssigma, q, r);
-
+    /* gausspow = \tau^n(\chi) */
     unity_zpq_pow(gausspow, gauss, n);
 
     result = -1;
     for (i = 0; i < r; i++)
     {
+        /* temp = \zeta_p^i * \tau^n(\chi) */
         unity_zpq_mul_unity_p_pow(temp, gausspow, i);
         if (unity_zpq_equal(gausssigma, temp))
         {
@@ -156,29 +182,37 @@ int is_condition_two(ulong q, ulong r, const fmpz_t n)
 }
 
 /*  
-    if for some a = n^k mod s, where k from 1 to r - 1 we have that 
-    a | n returns 0; otherwise returns 1.
+    Returns 0 if for some a = n^k mod s, where k from 1 to r - 1 we have that 
+    a | n; otherwise returns 1.
 */
-int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r)
+int _is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 {
-    int result = 0;
+    int result;
     ulong i;
     fmpz_t npow, nmul, rem;
-    fmpz_init_set(npow, n);
-    fmpz_mod(npow, npow, s);
-    fmpz_init_set(nmul, npow);
-    fmpz_init(rem);
 
+    fmpz_init(rem);
+    fmpz_init_set(npow, n);
+    fmpz_mod(npow, npow, s); /* npow = n mod s */
+    fmpz_init_set(nmul, npow);
 
     result = 1;
     for (i = 1; i < r; i++)
     {
         fmpz_mod(rem, n, npow);
-        if (fmpz_is_zero(rem) && (fmpz_equal(n, npow) == 0) && (fmpz_equal_ui(npow, 1) == 0))
+        /* if npow | n */
+        if (fmpz_is_zero(rem))
         {
-            result = 0;
-            break;
+            /* if npow != n and npow != 1 */
+            if ((fmpz_equal(n, npow) == 0) && (fmpz_equal_ui(npow, 1) == 0))
+            {
+                /* npow | n, so n is composite */
+                result = 0;
+                break;
+            }
         }
+
+        /* npow = n^i mod s */
         fmpz_mul(npow, npow, nmul);
         fmpz_mod(npow, npow, s);
     }
@@ -186,6 +220,7 @@ int is_prime_gauss_final_division(const fmpz_t n, const fmpz_t s, ulong r)
     fmpz_clear(npow);
     fmpz_clear(nmul);
     fmpz_clear(rem);
+
     return result;
 }
 
@@ -265,7 +300,7 @@ int is_prime_gauss(const fmpz_t n)
                     result = 0; break;
                 }
 
-                unity_power = is_condition_two(q, r, n);
+                unity_power = _is_gausspower_from_unity_p(q, r, n);
                 if (unity_power < 0)
                 {
                     result = 0; break;
@@ -294,18 +329,14 @@ int is_prime_gauss(const fmpz_t n)
         }
     }
 
-    if (result != 2) {
-
-    for (i = 0; i < conf->rs.num; i++) {
-        if (lambdas[i] != 3) result = 0;
-
-    }
-    } 
+    if (result != 2)
+        for (i = 0; i < conf->rs.num; i++)
+            if (lambdas[i] != 3) result = 0;
 
     free(lambdas);
 
     if (result == 1)
-        result = is_prime_gauss_final_division(n, conf->s, conf->R);
+        result = _is_prime_final_division(n, conf->s, conf->R);
     aprcl_config_clear(conf);
     if (result == 2)
         return 1;
