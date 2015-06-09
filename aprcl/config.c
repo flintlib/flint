@@ -52,7 +52,26 @@ void aprcl_config_init(aprcl_config conf, const fmpz_t n)
     fmpz_init_set_ui(s2, 0);
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
-    conf->R = 1259;
+    conf->R = 1;
+
+    while (fmpz_cmp(s2, n) <= 0)
+    {
+        conf->R += 1;
+        _aprcl_config_update(conf);
+        fmpz_mul(s2, conf->s, conf->s);
+    }
+    n_factor_init(&conf->rs);
+    n_factor(&conf->rs, conf->R, 1);
+}
+
+void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+{
+    fmpz_t s2;
+
+    fmpz_init_set_ui(s2, 0);
+    fmpz_init(conf->s);
+    fmpz_factor_init(conf->qs);
+    conf->R = R - 1;
 
     while (fmpz_cmp(s2, n) <= 0)
     {
@@ -69,5 +88,4 @@ void aprcl_config_clear(aprcl_config conf)
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);
 }
-
 

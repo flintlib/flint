@@ -224,23 +224,43 @@ int _is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
     return result;
 }
 
+int _is_prime_gauss(const fmpz_t n, const aprcl_config config)
+{
+    /* TODO: */
+    /* code from is_prime_gauss */
+    return 0;
+}
+
+int is_prime_gauss_fixed_R(const fmpz_t n, ulong R)
+{
+    /* TODO: */
+    /* compute config for fixed R */
+    /* _is_prime_gauss(n, config); */
+    return 0;
+}
+
 int is_prime_gauss(const fmpz_t n)
 {
-    int result;
-    ulong i, j, k;
-    ulong nmod4;
-    aprcl_config conf;
-    aprcl_config_init(conf, n);
+    /* TODO: */
+    /* auto compute config and run _is_prime_gauss(n, config) */
+    /* if fail for config, recompute and try again */
 
-    int *lambdas = (int *)malloc(sizeof(int) * conf->rs.num);
+    int result;
+    int *lambdas;
+    ulong i, j, k, nmod4;
+    aprcl_config conf;
+    aprcl_config_init_min_R(conf, n, 1260);
+
+    lambdas = (int*) malloc(sizeof(int) * conf->rs.num);
     for (i = 0; i < conf->rs.num; i++)
         lambdas[i] = 0;
 
     result = 1;
 
-    /* nmod4 = N % 4 */
+    /* nmod4 = n % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
 
+    /* for every prime q | s */
     for (i = 0; i < conf->qs->num; i++)
     {
         if (result == 0) break;
@@ -248,6 +268,7 @@ int is_prime_gauss(const fmpz_t n)
         n_factor_t q_factors;
         ulong q = fmpz_get_ui(conf->qs->p + i);
 
+        /* n == q, q - prime => n - prime */
         if (fmpz_equal_ui(n, q))
         {
             result = 2;
@@ -257,6 +278,7 @@ int is_prime_gauss(const fmpz_t n)
         n_factor_init(&q_factors);
         n_factor(&q_factors, q - 1, 1);
 
+        /* for every prime p | q - 1 */
         for (j = 0; j < q_factors.num; j++)
         {
             if (result == 0) break;
@@ -288,6 +310,7 @@ int is_prime_gauss(const fmpz_t n)
                 }
             }
 
+            /* for every prime power p^k | q - 1 */
             for (k = 1; k <= q_factors.exp[j]; k++)
             {
                 int unity_power;
@@ -333,13 +356,13 @@ int is_prime_gauss(const fmpz_t n)
         for (i = 0; i < conf->rs.num; i++)
             if (lambdas[i] != 3) result = 0;
 
-    free(lambdas);
-
     if (result == 1)
         result = _is_prime_final_division(n, conf->s, conf->R);
-    aprcl_config_clear(conf);
     if (result == 2)
-        return 1;
+        result = 1;
+
+    free(lambdas);
+    aprcl_config_clear(conf);
 
     return result;
 }

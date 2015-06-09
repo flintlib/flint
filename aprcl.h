@@ -89,6 +89,8 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
 int _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
 int _is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
+int _is_prime_gauss(const fmpz_t n, const aprcl_config config);
+int is_prime_gauss_fixed_R(const fmpz_t n, ulong R);
 int is_prime_gauss(const fmpz_t n);
 
 int is_prime_aprcl(const fmpz_t n);
@@ -151,6 +153,7 @@ void jacobi_2q_two(unity_root result, ulong q);
 
 /* Initial step functions. */
 void aprcl_config_init(aprcl_config conf, const fmpz_t n);
+void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R);
 void aprcl_config_clear(aprcl_config conf);
 void _aprcl_config_update(aprcl_config conf);
 
