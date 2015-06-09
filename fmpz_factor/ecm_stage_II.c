@@ -66,9 +66,9 @@ fmpz_factor_ecm_stage_II(fmpz_t f, fmpz_t x0, fmpz_t z0, mp_limb_t B1,
     ret = 0;
 
     /* compute GCD_table */
-    for (j = 1; j <= maxj; j++)
+    for (j = 1; j <= maxj; j ++)
     {
-        if (n_gcd(j, D) == 1)
+        if ((j%2) && n_gcd(j, D) == 1)
             GCD_table[j] = 1;  
         else
             GCD_table[j] = 0;
