@@ -58,16 +58,6 @@ main()
             paterson_time =
                 (double) (clock() - paterson_begin) / CLOCKS_PER_SEC;
 
-            if (!nmod_mat_equal(B, C))
-            {
-                flint_printf("FAIL:\n");
-                nmod_mat_print_pretty(A);
-                nmod_mat_print_pretty(B);
-                nmod_mat_print_pretty(C);
-                nmod_poly_print(poly), flint_printf("\n\n");
-                abort();
-            }
-
             result = horner_time < paterson_time ? 0 : 1;
             flint_printf("%wd\t\t%wd\t\t%lf\t\t%lf\t\t%d\n", dim, len,
                          horner_time, paterson_time, result);
