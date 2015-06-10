@@ -30,7 +30,7 @@ int is_prime_aprcl(const fmpz_t n)
     return _is_prime_aprcl(n) == PRIME;
 }
 
-return_status_aprcl _is_prime_aprcl(const fmpz_t n)
+primality_test_status _is_prime_aprcl(const fmpz_t n)
 {
     return UNKNOWN;
 }

@@ -77,11 +77,10 @@ typedef _unity_zpq unity_zpq[1];
 typedef enum
 {
     UNKNOWN,
-    COMPOSITE,
     PRIME,
-    FAIL_LUCAS,
-    FAIL_ADDITIONAL
-} return_status_aprcl;
+    COMPOSITE,
+    PROBABPRIME
+} primality_test_status;
 
 int _p_ind(const aprcl_config conf, ulong p);
 int _is_coprime(ulong q, ulong r, const fmpz_t n);
@@ -89,13 +88,13 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
 int _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
 int _is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
-int _is_prime_gauss(const fmpz_t n, const aprcl_config config);
+primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config);
 int is_prime_gauss_fixed_R(const fmpz_t n, ulong R);
 int is_prime_gauss(const fmpz_t n);
 
 int is_prime_aprcl(const fmpz_t n);
 
-return_status_aprcl _is_prime_aprcl(const fmpz_t n);
+primality_test_status _is_prime_aprcl(const fmpz_t n);
 
 /* Z[unity_root] operations. */
 void unity_init(unity_root element, ulong n);

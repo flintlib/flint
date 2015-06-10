@@ -224,71 +224,68 @@ int _is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
     return result;
 }
 
-int _is_prime_gauss(const fmpz_t n, const aprcl_config config)
+primality_test_status
+_is_prime_gauss(const fmpz_t n, const aprcl_config config)
 {
-    /* TODO: */
-    /* code from is_prime_gauss */
-    return 0;
-}
-
-int is_prime_gauss_fixed_R(const fmpz_t n, ulong R)
-{
-    /* TODO: */
-    /* compute config for fixed R */
-    /* _is_prime_gauss(n, config); */
-    return 0;
-}
-
-int is_prime_gauss(const fmpz_t n)
-{
-    /* TODO: */
-    /* auto compute config and run _is_prime_gauss(n, config) */
-    /* if fail for config, recompute and try again */
-
-    int result;
+    int f_division;
     int *lambdas;
     ulong i, j, k, nmod4;
-    aprcl_config conf;
-    aprcl_config_init_min_R(conf, n, 1260);
+    primality_test_status result;
 
-    lambdas = (int*) malloc(sizeof(int) * conf->rs.num);
-    for (i = 0; i < conf->rs.num; i++)
+    /* 
+        Condition (Lp) is satisfied iff:
+        For each p | R we must show that for all prime r | n and all
+        positive integers a there exists l such that:
+            r^(p-1) congruent n^(l(p-1)) mod p^a
+
+        If this (Lp), then lambdas_p = 3.
+    */
+    lambdas = (int*) malloc(sizeof(int) * config->rs.num);
+    for (i = 0; i < config->rs.num; i++)
         lambdas[i] = 0;
 
-    result = 1;
+    result = PROBABPRIME;
 
     /* nmod4 = n % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
 
     /* for every prime q | s */
-    for (i = 0; i < conf->qs->num; i++)
+    for (i = 0; i < config->qs->num; i++)
     {
-        if (result == 0) break;
-
         n_factor_t q_factors;
-        ulong q = fmpz_get_ui(conf->qs->p + i);
+        ulong q;
+        if (result == COMPOSITE) break;
+
+        q = fmpz_get_ui(config->qs->p + i);
 
         /* n == q, q - prime => n - prime */
         if (fmpz_equal_ui(n, q))
         {
-            result = 2;
+            result = PRIME;
             break;
         }
 
+        /* find prime factors of q - 1 */
         n_factor_init(&q_factors);
         n_factor(&q_factors, q - 1, 1);
 
         /* for every prime p | q - 1 */
         for (j = 0; j < q_factors.num; j++)
         {
-            if (result == 0) break;
-
             int state, pind;
-            ulong p = q_factors.p[j];
+            ulong p;
+            if (result == COMPOSITE) break;
 
-            pind = _p_ind(conf, p);
+            p = q_factors.p[j];
+
+            pind = _p_ind(config, p);
             state = lambdas[pind];
 
+            /*
+                (Lp.a)
+                if p == 2 and n = 1 mod 4 then (Lp) is equal to:
+                    for quadratic character \chi (\tau(\chi))^(\sigma_n-n) = -1
+            */
             if (p == 2 && state == 0 && nmod4 == 1)
             {
                 if (_is_gausspower_2q_equal_first(q, n) == 1)
@@ -298,6 +295,19 @@ int is_prime_gauss(const fmpz_t n)
                 }
             }
 
+            /*
+                (Lp.b)
+                if p == 2, r = 2^k >= 4 and n = 3 mod 4 then (Lp) is equal to:
+                    1) for quadratic character \chi 
+                        (\tau(\chi^(r / 2)))^(\sigma_n-n) = -1
+                    2) for character \chi = \chi_{r, q}
+                        (\tau(\chi))^(\sigma_n-n) is a generator of cyclic 
+                        group <\zeta_r>
+
+                if 1) is true, then lambdas_p = 1
+                if 2) is true, then lambdas_p = 2
+                if 1) and 2) is true, then lambdas_p = 3
+            */
             if (p == 2 && (state == 0 || state == 2) && nmod4 == 3)
             {
                 if (_is_gausspower_2q_equal_second(q, n) == 1)
@@ -316,22 +326,42 @@ int is_prime_gauss(const fmpz_t n)
                 int unity_power;
                 ulong r;
 
+                /* r = p^k */
                 r = n_pow(p, k);
 
+                /* if gcd(q*r, n) != 1 ||  gcd(q*r, n) != n */
                 if (_is_coprime(q, r, n) == 0)
                 {
-                    result = 0; break;
+                    result = COMPOSITE;
+                    break;
                 }
 
+                /* 
+                    if exists z such that \tau(\chi^n) = \zeta_r^z*\tau^n(\chi) 
+                    unity_power = z; otherwise unity_power = -1
+                */
                 unity_power = _is_gausspower_from_unity_p(q, r, n);
+
+                /* if unity_power < 0 then n is composite */
                 if (unity_power < 0)
                 {
-                    result = 0; break;
+                    result = COMPOSITE;
+                    break;
                 }
 
+                /*
+                    (Lp.c)
+                    if p > 2 then (Lp) is equal to:
+                        (\tau(\chi))^(\sigma_n - n) is a generator of cyclic 
+                        group <\zeta_r>
+                */
                 if (p > 2 && state == 0 && unity_power > 0)
                 {
                     ulong upow = unity_power;
+                    /* 
+                        if gcd(r, unity_power) = 1 then 
+                        (\tau(\chi))^(\sigma_n - n) is a generator
+                    */
                     if (n_gcd(r, upow) == 1)
                     {
                         state = 3;
@@ -339,31 +369,123 @@ int is_prime_gauss(const fmpz_t n)
                     }
                 }
 
-                if (p == 2 && unity_power > 0 && (state == 0 || state == 1) && nmod4 == 3)
+                /*
+                    (Lp.b)
+                    check 2) of (Lp) if p == 2 and nmod4 == 3
+                */
+                if (p == 2 && unity_power > 0 
+                    && (state == 0 || state == 1) && nmod4 == 3)
                 {
                     ulong upow = unity_power;
                     if (n_gcd(r, upow) == 1)
                     {
-                        if (state == 0) { state = 2; lambdas[pind] = state; }
-                        if (state == 1) { state = 3; lambdas[pind] = state; }
+                        if (state == 0) 
+                        { 
+                            state = 2;
+                            lambdas[pind] = state;
+                        }
+                        if (state == 1)
+                        {
+                            state = 3;
+                            lambdas[pind] = state;
+                        }
                     }
                 }
             }
         }
     }
 
-    if (result != 2)
-        for (i = 0; i < conf->rs.num; i++)
-            if (lambdas[i] != 3) result = 0;
+    /* 
+        if for some p we have not proved (Lp) 
+        then n can be as prime or composite
+    */
+    if (result == PROBABPRIME)
+        for (i = 0; i < config->rs.num; i++)
+            if (lambdas[i] != 3)
+                result = UNKNOWN;
 
-    if (result == 1)
-        result = _is_prime_final_division(n, conf->s, conf->R);
-    if (result == 2)
-        result = 1;
+  
+    /* if n can be prime we do final division */
+    if (result == UNKNOWN || result == PROBABPRIME)
+    {
+        int f_division;
+        f_division = _is_prime_final_division(n, config->s, config->R);
+        /* if (Lp) is true for all p | R and f_division == 1 then n - prime */
+        if (result == PROBABPRIME && f_division == 1)
+            result = PRIME;
+        /* 
+            if we not prove (Lp) for some p and f_division == 1 
+            then n still can be prime 
+        */
+        if (result == UNKNOWN && f_division == 1)
+            result = PROBABPRIME;
+        /* if f_division == 0 so we find the divisor of n, so n - composite */
+        if (f_division == 0)
+            result = COMPOSITE;
+    }
 
     free(lambdas);
-    aprcl_config_clear(conf);
 
     return result;
+}
+
+int is_prime_gauss_fixed_R(const fmpz_t n, ulong R)
+{
+    primality_test_status result;
+    aprcl_config config;
+
+    aprcl_config_init_min_R(config, n, R);
+    result = _is_prime_gauss(n, config);
+
+    aprcl_config_clear(config);
+
+    if (result == PRIME)
+        return 1;
+    return 0;
+}
+
+int is_prime_gauss(const fmpz_t n)
+{
+    ulong R;
+    primality_test_status result;
+    aprcl_config config;
+
+    aprcl_config_init_min_R(config, n, 180);
+    result = _is_prime_gauss(n, config);
+    R = config->R;
+    aprcl_config_clear(config);
+
+    /* 
+        if result == PROBABPRIME it means that we have
+        not proved (Lp) for some p (most we fail likely L.c step); 
+        we can try to use bigger R
+    */
+    if (result == PROBABPRIME)
+    {
+        R = R * 2;
+        aprcl_config_init_min_R(config, n, R);
+        result = _is_prime_gauss(n, config);
+        aprcl_config_clear(config);
+    }
+
+    if (result == PROBABPRIME)
+    {
+        R = R * 3;
+        aprcl_config_init_min_R(config, n, R);
+        result = _is_prime_gauss(n, config);
+        aprcl_config_clear(config);
+    }
+
+    if (result == PROBABPRIME)
+    {
+        R = R * 5;
+        aprcl_config_init_min_R(config, n, R);
+        result = _is_prime_gauss(n, config);
+        aprcl_config_clear(config);
+    }
+
+    if (result == PRIME)
+        return 1;
+    return 0;
 }
 
