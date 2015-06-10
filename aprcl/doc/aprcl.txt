@@ -43,10 +43,10 @@ int is_prime_gauss(const fmpz_t n)
     If $n$ exactly prime returns 1; otherwise returns 0.
     In function used Cyclotomic primality testing algorithm discribed in 
     "Four primality testing algorithms" by Rene Schoof. 
-    The minimum required numbers $s$ and $R$ computed automatically.
-    In some cases returns 0 for prime numbers. It means that we select
-    too small R value. To find this case \code{_is_prime_gauss} function can
-    be used.
+    The minimum required numbers $s$ and $R$ computed automatically. 
+    By default $R >= 180$. In some cases returns 0 for prime numbers. 
+    It means that we select too small R value. To find this case 
+    \code{_is_prime_gauss} function can be used.
 
 is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
