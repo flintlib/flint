@@ -420,7 +420,7 @@ is_prime_gauss(const fmpz_t n)
 
     /* 
         if result == PROBABPRIME it means that we have
-        not proved (Lp) for some p (most we fail likely L.c step); 
+        not proved (Lp) for some p (most likely we fail L.c step); 
         we can try to use bigger R
     */
     if (result == PROBABPRIME)
