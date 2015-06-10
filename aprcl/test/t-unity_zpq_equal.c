@@ -47,13 +47,15 @@ int main(void)
         q = n_randprime(state, 2 + n_randint(state, 6), 0);
 
         fmpz_init(n);
-        fmpz_randtest_not_zero(n, state, 200);
+        fmpz_randtest_unsigned(n, state, 200);
+        while (fmpz_equal_ui(n, 0) != 0)
+            fmpz_randtest_unsigned(n, state, 200);
+
         unity_zpq_init(f, q, p, n);
         unity_zpq_init(g, q, p, n);
 
         for (j = 0; j < 100; j++)
         {
-            
             ulong x, y;
             fmpz_t val;
 
@@ -61,7 +63,8 @@ int main(void)
 
             x = n_randint(state, p);
             y = n_randint(state, q);
-            fmpz_randtest_not_zero(val, state, 221);
+
+            fmpz_randtest_not_zero(val, state, 300);
             unity_zpq_coeff_set_fmpz(f, y, x, val);
             unity_zpq_coeff_set_fmpz(g, y, x, val);
 

@@ -65,7 +65,7 @@ void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 
     fmpz_clear(power);
     fmpz_clear(rem);
-    fmpz_clear(value);
+    unity_zpq_clear(value);
 }
 
 void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)

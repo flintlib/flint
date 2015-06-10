@@ -110,6 +110,8 @@ primality_test_status _is_prime_aprcl(const fmpz_t n);
 void unity_zp_init(unity_zp f, ulong p, const fmpz_t n);
 void unity_zp_clear(unity_zp f);
 void unity_zp_copy(unity_zp f, const unity_zp g);
+void unity_zp_swap(unity_zp f, unity_zp g);
+
 int unity_zp_equal(const unity_zp f, const unity_zp g);
 
 void unity_zp_coeff_set_fmpz(unity_zp value, ulong ind, const fmpz_t x);
@@ -119,7 +121,8 @@ void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x);
 
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
-void unity_zp_pow(unity_zp f, const unity_zp g, const fmpz_t pow);
+void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
+void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
 /* Z[unity_root] operations. */
 void unity_init(unity_root element, ulong n);

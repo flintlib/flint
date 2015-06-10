@@ -37,9 +37,69 @@ int main(void)
     flint_printf("unity_zp_pow....");
     fflush(stdout);
 
+    for (i = 0; i < 100; i++)
+    {
+        ulong p, pow;
+        fmpz_t n;
+        unity_zp res, left, right, test;
+
+        p = n_randprime(state, 2 + n_randint(state, 6), 0);
+
+        pow =  n_randint(state, 100);        
+
+        fmpz_randtest_unsigned(n, state, 200);
+        while (fmpz_equal_ui(n, 0) != 0)
+            fmpz_randtest_unsigned(n, state, 200);
+
+        unity_zp_init(res, p, n);
+        unity_zp_init(test, p, n);
+        unity_zp_init(left, p, n);
+        unity_zp_init(right, p, n);
+
+        for (j = 0; j < 100; j++)
+        {
+            ulong ind;
+            fmpz_t val;
+
+            fmpz_init(val);
+
+            ind = n_randint(state, p);
+            fmpz_randtest_not_zero(val, state, 200);
+            unity_zp_coeff_set_fmpz(left, ind, val);
+
+            fmpz_clear(val);
+        }
+
+        unity_zp_copy(right, left);
+
+        unity_zp_pow_ui(res, right, pow);
+        if (pow == 0)
+        {
+            unity_zp_coeff_set_ui(test, 0, 1);
+        } else {
+            for (j = 0; j < pow; j++)
+            {
+                unity_zp_mul(test, left, right);
+                unity_zp_swap(right, test);
+            }
+        }
+
+        if (unity_zp_equal(res, test) == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
+
+        fmpz_clear(n);
+        unity_zp_clear(res);
+        unity_zp_clear(left);
+        unity_zp_clear(right);
+        unity_zp_clear(test);
+    }
+
     FLINT_TEST_CLEANUP(state);
     
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
 
