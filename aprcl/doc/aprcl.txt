@@ -176,3 +176,66 @@ void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
 
     Sets $value = \tau^{\sigma_n}(\chi_{p, q})$.
 
+*******************************************************************************
+
+    Operations in $\mathbb{Z}[\zeta_p] / (n)$.
+
+*******************************************************************************
+
+void unity_zp_init(unity_zp value, ulong p, const fmpz_t n)
+
+    Initialized \code{unity_zp} element of $\mathbb{Z}[\zeta_p] / (n)$.
+
+void unity_zp_clear(unity_zp value)
+
+    Clears the given \code{unity_zp} element. It must be reinitialised in
+    order to be used again.
+
+void unity_zp_copy(unity_zp f, const unity_zp g)
+
+    Sets $f$ to $g$. $f$ and $g$ must be initialized with same $p$ and $n$.
+
+void unity_zp_swap(unity_zp f, unity_zp q)
+
+    Swaps $f$ and $g$. $f$ and $g$ must be initialized with same $p$ and $n$.
+
+int unity_zp_equal(const unity_zp f, const unity_zp g)
+
+    Returns non zero value if $f == g$.
+
+void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x)
+
+    Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
+    $ind$ must be less then $p$.
+
+void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x)
+
+    Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
+    $ind$ must be less then $p$.
+
+void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)
+
+    Sets $a$ in $a*\zeta_p^ind$ to $a + x$. $x$ must be less then $n$.
+
+void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
+
+    Sets $a$ in $a*\zeta_p^ind$ to $a + x$. $x$ must be less then $n$.
+
+void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h)
+
+    Sets the $f$ to $g + h$.
+    $f$, $g$ and $h$ must be initialized with same $p$ and $n$
+
+void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
+
+    Sets the $f$ to the $g * h$.
+    $f$, $g$ and $h$ must be initialized with same $p$ and $n$
+
+void unity_zp_pow_fmpz(unity_zp f, unity_zp g, const fmpz_t p)
+
+    Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$ and $n$.
+
+void unity_zp_pow_ui(unity_zp f, unity_zp g, ulong p)
+
+    Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$ and $n$.
+
