@@ -188,7 +188,6 @@ _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 primality_test_status
 _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 {
-    int f_division;
     int *lambdas;
     ulong i, j, k, nmod4;
     primality_test_status result;

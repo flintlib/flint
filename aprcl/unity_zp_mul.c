@@ -20,28 +20,29 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
 #include "aprcl.h"
 
-/*
-    Computes gauss sum for character \chi corresponding (q, p).
-*/
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 {
-    ulong i, qinv, qpow, ppow, g;
+    ulong i, p;
 
-    g = n_primitive_root_prime(q);
-    qinv = n_preinvert_limb(q);
-    qpow = 1;
-    ppow = 0;
+    fmpz_mod_poly_mul(f->poly, g->poly, h->poly);
+    if (f->poly->length == 0)
+        return;
 
-    for (i = 1; i < q; i++)
+    p = f->p;
+    for (i = f->poly->length - 1; i >= p; i--)
     {
-        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
+        fmpz_add(f->poly->coeffs + i - p
+            , f->poly->coeffs + i - p, f->poly->coeffs + i);
+
+        fmpz_set_ui(f->poly->coeffs + i, 0);
+        if (fmpz_cmp(f->poly->coeffs + i - p, f->n) >= 0)
+            fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->n);
     }
+    _fmpz_mod_poly_normalise(f->poly);
 }
 

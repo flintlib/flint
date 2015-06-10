@@ -23,25 +23,41 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-/*
-    Computes gauss sum for character \chi corresponding (q, p).
-*/
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+int main(void)
 {
-    ulong i, qinv, qpow, ppow, g;
+    int i, j;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zp_init....");
+    fflush(stdout);
 
-    g = n_primitive_root_prime(q);
-    qinv = n_preinvert_limb(q);
-    qpow = 1;
-    ppow = 0;
-
-    for (i = 1; i < q; i++)
+    for (i = 0; i < 100; i++)
     {
-        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
+        ulong p;
+        fmpz_t n;
+        unity_zp value;
+
+        fmpz_init(n);
+
+        p = n_randprime(state, 2 + n_randint(state, 16), 0);
+
+        fmpz_randtest_not_zero(n, state, 200);
+
+        unity_zp_init(value, p, n);
+        unity_zp_clear(value);
+
+        fmpz_clear(n);
     }
+
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
+    return 0;
 }
 

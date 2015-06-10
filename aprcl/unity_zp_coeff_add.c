@@ -20,28 +20,44 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
 #include "aprcl.h"
 
-/*
-    Computes gauss sum for character \chi corresponding (q, p).
-*/
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+void
+unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)
 {
-    ulong i, qinv, qpow, ppow, g;
-
-    g = n_primitive_root_prime(q);
-    qinv = n_preinvert_limb(q);
-    qpow = 1;
-    ppow = 0;
-
-    for (i = 1; i < q; i++)
+    fmpz_t coeff;
+    fmpz_init(coeff);
+    fmpz_mod_poly_get_coeff_fmpz(coeff, f->poly, ind);
+    if (fmpz_is_zero(coeff))
     {
-        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
+        fmpz_clear(coeff);
+        fmpz_mod_poly_set_coeff_fmpz(f->poly, ind, x);
+        return;
     }
+    fmpz_clear(coeff);
+    fmpz_add(f->poly->coeffs + ind, f->poly + ind, x);           
+    if (fmpz_cmp(f->poly->coeffs + ind, f->n) >= 0)
+        fmpz_sub(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
+}
+
+void
+unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
+{
+    fmpz_t coeff;
+    fmpz_init(coeff);
+    fmpz_mod_poly_get_coeff_fmpz(coeff, f->poly, ind);
+    if (fmpz_is_zero(coeff))
+    {
+        fmpz_clear(coeff);
+        fmpz_mod_poly_set_coeff_ui(f->poly, ind, x);
+        return;
+    }
+    fmpz_clear(coeff);
+    fmpz_add_ui(f->poly->coeffs + ind, f->poly + ind, x);           
+    if (fmpz_cmp(f->poly->coeffs + ind, f->n) >= 0)
+        fmpz_sub(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
 }
 

@@ -74,6 +74,15 @@ typedef struct
 
 typedef _unity_zpq unity_zpq[1];
 
+typedef struct
+{
+    fmpz_mod_poly_t poly;
+    ulong p;
+    fmpz_t n;
+} _unity_zp;
+
+typedef _unity_zp unity_zp[1];
+
 typedef enum
 {
     UNKNOWN,
@@ -95,6 +104,22 @@ int is_prime_gauss(const fmpz_t n);
 int is_prime_aprcl(const fmpz_t n);
 
 primality_test_status _is_prime_aprcl(const fmpz_t n);
+
+/* Z[unity_root] operation v2. */
+
+void unity_zp_init(unity_zp f, ulong p, const fmpz_t n);
+void unity_zp_clear(unity_zp f);
+void unity_zp_copy(unity_zp f, const unity_zp g);
+int unity_zp_equal(const unity_zp f, const unity_zp g);
+
+void unity_zp_coeff_set_fmpz(unity_zp value, ulong ind, const fmpz_t x);
+void unity_zp_coeff_set_ui(unity_zp value, ulong ind, ulong x);
+void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x);
+void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x);
+
+void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
+void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
+void unity_zp_pow(unity_zp f, const unity_zp g, const fmpz_t pow);
 
 /* Z[unity_root] operations. */
 void unity_init(unity_root element, ulong n);

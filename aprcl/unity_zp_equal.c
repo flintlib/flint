@@ -20,28 +20,22 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
 #include "aprcl.h"
 
-/*
-    Computes gauss sum for character \chi corresponding (q, p).
-*/
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+int
+unity_zp_equal(const unity_zp f, const unity_zp g)
 {
-    ulong i, qinv, qpow, ppow, g;
+    if (f->p != g->p)
+        return 0;
+    if (fmpz_equal(f->n, g->n) == 0)
+        return 0;
 
-    g = n_primitive_root_prime(q);
-    qinv = n_preinvert_limb(q);
-    qpow = 1;
-    ppow = 0;
+    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
+        return 0;
 
-    for (i = 1; i < q; i++)
-    {
-        qpow = n_mulmod2_preinv(qpow, g, q, qinv);
-        ppow = n_addmod(ppow, 1, p);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
-    }
+    return 1;
 }
 
