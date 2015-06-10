@@ -108,22 +108,22 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         exp = 0;
     }
 
-    if (factors->num) return 0;
-
-    while (small_factor == 0)
+    while (factors->num == 0)
+    {
         small_factor = qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
 
-    if (small_factor)
-    {
-        while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+        if (small_factor)
         {
-            fmpz_divexact_ui(x, qs_inf->n, small_factor);
-            fmpz_init_set(qs_inf->n, x);
-            exp++;
-        }
+            while (fmpz_fdiv_ui(qs_inf->n, small_factor) == 0)
+            {
+                fmpz_divexact_ui(x, qs_inf->n, small_factor);
+                fmpz_init_set(qs_inf->n, x);
+                exp++;
+            }
 
-        _fmpz_factor_append_ui(factors, small_factor, exp);
-        exp = 0;
+            _fmpz_factor_append_ui(factors, small_factor, exp);
+            exp = 0;
+        }
     }
 
     fmpz_clear(x);
