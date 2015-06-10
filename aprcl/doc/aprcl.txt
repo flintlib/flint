@@ -25,6 +25,41 @@
 
 *******************************************************************************
 
+    Primality test functions
+
+*******************************************************************************
+
+primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config)
+
+    Test $n$ for primality with fixed \code{config}. Possible return values:
+        - PRIME - if $n$ prime
+        - COMPOSITE - if $n$ composite
+        - PROBABPRIME - if $n$ still can be prime. This happens if we can't
+        verify condition (1) of Theorem 4.2 of "Four primality testing algorithms"
+        for selected $R$ and $s$ values.
+
+int is_prime_gauss(const fmpz_t n)
+
+    If $n$ exactly prime returns 1; otherwise returns 0.
+    In function used Cyclotomic primality testing algorithm discribed in 
+    "Four primality testing algorithms" by Rene Schoof. 
+    The minimum required numbers $s$ and $R$ computed automatically.
+    In some cases returns 0 for prime numbers. It means that we select
+    too small R value. To find this case \code{_is_prime_gauss} function can
+    be used.
+
+is_prime_gauss_min_R(const fmpz_t n, ulong R)
+
+    Same as \code{is_prime_gauss} function with fixed minimum value of $R$.
+
+int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
+
+    Returns 0 if for some a = n^k mod s, where k from 1 to r - 1 we have that 
+    a | n; otherwise returns 1.
+
+
+*******************************************************************************
+
     Preparation functions
 
 *******************************************************************************
@@ -34,6 +69,21 @@ mp_ptr f_table(const ulong q)
     Returns a table of the function $f: \{1,2,...,q-2\}\rightarrow\{1,2,...,q-2\}$
     defined by $1 - g^x \equiv  gf(x) \bmod q$, 
     there $g$ is a primitive root modulo $q$. f_table[x - 1] = f(x).
+
+void aprcl_config_init(aprcl_config conf, const fmpz_t n)
+
+    Compute the $s$ and $R$ values used in cyclotomic primality test.
+    $s^2 > n$ and $s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q$.
+    Also store factors of $R$ and $s$.
+
+void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+
+    Compute the $s$ with fixed minimum $R$.
+
+void aprcl_config_clear(aprcl_config conf)
+
+    Clears the given \code{aprcl_config} element. It must be reinitialised in
+    order to be used again.
 
 
 *******************************************************************************

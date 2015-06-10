@@ -25,11 +25,11 @@
 
 #include "aprcl.h"
 
-
 /*
     Returns 1 if gcd(q * r, n) == 1 or gcd(q * r, n) == n
 */
-int _is_coprime(ulong q, ulong r, const fmpz_t n)
+int
+_is_coprime(ulong q, ulong r, const fmpz_t n)
 {
     int result;
     fmpz_t qr, gcd;
@@ -53,7 +53,8 @@ int _is_coprime(ulong q, ulong r, const fmpz_t n)
 /*
     Returns the index of divisor p on R factors list.
 */
-int _p_ind(const aprcl_config conf, ulong p)
+int
+_p_ind(const aprcl_config conf, ulong p)
 {
     int i;
     for (i = 0; i < conf->rs.num; i++)
@@ -67,7 +68,8 @@ int _p_ind(const aprcl_config conf, ulong p)
     It is equal to check: 
         (\chi(-1) * q)^((n - 1) / 2) congruent -1 mod n
 */
-int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
+int
+_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 {
     int result;
     fmpz_t npow, nval, ncmp;
@@ -109,7 +111,8 @@ int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
     It is equal to check:
         q^((n - 1) / 2) congruent -1 mod n
 */
-int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
+int
+_is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
 {
     int result;
     fmpz_t npow, nval, ncmp;
@@ -143,7 +146,8 @@ int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
     \tau(\chi^n) == \zeta_p^i * \tau^n(\chi). If such i exists returns i.
     Otherwise returns -1.
 */
-int _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
+int
+_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 {
     int result;
     ulong i;
@@ -177,49 +181,6 @@ int _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
     unity_zpq_clear(gausssigma);
     unity_zpq_clear(gausspow);
     unity_zpq_clear(temp);
-
-    return result;
-}
-
-/*  
-    Returns 0 if for some a = n^k mod s, where k from 1 to r - 1 we have that 
-    a | n; otherwise returns 1.
-*/
-int _is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
-{
-    int result;
-    ulong i;
-    fmpz_t npow, nmul, rem;
-
-    fmpz_init(rem);
-    fmpz_init_set(npow, n);
-    fmpz_mod(npow, npow, s); /* npow = n mod s */
-    fmpz_init_set(nmul, npow);
-
-    result = 1;
-    for (i = 1; i < r; i++)
-    {
-        fmpz_mod(rem, n, npow);
-        /* if npow | n */
-        if (fmpz_is_zero(rem))
-        {
-            /* if npow != n and npow != 1 */
-            if ((fmpz_equal(n, npow) == 0) && (fmpz_equal_ui(npow, 1) == 0))
-            {
-                /* npow | n, so n is composite */
-                result = 0;
-                break;
-            }
-        }
-
-        /* npow = n^i mod s */
-        fmpz_mul(npow, npow, nmul);
-        fmpz_mod(npow, npow, s);
-    }
-
-    fmpz_clear(npow);
-    fmpz_clear(nmul);
-    fmpz_clear(rem);
 
     return result;
 }
@@ -409,7 +370,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
     if (result == UNKNOWN || result == PROBABPRIME)
     {
         int f_division;
-        f_division = _is_prime_final_division(n, config->s, config->R);
+        f_division = is_prime_final_division(n, config->s, config->R);
         /* if (Lp) is true for all p | R and f_division == 1 then n - prime */
         if (result == PROBABPRIME && f_division == 1)
             result = PRIME;
@@ -429,7 +390,8 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
     return result;
 }
 
-int is_prime_gauss_fixed_R(const fmpz_t n, ulong R)
+int
+is_prime_gauss_min_R(const fmpz_t n, ulong R)
 {
     primality_test_status result;
     aprcl_config config;
@@ -444,7 +406,8 @@ int is_prime_gauss_fixed_R(const fmpz_t n, ulong R)
     return 0;
 }
 
-int is_prime_gauss(const fmpz_t n)
+int
+is_prime_gauss(const fmpz_t n)
 {
     ulong R;
     primality_test_status result;
