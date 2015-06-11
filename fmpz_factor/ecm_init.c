@@ -27,39 +27,16 @@
 #include "flint.h"
 #include "fmpz.h"
 
-/* Implementation of the stage I of ECM */
-
-int
-fmpz_factor_ecm_stage_I(fmpz_t f, const mp_limb_t *prime_array, mp_limb_t num,
-                        mp_limb_t B1, fmpz_t n, ecm_t ecm_inf)
+void
+fmpz_factor_ecm_init(ecm_t ecm_inf)
 {
-    fmpz_t times;
-    int i, j, p, ret;
+    fmpz_init(ecm_inf->t);
+    fmpz_init(ecm_inf->u);
+    fmpz_init(ecm_inf->v);
+    fmpz_init(ecm_inf->w);
 
-    fmpz_init(times);
-    ret = 0;
-
-    for (i = 0; i < num; i++)
-    {
-        p = n_flog(B1, prime_array[i]);
-        fmpz_set_ui(times, prime_array[i]);
-
-        for (j = 1; j <= p; j ++)
-            fmpz_factor_ecm_mul_montgomery_ladder(ecm_inf->x, ecm_inf->z,
-                                                  ecm_inf->x, ecm_inf->z, 
-                                                  times, n, ecm_inf);
-
-        fmpz_gcd(f, ecm_inf->z, n);
-        if (!fmpz_is_one(f) && fmpz_cmp(f, n))
-        {
-            /* Found factor in stage I */
-            ret = 1;
-            goto cleanup;
-        }
-    }
-
-    cleanup:
-    fmpz_clear(times);
-
-    return ret;
-}
+    fmpz_init(ecm_inf->x);
+    fmpz_init(ecm_inf->z);
+    
+    fmpz_init(ecm_inf->a24);
+} 

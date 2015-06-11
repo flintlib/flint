@@ -39,46 +39,35 @@
 /* a24 = (a + 2) / 4 mod n */
 
 void
-fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t a24, fmpz_t n)
+fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, ecm_t ecm_inf)
 {
-    if (fmpz_cmp_ui(z0, 0) == 0)    /* If point is 0, return [0 :: 0] */
+    if (fmpz_cmp_ui(z0, 0) == 0)
     {
         fmpz_set(x, x0);
         fmpz_set(z, z0);
         return;
     }
 
-    fmpz_t u, v, w;
+    fmpz_add(ecm_inf->u, x0, z0);    /* u = x0 + z0 */
+    if (fmpz_cmp(ecm_inf->u, n) > 0)
+        fmpz_sub(ecm_inf->u, ecm_inf->u, n);
+    fmpz_mul(ecm_inf->u, ecm_inf->u, ecm_inf->u);      /* u = (x0 + z0)^2 */
+    fmpz_mod(ecm_inf->u, ecm_inf->u, n);
 
-    fmpz_init(u);
-    fmpz_init(v);
-    fmpz_init(w);
+    fmpz_sub(ecm_inf->v, x0, z0);    /* v = x0 - z0 */
+    fmpz_mul(ecm_inf->v, ecm_inf->v, ecm_inf->v);      /* v = (x0 - z0)^2 */
+    fmpz_mod(ecm_inf->v, ecm_inf->v, n);
 
-    fmpz_add(u, x0, z0);    /* u = x0 + z0 */
-    if (fmpz_cmp(u, n) > 0)
-        fmpz_sub(u, u, n);
-    fmpz_mul(u, u, u);      /* u = (x0 + z0)^2 */
-    fmpz_mod(u, u, n);
-
-    fmpz_sub(v, x0, z0);    /* v = x0 - z0 */
-    fmpz_mul(v, v, v);      /* v = (x0 - z0)^2 */
-    fmpz_mod(v, v, n);
-
-    fmpz_mul(x, u, v);      /* x = (x0 + z0)^2 * (x0 - z0)^2 */
+    fmpz_mul(x, ecm_inf->u, ecm_inf->v);      /* x = (x0 + z0)^2 * (x0 - z0)^2 */
     fmpz_mod(x, x, n);
 
-    fmpz_sub(w, u, v);      /* w = 4 * x0 * z0 */
-    fmpz_mul(u, w, a24);    /* u = a24 * 4 * x0 * z0 */
-    fmpz_mod(u, u, n);
+    fmpz_sub(ecm_inf->w, ecm_inf->u, ecm_inf->v);      /* w = 4 * x0 * z0 */
+    fmpz_mul(ecm_inf->u, ecm_inf->w, ecm_inf->a24);    /* u = a24 * 4 * x0 * z0 */
+    fmpz_mod(ecm_inf->u, ecm_inf->u, n);
 
-    fmpz_add(u, u, v);      /* u = (x0 - z0)^2 + a24 * 4 * x0 * z0 */
-    if (fmpz_cmp(u, n) > 0)
-        fmpz_sub(u, u, n);
-    fmpz_mul(z, w, u);      /* z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) */
+    fmpz_add(ecm_inf->u, ecm_inf->u, ecm_inf->v);      /* u = (x0 - z0)^2 + a24 * 4 * x0 * z0 */
+    if (fmpz_cmp(ecm_inf->u, n) > 0)
+        fmpz_sub(ecm_inf->u, ecm_inf->u, n);
+    fmpz_mul(z, ecm_inf->w, ecm_inf->u);      /* z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) */
     fmpz_mod(z, z, n);
-
-    fmpz_clear(u);
-    fmpz_clear(v);
-    fmpz_clear(w);
 }
-

@@ -32,83 +32,68 @@
    Returns 1 in case factor is found while selecting
    the curev. */
 
+/* Also selects initial point Q0 [x0 :: z0]  (z0 = 1) */
+
 int
-fmpz_factor_ecm_select_curve(fmpz_t f, fmpz_t x, fmpz_t a, fmpz_t sig, fmpz_t n)
+fmpz_factor_ecm_select_curve(fmpz_t f, fmpz_t sig, fmpz_t n, ecm_t ecm_inf)
 {
-    fmpz_t u, v, w, y, z;
-    int ret;
-    ret = 0;
+    fmpz_set(ecm_inf->u, sig);
 
-    fmpz_init_set(u, sig);
-    fmpz_init(v);
-    fmpz_init(w);
-    fmpz_init(y);
-    fmpz_init(z);
+    fmpz_mul_2exp(ecm_inf->v, ecm_inf->u, 2);     /* v = sig * 4 */
+    fmpz_mod(ecm_inf->v, ecm_inf->v, n);
+    fmpz_mul(ecm_inf->w, ecm_inf->u, ecm_inf->u);
+    fmpz_mod(ecm_inf->w, ecm_inf->w, n);
+    fmpz_sub_ui(ecm_inf->u, ecm_inf->w, 5);       /* u = sig^2 - 5 */
 
-    fmpz_mul_2exp(v, u, 2);     /* v = sig * 4 */
-    fmpz_mod(v, v, n);
-    fmpz_mul(w, u, u);
-    fmpz_mod(w, w, n);
-    fmpz_sub_ui(u, w, 5);       /* u = sig^2 - 5 */
+    fmpz_mul(ecm_inf->w, ecm_inf->u, ecm_inf->u);          /* w = u * u */
+    fmpz_mod(ecm_inf->w, ecm_inf->w, n);
+    fmpz_mul(ecm_inf->x, ecm_inf->w, ecm_inf->u);          /* x = u * u * u */
+    fmpz_mod(ecm_inf->x, ecm_inf->x, n);
 
-    fmpz_mul(w, u, u);          /* w = u * u */
-    fmpz_mod(w, w, n);
-    fmpz_mul(x, w, u);          /* x = u * u * u */
-    fmpz_mod(x, x, n);
+    fmpz_mul(ecm_inf->w, ecm_inf->v, ecm_inf->v);          /* w = v * v */
+    fmpz_mod(ecm_inf->w, ecm_inf->w, n);
+    fmpz_mul(ecm_inf->z, ecm_inf->w, ecm_inf->v);          /* z = v * v * v */
+    fmpz_mod(ecm_inf->z, ecm_inf->z, n);
 
-    fmpz_mul(w, v, v);          /* w = v * v */
-    fmpz_mod(w, w, n);
-    fmpz_mul(z, w, v);          /* z = v * v * v */
-    fmpz_mod(z, z, n);
+    fmpz_mul(ecm_inf->w, ecm_inf->x, ecm_inf->v);
+    fmpz_mod(ecm_inf->w, ecm_inf->w, n);
+    fmpz_mul_2exp(ecm_inf->t, ecm_inf->w, 2);
+    fmpz_mod(ecm_inf->t, ecm_inf->t, n);
+    fmpz_mul_ui(ecm_inf->w, ecm_inf->u, 3);
+    fmpz_mod(ecm_inf->w, ecm_inf->w, n);
+    fmpz_sub(ecm_inf->u, ecm_inf->v, ecm_inf->u);
 
-    fmpz_mul(w, x, v);
-    fmpz_mod(w, w, n);
-    fmpz_mul_2exp(y, w, 2);
-    fmpz_mod(y, y, n);
-    fmpz_mul_ui(w, u, 3);
-    fmpz_mod(w, w, n);
-    fmpz_sub(u, v, u);
+    fmpz_add(ecm_inf->v, ecm_inf->v, ecm_inf->w);
+    if (fmpz_cmp(ecm_inf->v, n) >= 0)
+        fmpz_sub(ecm_inf->v, ecm_inf->v, n);
+    fmpz_mul(ecm_inf->w, ecm_inf->u, ecm_inf->u);
+    fmpz_mod(ecm_inf->w, ecm_inf->w ,n);
+    fmpz_mul(ecm_inf->u, ecm_inf->u, ecm_inf->w);
+    fmpz_mod(ecm_inf->u, ecm_inf->u, n);
+    fmpz_mul(ecm_inf->a24, ecm_inf->u, ecm_inf->v);
+    fmpz_mod(ecm_inf->a24, ecm_inf->a24, n);
 
-    fmpz_add(v, v, w);
-    if (fmpz_cmp(v, n) >= 0)
-        fmpz_sub(v, v, n);
-    fmpz_mul(w, u, u);
-    fmpz_mod(w, w ,n);
-    fmpz_mul(u, u, w);
-    fmpz_mod(u, u, n);
-    fmpz_mul(a, u, v);
-    fmpz_mod(a, a, n);
-
-    fmpz_mul(v, y, z);
-    fmpz_mod(v, v, n);
-    fmpz_gcdinv(f, u, v, n);
+    fmpz_mul(ecm_inf->v, ecm_inf->t, ecm_inf->z);
+    fmpz_mod(ecm_inf->v, ecm_inf->v, n);
+    fmpz_gcdinv(f, ecm_inf->u, ecm_inf->v, n);
 
     if (fmpz_is_one(f) == 0)
-    {
-        ret = 1;
-        goto cleanup;
-    }
+        return 1;
 
-    fmpz_mul(v, u, y);
-    fmpz_mod(v, v, n);
-    fmpz_mul(x, x, v);
-    fmpz_mod(x, x, n);
+    fmpz_mul(ecm_inf->v, ecm_inf->u, ecm_inf->t);
+    fmpz_mod(ecm_inf->v, ecm_inf->v, n);
+    fmpz_mul(ecm_inf->x, ecm_inf->x, ecm_inf->v);
+    fmpz_mod(ecm_inf->x, ecm_inf->x, n);
 
-    fmpz_mul(v, u, z);
-    fmpz_mod(v, v, n);
-    fmpz_mul(w, a, v);
-    fmpz_mod(w, w, n);
-    fmpz_sub_ui(a, w, 2);
+    fmpz_mul(ecm_inf->v, ecm_inf->u, ecm_inf->z);
+    fmpz_mod(ecm_inf->v, ecm_inf->v, n);
+    fmpz_mul(ecm_inf->w, ecm_inf->a24, ecm_inf->v);
+    fmpz_mod(ecm_inf->w, ecm_inf->w, n);
+    fmpz_sub_ui(ecm_inf->a24, ecm_inf->w, 2);
 
+    fmpz_add_ui(ecm_inf->a24, ecm_inf->a24, 2);
+    fmpz_fdiv_q_2exp(ecm_inf->a24, ecm_inf->a24, 2);
+    fmpz_set_ui(ecm_inf->z, 1);
 
-    cleanup:
-
-    fmpz_clear(u);
-    fmpz_clear(v);
-    fmpz_clear(w);   
-    fmpz_clear(y);   
-    fmpz_clear(z); 
-
-    return ret; 
-
+    return 0;
 }
