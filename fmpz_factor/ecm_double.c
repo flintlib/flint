@@ -36,8 +36,6 @@
         z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) mod n
 */
 
-/* a24 = (a + 2) / 4 mod n */
-
 void
 fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, ecm_t ecm_inf)
 {
