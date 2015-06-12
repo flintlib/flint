@@ -94,7 +94,7 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     }
 
     /* arr[P] = double(arr[P/2]) */
-    /* P is always even,hence P/2 will always exist in array (is odd)*/
+    /* P is of form 2 * odd, hence P/2 will always exist in array (is odd)*/
     
     fmpz_init(jx[P]);
     fmpz_init(jz[P]);

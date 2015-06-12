@@ -136,10 +136,7 @@ int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n,
     suggested by Richard Brent. It can be found in the paper availible at
     http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
 
-************************************ ECM FUNTIONS  ************************************
-
-
-/* ECM Factoring functions ***************************************************/
+************************************ ECM FUNCTIONS  ***********************************
 
 typedef struct ecm_s {
 
