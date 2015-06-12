@@ -313,7 +313,9 @@ void qsieve_init_poly_next(qs_t qs_inf)
 
     }
 
-/*  p = qs_inf->q0;
+/* add component of prime 'q0' to 'B' values */
+/*
+    p = qs_inf->q0;
     pinv = n_preinvert_limb(p);
     pmod = fmpz_fdiv_ui(qs_inf->A0, p);
     mod_inv = n_invmod(pmod, p);

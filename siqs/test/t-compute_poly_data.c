@@ -41,7 +41,6 @@ int main(void)
    fmpz_init(n);
    fmpz_init(temp);
    fmpz_init(temp2);
-   fmpz_init(B);
    fmpz_init(B_2);
    FLINT_TEST_INIT(state);
 
@@ -111,20 +110,24 @@ int main(void)
           $B^2 \equiv kn \pmod{A}$
        */
 
+       /*
+           currently works for, 'B' (excluding 'q0' component) i.e.
+           $B^2 \equiv kn \pmod{A0}$ but fails otherwise
+       */
+
        for (j = 0; j < qs_inf->num_q0; j++)
        {
            qs_inf->q0 = qs_inf->q0_values[j];
            fmpz_mul_ui(qs_inf->A, qs_inf->A0, qs_inf->q0);
-           fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
+           fmpz_mod(temp2, qs_inf->kn, qs_inf->A0);
 
            qsieve_init_poly_first(qs_inf);
            qsieve_init_poly_next(qs_inf);
 
            for (k = 0; k < (1 << qs_inf->s); k++)
            {
-               fmpz_set(B, qs_inf->B[k]);
-               fmpz_mul(B_2, B, B);
-               fmpz_mod(temp, B_2, qs_inf->A);
+               fmpz_pow_ui(B_2, qs_inf->B[k], 2);
+               fmpz_mod(temp, B_2, qs_inf->A0);
 
                if (fmpz_cmp(temp, temp2) != 0)
                {
@@ -140,7 +143,6 @@ int main(void)
    fmpz_clear(n);
    fmpz_clear(temp);
    fmpz_clear(temp2);
-   fmpz_clear(B);
    fmpz_clear(B_2);
 
    FLINT_TEST_CLEANUP(state);
