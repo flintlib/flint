@@ -148,7 +148,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     fmpz_mul_2exp(temp, qs_inf->kn, 1);
     fmpz_sqrt(temp, temp);
     fmpz_tdiv_q_ui(temp, temp, qs_inf->sieve_size);
-    qs_inf->target_A = fmpz_get_ui(temp);        /* optimal value for hypercube */
+    fmpz_init_set(qs_inf->target_A, temp);        /* optimal value for hypercube */
 
     fmpz_clear(temp);
 
