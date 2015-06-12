@@ -67,6 +67,11 @@ _p_ind(const aprcl_config conf, ulong p)
     Returns 1 if \tau^{\sigma_n-n}(\chi)=-1; otherwise returns 0.
     It is equal to check: 
         (\chi(-1) * q)^((n - 1) / 2) congruent -1 mod n
+
+    \tau is the Gauss sum;
+    \chi is the character of conductor q and order 2 (quadratic character);
+    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
+        there \sigma_n is the ring automorphism
 */
 int
 _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
@@ -110,6 +115,11 @@ _is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
     Returns 1 if \tau^{\sigma_n-n}(\chi^{p / 2}) = -1; otherwise returns 0.
     It is equal to check:
         q^((n - 1) / 2) congruent -1 mod n
+
+    \tau is the Gauss sum;
+    \chi is the character of conductor q and order 2 (quadratic character);
+    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
+        there \sigma_n is the ring automorphism
 */
 int
 _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
@@ -145,6 +155,11 @@ _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
     cyclic group. It is equal to check that for some i from 0 to p - 1 
     \tau(\chi^n) == \zeta_p^i * \tau^n(\chi). If such i exists returns i.
     Otherwise returns -1.
+
+    \tau is the Gauss sum;
+    \chi is the character of conductor q and order r;
+    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
+        there \sigma_n is the ring automorphism
 */
 int
 _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
