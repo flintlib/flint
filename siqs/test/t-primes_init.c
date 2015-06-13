@@ -58,7 +58,7 @@ int main(void)
 
        if (small_factor) continue;
 
-       fmpz_mul_ui(qs_inf->kn, n, qs_inf->k);                      /* haven't calculated earlier */
+       fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k);                      /* haven't calculated earlier */
        small_factor = qsieve_primes_init(qs_inf);
 
        if (small_factor)

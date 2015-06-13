@@ -48,7 +48,6 @@
         polynomial
 */
 
-
 void qsieve_compute_A0(qs_t qs_inf)
 {
     slong i, s = 0, j = 0, k;
@@ -136,7 +135,7 @@ mp_limb_t qsieve_compute_A(qs_t qs_inf)
 
         while (pmod % 2 == 0)
         {
-            if ((pmod % 8) == 3 || (pmod % 8) == 5) kron *= -1;
+            if ((p % 8) == 3 || (p % 8) == 5) kron *= -1;
             pmod /= 2;
         }
 
@@ -173,7 +172,7 @@ mp_limb_t qsieve_compute_A(qs_t qs_inf)
 
             while (pmod % 2 == 0)
             {
-                if ((pmod % 8) == 3 || (pmod % 8) == 5) kron *= -1;
+                if ((p % 8) == 3 || (p % 8) == 5) kron *= -1;
                 pmod /= 2;
             }
 
@@ -209,7 +208,6 @@ void qsieve_compute_pre_data(qs_t qs_inf)
     slong i, j;
     slong s = qs_inf->s;
     mp_limb_t * A_ind = qs_inf->A_ind;
-    mp_limb_t A0 = qs_inf->A0;
     fmpz_t * A0_divp = qs_inf->A0_divp;
     mp_limb_t * B0_terms = qs_inf->B0_terms;
     prime_t * factor_base = qs_inf->factor_base;
@@ -248,7 +246,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     fmpz_t * A_divp = qs_inf->A_divp;
     fmpz_t * B = qs_inf->B;
     prime_t * factor_base = qs_inf->factor_base;
-    mp_limb_t p, pinv, temp, temp2;
+    mp_limb_t p, pinv, temp, temp2, pmod, mod_inv;
     fmpz_t temp3, temp4;
     fmpz_init(temp3);
     B = flint_malloc((1 << s) * sizeof(fmpz_t));
@@ -274,6 +272,18 @@ void qsieve_init_poly_first(qs_t qs_inf)
         fmpz_set(B[0], temp4);
     }
 
+   /* adding component for 'q0' */
+    p = qs_inf->q0;
+    pinv = n_preinvert_limb(p);
+    pmod = fmpz_fdiv_ui(qs_inf->A0, p);
+    mod_inv = n_invmod(pmod, p);
+    pmod = fmpz_fdiv_ui(qs_inf->kn, p);
+    pmod = n_sqrtmod(pmod, p);
+    pmod = n_mulmod2_preinv(mod_inv, pmod, p, pinv);
+    fmpz_mul_ui(temp3, qs_inf->A0, pmod);
+    fmpz_set(temp4, B[0]);
+    fmpz_add(B[0], temp3, temp4);
+
     qs_inf->B = B;
 
     fmpz_clear(temp3);
@@ -290,12 +300,9 @@ void qsieve_init_poly_next(qs_t qs_inf)
     slong i, j, v;
     slong s = qs_inf->s;
     prime_t * factor_base = qs_inf->factor_base;
-    mp_limb_t sign, p, pinv, pmod, mod_inv;
-    fmpz_t temp, temp2, temp3;
+    mp_limb_t sign;
+    fmpz_t temp;
     fmpz_init(temp);
-    fmpz_init(temp2);
-    fmpz_init(temp3);
-
     for (i = 1; i < (1 << s); i++)
     {
         for (v = 0; v < s; v++)
@@ -313,27 +320,6 @@ void qsieve_init_poly_next(qs_t qs_inf)
 
     }
 
-/* add component of prime 'q0' to 'B' values */
-/*
-    p = qs_inf->q0;
-    pinv = n_preinvert_limb(p);
-    pmod = fmpz_fdiv_ui(qs_inf->A0, p);
-    mod_inv = n_invmod(pmod, p);
-    pmod = fmpz_fdiv_ui(qs_inf->kn, p);
-    while (pmod % 2 == 0) pmod /= 2;
-    pmod = n_sqrtmod(pmod, p);
-    pmod = n_mulmod2_preinv(pmod, mod_inv, p, pinv);
-    fmpz_mul_ui(temp2, qs_inf->A0, pmod);
-    fmpz_neg(temp3, temp2);
-
-    for (i = 0; i < (1 << s); i++)
-    {
-        fmpz_set(temp, qs_inf->B[i]);
-        fmpz_add(qs_inf->B[i], temp3, temp);
-    }
-*/
     fmpz_clear(temp);
-    fmpz_clear(temp2);
-    fmpz_clear(temp3);
 }
 

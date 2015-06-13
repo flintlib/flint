@@ -74,7 +74,7 @@ typedef struct qs_s
     **************************************************************************/
 
    fmpz_t A;           /* current value of coefficient A */
-   fmpz_t * A0;        /* possible candidate for A0 i.e.
+   fmpz_t A0;        /* possible candidate for A0 i.e.
                           value of coefficient A excluding the non-factor-base prime */
    mp_limb_t * q0_values;   /* value of primes immediately following prime bound
                                 which will be used as factors of current A */

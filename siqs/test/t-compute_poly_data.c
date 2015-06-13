@@ -58,7 +58,7 @@ int main(void)
 
        if (small_factor) continue;
 
-       fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k);
+       fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k); /* haven't calculated earlier */
        small_factor = qsieve_primes_init(qs_inf);
 
        if (small_factor) continue;
@@ -109,25 +109,18 @@ int main(void)
        /* check if all the 'B' values for particular hypercube 'A' satisfy,
           $B^2 \equiv kn \pmod{A}$
        */
-
-       /*
-           currently works for, 'B' (excluding 'q0' component) i.e.
-           $B^2 \equiv kn \pmod{A0}$ but fails otherwise
-       */
-
        for (j = 0; j < qs_inf->num_q0; j++)
        {
            qs_inf->q0 = qs_inf->q0_values[j];
            fmpz_mul_ui(qs_inf->A, qs_inf->A0, qs_inf->q0);
-           fmpz_mod(temp2, qs_inf->kn, qs_inf->A0);
-
+           fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
            qsieve_init_poly_first(qs_inf);
            qsieve_init_poly_next(qs_inf);
 
            for (k = 0; k < (1 << qs_inf->s); k++)
            {
                fmpz_pow_ui(B_2, qs_inf->B[k], 2);
-               fmpz_mod(temp, B_2, qs_inf->A0);
+               fmpz_mod(temp, B_2, qs_inf->A);
 
                if (fmpz_cmp(temp, temp2) != 0)
                {

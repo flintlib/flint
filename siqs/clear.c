@@ -35,9 +35,6 @@ void qsieve_clear(qs_t qs_inf)
 
     fmpz_clear(qs_inf->n);
     fmpz_clear(qs_inf->kn);
-    fmpz_clear(qs_inf->A);
-    fmpz_clear(qs_inf->A0);
-    fmpz_clear(qs_inf->target_A);
 
     flint_free(qs_inf->factor_base);
     flint_free(qs_inf->sqrts);
