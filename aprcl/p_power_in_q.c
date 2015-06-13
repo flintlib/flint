@@ -23,39 +23,19 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+ulong
+p_power_in_q(ulong q, ulong p)
 {
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("jacobi....");
-    fflush(stdout);
-
-    unity_root sum;
-    jacobi_pq(sum, 7, 3);
-    flint_printf("%w\n", sum->power);
-    unity_roots_reduce_cyclotomic(sum, 3); 
-    flint_printf("\n");
-    unity_print(sum);
-    unity_clear(sum);
-
-    unity_root sum2;
-    jacobi_pq_not2(sum2, 7, 3);
-    unity_print(sum2);
-    unity_clear(sum2);
-
-    jacobi_2q_one(sum2, 7);
-    unity_print(sum2);
-    unity_clear(sum2);
-
-    FLINT_TEST_CLEANUP(state);
-    
-    flint_printf("PASS\n");
-    return 0;
+    ulong k, q_temp;
+    k = 0;
+    q_temp = q;
+    while (q_temp % p == 0 && q_temp != 0)
+    {
+        k++;
+        q_temp /= p;
+    }
+    return k;
 }
 

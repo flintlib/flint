@@ -19,28 +19,29 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 Vladimir Glazachev
-   
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
+
 ******************************************************************************/
 
-#include "aprcl.h"
+#include <gmp.h>
+#include <stdlib.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mod_poly.h"
 
-int
-unity_zp_equal(unity_zp f, unity_zp g)
+void fmpz_mod_poly_set_coeff_si(fmpz_mod_poly_t poly, slong n, slong x)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
+    fmpz_mod_poly_fit_length(poly, n + 1);
 
-    _unity_zp_reduce_cyclotomic(f);
-    _unity_zp_reduce_cyclotomic(g);
+    if (n + 1 > poly->length)
+    {
+        flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+        poly->length = n + 1;
+    }
 
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
-
-    return 1;
+    fmpz_set_si(poly->coeffs + n, x);
+    fmpz_mod(poly->coeffs + n, poly->coeffs + n, &(poly->p));
+    _fmpz_mod_poly_normalise(poly);
 }
 

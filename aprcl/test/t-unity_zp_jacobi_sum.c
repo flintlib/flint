@@ -20,27 +20,49 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-int
-unity_zp_equal(unity_zp f, unity_zp g)
+int main(void)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zp_jacobi_sum....");
+    fflush(stdout);
 
-    _unity_zp_reduce_cyclotomic(f);
-    _unity_zp_reduce_cyclotomic(g);
+    fmpz_t n;
+    fmpz_init_set_ui(n, 37);
 
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
+    unity_zp sum;
+    unity_zp_init(sum, 3, 1, n);
+    jacobi_pq_not2(sum, 7, 3);
 
-    return 1;
+    flint_printf("\n");
+    fmpz_mod_poly_print(sum->poly);
+    flint_printf("\n");
+
+/*
+    unity_root sum2;
+    jacobi_pq_not2(sum2, 7, 3);
+    unity_print(sum2);
+    unity_clear(sum2);
+
+    jacobi_2q_one(sum2, 7);
+    unity_print(sum2);
+    unity_clear(sum2);
+*/
+
+    unity_zp_clear(sum);
+
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
+    return 0;
 }
 

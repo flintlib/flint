@@ -25,22 +25,31 @@
 
 #include "aprcl.h"
 
-int
-unity_zp_equal(unity_zp f, unity_zp g)
+void
+unity_zp_coeff_inc(unity_zp f, ulong ind)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
+    if (ind >= f->poly->length)
+    {
+        fmpz_mod_poly_set_coeff_ui(f->poly, ind, 1);
+        return;
+    }
 
-    _unity_zp_reduce_cyclotomic(f);
-    _unity_zp_reduce_cyclotomic(g);
+    fmpz_add_ui(f->poly->coeffs + ind, f->poly->coeffs + ind, 1);
+    if (fmpz_equal(f->poly->coeffs + ind, f->n))
+        fmpz_set_ui(f->poly->coeffs + ind, 0);
+}
 
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
+void
+unity_zp_coeff_dec(unity_zp f, ulong ind)
+{
+    if (ind >= f->poly->length)
+    {
+        fmpz_mod_poly_set_coeff_si(f->poly, ind, -1);
+        return;
+    }
 
-    return 1;
+    fmpz_sub_ui(f->poly->coeffs + ind, f->poly->coeffs + ind, 1);
+    if (fmpz_equal_si(f->poly->coeffs + ind, -1))
+        fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
 }
 

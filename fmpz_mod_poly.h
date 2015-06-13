@@ -298,6 +298,8 @@ FLINT_DLL void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const
 
 FLINT_DLL void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x);
 
+FLINT_DLL void fmpz_mod_poly_set_coeff_si(fmpz_mod_poly_t poly, slong n, slong x);
+
 FMPZ_MOD_POLY_INLINE 
 void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
 {

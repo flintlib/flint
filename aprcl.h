@@ -77,7 +77,6 @@ typedef _unity_zpq unity_zpq[1];
 typedef struct
 {
     fmpz_mod_poly_t poly;
-    ulong size;
     ulong p;
     ulong exp;
     fmpz_t n;
@@ -114,7 +113,11 @@ void unity_zp_clear(unity_zp f);
 void unity_zp_copy(unity_zp f, const unity_zp g);
 void unity_zp_swap(unity_zp f, unity_zp g);
 
-int unity_zp_equal(const unity_zp f, const unity_zp g);
+void unity_zp_set_zero(unity_zp f);
+void unity_zp_coeff_inc(unity_zp f, ulong ind);
+void unity_zp_coeff_dec(unity_zp f, ulong ind);
+
+int unity_zp_equal(unity_zp f, unity_zp g);
 
 void unity_zp_coeff_set_fmpz(unity_zp value, ulong ind, const fmpz_t x);
 void unity_zp_coeff_set_ui(unity_zp value, ulong ind, ulong x);
@@ -128,6 +131,12 @@ void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
 void _unity_zp_reduce_cyclotomic(unity_zp f);
 void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g);
+
+/* Jacobi sum computation. */
+void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
+void jacobi_pq_not2(unity_zp f, ulong q, ulong p);
+void jacobi_2q_one(unity_zp f, ulong q);
+void jacobi_2q_two(unity_zp f, ulong q);
 
 /* Z[unity_root] operations. */
 void unity_init(unity_root element, ulong n);
@@ -176,12 +185,6 @@ ulong unity_zpq_p_unity(const unity_zpq f);
 int unity_zpq_is_p_unity(const unity_zpq f);
 int unity_zpq_is_p_unity_generator(const unity_zpq f);
 
-/* Jacobi sum computation. */
-void jacobi_pq(unity_root result, ulong q, ulong p);
-void jacobi_pq_general(unity_root result, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
-void jacobi_pq_not2(unity_root result, ulong q, ulong p);
-void jacobi_2q_one(unity_root result, ulong q);
-void jacobi_2q_two(unity_root result, ulong q);
 
 /* Initial step functions. */
 void aprcl_config_init(aprcl_config conf, const fmpz_t n);
@@ -190,6 +193,7 @@ void aprcl_config_clear(aprcl_config conf);
 void _aprcl_config_update(aprcl_config conf);
 
 mp_ptr f_table(const ulong q);
+ulong p_power_in_q(ulong q, ulong p);
 
 #endif
 

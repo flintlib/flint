@@ -20,27 +20,26 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-int
-unity_zp_equal(unity_zp f, unity_zp g)
+int main(void)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
+    int i, j;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zp_coeff_inc....");
+    fflush(stdout);
 
-    _unity_zp_reduce_cyclotomic(f);
-    _unity_zp_reduce_cyclotomic(g);
-
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
-
-    return 1;
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("NO TEST\n");
+    return 0;
 }
 

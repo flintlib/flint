@@ -47,7 +47,7 @@ int main(void)
 
         n_factor_init(&factors);
 
-        q = n_randprime(state, 8, 0);
+        q = n_randprime(state, 6, 0);
         if (q == 2)
             q = 7;
 
@@ -61,7 +61,7 @@ int main(void)
 
         p = n_pow(p, ppow);
 
-        fmpz_init_set_ui(n, n_randprime(state, 32, 0));
+        fmpz_init_set_ui(n, n_randprime(state, 16, 0));
 
         unity_zpq_init(gausssigma, q, p, n);
         unity_zpq_init(gauss, q, p, n);

@@ -25,6 +25,9 @@
 
 #include "aprcl.h"
 
+/*
+    TODO: Need to add reduction by F_q and F_p cyclotomic polynomial.
+*/
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 {
     ulong i;

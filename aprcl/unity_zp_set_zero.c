@@ -25,22 +25,9 @@
 
 #include "aprcl.h"
 
-int
-unity_zp_equal(unity_zp f, unity_zp g)
+void
+unity_zp_set_zero(unity_zp f)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
-
-    _unity_zp_reduce_cyclotomic(f);
-    _unity_zp_reduce_cyclotomic(g);
-
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
-
-    return 1;
+    fmpz_mod_poly_zero(f->poly);
 }
 
