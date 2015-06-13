@@ -47,6 +47,7 @@ int main(void)
 
         pow =  n_randint(state, 100);        
 
+        fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
@@ -64,7 +65,7 @@ int main(void)
             fmpz_init(val);
 
             ind = n_randint(state, p);
-            fmpz_randtest_not_zero(val, state, 200);
+            fmpz_randtest_unsigned(val, state, 200);
             unity_zp_coeff_set_fmpz(left, ind, val);
 
             fmpz_clear(val);

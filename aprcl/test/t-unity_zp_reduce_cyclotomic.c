@@ -31,29 +31,64 @@
 
 int main(void)
 {
-    int i;
+    int i, j;
     FLINT_TEST_INIT(state);
    
-    flint_printf("unity_zp_init....");
+    flint_printf("unity_zp_reduce_cyclotomic....");
     fflush(stdout);
 
     for (i = 0; i < 100; i++)
     {
-        ulong p;
+        fmpz_mod_poly_t cyclo_poly;
+        ulong p, exp;
         fmpz_t n;
-        unity_zp value;
+        unity_zp f, g;
 
-        p = n_randprime(state, 2 + n_randint(state, 6), 0);
+        p = n_randprime(state, 2 + n_randint(state, 2), 0);
+        exp = n_randint(state, 4);
+        while (exp == 0)
+            exp = n_randint(state, 4);
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
-        while (fmpz_equal_ui(n, 0) != 0)
+        while (fmpz_cmp_ui(n, 2) < 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zp_init(value, p, 1, n);
-        unity_zp_clear(value);
+        unity_zp_init(f, p, exp, n);
+        unity_zp_init(g, p, exp, n);
 
-        fmpz_clear(n);
+        for (j = 0; j < 100; j++)
+        {
+            ulong ind;
+            fmpz_t val;
+
+            fmpz_init(val);
+
+            ind = n_randint(state, n_pow(p, exp));
+            
+            fmpz_randtest_unsigned(val, state, 200);
+
+            unity_zp_coeff_set_fmpz(f, ind, val);
+
+            fmpz_clear(val);
+        }
+
+        unity_zp_reduce_cyclotomic(g, f);
+
+        fmpz_mod_poly_init(cyclo_poly, n);
+        for (j = 0; j < p; j++)
+            fmpz_mod_poly_set_coeff_ui(cyclo_poly, j * n_pow(p, exp - 1), 1);
+        fmpz_mod_poly_rem(f->poly, f->poly, cyclo_poly);
+
+        if (unity_zp_equal(f, g) == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
+
+        fmpz_mod_poly_clear(cyclo_poly);
+        unity_zp_clear(f);
+        unity_zp_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);

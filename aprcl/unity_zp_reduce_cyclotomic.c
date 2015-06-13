@@ -28,29 +28,32 @@
 void _unity_zp_reduce_cyclotomic(unity_zp f)
 {
     ulong i, j, ppow, cycl_pow;
-    fmpz_t coeff;
+
+    if (f->poly->length == 0)
+        return;
 
     ppow = n_pow(f->p, f->exp - 1);
     cycl_pow = (f->p - 1) * ppow;
-    fmpz_init(coeff);
 
     for (i = f->poly->length - 1; i >= cycl_pow; i--)
     {
-        fmpz_set(coeff, f->poly->coeffs + i);
-        if (fmpz_is_zero(coeff))
+        if (fmpz_is_zero(f->poly->coeffs + i))
             continue;
 
         for (j = 0; j < f->p - 1; j++)
         {
-            ulong ind = j * ppow;
+            ulong ind = i - cycl_pow + j * ppow;
             fmpz_sub(f->poly->coeffs + ind
-                , f->poly->coeffs + ind, coeff);
-            if (fmpz_cmp(f->poly->coeffs + ind, 0) < 0)
+                , f->poly->coeffs + ind, f->poly->coeffs + i);
+
+            if (fmpz_cmp_ui(f->poly->coeffs + ind, 0) < 0)
                 fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
         }
-    } 
 
-    fmpz_clear(coeff);
+        fmpz_set_ui(f->poly->coeffs + i, 0);
+    }
+
+    _fmpz_mod_poly_normalise(f->poly);
 }
 
 void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g)
