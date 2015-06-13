@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2006, 2011 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
 ******************************************************************************/
 
@@ -73,10 +73,11 @@ typedef struct qs_s
                        POLYNOMIAL DATA
     **************************************************************************/
 
-   fmpz_t A;                 /* current value of coefficient A */
-   fmpz_t A0;                /* value of coefficient A excluding the non-factor-base prime */
-   mp_limb_t * q0_values;    /* value of primes immediately following prime bound
-                                which will be used as factors of A */
+   fmpz_t A;           /* current value of coefficient A */
+   fmpz_t * A0;        /* possible candidate for A0 i.e.
+                          value of coefficient A excluding the non-factor-base prime */
+   mp_limb_t * q0_values;   /* value of primes immediately following prime bound
+                                which will be used as factors of current A */
 
    mp_limb_t num_q0;        /* total number of q0 */
 
@@ -122,18 +123,30 @@ typedef qs_s qs_t[1];
 */
 static const mp_limb_t qsieve_tune[][5] =
 {
-    {0, 50, 80, 2, 14000 },
-    {30, 50, 80, 2, 16000 },
-    {40, 50, 100, 3, 18000 },
-    {50, 50, 120, 3, 20000 },
-    {60, 50, 140, 4, 22000 },
-    {70, 50, 160, 4, 24000 },
-    {80, 100, 180, 5, 26000 },
-    {90, 100, 200, 5, 28000 },
-    {100, 100, 250, 6, 30000 },
-    {110, 100, 300, 6, 34000 },
-    {120, 100, 500, 7, 40000 },
-    {130, 100, 550, 7, 60000 }
+   {40, 50, 50, 5, 3000},
+   {50, 50, 80, 5, 3500},
+   {60, 50, 100, 5, 4000},
+   {70, 50, 300, 6, 6000},
+   {80, 50, 400, 6, 8000,},
+   {90, 50, 500, 7, 10000},
+   {100, 100, 650, 7, 13000},
+   {110, 100, 800, 7, 15000}, // 31 digits
+   {120, 100, 1000, 7, 20000},
+   {130, 100, 800, 9, 32000}, // 41 digits
+   {140, 100, 1200, 8, 28000},
+   {150, 100, 1800, 8, 32000},
+   {160, 150, 2000, 8, 40000},
+   {170, 150, 2200, 9, 64000}, // 50 digits
+   {180, 150, 2400, 9, 64000},
+   {190, 150, 2700, 10, 64000},
+   {200, 150, 3600, 10, 64000}, // 60 digits
+   {210, 150, 6000, 12, 64000},
+   {220, 200, 7500, 15, 64000},
+   {230, 200, 8500, 17, 64000}, // 70 digits
+   {240, 200, 18000, 19, 64000},
+   {250, 200, 24000, 19, 64000}, // 75 digits
+   {260, 200, 55000, 25, 128000}, // 80 digits
+   {270, 200, 64000, 27, 128000}
 };
 
 /* number of entries in the tuning table */
