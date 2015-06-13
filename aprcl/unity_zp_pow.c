@@ -28,13 +28,12 @@
 void
 unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 {
-    ulong j;
     unity_zp value, temp_pow, temp;
     fmpz_t power, rem;
 
-    unity_zp_init(value, f->p, f->n);
-    unity_zp_init(temp_pow, f->p, f->n);
-    unity_zp_init(temp, f->p, f->n);
+    unity_zp_init(value, f->p, f->exp, f->n);
+    unity_zp_init(temp_pow, f->p, f->exp, f->n);
+    unity_zp_init(temp, f->p, f->exp, f->n);
     fmpz_init_set(power, pow);
     fmpz_init(rem);
 

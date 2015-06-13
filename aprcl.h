@@ -77,7 +77,9 @@ typedef _unity_zpq unity_zpq[1];
 typedef struct
 {
     fmpz_mod_poly_t poly;
+    ulong size;
     ulong p;
+    ulong exp;
     fmpz_t n;
 } _unity_zp;
 
@@ -107,7 +109,7 @@ primality_test_status _is_prime_aprcl(const fmpz_t n);
 
 /* Z[unity_root] operation v2. */
 
-void unity_zp_init(unity_zp f, ulong p, const fmpz_t n);
+void unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n);
 void unity_zp_clear(unity_zp f);
 void unity_zp_copy(unity_zp f, const unity_zp g);
 void unity_zp_swap(unity_zp f, unity_zp g);
@@ -123,6 +125,9 @@ void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
+
+void _unity_zp_reduce_cyclotomic(unity_zp f);
+void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g);
 
 /* Z[unity_root] operations. */
 void unity_init(unity_root element, ulong n);

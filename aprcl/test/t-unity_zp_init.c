@@ -31,7 +31,7 @@
 
 int main(void)
 {
-    int i, j;
+    int i;
     FLINT_TEST_INIT(state);
    
     flint_printf("unity_zp_init....");
@@ -45,11 +45,11 @@ int main(void)
 
         fmpz_init(n);
 
-        p = n_randprime(state, 2 + n_randint(state, 16), 0);
+        p = n_randprime(state, 2 + n_randint(state, 6), 0);
 
         fmpz_randtest_not_zero(n, state, 200);
 
-        unity_zp_init(value, p, n);
+        unity_zp_init(value, p, 1, n);
         unity_zp_clear(value);
 
         fmpz_clear(n);

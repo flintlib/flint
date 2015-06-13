@@ -25,19 +25,37 @@
 
 #include "aprcl.h"
 
-int
-unity_zp_equal(const unity_zp f, const unity_zp g)
+void _unity_zp_reduce_cyclotomic(unity_zp f)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
+    ulong i, j, ppow, cycl_pow;
+    fmpz_t coeff;
 
-    if (fmpz_mod_poly_equal(f->poly, g->poly) == 0)
-        return 0;
+    ppow = n_pow(f->p, f->exp - 1);
+    cycl_pow = (f->p - 1) * ppow;
+    fmpz_init(coeff);
 
-    return 1;
+    for (i = f->poly->length - 1; i >= cycl_pow; i--)
+    {
+        fmpz_set(coeff, f->poly->coeffs + i);
+        if (fmpz_is_zero(coeff))
+            continue;
+
+        for (j = 0; j < f->p - 1; j++)
+        {
+            ulong ind = j * ppow;
+            fmpz_sub(f->poly->coeffs + ind
+                , f->poly->coeffs + ind, coeff);
+            if (fmpz_cmp(f->poly->coeffs + ind, 0) < 0)
+                fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
+        }
+    } 
+
+    fmpz_clear(coeff);
+}
+
+void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g)
+{
+    unity_zp_copy(f, g);
+    _unity_zp_reduce_cyclotomic(f);
 }
 

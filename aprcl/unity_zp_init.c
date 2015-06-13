@@ -26,9 +26,10 @@
 #include "aprcl.h"
 
 void
-unity_zp_init(unity_zp f, ulong p, const fmpz_t n)
+unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n)
 {
     f->p = p;
+    f->exp = exp;
     fmpz_init_set(f->n, n);
     fmpz_mod_poly_init(f->poly, n);
 }

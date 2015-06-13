@@ -43,18 +43,17 @@ int main(void)
         fmpz_t n;
         unity_zp res, left, right, test;
 
-        fmpz_init(n);
-
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
 
+        fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zp_init(res, p, n);
-        unity_zp_init(test, p, n);
-        unity_zp_init(left, p, n);
-        unity_zp_init(right, p, n);
+        unity_zp_init(res, p, 1, n);
+        unity_zp_init(test, p, 1, n);
+        unity_zp_init(left, p, 1, n);
+        unity_zp_init(right, p, 1, n);
 
         for (j = 0; j < 100; j++)
         {

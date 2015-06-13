@@ -51,10 +51,10 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zp_init(res, p, n);
-        unity_zp_init(test, p, n);
-        unity_zp_init(left, p, n);
-        unity_zp_init(right, p, n);
+        unity_zp_init(res, p, 1, n);
+        unity_zp_init(test, p, 1, n);
+        unity_zp_init(left, p, 1, n);
+        unity_zp_init(right, p, 1, n);
 
         for (j = 0; j < 100; j++)
         {
