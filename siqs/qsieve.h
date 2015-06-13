@@ -75,38 +75,29 @@ typedef struct qs_s
 
    fmpz_t A;                /* current value of coefficient A */
    fmpz_t A0;               /* possible candidate for A0 i.e. value of
-                                 coefficient A excluding the non-factor-base
-                                 prime  */
+                               coefficient A excluding the non-factor-base
+                               prime  */
    mp_limb_t * q0_values;   /* value of primes immediately following prime bound
-                                 which will be used as factors of current A */
-
+                               which will be used as factors of current A */
    mp_limb_t num_q0;        /* total number of q0 */
-
    mp_limb_t q0;            /* current non-factor-base prime,
-                                 prime factor of A */
-
+                               prime factor of A */
    fmpz_t * B;              /* B values corresponding to current value of A */
    fmpz_t C;
-
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
    fmpz_t * A_divp;         /* A_divp[i] = A0_divp[i] * q0 */
    fmpz_t * A0_divp;        /* (A0 / p) for each prime dividing A0 */
    fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1))%p,
-                                 where 'p' is a prime factor of 'A0' */
+                               where 'p' is a prime factor of 'A0' */
 
    mp_limb_t * B0_terms;    /* B0_terms[i] = (sqrt(kn) * (A0_divp[i])^(-1)) modulo p,
                                where 'p' is a prime factor of 'A0' */
-
    mp_limb_t * A_inv;       /* A^(-1) mod p */
    mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
-
    mp_limb_t * soln1;       /* first root of poly */
    mp_limb_t * soln2;       /* second root of poly */
-
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
-
    slong s;                 /* number of prime factor of A0 */
-
 
 } qs_s;
 
