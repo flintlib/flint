@@ -807,11 +807,27 @@ FLINT_DLL void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr coeffs, sl
 FLINT_DLL void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys,
         const nmod_poly_t poly, mp_srcptr xs, slong n);
 
-FLINT_DLL void _nmod_poly_evaluate_mat(nmod_mat_t dest,
-	const mp_srcptr poly, slong len, const nmod_mat_t c);
+FLINT_DLL void nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c);
 
-FLINT_DLL void nmod_poly_evaluate_mat(nmod_mat_t dest,
-	const nmod_poly_t poly, const nmod_mat_t c);
+FLINT_DLL void nmod_poly_evaluate_mat_horner(nmod_mat_t dest,
+    const nmod_poly_t poly, const nmod_mat_t c);
+
+FLINT_DLL void nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest,
+    const nmod_poly_t poly, const nmod_mat_t c);
+
+static __inline__
+void nmod_poly_evaluate_mat(nmod_mat_t dest,
+	const nmod_poly_t poly, const nmod_mat_t c)
+{
+    if (poly->length < 5 || c->r * poly->length < 425)
+    {
+        nmod_poly_evaluate_mat_horner(dest, poly, c);
+    }
+    else
+    {
+        nmod_poly_evaluate_mat_paterson_stockmeyer(dest, poly, c);
+    }
+}
 
 /* Subproduct tree  **********************************************************/
 

@@ -58,7 +58,7 @@ nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
 }
 
 void
-_nmod_poly_evaluate_mat_horner(nmod_mat_t dest,const mp_srcptr poly, slong len, const nmod_mat_t c)
+_nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const mp_srcptr poly, slong len, const nmod_mat_t c)
 {
     slong m = len-1;
     nmod_mat_t temp;
@@ -100,106 +100,5 @@ nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmo
     else
     {
         _nmod_poly_evaluate_mat_horner(dest, poly->coeffs, poly->length, c);
-    }
-}
-
-void
-nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b,
-                        const nmod_mat_t Y)
-{
-    slong i, j;
-
-    if (b == UWORD(0))
-    {
-        if (dest != X)
-            nmod_mat_set(dest, X);
-        return;
-    }
-
-    for (i = 0; i < X->r; i++)
-    {
-        for (j = 0; j < X->c; j++)
-        {
-            nmod_mat_entry(dest, i, j) =
-                n_addmod(nmod_mat_entry(X, i, j),
-                         n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n,
-                                          Y->mod.ninv), X->mod.n);
-        }
-    }
-}
-
-void
-nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t poly,
-                       const nmod_mat_t c)
-{
-    slong lim = n_sqrt(poly->length), i, j, rem, quo, curr;
-    nmod_mat_t tmat, *temp;
-
-    nmod_mat_zero(dest);
-
-    if (poly->length == 0)
-    {
-        return;
-    }
-
-    if (poly->length == 1 || nmod_mat_is_zero(c))
-    {
-        nmod_mat_one_addmul(dest, dest, poly->coeffs[0]);
-        return;
-    }
-
-    temp = malloc((lim + 1) * sizeof(nmod_mat_t));
-    nmod_mat_init(temp[0], c->r, c->c, c->mod.n);
-    nmod_mat_one(temp[0]);
-    nmod_mat_init(temp[1], c->r, c->c, c->mod.n);
-    nmod_mat_set(temp[1], c);
-    nmod_mat_init(tmat, c->r, c->c, c->mod.n);
-
-    for (i = 2; i <= lim; i++)
-    {
-        nmod_mat_init(temp[i], c->r, c->c, c->mod.n);
-        nmod_mat_mul(temp[i], temp[i - 1], c);
-    }
-
-    rem = (poly->length % lim);
-    quo = poly->length / lim;
-    curr = poly->length - rem - 1;
-
-    for (i = 0; i < rem; i++)
-    {
-        nmod_mat_scalar_mul_add(dest, dest,
-                                poly->coeffs[poly->length - rem + i], temp[i]);
-    }
-
-    for (i = 0; i < quo; i++)
-    {
-        nmod_mat_mul(tmat, dest, temp[lim]);
-        nmod_mat_scalar_mul_add(dest, tmat, poly->coeffs[curr--],
-                                temp[lim - 1]);
-        for (j = 1; j < lim; j++)
-        {
-            nmod_mat_scalar_mul_add(dest, dest, poly->coeffs[curr--],
-                                    temp[lim - 1 - j]);
-        }
-    }
-
-    for (i = 0; i <= lim; i++)
-    {
-        nmod_mat_clear(temp[i]);
-    }
-    nmod_mat_clear(tmat);
-    free(temp);
-}
-
-void
-nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
-{
-    if(poly->length < 5 || c->r * poly->length < 425)
-    {
-        nmod_poly_evaluate_mat_horner(dest, poly, c);
-    }
-    else
-    {
-        nmod_poly_evaluate_mat_paterson_stockmeyer(dest, poly, c);
     }
 }
