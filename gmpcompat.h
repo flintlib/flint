@@ -569,6 +569,56 @@ slong flint_mpf_get_si (mpf_srcptr f)
     return ~ (fl - 1);
 }
 
+/* mpf_fits_s*_p -- test whether an mpf fits a C signed type.
+
+Copyright 2001, 2002 Free Software Foundation, Inc.
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
+
+int
+flint_mpf_fits_slong_p(mpf_srcptr f)
+{
+  mp_size_t  fs, fn;
+  mp_srcptr  fp;
+  mp_exp_t   exp;
+  mp_limb_t  fl;
+
+  fs = f->_mp_size;
+  if (fs == 0)
+    return 1;  /* zero fits */
+
+  exp = f->_mp_exp;
+  if (exp < 1)
+    return 1;  /* -1 < f < 1 truncates to zero, so fits */
+
+  fp = f->_mp_d;
+  fn = FLINT_ABS(fs);
+
+  if (exp == 1)
+    {
+      fl = fp[fn-1];
+    }
+  else
+    return 0;
+
+  return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
+}
+
 #else
 
 #define flint_mpz_get_si mpz_get_si
@@ -615,6 +665,7 @@ slong flint_mpf_get_si (mpf_srcptr f)
 
 #define flint_mpf_set_si mpf_set_si
 #define flint_mpf_get_si mpf_get_si
+#define flint_mpf_fits_slong_p mpf_fits_slong_p
 
 #endif
 
