@@ -20,25 +20,42 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "aprcl.h"
 
-int main(void)
+void
+unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
 {
-    FLINT_TEST_INIT(state);
-   
-    flint_printf("automorphism_inv....");
-    fflush(stdout);
-
-    FLINT_TEST_CLEANUP(state);
+    ulong i, j, p_pow1, p_pow2, m, p_pow_preinv;
+    fmpz_t f_coeff, g_coeff;
     
-    flint_printf("NO TEST\n");
-    return 0;
+    fmpz_init(f_coeff);
+    fmpz_init(g_coeff);
+    p_pow1 = n_pow(f->p, f->exp - 1);
+    p_pow2 = p_pow1 * f->p;
+    m = (f->p - 1) * p_pow1;
+    p_pow_preinv = n_preinvert_limb(p_pow2);
+
+    for (i = 0; i < m - 1; i++)
+    {
+        ulong g_ind = n_mulmod2_preinv(x, i, p_pow2, p_pow_preinv);
+        fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind);
+        unity_zp_coeff_set_fmpz(f, i, g_coeff);
+    }
+
+    for (i = m; i < p_pow2; i++)
+    {
+        ulong g_ind = n_mulmod2_preinv(x, i, p_pow2, p_pow_preinv);
+        for (j = 1; j < f->p; j++)
+        {
+            ulong f_ind = i - j * p_pow1;
+            fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind);
+            fmpz_mod_poly_get_coeff_fmpz(f_coeff, f->poly, f_ind);
+            fmpz_sub(f_coeff, f_coeff, g_coeff);
+            unity_zp_coeff_set_fmpz(f, f_ind, f_coeff);
+        }
+    }
 }
 

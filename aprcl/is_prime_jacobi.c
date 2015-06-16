@@ -28,6 +28,7 @@
 int
 is_prime_jacobi(const fmpz_t n)
 {
-
+    
+    /* 1) l_p = 1 if p >= 3 and n^{p-1} != 1 mod p^2; l_p = 0 otherwise. */
 }
 

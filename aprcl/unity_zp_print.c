@@ -20,45 +20,15 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-
+   
 ******************************************************************************/
 
 #include "aprcl.h"
 
-void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b)
+void
+unity_zp_print(const unity_zp f)
 {
-    int i, j;
-
-    ulong p_pow, p_pow_kk, m, p_pow_inv;
-    p_pow = a->power;
-    p_pow_kk = p_pow / a->p;
-    m = (a->p - 1) * p_pow_kk;
-    p_pow_inv = n_preinvert_limb(p_pow);
-
-    for (i = 0; i < m; i++)
-    {
-        slong a_ind;
-        fmpz_t a_value;
-
-        a_ind = n_mulmod2_preinv(x, i, p_pow, p_pow_inv);
-        fmpz_mod_poly_get_coeff_fmpz(a_value, a->poly, a_ind);
-        fmpz_mod_poly_set_coeff_fmpz(b->poly, i, a_value);
-    }
-
-    for (i = m; i < p_pow; i++)
-    {
-        slong a_ind = n_mulmod2_preinv(x, i, p_pow, p_pow_inv);
-        for (j = 1; j < a->p; j++)
-        {
-            slong b_ind;
-            fmpz_t a_value, b_value;
-
-            b_ind = i - j * p_pow_kk;
-            fmpz_mod_poly_get_coeff_fmpz(a_value, a->poly, a_ind);
-            fmpz_mod_poly_get_coeff_fmpz(b_value, b->poly, b_ind);
-            fmpz_sub(b_value, b_value, a_value);
-            fmpz_mod_poly_set_coeff_fmpz(b->poly, b_ind, b_value);
-        }
-    }
+    flint_printf("p = %wu; exp = %wu\n", f->p, f->exp);
+    fmpz_mod_poly_print(f->poly);
+    flint_printf("\n");
 }
-

@@ -119,6 +119,8 @@ void unity_zp_coeff_dec(unity_zp f, ulong ind);
 
 int unity_zp_equal(unity_zp f, unity_zp g);
 
+void unity_zp_print(const unity_zp f);
+
 void unity_zp_coeff_set_fmpz(unity_zp value, ulong ind, const fmpz_t x);
 void unity_zp_coeff_set_ui(unity_zp value, ulong ind, ulong x);
 void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x);
@@ -129,6 +131,8 @@ void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
+void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
+
 void _unity_zp_reduce_cyclotomic(unity_zp f);
 void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g);
 
@@ -137,20 +141,6 @@ void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong 
 void jacobi_pq_not2(unity_zp f, ulong q, ulong p);
 void jacobi_2q_one(unity_zp f, ulong q);
 void jacobi_2q_two(unity_zp f, ulong q);
-
-/* Z[unity_root] operations. */
-void unity_init(unity_root element, ulong n);
-void unity_clear(unity_root element);
-void unity_print(unity_root element);
-void unity_nth_root(unity_root element, ulong n);
-void unity_nth_root_inc(unity_root element, ulong n);
-void unity_nth_root_dec(unity_root element, ulong n);
-void unity_roots_add(unity_root res, const unity_root element1, const unity_root element2);
-void unity_roots_mul(unity_root res, const unity_root element1, const unity_root element2);
-void unity_roots_mul_sub(unity_root res, const unity_root element1, const unity_root element2);
-void unity_roots_reduce_cyclotomic(unity_root res, ulong p);
-
-void unity_automorphism_inv(unity_root_mod a, ulong x, unity_root_mod b);
 
 /* Z[unity_root_q, unity_root_p] operations. */
 void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n);

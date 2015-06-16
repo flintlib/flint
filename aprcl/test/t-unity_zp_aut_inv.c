@@ -23,41 +23,52 @@
    
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-void
-unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)
+int main(void)
 {
-    fmpz_t coeff;
-    fmpz_init(coeff);
-    fmpz_mod_poly_get_coeff_fmpz(coeff, f->poly, ind);
-    if (fmpz_is_zero(coeff))
-    {
-        fmpz_clear(coeff);
-        fmpz_mod_poly_set_coeff_fmpz(f->poly, ind, x);
-        return;
-    }
-    fmpz_clear(coeff);
-    fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind, x);           
-    if (fmpz_cmp(f->poly->coeffs + ind, f->n) >= 0)
-        fmpz_sub(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
-}
+    ulong i, j;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zp_aut_inv....");
+    fflush(stdout);
 
-void
-unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
-{
-    fmpz_t coeff;
-    fmpz_init(coeff);
-    fmpz_mod_poly_get_coeff_fmpz(coeff, f->poly, ind);
-    if (fmpz_is_zero(coeff))
+    flint_printf("\n");
+
+    for (i = 0; i < 1; i++)
     {
-        fmpz_clear(coeff);
-        fmpz_mod_poly_set_coeff_ui(f->poly, ind, x);
-        return;
+        ulong p, k, x;
+        fmpz_t n;
+        unity_zp f, g;
+
+        p = 3;
+        k = 1;
+        x = 7;
+
+        fmpz_init_set_ui(n, 23);
+
+        unity_zp_init(f, p, k, n);
+        unity_zp_init(g, p, k, n);
+
+        jacobi_pq_not2(g, 13, 3);
+
+        unity_zp_aut_inv(f, g, x);
+        unity_zp_print(g);
+        flint_printf("\n");
+        unity_zp_print(f);
+
+        fmpz_clear(n);
+        unity_zp_clear(f);
+        unity_zp_clear(g);
     }
-    fmpz_clear(coeff);
-    fmpz_add_ui(f->poly->coeffs + ind, f->poly->coeffs + ind, x);           
-    if (fmpz_cmp(f->poly->coeffs + ind, f->n) >= 0)
-        fmpz_sub(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);
+
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("NO TEST\n");
+    return 0;
 }
 
