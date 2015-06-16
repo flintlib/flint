@@ -37,38 +37,68 @@ int main(void)
     flint_printf("unity_zp_aut_inv....");
     fflush(stdout);
 
-    flint_printf("\n");
-
-    for (i = 0; i < 1; i++)
+    for (i = 0; i < 100; i++)
     {
-        ulong p, k, x;
+        ulong ind, q, p, k, x;
         fmpz_t n;
-        unity_zp f, g;
+        unity_zp f, g, h;
+        n_factor_t q_factors;
 
-        p = 3;
-        k = 1;
-        x = 7;
+        n_factor_init(&q_factors);
 
-        fmpz_init_set_ui(n, 23);
+        q = n_randprime(state, 2 + n_randint(state, 6), 0);
+        while (q < 3)
+            q = n_randprime(state, 2 + n_randint(state, 6), 0);
+
+        n_factor(&q_factors, q - 1, 1);
+        ind = n_randint(state, q_factors.num);
+        p = q_factors.p[ind];
+        k = q_factors.exp[ind];
+        
+        x = n_randint(state, n_pow(p, k));
+        while (n_gcd(p, x) != 1 || x == 0)
+            x = n_randint(state, n_pow(p, k));
 
         unity_zp_init(f, p, k, n);
         unity_zp_init(g, p, k, n);
+        unity_zp_init(h, p, k, n);
 
-        jacobi_pq_not2(g, 13, 3);
+        for (j = 0; j < 100; j++)
+        {
+            ulong ind;
+            fmpz_t val;
 
-        unity_zp_aut_inv(f, g, x);
-        unity_zp_print(g);
-        flint_printf("\n");
-        unity_zp_print(f);
+            fmpz_init(val);
+
+            ind = n_randint(state, n_pow(p, k));
+            fmpz_randtest_unsigned(val, state, 200);
+            unity_zp_coeff_set_fmpz(g, ind, val);
+
+            fmpz_clear(val);
+        }
+
+        /* reduce random element h */
+        unity_zp_reduce_cyclotomic(h, g);
+        /* \sigma_x(f) == h now */
+        unity_zp_aut_inv(f, h, x);
+        /* g = \sigma_x(f) */
+        unity_zp_aut(g, f, x);
+        
+        if (unity_zp_equal(h, g) == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
 
         fmpz_clear(n);
         unity_zp_clear(f);
         unity_zp_clear(g);
+        unity_zp_clear(h);
     }
 
     FLINT_TEST_CLEANUP(state);
     
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

@@ -132,6 +132,7 @@ void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
 void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
+void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
 
 void _unity_zp_reduce_cyclotomic(unity_zp f);
 void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g);

@@ -71,9 +71,6 @@ int main(void)
             unity_zp_coeff_set_fmpz(left, ind, val1);
             unity_zp_coeff_set_fmpz(right, ind, val2);
 
-            fmpz_add(val1, val1, val2);
-            unity_zp_coeff_set_fmpz(test, ind, val1);
-
             fmpz_clear(val1);
             fmpz_clear(val2);
         }

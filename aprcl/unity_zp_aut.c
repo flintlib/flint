@@ -26,36 +26,24 @@
 #include "aprcl.h"
 
 void
-unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
+unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
 {
-    ulong i, j, p_pow1, p_pow2, m, p_pow_preinv;
-    fmpz_t f_coeff, g_coeff;
-    
-    fmpz_init(f_coeff);
-    fmpz_init(g_coeff);
-    p_pow1 = n_pow(f->p, f->exp - 1);
-    p_pow2 = p_pow1 * f->p;
-    m = (f->p - 1) * p_pow1;
-    p_pow_preinv = n_preinvert_limb(p_pow2);
+    ulong i, p_pow, p_pow_preinv;
+    fmpz_t coeff;
+    fmpz_init(coeff);
 
-    for (i = 0; i < m - 1; i++)
+    p_pow = n_pow(f->p, f->exp);
+    p_pow_preinv = n_preinvert_limb(p_pow);
+
+    unity_zp_set_zero(f);
+    for (i = 0; i < p_pow; i++)
     {
-        ulong g_ind = n_mulmod2_preinv(x, i, p_pow2, p_pow_preinv);
-        fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind);
-        unity_zp_coeff_set_fmpz(f, i, g_coeff);
+        ulong ind = n_mulmod2_preinv(x, i, p_pow, p_pow_preinv);        
+        fmpz_mod_poly_get_coeff_fmpz(coeff, g->poly, i);
+        unity_zp_coeff_add_fmpz(f, ind, coeff);
     }
 
-    for (i = m; i < p_pow2; i++)
-    {
-        ulong g_ind = n_mulmod2_preinv(x, i, p_pow2, p_pow_preinv);
-        for (j = 1; j < f->p; j++)
-        {
-            ulong f_ind = i - j * p_pow1;
-            fmpz_mod_poly_get_coeff_fmpz(g_coeff, g->poly, g_ind);
-            fmpz_mod_poly_get_coeff_fmpz(f_coeff, f->poly, f_ind);
-            fmpz_sub(f_coeff, f_coeff, g_coeff);
-            unity_zp_coeff_set_fmpz(f, f_ind, f_coeff);
-        }
-    }
+    _unity_zp_reduce_cyclotomic(f);
+    fmpz_clear(coeff);
 }
 
