@@ -20,56 +20,60 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-void
-unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+#include <time.h>
+
+int main(void)
 {
-    unity_zp value, temp_pow, temp;
-    fmpz_t power, rem;
+    int i;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("is_prime_jacobi....");
+    fflush(stdout);
 
-    unity_zp_init(value, f->p, f->exp, f->n);
-    unity_zp_init(temp_pow, f->p, f->exp, f->n);
-    unity_zp_init(temp, f->p, f->exp, f->n);
-    fmpz_init_set(power, pow);
-    fmpz_init(rem);
-
-    unity_zp_set_zero(f);
-    unity_zp_coeff_set_ui(f, 0, 1);
-
-    unity_zp_copy(value, g);
-
-    while (fmpz_is_zero(power) == 0)
+    /* Test _is_prime_jacobi_check_pk() */
     {
-        fmpz_fdiv_r_2exp(rem, power, 1);
-        if (fmpz_is_zero(rem) == 0)
+        ulong p, q, v, k, p_pow;
+        unity_zp j;
+        fmpz_t n, u;
+
+        q = 19;
+        p = 3;
+        k = 2;
+        p_pow = n_pow(p, k);
+
+        fmpz_init(u);
+        fmpz_init_set_ui(n, 31);
+
+        fmpz_tdiv_q_ui(u, n, p_pow);
+        v = fmpz_tdiv_ui(n, p_pow);
+
+        unity_zp_init(j, p, k, n);
+        jacobi_pq_not2(j, q, p);
+
+        if (_is_prime_jacobi_check_pk(j, u, v) < 0)
         {
-            unity_zp_mul(temp, f, value);
-            unity_zp_swap(f, temp);
+            flint_printf("FAIL\n");
+            flint_printf("_is_prime_jacobi_check_pk() wrong answer");
+            abort();
         }
 
-        unity_zp_mul(temp_pow, value, value);
-        unity_zp_swap(value, temp_pow);
-        fmpz_fdiv_q_2exp(power, power, 1);
+        unity_zp_clear(j);
+        fmpz_clear(n);
+        fmpz_clear(u);
     }
 
+    FLINT_TEST_CLEANUP(state);
 
-    fmpz_clear(power);
-    fmpz_clear(rem);
-    unity_zp_clear(temp);
-    unity_zp_clear(temp_pow);
-    unity_zp_clear(value);
-}
-
-void
-unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow)
-{
-    fmpz_t p;
-    fmpz_init_set_ui(p, pow);
-    unity_zp_pow_fmpz(f, g, p);
-    fmpz_clear(p);
+    flint_printf("NOT ALL TEST\n");
+    return 0;
 }
 

@@ -29,8 +29,6 @@
 #include "flint.h"
 #include "aprcl.h"
 
-#include <time.h>
-
 int main(void)
 {
     return 0;

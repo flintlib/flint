@@ -52,8 +52,8 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
         unity_zp_aut_inv(aut, j_pow, i);
         unity_zp_mul(temp, j1, aut);
         unity_zp_swap(temp, j1);
-
-        unity_zp_pow_ui(j_pow, j, v * i % p_pow);
+    
+        unity_zp_pow_ui(j_pow, j, (v * i) / p_pow);
         _unity_zp_reduce_cyclotomic(j_pow);
         unity_zp_aut_inv(aut, j_pow, i);
         unity_zp_mul(temp, j2, aut);
@@ -62,6 +62,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 
     unity_zp_pow_fmpz(j_pow, j1, u);
     unity_zp_mul(j1, j2, j_pow);
+    
     h = unity_zp_is_unity(j1);
 
     unity_zp_clear(aut);
