@@ -104,6 +104,7 @@ int is_prime_gauss(const fmpz_t n);
 
 
 slong _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
+int _is_prime_jacobi_check_21(ulong q, const fmpz_t n);
 int _is_prime_jacobi(const fmpz_t n, const aprcl_config config);
 
 int is_prime_aprcl(const fmpz_t n);

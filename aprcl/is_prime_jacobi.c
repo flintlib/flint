@@ -75,6 +75,42 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 }
 
 int
+_is_prime_jacobi_check_21(ulong q, const fmpz_t n)
+{
+    int result;
+    fmpz_t qpow, ncmp, temp;
+
+    fmpz_init(temp);
+    fmpz_init_set_ui(qpow, q);
+    fmpz_init_set(ncmp, n);
+
+    fmpz_sub_ui(ncmp, ncmp, 1);
+    fmpz_fdiv_q_2exp(temp, ncmp, 1);
+    fmpz_powm(qpow, qpow, temp, n);
+
+    result = 0;
+    if (fmpz_equal_ui(qpow, 1) || fmpz_equal(qpow, ncmp))
+        result = 1;
+
+    fmpz_clear(temp);
+    fmpz_clear(qpow);
+    fmpz_clear(ncmp);
+}
+
+slong
+_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v)
+{
+
+}
+
+slong
+_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
+        , const unity_zp j2_2, const fmpz_t u, ulong v)
+{
+
+}
+
+int
 _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 {
     int *lambdas;
