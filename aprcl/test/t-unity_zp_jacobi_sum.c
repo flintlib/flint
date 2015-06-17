@@ -41,7 +41,7 @@ int main(void)
 
     unity_zp sum;
     unity_zp_init(sum, 3, 1, n);
-    jacobi_pq_not2(sum, 7, 3);
+    jacobi_pq(sum, 7, 3);
 
     flint_printf("\n");
     fmpz_mod_poly_print(sum->poly);

@@ -25,3 +25,14 @@
 
 #include "aprcl.h"
 
+void
+unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
+{
+    fmpz_mod_poly_scalar_mul_fmpz(f->poly, g->poly, s);
+}
+
+void
+unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s)
+{
+    fmpz_mod_poly_scalar_mul_ui(f->poly, g->poly, s);
+}

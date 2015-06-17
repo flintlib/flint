@@ -46,24 +46,6 @@ typedef struct
 
 typedef _aprcl_config aprcl_config[1];
 
-typedef struct 
-{
-    fmpz_poly_t poly;
-    ulong power;
-} _unity_root;
-
-typedef _unity_root unity_root[1];
-
-typedef struct
-{
-    fmpz_mod_poly_t poly;
-    ulong power;
-    ulong p;
-    ulong exp;
-} _unity_root_mod;
-
-typedef _unity_root_mod unity_root_mod[1];
-
 typedef struct
 {
     fmpz_mod_poly_t *polys;
@@ -105,6 +87,7 @@ int is_prime_gauss(const fmpz_t n);
 
 slong _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
 int _is_prime_jacobi_check_21(ulong q, const fmpz_t n);
+slong _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q);
 int _is_prime_jacobi(const fmpz_t n, const aprcl_config config);
 
 int is_prime_aprcl(const fmpz_t n);
@@ -131,6 +114,9 @@ void unity_zp_coeff_set_ui(unity_zp value, ulong ind, ulong x);
 void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x);
 void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x);
 
+void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s);
+void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
+
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
@@ -146,7 +132,7 @@ void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g);
 
 /* Jacobi sum computation. */
 void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
-void jacobi_pq_not2(unity_zp f, ulong q, ulong p);
+void jacobi_pq(unity_zp f, ulong q, ulong p);
 void jacobi_2q_one(unity_zp f, ulong q);
 void jacobi_2q_two(unity_zp f, ulong q);
 

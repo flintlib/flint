@@ -57,7 +57,7 @@ int main(void)
         v = fmpz_tdiv_ui(n, p_pow);
 
         unity_zp_init(j, p, k, n);
-        jacobi_pq_not2(j, q, p);
+        jacobi_pq(j, q, p);
 
         if (_is_prime_jacobi_check_pk(j, u, v) < 0)
         {
@@ -71,9 +71,42 @@ int main(void)
         fmpz_clear(u);
     }
 
+    /* Test _is_prime_jacobi_check_22() */
+    {
+        ulong p, q, v, k, p_pow;
+        unity_zp j;
+        fmpz_t n, u;
+
+        q = 13;
+        p = 2;
+        k = 2;
+        p_pow = n_pow(p, k);
+
+        fmpz_init(u);
+        fmpz_init_set_ui(n, 31);
+
+        fmpz_tdiv_q_ui(u, n, p_pow);
+        v = fmpz_tdiv_ui(n, p_pow);
+
+        unity_zp_init(j, p, k, n);
+        jacobi_pq(j, q, p);
+
+        if (_is_prime_jacobi_check_22(j, u, v, q) < 0)
+        {
+            flint_printf("FAIL\n");
+            flint_printf("_is_prime_jacobi_check_pk() wrong answer");
+            abort();
+        }
+
+        unity_zp_clear(j);
+        fmpz_clear(n);
+        fmpz_clear(u);
+
+    }
+
     FLINT_TEST_CLEANUP(state);
 
-    flint_printf("NOT ALL TEST\n");
+    flint_printf("NOT FINISHED\n");
     return 0;
 }
 

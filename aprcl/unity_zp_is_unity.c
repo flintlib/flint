@@ -34,18 +34,17 @@ unity_zp_is_unity(const unity_zp f)
 
     p_pow = n_pow(f->p, f->exp);
     unity_zp_init(unity, f->p, f->exp, f->n);
-    unity_zp_coeff_set_ui(unity, 0, 1);
 
     result = -1;
     for (i = 0; i < p_pow; i++)
     {
+        unity_zp_set_zero(unity);
+        unity_zp_coeff_set_ui(unity, i, 1);
         if (unity_zp_equal(unity, f) == 1)
         {
             result = i;
             break;
         }
-        unity_zp_coeff_set_ui(unity, i + 1, 1);
-        unity_zp_coeff_set_ui(unity, i, 0);
     }
 
     unity_zp_clear(unity);

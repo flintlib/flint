@@ -25,6 +25,7 @@
 
 #include "aprcl.h"
 
+/* if returns >= 0 and h % p != 0 lambda_p = 1 */
 slong
 _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 {
@@ -74,6 +75,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     return h;
 }
 
+/* if returns 1 and n = 1 mod 3 then lambda_2 = 1*/
 int
 _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
 {
@@ -98,9 +100,33 @@ _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
 }
 
 slong
-_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v)
+_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
 {
+    slong h;
+    unity_zp j1, j2, j_pow;
 
+    unity_zp_init(j_pow, 2, 2, j->n);
+    unity_zp_init(j1, 2, 2, j->n);
+    unity_zp_init(j2, 2, 2, j->n);
+
+    unity_zp_mul(j_pow, j, j);
+    unity_zp_mul_scalar_ui(j1, j_pow, q);
+
+    if (v == 1)
+        unity_zp_coeff_set_ui(j2, 0, 1);
+    else if (v == 3)
+        unity_zp_swap(j2, j_pow);
+
+    unity_zp_pow_fmpz(j_pow, j1, u);
+    unity_zp_mul(j1, j2, j_pow);
+
+    h = unity_zp_is_unity(j1);
+
+    unity_zp_clear(j_pow);
+    unity_zp_clear(j1);
+    unity_zp_clear(j2);
+
+    return h;
 }
 
 slong
