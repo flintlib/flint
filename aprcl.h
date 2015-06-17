@@ -96,11 +96,15 @@ int _p_ind(const aprcl_config conf, ulong p);
 int _is_coprime(ulong q, ulong r, const fmpz_t n);
 int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
-int _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
+slong _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
 int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config);
 int is_prime_gauss_min_R(const fmpz_t n, ulong R);
 int is_prime_gauss(const fmpz_t n);
+
+
+slong _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
+int _is_prime_jacobi(const fmpz_t n, const aprcl_config config);
 
 int is_prime_aprcl(const fmpz_t n);
 
@@ -130,6 +134,8 @@ void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
+
+slong unity_zp_is_p_unity(const unity_zp f);
 
 void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);

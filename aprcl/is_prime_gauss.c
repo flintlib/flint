@@ -161,10 +161,10 @@ _is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
     \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
         there \sigma_n is the ring automorphism
 */
-int
+slong
 _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
 {
-    int result;
+    slong result;
     ulong i;
     unity_zpq temp, gauss, gausspow, gausssigma;
 
