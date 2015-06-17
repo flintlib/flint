@@ -20,39 +20,58 @@
 /******************************************************************************
 
     Copyright (C) 2015 Vladimir Glazachev
-   
+
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <gmp.h>
+#include "flint.h"
 #include "aprcl.h"
 
-slong
-unity_zp_is_p_unity(const unity_zp f)
+int main(void)
 {
-    ulong i, j, m, size, p_pow1, p_pow2;
-    slong h;
-    fmpz_t n;
+    int i;
+    FLINT_TEST_INIT(state);
+   
+    flint_printf("unity_zp_is_unity....");
+    fflush(stdout);
 
-    fmpz_init_set(n, f->n);
-    fmpz_sub_ui(n, n, 1);
-    p_pow1 = n_pow(f->p, f->exp - 1);
-    p_pow2 = p_pow1 * f->p;
-    h = -1;
-    
-    size = FLINT_MIN(p_pow2, f->poly->length);
-    for (i = 0; i < size; i++)
+    for (i = 0; i < 100; i++)
     {
-        if (fmpz_equal_ui(f->poly->coeffs + i, 0) == 0 && h != -1)
+        ulong p, exp;
+        fmpz_t n;
+        unity_zp f;
+
+        p = n_randprime(state, 2 + n_randint(state, 4), 0);
+        exp =  n_randint(state, 5);        
+        while (exp == 0)
+            exp = n_randint(state, 5);
+
+        fmpz_init(n);
+        fmpz_randtest_unsigned(n, state, 200);
+        while (fmpz_equal_ui(n, 0) != 0)
+            fmpz_randtest_unsigned(n, state, 200);
+
+        unity_zp_init(f, p, 1, n);
+
+        ulong ind = n_randint(state, n_pow(p, exp));
+
+        unity_zp_coeff_set_ui(f, ind, 1);
+
+        if (unity_zp_is_unity(f) < 0)
         {
-            h = -1;
-            break;
+            flint_printf("FAIL\n");
+            abort();
         }
-        if (fmpz_equal_ui(f->poly->coeffs + i, 1))
-            h = i;
+
+        fmpz_clear(n);
+        unity_zp_clear(f);
     }
 
-    /* reduce cyclotomic... */
-
-    fmpz_clear(n);
-    return h;
+    FLINT_TEST_CLEANUP(state);
+    
+    flint_printf("PASS\n");
+    return 0;
 }
 

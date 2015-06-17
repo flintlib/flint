@@ -135,7 +135,7 @@ void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
-slong unity_zp_is_p_unity(const unity_zp f);
+slong unity_zp_is_unity(const unity_zp f);
 
 void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);

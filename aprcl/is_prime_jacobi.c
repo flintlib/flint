@@ -62,7 +62,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 
     unity_zp_pow_fmpz(j_pow, j1, u);
     unity_zp_mul(j1, j2, j_pow);
-    h = unity_zp_is_p_unity(j1);
+    h = unity_zp_is_unity(j1);
 
     unity_zp_clear(aut);
     unity_zp_clear(j_pow);
