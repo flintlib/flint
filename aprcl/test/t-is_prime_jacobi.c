@@ -105,7 +105,7 @@ int main(void)
         p_pow = n_pow(p, k);
 
         fmpz_init(u);
-        fmpz_init_set_ui(n, 101);
+        fmpz_init_set_ui(n, 659);
 
         fmpz_tdiv_q_ui(u, n, p_pow);
         v = fmpz_tdiv_ui(n, p_pow);
@@ -169,23 +169,36 @@ int main(void)
 
     /* Test is_prime_jacobi. */
     {
-        fmpz_t n;
-        aprcl_config config;
+        for (i = 0; i < 100000; i++)
+        {
+            flint_printf("%i \n", i);
+            int pbprime, cycloprime;
+            fmpz_t n;
+            fmpz_init(n);
 
-        fmpz_init(n);
-        fmpz_set_str(n, "521419622856657689423872613771", 10);
-        aprcl_config_init_min_R(config, n, 720);
+            fmpz_randtest_unsigned(n, state, 50);
+            while (fmpz_cmp_ui(n, 100) <= 0)
+                fmpz_randtest_unsigned(n, state, 50);
 
-        flint_printf("\ngocheck:\n");
+            pbprime = fmpz_is_probabprime(n);
+            cycloprime = is_prime_jacobi(n);
+        
+            if (pbprime != cycloprime)
+            {
+                flint_printf("FAIL\n");
+                flint_printf("Testing number = ");
+                fmpz_print(n);
+                flint_printf("\nis_probabprime = %i, is_prime_gauss = %i\n", pbprime, cycloprime);
+                abort();
+            }
 
-        flint_printf("STATUS = %i\n", _is_prime_jacobi(n, config));
-
-        aprcl_config_clear(config);
+            fmpz_clear(n);
+        }
     }
 
     FLINT_TEST_CLEANUP(state);
 
-    flint_printf("NOT FINISHED\n");
+    flint_printf("PASS\n");
     return 0;
 }
 
