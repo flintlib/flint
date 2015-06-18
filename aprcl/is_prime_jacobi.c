@@ -25,6 +25,93 @@
 
 #include "aprcl.h"
 
+int
+_is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
+{
+    int result, p_counter, counter;
+    ulong q, k;
+    fmpz_t npow, qmod;
+
+    k = 1;
+    if (p == 2)
+        k = 2;
+    result = 0;
+    p_counter = 50;
+    counter = 10;
+
+    fmpz_init(npow);
+    fmpz_init(qmod);
+
+    while (p_counter > 0)
+    {
+        q = 2 * counter * p + 1;
+        if (n_is_prime(q))
+        {
+            fmpz_set_ui(qmod, q);
+            fmpz_powm_ui(npow, n, (q - 1) / p, qmod);
+            if (fmpz_equal_ui(npow, 1) == 0)
+                break;
+            p_counter--;
+        }
+        counter++;
+    }
+
+    if (p_counter != 0)
+    {
+        ulong v, h;
+        fmpz_t u;
+        unity_zp jacobi_sum;
+
+        fmpz_init(u);
+        unity_zp_init(jacobi_sum, p, k, n);
+
+        jacobi_pq(jacobi_sum, q, p);
+        fmpz_tdiv_q_ui(u, n, n_pow(p, k));
+        v = fmpz_tdiv_ui(n, n_pow(p, k));
+
+        if (p == 2)
+        {
+            h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
+            if (h < 0 || h % 2 == 0)
+                result = 2;
+            else
+            {
+                fmpz_t ndec, ndecdiv, qpow;
+                fmpz_init_set(ndec, n);
+                fmpz_init(ndecdiv);
+                fmpz_init_set_ui(qpow, q);
+                fmpz_sub_ui(ndec, ndec, 1);
+                fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
+                fmpz_powm(qpow, qpow, ndecdiv, n);
+
+                if (fmpz_equal(qpow, ndec) == 1)
+                    result = 1;
+                else
+                    result = 2;
+
+                fmpz_clear(ndec);
+                fmpz_clear(ndecdiv);
+                fmpz_clear(qpow);
+            }
+        }
+        else
+        {
+            h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
+            if (h < 0 || h % p == 0)
+                result = 2;
+            else
+                result = 1;
+        }
+
+        fmpz_clear(u);
+        unity_zp_clear(jacobi_sum);
+    }
+
+    fmpz_clear(npow);
+    fmpz_clear(qmod);
+    return result;
+}
+
 /* if returns >= 0 and h % p != 0 lambda_p = 1 */
 slong
 _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
@@ -73,29 +160,31 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 }
 
 /* if returns 1 and n = 1 mod 3 then lambda_2 = 1*/
-int
+slong
 _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
 {
-    int result;
-    fmpz_t qpow, ncmp, temp;
+    slong h;
+    fmpz_t qpow, ndec, temp;
 
     fmpz_init(temp);
     fmpz_init_set_ui(qpow, q);
-    fmpz_init_set(ncmp, n);
+    fmpz_init_set(ndec, n);
 
-    fmpz_sub_ui(ncmp, ncmp, 1);
-    fmpz_fdiv_q_2exp(temp, ncmp, 1);
+    fmpz_sub_ui(ndec, ndec, 1);
+    fmpz_fdiv_q_2exp(temp, ndec, 1);
     fmpz_powm(qpow, qpow, temp, n);
 
-    result = 0;
-    if (fmpz_equal_ui(qpow, 1) || fmpz_equal(qpow, ncmp))
-        result = 1;
+    h = -1;
+    if (fmpz_equal_ui(qpow, 1))
+        h = 0;
+    if (fmpz_equal(qpow, ndec))
+        h = 1;
 
     fmpz_clear(temp);
     fmpz_clear(qpow);
-    fmpz_clear(ncmp);
+    fmpz_clear(ndec);
 
-    return result;
+    return h;
 }
 
 slong
@@ -208,12 +297,22 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     primality_test_status result;
     fmpz_t temp;
     fmpz_t p2;
+    fmpz_t ndec, ndecdiv;
 
     fmpz_init(temp);
     fmpz_init(p2);
+    fmpz_init(ndecdiv);
+    fmpz_init_set(ndec, n);
+    fmpz_sub_ui(ndec, ndec, 1);
+    fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
     
     result = PROBABPRIME;
     lambdas = (int*) malloc(sizeof(int) * config->rs.num);
+
+    /* nmod4 = n % 4 */
+    nmod4 = fmpz_tdiv_ui(n, 4);
+
+    /* 1) l_p = 1 if p >= 3 and n^{p-1} != 1 mod p^2; l_p = 0 otherwise. */
     for (i = 0; i < config->rs.num; i++)
     {
         ulong p = config->rs.p[i];
@@ -230,12 +329,181 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             lambdas[i] = 0;
     }
 
-    
-    /* 1) l_p = 1 if p >= 3 and n^{p-1} != 1 mod p^2; l_p = 0 otherwise. */
+    for (i = 0; i < config->qs->num; i++)
+    {
+        n_factor_t q_factors;
+        ulong q;
+        if (result == COMPOSITE)
+            break;
 
+        q = fmpz_get_ui(config->qs->p + i);
+
+        if (fmpz_equal_ui(n, q))
+        {
+            result = PRIME;
+            break;
+        }
+
+        /* find prime factors of q - 1 */
+        n_factor_init(&q_factors);
+        n_factor(&q_factors, q - 1, 1);
+
+        for (j = 0; j < q_factors.num; j++)
+        {
+            int state, pind;
+            ulong v, p, exp, p_pow;
+            unity_zp jacobi_sum, jacobi_sum2_1, jacobi_sum2_2;
+            fmpz_t u, q_pow;
+            if (result == COMPOSITE) break;
+
+            p = q_factors.p[j];
+            exp = q_factors.exp[j];
+            p_pow = n_pow(p, exp);
+            pind = _p_ind(config, p);
+            state = lambdas[pind];
+
+            fmpz_init_set_ui(q_pow, q);
+            if (state == 0)
+            {
+                fmpz_powm(q_pow, q_pow, ndec, n);
+            }
+
+            fmpz_init(u);
+            fmpz_tdiv_q_ui(u, n, p_pow);
+            v = fmpz_tdiv_ui(n, p_pow);
+
+            unity_zp_init(jacobi_sum, p, exp, n);
+            unity_zp_init(jacobi_sum2_1, p, exp, n);
+            unity_zp_init(jacobi_sum2_2, p, exp, n);
+
+            jacobi_pq(jacobi_sum, q, p);
+            if (p == 2 && exp >= 3)
+            {
+                jacobi_2q_one(jacobi_sum2_1, q);
+                jacobi_2q_two(jacobi_sum2_2, q);
+            }
+
+            for (k = 1; k <= exp; k++)
+            {
+                slong h;
+                if (p == 2 && k == 1)
+                {
+                    h = _is_prime_jacobi_check_21(q, n);
+
+                    if (h < 0)
+                    {
+                        result = COMPOSITE;
+                        break;
+                    }
+
+                    if (state == 0 && h == 1 && nmod4 == 1)
+                    {
+                        state = 1;
+                        lambdas[pind] = state;
+                    }
+                    continue;
+                }
+
+                if (p == 2 && k == 2)
+                {
+                    h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
+
+                    if (h < 0)
+                    {
+                        result = COMPOSITE;
+                        break;
+                    }
+
+                    if (h % 2 != 0 && state == 0 && fmpz_equal(q_pow, ndec))
+                    {
+                        state = 1;
+                        lambdas[pind] = state;
+                    }
+
+                    continue;
+                }
+
+                if (p == 2 && k >= 3)
+                {
+                    h = _is_prime_jacobi_check_2k(jacobi_sum
+                        , jacobi_sum2_1, jacobi_sum2_2, u, v);
+
+                    if (h < 0)
+                    {
+                        result = COMPOSITE;
+                        break;
+                    }
+
+                    if (h % 2 != 0 && state == 0 && fmpz_equal(q_pow, ndec))
+                    {
+                        state = 1;
+                        lambdas[pind] = state;
+                    }
+
+                    continue;
+                }
+
+                if (p != 2)
+                {
+                    h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
+
+                    if (h < 0)
+                    {
+                        result = COMPOSITE;
+                        break;
+                    }
+
+                    if (h % p != 0 && state == 0)
+                    {
+                        state = 1;
+                        lambdas[pind] = state;
+                    }
+                }
+            }
+
+            fmpz_clear(u);
+            fmpz_clear(q_pow);
+            unity_zp_clear(jacobi_sum);
+            unity_zp_clear(jacobi_sum2_1);
+            unity_zp_clear(jacobi_sum2_2);
+        }
+
+    }
+
+    flint_printf("\nCURR STATUS = %i\n", result);
+
+    flint_printf("\nLAMBDAS:\n");
+    for (i = 0; i < config->rs.num; i++)
+    {
+        flint_printf("p = %wu; l = %i\n", config->rs.p[i], lambdas[i]);
+        if (lambdas[i] == 0)
+        {
+            int r = _is_prime_jacobi_additional_test(n, config->rs.p[i]);
+            flint_printf("RESSS = %i\n", r);
+            if (r == 2)
+                result = COMPOSITE;
+            else if (r == 1)
+                lambdas[i] = 1;
+            else
+                result = UNKNOWN;
+        }
+    }
+
+    for (i = 0; i < config->rs.num; i++)
+    {
+        flint_printf("%i ", lambdas[i]);
+    }
+    flint_printf("\n");
+
+    if (result == PROBABPRIME)
+        if (is_prime_final_division(n, config->s, config->R) == 1)
+            result = PRIME;
 
     free(lambdas);
+    fmpz_clear(p2);
+    fmpz_clear(ndec);
+    fmpz_clear(ndecdiv);
     fmpz_clear(temp);
-    return 0;
+    return result;
 }
 

@@ -85,8 +85,9 @@ int is_prime_gauss_min_R(const fmpz_t n, ulong R);
 int is_prime_gauss(const fmpz_t n);
 
 
+int _is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
 slong _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
-int _is_prime_jacobi_check_21(ulong q, const fmpz_t n);
+slong _is_prime_jacobi_check_21(ulong q, const fmpz_t n);
 slong _is_prime_jacobi_check_22(const unity_zp j
     , const fmpz_t u, ulong v, ulong q);
 slong _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1

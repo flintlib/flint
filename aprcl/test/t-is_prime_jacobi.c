@@ -83,7 +83,7 @@ int main(void)
 
         fmpz_init_set_ui(n, 101);
 
-        if (_is_prime_jacobi_check_21(q, n) == 0)
+        if (_is_prime_jacobi_check_21(q, n) < 0)
         {
             flint_printf("FAIL\n");
             flint_printf("in function _is_prime_jacobi_check_21() wrong answer\n");
@@ -151,9 +151,6 @@ int main(void)
         jacobi_2q_one(j2_1, q);
         jacobi_2q_two(j2_2, q);
 
-        unity_zp_print(j2_1);
-        unity_zp_print(j2_2);
-
         flint_printf("\nresult = %w\n", _is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v));
 
         if (_is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v) < 0)
@@ -168,6 +165,22 @@ int main(void)
         unity_zp_clear(j2_2);
         fmpz_clear(n);
         fmpz_clear(u);
+    }
+
+    /* Test is_prime_jacobi. */
+    {
+        fmpz_t n;
+        aprcl_config config;
+
+        fmpz_init(n);
+        fmpz_set_str(n, "521419622856657689423872613771", 10);
+        aprcl_config_init_min_R(config, n, 720);
+
+        flint_printf("\ngocheck:\n");
+
+        flint_printf("STATUS = %i\n", _is_prime_jacobi(n, config));
+
+        aprcl_config_clear(config);
     }
 
     FLINT_TEST_CLEANUP(state);

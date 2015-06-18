@@ -57,7 +57,7 @@ _jacobi_pq_general(unity_zp f, const mp_ptr table
 
 void jacobi_pq(unity_zp f, ulong q, ulong p)
 {
-    ulong k, temp_q;
+    ulong k;
     mp_ptr table;
 
     table = f_table(q);
