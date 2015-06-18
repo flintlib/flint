@@ -62,13 +62,35 @@ int main(void)
         if (_is_prime_jacobi_check_pk(j, u, v) < 0)
         {
             flint_printf("FAIL\n");
-            flint_printf("_is_prime_jacobi_check_pk() wrong answer");
+            flint_printf("in function _is_prime_jacobi_check_pk() wrong answer\n");
             abort();
         }
 
         unity_zp_clear(j);
         fmpz_clear(n);
         fmpz_clear(u);
+    }
+
+    /* Test _is_prime_jacobi_check_21() */
+    {
+        ulong p, q, v, k, p_pow;
+        fmpz_t n;
+
+        q = 7;
+        p = 2;
+        k = 1;
+        p_pow = n_pow(p, k);
+
+        fmpz_init_set_ui(n, 101);
+
+        if (_is_prime_jacobi_check_21(q, n) == 0)
+        {
+            flint_printf("FAIL\n");
+            flint_printf("in function _is_prime_jacobi_check_21() wrong answer\n");
+            abort();
+        }
+
+        fmpz_clear(n);
     }
 
     /* Test _is_prime_jacobi_check_22() */
@@ -83,7 +105,7 @@ int main(void)
         p_pow = n_pow(p, k);
 
         fmpz_init(u);
-        fmpz_init_set_ui(n, 31);
+        fmpz_init_set_ui(n, 101);
 
         fmpz_tdiv_q_ui(u, n, p_pow);
         v = fmpz_tdiv_ui(n, p_pow);
@@ -94,14 +116,58 @@ int main(void)
         if (_is_prime_jacobi_check_22(j, u, v, q) < 0)
         {
             flint_printf("FAIL\n");
-            flint_printf("_is_prime_jacobi_check_pk() wrong answer");
+            flint_printf("in function _is_prime_jacobi_check_22() wrong answer\n");
             abort();
         }
 
         unity_zp_clear(j);
         fmpz_clear(n);
         fmpz_clear(u);
+    }
 
+
+    /* Test _is_prime_jacobi_check_2k() */
+    {
+        ulong p, q, v, k, p_pow;
+        unity_zp j, j2_1, j2_2;
+        fmpz_t n, u;
+
+        q = 41;
+        p = 2;
+        k = 3;
+        p_pow = n_pow(p, k);
+
+        fmpz_init(u);
+        fmpz_init_set_ui(n, 101);
+
+        fmpz_tdiv_q_ui(u, n, p_pow);
+        v = fmpz_tdiv_ui(n, p_pow);
+
+        unity_zp_init(j, p, k, n);
+        unity_zp_init(j2_1, p, k, n);
+        unity_zp_init(j2_2, p, k, n);
+
+        jacobi_pq(j, q, p);
+        jacobi_2q_one(j2_1, q);
+        jacobi_2q_two(j2_2, q);
+
+        unity_zp_print(j2_1);
+        unity_zp_print(j2_2);
+
+        flint_printf("\nresult = %w\n", _is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v));
+
+        if (_is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v) < 0)
+        {
+            flint_printf("FAIL\n");
+            flint_printf("in function _is_prime_jacobi_check_2k() wrong answer\n");
+            abort();
+        }
+
+        unity_zp_clear(j);
+        unity_zp_clear(j2_1);
+        unity_zp_clear(j2_2);
+        fmpz_clear(n);
+        fmpz_clear(u);
     }
 
     FLINT_TEST_CLEANUP(state);

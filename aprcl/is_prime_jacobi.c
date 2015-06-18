@@ -31,16 +31,14 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 {
     slong h;
     ulong i, p_pow;
-    unity_zp j1, j2, j_pow, temp, aut;
+    unity_zp j1, j2, temp, aut;
 
     p_pow = n_pow(j->p, j->exp);
-    unity_zp_init(j_pow, j->p, j->exp, j->n);
     unity_zp_init(j1, j->p, j->exp, j->n);
     unity_zp_init(j2, j->p, j->exp, j->n);
     unity_zp_init(temp, j->p, j->exp, j->n);
     unity_zp_init(aut, j->p, j->exp, j->n);
 
-    unity_zp_copy(j_pow, j);
     unity_zp_coeff_set_ui(j1, 0, 1);
     unity_zp_coeff_set_ui(j2, 0, 1);
 
@@ -48,26 +46,25 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     {
         if (i % j->p == 0) continue;
 
-        unity_zp_pow_ui(j_pow, j, i);
-        _unity_zp_reduce_cyclotomic(j_pow);
-        unity_zp_aut_inv(aut, j_pow, i);
+        unity_zp_pow_ui(temp, j, i);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
         unity_zp_mul(temp, j1, aut);
         unity_zp_swap(temp, j1);
     
-        unity_zp_pow_ui(j_pow, j, (v * i) / p_pow);
-        _unity_zp_reduce_cyclotomic(j_pow);
-        unity_zp_aut_inv(aut, j_pow, i);
+        unity_zp_pow_ui(temp, j, (v * i) / p_pow);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
         unity_zp_mul(temp, j2, aut);
         unity_zp_swap(temp, j2);
     }
 
-    unity_zp_pow_fmpz(j_pow, j1, u);
-    unity_zp_mul(j1, j2, j_pow);
+    unity_zp_pow_fmpz(temp, j1, u);
+    unity_zp_mul(j1, j2, temp);
     
     h = unity_zp_is_unity(j1);
 
     unity_zp_clear(aut);
-    unity_zp_clear(j_pow);
     unity_zp_clear(j1);
     unity_zp_clear(j2);
     unity_zp_clear(temp);
@@ -97,6 +94,8 @@ _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
     fmpz_clear(temp);
     fmpz_clear(qpow);
     fmpz_clear(ncmp);
+
+    return result;
 }
 
 slong
@@ -133,7 +132,72 @@ slong
 _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
         , const unity_zp j2_2, const fmpz_t u, ulong v)
 {
+    slong h;
+    ulong i, p_pow;
+    unity_zp j_j2, j1, j2, temp, aut;
 
+    p_pow = n_pow(j->p, j->exp);
+    unity_zp_init(temp, 2, j->exp, j->n);
+    unity_zp_init(j_j2, 2, j->exp, j->n);
+    unity_zp_init(aut, 2, j->exp, j->n);
+    unity_zp_init(j1, 2, j->exp, j->n);
+    unity_zp_init(j2, 2, j->exp, j->n);
+
+    unity_zp_coeff_set_ui(j1, 0, 1);
+    unity_zp_coeff_set_ui(j2, 0, 1);
+
+    unity_zp_mul(j_j2, j, j2_1);
+
+    for (i = 1; i < p_pow;)
+    {
+        unity_zp_pow_ui(temp, j_j2, i);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, j1, aut);
+        unity_zp_swap(temp, j1);
+
+        unity_zp_pow_ui(temp, j_j2, (v * i) / p_pow);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, j2, aut);
+        unity_zp_swap(temp, j2);
+
+        i += 2;
+
+        unity_zp_pow_ui(temp, j_j2, i);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, j1, aut);
+        unity_zp_swap(temp, j1);
+
+        unity_zp_pow_ui(temp, j_j2, (v * i) / p_pow);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, j2, aut);
+        unity_zp_swap(temp, j2);
+
+        i += 6;
+    }
+
+    if (v % 8 != 1 && v % 8 != 3)
+    {
+        unity_zp_mul(temp, j2_2, j2_2);
+        unity_zp_mul(j_j2, j2, temp);
+        unity_zp_swap(j_j2, j2);
+    }
+
+    unity_zp_pow_fmpz(temp, j1, u);
+    unity_zp_mul(j1, j2, temp);
+    
+    h = unity_zp_is_unity(j1);
+
+    unity_zp_clear(aut);
+    unity_zp_clear(j1);
+    unity_zp_clear(j2);
+    unity_zp_clear(j_j2);
+    unity_zp_clear(temp);
+
+    return h;
 }
 
 int
