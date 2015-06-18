@@ -32,12 +32,9 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
     ulong q, k;
     fmpz_t npow, qmod;
 
-    k = 1;
-    if (p == 2)
-        k = 2;
     result = 0;
     p_counter = 50;
-    counter = 10;
+    counter = 9;
 
     fmpz_init(npow);
     fmpz_init(qmod);
@@ -53,9 +50,10 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
                 break;
             p_counter--;
         }
-        counter++;
+        counter += 2;
     }
 
+    k = p_power_in_q(q - 1, p);
     if (p_counter != 0)
     {
         ulong v, h;
@@ -383,7 +381,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 jacobi_2q_two(jacobi_sum2_2, q);
             }
 
-            k = p_power_in_q(p, q - 1);
+            k = p_power_in_q(q - 1, p);
 
             slong h;
             if (p == 2 && k == 1)
@@ -391,7 +389,9 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 h = _is_prime_jacobi_check_21(q, n);
 
                 if (h < 0)
+                {
                     result = COMPOSITE;
+                }
 
                 if (state == 0 && h == 1 && nmod4 == 1)
                 {
@@ -406,8 +406,9 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
 
                 if (h < 0)
+                {
                     result = COMPOSITE;
-
+                }
                 if (h % 2 != 0 && state == 0 && fmpz_equal(q_pow, ndec))
                 {
                     state = 1;
@@ -423,7 +424,9 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                     , jacobi_sum2_1, jacobi_sum2_2, u, v);
 
                 if (h < 0)
+                {
                     result = COMPOSITE;
+                }
 
                 if (h % 2 != 0 && state == 0 && fmpz_equal(q_pow, ndec))
                 {
@@ -439,7 +442,9 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
 
                 if (h < 0)
+                {
                     result = COMPOSITE;
+                }
 
                 if (h % p != 0 && state == 0)
                 {

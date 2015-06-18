@@ -151,8 +151,6 @@ int main(void)
         jacobi_2q_one(j2_1, q);
         jacobi_2q_two(j2_2, q);
 
-        flint_printf("\nresult = %w\n", _is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v));
-
         if (_is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v) < 0)
         {
             flint_printf("FAIL\n");
@@ -169,9 +167,8 @@ int main(void)
 
     /* Test is_prime_jacobi. */
     {
-        for (i = 0; i < 100000; i++)
+        for (i = 0; i < 10000; i++)
         {
-            flint_printf("%i \n", i);
             int pbprime, cycloprime;
             fmpz_t n;
             fmpz_init(n);
@@ -194,6 +191,53 @@ int main(void)
 
             fmpz_clear(n);
         }
+
+        {
+            int result;
+            fmpz_t n;
+            fmpz_init(n);
+            result = 1;
+
+            /* Test big primes. */
+            fmpz_set_str(n, "40206835204840513073", 10);
+            if (is_prime_jacobi(n) == 0)
+                result = 0;
+
+            /* 521419622856657689423872613771 % 4 == 3 */
+            fmpz_set_str(n, "521419622856657689423872613771", 10);
+            if (is_prime_jacobi(n) == 0)
+                result = 0;
+
+            /* 5991810554633396517767024967580894321153 % 4 == 1 */
+            fmpz_set_str(n, "5991810554633396517767024967580894321153", 10);
+            if (is_prime_jacobi(n) == 0)
+                result = 0;
+
+            /* Test big composite. */
+            /* 1500450271 * 5915587277 */
+            fmpz_set_str(n, "8876044532898802067", 10);
+            if (is_prime_jacobi(n) == 1)
+                result = 0;
+
+            /* 5915587277 * 54673257461630679457 */
+            fmpz_set_str(n, "323424426232167763068694468589", 10);
+            if (is_prime_jacobi(n) == 1)
+                result = 0;
+
+            /* 48112959837082048697 * 66405897020462343733 */
+            fmpz_set_str(n, "3194984256290911228520362769161858765901", 10);
+            if (is_prime_jacobi(n) == 1)
+                result = 0;
+
+            if (result == 0)
+            {
+                flint_printf("FAIL\n");
+                abort();
+            }
+
+            fmpz_clear(n);
+        }
+
     }
 
     FLINT_TEST_CLEANUP(state);
