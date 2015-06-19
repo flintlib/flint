@@ -19,36 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2015 Tommy Hofmann
 
 ******************************************************************************/
 
+#define FQ_NMOD_POLY_FACTOR_INLINES_C
+
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 
-void
-fmpz_set_mpf(fmpz_t f, const mpf_t x)
+void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z, fq_nmod_poly_factor_t fac, slong i, fq_nmod_ctx_t ctx)
 {
-    if (!COEFF_IS_MPZ(*f))
-    {
-        if (flint_mpf_fits_slong_p(x))
-        {
-            slong cx = flint_mpf_get_si(x);
-            fmpz_set_si(f, cx);
-        }
-        else
-        {
-            __mpz_struct *z = _fmpz_promote(f);
-            mpz_set_f(z, x);
-        }
-    }
-    else
-    {
-        __mpz_struct *z = _fmpz_promote(f);
-        mpz_set_f(z, x);
-        _fmpz_demote_val(f);
-    }
+    fq_nmod_poly_set(z, fac->poly + i, ctx);
 }
