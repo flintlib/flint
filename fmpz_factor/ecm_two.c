@@ -47,6 +47,8 @@ fmpz_factor_ecm_two(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     int i, j, ret;
     ecm_t ecm_inf;
 
+    const mp_limb_t *prime_array;
+
     fmpz_factor_ecm_init(ecm_inf);
     fmpz_init(sig);
     fmpz_init(nm8);
@@ -60,7 +62,6 @@ fmpz_factor_ecm_two(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     num = n_prime_pi(B1);   /* number of primes under B1 */
 
     /* compute list of primes under B1 for stage I */
-    const mp_limb_t *prime_array = flint_malloc(num * sizeof(mp_limb_t));
     prime_array = n_primes_arr_readonly(num);   
 
     /************************ STAGE II PRECOMPUTATIONS ***********************/
@@ -77,7 +78,7 @@ fmpz_factor_ecm_two(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     /* compute GCD_table */
 
-    ecm_inf->GCD_table = flint_malloc(P * sizeof(uint8_t));
+    ecm_inf->GCD_table = flint_malloc(P * sizeof(unsigned char));
 
     for (j = 1; j < P; j += 1)
     {
@@ -94,10 +95,10 @@ fmpz_factor_ecm_two(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     /* compute prime table */
 
-    ecm_inf->prime_table = flint_malloc(mdiff * sizeof(uint8_t*));
+    ecm_inf->prime_table = flint_malloc(mdiff * sizeof(unsigned char*));
 
     for (i = 0; i < mdiff; i++)
-        ecm_inf->prime_table[i] = flint_malloc(Psq * sizeof(uint8_t));
+        ecm_inf->prime_table[i] = flint_malloc(Psq * sizeof(unsigned char));
 
     for (i = 0; i < mdiff; i++)
     {

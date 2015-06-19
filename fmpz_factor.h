@@ -114,10 +114,10 @@ typedef struct ecm_s {
     fmpz_t x, z;            /* the coordinates */
     fmpz_t a24;             /* value (a + 2)/4 */
 
-    uint8_t *GCD_table;     /* checks whether baby step int is
+    unsigned char *GCD_table;     /* checks whether baby step int is
                                coprime to Primorial or not */
 
-    uint8_t **prime_table;
+    unsigned char **prime_table;
 
 } ecm_s;
 

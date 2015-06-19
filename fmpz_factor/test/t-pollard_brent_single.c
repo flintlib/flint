@@ -32,6 +32,7 @@ int main(void)
 {
     fmpz_t prime1, prime2, prime3, prime4, primeprod, fac, modval, maxa, maxy, a, y;
     int i, j, k, fails;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(prime1);
     fmpz_init(prime2);
@@ -44,7 +45,6 @@ int main(void)
     fmpz_init(y);
     fmpz_init(maxa);
     fmpz_init(maxy);
-    FLINT_TEST_INIT(state);
 
     fails = 0;
 
@@ -96,7 +96,7 @@ int main(void)
 
     if (fails > flint_test_multiplier())
     {
-        printf("FAIL : Pollard Rho failed too many times (%d times) %d\n", fails);
+        printf("FAIL : Pollard Rho failed too many times (%d times)\n", fails);
         abort();
     }
 
