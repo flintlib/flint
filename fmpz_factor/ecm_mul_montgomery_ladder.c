@@ -35,6 +35,8 @@ void
 fmpz_factor_ecm_mul_montgomery_ladder(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0,
                                       fmpz_t k, fmpz_t n, ecm_t ecm_inf)
 {
+    mp_limb_t i;
+    fmpz_t x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
 
     if (fmpz_cmp_ui(k, 0) == 0)
     {
@@ -42,9 +44,6 @@ fmpz_factor_ecm_mul_montgomery_ladder(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0,
         fmpz_set_ui(z, 0);
         return;
     }
-
-    mp_limb_t i;
-    fmpz_t x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
 
     if (fmpz_is_one(k))
     {

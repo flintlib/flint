@@ -145,7 +145,7 @@ fmpz_factor_ecm_two(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
         /************************** STAGE II ***************************/
 
-        if(fmpz_factor_ecm_stage_II_two(f, B1, B2, P, n, ecm_inf))
+        if(fmpz_factor_ecm_stage_II_FFT(f, B1, B2, P, n, ecm_inf))
         {
             /* Found factor after stage II */
             ret = 1;

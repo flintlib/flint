@@ -26,6 +26,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
 /* Implementation of the stage I of ECM */
 
@@ -34,9 +35,9 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                              fmpz_t n, ecm_t ecm_inf)
 {
     fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
-    mp_limb_t mmin, mmax, maxj, mdiff, prod, Psq;
+    mp_limb_t mmin, mmax, Psq;
     int i, j, ret;
-    fmpz *arrx, *arrz;
+    fmpz * jz, * jx;
 
     fmpz_init(Qx);
     fmpz_init(Qz);
@@ -51,21 +52,12 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     Psq = P*P;
     mmin = (B1) / (Psq);
     mmax = (B2) / (Psq);
-    mdiff = mmax - mmin + 1;
 
     ret = 0;
     j = 0;
 
-    fmpz_t jx[Psq], jz[Psq];
-
-    fmpz_init(jx[2]);
-    fmpz_init(jz[2]);
-
-    for (i = 1; i < P; i += 2)
-    {
-        fmpz_init(jx[i]);
-        fmpz_init(jz[i]);
-    }
+    jz = _fmpz_vec_init(Psq);
+    jx = _fmpz_vec_init(Psq);
 
     /* For each odd j (j < P) , compute j * Q0 [x0 :: z0]  */
 
@@ -73,32 +65,30 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
        as (j - 2)Q0 is required for (j + 2)Q0 */
 
     /* arr[1] = Q0 */
-    fmpz_set(jx[1], ecm_inf->x);  
-    fmpz_set(jz[1], ecm_inf->z);
+    fmpz_set(jx + 1, ecm_inf->x);  
+    fmpz_set(jz + 1, ecm_inf->z);
 
     /* arr[2] = 2Q0 */
-    fmpz_factor_ecm_double(jx[2], jz[2], jx[1], jz[1], n, ecm_inf);
+    fmpz_factor_ecm_double(jx + 2, jz + 2, jx + 1, jz + 1, n, ecm_inf);
 
     /* arr[3] = 3Q0 */
-    fmpz_factor_ecm_add(jx[3], jz[3], jx[2], jz[2], jx[1], jz[1], 
-                        jx[1], jz[1], n, ecm_inf);
+    fmpz_factor_ecm_add(jx + 3, jz + 3, jx + 2, jz + 2, jx + 1, jz + 1, 
+                        jx + 1, jz + 1, n, ecm_inf);
 
     for (j = 5; j < P; j += 2)
     {
         /* jQ0 = (j - 2)Q0 + 2Q0 
            Differnce is (j - 4)Q0 */
 
-        fmpz_factor_ecm_add(jx[j], jz[j], jx[j - 2], jz[j - 2], 
-                            jx[2], jz[2], jx[j - 4], jz[j - 4], 
+        fmpz_factor_ecm_add(jx + j, jz + j, jx + j - 2, jz + j - 2, 
+                            jx + 2, jz + 2, jx + j - 4, jz + j - 4, 
                             n, ecm_inf);     
     }
 
     /* arr[P] = double(arr[P/2]) */
     /* P is of form 2 * odd, hence P/2 will always exist in array (is odd)*/
     
-    fmpz_init(jx[P]);
-    fmpz_init(jz[P]);
-    fmpz_factor_ecm_double(jx[P], jz[P], jx[P/2], jz[P/2], n, ecm_inf);
+    fmpz_factor_ecm_double(jx + P, jz + P, jx + P/2, jz + P/2, n, ecm_inf);
 
     /* computing P + i (i < P, gcd(i, P) = 1) from P, i, (P - i) */
 
@@ -107,10 +97,8 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
         int val = i - P;
         if (ecm_inf->GCD_table[val] == 1)
         {
-            fmpz_init(jx[i]);
-            fmpz_init(jz[i]);
-            fmpz_factor_ecm_add(jx[i], jz[i], jx[P], jz[P], 
-                                jx[val], jz[val], jx[P - val], jz[P - val],
+            fmpz_factor_ecm_add(jx + i, jz + i, jx + P, jz + P, 
+                                jx + val, jz + val, jx + P - val, jz + P - val,
                                 n, ecm_inf);
         }
     }
@@ -126,11 +114,11 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
         {
             for (j = 2; j < P; j += 1)
             {
-                fmpz_init(jx[j*P + i]);
-                fmpz_init(jz[j*P + i]);            
-                fmpz_factor_ecm_add(jx[j*P + i], jz[j*P + i], jx[(j-1)*P + i],
-                                    jz[(j-1)*P + i], jx[P], jz[P], 
-                                    jx[(j-2)*P + i], jz[(j-2)*P + i], n, 
+                fmpz_init(jx + j*P + i);
+                fmpz_init(jz + j*P + i);            
+                fmpz_factor_ecm_add(jx + j*P + i, jz + j*P + i, jx + (j-1)*P + i,
+                                    jz + (j-1)*P + i, jx + P, jz + P, 
+                                    jx + (j-2)*P + i, jz + (j-2)*P + i, n, 
                                     ecm_inf);
             }   
         }
@@ -161,10 +149,10 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
         {
             if (ecm_inf->prime_table[i - mmin][j] == 1)
             {
-                fmpz_mul(a, Rx, jz[j]);
+                fmpz_mul(a, Rx, jz + j);
                 fmpz_mod(a, a, n);
 
-                fmpz_mul(b, Rz, jx[j]);
+                fmpz_mul(b, Rz, jx + j);
                 fmpz_mod(b, b, n);
 
                 fmpz_sub(a, a, b);
@@ -189,6 +177,9 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     if (!fmpz_is_one(f) && fmpz_cmp(f, n))
         ret = 1;
+
+    _fmpz_vec_clear(jz, Psq);
+    _fmpz_vec_clear(jx, Psq);
 
     fmpz_clear(Qx);
     fmpz_clear(Qz);
