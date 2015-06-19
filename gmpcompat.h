@@ -53,7 +53,7 @@
    ((xxx)->_mp_size > 0 ? (slong) (xxx)->_mp_d[0] : (slong) -(xxx)->_mp_d[0]))
 
 #define flint_mpz_get_ui(xxx) \
-   ((xxx)->_mp_size == 0 ? WORD(0) : (xxx)->_mp_d[0])
+   ((xxx)->_mp_size == 0 ? UWORD(0) : (xxx)->_mp_d[0])
 
 static __inline__
 void flint_mpz_set_si(mpz_ptr r, slong s)
