@@ -26,31 +26,6 @@
 #include "aprcl.h"
 
 /*
-    Returns 1 if gcd(q * r, n) == 1 or gcd(q * r, n) == n
-*/
-int
-_is_coprime(ulong q, ulong r, const fmpz_t n)
-{
-    int result;
-    fmpz_t qr, gcd;
-
-    fmpz_init(gcd);
-    fmpz_init_set_ui(qr, q);
-
-    fmpz_mul_ui(qr, qr, r);
-    fmpz_gcd(gcd, n, qr);
-
-    result = 1;
-    if (fmpz_equal_ui(gcd, 1) == 0 && fmpz_equal(gcd, n) == 0)
-        result = 0;
-
-    fmpz_clear(qr);
-    fmpz_clear(gcd);
-
-    return result;
-}
-
-/*
     Returns the index of divisor p on R factors list.
 */
 int
@@ -304,8 +279,8 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
                 /* r = p^k */
                 r = n_pow(p, k);
 
-                /* if gcd(q*r, n) != 1 ||  gcd(q*r, n) != n */
-                if (_is_coprime(q, r, n) == 0)
+                /* if gcd(q*r, n) != 1 */
+                if (is_mul_coprime_ui_ui(q, r, n) == 0)
                 {
                     result = COMPOSITE;
                     break;

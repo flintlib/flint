@@ -327,6 +327,10 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             lambdas[i] = 0;
     }
 
+    /* check that s*R and n are coprime */
+    if (is_mul_coprime_ui_fmpz(config->R, config->s, n) == 0)
+        result = COMPOSITE;
+
     for (i = 0; i < config->qs->num; i++)
     {
         n_factor_t q_factors;
@@ -496,7 +500,7 @@ is_prime_jacobi(const fmpz_t n)
 {
     primality_test_status result;
     aprcl_config config;
-    aprcl_config_init_min_R(config, n, 180);
+    aprcl_config_init_min_R(config, n, 2);
 
     result = _is_prime_jacobi(n, config);
     aprcl_config_clear(config);

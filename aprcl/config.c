@@ -41,7 +41,9 @@ void _aprcl_config_update(aprcl_config conf)
             _fmpz_factor_append_ui(conf->qs, prime, 1);
             fmpz_mul_ui(conf->s, conf->s, prime);
         }
-        prime = n_nextprime(prime, 1);
+        prime++;
+        while (n_is_prime(prime) == 0)
+            prime++;
     }
 }
 
@@ -79,6 +81,7 @@ void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
         _aprcl_config_update(conf);
         fmpz_mul(s2, conf->s, conf->s);
     }
+
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
 }

@@ -75,11 +75,9 @@ typedef enum
 } primality_test_status;
 
 int _p_ind(const aprcl_config conf, ulong p);
-int _is_coprime(ulong q, ulong r, const fmpz_t n);
 int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
 slong _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
-int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config);
 int is_prime_gauss_min_R(const fmpz_t n, ulong R);
 int is_prime_gauss(const fmpz_t n);
@@ -98,6 +96,10 @@ int is_prime_jacobi(const fmpz_t n);
 int is_prime_aprcl(const fmpz_t n);
 
 primality_test_status _is_prime_aprcl(const fmpz_t n);
+
+int is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
+int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
+int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 
 /* Z[unity_root] operation v2. */
 
