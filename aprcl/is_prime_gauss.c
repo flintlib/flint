@@ -188,7 +188,7 @@ _is_prime_gauss(const fmpz_t n, const aprcl_config config)
         positive integers a there exists l such that:
             r^(p-1) congruent n^(l(p-1)) mod p^a
 
-        If this (Lp), then lambdas_p = 3.
+        If (Lp), then lambdas_p = 3.
     */
     lambdas = (int*) malloc(sizeof(int) * config->rs.num);
     for (i = 0; i < config->rs.num; i++)

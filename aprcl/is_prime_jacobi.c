@@ -166,8 +166,8 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
         q, n from standard variables;
 
     Returns:
-        If j0^u * jv = 1 returns 0;
-        If j0^u * jv = -1 returns 1;
+        if j0^u * jv = 1 returns 0;
+        if j0^u * jv = -1 returns 1;
         otherwise returns -1.
 
     For details see (i1b) in [2] or
@@ -265,138 +265,243 @@ _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
     return h;
 }
 
+
+/*
+    (2.d)
+    Check the case p = 2 and k >= 3.
+
+    Computes j0 = j_{0, 2, q}, jv = j_{v, 2, q} and checks that
+    j0^u * jv is unity root.
+
+    Parameters:
+        j = J(2, q);
+        j2_1 = J_3(q);
+        j2_2 = j_2(q);
+        
+        u, v from standard variables;
+
+    Returns:
+        If there exist h such that j0^u * jv = \zeta_{2^k}^h returns h
+        otherwise returns -1.
+
+    For details see (i1d) in [2] or
+    algorithm (9.1.28) step 4.b in [1].
+*/
 slong
-_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp jv_1
-        , const unity_zp jv_2, const fmpz_t u, ulong v)
+_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
+        , const unity_zp j2_2, const fmpz_t u, ulong v)
 {
     slong h;
     ulong i, r;
-    unity_zp j_jv, j0, jv, temp, aut;
+    unity_zp j_j0, j0, jv, temp, aut;
 
+    /* initialization */
     r = n_pow(j->p, j->exp);
     unity_zp_init(temp, 2, j->exp, j->n);
-    unity_zp_init(j_jv, 2, j->exp, j->n);
+    unity_zp_init(j_j0, 2, j->exp, j->n);
     unity_zp_init(aut, 2, j->exp, j->n);
     unity_zp_init(j0, 2, j->exp, j->n);
     unity_zp_init(jv, 2, j->exp, j->n);
 
-    unity_zp_coeff_set_ui(j0, 0, 1);
-    unity_zp_coeff_set_ui(jv, 0, 1);
+    unity_zp_coeff_set_ui(j0, 0, 1);    /* j0 = 1 */
+    unity_zp_coeff_set_ui(jv, 0, 1);    /* jv = 1 */
 
-    unity_zp_mul(j_jv, j, jv_1);
+    /* j_j0 = J(2, q) * J_3(q) */
+    unity_zp_mul(j_j0, j, j2_1);
 
+    /* for i in 1..p^k and (i == 1 or i == 3 mod 8) */
     for (i = 1; i < r;)
     {
-        unity_zp_pow_ui(temp, j_jv, i);
+        /* i == 1 mod 8 */
+
+        /* update j0 = \prod{\sigma_i^{-1}(j^i)} */
+        unity_zp_pow_ui(temp, j_j0, i);
         _unity_zp_reduce_cyclotomic(temp);
+        /* aut = \sigma_i^{-1}(temp) */
         unity_zp_aut_inv(aut, temp, i);
+
+        /* j0 *= aut */
         unity_zp_mul(temp, j0, aut);
         unity_zp_swap(temp, j0);
 
-        unity_zp_pow_ui(temp, j_jv, (v * i) / r);
+        /* update jv = \prod{\sigma_i^{-1}(j^{(v * i) / r})} */
+        unity_zp_pow_ui(temp, j_j0, (v * i) / r);
         _unity_zp_reduce_cyclotomic(temp);
+        /* aut = \sigma_i^{-1}(temp) */
         unity_zp_aut_inv(aut, temp, i);
+
+        /* jv *= aut */
         unity_zp_mul(temp, jv, aut);
         unity_zp_swap(temp, jv);
 
+        /* i == 3 mod 8 */
         i += 2;
 
-        unity_zp_pow_ui(temp, j_jv, i);
+        /* update j0 = \prod{\sigma_i^{-1}(j^i)} */
+        unity_zp_pow_ui(temp, j_j0, i);
         _unity_zp_reduce_cyclotomic(temp);
+        /* aut = \sigma_i^{-1}(temp) */
         unity_zp_aut_inv(aut, temp, i);
+
+        /* j0 *= aut */
         unity_zp_mul(temp, j0, aut);
         unity_zp_swap(temp, j0);
 
-        unity_zp_pow_ui(temp, j_jv, (v * i) / r);
+        /* update jv = \prod{\sigma_i^{-1}(j^{(v * i) / r})} */
+        unity_zp_pow_ui(temp, j_j0, (v * i) / r);
         _unity_zp_reduce_cyclotomic(temp);
+        /* aut = \sigma_i^{-1}(temp) */
         unity_zp_aut_inv(aut, temp, i);
+
+        /* jv *= aut */
         unity_zp_mul(temp, jv, aut);
         unity_zp_swap(temp, jv);
 
+        /* now again i == 1 mod 8 */
         i += 6;
     }
 
+    /* if v % 8 not congruent 1 or 3 modulo 8 then jv *= J_2(q)^2 */
     if (v % 8 != 1 && v % 8 != 3)
     {
-        unity_zp_mul(temp, jv_2, jv_2);
-        unity_zp_mul(j_jv, jv, temp);
-        unity_zp_swap(j_jv, jv);
+        unity_zp_mul(temp, j2_2, j2_2);
+        unity_zp_mul(j_j0, jv, temp);
+        unity_zp_swap(j_j0, jv);
     }
 
+    /* set j0 = j0^u * jv */
     unity_zp_pow_fmpz(temp, j0, u);
     unity_zp_mul(j0, jv, temp);
     
+    /* try to find h */
     h = unity_zp_is_unity(j0);
 
+    /* clear */
     unity_zp_clear(aut);
     unity_zp_clear(j0);
     unity_zp_clear(jv);
-    unity_zp_clear(j_jv);
+    unity_zp_clear(j_j0);
     unity_zp_clear(temp);
 
     return h;
 }
 
+/*
+    (4.)
+    Try to find prime number q such that:
+        q == mod 2p;
+        n^{(q - 1) / p} != 1 mod q;
+        if p == 2 then 4 | q - 1 and 8 not | q - 1.
+
+    If the q is found we have two cases:
+        (4.a) if p == 2 verify
+            1) h from (2.c) is a primitive root;
+            2) q^{(n - 1) / 2} = -1 mod n;
+        (4.b) if p != 2 verify
+            1) h from (2.a) is a primitive root;
+    if this is not the case for (p, q) then n is composite.
+
+    (4.c) If we can't find q check p | n; if so then n is composite. 
+    Otherwise n can be prime but we can't prove its primality.
+
+    Parameters:
+        n, p from standard variables;
+
+    Returns:
+        if n composite returns 2;
+        if n can be prime returns 1;
+        if we not find q and n can be prime returns 0.
+
+    For details see (Additional tests step) in [2] or
+    algorithm (9.1.28) step 5 in [1].
+*/
 int
 _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
 {
-    int result, p_counter, counter;
-    ulong q, k;
+    int result, p_counter, m;
+    ulong q;
     fmpz_t npow, qmod;
 
+    /* initialization */
     result = 0;
-    p_counter = 50;
-    counter = 9;
+    p_counter = 50;     /* check only first 50 primes q = 2mp + 1 */
+    m = 9;        /* begin from q = 2*9*p + 1 */
 
     fmpz_init(npow);
     fmpz_init(qmod);
 
+
+    /* check first 50 primes */
     while (p_counter > 0)
     {
-        q = 2 * counter * p + 1;
+        /* 
+            q = 2mp + 1 and m is odd, so if p == 2 
+            then q - 1 | 4 and not q - 1 | 8.
+        */
+        q = 2 * m * p + 1;
+        /* if q prime */
         if (n_is_prime(q))
         {
             fmpz_set_ui(qmod, q);
+            /* npow = n^{(q - 1) / p} */
             fmpz_powm_ui(npow, n, (q - 1) / p, qmod);
+            /* if n^{(q - 1) / p} != 1 mod n then we find q */
             if (fmpz_equal_ui(npow, 1) == 0)
                 break;
+            /* else decrease the prime counter */
             p_counter--;
         }
-        counter += 2;
+        /* m is still odd */
+        m += 2;
     }
 
-    k = p_power_in_q(q - 1, p);
+    /* if we find q */
     if (p_counter != 0)
     {
-        ulong v, h;
+        ulong v, h, k;
         fmpz_t u;
         unity_zp jacobi_sum;
 
         fmpz_init(u);
-        unity_zp_init(jacobi_sum, p, k, n);
 
+        /* find max k such that p^k | q - 1; if p = 2 => k = 2 */
+        k = p_power_in_q(q - 1, p);
+
+        /* compute J(p, q) */
+        unity_zp_init(jacobi_sum, p, k, n);
         jacobi_pq(jacobi_sum, q, p);
+
+        /* compute u and v */
         fmpz_tdiv_q_ui(u, n, n_pow(p, k));
         v = fmpz_tdiv_ui(n, n_pow(p, k));
 
+        /* if p == 2 */
         if (p == 2)
         {
+            /* find h using (2.c) */
             h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
+            /* if h not find or h not primitive root then n is composite */
             if (h < 0 || h % 2 == 0)
                 result = 2;
-            else
+            else  /* else verify (4.a) */
             {
                 fmpz_t ndec, ndecdiv, qpow;
+
                 fmpz_init_set(ndec, n);
                 fmpz_init(ndecdiv);
                 fmpz_init_set_ui(qpow, q);
+
+                /* ndec = n - 1 */
                 fmpz_sub_ui(ndec, ndec, 1);
+                /* ndecdiv = (n - 1) / 2 */
                 fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
+                /* qpow = q^{(n - 1) / 2} */
                 fmpz_powm(qpow, qpow, ndecdiv, n);
 
+                /* if q^{(n - 1) / 2} = -1 mod n then n can b prime */
                 if (fmpz_equal(qpow, ndec) == 1)
                     result = 1;
-                else
+                else /* else n is composite */
                     result = 2;
 
                 fmpz_clear(ndec);
@@ -404,12 +509,14 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
                 fmpz_clear(qpow);
             }
         }
-        else
+        else  /* if p != 2 */
         {
+            /* find h using (2.a) */
             h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
+            /* if h not find or h not primitive root then n is composite */
             if (h < 0 || h % p == 0)
                 result = 2;
-            else
+            else /* else (4.b) is true and n can be prime */
                 result = 1;
         }
 
@@ -417,21 +524,30 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
         unity_zp_clear(jacobi_sum);
     }
 
+    /* if we do not find a q then check (4.c) */
+    if (p_counter == 0)
+        if (fmpz_tdiv_ui(n, p) == 0) /* if p | n then n is composite */
+            result = 2;
+    /* if we not find q and p not | n then we cant prove composite or primality */
+
+    /* clear */
     fmpz_clear(npow);
     fmpz_clear(qmod);
+
     return result;
 }
 
-int
+primality_test_status
 _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 {
     int *lambdas;
     ulong i, j, nmod4;
     primality_test_status result;
-    fmpz_t temp;
-    fmpz_t p2;
-    fmpz_t ndec, ndecdiv;
+    fmpz_t temp, p2, ndec, ndecdiv, u, q_pow;
 
+    /* initialization */
+    fmpz_init(q_pow);
+    fmpz_init(u);
     fmpz_init(temp);
     fmpz_init(p2);
     fmpz_init(ndecdiv);
@@ -440,12 +556,25 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
     
     result = PROBABPRIME;
+
+    /* 
+        Condition (Lp) is satisfied iff:
+        For each p | R we must show that for all prime r | n and all
+        positive integers a there exists l such that:
+            r^(p-1) congruent n^(l(p-1)) mod p^a
+
+        If (Lp), then lambdas_p = 1.
+    */
     lambdas = (int*) malloc(sizeof(int) * config->rs.num);
 
     /* nmod4 = n % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
 
-    /* 1) l_p = 1 if p >= 3 and n^{p-1} != 1 mod p^2; l_p = 0 otherwise. */
+    /* 
+        (1.b) For every prime p | R, set lambdas_p:
+            to 1 if p >= 3 and n^{p - 1} != 1 mod p^2;
+            to 0 otherwise.
+    */
     for (i = 0; i < config->rs.num; i++)
     {
         ulong p = config->rs.p[i];
@@ -462,19 +591,25 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             lambdas[i] = 0;
     }
 
-    /* check that s*R and n are coprime */
+    /* check that s*R and n are coprime; if not then n is composite */
     if (is_mul_coprime_ui_fmpz(config->R, config->s, n) == 0)
         result = COMPOSITE;
 
+    /* end of (1.) */
+
+    /* (2.) begin of Pseudoprime tests with Jacobi sums step. */
+    /* for every prime q | s */
     for (i = 0; i < config->qs->num; i++)
     {
         n_factor_t q_factors;
         ulong q;
+
         if (result == COMPOSITE)
             break;
 
-        q = fmpz_get_ui(config->qs->p + i);
+        q = fmpz_get_ui(config->qs->p + i); /* set q; q must get into ulong */
 
+        /* if n == q; q - prime => n - prime */
         if (fmpz_equal_ui(n, q))
         {
             result = PRIME;
@@ -485,115 +620,119 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
         n_factor_init(&q_factors);
         n_factor(&q_factors, q - 1, 1);
 
+        /* for every prime p | q - 1 */
         for (j = 0; j < q_factors.num; j++)
         {
-            int state, pind;
-            ulong v, p, exp, r, k;
+            int pind;
+            slong h;
+            ulong v, p, r, k;
             unity_zp jacobi_sum, jacobi_sum2_1, jacobi_sum2_2;
-            fmpz_t u, q_pow;
-            if (result == COMPOSITE) break;
 
-            p = q_factors.p[j];
-            exp = q_factors.exp[j];
-            r = n_pow(p, exp);
-            pind = _p_ind(config, p);
-            state = lambdas[pind];
+            if (result == COMPOSITE)
+                break;
 
-            fmpz_init_set_ui(q_pow, q);
-            if (state == 0)
-            {
-                fmpz_powm(q_pow, q_pow, ndec, n);
-            }
+            p = q_factors.p[j];     /* set p; p | q - 1 */
+            k = q_factors.exp[j];   /* set max k for which p^k | q - 1 */
+            r = n_pow(p, k);        /* set r = p^k */
+            pind = _p_ind(config, p);  /* find index of p in lambdas */
 
-            fmpz_init(u);
+            /* if lambdas_p == 0 set q_pow = q^{(n - 1) / 2} and p == 2 */
+            fmpz_set_ui(q_pow, q);
+            if (lambdas[pind] == 0 && p == 2)
+                fmpz_powm(q_pow, q_pow, ndecdiv, n);
+
+            /* compute u = n / r and v = n % r */
             fmpz_tdiv_q_ui(u, n, r);
             v = fmpz_tdiv_ui(n, r);
 
-            unity_zp_init(jacobi_sum, p, exp, n);
-            unity_zp_init(jacobi_sum2_1, p, exp, n);
-            unity_zp_init(jacobi_sum2_2, p, exp, n);
+            /* init unity_zp for jacobi sums */
+            unity_zp_init(jacobi_sum, p, k, n);
+            unity_zp_init(jacobi_sum2_1, p, k, n);
+            unity_zp_init(jacobi_sum2_2, p, k, n);
 
+            /* compute set jacobi_sum = J(p, q) */
             jacobi_pq(jacobi_sum, q, p);
-            if (p == 2 && exp >= 3)
+            /* if p == 2 and k >= 3 we also need to compute J_2(q) and J_3(q) */
+            if (p == 2 && k >= 3)
             {
-                jacobi_2q_one(jacobi_sum2_1, q);
-                jacobi_2q_two(jacobi_sum2_2, q);
+                jacobi_2q_one(jacobi_sum2_1, q);    /* compute J_3(q) */
+                jacobi_2q_two(jacobi_sum2_2, q);    /* compute J_2(q) */
             }
 
-            k = p_power_in_q(q - 1, p);
-
-            slong h;
+            /* check (2.b) */
             if (p == 2 && k == 1)
             {
                 h = _is_prime_jacobi_check_21(q, n);
 
+                /* if h not found then n is composite */
                 if (h < 0)
-                {
                     result = COMPOSITE;
-                }
 
-                if (state == 0 && h == 1 && nmod4 == 1)
-                {
-                    state = 1;
-                    lambdas[pind] = state;
-                }
-                continue;
+                /* 
+                    check (Lp); 
+                    if h == 1 (unity root = -1) 
+                    and n % 4 == 1 then lambdas_2 = 1 
+                */
+                if (lambdas[pind] == 0 && h == 1 && nmod4 == 1)
+                    lambdas[pind] = 1;
             }
 
+            /* check (2.c) */
             if (p == 2 && k == 2)
             {
                 h = _is_prime_jacobi_check_22(jacobi_sum, u, v, q);
 
+                /* if h not found then n is composite */
                 if (h < 0)
-                {
                     result = COMPOSITE;
-                }
-                if (h % 2 != 0 && state == 0 && fmpz_equal(q_pow, ndec))
-                {
-                    state = 1;
-                    lambdas[pind] = state;
-                }
 
-                continue;
+                /* 
+                    check (Lp); 
+                    if h == 1 or 3 (unity root = -i or i) 
+                    and q^{(n - 1) / 2} = -1 mod n then lambdas_2 = 1
+                */
+                if (h % 2 != 0 && lambdas[pind] == 0 && fmpz_equal(q_pow, ndec))
+                    lambdas[pind] = 1;
             }
 
+            /* check (2.d) */
             if (p == 2 && k >= 3)
             {
                 h = _is_prime_jacobi_check_2k(jacobi_sum
                     , jacobi_sum2_1, jacobi_sum2_2, u, v);
 
+                /* if h not found then n is composite */
                 if (h < 0)
-                {
                     result = COMPOSITE;
-                }
 
-                if (h % 2 != 0 && state == 0 && fmpz_equal(q_pow, ndec))
-                {
-                    state = 1;
-                    lambdas[pind] = state;
-                }
-
-                continue;
+                /* 
+                    check (Lp); 
+                    if h % 2 != 0 (primitive unity root) 
+                    and q^{(n - 1) / 2} = -1 mod n then lambdas_2 = 1
+                */
+                if (h % 2 != 0 && lambdas[pind] == 0 && fmpz_equal(q_pow, ndec))
+                    lambdas[pind] = 1;
             }
 
+            /* check (2.a) */
             if (p != 2)
             {
                 h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
 
+                /* if h not found then n is compisite */
                 if (h < 0)
-                {
                     result = COMPOSITE;
-                }
 
-                if (h % p != 0 && state == 0)
-                {
-                    state = 1;
-                    lambdas[pind] = state;
-                }
+                /* 
+                    check (Lp); 
+                    if h % p != 0 (primitive unity root) 
+                    then lambdas_p = 1
+                */
+                if (h % p != 0 && lambdas[pind] == 0)
+                    lambdas[pind] = 1;
             }
 
-            fmpz_clear(u);
-            fmpz_clear(q_pow);
+            /* clear unity_zp for jacobi sums */
             unity_zp_clear(jacobi_sum);
             unity_zp_clear(jacobi_sum2_1);
             unity_zp_clear(jacobi_sum2_2);
@@ -601,32 +740,70 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
     }
 
+    /* end of (2.) */
+
+    /* (3.) begin of Additionl tests step */
+
+    /* if n can be prime */
     if (result == PROBABPRIME)
     {
+        /* for every lambdas_p */
         for (i = 0; i < config->rs.num; i++)
         {
+            /* if lambdas_p == 0 need run additional test for p */
             if (lambdas[i] == 0)
             {
                 int r = _is_prime_jacobi_additional_test(n, config->rs.p[i]);
+
+                /* if r == 2 then we prove that n is composite */
                 if (r == 2)
+                {
                     result = COMPOSITE;
+                }
                 else if (r == 1)
+                {   
+                    /* if r == 1 then we check than n still can be prime */
                     lambdas[i] = 1;
+                }
                 else
+                {
+                    /* 
+                        if r == 0 then we can't find q and we can't 
+                        prove is n prime or composite 
+                    */
                     result = UNKNOWN;
+                }
             }
         }
     }
 
+    /* end of (3.) */
+
+    /* (4.) begin of Final trial division and primality proving step */
+
+    /* 
+        If result = PROBAPRIME then all lambdas_p = 1.
+        Using this information we know that:
+            for every divisor p of f of n there exists i from 0..R-1 such that
+            f == n^i mod s.
+        This is done in is_prime_final_division() function.
+    */
     if (result == PROBABPRIME)
+        /* if we not find divisors of n then n is composite */
         if (is_prime_final_division(n, config->s, config->R) == 1)
             result = PRIME;
 
+    /* end of (4.) */
+
+    /* clear */
     free(lambdas);
+    fmpz_clear(u);
+    fmpz_clear(q_pow);
     fmpz_clear(p2);
     fmpz_clear(ndec);
     fmpz_clear(ndecdiv);
     fmpz_clear(temp);
+
     return result;
 }
 
@@ -635,11 +812,20 @@ is_prime_jacobi(const fmpz_t n)
 {
     primality_test_status result;
     aprcl_config config;
+
+    /* begin of (1.) Precomutation step */ 
+
+    /* 
+        (1.a) Choose R and s values for n and store its factorisation.
+        See definition in aprcl_config functions documentation. s^2 > n.
+    */
     aprcl_config_init_min_R(config, n, 2);
 
     result = _is_prime_jacobi(n, config);
+
     aprcl_config_clear(config);
 
+    /* if we prove primality returns 1 */
     if (result == PRIME)
         return 1;
     return 0;

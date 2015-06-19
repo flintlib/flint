@@ -90,7 +90,7 @@ slong _is_prime_jacobi_check_22(const unity_zp j
     , const fmpz_t u, ulong v, ulong q);
 slong _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
     , const unity_zp j2_2, const fmpz_t u, ulong v);
-int _is_prime_jacobi(const fmpz_t n, const aprcl_config config);
+primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config);
 int is_prime_jacobi(const fmpz_t n);
 
 int is_prime_aprcl(const fmpz_t n);
