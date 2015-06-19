@@ -32,31 +32,6 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X, const mp_limb_t b,
-                        const nmod_mat_t Y)
-{
-    slong i, j;
-
-    if (b == UWORD(0))
-    {
-        if (dest != X)
-            nmod_mat_set(dest, X);
-        return;
-    }
-
-    for (i = 0; i < X->r; i++)
-    {
-        for (j = 0; j < X->c; j++)
-        {
-            nmod_mat_entry(dest, i, j) =
-                n_addmod(nmod_mat_entry(X, i, j),
-                         n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n,
-                                          Y->mod.ninv), X->mod.n);
-        }
-    }
-}
-
-void
 nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest, const nmod_poly_t poly,
                        const nmod_mat_t c)
 {

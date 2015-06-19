@@ -208,6 +208,13 @@ void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
     Sets $B = cA$, where the scalar $c$ is assumed to be reduced
     modulo the modulus. Dimensions of $A$ and $B$ must be identical.
 
+void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
+                        const mp_limb_t b, const nmod_mat_t Y)
+
+    Sets $dest = X + bY$, where the scalar $c$ is assumed to be reduced
+    modulo the modulus. Dimensions of dest, X and Y must be identical.
+    dest can be aliased with X or Y.
+
 
 *******************************************************************************
 
