@@ -91,7 +91,8 @@
         If there exist h such that j0^u * jv = \zeta_{p^k}^h returns h;
         otherwise returns -1.
 
-    For details about j0 and jv see (i1a) in [2].
+    For details about j0 and jv see (i1a) in [2] or
+    algorithm (9.1.28) step 4.a in [1].
 */
 slong
 _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
@@ -158,9 +159,8 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     (2.b)
     Check the case p = 2 and k = 1.
 
-    Computes j0 = j_{0, p, q}, jv = j_{v, p, q} and checks that
-    j0^u * jv is unity root. 
-    j^0^u * jv = (-q)^{(n - 1) / 2}.
+    Computes j0 = j_{0, 2, q}, jv = j_{v, 2, q} and checks that
+    j0^u * jv is unity root. j^0^u * jv = (-q)^{(n - 1) / 2}.
 
     Parameters:
         q, n from standard variables;
@@ -172,7 +172,6 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
 
     For details see (i1b) in [2] or
     algorithm (9.1.28) step 4.d in [1].
-
 */
 slong
 _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
@@ -208,29 +207,57 @@ _is_prime_jacobi_check_21(ulong q, const fmpz_t n)
     return h;
 }
 
+/*
+    (2.c)
+    Check the case p = 2 and k = 2.
+
+    Computes j0 = j_{0, 2, q}, jv = j_{v, 2, q} and checks that
+    j0^u * jv is unity root.
+
+    Parameters:
+        j = J(2, q);
+        u, v, q from standard variables;
+
+    Returns:
+        If there exist h such that j0^u * jv = \zeta_{4}^h returns h
+        \zeta_4^h \in (1, i, -1, -i);
+        otherwise returns -1.
+
+    For details see (i1c) in [2] or
+    algorithm (9.1.28) step 4.c in [1].
+*/
 slong
 _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
 {
     slong h;
     unity_zp j0, jv, j_pow;
 
+    /* initialization */
     unity_zp_init(j_pow, 2, 2, j->n);
     unity_zp_init(j0, 2, 2, j->n);
     unity_zp_init(jv, 2, 2, j->n);
 
+    /* set j0 = q * j^2 */
     unity_zp_mul(j_pow, j, j);
     unity_zp_mul_scalar_ui(j0, j_pow, q);
 
+    /*
+        if v == 1 jv = 1
+        if v == 3 jv = j^2
+    */
     if (v == 1)
         unity_zp_coeff_set_ui(jv, 0, 1);
     else if (v == 3)
         unity_zp_swap(jv, j_pow);
 
+    /* j0 = j0^u * jv */
     unity_zp_pow_fmpz(j_pow, j0, u);
     unity_zp_mul(j0, jv, j_pow);
 
+    /* try to find h */
     h = unity_zp_is_unity(j0);
 
+    /* clear */
     unity_zp_clear(j_pow);
     unity_zp_clear(j0);
     unity_zp_clear(jv);

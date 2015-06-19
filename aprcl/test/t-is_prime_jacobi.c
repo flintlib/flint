@@ -73,13 +73,10 @@ int main(void)
 
     /* Test _is_prime_jacobi_check_21() */
     {
-        ulong p, q, v, k, p_pow;
+        ulong q;
         fmpz_t n;
 
         q = 7;
-        p = 2;
-        k = 1;
-        p_pow = n_pow(p, k);
 
         fmpz_init_set_ui(n, 101);
 
