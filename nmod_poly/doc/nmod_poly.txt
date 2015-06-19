@@ -1321,7 +1321,7 @@ void nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest,
     and stores the result in \code{dest}. The dimension and modulus of
     \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
     \code{c} may be aliased. Paterson-Stockmeyer algorithm is used to compute
-    the result.
+    the result. The algorithm is described in \cite{Paterson73}.
 
 *******************************************************************************
 
