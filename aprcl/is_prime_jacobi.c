@@ -31,7 +31,7 @@
         [1] "A Course in Computational Algebraic Number Theory" by H. Cohen
         [2] "Implementation of a New Primality Test" by H. Cohen and A. K. Lenstra
 
-    The algorithm consist of N steps:
+    The algorithm consist of 4 steps:
         (1.) Precomutation;
         (2.) Pseudoprime tests with Jacobi sums;
         (3.) Additionl tests;
