@@ -1190,6 +1190,42 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
     If the algorithm succeeds, it returns the factor, otherwise it
     returns $0$ or $1$ (the trivial factors modulo $n$).
 
+int n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, 
+                              mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits,
+                              mp_limb_t max_iters)
+
+    Pollard Rho algorithm (with Brent modification) for integer factorization. 
+    Assumes that the $n$ is not prime. $factor$ is set as the factor if found. 
+    It is not assured that the factor found will be prime. Does not compute the complete 
+    factorization, just one factor. Returns 1 if factorization is successfull 
+    (non trivial factor is found), else returns 0. Assumes $n$ is normalized,
+    (shifted by normbits bits), and takes as input a precomputed inverse of $n$ as 
+    computed by \code{n_preinvert_limb()}. $ai$ and $xi$ should also be shifted
+    left by $normbits$.
+
+    $ai$ is the constant of the polynomial used, $xi$ is the initial value. 
+    $max_iters$ is the number of iterations tried in process of finding the 
+    cycle.
+
+    The algorithm used is a modification of the original Pollard Rho algorithm,
+    suggested by Richard Brent in the paper, availible at
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
+
+int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, 
+                        mp_limb_t max_tries, mp_limb_t max_iters)       
+
+    Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to 
+    \code{n_factor_pollard_brent_single}. The input parameters ai and xi for
+    \code{n_factor_pollard_brent_single} are selected at random. 
+
+    If the algorithm fails to find a non trivial factor in one call, it tries again 
+    (this time with a different set of random values). This process is repeated a 
+    maximum of $max_tries$ times. 
+
+    Assumes $n$ is not prime. $factor$ is set as the factor found, if factorization
+    is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
+    discovered is not necessarily prime.
+
 *******************************************************************************
 
     Arithmetic functions
