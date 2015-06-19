@@ -114,6 +114,19 @@ FLINT_DLL void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t
 FLINT_DLL void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state,
                         slong len, mp_bitcnt_t bits, float density);
 
+/* Windows and concatenation */
+
+FLINT_DLL void fmpz_poly_mat_window_init(fmpz_poly_mat_t window, const fmpz_poly_mat_t mat, slong r1,
+    slong c1, slong r2, slong c2);
+
+FLINT_DLL void fmpz_poly_mat_window_clear(fmpz_poly_mat_t window);
+
+FLINT_DLL void fmpz_poly_mat_concat_horizontal(fmpz_poly_mat_t res,
+                           const fmpz_poly_mat_t mat1,  const fmpz_poly_mat_t mat2);
+
+FLINT_DLL void fmpz_poly_mat_concat_vertical(fmpz_poly_mat_t res,
+                           const fmpz_poly_mat_t mat1,  const fmpz_poly_mat_t mat2);
+
 /* Input and output **********************************************************/
 
 FLINT_DLL void fmpz_poly_mat_print(const fmpz_poly_mat_t mat, const char * x);

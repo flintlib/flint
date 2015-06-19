@@ -77,7 +77,7 @@ distclean: clean
 	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
-	git archive --format tar --prefix flint-2.4.2/ flint-2.4 > ../flint-2.4.2.tar; gzip ../flint-2.4.2.tar
+	git archive --format tar --prefix flint-2.4.5/ flint-2.4 > ../flint-2.4.5.tar; gzip ../flint-2.4.5.tar
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile
@@ -126,7 +126,7 @@ libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | bu
 	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;))
 
-library:
+library: build/CPimport.h
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(MAKE) shared; \
 	fi
@@ -146,6 +146,23 @@ tests: library test_helpers.o $(TESTS)
 		$(MAKE) build/interfaces/test/t-NTL-interface; \
 	fi
 
+define test_mod
+	$(eval vl := $(subst :, ,$(1)))
+	$(eval dir := $(firstword $(vl)))
+	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
+	$(eval USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests))
+	$(AT)test ! -d $(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir)  || $(MAKE) $(USER_SET_TESTS_VAR) -f ../Makefile.subdirs -C $(dir) check
+endef
+
+define test_mod_ext
+	$(eval vl := $(subst :, ,$(1)))
+	$(eval ext := $(2))
+	$(eval dir := $(firstword $(vl)))
+	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
+	$(eval USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests))
+	$(AT)MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) $(USER_SET_TESTS_VAR) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check
+endef
+
 check: library test_helpers.o
 ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
@@ -158,8 +175,8 @@ ifndef MOD
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(AT)$(foreach dir, $(MOD), test ! -d $(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir) || $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach dir, $(MOD), MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
+	$(AT)$(foreach mod, $(MOD), $(call test_mod,$(mod)) || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
 endif
 
 valgrind: library
@@ -183,14 +200,15 @@ install: library
 	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
 		cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
 	fi
-	mkdir -p "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
-	cp qadic/CPimport.txt "$(DESTDIR)$(FLINT_CPIMPORT_DIR)"
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 
 build:
 	mkdir -p build
+
+build/CPimport.h: qadic/CPimport.txt build
+	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
 
 build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
@@ -208,13 +226,13 @@ build/interfaces:
 	mkdir -p build/interfaces
 
 build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@
 
 build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@
 
-build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.lo -o $@ $(LIBS);
+build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o
+	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS)
 
 print-%:
 	@echo '$*=$($*)'

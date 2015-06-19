@@ -63,8 +63,8 @@
 
 #define __FLINT_VERSION 2
 #define __FLINT_VERSION_MINOR 4
-#define __FLINT_VERSION_PATCHLEVEL 4 
-#define FLINT_VERSION "2.4.4"
+#define __FLINT_VERSION_PATCHLEVEL 5 
+#define FLINT_VERSION "2.4.5"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -103,7 +103,7 @@ typedef void (*flint_cleanup_function_t)(void);
 FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 FLINT_DLL void flint_cleanup(void);
 
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(__mips64)
 #define WORD_FMT "%ll"
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
@@ -291,7 +291,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 
 #define TMP_ALLOC(size) \
    ((size) > 8192 ? \
-      (__tpx = alloca(sizeof(__tmp_t)), \
+      (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \
        __tmp_root = __tpx, \
        __tpx->block = flint_malloc(size)) : \

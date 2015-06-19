@@ -29,7 +29,7 @@
 slong
 fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
-    if (FLINT_MIN(A->c, A->r) <= 12)
+    if (FLINT_MIN(A->c, A->r) <= 20)
         return fmpz_mat_rref_fflu(R, den, A);
     else if (A->r <= 105 && A->c >= 1.4 * A->r)
         return fmpz_mat_rref_fflu(R, den, A);

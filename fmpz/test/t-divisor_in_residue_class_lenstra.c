@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    int i, result, r1;
+    int i, result;
     FLINT_TEST_INIT(state);
 
     flint_printf("divisors_in_residue_class....");

@@ -58,9 +58,6 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p,
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
 
-    The path to the Conway polynomial data file can be set at runtime using 
-    \code{flint_set_cpimport()}, documented in the \code{qadic} module.
-
 void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p,
                              slong d, const char *var)
 
@@ -72,9 +69,6 @@ void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p,
 
     Assumes that the string \code{var} is a null-terminated string
     of length at least one.
-
-    The path to the Conway polynomial data file can be set at runtime using 
-    \code{flint_set_cpimport()}, documented in the \code{qadic} module.
 
 void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
                               nmod_poly_t modulus,
@@ -435,7 +429,7 @@ void _fq_nmod_trace(fmpz_t rop, mp_srcptr *op, slong len,
     Sets \code{rop} to the trace of the non-zero element \code{(op, len)}
     in $\mathbf{F}_{q}$.
 
-void fq_nmod_trace(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Sets \code{rop} to the trace of \code{op}.
 
@@ -451,7 +445,7 @@ void _fq_nmod_norm(fmpz_t rop, mp_srcptr *op, slong len, const fq_nmod_ctx_t ctx
     Sets \code{rop} to the norm of the non-zero element \code{(op, len)}
     in $\mathbf{F}_{q}$.
 
-void fq_nmod_norm(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Computes the norm of \code{op}.
 

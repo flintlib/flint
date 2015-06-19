@@ -1,6 +1,7 @@
 QUIET_CC  = @echo '   ' CC  ' ' $@;
 
 AT=@
+comma=,
 
 SOURCES = $(wildcard *.c)
 
@@ -12,8 +13,14 @@ OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo
 
-TEST_SOURCES = $(wildcard test/*.c)
-TESTXX_SOURCES = $(wildcard test/*.cpp)
+ifndef USER_SET_TESTS
+	TEST_SOURCES = $(wildcard test/*.c)
+	TESTXX_SOURCES = $(wildcard test/*.cpp)
+else
+	TL = $(subst $(comma), ,$(USER_SET_TESTS))
+	TEST_SOURCES = $(foreach test, $(TL), $(wildcard test/t-$(test).c))
+	TESTXX_SOURCES = $(foreach test, $(TL), $(wildcard test/t-$(test).cpp))
+endif
 
 PROF_SOURCES = $(wildcard profile/*.c)
 

@@ -19,39 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Jan Tuitman
-    Copyright (C) 2011, 2012 Sebastian Pancratz
-    Copyright (C) 2014 William Hart
+    Copyright (C) 2015 Elena Sergeicheva
 
 ******************************************************************************/
 
-#include "padic.h"
+#include "fmpq_mat.h"
 
-int padic_sqrt_exact(padic_t rop, const padic_t op)
+void
+fmpq_mat_window_init(fmpq_mat_t window, const fmpq_mat_t mat, slong r1,
+                     slong c1, slong r2, slong c2)
 {
-    fmpz_t r;
-    int res = 1;
+    slong i;
+    window->entries = NULL;
 
-    if (padic_is_zero(op))
-    {
-        padic_zero(rop);
-        return 1;
-    }
-    if (padic_val(op) & WORD(1))
-    {
-        return 0;
-    }
+    if (r2 - r1)
+        window->rows = flint_malloc((r2 - r1) * sizeof(fmpq *));
 
-    padic_val(rop) = padic_val(op) / 2;
+    for (i = 0; i < r2 - r1; i++)
+        window->rows[i] = mat->rows[r1 + i] + c1;
 
-    fmpz_init(r);
-
-    fmpz_sqrtrem(padic_unit(rop), r, padic_unit(op));
-
-    res = fmpz_is_zero(r);
-
-    fmpz_clear(r);
-
-    return res;
+    window->r = r2 - r1;
+    window->c = c2 - c1;
 }
-

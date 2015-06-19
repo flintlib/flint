@@ -19,19 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2014 William Hart
- 
+    Copyright (C) 2015 Elena Sergeicheva
+
 ******************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
+#include "fq_mat.h"
 
-#include "qadic.h"
+#ifdef T
+#undef T
+#endif
 
-char * flint_cpimport = NULL;
-
-void flint_set_cpimport(char * path)
-{
-   flint_cpimport = path;
-}
-
+#define T fq
+#define CAP_T FQ
+#include "fq_mat_templates/concat_vertical.c"
+#undef CAP_T
+#undef T

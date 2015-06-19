@@ -19,24 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
-    Copyright (C) 2014 William Hart
- 
+    Copyright (C) 2015 Elena Sergeicheva
+
 ******************************************************************************/
 
-#include "padic.h"
+#include "fq_mat.h"
 
-void padic_mul_exact(padic_t rop, const padic_t op1, const padic_t op2, 
-               const padic_ctx_t ctx)
-{
-    if (padic_is_zero(op1) || padic_is_zero(op2))
-    {
-        padic_zero(rop);
-    }
-    else
-    {
-        fmpz_mul(padic_unit(rop), padic_unit(op1), padic_unit(op2));
-        padic_val(rop) = padic_val(op1) + padic_val(op2);
-    }
-}
+#ifdef T
+#undef T
+#endif
 
+#define T fq
+#define CAP_T FQ
+#include "fq_mat_templates/test/t-concat_vertical.c"
+#undef CAP_T
+#undef T

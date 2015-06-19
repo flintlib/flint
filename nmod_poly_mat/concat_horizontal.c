@@ -19,48 +19,37 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
- 
+    Copyright (C) 2015 Elena Sergeicheva
+
 ******************************************************************************/
 
-#include "padic.h"
 
-int padic_div_exact_fmpz(padic_t rop, const padic_t op1, const fmpz_t op2,
-                                   const padic_ctx_t ctx)
+
+
+#include "nmod_poly_mat.h"
+
+void
+nmod_poly_mat_concat_horizontal(nmod_poly_mat_t res, const nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
 {
-    int res = 1;
-
-    if (fmpz_is_zero(op2))
+    slong i, j;
+    slong r1 = mat1->r;
+    slong c1 = mat1->c;
+    slong r2 = mat2->r;
+    slong c2 = mat2->c;
+    
+    for (i = 0; i < r1; i++)
     {
-        flint_printf("Exception (padic_div_exact_fmpz).  op2 is zero.\n");
-        abort();
+        for (j = 0; j < c1; j++)
+        {
+            nmod_poly_set(nmod_poly_mat_entry(res, i, j), nmod_poly_mat_entry(mat1, i, j));
+        }
     }
 
-    if (fmpz_sgn(op2) < 0)
-       return 0;
-
-    if (padic_is_zero(op1))
+    for (i = 0; i < r2; i++)
     {
-        padic_zero(rop);
+        for (j = 0; j < c2; j++)
+        {
+            nmod_poly_set(nmod_poly_mat_entry(res, i, j + c1), nmod_poly_mat_entry(mat2, i, j));
+        }
     }
-    else if (!fmpz_is_one(op2))
-    {
-        fmpz_t r;
-        slong val;
-
-        fmpz_init(r);
-       
-        val = fmpz_remove(r, op2, ctx->p);
-
-        fmpz_tdiv_qr(padic_unit(rop), r, padic_unit(op1), r);
-
-        res = fmpz_is_zero(r);
-
-        fmpz_clear(r);
-
-        padic_val(rop) = padic_val(op1) - val;
-    }
-
-    return res;
 }
-

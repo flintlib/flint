@@ -28,9 +28,6 @@ EXT_MODS=
 EXTRA_BUILD=
 FLINT_DLL=0
 
-FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
-FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
-
 usage()
 {
    echo "Usage: ./configure <options> <args>"
@@ -109,8 +106,6 @@ while [ "$1" != "" ]; do
          ;;
       --prefix)
          PREFIX=$VALUE
-         FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
-         FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
          ;;
       --enable-shared)
          SHARED=1
@@ -361,6 +356,8 @@ case "$ARCH" in
       MACHINE="ppc64";;
    ppc | powerpc | [P|p]ower*)
       MACHINE="ppc";;
+   mips64)
+      MACHINE="mips64";;
    *)
       MACHINE="unknown";;
 esac
@@ -497,14 +494,12 @@ if [ -z "$CFLAGS" ]; then
       CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    elif [ "$OS" = "CYGWIN64" ]; then
       CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
+   elif [ "$MACHINE" = "mips64" ]; then
+      CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    else
       CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    fi
 fi
-
-#Conway polynomials database
-
-CFLAGS="$CFLAGS -DFLINT_CPIMPORT=\\\"$FLINT_CPIMPORT\\\""
 
 #this is needed on PPC G5 and does not hurt on other OS Xes
 
@@ -663,9 +658,6 @@ echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile
 echo "WANT_NTL=$WANT_NTL" >> Makefile
-echo "" >> Makefile
-echo "FLINT_CPIMPORT_DIR=$FLINT_CPIMPORT_DIR" >> Makefile
-echo "FLINT_CPIMPORT=$FLINT_CPIMPORT" >> Makefile
 echo "" >> Makefile
 echo "INCS=$INCS" >> Makefile
 echo "LIBS=$LIBS" >> Makefile

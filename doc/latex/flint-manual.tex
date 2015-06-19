@@ -482,6 +482,16 @@ also pass a list of module names in inverted commas, e.g:
 
 \begin{lstlisting}[language=bash]
 make check MOD=ulong_extras
+make check MOD="fft fmpz_mat"
+\end{lstlisting}
+
+To specify an individual test(s) for any module you can add it 
+(or comma separated test list)
+after chosen module name followed by the colon, e.g.:
+
+\begin{lstlisting}[language=bash]
+make check MOD=ulong_extras:clog,factor,is_prime
+make check MOD="fft fmpz_mat:add_sub,charpoly fq_vec:add"
 \end{lstlisting}
 
 FLINT has an assert system. If you want a debug build you can pass
@@ -685,6 +695,25 @@ Weiferich prime search. (Funded by the Nuffield Foundation)
 $\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against 
 Feitma's tables and sped up and corrected \code{n_is_prime} and 
 \code{n_is_probabprime}.
+
+$\bullet$ Anubhav Srivastava contributed horizontal and vertical concatenation
+of matrices over $\mathbb{Z}$ and an implementation of the Bodrato matrix
+squaring algorithm.
+
+$\bullet$ Dharak Kharod and Prabhdeep Singh Walia both independently
+contributed matrix content.
+
+$\bullet$ Alena Sergeicheva contributed a patch to the build system for
+individual file testing and also contributed numerous matrix concatenation
+functions.
+
+$\bullet$ Kushagra Singh contributed fast cube root and nth root code for word
+sized integers, including magic number, Newton iteration, Kahan iteration and
+Chebyshev approximation code.
+
+$\bullet$ Andreas Enge help with a port to MIPS64.
+
+$\bullet$ Tommy Hofmann supplied some inline functions.
 
 $\bullet$ Patches and bug reports have been made by Michael Abshoff,
 Didier Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Gonzalo Tornaria,

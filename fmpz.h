@@ -754,9 +754,6 @@ FLINT_DLL int fmpz_is_prime(const fmpz_t p);
 FLINT_DLL int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, 
                                                const fmpz_t r, const fmpz_t s);
 
-FLINT_DLL int fmpz_is_prime_lenstra(fmpz_t F, fmpz * r, const fmpz_t n, 
-                                                    mp_ptr pk1, slong num_pk1, slong k);
-
 /* Primorials */
 
 FLINT_DLL void fmpz_primorial(fmpz_t res, ulong n);

@@ -19,41 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
- 
+    Copyright (C) 2015 Elena Sergeicheva
+
 ******************************************************************************/
 
-#include "padic.h"
 
-int padic_div_exact(padic_t rop, const padic_t op1, const padic_t op2)
+#ifdef T
+
+#include "templates.h"
+
+void
+TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
+		                            const TEMPLATE(T, mat_t) mat1,
+		                            const TEMPLATE(T, mat_t) mat2,
+		                            const TEMPLATE(T, ctx_t) ctx)
 {
-    int res = 1;
+    slong i, j;
+    slong r1 = mat1->r;
+    slong c1 = mat1->c;
+    slong c2 = mat2->c;
 
-    if (padic_is_zero(op2))
-    {
-        flint_printf("Exception (padic_div_exact).  op2 is zero.\n");
-        abort();
-    }
-
-    if (padic_is_zero(op1))
-    {
-        padic_zero(rop);
-    }
-    else
-    {
-        fmpz_t r;
-   
-        fmpz_init(r);
-       
-        fmpz_tdiv_qr(padic_unit(rop), r, padic_unit(op1), padic_unit(op2));
-
-        res = fmpz_is_zero(r);
-
-        fmpz_clear(r);
-
-        padic_val(rop) = padic_val(op1) - padic_val(op2);
-    }
-
-    return res;
+   for (i = 0; i < r1; i++) {
+       _TEMPLATE(T, vec_set) (res->rows[i], mat1->rows[i], c1, ctx);
+       _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
+   }
 }
 
+
+#endif

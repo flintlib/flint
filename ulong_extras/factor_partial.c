@@ -47,6 +47,12 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
 
    cofactor = n_factor_trial_partial(factors, n, &prod, FLINT_FACTOR_TRIAL_PRIMES, limit);
    if (prod > limit) return cofactor;
+
+   if ( cofactor == 1 )
+   {
+      return cofactor;
+   }
+
    if (is_prime2(cofactor, proved)) 
    {
       n_factor_insert(factors, cofactor, UWORD(1));

@@ -20,8 +20,10 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2015 Anubhav Srivastava
 
 ******************************************************************************/
+
 
 #include "fmpz_mat.h"
 
@@ -30,40 +32,42 @@
 void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    slong n = A->r;
-
-    if (n == 0)
+    slong n = A->r, ab;
+    
+    if (B == A)
     {
+        fmpz_mat_t t;
+        fmpz_mat_init(t, n, n);
+        fmpz_mat_sqr(t, A);
+        fmpz_mat_swap(B, t);
+        fmpz_mat_clear(t);
         return;
     }
-    else if (n == 1)
+
+    if (n <= 12)
     {
-        fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-    }
-    else if (n == 2)
-    {
-        fmpz_t t, u;
-
-        fmpz_init(t);
-        fmpz_init(u);
-
-        fmpz_add(t, E(A, 0, 0), E(A, 1, 1));
-        fmpz_mul(u, E(A, 0, 1), E(A, 1, 0));
-
-        fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-        fmpz_add(E(B, 0, 0), E(B, 0, 0), u);
-
-        fmpz_mul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
-        fmpz_add(E(B, 1, 1), E(B, 1, 1), u);
-
-        fmpz_mul(E(B, 0, 1), E(A, 0, 1), t);
-        fmpz_mul(E(B, 1, 0), E(A, 1, 0), t);
-
-        fmpz_clear(t);
-        fmpz_clear(u);
+        if (n <= 3)
+        {   
+            fmpz_mat_sqr_bodrato(B, A);
+        }
+        else
+        {
+            fmpz_mat_mul(B, A, A);    
+        }
     }
     else
     {
-        fmpz_mat_mul(B, A, A);
+        ab = fmpz_mat_max_bits(A);
+        ab = FLINT_ABS(ab);
+
+        if (5*(ab + ab) > n * n )
+        {
+            fmpz_mat_sqr_bodrato(B, A);
+        }
+        else
+        {
+            fmpz_mat_mul(B, A, A);
+        }
+
     }
 }
