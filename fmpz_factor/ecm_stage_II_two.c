@@ -39,6 +39,7 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     int i, j, ret;
     fmpz * jz, * jx;
 
+    fmpz_init(tim);
     fmpz_init(Qx);
     fmpz_init(Qz);
     fmpz_init(Qdx);
@@ -181,6 +182,7 @@ fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     _fmpz_vec_clear(jz, Psq);
     _fmpz_vec_clear(jx, Psq);
 
+    fmpz_clear(tim);
     fmpz_clear(Qx);
     fmpz_clear(Qz);
     fmpz_clear(Qdx);

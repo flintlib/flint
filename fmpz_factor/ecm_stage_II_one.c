@@ -52,6 +52,7 @@ fmpz_factor_ecm_stage_II_one(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     fmpz_init(Rz);
     fmpz_init(a);
     fmpz_init(b);
+    fmpz_init(tim);
 
     fmpz_init_set_ui(g, 1);
 
@@ -138,6 +139,7 @@ fmpz_factor_ecm_stage_II_one(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     if (!fmpz_is_one(f) && fmpz_cmp(f, n))
         ret = 1;
 
+    fmpz_clear(tim);
     fmpz_clear(Qx);
     fmpz_clear(Qz);
     fmpz_clear(Qdx);
