@@ -25,6 +25,291 @@
 
 #include "aprcl.h"
 
+/*
+    Below is the implementation of primality test using Jacibi sums.
+    Many steps are well described in:
+        [1] "A Course in Computational Algebraic Number Theory" by H. Cohen
+        [2] "Implementation of a New Primality Test" by H. Cohen and A. K. Lenstra
+
+    The algorithm consist of N steps:
+        (1.) Precomutation;
+        (2.) Pseudoprime tests with Jacobi sums;
+        (3.) Additionl tests;
+        (4.) Final trial division and primality proving.
+
+    The file contains the implementation of steps (2.) and (3.).
+    It also contains the Jacobi sum primality test.
+    A small part of implementation of step (1.) is here and most are in
+    aprcl_config file.
+    (4.) implemented in function is_prime_final_division().
+
+    Standard variables:
+        n - number to check for primality;
+        
+        R - configuration parameter;
+        s - configuration parameter depends on the R; s^2 > n;
+
+        q - prime number such that (q | s);
+        p - prime number such that (p | q - 1);
+        r - prime power p^k such that (r | q - 1) and not (r * p | q - 1);
+        k - power of p in r;
+
+        v - n % r;
+        u - n / r;
+
+    Standard notation:
+        \zeta_p - p-th root of unity;
+        \sigma_x - automorphism of Z[\zeta_p] for which
+                \sigma_x(\zeta_p) = \zeta_p^x;
+        \sigma_x^{-1} - inverse of \sigma_x;
+
+        \chi_{p, q} - character defined by 
+                \chi_{p, q}(g^x) = \zeta_{p^k}^x, 
+                there g is a primitive root modulo q;
+
+        J(p, q) - jacobi sum j(\chi_{p, q}, \chi_{p, q});
+        J_2(q)  - jacobi sum 
+                ( j(\chi_{2, q}^{2^{k - 3}}, \chi{2, q}^{3 * 2^{k - 3}}) )^2;
+        J_3(q)  - jacobi sum
+                j(\chi_{2, q}, \chi_{2, q}, \chi_{2, q}) =
+                J(2, q) * j(\chi{2, q}^2, \chi{2, q});
+*/
+
+/*----------------------------------------------------------------------------*/
+
+/*
+    (2.a)
+    Checks the case p != 2.
+    Computes j0 = j_{0, p, q}, jv = j_{v, p, q} and checks that
+    j0^u * jv is unity root.
+
+    Parameters:
+        j = J(p, q);
+        u, v from standard variables;
+
+    Returns:
+        If there exist h such that j0^u * jv = \zeta_{p^k}^h returns h;
+        otherwise returns -1.
+
+    For details about j0 and jv see (i1a) in [2].
+*/
+slong
+_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
+{
+    slong h;
+    ulong i, r;
+    unity_zp j0, jv, temp, aut;
+
+    /* initialization */
+    r = n_pow(j->p, j->exp);            /* r = p^k */
+    unity_zp_init(j0, j->p, j->exp, j->n);
+    unity_zp_init(jv, j->p, j->exp, j->n);
+    unity_zp_init(temp, j->p, j->exp, j->n);
+    unity_zp_init(aut, j->p, j->exp, j->n);
+
+    unity_zp_coeff_set_ui(j0, 0, 1);    /* j0 = 1 */
+    unity_zp_coeff_set_ui(jv, 0, 1);    /* jv = 1 */
+
+    /* for i in 1..p^k */
+    for (i = 1; i <= r; i++)
+    {
+        /* only for i that coprime to p */
+        if (i % j->p == 0) continue;
+
+        /* update j0 = \prod{\sigma_i^{-1}(j^i)} */
+        unity_zp_pow_ui(temp, j, i);
+        _unity_zp_reduce_cyclotomic(temp);
+        /* aut = \sigma_i^{-1}(temp) */
+        unity_zp_aut_inv(aut, temp, i);
+
+        /* j0 *= aut */
+        unity_zp_mul(temp, j0, aut);
+        unity_zp_swap(temp, j0);
+
+        /* update jv = \prod{\sigma_i^{-1}(j^{(v * i) / r})} */
+        unity_zp_pow_ui(temp, j, (v * i) / r);
+        _unity_zp_reduce_cyclotomic(temp);
+        /* aut = \sigma_i^{-1}(temp) */
+        unity_zp_aut_inv(aut, temp, i);
+
+        /* jv *= aut */
+        unity_zp_mul(temp, jv, aut);
+        unity_zp_swap(temp, jv);
+    }
+
+    /* temp = j0^u */
+    unity_zp_pow_fmpz(temp, j0, u);
+    /* j0 = j0^u * jv */
+    unity_zp_mul(j0, jv, temp);
+    
+    /* try to find h */
+    h = unity_zp_is_unity(j0);
+
+    /* clear */
+    unity_zp_clear(aut);
+    unity_zp_clear(j0);
+    unity_zp_clear(jv);
+    unity_zp_clear(temp);
+
+    return h;
+}
+
+/*
+    (2.b)
+    Check the case p = 2 and k = 1.
+
+    Computes j0 = j_{0, p, q}, jv = j_{v, p, q} and checks that
+    j0^u * jv is unity root. 
+    j^0^u * jv = (-q)^{(n - 1) / 2}.
+
+    Parameters:
+        q, n from standard variables;
+
+    Returns:
+        If j0^u * jv = 1 returns 0;
+        If j0^u * jv = -1 returns 1;
+        otherwise returns -1.
+
+    For details see (i1b) in [2] or
+    algorithm (9.1.28) step 4.d in [1].
+
+*/
+slong
+_is_prime_jacobi_check_21(ulong q, const fmpz_t n)
+{
+    slong h;
+    fmpz_t qpow, ndec, temp;
+
+    /* initialization */
+    fmpz_init(temp);
+    fmpz_init_set_ui(qpow, q);
+    fmpz_init_set(ndec, n);
+
+    /* qpow = -q mod n */
+    fmpz_sub(qpow, n, qpow);
+    fmpz_sub_ui(ndec, ndec, 1);
+    /* temp = (n - 1) / 2 */
+    fmpz_fdiv_q_2exp(temp, ndec, 1);
+    /* qpow = (-q)^{(n - 1) / 2} */
+    fmpz_powm(qpow, qpow, temp, n);
+
+    h = -1;
+    /* check if qpow == +-1 */
+    if (fmpz_equal_ui(qpow, 1))
+        h = 0;
+    if (fmpz_equal(qpow, ndec))
+        h = 1;
+
+    /* clear */
+    fmpz_clear(temp);
+    fmpz_clear(qpow);
+    fmpz_clear(ndec);
+
+    return h;
+}
+
+slong
+_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
+{
+    slong h;
+    unity_zp j0, jv, j_pow;
+
+    unity_zp_init(j_pow, 2, 2, j->n);
+    unity_zp_init(j0, 2, 2, j->n);
+    unity_zp_init(jv, 2, 2, j->n);
+
+    unity_zp_mul(j_pow, j, j);
+    unity_zp_mul_scalar_ui(j0, j_pow, q);
+
+    if (v == 1)
+        unity_zp_coeff_set_ui(jv, 0, 1);
+    else if (v == 3)
+        unity_zp_swap(jv, j_pow);
+
+    unity_zp_pow_fmpz(j_pow, j0, u);
+    unity_zp_mul(j0, jv, j_pow);
+
+    h = unity_zp_is_unity(j0);
+
+    unity_zp_clear(j_pow);
+    unity_zp_clear(j0);
+    unity_zp_clear(jv);
+
+    return h;
+}
+
+slong
+_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp jv_1
+        , const unity_zp jv_2, const fmpz_t u, ulong v)
+{
+    slong h;
+    ulong i, r;
+    unity_zp j_jv, j0, jv, temp, aut;
+
+    r = n_pow(j->p, j->exp);
+    unity_zp_init(temp, 2, j->exp, j->n);
+    unity_zp_init(j_jv, 2, j->exp, j->n);
+    unity_zp_init(aut, 2, j->exp, j->n);
+    unity_zp_init(j0, 2, j->exp, j->n);
+    unity_zp_init(jv, 2, j->exp, j->n);
+
+    unity_zp_coeff_set_ui(j0, 0, 1);
+    unity_zp_coeff_set_ui(jv, 0, 1);
+
+    unity_zp_mul(j_jv, j, jv_1);
+
+    for (i = 1; i < r;)
+    {
+        unity_zp_pow_ui(temp, j_jv, i);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, j0, aut);
+        unity_zp_swap(temp, j0);
+
+        unity_zp_pow_ui(temp, j_jv, (v * i) / r);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, jv, aut);
+        unity_zp_swap(temp, jv);
+
+        i += 2;
+
+        unity_zp_pow_ui(temp, j_jv, i);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, j0, aut);
+        unity_zp_swap(temp, j0);
+
+        unity_zp_pow_ui(temp, j_jv, (v * i) / r);
+        _unity_zp_reduce_cyclotomic(temp);
+        unity_zp_aut_inv(aut, temp, i);
+        unity_zp_mul(temp, jv, aut);
+        unity_zp_swap(temp, jv);
+
+        i += 6;
+    }
+
+    if (v % 8 != 1 && v % 8 != 3)
+    {
+        unity_zp_mul(temp, jv_2, jv_2);
+        unity_zp_mul(j_jv, jv, temp);
+        unity_zp_swap(j_jv, jv);
+    }
+
+    unity_zp_pow_fmpz(temp, j0, u);
+    unity_zp_mul(j0, jv, temp);
+    
+    h = unity_zp_is_unity(j0);
+
+    unity_zp_clear(aut);
+    unity_zp_clear(j0);
+    unity_zp_clear(jv);
+    unity_zp_clear(j_jv);
+    unity_zp_clear(temp);
+
+    return h;
+}
+
 int
 _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
 {
@@ -110,188 +395,11 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
     return result;
 }
 
-/* if returns >= 0 and h % p != 0 lambda_p = 1 */
-slong
-_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
-{
-    slong h;
-    ulong i, p_pow;
-    unity_zp j1, j2, temp, aut;
-
-    p_pow = n_pow(j->p, j->exp);
-    unity_zp_init(j1, j->p, j->exp, j->n);
-    unity_zp_init(j2, j->p, j->exp, j->n);
-    unity_zp_init(temp, j->p, j->exp, j->n);
-    unity_zp_init(aut, j->p, j->exp, j->n);
-
-    unity_zp_coeff_set_ui(j1, 0, 1);
-    unity_zp_coeff_set_ui(j2, 0, 1);
-
-    for (i = 1; i <= p_pow; i++)
-    {
-        if (i % j->p == 0) continue;
-
-        unity_zp_pow_ui(temp, j, i);
-        _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_aut_inv(aut, temp, i);
-        unity_zp_mul(temp, j1, aut);
-        unity_zp_swap(temp, j1);
-    
-        unity_zp_pow_ui(temp, j, (v * i) / p_pow);
-        _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_aut_inv(aut, temp, i);
-        unity_zp_mul(temp, j2, aut);
-        unity_zp_swap(temp, j2);
-    }
-
-    unity_zp_pow_fmpz(temp, j1, u);
-    unity_zp_mul(j1, j2, temp);
-    
-    h = unity_zp_is_unity(j1);
-
-    unity_zp_clear(aut);
-    unity_zp_clear(j1);
-    unity_zp_clear(j2);
-    unity_zp_clear(temp);
-
-    return h;
-}
-
-/* if returns 1 and n = 1 mod 3 then lambda_2 = 1*/
-slong
-_is_prime_jacobi_check_21(ulong q, const fmpz_t n)
-{
-    slong h;
-    fmpz_t qpow, ndec, temp;
-
-    fmpz_init(temp);
-    fmpz_init_set_ui(qpow, q);
-    fmpz_init_set(ndec, n);
-
-    fmpz_sub_ui(ndec, ndec, 1);
-    fmpz_fdiv_q_2exp(temp, ndec, 1);
-    fmpz_powm(qpow, qpow, temp, n);
-
-    h = -1;
-    if (fmpz_equal_ui(qpow, 1))
-        h = 0;
-    if (fmpz_equal(qpow, ndec))
-        h = 1;
-
-    fmpz_clear(temp);
-    fmpz_clear(qpow);
-    fmpz_clear(ndec);
-
-    return h;
-}
-
-slong
-_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
-{
-    slong h;
-    unity_zp j1, j2, j_pow;
-
-    unity_zp_init(j_pow, 2, 2, j->n);
-    unity_zp_init(j1, 2, 2, j->n);
-    unity_zp_init(j2, 2, 2, j->n);
-
-    unity_zp_mul(j_pow, j, j);
-    unity_zp_mul_scalar_ui(j1, j_pow, q);
-
-    if (v == 1)
-        unity_zp_coeff_set_ui(j2, 0, 1);
-    else if (v == 3)
-        unity_zp_swap(j2, j_pow);
-
-    unity_zp_pow_fmpz(j_pow, j1, u);
-    unity_zp_mul(j1, j2, j_pow);
-
-    h = unity_zp_is_unity(j1);
-
-    unity_zp_clear(j_pow);
-    unity_zp_clear(j1);
-    unity_zp_clear(j2);
-
-    return h;
-}
-
-slong
-_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
-        , const unity_zp j2_2, const fmpz_t u, ulong v)
-{
-    slong h;
-    ulong i, p_pow;
-    unity_zp j_j2, j1, j2, temp, aut;
-
-    p_pow = n_pow(j->p, j->exp);
-    unity_zp_init(temp, 2, j->exp, j->n);
-    unity_zp_init(j_j2, 2, j->exp, j->n);
-    unity_zp_init(aut, 2, j->exp, j->n);
-    unity_zp_init(j1, 2, j->exp, j->n);
-    unity_zp_init(j2, 2, j->exp, j->n);
-
-    unity_zp_coeff_set_ui(j1, 0, 1);
-    unity_zp_coeff_set_ui(j2, 0, 1);
-
-    unity_zp_mul(j_j2, j, j2_1);
-
-    for (i = 1; i < p_pow;)
-    {
-        unity_zp_pow_ui(temp, j_j2, i);
-        _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_aut_inv(aut, temp, i);
-        unity_zp_mul(temp, j1, aut);
-        unity_zp_swap(temp, j1);
-
-        unity_zp_pow_ui(temp, j_j2, (v * i) / p_pow);
-        _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_aut_inv(aut, temp, i);
-        unity_zp_mul(temp, j2, aut);
-        unity_zp_swap(temp, j2);
-
-        i += 2;
-
-        unity_zp_pow_ui(temp, j_j2, i);
-        _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_aut_inv(aut, temp, i);
-        unity_zp_mul(temp, j1, aut);
-        unity_zp_swap(temp, j1);
-
-        unity_zp_pow_ui(temp, j_j2, (v * i) / p_pow);
-        _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_aut_inv(aut, temp, i);
-        unity_zp_mul(temp, j2, aut);
-        unity_zp_swap(temp, j2);
-
-        i += 6;
-    }
-
-    if (v % 8 != 1 && v % 8 != 3)
-    {
-        unity_zp_mul(temp, j2_2, j2_2);
-        unity_zp_mul(j_j2, j2, temp);
-        unity_zp_swap(j_j2, j2);
-    }
-
-    unity_zp_pow_fmpz(temp, j1, u);
-    unity_zp_mul(j1, j2, temp);
-    
-    h = unity_zp_is_unity(j1);
-
-    unity_zp_clear(aut);
-    unity_zp_clear(j1);
-    unity_zp_clear(j2);
-    unity_zp_clear(j_j2);
-    unity_zp_clear(temp);
-
-    return h;
-}
-
 int
 _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 {
     int *lambdas;
-    ulong i, j, k, nmod4;
+    ulong i, j, nmod4;
     primality_test_status result;
     fmpz_t temp;
     fmpz_t p2;
@@ -353,14 +461,14 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
         for (j = 0; j < q_factors.num; j++)
         {
             int state, pind;
-            ulong v, p, exp, p_pow, k;
+            ulong v, p, exp, r, k;
             unity_zp jacobi_sum, jacobi_sum2_1, jacobi_sum2_2;
             fmpz_t u, q_pow;
             if (result == COMPOSITE) break;
 
             p = q_factors.p[j];
             exp = q_factors.exp[j];
-            p_pow = n_pow(p, exp);
+            r = n_pow(p, exp);
             pind = _p_ind(config, p);
             state = lambdas[pind];
 
@@ -371,8 +479,8 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             }
 
             fmpz_init(u);
-            fmpz_tdiv_q_ui(u, n, p_pow);
-            v = fmpz_tdiv_ui(n, p_pow);
+            fmpz_tdiv_q_ui(u, n, r);
+            v = fmpz_tdiv_ui(n, r);
 
             unity_zp_init(jacobi_sum, p, exp, n);
             unity_zp_init(jacobi_sum2_1, p, exp, n);
