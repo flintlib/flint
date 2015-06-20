@@ -46,7 +46,6 @@ int main(int argc, char const *argv[])
 
     FLINT_TEST_INIT(state);
 
-    printf("\n\n************** TIMING FACTOR_ECM_ONE VS FACTOR_ECM_TWO (100 semiprimes each) ************** \n\n");
     printf("bits1        bits2         time1         fails1         \n");
 
     for(i = 30; i <= 61; i += 5)
