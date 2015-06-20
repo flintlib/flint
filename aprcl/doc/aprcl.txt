@@ -199,27 +199,58 @@ void unity_zp_swap(unity_zp f, unity_zp q)
 
     Swaps $f$ and $g$. $f$ and $g$ must be initialized with same $p$ and $n$.
 
+void unity_zp_set_zero(unity_zp f)
+
+    Sets $f = 0$.
+
+void unity_zp_print(const unity_zp f)
+
+    Prints the contents of the $f$.
+
+slong unity_zp_is_unity(const unity_zp f)
+
+    If $f = \zeta^h$ returns h; otherwise returns -1.
+
 int unity_zp_equal(const unity_zp f, const unity_zp g)
 
-    Returns non zero value if $f == g$.
+    Returns non zero value if $f == g$ reduced by $p^exp$-th cyclotomic
+    polynomial.
+
+void unity_zp_coeff_inc(unity_zp f, ulong ind)
+
+    Increase the coefficient at $\zeta^ind$. 
+    $ind$ must be less then $p^exp$.
+
+void unity_zp_coeff_dec(unity_zp f, ulong ind)
+
+    Increase the coefficient at $\zeta^ind$. 
+    $ind$ must be less then $p^exp$.
 
 void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x)
 
-    Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
-    $ind$ must be less then $p$.
+    Sets the coefficient of the $\zeta^ind$ equal to x.
+    $ind$ must be less then $p^exp$.
 
 void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x)
 
-    Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
-    $ind$ must be less then $p$.
+    Sets the coefficient of the $\zeta^ind$ equal to x.
+    $ind$ must be less then $p^exp$.
 
 void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x)
 
-    Sets $a$ in $a*\zeta_p^ind$ to $a + x$. $x$ must be less then $n$.
+    Sets $a$ in $a*\zeta^ind$ to $a + x$. $x$ must be less then $n$.
 
 void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
 
-    Sets $a$ in $a*\zeta_p^ind$ to $a + x$. $x$ must be less then $n$.
+    Sets $a$ in $a*\zeta^ind$ to $a + x$. $x$ must be less then $n$.
+
+void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
+
+    Sets $f = s*g$.
+
+void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s)
+
+    Sets $f = s*g$.
 
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h)
 
@@ -238,4 +269,23 @@ void unity_zp_pow_fmpz(unity_zp f, unity_zp g, const fmpz_t p)
 void unity_zp_pow_ui(unity_zp f, unity_zp g, ulong p)
 
     Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$ and $n$.
+
+void _unity_zp_reduce_cyclotomic(unity_zp f)
+
+    Sets $f = f mod \Phi_{p^exp}$. $\Phi_{p^exp}$ is the $p^exp$-th cyclotomic
+    polynomial.
+
+void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g)
+
+    Sets $f = g mod \Phi_{p^exp}$. $\Phi_{p^exp}$ is the $p^exp$-th cyclotomic
+    polynomial.
+
+void unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
+
+    Sets $f = \sigma_x(g)$, there automorphism $\sigma_x(\zeta)=\zeta^x$.
+
+void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
+
+    Sets $f = \sigma_x^{-1}(g)$, so $\sigma_x(f) = g$. 
+    $g$ must be reduced by $\Phi_{p^exp}$.
 

@@ -109,13 +109,14 @@ void unity_zp_copy(unity_zp f, const unity_zp g);
 void unity_zp_swap(unity_zp f, unity_zp g);
 
 void unity_zp_set_zero(unity_zp f);
-void unity_zp_coeff_inc(unity_zp f, ulong ind);
-void unity_zp_coeff_dec(unity_zp f, ulong ind);
 
+slong unity_zp_is_unity(const unity_zp f);
 int unity_zp_equal(unity_zp f, unity_zp g);
 
 void unity_zp_print(const unity_zp f);
 
+void unity_zp_coeff_inc(unity_zp f, ulong ind);
+void unity_zp_coeff_dec(unity_zp f, ulong ind);
 void unity_zp_coeff_set_fmpz(unity_zp value, ulong ind, const fmpz_t x);
 void unity_zp_coeff_set_ui(unity_zp value, ulong ind, ulong x);
 void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x);
@@ -129,13 +130,11 @@ void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
-slong unity_zp_is_unity(const unity_zp f);
-
-void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
-void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
-
 void _unity_zp_reduce_cyclotomic(unity_zp f);
 void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g);
+
+void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
+void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 
 /* Jacobi sum computation. */
 void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
