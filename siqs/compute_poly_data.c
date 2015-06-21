@@ -409,7 +409,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
 
     /*
        compute $(A/p) = (A0 / p) * q0$, and
-       $b_i = (A / p) * \sqrt{kn} (A / p)^(-1) modulo p$
+       $B_i = (A / p) * \sqrt{kn} (A / p)^(-1) modulo p$
        where 'p' are prime factor of 'A0';
     */
     for (i = 0; i < s; i++)
@@ -457,7 +457,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     }
 
     /*
-      calculate A_inv2B[j][i] = $2 * b_j * A^(-1) modulo p$
+      calculate A_inv2B[j][i] = $2 * B_j * A^(-1) modulo p$
       for factor base prime 'p'
     */
     for (j = 0; j < s; j++)
@@ -514,7 +514,7 @@ void qsieve_init_poly_next(qs_t qs_inf)
     fmpz_t temp;
     fmpz_init(temp);
 
-    /* we have b_i, calculating b_{i+1} using gray code formula */
+    /* we have $b_i$, calculating $b_{i+1}$ using gray code formula */
     i = qs_inf->curr_poly;
 
     for (v = 0; v < s; v++)
@@ -530,7 +530,7 @@ void qsieve_init_poly_next(qs_t qs_inf)
     if (sign) fmpz_add(qs_inf->B[i], qs_inf->B[i - 1], temp);
     else fmpz_sub(qs_inf->B[i], qs_inf->B[i - 1], temp);
 
-    /* updating roots for , b_{i+1} */
+    /* updating roots for $b_{i+1}$ */
     for (j = 2; j < qs_inf->num_primes; j++)
     {
         p = factor_base[j].p;
