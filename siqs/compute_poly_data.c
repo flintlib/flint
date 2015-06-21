@@ -64,6 +64,10 @@ void qsieve_next_A0(qs_t qs_inf)
     fmpz_init(prod);
     fmpz_init(temp);
 
+    /*
+       generate lexicographically next s-subset from odd indices
+       of possible range of factor's of 'A0'
+    */
     if (current_subset[0] != span - s + 1)
     {
         if (m >= span - h) ++h;
@@ -84,6 +88,7 @@ void qsieve_next_A0(qs_t qs_inf)
 
         for (j = 0; j < s; j++)
             A_ind[j] = 2 * current_subset[j] - 1 + low - 1;
+
     }
     else
     {
@@ -123,8 +128,8 @@ void qsieve_init_A0(qs_t qs_inf)
     fmpz_init(lower_bound);
     fmpz_init_set_ui(prod, UWORD(1));
     fmpz_tdiv_q_ui(target, qs_inf->target_A, UWORD(2) * qs_inf->q0);
-    fmpz_mul_ui(upper_bound, target, UWORD(5));
-    fmpz_tdiv_q_ui(lower_bound, target, UWORD(5));
+    fmpz_mul_ui(upper_bound, target, UWORD(2));
+    fmpz_tdiv_q_ui(lower_bound, target, UWORD(2));
     bits = fmpz_bits(target);
 
     for (i = qs_inf->small_primes; i < qs_inf->num_primes; i++)
@@ -136,7 +141,11 @@ void qsieve_init_A0(qs_t qs_inf)
         }
     }
 
-    /* following 'for' loop is taken from 'msieve' implementation */
+    /*
+       following 'for' loop is taken from 'msieve' implementation,
+       try to determine number of factors, such that we have enough
+       primes to choose from
+    */
     if (bits > 210) i = 15;
     else if (bits > 190) i = 13;
     else if (bits > 180) i = 12;
@@ -150,7 +159,7 @@ void qsieve_init_A0(qs_t qs_inf)
         if (factor_bound[i] == 0 || num_factor == 1) continue;
         if (rem == 0 && num_factor > 2 && factor_bound[i + 1] > 0)
         {
-            low = factor_bound[i];
+            low = factor_bound[i - 1];
             high = factor_bound[i + 1];
             break;
         }
@@ -189,6 +198,8 @@ void qsieve_init_A0(qs_t qs_inf)
     span = high - low;
     if (span > 100) span = 100;
 
+    /* generate first s-subset from range of possible factors */
+
     current_subset = flint_malloc( s * sizeof(mp_limb_t));
     m = 0;
     h = s;
@@ -196,26 +207,12 @@ void qsieve_init_A0(qs_t qs_inf)
     for (j = 1; j <= h; j++)
         current_subset[s + j - h - 1] = m + j;
 
-    while (current_subset[0] != span - s + 1)
+    fmpz_set_ui(prod, UWORD(1));
+
+    for (j = 1; j <= s; j++)
     {
-        fmpz_set_ui(prod, UWORD(1));
-
-        for (j = 1; j <= s; j++)
-        {
-            fmpz_mul_ui(temp, prod, factor_base[2 * current_subset[j - 1] - 1 + low - 1].p);
-            fmpz_set(prod, temp);
-        }
-
-        if (fmpz_cmp(prod, upper_bound) <= 0)
-            break;
-
-        if (m >= span - h) h++;
-        else h = 1;
-
-        m = current_subset[s - h];
-
-        for (j = 1; j <= h; j++)
-            current_subset[s + j - h - 1] = m + j;
+        fmpz_mul_ui(temp, prod, factor_base[2 * current_subset[j - 1] - 1 + low - 1].p);
+        fmpz_set(prod, temp);
     }
 
     qs_inf->current_subset = current_subset;
@@ -240,8 +237,8 @@ void qsieve_init_A0(qs_t qs_inf)
 
 
 /*
-    calculate A = q0 * A0, where q0 are primes immediately following
-    prime bound
+    generate q0, q0 are primes immediately following
+    prime bound such that 'kn' is quadratic residue modulo 'q0'
 */
 
 
@@ -410,6 +407,11 @@ void qsieve_init_poly_first(qs_t qs_inf)
 
     fmpz_mul_ui(qs_inf->A, qs_inf->A0, q0);
 
+    /*
+       compute $(A/p) = (A0 / p) * q0$, and
+       $b_i = (A / p) * \sqrt{kn} (A / p)^(-1) modulo p$
+       where 'p' are prime factor of 'A0';
+    */
     for (i = 0; i < s; i++)
     {
         p = factor_base[A_ind[i]].p;
@@ -428,7 +430,10 @@ void qsieve_init_poly_first(qs_t qs_inf)
         fmpz_set(B[0], temp4);
     }
 
-   /* adding $A0 * \sqrt{kn} * A0^{-1} modulo q0$ to $b_1 = \sum _{i=1} ^{s} B_i$ */
+    /*
+       adding $A0 * \sqrt{kn} * A0^{-1} modulo q0$
+       to $b_1 = \sum _{i=1} ^{s} B_i$
+    */
     p = qs_inf->q0;
     pinv = n_preinvert_limb(p);
     pmod = fmpz_fdiv_ui(qs_inf->A0, p);
@@ -451,6 +456,10 @@ void qsieve_init_poly_first(qs_t qs_inf)
         A_inv[j] = n_mulmod2_preinv(A0_inv[j], temp, p, pinv);
     }
 
+    /*
+      calculate A_inv2B[j][i] = $2 * b_j * A^(-1) modulo p$
+      for factor base prime 'p'
+    */
     for (j = 0; j < s; j++)
     {
         for (i = 2; i < qs_inf->num_primes; i++)
@@ -465,6 +474,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
         }
     }
 
+    /* compute roots of base polynomial modulo factor base prime */
     for (i = 2; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
