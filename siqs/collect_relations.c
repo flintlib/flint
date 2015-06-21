@@ -284,10 +284,11 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
         {
             qs_inf->q0 = qs_inf->q0_values[i];
             qsieve_init_poly_first(qs_inf);
-            qsieve_compute_C(qs_inf);
 
             do
             {
+                qsieve_compute_C(qs_inf);
+
                 qsieve_do_sieving(qs_inf, sieve);
                 relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
