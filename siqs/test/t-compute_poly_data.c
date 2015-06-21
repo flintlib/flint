@@ -34,7 +34,7 @@
 int main(void)
 {
    int i, j, k;
-   mp_limb_t small_factor, p, pinv, pmod, x;
+   mp_limb_t small_factor, p, pinv, pmod, mod_inv, q, qsqrt;
    fmpz_t n;
    fmpz_t temp, temp2, B, B_2;
    qs_t qs_inf;
@@ -49,9 +49,9 @@ int main(void)
 
    for (i = 0; i < 1000; i++)
    {
-       fmpz_randtest_unsigned(n, state, 130);
+       fmpz_randtest_unsigned(n, state, 270);
 
-       if (fmpz_is_zero(n) || fmpz_is_one(n)) continue;
+       if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 200) continue;
 
        qsieve_init(qs_inf, n);
        small_factor = qsieve_knuth_schroeppel(qs_inf);
@@ -65,72 +65,296 @@ int main(void)
 
        qsieve_poly_init(qs_inf);
 
-       small_factor = qsieve_compute_A(qs_inf);
+       small_factor = qsieve_compute_q0(qs_inf);
 
        if (small_factor) continue;
 
-
-       /* check if prime factor of 'A0', are it's factor */
-
-       for (j = 0; j < qs_inf->s; j++)
-       {
-           if (fmpz_fdiv_ui(qs_inf->A0, qs_inf->factor_base[qs_inf->A_ind[j]].p) != 0)
-           {
-               abort();
-           }
-       }
+       qsieve_init_A0(qs_inf);
 
        qsieve_compute_pre_data(qs_inf);
 
-       /* check if precomputed values for 'A0' are correct */
+       /* check correctness of precomputed data for 'A0' */
 
+       /* check values of 'A0_divp' */
        for (j = 0; j < qs_inf->s; j++)
        {
            p = qs_inf->factor_base[qs_inf->A_ind[j]].p;
-           pinv = n_preinvert_limb(p);
            fmpz_divexact_ui(temp, qs_inf->A0, p);
 
-           if (fmpz_cmp(temp, qs_inf->A0_divp[j]) != 0)
+           if (fmpz_cmp(qs_inf->A0_divp[j], temp) != 0)
            {
+               fmpz_print(qs_inf->A0);
+               flint_printf(" / %wu != ", p);
+               fmpz_print(qs_inf->A0_divp[j]);
+               flint_printf("\n");
                abort();
            }
-
-           pmod = fmpz_fdiv_ui(qs_inf->A0_divp[j], p);
-           x = n_invmod(pmod, p);
-           x = n_mulmod2_preinv(x, qs_inf->sqrts[qs_inf->A_ind[j]], p, pinv);
-
-           if (qs_inf->B0_terms[j] != x)
-           {
-               abort();
-           }
-
        }
 
-       /* check if all the 'B' values for particular hypercube 'A' satisfy,
-          $B^2 \equiv kn \pmod{A}$
-       */
-       for (j = 0; j < qs_inf->num_q0; j++)
+       /* check values of 'A0_inv' */
+       for (j = 2; j < qs_inf->num_primes; j++)
        {
-           qs_inf->q0 = qs_inf->q0_values[j];
-           fmpz_mul_ui(qs_inf->A, qs_inf->A0, qs_inf->q0);
-           fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
-           qsieve_init_poly_first(qs_inf);
-           qsieve_init_poly_next(qs_inf);
+           p = qs_inf->factor_base[j].p;
+           fmpz_mul_ui(temp, qs_inf->A0, qs_inf->A0_inv[j]);
+           pmod = fmpz_fdiv_ui(temp, p);
 
-           for (k = 0; k < (1 << qs_inf->s); k++)
+           if (pmod != UWORD(0) && pmod != UWORD(1))
            {
-               fmpz_pow_ui(B_2, qs_inf->B[k], 2);
-               fmpz_mod(temp, B_2, qs_inf->A);
+               fmpz_print(qs_inf->A0);
+               flint_printf(" ^ (%wd) modulo %wu != %wu\n", -1, p, qs_inf->A_inv[j]);
+               abort();
+           }
+       }
 
-               if (fmpz_cmp(temp, temp2) != 0)
+      /* check values of 'B0_terms' */
+       for (j = 0; j < qs_inf->s; j++)
+       {
+           p = qs_inf->factor_base[qs_inf->A_ind[j]].p;
+           fmpz_mul_ui(temp, qs_inf->A0_divp[j], qs_inf->B0_terms[j]);
+           fmpz_pow_ui(B_2, temp, UWORD(2));
+
+           if (fmpz_fdiv_ui(qs_inf->kn, p) != fmpz_fdiv_ui(B_2, p))
+           {
+               flint_printf("( ");
+               fmpz_print(qs_inf->A0_divp[j]);
+               flint_printf(" * %wu )", qs_inf->B0_terms[j]);
+               flint_printf(" ^ %wd modulo %wu != ", UWORD(2), p);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %wu \n", p);
+               abort();
+           }
+
+           for (k = 0; k < qs_inf->s; k++)
+           {
+               if (k == j) continue;
+
+               q = qs_inf->factor_base[qs_inf->A_ind[k]].p;
+
+               if (fmpz_fdiv_ui(temp, q) != UWORD(0))
                {
+                   flint_printf("( ");
+                   fmpz_print(qs_inf->A0_divp[j]);
+                   flint_printf(" * %wu )", qs_inf->B0_terms[j]);
+                   flint_printf(" ^ %wd modulo %wu != %wu\n", UWORD(2), q, UWORD(0));
                    abort();
                }
-
            }
        }
 
-       qsieve_clear(qs_inf);
+       qsieve_init_poly_first(qs_inf);
+
+       /*
+          check correctness of precomputed data corresponding to initialization
+          of first polynomial
+       */
+
+       /* check values of 'A_divp' */
+       for (j = 0; j < qs_inf->s; j++)
+       {
+           p = qs_inf->factor_base[qs_inf->A_ind[j]].p;
+           fmpz_divexact_ui(temp, qs_inf->A, p);
+
+           if (fmpz_cmp(qs_inf->A_divp[j], temp) != 0)
+           {
+               fmpz_print(qs_inf->A);
+               flint_printf(" / %wu != ", p);
+               fmpz_print(qs_inf->A_divp[j]);
+               flint_printf("\n");
+               abort();
+           }
+       }
+
+       /* check values of 'A_inv' */
+       for (j = 2; j < qs_inf->num_primes; j++)
+       {
+           p = qs_inf->factor_base[j].p;
+           fmpz_mul_ui(temp, qs_inf->A, qs_inf->A_inv[j]);
+           pmod = fmpz_fdiv_ui(temp, p);
+
+           if (pmod != UWORD(0) && pmod != UWORD(1))
+           {
+               fmpz_print(qs_inf->A);
+               flint_printf(" ^ (%wd) modulo %wu != %wu\n", -1, p, qs_inf->A_inv[j]);
+               abort();
+           }
+       }
+
+       /* check values of 'B_terms' */
+       for (j = 0; j < qs_inf->s; j++)
+       {
+           p = qs_inf->factor_base[qs_inf->A_ind[j]].p;
+           fmpz_pow_ui(temp, qs_inf->B_terms[j], UWORD(2));
+
+           if (fmpz_fdiv_ui(qs_inf->kn, p) != fmpz_fdiv_ui(temp, p))
+           {
+               fmpz_print(temp);
+               flint_printf(" ^ %wd modulo %wu != ", UWORD(2), p);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %wu \n", p);
+               abort();
+           }
+
+           for (k = 0; k < qs_inf->s; k++)
+           {
+               if (k == j) continue;
+
+               q = qs_inf->factor_base[qs_inf->A_ind[k]].p;
+
+               if (fmpz_fdiv_ui(temp, q) != UWORD(0))
+               {
+                   flint_printf("( ");
+                   fmpz_print(qs_inf->A_divp[j]);
+                   flint_printf(" * %wu )", qs_inf->B_terms[j]);
+                   flint_printf(" ^ %wd modulo %wu != %wu\n", UWORD(2), q, UWORD(0));
+                   abort();
+               }
+           }
+       }
+
+       /* check for initial 'B' coefficient */
+
+       fmpz_pow_ui(B_2, qs_inf->B[0], UWORD(2));
+       fmpz_mod(temp, B_2, qs_inf->A);
+       fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
+
+       if (fmpz_cmp(temp, temp2) != 0)
+       {
+           fmpz_print(qs_inf->B[0]);
+           flint_printf(" ^ %wu modulo ", UWORD(2));
+           fmpz_print(qs_inf->A);
+           flint_printf(" != ");
+           fmpz_print(qs_inf->kn);
+           flint_printf(" modulo ");
+           fmpz_print(qs_inf->A);
+           flint_printf("\n");
+           abort();
+       }
+
+       /* check values of 'A_inv2B' */
+       for (j =0; j < qs_inf->s; j++)
+       {
+           for (k = 2; k < qs_inf->num_primes; k++)
+           {
+               p = qs_inf->factor_base[k].p;
+               pinv = qs_inf->factor_base[k].pinv;
+               pmod = fmpz_fdiv_ui(qs_inf->B_terms[j], p);
+               pmod *= 2;
+               pmod = n_mulmod2_preinv(pmod, qs_inf->A_inv[k], p, pinv);
+
+               if (pmod != qs_inf->A_inv2B[j][k])
+               {
+                   flint_printf("( %wu * ",UWORD(2));
+                   fmpz_print(qs_inf->B_terms[j]);
+                   flint_printf(" * %wu ) modulo %wu != %wu",
+                                qs_inf->A_inv[k], p, qs_inf->A_inv2B[j][k]);
+                   abort();
+               }
+           }
+       }
+
+       /* check values of 'soln1' and 'soln2' */
+       for (j = 2; j < qs_inf->num_primes; j++)
+       {
+           p = qs_inf->factor_base[j].p;
+           fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln1[j]);
+           fmpz_add(temp2, temp, qs_inf->B[0]);
+           fmpz_pow_ui(B_2, temp2, UWORD(2));
+
+           if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
+           {
+               flint_printf("(");
+               fmpz_print(qs_inf->A);
+               flint_printf(" * %wu + ", qs_inf->soln1[j]);
+               fmpz_print(qs_inf->B[0]);
+               flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %wu\n", p);
+               abort();
+           }
+
+           fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln2[j]);
+           fmpz_add(temp2, temp, qs_inf->B[0]);
+           fmpz_pow_ui(B_2, temp2, UWORD(2));
+
+           if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
+           {
+               flint_printf("(");
+               fmpz_print(qs_inf->A);
+               flint_printf(" * %wu + ", qs_inf->soln2[j]);
+               fmpz_print(qs_inf->B[0]);
+               flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
+               fmpz_print(qs_inf->kn);
+               flint_printf(" modulo %wu\n", p);
+               abort();
+           }
+        }
+
+        /* check for all subsequent polynomial for current 'A' */
+
+        for (j = 1; j < (1 << qs_inf->s); j++)
+        {
+            qsieve_init_poly_next(qs_inf);
+
+            /* check for current 'B' coefficient */
+
+            fmpz_pow_ui(B_2, qs_inf->B[j], UWORD(2));
+            fmpz_mod(temp, B_2, qs_inf->A);
+            fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
+
+            if (fmpz_cmp(temp, temp2) != 0)
+            {
+                fmpz_print(qs_inf->B[j]);
+                flint_printf(" ^ %wu modulo ", UWORD(2));
+                fmpz_print(qs_inf->A);
+                flint_printf(" != ");
+                fmpz_print(qs_inf->kn);
+                flint_printf(" modulo ");
+                fmpz_print(qs_inf->A);
+                flint_printf("\n");
+                abort();
+            }
+
+            /* check for roots corresponding to current 'A' and 'B' */
+
+            for (k = 2; k < qs_inf->num_primes; k++)
+            {
+                p = qs_inf->factor_base[k].p;
+                fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln1[k]);
+                fmpz_add(temp2, temp, qs_inf->B[j]);
+                fmpz_pow_ui(B_2, temp2, UWORD(2));
+
+                if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
+                {
+                    flint_printf("(");
+                    fmpz_print(qs_inf->A);
+                    flint_printf(" * %wu + ", qs_inf->soln1[k]);
+                    fmpz_print(qs_inf->B[j]);
+                    flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
+                    fmpz_print(qs_inf->kn);
+                    flint_printf(" modulo %wu\n", p);
+                    abort();
+                }
+
+                fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln2[k]);
+                fmpz_add(temp2, temp, qs_inf->B[j]);
+                fmpz_pow_ui(B_2, temp2, UWORD(2));
+
+                if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
+                {
+                    flint_printf("(");
+                    fmpz_print(qs_inf->A);
+                    flint_printf(" * %wu + ", qs_inf->soln2[k]);
+                    fmpz_print(qs_inf->B[j]);
+                    flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
+                    fmpz_print(qs_inf->kn);
+                    flint_printf(" modulo %wu\n", p);
+                    abort();
+                }
+            }
+
+        }
+
+        qsieve_clear(qs_inf);
    }
 
    fmpz_clear(n);

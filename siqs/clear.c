@@ -39,7 +39,11 @@ void qsieve_clear(qs_t qs_inf)
     flint_free(qs_inf->factor_base);
     flint_free(qs_inf->sqrts);
 
+    flint_free(qs_inf->q0_values);
+
     qs_inf->factor_base = NULL;
     qs_inf->sqrts       = NULL;
+
+    qs_inf->q0_values = NULL;
 
 }
