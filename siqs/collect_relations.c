@@ -276,7 +276,7 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
     /* iterate over polynomial to call for sieving */
     qsieve_compute_q0(qs_inf);
     qsieve_init_A0(qs_inf);
-    qsieve_compute_pre_data(qs_inf->);
+    qsieve_compute_pre_data(qs_inf);
 
     do
     {
@@ -301,7 +301,7 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 
         qsieve_next_A0(qs_inf);
 
-    } while (qs_inf->coulmns < qs_inf->num_primes + qs_inf->extra_rels);
+    } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
 
     return relation;
 }
