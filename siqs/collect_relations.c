@@ -130,10 +130,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    bits = FLINT_ABS(fmpz_bits(res));
    bits -= BITS_ADJUST;
    extra_bits = 0;
-
-  // fmpz_print(res);
-  // flint_printf("\n");
-
    fmpz_set_ui(p, 2); /* divide out by powers of 2 */
    exp = fmpz_remove(res, res, p);
 
@@ -222,9 +218,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
       }
    }
 
-  // fmpz_print(res);
-  // flint_printf("here\n");
-
 cleanup:
    fmpz_clear(X);
    fmpz_clear(Y);
@@ -278,6 +271,37 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 
 slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
+    slong i, relation = 0;
+
     /* iterate over polynomial to call for sieving */
-    return UWORD(0);
+    qsieve_compute_q0(qs_inf);
+    qsieve_init_A0(qs_inf);
+    qsieve_compute_pre_data(qs_inf->);
+
+    do
+    {
+        for (i = 0; i < qs_inf->num_q0; i++)
+        {
+            qs_inf->q0 = qs_inf->q0_values[i];
+            qsieve_init_poly_first(qs_inf);
+            qsieve_compute_C(qs_inf);
+
+            do
+            {
+                qsieve_do_sieving(qs_inf, sieve);
+                relation += qsieve_evaluate_sieve(qs_inf, sieve);
+
+                if (qs_inf->curr_poly < (1 << qs_inf->s))
+                    qsieve_init_poly_next(qs_inf);
+                else
+                    break;
+
+             } while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+        }
+
+        qsieve_next_A0(qs_inf);
+
+    } while (qs_inf->coulmns < qs_inf->num_primes + qs_inf->extra_rels);
+
+    return relation;
 }
