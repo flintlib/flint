@@ -65,8 +65,8 @@ void qsieve_next_A0(qs_t qs_inf)
     fmpz_init(temp);
 
     /*
-       generate lexicographically next s-subset from odd indices
-       of possible range of factor's of 'A0'
+       generate lexicographically next s-subset from
+       possible range of factor's of 'A0'
     */
     if (current_subset[0] != span - s + 1)
     {
@@ -82,17 +82,23 @@ void qsieve_next_A0(qs_t qs_inf)
 
         for (j = 1; j <= s; j++)
         {
-            fmpz_mul_ui(temp, prod, factor_base[2 * current_subset[j - 1] - 1 + low - 1].p);
+            fmpz_mul_ui(temp, prod, factor_base[current_subset[j - 1] + low - 1].p);
             fmpz_set(prod, temp);
         }
 
         for (j = 0; j < s; j++)
-            A_ind[j] = 2 * current_subset[j] - 1 + low - 1;
+            A_ind[j] = current_subset[j] + low - 1;
 
+    }
+    else if (A_ind[s - 1] > span)
+    {
+        flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
+        abort();
     }
     else
     {
-        /* exception to add as we ran out of 'A0' coefficients */
+        flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
+        abort();
     }
 
     fmpz_set(qs_inf->A0, prod);
@@ -211,7 +217,7 @@ void qsieve_init_A0(qs_t qs_inf)
 
     for (j = 1; j <= s; j++)
     {
-        fmpz_mul_ui(temp, prod, factor_base[2 * current_subset[j - 1] - 1 + low - 1].p);
+        fmpz_mul_ui(temp, prod, factor_base[current_subset[j - 1] + low - 1].p);
         fmpz_set(prod, temp);
     }
 
@@ -224,7 +230,7 @@ void qsieve_init_A0(qs_t qs_inf)
     fmpz_set(qs_inf->A0, prod);
 
     for (j = 0; j < s; j++)
-        A_ind[j] = 2 * current_subset[j] - 1 + low - 1;
+        A_ind[j] = current_subset[j] + low - 1;
 
     fmpz_clear(target);
     fmpz_clear(prod);
