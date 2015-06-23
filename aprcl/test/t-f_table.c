@@ -55,7 +55,7 @@ int main(void)
         {
             ulong g_powx, g_powfx;
             g_powx = n_powmod(g, j, q);
-            g_powfx = n_powmod(g, table[j - 1], q);
+            g_powfx = n_powmod(g, table[j], q);
             
             if (n_submod(1, g_powx, q) != g_powfx)
             {

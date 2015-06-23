@@ -39,9 +39,9 @@ _jacobi_pq_general(unity_zp f, const mp_ptr table
     size = (p - 1) * pow_dec;
     pow = pow_dec * p;
 
-    for (i = 0; i < q - 2; i++)
+    for (i = 1; i < q - 1; i++)
     {
-        ulong l = (a * (i + 1) + b * table[i]) % pow;
+        ulong l = (a * (i) + b * table[i]) % pow;
         if (l < size) 
             unity_zp_coeff_inc(f, l); 
         else
@@ -64,6 +64,8 @@ void jacobi_pq(unity_zp f, ulong q, ulong p)
     k = p_power_in_q(q - 1, p);
 
     _jacobi_pq_general(f, table, p, q, k, 1, 1);
+
+    _nmod_vec_clear(table);
 }
 
 void jacobi_2q_one(unity_zp f, ulong q)
@@ -75,6 +77,8 @@ void jacobi_2q_one(unity_zp f, ulong q)
     k = p_power_in_q(q - 1, 2);
 
     _jacobi_pq_general(f, table, 2, q, k, 2, 1);
+
+    _nmod_vec_clear(table);
 }
 
 void jacobi_2q_two(unity_zp f, ulong q)
@@ -88,5 +92,7 @@ void jacobi_2q_two(unity_zp f, ulong q)
     a = 3 * b;
 
     _jacobi_pq_general(f, table, 2, q, k, a, b);
+
+    _nmod_vec_clear(table);
 }
 

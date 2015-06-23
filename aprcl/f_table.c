@@ -24,25 +24,36 @@
 ******************************************************************************/
 
 #include "aprcl.h"
-#include "ulong_extras.h"
 
-mp_ptr f_table(const ulong q)
+mp_ptr
+f_table(const ulong q)
 {
     int i;
-    ulong g, g_pow, g_comp, qinv;
-    mp_ptr table;
+    ulong g, g_pow, qinv;
+    mp_ptr g_table, f_table;
 
     g = n_primitive_root_prime(q);
-    table = _nmod_vec_init(q - 2);
+    g_table = _nmod_vec_init(q);
+    f_table = _nmod_vec_init(q);
     qinv = n_preinvert_limb(q);
   
     g_pow = g;
-    for (i = 0; i < q - 2; i++)
+    /* g_table[g^i mod q] = i */
+    for (i = 1; i < q; i++)
     {
-        g_comp = n_submod(1, g_pow, q);
-        table[i] = n_discrete_log_bsgs(g_comp, g, q);
+        g_table[g_pow] = i;
         g_pow = n_mulmod2_preinv(g_pow, g, q, qinv);
     }
-    return table;
+
+    g_pow = g;
+    /* f_table[i] such that g^f_table[i] = 1 - g^i mod q*/
+    for (i = 1; i < q; i++)
+    {
+        f_table[i] = g_table[n_submod(1, g_pow, q)];
+        g_pow = n_mulmod2_preinv(g_pow, g, q, qinv);
+    }
+
+    _nmod_vec_clear(g_table);
+    return f_table;
 }
 
