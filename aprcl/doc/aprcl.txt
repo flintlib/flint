@@ -262,13 +262,18 @@ void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
     Sets the $f$ to the $g * h$.
     $f$, $g$ and $h$ must be initialized with same $p$ and $n$
 
-void unity_zp_pow_fmpz(unity_zp f, unity_zp g, const fmpz_t p)
+void unity_zp_pow_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 
-    Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$ and $n$.
+    Sets the $f$ to $g^pow$. $f$ and $g$ must be initialized with same $p$ and $n$.
 
-void unity_zp_pow_ui(unity_zp f, unity_zp g, ulong p)
+void unity_zp_pow_ui(unity_zp f, unity_zp g, ulong pow)
 
-    Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$ and $n$.
+    Sets the $f$ to $g^pow$. $f$ and $g$ must be initialized with same $p$ and $n$.
+
+void unity_zp_pow_2k_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
+
+    Sets the $f$ to $g^pow$ using $2^k$-ary exponentiation method.
+    $f$ and $g$ must be initialized with same $p$ and $n$.
 
 void _unity_zp_reduce_cyclotomic(unity_zp f)
 

@@ -25,7 +25,8 @@
 
 #include "aprcl.h"
 
-void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
+void
+unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 {
     ulong i, p;
 

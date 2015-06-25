@@ -76,6 +76,7 @@ void _jacobi_config_update(aprcl_config conf)
     }
 }
 
+/* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 void jacobi_config_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
