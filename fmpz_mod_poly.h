@@ -1085,6 +1085,14 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
     return fmpz_mod_poly_fprint_pretty(stdout, poly, x);
 }
 
+/* Products *****************************************************************/
+
+FLINT_DLL void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs,
+                                                     slong n, const fmpz_t mod);
+
+FLINT_DLL void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs,
+                                                    slong n, const fmpz_t mod);
+
 #ifdef __cplusplus
 }
 #endif
