@@ -34,18 +34,18 @@
 
 
 int
-fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
+fmpz_factor_ecm_stage_one_II(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                              fmpz_t n, ecm_t ecm_inf)
 {
-    fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
+
+    fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b, zprod, c, d;
     mp_limb_t mmin, mmax, maxj, mdiff;
     int i, j, ret;
 
     mp_limb_t num_roots;
 
     fmpz * arrx, * arrz;
-
-    fmpz * roots, * roots2, * evals;
+    fmpz * roots, * roots2, * evals, * poly;
     fmpz_poly_struct ** tree;
 
     mmin = (B1 + (P/2)) / P;
@@ -56,7 +56,6 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     arrx = _fmpz_vec_init(maxj + 1);
     arrz = _fmpz_vec_init(maxj + 1);
 
-    fmpz_init(tim);
     fmpz_init(Qx);
     fmpz_init(Qz);
     fmpz_init(Qdx);
@@ -65,6 +64,10 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     fmpz_init(Rz);
     fmpz_init(a);
     fmpz_init(b);
+    fmpz_init(tim);
+    fmpz_init(zprod);
+    fmpz_init(c);
+    fmpz_init(d);
 
     fmpz_init_set_ui(g, 1);
 
@@ -78,8 +81,8 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     fmpz_factor_ecm_double(arrx + 2, arrz + 2, arrx + 1, arrz + 1, n, ecm_inf);
 
     /* arr[3] = 3Q0 */
-    fmpz_factor_ecm_add(arrx + 3, arrz + 3, arrx + 3, arrz + 3, arrx + 1, arrz + 1, 
-                        arrx + 1, arrz + 1, n, ecm_inf);
+    fmpz_factor_ecm_add(arrx + 3, arrz + 3, arrx + 2, arrz + 2, arrx + 1, arrz + 1, 
+                          arrx + 1, arrz + 1, n, ecm_inf);
 
     /* For each odd j (j > 3) , compute j * Q0 [x0 :: z0] */
 
@@ -92,26 +95,40 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
            Differnce is (j - 4)Q0 */
 
         fmpz_factor_ecm_add(arrx + j, arrz + j, arrx + j - 2, arrz + j - 2, 
-                            arrx + 2, arrz + 2, arrx + j - 4, arrz + j - 4, 
-                            n, ecm_inf);
-    }
+                              arrx + 2, arrz + 2, arrx + j - 4, arrz + j - 4, 
+                              n, ecm_inf);
 
+    }
 
     num_roots = (maxj + 1)/2;
 
-	roots = _fmpz_vec_init(num_roots);
-	evals = _fmpz_vec_init(num_roots);
-	roots2 = _fmpz_vec_init(mdiff);
+    roots = _fmpz_vec_init(num_roots);
+    poly = _fmpz_vec_init(num_roots + 1);
+    evals = _fmpz_vec_init(mdiff);
+    roots2 = _fmpz_vec_init(mdiff);
+    tree = _fmpz_mod_poly_tree_alloc(mdiff);
 
-	/* roots has the small steps (the j's) */
+    /* roots has the small steps (the j's) */
 
-	for (i = 0; i < num_roots; i++)
-		fmpz_set(roots + i, arrx + 2*i + 1);
-    
+    for (i = 0; i < num_roots; i++)
+    {
+        fmpz_gcdinv(c, d, arrz + 2*i + 1, n);
+
+        if (fmpz_cmp_ui(c, 1))
+        {
+            fmpz_set(f, c);
+            ret = 1;
+            goto cleanup;
+        }
+
+        fmpz_mul(a, arrx + 2*i + 1, d);
+        fmpz_mod(roots + i, a, n);
+    }
+
     /* Q = D * Q_0 */
     fmpz_set_ui(tim, P);
     fmpz_factor_ecm_mul_montgomery_ladder(Qx, Qz, ecm_inf->x, ecm_inf->z, tim, n, ecm_inf);
-    
+
     /* R = mmin * Q */
     fmpz_set_ui(tim, mmin);
     fmpz_factor_ecm_mul_montgomery_ladder(Rx, Rz, Qx, Qz, tim, n, ecm_inf);
@@ -119,14 +136,26 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     /* Qd = (mmin - 1) * Q */
     fmpz_set_ui(tim, mmin - 1);
     fmpz_factor_ecm_mul_montgomery_ladder(Qdx, Qdz, Qx, Qz, tim, n, ecm_inf);
-                
+
     /* main stage II step */
 
-    for (i = mmin; i <= mmax; i ++)
-    {
-    	/* roots2 has the giant steps (the points of evaluations) */
 
-    	fmpz_set(roots2 + i - mmin, Rx);
+    for (i = 0; i < mdiff; i ++)
+    {
+        /* roots2 has the giant steps (the points of evaluations) */
+
+        fmpz_gcdinv(c, d, Rz, n);
+
+        if (fmpz_cmp_ui(c, 1))
+        {
+            fmpz_set(f, c);
+            ret = 1;
+            goto cleanup;
+        }
+
+        fmpz_mul(a, Rx, d);
+        fmpz_mod(roots2 + i, a, n);
+
         fmpz_set(a, Rx);
         fmpz_set(b, Rz);
 
@@ -140,30 +169,32 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     }
 
+    /* create poly from roots */
+
+    _fmpz_poly_product_roots_fmpz_vec(poly, roots, num_roots);
+
     /* building product tree for *mdiff* number of giant steps */
-    tree = _fmpz_mod_poly_tree_alloc(mdiff);
+
     _fmpz_mod_poly_tree_build(tree, roots2, mdiff, n);
 
     /* Evaluating the poly with small steps as coefficients (roots) at all big step points */
-    _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, roots, num_roots, tree, mdiff, n);
+
+    _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, poly, num_roots + 1, tree, mdiff, n);
 
     /* Checking for gcd's */
     
-	for (i = 0; i < num_roots; i++)
-	{
-		fmpz_gcd(f, n, evals + i);
+    for (i = 0; i < mdiff; i++)
+    {
+        fmpz_gcd(f, evals + i, n);
 
-		if (!fmpz_is_zero(f) && !fmpz_is_one(f))
-		{
-			ret = 1;
-			break;
-		}
-	}
+        if (!fmpz_is_one(f) && fmpz_cmp(f, n))
+        {
+            ret = 1;
+            goto cleanup;
+        }   
+    }
 
-	_fmpz_vec_clear(roots, num_roots);
-	_fmpz_vec_clear(evals, num_roots);
-	_fmpz_vec_clear(roots2, mdiff);
-	_fmpz_mod_poly_tree_free(tree, mdiff);
+    cleanup:
 
     fmpz_clear(tim);
     fmpz_clear(Qx);
@@ -175,10 +206,18 @@ fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     fmpz_clear(a);
     fmpz_clear(b);
     fmpz_clear(g);
-
+    fmpz_clear(zprod);
+    fmpz_clear(c);
+    fmpz_clear(d);
+    
     _fmpz_vec_clear(arrx, maxj + 1);
     _fmpz_vec_clear(arrz, maxj + 1);
+    _fmpz_vec_clear(roots, num_roots);
+    _fmpz_vec_clear(poly, num_roots + 1);
+    _fmpz_vec_clear(evals, mdiff);
+    _fmpz_vec_clear(roots2, mdiff);
+    _fmpz_mod_poly_tree_free(tree, mdiff);
+
 
     return ret;
 }
-

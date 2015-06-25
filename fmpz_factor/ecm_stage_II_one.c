@@ -37,7 +37,7 @@ fmpz_factor_ecm_stage_II_one(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     fmpz_t g, tim, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
     mp_limb_t mmin, mmax, maxj;
-    int i, j, checks, ret;
+    int i, j, ret;
     fmpz * arrx, * arrz;
 
     mmin = (B1 + (P/2)) / P;
@@ -101,14 +101,12 @@ fmpz_factor_ecm_stage_II_one(fmpz_t f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                 
     /* main stage II step */
 
-    checks = 0;
     for (i = mmin; i <= mmax; i ++)
     {
         for (j = 1; j <= maxj; j+=2)
         {
             if (ecm_inf->prime_table[i - mmin][j] == 1)
             {
-                checks += 1;
                 fmpz_mul(a, Rx, arrz + j);
                 fmpz_mod(a, a, n);
 

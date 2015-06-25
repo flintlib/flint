@@ -160,6 +160,9 @@ FLINT_DLL int fmpz_factor_ecm_one(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
 FLINT_DLL int fmpz_factor_ecm_two(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
                                   mp_limb_t B2, flint_rand_t state, fmpz_t n);
 
+FLINT_DLL int fmpz_factor_ecm_stage_one_II(fmpz_t f, mp_limb_t B1, mp_limb_t B2, 
+										   mp_limb_t P, fmpz_t n, ecm_t ecm_inf);
+
 #ifdef __cplusplus
 }
 #endif
