@@ -44,6 +44,6 @@ unity_zp_sqr(unity_zp f, const unity_zp g)
         if (fmpz_cmp(f->poly->coeffs + i - p, f->n) >= 0)
             fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->n);
     }
-    _fmpz_mod_poly_normalise(f->poly);
+    _unity_zp_reduce_cyclotomic(f);
 }
 
