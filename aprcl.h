@@ -127,6 +127,12 @@ void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
 
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
+void unity_zp_sqr(unity_zp f, const unity_zp g);
+
+ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
+void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
+void unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow);
+
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 
@@ -181,6 +187,11 @@ void aprcl_config_init(aprcl_config conf, const fmpz_t n);
 void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R);
 void aprcl_config_clear(aprcl_config conf);
 void _aprcl_config_update(aprcl_config conf);
+
+ulong _R_value(const fmpz_t n);
+void _jacobi_config_update(aprcl_config conf);
+void jacobi_config_init(aprcl_config conf, const fmpz_t n);
+void jacobi_config_clear(aprcl_config conf);
 
 mp_ptr f_table(const ulong q);
 ulong p_power_in_q(ulong q, ulong p);

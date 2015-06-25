@@ -819,11 +819,11 @@ is_prime_jacobi(const fmpz_t n)
         (1.a) Choose R and s values for n and store its factorisation.
         See definition in aprcl_config functions documentation. s^2 > n.
     */
-    aprcl_config_init_min_R(config, n, 2);
+    jacobi_config_init(config, n);
 
     result = _is_prime_jacobi(n, config);
 
-    aprcl_config_clear(config);
+    jacobi_config_clear(config);
 
     /* if we prove primality returns 1 */
     if (result == PRIME)
