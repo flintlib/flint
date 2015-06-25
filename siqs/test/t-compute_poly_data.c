@@ -51,7 +51,7 @@ int main(void)
    {
        fmpz_randtest_unsigned(n, state, 270);
 
-       if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 200) continue;
+       if (fmpz_is_zero(n) || fmpz_is_one(n)|| fmpz_bits(n) < 100) continue;
 
        qsieve_init(qs_inf, n);
        small_factor = qsieve_knuth_schroeppel(qs_inf);

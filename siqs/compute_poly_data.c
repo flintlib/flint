@@ -457,7 +457,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     for (j = 2; j < qs_inf->num_primes; j++)
     {
         p = factor_base[j].p;
-        pinv = n_preinvert_limb(p);
+        pinv = factor_base[j].pinv;
         temp = n_invmod(q0, p);
         A_inv[j] = n_mulmod2_preinv(A0_inv[j], temp, p, pinv);
     }
@@ -471,7 +471,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
         for (i = 2; i < qs_inf->num_primes; i++)
         {
             p = factor_base[i].p;
-            pinv = n_preinvert_limb(p);
+            pinv = factor_base[i].pinv;
             temp = fmpz_fdiv_ui(B_terms[j], p);
             temp *= 2;
             if (temp >= p) temp -= p;
@@ -484,17 +484,24 @@ void qsieve_init_poly_first(qs_t qs_inf)
     for (i = 2; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
-        pinv = n_preinvert_limb(p);
+        pinv = factor_base[i].pinv;
         temp = fmpz_fdiv_ui(B[0], p);
         temp2 = sqrts[i];
         temp2 = temp2 + p - temp;
         temp2 = n_mulmod2_preinv(temp2, A_inv[i], p, pinv);
+        temp2 += qs_inf->sieve_size / 2;
+        temp2 = n_mod2_preinv(temp2, p, pinv);
         soln1[i] = temp2;
         temp2 = sqrts[i];
         temp2 = p - temp2;
         temp2 = temp2 + p - temp;
         temp2 = n_mulmod2_preinv(temp2, A_inv[i], p, pinv);
+        temp2 += qs_inf->sieve_size / 2;
+        temp2 = n_mod2_preinv(temp2, p, pinv);
         soln2[i] = temp2;
+
+        if (soln1[i] > soln2[i])
+            soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
     }
 
     qs_inf->curr_poly = 1;
@@ -554,6 +561,9 @@ void qsieve_init_poly_next(qs_t qs_inf)
 
         if (soln1[j] >= p) soln1[j] -= p;
         if (soln2[j] >= p) soln2[j] -= p;
+
+        if (soln1[j] > soln2[j])
+            soln1[j] = (soln1[j] + soln2[j]) - (soln2[j] = soln1[j]);
     }
 
     i++;

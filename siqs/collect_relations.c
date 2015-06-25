@@ -35,6 +35,8 @@
 #include "qsieve.h"
 #include "fmpz.h"
 
+#include <time.h>
+
 /* taken from FLINT2 */
 
 void qsieve_do_sieving(qs_t qs_inf, char * sieve)
@@ -118,7 +120,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    fmpz_init(p);
 
    fmpz_set_ui(X, i);
-   fmpz_sub_ui(X, X, qs_inf->sieve_size/2); /* X */
+   fmpz_sub_ui(X, X, qs_inf->sieve_size / 2); /* X */
 
    fmpz_mul(Y, X, A);
    fmpz_add(Y, Y, B); /* Y = AX+B */
@@ -142,20 +144,23 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
       exp = fmpz_remove(res, res, p);
       if (exp) extra_bits += exp*qs_inf->factor_base[0].size;
       small[0] = exp;
-   } else small[0] = 0;
+   }
+   else small[0] = 0;
 
    for (j = 2; j < qs_inf->small_primes; j++) /* pull out small primes */
    {
       prime = factor_base[j].p;
       pinv = factor_base[j].pinv;
       modp = n_mod2_preinv(i, prime, pinv);
+
       if ((modp == soln1[j]) || (modp == soln2[j]))
       {
          fmpz_set_ui(p, prime);
          exp = fmpz_remove(res, res, p);
          if (exp) extra_bits += qs_inf->factor_base[j].size;
          small[j] = exp;
-      } else small[j] = 0;
+      }
+      else small[j] = 0;
    }
 
    if (extra_bits + sieve[i] > bits)
@@ -168,6 +173,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          prime = factor_base[j].p;
          pinv = factor_base[j].pinv;
          modp = n_mod2_preinv(i, prime, pinv);
+
          if (soln2[j] != 0)
          {
             if ((modp == soln1[j]) || (modp == soln2[j]))
@@ -181,7 +187,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
                   factor[num_factors++].exp = exp;
                }
             }
-         } else
+         }
+         else
          {
             fmpz_set_ui(p, prime);
             exp = fmpz_remove(res, res, p);
@@ -297,7 +304,9 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
                 else
                     break;
 
-             } while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+
+            } while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+
         }
 
         qsieve_next_A0(qs_inf);
