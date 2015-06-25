@@ -151,8 +151,8 @@ FLINT_DLL int fmpz_factor_ecm_stage_II_one(fmpz_t f, mp_limb_t B1, mp_limb_t B2,
 FLINT_DLL int fmpz_factor_ecm_stage_II_two(fmpz_t f, mp_limb_t B1, mp_limb_t B2,
                                            mp_limb_t P, fmpz_t n, ecm_t ecm_inf);
 
-FLINT_DLL int fmpz_factor_ecm_stage_II_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2,
-                                           mp_limb_t P, fmpz_t n, ecm_t ecm_inf);
+FLINT_DLL int fmpz_factor_ecm_stage_II_one_FFT(fmpz_t f, mp_limb_t B1, mp_limb_t B2,
+                                               mp_limb_t P, fmpz_t n, ecm_t ecm_inf);
 
 FLINT_DLL int fmpz_factor_ecm_one(fmpz_t f, mp_limb_t curves, mp_limb_t B1,
                                   mp_limb_t B2, flint_rand_t state, fmpz_t n);
