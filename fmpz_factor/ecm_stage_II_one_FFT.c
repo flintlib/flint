@@ -32,6 +32,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
+/* prod + i will have product of all elements of arr except (arr + i) */
+
 void
 create_subproduct_tree(fmpz * prod, const fmpz * arr, mp_limb_t len, fmpz_t mod)
 {
