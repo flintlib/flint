@@ -99,6 +99,8 @@ primality_test_status _is_prime_aprcl(const fmpz_t n);
 
 int is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
 int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
+
+int is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r);
 int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 
 /* Z[unity_root] operation v2. */

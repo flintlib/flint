@@ -792,6 +792,8 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
         /* if we not find divisors of n then n is composite */
         if (is_prime_final_division(n, config->s, config->R) == 1)
             result = PRIME;
+        else
+            result = COMPOSITE;
 
     /* end of (4.) */
 
