@@ -405,7 +405,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     mp_limb_t p, pinv, temp, temp2, pmod, mod_inv;
     fmpz_t temp3, temp4;
     fmpz_init(temp3);
-    B = flint_malloc((1 << s) * sizeof(fmpz_t));
+    B = flint_malloc((1 << s) * sizeof(mp_limb_t));
     fmpz_init(B[0]);
     fmpz_zero(B[0]);
     fmpz_init(temp4);
@@ -502,6 +502,11 @@ void qsieve_init_poly_first(qs_t qs_inf)
 
         if (soln1[i] > soln2[i])
             soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
+    }
+
+    for (i = 0; i < s; i++)
+    {
+        soln1[A_ind[i]] = soln2[A_ind[i]] = 0;
     }
 
     qs_inf->curr_poly = 1;

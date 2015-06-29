@@ -171,37 +171,37 @@ typedef qs_s qs_t[1];
    Tuning parameters { bits, ks_primes, fb_primes, small_primes, sieve_size}
    for qsieve_factor where:
      * bits is the number of bits of n
-     * ks_primes is the max number of primes to try in Knuth-Schroeppel algo
+     * ks_primes is the max number of primes to try in Knuth-Schroeppel function
      * fb_primes is the number of factor base primes to use (including k and 2)
      * small_primes is the number of small primes to not factor with (including k and 2)
      * sieve_size is the size of the sieve to use
 */
 static const mp_limb_t qsieve_tune[][5] =
 {
-   {40,   50,    50,  5,   3000},
-   {50,   50,    80,  5,   3500},
-   {60,   50,   100,  5,   4000},
-   {70,   50,   300,  6,   6000},
-   {80,   50,   400,  6,   8000},
-   {90,   50,   500,  7,  10000},
-   {100, 100,   650,  7,  13000},
-   {110, 100,   800,  7,  15000}, // 31 digits
-   {120, 100,  1000,  7,  20000},
-   {130, 100,   800,  9,  32000}, // 41 digits
-   {140, 100,  1200,  8,  28000},
-   {150, 100,  1800,  8,  32000},
-   {160, 150,  2000,  8,  40000},
-   {170, 150,  2200,  9,  64000}, // 50 digits
-   {180, 150,  2400,  9,  64000},
-   {190, 150,  2700, 10,  64000},
-   {200, 150,  3600, 10,  64000}, // 60 digits
-   {210, 150,  6000, 12,  64000},
-   {220, 200,  7500, 15,  64000},
-   {230, 200,  8500, 17,  64000}, // 70 digits
-   {240, 200, 18000, 19,  64000},
-   {250, 200, 24000, 19,  64000}, // 75 digits
-   {260, 200, 55000, 25, 128000}, // 80 digits
-   {270, 200, 64000, 27, 128000}
+   {40,   50,    50,  5,   2 *   3000},
+   {50,   50,    80,  5,   2 *   3500},
+   {60,   50,   100,  5,   2 *   4000},
+   {70,   50,   300,  6,   2 *   6000},
+   {80,   50,   400,  6,   2 *   8000},
+   {90,   50,   500,  7,   2 *  10000},
+   {100, 100,   650,  7,   2 *  13000},
+   {110, 100,   800,  7,   2 *  15000}, // 31 digits
+   {120, 100,  1000,  7,   2 *  20000},
+   {130, 100,   800,  9,   2 *  32000}, // 41 digits
+   {140, 100,  1200,  8,   2 *  28000},
+   {150, 100,  1800,  8,   2 *  32000},
+   {160, 150,  2000,  8,   2 *  40000},
+   {170, 150,  2200,  9,   2 *  64000}, // 50 digits
+   {180, 150,  2400,  9,   2 *  64000},
+   {190, 150,  2700, 10,   2 *  64000},
+   {200, 150,  3600, 10,   2 *  64000}, // 60 digits
+   {210, 150,  6000, 12,   2 *  64000},
+   {220, 200,  7500, 15,   2 *  64000},
+   {230, 200,  8500, 17,   2 *  64000}, // 70 digits
+   {240, 200, 18000, 19,   2 *  64000},
+   {250, 200, 24000, 19,   2 *  64000}, // 75 digits
+   {260, 200, 55000, 25,   2 * 128000}, // 80 digits
+   {270, 200, 64000, 27,   2 * 128000}
 };
 
 /* number of entries in the tuning table */
@@ -265,13 +265,15 @@ static __inline__ void free_col(la_col_t * col)
 #include "init.c"
 #include "knuth_schroeppel.c"
 #include "primes_init.c"
-#include "factor.c"
 #include "poly_init.c"
 #include "compute_poly_data.c"
 #include "linalg_init.c"
 #include "insert_relations.c"
 #include "collect_relations.c"
 #include "block_lanczos.c"
+#include "square_root.c"
+#include "factor.c"
+
 
 /******************************************************************************/
 

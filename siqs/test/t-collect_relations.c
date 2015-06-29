@@ -33,7 +33,7 @@
 
 int main(void)
 {
-    slong i, j;
+    slong i, j, ncols, nrows;
     mp_limb_t small_factor;
     fmpz_t n, temp, temp2;
     qs_t qs_inf;
@@ -46,13 +46,18 @@ int main(void)
     flint_printf("collect_relations....");
     fflush(stdout);
 
+    //flint_printf("\n");
+
     for (i = 0; i < 1000; i++)
     {
         fmpz_randtest_unsigned(n, state, 130);
 
-        if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 100) continue;
+        if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 60 || fmpz_bits(n) >= 100) continue;
 
         qsieve_init(qs_inf, n);
+
+        fmpz_clear(n);
+
         small_factor = qsieve_knuth_schroeppel(qs_inf);
 
         if (small_factor) continue;
@@ -62,58 +67,41 @@ int main(void)
 
         if (small_factor) continue;
 
+        flint_printf("largest prime is : %wu \n", qs_inf->factor_base[qs_inf->num_primes - 1]);
+
         flint_printf("number to factor : ");
         fmpz_print(qs_inf->kn);
+        flint_printf("\n bits = %wu", fmpz_bits(qs_inf->kn));
         flint_printf("\n");
 
-        flint_printf("optimal hypercube: ");
+        flint_printf("optimal hypercube:      ");
         fmpz_print(qs_inf->target_A);
         flint_printf("\n");
 
         qsieve_poly_init(qs_inf);
 
-        qsieve_compute_q0(qs_inf);
-
-        qsieve_init_A0(qs_inf);
-
-        qsieve_compute_pre_data(qs_inf);
-
-        qsieve_init_poly_first(qs_inf);
-
-        flint_printf("approximated hypercube: ");
-        fmpz_print(qs_inf->A);
-        flint_printf("\n with factor = %wu \n", qs_inf->s);
-
-        qsieve_compute_C(qs_inf);
-
         char * sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
         qsieve_linalg_init(qs_inf);
 
-        qsieve_do_sieving(qs_inf, sieve);
+        qs_inf->sieve_bits = 30;
 
-        qs_inf->sieve_bits = 32;
+        flint_printf("stop = %wu \n", qs_inf->num_primes + qs_inf->extra_rels);
 
-        qsieve_evaluate_sieve(qs_inf, sieve);
+        qsieve_collect_relations(qs_inf, sieve);
 
-        qsieve_next_A0(qs_inf);
+        flint_free(sieve);
+        fmpz_clear(temp);
+        fmpz_clear(temp2);
 
-        qsieve_compute_pre_data(qs_inf);
+        //ncols = qs_inf->num_primes + qs_inf->extra_rels;
+        //nrows = qs_inf->num_primes;
 
-        qsieve_init_poly_first(qs_inf);
-
-        flint_printf("approximated hypercube: ");
-        fmpz_print(qs_inf->A);
-        flint_printf("\n with factor = %wu \n", qs_inf->s);
+        //reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
         qsieve_clear(qs_inf);
-
         break;
     }
-
-    fmpz_clear(n);
-    fmpz_clear(temp);
-    fmpz_clear(temp2);
 
     FLINT_TEST_CLEANUP(state);
 

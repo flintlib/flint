@@ -199,6 +199,9 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
 
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
+       /*  flint_printf("relation = ");
+         fmpz_print(Y);
+         flint_printf("\n"); */
          mp_limb_t * A_ind = qs_inf->A_ind;
          slong i;
 
@@ -279,21 +282,38 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
     slong i, relation = 0;
+    prime_t * fb = qs_inf->factor_base;
+    mp_limb_t * ind = qs_inf->A_ind;
+
+    clock_t start = clock(), diff;
 
     /* iterate over polynomial to call for sieving */
     qsieve_compute_q0(qs_inf);
     qsieve_init_A0(qs_inf);
     qsieve_compute_pre_data(qs_inf);
 
+    flint_printf("s = %wu\n", qs_inf->s);
+
     do
     {
         for (i = 0; i < qs_inf->num_q0; i++)
         {
+            if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
+                break;
+
             qs_inf->q0 = qs_inf->q0_values[i];
             qsieve_init_poly_first(qs_inf);
 
+            flint_printf("A = ");
+            fmpz_print(qs_inf->A);
+            flint_printf(" = %wu * %wu * %wu * %wu relation = %wd\n", qs_inf->q0,
+                         fb[ind[0]].p, fb[ind[1]].p, fb[ind[2]].p, relation);
+
             do
             {
+                if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
+                    break;
+
                 qsieve_compute_C(qs_inf);
 
                 qsieve_do_sieving(qs_inf, sieve);
@@ -304,14 +324,27 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
                 else
                     break;
 
+            diff = clock() - start;
+
+            if (diff / 1000 > 20)
+            {
+               //flint_printf("time = %wu relation = %wd\n", diff / 100, relation);
+               break;
+            }
 
             } while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
 
+            if (diff / 1000 > 20) break;
         }
+
+        if (diff / 1000 > 20) break;
 
         qsieve_next_A0(qs_inf);
 
     } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+
+    if (diff / 1000 < 20)
+        flint_printf("total coulmns = %wu\n", qs_inf->columns);
 
     return relation;
 }
