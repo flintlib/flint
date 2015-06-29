@@ -39,7 +39,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
 
-    flint_printf("evaluate_mat....");
+    flint_printf("evaluate_mat_horner....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -57,7 +57,7 @@ main(void)
         nmod_mat_init(A, m, m, n);
         nmod_mat_init(B, m, m, n);
         nmod_mat_one(A);
-        nmod_poly_evaluate_mat(B, a, A);
+        nmod_poly_evaluate_mat_horner(B, a, A);
 
         sum = 0;
         for (j = 0; j < a->length; j++)
@@ -102,13 +102,13 @@ main(void)
         nmod_mat_init(C, m, m, n);
         nmod_mat_randtest(A, state);
 
-        nmod_poly_evaluate_mat(B, a, A);
-        nmod_poly_evaluate_mat(C, b, A);
+        nmod_poly_evaluate_mat_horner(B, a, A);
+        nmod_poly_evaluate_mat_horner(C, b, A);
         nmod_mat_add(C, B, C);
 
 
         nmod_poly_add(a, a, b);
-        nmod_poly_evaluate_mat(B, a, A);
+        nmod_poly_evaluate_mat_horner(B, a, A);
 
         if (!nmod_mat_equal(B, C))
         {

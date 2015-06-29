@@ -36,27 +36,29 @@ nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
 {
     slong i, j;
 
-    if(dest == mat)
+    if (dest == mat)
     {
-        for(i = 0; i < mat->r ; i++)
+        for (i = 0; i < mat->r; i++)
         {
-            nmod_mat_entry(dest, i, i) = n_addmod(nmod_mat_entry(mat, i, i),  c, mat->mod.n);
+            nmod_mat_entry(dest, i, i) =
+                n_addmod(nmod_mat_entry(mat, i, i), c, mat->mod.n);
         }
         return;
     }
-    for(i = 0; i < mat->r ; i++)
-        for(j = 0; j < mat->c ; j++)
+    for (i = 0; i < mat->r; i++)
+        for (j = 0; j < mat->c; j++)
         {
             nmod_mat_entry(dest, i, j) = nmod_mat_entry(mat, i, j);
-            if(i == j)
+            if (i == j)
             {
-                nmod_mat_entry(dest, i, i) = n_addmod(nmod_mat_entry(dest, i, i),  c, mat->mod.n);
+                nmod_mat_entry(dest, i, i) =
+                    n_addmod(nmod_mat_entry(dest, i, i), c, mat->mod.n);
             }
         }
 }
 
 void
-_nmod_poly_evaluate_mat(nmod_mat_t dest,const mp_srcptr poly, slong len, const nmod_mat_t c)
+_nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const mp_srcptr poly, slong len, const nmod_mat_t c)
 {
     slong m = len-1;
     nmod_mat_t temp;
@@ -86,17 +88,17 @@ _nmod_poly_evaluate_mat(nmod_mat_t dest,const mp_srcptr poly, slong len, const n
 }
 
 void
-nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
+nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 {
     nmod_mat_t temp;
     if (dest == c)
     {
         nmod_mat_init_set(temp, c);
-        _nmod_poly_evaluate_mat(dest, poly->coeffs, poly->length, temp);
+        _nmod_poly_evaluate_mat_horner(dest, poly->coeffs, poly->length, temp);
         nmod_mat_clear(temp);
     }
     else
     {
-        _nmod_poly_evaluate_mat(dest, poly->coeffs, poly->length, c);
+        _nmod_poly_evaluate_mat_horner(dest, poly->coeffs, poly->length, c);
     }
 }
