@@ -278,16 +278,13 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
     slong i, relation = 0;
-    prime_t * fb = qs_inf->factor_base;
-    mp_limb_t * ind;
-    clock_t start = clock(), diff;
 
     /* iterate over polynomial to call for sieving */
-    qsieve_compute_q0(qs_inf);
+    qsieve_compute_q0(qs_inf);          /* calculate q0 */
+
+    /* initialize 'A0' and precompute data associated with it */
     qsieve_init_A0(qs_inf);
     qsieve_compute_pre_data(qs_inf);
-
-    ind = qs_inf->A_ind;
 
     do
     {
@@ -297,6 +294,8 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
                 break;
 
             qs_inf->q0 = qs_inf->q0_values[i];
+
+            /* initialize first polynomial*/
             qsieve_init_poly_first(qs_inf);
 
             do
@@ -304,11 +303,14 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
                 if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
                     break;
 
+                /* calculate coefficient 'C' */
                 qsieve_compute_C(qs_inf);
 
+                /* perform sieving for current polynomial */
                 qsieve_do_sieving(qs_inf, sieve);
                 relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
+                /* switch to next polynomial if exist */
                 if (qs_inf->curr_poly < (1 << qs_inf->s))
                     qsieve_init_poly_next(qs_inf);
                 else
@@ -318,7 +320,9 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 
         }
 
+        /* generate next 'A0' and precompute data associated with it */
         qsieve_next_A0(qs_inf);
+        qsieve_compute_pre_data(qs_inf);
 
     } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
 
