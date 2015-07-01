@@ -95,8 +95,6 @@ int is_prime_jacobi(const fmpz_t n);
 
 int is_prime_aprcl(const fmpz_t n);
 
-primality_test_status _is_prime_aprcl(const fmpz_t n);
-
 int is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
 int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
 

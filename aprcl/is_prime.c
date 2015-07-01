@@ -25,13 +25,9 @@
 
 #include "aprcl.h"
 
-int is_prime_aprcl(const fmpz_t n)
+int
+is_prime_aprcl(const fmpz_t n)
 {
-    return _is_prime_aprcl(n) == PRIME;
-}
-
-primality_test_status _is_prime_aprcl(const fmpz_t n)
-{
-    return UNKNOWN;
+    return is_prime_jacobi(n);
 }
 

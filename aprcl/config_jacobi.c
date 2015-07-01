@@ -35,6 +35,7 @@ _R_value(const fmpz_t n)
     if (bits <= 204) return 1260;
     if (bits <= 268) return 2520;
     if (bits <= 344) return 5040;
+    if (bits <= 427) return 10080;
     if (bits <= 525) return 27720;
     if (bits <= 774) return 98280;
     if (bits <= 1035) return 166320;
