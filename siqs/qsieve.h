@@ -99,7 +99,7 @@ typedef struct qs_s
    mp_limb_t num_q0;        /* total number of q0 */
    mp_limb_t q0;            /* current non-factor-base prime,
                                prime factor of A */
-   fmpz_t * B;              /* B values corresponding to current value of A */
+   fmpz_t B;              /* B values corresponding to current value of A */
    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
    fmpz_t * A_divp;         /* A_divp[i] = A0_divp[i] * q0 */
@@ -209,6 +209,53 @@ static const mp_limb_t qsieve_tune[][5] =
 
 #define BITS_ADJUST 10
 
+void qsieve_init(qs_t qs_inf, fmpz_t n);
+
+mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
+
+void qsieve_clear(qs_t qs_inf);
+
+mp_limb_t qsieve_primes_init(qs_t qs_inf);
+
+mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
+
+mp_limb_t qsieve_poly_init(qs_t qs_inf);
+
+void qsieve_next_A0(qs_t qs_inf);
+
+void qsieve_init_A0(qs_t qs_inf);
+
+mp_limb_t qsieve_compute_q0(qs_t qs_inf);
+
+void qsieve_compute_pre_data(qs_t qs_inf);
+
+void qsieve_init_poly_first(qs_t qs_inf);
+
+void qsieve_init_poly_next(qs_t qs_inf);
+
+void qsieve_compute_C(qs_t qs_inf);
+
+void qsieve_poly_clear(qs_t qs_inf);
+
+void qsieve_do_sieving(qs_t qs_inf, char * sieve);
+
+slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve);
+
+slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve);
+
+slong qsieve_collect_relations(qs_t qs_inf, char * sieve);
+
+void qsieve_linalg_init(qs_t qs_inf);
+
+void qsieve_linalg_clear(qs_t qs_inf);
+
+slong qsieve_merge_sort(qs_t qs_inf);
+
+slong qsieve_merge_relations(qs_t qs_inf);
+
+slong qsieve_insert_relation(qs_t qs_inf, fmpz_t Y);
+
+
 static __inline__ void insert_col_entry(la_col_t * col, slong entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
@@ -255,28 +302,6 @@ static __inline__ void free_col(la_col_t * col)
 {
    if (col->weight) flint_free(col->data);
 }
-
-/* need to replace with function prototype */
-
-/******************************************************************************/
-
-#include "test_helpers.c"
-#include "clear.c"
-#include "init.c"
-#include "knuth_schroeppel.c"
-#include "primes_init.c"
-#include "poly_init.c"
-#include "compute_poly_data.c"
-#include "linalg_init.c"
-#include "insert_relations.c"
-#include "collect_relations.c"
-#include "block_lanczos.c"
-#include "square_root.c"
-#include "factor.c"
-
-
-/******************************************************************************/
-
 
 #ifdef __cplusplus
 }

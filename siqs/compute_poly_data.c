@@ -115,16 +115,11 @@ void qsieve_next_A0(qs_t qs_inf)
 void qsieve_init_A0(qs_t qs_inf)
 {
     slong i, j = 0;
-    slong s = qs_inf->s;
-    slong low = qs_inf->low;
-    slong high = qs_inf->high;
-    slong span = qs_inf->span;
-    slong m = qs_inf->m;
-    slong h = qs_inf->h;
+    slong s, low, high, span, m, h;
     mp_limb_t bits, num_factor, rem, mid;
     mp_limb_t * factor_bound = flint_malloc(32 * sizeof(mp_limb_t));
-    mp_limb_t * A_ind = qs_inf->A_ind;
-    mp_limb_t * current_subset = qs_inf->current_subset;
+    mp_limb_t * A_ind;
+    mp_limb_t * current_subset;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t target, prod, temp, temp2, upper_bound, lower_bound;
     fmpz_init(target);
@@ -201,12 +196,17 @@ void qsieve_init_A0(qs_t qs_inf)
     }
 
     s = num_factor;
+    qs_inf->s = s;
+
+    qsieve_poly_init(qs_inf);
+    A_ind = qs_inf->A_ind;
+    current_subset = qs_inf->current_subset;
+
     span = high - low;
     if (span > 100) span = 100;
 
     /* generate first s-subset from range of possible factors */
 
-    current_subset = flint_malloc( s * sizeof(mp_limb_t));
     m = 0;
     h = s;
 
@@ -217,8 +217,7 @@ void qsieve_init_A0(qs_t qs_inf)
 
     for (j = 1; j <= s; j++)
     {
-        fmpz_mul_ui(temp, prod, factor_base[current_subset[j - 1] + low - 1].p);
-        fmpz_set(prod, temp);
+        fmpz_mul_ui(prod, prod, factor_base[current_subset[j - 1] + low - 1].p);
     }
 
     qs_inf->current_subset = current_subset;
@@ -226,7 +225,6 @@ void qsieve_init_A0(qs_t qs_inf)
     qs_inf->m = m;
     qs_inf->low = low;
     qs_inf->span = span;
-    qs_inf->s = s;
     fmpz_set(qs_inf->A0, prod);
 
     for (j = 0; j < s; j++)
@@ -252,6 +250,7 @@ mp_limb_t qsieve_compute_q0(qs_t qs_inf)
 {
     mp_limb_t p, kron, pmod, pinv, q0, qr;
     ulong i = 0;
+    qs_inf->q0_values = NULL;
 
     fmpz_t upper_bound;
     fmpz_t temp;
@@ -335,6 +334,7 @@ mp_limb_t qsieve_compute_q0(qs_t qs_inf)
     n_primes_clear(iter);
     fmpz_clear(upper_bound);
     fmpz_clear(temp);
+
     return 0;
 }
 
@@ -360,7 +360,6 @@ void qsieve_compute_pre_data(qs_t qs_inf)
     {
         p = factor_base[A_ind[i]].p;
         pinv = factor_base[A_ind[i]].pinv;
-        fmpz_init(A0_divp[i]);
         fmpz_divexact_ui(A0_divp[i], qs_inf->A0, p);
         temp2 = fmpz_fdiv_ui(A0_divp[i], p);
         temp2 = n_invmod(temp2, p);
@@ -399,18 +398,13 @@ void qsieve_init_poly_first(qs_t qs_inf)
     mp_limb_t * B0_terms = qs_inf->B0_terms;
     fmpz_t * A0_divp = qs_inf->A0_divp;
     fmpz_t * A_divp = qs_inf->A_divp;
-    fmpz_t * B = qs_inf->B;
     prime_t * factor_base = qs_inf->factor_base;
     int * sqrts = qs_inf->sqrts;
     mp_limb_t p, pinv, temp, temp2, pmod, mod_inv;
-    fmpz_t temp3, temp4;
+    fmpz_t temp3;
     fmpz_init(temp3);
-    B = flint_malloc((1 << s) * sizeof(mp_limb_t));
-    fmpz_init(B[0]);
-    fmpz_zero(B[0]);
-    fmpz_init(temp4);
-    fmpz_init(qs_inf->A);
 
+    fmpz_zero(qs_inf->B);
     fmpz_mul_ui(qs_inf->A, qs_inf->A0, q0);
 
     /*
@@ -422,25 +416,21 @@ void qsieve_init_poly_first(qs_t qs_inf)
     {
         p = factor_base[A_ind[i]].p;
         pinv = factor_base[A_ind[i]].pinv;
-        fmpz_set(temp3, A0_divp[i]);
-        fmpz_init(A_divp[i]);
-        fmpz_mul_ui(A_divp[i], temp3, q0);
+        fmpz_mul_ui(A_divp[i], A0_divp[i], q0);
         temp2 = n_invmod(q0, p);
         temp2 = n_mulmod2_preinv(temp2, B0_terms[i], p, pinv);
 
         if (temp2 >= p / 2) temp2 = p - temp2;
 
-        fmpz_init(B_terms[i]);
         fmpz_mul_ui(B_terms[i], A_divp[i], temp2);
-        fmpz_add(temp4, B[0], B_terms[i]);
-        fmpz_set(B[0], temp4);
+        fmpz_add(qs_inf->B, qs_inf->B, B_terms[i]);
     }
 
     /*
        adding $A0 * \sqrt{kn} * A0^{-1} modulo q0$
        to $b_1 = \sum _{i=1} ^{s} B_i$
     */
-    p = qs_inf->q0;
+    p = q0;
     pinv = n_preinvert_limb(p);
     pmod = fmpz_fdiv_ui(qs_inf->A0, p);
     mod_inv = n_invmod(pmod, p);
@@ -448,10 +438,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     pmod = n_sqrtmod(pmod, p);
     pmod = n_mulmod2_preinv(mod_inv, pmod, p, pinv);
     fmpz_mul_ui(temp3, qs_inf->A0, pmod);
-    fmpz_set(temp4, B[0]);
-    fmpz_add(B[0], temp3, temp4);
-
-    qs_inf->B = B;
+    fmpz_add(qs_inf->B, qs_inf->B, temp3);
 
     /* calculating $A^(-1) modulo p$, $p \in factor_base$*/
     for (j = 2; j < qs_inf->num_primes; j++)
@@ -485,7 +472,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
     {
         p = factor_base[i].p;
         pinv = factor_base[i].pinv;
-        temp = fmpz_fdiv_ui(B[0], p);
+        temp = fmpz_fdiv_ui(qs_inf->B, p);
         temp2 = sqrts[i];
         temp2 = temp2 + p - temp;
         temp2 = n_mulmod2_preinv(temp2, A_inv[i], p, pinv);
@@ -512,7 +499,6 @@ void qsieve_init_poly_first(qs_t qs_inf)
     qs_inf->curr_poly = 1;
 
     fmpz_clear(temp3);
-    fmpz_clear(temp4);
 }
 
 /*
@@ -543,10 +529,9 @@ void qsieve_init_poly_next(qs_t qs_inf)
     sign = (i >> v) & 2;
 
     fmpz_mul_ui(temp, qs_inf->B_terms[v], UWORD(2));
-    fmpz_init(qs_inf->B[i]);
 
-    if (sign) fmpz_add(qs_inf->B[i], qs_inf->B[i - 1], temp);
-    else fmpz_sub(qs_inf->B[i], qs_inf->B[i - 1], temp);
+    if (sign) fmpz_add(qs_inf->B, qs_inf->B, temp);
+    else fmpz_sub(qs_inf->B, qs_inf->B, temp);
 
     /* updating roots for $b_{i+1}$ */
     for (j = 2; j < qs_inf->num_primes; j++)
@@ -580,12 +565,8 @@ void qsieve_init_poly_next(qs_t qs_inf)
 /* calculate coefficient 'C' for current 'A' and 'B' */
 void qsieve_compute_C(qs_t qs_inf)
 {
-    fmpz_t temp;
-    fmpz_init(temp);
-    fmpz_init(qs_inf->C);
-    fmpz_pow_ui(qs_inf->C, qs_inf->B[qs_inf->curr_poly - 1], UWORD(2));
-    fmpz_sub(temp, qs_inf->C, qs_inf->kn);
-    fmpz_divexact(qs_inf->C, temp, qs_inf->A);
-    fmpz_clear(temp);
+    fmpz_pow_ui(qs_inf->C, qs_inf->B, UWORD(2));
+    fmpz_sub(qs_inf->C, qs_inf->C, qs_inf->kn);
+    fmpz_divexact(qs_inf->C, qs_inf->C, qs_inf->A);
 }
 

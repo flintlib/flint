@@ -31,16 +31,18 @@
 mp_limb_t qsieve_poly_init(qs_t qs_inf)
 {
    ulong num_primes = qs_inf->num_primes;
-   ulong s = 12; /* number of prime factors in A coeff */
+   ulong s = qs_inf->s; /* number of prime factors in A coeff */
 
    fmpz_init(qs_inf->A);
    fmpz_init(qs_inf->A0);
+   fmpz_init(qs_inf->B);
+   fmpz_init(qs_inf->C);
 
    mp_limb_t ** A_inv2B;
 
    slong i;
 
-   qs_inf->q0_values = NULL;
+   qs_inf->current_subset = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->B_terms = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->A_ind = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->A0_divp = flint_malloc(s * sizeof(mp_limb_t));
@@ -56,9 +58,15 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
 
    A_inv2B = qs_inf->A_inv2B;
 
-   A_inv2B[0] = flint_malloc(num_primes * sizeof(mp_limb_t));
-   for (i = 1; i < s; i++)
+   for (i = 0; i < s; i++)
       A_inv2B[i] = flint_malloc(num_primes * sizeof(mp_limb_t));
+
+   for (i = 0; i < s; i++)
+   {
+       fmpz_init(qs_inf->A0_divp[i]);
+       fmpz_init(qs_inf->A_divp[i]);
+       fmpz_init(qs_inf->B_terms[i]);
+   }
 
    return 0;
 }

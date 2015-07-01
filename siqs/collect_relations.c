@@ -111,9 +111,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    slong relations = 0;
    slong j;
 
-   fmpz_t X, Y, res, p, A, B;
-   fmpz_init_set(A, qs_inf->A);
-   fmpz_init_set(B, qs_inf->B[qs_inf->curr_poly - 1]);
+   fmpz_t X, Y, res, p;
    fmpz_init(X);
    fmpz_init(Y);
    fmpz_init(res);
@@ -122,9 +120,9 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    fmpz_set_ui(X, i);
    fmpz_sub_ui(X, X, qs_inf->sieve_size / 2); /* X */
 
-   fmpz_mul(Y, X, A);
-   fmpz_add(Y, Y, B); /* Y = AX+B */
-   fmpz_add(res, Y, B);
+   fmpz_mul(Y, X, qs_inf->A);
+   fmpz_add(Y, Y, qs_inf->B); /* Y = AX+B */
+   fmpz_add(res, Y, qs_inf->B);
 
    fmpz_mul(res, res, X);
    fmpz_add(res, res, qs_inf->C); /* res = AX^2 + 2BX + C */
@@ -132,6 +130,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    bits = FLINT_ABS(fmpz_bits(res));
    bits -= BITS_ADJUST;
    extra_bits = 0;
+
    fmpz_set_ui(p, 2); /* divide out by powers of 2 */
    exp = fmpz_remove(res, res, p);
 
@@ -199,9 +198,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
 
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
-       /*  flint_printf("relation = ");
-         fmpz_print(Y);
-         flint_printf("\n"); */
          mp_limb_t * A_ind = qs_inf->A_ind;
          slong i;
 
@@ -283,8 +279,7 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
     slong i, relation = 0;
     prime_t * fb = qs_inf->factor_base;
-    mp_limb_t * ind = qs_inf->A_ind;
-
+    mp_limb_t * ind;
     clock_t start = clock(), diff;
 
     /* iterate over polynomial to call for sieving */
@@ -292,7 +287,7 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
     qsieve_init_A0(qs_inf);
     qsieve_compute_pre_data(qs_inf);
 
-    flint_printf("s = %wu\n", qs_inf->s);
+    ind = qs_inf->A_ind;
 
     do
     {
@@ -303,11 +298,6 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 
             qs_inf->q0 = qs_inf->q0_values[i];
             qsieve_init_poly_first(qs_inf);
-
-            flint_printf("A = ");
-            fmpz_print(qs_inf->A);
-            flint_printf(" = %wu * %wu * %wu * %wu relation = %wd\n", qs_inf->q0,
-                         fb[ind[0]].p, fb[ind[1]].p, fb[ind[2]].p, relation);
 
             do
             {
@@ -324,27 +314,13 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
                 else
                     break;
 
-            diff = clock() - start;
-
-            if (diff / 1000 > 20)
-            {
-               //flint_printf("time = %wu relation = %wd\n", diff / 100, relation);
-               break;
-            }
-
             } while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
 
-            if (diff / 1000 > 20) break;
         }
-
-        if (diff / 1000 > 20) break;
 
         qsieve_next_A0(qs_inf);
 
     } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
-
-    if (diff / 1000 < 20)
-        flint_printf("total coulmns = %wu\n", qs_inf->columns);
 
     return relation;
 }

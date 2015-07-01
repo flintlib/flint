@@ -19,24 +19,53 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 Nitin Kumar
+    Copyright (C) 2006, 2011 William Hart
 
 ******************************************************************************/
 
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 #include "qsieve.h"
+#include "fmpz.h"
 
-void qsieve_clear(qs_t qs_inf)
+void qsieve_linalg_clear(qs_t qs_inf)
 {
-    fmpz_clear(qs_inf->n);
-    fmpz_clear(qs_inf->kn);
+    slong i;
 
-    flint_free(qs_inf->factor_base);
-    flint_free(qs_inf->sqrts);
+    flint_free(qs_inf->small);
+    flint_free(qs_inf->factor);
+    flint_free(qs_inf->relation);
+    flint_free(qs_inf->qsort_arr);
 
-    qs_inf->factor_base = NULL;
-    qs_inf->sqrts       = NULL;
+    if (qs_inf->matrix != NULL)
+    {
+        for (i = 0; i < qs_inf->buffer_size + qs_inf->num_unmerged; i++)
+        {
+            la_col_t * col = qs_inf->matrix + i;
+
+            if (col->weight)
+                flint_free(col->data);
+        }
+
+        flint_free(qs_inf->matrix);
+    }
+
+    if (qs_inf->Y_arr != NULL)
+    {
+        for (i = 0; i < qs_inf->buffer_size; i++)
+            fmpz_clear(qs_inf->Y_arr + i);
+        flint_free(qs_inf->Y_arr);
+    }
+
+    flint_free(qs_inf->prime_count);
+
+    qs_inf->small = NULL;
+    qs_inf->factor = NULL;
+    qs_inf->relation = NULL;
+    qs_inf->qsort_arr = NULL;
+    qs_inf->matrix = NULL;
+    qs_inf->Y_arr = NULL;
+    qs_inf->prime_count = NULL;
+
 }

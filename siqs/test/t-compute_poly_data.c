@@ -63,8 +63,6 @@ int main(void)
 
        if (small_factor) continue;
 
-       qsieve_poly_init(qs_inf);
-
        small_factor = qsieve_compute_q0(qs_inf);
 
        if (small_factor) continue;
@@ -213,13 +211,13 @@ int main(void)
 
        /* check for initial 'B' coefficient */
 
-       fmpz_pow_ui(B_2, qs_inf->B[0], UWORD(2));
+       fmpz_pow_ui(B_2, qs_inf->B, UWORD(2));
        fmpz_mod(temp, B_2, qs_inf->A);
        fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
 
        if (fmpz_cmp(temp, temp2) != 0)
        {
-           fmpz_print(qs_inf->B[0]);
+           fmpz_print(qs_inf->B);
            flint_printf(" ^ %wu modulo ", UWORD(2));
            fmpz_print(qs_inf->A);
            flint_printf(" != ");
@@ -257,7 +255,7 @@ int main(void)
        {
            p = qs_inf->factor_base[j].p;
            fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln1[j]);
-           fmpz_add(temp2, temp, qs_inf->B[0]);
+           fmpz_add(temp2, temp, qs_inf->B);
            fmpz_pow_ui(B_2, temp2, UWORD(2));
 
            if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
@@ -265,7 +263,7 @@ int main(void)
                flint_printf("(");
                fmpz_print(qs_inf->A);
                flint_printf(" * %wu + ", qs_inf->soln1[j]);
-               fmpz_print(qs_inf->B[0]);
+               fmpz_print(qs_inf->B);
                flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
                fmpz_print(qs_inf->kn);
                flint_printf(" modulo %wu\n", p);
@@ -273,7 +271,7 @@ int main(void)
            }
 
            fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln2[j]);
-           fmpz_add(temp2, temp, qs_inf->B[0]);
+           fmpz_add(temp2, temp, qs_inf->B);
            fmpz_pow_ui(B_2, temp2, UWORD(2));
 
            if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
@@ -281,7 +279,7 @@ int main(void)
                flint_printf("(");
                fmpz_print(qs_inf->A);
                flint_printf(" * %wu + ", qs_inf->soln2[j]);
-               fmpz_print(qs_inf->B[0]);
+               fmpz_print(qs_inf->B);
                flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
                fmpz_print(qs_inf->kn);
                flint_printf(" modulo %wu\n", p);
@@ -297,13 +295,13 @@ int main(void)
 
             /* check for current 'B' coefficient */
 
-            fmpz_pow_ui(B_2, qs_inf->B[j], UWORD(2));
+            fmpz_pow_ui(B_2, qs_inf->B, UWORD(2));
             fmpz_mod(temp, B_2, qs_inf->A);
             fmpz_mod(temp2, qs_inf->kn, qs_inf->A);
 
             if (fmpz_cmp(temp, temp2) != 0)
             {
-                fmpz_print(qs_inf->B[j]);
+                fmpz_print(qs_inf->B);
                 flint_printf(" ^ %wu modulo ", UWORD(2));
                 fmpz_print(qs_inf->A);
                 flint_printf(" != ");
@@ -320,7 +318,7 @@ int main(void)
             {
                 p = qs_inf->factor_base[k].p;
                 fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln1[k]);
-                fmpz_add(temp2, temp, qs_inf->B[j]);
+                fmpz_add(temp2, temp, qs_inf->B);
                 fmpz_pow_ui(B_2, temp2, UWORD(2));
 
                 if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
@@ -328,7 +326,7 @@ int main(void)
                     flint_printf("(");
                     fmpz_print(qs_inf->A);
                     flint_printf(" * %wu + ", qs_inf->soln1[k]);
-                    fmpz_print(qs_inf->B[j]);
+                    fmpz_print(qs_inf->B);
                     flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
                     fmpz_print(qs_inf->kn);
                     flint_printf(" modulo %wu\n", p);
@@ -336,7 +334,7 @@ int main(void)
                 }
 
                 fmpz_mul_ui(temp, qs_inf->A, qs_inf->soln2[k]);
-                fmpz_add(temp2, temp, qs_inf->B[j]);
+                fmpz_add(temp2, temp, qs_inf->B);
                 fmpz_pow_ui(B_2, temp2, UWORD(2));
 
                 if (fmpz_fdiv_ui(B_2, p) != fmpz_fdiv_ui(qs_inf->kn, p))
@@ -344,7 +342,7 @@ int main(void)
                     flint_printf("(");
                     fmpz_print(qs_inf->A);
                     flint_printf(" * %wu + ", qs_inf->soln2[k]);
-                    fmpz_print(qs_inf->B[j]);
+                    fmpz_print(qs_inf->B);
                     flint_printf(") ^ %wu modulo %wu != ", UWORD(2), p);
                     fmpz_print(qs_inf->kn);
                     flint_printf(" modulo %wu\n", p);
@@ -354,6 +352,7 @@ int main(void)
 
         }
 
+        qsieve_poly_clear(qs_inf);
         qsieve_clear(qs_inf);
    }
 

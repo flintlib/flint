@@ -54,4 +54,5 @@ void qsieve_init(qs_t qs_inf, fmpz_t n)
 
     qs_inf->factor_base = NULL;
     qs_inf->sqrts       = NULL;
+
 }

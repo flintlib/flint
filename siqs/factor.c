@@ -145,7 +145,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         Sieve for relations
     ************************************************************************/
 
-    sieve = (char *) flint_malloc(qs_inf->sieve_size + sizeof(ulong));
+    sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
     qs_inf->sieve_bits = 30;
 
