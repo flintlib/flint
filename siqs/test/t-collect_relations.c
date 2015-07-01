@@ -65,11 +65,11 @@ int main(void)
 
         sieve = (char *) flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-        qsieve_linalg_init(qs_inf);
+        qsieve_linalg_init(qs_inf);    /* initialize linear algebra fields */
 
         qs_inf->sieve_bits = 30; /* sieve threshold */
 
-        qsieve_collect_relations(qs_inf, sieve);
+        qsieve_collect_relations(qs_inf, sieve);  /* perform sieving */
 
         flint_free(sieve);
 
@@ -78,9 +78,9 @@ int main(void)
 
         reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix); */
 
-        qsieve_linalg_clear(qs_inf);
-        qsieve_poly_clear(qs_inf);
-        qsieve_clear(qs_inf);
+        qsieve_linalg_clear(qs_inf);        /* free linear algebra field */
+        qsieve_poly_clear(qs_inf);          /* free polynomials field */
+        qsieve_clear(qs_inf);               /* free rest of the field */
         fmpz_clear(n);
 
         break;
