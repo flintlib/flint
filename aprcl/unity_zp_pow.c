@@ -28,40 +28,31 @@
 void
 unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 {
-    unity_zp value, temp_pow, temp;
-    fmpz_t power, rem;
+    slong i;
+    unity_zp temp;
 
-    unity_zp_init(value, f->p, f->exp, f->n);
-    unity_zp_init(temp_pow, f->p, f->exp, f->n);
     unity_zp_init(temp, f->p, f->exp, f->n);
-    fmpz_init_set(power, pow);
-    fmpz_init(rem);
 
     unity_zp_set_zero(f);
     unity_zp_coeff_set_ui(f, 0, 1);
 
-    unity_zp_copy(value, g);
+    i = fmpz_bits(pow) - 1;
 
-    while (fmpz_is_zero(power) == 0)
+    while (i >= 0)
     {
-        fmpz_fdiv_r_2exp(rem, power, 1);
-        if (fmpz_is_zero(rem) == 0)
+        unity_zp_sqr(temp, f);
+        unity_zp_swap(f, temp);
+
+        if (fmpz_tstbit(pow, i) == 1)
         {
-            unity_zp_mul(temp, f, value);
+            unity_zp_mul(temp, f, g);
             unity_zp_swap(f, temp);
         }
 
-        unity_zp_sqr(temp_pow, value);
-        unity_zp_swap(value, temp_pow);
-        fmpz_fdiv_q_2exp(power, power, 1);
+        i--;
     }
 
-
-    fmpz_clear(power);
-    fmpz_clear(rem);
     unity_zp_clear(temp);
-    unity_zp_clear(temp_pow);
-    unity_zp_clear(value);
 }
 
 void
