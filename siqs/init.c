@@ -49,6 +49,7 @@ void qsieve_init(qs_t qs_inf, fmpz_t n)
 
     qs_inf->ks_primes  = qsieve_tune[i][1]; /* number of Knuth-Schroeppel primes */
     qs_inf->num_primes = qsieve_tune[i][2]; /* number of factor base primes */
+    qs_inf->qsort_rels = qsieve_tune[i][1];
 
     fmpz_init(qs_inf->kn); /* initialise kn */
 

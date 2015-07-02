@@ -73,10 +73,19 @@ int main(void)
 
         flint_free(sieve);
 
-   /*   ncols = qs_inf->num_primes + qs_inf->extra_rels;
+        ncols = 0;
+
+        for (j = 0; j < qs_inf->buffer_size; j++)
+        {
+            if (qs_inf->matrix[j].weight > 0) ncols++;
+        }
+
+        flint_printf("total coulmns = %wd\n", ncols);
+
+        ncols = qs_inf->num_primes + qs_inf->extra_rels;
         nrows = qs_inf->num_primes;
 
-        reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix); */
+        reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
         qsieve_linalg_clear(qs_inf);        /* free linear algebra field */
         qsieve_poly_clear(qs_inf);          /* free polynomials field */

@@ -50,9 +50,20 @@ int main(void)
    {
       fmpz_randtest_unsigned(n, state, 130);
 
-      if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 60 || fmpz_bits(n) > 100 ) continue;
+      if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 20 || fmpz_bits(n) > 50 ) continue;
+
+      fmpz_set_ui(n, UWORD(1801));
+
+      fmpz_mul_ui(n, n, UWORD(1801));
+
+      fmpz_mul_ui(n, n, UWORD(2309));
+
+   //   fmpz_mul_ui(n, n, UWORD(953));
+
+      fmpz_mul_ui(n, n, UWORD(911));
 
       qsieve_init(qs_inf, n);
+
       small_factor = qsieve_knuth_schroeppel(qs_inf);
 
       if (small_factor) continue;
@@ -61,10 +72,6 @@ int main(void)
       small_factor = qsieve_primes_init(qs_inf);
 
       if (small_factor) continue;
-
-      flint_printf("\n number to factor is: ");
-      fmpz_print(n);
-      flint_printf("\n with bits = %wu\n", fmpz_bits(n));
 
       fmpz_factor_init(factors);
 

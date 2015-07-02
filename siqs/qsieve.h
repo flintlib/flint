@@ -42,6 +42,9 @@
    #include <stdint.h>
 #endif
 
+
+#define QS_DEBUG 128
+
 typedef struct prime_t
 {
    mp_limb_t pinv; /* precomputed inverse */
@@ -127,9 +130,9 @@ typedef struct qs_s
    slong m;
    mp_limb_t * current_subset;
 
-   /*********************
-     Relations data
-   **********************/
+   /***************************************************************************
+                       RELATION DATA
+   ***************************************************************************/
 
    slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
@@ -146,9 +149,9 @@ typedef struct qs_s
 
    slong num_factors; /* number of factors found in a relation */
 
-   /*********************
-     Linear algebra data
-   **********************/
+   /***************************************************************************
+                       LINEAR ALGEBRA DATA
+   ***************************************************************************/
 
    la_col_t * matrix; /* the main matrix over GF(2) in sparse format */
    la_col_t * unmerged; /* unmerged matrix columns */
@@ -157,9 +160,9 @@ typedef struct qs_s
    slong num_unmerged; /* number of columns unmerged */
    slong columns; /* number of columns in matrix so far */
 
-   /*********************
-     Square root data
-   **********************/
+   /***************************************************************************
+                       SQUARE ROOT DATA
+   ***************************************************************************/
 
    slong * prime_count; /* counts of the exponents of primes appearing in the square */
 
