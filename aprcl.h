@@ -133,6 +133,8 @@ ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
 void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow);
 
+void unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
+
 void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow);
 

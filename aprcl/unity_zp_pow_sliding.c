@@ -25,31 +25,12 @@
 
 #include "aprcl.h"
 
-ulong
-_unity_zp_pow_2k_find_k(const fmpz_t n)
-{
-    ulong bits;
-    bits = fmpz_bits(n);
-
-    if (bits <= 8)  return 1;
-    if (bits <= 24) return 2;
-    if (bits <= 69) return 3;
-    if (bits <= 196) return 4;
-    if (bits <= 538) return 5;
-    if (bits <= 1433) return 6;
-    if (bits <= 3714) return 7;
-    if (bits <= 9399) return 8;
-    if (bits <= 23290) return 9;
-    if (bits <= 56651) return 10;
-    return 11;
-}
-
 void
-unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 {
-    ulong j, k, pow2k;
+    ulong h, k, value, pow2k, chain;
     ulong *digits;
-    slong i, e;
+    slong i, y, j;
     fmpz_t power;
     unity_zp g_sqr, temp;
     unity_zp *g_powers;
@@ -63,20 +44,18 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
     /* selects optimal k value for n */
     k = _unity_zp_pow_2k_find_k(pow);
-    /* selects e such that 2^(ek) < n < 2^((e + 1) * k) */
-    e = (fmpz_bits(pow) - 1) / k;
     /* computes 2^k */
-    pow2k = n_pow(2, k);
+    pow2k = 2;
 
-    /* 
-        digits[i] = i-th digit of n in 2^k-ary base;
+    /*
+        set digits[i] = i-th digit of pow in binary representation;
         least signifant digit have number 0
     */
-    digits = (ulong*) flint_malloc(sizeof(ulong) * (e + 1));
-    for (i = 0; i <= e; i++)
+    digits = (ulong*) flint_malloc(sizeof(ulong) * fmpz_bits(pow));
+    for (i = 0; i < fmpz_bits(pow); i++)
     {
-        digits[i] = fmpz_tdiv_ui(power, pow2k);
-        fmpz_tdiv_q_ui(power, power, pow2k);
+        digits[i] = fmpz_tdiv_ui(power, 2);
+        fmpz_tdiv_q_ui(power, power, 2);
     }
 
     /* 
@@ -100,53 +79,61 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
         unity_zp_mul(g_powers[i], g_powers[i - 1], g_sqr);
     }
 
-    /* for all digits[i] */
-    for (i = e; i >= 0; i--)
+    unity_zp_set_zero(f);
+    unity_zp_coeff_set_ui(f, 0, 1);
+    i = fmpz_bits(pow) - 1;
+
+    if (fmpz_equal_ui(pow, 1) == 1)
+        unity_zp_copy(f, g);
+    else {
+    while (i >= 0)
     {
-        /* if digits[i] == 0 set f = f^(2^k) */
         if (digits[i] == 0)
         {
-            for (j = 0; j < k; j++)
-            {
-                /* sets f = f^2 */
-                unity_zp_sqr(temp, f);
-                unity_zp_swap(temp, f);
-            }
+            unity_zp_sqr(temp, f);
+            unity_zp_swap(temp, f);
+            i--;
         }
         else
         {
-            ulong t, b;
-
-            /* digits[i] = 2^t * b and b is odd */
-            t = p_power_in_q(digits[i], 2);
-            b = digits[i] / n_pow(2, t);
-
-            if (i == e) 
-            {
-                unity_zp_copy(f, g_powers[(b + 1) / 2]);
+            /* 
+                finds length of chain; chain is length of
+                longest bitstring less then k ending on 1.
+            */
+            j = i;
+            chain = 0;
+            while (j >= 0 && i - j < k) {
+                if (digits[j] == 1) chain = i - j;
+                j--;
             }
-            else
-            {
-                /* sets f = f^(2^(k - t)) */
-                for (j = 0; j < k - t; j++)
-                {
-                    unity_zp_sqr(temp, f);
-                    unity_zp_swap(temp, f);
-                }
-
-                /* sets f = f * g^b */
-                unity_zp_mul(temp, f, g_powers[(b + 1) / 2]);
-                unity_zp_swap(temp, f);
-            }
-
-            /* sets f = f^(2^t) */
-            for (j = 0; j < t; j++)
+            /* f = f^(2^chain)) */
+            for (h = 0; h <= chain; h++)
             {
                 unity_zp_sqr(temp, f);
                 unity_zp_swap(temp, f);
             }
-        }
 
+            pow2k = 1;
+            value = 0;
+
+            /* 
+                value = binary number (digits[i], ... , digits[i - chain])
+                in decimal base
+            */
+            for (h = 0; h <= chain; h++)
+            {
+                value += digits[i - chain + h] * pow2k;
+                pow2k *= 2;
+            }
+
+            /* f = f * g^value */
+            unity_zp_mul(temp, f, g_powers[(value + 1) / 2]);
+            unity_zp_swap(temp, f);
+
+            /* increase i */
+            i -= chain + 1;
+        }
+    }
     }
 
     for (i = 0; i <= n_pow(2, k - 1); i++)
@@ -157,14 +144,5 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     fmpz_clear(power);
     unity_zp_clear(g_sqr);
     unity_zp_clear(temp);
-}
-
-void
-unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow)
-{
-    fmpz_t p;
-    fmpz_init_set_ui(p, pow);
-    unity_zp_pow_2k_fmpz(f, g, p);
-    fmpz_clear(p);
 }
 
