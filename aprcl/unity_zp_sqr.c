@@ -47,3 +47,14 @@ unity_zp_sqr(unity_zp f, const unity_zp g)
     _unity_zp_reduce_cyclotomic(f);
 }
 
+void
+unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
+{
+    if (f->p == 5 && f->exp == 1)
+        unity_zp_sqr5(f, g, t);
+    if (f->p == 7 && f->exp == 1)
+        unity_zp_sqr7(f, g, t);
+    else
+        unity_zp_sqr(f, g);      
+}
+

@@ -34,7 +34,7 @@
     The algorithm consist of 4 steps:
         (1.) Precomutation;
         (2.) Pseudoprime tests with Jacobi sums;
-        (3.) Additionl tests;
+        (3.) Additional tests;
         (4.) Final trial division and primality proving.
 
     The file contains the implementation of steps (2.) and (3.).
@@ -139,7 +139,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     }
 
     /* temp = j0^u */
-    unity_zp_pow_2k_fmpz(temp, j0, u);
+    unity_zp_pow_sliding_fmpz(temp, j0, u);
     /* j0 = j0^u * jv */
     unity_zp_mul(j0, jv, temp);
     
@@ -251,7 +251,7 @@ _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
         unity_zp_swap(jv, j_pow);
 
     /* j0 = j0^u * jv */
-    unity_zp_pow_2k_fmpz(j_pow, j0, u);
+    unity_zp_pow_sliding_fmpz(j_pow, j0, u);
     unity_zp_mul(j0, jv, j_pow);
 
     /* try to find h */
@@ -288,8 +288,8 @@ _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
     algorithm (9.1.28) step 4.b in [1].
 */
 slong
-_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
-        , const unity_zp j2_2, const fmpz_t u, ulong v)
+_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
+        const unity_zp j2_2, const fmpz_t u, ulong v)
 {
     slong h;
     ulong i, r;
@@ -370,7 +370,7 @@ _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
     }
 
     /* set j0 = j0^u * jv */
-    unity_zp_pow_2k_fmpz(temp, j0, u);
+    unity_zp_pow_sliding_fmpz(temp, j0, u);
     unity_zp_mul(j0, jv, temp);
     
     /* try to find h */
@@ -698,8 +698,8 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             /* check (2.d) */
             if (p == 2 && k >= 3)
             {
-                h = _is_prime_jacobi_check_2k(jacobi_sum
-                    , jacobi_sum2_1, jacobi_sum2_2, u, v);
+                h = _is_prime_jacobi_check_2k(jacobi_sum,
+                        jacobi_sum2_1, jacobi_sum2_2, u, v);
 
                 /* if h not found then n is composite */
                 if (h < 0)
@@ -719,7 +719,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             {
                 h = _is_prime_jacobi_check_pk(jacobi_sum, u, v);
 
-                /* if h not found then n is compisite */
+                /* if h not found then n is composite */
                 if (h < 0)
                     result = COMPOSITE;
 
@@ -742,7 +742,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
     /* end of (2.) */
 
-    /* (3.) begin of Additionl tests step */
+    /* (3.) begin of Additional tests step */
 
     /* if n can be prime */
     if (result == PROBABPRIME)
@@ -789,11 +789,13 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
         This is done in is_prime_final_division() function.
     */
     if (result == PROBABPRIME)
+    {
         /* if we not find divisors of n then n is composite */
         if (is_prime_final_division(n, config->s, config->R) == 1)
             result = PRIME;
         else
             result = COMPOSITE;
+    }
 
     /* end of (4.) */
 
@@ -822,6 +824,32 @@ is_prime_jacobi(const fmpz_t n)
         See definition in aprcl_config functions documentation. s^2 > n.
     */
     jacobi_config_init(config, n);
+
+    ulong i, j;
+    fmpz_t nsub, nadd;
+    fmpz_init_set(nsub, n);
+    fmpz_init_set(nadd, n);
+    fmpz_sub_ui(nsub, nsub, 1);
+    fmpz_add_ui(nadd, nadd, 1);
+    for (i = 0; i < config->rs.num; i++)
+    {
+        ulong p = config->rs.p[i];
+        flint_printf("p = %wu\n", p);
+        for (j = 1; j <= config->rs.exp[i]; j++)
+        {
+            flint_printf("j = %wu\n", j);
+            ulong r = n_pow(p, j);
+            flint_printf("%wu - ", r);
+            if (fmpz_tdiv_ui(nsub, r) == 0)
+                flint_printf("true\n");
+            else flint_printf("false\n");
+            if (fmpz_tdiv_ui(nadd, r) == 0)
+                flint_printf("true\n");
+            else flint_printf("false\n");
+        }
+    }
+    fmpz_clear(nsub);
+    fmpz_clear(nadd);
 
     result = _is_prime_jacobi(n, config);
 

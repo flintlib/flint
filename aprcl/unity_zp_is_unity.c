@@ -26,7 +26,7 @@
 #include "aprcl.h"
 
 slong
-unity_zp_is_unity(const unity_zp f)
+unity_zp_is_unity(unity_zp f)
 {
     ulong result;
     ulong i, p_pow;

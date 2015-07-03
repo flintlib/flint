@@ -33,6 +33,11 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     unity_zp temp;
     unity_zp *g_powers;
 
+    fmpz_t * t;
+    t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (35));
+    for (i = 0; i < 35; i++)
+        fmpz_init(t[i]);
+
     unity_zp_init(temp, f->p, f->exp, f->n);
 
     /* temp = g * g */
@@ -71,7 +76,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     {
         if (fmpz_tstbit(pow, i) == 0)
         {
-            unity_zp_sqr(temp, f);
+            unity_zp_sqr_inplace(temp, f, t);
             unity_zp_swap(temp, f);
             i--;
         }
@@ -88,7 +93,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
             /* f = f^(2^(i - j + 1)) */
             for (h = 0; h < i - j + 1; h++)
             {
-                unity_zp_sqr(temp, f);
+                unity_zp_sqr_inplace(temp, f, t);
                 unity_zp_swap(temp, f);
             }
 
@@ -107,6 +112,10 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
             i = j - 1;
         }
     }
+
+    for (i = 0; i < 35; i++)
+        fmpz_clear(t[i]);
+    flint_free(t);
 
     for (i = 0; i <= n_pow(2, k - 1); i++)
         unity_zp_clear(g_powers[i]);

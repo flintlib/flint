@@ -110,7 +110,7 @@ void unity_zp_swap(unity_zp f, unity_zp g);
 
 void unity_zp_set_zero(unity_zp f);
 
-slong unity_zp_is_unity(const unity_zp f);
+slong unity_zp_is_unity(unity_zp f);
 int unity_zp_equal(unity_zp f, unity_zp g);
 
 void unity_zp_print(const unity_zp f);
@@ -128,6 +128,10 @@ void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_sqr(unity_zp f, const unity_zp g);
+void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);
+
+void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
+void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
 
 ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
 void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
@@ -198,5 +202,8 @@ void jacobi_config_clear(aprcl_config conf);
 mp_ptr f_table(const ulong q);
 ulong p_power_in_q(ulong q, ulong p);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
