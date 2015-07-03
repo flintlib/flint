@@ -19,31 +19,41 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+int
+n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
+                     mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t base;
-    
-    if (!n)
+    mp_limb_t times;
+    int i, j, p;
+
+    for (i = 0; i < num; i++)
     {
-        *remainder = 0;
-        return 0;
+        p = n_flog(B1, prime_array[i]);
+        times = prime_array[i];
+
+        for (j = 1; j <= p; j ++)
+        {
+            n_factor_ecm_mul_montgomery_ladder(&(n_ecm_inf->x), &(n_ecm_inf->z),
+                                               n_ecm_inf->x, n_ecm_inf->z, 
+                                               times, n, n_ecm_inf);
+        }
+        
+        *f = n_gcd(n_ecm_inf->z, n);
+
+        if ((*f > n_ecm_inf->one) && (*f < n))
+        {
+            /* Found factor in stage I */
+            return 1;
+        }
     }
 
-    base = n_cbrt(n);
-    *remainder = n - base * base * base;
-    return base;
+    return 0;
 }

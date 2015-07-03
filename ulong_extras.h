@@ -396,6 +396,51 @@ FLINT_DLL mp_limb_t n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
 
 FLINT_DLL mp_limb_t n_root(mp_limb_t n, mp_limb_t root);
 
+/***** ECM functions *********************************************************/
+
+typedef struct n_ecm_s {
+
+    mp_limb_t x, z;        /* the coordinates */
+    mp_limb_t a24;         /* value (a + 2)/4 */
+    mp_limb_t ninv;
+    mp_limb_t normbits;
+    mp_limb_t one;
+
+    unsigned char *GCD_table; /* checks whether baby step int is
+                           coprime to Primorial or not */
+
+    unsigned char **prime_table;
+
+} n_ecm_s;
+
+typedef n_ecm_s n_ecm_t[1];
+
+FLINT_DLL void n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0,
+                                   mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf);
+
+FLINT_DLL void n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1,
+                                mp_limb_t z1, mp_limb_t x2, mp_limb_t z2, 
+                                mp_limb_t x0, mp_limb_t z0, mp_limb_t n, 
+                                n_ecm_t n_ecm_inf);
+
+FLINT_DLL void n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z,
+                                                  mp_limb_t x0, mp_limb_t z0,
+                                                  mp_limb_t k, mp_limb_t n, 
+                                                  n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n,
+                                        n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array,
+                                   mp_limb_t num, mp_limb_t B1, mp_limb_t n,
+                                   n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1,
+                           mp_limb_t B2, flint_rand_t state, mp_limb_t n);
+
+FLINT_DLL int n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2,
+                                    mp_limb_t P, mp_limb_t n, n_ecm_t n_ecm_inf);
+
 #ifdef __cplusplus
 }
 #endif
