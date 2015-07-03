@@ -27,8 +27,8 @@
 #include "ulong_extras.h"
 
 void 
-_jacobi_pq_general(unity_zp f, const mp_ptr table
-        , ulong p, ulong q, ulong k, ulong a, ulong b)
+_jacobi_pq_general(unity_zp f, const mp_ptr table,
+        ulong p, ulong q, ulong k, ulong a, ulong b)
 {
     int i, j;
     ulong size, pow, pow_dec;

@@ -43,8 +43,8 @@ void _unity_zp_reduce_cyclotomic(unity_zp f)
         for (j = 0; j < f->p - 1; j++)
         {
             ulong ind = i - cycl_pow + j * ppow;
-            fmpz_sub(f->poly->coeffs + ind
-                , f->poly->coeffs + ind, f->poly->coeffs + i);
+            fmpz_sub(f->poly->coeffs + ind,
+                    f->poly->coeffs + ind, f->poly->coeffs + i);
 
             if (fmpz_cmp_ui(f->poly->coeffs + ind, 0) < 0)
                 fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind, f->n);

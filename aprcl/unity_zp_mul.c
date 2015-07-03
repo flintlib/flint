@@ -37,8 +37,8 @@ unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
     p = n_pow(f->p, f->exp);
     for (i = f->poly->length - 1; i >= p; i--)
     {
-        fmpz_add(f->poly->coeffs + i - p
-            , f->poly->coeffs + i - p, f->poly->coeffs + i);
+        fmpz_add(f->poly->coeffs + i - p,
+                f->poly->coeffs + i - p, f->poly->coeffs + i);
 
         fmpz_set_ui(f->poly->coeffs + i, 0);
         if (fmpz_cmp(f->poly->coeffs + i - p, f->n) >= 0)

@@ -25,8 +25,8 @@
 
 #include "aprcl.h"
 
-void unity_zpq_mul(unity_zpq result
-        , const unity_zpq left, const unity_zpq right)
+void unity_zpq_mul(unity_zpq result,
+        const unity_zpq left, const unity_zpq right)
 {
     ulong i, j, k, p, q;
     fmpz_mod_poly_t temp;
@@ -54,8 +54,8 @@ void unity_zpq_mul(unity_zpq result
 
             for (k = temp->length - 1; k >= q; k--)
             {
-                fmpz_add(temp->coeffs + k - q
-                    , temp->coeffs + k - q, temp->coeffs + k);
+                fmpz_add(temp->coeffs + k - q,
+                        temp->coeffs + k - q, temp->coeffs + k);
                 fmpz_set_ui(temp->coeffs + k, 0);
                 fmpz_mod(temp->coeffs + k - q, temp->coeffs + k - q, result->n);
             }
