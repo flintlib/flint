@@ -25,6 +25,7 @@
 
 #include "aprcl.h"
 
+/* computes f = g * g for p = 5 */
 void
 unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t)
 {
@@ -66,6 +67,7 @@ unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t)
     unity_zp_coeff_set_fmpz(f, 3, t[14]);
 }
 
+/* computes f = g * g for p = 7 */
 void
 unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t)
 {
