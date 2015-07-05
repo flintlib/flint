@@ -50,11 +50,42 @@ unity_zp_sqr(unity_zp f, const unity_zp g)
 void
 unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
 {
+    /* squaring for p^k = 4 */
+    if (f->p == 2 && f->exp == 2)
+    {
+        unity_zp_sqr4(f, g, t);
+        return;
+    }
+
+    /* squaring for p^k = 8 */
+    if (f->p == 2 && f->exp == 3)
+    {
+        unity_zp_sqr8(f, g, t);
+        return;
+    }
+
+    /* squaring for p^k = 3 */
+    if (f->p == 3 && f->exp == 1)
+    {
+        unity_zp_sqr3(f, g, t);
+        return;
+    }
+
+    /* squaring for p^k = 5 */
     if (f->p == 5 && f->exp == 1)
+    {
         unity_zp_sqr5(f, g, t);
+        return;
+    }
+
+    /* squaring for p^k = 7 */
     if (f->p == 7 && f->exp == 1)
+    {
         unity_zp_sqr7(f, g, t);
-    else
-        unity_zp_sqr(f, g);      
+        return;
+    }
+
+    /* traditional squaring */
+    unity_zp_sqr(f, g);      
 }
 

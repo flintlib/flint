@@ -825,32 +825,6 @@ is_prime_jacobi(const fmpz_t n)
     */
     jacobi_config_init(config, n);
 
-    ulong i, j;
-    fmpz_t nsub, nadd;
-    fmpz_init_set(nsub, n);
-    fmpz_init_set(nadd, n);
-    fmpz_sub_ui(nsub, nsub, 1);
-    fmpz_add_ui(nadd, nadd, 1);
-    for (i = 0; i < config->rs.num; i++)
-    {
-        ulong p = config->rs.p[i];
-        flint_printf("p = %wu\n", p);
-        for (j = 1; j <= config->rs.exp[i]; j++)
-        {
-            flint_printf("j = %wu\n", j);
-            ulong r = n_pow(p, j);
-            flint_printf("%wu - ", r);
-            if (fmpz_tdiv_ui(nsub, r) == 0)
-                flint_printf("true\n");
-            else flint_printf("false\n");
-            if (fmpz_tdiv_ui(nadd, r) == 0)
-                flint_printf("true\n");
-            else flint_printf("false\n");
-        }
-    }
-    fmpz_clear(nsub);
-    fmpz_clear(nadd);
-
     result = _is_prime_jacobi(n, config);
 
     jacobi_config_clear(config);
