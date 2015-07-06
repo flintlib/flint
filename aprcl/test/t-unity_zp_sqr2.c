@@ -141,7 +141,7 @@ int main(void)
         unity_zp_clear(temp);
     }
 
-    for (i = 0; i < 0; i++)
+    for (i = 0; i < 100; i++)
     {
         ulong p, k;
         fmpz_t n;
@@ -178,9 +178,6 @@ int main(void)
         _unity_zp_reduce_cyclotomic(temp);
         unity_zp_sqr16(f, temp, t);
         unity_zp_sqr(g, temp);
-
-        unity_zp_print(f);
-        unity_zp_print(g);
 
         if (unity_zp_equal(f, g) == 0)
         {

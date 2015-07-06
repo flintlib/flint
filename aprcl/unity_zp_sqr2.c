@@ -145,6 +145,10 @@ unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_add(t[1], t[31], t[31]);
     fmpz_add(t[2], t[32], t[32]);
     fmpz_add(t[3], t[33], t[33]);
+    fmpz_set(t[4], t[34]);
+    fmpz_set(t[5], t[35]);
+    fmpz_set(t[6], t[36]);
+    fmpz_set(t[7], t[37]);
     
     unity_zp_ar2(t);
 
@@ -152,7 +156,7 @@ unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
     unity_zp_coeff_set_fmpz(f, 0, t[16]);
     fmpz_sub(t[16], t[39], t[13]);
     unity_zp_coeff_set_fmpz(f, 1, t[16]);
-    fmpz_sub(t[16], t[30], t[14]);
+    fmpz_sub(t[16], t[40], t[14]);
     unity_zp_coeff_set_fmpz(f, 2, t[16]);
     unity_zp_coeff_set_fmpz(f, 3, t[41]);
     fmpz_add(t[16], t[42], t[8]);
