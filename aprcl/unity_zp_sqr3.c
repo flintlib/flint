@@ -54,3 +54,51 @@ unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t)
     unity_zp_coeff_set_fmpz(f, 1, t[4]);    /*  y1 = d1 mod n   */
 }
 
+void
+unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t)
+{
+    fmpz_mod_poly_get_coeff_fmpz(t[20], g->poly, 0);
+    fmpz_mod_poly_get_coeff_fmpz(t[21], g->poly, 1);
+    fmpz_mod_poly_get_coeff_fmpz(t[22], g->poly, 2);
+    fmpz_mod_poly_get_coeff_fmpz(t[23], g->poly, 3);
+    fmpz_mod_poly_get_coeff_fmpz(t[24], g->poly, 4);
+    fmpz_mod_poly_get_coeff_fmpz(t[25], g->poly, 5);
+
+    fmpz_sub(t[0], t[20], t[23]);
+    fmpz_sub(t[1], t[21], t[24]);
+    fmpz_sub(t[2], t[22], t[25]);
+    fmpz_add(t[3], t[20], t[23]);
+    fmpz_add(t[4], t[21], t[24]);
+    fmpz_add(t[5], t[22], t[25]);
+
+    unity_zp_ar1(t);
+
+    fmpz_set(t[26], t[6]);
+    fmpz_set(t[27], t[7]);
+    fmpz_set(t[28], t[8]);
+    fmpz_set(t[29], t[9]);
+    fmpz_set(t[30], t[10]);
+
+    fmpz_add(t[3], t[20], t[0]);
+    fmpz_add(t[4], t[21], t[1]);
+    fmpz_add(t[5], t[22], t[2]);
+    fmpz_set(t[0], t[23]);
+    fmpz_set(t[1], t[24]);
+    fmpz_set(t[2], t[25]);
+
+    unity_zp_ar1(t);
+
+    fmpz_sub(t[0], t[26], t[9]);
+    unity_zp_coeff_set_fmpz(f, 0, t[0]);
+    fmpz_sub(t[0], t[27], t[10]);
+    unity_zp_coeff_set_fmpz(f, 1, t[0]);
+    unity_zp_coeff_set_fmpz(f, 2, t[28]);
+    fmpz_add(t[0], t[29], t[6]);
+    fmpz_sub(t[1], t[0], t[9]);
+    unity_zp_coeff_set_fmpz(f, 3, t[1]);
+    fmpz_add(t[0], t[30], t[7]);
+    fmpz_sub(t[1], t[0], t[10]);
+    unity_zp_coeff_set_fmpz(f, 4, t[1]);
+    unity_zp_coeff_set_fmpz(f, 5, t[8]);
+}
+

@@ -130,12 +130,16 @@ void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_sqr(unity_zp f, const unity_zp g);
 void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);
 
+void unity_zp_ar1(fmpz_t * t);
 void unity_zp_ar2(fmpz_t * t);
 
 void unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t);
+void unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t);
+
 void unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t);
 void unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t);
 void unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t);
+
 void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
 void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
 

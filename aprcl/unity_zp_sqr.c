@@ -78,6 +78,12 @@ unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
         return;
     }
 
+    if (f->p == 3 && f->exp == 2)
+    {
+        unity_zp_sqr9(f, g, t);
+        return;
+    }
+
     /* squaring for p^k = 5 */
     if (f->p == 5 && f->exp == 1)
     {

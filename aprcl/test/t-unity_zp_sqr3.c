@@ -34,11 +34,11 @@ int main(void)
     int i, j;
     FLINT_TEST_INIT(state);
    
-    flint_printf("unity_zp_sqr_special....");
+    flint_printf("unity_zp_sqr3....");
     fflush(stdout);
 
-    fmpz_t * t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (35));
-    for (i = 0; i < 35; i++)
+    fmpz_t * t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (50));
+    for (i = 0; i < 50; i++)
         fmpz_init(t[i]);
 
     for (i = 0; i < 100; i++)
@@ -47,7 +47,7 @@ int main(void)
         fmpz_t n;
         unity_zp f, g, temp;
 
-        p = 5;
+        p = 3;
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
@@ -75,7 +75,7 @@ int main(void)
         }
 
         _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_sqr5(f, temp, t);
+        unity_zp_sqr3(f, temp, t);
         unity_zp_sqr(g, temp);
 
         if (unity_zp_equal(f, g) == 0)
@@ -92,20 +92,21 @@ int main(void)
 
     for (i = 0; i < 100; i++)
     {
-        ulong p;
+        ulong p, k;
         fmpz_t n;
         unity_zp f, g, temp;
 
-        p = 7;
+        p = 3;
+        k = 2;
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zp_init(f, p, 1, n);
-        unity_zp_init(g, p, 1, n);
-        unity_zp_init(temp, p, 1, n);
+        unity_zp_init(f, p, k, n);
+        unity_zp_init(g, p, k, n);
+        unity_zp_init(temp, p, k, n);
 
         for (j = 0; j < 100; j++)
         {
@@ -114,7 +115,7 @@ int main(void)
 
             fmpz_init(val);
 
-            ind = n_randint(state, p);
+            ind = n_randint(state, n_pow(p, k));
             
             fmpz_randtest_unsigned(val, state, 200);
 
@@ -124,7 +125,7 @@ int main(void)
         }
 
         _unity_zp_reduce_cyclotomic(temp);
-        unity_zp_sqr7(f, temp, t);
+        unity_zp_sqr9(f, temp, t);
         unity_zp_sqr(g, temp);
 
         if (unity_zp_equal(f, g) == 0)
@@ -139,7 +140,7 @@ int main(void)
         unity_zp_clear(temp);
     }
 
-    for (i = 0; i < 35; i++)
+    for (i = 0; i < 50; i++)
         fmpz_clear(t[i]);
     flint_free(t);
 

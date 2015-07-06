@@ -109,6 +109,32 @@ unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t)
     unity_zp_coeff_set_fmpz(f, 2, t[24]);
 }
 
+void
+unity_zp_ar1(fmpz_t * t)
+{
+    fmpz_mul(t[6], t[0], t[3]);
+    fmpz_mul(t[13], t[1], t[4]);
+    fmpz_mul(t[10], t[2], t[5]);
+    fmpz_add(t[11], t[0], t[1]);
+    fmpz_add(t[12], t[3], t[4]);
+    fmpz_mul(t[15], t[11], t[12]);
+    
+    fmpz_add(t[11], t[0], t[2]);
+    fmpz_add(t[12], t[3], t[5]);
+    fmpz_mul(t[16], t[11], t[12]);
+    fmpz_add(t[11], t[1], t[2]);
+    fmpz_add(t[12], t[4], t[5]);
+    fmpz_mul(t[17], t[11], t[12]);
+
+    fmpz_add(t[14], t[6], t[13]);
+    fmpz_sub(t[7], t[15], t[14]);
+    fmpz_add(t[14], t[16], t[13]);
+    fmpz_add(t[16], t[6], t[10]);
+    fmpz_sub(t[8], t[14], t[16]);
+    fmpz_add(t[14], t[13], t[10]);
+
+    fmpz_sub(t[9], t[17], t[14]);
+}
 
 void
 unity_zp_ar2(fmpz_t * t)
