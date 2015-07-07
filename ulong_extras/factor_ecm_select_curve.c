@@ -75,7 +75,9 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
 
     *f = n_gcdinv(&u, v, n);
 
-    if (*f != n_ecm_inf->one)
+    if (*f == n)
+        return 0;
+    else if (*f > n_ecm_inf->one)
         return 1;
 
     a[1] = UWORD(0);
