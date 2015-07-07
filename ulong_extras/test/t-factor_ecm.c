@@ -29,7 +29,6 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-
 int main(void)
 {
     int i, j, k, result, fails;
@@ -38,7 +37,7 @@ int main(void)
 
     fails = 0;
 
-    flint_printf("ecm....");
+    flint_printf("factor_ecm....");
     fflush(stdout);
 
     for (i = 10; i < 64; i += 5)

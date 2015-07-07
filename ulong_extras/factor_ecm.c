@@ -151,7 +151,8 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             /* Found factor while selecting curve,
                very very lucky :) */
             (*f) >>= n_ecm_inf->normbits;
-            return 1;
+            ret = -1;
+            goto cleanup;
         }
 
         /************************** STAGE I ***************************/
@@ -162,7 +163,8 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         {
             /* Found factor after stage I */
             (*f) >>= n_ecm_inf->normbits;
-            return 1;
+            ret = 1;
+            goto cleanup;
         }  
 
         /************************** STAGE II ***************************/
@@ -173,9 +175,19 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         {
             /* Found factor after stage II */
             (*f) >>= n_ecm_inf->normbits;
-            return 2;
+            ret = 2;
+            goto cleanup;
         }   
     }
+
+    cleanup:
+
+    flint_free(n_ecm_inf->GCD_table);
+
+    for (i = 0; i < mdiff; i++)
+        flint_free(n_ecm_inf->prime_table[i]);
+
+    flint_free(n_ecm_inf->prime_table);
 
     return ret;
 }

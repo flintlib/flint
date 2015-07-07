@@ -435,11 +435,11 @@ FLINT_DLL int n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array,
                                    mp_limb_t num, mp_limb_t B1, mp_limb_t n,
                                    n_ecm_t n_ecm_inf);
 
-FLINT_DLL int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1,
-                           mp_limb_t B2, flint_rand_t state, mp_limb_t n);
-
 FLINT_DLL int n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2,
                                     mp_limb_t P, mp_limb_t n, n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1,
+                           mp_limb_t B2, flint_rand_t state, mp_limb_t n);
 
 #ifdef __cplusplus
 }
