@@ -497,6 +497,15 @@ FLINT_DLL ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 FLINT_DLL void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+FLINT_DLL void fmpz_addmod(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_t n);
+
+FLINT_DLL void fmpz_submod(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_t n);
+
+FLINT_DLL void fmpz_mul_mont(fmpz_t f, const fmpz_t g, const fmpz_t h,
+                            const fmpz_t n);
+FLINT_DLL void fmpz_mulmod(fmpz_t f, const fmpz_t g, const fmpz_t h,
+                            const fmpz_t n, const fmpz_t r);
+
 void fmpz_mods(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FMPZ_INLINE void
