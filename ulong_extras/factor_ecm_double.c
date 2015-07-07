@@ -44,8 +44,6 @@ n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0,
                     mp_limb_t n, n_ecm_t n_ecm_inf)
 {
     mp_limb_t u, v, w;
-    mp_ptr a;
-    a = flint_malloc(2 * sizeof(mp_limb_t));
 
     if (z0 == 0)
     {

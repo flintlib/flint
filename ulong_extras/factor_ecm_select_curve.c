@@ -84,7 +84,6 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     hi = a[1];
     lo = a[0];
     u = n_ll_mod_preinv(hi, lo, n, n_ecm_inf->ninv);
-    u = n_mod2_preinv(u, n, n_ecm_inf->ninv);
 
     v = n_mulmod_preinv(u, t, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
     n_ecm_inf->x = n_mulmod_preinv(n_ecm_inf->x, v, n, n_ecm_inf->ninv, 
