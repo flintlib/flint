@@ -147,6 +147,7 @@ void qsieve_init_A0(qs_t qs_inf)
        try to determine number of factors, such that we have enough
        primes to choose from
     */
+
     if (bits > 210) i = 15;
     else if (bits > 190) i = 13;
     else if (bits > 180) i = 12;
@@ -502,7 +503,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
 }
 
 /*
-    generate all possible values of coefficient 'B', using
+    generate next possible value of coefficient 'B', using
     gray-code formula, for current value of 'A'
 */
 

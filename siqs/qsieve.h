@@ -43,7 +43,7 @@
 #endif
 
 
-#define QS_DEBUG 128
+#define QS_DEBUG 0
 
 typedef struct prime_t
 {
@@ -102,7 +102,7 @@ typedef struct qs_s
    mp_limb_t num_q0;        /* total number of q0 */
    mp_limb_t q0;            /* current non-factor-base prime,
                                prime factor of A */
-   fmpz_t B;              /* B values corresponding to current value of A */
+   fmpz_t B;                /* B values corresponding to current value of A */
    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
    fmpz_t * A_divp;         /* A_divp[i] = A0_divp[i] * q0 */
