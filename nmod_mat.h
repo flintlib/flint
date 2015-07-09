@@ -137,6 +137,8 @@ FLINT_DLL void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 /* Matrix-scalar arithmetic */
 
 FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
+FLINT_DLL void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
+                                const mp_limb_t b, const nmod_mat_t Y);
 
 /* Matrix multiplication */
 
