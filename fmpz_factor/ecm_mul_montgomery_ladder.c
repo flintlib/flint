@@ -26,64 +26,71 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "mpn_extras.h"
 
 /* P (x0 : z0) <- kP using Montgomery ladder algorithm */
 
 /* tstbit uses 0 based indexing */
 
 void
-fmpz_factor_ecm_mul_montgomery_ladder(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0,
-                                      fmpz_t k, fmpz_t n, ecm_t ecm_inf)
+fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
+                                      mp_limb_t k, mp_ptr n, ecm_t ecm_inf)
 {
-    mp_limb_t i;
-    fmpz_t x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
+    mp_ptr x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
+    mp_limb_t len;
 
-    if (fmpz_cmp_ui(k, 0) == 0)
+    if (k == 0)
     {
-        fmpz_set_ui(x, 0);
-        fmpz_set_ui(z, 0);
+        mpn_zero(x, ecm_inf->n_size);
+        mpn_zero(z, ecm_inf->n_size);
         return;
     }
 
-    if (fmpz_is_one(k))
+    if (k == 1)
     {
-        fmpz_set(x, x0);
-        fmpz_set(z, z0);
+        mpn_copyi(x, x0, ecm_inf->n_size);
+        mpn_copyi(z, z0, ecm_inf->n_size);
         return;
     }
 
-    fmpz_init_set(x1, x0);        /* Q <- P0 */
-    fmpz_init_set(z1, z0);
-    fmpz_init(x2);
-    fmpz_init(z2);
+    x1 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
+    z1 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
+    x2 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
+    z2 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
 
-    fmpz_factor_ecm_double(x2, z2, x0, z0, n, ecm_inf); /* P <- 2P0 */
-    i = fmpz_sizeinbase(k, 2) - 2;
+    mpn_copyi(x1, x0, ecm_inf->n_size);    /* Q <- P0 */
+    mpn_copyi(z1, z0, ecm_inf->n_size);
+    mpn_zero(x2, ecm_inf->n_size);
+    mpn_zero(z2, ecm_inf->n_size);
+
+    fmpz_factor_ecm_double(x2, z2, x0, z0, n, ecm_inf);   /* P <- 2P0 */
+
+    len = n_sizeinbase(k, 2) - 2;
 
     while (1)
     {
-        if (fmpz_tstbit(k, i) == 1)   /* ith bit is 1 */
+        if (((UWORD(1) << len) & k) != 0)       /* ith bit is 1 */
         {
-            fmpz_factor_ecm_add(x1, z1, x1, z1, x2, z2, x0, z0, n, ecm_inf); /* Q <- P + Q */
-            fmpz_factor_ecm_double(x2, z2, x2, z2, n, ecm_inf);         /* P <- 2 * P */
+            fmpz_factor_ecm_add(x1, z1, x1, z1, x2, z2, x0, z0, n, ecm_inf);  /* Q <- P + Q */
+            fmpz_factor_ecm_double(x2, z2, x2, z2, n, ecm_inf);               /* P <- 2 * P */
         }
         else
         {   
-            fmpz_factor_ecm_add(x2, z2, x1, z1, x2, z2, x0, z0, n, ecm_inf); /* P <- P + Q */
-            fmpz_factor_ecm_double(x1, z1, x1, z1, n, ecm_inf);         /* Q <- 2 * Q */
+            fmpz_factor_ecm_add(x2, z2, x1, z1, x2, z2, x0, z0, n, ecm_inf);  /* P <- P + Q */
+            fmpz_factor_ecm_double(x1, z1, x1, z1, n, ecm_inf);               /* Q <- 2 * Q */        
         }
 
-        if (i == 0)
+        if (len == 0)
             break;
         else
-            i -= 1;
+            len -= 1;
     }
 
-    fmpz_set(x, x1);
-    fmpz_set(z, z1);
+    mpn_copyi(x, x1, ecm_inf->n_size);
+    mpn_copyi(z, z1, ecm_inf->n_size);
 
-    fmpz_clear(x1);
-    fmpz_clear(z1);
-    fmpz_clear(x2);
-    fmpz_clear(z2);
+    flint_free(x1);
+    flint_free(z1);
+    flint_free(x2);
+    flint_free(z2);
 }

@@ -26,6 +26,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "mpn_extras.h"
 
 /* P (x : z) = 2 * P1 (x0 : z0)  */
 
@@ -37,35 +38,42 @@
 */
 
 void
-fmpz_factor_ecm_double(fmpz_t x, fmpz_t z, fmpz_t x0, fmpz_t z0, fmpz_t n, ecm_t ecm_inf)
+fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
+                       mp_ptr n, ecm_t ecm_inf)
 {
-    if (fmpz_cmp_ui(z0, 0) == 0)
+    if (flint_mpn_zero_p(z0, ecm_inf->n_size))
     {
-        fmpz_set(x, x0);
-        fmpz_set(z, z0);
+        mpn_copyi(x, x0, ecm_inf->n_size);
+        mpn_zero(z, ecm_inf->n_size);
         return;
     }
 
-    fmpz_add(ecm_inf->u, x0, z0);    /* u = x0 + z0 */
-    if (fmpz_cmp(ecm_inf->u, n) > 0)
-        fmpz_sub(ecm_inf->u, ecm_inf->u, n);
-    fmpz_mul(ecm_inf->u, ecm_inf->u, ecm_inf->u);      /* u = (x0 + z0)^2 */
-    fmpz_mod(ecm_inf->u, ecm_inf->u, n);
+    fmpz_factor_ecm_addmod(ecm_inf->u, x0, z0, n, ecm_inf->n_size);    /* u = x0 + z0 */
+    
+    /* u = (x0 + z0)^2 */
+    flint_mpn_mulmod_preinvn(ecm_inf->u, ecm_inf->u, ecm_inf->u, ecm_inf->n_size, n,
+                             ecm_inf->ninv, ecm_inf->normbits);
 
-    fmpz_sub(ecm_inf->v, x0, z0);    /* v = x0 - z0 */
-    fmpz_mul(ecm_inf->v, ecm_inf->v, ecm_inf->v);      /* v = (x0 - z0)^2 */
-    fmpz_mod(ecm_inf->v, ecm_inf->v, n);
+    fmpz_factor_ecm_submod(ecm_inf->v, x0, z0, n, ecm_inf->n_size);     /* v = x0 - z0 */
+        
+    /* v = (x0 - z0)^2 */
+    flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->v, ecm_inf->v, ecm_inf->n_size, n,
+                             ecm_inf->ninv, ecm_inf->normbits);
 
-    fmpz_mul(x, ecm_inf->u, ecm_inf->v);      /* x = (x0 + z0)^2 * (x0 - z0)^2 */
-    fmpz_mod(x, x, n);
+    /* x = (x0 + z0)^2 * (x0 - z0)^2 */
+    flint_mpn_mulmod_preinvn(x, ecm_inf->u, ecm_inf->v, ecm_inf->n_size, n,
+                             ecm_inf->ninv, ecm_inf->normbits);
+    /* w = 4 * x0 * z0 */
+    fmpz_factor_ecm_submod(ecm_inf->w, ecm_inf->u, ecm_inf->v, n, ecm_inf->n_size);
 
-    fmpz_sub(ecm_inf->w, ecm_inf->u, ecm_inf->v);      /* w = 4 * x0 * z0 */
-    fmpz_mul(ecm_inf->u, ecm_inf->w, ecm_inf->a24);    /* u = a24 * 4 * x0 * z0 */
-    fmpz_mod(ecm_inf->u, ecm_inf->u, n);
+    /* u = a24 * 4 * x0 * z0 */
+    flint_mpn_mulmod_preinvn(ecm_inf->u, ecm_inf->w, ecm_inf->a24, ecm_inf->n_size, n,
+                             ecm_inf->ninv, ecm_inf->normbits);
+    
+    /* u = (x0 - z0)^2 + a24 * 4 * x0 * z0 */
+    fmpz_factor_ecm_addmod(ecm_inf->u, ecm_inf->u, ecm_inf->v, n, ecm_inf->n_size);
 
-    fmpz_add(ecm_inf->u, ecm_inf->u, ecm_inf->v);      /* u = (x0 - z0)^2 + a24 * 4 * x0 * z0 */
-    if (fmpz_cmp(ecm_inf->u, n) > 0)
-        fmpz_sub(ecm_inf->u, ecm_inf->u, n);
-    fmpz_mul(z, ecm_inf->w, ecm_inf->u);      /* z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) */
-    fmpz_mod(z, z, n);
+    /* z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) */
+    flint_mpn_mulmod_preinvn(z, ecm_inf->w, ecm_inf->u, ecm_inf->n_size, n,
+                             ecm_inf->ninv, ecm_inf->normbits);
 }

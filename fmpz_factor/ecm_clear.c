@@ -26,18 +26,20 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "mpn_extras.h"
 
 void
 fmpz_factor_ecm_clear(ecm_t ecm_inf)
 {
-    fmpz_clear(ecm_inf->t);
-    fmpz_clear(ecm_inf->u);
-    fmpz_clear(ecm_inf->v);
-    fmpz_clear(ecm_inf->w);
+    flint_free(ecm_inf->t);
+    flint_free(ecm_inf->u);
+    flint_free(ecm_inf->v);
+    flint_free(ecm_inf->w);
 
-    fmpz_clear(ecm_inf->x);
-    fmpz_clear(ecm_inf->z);
+    flint_free(ecm_inf->x);
+    flint_free(ecm_inf->z);
 
-    fmpz_clear(ecm_inf->a24);
-    
-} 
+    flint_free(ecm_inf->a24);
+    flint_free(ecm_inf->ninv);
+    flint_free(ecm_inf->one);
+}

@@ -28,32 +28,13 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-void
-fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)
+void 
+fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
 {
-    ecm_inf->t = flint_malloc(sz * sizeof(mp_limb_t));
-    ecm_inf->u = flint_malloc(sz * sizeof(mp_limb_t));
-    ecm_inf->v = flint_malloc(sz * sizeof(mp_limb_t));
-    ecm_inf->w = flint_malloc(sz * sizeof(mp_limb_t));
+	mp_limb_t cy;
 
-    ecm_inf->x = flint_malloc(sz * sizeof(mp_limb_t));
-    ecm_inf->z = flint_malloc(sz * sizeof(mp_limb_t));
+    cy = mpn_add_n(a, b, c, n_size);
 
-    ecm_inf->a24 = flint_malloc(sz * sizeof(mp_limb_t));
-    ecm_inf->ninv = flint_malloc(sz * sizeof(mp_limb_t));
-    ecm_inf->one = flint_malloc(sz * sizeof(mp_limb_t));
-
-    mpn_zero(ecm_inf->t, sz);
-    mpn_zero(ecm_inf->u, sz);
-    mpn_zero(ecm_inf->v, sz);
-    mpn_zero(ecm_inf->w, sz);
-
-    mpn_zero(ecm_inf->x, sz);
-    mpn_zero(ecm_inf->z, sz);
-
-    mpn_zero(ecm_inf->a24, sz);
-    mpn_zero(ecm_inf->ninv, sz);
-    mpn_zero(ecm_inf->one, sz);
-
-    ecm_inf->n_size = sz;
+    if (cy || (mpn_cmp(a, n, n_size) > 0))
+        mpn_sub_n(a, a, n, n_size);
 }
