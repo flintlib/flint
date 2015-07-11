@@ -36,6 +36,8 @@
  extern "C" {
 #endif
 
+#define SQUARING_SPACE 50
+
 typedef struct
 {
     ulong R;
@@ -62,9 +64,25 @@ typedef struct
     ulong p;
     ulong exp;
     fmpz_t n;
+
+    ulong r;
+    fmpz_t ninv;
 } _unity_zp;
 
 typedef _unity_zp unity_zp[1];
+
+typedef struct
+{
+    fmpz_mod_poly_t poly;
+    ulong p;
+    ulong exp;
+    fmpz_t n;
+    fmpz_t ninv;
+    ulong r;
+    fmpz_t rinv;
+} _unity_zp_mont;
+
+typedef _unity_zp_mont unity_zp_mont[1];
 
 typedef enum
 {
@@ -127,21 +145,21 @@ void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
 
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
 void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
-void unity_zp_sqr(unity_zp f, const unity_zp g);
-void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr(unity_zp f, const unity_zp g);
+FLINT_DLL void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);
 
-void unity_zp_ar1(fmpz_t * t);
-void unity_zp_ar2(fmpz_t * t);
+FLINT_DLL void unity_zp_ar1(fmpz_t * t);
+FLINT_DLL void unity_zp_ar2(fmpz_t * t);
 
-void unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t);
 
-void unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t);
 
-void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
-void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
 
 ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
 void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
@@ -211,6 +229,13 @@ void jacobi_config_clear(aprcl_config conf);
 
 mp_ptr f_table(const ulong q);
 ulong p_power_in_q(ulong q, ulong p);
+
+
+/* experemental functions for montgomery form */
+
+void unity_zp_mont_init(unity_zp_mont f, ulong p, ulong exp, const fmpz_t n);
+void unity_zp_mont_clear(unity_zp_mont f);
+void unity_zp_mont_reduction(unity_zp_mont f);
 
 #ifdef __cplusplus
 }
