@@ -1426,6 +1426,6 @@ int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     n is the number being factored.
 
     If a factor is found in stage I, 1 is returned. 
-    If a factor is found in stage II, 1 is returned. 
+    If a factor is found in stage II, 2 is returned. 
     If a factor is found while selecting the curve, -1 is returned. 
     Otherwise 0 is returned.
