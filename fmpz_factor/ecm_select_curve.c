@@ -183,5 +183,10 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     cleanup:
 
     flint_free(temp);
+
+    fmpz_clear(ff);
+    fmpz_clear(inv);
+    fmpz_clear(a);
+    fmpz_clear(b);
     return ret;
 }
