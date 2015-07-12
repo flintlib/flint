@@ -262,7 +262,10 @@ int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                     flint_rand_t state, fmpz_t n_in);
 
-    Outer wrapper function for the ECM algorithm. Calls stage I and II (one), and
+    Outer wrapper function for the ECM algorithm. In case f can fit in a single
+    unsigned word, a call to n_factor_ecm is made. 
+
+    Calls stage I and II, and
     the precomputations (builds prime_array for stage I, GCD_table and
     prime_table for stage II).
 
