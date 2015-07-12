@@ -38,13 +38,15 @@ static int is_prime(mp_limb_t n, int proved)
     return proved ? n_is_prime(n) : n_is_probabprime(n);
 }
 
-void n_factor(n_factor_t * factors, flint_rand_t state, mp_limb_t n, int proved)
+void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
 {
     ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
     ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
     ulong factors_left;
     ulong exp, bits;
     mp_limb_t cofactor, factor, cutoff;
+    flint_rand_t state;
+    flint_randinit(state);
 
     cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
 
@@ -83,7 +85,7 @@ void n_factor(n_factor_t * factors, flint_rand_t state, mp_limb_t n, int proved)
 
                 /* Parameters for Pollard Rho :
                                     - tries : 1
-                                    - max itertions per try : 2 ^ (bits/4) */
+                                    - max iterations per try : 2 ^ (bits/4) */
 
                 /* Parameters for ECM : 
                                     - tries : 4 * bits
