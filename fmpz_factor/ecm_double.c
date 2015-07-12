@@ -48,13 +48,15 @@ fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
         return;
     }
 
-    fmpz_factor_ecm_addmod(ecm_inf->u, x0, z0, n, ecm_inf->n_size);    /* u = x0 + z0 */
+    /* u = x0 + z0 */
+    fmpz_factor_ecm_addmod(ecm_inf->u, x0, z0, n, ecm_inf->n_size);
     
     /* u = (x0 + z0)^2 */
     flint_mpn_mulmod_preinvn(ecm_inf->u, ecm_inf->u, ecm_inf->u, ecm_inf->n_size, n,
                              ecm_inf->ninv, ecm_inf->normbits);
 
-    fmpz_factor_ecm_submod(ecm_inf->v, x0, z0, n, ecm_inf->n_size);     /* v = x0 - z0 */
+    /* v = x0 - z0 */
+    fmpz_factor_ecm_submod(ecm_inf->v, x0, z0, n, ecm_inf->n_size);
         
     /* v = (x0 - z0)^2 */
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->v, ecm_inf->v, ecm_inf->n_size, n,

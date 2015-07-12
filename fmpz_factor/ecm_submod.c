@@ -28,6 +28,13 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
+/* x = (a - b) mod n 
+
+    Not a normal sub mod function, assumes n is normalized (higest bit set)
+    and a and b are reduced modulo n
+
+*/
+
 void
 fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
 {

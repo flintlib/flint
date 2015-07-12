@@ -71,13 +71,17 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
     {
         if (((UWORD(1) << len) & k) != 0)       /* ith bit is 1 */
         {
-            fmpz_factor_ecm_add(x1, z1, x1, z1, x2, z2, x0, z0, n, ecm_inf);  /* Q <- P + Q */
-            fmpz_factor_ecm_double(x2, z2, x2, z2, n, ecm_inf);               /* P <- 2 * P */
+            /* Q <- P + Q */
+            fmpz_factor_ecm_add(x1, z1, x1, z1, x2, z2, x0, z0, n, ecm_inf
+            /* P <- 2 * P */
+            fmpz_factor_ecm_double(x2, z2, x2, z2, n, ecm_inf);
         }
         else
         {   
-            fmpz_factor_ecm_add(x2, z2, x1, z1, x2, z2, x0, z0, n, ecm_inf);  /* P <- P + Q */
-            fmpz_factor_ecm_double(x1, z1, x1, z1, n, ecm_inf);               /* Q <- 2 * Q */        
+            /* P <- P + Q */
+            fmpz_factor_ecm_add(x2, z2, x1, z1, x2, z2, x0, z0, n, ecm_inf
+            /* Q <- 2 * Q */
+            fmpz_factor_ecm_double(x1, z1, x1, z1, n, ecm_inf);
         }
 
         if (len == 0)
