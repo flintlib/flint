@@ -73,13 +73,13 @@ typedef _unity_zp unity_zp[1];
 
 typedef struct
 {
-    fmpz_mod_poly_t poly;
+    fmpz_poly_t poly;
     ulong p;
     ulong exp;
     fmpz_t n;
+
     fmpz_t ninv;
     ulong r;
-    fmpz_t rinv;
 } _unity_zp_mont;
 
 typedef _unity_zp_mont unity_zp_mont[1];
@@ -233,9 +233,29 @@ ulong p_power_in_q(ulong q, ulong p);
 
 /* experemental functions for montgomery form */
 
-void unity_zp_mont_init(unity_zp_mont f, ulong p, ulong exp, const fmpz_t n);
+void unity_zp_mont_init(unity_zp_mont f, ulong p, ulong exp, const fmpz_t n, const fmpz_t ninv);
 void unity_zp_mont_clear(unity_zp_mont f);
 void unity_zp_mont_reduction(unity_zp_mont f);
+
+void _unity_zp_mont_reduce_cyclotomic(unity_zp_mont f);
+
+void
+unity_zp_mont_set_zero(unity_zp_mont f);
+void
+unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g);
+void
+unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g, const unity_zp_mont h);
+void
+unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow);
+void
+unity_zp_mont_swap(unity_zp_mont f, unity_zp_mont g);
+void
+unity_zp_mont_copy(unity_zp_mont f, const unity_zp_mont g);
+
+void
+unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r);
+void
+unity_zp_from_mont(unity_zp f, const unity_zp_mont g);
 
 #ifdef __cplusplus
 }
