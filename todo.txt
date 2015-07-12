@@ -83,9 +83,9 @@ fmpz_factor
 -----------
 
 * Add primality testing, perfect power testing, fast factorisation
-  (Brent-Pollard, QS, ...)
+  (QS, ...)
 
-* Tune Pollard Rhi for optimal values
+* Tune Brent-Pollard Rho for optimal values
 
 * Find optimal values for B1, B2 for ECM.
 
