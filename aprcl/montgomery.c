@@ -99,7 +99,7 @@ void _unity_zp_mont_reduce_cyclotomic(unity_zp_mont f)
             fmpz_sub(f->poly->coeffs + ind,
                     f->poly->coeffs + ind, f->poly->coeffs + i);
 
-            if (fmpz_cmp_ui(f->poly->coeffs + ind, 0) < 0)
+            while (fmpz_cmp_ui(f->poly->coeffs + ind, 0) < 0)
                 fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind, f->nr);
         }
 
@@ -132,9 +132,10 @@ unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g)
                 f->poly->coeffs + i - p, f->poly->coeffs + i);
 
         fmpz_set_ui(f->poly->coeffs + i, 0);
-        if (fmpz_cmp(f->poly->coeffs + i - p, f->nr) >= 0)
+        while (fmpz_cmp(f->poly->coeffs + i - p, f->nr) >= 0)
             fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->nr);
     }
+
     _unity_zp_mont_reduce_cyclotomic(f);
     unity_zp_mont_reduction(f);
 }

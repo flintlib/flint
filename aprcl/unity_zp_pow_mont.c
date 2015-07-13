@@ -25,11 +25,30 @@
 
 #include "aprcl.h"
 
+int
+unity_zp_is_inplace(ulong p, ulong exp)
+{
+    if (p == 2 && exp == 2) return 1;
+    if (p == 2 && exp == 3) return 1;
+    if (p == 2 && exp == 4) return 1;
+    if (p == 3 && exp == 1) return 1;
+    if (p == 3 && exp == 2) return 1;
+    if (p == 5 && exp == 1) return 1;
+    if (p == 7 && exp == 1) return 1;
+    return 0;
+}
+
 void
 unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 {
     fmpz_t r, ninv;
     unity_zp_mont fm, gm;
+
+    if (unity_zp_is_inplace(f->p, f->exp) == 1)
+    {
+        unity_zp_pow_sliding_fmpz(f, g, pow);
+        return;
+    }
 
     fmpz_init(r);
     fmpz_init(ninv);
