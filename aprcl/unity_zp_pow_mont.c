@@ -26,7 +26,38 @@
 #include "aprcl.h"
 
 void
-unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow)
+unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+{
+    fmpz_t r, ninv;
+    unity_zp_mont fm, gm;
+
+    fmpz_init(r);
+    fmpz_init(ninv);
+    unity_zp_mont_init(fm, f->p, f->exp, f->n, f->ninv);
+    unity_zp_mont_init(gm, f->p, f->exp, f->n, f->ninv);
+    unity_zp_mont_ninv(ninv, fm);
+    fmpz_set(fm->ninv, ninv);
+    fmpz_set(gm->ninv, ninv);
+
+    fmpz_setbit(r, fm->r);
+
+    fmpz_mul(fm->nr, fm->n, r);
+    fmpz_mul(gm->nr, gm->n, r);
+
+    unity_zp_to_mont(gm, g, r);
+    unity_zp_pow_mont_fmpz(fm, gm, pow, r);
+
+    unity_zp_from_mont(f, fm);
+
+    fmpz_clear(r);
+    fmpz_clear(ninv);
+    unity_zp_mont_clear(fm);
+    unity_zp_mont_clear(gm);
+}
+
+/* Compute f = g^pow for f, g - unity_zp in Montgomery form */
+void
+unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow, const fmpz_t r)
 {
     ulong h, k, value;
     slong i, j;
@@ -34,6 +65,7 @@ unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow)
     unity_zp_mont *g_powers;
 
     unity_zp_mont_init(temp, f->p, f->exp, f->n, f->ninv);
+    fmpz_set(temp->nr, f->nr);
 
     /* temp = g * g */
     unity_zp_mont_sqr(temp, g);
@@ -49,21 +81,24 @@ unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow)
 
     /* sets g_powers[0] = 1 */
     unity_zp_mont_init(g_powers[0], f->p, f->exp, f->n, f->ninv);
-    fmpz_poly_set_coeff_ui(g_powers[0]->poly, 0, 1);
+    fmpz_set(g_powers[0]->nr, f->nr);
+    fmpz_poly_set_coeff_fmpz(g_powers[0]->poly, 0, r);
 
     /* sets g_powers[1] = g */
     unity_zp_mont_init(g_powers[1], f->p, f->exp, f->n, f->ninv);
-    unity_zp_mont_copy(g_powers[1], g);
+    fmpz_set(g_powers[1]->nr, f->nr);
+    unity_zp_mont_mul(g_powers[1], g_powers[0], g);
 
     /* sets g_powers[i] = g^2 * g_powers[i - 1] */
     for (i = 2; i <= n_pow(2, k - 1); i++)
     {
         unity_zp_mont_init(g_powers[i], f->p, f->exp, f->n, f->ninv);
+        fmpz_set(g_powers[i]->nr, f->nr);
         unity_zp_mont_mul(g_powers[i], g_powers[i - 1], temp);
     }
 
     unity_zp_mont_set_zero(f);
-    fmpz_poly_set_coeff_ui(f->poly, 0, 1);
+    fmpz_poly_set_coeff_fmpz(f->poly, 0, r);
     i = fmpz_bits(pow) - 1;
 
     /* working with pow = (e_l, e_{l-1}, ... , e_0) in 2 base */

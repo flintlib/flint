@@ -77,6 +77,7 @@ typedef struct
     ulong p;
     ulong exp;
     fmpz_t n;
+    fmpz_t nr;
 
     fmpz_t ninv;
     ulong r;
@@ -246,7 +247,9 @@ unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g);
 void
 unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g, const unity_zp_mont h);
 void
-unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow);
+unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow, const fmpz_t r);
+void
+unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void
 unity_zp_mont_swap(unity_zp_mont f, unity_zp_mont g);
 void
@@ -255,7 +258,10 @@ unity_zp_mont_copy(unity_zp_mont f, const unity_zp_mont g);
 void
 unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r);
 void
-unity_zp_from_mont(unity_zp f, const unity_zp_mont g);
+unity_zp_from_mont(unity_zp f, unity_zp_mont g);
+
+void
+unity_zp_mont_ninv(fmpz_t ninv, const unity_zp_mont f);
 
 #ifdef __cplusplus
 }
