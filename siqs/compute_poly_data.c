@@ -49,7 +49,7 @@
 */
 
 
-void qsieve_next_A0(qs_t qs_inf)
+mp_limb_t qsieve_next_A0(qs_t qs_inf)
 {
     slong j;
     slong s = qs_inf->s;
@@ -57,6 +57,7 @@ void qsieve_next_A0(qs_t qs_inf)
     slong span = qs_inf->span;
     slong h = qs_inf->h;
     slong m = qs_inf->m;
+    mp_limb_t ret = 1;
     mp_limb_t * current_subset = qs_inf->current_subset;
     mp_limb_t * A_ind = qs_inf->A_ind;
     prime_t * factor_base = qs_inf->factor_base;
@@ -92,13 +93,15 @@ void qsieve_next_A0(qs_t qs_inf)
     }
     else if (A_ind[s - 1] > span)
     {
-        flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
-        abort();
+        //flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
+        //abort();
+        ret = 0;
     }
     else
     {
-        flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
-        abort();
+        //flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
+        //abort();
+        ret = 0;
     }
 
     fmpz_set(qs_inf->A0, prod);
@@ -110,6 +113,8 @@ void qsieve_next_A0(qs_t qs_inf)
 
     fmpz_clear(prod);
     fmpz_clear(temp);
+
+    return ret;
 }
 
 void qsieve_init_A0(qs_t qs_inf)
@@ -147,6 +152,7 @@ void qsieve_init_A0(qs_t qs_inf)
        try to determine number of factors, such that we have enough
        primes to choose from
     */
+
     if (bits > 210) i = 15;
     else if (bits > 190) i = 13;
     else if (bits > 180) i = 12;
@@ -252,16 +258,9 @@ mp_limb_t qsieve_compute_q0(qs_t qs_inf)
     ulong i = 0;
     qs_inf->q0_values = NULL;
 
-    fmpz_t upper_bound;
-    fmpz_t temp;
     n_primes_t iter;
     n_primes_init(iter);
     n_primes_jump_after(iter, qs_inf->factor_base[qs_inf->num_primes - 1].p);
-
-    fmpz_init(upper_bound);
-    fmpz_init(temp);
-    fmpz_fdiv_q_ui(temp, qs_inf->target_A, UWORD(2));
-    fmpz_add(upper_bound, qs_inf->target_A, temp);
 
     /* find first 'q0', such that 'kn' is quadratic residue modulo 'q0' */
 
@@ -332,8 +331,6 @@ mp_limb_t qsieve_compute_q0(qs_t qs_inf)
     qs_inf->num_q0 = i;
 
     n_primes_clear(iter);
-    fmpz_clear(upper_bound);
-    fmpz_clear(temp);
 
     return 0;
 }
@@ -390,17 +387,15 @@ void qsieve_init_poly_first(qs_t qs_inf)
     mp_limb_t q0 = qs_inf->q0;
     mp_limb_t * A_ind = qs_inf->A_ind;
     mp_limb_t * A0_inv = qs_inf->A0_inv;
-    mp_limb_t * A_inv = qs_inf->A_inv;
     mp_limb_t * soln1 = qs_inf->soln1;
     mp_limb_t * soln2 = qs_inf->soln2;
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     fmpz_t * B_terms = qs_inf->B_terms;
     mp_limb_t * B0_terms = qs_inf->B0_terms;
     fmpz_t * A0_divp = qs_inf->A0_divp;
-    fmpz_t * A_divp = qs_inf->A_divp;
     prime_t * factor_base = qs_inf->factor_base;
     int * sqrts = qs_inf->sqrts;
-    mp_limb_t p, pinv, temp, temp2, pmod, mod_inv;
+    mp_limb_t p, pinv, temp, temp2, pmod, mod_inv, Ainv;
     fmpz_t temp3;
     fmpz_init(temp3);
 
@@ -416,13 +411,14 @@ void qsieve_init_poly_first(qs_t qs_inf)
     {
         p = factor_base[A_ind[i]].p;
         pinv = factor_base[A_ind[i]].pinv;
-        fmpz_mul_ui(A_divp[i], A0_divp[i], q0);
+
+        fmpz_mul_ui(temp3, A0_divp[i], q0);
         temp2 = n_invmod(q0, p);
         temp2 = n_mulmod2_preinv(temp2, B0_terms[i], p, pinv);
 
         if (temp2 >= p / 2) temp2 = p - temp2;
 
-        fmpz_mul_ui(B_terms[i], A_divp[i], temp2);
+        fmpz_mul_ui(B_terms[i], temp3, temp2);
         fmpz_add(qs_inf->B, qs_inf->B, B_terms[i]);
     }
 
@@ -440,55 +436,44 @@ void qsieve_init_poly_first(qs_t qs_inf)
     fmpz_mul_ui(temp3, qs_inf->A0, pmod);
     fmpz_add(qs_inf->B, qs_inf->B, temp3);
 
-    /* calculating $A^(-1) modulo p$, $p \in factor_base$*/
-    for (j = 2; j < qs_inf->num_primes; j++)
-    {
-        p = factor_base[j].p;
-        pinv = factor_base[j].pinv;
-        temp = n_invmod(q0, p);
-        A_inv[j] = n_mulmod2_preinv(A0_inv[j], temp, p, pinv);
-    }
-
     /*
-      calculate A_inv2B[j][i] = $2 * B_j * A^(-1) modulo p$
-      for factor base prime 'p'
+        calculating $A^(-1) modulo p$, $p \in factor_base$,
+        calculate A_inv2B[j][i] = $2 * B_j * A^(-1) modulo p$
+        for factor base prime 'p',
+        compute roots of base polynomial modulo factor base prime
     */
-    for (j = 0; j < s; j++)
-    {
-        for (i = 2; i < qs_inf->num_primes; i++)
-        {
-            p = factor_base[i].p;
-            pinv = factor_base[i].pinv;
-            temp = fmpz_fdiv_ui(B_terms[j], p);
-            temp *= 2;
-            if (temp >= p) temp -= p;
-            temp = n_mulmod2_preinv(temp, A_inv[i], p, pinv);
-            A_inv2B[j][i] = temp;
-        }
-    }
 
-    /* compute roots of base polynomial modulo factor base prime */
     for (i = 2; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
         pinv = factor_base[i].pinv;
+        temp = n_invmod(q0, p);
+        Ainv = n_mulmod2_preinv(A0_inv[i], temp, p, pinv);
+
         temp = fmpz_fdiv_ui(qs_inf->B, p);
-        temp2 = sqrts[i];
-        temp2 = temp2 + p - temp;
-        temp2 = n_mulmod2_preinv(temp2, A_inv[i], p, pinv);
+        temp2 = sqrts[i] + p - temp;
+        temp2 = n_mulmod2_preinv(temp2, Ainv, p, pinv);
         temp2 += qs_inf->sieve_size / 2;
         temp2 = n_mod2_preinv(temp2, p, pinv);
         soln1[i] = temp2;
-        temp2 = sqrts[i];
-        temp2 = p - temp2;
+        temp2 = p - sqrts[i];
         temp2 = temp2 + p - temp;
-        temp2 = n_mulmod2_preinv(temp2, A_inv[i], p, pinv);
+        temp2 = n_mulmod2_preinv(temp2, Ainv, p, pinv);
         temp2 += qs_inf->sieve_size / 2;
         temp2 = n_mod2_preinv(temp2, p, pinv);
         soln2[i] = temp2;
 
         if (soln1[i] > soln2[i])
             soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
+
+        for (j = 0; j < s; j++)
+        {
+            temp = fmpz_fdiv_ui(B_terms[j], p);
+            temp *= 2;
+            if (temp >= p) temp -= p;
+            temp = n_mulmod2_preinv(temp, Ainv, p, pinv);
+            A_inv2B[j][i] = temp;
+        }
     }
 
     for (i = 0; i < s; i++)
@@ -502,7 +487,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
 }
 
 /*
-    generate all possible values of coefficient 'B', using
+    generate next possible value of coefficient 'B', using
     gray-code formula, for current value of 'A'
 */
 

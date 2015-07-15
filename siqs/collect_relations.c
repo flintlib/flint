@@ -211,6 +211,26 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          }
 
          qs_inf->num_factors = num_factors;
+
+       /*  fprintf(qs_inf->file, " %wu", UWORD(1));
+
+         for (j = 0; j < qs_inf->small_primes; j++)
+         {
+             fprintf(qs_inf->file, " %wd ", small[j]);
+         }
+
+         fprintf(qs_inf->file, "%wu ", qs_inf->num_factors);
+
+         for (j = 0; j < num_factors; j++)
+         {
+             fprintf(qs_inf->file, "%wd %wd ", factor[j].ind, factor[j].exp);
+         }
+
+         fmpz_fprint(qs_inf->file, Y);
+         fprintf(qs_inf->file, "\n");
+
+         qs_inf->max_relations++; */
+
          relations += qsieve_insert_relation(qs_inf, Y);  /* Insert the relation in the matrix */
 
          if (qs_inf->num_relations >= qs_inf->buffer_size)
@@ -221,6 +241,38 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          }
 
          goto cleanup;
+      }
+      else
+      {
+        /*  if (fmpz_bits(res) < 32)
+          {
+              prime = fmpz_get_ui(res);
+
+              if (n_is_prime(prime) && prime > qs_inf->q0 && prime <= 64 * factor_base[qs_inf->num_primes - 1].p)
+              {
+                  qsieve_add_to_cycles(qs_inf, UWORD(1), prime, Y);
+
+                  fprintf(qs_inf->file, " %wu", prime);
+
+                  for (j = 0; j < qs_inf->small_primes; j++)
+                  {
+                      fprintf(qs_inf->file, " %wd ", small[j]);
+                  }
+
+                  fprintf(qs_inf->file, "%wu ", qs_inf->num_factors);
+
+                  for (j = 0; j < num_factors; j++)
+                  {
+                      fprintf(qs_inf->file, "%wd %wd ", factor[j].ind, factor[j].exp);
+                  }
+
+                  fmpz_fprint(qs_inf->file, Y);
+
+                  fprintf(qs_inf->file, "\n");
+
+                  qs_inf->max_relations++;
+              }
+          } */
       }
    }
 
@@ -277,54 +329,24 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 
 slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
-    slong i, relation = 0;
-
-    /* iterate over polynomial to call for sieving */
-    qsieve_compute_q0(qs_inf);          /* calculate q0 */
-
-    /* initialize 'A0' and precompute data associated with it */
-    qsieve_init_A0(qs_inf);
-    qsieve_compute_pre_data(qs_inf);
+    slong relation = 0;
 
     do
     {
-        for (i = 0; i < qs_inf->num_q0; i++)
-        {
-            if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
-                break;
+        if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
+            break;
 
-            qs_inf->q0 = qs_inf->q0_values[i];
+        qsieve_compute_C(qs_inf);
 
-            /* initialize first polynomial*/
-            qsieve_init_poly_first(qs_inf);
+        qsieve_do_sieving(qs_inf, sieve);
+        relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
-            do
-            {
-                if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
-                    break;
+        if (qs_inf->curr_poly < (1 << qs_inf->s))
+            qsieve_init_poly_next(qs_inf);
+        else
+            break;
 
-                /* calculate coefficient 'C' */
-                qsieve_compute_C(qs_inf);
-
-                /* perform sieving for current polynomial */
-                qsieve_do_sieving(qs_inf, sieve);
-                relation += qsieve_evaluate_sieve(qs_inf, sieve);
-
-                /* switch to next polynomial if exist */
-                if (qs_inf->curr_poly < (1 << qs_inf->s))
-                    qsieve_init_poly_next(qs_inf);
-                else
-                    break;
-
-            } while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
-
-        }
-
-        /* generate next 'A0' and precompute data associated with it */
-        qsieve_next_A0(qs_inf);
-        qsieve_compute_pre_data(qs_inf);
-
-    } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+    }while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
 
     return relation;
 }
