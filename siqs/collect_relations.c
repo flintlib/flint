@@ -211,6 +211,26 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          }
 
          qs_inf->num_factors = num_factors;
+
+       /*  fprintf(qs_inf->file, " %wu", UWORD(1));
+
+         for (j = 0; j < qs_inf->small_primes; j++)
+         {
+             fprintf(qs_inf->file, " %wd ", small[j]);
+         }
+
+         fprintf(qs_inf->file, "%wu ", qs_inf->num_factors);
+
+         for (j = 0; j < num_factors; j++)
+         {
+             fprintf(qs_inf->file, "%wd %wd ", factor[j].ind, factor[j].exp);
+         }
+
+         fmpz_fprint(qs_inf->file, Y);
+         fprintf(qs_inf->file, "\n");
+
+         qs_inf->max_relations++; */
+
          relations += qsieve_insert_relation(qs_inf, Y);  /* Insert the relation in the matrix */
 
          if (qs_inf->num_relations >= qs_inf->buffer_size)
@@ -221,6 +241,38 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          }
 
          goto cleanup;
+      }
+      else
+      {
+        /*  if (fmpz_bits(res) < 32)
+          {
+              prime = fmpz_get_ui(res);
+
+              if (n_is_prime(prime) && prime > qs_inf->q0 && prime <= 64 * factor_base[qs_inf->num_primes - 1].p)
+              {
+                  qsieve_add_to_cycles(qs_inf, UWORD(1), prime, Y);
+
+                  fprintf(qs_inf->file, " %wu", prime);
+
+                  for (j = 0; j < qs_inf->small_primes; j++)
+                  {
+                      fprintf(qs_inf->file, " %wd ", small[j]);
+                  }
+
+                  fprintf(qs_inf->file, "%wu ", qs_inf->num_factors);
+
+                  for (j = 0; j < num_factors; j++)
+                  {
+                      fprintf(qs_inf->file, "%wd %wd ", factor[j].ind, factor[j].exp);
+                  }
+
+                  fmpz_fprint(qs_inf->file, Y);
+
+                  fprintf(qs_inf->file, "\n");
+
+                  qs_inf->max_relations++;
+              }
+          } */
       }
    }
 

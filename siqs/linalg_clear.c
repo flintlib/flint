@@ -68,4 +68,8 @@ void qsieve_linalg_clear(qs_t qs_inf)
     qs_inf->Y_arr = NULL;
     qs_inf->prime_count = NULL;
 
+/* free graph of partial */
+
+    flint_free(qs_inf->cycle_hashtable);
+    flint_free(qs_inf->cycle_table);
 }

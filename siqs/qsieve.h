@@ -67,6 +67,22 @@ typedef struct la_col_t  /* matrix column */
 } la_col_t;
 
 
+typedef struct relation_t
+{
+    slong num_factor;
+    slong * small;
+    fac_t * factor;
+    fmpz_t Y;
+} relation_t;
+
+typedef struct cycle_t
+{
+    mp_limb_t prime;
+    mp_limb_t next;
+    mp_limb_t count;
+    mp_limb_t data;
+} cycle_t;
+
 typedef struct qs_s
 {
    fmpz_t n; /* Number to factor */
@@ -105,7 +121,6 @@ typedef struct qs_s
    fmpz_t B;                /* B values corresponding to current value of A */
    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
-   fmpz_t * A_divp;         /* A_divp[i] = A0_divp[i] * q0 */
    fmpz_t * A0_divp;        /* (A0 / p) for each prime dividing A0 */
    fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1))%p,
                                where 'p' is a prime factor of 'A0' */
@@ -114,7 +129,6 @@ typedef struct qs_s
                                where 'p' is a prime factor of 'A0' */
 
    mp_limb_t * A0_inv;      /* A0^(-1) mod p, for factor base prime p */
-   mp_limb_t * A_inv;       /* A^(-1) mod p, for factor base prime p */
    mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
    mp_limb_t * soln1;       /* first root of poly */
    mp_limb_t * soln2;       /* second root of poly */
@@ -133,6 +147,19 @@ typedef struct qs_s
    /***************************************************************************
                        RELATION DATA
    ***************************************************************************/
+
+   FILE * file;      /* file to store partial relation */
+
+   cycle_t * cycle_table;
+   mp_limb_t * cycle_hashtable;
+   mp_limb_t cycle_table_size;
+   mp_limb_t cycle_table_alloc;
+
+   slong component;
+   slong vertices;
+   slong edges;        /* or number of partial relation */
+
+   slong max_relations;
 
    slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
@@ -181,7 +208,7 @@ typedef qs_s qs_t[1];
 */
 static const mp_limb_t qsieve_tune[][5] =
 {
-   {40,   50,    50,  5,   2 *   3000},
+   {40,   50,    60,  5,   2 *   3000},  //change factor base to 60 from 50
    {50,   50,    80,  5,   2 *   3500},
    {60,   50,   100,  5,   2 *   4000},
    {70,   50,   300,  6,   2 *   6000},
@@ -224,7 +251,7 @@ mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
 
 mp_limb_t qsieve_poly_init(qs_t qs_inf);
 
-void qsieve_next_A0(qs_t qs_inf);
+mp_limb_t qsieve_next_A0(qs_t qs_inf);
 
 void qsieve_init_A0(qs_t qs_inf);
 

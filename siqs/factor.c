@@ -45,11 +45,12 @@
 
 mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 {
+    clock_t start = clock(), diff;
     qs_t qs_inf;
     mp_limb_t small_factor, factor = 0, t;
     ulong exp = 0;
     char * sieve;
-    slong ncols, nrows, i, j, count, relation = 0;
+    slong ncols, nrows, i, j, k = 0, count, relation = 0;
     uint64_t * nullrows;
     uint64_t mask;
     flint_rand_t state;
@@ -171,7 +172,9 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 20;
+    qs_inf->sieve_bits = 30;
+
+    //qs_inf->file = fopen("saved_relations.dat", "w");
 
     while(1)
     {
@@ -194,6 +197,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
             for (j = 0; j < qs_inf->num_q0; j++)
             {
+
+                //if ((clock() - start) / 1000.0 > 10.0) return;
 
                 qs_inf->q0 = qs_inf->q0_values[j];
                 qsieve_init_poly_first(qs_inf);
@@ -256,6 +261,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                     {
                         if (mask & ((uint64_t)(1) << count))
                         {
+
                             qsieve_square_root(X, Y, qs_inf, nullrows, ncols, count, qs_inf->n);
 
                             fmpz_sub(X, X, Y);
@@ -265,9 +271,11 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                             {
                                 if (fmpz_size(X)!= 1)
                                     fmpz_fdiv_q(X, qs_inf->n, X); /* take smaller of two factors */
+
+                                diff = clock() - start;
                                 flint_printf("factor found = ");
                                 fmpz_print(X);
-                                flint_printf("\n");
+                                flint_printf(" time taken = %f \n", diff / 1000.0);
                                 return;
                             }
                         }
@@ -285,7 +293,28 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                 }
             }
 
-            qsieve_next_A0(qs_inf);
+            i = qsieve_next_A0(qs_inf);
+
+            if (i == 0)
+            {
+                if (qs_inf->high < qs_inf->num_primes)
+                {
+                    qs_inf->high = qs_inf->high + 100;
+                    if (qs_inf->high >= qs_inf->num_primes)
+                        qs_inf->high = qs_inf->num_primes;
+                }
+                else
+                {
+                    qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
+                    qs_inf->high = qs_inf->num_primes;
+                }
+
+                qs_inf->span = qs_inf->high - qs_inf->low;
+                relation = 0;
+                qsieve_linalg_clear(qs_inf);
+                qsieve_linalg_init(qs_inf);
+                break;
+            }
 
         } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
     }

@@ -46,13 +46,11 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
    qs_inf->B_terms = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->A_ind = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->A0_divp = flint_malloc(s * sizeof(mp_limb_t));
-   qs_inf->A_divp = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->B0_terms = flint_malloc(s * sizeof(mp_limb_t));
 
    qs_inf->A_inv2B = flint_malloc(s * sizeof(mp_limb_t *));
 
    qs_inf->A0_inv = flint_malloc(num_primes * sizeof(mp_limb_t));
-   qs_inf->A_inv = flint_malloc(num_primes * sizeof(mp_limb_t));
    qs_inf->soln1 = flint_malloc(num_primes * sizeof(mp_limb_t));
    qs_inf->soln2 = flint_malloc(num_primes * sizeof(mp_limb_t));
 
@@ -64,7 +62,6 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
    for (i = 0; i < s; i++)
    {
        fmpz_init(qs_inf->A0_divp[i]);
-       fmpz_init(qs_inf->A_divp[i]);
        fmpz_init(qs_inf->B_terms[i]);
    }
 

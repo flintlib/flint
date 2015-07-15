@@ -33,12 +33,13 @@
 
 int main(void)
 {
-   int i, j, k;
+   int i, j = 0;
    qs_t qs_inf;
-   mp_limb_t small_factor;
-   fmpz_t n;
+   mp_limb_t small_factor, a, b;
+   fmpz_t n, x, y;
+   fmpz_init(x);
+   fmpz_init(y);
    fmpz_factor_t factors;
-   fmpz_init(n);
    FLINT_TEST_INIT(state);
 
    flint_printf("factor....");
@@ -46,56 +47,43 @@ int main(void)
 
 
 
-   for (i = 0; i < 1000; i++) /* Test random n */
+   for (i = 0; i < 10; i++) /* Test random n */
    {
-      fmpz_randtest_unsigned(n, state, 130);
+      b = a = n_randprime(state, 20, 1);
 
-      if (fmpz_is_zero(n) || fmpz_is_one(n) || fmpz_bits(n) <= 20 || fmpz_bits(n) > 50 ) continue;
+      while (b == a)
+        b = n_randprime(state, 20, 1);
 
-      fmpz_set_ui(n, UWORD(1801));
+      fmpz_init_set_ui(n, a);
+      fmpz_mul_ui(n, n, b);
 
-      fmpz_mul_ui(n, n, UWORD(1801));
+      //fmpz_set_str(x, "48112959837082048697", 10);
 
-      fmpz_mul_ui(n, n, UWORD(2309));
+      //fmpz_set_str(y, "54673257461630679457", 10);
 
-   //   fmpz_mul_ui(n, n, UWORD(953));
+      //fmpz_mul(n, x, y);
+      //flint_printf("\n n = %wu * %wu\n", a, b);
+      fmpz_print(n);
+      flint_printf("\n");
 
-      fmpz_mul_ui(n, n, UWORD(911));
+     // if (i == 0) continue;
 
       qsieve_init(qs_inf, n);
-
-      small_factor = qsieve_knuth_schroeppel(qs_inf);
-
-      if (small_factor) continue;
-
-      fmpz_mul_ui(qs_inf->kn, qs_inf->n, qs_inf->k); /* haven't calculated earlier */
-      small_factor = qsieve_primes_init(qs_inf);
-
-      if (small_factor) continue;
 
       fmpz_factor_init(factors);
 
       qsieve_factor(n, factors);
 
-      for (j = 0; j < factors->num; j++)
-      {
-          if (fmpz_fdiv_ui(n, fmpz_get_ui(&factors->p[j])))
-          {
-              flint_printf("%wd is not a factor of ",
-                           fmpz_get_ui(&factors->p[j]));
-              fmpz_print(n);
-              flint_printf("\n");
-              abort();
-          }
-      }
+     // qsieve_process_partial(qs_inf);
 
       fmpz_factor_clear(factors);
-      qsieve_clear(qs_inf);
 
-      break;
+      //break;
    }
 
    fmpz_clear(n);
+   fmpz_clear(x);
+   fmpz_clear(y);
 
    FLINT_TEST_CLEANUP(state);
 
