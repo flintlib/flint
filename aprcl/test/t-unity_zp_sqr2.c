@@ -32,15 +32,17 @@
 int main(void)
 {
     int i, j;
+    fmpz_t * t;
     FLINT_TEST_INIT(state);
    
     flint_printf("unity_zp_sqr2....");
     fflush(stdout);
 
-    fmpz_t * t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (50));
-    for (i = 0; i < 50; i++)
+    t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (SQUARING_SPACE));
+    for (i = 0; i < SQUARING_SPACE; i++)
         fmpz_init(t[i]);
 
+    /* test squaring in Z[\zeta_4] */
     for (i = 0; i < 100; i++)
     {
         ulong p, k;
@@ -91,6 +93,7 @@ int main(void)
         unity_zp_clear(temp);
     }
 
+    /* test squaring in Z[\zeta_8] */
     for (i = 0; i < 100; i++)
     {
         ulong p, k;
@@ -141,6 +144,7 @@ int main(void)
         unity_zp_clear(temp);
     }
 
+    /* test squaring in Z[\zeta_16] */
     for (i = 0; i < 100; i++)
     {
         ulong p, k;
@@ -191,7 +195,7 @@ int main(void)
         unity_zp_clear(temp);
     }
 
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < SQUARING_SPACE; i++)
         fmpz_clear(t[i]);
     flint_free(t);
 
