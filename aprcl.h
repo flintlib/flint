@@ -264,7 +264,7 @@ void unity_zp_mont_swap(unity_zp_mont f, unity_zp_mont g);
 void unity_zp_mont_copy(unity_zp_mont f, const unity_zp_mont g);
 
 /* Conversion from simple to Montgomery form and back */
-void unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r);
+void unity_zp_to_mont(unity_zp_mont f, const unity_zp g);
 void unity_zp_from_mont(unity_zp f, unity_zp_mont g);
 
 /* Montgomery reduction */
@@ -274,10 +274,10 @@ void unity_zp_mont_reduction(unity_zp_mont f);
 
 /* Modular functions for fmpz_t */
 
-/*
 static __inline__
 void
-mod_mul_mont(fmpz_t * t, ulong r)
+mod_redc_mont(fmpz_t f, const fmpz_t g, const fmpz_t n,
+        const fmpz_t ninv, fmpz_t m, fmpz_t t, ulong r)
 {
     fmpz_fdiv_r_2exp(m, g, r);
     fmpz_mul(t, m, ninv);
@@ -288,7 +288,6 @@ mod_mul_mont(fmpz_t * t, ulong r)
     if (fmpz_cmp(n, f) <= 0)
         fmpz_sub(f, f, n);
 }
-*/
 
 static __inline__
 void
@@ -296,15 +295,7 @@ mod_mul(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_t n,
         const fmpz_t ninv, fmpz_t m, fmpz_t t, ulong r)
 {
     fmpz_mul(f, g, h);
-    
-    fmpz_fdiv_r_2exp(m, f, r);
-    fmpz_mul(t, m, ninv);
-    fmpz_fdiv_r_2exp(m, t, r);
-    fmpz_mul(t, n, m);
-    fmpz_add(f, f, t);
-    fmpz_fdiv_q_2exp(f, f, r);
-    if (fmpz_cmp(n, f) <= 0)
-        fmpz_sub(f, f, n);
+    mod_redc_mont(f, f, n, ninv, m, t, r);
 }
 
 static __inline__
@@ -332,6 +323,9 @@ void _unity_zp_mont_reduce_cyclotomic(unity_zp_mont f);
 void unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g);
 void unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g,
         const unity_zp_mont h);
+
+void
+unity_zp_mont_sqr7(unity_zp_mont f, const unity_zp_mont g, fmpz_t * t);
 
 /* Powering functions */
 int unity_zp_is_inplace(ulong p, ulong exp);
