@@ -352,9 +352,9 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
-FLINT_DLL size_t flint_printf(const char * str, ...); /* flint version of printf */
-FLINT_DLL size_t flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
-FLINT_DLL size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
+FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */
+FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
 FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
 FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */

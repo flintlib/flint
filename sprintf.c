@@ -31,7 +31,7 @@
 #include <stdarg.h>
 #include "flint.h"
 
-size_t flint_sprintf(char * s, const char * str, ...)
+int flint_sprintf(char * s, const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
@@ -125,5 +125,5 @@ size_t flint_sprintf(char * s, const char * str, ...)
    va_end(ap);
    flint_free(str2);
 
-   return ret;
+   return (int) ret;
 }

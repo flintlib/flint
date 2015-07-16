@@ -75,7 +75,7 @@ int parse_fmt(int * floating, const char * fmt)
    return args;
 }
 
-size_t flint_printf(const char * str, ...)
+int flint_printf(const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
@@ -169,5 +169,5 @@ size_t flint_printf(const char * str, ...)
    va_end(ap);
    flint_free(str2);
 
-   return ret;
+   return (int) ret;
 }
