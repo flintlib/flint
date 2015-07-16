@@ -271,6 +271,60 @@ void unity_zp_from_mont(unity_zp f, unity_zp_mont g);
 void unity_zp_mont_ninv(fmpz_t ninv, const unity_zp_mont f);
 void unity_zp_mont_reduction(unity_zp_mont f);
 
+
+/* Modular functions for fmpz_t */
+
+/*
+static __inline__
+void
+mod_mul_mont(fmpz_t * t, ulong r)
+{
+    fmpz_fdiv_r_2exp(m, g, r);
+    fmpz_mul(t, m, ninv);
+    fmpz_fdiv_r_2exp(m, t, r);
+    fmpz_mul(t, n, m);
+    fmpz_add(f, g, t);
+    fmpz_fdiv_q_2exp(f, f, r);
+    if (fmpz_cmp(n, f) <= 0)
+        fmpz_sub(f, f, n);
+}
+*/
+
+static __inline__
+void
+mod_mul(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_t n,
+        const fmpz_t ninv, fmpz_t m, fmpz_t t, ulong r)
+{
+    fmpz_mul(f, g, h);
+    
+    fmpz_fdiv_r_2exp(m, f, r);
+    fmpz_mul(t, m, ninv);
+    fmpz_fdiv_r_2exp(m, t, r);
+    fmpz_mul(t, n, m);
+    fmpz_add(f, f, t);
+    fmpz_fdiv_q_2exp(f, f, r);
+    if (fmpz_cmp(n, f) <= 0)
+        fmpz_sub(f, f, n);
+}
+
+static __inline__
+void
+mod_add(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_t n)
+{
+    fmpz_add(f, g, h);
+    if (fmpz_cmp(f, n) >= 0)
+        fmpz_sub(f, f, n);
+}
+
+static __inline__
+void
+mod_sub(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_t n)
+{
+    fmpz_sub(f, g, h);
+    if (fmpz_cmp_ui(f, 0) < 0)
+        fmpz_add(f, f, n);
+}
+
 /* Cyclotomic reduction */
 void _unity_zp_mont_reduce_cyclotomic(unity_zp_mont f);
 
