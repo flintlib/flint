@@ -93,34 +93,46 @@ typedef enum
     PROBABPRIME
 } primality_test_status;
 
+/* Primality testing useful functions */
 int _p_ind(const aprcl_config conf, ulong p);
-int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
-int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
-slong _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
-primality_test_status _is_prime_gauss(const fmpz_t n,
-        const aprcl_config config);
-int is_prime_gauss_min_R(const fmpz_t n, ulong R);
-int is_prime_gauss(const fmpz_t n);
-
-
-int _is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
-slong _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
-slong _is_prime_jacobi_check_21(ulong q, const fmpz_t n);
-slong _is_prime_jacobi_check_22(const unity_zp j
-    , const fmpz_t u, ulong v, ulong q);
-slong _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
-    , const unity_zp j2_2, const fmpz_t u, ulong v);
-primality_test_status _is_prime_jacobi(const fmpz_t n,
-        const aprcl_config config);
-int is_prime_jacobi(const fmpz_t n);
-
-int is_prime_aprcl(const fmpz_t n);
 
 int is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
 int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
 
 int is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r);
 int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
+
+/* Gauss sums primality test */
+
+int is_prime_gauss(const fmpz_t n);
+int is_prime_gauss_min_R(const fmpz_t n, ulong R);
+
+primality_test_status _is_prime_gauss(const fmpz_t n,
+        const aprcl_config config);
+
+int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
+int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
+
+slong _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
+
+
+/* Jacobi sums primality test */
+
+int is_prime_jacobi(const fmpz_t n);
+primality_test_status _is_prime_jacobi(const fmpz_t n,
+        const aprcl_config config);
+
+slong _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
+slong _is_prime_jacobi_check_21(ulong q, const fmpz_t n);
+slong _is_prime_jacobi_check_22(const unity_zp j
+    , const fmpz_t u, ulong v, ulong q);
+slong _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
+    , const unity_zp j2_2, const fmpz_t u, ulong v);
+
+int _is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
+
+
+int is_prime_aprcl(const fmpz_t n); /* now just returns is_prime_jacobi(n) */
 
 /* Z[unity_root]/(n) operation */
 

@@ -294,3 +294,82 @@ void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
     Sets $f = \sigma_x^{-1}(g)$, so $\sigma_x(f) = g$. 
     $g$ must be reduced by $\Phi_{p^exp}$.
 
+*******************************************************************************
+
+    Operations in $\mathbb{Z}[\zeta_p]$ in Montgomery form.
+
+*******************************************************************************
+
+void unity_zp_mont_init(unity_zp_mont f, ulong p, ulong exp,
+        const fmpz_t n, const fmpz_t ninv)
+
+    Initialized \code{unity_zp_mont} element of $\mathbb{Z}[\zeta_p]$.
+
+void unity_zp_mont_clear(unity_zp_mont f)
+
+    Clears the given \code{unity_zp_mont} element. It must be reinitialised in
+    order to be used again.
+
+void unity_zp_mont_set_zero(unity_zp_mont f)
+
+    Sets $f = 0$.  
+
+void unity_zp_mont_copy(unity_zp_mont f, const unity_zp_mont g)
+
+    Sets $f$ to $g$. $f$ and $g$ must be initialized with same parameters.
+
+void unity_zp_mont_swap(unity_zp_mont f, unity_zp_mont q)
+
+    Swaps $f$ and $g$. $f$ and $g$ must be initialized with same parameters.
+
+void unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r)
+
+    Sets $f$ to $g * r \bmod n$ - $g$'s Montgomery form.
+
+void unity_zp_from_mont(unity_zp f, unity_zp_mont g)
+
+    Sets $f$ to $g$ from Montgomery to simple form.
+
+void unity_zp_mont_ninv(fmpz_t ninv, const unity_zp_mont f)
+
+    Computes $ninv$ such that $r*r^{-1} - n * ninv = 1$.
+
+void unity_zp_mont_reduction(unity_zp_mont f)
+
+    Sets $f$ to $f * r^{-1} \bmod n$.
+
+void _unity_zp_mont_reduce_cyclotomic(unity_zp_mont f)
+
+    Reduce $f$ by it's unity cyclotomic polynomial. Elements of $f$ from $0..n*r$.
+
+void unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g)
+
+    Sets the $f$ to the $g * g$ in Montgomery form. So the each element of $f$
+    represented as $a * r$.
+    $f$ and $g$ must be initialized with same parameters. Element of $g$ must be
+    reduced modulo $n$.
+
+void unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g,
+        const unity_zp_mont h)
+
+    Sets the $f$ to the $g * h$ in Montgomery form. So the each element of $f$
+    represented as $a * r$.
+    $f$, $g$ and $h$ must be initialized with same parameters. Element of 
+    $g$ and $h$must be reduced modulo $n$.
+
+int unity_zp_is_inplace(ulong p, ulong exp)
+
+    Returns positive value if we have special functions 
+    for $p^exp$ unity root squaring.
+
+void _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
+        const fmpz_t pow, const fmpz_t r)
+
+    Computest $f = g^pow$ for Montgomery form $g$ with selected $r$ using
+    sliding window exponentiation.
+
+void unity_zp_pow_mont_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+
+    Computes $f = g^pow$ for $f$, $g$ from $\mathbb{Z}[\zeta_p] / (n)$ using
+    special functions and Montgomery form.
+
