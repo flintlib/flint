@@ -58,6 +58,7 @@ EXT_TUNE_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext
 EXT_PROF_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/profile/p-*.c)))
 EXT_OBJS = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), build/$(dir).lo))
 EXT_HEADERS = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/*.h))
+EXT_EXMP_SOURCES = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/examples/*.c))
 
 all: library
 
@@ -95,9 +96,10 @@ tune: library $(TUNE_SOURCES) $(EXT_TUNE_SOURCES)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tune || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/tune; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tune || exit $$?;))
 
-examples: library $(EXMP_SOURCES)
+examples: library $(EXMP_SOURCES) $(EXT_EXMP_SOURCES) $(EXT_HEADERS)
 	mkdir -p build/examples
 	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach prog, $(patsubst $(ext)/examples/%.c, %, $(wildcard $(ext)/examples/*.c)), $(CC) $(CFLAGS) $(INCS) $(ext)/examples/$(prog).c -o build/examples/$(prog) $(LIBS) || exit $$?;))
 
 $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
