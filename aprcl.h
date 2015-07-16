@@ -97,7 +97,8 @@ int _p_ind(const aprcl_config conf, ulong p);
 int _is_gausspower_2q_equal_first(ulong q, const fmpz_t n);
 int _is_gausspower_2q_equal_second(ulong q, const fmpz_t n);
 slong _is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n);
-primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config);
+primality_test_status _is_prime_gauss(const fmpz_t n,
+        const aprcl_config config);
 int is_prime_gauss_min_R(const fmpz_t n, ulong R);
 int is_prime_gauss(const fmpz_t n);
 
@@ -109,7 +110,8 @@ slong _is_prime_jacobi_check_22(const unity_zp j
     , const fmpz_t u, ulong v, ulong q);
 slong _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1
     , const unity_zp j2_2, const fmpz_t u, ulong v);
-primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config);
+primality_test_status _is_prime_jacobi(const fmpz_t n,
+        const aprcl_config config);
 int is_prime_jacobi(const fmpz_t n);
 
 int is_prime_aprcl(const fmpz_t n);
@@ -120,7 +122,7 @@ int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
 int is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r);
 int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 
-/* Z[unity_root] operation v2. */
+/* Z[unity_root]/(n) operation */
 
 void unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n);
 void unity_zp_clear(unity_zp f);
@@ -178,7 +180,8 @@ void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
 void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 
 /* Jacobi sum computation. */
-void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
+void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p,
+        ulong q, ulong k, ulong a, ulong b);
 void jacobi_pq(unity_zp f, ulong q, ulong p);
 void jacobi_2q_one(unity_zp f, ulong q);
 void jacobi_2q_two(unity_zp f, ulong q);
@@ -190,7 +193,8 @@ void unity_zpq_clear(unity_zpq value);
 void unity_zpq_copy(unity_zpq f, const unity_zpq g);
 void unity_zpq_swap(unity_zpq f, unity_zpq g);
 
-void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x);
+void unity_zpq_coeff_set_fmpz(unity_zpq value,
+        ulong i, ulong j, const fmpz_t x);
 void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x);
 
 void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x);
@@ -198,8 +202,10 @@ void unity_zpq_coeff_add_ui(unity_zpq value, ulong i, ulong j, ulong x);
 
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
-void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right);
-void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right);
+void unity_zpq_add(unity_zpq result, const unity_zpq left,
+        const unity_zpq right);
+void unity_zpq_mul(unity_zpq result, const unity_zpq left,
+        const unity_zpq right);
 void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t p);
 void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow);
 
@@ -209,7 +215,8 @@ void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong p);
 void unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s);
 
 void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p);
-void unity_zpq_gauss_sum_character_pow(unity_zpq value, ulong q, ulong p, ulong pow);
+void unity_zpq_gauss_sum_character_pow(unity_zpq value,
+        ulong q, ulong p, ulong pow);
 void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p);
 
 ulong unity_zpq_p_unity(const unity_zpq f);
@@ -232,36 +239,39 @@ mp_ptr f_table(const ulong q);
 ulong p_power_in_q(ulong q, ulong p);
 
 
-/* experemental functions for montgomery form */
+/* Z[unity_root] functions for Montgomery form */
 
-void unity_zp_mont_init(unity_zp_mont f, ulong p, ulong exp, const fmpz_t n, const fmpz_t ninv);
+/* Memory allocation and free */
+void unity_zp_mont_init(unity_zp_mont f, ulong p, ulong exp,
+        const fmpz_t n, const fmpz_t ninv);
 void unity_zp_mont_clear(unity_zp_mont f);
+
+void unity_zp_mont_set_zero(unity_zp_mont f);
+
+void unity_zp_mont_swap(unity_zp_mont f, unity_zp_mont g);
+void unity_zp_mont_copy(unity_zp_mont f, const unity_zp_mont g);
+
+/* Conversion from simple to Montgomery form and back */
+void unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r);
+void unity_zp_from_mont(unity_zp f, unity_zp_mont g);
+
+/* Montgomery reduction */
+void unity_zp_mont_ninv(fmpz_t ninv, const unity_zp_mont f);
 void unity_zp_mont_reduction(unity_zp_mont f);
 
+/* Cyclotomic reduction */
 void _unity_zp_mont_reduce_cyclotomic(unity_zp_mont f);
 
-void
-unity_zp_mont_set_zero(unity_zp_mont f);
-void
-unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g);
-void
-unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g, const unity_zp_mont h);
-void
-unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow, const fmpz_t r);
-void
-unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
-void
-unity_zp_mont_swap(unity_zp_mont f, unity_zp_mont g);
-void
-unity_zp_mont_copy(unity_zp_mont f, const unity_zp_mont g);
+/* Multiplication and squaring */
+void unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g);
+void unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g,
+        const unity_zp_mont h);
 
-void
-unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r);
-void
-unity_zp_from_mont(unity_zp f, unity_zp_mont g);
-
-void
-unity_zp_mont_ninv(fmpz_t ninv, const unity_zp_mont f);
+/* Powering functions */
+int unity_zp_is_inplace(ulong p, ulong exp);
+void _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
+        const fmpz_t pow, const fmpz_t r);
+void unity_zp_pow_mont_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 
 #ifdef __cplusplus
 }

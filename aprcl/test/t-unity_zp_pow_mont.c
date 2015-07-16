@@ -72,7 +72,7 @@ int main(void)
             fmpz_clear(val);
         }
 
-        unity_zp_poww_fmpz(f, temp, pow);
+        unity_zp_pow_mont_fmpz(f, temp, pow);
         unity_zp_pow_fmpz(g, temp, pow);
 
         if (unity_zp_equal(f, g) == 0)

@@ -39,7 +39,7 @@ unity_zp_is_inplace(ulong p, ulong exp)
 }
 
 void
-unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+unity_zp_pow_mont_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 {
     fmpz_t r, ninv;
     unity_zp_mont fm, gm;
@@ -64,7 +64,7 @@ unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     fmpz_mul(gm->nr, gm->n, r);
 
     unity_zp_to_mont(gm, g, r);
-    unity_zp_pow_mont_fmpz(fm, gm, pow, r);
+    _unity_zp_pow_mont_fmpz(fm, gm, pow, r);
 
     unity_zp_from_mont(f, fm);
 
@@ -76,7 +76,8 @@ unity_zp_poww_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
 /* Compute f = g^pow for f, g - unity_zp in Montgomery form */
 void
-unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow, const fmpz_t r)
+_unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
+        const fmpz_t pow, const fmpz_t r)
 {
     ulong h, k, value;
     slong i, j;
@@ -96,7 +97,8 @@ unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g, const fmpz_t pow,
         g_powers store odd powers of g up to 2^k - 1;
         g_powers[(i + 1) / 2] = g^i
     */
-    g_powers = (unity_zp_mont*) flint_malloc(sizeof(unity_zp_mont) * (n_pow(2, k - 1) + 1));
+    g_powers = (unity_zp_mont*) flint_malloc(
+            sizeof(unity_zp_mont) * (n_pow(2, k - 1) + 1));
 
     /* sets g_powers[0] = 1 */
     unity_zp_mont_init(g_powers[0], f->p, f->exp, f->n, f->ninv);
