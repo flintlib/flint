@@ -89,7 +89,7 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
     const int bias = 1022;
     alias.double_val = (double)n;
 #else
-    const mp_limb_t upper_limit = 1626;         /* 1626 < (2^32)^(1/3) */
+    const mp_limb_t upper_limit = 1625;         /* log2(1625 ^ 3) < 32 */
     const mp_limb_t expo_mask = 0x7F800000;     /* exponent bits in float */
     const mp_limb_t mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
     const mp_limb_t table_mask = 0x00780000;    /* first 4 bits of mantissa */

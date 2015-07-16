@@ -59,7 +59,7 @@ n_cbrt(mp_limb_t n)
 #ifdef FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #else
-    upper_limit = 1626;     /* 1626 < (2^32)^(1/3) */
+    upper_limit = 1625;     /* log2(1625 ^ 3) < 32 */
 #endif
 
     x = n_cbrt_estimate((double)n);   /* initial estimate */
