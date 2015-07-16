@@ -42,7 +42,7 @@ int main(void)
 #if FLINT64
    upper_limit = 2642245;
 #else
-   upper_limit = 1626;
+   upper_limit = 1625;
 #endif
 
     /* random n and root */
