@@ -178,7 +178,7 @@ ifndef MOD
 	fi
 else
 	$(AT)$(foreach mod, $(MOD), $(call test_mod,$(mod)) || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
 endif
 
 valgrind: library
