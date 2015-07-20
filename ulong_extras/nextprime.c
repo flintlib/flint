@@ -48,6 +48,24 @@ unsigned int nextindex[] =
 
 #define NEXTPRIME_PRIMES 54
 
+/* first 64 primes used for modular arithmetic */
+static const unsigned short n_modular_primes_tab[64] = {
+#if FLINT_BITS == 64
+  29, 99, 123, 131, 155, 255, 269, 359, 435, 449, 453, 485, 491, 543, 585,
+  599, 753, 849, 879, 885, 903, 995, 1209, 1251, 1311, 1373, 1403, 1485, 1533,
+  1535, 1545, 1551, 1575, 1601, 1625, 1655, 1701, 1709, 1845, 1859, 1913,
+  1995, 2045, 2219, 2229, 2321, 2363, 2385, 2483, 2499, 2523, 2543, 2613,
+  2639, 2679, 2829, 2931, 3089, 3165, 3189, 3245, 3273, 3291, 3341
+#else
+  11, 45, 65, 95, 129, 135, 165, 209, 219, 221, 239, 245, 281, 303, 345, 351,
+  359, 389, 393, 395, 413, 435, 461, 513, 519, 549, 555, 573, 575, 585, 591,
+  611, 623, 629, 683, 689, 701, 729, 785, 791, 813, 843, 851, 869, 879, 893,
+  905, 921, 953, 963, 965, 969, 993, 1031, 1049, 1073, 1085, 1103, 1143, 1173,
+  1203, 1221, 1229, 1271
+#endif
+};
+
+#define N_MODULUS (UWORD(1) << (FLINT_BITS - 1))
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 {
@@ -61,6 +79,13 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
         n++;
         n |= 1;
         return n;  
+    }
+
+    if (n >= N_MODULUS && n < N_MODULUS + n_modular_primes_tab[63])
+    {
+        for (i = 0; i < 64; i++)
+            if (N_MODULUS + n_modular_primes_tab[i] > n)
+                return N_MODULUS + n_modular_primes_tab[i];
     }
 
     if (n >= UWORD_MAX_PRIME)
