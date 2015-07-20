@@ -327,6 +327,9 @@ void unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g,
 void
 unity_zp_mont_sqr7(unity_zp_mont f, const unity_zp_mont g, fmpz_t * t);
 
+void unity_zp_mont_sqr_inplace(unity_zp_mont f,
+        const unity_zp_mont g, fmpz_t * t);
+
 /* Powering functions */
 int unity_zp_is_inplace(ulong p, ulong exp);
 void _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,

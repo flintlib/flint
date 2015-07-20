@@ -60,10 +60,10 @@ unity_zp_pow_mont_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
     fmpz_setbit(r, fm->r);
 
-    fmpz_mul(fm->nr, fm->n, r);
-    fmpz_mul(gm->nr, gm->n, r);
+    fmpz_mul_2exp(fm->nr, fm->n, fm->r);
+    fmpz_mul_2exp(gm->nr, gm->n, fm->r);
 
-    unity_zp_to_mont(gm, g, r);
+    unity_zp_to_mont(gm, g);
     _unity_zp_pow_mont_fmpz(fm, gm, pow, r);
 
     unity_zp_from_mont(f, fm);
@@ -83,6 +83,12 @@ _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
     slong i, j;
     unity_zp_mont temp;
     unity_zp_mont *g_powers;
+
+    fmpz_t * t;
+    t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (50));
+    for (i = 0; i < 50; i++)
+        fmpz_init(t[i]);
+
 
     unity_zp_mont_init(temp, f->p, f->exp, f->n, f->ninv);
     fmpz_set(temp->nr, f->nr);
@@ -127,7 +133,7 @@ _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
     {
         if (fmpz_tstbit(pow, i) == 0)
         {
-            unity_zp_mont_sqr(temp, f);
+            unity_zp_mont_sqr_inplace(temp, f, t);
             unity_zp_mont_swap(temp, f);
             i--;
         }
@@ -144,7 +150,7 @@ _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
             /* f = f^(2^(i - j + 1)) */
             for (h = 0; h < i - j + 1; h++)
             {
-                unity_zp_mont_sqr(temp, f);
+                unity_zp_mont_sqr_inplace(temp, f, t);
                 unity_zp_mont_swap(temp, f);
             }
 
@@ -163,6 +169,10 @@ _unity_zp_pow_mont_fmpz(unity_zp_mont f, const unity_zp_mont g,
             i = j - 1;
         }
     }
+
+    for (i = 0; i < 50; i++)
+        fmpz_clear(t[i]);
+    flint_free(t);
 
     for (i = 0; i <= n_pow(2, k - 1); i++)
         unity_zp_mont_clear(g_powers[i]);

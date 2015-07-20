@@ -40,14 +40,8 @@ unity_zp_mont_reduction(unity_zp_mont f)
             set f[i] = f[i] * r^(-1);
             f[i] = (f[i] + (f[i] * ninv mod r) * n) / r
         */
-        fmpz_fdiv_r_2exp(m, f->poly->coeffs + i, f->r);
-        fmpz_mul(t, m, f->ninv);
-        fmpz_fdiv_r_2exp(m, t, f->r);
-        fmpz_mul(t, f->n, m);
-        fmpz_add(f->poly->coeffs + i, f->poly->coeffs + i, t);
-        fmpz_fdiv_q_2exp(f->poly->coeffs + i, f->poly->coeffs + i, f->r);
-        if (fmpz_cmp(f->n, f->poly->coeffs + i) <= 0)
-            fmpz_sub(f->poly->coeffs + i, f->poly->coeffs + i, f->n);
+        mod_redc_mont(f->poly->coeffs + i, f->poly->coeffs + i,
+                f->n, f->ninv, m, t, f->r);
     }
 
     fmpz_clear(m);

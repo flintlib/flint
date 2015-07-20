@@ -50,3 +50,16 @@ unity_zp_mont_sqr(unity_zp_mont f, const unity_zp_mont g)
     unity_zp_mont_reduction(f);
 }
 
+void
+unity_zp_mont_sqr_inplace(unity_zp_mont f, const unity_zp_mont g, fmpz_t * t)
+{
+    if (f->p == 7 && f->exp == 1)
+    {
+        unity_zp_mont_sqr7(f, g, t);
+        return;
+    }
+
+    unity_zp_mont_sqr(f, g);
+}
+
+

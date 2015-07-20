@@ -37,7 +37,7 @@ int main(void)
     flint_printf("unity_zp_pow_mont....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 100; i++)
     {
         ulong p;
         fmpz_t n, pow;

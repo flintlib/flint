@@ -27,11 +27,11 @@
 
 /* Convert unity_zp into Montgomery form */
 void
-unity_zp_to_mont(unity_zp_mont f, const unity_zp g, const fmpz_t r)
+unity_zp_to_mont(unity_zp_mont f, const unity_zp g)
 {
     fmpz_mod_poly_get_fmpz_poly(f->poly, g->poly);
-    _fmpz_vec_scalar_mul_fmpz(f->poly->coeffs,
-            f->poly->coeffs, f->poly->length, r);
+    _fmpz_vec_scalar_mul_2exp(f->poly->coeffs,
+            f->poly->coeffs, f->poly->length, f->r);
     _fmpz_vec_scalar_mod_fmpz(f->poly->coeffs,
             f->poly->coeffs, f->poly->length, f->n);
 }
