@@ -165,6 +165,8 @@ FLINT_DLL void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);
 
 FLINT_DLL void unity_zp_ar1(fmpz_t * t);
 FLINT_DLL void unity_zp_ar2(fmpz_t * t);
+FLINT_DLL void unity_zp_ar3(fmpz_t * t);
+FLINT_DLL void unity_zp_ar4(fmpz_t * t);
 
 FLINT_DLL void unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t);
 FLINT_DLL void unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t);
