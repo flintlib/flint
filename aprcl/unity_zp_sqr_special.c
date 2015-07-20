@@ -185,51 +185,79 @@ unity_zp_ar3(fmpz_t * t)
     fmpz_set(t[18], t[48]);             /* store c8 */
 }
 
+/*
+    Input a0, ... , a5 store in t[0 .. 4].
+    Output c0, ..., c8 store in t[5 .. 13].
+
+    c0 = a0 * a0;
+    c1 = 2 * a0 * a1;
+    c2 = 2 * a0 * a2 + a1 * a1;
+    c3 = 2 * a0 * a3 + a * a1 * a2;
+    c4 = 2 * a0 * a4 + 2 * a1 * a3 + a2 * a2;
+    c5 = 2 * a1 * a4 + 2 * a2 * a3;
+    c6 = 2 * a2 * a4 + a3 * a3;
+    c7 = 2 * a3 * a4;
+    c8 * a4 * a4.
+*/
 void
 unity_zp_ar4(fmpz_t * t)
 {
-    fmpz_add(t[14], t[2], t[2]);
-    fmpz_add(t[15], t[0], t[1]);
-    fmpz_add(t[16], t[1], t[14]);
-    fmpz_add(t[17], t[3], t[4]);
-    fmpz_add(t[18], t[3], t[14]);
-    fmpz_add(t[19], t[0], t[0]);
+    /*
+        a0 = t[0]; a1 = t[1]; a2 = t[2]; a3 = t[3]; a4 = t[4];
 
-    fmpz_add(t[19], t[19], t[14]);
-    fmpz_add(t[20], t[1], t[3]);
-    fmpz_add(t[21], t[4], t[4]);
-    fmpz_add(t[21], t[21], t[14]);
-    fmpz_add(t[22], t[0], t[3]);
-    fmpz_add(t[23], t[1], t[4]);
+        c0 = t[5]; c1 = t[6]; c2 = t[7]; c3 = t[8]; c4 = t[9];
+        c5 = t[10]; c6 = t[11]; c7 = t[12]; c8 = t[13];
 
-    fmpz_mul(t[5], t[0], t[0]);
-    fmpz_mul(t[24], t[0], t[1]);
-    fmpz_mul(t[13], t[4], t[4]);
-    fmpz_mul(t[25], t[3], t[4]);
-    fmpz_mul(t[26], t[1], t[14]);
-    fmpz_mul(t[27], t[3], t[14]);
-    fmpz_add(t[6], t[24], t[24]);
+        m1 = t[14]; m2 = t[15]; m3 = t[16]; m4 = t[17];
+        m5 = t[18]; m6 = t[19]; m7 = t[20]; m8 = t[21];
+        m9 = t[22]; m10 = t[23];
 
-    fmpz_add(t[12], t[25], t[25]);
-    fmpz_mul(t[28], t[15], t[16]);
-    fmpz_add(t[29], t[24], t[26]);
-    fmpz_sub(t[7], t[28], t[29]);
-    fmpz_mul(t[28], t[17], t[18]);
-    fmpz_add(t[29], t[25], t[27]);
+        d1 = t[24]; d2 = t[25]; d3 = t[26]; d4 = t[27];
+        d5 = t[28]; d6 = t[29];
+    */
 
-    fmpz_sub(t[11], t[28], t[29]);
-    fmpz_mul(t[28], t[19], t[20]);
-    fmpz_add(t[29], t[6], t[27]);
-    fmpz_sub(t[8], t[28], t[29]);
-    fmpz_mul(t[28], t[20], t[21]);
-    fmpz_add(t[29], t[12], t[26]);
+    fmpz_add(t[14], t[2], t[2]);        /* m1 = a2 + a2  */
+    fmpz_add(t[15], t[0], t[1]);        /* m2 = a0 + a1  */
+    fmpz_add(t[16], t[1], t[14]);       /* m3 = a1 + m1  */
+    fmpz_add(t[17], t[3], t[4]);        /* m4 = a3 + a4  */
+    fmpz_add(t[18], t[3], t[14]);       /* m5 = a3 + m1  */
+    fmpz_add(t[19], t[0], t[0]);        /* m6 = a0 + a0  */
 
-    fmpz_sub(t[10], t[28], t[29]);
-    fmpz_mul(t[28], t[22], t[23]);
-    fmpz_add(t[29], t[24], t[25]);
-    fmpz_sub(t[28], t[28], t[29]);
-    fmpz_add(t[29], t[28], t[28]);
-    fmpz_mul(t[28], t[2], t[2]);
-    fmpz_add(t[9], t[28], t[29]);
+    fmpz_add(t[19], t[19], t[14]);      /* m6 = m6 + m1  */
+    fmpz_add(t[20], t[1], t[3]);        /* m7 = a1 + a3  */
+    fmpz_add(t[21], t[4], t[4]);        /* m8 = a4 + a4  */
+    fmpz_add(t[21], t[21], t[14]);      /* m8 = m8 + m1  */
+    fmpz_add(t[22], t[0], t[3]);        /* m9 = a0 + a3  */
+    fmpz_add(t[23], t[1], t[4]);        /* m10 = a1 + a4 */
+
+    fmpz_mul(t[5], t[0], t[0]);         /* c0 = a0 * a0  */
+    fmpz_mul(t[24], t[0], t[1]);        /* d1 = a0 * a1  */
+    fmpz_mul(t[13], t[4], t[4]);        /* c8 = a4 * a4  */
+    fmpz_mul(t[25], t[3], t[4]);        /* d2 = a3 * a4  */
+    fmpz_mul(t[26], t[1], t[14]);       /* d3 = a1 * m1  */
+    fmpz_mul(t[27], t[3], t[14]);       /* d4 = a3 * m1  */
+    fmpz_add(t[6], t[24], t[24]);       /* c1 = d1 + d1  */
+
+    fmpz_add(t[12], t[25], t[25]);      /* c7 = d2 + d2  */
+    fmpz_mul(t[28], t[15], t[16]);      /* d5 = m2 * m3  */
+    fmpz_add(t[29], t[24], t[26]);      /* d6 = d1 + d3  */
+    fmpz_sub(t[7], t[28], t[29]);       /* c2 = d5 - d6  */
+    fmpz_mul(t[28], t[17], t[18]);      /* d5 = m4 * m5  */
+    fmpz_add(t[29], t[25], t[27]);      /* d6 = d2 + d4  */
+
+    fmpz_sub(t[11], t[28], t[29]);      /* c6 = d5 - d6  */
+    fmpz_mul(t[28], t[19], t[20]);      /* d5 = m6 * m7  */
+    fmpz_add(t[29], t[6], t[27]);       /* d6 = c1 + d4  */
+    fmpz_sub(t[8], t[28], t[29]);       /* c3 = d5 - d6  */
+    fmpz_mul(t[28], t[20], t[21]);      /* d5 = m7 * m8  */
+    fmpz_add(t[29], t[12], t[26]);      /* d6 = c7 + d3  */
+
+    fmpz_sub(t[10], t[28], t[29]);      /* c5 = d5 - d6  */
+    fmpz_mul(t[28], t[22], t[23]);      /* d5 = m9 * m10 */
+    fmpz_add(t[29], t[24], t[25]);      /* d6 = d1 + d2  */
+    fmpz_sub(t[28], t[28], t[29]);      /* d6 = d5 - d6  */
+    fmpz_add(t[29], t[28], t[28]);      /* d6 = d5 + d5  */
+    fmpz_mul(t[28], t[2], t[2]);        /* d5 = a2 * a2  */
+    fmpz_add(t[9], t[28], t[29]);       /* c4 = d5 + d6  */
 }
 
