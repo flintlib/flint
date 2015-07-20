@@ -66,6 +66,19 @@ usage()
    echo "     ABI=[32|64]          Tell the compiler to use given ABI (default: empty)"
 }
 
+absolute_path(){
+   dirlist="$1"
+   retval=""
+   for dir in $dirlist; do
+      case $dir in
+        /*) dir=$dir;;
+        *) dir=$PWD/$dir;;
+      esac
+      retval=$retval" "$dir
+   done
+   echo $retval
+}
+
 while [ "$1" != "" ]; do
    PARAM=`echo $1 | sed 's/=.*//'`
    VALUE=`echo $1 | sed 's/[^=]*//; s/=//'`
@@ -75,15 +88,15 @@ while [ "$1" != "" ]; do
          exit 0
          ;;
       --with-mpir|--with-gmp)
-         GMP_DIR="$VALUE"
+         GMP_DIR=$(absolute_path "$VALUE")
          ;;
       --with-mpfr)
-         MPFR_DIR="$VALUE"
+         MPFR_DIR=$(absolute_path "$VALUE")
          ;;
       --with-ntl)
          WANT_NTL=1
          if [ ! -z "$VALUE" ]; then
-            NTL_DIR="$VALUE"
+            NTL_DIR=$(absolute_path "$VALUE")
          fi
          ;;
       --without-ntl)
@@ -92,14 +105,14 @@ while [ "$1" != "" ]; do
       --with-blas)
          WANT_BLAS=1
          if [ ! -z "$VALUE" ]; then
-            BLAS_DIR="$VALUE"
+            BLAS_DIR=$(absolute_path "$VALUE")
          fi
          ;;
       --without-blas)
          WANT_BLAS=0
          ;;
       --extensions)
-         EXTENSIONS="$VALUE"
+         EXTENSIONS=$(absolute_path "$VALUE")
          ;;
       --build)
          BUILD="$VALUE"
