@@ -19,44 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
-#ifndef FQ_POLY_FACTOR_H
-#define FQ_POLY_FACTOR_H
+#define PADIC_POLY_INLINES_C
 
-#ifdef FQ_POLY_FACTOR_INLINES_C
-#define FQ_POLY_FACTOR_TEMPLATES_INLINE FLINT_DLL
-#define FQ_POLY_FACTOR_INLINE FLINT_DLL
-#else
-#define FQ_POLY_FACTOR_TEMPLATES_INLINE static __inline__
-#define FQ_POLY_FACTOR_INLINE static __inline__
-#endif
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#undef ulong
+#include <gmp.h>
+#include "flint.h"
+#include "padic_poly.h"
 
-FQ_POLY_FACTOR_INLINE
-int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
-{
-    int result;
-    fmpz_t q;
-    fmpz_init(q);
-    fq_ctx_order(q, ctx);
-    if ( fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
-        result = 1;
-    else
-        result = 0;
-    fmpz_clear(q);
-    return result;
-}
-
-#ifdef T
-#undef T
-#endif
-
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_factor_templates.h"
-#undef CAP_T
-#undef T
-
-#endif
