@@ -445,7 +445,6 @@ FLINT_DLL void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ct
 FLINT_DLL void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 FLINT_DLL int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
-FLINT_DLL int qadic_invsqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 

@@ -54,6 +54,22 @@ void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx
     _nmod_poly_normalise(rop);
 }
 
+void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
+{
+    const slong d = fq_nmod_ctx_degree(ctx);
+    slong i;
+
+    nmod_poly_fit_length(rop, d);
+
+    for (i = 0; i < d - 1; i++)
+        rop->coeffs[i] = n_randint(state, ctx->mod.n);
+
+    rop->coeffs[d - 1] = 1;
+
+    _nmod_poly_set_length(rop, d);
+    _nmod_poly_normalise(rop);
+}
+
 void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx)
 {
     slong i;
