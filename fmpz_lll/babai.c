@@ -650,4 +650,11 @@ FUNC_HEAD
 }
 
 #undef GM
+
+#else
+
+void osxdummy18464823876() /* OSX doesn't like empty files */
+{
+}
+
 #endif
