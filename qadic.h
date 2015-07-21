@@ -26,6 +26,12 @@
 #ifndef QADIC_H
 #define QADIC_H
 
+#ifdef QADIC_INLINES_C
+#define QADIC_INLINE FLINT_DLL
+#else
+#define QADIC_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -53,12 +59,12 @@ typedef padic_poly_t qadic_t;
 
 typedef padic_poly_struct qadic_struct;
 
-static __inline__ slong qadic_val(const qadic_t op)
+QADIC_INLINE slong qadic_val(const qadic_t op)
 {
     return padic_poly_val(op);
 }
 
-static __inline__ slong qadic_prec(const qadic_t op)
+QADIC_INLINE slong qadic_prec(const qadic_t op)
 {
     return padic_poly_prec(op);
 }
@@ -83,12 +89,12 @@ FLINT_DLL void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
 FLINT_DLL void qadic_ctx_clear(qadic_ctx_t ctx);
 
-static __inline__ slong qadic_ctx_degree(const qadic_ctx_t ctx)
+QADIC_INLINE slong qadic_ctx_degree(const qadic_ctx_t ctx)
 {
     return ctx->j[ctx->len - 1];
 }
 
-static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
+QADIC_INLINE void qadic_ctx_print(const qadic_ctx_t ctx)
 {
     slong i, k;
 
@@ -121,17 +127,17 @@ static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
 
 /* Memory management *********************************************************/
 
-static __inline__ void qadic_init(qadic_t x)
+QADIC_INLINE void qadic_init(qadic_t x)
 {
     padic_poly_init(x);
 }
 
-static __inline__ void qadic_init2(qadic_t rop, slong prec)
+QADIC_INLINE void qadic_init2(qadic_t rop, slong prec)
 {
     padic_poly_init2(rop, 0, prec);
 }
 
-static __inline__ void qadic_clear(qadic_t x)
+QADIC_INLINE void qadic_clear(qadic_t x)
 {
     padic_poly_clear(x);
 }
@@ -140,7 +146,7 @@ static __inline__ void qadic_clear(qadic_t x)
     TODO:  Consider renaming this function, prefix for the "qadic" module.
  */
 
-static __inline__ void
+QADIC_INLINE void
 _fmpz_poly_reduce(fmpz *R, slong lenR, const fmpz *a, const slong *j, slong len)
 {
     const slong d = j[len - 1];
@@ -162,7 +168,7 @@ _fmpz_poly_reduce(fmpz *R, slong lenR, const fmpz *a, const slong *j, slong len)
     TODO:  Consider renaming this function, prefix for the "qadic" module.
  */
 
-static __inline__ void 
+QADIC_INLINE void 
 _fmpz_mod_poly_reduce(fmpz *R, slong lenR, 
                       const fmpz *a, const slong *j, slong len, const fmpz_t p)
 {
@@ -179,7 +185,7 @@ _fmpz_mod_poly_reduce(fmpz *R, slong lenR,
     }
 }
 
-static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
+QADIC_INLINE void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
 {
     const slong N = qadic_prec(x);
     const slong d = ctx->j[ctx->len - 1];
@@ -207,27 +213,27 @@ static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
 
 /* Randomisation *************************************************************/
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_randtest(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 {
     padic_poly_randtest(x, state, qadic_ctx_degree(ctx), &ctx->pctx);
 }
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_randtest_not_zero(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 {
     padic_poly_randtest_not_zero(x, state, qadic_ctx_degree(ctx), 
                                  &ctx->pctx);
 }
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_randtest_val(qadic_t x, flint_rand_t state, slong val, 
                    const qadic_ctx_t ctx)
 {
     padic_poly_randtest_val(x, state, val, qadic_ctx_degree(ctx), &ctx->pctx);
 }
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_randtest_int(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 {
     const slong N = qadic_prec(x);
@@ -245,17 +251,17 @@ qadic_randtest_int(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 
 /* Assignments and conversions ***********************************************/
 
-static __inline__ void qadic_zero(qadic_t op)
+QADIC_INLINE void qadic_zero(qadic_t op)
 {
     padic_poly_zero(op);
 }
 
-static __inline__ void qadic_one(qadic_t op)
+QADIC_INLINE void qadic_one(qadic_t op)
 {
     padic_poly_one(op);
 }
 
-static __inline__ void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
+QADIC_INLINE void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
 {
     const slong N = qadic_prec(x);
     const slong d = qadic_ctx_degree(ctx);
@@ -282,13 +288,13 @@ static __inline__ void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
     }
 }
 
-static __inline__ 
+QADIC_INLINE 
 void qadic_set_ui(qadic_t rop, ulong op, const qadic_ctx_t ctx)
 {
     padic_poly_set_ui(rop, op, &ctx->pctx);
 }
 
-static __inline__ int 
+QADIC_INLINE int 
 qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     if (op->length > 0)
@@ -312,7 +318,7 @@ qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
 }
 
-static __inline__ void qadic_set(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+QADIC_INLINE void qadic_set(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     padic_poly_set(rop, op, &(ctx->pctx));
 }
@@ -322,36 +328,36 @@ FLINT_DLL void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op,
 
 /* Comparison ****************************************************************/
 
-static __inline__ int qadic_is_zero(const qadic_t op)
+QADIC_INLINE int qadic_is_zero(const qadic_t op)
 {
     return padic_poly_is_zero(op);
 }
 
-static __inline__ int qadic_is_one(const qadic_t op)
+QADIC_INLINE int qadic_is_one(const qadic_t op)
 {
     return padic_poly_is_one(op);
 }
 
-static __inline__ int qadic_equal(const qadic_t op1, const qadic_t op2)
+QADIC_INLINE int qadic_equal(const qadic_t op1, const qadic_t op2)
 {
     return padic_poly_equal(op1, op2);
 }
 
 /* Basic arithmetic **********************************************************/
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_add(qadic_t x, const qadic_t y, const qadic_t z, const qadic_ctx_t ctx)
 {
     padic_poly_add(x, y, z, &ctx->pctx);
 }
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_sub(qadic_t x, const qadic_t y, const qadic_t z, const qadic_ctx_t ctx)
 {
     padic_poly_sub(x, y, z, &ctx->pctx);
 }
 
-static __inline__ void 
+QADIC_INLINE void 
 qadic_neg(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
 {
     padic_poly_neg(x, y, &ctx->pctx);
@@ -450,13 +456,13 @@ FLINT_DLL int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 FLINT_DLL int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
 
-static __inline__ int 
+QADIC_INLINE int 
 qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)
 {
     return qadic_fprint_pretty(stdout, op, ctx);
 }
 
-static __inline__ int qadic_debug(const qadic_t op)
+QADIC_INLINE int qadic_debug(const qadic_t op)
 {
     return padic_poly_debug(op);
 }

@@ -26,6 +26,12 @@
 #ifndef NMOD_VEC_H
 #define NMOD_VEC_H
 
+#ifdef NMOD_VEC_INLINES_C
+#define NMOD_VEC_INLINE FLINT_DLL
+#else
+#define NMOD_VEC_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -96,21 +102,21 @@ do {                                            \
        NMOD_RED2(r, a_hi, a_lo, mod); \
     } while (0)
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t sum = a + b;
    return sum - mod.n + ((((mp_limb_signed_t)(sum - mod.n))>>(FLINT_BITS - 1)) & mod.n);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t _nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t diff = a - b;
    return  ((((mp_limb_signed_t)diff)>>(FLINT_BITS - 1)) & mod.n) + diff;
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t neg = mod.n - a;
@@ -120,7 +126,7 @@ mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
       return b - neg;
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t diff = a - b;
@@ -131,7 +137,7 @@ mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
       return diff;
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 {
    if (a)
@@ -140,32 +146,32 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
       return 0;
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
     return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
 {
     return n_invmod(a, mod.n);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
     b = n_invmod(b, mod.n);
     return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_limb_t nmod_pow_ui(mp_limb_t a, ulong exp, nmod_t mod)
 {
     return n_powmod2_ui_preinv(a, exp, mod.n, mod.ninv);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 void nmod_init(nmod_t * mod, mp_limb_t n)
 {
    mod->n = n;
@@ -173,13 +179,13 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
    count_leading_zeros(mod->norm, n);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 mp_ptr _nmod_vec_init(slong len)
 {
    return (mp_ptr) flint_malloc(len * sizeof(mp_limb_t));
 }
 
-static __inline__
+NMOD_VEC_INLINE
 void _nmod_vec_clear(mp_ptr vec)
 {
    flint_free(vec);
@@ -187,7 +193,7 @@ void _nmod_vec_clear(mp_ptr vec)
 
 FLINT_DLL void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 
-static __inline__
+NMOD_VEC_INLINE
 void _nmod_vec_zero(mp_ptr vec, slong len)
 {
    flint_mpn_zero(vec, len);
@@ -195,13 +201,13 @@ void _nmod_vec_zero(mp_ptr vec, slong len)
 
 FLINT_DLL mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
 
-static __inline__
+NMOD_VEC_INLINE
 void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
 {
    flint_mpn_copyi(res, vec, len);
 }
 
-static __inline__
+NMOD_VEC_INLINE
 void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)
 {
     slong i;
@@ -213,7 +219,7 @@ void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)
     }
 }
 
-static __inline__
+NMOD_VEC_INLINE
 int _nmod_vec_equal(mp_srcptr vec, mp_srcptr vec2, slong len)
 {
    slong i;
@@ -224,7 +230,7 @@ int _nmod_vec_equal(mp_srcptr vec, mp_srcptr vec2, slong len)
    return 1;
 }
 
-static __inline__
+NMOD_VEC_INLINE
 int _nmod_vec_is_zero(mp_srcptr vec, slong len)
 {
    slong i;

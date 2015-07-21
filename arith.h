@@ -26,6 +26,12 @@
 #ifndef ARITH_H
 #define ARITH_H
 
+#ifdef ARITH_INLINES_C
+#define ARITH_INLINE FLINT_DLL
+#else
+#define ARITH_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
@@ -214,7 +220,7 @@ typedef struct
 
 typedef trig_prod_struct trig_prod_t[1];
 
-static __inline__
+ARITH_INLINE
 void trig_prod_init(trig_prod_t sum)
 {
     sum->n = 0;

@@ -26,6 +26,12 @@
 #ifndef MFPR_VEC_H
 #define MPFR_VEC_H
 
+#ifdef MPFR_VEC_INLINES_C
+#define MPFR_VEC_INLINE FLINT_DLL
+#else
+#define MPFR_VEC_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include <mpfr.h> 
 

@@ -26,6 +26,12 @@
 #ifndef MFPR_MAT_H
 #define MPFR_MAT_H
 
+#ifdef MPFR_MAT_INLINES_C
+#define MPFR_MAT_INLINE FLINT_DLL
+#else
+#define MPFR_MAT_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include <mpfr.h> 
 

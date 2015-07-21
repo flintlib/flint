@@ -27,6 +27,12 @@
 #ifndef FMPZ_VEC_H
 #define FMPZ_VEC_H
 
+#ifdef FMPZ_VEC_INLINES_C
+#define FMPZ_VEC_INLINE FLINT_DLL
+#else
+#define FMPZ_VEC_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "fmpz.h"
 #include "flint.h"
@@ -84,7 +90,7 @@ FLINT_DLL slong _fmpz_vec_height_index(const fmpz * vec, slong len);
 
 FLINT_DLL int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len);
 
-static __inline__
+FMPZ_VEC_INLINE
 int _fmpz_vec_print(const fmpz * vec, slong len)
 {
     return _fmpz_vec_fprint(stdout, vec, len);
@@ -92,7 +98,7 @@ int _fmpz_vec_print(const fmpz * vec, slong len)
 
 FLINT_DLL int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len);
 
-static __inline__
+FMPZ_VEC_INLINE
 int _fmpz_vec_read(fmpz ** vec, slong * len)
 {
     return _fmpz_vec_fread(stdin, vec, len);

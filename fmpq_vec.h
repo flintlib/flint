@@ -26,6 +26,12 @@
 #ifndef FMPQ_VEC_H
 #define FMPQ_VEC_H
 
+#ifdef FMPQ_VEC_INLINES_C
+#define FMPQ_VEC_INLINE FLINT_DLL
+#else
+#define FMPQ_VEC_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "fmpq.h"
 #include "flint.h"

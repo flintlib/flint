@@ -26,6 +26,14 @@
 #ifndef FQ_ZECH_VEC_H
 #define FQ_ZECH_VEC_H
 
+#ifdef FQ_ZECH_VEC_INLINES_C
+#define FQ_VEC_TEMPLATES_INLINE FLINT_DLL
+#define FQ_ZECH_VEC_INLINE FLINT_DLL
+#else
+#define FQ_VEC_TEMPLATES_INLINE static __inline__
+#define FQ_ZECH_VEC_INLINE static __inline__
+#endif
+
 #include "fq_zech.h"
 
 #define FQ_ZECH_VEC_NORM(vec, i, ctx)                    \

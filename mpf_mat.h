@@ -27,6 +27,12 @@
 #ifndef MPF_MAT_H
 #define MPF_MAT_H
 
+#ifdef MPF_MAT_INLINES_C
+#define MPF_MAT_INLINE FLINT_DLL
+#else
+#define MPF_MAT_INLINE static __inline__
+#endif
+
 #include <math.h>
 #include <stdio.h>
 #include "mpf_vec.h"
@@ -64,13 +70,13 @@ FLINT_DLL int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, m
 
 FLINT_DLL int mpf_mat_is_zero(const mpf_mat_t mat);
 
-static __inline__ int
+MPF_MAT_INLINE int
 mpf_mat_is_empty(const mpf_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
+MPF_MAT_INLINE int
 mpf_mat_is_square(const mpf_mat_t mat)
 {
     return (mat->r == mat->c);
@@ -94,7 +100,7 @@ FLINT_DLL void mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B);
 
 /* Permutations */
 
-static __inline__ void
+MPF_MAT_INLINE void
 mpf_mat_swap_rows(mpf_mat_t mat, slong r, slong s)
 {
     if (r != s)

@@ -54,7 +54,7 @@ FLINT_DLL int _TEMPLATE(T, vec_fprint)(FILE * file,
                              slong len,
                              const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__
+FQ_VEC_TEMPLATES_INLINE
 int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
                             const TEMPLATE(T, ctx_t) ctx)
 {

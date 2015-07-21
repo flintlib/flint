@@ -26,6 +26,12 @@
 #ifndef FMPQ_MAT_H
 #define FMPQ_MAT_H
 
+#ifdef FMPQ_MAT_INLINES_C
+#define FMPQ_MAT_INLINE FLINT_DLL
+#else
+#define FMPQ_MAT_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -116,14 +122,14 @@ FLINT_DLL int fmpq_mat_is_integral(const fmpq_mat_t mat);
 
 FLINT_DLL int fmpq_mat_is_zero(const fmpq_mat_t mat);
 
-static __inline__ int
-fmpq_mat_is_empty(const fmpq_mat_t mat)
+FMPQ_MAT_INLINE
+int fmpq_mat_is_empty(const fmpq_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
-fmpq_mat_is_square(const fmpq_mat_t mat)
+FMPQ_MAT_INLINE
+int fmpq_mat_is_square(const fmpq_mat_t mat)
 {
     return (mat->r == mat->c);
 }

@@ -28,6 +28,12 @@
 #ifndef D_MAT_H
 #define D_MAT_H
 
+#ifdef D_MAT_INLINES_C
+#define D_MAT_INLINE FLINT_DLL
+#else
+#define D_MAT_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
@@ -72,14 +78,14 @@ FLINT_DLL int d_mat_is_zero(const d_mat_t mat);
 
 FLINT_DLL int d_mat_is_approx_zero(const d_mat_t mat, double eps);
 
-static __inline__ int
-d_mat_is_empty(const d_mat_t mat)
+D_MAT_INLINE
+int d_mat_is_empty(const d_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
-d_mat_is_square(const d_mat_t mat)
+D_MAT_INLINE
+int d_mat_is_square(const d_mat_t mat)
 {
     return (mat->r == mat->c);
 }
@@ -108,8 +114,8 @@ FLINT_DLL void d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B);
 
 /* Permutations */
 
-static __inline__ void
-d_mat_swap_rows(d_mat_t mat, slong r, slong s)
+D_MAT_INLINE
+void d_mat_swap_rows(d_mat_t mat, slong r, slong s)
 {
     if (r != s)
     {
