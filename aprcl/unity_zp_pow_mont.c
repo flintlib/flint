@@ -24,6 +24,7 @@
 ******************************************************************************/
 
 #include "aprcl.h"
+#include <time.h>
 
 int
 unity_zp_is_inplace(ulong p, ulong exp)
@@ -35,6 +36,7 @@ unity_zp_is_inplace(ulong p, ulong exp)
     if (p == 3 && exp == 2) return 1;
     if (p == 5 && exp == 1) return 1;
     if (p == 7 && exp == 1) return 1;
+    if (p == 11 && exp == 1) return 1;
     return 0;
 }
 

@@ -36,7 +36,7 @@
  extern "C" {
 #endif
 
-#define SQUARING_SPACE 50
+#define SQUARING_SPACE 70
 
 typedef struct
 {
@@ -177,6 +177,7 @@ FLINT_DLL void unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t);
 
 FLINT_DLL void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
 FLINT_DLL void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
+FLINT_DLL void unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t);
 
 ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
 void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);

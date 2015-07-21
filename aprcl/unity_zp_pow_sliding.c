@@ -34,8 +34,8 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     unity_zp *g_powers;
 
     fmpz_t * t;
-    t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (50));
-    for (i = 0; i < 50; i++)
+    t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * SQUARING_SPACE);
+    for (i = 0; i < SQUARING_SPACE; i++)
         fmpz_init(t[i]);
 
     unity_zp_init(temp, f->p, f->exp, f->n);
@@ -113,7 +113,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
         }
     }
 
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < SQUARING_SPACE; i++)
         fmpz_clear(t[i]);
     flint_free(t);
 
