@@ -37,7 +37,8 @@ _R_value(const fmpz_t n)
     if (bits <= 344) return 5040;
     if (bits <= 427) return 10080;
     if (bits <= 525) return 27720;
-    if (bits <= 774) return 98280;
+    if (bits <= 650) return 55440;
+    if (bits <= 774) return 110880;
     if (bits <= 1035) return 166320;
     if (bits <= 1566) return 720720;
     if (bits <= 2082) return 1663200;
@@ -80,6 +81,7 @@ void _jacobi_config_update(aprcl_config conf)
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 void jacobi_config_init(aprcl_config conf, const fmpz_t n)
 {
+    ulong i;
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
     conf->R = _R_value(n);

@@ -29,10 +29,18 @@ void
 unity_zp_sqr(unity_zp f, const unity_zp g)
 {
     ulong i, p;
+    const slong len = g->poly->length;
 
-    fmpz_mod_poly_sqr(f->poly, g->poly);
-    if (f->poly->length == 0)
+    if (len == 0)
+    {
+        fmpz_mod_poly_zero(f->poly);
         return;
+    }
+
+    fmpz_mod_poly_fit_length(f->poly, 2 * len - 1);
+    _fmpz_poly_sqr(f->poly->coeffs, g->poly->coeffs, len);
+    _fmpz_mod_poly_set_length(f->poly, 2 * len - 1);
+    _fmpz_mod_poly_normalise(f->poly);
 
     p = n_pow(f->p, f->exp);
     for (i = f->poly->length - 1; i >= p; i--)
@@ -41,9 +49,8 @@ unity_zp_sqr(unity_zp f, const unity_zp g)
                 f->poly->coeffs + i - p, f->poly->coeffs + i);
 
         fmpz_set_ui(f->poly->coeffs + i, 0);
-        if (fmpz_cmp(f->poly->coeffs + i - p, f->n) >= 0)
-            fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->n);
     }
+
     _unity_zp_reduce_cyclotomic(f);
 }
 

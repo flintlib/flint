@@ -139,7 +139,7 @@ _is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     }
 
     /* temp = j0^u */
-    unity_zp_pow_mont_fmpz(temp, j0, u);
+    unity_zp_pow_sliding_fmpz(temp, j0, u);
     /* j0 = j0^u * jv */
     unity_zp_mul(j0, jv, temp);
     
@@ -251,7 +251,7 @@ _is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q)
         unity_zp_swap(jv, j_pow);
 
     /* j0 = j0^u * jv */
-    unity_zp_pow_mont_fmpz(j_pow, j0, u);
+    unity_zp_pow_sliding_fmpz(j_pow, j0, u);
     unity_zp_mul(j0, jv, j_pow);
 
     /* try to find h */
@@ -370,7 +370,7 @@ _is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
     }
 
     /* set j0 = j0^u * jv */
-    unity_zp_pow_mont_fmpz(temp, j0, u);
+    unity_zp_pow_sliding_fmpz(temp, j0, u);
     unity_zp_mul(j0, jv, temp);
     
     /* try to find h */
