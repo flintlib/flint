@@ -452,50 +452,44 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
 }
 
 void
-fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
+fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
 {
-    slong i, j, m, n, p, r, bits = 0, hadamard_bits, *P, *pivots;
-    fmpz_t d1, d2, g, s, t, bound;
+    slong i, j, m, n, p, r, *P, *pivots;
+    fmpz_t d1, d2, g, s, t;
     fmpz_mat_t c, d, B, C, H1, H2, H3;
     nmod_mat_t Amod;
-    
+
     m = fmpz_mat_nrows(A);
     n = fmpz_mat_ncols(A);
 
-    /* start with the first prime after this value */
-    p = UWORD(1)<<(FLINT_BITS-1);
-    
+    /* find permutation so we can ensure first rows of H are nonsingular */
     P = _perm_init(m);
     pivots = _perm_init(n);
-     
-    /* determine number of bits of hadamard bound, plus one bit for sign */
-    fmpz_init(bound);
-    fmpz_mat_det_bound(bound, A);
-    hadamard_bits = fmpz_sizeinbase(bound, 2) + 1;
-    fmpz_clear(bound);
-   
-    do {
-       /* find permutation so we can ensure first rows of H are nonsingular */
-       p = n_nextprime(p, 1);
-       bits += FLINT_BITS - 1;
+    
+restart_pernet_stein:
 
-       nmod_mat_init(Amod, m, n, p);
+    p = n_randprime(state, NMOD_MAT_OPTIMAL_MODULUS_BITS, 1);
+    nmod_mat_init(Amod, m, n, p);
 
-       fmpz_mat_get_nmod_mat(Amod, A);
-       r = _nmod_mat_rref(Amod, pivots, P);
+    fmpz_mat_get_nmod_mat(Amod, A);
+    r = _nmod_mat_rref(Amod, pivots, P);
 
-       nmod_mat_clear(Amod);
+    nmod_mat_clear(Amod);
 
-       if (r == 0 && bits >= hadamard_bits)
-       {   
-           /* rank is zero so matrix is zero so HNF is too */
+    /* rank is zero, so matrix may be zero in which case HNF is too */
+    if (r == 0)
+    {
+        if (fmpz_mat_is_zero(A))
+        {
            _perm_clear(P);
            _perm_clear(pivots);
            fmpz_mat_zero(H);
+           
            return;
-       }        
-    } while (r == 0);
-       
+        } else /* we have a bad prime, try again */
+           goto restart_pernet_stein;
+    }
+
     /* if A has full column rank we might wish to use minors based hnf */
     if (r == n && n < 52)
     {
@@ -574,7 +568,7 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
         fmpz_mat_init(H1, r - 1, r - 1);
 
         if (COEFF_IS_MPZ(*g) && C->r > 3)   /* if g is too big, recurse */
-            fmpz_mat_hnf_pernet_stein(H1, C);
+            fmpz_mat_hnf_pernet_stein(H1, C, state);
         else                    /* use modulo determinant algorithm to compute HNF of C */
             fmpz_mat_hnf_modular(H1, C, g);
 
