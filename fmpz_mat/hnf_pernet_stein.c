@@ -451,7 +451,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
     fmpq_mat_clear(x);
 }
 
-void
+int
 fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
 {
     slong i, j, m, n, p, r, *P, *pivots;
@@ -466,8 +466,6 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
     P = _perm_init(m);
     pivots = _perm_init(n);
     
-restart_pernet_stein:
-
     p = n_randprime(state, NMOD_MAT_OPTIMAL_MODULUS_BITS, 1);
     nmod_mat_init(Amod, m, n, p);
 
@@ -476,18 +474,13 @@ restart_pernet_stein:
 
     nmod_mat_clear(Amod);
 
-    /* rank is zero, so matrix may be zero in which case HNF is too */
-    if (r == 0)
+    /* rank is not full, so silently fail */
+    if (r < FLINT_MIN(m, n))
     {
-        if (fmpz_mat_is_zero(A))
-        {
-           _perm_clear(P);
-           _perm_clear(pivots);
-           fmpz_mat_zero(H);
-           
-           return;
-        } else /* we have a bad prime, try again */
-           goto restart_pernet_stein;
+        _perm_clear(P);
+        _perm_clear(pivots);
+        
+        return 0;
     }
 
     /* if A has full column rank we might wish to use minors based hnf */
@@ -509,7 +502,7 @@ restart_pernet_stein:
             fmpz_mat_hnf_minors(H, A);
             _perm_clear(P);
             _perm_clear(pivots);
-            return;
+            return 1;
         }
     }
 
@@ -567,9 +560,10 @@ restart_pernet_stein:
     {
         fmpz_mat_init(H1, r - 1, r - 1);
 
-        if (COEFF_IS_MPZ(*g) && C->r > 3)   /* if g is too big, recurse */
-            fmpz_mat_hnf_pernet_stein(H1, C, state);
-        else                    /* use modulo determinant algorithm to compute HNF of C */
+        if (COEFF_IS_MPZ(*g) && C->r > 3)   /* if g is too big, call another algorithm */
+        {
+            fmpz_mat_hnf(H1, C);
+        }  else                    /* use modulo determinant algorithm to compute HNF of C */
             fmpz_mat_hnf_modular(H1, C, g);
 
         fmpz_mat_clear(B);
@@ -629,4 +623,6 @@ restart_pernet_stein:
     fmpz_mat_clear(B);
     fmpz_mat_clear(c);
     fmpz_mat_clear(d);
+
+    return 1;
 }

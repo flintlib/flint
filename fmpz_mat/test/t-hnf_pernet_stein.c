@@ -50,7 +50,7 @@ main(void)
     {
         fmpz_mat_t A, B, H, H2;
         slong m, n, r, b, d;
-        int equal;
+        int equal, ok;
 
         n = 1 + n_randint(state, 10);
         m = 1 + n_randint(state, 10);
@@ -70,9 +70,9 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_hnf_pernet_stein(H, A, state);
+        ok = fmpz_mat_hnf_pernet_stein(H, A, state);
 
-        if (!fmpz_mat_is_in_hnf(H))
+        if (ok && !fmpz_mat_is_in_hnf(H))
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in hnf!\n");
@@ -84,7 +84,7 @@ main(void)
         fmpz_mat_hnf_classical(H2, A);
         equal = fmpz_mat_equal(H, H2);
 
-        if (!equal)
+        if (ok && !equal)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnfs produced by different methods should be the same!\n");
@@ -94,10 +94,10 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_pernet_stein(H2, H, state);
+        ok = fmpz_mat_hnf_pernet_stein(H2, H, state);
         equal = fmpz_mat_equal(H, H2);
 
-        if (!equal)
+        if (ok && !equal)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnf of a matrix in hnf should be the same!\n");
@@ -118,7 +118,7 @@ main(void)
     {
         fmpz_mat_t A, B, H, H2;
         slong m, n, b;
-        int equal;
+        int equal, ok;
 
         n = 1 + n_randint(state, 10);
         m = 1 + n_randint(state, 10);
@@ -131,9 +131,9 @@ main(void)
         b = 1 + n_randint(state, 8) * n_randint(state, 8);
         fmpz_mat_randtest(A, state, b);
 
-        fmpz_mat_hnf_pernet_stein(H, A, state);
+        ok = fmpz_mat_hnf_pernet_stein(H, A, state);
 
-        if (!fmpz_mat_is_in_hnf(H))
+        if (ok && !fmpz_mat_is_in_hnf(H))
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in hnf!\n");
@@ -145,7 +145,7 @@ main(void)
         fmpz_mat_hnf_classical(H2, A);
         equal = fmpz_mat_equal(H, H2);
 
-        if (!equal)
+        if (ok && !equal)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnfs produced by different methods should be the same!\n");
@@ -155,10 +155,10 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_pernet_stein(H2, H, state);
+        ok = fmpz_mat_hnf_pernet_stein(H2, H, state);
         equal = fmpz_mat_equal(H, H2);
 
-        if (!equal)
+        if (ok && !equal)
         {
             flint_printf("FAIL:\n");
             flint_printf("hnf of a matrix in hnf should be the same!\n");
