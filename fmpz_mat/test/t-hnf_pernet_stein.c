@@ -30,6 +30,12 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
+/* 
+   Though fmpz_mat_hnf_pernet_stein may fail to give the correct result, so
+   that this test code could in theory fail with low probability, we always
+   generate the same random values, so it should always pass.
+*/
+
 int
 main(void)
 {
@@ -64,7 +70,7 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_hnf_pernet_stein(H, A);
+        fmpz_mat_hnf_pernet_stein(H, A, state);
 
         if (!fmpz_mat_is_in_hnf(H))
         {
@@ -88,7 +94,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_pernet_stein(H2, H);
+        fmpz_mat_hnf_pernet_stein(H2, H, state);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)
@@ -125,7 +131,7 @@ main(void)
         b = 1 + n_randint(state, 8) * n_randint(state, 8);
         fmpz_mat_randtest(A, state, b);
 
-        fmpz_mat_hnf_pernet_stein(H, A);
+        fmpz_mat_hnf_pernet_stein(H, A, state);
 
         if (!fmpz_mat_is_in_hnf(H))
         {
@@ -149,7 +155,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_hnf_pernet_stein(H2, H);
+        fmpz_mat_hnf_pernet_stein(H2, H, state);
         equal = fmpz_mat_equal(H, H2);
 
         if (!equal)

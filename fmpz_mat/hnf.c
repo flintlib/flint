@@ -52,6 +52,15 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
 
     if (m < cutoff)
         fmpz_mat_hnf_classical(H, A);
-    else
-        fmpz_mat_hnf_pernet_stein(H, A);
+    else {
+        flint_rand_t state;
+
+        flint_randinit(state);
+
+        do {
+            fmpz_mat_hnf_pernet_stein(H, A, state);
+        } while (!fmpz_mat_is_in_hnf(H));
+
+        flint_randclear(state);
+    }
 }
