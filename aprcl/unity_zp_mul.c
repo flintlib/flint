@@ -29,19 +29,10 @@ void
 unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 {
     ulong i, p;
-    const slong len1 = g->poly->length;
-    const slong len2 = h->poly->length;
 
-    if (len1 == 0 || len2 == 0)
-    {
-        fmpz_mod_poly_zero(f->poly);
+    fmpz_mod_poly_mul(f->poly, g->poly, h->poly);
+    if (f->poly->length == 0)
         return;
-    }
-
-    fmpz_mod_poly_fit_length(f->poly, len1 + len2 - 1);
-    _fmpz_poly_mul(f->poly->coeffs, g->poly->coeffs, len1, h->poly->coeffs, len2);
-    _fmpz_mod_poly_set_length(f->poly, len1 + len2 - 1);
-    _fmpz_mod_poly_normalise(f->poly);
 
     p = n_pow(f->p, f->exp);
     for (i = f->poly->length - 1; i >= p; i--)
@@ -50,9 +41,9 @@ unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
                 f->poly->coeffs + i - p, f->poly->coeffs + i);
 
         fmpz_set_ui(f->poly->coeffs + i, 0);
+        if (fmpz_cmp(f->poly->coeffs + i - p, f->n) >= 0)
+            fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->n);
     }
-
     _unity_zp_reduce_cyclotomic(f);
 }
-
 
