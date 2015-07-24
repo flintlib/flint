@@ -604,6 +604,9 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
         n_factor_t q_factors;
         ulong q;
 
+        if (config->qs_used[i] == 0)
+            continue;
+
         if (result == COMPOSITE)
             break;
 
@@ -762,7 +765,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 }
                 else if (r == 1)
                 {   
-                    /* if r == 1 then we check than n still can be prime */
+                    /* if r == 1 then we check that n still can be prime */
                     lambdas[i] = 1;
                 }
                 else

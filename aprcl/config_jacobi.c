@@ -30,12 +30,16 @@ _R_value(const fmpz_t n)
 {
     ulong bits = fmpz_bits(n);
 
+    if (bits <= 17) return 6;
+    if (bits <= 31) return 12;
+    if (bits <= 54) return 36;
+    if (bits <= 68) return 72;
     if (bits <= 101) return 180;
+    if (bits <= 127) return 360;
     if (bits <= 152) return 720;
     if (bits <= 204) return 1260;
     if (bits <= 268) return 2520;
     if (bits <= 344) return 5040;
-    if (bits <= 427) return 10080;
     if (bits <= 525) return 27720;
     if (bits <= 650) return 55440;
     if (bits <= 774) return 110880;
@@ -44,6 +48,37 @@ _R_value(const fmpz_t n)
     if (bits <= 2082) return 1663200;
     if (bits <= 3491) return 8648640;
     return 6983776800;
+}
+
+void _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
+{
+    slong i;
+    fmpz_t new_s, new_s2, p;
+
+    fmpz_init(p);
+    fmpz_init(new_s2);
+    fmpz_init_set(new_s, conf->s);
+
+    for (i = conf->qs->num - 1; i >= 0; i--)
+    {
+        fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
+        fmpz_fdiv_q(new_s, conf->s, p);
+
+        fmpz_mul(new_s2, new_s, new_s);
+        if (fmpz_cmp(new_s2, n) > 0)
+        {
+            fmpz_set(conf->s, new_s);
+            conf->qs_used[i] = 0;
+        }
+        else
+        {
+            conf->qs_used[i] = 1;
+        }
+    }
+
+    fmpz_clear(p);
+    fmpz_clear(new_s2);
+    fmpz_clear(new_s);
 }
 
 void _jacobi_config_update(aprcl_config conf)
@@ -89,11 +124,15 @@ void jacobi_config_init(aprcl_config conf, const fmpz_t n)
 
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
+
+    conf->qs_used = (int *) flint_malloc(sizeof(int) * conf->qs->num);
+    _jacobi_config_reduce_s(conf, n);
 }
 
 void jacobi_config_clear(aprcl_config conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);
+    flint_free(conf->qs_used);
 }
 
