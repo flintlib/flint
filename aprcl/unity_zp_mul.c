@@ -28,22 +28,26 @@
 void
 unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
 {
-    ulong i, p;
+    slong glen, hlen;
 
-    fmpz_mod_poly_mul(f->poly, g->poly, h->poly);
-    if (f->poly->length == 0)
-        return;
+    glen = g->poly->length;
+    hlen = h->poly->length;
 
-    p = n_pow(f->p, f->exp);
-    for (i = f->poly->length - 1; i >= p; i--)
+    if (glen == 0 || hlen == 0)
     {
-        fmpz_add(f->poly->coeffs + i - p,
-                f->poly->coeffs + i - p, f->poly->coeffs + i);
-
-        fmpz_set_ui(f->poly->coeffs + i, 0);
-        if (fmpz_cmp(f->poly->coeffs + i - p, f->n) >= 0)
-            fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->n);
+        fmpz_mod_poly_zero(f->poly);
+        return;
     }
-    _unity_zp_reduce_cyclotomic(f);
+
+    fmpz_mod_poly_fit_length(f->poly, glen + hlen - 1);
+
+    if (glen >= hlen)
+        _fmpz_poly_mul(f->poly->coeffs, g->poly->coeffs, glen, h->poly->coeffs, hlen);
+    else
+        _fmpz_poly_mul(f->poly->coeffs, h->poly->coeffs, hlen, g->poly->coeffs, glen);
+
+    _fmpz_mod_poly_set_length(f->poly, glen + hlen - 1);
+
+    _unity_zp_reduce_cyclotomic_divmod(f);
 }
 

@@ -42,7 +42,7 @@ unity_zp_mont_mul(unity_zp_mont f, const unity_zp_mont g, const unity_zp_mont h)
                 f->poly->coeffs + i - p, f->poly->coeffs + i);
 
         fmpz_set_ui(f->poly->coeffs + i, 0);
-        if (fmpz_cmp(f->poly->coeffs + i - p, f->nr) >= 0)
+        while (fmpz_cmp(f->poly->coeffs + i - p, f->nr) >= 0)
             fmpz_sub(f->poly->coeffs + i - p, f->poly->coeffs + i - p, f->nr);
     }
 
