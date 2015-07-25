@@ -54,6 +54,7 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
     slong j;
     slong s = qs_inf->s;
     slong low = qs_inf->low;
+    slong high = qs_inf->high;
     slong span = qs_inf->span;
     slong h = qs_inf->h;
     slong m = qs_inf->m;
@@ -65,56 +66,105 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
     fmpz_init(prod);
     fmpz_init(temp);
 
-    /*
-       generate lexicographically next s-subset from
-       possible range of factor's of 'A0'
-    */
-    if (current_subset[0] != span - s + 1)
+    /* generate next value of 'A0' */
+
+    if (s <= 3)
     {
-        if (m >= span - h) ++h;
-        else h = 1;
-
-        m = current_subset[s - h];
-
-        for (j = 1; j <= h; j++)
-            current_subset[s + j - h - 1] = m + j;
-
-        fmpz_set_ui(prod, UWORD(1));
-
-        for (j = 1; j <= s; j++)
+        if (current_subset[0] != span - s + 1)
         {
-            fmpz_mul_ui(temp, prod, factor_base[current_subset[j - 1] + low - 1].p);
-            fmpz_set(prod, temp);
+            h = (m >= span - h) ? h + 1 : 1;
+            m = current_subset[s - h];
+
+            for (j = 1; j <= h; j++)
+                current_subset[s + j - h - 1] = m + j;
+
+            fmpz_set_ui(prod, UWORD(1));
+
+            for (j = 0; j < s; j++)
+                fmpz_mul_ui(prod, prod, factor_base[current_subset[j] + low - 1].p);
+
+            for (j = 0; j < s; j++)
+                A_ind[j] = current_subset[j] + low - 1;
         }
-
-        for (j = 0; j < s; j++)
-            A_ind[j] = current_subset[j] + low - 1;
-
-    }
-    else if (A_ind[s - 1] > span)
-    {
-        //flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
-        //abort();
-        ret = 0;
+        else { ret = 0; }
     }
     else
     {
-        //flint_printf("Exception (qsieve_next_A0).  Out of A0.\n");
-        //abort();
-        ret = 0;
+        if (current_subset[0] != span - s + 2)
+        {
+            h = (m >= span - h) ? h + 1 : 1;
+            m = current_subset[s - 1 - h];
+
+            for (j = 1; j <= h; j++)
+                current_subset[s + j - h - 2] = m + j;
+
+            fmpz_set_ui(prod, UWORD(1));
+
+            for (j = 0; j < s - 1; j++)
+                fmpz_mul_ui(prod, prod, factor_base[2 * current_subset[j] - 1 + low - 1].p);
+
+            for (j = low + 1; j <= high; j += 2)
+            {
+                fmpz_mul_ui(temp, prod, factor_base[j].p);
+
+                if (fmpz_cmp(qs_inf->low_bound, temp) <= 0 && fmpz_cmp(temp, qs_inf->upp_bound) <= 0)
+                    break;
+            }
+
+            A_ind[s - 1] = j;
+
+         }
+         else { ret = 0; }
     }
 
-    fmpz_set(qs_inf->A0, prod);
-    qs_inf->s = s;
-    qs_inf->low = low;
     qs_inf->h = h;
     qs_inf->m = m;
-    qs_inf->current_subset = current_subset;
+    fmpz_set(qs_inf->A0, prod);
 
     fmpz_clear(prod);
     fmpz_clear(temp);
 
     return ret;
+}
+
+/* re-initialize parameter for 'A0' after factor base increment */
+
+void qsieve_re_init_A0(qs_t qs_inf)
+{
+    slong m, h, span, low, high, s, j;
+    mp_limb_t * A_ind = qs_inf->A_ind;
+    mp_limb_t * current_subset = qs_inf->current_subset;
+    prime_t * factor_base = qs_inf->factor_base;
+
+    fmpz_t prod;
+    fmpz_init(prod);
+
+    low =  qs_inf->high;
+    high = qs_inf->num_primes;
+    span = high - low;
+    s = qs_inf->s;
+    m = 0;
+    h = s;
+
+    fmpz_set_ui(prod, UWORD(1));
+
+    for (j = 1; j <= h; j++)
+        current_subset[s + j - h - 1] = m + j;
+
+    for (j = 0; j < s; j++)
+        fmpz_mul_ui(prod, prod, factor_base[current_subset[j] + low - 1].p);
+
+    for (j = 0; j < s; j++)
+        A_ind[j] = current_subset[j] + low - 1;
+
+    qs_inf->m = m;
+    qs_inf->h = h;
+    qs_inf->low = low;
+    qs_inf->high = high;
+    qs_inf->span = span;
+    fmpz_set(qs_inf->A0, prod);
+
+    fmpz_clear(prod);
 }
 
 void qsieve_init_A0(qs_t qs_inf)
@@ -133,9 +183,10 @@ void qsieve_init_A0(qs_t qs_inf)
     fmpz_init(upper_bound);
     fmpz_init(lower_bound);
     fmpz_init_set_ui(prod, UWORD(1));
-    fmpz_tdiv_q_ui(target, qs_inf->target_A, UWORD(2) * qs_inf->q0);
-    fmpz_mul_ui(upper_bound, target, UWORD(2));
-    fmpz_tdiv_q_ui(lower_bound, target, UWORD(2));
+    fmpz_fdiv_q_ui(target, qs_inf->target_A, UWORD(2) * qs_inf->q0);
+    fmpz_fdiv_q_ui(upper_bound, target, UWORD(2));
+    fmpz_sub(lower_bound, target, upper_bound);
+    fmpz_add(upper_bound, upper_bound, target);
     bits = fmpz_bits(target);
 
     for (i = qs_inf->small_primes; i < qs_inf->num_primes; i++)
@@ -174,7 +225,7 @@ void qsieve_init_A0(qs_t qs_inf)
         {
             if (num_factor > 2 && factor_bound[i + 1] > 0 && factor_bound[i + 2] > 0)
             {
-                low = factor_bound[i];
+                low = factor_bound[i - 1];
                 high = factor_bound[i + 2];
                 break;
             }
@@ -194,9 +245,7 @@ void qsieve_init_A0(qs_t qs_inf)
 
     if (i == 7)
     {
-        if (bits >= 15) num_factor = 3;
-        else num_factor = 2;
-
+        num_factor = (bits >= 15) ? 3 : 2;
         low = qs_inf->small_primes;
         high = qs_inf->num_primes;
     }
@@ -209,32 +258,101 @@ void qsieve_init_A0(qs_t qs_inf)
     current_subset = qs_inf->current_subset;
 
     span = high - low;
-    if (span > 100) span = 100;
 
-    /* generate first s-subset from range of possible factors */
 
-    m = 0;
-    h = s;
+    /*
+       factor of 'A0' :
+       if number of factor is less than 3 just generate 3-subset of
+       possible range from factor base lexicographically
+       else generate (s - 1) - subset of odd indices from possible
+       range from factor base lexicographically and choose last factor
+       from even index so that product of values is close to the
+       approximated value of hyper-cube
+    */
 
-    for (j = 1; j <= h; j++)
-        current_subset[s + j - h - 1] = m + j;
-
-    fmpz_set_ui(prod, UWORD(1));
-
-    for (j = 1; j <= s; j++)
+    if (s <= 3)
     {
-        fmpz_mul_ui(prod, prod, factor_base[current_subset[j - 1] + low - 1].p);
+        m = 0;
+        h = s;
+
+        for (j = 1; j <= h; j++)
+            current_subset[s + j - h - 1] = m + j;
+
+        fmpz_set_ui(prod, UWORD(1));
+
+        for (j = 0; j < s; j++)
+            fmpz_mul_ui(prod, prod, factor_base[current_subset[j] + low - 1].p);
+
+        for (j = 0; j < s; j++)
+            A_ind[j] = current_subset[j] + low - 1;
+    }
+    else
+    {
+        m = 0;
+        h = s - 1;
+
+        for (j = 1; j <= h; j++)
+            current_subset[s - 1 + j - h - 1] = m + j;
+
+        while (current_subset[0] != span - s + 2)
+        {
+            fmpz_set_ui(prod, UWORD(1));
+
+            for (j = 0; j < s - 1; j++)
+            {
+                fmpz_mul_ui(prod, prod, factor_base[2 * current_subset[j] - 1 + low - 1].p);
+            }
+
+            for (j = low + 1; j < qs_inf->num_primes; j += 2)
+            {
+                fmpz_mul_ui(temp, prod, factor_base[j].p);
+
+                if (fmpz_cmp(lower_bound, temp) <= 0 && fmpz_cmp(temp, upper_bound) <= 0)
+                    break;
+            }
+
+            if (j < qs_inf->num_primes) break;
+
+            h = (m >= span - h) ? h + 1 : 1;
+            m = current_subset[s - 1 - h];
+
+            for (j = 1; j <= h; j++)
+                current_subset[s + j - h - 2] = m + j;
+          }
+
+          A_ind[s - 1] = (j == qs_inf->num_primes) ? j - 1 : j;
+
+          for (j = 0; j < s - 1; j++)
+            A_ind[j] = 2 * current_subset[j] - 1 + low - 1;
+
+          fmpz_set(prod, temp);
     }
 
-    qs_inf->current_subset = current_subset;
     qs_inf->h = h;
     qs_inf->m = m;
     qs_inf->low = low;
+    qs_inf->high = high;
     qs_inf->span = span;
     fmpz_set(qs_inf->A0, prod);
+    fmpz_set(qs_inf->low_bound, lower_bound);
+    fmpz_set(qs_inf->upp_bound, upper_bound);
 
-    for (j = 0; j < s; j++)
-        A_ind[j] = current_subset[j] + low - 1;
+#if QS_DEBUG
+    flint_printf("number of factor in hypercube = %wd\n", qs_inf->s);
+    flint_printf("possible candidate in range [ %wd, %wd ]\n", qs_inf->low, qs_inf->high);
+    flint_printf("optimal value of hypercube = ");
+    fmpz_print(target);
+    flint_printf("\n");
+    flint_printf("lower bound       = ");
+    fmpz_print(lower_bound);
+    flint_printf("\n");
+    flint_printf("upper bound       = ");
+    fmpz_print(upper_bound);
+    flint_printf("\n");
+    flint_printf("initial hypercube = ");
+    fmpz_print(qs_inf->A0);
+    flint_printf("\n");
+#endif
 
     fmpz_clear(target);
     fmpz_clear(prod);

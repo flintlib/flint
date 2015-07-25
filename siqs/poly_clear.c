@@ -37,6 +37,8 @@ void qsieve_poly_clear(qs_t qs_inf)
    fmpz_clear(qs_inf->B);
    fmpz_clear(qs_inf->C);
    fmpz_clear(qs_inf->target_A);
+   fmpz_clear(qs_inf->low_bound);
+   fmpz_clear(qs_inf->upp_bound);
 
    for (i = 0; i < qs_inf->s; i++)
    {

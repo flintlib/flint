@@ -1,26 +1,19 @@
 /*=============================================================================
-
     This file is part of FLINT.
-
     FLINT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
-
     FLINT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
 =============================================================================*/
 /******************************************************************************
-
     Copyright (C) 2015 Nitin Kumar
-
 ******************************************************************************/
 
 #define ulong ulongxx /* interferes with system includes */
@@ -61,7 +54,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     /**************************************************************************
         INITIALISATION:
-
         Initialise the qs_t structure.
     **************************************************************************/
 
@@ -79,7 +71,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     /**************************************************************************
         KNUTH SCHROEPPEL:
-
         Try to compute a multiplier k such that there are a lot of small primes
         which are quadratic residues modulo kn. If a small factor of n is found
         during this process it is returned.
@@ -150,7 +141,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     /**************************************************************************
         INITIALISE RELATION/LINAXYXYXYXY DATA:
-
         Create space for all the relations and matrix information
     **************************************************************************/
 
@@ -162,7 +152,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     /**************************************************************************
         POLYNOMIAL INITIALIZATION AND SIEVEING:
-
         Sieve for relations
     **************************************************************************/
 
@@ -172,7 +161,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 30;
+    qs_inf->sieve_bits = 150;
 
     //qs_inf->file = fopen("saved_relations.dat", "w");
 
@@ -189,7 +178,10 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
             return small_factor;
         }
 
-        qsieve_init_A0(qs_inf);
+        if (qs_inf->s)
+            qsieve_re_init_A0(qs_inf);
+        else
+            qsieve_init_A0(qs_inf);
 
         do
         {
@@ -210,7 +202,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     /**************************************************************************
         REDUCE MATRIX:
-
         Perform some light filtering on the matrix
     **************************************************************************/
 
@@ -220,7 +211,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
    /**************************************************************************
         BLOCK LANCZOS:
-
         Find extra_rels nullspace vectors (if they exist)
     **************************************************************************/
 #if QS_DEBUG
@@ -246,7 +236,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     /**************************************************************************
         SQUARE ROOT:
-
         Compute the square root and take the GCD of X-Y with N
     **************************************************************************/
 
@@ -276,54 +265,35 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                                 flint_printf("factor found = ");
                                 fmpz_print(X);
                                 flint_printf(" time taken = %f \n", diff / 1000.0);
-                                return;
+                                goto cleanup;
                             }
                         }
                     }
 
-                    fmpz_clear(X);
-                    fmpz_clear(Y);
-                    flint_free(nullrows);
-                    fmpz_clear(temp);
 
-                    qsieve_linalg_clear(qs_inf);
-                    qsieve_linalg_init(qs_inf);
-
+                    qsieve_linalg_re_init(qs_inf);
                     relation = 0;
                 }
             }
 
-            i = qsieve_next_A0(qs_inf);
+        } while (qsieve_next_A0(qs_inf));
 
-            if (i == 0)
-            {
-                if (qs_inf->high < qs_inf->num_primes)
-                {
-                    qs_inf->high = qs_inf->high + 100;
-                    if (qs_inf->high >= qs_inf->num_primes)
-                        qs_inf->high = qs_inf->num_primes;
-                }
-                else
-                {
-                    qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
-                    qs_inf->high = qs_inf->num_primes;
-                }
-
-                qs_inf->span = qs_inf->high - qs_inf->low;
-                relation = 0;
-                qsieve_linalg_clear(qs_inf);
-                qsieve_linalg_init(qs_inf);
-                break;
-            }
-
-        } while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+      //  flint_printf("factor base increment\n");
+        qsieve_primes_increment(qs_inf, qs_inf->num_primes / 2);
+        qsieve_linalg_re_alloc(qs_inf);
+        relation = 0;
     }
 
 #if QS_DEBUG
     flint_printf("\nCleanup\n");
 #endif
 
+cleanup:
     flint_free(sieve);
+    fmpz_clear(X);
+    fmpz_clear(Y);
+    flint_free(nullrows);
+    fmpz_clear(temp);
     qsieve_clear(qs_inf);
 
     return 1;

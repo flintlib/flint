@@ -127,6 +127,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    fmpz_mul(res, res, X);
    fmpz_add(res, res, qs_inf->C); /* res = AX^2 + 2BX + C */
 
+  /*  flint_printf("\n initial value of Q(x) = ");
+      fmpz_print(res);
+      flint_printf("\n"); */
+
+
    bits = FLINT_ABS(fmpz_bits(res));
    bits -= BITS_ADJUST;
    extra_bits = 0;
@@ -331,22 +336,19 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
     slong relation = 0;
 
-    do
+    while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
-        if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
-            break;
-
         qsieve_compute_C(qs_inf);
 
         qsieve_do_sieving(qs_inf, sieve);
+
         relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
-        if (qs_inf->curr_poly < (1 << qs_inf->s))
-            qsieve_init_poly_next(qs_inf);
-        else
+        if (qs_inf->curr_poly == (1 << qs_inf->s))
             break;
 
-    }while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+        qsieve_init_poly_next(qs_inf);
+    }
 
     return relation;
 }
