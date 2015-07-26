@@ -37,7 +37,7 @@ int main(void)
     flint_printf("aprcl_config_jacobi....");
     fflush(stdout);
 
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t n, s2;
         aprcl_config conf;

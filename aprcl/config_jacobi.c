@@ -30,39 +30,36 @@ _R_value(const fmpz_t n)
 {
     ulong bits = fmpz_bits(n);
 
-    if (bits <= 17) return 6;
-    if (bits <= 31) return 12;
-    if (bits <= 54) return 36;
-    if (bits <= 68) return 72;
-    if (bits <= 101) return 180;
-    if (bits <= 127) return 360;
-    if (bits <= 152) return 720;
-    if (bits <= 204) return 1260;
-    if (bits <= 268) return 2520;
-    if (bits <= 344) return 5040;
-    if (bits <= 525) return 27720;
-    if (bits <= 650) return 55440;
-    if (bits <= 774) return 110880;
-    if (bits <= 1035) return 166320;
-    if (bits <= 1566) return 720720;
-    if (bits <= 2082) return 1663200;
-    if (bits <= 3491) return 8648640;
+    if (bits <= 17) return 6;           /*  2 * 3                       */
+    if (bits <= 31) return 12;          /*  2^2 * 3                     */
+    if (bits <= 54) return 36;          /*  2^2 * 3^2                   */
+    if (bits <= 68) return 72;          /*  2^3 * 3^2                   */
+    if (bits <= 101) return 180;        /*  2^2 * 3^2 * 5               */
+    if (bits <= 127) return 360;        /*  2^3 * 3^2 * 5               */
+    if (bits <= 152) return 720;        /*  2^4 * 3^2 * 5               */
+    if (bits <= 204) return 1260;       /*  2^2 * 3^2 * 5 * 7           */
+    if (bits <= 268) return 2520;       /*  2^3 * 3^2 * 5 * 7           */
+    if (bits <= 344) return 5040;       /*  2^4 * 3^2 * 5 * 7           */
+    if (bits <= 525) return 27720;      /*  2^3 * 3^2 * 5 * 7 * 11      */
+    if (bits <= 650) return 55440;      /*  2^4 * 3^2 * 5 * 7 * 11      */
+    if (bits <= 774) return 110880;     /*  2^5 * 3^2 * 5 * 7 * 11      */
+    if (bits <= 1035) return 166320;    /*  2^4 * 3^3 * 5 * 7 * 11      */
+    if (bits <= 1566) return 720720;    /*  2^4 * 3^2 * 5 * 7 * 11 * 13 */
+    if (bits <= 2082) return 1663200;   /*  2^5 * 3^3 * 5^2 * 7 * 11    */
+    if (bits <= 3491) return 8648640;   /*  2^6 * 3^3 * 5 * 7 * 11 * 13 */
+
+    /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
     return 6983776800;
 }
 
 void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
-    int have_div;
-    slong i, j, t;
-    ulong q;
-    double w_max;
+    ulong i, j, q;
     double * w;
-
     n_factor_t q_factors;
-    fmpz_t new_s, new_s2, p;
+    fmpz_t new_s, p;
 
     fmpz_init(new_s);
-    fmpz_init(new_s2);
     fmpz_init(p);
     w = (double *) flint_malloc(sizeof(double) * conf->qs->num);
 
@@ -77,8 +74,8 @@ void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
         for (j = 0; j < q_factors.num; j++)
         {
             ulong p, euler_phi;
-            p = q_factors.p[j];
 
+            p = q_factors.p[j];
             euler_phi = n_pow(p, q_factors.exp[j] - 1) * (p - 1);
             euler_phi = euler_phi * euler_phi;
 
@@ -88,52 +85,41 @@ void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
         w[i] /= log((double) n_pow(q, conf->qs->exp[i]));
     }
 
-    have_div = 1;
-    i = conf->qs->num;
-
-    while (have_div == 1)
+    while (1)
     {
-        for (; i >= 0; i--)
+        double w_max;
+        slong ind;
+
+        w_max = -1;
+        ind = -1;
+
+        for (i = 0; i < conf->qs->num; i++)
         {
             if (conf->qs_used[i] == 0)
                 continue;
 
             fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
             fmpz_fdiv_q(new_s, conf->s, p);
+            fmpz_mul(new_s, new_s, new_s);
 
-            fmpz_mul(new_s2, new_s, new_s);
-            if (fmpz_cmp(new_s2, n) > 0)
-                break;
+            if (fmpz_cmp(new_s, n) > 0)
+                if (w_max <= w[i])
+                {
+                    w_max = w[i];
+                    ind = i;
+                }
         }
 
-        t = i;
-        w_max = w[i];
-        for (j = i - 1; j >= 0; j--)
-        {
-            if (conf->qs_used[j] == 0)
-                continue;
-
-            if (w_max <= w[j])
-            {
-                w_max = w[j];
-                t = j;
-            }
-        }
-
-        if (t == -1)
-            have_div = 0;
+        if (ind == -1)
+            break;
         
-        if (have_div == 1)
-        {
-            fmpz_pow_ui(p, conf->qs->p + t, conf->qs->exp[t]);
-            fmpz_fdiv_q(new_s, conf->s, p);
-            fmpz_set(conf->s, new_s);
-            conf->qs_used[t] = 0;
-        }
+        fmpz_pow_ui(p, conf->qs->p + ind, conf->qs->exp[ind]);
+        fmpz_fdiv_q(new_s, conf->s, p);
+        fmpz_set(conf->s, new_s);
+        conf->qs_used[ind] = 0;
     }
 
     fmpz_clear(new_s);
-    fmpz_clear(new_s2);
     fmpz_clear(p);
     flint_free(w);
 }
@@ -204,7 +190,6 @@ void _jacobi_config_update(aprcl_config conf)
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 void jacobi_config_init(aprcl_config conf, const fmpz_t n)
 {
-    ulong i;
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
     conf->R = _R_value(n);
