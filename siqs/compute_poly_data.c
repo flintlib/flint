@@ -111,7 +111,14 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
                     break;
             }
 
+            if (j >= high)
+            {
+                flint_printf("A0 doesn't fit in bounds\n");
+                abort();
+            }
+
             A_ind[s - 1] = j;
+            fmpz_set(prod, temp);
 
          }
          else { ret = 0; }
@@ -139,7 +146,7 @@ void qsieve_re_init_A0(qs_t qs_inf)
     fmpz_t prod;
     fmpz_init(prod);
 
-    low =  qs_inf->high;
+    low =  qs_inf->low;
     high = qs_inf->num_primes;
     span = high - low;
     s = qs_inf->s;
@@ -318,14 +325,14 @@ void qsieve_init_A0(qs_t qs_inf)
 
             for (j = 1; j <= h; j++)
                 current_subset[s + j - h - 2] = m + j;
-          }
+        }
 
-          A_ind[s - 1] = (j == qs_inf->num_primes) ? j - 1 : j;
+        A_ind[s - 1] = (j == qs_inf->num_primes) ? j - 1 : j;
 
-          for (j = 0; j < s - 1; j++)
+        for (j = 0; j < s - 1; j++)
             A_ind[j] = 2 * current_subset[j] - 1 + low - 1;
 
-          fmpz_set(prod, temp);
+        fmpz_set(prod, temp);
     }
 
     qs_inf->h = h;
