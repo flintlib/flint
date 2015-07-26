@@ -161,7 +161,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 150;
+    qs_inf->sieve_bits = 120;
 
     //qs_inf->file = fopen("saved_relations.dat", "w");
 
@@ -196,10 +196,14 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                 qsieve_init_poly_first(qs_inf);
 
                 relation += qsieve_collect_relations(qs_inf, sieve);
+                //flint_printf("\nrelation = %wd", relation);
 
                 if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
                 {
 
+                  //  diff = clock() - start;
+
+                  //  flint_printf("time taken for set = %f\n", diff / 1000.0);
     /**************************************************************************
         REDUCE MATRIX:
         Perform some light filtering on the matrix
@@ -278,8 +282,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
         } while (qsieve_next_A0(qs_inf));
 
-      //  flint_printf("factor base increment\n");
-        qsieve_primes_increment(qs_inf, qs_inf->num_primes / 2);
+        //flint_printf("factor base increment\n");
+        qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
         qsieve_linalg_re_alloc(qs_inf);
         relation = 0;
     }
