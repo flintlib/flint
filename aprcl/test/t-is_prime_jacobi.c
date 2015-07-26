@@ -170,9 +170,9 @@ int main(void)
             fmpz_t n;
             fmpz_init(n);
 
-            fmpz_randtest_unsigned(n, state, 50);
+            fmpz_randtest_unsigned(n, state, 1000);
             while (fmpz_cmp_ui(n, 100) <= 0)
-                fmpz_randtest_unsigned(n, state, 50);
+                fmpz_randtest_unsigned(n, state, 1000);
 
             pbprime = fmpz_is_probabprime(n);
             cycloprime = is_prime_jacobi(n);

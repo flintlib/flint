@@ -252,6 +252,7 @@ void _aprcl_config_update(aprcl_config conf);
 ulong _R_value(const fmpz_t n);
 void _jacobi_config_update(aprcl_config conf);
 void _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n);
+void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n);
 
 void jacobi_config_init(aprcl_config conf, const fmpz_t n);
 void jacobi_config_clear(aprcl_config conf);

@@ -50,6 +50,94 @@ _R_value(const fmpz_t n)
     return 6983776800;
 }
 
+void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
+{
+    int have_div;
+    slong i, j, t;
+    ulong q;
+    double w_max;
+    double * w;
+
+    n_factor_t q_factors;
+    fmpz_t new_s, new_s2, p;
+
+    fmpz_init(new_s);
+    fmpz_init(new_s2);
+    fmpz_init(p);
+    w = (double *) flint_malloc(sizeof(double) * conf->qs->num);
+
+    for (i = 0; i < conf->qs->num; i++)
+    {
+        conf->qs_used[i] = 1;
+
+        q = fmpz_get_ui(conf->qs->p + i);
+        n_factor_init(&q_factors);
+        n_factor(&q_factors, q - 1, 1);
+
+        for (j = 0; j < q_factors.num; j++)
+        {
+            ulong p, euler_phi;
+            p = q_factors.p[j];
+
+            euler_phi = n_pow(p, q_factors.exp[j] - 1) * (p - 1);
+            euler_phi = euler_phi * euler_phi;
+
+            w[i] += euler_phi;
+        }
+
+        w[i] /= log((double) n_pow(q, conf->qs->exp[i]));
+    }
+
+    have_div = 1;
+    i = conf->qs->num;
+
+    while (have_div == 1)
+    {
+        for (; i >= 0; i--)
+        {
+            if (conf->qs_used[i] == 0)
+                continue;
+
+            fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
+            fmpz_fdiv_q(new_s, conf->s, p);
+
+            fmpz_mul(new_s2, new_s, new_s);
+            if (fmpz_cmp(new_s2, n) > 0)
+                break;
+        }
+
+        t = i;
+        w_max = w[i];
+        for (j = i - 1; j >= 0; j--)
+        {
+            if (conf->qs_used[j] == 0)
+                continue;
+
+            if (w_max <= w[j])
+            {
+                w_max = w[j];
+                t = j;
+            }
+        }
+
+        if (t == -1)
+            have_div = 0;
+        
+        if (have_div == 1)
+        {
+            fmpz_pow_ui(p, conf->qs->p + t, conf->qs->exp[t]);
+            fmpz_fdiv_q(new_s, conf->s, p);
+            fmpz_set(conf->s, new_s);
+            conf->qs_used[t] = 0;
+        }
+    }
+
+    fmpz_clear(new_s);
+    fmpz_clear(new_s2);
+    fmpz_clear(p);
+    flint_free(w);
+}
+
 void _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
 {
     slong i;
@@ -126,7 +214,7 @@ void jacobi_config_init(aprcl_config conf, const fmpz_t n)
     n_factor(&conf->rs, conf->R, 1);
 
     conf->qs_used = (int *) flint_malloc(sizeof(int) * conf->qs->num);
-    _jacobi_config_reduce_s(conf, n);
+    _jacobi_config_reduce_s2(conf, n);
 }
 
 void jacobi_config_clear(aprcl_config conf)
