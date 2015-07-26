@@ -43,7 +43,7 @@
 #endif
 
 
-#define QS_DEBUG 1
+#define QS_DEBUG 0
 
 typedef struct prime_t
 {
@@ -103,7 +103,7 @@ typedef struct qs_s
    slong small_primes; /* number of primes to not sieve with */
    slong sieve_size; /* size of sieve to use */
 
-   char sieve_bits; /* sieve threshold */
+   unsigned char sieve_bits; /* sieve threshold */
 
    /***************************************************************************
                        POLYNOMIAL DATA

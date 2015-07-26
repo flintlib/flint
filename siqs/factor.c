@@ -42,7 +42,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     qs_t qs_inf;
     mp_limb_t small_factor, factor = 0, t;
     ulong exp = 0;
-    char * sieve;
+    unsigned char * sieve;
     slong ncols, nrows, i, j, k = 0, count, relation = 0;
     uint64_t * nullrows;
     uint64_t mask;
@@ -196,7 +196,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                 qsieve_init_poly_first(qs_inf);
 
                 relation += qsieve_collect_relations(qs_inf, sieve);
-                //flint_printf("\nrelation = %wd", relation);
+                //if (relation) flint_printf("\nrelation = %wd", relation);
 
                 if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
                 {

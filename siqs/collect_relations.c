@@ -247,14 +247,15 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
 
          goto cleanup;
       }
-      else
+     /* else
       {
-        /*  if (fmpz_bits(res) < 32)
+          if (fmpz_bits(res) < 32)
           {
               prime = fmpz_get_ui(res);
 
               if (n_is_prime(prime) && prime > qs_inf->q0 && prime <= 64 * factor_base[qs_inf->num_primes - 1].p)
               {
+                  flint_printf("we've found partial\n");
                   qsieve_add_to_cycles(qs_inf, UWORD(1), prime, Y);
 
                   fprintf(qs_inf->file, " %wu", prime);
@@ -277,8 +278,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
 
                   qs_inf->max_relations++;
               }
-          } */
-      }
+          }
+      } */
    }
 
 cleanup:
@@ -297,7 +298,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 {
     slong i = 0, j = 0;
     ulong * sieve2 = (ulong *) sieve;
-    char bits = qs_inf->sieve_bits;
+    unsigned char bits = qs_inf->sieve_bits;
     slong rels = 0;
 
     while (j < qs_inf->sieve_size / sizeof(ulong))
@@ -306,7 +307,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 #if FLINT64
         while ((sieve2[j] & UWORD(0xE0E0E0E0E0E0E0E0)) == 0)
 #else
-        while ((sieve2[j] & UWORD(0xE0E0E0E0)) == 0)
+        while ((sieve2[j] & UWORD(0xC0C0C0C0)) == 0)
 #endif
         {
             j++;
