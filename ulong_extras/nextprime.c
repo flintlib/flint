@@ -83,7 +83,7 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
 {
     ulong i, index;
 
-    /* For tiny inputs, linear search in small primes table */
+    /* For tiny inputs, bsearch in small primes table */
     if (n < flint_primes_small[FLINT_NUM_PRIMES_SMALL-1])
         return bsearch_uint(n, flint_primes_small, FLINT_NUM_PRIMES_SMALL);
 
