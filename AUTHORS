@@ -107,7 +107,8 @@ Weiferich prime search. (Funded by the Nuffield Foundation)
 
 $\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against
 Feitma's tables and sped up and corrected \code{n_is_prime} and
-\code{n_is_probabprime}.
+\code{n_is_probabprime}. Improvements to \code{n_nextprime} and
+\code{n_isprime}.
 
 $\bullet$ Anubhav Srivastava contributed horizontal and vertical concatenation
 of matrices over $\mathbb{Z}$ and an implementation of the Bodrato matrix 
