@@ -22,6 +22,7 @@
     Copyright (C) 2007, 2008 William Hart
     Copyright (C) 2008 Peter Shrimpton
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2015 Dana Jacobsen
 
 ******************************************************************************/
 
@@ -34,22 +35,22 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-unsigned int nextmod30[] = 
+static unsigned int nextmod30[] =
 {
    1, 6, 5, 4, 3, 2, 1, 4, 3, 2, 1, 2, 1, 4, 3, 2, 1, 2, 1,
    4, 3, 2, 1, 6, 5, 4, 3, 2, 1, 2
 };
 
-unsigned int nextindex[] = 
+static unsigned int nextindex[] =
 {
    1, 7, 7, 7, 7, 7, 7, 11, 11, 11, 11, 13, 13, 17, 17, 17, 17, 19, 19,
    23, 23, 23, 23, 29, 29, 29, 29, 29, 29, 1
 };
 
-#define NEXTPRIME_PRIMES 54
-
 /* first 64 primes used for modular arithmetic */
-static const unsigned short n_modular_primes_tab[64] = {
+#define N_MODULUS (UWORD(1) << (FLINT_BITS - 1))
+#define N_MOD_TAB 64
+static const unsigned short n_modular_primes_tab[N_MOD_TAB] = {
 #if FLINT_BITS == 64
   29, 99, 123, 131, 155, 255, 269, 359, 435, 449, 453, 485, 491, 543, 585,
   599, 753, 849, 879, 885, 903, 995, 1209, 1251, 1311, 1373, 1403, 1485, 1533,
@@ -65,25 +66,30 @@ static const unsigned short n_modular_primes_tab[64] = {
 #endif
 };
 
-#define N_MODULUS (UWORD(1) << (FLINT_BITS - 1))
+
+static mp_limb_t bsearch_uint(mp_limb_t n, const unsigned int *t, int tlen)
+{
+  int lo = 0;
+  int hi = tlen-1;
+  while (lo < hi) {
+    int mid = lo + (hi-lo)/2;
+    if (t[mid] <= n) lo = mid+1;
+    else             hi = mid;
+  }
+  return t[lo];
+}
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 {
-    mp_limb_t * moduli;
     ulong i, index;
 
-    if (n < 7) 
-    {
-        if (n < 2)
-            return 2;
-        n++;
-        n |= 1;
-        return n;  
-    }
+    /* For tiny inputs, linear search in small primes table */
+    if (n < flint_primes_small[FLINT_NUM_PRIMES_SMALL-1])
+        return bsearch_uint(n, flint_primes_small, FLINT_NUM_PRIMES_SMALL);
 
-    if (n >= N_MODULUS && n < N_MODULUS + n_modular_primes_tab[63])
+    if (n >= N_MODULUS && n < N_MODULUS + n_modular_primes_tab[N_MOD_TAB-1])
     {
-        for (i = 0; i < 64; i++)
+        for (i = 0; i < N_MOD_TAB; i++)
             if (N_MODULUS + n_modular_primes_tab[i] > n)
                 return N_MODULUS + n_modular_primes_tab[i];
     }
@@ -95,62 +101,11 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
     }
 
     index = n % 30;
-    n += nextmod30[index];
-    index = nextindex[index];
 
-    if (n <= flint_primes_small[NEXTPRIME_PRIMES-1])
-    {
-        if (n == 7) return 7;
-        if (n == 11) return 11;
-        if (n == 13) return 13;
+    do {
+      n += nextmod30[index];
+      index = nextindex[index];
+    } while (!n_is_prime(n));
 
-        while (((n % 7) == 0) || ((n % 11) == 0) || ((n % 13) == 0))
-        {
-            n += nextmod30[index];
-            index = nextindex[index];
-        }
-        return n;
-    }
-
-    moduli = (mp_limb_t *) flint_malloc(NEXTPRIME_PRIMES * sizeof(mp_limb_t));
-
-    for (i = 3; i < NEXTPRIME_PRIMES; i++)
-        moduli[i] = (n % flint_primes_small[i]);
-
-    while (1)
-    {
-        ulong composite = 0;
-        ulong diff, acc, pr;
-
-        diff = nextmod30[index];
-
-        /* First check residues */
-        for (i = 3; i < NEXTPRIME_PRIMES; i++)
-        {
-            composite |= (moduli[i] == 0);
-            acc = moduli[i] + diff;
-            pr = flint_primes_small[i];
-            moduli[i] = acc >= pr ? acc - pr : acc;
-        }
-
-        if (composite)
-        {
-            n += diff;
-            index = nextindex[index];
-            continue;
-        }
-
-        if ((!proved && n_is_probabprime(n)) || (proved && n_is_prime(n)))
-        {
-            break;
-        }
-        else
-        {
-            n += diff;
-            index = nextindex[index];
-        }
-    }
-
-    flint_free(moduli);
     return n;
 }
