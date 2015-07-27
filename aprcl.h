@@ -182,6 +182,25 @@ FLINT_DLL void unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t);
 FLINT_DLL void unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t);
 FLINT_DLL void unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t);
 
+FLINT_DLL void unity_zp_mul3(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+FLINT_DLL void unity_zp_mul9(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+
+FLINT_DLL void unity_zp_mul4(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+FLINT_DLL void unity_zp_mul8(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+FLINT_DLL void unity_zp_mul16(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+
+FLINT_DLL void unity_zp_mul5(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+FLINT_DLL void unity_zp_mul7(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+FLINT_DLL void unity_zp_mul11(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
+
 ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
 void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow);
