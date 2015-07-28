@@ -50,26 +50,34 @@ void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
 
 *******************************************************************************
 
-MACRO fmpq_mat_entry(mat,i,j)
+fmpq * fmpq_mat_entry(const fmpq_mat_t mat, slong i, slong j)
 
     Gives a reference to the entry at row \code{i} and column \code{j}.
     The reference can be passed as an input or output variable to any
     \code{fmpq} function for direct manipulation of the matrix element.
     No bounds checking is performed.
 
-MACRO fmpq_mat_entry_num(mat,i,j)
+fmpz * fmpq_mat_entry_num(const fmpq_mat_t mat, slong i, slong j)
 
     Gives a reference to the numerator of the entry at row \code{i} and
     column \code{j}. The reference can be passed as an input or output
     variable to any \code{fmpz} function for direct manipulation of the
     matrix element. No bounds checking is performed.
 
-MACRO fmpq_mat_entry_den(mat,i,j)
+fmpz * fmpq_mat_entry_den(const fmpq_mat_t mat, slong i, slong j)
 
     Gives a reference to the denominator of the entry at row \code{i} and
     column \code{j}. The reference can be passed as an input or output
     variable to any \code{fmpz} function for direct manipulation of the
     matrix element. No bounds checking is performed.
+
+slong fmpq_mat_nrows(const fmpq_mat_t mat)
+
+    Return the number of rows of the matrix \code{mat}.
+
+slong fmpq_mat_ncols(const fmpq_mat_t mat)
+
+    Return the number of columns of the matrix \code{mat}.
 
 *******************************************************************************
 

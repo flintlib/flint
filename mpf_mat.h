@@ -52,7 +52,11 @@ typedef struct
 
 typedef mpf_mat_struct mpf_mat_t[1];
 
-#define mpf_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+MPF_MAT_INLINE
+mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
 
 /* Memory management  ********************************************************/
 

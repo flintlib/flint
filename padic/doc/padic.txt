@@ -41,9 +41,6 @@ fmpz * padic_unit(const padic_t op)
     Returns the unit part of the $p$-adic number as a FLINT integer, which 
     can be used as an operand for the \code{fmpz} functions.
 
-    Note that this function is implemented as a macro, but it can only be 
-    used as an \emph{rvalue}.
-
 slong padic_val(const padic_t op)
 
     Returns the valuation part of the $p$-adic number.
@@ -52,6 +49,10 @@ slong padic_val(const padic_t op)
     the expression \code{padic_val(op)} can be used as both an 
     \emph{lvalue} and an \emph{rvalue}.
 
+slong padic_get_val(const padic_t op)
+
+    Returns the valuation part of the $p$-adic number.
+
 slong padic_prec(const padic_t op)
 
     Returns the precision of the $p$-adic number.
@@ -59,6 +60,10 @@ slong padic_prec(const padic_t op)
     Note that this function is implemented as a macro and that 
     the expression \code{padic_prec(op)} can be used as both an 
     \emph{lvalue} and an \emph{rvalue}.
+
+slong padic_get_prec(const padic_t op)
+
+    Returns the precision of the $p$-adic number.
 
 *******************************************************************************
 

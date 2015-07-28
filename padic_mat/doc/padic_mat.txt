@@ -62,6 +62,10 @@ fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
     The return value can be used as an argument to 
     the functions in the \code{fmpz} module.
 
+slong padic_mat_get_val(const padic_mat_t A)
+
+    Returns the valuation of the matrix.
+
 slong padic_mat_val(const padic_mat_t A)
 
     Returns the valuation of the matrix.

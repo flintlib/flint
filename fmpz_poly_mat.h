@@ -54,7 +54,11 @@ typedef struct
 
 typedef fmpz_poly_mat_struct fmpz_poly_mat_t[1];
 
-#define fmpz_poly_mat_entry(mat,i,j) ((mat)->rows[(i)] + (j))
+FMPZ_POLY_MAT_INLINE
+fmpz_poly_struct * fmpz_poly_mat_entry(const fmpz_poly_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
 
 /* Memory management *********************************************************/
 

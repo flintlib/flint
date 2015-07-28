@@ -60,6 +60,18 @@ typedef d_mat_struct d_mat_t[1];
 
 #define d_mat_entry(mat,i,j) (*((mat)->rows[i] + (j)))
 
+D_MAT_INLINE
+double * d_mat_entry_ptr(const d_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
+
+D_MAT_INLINE
+double d_mat_get_entry(const d_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i][j];
+}
+
 /* Memory management  ********************************************************/
 
 FLINT_DLL void d_mat_init(d_mat_t mat, slong rows, slong cols);

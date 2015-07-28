@@ -52,12 +52,35 @@ typedef struct
 
 typedef fmpq_mat_struct fmpq_mat_t[1];
 
-#define fmpq_mat_entry(mat,i,j) ((mat)->rows[(i)] + (j))
-#define fmpq_mat_entry_num(mat,i,j) ((fmpz *)(&((*fmpq_mat_entry(mat,i,j)).num)))
-#define fmpq_mat_entry_den(mat,i,j) ((fmpz *)(&((*fmpq_mat_entry(mat,i,j)).den)))
+FMPQ_MAT_INLINE
+fmpq * fmpq_mat_entry(const fmpq_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
 
-#define fmpq_mat_nrows(mat) ((mat)->r)
-#define fmpq_mat_ncols(mat) ((mat)->c)
+FMPQ_MAT_INLINE
+fmpz * fmpq_mat_entry_num(const fmpq_mat_t mat, slong i, slong j)
+{
+   return (fmpz *)(&((*fmpq_mat_entry(mat, i, j)).num));
+}
+
+FMPQ_MAT_INLINE
+fmpz * fmpq_mat_entry_den(const fmpq_mat_t mat, slong i, slong j)
+{
+   return (fmpz *)(&((*fmpq_mat_entry(mat, i, j)).den));
+}
+
+FMPQ_MAT_INLINE
+slong fmpq_mat_nrows(const fmpq_mat_t mat)
+{
+   return mat->r;
+}
+
+FMPQ_MAT_INLINE
+slong fmpq_mat_ncols(const fmpq_mat_t mat)
+{
+   return mat->c;
+}
 
 FLINT_DLL void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
 
