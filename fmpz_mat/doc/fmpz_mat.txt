@@ -835,7 +835,7 @@ slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
 
-slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, slong * perm,
+slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
