@@ -59,6 +59,11 @@ int main(void)
         while (n_gcd(p, x) != 1 || x == 0)
             x = n_randint(state, n_pow(p, k));
 
+        fmpz_init(n);
+        fmpz_randtest_unsigned(n, state, 200);
+        while (fmpz_equal_ui(n, 0) != 0)
+            fmpz_randtest_unsigned(n, state, 200);
+
         unity_zp_init(f, p, k, n);
         unity_zp_init(g, p, k, n);
         unity_zp_init(h, p, k, n);

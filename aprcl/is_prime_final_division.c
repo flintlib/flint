@@ -38,9 +38,13 @@ is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
     fmpz_init_set(nmul, npow);
 
     result = 1;
-    for (i = 1; i < r; i++)
+    for (i = 1; i <= r; i++)
     {
         fmpz_mod(rem, n, npow);
+
+        if (fmpz_is_one(rem))
+            break;
+
         /* if npow | n */
         if (fmpz_is_zero(rem))
         {

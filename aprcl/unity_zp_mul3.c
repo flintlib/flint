@@ -64,6 +64,87 @@ unity_zp_mul3(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 void
 unity_zp_mul9(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 {
+    fmpz_mod_poly_get_coeff_fmpz(t[20], g->poly, 0);
+    fmpz_mod_poly_get_coeff_fmpz(t[21], g->poly, 1);
+    fmpz_mod_poly_get_coeff_fmpz(t[22], g->poly, 2);
+    fmpz_mod_poly_get_coeff_fmpz(t[23], g->poly, 3);
+    fmpz_mod_poly_get_coeff_fmpz(t[24], g->poly, 4);
+    fmpz_mod_poly_get_coeff_fmpz(t[25], g->poly, 5);
 
+    fmpz_mod_poly_get_coeff_fmpz(t[26], h->poly, 0);
+    fmpz_mod_poly_get_coeff_fmpz(t[27], h->poly, 1);
+    fmpz_mod_poly_get_coeff_fmpz(t[28], h->poly, 2);
+    fmpz_mod_poly_get_coeff_fmpz(t[29], h->poly, 3);
+    fmpz_mod_poly_get_coeff_fmpz(t[30], h->poly, 4);
+    fmpz_mod_poly_get_coeff_fmpz(t[31], h->poly, 5);
+
+    fmpz_set(t[0], t[20]);
+    fmpz_set(t[1], t[21]);
+    fmpz_set(t[2], t[22]);
+    fmpz_set(t[3], t[26]);
+    fmpz_set(t[4], t[27]);
+    fmpz_set(t[5], t[28]);
+    unity_zp_ar1(t);
+
+    fmpz_set(t[32], t[6]);
+    fmpz_set(t[33], t[7]);
+    fmpz_set(t[34], t[8]);
+    fmpz_set(t[35], t[9]);
+    fmpz_set(t[36], t[10]);
+
+    fmpz_set(t[0], t[23]);
+    fmpz_set(t[1], t[24]);
+    fmpz_set(t[2], t[25]);
+    fmpz_set(t[3], t[29]);
+    fmpz_set(t[4], t[30]);
+    fmpz_set(t[5], t[31]);
+    unity_zp_ar1(t);
+
+    fmpz_set(t[38], t[6]);
+    fmpz_set(t[39], t[7]);
+    fmpz_set(t[40], t[8]);
+    fmpz_set(t[41], t[9]);
+    fmpz_set(t[42], t[10]);
+
+    fmpz_sub(t[0], t[20], t[23]);
+    fmpz_sub(t[1], t[21], t[24]);
+    fmpz_sub(t[2], t[22], t[25]);
+    fmpz_sub(t[3], t[29], t[26]);
+    fmpz_sub(t[4], t[30], t[27]);
+    fmpz_sub(t[5], t[31], t[28]);
+    unity_zp_ar1(t);
+
+    fmpz_set(t[43], t[6]);
+    fmpz_set(t[44], t[7]);
+    fmpz_set(t[45], t[8]);
+    fmpz_set(t[46], t[9]);
+    fmpz_set(t[47], t[10]);
+
+    fmpz_add(t[50], t[38], t[46]);
+    fmpz_add(t[48], t[50], t[35]);
+    fmpz_add(t[50], t[39], t[47]);
+    fmpz_add(t[49], t[50], t[36]);
+    fmpz_add(t[50], t[35], t[43]);
+    fmpz_add(t[35], t[50], t[32]);
+    fmpz_add(t[50], t[36], t[44]);
+
+    fmpz_add(t[36], t[50], t[33]);
+    fmpz_add(t[37], t[34], t[45]);
+    fmpz_sub(t[0], t[32], t[48]);
+    unity_zp_coeff_set_fmpz(f, 0, t[0]);
+    fmpz_sub(t[0], t[33], t[49]);
+    unity_zp_coeff_set_fmpz(f, 1, t[0]);
+    fmpz_sub(t[0], t[34], t[40]);
+    unity_zp_coeff_set_fmpz(f, 2, t[0]);
+
+    unity_zp_coeff_set_fmpz(f, 5, t[37]);
+    fmpz_add(t[50], t[35], t[38]);
+    fmpz_add(t[51], t[48], t[41]);
+    fmpz_sub(t[0], t[50], t[51]);
+    unity_zp_coeff_set_fmpz(f, 3, t[0]);
+    fmpz_add(t[50], t[36], t[39]);
+    fmpz_add(t[51], t[42], t[49]);
+    fmpz_sub(t[0], t[50], t[51]);
+    unity_zp_coeff_set_fmpz(f, 4, t[0]);
 }
 

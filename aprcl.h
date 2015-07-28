@@ -161,7 +161,10 @@ void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s);
 void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
 
 void unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h);
-void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
+
+FLINT_DLL void unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h);
+FLINT_DLL void unity_zp_mul_inplace(unity_zp f,
+        const unity_zp g, const unity_zp h, fmpz_t * t);
 
 FLINT_DLL void unity_zp_sqr(unity_zp f, const unity_zp g);
 FLINT_DLL void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t);

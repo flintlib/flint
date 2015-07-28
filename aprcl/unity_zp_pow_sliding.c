@@ -64,7 +64,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     for (i = 2; i <= n_pow(2, k - 1); i++)
     {
         unity_zp_init(g_powers[i], f->p, f->exp, f->n);
-        unity_zp_mul(g_powers[i], g_powers[i - 1], temp);
+        unity_zp_mul_inplace(g_powers[i], g_powers[i - 1], temp, t);
     }
 
     unity_zp_set_zero(f);
@@ -105,7 +105,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
                 value += fmpz_tstbit(pow, j + h) << h;
 
             /* f = f * g^value */
-            unity_zp_mul(temp, f, g_powers[(value + 1) / 2]);
+            unity_zp_mul_inplace(temp, f, g_powers[(value + 1) / 2], t);
             unity_zp_swap(temp, f);
 
             /* increase i */

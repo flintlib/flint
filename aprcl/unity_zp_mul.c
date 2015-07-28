@@ -51,3 +51,60 @@ unity_zp_mul(unity_zp f, const unity_zp g, const unity_zp h)
     _unity_zp_reduce_cyclotomic_divmod(f);
 }
 
+void
+unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
+{
+    /* multiplication for p^k = 4 */
+    if (f->p == 2 && f->exp == 2)
+    {
+        unity_zp_mul4(f, g, h, t);
+        return;
+    }
+
+    /* multiplication for p^k = 8 */
+    if (f->p == 2 && f->exp == 3)
+    {
+        unity_zp_mul8(f, g, h, t);
+        return;
+    }
+
+    /* multiplication for p^k = 16 */
+    if (f->p == 2 && f->exp == 4)
+    {
+        unity_zp_mul16(f, g, h, t);
+        return;
+    }
+
+    /* multiplication for p^k = 3 */
+    if (f->p == 3 && f->exp == 1)
+    {
+        unity_zp_mul3(f, g, h, t);
+        return;
+    }
+
+    /* multiplicatiom for p^k = 9 */
+    if (f->p == 3 && f->exp == 2)
+    {
+        unity_zp_mul9(f, g, h, t);
+        return;
+    }
+
+    /* multiplication for p^k = 5 */
+    if (f->p == 5 && f->exp == 1)
+    {
+        unity_zp_mul5(f, g, h, t);
+        return;
+    }
+
+    /* multiplication for p^k = 7 */
+    if (f->p == 7 && f->exp == 1)
+    {
+        unity_zp_mul7(f, g, h, t);
+        return;
+    }
+
+    /* traditional multiplication */
+    unity_zp_mul(f, g, h);      
+}
+
+
