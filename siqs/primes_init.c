@@ -138,10 +138,11 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     qs_inf->small_primes = qsieve_tune[i][3]; /* number of primes to not sieve with */
 
     qs_inf->num_primes = 0; /* start with 0 primes */
-    factor_base = compute_factor_base(&small_factor, qs_inf, num_primes); /* build up FB */
+    factor_base = compute_factor_base(&small_factor, qs_inf, num_primes + qs_inf->ks_primes); /* build up FB */
     if (small_factor)
         return small_factor;
 
+    qs_inf->num_primes = num_primes;
 
     /* calculating parameter related to hypercube */
     fmpz_init(temp);

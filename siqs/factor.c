@@ -40,10 +40,10 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 {
     clock_t start = clock(), diff;
     qs_t qs_inf;
-    mp_limb_t small_factor, factor = 0, t;
+    mp_limb_t small_factor, factor = 0, t, delta;
     ulong exp = 0;
     unsigned char * sieve;
-    slong ncols, nrows, i, j, k = 0, count, relation = 0;
+    slong ncols, nrows, i, j, k = 0, count, relation = 0, num_primes;
     uint64_t * nullrows;
     uint64_t mask;
     flint_rand_t state;
@@ -161,23 +161,12 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
-    qs_inf->sieve_bits = 120;
+    qs_inf->sieve_bits = 64;
 
-    //qs_inf->file = fopen("saved_relations.dat", "w");
+    qs_inf->q_idx = qs_inf->num_primes;
 
     while(1)
     {
-        small_factor = qsieve_compute_q0(qs_inf);
-
-        if (small_factor)
-        {
-
-#if QS_DEBUG
-            flint_printf("found small factor %wu while calculating q0\n", small_factor);
-#endif
-            return small_factor;
-        }
-
         if (qs_inf->s)
             qsieve_re_init_A0(qs_inf);
         else
@@ -187,30 +176,28 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         {
             qsieve_compute_pre_data(qs_inf);
 
-            for (j = 0; j < qs_inf->num_q0; j++)
+            for (j = qs_inf->num_primes; j < qs_inf->num_primes + qs_inf->ks_primes; j++)
             {
 
-                //if ((clock() - start) / 1000.0 > 10.0) return;
+                qs_inf->q_idx  = j;
 
-                qs_inf->q0 = qs_inf->q0_values[j];
                 qsieve_init_poly_first(qs_inf);
-
                 relation += qsieve_collect_relations(qs_inf, sieve);
-                //if (relation) flint_printf("\nrelation = %wd", relation);
 
                 if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
                 {
 
-                  //  diff = clock() - start;
-
-                  //  flint_printf("time taken for set = %f\n", diff / 1000.0);
     /**************************************************************************
         REDUCE MATRIX:
         Perform some light filtering on the matrix
     **************************************************************************/
 
+                    num_primes = qs_inf->num_primes;
+                    qs_inf->num_primes += qs_inf->ks_primes;
+
                     ncols = qs_inf->num_primes + qs_inf->extra_rels;
                     nrows = qs_inf->num_primes;
+
                     reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
 
    /**************************************************************************
@@ -274,16 +261,22 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                         }
                     }
 
-
                     qsieve_linalg_re_init(qs_inf);
+                    qs_inf->num_primes = num_primes;
                     relation = 0;
+
                 }
             }
 
         } while (qsieve_next_A0(qs_inf));
 
-        //flint_printf("factor base increment\n");
-        qsieve_primes_increment(qs_inf, qs_inf->num_primes / 10);
+        delta = qs_inf->num_primes / 10;
+        num_primes = qs_inf->num_primes + delta;
+        qs_inf->num_primes += qs_inf->ks_primes;
+
+        qsieve_primes_increment(qs_inf, delta);
+
+        qs_inf->num_primes = num_primes;
         qsieve_linalg_re_alloc(qs_inf);
         relation = 0;
     }

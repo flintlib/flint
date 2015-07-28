@@ -57,14 +57,14 @@ int main(void)
       fmpz_init_set_ui(n, a);
       fmpz_mul_ui(n, n, b);
 
-      fmpz_set_str(x, "671998030559713968361666935769", 10);
+      fmpz_set_str(x, "282174488599599500573849980909", 10);
 
-      fmpz_set_str(y, "282174488599599500573849980909", 10);
+      fmpz_set_str(y, "671998030559713968361666935769", 10);
 
       fmpz_mul(n, x, y);
       //flint_printf("\n n = %wu * %wu\n", a, b);
-      //fmpz_set_str(n, "673899295409", 10);
-      fmpz_print(n);
+     // fmpz_set_str(n, "673899295409", 10);
+      //fmpz_print(n);
       flint_printf("\n");
 
      // if (i == 0) continue;

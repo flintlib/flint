@@ -44,7 +44,7 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
 
    slong i;
 
-   qs_inf->current_subset = flint_malloc((s + 1) * sizeof(mp_limb_t));
+   qs_inf->curr_subset = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->B_terms = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->A_ind = flint_malloc(s * sizeof(mp_limb_t));
    qs_inf->A0_divp = flint_malloc(s * sizeof(mp_limb_t));

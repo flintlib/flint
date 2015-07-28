@@ -46,7 +46,6 @@ void qsieve_poly_clear(qs_t qs_inf)
        fmpz_clear(qs_inf->B_terms[i]);
    }
 
-   flint_free(qs_inf->q0_values);
    flint_free(qs_inf->B_terms);
    flint_free(qs_inf->A_ind);
    flint_free(qs_inf->A0_divp);
@@ -54,7 +53,7 @@ void qsieve_poly_clear(qs_t qs_inf)
    flint_free(qs_inf->A0_inv);
    flint_free(qs_inf->soln1);
    flint_free(qs_inf->soln2);
-   flint_free(qs_inf->current_subset);
+   flint_free(qs_inf->curr_subset);
 
    if (qs_inf->A_inv2B != NULL)
    {
@@ -66,7 +65,6 @@ void qsieve_poly_clear(qs_t qs_inf)
 
    flint_free(qs_inf->A_inv2B);
 
-   qs_inf->q0_values = NULL;
    qs_inf->B_terms = NULL;
    qs_inf->A_ind = NULL;
    qs_inf->A0_divp = NULL;
@@ -75,7 +73,7 @@ void qsieve_poly_clear(qs_t qs_inf)
    qs_inf->soln1 = NULL;
    qs_inf->soln2 = NULL;
    qs_inf->A_inv2B = NULL;
-   qs_inf->current_subset = NULL;
+   qs_inf->curr_subset = NULL;
 
 }
 

@@ -43,7 +43,7 @@
 #endif
 
 
-#define QS_DEBUG 0
+#define QS_DEBUG 1
 
 typedef struct prime_t
 {
@@ -65,23 +65,6 @@ typedef struct la_col_t  /* matrix column */
 	slong weight;		/* Number of nonzero entries in this column */
 	slong orig;         /* Original relation number */
 } la_col_t;
-
-
-typedef struct relation_t
-{
-    slong num_factor;
-    slong * small;
-    fac_t * factor;
-    fmpz_t Y;
-} relation_t;
-
-typedef struct cycle_t
-{
-    mp_limb_t prime;
-    mp_limb_t next;
-    mp_limb_t count;
-    mp_limb_t data;
-} cycle_t;
 
 typedef struct qs_s
 {
@@ -113,11 +96,8 @@ typedef struct qs_s
    fmpz_t A0;               /* possible candidate for A0 i.e. value of
                                coefficient A excluding the non-factor-base
                                prime  */
-   mp_limb_t * q0_values;   /* value of primes immediately following prime bound
-                               which will be used as factors of current A */
-   mp_limb_t num_q0;        /* total number of q0 */
-   mp_limb_t q0;            /* current non-factor-base prime,
-                               prime factor of A */
+   slong q_idx;             /* offset of q0 in factor base */
+
    fmpz_t B;                /* B values corresponding to current value of A */
    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
@@ -145,24 +125,11 @@ typedef struct qs_s
    slong span;
    slong h;
    slong m;
-   mp_limb_t * current_subset;
+   mp_limb_t * curr_subset;
 
    /***************************************************************************
                        RELATION DATA
    ***************************************************************************/
-
-   FILE * file;      /* file to store partial relation */
-
-   cycle_t * cycle_table;
-   mp_limb_t * cycle_hashtable;
-   mp_limb_t cycle_table_size;
-   mp_limb_t cycle_table_alloc;
-
-   slong component;
-   slong vertices;
-   slong edges;        /* or number of partial relation */
-
-   slong max_relations;
 
    slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
