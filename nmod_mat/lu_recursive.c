@@ -63,7 +63,7 @@ slong
 nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 {
     slong i, j, m, n, r1, r2, n1;
-    nmod_mat_t A0, A1, A00, A01, A10, A11;
+    nmod_mat_t A0, A00, A01, A10, A11;
     slong * P1;
 
     m = A->r;
@@ -82,7 +82,6 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     P1 = flint_malloc(sizeof(slong) * m);
     nmod_mat_window_init(A0, A, 0, 0, m, n1);
-    nmod_mat_window_init(A1, A, 0, n1, m, n);
 
     r1 = nmod_mat_lu(P1, A0, rank_check);
 
@@ -90,7 +89,6 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
     {
         flint_free(P1);
         nmod_mat_window_clear(A0);
-        nmod_mat_window_clear(A1);
         return 0;
     }
 
@@ -141,7 +139,6 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
     nmod_mat_window_clear(A10);
     nmod_mat_window_clear(A11);
     nmod_mat_window_clear(A0);
-    nmod_mat_window_clear(A1);
 
     return r1 + r2;
 }
