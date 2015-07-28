@@ -103,6 +103,13 @@ unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
         return;
     }
 
+    /* multiplication for p^k = 11 */
+    if (f->p == 11 && f->exp == 1)
+    {
+        unity_zp_mul11(f, g, h, t);
+        return;
+    }
+
     /* traditional multiplication */
     unity_zp_mul(f, g, h);      
 }
