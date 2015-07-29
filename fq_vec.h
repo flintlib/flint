@@ -26,6 +26,14 @@
 #ifndef FQ_VEC_H
 #define FQ_VEC_H
 
+#ifdef FQ_VEC_INLINES_C
+#define FQ_VEC_TEMPLATES_INLINE FLINT_DLL
+#define FQ_VEC_INLINE FLINT_DLL
+#else
+#define FQ_VEC_TEMPLATES_INLINE static __inline__
+#define FQ_VEC_INLINE static __inline__
+#endif
+
 #include "fq.h"
 
 #define FQ_VEC_NORM(vec, i, ctx)                    \

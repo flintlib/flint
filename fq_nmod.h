@@ -30,8 +30,10 @@
 
 #ifdef FQ_NMOD_INLINES_C
 #define FQ_NMOD_INLINE FLINT_DLL
+#define FQ_TEMPLATES_INLINE FLINT_DLL
 #else
 #define FQ_NMOD_INLINE static __inline__
+#define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
 #include "nmod_poly.h"

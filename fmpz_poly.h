@@ -891,12 +891,6 @@ FLINT_DLL mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_lim
 FLINT_DLL mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
                                  mp_limb_t n);
 
-FLINT_DLL void _fmpz_poly_evaluate_divconquer(fmpz * res, const fmpz * poly, slong len, 
-                               const fmpz_t x);
-
-FLINT_DLL void fmpz_poly_evaluate_divconquer(fmpz_t res, 
-                              const fmpz_poly_t poly, const fmpz_t x);
-
 /*  Composition  *************************************************************/
 
 FLINT_DLL void _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, slong len1, 

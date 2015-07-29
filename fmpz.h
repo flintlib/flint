@@ -771,12 +771,6 @@ FLINT_DLL int fmpz_moebius_mu(const fmpz_t n);
 
 FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 
-/* Orthogonal polynomials */
-
-FLINT_DLL void fmpz_chebyshev_t(fmpz_t y, ulong n, const fmpz_t x);
-
-FLINT_DLL void fmpz_chebyshev_u(fmpz_t y, ulong n, const fmpz_t x);
-
 #ifdef __cplusplus
 }
 #endif

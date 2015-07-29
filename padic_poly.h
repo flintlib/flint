@@ -26,6 +26,12 @@
 #ifndef PADIC_POLY_H
 #define PADIC_POLY_H
 
+#ifdef PADIC_POLY_INLINES_C
+#define PADIC_POLY_INLINE FLINT_DLL
+#else
+#define PADIC_POLY_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx/* interferes with system includes */
 #include <limits.h>
@@ -67,7 +73,7 @@ typedef padic_poly_struct padic_poly_t[1];
 
     If \code{len} is zero, returns $0$.
  */
-static __inline__ slong _fmpz_vec_ord_p(const fmpz *vec, slong len, const fmpz_t p)
+PADIC_POLY_INLINE slong _fmpz_vec_ord_p(const fmpz *vec, slong len, const fmpz_t p)
 {
     if (len == 0)
     {
@@ -104,7 +110,7 @@ FLINT_DLL void padic_poly_realloc(padic_poly_t f, slong alloc, const fmpz_t p);
 
 FLINT_DLL void padic_poly_fit_length(padic_poly_t f, slong len);
 
-static __inline__
+PADIC_POLY_INLINE
 void _padic_poly_set_length(padic_poly_t poly, slong len)
 {
     if (poly->length > len)
@@ -125,7 +131,7 @@ FLINT_DLL void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p);
 
 FLINT_DLL void padic_poly_reduce(padic_poly_t f, const padic_ctx_t ctx);
 
-static __inline__ 
+PADIC_POLY_INLINE 
 void padic_poly_truncate(padic_poly_t poly, slong n, const fmpz_t p)
 {
     if (poly->length > n)
@@ -142,17 +148,17 @@ void padic_poly_truncate(padic_poly_t poly, slong n, const fmpz_t p)
 
 /*  Polynomial parameters  ***************************************************/
 
-static __inline__ slong padic_poly_degree(const padic_poly_t poly)
+PADIC_POLY_INLINE slong padic_poly_degree(const padic_poly_t poly)
 {
     return poly->length - 1;
 }
 
-static __inline__ slong padic_poly_length(const padic_poly_t poly)
+PADIC_POLY_INLINE slong padic_poly_length(const padic_poly_t poly)
 {
     return poly->length;
 }
 
-static __inline__ slong padic_poly_val(const padic_poly_t poly)
+PADIC_POLY_INLINE slong padic_poly_val(const padic_poly_t poly)
 {
     return poly->val;
 }
@@ -202,13 +208,13 @@ FLINT_DLL int padic_poly_get_fmpz_poly(fmpz_poly_t rop, const padic_poly_t op,
 FLINT_DLL void padic_poly_get_fmpq_poly(fmpq_poly_t rop, 
                               const padic_poly_t op, const padic_ctx_t ctx);
 
-static __inline__ void padic_poly_zero(padic_poly_t poly)
+PADIC_POLY_INLINE void padic_poly_zero(padic_poly_t poly)
 {
     _padic_poly_set_length(poly, 0);
     poly->val = 0;
 }
 
-static __inline__ void padic_poly_one(padic_poly_t poly)
+PADIC_POLY_INLINE void padic_poly_one(padic_poly_t poly)
 {
     if (padic_poly_prec(poly) > 0)
     {
@@ -237,12 +243,12 @@ FLINT_DLL void padic_poly_set_coeff_padic(padic_poly_t f, slong n, const padic_t
 
 FLINT_DLL int padic_poly_equal(const padic_poly_t f, const padic_poly_t g);
 
-static __inline__ int padic_poly_is_zero(const padic_poly_t poly)
+PADIC_POLY_INLINE int padic_poly_is_zero(const padic_poly_t poly)
 {
     return poly->length == 0;
 }
 
-static __inline__ int padic_poly_is_one(const padic_poly_t poly)
+PADIC_POLY_INLINE int padic_poly_is_one(const padic_poly_t poly)
 {
     return (poly->length == 1) && fmpz_is_one(poly->coeffs) && 
            (poly->val == 0);
@@ -351,7 +357,7 @@ FLINT_DLL void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, s
 
 /*  Input and output  ********************************************************/
 
-static __inline__ int padic_poly_debug(const padic_poly_t poly)
+PADIC_POLY_INLINE int padic_poly_debug(const padic_poly_t poly)
 {
     flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ", 
         poly->alloc, poly->length, poly->val, poly->N);
@@ -376,14 +382,14 @@ FLINT_DLL int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong 
 FLINT_DLL int padic_poly_fprint(FILE *file, const padic_poly_t poly, 
                       const padic_ctx_t ctx);
 
-static __inline__ 
+PADIC_POLY_INLINE 
 int _padic_poly_print(const fmpz *poly, slong val, slong len, 
                       const padic_ctx_t ctx)
 {
     return _padic_poly_fprint(stdout, poly, val, len, ctx);
 }
 
-static __inline__ 
+PADIC_POLY_INLINE 
 int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
 {
     return padic_poly_fprint(stdout, poly, ctx);
@@ -398,7 +404,7 @@ FLINT_DLL int padic_poly_fprint_pretty(FILE *file,
                              const padic_poly_t poly, const char *var, 
                              const padic_ctx_t ctx);
 
-static __inline__ 
+PADIC_POLY_INLINE 
 int _padic_poly_print_pretty(FILE *file, 
                              const fmpz *poly, slong val, slong len, 
                              const char *var, 
@@ -407,7 +413,7 @@ int _padic_poly_print_pretty(FILE *file,
     return _padic_poly_fprint_pretty(stdout, poly, val, len, var, ctx);
 }
 
-static __inline__ 
+PADIC_POLY_INLINE 
 int padic_poly_print_pretty(const padic_poly_t poly, const char *var, 
                             const padic_ctx_t ctx)
 {

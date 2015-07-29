@@ -27,6 +27,12 @@
 #ifndef MPF_VEC_H
 #define MPF_VEC_H
 
+#ifdef MPF_VEC_INLINES_C
+#define MPF_VEC_INLINE FLINT_DLL
+#else
+#define MPF_VEC_INLINE static __inline__
+#endif
+
 #include "flint.h"
 
 typedef __mpf_struct mpf;
