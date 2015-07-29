@@ -117,8 +117,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    fmpz_init(res);
    fmpz_init(p);
 
-   fmpz_set_ui(X, i);
-   fmpz_sub_ui(X, X, qs_inf->sieve_size / 2); /* X */
+   fmpz_set_ui(X, i - qs_inf->sieve_size / 2); /* X */
 
    fmpz_mul(Y, X, qs_inf->A);
    fmpz_add(Y, Y, qs_inf->B); /* Y = AX+B */
@@ -131,12 +130,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
    bits -= BITS_ADJUST;
    extra_bits = 0;
 
-   fmpz_set_ui(p, 2); /* divide out by powers of 2 */
-   exp = fmpz_remove(res, res, p);
-
-   extra_bits += exp;
-   small[1] = exp;
-
    if (factor_base[0].p != 1) /* divide out powers of the multiplier */
    {
       fmpz_set_ui(p, factor_base[0].p);
@@ -145,6 +138,12 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
       small[0] = exp;
    }
    else small[0] = 0;
+
+   fmpz_set_ui(p, 2); /* divide out by powers of 2 */
+   exp = fmpz_remove(res, res, p);
+
+   extra_bits += exp;
+   small[1] = exp;
 
    for (j = 2; j < qs_inf->small_primes; j++) /* pull out small primes */
    {
@@ -210,26 +209,10 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
             }
          }
 
+         factor[num_factors].ind = qs_inf->q_idx;
+         factor[num_factors++].exp = 1;
+
          qs_inf->num_factors = num_factors;
-
-       /*  fprintf(qs_inf->file, " %wu", UWORD(1));
-
-         for (j = 0; j < qs_inf->small_primes; j++)
-         {
-             fprintf(qs_inf->file, " %wd ", small[j]);
-         }
-
-         fprintf(qs_inf->file, "%wu ", qs_inf->num_factors);
-
-         for (j = 0; j < num_factors; j++)
-         {
-             fprintf(qs_inf->file, "%wd %wd ", factor[j].ind, factor[j].exp);
-         }
-
-         fmpz_fprint(qs_inf->file, Y);
-         fprintf(qs_inf->file, "\n");
-
-         qs_inf->max_relations++; */
 
          relations += qsieve_insert_relation(qs_inf, Y);  /* Insert the relation in the matrix */
 
@@ -241,38 +224,6 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
          }
 
          goto cleanup;
-      }
-      else
-      {
-        /*  if (fmpz_bits(res) < 32)
-          {
-              prime = fmpz_get_ui(res);
-
-              if (n_is_prime(prime) && prime > qs_inf->q0 && prime <= 64 * factor_base[qs_inf->num_primes - 1].p)
-              {
-                  qsieve_add_to_cycles(qs_inf, UWORD(1), prime, Y);
-
-                  fprintf(qs_inf->file, " %wu", prime);
-
-                  for (j = 0; j < qs_inf->small_primes; j++)
-                  {
-                      fprintf(qs_inf->file, " %wd ", small[j]);
-                  }
-
-                  fprintf(qs_inf->file, "%wu ", qs_inf->num_factors);
-
-                  for (j = 0; j < num_factors; j++)
-                  {
-                      fprintf(qs_inf->file, "%wd %wd ", factor[j].ind, factor[j].exp);
-                  }
-
-                  fmpz_fprint(qs_inf->file, Y);
-
-                  fprintf(qs_inf->file, "\n");
-
-                  qs_inf->max_relations++;
-              }
-          } */
       }
    }
 
@@ -292,16 +243,16 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 {
     slong i = 0, j = 0;
     ulong * sieve2 = (ulong *) sieve;
-    char bits = qs_inf->sieve_bits;
+    unsigned char bits = qs_inf->sieve_bits;
     slong rels = 0;
 
     while (j < qs_inf->sieve_size / sizeof(ulong))
     {
 
 #if FLINT64
-        while ((sieve2[j] & UWORD(0xE0E0E0E0E0E0E0E0)) == 0)
+        while ((sieve2[j] & UWORD(0xC0C0C0C0C0C0C0C0)) == 0)
 #else
-        while ((sieve2[j] & UWORD(0xE0E0E0E0)) == 0)
+        while ((sieve2[j] & UWORD(0xC0C0C0C0)) == 0)
 #endif
         {
             j++;
@@ -331,22 +282,18 @@ slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
 {
     slong relation = 0;
 
-    do
+    while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
-        if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
-            break;
-
         qsieve_compute_C(qs_inf);
-
         qsieve_do_sieving(qs_inf, sieve);
+
         relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
-        if (qs_inf->curr_poly < (1 << qs_inf->s))
-            qsieve_init_poly_next(qs_inf);
-        else
+        if (qs_inf->curr_poly == (1 << qs_inf->s))
             break;
 
-    }while(qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels);
+        qsieve_init_poly_next(qs_inf);
+    }
 
     return relation;
 }

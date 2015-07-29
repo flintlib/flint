@@ -37,6 +37,8 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->max_factors = 30; /* maximum number of factors a relation can have */
 
     /* allow as many dups as relations */
+    i = qs_inf->num_primes;
+    qs_inf->num_primes + qs_inf->ks_primes;
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels + qs_inf->qsort_rels);
     qs_inf->small = flint_malloc(qs_inf->small_primes*sizeof(mp_limb_t));
     qs_inf->factor = flint_malloc(qs_inf->max_factors*sizeof(fac_t));
@@ -46,6 +48,8 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->curr_rel = qs_inf->relation
                      = flint_malloc(2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));
     qs_inf->qsort_arr = flint_malloc(qs_inf->qsort_rels*sizeof(la_col_t *));
+
+    qs_inf->num_primes = i;
 
     for (i = 0; i < qs_inf->buffer_size; i++)
     {
@@ -65,18 +69,45 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;
     qs_inf->num_relations = 0;
+}
 
-    /* initializing graph of partials */
+/* re-initialize all the linear algebra parameter */
 
-    qs_inf->max_relations = 0;
-    qs_inf->vertices = 0;
-    qs_inf->component = 0;
-    qs_inf->edges = 0;
+void qsieve_linalg_re_init(qs_t qs_inf)
+{
+    slong i;
+    qs_inf->curr_rel = qs_inf->relation;
 
-    qs_inf->cycle_hashtable = flint_calloc(1 << 22, sizeof(mp_limb_t));
-    qs_inf->cycle_table_size = 1;
-    qs_inf->cycle_table_alloc = 10000;
-    qs_inf->cycle_table = flint_malloc(qs_inf->cycle_table_alloc * sizeof(cycle_t));
+    for (i = 0; i < qs_inf->buffer_size; i++)
+    {
+        fmpz_init(qs_inf->Y_arr + i);
+        qs_inf->matrix[i].weight = 0;
+        qs_inf->matrix[i].data = NULL;
+    }
 
+    for (i = 0; i < qs_inf->qsort_rels; i++)
+    {
+        qs_inf->unmerged[i].weight = 0;
+        qs_inf->unmerged[i].data = NULL;
+    }
 
+    qs_inf->num_unmerged = 0;
+    qs_inf->columns = 0;
+    qs_inf->num_relations = 0;
+}
+
+/* increase size of different array after factor base increment*/
+
+void qsieve_linalg_re_alloc(qs_t qs_inf)
+{
+    qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels + qs_inf->qsort_rels);
+    qs_inf->matrix = flint_realloc(qs_inf->matrix, (qs_inf->buffer_size + qs_inf->qsort_rels)*sizeof(la_col_t));
+    qs_inf->unmerged = qs_inf->matrix + qs_inf->buffer_size;
+    qs_inf->Y_arr = flint_realloc(qs_inf->Y_arr, qs_inf->buffer_size*sizeof(fmpz));
+    qs_inf->curr_rel = qs_inf->relation
+                     = flint_realloc(qs_inf->relation, 2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));
+
+    qs_inf->prime_count = flint_realloc(qs_inf->prime_count, qs_inf->num_primes*sizeof(slong));
+
+    qsieve_linalg_init(qs_inf);
 }
