@@ -171,6 +171,13 @@ void flint_randinit(flint_rand_t state)
 }
 
 static __inline__
+void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
+{
+   state->__randval = seed1;
+   state->__randval2 = seed2;
+}
+
+static __inline__
 void _flint_rand_init_gmp(flint_rand_t state)
 {
     if (!state->gmp_init)
