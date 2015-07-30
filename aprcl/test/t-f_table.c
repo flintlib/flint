@@ -64,6 +64,8 @@ int main(void)
                 abort();
             }
         }
+
+        _nmod_vec_clear(table);
     }
 
     FLINT_TEST_CLEANUP(state);
