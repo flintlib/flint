@@ -173,7 +173,8 @@ paley_construction(mp_limb_t * q, mp_limb_t n)
 }
 
 static void
-fmpz_mat_set2x2(fmpz_mat_t A, long i, long j, long a, long b, long c, long d)
+fmpz_mat_set2x2(fmpz_mat_t A, slong i, slong j,
+                                  slong a, slong b, slong c, slong d)
 {
     fmpz_set_si(fmpz_mat_entry(A, i, j), a);
     fmpz_set_si(fmpz_mat_entry(A, i, j + 1), b);
