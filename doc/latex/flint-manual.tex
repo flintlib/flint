@@ -964,7 +964,7 @@ are given by \code{UWORD_MAX} and \code{WORD_MAX} respectively.
 % Integers                                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz}
+\chapter{fmpz : Arbitrary precision integers}
 \epigraph{Arbitrary precision integers}{}
 
 \section{Introduction}
@@ -1049,7 +1049,7 @@ We now describe the functions available in the \code{fmpz} module.
 % Integer vectors                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_vec}
+\chapter{fmpz\_vec: Vectors over arbitrary precision integers}
 \epigraph{Vectors over $\Z$}{}
 
 \input{input/fmpz_vec.tex}
@@ -1058,7 +1058,7 @@ We now describe the functions available in the \code{fmpz} module.
 % Integer factorisation                                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_factor}
+\chapter{fmpz\_factor: Factorisation of arbitrary precision integers}
 \epigraph{Factorisation in $\Z$}{}
 
 The \code{fmpz_factor} module is included automatically with
@@ -1071,7 +1071,7 @@ directly.
 % Integer matrices                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_mat}
+\chapter{fmpz\_mat: Matrices over arbitrary precision integers}
 \epigraph{Matrices over $\Z$}{}
 
 \section{Introduction}
@@ -1136,7 +1136,7 @@ A^2 =
 % Integer polynomials                                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_poly}
+\chapter{fmpz\_poly: Polynomials over arbitrary precision integers}
 \epigraph{Polynomials over $\Z$}{}
 
 \section{Introduction}
@@ -1219,7 +1219,7 @@ We now describe the functions available in \code{fmpz_poly}.
 % Integer polynomial factorisation                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_poly\_factor}
+\chapter{fmpz\_poly\_factor: Polynomial factorisation over $\Z$}
 \epigraph{Factorisation of polynomials over $\Z$}{}
 
 The \code{fmpz_poly_factor} module is included automatically with
@@ -1232,7 +1232,7 @@ directly.
 % Rational numbers                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpq}
+\chapter{fmpq: Arbitrary precision rationals}
 \epigraph{Arbitrary-precision rational numbers}{}
 
 \section{Introduction}
@@ -1276,7 +1276,7 @@ canonical form just like the non-underscore functions.
 % Rational matrices                                                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpq\_mat}
+\chapter{fmpq\_mat: Matrices over the rationals}
 \epigraph{Matrices over $\Q$}{}
 
 \section{Introduction}
@@ -1301,7 +1301,7 @@ functions for conversion between rational and integer matrices are provided.
 % Rational polynomials                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpq\_poly}
+\chapter{fmpq\_poly: Polynomials over the rationals}
 \epigraph{Polynomials over $\Q$}{}
 
 \section{Introduction}
@@ -1354,7 +1354,7 @@ terms, and they do not allow their input and output arguments to be aliased.
 % Rational functions                                                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_poly\_q}
+\chapter{fmpz\_poly\_q: Rational functions}
 \epigraph{Rational functions over $\Q$}{}
 
 \section{Introduction}
@@ -1427,7 +1427,7 @@ The output is:
 % Matrices over integer polynomials                                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_poly\_mat}
+\chapter{fmpz\_poly\_mat: Polynomial matrices over $\Z$}
 \epigraph{Matrices over $\mathbf{Z}[x]$}{}
 
 The \code{fmpz_poly_mat_t} data type represents matrices whose
@@ -1491,7 +1491,7 @@ x^2-3*x-1
 % Vectors over Z / nZ for word-sized moduli                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{nmod\_vec}
+\chapter{nmod\_vec: Vectors over $\Z/n\Z$ (small $n$)}
 \epigraph{Vectors over $\Z / n \Z$ for word-sized moduli}{}
 
 \input{input/nmod_vec.tex}
@@ -1500,7 +1500,7 @@ x^2-3*x-1
 % Polynomials over Z / nZ for word-sized moduli                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{nmod\_poly}
+\chapter{nmod\_poly: Polynomials over $\Z/n\Z$ (small $n$)}
 \epigraph{Polynomials over $\Z / n \Z$ for word-sized moduli}{}
 
 \section{Introduction}
@@ -1578,7 +1578,7 @@ We now describe the functions available in \code{nmod_poly}.
 % Factorisation of polynomials over Z / nZ for word-sized moduli               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{nmod\_poly\_factor}
+\chapter{nmod\_poly\_factor: Polynomial factorisation over $\Z/n\Z$ (small $n$)}
 \epigraph{Factorisation of polynomials over $\Z / n \Z$ for word-sized moduli}{}
 
 The \code{nmod_poly_factor} module is included automatically with
@@ -1591,7 +1591,7 @@ directly.
 % Matrices over Z / nZ for word-sized moduli                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{nmod\_mat}
+\chapter{nmod\_mat: Matrices over $\Z/n\Z$ (small $n$)}
 \epigraph{Matrices over $\Z / n \Z$ for word-sized moduli}{}
 
 \section{Introduction}
@@ -1634,7 +1634,7 @@ assume responsibility for normalising all values to the range $[0, n)$.
 % Matrices over integer polynomials mod n                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{nmod\_poly\_mat}
+\chapter{nmod\_poly\_mat: Polynomial matrices over $\Z/n\Z$ (small $n$)}
 \epigraph{Matrices over $\Z / n \Z[x]$ for word-sized moduli}{}
 
 The \code{nmod_poly_mat_t} data type represents matrices whose
@@ -1666,7 +1666,7 @@ whose dimensions are compatible with the given operation.
 % Polynomials over Z/nZ for general moduli                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_mod\_poly}
+\chapter{fmpz\_mod\_poly: Polynomials over $\Z/n\Z$}
 \epigraph{Polynomials over $\Z / n \Z$ for general moduli}{}
 
 \section{Introduction}
@@ -1749,7 +1749,7 @@ We now describe the functions available in \code{fmpz_mod_poly}.
 % Polynomial factorisation over Z/nZ                                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fmpz\_mod\_poly\_factor}
+\chapter{fmpz\_mod\_poly\_factor: Polynomial factorisation over $\Z/n\Z$}
 \epigraph{Factorisation of polynomials over $\Z/n\Z$ for general moduli}{}
 
 The \code{fmpz_mod_poly_factor} module is included automatically when one
@@ -1762,7 +1762,7 @@ includes \code{fmpz_mod_poly.h}. One should not try to include
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Finite Fields (fq)                                                           %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq}
+\chapter{fq: Finite fields}
 \epigraph{Finite fields of arbitrary characteristic}
 
 We represent an element of the finite field $\mathbf{F}_{p^n} \cong
@@ -1783,7 +1783,7 @@ own $f(X)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_vec                                                                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_vec}
+\chapter{fq\_vec: Vectors over finite fields}
 \epigraph{Vectors over finite fields of arbitrary characteristic}
 
 \input{input/fq_vec.tex}
@@ -1791,7 +1791,7 @@ own $f(X)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_mat                                                                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_mat}
+\chapter{fq\_mat: Matrices over finite fields}
 \epigraph{Matrices over finite fields of arbitrary characteristic}
 
 \input{input/fq_mat.tex}
@@ -1799,7 +1799,7 @@ own $f(X)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_poly                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_poly}
+\chapter{fq\_poly: Polynomials over finite fields}
 \epigraph{polynomials over finite fields of arbitrary characteristic}
 
 We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
@@ -1819,7 +1819,7 @@ i.e., it assumes that the fields are generated by the same polynomial.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_poly_factor                                                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_poly\_factor}
+\chapter{fq\_poly\_factor: Polynomial factorisation over finite fields}
 \epigraph{Factorisation of polynomials over finite fields of arbitrary
   characteristic}
 
@@ -1832,7 +1832,7 @@ includes \code{fq_poly.h}. One should not try to include
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_nmod                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_nmod}
+\chapter{fq\_nmod: Finite fields (small representation)}
 \epigraph{Finite fields of word-sized characteristic}
 
 
@@ -1854,7 +1854,7 @@ own $f(X)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_nmod_vec                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_nmod\_vec}
+\chapter{fq\_nmod\_vec: Vectors over finite fields (small representation)}
 \epigraph{Vectors over finite fields of word-sized characteristic}
 
 \input{input/fq_nmod_vec.tex}
@@ -1862,7 +1862,7 @@ own $f(X)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_nmod_mat                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_nmod\_mat}
+\chapter{fq\_nmod\_mat: Matrices over finite fields (small representation)}
 \epigraph{Matrices over finite fields of word-sized characteristic}
 
 \input{input/fq_nmod_mat.tex}
@@ -1870,7 +1870,7 @@ own $f(X)$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_nmod_poly                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_nmod\_poly}
+\chapter{fq\_nmod\_poly: Polynomials over finite fields (small representation)}
 \epigraph{polynomials over finite fields of word-sized characteristic}
 
 We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
@@ -1892,7 +1892,8 @@ polynomial.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_nmod_poly_factor                                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_nmod\_poly\_factor}
+\chapter{fq\_nmod\_poly\_factor: Polynomial factorisation over finite fields
+          (small representation)}
 \epigraph{Factorisation of polynomials over finite fields of
   word-sized characteristic}
 
@@ -1905,7 +1906,7 @@ one includes \code{fq_nmod_poly.h}. One should not try to include
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_zech                                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_zech}
+\chapter{fq\_zech: Finite fields (Zech representation)}
 \epigraph{Finite fields in Zech logarithm representation}
 
 We represent an element of the finite field as a power of a generator
@@ -1931,7 +1932,7 @@ to the time and memory needed to compute the Zech logarithm table.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_zech_vec                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_zech\_vec}
+\chapter{fq\_zech\_vec: Vectors over finite fields (Zech representation)}
 \epigraph{Vectors over finite fields in Zech logarithm representation}
 
 \input{input/fq_zech_vec.tex}
@@ -1939,7 +1940,7 @@ to the time and memory needed to compute the Zech logarithm table.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_zech_mat                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_zech\_mat}
+\chapter{fq\_zech\_mat: Matrices over finite fields (Zech representation)}
 \epigraph{Matrices over finite fields in Zech logarithm representation}
 
 \input{input/fq_zech_mat.tex}
@@ -1947,7 +1948,7 @@ to the time and memory needed to compute the Zech logarithm table.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_zech_poly                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_zech\_poly}
+\chapter{fq\_zech\_poly: Polynomials over finite fields (Zech representation)}
 \epigraph{Polynomials over finite fields in Zech logarithm representation}
 
 We represent a polynomial in $\mathbf{F}_q[X]$ as a \code{struct}
@@ -1968,7 +1969,8 @@ polynomial.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % fq_zech_poly_factor                                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{fq\_zech\_poly\_factor}
+\chapter{fq\_zech\_poly\_factor: Polynomial factorisation over finite fields
+         (Zech representation)}
 \epigraph{Factorisation of polynomials over finite fields in Zech
   logarithm representation}
 
@@ -1982,7 +1984,7 @@ one includes \code{fq_zech_poly.h}. One should not try to include
 % Padic numbers                                                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{padic}
+\chapter{padic: $p$-adic numbers ($\Q_p$)}
 \epigraph{$p$-Adic numbers in $\mathbf{Q}_p$}{}
 
 \section{Introduction}
@@ -2012,28 +2014,28 @@ output variable.
 % Matrices of padic numbers                                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{padic\_mat}
+\chapter{padic\_mat: Matrices over $\Q_p$}
 \input{input/padic_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Polynomials of padic numbers                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{padic\_poly}
+\chapter{padic\_poly: Polynomials over $\Q_p$}
 \input{input/padic_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Finite unramified extensions of the padic numbers                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{qadic}
+\chapter{qadic: Unramified extensions of $\Q_p$}
 \input{input/qadic.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Arithmetic functions                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{arith}
+\chapter{arith: Arithmetic functions}
 \epigraph{Arithmetic functions}{}
 
 \section{Introduction}
@@ -2047,7 +2049,7 @@ combinatorial special number sequences and polynomials.
 % Unsigned single limb arithmetic                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{ulong\_extras}
+\chapter{ulong\_extras: Arithmetic for single word unsigned integers}
 \epigraph{Unsigned single limb arithmetic}{}
 
 \section{Introduction}
@@ -2110,7 +2112,7 @@ The output is:
 % Signed single limb arithmetic                                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{long\_extras}
+\chapter{long\_extras: Arithmetic for single word signed integers}
 \epigraph{Signed single limb arithmetic}{}
 
 \input{input/long_extras.tex}
@@ -2119,7 +2121,7 @@ The output is:
 % Fast Fourier Transforms                                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{fft}
+\chapter{fft: Fast Fourier Transform (integer and polynomial multiplication)}
 \epigraph{Fast Fourier Transforms}{}
 
 \input{input/fft.tex}
@@ -2128,7 +2130,7 @@ The output is:
 % Quadratic Sieve                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{qsieve}
+\chapter{qsieve: Quadratic sieve for integer factorisation}
 \epigraph{Quadratic sieve}{}
 
 \input{input/qsieve.tex}
@@ -2137,7 +2139,7 @@ The output is:
 % Permutations                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{perm}
+\chapter{perm: Permutations}
 \epigraph{Permutations}{}
 
 \input{input/perm.tex}
@@ -2146,7 +2148,7 @@ The output is:
 % longlong.h                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{longlong.h}
+\chapter{longlong.h: Assembly macros for wide integer arithmetic}
 \epigraph{$64$-bit arithmetic}
 
 \input{input/longlong.tex}
@@ -2155,7 +2157,7 @@ The output is:
 % mpn_extras                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{mpn\_extras}
+\chapter{mpn\_extras: Extra function for the GMP mpn layer}
 
 \input{input/mpn_extras.tex}
 
@@ -2163,7 +2165,7 @@ The output is:
 % C++ wrapper                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{flintxx}
+\chapter{flintxx: C++ wrapper}
 \epigraph{C++ wrapper library for FLINT}
 
 \section{Introduction}
