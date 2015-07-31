@@ -602,6 +602,9 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
     function \code{lo <= pi(n) <= hi}. If \code{lo} and \code{hi} point to 
     the same location, the high value will be stored.
 
+    This does a table lookup for small values, then switches over to some
+    proven bounds.
+
     The upper approximation is $1.25506 n / \ln n$, and the 
     lower is $n / \ln n$.  These bounds are due to Rosser and 
     Schoenfeld~\citep{RosSch1962} and valid for $n \geq 17$.
