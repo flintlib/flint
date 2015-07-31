@@ -115,7 +115,7 @@ main(void)
     /* Check truncate(a + b, n) = addseries(a, b, n) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpq_poly_t a, b, c, d, e;
+        fmpq_poly_t a, b, d, e;
         slong n;
 
         fmpq_poly_init(a);
