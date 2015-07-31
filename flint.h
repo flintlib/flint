@@ -105,6 +105,7 @@ FLINT_DLL void flint_cleanup(void);
 
 #if defined(_WIN64) || defined(__mips64)
 #define WORD_FMT "%ll"
+#define WORD_WIDTH_FMT "%*ll"
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
 #define UWORD_MAX ULLONG_MAX
@@ -113,6 +114,7 @@ FLINT_DLL void flint_cleanup(void);
 #define WORD_MIN LLONG_MIN
 #else
 #define WORD_FMT "%l"
+#define WORD_WIDTH_FMT "%*l"
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
 #define UWORD_MAX ULONG_MAX
