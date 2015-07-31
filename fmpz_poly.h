@@ -105,7 +105,13 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
     {
         slong i;
         for (i = newlen; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i); 
+        {
+           _fmpz_demote(poly->coeffs + i); 
+           poly->coeffs[i] = 0; /* 
+                                   we must zero here so creation of sparse 
+                                   polynomials does not become O(n^2)
+                                */
+        }
     }
     poly->length = newlen;
 }
@@ -175,7 +181,13 @@ void fmpz_poly_truncate(fmpz_poly_t poly, slong newlen)
     {
         slong i;
         for (i = newlen; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i);
+        {
+           _fmpz_demote(poly->coeffs + i);
+           poly->coeffs[i] = 0; /*
+                                    we must zero here so that creation of sparse
+                                    polynomials is not O(n^2)
+                                */
+        }
         poly->length = newlen;
         _fmpz_poly_normalise(poly);
     }  

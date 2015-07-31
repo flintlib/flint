@@ -93,8 +93,8 @@ NMOD_MAT_INLINE
 void _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
 {
     mat->mod.n = n;
-    mat->mod.ninv = n_preinvert_limb(n);
     count_leading_zeros(mat->mod.norm, n);
+    invert_limb(mat->mod.ninv, n << mat->mod.norm);
 }
 
 /* Memory management */

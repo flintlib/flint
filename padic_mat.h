@@ -74,6 +74,7 @@ fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
 }
 
 #define padic_mat_val(A) ((A)->val)
+#define padic_mat_prec(A) ((A)->N)
 
 PADIC_MAT_INLINE
 slong padic_mat_get_val(const padic_mat_t A)
@@ -82,7 +83,7 @@ slong padic_mat_get_val(const padic_mat_t A)
 }
 
 PADIC_MAT_INLINE
-slong padic_mat_prec(const padic_mat_t A)
+slong padic_mat_get_prec(const padic_mat_t A)
 {
    return A->N;
 }
