@@ -93,15 +93,16 @@ int main(void)
 
       bits = n_randint(state, FLINT_D_BITS) + 1;
       d = n_randtest_bits(state, bits);
-      
-      dpre = n_precompute_inverse(d);
-      r = n_powmod_precomp(0, 0, d);
+      if (d == 0) d++;
 
-      result = (r1 == r2);
+      dpre = n_precompute_inverse(d);
+      r = n_powmod_precomp(0, 0, d, dpre);
+
+      result = (r == 1 || (d == 1 && r == 0));
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("0^0 != 1 mod %wd\n");
+         flint_printf("0^0 != 1 mod %wd\n", d);
          abort();
       }
    }
