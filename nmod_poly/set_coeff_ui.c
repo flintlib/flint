@@ -38,7 +38,7 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)
 
     if (j + 1 < poly->length) /* interior */
         poly->coeffs[j] = c;
-    else if (j + 1 == poly->length) /* leadiung coeff */
+    else if (j + 1 == poly->length) /* leading coeff */
     {
         if (c != 0)
             poly->coeffs[j] = c;
