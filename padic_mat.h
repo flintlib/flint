@@ -85,7 +85,7 @@ slong padic_mat_get_val(const padic_mat_t A)
 PADIC_MAT_INLINE
 slong padic_mat_get_prec(const padic_mat_t A)
 {
-   return A->prec;
+   return A->N;
 }
 
 PADIC_MAT_INLINE
