@@ -114,20 +114,22 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
             for (j = 0; j < s - 1; j++)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
 
-         /*   for (j = low + 1; j <= high; j += 2)
+            /*
+            for (j = low + 1; j <= high; j += 2)
             {
                 fmpz_mul_ui(temp, prod, factor_base[j].p);
 
                 if (fmpz_cmp(qs_inf->low_bound, temp) <= 0 && fmpz_cmp(temp, qs_inf->upp_bound) <= 0)
                     break;
-            }  */
+            }
+            */
 
             i = 1;
             j = qs_inf->num_primes - 1;
 
             while (i < j)
             {
-                mid = (i + j) / 2;
+                mid = i + (j - i) / 2;
 
                 fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
 
@@ -347,20 +349,22 @@ void qsieve_init_A0(qs_t qs_inf)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
             }
 
-         /*   for (j = low + 1; j < qs_inf->num_primes; j += 2)
+            /*
+            for (j = low + 1; j < qs_inf->num_primes; j += 2)
             {
                 fmpz_mul_ui(temp, prod, factor_base[j].p);
 
                 if (fmpz_cmp(lower_bound, temp) <= 0 && fmpz_cmp(temp, upper_bound) <= 0)
                     break;
-            }  */
+            }
+            */
 
             i = 1;
             j = qs_inf->num_primes - 1;
 
             while (i < j)
             {
-                mid = (i + j) / 2;
+                mid = i + (j - i) / 2;
 
                 fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
 
