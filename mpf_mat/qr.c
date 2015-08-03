@@ -123,5 +123,8 @@ mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
             mpf_mul(mpf_mat_entry(Q, j, k), mpf_mat_entry(Q, j, k), s);
         }
     }
-    mpf_clears(t, s, tmp, eps, '\0');
+    mpf_clear(t);
+    mpf_clear(s);
+    mpf_clear(tmp);
+    mpf_clear(eps);
 }
