@@ -73,7 +73,7 @@ clean:
 	rm -rf test_helpers.o profiler.o
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS)
 	rm -f libflint.a
-	rm -f $(wildcard $(FLINT_LIB)*)
+	rm -f $(wildcard $(FLINT_LIBNAME)*)
 	rm -rf build
 
 distclean: clean
@@ -197,7 +197,7 @@ install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-		cp $(wildcard $(FLINT_LIB)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+		cp $(wildcard $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 		ln -sf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
