@@ -39,7 +39,7 @@
 
 /* taken from FLINT2 */
 
-void qsieve_do_sieving(qs_t qs_inf, char * sieve)
+void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
 {
    slong num_primes = qs_inf->num_primes;
    mp_limb_t * soln1 = qs_inf->soln1;
@@ -93,10 +93,97 @@ void qsieve_do_sieving(qs_t qs_inf, char * sieve)
    }
 }
 
+void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
+{
+    slong b, d1, d2, Bp, B, i, j;
+    slong pind, size;
+    slong num_primes = qs_inf->num_primes;
+    mp_limb_t x, p;
+    mp_limb_t * soln1 = qs_inf->soln1;
+    mp_limb_t * soln2 = qs_inf->soln2;
+    prime_t * factor_base = qs_inf->factor_base;
+
+    memset(sieve, 0, qs_inf->sieve_size + sizeof(ulong));
+
+    mp_limb_t * xr1 = flint_malloc(num_primes * sizeof(mp_limb_t));
+    mp_limb_t * xr2 = flint_malloc(num_primes * sizeof(mp_limb_t));
+
+    for (i = 0; i < num_primes; i++)
+    {
+        xr1[i] = soln1[i];
+        xr2[i] = soln2[i] - xr1[i];
+    }
+
+    for (b = 1; b <= qs_inf->sieve_size / BLOCK_SIZE; b++)
+    {
+        B = b * BLOCK_SIZE;
+
+        for (pind = qs_inf->small_primes; pind < qs_inf->num_primes; pind++)
+        {
+            if (soln2[pind] == 0)
+                continue;
+
+            p = factor_base[pind].p;
+
+            if (p > BLOCK_SIZE)
+                break;
+
+            size = factor_base[pind].size;
+            d1 = xr2[pind];
+            d2 = p - d1;
+            Bp = B - d1;
+
+            for (x = xr1[pind]; x <= Bp; )
+            {
+                sieve[x] += size;
+                x += d1;
+                sieve[x] += size;
+                x += d2;
+            }
+
+            if (x <= B)
+            {
+                sieve[x] += size;
+                x += d1;
+                xr2[pind] = d2;
+            }
+            else {xr2[pind] = d1;}
+
+            xr1[pind] = x;
+        }
+
+        for (; pind < num_primes; pind++)
+        {
+            p = factor_base[pind].p;
+
+            if (soln2[pind] == 0)
+                continue;
+
+            size = factor_base[pind].size;
+
+            if ((x = xr1[pind]) <= B)
+            {
+                sieve[x] += size;
+                x += xr2[pind];
+
+                if (x <= B)
+                {
+                    sieve[x] += size;
+                    x += p - xr2[pind];
+                }
+                else {xr2[pind] = p - xr2[pind];}
+
+                xr1[pind] = x;
+            }
+            else {xr1[pind] = x;}
+        }
+    }
+}
+
 
 /* check position 'i' in sieve array for smoothness */
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve)
+slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 {
    slong bits, exp, extra_bits;
    mp_limb_t modp, prime;
@@ -239,7 +326,7 @@ cleanup:
 
 /* scan sieve array for possible candidate for smooth relations */
 
-slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
+slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
 {
     slong i = 0, j = 0;
     ulong * sieve2 = (ulong *) sieve;
@@ -278,14 +365,14 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve)
 
 /* procedure to call polynomial initialization and sieving procedure */
 
-slong qsieve_collect_relations(qs_t qs_inf, char * sieve)
+slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 {
     slong relation = 0;
 
     while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
         qsieve_compute_C(qs_inf);
-        qsieve_do_sieving(qs_inf, sieve);
+        qsieve_do_sieving2(qs_inf, sieve);
 
         relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
