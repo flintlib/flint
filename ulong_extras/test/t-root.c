@@ -36,13 +36,13 @@ int main(void)
 
    FLINT_TEST_INIT(state);
    
-   flint_printf("n_root....");
+   flint_printf("root....");
    fflush(stdout);
 
 #if FLINT64
    upper_limit = 2642245;
 #else
-   upper_limit = 1626;
+   upper_limit = 1625;
 #endif
 
     /* random n and root */

@@ -65,29 +65,29 @@ elif len(exe) < len(pdb):
 build_fail = 0
 run_ok = 0
 run_fail = 0
-for i in vcd:
-  if i in exe:
-    ef = join(exe_dir, i) + '.exe'
-    try:
-      prc = subprocess.Popen( ef, stdout = subprocess.PIPE,
-        stderr = subprocess.STDOUT, creationflags = 0x08000000 )
-    except Exception as str:
-      print(i, ': ERROR (', str, ')')
-      run_fail += 1
-      continue
-    output = prc.communicate()[0]
-    if prc.returncode:
-      print('ERROR {}'.format(prc.returncode), end=' ')
-      run_fail += 1
-    else:
-      run_ok += 1
-    if output:
-      print(output.decode().replace('\n', ''))
-    else:
-      print()
+for i in exe:
+# if i in exe:
+  ef = join(exe_dir, i) + '.exe'
+  try:
+    prc = subprocess.Popen( ef, stdout = subprocess.PIPE,
+      stderr = subprocess.STDOUT, creationflags = 0x08000000 )
+  except Exception as str:
+    print(i, ': ERROR (', str, ')')
+    run_fail += 1
+    continue
+  output = prc.communicate()[0]
+  if prc.returncode:
+    print('ERROR {}'.format(prc.returncode), end=' ')
+    run_fail += 1
   else:
-    print("Build failure for {0}".format(i))
-    build_fail += 1
+    run_ok += 1
+  if output:
+    print(output.decode().replace('\n', ''))
+  else:
+    print()
+#  else:
+#    print("Build failure for {0}".format(i))
+#    build_fail += 1
 print(build_fail + run_ok + run_fail, "tests:")
 if build_fail > 0:
   print("\t{0} failed to build".format(build_fail))

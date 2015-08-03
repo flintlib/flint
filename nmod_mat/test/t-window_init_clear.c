@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t a, w;
-        slong j, k, r1, r2, c1, c2, n;
+        slong r1, r2, c1, c2, n;
         slong rows = n_randint(state, 100) + 1;
         slong cols = n_randint(state, 100) + 1;
         n = n_randint(state, 50) + 1;

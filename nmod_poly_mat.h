@@ -26,6 +26,12 @@
 #ifndef NMOD_POLY_MAT_H
 #define NMOD_POLY_MAT_H
 
+#ifdef NMOD_POLY_MAT_INLINES_C
+#define NMOD_POLY_MAT_INLINE FLINT_DLL
+#else
+#define NMOD_POLY_MAT_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -50,7 +56,11 @@ typedef struct
 
 typedef nmod_poly_mat_struct nmod_poly_mat_t[1];
 
-#define nmod_poly_mat_entry(mat,i,j) ((mat)->rows[(i)] + (j))
+NMOD_POLY_MAT_INLINE
+nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
 
 /* Memory management *********************************************************/
 
@@ -66,19 +76,19 @@ FLINT_DLL void nmod_poly_mat_clear(nmod_poly_mat_t mat);
 
 /* Basic properties **********************************************************/
 
-static __inline__ slong
+NMOD_POLY_MAT_INLINE slong
 nmod_poly_mat_nrows(const nmod_poly_mat_t mat)
 {
     return mat->r;
 }
 
-static __inline__ slong
+NMOD_POLY_MAT_INLINE slong
 nmod_poly_mat_ncols(const nmod_poly_mat_t mat)
 {
     return mat->c;
 }
 
-static __inline__ mp_limb_t
+NMOD_POLY_MAT_INLINE mp_limb_t
 nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 {
     return mat->modulus;
@@ -93,13 +103,13 @@ FLINT_DLL int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
 
 FLINT_DLL int nmod_poly_mat_is_one(const nmod_poly_mat_t mat);
 
-static __inline__ int
+NMOD_POLY_MAT_INLINE int
 nmod_poly_mat_is_empty(const nmod_poly_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
+NMOD_POLY_MAT_INLINE int
 nmod_poly_mat_is_square(const nmod_poly_mat_t mat)
 {
     return (mat->r == mat->c);

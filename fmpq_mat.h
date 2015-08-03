@@ -26,6 +26,12 @@
 #ifndef FMPQ_MAT_H
 #define FMPQ_MAT_H
 
+#ifdef FMPQ_MAT_INLINES_C
+#define FMPQ_MAT_INLINE FLINT_DLL
+#else
+#define FMPQ_MAT_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -46,12 +52,35 @@ typedef struct
 
 typedef fmpq_mat_struct fmpq_mat_t[1];
 
-#define fmpq_mat_entry(mat,i,j) ((mat)->rows[(i)] + (j))
-#define fmpq_mat_entry_num(mat,i,j) ((fmpz *)(&((*fmpq_mat_entry(mat,i,j)).num)))
-#define fmpq_mat_entry_den(mat,i,j) ((fmpz *)(&((*fmpq_mat_entry(mat,i,j)).den)))
+FMPQ_MAT_INLINE
+fmpq * fmpq_mat_entry(const fmpq_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
 
-#define fmpq_mat_nrows(mat) ((mat)->r)
-#define fmpq_mat_ncols(mat) ((mat)->c)
+FMPQ_MAT_INLINE
+fmpz * fmpq_mat_entry_num(const fmpq_mat_t mat, slong i, slong j)
+{
+   return (fmpz *)(&((*fmpq_mat_entry(mat, i, j)).num));
+}
+
+FMPQ_MAT_INLINE
+fmpz * fmpq_mat_entry_den(const fmpq_mat_t mat, slong i, slong j)
+{
+   return (fmpz *)(&((*fmpq_mat_entry(mat, i, j)).den));
+}
+
+FMPQ_MAT_INLINE
+slong fmpq_mat_nrows(const fmpq_mat_t mat)
+{
+   return mat->r;
+}
+
+FMPQ_MAT_INLINE
+slong fmpq_mat_ncols(const fmpq_mat_t mat)
+{
+   return mat->c;
+}
 
 FLINT_DLL void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols);
 
@@ -116,14 +145,14 @@ FLINT_DLL int fmpq_mat_is_integral(const fmpq_mat_t mat);
 
 FLINT_DLL int fmpq_mat_is_zero(const fmpq_mat_t mat);
 
-static __inline__ int
-fmpq_mat_is_empty(const fmpq_mat_t mat)
+FMPQ_MAT_INLINE
+int fmpq_mat_is_empty(const fmpq_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
-fmpq_mat_is_square(const fmpq_mat_t mat)
+FMPQ_MAT_INLINE
+int fmpq_mat_is_square(const fmpq_mat_t mat)
 {
     return (mat->r == mat->c);
 }

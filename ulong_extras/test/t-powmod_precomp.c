@@ -85,6 +85,28 @@ int main(void)
       mpz_clear(r2_m);
    }
 
+   /* check 0^0 = 1 */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+   {
+      mp_limb_t bits, d, r;
+      double dpre;
+
+      bits = n_randint(state, FLINT_D_BITS) + 1;
+      d = n_randtest_bits(state, bits);
+      if (d == 0) d++;
+
+      dpre = n_precompute_inverse(d);
+      r = n_powmod_precomp(0, 0, d, dpre);
+
+      result = (r == 1 || (d == 1 && r == 0));
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("0^0 != 1 mod %wd\n", d);
+         abort();
+      }
+   }
+
    FLINT_TEST_CLEANUP(state);
    
    flint_printf("PASS\n");

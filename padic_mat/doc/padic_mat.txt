@@ -64,6 +64,24 @@ fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
 
 slong padic_mat_val(const padic_mat_t A)
 
+    Allow access (as L-value or R-value) to \code{val} field of $A$.
+    This function is implemented as a macro.
+
+slong padic_mat_prec(const padic_mat_t A)
+
+    Allow access (as L-value or R-value) to \code{prec} field of $A$.
+    This function is implemented as a macro.
+
+slong padic_mat_get_val(const padic_mat_t A)
+
+    Returns the valuation of the matrix.
+
+slong padic_mat_get_prec(const padic_mat_t A)
+
+    Returns the $p$-adic precision of the matrix.
+
+slong padic_mat_val(const padic_mat_t A)
+
     Returns the valuation of the matrix.
 
     This is implemented as a macro and can be used as an \emph{lvalue} 

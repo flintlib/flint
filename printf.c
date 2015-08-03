@@ -75,7 +75,7 @@ int parse_fmt(int * floating, const char * fmt)
    return args;
 }
 
-size_t flint_printf(const char * str, ...)
+int flint_printf(const char * str, ...)
 {
    va_list ap;
    size_t len = strlen(str);
@@ -85,7 +85,7 @@ size_t flint_printf(const char * str, ...)
    double d;
    ulong wu;
    slong w;
-   int args, floating;
+   int args, floating, width = 0, have_width, digits;
    size_t ret;
 
    /* deal with first substring */
@@ -100,6 +100,19 @@ size_t flint_printf(const char * str, ...)
 
    while (len) /* deal with fmt spec prefixed strings */
    {
+      have_width = 0;
+      if (isdigit((unsigned char) str[1]))
+      {
+         width = atoi(str + 1);
+         have_width = 1;
+         digits = strspn(str + 1, "0123456789");
+         if (str[digits + 1] == 'w')
+         {
+            str += digits;
+            len -= digits;
+         }
+      }
+
       n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
       strncpy(str2, str, n);
       str2[n] = '\0';
@@ -110,22 +123,34 @@ size_t flint_printf(const char * str, ...)
          if (str[2] == 'x')
          {
             wu = (ulong) va_arg(ap, ulong);
-            ret += printf(WORD_FMT "x", wu);
+            if (have_width)
+                ret += printf(WORD_WIDTH_FMT "x", width, wu);
+            else
+                ret += printf(WORD_FMT "x", wu);
             ret += printf("%s", str2 + 3);
          } else if (str[2] == 'u')
          {
             wu = (ulong) va_arg(ap, ulong);
-            ret += printf(WORD_FMT "u", wu);
+            if (have_width)
+                ret += printf(WORD_WIDTH_FMT "u", width, wu);
+            else
+                ret += printf(WORD_FMT "u", wu);
             ret += printf("%s", str2 + 3);
          } else if (str[2] == 'd')
          {
             w = (slong) va_arg(ap, slong);
-            ret += printf(WORD_FMT "d", w);
+            if (have_width)
+                ret += printf(WORD_WIDTH_FMT "d", width, w);
+            else
+                ret += printf(WORD_FMT "d", w);
             ret += printf("%s", str2 + 3);
          } else
          {
             w = (slong) va_arg(ap, slong);
-            ret += printf(WORD_FMT "d", w);
+            if (have_width)
+                ret += printf(WORD_WIDTH_FMT "d", width, w);
+            else
+                ret += printf(WORD_FMT "d", w);
             ret += printf("%s", str2 + 2);
          }
          break;
@@ -169,5 +194,5 @@ size_t flint_printf(const char * str, ...)
    va_end(ap);
    flint_free(str2);
 
-   return ret;
+   return (int) ret;
 }

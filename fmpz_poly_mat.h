@@ -26,6 +26,12 @@
 #ifndef POLY_MAT_H
 #define POLY_MAT_H
 
+#ifdef FMPZ_POLY_MAT_INLINES_C
+#define FMPZ_POLY_MAT_INLINE FLINT_DLL
+#else
+#define FMPZ_POLY_MAT_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -48,7 +54,11 @@ typedef struct
 
 typedef fmpz_poly_mat_struct fmpz_poly_mat_t[1];
 
-#define fmpz_poly_mat_entry(mat,i,j) ((mat)->rows[(i)] + (j))
+FMPZ_POLY_MAT_INLINE
+fmpz_poly_struct * fmpz_poly_mat_entry(const fmpz_poly_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
 
 /* Memory management *********************************************************/
 
@@ -64,14 +74,14 @@ FLINT_DLL void fmpz_poly_mat_clear(fmpz_poly_mat_t mat);
 
 /* Basic properties **********************************************************/
 
-static __inline__ slong
-fmpz_poly_mat_nrows(const fmpz_poly_mat_t mat)
+FMPZ_POLY_MAT_INLINE
+slong fmpz_poly_mat_nrows(const fmpz_poly_mat_t mat)
 {
     return mat->r;
 }
 
-static __inline__ slong
-fmpz_poly_mat_ncols(const fmpz_poly_mat_t mat)
+FMPZ_POLY_MAT_INLINE
+slong fmpz_poly_mat_ncols(const fmpz_poly_mat_t mat)
 {
     return mat->c;
 }
@@ -85,14 +95,14 @@ FLINT_DLL int fmpz_poly_mat_is_zero(const fmpz_poly_mat_t mat);
 
 FLINT_DLL int fmpz_poly_mat_is_one(const fmpz_poly_mat_t mat);
 
-static __inline__ int
-fmpz_poly_mat_is_empty(const fmpz_poly_mat_t mat)
+FMPZ_POLY_MAT_INLINE
+int fmpz_poly_mat_is_empty(const fmpz_poly_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
-fmpz_poly_mat_is_square(const fmpz_poly_mat_t mat)
+FMPZ_POLY_MAT_INLINE
+int fmpz_poly_mat_is_square(const fmpz_poly_mat_t mat)
 {
     return (mat->r == mat->c);
 }

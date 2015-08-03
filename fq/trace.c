@@ -54,7 +54,7 @@ _fq_trace(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
     }
 
     fmpz_zero(rop);
-    for (i = 0; i < d; i++)
+    for (i = 0; i < len; i++)
     {
         fmpz_addmul(rop, op + i, t + i);
     }

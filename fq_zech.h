@@ -28,8 +28,10 @@
 
 #ifdef FQ_ZECH_INLINES_C
 #define FQ_ZECH_INLINE FLINT_DLL
+/* #define FQ_TEMPLATES_INLINE FLINT_DLL */
 #else
 #define FQ_ZECH_INLINE static __inline__
+/* #define FQ_TEMPLATES_INLINE static __inline__ */
 #endif
 
 #include "fq_nmod.h"

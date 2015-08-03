@@ -28,6 +28,12 @@
 #ifndef FMPZ_POLY_FACTOR_H
 #define FMPZ_POLY_FACTOR_H
 
+#ifdef FMPZ_POLY_FACTOR_INLINES_C
+#define FMPZ_POLY_FACTOR_INLINE FLINT_DLL
+#else
+#define FMPZ_POLY_FACTOR_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>

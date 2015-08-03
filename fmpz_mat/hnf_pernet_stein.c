@@ -451,14 +451,13 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
     fmpq_mat_clear(x);
 }
 
-void
-fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
+int
+fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
 {
     slong i, j, m, n, p, r, *P, *pivots;
     fmpz_t d1, d2, g, s, t;
     fmpz_mat_t c, d, B, C, H1, H2, H3;
     nmod_mat_t Amod;
-    flint_rand_t state;
 
     m = fmpz_mat_nrows(A);
     n = fmpz_mat_ncols(A);
@@ -466,24 +465,24 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
     /* find permutation so we can ensure first rows of H are nonsingular */
     P = _perm_init(m);
     pivots = _perm_init(n);
-    flint_randinit(state);
+    
     p = n_randprime(state, NMOD_MAT_OPTIMAL_MODULUS_BITS, 1);
     nmod_mat_init(Amod, m, n, p);
 
     fmpz_mat_get_nmod_mat(Amod, A);
     r = _nmod_mat_rref(Amod, pivots, P);
 
-    flint_randclear(state);
     nmod_mat_clear(Amod);
 
-    /* rank is zero so matrix is zero so HNF is too */
-    if (r == 0)
+    /* rank is not full, so silently fail */
+    if (r < FLINT_MIN(m, n))
     {
-        fmpz_mat_zero(H);
         _perm_clear(P);
         _perm_clear(pivots);
-        return;
+        
+        return 0;
     }
+
     /* if A has full column rank we might wish to use minors based hnf */
     if (r == n && n < 52)
     {
@@ -503,7 +502,7 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
             fmpz_mat_hnf_minors(H, A);
             _perm_clear(P);
             _perm_clear(pivots);
-            return;
+            return 1;
         }
     }
 
@@ -561,9 +560,10 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
     {
         fmpz_mat_init(H1, r - 1, r - 1);
 
-        if (COEFF_IS_MPZ(*g) && C->r > 3)   /* if g is too big, recurse */
-            fmpz_mat_hnf_pernet_stein(H1, C);
-        else                    /* use modulo determinant algorithm to compute HNF of C */
+        if (COEFF_IS_MPZ(*g) && C->r > 3)   /* if g is too big, call another algorithm */
+        {
+            fmpz_mat_hnf(H1, C);
+        }  else                    /* use modulo determinant algorithm to compute HNF of C */
             fmpz_mat_hnf_modular(H1, C, g);
 
         fmpz_mat_clear(B);
@@ -623,4 +623,6 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
     fmpz_mat_clear(B);
     fmpz_mat_clear(c);
     fmpz_mat_clear(d);
+
+    return 1;
 }

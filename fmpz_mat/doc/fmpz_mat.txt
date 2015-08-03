@@ -835,7 +835,7 @@ slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
 
-slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, slong * perm,
+slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
@@ -1035,7 +1035,8 @@ void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
 
-void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
+void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A,
+                                                           flint_rand_t state)
 
     Computes an integer matrix \code{H} such that \code{H} is the unique (row)
     Hermite normal form of the $m\times n$ matrix \code{A}. The algorithm used
@@ -1043,6 +1044,12 @@ void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A)
 
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
+
+    The algorithm may fail to return the correct result with low probability,
+    so \code{fmpz_mat_is_in_hnf} should be called afterwards to check the
+    result. If the routine is called again with the same random state, each
+    call gives an independent chance of computing the correct Hermite Normal
+    Form.
 
 int fmpz_mat_is_in_hnf(const fmpz_mat_t A)
 

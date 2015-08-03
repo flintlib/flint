@@ -448,7 +448,7 @@ int fq_zech_is_invertible_f(fq_zech_t f, const fq_zech_t op,
 
 *******************************************************************************
 
-void fq_zech_trace(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
+void fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Sets \code{rop} to the trace of \code{op}.
 
@@ -459,7 +459,7 @@ void fq_zech_trace(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
     $a$ is equal to $\sum_{i=0}^{d-1} \Sigma^i (a)$, where $d =
     \log_{p} q$.
 
-void fq_zech_norm(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
+void fq_zech_norm(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Computes the norm of \code{op}.
 

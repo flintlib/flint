@@ -26,6 +26,12 @@
 #ifndef ARITH_H
 #define ARITH_H
 
+#ifdef ARITH_INLINES_C
+#define ARITH_INLINE FLINT_DLL
+#else
+#define ARITH_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
@@ -195,7 +201,7 @@ FLINT_DLL void arith_landau_function_vec(fmpz * res, slong len);
 /* Dedekind sums *************************************************************/
 
 #define arith_dedekind_sum_naive fmpq_dedekind_sum_naive
-#define arith_dedekind_sum_coprime_d d_dedekind_sum_coprime
+#define arith_dedekind_sum_coprime_d fmpq_dedekind_sum_coprime_d
 #define arith_dedekind_sum_coprime_large fmpq_dedekind_sum_coprime_large
 #define arith_dedekind_sum_coprime fmpq_dedekind_sum_coprime
 #define arith_dedekind_sum fmpq_dedekind_sum
@@ -214,7 +220,7 @@ typedef struct
 
 typedef trig_prod_struct trig_prod_t[1];
 
-static __inline__
+ARITH_INLINE
 void trig_prod_init(trig_prod_t sum)
 {
     sum->n = 0;

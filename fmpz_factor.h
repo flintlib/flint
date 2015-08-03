@@ -26,6 +26,12 @@
 #ifndef FMPZ_FACTOR_H
 #define FMPZ_FACTOR_H
 
+#ifdef FMPZ_FACTOR_INLINES_C
+#define FMPZ_FACTOR_INLINE FLINT_DLL
+#else
+#define FMPZ_FACTOR_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 

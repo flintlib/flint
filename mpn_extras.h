@@ -26,6 +26,12 @@
 #ifndef MPN_EXTRAS_H
 #define MPN_EXTRAS_H
 
+#ifdef MPN_EXTRAS_INLINES_C
+#define MPN_EXTRAS_INLINE FLINT_DLL
+#else
+#define MPN_EXTRAS_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -64,7 +70,7 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 #ifdef mpn_modexact_1_odd
 #define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
 #else
-static __inline__ int
+MPN_EXTRAS_INLINE int
 flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {
     __mpz_struct s;
@@ -74,7 +80,7 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 }
 #endif
 
-static __inline__
+MPN_EXTRAS_INLINE
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 {
     slong i;
@@ -86,7 +92,7 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
     return 1;
 }
 
-static __inline__
+MPN_EXTRAS_INLINE
 mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 {
     mpn_divrem_1(x, 0, x, xsize, d);
@@ -143,7 +149,7 @@ FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r,
 FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
     int c, mp_bitcnt_t b, mp_ptr tp);
 
-static __inline__
+MPN_EXTRAS_INLINE
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 {
   __mpz_struct str;
@@ -153,7 +159,7 @@ void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
   mpz_rrandomb(&str,state,FLINT_BITS*n);
 }
 
-static __inline__
+MPN_EXTRAS_INLINE
 void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_bitcnt_t n)
 {
   __mpz_struct str;

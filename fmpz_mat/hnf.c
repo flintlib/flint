@@ -50,8 +50,21 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
     else if (b <= 512)
         cutoff = 3;
 
+    /* 
+        TODO: we should call Micciancio-Warisnchi or Pauderis-Storjohann
+        when implemented
+    */
+       
     if (m < cutoff)
         fmpz_mat_hnf_classical(H, A);
-    else
-        fmpz_mat_hnf_pernet_stein(H, A);
+    else {
+        flint_rand_t state;
+
+        flint_randinit(state);
+
+        if (!fmpz_mat_hnf_pernet_stein(H, A, state))
+           fmpz_mat_hnf_classical(H, A); /* fallback if pernet_stein fails */
+
+        flint_randclear(state);
+    }
 }
