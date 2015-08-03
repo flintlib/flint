@@ -70,7 +70,7 @@ main(void)
         }
 
         _mpf_vec_clear(a, len);
-        mpf_clears(res1, res2, res3, '\0');
+        mpf_clears(res1, res2, res3, NULL);
     }
 
     FLINT_TEST_CLEANUP(state);
