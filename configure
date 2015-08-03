@@ -435,7 +435,7 @@ if [ -z "$FLINT_LIB" ]; then
          FLINT_DLL=1;;
       *)
 	 FLINT_LIBNAME="libflint.so"
-         FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_MINOR"
+         FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
          EXTRA_SHARED_FLAGS="-Wl,-soname,libflint.so.$FLINT_MAJOR -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
    esac
 fi
