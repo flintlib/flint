@@ -51,7 +51,7 @@ main(void)
         a = _mpf_vec_init(len, 200);
         _mpf_vec_randtest(a, state, len, 200);
 
-        mpf_inits(res1, res2, res3, '\0');
+        mpf_inits(res1, res2, res3, NULL);
         _mpf_vec_norm2(res1, a, len - 1, 200);
         _mpf_vec_norm2(res2, a + len - 1, 1, 200);
         _mpf_vec_norm2(res3, a, len, 200);
