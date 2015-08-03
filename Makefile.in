@@ -116,7 +116,7 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
 		ldconfig -n "$(CURDIR)"; \
 	else \
-		ln -s "$(CURDIR)/$(FLINT_LIB)" "$(CURDIR)/$(FLINT_LIBNAME)" \
+		ln -s "$(CURDIR)/$(FLINT_LIB)" "$(CURDIR)/$(FLINT_LIBNAME)"; \
 	fi
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
