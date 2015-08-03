@@ -113,7 +113,9 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	$(AT)if [ "$(WANT_NTL)" -ne "1" ]; then \
 	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
 	fi
-	ldconfig -n "$(CURDIR)"
+	$(AT)if [ "$(FLINT_LIBNAME)" -eq "libflint.so" ]; then \
+		ldconfig -n "$(CURDIR)"; \
+	fi
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
