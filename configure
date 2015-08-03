@@ -28,6 +28,7 @@ EXT_MODS=
 EXTRA_BUILD=
 FLINT_DLL=0
 FLINT_LIBNAME=
+FLINT_SOLIB=
 
 # soname version, minor release number and patch number
 
@@ -437,6 +438,7 @@ if [ -z "$FLINT_LIB" ]; then
 	 FLINT_LIBNAME="libflint.so"
          FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
          EXTRA_SHARED_FLAGS="-Wl,-soname,libflint.so.$FLINT_MAJOR -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
+	 FLINT_SOLIB=1
    esac
 fi
 
@@ -689,6 +691,7 @@ echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
 echo "FLINT_LIBNAME=$FLINT_LIBNAME" >> Makefile
+echo "FLINT_SOLIB=$FLINT_SOLIB" >> Makefile
 echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile
