@@ -28,7 +28,7 @@ EXT_MODS=
 EXTRA_BUILD=
 FLINT_DLL=0
 FLINT_LIBNAME=
-FLINT_SOLIB=
+FLINT_SOLIB=0
 
 # soname version, minor release number and patch number
 
