@@ -101,7 +101,7 @@ int flint_printf(const char * str, ...)
    while (len) /* deal with fmt spec prefixed strings */
    {
       have_width = 0;
-      if (isdigit(str[1]))
+      if (isdigit((unsigned char) str[1]))
       {
          width = atoi(str + 1);
          have_width = 1;
