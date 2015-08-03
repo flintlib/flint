@@ -85,7 +85,7 @@ int flint_printf(const char * str, ...)
    double d;
    ulong wu;
    slong w;
-   int args, floating, width, have_width, digits;
+   int args, floating, width = 0, have_width, digits;
    size_t ret;
 
    /* deal with first substring */
