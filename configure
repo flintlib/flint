@@ -27,15 +27,16 @@ EXTENSIONS=
 EXT_MODS=
 EXTRA_BUILD=
 FLINT_DLL=0
-FLINT_SO=0
+FLINT_LIBNAME=
 
 # soname version and minor release number
 
 # flint => soname
-# 2.5.0 => 13.0
+# 2.5.0 => 2.5.0
 
-FLINT_SO_VERSION=13
-FLINT_SO_MINOR=0
+FLINT_MAJOR=2
+FLINT_MINOR=5
+FLINT_PATCH=0
 
 usage()
 {
@@ -424,16 +425,18 @@ echo "Configuring...${MACHINE}-${OS}"
 if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
-         FLINT_LIB="libflint.dylib"
-         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
+         FLINT_LIBNAME="libflint.dylib"
+         FLINT_LIB="libflint-$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH.dylib"
+         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB -compatibility_version $FLINT_MAJOR.$FLINT_MINOR -current_version $FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
       CYGWIN* | MINGW*)
-         FLINT_LIB="libflint.dll"
-         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
+         FLINT_LIBNAME="libflint.dll"
+         FLINT_LIB="libflint-$FLINT_MAJOR.dll"
+         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols -Wl,-soname,libflint-$FLINT_MAJOR.dll.$FLINT_MINOR.$FLINT_PATCH -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
          FLINT_DLL=1;;
       *)
-         FLINT_LIB="libflint.so.$FLINT_SO_VERSION"
-         EXTRA_SHARED_FLAGS="-Wl,-rpath,$GMP_LIB_DIR -Wl,-soname,libflint.so.$FLINT_SO_VERSION.$FLINT_SO_MINOR -Wl,-rpath,$MPFR_LIB_DIR"
-	 FLINT_SO=1;;
+	 FLINT_LIBNAME="libflint.so"
+         FLINT_LIB="libflint-$FLINT_MAJOR.so.$FLINT_MINOR"
+         EXTRA_SHARED_FLAGS="-Wl,-soname,libflint-$FLINT_MAJOR.so.$FLINT_MINOR.$FLINT_PATCH -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
    esac
 fi
 
@@ -685,7 +688,7 @@ echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
-echo "FLINT_SO=$FLINT_SO" >> Makefile
+echo "FLINT_LIBNAME=$FLINT_LIBNAME" >> Makefile
 echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile

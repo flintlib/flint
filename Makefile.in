@@ -198,9 +198,7 @@ install: library
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 		cp $(wildcard $(FLINT_LIB)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-		if [ "$(FLINT_SO)" -eq "1" ]; then \
-			ln -sf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/libflint.so"; \
-		fi \
+		ln -sf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
