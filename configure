@@ -29,12 +29,12 @@ EXTRA_BUILD=
 FLINT_DLL=0
 FLINT_LIBNAME=
 
-# soname version and minor release number
+# soname version, minor release number and patch number
 
 # flint => soname
-# 2.5.0 => 2.5.0
+# 2.5.0 => 13.5.0
 
-FLINT_MAJOR=2
+FLINT_MAJOR=13
 FLINT_MINOR=5
 FLINT_PATCH=0
 
@@ -435,8 +435,8 @@ if [ -z "$FLINT_LIB" ]; then
          FLINT_DLL=1;;
       *)
 	 FLINT_LIBNAME="libflint.so"
-         FLINT_LIB="libflint-$FLINT_MAJOR.so.$FLINT_MINOR"
-         EXTRA_SHARED_FLAGS="-Wl,-soname,libflint-$FLINT_MAJOR.so.$FLINT_MINOR.$FLINT_PATCH -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
+         FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_MINOR"
+         EXTRA_SHARED_FLAGS="-Wl,-soname,libflint.so.$FLINT_MAJOR -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
    esac
 fi
 
