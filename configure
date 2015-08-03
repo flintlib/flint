@@ -27,6 +27,15 @@ EXTENSIONS=
 EXT_MODS=
 EXTRA_BUILD=
 FLINT_DLL=0
+FLINT_SO=0
+
+# soname version and minor release number
+
+# flint => soname
+# 2.5.0 => 13.0
+
+FLINT_SO_VERSION=13
+FLINT_SO_MINOR=0
 
 usage()
 {
@@ -422,8 +431,9 @@ if [ -z "$FLINT_LIB" ]; then
          EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
          FLINT_DLL=1;;
       *)
-         FLINT_LIB="libflint.so"
-         EXTRA_SHARED_FLAGS="-Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
+         FLINT_LIB="libflint.so.$FLINT_SO_VERSION"
+         EXTRA_SHARED_FLAGS="-Wl,-rpath,$GMP_LIB_DIR -Wl,-soname,libflint.so.$FLINT_SO_VERSION.$FLINT_SO_MINOR -Wl,-rpath,$MPFR_LIB_DIR"
+	 FLINT_SO=1;;
    esac
 fi
 
@@ -675,6 +685,7 @@ echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
+echo "FLINT_SO=$FLINT_SO" >> Makefile
 echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile
