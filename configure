@@ -332,19 +332,19 @@ KERNEL=`uname`
 if [ -z "$BUILD" ]; then
    ARCH=`uname -m`
 
-   if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
+   if [ "$(uname | cut -d_ -f1)" = "MSYS" ]; then
+      if [ "$(ARCH)" = "x86_64" ]; then
+         OS="MINGW64"
+      else
+	 OS="MINGW32"
+      fi
+   elif [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
       if [ "$ABI" = "64" ]; then
          OS="MINGW64"
       else
          OS="MINGW32"
       fi
    elif [ "$(uname | cut -d_ -f1)" = "MINGW64" ]; then
-      if [ "$ABI" = "64" ]; then
-         OS="MINGW64"
-      else
-         OS="MINGW32"
-      fi
-   elif [ "$(uname | cut -d_ -f1)" = "MSYS" ]; then
       if [ "$ABI" = "64" ]; then
          OS="MINGW64"
       else

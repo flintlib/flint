@@ -58,7 +58,7 @@ main(void)
         {
             for (j = 0; j < n; j++)
             {
-                if (mpf_cmp_ui(mpf_mat_entry(A, i, j), 0) != 0)
+                if (flint_mpf_cmp_ui(mpf_mat_entry(A, i, j), 0) != 0)
                 {
                     flint_printf("FAIL: nonzero entry\n");
                     abort();

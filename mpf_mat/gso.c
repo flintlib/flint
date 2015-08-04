@@ -58,7 +58,7 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
     mpf_init2(tmp, B->prec);
     mpf_init2(eps, B->prec);
     exp = ceil((A->prec) / 64.0) * 64;
-    mpf_set_ui(eps, 1);
+    flint_mpf_set_ui(eps, 1);
     mpf_div_2exp(eps, eps, exp);
 
     for (k = 0; k < A->c; k++)
@@ -70,10 +70,10 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
         flag = 1;
         while (flag)
         {
-            mpf_set_ui(t, 0);
+            flint_mpf_set_ui(t, 0);
             for (i = 0; i < k; i++)
             {
-                mpf_set_ui(s, 0);
+                flint_mpf_set_ui(s, 0);
                 for (j = 0; j < A->r; j++)
                 {
                     mpf_mul(tmp, mpf_mat_entry(B, j, i),
@@ -89,7 +89,7 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
                             tmp);
                 }
             }
-            mpf_set_ui(s, 0);
+            flint_mpf_set_ui(s, 0);
             for (j = 0; j < A->r; j++)
             {
                 mpf_mul(tmp, mpf_mat_entry(B, j, k), mpf_mat_entry(B, j, k));
@@ -100,18 +100,18 @@ mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
             if (mpf_cmp(s, t) < 0)
             {
                 if (mpf_cmp(s, eps) < 0)
-                    mpf_set_ui(s, 0);
+                    flint_mpf_set_ui(s, 0);
                 else
                     flag = 1;
             }
         }
         mpf_sqrt(s, s);
-        if (mpf_cmp_ui(s, 0) != 0)
+        if (flint_mpf_cmp_ui(s, 0) != 0)
             mpf_ui_div(s, 1, s);
         for (j = 0; j < A->r; j++)
         {
             mpf_mul(mpf_mat_entry(B, j, k), mpf_mat_entry(B, j, k), s);
         }
     }
-    mpf_clears(t, s, tmp, eps, '\0');
+    mpf_clears(t, s, tmp, eps, NULL);
 }

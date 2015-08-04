@@ -138,7 +138,7 @@ FUNC_HEAD
             if (babai_ok == -1)
             {
                 flint_free(alpha);
-                mpf_clears(ctt, tmp, rtmp, '\0');
+                mpf_clears(ctt, tmp, rtmp, NULL);
                 mpf_mat_clear(mu);
                 mpf_mat_clear(r);
                 mpf_mat_clear(appB);
@@ -325,7 +325,7 @@ FUNC_HEAD
 #endif
 
         flint_free(alpha);
-        mpf_clears(ctt, tmp, rtmp, '\0');
+        mpf_clears(ctt, tmp, rtmp, NULL);
         mpf_mat_clear(mu);
         mpf_mat_clear(r);
         mpf_mat_clear(appB);
@@ -423,7 +423,7 @@ FUNC_HEAD
             if (babai_ok == -1)
             {
                 flint_free(alpha);
-                mpf_clears(ctt, tmp, rtmp, '\0');
+                mpf_clears(ctt, tmp, rtmp, NULL);
                 mpf_mat_clear(mu);
                 mpf_mat_clear(r);
                 if (fl->rt == Z_BASIS)
@@ -610,7 +610,7 @@ FUNC_HEAD
 #endif
 
         flint_free(alpha);
-        mpf_clears(ctt, tmp, rtmp, '\0');
+        mpf_clears(ctt, tmp, rtmp, NULL);
         mpf_mat_clear(mu);
         mpf_mat_clear(r);
         if (fl->rt == Z_BASIS)

@@ -34,7 +34,7 @@ _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, mp_bitcnt_t prec)
     mpf_t tmp;
     mpf_init2(tmp, prec);
 
-    mpf_set_ui(res, 0);
+    flint_mpf_set_ui(res, 0);
     for (i = 0; i < len; i++)
     {
         mpf_mul(tmp, vec + i, vec + i);

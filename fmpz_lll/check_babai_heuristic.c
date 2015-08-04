@@ -184,7 +184,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                     {
                         mpf_set(tmp, mpf_mat_entry(mu, kappa, j));
                         mpf_set_d(rtmp, 0.5);
-                        if (mpf_cmp_ui(tmp, 0) < 0)
+                        if (flint_mpf_cmp_ui(tmp, 0) < 0)
                         {
                             mpf_sub(tmp, tmp, rtmp);
                             mpf_ceil(tmp, tmp);
@@ -409,7 +409,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                     {
                         mpf_set(tmp, mpf_mat_entry(mu, kappa, j));
                         mpf_set_d(rtmp, 0.5);
-                        if (mpf_cmp_ui(tmp, 0) < 0)
+                        if (flint_mpf_cmp_ui(tmp, 0) < 0)
                         {
                             mpf_sub(tmp, tmp, rtmp);
                             mpf_ceil(tmp, tmp);
