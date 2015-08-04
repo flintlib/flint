@@ -1,4 +1,4 @@
-'''
+﻿'''
 Set up Visual Sudio to build a specified MPIR configuration
 
 Copyright (C) 2011, 2012, 2013, 2014 Brian Gladman
@@ -21,9 +21,9 @@ from time import sleep
 # for script debugging
 debug = False
 # what to build
-build_lib = False
-build_dll = False
-build_tests = True
+build_lib = True
+build_dll = True
+build_tests = False
 build_profiles = False
 
 # add user choice

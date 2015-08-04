@@ -331,7 +331,6 @@ MA 02111-1307, USA. */
 #define access _access
 #define strcasecmp _stricmp
 #define strncasecmp	_strnicmp
-#define snprintf _snprintf
 #define alloca _alloca
 #define HAVE_STRCASECMP		1
 #define HAVE_STRNCASECMP	1
