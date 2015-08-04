@@ -71,16 +71,22 @@ static const double inv_table[] = {
 
 static const mp_limb_t max_base[] = { 
 #ifdef FLINT64
-                        UWORD(0), UWORD_MAX, 4294967296, 2642245 ,65536,
-                        7131, 1625, 565, 256, 138, 84, 56, 40, 30,
-                        23, 19, 16, 13, 11, 10, 9, 8, 7, 6, 6, 5,
-                        5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 
-                        3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
-                        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 
+                        UWORD(0), UWORD_MAX, UWORD(4294967296), UWORD(2642245), UWORD(65536),
+                        UWORD(7131), UWORD(1625), UWORD(565), UWORD(256), UWORD(138), UWORD(84),
+                        UWORD(56), UWORD(40), UWORD(30), UWORD(23), UWORD(19), UWORD(16),
+                        UWORD(13), UWORD(11), UWORD(10), UWORD(9), UWORD(8), UWORD(7),
+                        UWORD(6), UWORD(6), UWORD(5), UWORD(5), UWORD(5), UWORD(4), UWORD(4),
+                        UWORD(4), UWORD(4), UWORD(4), UWORD(3), UWORD(3), UWORD(3), UWORD(3),
+                        UWORD(3), UWORD(3), UWORD(3), UWORD(3), UWORD(2), UWORD(2), UWORD(2),
+                        UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2),
+                        UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2),
+                        UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2)
 #else
-                        UWORD(0), 4294967295,  65535, 1625, 255,  84,  40,
-                        23, 15, 11, 9, 7, 6, 5, 4, 4, 3, 3, 3, 3, 3,
-                        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+                        UWORD(0), UWORD(4294967295),  UWORD(65535), UWORD(1625), UWORD(255), 
+                        UWORD(84),  UWORD(40), UWORD(23), UWORD(15), UWORD(11), UWORD(9),
+                        UWORD(7), UWORD(6), UWORD(5), UWORD(4), UWORD(4), UWORD(3), UWORD(3),
+                        UWORD(3), UWORD(3), UWORD(3), UWORD(2), UWORD(2), UWORD(2), UWORD(2),
+                        UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2), UWORD(2)
 #endif
                                                         };
 
@@ -139,9 +145,9 @@ n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
     while (currval <= n)
     {
         (base) += 1;
-        if (base == upper_limit)
-            goto final;
         currval = n_pow(base, root);
+        if (base == upper_limit)
+            break;
     }
 
     while (currval > n)
