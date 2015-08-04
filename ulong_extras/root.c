@@ -69,14 +69,14 @@ static const double inv_table[] = {
 
 static const mp_limb_t max_base[] = { 
 #ifdef FLINT64
-                        0, UWORD_MAX, 4294967296, 2642245 ,65536,
+                        UWORD(0), UWORD_MAX, 4294967296, 2642245 ,65536,
                         7131, 1625, 565, 256, 138, 84, 56, 40, 30,
                         23, 19, 16, 13, 11, 10, 9, 8, 7, 6, 6, 5,
                         5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 
                         3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
                         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 
 #else
-                        0, 4294967295,  65535, 1625, 255,  84,  40,
+                        UWORD(0), 4294967295,  65535, 1625, 255,  84,  40,
                         23, 15, 11, 9, 7, 6, 5, 4, 4, 3, 3, 3, 3, 3,
                         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 #endif
@@ -121,7 +121,7 @@ n_root(mp_limb_t n, mp_limb_t root)
 
     base = x;
 
-    if (base > upper_limit)
+    if (base >= upper_limit)
         base = upper_limit - 1;
 
     currval = n_pow(base, root);
