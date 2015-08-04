@@ -70,7 +70,7 @@ main(void)
         {
             for (k = 0; k < cols; k++)
             {
-                if (mpf_cmp_ui(mpf_mat_entry(B, j, k), 3 * j + 7 * k) != 0)
+                if (flint_mpf_cmp_ui(mpf_mat_entry(B, j, k), 3 * j + 7 * k) != 0)
                 {
                     flint_printf("FAIL: j = %wd, k = %wd\n", j, k);
                     fmpz_mat_print_pretty(A);

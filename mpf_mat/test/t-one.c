@@ -58,7 +58,7 @@ main(void)
         {
             for (j = 0; j < n; j++)
             {
-                if (i == j && mpf_cmp_ui(mpf_mat_entry(A, i, j), 1) != 0)
+                if (i == j && flint_mpf_cmp_ui(mpf_mat_entry(A, i, j), 1) != 0)
                 {
                     flint_printf("FAIL: entry not one\n");
                     abort();

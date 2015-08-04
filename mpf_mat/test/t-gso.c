@@ -71,9 +71,9 @@ main(void)
 
             mpf_sub_ui(dot, norm, 1);
             mpf_abs(dot, dot);
-            mpf_set_ui(tmp, 1);
+            flint_mpf_set_ui(tmp, 1);
             mpf_div_2exp(tmp, tmp, prec - 3);
-            if (mpf_cmp_ui(norm, 0) != 0 && mpf_cmp(dot, tmp) > 0)
+            if (flint_mpf_cmp_ui(norm, 0) != 0 && mpf_cmp(dot, tmp) > 0)
             {
                 flint_printf("FAIL:\n");
                 flint_printf("A:\n");
@@ -91,7 +91,7 @@ main(void)
             mpf_clear(norm);
             for (k = j + 1; k < n; k++)
             {
-                mpf_set_ui(dot, 0);
+                flint_mpf_set_ui(dot, 0);
                 for (l = 0; l < m; l++)
                 {
                     mpf_mul(tmp, mpf_mat_entry(A, l, j),
@@ -99,7 +99,7 @@ main(void)
                     mpf_add(dot, dot, tmp);
                 }
 
-                mpf_set_ui(tmp, 1);
+                flint_mpf_set_ui(tmp, 1);
                 mpf_div_2exp(tmp, tmp, prec);
                 mpf_abs(dot, dot);
                 if (mpf_cmp(dot, tmp) > 0)
