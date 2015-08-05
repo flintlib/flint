@@ -23,10 +23,14 @@
 
 ******************************************************************************/
 
-#include "fmpq_mat.h"
+#include "fq_nmod_mat.h"
 
-void
-fmpq_mat_window_clear(fmpq_mat_t window)
-{
-    flint_free(window->rows);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq_mod
+#define CAP_T FQ_NMOD
+#include "fq_mat_templates/concat_vertical.c"
+#undef CAP_T
+#undef T

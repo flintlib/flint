@@ -23,10 +23,14 @@
 
 ******************************************************************************/
 
-#include "fmpq_mat.h"
+#include "fq_zech_mat.h"
 
-void
-fmpq_mat_window_clear(fmpq_mat_t window)
-{
-    flint_free(window->rows);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_mat_templates/test/t-concat_horizontal.c"
+#undef CAP_T
+#undef T
