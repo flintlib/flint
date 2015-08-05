@@ -117,8 +117,8 @@ slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T,
 
     if (lenB == 1)
     {
-        G[0] = B[0];
-        T[0] = 1;
+        fmpz_set(G + 0, B + 0);
+        fmpz_set_ui(T, 1);
         lenG = 1;
         lenS = 0;
         lenT = 1;
