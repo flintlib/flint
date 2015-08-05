@@ -29,7 +29,7 @@
 #undef T
 #endif
 
-#define T fq_mod
+#define T fq_nmod
 #define CAP_T FQ_NMOD
 #include "fq_mat_templates/concat_vertical.c"
 #undef CAP_T
