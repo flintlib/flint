@@ -28,6 +28,5 @@
 void
 fmpz_mat_window_clear(fmpz_mat_t window)
 {
-    if (window->r > 0)
-        flint_free(window->rows);
+    flint_free(window->rows);
 }
