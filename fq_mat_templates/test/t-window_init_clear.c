@@ -48,7 +48,7 @@ main(void)
     	TEMPLATE(T, ctx_t) ctx;
 
     	TEMPLATE(T, mat_t) a, w;
-        slong j, k, r1, r2, c1, c2;
+        slong j, r1, r2, c1, c2;
         slong rows = n_randint(state, 100) + 1;
         slong cols = n_randint(state, 100) + 1;
 
