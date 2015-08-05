@@ -57,7 +57,7 @@ unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t)
 /*
     Computes f = g * g for p = 2^3. 
     g must be reduced by F_8 cyclotomic polynomial.
-    t is the memory for fmpz_t; size of t must be > 3.
+    t is the memory for fmpz_t; size of t must be > 16.
     Resulting f reduced by F_8 cyclotomic polynomial.
 */
 void
@@ -110,61 +110,82 @@ unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t)
     unity_zp_coeff_set_fmpz(f, 3, t[13]);   /*  y3 = d2 mod n   */
 }
 
+/*
+    Computes f = g * g for p = 2^4. 
+    g must be reduced by F_16 cyclotomic polynomial.
+    t is the memory for fmpz_t; size of t must be > 44.
+    Resulting f reduced by F_16 cyclotomic polynomial.
+*/
 void
 unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
 {
-    fmpz_mod_poly_get_coeff_fmpz(t[30], g->poly, 0);
-    fmpz_mod_poly_get_coeff_fmpz(t[31], g->poly, 1);
-    fmpz_mod_poly_get_coeff_fmpz(t[32], g->poly, 2);
-    fmpz_mod_poly_get_coeff_fmpz(t[33], g->poly, 3);
-    fmpz_mod_poly_get_coeff_fmpz(t[34], g->poly, 4);
-    fmpz_mod_poly_get_coeff_fmpz(t[35], g->poly, 5);
-    fmpz_mod_poly_get_coeff_fmpz(t[36], g->poly, 6);
-    fmpz_mod_poly_get_coeff_fmpz(t[37], g->poly, 7);
+    ulong i;
 
-    fmpz_add(t[0], t[30], t[34]);
-    fmpz_add(t[1], t[31], t[35]);
-    fmpz_add(t[2], t[32], t[36]);
-    fmpz_add(t[3], t[33], t[37]);
-    fmpz_sub(t[4], t[30], t[34]);
-    fmpz_sub(t[5], t[31], t[35]);
-    fmpz_sub(t[6], t[32], t[36]);
-    fmpz_sub(t[7], t[33], t[37]);
+    /*
+        g = (x0, x1, x2, x3, x4, x5, x6, x7);
+        f = (y0, y1, y2, y3, y4, y5, y6, y7);
 
+        x0 = t[30]; x1 = t[31]; x2 = t[32]; x3 = t[33];
+        x4 = t[34]; x5 = t[35]; x6 = t[37];
+
+        a0 = t[0]; a1 = t[1]; a2 = t[2]; a3 = t[3];
+        b0 = t[4]; b1 = t[5]; b2 = t[6]; b3 = t[7];
+        c0 = t[8]; c1 = t[9]; c2 = t[10]; c3 = t[11];
+        c4 = t[12]; c5 = t[13]; c6 = t[14];
+
+        d0 = t[38]; d1 = t[39]; d2 = t[40]; d3 = t[41];
+        d4 = t[42]; d5 = t[43]; d6 = t[44]; d7 = t[45].
+    */
+    for (i = 0; i < 8; i++)
+        fmpz_mod_poly_get_coeff_fmpz(t[30 + i], g->poly, i);
+
+    fmpz_add(t[0], t[30], t[34]);           /*  a0 = x0 + x4    */
+    fmpz_add(t[1], t[31], t[35]);           /*  a1 = x1 + x5    */
+    fmpz_add(t[2], t[32], t[36]);           /*  a2 = x2 + x6    */
+    fmpz_add(t[3], t[33], t[37]);           /*  a3 = x3 + x7    */
+    fmpz_sub(t[4], t[30], t[34]);           /*  b0 = x0 - x4    */
+    fmpz_sub(t[5], t[31], t[35]);           /*  b1 = x1 - x5    */
+    fmpz_sub(t[6], t[32], t[36]);           /*  b2 = x2 - x6    */
+    fmpz_sub(t[7], t[33], t[37]);           /*  b3 = x3 - x7    */
+
+    /* 
+        apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
+        store result in (c0, .. , c6)
+    */
     unity_zp_ar2(t);
 
-    fmpz_set(t[38], t[8]);
-    fmpz_set(t[39], t[9]);
-    fmpz_set(t[40], t[10]);
-    fmpz_set(t[41], t[11]);
-    fmpz_set(t[42], t[12]);
-    fmpz_set(t[43], t[13]);
-    fmpz_set(t[44], t[14]);
+    /* set d_i = c_i */
+    for (i = 8; i < 15; i++)
+        fmpz_set(t[30 + i], t[i]);
 
-    fmpz_add(t[0], t[30], t[30]);
-    fmpz_add(t[1], t[31], t[31]);
-    fmpz_add(t[2], t[32], t[32]);
-    fmpz_add(t[3], t[33], t[33]);
-    fmpz_set(t[4], t[34]);
-    fmpz_set(t[5], t[35]);
-    fmpz_set(t[6], t[36]);
-    fmpz_set(t[7], t[37]);
+    fmpz_add(t[0], t[30], t[30]);           /*  a0 = x0 + x0    */
+    fmpz_add(t[1], t[31], t[31]);           /*  a1 = x1 + x1    */
+    fmpz_add(t[2], t[32], t[32]);           /*  a2 = x2 + x2    */
+    fmpz_add(t[3], t[33], t[33]);           /*  a3 = x3 + x3    */
+    fmpz_set(t[4], t[34]);                  /*  set b0 = x4     */ 
+    fmpz_set(t[5], t[35]);                  /*  set b1 = x5     */
+    fmpz_set(t[6], t[36]);                  /*  set b2 = x6     */
+    fmpz_set(t[7], t[37]);                  /*  set b3 = x7     */
     
+    /* 
+        apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
+        store result in (c0, .. , c6)
+    */
     unity_zp_ar2(t);
 
-    fmpz_sub(t[16], t[38], t[12]);
-    unity_zp_coeff_set_fmpz(f, 0, t[16]);
-    fmpz_sub(t[16], t[39], t[13]);
-    unity_zp_coeff_set_fmpz(f, 1, t[16]);
-    fmpz_sub(t[16], t[40], t[14]);
-    unity_zp_coeff_set_fmpz(f, 2, t[16]);
-    unity_zp_coeff_set_fmpz(f, 3, t[41]);
-    fmpz_add(t[16], t[42], t[8]);
-    unity_zp_coeff_set_fmpz(f, 4, t[16]);
-    fmpz_add(t[16], t[43], t[9]);
-    unity_zp_coeff_set_fmpz(f, 5, t[16]);
-    fmpz_add(t[16], t[44], t[10]);
-    unity_zp_coeff_set_fmpz(f, 6, t[16]);
-    unity_zp_coeff_set_fmpz(f, 7, t[11]);
+    fmpz_sub(t[16], t[38], t[12]);          /*  d7 = d0 - c4    */
+    unity_zp_coeff_set_fmpz(f, 0, t[16]);   /*  y0 = d7 mod n   */
+    fmpz_sub(t[16], t[39], t[13]);          /*  d7 = d1 - c5    */
+    unity_zp_coeff_set_fmpz(f, 1, t[16]);   /*  y1 = d7 mod n   */
+    fmpz_sub(t[16], t[40], t[14]);          /*  d7 = d2 - c6    */
+    unity_zp_coeff_set_fmpz(f, 2, t[16]);   /*  y2 = d7 mod n   */
+    unity_zp_coeff_set_fmpz(f, 3, t[41]);   /*  y3 = d3 mod n   */
+    fmpz_add(t[16], t[42], t[8]);           /*  d7 = d4 + c0    */
+    unity_zp_coeff_set_fmpz(f, 4, t[16]);   /*  y4 = d7 mod n   */
+    fmpz_add(t[16], t[43], t[9]);           /*  d7 = d5 + c1    */
+    unity_zp_coeff_set_fmpz(f, 5, t[16]);   /*  y5 = d7 mod n   */
+    fmpz_add(t[16], t[44], t[10]);          /*  d7 = d6 + c2    */
+    unity_zp_coeff_set_fmpz(f, 6, t[16]);   /*  y6 = d7 mod n   */
+    unity_zp_coeff_set_fmpz(f, 7, t[11]);   /*  y7 = c3 mod n   */
 }
 
