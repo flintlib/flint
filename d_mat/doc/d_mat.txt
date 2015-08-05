@@ -63,6 +63,16 @@ double d_mat_entry(d_mat_t mat, slong i, slong j)
     Both $i$ and $j$ must not exceed the dimensions of the matrix.
     This function is implemented as a macro.
 
+double d_mat_get_entry(const d_mat_t mat, slong i, slong j)
+
+    Returns the entry of \code{mat} at row $i$ and column $j$.
+    Both $i$ and $j$ must not exceed the dimensions of the matrix.
+    
+double * d_mat_entry_ptr(const d_mat_t mat, slong i, slong j)
+
+    Returns a pointer to the entry of \code{mat} at row $i$ and column
+    $j$. Both $i$ and $j$ must not exceed the dimensions of the matrix.
+    
 void d_mat_zero(d_mat_t mat)
 
     Sets all entries of \code{mat} to 0.

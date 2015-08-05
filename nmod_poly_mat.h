@@ -56,7 +56,11 @@ typedef struct
 
 typedef nmod_poly_mat_struct nmod_poly_mat_t[1];
 
-#define nmod_poly_mat_entry(mat,i,j) ((mat)->rows[(i)] + (j))
+NMOD_POLY_MAT_INLINE
+nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
 
 /* Memory management *********************************************************/
 

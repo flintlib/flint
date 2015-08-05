@@ -72,19 +72,21 @@ clean:
 	$(AT)$(foreach dir, $(BUILD_DIRS), BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) clean || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) clean || exit $$?;))
 	rm -rf test_helpers.o profiler.o
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS)
+	rm -f libflint.a
+	rm -f $(wildcard $(FLINT_LIBNAME)*)
 	rm -rf build
 
 distclean: clean
 	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
-	git archive --format tar --prefix flint-2.4.5/ flint-2.4 > ../flint-2.4.5.tar; gzip ../flint-2.4.5.tar
+	git archive --format tar --prefix flint-2.5.0/ flint-2.5 > ../flint-2.5.0.tar; gzip ../flint-2.5.0.tar
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile
 ifndef MOD
-	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach prog, $(PROFS), $(CC) $(CFLAGS) -std=gnu99 $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir)/profile; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) profile || exit $$?;))
 else
@@ -111,6 +113,11 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	fi
 	$(AT)if [ "$(WANT_NTL)" -ne "1" ]; then \
 	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
+	fi
+	$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
+		ldconfig -n "$(CURDIR)"; \
+	else \
+		ln -sf "$(CURDIR)/$(FLINT_LIB)" "$(CURDIR)/$(FLINT_LIBNAME)"; \
 	fi
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
@@ -195,6 +202,8 @@ install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+		cp $(wildcard $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+		ln -sf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
@@ -229,13 +238,13 @@ build/interfaces:
 	mkdir -p build/interfaces
 
 build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@
+	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CXXFLAGS) $(INCS) -c $< -o $@
 
 build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) -c $< -o $@
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS)
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS)
 
 print-%:
 	@echo '$*=$($*)'

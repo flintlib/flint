@@ -61,13 +61,44 @@ typedef padic_mat_struct padic_mat_t[1];
 
 /* Macros  *******************************************************************/
 
-#define padic_mat(A)              (&((A)->mat))
-#define padic_mat_entry(A, i, j)  ((A)->mat.rows[i] + (j))
-#define padic_mat_val(A)          ((A)->val)
-#define padic_mat_prec(A)         ((A)->N)
+PADIC_MAT_INLINE
+fmpz_mat_struct * padic_mat(const padic_mat_t A) 
+{
+   return (fmpz_mat_struct *)(&(A->mat));
+}
 
-#define padic_mat_nrows(A)        (((A)->mat).r)
-#define padic_mat_ncols(A)        (((A)->mat).c)
+PADIC_MAT_INLINE
+fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
+{
+   return A->mat.rows[i] + j;
+}
+
+#define padic_mat_val(A) ((A)->val)
+#define padic_mat_prec(A) ((A)->N)
+
+PADIC_MAT_INLINE
+slong padic_mat_get_val(const padic_mat_t A)
+{
+   return A->val;
+}
+
+PADIC_MAT_INLINE
+slong padic_mat_get_prec(const padic_mat_t A)
+{
+   return A->N;
+}
+
+PADIC_MAT_INLINE
+slong padic_mat_nrows(const padic_mat_t A)
+{
+   return (A->mat).r;
+}
+
+PADIC_MAT_INLINE
+slong padic_mat_ncols(const padic_mat_t A)
+{
+   return (A->mat).c;
+}
 
 /* Memory management  ********************************************************/
 

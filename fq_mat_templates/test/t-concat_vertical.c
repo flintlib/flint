@@ -86,6 +86,7 @@ main(void)
         TEMPLATE(T, mat_window_clear) (window1, ctx);
         TEMPLATE(T, mat_window_clear) (window2, ctx);
 
+        TEMPLATE(T, ctx_clear) (ctx);
     }
 
     FLINT_TEST_CLEANUP(state);

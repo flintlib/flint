@@ -35,19 +35,31 @@ TEMPLATE(T, poly_set_coeff) (TEMPLATE(T, poly_t) poly, slong n,
                              const TEMPLATE(T, t) x,
                              const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i;
-
-    TEMPLATE(T, poly_fit_length) (poly, n + 1, ctx);
-
-    if (n + 1 > poly->length)   /* Insert zeros if needed */
+    if (TEMPLATE(T, is_zero) (x, ctx))
     {
-        for (i = poly->length; i < n; i++)
-            TEMPLATE(T, zero) (poly->coeffs + i, ctx);
-        poly->length = n + 1;
+        if (n >= poly->length)
+            return;
+
+        TEMPLATE(T, zero) (poly->coeffs + n, ctx);
+
+        if (n == poly->length - 1) /* only necessary when setting leading coefficient */
+            _TEMPLATE(T, poly_normalise) (poly, ctx);
+    }
+    else
+    {
+        slong i;
+
+        TEMPLATE(T, poly_fit_length) (poly, n + 1, ctx);
+
+        if (n + 1 > poly->length)   /* Insert zeros if needed */
+        {
+            for (i = poly->length; i < n; i++)
+                TEMPLATE(T, zero) (poly->coeffs + i, ctx);
+            poly->length = n + 1;
+        }
     }
 
     TEMPLATE(T, set) (poly->coeffs + n, x, ctx);
-    _TEMPLATE(T, poly_normalise) (poly, ctx);
 }
 
 

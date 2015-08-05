@@ -72,6 +72,6 @@ n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
 
     count_leading_zeros(norm, n);
 
-    return n_powmod_ui_preinv(a<<norm, exp, n<<norm, ninv, norm) >> norm;
+    return n_powmod_ui_preinv(a << norm, exp, n << norm, ninv, norm) >> norm;
 }
 

@@ -37,6 +37,9 @@ int n_is_oddprime_binary(mp_limb_t n)
     n_prime_pi_bounds(&prime_lo, &prime_hi, n);
     primes = n_primes_arr_readonly(prime_hi + 1);
 
+    prime_hi--; /* convert to indices of primes in table */
+    prime_lo--;
+
     if (n == primes[prime_hi]) return 1;
     if (n > primes[prime_hi]) return 0;
 

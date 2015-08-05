@@ -55,7 +55,7 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
     mpq_set_d(etax, eta);
     fmpq_set_mpq(deltaq, deltax);
     fmpq_set_mpq(etaq, etax);
-    mpq_clears(deltax, etax, '\0');
+    mpq_clears(deltax, etax, NULL);
 
     for (j = 0; j < n; j++)
     {

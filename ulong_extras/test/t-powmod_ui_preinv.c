@@ -79,6 +79,28 @@ int main(void)
       mpz_clear(r2_m);
    }
 
+   /* check 0^0 = 1 */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+   {
+      mp_limb_t d, r, dinv;
+      ulong norm;
+      
+      d = n_randtest_not_zero(state);
+      
+      count_leading_zeros(norm, d);
+      
+      dinv = n_preinvert_limb(d<<norm);
+      r = n_powmod_ui_preinv(0, 0, d<<norm, dinv, norm) >> norm;
+
+      result = (r == 1 || (d == 1 && r == 0));
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("0^0 != 1 mod %wd\n", d);
+         abort();
+      }
+   }
+
    FLINT_TEST_CLEANUP(state);
    
    flint_printf("PASS\n");

@@ -64,9 +64,26 @@ typedef struct {
 
 typedef padic_struct padic_t[1];
 
-#define padic_unit(x)  (&((x)->u))
 #define padic_val(x)   ((x)->v)
 #define padic_prec(x)  ((x)->N)
+
+PADIC_INLINE
+fmpz * padic_unit(const padic_t x)
+{
+   return (fmpz *)(&(x->u));
+}
+
+PADIC_INLINE
+slong padic_get_val(const padic_t x)
+{
+   return x->v;
+}
+
+PADIC_INLINE
+slong padic_get_prec(const padic_t x)
+{
+   return x->N;
+}
 
 enum padic_print_mode
 {

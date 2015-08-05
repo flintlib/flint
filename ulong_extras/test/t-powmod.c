@@ -37,8 +37,6 @@ int main(void)
    flint_printf("powmod....");
    fflush(stdout);
 
-   
-
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t bits, a, d, r1, r2;
@@ -81,6 +79,26 @@ int main(void)
       mpz_clear(a_m);
       mpz_clear(d_m);
       mpz_clear(r2_m);
+   }
+
+   /* check 0^0 = 1 */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+   {
+      mp_limb_t bits, d, r;
+      
+      bits = n_randint(state, FLINT_D_BITS) + 1;
+      d = n_randtest_bits(state, bits);
+      if (d == 0) d++;
+
+      r = n_powmod(0, 0, d);
+
+      result = (r == 1 || (d == 1 && r == 0));
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("0^0 != 1 mod %wd\n", d);
+         abort();
+      }
    }
 
    FLINT_TEST_CLEANUP(state);

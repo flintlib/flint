@@ -62,9 +62,9 @@
 /* flint version number */
 
 #define __FLINT_VERSION 2
-#define __FLINT_VERSION_MINOR 4
-#define __FLINT_VERSION_PATCHLEVEL 5 
-#define FLINT_VERSION "2.4.5"
+#define __FLINT_VERSION_MINOR 5 
+#define __FLINT_VERSION_PATCHLEVEL 0
+#define FLINT_VERSION "2.5.0"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -105,6 +105,7 @@ FLINT_DLL void flint_cleanup(void);
 
 #if defined(_WIN64) || defined(__mips64)
 #define WORD_FMT "%ll"
+#define WORD_WIDTH_FMT "%*ll"
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
 #define UWORD_MAX ULLONG_MAX
@@ -113,6 +114,7 @@ FLINT_DLL void flint_cleanup(void);
 #define WORD_MIN LLONG_MIN
 #else
 #define WORD_FMT "%l"
+#define WORD_WIDTH_FMT "%*l"
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
 #define UWORD_MAX ULONG_MAX
@@ -168,6 +170,13 @@ void flint_randinit(flint_rand_t state)
     state->__randval = UWORD(4187301858);
     state->__randval2 = UWORD(3721271368);
 #endif
+}
+
+static __inline__
+void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
+{
+   state->__randval = seed1;
+   state->__randval2 = seed2;
 }
 
 static __inline__

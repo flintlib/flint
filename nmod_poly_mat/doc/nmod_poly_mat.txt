@@ -69,7 +69,8 @@ mp_limb_t nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 
 *******************************************************************************
 
-MACRO nmod_poly_mat_entry(mat,i,j)
+nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, 
+                                                              slong i, slong j)
 
     Gives a reference to the entry at row \code{i} and column \code{j}.
     The reference can be passed as an input or output variable to any

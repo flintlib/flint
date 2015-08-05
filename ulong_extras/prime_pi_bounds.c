@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010, 2013 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,11 +28,23 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+extern const unsigned char FLINT_PRIME_PI_ODD_LOOKUP[];
 
 void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
 {
-    int lg2 = FLINT_BIT_COUNT(n);
-
-    *lo = (ulong)(((double)n)/((double)lg2*0.6931472));
-    *hi = (ulong)(((double)n)/((double)(lg2-1)*0.5522821));
+    if (n < FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF)
+    {
+        if (n < 3)
+            *lo = *hi = (n == 2);
+        else
+            *lo = *hi = FLINT_PRIME_PI_ODD_LOOKUP[(n-1)/2];
+    }
+    else
+    {
+        /* 14/10 < 1/log(2)*/
+        *lo = (n / (10 * FLINT_CLOG2(n))) * 14;
+        /* 19/10 > 1.25506/log(2) */
+        *hi = (n / (10 * FLINT_FLOG2(n)) + 1) * 19;
+    }
 }
+
