@@ -105,6 +105,8 @@ $\bullet$ Peter Shrimpton -- Wrote code for a basic prime sieve,
 Pocklington-Lehmer, Lucas, Fibonacci, BSPW and $n-1$ primality tests and a
 Weiferich prime search. (Funded by the Nuffield Foundation)
 
+$\bullet$ Brian Gladman -- MSVC support
+
 $\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against
 Feitma's tables and sped up and corrected \code{n_is_prime} and
 \code{n_is_probabprime}. Improvements to \code{n_nextprime} and
@@ -140,7 +142,7 @@ Fr\'{e}d\'{e}ric Chyzak, Julien Puydt, Dana Jacobsen, Michael Jacobson Jr.,
 Mike Stillman, Jan Englehardt, Jean-Pierre Flori, Jeroen Demeyer, Shi Bai,
 Qingwen Guan, Frithjof Schulze, Robert Baillie, Oleksandr Motsak, Hans
 Schoenemann, Janko Boehm, Ahmed Soliman, Francois Bissey, Anton Mellit, Daniel
-Roche, Denis Kryskov and others.
+Roche, Denis Kryskov, Vladimir Glazachev, Daniel Fabian, Julien Ospald, mgkurtz, Max Goldfar and others.
 
 $\bullet$ In addition Michael Abshoff, William Stein and Robert Bradshaw have
 contributed to the build system of FLINT.

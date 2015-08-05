@@ -1125,7 +1125,7 @@ v 2.5.0 -- 05 Aug 2015
   * Ogita-Rump-Oishi dot product
   * matrix window functions
   * MSVC support (Brian Gladman)
-  * very fast cube/nth-root and rootrem code for small integers
+  * fast cube/nth-root (Newton, Kahan, magic number, Chebyshev)
   * Bodrato matrix squaring
   * matrix concatenation functions
   * matrix content
