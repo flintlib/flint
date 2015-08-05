@@ -217,6 +217,13 @@ typedef __mpfr_struct mpfr;
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
 
+#define FLINT_GENERIC_SWAP(T, x, y) do { \
+    T __txxx; \
+    __txxx = x; \
+    x = y; \
+    y = __txxx; \
+} while (0)
+
 #define MP_PTR_SWAP(x, y) \
     do { \
         mp_limb_t * __txxx; \
