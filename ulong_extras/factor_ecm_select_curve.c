@@ -33,8 +33,10 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
 {
     mp_limb_t u, v, w, t, hi, lo;
     mp_ptr a;
+    TMP_INIT;
 
-    a = flint_malloc(2 * sizeof(mp_limb_t));
+    TMP_START;
+    a = TMP_ALLOC(2 * sizeof(mp_limb_t));
 
     u = sig;
 
@@ -98,6 +100,8 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     n_ecm_inf->a24 >>= n_ecm_inf->normbits;
     n_ecm_inf->a24 <<= n_ecm_inf->normbits;
     n_ecm_inf->z = n_ecm_inf->one;
+
+    TMP_END;
 
     return 0;
 }

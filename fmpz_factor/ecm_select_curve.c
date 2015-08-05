@@ -44,9 +44,13 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     int ret;
     fmpz_t a, b, ff, inv;
     __mpz_struct *aa, *bb;
+    
+    TMP_INIT;
 
     ret = 0;
-    temp = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
+
+    TMP_START;
+    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
 
     mpn_zero(temp, ecm_inf->n_size);
     mpn_copyi(ecm_inf->u, sig, ecm_inf->n_size);
@@ -182,11 +186,12 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     cleanup:
 
-    flint_free(temp);
-
     fmpz_clear(ff);
     fmpz_clear(inv);
     fmpz_clear(a);
     fmpz_clear(b);
+
+    TMP_END;
+    
     return ret;
 }

@@ -39,6 +39,8 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
     mp_ptr x1, z1, x2, z2;      /* Q (x1 : z1), P (x2 : z2) */
     mp_limb_t len;
 
+    TMP_INIT;
+
     if (k == 0)
     {
         mpn_zero(x, ecm_inf->n_size);
@@ -52,11 +54,13 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
         mpn_copyi(z, z0, ecm_inf->n_size);
         return;
     }
+    
+    TMP_START;
+    x1 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    z1 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    x2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    z2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
 
-    x1 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    z1 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    x2 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    z2 = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
 
     mpn_copyi(x1, x0, ecm_inf->n_size);    /* Q <- P0 */
     mpn_copyi(z1, z0, ecm_inf->n_size);
@@ -93,8 +97,5 @@ fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0,
     mpn_copyi(x, x1, ecm_inf->n_size);
     mpn_copyi(z, z1, ecm_inf->n_size);
 
-    flint_free(x1);
-    flint_free(z1);
-    flint_free(x2);
-    flint_free(z2);
+    TMP_END;
 }

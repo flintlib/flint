@@ -68,13 +68,17 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     __mpz_struct *fac, *mpz_ptr;
     mp_ptr n, mpsig;
 
+    TMP_INIT;
+
     const mp_limb_t *prime_array;
     n_size = fmpz_size(n_in);
 
     fmpz_factor_ecm_init(ecm_inf, n_size);
 
-    n = flint_malloc(n_size * sizeof(mp_limb_t));
-    mpsig = flint_malloc(n_size * sizeof(mp_limb_t));
+    TMP_START;
+
+    n     = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    mpsig = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     if (n_size == 1)
     {
@@ -258,9 +262,9 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         flint_free(ecm_inf->prime_table[i]);
     flint_free(ecm_inf->prime_table);
 
-    fmpz_clear(sig);
-    fmpz_clear(nm8);
     fmpz_factor_ecm_clear(ecm_inf);
+    
+    TMP_END;
 
     return ret;
 }

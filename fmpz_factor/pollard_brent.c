@@ -70,9 +70,9 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_sub_ui(maxy, n_in, 1);     /* 1 <= y <= n - 1 */
 
     TMP_START;
-    a = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    y = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    n = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    a    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    y    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    n    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
     ninv = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     /* copying n_in onto n, and normalizing */

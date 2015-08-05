@@ -39,7 +39,11 @@ void
 fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
 {
     mp_ptr temp;
-    temp = flint_malloc(n_size * sizeof(mp_limb_t));
+
+    TMP_INIT;
+
+    TMP_START;
+    temp = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     if (mpn_cmp(a, b, n_size) > 0)
         mpn_sub_n(x, a, b, n_size);
@@ -49,5 +53,5 @@ fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
         mpn_add_n(x, temp, a, n_size);
     }
 
-    flint_free(temp);
+    TMP_END;
 }

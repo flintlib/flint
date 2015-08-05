@@ -41,19 +41,22 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     int i, j, ret;
     mp_ptr arrx, arrz;
 
+    TMP_INIT;
+
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
     maxj = (P + 1)/2; 
 
-    Qx = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    Qz = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    Rx = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    Rz = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    Qdx = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    Qdz = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    a = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    b = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
-    g = flint_malloc(ecm_inf->n_size * sizeof(mp_limb_t));
+    TMP_START;
+    Qx  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qz  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Rx  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Rz  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qdx = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qdz = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    a   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    b   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    g   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
 
     g[0] = ecm_inf->one[0];
 
@@ -169,15 +172,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     cleanup:
 
-    flint_free(Qx);
-    flint_free(Qz);
-    flint_free(Rx);
-    flint_free(Rz);
-    flint_free(Qdx);
-    flint_free(Qdz);
-    flint_free(a);
-    flint_free(b);
-    flint_free(g);
+    TMP_END;
 
     flint_free(arrx);
     flint_free(arrz);

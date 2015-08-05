@@ -174,6 +174,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
     }
 
     TMP_END;
+    
     return ret;
 }
 
@@ -220,9 +221,9 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     count_leading_zeros(normbits, temp[n_size - 1]);
 
     TMP_START;
-    a = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    y = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    n = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    a    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    y    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    n    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
     ninv = TMP_ALLOC(n_size * sizeof(mp_limb_t));
 
     /* copying n_in onto n, and normalizing */
