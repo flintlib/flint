@@ -53,6 +53,8 @@ void qsieve_poly_clear(qs_t qs_inf)
    flint_free(qs_inf->A0_inv);
    flint_free(qs_inf->soln1);
    flint_free(qs_inf->soln2);
+   flint_free(qs_inf->xr1);
+   flint_free(qs_inf->xr2);
    flint_free(qs_inf->curr_subset);
 
    if (qs_inf->A_inv2B != NULL)
@@ -72,6 +74,8 @@ void qsieve_poly_clear(qs_t qs_inf)
    qs_inf->A0_inv = NULL;
    qs_inf->soln1 = NULL;
    qs_inf->soln2 = NULL;
+   qs_inf->xr1 = NULL;
+   qs_inf->xr2 = NULL;
    qs_inf->A_inv2B = NULL;
    qs_inf->curr_subset = NULL;
 

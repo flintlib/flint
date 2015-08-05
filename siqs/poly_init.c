@@ -55,6 +55,8 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf)
    qs_inf->A0_inv = flint_malloc(num_primes * sizeof(mp_limb_t));
    qs_inf->soln1 = flint_malloc(num_primes * sizeof(mp_limb_t));
    qs_inf->soln2 = flint_malloc(num_primes * sizeof(mp_limb_t));
+   qs_inf->xr1 = flint_malloc(num_primes * sizeof(mp_limb_t));
+   qs_inf->xr2 = flint_malloc(num_primes * sizeof(mp_limb_t));
 
    A_inv2B = qs_inf->A_inv2B;
 

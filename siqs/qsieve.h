@@ -112,6 +112,10 @@ typedef struct qs_s
    mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
    mp_limb_t * soln1;       /* first root of poly */
    mp_limb_t * soln2;       /* second root of poly */
+
+   mp_limb_t * xr1;
+   mp_limb_t * xr2;
+
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
    fmpz_t upp_bound;
@@ -209,6 +213,8 @@ static const mp_limb_t qsieve_tune[][5] =
 
 #define BITS_ADJUST 10
 
+#define BLOCK_SIZE 64000
+
 void qsieve_init(qs_t qs_inf, fmpz_t n);
 
 mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
@@ -237,13 +243,13 @@ void qsieve_compute_C(qs_t qs_inf);
 
 void qsieve_poly_clear(qs_t qs_inf);
 
-void qsieve_do_sieving(qs_t qs_inf, char * sieve);
+void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve);
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, char * sieve);
+slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve);
 
-slong qsieve_evaluate_sieve(qs_t qs_inf, char * sieve);
+slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve);
 
-slong qsieve_collect_relations(qs_t qs_inf, char * sieve);
+slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 
 void qsieve_linalg_init(qs_t qs_inf);
 
