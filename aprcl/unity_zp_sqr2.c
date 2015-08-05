@@ -42,6 +42,8 @@ unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t)
         m1 = t[2]; m2 = t[3];
         d1 = t[4].
     */
+
+    /* set xi */
     fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0);
     fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1);
 
@@ -73,6 +75,8 @@ unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t)
         d1 = t[12]; d2 = t[13]; d3 = t[14]; d4 = t[15];
         d5 = t[16]; d6 = t[17].
     */
+
+    /* set xi */
     fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0);
     fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1);
     fmpz_mod_poly_get_coeff_fmpz(t[2], g->poly, 2);
@@ -136,6 +140,8 @@ unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
         d0 = t[38]; d1 = t[39]; d2 = t[40]; d3 = t[41];
         d4 = t[42]; d5 = t[43]; d6 = t[44]; d7 = t[45].
     */
+
+    /* set xi */
     for (i = 0; i < 8; i++)
         fmpz_mod_poly_get_coeff_fmpz(t[30 + i], g->poly, i);
 

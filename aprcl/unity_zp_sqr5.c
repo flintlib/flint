@@ -43,6 +43,8 @@ unity_zp_sqr5(unity_zp f, const unity_zp g, fmpz_t * t)
         m5 = t[8]; m6 = t[9]; m7 = t[10]; m8 = t[11];
         d1 = t[12]; d2 = t[13]; d3 = t[14]; d4 = t[15].
     */
+
+    /* set xi */
     fmpz_mod_poly_get_coeff_fmpz(t[0], g->poly, 0);
     fmpz_mod_poly_get_coeff_fmpz(t[1], g->poly, 1);
     fmpz_mod_poly_get_coeff_fmpz(t[2], g->poly, 2);

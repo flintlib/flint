@@ -72,6 +72,7 @@ int main(void)
             fmpz_clear(val);
         }
 
+        _unity_zp_reduce_cyclotomic(temp);
         unity_zp_pow_sliding_fmpz(f, temp, pow);
         unity_zp_pow_fmpz(g, temp, pow);
 

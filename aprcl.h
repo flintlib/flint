@@ -282,7 +282,6 @@ void jacobi_config_clear(aprcl_config conf);
 mp_ptr f_table(const ulong q);
 ulong p_power_in_q(ulong q, ulong p);
 
-
 /* Z[unity_root] functions for Montgomery form */
 
 /* Memory allocation and free */

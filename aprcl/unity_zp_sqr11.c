@@ -55,6 +55,8 @@ unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
         d_{2, i} = t[60 + i] for i in [0, 9];
         d_{3, i} = t[10 + i] for i in [0, 9].
     */
+
+    /* set xi */
     for (i = 0; i < 10; i++)
         fmpz_mod_poly_get_coeff_fmpz(t[30 + i], g->poly, i);
 
