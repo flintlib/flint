@@ -34,7 +34,7 @@ TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
 		                            const TEMPLATE(T, mat_t) mat2,
 		                            const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i, j;
+    slong i;
     slong r1 = mat1->r;
     slong c1 = mat1->c;
     slong c2 = mat2->c;
