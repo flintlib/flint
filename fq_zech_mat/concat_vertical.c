@@ -19,21 +19,18 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart.
-    Copyright (C) 2008, Richard Howell-Peak
-    Copyright (C) 2008, Martin Albrecht
-    Copyright (C) 2010, Fredrik Johansson
+    Copyright (C) 2015 Elena Sergeicheva
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_mat.h"
+#include "fq_zech_mat.h"
 
-void
-nmod_mat_window_clear(nmod_mat_t window)
-{
-    if (window->r > 0)
-        flint_free(window->rows);
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq_zech
+#define CAP_T FQ_ZECH
+#include "fq_mat_templates/concat_vertical.c"
+#undef CAP_T
+#undef T

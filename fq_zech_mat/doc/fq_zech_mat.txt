@@ -88,6 +88,29 @@ void fq_zech_mat_zero(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Sets all entries of \code{mat} to 0.
 
+*******************************************************************************
+
+    Concatenate
+
+*******************************************************************************
+
+void fq_zech_mat_concat_vertical(fq_zech_mat_t res, const fq_zech_mat_t mat1, 
+                             const fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
+    Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2})
+    in that order.
+    Matrix dimensions :
+    \code{mat1} : $m \times n$, 
+    \code{mat2} : $k \times n$, 
+    \code{res} : $(m + k) \times n$.
+
+void fq_zech_mat_concat_horizontal(fq_zech_mat_t res, const fq_zech_mat_t mat1,
+                             const fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
+    Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2})
+    in that order.
+    Matrix dimensions :
+    \code{mat1} : $m \times n$, 
+    \code{mat2} : $m \times k$, 
+    \code{res}  : $m \times (n + k)$.
 
 *******************************************************************************
 
@@ -144,7 +167,6 @@ void fq_zech_mat_window_clear(fq_zech_mat_t window, const fq_zech_ctx_t ctx)
      Clears the matrix \code{window} and releases any memory that it
      uses.  Note that the memory to the underlying matrix that
      \code{window} points to is not freed.
-
 
 *******************************************************************************
 

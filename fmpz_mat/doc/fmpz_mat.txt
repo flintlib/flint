@@ -320,23 +320,23 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-
-void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
-    Sets \code{res} to the resultant matrix from the vertical concatenation of
-    (\code{mat1}, \code{mat2}) in that order.
+void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, 
+                                                         const fmpz_mat_t mat2)
+    Sets \code{res} to vertical concatenation of (\code{mat1}, \code{mat2})
+    in that order.
     Matrix dimensions :
     \code{mat1} : $m \times n$, 
     \code{mat2} : $k \times n$, 
     \code{res} : $(m + k) \times n$.
 
-void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
-    Sets \code{res} to the resultant matrix from the horizontal concatenation of
-    (\code{mat1}, \code{mat2}) in that order.
+void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1,
+                                                         const fmpz_mat_t mat2)
+    Sets \code{res} to horizontal concatenation of (\code{mat1}, \code{mat2})
+    in that order.
     Matrix dimensions :
     \code{mat1} : $m \times n$, 
     \code{mat2} : $m \times k$, 
     \code{res}  : $m \times (n + k)$.
-
 
 *******************************************************************************
 
