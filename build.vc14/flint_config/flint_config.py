@@ -749,7 +749,6 @@ def gen_tests(sln_name, directory, proj_dir, c_files):
     add_proj_to_sln(soln, name, p_name, vcx_name, p_guid, (g2fldr, g2proj, gf2gpl))
     if cnt % 100 == 99:
       write_solution_file(soln, g2fldr, g2proj, gf2gpl)
-      soln = sn + str(cnt // 100 + 1) + '.sln'
   if cnt % 100:
     write_solution_file(soln, g2fldr, g2proj, gf2gpl)
 
