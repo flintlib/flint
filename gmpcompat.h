@@ -537,6 +537,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+static __inline__
 void flint_mpf_set_ui(mpf_ptr f, ulong val)
 {
   mp_size_t size;
@@ -623,6 +624,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+static __inline__
 int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
 {
   mp_srcptr up;
@@ -666,6 +668,8 @@ int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
   return 0;
 }
 
+#else
+
 /* mpf_fits_s*_p -- test whether an mpf fits a C signed type.
 
 Copyright 2001, 2002 Free Software Foundation, Inc.
@@ -687,8 +691,8 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-int
-flint_mpf_fits_slong_p(mpf_srcptr f)
+static __inline__
+int flint_mpf_fits_si_p(mpf_srcptr f)
 {
   mp_size_t  fs, fn;
   mp_srcptr  fp;
@@ -715,8 +719,6 @@ flint_mpf_fits_slong_p(mpf_srcptr f)
 
   return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
 }
-
-#else
 
 #define flint_mpz_get_si mpz_get_si
 #define flint_mpz_get_ui mpz_get_ui
@@ -764,7 +766,6 @@ flint_mpf_fits_slong_p(mpf_srcptr f)
 #define flint_mpf_set_ui mpf_set_ui
 #define flint_mpf_get_si mpf_get_si
 #define flint_mpf_cmp_ui mpf_cmp_ui
-#define flint_mpf_fits_slong_p mpf_fits_slong_p
 
 #endif
 
