@@ -32,23 +32,15 @@
 void
 fmpz_set_mpf(fmpz_t f, const mpf_t x)
 {
-    if (!COEFF_IS_MPZ(*f))
+    if (flint_mpf_fits_slong_p(x))
     {
-        if (flint_mpf_fits_slong_p(x))
-        {
-            slong cx = flint_mpf_get_si(x);
-            fmpz_set_si(f, cx);
-        }
-        else
-        {
-            __mpz_struct *z = _fmpz_promote(f);
-            mpz_set_f(z, x);
-        }
+        slong cx = flint_mpf_get_si(x);
+        _fmpz_demote(f);
+        fmpz_set_si(f, cx);
     }
     else
     {
         __mpz_struct *z = _fmpz_promote(f);
         mpz_set_f(z, x);
-        _fmpz_demote_val(f);
     }
 }
