@@ -31,15 +31,40 @@
 
 int main(void)
 {
-    int i, j;
+    int i;
     FLINT_TEST_INIT(state);
    
-    flint_printf("unity_zp_coeff_inc....");
+    flint_printf("is_prime....");
     fflush(stdout);
+
+    for (i = 0; i < 10000; i++)
+    {
+        int pbprime, cycloprime;
+        fmpz_t n;
+        fmpz_init(n);
+
+        fmpz_randtest_unsigned(n, state, 1000);
+        while (fmpz_cmp_ui(n, 100) <= 0)
+            fmpz_randtest_unsigned(n, state, 1000);
+
+        pbprime = fmpz_is_probabprime(n);
+        cycloprime = is_prime_jacobi(n);
+        
+        if (pbprime != cycloprime)
+        {
+            flint_printf("FAIL\n");
+            flint_printf("Testing number = ");
+            fmpz_print(n);
+            flint_printf("\nis_probabprime = %i, is_prime_gauss = %i\n", pbprime, cycloprime);
+            abort();
+        }
+
+        fmpz_clear(n);
+    }
 
     FLINT_TEST_CLEANUP(state);
     
-    flint_printf("NO TEST\n");
+    flint_printf("PASS\n");
     return 0;
 }
 

@@ -36,29 +36,17 @@ int main(void)
     flint_printf("unity_zp_jacobi_sum....");
     fflush(stdout);
 
-    fmpz_t n;
-    fmpz_init_set_ui(n, 37);
+    {
+        fmpz_t n;
+        unity_zp sum;
 
-    unity_zp sum;
-    unity_zp_init(sum, 3, 1, n);
-    jacobi_pq(sum, 7, 3);
+        fmpz_init_set_ui(n, 37);
 
-    flint_printf("\n");
-    fmpz_mod_poly_print(sum->poly);
-    flint_printf("\n");
+        unity_zp_init(sum, 3, 1, n);
+        jacobi_pq(sum, 7, 3);
 
-/*
-    unity_root sum2;
-    jacobi_pq_not2(sum2, 7, 3);
-    unity_print(sum2);
-    unity_clear(sum2);
-
-    jacobi_2q_one(sum2, 7);
-    unity_print(sum2);
-    unity_clear(sum2);
-*/
-
-    unity_zp_clear(sum);
+        unity_zp_clear(sum);
+    }
 
     FLINT_TEST_CLEANUP(state);
     

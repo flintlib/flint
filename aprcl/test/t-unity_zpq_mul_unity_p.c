@@ -39,7 +39,7 @@ int main(void)
     
     for (i = 0; i < 100; i++)
     {
-        ulong p, q, k;
+        ulong p, q;
         fmpz_t n;
         unity_zpq res, left;
 

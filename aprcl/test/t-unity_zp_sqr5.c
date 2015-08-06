@@ -33,7 +33,6 @@ int main(void)
 {
     int i, j;
     fmpz_t * t;
-
     FLINT_TEST_INIT(state);
    
     flint_printf("unity_zp_sqr5....");

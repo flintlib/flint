@@ -27,7 +27,6 @@
 
 void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 {
-    ulong j;
     unity_zpq value;
     fmpz_t power, rem;
 

@@ -31,7 +31,6 @@
 
 int main(void)
 {
-    return 0;
     int i;
     FLINT_TEST_INIT(state);
    

@@ -30,12 +30,11 @@
 */
 void unity_zpq_gauss_sum_character_pow(unity_zpq value, ulong q, ulong p, ulong pow)
 {
-    ulong i, qinv, pinv, qpow, ppow, g, n;
+    ulong i, qinv, pinv, qpow, ppow, g;
 
     g = n_primitive_root_prime(q);
     qinv = n_preinvert_limb(q);
     pinv = n_preinvert_limb(p);
-    n = fmpz_fdiv_ui(value->n, p);
     qpow = 1;
     ppow = 0;
 
