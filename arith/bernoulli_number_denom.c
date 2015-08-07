@@ -65,7 +65,7 @@ void arith_bernoulli_number_denom(fmpz_t den, ulong n)
     else
     {
         n_prime_pi_bounds(&p, &p, n);
-        primes = n_primes_arr_readonly(p + 1);
+        primes = n_primes_arr_readonly(p + 2);
 
         fmpz_set_ui(den, UWORD(6));
         for (i = 2; i < n; i++)
