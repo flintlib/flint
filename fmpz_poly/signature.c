@@ -119,7 +119,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
             {
                 fmpz_mul(f, g, h);
                 _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, f);
-                fmpz_set(g, A + (lenA - 1));
+                fmpz_abs(g, A + (lenA - 1));
                 fmpz_set(h, g);
             }
             else
@@ -130,7 +130,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
                 fmpz_pow_ui(f, h, delta - 1);
                 fmpz_pow_ui(g, A + (lenA - 1), delta);
                 fmpz_divexact(h, g, f);
-                fmpz_set(g, A + (lenA - 1));
+                fmpz_abs(g, A + (lenA - 1));
             }
 		}
 	}

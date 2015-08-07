@@ -1148,4 +1148,5 @@ v 2.5.0 -- 05 Aug 2015
   * ARM64 patches
   * Support MSYS2
   * Progress towards supporting MIPS64
+  * Fix a serious bug in fmpz_poly_signature
 

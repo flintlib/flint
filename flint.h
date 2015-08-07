@@ -222,6 +222,12 @@ typedef __mpfr_struct mpfr;
 #define FLINT_ASSERT(param)
 #endif
 
+#if defined(__GNUC__)
+#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#else
+#define FLINT_UNUSED(x) x
+#endif
+
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
