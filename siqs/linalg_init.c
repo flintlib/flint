@@ -31,14 +31,14 @@
 
 void qsieve_linalg_init(qs_t qs_inf)
 {
-    slong i;
+    slong i, num_primes;
 
     qs_inf->extra_rels = 64; /* number of opportunities to factor n */
     qs_inf->max_factors = 30; /* maximum number of factors a relation can have */
 
     /* allow as many dups as relations */
-    i = qs_inf->num_primes;
-    qs_inf->num_primes + qs_inf->ks_primes;
+    num_primes = qs_inf->num_primes;
+    qs_inf->num_primes += qs_inf->ks_primes;
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels + qs_inf->qsort_rels);
     qs_inf->small = flint_malloc(qs_inf->small_primes*sizeof(mp_limb_t));
     qs_inf->factor = flint_malloc(qs_inf->max_factors*sizeof(fac_t));
@@ -48,8 +48,6 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->curr_rel = qs_inf->relation
                      = flint_malloc(2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));
     qs_inf->qsort_arr = flint_malloc(qs_inf->qsort_rels*sizeof(la_col_t *));
-
-    qs_inf->num_primes = i;
 
     for (i = 0; i < qs_inf->buffer_size; i++)
     {
@@ -66,6 +64,7 @@ void qsieve_linalg_init(qs_t qs_inf)
 
     qs_inf->prime_count = flint_malloc(qs_inf->num_primes*sizeof(slong));
 
+    qs_inf->num_primes = num_primes;
     qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;
     qs_inf->num_relations = 0;
