@@ -180,6 +180,7 @@ main(void)
         padic_poly_clear(b);
         padic_poly_clear(c);
         padic_poly_clear(d);
+        padic_poly_clear(t);
 
         padic_ctx_clear(ctx);
         fmpz_clear(p);
