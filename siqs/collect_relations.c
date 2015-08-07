@@ -105,8 +105,8 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
     mp_limb_t * xr2 = qs_inf->xr2;
     prime_t * factor_base = qs_inf->factor_base;
 
-    unsigned char * Bp;
     unsigned char * B;
+    unsigned char * Bp;
     register unsigned char * x;
 
     memset(sieve, 0, qs_inf->sieve_size + sizeof(ulong));
@@ -151,7 +151,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
                 (*x) += size, x += d1;
                 xr2[pind] = d2;
             }
-            else {xr2[pind] = d1;}
+            else { xr2[pind] = d1; }
 
             xr1[pind] = (x - sieve);
         }
@@ -159,9 +159,9 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
     for (b = 1; b <= qs_inf->sieve_size / BLOCK_SIZE; b++)
     {
-       B = sieve + b * BLOCK_SIZE;
+        B = sieve + b * BLOCK_SIZE;
 
-       for (pind = r0; pind < num_primes; pind++)
+        for (pind = r0; pind < num_primes; pind++)
         {
             p = factor_base[pind].p;
 
@@ -173,18 +173,18 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
             if ((x = sieve + xr1[pind]) <= B)
             {
                 (*x) += size;
-                 x += xr2[pind];
+                x += xr2[pind];
 
                 if (x <= B)
                 {
                     (*x) += size;
                     x += p - xr2[pind];
                 }
-                else {xr2[pind] = p - xr2[pind];}
+                else { xr2[pind] = p - xr2[pind]; }
 
                 xr1[pind] = (x - sieve);
             }
-            else {xr1[pind] = (x - sieve);}
+            else { xr1[pind] = (x - sieve); }
         }
     }
 }
@@ -380,7 +380,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
         qsieve_compute_C(qs_inf);
-        qsieve_do_sieving2(qs_inf, sieve);
+        qsieve_do_sieving(qs_inf, sieve);
 
         relation += qsieve_evaluate_sieve(qs_inf, sieve);
 
