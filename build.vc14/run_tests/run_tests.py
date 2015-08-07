@@ -1,4 +1,4 @@
-
+﻿
 from __future__ import print_function
 
 from os import chdir, walk
@@ -13,7 +13,7 @@ import re
 
 script_dir = dirname(__file__)
 chdir(script_dir)
-exe_dir = normpath(join(script_dir, '..\\tests\\x64\\Release'))
+exe_dir = normpath(join(script_dir, '..\\tests\\'))
 vcx_dir = normpath(join(script_dir, '..\\flint-tests'))
 
 def split_pnx(p):
@@ -42,52 +42,49 @@ if not (len(vcd) == len(vcp) == len(vcf)):
   print('warning: some tests may be missing or corrupted')
   print(len(vcd), len(vcp), len(vcf))
   
-exd, exe, pdb, ext = [], [], [], []
-for root, dirs, files in walk(exe_dir):
-  for x in dirs:
-    exd.append(x)
+exe = []
+for root, dirs, files in walk(exe_dir, topdown=False):
   for x in files:
     h, t = splitext(x)
     if t == '.exe':
-      exe.append(h)
-    elif t == '.pdb':
-      pdb.append(h)
-    else:
-      ext.append(x)
-
-if len(ext) > 1:
-  print('warning: unexpected files in binary test directory', len(ext))
-if len(exe) > len(pdb):
-  print('warning: some debug files are missing', len(exe), len(pdb))
-elif len(exe) < len(pdb):
-  print('warning: some test binaries may be missing', len(exe), len(pdb))
+      exe.append(join(root, x))
 
 build_fail = 0
 run_ok = 0
 run_fail = 0
-for i in vcd:
-  if i in exe:
-    ef = join(exe_dir, i) + '.exe'
-    try:
-      prc = subprocess.Popen( ef, stdout = subprocess.PIPE,
-        stderr = subprocess.STDOUT, creationflags = 0x08000000 )
-    except Exception as str:
-      print(i, ': ERROR (', str, ')')
-      run_fail += 1
-      continue
-    output = prc.communicate()[0]
-    if prc.returncode:
-      print('ERROR {}'.format(prc.returncode), end=' ')
-      run_fail += 1
-    else:
-      run_ok += 1
-    if output:
-      print(output.decode().replace('\n', ''))
-    else:
-      print()
+print(len(exe))
+
+for ef in exe:
+  fdn, fx = splitext(ef)
+  fd, fn = split(fdn)
+  fd = fd[fd.find('tests') + 6 : fd.find('\\x64\\')]
+  fd = fd + ': ' + fn
+  try:
+    prc = subprocess.Popen( ef, stdout = subprocess.PIPE,
+      stderr = subprocess.STDOUT, creationflags = 0x08000000 )
+  except Exception as str:
+    print(fd, ': ERROR (', str, ')')
+    run_fail += 1
+    continue
+  output = prc.communicate()[0]
+  if prc.returncode:
+    print(fd, 'ERROR {}'.format(prc.returncode), end=' ')
+    run_fail += 1
   else:
-    print("Build failure for {0}".format(i))
-    build_fail += 1
+    run_ok += 1
+  if output:
+    op = output.decode().replace('\n', '')
+    if 'PASS' in op:
+      print(fd + '... PASS')
+    elif 'SKIPPED' in op:
+      print(fd + '... SKIPPED')
+    else:
+      print('output from ' + op)
+  else:
+    print()
+#  else:
+#    print("Build failure for {0}".format(i))
+#    build_fail += 1
 print(build_fail + run_ok + run_fail, "tests:")
 if build_fail > 0:
   print("\t{0} failed to build".format(build_fail))

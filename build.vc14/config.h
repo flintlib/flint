@@ -311,6 +311,8 @@ MA 02111-1307, USA. */
    (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
 
+#define HAVE_PTHREAD 1
+
 /* Define as `__inline' if that's what the C compiler calls it, or to nothing
    if it is not supported. */
 #ifndef __cplusplus
@@ -331,7 +333,6 @@ MA 02111-1307, USA. */
 #define access _access
 #define strcasecmp _stricmp
 #define strncasecmp	_strnicmp
-#define snprintf _snprintf
 #define alloca _alloca
 #define HAVE_STRCASECMP		1
 #define HAVE_STRNCASECMP	1

@@ -4,7 +4,9 @@
     <Filter Include="Header Files" />
     <Filter Include="Source Files" />
     <Filter Include="Source Files\arith" />
-    <Filter Include="Source Files\build.vc12" />
+    <Filter Include="Source Files\build.vc14" />
+    <Filter Include="Source Files\d_mat" />
+    <Filter Include="Source Files\d_vec" />
     <Filter Include="Source Files\double_extras" />
     <Filter Include="Source Files\fft" />
     <Filter Include="Source Files\flint2" />
@@ -14,6 +16,7 @@
     <Filter Include="Source Files\fmpq_vec" />
     <Filter Include="Source Files\fmpz" />
     <Filter Include="Source Files\fmpz_factor" />
+    <Filter Include="Source Files\fmpz_lll" />
     <Filter Include="Source Files\fmpz_mat" />
     <Filter Include="Source Files\fmpz_mod_poly" />
     <Filter Include="Source Files\fmpz_mod_poly_factor" />
@@ -39,6 +42,8 @@
     <Filter Include="Source Files\fq_zech_vec" />
     <Filter Include="Source Files\link" />
     <Filter Include="Source Files\long_extras" />
+    <Filter Include="Source Files\mpf_mat" />
+    <Filter Include="Source Files\mpf_vec" />
     <Filter Include="Source Files\mpfr_mat" />
     <Filter Include="Source Files\mpfr_vec" />
     <Filter Include="Source Files\mpn_extras" />
@@ -62,16 +67,22 @@
     <ClInclude Include="..\..\arith.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\build.vc12\config.h">
+    <ClInclude Include="..\..\build.vc14\config.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\build.vc12\getopt.h">
+    <ClInclude Include="..\..\build.vc14\getopt.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\build.vc12\gettimeofday.h">
+    <ClInclude Include="..\..\build.vc14\gettimeofday.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\build.vc12\unistd.h">
+    <ClInclude Include="..\..\build.vc14\unistd.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\d_mat.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\d_vec.h">
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\double_extras.h">
@@ -105,6 +116,9 @@
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\fmpz_factor.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\fmpz_lll.h">
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\fmpz_mat.h">
@@ -185,10 +199,13 @@
     <ClInclude Include="..\..\longlong.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\mpfr_mat.h">
+    <ClInclude Include="..\..\mpf_mat.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\mpfr_poly.h">
+    <ClInclude Include="..\..\mpf_vec.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mpfr_mat.h">
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\mpfr_vec.h">
@@ -228,6 +245,9 @@
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\qadic.h">
+    <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\qadic\cpimport.h">
     <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\qsieve.h">
@@ -325,6 +345,9 @@
   <ClCompile Include="..\..\arith\harmonic_number.c">
     <Filter>Source Files\arith</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\arith\inlines.c">
+    <Filter>Source Files\arith</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\arith\landau_function_vec.c">
     <Filter>Source Files\arith</Filter>
     </ClCompile>
@@ -364,16 +387,127 @@
   <ClCompile Include="..\..\arith\zeta_inv_euler_product.c">
     <Filter>Source Files\arith</Filter>
     </ClCompile>
-  <ClCompile Include="..\..\build.vc12\getopt.c">
-    <Filter>Source Files\build.vc12</Filter>
+  <ClCompile Include="..\..\build.vc14\getopt.c">
+    <Filter>Source Files\build.vc14</Filter>
     </ClCompile>
-  <ClCompile Include="..\..\build.vc12\gettimeofday.c">
-    <Filter>Source Files\build.vc12</Filter>
+  <ClCompile Include="..\..\build.vc14\gettimeofday.c">
+    <Filter>Source Files\build.vc14</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\approx_equal.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\clear.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\equal.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\gso.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\init.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\inlines.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\is_approx_zero.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\is_zero.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\mul_classical.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\one.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\print.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\qr.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\randtest.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\set.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\swap.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\transpose.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_mat\zero.c">
+    <Filter>Source Files\d_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\add.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\approx_equal.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\clear.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\dot.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\dot_heuristic.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\dot_thrice.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\equal.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\init.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\is_approx_zero.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\is_zero.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\norm.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\randtest.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\set.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\sub.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\d_vec\zero.c">
+    <Filter>Source Files\d_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\double_extras\inlines.c">
+    <Filter>Source Files\double_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\double_extras\is_nan.c">
+    <Filter>Source Files\double_extras</Filter>
     </ClCompile>
   <ClCompile Include="..\..\double_extras\lambertw.c">
     <Filter>Source Files\double_extras</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\double_extras\log2.c">
+    <Filter>Source Files\double_extras</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\double_extras\randtest.c">
+    <Filter>Source Files\double_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\double_extras\randtest_signed.c">
+    <Filter>Source Files\double_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\double_extras\randtest_special.c">
     <Filter>Source Files\double_extras</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fft\adjust.c">
@@ -431,6 +565,9 @@
     <Filter>Source Files\fft</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fft\ifft_truncate_sqrt2.c">
+    <Filter>Source Files\fft</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fft\inlines.c">
     <Filter>Source Files\fft</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fft\mul_2expmod_2expp1.c">
@@ -547,6 +684,9 @@
   <ClCompile Include="..\..\fmpq\get_mpfr.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq\get_mpz_frac.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq\get_str.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
@@ -557,6 +697,9 @@
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq\height_bits.c">
+    <Filter>Source Files\fmpq</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq\init_set_fmpz_frac_readonly.c">
     <Filter>Source Files\fmpq</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq\init_set_readonly.c">
@@ -640,6 +783,12 @@
   <ClCompile Include="..\..\fmpq_mat\clear.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\concat_horizontal.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\concat_vertical.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\det.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
@@ -671,6 +820,9 @@
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\init.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\inlines.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\inv.c">
@@ -745,16 +897,28 @@
   <ClCompile Include="..\..\fmpq_mat\solve_dixon.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\solve_fmpz_mat.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\solve_fraction_free.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\sub.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\swap.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\trace.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\transpose.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\window_clear.c">
+    <Filter>Source Files\fmpq_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpq_mat\window_init.c">
     <Filter>Source Files\fmpq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpq_mat\zero.c">
@@ -1102,6 +1266,9 @@
   <ClCompile Include="..\..\fmpq_vec\randtest.c">
     <Filter>Source Files\fmpq_vec</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpq_vec\set_fmpz_vec.c">
+    <Filter>Source Files\fmpq_vec</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz\CRT.c">
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
@@ -1291,6 +1458,12 @@
   <ClCompile Include="..\..\fmpz\get_d_2exp.c">
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz\get_mpf.c">
+    <Filter>Source Files\fmpz</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz\get_mpfr.c">
+    <Filter>Source Files\fmpz</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz\get_mpz.c">
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
@@ -1319,9 +1492,6 @@
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz\is_prime.c">
-    <Filter>Source Files\fmpz</Filter>
-    </ClCompile>
-  <ClCompile Include="..\..\fmpz\is_prime_lenstra.c">
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz\is_prime_morrison.c">
@@ -1361,6 +1531,9 @@
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz\mod_ui.c">
+    <Filter>Source Files\fmpz</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz\mods.c">
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz\moebius_mu.c">
@@ -1457,6 +1630,9 @@
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz\set_d.c">
+    <Filter>Source Files\fmpz</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz\set_mpf.c">
     <Filter>Source Files\fmpz</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz\set_mpz.c">
@@ -1576,6 +1752,111 @@
   <ClCompile Include="..\..\fmpz_factor\set_length.c">
     <Filter>Source Files\fmpz_factor</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\advance_check_babai.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\advance_check_babai_heuristic_d.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\babai.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\check_babai.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\check_babai_heuristic.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\check_babai_heuristic_d.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\context_init.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\context_init_default.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\d_lll.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\heuristic_dot.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\is_reduced.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\is_reduced_d.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\is_reduced_d_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\is_reduced_mpfr.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\is_reduced_mpfr_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\is_reduced_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_d.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_d_heuristic.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_d_heuristic_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_d_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_d_with_removal_knapsack.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_mpf.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_mpf2.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_mpf2_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_mpf_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\lll_with_removal_ulll.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\mpf2_lll.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\randtest.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\shift.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\storjohann_ulll.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\wrapper.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\wrapper_with_removal.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_lll\wrapper_with_removal_knapsack.c">
+    <Filter>Source Files\fmpz_lll</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\CRT_ui.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
@@ -1585,7 +1866,19 @@
   <ClCompile Include="..\..\fmpz_mat\charpoly.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\chol_d.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\clear.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\concat_horizontal.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\concat_vertical.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\content.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\det.c">
@@ -1627,10 +1920,43 @@
   <ClCompile Include="..\..\fmpz_mat\fread.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\get_d_mat.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\get_d_mat_transpose.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\get_mpf_mat.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\get_nmod_mat.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\gram.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hadamard.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf_classical.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf_minors.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf_modular.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf_pernet_stein.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf_transform.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\hnf_xgcd.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\init.c">
@@ -1639,10 +1965,46 @@
   <ClCompile Include="..\..\fmpz_mat\init_set.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\inlines.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\inv.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_hadamard.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_in_hnf.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_in_rref_with_rank.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_in_snf.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_one.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_reduced.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_reduced_gram.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_reduced_gram_with_removal.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\is_reduced_with_removal.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\is_zero.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\lll_original.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\lll_storjohann.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\max_bits.c">
@@ -1720,7 +2082,13 @@
   <ClCompile Include="..\..\fmpz_mat\rref.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\rref_fflu.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\rref_mod.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\rref_mul.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\scalar_addmul_fmpz.c">
@@ -1750,6 +2118,9 @@
   <ClCompile Include="..\..\fmpz_mat\scalar_mod_fmpz.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\scalar_mul_2exp.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\scalar_mul_fmpz.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
@@ -1768,6 +2139,9 @@
   <ClCompile Include="..\..\fmpz_mat\scalar_submul_ui.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\scalar_tdiv_q_2exp.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\set.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
@@ -1775,6 +2149,18 @@
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\set_nmod_mat_unsigned.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\snf.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\snf_diagonal.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\snf_iliopoulos.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\snf_kannan_bachem.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\solve.c">
@@ -1798,6 +2184,9 @@
   <ClCompile Include="..\..\fmpz_mat\sqr.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\sqr_bodrato.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\sub.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
@@ -1808,6 +2197,12 @@
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\transpose.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\window_clear.c">
+    <Filter>Source Files\fmpz_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_mat\window_init.c">
     <Filter>Source Files\fmpz_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_mat\zero.c">
@@ -2740,6 +3135,12 @@
   <ClCompile Include="..\..\fmpz_poly_mat\clear.c">
     <Filter>Source Files\fmpz_poly_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_poly_mat\concat_horizontal.c">
+    <Filter>Source Files\fmpz_poly_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_poly_mat\concat_vertical.c">
+    <Filter>Source Files\fmpz_poly_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_poly_mat\det.c">
     <Filter>Source Files\fmpz_poly_mat</Filter>
     </ClCompile>
@@ -2768,6 +3169,9 @@
     <Filter>Source Files\fmpz_poly_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_poly_mat\init_set.c">
+    <Filter>Source Files\fmpz_poly_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_poly_mat\inlines.c">
     <Filter>Source Files\fmpz_poly_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_poly_mat\inv.c">
@@ -2878,6 +3282,12 @@
   <ClCompile Include="..\..\fmpz_poly_mat\truncate.c">
     <Filter>Source Files\fmpz_poly_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_poly_mat\window_clear.c">
+    <Filter>Source Files\fmpz_poly_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_poly_mat\window_init.c">
+    <Filter>Source Files\fmpz_poly_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_poly_mat\zero.c">
     <Filter>Source Files\fmpz_poly_mat</Filter>
     </ClCompile>
@@ -2909,6 +3319,9 @@
     <Filter>Source Files\fmpz_poly_q</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_poly_q\init.c">
+    <Filter>Source Files\fmpz_poly_q</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_poly_q\inlines.c">
     <Filter>Source Files\fmpz_poly_q</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_poly_q\inv.c">
@@ -2977,6 +3390,9 @@
   <ClCompile Include="..\..\fmpz_vec\content.c">
     <Filter>Source Files\fmpz_vec</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_vec\dot.c">
+    <Filter>Source Files\fmpz_vec</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_vec\equal.c">
     <Filter>Source Files\fmpz_vec</Filter>
     </ClCompile>
@@ -2986,7 +3402,13 @@
   <ClCompile Include="..\..\fmpz_vec\fread.c">
     <Filter>Source Files\fmpz_vec</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fmpz_vec\get_d_vec_2exp.c">
+    <Filter>Source Files\fmpz_vec</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fmpz_vec\get_fft.c">
+    <Filter>Source Files\fmpz_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_vec\get_mpf_vec.c">
     <Filter>Source Files\fmpz_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_vec\get_nmod_vec.c">
@@ -2999,6 +3421,9 @@
     <Filter>Source Files\fmpz_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_vec\init.c">
+    <Filter>Source Files\fmpz_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fmpz_vec\inlines.c">
     <Filter>Source Files\fmpz_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fmpz_vec\is_zero.c">
@@ -3223,6 +3648,12 @@
   <ClCompile Include="..\..\fq_mat\clear.c">
     <Filter>Source Files\fq_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_mat\concat_horizontal.c">
+    <Filter>Source Files\fq_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_mat\concat_vertical.c">
+    <Filter>Source Files\fq_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_mat\equal.c">
     <Filter>Source Files\fq_mat</Filter>
     </ClCompile>
@@ -3233,6 +3664,9 @@
     <Filter>Source Files\fq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_mat\init_set.c">
+    <Filter>Source Files\fq_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_mat\inlines.c">
     <Filter>Source Files\fq_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_mat\is_zero.c">
@@ -3424,6 +3858,12 @@
   <ClCompile Include="..\..\fq_nmod_mat\clear.c">
     <Filter>Source Files\fq_nmod_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_mat\concat_horizontal.c">
+    <Filter>Source Files\fq_nmod_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_mat\concat_vertical.c">
+    <Filter>Source Files\fq_nmod_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod_mat\equal.c">
     <Filter>Source Files\fq_nmod_mat</Filter>
     </ClCompile>
@@ -3434,6 +3874,9 @@
     <Filter>Source Files\fq_nmod_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_mat\init_set.c">
+    <Filter>Source Files\fq_nmod_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_mat\inlines.c">
     <Filter>Source Files\fq_nmod_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_mat\is_zero.c">
@@ -3847,6 +4290,9 @@
   <ClCompile Include="..\..\fq_nmod_poly_factor\init.c">
     <Filter>Source Files\fq_nmod_poly_factor</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_poly_factor\inlines.c">
+    <Filter>Source Files\fq_nmod_poly_factor</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_nmod_poly_factor\insert.c">
     <Filter>Source Files\fq_nmod_poly_factor</Filter>
     </ClCompile>
@@ -3896,6 +4342,9 @@
     <Filter>Source Files\fq_nmod_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_vec\init.c">
+    <Filter>Source Files\fq_nmod_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_nmod_vec\inlines.c">
     <Filter>Source Files\fq_nmod_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_nmod_vec\is_zero.c">
@@ -4255,6 +4704,9 @@
   <ClCompile Include="..\..\fq_poly_factor\init.c">
     <Filter>Source Files\fq_poly_factor</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_poly_factor\inlines.c">
+    <Filter>Source Files\fq_poly_factor</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_poly_factor\insert.c">
     <Filter>Source Files\fq_poly_factor</Filter>
     </ClCompile>
@@ -4304,6 +4756,9 @@
     <Filter>Source Files\fq_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_vec\init.c">
+    <Filter>Source Files\fq_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_vec\inlines.c">
     <Filter>Source Files\fq_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_vec\is_zero.c">
@@ -4441,6 +4896,12 @@
   <ClCompile Include="..\..\fq_zech_mat\clear.c">
     <Filter>Source Files\fq_zech_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_zech_mat\concat_horizontal.c">
+    <Filter>Source Files\fq_zech_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech_mat\concat_vertical.c">
+    <Filter>Source Files\fq_zech_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_zech_mat\equal.c">
     <Filter>Source Files\fq_zech_mat</Filter>
     </ClCompile>
@@ -4451,6 +4912,9 @@
     <Filter>Source Files\fq_zech_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_mat\init_set.c">
+    <Filter>Source Files\fq_zech_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\fq_zech_mat\inlines.c">
     <Filter>Source Files\fq_zech_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\fq_zech_mat\is_zero.c">
@@ -4864,6 +5328,9 @@
   <ClCompile Include="..\..\fq_zech_poly_factor\init.c">
     <Filter>Source Files\fq_zech_poly_factor</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_zech_poly_factor\inlines.c">
+    <Filter>Source Files\fq_zech_poly_factor</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_zech_poly_factor\insert.c">
     <Filter>Source Files\fq_zech_poly_factor</Filter>
     </ClCompile>
@@ -4915,6 +5382,9 @@
   <ClCompile Include="..\..\fq_zech_vec\init.c">
     <Filter>Source Files\fq_zech_vec</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\fq_zech_vec\inlines.c">
+    <Filter>Source Files\fq_zech_vec</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\fq_zech_vec\is_zero.c">
     <Filter>Source Files\fq_zech_vec</Filter>
     </ClCompile>
@@ -4954,6 +5424,9 @@
   <ClCompile Include="..\..\fmpz\link\fmpz_single.c">
     <Filter>Source Files\link</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\long_extras\inlines.c">
+    <Filter>Source Files\long_extras</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\long_extras\randint.c">
     <Filter>Source Files\long_extras</Filter>
     </ClCompile>
@@ -4963,10 +5436,121 @@
   <ClCompile Include="..\..\long_extras\sizeinbase.c">
     <Filter>Source Files\long_extras</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\approx_equal.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\clear.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\equal.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\gso.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\init.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\inlines.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\is_zero.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\mul.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\one.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\print.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\qr.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\randtest.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\set.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\swap.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_mat\zero.c">
+    <Filter>Source Files\mpf_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\add.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\approx_equal.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\clear.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\dot.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\dot2.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\equal.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\init.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\is_zero.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\norm.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\norm2.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\randtest.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\scalar_mul_2exp.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\scalar_mul_mpf.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\set.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\sub.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpf_vec\zero.c">
+    <Filter>Source Files\mpf_vec</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\mpfr_mat\clear.c">
     <Filter>Source Files\mpfr_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\mpfr_mat\equal.c">
+    <Filter>Source Files\mpfr_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\mpfr_mat\init.c">
+    <Filter>Source Files\mpfr_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpfr_mat\mul_classical.c">
+    <Filter>Source Files\mpfr_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpfr_mat\randtest.c">
+    <Filter>Source Files\mpfr_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpfr_mat\set.c">
+    <Filter>Source Files\mpfr_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpfr_mat\swap.c">
+    <Filter>Source Files\mpfr_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpfr_mat\zero.c">
     <Filter>Source Files\mpfr_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\mpfr_vec\add.c">
@@ -4975,7 +5559,13 @@
   <ClCompile Include="..\..\mpfr_vec\clear.c">
     <Filter>Source Files\mpfr_vec</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\mpfr_vec\equal.c">
+    <Filter>Source Files\mpfr_vec</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\mpfr_vec\init.c">
+    <Filter>Source Files\mpfr_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\mpfr_vec\randtest.c">
     <Filter>Source Files\mpfr_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\mpfr_vec\scalar_mul_2exp.c">
@@ -5044,6 +5634,12 @@
   <ClCompile Include="..\..\nmod_mat\clear.c">
     <Filter>Source Files\nmod_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\nmod_mat\concat_horizontal.c">
+    <Filter>Source Files\nmod_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_mat\concat_vertical.c">
+    <Filter>Source Files\nmod_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\nmod_mat\det.c">
     <Filter>Source Files\nmod_mat</Filter>
     </ClCompile>
@@ -5054,6 +5650,9 @@
     <Filter>Source Files\nmod_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_mat\init_set.c">
+    <Filter>Source Files\nmod_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_mat\inlines.c">
     <Filter>Source Files\nmod_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_mat\inv.c">
@@ -5123,6 +5722,9 @@
     <Filter>Source Files\nmod_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_mat\scalar_mul.c">
+    <Filter>Source Files\nmod_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_mat\scalar_mul_add.c">
     <Filter>Source Files\nmod_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_mat\set.c">
@@ -5320,7 +5922,10 @@
   <ClCompile Include="..\..\nmod_poly\evaluate_fmpz.c">
     <Filter>Source Files\nmod_poly</Filter>
     </ClCompile>
-  <ClCompile Include="..\..\nmod_poly\evaluate_mat.c">
+  <ClCompile Include="..\..\nmod_poly\evaluate_mat_horner.c">
+    <Filter>Source Files\nmod_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_poly\evaluate_mat_paterson_stockmeyer.c">
     <Filter>Source Files\nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_poly\evaluate_nmod.c">
@@ -5381,6 +5986,9 @@
     <Filter>Source Files\nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_poly\init2.c">
+    <Filter>Source Files\nmod_poly</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_poly\inlines.c">
     <Filter>Source Files\nmod_poly</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_poly\integral.c">
@@ -5623,6 +6231,9 @@
   <ClCompile Include="..\..\nmod_poly_factor\init.c">
     <Filter>Source Files\nmod_poly_factor</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\nmod_poly_factor\inlines.c">
+    <Filter>Source Files\nmod_poly_factor</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\nmod_poly_factor\insert.c">
     <Filter>Source Files\nmod_poly_factor</Filter>
     </ClCompile>
@@ -5656,6 +6267,12 @@
   <ClCompile Include="..\..\nmod_poly_mat\clear.c">
     <Filter>Source Files\nmod_poly_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\nmod_poly_mat\concat_horizontal.c">
+    <Filter>Source Files\nmod_poly_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_poly_mat\concat_vertical.c">
+    <Filter>Source Files\nmod_poly_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\nmod_poly_mat\det.c">
     <Filter>Source Files\nmod_poly_mat</Filter>
     </ClCompile>
@@ -5684,6 +6301,9 @@
     <Filter>Source Files\nmod_poly_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_poly_mat\init_set.c">
+    <Filter>Source Files\nmod_poly_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_poly_mat\inlines.c">
     <Filter>Source Files\nmod_poly_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_poly_mat\inv.c">
@@ -5776,6 +6396,12 @@
   <ClCompile Include="..\..\nmod_poly_mat\trace.c">
     <Filter>Source Files\nmod_poly_mat</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\nmod_poly_mat\window_clear.c">
+    <Filter>Source Files\nmod_poly_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_poly_mat\window_init.c">
+    <Filter>Source Files\nmod_poly_mat</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\nmod_poly_mat\zero.c">
     <Filter>Source Files\nmod_poly_mat</Filter>
     </ClCompile>
@@ -5789,6 +6415,9 @@
     <Filter>Source Files\nmod_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_vec\dot_ptr.c">
+    <Filter>Source Files\nmod_vec</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\nmod_vec\inlines.c">
     <Filter>Source Files\nmod_vec</Filter>
     </ClCompile>
   <ClCompile Include="..\..\nmod_vec\max_bits.c">
@@ -5815,9 +6444,6 @@
   <ClCompile Include="..\..\padic\add.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
-  <ClCompile Include="..\..\padic\add_exact.c">
-    <Filter>Source Files\padic</Filter>
-    </ClCompile>
   <ClCompile Include="..\..\padic\clear.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
@@ -5828,9 +6454,6 @@
     <Filter>Source Files\padic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic\div.c">
-    <Filter>Source Files\padic</Filter>
-    </ClCompile>
-  <ClCompile Include="..\..\padic\div_exact.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic\exp.c">
@@ -5887,9 +6510,6 @@
   <ClCompile Include="..\..\padic\mul.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
-  <ClCompile Include="..\..\padic\mul_exact.c">
-    <Filter>Source Files\padic</Filter>
-    </ClCompile>
   <ClCompile Include="..\..\padic\neg.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
@@ -5929,13 +6549,7 @@
   <ClCompile Include="..\..\padic\sqrt.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
-  <ClCompile Include="..\..\padic\sqrt_exact.c">
-    <Filter>Source Files\padic</Filter>
-    </ClCompile>
   <ClCompile Include="..\..\padic\sub.c">
-    <Filter>Source Files\padic</Filter>
-    </ClCompile>
-  <ClCompile Include="..\..\padic\sub_exact.c">
     <Filter>Source Files\padic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic\teichmuller.c">
@@ -5969,6 +6583,9 @@
     <Filter>Source Files\padic_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic_mat\init.c">
+    <Filter>Source Files\padic_mat</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\padic_mat\inlines.c">
     <Filter>Source Files\padic_mat</Filter>
     </ClCompile>
   <ClCompile Include="..\..\padic_mat\is_zero.c">
@@ -6064,6 +6681,9 @@
   <ClCompile Include="..\..\padic_poly\init.c">
     <Filter>Source Files\padic_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\padic_poly\inlines.c">
+    <Filter>Source Files\padic_poly</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\padic_poly\inv_series.c">
     <Filter>Source Files\padic_poly</Filter>
     </ClCompile>
@@ -6136,6 +6756,9 @@
   <ClCompile Include="..\..\padic_poly\swap.c">
     <Filter>Source Files\padic_poly</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\perm\inlines.c">
+    <Filter>Source Files\perm</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\perm\parity.c">
     <Filter>Source Files\perm</Filter>
     </ClCompile>
@@ -6161,6 +6784,9 @@
     <Filter>Source Files\qadic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\qadic\frobenius.c">
+    <Filter>Source Files\qadic</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\qadic\inlines.c">
     <Filter>Source Files\qadic</Filter>
     </ClCompile>
   <ClCompile Include="..\..\qadic\inv.c">
@@ -6238,6 +6864,24 @@
   <ClCompile Include="..\..\qsieve\ll_square_root.c">
     <Filter>Source Files\qsieve</Filter>
     </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\cbrt.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\cbrt_binary_search.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\cbrt_chebyshev_approximation.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\cbrt_estimate.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\cbrt_newton_iteration.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\cbrtrem.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
   <ClCompile Include="..\..\ulong_extras\cleanup_primes.c">
     <Filter>Source Files\ulong_extras</Filter>
     </ClCompile>
@@ -6302,6 +6946,9 @@
     <Filter>Source Files\ulong_extras</Filter>
     </ClCompile>
   <ClCompile Include="..\..\ulong_extras\gcdinv.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\inlines.c">
     <Filter>Source Files\ulong_extras</Filter>
     </ClCompile>
   <ClCompile Include="..\..\ulong_extras\invmod.c">
@@ -6455,6 +7102,15 @@
     <Filter>Source Files\ulong_extras</Filter>
     </ClCompile>
   <ClCompile Include="..\..\ulong_extras\revbin.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\root.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\root_estimate.c">
+    <Filter>Source Files\ulong_extras</Filter>
+    </ClCompile>
+  <ClCompile Include="..\..\ulong_extras\rootrem.c">
     <Filter>Source Files\ulong_extras</Filter>
     </ClCompile>
   <ClCompile Include="..\..\ulong_extras\sizeinbase.c">
