@@ -144,6 +144,8 @@ main(void)
         flint_free(threads);
     }
 
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+
     /* check composition */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -239,4 +241,15 @@ main(void)
     
     flint_printf("PASS\n");
     return 0;
+
+#else
+
+   FLINT_TEST_CLEANUP(state);
+
+   flint_printf("SKIPPED\n");
+   return 0;
+
+#endif
+
 }
+
