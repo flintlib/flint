@@ -1101,7 +1101,7 @@ v 2.4.4 -- fixed a severe bug in flint's primality code (n_is_prime() affecting 
 v 2.4.5 -- fixed a severe bug in flint's fmpz_poly_gcd_heuristic, reported by
     Anton Mellit.
 
-v 2.5.0 -- 05 Aug 2015
+v 2.5.0 -- 07 Aug 2015
 
   * LLL (rational, Nguyen-Stehle, from Gram matrix, with_removal, Storjohann/ULLL)
   * Hermite normal form (naive, xgcd, Domich-Kannan-Trotter, Kannan-Bachem, Pernet-Stein)

@@ -1,4 +1,4 @@
-'''
+﻿'''
 Set up Visual Sudio to build a specified MPIR configuration
 
 Copyright (C) 2011, 2012, 2013, 2014 Brian Gladman
@@ -21,10 +21,10 @@ from time import sleep
 # for script debugging
 debug = False
 # what to build
-build_lib = True
-build_dll = True
-build_tests = False
-build_profiles = False
+build_lib = False
+build_dll = False
+build_tests = True
+build_profiles = True
 
 # add user choice
 flib_type = 'single' # ('gc', 'reentrant', 'single')
@@ -32,7 +32,7 @@ flib_type = 'single' # ('gc', 'reentrant', 'single')
 # The path to flint, solution and project directories
 script_dir = dirname(__file__)
 project_name = 'flint'
-build_vc = 'build.vc12'
+build_vc = 'build.vc14'
 flint_dir = normpath(join(script_dir, '../../'))
 solution_dir = normpath(join(flint_dir, build_vc))
 
@@ -56,7 +56,8 @@ def write_f(ipath, opath):
         return
     copy(ipath, opath)
 
-ignore_dirs = ( '.git', 'doc', 'examples', 'lib', 'exe', 'dll', 'win_hdrs')
+ignore_dirs = ( '.git', 'doc', 'examples', 'lib', 'exe', 'dll', 'win_hdrs', 'build.vc12')
+req_extns = ( '.h', '.c', '.cc', '.cpp' )
 
 def find_src(path):
 
@@ -67,7 +68,7 @@ def find_src(path):
     _, _t = split(root)
     if _t in ignore_dirs:
       continue
-    if root.endswith(build_vc):
+    if 'build.vc' in root:
       for di in list(dirs):
         dirs.remove(di)
     for di in list(dirs):
@@ -82,6 +83,8 @@ def find_src(path):
       if 'template' in f:
         continue
       n, x = splitext(f)
+      if x not in req_extns:
+        continue
       pth, leaf = split(root)
       fp = join(relp, f)
       if leaf == 'tune':
@@ -190,7 +193,7 @@ def write_hdrs(h):
     makedirs(hdr_dir)
 
   for hf in sorted(d.keys()):
-    out_name = hf.replace('build.vc12\\', '')
+    out_name = hf.replace('build.vc14\\', '')
     inf = open(join(flint_dir, hf), 'r')
     outf = open(join(flint_dir, join(hdr_dir, out_name)), 'w')
     lines = inf.readlines()
@@ -328,7 +331,7 @@ def vcx_library_type(plat, proj_type, outf):
 
   f1 = r'''  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'" Label="Configuration">
     <ConfigurationType>{2:s}</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     </PropertyGroup>
 '''
   for pl in plat:
@@ -359,6 +362,7 @@ def vcx_target_name_and_dirs(proj_name, proj_dir, plat, outf):
   f2 = r'''    <TargetName Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">{2:s}</TargetName>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(Platform)\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">$(SolutionDir){3:s}$(Platform)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
 '''
   f3 = r'''  </PropertyGroup>
 '''
@@ -382,7 +386,7 @@ def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
     <PreprocessorDefinitions>{2:s}%(PreprocessorDefinitions)</PreprocessorDefinitions>
     <RuntimeLibrary>MultiThreaded{3:s}</RuntimeLibrary>
     <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
-    <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    <DebugInformationFormat>{4:s}</DebugInformationFormat>
     </ClCompile>
 '''
 
@@ -406,10 +410,10 @@ def compiler_options(plat, proj_type, is_debug, inc_dirs, outf):
   if plat == 'x64':
     s1 = s1 + '_WIN64;'
   if is_debug:
-    opt, defines, crt = 'Disabled', '_' + s1, 'Debug' + s2
+    opt, defines, crt, dbf = 'Disabled', '_' + s1, 'Debug' + s2, 'ProgramDatabase'
   else:
-    opt, defines, crt = 'Full', 'N' + s1, s2
-  outf.write(f1.format(opt, inc_dirs, defines, crt))
+    opt, defines, crt, dbf = 'Full', 'N' + s1, s2, 'None'
+  outf.write(f1.format(opt, inc_dirs, defines, crt, dbf))
 
 def linker_options(name, link_libs, proj_type, debug_info, outf):
 
@@ -513,7 +517,7 @@ def vcx_c_items(cf_list, plat, relp, outf):
 def gen_vcxproj(proj_name, project_dir, file_name, guid, plat, proj_type, postbuild, debug_info, hf_list, cf_list, inc_dirs, link_libs):
 
   f1 = r'''<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 '''
   f2 = r'''  <PropertyGroup Label="UserMacros" />
 '''
@@ -542,7 +546,8 @@ def gen_vcxproj(proj_name, project_dir, file_name, guid, plat, proj_type, postbu
 # add project files to the solution
 
 folder_guid = "{2150E333-8FDC-42A3-9474-1A3956D46DE8}"
-vcxproject_guid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+vcxproj_guid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}"
+pyproj_guid =  "{888888A0-9F3D-457C-B088-3A5042F75D52}"
 
 s_guid = r'\s*(\{\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\})\s*'
 s_name = r'\s*\"([a-zA-Z][-.\\_a-zA-Z0-9]*\s*)\"\s*'
@@ -552,7 +557,8 @@ re_proj = compile(r'Project\s*\(\s*\"' + s_guid + r'\"\)\s*=\s*'
 re_fmap = compile(r'\s*' + s_guid + r'\s*=\s*' + s_guid)
 
 def read_solution_file(soln_name):
-  fd, pd, p2f = {}, {}, {}
+  g2fldr, g2proj = {}, {}
+  gf2gpl = defaultdict(list)
   solution_path = join(solution_dir, soln_name)
   if exists(solution_path):
     lines = open(solution_path).readlines()
@@ -560,17 +566,33 @@ def read_solution_file(soln_name):
       m = re_proj.search(ln)
       if m:
         if m.group(1) == folder_guid and m.group(2) == m.group(3):
-          fd[m.group(2)] = m.group(4)
-        elif m.group(3).endswith('.vcxproj') or m.group(3).endswith('.pyproj'):
-          pd[m.group(2)] = (m.group(1), m.group(3), m.group(4))
+          # folder guid -> folder name
+          g2fldr[m.group(4)] = m.group(2)
+        elif (m.group(1) == vcxproj_guid and m.group(3).endswith('.vcxproj') or
+              m.group(1) == pyproj_guid and m.group(3).endswith('.pyproj')):
+          # project guid -> proj_type_guid, proj_name, vcx_path 
+          g2proj[m.group(4)] = (m.group(1), m.group(2), m.group(3))
+
+    for i, ln in enumerate(lines):
       m = re_fmap.search(ln)
       if m:
-        p2f[m.group(1)] = m.group(2)
-  return fd, pd, p2f
+        if m.group(1) in g2proj and m.group(2) in g2fldr:
+          gf2gpl[m.group(2)].append(m.group(1))
+
+  for g in g2proj:
+    for _, gpl in gf2gpl.items():
+      if g in gpl:
+        break
+    else:
+      gf2gpl[''].append(g)
+
+  assert len(g2fldr.keys()) == len(gf2gpl.keys()) - (1 if '' in gf2gpl.keys() else 0)
+  assert sum(len(gpl) for gf, gpl in gf2gpl.items()) == len(g2proj.keys())
+  return g2fldr, g2proj, gf2gpl
 
 sol_1 = '''Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30626.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 '''
 
@@ -598,37 +620,68 @@ sol_5 = r'''	EndGlobalSection
 EndGlobal
 '''
 
-def write_solution_file(file_name, fd, pd, p2f):
-  with open(join(solution_dir, file_name), 'w') as outf:
+def write_solution_file(soln_name, g2fldr, g2proj, gf2gpl):
+  if len(g2fldr.keys()) > len(gf2gpl.keys()):
+    for g in list(g2fldr.keys()):
+      if g not in gf2gpl.keys():
+        del g2fldr[g]
+  assert len(g2fldr.keys()) == len(gf2gpl.keys()) - (1 if '' in gf2gpl.keys() else 0)
+  assert sum(len(gpl) for gf, gpl in gf2gpl.items()) == len(g2proj.keys())
+
+  with open(join(solution_dir, soln_name), 'w') as outf:
     outf.write(sol_1)
-    for f, g in fd.items():
+    for g, f in g2fldr.items():
       outf.write(sol_2.format(folder_guid, f, f, g))
-    for f, (g1, pn, g2) in pd.items():
-      outf.write(sol_2.format(g1, f, pn, g2))
+    for g, (gg, f, n) in g2proj.items():
+      outf.write(sol_2.format(gg, f, n, g))
     outf.write(sol_3)
-    for f, g in p2f.items():
-      outf.write(sol_4.format(f, g))
+    for gf, gpl in gf2gpl.items():
+      if gf != '':
+        for gp in gpl:
+          outf.write(sol_4.format(gp, gf))
     outf.write(sol_5)
 
-def add_proj_to_sln(soln_name, soln_folder, proj_name, file_name, guid):
-  fd, pd, p2f = read_solution_file(soln_name)
+def add_proj_to_sln(soln_name, soln_folder, proj_name, file_name, p_guid, sol_inf):
+  if not sol_inf:
+    g2fldr, g2proj, gf2gpl = read_solution_file(soln_name)
+  else:
+    g2fldr, g2proj, gf2gpl = sol_inf
   if soln_folder:
-    if soln_folder in fd:
-      f_guid = fd[soln_folder]
+    for g, f in g2fldr.items():
+      if f == soln_folder:
+        f_guid = g
+        break
     else:
       f_guid = '{' + str(uuid4()).upper() + '}'
-      fd[soln_folder] = f_guid
-  pd[proj_name] = (vcxproject_guid, file_name, guid)
-  if soln_folder:
-    p2f[guid] = f_guid
+      g2fldr[f_guid] = soln_folder
 
-  write_solution_file(soln_name, fd, pd, p2f)
+  for g in list(g2proj.keys()):
+    if g2proj[g] == (vcxproj_guid, proj_name, file_name):
+      del g2proj[g]
+      for _, gpl in gf2gpl.items():
+        if g in gpl:
+          del gpl[gpl.index(g)]
+      break
+  g2proj[p_guid] = (vcxproj_guid, proj_name, file_name)
+  gf2gpl[f_guid if soln_folder else ''].append(p_guid)
+  if not sol_inf:
+    write_solution_file(soln_name, g2fldr, g2proj, gf2gpl)
 
 c, h, cx, hx, t, tx, p = find_src(flint_dir)
 
 # write_hdrs(h)
 
 if not debug:
+  with open('..\\..\\qadic\\CPimport.txt', 'r') as fin:
+    with open('..\\..\\qadic\\CPimport.h', 'w') as fout:
+      while True:
+        l = fin.readline()
+        if not l:
+          break
+        l = l.replace(' ', ',')
+        l = l.replace('\n', ',\n')
+        fout.writelines([l])
+
   fn = join(flint_dir, 'fmpz-conversions-{}.in'.format(flib_type))
   copy(fn , join(flint_dir, 'fmpz-conversions.h'))
   # fn = join(flint_dir, 'fft_tuning32.in')
@@ -643,11 +696,11 @@ if build_lib:
   proj_name = 'lib_flint'
   vcx_path = 'lib_flint\\lib_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
-  mode = ('win32', 'x64')
+  mode = ('Win32', 'x64')
   inc_dirs = r'..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads\lib\$(IntDir)'
   link_libs = r'..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib'
   gen_vcxproj(proj_name, None, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
-  add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
+  add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid, None)
 
 if build_dll:
   # set up DLL build
@@ -659,53 +712,45 @@ if build_dll:
   proj_name = 'dll_flint'
   vcx_path = 'dll_flint\\dll_flint.vcxproj'
   gen_filter(vcx_path + '.filters', h, c)
-  mode = ('win32', 'x64')
+  mode = ('Win32', 'x64')
   inc_dirs = r'..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);'
   link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\pthreads\dll\$(IntDir)pthreads.lib;'
   gen_vcxproj(proj_name, None, vcx_path, guid, mode, dll_type, True, True, h, c, inc_dirs, link_libs)
-  add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid)
+  add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid, None)
 
-def gen_test(sln_name, test_name, directory, proj_dir, c_file):
+def gen_test(sln_name, test_name, directory, proj_dir, name, c_file):
   # set up LIB build
   guid = '{' + str(uuid4()).upper() + '}'
-  proj_name = test_name
-  vcx_path = directory + '\\' + test_name + '\\' + test_name + '.vcxproj'
+  proj_name = test_name[2:]
+  p_dir = join(proj_dir, name)
+  vcx_path = directory + '\\' + name + '_' + proj_name + '\\' + proj_name + '.vcxproj'
   gen_filter(vcx_path + '.filters', [], [('', c_file)])
-  mode = ('win32', 'x64')
+  mode = ('Win32', 'x64')
   inc_dirs = r'..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads\lib\$(IntDir);'
   link_libs = r'..\..\..\lib\$(IntDir)lib_flint.lib;..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
-  gen_vcxproj(proj_name, proj_dir, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
+  gen_vcxproj(test_name, p_dir, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
   return vcx_path, guid
 
 def gen_tests(sln_name, directory, proj_dir, c_files):
-
   sn = sln_name[:sln_name.rfind('.')]
-  cnt = 0
-  soln = sn + str(cnt // 100 + 1) + '.sln'
+  cnt = -1
   for name, fpath in c_files:
+    cnt += 1
+    soln = sn + str(cnt // 100 + 1) + '.sln'
     if cnt % 100 == 0:
-      fd, pd, p2f = read_solution_file(soln)
-    if name:
-      if name in fd:
-        f_guid = fd[name]
-      else:
-        f_guid = '{' + str(uuid4()).upper() + '}'
-        fd[name] = f_guid
+      print(soln)
+      g2fldr, g2proj, gf2gpl = read_solution_file(soln)
+    print('  ', cnt, name, fpath)
     _, t = split(fpath)
     if t[:2] not in ('t-', 'p-'):
       continue
-    t = t[2:].replace('.c', '')
-    p_name = (name + '_' + t) if name else t
-    vcx_name, guid = gen_test(sln_name, p_name, directory, proj_dir, fpath)
-    pd[p_name] = (vcxproject_guid, vcx_name, guid)
-    if name:
-      p2f[guid] = f_guid
-    cnt += 1
-    if cnt % 100 == 0:
-      write_solution_file(soln, fd, pd, p2f)
-      soln = sn + str(cnt // 100 + 1) + '.sln'
+    p_name = t.replace('.c', '')
+    vcx_name, p_guid = gen_test(sln_name, p_name, directory, proj_dir, name, fpath)
+    add_proj_to_sln(soln, name, p_name, vcx_name, p_guid, (g2fldr, g2proj, gf2gpl))
+    if cnt % 100 == 99:
+      write_solution_file(soln, g2fldr, g2proj, gf2gpl)
   if cnt % 100:
-    write_solution_file(soln, fd, pd, p2f)
+    write_solution_file(soln, g2fldr, g2proj, gf2gpl)
 
 if build_tests:
   gen_tests('flint-tests.sln', 'flint-tests', 'tests', t)
