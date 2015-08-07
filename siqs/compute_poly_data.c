@@ -574,12 +574,12 @@ void qsieve_init_poly_first(qs_t qs_inf)
         temp2 = n_mod2_preinv(temp2, p, pinv);
         soln1[i] = temp2;
 
-        temp2 = p - sqrts[i];
-        temp2 = temp2 + p - temp;
-        temp2 = n_mulmod2_preinv(temp2, Ainv, p, pinv);
-        temp2 += qs_inf->sieve_size / 2;
-        temp2 = n_mod2_preinv(temp2, p, pinv);
-        soln2[i] = temp2;
+        temp = n_mulmod2_preinv(sqrts[i], Ainv, p, pinv);
+        temp *= 2;
+        if (temp >= p) temp -= p;
+        temp = soln1[i] + p - temp;
+        if (temp >= p) temp -= p;
+        soln2[i] = temp;
 
         for (j = 0; j < s; j++)
             A_inv2B[j][i] = n_mulmod2_preinv(A_inv2B[j][i], Ainv, p, pinv);
