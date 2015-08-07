@@ -41,7 +41,10 @@ _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
    NMOD_VEC_NORM(der, dlen);
 
    if (dlen == 0)
-      return 0;
+   {
+       _nmod_vec_clear(der);
+       return 0;
+   }
 
    res = _nmod_poly_resultant(poly, len, der, dlen, mod);
    pow = n_powmod2_preinv(poly[len - 1], len - dlen - 2, mod.n, mod.ninv);
