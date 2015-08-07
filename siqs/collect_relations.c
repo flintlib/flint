@@ -95,15 +95,19 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
 
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 {
-    slong b, d1, d2, Bp, B, i, j;
+    slong b, d1, d2, i, j;
     slong pind, size, r0;
     slong num_primes = qs_inf->num_primes;
-    mp_limb_t x, p;
+    mp_limb_t p;
     mp_limb_t * soln1 = qs_inf->soln1;
     mp_limb_t * soln2 = qs_inf->soln2;
     mp_limb_t * xr1 = qs_inf->xr1;
     mp_limb_t * xr2 = qs_inf->xr2;
     prime_t * factor_base = qs_inf->factor_base;
+
+    unsigned char * Bp;
+    unsigned char * B;
+    register unsigned char * x;
 
     memset(sieve, 0, qs_inf->sieve_size + sizeof(ulong));
 
@@ -113,47 +117,49 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
         xr2[i] = soln2[i] - xr1[i];
     }
 
+    for (i = 0; i < num_primes; i++)
+    {
+        if (factor_base[i].p > BLOCK_SIZE)
+            break;
+    }
+
+    r0 = i;
+
     for (b = 1; b <= qs_inf->sieve_size / BLOCK_SIZE; b++)
     {
-        B = b * BLOCK_SIZE;
+        B = sieve + b * BLOCK_SIZE;
 
-        for (pind = qs_inf->small_primes; pind < qs_inf->num_primes; pind++)
+        for (pind = qs_inf->small_primes; pind < r0; pind++)
         {
             if (soln2[pind] == 0)
                 continue;
 
             p = factor_base[pind].p;
-
-            if (p > BLOCK_SIZE)
-                break;
-
             size = factor_base[pind].size;
             d1 = xr2[pind];
             d2 = p - d1;
-            Bp = B - d1;
+            Bp = (B - xr2[pind]);
 
-            for (x = xr1[pind]; x <= Bp; )
+            for (x = sieve + xr1[pind]; x <= Bp; )
             {
-                sieve[x] += size, x += d1;
-                sieve[x] += size, x += d2;
+                (*x) += size, x += d1;
+                (*x) += size, x += d2;
             }
 
             if (x <= B)
             {
-                sieve[x] += size, x += d1;
+                (*x) += size, x += d1;
                 xr2[pind] = d2;
             }
             else {xr2[pind] = d1;}
 
-            xr1[pind] = x;
+            xr1[pind] = (x - sieve);
         }
     }
 
-    r0 = pind;
-
     for (b = 1; b <= qs_inf->sieve_size / BLOCK_SIZE; b++)
     {
-       B = b * BLOCK_SIZE;
+       B = sieve + b * BLOCK_SIZE;
 
        for (pind = r0; pind < num_primes; pind++)
         {
@@ -164,25 +170,24 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
             size = factor_base[pind].size;
 
-            if ((x = xr1[pind]) <= B)
+            if ((x = sieve + xr1[pind]) <= B)
             {
-                sieve[x] += size;
-                x += xr2[pind];
+                (*x) += size;
+                 x += xr2[pind];
 
                 if (x <= B)
                 {
-                    sieve[x] += size;
+                    (*x) += size;
                     x += p - xr2[pind];
                 }
                 else {xr2[pind] = p - xr2[pind];}
 
-                xr1[pind] = x;
+                xr1[pind] = (x - sieve);
             }
-            else {xr1[pind] = x;}
+            else {xr1[pind] = (x - sieve);}
         }
     }
 }
-
 
 /* check position 'i' in sieve array for smoothness */
 
