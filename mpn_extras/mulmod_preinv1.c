@@ -68,6 +68,9 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
    }
 
    mpn_copyi(r, t, n);
+
+   if (n > 30)
+       flint_free(t);
 }
 
 #if !defined(_MSC_VER)
