@@ -180,6 +180,11 @@ int main(void)
             flint_printf("Expected answer : base = %wu remainder = %wu", val, j);
             abort();
         }
+
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
+        mpz_clear(h);
     }
 
     FLINT_TEST_CLEANUP(state);
