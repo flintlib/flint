@@ -143,10 +143,9 @@ int main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, c, d, max_pow, base, val;
-        mpz_t e, f, g, h;
+        mpz_t e, g, h;
 
         mpz_init(e);
-        mpz_init(f);
         mpz_init(g);
         mpz_init(h);
  
@@ -174,6 +173,10 @@ int main(void)
             flint_printf("Expected answer : base = %wu", val);
             abort();
         }
+
+        mpz_clear(e);
+        mpz_clear(g);
+        mpz_clear(h);
     }
 
     FLINT_TEST_CLEANUP(state);
