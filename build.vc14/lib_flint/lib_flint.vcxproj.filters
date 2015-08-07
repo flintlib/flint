@@ -70,9 +70,6 @@
     <ClInclude Include="..\..\build.vc14\config.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\build.vc14\cpimport.h">
-    <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\build.vc14\getopt.h">
     <Filter>Header Files</Filter>
     </ClInclude>
