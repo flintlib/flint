@@ -39,23 +39,27 @@ int
 fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 {
     mp_size_t sz, cy;
-    mp_size_t invlimbs;
-    mp_ptr temp;
+    mp_size_t invlimbs, gcdlimbs;
+    mp_ptr temp, tempv, tempn, tempi, tempf;
     int ret;
-    fmpz_t a, b, ff, inv;
-    __mpz_struct *aa, *bb;
-    
-    TMP_INIT;
 
-    ret = 0;
+    TMP_INIT;
 
     TMP_START;
     temp = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    tempv = flint_malloc((ecm_inf->n_size) * sizeof(mp_limb_t));
+    tempn = flint_malloc((ecm_inf->n_size) * sizeof(mp_limb_t));
+    tempi = flint_malloc((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
+    tempf = flint_malloc((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
 
+    mpn_zero(tempn, ecm_inf->n_size);
+    mpn_zero(tempv, ecm_inf->n_size);
     mpn_zero(temp, ecm_inf->n_size);
     mpn_copyi(ecm_inf->u, sig, ecm_inf->n_size);
 
     temp[0] = UWORD(4);
+    ret = 0;
+
     mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);   /* temp = (4 << norm) */
 
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->u, temp, ecm_inf->n_size,
@@ -109,7 +113,6 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->t, ecm_inf->z, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
 
-
     sz = ecm_inf->n_size;
     MPN_NORM(ecm_inf->v, sz);  /* sz has number of limbs of v */
 
@@ -117,50 +120,46 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     {                   /* No point in further computation with curve */
         ret = (-1);
         goto cleanup;
-    }    
+    }
 
-    fmpz_init(ff);
-    fmpz_init(inv);
-    fmpz_init2(a, ecm_inf->n_size);
-    fmpz_init2(b, ecm_inf->n_size);
+    mpn_copyi(tempv, ecm_inf->v, sz);
+    mpn_copyi(tempn, n, ecm_inf->n_size);
 
-    aa = _fmpz_promote(a);
-    bb = _fmpz_promote(b);
+    gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
-    mpn_copyi(aa->_mp_d, ecm_inf->v, sz);
-    mpn_copyi(bb->_mp_d, n, ecm_inf->n_size);
-
-    aa->_mp_size = sz;
-    bb->_mp_size = ecm_inf->n_size;
-
-    mpn_rshift(aa->_mp_d, aa->_mp_d, aa->_mp_size, ecm_inf->normbits);
-    mpn_rshift(bb->_mp_d, bb->_mp_d, bb->_mp_size, ecm_inf->normbits);
-
-    fmpz_gcdinv(ff, inv, a, b);
-
-    if (fmpz_is_one(ff) == 0)
+    if ((((gcdlimbs == 1) && tempf[0] == ecm_inf->one[0]) || 
+        ((gcdlimbs == ecm_inf->n_size) && mpn_cmp(tempf, n, ecm_inf->n_size) == 0)) == 0)
     {
-        aa = _fmpz_promote(ff);
-        MPN_NORM(aa->_mp_d, aa->_mp_size);
-
-        mpn_zero(f, ecm_inf->n_size);
-        mpn_copyi(f, aa->_mp_d, aa->_mp_size);
-
-        ret = aa->_mp_size;
+        /* Found factor */
+        ret = gcdlimbs;
         goto cleanup;
     }
 
-    fmpz_mod(inv, inv, b);
+    if (invlimbs < 0) /* negative inverse, add n */
+    {
+        invlimbs *= -1;
 
-    bb = _fmpz_promote(inv);
+        cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
+        if (cy)
+            tempi[invlimbs] = cy;
+
+        mpn_sub_n(tempi, n, tempi, ecm_inf->n_size);\
+    }
+    else
+    {
+        cy = mpn_lshift(tempi, tempi, invlimbs, ecm_inf->normbits);
+        if (cy)
+            tempi[invlimbs] = cy;
+    }
+
+    MPN_NORM(tempi, invlimbs);
+
     mpn_zero(ecm_inf->u, ecm_inf->n_size);
 
-    cy = mpn_lshift(ecm_inf->u, bb->_mp_d, bb->_mp_size, ecm_inf->normbits);
+    cy = mpn_lshift(ecm_inf->u, tempi, invlimbs, ecm_inf->normbits);
 
     if (cy)
-        ecm_inf->u[bb->_mp_size] = cy;
-
-    invlimbs = bb->_mp_size;
+        ecm_inf->u[invlimbs] = cy;
 
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->u, ecm_inf->t, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
@@ -185,11 +184,6 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     mpn_copyi(ecm_inf->z, ecm_inf->one, ecm_inf->n_size);
 
     cleanup:
-
-    fmpz_clear(ff);
-    fmpz_clear(inv);
-    fmpz_clear(a);
-    fmpz_clear(b);
 
     TMP_END;
     

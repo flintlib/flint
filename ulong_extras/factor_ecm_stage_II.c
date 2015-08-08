@@ -89,7 +89,7 @@ n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     for (i = mmin; i <= mmax; i ++)
     {
-        for (j = 1; j <= maxj; j+=2)
+        for (j = 1; j <= maxj; j += 2)
         {
             if (n_ecm_inf->prime_table[i - mmin][j] == 1)
             {

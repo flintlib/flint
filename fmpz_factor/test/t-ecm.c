@@ -54,8 +54,6 @@ int main(void)
 
             fmpz_mul(primeprod, prime1, prime2);
 
-            k = fmpz_factor_pollard_brent(fac, state, primeprod, 5, 2500);
-
             k = fmpz_factor_ecm(fac, i << 2, 2000, 50000, state, primeprod);
 
             if (k == 0)

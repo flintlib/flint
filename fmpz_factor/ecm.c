@@ -210,10 +210,13 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             /* Found factor while selecting curve,
                very very lucky :) */
 
+            mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
+            MPN_NORM(fac->_mp_d, ret);
+
             fac->_mp_size = ret;
             _fmpz_demote_val(f);    
 
-            ret = 1;
+            ret = -1;
             goto cleanup;
         }
 

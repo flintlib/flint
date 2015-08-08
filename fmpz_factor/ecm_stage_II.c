@@ -39,7 +39,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     mp_ptr Qx, Qz, Rx, Rz, Qdx, Qdz, a, b, g;
     mp_limb_t mmin, mmax, maxj, sz, gcdlimbs;
     int i, j, ret;
-    mp_ptr arrx, arrz;
+    mp_ptr arrx, arrz, Q0x2, Q0z2;
 
     TMP_INIT;
 
@@ -48,57 +48,56 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     maxj = (P + 1)/2; 
 
     TMP_START;
-    Qx  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    Qz  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    Rx  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    Rz  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    Qdx = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    Qdz = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    a   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    b   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    g   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qx   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qz   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Rx   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Rz   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qdx  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Qdz  = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Q0x2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    Q0z2 = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    a    = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    b    = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    g    = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
+    arrx = flint_malloc(((maxj >> 1) + 1) * ecm_inf->n_size * sizeof(mp_limb_t));
+    arrz = flint_malloc(((maxj >> 1) + 1) * ecm_inf->n_size * sizeof(mp_limb_t));
+
+    mpn_zero(arrx, ((maxj >> 1) + 1) * ecm_inf->n_size);
+    mpn_zero(arrz, ((maxj >> 1) + 1) * ecm_inf->n_size);
+    mpn_zero(Q0x2, ecm_inf->n_size);
+    mpn_zero(Q0z2, ecm_inf->n_size);
+    mpn_zero(g, ecm_inf->n_size);
 
     g[0] = ecm_inf->one[0];
 
-    arrx = flint_malloc((maxj + 1) * ecm_inf->n_size * sizeof(mp_limb_t));
-    arrz = flint_malloc((maxj + 1) * ecm_inf->n_size * sizeof(mp_limb_t));
-
-    mpn_zero(arrx, (maxj + 1) * ecm_inf->n_size);
-    mpn_zero(arrz, (maxj + 1) * ecm_inf->n_size);
-
     ret = 0;
 
-    /* arr[1] = Q0 */
-    mpn_copyi(arrx + 1 * ecm_inf->n_size, ecm_inf->x, ecm_inf->n_size);
-    mpn_copyi(arrz + 1 * ecm_inf->n_size, ecm_inf->z, ecm_inf->n_size);
+    /* arr[0] = Q0 */
+    mpn_copyi(arrx, ecm_inf->x, ecm_inf->n_size);
+    mpn_copyi(arrz, ecm_inf->z, ecm_inf->n_size);
 
-    /* arr[2] = 2Q0 */
+    /* Q0x2, Q0z2 = 2Q0 */
+    fmpz_factor_ecm_double(Q0x2, Q0z2, arrx, arrz, n, ecm_inf);
 
-    fmpz_factor_ecm_double(arrx + 2 * ecm_inf->n_size, arrz + 2 * ecm_inf->n_size,
-                            arrx + 1 * ecm_inf->n_size, arrz + 1 * ecm_inf->n_size,
-                            n, ecm_inf);
-
-    /* arr[3] = 3Q0 */
-    fmpz_factor_ecm_add(arrx + 3 * ecm_inf->n_size, arrz + 3 * ecm_inf->n_size,
-                         arrx + 2 * ecm_inf->n_size, arrz + 2 * ecm_inf->n_size,
-                         arrx + 1 * ecm_inf->n_size, arrz + 1 * ecm_inf->n_size,
-                         arrx + 1 * ecm_inf->n_size, arrz + 1 * ecm_inf->n_size,
-                         n, ecm_inf);
+    /* arr[1] = 3Q0 */
+    fmpz_factor_ecm_add(arrx + 1 * ecm_inf->n_size, arrz + 1 * ecm_inf->n_size,
+                         Q0x2, Q0z2, arrx, arrz, arrx, arrz, n, ecm_inf);
 
     /* For each odd j (j > 3) , compute j * Q0 [x0 :: z0] */
+    /* jth stored in arr[j/2] */
 
     /* We are adding 2Q0 every time. Need to calculate all j's 
        as (j - 2)Q0 is required for (j + 2)Q0 */
 
-    for (j = 5; j <= maxj; j += 2)
+    for (j = 2; j <= (maxj >> 1); j += 1)
     {
         /* jQ0 = (j - 2)Q0 + 2Q0 
            Differnce is (j - 4)Q0 */
 
         fmpz_factor_ecm_add(arrx + j * ecm_inf->n_size, arrz + j * ecm_inf->n_size,
+                             arrx + (j - 1) * ecm_inf->n_size, arrz + (j - 1) * ecm_inf->n_size,
+                             Q0x2, Q0z2,
                              arrx + (j - 2) * ecm_inf->n_size, arrz + (j - 2) * ecm_inf->n_size,
-                             arrx + 2 * ecm_inf->n_size, arrz + 2 * ecm_inf->n_size,
-                             arrx + (j - 4) * ecm_inf->n_size, arrz + (j - 4) * ecm_inf->n_size,
                              n, ecm_inf);
     }
 
@@ -115,15 +114,15 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     for (i = mmin; i <= mmax; i ++)
     {
-        for (j = 1; j <= maxj; j+=2)
+        for (j = 1; j <= maxj; j += 2)
         {
             if (ecm_inf->prime_table[i - mmin][j] == 1)
             {
-                flint_mpn_mulmod_preinvn(a, Rx, arrz + j * ecm_inf->n_size,
+                flint_mpn_mulmod_preinvn(a, Rx, arrz + (j >> 1) * ecm_inf->n_size,
                                          ecm_inf->n_size, n, ecm_inf->ninv,
                                          ecm_inf->normbits);
 
-                flint_mpn_mulmod_preinvn(b, Rz, arrx + j * ecm_inf->n_size,
+                flint_mpn_mulmod_preinvn(b, Rz, arrx + (j >> 1) * ecm_inf->n_size,
                                          ecm_inf->n_size, n, ecm_inf->ninv,
                                          ecm_inf->normbits);
 
