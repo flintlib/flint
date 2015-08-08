@@ -99,6 +99,10 @@ void qsieve_linalg_re_init(qs_t qs_inf)
 
 void qsieve_linalg_re_alloc(qs_t qs_inf)
 {
+    slong num_primes;
+
+    num_primes = qs_inf->num_primes;
+    qs_inf->num_primes += qs_inf->ks_primes;
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels + qs_inf->qsort_rels);
     qs_inf->matrix = flint_realloc(qs_inf->matrix, (qs_inf->buffer_size + qs_inf->qsort_rels)*sizeof(la_col_t));
     qs_inf->unmerged = qs_inf->matrix + qs_inf->buffer_size;
@@ -107,6 +111,6 @@ void qsieve_linalg_re_alloc(qs_t qs_inf)
                      = flint_realloc(qs_inf->relation, 2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));
 
     qs_inf->prime_count = flint_realloc(qs_inf->prime_count, qs_inf->num_primes*sizeof(slong));
-
+    qs_inf->num_primes = num_primes;
     qsieve_linalg_init(qs_inf);
 }
