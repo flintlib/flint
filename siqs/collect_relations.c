@@ -320,6 +320,18 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
          goto cleanup;
       }
+      else
+      {
+          if (fmpz_bits(res) <= FLINT_BITS)
+          {
+              prime = fmpz_get_ui(res);
+
+              if (prime >= factor_base[qs_inf->q_idx].p && prime <= 64 * factor_base[num_primes - 1].p && n_is_prime(prime))
+              {
+                  flint_printf("We have found a partial!!\n");
+              }
+          }
+      }
    }
 
 cleanup:
