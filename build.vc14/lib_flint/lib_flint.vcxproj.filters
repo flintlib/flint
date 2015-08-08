@@ -247,9 +247,6 @@
     <ClInclude Include="..\..\qadic.h">
     <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\qadic\cpimport.h">
-    <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\qsieve.h">
     <Filter>Header Files</Filter>
     </ClInclude>

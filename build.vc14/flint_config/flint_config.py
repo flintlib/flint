@@ -6,7 +6,7 @@ Copyright (C) 2011, 2012, 2013, 2014 Brian Gladman
 
 from __future__ import print_function
 from operator import itemgetter
-from os import listdir, walk, unlink, makedirs
+from os import listdir, walk, unlink, makedirs, remove
 from os.path import split, splitext, isdir, relpath, join, exists
 from os.path import dirname, normpath
 from copy import deepcopy
@@ -437,6 +437,16 @@ def linker_options(name, link_libs, proj_type, debug_info, outf):
   #    outf.write(f4.format(name))
   outf.write(f5)
 
+def vcx_pre_build(outf):
+
+  f1 = r'''    <PreBuildEvent>
+        <Command>..\out_copy_rename.bat ..\cpimport.h ..\..\qadic\ cpimport.h
+        </Command>
+    </PreBuildEvent>
+'''
+
+  outf.write(f1)
+
 def vcx_post_build(outf, proj_type):
 
   f1 = r'''
@@ -448,7 +458,7 @@ def vcx_post_build(outf, proj_type):
 
   outf.write(f1.format((app_ext[proj_type][1:]).upper()))
 
-def vcx_tool_options(name, plat, proj_type, postbuild, inc_dirs, link_libs, debug_info, outf):
+def vcx_tool_options(name, plat, proj_type, prebuild, postbuild, inc_dirs, link_libs, debug_info, outf):
 
   f1 = r'''  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='{1:s}|{0:s}'">
 '''
@@ -457,6 +467,8 @@ def vcx_tool_options(name, plat, proj_type, postbuild, inc_dirs, link_libs, debu
   for pl in plat:
     for is_debug in (False, True):
       outf.write(f1.format(pl, 'Debug' if is_debug else 'Release'))
+      if prebuild:
+        vcx_pre_build(outf)
       compiler_options(pl, proj_type, is_debug, inc_dirs, outf)
       if proj_type != lib_type:
         linker_options(name, link_libs, proj_type, debug_info, outf)
@@ -514,7 +526,7 @@ def vcx_c_items(cf_list, plat, relp, outf):
       outf.write(f6)
   outf.write(f7)
 
-def gen_vcxproj(proj_name, project_dir, file_name, guid, plat, proj_type, postbuild, debug_info, hf_list, cf_list, inc_dirs, link_libs):
+def gen_vcxproj(proj_name, project_dir, file_name, guid, plat, proj_type, prebuild, postbuild, debug_info, hf_list, cf_list, inc_dirs, link_libs):
 
   f1 = r'''<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -537,7 +549,7 @@ def gen_vcxproj(proj_name, project_dir, file_name, guid, plat, proj_type, postbu
     vcx_user_props(plat, outf)
     outf.write(f2)
     vcx_target_name_and_dirs(proj_name, project_dir, plat, outf)
-    vcx_tool_options(proj_name, plat, proj_type, postbuild, inc_dirs, link_libs, debug_info, outf)
+    vcx_tool_options(proj_name, plat, proj_type, prebuild, postbuild, inc_dirs, link_libs, debug_info, outf)
     if hf_list:
       vcx_hdr_items(hf_list, relp, outf)
     vcx_c_items(cf_list, plat, relp, outf)
@@ -673,7 +685,7 @@ c, h, cx, hx, t, tx, p = find_src(flint_dir)
 
 if not debug:
   with open('..\\..\\qadic\\CPimport.txt', 'r') as fin:
-    with open('..\\..\\qadic\\CPimport.h', 'w') as fout:
+    with open('tmp.h', 'w') as fout:
       while True:
         l = fin.readline()
         if not l:
@@ -681,6 +693,8 @@ if not debug:
         l = l.replace(' ', ',')
         l = l.replace('\n', ',\n')
         fout.writelines([l])
+  write_f('tmp.h', '..\\cpimport.h')
+  remove('tmp.h')
 
   fn = join(flint_dir, 'fmpz-conversions-{}.in'.format(flib_type))
   copy(fn , join(flint_dir, 'fmpz-conversions.h'))
@@ -699,7 +713,7 @@ if build_lib:
   mode = ('Win32', 'x64')
   inc_dirs = r'..\;..\..\;..\..\..\mpir\lib\$(IntDir);..\..\..\mpfr\lib\$(IntDir);..\..\..\pthreads\lib\$(IntDir)'
   link_libs = r'..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\pthreads\lib\$(IntDir)pthreads.lib'
-  gen_vcxproj(proj_name, None, vcx_path, guid, mode, lib_type, True, True, h, c, inc_dirs, link_libs)
+  gen_vcxproj(proj_name, None, vcx_path, guid, mode, lib_type, True, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid, None)
 
 if build_dll:
@@ -715,7 +729,7 @@ if build_dll:
   mode = ('Win32', 'x64')
   inc_dirs = r'..\;..\..\;..\..\..\mpir\dll\$(IntDir);..\..\..\mpfr\dll\$(IntDir);..\..\..\pthreads\dll\$(IntDir);'
   link_libs = r'..\..\..\mpir\dll\$(IntDir)mpir.lib;..\..\..\mpfr\dll\$(IntDir)mpfr.lib;..\..\..\pthreads\dll\$(IntDir)pthreads.lib;'
-  gen_vcxproj(proj_name, None, vcx_path, guid, mode, dll_type, True, True, h, c, inc_dirs, link_libs)
+  gen_vcxproj(proj_name, None, vcx_path, guid, mode, dll_type, True, True, True, h, c, inc_dirs, link_libs)
   add_proj_to_sln(sln_name, '', proj_name, vcx_path, guid, None)
 
 def gen_test(sln_name, test_name, directory, proj_dir, name, c_file):
@@ -728,7 +742,7 @@ def gen_test(sln_name, test_name, directory, proj_dir, name, c_file):
   mode = ('Win32', 'x64')
   inc_dirs = r'..\..\;..\..\..\;..\..\..\..\mpir\lib\$(IntDir);..\..\..\..\mpfr\lib\$(IntDir);..\..\..\..\pthreads\lib\$(IntDir);'
   link_libs = r'..\..\..\lib\$(IntDir)lib_flint.lib;..\..\..\..\mpir\lib\$(IntDir)mpir.lib;..\..\..\..\mpfr\lib\$(IntDir)mpfr.lib;..\..\..\..\pthreads\lib\$(IntDir)pthreads.lib;'
-  gen_vcxproj(test_name, p_dir, vcx_path, guid, mode, app_type, False, False, [], [('', c_file)], inc_dirs, link_libs)
+  gen_vcxproj(test_name, p_dir, vcx_path, guid, mode, app_type, False, False, False, [], [('', c_file)], inc_dirs, link_libs)
   return vcx_path, guid
 
 def gen_tests(sln_name, directory, proj_dir, c_files):
