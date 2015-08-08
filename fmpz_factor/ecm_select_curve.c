@@ -153,13 +153,8 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     }
 
     MPN_NORM(tempi, invlimbs);
-
     mpn_zero(ecm_inf->u, ecm_inf->n_size);
-
-    cy = mpn_lshift(ecm_inf->u, tempi, invlimbs, ecm_inf->normbits);
-
-    if (cy)
-        ecm_inf->u[invlimbs] = cy;
+    mpn_copyi(ecm_inf->u, tempi, invlimbs);
 
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->u, ecm_inf->t, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
