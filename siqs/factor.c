@@ -274,7 +274,19 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         num_primes = qs_inf->num_primes + delta;
         qs_inf->num_primes += qs_inf->ks_primes;
 
-        qsieve_primes_increment(qs_inf, delta);
+#if QS_DEBUG
+        flint_printf("\nfactor base increment\n");
+#endif
+        small_factor = qsieve_primes_increment(qs_inf, delta);
+
+        if (small_factor)
+        {
+
+#if QS_DEBUG
+            flint_printf("found small factor %wu while incrementing factor base\n, small_factor");
+#endif
+            goto cleanup;
+        }
 
         qs_inf->num_primes = num_primes;
         qsieve_linalg_re_alloc(qs_inf);

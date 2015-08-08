@@ -57,27 +57,85 @@ int main(void)
       fmpz_init_set_ui(n, a);
       fmpz_mul_ui(n, n, b);
 
-      fmpz_set_str(x, "282174488599599500573849980909", 10);
+    /*  fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors); */
+
+    /*  fmpz_set_str(x, "282174488599599500573849980909", 10);
 
       fmpz_set_str(y, "671998030559713968361666935769", 10);
 
       fmpz_mul(n, x, y);
-      //flint_printf("\n n = %wu * %wu\n", a, b);
-     // fmpz_set_str(n, "673899295409", 10);
-      //fmpz_print(n);
+
+      fmpz_print(n);
+
       flint_printf("\n");
-
-     // if (i == 0) continue;
-
-     // fmpz_factor_init(factors);
 
       qsieve_factor(n, factors);
 
-     // qsieve_process_partial(qs_inf);
+      fmpz_set_str(x, "48112959837082048697", 10);
 
-     // fmpz_factor_clear(factors);
+      fmpz_set_str(y, "54673257461630679457", 10);
 
-      //break;
+      fmpz_mul(n, x, y);
+
+      fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors);  */
+
+     /* fmpz_set_str(x, "416064700201658306196320137931", 10);
+
+      fmpz_set_str(y, "280829369862134719390036617067", 10);
+
+      fmpz_mul(n, x, y);
+
+      fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors); */
+
+    /*  fmpz_set_str(x, "564819669946735512444543556507", 10);
+
+      fmpz_set_str(y, "513821217024129243948411056803", 10);
+
+      fmpz_mul(n, x, y);
+
+      fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors); */
+
+      fmpz_set_str(x, "341427877364219557396646723561", 10);
+
+      fmpz_set_str(y, "359916012598740083996400089999", 10);
+
+      fmpz_mul(n, x, y);
+
+      fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors);
+
+      fmpz_set_str(x, "666666777777788888888999999999", 10);
+
+      fmpz_set_str(y, "671998030559713968361666935769", 10);
+
+      fmpz_mul(n, x, y);
+
+      fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors);
+
+
    }
 
    fmpz_clear(n);

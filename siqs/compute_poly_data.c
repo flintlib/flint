@@ -51,7 +51,7 @@
 
 mp_limb_t qsieve_next_A0(qs_t qs_inf)
 {
-    slong j;
+    slong i, j, mid;
     slong s = qs_inf->s;
     slong low = qs_inf->low;
     slong high = qs_inf->high;
@@ -62,9 +62,11 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
     mp_limb_t * curr_subset = qs_inf->curr_subset;
     mp_limb_t * A_ind = qs_inf->A_ind;
     prime_t * factor_base = qs_inf->factor_base;
-    fmpz_t prod, temp;
+    fmpz_t prod, temp, lower_bound, upper_bound;
     fmpz_init(prod);
     fmpz_init(temp);
+    fmpz_init_set(lower_bound, qs_inf->low_bound);
+    fmpz_init_set(upper_bound, qs_inf->upp_bound);
 
     /* generate next value of 'A0' */
 
@@ -112,6 +114,7 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
             for (j = 0; j < s - 1; j++)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
 
+            /*
             for (j = low + 1; j <= high; j += 2)
             {
                 fmpz_mul_ui(temp, prod, factor_base[j].p);
@@ -119,8 +122,33 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
                 if (fmpz_cmp(qs_inf->low_bound, temp) <= 0 && fmpz_cmp(temp, qs_inf->upp_bound) <= 0)
                     break;
             }
+            */
 
-            if (j >= high)
+            i = 1;
+            j = qs_inf->num_primes - 1;
+
+            while (i < j)
+            {
+                mid = i + (j - i) / 2;
+
+                fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
+
+                if (fmpz_cmp(lower_bound, temp) > 0)
+                {
+                    i = mid;
+                }
+                else if (fmpz_cmp(temp, upper_bound) > 0)
+                {
+                    j = mid;
+                }
+                else
+                {
+                    j = 2 * mid - 1 + low;
+                    break;
+                }
+            }
+
+            if (j >= qs_inf->num_primes)
             {
                 flint_printf("A0 doesn't fit in bounds\n");
                 abort();
@@ -321,12 +349,38 @@ void qsieve_init_A0(qs_t qs_inf)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
             }
 
+            /*
             for (j = low + 1; j < qs_inf->num_primes; j += 2)
             {
                 fmpz_mul_ui(temp, prod, factor_base[j].p);
 
                 if (fmpz_cmp(lower_bound, temp) <= 0 && fmpz_cmp(temp, upper_bound) <= 0)
                     break;
+            }
+            */
+
+            i = 1;
+            j = qs_inf->num_primes - 1;
+
+            while (i < j)
+            {
+                mid = i + (j - i) / 2;
+
+                fmpz_mul_ui(temp, prod, factor_base[2 * mid - 1 + low].p);
+
+                if (fmpz_cmp(lower_bound, temp) > 0)
+                {
+                    i = mid;
+                }
+                else if (fmpz_cmp(temp, upper_bound) > 0)
+                {
+                    j = mid;
+                }
+                else
+                {
+                    j = 2 * mid - 1 + low;
+                    break;
+                }
             }
 
             if (j < qs_inf->num_primes) break;
@@ -337,6 +391,8 @@ void qsieve_init_A0(qs_t qs_inf)
             for (j = 1; j <= h; j++)
                 curr_subset[s + j - h - 2] = m + j;
         }
+
+        high = j;
 
         A_ind[s - 1] = (j == qs_inf->num_primes) ? j - 1 : j;
 
@@ -494,6 +550,19 @@ void qsieve_init_poly_first(qs_t qs_inf)
     for (i = 2; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
+
+        for (j = 0; j < s; j++)
+        {
+            temp = fmpz_fdiv_ui(B_terms[j], p);
+            temp *= 2;
+            if (temp >= p) temp -= p;
+            A_inv2B[j][i] = temp;
+        }
+    }
+
+    for (i = 2; i < qs_inf->num_primes; i++)
+    {
+        p = factor_base[i].p;
         pinv = factor_base[i].pinv;
         temp = n_invmod(n_mod2_preinv(q, p, pinv), p);
         Ainv = n_mulmod2_preinv(A0_inv[i], temp, p, pinv);
@@ -504,24 +573,22 @@ void qsieve_init_poly_first(qs_t qs_inf)
         temp2 += qs_inf->sieve_size / 2;
         temp2 = n_mod2_preinv(temp2, p, pinv);
         soln1[i] = temp2;
-        temp2 = p - sqrts[i];
-        temp2 = temp2 + p - temp;
-        temp2 = n_mulmod2_preinv(temp2, Ainv, p, pinv);
-        temp2 += qs_inf->sieve_size / 2;
-        temp2 = n_mod2_preinv(temp2, p, pinv);
-        soln2[i] = temp2;
 
-        if (soln1[i] > soln2[i])
-            soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
+        temp = n_mulmod2_preinv(sqrts[i], Ainv, p, pinv);
+        temp *= 2;
+        if (temp >= p) temp -= p;
+        temp = soln1[i] + p - temp;
+        if (temp >= p) temp -= p;
+        soln2[i] = temp;
 
         for (j = 0; j < s; j++)
-        {
-            temp = fmpz_fdiv_ui(B_terms[j], p);
-            temp *= 2;
-            if (temp >= p) temp -= p;
-            temp = n_mulmod2_preinv(temp, Ainv, p, pinv);
-            A_inv2B[j][i] = temp;
-        }
+            A_inv2B[j][i] = n_mulmod2_preinv(A_inv2B[j][i], Ainv, p, pinv);
+    }
+
+    for (i = 2; i < qs_inf->num_primes; i++)
+    {
+        if (soln1[i] > soln2[i])
+            soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
     }
 
     for (i = 0; i < s; i++)
