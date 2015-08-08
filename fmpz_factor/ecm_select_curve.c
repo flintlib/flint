@@ -47,10 +47,10 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     TMP_START;
     temp = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    tempv = flint_malloc((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempn = flint_malloc((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempi = flint_malloc((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
-    tempf = flint_malloc((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
+    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
+    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
+    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
+    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
 
     mpn_zero(tempn, ecm_inf->n_size);
     mpn_zero(tempv, ecm_inf->n_size);
