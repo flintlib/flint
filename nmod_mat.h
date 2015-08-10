@@ -84,7 +84,7 @@ slong nmod_mat_nrows(const nmod_mat_t mat)
 }
 
 NMOD_MAT_INLINE
-slong nmod_mat_cols(const nmod_mat_t mat)
+slong nmod_mat_ncols(const nmod_mat_t mat)
 {
    return mat->c;
 }
