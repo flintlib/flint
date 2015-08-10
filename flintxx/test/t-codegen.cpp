@@ -639,9 +639,9 @@ DEFINE_FUNC(test_nmod_matxx_2,
         (nmodxx& to, const nmod_matxx& A))
 {
     nmod_mat_t tmp1, tmp2;
-    nmod_mat_init(tmp1, nmod_mat_nrows(A._mat()), nmod_mat_cols(A._mat()),
+    nmod_mat_init(tmp1, nmod_mat_nrows(A._mat()), nmod_mat_ncols(A._mat()),
             A.modulus());
-    nmod_mat_init(tmp2, nmod_mat_cols(A._mat()), nmod_mat_cols(A._mat()),
+    nmod_mat_init(tmp2, nmod_mat_ncols(A._mat()), nmod_mat_ncols(A._mat()),
             A.modulus());
     nmod_mat_transpose(tmp1, A._mat());
     nmod_mat_mul(tmp1, tmp2, A._mat());
