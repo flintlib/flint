@@ -41,7 +41,7 @@ int main(void)
     {
         ulong p;
         fmpz_t n, pow;
-        unity_zp f, g, temp;
+        unity_zp f, g, h;
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
 
@@ -56,7 +56,7 @@ int main(void)
 
         unity_zp_init(f, p, 1, n);
         unity_zp_init(g, p, 1, n);
-        unity_zp_init(temp, p, 1, n);
+        unity_zp_init(h, p, 1, n);
 
         for (j = 0; j < 100; j++)
         {
@@ -67,13 +67,13 @@ int main(void)
 
             ind = n_randint(state, p);
             fmpz_randtest_unsigned(val, state, 200);
-            unity_zp_coeff_set_fmpz(temp, ind, val);
+            unity_zp_coeff_set_fmpz(h, ind, val);
 
             fmpz_clear(val);
         }
 
-        unity_zp_pow_2k_fmpz(f, temp, pow);
-        unity_zp_pow_fmpz(g, temp, pow);
+        unity_zp_pow_2k_fmpz(f, h, pow);
+        unity_zp_pow_fmpz(g, h, pow);
 
         if (unity_zp_equal(f, g) == 0)
         {
@@ -85,7 +85,7 @@ int main(void)
         fmpz_clear(pow);
         unity_zp_clear(f);
         unity_zp_clear(g);
-        unity_zp_clear(temp);
+        unity_zp_clear(h);
     }
 
     FLINT_TEST_CLEANUP(state);

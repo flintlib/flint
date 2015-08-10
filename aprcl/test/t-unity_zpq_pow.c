@@ -41,7 +41,7 @@ int main(void)
     {
         ulong p, q, pow;
         fmpz_t n;
-        unity_zpq res, left, right, test;
+        unity_zpq f, g, h1, h2;
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
         q = n_randprime(state, 2 + n_randint(state, 6), 0);
@@ -52,10 +52,10 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zpq_init(res, q, p, n);
-        unity_zpq_init(test, q, p, n);
-        unity_zpq_init(left, q, p, n);
-        unity_zpq_init(right, q, p, n);
+        unity_zpq_init(f, q, p, n);
+        unity_zpq_init(g, q, p, n);
+        unity_zpq_init(h1, q, p, n);
+        unity_zpq_init(h2, q, p, n);
 
         for (j = 0; j < 100; j++)
         {
@@ -69,36 +69,36 @@ int main(void)
             
             fmpz_randtest_not_zero(val, state, 200);
 
-            unity_zpq_coeff_set_fmpz(left, y, x, val);
+            unity_zpq_coeff_set_fmpz(h1, y, x, val);
 
             fmpz_clear(val);
         }
 
-        unity_zpq_copy(right, left);
+        unity_zpq_copy(h2, h1);
 
-        unity_zpq_pow_ui(res, right, pow);
+        unity_zpq_pow_ui(f, h2, pow);
         if (pow == 0)
         {
-            unity_zpq_coeff_set_ui(test, 0, 0, 1);
+            unity_zpq_coeff_set_ui(g, 0, 0, 1);
         } else {
             for (j = 0; j < pow; j++)
             {
-                unity_zpq_mul(test, left, right);
-                unity_zpq_swap(right, test);
+                unity_zpq_mul(g, h1, h2);
+                unity_zpq_swap(h2, g);
             }
         }
 
-        if (unity_zpq_equal(res, test) == 0)
+        if (unity_zpq_equal(f, g) == 0)
         {
             flint_printf("FAIL\n");
             abort();
         }
 
         fmpz_clear(n);
-        unity_zpq_clear(res);
-        unity_zpq_clear(left);
-        unity_zpq_clear(right);
-        unity_zpq_clear(test);
+        unity_zpq_clear(f);
+        unity_zpq_clear(g);
+        unity_zpq_clear(h1);
+        unity_zpq_clear(h2);
     }
 
     FLINT_TEST_CLEANUP(state);

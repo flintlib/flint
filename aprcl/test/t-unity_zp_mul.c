@@ -41,7 +41,7 @@ int main(void)
     {
         ulong p;
         fmpz_t n;
-        unity_zp res, left, right, test;
+        unity_zp f, g, h1, h2;
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
 
@@ -50,10 +50,10 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zp_init(res, p, 1, n);
-        unity_zp_init(test, p, 1, n);
-        unity_zp_init(left, p, 1, n);
-        unity_zp_init(right, p, 1, n);
+        unity_zp_init(f, p, 1, n);
+        unity_zp_init(g, p, 1, n);
+        unity_zp_init(h1, p, 1, n);
+        unity_zp_init(h2, p, 1, n);
 
         for (j = 0; j < 100; j++)
         {
@@ -68,27 +68,27 @@ int main(void)
             fmpz_randtest_unsigned(val1, state, 200);
             fmpz_randtest_unsigned(val2, state, 200);
 
-            unity_zp_coeff_set_fmpz(left, ind, val1);
-            unity_zp_coeff_set_fmpz(right, ind, val2);
+            unity_zp_coeff_set_fmpz(h1, ind, val1);
+            unity_zp_coeff_set_fmpz(h2, ind, val2);
 
             fmpz_clear(val1);
             fmpz_clear(val2);
         }
 
-        unity_zp_mul(res, left, right);
-        unity_zp_mul(test, right, left);
+        unity_zp_mul(f, h1, h2);
+        unity_zp_mul(g, h2, h1);
 
-        if (unity_zp_equal(res, test) == 0)
+        if (unity_zp_equal(f, g) == 0)
         {
             flint_printf("FAIL\n");
             abort();
         }
     
         fmpz_clear(n);
-        unity_zp_clear(res);
-        unity_zp_clear(left);
-        unity_zp_clear(right);
-        unity_zp_clear(test);
+        unity_zp_clear(f);
+        unity_zp_clear(g);
+        unity_zp_clear(h1);
+        unity_zp_clear(h2);
     }
 
     FLINT_TEST_CLEANUP(state);

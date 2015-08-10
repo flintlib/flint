@@ -41,7 +41,7 @@ int main(void)
     {
         ulong p;
         fmpz_t n;
-        unity_zp value;
+        unity_zp f;
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
 
@@ -50,8 +50,8 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zp_init(value, p, 1, n);
-        unity_zp_clear(value);
+        unity_zp_init(f, p, 1, n);
+        unity_zp_clear(f);
 
         fmpz_clear(n);
     }

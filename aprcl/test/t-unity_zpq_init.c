@@ -41,7 +41,7 @@ int main(void)
     {
         ulong p, q;
         fmpz_t n;
-        unity_zpq value;
+        unity_zpq f;
 
         fmpz_init(n);
 
@@ -50,8 +50,8 @@ int main(void)
 
         fmpz_randtest_not_zero(n, state, 200);
 
-        unity_zpq_init(value, q, p, n);
-        unity_zpq_clear(value);
+        unity_zpq_init(f, q, p, n);
+        unity_zpq_clear(f);
 
         fmpz_clear(n);
     }

@@ -41,7 +41,7 @@ int main(void)
     {
         ulong p, q;
         fmpz_t n;
-        unity_zpq res, left;
+        unity_zpq f, g;
 
         fmpz_init(n);
 
@@ -52,8 +52,8 @@ int main(void)
         while (fmpz_equal_ui(n, 0) != 0)
             fmpz_randtest_unsigned(n, state, 200);
 
-        unity_zpq_init(res, q, p, n);
-        unity_zpq_init(left, q, p, n);
+        unity_zpq_init(f, q, p, n);
+        unity_zpq_init(g, q, p, n);
 
         for (j = 0; j < 100; j++)
         {
@@ -67,34 +67,34 @@ int main(void)
 
             fmpz_randtest_unsigned(val, state, 200);
 
-            unity_zpq_coeff_set_fmpz(left, y, x, val);
+            unity_zpq_coeff_set_fmpz(g, y, x, val);
 
             fmpz_clear(val);
         }
 
         for (j = 0; j < p; j++)
         {
-            unity_zpq test, right;
-            unity_zpq_init(test, q, p, n);
-            unity_zpq_init(right, q, p, n);
+            unity_zpq h1, h2;
+            unity_zpq_init(h1, q, p, n);
+            unity_zpq_init(h2, q, p, n);
             
-            unity_zpq_coeff_set_ui(right, 0, j, 1);
-            unity_zpq_mul(test, left, right);
-            unity_zpq_mul_unity_p_pow(res, left, j);
+            unity_zpq_coeff_set_ui(h1, 0, j, 1);
+            unity_zpq_mul(h2, g, h1);
+            unity_zpq_mul_unity_p_pow(f, g, j);
 
-            if (unity_zpq_equal(res, test) == 0)
+            if (unity_zpq_equal(f, h2) == 0)
             {
                 flint_printf("FAIL\n");
                 abort();
             }
 
-            unity_zpq_clear(right);
-            unity_zpq_clear(test);
+            unity_zpq_clear(h1);
+            unity_zpq_clear(h2);
         }
 
         fmpz_clear(n);
-        unity_zpq_clear(res);
-        unity_zpq_clear(left);
+        unity_zpq_clear(f);
+        unity_zpq_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);
