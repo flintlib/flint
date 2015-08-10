@@ -115,7 +115,7 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
 	fi
 	$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
-		ldconfig -n "$(CURDIR)"; \
+		$(LDCONFIG) -n "$(CURDIR)"; \
 	else \
 		ln -sf "$(CURDIR)/$(FLINT_LIB)" "$(CURDIR)/$(FLINT_LIBNAME)"; \
 	fi
