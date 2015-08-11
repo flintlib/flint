@@ -433,7 +433,7 @@ case "$OS" in
       if [ -z "$LDCONFIG" ]; then
          if command -v ldconfig > /dev/null; then
             LDCONFIG="ldconfig"
-    	 elif [ -x /sbin/ldconfig ]; then
+         elif [ -x /sbin/ldconfig ]; then
             LDCONFIG="/sbin/ldconfig"
          else
             echo "Warning: ldconfig was not found. You can specify a path on the command line with LDCONFIG=<name>";
