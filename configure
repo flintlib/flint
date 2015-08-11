@@ -29,6 +29,7 @@ EXTRA_BUILD=
 FLINT_DLL=0
 FLINT_LIBNAME=
 FLINT_SOLIB=0
+LDCONFIG="/dev/null"
 
 # soname version, minor release number and patch number
 
@@ -428,7 +429,7 @@ echo "Configuring...${MACHINE}-${OS}"
 # sometimes LDCONFIG is not to be found in the path. Look at some common places.
 case "$OS" in
    MINGW*|CYGWIN*)
-      LDCONFIG=/dev/null;;
+      ;;
    *)
       if [ -z "$LDCONFIG" ]; then
          if command -v ldconfig > /dev/null; then
