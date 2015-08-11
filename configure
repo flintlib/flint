@@ -311,19 +311,6 @@ if [ -z "$AR" ]; then
    AR=ar
 fi
 
-# sometimes LDCONFIG is not to be found in the path. Look at some common places.
-
-if [ -z "$LDCONFIG" ]; then
-    if command -v ldconfig > /dev/null; then
-        LDCONFIG="ldconfig"
-    elif [ -x /sbin/ldconfig ]; then
-        LDCONFIG="/sbin/ldconfig"
-    else
-        echo "ldconfig was not found. You can specify a path on the command line with LDCONFIG=<name>";
-        exit 1;
-    fi
-fi
-
 #handle gc and reentrant flags
 
 if [ "$WANT_GC" = "1" ]; then
@@ -437,6 +424,22 @@ if [ "$MACHINE" = "sparc" ] || [ "$MACHINE" = "sparc64" ]; then
 fi
 
 echo "Configuring...${MACHINE}-${OS}"
+
+# sometimes LDCONFIG is not to be found in the path. Look at some common places.
+case "$OS" in
+   MINGW*|CYGWIN*)
+      LDCONFIG=/dev/null;;
+   *)
+      if [ -z "$LDCONFIG" ]; then
+         if command -v ldconfig > /dev/null; then
+            LDCONFIG="ldconfig"
+    	 elif [ -x /sbin/ldconfig ]; then
+            LDCONFIG="/sbin/ldconfig"
+         else
+            echo "Warning: ldconfig was not found. You can specify a path on the command line with LDCONFIG=<name>";
+         fi
+      fi;;
+esac
 
 #FLINT shared library
 
