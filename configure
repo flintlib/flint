@@ -73,6 +73,7 @@ usage()
    echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
    echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
    echo "     AR=<name>            Use the AR library builder with the given name (default: ar)"
+   echo "     LDCONFIG=<name>      Use the given dynamic linker"
    echo "     CFLAGS=<flags>       Pass the given flags to the compiler"
    echo "     CXXFLAGS=<flags>     Pass the given flags to the C++ compiler"
    echo "     ABI=[32|64]          Tell the compiler to use given ABI (default: empty)"
@@ -185,6 +186,9 @@ while [ "$1" != "" ]; do
          ;;
       CC)
          CC="$VALUE"
+         ;;
+      LDCONFIG)
+         LDCONFIG="$VALUE"
          ;;
       CXX)
          CXX="$VALUE"
@@ -305,6 +309,19 @@ fi
 
 if [ -z "$AR" ]; then
    AR=ar
+fi
+
+# sometimes LDCONFIG is not to be found in the path. Look at some common places.
+
+if [ -z "$LDCONFIG" ]; then
+    if command -v ldconfig > /dev/null; then
+        LDCONFIG="ldconfig"
+    elif [ -x /sbin/ldconfig ]; then
+        LDCONFIG="/sbin/ldconfig"
+    else
+        echo "ldconfig was not found. You can specify a path on the command line with LDCONFIG=<name>";
+        exit 1;
+    fi
 fi
 
 #handle gc and reentrant flags
@@ -704,6 +721,7 @@ echo "" >> Makefile
 echo "CC=$CC" >> Makefile
 echo "CXX=$CXX" >> Makefile
 echo "AR=$AR" >> Makefile
+echo "LDCONFIG=$LDCONFIG" >> Makefile
 echo "" >> Makefile
 echo "CFLAGS=$CFLAGS" >> Makefile
 echo "CXXFLAGS=$CXXFLAGS" >> Makefile
