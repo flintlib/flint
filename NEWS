@@ -1150,3 +1150,8 @@ v 2.5.0 -- 07 Aug 2015
   * Progress towards supporting MIPS64
   * Fix a serious bug in fmpz_poly_signature
 
+v 2.5.1 -- 12 Aug 2015
+
+  * Fix some build bugs related to soname versioning and ldconfig
+  * Fix issue with Windows MSVC build
+

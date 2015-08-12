@@ -34,10 +34,11 @@ FLINT_SOLIB=0
 
 # flint => soname
 # 2.5.0 => 13.5.0
+# 2.5.1 => 13.5.1
 
 FLINT_MAJOR=13
 FLINT_MINOR=5
-FLINT_PATCH=0
+FLINT_PATCH=1
 
 usage()
 {
