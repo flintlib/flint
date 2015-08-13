@@ -40,11 +40,14 @@ unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
     unity_zp_init(temp, f->p, f->exp, f->n);
 
+    /* reduce g by cyclopoly */
+    _unity_zp_reduce_cyclotomic(g);
+
     /* temp = g * g */
-    unity_zp_sqr(temp, g);
+    unity_zp_sqr_inplace(temp, g, t);
 
     /* selects optimal k value for n */
-    k = _unity_zp_pow_2k_find_k(pow);
+    k = _unity_zp_pow_select_k(pow);
 
     /* 
         g_powers store odd powers of g up to 2^k - 1;

@@ -25,31 +25,33 @@
 
 #include "aprcl.h"
 
-void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
+void
+unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
 {
     int i;
 
-    value->p = p;
-    value->q = q;
-    fmpz_init_set(value->n, n);
-    value->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
+    f->p = p;
+    f->q = q;
+    fmpz_init_set(f->n, n);
+    f->polys = (fmpz_mod_poly_t *) flint_malloc(p * sizeof(fmpz_mod_poly_t));
     for (i = 0; i < p; i++)
     {
-        fmpz_mod_poly_init(value->polys[i], n);
+        fmpz_mod_poly_init(f->polys[i], n);
     }
 }
 
-void unity_zpq_clear(unity_zpq value)
+void
+unity_zpq_clear(unity_zpq f)
 {
     int i;
     
-    for (i = 0; i < value->p; i++)
+    for (i = 0; i < f->p; i++)
     {
-        fmpz_mod_poly_clear(value->polys[i]);
+        fmpz_mod_poly_clear(f->polys[i]);
     }
-    value->p = 0;
-    value->q = 0;
-    fmpz_clear(value->n);
-    flint_free(value->polys);
+    f->p = 0;
+    f->q = 0;
+    fmpz_clear(f->n);
+    flint_free(f->polys);
 }
 

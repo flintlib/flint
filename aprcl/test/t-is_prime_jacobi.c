@@ -57,7 +57,7 @@ int main(void)
         v = fmpz_tdiv_ui(n, p_pow);
 
         unity_zp_init(j, p, k, n);
-        jacobi_pq(j, q, p);
+        unity_zp_jacobi_sum_pq(j, q, p);
 
         if (_is_prime_jacobi_check_pk(j, u, v) < 0)
         {
@@ -108,7 +108,7 @@ int main(void)
         v = fmpz_tdiv_ui(n, p_pow);
 
         unity_zp_init(j, p, k, n);
-        jacobi_pq(j, q, p);
+        unity_zp_jacobi_sum_pq(j, q, p);
 
         if (_is_prime_jacobi_check_22(j, u, v, q) < 0)
         {
@@ -144,9 +144,9 @@ int main(void)
         unity_zp_init(j2_1, p, k, n);
         unity_zp_init(j2_2, p, k, n);
 
-        jacobi_pq(j, q, p);
-        jacobi_2q_one(j2_1, q);
-        jacobi_2q_two(j2_2, q);
+        unity_zp_jacobi_sum_pq(j, q, p);
+        unity_zp_jacobi_sum_2q_one(j2_1, q);
+        unity_zp_jacobi_sum_2q_two(j2_2, q);
 
         if (_is_prime_jacobi_check_2k(j, j2_1, j2_2, u, v) < 0)
         {

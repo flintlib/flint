@@ -25,7 +25,8 @@
 
 #include "aprcl.h"
 
-void _aprcl_config_update(aprcl_config conf)
+void
+_aprcl_config_update(aprcl_config conf)
 {
     ulong prime = 2;
 
@@ -47,7 +48,8 @@ void _aprcl_config_update(aprcl_config conf)
     }
 }
 
-void aprcl_config_init(aprcl_config conf, const fmpz_t n)
+void
+aprcl_config_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_t s2;
 
@@ -66,7 +68,8 @@ void aprcl_config_init(aprcl_config conf, const fmpz_t n)
     n_factor(&conf->rs, conf->R, 1);
 }
 
-void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+void
+aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 {
     fmpz_t s2;
 
@@ -86,7 +89,8 @@ void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
     n_factor(&conf->rs, conf->R, 1);
 }
 
-void aprcl_config_clear(aprcl_config conf)
+void
+aprcl_config_clear(aprcl_config conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

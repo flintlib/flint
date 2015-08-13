@@ -28,7 +28,8 @@
 /*
     Computes gauss sum for character \chi^n corresponding (q, p).
 */
-void unity_zpq_gauss_sum_character_pow(unity_zpq value, ulong q, ulong p, ulong pow)
+void
+unity_zpq_gauss_sum_character_pow(unity_zpq f, ulong q, ulong p, ulong pow)
 {
     ulong i, qinv, pinv, qpow, ppow, g;
 
@@ -42,17 +43,18 @@ void unity_zpq_gauss_sum_character_pow(unity_zpq value, ulong q, ulong p, ulong 
     {
         qpow = n_mulmod2_preinv(qpow, g, q, qinv);
         ppow = n_mulmod2_preinv(i, pow, p, pinv);
-        unity_zpq_coeff_add_ui(value, qpow, ppow, 1);
+        unity_zpq_coeff_add_ui(f, qpow, ppow, 1);
     }
 }
 
 /*
     Computes gauss sum for character \chi^n corresponding (q, p).
 */
-void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
+void
+unity_zpq_gauss_sum_sigma_pow(unity_zpq f, ulong q, ulong p)
 {
     ulong n;
-    n = fmpz_fdiv_ui(value->n, p);
-    unity_zpq_gauss_sum_character_pow(value, q, p, n);
+    n = fmpz_fdiv_ui(f->n, p);
+    unity_zpq_gauss_sum_character_pow(f, q, p, n);
 }
 

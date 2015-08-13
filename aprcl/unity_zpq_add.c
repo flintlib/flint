@@ -25,13 +25,14 @@
 
 #include "aprcl.h"
 
-void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right)
+void
+unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h)
 {
     ulong i;
 
-    for (i = 0; i < result->p; i++)
+    for (i = 0; i < f->p; i++)
     {
-        fmpz_mod_poly_add(result->polys[i], left->polys[i], right->polys[i]);
+        fmpz_mod_poly_add(f->polys[i], g->polys[i], h->polys[i]);
     }
 }
 

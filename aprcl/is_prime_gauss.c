@@ -26,19 +26,6 @@
 #include "aprcl.h"
 
 /*
-    Returns the index of divisor p on R factors list.
-*/
-int
-_p_ind(const aprcl_config conf, ulong p)
-{
-    int i;
-    for (i = 0; i < conf->rs.num; i++)
-        if (p == conf->rs.p[i])
-            return i;
-    return -1;
-}
-
-/*
     Returns 1 if \tau^{\sigma_n-n}(\chi)=-1; otherwise returns 0.
     It is equal to check: 
         (\chi(-1) * q)^((n - 1) / 2) congruent -1 mod n

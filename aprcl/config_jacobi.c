@@ -45,10 +45,24 @@ _R_value(const fmpz_t n)
     if (bits <= 774) return 110880;     /*  2^5 * 3^2 * 5 * 7 * 11      */
     if (bits <= 1566) return 720720;    /*  2^4 * 3^2 * 5 * 7 * 11 * 13 */
     if (bits <= 1999) return 1441440;   /*  2^5 * 3^2 * 5 * 7 * 11 * 13 */
+    if (bits <= 2096) return 1663200;
+    if (bits <= 2165) return 1965600;
+    if (bits <= 2321) return 2162160;
+    if (bits <= 2368) return 2751840;
+    if (bits <= 2377) return 2827440;
+    if (bits <= 2514) return 3326400;
+    if (bits <= 2588) return 3341520;
+    if (bits <= 2636) return 3603600;
+    if (bits <= 2667) return 3931200;
     if (bits <= 3028) return 4324320;
+    if (bits <= 3045) return 5654880;
+    if (bits <= 3080) return 6652800;
+    if (bits <= 3121) return 6683040;
+    if (bits <= 3283) return 7207200;
     if (bits <= 3491) return 8648640;   /*  2^6 * 3^3 * 5 * 7 * 11 * 13 */
     if (bits <= 4362) return 24504480;
     if (bits <= 6423) return 73513440;
+    if (bits <= 6700) return 122522400;
     if (bits <= 9977) return 367567200;
     if (bits <= 12713) return 1396755360;
 
@@ -56,7 +70,8 @@ _R_value(const fmpz_t n)
     return 6983776800;
 }
 
-void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
+void
+_jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
     ulong i, j, q;
     double * w;
@@ -128,7 +143,8 @@ void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
     flint_free(w);
 }
 
-void _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
+void
+_jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
 {
     slong i;
     fmpz_t new_s, new_s2, p;
@@ -159,7 +175,8 @@ void _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
     fmpz_clear(new_s);
 }
 
-void _jacobi_config_update(aprcl_config conf)
+void
+_jacobi_config_update(aprcl_config conf)
 {
     ulong prime = 2;
 
@@ -192,7 +209,8 @@ void _jacobi_config_update(aprcl_config conf)
 }
 
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
-void jacobi_config_init(aprcl_config conf, const fmpz_t n)
+void
+jacobi_config_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
@@ -206,7 +224,8 @@ void jacobi_config_init(aprcl_config conf, const fmpz_t n)
     _jacobi_config_reduce_s2(conf, n);
 }
 
-void jacobi_config_clear(aprcl_config conf)
+void
+jacobi_config_clear(aprcl_config conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

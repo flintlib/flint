@@ -25,7 +25,8 @@
 
 #include "aprcl.h"
 
-void _unity_zpq_mul_unity_p(unity_zpq f)
+void
+_unity_zpq_mul_unity_p(unity_zpq f)
 {
     ulong i;
     for (i = f->p - 1; i > 0; i--)
@@ -35,7 +36,8 @@ void _unity_zpq_mul_unity_p(unity_zpq f)
 /*
     Computes unity_zpq * \zeta_p by swapping poly coeffs.
 */
-void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
+void
+unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
 {
     ulong i;
     unity_zpq_copy(f, g);

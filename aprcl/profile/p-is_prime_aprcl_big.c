@@ -48,7 +48,7 @@ int main(void)
 
     /*
         Using the primes from
-        mpz_aprcl implementation readmbe.txt file
+        mpz_aprcl implementation readme.txt file
         link : http://sourceforge.net/projects/mpzaprcl/
     */
 

@@ -25,12 +25,14 @@
 
 #include "aprcl.h"
 
-void unity_zpq_coeff_set_fmpz(unity_zpq f, ulong i, ulong j, const fmpz_t x)
+void
+unity_zpq_coeff_set_fmpz(unity_zpq f, ulong i, ulong j, const fmpz_t x)
 {
     fmpz_mod_poly_set_coeff_fmpz(f->polys[j], i, x);
 }
 
-void unity_zpq_coeff_set_ui(unity_zpq f, ulong i, ulong j, ulong x)
+void
+unity_zpq_coeff_set_ui(unity_zpq f, ulong i, ulong j, ulong x)
 {
     fmpz_mod_poly_set_coeff_ui(f->polys[j], i, x);
 }

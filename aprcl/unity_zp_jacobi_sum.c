@@ -27,7 +27,7 @@
 #include "ulong_extras.h"
 
 void 
-_jacobi_pq_general(unity_zp f, const mp_ptr table,
+_unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
 {
     int i, j;
@@ -55,7 +55,8 @@ _jacobi_pq_general(unity_zp f, const mp_ptr table,
     }
 }
 
-void jacobi_pq(unity_zp f, ulong q, ulong p)
+void
+unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
 {
     ulong k;
     mp_ptr table;
@@ -63,12 +64,13 @@ void jacobi_pq(unity_zp f, ulong q, ulong p)
     table = f_table(q);
     k = p_power_in_q(q - 1, p);
 
-    _jacobi_pq_general(f, table, p, q, k, 1, 1);
+    _unity_zp_jacobi_sum_pq_general(f, table, p, q, k, 1, 1);
 
     _nmod_vec_clear(table);
 }
 
-void jacobi_2q_one(unity_zp f, ulong q)
+void
+unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
 {
     ulong k;
     mp_ptr table;
@@ -76,12 +78,13 @@ void jacobi_2q_one(unity_zp f, ulong q)
     table = f_table(q);
     k = p_power_in_q(q - 1, 2);
 
-    _jacobi_pq_general(f, table, 2, q, k, 2, 1);
+    _unity_zp_jacobi_sum_pq_general(f, table, 2, q, k, 2, 1);
 
     _nmod_vec_clear(table);
 }
 
-void jacobi_2q_two(unity_zp f, ulong q)
+void
+unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 {
     ulong a, b, k;
     mp_ptr table;
@@ -91,7 +94,7 @@ void jacobi_2q_two(unity_zp f, ulong q)
     b = n_pow(2, k - 3);
     a = 3 * b;
 
-    _jacobi_pq_general(f, table, 2, q, k, a, b);
+    _unity_zp_jacobi_sum_pq_general(f, table, 2, q, k, a, b);
 
     _nmod_vec_clear(table);
 }

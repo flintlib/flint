@@ -25,30 +25,6 @@
 
 #include "aprcl.h"
 
-
-/* 
-    returns smallest integer k satisfies:
-        log(n) < (k * (k + 1) * 2^(2 * k)) / (2^(k + 1) - k - 2) + 1
-*/        
-ulong
-_unity_zp_pow_2k_find_k(const fmpz_t n)
-{
-    ulong bits;
-    bits = fmpz_bits(n);
-
-    if (bits <= 8)  return 1;
-    if (bits <= 24) return 2;
-    if (bits <= 69) return 3;
-    if (bits <= 196) return 4;
-    if (bits <= 538) return 5;
-    if (bits <= 1433) return 6;
-    if (bits <= 3714) return 7;
-    if (bits <= 9399) return 8;
-    if (bits <= 23290) return 9;
-    if (bits <= 56651) return 10;
-    return 11;
-}
-
 void
 unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 {
@@ -65,7 +41,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     unity_zp_sqr(temp, g);
 
     /* selects optimal k value for n */
-    k = _unity_zp_pow_2k_find_k(pow);
+    k = _unity_zp_pow_select_k(pow);
     /* selects e such that 2^(ek) < n < 2^((e + 1) * k) */
     e = (fmpz_bits(pow) - 1) / k;
     /* computes 2^k */

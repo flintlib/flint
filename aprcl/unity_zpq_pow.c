@@ -25,7 +25,8 @@
 
 #include "aprcl.h"
 
-void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
+void
+unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
 {
     unity_zpq value;
     fmpz_t power, rem;
@@ -67,7 +68,8 @@ void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t pow)
     unity_zpq_clear(value);
 }
 
-void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)
+void
+unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)
 {
     fmpz_t p;
     fmpz_init_set_ui(p, pow);

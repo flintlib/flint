@@ -25,14 +25,26 @@
 
 #include "aprcl.h"
 
-void
-unity_zpq_copy(unity_zpq f, const unity_zpq g)
+/* 
+    returns smallest integer k satisfies:
+        log(n) < (k * (k + 1) * 2^(2 * k)) / (2^(k + 1) - k - 2) + 1
+*/        
+ulong
+_unity_zp_pow_select_k(const fmpz_t n)
 {
-    ulong i;
+    ulong bits;
+    bits = fmpz_bits(n);
 
-    for (i = 0; i < f->p; i++)
-    {
-        fmpz_mod_poly_set(f->polys[i], g->polys[i]);
-    }
+    if (bits <= 8)  return 1;
+    if (bits <= 24) return 2;
+    if (bits <= 69) return 3;
+    if (bits <= 196) return 4;
+    if (bits <= 538) return 5;
+    if (bits <= 1433) return 6;
+    if (bits <= 3714) return 7;
+    if (bits <= 9399) return 8;
+    if (bits <= 23290) return 9;
+    if (bits <= 56651) return 10;
+    return 11;
 }
 

@@ -25,7 +25,8 @@
 
 #include "aprcl.h"
 
-ulong unity_zpq_p_unity(const unity_zpq f)
+ulong
+unity_zpq_p_unity(const unity_zpq f)
 {
     ulong i, is_punity;
     is_punity = f->p;
@@ -41,14 +42,16 @@ ulong unity_zpq_p_unity(const unity_zpq f)
     return is_punity;
 }
 
-int unity_zpq_is_p_unity(const unity_zpq f)
+int
+unity_zpq_is_p_unity(const unity_zpq f)
 {
     if (unity_zpq_p_unity(f) != f->p)
         return 1;
     return 0;
 }
 
-int unity_zpq_is_p_unity_generator(const unity_zpq f)
+int
+unity_zpq_is_p_unity_generator(const unity_zpq f)
 {
     ulong upow = unity_zpq_p_unity(f);
     if (upow != f->p && upow != 0)

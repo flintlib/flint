@@ -26,10 +26,10 @@
 #include "aprcl.h"
 
 /*
-    Below is the implementation of primality test using Jacibi sums.
+    Below is the implementation of primality test using Jacobi sums.
     Many steps are well described in:
         [1] "A Course in Computational Algebraic Number Theory" by H. Cohen
-        [2] "Implementation of a New Primality Test" by H. Cohen and A. K. Lenstra
+        [2] "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra
 
     The algorithm consist of 4 steps:
         (1.) Precomutation;
@@ -40,7 +40,7 @@
     The file contains the implementation of steps (2.) and (3.).
     It also contains the Jacobi sum primality test.
     A small part of implementation of step (1.) is here and most are in
-    aprcl_config file.
+    config_jacobi.c file.
     (4.) implemented in function is_prime_final_division().
 
     Standard variables:
@@ -425,11 +425,10 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
     /* initialization */
     result = 0;
     p_counter = 50;     /* check only first 50 primes q = 2mp + 1 */
-    m = 9;        /* begin from q = 2*9*p + 1 */
+    m = 9;              /* begin from q = 2*9*p + 1 */
 
     fmpz_init(npow);
     fmpz_init(qmod);
-
 
     /* check first 50 primes */
     while (p_counter > 0)
@@ -469,7 +468,7 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
 
         /* compute J(p, q) */
         unity_zp_init(jacobi_sum, p, k, n);
-        jacobi_pq(jacobi_sum, q, p);
+        unity_zp_jacobi_sum_pq(jacobi_sum, q, p);
 
         /* compute u and v */
         fmpz_tdiv_q_ui(u, n, n_pow(p, k));
@@ -654,12 +653,14 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
             unity_zp_init(jacobi_sum2_2, p, k, n);
 
             /* compute set jacobi_sum = J(p, q) */
-            jacobi_pq(jacobi_sum, q, p);
+            unity_zp_jacobi_sum_pq(jacobi_sum, q, p);
             /* if p == 2 and k >= 3 we also need to compute J_2(q) and J_3(q) */
             if (p == 2 && k >= 3)
             {
-                jacobi_2q_one(jacobi_sum2_1, q);    /* compute J_3(q) */
-                jacobi_2q_two(jacobi_sum2_2, q);    /* compute J_2(q) */
+                /* compute J_3(q) */
+                unity_zp_jacobi_sum_2q_one(jacobi_sum2_1, q);
+                /* compute J_2(q) */
+                unity_zp_jacobi_sum_2q_two(jacobi_sum2_2, q);
             }
 
             /* check (2.b) */
@@ -824,7 +825,7 @@ is_prime_jacobi(const fmpz_t n)
 
     /* 
         (1.a) Choose R and s values for n and store its factorisation.
-        See definition in aprcl_config functions documentation. s^2 > n.
+        See definition in jacobi_config functions documentation. s^2 > n.
     */
     jacobi_config_init(config, n);
 

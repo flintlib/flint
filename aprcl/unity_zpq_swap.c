@@ -25,7 +25,8 @@
 
 #include "aprcl.h"
 
-void unity_zpq_swap(unity_zpq f, unity_zpq g)
+void
+unity_zpq_swap(unity_zpq f, unity_zpq g)
 {
     fmpz_mod_poly_t *temp = f->polys;
     f->polys = g->polys;

@@ -66,26 +66,9 @@ typedef struct
     ulong p;
     ulong exp;
     fmpz_t n;
-
-    ulong r;
-    fmpz_t ninv;
 } _unity_zp;
 
 typedef _unity_zp unity_zp[1];
-
-typedef struct
-{
-    fmpz_poly_t poly;
-    ulong p;
-    ulong exp;
-    fmpz_t n;
-    fmpz_t nr;
-
-    fmpz_t ninv;
-    ulong r;
-} _unity_zp_mont;
-
-typedef _unity_zp_mont unity_zp_mont[1];
 
 typedef enum
 {
@@ -152,8 +135,8 @@ void unity_zp_print(const unity_zp f);
 
 void unity_zp_coeff_inc(unity_zp f, ulong ind);
 void unity_zp_coeff_dec(unity_zp f, ulong ind);
-void unity_zp_coeff_set_fmpz(unity_zp value, ulong ind, const fmpz_t x);
-void unity_zp_coeff_set_ui(unity_zp value, ulong ind, ulong x);
+void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x);
+void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x);
 void unity_zp_coeff_add_fmpz(unity_zp f, ulong ind, const fmpz_t x);
 void unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x);
 
@@ -204,7 +187,7 @@ FLINT_DLL void unity_zp_mul7(unity_zp f,
 FLINT_DLL void unity_zp_mul11(unity_zp f,
         const unity_zp g, const unity_zp h, fmpz_t * t);
 
-ulong _unity_zp_pow_2k_find_k(const fmpz_t n);
+ulong _unity_zp_pow_select_k(const fmpz_t n);
 void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow);
 void unity_zp_pow_2k_ui(unity_zp f, const unity_zp g, ulong pow);
 
@@ -221,32 +204,32 @@ void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
 void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 
 /* Jacobi sum computation. */
-void _jacobi_pq_general(unity_zp f, const mp_ptr table, ulong p,
+void _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table, ulong p,
         ulong q, ulong k, ulong a, ulong b);
-void jacobi_pq(unity_zp f, ulong q, ulong p);
-void jacobi_2q_one(unity_zp f, ulong q);
-void jacobi_2q_two(unity_zp f, ulong q);
+void unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p);
+void unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q);
+void unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q);
 
 /* Z[unity_root_q, unity_root_p] operations. */
-void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n);
-void unity_zpq_clear(unity_zpq value);
+void unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n);
+void unity_zpq_clear(unity_zpq f);
 
 void unity_zpq_copy(unity_zpq f, const unity_zpq g);
 void unity_zpq_swap(unity_zpq f, unity_zpq g);
 
-void unity_zpq_coeff_set_fmpz(unity_zpq value,
+void unity_zpq_coeff_set_fmpz(unity_zpq f,
         ulong i, ulong j, const fmpz_t x);
-void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x);
+void unity_zpq_coeff_set_ui(unity_zpq f, ulong i, ulong j, ulong x);
 
-void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x);
-void unity_zpq_coeff_add_ui(unity_zpq value, ulong i, ulong j, ulong x);
+void unity_zpq_coeff_add(unity_zpq f, ulong i, ulong j, const fmpz_t x);
+void unity_zpq_coeff_add_ui(unity_zpq f, ulong i, ulong j, ulong x);
 
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
-void unity_zpq_add(unity_zpq result, const unity_zpq left,
-        const unity_zpq right);
-void unity_zpq_mul(unity_zpq result, const unity_zpq left,
-        const unity_zpq right);
+void unity_zpq_add(unity_zpq f, const unity_zpq g,
+        const unity_zpq h);
+void unity_zpq_mul(unity_zpq f, const unity_zpq g,
+        const unity_zpq h);
 void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t p);
 void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow);
 
@@ -255,10 +238,10 @@ void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong p);
 
 void unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s);
 
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p);
-void unity_zpq_gauss_sum_character_pow(unity_zpq value,
+void unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p);
+void unity_zpq_gauss_sum_character_pow(unity_zpq f,
         ulong q, ulong p, ulong pow);
-void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p);
+void unity_zpq_gauss_sum_sigma_pow(unity_zpq f, ulong q, ulong p);
 
 ulong unity_zpq_p_unity(const unity_zpq f);
 int unity_zpq_is_p_unity(const unity_zpq f);

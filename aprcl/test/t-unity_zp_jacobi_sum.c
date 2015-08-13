@@ -43,7 +43,7 @@ int main(void)
         fmpz_init_set_ui(n, 37);
 
         unity_zp_init(sum, 3, 1, n);
-        jacobi_pq(sum, 7, 3);
+        unity_zp_jacobi_sum_pq(sum, 7, 3);
 
         unity_zp_clear(sum);
     }
