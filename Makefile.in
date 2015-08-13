@@ -114,7 +114,7 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	$(AT)if [ "$(WANT_NTL)" -ne "1" ]; then \
 	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
 	fi
-	$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
+	-$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
 		$(LDCONFIG) -n "$(CURDIR)"; \
 	fi
 	ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME)"; \
@@ -199,10 +199,7 @@ endif
 install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/$(LIBDIR)"
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
-	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-		cp -a $(wildcard $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-	fi
+	$(AT)$(MAKE) -f ./Makefile -C . install-copy
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
@@ -213,6 +210,12 @@ install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
+
+install-copy:
+	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+	   cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+	   cp -a $(wildcard $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+	fi
 
 build:
 	mkdir -p build
@@ -247,5 +250,5 @@ build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.
 print-%:
 	@echo '$*=$($*)'
 
-.PHONY: profile library shared static clean examples tune check tests distclean dist install all valgrind
+.PHONY: profile library shared static clean examples tune check tests distclean dist install install-copy all valgrind
 
