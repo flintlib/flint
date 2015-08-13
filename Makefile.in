@@ -203,7 +203,6 @@ install: library
 	   cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	   cp -a $(shell ls $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
-	$(AT)$(MAKE) -f ./Makefile -C . install-copy
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
