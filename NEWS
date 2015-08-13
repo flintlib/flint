@@ -1155,3 +1155,7 @@ v 2.5.1 -- 12 Aug 2015
   * Fix some build bugs related to soname versioning and ldconfig
   * Fix issue with Windows MSVC build
 
+v 2.5.2 -- 13 Aug 2015
+
+  * Fix further issues with soname versioning and ldconfig
+

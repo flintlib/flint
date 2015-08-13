@@ -651,7 +651,7 @@ int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
   ulimb = up[usize - 1];
   usize--;
 
-  f (ulimb > vval)
+  if (ulimb > vval)
     return 1;
   else if (ulimb < vval)
     return -1;
