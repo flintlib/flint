@@ -52,7 +52,7 @@ int main(void)
         https://primes.utm.edu/lists/small/
     */
 
-    flint_printf("Primality test profiing for numbers from 10 to 300 digits\n");
+    flint_printf("Primality test profiling for numbers from 10 to 300 digits\n");
     flint_printf("All timings given for 5 numbers\n");
 
     /* 10 digits primes */

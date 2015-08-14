@@ -52,7 +52,7 @@ int main(void)
         link : http://sourceforge.net/projects/mpzaprcl/
     */
 
-    flint_printf("Primality test profiing for numbers from 350 to 2000 digits\n");
+    flint_printf("Primality test profiling for numbers from 350 to 2000 digits\n");
     flint_printf("All timings given for one number\n");
 
     /* 350 digits prime */

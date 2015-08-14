@@ -29,6 +29,11 @@
 
 *******************************************************************************
 
+int is_prime_aprcl(const fmpz_t n)
+
+    Test $n$ for primality using APRCL test. Calls \code{is_prime_jacobi()}
+    function. Returns non zero value if $n$ is prime.
+
 primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
     Test $n$ for primality with fixed \code{config}. Possible return values:
@@ -46,7 +51,7 @@ int is_prime_gauss(const fmpz_t n)
     The minimum required numbers $s$ and $R$ computed automatically. 
     By default $R >= 180$. In some cases returns 0 for prime numbers. 
     It means that we select too small R value. To find this case 
-    \code{_is_prime_gauss} function can be used.
+    \code{_is_prime_gauss()} function can be used.
 
 is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
