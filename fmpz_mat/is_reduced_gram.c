@@ -54,7 +54,7 @@ fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta)
     mpq_set_d(etax, eta);
     fmpq_set_mpq(deltaq, deltax);
     fmpq_set_mpq(etaq, etax);
-    mpq_clears(deltax, etax, '\0');
+    mpq_clears(deltax, etax, NULL);
 
     fmpz_set(fmpq_mat_entry_num(r, 0, 0), fmpz_mat_entry(A, 0, 0));
 

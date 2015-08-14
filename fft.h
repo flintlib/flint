@@ -37,6 +37,12 @@ or implied, of William Hart.
 #ifndef FFT_H
 #define FFT_H
 
+#ifdef FFT_INLINES_C
+#define FFT_INLINE FLINT_DLL
+#else
+#define FFT_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -62,8 +68,8 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #else
 
-static __inline__ mp_limb_t
-mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
+FFT_INLINE
+mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
     mp_limb_t ret;
     mp_ptr t;
@@ -123,7 +129,7 @@ mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
          nn[limbs] = -nn[limbs]; \
    } while (0)
 
-static __inline__
+FFT_INLINE
 void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
 {
    mp_limb_t sum = r[0] + c;

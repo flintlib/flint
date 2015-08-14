@@ -1101,3 +1101,61 @@ v 2.4.4 -- fixed a severe bug in flint's primality code (n_is_prime() affecting 
 v 2.4.5 -- fixed a severe bug in flint's fmpz_poly_gcd_heuristic, reported by
     Anton Mellit.
 
+v 2.5.0 -- 07 Aug 2015
+
+  * LLL (rational, Nguyen-Stehle, from Gram matrix, with_removal, Storjohann/ULLL)
+  * Hermite normal form (naive, xgcd, Domich-Kannan-Trotter, Kannan-Bachem, Pernet-Stein)
+  * Smith normal form (diagonal, Kannen-Bachem, Iliopoulos)
+  * Paterson-Stockmeyer algorithm
+  * modular resultant
+  * hgcd resultant
+  * polynomial discriminant
+  * multithreaded multimodular Taylor shift
+  * multithreaded Brent-Kung composition
+  * multithreaded Kaltofen-Shoup distinct degree factorisation
+  * multiplication based reduced row echelon form
+  * place inline functions in library for foreign function interfaces
+  * Primality tests for large integers (Pocklington, Morrison)
+  * Probable prime tests for large integers (Lucas, Baillie-PSW, strong-psp, Brillhart-Lehmer-Selfridge)
+  * CRT for large integers
+  * Dixon algorithm for nullspace
+  * Brent-Kung composition in irreducibility and distinct degree factorisation
+  * floating point QR decomposition
+  * Schwarz-Rutishauser Gram-Schmidt algorithm
+  * Ogita-Rump-Oishi dot product
+  * matrix window functions
+  * MSVC support (Brian Gladman)
+  * fast cube/nth-root (Newton, Kahan, magic number, Chebyshev)
+  * Bodrato matrix squaring
+  * matrix concatenation functions
+  * matrix content
+  * faster n_gcd
+  * faster n_sqrtmod and fmpz_sqrtmod
+  * additional functions for returning factor of modulus in polys over Z/nZ
+  * Hadamard matrix construction
+  * series addition/subtraction
+  * faster prime_pi bounds
+  * speedup creation of sparse polynomials
+  * speedup n_isprime n_nextprime
+  * speedup n_isprime_pocklington
+  * speedups to fmpq_poly and fmpz_poly arithmetic
+  * speedup polynomial irreducibility testing over Z/pZ
+  * speedup of rank computation over ZZ
+  * made CPimport compile time dependency only
+  * teach flint_printf/sprintf about explicit width format specifiers
+  * support relative paths in configure
+  * library soname versioning
+  * ARM64 patches
+  * Support MSYS2
+  * Progress towards supporting MIPS64
+  * Fix a serious bug in fmpz_poly_signature
+
+v 2.5.1 -- 12 Aug 2015
+
+  * Fix some build bugs related to soname versioning and ldconfig
+  * Fix issue with Windows MSVC build
+
+v 2.5.2 -- 13 Aug 2015
+
+  * Fix further issues with soname versioning and ldconfig
+

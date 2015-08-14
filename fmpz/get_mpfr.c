@@ -24,7 +24,17 @@
 
 ******************************************************************************/
 
+#if defined(_WIN64) || defined(__mips64)
+#include <stdint.h> /* to enable mpfr_set_sj in mpfr.h */
+#endif
 #include <gmp.h>
+#if defined( _WIN64) && defined( _MSC_MPIR_VERSION ) && __MPIR_RELEASE >= 20700
+#  if defined( _MSC_VER ) && _MSC_VER >= 1600
+#    include <stdint.h>
+#    include <mpfr.h>
+#    define mpfr_set_si mpfr_set_sj
+#  endif
+#endif
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -33,7 +43,11 @@ void
 fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
 {
     if (!COEFF_IS_MPZ(*f))
+#if defined(_WIN64) || defined(__mips64)
+        mpfr_set_sj(x, *f, rnd);
+#else
         mpfr_set_si(x, *f, rnd);    /* set x to small value */
+#endif
     else
         mpfr_set_z(x, COEFF_TO_PTR(*f), rnd);   /* set x to large value */
 }

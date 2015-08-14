@@ -109,7 +109,7 @@ void timeit_stop(timeit_t t)
 
 #define FLINT_NUM_CLOCKS 20
 
-#define FLINT_CLOCKSPEED 2200000000.0
+#define FLINT_CLOCKSPEED 3100000000.0
 
 extern double clock_last[FLINT_NUM_CLOCKS];
 extern double clock_accum[FLINT_NUM_CLOCKS];

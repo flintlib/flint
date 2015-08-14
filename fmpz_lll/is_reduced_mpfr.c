@@ -53,7 +53,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
         mpfr_mat_zero(R);
         mpfr_mat_zero(V);
 
-        mpfr_inits2(prec, s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+        mpfr_inits2(prec, s, norm, ti, tj, tmp, NULL);
 
         for (i = 0; i < n; i++)
         {
@@ -176,7 +176,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
             mpfr_mat_clear(Wd);
             _mpfr_vec_clear(du, n);
             _mpfr_vec_clear(dd, n);
-            mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+            mpfr_clears(s, norm, ti, tj, tmp, NULL);
             return 0;
         }
 
@@ -446,7 +446,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
         {
             mpfr_mat_clear(R);
             mpfr_mat_clear(bound);
-            mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+            mpfr_clears(s, norm, ti, tj, tmp, NULL);
             return 0;
         }
 
@@ -488,7 +488,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                 {
                     mpfr_mat_clear(R);
                     mpfr_mat_clear(bound);
-                    mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+                    mpfr_clears(s, norm, ti, tj, tmp, NULL);
                     return 0;
                 }
             }
@@ -508,14 +508,14 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
             {
                 mpfr_mat_clear(R);
                 mpfr_mat_clear(bound);
-                mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+                mpfr_clears(s, norm, ti, tj, tmp, NULL);
                 return 0;
             }
         }
 
         mpfr_mat_clear(R);
         mpfr_mat_clear(bound);
-        mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+        mpfr_clears(s, norm, ti, tj, tmp, NULL);
     }
     else
     {
@@ -537,7 +537,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
         mpfr_mat_zero(R);
         mpfr_mat_zero(V);
 
-        mpfr_inits2(prec, s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+        mpfr_inits2(prec, s, norm, ti, tj, tmp, NULL);
 
         for (i = 0; i < n; i++)
         {
@@ -644,7 +644,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
             mpfr_mat_clear(Wd);
             _mpfr_vec_clear(du, n);
             _mpfr_vec_clear(dd, n);
-            mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+            mpfr_clears(s, norm, ti, tj, tmp, NULL);
             return 0;
         }
 
@@ -884,7 +884,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
         {
             mpfr_mat_clear(R);
             mpfr_mat_clear(bound);
-            mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+            mpfr_clears(s, norm, ti, tj, tmp, NULL);
             return 0;
         }
 
@@ -926,7 +926,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                 {
                     mpfr_mat_clear(R);
                     mpfr_mat_clear(bound);
-                    mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+                    mpfr_clears(s, norm, ti, tj, tmp, NULL);
                     return 0;
                 }
             }
@@ -946,14 +946,14 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
             {
                 mpfr_mat_clear(R);
                 mpfr_mat_clear(bound);
-                mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+                mpfr_clears(s, norm, ti, tj, tmp, NULL);
                 return 0;
             }
         }
 
         mpfr_mat_clear(R);
         mpfr_mat_clear(bound);
-        mpfr_clears(s, norm, ti, tj, tmp, (mpfr_ptr) 0);
+        mpfr_clears(s, norm, ti, tj, tmp, NULL);
     }
     return 1;
 }

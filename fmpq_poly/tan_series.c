@@ -51,10 +51,11 @@ _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
     if (n <= 3)
     {
         fmpz_zero(g);
-        fmpz_set(g + 1, h + 1);
+        if (n >= 2)
+            fmpz_set(g + 1, h + 1);
         if (hlen == 3)
             fmpz_set(g + 2, h + 2);
-        else
+        else if (n == 3)
             fmpz_zero(g + 2);
         fmpz_set(gden, hden);
         _fmpq_poly_canonicalise(g, gden, n);

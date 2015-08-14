@@ -35,5 +35,5 @@ mpf_mat_one(mpf_mat_t mat)
     n = FLINT_MIN(mat->r, mat->c);
 
     for (i = 0; i < n; i++)
-        mpf_set_ui(mpf_mat_entry(mat, i, i), 1);
+        flint_mpf_set_ui(mpf_mat_entry(mat, i, i), 1);
 }

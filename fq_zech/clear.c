@@ -26,3 +26,7 @@
 #include <string.h>
 
 #include "fq_zech.h"
+
+void osxdummy2394872398429() /* OSX doesn't like empty files */
+{
+}

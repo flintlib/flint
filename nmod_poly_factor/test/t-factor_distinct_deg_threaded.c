@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include "nmod_poly.h"
 #include "ulong_extras.h"
+#include "flint.h"
 
 int
 main(void)
@@ -38,9 +39,10 @@ main(void)
     int iter;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
+
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
     for (iter = 0; iter < 200; iter++)
     {
@@ -130,4 +132,14 @@ main(void)
     
     flint_printf("PASS\n");
     return 0;
+
+#else
+
+   FLINT_TEST_CLEANUP(state);
+
+   flint_printf("SKIPPED\n");
+   return 0;
+
+#endif
+
 }

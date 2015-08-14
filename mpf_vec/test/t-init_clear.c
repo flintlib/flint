@@ -50,7 +50,7 @@ main(void)
         a = _mpf_vec_init(length, prec);
 
         for (j = 0; j < length; j++)
-            mpf_set_ui(a + j, 0);
+            flint_mpf_set_ui(a + j, 0);
 
         _mpf_vec_clear(a, length);
     }

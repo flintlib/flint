@@ -87,6 +87,7 @@ main(void)
         fmpz_clear(b);
         fmpz_clear(c);
         fmpz_clear(d);
+        fmpz_clear(r);
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);
         fmpz_poly_clear(p);

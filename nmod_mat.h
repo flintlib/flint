@@ -28,6 +28,12 @@
 #ifndef NMOD_MAT_H
 #define NMOD_MAT_H
 
+#ifdef NMOD_MAT_INLINES_C
+#define NMOD_MAT_INLINE FLINT_DLL
+#else
+#define NMOD_MAT_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -58,16 +64,37 @@ nmod_mat_struct;
 typedef nmod_mat_struct nmod_mat_t[1];
 
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
-#define nmod_mat_nrows(mat) ((mat)->r)
-#define nmod_mat_ncols(mat) ((mat)->c)
 
-static __inline__
-void
-_nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
+NMOD_MAT_INLINE
+mp_limb_t nmod_mat_get_entry(const nmod_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i][j];
+}
+
+NMOD_MAT_INLINE
+mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
+
+NMOD_MAT_INLINE
+slong nmod_mat_nrows(const nmod_mat_t mat)
+{
+   return mat->r;
+}
+
+NMOD_MAT_INLINE
+slong nmod_mat_ncols(const nmod_mat_t mat)
+{
+   return mat->c;
+}
+
+NMOD_MAT_INLINE
+void _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
 {
     mat->mod.n = n;
-    mat->mod.ninv = n_preinvert_limb(n);
     count_leading_zeros(mat->mod.norm, n);
+    invert_limb(mat->mod.ninv, n << mat->mod.norm);
 }
 
 /* Memory management */
@@ -106,14 +133,14 @@ FLINT_DLL void nmod_mat_zero(nmod_mat_t mat);
 
 FLINT_DLL int nmod_mat_is_zero(const nmod_mat_t mat);
 
-static __inline__ int
-nmod_mat_is_empty(const nmod_mat_t mat)
+NMOD_MAT_INLINE
+int nmod_mat_is_empty(const nmod_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
-nmod_mat_is_square(const nmod_mat_t mat)
+NMOD_MAT_INLINE
+int nmod_mat_is_square(const nmod_mat_t mat)
 {
     return (mat->r == mat->c);
 }
@@ -131,6 +158,8 @@ FLINT_DLL void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 /* Matrix-scalar arithmetic */
 
 FLINT_DLL void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
+FLINT_DLL void nmod_mat_scalar_mul_add(nmod_mat_t dest, const nmod_mat_t X,
+                                const mp_limb_t b, const nmod_mat_t Y);
 
 /* Matrix multiplication */
 

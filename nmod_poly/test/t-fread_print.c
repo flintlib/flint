@@ -36,8 +36,8 @@ main(void)
     int i, result, r1;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("fread_print....");
+#if !defined( _MSC_VER )
     fflush(stdout);
 
     /* Check reading and writing to a file */
@@ -88,5 +88,8 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
+#else
+    flint_printf("SKIPPED\n");
+#endif
     return 0;
 }

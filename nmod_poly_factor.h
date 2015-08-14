@@ -23,11 +23,18 @@
     Copyright (C) 2010, 2011 William Hart
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2015 Tommy Hofmann
 
 ******************************************************************************/
 
 #ifndef NMOD_POLY_FACTOR_H
 #define NMOD_POLY_FACTOR_H
+
+#ifdef NMOD_POLY_FACTOR_INLINES_C
+#define NMOD_POLY_FACTOR_INLINE FLINT_DLL
+#else
+#define NMOD_POLY_FACTOR_INLINE static __inline__
+#endif
 
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */

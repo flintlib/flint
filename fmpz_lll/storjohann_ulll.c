@@ -56,7 +56,7 @@ fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl)
         mpq_set_d(etax, fl->eta);
         fmpq_set_mpq(delta, deltax);
         fmpq_set_mpq(eta, etax);
-        mpq_clears(deltax, etax, '\0');
+        mpq_clears(deltax, etax, NULL);
 
         if (mbits > new_size)
         {

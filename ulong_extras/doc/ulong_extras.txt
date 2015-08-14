@@ -602,6 +602,9 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
     function \code{lo <= pi(n) <= hi}. If \code{lo} and \code{hi} point to 
     the same location, the high value will be stored.
 
+    This does a table lookup for small values, then switches over to some
+    proven bounds.
+
     The upper approximation is $1.25506 n / \ln n$, and the 
     lower is $n / \ln n$.  These bounds are due to Rosser and 
     Schoenfeld~\citep{RosSch1962} and valid for $n \geq 17$.
@@ -907,6 +910,55 @@ int n_is_perfect_power235(mp_limb_t n)
     square root test is performed. Similarly a cube root or fifth 
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
+
+mp_limb_t n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
+
+    This function uses the Newton iteration method to calculate the nth root of
+    a number.
+    First approximation is calculated by an algorithm mentioned in this 
+    article :  \url{http://en.wikipedia.org/wiki/Fast_inverse_square_root}. 
+    Instead of the inverse square root, the nth root is calculated.
+    
+    Returns the integer part of \code{n ^ 1/root}. Remainder is set as
+    \code{n - base^root}. In case $n < 1$ or \code{root < 1}, $0$ is returned.   
+
+mp_limb_t n_cbrt(mp_limb_t n)
+    
+    This function returns the integer truncation of the cube root of $n$.
+    First approximation is calculated by an algorithm mentioned in this 
+    article : \url{http://en.wikipedia.org/wiki/Fast_inverse_square_root}.
+    Instead of the inverse sqare root, the cube root is calculated.
+    This functions uses different algorithms to calculate the cube root,
+    depending upon the size of $n$. For numbers greater than $2^46$, it uses
+    \code{n_cbrt_chebyshev_approx()}. Otherwise, it makes use of the iteration, 
+    $x \leftarrow x - (x*x*x - a)*x/(2*x*x*x + a)$ for getting a good estimate, 
+    as mentioned in the paper by W. Kahan~\citep{Kahan1991}.
+
+mp_limb_t n_cbrt_newton_iteration(mp_limb_t n)
+
+    This function returns the integer truncation of the cube root of $n$.
+    Makes use of Newton iterations to get a close value, and then adjusts the
+    estimate so as to get the correct value.
+
+mp_limb_t n_cbrt_binary_search(mp_limb_t n)
+
+    This function returns the integer truncation of the cube root of $n$.
+    Uses binary search to get the correct value.
+
+mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n)
+    
+    This function returns the integer truncation of the cube root of $n$.
+    The number is first expressed in the form \code{x * 2^exp}. This ensures
+    $x$ is in the range [0.5, 1]. Cube root of x is calculated using
+    Chebyshev's approximation polynomial for the function $y = x^1/3$. The
+    values of the coefficient are calculated from the python module mpmath, 
+    \url{http://mpmath.org}, using the function chebyfit. x is multiplied 
+    by \code{2^exp} and the cube root of 1, 2 or 4 (according to \code{exp%3}).
+
+mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+
+    This function returns the integer truncation of the cube root of $n$.
+    Remainder is set as $n$ minus the cube of the value returned.
 
 *******************************************************************************
 

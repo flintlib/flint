@@ -26,6 +26,12 @@
 #ifndef MFPR_MAT_H
 #define MPFR_MAT_H
 
+#ifdef MPFR_MAT_INLINES_C
+#define MPFR_MAT_INLINE FLINT_DLL
+#else
+#define MPFR_MAT_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include <mpfr.h> 
 
@@ -45,7 +51,11 @@ typedef struct
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef mpfr_mat_struct mpfr_mat_t[1];
 
-#define mpfr_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+MPFR_MAT_INLINE
+__mpfr_struct * mpfr_mat_entry(const mpfr_mat_t mat, slong i, slong j)
+{
+   return mat->rows[i] + j;
+}
 
 FLINT_DLL void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec);
 

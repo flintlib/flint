@@ -65,27 +65,27 @@ FLINT_DLL int TEMPLATE(T, mat_equal)(const TEMPLATE(T, mat_t) mat1,
 FLINT_DLL int TEMPLATE(T, mat_is_zero)(const TEMPLATE(T, mat_t) mat,
                          const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__ int
+FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_empty)(const TEMPLATE(T, mat_t) mat,
                           const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
-static __inline__ int
+FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_square)(const TEMPLATE(T, mat_t) mat,
                            const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == mat->c);
 }
 
-static __inline__ TEMPLATE(T, struct) *
+FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
 {
     return mat->rows[i] + j;
 }
 
-static __inline__ void
+FQ_MAT_TEMPLATES_INLINE void
 TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
                            const TEMPLATE(T, t) x,
                            const TEMPLATE(T, ctx_t) ctx)
@@ -93,14 +93,14 @@ TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
     TEMPLATE(T, set)(TEMPLATE(T, mat_entry)(mat, i, j), x, ctx);
 }
 
-static __inline__ slong
+FQ_MAT_TEMPLATES_INLINE slong
 TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat ,
                        const TEMPLATE(T, ctx_t) ctx)
 {
     return mat->r;
 }
 
-static __inline__ slong
+FQ_MAT_TEMPLATES_INLINE slong
 TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
                        const TEMPLATE(T, ctx_t) ctx)
 {
@@ -138,14 +138,14 @@ FLINT_DLL int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat,
 FLINT_DLL int TEMPLATE(T, mat_fprint_pretty)(FILE * file, const TEMPLATE(T, mat_t) mat,
                                    const TEMPLATE(T, ctx_t) ctx);
 
-static __inline__
+FQ_MAT_TEMPLATES_INLINE
 int TEMPLATE(T, mat_print)(const TEMPLATE(T, mat_t) mat,
                            const TEMPLATE(T, ctx_t) ctx)
 {
     return TEMPLATE(T, mat_fprint)(stdout, mat, ctx);
 }
 
-static __inline__
+FQ_MAT_TEMPLATES_INLINE
 int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat,
                                   const TEMPLATE(T, ctx_t) ctx)
 {

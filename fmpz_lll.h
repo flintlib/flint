@@ -28,6 +28,12 @@
 #ifndef FMPZ_LLL_H
 #define FMPZ_LLL_H
 
+#ifdef FMPZ_LLL_INLINES_C
+#define FMPZ_LLL_INLINE FLINT_DLL
+#else
+#define FMPZ_LLL_INLINE static __inline__
+#endif
+
 #include <stdio.h>
 #include <gmp.h>
 #include "flint.h"

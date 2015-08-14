@@ -55,7 +55,7 @@ main(void)
         {
             for (k = 0; k < cols; k++)
             {
-                mpf_set_si(mpf_mat_entry(A, j, k), 3 * j + 7 * k);
+                flint_mpf_set_si(mpf_mat_entry(A, j, k), 3 * j + 7 * k);
             }
         }
 
@@ -63,7 +63,7 @@ main(void)
         {
             for (k = 0; k < cols; k++)
             {
-                if (mpf_cmp_si(mpf_mat_entry(A, j, k), 3 * j + 7 * k) != 0)
+                if (flint_mpf_cmp_ui(mpf_mat_entry(A, j, k), 3 * j + 7 * k) != 0)
                 {
                     flint_printf("FAIL: get/set entry %wd,%wd\n", j, k);
                     abort();

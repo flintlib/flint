@@ -36,6 +36,7 @@
 
 #define ulong mp_limb_t
 
+#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -44,10 +45,11 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
 
     flint_printf("interval_threaded....");
     fflush(stdout);
+
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
 
     for (iter = 0; iter < 20*flint_test_multiplier(); iter++)
     {
@@ -154,4 +156,15 @@ main(void)
     
     flint_printf("PASS\n");
     return 0;
+
+#else
+
+   FLINT_TEST_CLEANUP(state);
+
+   flint_printf("SKIPPED\n");
+   return 0;
+
+#endif
+
 }
+

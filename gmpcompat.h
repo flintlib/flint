@@ -30,7 +30,7 @@
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
 
-#if defined(__MINGW64__) && !defined(__MPIR_VERSION)
+#if (defined(__MINGW64__) || defined(__mips64)) && !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
@@ -53,7 +53,7 @@
    ((xxx)->_mp_size > 0 ? (slong) (xxx)->_mp_d[0] : (slong) -(xxx)->_mp_d[0]))
 
 #define flint_mpz_get_ui(xxx) \
-   ((xxx)->_mp_size == 0 ? WORD(0) : (xxx)->_mp_d[0])
+   ((xxx)->_mp_size == 0 ? UWORD(0) : (xxx)->_mp_d[0])
 
 static __inline__
 void flint_mpz_set_si(mpz_ptr r, slong s)
@@ -475,6 +475,249 @@ void flint_mpz_fib_ui(mpz_ptr r, ulong n)
    mpz_fib_ui(r, (unsigned long) n);
 }
 
+/* mpf_set_si() -- Assign a float from a signed int.
+
+Copyright 1993, 1994, 1995, 2000, 2001, 2002, 2004 Free Software Foundation,
+Inc.
+
+Copyright 2015 William Hart.
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
+
+static __inline__
+void flint_mpf_set_si (mpf_ptr dest, slong val)
+{
+  mp_size_t size;
+  mp_limb_t vl;
+
+  vl = (mp_limb_t) (val >= 0 ? val : -val);
+
+  dest->_mp_d[0] = vl;
+  size = vl != 0;
+
+  dest->_mp_exp = size;
+  dest->_mp_size = val >= 0 ? size : -size;
+}
+
+/* mpf_set_ui() -- Assign a float from an unsigned int.
+
+Copyright 1993, 1994, 1995, 2001, 2002, 2004 Free Software Foundation, Inc.
+
+Copyright 2015 William Hart
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
+
+static __inline__
+void flint_mpf_set_ui(mpf_ptr f, ulong val)
+{
+  mp_size_t size;
+
+  f->_mp_d[0] = val;
+  size = val != 0;
+
+  f->_mp_exp = f->_mp_size = size;
+}
+
+/* mpf_get_si -- mpf to long conversion
+
+Copyright 2001, 2002, 2004 Free Software Foundation, Inc.
+
+Copyright 2015 William Hart
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+static __inline__
+slong flint_mpf_get_si (mpf_srcptr f)
+{
+  mp_exp_t exp;
+  mp_size_t size, abs_size;
+  mp_srcptr fp;
+  mp_limb_t fl;
+
+  exp = f->_mp_exp;
+  size = f->_mp_size;
+  fp = f->_mp_d;
+
+  /* fraction alone truncates to zero
+     this also covers zero, since we have exp==0 for zero */
+  if (exp <= 0)
+    return WORD(0);
+
+  /* there are some limbs above the radix point */
+
+  fl = 0;
+  abs_size = FLINT_ABS(size);
+  if (abs_size >= exp)
+    fl = fp[abs_size-exp];
+
+  if (size > 0)
+    return fl;
+  else
+    /* this form necessary to correctly handle -0x80..00 */
+    return ~ (fl - 1);
+}
+
+/* mpf_cmp_ui -- Compare a float with an unsigned integer.
+
+Copyright 1993, 1994, 1995, 1999, 2001, 2002 Free Software Foundation, Inc.
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
+
+static __inline__
+int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
+{
+  mp_srcptr up;
+  mp_size_t usize;
+  mp_exp_t uexp;
+  mp_limb_t ulimb;
+
+  uexp = u->_mp_exp;
+  usize = u->_mp_size;
+
+  if (usize < 0)
+    return -1;
+  
+  if (vval == 0)
+    return usize != 0;
+
+  if (uexp > 1)
+    return 1;
+  if (uexp < 1)
+    return -1;
+
+  up = u->_mp_d;
+
+  ulimb = up[usize - 1];
+  usize--;
+
+  if (ulimb > vval)
+    return 1;
+  else if (ulimb < vval)
+    return -1;
+
+  while (*up == 0)
+    {
+      up++;
+      usize--;
+    }
+
+  if (usize > 0)
+    return 1;
+
+  return 0;
+}
+
+/* mpf_fits_s*_p -- test whether an mpf fits a C signed type.
+
+Copyright 2001, 2002 Free Software Foundation, Inc.
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA. */
+
+static __inline__
+int flint_mpf_fits_slong_p(mpf_srcptr f)
+{
+  mp_size_t  fs, fn;
+  mp_srcptr  fp;
+  mp_exp_t   exp;
+  mp_limb_t  fl;
+
+  fs = f->_mp_size;
+  if (fs == 0)
+    return 1;  /* zero fits */
+
+  exp = f->_mp_exp;
+  if (exp < 1)
+    return 1;  /* -1 < f < 1 truncates to zero, so fits */
+
+  fp = f->_mp_d;
+  fn = FLINT_ABS(fs);
+
+  if (exp == 1)
+    {
+      fl = fp[fn-1];
+    }
+  else
+    return 0;
+
+  return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
+}
+
 #else
 
 #define flint_mpz_get_si mpz_get_si
@@ -518,6 +761,12 @@ void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 #define flint_mpq_cmp_ui mpq_cmp_ui
 #define flint_mpq_set_si mpq_set_si
 #define flint_mpq_set_ui mpq_set_ui
+
+#define flint_mpf_set_si mpf_set_si
+#define flint_mpf_set_ui mpf_set_ui
+#define flint_mpf_get_si mpf_get_si
+#define flint_mpf_cmp_ui mpf_cmp_ui
+#define flint_mpf_fits_slong_p mpf_fits_slong_p
 
 #endif
 

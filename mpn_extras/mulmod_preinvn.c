@@ -44,7 +44,11 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
    TMP_START;
    t = TMP_ALLOC(5*n*sizeof(mp_limb_t));
 
-   mpn_mul_n(t, a, b, n);
+   if (a == b)
+      mpn_sqr(t, a, n);
+   else
+      mpn_mul_n(t, a, b, n);
+    
    if (norm)
       mpn_rshift(t, t, 2*n, norm);
 

@@ -34,5 +34,6 @@
 void
 nmod_mat_window_clear(nmod_mat_t window)
 {
-    flint_free(window->rows);
+    if (window->r > 0)
+        flint_free(window->rows);
 }

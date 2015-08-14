@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#define FQ_POLY_INLINES_C
+#define FQ_NMOD_POLY_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>

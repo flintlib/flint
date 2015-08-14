@@ -31,5 +31,5 @@ _mpf_vec_zero(mpf * vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)
-        mpf_set_ui(vec + i, 0);
+        flint_mpf_set_ui(vec + i, 0);
 }

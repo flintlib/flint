@@ -35,8 +35,6 @@ main(void)
     flint_printf("padic_val_fac... ");
     fflush(stdout);
 
-    
-
     /* Check aliasing for padic_val_fac() */
     for (i = 0; i < 1000; i++)
     {

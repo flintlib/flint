@@ -31,7 +31,7 @@ _mpf_vec_is_zero(const mpf * vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)
-        if (mpf_cmp_ui(vec + i, 0) != 0)
+        if (flint_mpf_cmp_ui(vec + i, 0) != 0)
             return 0;
     return 1;
 }

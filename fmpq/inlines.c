@@ -44,6 +44,16 @@ void fmpq_denominator(fmpz_t n, const fmpq_t q)
    fmpz_set(n, fmpq_denref(q));
 }
 
+fmpz * fmpq_numerator_ptr(fmpq_t q)
+{
+   return fmpq_numref(q);
+}
+
+fmpz * fmpq_denominator_ptr(fmpq_t q)
+{
+   return fmpq_denref(q);
+}
+
 int fmpq_equal_si(fmpq_t q, slong n)
 {
    return q->num == n && q->den == WORD(1);

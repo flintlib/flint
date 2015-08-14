@@ -35,114 +35,16 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-#define NUM_POLYS 7 /* x^3 - 1, x^4 - 1, x^6 - 1, x^5 - 1, x^8 - 1, x^12 - 1, x^10 - 1 */
-
-static slong pol_degrees[NUM_POLYS] = { 3, 4, 6, 5, 8, 12, 10 };
-
-slong __primes_remove(ulong * arr1, slong len1, ulong * arr2, slong len2)
-{
-   slong i, j, k;
-
-   for (i = 0, j = 0, k = 0; i < len1; )
-   {
-      if (k >= len2 || arr1[i] < arr2[k])
-         arr1[j++] = arr1[i++];
-      else if (arr1[i] == arr2[k])
-         i++, k++;
-      else
-         k++;
-   }
-
-   return j;
-}
-
-void __print_list(ulong * arr, slong len)
-{
-   slong i;
-   
-   printf("[");
-   for (i = 0; i < len - 1; i++)
-      printf("%ld, ", arr[i]);
-   if (len)
-      printf("%ld", arr[i]);
-   printf("]\n");
-}
-
-void __print_fmpz_list(fmpz * arr, slong len)
-{
-   slong i;
-   
-   printf("[");
-   for (i = 0; i < len - 1; i++)
-      fmpz_print(arr + i), printf(", ");
-   if (len)
-      fmpz_print(arr + i);
-   printf("]\n");
-}
-
-void __combine_residues(fmpz * r, fmpz * r1, fmpz_t F1, slong r1n, 
-                                  fmpz * r2, fmpz_t F2, slong r2n)
-{
-   slong i, j;
-   fmpz * t = _fmpz_vec_init(r1n*r2n);
-
-   for (i = 0; i < r1n; i++)
-   {
-      for (j = 0; j < r2n; j++)
-      {
-         if (fmpz_is_zero(r2 + j))
-            fmpz_set(t + i*r2n + j, r1 + i);
-         else if (fmpz_is_zero(r1 + i))
-            fmpz_set(t + i*r2n + j, r2 + j);
-         else
-            fmpz_CRT(t + i*r2n + j, r1 + i, F1, r2 + j, F2, 0);
-      }
-   }
-
-   for (i = 0; i < r1n*r2n; i++)
-      fmpz_set(r + i, t + i);
-
-   _fmpz_vec_clear(t, r1n*r2n);
-}
-
-void __combine_residues2(fmpz * r, fmpz * r1, fmpz_t F1, slong r1n, 
-                                   fmpz * r2, fmpz_t F2, slong r2n)
-{
-   slong i, j;
-
-   for (i = 0, j = 0; i < r1n; i++, j++)
-   {
-      if (j == r2n) /* repeat same residues */
-         j = 0;
-      
-      if (fmpz_is_zero(r2 + j))
-         fmpz_set(r + i, r1 + i);
-      else if (fmpz_is_zero(r1 + i))
-         fmpz_set(r + i, r2 + j);
-      else
-         fmpz_CRT(r + i, r1 + i, F1, r2 + j, F2, 0);
-   }
-}
-
-void __set_residues(fmpz * r, fmpz * r1, slong r1n)
-{
-   slong i;
-
-   for (i = 0; i < r1n; i++)
-      fmpz_set(r + i, r1 + i);
-}
-
 int fmpz_is_prime(const fmpz_t n)
 {
    double logd = log(fmpz_get_d(n));
    ulong p, ppi, limit = (ulong) (logd*logd*logd/100.0) + 20;
-   ulong * pp1, * pm1, ** pk1, * pk1n;
-   slong i, j, l, num, num_pp1, num_pm1;
+   ulong * pp1, * pm1;
+   slong i, l, num, num_pp1, num_pm1;
    const ulong * primes; 
    const double * pinv;
 
    fmpz_t F1, Fsqr, Fcub, R;
-   int num_polys = 3;
    int res = -1;
    
    if (fmpz_cmp_ui(n, 1) <= 0)
@@ -159,8 +61,7 @@ int fmpz_is_prime(const fmpz_t n)
    fmpz_init(Fsqr);
    fmpz_init(Fcub);
 
-   for (l = 0; l < 4 && res == -1; l++, limit *= 10, 
-      num_polys = FLINT_MIN(num_polys + 2, NUM_POLYS))
+   for (l = 0; l < 4 && res == -1; l++, limit *= 10)
    {
       num_pm1 = num_pp1 = 0;
 
@@ -175,16 +76,6 @@ int fmpz_is_prime(const fmpz_t n)
    
       pm1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n - 1 */
       pp1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n + 1 */
-
-      /* allocate space for prime arrays */
-      pk1 = flint_malloc(num_polys*sizeof(ulong *));
-      pk1n = flint_malloc(num_polys*sizeof(ulong));
-      
-      for (j = 0; j < num_polys; j++)
-      {
-         pk1[j] = _nmod_vec_init(pol_degrees[j] * (ulong) logd);
-         pk1n[j] = 0;
-      }
 
       while (primes[0] < limit)
       {
@@ -201,82 +92,18 @@ int fmpz_is_prime(const fmpz_t n)
          /* check for factors */
          for (i = 0; i < num; i++)
          {
-            ulong rk, r2, r3, r4, r = n_mod2_precomp(p, primes[i], pinv[i]);
+            ulong r = n_mod2_precomp(p, primes[i], pinv[i]);
 
             if (r == 1) /* n - 1 = 0 mod p */
                pm1[num_pm1++] = primes[i];
 
             if (r == primes[i] - 1) /* n + 1 = 0 mod p */
                pp1[num_pp1++] = primes[i];
-
-            /* n^2 mod p */
-            r2 = n_mulmod_precomp(r, r, primes[i], pinv[i]);
-               
-            /* check for n^2 + n + 1 = 0 mod p */
-            rk = n_addmod(r2, r, primes[i]);
-
-            if (rk == primes[i] - 1) /* n^2 + n + 1 = 0 mod p */
-               pk1[0][pk1n[0]++] = primes[i];
-
-            /* check for n^2 + 1 = 0 mod p */
-            if (r2 == primes[i] - 1) /* n^2 + 1 = 0 mod p */
-               pk1[1][pk1n[1]++] = primes[i];
-
-            /* check for n^2 - n + 1 = 0 mod p */
-            rk = n_submod(r2, r, primes[i]);
-            
-            if (rk == primes[i] - 1) /* n^2 - n + 1 = 0 mod p */
-               pk1[2][pk1n[2]++] = primes[i];  
-
-            if (num_polys > 3)
-            {
-               /* check for n^4 + n^3 + n^2 + n + 1 = 0 mod p */
-               r4 = n_mulmod_precomp(r2, r2, primes[i], pinv[i]);
-               r3 = n_mulmod_precomp(r2, r, primes[i], pinv[i]);
-
-               rk = n_addmod(r4, r3, primes[i]);
-               rk = n_addmod(rk, r2, primes[i]);
-               rk = n_addmod(rk, r, primes[i]);
-
-               if (rk == primes[i] - 1) /* n^4 + n^3 + n^2 + n + 1 = 0 mod p */
-                  pk1[3][pk1n[3]++] = primes[i];  
-
-               /* check for n^4 + 1 = 0 mod p */
-               if (r4 == primes[i] - 1) /* n^4 + 1 = 0 mod p */
-                  pk1[4][pk1n[4]++] = primes[i];
-            }
-
-            if (num_polys > 5)
-            {
-               /* check for n^4 - n^2 + 1 = 0 mod p */
-               rk = n_submod(r4, r2, primes[i]);
-            
-               if (rk == primes[i] - 1) /* n^4 - n^2 + 1 = 0 mod p */
-                  pk1[5][pk1n[5]++] = primes[i];
-            
-               /* check for n^4 - n^3 + n^2 - n + 1 = 0 mod p */
-               rk = n_submod(r4, r3, primes[i]);
-               rk = n_addmod(rk, r2, primes[i]);
-               rk = n_submod(rk, r, primes[i]);
-
-               if (rk == primes[i] - 1) /* n^4 - n^3 + n^2 - n + 1 = 0 mod p */
-                  pk1[6][pk1n[6]++] = primes[i];
-            }
          }
 
          /* get next batch of primes */
          primes += num;
          pinv += num;
-      }
-
-      /* remove primes already dealt with at each size k */      
-      for (j = 0; j < num_polys; j++)
-      {
-          pk1n[j] = __primes_remove(pk1[j], pk1n[j], pm1, num_pm1);
-          pk1n[j] = __primes_remove(pk1[j], pk1n[j], pp1, num_pp1);
-
-          for (i = 0; i < j; i++)
-             pk1n[j] = __primes_remove(pk1[j], pk1n[j], pk1[i], pk1n[i]);
       }
 
       /* p - 1 test */
@@ -411,129 +238,11 @@ int fmpz_is_prime(const fmpz_t n)
                                  res = 0;
 
                               fmpz_clear(r);
-                           } else /* Lenstra finite fields primality test */
+                           } else
                            {
-                              fmpz * Fk;
-                              fmpz ** rk = (fmpz **) flint_malloc((num_polys + 1)*sizeof(fmpz *));
-                              fmpz ** racc = (fmpz **) flint_malloc((num_polys + 1)*sizeof(fmpz *));
-                              slong * rkn = (slong *) flint_malloc((num_polys + 1)*sizeof(slong));
-                              slong num_residues;
-                              
-                              Fk = _fmpz_vec_init(num_polys + 1);
-
-                              rk[0] = _fmpz_vec_init(2);
-                              for (i = 0; i < num_polys; i++)
-                                 rk[i + 1] = _fmpz_vec_init(pol_degrees[i]);
-                              
-                              if (fmpz_is_one(F))
-                                 fmpz_set_ui(rk[0] + 0, 0);
-                              else
-                                 fmpz_set_ui(rk[0] + 0, 1);
-                              fmpz_mod(rk[0] + 1, n, F);
-                              rkn[0] = fmpz_is_one(rk[0] + 1) || fmpz_is_one(F) ? 1 : 2;
-
-                              fmpz_set(Fk + 0, F);
-
-                              res = -1;
-
-                              for (j = 0; res == -1 && j < num_polys; j++)
-                              {
-                                 if ((pol_degrees[j]) % 2 == 0)
-                                    num_residues = pol_degrees[j];
-                                 else
-                                    num_residues = pol_degrees[j]*rkn[0];
-
-                                 for (i = 0; i < j; i++)
-                                 {
-                                    if ((pol_degrees[j] % pol_degrees[i]) != 0)
-                                       num_residues *= pol_degrees[i + 1];
-                                 }
-                                    
-                                 racc[j + 1] = _fmpz_vec_init(num_residues);                                 
-                                 rkn[j + 1] = num_residues;
-                              
-                                 res = 1;
-                                 
-                                 res = fmpz_is_prime_lenstra(Fk + j + 1, rk[j + 1], n, pk1[j], pk1n[j], pol_degrees[j]);
-
-                                 if ((pol_degrees[j] % 2) == 0)
-                                 {
-                                    __combine_residues2(racc[j + 1], rk[j + 1], Fk + j + 1, pol_degrees[j], rk[0], Fk + 0, rkn[0]);
-                                    fmpz_mul(F, Fk + j + 1, Fk + 0);
-                                 } else
-                                 {
-                                    __set_residues(racc[j + 1], rk[j + 1], pol_degrees[j]);
-                                    fmpz_set(F, Fk + j + 1);
-                                 }
-
-                                 for (i = 0; i < j; i++)
-                                 {
-                                    if ((pol_degrees[j] % pol_degrees[i]) == 0)
-                                    {
-                                       __combine_residues2(racc[j + 1], racc[j + 1], F, pol_degrees[j], rk[i + 1], Fk + i + 1, pol_degrees[i]);
-                                       fmpz_mul(F, F, Fk + i + 1);
-                                    }
-                                 }
-
-                                 num_residues = pol_degrees[j];
-                                 
-                                 if ((pol_degrees[j] % 2) != 0)
-                                 {
-                                    __combine_residues(racc[j + 1], racc[j + 1], F, num_residues, rk[0], Fk + 0, rkn[0]);
-                                    fmpz_mul(F, F, Fk + 0);
-                                    if (!fmpz_is_one(Fk + 0))
-                                       num_residues *= rkn[0];
-                                 } 
-
-                                 for (i = 0; i < j; i++)
-                                 {
-                                    if ((pol_degrees[j] % pol_degrees[i]) != 0)
-                                    {
-                                       __combine_residues(racc[j + 1], racc[j + 1], F, num_residues, rk[i + 1], Fk + i + 1, pol_degrees[i]);
-                                       fmpz_mul(F, F, Fk + i + 1);
-                                       if (!fmpz_is_one(Fk + i + 1))
-                                          num_residues *= pol_degrees[i];
-                                    }
-                                 }
-
-                                 fmpz_mul(Fsqr, F, F);
-
-                                 if (fmpz_cmp(Fsqr, n) >= 0) 
-                                 {
-                                    for (i = 0; i < num_residues; i++)
-                                    {
-                                       if (!fmpz_is_one(racc[j + 1] + i) && !fmpz_equal(racc[j + 1] + i, n) 
-                                         && fmpz_divisible(n, racc[j + 1] + i))
-                                         res = 0;
-                                    }
-                                 } else
-                                 {
-                                    fmpz_mul(Fcub, Fsqr, F);
-                                    
-                                    if (fmpz_cmp(Fcub, n) >= 0)
-                                    {
-                                       for (i = 0; i < num_residues; i++)
-                                       {
-                                          if (fmpz_divisor_in_residue_class_lenstra(d, n, racc[j + 1] + i, F))
-                                             res = 0;
-                                       }
-                                    } else
-                                       res = -1;
-                                 }
-                              }
-                              
-                              for (i = 0; i < j; i++)
-                                 _fmpz_vec_clear(racc[i + 1], rkn[i + 1]);
-                              
-                              _fmpz_vec_clear(rk[0], 2);
-                              for (i = 0; i < num_polys; i++)
-                                 _fmpz_vec_clear(rk[i + 1], pol_degrees[i]);
-                              
-                              _fmpz_vec_clear(Fk, num_polys + 1);
-
-                              flint_free(rk);
-                              flint_free(racc);
-                              flint_free(rkn);
+                              res = -1; /* we failed to prove anything prime */
+                           
+                              /* future home of APR-CL test */
                            }
 
                            fmpz_clear(d);
@@ -551,13 +260,6 @@ int fmpz_is_prime(const fmpz_t n)
          }
       } 
 
-      /* deallocate prime arrays */
-      for (j = 0; j < num_polys; j++)
-         _nmod_vec_clear(pk1[j]);
-
-      flint_free(pk1);
-      flint_free(pk1n);
-
       _nmod_vec_clear(pm1);
       _nmod_vec_clear(pp1);
 
@@ -568,8 +270,5 @@ int fmpz_is_prime(const fmpz_t n)
    fmpz_clear(Fsqr);
    fmpz_clear(Fcub);
 
-   return res;
-      
+   return res;    
 }
-
-#undef NUM_POLYS

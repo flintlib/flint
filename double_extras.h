@@ -26,6 +26,12 @@
 #ifndef DOUBLE_EXTRAS_H
 #define DOUBLE_EXTRAS_H
 
+#ifdef DOUBLE_EXTRAS_INLINES_C
+#define DOUBLE_EXTRAS_INLINE FLINT_DLL
+#else
+#define DOUBLE_EXTRAS_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <math.h>
@@ -51,8 +57,8 @@ FLINT_DLL double d_randtest_signed(flint_rand_t state, slong minexp, slong maxex
 
 FLINT_DLL double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
 
-static __inline__ double
-d_polyval(const double * poly, int len, double x)
+DOUBLE_EXTRAS_INLINE
+double d_polyval(const double * poly, int len, double x)
 {
     double t;
     int i;

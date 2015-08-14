@@ -26,7 +26,16 @@
 #ifndef FQ_ZECH_POLY_FACTOR_H
 #define FQ_ZECH_POLY_FACTOR_H
 
-static __inline__ int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length)
+#ifdef FQ_ZECH_POLY_FACTOR_INLINES_C
+#define FQ_POLY_FACTOR_TEMPLATES_INLINE FLINT_DLL
+#define FQ_ZECH_POLY_FACTOR_INLINE FLINT_DLL
+#else
+#define FQ_POLY_FACTOR_TEMPLATES_INLINE static __inline__
+#define FQ_ZECH_POLY_FACTOR_INLINE static __inline__
+#endif
+
+FQ_ZECH_POLY_FACTOR_INLINE
+int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length)
 {
     int result;
     fmpz_t q;

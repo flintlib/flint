@@ -777,9 +777,9 @@ _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
                     const fmpz_t invB, const fmpz_t p)
 {
     if (FLINT_MIN(lenA, lenB) < FMPZ_MOD_POLY_GCD_CUTOFF)
-       return _fmpz_mod_poly_xgcd_hgcd(G, S, T, A, lenA, B, lenB, p);
-    else
        return _fmpz_mod_poly_xgcd_euclidean(G, S, T, A, lenA, B, lenB, invB, p);
+    else
+       return _fmpz_mod_poly_xgcd_hgcd(G, S, T, A, lenA, B, lenB, p);
 }
 
 FMPZ_MOD_POLY_INLINE slong 

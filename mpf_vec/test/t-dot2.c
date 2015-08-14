@@ -53,7 +53,7 @@ main(void)
         _mpf_vec_randtest(a, state, len, 200);
         _mpf_vec_randtest(b, state, len, 200);
 
-        mpf_inits(res1, res2, res3, '\0');
+        mpf_inits(res1, res2, res3, NULL);
         _mpf_vec_dot2(res1, a, b, len - 1, 200);
         _mpf_vec_dot2(res2, a + len - 1, b + len - 1, 1, 200);
         _mpf_vec_dot2(res3, a, b, len, 200);
@@ -73,7 +73,7 @@ main(void)
 
         _mpf_vec_clear(a, len);
         _mpf_vec_clear(b, len);
-        mpf_clears(res1, res2, res3, '\0');
+        mpf_clears(res1, res2, res3, NULL);
     }
 
     FLINT_TEST_CLEANUP(state);

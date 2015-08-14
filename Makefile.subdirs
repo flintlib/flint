@@ -48,7 +48,7 @@ profile: $(PROFS)
 -include $(patsubst %, %.d, $(PROFS))
 
 $(BUILD_DIR)/profile/%$(EXEEXT): profile/%.c $(BUILD_DIR)/../profiler.o
-	$(QUIET_CC) $(CC) $(ABI_FLAG) -O2 -std=c99 -g $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LIBS)  -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
+	$(QUIET_CC) $(CC) $(CFLAGS) -std=gnu99 $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LIBS)  -MMD -MP -MF $@.d -MT "$@" -MT "$@.d"
 
 tune: $(TUNE_SOURCES) $(HEADERS)
 	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)

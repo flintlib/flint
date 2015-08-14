@@ -33,15 +33,26 @@
 void
 fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
 {
-    fmpz_mod_poly_fit_length(poly, n + 1);
-
-    if (n + 1 > poly->length)
+    if (fmpz_is_zero(x))
     {
-        flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
-        poly->length = n + 1;
+       if (n >= poly->length)
+          return;
+
+       fmpz_zero(poly->coeffs + n);
+    } else
+    {
+        fmpz_mod_poly_fit_length(poly, n + 1);
+
+        if (n + 1 > poly->length)
+        {
+            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+            poly->length = n + 1;
+        }
+
+        fmpz_mod(poly->coeffs + n, x, &(poly->p));
     }
 
-    fmpz_mod(poly->coeffs + n, x, &(poly->p));
-    _fmpz_mod_poly_normalise(poly);
+    if (n == poly->length - 1) 
+        _fmpz_mod_poly_normalise(poly); /* we may have set the leading coefficient to 0 */
 }
 
