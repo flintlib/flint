@@ -26,7 +26,7 @@
 #include "aprcl.h"
 
 void
-unity_zp_pow_sliding_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
+unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 {
     ulong h, k, value;
     slong i, j;
