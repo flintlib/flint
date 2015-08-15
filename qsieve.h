@@ -128,13 +128,6 @@ typedef struct qs_s
 
    mp_limb_t target_A; /* approximate target value for A coeff of poly */
 
-   slong s; /* number of prime factors of A coeff */
-   slong min; /* minimum FB prime that can appear as factor of A */
-   slong span; /* size of set of possible prime factors of A */
-   slong fact; /* middle of set of possible prime factors of A */
-   slong mid; /* start of range for middle factor */
-   slong high; /* end of range for middle factor */
-
 
    /*********************
      Relations data
