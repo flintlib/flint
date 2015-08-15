@@ -25,6 +25,13 @@
 
 #include "aprcl.h"
 
+/*
+    Returns a table of the function f: [1,2,...,q-2] -> [1,2,...,q-2]
+    defined by $1 - g^x \equiv  gf(x) \bmod q$, 
+    there $g$ is a primitive root modulo $q$.
+
+    f_table[x - 1] = f(x).
+*/
 mp_ptr
 f_table(const ulong q)
 {

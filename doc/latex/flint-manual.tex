@@ -2156,8 +2156,8 @@ output variable.
 % APRCL primality test                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{aprcl}
-\epigraph{Arbitrary precision integers}{}
+\chapter{aprcl: primality test for \code{fmpz_t}}
+\epigraph{APR-CL primality test}{}
 
 \section{Introduction}
 
@@ -2170,7 +2170,7 @@ is just a wrapper over \code{fmpz_mod_poly} with aditional fields.
 
 Also provides Gauss sum test, which is not very useful in practice, but can be
 useful for people who want to see an implementation of these. Gauss sums 
-belong $\mathbb{Z}[\zeta_p, \zeta_q]/(n)$ and implemented in \code{unity_zpq} 
+belong $\mathbb{Z}[\zeta_q, \zeta_p]/(n)$ and implemented in \code{unity_zpq} 
 struct.
 
 We now describe the functions available in the \code{aprcl} module.
