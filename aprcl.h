@@ -99,27 +99,27 @@ FLINT_DLL int is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
 FLINT_DLL int is_prime_aprcl(const fmpz_t n);
 
 /* Gauss test configuration */
-FLINT_DLL void aprcl_config_init(aprcl_config conf, const fmpz_t n);
+FLINT_DLL void config_gauss_init(aprcl_config conf, const fmpz_t n);
 
-FLINT_DLL void aprcl_config_init_min_R(aprcl_config conf,
+FLINT_DLL void config_gauss_init_min_R(aprcl_config conf,
         const fmpz_t n, ulong R);
 
-FLINT_DLL void aprcl_config_clear(aprcl_config conf);
+FLINT_DLL void config_gauss_clear(aprcl_config conf);
 
-FLINT_DLL void _aprcl_config_update(aprcl_config conf);
+FLINT_DLL void _config_gauss_update(aprcl_config conf);
 
 /* Jacobi test configuration */
 FLINT_DLL ulong _R_value(const fmpz_t n);
 
-FLINT_DLL void jacobi_config_init(aprcl_config conf, const fmpz_t n);
+FLINT_DLL void config_jacobi_init(aprcl_config conf, const fmpz_t n);
 
-FLINT_DLL void jacobi_config_clear(aprcl_config conf);
+FLINT_DLL void config_jacobi_clear(aprcl_config conf);
 
-FLINT_DLL void _jacobi_config_update(aprcl_config conf);
+FLINT_DLL void _config_jacobi_update(aprcl_config conf);
 
-FLINT_DLL void _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n);
+FLINT_DLL void _config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n);
 
-FLINT_DLL void _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n);
+FLINT_DLL void _config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n);
 
 /*  Gauss sums primality test */
 FLINT_DLL int is_prime_gauss(const fmpz_t n);

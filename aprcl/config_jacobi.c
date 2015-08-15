@@ -75,7 +75,7 @@ _R_value(const fmpz_t n)
 }
 
 void
-_jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
+_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
     ulong i, j, q;
     double * w;
@@ -148,7 +148,7 @@ _jacobi_config_reduce_s2(aprcl_config conf, const fmpz_t n)
 }
 
 void
-_jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
+_config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n)
 {
     slong i;
     fmpz_t new_s, new_s2, p;
@@ -180,7 +180,7 @@ _jacobi_config_reduce_s(aprcl_config conf, const fmpz_t n)
 }
 
 void
-_jacobi_config_update(aprcl_config conf)
+_config_jacobi_update(aprcl_config conf)
 {
     ulong prime = 2;
 
@@ -214,22 +214,22 @@ _jacobi_config_update(aprcl_config conf)
 
 /* Computes s = \prod q^(k + 1) ; q - prime, q - 1 | R; q^k | R and q^(k + 1) not | R */
 void
-jacobi_config_init(aprcl_config conf, const fmpz_t n)
+config_jacobi_init(aprcl_config conf, const fmpz_t n)
 {
     fmpz_init(conf->s);
     fmpz_factor_init(conf->qs);
     conf->R = _R_value(n);
-    _jacobi_config_update(conf);
+    _config_jacobi_update(conf);
 
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
 
     conf->qs_used = (int *) flint_malloc(sizeof(int) * conf->qs->num);
-    _jacobi_config_reduce_s2(conf, n);
+    _config_jacobi_reduce_s2(conf, n);
 }
 
 void
-jacobi_config_clear(aprcl_config conf)
+config_jacobi_clear(aprcl_config conf)
 {
     fmpz_clear(conf->s);
     fmpz_factor_clear(conf->qs);

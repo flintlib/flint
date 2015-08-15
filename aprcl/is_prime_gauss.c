@@ -372,10 +372,10 @@ is_prime_gauss_min_R(const fmpz_t n, ulong R)
     primality_test_status result;
     aprcl_config config;
 
-    aprcl_config_init_min_R(config, n, R);
+    config_gauss_init_min_R(config, n, R);
     result = _is_prime_gauss(n, config);
 
-    aprcl_config_clear(config);
+    config_gauss_clear(config);
 
     if (result == PRIME)
         return 1;
@@ -389,10 +389,10 @@ is_prime_gauss(const fmpz_t n)
     primality_test_status result;
     aprcl_config config;
 
-    aprcl_config_init_min_R(config, n, 180);
+    config_gauss_init_min_R(config, n, 180);
     result = _is_prime_gauss(n, config);
     R = config->R;
-    aprcl_config_clear(config);
+    config_gauss_clear(config);
 
     /* 
         if result == PROBABPRIME it means that we have
@@ -402,25 +402,25 @@ is_prime_gauss(const fmpz_t n)
     if (result == PROBABPRIME)
     {
         R = R * 2;
-        aprcl_config_init_min_R(config, n, R);
+        config_gauss_init_min_R(config, n, R);
         result = _is_prime_gauss(n, config);
-        aprcl_config_clear(config);
+        config_gauss_clear(config);
     }
 
     if (result == PROBABPRIME)
     {
         R = R * 3;
-        aprcl_config_init_min_R(config, n, R);
+        config_gauss_init_min_R(config, n, R);
         result = _is_prime_gauss(n, config);
-        aprcl_config_clear(config);
+        config_gauss_clear(config);
     }
 
     if (result == PROBABPRIME)
     {
         R = R * 5;
-        aprcl_config_init_min_R(config, n, R);
+        config_gauss_init_min_R(config, n, R);
         result = _is_prime_gauss(n, config);
-        aprcl_config_clear(config);
+        config_gauss_clear(config);
     }
 
     if (result == PRIME)

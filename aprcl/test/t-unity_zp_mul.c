@@ -37,6 +37,48 @@ int main(void)
     flint_printf("unity_zp_mul....");
     fflush(stdout);
 
+    /* test that \zeta_p^i * \zeta_p^j computest correctly */
+    for (i = 0; i < 100; i++)
+    {
+        ulong p, ind1, ind2;
+        fmpz_t n;
+        unity_zp f, g, h1, h2;
+
+        p = n_randprime(state, 2 + n_randint(state, 6), 0);
+
+        fmpz_init(n);
+        fmpz_randtest_unsigned(n, state, 200);
+        while (fmpz_equal_ui(n, 0) != 0)
+            fmpz_randtest_unsigned(n, state, 200);
+
+        unity_zp_init(f, p, 1, n);
+        unity_zp_init(g, p, 1, n);
+        unity_zp_init(h1, p, 1, n);
+        unity_zp_init(h2, p, 1, n);
+
+        ind1 = n_randint(state, p);
+        unity_zp_coeff_set_ui(h1, ind1, 1);
+
+        ind2 = n_randint(state, p);
+        unity_zp_coeff_set_ui(h2, ind2, 1);
+
+        ind1 = (ind1 + ind2) % p;
+        unity_zp_coeff_set_ui(g, ind1, 1);
+        unity_zp_mul(f, h1, h2);
+
+        if (unity_zp_equal(f, g) == 0)
+        {
+            flint_printf("FAIL\n");
+            abort();
+        }
+    
+        fmpz_clear(n);
+        unity_zp_clear(f);
+        unity_zp_clear(g);
+        unity_zp_clear(h1);
+        unity_zp_clear(h2);
+    }
+
     for (i = 0; i < 100; i++)
     {
         ulong p;

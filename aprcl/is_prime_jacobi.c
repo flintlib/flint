@@ -825,13 +825,13 @@ is_prime_jacobi(const fmpz_t n)
 
     /* 
         (1.a) Choose R and s values for n and store its factorisation.
-        See definition in jacobi_config functions documentation. s^2 > n.
+        See definition in config_jacobi functions documentation. s^2 > n.
     */
-    jacobi_config_init(config, n);
+    config_jacobi_init(config, n);
 
     result = _is_prime_jacobi(n, config);
 
-    jacobi_config_clear(config);
+    config_jacobi_clear(config);
 
     /* if we prove primality returns 1 */
     if (result == PRIME)

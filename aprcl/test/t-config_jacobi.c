@@ -34,7 +34,7 @@ int main(void)
     int i;
     FLINT_TEST_INIT(state);
    
-    flint_printf("aprcl_config_jacobi....");
+    flint_printf("config_jacobi....");
     fflush(stdout);
 
     for (i = 0; i < 100; i++)
@@ -45,7 +45,7 @@ int main(void)
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 1000);
 
-        jacobi_config_init(conf, n);
+        config_jacobi_init(conf, n);
 
         fmpz_mul(s2, conf->s, conf->s);
         if (fmpz_cmp(s2, n) <= 0)
@@ -58,7 +58,7 @@ int main(void)
             abort();
         }
 
-        jacobi_config_clear(conf);
+        config_jacobi_clear(conf);
         fmpz_clear(n);
     }
 

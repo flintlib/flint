@@ -71,37 +71,52 @@ int is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
 *******************************************************************************
 
-    Preparation functions
+    Configuration functions
 
 *******************************************************************************
 
-void aprcl_config_init(aprcl_config conf, const fmpz_t n)
+void config_gauss_init(aprcl_config conf, const fmpz_t n)
 
     Compute the $s$ and $R$ values used in cyclotomic primality test.
     $s^2 > n$ and $s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q$.
     Also store factors of $R$ and $s$.
 
-void aprcl_config_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
+void config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
     Compute the $s$ with fixed minimum $R$.
 
-void aprcl_config_clear(aprcl_config conf)
+void config_gauss_clear(aprcl_config conf)
 
     Clears the given \code{aprcl_config} element. It must be reinitialised in
     order to be used again.
+
+ulong _R_value(const fmpz_t n);
+
+void config_jacobi_init(aprcl_config conf, const fmpz_t n);
+
+void config_jacobi_clear(aprcl_config conf);
+
+void _config_jacobi_update(aprcl_config conf);
+
+void _config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n);
+
+_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n);
 
 
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Memory management
 
+    \code{unity_zp} represents as \code{fmpz_mod_poly} reduced modulo
+    cyclotomic polynomial.
+
 *******************************************************************************
 
-void unity_zp_init(unity_zp value, ulong p, const fmpz_t n)
+void unity_zp_init(unity_zp f, ulong p, const fmpz_t n)
 
-    Initialized \code{unity_zp} element of $\mathbb{Z}[\zeta_p] / (n)$.
+    Initialized \code{unity_zp} element of $\mathbb{Z}[\zeta_p]/(n)$.
 
-void unity_zp_clear(unity_zp value)
+void unity_zp_clear(unity_zp f)
 
     Clears the given \code{unity_zp} element. It must be reinitialised in
     order to be used again.
@@ -118,6 +133,7 @@ void unity_zp_set_zero(unity_zp f)
 
     Sets $f = 0$.
 
+
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Comparision
@@ -133,6 +149,7 @@ int unity_zp_equal(const unity_zp f, const unity_zp g)
     Returns non zero value if $f == g$ reduced by $p^{exp}$-th cyclotomic
     polynomial.
 
+
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Output
@@ -142,6 +159,7 @@ int unity_zp_equal(const unity_zp f, const unity_zp g)
 void unity_zp_print(const unity_zp f)
 
     Prints the contents of the $f$.
+
 
 *******************************************************************************
 
@@ -179,6 +197,7 @@ void unity_zp_coeff_dec(unity_zp f, ulong ind)
     Decrease the coefficient at $\zeta^{ind}$. 
     $ind$ must be less then $p^{exp}$.
 
+
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Scalar multiplication
@@ -194,6 +213,7 @@ void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s)
 
     Sets the $f$ to $s * g$. $f$ and $g$ must be initialized with
     same $p$, $exp$ and $n$.
+
 
 *******************************************************************************
 
@@ -231,6 +251,7 @@ void unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
     used for all computations in this case.
     $f$ and $g$ must be initialized with same $p$, $exp$ and $n$.
 
+
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Powering functions
@@ -267,6 +288,7 @@ void unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
     Sets the $f$ to $g^{pow}$ using sliding window exponentiation method.
     $f$ and $g$ must be initialized with same $p$, $exp$ and $n$.
 
+
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Cyclotomic reduction
@@ -289,6 +311,7 @@ void unity_zp_reduce_cyclotomic(unity_zp f, const unity_zp g)
     Sets $f = g \bmod \Phi_{p^{exp}}$. $\Phi_{p^{exp}}$ is the $p^{exp}$-th
     cyclotomic polynomial.
 
+
 *******************************************************************************
 
     $\mathbb{Z}[\zeta_p]/(n)$. Automorphism and inverse
@@ -305,6 +328,7 @@ void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
     Sets $f = \sigma_x^{-1}(g)$, so $\sigma_x(f) = g$. 
     $g$ must be reduced by $\Phi_{p^{exp}}$.
     $f$ and $g$ must be initialized with same $p$, $exp$ and $n$.
+
 
 *******************************************************************************
 
@@ -331,29 +355,34 @@ void unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
     $J_3(1) = j(\chi_{2, q}, \chi_{2, q}, \chi_{2, q}) = 
     J(2, q) * j(\chi_{2, q}^2, \chi_{2, q})$
 
-*******************************************************************************
-
-    Operations in $\mathbb{Z}[\zeta_q, \zeta_p] / (n)$.
 
 *******************************************************************************
 
-void unity_zpq_init(unity_zpq value, ulong q, ulong p, const fmpz_t n)
+    Operations in $\mathbb{Z}[\zeta_q, \zeta_p]/(n)$.
 
-    Initialized \code{unity_zpq} element of $\mathbb{Z}[\zeta_q, \zeta_p] / (n)$.
+    \code{unity_zpq} represents as array of \code{fmpz_mod_poly}.
+
+*******************************************************************************
+
+void unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
+
+    Initialized \code{unity_zpq} element of $\mathbb{Z}[\zeta_q, \zeta_p]/(n)$.
     \code{unity_zpq} is an array of \code{fmpz_mod_poly_t} elements.
 
-void unity_zpq_clear(unity_zpq value)
+void unity_zpq_clear(unity_zpq f)
 
     Clears the given \code{unity_zpq} element. It must be reinitialised in
     order to be used again.
 
 void unity_zpq_copy(unity_zpq f, const unity_zpq g)
 
-    Sets $f$ to $g$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
+    Sets $f$ to $g$. $f$ and $g$ must be initialized with
+    same $p$, $q$ and $n$.
 
 void unity_zpq_swap(unity_zpq f, unity_zpq q)
 
-    Swaps $f$ and $g$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
+    Swaps $f$ and $g$. $f$ and $g$ must be initialized with
+    same $p$, $q$ and $n$.
 
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 
@@ -371,30 +400,30 @@ int unity_zpq_is_p_unity_generator(const unity_zpq f)
 
     Returns non zero value if $f$ is a generator of $<\zeta_p>$ cyclic group.
 
-void unity_zpq_coeff_set_fmpz(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+void unity_zpq_coeff_set_fmpz(unity_zpq f, ulong i, ulong j, const fmpz_t x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
     \code{i} must be less then {q} and \code{j} must be less then {p}.
 
-void unity_zpq_coeff_set_ui(unity_zpq value, ulong i, ulong j, ulong x)
+void unity_zpq_coeff_set_ui(unity_zpq f, ulong i, ulong j, ulong x)
 
     Sets the coefficient of the $\zeta_q^i*\zeta_p^j$ equal to x.
     \code{i} must be less then {q} and \code{j} must be less then {p}.
 
-void unity_zpq_coeff_add(unity_zpq value, ulong i, ulong j, const fmpz_t x)
+void unity_zpq_coeff_add(unity_zpq f, ulong i, ulong j, const fmpz_t x)
 
     Sets $a$ in $a*\zeta_p^i*\zeta_q^j$ to $a + x$. $x$ must be less then $n$.
 
-void unity_zpq_add(unity_zpq result, const unity_zpq left, const unity_zpq right)
+void unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h)
 
-    Sets the \code{result} to the \code{left}+\code{right}.
-    \code{result}, \code{left} and \code{right} must be initialized with same
+    Sets the \code{f} to the \code{g}+\code{h}.
+    \code{f}, \code{g} and \code{h} must be initialized with same
     \code{q}, \code{p} and \code{n}.
 
-void unity_zpq_mul(unity_zpq result, const unity_zpq left, const unity_zpq right)
+void unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h)
 
-    Sets the \code{result} to the \code{left}*\code{right}.
-    \code{result}, \code{left} and \code{right} must be initialized with same
+    Sets the \code{f} to the \code{g}*\code{h}.
+    \code{f}, \code{g} and \code{h} must be initialized with same
     \code{q}, \code{p} and \code{n}.
 
 void _unity_zpq_mul_unity_p(unity_zpq f)
@@ -413,11 +442,11 @@ void unity_zpq_pow_ui(unity_zpq f, unity_zpq g, ulong p)
 
     Sets the $f$ to $g^p$. $f$ and $g$ must be initialized with same $p$, $q$ and $n$.
 
-void unity_zpq_gauss_sum(unity_zpq value, ulong q, ulong p)
+void unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p)
 
-    Sets $value = \tau(\chi_{p, q})$.
+    Sets $f = \tau(\chi_{p, q})$.
 
-void unity_zpq_gauss_sum_sigma_pow(unity_zpq value, ulong q, ulong p)
+void unity_zpq_gauss_sum_sigma_pow(unity_zpq f, ulong q, ulong p)
 
-    Sets $value = \tau^{\sigma_n}(\chi_{p, q})$.
+    Sets $f = \tau^{\sigma_n}(\chi_{p, q})$.
 

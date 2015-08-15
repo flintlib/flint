@@ -34,7 +34,7 @@ int main(void)
     int i;
     FLINT_TEST_INIT(state);
    
-    flint_printf("aprcl_config....");
+    flint_printf("config_gauss....");
     fflush(stdout);
 
     for (i = 0; i < 100; i++)
@@ -45,7 +45,7 @@ int main(void)
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
 
-        aprcl_config_init(conf, n);
+        config_gauss_init(conf, n);
 
         fmpz_mul(s2, conf->s, conf->s);
         if (fmpz_cmp(s2, n) <= 0)
@@ -58,7 +58,7 @@ int main(void)
             abort();
         }
 
-        aprcl_config_clear(conf);
+        config_gauss_clear(conf);
         fmpz_clear(n);
     }
 
