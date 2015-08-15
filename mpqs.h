@@ -92,28 +92,16 @@ typedef struct mpqs_s
 
     fmpz_t A;                /* current value of coefficient A */
     fmpz_t B;                /* B values corresponding to current value of A */
-    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
     
-    mp_limb_t * A_ind;       /* indices of factor base primes dividing A0 */
-    fmpz_t * A_divp;        /* (A0 / p) for each prime dividing A0 */
-    fmpz_t * inv_p2;     /* newton inverse of p^2 for each factor p of A */
-
-    fmpz_t * B_terms;        /* B_terms[i] = A_divp[i] * (B0_terms[i] * q0^(-1))%p,
-                               where 'p' is a prime factor of 'A0' */
+    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
+    /* (B^2 - kn)/4A */
 
     mp_limb_t * A_inv;      /* A0^(-1) mod p, for factor base prime p */
     mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
     mp_limb_t * soln1;       /* first root of poly */
     mp_limb_t * soln2;       /* second root of poly */
 
-    fmpz_t target_A;         /* approximate target value for A coeff of poly */
-
-    slong s; /* number of prime factors of A coeff */
-    slong min; /* minimum FB prime that can appear as factor of A */
-    slong span; /* size of set of possible prime factors of A */
-    slong fact; /* middle of set of possible prime factors of A */
-    slong mid; /* start of range for middle factor */
-    slong high; /* end of range for middle factor */
+    mp_limb_t A_targetprime;         /* approximate target value for A coeff of poly */
 
    /***************************************************************************
                        RELATION DATA
@@ -165,6 +153,8 @@ typedef mpqs_s mpqs_t[1];
      * sieve_size is the size of the sieve to use
 */
 
+#define QS_DEBUG 1
+
 static const mp_limb_t mpqs_tune[][5] =
 {
    {40,   50,    60,  5,   2 *   3000}, /* 12 digit, change factor base to 60 from 50 */
@@ -213,6 +203,10 @@ void mpqs_linalg_init(mpqs_t mpqs_inf);
 void mpqs_linalg_re_init(mpqs_t mpqs_inf);
 
 void mpqs_linalg_re_alloc(mpqs_t mpqs_inf);
+
+void mpqs_linalg_clear(mpqs_t mpqs_inf);
+
+void mpqs_sqrtmod_psq(fmpz_t root, fmpz_t n, mp_limb_t prime);
 
 #ifdef __cplusplus
 }
