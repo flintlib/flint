@@ -165,6 +165,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     qs_inf->q_idx = qs_inf->num_primes;
 
+    qs_inf->siqs = fopen("siqs.dat", "w");
+
     while(1)
     {
         if (qs_inf->s)
@@ -184,8 +186,13 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                 qsieve_init_poly_first(qs_inf);
                 relation += qsieve_collect_relations(qs_inf, sieve);
 
-                if (qs_inf->columns >= qs_inf->num_primes + qs_inf->extra_rels)
+                qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
+
+                if (qs_inf->full_relation + qs_inf->num_cycles >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
                 {
+
+                    fclose(qs_inf->siqs);
+                    qsieve_process_relation(qs_inf);
 
     /**************************************************************************
         REDUCE MATRIX:
@@ -261,13 +268,13 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                         }
                     }
 
+                    qs_inf->siqs = fopen("siqs.dat", "w");
                     qsieve_linalg_re_init(qs_inf);
                     qs_inf->num_primes = num_primes;
                     relation = 0;
 
                 }
             }
-
         } while (qsieve_next_A0(qs_inf));
 
         delta = qs_inf->num_primes / 10;
@@ -278,6 +285,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
         flint_printf("\nfactor base increment\n");
 #endif
         small_factor = qsieve_primes_increment(qs_inf, delta);
+        qs_inf->num_primes = num_primes;
 
         if (small_factor)
         {
@@ -288,7 +296,6 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
             goto cleanup;
         }
 
-        qs_inf->num_primes = num_primes;
         qsieve_linalg_re_alloc(qs_inf);
         relation = 0;
     }

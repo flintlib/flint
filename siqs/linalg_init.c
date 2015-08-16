@@ -68,6 +68,17 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;
     qs_inf->num_relations = 0;
+
+    /* parameter related to partials */
+    qs_inf->full_relation = 0;
+    qs_inf->edges = 0;
+    qs_inf->vertices = 0;
+    qs_inf->components = 1;
+    qs_inf->num_cycles = 0;
+
+    qs_inf->table_size = 10000;
+    qs_inf->hash_table = flint_calloc(1 << 22, sizeof(mp_limb_t));
+    qs_inf->table = flint_malloc(qs_inf->table_size * sizeof(hash_t));
 }
 
 /* re-initialize all the linear algebra parameter */
@@ -93,6 +104,15 @@ void qsieve_linalg_re_init(qs_t qs_inf)
     qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;
     qs_inf->num_relations = 0;
+
+    /* parameters related to partials */
+    qs_inf->full_relation = 0;
+    qs_inf->edges = 0;
+    qs_inf->vertices = 0;
+    qs_inf->components = 1;
+    qs_inf->num_cycles = 0;
+
+    memset(qs_inf->hash_table, 0, (1 << 22) * sizeof(mp_limb_t));
 }
 
 /* increase size of different array after factor base increment*/

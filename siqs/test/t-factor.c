@@ -111,7 +111,7 @@ int main(void)
 
       qsieve_factor(n, factors); */
 
-      fmpz_set_str(x, "341427877364219557396646723561", 10);
+    /*  fmpz_set_str(x, "341427877364219557396646723561", 10);
 
       fmpz_set_str(y, "359916012598740083996400089999", 10);
 
@@ -121,7 +121,7 @@ int main(void)
 
       flint_printf("\n");
 
-      qsieve_factor(n, factors);
+      qsieve_factor(n, factors); */
 
       fmpz_set_str(x, "666666777777788888888999999999", 10);
 
@@ -134,6 +134,18 @@ int main(void)
       flint_printf("\n");
 
       qsieve_factor(n, factors);
+
+  /*    fmpz_set_str(x, "1291713871775387910289126481863", 10);
+
+      fmpz_set_str(y, "1317313773719779779173773137131", 10);
+
+      fmpz_mul(n, x, y);
+
+      fmpz_print(n);
+
+      flint_printf("\n");
+
+      qsieve_factor(n, factors); */
 
 
    }

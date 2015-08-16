@@ -114,16 +114,6 @@ mp_limb_t qsieve_next_A0(qs_t qs_inf)
             for (j = 0; j < s - 1; j++)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
 
-            /*
-            for (j = low + 1; j <= high; j += 2)
-            {
-                fmpz_mul_ui(temp, prod, factor_base[j].p);
-
-                if (fmpz_cmp(qs_inf->low_bound, temp) <= 0 && fmpz_cmp(temp, qs_inf->upp_bound) <= 0)
-                    break;
-            }
-            */
-
             i = 1;
             j = qs_inf->num_primes - 1;
 
@@ -349,16 +339,6 @@ void qsieve_init_A0(qs_t qs_inf)
                 fmpz_mul_ui(prod, prod, factor_base[2 * curr_subset[j] - 1 + low - 1].p);
             }
 
-            /*
-            for (j = low + 1; j < qs_inf->num_primes; j += 2)
-            {
-                fmpz_mul_ui(temp, prod, factor_base[j].p);
-
-                if (fmpz_cmp(lower_bound, temp) <= 0 && fmpz_cmp(temp, upper_bound) <= 0)
-                    break;
-            }
-            */
-
             i = 1;
             j = qs_inf->num_primes - 1;
 
@@ -413,6 +393,7 @@ void qsieve_init_A0(qs_t qs_inf)
 
 #if QS_DEBUG
     flint_printf("number of factor in hypercube = %wd\n", qs_inf->s);
+    flint_printf("factor base size = %wd max prime = %wu\n", qs_inf->num_primes, qs_inf->factor_base[qs_inf->num_primes - 1].p);
     flint_printf("possible candidate in range [ %wd, %wd ]\n", qs_inf->low, qs_inf->high);
     flint_printf("optimal value of hypercube = ");
     fmpz_print(target);

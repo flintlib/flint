@@ -37,6 +37,8 @@ void qsieve_linalg_clear(qs_t qs_inf)
     flint_free(qs_inf->factor);
     flint_free(qs_inf->relation);
     flint_free(qs_inf->qsort_arr);
+    flint_free(qs_inf->hash_table);
+    flint_free(qs_inf->table);
 
     if (qs_inf->matrix != NULL)
     {
@@ -67,4 +69,6 @@ void qsieve_linalg_clear(qs_t qs_inf)
     qs_inf->matrix = NULL;
     qs_inf->Y_arr = NULL;
     qs_inf->prime_count = NULL;
+    qs_inf->hash_table = NULL;
+    qs_inf->table = NULL;
 }
