@@ -73,9 +73,9 @@ typedef struct fac_t /* struct for factors of relations */
 
 typedef struct la_col_t /* matrix column */
 {
-	slong * data;		/* The list of occupied rows in this column */
-	slong weight;		/* Number of nonzero entries in this column */
-	slong orig;         /* Original relation number */
+  slong * data;   /* The list of occupied rows in this column */
+  slong weight;   /* Number of nonzero entries in this column */
+  slong orig;         /* Original relation number */
 } la_col_t;
 
 typedef struct qs_s
@@ -127,6 +127,13 @@ typedef struct qs_s
    mp_limb_t * soln2; /* second root of poly */
 
    mp_limb_t target_A; /* approximate target value for A coeff of poly */
+
+   slong s; /* number of prime factors of A coeff */
+   slong min; /* minimum FB prime that can appear as factor of A */
+   slong span; /* size of set of possible prime factors of A */
+   slong fact; /* middle of set of possible prime factors of A */
+   slong mid; /* start of range for middle factor */
+   slong high; /* end of range for middle factor */
 
 
    /*********************

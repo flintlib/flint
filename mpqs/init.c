@@ -29,7 +29,8 @@
 #include "ulong_extras.h"
 #include "mpqs.h"
 
-void mpqs_init(mpqs_t mpqs_inf, fmpz_t n)
+void
+mpqs_init(mpqs_t mpqs_inf, fmpz_t n)
 {
     ulong i;
 
@@ -56,5 +57,4 @@ void mpqs_init(mpqs_t mpqs_inf, fmpz_t n)
     mpqs_inf->factor_base = NULL;
     mpqs_inf->sqrts       = NULL;
 
-    mpqs_inf->s = 0;
 }

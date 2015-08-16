@@ -90,18 +90,17 @@ typedef struct mpqs_s
                        POLYNOMIAL DATA
     **************************************************************************/
 
-    fmpz_t A;                /* current value of coefficient A */
-    fmpz_t B;                /* B values corresponding to current value of A */
-    
-    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
-    /* (B^2 - kn)/4A */
+    /* poly is (ax + b)^2, evaluating at points Q(x) - kn = 0 */
 
-    mp_limb_t * A_inv;      /* A0^(-1) mod p, for factor base prime p */
-    mp_limb_t ** A_inv2B;    /* A_inv2B[j][i] = 2 * B_terms[j] * A^(-1)  mod p */
+    fmpz_t A;                /* current value of coefficient A */
+    fmpz_t B;                /* B value corresponding to current value of A */
+    fmpz_t C;                /* value of coefficient 'C' for current 'A' & 'B' */
+
+    mp_limb_t * A_inv;       /* A^(-1) mod p, for factor base prime p */
     mp_limb_t * soln1;       /* first root of poly */
     mp_limb_t * soln2;       /* second root of poly */
 
-    mp_limb_t A_targetprime;         /* approximate target value for A coeff of poly */
+    mp_limb_t A_targetprime; /* A = A_targetprime ^ 2 */
 
    /***************************************************************************
                        RELATION DATA
@@ -187,6 +186,55 @@ static const mp_limb_t mpqs_tune[][5] =
 
 #define MPQS_TUNE_SIZE (sizeof(mpqs_tune) / (5 * sizeof(mp_limb_t)))
 
+#define BITS_ADJUST 10 /* no. bits less than f(X) to qualify for trial division */
+
+static __inline__ void insert_col_entry(la_col_t * col, slong entry)
+{
+   if (((col->weight >> 4) << 4) == col->weight) /* need more space */
+   {
+       if (col->weight != 0) col->data =
+           (slong *) flint_realloc(col->data, (col->weight + 16)*sizeof(slong));
+       else col->data = (slong *) flint_malloc(16*sizeof(slong));
+   }
+
+   col->data[col->weight] = entry;
+   col->weight++;
+}
+
+static __inline__ void copy_col(la_col_t * col2, la_col_t * col1)
+{
+   col2->weight = col1->weight;
+   col2->data = col1->data;
+   col2->orig = col1->orig;
+}
+
+static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
+{
+   la_col_t temp;
+
+   temp.weight = col1->weight;
+   temp.data = col1->data;
+   temp.orig = col1->orig;
+
+   col1->weight = col2->weight;
+   col1->data = col2->data;
+   col1->orig = col2->orig;
+
+   col2->weight = temp.weight;
+   col2->data = temp.data;
+   col2->orig = temp.orig;
+}
+
+static __inline__ void clear_col(la_col_t * col)
+{
+   col->weight = 0;
+}
+
+static __inline__ void free_col(la_col_t * col)
+{
+   if (col->weight) flint_free(col->data);
+}
+
 void mpqs_init(mpqs_t mpqs_inf, fmpz_t m);
 
 void mpqs_clear(mpqs_t mpqs_inf);
@@ -206,7 +254,25 @@ void mpqs_linalg_re_alloc(mpqs_t mpqs_inf);
 
 void mpqs_linalg_clear(mpqs_t mpqs_inf);
 
-void mpqs_sqrtmod_psq(fmpz_t root, fmpz_t n, mp_limb_t prime);
+uint64_t * mpqs_block_lanczos(flint_rand_t state, slong nrows, 
+      slong dense_rows, slong ncols, la_col_t *B);
+
+void mpqs_reduce_matrix(mpqs_t mpqs_inf, slong *nrows, slong *ncols, la_col_t *cols);
+
+void mpqs_poly_init(mpqs_t mpqs_inf);
+
+void mpqs_compute_next_poly(mpqs_t mpqs_inf);
+
+slong mpqs_merge_relations(mpqs_t mpqs_inf);
+
+slong mpqs_insert_relation(mpqs_t mpqs_inf, fmpz_t Y);
+
+slong mpqs_collect_relations(mpqs_t mpqs_inf, unsigned char * sieve);
+
+void mpqs_square_root(fmpz_t X, fmpz_t Y, mpqs_t mpqs_inf, uint64_t * nullrows,
+                      slong ncols, slong l, fmpz_t N);
+
+uint64_t mpqs_get_null_entry(uint64_t * nullrows, slong i, slong l);
 
 #ifdef __cplusplus
 }
