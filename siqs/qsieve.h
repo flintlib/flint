@@ -43,7 +43,7 @@
 #endif
 
 
-#define QS_DEBUG 1
+#define QS_DEBUG 0
 
 typedef struct prime_t
 {
@@ -65,6 +65,23 @@ typedef struct la_col_t  /* matrix column */
 	slong weight;		/* Number of nonzero entries in this column */
 	slong orig;         /* Original relation number */
 } la_col_t;
+
+
+typedef struct hash_t
+{
+    mp_limb_t prime;
+    mp_limb_t next;
+    mp_limb_t count;
+} hash_t;
+
+typedef struct relation_t
+{
+    mp_limb_t lp;
+    slong num_factors;
+    slong * small;
+    fac_t * factor;
+    fmpz_t Y;
+} relation_t;
 
 typedef struct qs_s
 {
@@ -135,6 +152,19 @@ typedef struct qs_s
                        RELATION DATA
    ***************************************************************************/
 
+   FILE * siqs;
+
+   slong full_relation;
+   slong num_cycles;
+
+   slong vertices;
+   slong components;
+   slong edges;
+
+   slong table_size;
+   hash_t * table;
+   mp_limb_t * hash_table;
+
    slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
    slong max_factors; /* maximum number of factors a relation can have */
@@ -191,14 +221,14 @@ static const mp_limb_t qsieve_tune[][5] =
    {100, 100,   650,  7,   2 *  13000}, //
    {110, 100,   800,  7,   2 *  15000}, // 31 digits
    {120, 100,  1000,  7,   2 *  20000}, //
-   {130, 100,   3600,  9,   2 *  32000}, // 41 digits, changed from 800
+   {130, 100,   800,  9,   2 *  32000}, // 41 digits,
    {140, 100,  1200,  8,   2 *  28000}, //
    {150, 100,  1800,  8,   2 *  32000}, // 45 digit
    {160, 150,  2000,  8,   2 *  40000}, //
    {170, 150,  2200,  9,   2 *  64000}, // 50 digits
    {180, 150,  2400,  9,   2 *  64000}, //
-   {190, 150,  5400, 10,   2 *  64000}, // factor base size changed from 2700 to x
-   {200, 150,  3600, 10,   2 *  64000}, // 60 digits
+   {190, 150,  4000, 10,   2 *  64000}, // factor base size changed from 2700 to x, ks_primes 150
+   {200, 150,  4000, 10,   2 *  64000}, // 60 digits, fb changed from 3600, ks_primes changed from 150
    {210, 150,  6000, 12,   2 *  64000}, //
    {220, 200,  7500, 15,   2 *  64000}, //
    {230, 200,  8500, 17,   2 *  64000}, // 70 digits
