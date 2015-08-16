@@ -54,7 +54,7 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    slong diff;
    slong pind;
 
-   memset(sieve, 0, qs_inf->sieve_size + sizeof(ulong));
+   memset(sieve, 10, qs_inf->sieve_size + sizeof(ulong));
    *end = (char) 255;
 
    for (pind = qs_inf->small_primes; pind < num_primes; pind++)
@@ -200,11 +200,12 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
    fac_t * factor = qs_inf->factor;
    mp_limb_t * soln1 = qs_inf->soln1;
    mp_limb_t * soln2 = qs_inf->soln2;
+   mp_limb_t * A_ind = qs_inf->A_ind;
    slong * small = qs_inf->small;
    mp_limb_t pinv;
    slong num_factors = 0;
    slong relations = 0;
-   slong j;
+   slong j, k;
 
    fmpz_t X, Y, res, p;
    fmpz_init(X);
@@ -292,14 +293,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
-         mp_limb_t * A_ind = qs_inf->A_ind;
-         slong i;
-
-         for (i = 0; i < qs_inf->s; i++) /* Commit any outstanding A factors */
+         for (k = 0; k < qs_inf->s; k++) /* Commit any outstanding A factors */
          {
-            if (A_ind[i] >= j)
+            if (A_ind[k] >= j)
             {
-               factor[num_factors].ind = A_ind[i];
+               factor[num_factors].ind = A_ind[k];
                factor[num_factors++].exp = 1;
             }
          }
@@ -309,29 +307,56 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
          qs_inf->num_factors = num_factors;
 
-         relations += qsieve_insert_relation(qs_inf, Y);  /* Insert the relation in the matrix */
+         qsieve_write_to_file(qs_inf, UWORD(1), Y);
 
-         if (qs_inf->num_relations >= qs_inf->buffer_size)
+         qs_inf->full_relation++;
+
+        /* relations += qsieve_insert_relation(qs_inf, Y); */  /* Insert the relation in the matrix */
+
+       /*  if (qs_inf->num_relations >= qs_inf->buffer_size)
          {
             flint_printf("Error: too many duplicate relations!\n");
             flint_printf("s = %wd, bits = %wd\n", qs_inf->s, qs_inf->bits);
             abort();
-         }
-
-         goto cleanup;
+         } */
       }
       else
       {
+          fmpz_abs(res, res);
+
           if (fmpz_bits(res) <= FLINT_BITS)
           {
               prime = fmpz_get_ui(res);
 
-              if (prime >= factor_base[qs_inf->q_idx].p && prime <= 64 * factor_base[num_primes - 1].p && n_is_prime(prime))
+              if (prime > factor_base[qs_inf->q_idx].p && prime < 64 * factor_base[qs_inf->num_primes - 1].p && n_is_prime(prime))
               {
-                  flint_printf("We have found a partial!!\n");
+
+                  for (k = 0; k < qs_inf->s; k++)  /* commit any outstanding A factor */
+                  {
+                      if (A_ind[k] >= j)
+                      {
+                          factor[num_factors].ind = A_ind[k];
+                          factor[num_factors++].exp = 1;
+                      }
+                  }
+
+                  factor[num_factors].ind = qs_inf->q_idx;
+                  factor[num_factors++].exp = 1;
+
+                  qs_inf->num_factors = num_factors;
+
+                  /* store this partial in file */
+
+                  qsieve_write_to_file(qs_inf, prime, Y, i);
+
+                  qs_inf->edges++;
+
+                  qsieve_add_to_hashtable(qs_inf, prime);
               }
           }
       }
+
+      goto cleanup;
    }
 
 cleanup:
