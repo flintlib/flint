@@ -98,21 +98,23 @@ void config_gauss_clear(aprcl_config conf)
     Clears the given \code{aprcl_config} element. It must be reinitialised in
     order to be used again.
 
-ulong _R_value(const fmpz_t n);
+ulong _R_value(const fmpz_t n)
 
     Returns precomputed $R$ value for APR-CL configration. $R$ such that the 
     corresponding $s$ value greater then $\sqrt{n}$. Maximum stored value:
     $6983776800$ allows to test numbers up to $6000$ digit.
 
-void config_jacobi_init(aprcl_config conf, const fmpz_t n);
+void config_jacobi_init(aprcl_config conf, const fmpz_t n)
 
     Compute the $s$ and $R$ values used in cyclotomic primality test.
     $s^2 > n$ and $s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q$.
     Also store factors of $R$ and $s$.
 
-void config_jacobi_clear(aprcl_config conf);
+void config_jacobi_clear(aprcl_config conf)
 
-void _config_jacobi_update(aprcl_config conf);
+    Clears the given \code{aprcl_config} element. It must be reinitialised in
+    order to be used again.
+
 
 *******************************************************************************
 
