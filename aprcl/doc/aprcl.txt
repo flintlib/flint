@@ -36,12 +36,20 @@ int is_prime_aprcl(const fmpz_t n)
 
 primality_test_status _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
-    Jacobi sum test fmpz. For implementation details see
-    \code{is_prime_jacobi.c} source code.
+    Jacobi sum test for \code{fmpz} value $n$. Possible return values:
+    \code{PRIME}, \code{COMPOSITE} and \code{UNKNOWN} (if we can't 
+    prove primality). For implementation details see \code{is_prime_jacobi.c}
+    source code.
 
 int is_prime_jacobi(const fmpz_t n)
 
-    Jacobi sum test int.
+    If $n$ prime returns 1; otherwise returns 0. The algorithm is well described
+    in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and 
+    "A Course in Computational Algebraic Number Theory" by H. Cohen.
+    It is theoretically possible that returns 0 for prime number. 
+    It means that we can't check $L_p$ condition (see \code{is_prime_jacobi.c} 
+    source code for implementation details), this case can be find
+    using \code{_is_prime_jacobi()} function.
 
 primality_test_status _is_prime_gauss(const fmpz_t n, const aprcl_config config)
 
@@ -92,16 +100,19 @@ void config_gauss_clear(aprcl_config conf)
 
 ulong _R_value(const fmpz_t n);
 
+    Returns precomputed $R$ value for APR-CL configration. $R$ such that the 
+    corresponding $s$ value greater then $\sqrt{n}$. Maximum stored value:
+    $6983776800$ allows to test numbers up to $6000$ digit.
+
 void config_jacobi_init(aprcl_config conf, const fmpz_t n);
+
+    Compute the $s$ and $R$ values used in cyclotomic primality test.
+    $s^2 > n$ and $s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q$.
+    Also store factors of $R$ and $s$.
 
 void config_jacobi_clear(aprcl_config conf);
 
 void _config_jacobi_update(aprcl_config conf);
-
-void _config_jacobi_reduce_s(aprcl_config conf, const fmpz_t n);
-
-_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n);
-
 
 *******************************************************************************
 
@@ -131,7 +142,7 @@ void unity_zp_swap(unity_zp f, unity_zp q)
 
 void unity_zp_set_zero(unity_zp f)
 
-    Sets $f = 0$.
+    Sets $f$ to zero value.
 
 
 *******************************************************************************

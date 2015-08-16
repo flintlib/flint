@@ -79,6 +79,7 @@ int main(void)
         unity_zp_clear(h2);
     }
 
+    /* test commutative */
     for (i = 0; i < 100; i++)
     {
         ulong p;
