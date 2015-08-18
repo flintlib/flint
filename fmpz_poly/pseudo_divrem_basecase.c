@@ -49,7 +49,7 @@ _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
 
     while (iR >= lenB - 1)
     {
-        if (inv)
+        if (inv != NULL)
            fmpz_fdiv_qr_preinvn(Q + iQ, rem, R + iR, leadB, inv);
         else
            fmpz_fdiv_qr(Q + iQ, rem, R + iR, leadB);
