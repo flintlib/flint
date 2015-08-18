@@ -42,7 +42,14 @@
 #else
    #include <stdint.h>
 #endif
+<<<<<<< HEAD:mpqs.h
  
+=======
+
+
+#define QS_DEBUG 0
+
+>>>>>>> 5903f39ba98692427f9f0b120c0ac156fb229a3c:siqs/qsieve.h
 typedef struct prime_t
 {
    mp_limb_t pinv; /* precomputed inverse */
@@ -64,7 +71,28 @@ typedef struct la_col_t  /* matrix column */
     slong orig;         /* Original relation number */
 } la_col_t;
 
+<<<<<<< HEAD:mpqs.h
 typedef struct mpqs_s
+=======
+
+typedef struct hash_t
+{
+    mp_limb_t prime;
+    mp_limb_t next;
+    mp_limb_t count;
+} hash_t;
+
+typedef struct relation_t
+{
+    mp_limb_t lp;
+    slong num_factors;
+    slong * small;
+    fac_t * factor;
+    fmpz_t Y;
+} relation_t;
+
+typedef struct qs_s
+>>>>>>> 5903f39ba98692427f9f0b120c0ac156fb229a3c:siqs/qsieve.h
 {
    fmpz_t n; /* Number to factor */
 
@@ -105,6 +133,19 @@ typedef struct mpqs_s
    /***************************************************************************
                        RELATION DATA
    ***************************************************************************/
+
+   FILE * siqs;
+
+   slong full_relation;
+   slong num_cycles;
+
+   slong vertices;
+   slong components;
+   slong edges;
+
+   slong table_size;
+   hash_t * table;
+   mp_limb_t * hash_table;
 
    slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
@@ -156,6 +197,7 @@ typedef mpqs_s mpqs_t[1];
 
 static const mp_limb_t mpqs_tune[][5] =
 {
+<<<<<<< HEAD:mpqs.h
    {40,   50,    60,  5,   2 *   3000}, /* 12 digit, change factor base to 60 from 50 */
    {50,   50,    80,  5,   2 *   3500}, /* 15 digit, change factor base to 100 from 80 */
    {60,   50,   100,  5,   2 *   4000}, /* 18 digit */
@@ -179,6 +221,31 @@ static const mp_limb_t mpqs_tune[][5] =
    {240, 200, 18000, 19,   2 *  64000}, 
    {250, 200, 24000, 19,   2 *  64000}, /* 75 digits */
    {260, 200, 55000, 25,   2 * 128000}, /* 80 digits */
+=======
+   {40,   50,    60,  5,   2 *   3000}, // 12 digit,   change factor base to 60 from 50
+   {50,   50,    80,  5,   2 *   3500}, // 15 digit,   change factor base to 100 from 80
+   {60,   50,   100,  5,   2 *   4000}, // 18 digit
+   {70,   50,   300,  6,   2 *   6000}, // 21 digit
+   {80,   50,   400,  6,   2 *   8000}, // 24 digit
+   {90,   50,   500,  7,   2 *  10000}, //
+   {100, 100,   650,  7,   2 *  13000}, //
+   {110, 100,   800,  7,   2 *  15000}, // 31 digits
+   {120, 100,  1000,  7,   2 *  20000}, //
+   {130, 100,   800,  9,   2 *  32000}, // 41 digits,
+   {140, 100,  1200,  8,   2 *  28000}, //
+   {150, 100,  1800,  8,   2 *  32000}, // 45 digit
+   {160, 150,  2000,  8,   2 *  40000}, //
+   {170, 150,  2200,  9,   2 *  64000}, // 50 digits
+   {180, 150,  2400,  9,   2 *  64000}, //
+   {190, 150,  4000, 10,   2 *  64000}, // factor base size changed from 2700 to x, ks_primes 150
+   {200, 150,  4000, 10,   2 *  64000}, // 60 digits, fb changed from 3600, ks_primes changed from 150
+   {210, 150,  6000, 12,   2 *  64000}, //
+   {220, 200,  7500, 15,   2 *  64000}, //
+   {230, 200,  8500, 17,   2 *  64000}, // 70 digits
+   {240, 200, 18000, 19,   2 *  64000}, //
+   {250, 200, 24000, 19,   2 *  64000}, // 75 digits
+   {260, 200, 55000, 25,   2 * 128000}, // 80 digits
+>>>>>>> 5903f39ba98692427f9f0b120c0ac156fb229a3c:siqs/qsieve.h
    {270, 200, 64000, 27,   2 * 128000}
 };
 
