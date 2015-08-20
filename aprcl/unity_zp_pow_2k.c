@@ -44,9 +44,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     k = _unity_zp_pow_select_k(pow);
     /* selects e such that 2^(ek) < n < 2^((e + 1) * k) */
     e = (fmpz_bits(pow) - 1) / k;
-    /* computes 2^k */
-    pow2k = 1 << k;
-
+    
     /* 
         g_powers store odd powers of g up to 2^k - 1;
         g_powers[(i + 1) / 2] = g^i

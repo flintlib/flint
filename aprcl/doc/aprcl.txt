@@ -91,7 +91,8 @@ void config_gauss_init(aprcl_config conf, const fmpz_t n)
 
 void config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
-    Compute the $s$ with fixed minimum $R$.
+    Compute the $s$ with fixed minimum $R$ such that $a^R \equiv 1 \mod{s}$
+    for all integer $a$ coprime to $s$. 
 
 void config_gauss_clear(aprcl_config conf)
 
@@ -107,7 +108,7 @@ ulong _R_value(const fmpz_t n)
 void config_jacobi_init(aprcl_config conf, const fmpz_t n)
 
     Compute the $s$ and $R$ values used in cyclotomic primality test.
-    $s^2 > n$ and $s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q$.
+    $s^2 > n$ and $a^R \equiv 1 \mod{s}$ for all $a$ coprime to $s$.
     Also store factors of $R$ and $s$.
 
 void config_jacobi_clear(aprcl_config conf)

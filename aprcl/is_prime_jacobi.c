@@ -47,7 +47,8 @@
         n - number to check for primality;
         
         R - configuration parameter;
-        s - configuration parameter depends on the R; s^2 > n;
+        s - configuration parameter depends on the R; s^2 > n; 
+        a^R = 1 mod s for all integer a coprime to s;
 
         q - prime number such that (q | s);
         p - prime number such that (p | q - 1);
@@ -457,7 +458,8 @@ _is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
     /* if we find q */
     if (p_counter != 0)
     {
-        ulong v, h, k;
+        ulong v, k;
+        slong h;
         fmpz_t u;
         unity_zp jacobi_sum;
 
@@ -564,7 +566,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
         If (Lp), then lambdas_p = 1.
     */
-    lambdas = (int*) malloc(sizeof(int) * config->rs.num);
+    lambdas = (int*) flint_malloc(sizeof(int) * config->rs.num);
 
     /* nmod4 = n % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
@@ -804,7 +806,7 @@ _is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     /* end of (4.) */
 
     /* clear */
-    free(lambdas);
+    flint_free(lambdas);
     fmpz_clear(u);
     fmpz_clear(q_pow);
     fmpz_clear(p2);

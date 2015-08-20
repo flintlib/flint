@@ -28,13 +28,10 @@
 int
 unity_zp_equal(unity_zp f, unity_zp g)
 {
-    if (f->p != g->p)
-        return 0;
-    if (f->exp != g->exp)
-        return 0;
-    if (fmpz_equal(f->n, g->n) == 0)
-        return 0;
-
+    /*
+        f and g can be reduced only by modylo x^{p^k} - 1,
+        so reduce by cyclotomic polynomial
+    */
     _unity_zp_reduce_cyclotomic(f);
     _unity_zp_reduce_cyclotomic(g);
 

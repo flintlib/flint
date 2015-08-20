@@ -37,7 +37,6 @@ unity_zpq_gauss_sum_character_pow(unity_zpq f, ulong q, ulong p, ulong pow)
     qinv = n_preinvert_limb(q);
     pinv = n_preinvert_limb(p);
     qpow = 1;
-    ppow = 0;
 
     for (i = 1; i < q; i++)
     {

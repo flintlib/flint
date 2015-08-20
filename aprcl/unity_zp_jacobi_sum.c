@@ -26,6 +26,9 @@
 #include "aprcl.h"
 #include "ulong_extras.h"
 
+/*
+    Computes sum \zeta_{p^k}^{a * x + b * f(x)} for x = 1, 2, ..., q - 2.
+*/
 void 
 _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
@@ -41,10 +44,15 @@ _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
 
     for (i = 1; i < q - 1; i++)
     {
+        /* l = a * i + b * f[i] */ 
         ulong l = (a * (i) + b * table[i]) % pow;
-        if (l < size) 
-            unity_zp_coeff_inc(f, l); 
-        else
+
+        /* if l < (p - 1)p^{k - 1} increase f[l] by one */
+        if (l < size)
+        {
+            unity_zp_coeff_inc(f, l);
+        }
+        else /* else decrease f[l - jp^{k - 1}] by one for j in [0; p - 2] */
         {
             for (j = 0; j < p - 1; j++)
             {
@@ -55,6 +63,9 @@ _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
     }
 }
 
+/*
+    Computes sum \zeta_{p^k}^{x + f(x)} for x = 1, 2, ..., q - 2.
+*/
 void
 unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
 {
@@ -69,6 +80,9 @@ unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
     _nmod_vec_clear(table);
 }
 
+/*
+    Computes sum \zeta_{p^k}^{2 * x + b * f(x)} for x = 1, 2, ..., q - 2.
+*/
 void
 unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
 {
@@ -83,6 +97,10 @@ unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
     _nmod_vec_clear(table);
 }
 
+/*
+    Computes sum \zeta_{p^k}^{3 * 2^{k - 3} * x + 2^{k - 3} * f(x)}
+    for x = 1, 2, ..., q - 2.
+*/
 void
 unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 {
@@ -91,8 +109,8 @@ unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 
     table = f_table(q);
     k = p_power_in_q(q - 1, 2);
-    b = n_pow(2, k - 3);
-    a = 3 * b;
+    b = n_pow(2, k - 3);    /* b = 2^{k - 3}        */
+    a = 3 * b;              /* a = 3 * 2^{k - 3}    */
 
     _unity_zp_jacobi_sum_pq_general(f, table, 2, q, k, a, b);
 

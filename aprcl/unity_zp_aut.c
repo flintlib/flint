@@ -25,6 +25,9 @@
 
 #include "aprcl.h"
 
+/*
+    Computes f such that \sigma_x(g) = f.
+*/
 void
 unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
 {
@@ -36,9 +39,14 @@ unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
     p_pow_preinv = n_preinvert_limb(p_pow);
 
     unity_zp_set_zero(f);
+
+    /* for i = 0, 1,..., p^k set f[i * x mod p^k] = g[i] */
     for (i = 0; i < p_pow; i++)
     {
-        ulong ind = n_mulmod2_preinv(x, i, p_pow, p_pow_preinv);        
+        /* compute x * i mod p^k */
+        ulong ind = n_mulmod2_preinv(x, i, p_pow, p_pow_preinv);
+
+        /* set f[ind] = g[i] */
         fmpz_mod_poly_get_coeff_fmpz(coeff, g->poly, i);
         unity_zp_coeff_add_fmpz(f, ind, coeff);
     }
