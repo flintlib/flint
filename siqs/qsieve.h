@@ -47,13 +47,13 @@
 
 typedef struct prime_t
 {
-   mp_limb_t pinv; /* precomputed inverse */
-   int p; /* prime */
+   mp_limb_t pinv;     /* precomputed inverse */
+   int p;              /* prime */
    char size;
 } prime_t;
 
 
-typedef struct fac_t /* struct for factors of relations */
+typedef struct fac_t    /* struct for factors of relations */
 {
    slong ind;
    slong exp;
@@ -67,43 +67,44 @@ typedef struct la_col_t  /* matrix column */
 } la_col_t;
 
 
-typedef struct hash_t
+typedef struct hash_t   /* entry in hash table */
 {
-    mp_limb_t prime;
-    mp_limb_t next;
-    mp_limb_t count;
+    mp_limb_t prime;    /* value of prime */
+    mp_limb_t next;     /* next prime which have same hash value as 'prime' */
+    mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
-typedef struct relation_t
+typedef struct relation_t  /* format for relation */
 {
-    mp_limb_t lp;
-    slong num_factors;
-    slong * small;
-    fac_t * factor;
-    fmpz_t Y;
+    mp_limb_t lp;          /* large prime, is 1, if relation is full */
+    slong num_factors;     /* number of factors, excluding small factor */
+    slong * small;         /* exponent of small factors */
+    fac_t * factor;        /* factor of relation */
+    fmpz_t Y;              /* square root of sieve value for relation */
 } relation_t;
 
 typedef struct qs_s
 {
-   fmpz_t n; /* Number to factor */
+   fmpz_t n;               /* Number to factor */
 
-   mp_bitcnt_t bits; /* Number of bits of n */
+   mp_bitcnt_t bits;       /* Number of bits of n */
 
-   ulong ks_primes; /* number of Knuth-Schroeppel primes */
+   ulong ks_primes;        /* number of Knuth-Schroeppel primes */
 
-   mp_limb_t k; /* Multiplier */
-   fmpz_t kn; /* kn as a multiprecision integer */
+   mp_limb_t k;            /* Multiplier */
+   fmpz_t kn;              /* kn as a multiprecision integer */
 
-   slong num_primes; /* number of factor base primes including k and 2 */
+   slong num_primes;       /* number of factor base primes including k and 2 */
 
-   prime_t * factor_base; /* data about factor base primes */
+   prime_t * factor_base;  /* data about factor base primes */
 
-   int * sqrts; /* square roots of kn mod factor base primes */
+   int * sqrts;            /* square roots of kn mod factor base primes */
 
-   slong small_primes; /* number of primes to not sieve with */
-   slong sieve_size; /* size of sieve to use */
+   slong small_primes;     /* number of primes to not sieve with */
+   slong sieve_size;       /* size of sieve to use */
 
-   unsigned char sieve_bits; /* sieve threshold */
+   unsigned char sieve_bits;  /* sieve threshold */
+   unsigned char sieve_fill;  /* for biasing sieve values */
 
    /***************************************************************************
                        POLYNOMIAL DATA
@@ -141,9 +142,15 @@ typedef struct qs_s
    slong curr_poly;         /* rank of polynomial according to gray-code
                                formula */
    slong s;                 /* number of prime factor of A0 */
-   slong low;
-   slong high;
-   slong span;
+   slong low;               /* minimum offset in factor base,
+                               for possible factor of 'A0'*/
+
+   slong high;              /* maximum offset in factor base,
+                               for possible factor of 'A0' */
+   slong span;              /* total number of possible factor for 'A0' */
+
+   /* parameters for calculating next subset of possible factor of 'A0' */
+
    slong h;
    slong m;
    mp_limb_t * curr_subset;
@@ -152,18 +159,18 @@ typedef struct qs_s
                        RELATION DATA
    ***************************************************************************/
 
-   FILE * siqs;
+   FILE * siqs;          /* pointer to file for storing relations */
 
-   slong full_relation;
-   slong num_cycles;
+   slong full_relation;  /* number of full relation */
+   slong num_cycles;     /* number of possible full relation from partials */
 
-   slong vertices;
-   slong components;
-   slong edges;
+   slong vertices;       /* number of different prime in partials */
+   slong components;     /* equals to 1 */
+   slong edges;          /* total number of partials */
 
-   slong table_size;
-   hash_t * table;
-   mp_limb_t * hash_table;
+   slong table_size;     /* size of table */
+   hash_t * table;       /* store 'prime' occurring in partial */
+   mp_limb_t * hash_table;  /* to keep track of location of primes in 'table' */
 
    slong qsort_rels; /* number of relations to accumulate before sorting */
    slong extra_rels; /* number of extra relations beyond num_primes */
@@ -212,8 +219,8 @@ typedef qs_s qs_t[1];
 */
 static const mp_limb_t qsieve_tune[][5] =
 {
-   {40,   50,    60,  5,   2 *   3000}, // 12 digit,   change factor base to 60 from 50
-   {50,   50,    80,  5,   2 *   3500}, // 15 digit,   change factor base to 100 from 80
+   {40,   50,    60,  5,   2 *   3000}, // 12 digit,
+   {50,   50,    80,  5,   2 *   3500}, // 15 digit,
    {60,   50,   100,  5,   2 *   4000}, // 18 digit
    {70,   50,   300,  6,   2 *   6000}, // 21 digit
    {80,   50,   400,  6,   2 *   8000}, // 24 digit
@@ -227,8 +234,8 @@ static const mp_limb_t qsieve_tune[][5] =
    {160, 150,  2000,  8,   2 *  40000}, //
    {170, 150,  2200,  9,   2 *  64000}, // 50 digits
    {180, 150,  2400,  9,   2 *  64000}, //
-   {190, 150,  4000, 10,   2 *  64000}, // factor base size changed from 2700 to x, ks_primes 150
-   {200, 150,  4000, 10,   2 *  64000}, // 60 digits, fb changed from 3600, ks_primes changed from 150
+   {190, 150,  4000, 10,   2 *  65536}, //
+   {200, 150,  4000, 10,   2 *  65536}, // 60 digits
    {210, 150,  6000, 12,   2 *  64000}, //
    {220, 200,  7500, 15,   2 *  64000}, //
    {230, 200,  8500, 17,   2 *  64000}, // 70 digits
@@ -243,13 +250,16 @@ static const mp_limb_t qsieve_tune[][5] =
 
 #define BITS_ADJUST 10
 
-#define BLOCK_SIZE 64000
+#define BLOCK_SIZE 65536
 
 void qsieve_init(qs_t qs_inf, fmpz_t n);
 
 mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
 void qsieve_clear(qs_t qs_inf);
+
+prime_t *
+compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes);
 
 mp_limb_t qsieve_primes_init(qs_t qs_inf);
 
@@ -259,9 +269,9 @@ mp_limb_t qsieve_poly_init(qs_t qs_inf);
 
 mp_limb_t qsieve_next_A0(qs_t qs_inf);
 
-void qsieve_init_A0(qs_t qs_inf);
+void qsieve_re_init_A0(qs_t qs_inf);
 
-mp_limb_t qsieve_compute_q0(qs_t qs_inf);
+void qsieve_init_A0(qs_t qs_inf);
 
 void qsieve_compute_pre_data(qs_t qs_inf);
 
@@ -275,6 +285,8 @@ void qsieve_poly_clear(qs_t qs_inf);
 
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve);
 
+void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve);
+
 slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve);
 
 slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve);
@@ -283,13 +295,39 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 
 void qsieve_linalg_init(qs_t qs_inf);
 
+void qsieve_linalg_re_init(qs_t qs_inf);
+
+void qsieve_linalg_re_alloc(qs_t qs_inf);
+
 void qsieve_linalg_clear(qs_t qs_inf);
+
+int qsieve_relations_cmp(const void * a, const void * b);
+
+int qsieve_relations_cmp2(const void * a, const void * b);
 
 slong qsieve_merge_sort(qs_t qs_inf);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
 slong qsieve_insert_relation(qs_t qs_inf, fmpz_t Y);
+
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y);
+
+hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
+
+void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
+
+relation_t qsieve_parse_relation(qs_t qs_inf, char * str);
+
+relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
+
+int qsieve_compare_relation(const void * a, const void * b);
+
+int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
+
+void qsieve_insert_relation2(qs_t qs_inf, relation_t * rel_list, slong num_relations);
+
+void qsieve_process_relation(qs_t qs_inf);
 
 
 static __inline__ void insert_col_entry(la_col_t * col, slong entry)
@@ -338,6 +376,17 @@ static __inline__ void free_col(la_col_t * col)
 {
    if (col->weight) flint_free(col->data);
 }
+
+uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
+
+void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols);
+
+uint64_t * block_lanczos(flint_rand_t state, slong nrows,
+			slong dense_rows, slong ncols, la_col_t *B);
+
+void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
+   uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
+
 
 #ifdef __cplusplus
 }
