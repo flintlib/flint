@@ -42,6 +42,7 @@ int main(void)
         fmpz_t n, s2;
         aprcl_config conf;
 
+        fmpz_init(s2);
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
 
@@ -60,6 +61,7 @@ int main(void)
 
         config_gauss_clear(conf);
         fmpz_clear(n);
+        fmpz_clear(s2);
     }
 
     FLINT_TEST_CLEANUP(state);

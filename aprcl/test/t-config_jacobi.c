@@ -43,6 +43,7 @@ int main(void)
         aprcl_config conf;
 
         fmpz_init(n);
+        fmpz_init(s2);
         fmpz_randtest_unsigned(n, state, 1000);
 
         config_jacobi_init(conf, n);
@@ -59,6 +60,7 @@ int main(void)
         }
 
         config_jacobi_clear(conf);
+        fmpz_clear(s2);
         fmpz_clear(n);
     }
 

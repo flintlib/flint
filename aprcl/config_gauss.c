@@ -66,6 +66,8 @@ config_gauss_init(aprcl_config conf, const fmpz_t n)
     }
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
+
+    fmpz_clear(s2);
 }
 
 void
@@ -87,6 +89,8 @@ config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
     n_factor_init(&conf->rs);
     n_factor(&conf->rs, conf->R, 1);
+
+    fmpz_clear(s2);
 }
 
 void
