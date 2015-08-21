@@ -449,7 +449,7 @@ void qsieve_compute_pre_data(qs_t qs_inf)
     }
 
     /* calculate $A0^{-1} modulo p$ where $p \in factor_base$ */
-    for (i = 2; i < qs_inf->num_primes; i++)
+    for (i = 3; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
         temp = fmpz_fdiv_ui(qs_inf->A0, p);
@@ -528,7 +528,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
         compute roots of base polynomial modulo factor base prime
     */
 
-    for (i = 2; i < qs_inf->num_primes; i++)
+    for (i = 3; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
 
@@ -541,7 +541,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
         }
     }
 
-    for (i = 2; i < qs_inf->num_primes; i++)
+    for (i = 3; i < qs_inf->num_primes; i++)
     {
         p = factor_base[i].p;
         pinv = factor_base[i].pinv;
@@ -566,7 +566,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
             A_inv2B[j][i] = n_mulmod2_preinv(A_inv2B[j][i], Ainv, p, pinv);
     }
 
-    for (i = 2; i < qs_inf->num_primes; i++)
+    for (i = 3; i < qs_inf->num_primes; i++)
     {
         if (soln1[i] > soln2[i])
             soln1[i] = (soln1[i] + soln2[i]) - (soln2[i] = soln1[i]);
@@ -622,7 +622,7 @@ void qsieve_init_poly_next(qs_t qs_inf)
     fmpz_mod(temp2, temp2, qs_inf->A);
 
     /* updating roots for $b_{i+1}$ */
-    for (j = 2; j < qs_inf->num_primes; j++)
+    for (j = 3; j < qs_inf->num_primes; j++)
     {
         p = factor_base[j].p;
 

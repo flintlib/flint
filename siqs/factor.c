@@ -162,9 +162,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
     qs_inf->sieve_bits = 64;
-
+    qs_inf->sieve_fill = 8;
     qs_inf->q_idx = qs_inf->num_primes;
-
     qs_inf->siqs = fopen("siqs.dat", "w");
 
     while(1)
@@ -182,16 +181,14 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
             {
 
                 qs_inf->q_idx  = j;
-
-                qsieve_init_poly_first(qs_inf);
                 relation += qsieve_collect_relations(qs_inf, sieve);
 
                 qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
-                if (qs_inf->full_relation + qs_inf->num_cycles >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
+                if (qs_inf->full_relation  + qs_inf->num_cycles   >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
                 {
-
                     fclose(qs_inf->siqs);
+
                     qsieve_process_relation(qs_inf);
 
     /**************************************************************************
@@ -249,7 +246,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
                         if (mask & ((uint64_t)(1) << count))
                         {
 
-                            qsieve_square_root(X, Y, qs_inf, nullrows, ncols, count, qs_inf->n);
+                            qsieve_square_root(X, Y, qs_inf, nullrows, ncols, count, qs_inf->kn);
 
                             fmpz_sub(X, X, Y);
                             fmpz_gcd(X, X, qs_inf->n);
@@ -275,6 +272,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
                 }
             }
+
         } while (qsieve_next_A0(qs_inf));
 
         delta = qs_inf->num_primes / 10;

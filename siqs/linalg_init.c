@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2006, 2011 William Hart
+    Copyright (C) 2015 Nitin Kumar
 
 ******************************************************************************/
 
@@ -34,11 +34,12 @@ void qsieve_linalg_init(qs_t qs_inf)
     slong i, num_primes;
 
     qs_inf->extra_rels = 64; /* number of opportunities to factor n */
-    qs_inf->max_factors = 30; /* maximum number of factors a relation can have */
+    qs_inf->max_factors = 40; /* maximum number of factors a relation can have */
 
     /* allow as many dups as relations */
     num_primes = qs_inf->num_primes;
     qs_inf->num_primes += qs_inf->ks_primes;
+
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels + qs_inf->qsort_rels);
     qs_inf->small = flint_malloc(qs_inf->small_primes*sizeof(mp_limb_t));
     qs_inf->factor = flint_malloc(qs_inf->max_factors*sizeof(fac_t));

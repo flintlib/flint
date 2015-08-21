@@ -31,7 +31,7 @@
 
 void qsieve_init(qs_t qs_inf, fmpz_t n)
 {
-    ulong i;
+    slong i;
 
     /* store n in struct */
     fmpz_init_set(qs_inf->n, n);

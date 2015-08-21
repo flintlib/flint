@@ -31,7 +31,7 @@
 mp_limb_t qsieve_poly_init(qs_t qs_inf)
 {
    ulong num_primes = qs_inf->num_primes;
-   ulong s = qs_inf->s; /* number of prime factors in A coeff */
+   ulong s = qs_inf->s;    /* number of prime factors in A coeff */
 
    fmpz_init(qs_inf->A);
    fmpz_init(qs_inf->A0);

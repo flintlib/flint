@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2006, 2011 William Hart
+   Copyright (C) 2015 Nitin Kumar
 
 ******************************************************************************/
 
@@ -37,7 +37,7 @@
 
 #include <time.h>
 
-/* taken from FLINT2 */
+/* sieving routine, taken from FLINT2 */
 
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
 {
@@ -54,7 +54,7 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    slong diff;
    slong pind;
 
-   memset(sieve, 10, qs_inf->sieve_size + sizeof(ulong));
+   memset(sieve, qs_inf->sieve_fill, qs_inf->sieve_size + sizeof(ulong));
    *end = (char) 255;
 
    for (pind = qs_inf->small_primes; pind < num_primes; pind++)
@@ -93,6 +93,11 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve)
    }
 }
 
+/*
+   sieving routine, breaks sieve array into blocks than sieve
+   each block, for whole factor base at once
+*/
+
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 {
     slong b, d1, d2, i, j;
@@ -109,7 +114,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
     unsigned char * Bp;
     register unsigned char * x;
 
-    memset(sieve, 0, qs_inf->sieve_size + sizeof(ulong));
+    memset(sieve, 8, qs_inf->sieve_size + sizeof(ulong));
 
     for (i = 0; i < num_primes; i++)
     {
@@ -138,7 +143,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
             size = factor_base[pind].size;
             d1 = xr2[pind];
             d2 = p - d1;
-            Bp = (B - xr2[pind]);
+            Bp = (B - d1);
 
             for (x = sieve + xr1[pind]; x <= Bp; )
             {
@@ -155,11 +160,6 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve)
 
             xr1[pind] = (x - sieve);
         }
-    }
-
-    for (b = 1; b <= qs_inf->sieve_size / BLOCK_SIZE; b++)
-    {
-        B = sieve + b * BLOCK_SIZE;
 
         for (pind = r0; pind < num_primes; pind++)
         {
@@ -241,7 +241,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
    extra_bits += exp;
    small[1] = exp;
 
-   for (j = 2; j < qs_inf->small_primes; j++) /* pull out small primes */
+   for (j = 3; j < qs_inf->small_primes; j++) /* pull out small primes */
    {
       prime = factor_base[j].p;
       pinv = factor_base[j].pinv;
@@ -293,6 +293,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
       if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
       {
+         if (fmpz_cmp_si(res, -1) == 0)
+            small[2] = 1;
+         else
+            small[2] = 0;
+
          for (k = 0; k < qs_inf->s; k++) /* Commit any outstanding A factors */
          {
             if (A_ind[k] >= j)
@@ -322,13 +327,19 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
       }
       else
       {
-          fmpz_abs(res, res);
+          small[2] = 0;
 
-          if (fmpz_bits(res) <= FLINT_BITS)
+          if (fmpz_cmp_si(res, UWORD(0)) < 0)
+          {
+              fmpz_abs(res, res);
+              small[2] = 1;
+          }
+
+          if (fmpz_bits(res) <= 23)
           {
               prime = fmpz_get_ui(res);
 
-              if (prime > factor_base[qs_inf->q_idx].p && prime < 64 * factor_base[qs_inf->num_primes - 1].p && n_is_prime(prime))
+              if (prime > factor_base[qs_inf->q_idx].p && prime < 60 * factor_base[qs_inf->num_primes - 1].p && n_is_prime(prime))
               {
 
                   for (k = 0; k < qs_inf->s; k++)  /* commit any outstanding A factor */
@@ -347,7 +358,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, slong i, unsigned char * sieve)
 
                   /* store this partial in file */
 
-                  qsieve_write_to_file(qs_inf, prime, Y, i);
+                  qsieve_write_to_file(qs_inf, prime, Y);
 
                   qs_inf->edges++;
 
@@ -413,6 +424,8 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve)
 slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
 {
     slong relation = 0;
+
+    qsieve_init_poly_first(qs_inf);
 
     while (qs_inf->columns < qs_inf->num_primes + qs_inf->extra_rels)
     {
