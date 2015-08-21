@@ -214,6 +214,11 @@ int main(void)
             if (is_prime_jacobi(n) == 0)
                 result = 0;
 
+            /* prime power */
+            fmpz_pow_ui(n, n, 7);
+            if (is_prime_jacobi(n) == 1)
+                result = 0;
+
             /* Test big composite. */
             /* 1500450271 * 5915587277 */
             fmpz_set_str(n, "8876044532898802067", 10);
