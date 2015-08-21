@@ -75,7 +75,7 @@ int main(void)
            else continue;
        }
 
-       for (j = 2; j < qs_inf->num_primes; j++)
+       for (j = 3; j < qs_inf->num_primes; j++)
        {
            /* check if square root of kn modulo
                factor base prime p are correct   */

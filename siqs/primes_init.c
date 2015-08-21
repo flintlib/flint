@@ -61,7 +61,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     if (num == 0)
     {
         p = 2;
-        num = 2;
+        num = 3;
     }
     else p = factor_base[num - 1].p;
 
@@ -159,7 +159,8 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     factor_base[0].pinv = n_preinvert_limb(k);
     factor_base[0].size = FLINT_BIT_COUNT(k);
     factor_base[1].p = 2;
-    factor_base[0].size = 2;
+    factor_base[1].size = 2;
+    factor_base[2].p = -1;
 
     return 0;
 }

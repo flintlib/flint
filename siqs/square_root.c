@@ -75,7 +75,7 @@ void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    {
       if (prime_count[i])
       {
-         fmpz_set_ui(pow, factor_base[i].p);
+         fmpz_set_si(pow, factor_base[i].p);
          fmpz_powm_ui(pow, pow, prime_count[i]/2, N);
          fmpz_mul(X, X, pow);
       }
