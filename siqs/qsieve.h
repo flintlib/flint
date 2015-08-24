@@ -43,7 +43,7 @@
 #endif
 
 
-#define QS_DEBUG 0
+#define QS_DEBUG 128
 
 typedef struct prime_t
 {
@@ -101,6 +101,7 @@ typedef struct qs_s
    int * sqrts;            /* square roots of kn mod factor base primes */
 
    slong small_primes;     /* number of primes to not sieve with */
+   slong second_prime;
    slong sieve_size;       /* size of sieve to use */
 
    unsigned char sieve_bits;  /* sieve threshold */
