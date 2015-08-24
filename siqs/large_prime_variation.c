@@ -192,23 +192,24 @@ void qsieve_write_to_file2(qs_t qs_inf, relation_t r)
 void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
 {
     slong i, j;
+    char * str = NULL;
     slong num_factors = qs_inf->num_factors;
     slong * small = qs_inf->small;
     fac_t * factor = qs_inf->factor;
 
-    flint_fprintf(qs_inf->siqs, "%wu ", prime);  /* write large prime */
+    flint_fprintf(qs_inf->siqs, "%X ", prime);  /* write large prime */
 
     for (i = 0; i < qs_inf->small_primes; i++)   /* write small primes */
-        flint_fprintf(qs_inf->siqs, "%wd ", small[i]);
+        flint_fprintf(qs_inf->siqs, "%X ", small[i]);
 
-    flint_fprintf(qs_inf->siqs, "%wd ", num_factors);  /* write number of factor */
+    flint_fprintf(qs_inf->siqs, "%X ", num_factors);  /* write number of factor */
 
     for (i = 0; i < num_factors; i++)               /* write factor along with exponent */
-        flint_fprintf(qs_inf->siqs, "%wd %wu ", factor[i].ind, factor[i].exp);
+        flint_fprintf(qs_inf->siqs, "%X %X ", factor[i].ind, factor[i].exp);
 
-    fmpz_fprint(qs_inf->siqs, Y);             /* write value of 'Y' */
+    str = fmpz_get_str(str, 16, Y);    /* converting value of 'Y'  to hex */
 
-    flint_fprintf(qs_inf->siqs, "\n");
+    flint_fprintf(qs_inf->siqs, "%s\n", str);   /* write value of 'Y' */
 }
 
 void qsieve_copy_relation(qs_t qs_inf, relation_t a)
@@ -319,14 +320,14 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
         while (isspace(*str))
             str++;
 
-        rel.small[i] = strtoul(str, &next, 10);
+        rel.small[i] = strtoul(str, &next, 16);
         str = next;
     }
 
     while (isspace(*str))
         str++;
 
-    rel.num_factors = strtoul(str, &next, 10);
+    rel.num_factors = strtoul(str, &next, 16);
     str = next;
 
     for (i = 0; i < rel.num_factors; i++)
@@ -334,13 +335,13 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
         while (isspace(*str))
             str++;
 
-        rel.factor[i].ind = strtoul(str, &next, 10);
+        rel.factor[i].ind = strtoul(str, &next, 16);
         str = next;
 
         while (isspace(*str))
             str++;
 
-        rel.factor[i].exp = strtoul(str, &next, 10);
+        rel.factor[i].exp = strtoul(str, &next, 16);
         str = next;
     }
 
@@ -348,7 +349,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
         str++;
 
     fmpz_init(rel.Y);
-    fmpz_set_str(rel.Y, str, 10);
+    fmpz_set_str(rel.Y, str, 16);
 
     return rel;
 }
@@ -592,7 +593,7 @@ void qsieve_process_relation(qs_t qs_inf)
 
     while (fgets(buf, sizeof(buf), qs_inf->siqs) != NULL)
     {
-        prime = strtoul(buf, &str, 10);
+        prime = strtoul(buf, &str, 16);
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (prime == 1  || entry->count >= 2)
