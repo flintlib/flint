@@ -166,6 +166,14 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
     qs_inf->q_idx = qs_inf->num_primes;
     qs_inf->siqs = fopen("siqs.dat", "w");
 
+    for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
+    {
+        if (qs_inf->factor_base[j].p > BLOCK_SIZE)
+            break;
+    }
+
+    qs_inf->second_prime = j;
+
     while(1)
     {
         if (qs_inf->s)
@@ -185,7 +193,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
                 qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
-                if (qs_inf->full_relation  + qs_inf->num_cycles   >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
+                if (qs_inf->full_relation  + qs_inf->num_cycles    >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
                 {
                     fclose(qs_inf->siqs);
 
