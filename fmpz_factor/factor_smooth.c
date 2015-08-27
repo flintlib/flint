@@ -31,9 +31,10 @@
 #include "ulong_extras.h"
 
 void
-fmpz_factor_smooth(fmpz_t fac, const fmpz_t n)
+fmpz_factor_smooth(fmpz_t fac, flint_rand_t state, const fmpz_t n)
 {
-    mp_limb_t bits, trial_div_cut, currprime;
+    mp_limb_t bits, trial_div_cut, currprime, max_iters;
+    int i, ret;
 
     if (fmpz_is_even(n) == 1)
     {
@@ -42,10 +43,14 @@ fmpz_factor_smooth(fmpz_t fac, const fmpz_t n)
     }
 
     bits = fmpz_bits(n);
-    trial_div_cut = (mp_limb_t) ((float) bits/3.32);    /* cutoff = log10(n) */
+    trial_div_cut = 200;
+
     currprime = UWORD(3);        /* first prime to start trial division with */
 
-    while (currprime <= trial_div_cut)
+
+    /* TRIAL DIVISION */
+
+    while (currprime < trial_div_cut)
     {
         if (fmpz_fdiv_ui(n, currprime) == 0)
         {
@@ -55,4 +60,29 @@ fmpz_factor_smooth(fmpz_t fac, const fmpz_t n)
 
         currprime = n_nextprime(currprime, 0);
     }
+
+    max_iters = UWORD(256);
+
+    for (i = 0; i < 3; i++)
+    {
+        ret = fmpz_factor_pollard_brent(fac, state, n, 2, max_iters)
+
+        if (ret > 0)
+            return;
+        else
+            max_iters <<= UWORD(1);
+    }
+
+    /* ECM */
+
+    for (i = 0; i < 6; i++)
+    {
+        ret = fmpz_factor_ecm(fac, 25, ecm_parameters[i][0], ecm_parameters[i][1], state, n);
+
+        if (ret > 0)
+            return;
+    }
+
+    /* Known ECM ecm_parameters upto 15 bit factors failed. Going blind */
+
 }
