@@ -23,7 +23,6 @@
 
 ******************************************************************************/
 
-<<<<<<< HEAD:nmod_poly_factor/inlines.c
 #define NMOD_POLY_FACTOR_INLINES_C
 
 #define ulong ulongxx /* interferes with system includes */
