@@ -26,6 +26,12 @@
 #ifndef LONG_EXTRAS_H
 #define LONG_EXTRAS_H
 
+#ifdef LONG_EXTRAS_INLINES_C
+#define LONG_EXTRAS_INLINE FLINT_DLL
+#else
+#define LONG_EXTRAS_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 

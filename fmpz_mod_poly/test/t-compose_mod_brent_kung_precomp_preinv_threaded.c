@@ -51,6 +51,8 @@ main(void)
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+
     /* check precomputation */
     for (i = 0; i < 2000; i++)
     {
@@ -247,4 +249,15 @@ main(void)
     
     flint_printf("PASS\n");
     return 0;
+
+#else
+
+   FLINT_TEST_CLEANUP(state);
+
+   flint_printf("SKIPPED\n");
+   return 0;
+
+#endif
+
 }
+

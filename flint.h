@@ -62,9 +62,9 @@
 /* flint version number */
 
 #define __FLINT_VERSION 2
-#define __FLINT_VERSION_MINOR 4
-#define __FLINT_VERSION_PATCHLEVEL 5 
-#define FLINT_VERSION "2.4.5"
+#define __FLINT_VERSION_MINOR 5 
+#define __FLINT_VERSION_PATCHLEVEL 2 
+#define FLINT_VERSION "2.5.2"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -105,6 +105,7 @@ FLINT_DLL void flint_cleanup(void);
 
 #if defined(_WIN64) || defined(__mips64)
 #define WORD_FMT "%ll"
+#define WORD_WIDTH_FMT "%*ll"
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
 #define UWORD_MAX ULLONG_MAX
@@ -113,6 +114,7 @@ FLINT_DLL void flint_cleanup(void);
 #define WORD_MIN LLONG_MIN
 #else
 #define WORD_FMT "%l"
+#define WORD_WIDTH_FMT "%*l"
 #define WORD(xx) (xx##L)
 #define UWORD(xx) (xx##UL)
 #define UWORD_MAX ULONG_MAX
@@ -171,6 +173,13 @@ void flint_randinit(flint_rand_t state)
 }
 
 static __inline__
+void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
+{
+   state->__randval = seed1;
+   state->__randval2 = seed2;
+}
+
+static __inline__
 void _flint_rand_init_gmp(flint_rand_t state)
 {
     if (!state->gmp_init)
@@ -211,6 +220,12 @@ typedef __mpfr_struct mpfr;
 #define FLINT_ASSERT(param) assert(param)
 #else 
 #define FLINT_ASSERT(param)
+#endif
+
+#if defined(__GNUC__)
+#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#else
+#define FLINT_UNUSED(x) x
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
@@ -352,9 +367,9 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
-FLINT_DLL size_t flint_printf(const char * str, ...); /* flint version of printf */
-FLINT_DLL size_t flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
-FLINT_DLL size_t flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
+FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */
+FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
 FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
 FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */

@@ -41,8 +41,6 @@ main(void)
     flint_printf("signature....");
     fflush(stdout);
 
-    
-
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t poly, linear, quadratic, rem;
@@ -150,6 +148,29 @@ main(void)
         fmpz_poly_clear(poly);
     }
 
+    for (i = 0; i < 50; i++)
+    {
+        slong r, s;
+        fmpz_poly_t poly;
+
+        fmpz_poly_init(poly);
+ 
+        fmpz_poly_cyclotomic(poly, i + 3);
+
+        fmpz_poly_signature(&r, &s, poly);
+
+        result = (r == 0 && s == (fmpz_poly_length(poly) - 1)/2);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("Cyclotomic(%ld) has signature (%ld, %ld)\n", i + 3, r, s);
+            flint_printf("Expected signature (%ld, %ld)\n", 0, (fmpz_poly_length(poly) - 1)/2);
+            abort();
+        }
+        
+        fmpz_poly_clear(poly);
+    }
+    
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");

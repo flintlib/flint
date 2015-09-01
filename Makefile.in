@@ -58,6 +58,7 @@ EXT_TUNE_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext
 EXT_PROF_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/profile/p-*.c)))
 EXT_OBJS = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), build/$(dir).lo))
 EXT_HEADERS = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/*.h))
+EXT_EXMP_SOURCES = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/examples/*.c))
 
 all: library
 
@@ -70,19 +71,22 @@ clean:
 	$(AT)$(foreach dir, $(BUILD_DIRS), BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) clean || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) clean || exit $$?;))
 	rm -rf test_helpers.o profiler.o
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS)
+	rm -f libflint.a
+	rm -f $(wildcard $(FLINT_LIBNAME)*)
 	rm -rf build
 
 distclean: clean
 	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
 
 dist:
-	git archive --format tar --prefix flint-2.4.5/ flint-2.4 > ../flint-2.4.5.tar; gzip ../flint-2.4.5.tar
+	git archive --format tar --prefix flint-2.5.2/ flint-2.5 > ../flint-2.5.2.tar; gzip ../flint-2.5.2.tar
+	git archive --format zip --prefix flint-2.5.2/ flint-2.5 > ../flint-2.5.2.zip 
 
 profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
 	mkdir -p build/profile
 ifndef MOD
-	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach prog, $(PROFS), $(CC) $(CFLAGS) -std=gnu99 $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir)/profile; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) profile || exit $$?;))
 else
@@ -95,9 +99,10 @@ tune: library $(TUNE_SOURCES) $(EXT_TUNE_SOURCES)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tune || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/tune; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tune || exit $$?;))
 
-examples: library $(EXMP_SOURCES)
+examples: library $(EXMP_SOURCES) $(EXT_EXMP_SOURCES) $(EXT_HEADERS)
 	mkdir -p build/examples
 	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach prog, $(patsubst $(ext)/examples/%.c, %, $(wildcard $(ext)/examples/*.c)), $(CC) $(CFLAGS) $(INCS) $(ext)/examples/$(prog).c -o build/examples/$(prog) $(LIBS) || exit $$?;))
 
 $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
@@ -109,6 +114,10 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) |
 	$(AT)if [ "$(WANT_NTL)" -ne "1" ]; then \
 	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
 	fi
+	-$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
+		$(LDCONFIG) -n "$(CURDIR)"; \
+	fi
+	ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME)"; \
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
@@ -166,7 +175,7 @@ endef
 check: library test_helpers.o
 ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
-	$(AT)$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+	$(AT)(BUILD_DIR=build; export BUILD_DIR; $(MAKE) -f Makefile.subdirs -C . check || exit$$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
 	mkdir -p build/interfaces/test
@@ -176,7 +185,7 @@ ifndef MOD
 	fi
 else
 	$(AT)$(foreach mod, $(MOD), $(call test_mod,$(mod)) || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(AT)$(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
 endif
 
 valgrind: library
@@ -191,7 +200,8 @@ install: library
 	mkdir -p "$(DESTDIR)$(PREFIX)/$(LIBDIR)"
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+	   cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
+	   cp -a $(shell ls $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
 	fi
 	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
@@ -226,13 +236,13 @@ build/interfaces:
 	mkdir -p build/interfaces
 
 build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@
+	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CXXFLAGS) $(INCS) -c $< -o $@
 
 build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) -c $< -o $@
 
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o
-	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS)
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS)
 
 print-%:
 	@echo '$*=$($*)'

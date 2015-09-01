@@ -26,6 +26,14 @@
 #ifndef FQ_ZECH_MAT_H
 #define FQ_ZECH_MAT_H
 
+#ifdef FQ_ZECH_MAT_INLINES_C
+#define FQ_MAT_TEMPLATES_INLINE FLINT_DLL
+#define FQ_ZECH_MAT_INLINE FLINT_DLL
+#else
+#define FQ_MAT_TEMPLATES_INLINE static __inline__
+#define FQ_ZECH_MAT_INLINE static __inline__
+#endif
+
 #include "fq_zech.h"
 #include "fq_zech_vec.h"
 
@@ -36,7 +44,8 @@
 /* Cutoff between classical and recursive LU decomposition */
 #define FQ_ZECH_MAT_LU_RECURSIVE_CUTOFF 4
 
-static __inline__ int FQ_ZECH_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_zech_ctx_t ctx)
+FQ_ZECH_MAT_INLINE
+int FQ_ZECH_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_zech_ctx_t ctx)
 {
     if (5 * FLINT_MIN(r, c) > 8 * fq_zech_ctx_degree(ctx) + 29)
         return 1;

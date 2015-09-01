@@ -45,7 +45,7 @@ nmod_mat_print_pretty(const nmod_mat_t mat)
 
     width = n_sizeinbase(mat->mod.n, 10);
 
-    flint_sprintf(fmt, "%%%dlu", width);
+    flint_sprintf(fmt, "%%%dwu", width);
 
     for (i = 0; i < mat->r; i++)
     {
@@ -61,3 +61,4 @@ nmod_mat_print_pretty(const nmod_mat_t mat)
         flint_printf("]\n");
     }
 }
+

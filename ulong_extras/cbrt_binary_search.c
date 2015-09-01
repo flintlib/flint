@@ -42,7 +42,7 @@ n_cbrt_binary_search(mp_limb_t x)
 #ifdef FLINT64
     upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #else
-    upper_limit = 1625;     /* log2(1625 ^ 3) < 32 */
+    upper_limit = 1625;     /* 1625 < (2^32)^(1/3) */
 #endif
 
     low = 0;

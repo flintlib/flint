@@ -29,6 +29,12 @@
 #ifndef ULONG_EXTRAS_H
 #define ULONG_EXTRAS_H
 
+#ifdef ULONG_EXTRAS_INLINES_C
+#define ULONG_EXTRAS_INLINE FLINT_DLL
+#else
+#define ULONG_EXTRAS_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 
@@ -101,7 +107,7 @@ FLINT_DLL void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b);
 
 FLINT_DLL void n_primes_jump_after(n_primes_t iter, mp_limb_t n);
 
-static __inline__ mp_limb_t
+ULONG_EXTRAS_INLINE mp_limb_t
 n_primes_next(n_primes_t iter)
 {
     if (iter->small_i < iter->small_num)
@@ -155,13 +161,13 @@ FLINT_DLL mp_limb_t n_flog(mp_limb_t n, mp_limb_t b);
 
 FLINT_DLL mp_limb_t n_clog(mp_limb_t n, mp_limb_t b);
 
-static __inline__ 
+ULONG_EXTRAS_INLINE 
 double n_precompute_inverse(mp_limb_t n)
 {
    return (double) 1 / (double) n;
 }
 
-static __inline__
+ULONG_EXTRAS_INLINE
 mp_limb_t n_preinvert_limb(mp_limb_t n)
 {
    mp_limb_t norm, ninv;
@@ -201,7 +207,7 @@ FLINT_DLL mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n,
 FLINT_DLL mp_limb_t n_powmod_precomp(mp_limb_t a, 
                      mp_limb_signed_t exp, mp_limb_t n, double npre);
 
-static __inline__
+ULONG_EXTRAS_INLINE
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 {
    double npre = n_precompute_inverse(n);
@@ -218,7 +224,7 @@ FLINT_DLL mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp,
 FLINT_DLL mp_limb_t n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
                                              mp_limb_t ninv, ulong norm);
 
-static __inline__
+ULONG_EXTRAS_INLINE
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 {
    mp_limb_t ninv = n_preinvert_limb(n);
@@ -226,19 +232,19 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
    return n_powmod2_preinv(a, exp, n, ninv);
 }
 
-static __inline__
+ULONG_EXTRAS_INLINE
 mp_limb_t n_addmod(mp_limb_t x, mp_limb_t y, mp_limb_t n)
 {
     return (n - y > x ? x + y : x + y - n);
 }
 
-static __inline__
+ULONG_EXTRAS_INLINE
 mp_limb_t n_submod(mp_limb_t x, mp_limb_t y, mp_limb_t n)
 {
     return (y > x ? x - y + n : x - y);
 }
 
-static __inline__
+ULONG_EXTRAS_INLINE
 mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 {
     return n_submod(0, x, n);
@@ -327,7 +333,7 @@ FLINT_DLL int n_remove(mp_limb_t * n, mp_limb_t p);
 
 FLINT_DLL int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre);
 
-static __inline__
+ULONG_EXTRAS_INLINE
 void n_factor_init(n_factor_t * factors)
 {
     factors->num = UWORD(0);

@@ -32,16 +32,27 @@
 
 void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
 {
-    fmpz_mod_poly_fit_length(poly, n + 1);
-
-    if (n + 1 > poly->length)
+    if (x == 0)
     {
-        flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
-        poly->length = n + 1;
-    }
+       if (n >= poly->length)
+          return;
 
-    fmpz_set_ui(poly->coeffs + n, x);
-    fmpz_mod(poly->coeffs + n, poly->coeffs + n, &(poly->p));
-    _fmpz_mod_poly_normalise(poly);
+       fmpz_zero(poly->coeffs + n);
+    } else
+    {
+        fmpz_mod_poly_fit_length(poly, n + 1);
+
+        if (n + 1 > poly->length)
+        {
+            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+            poly->length = n + 1;
+        }
+
+        fmpz_set_ui(poly->coeffs + n, x);
+        fmpz_mod(poly->coeffs + n, poly->coeffs + n, &(poly->p));
+    }
+    
+    if (n == poly->length - 1) 
+        _fmpz_mod_poly_normalise(poly); /* we may have set the leading coefficient to 0 */
 }
 

@@ -26,6 +26,12 @@
 #ifndef FMPZ_POLY_Q_H
 #define FMPZ_POLY_Q_H
 
+#ifdef FMPZ_POLY_Q_INLINES_C
+#define FMPZ_POLY_Q_INLINE FLINT_DLL
+#else
+#define FMPZ_POLY_Q_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -83,21 +89,21 @@ FLINT_DLL void fmpz_poly_q_set_si(fmpz_poly_q_t rop, slong op);
 
 FLINT_DLL void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2);
 
-static __inline__
+FMPZ_POLY_Q_INLINE
 void fmpz_poly_q_zero(fmpz_poly_q_t rop)
 {
     fmpz_poly_zero(rop->num);
     fmpz_poly_set_si(rop->den, 1);
 }
 
-static __inline__ 
+FMPZ_POLY_Q_INLINE
 void fmpz_poly_q_one(fmpz_poly_q_t rop)
 {
     fmpz_poly_set_si(rop->num, 1);
     fmpz_poly_set_si(rop->den, 1);
 }
 
-static __inline__ 
+FMPZ_POLY_Q_INLINE
 void fmpz_poly_q_neg(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
 {
     fmpz_poly_neg(rop->num, op->num);
@@ -108,19 +114,19 @@ FLINT_DLL void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 /* Comparison ****************************************************************/
 
-static __inline__ 
+FMPZ_POLY_Q_INLINE
 int fmpz_poly_q_is_zero(const fmpz_poly_q_t op)
 {
     return fmpz_poly_is_zero(op->num);
 }
 
-static __inline__ 
+FMPZ_POLY_Q_INLINE
 int fmpz_poly_q_is_one(const fmpz_poly_q_t op)
 {
     return fmpz_poly_is_one(op->num) && fmpz_poly_is_one(op->den);
 }
 
-static __inline__ 
+FMPZ_POLY_Q_INLINE
 int fmpz_poly_q_equal(const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 {
     return fmpz_poly_equal(op1->num, op2->num) && fmpz_poly_equal(op1->den, op2->den);

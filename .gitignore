@@ -17,3 +17,14 @@ doc/latex/flint-manual.*
 !doc/latex/flint-manual.tex
 doc/latex/input/*
 doc/latex/create_doc
+libflint*
+*.suo
+*.pyc
+/build.vc14/build_tests/arith/test/*.obj
+*.manifest
+*.obj
+*.log
+*.user
+*.tlog
+*.sdf
+build.vc12

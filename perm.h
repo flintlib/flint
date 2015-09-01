@@ -26,6 +26,12 @@
 #ifndef PERM_H
 #define PERM_H
 
+#ifdef PERM_INLINES_C
+#define PERM_INLINE FLINT_DLL
+#else
+#define PERM_INLINE static __inline__
+#endif
+
 #undef ulong
 #define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
@@ -42,7 +48,7 @@
 
 /* Memory management *********************************************************/
 
-static __inline__ slong * _perm_init(slong n)
+PERM_INLINE slong * _perm_init(slong n)
 {
     slong i, *vec;
 
@@ -60,14 +66,14 @@ static __inline__ slong * _perm_init(slong n)
     return vec;
 }
 
-static __inline__ void _perm_clear(slong * vec)
+PERM_INLINE void _perm_clear(slong * vec)
 {
     flint_free(vec);
 }
 
 /* Assignment ****************************************************************/
 
-static __inline__ slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
+PERM_INLINE slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
 {
     slong i;
 
@@ -78,7 +84,7 @@ static __inline__ slong _perm_equal(const slong *vec1, const slong *vec2, slong 
     return 1;
 }
 
-static __inline__ void _perm_set(slong *res, const slong *vec, slong n)
+PERM_INLINE void _perm_set(slong *res, const slong *vec, slong n)
 {
     slong i;
 
@@ -86,7 +92,7 @@ static __inline__ void _perm_set(slong *res, const slong *vec, slong n)
         res[i] = vec[i];
 }
 
-static __inline__ void _perm_set_one(slong *vec, slong n)
+PERM_INLINE void _perm_set_one(slong *vec, slong n)
 {
     slong i;
 
@@ -94,7 +100,7 @@ static __inline__ void _perm_set_one(slong *vec, slong n)
         vec[i] = i;
 }
 
-static __inline__ void
+PERM_INLINE void
  _perm_inv(slong *res, const slong *vec, slong n)
 {
     slong i;
@@ -125,7 +131,7 @@ static __inline__ void
 
 /* Composition ***************************************************************/
 
-static __inline__ void
+PERM_INLINE void
 _perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 {
     slong i;
@@ -158,7 +164,7 @@ FLINT_DLL int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 
-static __inline__  int _long_vec_print(const slong * vec, slong len)
+PERM_INLINE  int _long_vec_print(const slong * vec, slong len)
 {
     slong i;
 
@@ -173,7 +179,7 @@ static __inline__  int _long_vec_print(const slong * vec, slong len)
     return 1;
 }
 
-static __inline__ int _perm_print(const slong * vec, slong n)
+PERM_INLINE int _perm_print(const slong * vec, slong n)
 {
     slong i;
 

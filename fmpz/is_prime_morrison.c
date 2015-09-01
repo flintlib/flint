@@ -162,7 +162,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
    /* Want D = A^2 - 4B where A = a, B = b, such that (D/n) = -1 */
    for (b = 1; ; b++)
    {
-      fmpz_set_si(B, b);
+      fmpz_set_ui(B, b);
       fmpz_gcd(g, B, n);
 
       if (fmpz_equal(g, n)) /* need gcd(n, b) = 1 */

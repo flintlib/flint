@@ -48,7 +48,7 @@ main(void)
     
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 13; depth++)
+    for (depth = 6; depth <= 12; depth++)
     {
         for (w = 1; w <= 3 - (depth >= 12); w++)
         {

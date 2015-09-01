@@ -53,7 +53,7 @@ main(void)
 
         for (j = 0; j < rows; j++)
             for (k = 0; k < cols; k++)
-                mpf_set_ui(a->rows[j] + k, 0);
+                flint_mpf_set_ui(a->rows[j] + k, 0);
 
         mpf_mat_clear(a);
     }

@@ -1306,21 +1306,31 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
     modulus of \code{poly}. The value~\code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
 
-_nmod_poly_evaluate_mat(nmod_mat_t dest, const mp_srcptr poly, slong len,
+void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly,
 						const nmod_mat_t c)
 
     Evaluates \code{poly} with matrix as an argument at the value \code{c}
-    and reduces modulus of \code{c}.\code{dest} and \code{c} should have
-    same dimension and modulus. \code{dest} and \code{c} cannot be aliased.
-    The algorithm used is Horner's method.
+    and stores the result in \code{dest}. The dimension and modulus of
+    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
+    \code{c} may be aliased. Horner's Method is used to compute the result.
 
-nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
-						const nmod_mat_t c)
+void nmod_poly_evaluate_mat_paterson_stockmeyer(nmod_mat_t dest,
+                        const nmod_poly_t poly, const nmod_mat_t c)
 
     Evaluates \code{poly} with matrix as an argument at the value \code{c}
-    and reduces modulus of \code{c}. \code{dest} and \code{c} should have
-    same dimension and modulus. \code{dest} and \code{c} may be aliased.
-    The algorithm used is Horner's method.
+    and stores the result in \code{dest}. The dimension and modulus of
+    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
+    \code{c} may be aliased. Paterson-Stockmeyer algorithm is used to compute
+    the result. The algorithm is described in \cite{Paterson1973}.
+
+void nmod_poly_evaluate_mat(nmod_mat_t dest, const nmod_poly_t poly,
+                        const nmod_mat_t c)
+
+    Evaluates \code{poly} with matrix as an argument at the value \code{c}
+    and stores the result in \code{dest}. The dimension and modulus of
+    \code{dest} is assumed to be same as that of \code{c}. \code{dest} and 
+    \code{c} may be aliased. This function automatically switches between
+    Horner's method and the Paterson-Stockmeyer algorithm.
 
 *******************************************************************************
 

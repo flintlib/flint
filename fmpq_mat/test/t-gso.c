@@ -74,14 +74,17 @@ main(void)
             for (k = j + 1; k < n; k++)
             {
 
-                _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
-
-                if (!fmpq_is_zero(dot))
+                if (m)
                 {
-                    flint_printf("FAIL:\n");
-                    flint_printf("A:\n");
-                    fmpq_mat_print(A);
-                    abort();
+                   _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
+
+                   if (!fmpq_is_zero(dot))
+                   {
+                       flint_printf("FAIL:\n");
+                       flint_printf("A:\n");
+                       fmpq_mat_print(A);
+                       abort();
+                   }
                 }
             }
         }

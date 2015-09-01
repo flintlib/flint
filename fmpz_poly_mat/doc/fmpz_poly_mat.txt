@@ -65,7 +65,7 @@ slong fmpz_poly_mat_ncols(const fmpz_poly_mat_t mat)
 
 *******************************************************************************
 
-MACRO fmpz_poly_mat_entry(mat,i,j)
+fmpz_poly_struct * fmpz_poly_mat_entry(fmpz_poly_mat_t mat, slong i, slong j)
 
     Gives a reference to the entry at row \code{i} and column \code{j}.
     The reference can be passed as an input or output variable to any

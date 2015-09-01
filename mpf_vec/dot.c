@@ -33,7 +33,7 @@ _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2)
     mpf_t tmp;
     mpf_init(tmp);
 
-    mpf_set_ui(res, 0);
+    flint_mpf_set_ui(res, 0);
     for (i = 0; i < len2; i++)
     {
         mpf_mul(tmp, vec1 + i, vec2 + i);

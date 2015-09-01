@@ -44,7 +44,7 @@ n_cbrt_newton_iteration(mp_limb_t n)
 #ifdef FLINT64
     const mp_limb_t upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
 #else
-    const mp_limb_t  upper_limit = 1625;    /* 1626 < (2^32)^(1/3) */
+    const mp_limb_t  upper_limit = 1625;    /* 1625 < (2^32)^(1/3) */
 #endif
     
     val = (double)n;

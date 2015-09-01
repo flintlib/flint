@@ -50,7 +50,7 @@ main(void)
         fmpz_init(x);
         fmpz_init(y);
         mpz_init(z);
-        mpf_inits(a, b, tmp, '\0');
+        mpf_inits(a, b, tmp, NULL);
 
         fmpz_randtest(x, state, 200);
         fmpz_get_mpz(z, x);
@@ -93,7 +93,7 @@ main(void)
         fmpz_clear(x);
         fmpz_clear(y);
         mpz_clear(z);
-        mpf_clears(a, b, tmp, '\0');
+        mpf_clears(a, b, tmp, NULL);
     }
 
     FLINT_TEST_CLEANUP(state);

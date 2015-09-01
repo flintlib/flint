@@ -42,7 +42,7 @@ int main(void)
 #if FLINT64
    upper_limit = 2642245;
 #else
-   upper_limit = 1626;
+   upper_limit = 1625;
 #endif
 
     /* random n and root */
@@ -180,6 +180,11 @@ int main(void)
             flint_printf("Expected answer : base = %wu remainder = %wu", val, j);
             abort();
         }
+
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
+        mpz_clear(h);
     }
 
     FLINT_TEST_CLEANUP(state);

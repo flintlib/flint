@@ -26,6 +26,14 @@
 #ifndef FQ_NMOD_MAT_H
 #define FQ_NMOD_MAT_H
 
+#ifdef FQ_NMOD_MAT_INLINES_C
+#define FQ_MAT_TEMPLATES_INLINE FLINT_DLL
+#define FQ_NMOD_MAT_INLINE FLINT_DLL
+#else
+#define FQ_MAT_TEMPLATES_INLINE static __inline__
+#define FQ_NMOD_MAT_INLINE static __inline__
+#endif
+
 #include "fq_nmod.h"
 #include "fq_nmod_vec.h"
 
@@ -36,7 +44,8 @@
 /* Cutoff between classical and recursive LU decomposition */
 #define FQ_NMOD_MAT_LU_RECURSIVE_CUTOFF 4
 
-static __inline__ int FQ_NMOD_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_nmod_ctx_t ctx)
+FQ_NMOD_MAT_INLINE
+int FQ_NMOD_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_nmod_ctx_t ctx)
 {
     if (FLINT_MIN(r, c) > fq_nmod_ctx_degree(ctx) / 20 + 6)
         return 1;

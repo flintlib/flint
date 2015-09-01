@@ -90,11 +90,15 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f);
 FMPZ_INLINE
 void _fmpz_demote(fmpz_t f)
 {
+    /* 
+       warning, if fmpz_demote changes, fmpz_zero must
+       also be changed to match
+    */
     if (COEFF_IS_MPZ(*f)) 
     {
         _fmpz_clear_mpz(*f);
         (*f) = WORD(0);
-	}
+    }
 }
 
 FLINT_DLL void _fmpz_demote_val(fmpz_t f);
@@ -301,8 +305,9 @@ FLINT_DLL int fmpz_fits_si(const fmpz_t f);
 FMPZ_INLINE
 void fmpz_zero(fmpz_t f)
 {
-   _fmpz_demote(f);	
-   (*f) = WORD(0);
+   if (COEFF_IS_MPZ(*f))
+      _fmpz_clear_mpz(*f);
+   *f = WORD(0);
 }
 
 FMPZ_INLINE 
@@ -767,12 +772,6 @@ FLINT_DLL void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 FLINT_DLL int fmpz_moebius_mu(const fmpz_t n);
 
 FLINT_DLL void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
-
-/* Orthogonal polynomials */
-
-FLINT_DLL void fmpz_chebyshev_t(fmpz_t y, ulong n, const fmpz_t x);
-
-FLINT_DLL void fmpz_chebyshev_u(fmpz_t y, ulong n, const fmpz_t x);
 
 #ifdef __cplusplus
 }

@@ -26,6 +26,12 @@
 #ifndef D_VEC_H
 #define D_VEC_H
 
+#ifdef D_VEC_INLINES_C
+#define D_VEC_INLINE FLINT_DLL
+#else
+#define D_VEC_INLINE static __inline__
+#endif
+
 #include <math.h>
 #include "double_extras.h"
 #include "flint.h"

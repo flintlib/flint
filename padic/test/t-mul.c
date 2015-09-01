@@ -298,6 +298,7 @@ main(void)
 
         padic_clear(a);
         padic_clear(b);
+        padic_clear(c);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);

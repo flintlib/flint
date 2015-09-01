@@ -34,14 +34,16 @@ TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
 		                            const TEMPLATE(T, mat_t) mat2,
 		                            const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i, j;
+    slong i;
     slong r1 = mat1->r;
     slong c1 = mat1->c;
     slong c2 = mat2->c;
 
    for (i = 0; i < r1; i++) {
-       _TEMPLATE(T, vec_set) (res->rows[i], mat1->rows[i], c1, ctx);
-       _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
+       if (c1 > 0)
+          _TEMPLATE(T, vec_set) (res->rows[i], mat1->rows[i], c1, ctx);
+       if (c2 > 0)
+          _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
    }
 }
 

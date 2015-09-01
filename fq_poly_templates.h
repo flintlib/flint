@@ -71,7 +71,7 @@ FLINT_DLL void _TEMPLATE(T, poly_normalise)(TEMPLATE(T, poly_t) poly,
 FLINT_DLL void _TEMPLATE(T, poly_normalise2)(TEMPLATE(T, struct) *poly, slong *length,
                               const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
                               const TEMPLATE(T, ctx_t) ctx)
 {
@@ -87,21 +87,21 @@ _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
 
 /*  Polynomial parameters  ***************************************************/
 
-FQ_POLY_INLINE slong
+FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_length)(const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length;
 }
 
-FQ_POLY_INLINE slong
+FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_degree)(const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length - 1;
 }
 
-FQ_POLY_INLINE TEMPLATE(T, struct) *
+FQ_POLY_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, poly_lead)(const TEMPLATE(T, poly_t) poly,
                        const TEMPLATE(T, ctx_t) ctx)
 {
@@ -138,7 +138,7 @@ FLINT_DLL void TEMPLATE3(T, poly_set, T)(TEMPLATE(T, poly_t) poly, const TEMPLAT
 FLINT_DLL void TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
                        const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len,
                         const TEMPLATE(T, ctx_t) ctx)
 {
@@ -148,7 +148,7 @@ _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len,
         TEMPLATE(T, zero)(rop + i, ctx);
 }
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_zero)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
 {
     _TEMPLATE(T, poly_set_length)(poly, 0, ctx);
@@ -194,7 +194,7 @@ FLINT_DLL void TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, slong n,
                                  const TEMPLATE(T, t) x,
                                  const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE void 
+FQ_POLY_TEMPLATES_INLINE void 
 TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, slong n,
                                  const fmpz_t x, const TEMPLATE(T, ctx_t) ctx)
 {
@@ -207,7 +207,7 @@ TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, slong n,
     _TEMPLATE(T, poly_normalise)(poly, ctx);
 }
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_gen)(const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx)
 {
@@ -226,28 +226,28 @@ FLINT_DLL int TEMPLATE(T, poly_equal_trunc)(const TEMPLATE(T, poly_t) poly1,
                             const TEMPLATE(T, poly_t) poly2,
                             slong n, const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
                           const TEMPLATE(T, ctx_t) ctx)
 {
     return (poly->length == 0);
 }
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_one)(const TEMPLATE(T, poly_t) op,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     return (op->length == 1) && (TEMPLATE(T, is_one)(op->coeffs + 0, ctx));
 }
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_unit)(const TEMPLATE(T, poly_t) op,
                           const TEMPLATE(T, ctx_t) ctx)
 {
     return (op->length == 1) && (!(TEMPLATE(T, is_zero)(op->coeffs + 0, ctx)));
 }
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE3(T, poly_equal, T)(const TEMPLATE(T, poly_t) poly,
                             const TEMPLATE(T, t) c,
                             const TEMPLATE(T, ctx_t) ctx)
@@ -706,7 +706,7 @@ FLINT_DLL void TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, poly_t) G,
                                  const TEMPLATE(T, poly_t) B,
                                  const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE slong
+FQ_POLY_TEMPLATES_INLINE slong
 _TEMPLATE(T, poly_xgcd)(TEMPLATE(T, struct) *G,
                         TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T,
                         const TEMPLATE(T, struct) *A, slong lenA,
@@ -719,7 +719,7 @@ _TEMPLATE(T, poly_xgcd)(TEMPLATE(T, struct) *G,
 }
 
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_xgcd)(TEMPLATE(T, poly_t) G,
                        TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
                        const TEMPLATE(T, poly_t) A,
@@ -780,7 +780,7 @@ FLINT_DLL void TEMPLATE(T, poly_divrem_divconquer)(TEMPLATE(T, poly_t) Q,
                                     const TEMPLATE(T, poly_t) B,
                                     const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_divrem)(TEMPLATE(T, struct) *Q, TEMPLATE(T, struct) *R,
                           const TEMPLATE(T, struct) *A, slong lenA,
                           const TEMPLATE(T, struct) *B, slong lenB,
@@ -790,7 +790,7 @@ _TEMPLATE(T, poly_divrem)(TEMPLATE(T, struct) *Q, TEMPLATE(T, struct) *R,
     _TEMPLATE(T, poly_divrem_divconquer)(Q, R, A, lenA, B, lenB, invB, ctx);
 }
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_divrem)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
                          const TEMPLATE(T, poly_t) A,
                          const TEMPLATE(T, poly_t) B,
@@ -799,7 +799,7 @@ TEMPLATE(T, poly_divrem)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
     TEMPLATE(T, poly_divrem_divconquer)(Q, R, A, B, ctx);
 }
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R,
                        const TEMPLATE(T, struct) *A, slong lenA,
                        const TEMPLATE(T, struct) *B, slong lenB,
@@ -826,7 +826,7 @@ _TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R,
 
 
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_rem)(TEMPLATE(T, poly_t) R,
                       const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
                       const TEMPLATE(T, ctx_t) ctx)
@@ -846,7 +846,7 @@ FLINT_DLL void TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, poly_t) Qinv,
                                     const TEMPLATE(T, poly_t) Q, slong n,
                                     const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 _TEMPLATE(T, poly_inv_series)(TEMPLATE(T, struct) * Qinv,
                                      const TEMPLATE(T, struct) * Q, slong n,
                                      const TEMPLATE(T, t) cinv,
@@ -855,7 +855,7 @@ _TEMPLATE(T, poly_inv_series)(TEMPLATE(T, struct) * Qinv,
    _TEMPLATE(T, poly_inv_series_newton) (Qinv, Q, n, cinv, ctx);
 }
 
-FQ_POLY_INLINE void
+FQ_POLY_TEMPLATES_INLINE void
 TEMPLATE(T, poly_inv_series)(TEMPLATE(T, poly_t) Qinv,
                                     const TEMPLATE(T, poly_t) Q, slong n,
                                     const TEMPLATE(T, ctx_t) ctx)
@@ -1163,14 +1163,14 @@ FLINT_DLL int TEMPLATE(T, poly_fprint)(FILE * file,
                          const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 _TEMPLATE(T, poly_print)(const TEMPLATE(T, struct) *poly, slong len,
                          const TEMPLATE(T, ctx_t) ctx)
 {
     return _TEMPLATE(T, poly_fprint)(stdout, poly, len, ctx);
 }
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly,
                         const TEMPLATE(T, ctx_t) ctx)
 {
@@ -1178,14 +1178,14 @@ TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly,
 }
 
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 _TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, slong len,
                                 const char *x, const TEMPLATE(T, ctx_t) ctx)
 {
     return _TEMPLATE(T, poly_fprint_pretty)(stdout, poly, len, x, ctx);
 }
 
-FQ_POLY_INLINE int
+FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly,
                                const char *x,
                                const TEMPLATE(T, ctx_t) ctx)

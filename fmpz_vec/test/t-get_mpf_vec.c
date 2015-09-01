@@ -48,7 +48,7 @@ main(void)
         int result;
         fmpz *a;
         mpf *d1, *d2;
-        slong bits, j, len;
+        slong bits, len;
 
         len = n_randint(state, 100);
 

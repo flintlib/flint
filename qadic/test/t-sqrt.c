@@ -136,6 +136,7 @@ int main(void)
 
         qadic_clear(a);
         qadic_clear(b);
+        qadic_clear(c);
 
         qadic_ctx_clear(ctx);
     }
@@ -284,7 +285,6 @@ int main(void)
         qadic_init2(b, N);
         qadic_init2(c, N);
 
-
         qadic_randtest_val(b, state, 0, ctx);
         qadic_randtest_int(b, state, ctx);
         qadic_mul(a, b, b, ctx);
@@ -320,6 +320,9 @@ int main(void)
 
             qadic_clear(d);
             qadic_clear(e);
+            qadic_clear(u);
+            qadic_clear(v);
+            qadic_clear(w);
         }
         else
         {
@@ -341,7 +344,6 @@ int main(void)
         qadic_clear(b);
         qadic_clear(c);
 
-        fmpz_clear(p);
         qadic_ctx_clear(ctx);
     }
 
@@ -397,7 +399,6 @@ int main(void)
         qadic_clear(a);
         qadic_clear(b);
 
-        fmpz_clear(p);
         qadic_ctx_clear(ctx);
     }
 
@@ -445,6 +446,7 @@ int main(void)
 
         qadic_clear(a);
         qadic_clear(b);
+        qadic_clear(c);
 
         fmpz_clear(p);
         qadic_ctx_clear(ctx);

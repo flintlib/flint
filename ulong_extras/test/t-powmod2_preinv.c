@@ -37,8 +37,6 @@ int main(void)
    flint_printf("powmod2_preinv....");
    fflush(stdout);
 
-   
-
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, d, r1, r2, dinv;
@@ -81,6 +79,25 @@ int main(void)
       mpz_clear(a_m);
       mpz_clear(d_m);
       mpz_clear(r2_m);
+   }
+
+   /* check 0^0 = 1 */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+   {
+      mp_limb_t d, r, dinv;
+      
+      d = n_randtest_not_zero(state);
+      
+      dinv = n_preinvert_limb(d);
+      r = n_powmod2_preinv(0, 0, d, dinv);
+
+      result = (r == 1 || (d == 1 && r == 0));
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("0^0 != 1 mod %wd\n", d);
+         abort();
+      }
    }
 
    FLINT_TEST_CLEANUP(state);
