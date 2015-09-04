@@ -241,7 +241,7 @@ struct matrix_traits<nmod_matxx>
     }
     template<class M> static slong cols(const M& m)
     {
-        return nmod_mat_cols(m._mat());
+        return nmod_mat_ncols(m._mat());
     }
 
     template<class M> static nmodxx_srcref at(const M& m, slong i, slong j)

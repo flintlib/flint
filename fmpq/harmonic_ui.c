@@ -119,7 +119,7 @@ def harmonic(n):
 static void
 harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
 {
-    mp_limb_t p, q, r, s, t, u, v, w;
+    mp_limb_t p, q, r, s, t, u, v, w = 0;
     slong k;
 
     fmpz_zero(P);

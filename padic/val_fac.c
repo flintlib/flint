@@ -83,5 +83,8 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
     while (!fmpz_is_zero(t));
 
     fmpz_swap(rop, s);
+
+    fmpz_clear(s);
+    fmpz_clear(t);
 }
 

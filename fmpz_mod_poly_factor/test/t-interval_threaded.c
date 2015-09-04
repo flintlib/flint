@@ -49,6 +49,8 @@ main(void)
     flint_printf("interval_threaded....");
     fflush(stdout);
 
+#if HAVE_PTHREAD && (HAVE_TLS || FLINT_REENTRANT)
+
     /* no aliasing */
     for (i = 0; i < 2000; i++)
     {
@@ -157,4 +159,15 @@ main(void)
     
     flint_printf("PASS\n");
     return 0;
+
+#else
+
+   FLINT_TEST_CLEANUP(state);
+
+   flint_printf("SKIPPED\n");
+   return 0;
+
+#endif
+
 }
+

@@ -52,7 +52,7 @@ _fmpz_poly_revert_series_newton(fmpz * Qinv,
     _fmpz_vec_zero(Qinv + k, n - k);
     FLINT_NEWTON_END_BASECASE
 
-    FLINT_NEWTON_LOOP(k0, k)
+    FLINT_NEWTON_LOOP(FLINT_UNUSED(k0), k)
     _fmpz_poly_compose_series(T, Q, FLINT_MIN(Qlen, k), Qinv, k, k);
     _fmpz_poly_derivative(U, T, k); fmpz_zero(U + k - 1);
     fmpz_zero(T + 1);

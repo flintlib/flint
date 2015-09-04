@@ -63,8 +63,8 @@
 
 #define __FLINT_VERSION 2
 #define __FLINT_VERSION_MINOR 5 
-#define __FLINT_VERSION_PATCHLEVEL 0
-#define FLINT_VERSION "2.5.0"
+#define __FLINT_VERSION_PATCHLEVEL 2 
+#define FLINT_VERSION "2.5.2"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
@@ -220,6 +220,12 @@ typedef __mpfr_struct mpfr;
 #define FLINT_ASSERT(param) assert(param)
 #else 
 #define FLINT_ASSERT(param)
+#endif
+
+#if defined(__GNUC__)
+#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#else
+#define FLINT_UNUSED(x) x
 #endif
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))

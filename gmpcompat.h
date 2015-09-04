@@ -537,6 +537,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+static __inline__
 void flint_mpf_set_ui(mpf_ptr f, ulong val)
 {
   mp_size_t size;
@@ -623,6 +624,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+static __inline__
 int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
 {
   mp_srcptr up;
@@ -649,7 +651,7 @@ int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
   ulimb = up[usize - 1];
   usize--;
 
-  f (ulimb > vval)
+  if (ulimb > vval)
     return 1;
   else if (ulimb < vval)
     return -1;
@@ -687,8 +689,8 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-int
-flint_mpf_fits_slong_p(mpf_srcptr f)
+static __inline__
+int flint_mpf_fits_slong_p(mpf_srcptr f)
 {
   mp_size_t  fs, fn;
   mp_srcptr  fp;
