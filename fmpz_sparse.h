@@ -718,15 +718,12 @@ FLINT_DLL void fmpz_sparse_rem_dense(fmpz_poly_t R, fmpz_sparse_t A, fmpz_poly_t
 FLINT_DLL void fmpz_sparse_rem_cyc(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t e);
 
-/* FIXME rename */
 FLINT_DLL void fmpz_sparse_rem_cyc_dense(fmpz_poly_t res,
     const fmpz_sparse_t poly, ulong e);
 
-/* FIXME rename */
 FLINT_DLL void fmpz_sparse_rem_cyc_nmod(nmod_poly_t res,
     const fmpz_sparse_t poly, ulong e, ulong q);
 
-/* FIXME rename */
 FLINT_DLL void fmpz_sparse_rem_cyc_mod_diverse(nmod_poly_t res,
     const fmpz_sparse_t poly, ulong a, ulong e, ulong q);
 
