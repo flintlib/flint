@@ -28,7 +28,7 @@
 int fmpz_sparse_fprint(FILE * file, const fmpz_sparse_t poly)
 {
     slong i;
-    if (flint_fprintf(file, "%wd", poly->length) <= 0) return -1;
+    if (flint_fprintf(file, "%wd ", poly->length) <= 0) return -1;
     for (i=0; i<poly->length; ++i) {
         fputc(' ', file);
         if (fmpz_fprint(file, poly->coeffs+i) <= 0) return -1;

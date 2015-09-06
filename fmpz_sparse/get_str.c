@@ -42,7 +42,7 @@ char * fmpz_sparse_get_str(const fmpz_sparse_t poly)
         return str;
     }
 
-    bound = (slong) (ceil(log10((double) (poly->length + 1)))) + 2;
+    bound = (slong) (ceil(log10((double) (poly->length + 1)))) + 3;
     for (i=0, cptr=poly->coeffs, eptr=poly->expons; i<poly->length; 
          ++i, ++cptr, ++eptr)
     {
@@ -53,7 +53,7 @@ char * fmpz_sparse_get_str(const fmpz_sparse_t poly)
     strbase = (char*) flint_malloc(bound * sizeof(char));
     str = strbase;
 
-    str += flint_sprintf(str, "%wd", poly->length);
+    str += flint_sprintf(str, "%wd ", poly->length);
     for (i=0, cptr=poly->coeffs, eptr=poly->expons; i<poly->length; 
          ++i, ++cptr, ++eptr)
     {
