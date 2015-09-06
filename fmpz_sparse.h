@@ -200,7 +200,6 @@ void fmpz_sparse_set_si_si(fmpz_sparse_t poly,
 FLINT_DLL void fmpz_sparse_set_fmpz_poly(fmpz_sparse_t poly1, 
     const fmpz_poly_t poly2);
 
-/* FIXME rename fmpz_sparse_get_dense */
 FLINT_DLL void fmpz_sparse_get_fmpz_poly(fmpz_poly_t out, 
     const fmpz_sparse_t in);
 
@@ -208,6 +207,7 @@ FLINT_DLL int fmpz_sparse_set_str(fmpz_sparse_t poly, const char * str);
 
 FLINT_DLL char * fmpz_sparse_get_str(const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL char * fmpz_sparse_get_str_pretty(const fmpz_sparse_t poly, const char * x);
 
 FMPZ_SPARSE_INLINE
@@ -249,26 +249,30 @@ FLINT_DLL void fmpz_sparse_randtest_not_zero(fmpz_sparse_t res,
 
 /*  Getting and setting coefficients  ****************************************/
 
-/* // FIXME */
 /* FIXME */
 FLINT_DLL slong fmpz_sparse_get_coeff_si_si(const fmpz_sparse_t poly, 
     slong e);
 
+/* FIXME */
 FLINT_DLL slong fmpz_sparse_get_coeff_si_fmpz(const fmpz_sparse_t poly, 
     const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_get_coeff_fmpz_si(fmpz_t res,
     const fmpz_sparse_t poly, slong e);
 
 FLINT_DLL void fmpz_sparse_get_coeff(fmpz_t res,
     const fmpz_sparse_t poly, const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_set_coeff_si_si(fmpz_sparse_t poly, 
     slong c, slong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_set_coeff_si_fmpz(fmpz_sparse_t poly, 
     slong c, const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_set_coeff_fmpz_si(fmpz_sparse_t poly, 
     const fmpz_t c, slong e);
 
@@ -278,6 +282,7 @@ FLINT_DLL void fmpz_sparse_set_coeff(fmpz_sparse_t poly,
 /* FIXME */
 FLINT_DLL fmpz* fmpz_sparse_get_coeff_ptr(fmpz_sparse_t poly, const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL fmpz* fmpz_sparse_get_coeff_ptr_si(fmpz_sparse_t poly, slong e);
 
 FMPZ_SPARSE_INLINE 
@@ -427,55 +432,65 @@ FLINT_DLL void fmpz_sparse_neg(fmpz_sparse_t res, const fmpz_sparse_t poly);
 
 /*  Scalar multiplication and division  **************************************/
 
-/* // FIXME */
 /* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_mul_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_mul(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_addmul(fmpz_sparse_t poly1,
     const fmpz_sparse_t poly2, const fmpz_t c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_submul(fmpz_sparse_t poly1,
     const fmpz_sparse_t poly2, const fmpz_t c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_fdiv_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_fdiv(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_tdiv_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_tdiv(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_mul_2exp(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong exp);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_fdiv_2exp(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong exp);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_tdiv_2exp(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong exp);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_mod(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_scalar_smod(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c);
 
 /*  Bit packing  *************************************************************/
 
-/* // FIXME */
 /* FIXME */
-
 FLINT_DLL void fmpz_sparse_bit_pack(fmpz_t res,
     const fmpz_sparse_t poly, mp_bitcnt_t bit_size);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bit_unpack(fmpz_sparse_t res,
     const fmpz_t f, mp_bitcnt_t bit_size);
 
@@ -511,20 +526,23 @@ void fmpz_sparse_sqr(fmpz_sparse_t res, const fmpz_sparse_t poly)
 
 /*  Powering  ****************************************************************/
 
-/* // FIXME */
 /* FIXME */
 FLINT_DLL void fmpz_sparse_pow_recurrence(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_pow_binomial(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_pow_binexp(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_pow(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_pow_trunc(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong e, const fmpz_t n);
 
@@ -564,29 +582,35 @@ FLINT_DLL void _fmpz_sparse_append(fmpz_sparse_t poly1,
 
 /*  Monomial multiplication and division *************************************/
 
-/* // FIXME */
 /* FIXME */
 FLINT_DLL void fmpz_sparse_mon_mul_si_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c, slong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_mul_si_fmpz(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c, const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_mul_fmpz_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c, slong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_mul_fmpz_fmpz(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c, const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_fdiv_si_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c, slong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_fdiv_si_fmpz(fmpz_sparse_t res,
     const fmpz_sparse_t poly, slong c, const fmpz_t e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_fdiv_fmpz_si(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c, slong e);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_mon_fdiv_fmpz_fmpz(fmpz_sparse_t res,
     const fmpz_sparse_t poly, const fmpz_t c, const fmpz_t e);
 
@@ -661,6 +685,7 @@ void fmpz_sparse_rem(fmpz_sparse_t R, fmpz_sparse_t A, fmpz_sparse_t B)
     fmpz_sparse_clear(temp);
 }
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_divrem_dense(fmpz_sparse_t Q, fmpz_poly_t R,
     const fmpz_sparse_t A, const fmpz_poly_t B);
 
@@ -713,7 +738,8 @@ void fmpz_sparse_gcd(fmpz_sparse_t res,
     fmpz_sparse_clear(t);
 }
 
-FLINT_DLL void fmpz_sparse_lcm(fmpz_sparse_t res, 
+FMPZ_SPARSE_INLINE 
+void fmpz_sparse_lcm(fmpz_sparse_t res, 
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
 {
     /* TODO better efficiency */
@@ -732,43 +758,55 @@ FLINT_DLL void fmpz_sparse_primitive_part(fmpz_sparse_t res, const fmpz_sparse_t
 
 /*  Sparse interpolation ****************************************************/
 
-/* // FIXME */
 /* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_init(fmpz_sparse_bp_interp_t res,
     slong terms, const fmpz_t height, const fmpz_t degree);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_clear(fmpz_sparse_bp_interp_t res);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_eval(fmpz_sparse_bp_interp_t res,
     const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_mul(fmpz_sparse_bp_interp_t res,
     const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_add(fmpz_sparse_bp_interp_t res,
     const fmpz_t c, const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_pow(fmpz_sparse_bp_interp_t res, ulong pow);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp(fmpz_sparse_t res,
     const fmpz_sparse_bp_interp_t evals);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp_init(fmpz_sparse_sp_interp_t res,
     slong terms, const fmpz_t height, const fmpz_t degree);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp_clear(fmpz_sparse_sp_interp_t res);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp_eval(fmpz_sparse_sp_interp_t res,
     const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp_mul(fmpz_sparse_sp_interp_t res,
     const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp_add(fmpz_sparse_sp_interp_t res,
     const fmpz_t c, const fmpz_sparse_t poly);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp_pow(fmpz_sparse_sp_interp_t res, ulong pow);
 
+/* FIXME */
 FLINT_DLL void fmpz_sparse_sp_interp(fmpz_sparse_t res,
     const fmpz_sparse_sp_interp_t evals);
 
