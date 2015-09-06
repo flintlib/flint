@@ -499,9 +499,13 @@ FLINT_DLL void fmpz_sparse_bit_unpack(fmpz_sparse_t res,
 FLINT_DLL void fmpz_sparse_mul_classical(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
-/* FIXME */
-FLINT_DLL void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+FMPZ_SPARSE_INLINE
+void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
+    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
+{
+    /* FIXME this is just a placeholder! */
+    fmpz_sparse_mul_classical(res, poly1, poly2);
+}
 
 /* FIXME */
 FLINT_DLL void fmpz_sparse_mul_interp(fmpz_sparse_t res,
@@ -660,9 +664,13 @@ void fmpz_sparse_height(fmpz_t res, const fmpz_sparse_t poly)
 
 /*  Euclidean division  ******************************************************/
 
-/* FIXME */
-FLINT_DLL void fmpz_sparse_divrem(fmpz_sparse_t Q, fmpz_sparse_t R,
-    const fmpz_sparse_t A, const fmpz_sparse_t B);
+FMPZ_SPARSE_INLINE
+void fmpz_sparse_divrem(fmpz_sparse_t Q, fmpz_sparse_t R,
+    const fmpz_sparse_t A, const fmpz_sparse_t B)
+{
+    FLINT_ASSERT(false);
+    /* FIXME this is just a placeholder! */
+}
 
 FMPZ_SPARSE_INLINE
 void fmpz_sparse_div(fmpz_sparse_t Q, 
@@ -685,9 +693,13 @@ void fmpz_sparse_rem(fmpz_sparse_t R, fmpz_sparse_t A, fmpz_sparse_t B)
     fmpz_sparse_clear(temp);
 }
 
-/* FIXME */
-FLINT_DLL void fmpz_sparse_divrem_dense(fmpz_sparse_t Q, fmpz_poly_t R,
-    const fmpz_sparse_t A, const fmpz_poly_t B);
+FMPZ_SPARSE_INLINE
+void fmpz_sparse_divrem_dense(fmpz_sparse_t Q, fmpz_poly_t R,
+    const fmpz_sparse_t A, const fmpz_poly_t B)
+{
+    /* FIXME this is just a placeholder! */
+    FLINT_ASSERT(false);
+}
 
 FMPZ_SPARSE_INLINE
 void fmpz_sparse_div_dense(fmpz_sparse_t Q, fmpz_sparse_t A, fmpz_poly_t B)
@@ -720,10 +732,14 @@ FLINT_DLL void fmpz_sparse_rem_cyc_mod_diverse(nmod_poly_t res,
 
 /*  Greatest common divisor  *************************************************/
 
-/* FIXME */
-FLINT_DLL void fmpz_sparse_xgcd(fmpz_sparse_t r, 
+FMPZ_SPARSE_INLINE
+void fmpz_sparse_xgcd(fmpz_sparse_t r, 
     fmpz_sparse_t s, fmpz_sparse_t t,
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
+{
+    /* FIXME this is just a placeholder! */
+    FLINT_ASSERT(false);
+}
 
 FMPZ_SPARSE_INLINE
 void fmpz_sparse_gcd(fmpz_sparse_t res, 
@@ -887,8 +903,13 @@ int fmpz_sparse_print_pretty(const fmpz_sparse_t poly, const char *x)
 FLINT_DLL int fmpz_sparse_fread(FILE * file, fmpz_sparse_t poly);
 
 /* FIXME */
-FLINT_DLL int fmpz_sparse_fread_pretty(FILE * file,
-    fmpz_sparse_t poly, char ** x);
+FMPZ_SPARSE_INLINE
+int fmpz_sparse_fread_pretty(FILE * file,
+    fmpz_sparse_t poly, char ** x)
+{
+    /* FIXME this is just a placeholder! */
+    return -1;
+}
 
 FMPZ_SPARSE_INLINE
 int fmpz_sparse_read(fmpz_sparse_t poly)
