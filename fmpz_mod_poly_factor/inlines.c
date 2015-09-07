@@ -32,7 +32,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z, fmpz_mod_poly_factor_t fac, slong i)
 {
