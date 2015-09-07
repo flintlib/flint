@@ -36,6 +36,6 @@
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z, fmpz_mod_poly_factor_t fac, slong i)
 {
-    fmpz_mod_poly_set(z, fac->p + i);
+    fmpz_mod_poly_set(z, fac->poly + i);
 }
 
