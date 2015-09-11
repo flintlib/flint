@@ -87,16 +87,16 @@ char *_TEMPLATE(T, poly_get_str_pretty) (const TEMPLATE(T, struct) * poly,
             continue;
         if (!TEMPLATE(T, is_one) (poly + i, ctx))
         {
-            off += flint_sprintf(str + off, "+(%s)", coeffstrs[i]);
+            off += flint_sprintf(str + off, "+(%s)*", coeffstrs[i]);
         }
         else
         {
             off += flint_sprintf(str + off, "+");
         }
         if (i > 1)
-            off += flint_sprintf(str + off, "*%s^%wd", x, i);
+            off += flint_sprintf(str + off, "%s^%wd", x, i);
         else
-            off += flint_sprintf(str + off, "*%s", x);
+            off += flint_sprintf(str + off, "%s", x);
     }
 
     if (!TEMPLATE(T, is_zero) (poly + i, ctx))
