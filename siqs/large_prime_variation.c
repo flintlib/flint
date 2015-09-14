@@ -361,18 +361,21 @@ relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
 
 relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 {
-    slong i, j, k;
+    slong i = 0, j = 0, k = 0;
     relation_t  c;
     fmpz_t temp;
 
     c.lp = UWORD(1);
     c.small = flint_malloc(qs_inf->small_primes * sizeof(slong));
     c.factor = flint_malloc(qs_inf->max_factors * sizeof(fac_t));
+    fmpz_init(c.Y);
 
     for (i = 0; i < qs_inf->small_primes; i++)
         c.small[i] = (a.small[i] + b.small[i]);
 
-    for (i = j = k = 0; i < a.num_factors && j < b.num_factors;)
+    i = 0;
+
+    while (i < a.num_factors && j < b.num_factors)
     {
         if (a.factor[i].ind == b.factor[j].ind)
         {
@@ -397,10 +400,10 @@ relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
         }
     }
 
-    for (; i < a.num_factors; i++)
+    while (i < a.num_factors)
     {
         c.factor[k].ind = a.factor[i].ind;
-        c.factor[k++].exp = a.factor[i].exp;
+        c.factor[k++].exp = a.factor[i++].exp;
 
         if (k >= qs_inf->max_factors)
         {
@@ -409,10 +412,10 @@ relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
         }
     }
 
-    for (; j < b.num_factors; j++)
+    while (j < b.num_factors)
     {
         c.factor[k].ind = b.factor[j].ind;
-        c.factor[k++].exp = b.factor[j].exp;
+        c.factor[k++].exp = b.factor[j++].exp;
 
         if (k >= qs_inf->max_factors)
         {
@@ -427,14 +430,14 @@ relation_t  qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 
     if (fmpz_invmod(temp, temp, qs_inf->kn) == 0)
     {
-        flint_printf("Inverse doesn't exist !!");
+        flint_printf("Inverse doesn't exist !!\n");
         abort();
     }
 
-    fmpz_init_set(c.Y, a.Y);
-    fmpz_mul(c.Y, c.Y, b.Y);
+    fmpz_mul(c.Y, a.Y, b.Y);
     fmpz_mul(c.Y, c.Y, temp);
-    fmpz_mod(c.Y, c.Y, qs_inf->kn);
+    if (fmpz_cmp(qs_inf->kn, c.Y) <= 0)
+        fmpz_mod(c.Y, c.Y, qs_inf->kn);
     fmpz_clear(temp);
 
     return c;

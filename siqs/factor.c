@@ -174,6 +174,8 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
     qs_inf->second_prime = j;
 
+    flint_printf("second prime index = %wd\n", qs_inf->second_prime);
+
     while(1)
     {
         if (qs_inf->s)
@@ -193,7 +195,7 @@ mp_limb_t qsieve_factor(fmpz_t n, fmpz_factor_t factors)
 
                 qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
-                if (qs_inf->full_relation  + qs_inf->num_cycles    >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
+                if (qs_inf->full_relation  + qs_inf->num_cycles >= (qs_inf->num_primes + qs_inf->ks_primes + 1.5 * qs_inf->extra_rels))
                 {
                     fclose(qs_inf->siqs);
 

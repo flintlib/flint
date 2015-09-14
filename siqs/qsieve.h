@@ -43,7 +43,7 @@
 #endif
 
 
-#define QS_DEBUG 128
+#define QS_DEBUG 0
 
 typedef struct prime_t
 {
@@ -132,8 +132,8 @@ typedef struct qs_s
    mp_limb_t * soln1;       /* first root of poly */
    mp_limb_t * soln2;       /* second root of poly */
 
-   mp_limb_t * xr1;
-   mp_limb_t * xr2;
+   mp_limb_t * posn1;
+   mp_limb_t * posn2;
 
    fmpz_t target_A;         /* approximate target value for A coeff of poly */
 
