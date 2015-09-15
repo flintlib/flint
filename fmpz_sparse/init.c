@@ -27,10 +27,29 @@
 
 static const slong FMPZ_SPARSE_INIT_LEN = 16;
 
-void fmpz_sparse_init(fmpz_sparse_t poly)
+void
+fmpz_sparse_init(fmpz_sparse_t poly)
 {
     poly->length = 0;
     poly->alloc = FMPZ_SPARSE_INIT_LEN;
     poly->coeffs = flint_calloc(poly->alloc, sizeof(fmpz));
     poly->expons = flint_calloc(poly->alloc, sizeof(fmpz));
+}
+
+void
+fmpz_sparse_init2(fmpz_sparse_t poly, slong alloc)
+{
+  if(alloc)
+  {
+    poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
+    poly->expons = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
+  }
+  else
+  {
+    poly->coeffs = NULL;
+    poly->expons = NULL;
+  }
+
+  poly->alloc = alloc;
+  poly->length = 0;
 }

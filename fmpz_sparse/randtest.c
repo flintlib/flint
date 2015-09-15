@@ -30,6 +30,10 @@ void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state,
 {
     slong i;
     fmpz_sparse_zero(res);
+    
+    if(fmpz_is_zero(degree))
+      return;
+
     _fmpz_sparse_reserve(res, terms);
     for (i=0; i<terms; ++i) {
         fmpz_init(res->coeffs+i);

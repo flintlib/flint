@@ -27,11 +27,16 @@
 
 void fmpz_sparse_clear(fmpz_sparse_t poly)
 {
-  slong i;
-  for (i=0; i<poly->length; ++i) {
-    fmpz_clear(poly->coeffs + i);
-    fmpz_clear(poly->expons + i);
+  
+  if(poly->coeffs)
+  {
+    slong i;
+    for (i=0; i<poly->length; ++i) 
+    {
+      _fmpz_demote(poly->coeffs + i);
+      _fmpz_demote(poly->expons + i);
+    }
+    flint_free(poly->coeffs);
+    flint_free(poly->expons);
   }
-  flint_free(poly->coeffs);
-  flint_free(poly->expons);
 }
