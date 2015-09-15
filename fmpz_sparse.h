@@ -254,7 +254,6 @@ FLINT_DLL void fmpz_sparse_set_trunc_fmpz_poly(fmpz_poly_t res,
 
 /*  Randomisation  ***********************************************************/
 
-/* FIXME*/
 FLINT_DLL void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state, 
      slong terms, const fmpz_t degree, mp_bitcnt_t bits);
 
@@ -442,17 +441,28 @@ FLINT_DLL int fmpz_sparse_equal_fmpz_poly(const fmpz_sparse_t spoly,
 /*  Addition and subtraction  ************************************************/
 
 /*  BEGINNING OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-/*FIXME*/
 FLINT_DLL void _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, slong * res_len, 
     const fmpz * poly1_c, const fmpz * poly1_e, slong len1, const fmpz * poly2_c, 
     const fmpz * poly2_e, slong len2);
-/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_new_add(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_add(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+
+/*  BEGINNING OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+FLINT_DLL void _fmpz_sparse_new_sub(fmpz * res_c, fmpz * res_e, slong * res_len,
+        const fmpz * poly1_c, const fmpz * poly1_e, slong len1, const fmpz * poly2_c,
+            const fmpz * poly2_e, slong len2);
+
+FLINT_DLL void fmpz_sparse_new_sub(fmpz_sparse_t res,
+        const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+
+FLINT_DLL void fmpz_sparse_add(fmpz_sparse_t res,
+        const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
 FLINT_DLL void fmpz_sparse_sub(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);

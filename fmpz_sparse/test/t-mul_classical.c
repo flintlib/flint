@@ -137,7 +137,7 @@ main(void)
     }
 
     /* Check _fmpz_poly_mul_classical directly */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    /*for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         slong len1, len2;
         fmpz_poly_t a, b, out1, out2;
@@ -175,7 +175,7 @@ main(void)
         fmpz_poly_clear(b);
         fmpz_poly_clear(out1);
         fmpz_poly_clear(out2);
-    }
+    }*/
 
     FLINT_TEST_CLEANUP(state);
     

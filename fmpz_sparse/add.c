@@ -28,14 +28,14 @@
 void fmpz_sparse_add(fmpz_sparse_t res, 
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
 {
-    if (poly1 == res)  fmpz_sparse_set(res, poly2); /**_fmpz_sparse_append_si(res, poly2, 1, 0);*/
-    else if (poly2 == res) fmpz_sparse_set(res, poly1); /**_fmpz_sparse_append_si(res, poly1, 1, 0);*/
+    if (poly1 == res)  _fmpz_sparse_append_si(res, poly2, 1, 0);
+    else if (poly2 == res) _fmpz_sparse_append_si(res, poly1, 1, 0);
     else {
         fmpz_sparse_set(res, poly1);
         _fmpz_sparse_append_si(res, poly2, 1, 0);
-        _fmpz_sparse_normalise(res);
     }
     /* TODO this version just concatentates the two polys and lets
      * normalise do all the work. Could be faster with a "merge" style
      * approach. */
+    _fmpz_sparse_normalise(res);
 }

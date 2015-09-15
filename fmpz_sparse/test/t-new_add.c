@@ -49,8 +49,8 @@ main(void)
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest_not_zero(d, state, 100);
-        fmpz_randtest_not_zero(e, state, 100);
+        fmpz_randtest(d, state, 100);
+        fmpz_randtest(e, state, 100);
         
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
@@ -89,8 +89,8 @@ main(void)
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest_not_zero(d, state, 100);
-        fmpz_randtest_not_zero(e, state, 100);
+        fmpz_randtest(d, state, 100);
+        fmpz_randtest(e, state, 100);
 
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);

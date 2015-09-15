@@ -25,7 +25,8 @@
 
 #include "fmpz_sparse.h"
 
-void fmpz_sparse_clear(fmpz_sparse_t poly)
+void
+fmpz_sparse_clear(fmpz_sparse_t poly)
 {
   
   if(poly->coeffs)
