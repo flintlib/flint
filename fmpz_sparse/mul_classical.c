@@ -25,8 +25,9 @@
 
 #include "fmpz_sparse.h"
 
-void fmpz_sparse_mul_classical(fmpz_sparse_t res, 
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
+void 
+fmpz_sparse_mul_classical(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
+    const fmpz_sparse_t poly2)
 {
     slong curg;
     if (res == poly1 || res == poly2) {
