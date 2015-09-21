@@ -24,12 +24,12 @@
 ******************************************************************************/
 
 #include "fmpz_sparse.h"
-
+#include "fmpz_vec.h"
 void 
-fmpz_sparse_mul_classical(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
+fmpz_sparse_new_mul_classical(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
     const fmpz_sparse_t poly2)
 {
-    slong curg;
+    slong i, size;
 
     if((poly1->length == 0) || (poly2->length == 0))
     {
@@ -41,14 +41,27 @@ fmpz_sparse_mul_classical(fmpz_sparse_t res, const fmpz_sparse_t poly1,
         fmpz_sparse_t temp;
         fmpz_sparse_init(temp);
         fmpz_sparse_mul_classical(temp, poly1, poly2);
+        fmpz_sparse_init2(res, temp->length);
         fmpz_sparse_set(res, temp);
         fmpz_sparse_clear(temp);
-        return;
     }
-    /* TODO rewrite this if addition is rewritten. */
-    fmpz_sparse_zero(res);
-    for (curg=0; curg < poly2->length; ++curg) {
-        _fmpz_sparse_append(res, poly1, poly2->coeffs+curg, poly2->expons+curg);
+    else
+    {
+      /* TODO rewrite this if addition is rewritten. */
+      fmpz_sparse_zero(res);
+      for (i = 0; i < poly2->length; ++i) 
+      {
+        fmpz_sparse_t temp;
+        fmpz_sparse_init2(temp, poly1->length);
+        temp->length = poly1->length;
+
+        _fmpz_vec_scalar_mul_fmpz(temp->coeffs, poly1->coeffs, poly1->length, poly2->coeffs + i);
+        fmpz_sparse_shift_left(temp, poly1, poly2->expons + i);
+      
+        fmpz_sparse_new_add(res, temp, res);
+      
+        fmpz_sparse_clear(temp);
+      }
     }
-    _fmpz_sparse_normalise(res);
+   _fmpz_sparse_normalise(res);
 }

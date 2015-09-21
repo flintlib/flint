@@ -100,7 +100,6 @@ fmpz_sparse_new_add(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     fmpz_sparse_swap(res, temp);
     fmpz_sparse_clear(temp);
   }
-  /*else if (poly1 == poly2) fmpz_sparse_scalar_mul(res, poly1, (fmpz) 2);*/
   else
   {
     fmpz_sparse_init2(res, max_length);

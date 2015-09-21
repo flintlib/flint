@@ -1,4 +1,4 @@
-/*=============================================================================
+/*============================================================================
 
     This file is part of FLINT.
 
@@ -29,7 +29,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_sparse.h"
 #include "ulong_extras.h"
 
 int
@@ -42,140 +42,125 @@ main(void)
     fflush(stdout);
 
     
-
     /* Check aliasing of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t a, b, c;
+        fmpz_sparse_t a, b, c;
+        fmpz_t d, e;
 
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
-        fmpz_poly_randtest(c, state, n_randint(state, 50), 200);
+        fmpz_init(d);
+        fmpz_init(e);
+        fmpz_randtest(d, state, 100);
+        fmpz_randtest(e, state, 100);
 
-        fmpz_poly_mul_classical(a, b, c);
-        fmpz_poly_mul_classical(b, b, c);
+        fmpz_sparse_init(a);
+        fmpz_sparse_init(b);
+        fmpz_sparse_init(c);
+        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 200);
+        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 200);
 
-        result = (fmpz_poly_equal(a, b));
+        fmpz_sparse_mul_classical(a, b, c);
+        fmpz_sparse_mul_classical(b, b, c);
+
+        result = (fmpz_sparse_equal(a, b));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_poly_print(a), flint_printf("\n\n");
-            fmpz_poly_print(b), flint_printf("\n\n");
+            fmpz_sparse_print(a), flint_printf("\n\n");
+            fmpz_sparse_print(b), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
+        fmpz_sparse_clear(a);
+        fmpz_sparse_clear(b);
+        fmpz_sparse_clear(c);
+        fmpz_clear(d);
+        fmpz_clear(e);
     }
 
     /* Check aliasing of a and c */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t a, b, c;
+        fmpz_sparse_t a, b, c;
+        fmpz_t d, e;
 
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
-        fmpz_poly_randtest(c, state, n_randint(state, 50), 200);
+        fmpz_init(d);
+        fmpz_init(e);
+        fmpz_randtest(d, state, 200);
+        fmpz_randtest(e, state, 200);
 
-        fmpz_poly_mul_classical(a, b, c);
-        fmpz_poly_mul_classical(c, b, c);
+        fmpz_sparse_init(a);
+        fmpz_sparse_init(b);
+        fmpz_sparse_init(c);
+        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 200);
+        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 200);
 
-        result = (fmpz_poly_equal(a, c));
+        fmpz_sparse_mul_classical(a, b, c);
+        fmpz_sparse_mul_classical(c, b, c);
+
+        result = (fmpz_sparse_equal(a, c));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_poly_print(a), flint_printf("\n\n");
-            fmpz_poly_print(c), flint_printf("\n\n");
+            fmpz_sparse_print(a), flint_printf("\n\n");
+            fmpz_sparse_print(c), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
+        fmpz_sparse_clear(a);
+        fmpz_sparse_clear(b);
+        fmpz_sparse_clear(c);
+        fmpz_clear(d);
+        fmpz_clear(e);
     }
 
     /* Check (b*c)+(b*d) = b*(c+d) */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t a1, a2, b, c, d;
+        fmpz_sparse_t a1, a2, b, c, d;
+        fmpz_t e, f, g;
 
-        fmpz_poly_init(a1);
-        fmpz_poly_init(a2);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
-        fmpz_poly_randtest(c, state, n_randint(state, 100), 200);
-        fmpz_poly_randtest(d, state, n_randint(state, 100), 200);
+        fmpz_init(e);
+        fmpz_init(f);
+        fmpz_init(g);
+        fmpz_randtest(e, state, 100);
+        fmpz_randtest(f, state, 100);
+        fmpz_randtest(g, state, 100);
 
-        fmpz_poly_mul_classical(a1, b, c);
-        fmpz_poly_mul_classical(a2, b, d);
-        fmpz_poly_add(a1, a1, a2);
+        fmpz_sparse_init(a1);
+        fmpz_sparse_init(a2);
+        fmpz_sparse_init(b);
+        fmpz_sparse_init(c);
+        fmpz_sparse_init(d);
+        fmpz_sparse_randtest(b, state, n_randint(state, 50), e, 200);
+        fmpz_sparse_randtest(c, state, n_randint(state, 50), f, 200);
+        fmpz_sparse_randtest(d, state, n_randint(state, 50), g, 200);
 
-        fmpz_poly_add(c, c, d);
-        fmpz_poly_mul_classical(a2, b, c);
+        fmpz_sparse_mul_classical(a1, b, c);
+        fmpz_sparse_mul_classical(a2, b, d);
+        fmpz_sparse_add(a1, a1, a2);
 
-        result = (fmpz_poly_equal(a1, a2));
+        fmpz_sparse_add(c, c, d);
+        fmpz_sparse_mul_classical(a2, b, c);
+
+        result = (fmpz_sparse_equal(a1, a2));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            fmpz_poly_print(a1), flint_printf("\n\n");
-            fmpz_poly_print(a2), flint_printf("\n\n");
+            fmpz_sparse_print(a1), flint_printf("\n\n");
+            fmpz_sparse_print(a2), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(a1);
-        fmpz_poly_clear(a2);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
-        fmpz_poly_clear(d);
+        fmpz_sparse_clear(a1);
+        fmpz_sparse_clear(a2);
+        fmpz_sparse_clear(b);
+        fmpz_sparse_clear(c);
+        fmpz_sparse_clear(d);
+        fmpz_clear(e);
+        fmpz_clear(f);
+        fmpz_clear(g);
     }
-
-    /* Check _fmpz_poly_mul_classical directly */
-    /*for (i = 0; i < 200 * flint_test_multiplier(); i++)
-    {
-        slong len1, len2;
-        fmpz_poly_t a, b, out1, out2;
-
-        len1 = n_randint(state, 100) + 1;
-        len2 = n_randint(state, 100) + 1;
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(out1);
-        fmpz_poly_init(out2);
-        fmpz_poly_randtest(a, state, len1, 200);
-        fmpz_poly_randtest(b, state, len2, 200);
-
-        fmpz_poly_mul_classical(out1, a, b);
-        fmpz_poly_fit_length(a, a->alloc + n_randint(state, 10));
-        fmpz_poly_fit_length(b, b->alloc + n_randint(state, 10));
-        a->length = a->alloc;
-        b->length = b->alloc;
-        fmpz_poly_fit_length(out2, a->length + b->length - 1);
-        _fmpz_poly_mul_classical(out2->coeffs, a->coeffs, a->length,
-                                               b->coeffs, b->length);
-        _fmpz_poly_set_length(out2, a->length + b->length - 1);
-        _fmpz_poly_normalise(out2);
-
-        result = (fmpz_poly_equal(out1, out2));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpz_poly_print(out1), flint_printf("\n\n");
-            fmpz_poly_print(out2), flint_printf("\n\n");
-            abort();
-        }
-
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(out1);
-        fmpz_poly_clear(out2);
-    }*/
 
     FLINT_TEST_CLEANUP(state);
     

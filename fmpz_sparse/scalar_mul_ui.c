@@ -6,7 +6,7 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
-     
+
     FLINT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,36 +19,47 @@
 =============================================================================*/
 /******************************************************************************
 
-    Authored 2015 by Daniel S. Roche; US Government work in the public domain. 
+    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
+#include <gmp.h>
+#include "flint.h"
+#include "fmpz.h"
 #include "fmpz_sparse.h"
 
-void 
-fmpz_sparse_mul_classical(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
-    const fmpz_sparse_t poly2)
+void
+fmpz_sparse_scalar_mul_ui(fmpz_sparse_t poly1, const fmpz_sparse_t poly2, ulong x)
 {
-    slong curg;
+    slong i;
 
-    if((poly1->length == 0) || (poly2->length == 0))
+    /* Either scalar or input sparse is zero */
+    if ((x == 0) || (poly2->length == 0))
     {
-      fmpz_sparse_zero(res);
-      return;
-    }
-
-    if (res == poly1 || res == poly2) {
-        fmpz_sparse_t temp;
-        fmpz_sparse_init(temp);
-        fmpz_sparse_mul_classical(temp, poly1, poly2);
-        fmpz_sparse_set(res, temp);
-        fmpz_sparse_clear(temp);
+        fmpz_sparse_zero(poly1);
         return;
     }
-    /* TODO rewrite this if addition is rewritten. */
-    fmpz_sparse_zero(res);
-    for (curg=0; curg < poly2->length; ++curg) {
-        _fmpz_sparse_append(res, poly1, poly2->coeffs+curg, poly2->expons+curg);
+
+    /* Special case, multiply by 1 */
+    if (x == 1)
+    {
+        fmpz_sparse_set(poly1, poly2);
+        return;
     }
-    _fmpz_sparse_normalise(res);
+
+    /*This case mysteriously does not work
+     * if (x == -1)
+    {
+      fmpz_sparse_neg(poly1, poly2);
+      return;
+    }*/
+
+    _fmpz_sparse_reserve(poly1, poly2->length);
+
+    for (i = 0; i < poly2->length; i++)
+    {
+        fmpz_mul_ui(poly1->coeffs + i, poly2->coeffs + i, x);
+        fmpz_set(poly1->expons + i, poly2->expons + i);
+    }
+    poly1->length = poly2->length;
 }
