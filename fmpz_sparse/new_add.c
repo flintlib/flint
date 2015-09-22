@@ -58,6 +58,7 @@ _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, slong * res_len, const fmpz * p
 
         if(fmpz_is_zero(res_c + k))
         {
+          _fmpz_demote(res_e+k);
           k--;
         }
       }

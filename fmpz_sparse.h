@@ -536,19 +536,14 @@ FLINT_DLL void fmpz_sparse_bit_unpack(fmpz_sparse_t res,
 /*  BEGINNING OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 FLINT_DLL void fmpz_sparse_new_mul_classical(fmpz_sparse_t res,
         const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
-/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
+FLINT_DLL void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
+    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_mul_classical(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
-FMPZ_SPARSE_INLINE
-void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
-{
-    /* FIXME this is just a placeholder! */
-    fmpz_sparse_mul_classical(res, poly1, poly2);
-}
 
 /* FIXME */
 FLINT_DLL void fmpz_sparse_mul_interp(fmpz_sparse_t res,
