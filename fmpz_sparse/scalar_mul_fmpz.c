@@ -33,8 +33,6 @@ void
 fmpz_sparse_scalar_mul(fmpz_sparse_t poly1, const fmpz_sparse_t poly2,
                           const fmpz_t x)
 {
-    slong i;
-
     /* Either scalar or input poly is zero */
     if (fmpz_is_zero(x) || (poly2->length == 0))
     {
@@ -45,15 +43,24 @@ fmpz_sparse_scalar_mul(fmpz_sparse_t poly1, const fmpz_sparse_t poly2,
     if (fmpz_is_one(x))
     {
       fmpz_sparse_set(poly1, poly2);
+      return;
     }
 
-    _fmpz_sparse_reserve(poly1, poly2->length);
-
-    for(i = 0; i < poly2->length; i++)
+    if (poly1 == poly2)
     {
-      fmpz_mul(poly1->coeffs + i, poly2->coeffs + i, x);
-      fmpz_set(poly1->expons + i, poly2->expons + i);
+      fmpz_sparse_t temp;
+      fmpz_sparse_init(temp);
+      fmpz_sparse_scalar_mul(temp, poly2, x);
+      poly1->length = poly2->length;
+      fmpz_sparse_set(poly1, temp);
+      fmpz_sparse_clear(temp);
     }
-
-    poly1->length = poly2->length;
+    else
+    {
+      fmpz_sparse_init2(poly1, poly2->length);
+      poly1->length = poly2->length;
+    
+      _fmpz_vec_scalar_mul_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
+      _fmpz_vec_set(poly1->expons, poly2->expons, poly2->length);
+    }
 }
