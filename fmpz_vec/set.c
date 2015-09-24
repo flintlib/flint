@@ -32,6 +32,9 @@ void
 _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2)
 {
     slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_set(vec1 + i, vec2 + i);
+    if (vec1 != vec2)
+    {
+        for (i = 0; i < len2; i++)
+            fmpz_set(vec1 + i, vec2 + i);
+    }
 }
