@@ -32,6 +32,19 @@ FLINT_SOLIB=0
 
 # soname version, minor release number and patch number
 
+# Every major version of Flint (1.0, 1.1, 1.2, etc.) gets
+# a new major soname number.
+
+# Every time a release happens where interfaces are added
+# to Flint, the minor soname number gets incremented.
+
+# Every patch that is made that doesn't change the Flint
+# interface updates the patch number.
+
+# However, if backwards compatible changes are made, both
+# the minor and patch numbers are set to 0. (Hopefully this
+# doesn't happen in practice.)
+
 # flint => soname
 # 2.5.0 => 13.5.0
 # 2.5.1 => 13.5.1
