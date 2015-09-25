@@ -350,9 +350,18 @@ FQ_NMOD_INLINE void fq_nmod_one(fq_nmod_t rop,  const fq_nmod_ctx_t ctx)
 
 FQ_NMOD_INLINE void fq_nmod_gen(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 {
-    nmod_poly_zero(rop);
-    nmod_poly_set_coeff_ui(rop, 0, 0);
-    nmod_poly_set_coeff_ui(rop, 1, 1);
+    if (ctx->modulus->length == 2)
+    {
+        nmod_poly_set_coeff_ui(rop, 0,
+              nmod_neg(nmod_div(ctx->modulus->coeffs[0],
+              ctx->modulus->coeffs[1], ctx->mod), ctx->mod));
+    }
+    else
+    {
+        nmod_poly_zero(rop);
+        nmod_poly_set_coeff_ui(rop, 0, 0);
+        nmod_poly_set_coeff_ui(rop, 1, 1);
+    }
 }
 
 /* Output ********************************************************************/
