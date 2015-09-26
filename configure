@@ -446,7 +446,7 @@ if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
          FLINT_LIBNAME="libflint.dylib"
-         FLINT_LIB="libflint-$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH.dylib"
+         FLINT_LIB="libflint-$FLINT_MAJOR.dylib"
          EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -compatibility_version $FLINT_MAJOR.$FLINT_MINOR"
          EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -current_version $FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
