@@ -447,17 +447,31 @@ if [ -z "$FLINT_LIB" ]; then
       Darwin)
          FLINT_LIBNAME="libflint.dylib"
          FLINT_LIB="libflint-$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH.dylib"
-         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB -compatibility_version $FLINT_MAJOR.$FLINT_MINOR -current_version $FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR";;
+         EXTRA_SHARED_FLAGS="-install_name $PREFIX/lib/$FLINT_LIB"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -compatibility_version $FLINT_MAJOR.$FLINT_MINOR"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -current_version $FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,$GMP_LIB_DIR"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,$MPFR_LIB_DIR"
+         ;;
       CYGWIN* | MINGW*)
          FLINT_LIBNAME="libflint.dll"
          FLINT_LIB="libflint-$FLINT_MAJOR.dll"
-         EXTRA_SHARED_FLAGS="-static-libgcc -shared -Wl,--export-all-symbols -Wl,-soname,libflint-$FLINT_MAJOR.dll.$FLINT_MINOR.$FLINT_PATCH -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
-         FLINT_DLL=1;;
+         EXTRA_SHARED_FLAGS="-static-libgcc"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -shared"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,--export-all-symbols"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-soname,libflint-$FLINT_MAJOR.dll.$FLINT_MINOR.$FLINT_PATCH"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,$GMP_LIB_DIR"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,$MPFR_LIB_DIR"
+         FLINT_DLL=1
+         ;;
       *)
-	 FLINT_LIBNAME="libflint.so"
+         FLINT_LIBNAME="libflint.so"
          FLINT_LIB="libflint.so.$FLINT_MAJOR.$FLINT_MINOR.$FLINT_PATCH"
-         EXTRA_SHARED_FLAGS="-Wl,-soname,libflint.so.$FLINT_MAJOR -Wl,-rpath,$GMP_LIB_DIR -Wl,-rpath,$MPFR_LIB_DIR"
-	 FLINT_SOLIB=1
+         EXTRA_SHARED_FLAGS="-Wl,-soname,libflint.so.$FLINT_MAJOR"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,$GMP_LIB_DIR"
+         EXTRA_SHARED_FLAGS="$EXTRA_SHARED_FLAGS -Wl,-rpath,$MPFR_LIB_DIR"
+         FLINT_SOLIB=1
+         ;;
    esac
 fi
 
