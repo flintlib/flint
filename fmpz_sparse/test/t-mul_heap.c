@@ -50,20 +50,20 @@ main(void)
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest(d, state, 50);
-        fmpz_randtest(e, state, 50);
+        fmpz_randtest(d, state, 10);
+        fmpz_randtest(e, state, 10);
 
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
         fmpz_sparse_init(c);
-        fmpz_sparse_randtest(b, state, n_randint(state, 100), d, 50);
-        fmpz_sparse_randtest(c, state, n_randint(state, 100), e, 50);
+        fmpz_sparse_randtest(b, state, n_randint(state, 20), d, 10);
+        fmpz_sparse_randtest(c, state, n_randint(state, 20), e, 10);
 
         flint_printf("\nB: i: %d\n", i);
         fmpz_sparse_print(b), flint_printf("\n\nC:\n");
         fmpz_sparse_print(c), flint_printf("\n\n");
         fmpz_sparse_mul_heaps(a, b, c);
-        fmpz_sparse_mul_heaps(b, b, c);
+        fmpz_sparse_mul_classical(b, b, c);
 
         result = (fmpz_sparse_equal(a, b));
         if (!result)
