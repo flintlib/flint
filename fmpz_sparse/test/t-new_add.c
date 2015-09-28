@@ -49,8 +49,8 @@ main(void)
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest(d, state, 100);
-        fmpz_randtest(e, state, 100);
+        fmpz_randtest(d, state, 10);
+        fmpz_randtest(e, state, 10);
         
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
@@ -75,8 +75,8 @@ main(void)
         fmpz_sparse_clear(a);
         fmpz_sparse_clear(b);
         fmpz_sparse_clear(c);
-        fmpz_clear(d);
         fmpz_clear(e);
+        fmpz_clear(d);
     }
     
     
@@ -115,8 +115,8 @@ main(void)
         fmpz_sparse_clear(a);
         fmpz_sparse_clear(b);
         fmpz_sparse_clear(c);
-        fmpz_clear(d);
         fmpz_clear(e);
+        fmpz_clear(d);
     }
 
     FLINT_TEST_CLEANUP(state);

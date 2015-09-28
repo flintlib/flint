@@ -56,9 +56,12 @@ main(void)
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
         fmpz_sparse_init(c);
-        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 100);
-        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 100);
+        fmpz_sparse_randtest(b, state, n_randint(state, 100), d, 50);
+        fmpz_sparse_randtest(c, state, n_randint(state, 100), e, 50);
 
+        flint_printf("\nB: i: %d\n", i);
+        fmpz_sparse_print(b), flint_printf("\n\nC:\n");
+        fmpz_sparse_print(c), flint_printf("\n\n");
         fmpz_sparse_mul_heaps(a, b, c);
         fmpz_sparse_mul_heaps(b, b, c);
 
@@ -66,7 +69,10 @@ main(void)
         if (!result)
         {
           flint_printf("FAIL PHASE 1:\n");
+
+          flint_printf("B + C -> A:\n");
           fmpz_sparse_print(a), flint_printf("\n\n");
+          flint_printf("B + C -> B:\n");
           fmpz_sparse_print(b), flint_printf("\n\n");
           abort();
         }
