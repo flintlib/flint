@@ -88,7 +88,7 @@ fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff,
     heap->p2[place] = term2;
   }
   heap->size += 1;
-  flint_printf("\nEntering Exponent: %lu: ", heap->size);
+  flint_printf("Entering Exponent (%lu, %lu, %lu): ", term1, term2, heap->size);
   fmpz_print(expon);
   flint_printf("\n");
 }
@@ -101,6 +101,7 @@ fmpz_heap_pop(heap_t heap)
   slong temp2 = heap->p2[heap->size];
   slong temp3;
   fmpz_t temp_e, temp_c;
+  flint_printf("Popping (%lu, %lu)\n", heap->p1[1], heap->p2[1]);
 
   fmpz_init(temp_e);
   fmpz_init(temp_c);
@@ -139,8 +140,6 @@ fmpz_heap_pop(heap_t heap)
       break;
   }
 
-  flint_printf("pop done\n");
-  
   fmpz_init_set(heap->expons + place, temp_e);
   fmpz_init_set(heap->coeffs + place, temp_c);
   heap->p1[place] = temp1;
@@ -211,7 +210,7 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
       flint_printf("\nExponent: %lu: ", i);
       fmpz_print(temp_e);
       flint_printf("\n");
-      fmpz_heap_insert(heap, temp_e, temp_c, 0, i);
+      fmpz_heap_insert(heap, temp_e, temp_c, i, 0);
       fmpz_clear(temp_e);
       fmpz_clear(temp_c);
     }
@@ -225,7 +224,7 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
       i = heap->p1[1];
       j = heap->p2[1];
 
-      if(res->length == 0)
+      if(k == 0)
       {
         fmpz_init(res->expons + k);
         fmpz_init(res->coeffs + k);
@@ -252,15 +251,12 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
       }
 
       fmpz_heap_pop(heap);
-      if(heap->size != 0)
-      {
-        fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs + j);
-        fmpz_add(temp_e, poly1->expons + i, poly2->expons + j);
-      }
 
-      if(j <= poly2->length)
+      if(j < poly2->length - 1)
       {
-        /*fmpz_heap_insert(heap, temp_e, temp_c, i + 1, j);*/
+        fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs + j + 1);
+        fmpz_add(temp_e, poly1->expons + i, poly2->expons + j + 1);
+        fmpz_heap_insert(heap, temp_e, temp_c, i, j + 1);
       }
 
       fmpz_clear(temp_e);
@@ -275,5 +271,6 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     fmpz_sparse_print(res), flint_printf("\n\n");
     fmpz_clear(temp_e);
     fmpz_clear(temp_c);
+    _fmpz_sparse_normalise(res);
   }
 }
