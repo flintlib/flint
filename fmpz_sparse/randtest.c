@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Authored 2015 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2015 by Daniel S. Roche and A. Whitman Groves;
+    US Government work in the public domain. 
 
 ******************************************************************************/
 

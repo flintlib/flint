@@ -59,7 +59,7 @@ main(void)
         fmpz_sparse_randtest(b, state, n_randint(state, 20), d, 10);
         fmpz_sparse_randtest(c, state, n_randint(state, 20), e, 10);
 
-        flint_printf("\nB: i: %d\n", i);
+        flint_printf("\nB:\n");
         fmpz_sparse_print(b), flint_printf("\n\nC:\n");
         fmpz_sparse_print(c), flint_printf("\n\n");
         fmpz_sparse_mul_heaps(a, b, c);
