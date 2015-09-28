@@ -28,8 +28,10 @@
 
 typedef struct heap
 {
-  fmpz_t * expons;
-  fmpz_t * coeffs;
+  fmpz * expons;
+  fmpz * coeffs;
+  slong * p1;
+  slong * p2;
   slong size;
 } heap;
 
@@ -40,84 +42,112 @@ fmpz_heap_init(heap * h, const slong size)
 {
   h->expons = flint_calloc(size, sizeof(fmpz));
   h->coeffs = flint_calloc(size, sizeof(fmpz));
+  h->p1 = flint_calloc(size, sizeof(slong));
+  h->p2 = flint_calloc(size, sizeof(slong));
   h->size = 0;
 }
 
 void
-fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff)
+fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff,
+    const slong term1, const slong term2)
 {
+
   if(heap->size == 0)
   {
-    fmpz_set(heap->expons[1], expon);
-    fmpz_set(heap->coeffs[1], coeff);
+    fmpz_init(heap->expons + 1);
+    fmpz_init(heap->coeffs + 1);
+    fmpz_set(heap->expons + 1, expon);
+    fmpz_set(heap->coeffs + 1, coeff);
+    heap->p1[1] = term1;
+    heap->p2[1] = term2;
   }
   else
   {
-    slong place = heap->size+1;
- 
-    fmpz_set(heap->expons[place], expon);
-    fmpz_set(heap->coeffs[place], coeff);
+    slong place = heap->size + 1;
+
+    fmpz_init(heap->expons + place);
+    fmpz_init(heap->coeffs + place);
     
-    while(fmpz_cmp(heap->expons[place/2], expon) < 0)
+    while(place != 1)
     {
-      fmpz_swap(heap->expons[place/2], heap->expons[place]);
-      fmpz_swap(heap->coeffs[place/2], heap->coeffs[place]);
-      place = place/2;
+      if(fmpz_cmp(heap->expons + place/2, expon) < 0)
+      {
+        fmpz_set(heap->expons + place, heap->expons + place/2);
+        fmpz_set(heap->coeffs + place, heap->coeffs + place/2);
+        heap->p1[place] = heap->p1[place/2];
+        heap->p2[place] = heap->p2[place/2];
+        place = place/2;
+      }
+      else
+        break;
     }
+
+    fmpz_set(heap->expons + place, expon);
+    fmpz_set(heap->coeffs + place, coeff);
+    heap->p1[place] = term1;
+    heap->p2[place] = term2;
   }
   heap->size += 1;
+  flint_printf("\nEntering Exponent: %lu: ", heap->size);
+  fmpz_print(expon);
+  flint_printf("\n");
 }
 
 void
-fmpz_heap_pop(fmpz_sparse_t res, heap_t heap)
+fmpz_heap_pop(heap_t heap)
 {
-  slong place = 1, k = res->length;
+  slong place = 1;
+  slong temp1 = heap->p1[heap->size];
+  slong temp2 = heap->p2[heap->size];
+  slong temp3;
+  fmpz_t temp_e, temp_c;
 
-  if(res->coeffs + k - 1 == 0)
+  fmpz_init(temp_e);
+  fmpz_init(temp_c);
+
+  if(heap->size > 1)
   {
-    k--;
-    fmpz_set(res->expons + k, heap->expons[place]);
-    fmpz_set(res->coeffs + k, heap->coeffs[place]);
-    k++;
-  }
-  else if(fmpz_equal(res->expons + k - 1, heap->expons[1]) == 0)
-  {
-    k--;
-    fmpz_add(res->coeffs + k, heap->coeffs[place], res->coeffs + k);
-    k++;
-  }
-  else
-  {
-    fmpz_init(res->expons + k);
-    fmpz_init(res->coeffs + k);
-    fmpz_set(res->expons + k, heap->expons[place]);
-    fmpz_set(res->coeffs + k, heap->coeffs[place]);
-    k++;
+    fmpz_set(temp_e, heap->expons + heap->size);
+    fmpz_set(temp_c, heap->coeffs + heap->size);
   }
 
- 
-  res->length = k;
+  fmpz_clear(heap->expons + heap->size);
+  fmpz_clear(heap->coeffs + heap->size);
 
-  fmpz_swap(heap->expons[place], heap->expons[heap->size]);
-  fmpz_swap(heap->coeffs[place], heap->coeffs[heap->size]);
-  
-  while((fmpz_cmp(heap->expons[place], heap->expons[place*2]) < 0) || 
-      (fmpz_cmp(heap->expons[place], heap->expons[place*2+1]) < 0))
+  heap->size -= 1;
+  while(place*2 <= heap->size)
   {
-    if(fmpz_cmp(heap->expons[place*2], heap->expons[place*2+1]) > 0)
+    if(place*2 + 1 <= heap->size)
+      temp3 = place*2 + 1;
+    else
+      temp3 = place*2;
+
+    if(fmpz_cmp(heap->expons + place*2, heap->expons + temp3) >= 0)
+      temp3 = place*2;
+    else
+      temp3 = place*2 + 1;
+
+    if(fmpz_cmp(temp_e, heap->expons + temp3) < 0)
     {
-      fmpz_swap(heap->expons[place], heap->expons[place*2]);
-      fmpz_swap(heap->expons[place], heap->expons[place*2]);
-      place = place*2;
+      fmpz_init_set(heap->expons + place, heap->expons + temp3);
+      fmpz_init_set(heap->coeffs + place, heap->coeffs + temp3);
+      heap->p1[place] = heap->p1[temp3];
+      heap->p2[place] = heap->p2[temp3];
+      place = temp3;
     }
     else
-    {
-      fmpz_swap(heap->expons[place], heap->expons[place*2+1]);
-      fmpz_swap(heap->expons[place], heap->expons[place*2+1]);
-      place = place*2 + 1;
-    }
+      break;
   }
-  heap->size -= 1;
+
+  flint_printf("pop done\n");
+  
+  fmpz_init_set(heap->expons + place, temp_e);
+  fmpz_init_set(heap->coeffs + place, temp_c);
+  heap->p1[place] = temp1;
+  heap->p2[place] = temp2;
+
+  fmpz_clear(temp_c);
+  fmpz_clear(temp_e);
 }
 
 void 
@@ -125,30 +155,36 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     const fmpz_sparse_t poly2)
 {
   slong i, j, max = poly1->length * poly2->length;
+  if (res == poly1 || res == poly2)
+  {
+    fmpz_sparse_t temp;
+    fmpz_sparse_init(temp);
+    fmpz_sparse_mul_heaps(temp, poly1, poly2);
+    _fmpz_sparse_reserve(res, temp->length);
+    fmpz_sparse_set(res, temp);
+    fmpz_sparse_clear(temp);
+    return;
+  }
+  
   if((poly1->length == 0) || (poly2->length == 0))
   {
+    flint_printf("INITIALIZED METHOD 1");
     fmpz_sparse_zero(res);
     return;
   }
 
   if((poly1->length == 1) && (poly2->length == 1))
   {
+    flint_printf("INITIALIZED METHOD 2");
     res->length = 1;
+    fmpz_init(res->coeffs);
+    fmpz_init(res->expons);
     fmpz_mul(res->coeffs, poly1->coeffs, poly2->coeffs);
     fmpz_add(res->expons, poly1->expons, poly2->expons);
     return;
   }
 
-  if (res == poly1 || res == poly2) 
-  {
-    fmpz_sparse_t temp;
-    fmpz_sparse_init2(temp, max);
-    fmpz_sparse_mul_heaps(temp, poly1, poly2);
-    fmpz_sparse_init2(res, temp->length);
-    fmpz_sparse_set(res, temp);
-    fmpz_sparse_clear(temp);
-  }
-  else if(poly2->length < poly1->length)
+  if(poly2->length < poly1->length)
   {
     fmpz_sparse_mul_heaps(res, poly2, poly1);
   }
@@ -156,31 +192,87 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
   {
     heap_t heap;
 
-    fmpz_sparse_print(poly1), flint_printf("\n\n");
-    fmpz_sparse_print(poly2), flint_printf("\n\n");
-    fmpz_heap_init(heap, poly1->length + 1);
-
     fmpz_t temp_e, temp_c;
-    
-    fmpz_init(temp_e);
-    fmpz_init(temp_c);
-    
-    for(j = 0; j < poly2->length; ++j)
+   
+    slong k;
+
+    _fmpz_sparse_reserve(res, poly1->length*poly2->length);
+
+    fmpz_heap_init(heap, poly1->length + 1);
+   
+
+    for(i = 0; i < poly1->length; ++i)
     {
-      for(i = 0; i < poly1->length; ++i)
+      fmpz_init(temp_e);
+      fmpz_init(temp_c);
+      fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs);
+      fmpz_add(temp_e, poly1->expons + i, poly2->expons);
+
+      flint_printf("\nExponent: %lu: ", i);
+      fmpz_print(temp_e);
+      flint_printf("\n");
+      fmpz_heap_insert(heap, temp_e, temp_c, 0, i);
+      fmpz_clear(temp_e);
+      fmpz_clear(temp_c);
+    }
+
+    k = 0;
+
+    while(heap->size > 0)
+    {
+      fmpz_init(temp_e);
+      fmpz_init(temp_c);
+      i = heap->p1[1];
+      j = heap->p2[1];
+
+      if(res->length == 0)
+      {
+        fmpz_init(res->expons + k);
+        fmpz_init(res->coeffs + k);
+        fmpz_set(res->expons + k, heap->expons + 1);
+        fmpz_set(res->coeffs + k, heap->coeffs + 1);
+        k++;
+      }
+      else if(fmpz_is_zero(res->coeffs + k - 1))
+      {
+        fmpz_set(res->expons + k - 1, heap->expons + 1);
+        fmpz_set(res->coeffs + k - 1, heap->coeffs + 1);
+      }
+      else if(fmpz_equal(res->expons + k - 1, heap->expons + 1) == 1)
+      {
+        fmpz_add(res->coeffs + k - 1, heap->coeffs + 1, res->coeffs + k);
+      }
+      else
+      {
+        fmpz_init(res->expons + k);
+        fmpz_init(res->coeffs + k);
+        fmpz_set(res->expons + k, heap->expons + 1);
+        fmpz_set(res->coeffs + k, heap->coeffs + 1);
+        k++;
+      }
+
+      fmpz_heap_pop(heap);
+      if(heap->size != 0)
       {
         fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs + j);
         fmpz_add(temp_e, poly1->expons + i, poly2->expons + j);
-      
-        if(heap->size == poly1->length)
-          fmpz_heap_pop(res, heap);
-        
-        fmpz_heap_insert(heap, temp_e, temp_c);
       }
+
+      if(j <= poly2->length)
+      {
+        /*fmpz_heap_insert(heap, temp_e, temp_c, i + 1, j);*/
+      }
+
+      fmpz_clear(temp_e);
+      fmpz_clear(temp_c);
     }
    
-    fmpz_sparse_print(res), flint_printf("\n\n");
+    res->length = k;
     
+    flint_printf("\n\nORIGINALS:\n\n");
+    fmpz_sparse_print(poly1), flint_printf("\n\n");
+    fmpz_sparse_print(poly2), flint_printf("\n\nRESULT:\n\n");
+    fmpz_sparse_print(res), flint_printf("\n\n");
     fmpz_clear(temp_e);
     fmpz_clear(temp_c);
   }

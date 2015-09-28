@@ -58,6 +58,7 @@ _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, slong * res_len, const fmpz * p
 
         if(fmpz_is_zero(res_c + k))
         {
+          _fmpz_demote(res_c+k);
           _fmpz_demote(res_e+k);
           k--;
         }
@@ -69,6 +70,8 @@ _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, slong * res_len, const fmpz * p
     if(i < len1)
       for(; i < len1; i++)
       {
+        fmpz_init(res_c + k);
+        fmpz_init(res_e + k);
         fmpz_set(res_c + k, poly1_c + i);
         fmpz_set(res_e + k, poly1_e + i);
         k++;
@@ -77,6 +80,8 @@ _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, slong * res_len, const fmpz * p
     if(j < len2)
       for(; j < len2; j++)
       {
+        fmpz_init(res_c + k);
+        fmpz_init(res_e + k);
         fmpz_set(res_c + k, poly2_c + j);
         fmpz_set(res_e + k, poly2_e + j);
         k++;
@@ -98,13 +103,20 @@ fmpz_sparse_new_add(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     _fmpz_sparse_new_add(temp->coeffs, temp->expons, &temp->length, poly1->coeffs,
         poly1->expons, poly1->length, poly2->coeffs, poly2->expons, poly2->length);
 
-    fmpz_sparse_swap(res, temp);
+    fmpz_sparse_set(res, temp);
     fmpz_sparse_clear(temp);
   }
-  else
+  else if(poly1->length == 0)
   {
-    fmpz_sparse_init2(res, max_length);
-    
+    fmpz_sparse_set(res, poly2);
+  }
+  else if(poly2->length == 0)
+  {
+    fmpz_sparse_set(res, poly1);
+  }
+  else
+  {    
+    _fmpz_sparse_reserve(res, max_length);
     _fmpz_sparse_new_add(res->coeffs, res->expons, &res->length, poly1->coeffs, 
         poly1->expons, poly1->length, poly2->coeffs, poly2->expons, poly2->length);
   }
