@@ -50,14 +50,14 @@ main(void)
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest(d, state, 10);
-        fmpz_randtest(e, state, 10);
+        fmpz_randtest(d, state, 5);
+        fmpz_randtest(e, state, 5);
 
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
         fmpz_sparse_init(c);
-        fmpz_sparse_randtest(b, state, n_randint(state, 20), d, 10);
-        fmpz_sparse_randtest(c, state, n_randint(state, 20), e, 10);
+        fmpz_sparse_randtest(b, state, n_randint(state, 10), d, 5);
+        fmpz_sparse_randtest(c, state, n_randint(state, 10), e, 5);
 
         flint_printf("\nB:\n");
         fmpz_sparse_print(b), flint_printf("\n\nC:\n");
