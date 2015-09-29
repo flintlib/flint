@@ -33,6 +33,7 @@ typedef struct heap
   slong * p1;
   slong * p2;
   slong size;
+  slong alloc;
 } heap;
 
 typedef struct heap heap_t[1];
@@ -45,6 +46,22 @@ fmpz_heap_init(heap * h, const slong size)
   h->p1 = flint_calloc(size, sizeof(slong));
   h->p2 = flint_calloc(size, sizeof(slong));
   h->size = 0;
+  h->alloc = size;
+}
+
+void
+fmpz_heap_free(heap_t heap)
+{
+  slong i;
+  for(i = 0; i < heap->alloc; i++)
+  {
+    _fmpz_demote(heap->coeffs + i);
+    _fmpz_demote(heap->expons + i);
+  }
+  flint_free(heap->expons);
+  flint_free(heap->coeffs);
+  flint_free(heap->p1);
+  flint_free(heap->p2);
 }
 
 void
@@ -54,8 +71,6 @@ fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff,
 
   if(heap->size == 0)
   {
-    fmpz_init(heap->expons + 1);
-    fmpz_init(heap->coeffs + 1);
     fmpz_set(heap->expons + 1, expon);
     fmpz_set(heap->coeffs + 1, coeff);
     heap->p1[1] = term1;
@@ -126,8 +141,8 @@ fmpz_heap_pop(heap_t heap)
 
     if(fmpz_cmp(temp_e, heap->expons + temp3) < 0)
     {
-      fmpz_init_set(heap->expons + place, heap->expons + temp3);
-      fmpz_init_set(heap->coeffs + place, heap->coeffs + temp3);
+      fmpz_set(heap->expons + place, heap->expons + temp3);
+      fmpz_set(heap->coeffs + place, heap->coeffs + temp3);
       heap->p1[place] = heap->p1[temp3];
       heap->p2[place] = heap->p2[temp3];
       place = temp3;
@@ -136,8 +151,8 @@ fmpz_heap_pop(heap_t heap)
       break;
   }
 
-  fmpz_init_set(heap->expons + place, temp_e);
-  fmpz_init_set(heap->coeffs + place, temp_c);
+  fmpz_set(heap->expons + place, temp_e);
+  fmpz_set(heap->coeffs + place, temp_c);
   heap->p1[place] = temp1;
   heap->p2[place] = temp2;
 
@@ -155,7 +170,6 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     fmpz_sparse_t temp;
     fmpz_sparse_init(temp);
     fmpz_sparse_mul_heaps(temp, poly1, poly2);
-    _fmpz_sparse_reserve(res, temp->length);
     fmpz_sparse_set(res, temp);
     fmpz_sparse_clear(temp);
     return;
@@ -255,8 +269,7 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     }
    
     res->length = k;
-    
-    fmpz_clear(temp_e);
-    fmpz_clear(temp_c);
+
+    fmpz_heap_free(heap);
   }
 }
