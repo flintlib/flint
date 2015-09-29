@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Authored 2015 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2015 by A. Whitman Groves; US Government work in the public domain. 
 
 ******************************************************************************/
 
@@ -88,9 +88,6 @@ fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff,
     heap->p2[place] = term2;
   }
   heap->size += 1;
-  flint_printf("Entering Exponent (%lu, %lu, %lu): ", term1, term2, heap->size);
-  fmpz_print(expon);
-  flint_printf("\n");
 }
 
 void
@@ -101,7 +98,6 @@ fmpz_heap_pop(heap_t heap)
   slong temp2 = heap->p2[heap->size];
   slong temp3;
   fmpz_t temp_e, temp_c;
-  flint_printf("Popping (%lu, %lu)\n", heap->p1[1], heap->p2[1]);
 
   fmpz_init(temp_e);
   fmpz_init(temp_c);
@@ -153,7 +149,7 @@ void
 fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
     const fmpz_sparse_t poly2)
 {
-  slong i, j, max = poly1->length * poly2->length;
+  slong i, j;
   if (res == poly1 || res == poly2)
   {
     fmpz_sparse_t temp;
@@ -167,14 +163,12 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
   
   if((poly1->length == 0) || (poly2->length == 0))
   {
-    flint_printf("INITIALIZED METHOD 1");
     fmpz_sparse_zero(res);
     return;
   }
 
   if((poly1->length == 1) && (poly2->length == 1))
   {
-    flint_printf("INITIALIZED METHOD 2");
     res->length = 1;
     fmpz_init(res->coeffs);
     fmpz_init(res->expons);
@@ -207,9 +201,6 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
       fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs);
       fmpz_add(temp_e, poly1->expons + i, poly2->expons);
 
-      flint_printf("\nExponent: %lu: ", i);
-      fmpz_print(temp_e);
-      flint_printf("\n");
       fmpz_heap_insert(heap, temp_e, temp_c, i, 0);
       fmpz_clear(temp_e);
       fmpz_clear(temp_c);
@@ -239,7 +230,7 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
       }
       else if(fmpz_equal(res->expons + k - 1, heap->expons + 1) == 1)
       {
-        fmpz_add(res->coeffs + k - 1, heap->coeffs + 1, res->coeffs + k);
+        fmpz_add(res->coeffs + k - 1, heap->coeffs + 1, res->coeffs + k - 1);
       }
       else
       {
@@ -265,12 +256,7 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
    
     res->length = k;
     
-    flint_printf("\n\nORIGINALS:\n\n");
-    fmpz_sparse_print(poly1), flint_printf("\n\n");
-    fmpz_sparse_print(poly2), flint_printf("\n\nRESULT:\n\n");
-    fmpz_sparse_print(res), flint_printf("\n\n");
     fmpz_clear(temp_e);
     fmpz_clear(temp_c);
-    _fmpz_sparse_normalise(res);
   }
 }

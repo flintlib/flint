@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
+    Authored 2015 by A. Whitman Groves; US Government work in the public domain. 
 
 ******************************************************************************/
 
@@ -68,6 +68,8 @@ _fmpz_sparse_new_sub(fmpz * res_c, fmpz * res_e, slong * res_len, const fmpz * p
     if(i < len1)
       for(; i < len1; i++)
       {
+        fmpz_init(res_c + k);
+        fmpz_init(res_e + k);
         fmpz_set(res_c + k, poly1_c + i);
         fmpz_set(res_e + k, poly1_e + i);
         k++;
@@ -76,6 +78,8 @@ _fmpz_sparse_new_sub(fmpz * res_c, fmpz * res_e, slong * res_len, const fmpz * p
     if(j < len2)
       for(; j < len2; j++)
       {
+        fmpz_init(res_c + k);
+        fmpz_init(res_e + k);
         fmpz_neg(res_c + k, poly2_c + j);
         fmpz_set(res_e + k, poly2_e + j);
         k++;
@@ -97,14 +101,13 @@ fmpz_sparse_new_sub(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     _fmpz_sparse_new_sub(temp->coeffs, temp->expons, &temp->length, poly1->coeffs,
         poly1->expons, poly1->length, poly2->coeffs, poly2->expons, poly2->length);
 
-    fmpz_sparse_swap(res, temp);
+    fmpz_sparse_set(res, temp);
     fmpz_sparse_clear(temp);
   }
   else if (fmpz_sparse_equal(poly1, poly2)) fmpz_sparse_zero(res);
   else
   {
-    fmpz_sparse_init2(res, max_length);
-    
+    _fmpz_sparse_reserve(res, max_length);
     _fmpz_sparse_new_sub(res->coeffs, res->expons, &res->length, poly1->coeffs, 
         poly1->expons, poly1->length, poly2->coeffs, poly2->expons, poly2->length);
   }
