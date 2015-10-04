@@ -320,9 +320,19 @@ FQ_INLINE void fq_one(fq_t rop,  const fq_ctx_t ctx)
 
 FQ_INLINE void fq_gen(fq_t rop, const fq_ctx_t ctx)
 {
-    fmpz_poly_zero(rop);
-    fmpz_poly_set_coeff_ui(rop, 0, 0);
-    fmpz_poly_set_coeff_ui(rop, 1, 1);
+    if (ctx->modulus->length == 2)
+    {
+        fmpz_invmod(rop->coeffs, ctx->modulus->coeffs + 1, fq_ctx_prime(ctx));
+        fmpz_neg(rop->coeffs, rop->coeffs);
+        fmpz_mul(rop->coeffs, rop->coeffs, ctx->modulus->coeffs);
+        fmpz_mod(rop->coeffs, rop->coeffs, fq_ctx_prime(ctx));
+    }
+    else
+    {
+        fmpz_poly_zero(rop);
+        fmpz_poly_set_coeff_ui(rop, 0, 0);
+        fmpz_poly_set_coeff_ui(rop, 1, 1);
+    }
 }
 
 /* Output ********************************************************************/
