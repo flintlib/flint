@@ -1,4 +1,4 @@
-#! /usr/bin/sh
+#! /bin/sh
 wget http://mpir.org/mpir-2.7.0.tar.bz2
 tar -xvf mpir-2.7.0.tar.bz2
 cd mpir-2.7.0
