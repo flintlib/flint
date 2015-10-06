@@ -539,6 +539,9 @@ FLINT_DLL void fmpz_sparse_new_mul_classical(fmpz_sparse_t res,
 
 FLINT_DLL void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+
+FLINT_DLL void fmpz_sparse_new_heaps(fmpz_sparse_t res,
+    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 /*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_mul_classical(fmpz_sparse_t res,

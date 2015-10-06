@@ -55,8 +55,8 @@ fmpz_heap_free(heap_t heap)
   slong i;
   for(i = 0; i < heap->alloc; i++)
   {
-    _fmpz_demote(heap->coeffs + i);
-    _fmpz_demote(heap->expons + i);
+    fmpz_clear(heap->coeffs + i);
+    fmpz_clear(heap->expons + i);
   }
   flint_free(heap->expons);
   flint_free(heap->coeffs);
@@ -80,9 +80,6 @@ fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff,
   {
     slong place = heap->size + 1;
 
-    fmpz_init(heap->expons + place);
-    fmpz_init(heap->coeffs + place);
-    
     while(place != 1)
     {
       if(fmpz_cmp(heap->expons + place/2, expon) < 0)
@@ -113,19 +110,19 @@ fmpz_heap_pop(heap_t heap)
   slong temp2 = heap->p2[heap->size];
   slong temp3;
   fmpz_t temp_e, temp_c;
-
+  
   fmpz_init(temp_e);
   fmpz_init(temp_c);
-
+  
   if(heap->size > 1)
   {
     fmpz_set(temp_e, heap->expons + heap->size);
     fmpz_set(temp_c, heap->coeffs + heap->size);
   }
-
+  
   fmpz_clear(heap->expons + heap->size);
   fmpz_clear(heap->coeffs + heap->size);
-
+  
   heap->size -= 1;
   while(place*2 <= heap->size)
   {
@@ -133,12 +130,12 @@ fmpz_heap_pop(heap_t heap)
       temp3 = place*2 + 1;
     else
       temp3 = place*2;
-
+    
     if(fmpz_cmp(heap->expons + place*2, heap->expons + temp3) >= 0)
       temp3 = place*2;
     else
       temp3 = place*2 + 1;
-
+    
     if(fmpz_cmp(temp_e, heap->expons + temp3) < 0)
     {
       fmpz_set(heap->expons + place, heap->expons + temp3);
@@ -150,12 +147,12 @@ fmpz_heap_pop(heap_t heap)
     else
       break;
   }
-
+  
   fmpz_set(heap->expons + place, temp_e);
   fmpz_set(heap->coeffs + place, temp_c);
   heap->p1[place] = temp1;
   heap->p2[place] = temp2;
-
+  
   fmpz_clear(temp_c);
   fmpz_clear(temp_e);
 }
