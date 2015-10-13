@@ -1,7 +1,8 @@
 language: c
-before_install:
-   - apt-get update -qq
-   - apt-get install -qq texinfo
+addons:
+  apt:
+    packages:
+      - texinfo
 script:
   - ./.build_dependencies && ./configure --with-mpir=mpir-2.7.0 --with-mpfr=mpfr-3.1.3 && make && make check
 
