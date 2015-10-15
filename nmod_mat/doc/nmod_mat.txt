@@ -550,3 +550,22 @@ slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 
     This function computes the reduced row echelon form and then reads
     off the basis vectors.
+    
+*******************************************************************************
+
+    Strong echelon form and Howell form
+
+*******************************************************************************
+
+slong nmod_mat_strong_echelon_form(nmod_mat_t A)
+
+    Puts $A$ into strong echelon form.
+
+    $A$ must have at least as many rows as columns.
+
+slong nmod_mat_howell_form(nmod_mat_t A)
+
+    Puts $A$ into Howell form.
+
+    $A$ must have at least as many rows as columns.
+
