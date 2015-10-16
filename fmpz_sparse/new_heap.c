@@ -66,30 +66,32 @@ fmpz_new_heap_init(new_heap_t  h, const slong size)
 }
 
 void
-fmpz_node_free(node * n)
-{
-  fmpz_clear(n->expons);
-  fmpz_clear(n->coeffs);
-}
-
-void
 fmpz_new_heap_free(new_heap_t heap)
 {
   slong i;
   for(i = 0; i < heap->alloc; i++)
   {
-    fmpz_node_free(heap->nodes + i);
+    fmpz_clear((heap->nodes + i)->expons);
+    fmpz_clear((heap->nodes + i)->coeffs);
   }
+  flint_free(heap->nodes);
 }
 
 void
 fmpz_node_swap(node_t n1, node_t n2)
 {
-  node_t temp;
-  *temp = *n1;
-  *n1 = *n2;
-  *n2 = *temp;
-  fmpz_node_free(temp);
+  slong temp;
+  
+  fmpz_swap(n1->expons, n2->expons);
+  fmpz_swap(n1->coeffs, n2->coeffs);
+
+  temp = n1->p1;
+  n1->p1 = n2->p1;
+  n2->p1 = temp;
+  
+  temp = n1->p2;
+  n1->p2 = n2->p2;
+  n2->p2 = temp;
 }
 
 void
@@ -182,7 +184,7 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
     fmpz_sparse_t temp;
     fmpz_sparse_init(temp);
     fmpz_sparse_new_heaps(temp, poly1, poly2);
-    fmpz_sparse_set(res, temp);
+    fmpz_sparse_swap(res, temp);
     fmpz_sparse_clear(temp);
     return;
   }
@@ -217,7 +219,7 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
     
     _fmpz_sparse_reserve(res, poly1->length*poly2->length);
     
-    fmpz_new_heap_init(heap, poly1->length + 1);
+    fmpz_new_heap_init(heap, poly1->length);
     
     
     for(i = 0; i < poly1->length; ++i)
@@ -228,19 +230,13 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
       (heap->nodes + i)->p2 = 0;
       heap->size += 1;
     }
-    fmpz_heap_print(heap);
-    flint_printf("\nORIGINAL HEAP SIZE: %lu", heap->size); 
+    
     k = 0;
     
     while(heap->size > 0)
     {
       if(k == 0)
       {
-        flint_printf("\nbegin number: (");
-        fmpz_print((heap->nodes)->coeffs);
-        flint_printf(",");
-        fmpz_print((heap->nodes)->expons);
-        flint_printf(") (%lu, %lu) size: %lu\n", (heap->nodes)->p1, (heap->nodes)->p2, heap->size);
         fmpz_init(res->expons);
         fmpz_init(res->coeffs);
         fmpz_set(res->expons, (heap->nodes)->expons);
@@ -249,30 +245,15 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
       }
       else if(fmpz_is_zero(res->coeffs + k - 1))
       {
-        flint_printf("\ncancel zero: (");
-        fmpz_print((heap->nodes)->coeffs);
-        flint_printf(",");
-        fmpz_print((heap->nodes)->expons);
-        flint_printf(") (%lu, %lu) size: %lu\n", (heap->nodes)->p1, (heap->nodes)->p2, heap->size);
         fmpz_set(res->expons + k - 1, (heap->nodes)->expons);
         fmpz_set(res->coeffs + k - 1, (heap->nodes)->coeffs);
       }
       else if(fmpz_equal(res->expons + k - 1, (heap->nodes)->expons))
       {
-        flint_printf("\nappend coeffs: (");
-        fmpz_print((heap->nodes)->coeffs);
-        flint_printf(",");
-        fmpz_print((heap->nodes)->expons);
-        flint_printf(") (%lu, %lu) size: %lu\n", (heap->nodes)->p1, (heap->nodes)->p2, heap->size);
         fmpz_add(res->coeffs + k - 1, (heap->nodes)->coeffs, res->coeffs + k - 1);
       }
       else
       {
-        flint_printf("\nadd length: (");
-        fmpz_print((heap->nodes)->coeffs);
-        flint_printf(",");
-        fmpz_print((heap->nodes)->expons);
-        flint_printf(") (%lu, %lu) size: %lu\n", (heap->nodes)->p1, (heap->nodes)->p2, heap->size);
         fmpz_init(res->expons + k);
         fmpz_init(res->coeffs + k);
         fmpz_set(res->expons + k, (heap->nodes)->expons);
@@ -280,23 +261,20 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
         k++;
       }
  
-      /*if((heap->nodes)->p2 == poly2->length - 1)
-      {*/
-        flint_printf("\nPOP (%lu, %lu)\n", (heap->nodes)->p1, (heap->nodes)->p2);
+      if((heap->nodes)->p2 == poly2->length - 1)
+      {
         fmpz_new_heap_pop(heap);
-        fmpz_heap_print(heap);
-      /*}
+      }
       else
       {
         (heap->nodes)->p2 += 1;
         fmpz_mul((heap->nodes)->coeffs, poly1->coeffs + (heap->nodes)->p1, poly2->coeffs + (heap->nodes)->p2);
         fmpz_add((heap->nodes)->expons, poly1->expons + (heap->nodes)->p1, poly2->expons + (heap->nodes)->p2);
         fmpz_heap_replace(heap);
-      }*/
+      }
     }
     
     res->length = k;
-    
     fmpz_new_heap_free(heap);
   }
 }

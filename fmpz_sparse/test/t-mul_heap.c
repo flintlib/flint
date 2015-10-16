@@ -43,21 +43,21 @@ main(void)
 
     
     /* Check aliasing of a and b */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_sparse_t a, b, c;
         fmpz_t d, e;
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest(d, state, 50);
-        fmpz_randtest(e, state, 50);
+        fmpz_randtest(d, state, 100);
+        fmpz_randtest(e, state, 100);
 
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
         fmpz_sparse_init(c);
-        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 50);
-        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 50);
+        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 200);
+        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 200);
 
         fmpz_sparse_mul_heaps(a, b, c);
         fmpz_sparse_mul_heaps(b, b, c);
@@ -79,21 +79,21 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_sparse_t a, b, c;
         fmpz_t d, e;
 
         fmpz_init(d);
         fmpz_init(e);
-        fmpz_randtest(d, state, 50);
-        fmpz_randtest(e, state, 50);
+        fmpz_randtest(d, state, 100);
+        fmpz_randtest(e, state, 100);
 
         fmpz_sparse_init(a);
         fmpz_sparse_init(b);
         fmpz_sparse_init(c);
-        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 50);
-        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 50);
+        fmpz_sparse_randtest(b, state, n_randint(state, 50), d, 200);
+        fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 200);
 
         fmpz_sparse_mul_heaps(a, b, c);
         fmpz_sparse_mul_heaps(c, b, c);
@@ -115,7 +115,7 @@ main(void)
     }
 
     /* Check (b*c)+(b*d) = b*(c+d) */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_sparse_t a1, a2, b, c, d;
         fmpz_t e, f, g;
@@ -123,18 +123,18 @@ main(void)
         fmpz_init(e);
         fmpz_init(f);
         fmpz_init(g);
-        fmpz_randtest(e, state, 50);
-        fmpz_randtest(f, state, 50);
-        fmpz_randtest(g, state, 50);
+        fmpz_randtest(e, state, 100);
+        fmpz_randtest(f, state, 100);
+        fmpz_randtest(g, state, 100);
 
         fmpz_sparse_init(a1);
         fmpz_sparse_init(a2);
         fmpz_sparse_init(b);
         fmpz_sparse_init(c);
         fmpz_sparse_init(d);
-        fmpz_sparse_randtest(b, state, n_randint(state, 50), e, 50);
-        fmpz_sparse_randtest(c, state, n_randint(state, 50), f, 50);
-        fmpz_sparse_randtest(d, state, n_randint(state, 50), g, 50);
+        fmpz_sparse_randtest(b, state, n_randint(state, 50), e, 200);
+        fmpz_sparse_randtest(c, state, n_randint(state, 50), f, 200);
+        fmpz_sparse_randtest(d, state, n_randint(state, 50), g, 200);
 
         fmpz_sparse_mul_heaps(a1, b, c);
         fmpz_sparse_mul_heaps(a2, b, d);
