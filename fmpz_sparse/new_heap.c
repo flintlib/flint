@@ -197,6 +197,8 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
   
   if((poly1->length == 1) && (poly2->length == 1))
   {
+    fmpz_sparse_zero(res);
+
     res->length = 1;
     fmpz_init(res->coeffs);
     fmpz_init(res->expons);
@@ -217,6 +219,8 @@ fmpz_sparse_new_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_s
     
     slong i;
     
+    fmpz_sparse_zero(res);
+   
     _fmpz_sparse_reserve(res, poly1->length*poly2->length);
     
     fmpz_new_heap_init(heap, poly1->length);
