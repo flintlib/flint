@@ -103,7 +103,6 @@ void
 nmod_mat_strong_echelon_form(nmod_mat_t A)
 {
     mp_limb_t s, t, u, v, q, t1, t2, g;
-    mp_limb_t temp;
     slong m, n, row, col, i, k, l;
     mp_limb_t **r;
     nmod_t mod;
@@ -133,12 +132,8 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             }
             else
             {
-                g = n_xgcd(&s, &t, nmod_mat_entry(A, i, col), nmod_mat_entry(A, row, col));
-                temp = s;
-                s = t;
-                t = temp;
+                g = n_xgcd(&t, &s, nmod_mat_entry(A, i, col), nmod_mat_entry(A, row, col));
             }
-
 
             /* now g = a*x - b*y 
              a,b < x < mod.n */
@@ -186,7 +181,6 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             if (g == 1)
             {
                 continue;
-
             }
             g = mod.n/g;
             _nmod_vec_scalar_mul_nmod(extra_row, r[col], m, g, mod);
@@ -204,11 +198,7 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
             }
             else
             {
-                g = n_xgcd(&s, &t, extra_row[row], nmod_mat_entry(A, row, row));
-                temp = s;
-                s = t;
-                t = temp;
-
+                g = n_xgcd(&t, &s, extra_row[row], nmod_mat_entry(A, row, row));
             }
             if (g == 0)
             {
