@@ -29,7 +29,7 @@
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 
-int
+slong
 nmod_mat_howell_form(nmod_mat_t A)
 {
     slong i, j, n;
