@@ -737,6 +737,18 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
 *******************************************************************************
 
+	Minimal polynomial
+
+*******************************************************************************
+
+void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+
+	Assumes that \code{mat} is $n \times n$ matrix and sets
+	\code{cp} to its minimal polynomial which has at most
+	$n + 1$ terms.
+
+*******************************************************************************
+
     Rank
 
 *******************************************************************************
