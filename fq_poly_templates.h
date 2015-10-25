@@ -1207,6 +1207,32 @@ FLINT_DLL char * _TEMPLATE(T, poly_get_str)(const TEMPLATE(T, struct) * poly, sl
 FLINT_DLL char * TEMPLATE(T, poly_get_str)(const TEMPLATE(T, poly_t) poly,
                           const TEMPLATE(T, ctx_t) ctx);
 
+/* Characteristic polynomial ************************************************/
+
+FLINT_DLL 
+void TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
+                      const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
+
+FQ_POLY_TEMPLATES_INLINE
+void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
+                       const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx)
+{
+   TEMPLATE(T, mat_t) A;
+
+   TEMPLATE(T, mat_init) (A, M->r, M->c, ctx);
+   TEMPLATE(T, mat_set) (A, M, ctx);
+
+   if (A->r != A->c)
+   {
+       flint_printf("Exception (fq_mat_charpoly).  Non-square matrix.\n");
+       abort();
+   }
+
+   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+
+   TEMPLATE(T, mat_clear) (A, ctx);
+}
+
 #ifdef __cplusplus
 }
 #endif

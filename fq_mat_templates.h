@@ -277,6 +277,16 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
                                       const TEMPLATE(T, ctx_t) ctx);
 
 
+/* Characteristic polynomial *************************************************/
+
+/* this prototype really lives in fq_poly_templates.h 
+ * FQ_MAT_TEMPLATES_INLINE
+ * void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p, 
+ *                          TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
+ * {
+ *   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+ * }
+*/
 
 #ifdef __cplusplus
 }

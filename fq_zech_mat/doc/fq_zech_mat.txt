@@ -462,3 +462,19 @@ void fq_zech_mat_solve_triu_recursive(fq_zech_mat_t X, const fq_zech_mat_t U,
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
+
+*******************************************************************************
+
+    Characteristic polynomial
+
+*******************************************************************************
+
+void fq_zech_mat_charpoly_danilevsky(fq_zech_poly_t p, const fq_zech_mat_t M)
+
+    Compute the characteristic polynomial $p$ of the matrix $M$. The matrix
+    is assumed to be square.
+
+void fq_zech_mat_charpoly(fq_zech_poly_t p, const fq_zech_mat_t M)
+
+    Compute the characteristic polynomial $p$ of the matrix $M$. The matrix
+    is required to be square, otherwise an exception is raised.
