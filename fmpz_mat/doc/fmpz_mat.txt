@@ -714,11 +714,21 @@ void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
     an $n \times n$ square matrix. Uses an $O(n^4)$ algorithm based on the
     method of Berkowitz.
 
+void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
+
+    Sets \code{(cp, n+1)} to the characteristic polynomial of 
+    an $n \times n$ square matrix.
+
 void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     Computes the characteristic polynomial of length $n + 1$ of 
     an $n \times n$ square matrix. Uses a modular method based on an $O(n^3)$
     method over $\mathbb{Z}/n\mathbb{Z}$.
+
+void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+
+    Sets \code{(cp, n+1)} to the characteristic polynomial of 
+    an $n \times n$ square matrix.
 
 void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 

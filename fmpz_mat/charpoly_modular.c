@@ -1,28 +1,3 @@
-/*=============================================================================
-
-    This file is part of FLINT.
-
-    FLINT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    FLINT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-=============================================================================*/
-/******************************************************************************
-
-    Copyright (C) 2013 Sebastian Pancratz
-
-******************************************************************************/
-
 #include <math.h>
 
 #include "flint.h"
@@ -81,37 +56,34 @@ static void _fmpz_mat_charpoly_small_3x3(fmpz *rop, fmpz ** const x)
     fmpz_clear(a + 1);
 }
 
-void fmpz_mat_charpoly_small(fmpz_poly_t rop, const fmpz_mat_t op)
+void _fmpz_mat_charpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
-    fmpz_poly_fit_length(rop, op->r + 1);
-
     if (op->r == 0)
     {
-        fmpz_one(rop->coeffs + 0);
+        fmpz_one(rop + 0);
     }
     else if (op->r == 1)
     {
-        fmpz_one(rop->coeffs + 1);
-        fmpz_neg(rop->coeffs + 0, &(op->rows[0][0]));
+        fmpz_one(rop + 1);
+        fmpz_neg(rop + 0, &(op->rows[0][0]));
     }
     else if (op->r == 2)
     {
-        _fmpz_mat_charpoly_small_2x2(rop->coeffs, op->rows);
+        _fmpz_mat_charpoly_small_2x2(rop, op->rows);
     }
     else  /* op->r == 3 */
     {
-        _fmpz_mat_charpoly_small_3x3(rop->coeffs, op->rows);
+        _fmpz_mat_charpoly_small_3x3(rop, op->rows);
     }
-    _fmpz_poly_set_length(rop, op->r + 1);
 }
 
-void fmpz_mat_charpoly_modular(fmpz_poly_t rop, const fmpz_mat_t op)
+void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
 {
     const long n = op->r;
 
     if (n < 4)
     {
-        fmpz_mat_charpoly_small(rop, op);
+        _fmpz_mat_charpoly_small(rop, op);
     }
     else
     {
@@ -145,8 +117,9 @@ void fmpz_mat_charpoly_modular(fmpz_poly_t rop, const fmpz_mat_t op)
 
             if (fmpz_bits(ptr) == 0)  /* Zero matrix */
             {
-                fmpz_poly_zero(rop);
-                fmpz_poly_set_coeff_ui(rop, n, 1);
+                for (i = 0; i < n; i++)
+                   fmpz_zero(rop + i);
+                fmpz_set_ui(rop + n, 1);
                 return;
             }
 
@@ -157,7 +130,6 @@ void fmpz_mat_charpoly_modular(fmpz_poly_t rop, const fmpz_mat_t op)
         }
 
         fmpz_init_set_ui(m, 1);
-        fmpz_poly_zero(rop);
 
         for ( ; fmpz_bits(m) < bound; )
         {
@@ -172,14 +144,22 @@ void fmpz_mat_charpoly_modular(fmpz_poly_t rop, const fmpz_mat_t op)
             fmpz_mat_get_nmod_mat(mat, op);
             nmod_mat_charpoly(poly, mat);
 
-            fmpz_poly_CRT_ui(rop, rop, m, poly, 1);
+            _fmpz_poly_CRT_ui(rop, rop, n + 1, m, poly->coeffs, n + 1, poly->mod.n, poly->mod.ninv, 1);
 
             fmpz_mul_ui(m, m, p);
 
             nmod_mat_clear(mat);
             nmod_poly_clear(poly);
         }
+
         fmpz_clear(m);
     }
 }
 
+void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
+{
+     fmpz_poly_fit_length(cp, mat->r + 1);
+    _fmpz_poly_set_length(cp, mat->r + 1);
+
+    _fmpz_mat_charpoly_modular(cp->coeffs, mat);
+}

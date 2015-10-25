@@ -294,10 +294,20 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 /* Characteristic polynomial ************************************************/
 
+FLINT_DLL void _fmpz_mat_charpoly_berkowitz(fmpz * rop, const fmpz_mat_t op);
+
 FLINT_DLL void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp,
                                                           const fmpz_mat_t mat);
 
+FLINT_DLL void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op);
+
 FLINT_DLL void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
+
+FMPZ_MAT_INLINE
+void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+{
+   _fmpz_mat_charpoly_modular(cp, mat);
+}
 
 FMPZ_MAT_INLINE
 void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
@@ -310,6 +320,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
    fmpz_mat_charpoly_modular(cp, mat);
 }
+
 
 /* Rank *********************************************************************/
 

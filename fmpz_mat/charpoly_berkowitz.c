@@ -110,13 +110,7 @@ void _fmpz_mat_charpoly_berkowitz(fmpz *cp, const fmpz_mat_t mat)
 
 void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
-    if (mat->r != mat->c)
-    {
-        flint_printf("Exception (fmpz_mat_charpoly).  Non-square matrix.\n");
-        abort();
-    }
-
-    fmpz_poly_fit_length(cp, mat->r + 1);
+     fmpz_poly_fit_length(cp, mat->r + 1);
     _fmpz_poly_set_length(cp, mat->r + 1);
 
     _fmpz_mat_charpoly_berkowitz(cp->coeffs, mat);
