@@ -51,7 +51,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
    if (n == 1)
    {
       nmod_poly_set_coeff_ui(p, 1, 1);
-      nmod_poly_set_coeff_ui(p, 0, A[0][0]);
+      nmod_poly_set_coeff_ui(p, 0, n_negmod(A[0][0], p->mod.n));
       _nmod_poly_set_length(p, 2);
       return;
    }
