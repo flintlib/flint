@@ -294,8 +294,22 @@ FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 /* Characteristic polynomial ************************************************/
 
-FLINT_DLL void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat);
-FLINT_DLL void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat);
+FLINT_DLL void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp,
+                                                          const fmpz_mat_t mat);
+
+FLINT_DLL void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
+
+FMPZ_MAT_INLINE
+void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+{
+   if (mat->r != mat->c)
+   {
+       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
+       abort();
+   }
+
+   fmpz_mat_charpoly_modular(cp, mat);
+}
 
 /* Rank *********************************************************************/
 

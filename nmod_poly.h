@@ -1221,6 +1221,22 @@ FLINT_DLL void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input,
 FLINT_DLL void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
     ulong inflation);
 
+/* Characteristic polynomial */
+
+FLINT_DLL void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+
+NMOD_POLY_INLINE
+void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
+{
+   if (M->r != M->c)
+   {
+       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
+       abort();
+   }
+
+   nmod_mat_charpoly_danilevsky(p, M);
+}
+
 #ifdef __cplusplus
     }
 #endif

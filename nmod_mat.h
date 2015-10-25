@@ -270,6 +270,13 @@ FLINT_DLL void nmod_mat_strong_echelon_form(nmod_mat_t A);
 
 FLINT_DLL slong nmod_mat_howell_form(nmod_mat_t A);
 
+/* Characteristic polynomial */
+
+/* The following prototype actually lives in nmod_poly.h
+ * 
+ * FLINT_DLL void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+*/
+
 /* Tuning parameters *********************************************************/
 
 /* Size at which pre-transposing becomes faster in classical multiplication */

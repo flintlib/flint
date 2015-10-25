@@ -32,7 +32,7 @@
     Employs a division-free algorithm using $O(n^4)$ ring operations.
  */
 
-void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
+void _fmpz_mat_charpoly_berkowitz(fmpz *cp, const fmpz_mat_t mat)
 {
     const slong n = mat->r;
 
@@ -108,7 +108,7 @@ void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
     }
 }
 
-void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
     if (mat->r != mat->c)
     {
@@ -119,6 +119,6 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
     fmpz_poly_fit_length(cp, mat->r + 1);
     _fmpz_poly_set_length(cp, mat->r + 1);
 
-    _fmpz_mat_charpoly(cp->coeffs, mat);
+    _fmpz_mat_charpoly_berkowitz(cp->coeffs, mat);
 }
 
