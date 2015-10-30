@@ -321,6 +321,29 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
    fmpz_mat_charpoly_modular(cp, mat);
 }
 
+/* Characteristic polynomial ************************************************/
+
+FLINT_DLL slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op);
+
+FLINT_DLL void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
+
+FMPZ_MAT_INLINE
+slong _fmpz_mat_minpoly(fmpz * cp, const fmpz_mat_t mat)
+{
+   return _fmpz_mat_minpoly_modular(cp, mat);
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+{
+   if (mat->r != mat->c)
+   {
+       flint_printf("Exception (nmod_mat_minpoly).  Non-square matrix.\n");
+       abort();
+   }
+
+   fmpz_mat_minpoly_modular(cp, mat);
+}
 
 /* Rank *********************************************************************/
 

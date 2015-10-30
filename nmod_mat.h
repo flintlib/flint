@@ -260,6 +260,8 @@ FLINT_DLL slong _nmod_mat_rref_classical(nmod_mat_t A, slong * pivots_nonpivots)
 FLINT_DLL slong nmod_mat_rref_storjohann(nmod_mat_t A);
 FLINT_DLL slong _nmod_mat_rref_storjohann(nmod_mat_t A, slong * pivots_nonpivots);
 
+slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
+
 /* Nullspace */
 
 FLINT_DLL slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
@@ -270,11 +272,13 @@ FLINT_DLL void nmod_mat_strong_echelon_form(nmod_mat_t A);
 
 FLINT_DLL slong nmod_mat_howell_form(nmod_mat_t A);
 
-/* Characteristic polynomial */
+/* Characteristic polynomial and minimal polynomial */
 
 /* The following prototype actually lives in nmod_poly.h
  * 
  * FLINT_DLL void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+ *
+ * FLINT_DLL void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 */
 
 /* Tuning parameters *********************************************************/

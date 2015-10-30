@@ -44,7 +44,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
 
    if (n == 0)
    {
-      nmod_poly_zero(p);
+      nmod_poly_one(p);
       return;
    }
 

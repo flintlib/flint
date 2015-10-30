@@ -1221,7 +1221,7 @@ FLINT_DLL void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input,
 FLINT_DLL void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
     ulong inflation);
 
-/* Characteristic polynomial */
+/* Characteristic polynomial and minimal polynomial */
 
 FLINT_DLL void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
 
@@ -1243,6 +1243,8 @@ void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
 
    nmod_mat_clear(A);
 }
+
+FLINT_DLL void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 
 #ifdef __cplusplus
     }
