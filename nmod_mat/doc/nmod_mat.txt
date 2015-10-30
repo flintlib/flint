@@ -566,6 +566,23 @@ slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
     
 *******************************************************************************
 
+    Transforms
+
+*******************************************************************************
+
+void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)
+
+    Applies a similarity transform to the $n\times n$ matrix $M$ in-place.
+
+    If $P$ is the $n\times n$ identity matrix the zero entries of whose row
+    $r$ ($0$-indexed) have been replaced by $d$, this transform is equivalent
+    to $M = P^{-1}MP$.
+
+    Similarity transforms preserve the determinant, characteristic polynomial
+    and minimal polynomial.
+
+*******************************************************************************
+
     Characteristic polynomial
 
 *******************************************************************************

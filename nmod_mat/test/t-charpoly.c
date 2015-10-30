@@ -35,14 +35,12 @@
 int
 main(void)
 {
-    slong m, n, rep;
+    slong m, n, rep, i;
     ulong mod;
     FLINT_TEST_INIT(state);
 
     flint_printf("charpoly....");
     fflush(stdout);
-
-    
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -84,6 +82,43 @@ main(void)
         nmod_mat_clear(B);
         nmod_mat_clear(C);
         nmod_mat_clear(D);
+        nmod_poly_clear(f);
+        nmod_poly_clear(g);
+    }
+
+    for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
+    {
+        nmod_mat_t A;
+        nmod_poly_t f, g;
+
+        m = n_randint(state, 10);
+        n = m;
+
+        mod = n_randprime(state, 6, 0);
+
+        nmod_mat_init(A, m, n, mod);
+        nmod_poly_init(f, mod);
+        nmod_poly_init(g, mod);
+
+        nmod_mat_randtest(A, state);
+
+        nmod_mat_charpoly(f, A);
+        
+        for (i = 0; i < 10; i++)
+           nmod_mat_similarity(A, n_randint(state, m), n_randint(state, mod));
+
+        nmod_mat_charpoly(g, A);
+
+        if (!nmod_poly_equal(f, g))
+        {
+            flint_printf("FAIL: charpoly(P^{-1}AP) != charpoly(A).\n");
+            flint_printf("Matrix A:\n"), nmod_mat_print_pretty(A), flint_printf("\n");
+            flint_printf("cp(A) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
+            flint_printf("cp(P^{-1}AP) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
+            abort();
+        }
+
+        nmod_mat_clear(A);
         nmod_poly_clear(f);
         nmod_poly_clear(g);
     }

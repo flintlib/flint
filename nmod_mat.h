@@ -272,6 +272,10 @@ FLINT_DLL void nmod_mat_strong_echelon_form(nmod_mat_t A);
 
 FLINT_DLL slong nmod_mat_howell_form(nmod_mat_t A);
 
+/* Transforms */
+
+void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
+
 /* Characteristic polynomial and minimal polynomial */
 
 /* The following prototype actually lives in nmod_poly.h
