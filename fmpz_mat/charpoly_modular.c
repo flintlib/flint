@@ -79,7 +79,7 @@ void _fmpz_mat_charpoly_small(fmpz * rop, const fmpz_mat_t op)
 
 void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
 {
-    const long n = op->r;
+    const slong n = op->r;
 
     if (n < 4)
     {
@@ -96,16 +96,16 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
             See Lemma 4.1 in Dumas, Pernet, and Wan, "Efficient computation 
             of the characteristic polynomial", 2008.
          */
-        long bound;
+        slong bound;
 
-        long pbits  = FLINT_BITS - 1;
+        slong pbits  = FLINT_BITS - 1;
         mp_limb_t p = (1UL << pbits);
 
         fmpz_t m;
 
         /* Determine the bound in bits */
         {
-            long i, j;
+            slong i, j;
             fmpz *ptr;
             double t;
 
