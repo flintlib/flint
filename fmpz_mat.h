@@ -292,6 +292,10 @@ FLINT_DLL void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A
 FLINT_DLL void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
+/* Transforms */
+
+void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
+
 /* Characteristic polynomial ************************************************/
 
 FLINT_DLL void _fmpz_mat_charpoly_berkowitz(fmpz * rop, const fmpz_mat_t op);
