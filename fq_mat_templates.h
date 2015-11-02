@@ -281,6 +281,12 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
                                       const TEMPLATE(T, ctx_t) ctx);
 
 
+/* Transforms ****************************************************************/
+
+FLINT_DLL
+void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
+                               TEMPLATE(T, t) d, const TEMPLATE(T, ctx_t) ctx);
+
 /* Characteristic polynomial *************************************************/
 
 /* this prototype really lives in fq_poly_templates.h 
@@ -292,12 +298,12 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
  * }
  */
 
-/* Minimal polynomial *************************************************/
+/* Minimal polynomial ********************************************************/
 
 /* this prototype really lives in fq_poly_templates.h 
  * FLINT_DLL 
  * void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p, 
- *                     const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
+ *                   const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
  */
 
 #ifdef __cplusplus
