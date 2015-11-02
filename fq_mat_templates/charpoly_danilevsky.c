@@ -37,7 +37,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
    
    if (n == 0)
    {
-      TEMPLATE(T, poly_zero) (p, ctx);
+      TEMPLATE(T, poly_one) (p, ctx);
       return;
    }
 
@@ -50,6 +50,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
       TEMPLATE(T, neg) (c, TEMPLATE(T, mat_entry) (A, 0, 0), ctx);
       TEMPLATE(T, poly_set_coeff) (p, 0, c, ctx);
       _TEMPLATE(T, poly_set_length) (p, 2, ctx);
+      TEMPLATE(T, clear) (c, ctx);
       return;
    }
 

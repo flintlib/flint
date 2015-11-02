@@ -1233,6 +1233,12 @@ void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
    TEMPLATE(T, mat_clear) (A, ctx);
 }
 
+/* Minimal polynomial ************************************************/
+
+FLINT_DLL 
+void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p, 
+                      const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
+
 #ifdef __cplusplus
 }
 #endif
