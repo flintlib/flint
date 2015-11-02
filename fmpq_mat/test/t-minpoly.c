@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    slong m, n, rep, i;
+    slong m, n, rep, i, j;
     FLINT_TEST_INIT(state);
 
     flint_printf("minpoly....");
@@ -94,6 +94,24 @@ main(void)
         fmpq_poly_init(g);
 
         fmpq_mat_randtest(A, state, 10);
+
+        for (i = 0; i < n/2; i++)
+        {
+           for (j = 0; j < n/2; j++)
+           {
+              fmpq_zero(fmpq_mat_entry(A, i, j + n/2));
+              fmpq_zero(fmpq_mat_entry(A, i + n/2, j));
+           }
+        }
+
+        for (i = 0; i < n/2; i++)
+        {
+           for (j = 0; j < n/2; j++)
+           {
+              fmpq_set(fmpq_mat_entry(A, i + n/2, j + n/2), fmpq_mat_entry(A, i, j));
+           }
+        }
+
         fmpq_mat_set(B, A);
 
         fmpq_mat_minpoly(g, A);
