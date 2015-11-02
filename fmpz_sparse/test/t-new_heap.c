@@ -43,7 +43,7 @@ main(void)
 
     
     /* Check aliasing of a and b */
-   /* for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_sparse_t a, b, c;
         fmpz_t d, e;
@@ -60,7 +60,7 @@ main(void)
         fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 200);
 
         fmpz_sparse_new_heaps(a, b, c);
-        fmpz_sparse_mul_classical(b, b, c);
+        fmpz_sparse_mul_heaps(b, b, c);
 
         result = (fmpz_sparse_equal(a, b));
         if (!result)
@@ -76,10 +76,10 @@ main(void)
         fmpz_sparse_clear(c);
         fmpz_clear(d);
         fmpz_clear(e);
-    }*/
+    }
 
     /* Check aliasing of a and c */
-   /* for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_sparse_t a, b, c;
         fmpz_t d, e;
@@ -96,7 +96,7 @@ main(void)
         fmpz_sparse_randtest(c, state, n_randint(state, 50), e, 200);
 
         fmpz_sparse_new_heaps(a, b, c);
-        fmpz_sparse_mul_classical(c, b, c);
+        fmpz_sparse_new_heaps(c, b, c);
 
         result = (fmpz_sparse_equal(a, c));
         if (!result)
@@ -112,7 +112,7 @@ main(void)
         fmpz_sparse_clear(c);
         fmpz_clear(d);
         fmpz_clear(e);
-    }*/
+    }
 
     /* Check (b*c)+(b*d) = b*(c+d) */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)

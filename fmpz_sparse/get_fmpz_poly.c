@@ -19,22 +19,51 @@
 =============================================================================*/
 /******************************************************************************
 
-    Authored 2015 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2015 by A. Whitman Groves; US Government work in the public domain. 
 
 ******************************************************************************/
 
 #include "fmpz_sparse.h"
+#include "fmpz_poly.h"
 
 void fmpz_sparse_get_fmpz_poly(fmpz_poly_t out, const fmpz_sparse_t in)
 {
-    slong i;
-    fmpz_t c, e;
-    fmpz_init(c);
-    fmpz_init(e);
-    fmpz_poly_zero(out);
-    for (i=0; i<fmpz_sparse_terms(in); ++i) {
-        fmpz_sparse_get_term(c, e, in, i);
-        FLINT_ASSERT (fmpz_fits_si(e));
-        fmpz_poly_set_coeff_fmpz(out, fmpz_get_si(e), c);
+    slong i, j;
+    
+    if(fmpz_sparse_is_zero(in))
+    {
+      fmpz_poly_zero(out);
+      return;
+    }
+    else if(fmpz_sgn(in->expons) == -1)
+    {
+      fmpz_poly_zero(out);
+      return;
+    }
+    else if(in->length == 1)
+    {
+      fmpz_poly_fit_length(out, 1);
+      fmpz_set(out->coeffs, in->coeffs);
+      out->length = 1;
+      return;
+    }
+    else
+    {
+      i = 0;
+      j = fmpz_get_si(in->expons);
+      
+      /*flint_printf("\n");
+      fmpz_print(in->expons);
+      flint_printf("\n");*/
+      
+      fmpz_poly_fit_length(out, j+1); 
+      
+      while (i < in->length && fmpz_sgn(in->expons + i) != -1)
+      {
+        fmpz_set(out->coeffs + fmpz_get_si(in->expons + i), in->coeffs + i);
+        i++;
+      }
+
+      _fmpz_poly_set_length(out, j);
     }
 }
