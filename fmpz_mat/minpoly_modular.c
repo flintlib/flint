@@ -59,6 +59,75 @@ slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
     return len;
 }
 
+void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
+{
+   slong n = op->r, i, j;
+   fmpz * v1;
+   fmpz_t t, q, r1, r2;
+
+   fmpz_init(t);
+   fmpz_init(q);
+   fmpz_init(r1);
+   fmpz_init(r2);
+   
+   v1 = _fmpz_vec_init(n);
+   
+   /* |A| [1,1,...,1]^T */
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < n; j++)
+      {
+         if (fmpz_sgn(fmpz_mat_entry(op, j, i)) >= 0)
+            fmpz_add(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
+         else
+            fmpz_sub(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
+      }
+   }
+
+   for (i = 0; i < n; i++)
+   {
+      fmpz_zero(t);
+
+      /* q_i */
+      fmpz_set(t, fmpz_mat_entry(op, i, j));
+
+      if (fmpz_cmp(t, q) > 0)
+         fmpz_set(q, t);
+
+      if (fmpz_sgn(t) > 0)
+         fmpz_neg(t, t);
+
+      /* r_i */
+      if (fmpz_sgn(t) > 0)
+         fmpz_sub(t, v1 + i, t);
+      else
+         fmpz_add(t, v1 + i, t);
+
+      if (fmpz_cmp(t, r2) > 0)
+      {
+         fmpz_swap(t, r2);
+
+         if (fmpz_cmp(r2, r1) > 0)
+            fmpz_swap(r2, r1);
+      }
+   }
+
+   fmpz_mul(r1, r1, r2);
+
+   fmpz_sqrtrem(b, r2, r1);
+   
+   if (!fmpz_is_zero(r2))
+      fmpz_add_ui(b, b, 1);
+
+   fmpz_add(b, b, q);
+
+   _fmpz_vec_clear(v1, n);
+   fmpz_clear(r1);
+   fmpz_clear(r2);
+   fmpz_clear(t);
+   fmpz_clear(q);
+}
+
 slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 {
     const slong n = op->r;
@@ -71,69 +140,57 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
     else
     {
         /*
-            If $A$ is an $n \times n$ matrix with $n \geq 4$ and 
-            coefficients bounded in absolute value by $B > 1$ then 
-            the coefficients of the characteristic polynomial have 
-            less than $\ceil{n/2 (\log_2(n) + \log_2(B^2) + 1.6669)}$ 
-            bits.
-            See Lemma 4.1 in Dumas, Pernet, and Wan, "Efficient computation 
-            of the characteristic polynomial", 2008.
-            
-            The coefficients of the minimal polynomial have at most
-            n more bits. See Dumas, "Bounds on the coefficients of the
-            characteristic and minimal polynomials, 2007, especially
-            section 3.
-
-            From the explicit formulae for charpolys, the absolute values
-            of the coefficients in the case n = 2 and n = 3 are at most
-            2B^2 and 6B^3 respectively.
-
-            Thus we have bounds on the coefficients of the minimal
-            polynomial of $2\log_2(B) + 3$ and 3\log(B) + 6$.
-         */
+            If $A$ is an $n \times n$ matrix with spectral radius
+            bound by b, the coefficients of the minimal polynomial have 
+            at most $\ceil{d\log_2(b)}$ bits if $d \leq b$. Otherwise
+            if $d > 0$ it has at most
+            $\min{\ceil{d/2\log_2(bd)}, \ceil{d\log_2(2b)}}$ 
+            bits, where $d$ is the degree of the minimal polynomial.
+            See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
+            characteristic and minimal polynomials", 2007.
+        */
         slong bound;
+        double b1, b2, b3, bb;
 
         slong pbits  = FLINT_BITS - 1;
         mp_limb_t p = (1UL << pbits);
 
         fmpz_t m;
 
+        if (fmpz_mat_is_zero(op))
+        {
+           fmpz_set_ui(rop + 0, 1);
+           return 1;
+        }
+
         /* Determine the bound in bits */
         {
-            slong i, j;
-            fmpz *ptr;
-            double t;
+            fmpz_t b;
+            
+            fmpz_init(b);
 
-            ptr = fmpz_mat_entry(op, 0, 0);
-            for (i = 0; i < n; i++)
-                for (j = 0; j < n; j++)
-                    if (fmpz_cmpabs(ptr, fmpz_mat_entry(op, i, j)) < 0)
-                        ptr = fmpz_mat_entry(op, i, j);
+            _fmpz_mat_bound_ovals_of_cassini(b, op);
+            bb = fmpz_get_d(b);
+            if (bb <= 1.0)
+               bb = 1.0;
 
-            if (fmpz_bits(ptr) == 0)  /* Zero matrix */
-            {
-                for (i = 0; i < n; i++)
-                   fmpz_zero(rop + i);
-                fmpz_set_ui(rop + n, 1);
-                return n + 1;
-            }
+            b1 = _log2(bb);
+            b2 = _log2(bb*n)/2;
+            b3 = _log2(bb*2);
+            
+            if (b3 < b2)
+               b2 = b3;
 
-            t = (fmpz_bits(ptr) <= FLINT_D_BITS) ? 
-                _log2(FLINT_ABS(fmpz_get_d(ptr))) : fmpz_bits(ptr);
-
-            if (n == 2)
-               bound = ceil(2.0 * t + 3.0);
-            else if (n == 3)
-               bound = ceil(3.0 * t + 6.0);
-            else
-               bound = ceil( (n / 2.0) * (_log2(n) + 2.0 * t + 1.6669) ) + n;
+            bound = n <= bb ? (slong) ceil(n*b1) : (slong) ceil(n*b2);
+            
+            fmpz_clear(b);
         }
 
         fmpz_init_set_ui(m, 1);
 
         len = 0;
 
-        for ( ; fmpz_bits(m) < bound; )
+        for ( ; fmpz_bits(m) <= bound; )
         {
             nmod_mat_t mat;
             nmod_poly_t poly;
@@ -148,12 +205,17 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
             len = FLINT_MAX(len, poly->length);
 
-            _fmpz_poly_CRT_ui(rop, rop, n + 1, m, poly->coeffs, poly->length, poly->mod.n, poly->mod.ninv, 1);
+            _fmpz_poly_CRT_ui(rop, rop, n + 1, m, poly->coeffs, 
+                              poly->length, poly->mod.n, poly->mod.ninv, 1);
 
             fmpz_mul_ui(m, m, p);
 
             nmod_mat_clear(mat);
             nmod_poly_clear(poly);
+
+            /* recompute bound */
+            bound = len - 1 <= bb ? 
+                    (slong) ceil((len - 1)*b1) : (slong) ceil((len - 1)*b2);
         }
 
         fmpz_clear(m);
