@@ -245,6 +245,12 @@ FLINT_DLL void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t ma
 
 FLINT_DLL void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
 
+/* Minimal polynomial */
+
+slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat);
+
+void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
+
 #ifdef __cplusplus
 }
 #endif
