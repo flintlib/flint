@@ -40,10 +40,10 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
    {
       if (A[m][i] != 0)
       {
-         h = n_negmod(A[m][i], M->mod.n);
          r = P[i];
          if (r != -WORD(1))
          {
+            h = n_negmod(A[m][i], M->mod.n);
             A[m][i] = 0;
 
             for (j = i + 1; j < L[r]; j++)
