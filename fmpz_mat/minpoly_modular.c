@@ -77,7 +77,7 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
    {
       for (j = 0; j < n; j++)
       {
-         if (fmpz_sgn(fmpz_mat_entry(op, j, i)) >= 0)
+         if (fmpz_sgn(fmpz_mat_entry(op, i, j)) >= 0)
             fmpz_add(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
          else
             fmpz_sub(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
@@ -89,19 +89,13 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
       fmpz_zero(t);
 
       /* q_i */
-      fmpz_set(t, fmpz_mat_entry(op, i, j));
+      fmpz_abs(t, fmpz_mat_entry(op, i, i));
 
       if (fmpz_cmp(t, q) > 0)
          fmpz_set(q, t);
 
-      if (fmpz_sgn(t) > 0)
-         fmpz_neg(t, t);
-
       /* r_i */
-      if (fmpz_sgn(t) > 0)
-         fmpz_sub(t, v1 + i, t);
-      else
-         fmpz_add(t, v1 + i, t);
+      fmpz_sub(t, v1 + i, t);
 
       if (fmpz_cmp(t, r2) > 0)
       {
@@ -214,7 +208,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             nmod_poly_clear(poly);
 
             /* recompute bound */
-            bound = len - 1 <= bb ? 
+            bound = (len - 1) <= bb ? 
                     (slong) ceil((len - 1)*b1) : (slong) ceil((len - 1)*b2);
         }
 
