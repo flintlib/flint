@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    slong m, n, rep;
+    slong m, n, rep, i;
     FLINT_TEST_INIT(state);
 
     flint_printf("minpoly....");
@@ -76,6 +76,51 @@ main(void)
         fmpq_poly_clear(g);
         fmpq_poly_clear(q);
         fmpq_poly_clear(r);
+    }
+
+    for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
+    {
+        fmpq_mat_t A, B;
+        fmpq_poly_t f, g;
+        fmpq_t d;
+
+        m = n_randint(state, 4);
+        n = m;
+
+        fmpq_init(d);
+        fmpq_mat_init(A, m, n);
+        fmpq_mat_init(B, m, n);
+        fmpq_poly_init(f);
+        fmpq_poly_init(g);
+
+        fmpq_mat_randtest(A, state, 10);
+        fmpq_mat_set(B, A);
+
+        fmpq_mat_minpoly(g, A);
+
+        for (i = 0; i < n; i++)
+        {
+           fmpq_set_si(d, n_randint(state, 6) - 3, 1);
+           fmpq_mat_similarity(B, n_randint(state, n), d);
+        }
+        
+        fmpq_mat_minpoly(f, B);
+
+        if (!fmpq_poly_equal(f, g))
+        {
+            flint_printf("FAIL: minpoly(P^{-1}AP) != minpoly(A).\n");
+            flint_printf("Matrix A:\n"), fmpq_mat_print(A), flint_printf("\n");
+            flint_printf("Matrix P^{-1}AP:\n"), fmpq_mat_print(B), flint_printf("\n");
+            flint_printf("mp(P^{-1}AP) = "), fmpq_poly_print_pretty(f, "X"), flint_printf("\n");
+            flint_printf("mp(A) = "), fmpq_poly_print_pretty(g, "X"), flint_printf("\n");
+            abort();
+        }
+
+        fmpq_clear(d);
+        fmpq_mat_clear(A);
+        fmpq_mat_clear(B);
+        fmpq_poly_clear(f);
+        fmpq_poly_clear(g);
     }
 
     FLINT_TEST_CLEANUP(state);

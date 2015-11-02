@@ -239,13 +239,18 @@ FLINT_DLL slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
 FLINT_DLL void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A);
 
-/* Characteristic polynomial */
+/* Characteristic polynomial *************************************************/
 
-FLINT_DLL void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat);
+void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d);
+
+/* Characteristic polynomial *************************************************/
+
+FLINT_DLL void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, 
+                                                         const fmpq_mat_t mat);
 
 FLINT_DLL void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
 
-/* Minimal polynomial */
+/* Minimal polynomial ********************************************************/
 
 slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat);
 
