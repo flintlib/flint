@@ -929,19 +929,20 @@ slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
 
 void fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
 
-    Puts $A$ into strong echelon form. The Howell form and the strong echelon
-    form are equal up to permutation of the rows, see \cite{FieHof2014} for a
-    definition of the strong echelon form and the algorithm used here.
-    All computations are done modulo \code{mod}.
+    Transforms $A$ such that $A$ modulo \code{mod} is the strong echelon form
+    of the input matrix modulo \code{mod}. The Howell form and the strong
+    echelon form are equal up to permutation of the rows, see \cite{FieHof2014}
+    for a definition of the strong echelon form and the algorithm used here.
 
     $A$ must have at least as many rows as columns.
 
 slong fmpz_mat_howell_form_mod(nmod_mat_t A, const fmpz_t mod)
 
-    Puts $A$ into Howell form and returns the number of non-zero rows.
+    Transforms $A$ such that $A$ modulo \code{mod} is the Howell form of the
+    input matrix modulo \code{mod}. 
     For a definition of the Howell form see \cite{StoMul1998}. The Howell form
     is computed by first putting $A$ into strong echelon form and then ordering
-    the rows. All computations are done modulo \code{mod}.
+    the rows.
 
     $A$ must have at least as many rows as columns.
 
