@@ -214,12 +214,13 @@ void fmpz_sparse_set_si_si(fmpz_sparse_t poly,
     }
 }
 
-/* FIXME */
+/*  BEGINNING OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 FLINT_DLL void fmpz_sparse_set_fmpz_poly(fmpz_sparse_t poly1, 
     const fmpz_poly_t poly2);
 
 FLINT_DLL void fmpz_sparse_get_fmpz_poly(fmpz_poly_t out, 
     const fmpz_sparse_t in);
+/*  ENDING OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL int fmpz_sparse_set_str(fmpz_sparse_t poly, const char * str);
 

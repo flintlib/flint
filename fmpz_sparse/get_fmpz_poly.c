@@ -52,10 +52,6 @@ void fmpz_sparse_get_fmpz_poly(fmpz_poly_t out, const fmpz_sparse_t in)
       i = 0;
       j = fmpz_get_si(in->expons);
       
-      /*flint_printf("\n");
-      fmpz_print(in->expons);
-      flint_printf("\n");*/
-      
       fmpz_poly_fit_length(out, j+1); 
       
       while (i < in->length && fmpz_sgn(in->expons + i) != -1)

@@ -57,14 +57,12 @@ main(void)
 
         fmpz_init(c);
 
-        fmpz_randtest(c, state, 20);
+        fmpz_randtest(c, state, 30);
 
         fmpz_sparse_randtest(n, state, n_randint(state, 50), c, 200);
         fmpz_sparse_get_fmpz_poly(a, n);
         fmpz_poly_set(b, a);
 
-           /* flint_printf("n = "), fmpz_sparse_print(n), flint_printf("\n\n");
-            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");*/
         result = (fmpz_poly_equal(a, b));
 
         if (!result)
@@ -96,14 +94,14 @@ main(void)
 
         fmpz_init(c);
 
-        fmpz_randtest(c, state, 20);
+        fmpz_randtest(c, state, 30);
 
         fmpz_sparse_randtest(m, state, n_randint(state, 50), c, 200);
         fmpz_sparse_randtest(n, state, n_randint(state, 50), c, 200);
         while (fmpz_sparse_equal(m, n))
         {
             if(fmpz_is_zero(c))
-              fmpz_randtest(c, state, 20);
+              fmpz_randtest(c, state, 30);
             fmpz_sparse_randtest(n, state, n_randint(state, 50), c, 200);
         }
         fmpz_sparse_get_fmpz_poly(a, m);
