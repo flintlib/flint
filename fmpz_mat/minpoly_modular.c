@@ -283,7 +283,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
                             break;
                      }
 
-                     if (j != len)
+                     if (j != n)
                         break;
                   }
                }
