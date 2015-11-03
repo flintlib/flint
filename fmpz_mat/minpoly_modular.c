@@ -125,7 +125,7 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
 slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 {
     const slong n = op->r;
-    slong len = 0;
+    slong len = 0, oldlen = 0;
 
     if (n < 2)
     {
@@ -146,9 +146,12 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
         slong bound;
         double b1, b2, b3, bb;
 
-        slong pbits  = FLINT_BITS - 1;
+        slong pbits  = FLINT_BITS - 1, i, j;
         mp_limb_t p = (1UL << pbits);
+        ulong * P, * Q;
 
+        fmpz_mat_t v1, v2, v3;
+        fmpz * rold;
         fmpz_t m;
 
         if (fmpz_mat_is_zero(op))
@@ -180,35 +183,131 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             fmpz_clear(b);
         }
 
+        P = (ulong *) flint_calloc(n, sizeof(ulong));
+        Q = (ulong *) flint_calloc(n, sizeof(ulong));
+        rold = (fmpz *) _fmpz_vec_init(n + 1);
+        fmpz_mat_init(v1, n, 1);
+        fmpz_mat_init(v2, n, 1);
+        fmpz_mat_init(v3, n, 1);
+
         fmpz_init_set_ui(m, 1);
 
+        oldlen = 0;
         len = 0;
 
         for ( ; fmpz_bits(m) <= bound; )
         {
             nmod_mat_t mat;
             nmod_poly_t poly;
-
+            
             p = n_nextprime(p, 0);
 
             nmod_mat_init(mat, n, n, p);
             nmod_poly_init(poly, p);
 
-            fmpz_mat_get_nmod_mat(mat, op);
-            nmod_mat_minpoly(poly, mat);
+            for (i = 0; i < n; i++)
+               P[i] = 0;
 
-            len = FLINT_MAX(len, poly->length);
+            fmpz_mat_get_nmod_mat(mat, op);
+            nmod_mat_minpoly_with_gens(poly, mat, P);
+
+            len = poly->length;
+
+            if (oldlen != 0 && len > oldlen)
+            {
+               /* all previous primes were bad, discard */
+                           
+               fmpz_one(m);
+               oldlen = len;
+
+               for (i = 0; i < n + 1; i++)
+                  fmpz_zero(rop + i);
+
+               for (i = 0; i < n; i++)
+                  Q[i] = 0;
+            } else if (len < oldlen)
+            {
+               /* this prime was bad, skip */
+
+               nmod_mat_clear(mat);
+               nmod_poly_clear(poly);
+            
+               continue;   
+            }
+
+            for (i = 0; i < n; i++)
+               Q[i] |= P[i];
 
             _fmpz_poly_CRT_ui(rop, rop, n + 1, m, poly->coeffs, 
                               poly->length, poly->mod.n, poly->mod.ninv, 1);
 
             fmpz_mul_ui(m, m, p);
 
+            /* check if stabilised */
+            for (i = 0; i < len; i++)
+            {
+               if (!fmpz_equal(rop + i, rold + i))
+                  break;
+            }
+
+            for (j = 0; j < len; j++)
+               fmpz_set(rold + j, rop + j);
+
+            if (i == len) /* stabilised */
+            {
+               for (i = 0; i < n; i++)
+               {
+                  if (Q[i] == 1)
+                  {
+                     fmpz_mat_zero(v1);
+                     fmpz_mat_zero(v3);
+
+                     fmpz_set_ui(fmpz_mat_entry(v1, i, 0), 1);
+
+                     for (j = 0; j < len; j++)
+                     {
+                        fmpz_mat_scalar_mul_fmpz(v2, v1, rop + j);
+                        fmpz_mat_add(v3, v3, v2);
+
+                        if (j != len - 1)
+                        {
+                           fmpz_mat_mul(v2, op, v1);
+                           fmpz_mat_swap(v1, v2);
+                        }
+                     }
+                  
+                     /* check f(A)v = 0 */
+                     for (j = 0; j < n; j++)
+                     {
+                        if (!fmpz_is_zero(v3->rows[j] + 0))
+                            break;
+                     }
+
+                     if (j != len)
+                        break;
+                  }
+               }
+
+               /* if f(A)v = 0 for all generators v, we are done */
+               if (i == n)
+               {
+                  nmod_mat_clear(mat);
+                  nmod_poly_clear(poly);
+                  break;
+               }
+            }
+
             nmod_mat_clear(mat);
             nmod_poly_clear(poly);
         }
 
+        flint_free(P);
+        flint_free(Q);
+        fmpz_mat_clear(v2);
+        fmpz_mat_clear(v1);
+        fmpz_mat_clear(v3);
         fmpz_clear(m);
+        _fmpz_vec_clear(rold, n);
     }
 
     return len;

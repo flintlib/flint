@@ -30,7 +30,7 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t X)
+void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
 {
    slong n = X->r, i, j, c, c1, c2, r1, r2;
    ulong ** A, ** B, ** v, t, h;
@@ -57,6 +57,8 @@ void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t X)
       nmod_poly_set_coeff_ui(p, 1, 1);
       nmod_poly_set_coeff_ui(p, 0, n_negmod(X->rows[0][0], p->mod.n));
       _nmod_poly_set_length(p, 2);
+      if (P != NULL)
+         P[0] = 1;
       return;
    }
 
@@ -111,6 +113,8 @@ void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t X)
       B[r2][c2] = 1;
       A[0][c2] = 1;
       A[0][n] = 1;
+      if (P != NULL)
+         P[c2] = 1;
 
       indep = 1;
 
@@ -205,4 +209,9 @@ void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t X)
    nmod_poly_clear(g);
 
    TMP_END;
+}
+
+void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t X)
+{
+   nmod_mat_minpoly_with_gens(p, X, NULL);
 }
