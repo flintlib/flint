@@ -206,10 +206,6 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
             nmod_mat_clear(mat);
             nmod_poly_clear(poly);
-
-            /* recompute bound */
-            bound = (len - 1) <= bb ? 
-                    (slong) ceil((len - 1)*b1) : (slong) ceil((len - 1)*b2);
         }
 
         fmpz_clear(m);
