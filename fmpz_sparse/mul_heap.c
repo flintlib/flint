@@ -26,12 +26,19 @@
 #include "fmpz_sparse.h"
 #include "fmpz_vec.h"
 
+typedef struct node
+{
+  fmpz_t expons;
+  fmpz_t coeffs;
+  slong p1;
+  slong p2;
+} node;
+
+typedef struct node node_t[1];
+
 typedef struct heap
 {
-  fmpz * expons;
-  fmpz * coeffs;
-  slong * p1;
-  slong * p2;
+  node * nodes;
   slong size;
   slong alloc;
 } heap;
@@ -39,12 +46,21 @@ typedef struct heap
 typedef struct heap heap_t[1];
 
 void
-fmpz_heap_init(heap * h, const slong size)
+fmpz_node_init(node * n)
 {
-  h->expons = flint_calloc(size, sizeof(fmpz));
-  h->coeffs = flint_calloc(size, sizeof(fmpz));
-  h->p1 = flint_calloc(size, sizeof(slong));
-  h->p2 = flint_calloc(size, sizeof(slong));
+  fmpz_init(n->expons);
+  fmpz_init(n->coeffs);
+}
+
+void
+fmpz_heap_init(heap_t  h, const slong size)
+{
+  int i;
+  h->nodes = flint_calloc(size, sizeof(node_t));
+  for(i = 0; i < size; i++)
+  {
+    fmpz_node_init(h->nodes + i);
+  }
   h->size = 0;
   h->alloc = size;
 }
@@ -55,119 +71,101 @@ fmpz_heap_free(heap_t heap)
   slong i;
   for(i = 0; i < heap->alloc; i++)
   {
-    fmpz_clear(heap->coeffs + i);
-    fmpz_clear(heap->expons + i);
+    fmpz_clear((heap->nodes + i)->expons);
+    fmpz_clear((heap->nodes + i)->coeffs);
   }
-  flint_free(heap->expons);
-  flint_free(heap->coeffs);
-  flint_free(heap->p1);
-  flint_free(heap->p2);
+  flint_free(heap->nodes);
 }
 
 void
-fmpz_heap_insert(heap_t heap, const fmpz_t expon, const fmpz_t coeff,
-    const slong term1, const slong term2)
+fmpz_node_swap(node_t n1, node_t n2)
 {
+  slong temp;
+  
+  fmpz_swap(n1->expons, n2->expons);
+  fmpz_swap(n1->coeffs, n2->coeffs);
 
-  if(heap->size == 0)
-  {
-    fmpz_set(heap->expons + 1, expon);
-    fmpz_set(heap->coeffs + 1, coeff);
-    heap->p1[1] = term1;
-    heap->p2[1] = term2;
-  }
-  else
-  {
-    slong place = heap->size + 1;
-
-    while(place != 1)
-    {
-      if(fmpz_cmp(heap->expons + place/2, expon) < 0)
-      {
-        fmpz_set(heap->expons + place, heap->expons + place/2);
-        fmpz_set(heap->coeffs + place, heap->coeffs + place/2);
-        heap->p1[place] = heap->p1[place/2];
-        heap->p2[place] = heap->p2[place/2];
-        place = place/2;
-      }
-      else
-        break;
-    }
-
-    fmpz_set(heap->expons + place, expon);
-    fmpz_set(heap->coeffs + place, coeff);
-    heap->p1[place] = term1;
-    heap->p2[place] = term2;
-  }
-  heap->size += 1;
+  temp = n1->p1;
+  n1->p1 = n2->p1;
+  n2->p1 = temp;
+  
+  temp = n1->p2;
+  n1->p2 = n2->p2;
+  n2->p2 = temp;
 }
 
 void
-fmpz_heap_pop(heap_t heap)
+fmpz_heap_replace(heap_t heap)
 {
-  slong place = 1;
-  slong temp1 = heap->p1[heap->size];
-  slong temp2 = heap->p2[heap->size];
+  slong place = 0;
   slong temp3;
-  fmpz_t temp_e, temp_c;
-  
-  fmpz_init(temp_e);
-  fmpz_init(temp_c);
-  
-  if(heap->size > 1)
+
+  if(heap->size == 1)
+    return;
+ 
+  while(place*2 + 1 <= heap->size - 1)
   {
-    fmpz_set(temp_e, heap->expons + heap->size);
-    fmpz_set(temp_c, heap->coeffs + heap->size);
-  }
-  
-  fmpz_clear(heap->expons + heap->size);
-  fmpz_clear(heap->coeffs + heap->size);
-  
-  heap->size -= 1;
-  while(place*2 <= heap->size)
-  {
-    if(place*2 + 1 <= heap->size)
-      temp3 = place*2 + 1;
-    else
-      temp3 = place*2;
-    
-    if(fmpz_cmp(heap->expons + place*2, heap->expons + temp3) >= 0)
-      temp3 = place*2;
+    if(place*2 + 2 <= heap->size - 1)
+      temp3 = place*2 + 2;
     else
       temp3 = place*2 + 1;
     
-    if(fmpz_cmp(temp_e, heap->expons + temp3) < 0)
+    if(fmpz_cmp((heap->nodes + place*2 + 1)->expons, (heap->nodes + temp3)->expons) >= 0)
+      temp3 = place*2 + 1;
+    else
+      temp3 = place*2 + 2;
+    
+    if(fmpz_cmp((heap->nodes + place)->expons, (heap->nodes + temp3)->expons) < 0)
     {
-      fmpz_set(heap->expons + place, heap->expons + temp3);
-      fmpz_set(heap->coeffs + place, heap->coeffs + temp3);
-      heap->p1[place] = heap->p1[temp3];
-      heap->p2[place] = heap->p2[temp3];
+      fmpz_node_swap(heap->nodes + place, heap->nodes + temp3);
       place = temp3;
     }
     else
       break;
   }
-  
-  fmpz_set(heap->expons + place, temp_e);
-  fmpz_set(heap->coeffs + place, temp_c);
-  heap->p1[place] = temp1;
-  heap->p2[place] = temp2;
-  
-  fmpz_clear(temp_c);
-  fmpz_clear(temp_e);
 }
 
-void 
-fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
-    const fmpz_sparse_t poly2)
+void
+fmpz_heap_pop(heap_t heap)
 {
-  slong i, j;
-  if (res == poly1 || res == poly2)
+  slong place = 0;
+  slong temp3;
+ 
+  fmpz_node_swap(heap->nodes + place, heap->nodes + heap->size - 1);
+
+  heap->size -= 1;
+  while(place*2 + 1 <= heap->size - 1)
+  {
+    if(place*2 + 2 <= heap->size - 1)
+      temp3 = place*2 + 2;
+    else
+      temp3 = place*2 + 1;
+    
+    if(fmpz_cmp((heap->nodes + place*2 + 1)->expons, (heap->nodes + temp3)->expons) >= 0)
+      temp3 = place*2 + 1;
+    else
+      temp3 = place*2 + 2;
+    
+    if(fmpz_cmp((heap->nodes + place)->expons, (heap->nodes + temp3)->expons) < 0)
+    {
+      fmpz_node_swap(heap->nodes + place, heap->nodes + temp3);
+      place = temp3;
+    }
+    else
+      break;
+  }
+ 
+}
+
+void
+fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
+{
+  if(res == poly1 || res == poly2)
   {
     fmpz_sparse_t temp;
     fmpz_sparse_init(temp);
     fmpz_sparse_mul_heaps(temp, poly1, poly2);
-    fmpz_sparse_set(res, temp);
+    fmpz_sparse_swap(res, temp);
     fmpz_sparse_clear(temp);
     return;
   }
@@ -177,9 +175,11 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     fmpz_sparse_zero(res);
     return;
   }
-
+  
   if((poly1->length == 1) && (poly2->length == 1))
   {
+    fmpz_sparse_zero(res);
+
     res->length = 1;
     fmpz_init(res->coeffs);
     fmpz_init(res->expons);
@@ -187,7 +187,7 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     fmpz_add(res->expons, poly1->expons, poly2->expons);
     return;
   }
-
+  
   if(poly2->length < poly1->length)
   {
     fmpz_sparse_mul_heaps(res, poly2, poly1);
@@ -195,78 +195,71 @@ fmpz_sparse_mul_heaps(fmpz_sparse_t res, const fmpz_sparse_t poly1,
   else
   {
     heap_t heap;
-
-    fmpz_t temp_e, temp_c;
-   
+    
     slong k;
-
-    _fmpz_sparse_reserve(res, poly1->length*poly2->length);
-
-    fmpz_heap_init(heap, poly1->length + 1);
+    
+    slong i;
+    
+    fmpz_sparse_zero(res);
    
-
+    _fmpz_sparse_reserve(res, poly1->length*poly2->length);
+    
+    fmpz_heap_init(heap, poly1->length);
+    
+    
     for(i = 0; i < poly1->length; ++i)
     {
-      fmpz_init(temp_e);
-      fmpz_init(temp_c);
-      fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs);
-      fmpz_add(temp_e, poly1->expons + i, poly2->expons);
-
-      fmpz_heap_insert(heap, temp_e, temp_c, i, 0);
-      fmpz_clear(temp_e);
-      fmpz_clear(temp_c);
+      fmpz_mul((heap->nodes + i)->coeffs, poly1->coeffs + i, poly2->coeffs);
+      fmpz_add((heap->nodes + i)->expons, poly1->expons + i, poly2->expons);
+      (heap->nodes + i)->p1 = i;
+      (heap->nodes + i)->p2 = 0;
+      heap->size += 1;
     }
-
+    
     k = 0;
-
+    
     while(heap->size > 0)
     {
-      fmpz_init(temp_e);
-      fmpz_init(temp_c);
-      i = heap->p1[1];
-      j = heap->p2[1];
-
       if(k == 0)
       {
-        fmpz_init(res->expons + k);
-        fmpz_init(res->coeffs + k);
-        fmpz_set(res->expons + k, heap->expons + 1);
-        fmpz_set(res->coeffs + k, heap->coeffs + 1);
+        fmpz_init(res->expons);
+        fmpz_init(res->coeffs);
+        fmpz_set(res->expons, (heap->nodes)->expons);
+        fmpz_set(res->coeffs, (heap->nodes)->coeffs);
         k++;
       }
       else if(fmpz_is_zero(res->coeffs + k - 1))
       {
-        fmpz_set(res->expons + k - 1, heap->expons + 1);
-        fmpz_set(res->coeffs + k - 1, heap->coeffs + 1);
+        fmpz_set(res->expons + k - 1, (heap->nodes)->expons);
+        fmpz_set(res->coeffs + k - 1, (heap->nodes)->coeffs);
       }
-      else if(fmpz_equal(res->expons + k - 1, heap->expons + 1) == 1)
+      else if(fmpz_equal(res->expons + k - 1, (heap->nodes)->expons))
       {
-        fmpz_add(res->coeffs + k - 1, heap->coeffs + 1, res->coeffs + k - 1);
+        fmpz_add(res->coeffs + k - 1, (heap->nodes)->coeffs, res->coeffs + k - 1);
       }
       else
       {
         fmpz_init(res->expons + k);
         fmpz_init(res->coeffs + k);
-        fmpz_set(res->expons + k, heap->expons + 1);
-        fmpz_set(res->coeffs + k, heap->coeffs + 1);
+        fmpz_set(res->expons + k, (heap->nodes)->expons);
+        fmpz_set(res->coeffs + k, (heap->nodes)->coeffs);
         k++;
       }
-
-      fmpz_heap_pop(heap);
-
-      if(j < poly2->length - 1)
+ 
+      if((heap->nodes)->p2 == poly2->length - 1)
       {
-        fmpz_mul(temp_c, poly1->coeffs + i, poly2->coeffs + j + 1);
-        fmpz_add(temp_e, poly1->expons + i, poly2->expons + j + 1);
-        fmpz_heap_insert(heap, temp_e, temp_c, i, j + 1);
+        fmpz_heap_pop(heap);
       }
-
-      fmpz_clear(temp_e);
-      fmpz_clear(temp_c);
+      else
+      {
+        (heap->nodes)->p2 += 1;
+        fmpz_mul((heap->nodes)->coeffs, poly1->coeffs + (heap->nodes)->p1, poly2->coeffs + (heap->nodes)->p2);
+        fmpz_add((heap->nodes)->expons, poly1->expons + (heap->nodes)->p1, poly2->expons + (heap->nodes)->p2);
+        fmpz_heap_replace(heap);
+      }
     }
-   
+    
     res->length = k;
-
     fmpz_heap_free(heap);
   }
 }

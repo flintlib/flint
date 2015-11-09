@@ -58,7 +58,7 @@ fmpz_sparse_new_mul_classical(fmpz_sparse_t res, const fmpz_sparse_t poly1,
       _fmpz_vec_scalar_mul_fmpz(temp->coeffs, poly1->coeffs, poly1->length, poly2->coeffs + i);
       fmpz_sparse_shift_left(temp, poly1, poly2->expons + i);
     
-      fmpz_sparse_new_add(res, temp, res);
+      fmpz_sparse_add(res, temp, res);
       
       fmpz_sparse_clear(temp);
     }
