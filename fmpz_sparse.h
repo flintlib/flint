@@ -540,7 +540,7 @@ FLINT_DLL void fmpz_sparse_mul_classical(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
 /* FIXME */
-FLINT_DLL void fmpz_sparse_mul_interp(fmpz_sparse_t res,
+FLINT_DLL void fmpz_sparse_mul_interp(fmpz_sparse_t res, flint_rand_t state, 
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
 FMPZ_SPARSE_INLINE 
