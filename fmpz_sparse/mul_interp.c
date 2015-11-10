@@ -102,17 +102,9 @@ fmpz_sparse_mul_interp(fmpz_sparse_t res, flint_rand_t state, const fmpz_sparse_
   /* estimate structural sparsity */
   do
   {
-    fmpz_randm(p, state, f_s->expons);
-    while(fmpz_is_zero(p))
-    {
-      fmpz_randm(p, state, f_s->expons);
-    }
+    fmpz_set_ui(p, n_randprime(state, 10, 1));
 
-    fmpz_randm(q, state, f_s->expons);
-    while(fmpz_is_zero(q))
-    {
-      fmpz_randm(q, state, f_s->expons);
-    }
+    fmpz_set_ui(q, n_randprime(state, 5, 1));
 
     fmpz_sparse_mul_heaps(temp_1, f_s, g_s);
     _fmpz_vec_scalar_mod_fmpz(temp_1->expons, temp_1->expons, temp_1->length, p);
@@ -124,6 +116,8 @@ fmpz_sparse_mul_interp(fmpz_sparse_t res, flint_rand_t state, const fmpz_sparse_
   fmpz_sparse_print(f_s);
   flint_printf("\n");
   fmpz_sparse_print(g_s);
+  flint_printf("\n");
+  fmpz_sparse_print(temp_1);
   flint_printf("\n");
 
 
