@@ -30,6 +30,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_sparse.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 
@@ -87,7 +88,7 @@ main(void)
     int X[rows][cols];
     double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
-    fmpz_sparse_t m, n, p;
+    fmpz_sparse_t x, y, z;
 
     FLINT_TEST_INIT(state);
     
@@ -96,9 +97,9 @@ main(void)
     fmpz_poly_init2(g, lenhi);
     fmpz_poly_init2(h, 2*lenhi - 1);
     
-    fmpz_sparse_init(m);
-    fmpz_sparse_init(n);
-    fmpz_sparse_init(p);
+    fmpz_sparse_init(x);
+    fmpz_sparse_init(y);
+    fmpz_sparse_init(z);
 
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
@@ -137,8 +138,8 @@ main(void)
                 /*
                    Construct sparse polynomials from f and g
                  */
-                fmpz_sparse_set_fmpz_poly(m, f);
-                fmpz_sparse_set_fmpz_poly(n, g); 
+                fmpz_sparse_set_fmpz_poly(x, f);
+                fmpz_sparse_set_fmpz_poly(y, g); 
 
               loop:
 
@@ -159,7 +160,7 @@ main(void)
 
                 timeit_start(t[3]);
                 for (l = 0; l < loops; l++)
-                    fmpz_sparse_new_heap(p, f, g);
+                    fmpz_sparse_mul_heaps(z, y, x);
                 timeit_stop(t[3]);
 
                 for (c = 0; c < nalgs; c++)
@@ -177,12 +178,14 @@ main(void)
             for (c = 0; c < nalgs; c++)
                 T[i][j][c] = s[c] / (double) reps;
             
-            if (s[0] <= s[1] && s[0] <= s[2])
+            if (s[0] <= s[1] && s[0] <= s[2] && s[0] <= s[3])
                 X[i][j] = 0;
-            else if (s[1] <= s[2])
+            else if (s[1] <= s[2] && s[1] <= s[3])
                 X[i][j] = 1;
-            else
+            else if (s[2] <= s[3])
                 X[i][j] = 2;
+            else
+                X[i][j] = 3;
         }
         {
            slong sum = 0, c;
@@ -195,9 +198,9 @@ main(void)
     fmpz_poly_clear(g);
     fmpz_poly_clear(h);
     
-    fmpz_sparse_clear(m);
-    fmpz_sparse_clear(n);
-    fmpz_sparse_clear(p);
+    fmpz_sparse_clear(x);
+    fmpz_sparse_clear(y);
+    fmpz_sparse_clear(z);
     /* 
        Print 2-D ASCII image of the winning algorithms
      */
@@ -238,12 +241,12 @@ main(void)
                 }
                 for (; m < 3; m++)
                     PIXELS[k++] = (unsigned char) 0;
+                
             }
         }
 
         k = write_rgb_ppm(imgname, PIXELS, cols, rows);
         flint_free(PIXELS);
-        
         if (k)
         {
             flint_printf("Exception:  writing ppm image failed\n");
@@ -251,4 +254,5 @@ main(void)
     }
 
     flint_randclear(state);
+    return 0;
 }

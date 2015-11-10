@@ -138,9 +138,9 @@ main(void)
 
         fmpz_sparse_mul_heaps(a1, b, c);
         fmpz_sparse_mul_heaps(a2, b, d);
-        fmpz_sparse_new_add(a1, a1, a2);
+        fmpz_sparse_add(a1, a1, a2);
 
-        fmpz_sparse_new_add(c, c, d);
+        fmpz_sparse_add(c, c, d);
         fmpz_sparse_mul_heaps(a2, b, c);
 
         result = (fmpz_sparse_equal(a1, a2));
