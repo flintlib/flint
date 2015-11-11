@@ -69,7 +69,8 @@ typedef fmpz_sparse_struct fmpz_sparse_t[1];
 
 typedef struct
 {
-    fmpz q;
+    fmpz_t q;
+    fmpz_t order;
     fmpz * sample_points;
     fmpz * evaluations;
     slong length;
@@ -805,29 +806,22 @@ FLINT_DLL void fmpz_sparse_primitive_part(fmpz_sparse_t res, const fmpz_sparse_t
 
 /*  Sparse interpolation ****************************************************/
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_init(fmpz_sparse_bp_interp_t res,
-    slong terms, const fmpz_t height, const fmpz_t degree);
+    slong terms, const fmpz_t height, const fmpz_t degree, flint_rand_t rs);
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_clear(fmpz_sparse_bp_interp_t res);
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_eval(fmpz_sparse_bp_interp_t res,
     const fmpz_sparse_t poly);
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_mul(fmpz_sparse_bp_interp_t res,
     const fmpz_sparse_t poly);
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_add(fmpz_sparse_bp_interp_t res,
     const fmpz_t c, const fmpz_sparse_t poly);
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp_pow(fmpz_sparse_bp_interp_t res, ulong pow);
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_bp_interp(fmpz_sparse_t res,
     const fmpz_sparse_bp_interp_t evals);
 
@@ -894,12 +888,13 @@ FLINT_DLL void fmpz_sparse_derivative(fmpz_sparse_t res, const fmpz_sparse_t pol
 
 /*  Evaluation  **************************************************************/
 
-/* FIXME */
 FLINT_DLL void fmpz_sparse_evaluate(fmpz_t res,
     const fmpz_sparse_t f, const fmpz_t a);
 
-/* FIXME */
-FLINT_DLL ulong fmpz_sparse_evaluate_mod(const fmpz_sparse_t poly, 
+FLINT_DLL void fmpz_sparse_evaluate_mod(fmpz_t res, const fmpz_sparse_t poly, 
+    const fmpz_t a, const fmpz_t m);
+
+FLINT_DLL ulong fmpz_sparse_evaluate_mod_ui(const fmpz_sparse_t poly, 
     ulong a, ulong m);
 
 /*  Composition  *************************************************************/

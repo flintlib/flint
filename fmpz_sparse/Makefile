@@ -28,12 +28,14 @@ all: tests profile
 $(TEST_RUNS): %: build/%
 	@echo
 	@echo "RUNNING TEST $@"
-	$(LD_PRE) $<
+	@$(LD_PRE) $<
 
 tests: $(TEST_RUNS)
 
 $(TEST_EXES): $(BD)/%: test/%.c $(SOURCES) $(HEADERS) $(TESTS_EXTRA_SRC)
-	$(CC) $(CFLAGS) -I.. $< $(SOURCES) $(TESTS_EXTRA_SRC) -L.. $(LIBS) -o $@
+	@echo
+	@echo "COMPILING $@"
+	@$(CC) $(CFLAGS) -I.. $< $(SOURCES) $(TESTS_EXTRA_SRC) -L.. $(LIBS) -o $@
 
 clean:
 	rm -f $(BD)/*
