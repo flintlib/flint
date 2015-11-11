@@ -19,22 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2013 Mike Hansen
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fq_nmod_mat.h"
+#include "fq_nmod_poly.h"
+#include "fq_nmod_vec.h"
 
-void
-_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2)
-{
-    slong i;
-    if (vec1 != vec2)
-    {
-        for (i = 0; i < len2; i++)
-            fmpz_set(vec1 + i, vec2 + i);
-    }
-}
+#ifdef T
+#undef T
+#endif
+
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_mat_templates/reduce_row.c"
+#undef CAP_T
+#undef T

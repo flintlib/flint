@@ -19,22 +19,33 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 
-void
-_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2)
+void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d)
 {
-    slong i;
-    if (vec1 != vec2)
-    {
-        for (i = 0; i < len2; i++)
-            fmpz_set(vec1 + i, vec2 + i);
-    }
+   slong n = A->r, i, j;
+   
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < r - 1; j++)
+         fmpz_addmul(fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, r), d);
+      
+      for (j = r + 1; j < n; j++)
+         fmpz_addmul(fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, r), d); 
+   }
+
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < r - 1; j++)
+         fmpz_submul(fmpz_mat_entry(A, r, i), fmpz_mat_entry(A, j, i), d);
+
+      for (j = r + 1; j < n; j++)
+         fmpz_submul(fmpz_mat_entry(A, r, i), fmpz_mat_entry(A, j, i), d);      
+   }
 }

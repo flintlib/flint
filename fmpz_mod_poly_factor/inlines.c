@@ -19,22 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 Tommy Hofmann
 
 ******************************************************************************/
 
+#define FMPZ_MOD_POLY_FACTOR_INLINES_C
+
+#define ulong ulongxx /* interferes with system includes */
+#include <stdlib.h>
+#include <stdio.h>
+#undef ulong
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "ulong_extras.h"
+#include "fmpz_mod_poly.h"
 
-void
-_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2)
+void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z, fmpz_mod_poly_factor_t fac, slong i)
 {
-    slong i;
-    if (vec1 != vec2)
-    {
-        for (i = 0; i < len2; i++)
-            fmpz_set(vec1 + i, vec2 + i);
-    }
+    fmpz_mod_poly_set(z, fac->poly + i);
 }
+

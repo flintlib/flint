@@ -107,7 +107,7 @@ Weiferich prime search. (Funded by the Nuffield Foundation)
 
 $\bullet$ Brian Gladman -- MSVC support
 
-$\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^64$ against
+$\bullet$ Dana Jacobsen -- test BPSW primality code up to $2^{64}$ against
 Feitma's tables and sped up and corrected \code{n_is_prime} and
 \code{n_is_probabprime}. Improvements to \code{n_nextprime} and
 \code{n_isprime}.
