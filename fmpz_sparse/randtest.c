@@ -35,7 +35,11 @@ void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state,
     if(fmpz_is_zero(degree))
       return;
 
-    if(fmpz_equal_si(degree, terms))
+    flint_printf("degree: ");
+    fmpz_print(degree);
+    flint_printf("terms: %d\n", terms);
+ 
+    if(fmpz_cmp_si(degree, terms) < 0)
     {
       terms = fmpz_get_si(degree);
     }
