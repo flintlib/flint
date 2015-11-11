@@ -239,6 +239,10 @@ FLINT_DLL slong TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, i
 
 FLINT_DLL slong TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
+
+FLINT_DLL slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L, 
+                                         slong m, const TEMPLATE(T, ctx_t) ctx);
+
 FLINT_DLL slong TEMPLATE(T, mat_nullspace)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
                            const TEMPLATE(T, ctx_t) ctx);
 
@@ -277,6 +281,30 @@ FLINT_DLL void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
                                       const TEMPLATE(T, ctx_t) ctx);
 
 
+/* Transforms ****************************************************************/
+
+FLINT_DLL
+void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
+                               TEMPLATE(T, t) d, const TEMPLATE(T, ctx_t) ctx);
+
+/* Characteristic polynomial *************************************************/
+
+/* this prototype really lives in fq_poly_templates.h 
+ * FQ_MAT_TEMPLATES_INLINE
+ * void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p, 
+ *                          TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
+ * {
+ *   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+ * }
+ */
+
+/* Minimal polynomial ********************************************************/
+
+/* this prototype really lives in fq_poly_templates.h 
+ * FLINT_DLL 
+ * void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p, 
+ *                   const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
+ */
 
 #ifdef __cplusplus
 }

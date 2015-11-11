@@ -134,6 +134,13 @@ FLINT_DLL void nmod_mat_zero(nmod_mat_t mat);
 FLINT_DLL int nmod_mat_is_zero(const nmod_mat_t mat);
 
 NMOD_MAT_INLINE
+int
+nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
+{
+    return _nmod_vec_is_zero(mat->rows[i], mat->c);
+}
+
+NMOD_MAT_INLINE
 int nmod_mat_is_empty(const nmod_mat_t mat)
 {
     return (mat->r == 0) || (mat->c == 0);
@@ -198,6 +205,31 @@ FLINT_DLL slong nmod_mat_rank(const nmod_mat_t A);
 
 FLINT_DLL int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
 
+/* Permutations */
+
+NMOD_MAT_INLINE
+void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
+{
+    if (r != s)
+    {
+        mp_ptr u;
+        slong t;
+
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
+
+        u = mat->rows[s];
+        mat->rows[s] = mat->rows[r];
+        mat->rows[r] = u;
+    }
+}
+
+FLINT_DLL void nmod_mat_apply_permutation(nmod_mat_t A, slong * P, slong n);
+
 /* Triangular solving */
 
 FLINT_DLL void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
@@ -228,10 +260,30 @@ FLINT_DLL slong _nmod_mat_rref_classical(nmod_mat_t A, slong * pivots_nonpivots)
 FLINT_DLL slong nmod_mat_rref_storjohann(nmod_mat_t A);
 FLINT_DLL slong _nmod_mat_rref_storjohann(nmod_mat_t A, slong * pivots_nonpivots);
 
+slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
+
 /* Nullspace */
 
 FLINT_DLL slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
 
+/* Howell form */
+
+FLINT_DLL void nmod_mat_strong_echelon_form(nmod_mat_t A);
+
+FLINT_DLL slong nmod_mat_howell_form(nmod_mat_t A);
+
+/* Transforms */
+
+void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
+
+/* Characteristic polynomial and minimal polynomial */
+
+/* The following prototype actually lives in nmod_poly.h
+ * 
+ * FLINT_DLL void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+ *
+ * FLINT_DLL void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
+*/
 
 /* Tuning parameters *********************************************************/
 

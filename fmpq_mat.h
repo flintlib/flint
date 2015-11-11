@@ -36,6 +36,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpq_poly.h"
 #include "fmpq.h"
 
 #ifdef __cplusplus
@@ -237,6 +238,23 @@ FLINT_DLL slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 /* Gram-Schmidt Orthogonalisation  *******************************************/
 
 FLINT_DLL void fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A);
+
+/* Characteristic polynomial *************************************************/
+
+void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d);
+
+/* Characteristic polynomial *************************************************/
+
+FLINT_DLL void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, 
+                                                         const fmpq_mat_t mat);
+
+FLINT_DLL void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
+
+/* Minimal polynomial ********************************************************/
+
+slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat);
+
+void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat);
 
 #ifdef __cplusplus
 }
