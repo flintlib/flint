@@ -442,26 +442,20 @@ FLINT_DLL int fmpz_sparse_equal_fmpz_poly(const fmpz_sparse_t spoly,
 /*  Addition and subtraction  ************************************************/
 
 /*  BEGINNING OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
-FLINT_DLL void _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, slong * res_len, 
+FLINT_DLL void _fmpz_sparse_add(fmpz * res_c, fmpz * res_e, slong * res_len, 
     const fmpz * poly1_c, const fmpz * poly1_e, slong len1, const fmpz * poly2_c, 
     const fmpz * poly2_e, slong len2);
-
-FLINT_DLL void fmpz_sparse_new_add(fmpz_sparse_t res,
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
-
-FLINT_DLL void _fmpz_sparse_new_sub(fmpz * res_c, fmpz * res_e, slong * res_len,
-        const fmpz * poly1_c, const fmpz * poly1_e, slong len1, const fmpz * poly2_c,
-            const fmpz * poly2_e, slong len2);
-
-FLINT_DLL void fmpz_sparse_new_sub(fmpz_sparse_t res,
-        const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
-/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_add(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
+FLINT_DLL void _fmpz_sparse_sub(fmpz * res_c, fmpz * res_e, slong * res_len,
+    const fmpz * poly1_c, const fmpz * poly1_e, slong len1, const fmpz * poly2_c,
+    const fmpz * poly2_e, slong len2);
+
 FLINT_DLL void fmpz_sparse_sub(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
+/*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_neg(fmpz_sparse_t res, const fmpz_sparse_t poly);
 
@@ -540,17 +534,13 @@ FLINT_DLL void fmpz_sparse_new_mul_classical(fmpz_sparse_t res,
 
 FLINT_DLL void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
-
-FLINT_DLL void fmpz_sparse_new_heaps(fmpz_sparse_t res,
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 /*  END OF WHITMAN'S WORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
 
 FLINT_DLL void fmpz_sparse_mul_classical(fmpz_sparse_t res,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
-
 /* FIXME */
-FLINT_DLL void fmpz_sparse_mul_interp(fmpz_sparse_t res,
+FLINT_DLL void fmpz_sparse_mul_interp(fmpz_sparse_t res, flint_rand_t state, 
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
 FMPZ_SPARSE_INLINE 
