@@ -54,12 +54,12 @@ void fmpz_sparse_get_fmpz_poly(fmpz_poly_t out, const fmpz_sparse_t in)
       
       fmpz_poly_fit_length(out, j+1); 
       
-      while (i < in->length && fmpz_sgn(in->expons + i) != -1)
+      while (i < in->length && fmpz_cmp_si(in->expons + i, 0) >= 0)
       {
         fmpz_set(out->coeffs + fmpz_get_si(in->expons + i), in->coeffs + i);
         i++;
       }
 
-      _fmpz_poly_set_length(out, j);
+      _fmpz_poly_set_length(out, j+1);
     }
 }
