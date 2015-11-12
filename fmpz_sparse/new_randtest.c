@@ -26,24 +26,33 @@
 
 #include "fmpz_sparse.h"
 
-void fmpz_sparse_new_randtest(fmpz_sparse_t res, flint_rand_t state, 
+void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state, 
     slong terms, const fmpz_t degree, mp_bitcnt_t bits)
 {
     slong i;
+    fmpz_t abs;
     fmpz_sparse_zero(res);
     
-    if(fmpz_is_zero(degree))
+    fmpz_init(abs);
+      
+    /* zero terms => 0 */
+    if(terms == 0)
       return;
 
-    flint_printf("degree: ");
-    fmpz_print(degree);
-    flint_printf("terms: %d\n", terms);
- 
-    if(fmpz_cmp_si(degree, terms) < 0)
+    /* zero degree => random number with 0 exponent */
+    if(fmpz_is_zero(degree))
     {
-      terms = fmpz_get_si(degree);
+      fmpz_randtest(res->coeffs, state, bits);
+      return;
     }
 
+    /*if abs(degree) < terms => terms == degree */
+    fmpz_abs(abs, degree);
+    if(fmpz_cmp_si(abs, terms) < 0)
+    {
+      terms = fmpz_get_si(abs);
+    }
+    
     _fmpz_sparse_reserve(res, terms);
     for (i=0; i<terms; ++i) {
         fmpz_init(res->coeffs+i);
