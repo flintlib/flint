@@ -29,7 +29,8 @@
 void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state, 
     slong terms, const fmpz_t degree, mp_bitcnt_t bits)
 {
-    slong i;
+    slong i, k;
+    mp_limb_t j;
     fmpz_t abs;
     fmpz_sparse_zero(res);
     
@@ -52,13 +53,24 @@ void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state,
     {
       terms = fmpz_get_si(abs);
     }
-    
+
+    if(fmpz_cmp_si(degree, 0) < 0)
+      k = 1;
+    else
+      k = 0;
+
     _fmpz_sparse_reserve(res, terms);
     for (i=0; i<terms; ++i) {
         fmpz_init(res->coeffs+i);
         fmpz_init(res->expons+i);
         fmpz_randbits(res->coeffs+i, state, bits);
         fmpz_randm(res->expons+i, state, degree);
+        if(k)
+        {
+          j = n_randint(state, 2);
+          if(j)
+            fmpz_mul_si(res->expons+i, res->expons+i, -1);
+        }
     }
     res->length = terms;
     _fmpz_sparse_normalise(res);
