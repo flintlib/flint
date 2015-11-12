@@ -26,7 +26,7 @@
 
 #include "fmpz_sparse.h"
 
-void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state, 
+void fmpz_sparse_new_randtest(fmpz_sparse_t res, flint_rand_t state, 
     slong terms, const fmpz_t degree, mp_bitcnt_t bits)
 {
     slong i;

@@ -259,6 +259,9 @@ FLINT_DLL void fmpz_sparse_set_trunc_fmpz_poly(fmpz_poly_t res,
 FLINT_DLL void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state, 
      slong terms, const fmpz_t degree, mp_bitcnt_t bits);
 
+FLINT_DLL void fmpz_sparse_new_randtest(fmpz_sparse_t res, flint_rand_t state, 
+     slong terms, const fmpz_t degree, mp_bitcnt_t bits);
+
 /* FIXME */
 FLINT_DLL void fmpz_sparse_randtest_unsigned(fmpz_sparse_t res, 
     flint_rand_t state, slong terms, const fmpz_t degree, mp_bitcnt_t bits);
