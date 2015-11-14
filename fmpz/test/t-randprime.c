@@ -35,7 +35,7 @@ int main(void)
     flint_printf("randprime....");
     fflush(stdout);
 
-    for (bits=2; bits < 40; ++bits)
+    for (bits=2; bits < 36; ++bits)
     {
         for (i=0; i < 1 * flint_test_multiplier(); ++i)
         {
@@ -83,7 +83,7 @@ int main(void)
          * one in a billion. So it should never happen.
          */
         
-        for (i=0; i < 1 * flint_test_multiplier(); ++i)
+        for (i=0; i < 1 + flint_test_multiplier()/5; ++i)
         {
             int j, res;
             fmpz p[2];
