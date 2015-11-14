@@ -108,6 +108,16 @@ void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
     increased probability of generating values close to the
     endpoints or close to zero.
 
+int fmpz_randprime(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits, int proved)
+
+    Generates a random prime number with the given number of bits
+    (or, with vanishingly low probability, one more bit).
+    
+    The generation is performed by choosing a random number and then
+    finding the next largest prime, and therefore does not quite
+    give a uniform distribution over the set of primes with that
+    many bits.
+
 
 *******************************************************************************
 
@@ -1364,6 +1374,11 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n,
     We require $\gcd(r, s) = 1$.
 
     This is efficient if $s^3 > n$.
+
+int fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
+
+    Finds the next prime number larger than $n$.
+
 
 *******************************************************************************
 
