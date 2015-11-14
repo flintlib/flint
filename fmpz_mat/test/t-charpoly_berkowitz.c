@@ -38,7 +38,7 @@ main(void)
     slong m, n, rep, i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("charpoly....");
+    flint_printf("charpoly_berkowitz....");
     fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
@@ -62,8 +62,8 @@ main(void)
         fmpz_mat_mul(C, A, B);
         fmpz_mat_mul(D, B, A);
 
-        fmpz_mat_charpoly(f, C);
-        fmpz_mat_charpoly(g, D);
+        fmpz_mat_charpoly_berkowitz(f, C);
+        fmpz_mat_charpoly_berkowitz(g, D);
 
         if (!fmpz_poly_equal(f, g))
         {
@@ -107,8 +107,8 @@ main(void)
            fmpz_mat_similarity(B, n_randint(state, m), c);
         }
 
-        fmpz_mat_charpoly(f, A);
-        fmpz_mat_charpoly(g, B);
+        fmpz_mat_charpoly_berkowitz(f, A);
+        fmpz_mat_charpoly_berkowitz(g, B);
 
         if (!fmpz_poly_equal(f, g))
         {

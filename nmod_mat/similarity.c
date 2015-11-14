@@ -19,22 +19,39 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 William Hart
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "nmod_vec.h"
+#include "nmod_mat.h"
+#include "nmod_poly.h"
 
-void
-_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2)
+void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)
 {
-    slong i;
-    if (vec1 != vec2)
-    {
-        for (i = 0; i < len2; i++)
-            fmpz_set(vec1 + i, vec2 + i);
-    }
+   slong n = M->r, i, j;
+   ulong ** A = M->rows;
+
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < r - 1; j++)
+         NMOD_ADDMUL(A[i][j], A[i][r], d, M->mod);
+      
+      for (j = r + 1; j < n; j++)
+         NMOD_ADDMUL(A[i][j], A[i][r], d, M->mod); 
+   }
+
+   d = n_negmod(d, M->mod.n);
+
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < r - 1; j++)
+         NMOD_ADDMUL(A[r][i], A[j][i], d, M->mod);
+
+      for (j = r + 1; j < n; j++)
+         NMOD_ADDMUL(A[r][i], A[j][i], d, M->mod);      
+   }
 }

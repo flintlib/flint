@@ -19,22 +19,42 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 Tommy Hofmann
 
 ******************************************************************************/
 
-#include <gmp.h>
+#include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "nmod_vec.h"
+#include "nmod_mat.h"
+#include "ulong_extras.h"
 
-void
-_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, slong len2)
+slong
+nmod_mat_howell_form(nmod_mat_t A)
 {
-    slong i;
-    if (vec1 != vec2)
+    slong i, j, n;
+    slong k;
+
+    n = A->r;
+    k = n;
+    nmod_mat_strong_echelon_form(A);
+
+    for (i = 0; i < n; i++)
     {
-        for (i = 0; i < len2; i++)
-            fmpz_set(vec1 + i, vec2 + i);
+        if (nmod_mat_is_zero_row(A, i))
+        {
+            k--;
+            for (j = i + 1; j < n; j++)
+            {
+                if (!nmod_mat_is_zero_row(A, j))
+                {
+                    nmod_mat_swap_rows(A, NULL, i, j);
+                    j = n;
+                    k++;
+                }
+            }
+        }
     }
+    return k;
 }
+
