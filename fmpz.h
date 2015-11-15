@@ -186,8 +186,8 @@ FLINT_DLL void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
 FLINT_DLL void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
-FLINT_DLL int fmpz_randprime(fmpz_t f, flint_rand_t state, 
-                             mp_bitcnt_t bits, int proved);
+FLINT_DLL void fmpz_randprime(fmpz_t f, flint_rand_t state, 
+                              mp_bitcnt_t bits, int proved);
 
 FLINT_DLL slong fmpz_get_si(const fmpz_t f);
 
@@ -762,7 +762,7 @@ FLINT_DLL int fmpz_is_prime(const fmpz_t p);
 FLINT_DLL int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, 
                                                const fmpz_t r, const fmpz_t s);
 
-FLINT_DLL int fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved);
+FLINT_DLL void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved);
 
 /* Primorials */
 

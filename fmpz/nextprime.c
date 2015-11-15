@@ -28,12 +28,12 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-int fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
+void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
 {
     if (fmpz_sgn(n) <= 0)
     {
         fmpz_set_ui(res, UWORD(2));
-        return 1;
+        return;
     }
     else if (COEFF_IS_MPZ(*n))
     {
@@ -46,7 +46,7 @@ int fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
         /* n and res will both be small */
         _fmpz_demote(res);
         *res = n_nextprime(*n, proved);
-        return 1;
+        return;
     }
     else if (res != n)
     {
@@ -65,7 +65,22 @@ int fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved)
         mpz_nextprime(res_mpz, res_mpz);
         _fmpz_demote_val(res);
     }
-    /* try proving primality, if necessary */
-    if (proved) return fmpz_is_prime(res);
-    else return 1;
+
+    if (proved)
+    {
+        int proof = fmpz_is_prime(res);
+        
+        if (proof == 0)
+        {
+            /* Keep searching. No big penalty for recursion here because this
+             * will almost never happen.
+             */
+            fmpz_nextprime(res, res, proved);
+        }
+        else if (proof < 0)
+        {
+            flint_printf("Exception in fmpz_nextprime: Proof requested but couldn't be found\n");
+            abort();
+        }
+    }
 }

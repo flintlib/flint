@@ -44,24 +44,11 @@ int main(void)
 
             fmpz_init(p);
 
-            res = fmpz_randprime(p, state, bits, 1);
+            fmpz_randprime(p, state, bits, 1);
             
-            if (res != 1)
+            if (fmpz_bits(p) != bits)
             {
-                flint_printf("FAIL: %wu bits, returned %d\n", bits, res);
-                abort();
-            }
-
-            if (fmpz_bits(p) < bits)
-            {
-                flint_printf("FAIL: fewer than %wu bits\n", bits);
-                fmpz_print(p); flint_printf("\n");
-                abort();
-            }
-
-            if (fmpz_bits(p) > bits+1)
-            {
-                flint_printf("FAIL: more than %wu bits\n", bits);
+                flint_printf("FAIL: not %wu bits\n", bits);
                 fmpz_print(p); flint_printf("\n");
                 abort();
             }
@@ -93,24 +80,11 @@ int main(void)
 
             for (j=0; j<2; ++j)
             {
-                res = fmpz_randprime(p+j, state, bits, 0);
+                fmpz_randprime(p+j, state, bits, 0);
                 
-                if (res != 1)
+                if (fmpz_bits(p+j) != bits)
                 {
-                    flint_printf("FAIL: %wu bits, returned %d\n", bits, res);
-                    abort();
-                }
-
-                if (fmpz_bits(p+j) < bits)
-                {
-                    flint_printf("FAIL: fewer than %wu bits\n", bits);
-                    fmpz_print(p+j); flint_printf("\n");
-                    abort();
-                }
-
-                if (fmpz_bits(p+j) > bits+1)
-                {
-                    flint_printf("FAIL: more than %wu bits\n", bits);
+                    flint_printf("FAIL: not %wu bits\n", bits);
                     fmpz_print(p+j); flint_printf("\n");
                     abort();
                 }
