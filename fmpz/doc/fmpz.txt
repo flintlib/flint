@@ -74,8 +74,8 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
 
 void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
-    Generates a random signed integer whose absolute value has the given
-    number of bits.
+    Generates a random signed integer whose absolute value has precisely
+    the given number of bits.
 
 void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
