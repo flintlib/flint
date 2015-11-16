@@ -32,11 +32,11 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-#define M_LOG2E  1.44269504088896340736  /* log2(e) */
+#define CHARPOLY_M_LOG2E  1.44269504088896340736  /* log2(e) */
 
 static __inline__ long double _log2(const long double x)
 {
-    return log(x) * M_LOG2E;
+    return log(x) * CHARPOLY_M_LOG2E;
 }
 
 static void _fmpz_mat_charpoly_small_2x2(fmpz *rop, fmpz ** const x)
