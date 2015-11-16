@@ -3,7 +3,7 @@ LD_PRE=LD_LIBRARY_PATH=..
 
 CC=gcc
 
-WARNS=-ansi -pedantic -Wall -Wextra -Werror -Wno-unused-parameter
+WARNS=-ansi -pedantic -Wall -Wextra -Werror -Wno-unused-parameter -Wno-unused
 CFLAGS=$(WARNS) -mpopcnt -g -O0
 CFLAGS_PROF=$(WARNS) -mpopcnt -funroll-loops -O3
 LIBS=-lflint -lmpfr -lgmp -lm
