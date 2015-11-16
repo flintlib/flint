@@ -39,7 +39,6 @@ int main(void)
     {
         for (i=0; i < 1 * flint_test_multiplier(); ++i)
         {
-            int res;
             fmpz_t p;
 
             fmpz_init(p);
@@ -72,7 +71,7 @@ int main(void)
         
         for (i=0; i < 1 + flint_test_multiplier()/5; ++i)
         {
-            int j, res;
+            int j;
             fmpz p[2];
 
             fmpz_init(p+0);
