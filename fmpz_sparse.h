@@ -71,6 +71,7 @@ typedef struct
 {
     fmpz_t q;
     fmpz_t order;
+    int laurent;
     fmpz * sample_points;
     fmpz * evaluations;
     slong length;
@@ -706,7 +707,7 @@ FMPZ_SPARSE_INLINE
 void fmpz_sparse_divrem(fmpz_sparse_t Q, fmpz_sparse_t R,
     const fmpz_sparse_t A, const fmpz_sparse_t B)
 {
-    FLINT_ASSERT(false);
+    FLINT_ASSERT(0);
     /* FIXME this is just a placeholder! */
 }
 
@@ -736,7 +737,7 @@ void fmpz_sparse_divrem_dense(fmpz_sparse_t Q, fmpz_poly_t R,
     const fmpz_sparse_t A, const fmpz_poly_t B)
 {
     /* FIXME this is just a placeholder! */
-    FLINT_ASSERT(false);
+    FLINT_ASSERT(0);
 }
 
 FMPZ_SPARSE_INLINE
@@ -773,7 +774,7 @@ void fmpz_sparse_xgcd(fmpz_sparse_t r,
     const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
 {
     /* FIXME this is just a placeholder! */
-    FLINT_ASSERT(false);
+    FLINT_ASSERT(0);
 }
 
 FMPZ_SPARSE_INLINE

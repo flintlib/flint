@@ -52,7 +52,17 @@ void fmpz_sparse_bp_interp_init(fmpz_sparse_bp_interp_t res,
   fmpz_init(k);
 
   /* order = next higher power of 2 from degree */
-  fmpz_mul_2exp(res->order, res->order, fmpz_bits(degree));
+  if (fmpz_cmp_si(degree, WORD(0)) >= 0)
+  {
+    fmpz_mul_2exp(res->order, res->order, FLINT_MAX(1, fmpz_bits(degree)));
+    res->laurent = 0;
+  }
+  else
+  {
+    /* negative degree means Laurent polynomial */
+    fmpz_mul_2exp(res->order, res->order, fmpz_bits(degree)+1);
+    res->laurent = 1;
+  }
 
   /* Starting point for q = ceil(height/order)*order + 1 */
   fmpz_cdiv_q(k, height, res->order);
@@ -74,7 +84,8 @@ void fmpz_sparse_bp_interp_init(fmpz_sparse_bp_interp_t res,
     fmpz_randm(w, rs, res->q);
     fmpz_powm(w, w, k, res->q);
     fmpz_powm(test, w, halford, res->q);
-  } while (!fmpz_equal_si(test, WORD(-1)));
+    fmpz_add_ui(test, test, UWORD(1));
+  } while (!fmpz_equal(test, res->q));
 
   fmpz_clear(k);
   fmpz_clear(test);

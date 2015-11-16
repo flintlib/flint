@@ -36,6 +36,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
+    flint_randseed(state, UWORD(3), UWORD(2)); /* TODO remove */
 
     flint_printf("interp....");
     fflush(stdout);
@@ -50,19 +51,23 @@ main(void)
 
       /*random fmpz*/
       fmpz_init(d);
-      fmpz_randtest(d, state, 100);
+      fmpz_init(h);
+      /* fmpz_randtest(d, state, 100); TODO too hard */
+      fmpz_randtest(d, state, 6);
 
       /*random fmpz_sparse*/
       fmpz_sparse_init(a);
       fmpz_sparse_init(b);
       fmpz_sparse_init(c);
-      fmpz_sparse_randtest(a, state, n_randint(state, 100), d, 200);
+      /* fmpz_sparse_randtest(a, state, n_randint(state, 100), d, 200); TODO too hard */
+      fmpz_sparse_randtest(a, state, n_randint(state, 4), d, 7);
 
       /*calculate height of coefficients*/
       fmpz_sparse_height(h, a);
+      fmpz_mul_ui(h, h, UWORD(2));
       
       /*initialize interpolation struct and eval random fmpz_sparse*/
-      fmpz_sparse_bp_interp_init(f, a->length, h, a->expons, state);
+      fmpz_sparse_bp_interp_init(f, a->length, h, d, state);
       fmpz_sparse_bp_interp_eval(f, a);
       
       /*b gets result*/
