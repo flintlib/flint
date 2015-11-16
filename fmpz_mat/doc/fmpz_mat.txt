@@ -1109,12 +1109,6 @@ void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A,
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
 
-    The algorithm may fail to return the correct result with low probability,
-    so \code{fmpz_mat_is_in_hnf} should be called afterwards to check the
-    result. If the routine is called again with the same random state, each
-    call gives an independent chance of computing the correct Hermite Normal
-    Form.
-
 int fmpz_mat_is_in_hnf(const fmpz_mat_t A)
 
     Checks that the given matrix is in Hermite normal form, returns 1 if so and
