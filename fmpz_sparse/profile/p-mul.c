@@ -52,6 +52,7 @@
    imgname  File name for image
  */
 
+#define deg      60
 #define lenlo    1
 #define lenhi    60
 #define lenh     1
@@ -87,19 +88,22 @@ main(void)
     int i, j, len, bits;
     int X[rows][cols];
     double T[rows][cols][nalgs];
-    fmpz_poly_t f, g, h;
-    fmpz_sparse_t x, y, z;
+    fmpz_sparse_t f, g, h;
+    fmpz_poly_t x, y, z;
+    fmpz_t degree;
 
     FLINT_TEST_INIT(state);
     
        
-    fmpz_poly_init2(f, lenhi);
-    fmpz_poly_init2(g, lenhi);
-    fmpz_poly_init2(h, 2*lenhi - 1);
+    fmpz_sparse_init(f);
+    fmpz_sparse_init(g);
+    fmpz_sparse_init(h);
     
-    fmpz_sparse_init(x);
-    fmpz_sparse_init(y);
-    fmpz_sparse_init(z);
+    fmpz_poly_init(x);
+    fmpz_poly_init(y);
+    fmpz_poly_init(z);
+
+    fmpz_init_set_ui(degree, deg);
 
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
@@ -118,49 +122,39 @@ main(void)
                 int l, loops = 1;
                 
                 /*
-                   Construct random polynomials f and g
+                   Construct random sparse polynomials f and g
                  */
                 {
-                    slong k;
-                    for (k = 0; k < len; k++)
-                    {
-                        fmpz_randbits(f->coeffs + k, state, bits);
-                        fmpz_randbits(g->coeffs + k, state, bits);
-                    }
-                    if ((f->coeffs)[len-1] == WORD(0))
-                        fmpz_randtest_not_zero(f->coeffs + (len - 1), state, bits);
-                    if ((g->coeffs)[len-1] == WORD(0))
-                        fmpz_randtest_not_zero(g->coeffs + (len - 1), state, bits);
-                    f->length = len;
-                    g->length = len;
+                  fmpz_sparse_randtest(f, state, len, degree, bits);
+                  fmpz_sparse_randtest(g, state, len, degree, bits);
                 }
 
                 /*
-                   Construct sparse polynomials from f and g
+                   Construct dense polynomials from f and g
                  */
-                fmpz_sparse_set_fmpz_poly(x, f);
-                fmpz_sparse_set_fmpz_poly(y, g); 
+                fmpz_sparse_get_fmpz_poly(x, f);
+                fmpz_sparse_get_fmpz_poly(y, g); 
 
               loop:
 
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
-                    fmpz_poly_mul_classical(h, f, g);
+                    fmpz_poly_mul_classical(z, y, x);
                 timeit_stop(t[0]);
                 
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
-                    fmpz_poly_mul_karatsuba(h, f, g);
+                    fmpz_poly_mul_karatsuba(z, y, x);
                 timeit_stop(t[1]);
 
                 timeit_start(t[2]);
                 for (l = 0; l < loops; l++)
-                    fmpz_poly_mul_KS(h, f, g);
+                    fmpz_poly_mul_KS(z, y, x);
                 timeit_stop(t[2]);
 
                 timeit_start(t[3]);
                 for (l = 0; l < loops; l++)
-                    fmpz_sparse_mul_heaps(z, y, x);
+                    fmpz_sparse_mul_heaps(h, g, f);
                 timeit_stop(t[3]);
 
                 for (c = 0; c < nalgs; c++)

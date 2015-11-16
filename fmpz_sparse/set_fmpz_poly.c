@@ -37,7 +37,7 @@ void fmpz_sparse_set_fmpz_poly(fmpz_sparse_t poly1, const fmpz_poly_t poly2)
       {
         fmpz_init(poly1->expons + j);
         fmpz_init(poly1->coeffs + j);
-        fmpz_set_si(poly1->expons + j, i + 1);
+        fmpz_set_si(poly1->expons + j, i);
         fmpz_set(poly1->coeffs + j, poly2->coeffs + i);
         j += 1;
       }
