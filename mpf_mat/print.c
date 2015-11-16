@@ -29,7 +29,7 @@
 void
 mpf_mat_print(const mpf_mat_t mat)
 {
-    long i, j;
+    slong i, j;
 
     flint_printf("[");
     for (i = 0; i < mat->r; i++)

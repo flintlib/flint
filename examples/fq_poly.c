@@ -35,7 +35,7 @@
 int main(void)
 {
     fmpz_t p;
-    long d, i;
+    slong d, i;
     fq_ctx_t ctx;
     clock_t c0, c1;
     double c;

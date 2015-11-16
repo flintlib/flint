@@ -29,7 +29,7 @@
 void
 d_mat_print(const d_mat_t mat)
 {
-    long i, j;
+    slong i, j;
 
     flint_printf("[");
     for (i = 0; i < mat->r; i++)
