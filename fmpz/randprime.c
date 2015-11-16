@@ -27,13 +27,12 @@
 #include "flint.h"
 #include "fmpz.h"
 
-int fmpz_randprime(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits, int proved)
+void fmpz_randprime(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits, int proved)
 {
     if (bits <= FLINT_BITS-3)
     {
         _fmpz_demote(f);
         *f = n_randprime(state, bits, proved);
-        return 1;
     }
     else
     {
@@ -45,10 +44,13 @@ int fmpz_randprime(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits, int proved)
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
         _flint_rand_init_gmp(state);
 
-        mpz_urandomb(mpz_ptr, state->gmp_state, bits-1);
-        mpz_setbit(mpz_ptr, bits-1);
-        _fmpz_demote_val(f);
-
-        return fmpz_nextprime(f, f, proved);
+        do
+        {
+            mpz_urandomb(mpz_ptr, state->gmp_state, bits-1);
+            mpz_setbit(mpz_ptr, bits-1);
+            _fmpz_demote_val(f);
+            
+            fmpz_nextprime(f, f, proved);
+        } while (fmpz_bits(f) != bits);
     }
 }
