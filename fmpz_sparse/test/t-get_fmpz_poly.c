@@ -46,38 +46,39 @@ main(void)
     /* equal polynomials */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t a, b;
-        fmpz_sparse_t n;
-        fmpz_t c;
+        fmpz_sparse_t a;
+        fmpz_poly_t b, c;
+        fmpz_t n;
 
-        fmpz_poly_init(a);
+        fmpz_sparse_init(a);
+        
         fmpz_poly_init(b);
+        fmpz_poly_init(c);
 
-        fmpz_sparse_init(n);
 
-        fmpz_init(c);
+        fmpz_init(n);
 
-        fmpz_randtest(c, state, 15);
+        fmpz_randtest(n, state, 15);
 
-        fmpz_sparse_randtest(n, state, n_randint(state, 50), c, 200);
-        fmpz_sparse_get_fmpz_poly(a, n);
-        fmpz_poly_set(b, a);
+        fmpz_sparse_randtest(a, state, n_randint(state, 50), n, 200);
+        fmpz_sparse_get_fmpz_poly(b, a);
+        fmpz_poly_set(c, b);
 
-        result = (fmpz_poly_equal(a, b));
+        result = (fmpz_poly_equal(b, c));
 
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("n = "), fmpz_sparse_print(n), flint_printf("\n\n");
-            flint_printf("a = "), fmpz_poly_print(a), flint_printf("\n\n");
+            flint_printf("a = "), fmpz_sparse_print(a), flint_printf("\n\n");
             flint_printf("b = "), fmpz_poly_print(b), flint_printf("\n\n");
+            flint_printf("c = "), fmpz_poly_print(c), flint_printf("\n\n");
             abort();
         }
 
-        fmpz_sparse_clear(n);
-        fmpz_poly_clear(a);
+        fmpz_sparse_clear(a);
         fmpz_poly_clear(b);
-        fmpz_clear(c);
+        fmpz_poly_clear(c);
+        fmpz_clear(n);
     }
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)

@@ -1,6 +1,3 @@
-/******************** FUNCTIONS  ************************/
-
-/*DONE*****************************************/
 FLINT_DLL void fmpz_sparse_scalar_mul_ui(fmpz_sparse_t res,
     const fmpz_sparse_t poly, ulong c);
 
@@ -10,66 +7,37 @@ const fmpz_sparse_t poly, slong c);
 FLINT_DLL void fmpz_sparse_scalar_mul(fmpz_sparse_t res, 
     const fmpz_sparse_t poly, const fmpz_t c);
 
-
 FLINT_DLL void fmpz_sparse_init2(fmpz_sparse_t poly, slong alloc);
 
 FLINT_DLL void fmpz_sparse_randtest(fmpz_sparse_t res, flint_rand_t state,
     slong terms, const fmpz_t degree, mp_bitcnt_t bits);
      
-FLINT_DLL void _fmpz_sparse_new_add(fmpz * res_c, fmpz * res_e, const
+FLINT_DLL void _fmpz_sparse_add(fmpz * res_c, fmpz * res_e, const
     fmpz * poly1_c, const fmpz * poly1_e, slong len1, const
     fmpz * poly2_c, const fmpz * poly2_e, slong len2)
 
-FLINT_DLL void fmpz_new_add(fmpz_sparse_t res, const fmpz_sparse_t poly1,
+FLINT_DLL void fmpz_add(fmpz_sparse_t res, const fmpz_sparse_t poly1,
     const fmpz_sparse_t poly2);
 
-FLINT_DLL void _fmpz_sparse_new_sub(fmpz * res_c, fmpz * res_e, const
+FLINT_DLL void _fmpz_sparse_sub(fmpz * res_c, fmpz * res_e, const
     fmpz * poly1_c, const fmpz * poly1_e, slong len1, const
     fmpz * poly2_c, const fmpz * poly2_e, slong
     len2)
 
-FLINT_DLL void fmpz_new_sub(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
+FLINT_DLL void fmpz_sub(fmpz_sparse_t res, const fmpz_sparse_t poly1, 
     const fmpz_sparse_t poly2);
 
 FLINT_DLL void fmpz_sparse_shift_left(fmpz_sparse_t res, const fmpz_sparse_t
-    poly, fmpz_t * exp); *****BUG FIXED*****
+    poly, fmpz_t * exp);
 
-
-/*IN PROGRESS*********************************/
 FLINT_DLL void fmpz_set_fmpz_poly(fmpz_sparse_t poly1, fmpz_poly_t
     poly2);
 
-FLINT_DLL void fmpz_sparse_realloc(fmpz_sparse_t poly, slong alloc);
+FLINT_DLL void fmpz_get_fmpz_poly(fmpz_poly_t poly1, fmpz_sparse_t
+    poly2);
 
 FLINT_DLL void fmpz_sparse_mul_classical(fmpz_sparse_t res,
-    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2)
+    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
 
-/********************** TESTS  **************************/
-
-/*DONE***************************************/
-t-add.c
-t-mul_classical.c
-t-neg.c
-t-new_add.c *****NOTE***** new_add does not use normalise()
-t-new_sub.c *****NOTE***** new_sub does not use normalise()
-t-new_classical.c *****NOTE***** new_mul_classical does not use
-    fmpz_vec operations making it very slow. 
-t-scalar_mul_fmpz.c
-t-scalar_mul_si.c
-t-scalar_mul_ui.c
-t-sub.c
-t-zero.c
-
-/*IN PROGRESS*******************************/
-t-init_realloc_clear.c
-t-set_fmpz_poly.c
-
-/*********************  FILES  **************************/
-
-/*DONE**************************************/
-randtest.c (unless other implementations of randtest are to be
-      implemented such as fmpz_sparse_randtest_not_zero())
-
-/*IN PROGRESS******************************/
-realloc.c
-new_add.c (not finished implementing fmpz_scalar_mul for doubling)
+FLINT_DLL void fmpz_sparse_mul_heaps(fmpz_sparse_t res,
+    const fmpz_sparse_t poly1, const fmpz_sparse_t poly2);
