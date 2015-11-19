@@ -34,14 +34,13 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <stdio.h>
-#include <stdlib.h> /* for alloca on *BSD */
-#if !defined(alloca) && !defined(__MINGW32__) && !defined(_MSC_VER)
+#include <stdlib.h> /* for alloca on FreeBSD */
+#if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)
+/* MinGW and FreeBSD have alloca, but not alloca.h */
 #include <alloca.h>
-#else
-#include <malloc.h>
-#if defined(_MSC_VER)
-#define alloca _alloca
 #endif
+#if defined(__MINGW32__)
+#include <malloc.h> /* for alloca on MinGW */
 #endif
 #include "limits.h"
 #include "longlong.h"
