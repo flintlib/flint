@@ -62,8 +62,7 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
 
         flint_randinit(state);
 
-        if (!fmpz_mat_hnf_pernet_stein(H, A, state))
-           fmpz_mat_hnf_classical(H, A); /* fallback if pernet_stein fails */
+        fmpz_mat_hnf_pernet_stein(H, A, state);
 
         flint_randclear(state);
     }

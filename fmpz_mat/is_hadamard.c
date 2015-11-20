@@ -28,7 +28,7 @@
 int
 fmpz_mat_is_hadamard(const fmpz_mat_t A)
 {
-    long i, j, n;
+    slong i, j, n;
     fmpz_mat_t B, C;
     int result;
 

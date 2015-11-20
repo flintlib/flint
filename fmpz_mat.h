@@ -305,10 +305,62 @@ FLINT_DLL void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A
 FLINT_DLL void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
+/* Transforms */
+
+void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
+
 /* Characteristic polynomial ************************************************/
 
-FLINT_DLL void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat);
-FLINT_DLL void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat);
+FLINT_DLL void _fmpz_mat_charpoly_berkowitz(fmpz * rop, const fmpz_mat_t op);
+
+FLINT_DLL void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp,
+                                                          const fmpz_mat_t mat);
+
+FLINT_DLL void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op);
+
+FLINT_DLL void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
+
+FMPZ_MAT_INLINE
+void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+{
+   _fmpz_mat_charpoly_modular(cp, mat);
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+{
+   if (mat->r != mat->c)
+   {
+       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
+       abort();
+   }
+
+   fmpz_mat_charpoly_modular(cp, mat);
+}
+
+/* Characteristic polynomial ************************************************/
+
+FLINT_DLL slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op);
+
+FLINT_DLL void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
+
+FMPZ_MAT_INLINE
+slong _fmpz_mat_minpoly(fmpz * cp, const fmpz_mat_t mat)
+{
+   return _fmpz_mat_minpoly_modular(cp, mat);
+}
+
+FMPZ_MAT_INLINE
+void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+{
+   if (mat->r != mat->c)
+   {
+       flint_printf("Exception (nmod_mat_minpoly).  Non-square matrix.\n");
+       abort();
+   }
+
+   fmpz_mat_minpoly_modular(cp, mat);
+}
 
 /* Rank *********************************************************************/
 
@@ -374,8 +426,8 @@ FLINT_DLL void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_xgcd(fmpz_mat_t H, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A);
 FLINT_DLL void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
-FLINT_DLL int fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state);
 FLINT_DLL void fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D);
+FLINT_DLL void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state);
 FLINT_DLL int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
 
 FLINT_DLL void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);

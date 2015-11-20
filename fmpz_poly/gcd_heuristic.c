@@ -85,7 +85,7 @@ int
 _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1, 
                                         const fmpz * poly2, slong len2)
 {
-   long bits1, bits2, max_bits, pack_bits, bound_bits, bits_G, bits_Q;
+   slong bits1, bits2, max_bits, pack_bits, bound_bits, bits_G, bits_Q;
    ulong limbs1, limbs2, limbsg, pack_limbs, qlimbs;
    ulong log_glen, log_length;
    slong sign1, sign2, glen, qlen;

@@ -534,6 +534,19 @@ slong nmod_mat_rref(nmod_mat_t A)
     form via LU decomposition and then solving an additional
     triangular system.
 
+slong nmod_mat_reduce_row(nmod_mat_t A, slong * P, slong * L, slong n)
+
+    Reduce row n of the matrix $A$, assuming the prior rows are in Gauss
+    form. However those rows may not be in order. The entry $i$ of the array
+    $P$ is the row of $A$ which has a pivot in the $i$-th column. If no such
+    row exists, the entry of $P$ will be $-1$. The function returns the column
+    in which the $n$-th row has a pivot after reduction. This will always be
+    chosen to be the first available column for a pivot from the left. This
+    information is also updated in $P$. Entry $i$ of the array $L$ contains the
+    number of possibly nonzero columns of $A$ row $i$. This speeds up reduction
+    in the case that $A$ is chambered on the right. Otherwise the entries of $L$
+    can all be set to the number of columns of $A$. We require the entries of
+    $L$ to be monotonic increasing.
 
 *******************************************************************************
 
@@ -555,6 +568,53 @@ slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
     This function computes the reduced row echelon form and then reads
     off the basis vectors.
     
+*******************************************************************************
+
+    Transforms
+
+*******************************************************************************
+
+void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)
+
+    Applies a similarity transform to the $n\times n$ matrix $M$ in-place.
+
+    If $P$ is the $n\times n$ identity matrix the zero entries of whose row
+    $r$ ($0$-indexed) have been replaced by $d$, this transform is equivalent
+    to $M = P^{-1}MP$.
+
+    Similarity transforms preserve the determinant, characteristic polynomial
+    and minimal polynomial.
+
+    The value $d$ is required to be reduced modulo the modulus of the entries
+    in the matrix.
+
+*******************************************************************************
+
+    Characteristic polynomial
+
+*******************************************************************************
+
+void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
+
+    Compute the characteristic polynomial $p$ of the matrix $M$. The matrix
+    is assumed to be square.
+
+void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
+
+    Compute the characteristic polynomial $p$ of the matrix $M$. The matrix
+    is required to be square, otherwise an exception is raised.
+
+*******************************************************************************
+
+    Minimal polynomial
+
+*******************************************************************************
+
+void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M)
+
+    Compute the minimal polynomial $p$ of the matrix $M$. The matrix
+    is required to be square, otherwise an exception is raised.
+
 *******************************************************************************
 
     Strong echelon form and Howell form

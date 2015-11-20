@@ -107,7 +107,7 @@ _eta_three(fmpz * c, slong N)
 
 /* (P + Q) * R */
 static void
-_eta_four(fmpz * c, long N)
+_eta_four(fmpz * c, slong N)
 {
     slong k1, n1, k2, n2;
 
