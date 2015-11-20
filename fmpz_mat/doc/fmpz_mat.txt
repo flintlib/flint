@@ -302,6 +302,10 @@ int fmpz_mat_is_square(const fmpz_mat_t mat)
     Returns a non-zero value if the number of rows is equal to the
     number of columns in \code{mat}, and otherwise returns zero.
 
+int fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
+
+    Returns a non-zero value if row $i$ of \code{mat} is zero.
+
 *******************************************************************************
 
     Transpose
@@ -987,6 +991,31 @@ slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
 
 *******************************************************************************
 
+    Strong echelon form and Howell form
+
+*******************************************************************************
+
+void fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
+
+    Transforms $A$ such that $A$ modulo \code{mod} is the strong echelon form
+    of the input matrix modulo \code{mod}. The Howell form and the strong
+    echelon form are equal up to permutation of the rows, see \cite{FieHof2014}
+    for a definition of the strong echelon form and the algorithm used here.
+
+    $A$ must have at least as many rows as columns.
+
+slong fmpz_mat_howell_form_mod(nmod_mat_t A, const fmpz_t mod)
+
+    Transforms $A$ such that $A$ modulo \code{mod} is the Howell form of the
+    input matrix modulo \code{mod}. 
+    For a definition of the Howell form see \cite{StoMul1998}. The Howell form
+    is computed by first putting $A$ into strong echelon form and then ordering
+    the rows.
+
+    $A$ must have at least as many rows as columns.
+
+*******************************************************************************
+
     Nullspace
 
 *******************************************************************************
@@ -1087,6 +1116,13 @@ void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D)
 
     Aliasing of \code{H} and \code{A} is allowed. The size of \code{H} must be
     the same as that of \code{A}.
+
+void fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D)
+
+    Transforms the $m\times n$ matrix \code{A} into Hermite normal form,
+    where \code{A} is assumed to be of rank $n$ and \code{D} is known to be a
+    positive multiple of the largest elementary divisor of \code{A}.
+    The algorithm used here is described in \cite{FieHof2014}.
 
 void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 
