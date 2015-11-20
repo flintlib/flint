@@ -302,6 +302,10 @@ int fmpz_mat_is_square(const fmpz_mat_t mat)
     Returns a non-zero value if the number of rows is equal to the
     number of columns in \code{mat}, and otherwise returns zero.
 
+int fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
+
+    Returns a non-zero value if row $i$ of \code{mat} is zero.
+
 *******************************************************************************
 
     Transpose

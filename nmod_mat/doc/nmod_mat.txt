@@ -219,6 +219,10 @@ int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
     Returns nonzero if mat1 and mat2 have the same dimensions and elements,
     and zero otherwise. The moduli are ignored.
 
+int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
+
+    Returns a non-zero value if row $i$ of \code{mat} is zero.
+
 *******************************************************************************
 
     Transpose

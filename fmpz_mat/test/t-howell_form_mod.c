@@ -40,7 +40,6 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
     fmpz * extra_row;
     fmpz_t g;
 
-    fmpz_init(g);
 
     pivots = flint_malloc(A->r * sizeof(slong));
 
@@ -114,6 +113,8 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
     }
     extra_row = _fmpz_vec_init(A->c);
 
+    fmpz_init(g);
+
     for (i = 0; i < numberpivots; i++)
     {
         fmpz_gcd(g, mod, fmpz_mat_entry(A, i, pivots[i]));
@@ -144,11 +145,13 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
         {
             _fmpz_vec_clear(extra_row, A->c);
             flint_free(pivots);
+            fmpz_clear(g);
             return 0; 
         }
     }
     _fmpz_vec_clear(extra_row, A->c);
     flint_free(pivots);
+    fmpz_clear(g);
     return 1;
 }
 
@@ -267,6 +270,7 @@ main(void)
 
         fmpz_clear(mod);
         fmpz_clear(t);
+        fmpz_clear(c);
     }
 
     FLINT_TEST_CLEANUP(state);

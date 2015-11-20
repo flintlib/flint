@@ -128,9 +128,16 @@ _fmpz_unit(fmpz_t u, fmpz_t a, const fmpz_t N)
         fmpz_add(u, u, s);
         fmpz_mod(u, u, N);
     }
+    
+    fmpz_clear(g);
+    fmpz_clear(s);
+    fmpz_clear(t);
+    fmpz_clear(l);
+    fmpz_clear(d);
+    fmpz_clear(k);
 }
 
-slong
+void
 fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
 {
     fmpz_t s, t, q, u, v, t1, t2, g;
@@ -294,7 +301,5 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
     fmpz_clear(t1);
     fmpz_clear(t2);
     fmpz_clear(g);
-
-    return 0;
 }
 

@@ -277,7 +277,7 @@ FLINT_DLL slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
 
 FLINT_DLL slong fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod);
 
-FLINT_DLL slong fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod);
+FLINT_DLL void fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod);
 
 /* Trace ********************************************************************/
 

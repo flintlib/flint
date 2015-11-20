@@ -39,6 +39,7 @@ fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D)
         fmpz_mat_get_nmod_mat(AmodD, A);
         nmod_mat_strong_echelon_form(AmodD);
         fmpz_mat_set_nmod_mat_unsigned(A, AmodD);
+        nmod_mat_clear(AmodD);
     }
     else
     {
