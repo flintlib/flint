@@ -42,6 +42,9 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     mp_ptr extra_row;
     mp_limb_t g;
 
+    if (nmod_mat_is_zero(A))
+        return 1;
+
     pivots = flint_malloc(A->r * sizeof(slong));
 
     if (!nmod_mat_is_zero_row(A, 0))

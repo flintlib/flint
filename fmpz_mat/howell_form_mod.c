@@ -31,6 +31,9 @@ fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod)
     slong i, j, n;
     slong k;
 
+    if (fmpz_mat_is_empty(A))
+        return 0;
+
     n = A->r;
     k = n;
     fmpz_mat_strong_echelon_form_mod(A, mod);

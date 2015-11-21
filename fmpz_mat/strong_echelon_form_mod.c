@@ -145,6 +145,9 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
     fmpz  ** r;
     fmpz * extra_row;
 
+    if (fmpz_mat_is_empty(A))
+        return;
+
     fmpz_init(s);
     fmpz_init(t);
     fmpz_init(q);

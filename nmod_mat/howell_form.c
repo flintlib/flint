@@ -37,6 +37,10 @@ nmod_mat_howell_form(nmod_mat_t A)
 
     n = A->r;
     k = n;
+
+    if (nmod_mat_is_empty(A))
+        return 0;
+
     nmod_mat_strong_echelon_form(A);
 
     for (i = 0; i < n; i++)
