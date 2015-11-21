@@ -40,6 +40,8 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
     fmpz * extra_row;
     fmpz_t g;
 
+    if (fmpz_mat_is_empty(A))
+        return 1;
 
     pivots = flint_malloc(A->r * sizeof(slong));
 
@@ -194,7 +196,6 @@ main(void)
 
         if (!fmpz_mat_mod_is_in_howell_form(B, mod))
         {
-            flint_printf("done\n");
             flint_printf("FAIL (malformed Howell form)\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(B); flint_printf("\n\n");

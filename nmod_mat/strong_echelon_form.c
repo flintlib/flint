@@ -108,6 +108,9 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
     nmod_t mod;
     mp_ptr extra_row;
 
+    if (nmod_mat_is_empty(A))
+        return;
+
     n = A->r;
     m = A->c;
     r = A->rows;

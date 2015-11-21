@@ -32,6 +32,9 @@ fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D)
     mp_limb_t Dlimbt;
     nmod_mat_t AmodD;
 
+    if (fmpz_mat_is_empty(A))
+        return;
+
     if (fmpz_abs_fits_ui(D))
     {
         Dlimbt = fmpz_get_ui(D);
@@ -53,7 +56,5 @@ fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D)
             fmpz_set(fmpz_mat_entry(A, i, i), D);
         }
     }
-    
-
 }
     
