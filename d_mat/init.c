@@ -29,7 +29,7 @@
 void
 d_mat_init(d_mat_t mat, slong rows, slong cols)
 {
-    if ((rows) && (cols))       /* Allocate space for r*c small entries */
+    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
         slong i;
         mat->entries = (double *) flint_malloc(rows * cols * sizeof(double));
@@ -41,8 +41,8 @@ d_mat_init(d_mat_t mat, slong rows, slong cols)
     else
     {
        mat->entries = NULL;
-	   mat->rows = NULL;
-	}
+       mat->rows = NULL;
+    }
 
     mat->r = rows;
     mat->c = cols;

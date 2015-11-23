@@ -448,7 +448,7 @@ FUNC_HEAD
                         }
                         else    /* otherwise X is -1 */
                         {
-                            fmpz_set_si(x + j, -1);
+                            fmpz_set_si(x + j, -WORD(1));
                             for (k = zeros + 1; k < j; k++)
                             {
                                 tmp = ldexp(d_mat_entry(mu, j, k), exponent);

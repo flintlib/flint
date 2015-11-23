@@ -28,7 +28,8 @@
 void
 d_mat_gso(d_mat_t B, const d_mat_t A)
 {
-    slong i, j, k, flag;
+    slong i, j, k;
+    int flag;
     double t, s;
 
     if (B->r != A->r || B->c != A->c)

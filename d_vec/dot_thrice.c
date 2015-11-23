@@ -34,7 +34,7 @@ _d_vec_dot_thrice(const double *vec1, const double *vec2, slong len2,
     int i, j;
     double p, h, a1, a2, b1, b2, c, res = 0, g;
     double *r;
-    ulong factor = (1 << 27) + 1;
+    ulong factor = (UWORD(1) << 27) + 1;
 
     if (len2 == 0)
     {

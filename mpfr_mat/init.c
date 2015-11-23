@@ -33,7 +33,7 @@ void
 mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec)
 {
 
-    if ((rows) && (cols))       /* Allocate space for r*c small entries */
+    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
         slong i;
         mat->entries =

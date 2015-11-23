@@ -33,7 +33,7 @@ void
 mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec)
 {
 
-    if ((rows) && (cols))       /* Allocate space for r*c small entries */
+    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
     {
         slong i;
         mat->entries = (mpf *) flint_malloc(rows * cols * sizeof(mpf));
@@ -48,7 +48,7 @@ mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, mp_bitcnt_t prec)
     {
        mat->entries = NULL;
        mat->rows = NULL;
-	}
+    }
 
     mat->r = rows;
     mat->c = cols;

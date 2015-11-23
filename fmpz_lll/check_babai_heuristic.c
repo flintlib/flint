@@ -385,7 +385,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         }
                         else    /* otherwise X is -1 */
                         {
-                            fmpz_set_si(x + j, -1);
+                            fmpz_set_si(x + j, -WORD(1));
                             for (k = zeros + 1; k < j; k++)
                             {
                                 mpf_add(mpf_mat_entry(mu, kappa, k),

@@ -28,7 +28,8 @@
 void
 mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A)
 {
-    slong i, j, k, flag;
+    slong i, j, k;
+    int flag;
     mpf_t t, s, tmp, eps;
     mp_bitcnt_t exp;
 

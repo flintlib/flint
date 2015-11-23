@@ -28,7 +28,8 @@
 void
 mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)
 {
-    slong i, j, k, flag, orig;
+    slong i, j, k;
+    int flag, orig;
     mpf_t t, s, tmp, eps;
     mp_bitcnt_t exp;
 

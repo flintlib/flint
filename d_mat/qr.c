@@ -28,7 +28,8 @@
 void
 d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
 {
-    slong i, j, k, flag, orig;
+    slong i, j, k;
+    int flag, orig;
     double t, s;
 
     if (Q->r != A->r || Q->c != A->c || R->r != A->c || R->c != A->c)
