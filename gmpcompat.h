@@ -745,7 +745,7 @@ static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 {
   mp_size_t size, abs_size;
-  mp_srcptr ptr;
+  mp_limb_t * ptr;
   int cnt;
   slong exp;
 
