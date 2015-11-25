@@ -358,9 +358,17 @@ if [ -z "$BUILD" ]; then
          OS="MINGW32"
       fi
    elif [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
-      OS="MINGW32"
+      if [ "$ABI" = "64" ]; then
+         OS="MINGW64"
+      else
+         OS="MINGW32"
+      end
    elif [ "$(uname | cut -d_ -f1)" = "MINGW64" ]; then
-      OS="MINGW64"
+      if [ "$ABI" = "32" ]; then
+         OS="MINGW32"
+      else
+         OS="MINGW64"
+      end
    elif [ "$(uname | cut -d_ -f1)" = "CYGWIN" ]; then
       if [ "$ARCH" = "x86_64" ]; then
          if [ "$ABI" = "32" ]; then
@@ -565,7 +573,7 @@ fi
 
 if [ -z "$CFLAGS" ]; then
    if [ "$OS" = "MINGW64" ]; then
-      CFLAGS="-O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      CFLAGS="-std=c99 -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    elif [ "$OS" = "CYGWIN64" ]; then
       CFLAGS="-O2 -funroll-loops -g -D _WIN64 $POPCNT_FLAG $ABI_FLAG"
    elif [ "$MACHINE" = "mips64" ]; then
