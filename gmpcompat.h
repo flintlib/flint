@@ -740,7 +740,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
 extern double
-mpn_get_d(mp_srcptr up, mp_size_t size, mp_size_t sign, long exp);
+__gmpn_get_d(mp_srcptr up, mp_size_t size, mp_size_t sign, long exp);
 
 static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
@@ -764,7 +764,7 @@ double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
   exp = src->_mp_exp * FLINT_BITS - cnt;
   *exp2 = exp;
 
-  return mpn_get_d (ptr, abs_size, size,
+  return __gmpn_get_d (ptr, abs_size, size,
                     (long) - (abs_size * FLINT_BITS - cnt));
 }
 
