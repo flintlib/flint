@@ -117,7 +117,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                 for (j = 0; j < kappa; j++)
                 {
                     slong expo2;
-                    mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                    flint_mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
                     new_max_expo = FLINT_MAX(new_max_expo, expo2);
                 }
                 if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
@@ -201,7 +201,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                     mpf_mat_entry(mu, kappa, k), rtmp);
                         }
 
-                        mpf_get_d_2exp(&exponent, tmp);
+                        flint_mpf_get_d_2exp(&exponent, tmp);
                         if (exponent < CPU_SIZE_1 - 2)
                         {
                             /* X is stored in an slong */
@@ -333,7 +333,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                 for (j = 0; j < kappa; j++)
                 {
                     slong expo2;
-                    mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                    flint_mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
                     new_max_expo = FLINT_MAX(new_max_expo, expo2);
                 }
                 if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
@@ -426,7 +426,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                     mpf_mat_entry(mu, kappa, k), rtmp);
                         }
 
-                        mpf_get_d_2exp(&exponent, tmp);
+                        flint_mpf_get_d_2exp(&exponent, tmp);
                         if (exponent < CPU_SIZE_1 - 2)
                         {
                             /* X is stored in an slong */
