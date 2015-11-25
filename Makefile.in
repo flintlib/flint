@@ -74,6 +74,7 @@ clean:
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS)
 	rm -f libflint.a
 	rm -f $(wildcard $(FLINT_LIBNAME)*)
+	rm -f $(wildcard $(FLINT_LIB)*)
 	rm -rf build
 
 distclean: clean
