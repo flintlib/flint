@@ -104,8 +104,13 @@ FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_
 FLINT_DLL void flint_cleanup(void);
 
 #if defined(_WIN64) || defined(__mips64)
+#if defined(__MINGW64__)
+#define WORD_FMT "%I64"
+#define WORD_WIDTH_FMT "%*I64"
+#else
 #define WORD_FMT "%ll"
 #define WORD_WIDTH_FMT "%*ll"
+#endif
 #define WORD(xx) (xx##LL)
 #define UWORD(xx) (xx##ULL)
 #define UWORD_MAX ULLONG_MAX

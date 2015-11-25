@@ -50,7 +50,7 @@ do {                       \
 
 #define xxx_printf()                       \
 do {                                       \
-    z = fprintf(file, "%li %li  ", r, c);  \
+    z = flint_fprintf(file, WORD_FMT "d " WORD_FMT "d  ", r, c);  \
     if (z <= 0)                            \
         return z;                          \
 } while (0)
