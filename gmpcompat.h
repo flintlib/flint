@@ -739,6 +739,9 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
+extern double
+mpn_get_d(mp_srcptr up, mp_size_t size, mp_size_t sign, long exp);
+
 static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 {
