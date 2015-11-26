@@ -227,8 +227,8 @@ build/%.lo: %.c $(HEADERS) | build
 build/%.o: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/test/%$(EXEEXT): test/%.c $(HEADERS) | build/test
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
+build/test/%$(EXEEXT): test/%.c $(HEADERS) test_helpers.o | build/test
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) test_helpers.o $< -o $@ $(LIBS)
 
 build/test:
 	mkdir -p build/test
@@ -247,6 +247,9 @@ build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.
 
 print-%:
 	@echo '$*=$($*)'
+
+test_helpers.o: test_helpers.c
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c test_helpers.c -o test_helpers.o
 
 .PHONY: profile library shared static clean examples tune check tests distclean dist install all valgrind
 

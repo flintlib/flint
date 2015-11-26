@@ -120,11 +120,10 @@ mp_limb_t n_clog(mp_limb_t n, mp_limb_t b)
 
 *******************************************************************************
 
-ulong n_revbin(ulong in, ulong bits)
+ulong n_revbin(ulong n, ulong b)
 
-    Returns the binary reverse of \code{in}, assuming it is the given 
-    number of bits in length, e.g.\ \code{n_revbin(10110, 6)} will return
-    \code{110100}.
+    Returns the binary reverse of $n$, assuming it is $b$ bits in length,
+    e.g. \code{n_revbin(10110, 6)} will return \code{110100}.
 
 int n_sizeinbase(mp_limb_t n, int base)
 

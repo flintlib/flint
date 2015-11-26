@@ -22,7 +22,7 @@
 
     Copyright (C) 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 
                   2002, 2003, 2004, 2005 Free Software Foundation, Inc.
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2015 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -91,6 +91,11 @@ sub_ddmmss(high_difference, low_difference, high_minuend, low_minuend,
     \code{LOW_SUBTRAHEND_2}, respectively.  The result is placed in\\ 
     \code{HIGH_DIFFERENCE} and \code{LOW_DIFFERENCE}.  Overflow, i.e.\ 
     carry out is not stored anywhere, and is lost.
+
+byte_swap(x)
+
+    Swap the order of the bytes in the word $x$, i.e. most significant byte
+    becomes least significant byte, etc.
 
 invert_limb(invxl, xl)
 

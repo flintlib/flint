@@ -86,6 +86,11 @@
     __asm__ ("bsfq %1,%q0" : "=r" (count) : "rm" ((mp_limb_t)(x)));  \
   } while (0)
 
+#define byte_swap(x)                                                 \
+  do {                                                               \
+    __asm__("bswapq %q0" : "=r"(x) : "0"(x));                         \
+  } while (0)
+
 #endif /* x86_64 */
 
 /* x86 : 32 bit */
@@ -138,6 +143,11 @@
   do {                                                              \
     FLINT_ASSERT ((x) != 0);                                        \
     __asm__ ("bsfl %1,%0" : "=r" (count) : "rm" ((mp_limb_t)(x)));  \
+  } while (0)
+
+#define byte_swap(x)                                                 \
+  do {                                                               \
+    __asm__("bswap %0" : "=r"(x) : "0"(x));                          \
   } while (0)
 
 #endif /* x86 */
@@ -449,6 +459,30 @@
        (r) = (__d) - (r);           \
     }                               \
   } while (0)
+
+#if GMP_LIMB_BITS == 32
+
+#define byte_swap(n)                                           \
+  do {                                                         \
+      /* swap adjacent bytes */                                \
+      n = (((n & 0xff00ff00) >> 8) | ((n & 0x00ff00ff) << 8)); \
+      /* swap adjacent words */                                \
+      n = ((n >> 16) | (n << 16));                             \
+  } while (0)
+
+#else
+
+#define byte_swap(n)                                                             \
+  do {                                                                           \
+      /* swap adjacent bytes */                                                  \
+      n = (((n & 0xff00ff00ff00ff00) >> 8) | ((n & 0x00ff00ff00ff00ff) << 8));   \
+      /* swap adjacent words */                                                  \
+      n = (((n & 0xffff0000ffff0000) >> 16) | ((n & 0x0000ffff0000ffff) << 16)); \
+      /* swap adjacent double words */                                           \
+      n = ((n >> 32) | (n << 32));                                               \
+  } while (0)
+
+#endif /* 64 bits */
 
 #endif /* non x86 fallback code */
 
