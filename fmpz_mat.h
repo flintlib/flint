@@ -355,7 +355,7 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
    {
-       flint_printf("Exception (nmod_mat_minpoly).  Non-square matrix.\n");
+       flint_printf("Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
        abort();
    }
 
