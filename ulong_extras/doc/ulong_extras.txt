@@ -31,7 +31,7 @@
 
 *******************************************************************************
 
-mp_limb_t n_randlimb(flint_rand_t state)
+ulong n_randlimb(flint_rand_t state)
 
     Returns a uniformly pseudo random limb. 
 
@@ -42,13 +42,13 @@ mp_limb_t n_randlimb(flint_rand_t state)
     and \code{p_0 = nextprime(2^16)} on a 32-bit machine and 
     \code{p_1 = nextprime(p_0)}.
 
-mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
+ulong n_randbits(flint_rand_t state, unsigned int bits)
 
     Returns a uniformly pseudo random number with the given number of 
     bits. The most significant bit is always set, unless zero is passed,
     in which case zero is returned.
 
-mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
+ulong n_randtest_bits(flint_rand_t state, int bits)
 
     Returns a uniformly pseudo random number with the given number of 
     bits. The most significant bit is always set, unless zero is passed,
@@ -56,13 +56,13 @@ mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
     sparse binary representation being returned is increased. This
     function is intended for use in test code.
 
-mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
+ulong n_randint(flint_rand_t state, ulong limit)
 
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire random
     limb is returned.
 
-mp_limb_t n_randtest(flint_rand_t state)
+ulong n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
@@ -71,18 +71,18 @@ mp_limb_t n_randtest(flint_rand_t state)
     This random function is mainly used for testing purposes.
     This function is intended for use in test code. 
 
-mp_limb_t n_randtest_not_zero(flint_rand_t state)
+ulong n_randtest_not_zero(flint_rand_t state)
 
     As for \code{n_randtest()}, but does not return $0$.
     This function is intended for use in test code. 
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned slong bits, int proved)
+ulong n_randprime(flint_rand_t state, unsigned slong bits, int proved)
 
     Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with \code{bits} bits, where \code{bits} must be at least 2 and
     at most \code{FLINT_BITS}.
 
-mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
+ulong n_randtest_prime(flint_rand_t state, int proved)
 
     Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with size randomly chosen between 2 and \code{FLINT_BITS} bits.
@@ -94,7 +94,7 @@ mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
 
 *******************************************************************************
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+ulong n_pow(ulong n, ulong exp)
 
     Returns \code{n^exp}. No checking is done for overflow. The exponent
     may be zero. We define $0^0 = 1$.
@@ -102,13 +102,13 @@ mp_limb_t n_pow(mp_limb_t n, ulong exp)
     The algorithm simply uses a for loop. Repeated squaring is
     unlikely to speed up this algorithm.
 
-mp_limb_t n_flog(mp_limb_t n, mp_limb_t b)
+ulong n_flog(ulong n, ulong b)
 
     Returns $\floor{\log_b x}$.
 
     Assumes that $x \geq 1$ and $b \geq 2$.
 
-mp_limb_t n_clog(mp_limb_t n, mp_limb_t b)
+ulong n_clog(ulong n, ulong b)
 
     Returns $\ceil{\log_b x}$.
 
@@ -125,7 +125,7 @@ ulong n_revbin(ulong n, ulong b)
     Returns the binary reverse of $n$, assuming it is $b$ bits in length,
     e.g. \code{n_revbin(10110, 6)} will return \code{110100}.
 
-int n_sizeinbase(mp_limb_t n, int base)
+int n_sizeinbase(ulong n, int base)
 
     Returns the exact number of digits needed to represent $n$ as a
     string in base \code{base} assumed to be between 2 and 36.
@@ -154,7 +154,7 @@ double n_precompute_inverse(ulong n)
     
     We require $n > 0$. 
 
-mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+ulong n_mod_precomp(ulong a, ulong n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
     by\\ \code{n_precompute_inverse()}. We require \code{n < 2^FLINT_D_BITS}
@@ -184,7 +184,7 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
     subtracting 1 from the quotient. Then the quotient we have computed is 
     either exactly what we are after, or one too small.
 
-mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+ulong n_mod2_precomp(ulong a, ulong n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_precompute_inverse()}. There are no restrictions on $a$ or 
@@ -200,7 +200,7 @@ mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
     negative or positive, so the quotient we compute may be one
     out in either direction.
 
-mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
     \code{n_preinvert_limb()}. There are no restrictions on $a$ and the only
@@ -214,7 +214,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
     % Improved Division by Invariant Integers
     % https://gmplib.org/~tege/division-paper.pdf
 
-mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, 
+ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, 
                                                                    double npre)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
@@ -226,8 +226,8 @@ mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n,
     cases to deal with the case where $a$ is already reduced modulo 
     $n$ and where $n$ is $64$ bits and $a$ is not reduced modulo $n$.
 
-mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
-                                     mp_limb_t n, mp_limb_t ninv)
+ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, 
+                                     ulong n, ulong ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
     \code{n_preinvert_limb()}. There are no restrictions on $a$, which
@@ -245,8 +245,8 @@ mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo,
     % Improved Division by Invariant Integers
     % http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
 
-mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, 
-                       mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv)
+ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, 
+                       ulong a_lo, ulong n, ulong ninv)
 
     Returns $a \bmod{n}$, where $a$ has three limbs \code{(a_hi, a_mi, a_lo)}, 
     given a precomputed inverse of $n$ computed by \code{n_preinvert_limb()}. 
@@ -261,7 +261,7 @@ mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi,
     % Improved Division by Invariant Integers
     % http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
 
-mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
+ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ 
     computed by\\ \code{n_precompute_inverse()}. We require 
@@ -283,16 +283,16 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
     computed integer quotient is at most two above and one below the quotient 
     we are after.
 
-mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
-                                           mp_limb_t n, mp_limb_t ninv)
+ulong n_mulmod2_preinv(ulong a, ulong b, 
+                                           ulong n, ulong ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}. There are no restrictions on $a$, $b$ or 
     on $n$. This is implemented by multiplying using \code{umul_ppmm()} and 
     then reducing using \code{n_ll_mod_preinv()}.
 
-mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, 
-                                            mp_limb_t ninv, ulong norm)
+ulong n_mulmod_preinv(ulong a, ulong b, ulong n, 
+                                            ulong ninv, ulong norm)
 
     Returns $a b \pmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}, assuming $a$ and $b$ are reduced modulo $n$ 
@@ -319,7 +319,7 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
 
 *******************************************************************************
 
-mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
+ulong n_gcd(ulong x, ulong y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$. 
     We require $x \geq y$.
@@ -337,12 +337,12 @@ mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
     be $3$. When the quotient is $4$ or above, we use division. However this 
     happens rarely for generic inputs.
 
-mp_limb_t n_gcd_full(mp_limb_t x, mp_limb_t y)
+ulong n_gcd_full(ulong x, ulong y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$.
     No assumptions are made about $x$ and $y$.
 
-mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
+ulong n_gcdinv(ulong * a, ulong x, ulong y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$ and computes 
     $a$ such that $0 \leq a < y$ and $a x = \gcd(x, y) \bmod{y}$, when 
@@ -351,7 +351,7 @@ mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
     This is merely an adaption of the extended Euclidean algorithm with 
     appropriate normalisation.
 
-mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
+ulong n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$ and unsigned 
     values $a$ and $b$ such that $a x - b y = g$. We require $x \geq y$.
@@ -385,7 +385,7 @@ mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
 
 *******************************************************************************
 
-int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+int n_jacobi(mp_limb_signed_t x, ulong y)
 
     Computes the Jacobi symbol of $x \bmod{y}$.  Assumes that $y$ is positive 
     and odd, and for performance reasons that $\gcd(x, y) = 1$.
@@ -394,7 +394,7 @@ int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
     reciprocity. For performance, divisions are replaced with some 
     comparisons and subtractions where possible.
 
-int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
+int n_jacobi_unsigned(ulong x, ulong y)
 
     Computes the Jacobi symbol, allowing $x$ to go up to a full limb.
 
@@ -404,15 +404,15 @@ int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
 
 *******************************************************************************
 
-mp_limb_t n_addmod(mp_limb_t a, mp_limb_t b, mp_limb_t n)
+ulong n_addmod(ulong a, ulong b, ulong n)
 
     Returns $(a + b) \bmod{n}$.
 
-mp_limb_t n_submod(mp_limb_t a, mp_limb_t b, mp_limb_t n)
+ulong n_submod(ulong a, ulong b, ulong n)
 
     Returns $(a - b) \bmod{n}$.
 
-mp_limb_t n_invmod(mp_limb_t x, mp_limb_t y)
+ulong n_invmod(ulong x, ulong y)
 
     Returns a value $a$ such that $0 \leq a < y$ and 
     $a x = \gcd(x, y) \bmod{y}$, when this is defined. 
@@ -424,8 +424,8 @@ mp_limb_t n_invmod(mp_limb_t x, mp_limb_t y)
     This is merely an adaption of the extended Euclidean algorithm 
     with appropriate normalisation.
 
-mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, 
-                                                      mp_limb_t n, double npre)
+ulong n_powmod_precomp(ulong a, mp_limb_signed_t exp, 
+                                                      ulong n, double npre)
 
     Returns \code{a^exp} modulo $n$ given a precomputed inverse of $n$ 
     computed by\\ \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
@@ -435,8 +435,8 @@ mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
-mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, 
-                                                      mp_limb_t n, double npre)
+ulong n_powmod_ui_precomp(ulong a, ulong exp, 
+                                                      ulong n, double npre)
 
     Returns \code{a^exp} modulo $n$ given a precomputed inverse of $n$ 
     computed by\\ \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
@@ -446,7 +446,7 @@ mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
-mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
+ulong n_powmod(ulong a, mp_limb_signed_t exp, ulong n)
 
     Returns \code{a^exp} modulo $n$. We require \code{n < 2^FLINT_D_BITS} 
     and $0 \leq a < n$. There are no restrictions on \code{exp}, i.e.\ 
@@ -455,8 +455,8 @@ mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
     This is implemented by precomputing an inverse and calling the 
     \code{precomp} version of this function.
 
-mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, 
-                                                                mp_limb_t ninv)
+ulong n_powmod2_preinv(ulong a, mp_limb_signed_t exp, ulong n, 
+                                                                ulong ninv)
 
     Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
     by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 
@@ -465,7 +465,7 @@ mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
-mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
+ulong n_powmod2(ulong a, mp_limb_signed_t exp, ulong n)
 
     Returns \code{(a^exp) % n}. We require $0 \leq a < n$, but there are 
     no restrictions on $n$ or on \code{exp}, i.e.\ it can be negative.
@@ -473,8 +473,8 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
     This is implemented by precomputing an inverse limb and calling the 
     \code{preinv} version of this function.
 
-mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
-                                                                mp_limb_t ninv)
+ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, 
+                                                                ulong ninv)
 
     Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
     by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 
@@ -484,14 +484,14 @@ mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
-mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
+ulong n_sqrtmod(ulong a, ulong p)
 
     Computes a square root of $a$ modulo $p$.
 
     Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
     Returns 0 if $a$ is a quadratic non-residue modulo $p$.
 
-slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
+slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -503,7 +503,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
     NULL. 
 
 slong
-n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
+n_sqrtmod_primepow(ulong ** sqrt, ulong a, ulong p, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -514,7 +514,7 @@ n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
 
     Computes all the square roots of \code{a} modulo \code{m} given the 
     factorisation of \code{m} in \code{fac}. The roots are stored in an array 
@@ -539,7 +539,7 @@ void n_primes_clear(n_primes_t iter)
 
     Clears memory allocated by the prime number iterator \code{iter}.
 
-mp_limb_t n_primes_next(n_primes_t iter)
+ulong n_primes_next(n_primes_t iter)
 
     Returns the next prime number and advances the state of \code{iter}.
     The first call returns 2.
@@ -548,17 +548,17 @@ mp_limb_t n_primes_next(n_primes_t iter)
     When this table is exhausted, primes are generated in blocks
     by calling \code{n_primes_sieve_range}.
 
-void n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+void n_primes_jump_after(n_primes_t iter, ulong n)
 
     Changes the state of \code{iter} to start generating primes
     after $n$ (excluding $n$ itself).
 
-void n_primes_extend_small(n_primes_t iter, mp_limb_t bound)
+void n_primes_extend_small(n_primes_t iter, ulong bound)
 
     Extends the table of small primes in \code{iter} to contain
     at least two primes larger than or equal to \code{bound}.
 
-void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
+void n_primes_sieve_range(n_primes_t iter, ulong a, ulong b)
 
     Sets the block endpoints of \code{iter} to the smallest and
     largest odd numbers between $a$ and $b$ inclusive, and
@@ -573,7 +573,7 @@ void n_compute_primes(ulong num_primes)
     Assuming that FLINT has been built with support for thread-local storage,
     each thread has its own cache.
 
-const mp_limb_t * n_primes_arr_readonly(ulong num_primes)
+const ulong * n_primes_arr_readonly(ulong num_primes)
 
     Returns a pointer to a read-only array of the first \code{num_primes}
     prime numbers. The computed primes are cached for repeated calls.
@@ -593,13 +593,13 @@ void n_cleanup_primes()
     This will invalidate any pointers returned by
     \code{n_primes_arr_readonly} or \code{n_prime_inverses_arr_readonly}.
 
-mp_limb_t n_nextprime(mp_limb_t n, int proved)
+ulong n_nextprime(ulong n, int proved)
 
     Returns the next prime after $n$. Assumes the result will fit in an
-    \code{mp_limb_t}. If proved is $0$, i.e.\ false, the prime is not 
+    \code{ulong}. If proved is $0$, i.e.\ false, the prime is not 
     proven prime, otherwise it is.
 
-ulong n_prime_pi(mp_limb_t n)
+ulong n_prime_pi(ulong n)
 
     Returns the value of the prime counting function $\pi(n)$, i.e.\ the
     number of primes less than or equal to $n$. The invariant
@@ -608,7 +608,7 @@ ulong n_prime_pi(mp_limb_t n)
     Currently, this function simply extends the table of cached primes up to
     an upper limit and then performs a binary search.
 
-void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
+void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n)
 
     Calculates lower and upper bounds for the value of the prime counting
     function \code{lo <= pi(n) <= hi}. If \code{lo} and \code{hi} point to 
@@ -625,7 +625,7 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
     approximation to $\ln n$, taking care to use a value too
     small or too large to maintain the inequality.
 
-mp_limb_t n_nth_prime(ulong n)
+ulong n_nth_prime(ulong n)
 
     Returns the $n$th prime number $p_n$, using the mathematical indexing
     convention $p_1 = 2, p_2 = 3, \dotsc$.
@@ -633,7 +633,7 @@ mp_limb_t n_nth_prime(ulong n)
     This function simply ensures that the table of cached primes is large
     enough and then looks up the entry.
 
-void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
+void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n)
 
     Calculates lower and upper bounds for the $n$th prime number $p_n$,
     \code{lo <= p_n <= hi}. If \code{lo} and \code{hi} point to the same 
@@ -668,7 +668,7 @@ void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
 
 *******************************************************************************
 
-int n_is_oddprime_small(mp_limb_t n) 
+int n_is_oddprime_small(ulong n) 
 
     Returns $1$ if $n$ is an odd prime smaller than 
     \code{FLINT_ODDPRIME_SMALL_CUTOFF}. Expects $n$ 
@@ -677,7 +677,7 @@ int n_is_oddprime_small(mp_limb_t n)
     This function merely uses a lookup table with one bit allocated for each
     odd number up to the cutoff.
 
-int n_is_oddprime_binary(mp_limb_t n) 
+int n_is_oddprime_binary(ulong n) 
 
     This function performs a simple binary search through 
     the table of cached primes for $n$. If it exists in the array it returns
@@ -689,7 +689,7 @@ int n_is_oddprime_binary(mp_limb_t n)
     refine our search with a simple binary algorithm, taking
     the top or bottom of the current interval as necessary.
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+int n_is_prime_pocklington(ulong n, ulong iterations)
 
     Tests if $n$ is a prime using the Pocklington--Lehmer primality
     test. If $1$ is returned $n$ has been proved prime. If $0$ is returned 
@@ -713,7 +713,7 @@ int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     \url{http://mathworld.wolfram.com/PocklingtonsTheorem.html}
     for a description of the algorithm.
 
-int n_is_prime_pseudosquare(mp_limb_t n)
+int n_is_prime_pseudosquare(ulong n)
 
     Tests if $n$ is a prime according to~\citep[Theorem~2.7]{LukPatWil1996}.
 
@@ -751,7 +751,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
 
-int n_is_prime(mp_limb_t n)
+int n_is_prime(ulong n)
 
     Tests if $n$ is a prime. This first sieves for small prime factors,
     then simply calls \code{n_is_probabprime()}. This has been checked
@@ -764,8 +764,8 @@ int n_is_prime(mp_limb_t n)
     primality. This is likely to be significantly slower for prime
     inputs.
 
-int n_is_strong_probabprime_precomp(mp_limb_t n, double npre, 
-                                                      mp_limb_t a, mp_limb_t d)
+int n_is_strong_probabprime_precomp(ulong n, double npre, 
+                                                      ulong a, ulong d)
 
     Tests if $n$ is a strong probable prime to the base $a$. We 
     require that $d$ is set to the largest odd factor of $n - 1$ and 
@@ -781,8 +781,8 @@ int n_is_strong_probabprime_precomp(mp_limb_t n, double npre,
     A description of strong probable primes is given here:
     \url{http://mathworld.wolfram.com/StrongPseudoprime.html}
 
-int n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, 
-                                                      mp_limb_t a, mp_limb_t d)
+int n_is_strong_probabprime2_preinv(ulong n, ulong ninv, 
+                                                      ulong a, ulong d)
 
     Tests if $n$ is a strong probable prime to the base $a$. We require 
     that $d$ is set to the largest odd factor of $n - 1$ and \code{npre} 
@@ -796,7 +796,7 @@ int n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv,
     A description of strong probable primes is given here:
     \url{http://mathworld.wolfram.com/StrongPseudoprime.html}
 
-int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
+int n_is_probabprime_fermat(ulong n, ulong i)
 
     Returns $1$ if $n$ is a base $i$ Fermat probable prime. Requires 
     $1 < i < n$ and that $i$ does not divide $n$.
@@ -804,7 +804,7 @@ int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
     By Fermat's Little Theorem if $i^{n-1}$ is not congruent to $1$ 
     then $n$ is not prime.
 
-int n_is_probabprime_fibonacci(mp_limb_t n)
+int n_is_probabprime_fibonacci(ulong n)
 
     Let $F_j$ be the $j$th element of the Fibonacci sequence 
     $0, 1, 1, 2, 3, 5, \dotsc$, starting at $j = 0$. Then if $n$ is prime
@@ -815,7 +815,7 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
     We require that $n$ is not divisible by $2$ or $5$. 
 
-int n_is_probabprime_BPSW(mp_limb_t n)
+int n_is_probabprime_BPSW(ulong n)
 
     Implements a Baillie--Pomerance--Selfridge--Wagstaff probable primality
     test. This is a variant of the usual BPSW test (which only uses strong
@@ -832,14 +832,14 @@ int n_is_probabprime_BPSW(mp_limb_t n)
     Up to $2^64$ the test we use has been checked against tables of 
     pseudoprimes. Thus it is a primality test up to this limit.
 
-int n_is_probabprime_lucas(mp_limb_t n)
+int n_is_probabprime_lucas(ulong n)
 
     For details on Lucas pseudoprimes, see~\citep[pp.~143]{CraPom2005}.
 
     We implement a variant of the Lucas pseudoprime test similar to that
     described by Baillie and Wagstaff~\citep{BaiWag1980}.
 
-int n_is_probabprime(mp_limb_t n)
+int n_is_probabprime(ulong n)
 
     Tests if $n$ is a probable prime. Up to \code{FLINT_ODDPRIME_SMALL_CUTOFF} 
     this algorithm uses \code{n_is_oddprime_small()} which uses a lookup table.
@@ -865,7 +865,7 @@ int n_is_probabprime(mp_limb_t n)
 
 *******************************************************************************
 
-mp_limb_t n_sqrt(mp_limb_t a)
+ulong n_sqrt(ulong a)
 
     Computes the integer truncation of the square root of $a$. 
 
@@ -880,7 +880,7 @@ mp_limb_t n_sqrt(mp_limb_t a)
     precision float provided the square root itself can be represented 
     in a single float, i.e.\ for $a < 281474976710656 = 2^{46}$.
 
-mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
+ulong n_sqrtrem(ulong * r, ulong a)
 
     Computes the integer truncation of the square root of $a$. 
 
@@ -898,7 +898,7 @@ mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
     The remainder is computed by subtracting the square of the computed square
     root from $a$.
 
-int n_is_square(mp_limb_t x)
+int n_is_square(ulong x)
 
     Returns $1$ if $x$ is a square, otherwise $0$.
 
@@ -907,7 +907,7 @@ int n_is_square(mp_limb_t x)
     and if so it then takes a square root and checks that the square of this 
     equals the original value. 
 
-int n_is_perfect_power235(mp_limb_t n)
+int n_is_perfect_power235(ulong n)
 
     Returns $1$ if $n$ is a perfect square, cube or fifth power. 
 
@@ -923,7 +923,7 @@ int n_is_perfect_power235(mp_limb_t n)
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
 
-mp_limb_t n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
+ulong n_rootrem(ulong* remainder, ulong n, ulong root)
 
     This function uses the Newton iteration method to calculate the nth root of
     a number.
@@ -934,7 +934,7 @@ mp_limb_t n_rootrem(mp_limb_t* remainder, mp_limb_t n, mp_limb_t root)
     Returns the integer part of \code{n ^ 1/root}. Remainder is set as
     \code{n - base^root}. In case $n < 1$ or \code{root < 1}, $0$ is returned.   
 
-mp_limb_t n_cbrt(mp_limb_t n)
+ulong n_cbrt(ulong n)
     
     This function returns the integer truncation of the cube root of $n$.
     First approximation is calculated by an algorithm mentioned in this 
@@ -946,18 +946,18 @@ mp_limb_t n_cbrt(mp_limb_t n)
     $x \leftarrow x - (x*x*x - a)*x/(2*x*x*x + a)$ for getting a good estimate, 
     as mentioned in the paper by W. Kahan~\citep{Kahan1991}.
 
-mp_limb_t n_cbrt_newton_iteration(mp_limb_t n)
+ulong n_cbrt_newton_iteration(ulong n)
 
     This function returns the integer truncation of the cube root of $n$.
     Makes use of Newton iterations to get a close value, and then adjusts the
     estimate so as to get the correct value.
 
-mp_limb_t n_cbrt_binary_search(mp_limb_t n)
+ulong n_cbrt_binary_search(ulong n)
 
     This function returns the integer truncation of the cube root of $n$.
     Uses binary search to get the correct value.
 
-mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n)
+ulong n_cbrt_chebyshef_approx(ulong n)
     
     This function returns the integer truncation of the cube root of $n$.
     The number is first expressed in the form \code{x * 2^exp}. This ensures
@@ -967,7 +967,7 @@ mp_limb_t n_cbrt_chebyshef_approx(mp_limb_t n)
     \url{http://mpmath.org}, using the function chebyfit. x is multiplied 
     by \code{2^exp} and the cube root of 1, 2 or 4 (according to \code{exp%3}).
 
-mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+ulong n_cbrtrem(ulong* remainder, ulong n)
 
     This function returns the integer truncation of the cube root of $n$.
     Remainder is set as $n$ minus the cube of the value returned.
@@ -978,7 +978,7 @@ mp_limb_t n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
 
 *******************************************************************************
 
-int n_remove(mp_limb_t * n, mp_limb_t p)
+int n_remove(ulong * n, ulong p)
 
     Removes the highest possible power of $p$ from $n$, replacing
     $n$ with the quotient. The return value is that highest 
@@ -991,7 +991,7 @@ int n_remove(mp_limb_t * n, mp_limb_t p)
     proceeds down the power tree again removing powers of $p$
     until none remain.
 
-int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre)
+int n_remove2_precomp(ulong * n, ulong p, double ppre)
 
     Removes the highest possible power of $p$ from $n$, replacing
     $n$ with the quotient. The return value is that highest 
@@ -1003,7 +1003,7 @@ int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre)
     $p$ we make repeated use of \code{n_divrem2_precomp()} until division
     by $p$ is no longer possible.
 
-void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
+void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
 
     Inserts the given prime power factor \code{p^exp} into 
     the \code{n_factor_t} \code{factors}. See the documentation for 
@@ -1017,8 +1017,8 @@ void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
     There is no test code for this function other than its use by
     the various factoring functions, which have test code.
 
-mp_limb_t n_factor_trial_range(n_factor_t * factors,
-                  mp_limb_t n, ulong start, ulong num_primes)
+ulong n_factor_trial_range(n_factor_t * factors,
+                  ulong n, ulong start, ulong num_primes)
 
     Trial factor $n$ with the first \code{num_primes} primes, but
     starting at the prime with index start (counting from zero).
@@ -1029,7 +1029,7 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors,
     initialisation has not already been completed on factors.
 
     Once completed, \code{num} will contain the number of distinct 
-    prime factors found. The field $p$ is an array of \code{mp_limb_t}'s 
+    prime factors found. The field $p$ is an array of \code{ulong}'s 
     containing the distinct prime factors, \code{exp} an array 
     containing the corresponding exponents.
 
@@ -1047,13 +1047,13 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors,
     \code{n_compute_primes()} are utilised with the \code{n_remove2_precomp()}
     function.
 
-mp_limb_t n_factor_trial(n_factor_t * factors, mp_limb_t n, ulong num_primes)
+ulong n_factor_trial(n_factor_t * factors, ulong n, ulong num_primes)
 
     This function calls \code{n_factor_trial_range()}, with the value of 
     $0$ for \code{start}. By default this adds factors to an already existing
     \code{n_factor_t} or to a newly initialised one.
 
-mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n)
+ulong n_factor_power235(ulong *exp, ulong n)
 
     Returns $0$ if $n$ is not a perfect square, cube or fifth power.
     Otherwise it returns the root and sets \code{exp} to either $2$, 
@@ -1071,20 +1071,20 @@ mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n)
     root can be taken, if indicated, to determine whether the power
     of that root is exactly equal to $n$.
 
-mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters)
+ulong n_factor_one_line(ulong n, ulong iters)
 
     This implements Bill Hart's one line factoring algorithm~\citep{Har2009}.
     It is a variant of Fermat's algorithm which cycles through a large number 
     of multipliers instead of incrementing the square root. It is faster than 
     SQUFOF for $n$ less than about $2^{40}$.
 
-mp_limb_t n_factor_lehman(mp_limb_t n)
+ulong n_factor_lehman(ulong n)
 
     Lehman's factoring algorithm. Currently works up to $10^{16}$, but is
     not particularly efficient and so is not used in the general factor
     function. Always returns a factor of $n$.
 
-mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
+ulong n_factor_SQUFOF(ulong n, ulong iters)
 
     Attempts to split $n$ using the given number of iterations
     of SQUFOF. Simply set \code{iters} to \code{~WORD(0)} for maximum 
@@ -1108,7 +1108,7 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
     If SQUFOF fails to factor $n$ we return $0$, however with 
     \code{iters} large enough this should never happen.
 
-void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
+void n_factor(n_factor_t * factors, ulong n, int proved)
 
     Factors $n$ with no restrictions on $n$. If the prime factors are 
     required to be checked with a primality test, one may set 
@@ -1140,8 +1140,8 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
     \code{FLINT_FACTOR_SQUFOF_ITERS}. If that fails an error results and
     the program aborts. However this should not happen in practice.
 
-mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, 
-                  mp_limb_t * prod, ulong num_primes, mp_limb_t limit)
+ulong n_factor_trial_partial(n_factor_t * factors, ulong n, 
+                  ulong * prod, ulong num_primes, ulong limit)
 
     Attempts trial factoring of $n$ with the first \code{num_primes primes}, 
     but stops when the product of prime factors so far exceeds \code{limit}.
@@ -1152,7 +1152,7 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n,
     initialisation has not already been completed on \code{factors}.
 
     Once completed, \code{num} will contain the number of distinct 
-    prime factors found. The field $p$ is an array of \code{mp_limb_t}'s 
+    prime factors found. The field $p$ is an array of \code{ulong}'s 
     containing the distinct prime factors, \code{exp} an array 
     containing the corresponding exponents.
 
@@ -1171,8 +1171,8 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n,
     \code{n_compute_primes()} are utilised with the \code{n_remove2_precomp()}
     function.
 
-mp_limb_t n_factor_partial(n_factor_t * factors, 
-                     mp_limb_t n, mp_limb_t limit, int proved)
+ulong n_factor_partial(n_factor_t * factors, 
+                     ulong n, ulong limit, int proved)
 
     Factors $n$, but stops when the product of prime factors so far 
     exceeds \code{limit}.
@@ -1183,7 +1183,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
     initialisation has not already been completed on \code{factors}.
 
     On exit, \code{num} will contain the number of distinct prime factors 
-    found. The field $p$ is an array of \code{mp_limb_t}'s containing the 
+    found. The field $p$ is an array of \code{ulong}'s containing the 
     distinct prime factors, \code{exp} an array containing the corresponding 
     exponents.
 
@@ -1192,7 +1192,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
     The factors are proved prime if \code{proved} is $1$, otherwise
     they are merely probably prime.
 
-mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
+ulong n_factor_pp1(ulong n, ulong B1, ulong c)
 
     Factors $n$ using Williams' $p + 1$ factoring algorithm, with prime
     limit set to $B1$. We require $c$ to be set to a random value. Each
@@ -1211,7 +1211,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
 
 *******************************************************************************
 
-int n_moebius_mu(mp_limb_t n)
+int n_moebius_mu(ulong n)
 
     Computes the Moebius function $\mu(n)$, which is defined as $\mu(n) = 0$ 
     if $n$ has a prime factor of multiplicity greater than $1$, $\mu(n) = -1$ 
@@ -1233,13 +1233,13 @@ void n_moebius_mu_vec(int * mu, ulong len)
     of $\mu(n)$ for every multiple of a prime $p$ and setting $\mu(n) = 0$ 
     for every multiple of $p^2$.
 
-int n_is_squarefree(mp_limb_t n)
+int n_is_squarefree(ulong n)
 
     Returns $0$ if $n$ is divisible by some perfect square, and $1$ otherwise.
     This simply amounts to testing whether $\mu(n) \neq 0$. As special 
     cases, $1$ is considered squarefree and $0$ is not considered squarefree.
 
-mp_limb_t n_euler_phi(mp_limb_t n)
+ulong n_euler_phi(ulong n)
 
     Computes the Euler totient function $\phi(n)$, counting the number of
     positive integers less than or equal to $n$ that are coprime to $n$.
@@ -1250,14 +1250,14 @@ mp_limb_t n_euler_phi(mp_limb_t n)
 
 *******************************************************************************
 
-mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+ulong n_factorial_fast_mod2_preinv(ulong n, ulong p, ulong pinv)
 
     Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
     by \code{n_preinvert_limb()}. $p$ is not required to be a prime, but
     no special optimisations are made for composite $p$.
     Uses fast multipoint evaluation, running in about $O(n^{1/2})$ time.
 
-mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv)
 
     Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
     by \code{n_preinvert_limb()}. $p$ is not required to be a prime, but
@@ -1273,18 +1273,18 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 
 *******************************************************************************
 
-mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
+ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 
     Returns a primitive root for the multiplicative subgroup of $\Z/p\Z$
     where $p$ is prime given the factorisation ($factors$) of $p - 1$.
 
 
-mp_limb_t n_primitive_root_prime(mp_limb_t p)
+ulong n_primitive_root_prime(ulong p)
 
     Returns a primitive root for the multiplicative subgroup of $\Z/p\Z$
     where $p$ is prime.
 
-mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n)
+ulong n_discrete_log_bsgs(ulong b, ulong a, ulong n)
 
     Returns the discrete logarithm of $b$ with respect to $a$ in the
     multiplicative subgroup of $\Z/n\Z$ when $\Z/n\Z$ is cyclic That is,
