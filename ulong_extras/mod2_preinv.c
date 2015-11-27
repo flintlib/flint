@@ -31,7 +31,8 @@
    Method of Niels Moller and Torbjorn Granlund see paper:
    Improved Division by Invariant Integers: (algorithm 4)
    https://gmplib.org/~tege/division-paper.pdf 
- */
+*/
+
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
 {
    ulong norm, q1, q0, r;
