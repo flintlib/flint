@@ -51,7 +51,7 @@ ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
 
       r = u0 - (q1 + 1)*n;
 
-      if (r >= q0)
+      if (r > q0)
          r += n;
 
       return (r < n) ? (r >> norm) : ((r - n) >> norm);
