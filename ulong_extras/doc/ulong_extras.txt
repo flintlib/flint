@@ -208,11 +208,11 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 
     This uses the algorithm of Granlund and M\"oller~\citep{GraMol2010}. First
     $n$ is normalised and $a$ is shifted into two limbs to compensate. Then
-    their algorithm is  applied verbatim and the result shifted back.
+    their algorithm is applied verbatim and the result shifted back.
 
     % Torbjorn Granlund and Niels Moller
     % Improved Division by Invariant Integers
-    % http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
+    % https://gmplib.org/~tege/division-paper.pdf
 
 mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, 
                                                                    double npre)

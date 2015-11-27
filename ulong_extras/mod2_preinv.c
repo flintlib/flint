@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010, 2015 William Hart
 
 ******************************************************************************/
 
@@ -27,46 +27,32 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/*
-
-mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
-{
-    unsigned int norm;
-    mp_limb_t q, r;
-
-    count_leading_zeros(norm, n);
-    udiv_qrnnd_preinv(q, r, r_shift(a, FLINT_BITS-norm), a<<norm, n<<norm, ninv);
-    return (r>>norm);
-}
-
-*/
-
 /* 
-   New method of Moller and Granlund
-   see paper Improved Division by Invariant Integers (Torbjorn Granlund
-   and Niels Moller) (preprint): (pp. 4)
-   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 
+   Method of Niels Moller and Torbjorn Granlund see paper:
+   Improved Division by Invariant Integers: (algorithm 4)
+   https://gmplib.org/~tege/division-paper.pdf 
  */
-mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
 {
-    unsigned int norm;
-    mp_limb_t q1, q0, r;
+   ulong norm, q1, q0, r;
 
-    count_leading_zeros(norm, n);
-    n <<= norm;
+   FLINT_ASSERT(n != 0);
 
-    {
-	    const mp_limb_t u1 = r_shift(a, FLINT_BITS-norm);
-        const mp_limb_t u0 = (a << norm);
+   count_leading_zeros(norm, n);
+   n <<= norm;
 
-        umul_ppmm(q1, q0, ninv, u1);
-        add_ssaaaa(q1, q0, q1, q0, u1, u0);
+   {
+      const ulong u1 = r_shift(a, FLINT_BITS - norm);
+      const ulong u0 = (a << norm);
 
-        r = (u0 - (q1 + 1)*n);
+      umul_ppmm(q1, q0, ninv, u1);
+      add_ssaaaa(q1, q0, q1, q0, u1, u0);
 
-        if (r >= q0) r += n;
+      r = u0 - (q1 + 1)*n;
 
-        return (r < n) ? (r >> norm) : ((r - n) >> norm);
+      if (r >= q0)
+         r += n;
+
+      return (r < n) ? (r >> norm) : ((r - n) >> norm);
    }
 }
-
