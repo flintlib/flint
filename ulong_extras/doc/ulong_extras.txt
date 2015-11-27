@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2015 William Hart
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 Fredrik Johansson
 
@@ -138,6 +138,22 @@ int n_sizeinbase(mp_limb_t n, int base)
 
 *******************************************************************************
 
+ulong n_preinvert_limb(ulong n)
+
+    Returns a precomputed inverse of $n$, as defined in \citep{GraMol2010}.
+    This precomputed inverse can be used with all of the functions that
+    take a precomputed inverse whose names are suffixed by \code{_preinv}.
+    
+    We require $n > 0$. 
+
+double n_precompute_inverse(ulong n)
+
+    Returns a precomputed inverse of $n$ with double precision value $1/n$.
+    This precomputed inverse can be used with all of the functions that
+    take a precomputed inverse whose names are suffixed by \code{_precomp}.
+    
+    We require $n > 0$. 
+
 mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
@@ -187,15 +203,12 @@ mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
-    \code{n_preinvert_limb()}. There are no restrictions on $a$ or on $n$. 
+    \code{n_preinvert_limb()}. There are no restrictions on $a$ and the only
+    restriction on $n$ is that it be nonzero. 
 
-    The old version of this function was implemented simply by 
-    making use of\\ \code{udiv_qrnnd_preinv()}.
-
-    The new version uses the new algorithm of Granlund and 
-    M\"oller~\citep{GraMol2010}. First $n$ is normalised and a 
-    shifted into two limbs to compensate. Then their algorithm is 
-    applied verbatim and the result shifted back.
+    This uses the algorithm of Granlund and M\"oller~\citep{GraMol2010}. First
+    $n$ is normalised and $a$ is shifted into two limbs to compensate. Then
+    their algorithm is  applied verbatim and the result shifted back.
 
     % Torbjorn Granlund and Niels Moller
     % Improved Division by Invariant Integers

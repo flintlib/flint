@@ -168,12 +168,12 @@ double n_precompute_inverse(mp_limb_t n)
 }
 
 ULONG_EXTRAS_INLINE
-mp_limb_t n_preinvert_limb(mp_limb_t n)
+ulong n_preinvert_limb(ulong n)
 {
-   mp_limb_t norm, ninv;
+   ulong norm, ninv;
 
    count_leading_zeros(norm, n);
-   invert_limb(ninv, n<<norm);
+   invert_limb(ninv, n << norm);
 
    return ninv;
 }
