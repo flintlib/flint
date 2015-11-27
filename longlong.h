@@ -544,12 +544,12 @@ static const int rec_word_tab[512] = {
       _v0 = rec_word_tab[((d) >> 22) & 0x1FF];                    \
       _d21 = ((d) >> 11) + 1;                                     \
       _m0 = _v0*_v0;                                              \
-      umul_ppmm(_v1, _e, 0, _m0, 0, _d21);                        \
+      umul_ppmm(_v1, _e, _m0, _d21);                              \
       _v1 = (_v0 << 4) - _v1 - 1;                                 \
       _e = -_v1*((d) >> 1);                                       \
       _m0 = -((d) & (mp_limb_t) 1);                               \
       _e -= ((_v1 - (_v1 >> 1)) & _m0);                           \
-      umul_ppmm(_v2, _m0, 0, _v1, 0, _e);                         \
+      umul_ppmm(_v2, _m0, _v1, _e);                               \
       _v2 = (_v1 << 15) + (_v2 >> 1);                             \
       umul_ppmm(_v0, _d21, _v2, (d));                             \
       add_ssaaaa(_v0, _d21, _v0, _d21, (mp_limb_t) 0, (d));       \
