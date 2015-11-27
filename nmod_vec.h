@@ -70,7 +70,7 @@ do {                                            \
       umul_ppmm(q1, q0, (mod).ninv, u1); \
       add_ssaaaa(q1, q0, q1, q0, u1, u0); \
       r1 = (u0 - (q1 + 1)*nxx); \
-      if (r1 >= q0) r1 += nxx; \
+      if (r1 > q0) r1 += nxx; \
       if (r1 < nxx) r = (r1>>(mod).norm); \
       else r = ((r1 - nxx)>>(mod).norm); \
    } while (0)
