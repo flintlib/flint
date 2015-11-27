@@ -200,6 +200,27 @@ ulong n_mod2_precomp(ulong a, ulong n, double ninv)
     negative or positive, so the quotient we compute may be one
     out in either direction.
 
+ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
+
+    Returns $a \bmod{n}$ and sets $q$ to the quotient of $a$ by $n$, given a
+    precomputed inverse of $n$ computed by \code{n_preinvert_limb()}. There are
+    no restrictions on $a$ and the only restriction on $n$ is that it be
+    nonzero. 
+
+    This uses the algorithm of Granlund and M\"oller~\citep{GraMol2010}. First
+    $n$ is normalised and $a$ is shifted into two limbs to compensate. Then
+    their algorithm is applied verbatim and the remainder shifted back.
+
+ulong n_div2_preinv(ulong a, ulong n, ulong ninv)
+
+    Returns the Euclidean quotient of $a$ by $n$ given a precomputed inverse of
+    $n$ computed by \code{n_preinvert_limb()}. There are no restrictions on $a$
+    and the only restriction on $n$ is that it be nonzero. 
+
+    This uses the algorithm of Granlund and M\"oller~\citep{GraMol2010}. First
+    $n$ is normalised and $a$ is shifted into two limbs to compensate. Then
+    their algorithm is applied verbatim.
+
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 

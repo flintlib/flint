@@ -185,6 +185,10 @@ FLINT_DLL ulong n_mod2_precomp(ulong a, ulong n, double ninv);
 FLINT_DLL ulong n_divrem2_precomp(ulong * q, ulong a, 
                                            ulong n, double npre);
 
+FLINT_DLL ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
+
+FLINT_DLL ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
+
 FLINT_DLL ulong n_mod2_preinv(ulong a, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, 
