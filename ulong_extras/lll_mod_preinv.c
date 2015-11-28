@@ -33,7 +33,7 @@
    https://gmplib.org/~tege/division-paper.pdf 
 */
 
-mp_limb_t n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
+ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
                  ulong n, ulong ninv)
 {
     ulong q0, q1, r, norm;
