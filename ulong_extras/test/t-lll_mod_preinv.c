@@ -19,12 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2015 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -37,11 +35,10 @@ int main(void)
    flint_printf("lll_mod_preinv....");
    fflush(stdout);
 
-   
-
+   /* test n_lll_mod_preinv against n_ll_mod_preinv */
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t d, dinv, nh, nm, nl, r1, r2;
+      ulong d, dinv, nh, nm, nl, r1, r2, rm;
 
       d = n_randtest_not_zero(state);
       nh = n_randtest(state) % d;
@@ -51,8 +48,9 @@ int main(void)
       dinv = n_preinvert_limb(d);
 
       r2 = n_lll_mod_preinv(nh, nm, nl, d, dinv);
-      nm = n_ll_mod_preinv(nh, nm, d, dinv);
-	  r1 = n_ll_mod_preinv(nm, nl, d, dinv);
+      
+      rm = n_ll_mod_preinv(nh, nm, d, dinv);
+      r1 = n_ll_mod_preinv(rm, nl, d, dinv);
 
       result = (r1 == r2);
       if (!result)
