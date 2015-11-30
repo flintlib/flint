@@ -1290,6 +1290,18 @@ void fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
     This function uses the modular algorithm described 
     in~\citep{Col1971}.
 
+void fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
+                                                 const fmpz_poly_t poly2,
+                                                 const fmpz_t div,
+                                                 slong nbits)
+
+    Computes the resultant of \code{poly1} and \code{poly2} divided by
+    div using a slight modification of the above function: it is assumed that
+    - the resultant is exactly divisible by div
+    - the rest (after the division) has at most nbits bits
+    This bypasses the computation of general bounds.
+
+
 void _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
                                       const fmpz * poly2, slong len2)
 

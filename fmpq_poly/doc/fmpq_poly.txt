@@ -1050,6 +1050,15 @@ void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
     the resultant is zero.  Note that otherwise if one of the polynomials is 
     constant, the last term in the above expression is the empty product.
 
+void fmpq_poly_resultant_modular_div(fmpq_t r, const fmpq_poly_t f, 
+                                               const fmpq_poly_t g,
+                                               fmpz_t div,
+                                               slong nbits)
+
+    Returns the resultant of $f$ and $g$ divided by div under the assumption
+    that the result has at most nbits bits. The result must be integral.
+
+
 *******************************************************************************
 
     Derivative and integral

@@ -541,6 +541,14 @@ FLINT_DLL void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden,
 
 FLINT_DLL void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g);
 
+
+FLINT_DLL void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden, 
+                          const fmpz *poly1, const fmpz_t den1, slong len1, 
+                          const fmpz *poly2, const fmpz_t den2, slong len2,
+                          const fmpz_t divisor, slong nbits);
+
+FLINT_DLL void fmpq_poly_resultant_div(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g, const fmpz_t divisor, slong nbits);
+
 /*  Derivative and integral  *************************************************/
 
 FLINT_DLL void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 

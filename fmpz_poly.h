@@ -619,6 +619,14 @@ FLINT_DLL void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1,
 FLINT_DLL void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
                                                       const fmpz_poly_t poly2);
 
+FLINT_DLL void _fmpz_poly_resultant_modular_div(fmpz_t res,
+       const fmpz * poly1, slong len1, 
+       const fmpz * poly2, slong len2, const fmpz_t divisor, slong nbits);
+
+FLINT_DLL void fmpz_poly_resultant_modular_div(fmpz_t res, 
+               const fmpz_poly_t poly1, const fmpz_poly_t poly2,
+               const fmpz_t divisor, slong nbits);
+
 FLINT_DLL void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
                const fmpz * poly1, slong len1, const fmpz * poly2, slong len2);
 
