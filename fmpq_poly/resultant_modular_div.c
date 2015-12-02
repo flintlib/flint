@@ -66,8 +66,7 @@ void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden,
     else  /* len1 >= len2 >= 2 */
     {
         fmpz_t c1, c2, t;
-        fmpz *prim1, *prim2, *g;
-        slong lenG = len2;
+        fmpz *prim1, *prim2;
 
         fmpz_init(c1);
         fmpz_init(c2);
