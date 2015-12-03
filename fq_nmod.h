@@ -259,6 +259,8 @@ FLINT_DLL void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x, const 
 
 FLINT_DLL void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx);
 
+FLINT_DLL void fq_nmod_div(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+
 FLINT_DLL void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 FLINT_DLL void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
@@ -296,6 +298,8 @@ FQ_NMOD_INLINE int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     return nmod_poly_is_one(op);
 }
+
+FLINT_DLL int fq_nmod_is_invertible(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Assignments and conversions ***********************************************/
 
