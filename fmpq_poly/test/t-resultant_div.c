@@ -112,7 +112,6 @@ main(void)
         if (fmpq_is_zero(z)) 
         {
             fmpq_poly_clear(f);
-
             fmpq_poly_clear(g);
             fmpq_poly_clear(h);
             fmpq_poly_clear(p);
