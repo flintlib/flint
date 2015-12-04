@@ -98,7 +98,7 @@ main(void)
             abort();
         }
 
-        fmpq_poly_resultant(z, p, g);
+        fmpq_poly_resultant(z, p, h);
 
         if (!fmpz_is_one(fmpq_denref(z)))
         {
