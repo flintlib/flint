@@ -61,9 +61,9 @@ main(void)
         
         fmpz_init(den);
 
-        fmpq_poly_randtest(f, state, n_randint(state, 10), 10);
-        fmpq_poly_randtest(g, state, n_randint(state, 10), 10);
-        fmpq_poly_randtest(h, state, n_randint(state, 10), 10);
+        fmpq_poly_randtest(f, state, n_randint(state, 50), 100);
+        fmpq_poly_randtest(g, state, n_randint(state, 50), 100);
+        fmpq_poly_randtest(h, state, n_randint(state, 50), 100);
 
         fmpz_set(den, fmpq_poly_denref(f));
         fmpq_poly_scalar_mul_fmpz(f, f, den);

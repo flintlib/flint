@@ -1296,9 +1296,9 @@ void fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
                                                  slong nbits)
 
     Computes the resultant of \code{poly1} and \code{poly2} divided by
-    div using a slight modification of the above function: it is assumed that
-    - the resultant is exactly divisible by div
-    - the rest (after the division) has at most nbits bits
+    \code{div} using a slight modification of the above function. It is assumed that
+    the resultant is exactly divisible by code{div} and the result \code{res}
+    has at most \code{nbits} bits.
     This bypasses the computation of general bounds.
 
 
