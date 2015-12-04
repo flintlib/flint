@@ -90,25 +90,25 @@ void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden,
         fmpz_init(l);
         if (!fmpz_is_one(c1))
         {
-           fmpz_pow_ui(l, c1, len2 - 1);
-           fmpz_init(div);
-           fmpz_init(la);
-           fmpz_gcd(div, l, divisor); /* div = gcd(c1^(len2-1), divisor) */
-           fmpz_divexact(la, l, div); /* la = c1^(len2 -1)/gcd           */
-           fmpz_divexact(div, divisor, div); /*div /= gcd                */
-           nbits = nbits - fmpz_bits(la) + 1;
+            fmpz_pow_ui(l, c1, len2 - 1);
+            fmpz_init(div);
+            fmpz_init(la);
+            fmpz_gcd(div, l, divisor); /* div = gcd(c1^(len2-1), divisor) */
+            fmpz_divexact(la, l, div); /* la = c1^(len2 -1)/gcd           */
+            fmpz_divexact(div, divisor, div); /*div /= gcd                */
+            nbits = nbits - fmpz_bits(la) + 1;
         } else {
-           fmpz_init_set(div, divisor);
+            fmpz_init_set(div, divisor);
         }
 
         if (!fmpz_is_one(c2))
         {
-           fmpz_init(lb);
-           fmpz_pow_ui(lb, c2, len1 - 1);
-           fmpz_gcd(l, lb, div);
-           fmpz_divexact(lb, lb, l);
-           fmpz_divexact(div, div, l);
-           nbits = nbits - fmpz_bits(lb) + 1;
+            fmpz_init(lb);
+            fmpz_pow_ui(lb, c2, len1 - 1);
+            fmpz_gcd(l, lb, div);
+            fmpz_divexact(lb, lb, l);
+            fmpz_divexact(div, div, l);
+            nbits = nbits - fmpz_bits(lb) + 1;
         }
 
         _fmpz_poly_resultant_modular_div(rnum, prim1, len1, prim2, len2, div, nbits);

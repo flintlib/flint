@@ -92,25 +92,25 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
     if (!fmpz_is_one(ac))
     {
-       fmpz_pow_ui(l, ac, len2 - 1);
-       fmpz_init(div);
-       fmpz_init(la);
-       fmpz_gcd(div, l, divisor); /* div = gcd(ac^(len2-1), divisor) */
-       fmpz_divexact(la, l, div); /* la = ac^(len2 -1)/gcd           */
-       fmpz_divexact(div, divisor, div); /*div /= gcd                */
-       nbits = nbits - fmpz_bits(la) + 1;
+        fmpz_pow_ui(l, ac, len2 - 1);
+        fmpz_init(div);
+        fmpz_init(la);
+        fmpz_gcd(div, l, divisor); /* div = gcd(ac^(len2-1), divisor) */
+        fmpz_divexact(la, l, div); /* la = ac^(len2 -1)/gcd           */
+        fmpz_divexact(div, divisor, div); /*div /= gcd                */
+        nbits = nbits - fmpz_bits(la) + 1;
     } else {
-       fmpz_init_set(div, divisor);
+        fmpz_init_set(div, divisor);
     }
     
     if (!fmpz_is_one(bc))
     {
-       fmpz_init(lb);
-       fmpz_pow_ui(lb, bc, len1 - 1);
-       fmpz_gcd(l, lb, div);
-       fmpz_divexact(lb, lb, l);
-       fmpz_divexact(div, div, l);
-       nbits = nbits - fmpz_bits(lb) + 1;
+        fmpz_init(lb);
+        fmpz_pow_ui(lb, bc, len1 - 1);
+        fmpz_gcd(l, lb, div);
+        fmpz_divexact(lb, lb, l);
+        fmpz_divexact(div, div, l);
+        nbits = nbits - fmpz_bits(lb) + 1;
     }
 
     
@@ -181,14 +181,14 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     /* finally multiply by powers of content */
     if (!fmpz_is_one(ac))
     {
-       fmpz_mul(res, res, la);
-       fmpz_clear(la);
+        fmpz_mul(res, res, la);
+        fmpz_clear(la);
     }
     
     if (!fmpz_is_one(bc))
     {
-       fmpz_mul(res, res, lb);
-       fmpz_clear(lb);
+        fmpz_mul(res, res, lb);
+        fmpz_clear(lb);
     }
 
     fmpz_clear(l); 
@@ -205,20 +205,20 @@ void
 fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
               const fmpz_poly_t poly2, const fmpz_t divisor, slong nbits)
 {
-   slong len1 = poly1->length;
-   slong len2 = poly2->length;
-   
-   if (len1 == 0 || len2 == 0 || fmpz_is_zero(divisor))
-     fmpz_zero(res);
-   else if (len1 >= len2)
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    
+    if (len1 == 0 || len2 == 0 || fmpz_is_zero(divisor))
+        fmpz_zero(res);
+    else if (len1 >= len2)
         _fmpz_poly_resultant_modular_div(res, poly1->coeffs, len1,
-                                         poly2->coeffs, len2, divisor, nbits);
-   else
-   {
+                                          poly2->coeffs, len2, divisor, nbits);
+    else
+    {
         _fmpz_poly_resultant_modular_div(res, poly2->coeffs, len2, 
-                                         poly1->coeffs, len1, divisor, nbits);  
+                                          poly1->coeffs, len1, divisor, nbits);  
         if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
             fmpz_neg(res, res);
-   }
+    }
 }
 
