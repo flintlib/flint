@@ -104,7 +104,7 @@ main(void)
         fmpz_poly_resultant_modular(a, f, h);
         fmpz_poly_resultant_modular(b, g, h);
 
-        if (fmpz_is_zero(b)) 
+        if (fmpz_is_zero(b) || fmpz_is_zero(a)) 
         {
            fmpz_clear(b);
            fmpz_clear(a);

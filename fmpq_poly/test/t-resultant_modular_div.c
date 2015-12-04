@@ -44,13 +44,14 @@ main(void)
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        fmpq_poly_t f, g, h;
+        fmpq_poly_t f, g, h, p;
         fmpq_t x, y, z, zz;
         fmpz_t den;
         slong nbits;
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
+        fmpq_poly_init(p);
         fmpq_poly_init(h);
 
         fmpq_init(x);
@@ -60,9 +61,9 @@ main(void)
         
         fmpz_init(den);
 
-        fmpq_poly_randtest(f, state, n_randint(state, 60), 60);
-        fmpq_poly_randtest(g, state, n_randint(state, 60), 60);
-        fmpq_poly_randtest(h, state, n_randint(state, 60), 60);
+        fmpq_poly_randtest(f, state, n_randint(state, 10), 10);
+        fmpq_poly_randtest(g, state, n_randint(state, 10), 10);
+        fmpq_poly_randtest(h, state, n_randint(state, 10), 10);
 
         fmpz_set(den, fmpq_poly_denref(f));
         fmpq_poly_scalar_mul_fmpz(f, f, den);
@@ -73,20 +74,11 @@ main(void)
         fmpz_set(den, fmpq_poly_denref(h));
         fmpq_poly_scalar_mul_fmpz(h, h, den);
 
-        flint_printf("\nf:\n");
-        fmpq_poly_print_pretty(f, "x");
-        flint_printf("\ng:\n");
-        fmpq_poly_print_pretty(g, "x");
-        flint_printf("\nh:\n");
-        fmpq_poly_print_pretty(h, "x");
-        flint_printf("\n");
+        fmpq_poly_mul(p, f, g);
 
-
-        fmpq_poly_resultant(y, f, g);
+        fmpq_poly_resultant(x, f, h);
         
-        flint_printf("y: "), fmpq_print(y), flint_printf("\n");
-
-        if (!fmpz_is_one(fmpq_denref(y)))
+        if (!fmpz_is_one(fmpq_denref(x)))
         {
             flint_printf("FAIL resultant not integral\n");
             flint_printf("f = "), fmpq_poly_print(f), flint_printf("\n\n");
@@ -95,9 +87,9 @@ main(void)
             abort();
         }
 
-        fmpq_poly_resultant(z, h, g);
+        fmpq_poly_resultant(y, g, h);
         
-        if (!fmpz_is_one(fmpq_denref(z)))
+        if (!fmpz_is_one(fmpq_denref(y)))
         {
             flint_printf("FAIL resultant not integral\n");
             flint_printf("h = "), fmpq_poly_print(f), flint_printf("\n\n");
@@ -106,53 +98,59 @@ main(void)
             abort();
         }
 
-        flint_printf("y: "), fmpq_print(y), flint_printf("\n");
+        fmpq_poly_resultant(z, p, g);
 
-        fmpq_mul(y, y, z);
-
-        flint_printf("y: "), fmpq_print(y), flint_printf("\n");
-        
-        /* y is the correct value we want to compute.
-         * Get the number of bits and add some random value. */
-
-        if (!fmpz_is_one(fmpq_denref(y)))
+        if (!fmpz_is_one(fmpq_denref(z)))
         {
             flint_printf("FAIL resultant not integral\n");
-            flint_printf("f = "), fmpq_poly_print(f), flint_printf("\n\n");
+            flint_printf("p = "), fmpq_poly_print(f), flint_printf("\n\n");
             flint_printf("g = "), fmpq_poly_print(g), flint_printf("\n\n");
             flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
             abort();
         }
-     
 
-        nbits = (slong)fmpz_bits(fmpq_numref(y));
+        if (fmpq_is_zero(z)) 
+        {
+            fmpq_poly_clear(f);
 
-        /* Compute res(f h, g) using the divisor res(f, g) and the
-         * correct number of bits of the output. */
+            fmpq_poly_clear(g);
+            fmpq_poly_clear(h);
+            fmpq_poly_clear(p);
 
-        fmpq_poly_mul(f, f, h);
-        fmpq_poly_resultant(zz, f, g);
+            fmpq_clear(x);
+            fmpq_clear(y);
+            fmpq_clear(z);
+            fmpq_clear(zz);
+        
+            fmpz_clear(den);
+            continue;
+        }
+    
+        nbits = (slong)fmpz_bits(fmpq_numref(y)) + 1;
 
-        flint_printf("res(f h, g) = "), fmpq_print(zz), flint_printf("\n\n");
-        fmpq_poly_resultant_div(x, f, g, fmpq_numref(z), nbits);
+        fmpq_poly_resultant_div(z, p, h, fmpq_numref(x), nbits);
+        fmpq_poly_resultant(zz, p, h);
 
-        result = fmpq_equal(x, y);
+        result = fmpq_equal(z, y);
         
         if (!result)
         {
-            flint_printf("FAIL (res_modular_div(f, g) == res(f, g):\n");
-            flint_printf("f = "), fmpq_poly_print_pretty(f, "x"), flint_printf("\n\n");
-            flint_printf("g = "), fmpq_poly_print_pretty(g, "x"), flint_printf("\n\n");
-            flint_printf("x = "), fmpq_print(x), flint_printf("\n\n");
-            flint_printf("nbits = %wu\n\n");
-            flint_printf("div = "), fmpq_print(z), flint_printf("\n\n");
-            flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
+            flint_printf("FAIL (res(p, g)/div == res(p, g)/div:\n");
+            flint_printf("p = "), fmpq_poly_print_pretty(p, "x"), flint_printf("\n\n");
+            flint_printf("h = "), fmpq_poly_print_pretty(h, "x"), flint_printf("\n\n");
+            flint_printf("res(p, h) = "), fmpq_print(zz), flint_printf("\n\n");
+            flint_printf("res(p, h) = "), fmpq_print(x), flint_printf(" * "), fmpq_print(y), flint_printf("\n\n");
+            flint_printf("supplied divisor = "), fmpq_print(x), flint_printf("\n\n");
+            flint_printf("nbits = %wu\n\n", nbits);
+            flint_printf("divisor found = "), fmpq_print(z), flint_printf("\n\n");
+            flint_printf("correct result = "), fmpq_print(y), flint_printf("\n\n");
             abort();
         }
         
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
         fmpq_poly_clear(h);
+        fmpq_poly_clear(p);
 
         fmpq_clear(x);
         fmpq_clear(y);
