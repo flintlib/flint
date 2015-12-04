@@ -40,12 +40,12 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     slong i, pc, num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
-    fmpz_t ac, bc, l, modulus, div;
+    fmpz_t ac, bc, l, modulus, div, la, lb;
     fmpz * A, * B, * lead_A, * lead_B;
     mp_ptr a, b, rarr, parr;
     mp_limb_t p, d;
     nmod_t mod;
-    
+
     /* special case, one of the polys is a constant */
     if (len2 == 1) /* if len1 == 1 then so does len2 */
     {
@@ -70,22 +70,41 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
 
     fmpz_init(l);
+    /* we have, originally 
+    // res(p1, p2) = r d 
+    // with nbits(r) <= nbits
+    // Now
+    // res(p1, p2) = ac^(len2-1) bc^(len1-1) res(A, B)
+    // So we need to split ac^(len2-1) bc^(len1-1) = xy
+    // such that d mod x == 0 and gcd(ac^... /x, y) = 1
+    // Then we need to compute res(A,B)/(d/x) 
+    // res(p1, p2) =  x y res(A,B) = r d
+    // and
+    // r = x y res(A,B)/d = y res(A, B)/(d/x)
+    // The length of res(A, B) shrinks by length(y)
+    */
 
     if (!fmpz_is_one(ac))
     {
        fmpz_pow_ui(l, ac, len2 - 1);
        fmpz_init(div);
-       fmpz_gcd(div, l, divisor);
-       fmpz_divexact(div, divisor, div);
+       fmpz_init(la);
+       fmpz_gcd(div, l, divisor); /* div = gcd(ac^(len2-1), divisor) */
+       fmpz_divexact(la, l, div); /* la = ac^(len2 -1)/gcd           */
+       fmpz_divexact(div, divisor, div); /*div /= gcd                */
+       nbits -= fmpz_bits(la);
     } else {
        fmpz_init_set(div, divisor);
     }
     
     if (!fmpz_is_one(bc))
     {
-       fmpz_pow_ui(l, bc, len1 - 1);
-       fmpz_gcd(l, l, div);
+       fmpz_init(lb);
+       fmpz_pow_ui(lb, bc, len1 - 1);
+       fmpz_gcd(l, lb, div);
+       fmpz_divexact(lb, lb, l);
        fmpz_divexact(div, div, l);
+       nbits -= fmpz_bits(lb);
     }
 
     
@@ -106,7 +125,11 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     pbits = FLINT_BITS - 1;
     p = (UWORD(1)<<pbits);
 
+    nbits = FLINT_MAX((slong)0, nbits);
+
     num_primes = (nbits+pbits-1)/pbits;
+    if (num_primes <= 0) num_primes = 1;
+
     parr = _nmod_vec_init(num_primes);
     rarr = _nmod_vec_init(num_primes);
 
@@ -153,14 +176,14 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     /* finally multiply by powers of content */
     if (!fmpz_is_one(ac))
     {
-       fmpz_pow_ui(l, ac, len2 - 1);
-       fmpz_mul(res, res, l);
+       fmpz_mul(res, res, la);
+       fmpz_clear(la);
     }
     
     if (!fmpz_is_one(bc))
     {
-       fmpz_pow_ui(l, bc, len1 - 1);
-       fmpz_mul(res, res, l);
+       fmpz_mul(res, res, lb);
+       fmpz_clear(lb);
     }
 
     fmpz_clear(l); 

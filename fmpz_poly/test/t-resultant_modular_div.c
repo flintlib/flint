@@ -103,9 +103,18 @@ main(void)
 
         fmpz_poly_resultant_modular(a, f, h);
         fmpz_poly_resultant_modular(b, g, h);
+        if (fmpz_is_zero(b)) 
+        {
+           fmpz_clear(b);
+           fmpz_clear(a);
+           fmpz_poly_clear(f);
+           fmpz_poly_clear(g);
+           fmpz_poly_clear(h);
+           continue;
+        }
         fmpz_mul(c, a, b);
         fmpz_poly_mul(p, f, g);
-        nbits = (slong)fmpz_bits(a);
+        nbits = (slong)fmpz_bits(a)+1; /* for sign */
         fmpz_poly_resultant_modular_div(d, p, h, b, nbits);
 
         result = (fmpz_equal(a, d));
