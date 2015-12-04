@@ -92,7 +92,7 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
        fmpz_gcd(div, l, divisor); /* div = gcd(ac^(len2-1), divisor) */
        fmpz_divexact(la, l, div); /* la = ac^(len2 -1)/gcd           */
        fmpz_divexact(div, divisor, div); /*div /= gcd                */
-       nbits -= fmpz_bits(la);
+       nbits = nbits - fmpz_bits(la) + 1;
     } else {
        fmpz_init_set(div, divisor);
     }
@@ -104,7 +104,7 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
        fmpz_gcd(l, lb, div);
        fmpz_divexact(lb, lb, l);
        fmpz_divexact(div, div, l);
-       nbits -= fmpz_bits(lb);
+       nbits = nbits - fmpz_bits(lb) + 1;
     }
 
     

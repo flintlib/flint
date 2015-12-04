@@ -97,9 +97,9 @@ main(void)
         fmpz_poly_init(g);
         fmpz_poly_init(h);
         fmpz_poly_init(p);
-        fmpz_poly_randtest(f, state, n_randint(state, 15), 10);
-        fmpz_poly_randtest(g, state, n_randint(state, 15), 10);
-        fmpz_poly_randtest(h, state, n_randint(state, 15), 10);
+        fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
+        fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+        fmpz_poly_randtest(h, state, n_randint(state, 50), 100);
 
         fmpz_poly_resultant_modular(a, f, h);
         fmpz_poly_resultant_modular(b, g, h);
