@@ -1055,9 +1055,9 @@ void fmpq_poly_resultant_modular_div(fmpq_t r, const fmpq_poly_t f,
                                                fmpz_t div,
                                                slong nbits)
 
-    Returns the resultant of $f$ and $g$ divided by div under the assumption
-    that the result has at most nbits bits. The result must be integral.
-
+    Returns the resultant of $f$ and $g$ divided by \code{div} under the
+    assumption that the result has at most \code{nbits} bits. The result must
+    be an integer.
 
 *******************************************************************************
 
