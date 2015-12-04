@@ -37,6 +37,13 @@ void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden,
 {
     fmpz_t div, l;
 
+    if (fmpz_is_zero(divisor))
+    {
+        fmpz_zero(rnum);
+        fmpz_one(rden);
+        return;
+    }
+
     if (len2 == 1)
     {
         if (len1 == 1)
@@ -98,7 +105,6 @@ void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden,
            fmpz_divexact(div, div, l);
         }
 
-
         _fmpz_poly_resultant_modular_div(rnum, prim1, len1, prim2, len2, div, nbits);
 
         fmpz_init(t);
@@ -148,7 +154,7 @@ void fmpq_poly_resultant_div(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g,
     const slong len1 = f->length;
     const slong len2 = g->length;
 
-    if (len1 == 0 || len2 == 0)
+    if (len1 == 0 || len2 == 0 || fmpz_is_zero(divisor))
     {
         fmpq_zero(r);
     }

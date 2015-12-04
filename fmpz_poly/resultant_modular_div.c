@@ -37,7 +37,7 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
         const fmpz * poly2, slong len2, const fmpz_t divisor, slong nbits)
 {
     mp_bitcnt_t pbits;
-    slong i, pc, num_primes;
+    slong i, num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus, div, la, lb;
@@ -45,6 +45,12 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     mp_ptr a, b, rarr, parr;
     mp_limb_t p, d;
     nmod_t mod;
+
+    if (fmpz_is_zero(divisor))
+    {
+        fmpz_zero(res);
+        return;
+    }
 
     /* special case, one of the polys is a constant */
     if (len2 == 1) /* if len1 == 1 then so does len2 */
@@ -121,7 +127,6 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     a = _nmod_vec_init(len1);
     b = _nmod_vec_init(len2);
 
-    pc = 0;
     pbits = FLINT_BITS - 1;
     p = (UWORD(1)<<pbits);
 
@@ -203,7 +208,7 @@ fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
    slong len1 = poly1->length;
    slong len2 = poly2->length;
    
-   if (len1 == 0 || len2 == 0)
+   if (len1 == 0 || len2 == 0 || fmpz_is_zero(divisor))
      fmpz_zero(res);
    else if (len1 >= len2)
         _fmpz_poly_resultant_modular_div(res, poly1->coeffs, len1,
