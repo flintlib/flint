@@ -44,7 +44,7 @@ TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
     while (TEMPLATE(T, is_zero) (input->coeffs + coeff, ctx))
         coeff++;
 
-    deflation = n_gcd_full(input->length - 1, coeff);
+    deflation = n_gcd(input->length - 1, coeff);
 
     while ((deflation > 1) && (coeff + deflation < input->length))
     {
@@ -52,7 +52,7 @@ TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
         {
             coeff++;
             if (!TEMPLATE(T, is_zero) (input->coeffs + coeff, ctx))
-                deflation = n_gcd_full(coeff, deflation);
+                deflation = n_gcd(coeff, deflation);
         }
         if (i == deflation - 1)
             coeff++;

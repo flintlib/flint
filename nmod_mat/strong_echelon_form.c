@@ -57,14 +57,14 @@ _n_ppio(mp_ptr ppi, mp_ptr ppo, mp_limb_t a, mp_limb_t b)
 {
     mp_limb_t c, n, g;
 
-    c = n_gcd_full(a, b);
+    c = n_gcd(a, b);
     n = a/c;
-    g = n_gcd_full(c, n);
+    g = n_gcd(c, n);
     while( g != 1 )
     {
         c = c * g;
         n = n/g;
-        g = n_gcd_full(c, n);
+        g = n_gcd(c, n);
     }
     *ppi = c;
     *ppo = n;
@@ -74,8 +74,8 @@ static mp_limb_t
 _n_stab(mp_limb_t a, mp_limb_t b, nmod_t N)
 {
     mp_limb_t g, s, t;
-    g = n_gcd_full(a, b);
-    b = n_gcd_full(g, N.n);
+    g = n_gcd(a, b);
+    b = n_gcd(g, N.n);
     _n_ppio(&s, &t, N.n/b, a/b);
     return t;
 }
@@ -180,7 +180,7 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
                 }
             }
 
-            g = n_gcd_full(mod.n, nmod_mat_entry(A, col, col));
+            g = n_gcd(mod.n, nmod_mat_entry(A, col, col));
             if (g == 1)
             {
                 continue;

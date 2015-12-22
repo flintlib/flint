@@ -34,7 +34,7 @@ z_gcd(slong a, slong b)
     ulong ua = FLINT_ABS(a);
     ulong ub = FLINT_ABS(b);
 
-    return n_gcd_full(ua, ub);
+    return n_gcd(ua, ub);
 }
 
 void

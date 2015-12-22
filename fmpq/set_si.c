@@ -34,7 +34,7 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
     }
     else
     {
-        ulong r = n_gcd_full(p < 0 ? (-(ulong) p) : (ulong) p, q);
+        ulong r = n_gcd(p < 0 ? (-(ulong) p) : (ulong) p, q);
 
         if (p < 0)
         {

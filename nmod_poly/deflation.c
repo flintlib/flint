@@ -42,7 +42,7 @@ nmod_poly_deflation(const nmod_poly_t input)
     while (!input->coeffs[coeff])
         coeff++;
 
-    deflation = n_gcd_full(input->length - 1, coeff);
+    deflation = n_gcd(input->length - 1, coeff);
 
     while ((deflation > 1) && (coeff + deflation < input->length))
     {
@@ -50,7 +50,7 @@ nmod_poly_deflation(const nmod_poly_t input)
         {
             coeff++;
             if (input->coeffs[coeff])
-                deflation = n_gcd_full(coeff, deflation);
+                deflation = n_gcd(coeff, deflation);
         }
         if (i == deflation - 1)
             coeff++;
