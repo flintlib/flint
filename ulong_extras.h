@@ -208,19 +208,17 @@ FLINT_DLL ulong n_mulmod_preinv(ulong a, ulong b,
 
 FLINT_DLL ulong n_powmod_ui_precomp(ulong a, ulong exp, ulong n, double npre);
 
-FLINT_DLL ulong n_powmod_precomp(ulong a, 
-                     mp_limb_signed_t exp, ulong n, double npre);
+FLINT_DLL ulong n_powmod_precomp(ulong a, slong exp, ulong n, double npre);
 
 ULONG_EXTRAS_INLINE
-ulong n_powmod(ulong a, mp_limb_signed_t exp, ulong n)
+ulong n_powmod(ulong a, slong exp, ulong n)
 {
    double npre = n_precompute_inverse(n);
 
    return n_powmod_precomp(a, exp, n, npre);
 }
 
-FLINT_DLL ulong n_powmod2_preinv(ulong a, 
-                  mp_limb_signed_t exp, ulong n, ulong ninv);
+FLINT_DLL ulong n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp,
                                             ulong n, ulong ninv);
@@ -229,7 +227,7 @@ FLINT_DLL ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n,
                                              ulong ninv, ulong norm);
 
 ULONG_EXTRAS_INLINE
-ulong n_powmod2(ulong a, mp_limb_signed_t exp, ulong n)
+ulong n_powmod2(ulong a, slong exp, ulong n)
 {
    ulong ninv = n_preinvert_limb(n);
 
@@ -275,7 +273,7 @@ FLINT_DLL ulong n_gcdinv(ulong * a, ulong x, ulong y);
 
 FLINT_DLL ulong n_revbin(ulong in, ulong bits);
 
-FLINT_DLL int n_jacobi(mp_limb_signed_t x, ulong y);
+FLINT_DLL int n_jacobi(slong x, ulong y);
 
 FLINT_DLL int n_jacobi_unsigned(ulong x, ulong y);
 
