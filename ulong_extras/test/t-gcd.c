@@ -19,12 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2015 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -36,16 +34,18 @@ int main(void)
    
    flint_printf("gcd....");
    fflush(stdout);
-   
-   
 
+   /* test gcd(ac, bc) == gcd(a, b) */
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
-      mp_limb_t a, b, c, bits1, bits2, bits3;
+      ulong a, b, c, g, bits1, bits2, bits3, mbits;
       
-      bits1 = n_randint(state, FLINT_BITS-1) + 1;
-      bits2 = n_randint(state, bits1) + 1;
-      bits3 = n_randint(state, FLINT_BITS - bits1) + 1;
+      bits1 = n_randint(state, FLINT_BITS - 1) + 1;
+      bits2 = n_randint(state, FLINT_BITS - 1) + 1;
+      mbits = FLINT_MAX(bits1, bits2);
+
+      bits3 = mbits == FLINT_BITS ? 
+              0 : n_randint(state, FLINT_BITS - mbits) + 1;
 
       do
       {
@@ -53,13 +53,65 @@ int main(void)
          b = n_randtest_bits(state, bits2);
       } while (n_gcd(a, b) != UWORD(1));
 
-      c = n_randtest_bits(state, bits3);
+      c = bits3 == 0 ? 1 : n_randtest_bits(state, bits3);
 
-      result = (n_gcd(a*c, b*c) == c);
+      g = n_gcd(a*c, b*c);
+
+      result = (g == c);
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c); 
+         flint_printf("gcd(ac, bc) != gcd(a, b)\n");
+         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu\n", a, b, c, g); 
+         abort();
+      }
+   }
+
+   /* test gcd(a, 0) == a */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
+   {
+      ulong a, g;
+      
+      a = n_randtest(state);
+
+      g = n_gcd(a, 0);
+
+      result = (g == a);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("gcd(a, 0) != a\n");
+         flint_printf("a = %wu\n", a); 
+         abort();
+      }      
+   }
+
+   /* test gcd(0, b) == b */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
+   {
+      ulong b, g;
+      
+      b = n_randtest(state);
+
+      g = n_gcd(0, b);
+
+      result = (g == b);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("gcd(0, b) != b\n");
+         flint_printf("b = %wu\n", b); 
+         abort();
+      }      
+   }
+
+   /* test gcd(0, 0) == 0 */
+   {
+      result = (n_gcd(0, 0) == 0);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("gcd(0, 0) != 0\n");
          abort();
       }
    }

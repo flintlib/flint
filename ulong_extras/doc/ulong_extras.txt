@@ -342,8 +342,8 @@ ulong n_mulmod_preinv(ulong a, ulong b, ulong n,
 
 ulong n_gcd(ulong x, ulong y)
 
-    Returns the greatest common divisor $g$ of $x$ and $y$. 
-    We require $x \geq y$.
+    Returns the greatest common divisor $g$ of $x$ and $y$. No assumptions
+    are made about the values $x$ and $y$.
 
     The algorithm is a slight embelishment of the Euclidean algorithm
     which uses some branches to avoid most divisions.
@@ -362,6 +362,8 @@ ulong n_gcd_full(ulong x, ulong y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$.
     No assumptions are made about $x$ and $y$.
+
+    This function is deprecated.
 
 ulong n_gcdinv(ulong * a, ulong x, ulong y)
 
