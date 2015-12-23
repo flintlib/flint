@@ -81,6 +81,8 @@ FLINT_DLL void fmpz_factor_si(fmpz_factor_t factor, slong n);
 FLINT_DLL int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
                                        ulong B1, ulong B2_sqrt, ulong c);
 
+FLINT_DLL void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f);
+
 /* Expansion *****************************************************************/
 
 FLINT_DLL void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
