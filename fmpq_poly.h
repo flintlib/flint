@@ -239,8 +239,6 @@ FLINT_DLL int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slon
 
 FLINT_DLL int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
 
-FLINT_DLL int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
-
 FMPQ_POLY_INLINE
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 {
@@ -294,10 +292,6 @@ FLINT_DLL void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
 
 FLINT_DLL void fmpq_poly_add_can(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can);
-
-FLINT_DLL void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, slong len1,
-                    const fmpz * poly2, const fmpz_t den2, slong len2);
 
 FLINT_DLL void fmpq_poly_add_series(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
