@@ -46,7 +46,7 @@ fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         else
             fmpz_set_si(b, -1);
     }
-    else if (fmpz_cmp(f, g) == 0)
+    else if (fmpz_cmpabs(f, g) == 0)
     {
         if (fmpz_sgn(f) > 0)
         {
