@@ -23,8 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -36,35 +34,88 @@ int main(void)
    
    flint_printf("gcdinv....");
    fflush(stdout);
-   
-   
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
-      mp_limb_t a, b, c, g, g2, s, t2, t, bits1, bits2, bits3;
+      ulong a, b, c, g, g2, s, t2, t, bits1, bits2, bits3, ainv;
       
-      bits1 = n_randint(state, FLINT_BITS-2) + 2;
+      bits1 = n_randint(state, FLINT_BITS - 1) + 2;
       bits2 = n_randint(state, bits1) + 1;
-      bits3 = n_randint(state, FLINT_BITS - bits1) + 1;
+      bits3 = bits1 == FLINT_BITS ? 0 : n_randint(state, FLINT_BITS - bits1) + 1;
 
       do
       {
          a = n_randtest_bits(state, bits1);
          b = n_randtest_bits(state, bits2);
-      } while ((n_gcd(a, b) != UWORD(1)) || (b >= a));
+      } while (n_gcd(a, b) != UWORD(1) || b >= a);
 
-      c = n_randtest_bits(state, bits3);
+      c = bits3 == 0 ? 1 : n_randtest_bits(state, bits3);
 
+      /* compare n_gcdinv with n_xgcd */
       g = n_xgcd(&s, &t, a*c, b*c);
       g2 = n_gcdinv(&t2, b*c, a*c);
-      t %= (a*c);
-      t = a*c - t;
+      
+      /* compute second cofactor modulo ac */
+      t %= (a*c);  /* t is non-negative... */
+      t = a*c - t; /* ... but minus the actual cofactor */
 
-      result = ((g == g2) && (t == t2));
+      result = (g == g2 && t == t2);
       if (!result)
       {
          flint_printf("FAIL\n");
-         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, g2 = %wu, t = %wd, t2 = %wd\n", a, b, c, g, g2, t, t2); 
+         flint_printf("Cofactor doesn't agree with n_xgcd\n");
+         flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c);
+         flint_printf("g = %wu, g2 = %wu, t = %wd, t2 = %wd\n", g, g2, t, t2);
+         abort();
+      }
+
+      /* test b*t2 == 1 mod a */
+      ainv = n_preinvert_limb(a);
+
+      s = n_mulmod2_preinv(t2, b, a, ainv);
+      
+      result = (s == 1);
+      if (!result)
+      {
+         flint_printf("FAIL\n");
+         flint_printf("Incorrect inverse\n");
+         flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c);
+         flint_printf("g2 = %wu, s = %wd, t2 = %wd\n", g2, s, t2); 
+         abort();
+      }
+   }
+
+   /* test modulo 1 */
+   {
+      ulong s, g;
+
+      g = n_gcdinv(&s, 0, 1);
+
+      result = (g == 1 && s == 0);
+      if (!result)
+      {
+         flint_printf("FAIL\n");
+         flint_printf("Incorrect modulo 1\n");
+         flint_printf("g = %wu, s = %wu\n", g, s);
+         abort();
+      }
+   }
+
+   /* check gcd not 1 when a = 0 (and b != 1) */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
+   {
+      ulong b, s, g;
+
+      b = n_randtest_not_zero(state);
+
+      g = n_gcdinv(&s, 0, b);
+
+      result = (g != 1 || b == 1);
+      if (!result)
+      {
+         flint_printf("FAIL\n");
+         flint_printf("gcd(0, b) == 1\n");
+         flint_printf("b = %wu, s = %wu\n", b, s);
          abort();
       }
    }

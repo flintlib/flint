@@ -369,10 +369,13 @@ ulong n_gcdinv(ulong * a, ulong x, ulong y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$ and computes 
     $a$ such that $0 \leq a < y$ and $a x = \gcd(x, y) \bmod{y}$, when 
-    this is defined. We require $0 \leq x < y$.
+    this is defined. We require $x < y$.
 
-    This is merely an adaption of the extended Euclidean algorithm with 
-    appropriate normalisation.
+    When $y = 1$ the greatest common divisor is set to $1$ and $a$ is
+    set to $0$.
+
+    This is merely an adaption of the extended Euclidean algorithm
+    computing just one cofactor and reducing it modulo $y$.
 
 ulong n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
 
