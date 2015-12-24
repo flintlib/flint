@@ -476,9 +476,6 @@ FLINT_DLL void _nmod_poly_KS2_reduce(mp_ptr res, slong s, mp_srcptr op,
 FLINT_DLL void _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
                                   mp_srcptr op2, slong n, ulong b, nmod_t mod);
 
-FLINT_DLL void _nmod_poly_KS2_recover_reduce1(mp_ptr res, slong s, mp_srcptr op1,
-                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
-
 FLINT_DLL void _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
                                   mp_srcptr op2, slong n, ulong b, nmod_t mod);
 
@@ -498,9 +495,6 @@ FLINT_DLL void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
                    mp_bitcnt_t bit_size);
 
 FLINT_DLL void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size);
-
-FLINT_DLL void _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
-               ulong b, ulong k, slong r);
 
 /* Multiplication  ***********************************************************/
 
@@ -792,9 +786,6 @@ FLINT_DLL mp_limb_t nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c)
 FLINT_DLL void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, slong len,
     mp_srcptr xs, slong n, nmod_t mod);
 
-FLINT_DLL void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, slong n);
-
 FLINT_DLL void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
         mp_srcptr xs, slong n);
 
@@ -960,9 +951,6 @@ FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv (nmod_poly_struct * 
 FLINT_DLL void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_struct * polys, slong len1, slong n,
                     const nmod_poly_t poly, const nmod_poly_t polyinv);
-
-FLINT_DLL void _nmod_poly_compose_mod_horner(mp_ptr res,
-    mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod);
 
 FLINT_DLL void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                              const nmod_poly_struct * polys,
