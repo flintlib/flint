@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2015 William Hart
 
 ******************************************************************************/
 
@@ -27,112 +27,101 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_gcdinv(mp_limb_t * s, mp_limb_t x, mp_limb_t y)
+ulong n_gcdinv(ulong * s, ulong x, ulong y)
 {
-    mp_limb_signed_t v1 = UWORD(0);
-    mp_limb_signed_t v2 = UWORD(1);
-    mp_limb_signed_t t2;
-    mp_limb_t u3, v3;
-    mp_limb_t quot, rem;
+   slong v1, v2, t2;
+   ulong d, r, quot, rem;
 
-    u3 = y, v3 = x;
+   FLINT_ASSERT(y > x);
 
-    if (v3 > u3)
-    {
-        rem = u3;
-        u3 = v3;
-        t2 = v2;
-        v2 = v1;
-        v1 = t2;
-        v3 = rem;
-    }
+   v1 = UWORD(0);
+   v2 = UWORD(1);
+   r = x;
+   x = y;
 
-    if ((mp_limb_signed_t) (y & x) < WORD(0))  /* y and x both have top bit set */
-    {
-        quot = u3 - v3;
-        t2 = v2;
-        u3 = v3;
-        v2 = v1 - v2;
-        v1 = t2;
-        v3 = quot;
-    }
+   /* y and x both have top bit set */
+   if ((slong) (x & r) < WORD(0))
+   {
+      d = x - r;
+      t2 = v2;
+      x = r;
+      v2 = v1 - v2;
+      v1 = t2;
+      r = d;
+   }
 
-    while ((mp_limb_signed_t) (v3 << 1) < WORD(0))  /* second value has second msb set */
-    {
-        quot = u3 - v3;
-        if (quot < v3)
-        {
+   /* second value has second msb set */
+   while ((slong) (r << 1) < WORD(0))
+   {
+      d = x - r;
+      if (d < r) /* quot = 1 */
+      {
+         t2 = v2;
+         x = r;
+         v2 = v1 - v2;
+         v1 = t2;
+         r = d;
+      } else if (d < (r << 1)) /* quot = 2 */
+      {
+         x = r;
+         t2 = v2;
+         v2 = v1 - (v2 << 1);
+         v1 = t2;
+         r = d - x;
+      } else /* quot = 3 */
+      {
+         x = r;
+         t2 = v2;
+         v2 = v1 - 3 * v2;
+         v1 = t2;
+         r = d - (x << 1);
+      }
+   }
+
+   while (r)
+   {
+      /* overflow not possible due to top 2 bits of r not being set */
+      if (x < (r << 2)) /* if quot < 4 */
+      {
+         d = x - r;
+         if (d < r) /* quot = 1 */
+         {
             t2 = v2;
-            u3 = v3;
+            x = r;
             v2 = v1 - v2;
             v1 = t2;
-            v3 = quot;
-        }
-        else if (quot < (v3 << 1))
-        {
-            u3 = v3;
+            r = d;
+         } else if (d < (r << 1)) /* quot = 2 */
+         {
+            x = r;
             t2 = v2;
             v2 = v1 - (v2 << 1);
             v1 = t2;
-            v3 = quot - u3;
-        }
-        else
-        {
-            u3 = v3;
+            r = d - x;
+         } else /* quot = 3 */
+         {
+            x = r;
             t2 = v2;
             v2 = v1 - 3 * v2;
             v1 = t2;
-            v3 = quot - (u3 << 1);
-        }
-    }
+            r = d - (x << 1);
+         }
+      } else
+      {
+         quot = x / r;
+         rem = x - r * quot;
+         x = r;
+         t2 = v2;
+         v2 = v1 - quot * v2;
+         v1 = t2;
+         r = rem;
+      }
+   }
 
-    while (v3)
-    {
-        if (u3 < (v3 << 2))  /* overflow not possible due to top 2 bits of v3 not being set */
-        {
-            quot = u3 - v3;
-            if (quot < v3)
-            {
-                t2 = v2;
-                u3 = v3;
-                v2 = v1 - v2;
-                v1 = t2;
-                v3 = quot;
-            }
-            else if (quot < (v3 << 1))
-            {
-                u3 = v3;
-                t2 = v2;
-                v2 = v1 - (v2 << 1);
-                v1 = t2;
-                v3 = quot - u3;
-            }
-            else
-            {
-                u3 = v3;
-                t2 = v2;
-                v2 = v1 - 3 * v2;
-                v1 = t2;
-                v3 = quot - (u3 << 1);
-            }
-        }
-        else
-        {
-            quot = u3 / v3;
-            rem = u3 - v3 * quot;
-            u3 = v3;
-            t2 = v2;
-            v2 = v1 - quot * v2;
-            v1 = t2;
-            v3 = rem;
-        }
-    }
+   if (v1 < WORD(0))
+      v1 += y;
 
-    if (v1 < WORD(0))
-        v1 += y;
+   (*s) = v1;
 
-    (*s) = v1;
-
-    return u3;
+   return x;
 }

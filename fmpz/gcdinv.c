@@ -30,6 +30,8 @@
 
 void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
 {
+    FLINT_ASSERT(fmpz_cmp(f, g) < 0);
+    
     if (fmpz_is_zero(f))
     {
         fmpz_set(d, g);
