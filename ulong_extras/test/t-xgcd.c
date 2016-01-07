@@ -37,36 +37,70 @@ int main(void)
    flint_printf("xgcd....");
    fflush(stdout);
    
-   
-
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
-      mp_limb_t a, b, c, g, bits1, bits2, bits3, ph, pl, qh, ql;
-      mp_limb_t s, t;
+      ulong a, b, c, g, bits1, bits2, bits3, ph, pl, qh, ql;
+      ulong s, t;
       
-      bits1 = n_randint(state, FLINT_BITS-1) + 1;
+      bits1 = n_randint(state, FLINT_BITS - 1) + 2;
       bits2 = n_randint(state, bits1) + 1;
-      bits3 = n_randint(state, FLINT_BITS - bits1) + 1;
+      bits3 = bits1 == FLINT_BITS ? 0 : n_randint(state, FLINT_BITS - bits1) + 1;
 
       do
       {
          a = n_randtest_bits(state, bits1);
          b = n_randtest_bits(state, bits2);
-      } while ((n_gcd(a, b) != UWORD(1)) || (b > a));
+      } while (n_gcd(a, b) != UWORD(1) || b > a);
 
-      c = n_randtest_bits(state, bits3);
+      c = bits3 == 0 ? 1 : n_randtest_bits(state, bits3);
 
       g = n_xgcd(&s, &t, a*c, b*c);
 
+      /* s*ac + t*bc */
       umul_ppmm(ph, pl, a*c, s);
       umul_ppmm(qh, ql, b*c, t);
       sub_ddmmss(ph, pl, ph, pl, qh, ql);
       
-      result = ((g == c) && (ph == UWORD(0)) && (pl == c));
+      result = (g == c && ph == UWORD(0) && pl == c);
       if (!result)
       {
          flint_printf("FAIL:\n");
+         flint_printf("g != c or s*ac + t*bc != c\n");
          flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a, b, c, g, s, t); 
+         abort();
+      }
+   }
+
+   /* a = 0, b = 0 */
+   {
+      ulong g, s, t;
+      
+      g = n_xgcd(&s, &t, 0, 0);
+
+      result = (g == 0 && s == 1 && t == 0);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Case a = 0, b = 0\n");
+         flint_printf("g = %wu, s = %wu, t = %wu\n", g, s, t); 
+         abort();
+      }
+   }
+
+   /* b = 0 */
+   {
+      ulong a, g, s, t;
+      
+      a = n_randtest(state);
+
+      g = n_xgcd(&s, &t, a, 0);
+
+      result = (g == a && s == 1 && t == 0);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Case a = 0\n");
+         flint_printf("a = %wu, g = %wu, s = %wu, t = %wu\n", a, g, s, t); 
          abort();
       }
    }

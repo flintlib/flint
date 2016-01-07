@@ -83,9 +83,9 @@ _n_stab(mp_limb_t a, mp_limb_t b, nmod_t N)
 static mp_limb_t
 _n_unit(mp_limb_t a, nmod_t N)
 {
-    mp_limb_t g, s, t, l, d;
+    mp_limb_t g, s, l, d;
 
-    g = n_xgcd(&s, &t, a, N.n);
+    g = n_gcdinv(&s, a, N.n);
 
     if (g == 1)
     {
