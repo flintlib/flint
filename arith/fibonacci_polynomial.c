@@ -54,7 +54,7 @@ void _arith_fibonacci_polynomial(fmpz * coeffs, ulong n)
 	/* calculate the coefficients of the polynomial*/
 	for (k = 2 + even; k < n; k += 2)
 	{
-		fmpz_mul2_uiui(r, r - 2, L + k/2, L + k/2 - k + 1);
+		fmpz_mul2_uiui(r, r - 2, L + k / 2, L + k / 2 - k + 1);
 		fmpz_divexact2_uiui(r, r, k, k - 1);
 		r += 2;
 	}
