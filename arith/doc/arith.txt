@@ -422,9 +422,9 @@ void arith_fibonacci_polynomial(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the $n$-th Fibonacci polynomial
     $$P_n(x) = \begin{cases}0, & \mbox{if } n =  0\\1, & \mbox{if } n =  1\\
-    x P_{n - 1}(x) + P_{n - 2}(x),& \mbox{if }  n \geq 2\end{cases}
+    x P_{n - 1}(x) + P_{n - 2}(x),& \mbox{if }  n \geq 2\end{cases}$$
     The coefficients are calculated using a hypergeometric recurrence.
-   
+
 *******************************************************************************
 
     Multiplicative functions
