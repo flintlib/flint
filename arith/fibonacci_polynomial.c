@@ -41,7 +41,6 @@ void _arith_fibonacci_polynomial(fmpz * coeffs, ulong n)
         fmpz_one(coeffs + 1);
         fmpz_mul_ui(coeffs + 1, coeffs + 1, L);
     }
-
     else 
     {
         fmpz_one(coeffs);
@@ -79,7 +78,6 @@ void arith_fibonacci_polynomial(fmpz_poly_t poly, ulong n)
     {
         fmpz_poly_set_ui(poly, UWORD(1));
     }
-
     else
     {
         fmpz_poly_fit_length(poly, n);
