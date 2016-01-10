@@ -24,7 +24,6 @@
  ******************************************************************************/
 
 #include <gmp.h>
-#include "arith.h"
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -50,7 +49,7 @@ int main(void)
 
     for (n = 0; n <= 500; n++)
     {
-        arith_fibonacci_polynomial(R, n);
+        fmpz_poly_fibonacci(R, n);
 
         if (!fmpz_poly_equal(Pn, R))
         {

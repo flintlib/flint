@@ -183,7 +183,6 @@ FLINT_DLL void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
 /* Hypergeometric polynomials ************************************************/
 
 FLINT_DLL void arith_legendre_polynomial(fmpq_poly_t poly, ulong n);
-FLINT_DLL void arith_fibonacci_polynomial(fmpz_poly_t poly, ulong n);
 
 #define _arith_chebyshev_t_polynomial _fmpz_poly_chebyshev_t
 #define arith_chebyshev_t_polynomial fmpz_poly_chebyshev_t

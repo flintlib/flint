@@ -23,10 +23,18 @@
 
  ******************************************************************************/
 
-#include "arith.h"
+#include "fmpz_poly.h"
 
-void _arith_fibonacci_polynomial(fmpz * coeffs, ulong n)
+void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
 {
+    if (n == 0) return;
+
+    if (n == 1)
+    {
+        fmpz_one(coeffs);
+        return;
+    }
+
     fmpz * r;
     int even;
     slong k;
@@ -34,6 +42,7 @@ void _arith_fibonacci_polynomial(fmpz * coeffs, ulong n)
 
     L = n / 2;
     even = 1 - (n % 2);
+
     /* set the first two coefficients of poly depending parity of n */
     if (even)
     {
@@ -68,23 +77,10 @@ void _arith_fibonacci_polynomial(fmpz * coeffs, ulong n)
 }
 
 
-void arith_fibonacci_polynomial(fmpz_poly_t poly, ulong n)
+void fmpz_poly_fibonacci(fmpz_poly_t poly, ulong n)
 {
-    if (n == 0)
-    {
-        fmpz_poly_set_ui(poly, UWORD(0));
-        return;
-    }
-
-    if (n == 1)
-    {
-        fmpz_poly_set_ui(poly, UWORD(1));
-    }
-    else
-    {
-        fmpz_poly_fit_length(poly, n);
-        _arith_fibonacci_polynomial(poly->coeffs, n);
-    }
+    fmpz_poly_fit_length(poly, n);
+    _fmpz_poly_fibonacci_polynomial(poly->coeffs, n);
     _fmpz_poly_set_length(poly, n);
 }
 
