@@ -40,18 +40,20 @@ void _arith_fibonacci_polynomial(fmpz * coeffs, ulong n)
         fmpz_zero(coeffs);
         fmpz_one(coeffs + 1);
         fmpz_mul_ui(coeffs + 1, coeffs + 1, L);
+        fmpz_one(coeffs + n - 1);
     }
     else 
     {
         fmpz_one(coeffs);
         fmpz_zero(coeffs + 1);
+        fmpz_one(coeffs + n - 1);
     }
 
     r = coeffs + even;
     r += 2;
 
     /* calculate the coefficients of the polynomial*/
-    for (k = 2 + even; k < n; k += 2)
+    for (k = 2 + even; k < n - 2; k += 2)
     {
         fmpz_mul2_uiui(r, r - 2, L + k / 2, L + k / 2 - k + 1);
         fmpz_divexact2_uiui(r, r, k, k - 1);
