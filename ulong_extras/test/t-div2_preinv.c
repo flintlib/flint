@@ -27,38 +27,39 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   FLINT_TEST_INIT(state);
-   
-   flint_printf("div2_preinv....");
-   fflush(stdout);
+    int i, result;
+    FLINT_TEST_INIT(state);
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      ulong d, dinv, n, q1, q2;
+    flint_printf("div2_preinv....");
+    fflush(stdout);
 
-      d = n_randtest_not_zero(state);
-      n = n_randtest(state);
-      
-      dinv = n_preinvert_limb(d);
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        ulong d, dinv, n, q1, q2;
 
-      q1 = n_div2_preinv(n, d, dinv);
-      q2 = n / d;
+        d = n_randtest_not_zero(state);
+        n = n_randtest(state);
 
-      result = (q1 == q2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv); 
-         flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
-         abort();
-      }
-   }
+        dinv = n_preinvert_limb(d);
 
-   FLINT_TEST_CLEANUP(state);
-   
-   flint_printf("PASS\n");
-   return 0;
+        q1 = n_div2_preinv(n, d, dinv);
+        q2 = n / d;
+
+        result = (q1 == q2);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv);
+            flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
+            abort();
+        }
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }

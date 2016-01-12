@@ -33,37 +33,38 @@
    https://gmplib.org/~tege/division-paper.pdf 
 */
 
-ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
+ulong
+n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
 {
-   ulong norm, q1, q0, r;
+    ulong norm, q1, q0, r;
 
-   FLINT_ASSERT(n != 0);
+    FLINT_ASSERT(n != 0);
 
-   count_leading_zeros(norm, n);
-   n <<= norm;
+    count_leading_zeros(norm, n);
+    n <<= norm;
 
-   {
-      const ulong u1 = r_shift(a, FLINT_BITS - norm);
-      const ulong u0 = (a << norm);
+    {
+        const ulong u1 = r_shift(a, FLINT_BITS - norm);
+        const ulong u0 = (a << norm);
 
-      umul_ppmm(q1, q0, ninv, u1);
-      add_ssaaaa(q1, q0, q1, q0, u1, u0);
+        umul_ppmm(q1, q0, ninv, u1);
+        add_ssaaaa(q1, q0, q1, q0, u1, u0);
 
-      (*q) = q1 + 1;
-      r = u0 - (*q)*n;
+        (*q) = q1 + 1;
+        r = u0 - (*q) * n;
 
-      if (r > q0)
-      {
-         r += n;
-         (*q)--;
-      }
+        if (r > q0)
+        {
+            r += n;
+            (*q)--;
+        }
 
-      if (r >= n)
-      {
-         (*q)++;
-         r -= n;
-      }
- 
-      return r >> norm;
-   }
+        if (r >= n)
+        {
+            (*q)++;
+            r -= n;
+        }
+
+        return r >> norm;
+    }
 }

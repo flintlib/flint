@@ -33,8 +33,8 @@
    https://gmplib.org/~tege/division-paper.pdf 
 */
 
-ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
-                 ulong n, ulong ninv)
+ulong
+n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
 {
     ulong q0, q1, r, norm;
 
@@ -43,7 +43,7 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
 
     /* 
        a_hi is already reduced, so first reduce a_hi, a_mi mod n 
-    */
+     */
     {
         const ulong u1 = (a_hi << norm) + r_shift(a_mi, FLINT_BITS - norm);
         const ulong u0 = (a_mi << norm);
@@ -51,7 +51,7 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
         umul_ppmm(q1, q0, ninv, u1);
         add_ssaaaa(q1, q0, q1, q0, u1, u0);
 
-        a_mi = (u0 - (q1 + 1)*n);
+        a_mi = (u0 - (q1 + 1) * n);
 
         if (a_mi > q0)
             a_mi += n;
@@ -62,7 +62,7 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
 
     /* 
        a_mi is now reduced mod n, so reduce a_mi, a_lo mod n 
-    */
+     */
     {
         const ulong u1 = a_mi + r_shift(a_lo, FLINT_BITS - norm);
         const ulong u0 = (a_lo << norm);
@@ -70,7 +70,7 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo,
         umul_ppmm(q1, q0, ninv, u1);
         add_ssaaaa(q1, q0, q1, q0, u1, u0);
 
-        r = (u0 - (q1 + 1)*n);
+        r = (u0 - (q1 + 1) * n);
 
         if (r > q0)
             r += n;
