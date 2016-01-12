@@ -25,7 +25,7 @@
 
 #include "fmpz_poly.h"
 
-void _fmpz_poly_fibonacci_polynomial(fmpz * coeffs, ulong n)
+void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
 {
     if (n == 0) return;
 
@@ -49,15 +49,15 @@ void _fmpz_poly_fibonacci_polynomial(fmpz * coeffs, ulong n)
         fmpz_zero(coeffs);
         fmpz_one(coeffs + 1);
         fmpz_mul_ui(coeffs + 1, coeffs + 1, L);
-        fmpz_one(coeffs + n - 1);
     }
     else 
     {
         fmpz_one(coeffs);
         fmpz_zero(coeffs + 1);
-        fmpz_one(coeffs + n - 1);
     }
 
+    fmpz_one(coeffs + n - 1);
+    
     r = coeffs + even;
     r += 2;
 
@@ -77,10 +77,10 @@ void _fmpz_poly_fibonacci_polynomial(fmpz * coeffs, ulong n)
 }
 
 
-void fmpz_poly_fibonacci_polynomial(fmpz_poly_t poly, ulong n)
+void fmpz_poly_fibonacci(fmpz_poly_t poly, ulong n)
 {
     fmpz_poly_fit_length(poly, n);
-    _fmpz_poly_fibonacci_polynomial(poly->coeffs, n);
+    _fmpz_poly_fibonacci(poly->coeffs, n);
     _fmpz_poly_set_length(poly, n);
 }
 
