@@ -36,7 +36,7 @@ int main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("fibonacci_polynomial....");
+    flint_printf("fibonacci....");
     fflush(stdout);
 
     fmpz_poly_init(Pn);

@@ -49,14 +49,15 @@ void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
         fmpz_zero(coeffs);
         fmpz_one(coeffs + 1);
         fmpz_mul_ui(coeffs + 1, coeffs + 1, L);
-        fmpz_one(coeffs + n - 1);
     }
     else 
     {
         fmpz_one(coeffs);
         fmpz_zero(coeffs + 1);
-        fmpz_one(coeffs + n - 1);
     }
+    
+    /* set the highest coefficient to 1*/
+    fmpz_one(coeffs + n - 1);
 
     r = coeffs + even;
     r += 2;
