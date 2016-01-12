@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2015 William Hart
 
 ******************************************************************************/
 
@@ -61,6 +61,24 @@ int main(void)
       umul_ppmm(qh, ql, b*c, t);
       sub_ddmmss(ph, pl, ph, pl, qh, ql);
       
+      result = (s <= b*c || b*c == 0);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("s >= b*c\n");
+         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a, b, c, g, s, t); 
+         abort();
+      }
+
+      result = (t <= a*c || a*c == 0);
+      if (!result)
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("t >= a*c\n");
+         flint_printf("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a, b, c, g, s, t); 
+         abort();
+      }
+
       result = (g == c && ph == UWORD(0) && pl == c);
       if (!result)
       {
