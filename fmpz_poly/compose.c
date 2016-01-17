@@ -61,6 +61,39 @@ fmpz_poly_compose(fmpz_poly_t res,
         fmpz_poly_set_fmpz(res, poly1->coeffs);
         return;
     }
+    if (len2 == 2)
+    {
+        fmpz_t c0, c1, temp;
+        fmpz_poly_t res_temp;
+        slong i;
+        fmpz * curr;
+        
+        fmpz_init(c0);
+        fmpz_init(c1);
+        fmpz_init(temp);
+        fmpz_poly_init2(res_temp, len1);
+        fmpz_poly_set(res_temp, poly1);
+        
+        /*poly2 is of the form c1*x + c0*/
+        fmpz_poly_get_coeff_fmpz(c0, poly2, 0);
+        fmpz_poly_get_coeff_fmpz(c1, poly2, 1);
+        fmpz_one(temp);
+        fmpz_poly_taylor_shift(res_temp, poly1, c0);
+        
+        curr = res_temp->coeffs;
+        for (i = 0; i < len1; i++)
+        {
+            fmpz_mul(curr + i, curr + i, temp);
+            /* no need to reverse signs manually as if c1 negative then 
+            signs alternate automatically*/
+            fmpz_mul(temp, temp, c1);
+        }
+        fmpz_poly_set(res, res_temp);
+        fmpz_clear(temp);
+        fmpz_clear(c0);
+        fmpz_clear(c1);
+        return;
+    }
     
     lenr = (len1 - 1) * (len2 - 1) + 1;
     
