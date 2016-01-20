@@ -34,12 +34,12 @@ void
 _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1, 
                                const fmpz * poly2, slong len2)
 {
-    if (len2 == 1)
+    if (len1 == 1)
+        fmpz_set(res, poly1);
+    else if (len2 == 1)
         _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
     else if (len1 <= 4)
         _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
-    else if (len1 == 2)
-        fmpz_set(res, poly1);
     else if (len2 == 2)
     {
         fmpz_t c0, c1, temp;
