@@ -45,11 +45,8 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         fmpz_t c0, c1, temp;
         slong i;
         
-        fmpz_init(temp);
         
         _fmpz_vec_set(res, poly1, len1);
-        
-        fmpz_one(temp);
         
         _fmpz_poly_taylor_shift(res, poly2, len1);
         
@@ -60,16 +57,19 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         }   
         else
         {
+            fmpz_init(temp);
+            fmpz_one(temp);
+        
             for (i = 0; i < len1; i++)
             {
                 fmpz_mul(res + i, res + i, temp);
                 /* no need to reverse signs manually as if c1 negative then 
                 signs alternate automatically*/
                 fmpz_mul(temp, temp, poly2 + 1);
-            }    
+            }
+            fmpz_clear(temp);
         } 
         
-        fmpz_clear(temp);
         return;    
     }
     else
