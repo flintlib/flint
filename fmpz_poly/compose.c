@@ -53,14 +53,22 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         
         _fmpz_poly_taylor_shift(res, poly2, len1);
         
-        for (i = 0; i < len1; i++)
+        if (fmpz_equal_si(poly2 + 1, 1) || fmpz_equal_si(poly2 + 1, -1))
         {
-            fmpz_mul(res + i, res + i, temp);
-            /* no need to reverse signs manually as if c1 negative then 
-            signs alternate automatically*/
-            fmpz_mul(temp, temp, poly2 + 1);
-        }
-
+            fmpz_clear(temp);
+            return;            
+        }   
+        else
+        {
+            for (i = 0; i < len1; i++)
+            {
+                fmpz_mul(res + i, res + i, temp);
+                /* no need to reverse signs manually as if c1 negative then 
+                signs alternate automatically*/
+                fmpz_mul(temp, temp, poly2 + 1);
+            }    
+        } 
+        
         fmpz_clear(temp);
         return;    
     }
