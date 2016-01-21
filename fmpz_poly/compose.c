@@ -42,7 +42,7 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
     else if (len2 == 2)
     {
-        fmpz_t c0, c1, temp;
+        fmpz_t temp;
         slong i;
         
         
@@ -50,7 +50,7 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         
         _fmpz_poly_taylor_shift(res, poly2, len1);
         
-        if (fmpz_equal_si(poly2 + 1, 1) || fmpz_equal_si(poly2 + 1, -1))
+        if (fmpz_is_pm1(poly2 + 1))
         {
             fmpz_clear(temp);
             return;            
