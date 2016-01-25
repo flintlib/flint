@@ -19,41 +19,57 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2010, 2012, 2016 William Hart
+    Copyright (C) 2009, 2016 William Hart
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-ulong
-n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm)
+int
+main(void)
 {
-    ulong q0, q1, r, p_hi, p_lo;
+    int i, result;
+    FLINT_TEST_INIT(state);
 
-    /* check normalisation */
-    FLINT_ASSERT((n & (UWORD(1) << (FLINT_BITS - 1))) != 0);
-    FLINT_ASSERT(a < n);
-    FLINT_ASSERT(b < n);
-    FLINT_ASSERT(n != 0);
+    flint_printf("mulmod_preinv....");
+    fflush(stdout);
 
-    /* renormalise product */
-    a >>= norm;
-
-    /* multiply */
-    umul_ppmm(p_hi, p_lo, a, b);
-
-    /* reduce mod n */
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        umul_ppmm(q1, q0, ninv, p_hi);
-        add_ssaaaa(q1, q0, q1, q0, p_hi, p_lo);
+        ulong a, b, d, r1, r2, q, p1, p2, dinv, norm;
 
-        r = (p_lo - (q1 + 1) * n);
+        d = n_randtest_not_zero(state);
+        a = n_randtest(state) % d;
+        b = n_randtest(state) % d;
 
-        if (r > q0)
-            r += n;
+        count_leading_zeros(norm, d);
 
-        return (r < n ? r : r - n);
+        dinv = n_preinvert_limb(d << norm);
+
+        r1 = n_mulmod_preinv(a << norm, b << norm, d << norm, dinv,
+                             norm) >> norm;
+
+        umul_ppmm(p1, p2, a, b);
+        p1 %= d;
+        udiv_qrnnd(q, r2, p1, p2, d);
+
+        result = (r1 == r2);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu, b = %wu, d = %wu, dinv = %wu\n", a, b, d,
+                         dinv);
+            flint_printf("q = %wu, r1 = %wu, r2 = %wu\n", q, r1, r2);
+            abort();
+        }
     }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }

@@ -239,6 +239,7 @@ ulong n_addmod(ulong x, ulong y, ulong n)
 {
     FLINT_ASSERT(x < n);
     FLINT_ASSERT(y < n);
+    FLINT_ASSERT(n != 0);
 
     return (n - y > x ? x + y : x + y - n);
 }
@@ -248,6 +249,7 @@ ulong n_submod(ulong x, ulong y, ulong n)
 {
     FLINT_ASSERT(x < n);
     FLINT_ASSERT(y < n);
+    FLINT_ASSERT(n != 0);
 
     return (y > x ? x - y + n : x - y);
 }
@@ -256,7 +258,8 @@ ULONG_EXTRAS_INLINE
 ulong n_negmod(ulong x, ulong n)
 {
     FLINT_ASSERT(x < n);
-    
+    FLINT_ASSERT(n != 0);
+
     return n_submod(0, x, n);
 }
 
