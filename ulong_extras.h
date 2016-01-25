@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2006, 2007, 2008, 2009 William Hart
+    Copyright (C) 2006, 2007, 2008, 2009, 2016 William Hart
     Copyright (C) 2008, Peter Shrimpton
     Copyright (C) 2009, Tom Boothby
     Copyright (C) 2010, Fredrik Johansson
@@ -237,18 +237,26 @@ ulong n_powmod2(ulong a, slong exp, ulong n)
 ULONG_EXTRAS_INLINE
 ulong n_addmod(ulong x, ulong y, ulong n)
 {
+    FLINT_ASSERT(x < n);
+    FLINT_ASSERT(y < n);
+
     return (n - y > x ? x + y : x + y - n);
 }
 
 ULONG_EXTRAS_INLINE
 ulong n_submod(ulong x, ulong y, ulong n)
 {
+    FLINT_ASSERT(x < n);
+    FLINT_ASSERT(y < n);
+
     return (y > x ? x - y + n : x - y);
 }
 
 ULONG_EXTRAS_INLINE
 ulong n_negmod(ulong x, ulong n)
 {
+    FLINT_ASSERT(x < n);
+    
     return n_submod(0, x, n);
 }
 

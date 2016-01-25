@@ -19,12 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2016 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -37,11 +35,9 @@ int main(void)
    flint_printf("addmod....");
    fflush(stdout);
    
-   
-
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t a, b, d, r1, r2, s1;
+      ulong a, b, d, r1, r2, s1;
       
       d = n_randtest_not_zero(state);
       a = n_randtest(state) % d;
@@ -50,8 +46,8 @@ int main(void)
       r1 = n_addmod(a, b, d);
 
       add_ssaaaa(s1, r2, UWORD(0), a, UWORD(0), b);
-      if (s1) sub_ddmmss(s1, r2, s1, r2, UWORD(0), d);
-      else if (r2 >= d) r2 -= d;
+      if (s1 != 0 || r2 >= d)
+         r2 -= d;
       
       result = (r1 == r2);
 
