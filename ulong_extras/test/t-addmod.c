@@ -27,41 +27,42 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   FLINT_TEST_INIT(state);
-   
-   flint_printf("addmod....");
-   fflush(stdout);
-   
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      ulong a, b, d, r1, r2, s1;
-      
-      d = n_randtest_not_zero(state);
-      a = n_randtest(state) % d;
-      b = n_randtest(state) % d;
-      
-      r1 = n_addmod(a, b, d);
+    int i, result;
+    FLINT_TEST_INIT(state);
 
-      add_ssaaaa(s1, r2, UWORD(0), a, UWORD(0), b);
-      if (s1 != 0 || r2 >= d)
-         r2 -= d;
-      
-      result = (r1 == r2);
+    flint_printf("addmod....");
+    fflush(stdout);
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, d = %wu\n", a, b, d); 
-         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-         abort();
-      }
-   }
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        ulong a, b, d, r1, r2, s1;
 
-   FLINT_TEST_CLEANUP(state);
-   
-   flint_printf("PASS\n");
-   return 0;
+        d = n_randtest_not_zero(state);
+        a = n_randtest(state) % d;
+        b = n_randtest(state) % d;
+
+        r1 = n_addmod(a, b, d);
+
+        add_ssaaaa(s1, r2, UWORD(0), a, UWORD(0), b);
+        if (s1 != 0 || r2 >= d)
+            r2 -= d;
+
+        result = (r1 == r2);
+
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu, b = %wu, d = %wu\n", a, b, d);
+            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
+            abort();
+        }
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }
