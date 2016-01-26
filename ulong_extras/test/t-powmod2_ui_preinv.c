@@ -37,8 +37,6 @@ int main(void)
    flint_printf("powmod2_ui_preinv....");
    fflush(stdout);
 
-   
-
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, d, r1, r2, dinv;

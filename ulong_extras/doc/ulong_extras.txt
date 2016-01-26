@@ -486,8 +486,7 @@ ulong n_powmod(ulong a, mp_limb_signed_t exp, ulong n)
     This is implemented by precomputing an inverse and calling the 
     \code{precomp} version of this function.
 
-ulong n_powmod2_preinv(ulong a, mp_limb_signed_t exp, ulong n, 
-                                                                ulong ninv)
+ulong n_powmod2_preinv(ulong a, mp_limb_signed_t exp, ulong n, ulong ninv)
 
     Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
     by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 
@@ -504,8 +503,7 @@ ulong n_powmod2(ulong a, mp_limb_signed_t exp, ulong n)
     This is implemented by precomputing an inverse limb and calling the 
     \code{preinv} version of this function.
 
-ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, 
-                                                                ulong ninv)
+ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv)
 
     Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
     by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 

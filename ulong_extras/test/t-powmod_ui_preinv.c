@@ -19,90 +19,108 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2013 William Hart
+    Copyright (C) 2009, 2013, 2016 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   FLINT_TEST_INIT(state);
-   
-   flint_printf("powmod_ui_preinv....");
-   fflush(stdout);
+    int i, result;
+    FLINT_TEST_INIT(state);
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t a, d, r1, r2, dinv;
-      mpz_t a_m, d_m, r2_m;
-      mp_limb_t exp;
-      ulong norm;
+    flint_printf("powmod_ui_preinv....");
+    fflush(stdout);
 
-      mpz_init(a_m);
-      mpz_init(d_m);
-      mpz_init(r2_m);
-      
-      d = n_randtest_not_zero(state);
-      do
-      {
-         a = n_randtest(state) % d;
-      } while (n_gcd(d, a) != UWORD(1));
-      exp = n_randtest(state);
-      
-      count_leading_zeros(norm, d);
-      
-      dinv = n_preinvert_limb(d<<norm);
-      r1 = n_powmod_ui_preinv(a<<norm, exp, d<<norm, dinv, norm) >> norm;
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        ulong a, d, r1, r2, dinv, exp, norm;
+        mpz_t a_m, d_m, r2_m;
 
-      flint_mpz_set_ui(a_m, a);
-      flint_mpz_set_ui(d_m, d);
-      flint_mpz_powm_ui(r2_m, a_m, exp, d_m);      
-      r2 = flint_mpz_get_ui(r2_m);
-      
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, exp = %wu, d = %wu\n", a, exp, d); 
-         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-         abort();
-      }
+        mpz_init(a_m);
+        mpz_init(d_m);
+        mpz_init(r2_m);
 
-      mpz_clear(a_m);
-      mpz_clear(d_m);
-      mpz_clear(r2_m);
-   }
+        d = n_randtest_not_zero(state);
+        do
+        {
+            a = n_randtest(state) % d;
+        } while (n_gcd(d, a) != UWORD(1));
+        exp = n_randtest(state);
 
-   /* check 0^0 = 1 */
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t d, r, dinv;
-      ulong norm;
-      
-      d = n_randtest_not_zero(state);
-      
-      count_leading_zeros(norm, d);
-      
-      dinv = n_preinvert_limb(d<<norm);
-      r = n_powmod_ui_preinv(0, 0, d<<norm, dinv, norm) >> norm;
+        count_leading_zeros(norm, d);
 
-      result = (r == 1 || (d == 1 && r == 0));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("0^0 != 1 mod %wd\n", d);
-         abort();
-      }
-   }
+        dinv = n_preinvert_limb(d);
+        r1 = n_powmod_ui_preinv(a << norm, exp, d << norm, dinv, norm) >> norm;
 
-   FLINT_TEST_CLEANUP(state);
-   
-   flint_printf("PASS\n");
-   return 0;
+        flint_mpz_set_ui(a_m, a);
+        flint_mpz_set_ui(d_m, d);
+        flint_mpz_powm_ui(r2_m, a_m, exp, d_m);
+        r2 = flint_mpz_get_ui(r2_m);
+
+        result = (r1 == r2);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu, exp = %wu, d = %wu\n", a, exp, d);
+            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
+            abort();
+        }
+
+        mpz_clear(a_m);
+        mpz_clear(d_m);
+        mpz_clear(r2_m);
+    }
+
+    /* check 0^0 = 1 */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        ulong d, r, dinv, norm;
+
+        d = n_randtest_not_zero(state);
+
+        count_leading_zeros(norm, d);
+
+        dinv = n_preinvert_limb(d);
+        r = n_powmod_ui_preinv(0, 0, d << norm, dinv, norm) >> norm;
+
+        /* 0^0 = 0 mod 1 and 0^0 = 1 mod d for d != 1 */
+        result = (r == 1 || (d == 1 && r == 0));
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("0^0 != 1 mod %wd\n", d);
+            abort();
+        }
+    }
+
+    /* check 0^exp = 0 mod 1 */
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        ulong r, dinv, norm, exp;
+
+        exp = n_randtest(state);
+
+        count_leading_zeros(norm, 1);
+
+        dinv = n_preinvert_limb(1);
+        r = n_powmod_ui_preinv(0, exp, UWORD(1) << norm, dinv, norm) >> norm;
+
+        result = (r == 0);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("0^%wd != 0 mod 1\n", exp);
+            abort();
+        }
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }

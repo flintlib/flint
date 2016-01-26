@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2013 William Hart
+    Copyright (C) 2013, 2016 William Hart
 
 ******************************************************************************/
 
@@ -27,32 +27,44 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_powmod_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv, ulong norm)
+ulong
+n_powmod_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv, ulong norm)
 {
-    mp_limb_t x;
+    ulong x;
 
-    if (n == (UWORD(1)<<norm) || (a == 0 && exp != 0)) return UWORD(0);
+    /* check normalisation */
+    FLINT_ASSERT((n & (UWORD(1) << (FLINT_BITS - 1))) != 0);
+    FLINT_ASSERT(a < n);
+    FLINT_ASSERT(n != 0);
 
-    if (exp)
+    if (exp == 0)
     {
-       while ((exp & 1) == 0)
-       {
-          a = n_mulmod_preinv(a, a, n, ninv, norm);
-          exp >>= 1;
-       }
+        x = UWORD(1) << norm;
 
-       x = a;
-       
-       while (exp >>= 1)
-       {
-          a = n_mulmod_preinv(a, a, n, ninv, norm);
-          if (exp & 1) x = n_mulmod_preinv(x, a, n, ninv, norm);
-       }
+        /* anything modulo 1 is 0 */
+        return x == n ? 0 : x;
+    }
 
-       return x;
-    } else
-       return (UWORD(1)<<norm);
+    if (a == 0)
+        return UWORD(0);
+
+    /* find first 1 in binary repn of exp */
+    while ((exp & 1) == 0)
+    {
+        a = n_mulmod_preinv(a, a, n, ninv, norm);
+        exp >>= 1;
+    }
+
+    x = a;
+
+    /* binary exponentiation */
+    while (exp >>= 1)
+    {
+        a = n_mulmod_preinv(a, a, n, ninv, norm);
+
+        if (exp & 1)
+            x = n_mulmod_preinv(x, a, n, ninv, norm);
+    }
+
+    return x;
 }
-
-
