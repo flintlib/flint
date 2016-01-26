@@ -75,9 +75,8 @@ int parse_fmt(int * floating, const char * fmt)
    return args;
 }
 
-int flint_printf(const char * str, ...)
+int flint_vprintf(const char * str, va_list ap)
 {
-   va_list ap;
    size_t len = strlen(str);
    char * str2 = flint_malloc(len + 1);
    int w1 = 0, w2 = 0;
@@ -95,8 +94,6 @@ int flint_printf(const char * str, ...)
    ret = printf("%s", str2);
    len -= n;
    str += n;
-
-   va_start(ap, str);
 
    while (len) /* deal with fmt spec prefixed strings */
    {
@@ -191,8 +188,19 @@ int flint_printf(const char * str, ...)
       str += n;
    }
 
-   va_end(ap);
    flint_free(str2);
 
    return (int) ret;
+}
+
+int flint_printf(const char * str, ...)
+{
+   va_list ap;
+   int count;
+
+   va_start(ap, str);
+   count = flint_vprintf(str, ap);
+   va_end(ap);
+
+   return count;
 }

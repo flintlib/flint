@@ -33,6 +33,7 @@
 #endif
 #include <gmp.h>
 #include <mpfr.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h> /* for alloca on FreeBSD */
 #if !defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)
@@ -373,6 +374,7 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
 FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */
+FLINT_DLL int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
 FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
 FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
@@ -381,6 +383,7 @@ FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of
 FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
 
 #include "gmpcompat.h"
+#include "exception.h"
 
 #ifdef __cplusplus
 }

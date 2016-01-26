@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009, 2013 William Hart
+    Copyright (C) 2009, 2013, 2016 William Hart
 
 ******************************************************************************/
 
@@ -27,46 +27,24 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
-{
-    mp_limb_t x;
-   
-    if (n == UWORD(1) || (a == 0 && exp != 0)) return UWORD(0);
-
-    x = UWORD(1);
-    
-    if (exp)
-    {
-       while ((exp & 1) == 0)
-       {
-          a = n_mulmod2_preinv(a, a, n, ninv);
-          exp >>= 1;
-       }
-
-       if (a >= n)
-          x = n_mod2_preinv(a, n, ninv);
-       else
-          x = a;
-       
-       while (exp >>= 1)
-       {
-          a = n_mulmod2_preinv(a, a, n, ninv);
-          if (exp & 1) x = n_mulmod2_preinv(x, a, n, ninv);
-       }
-    }
-
-    return x;
-}
-
-mp_limb_t
-n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
+ulong
+n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv)
 {
     ulong norm;
-    
-    if (exp < WORD(0))
+
+    FLINT_ASSERT(n != 0);
+
+    if (a >= n)
+        a = n_mod2_preinv(a, n, ninv);
+
+    if (exp < 0)
     {
-        a = n_invmod(a, n);
+        ulong g = n_gcdinv(&a, a, n);
+
+        if (g != 1)
+            flint_throw(FLINT_IMPINV, "Cannot invert modulo %wd*%wd\n", g,
+                        n / g);
+
         exp = -exp;
     }
 
@@ -74,4 +52,3 @@ n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
 
     return n_powmod_ui_preinv(a << norm, exp, n << norm, ninv, norm) >> norm;
 }
-

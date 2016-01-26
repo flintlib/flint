@@ -46,7 +46,7 @@ n_powmod_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv, ulong norm)
     }
 
     if (a == 0)
-        return UWORD(0);
+        return 0;
 
     /* find first 1 in binary repn of exp */
     while ((exp & 1) == 0)

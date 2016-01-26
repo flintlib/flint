@@ -244,7 +244,7 @@ FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp,
                                             ulong n, ulong ninv);
 
 FLINT_DLL ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n, 
-                                             ulong ninv, ulong norm);
+                                                       ulong ninv, ulong norm);
 
 ULONG_EXTRAS_INLINE
 ulong n_powmod2(ulong a, slong exp, ulong n)
