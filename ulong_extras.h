@@ -240,8 +240,7 @@ ulong n_powmod(ulong a, slong exp, ulong n)
 
 FLINT_DLL ulong n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv);
 
-FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp,
-                                            ulong n, ulong ninv);
+FLINT_DLL ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv);
 
 FLINT_DLL ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n, 
                                                        ulong ninv, ulong norm);
@@ -249,7 +248,11 @@ FLINT_DLL ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n,
 ULONG_EXTRAS_INLINE
 ulong n_powmod2(ulong a, slong exp, ulong n)
 {
-   ulong ninv = n_preinvert_limb(n);
+   ulong ninv;
+
+   FLINT_ASSERT(n != 0);
+
+   ninv = n_preinvert_limb(n);
 
    return n_powmod2_preinv(a, exp, n, ninv);
 }
