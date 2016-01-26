@@ -304,16 +304,21 @@ ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv)
     computed integer quotient is at most two above and one below the quotient 
     we are after.
 
-ulong n_mulmod2_preinv(ulong a, ulong b, 
-                                           ulong n, ulong ninv)
+ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}. There are no restrictions on $a$, $b$ or 
     on $n$. This is implemented by multiplying using \code{umul_ppmm()} and 
     then reducing using \code{n_ll_mod_preinv()}.
 
-ulong n_mulmod_preinv(ulong a, ulong b, ulong n, 
-                                            ulong ninv, ulong norm)
+ulong n_mulmod2(ulong a, ulong b, ulong n)
+
+    Returns $a b \bmod{n}$. There are no restrictions on $a$, $b$ or 
+    on $n$. This is implemented by multiplying using \code{umul_ppmm()} and 
+    then reducing using \code{n_ll_mod_preinv()} after computing a precomputed
+    inverse.
+
+ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm)
 
     Returns $a b \pmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}, assuming $a$ and $b$ are reduced modulo $n$ 

@@ -200,8 +200,28 @@ FLINT_DLL ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi,
 FLINT_DLL ulong n_mulmod_precomp(ulong a, ulong b, 
                                            ulong n, double ninv);
 
-FLINT_DLL ulong n_mulmod2_preinv(ulong a, ulong b, 
-                                        ulong n, ulong ninv);
+ULONG_EXTRAS_INLINE
+ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
+{
+    ulong p1, p2;
+
+    FLINT_ASSERT(n != 0);
+
+    umul_ppmm(p1, p2, a, b);
+    return n_ll_mod_preinv(p1, p2, n, ninv);
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mulmod2(ulong a, ulong b, ulong n)
+{
+    ulong p1, p2, ninv;
+
+    FLINT_ASSERT(n != 0);
+
+    ninv = n_preinvert_limb(n);
+    umul_ppmm(p1, p2, a, b);
+    return n_ll_mod_preinv(p1, p2, n, ninv);
+}
 
 FLINT_DLL ulong n_mulmod_preinv(ulong a, ulong b, 
                             ulong n, ulong ninv, ulong norm);

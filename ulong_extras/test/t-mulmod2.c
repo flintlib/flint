@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2016 William Hart
 
 ******************************************************************************/
 
@@ -27,12 +27,41 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
+int
+main(void)
 {
-    mp_limb_t p1, p2;
+    int i, result;
+    FLINT_TEST_INIT(state);
 
-    umul_ppmm(p1, p2, a, b);
+    flint_printf("mulmod2....");
+    fflush(stdout);
 
-    return n_ll_mod_preinv(p1, p2, n, ninv);
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        ulong a, b, d, r1, r2, q, p1, p2;
+
+        d = n_randtest_not_zero(state);
+        a = n_randtest(state) % d;
+        b = n_randtest(state) % d;
+
+        r1 = n_mulmod2(a, b, d);
+
+        umul_ppmm(p1, p2, a, b);
+        p1 %= d;
+        udiv_qrnnd(q, r2, p1, p2, d);
+
+        result = (r1 == r2);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("a = %wu, b = %wu, d = %wu\n", a, b, d);
+            flint_printf("q = %wu, r1 = %wu, r2 = %wu\n", q, r1, r2);
+            abort();
+        }
+    }
+
+    FLINT_TEST_CLEANUP(state);
+
+    flint_printf("PASS\n");
+    return 0;
 }

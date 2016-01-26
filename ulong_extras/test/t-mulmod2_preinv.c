@@ -19,12 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2016 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -37,11 +35,9 @@ int main(void)
    flint_printf("mulmod2_preinv....");
    fflush(stdout);
 
-   
-
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t a, b, d, r1, r2, q, p1, p2, dinv;
+      ulong a, b, d, r1, r2, q, p1, p2, dinv;
       
       d = n_randtest_not_zero(state);
       a = n_randtest(state) % d;
