@@ -50,8 +50,8 @@ main(void)
         mp_limb_t mod;
 
         /* Make sure to workout the Newton code */
-        if (n_randint(state, 10) == 1)
-            N = 2000;
+        if (n_randint(state, 100) == 1)
+            N = 20000;
 
         mod = n_randtest_prime(state, 0);
         n = n_randtest(state) % N;
@@ -116,12 +116,17 @@ main(void)
         slong n;
         mp_limb_t mod;
         mod = n_randtest_prime(state, 0);
-        n = n_randtest(state) % 50;
+ 
+        if (i < 30)
+            n = n_randint(state, 20000);
+        else
+            n = n_randtest(state) % 50;
+
         n = FLINT_MIN(n, mod);
 
         nmod_poly_init(A, mod);
         nmod_poly_init(B, mod);
-        nmod_poly_randtest(A, state, n_randint(state, 50));
+        nmod_poly_randtest(A, state, n);
         nmod_poly_set_coeff_ui(A, 0, UWORD(0));
 
         nmod_poly_exp_series(B, A, n);
