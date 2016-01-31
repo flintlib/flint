@@ -72,7 +72,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a = %wu, exp = %wd, d = %wu\n", a, exp, d);
+            flint_printf("a = %wu, exp = %wd, d = %wu, dinv = %wu\n", a, exp, d, dinv);
             flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
             abort();
         }
