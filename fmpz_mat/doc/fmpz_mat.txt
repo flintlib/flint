@@ -523,6 +523,12 @@ void fmpz_mat_mul_classical(fmpz_mat_t C,
 
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
+    
+void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. Uses Strassen
+    multiplication (the Strassen-Winograd variant).
 
 void _fmpz_mat_mul_multi_mod(fmpz_mat_t C,
             const fmpz_mat_t A, const fmpz_mat_t B, mp_bitcnt_t bits)
