@@ -75,6 +75,9 @@ void sample(void * arg, ulong count)
     else if (algorithm == 3)
         for (i = 0; i < count; i++)
             fmpz_mat_mul_multi_mod(C, A, B);
+    else if(algorithm == 4)
+	    for (i = 0; i < count; i++)
+	        fmpz_mat_mul_strassen(C, A, B);
 
     prof_stop();
 
@@ -87,7 +90,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-    double min_default, min_classical, min_inline, min_multi_mod, max;
+    double min_default, min_classical, min_inline, min_multi_mod, min_strassen, max;
     mat_mul_t params;
     slong bits, dim;
 
@@ -114,14 +117,20 @@ int main(void)
 
             params.algorithm = 3;
             prof_repeat(&min_multi_mod, &max, sample, &params);
+            
+            params.algorithm = 4;
+            prof_repeat(&min_strassen, &max, sample, &params);
 
-            flint_printf("dim = %wd default/classical/inline/multi_mod %.2f %.2f %.2f %.2f (us)\n", 
-                dim, min_default, min_classical, min_inline, min_multi_mod);
+            flint_printf("dim = %wd default/classical/inline/multi_mod/strassen %.2f %.2f %.2f %.2f %.2f (us)\n", 
+                dim, min_default, min_classical, min_inline, min_multi_mod, min_strassen);
 
             if (min_multi_mod < 0.6*min_default)
                 flint_printf("BAD!\n");
 
             if (min_inline < 0.6*min_default)
+                flint_printf("BAD!\n");
+                
+            if (min_strassen < 0.7*min_default)
                 flint_printf("BAD!\n");
 
             if (min_multi_mod < 0.7*min_inline)
