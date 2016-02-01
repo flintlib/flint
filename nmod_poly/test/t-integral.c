@@ -38,7 +38,6 @@ main(void)
     int i, result = 1;
     FLINT_TEST_INIT(state);
     
-    
     flint_printf("integral....");
     fflush(stdout);
 
@@ -88,7 +87,7 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, state, n_randint(state, 100));
+        nmod_poly_randtest(a, state, n_randint(state, FLINT_MIN(100, n)));
 
         nmod_poly_integral(b, a);
         nmod_poly_integral(a, a);

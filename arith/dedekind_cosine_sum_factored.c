@@ -194,7 +194,7 @@ trigprod_mul_prime_power(trig_prod_t prod, mp_limb_t k, mp_limb_t n,
     prod->prefactor *= 2;
     prod->prefactor *= n_jacobi(3, k);
     prod->sqrt_p *= k;
-    prod->cos_p[prod->n] = 4 * n_mulmod2_preinv(m, n_invmod(24, k), k, inv);
+    prod->cos_p[prod->n] = 4 * n_mulmod2_preinv(m, n_invmod(24 >= k ? n_mod2_preinv(24, k, inv) : 24, k), k, inv);
     prod->cos_q[prod->n] = k;
     prod->n++;
 }
@@ -220,9 +220,9 @@ solve_n1(mp_limb_t n, mp_limb_t k1, mp_limb_t k2,
     n1 = n_mod2_preinv(n1 + d2*e*n, k1, inv);
 
     u = n_mulmod2_preinv(k2, k2, k1, inv);
-    u = n_invmod(u * d2 * e, k1);
+    u = n_invmod(n_mod2_preinv(u * d2 * e, k1, inv), k1);
     n1 = n_mulmod2_preinv(n1, u, k1, inv);
-
+ 
     return n1;
 }
 
@@ -255,7 +255,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
             k2 = k / 2;
             inv = n_preinvert_limb(k2);
 
-            n2 = n_invmod(32, k2);
+            n2 = n_invmod(32 >= k2 ? n_mod2_preinv(32, k2, inv) : 32, k2);
             n2 = n_mulmod2_preinv(n2,
                     n_mod2_preinv(8*n + 1, k2, inv), k2, inv);
             n1 = ((k2 % 8 == 3) || (k2 % 8 == 5)) ^ (n & 1);
@@ -270,7 +270,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
             k2 = k / 4;
             inv = n_preinvert_limb(k2);
 
-            n2 = n_invmod(128, k2);
+            n2 = n_invmod(128 >= k2 ? n_mod2_preinv(128, k2, inv) : 128, k2);
             n2 = n_mulmod2_preinv(n2,
                 n_mod2_preinv(8*n + 5, k2, inv), k2, inv);
             n1 = (n + mod4_tab[(k2 / 2) % 8]) % 4;
@@ -294,7 +294,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
 
             n1 = solve_n1(n, k1, k2, d1, d2, e);
             n2 = solve_n1(n, k2, k1, d2, d1, e);
-
+            
             trigprod_mul_prime_power(prod, k1, n1, fac.p[i], fac.exp[i]);
             k = k2;
             n = n2;

@@ -340,6 +340,7 @@ void qsieve_ll_compute_off_adj(qs_t qs_inf)
    mp_limb_t * B_terms = qs_inf->B_terms;
    mp_limb_t * soln1 = qs_inf->soln1;
    mp_limb_t * soln2 = qs_inf->soln2;
+   mp_limb_t Amod;
    int * sqrts = qs_inf->sqrts;
    prime_t * factor_base = qs_inf->factor_base;
    slong s = qs_inf->s;
@@ -351,7 +352,8 @@ void qsieve_ll_compute_off_adj(qs_t qs_inf)
       p = factor_base[i].p;
       pinv = factor_base[i].pinv;
       
-      A_inv[i] = n_invmod(n_mod2_preinv(A, p, pinv), p);
+      Amod = n_mod2_preinv(A, p, pinv);
+      A_inv[i] = Amod == 0 ? 0 : n_invmod(Amod, p);
              
       for (j = 0; j < s; j++)
       {

@@ -37,7 +37,6 @@ main(void)
     int i, result = 1;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("sin_series....");
     fflush(stdout);
 
@@ -87,7 +86,7 @@ main(void)
         nmod_poly_t A, B;
         slong n;
         mp_limb_t mod;
-        mod = n_randtest_prime(state, 0);
+        do { mod = n_randtest_prime(state, 0); } while (mod == 2);
         n = n_randtest(state) % 50;
         n = FLINT_MIN(n, mod);
 

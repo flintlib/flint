@@ -35,13 +35,13 @@ n_gcdinv(ulong * s, ulong x, ulong y)
 
     FLINT_ASSERT(y > x);
 
-    v1 = UWORD(0);
-    v2 = UWORD(1);
+    v1 = 0;
+    v2 = 1;
     r = x;
     x = y;
 
     /* y and x both have top bit set */
-    if ((slong) (x & r) < WORD(0))
+    if ((slong) (x & r) < 0)
     {
         d = x - r;
         t2 = v2;
@@ -52,7 +52,7 @@ n_gcdinv(ulong * s, ulong x, ulong y)
     }
 
     /* second value has second msb set */
-    while ((slong) (r << 1) < WORD(0))
+    while ((slong) (r << 1) < 0)
     {
         d = x - r;
         if (d < r)              /* quot = 1 */

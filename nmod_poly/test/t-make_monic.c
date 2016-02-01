@@ -36,7 +36,6 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("make_monic....");
     fflush(stdout);
 
@@ -51,7 +50,10 @@ main(void)
         nmod_poly_init(b, n);
         
         if (n == 1) continue;
-        do { nmod_poly_randtest(a, state, n_randint(state, 100) + 1); } while (a->length == 0);
+        do 
+        {
+           nmod_poly_randtest(a, state, n_randint(state, 100) + 1);
+        } while (a->length == 0 || n_gcd(*nmod_poly_lead(a), n) != 1);
         
         nmod_poly_make_monic(b, a);
         l = n_gcd(a->mod.n, a->coeffs[a->length - 1]);
@@ -81,7 +83,10 @@ main(void)
         nmod_poly_init(a, n);
         
         if (n == 1) continue;
-        do { nmod_poly_randtest(a, state, n_randint(state, 100) + 1); } while (a->length == 0);
+        do
+        {
+            nmod_poly_randtest(a, state, n_randint(state, 100) + 1);
+        } while (a->length == 0 || n_gcd(*nmod_poly_lead(a), n) != 1);
         
         l = n_gcd(a->mod.n, a->coeffs[a->length - 1]);
         nmod_poly_make_monic(a, a);

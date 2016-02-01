@@ -52,7 +52,8 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
     {
         if (k > 3 && k < PROD_TAKE4)
         {
-            r = n_invmod(k*(k-1)*(k-2)*(k-3), mod.n);
+            r = k*(k-1)*(k-2)*(k-3);
+            r = n_invmod(r >= mod.n ? r % mod.n : r, mod.n);
             x_int[k]   = MUL3(x[k-1], r, (k-1)*(k-2)*(k-3));
             x_int[k-1] = MUL3(x[k-2], r, k*(k-2)*(k-3));
             x_int[k-2] = MUL3(x[k-3], r, k*(k-1)*(k-3));
@@ -61,7 +62,8 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
         }
         else if (k > 2 && k < PROD_TAKE3)
         {
-            r = n_invmod(k*(k-1)*(k-2), mod.n);
+            r = k*(k-1)*(k-2);
+            r = n_invmod(r >= mod.n ? r % mod.n : r, mod.n);
             x_int[k]   = MUL3(x[k-1], r, (k-1)*(k-2));
             x_int[k-1] = MUL3(x[k-2], r, k*(k-2));
             x_int[k-2] = MUL3(x[k-3], r, k*(k-1));
@@ -69,14 +71,15 @@ void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
         }
         else if (k > 1 && k < PROD_TAKE2)
         {
-            r = n_invmod(k*(k-1), mod.n);
+            r = k*(k-1);
+            r = n_invmod(r >= mod.n ? r % mod.n : r, mod.n);
             x_int[k]   = MUL3(x[k-1], r, k-1);
             x_int[k-1] = MUL3(x[k-2], r, k);
             k -= 2;
         }
         else
         {
-            r = n_invmod(k, mod.n);
+            r = n_invmod(k >= mod.n ? k % mod.n : k, mod.n);
             x_int[k] = n_mulmod2_preinv(x[k-1], r, mod.n, mod.ninv);
             k -= 1;
         }

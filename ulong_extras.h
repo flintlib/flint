@@ -301,9 +301,19 @@ FLINT_DLL ulong n_gcd(ulong x, ulong y);
 
 FLINT_DLL ulong n_xgcd(ulong * a, ulong * b, ulong x, ulong y);
 
-FLINT_DLL ulong n_invmod(ulong x, ulong y);
-
 FLINT_DLL ulong n_gcdinv(ulong * a, ulong x, ulong y);
+
+ULONG_EXTRAS_INLINE
+ulong n_invmod(ulong x, ulong y)
+{
+   ulong r, g;
+
+   g = n_gcdinv(&r, x, y);
+   if (g != 1)
+      flint_throw(FLINT_IMPINV, "Cannot invert modulo %wd*%wd\n", g, g/y);
+
+   return r;
+}
 
 FLINT_DLL ulong n_revbin(ulong in, ulong bits);
 

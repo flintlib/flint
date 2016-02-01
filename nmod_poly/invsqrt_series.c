@@ -60,7 +60,7 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
     _nmod_poly_mullow(u, t, n, g, n, n, mod);
     _nmod_poly_mullow(t, u, n, h, n, n, mod);
 
-    c = n_invmod(mod.n - UWORD(2), mod.n);
+    c = n_invmod(mod.n - 2, mod.n);
     _nmod_vec_scalar_mul_nmod(g + m, t + m, n - m, c, mod);
 
     if (alloc)
