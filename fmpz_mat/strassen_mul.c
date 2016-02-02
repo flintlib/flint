@@ -22,9 +22,7 @@
     Copyright (C) 2016 Aaditya Thakkar
 
 ******************************************************************************/
-#include<stdio.h>
-#include<gmp.h>
-#include<stdlib.h>
+
 #include "fmpz_mat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
