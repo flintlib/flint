@@ -615,6 +615,12 @@ FLINT_DLL void _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
 
 FLINT_DLL void fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
+FLINT_DLL void _fmpq_poly_sin_cos_series(fmpz * s, fmpz_t sden, fmpz * c, fmpz_t cden,
+                            const fmpz * h, const fmpz_t hden, slong hlen, slong n);
+
+FLINT_DLL void fmpq_poly_sin_cos_series(fmpq_poly_t res1, fmpq_poly_t res2,
+                            const fmpq_poly_t poly, slong n);
+
 FLINT_DLL void _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden,
                             const fmpz * h, const fmpz_t hden, slong hlen, slong n);
 
