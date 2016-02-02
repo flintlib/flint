@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010,2011 Fredrik Johansson
-                  2016 Aaditya Thakkar
+    Copyright (C) 2016 Aaditya Thakkar
 
 ******************************************************************************/
 
@@ -69,18 +69,20 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
         if (5*(ab + bb) > dim * dim || (bits > FLINT_BITS - 3 && dim < 60))
         {
-            if((ab + bb) * dim < 17000){
-            	fmpz_mat_mul_classical_inline(C, A, B);
-	        }
-	        else
+            if ((ab + bb) * dim < 17000) 
             {
-	            if(dim > 75 && (ab + bb) > 650){
-	                _fmpz_mat_mul_multi_mod(C,A,B,bits);
+            	fmpz_mat_mul_classical_inline(C, A, B);
+	    }
+	    else 
+	    {
+	        if (dim > 75 && (ab + bb) > 650){
+	            _fmpz_mat_mul_multi_mod(C, A, B, bits);
+	        }
+                else 
+                {
+              	    fmpz_mat_mul_strassen(C, A, B);
                 }
-                else{
-              	    fmpz_mat_mul_strassen(C,A,B);
-                }
-           }
+            }
         }
         else
         {
