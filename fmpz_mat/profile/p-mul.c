@@ -75,9 +75,9 @@ void sample(void * arg, ulong count)
     else if (algorithm == 3)
         for (i = 0; i < count; i++)
             fmpz_mat_mul_multi_mod(C, A, B);
-    else if(algorithm == 4)
-	    for (i = 0; i < count; i++)
-	        fmpz_mat_mul_strassen(C, A, B);
+    else if (algorithm == 4)
+	for (i = 0; i < count; i++)
+	    fmpz_mat_mul_strassen(C, A, B);
 
     prof_stop();
 
