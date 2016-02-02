@@ -74,7 +74,7 @@ main(void)
                 fmpz_set_ui(jl, 1);
                 fmpz_set_ui(kl, 1);
                 fmpz_init(tot);
-                for (l = 0; l < FLINT_MIN(20, fmpz_poly_length(b)); ++l)
+                for (l = 0; l < FLINT_MIN(20, fmpz_poly_length(b)); l++)
                 {
                     fmpz_set(tot, il);
                     fmpz_add(tot, tot, jl);
@@ -163,7 +163,7 @@ main(void)
         result = fmpz_poly_equal(a, c);
         if (!result)
         {
-            flint_printf("FAIL2: power_sums_to_poly\n");
+            flint_printf("FAIL: power_sums_to_poly\n");
             fmpz_poly_print(a), flint_printf("\n\n");
             fmpz_poly_print(b), flint_printf("\n\n");
             fmpz_poly_print(c), flint_printf("\n\n");

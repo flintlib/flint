@@ -29,24 +29,22 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_power_sums_naive(fmpz * res, const fmpz * poly, slong len,
-                               slong n)
+_fmpz_poly_power_sums_naive(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     slong i, k;
 
     fmpz_set_ui(res, len - 1);
-    for (k = 1; k < FLINT_MIN(n, len); ++k)
+    for (k = 1; k < FLINT_MIN(n, len); k++)
     {
-        fmpz_set(res + k, poly + len - 1 - k);
-        fmpz_mul_ui(res + k, res + k, k);
-        for (i = 1; i < k; ++i)
+        fmpz_mul_ui(res + k, poly + len - 1 - k, k);
+        for (i = 1; i < k; i++)
             fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
         fmpz_neg(res + k, res + k);
     }
-    for (k = len; k < n; ++k)
+    for (k = len; k < n; k++)
     {
-        fmpz_set_ui(res + k, 0);
-        for (i = k - len + 1; i < k; ++i)
+        fmpz_zero(res + k);
+        for (i = k - len + 1; i < k; i++)
             fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
         fmpz_neg(res + k, res + k);
     }
@@ -73,7 +71,7 @@ fmpz_poly_power_sums_naive(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
             fmpz_poly_init(t);
             fmpz_poly_fit_length(t, n);
             _fmpz_poly_power_sums_naive(t->coeffs, poly->coeffs,
-                                           poly->length, n);
+                                        poly->length, n);
             fmpz_poly_swap(res, t);
             fmpz_poly_clear(t);
         }
@@ -81,7 +79,7 @@ fmpz_poly_power_sums_naive(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
         {
             fmpz_poly_fit_length(res, n);
             _fmpz_poly_power_sums_naive(res->coeffs, poly->coeffs,
-                                           poly->length, n);
+                                        poly->length, n);
         }
         _fmpz_poly_set_length(res, n);
         _fmpz_poly_normalise(res);

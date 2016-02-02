@@ -2528,7 +2528,7 @@ void fmpz_poly_power_sums(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
     the sum of the $i$-th power of all (complex) roots of the polynomial
     \code{poly}.
 
-void _fmpz_poly_power_sums_to_poly_naive(fmpz * res, const fmpz * poly, slong len)
+void _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
 
     Compute the (monic) polynomial given by its power sums series \code{(poly,len)}.
 
