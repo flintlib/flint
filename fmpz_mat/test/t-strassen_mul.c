@@ -38,7 +38,6 @@ main(void)
     slong i;
     FLINT_TEST_INIT(state);
     
-
     flint_printf("strassen_mul....");
     fflush(stdout);
 
