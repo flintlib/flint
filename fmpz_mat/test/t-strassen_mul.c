@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -41,7 +40,7 @@ main(void)
     flint_printf("strassen_mul....");
     fflush(stdout);
 
-    for (i = 0; i < 20 * 10; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C, D;
 
