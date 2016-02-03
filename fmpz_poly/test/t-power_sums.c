@@ -38,7 +38,7 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-    flint_printf("Power sums....");
+    flint_printf("power_sums....");
 
     /* Check that it is valid in degree 3 with integer roots, ie */
     /* for polynomials of the form (x-i)(x-j)(x-k)               */
