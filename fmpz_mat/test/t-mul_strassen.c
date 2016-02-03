@@ -37,7 +37,7 @@ main(void)
     slong i;
     FLINT_TEST_INIT(state);
     
-    flint_printf("strassen_mul....");
+    flint_printf("mul_strassen....");
     fflush(stdout);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
