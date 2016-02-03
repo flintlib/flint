@@ -2507,6 +2507,37 @@ int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
 
 *******************************************************************************
 
+    Power sums
+
+*******************************************************************************
+
+void _fmpz_poly_power_sums_naive(fmpz * res, const fmpz * poly, slong len, slong n)
+
+    Compute the (truncated) power sums series of the monic polynomial
+    \code{(poly,len)} up to length $n$ using Newton identities.
+
+void fmpz_poly_power_sums_naive(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+
+    Compute the (truncated) power sum series of the monic polynomial
+    \code{poly} up to length $n$ using Newton identities.
+
+void fmpz_poly_power_sums(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
+
+    Compute the (truncated) power sums series of the monic polynomial \code{poly}
+    up to length $n$. That is the power series whose coefficient of degree $i$ is
+    the sum of the $i$-th power of all (complex) roots of the polynomial
+    \code{poly}.
+
+void _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
+
+    Compute the (monic) polynomial given by its power sums series \code{(poly,len)}.
+
+void fmpz_poly_power_sums_to_poly(fmpz_poly_t res, const fmpz_poly_t Q);
+
+    Compute the (monic) polynomial given its power sums series \code{(Q)}.
+
+*******************************************************************************
+
     Signature
 
 *******************************************************************************

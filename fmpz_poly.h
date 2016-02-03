@@ -986,6 +986,17 @@ FLINT_DLL int _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a);
 
+/* Newton series *************************************************************/
+
+FLINT_DLL void _fmpz_poly_power_sums_naive(fmpz * res, const fmpz * poly, slong len, slong n);
+
+FLINT_DLL void fmpz_poly_power_sums_naive(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
+
+FLINT_DLL void fmpz_poly_power_sums(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
+
+FLINT_DLL void _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len);
+
+FLINT_DLL void fmpz_poly_power_sums_to_poly(fmpz_poly_t res, const fmpz_poly_t Q);
 
 /*  Signature  ***************************************************************/
 
