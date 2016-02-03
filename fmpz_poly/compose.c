@@ -42,35 +42,32 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
     else if (len2 == 2)
     {
-        fmpz_t temp;
         slong i;
-        
-        
         _fmpz_vec_set(res, poly1, len1);
-        
         _fmpz_poly_taylor_shift(res, poly2, len1);
         
-        if (fmpz_is_pm1(poly2 + 1))
+        if (fmpz_equal_si(poly2 + 1, -1))
         {
-            fmpz_clear(temp);
-            return;            
-        }   
-        else
+            for (i = 1; i < len1; i += 2)
+                fmpz_neg(res + i, res + i);
+            return;
+        }
+        else if (!fmpz_is_one(poly2 + 1))
         {
+            fmpz_t temp;
             fmpz_init(temp);
             fmpz_one(temp);
         
             for (i = 0; i < len1; i++)
             {
                 fmpz_mul(res + i, res + i, temp);
-                /* no need to reverse signs manually as if c1 negative then 
-                signs alternate automatically*/
+                /* no need to reverse signs manually as if poly2 + 1 negative 
+                then signs alternate automatically*/
                 fmpz_mul(temp, temp, poly2 + 1);
             }
             fmpz_clear(temp);
-        } 
-        
-        return;    
+        }
+        return; 
     }
     else
         _fmpz_poly_compose_divconquer(res, poly1, len1, poly2, len2);
