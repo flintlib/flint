@@ -567,6 +567,17 @@ FLINT_DLL void  _fmpq_poly_sqrt_series(fmpz * rpoly, fmpz_t rden,
 
 FLINT_DLL void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
+/* Power sums ****************************************************************/
+
+FLINT_DLL void _fmpq_poly_power_sums(fmpz * res, fmpz_t rden, const fmpz * poly, slong len, slong n);
+
+FLINT_DLL void fmpq_poly_power_sums(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
+
+FLINT_DLL void _fmpq_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, const fmpz_t den, slong len);
+
+FLINT_DLL void fmpq_poly_power_sums_to_fmpz_poly(fmpz_poly_t res, const fmpq_poly_t Q);
+
+FLINT_DLL void fmpq_poly_power_sums_to_poly(fmpq_poly_t res, const fmpq_poly_t Q);
 
 /*  Transcendental functions  ************************************************/
 
