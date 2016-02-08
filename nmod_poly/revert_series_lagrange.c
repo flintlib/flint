@@ -45,7 +45,7 @@ _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
     S = _nmod_vec_init(n - 1);
     T = _nmod_vec_init(n - 1);
 
-    _nmod_poly_inv_series(R, Q + 1, n - 1, mod);
+    _nmod_poly_inv_series(R, Q + 1, n - 1, n - 1, mod);
     _nmod_vec_set(S, R, n - 1);
 
     for (i = 2; i < n; i++)

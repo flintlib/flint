@@ -1080,9 +1080,9 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
     Computes the remainder $R$ on polynomial division of $A$ by $B$.
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv,
-                                    mp_srcptr Q, slong n, nmod_t mod)
+                                    mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
 
-    Given \code{Q} of length \code{n} whose leading coefficient is invertible
+    Given \code{Q} of length \code{Qlen} whose leading coefficient is invertible
     modulo the given modulus, finds a polynomial \code{Qinv} of length \code{n}
     such that the top \code{n} coefficients of the product \code{Q * Qinv} is
     $x^{n - 1}$. Requires that \code{n > 0}. This function can be viewed as
@@ -1099,9 +1099,9 @@ void nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     \code{Q}. This function can be viewed as inverting a power series.
 
 void
-_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
+_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
 
-    Given \code{Q} of length \code{n} whose constant coefficient is invertible
+    Given \code{Q} of length \code{Qlen} whose constant coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
     This function can be viewed as inverting a power series via Newton
@@ -1116,9 +1116,9 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
     the case or if \code{n = 0}. This function can be viewed as inverting
     a power series via Newton iteration.
 
-void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
+void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
 
-    Given \code{Q} of length \code{n} whose constant coefficient is invertible
+    Given \code{Q} of length \code{Qlenn} whose constant coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
     This function can be viewed as inverting a power series.
@@ -1131,10 +1131,31 @@ void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
     the case or if \code{n = 0}. This function can be viewed as inverting
     a power series.
 
-void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B,
-                                                  slong n, nmod_t mod)
+void _nmod_poly_div_series_basecase(mp_ptr Q, mp_srcptr A, slong Alen,
+                                mp_srcptr B, slong Blen, slong n, nmod_t mod)
 
-    Given polynomials \code{A} and \code{B} of length \code{n}, finds the
+    Given polynomials \code{A} and \code{B} of length \code{Alen} and
+    \code{Blen}, finds the
+    polynomial \code{Q} of length \code{n} such that \code{Q * B = A}
+    modulo $x^n$. We assume \code{n > 0} and that the constant coefficient
+    of \code{B} is invertible modulo the given modulus. The polynomial
+    \code{Q} must have space for \code{n} coefficients.
+
+void nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A,
+                                         const nmod_poly_t B, slong n)
+
+    Given polynomials \code{A} and \code{B} considered modulo \code{n},
+    finds the polynomial \code{Q} of length at most \code{n} such that
+    \code{Q * B = A} modulo $x^n$. We assume \code{n > 0} and that the
+    constant coefficient of \code{B} is invertible modulo the modulus.
+    An exception is raised if \code{n == 0} or the constant coefficient
+    of \code{B} is zero.
+
+void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
+                                mp_srcptr B, slong Blen, slong n, nmod_t mod)
+
+    Given polynomials \code{A} and \code{B} of length \code{Alen} and
+    \code{Blen}, finds the
     polynomial \code{Q} of length \code{n} such that \code{Q * B = A}
     modulo $x^n$. We assume \code{n > 0} and that the constant coefficient
     of \code{B} is invertible modulo the given modulus. The polynomial
@@ -2432,10 +2453,10 @@ void nmod_poly_log_series_monomial_ui(nmod_poly_t g,
 
     Set $g = \log(1+cx^r) + O(x^n)$. Works efficiently in linear time.
 
-void _nmod_poly_log_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+void _nmod_poly_log_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set $g = \log(h) + O(x^n)$. Assumes $n > 0$ and that $h$ is zero-padded
-    as necessary to length $n$. Aliasing of $g$ and $h$ is allowed.
+    Set $g = \log(h) + O(x^n)$. Assumes $n > 0$ and \code{hlen > 0}.
+    Aliasing of $g$ and $h$ is allowed.
 
 void nmod_poly_log_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 

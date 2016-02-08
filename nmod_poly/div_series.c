@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 William Hart
+    Copyright (C) 2016 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -31,25 +32,32 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
-                                             slong n, nmod_t mod)
+_nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
+                                mp_srcptr B, slong Blen, slong n, nmod_t mod)
 {
-    mp_ptr Binv = _nmod_vec_init(n);
+    Blen = FLINT_MIN(Blen, n);
 
-    _nmod_poly_inv_series(Binv, B, n, mod);
-    _nmod_poly_mullow(Q, Binv, n, A, n, n, mod);
+    if (Blen < 32 || Blen < 120 * FLINT_BIT_COUNT(mod.n))
+    {
+        _nmod_poly_div_series_basecase(Q, A, Alen, B, Blen, n, mod);
+    }
+    else
+    {
+        mp_ptr Binv = _nmod_vec_init(n);
 
-    _nmod_vec_clear(Binv);
+        _nmod_poly_inv_series(Binv, B, Blen, n, mod);
+        _nmod_poly_mullow(Q, Binv, n, A, FLINT_MIN(n, Alen), n, mod);
+
+        _nmod_vec_clear(Binv);
+    }
 }
 
 void
 nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
                                     const nmod_poly_t B, slong n)
 {
-    mp_ptr A_coeffs, B_coeffs, Q_coeffs;
-    nmod_poly_t t1;
     slong Alen, Blen;
-    
+
     Blen = B->length;
 
     if (n == 0 || Blen == 0 || B->coeffs[0] == 0)
@@ -57,53 +65,30 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
         flint_printf("Exception (nmod_poly_div_series). Division by zero.\n");
         abort();
     }
-    
+
     Alen = A->length;
 
-    if (Alen < n)
+    if (Alen == 0)
     {
-        A_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(A_coeffs, A->coeffs, Alen);
-        flint_mpn_zero(A_coeffs + Alen, n - Alen);
+        nmod_poly_zero(Q);
+        return;
     }
-    else
-        A_coeffs = A->coeffs;
 
-    if (Blen < n)
-    {
-        B_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(B_coeffs, B->coeffs, Blen);
-        flint_mpn_zero(B_coeffs + Blen, n - Blen);
-    }
-    else
-        B_coeffs = B->coeffs;
-
-    if ((Q == A || Q == B) && Q->length >= n)
-    {
-        nmod_poly_init2(t1, Q->mod.n, n);
-        Q_coeffs = t1->coeffs;
-    }
-    else
+    if (Q != A && Q != B)
     {
         nmod_poly_fit_length(Q, n);
-        Q_coeffs = Q->coeffs;
+        _nmod_poly_div_series(Q->coeffs, A->coeffs, Alen, B->coeffs, Blen, n, Q->mod);
     }
-
-    _nmod_poly_div_series(Q_coeffs, A_coeffs, B_coeffs, n, Q->mod);
-
-    if ((Q == A || Q == B) && Q->length >= n)
+    else
     {
-        nmod_poly_swap(Q, t1);
-        nmod_poly_clear(t1);
+        nmod_poly_t t;
+        nmod_poly_init2(t, Q->mod.n, n);
+        _nmod_poly_div_series(t->coeffs, A->coeffs, Alen, B->coeffs, Blen, n, Q->mod);
+        nmod_poly_swap(Q, t);
+        nmod_poly_clear(t);
     }
-    
+
     Q->length = n;
-
-    if (Alen < n)
-        _nmod_vec_clear(A_coeffs);
-
-    if (Blen < n)
-        _nmod_vec_clear(B_coeffs);
-
     _nmod_poly_normalise(Q);
 }
+

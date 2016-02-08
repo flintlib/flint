@@ -52,7 +52,7 @@ _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv,
     S = _nmod_vec_init(n - 1);
     T = _nmod_vec_init(n - 1);
 
-    _nmod_poly_inv_series(Ri(1), Q + 1, n - 1, mod);
+    _nmod_poly_inv_series(Ri(1), Q + 1, n - 1, n - 1, mod);
     for (i = 2; i <= m; i++)
         _nmod_poly_mullow(Ri(i), Ri(i-1), n - 1, Ri(1), n - 1, n - 1, mod);
     for (i = 2; i < m; i++)

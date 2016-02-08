@@ -57,7 +57,7 @@ _nmod_poly_exp_series_newton(mp_ptr f, mp_ptr g,
 
     /* f := exp(h) + O(x^m),  g := exp(-h) + O(x^m2) */
     _nmod_poly_exp_series_basecase(f, h, n, n, mod);
-    _nmod_poly_inv_series_basecase(g, f, (n + 1) / 2, mod);
+    _nmod_poly_inv_series_basecase(g, f, (n + 1) / 2, (n + 1) / 2, mod);
 
     for (i--; i >= 0; i--)
     {
@@ -106,7 +106,7 @@ _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong n, nmod_t mo
     if (n < NMOD_POLY_NEWTON_EXP_CUTOFF)
     {
         _nmod_poly_exp_series_basecase(f, h, n, n, mod);
-        _nmod_poly_inv_series(g, f, n, mod);
+        _nmod_poly_inv_series(g, f, n, n, mod);
     }
     else
     {

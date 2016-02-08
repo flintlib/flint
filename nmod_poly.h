@@ -705,21 +705,21 @@ FLINT_DLL void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
 FLINT_DLL void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
 
 FLINT_DLL void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
-                                              mp_srcptr Q, slong n, nmod_t mod);
+                                              mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
 
 FLINT_DLL void nmod_poly_inv_series_basecase(nmod_poly_t Qinv, 
                                                   const nmod_poly_t Q, slong n);
 
 FLINT_DLL void _nmod_poly_inv_series_newton(mp_ptr Qinv, 
-                                              mp_srcptr Q, slong n, nmod_t mod);
+                                              mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
 
 FLINT_DLL void nmod_poly_inv_series_newton(nmod_poly_t Qinv, 
                                                   const nmod_poly_t Q, slong n);
 
 NMOD_POLY_INLINE
-void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
+void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    _nmod_poly_inv_series_newton(Qinv, Q, n, mod);
+    _nmod_poly_inv_series_newton(Qinv, Q, Qlen, n, mod);
 }
 
 NMOD_POLY_INLINE
@@ -728,8 +728,14 @@ void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
     nmod_poly_inv_series_newton(Qinv, Q, n);
 }
 
-FLINT_DLL void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
-                                                          slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_div_series_basecase(mp_ptr Q, mp_srcptr A, slong Alen,
+        mp_srcptr B, slong Blen, slong n, nmod_t mod);
+
+FLINT_DLL void nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A, 
+                                                 const nmod_poly_t B, slong n);
+
+FLINT_DLL void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
+        mp_srcptr B, slong Blen, slong n, nmod_t mod);
 
 FLINT_DLL void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
                                                  const nmod_poly_t B, slong n);
@@ -1174,7 +1180,7 @@ FLINT_DLL void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
 FLINT_DLL void nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
                 ulong power, slong n);
 
-FLINT_DLL void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n);
 
 FLINT_DLL void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,

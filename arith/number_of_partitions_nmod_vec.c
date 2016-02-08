@@ -55,7 +55,7 @@ arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod)
     if (n + k < len) tmp[n + k] = r;
     if (n + 3*k + 1 < len) tmp[n + 3*k + 1] = WORD(1);
 
-    _nmod_poly_inv_series(res, tmp, len, mod);
+    _nmod_poly_inv_series(res, tmp, len, len, mod);
 
     _nmod_vec_clear(tmp);
 }

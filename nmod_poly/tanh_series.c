@@ -42,7 +42,7 @@ _nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
     _nmod_vec_set(t, u, n);
     t[0] = UWORD(0);
     u[0] = UWORD(2);
-    _nmod_poly_div_series(f, t, u, n, mod);
+    _nmod_poly_div_series(f, t, n, u, n, n, mod);
 
     _nmod_vec_clear(t);
     _nmod_vec_clear(u);
