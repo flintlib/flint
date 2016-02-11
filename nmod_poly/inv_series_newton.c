@@ -48,7 +48,7 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod
     if (Qlen < 16 || mod.n <= 3)
         cutoff = 16;
     else
-        cutoff = 60 * FLINT_BIT_COUNT(mod.n);
+        cutoff = 25 * FLINT_BIT_COUNT(mod.n);
 
     if (Qlen < cutoff)
     {

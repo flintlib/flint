@@ -37,7 +37,7 @@ _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
 {
     Blen = FLINT_MIN(Blen, n);
 
-    if (Blen < 32 || Blen < 120 * FLINT_BIT_COUNT(mod.n))
+    if (Blen < 32 || Blen < 65 * FLINT_BIT_COUNT(mod.n))
     {
         _nmod_poly_div_series_basecase(Q, A, Alen, B, Blen, n, mod);
     }
