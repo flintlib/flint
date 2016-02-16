@@ -32,25 +32,33 @@ void
 _fmpq_poly_power_sums(fmpz * res, fmpz_t rden, const fmpz * poly, slong len,
                       slong n)
 {
-    slong i, k;
-
-    if (len == 2)
+    if (fmpz_is_one(poly + len - 1))
     {
+        /* monic polynomial */
+        _fmpz_poly_power_sums_naive(res, poly, len, n);
+        fmpz_one(rden);
+    }
+    else if (len == 2)
+    {
+        /* degree 1 */
         fmpz_t a;
         slong i;
+
         fmpz_init(a);
         fmpz_set(a, poly + 1);
         fmpz_set(rden, poly);
+
         if (fmpz_sgn(a) < 0)
             fmpz_neg(a, a);
         else
             fmpz_neg(rden, rden);
 
-        fmpq_poly_fit_length(res, n);
         fmpz_one(res);
+
         for (i = 1; i < n; i++)
             fmpz_mul(res + i, res + i - 1, rden);
         fmpz_one(rden);
+
         for (i = n - 2; i >= 0; i--)
         {
             fmpz_mul(rden, rden, a);
@@ -61,7 +69,11 @@ _fmpq_poly_power_sums(fmpz * res, fmpz_t rden, const fmpz * poly, slong len,
     }
     else
     {
+        /* general case */
+        slong i, k;
+
         fmpz_one(rden);
+
         for (k = 1; k < FLINT_MIN(n, len); k++)
         {
             fmpz_mul_ui(res + k, poly + len - 1 - k, k);
@@ -74,6 +86,7 @@ _fmpq_poly_power_sums(fmpz * res, fmpz_t rden, const fmpz * poly, slong len,
             fmpz_neg(res + k, res + k);
             fmpz_mul(rden, rden, poly + len - 1);
         }
+
         for (k = len; k < n; k++)
         {
             fmpz_zero(res + k);
@@ -83,9 +96,11 @@ _fmpq_poly_power_sums(fmpz * res, fmpz_t rden, const fmpz * poly, slong len,
                 fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
             fmpz_neg(res + k, res + k);
         }
+
         for (i = n - len + 1; i < n - 1; i++)
             fmpz_mul(res + i, res + i, poly + len - 1);
         fmpz_one(rden);
+
         for (i = n - len; i > 0; i--)
         {
             fmpz_mul(rden, rden, poly + len - 1);
@@ -117,27 +132,6 @@ fmpq_poly_power_sums(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
         fmpz_one(res->den);
         _fmpq_poly_set_length(res, 1);
         return;
-    }
-    else if (fmpz_is_one(poly->coeffs + poly->length - 1))
-    {
-        /* monic integer polynomial */
-        if (poly == res)
-        {
-            fmpq_poly_t t;
-            fmpq_poly_init(t);
-            fmpq_poly_fit_length(t, n);
-            _fmpz_poly_power_sums_naive(t->coeffs, poly->coeffs, poly->length,
-                                        n);
-            fmpq_poly_swap(res, t);
-            fmpq_poly_clear(t);
-        }
-        else
-        {
-            fmpq_poly_fit_length(res, n);
-            _fmpz_poly_power_sums_naive(res->coeffs, poly->coeffs,
-                                        poly->length, n);
-        }
-        fmpz_one(res->den);
     }
     else if (poly == res)
     {

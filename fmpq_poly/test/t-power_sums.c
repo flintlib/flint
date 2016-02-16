@@ -157,27 +157,25 @@ main(void)
 
 
     /* Check that the product of polynomials correspond to the sum of Power sums series */
+    /* (and aliasing of fmpq_poly_power_sums)                                           */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
         fmpq_poly_init(d);
-        fmpq_poly_init(e);
-        fmpq_poly_init(f);
 
         fmpq_poly_randtest_not_zero(a, state, 1 + n_randint(state, 10), 30);
         fmpq_poly_randtest_not_zero(b, state, 1 + n_randint(state, 10), 30);
 
-        fmpq_poly_power_sums(c, a, 20);
-        fmpq_poly_power_sums(d, b, 20);
-        fmpq_poly_add(f, c, d);
+        fmpq_poly_mul(c, a, b);
+        fmpq_poly_power_sums(c, c, 20);
 
-        fmpq_poly_mul(e, a, b);
+        fmpq_poly_power_sums(a, a, 20);
+        fmpq_poly_power_sums(b, b, 20);
+        fmpq_poly_add(d, a, b);
 
-        fmpq_poly_power_sums(e, e, 20);
-
-        result = fmpq_poly_equal(e, f);
+        result = fmpq_poly_equal(c, d);
         if (!result)
         {
             flint_printf
@@ -186,17 +184,12 @@ main(void)
             fmpq_poly_print(b), flint_printf("\n");
             fmpq_poly_print(c), flint_printf("\n");
             fmpq_poly_print(d), flint_printf("\n");
-            fmpq_poly_print(e), flint_printf("\n");
-            fmpq_poly_print(f), flint_printf("\n");
             abort();
         }
 
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
         fmpq_poly_clear(c);
-        fmpq_poly_clear(d);
-        fmpq_poly_clear(e);
-        fmpq_poly_clear(f);
     }
 
     FLINT_TEST_CLEANUP(state);
