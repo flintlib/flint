@@ -63,7 +63,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
         _nmod_poly_compose_series(T, Q, k, Qinv, k, k, mod);
         _nmod_poly_derivative(U, T, k, mod); U[k - 1] = UWORD(0);
         T[1] = UWORD(0);
-        _nmod_poly_div_series(V, T, U, k, mod);
+        _nmod_poly_div_series(V, T, k, U, k, k, mod);
         _nmod_poly_derivative(T, Qinv, k, mod);
         _nmod_poly_mullow(U, V, k, T, k, k, mod);
         _nmod_vec_sub(Qinv, Qinv, U, k, mod);

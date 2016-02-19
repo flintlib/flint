@@ -29,6 +29,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
+/* todo: handle short h */
 void
 _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 {
@@ -41,7 +42,7 @@ _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     _nmod_poly_mullow(u, h, n, h, n, n, mod);
     _nmod_vec_neg(u, u, n, mod); u[0] = UWORD(1);
     _nmod_poly_derivative(t, h, n, mod); t[n-1] = UWORD(0);
-    _nmod_poly_div_series(g, t, u, n, mod);
+    _nmod_poly_div_series(g, t, n, u, n, n, mod);
     _nmod_poly_integral(g, g, n, mod);
 
     _nmod_vec_clear(t);

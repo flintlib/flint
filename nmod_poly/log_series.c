@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2016 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,28 +30,29 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong n, nmod_t mod)
+_nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod)
 {
-    mp_ptr f_diff;
-    mp_ptr f_inv;
+    flen = FLINT_MIN(flen, n);
 
-    f_diff = _nmod_vec_init(n);
-    f_inv = _nmod_vec_init(n);
-
-    _nmod_poly_derivative(f_diff, f, n, mod); f_diff[n-1] = UWORD(0);
-    _nmod_poly_inv_series(f_inv, f, n, mod);
-    _nmod_poly_mullow(res, f_diff, n - 1, f_inv, n - 1, n - 1, mod);
-    _nmod_poly_integral(res, res, n, mod);
-
-    _nmod_vec_clear(f_diff);
-    _nmod_vec_clear(f_inv);
+    if (flen == 1)
+    {
+        res[0] = 1;
+        _nmod_vec_zero(res + 1, n - 1);
+    }
+    else
+    {
+        mp_ptr tmp = _nmod_vec_init(2 * n);
+        _nmod_poly_derivative(tmp, f, flen, mod);
+        _nmod_poly_div_series(tmp + n, tmp, flen - 1, f,
+            FLINT_MIN(flen, n - 1), n - 1, mod);
+        _nmod_poly_integral(res, tmp + n, n, mod);
+        _nmod_vec_clear(tmp);
+    }
 }
 
 void
 nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
 {
-    mp_ptr f_coeffs;
-    slong k;
     slong flen = f->length;
 
     if (flen < 1 || f->coeffs[0] != UWORD(1))
@@ -67,32 +68,8 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
     }
 
     nmod_poly_fit_length(res, n);
-
-    /* Efficiently handle monomials */
-    for (k = 1; f->coeffs[k] == UWORD(0) && k < n - 1; k++);
-    if (k == flen - 1 || k == n - 1)
-    {
-        flen = FLINT_MIN(flen, n);
-        _nmod_poly_log_series_monomial_ui(res->coeffs,
-            f->coeffs[flen-1], flen - 1, n, res->mod);
-    }
-    else
-    {
-        if (flen < n)
-        {
-            f_coeffs = _nmod_vec_init(n);
-            flint_mpn_copyi(f_coeffs, f->coeffs, flen);
-            flint_mpn_zero(f_coeffs + flen, n - flen);
-        }
-        else
-            f_coeffs = f->coeffs;
-
-        _nmod_poly_log_series(res->coeffs, f_coeffs, n, res->mod);
-
-        if (flen < n)
-            _nmod_vec_clear(f_coeffs);
-    }
-
+    _nmod_poly_log_series(res->coeffs, f->coeffs, f->length, n, res->mod);
     res->length = n;
 	_nmod_poly_normalise(res);
 }
+
