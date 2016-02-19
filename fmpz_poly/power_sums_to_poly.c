@@ -74,7 +74,7 @@ fmpz_poly_power_sums_to_poly(fmpz_poly_t res, const fmpz_poly_t Q)
             fmpz_poly_init(t);
             fmpz_poly_fit_length(t, d + 1);
             _fmpz_poly_power_sums_to_poly(t->coeffs, Q->coeffs, Q->length);
-            fmpz_poly_swap(Q, t);
+            fmpz_poly_swap(res, t);
             fmpz_poly_clear(t);
         }
         else

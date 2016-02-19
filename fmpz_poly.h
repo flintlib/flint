@@ -1237,9 +1237,9 @@ FLINT_DLL void _fmpz_poly_chebyshev_u(fmpz * coeffs, ulong n);
 
 FLINT_DLL void fmpz_poly_chebyshev_u(fmpz_poly_t poly, ulong n);
 
-FLINT_DLL void fmpz_poly_fibonacci_polynomial(fmpz_poly_t poly, ulong n);
+FLINT_DLL void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n);
 
-FLINT_DLL void _fmpz_poly_fibonacci_polynomial(fmpz * coeffs, ulong n);
+FLINT_DLL void fmpz_poly_fibonacci(fmpz_poly_t poly, ulong n);
 
 FLINT_DLL void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
 

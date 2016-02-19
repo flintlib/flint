@@ -1,32 +1,37 @@
 /*=============================================================================
 
-  This file is part of FLINT.
+   This file is part of FLINT.
 
-  FLINT is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+   FLINT is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-  FLINT is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+   FLINT is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with FLINT; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+   You should have received a copy of the GNU General Public License
+   along with FLINT; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-  =============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
   Copyright (C) 2016 Shivin Srivastava
 
- ******************************************************************************/
+******************************************************************************/
 
 #include "fmpz_poly.h"
 
 void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
 {
+    fmpz * r;
+    int even;
+    slong k;
+    ulong L;
+
     if (n == 0) return;
 
     if (n == 1)
@@ -34,11 +39,6 @@ void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
         fmpz_one(coeffs);
         return;
     }
-
-    fmpz * r;
-    int even;
-    slong k;
-    ulong L;
 
     L = n / 2;
     even = 1 - (n % 2);
@@ -75,7 +75,6 @@ void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
         fmpz_zero(coeffs + k);
     }
 }
-
 
 void fmpz_poly_fibonacci(fmpz_poly_t poly, ulong n)
 {
