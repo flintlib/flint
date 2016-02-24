@@ -104,6 +104,10 @@ typedef void (*flint_cleanup_function_t)(void);
 FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 FLINT_DLL void flint_cleanup(void);
 
+FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
+     void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
+                                                              void (*free_func) (void *));
+
 #if defined(_WIN64) || defined(__mips64)
 #if defined(__MINGW64__)
 #define WORD_FMT "%I64"
