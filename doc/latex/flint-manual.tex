@@ -1012,6 +1012,13 @@ by \code{flint_cleanup()} by passing a pointer
 to a function with signature \code{void cleanup_function(void)}
 to \code{flint_register_cleanup_function()}.
 
+Flint also makes use of \code{malloc}, \code{realloc}, \code{calloc} and
+\code{free} by default to allocate memory internally. The user is able to
+override this behaviour by calling \code{__flint_set_memory_functions}
+passing the \code{malloc}, \code{realloc}, \code{calloc} and
+\code{free} function pointers as parameters (see \code{flint.h} for the
+exact prototype).
+
 \chapter{Temporary allocation}
 
 FLINT allows for temporary allocation of memory using \code{alloca}
