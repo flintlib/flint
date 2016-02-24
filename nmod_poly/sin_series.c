@@ -41,7 +41,7 @@ _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     _nmod_vec_scalar_mul_nmod(u, h, n, n_invmod(2, mod.n), mod);
     _nmod_poly_tan_series(t, u, n, mod);
     _nmod_poly_mullow(u, t, n, t, n, n, mod); u[0] = UWORD(1);
-    _nmod_poly_div_series(g, t, u, n, mod);
+    _nmod_poly_div_series(g, t, n, u, n, n, mod);
     _nmod_vec_add(g, g, g, n, mod);
 
     _nmod_vec_clear(t);

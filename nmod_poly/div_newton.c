@@ -52,7 +52,8 @@ void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong lenA,
         flint_mpn_zero(Brev + lenB, lenQ - lenB);
     }
 
-    _nmod_poly_div_series(Q, Arev, Brev, lenQ, mod);
+    /* todo: don't zero pad! */
+    _nmod_poly_div_series(Q, Arev, lenQ, Brev, lenQ, lenQ, mod);
 
     _nmod_poly_reverse(Q, Q, lenQ, lenQ);
 

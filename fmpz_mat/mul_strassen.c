@@ -144,17 +144,16 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     if (b > 2*anc) 
     {
-        fmpz_mat_t Ac, Br, Cb;
+        fmpz_mat_t Ac, Br, Cb, tmp;
+        slong mt, nt;
+
         fmpz_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
         fmpz_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
         fmpz_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
         
-        slong mt, kt, nt;
-
         mt = Ac->r;
-        kt = Ac->c;
         nt = Br->c;
-        fmpz_mat_t tmp;
+        
         fmpz_mat_init(tmp, mt, nt);
         fmpz_mat_mul(tmp, Ac, Br);
         fmpz_mat_add(Cb, Cb, tmp); 

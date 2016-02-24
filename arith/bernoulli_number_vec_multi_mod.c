@@ -44,7 +44,7 @@ __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
         c = n_mulmod2_preinv(c, (2*k+1)*(2*k+2), mod.n, mod.ninv);
     }
 
-    _nmod_poly_inv_series(res, tmp, m, mod);
+    _nmod_poly_inv_series(res, tmp, m, m, mod);
     res[0] = UWORD(1);
 
     /* N_(2k) = -1 * D_(2k) * (2k)! / (2k-1) */

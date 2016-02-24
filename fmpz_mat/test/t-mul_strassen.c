@@ -40,23 +40,23 @@ main(void)
     flint_printf("mul_strassen....");
     fflush(stdout);
 
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C, D;
 
         slong m, k, n;
 
-        m = n_randint(state, 400);
-        k = n_randint(state, 400);
-        n = n_randint(state, 400);
+        m = n_randint(state, 150);
+        k = n_randint(state, 150);
+        n = n_randint(state, 150);
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, k);
         fmpz_mat_init(C, m, k);
         fmpz_mat_init(D, m, k);
 
-        fmpz_mat_randtest(A, state, n_randint(state, 200)+1);
-        fmpz_mat_randtest(B, state, n_randint(state, 200)+1);
+        fmpz_mat_randtest(A, state, n_randint(state, 200) + 1);
+        fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
 
         fmpz_mat_mul_classical(C, A, B);
         fmpz_mat_mul_strassen(D, A, B);

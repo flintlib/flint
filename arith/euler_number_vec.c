@@ -42,7 +42,7 @@ __euler_number_vec_mod_p(mp_ptr res, mp_ptr tmp, slong m, nmod_t mod)
         c = n_mulmod2_preinv(c, (2*k)*(2*k-1), mod.n, mod.ninv);
     }
 
-    _nmod_poly_inv_series(res, tmp, m, mod);
+    _nmod_poly_inv_series(res, tmp, m, m, mod);
 
     /* Multiply by factorials */
     c = UWORD(1);

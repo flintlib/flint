@@ -174,7 +174,7 @@ main(void)
 
         mod = n_randtest_not_zero(state);
 
-        do { m = n_randint(state, 20); } while (m == 0);
+        m = n_randint(state, 20);
         do { n = n_randint(state, 20); } while (n > m);
 
         perm = _perm_init(2*m);

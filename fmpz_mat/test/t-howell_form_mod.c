@@ -181,7 +181,7 @@ main(void)
 
         do { fmpz_randtest_unsigned(mod, state, 10); } while (fmpz_is_zero(mod));
 
-        do { m = n_randint(state, 20); } while (m == 0);
+        m = n_randint(state, 20);
         do { n = n_randint(state, 20); } while (n > m);
 
         perm = _perm_init(2*m);
