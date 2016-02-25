@@ -57,7 +57,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         fmpz_get_mpz(mpq_numref(q), poly);
         fmpz_get_mpz(mpq_denref(q), den);
         mpq_canonicalize(q);
-        str = mpq_get_str(NULL, 10, q);
+        str = flint_malloc(mpz_sizeinbase (mpq_numref(q), 10) +
+                           mpz_sizeinbase (mpq_denref(q), 10) + 3);
+        str = mpq_get_str(str, 10, q);
         mpq_clear(q);
         return str;
     }
