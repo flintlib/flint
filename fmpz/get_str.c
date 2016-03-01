@@ -35,11 +35,18 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
         mpz_t z;
 
         flint_mpz_init_set_si(z, *f);
+
+        if (!str) {
+          str = flint_malloc(mpz_sizeinbase (z, b) + 2);
+        }
         str = mpz_get_str(str, b, z);
         mpz_clear(z);
     }
     else
     {
+        if (!str) {
+          str = flint_malloc(mpz_sizeinbase (COEFF_TO_PTR(*f), b) + 2);
+        }
         str = mpz_get_str(str, b, COEFF_TO_PTR(*f));
     }
 
