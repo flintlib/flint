@@ -124,8 +124,11 @@ void * _flint_realloc(void * ptr, size_t size)
 void * flint_realloc(void * ptr, size_t size)
 {
     void * ptr2;
-
-    ptr2 = (*__flint_reallocate_func)(ptr, size);
+  
+    if (ptr)
+      ptr2 = (*__flint_reallocate_func)(ptr, size);
+    else
+      ptr2 = (*__flint_allocate_func)(size);
 
     if (ptr2 == NULL)
         flint_memory_error(size);
