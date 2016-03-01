@@ -37,7 +37,7 @@ main(void)
     fmpz_t il, jl, kl, dl;
     fmpq_t tot;
     fmpq_t tmp;
-    fmpq_poly_t a, b, c, d, e, f;
+    fmpq_poly_t a, b, c, d;
     fmpz_poly_t az, bz;
 
     FLINT_TEST_INIT(state);
