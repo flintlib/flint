@@ -42,7 +42,7 @@ int main(void)
         mp_limb_t p, root, b, d, result;
         double pinv;
         
-        p = n_randprime(state, 20, 1);
+        p = n_randprime(state, 26, 1);
         pinv = n_precompute_inverse(p);
         root = n_primitive_root_prime(p);
         b = n_randint(state, p - 1) + 1;

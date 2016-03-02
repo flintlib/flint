@@ -20,7 +20,8 @@
 /******************************************************************************
 
     Copyright (C) 2013 Mike Hansen
- 
+    Copyright (C) 2016 Pascal Molin
+
 ******************************************************************************/
 
 #include <stdio.h>
@@ -30,44 +31,85 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_discrete_log_bsgs(mp_limb_t b, mp_limb_t a, mp_limb_t n)
-{
-    int i, j;
+typedef struct apow {
+    ulong k;
+    ulong ak;
+} apow_t;
+
+typedef struct {
+    ulong n;
     double ninv;
-    mp_limb_t m, a_m, c;
-    mp_limb_t * table;
+    ulong m;
+    ulong am;
+    apow_t * table;
+} bsgs_struct;
 
-    ninv = n_precompute_inverse(n);
+typedef bsgs_struct bsgs_t[1];
 
-    m = ceil(sqrt((double) n));
+static int
+apow_cmp(const apow_t * x, const apow_t * y)
+{
+    return (x->ak < y->ak) ? -1 : (x->ak > y->ak);
+}
 
-    table = (mp_limb_t*)flint_malloc(m * sizeof(mp_limb_t));
+/* set size of table m=sqrt(nk) to compute k logs in a group of size n */
+void
+bsgs_table_init(bsgs_t t, ulong a, ulong n, ulong m)
+{
+    ulong k, ak;
+    t->table = (apow_t *)flint_malloc(m * sizeof(apow_t));
 
-    table[0] = 1;
-    for (j = 1; j < m; j++)
+    t->n = n;
+    t->ninv = n_precompute_inverse(n);
+    t->m = m;
+
+    for (k = 0, ak = 1; k < m; k++)
     {
-        table[j] = n_mulmod_precomp(table[j-1], a, n, ninv);
+        t->table[k].k = k;
+        t->table[k].ak = ak;
+        ak = n_mulmod_precomp(ak, a, n, t->ninv);
     }
 
-    a_m = n_invmod(a, n);
-    a_m = n_powmod_precomp(a_m, m, n, ninv);
+    t->am = n_invmod(ak, n);
+    qsort(t->table, m, sizeof(apow_t), (int(*)(const void*,const void*))apow_cmp);
+}
 
-    c = b;
+void
+bsgs_table_clear(bsgs_t t)
+{
+    flint_free(t->table);
+}
 
-    for (i = 0; i < m; i++)
+ulong
+n_discrete_log_bsgs_table(const bsgs_t t, ulong b)
+{
+    ulong i;
+    apow_t c, * x;
+
+    c.k = 0;
+    c.ak = b;
+    for (i = 0; i < t->m; i++)
     {
-        for (j = 0; j < m; j++)
-        {
-            if (c == table[j])
-            {
-                flint_free(table);
-                return i * m + j;
-            }
-        }
-        c = n_mulmod_precomp(c, a_m, n, ninv);
+        x = bsearch(&c, t->table, t->m, sizeof(apow_t),
+            (int(*)(const void*,const void*))apow_cmp);
+        if (x != NULL)
+            return i * t->m + x->k;
+        c.ak = n_mulmod_precomp(c.ak, t->am, t->n, t->ninv);
     }
-
-    flint_free(table);
     flint_printf("Exception (n_discrete_log_bsgs).  discrete log not found.\n");
     abort();
+}
+
+ulong
+n_discrete_log_bsgs(ulong b, ulong a, ulong n)
+{
+    ulong m;
+    bsgs_t table;
+
+    m = ceil(sqrt((double) n));
+    bsgs_table_init(table, a, n, m);
+    m = n_discrete_log_bsgs_table(table, b);
+    bsgs_table_clear(table);
+
+    return m;
 }
