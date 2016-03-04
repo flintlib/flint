@@ -219,3 +219,15 @@ void fmpq_poly_fmpq_sub(fmpq_poly_t res, fmpq_t c, const fmpq_poly_t poly)
       fmpq_clear(t);
    }
 }
+
+void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n)
+{
+    if (n >= poly->length)  /* Coefficient is beyond the end of poly */
+    {
+        fmpz_zero(x);
+        return;
+    }
+    
+    fmpz_set(x, poly->coeffs + n);
+}
+

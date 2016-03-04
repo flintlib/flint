@@ -212,6 +212,8 @@ FLINT_DLL void fmpq_poly_reverse(fmpq_poly_t res, const fmpq_poly_t poly, slong 
 
 /*  Getting and setting coefficients  ****************************************/
 
+FLINT_DLL void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n);
+
 FLINT_DLL void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n);
 
 FLINT_DLL void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n);
