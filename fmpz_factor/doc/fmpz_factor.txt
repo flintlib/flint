@@ -80,6 +80,15 @@ int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n,
     The function returns 1 if $n$ is completely factored, otherwise it returns
     $0$.
 
+void fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f)
+
+    Attempts to improve a partial factorization of an integer by "refining"
+    the factorization \code{f} to a more complete factorization \code{res}
+    whose bases are pairwise relatively prime.
+
+    This function does not require its input to be in canonical form,
+    nor does it guarantee that the resulting factorization will be canonical.
+
 void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
 
     Evaluates an integer in factored form back to an \code{fmpz_t}.
