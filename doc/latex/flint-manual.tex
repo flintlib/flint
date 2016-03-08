@@ -2160,6 +2160,31 @@ output variable.
 \input{input/qadic.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APRCL primality test                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{aprcl: Primality test for \code{fmpz}}
+\epigraph{APR-CL primality test}{}
+
+\section{Introduction}
+
+This module provides the APR-CL primality test implementation for \code{fmpz_t}
+numbers.
+
+The APR-CL test uses the Jacobi sums that belong $\mathbb{Z}[\zeta]/(n)$, 
+so we have \code{unity_zp} struct and some useful operations. \code{unity_zp} 
+is just a wrapper over \code{fmpz_mod_poly} with aditional fields.
+
+Also provides Gauss sum test, which is not very useful in practice, but can be
+useful for people who want to see an implementation of these. Gauss sums 
+belong $\mathbb{Z}[\zeta_q, \zeta_p]/(n)$ and implemented in \code{unity_zpq} 
+struct.
+
+We now describe the functions available in the \code{aprcl} module.
+
+\input{input/aprcl.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Arithmetic functions                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
