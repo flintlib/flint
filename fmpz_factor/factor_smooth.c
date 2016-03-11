@@ -65,7 +65,7 @@ fmpz_factor_smooth(fmpz_t fac, flint_rand_t state, const fmpz_t n)
 
     for (i = 0; i < 3; i++)
     {
-        ret = fmpz_factor_pollard_brent(fac, state, n, 2, max_iters)
+        ret = fmpz_factor_pollard_brent(fac, state, n, 2, max_iters);
 
         if (ret > 0)
             return;
