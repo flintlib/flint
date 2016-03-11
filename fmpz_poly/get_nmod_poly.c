@@ -31,24 +31,6 @@
 #include "nmod_poly.h"
 
 void
-_fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz * coeffs, slong len)
-{
-    if (len == 0)
-    {
-        nmod_poly_zero(res);
-    }
-    else
-    {
-        slong i;
-        nmod_poly_fit_length(res, len);
-        for (i = 0; i < len; i++)
-            res->coeffs[i] = fmpz_fdiv_ui(coeffs + i, res->mod.n);
-        _nmod_poly_set_length(res, len);
-        _nmod_poly_normalise(res);
-    }
-}
-
-void
 fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly)
 {
     slong len = poly->length;
@@ -59,6 +41,11 @@ fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly)
     }
     else
     {
-        _fmpz_poly_get_nmod_poly(res, poly->coeffs, len);
+        slong i;
+        nmod_poly_fit_length(res, len);
+        for (i = 0; i < len; i++)
+            res->coeffs[i] = fmpz_fdiv_ui(poly->coeffs + i, res->mod.n);
+        _nmod_poly_set_length(res, len);
+        _nmod_poly_normalise(res);
     }
 }
