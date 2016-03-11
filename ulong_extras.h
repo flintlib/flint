@@ -422,7 +422,7 @@ FLINT_DLL int n_factor_pollard_brent(ulong *factor, flint_rand_t state,
                                      ulong n_in, ulong max_tries, 
                                      ulong max_iters);
 
-FLINT_DLL int n_is_squarefree(unlong n);
+FLINT_DLL int n_is_squarefree(ulong n);
 
 FLINT_DLL int n_moebius_mu(ulong n);
 
