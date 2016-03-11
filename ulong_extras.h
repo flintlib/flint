@@ -81,6 +81,8 @@ typedef struct {
 #define UWORD_MAX_PRIME UWORD(4294967291)
 #endif
 
+#define UWORD_HALF (UWORD_MAX / 2 + 1)
+
 typedef struct
 {
     slong small_i;
@@ -492,6 +494,29 @@ FLINT_DLL int n_factor_ecm_stage_II(ulong *f, ulong B1, ulong B2,
 
 FLINT_DLL int n_factor_ecm(ulong *f, ulong curves, ulong B1,
                            ulong B2, flint_rand_t state, ulong n);
+
+FLINT_DLL mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
+
+static __inline__
+mp_limb_t
+n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+{
+   mp_limb_t q, r, p_hi, p_lo;
+
+   umul_ppmm(p_hi, p_lo, w_precomp, t);
+   q = p_hi;
+
+   
+   r = w * t;
+   r -= q * p;
+
+   if (r >= p)
+   {
+      r -= p;
+   }
+
+    return r;
+}
 
 #ifdef __cplusplus
 }

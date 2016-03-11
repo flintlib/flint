@@ -19,19 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 William Hart
+    Copyright (C) 2015 Vladimir Glazachev
 
 ******************************************************************************/
 
 #include <gmp.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
 
-void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, slong len, nmod_t mod)
+/* Computes the W' = [w * b / p] (b = mp_limb_t power) */
+mp_limb_t
+n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
 {
-    slong i;
-    for (i = 0 ; i < len; i++)
-        NMOD_RED(res[i], vec[i], mod);
+   mp_limb_t q, r;
+   udiv_qrnnd(q, r, w, UWORD(0), p);
+   return q;
 }
+

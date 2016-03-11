@@ -556,6 +556,20 @@ slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
     \code{m} then 0 is returned by the function and the location \code{sqrt} 
     points to is set to NULL. 
 
+mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, 
+                                                               mp_limb_t p)
+
+    Returns $w t \bmod{p}$ given a precomputed scaled approximation of $w / p$ 
+    computed by \code{n_mulmod_precomp_shoup()}. The value of $p$ should be 
+    less than $2^{\code{FLINT_BITS} - 1}$. $w$ and $t$ should be less than $p$. 
+    Works faster than \code{n_mulmod2_preinv()} if $w$ fixed and $t$ from array
+    (for example, scalar multiplication of vector).
+
+mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
+
+    Returns $w'$, scaled approximation of $w / p$. $w'$  is equal to the integer 
+    part of $w * 2^{\code{FLINT_BITS}} / p$.
+
 *******************************************************************************
 
     Prime number generation and counting

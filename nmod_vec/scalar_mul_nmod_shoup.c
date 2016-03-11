@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2015 William Hart
+    Copyright (C) 2015 Vladimir Glazachev
 
 ******************************************************************************/
 
@@ -29,9 +30,12 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, slong len, nmod_t mod)
+void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
+                               slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;
-    for (i = 0 ; i < len; i++)
-        NMOD_RED(res[i], vec[i], mod);
+    mp_limb_t w_pr;
+    w_pr = n_mulmod_precomp_shoup(c, mod.n);
+    for (i = 0; i < len; i++)
+        res[i] = n_mulmod_shoup(c, vec[i], w_pr, mod.n);
 }

@@ -30,20 +30,26 @@
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-				                  slong len, mp_limb_t c, nmod_t mod)
+                               slong len, mp_limb_t c, nmod_t mod)
 {
-   if (mod.norm >= FLINT_BITS/2) /* products will fit in a limb */
-   {
-      mpn_mul_1(res, vec, len, c);
-	  _nmod_vec_reduce(res, res, len, mod);
-   } else /* products may take two limbs */
-   {
-	  slong i;
-	  for (i = 0; i < len; i++)
-	  {
-         mp_limb_t hi, lo;
-	     umul_ppmm(hi, lo, vec[i], c);
-		 NMOD_RED2(res[i], hi, lo, mod); /* hi already reduced mod n */
-	  }
-   }
+    if (len > 10 && mod.n < UWORD_HALF)
+    {
+        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+        return;
+    }
+
+    if (mod.norm >= FLINT_BITS / 2) /* products will fit in a limb */
+    {
+        mpn_mul_1(res, vec, len, c);
+        _nmod_vec_reduce(res, res, len, mod);
+    } else /* products may take two limbs */
+    {
+        slong i;
+        for (i = 0; i < len; i++)
+        {
+            mp_limb_t hi, lo;
+            umul_ppmm(hi, lo, vec[i], c);
+            NMOD_RED2(res[i], hi, lo, mod); /* hi already reduced mod n */
+        }
+    }
 }
