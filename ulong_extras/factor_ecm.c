@@ -56,7 +56,7 @@ int
 n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
              flint_rand_t state, mp_limb_t n)
 {
-    mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig, nm8;
+    mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
     int i, j, ret;
     n_ecm_t n_ecm_inf;
 
@@ -66,7 +66,6 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     n <<= n_ecm_inf->normbits;
     n_ecm_inf->ninv = n_preinvert_limb(n);
     n_ecm_inf->one = UWORD(1) << n_ecm_inf->normbits;
-    nm8 = n_submod(n, UWORD(8) << n_ecm_inf->normbits, n);
 
     ret = 0;
 
