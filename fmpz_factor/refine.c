@@ -444,6 +444,7 @@ fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f)
     slong i, len;
     fmpz * b;
     ulong e;
+    fr_node_ptr * qsort_arr;
 
     /* check the sign of f without requiring canonical form */
     s = _fmpz_factor_sgn(f);
@@ -469,7 +470,6 @@ fmpz_factor_refine(fmpz_factor_t res, const fmpz_factor_t f)
     len = fr_node_list_length(L);
 
     /* make a sorted array of pointers to the refined factor nodes */
-    fr_node_ptr * qsort_arr;
     qsort_arr = flint_malloc(sizeof(fr_node_ptr) * len);
     for (i = 0, curr = L; i < len; i++, curr = curr->next)
     {

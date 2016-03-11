@@ -128,7 +128,7 @@ int main(void)
     flint_printf("refine....");
     fflush(stdout);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         int i;
         fmpz_factor_t f, g;
