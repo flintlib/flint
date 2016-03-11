@@ -19,31 +19,41 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
 #include "flint.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "mpn_extras.h"
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+void
+fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)
 {
-    mp_limb_t base;
-    
-    if (!n)
-    {
-        *remainder = 0;
-        return 0;
-    }
+    ecm_inf->t = flint_malloc(sz * sizeof(mp_limb_t));
+    ecm_inf->u = flint_malloc(sz * sizeof(mp_limb_t));
+    ecm_inf->v = flint_malloc(sz * sizeof(mp_limb_t));
+    ecm_inf->w = flint_malloc(sz * sizeof(mp_limb_t));
 
-    base = n_cbrt(n);
-    *remainder = n - base * base * base;
-    return base;
+    ecm_inf->x = flint_malloc(sz * sizeof(mp_limb_t));
+    ecm_inf->z = flint_malloc(sz * sizeof(mp_limb_t));
+
+    ecm_inf->a24 = flint_malloc(sz * sizeof(mp_limb_t));
+    ecm_inf->ninv = flint_malloc(sz * sizeof(mp_limb_t));
+    ecm_inf->one = flint_malloc(sz * sizeof(mp_limb_t));
+
+    mpn_zero(ecm_inf->t, sz);
+    mpn_zero(ecm_inf->u, sz);
+    mpn_zero(ecm_inf->v, sz);
+    mpn_zero(ecm_inf->w, sz);
+
+    mpn_zero(ecm_inf->x, sz);
+    mpn_zero(ecm_inf->z, sz);
+
+    mpn_zero(ecm_inf->a24, sz);
+    mpn_zero(ecm_inf->ninv, sz);
+    mpn_zero(ecm_inf->one, sz);
+
+    ecm_inf->n_size = sz;
 }

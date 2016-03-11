@@ -83,8 +83,13 @@ fmpz_factor
 -----------
 
 * Add primality testing, perfect power testing, fast factorisation
-  (Brent-Pollard, QS, ...)
+  (QS, ...)
 
+* Tune Brent-Pollard Rho for optimal values
+
+* Find optimal values for B1, B2 for ECM.
+
+* Use multipoint polynomial evaluation in ECM stage II.
 
 fmpz_mpoly / nmod_mpoly
 -----------------------
