@@ -237,4 +237,3 @@ void flint_mpn_urandomb(mp_limb_t *rp,
 
     Generates a uniform random number \code{n} bits and stores 
     it on \code{rp}.
-

@@ -545,6 +545,32 @@ void fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res,
 
 *******************************************************************************
 
+    Products
+
+*******************************************************************************
+
+void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n
+                                           fmpz_t f)
+
+    Sets \code{(poly, n + 1)} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}. The coefficients reduced modulo \code{f}.
+
+    Aliasing of the input and output is not allowed. It is required that 
+    \code{poly} is reduced modulo \code{f}.
+
+
+void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs,
+                                          slong n, fmpz_t f)
+
+    Sets \code{poly} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}. The coefficients reduced modulo \code{f}.
+
+    It is required that \code{poly} is reduced modulo \code{f}.
+
+*******************************************************************************
+
     Powering
 
 *******************************************************************************

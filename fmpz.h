@@ -289,6 +289,8 @@ FLINT_DLL void fmpz_set_mpf(fmpz_t f, const mpf_t x);
 
 FLINT_DLL void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
 
+FLINT_DLL int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in);
+
 FLINT_DLL int fmpz_set_str(fmpz_t f, const char * str, int b);
 
 FLINT_DLL void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);

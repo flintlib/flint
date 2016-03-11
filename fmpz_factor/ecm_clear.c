@@ -19,31 +19,27 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
 #include "flint.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "mpn_extras.h"
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+void
+fmpz_factor_ecm_clear(ecm_t ecm_inf)
 {
-    mp_limb_t base;
-    
-    if (!n)
-    {
-        *remainder = 0;
-        return 0;
-    }
+    flint_free(ecm_inf->t);
+    flint_free(ecm_inf->u);
+    flint_free(ecm_inf->v);
+    flint_free(ecm_inf->w);
 
-    base = n_cbrt(n);
-    *remainder = n - base * base * base;
-    return base;
+    flint_free(ecm_inf->x);
+    flint_free(ecm_inf->z);
+
+    flint_free(ecm_inf->a24);
+    flint_free(ecm_inf->ninv);
+    flint_free(ecm_inf->one);
 }

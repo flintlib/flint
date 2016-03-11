@@ -19,31 +19,34 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
 #include "flint.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
+#include "fmpz.h"
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+int
+fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
 {
-    mp_limb_t base;
-    
-    if (!n)
-    {
-        *remainder = 0;
-        return 0;
-    }
+    mp_limb_t n_size;
+    mp_ptr temp;
 
-    base = n_cbrt(n);
-    *remainder = n - base * base * base;
-    return base;
+    n_size = fmpz_size(n_in);
+    *n = flint_malloc(n_size * sizeof(mp_limb_t));
+
+    if (n_size <= 1)
+    {
+        (*n)[0] = fmpz_get_ui(n_in);
+        return 1;
+    }
+    else
+    {
+        temp = COEFF_TO_PTR(*n_in)->_mp_d;
+        mpn_copyi(*n, temp, n_size);
+        return n_size;
+    }
 }

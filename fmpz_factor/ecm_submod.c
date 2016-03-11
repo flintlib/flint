@@ -19,31 +19,39 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Fredrik Johansson
     Copyright (C) 2015 Kushagra Singh
 
 ******************************************************************************/
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
-#include <math.h>
-#undef ulong
 #include "flint.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "mpn_extras.h"
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+/* x = (a - b) mod n 
+
+    Not a normal sub mod function, assumes n is normalized (higest bit set)
+    and a and b are reduced modulo n
+
+*/
+
+void
+fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
 {
-    mp_limb_t base;
-    
-    if (!n)
+    mp_ptr temp;
+
+    TMP_INIT;
+
+    TMP_START;
+    temp = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+
+    if (mpn_cmp(a, b, n_size) > 0)
+        mpn_sub_n(x, a, b, n_size);
+    else
     {
-        *remainder = 0;
-        return 0;
+        mpn_sub_n(temp, n, b, n_size);
+        mpn_add_n(x, temp, a, n_size);
     }
 
-    base = n_cbrt(n);
-    *remainder = n - base * base * base;
-    return base;
+    TMP_END;
 }

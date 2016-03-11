@@ -35,9 +35,9 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
+#include <pthread.h>
 
 #if FLINT_REENTRANT && !HAVE_TLS
-#include <pthread.h>
 
 static pthread_once_t primes_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t primes_lock;

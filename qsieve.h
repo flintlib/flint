@@ -73,9 +73,9 @@ typedef struct fac_t /* struct for factors of relations */
 
 typedef struct la_col_t /* matrix column */
 {
-	slong * data;		/* The list of occupied rows in this column */
-	slong weight;		/* Number of nonzero entries in this column */
-	slong orig;         /* Original relation number */
+  slong * data;   /* The list of occupied rows in this column */
+  slong weight;   /* Number of nonzero entries in this column */
+  slong orig;         /* Original relation number */
 } la_col_t;
 
 typedef struct qs_s

@@ -173,6 +173,12 @@ void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
     Sets the \code{mpz_t} $x$ to the same value as $f$.
 
+int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+
+    Sets the \code{mp_ptr} $n$ to the same value as $n_in$. Returned
+    integer is number of limbs allocated to $n$, minimum number of limbs
+    required to hold the value stored in $n_in$.
+
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
     Returns the representation of $f$ in base~$b$, which can vary 
