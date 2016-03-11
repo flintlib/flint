@@ -136,7 +136,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     /* compute GCD_table */
 
-    ecm_inf->GCD_table = flint_malloc((maxj + 1) * sizeof(uint8_t));
+    ecm_inf->GCD_table = flint_malloc(maxj + 1);
 
     for (j = 1; j <= maxj; j += 2)
     {

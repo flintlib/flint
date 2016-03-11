@@ -96,7 +96,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     /* compute GCD_table */
 
-    n_ecm_inf->GCD_table = flint_malloc((maxj + 1) * sizeof(uint8_t));
+    n_ecm_inf->GCD_table = flint_malloc(maxj + 1);
 
     for (j = 1; j <= maxj; j += 2)
     {
