@@ -120,7 +120,14 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     for (i = 0; i < numberpivots; i++)
     {
         g = n_gcd(A->mod.n, nmod_mat_entry(A, i, pivots[i]));
+        
+        if (g == 1)
+        {
+            continue;
+        }
+
         g = A->mod.n/g;
+
         _nmod_vec_scalar_mul_nmod(extra_row, A->rows[i], A->c, g, A->mod);
         
         for ( j = pivots[i] + 1; j < A->c; j++)
