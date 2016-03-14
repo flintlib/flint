@@ -42,6 +42,7 @@ main(void)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, H, H2, U;
+        fmpz_t det;
         slong m, n, b, d, r;
         int equal;
 
@@ -73,6 +74,21 @@ main(void)
             fmpz_mat_print_pretty(H); flint_printf("\n\n");
             abort();
         }
+
+        fmpz_init(det);
+
+        fmpz_mat_det(det, U);
+        if (!fmpz_is_pm1(det))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("transformation matrices should have determinant +-1, U does not!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(U); flint_printf("\n\n");
+            fmpz_mat_print_pretty(H); flint_printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(det);
 
         fmpz_mat_mul(H2, U, A);
         equal = fmpz_mat_equal(H, H2);

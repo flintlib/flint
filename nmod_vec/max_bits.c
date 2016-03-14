@@ -30,19 +30,19 @@
 
 mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 {
-   mp_bitcnt_t bits = 0;
-   mp_limb_t mask   = ~(mp_limb_t) 0;
-   slong i;
-   
-   for (i = 0; i < len; i++)
-   {
-      if (vec[i] & mask)
-      {
-         bits = FLINT_BIT_COUNT(vec[i]);
-         if (bits == FLINT_BITS) break;
-         else mask = ~(mp_limb_t) 0 - ((UWORD(1) << bits) - UWORD(1));
-      }
-   }
-   
-   return bits;
+    mp_bitcnt_t bits = 0;
+    mp_limb_t mask   = ~(mp_limb_t) 0;
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (vec[i] & mask)
+        {
+            bits = FLINT_BIT_COUNT(vec[i]);
+            if (bits == FLINT_BITS) break;
+            else mask = ~(mp_limb_t) 0 - ((UWORD(1) << bits) - UWORD(1));
+        }
+    }
+
+    return bits;
 }

@@ -556,6 +556,20 @@ slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
     \code{m} then 0 is returned by the function and the location \code{sqrt} 
     points to is set to NULL. 
 
+mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, 
+                                                               mp_limb_t p)
+
+    Returns $w t \bmod{p}$ given a precomputed scaled approximation of $w / p$ 
+    computed by \code{n_mulmod_precomp_shoup()}. The value of $p$ should be 
+    less than $2^{\code{FLINT_BITS} - 1}$. $w$ and $t$ should be less than $p$. 
+    Works faster than \code{n_mulmod2_preinv()} if $w$ fixed and $t$ from array
+    (for example, scalar multiplication of vector).
+
+mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
+
+    Returns $w'$, scaled approximation of $w / p$. $w'$  is equal to the integer 
+    part of $w * 2^{\code{FLINT_BITS}} / p$.
+
 *******************************************************************************
 
     Prime number generation and counting
@@ -1236,6 +1250,42 @@ ulong n_factor_pp1(ulong n, ulong B1, ulong c)
     If the algorithm succeeds, it returns the factor, otherwise it
     returns $0$ or $1$ (the trivial factors modulo $n$).
 
+int n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, 
+                              mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits,
+                              mp_limb_t max_iters)
+
+    Pollard Rho algorithm (with Brent modification) for integer factorization. 
+    Assumes that the $n$ is not prime. $factor$ is set as the factor if found. 
+    It is not assured that the factor found will be prime. Does not compute the complete 
+    factorization, just one factor. Returns 1 if factorization is successfull 
+    (non trivial factor is found), else returns 0. Assumes $n$ is normalized,
+    (shifted by normbits bits), and takes as input a precomputed inverse of $n$ as 
+    computed by \code{n_preinvert_limb()}. $ai$ and $xi$ should also be shifted
+    left by $normbits$.
+
+    $ai$ is the constant of the polynomial used, $xi$ is the initial value. 
+    $max_iters$ is the number of iterations tried in process of finding the 
+    cycle.
+
+    The algorithm used is a modification of the original Pollard Rho algorithm,
+    suggested by Richard Brent in the paper, availible at
+    http://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
+
+int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, 
+                        mp_limb_t max_tries, mp_limb_t max_iters)       
+
+    Pollard Rho algorithm, modified as suggested by Richar Brent. Makes a call to 
+    \code{n_factor_pollard_brent_single}. The input parameters ai and xi for
+    \code{n_factor_pollard_brent_single} are selected at random. 
+
+    If the algorithm fails to find a non trivial factor in one call, it tries again 
+    (this time with a different set of random values). This process is repeated a 
+    maximum of $max_tries$ times. 
+
+    Assumes $n$ is not prime. $factor$ is set as the factor found, if factorization
+    is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
+    discovered is not necessarily prime.
+
 *******************************************************************************
 
     Arithmetic functions
@@ -1323,3 +1373,119 @@ ulong n_discrete_log_bsgs(ulong b, ulong a, ulong n)
     multiplicative subgroup is only cyclic when $n$ is $2$, $4$,
     $p^k$, or $2p^k$ where $p$ is an odd prime and $k$ is a positive
     integer.
+
+
+*******************************************************************************
+
+    Elliptic curve method of factorization
+
+*******************************************************************************
+
+typedef struct n_ecm_s {
+
+    mp_limb_t x, z;        /* the coordinates */
+    mp_limb_t a24;         /* value (a + 2)/4 */
+    mp_limb_t ninv;        /* precomputed invcerse of n*/
+    mp_limb_t normbits;    /* normalization bits */
+    mp_limb_t one;         /* UWORD(1) << normbits */
+
+    unsigned char *GCD_table; /* checks whether baby step int is
+                                 coprime to Primorial or not */
+
+    unsigned char **prime_table;  /* checks whether [i][j] is prime */
+
+}
+
+void fmpz_factor_ecm_clear(ecm_t ecm_inf)
+
+    Clears the ecm struct
+
+void n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, 
+                         mp_limb_t n, n_ecm_t n_ecm_inf);
+
+    Sets the point [x :: z] to two times [x0 :: z0] according to the formula
+
+        x = (x0 + z0)^2 * (x0 - z0)^2 mod n
+        z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) mod n
+
+    This group doubling is valid only for points expressed in MONTGOMERY 
+    PROJECTIVE coordinates.
+
+void n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1,
+                      mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0, 
+                      mp_limb_t n, n_ecm_t n_ecm_inf)
+
+    Sets the point [x :: z] to the sum of [x1 :: z1] and [x2 :: z2], given the
+    difference [x0 :: z0] according to the formula
+
+        x = 4 * z0 * (x1 * x2 - z1 * z2)^2 mod n
+        z = 4 * x0 * (x2 * z1 - x1 * z2)^2 mod n
+
+    This group addition is valid only for points expressed in MONTGOMERY 
+    PROJECTIVE coordinates.
+
+void n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0,
+                                        mp_limb_t z0, mp_limb_t k, mp_limb_t n, 
+                                        n_ecm_t n_ecm_inf)
+
+    Montgomery ladder algorithm for scalar multiplication of elliptic points. 
+
+    Sets the point [x :: z] to k[x0 :: z0] (mod n).
+
+    Valid only for points expressed in MONTGOMERY PROJECTIVE coordinates.
+
+int n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n,
+                              n_ecm_t n_ecm_inf)
+
+    Selects a random elliptic curve given a random integer sigma, according to 
+    Suyama's parameterization. If in case factor is found while selecting the 
+    curve, 1 is returned. In case curve found is not suitable, 0 is returned.
+
+    Also selects the initial point x0, and the value of a24 (a + 2)/4, where a 
+    is a curve parameter. Sets z0 as 1 (shifted left by n_ecm_inf->normbits).
+    All these are stored in the ecm struct.
+
+    The curve selected is of montgomery form, the points selected satisfy the
+    curve and are projective coordinates.
+
+int n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
+                         mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
+
+    Stage I implementation of the ECM algorithm.
+    
+    f is set as the factor if found. 
+    num is number of prime numbers <= the bound B1.
+    prime_array is an array of first B1 primes.
+    n is the number being factored.
+
+    If the factor is found, one is returned, otherwise 0.
+
+int n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
+                          mp_limb_t n, n_ecm_t n_ecm_inf)
+
+    Stage II implementation of the ECM algorithm.
+
+    f is set as the factor if found. 
+    B1, B2 are the two bounds.
+    P is the primorial (approximately equal to B2^0.5).
+    n is the number being factored.
+
+    If the factor is found, one is returned, otherwise 0.
+
+
+int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, 
+                 flint_rand_t state, mp_limb_t n)
+
+    Outer wrapper function for the ECM algorithm. Calls stage I and II, and
+    the precomputations (builds prime_array for stage I, GCD_table and
+    prime_table for stage II).
+
+    f is set as the factor if found.
+    curves is the number of random curves being tried.
+    B1, B2 are the two bounds or stage I and stage II.
+    n is the number being factored.
+
+    If a factor is found in stage I, 1 is returned. 
+    If a factor is found in stage II, 2 is returned. 
+    If a factor is found while selecting the curve, -1 is returned. 
+    Otherwise 0 is returned.

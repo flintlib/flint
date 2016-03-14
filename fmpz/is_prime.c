@@ -34,6 +34,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "aprcl.h"
 
 int fmpz_is_prime(const fmpz_t n)
 {
@@ -238,11 +239,9 @@ int fmpz_is_prime(const fmpz_t n)
                                  res = 0;
 
                               fmpz_clear(r);
-                           } else
+                           } else /* apr-cl primality test */
                            {
-                              res = -1; /* we failed to prove anything prime */
-                           
-                              /* future home of APR-CL test */
+                              res = is_prime_aprcl(n);
                            }
 
                            fmpz_clear(d);

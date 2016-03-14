@@ -41,7 +41,8 @@ nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
     nmod_poly_fit_length(res, poly1->length);
 
     _nmod_vec_scalar_mul_nmod(res->coeffs, poly1->coeffs, poly1->length,
-                         c, poly1->mod);
+                              c, poly1->mod);
+
 
     res->length = poly1->length;
     _nmod_poly_normalise(res);  /* there may have been cancellation */

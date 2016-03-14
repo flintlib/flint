@@ -179,6 +179,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
                b2 = b3;
 
             bound = n <= bb ? (slong) ceil(n*b1) : (slong) ceil(n*b2);
+            bound = bound + 1;
             
             fmpz_clear(b);
         }

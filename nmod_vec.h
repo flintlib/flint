@@ -256,9 +256,11 @@ FLINT_DLL void _nmod_vec_neg(mp_ptr res, mp_srcptr vec,
 FLINT_DLL void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
                             slong len, mp_limb_t c, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
+FLINT_DLL void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
                             slong len, mp_limb_t c, nmod_t mod);
 
+FLINT_DLL void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
+                            slong len, mp_limb_t c, nmod_t mod);
 
 FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 

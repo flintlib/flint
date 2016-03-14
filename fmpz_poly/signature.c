@@ -45,7 +45,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
     
     w = _fmpz_vec_init(2 * len + 2);
     A = w;
-	B = w + len;
+    B = w + len;
     lenA = len;
     lenB = lenA - 1;
     f = w + 2 * len - 1;
@@ -129,6 +129,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
                 _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, f);
                 fmpz_pow_ui(f, h, delta - 1);
                 fmpz_pow_ui(g, A + (lenA - 1), delta);
+                fmpz_abs(g, g);
                 fmpz_divexact(h, g, f);
                 fmpz_abs(g, A + (lenA - 1));
             }

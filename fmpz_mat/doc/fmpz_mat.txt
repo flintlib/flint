@@ -767,10 +767,10 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
 *******************************************************************************
 
-void _fmpz_mat_minpoly_modular(fmpz * cp, const fmpz_mat_t mat)
+slong _fmpz_mat_minpoly_modular(fmpz * cp, const fmpz_mat_t mat)
 
     Sets \code{(cp, n+1)} to the modular polynomial of 
-    an $n \times n$ square matrix.
+    an $n \times n$ square matrix and returns its length.
 
 void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
@@ -778,7 +778,7 @@ void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
     Uses a modular method based on an average time $O~(n^3)$, worst case
     $O(n^4)$ method over $\mathbb{Z}/n\mathbb{Z}$.
 
-void _fmpz_mat_minpoly(fmpz * cp, const fmpz_mat_t mat)
+slong _fmpz_mat_minpoly(fmpz * cp, const fmpz_mat_t mat)
 
     Sets \code{cp} to the minimal polynomial of an $n \times n$ square
     matrix and returns its length.

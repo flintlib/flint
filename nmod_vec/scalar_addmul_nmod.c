@@ -35,7 +35,7 @@ void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
     if (mod.norm >= FLINT_BITS/2) /* addmul will fit in a limb */
     {
         mpn_addmul_1(res, vec, len, c);
-	    _nmod_vec_reduce(res, res, len, mod);
+        _nmod_vec_reduce(res, res, len, mod);
     }
     else /* products may take two limbs */
     {

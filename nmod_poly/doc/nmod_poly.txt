@@ -1983,7 +1983,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
 
     Assumes that \code{len1 >= len2 > 0}.
 
-    Asumes that the modulus is prime.
+    Assumes that the modulus is prime.
 
 mp_limb_t
 nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
@@ -2037,7 +2037,7 @@ _nmod_poly_resultant_hgcd(mp_srcptr poly1, slong len1,
 
     Assumes that \code{len1 >= len2 > 0}.
 
-    Asumes that the modulus is prime.
+    Assumes that the modulus is prime.
 
 mp_limb_t
 nmod_poly_resultant_hgcd(const nmod_poly_t f, const nmod_poly_t g)
@@ -2062,7 +2062,7 @@ _nmod_poly_resultant(mp_srcptr poly1, slong len1,
 
     Assumes that \code{len1 >= len2 > 0}.
 
-    Asumes that the modulus is prime.
+    Assumes that the modulus is prime.
 
 mp_limb_t
 nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)

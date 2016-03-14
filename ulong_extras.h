@@ -81,6 +81,8 @@ typedef struct {
 #define UWORD_MAX_PRIME UWORD(4294967291)
 #endif
 
+#define UWORD_HALF (UWORD_MAX / 2 + 1)
+
 typedef struct
 {
     slong small_i;
@@ -411,6 +413,15 @@ FLINT_DLL void n_factor(n_factor_t * factors, ulong n, int proved);
 
 FLINT_DLL ulong n_factor_pp1(ulong n, ulong B1, ulong c);
 
+FLINT_DLL int n_factor_pollard_brent_single(ulong *factor, ulong n, 
+                                            ulong ninv, ulong ai, 
+                                            ulong xi, ulong normbits,
+                                            ulong max_iters);
+
+FLINT_DLL int n_factor_pollard_brent(ulong *factor, flint_rand_t state, 
+                                     ulong n_in, ulong max_tries, 
+                                     ulong max_iters);
+
 FLINT_DLL int n_is_squarefree(ulong n);
 
 FLINT_DLL int n_moebius_mu(ulong n);
@@ -438,6 +449,74 @@ FLINT_DLL ulong n_root_estimate(double a, int n);
 FLINT_DLL ulong n_rootrem(ulong* remainder, ulong n, ulong root);
 
 FLINT_DLL ulong n_root(ulong n, ulong root);
+
+/***** ECM functions *********************************************************/
+
+typedef struct n_ecm_s {
+
+    ulong x, z;        /* the coordinates */
+    ulong a24;         /* value (a + 2)/4 */
+    ulong ninv;
+    ulong normbits;
+    ulong one;
+
+    unsigned char *GCD_table; /* checks whether baby step int is
+                           coprime to Primorial or not */
+
+    unsigned char **prime_table;
+
+} n_ecm_s;
+
+typedef n_ecm_s n_ecm_t[1];
+
+FLINT_DLL void n_factor_ecm_double(ulong *x, ulong *z, ulong x0,
+                                   ulong z0, ulong n, n_ecm_t n_ecm_inf);
+
+FLINT_DLL void n_factor_ecm_add(ulong *x, ulong *z, ulong x1,
+                                ulong z1, ulong x2, ulong z2, 
+                                ulong x0, ulong z0, ulong n, 
+                                n_ecm_t n_ecm_inf);
+
+FLINT_DLL void n_factor_ecm_mul_montgomery_ladder(ulong *x, ulong *z,
+                                                  ulong x0, ulong z0,
+                                                  ulong k, ulong n, 
+                                                  n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm_select_curve(ulong *f, ulong sig, ulong n,
+                                        n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm_stage_I(ulong *f, const ulong *prime_array,
+                                   ulong num, ulong B1, ulong n,
+                                   n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm_stage_II(ulong *f, ulong B1, ulong B2,
+                                    ulong P, ulong n, n_ecm_t n_ecm_inf);
+
+FLINT_DLL int n_factor_ecm(ulong *f, ulong curves, ulong B1,
+                           ulong B2, flint_rand_t state, ulong n);
+
+FLINT_DLL mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
+
+static __inline__
+mp_limb_t
+n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+{
+   mp_limb_t q, r, p_hi, p_lo;
+
+   umul_ppmm(p_hi, p_lo, w_precomp, t);
+   q = p_hi;
+
+   
+   r = w * t;
+   r -= q * p;
+
+   if (r >= p)
+   {
+      r -= p;
+   }
+
+    return r;
+}
 
 #ifdef __cplusplus
 }
